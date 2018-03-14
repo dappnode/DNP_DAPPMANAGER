@@ -3,7 +3,7 @@ version: '3.4'
 services:
   dnp_installer:
     build: ./build
-    image: dnp_installer:dev
+    image: dnp_installer
     container_name: dnp_installer
     privileged: true
     environment:
