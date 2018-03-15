@@ -2,7 +2,7 @@
 const ipfsAPI = require('ipfs-api');
 const fs = require('fs');
 const shell = require('shelljs');
-const IPFS = process.env.IPFS_REDIRECT || "my.ipfs.repo.dappnode.eth";
+const IPFS = process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth";
 const ipfs = ipfsAPI(IPFS, '5001', {protocol: 'http'});
 const express = require("express");
 const bodyParser = require("body-parser");
