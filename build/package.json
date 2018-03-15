@@ -1,5 +1,5 @@
 {
-  "name": "dps_app_installer",
+  "name": "dappnode_package_installer",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
