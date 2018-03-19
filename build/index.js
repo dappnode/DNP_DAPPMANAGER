@@ -8,7 +8,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const validator = require('validator');
-const ens = require('./ens');
+const apm = require('./apm');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -45,7 +45,7 @@ async function install(req) {
     }
 
     if (validator.isFQDN(aps_name)) {
-        aps_latest_hash = await ens.getContent(aps_name+".eth");
+        aps_latest_hash = await apm.getRepoHash(aps_name);
     } else {
         console.error("No valid APS");
         return;
@@ -120,7 +120,7 @@ function resolveDependencies(dependencies) {
                 console.log(dep + " -> " + dependencies[dep]);
                 var hash;
                 try {
-                    hash = await ens.getContent(dep + ".eth");
+                    hash = await apm.getRepoHash(dep);
                     if (hash === "0x0000000000000000000000000000000000000000") {
                         hash = dependencies[dep];
                     }
@@ -192,7 +192,7 @@ function runImage(manifest) {
 
         shell.exec('docker rm -f $(docker ps -f name=dnp-' + manifest.name+' -q) >/dev/null 2>&1')
 
-        shell.exec('docker run -d --restart always --network=dappnode_network --dns=10.17.0.2 ' + opts + ' --name dnp-' + manifest.name + ' ' + manifest.image.name + ":" + manifest.image.version, { async: true });
+        shell.exec('docker run -d --restart always --network=dappnode_network  --dns=10.17.0.2 ' + opts + ' --name dnp-' + manifest.name + ' ' + manifest.image.name + ":" + manifest.image.version, { async: true });
         console.log("Image started");
         resolve("OK");
     });
