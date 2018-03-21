@@ -4,7 +4,7 @@ RUN apk add --no-cache git python build-base bind-tools docker
 
 WORKDIR /usr/src/app
 
-ADD ens.js .
+ADD apm.js .
 ADD index.js .
 ADD package-lock.json .
 ADD package.json . 
