@@ -1,6 +1,7 @@
-var Web3 = require('web3');
+const Web3 = require('web3');
+const semver = require('semver')
 
-const WEB3HOSTWS = process.env.WEB3HOSTWS  || "ws://my.ethchain.dnp.dappnode.eth:8546";
+const WEB3HOSTWS = process.env.WEB3HOSTWS || "ws://my.ethchain.dnp.dappnode.eth:8546";
 var web3 = new Web3(WEB3HOSTWS);
 
 
@@ -27,26 +28,68 @@ function namehash(name) {
     return node.toString();
 }
 
-async function getRepo(reponame) {
 
+async function getRepoContract(reponame) {
     const ens = new web3.eth.Contract(ensAbi, ensAddr);
     const resolverAddress = await ens.methods.resolver(namehash(reponame)).call();
+
+    if (resolverAddress == "0x0000000000000000000000000000000000000000")
+        return ""
 
     const resolver = new web3.eth.Contract(publicResolverAbi, resolverAddress);
 
     const repoAddr = await resolver.methods.addr(namehash(reponame)).call();
-    const repo = new web3.eth.Contract(repoAbi, repoAddr);
+    return repo = new web3.eth.Contract(repoAbi, repoAddr);
+}
 
-    const latest = await repo.methods.getLatest().call();
-    return latest;
+async function getRepo(reponame) {
+
+    var repo = await getRepoContract(reponame)
+    if(repo != "")
+        return await repo.methods.getLatest().call();
+    return repo;
 }
 
 async function getRepoHash(reponame) {
     var repoInfo = await getRepo(reponame);
+    if (repoInfo == "")
+        return ""
+    console.log(repoInfo)
     return web3.utils.hexToAscii(repoInfo.contentURI);
 }
 
+async function getRepoVersionHash(reponame) {
+    var repoInfo = await getRepo(reponame);
+    if (repoInfo == "")
+        return ""
+    return web3.utils.hexToAscii(repoInfo.contentURI);
+}
+
+async function getBySemanticVersion(reponame, version) {
+
+    var repo = await getRepoContract(reponame)
+
+    const latest = await repo.methods.getBySemanticVersion(version).call().then(function (result) {
+        return web3.utils.hexToAscii(result.contentURI);
+    }).catch((err) => {
+        if (err.message == "Couldn't decode uint16 from ABI: 0x") {
+            return "NOT_VALID_VERSION";
+        } else {
+            throw err;
+        }
+    });;
+    return latest;
+}
 
 exports.getRepoHash = async (name) => {
+    var package = name.split("@");
+    if (package.length > 1)
+        return getRepoVersionHash(package[0], package[1])
     return getRepoHash(name);
+}
+
+exports.getRepoVersionHash = async (name, version) => {
+    var cleanSemver = semver.clean(version);
+    var aVersion = cleanSemver.split(".");
+    return getBySemanticVersion(name, aVersion);
 }
