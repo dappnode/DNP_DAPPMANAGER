@@ -181,9 +181,28 @@ function generateDockerCompose(dpn_manifest) {
 
             dockerCompose.volumes = external_volumes;
         }
+        /*
+        html:
+            external:
+                name: dnpnginxproxy_html
+        vhost.d:
+            external:
+                name: dnpnginxproxy_vhost.d
+        */
+        dpn_manifest.image.external_vol = external_vol;
+        if(dpn_manifest.image.external_vol) {
+            dockerCompose.services[name].volumes = dpn_manifest.image.external_vol
+            dpn_manifest.image.external_vol.forEach((vol) => {
+                var name = vol.split(":")[0];
+                var external = {name};
+                dockerCompose[name] = {external};
+            });
+        }
+
         if(dpn_manifest.image.ports){
             dockerCompose.services[name].ports = dpn_manifest.image.ports
         }
+
         // label handling
         if(dpn_manifest.image.labels){
             dockerCompose.services[name].labels = dpn_manifest.image.labels
