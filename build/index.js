@@ -168,25 +168,31 @@ function generateDockerCompose(dpn_manifest) {
         dockerCompose.services[name].image = dpn_manifest.image.name + ":" + dpn_manifest.image.version
         dockerCompose.services[name].container_name = "DAppNodePackage-" + name
         if(dpn_manifest.image.volumes){
+            var external_volumes = {};
             dockerCompose.services[name].volumes = dpn_manifest.image.volumes
+            
+            //suport for external volumes. it detects external volumes and add
+            //a entry for that purpouse
+            dpn_manifest.image.volumes.forEach((vol) => {
+                if(!vol.startsWith('/') && !vol.startsWith('~')){
+                    external_volumes[vol.split(":")[0]] = {};
+                }
+            });
+
+            dockerCompose.volumes = external_volumes;
         }
         if(dpn_manifest.image.ports){
             dockerCompose.services[name].ports = dpn_manifest.image.ports
+        }
+        // label handling
+        if(dpn_manifest.image.labels){
+            dockerCompose.services[name].labels = dpn_manifest.image.labels
         }
         dockerCompose.services[name].networks = ["dncore_network"];
         dockerCompose.services[name].dns = '10.17.0.2';
         dockerCompose.networks = {}
         dockerCompose.networks.dncore_network = {}
         dockerCompose.networks.dncore_network.external = true
-
-        if (dpn_manifest.image.volumes) {
-            dpn_manifest.image.volumes.forEach(function(value, index, _arr) {
-                if (!value.startsWith("/") && !value.startsWith(".")) {
-                    dockerCompose.volumes = {};
-                    dockerCompose.volumes[value.split(":")[0]] = {}
-                }
-            });
-        }
 
         try {
             await writeFileToRepo(dpn_manifest, "docker-compose.yml", yaml.stringify(dockerCompose, 4))
@@ -216,15 +222,6 @@ function resolveDependencies(dependencies) {
             if (dependencies.hasOwnProperty(dep)) {
                 console.log(dep + " -> " + dependencies[dep]);
                 var dep_hash;
-                if (dep == "b") {
-                    dep_hash = "QmWkGBvkmgmjqArLZWB3YqhAVXkZLG8wYCCNgmZ39Cf586";
-                } else if (dep == "c") {
-                    dep_hash = "QmPciYJVEuV2rhk299fPqzodVgpx99MbanxMQ8g5W2ktyY";
-                } else if (dep == "d") {
-                    dep_hash = "QmWM5EPUEdjibRGp3w35isrcExfWeXd71xrP22ycQwmbTd";
-                } else {
-                    dep_hash = await get_dnp_hash(dep);
-                }
                 try {
                     await install([dep_hash, true]);
                 } catch (err) {
