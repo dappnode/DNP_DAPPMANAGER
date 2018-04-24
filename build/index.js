@@ -189,7 +189,6 @@ function generateDockerCompose(dpn_manifest) {
             external:
                 name: dnpnginxproxy_vhost.d
         */
-        dpn_manifest.image.external_vol = external_vol;
         if(dpn_manifest.image.external_vol) {
             dockerCompose.services[name].volumes = dpn_manifest.image.external_vol
             dpn_manifest.image.external_vol.forEach((vol) => {
