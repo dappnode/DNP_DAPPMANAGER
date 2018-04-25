@@ -211,6 +211,10 @@ function generateDockerCompose(dpn_manifest) {
         if(dpn_manifest.image.labels){
             dockerCompose.services[name].labels = dpn_manifest.image.labels
         }
+        // Support for environment variables
+        if(dpn_manifest.image.environment){
+            dockerCompose.services[name].environment = dpn_manifest.image.environment
+        }
         dockerCompose.services[name].networks = ["dncore_network"];
         dockerCompose.services[name].dns = '10.17.0.2';
         dockerCompose.networks = {}
