@@ -239,7 +239,7 @@ function resolveDependencies(dependencies) {
         for (var dep in dependencies) {
             if (dependencies.hasOwnProperty(dep)) {
                 console.log(dep + " -> " + dependencies[dep]);
-                var dep_hash;
+                var dep_hash = await get_dnp_hash(dep);	
                 try {
                     await install([dep_hash, true]);
                 } catch (err) {
