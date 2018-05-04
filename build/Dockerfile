@@ -4,13 +4,14 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 
 WORKDIR /usr/src/app
 
+ADD package-lock.json .
+ADD package.json .
+ADD entrypoint.sh .
 ADD apm.js .
 ADD index.js .
-ADD package-lock.json .
-ADD package.json . 
-ADD entrypoint.sh .
 
 RUN npm install
+RUN npm install nodemon --save
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
@@ -38,6 +39,9 @@ RUN set -x && \
 
 RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
+
+# Copy files and do things that can change
+
 
 WORKDIR /usr/src/app
 
