@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "autobahn": "^18.3.1",
+    "create-error": "^0.3.1",
+    "docker-remote-api": "^5.0.0",
     "ethereum-ens": "^0.7.3",
     "express": "^4.16.2",
     "http-proxy": "^1.16.2",
