@@ -141,23 +141,33 @@ async function installPackage(req) {
 
 async function removePackage(req) {
 
-    let packageName = req[0]
-    let runningPackagesInfo = await dockerCalls.runningPackagesInfo()
-    let packageID = runningPackagesInfo[packageName].id
+    let id = req[0]
+    let containers = await dockerCalls.listContainers()
+    let container = containers.find( container => container.id == id );
 
-    await dockerCalls.deleteContainer(packageID)
+    if (container) {
 
-    return JSON.stringify({
-        success: true,
-        message: "Removed package: " + packageName
-    })
+      console.log('Removing package: '+container.name+' is status: '+container.state)
+      await dockerCalls.deleteContainer(container.id)
 
+      return JSON.stringify({
+          success: true,
+          message: 'Removed package: '+container.name+' is status: '+container.state
+      })
+
+    } else {
+
+      return JSON.stringify({
+          success: true,
+          message: 'No package found with ID: '+id
+      })
+    }
 }
 
 
 async function listPackages(req) {
 
-    let dnpList = await dockerCalls.listPackages()
+    let dnpList = await dockerCalls.listContainers()
     // Return
     return JSON.stringify({
         success: true,

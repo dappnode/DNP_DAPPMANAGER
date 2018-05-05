@@ -14,18 +14,18 @@ const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
 // Documentation of docker-remote-api possible calls
 // https://docs.docker.com/engine/api/v1.24/#31-containers
 
-async function listPackages() {
-    let installedDNP = await getListOfInstalledDNP()
-    let runningDNP = await runningPackagesInfo()
+async function listContainers() {
 
-    let dnpList = installedDNP.map(dnp => {
-      dnp.running = dnp.name in runningDNP
-      dnp.id = dnp.name
-      if (dnp.running) dnp.ports = runningDNP[dnp.name].ports
-      return dnp
+  return new Promise(function(resolve, reject) {
+    request.get('/containers/json?all=true', { json:true }, function(err, containers) {
+      if (err) console.log(err)
+      resolve(containers
+        .map(format)
+        .filter(container => container.isDNP)
+      )
     })
+  })
 
-    return dnpList;
 }
 
 function runningPackagesInfo() {
@@ -85,8 +85,9 @@ function format(c) {
       created: new Date(1000*c.Created),
       image: c.Image,
       name: name,
+      version: c.Labels[params.DNP_VERSION_TAG],
       ports: mapPorts(c.Ports),
-      status: c.Status,
+      state: c.State,
       running: !/^Exited /i.test(c.Status)
     }
   }
@@ -130,7 +131,7 @@ function dockerComposeUp(dockerComposePath) {
 
     shell.exec(command, { silent: true }, function(code, stdout, stderr) {
       if (code !== 0) {
-        return Error(stderr)
+        return reject(Error(stderr))
       } else {
         return resolve(stdout)
       }
@@ -141,7 +142,7 @@ function dockerComposeUp(dockerComposePath) {
 
 
 module.exports = {
-  listPackages,
+  listContainers,
   runningPackagesInfo,
   deleteContainer,
   loadImage,

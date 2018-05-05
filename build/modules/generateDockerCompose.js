@@ -19,6 +19,8 @@ function generateDockerCompose(dpn_manifest) {
     dockerCompose.services[name] = {}
     dockerCompose.services[name].image = dpn_manifest.image.name + ":" + dpn_manifest.image.version
     dockerCompose.services[name].container_name = CONTAINER_NAME_PREFIX + name
+    dockerCompose.services[name].labels = [params.DNP_VERSION_TAG+"="+dpn_manifest.version]
+
     if(dpn_manifest.image.volumes){
         var external_volumes = {};
         dockerCompose.services[name].volumes = dpn_manifest.image.volumes
@@ -61,8 +63,12 @@ function generateDockerCompose(dpn_manifest) {
 
     // label handling
     if(dpn_manifest.image.labels){
-        dockerCompose.services[name].labels = dpn_manifest.image.labels
+      dpn_manifest.image.labels.forEach(function(label){
+        dockerCompose.services[name].labels.push(label)
+      })
+      console.log(dockerCompose.services[name].labels)
     }
+
     // Support for environment variables
     if(dpn_manifest.image.environment){
         dockerCompose.services[name].environment = dpn_manifest.image.environment
