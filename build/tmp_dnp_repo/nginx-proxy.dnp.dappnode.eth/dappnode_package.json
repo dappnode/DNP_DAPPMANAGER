@@ -1,0 +1,28 @@
+{
+  "name": "nginx-proxy.dnp.dappnode.eth",
+  "version": "0.0.1",
+  "description": "jwilder/nginx-proxy version for DAppNode",
+  "image": {
+    "path": "nginx-proxy.dnp.dappnode.eth_0.0.1.tar.xz",
+    "hash": "QmQ5wkmhjJLhTPuZugSffjEdfyYYDhh5ZcB8WBTdBt9Jx3",
+    "size": 13696900,
+    "ports": [
+      "80:80",
+      "443:443"
+    ],
+    "volumes": [
+      "~/certs:/etc/nginx/certs:ro",
+      "vhost.d:/etc/nginx/vhost.d",
+      "html:/usr/share/nginx/html",
+      "/var/run/docker.sock:/tmp/docker.sock:ro"
+    ],
+    "labels": [
+      "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
+    ],
+    "name": "nginx-proxy.dnp.dappnode.eth",
+    "version": "0.0.1"
+  },
+  "author": "Eduardo Antuña (eduadiez)",
+  "license": "MIT",
+  "dependencies": {}
+}

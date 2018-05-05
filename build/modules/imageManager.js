@@ -33,6 +33,11 @@ async function download(packageName) {
   let dnpManifest = await getManifest(packageName)
   let path = getPaths (dnpManifest)
 
+  // Create de Global repo dir
+  if (!fs.existsSync(REPO_DIR)) {
+      fs.mkdirSync(REPO_DIR)
+  }
+
   // Create de repo dir
   if (!fs.existsSync(path.PACKAGE_REPO_DIR)) {
       fs.mkdirSync(path.PACKAGE_REPO_DIR)
@@ -44,9 +49,7 @@ async function download(packageName) {
   }
 
   // Write docker-compose
-  if (!fs.existsSync(path.DOCKERCOMPOSE)) {
-      await writeDockerCompose(dnpManifest, path.DOCKERCOMPOSE)
-  }
+  await writeDockerCompose(dnpManifest, path.DOCKERCOMPOSE)
 
   // Write image
   if (!fs.existsSync(path.IMAGE)) {
