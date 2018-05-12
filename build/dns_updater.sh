@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "server 10.17.0.2" > /tmp/nsupdate.txt
+echo "server 172.33.1.2" > /tmp/nsupdate.txt
 echo "debug yes" >> /tmp/nsupdate.txt
 echo "zone eth." >> /tmp/nsupdate.txt
 for container in $(docker inspect -f '{{.Name}};{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q -f "name=DAppNodePackage-"))
