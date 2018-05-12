@@ -1,324 +1,365 @@
-'use strict';
-const ipfsAPI = require('ipfs-api');
-const fs = require('fs');
-const shell = require('shelljs');
-const IPFS = process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth";
-const ipfs = ipfsAPI(IPFS, '5001', { protocol: 'http' });
-const validator = require('validator');
-const apm = require('./apm');
-const autobahn = require('autobahn');
-const yaml = require('yamljs');
+'use strict'
+// node modules
+const autobahn = require('autobahn')
+const fs = require('fs')
 
-var connection = new autobahn.Connection({ url: 'ws://my.wamp.dnp.dappnode.eth:8080/ws', realm: 'realm1' });
-var session;
+// dedicated modules
+const params = require('./params')
+const emitter = require('./modules/emitter')
+const dockerCalls = require('./modules/calls/dockerCalls')
+const { Docker_Compose } = require('./modules/calls/dockerCalls')
+const dependenciesTools = require('./modules/tools/dependenciesTools')
+const PackageInstaller = require('./modules/PackageInstaller')
+const directoryCalls = require('./modules/calls/directoryCalls')
+const getManifest = require('./modules/getManifest')
+const apm = require('./modules/calls/apm')
 
-const TMP_REPO_DIR = "./tmp_dnp_repo/";
-const REPO_DIR = "./dnp_repo/";
+const docker_compose = new Docker_Compose()
 
-connection.onopen = function(_session) {
-    session = _session;
-    session.register('installPackage.installer.dnp.dappnode.eth', installPackage);
-};
+// Define paths
+const REPO_DIR = params.REPO_DIR
+const DAPPNODE_PACKAGE_NAME = params.DAPPNODE_PACKAGE_NAME
+const DOCKERCOMPOSE_NAME = params.DOCKERCOMPOSE_NAME
 
-connection.open();
+const autobahnTag = params.autobahnTag
+const autobahnUrl = params.autobahnUrl
+const autobahnRealm = params.autobahnRealm
+const connection = new autobahn.Connection({ url: autobahnUrl, realm: autobahnRealm })
 
-//install(["QmWhzrpqcrR5N4xB6nR5iX9q3TyN5LUMxBLHdMedquR8nr"]);
-//getDNPInstalled();
-/*
-async function getDNPInstalled() {
-    var list = shell.find('./repo/').filter(function(file) { return file.match(/dappnode_package\.json$/); });
-    var dnp_index = [];
-    list.forEach(function(value, index, _arr) {
-        console.log(index + ": " + value);
-        var dpn = JSON.parse(fs.readFileSync(value, 'utf8'));
-        var dpn_info = {};
-        dpn_info.name = dpn.name;
-        dpn_info.version = dpn.version;
-        dnp_index.push(dpn_info);
+connection.onopen = function(session, details) {
 
+    console.log("CONNECTED to DAppnode's WAMP "+
+      "\n   url "+autobahnUrl+
+      "\n   realm: "+autobahnRealm+
+      "\n   session ID: "+details.authid)
+
+    register(session, 'installPackage.installer.dnp.dappnode.eth',   installPackage)
+    register(session, 'removePackage.installer.dnp.dappnode.eth',    removePackage)
+    register(session, 'togglePackage.installer.dnp.dappnode.eth',    togglePackage)
+    register(session, 'logPackage.installer.dnp.dappnode.eth',       logPackage)
+    register(session, 'listPackages.installer.repo.dappnode.eth' ,   listPackages)
+    register(session, 'listDirectory.installer.repo.dappnode.eth',   listDirectory)
+    register(session, 'fetchPackageInfo.installer.dnp.dappnode.eth', fetchPackageInfo)
+
+
+    // ###### FOR DEVELOPMENT - simulating an install call
+    // ###### FOR DEVELOPMENT - simulating an install call
+
+    setTimeout(function(){
+      let link = 'otpweb.dnp.dappnode.eth'
+      session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
+      // session.call('listDirectory.installer.repo.dappnode.eth', [link])
+    }, 3000)
+
+    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
+    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
+
+    emitter.on('log', (log) => {
+      log.topic = log.topic || 'general'
+      log.type = log.type || 'default'
+      log.msg = String(log.msg) || ''
+      console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
+      session.publish(autobahnTag.installerLog, [log])
     })
-    return (dnp_index)
+
 }
-*/
+
+connection.open()
+
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////
+// Connection helper functions
+
+
+function register(session, event, handler) {
+
+  const SUCCESS_MESSAGE = '---------------------- \n procedure registered'
+  const ERROR_MESSAGE = '------------------------------ \n failed to register procedure '
+
+  return session.register(event, wrapErrors(handler)).then(
+    function (reg) { console.log(SUCCESS_MESSAGE) },
+    function (err) { console.log(ERROR_MESSAGE, err) }
+  )
+}
+
+
+function wrapErrors(handler) {
+
+  return async function () {
+    try {
+        return await handler(arguments[0])
+    } catch (err) {
+
+      console.log(err)
+      return JSON.stringify({
+          success: false,
+          message: err.message
+      })
+
+    }
+  }
+}
+
+
+///////////////////////////////
+// Main functions
+
+async function writeEnvs(packageReq, envs) {
+  let dnpManifest = await getManifest(packageReq.req)
+  let path = getPaths (dnpManifest)
+  let PACKAGE_REPO_DIR = REPO_DIR + dnpManifest.name
+}
+
 
 async function installPackage(req) {
-    try {
-        await install(req);
-    } catch (err) {
-        return JSON.stringify({
-            result: "ERR",
-            resultStr: err.message
-        });
-    }
+
+  let packageReq = parsePackageReq(req[0])
+  let envs = JSON.parse(req[1])
+
+  // If requested package is already running, throw error
+  if (await packageIsAlreadyRunning(packageReq.name)) {
     return JSON.stringify({
-        result: "OK",
-        resultStr: "req[0]"
-    });
-}
+        success: false,
+        message: "Package already running"
+    })
+  }
 
-function install(req) {
-    return new Promise(async function(resolve, reject) {
+  // Write envs
+  await writeEnvs(packageReq.name, envs)
 
-        console.log('installPackage.installer.dnp.dappnode.eth called: ' + JSON.stringify(req))
+  // Get complete list of packages = requested + dependencies
+  let packagesToInstall = await dependenciesTools.getAllResolved(packageReq.req)
+  packagesToInstall.forEach((dep) => {
+    emitter.emit('log', {
+      topic: dep,
+      msg: "is a dependency"
+    })
+  })
+  packagesToInstall.push(packageReq.req)
+  console.log('##### OG INSTALL LIST')
+  console.log(packagesToInstall)
 
-        var isDep = req[1] || false;
+  // Check that there are no incompatibilities between packages
+  let packageIncompatibilities = await getPackageIncompatibilities(packagesToInstall)
+  if (packageIncompatibilities) {
+    return JSON.stringify({
+        success: false,
+        message: "Packages have incompatibilities: " + JSON.stringify(packageIncompatibilities)
+    })
+  }
 
-        try {
-            var dnpHash = await get_dnp_hash(req[0]);
-            var dpn_manifest = await getAPSManifest(dnpHash);
-
-            // Create de repo dir
-            if (!fs.existsSync(TMP_REPO_DIR + dpn_manifest.name)) {
-                shell.mkdir('-p', TMP_REPO_DIR + dpn_manifest.name);
-            }
-
-            await writeFileToRepo(dpn_manifest, 'dappnode_package.json', JSON.stringify(dpn_manifest, null, 2));
-            await resolveDependencies(dpn_manifest.dependencies);
-            await generateDockerCompose(dpn_manifest);
-            await hashToFile(dpn_manifest);
-            //if (!isDep) {
-            //    await buildRepoTree();
-            //}
-
-            await loadImage(dpn_manifest);
-            await runImage(dpn_manifest);
-
-        } catch (err) {
-            return reject(err);
-        }
-
-        resolve();
-
-
-        /*
-        console.log("Loading image...");
-        await loadImage(dpn_manifest);
-
-        console.log("Starting image...");
-        await runImage(dpn_manifest)
-
-        console.log("Installed and running!");
-        */
-    });
+  let packageInstallerPromiseArray = packagesToInstall.map(dep => {
+    let packageInstaller = new PackageInstaller(dep)
+    return packageInstaller.launch()
+  })
+  return await Promise.all(packageInstallerPromiseArray).then(packageList => {
+    return JSON.stringify({
+        success: true,
+        message: 'Completed the installation of ' + packageReq.req
+    })
+  })
 
 }
 
-function buildRepoTree() {
-    return new Promise(function(resolve, reject) {
 
-        var list = shell.find(TMP_REPO_DIR).filter(function(file) {
-            return file.match(/dappnode_package\.json$/);
-        });
+async function removePackage(req) {
 
-        var dnp_index = [];
-        list.forEach(function(value, index, _arr) {
-            console.log(index + ": " + value);
-            var dpn = JSON.parse(fs.readFileSync(value, 'utf8'));
-            var dpn_info = {};
-            dpn_info.name = dpn.name;
-            dpn_info.version = dpn.version;
-            dnp_index.push(dpn_info);
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
+    if (!fs.existsSync(dockerComposePath)) {
+      return JSON.stringify({
+          success: false,
+          message: 'No docker-compose found with at: ' + dockerComposePath
+      })
+    }
 
+    console.log('Removing package: ' + packageName)
+    await docker_compose.down(dockerComposePath)
+
+    return JSON.stringify({
+        success: true,
+        message: 'Removed package: ' + packageName
+    })
+}
+
+
+async function togglePackage(req) {
+
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
+    if (!fs.existsSync(dockerComposePath)) {
+      return JSON.stringify({
+          success: false,
+          message: 'No docker-compose found with at: ' + dockerComposePath
+      })
+    }
+
+    let id = req[0]
+    let containers = await dockerCalls.listContainers()
+    let container = containers.find( container => container.name.includes(packageName) );
+    if (!container) return JSON.stringify({
+        success: false,
+        message: 'No package found with name: ' + packageName
+    })
+    // The toggle function will:
+    // - stop the package if it's running (container.state == 'running')
+    // - run the package if it's stopped  (container.state == 'exited')
+    // - return and error if it's in any other state
+    switch (container.state) {
+
+      case 'running':
+        // stop
+        console.log('FIRING A STOP!!')
+        await docker_compose.stop(dockerComposePath)
+        console.log('FIRED A STOP')
+        return JSON.stringify({
+            success: true,
+            message: 'Package stopped'
         })
-        return (dnp_index)
-    });
+        break;
+
+      case 'exited':
+        // start
+        console.log('FIRING A START!!')
+        await docker_compose.start(dockerComposePath)
+        console.log('FIRED A START')
+        return JSON.stringify({
+            success: true,
+            message: 'Package started'
+        })
+        break;
+
+      default:
+        // unknown status
+        return JSON.stringify({
+            success: false,
+            message: 'Package: '+container.name+' has an unkown status: '+container.state
+        })
+    }
 }
 
-function get_dnp_hash(dnp_req) {
-    return new Promise(function(resolve, reject) {
-        var packageName = dnp_req.split("@")[0];
-        if (validator.isFQDN(packageName)) {
-            apm.getRepoHash(dnp_req).then((repoHash) => {
-                if (repoHash != "") {
-                    return resolve(repoHash);
-                } else {
-                    return reject(new Error("A valid hash has not been found for the repo"));
-                }
-            })
-        } else {
-            return resolve(packageName);
-        }
-    });
-}
 
-function getAPSManifest(hash) {
-    return new Promise(function(resolve, reject) {
-        console.log("Reading manifest... " + hash);
-        ipfs.files.cat(hash, function(err, file) {
-            if (err) {
-                return reject(err);
-            }
-            clearTimeout(timeoutReject);
-            ipfs.pin.add(hash);
-            return resolve(JSON.parse(file));
-        });
-        var timeoutReject = setTimeout(function() { return reject(new Error("ipfs cat timeout")) }, 15000);
-    });
-}
+async function logPackage(req) {
 
-function generateDockerCompose(dpn_manifest) {
-    return new Promise(async function(resolve, reject) {
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
 
-        var name = dpn_manifest.name.replace("/", "_").replace("@", "");
-
-        var dockerCompose = {};
-        dockerCompose.version = "3.4"
-        dockerCompose.services = {}
-        dockerCompose.services[name] = {}
-        dockerCompose.services[name].image = dpn_manifest.image.name + ":" + dpn_manifest.image.version
-        dockerCompose.services[name].container_name = "DAppNodePackage-" + name
-        if(dpn_manifest.image.volumes){
-            var external_volumes = {};
-            dockerCompose.services[name].volumes = dpn_manifest.image.volumes
-            
-            //suport for external volumes. it detects external volumes and add
-            //a entry for that purpouse
-            dpn_manifest.image.volumes.forEach((vol) => {
-                if(!vol.startsWith('/') && !vol.startsWith('~')){
-                    external_volumes[vol.split(":")[0]] = {};
-                }
-            });
-
-            dockerCompose.volumes = external_volumes;
-        }
-        /*
-        html:
-            external:
-                name: dnpnginxproxy_html
-        vhost.d:
-            external:
-                name: dnpnginxproxy_vhost.d
-        */
-        if(dpn_manifest.image.external_vol) {
-            var external_volumes = {};
-            if(!dockerCompose.services[name].volumes){
-                dockerCompose.services[name].volumes = [];
-            }
-            dpn_manifest.image.external_vol.forEach((vol) => {
-                dockerCompose.services[name].volumes.push(vol);
-                var vol_name = vol.split(":")[0];
-                var external = {"name": vol_name };
-                external_volumes[vol_name] = {external};
-                dockerCompose.volumes = external_volumes;
-            });
-        }
-
-        if(dpn_manifest.image.ports){
-            dockerCompose.services[name].ports = dpn_manifest.image.ports
-        }
-
-        // label handling
-        if(dpn_manifest.image.labels){
-            dockerCompose.services[name].labels = dpn_manifest.image.labels
-        }
-        // Support for environment variables
-        if(dpn_manifest.image.environment){
-            dockerCompose.services[name].environment = dpn_manifest.image.environment
-        }
-        dockerCompose.services[name].networks = ["dncore_network"];
-        dockerCompose.services[name].dns = '10.17.0.2';
-        dockerCompose.networks = {}
-        dockerCompose.networks.dncore_network = {}
-        dockerCompose.networks.dncore_network.external = true
-
-        try {
-            await writeFileToRepo(dpn_manifest, "docker-compose.yml", yaml.stringify(dockerCompose, 4))
-        } catch (err) {
-            return reject(err);
-        }
-        return resolve();
+    console.log('LOGGING...')
+    let logs = await docker_compose.logs(dockerComposePath)
+    console.log('LOGGED')
+    return JSON.stringify({
+        success: true,
+        message: 'Got logs of package: ' + packageName,
+        result: logs
     })
 }
 
 
-function writeFileToRepo(dpn_manifest, filename, info) {
-    return new Promise(function(resolve, reject) {
-        fs.writeFile(TMP_REPO_DIR + dpn_manifest.name + "/" + filename, info, 'utf-8', function(err) {
-            if (err) {
-                return reject(err)
-            }
-            return resolve();
-        });
+async function listPackages(req) {
+
+    let dnpList = await dockerCalls.listContainers()
+    // Return
+    return JSON.stringify({
+        success: true,
+        message: "Listing " + dnpList.length + " packages",
+        result: dnpList
     })
+
 }
 
-// TODO
-function resolveDependencies(dependencies) {
-    return new Promise(async (resolve, reject) => {
-        for (var dep in dependencies) {
-            if (dependencies.hasOwnProperty(dep)) {
-                console.log(dep + " -> " + dependencies[dep]);
-                var dep_hash = await get_dnp_hash(dep);	
-                try {
-                    await install([dep_hash, true]);
-                } catch (err) {
-                    return reject(err);
-                }
-            }
-        }
-        return resolve();
-    });
+async function fetchPackageInfo(req) {
+
+  let packageName = parsePackageReq(req[0]).name
+  let packageWithVersions = await getPackageVersions({
+    name: packageName
+  })
+
+  await getManifestOfVersions(packageName, packageWithVersions.versions)
+
+  return JSON.stringify({
+      success: true,
+      message: "Fetched " + packageName + " info",
+      result: packageWithVersions
+  })
+
 }
 
-function hashToFile(dpn_manifest) {
-    return new Promise(function(resolve, reject) {
-        console.log("Getting compress image... "+dpn_manifest.image.hash);
-        const rstream = ipfs.files.catReadableStream(dpn_manifest.image.hash);
-        var wstream = fs.createWriteStream("./tmp_dnp_repo/" + dpn_manifest.name + "/" + '/' + dpn_manifest.image.path);
 
-        rstream.pipe(wstream, { end: true });
-        var dataLength = 0;
-        var previusState = 0;
-        rstream
-            .on('data', function(chunk) {
-                var state = (100.0 * dataLength / dpn_manifest.image.size).toFixed(2);
-                dataLength += chunk.length;
-                if (state - 10 >= previusState) {
-                    console.log(state + "%");
-                    previusState = state;
-                }
-            })
-            .on('error', function() {  // done
-                console.log('error');
-            })
-            .on('close', function() {  // done
-                console.log('close');
-            })
-            .on('end', function() {  // done
-                console.log('Donwload complete');
-                ipfs.pin.add(dpn_manifest.image.hash);
-                resolve("Download");
-            });
-    });
+async function getManifestOfVersions(packageName, versions) {
+
+  let manifests = await Promise.all(
+    versions.map( async (version) => {
+      try {
+        version.manifest = await getManifest(packageName + '@' + version.version)
+      } catch(e) {
+        console.error(Error(e))
+        version.manifest = 'Error: '+e.message
+      }
+    })
+  )
 }
 
-function loadImage(dpn_manifest) {
-    return new Promise(function(resolve, reject) {
-        console.log("Loading docker image...");
-        console.log('docker load -i ' + "./tmp_dnp_repo/" + dpn_manifest.name + "/" + '/' + dpn_manifest.image.path);
-        shell.exec('docker load -i ' + "./tmp_dnp_repo/" + dpn_manifest.name + "/" + '/' + dpn_manifest.image.path, { silent: true }, function(code, stdout, stderr) {
-            if (code !== 0) {
-                console.log("stderr:" + stderr);
-            } else {
-                console.log("Image " + dpn_manifest.image.path + " loaded");
-                resolve("OK");
-            }
-        });
-    });
+
+async function listDirectory(req) {
+
+    let packages = await directoryCalls.getDirectory()
+
+    return JSON.stringify({
+        success: true,
+        message: "Listing " + packages.length + " packages",
+        result: packages
+    })
+
 }
 
-function runImage(dpn_manifest) {
-    return new Promise(function(resolve, reject) {
-        var docker_file = 'docker-compose -f ' + "./tmp_dnp_repo/" + dpn_manifest.name + '/docker-compose.yml' + ' up -d' ;
-        console.log(docker_file)
-        shell.exec(docker_file,
-        function(code, stdout, stderr) {
-            if (code !== 0) {
-                console.log("stderr:" + stderr);
-            } else {
-                console.log("Image started");
-                resolve("OK");
-            }
-        });
-    });
+async function getPackagesVersions(packages) {
+  return await Promise.all(packages.map(getPackageVersions))
+}
+
+async function getPackageVersions(_package) {
+  _package.versions = await apm.getRepoVersions(_package.name)
+  _package.versions.reverse()
+  return _package
+}
+
+
+///////////////////////////////
+// Helper functions
+
+
+function parsePackageReq(req) {
+
+  let packageName = req.split('@')[0]
+  let version = req.split('@')[1] || 'latest'
+
+  return {
+    name: packageName,
+    ver: version,
+    req: packageName + '@' + version
+  }
+}
+
+async function packageIsAlreadyRunning(packageName) {
+
+  let runningPackages = await dockerCalls.runningPackagesInfo()
+  return (packageName in runningPackages)
+
+}
+
+
+function getPackageIncompatibilities(packagesToInstall) {
+
+  // TODO
+  // - Verify port collision
+  // - Existance of volumes
+
 }
