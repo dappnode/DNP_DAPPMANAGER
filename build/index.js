@@ -276,7 +276,6 @@ async function listPackages(req) {
 
 }
 
-
 async function fetchPackageInfo(req) {
 
   let packageName = parsePackageReq(req[0]).name
