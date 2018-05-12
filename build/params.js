@@ -2,7 +2,7 @@ module.exports = {
 
   // Autobahn parameters
   autobahnUrl: 'ws://my.wamp.dnp.dappnode.eth:8080/ws',
-  autobahnRealm: 'realm1',
+  autobahnRealm: 'dappnode_admin',
   autobahnTag: {
     installerLog: "log.installer.repo.dappnode.eth"
   },
@@ -21,7 +21,7 @@ module.exports = {
 
   // Docker compose parameters
   DNP_VERSION_TAG: "dnp_version",
-  DNS_SERVICE: "10.17.0.2",
+  DNS_SERVICE: "172.33.1.2",
   DNP_NETWORK: "dncore_network", // production: "dncore_network"
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
 
