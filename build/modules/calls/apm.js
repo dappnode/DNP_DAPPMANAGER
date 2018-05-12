@@ -130,7 +130,7 @@ async function getSemanticVersion(repo, version) {
         } else {
             throw Error(err);
         }
-    });;
+    })
     return latest;
 }
 
@@ -160,6 +160,9 @@ async function getRepoHash(name, version) {
 async function getRepoVersions(name) {
 
     // Validate the provided name, it only accepts .eth domains
+    if (!name) {
+      throw Error('Variable name is not defined: ' + name)
+    }
     if (name.substr(name.length - 4) != '.eth') {
       throw Error('reponame is not an .eth domain: ' + name)
     }
@@ -182,7 +185,12 @@ async function getVersions(repo) {
     // and log other errors
     try {
       var res = await repo.methods.getByVersionId(i).call();
-      versions.push(res.semanticVersion.join('.'))
+      var version = res.semanticVersion
+      var hash = await getSemanticVersion(repo, version)
+      versions.push({
+        version: version.join('.'),
+        manifestHash: hash
+      })
     }
     catch(error) {
       if (String(error).includes('decode uint16 from ABI')) {

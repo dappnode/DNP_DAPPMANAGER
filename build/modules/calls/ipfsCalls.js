@@ -65,7 +65,7 @@ async function download(hash, path, log=console.log) {
 
   }
 
-  throw new IPFSError('IPFS could not download HASH: '+hash+' to PATH: '+path+' after # '+maxNumberOfAttempts+' attempts')
+  throw new IPFSError('IPFS could not download HASH: '+hash+' to PATH: '+path+' after # '+maxAttempts+' attempts')
 
 }
 
