@@ -1,18 +1,27 @@
 'use strict'
 // node modules
 const autobahn = require('autobahn')
+const fs = require('fs')
 
 // dedicated modules
 const params = require('./params')
 const emitter = require('./modules/emitter')
 const dockerCalls = require('./modules/calls/dockerCalls')
+const { Docker_Compose } = require('./modules/calls/dockerCalls')
 const dependenciesTools = require('./modules/tools/dependenciesTools')
 const PackageInstaller = require('./modules/PackageInstaller')
 const directoryCalls = require('./modules/calls/directoryCalls')
+const getManifest = require('./modules/getManifest')
 const apm = require('./modules/calls/apm')
 
-const autobahnTag = params.autobahnTag
+const docker_compose = new Docker_Compose()
 
+// Define paths
+const REPO_DIR = params.REPO_DIR
+const DAPPNODE_PACKAGE_NAME = params.DAPPNODE_PACKAGE_NAME
+const DOCKERCOMPOSE_NAME = params.DOCKERCOMPOSE_NAME
+
+const autobahnTag = params.autobahnTag
 const autobahnUrl = params.autobahnUrl
 const autobahnRealm = params.autobahnRealm
 const connection = new autobahn.Connection({ url: autobahnUrl, realm: autobahnRealm })
@@ -24,17 +33,21 @@ connection.onopen = function(session, details) {
       "\n   realm: "+autobahnRealm+
       "\n   session ID: "+details.authid)
 
-    register(session, 'installPackage.installer.dnp.dappnode.eth', installPackage)
-    register(session, 'removePackage.installer.repo.dappnode.eth', removePackage )
-    register(session, 'listPackages.installer.repo.dappnode.eth' , listPackages  )
-    register(session, 'listDirectory.installer.repo.dappnode.eth', listDirectory )
+    register(session, 'installPackage.installer.dnp.dappnode.eth',   installPackage)
+    register(session, 'removePackage.installer.dnp.dappnode.eth',    removePackage)
+    register(session, 'togglePackage.installer.dnp.dappnode.eth',    togglePackage)
+    register(session, 'logPackage.installer.dnp.dappnode.eth',       logPackage)
+    register(session, 'listPackages.installer.repo.dappnode.eth' ,   listPackages)
+    register(session, 'listDirectory.installer.repo.dappnode.eth',   listDirectory)
+    register(session, 'fetchPackageInfo.installer.dnp.dappnode.eth', fetchPackageInfo)
+
 
     // ###### FOR DEVELOPMENT - simulating an install call
     // ###### FOR DEVELOPMENT - simulating an install call
 
     setTimeout(function(){
       let link = 'otpweb.dnp.dappnode.eth'
-      // session.call('installPackage.installer.dnp.dappnode.eth', [link])
+      session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
       // session.call('listDirectory.installer.repo.dappnode.eth', [link])
     }, 3000)
 
@@ -52,6 +65,15 @@ connection.onopen = function(session, details) {
 }
 
 connection.open()
+
+
+
+
+
+
+
+
+
 
 
 ///////////////////////////////
@@ -91,10 +113,17 @@ function wrapErrors(handler) {
 ///////////////////////////////
 // Main functions
 
+async function writeEnvs(packageReq, envs) {
+  let dnpManifest = await getManifest(packageReq.req)
+  let path = getPaths (dnpManifest)
+  let PACKAGE_REPO_DIR = REPO_DIR + dnpManifest.name
+}
+
 
 async function installPackage(req) {
 
   let packageReq = parsePackageReq(req[0])
+  let envs = JSON.parse(req[1])
 
   // If requested package is already running, throw error
   if (await packageIsAlreadyRunning(packageReq.name)) {
@@ -103,6 +132,9 @@ async function installPackage(req) {
         message: "Package already running"
     })
   }
+
+  // Write envs
+  await writeEnvs(packageReq.name, envs)
 
   // Get complete list of packages = requested + dependencies
   let packagesToInstall = await dependenciesTools.getAllResolved(packageReq.req)
@@ -113,7 +145,7 @@ async function installPackage(req) {
     })
   })
   packagesToInstall.push(packageReq.req)
-  console.log('##### OG INStALL LIST')
+  console.log('##### OG INSTALL LIST')
   console.log(packagesToInstall)
 
   // Check that there are no incompatibilities between packages
@@ -141,27 +173,94 @@ async function installPackage(req) {
 
 async function removePackage(req) {
 
-    let id = req[0]
-    let containers = await dockerCalls.listContainers()
-    let container = containers.find( container => container.id == id );
-
-    if (container) {
-
-      console.log('Removing package: '+container.name+' is status: '+container.state)
-      await dockerCalls.deleteContainer(container.id)
-
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
+    if (!fs.existsSync(dockerComposePath)) {
       return JSON.stringify({
-          success: true,
-          message: 'Removed package: '+container.name+' is status: '+container.state
-      })
-
-    } else {
-
-      return JSON.stringify({
-          success: true,
-          message: 'No package found with ID: '+id
+          success: false,
+          message: 'No docker-compose found with at: ' + dockerComposePath
       })
     }
+
+    console.log('Removing package: ' + packageName)
+    await docker_compose.down(dockerComposePath)
+
+    return JSON.stringify({
+        success: true,
+        message: 'Removed package: ' + packageName
+    })
+}
+
+
+async function togglePackage(req) {
+
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
+    if (!fs.existsSync(dockerComposePath)) {
+      return JSON.stringify({
+          success: false,
+          message: 'No docker-compose found with at: ' + dockerComposePath
+      })
+    }
+
+    let id = req[0]
+    let containers = await dockerCalls.listContainers()
+    let container = containers.find( container => container.name.includes(packageName) );
+    if (!container) return JSON.stringify({
+        success: false,
+        message: 'No package found with name: ' + packageName
+    })
+    // The toggle function will:
+    // - stop the package if it's running (container.state == 'running')
+    // - run the package if it's stopped  (container.state == 'exited')
+    // - return and error if it's in any other state
+    switch (container.state) {
+
+      case 'running':
+        // stop
+        console.log('FIRING A STOP!!')
+        await docker_compose.stop(dockerComposePath)
+        console.log('FIRED A STOP')
+        return JSON.stringify({
+            success: true,
+            message: 'Package stopped'
+        })
+        break;
+
+      case 'exited':
+        // start
+        console.log('FIRING A START!!')
+        await docker_compose.start(dockerComposePath)
+        console.log('FIRED A START')
+        return JSON.stringify({
+            success: true,
+            message: 'Package started'
+        })
+        break;
+
+      default:
+        // unknown status
+        return JSON.stringify({
+            success: false,
+            message: 'Package: '+container.name+' has an unkown status: '+container.state
+        })
+    }
+}
+
+
+async function logPackage(req) {
+
+    let packageName = req[0]
+    let dockerComposePath = REPO_DIR + packageName + '/' + DOCKERCOMPOSE_NAME
+
+    console.log('LOGGING...')
+    let logs = await docker_compose.logs(dockerComposePath)
+    console.log('LOGGED')
+    return JSON.stringify({
+        success: true,
+        message: 'Got logs of package: ' + packageName,
+        result: logs
+    })
 }
 
 
@@ -178,28 +277,59 @@ async function listPackages(req) {
 }
 
 
+async function fetchPackageInfo(req) {
+
+  let packageName = parsePackageReq(req[0]).name
+  let packageWithVersions = await getPackageVersions({
+    name: packageName
+  })
+
+  await getManifestOfVersions(packageName, packageWithVersions.versions)
+
+  return JSON.stringify({
+      success: true,
+      message: "Fetched " + packageName + " info",
+      result: packageWithVersions
+  })
+
+}
+
+
+async function getManifestOfVersions(packageName, versions) {
+
+  let manifests = await Promise.all(
+    versions.map( async (version) => {
+      try {
+        version.manifest = await getManifest(packageName + '@' + version.version)
+      } catch(e) {
+        console.error(Error(e))
+        version.manifest = 'Error: '+e.message
+      }
+    })
+  )
+}
+
+
 async function listDirectory(req) {
 
-    let packagesWithVersions = await getPackagesWithVersions()
+    let packages = await directoryCalls.getDirectory()
 
     return JSON.stringify({
         success: true,
-        message: "Listing " + packagesWithVersions.length + " packages",
-        result: packagesWithVersions
+        message: "Listing " + packages.length + " packages",
+        result: packages
     })
 
 }
 
-async function getPackagesWithVersions() {
+async function getPackagesVersions(packages) {
+  return await Promise.all(packages.map(getPackageVersions))
+}
 
-  let packages = await directoryCalls.getDirectory()
-
-  return await Promise.all(packages.map(async function(_package) {
-    _package.versions = await apm.getRepoVersions(_package.name)
-    _package.versions.reverse()
-    return _package
-  }))
-
+async function getPackageVersions(_package) {
+  _package.versions = await apm.getRepoVersions(_package.name)
+  _package.versions.reverse()
+  return _package
 }
 
 

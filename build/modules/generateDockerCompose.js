@@ -71,7 +71,7 @@ function generateDockerCompose(dpn_manifest) {
 
     // Support for environment variables
     if(dpn_manifest.image.environment){
-        dockerCompose.services[name].environment = dpn_manifest.image.environment
+        dockerCompose.services[name].environment = [name + '.env']
     }
     dockerCompose.services[name].networks = [DNP_NETWORK]
     dockerCompose.services[name].dns = DNS_SERVICE

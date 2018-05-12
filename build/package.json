@@ -1,12 +1,12 @@
 {
-  "name": "dappnode_package_installer",
+  "name": "DNP_PACKAGE_MANAGER",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
-  "author": "",
+  "author": "dappLion",
   "license": "ISC",
   "dependencies": {
     "autobahn": "^18.3.1",
@@ -21,5 +21,9 @@
     "validator": "^9.2.0",
     "web3": "^1.0.0-beta.29",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "mocha": "^5.1.1",
+    "sinon": "^5.0.7"
   }
 }
