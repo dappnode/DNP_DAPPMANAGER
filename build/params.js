@@ -2,7 +2,7 @@ module.exports = {
 
   // Autobahn parameters
   autobahnUrl: 'ws://my.wamp.dnp.dappnode.eth:8080/ws',
-  autobahnRealm: 'dappnode_admin',
+  autobahnRealm: 'realm1',
   autobahnTag: {
     installerLog: "log.installer.repo.dappnode.eth"
   },
@@ -13,6 +13,7 @@ module.exports = {
   REPO_DIR: "./tmp_dnp_repo/", // ### Temporary name for development
   DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
   DOCKERCOMPOSE_NAME: 'docker-compose.yml',
+  ENV_FILE_EXTENSION: '.env',
 
   // Docker parameters
   TMP_REPO_DIR: "./tmp_dnp_repo/",

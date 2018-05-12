@@ -13,7 +13,6 @@ const { Docker_Compose } = require('./calls/dockerCalls')
 const docker_compose = new Docker_Compose()
 
 
-
 async function download(packageName) {
 
   // Initialize variables
@@ -21,8 +20,8 @@ async function download(packageName) {
   let path = utils.getPaths (dnpManifest)
 
   // Create de Global repo dir
-  if (!fs.existsSync(REPO_DIR)) {
-      fs.mkdirSync(REPO_DIR)
+  if (!fs.existsSync(path.REPO_DIR)) {
+      fs.mkdirSync(path.REPO_DIR)
   }
 
   // Create de repo dir
@@ -83,7 +82,7 @@ async function deleteFile(path) {
 async function load(packageName) {
 
   let dnpManifest = await getManifest(packageName)
-  let path = getPaths(dnpManifest)
+  let path = utils.getPaths(dnpManifest)
 
   emitter.emit('log', {
     topic: packageName,
@@ -103,7 +102,7 @@ async function load(packageName) {
 async function run(packageName) {
 
   let dnpManifest = await getManifest(packageName)
-  let path = getPaths (dnpManifest)
+  let path = utils.getPaths (dnpManifest)
 
   emitter.emit('log', {
     topic: packageName,
