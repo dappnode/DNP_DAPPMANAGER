@@ -26,17 +26,6 @@ async function listContainers() {
     .filter(container => container.isDNP)
 }
 
-function deleteContainer(id) {
-  return dockerRequest('delete', '/containers/'+id+'?force=true')
-}
-
-function startContainer(id) {
-  return dockerRequest('post', '/containers/'+id+'/start')
-}
-
-function stopContainer(id) {
-  return dockerRequest('post', '/containers/'+id+'/stop')
-}
 
 async function runningPackagesInfo() {
 
@@ -63,7 +52,7 @@ function loadImage(imagePath) {
 // docker.up()
 
 
-class Docker_Compose {
+class Docker_compose {
   constructor() {
     this.exec = shellExec
   }
@@ -98,8 +87,9 @@ class Docker_Compose {
   //     -v, --volumes           Remove named volumes declared in the `volumes`
   //     --remove-orphans        Remove containers for services not defined in the Compose file
   //     -t, --timeout TIMEOUT   Specify a shutdown timeout in seconds. (default: 10)
-  down(dockerComposePath) {
-    return this.exec('docker-compose -f ' + dockerComposePath + ' down')
+  down(dockerComposePath, options={}) {
+    let optionsString = parseOptions(options)
+    return this.exec('docker-compose -f ' + dockerComposePath + ' down'+optionsString)
   }
 
   // Usage: start [SERVICE...]
@@ -110,8 +100,9 @@ class Docker_Compose {
   // Usage: stop [options] [SERVICE...]
   // Options:
   // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  stop(dockerComposePath) {
-    return this.exec('docker-compose -f ' + dockerComposePath + ' stop')
+  stop(dockerComposePath, options={}) {
+    let optionsString = parseOptions(options)
+    return this.exec('docker-compose -f ' + dockerComposePath + ' stop'+optionsString)
   }
 
   // Usage: logs [options] [SERVICE...]
@@ -121,10 +112,30 @@ class Docker_Compose {
   // -t, --timestamps    Show timestamps
   // --tail="all"        Number of lines to show from the end of the logs
   //                     for each container.
-  logs(dockerComposePath) {
-    return this.exec('docker-compose -f ' + dockerComposePath + ' logs')
+  logs(dockerComposePath, options={}) {
+    let optionsString = parseOptions(options)
+    return this.exec('docker-compose -f ' + dockerComposePath + ' logs'+optionsString)
   }
 
+  // Usage: ps [options] [SERVICE...]
+  // Options:
+  // -q    Only display IDs
+  ps(dockerComposePath) {
+    return this.exec('docker-compose -f ' + dockerComposePath + ' ps')
+  }
+
+}
+
+
+function parseOptions(options) {
+  let optionsString = ''
+
+  // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
+  if (Number.isInteger(options.timeout)) optionsString += ' --timeout '+options.timeout
+  // -t, --timestamps    Show timestamps
+  if (options.timestamps) optionsString += ' --timestamps'
+
+  return optionsString
 }
 
 
@@ -132,11 +143,6 @@ function dockerComposeUp(dockerComposePath) {
   return shellExec('docker-compose -f ' + dockerComposePath + ' up -d')
 }
 
-function logContainer(id) {
-  // // There are many customization options
-  // return dockerRequest('get', '/containers/'+id+'/logs?stderr=1&stdout=1&timestamps=1', {})
-  return shellExec('docker logs ' + id)
-}
 
 
 ///////////////////
@@ -157,7 +163,6 @@ function dockerRequest(method, url) {
 function shellExec(command) {
 
   return new Promise(function(resolve, reject) {
-    console.log(command)
     shell.exec(command, { silent: true }, function(code, stdout, stderr) {
       if (code !== 0) {
         return reject(Error(stderr))
@@ -232,10 +237,6 @@ function mapPorts(ports) {
 module.exports = {
   listContainers,
   runningPackagesInfo,
-  deleteContainer,
-  startContainer,
-  stopContainer,
-  logContainer,
   loadImage,
-  Docker_Compose
+  Docker_compose
 }

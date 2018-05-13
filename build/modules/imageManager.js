@@ -2,22 +2,22 @@
 const fs = require('fs')
 
 // dedicated modules
-const utils = require('../utils')
+const getPath = require('../utils/getPath')
 const emitter = require('./emitter')
 const ipfsCalls = require('./calls/ipfsCalls')
 const getManifest = require('./getManifest')
 const generateDockerCompose = require('./generateDockerCompose')
 const dockerCalls = require('./calls/dockerCalls')
-const { Docker_Compose } = require('./calls/dockerCalls')
+const { Docker_compose } = require('./calls/dockerCalls')
 
-const docker_compose = new Docker_Compose()
+const docker_compose = new Docker_compose()
 
 
 async function download(packageName) {
 
   // Initialize variables
   let dnpManifest = await getManifest(packageName)
-  let path = utils.getPaths (dnpManifest)
+  let path = getPath (dnpManifest)
 
   // Create de Global repo dir
   if (!fs.existsSync(path.REPO_DIR)) {
@@ -82,7 +82,7 @@ async function deleteFile(path) {
 async function load(packageName) {
 
   let dnpManifest = await getManifest(packageName)
-  let path = utils.getPaths(dnpManifest)
+  let path = getPath(dnpManifest)
 
   emitter.emit('log', {
     topic: packageName,
@@ -102,7 +102,7 @@ async function load(packageName) {
 async function run(packageName) {
 
   let dnpManifest = await getManifest(packageName)
-  let path = utils.getPaths (dnpManifest)
+  let path = getPath (dnpManifest)
 
   emitter.emit('log', {
     topic: packageName,
