@@ -1,24 +1,29 @@
-const utils = require('../utils')
+const { parsePackageReq } = require('../utils/parse')
 const getManifest = require('../modules/getManifest')
 const apm = require('../modules/calls/apm')
 
 
-async function fetchPackageInfo(req) {
+function createFetchPackageInfo() {
 
-  let packageName = utils.parsePackageReq(req[0]).name
-  let packageWithVersions = await getPackageVersions({
-    name: packageName
-  })
+  return async function fetchPackageInfo(req) {
 
-  await getManifestOfVersions(packageName, packageWithVersions.versions)
+    let packageName = parsePackageReq(req[0]).name
+    let packageWithVersions = await getPackageVersions({
+      name: packageName
+    })
 
-  return JSON.stringify({
-      success: true,
-      message: "Fetched " + packageName + " info",
-      result: packageWithVersions
-  })
+    await getManifestOfVersions(packageName, packageWithVersions.versions)
 
+    return JSON.stringify({
+        success: true,
+        message: "Fetched " + packageName + " info",
+        result: packageWithVersions
+    })
+
+  }
 }
+
+
 
 
 ///////////////////////////////
@@ -47,4 +52,4 @@ async function getPackageVersions(_package) {
 }
 
 
-module.exports = fetchPackageInfo
+module.exports = createFetchPackageInfo

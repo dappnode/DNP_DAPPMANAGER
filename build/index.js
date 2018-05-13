@@ -3,23 +3,33 @@
 const autobahn = require('autobahn')
 
 // import calls
-const installPackage   = require('./calls/installPackage')
-const removePackage    = require('./calls/removePackage')
-const togglePackage    = require('./calls/togglePackage')
-const logPackage       = require('./calls/logPackage')
-const listPackages     = require('./calls/listPackages')
-const listDirectory    = require('./calls/listDirectory')
-const fetchPackageInfo = require('./calls/fetchPackageInfo')
-const updatePackageEnv = require('./calls/updatePackageEnv')
+const createInstallPackage   = require('./calls/createInstallPackage')
+const createRemovePackage    = require('./calls/createRemovePackage')
+const createTogglePackage    = require('./calls/createTogglePackage')
+const createLogPackage       = require('./calls/createLogPackage')
+const createListPackages     = require('./calls/createListPackages')
+const createListDirectory    = require('./calls/createListDirectory')
+const createFetchPackageInfo = require('./calls/createFetchPackageInfo')
+const createUpdatePackageEnv = require('./calls/createUpdatePackageEnv')
 
-// import params
+// import dependencies
 const params = require('./params')
 const emitter = require('./modules/emitter')
+const { Docker_compose } = require('./modules/calls/dockerCalls')
+const dockerCalls = require('./modules/calls/dockerCalls')
 
-// Define paths
-const REPO_DIR = params.REPO_DIR
-const DAPPNODE_PACKAGE_NAME = params.DAPPNODE_PACKAGE_NAME
-const DOCKERCOMPOSE_NAME = params.DOCKERCOMPOSE_NAME
+// initialize dependencies
+let docker_compose = new Docker_compose()
+
+// Initialize calls
+const installPackage   = createInstallPackage  (params, docker_compose)
+const removePackage    = createRemovePackage   (params, docker_compose)
+const togglePackage    = createTogglePackage   (params, docker_compose)
+const logPackage       = createLogPackage      (params, docker_compose)
+const listPackages     = createListPackages    (params, dockerCalls)
+const listDirectory    = createListDirectory   (params, docker_compose)
+const fetchPackageInfo = createFetchPackageInfo(params, docker_compose)
+const updatePackageEnv = createUpdatePackageEnv(params, docker_compose)
 
 const autobahnTag = params.autobahnTag
 const autobahnUrl = params.autobahnUrl
@@ -48,8 +58,8 @@ connection.onopen = function(session, details) {
     setTimeout(function(){
       let link = 'otpweb.dnp.dappnode.eth'
       // session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
-      // session.call('listDirectory.installer.repo.dappnode.eth', [link])
-    }, 3000)
+      session.call('listPackages.installer.repo.dappnode.eth', [link])
+    }, 1000)
 
     // ^^^^^^ FOR DEVELOPMENT - simulating an install call
     // ^^^^^^ FOR DEVELOPMENT - simulating an install call
