@@ -7,7 +7,6 @@ const fs = require('fs')
 const getPath = require('../utils/getPath')
 
 const { stringifyEnvs } = require('../utils/parse')
-const packagesUtils = require('./packagesUtils')
 
 const params = require('../params')
 const REPO_DIR = params.REPO_DIR
@@ -15,13 +14,6 @@ const ENV_FILE_EXTENSION = params.ENV_FILE_EXTENSION
 
 
 function createInstallPackage(params) {
-
-  // Construct single package downloader and runner
-  const download = packagesUtils.createDownload(params, ipfsCalls, generate, fs)
-  const run = packagesUtils.createrun(params, dockerCalls, docker_compose)
-  // Construct a multiple package downloader and runner with previous functions
-  const downloadPackages = packagesUtils.createDownloadPackages(download)
-  const runPackages = packagesUtils.createRunPackages(run)
 
   return async function installPackage(req) {
 
@@ -33,23 +25,49 @@ function createInstallPackage(params) {
       throw Error("Package already running")
     }
 
+    // Write envs, this will fail at this point (REPO_DIR not created yet)
+    await fs.writeFileSync(
+      getPath.ENV_FILE(PACKAGE_NAME, params),
+      stringifyEnvs(envs))
+
     // This shoud be moved somewhere
     async function fetchDependencies(packageReq) {
       let dnpManifest = await getManifest(packageReq);
       return dnpManifest.dependencies;
     }
 
-    // Returns a list of unique dep (highest requested version) + requested package
-    // > fetchDependencies needs IPFS
-    let allResolvedDeps = await getAllResolvedDeps(packageReq, fetchDependencies)
-    // Return an order to follow in order to install repecting dependencies
-    let packageListOrdered = orderDependecies(allResolvedDeps)
-
+    // Returns a list of unique dep (highest requested version)
     // -> install in paralel
-    await downloadPackages(packageListOrdered)
-    // -> run in serie
-    await runPackages(packageListOrdered)
+    let allResolvedDeps = await getAllResolvedDeps(packageReq, fetchDependencies)
+    await downloadPackagesInParalel(allResolvedDeps)
 
+    // Return an order to follow in order to install repecting dependencies
+    // -> run in serie
+    let depsRunOrder = orderDependecies(allResolvedDeps)
+    await runPackagesInSerie(depsRunOrder)
+
+    // Get complete list of packages = requested + dependencies
+    let packagesToInstall = await dependenciesTools.getAllResolved(packageReq.req)
+    packagesToInstall.forEach((dep) => {
+      emitter.emit('log', {
+        topic: dep,
+        msg: "is a dependency"
+      })
+    })
+    packagesToInstall.push(packageReq.req)
+    console.log('##### OG INSTALL LIST')
+    console.log(packagesToInstall)
+
+    // Check that there are no incompatibilities between packages
+    let packageIncompatibilities = await getPackageIncompatibilities(packagesToInstall)
+    if (packageIncompatibilities) {
+      throw Error( "Packages have incompatibilities: " + JSON.stringify(packageIncompatibilities) )
+    }
+
+    let packageInstallerPromiseArray = packagesToInstall.map(dep => {
+      let packageInstaller = new PackageInstaller(dep)
+      return packageInstaller.launch()
+    })
     return await Promise.all(packageInstallerPromiseArray).then(packageList => {
       return JSON.stringify({
           success: true,
@@ -62,10 +80,6 @@ function createInstallPackage(params) {
 
 ///////////////////////////////
 // Helper functions
-
-async function downloadPackagesInParalel() {
-
-}
 
 
 async function packageIsAlreadyRunning(packageName) {

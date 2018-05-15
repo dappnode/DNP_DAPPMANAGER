@@ -15,13 +15,7 @@ describe('Util: get paths', function() {
   }
 
   const packageName = 'some_package'
-  const IMAGE_PATH = 'some_image'
-  let manifest = {
-    name: packageName,
-    image: {
-      path: IMAGE_PATH
-    }
-  }
+  const imageName = 'some_image.tar.xz'
 
   it('return REPO_DIR path', function(){
     let path = 'repo'
@@ -50,8 +44,8 @@ describe('Util: get paths', function() {
   });
 
   it('return IMAGE path', function(){
-    getPath.IMAGE(manifest, params)
-      .should.equal(REPO_PATH_MOCK + packageName + '/' + IMAGE_PATH)
+    getPath.IMAGE(packageName, imageName, params)
+      .should.equal(REPO_PATH_MOCK + packageName + '/' + imageName)
   });
 
 

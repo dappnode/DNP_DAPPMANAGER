@@ -16,7 +16,7 @@ module.exports = {
   ENV_FILE: function(PACKAGE_NAME, params) {
     return params.REPO_DIR + PACKAGE_NAME + '/' + PACKAGE_NAME + params.ENV_FILE_EXTENSION
   },
-  IMAGE: function(dnpManifest, params) {
-    return params.REPO_DIR + dnpManifest.name + '/' + dnpManifest.image.path
+  IMAGE: function(PACKAGE_NAME, IMAGE_NAME, params) {
+    return params.REPO_DIR + PACKAGE_NAME + '/' + IMAGE_NAME
   }
 }

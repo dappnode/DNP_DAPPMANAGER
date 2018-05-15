@@ -21,7 +21,7 @@ function createListPackages(params,
         dnp.envs = parseEnvFile(envFileData)
       }
     })
-    console.log(dnpList)
+
     // Return
     return JSON.stringify({
         success: true,

@@ -30,13 +30,13 @@ function stringifyEnvs(envs) {
 
 function parsePackageReq(req) {
 
-  let packageName = req.split('@')[0]
-  let version = req.split('@')[1] || 'latest'
+  let name = req.split('@')[0]
+  let ver = req.split('@')[1] || 'latest'
 
   return {
-    name: packageName,
-    ver: version,
-    req: packageName + '@' + version
+    name,
+    ver,
+    req: name + '@' + ver
   }
 }
 

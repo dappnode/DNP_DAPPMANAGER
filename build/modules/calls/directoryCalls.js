@@ -25,11 +25,12 @@ async function init() {
 
 
 async function getWorkingWeb3Host(web3HostsArray) {
-  for (let i = 0; i < web3HostsArray.length; i++) {
-    let _testWeb3Host = await testWeb3Host(web3HostsArray[i]);
+
+  for (const web3Host of web3HostsArray) {
+    let _testWeb3Host = await testWeb3Host(web3Host)
     if (_testWeb3Host.works) {
       // console.log('TESTING '+web3HostsArray[i]+' WORKED')
-      return web3HostsArray[i];
+      return web3Host
     } else {
       // console.log('TESTING '+web3HostsArray[i]+' NOT WORKING, reason: '+_testWeb3Host.reason)
     }

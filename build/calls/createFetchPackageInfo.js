@@ -8,9 +8,7 @@ function createFetchPackageInfo() {
   return async function fetchPackageInfo(req) {
 
     let packageName = parsePackageReq(req[0]).name
-    let packageWithVersions = await getPackageVersions({
-      name: packageName
-    })
+    let packageWithVersions = await getPackageVersions(packageName)
 
     await getManifestOfVersions(packageName, packageWithVersions.versions)
 
@@ -45,10 +43,11 @@ async function getManifestOfVersions(packageName, versions) {
 }
 
 
-async function getPackageVersions(_package) {
-  _package.versions = await apm.getRepoVersions(_package.name)
-  _package.versions.reverse()
-  return _package
+async function getPackageVersions(packageName) {
+  return {
+    name: packageName,
+    versions: ( await apm.getRepoVersions(packageName) ).reverse()
+  }
 }
 
 
