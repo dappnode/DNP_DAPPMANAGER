@@ -65,7 +65,6 @@ function docker_composeMockTest() {
 
     it('should return a stringified object containing lists', async () => {
       let res = await listPackage()
-      console.log(res)
       expect(JSON.parse(res)).to.deep.include({
         success: true,
         result: expected_result

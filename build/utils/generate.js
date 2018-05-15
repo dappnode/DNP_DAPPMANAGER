@@ -9,7 +9,7 @@ const DNS_SERVICE = params.DNS_SERVICE
 const DNP_NETWORK = params.DNP_NETWORK
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
 
-function generateDockerCompose(dpn_manifest) {
+function DockerCompose(dpn_manifest) {
 
     var name = dpn_manifest.name.replace("/", "_").replace("@", "");
 
@@ -83,4 +83,13 @@ function generateDockerCompose(dpn_manifest) {
 
 }
 
-module.exports = generateDockerCompose;
+
+function Manifest(dnpManifest) {
+  return JSON.stringify(dnpManifest, null, 2)
+}
+
+
+module.exports = {
+  DockerCompose,
+  Manifest
+}

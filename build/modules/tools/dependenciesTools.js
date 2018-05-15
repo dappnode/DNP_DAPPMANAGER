@@ -15,9 +15,8 @@ let getNames = async function (packageName) {
 let getTree = async function (packageName) {
   let depObject = await getDep(packageName);
   let _depTree = {}
-  let dependencyList = Object.getOwnPropertyNames(depObject);
-  for (let i = 0; i < dependencyList.length; i++) {
-    let dep = dependencyList[i];
+
+  for (const dep of Object.getOwnPropertyNames(depObject)) {
     _depTree[dep+'@'+depObject[dep]] = await getTree (dep+'@'+depObject[dep])
   }
   return _depTree;
@@ -26,9 +25,7 @@ let getTree = async function (packageName) {
 let getAll = async function (packageReq) {
   let depObject = await getDep(packageReq);
   let _depList = [];
-  let dependencyList = Object.getOwnPropertyNames(depObject);
-  for (let i = 0; i < dependencyList.length; i++) {
-    let dep = dependencyList[i];
+  for (const dep of Object.getOwnPropertyNames(depObject)) {
     _depList.push(dep+'@'+depObject[dep])
     _depList.push.apply(_depList, await getAll (dep+'@'+depObject[dep]))
   }
