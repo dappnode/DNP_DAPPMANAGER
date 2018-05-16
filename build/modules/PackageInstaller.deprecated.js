@@ -43,7 +43,7 @@ function PackageInstaller (packageName) {
     let _this = this
 
     return new Promise((resolve) => {
-      let watchLoop = setInterval(function(){
+      let watchLoop = setInterval(() => {
         if (arrayContainsAnotherArray(_this.dependencyList, _this.installedPackages)) {
           clearInterval(watchLoop)
           resolve()

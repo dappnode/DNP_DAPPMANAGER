@@ -5,7 +5,7 @@
 function containerStateFromPs(dockerPsOutput, container_name) {
 
   let containers = parsePs(dockerPsOutput)
-  let container = containers.find(c => c.name == container_name)
+  let container = containers.find(c => c.name.includes(container_name))
   if (!container) {
     return 'Down'
   } else if ('state' in container) {
@@ -49,8 +49,11 @@ function parsePs(output) {
       .filter(e => e != '')
       .map(e => e.trim())
 
+    let nameCorrected = containerProps[0]
+      .replace('DAppNodePackage-', '')
+      
     return {
-      name: containerProps[0],
+      name: nameCorrected,
       command: containerProps[1],
       state: containerProps[2],
       ports: containerProps[3] || '',

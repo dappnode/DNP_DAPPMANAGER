@@ -31,19 +31,19 @@ function createInstallPackage(params) {
       stringifyEnvs(envs))
 
     // This shoud be moved somewhere
-    async function fetchDependencies(packageReq) {
+    async function getManifest(packageReq) {
       let dnpManifest = await getManifest(packageReq);
       return dnpManifest.dependencies;
     }
 
     // Returns a list of unique dep (highest requested version)
     // -> install in paralel
-    let allResolvedDeps = await getAllResolvedDeps(packageReq, fetchDependencies)
+    let allResolvedDeps = await getAllResolvedDeps(packageReq, getManifest)
     await downloadPackagesInParalel(allResolvedDeps)
 
     // Return an order to follow in order to install repecting dependencies
     // -> run in serie
-    let depsRunOrder = orderDependecies(allResolvedDeps)
+    let depsRunOrder = orderDependencies(allResolvedDeps)
     await runPackagesInSerie(depsRunOrder)
 
     // Get complete list of packages = requested + dependencies

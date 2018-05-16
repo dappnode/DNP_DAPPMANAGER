@@ -1,12 +1,11 @@
-const { Docker_compose } = require('../modules/calls/dockerCalls')
+const DockerCompose = require('../utils/DockerCompose')
 const fs = require('fs')
 const getPath = require('../utils/getPath')
-const docker_compose_default = new Docker_compose()
 
 
 function createRemovePackage(params,
   // default option passed to allow testing
-  docker_compose=docker_compose_default) {
+  dockerCompose) {
 
   return async function removePackage(req) {
 
@@ -17,7 +16,7 @@ function createRemovePackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
-    await docker_compose.down(DOCKERCOMPOSE_PATH)
+    await dockerCompose.down(DOCKERCOMPOSE_PATH)
 
     return JSON.stringify({
         success: true,

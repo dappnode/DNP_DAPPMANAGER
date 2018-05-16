@@ -3,7 +3,8 @@ const semver = require('semver')
 const Web3 = require('web3')
 
 // dedicated modules
-const params = require('../../params')
+const validate = require('../utils/validate')
+const params = require('../params')
 
 const possibleWeb3Hosts = params.possibleWeb3Hosts
 
@@ -135,21 +136,21 @@ async function getSemanticVersion(repo, version) {
 }
 
 
-async function getRepoHash(name, version) {
+async function getRepoHash(packageReq) {
 
+  const NAME = packageReq.name
+  const VERSION = packageReq.ver
   // Validate the provided name, it only accepts .eth domains
-  if (name.substr(name.length - 4) != '.eth') {
-    throw Error('reponame is not an .eth domain: ' + name)
-  }
+  validate.isEthDomain(NAME)
 
-  var repo = await getRepoContract(name)
+  var repo = await getRepoContract(NAME)
   if (!repo) {
-    throw Error('Resolver could not found a match for ' + name)
+    throw Error('Resolver could not found a match for ' + NAME)
   }
 
-  if (semver.valid(version)) {
+  if (semver.valid(VERSION)) {
     // Getting the specific version provided
-    let versionArray = semver.clean(version).split(".")
+    let versionArray = semver.clean(VERSION).split(".")
     return getSemanticVersion(repo, versionArray)
   } else {
     return getLatestVersion(repo)

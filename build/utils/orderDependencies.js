@@ -1,6 +1,6 @@
 
 
-function orderDependecies(packageList) {
+function orderDependencies(packageList) {
 
   // Expects an array of objects
   // [{
@@ -73,5 +73,5 @@ module.exports = {
   check,
   mulBool,
   createRegistry,
-  orderDependecies,
+  orderDependencies,
 }

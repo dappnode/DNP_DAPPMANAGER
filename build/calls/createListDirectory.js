@@ -1,11 +1,10 @@
-const directoryCalls = require('../modules/calls/directoryCalls')
 
 
-function createListDirectory() {
+function createListDirectory(getDirectory) {
 
-  return async function listDirectory(req) {
+  return async function listDirectory() {
 
-      let packages = await directoryCalls.getDirectory()
+      let packages = await getDirectory()
 
       return JSON.stringify({
           success: true,

@@ -9,12 +9,12 @@ chai.should();
 
 describe('Call function: removePackage', function() {
 
-  docker_composeMockTest()
+  dockerComposeMockTest()
 
 });
 
 
-function docker_composeMockTest() {
+function dockerComposeMockTest() {
   describe('mock test', function() {
 
     // const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
@@ -28,13 +28,13 @@ function docker_composeMockTest() {
 
     let hasRemoved = false
     const PACKAGE_NAME = 'test.dnp.dappnode.eth'
-    const docker_composeMock = {
+    const dockerComposeMock = {
       down: async (path) => {
         hasRemoved = true
       }
     }
 
-    const removePackage = createRemovePackage(params, docker_composeMock)
+    const removePackage = createRemovePackage(params, dockerComposeMock)
 
     it('should stop the package with correct arguments', async () => {
       await removePackage([PACKAGE_NAME])

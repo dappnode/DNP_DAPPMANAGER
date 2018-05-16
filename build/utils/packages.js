@@ -1,12 +1,20 @@
-const getPath = require('../utils/getPath')
+const getPath = require('./getPath')
+const parse = require('./parse')
+const generate_default = require('./generate')
+const fs_default = require('fs')
+const validate_default = require('./validate')
+
 // packageList should be an array of package objects, i.e.
 // [
 //   {
 //     name: 'packageA',
-//     ver: 'latest'
+//     ver: 'latest',
+//     dep: <dep object>,
+//     manifest: <manifest object>
 //   },
 //   ...
 // ]
+
 function createDownloadPackages(download) {
   return async function downloadPackages(packageList) {
     return await runInParalel(packageList, download)
@@ -21,24 +29,31 @@ function createRunPackages(run) {
 }
 
 
-function createDownload(params, ipfsCalls, getManifest, generate, fs) {
+function createDownload(params,
+  ipfsCalls,
+  generate = generate_default,
+  validate = validate_default,
+  fs = fs_default) {
 
   return async function download(pkg) {
     // call IPFS, store the file in the repo's folder
     // load the image to docker
 
     const PACKAGE_NAME = pkg.name
-    const dnpManifest = await getManifest(PACKAGE_NAME)
-
-    const IMAGE_NAME = dnpManifest.image.path
-    const IMAGE_HASH = dnpManifest.image.hash
+    const MANIFEST = pkg.manifest
+    const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
+    const IMAGE_HASH = parse.manifest.IMAGE_HASH(MANIFEST)
     const MANIFEST_PATH = getPath.MANIFEST(PACKAGE_NAME, params)
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
 
     // Write manifest and docker-compose
-    await fs.writeFileSync(generate.Manifest(dnpManifest), MANIFEST_PATH)
-    await fs.writeFileSync(generate.DockerCompose(dnpManifest), DOCKERCOMPOSE_PATH)
+    await fs.writeFileSync(
+      validate.path(MANIFEST_PATH),
+      generate.manifest(MANIFEST))
+    await fs.writeFileSync(
+      validate.path(DOCKERCOMPOSE_PATH),
+      generate.dockerCompose(MANIFEST, params))
 
     // Image validation
     if (fs.existsSync(IMAGE_PATH)) {
@@ -49,24 +64,28 @@ function createDownload(params, ipfsCalls, getManifest, generate, fs) {
     }
 
     // download and load image to docker
-    await ipfsCalls.download(IMAGE_HASH, IMAGE_PATH)
+    await ipfsCalls.download(
+      validate.path(IMAGE_PATH),
+      IMAGE_HASH)
 
   }
 }
 
 
-function createRun(params, getManifest, dockerCalls, docker_compose) {
+function createRun(params,
+  dockerCompose
+) {
 
   return async function run(pkg) {
 
     const PACKAGE_NAME = pkg.name
-    const dnpManifest = await getManifest(PACKAGE_NAME)
-    const IMAGE_NAME = dnpManifest.image.path
+    const MANIFEST = pkg.manifest
+    const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
 
-    await dockerCalls.loadImage(IMAGE_PATH)
-    await docker_compose.up(DOCKERCOMPOSE_PATH)
+    await dockerCompose.loadImage(IMAGE_PATH)
+    await dockerCompose.up(DOCKERCOMPOSE_PATH)
 
   }
 }

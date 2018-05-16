@@ -1,6 +1,6 @@
 const chai = require('chai')
 const expect = require('chai').expect
-const utils = require('./installDepUtils')
+const dependencies = require('./dependencies')
 
 
 describe('Util: get dependencies', () => {
@@ -24,8 +24,10 @@ describe('Util: get dependencies', () => {
     }
   }
 
-  async function fetchDependenciesMock (packageReq) {
-    return dependencyObjectMock[packageReq.name]
+  async function getManifestMock (packageReq) {
+    return {
+      dependencies: dependencyObjectMock[packageReq.name]
+    }
   }
 
 
@@ -36,7 +38,7 @@ describe('Util: get dependencies', () => {
       const input           = [{name: 'B'}, {name: 'A'}]
       const expected_result = [{name: 'A'}, {name: 'B'}]
 
-      expect( input.sort(utils.sortByNameKey) )
+      expect( input.sort(dependencies.sortByNameKey) )
         .to.deep.equal( expected_result )
     })
   })
@@ -49,7 +51,7 @@ describe('Util: get dependencies', () => {
       const input           = [{name: 'A', ver: '1'}, {name: 'A', ver: '2'}, {name: 'A', ver: '1'}]
       const expected_result = [{name: 'A', ver: '1'}, {name: 'A', ver: '2'}]
 
-      expect( input.filter(utils.byUniqueObjects) )
+      expect( input.filter(dependencies.byUniqueObjects) )
         .to.deep.equal( expected_result )
     })
   })
@@ -67,17 +69,19 @@ describe('Util: get dependencies', () => {
       const expected_result = [].concat(
         Array(1).fill({
           name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB
+          dep: dependencyObjectMock.packageB,
+          manifest: await getManifestMock({name: 'packageB'})
         }),
         Array(1).fill({
           name: 'packageC', ver: 'latest',
-          dep: dependencyObjectMock.packageC
+          dep: dependencyObjectMock.packageC,
+          manifest: await getManifestMock({name: 'packageC'})
         })
       )
-      let res = await utils.getAllDeps(packageReq, fetchDependenciesMock)
+      let res = await dependencies.getAll(packageReq, getManifestMock)
 
       // sorting object because deep equal and include is buggy sometimes
-      res = res.sort(utils.sortByNameKey)
+      res = res.sort(dependencies.sortByNameKey)
 
       expect( res )
         .to.deep.equal( expected_result )
@@ -93,26 +97,30 @@ describe('Util: get dependencies', () => {
       const expected_result = [].concat(
         Array(1).fill({
           name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA
+          dep: dependencyObjectMock.packageA,
+          manifest: await getManifestMock({name: 'packageA'})
         }),
         Array(2).fill({
           name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB
+          dep: dependencyObjectMock.packageB,
+          manifest: await getManifestMock({name: 'packageB'})
         }),
         Array(4).fill({
           name: 'packageC', ver: 'latest',
-          dep: dependencyObjectMock.packageC
+          dep: dependencyObjectMock.packageC,
+          manifest: await getManifestMock({name: 'packageC'})
         }),
         Array(1).fill({
           name: 'packageD', ver: 'latest',
-          dep: dependencyObjectMock.packageD
+          dep: dependencyObjectMock.packageD,
+          manifest: await getManifestMock({name: 'packageD'})
         })
       )
 
-      let res = await utils.getAllDeps(packageReq, fetchDependenciesMock)
+      let res = await dependencies.getAll(packageReq, getManifestMock)
 
       // sorting object because deep equal and include is buggy sometimes
-      res = res.sort(utils.sortByNameKey)
+      res = res.sort(dependencies.sortByNameKey)
 
       expect( res )
         .to.deep.equal( expected_result )
@@ -125,9 +133,9 @@ describe('Util: get dependencies', () => {
         ver: 'latest'
       }
 
-      let error = '--- getAllDeps did not throw ---'
+      let error = '--- getAll did not throw ---'
       try {
-        await utils.getAllDeps(packageReq, fetchDependenciesMock)
+        await dependencies.getAll(packageReq, getManifestMock)
       } catch(e) {
         error = e.message
       }
@@ -139,23 +147,25 @@ describe('Util: get dependencies', () => {
 
   describe('.resolveConflictingVersions', () => {
 
-    it('should clean up repeated versions', () => {
+    it('should clean up repeated versions', async () => {
 
       const dependecyList = [].concat(
         Array(3).fill({
           name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA
+          dep: dependencyObjectMock.packageA,
+          manifest: await getManifestMock({name: 'packageA'})
         })
       )
 
       const expected_result = [].concat(
         Array(1).fill({
           name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA
+          dep: dependencyObjectMock.packageA,
+          manifest: await getManifestMock({name: 'packageA'})
         })
       )
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
@@ -193,7 +203,7 @@ describe('Util: get dependencies', () => {
         }
       ]
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
@@ -218,7 +228,7 @@ describe('Util: get dependencies', () => {
         })
       )
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
@@ -256,7 +266,7 @@ describe('Util: get dependencies', () => {
         }
       ]
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
@@ -281,7 +291,7 @@ describe('Util: get dependencies', () => {
         })
       )
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
@@ -319,14 +329,14 @@ describe('Util: get dependencies', () => {
         }
       ]
 
-      let res = utils.resolveConflictingVersions(dependecyList)
+      let res = dependencies.resolveConflictingVersions(dependecyList)
       expect( res )
         .to.deep.equal( expected_result )
 
     })
   })
 
-  describe('.getAllResolvedDeps final complete test', () => {
+  describe('.getAllResolved final complete test', () => {
 
     it('should return the package req (which has no dependencies)', async () => {
 
@@ -338,12 +348,13 @@ describe('Util: get dependencies', () => {
       const expected_result = [
         {
           name: 'packageC', ver: 'latest',
-          dep: dependencyObjectMock.packageC
+          dep: dependencyObjectMock.packageC,
+          manifest: await getManifestMock({name: 'packageC'})
         }
       ]
 
-      let res = await utils.getAllResolvedDeps(packageReq, fetchDependenciesMock)
-      res = res.sort(utils.sortByNameKey)
+      let res = await dependencies.getAllResolved(packageReq, getManifestMock)
+      res = res.sort(dependencies.sortByNameKey)
 
       expect( res )
         .to.deep.equal( expected_result )
@@ -364,24 +375,28 @@ describe('Util: get dependencies', () => {
       const expected_result = [
         {
           name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA
+          dep: dependencyObjectMock.packageA,
+          manifest: await getManifestMock({name: 'packageA'})
         },
         {
           name: 'packageB', ver: '1.4.2',
-          dep: dependencyObjectMock.packageB
+          dep: dependencyObjectMock.packageB,
+          manifest: await getManifestMock({name: 'packageB'})
         },
         {
           name: 'packageC', ver: 'latest',
-          dep: dependencyObjectMock.packageC
+          dep: dependencyObjectMock.packageC,
+          manifest: await getManifestMock({name: 'packageC'})
         },
         {
           name: 'packageD', ver: 'latest',
-          dep: dependencyObjectMock.packageD
+          dep: dependencyObjectMock.packageD,
+          manifest: await getManifestMock({name: 'packageD'})
         }
       ]
 
-      let res = await utils.getAllResolvedDeps(packageReq, fetchDependenciesMock)
-      res = res.sort(utils.sortByNameKey)
+      let res = await dependencies.getAllResolved(packageReq, getManifestMock)
+      res = res.sort(dependencies.sortByNameKey)
 
       expect( res )
         .to.deep.equal( expected_result )

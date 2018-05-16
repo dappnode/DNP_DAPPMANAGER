@@ -9,27 +9,43 @@ const createTogglePackage    = require('./calls/createTogglePackage')
 const createLogPackage       = require('./calls/createLogPackage')
 const createListPackages     = require('./calls/createListPackages')
 const createListDirectory    = require('./calls/createListDirectory')
-const createFetchPackageInfo = require('./calls/createFetchPackageInfo')
+const { createFetchPackageInfo } = require('./calls/createFetchPackageInfo')
 const createUpdatePackageEnv = require('./calls/createUpdatePackageEnv')
 
 // import dependencies
 const params = require('./params')
 const emitter = require('./modules/emitter')
-const { Docker_compose } = require('./modules/calls/dockerCalls')
-const dockerCalls = require('./modules/calls/dockerCalls')
+const DockerCompose = require('./utils/DockerCompose')
+const pkg = require('./utils/packages')
+const createGetAllResolvedOrdered = require('./utils/dependencies')
+const createGetManifest = require('./utils/getManifest')
+const dependencies = require('./utils/dependencies')
+const createAPM = require('./modules/apm')
+const ipfsCalls = require('./modules/ipfsCalls')
+const web3Setup = require('./modules/web3Setup')
+const createGetDirectory = require('./modules/createGetDirectory')
 
-// initialize dependencies
-let docker_compose = new Docker_compose()
+// initialize dependencies (by order)
+const web3 = web3Setup(params) // <-- web3
+const apm = createAPM(web3)
+const getDirectory = createGetDirectory(web3)
+const getManifest = createGetManifest(apm, ipfsCalls)
+const dockerCompose = new DockerCompose()
+const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest)
+const download = pkg.createDownload(params, ipfsCalls)
+const run      = pkg.createRun(params, dockerCompose)
+const downloadPackages = pkg.createDownloadPackages(download)
+const runPackages      = pkg.createRunPackages(run)
 
 // Initialize calls
-const installPackage   = createInstallPackage  (params, docker_compose)
-const removePackage    = createRemovePackage   (params, docker_compose)
-const togglePackage    = createTogglePackage   (params, docker_compose)
-const logPackage       = createLogPackage      (params, docker_compose)
-const listPackages     = createListPackages    (params, dockerCalls)
-const listDirectory    = createListDirectory   (params, docker_compose)
-const fetchPackageInfo = createFetchPackageInfo(params, docker_compose)
-const updatePackageEnv = createUpdatePackageEnv(params, docker_compose)
+const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages)
+const removePackage    = createRemovePackage   (params, dockerCompose)
+const togglePackage    = createTogglePackage   (params, dockerCompose)
+const logPackage       = createLogPackage      (params, dockerCompose)
+const listPackages     = createListPackages    (params) // Needs work
+const listDirectory    = createListDirectory   (getDirectory)
+const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
+const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
 
 const autobahnTag = params.autobahnTag
 const autobahnUrl = params.autobahnUrl
@@ -55,7 +71,7 @@ connection.onopen = function(session, details) {
     // ###### FOR DEVELOPMENT - simulating an install call
     // ###### FOR DEVELOPMENT - simulating an install call
 
-    setTimeout(function(){
+    setTimeout(() => {
       let link = 'otpweb.dnp.dappnode.eth'
       // session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
       session.call('listPackages.installer.repo.dappnode.eth', [link])

@@ -12,12 +12,12 @@ chai.should();
 
 describe('Call function: listPackages', function() {
 
-  docker_composeMockTest()
+  mockTest()
 
 });
 
 
-function docker_composeMockTest() {
+function mockTest() {
 
   let hasListed = false
   let envs = {VAR1: 'VALUE1'}

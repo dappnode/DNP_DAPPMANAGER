@@ -1,78 +1,5 @@
 // node modules
 const semver = require('semver')
-const Web3 = require('web3')
-
-// dedicated modules
-const params = require('../../params')
-
-const possibleWeb3Hosts = params.possibleWeb3Hosts
-
-var WEB3HOSTWS;
-var web3;
-
-// FOR DEVELOPING PURPOSES ONLY
-// ############################
-
-// testing dappnode's provider and defaulting to infura if not ready
-init();
-
-async function init() {
-  WEB3HOSTWS = await getWorkingWeb3Host(possibleWeb3Hosts);
-  web3 = new Web3(WEB3HOSTWS);
-  console.log('CONNECTED to ETHCHAIN \n   host: '+WEB3HOSTWS)
-  watchWeb3Provider();
-}
-
-
-async function getWorkingWeb3Host(web3HostsArray) {
-
-  for (const web3Host of web3HostsArray) {
-    let _testWeb3Host = await testWeb3Host(web3Host)
-    if (_testWeb3Host.works) {
-      // console.log('TESTING '+web3HostsArray[i]+' WORKED')
-      return web3Host
-    } else {
-      // console.log('TESTING '+web3HostsArray[i]+' NOT WORKING, reason: '+_testWeb3Host.reason)
-    }
-  }
-  throw Error('NO WEB3 HOST IS WORKING');
-}
-
-function testWeb3Host(web3Host) {
-  return new Promise(function(resolve, reject) {
-    var _web3 = new Web3(web3Host);
-    _web3.eth.isSyncing()
-    .then(function(isSyncing){
-      if (isSyncing) {
-        return resolve({
-          works: false,
-          reason: 'still syncing'
-        })
-      } else {
-        return resolve({
-          works: true,
-          reason: ''
-        })
-      }
-    })
-    .catch(function(err){
-      return resolve({
-        works: false,
-        reason: err
-      })
-    });
-  });
-}
-
-
-function watchWeb3Provider() {
-  setInterval(function () {
-      web3.eth.net.isListening().then().catch(e => {
-          console.log('[ - ] Lost connection to the node: ' + WEB3HOSTWS + ', reconnecting');
-          web3.setProvider(WEB3HOSTWS);
-      })
-  }, 10000)
-}
 
 
 const directoryAddr = '0xc8330fB0B7d80A7be4eDB624139e15Ec1f3FfEa3'
@@ -80,26 +7,30 @@ const directoryAbi = [{"constant":false,"inputs":[{"name":"name","type":"string"
 
 const DAppNodePackageStatus = ['Preparing', 'Develop', 'Active', 'Deprecated', 'Deleted']
 
-async function getDirectory() {
+function createGetDirectory(web3) {
 
-    const directory = new web3.eth.Contract(directoryAbi, directoryAddr);
-    const numberOfDAppNodePackages = parseFloat( await directory.methods.numberOfDAppNodePackages().call() )
+  return async function getDirectory() {
 
-    let packages = [];
-    for (let i = 0; i < numberOfDAppNodePackages; i++) {
-      try {
-        const package = await directory.methods.getPackage(i).call();
-        packages.push({
-          name: package.name,
-          status: DAppNodePackageStatus[package.status]
-        })
-      } catch(e) {
-        console.log('Error retrieving package #' + i + ' from directory, err: ' + e)
+      const directory = new web3.eth.Contract(directoryAbi, directoryAddr);
+      const numberOfDAppNodePackages = parseFloat( await directory.methods.numberOfDAppNodePackages().call() )
+
+      let packages = [];
+      for (let i = 0; i < numberOfDAppNodePackages; i++) {
+        try {
+          const package = await directory.methods.getPackage(i).call();
+          packages.push({
+            name: package.name,
+            status: DAppNodePackageStatus[package.status]
+          })
+        } catch(e) {
+          console.trace('Error retrieving package #' + i + ' from directory, err: ' + e)
+        }
       }
-    }
-    return packages
+      return packages
+  }
+
 }
 
-module.exports = {
-  getDirectory,
-}
+
+
+module.exports = createGetDirectory
