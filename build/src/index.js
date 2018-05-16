@@ -49,9 +49,9 @@ const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
 const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
 
 // Initalize app
-init()
+start()
 
-async function init() {
+async function start() {
 
   const credentials = await getCredentials('core')
   console.log('Successfully fetched credentials for: '+credentials.id)
@@ -64,7 +64,7 @@ async function init() {
     url: autobahnUrl,
     realm: autobahnRealm,
     authmethods: ["wampcra"],
-    authid: 'coredappnode',
+    authid: credentials.id,
     onchallenge: onchallenge
   })
 

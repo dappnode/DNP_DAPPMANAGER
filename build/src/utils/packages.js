@@ -38,7 +38,6 @@ function createDownload(params,
   return async function download(pkg) {
     // call IPFS, store the file in the repo's folder
     // load the image to docker
-
     const PACKAGE_NAME = pkg.name
     const MANIFEST = pkg.manifest
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
@@ -66,7 +65,10 @@ function createDownload(params,
     // download and load image to docker
     await ipfsCalls.download(
       validate.path(IMAGE_PATH),
-      IMAGE_HASH)
+      IMAGE_HASH,
+      function(downloadedSize){
+        log()
+      })
 
   }
 }

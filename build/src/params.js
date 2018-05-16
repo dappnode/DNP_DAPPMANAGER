@@ -1,7 +1,9 @@
+// console.trace('CHANGE BACK THE REALM to: dappnode_admin')
 module.exports = {
 
   // Autobahn parameters
   autobahnUrl: 'ws://my.wamp.dnp.dappnode.eth:8080/ws',
+  // autobahnRealm: 'realm1',
   autobahnRealm: 'dappnode_admin',
   autobahnTag: {
     installerLog: "log.installer.repo.dappnode.eth"

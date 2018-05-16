@@ -85,7 +85,7 @@ function handleDownload(PATH, HASH, log) {
     }, timeoutTime)
 
     // Track progress
-    let progressTracker = new ProgressTracker('MB', PATH, log)
+    let progressTracker = new ProgressTracker('KB', PATH, log)
 
     readStream
       .on('data', function(chunk) {
@@ -150,6 +150,9 @@ function ProgressTracker(displayOption, fileID, log) {
     case 'MB':
       displaySize = 1000000 // MB
       break;
+    case 'KB':
+      displaySize = 1000 // MB
+      break;
   }
 
   this.downloadedSize = 0
@@ -161,7 +164,8 @@ function ProgressTracker(displayOption, fileID, log) {
 
     if (Math.floor(this.downloadedSize/displaySize) > this.downloadedSizeDisplay) {
       this.downloadedSizeDisplay = Math.floor(this.downloadedSize/displaySize)
-      log('Downloaded '+this.downloadedSizeDisplay+' '+displayOption)
+      // Log the downloaded amount
+      log(this.downloadedSizeDisplay)
     }
 
   }

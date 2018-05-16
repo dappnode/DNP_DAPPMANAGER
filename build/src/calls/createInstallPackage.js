@@ -23,11 +23,14 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
     // > getManifest needs IPFS
     // > Returns an order to follow in order to install repecting dependencies
     let packageList = await getAllDependenciesResolvedOrdered(packageReq)
+    console.log('\x1b[36m%s\x1b[0m', 'Finished getDeps');
 
     // -> install in paralel
     await downloadPackages(packageList)
+    console.log('\x1b[36m%s\x1b[0m', 'Finished downloading');
     // -> run in serie
     await runPackages(packageList)
+    console.log('\x1b[36m%s\x1b[0m', 'Finished running');
 
     return JSON.stringify({
         success: true,
