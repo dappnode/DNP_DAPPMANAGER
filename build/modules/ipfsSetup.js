@@ -2,7 +2,7 @@
 const ipfsAPI = require('ipfs-api');
 
 // dedicated modules
-const params = require('../../../params')
+const params = require('../params')
 
 const IPFS = params.IPFS;
 const ipfs = ipfsAPI(IPFS, '5001', { protocol: 'http' });

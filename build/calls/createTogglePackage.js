@@ -1,17 +1,17 @@
-const { containerStateFromPs } = require('../modules/calls/dockerCallsUtils')
-const { Docker_compose } = require('../modules/calls/dockerCalls')
+const { containerStateFromPs } = require('../utils/dockerUtils')
+const DockerCompose = require('../utils/DockerCompose')
 const fs = require('fs')
 const getPath = require('../utils/getPath')
-const docker_compose_default = new Docker_compose()
 
 
 function createTogglePackage(params,
   // default option passed to allow testing
-  docker_compose=docker_compose_default) {
+  dockerCompose) {
 
   return async function togglePackage(req) {
 
       const PACKAGE_NAME = req[0]
+      const timeout = req[1] || 10
       const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
 
       if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
@@ -19,7 +19,7 @@ function createTogglePackage(params,
       }
 
       let packageState = containerStateFromPs(
-        await docker_compose.ps(DOCKERCOMPOSE_PATH),
+        await dockerCompose.ps(DOCKERCOMPOSE_PATH),
         PACKAGE_NAME
       )
 
@@ -27,14 +27,17 @@ function createTogglePackage(params,
       switch (packageState.split(' ')[0]) {
 
         case 'Up':
-          await docker_compose.stop(DOCKERCOMPOSE_PATH)
+          await dockerCompose.stop(DOCKERCOMPOSE_PATH, {timeout})
           break;
 
         case 'Exit':
-          await docker_compose.start(DOCKERCOMPOSE_PATH)
+          await dockerCompose.start(DOCKERCOMPOSE_PATH)
           break;
 
         case 'Down':
+          console.log('{{{{{{{{{{{}}}}}}}}}}}')
+          console.log(packageState)
+          console.trace(await dockerCompose.ps(DOCKERCOMPOSE_PATH))
           throw Error('Package ' + PACKAGE_NAME + ' is down, state: ' + packageState)
           break;
 

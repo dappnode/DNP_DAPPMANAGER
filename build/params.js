@@ -23,7 +23,7 @@ module.exports = {
   // Docker compose parameters
   DNP_VERSION_TAG: "dnp_version",
   DNS_SERVICE: "172.33.1.2",
-  DNP_NETWORK: "dncore_network", // production: "dncore_network"
+  DNP_NETWORK: "dncore_network",
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
 
   // IPFS parameters

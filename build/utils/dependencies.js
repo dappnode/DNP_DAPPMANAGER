@@ -1,42 +1,50 @@
 const { highestVersion } = require('../utils/versions')
-// function getAllDependencies(pac) {
-//   // Expects a package request: package@version
-//   // It will fetch dependencies recursively until filling the whole tree
-//   let dependencyList = await getAll (packageReq);
-//
-// }
+const { orderDependencies } = require('./orderDependencies')
+const parse = require('./parse')
 
-// A package manifest has this format:
-// {
-//   ...
-//   "dependencies": {
-//     "nginx-proxy.dnp.dappnode.eth": "latest"
-//   }
-// }
 
-// Default fecthDependencies
-// async function fetchDependencies(packageReq) {
-//   let dnpManifest = await getManifest(packageReq);
-//   return dnpManifest.dependencies;
-// }
+function createGetAllResolvedOrdered(getManifest) {
+  return async function getAllResolvedOrdered(packageReq) {
+    let allResolvedDeps = await getAllResolved(packageReq, getManifest)
+    // Dependencies will be ordered so they can be installed in series
+    return orderDependencies(allResolvedDeps)
+  }
+}
 
-async function getAllResolvedDeps(packageReq, fetchDependencies) {
 
-  let dependencyList = await getAllDeps(packageReq, fetchDependencies)
+async function getAllResolved(packageReq, getManifest) {
+  // Inputs
+  //  [1] packageReq = object, i.e {name: 'myPackage', ver: '1.2.3'}
+  //  [2] getManifest = async function: must return a manifest parsed object
+  // Specs
+  //  - It will fetch dependencies recursively until filling the whole tree
+  //  - !! It will attach the fetched manifest in the package object
+  // Output
+  //
+  //   allResolvedDeps = [
+  //     {
+  //       name: 'myPackage'
+  //       ver: '1.3.5'
+  //       dep: <dep object>
+  //       manifest: <manifest object>
+  //     },
+  //   ...
+  //   ]
+
+  let dependencyList = await getAll(packageReq, getManifest)
   // The dependecy list may contain the same package with different versions
   return resolveConflictingVersions(dependencyList)
 
 }
 
 
-async function getAllDeps(packageReq, fetchDependencies, packageList=[]) {
-  let depObject = await fetchDependencies(packageReq);
+async function getAll(packageReq, getManifest, packageList=[]) {
+  // Expects packageReq = {name: packageName, ver: packageVersion}
+  // >> Will attach the fetched manifest
 
+  let manifest = await getManifest(packageReq);
   // Validate the input, manifests are not controlled by the dappnode team
-  let dep = [];
-  if ( !depObject || typeof(depObject) != typeof({}) ) {
-    throw Error('BROKEN DEPENDENCY OBJECT, of package: '+JSON.stringify(packageReq)+' depObject: '+depObject)
-  }
+  let depObject = parse.manifest.depObject(manifest)
 
   // Using a for loop instead of map or forEach to avoid hiding this code
   // and its errors inside a different function
@@ -52,7 +60,7 @@ async function getAllDeps(packageReq, fetchDependencies, packageList=[]) {
       name: depName,
       ver: depObject[depName]
     }
-    await getAllDeps(subDepReq, fetchDependencies, packageList)
+    await getAll(subDepReq, getManifest, packageList)
 
   }
 
@@ -60,7 +68,8 @@ async function getAllDeps(packageReq, fetchDependencies, packageList=[]) {
   packageList.push({
     name: packageReq.name,
     ver: packageReq.ver,
-    dep: depObject
+    dep: depObject,
+    manifest: manifest
   })
   return packageList
 
@@ -102,9 +111,10 @@ function sortByNameKey(a,b) {
 
 
 module.exports = {
-  getAllDeps,
+  createGetAllResolvedOrdered,
+  getAll,
+  getAllResolved,
   sortByNameKey,
   byUniqueObjects,
-  resolveConflictingVersions,
-  getAllResolvedDeps
+  resolveConflictingVersions
 }

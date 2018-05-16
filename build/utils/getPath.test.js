@@ -17,33 +17,33 @@ describe('Util: get paths', function() {
   const packageName = 'some_package'
   const imageName = 'some_image.tar.xz'
 
-  it('return REPO_DIR path', function(){
+  it('return REPO_DIR path', () => {
     let path = 'repo'
     getPath.REPO_DIR(params)
       .should.equal(REPO_PATH_MOCK)
   });
 
-  it('return PACKAGE_REPO_DIR path', function(){
+  it('return PACKAGE_REPO_DIR path', () => {
     getPath.PACKAGE_REPO_DIR(packageName, params)
       .should.equal(REPO_PATH_MOCK + packageName)
   });
 
-  it('return MANIFEST path', function(){
+  it('return MANIFEST path', () => {
     getPath.MANIFEST(packageName, params)
       .should.equal(REPO_PATH_MOCK + packageName + '/' + params.DAPPNODE_PACKAGE_NAME)
   });
 
-  it('return DOCKERCOMPOSE path', function(){
+  it('return DOCKERCOMPOSE path', () => {
     getPath.DOCKERCOMPOSE(packageName, params)
       .should.equal(REPO_PATH_MOCK + packageName + '/' + params.DOCKERCOMPOSE_NAME)
   });
 
-  it('return ENV_FILE path', function(){
+  it('return ENV_FILE path', () => {
     getPath.ENV_FILE(packageName, params)
       .should.equal(REPO_PATH_MOCK + packageName + '/' + packageName + params.ENV_FILE_EXTENSION)
   });
 
-  it('return IMAGE path', function(){
+  it('return IMAGE path', () => {
     getPath.IMAGE(packageName, imageName, params)
       .should.equal(REPO_PATH_MOCK + packageName + '/' + imageName)
   });

@@ -1,12 +1,11 @@
-const { Docker_compose } = require('../modules/calls/dockerCalls')
+const DockerCompose = require('../utils/DockerCompose')
 const fs = require('fs')
 const getPath = require('../utils/getPath')
-const docker_compose_default = new Docker_compose()
 
 
 function createLogPackage(params,
   // default option passed to allow testing
-  docker_compose=docker_compose_default) {
+  dockerCompose) {
 
   return async function logPackage(req) {
 
@@ -17,7 +16,7 @@ function createLogPackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
-    let logs = await docker_compose.logs(DOCKERCOMPOSE_PATH)
+    let logs = await dockerCompose.logs(DOCKERCOMPOSE_PATH)
 
     return JSON.stringify({
         success: true,

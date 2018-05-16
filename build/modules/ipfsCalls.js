@@ -4,8 +4,8 @@ const through = require('through2')
 const createError = require('create-error')
 
 // dedicated modules
-const params = require('../../params')
-const ipfs = require('./setup/ipfsSetup')
+const params = require('../params')
+const ipfs = require('./ipfsSetup')
 
 // Define custom errors
 
@@ -14,50 +14,50 @@ const CACHE_DIR = params.CACHE_DIR
 
 // Define parameters
 
-let maxAttempts = 3
-let timeoutTime = 3000
-let waitingTimeBetweenAttempts = 1000
+const maxAttempts = 3
+const timeoutTime = 3000
+const waitingTimeBetweenAttempts = 1000
+const emptyFunction = () => {}
 
 // Main functions
 
-async function cat(hash) {
+async function cat(HASH) {
 
-  let FILE_PATH = CACHE_DIR + hash
+  let FILE_PATH = CACHE_DIR + HASH
 
   if (!fs.existsSync(CACHE_DIR)) {
     fs.mkdirSync(CACHE_DIR)
   }
 
   if (fs.existsSync(FILE_PATH)) {
+    // fs.fstatSync(fd)
+    // stats.ctimeMs: 1318289051000.1 -> The timestamp indicating the last time the file status was changed expressed in milliseconds since the POSIX Epoch.
+    // stats.ctime -> The timestamp indicating the last time the file status was changed.
     return fs.readFileSync(FILE_PATH, 'utf8')
   } else {
-    await download(hash, FILE_PATH)
+    await download(FILE_PATH, HASH)
     return fs.readFileSync(FILE_PATH, 'utf8')
   }
 
 }
 
 
-async function download(hash, path, log=console.log) {
+async function download(PATH, HASH, log=emptyFunction) {
 
   // Make sure hash if valid
-  if(!hash.startsWith('Qm')) {
-    throw Error('Invalid IPFS hash: ' + hash)
+  if(!HASH.startsWith('Qm')) {
+    throw Error('Invalid IPFS hash: ' + HASH)
   }
 
   for (let i = 0; i < maxAttempts; i++) {
 
     try {
-
-      await handleDownload(hash, path, log)
-      console.log('#### Download attempt n# '+i+' succeeded')
-      return
+      await handleDownload(PATH, HASH, log)
 
     } catch(error) {
-
       if (error instanceof IPFSError) {
-        console.log('#### Download attempt n# '+i+' failed, reason: '+error.msg)
-        console.log(error)
+        console.trace('#### Download attempt n# '+i+' failed, reason: '+error.msg)
+        console.error(error)
         await randomWaitingPeriod(waitingTimeBetweenAttempts)
       } else throw error
 
@@ -65,27 +65,27 @@ async function download(hash, path, log=console.log) {
 
   }
 
-  throw new IPFSError('IPFS could not download HASH: '+hash+' to PATH: '+path+' after # '+maxAttempts+' attempts')
+  throw new IPFSError('IPFS could not download HASH: '+HASH+' to PATH: '+PATH+' after # '+maxAttempts+' attempts')
 
 }
 
 
-function handleDownload(hash, path, log) {
+function handleDownload(PATH, HASH, log) {
   return new Promise(function(resolve, reject) {
     // This function has to download the file but also verify that:
     // - The downloaded file is correct (checking the hash)
     // - The download is happening (with a timer)
 
-    let readStream = ipfs.files.catReadableStream(hash)
-    let writeStream = fs.createWriteStream(path)
+    let readStream = ipfs.files.catReadableStream(HASH)
+    let writeStream = fs.createWriteStream(PATH)
 
     // Timeout cancel mechanism
-    let timeoutToCancel = setTimeout(function(){
+    let timeoutToCancel = setTimeout(() => {
       reject(new IPFSError('Timeout to cancel expired'))
     }, timeoutTime)
 
     // Track progress
-    let progressTracker = new ProgressTracker('MB', path, log)
+    let progressTracker = new ProgressTracker('MB', PATH, log)
 
     readStream
       .on('data', function(chunk) {
@@ -96,7 +96,7 @@ function handleDownload(hash, path, log) {
 
     writeStream
       .on('error', handleError)
-      .on('finish', checkFile(hash, resolve, reject))
+      .on('finish', checkFile(HASH, resolve, reject))
 
     readStream.pipe(writeStream)
 
@@ -105,11 +105,11 @@ function handleDownload(hash, path, log) {
 
 // Helper functions
 
-function checkFile(hash, onSuccess, onError) {
+function checkFile(HASH, onSuccess, onError) {
 
   return async function() {
 
-    if (await isfileHashValid(hash, this.path)) {
+    if (await isfileHashValid(HASH, this.path)) {
       onSuccess()
     } else {
       onError(new IPFSError('Downloaded file hash does not match origin, for: '+this.path))
@@ -119,11 +119,11 @@ function checkFile(hash, onSuccess, onError) {
 
 }
 
-function isfileHashValid(providedHash, path) {
+function isfileHashValid(providedHash, PATH) {
 
   return new Promise(function(resolve, reject) {
 
-    let cont = fs.readFileSync(path)
+    let cont = fs.readFileSync(PATH)
     let buffer = new Buffer(cont)
 
     ipfs.files.add(buffer, function (err, res) {
@@ -172,7 +172,7 @@ function ProgressTracker(displayOption, fileID, log) {
 
 function randomWaitingPeriod(maxPeriod) {
   return new Promise(function(resolve, reject) {
-    setTimeout(function(){
+    setTimeout(() => {
       resolve()
     }, maxPeriod * Math.random())
   })
@@ -189,18 +189,3 @@ module.exports = {
   download : download,
   cat: cat
 }
-
-// function getAPSManifest(hash) {
-//     return new Promise(function(resolve, reject) {
-//         console.log("Reading manifest... " + hash);
-//         ipfs.files.cat(hash, function(err, file) {
-//             if (err) {
-//                 return reject(err);
-//             }
-//             clearTimeout(timeoutReject);
-//             ipfs.pin.add(hash);
-//             return resolve(JSON.parse(file));
-//         });
-//         var timeoutReject = setTimeout(function() { return reject(new Error("ipfs cat timeout")) }, 15000);
-//     });
-// }

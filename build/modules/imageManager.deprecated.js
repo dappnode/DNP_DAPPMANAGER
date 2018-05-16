@@ -8,9 +8,9 @@ const ipfsCalls = require('./calls/ipfsCalls')
 const getManifest = require('./getManifest')
 const generateDockerCompose = require('./generateDockerCompose')
 const dockerCalls = require('./calls/dockerCalls')
-const { Docker_compose } = require('./calls/dockerCalls')
+const { DockerCompose } = require('./calls/dockerCalls')
 
-const docker_compose = new Docker_compose()
+const dockerCompose = new DockerCompose()
 
 
 async function download(packageName) {
@@ -73,7 +73,6 @@ async function deleteFile(path) {
   return new Promise(function(resolve, reject) {
     fs.unlink(path, (err) => {
       if (err) throw err
-      console.log('DELETED ' + path)
       resolve()
     })
   })
@@ -109,7 +108,7 @@ async function run(packageName) {
     msg: 'Running docker image...'
   })
 
-  await docker_compose.up(path.DOCKERCOMPOSE)
+  await dockerCompose.up(path.DOCKERCOMPOSE)
 
   emitter.emit('log', {
     topic: packageName,

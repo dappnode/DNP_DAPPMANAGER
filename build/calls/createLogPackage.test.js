@@ -9,12 +9,12 @@ chai.should();
 
 describe('Call function: logPackage', function() {
 
-  docker_composeMockTest()
+  dockerComposeMockTest()
 
 });
 
 
-function docker_composeMockTest() {
+function dockerComposeMockTest() {
   describe('mock test', function() {
 
     // const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
@@ -28,14 +28,14 @@ function docker_composeMockTest() {
 
     let hasLogged = false
     const PACKAGE_NAME = 'test.dnp.dappnode.eth'
-    const docker_composeMock = {
+    const dockerComposeMock = {
       logs: async (path) => {
         hasLogged = true
         return 'LOGS'
       }
     }
 
-    const logPackage = createLogPackage(params, docker_composeMock)
+    const logPackage = createLogPackage(params, dockerComposeMock)
 
     it('should log the package with correct arguments', async () => {
       let res = await logPackage([PACKAGE_NAME])

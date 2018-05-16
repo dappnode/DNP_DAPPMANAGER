@@ -1,54 +1,74 @@
-const { parsePackageReq } = require('../utils/parse')
-const getManifest = require('../modules/getManifest')
-const apm = require('../modules/calls/apm')
+const parse = require('../utils/parse')
 
-
-function createFetchPackageInfo() {
-
-  return async function fetchPackageInfo(req) {
-
-    let packageName = parsePackageReq(req[0]).name
-    let packageWithVersions = await getPackageVersions(packageName)
-
-    await getManifestOfVersions(packageName, packageWithVersions.versions)
-
+const res = {
+  success: (message, result) => {
+    // console.log('--------------\n User called method with success')
+    // console.log('  response message: ' + message+ '\n  result: ')
+    // console.log(result)
     return JSON.stringify({
         success: true,
-        message: "Fetched " + packageName + " info",
-        result: packageWithVersions
+        message,
+        result
     })
-
   }
 }
 
+function createFetchPackageInfo(getManifest, apm) {
 
+  const getManifestOfVersions = createGetManifestOfVersions(getManifest)
+  const getPackageVersions = createGetPackageVersions(apm)
+
+  return async function fetchPackageInfo(req) {
+
+    const packageReq = parse.packageReq(req[0])
+    let packageWithVersions = await getPackageVersions(packageReq)
+
+    await getManifestOfVersions(packageReq, packageWithVersions.versions)
+
+    return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
+
+  }
+}
 
 
 ///////////////////////////////
 // Helper functions
 
 
-async function getManifestOfVersions(packageName, versions) {
+function createGetManifestOfVersions(getManifest) {
 
-  let manifests = await Promise.all(
-    versions.map( async (version) => {
-      try {
-        version.manifest = await getManifest(packageName + '@' + version.version)
-      } catch(e) {
-        console.error(Error(e))
-        version.manifest = 'Error: '+e.message
-      }
-    })
-  )
-}
+  return async function getManifestOfVersions(packageReq, versions) {
 
-
-async function getPackageVersions(packageName) {
-  return {
-    name: packageName,
-    versions: ( await apm.getRepoVersions(packageName) ).reverse()
+    let manifests = await Promise.all(
+      versions.map( async (version) => {
+        try {
+          version.manifest = await getManifest({
+            name: packageReq.name,
+            ver: version.version
+          })
+        } catch(e) {
+          version.manifest = {error: true, message: e.message, stack: e.stack}
+        }
+      })
+    )
   }
 }
 
 
-module.exports = createFetchPackageInfo
+function createGetPackageVersions(apm) {
+
+  return async function getPackageVersions(packageReq) {
+    return {
+      name: packageReq.name,
+      versions: ( await apm.getRepoVersions(packageReq) ).reverse()
+    }
+  }
+}
+
+
+
+module.exports = {
+  createFetchPackageInfo,
+  createGetManifestOfVersions,
+  createGetPackageVersions
+}

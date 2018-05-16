@@ -1,15 +1,14 @@
 // node modules
 const yaml = require('yamljs')
 
-// dedicated modules
-const params = require('../params')
 
-// Define docker compose parameters
-const DNS_SERVICE = params.DNS_SERVICE
-const DNP_NETWORK = params.DNP_NETWORK
-const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
+function dockerCompose(dpn_manifest, params) {
 
-function DockerCompose(dpn_manifest) {
+    // Define docker compose parameters
+    const DNS_SERVICE = params.DNS_SERVICE
+    const DNP_NETWORK = params.DNP_NETWORK
+    const DNP_VERSION_TAG = params.DNP_VERSION_TAG
+    const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
 
     var name = dpn_manifest.name.replace("/", "_").replace("@", "");
 
@@ -19,7 +18,7 @@ function DockerCompose(dpn_manifest) {
     dockerCompose.services[name] = {}
     dockerCompose.services[name].image = dpn_manifest.image.name + ":" + dpn_manifest.image.version
     dockerCompose.services[name].container_name = CONTAINER_NAME_PREFIX + name
-    dockerCompose.services[name].labels = [params.DNP_VERSION_TAG+"="+dpn_manifest.version]
+    dockerCompose.services[name].labels = [DNP_VERSION_TAG+"="+dpn_manifest.version]
 
     if(dpn_manifest.image.volumes){
         var external_volumes = {};
@@ -66,7 +65,6 @@ function DockerCompose(dpn_manifest) {
       dpn_manifest.image.labels.forEach(function(label){
         dockerCompose.services[name].labels.push(label)
       })
-      console.log(dockerCompose.services[name].labels)
     }
 
     // Support for environment variables
@@ -84,12 +82,12 @@ function DockerCompose(dpn_manifest) {
 }
 
 
-function Manifest(dnpManifest) {
-  return JSON.stringify(dnpManifest, null, 2)
+function manifest (dnpManifest) {
+    return JSON.stringify(dnpManifest, null, 2)
 }
 
 
 module.exports = {
-  DockerCompose,
-  Manifest
+  dockerCompose,
+  manifest
 }

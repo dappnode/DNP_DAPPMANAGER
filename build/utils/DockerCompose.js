@@ -1,60 +1,14 @@
 // node modules
 const { promisify } = require('util');
-const shell = require('shelljs')
+const shellSync = require('./shell')
 const fs = require('fs')
 const docker = require('docker-remote-api')
 const request = docker()
 
-// dedicated modules
-const params = require('../../params')
 
-const TMP_REPO_DIR = params.TMP_REPO_DIR
-const DAPPNODE_PACKAGE_NAME = params.DAPPNODE_PACKAGE_NAME
-const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
-
-
-
-//////////////////////////////
-// Main functions
-//  (Docker API)
-//  endpoint documentation https://docs.docker.com/engine/api/v1.24/#31-containers
-
-async function listContainers() {
-  let containers = await dockerRequest('get', '/containers/json?all=true')
-  return containers
-    .map(format)
-    .filter(container => container.isDNP)
-}
-
-
-async function runningPackagesInfo() {
-
-  let containers = await listContainers()
-  let containersObject = {}
-  containers.forEach(function(container) {
-    containersObject[container.name] = container
-  })
-  return containersObject
-
-}
-
-//  (Shell API) - for methods not supported in the docker API
-
-function loadImage(imagePath) {
-  return shellExec('docker load -i ' + imagePath)
-}
-
-
-// FOR TESTING
-// var docker = new DockerManager()
-// docker.setExec(myfakeexec)
-//
-// docker.up()
-
-
-class Docker_compose {
+class DockerCompose {
   constructor() {
-    this.exec = shellExec
+    this.exec = shellSync
   }
 
   setExec(exec) {
@@ -124,6 +78,14 @@ class Docker_compose {
     return this.exec('docker-compose -f ' + dockerComposePath + ' ps')
   }
 
+  // NOT A DOCKER-COMPOSE
+  // Usage: docker load [OPTIONS]
+  // --input , -i		Read from tar archive file, instead of STDIN
+  // --quiet , -q		Suppress the load output
+  loadImage(imagePath) {
+    return this.exec('docker load -i ' + imagePath)
+  }
+
 }
 
 
@@ -139,104 +101,5 @@ function parseOptions(options) {
 }
 
 
-function dockerComposeUp(dockerComposePath) {
-  return shellExec('docker-compose -f ' + dockerComposePath + ' up -d')
-}
 
-
-
-///////////////////
-// Helper functions
-
-
-function dockerRequest(method, url) {
-
-  options = { json: true }
-  if (method == 'post') options.body = null
-
-  const dockerRequestPromise = promisify(request[method].bind(request))
-  return dockerRequestPromise(url, options)
-
-}
-
-
-function shellExec(command) {
-
-  return new Promise(function(resolve, reject) {
-    shell.exec(command, { silent: true }, function(code, stdout, stderr) {
-      if (code !== 0) {
-        return reject(Error(stderr))
-      } else {
-        return resolve(stdout)
-      }
-    })
-
-  })
-}
-
-
-function getListOfInstalledDNP() {
-  return new Promise(function(resolve, reject) {
-    let installedDNP = [];
-    shell.ls(TMP_REPO_DIR).forEach(function (file) {
-      let dnpManifestPath = TMP_REPO_DIR + file + '/' + DAPPNODE_PACKAGE_NAME;
-      if (fs.existsSync(dnpManifestPath)) {
-        let dnpManifest = JSON.parse(shell.cat(dnpManifestPath).stdout)
-        installedDNP.push({
-          name: dnpManifest.name,
-          version: dnpManifest.version,
-          description: dnpManifest.description
-        })
-      }
-    });
-    resolve(installedDNP)
-  })
-}
-
-
-///////////
-// utils
-
-
-function format(c) {
-  let packageName = c.Names[0]
-  let isDNP = packageName.includes(CONTAINER_NAME_PREFIX)
-  let name = c.Names[0].split(CONTAINER_NAME_PREFIX)[1]
-
-  let shortName;
-  if (name && name.includes('.')) shortName = name.split('.')[0]
-  else shortName = name
-
-  return {
-    id: c.Id,
-    isDNP: isDNP,
-    created: new Date(1000*c.Created),
-    image: c.Image,
-    name: name,
-    shortName: shortName,
-    version: c.Labels[params.DNP_VERSION_TAG],
-    ports: mapPorts(c.Ports),
-    state: c.State,
-    running: !/^Exited /i.test(c.Status)
-  }
-}
-
-
-function mapPorts(ports) {
-  if (!ports || ports.length === 0) return ''
-  var res = []
-  ports.forEach(function(p) {
-    let publicPort = p.PublicPort || ''
-    let privatePort = p.PrivatePort || ''
-    res.push(publicPort+'->'+privatePort)
-  })
-  return res.join(', ')
-}
-
-
-module.exports = {
-  listContainers,
-  runningPackagesInfo,
-  loadImage,
-  Docker_compose
-}
+module.exports = DockerCompose

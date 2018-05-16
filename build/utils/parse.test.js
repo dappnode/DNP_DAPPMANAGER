@@ -1,7 +1,6 @@
 const chai = require('chai')
 const expect = require('chai').expect
-const { parseEnvFile, stringifyEnvs } = require('./parse')
-const { parsePackageReq } = require('./parse')
+const parse = require('./parse')
 
 chai.should();
 
@@ -16,22 +15,22 @@ describe('Util: parse', function() {
     }
     const envString = 'VAR1=VALUE1\nVAR2=VALUE2'
 
-    it('should stringify an envs object', function(){
-      stringifyEnvs(envs)
+    it('should stringify an envs object', () => {
+      parse.stringifyEnvs(envs)
         .should.equal(envString)
     });
 
-    it('should parse an env string', function(){
-      parseEnvFile(envString)
+    it('should parse an env string', () => {
+      parse.envFile(envString)
         .should.deep.equal(envs)
     });
   });
 
   describe('parse Package request', function() {
 
-    it('should parse a package request', function(){
+    it('should parse a package request', () => {
 
-      parsePackageReq('package_name@version')
+      parse.packageReq('package_name@version')
         .should.deep.equal({
           name: 'package_name',
           ver: 'version',
@@ -40,9 +39,9 @@ describe('Util: parse', function() {
 
     });
 
-    it('should add latest to verionless requests', function(){
+    it('should add latest to verionless requests', () => {
 
-      parsePackageReq('package_name')
+      parse.packageReq('package_name')
         .should.deep.equal({
           name: 'package_name',
           ver: 'latest',
