@@ -1,6 +1,7 @@
 'use strict'
 // node modules
 const autobahn = require('autobahn')
+const fetch = require('node-fetch')
 
 // import calls
 const createInstallPackage   = require('./calls/createInstallPackage')
@@ -47,12 +48,27 @@ const listDirectory    = createListDirectory   (getDirectory)
 const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
 const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
 
-const autobahnTag = params.autobahnTag
-const autobahnUrl = params.autobahnUrl
-const autobahnRealm = params.autobahnRealm
-const connection = new autobahn.Connection({ url: autobahnUrl, realm: autobahnRealm })
+// Initalize app
+init()
 
-connection.onopen = function(session, details) {
+async function init() {
+
+  const credentials = await getCredentials('core')
+  console.log('Successfully fetched credentials for: '+credentials.id)
+  const onchallenge = createOnchallenge(credentials.key)
+
+  const autobahnTag = params.autobahnTag
+  const autobahnUrl = params.autobahnUrl
+  const autobahnRealm = params.autobahnRealm
+  const connection = new autobahn.Connection({
+    url: autobahnUrl,
+    realm: autobahnRealm,
+    authmethods: ["wampcra"],
+    authid: 'coredappnode',
+    onchallenge: onchallenge
+  })
+
+  connection.onopen = function(session, details) {
 
     console.log("CONNECTED to DAppnode's WAMP "+
       "\n   url "+autobahnUrl+
@@ -68,18 +84,6 @@ connection.onopen = function(session, details) {
     register(session, 'fetchPackageInfo.installer.dnp.dappnode.eth', fetchPackageInfo)
     register(session, 'updatePackageEnv.installer.dnp.dappnode.eth', updatePackageEnv)
 
-    // ###### FOR DEVELOPMENT - simulating an install call
-    // ###### FOR DEVELOPMENT - simulating an install call
-
-    setTimeout(() => {
-      let link = 'otpweb.dnp.dappnode.eth'
-      // session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
-      session.call('listPackages.installer.repo.dappnode.eth', [link])
-    }, 1000)
-
-    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
-    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
-
     emitter.on('log', (log) => {
       log.topic = log.topic || 'general'
       log.type = log.type || 'default'
@@ -87,14 +91,61 @@ connection.onopen = function(session, details) {
       console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
       session.publish(autobahnTag.installerLog, [log])
     })
+  }
+
+  console.log('ATTEMPTING TO CONNECT')
+  connection.open()
 
 }
-
-connection.open()
 
 
 ///////////////////////////////
 // Connection helper functions
+
+
+async function getCredentials(type) {
+
+  let url, id
+  switch (type) {
+    case 'core':
+      url = 'http://my.wamp.dnp.dappnode.eth:8080/core'
+      id = 'coredappnode'
+      break
+    case 'admin':
+      url = 'http://my.wamp.dnp.dappnode.eth:8080/admin'
+      id = 'dappnodeadmin'
+      break
+    default:
+      throw Error('Unkown user type')
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    body: '{"procedure": "authenticate.wamp.dnp.dappnode.eth", "args": [{},{},{}]}',
+    headers: { 'Content-Type': 'application/json' }
+  })
+
+  const resParsed = await res.json()
+  const key = resParsed.args[0]
+  return {
+    id,
+    key
+  }
+}
+
+
+function createOnchallenge(key) {
+
+  return function(session, method, extra) {
+    console.log("onchallenge", method, extra);
+    if (method === "wampcra") {
+       console.log("authenticating via '" + method + "' and challenge '" + extra.challenge + "'");
+       return autobahn.auth_cra.sign(key, extra.challenge);
+    } else {
+       throw "don't know how to authenticate using '" + method + "'";
+    }
+  }
+}
 
 
 function register(session, event, handler) {
