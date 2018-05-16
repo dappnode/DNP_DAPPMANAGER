@@ -64,8 +64,8 @@ const manifest = {
   },
 
   IMAGE_NAME: manifest => manifest.image.path,
-
-  IMAGE_HASH: manifest => manifest.image.hash
+  IMAGE_HASH: manifest => manifest.image.hash,
+  IMAGE_SIZE: manifest => manifest.image.hash
 
 }
 

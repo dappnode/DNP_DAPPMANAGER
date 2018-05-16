@@ -80,7 +80,7 @@ function integrationTest() {
   const togglePackage    = createTogglePackage   (params, dockerCompose)
   const logPackage       = createLogPackage      (params, dockerCompose)
   const listPackages     = createListPackages    (params) // Needs work
-  const listDirectory    = createListDirectory   (getDirectory)
+  const listDirectory    = createListDirectory   (getDirectory, getManifest, ipfsCalls)
   const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
   const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
 
@@ -88,7 +88,7 @@ function integrationTest() {
   const envs = JSON.stringify({VAR1: 'VALUE1'})
 
   // add .skip to skip test
-  describe('TEST 1, install package, log, toggle twice and delete it', () => {
+  describe.skip('TEST 1, install package, log, toggle twice and delete it', () => {
 
     beforeRemovePackage(dockerCompose, packageReq)
     // The test will perfom intense tasks and could take up to some minutes
@@ -123,7 +123,7 @@ function integrationTest() {
   })
 
 
-  describe('TEST 2, updatePackageEnv', () => {
+  describe.skip('TEST 2, updatePackageEnv', () => {
 
     // - > updatePackageEnv (of a non-existent package)
     testUpdatePackageEnv(updatePackageEnv, 'fake.eth', false, params)
@@ -131,7 +131,7 @@ function integrationTest() {
   })
 
 
-  describe('TEST 3, list directory and fetch package info', () => {
+  describe.skip('TEST 3, list directory and fetch package info', () => {
 
     // - > listDirectory
     testListDirectory(listDirectory, packageReq)

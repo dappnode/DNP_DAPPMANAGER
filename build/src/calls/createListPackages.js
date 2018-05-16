@@ -23,6 +23,7 @@ function createListPackages(params,
     })
 
     // Return
+    console.trace("Listing " + dnpList.length + " packages")
     return JSON.stringify({
         success: true,
         message: "Listing " + dnpList.length + " packages",

@@ -11,16 +11,26 @@ function createGetDirectory(web3) {
 
   return async function getDirectory() {
 
+    // Expects no input
+    // Return an array of objects:
+    //   [
+    //     {
+    //       name: packageName,  (string)
+    //       status: 'Preparing' (string)
+    //     },
+    //     ...
+    //   ]
+
       const directory = new web3.eth.Contract(directoryAbi, directoryAddr);
       const numberOfDAppNodePackages = parseFloat( await directory.methods.numberOfDAppNodePackages().call() )
 
       let packages = [];
       for (let i = 0; i < numberOfDAppNodePackages; i++) {
         try {
-          const package = await directory.methods.getPackage(i).call();
+          const pkg = await directory.methods.getPackage(i).call();
           packages.push({
-            name: package.name,
-            status: DAppNodePackageStatus[package.status]
+            name: pkg.name,
+            status: DAppNodePackageStatus[pkg.status]
           })
         } catch(e) {
           console.trace('Error retrieving package #' + i + ' from directory, err: ' + e)
