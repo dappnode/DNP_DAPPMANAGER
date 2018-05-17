@@ -4,11 +4,9 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 
 WORKDIR /usr/src/app
 
-ADD package-lock.json .
-ADD package.json .
+ADD src .
 ADD entrypoint.sh .
-ADD apm.js .
-ADD index.js .
+ADD dns_updater.sh .
 
 RUN npm install
 RUN npm install nodemon --save
