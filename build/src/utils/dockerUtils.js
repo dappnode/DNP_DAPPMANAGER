@@ -33,12 +33,12 @@ function parsePs(output) {
 
   // If the docker-compose ps format changes, this may alert it
   if (propNames.length != 4) {
-    console.warning('docker-compose ps format may have changed, raw output:\n'+output)
+    console.trace('docker-compose ps format may have changed, raw output:\n'+output)
   } else if (propNames[0] != 'name'
   || propNames[1] != 'command'
   || propNames[2] != 'state'
   || propNames[3] != 'ports') {
-    console.warning('docker-compose ps format may have changed, raw output:\n'+output)
+    console.trace('docker-compose ps format may have changed, raw output:\n'+output)
   }
 
   return containerRows
@@ -51,7 +51,7 @@ function parsePs(output) {
 
     let nameCorrected = containerProps[0]
       .replace('DAppNodePackage-', '')
-      
+
     return {
       name: nameCorrected,
       command: containerProps[1],

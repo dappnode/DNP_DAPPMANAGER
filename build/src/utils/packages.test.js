@@ -78,6 +78,8 @@ describe('Util: package install / download', () => {
   const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
   const dnpManifest = {image:{path: IMAGE_NAME, hash: IMAGE_HASH}}
 
+  const emptyFunction = () => {}
+
 
   describe('.download', () => {
 
@@ -111,6 +113,12 @@ describe('Util: package install / download', () => {
       }
     }
 
+    // dockerCompose .loadImage .up
+    const dockerCompose_loadImage_spy = sinon.spy()
+    const dockerComposeMock = {
+      loadImage: dockerCompose_loadImage_spy
+    }
+
     // validate .path --> blindly accept all paths
     const validateMock = {
       path: (path) => { return path }
@@ -133,7 +141,14 @@ describe('Util: package install / download', () => {
       }
     }
 
-    const download = pkg.createDownload(params, ipfsCallsMock, generateMock, validateMock, fsMock)
+
+    const download = pkg.createDownload(params,
+      ipfsCallsMock,
+      dockerComposeMock,
+      emptyFunction,
+      generateMock,
+      validateMock,
+      fsMock)
 
 
     download({
@@ -184,6 +199,11 @@ describe('Util: package install / download', () => {
       sinon.assert.calledWith(ipfs_download_spy, IMAGE_PATH, IMAGE_HASH);
     });
 
+    it('dockerCompose.loadImage should be called with IMAGE_PATH', () => {
+      expect(dockerCompose_loadImage_spy.getCalls()[0].args)
+        .to.deep.equal( [IMAGE_PATH] )
+    });
+
   })
 
 
@@ -192,27 +212,21 @@ describe('Util: package install / download', () => {
     /////// Make mocks for dependencies
 
     // dockerCompose .loadImage .up
-    const dockerCompose_loadImage_spy = sinon.spy()
     const dockerCompose_up_spy = sinon.spy()
     const dockerComposeMock = {
-      loadImage: dockerCompose_loadImage_spy,
       up: dockerCompose_up_spy
     }
 
     // getManifest
     const getManifest_spy = sinon.spy()
 
-    const run = pkg.createRun(params, dockerComposeMock)
+    const run = pkg.createRun(params,
+      dockerComposeMock)
 
     run({
       name: PACKAGE_NAME,
       manifest: dnpManifest
     })
-
-    it('dockerCompose.loadImage should be called with IMAGE_PATH', () => {
-      expect(dockerCompose_loadImage_spy.getCalls()[0].args)
-        .to.deep.equal( [IMAGE_PATH] )
-    });
 
     // generate_DockerCompose_spy - dnpManifest
     it('dockerCompose.up should be called with DOCKERCOMPOSE_PATH', () => {

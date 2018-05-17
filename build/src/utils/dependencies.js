@@ -3,11 +3,15 @@ const { orderDependencies } = require('./orderDependencies')
 const parse = require('./parse')
 
 
-function createGetAllResolvedOrdered(getManifest) {
+function createGetAllResolvedOrdered(getManifest, log = () => {}) {
   return async function getAllResolvedOrdered(packageReq) {
+
+    log({clear: true, msg: 'fetching dependencies...'})
     let allResolvedDeps = await getAllResolved(packageReq, getManifest)
     // Dependencies will be ordered so they can be installed in series
-    return orderDependencies(allResolvedDeps)
+    let allResolvedOrdered = orderDependencies(allResolvedDeps)
+    log({order: allResolvedOrdered.map(p => p.name)})
+    return allResolvedOrdered
   }
 }
 

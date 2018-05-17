@@ -9,7 +9,7 @@ chai.should();
 
 describe('All Calls functions: installPackage', function() {
 
-  integrationTest()
+  // integrationTest()
 
 });
 
@@ -69,8 +69,8 @@ function integrationTest() {
   const getManifest = createGetManifest(apm, ipfsCalls)
   const dockerCompose = new DockerCompose()
   const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest)
-  const download = pkg.createDownload(params, ipfsCalls)
-  const run      = pkg.createRun(params, dockerCompose)
+  const download = pkg.createDownload(params, ipfsCalls, dockerCompose, log)
+  const run      = pkg.createRun(params, dockerCompose, log)
   const downloadPackages = pkg.createDownloadPackages(download)
   const runPackages      = pkg.createRunPackages(run)
 
@@ -87,8 +87,12 @@ function integrationTest() {
   const packageReq = 'otpweb.dnp.dappnode.eth'
   const envs = JSON.stringify({VAR1: 'VALUE1'})
 
+  function log(topic, packageName, res) {
+    console.log('\x1b[33m%s\x1b[0m',topic,' ','\x1b[36m%s\x1b[0m',packageName,' ','\x1b[35m%s\x1b[0m',res)
+  }
+
   // add .skip to skip test
-  describe.skip('TEST 1, install package, log, toggle twice and delete it', () => {
+  describe('TEST 1, install package, log, toggle twice and delete it', () => {
 
     beforeRemovePackage(dockerCompose, packageReq)
     // The test will perfom intense tasks and could take up to some minutes
