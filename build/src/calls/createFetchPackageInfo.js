@@ -1,17 +1,17 @@
 const parse = require('../utils/parse')
+const res =   require('../utils/res')
 
-const res = {
-  success: (message, result) => {
-    // console.log('--------------\n User called method with success')
-    // console.log('  response message: ' + message+ '\n  result: ')
-    // console.log(result)
-    return JSON.stringify({
-        success: true,
-        message,
-        result
-    })
-  }
-}
+// CALL DOCUMENTATION:
+// > result = packageWithVersions =
+//   {
+//     name: packageName, (string)
+//     versions: [
+//       {
+//         version: '0.0.4', (string)
+//         manifest: <Manifest> (object)
+//       }
+//     ]
+//   }
 
 function createFetchPackageInfo(getManifest, apm) {
 

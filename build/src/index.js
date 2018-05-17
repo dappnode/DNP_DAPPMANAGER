@@ -31,19 +31,19 @@ const apm = createAPM(web3)
 const getDirectory = createGetDirectory(web3)
 const getManifest = createGetManifest(apm, ipfsCalls)
 const dockerCompose = new DockerCompose()
-const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest)
-const download = pkg.createDownload(params, ipfsCalls)
-const run      = pkg.createRun(params, dockerCompose)
+const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest, log)
+const download = pkg.createDownload(params, ipfsCalls, dockerCompose, log)
+const run      = pkg.createRun(params, dockerCompose, log)
 const downloadPackages = pkg.createDownloadPackages(download)
 const runPackages      = pkg.createRunPackages(run)
 
 // Initialize calls
-const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages)
+const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages, log)
 const removePackage    = createRemovePackage   (params, dockerCompose)
 const togglePackage    = createTogglePackage   (params, dockerCompose)
 const logPackage       = createLogPackage      (params, dockerCompose)
 const listPackages     = createListPackages    (params) // Needs work
-const listDirectory    = createListDirectory   (getDirectory)
+const listDirectory    = createListDirectory   (getDirectory, getManifest, ipfsCalls)
 const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
 const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
 
@@ -51,6 +51,8 @@ const autobahnTag = params.autobahnTag
 const autobahnUrl = params.autobahnUrl
 const autobahnRealm = params.autobahnRealm
 const connection = new autobahn.Connection({ url: autobahnUrl, realm: autobahnRealm })
+
+let session_global;
 
 connection.onopen = function(session, details) {
 
@@ -80,14 +82,20 @@ connection.onopen = function(session, details) {
     // ^^^^^^ FOR DEVELOPMENT - simulating an install call
     // ^^^^^^ FOR DEVELOPMENT - simulating an install call
 
-    emitter.on('log', (log) => {
-      log.topic = log.topic || 'general'
-      log.type = log.type || 'default'
-      log.msg = String(log.msg) || ''
-      console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
-      session.publish(autobahnTag.installerLog, [log])
-    })
+    session_global = session
+    // emitter.on('log', (log) => {
+    //   log.topic = log.topic || 'general'
+    //   log.type = log.type || 'default'
+    //   log.msg = String(log.msg) || ''
+    //   console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
+    //   session.publish(autobahnTag.installerLog, [log])
+    // })
 
+}
+
+function log(data) {
+  session_global.publish(autobahnTag.installerLog, [data])
+  console.log('\x1b[35m%s\x1b[0m',JSON.stringify(data))
 }
 
 connection.open()

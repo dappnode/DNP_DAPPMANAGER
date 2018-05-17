@@ -1,7 +1,10 @@
-const DockerCompose = require('../utils/DockerCompose')
 const fs = require('fs')
-const getPath = require('../utils/getPath')
+const DockerCompose = require('../utils/DockerCompose')
+const getPath =       require('../utils/getPath')
+const res =           require('../utils/res')
 
+// CALL DOCUMENTATION:
+// > result = {}
 
 function createRemovePackage(params,
   // default option passed to allow testing
@@ -18,10 +21,8 @@ function createRemovePackage(params,
 
     await dockerCompose.down(DOCKERCOMPOSE_PATH)
 
-    return JSON.stringify({
-        success: true,
-        message: 'Removed package: ' + PACKAGE_NAME
-    })
+    return res.success('Removed package: ' + PACKAGE_NAME)
+
   }
 }
 

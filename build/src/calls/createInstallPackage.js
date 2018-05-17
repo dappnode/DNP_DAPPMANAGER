@@ -1,19 +1,18 @@
-
-const emitter = require('../modules/emitter')
 const fs = require('fs')
-
-// Utilities
-const pkg = require('../utils/packages')
-const { stringifyEnvs } = require('../utils/parse')
-const getPath = require('../utils/getPath')
+const emitter = require('../modules/emitter')
+const pkg =          require('../utils/packages')
+const getPath =      require('../utils/getPath')
 const dependencies = require('../utils/dependencies')
-const parse = require('../utils/parse')
-const params = require('../params')
+const parse =        require('../utils/parse')
+const res =          require('../utils/res')
 
+// CALL DOCUMENTATION:
+// > result = {}
 
 function createInstallPackage(getAllDependenciesResolvedOrdered,
   downloadPackages,
-  runPackages) {
+  runPackages,
+  log = () => {}) {
 
   return async function installPackage(req) {
 
@@ -32,10 +31,8 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
     await runPackages(packageList)
     console.log('\x1b[36m%s\x1b[0m', 'Finished running');
 
-    return JSON.stringify({
-        success: true,
-        message: 'Installed ' + packageReq.name + ' version: ' + packageReq.ver
-    })
+    log({clear: true})
+    return res.success('Installed ' + packageReq.name + ' version: ' + packageReq.ver)
   }
 }
 

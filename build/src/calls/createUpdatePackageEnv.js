@@ -1,7 +1,8 @@
-const parse = require('../utils/parse')
-const getPath = require('../utils/getPath')
-const validate = require('../utils/validate')
 const fs = require('fs')
+const parse =    require('../utils/parse')
+const getPath =  require('../utils/getPath')
+const validate = require('../utils/validate')
+const res =      require('../utils/res')
 
 
 // default option passed to allow testing
@@ -28,10 +29,8 @@ function createUpdatePackageEnv(params, dockerCompose) {
       await dockerCompose.up(DOCKERCOMPOSE_PATH)
     }
 
-    return JSON.stringify({
-        success: true,
-        message: 'Updated envs for package: ' + PACKAGE_NAME
-    })
+    return res.success('Updated envs for package: ' + PACKAGE_NAME)
+
   }
 
 }

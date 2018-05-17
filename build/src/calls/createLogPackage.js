@@ -1,7 +1,10 @@
-const DockerCompose = require('../utils/DockerCompose')
 const fs = require('fs')
-const getPath = require('../utils/getPath')
+const DockerCompose = require('../utils/DockerCompose')
+const getPath =       require('../utils/getPath')
+const res =           require('../utils/res')
 
+// CALL DOCUMENTATION:
+// > result = logs = <String with escape codes> (string)
 
 function createLogPackage(params,
   // default option passed to allow testing
@@ -18,11 +21,11 @@ function createLogPackage(params,
 
     let logs = await dockerCompose.logs(DOCKERCOMPOSE_PATH)
 
-    return JSON.stringify({
-        success: true,
-        message: 'Got logs of package: ' + PACKAGE_NAME,
-        result: logs
+    return res.success('Got logs of package: ' + PACKAGE_NAME, {
+      name: PACKAGE_NAME,
+      logs
     })
+
   }
 }
 

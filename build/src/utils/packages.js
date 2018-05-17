@@ -31,6 +31,8 @@ function createRunPackages(run) {
 
 function createDownload(params,
   ipfsCalls,
+  dockerCompose,
+  log = () => {},
   generate = generate_default,
   validate = validate_default,
   fs = fs_default) {
@@ -42,6 +44,7 @@ function createDownload(params,
     const MANIFEST = pkg.manifest
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
     const IMAGE_HASH = parse.manifest.IMAGE_HASH(MANIFEST)
+    const IMAGE_SIZE = parse.manifest.IMAGE_SIZE(MANIFEST)
     const MANIFEST_PATH = getPath.MANIFEST(PACKAGE_NAME, params)
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
@@ -59,24 +62,34 @@ function createDownload(params,
       // Image file exists and is valid -> do nothing
       if (await ipfsCalls.isfileHashValid(IMAGE_HASH, IMAGE_PATH)) return
       // Image file exists and NOT valid -> delete and re-download
-      else await fs.unlinkSync(IMAGE_PATH)
+      else {
+        console.trace('Previously downloaded image was defective and will be re-downloaded')
+        await fs.unlinkSync(IMAGE_PATH)
+      }
     }
 
     // download and load image to docker
+    const displayRes = 2
+    const round = x => displayRes*Math.ceil(100*x/IMAGE_SIZE/displayRes)
+    const _log = percent => log({pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'})
+
+    log({pkg: PACKAGE_NAME, msg: 'starting download...'})
     await ipfsCalls.download(
       validate.path(IMAGE_PATH),
       IMAGE_HASH,
-      function(downloadedSize){
-        log()
-      })
-
+      _log,
+      round
+    )
+    log({pkg: PACKAGE_NAME, msg: 'loading image'})
+    await dockerCompose.loadImage(IMAGE_PATH)
+    log({pkg: PACKAGE_NAME, msg: 'loaded image'})
   }
 }
 
 
 function createRun(params,
-  dockerCompose
-) {
+  dockerCompose,
+  log = () => {}) {
 
   return async function run(pkg) {
 
@@ -86,8 +99,9 @@ function createRun(params,
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
 
-    await dockerCompose.loadImage(IMAGE_PATH)
+    log({pkg: PACKAGE_NAME, msg: 'starting package... '})
     await dockerCompose.up(DOCKERCOMPOSE_PATH)
+    log({pkg: PACKAGE_NAME, msg: 'package started'})
 
   }
 }

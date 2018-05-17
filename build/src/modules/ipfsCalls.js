@@ -17,7 +17,7 @@ const CACHE_DIR = params.CACHE_DIR
 const maxAttempts = 3
 const timeoutTime = 3000
 const waitingTimeBetweenAttempts = 1000
-const emptyFunction = () => {}
+const emptyFoo = x => x
 
 // Main functions
 
@@ -42,7 +42,7 @@ async function cat(HASH) {
 }
 
 
-async function download(PATH, HASH, log=emptyFunction) {
+async function download(PATH, HASH, log=emptyFoo, round=emptyFoo) {
 
   // Make sure hash if valid
   if(!HASH.startsWith('Qm')) {
@@ -52,7 +52,8 @@ async function download(PATH, HASH, log=emptyFunction) {
   for (let i = 0; i < maxAttempts; i++) {
 
     try {
-      await handleDownload(PATH, HASH, log)
+      await handleDownload(PATH, HASH, log, round)
+      return
 
     } catch(error) {
       if (error instanceof IPFSError) {
@@ -70,7 +71,7 @@ async function download(PATH, HASH, log=emptyFunction) {
 }
 
 
-function handleDownload(PATH, HASH, log) {
+function handleDownload(PATH, HASH, log, round) {
   return new Promise(function(resolve, reject) {
     // This function has to download the file but also verify that:
     // - The downloaded file is correct (checking the hash)
@@ -85,7 +86,7 @@ function handleDownload(PATH, HASH, log) {
     }, timeoutTime)
 
     // Track progress
-    let progressTracker = new ProgressTracker('KB', PATH, log)
+    let progressTracker = new ProgressTracker(log, round)
 
     readStream
       .on('data', function(chunk) {
@@ -143,31 +144,14 @@ function isfileHashValid(providedHash, PATH) {
 
 }
 
-function ProgressTracker(displayOption, fileID, log) {
+function ProgressTracker(log, round) {
 
-  let displaySize;
-  switch(displayOption) {
-    case 'MB':
-      displaySize = 1000000 // MB
-      break;
-    case 'KB':
-      displaySize = 1000 // MB
-      break;
-  }
+  this.prev = this.bytes = 0
+  this.round = round
 
-  this.downloadedSize = 0
-  this.downloadedSizeDisplay = 0
-
-  this.track = function(chunk) {
-
-    this.downloadedSize += chunk.length
-
-    if (Math.floor(this.downloadedSize/displaySize) > this.downloadedSizeDisplay) {
-      this.downloadedSizeDisplay = Math.floor(this.downloadedSize/displaySize)
-      // Log the downloaded amount
-      log(this.downloadedSizeDisplay)
-    }
-
+  this.track = (chunk) => {
+    if (this.round(this.bytes += chunk.length) > this.prev)
+      log(this.prev = this.round(this.bytes))
   }
 
 }
