@@ -124,10 +124,7 @@ function isfileHashValid(providedHash, PATH) {
 
   return new Promise(function(resolve, reject) {
 
-    let cont = fs.readFileSync(PATH)
-    let buffer = new Buffer(cont)
-
-    ipfs.files.add(buffer, function (err, res) {
+    ipfs.files.add([PATH], {onlyHash: true}, function (err, res) {
 
       if (err) reject(new IPFSError(err))
 
@@ -139,9 +136,7 @@ function isfileHashValid(providedHash, PATH) {
       }
 
     })
-
   })
-
 }
 
 function ProgressTracker(log, round) {

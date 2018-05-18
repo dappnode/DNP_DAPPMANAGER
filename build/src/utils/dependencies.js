@@ -1,9 +1,14 @@
+const semver = require('semver')
 const { highestVersion } = require('../utils/versions')
 const { orderDependencies } = require('./orderDependencies')
+const dockerList_default = require('../modules/dockerList')
 const parse = require('./parse')
 
 
-function createGetAllResolvedOrdered(getManifest, log = () => {}) {
+function createGetAllResolvedOrdered(getManifest,
+  log = () => {},
+  dockerList=dockerList_default) {
+
   return async function getAllResolvedOrdered(packageReq) {
 
     log({clear: true, msg: 'fetching dependencies...'})
@@ -11,8 +16,41 @@ function createGetAllResolvedOrdered(getManifest, log = () => {}) {
     // Dependencies will be ordered so they can be installed in series
     let allResolvedOrdered = orderDependencies(allResolvedDeps)
     log({order: allResolvedOrdered.map(p => p.name)})
-    return allResolvedOrdered
+
+    // Check which dependencies should be installed
+    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, log)
+    return allResolvedOrderedChecked
   }
+}
+
+
+async function shouldInstall(packageList, dockerList, log) {
+
+  // This function verifies if vcurrent < vreq
+  // otherwise, splices out the package of the list
+  const dnpList = await dockerList.listContainers()
+
+  return packageList.filter(packageReq => {
+
+    const packageCurrent = dnpList.filter(c => c.name == packageReq.name)[0]
+
+    // If there is no current package, install
+    if (!packageCurrent) return true
+
+    // Otherwise, compare verions
+    const requestedVersion = packageReq.manifest.version
+    const currentVersion = packageCurrent.version
+
+    console.trace('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion)
+    if (semver.lt(currentVersion, requestedVersion)) {
+      return true
+    } else {
+      log({pkg: packageReq.name, msg: 'Already updated'})
+      console.trace('IGNORING PACKAGE: '+packageReq.name)
+      return false
+    }
+  })
+
 }
 
 

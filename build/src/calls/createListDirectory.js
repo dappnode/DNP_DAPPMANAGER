@@ -42,14 +42,14 @@ function createListDirectory(getDirectory,
       const currentVersion = _package ? _package.version : null
 
       // Store info in package object
-      pkg.tag = shouldInstall(currentVersion, latestVersion)
+      pkg.tag = getTag(currentVersion, latestVersion)
+      pkg.disableInstall = (pkg.tag == 'Installed')
       pkg.manifest = manifest
-      console.trace('\x1b[33m%s\x1b[0m', pkg.name + 'currentVersion: '+currentVersion+' latestVersion: '+latestVersion+' ==> '+pkg.tag)
+      // console.trace('\x1b[33m%s\x1b[0m', pkg.name + 'currentVersion: '+currentVersion+' latestVersion: '+latestVersion+' ==> '+pkg.tag)
 
       // Fetch the package image
       const avatarHash = manifest.avatar
       if (avatarHash) {
-        console.trace('\x1b[33m%s\x1b[0m', avatarHash)
         await ipfsCalls.cat(avatarHash)
         pkg.avatarHash = avatarHash
         pkg.avatar = base64Img.base64Sync('cache/'+avatarHash)
@@ -62,10 +62,10 @@ function createListDirectory(getDirectory,
 }
 
 
-function shouldInstall(v_now, v_avail) {
-  if (!v_now) return 'install'
-  if (semver.lt(v_now, v_avail)) return 'update'
-  else return 'installed'
+function getTag(v_now, v_avail) {
+  if (!v_now) return 'Install'
+  if (semver.lt(v_now, v_avail)) return 'Update'
+  else return 'Installed'
 }
 
 
