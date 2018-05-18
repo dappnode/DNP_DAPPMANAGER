@@ -1,23 +1,19 @@
 const shell = require('shelljs')
 
+const maxTime = 20*1000
+
 async function shellExecSync(command) {
 
-  let { code, stdout, stderr } = await shell.exec(command, { silent: true })
-  if (code !== 0) {
-    if (command.includes('docker-compose')
-    && stderr.includes('Please')
-    && stderr.includes('\`')) {
+  const res = await shell.exec(command, { silent: false, timeout: maxTime })
 
-      let _command = stderr.split('\`')[1]
-      console.trace('AUTOMATICALLY CREATING REQUEST docker-compose INSTRUCTION: ' + _command)
-      await shellExecSync(_command)
-      await shellExecSync(command)
+  // When shell.exec timeout expires, res will be undefined
+  if (!res) throw Error('ERROR: shell process: '+command+' expired timeout ('+maxTime+' ms)')
 
-    } else {
-      throw Error(stderr)
-    }
-  }
-
+  // Otherwise, parse response
+  const code = res.code
+  const stdout = res.stdout
+  const stderr = res.stderr
+  if (code !== 0) throw Error(stderr)
   return stdout
 
 }

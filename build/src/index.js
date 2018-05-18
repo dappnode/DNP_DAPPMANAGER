@@ -38,7 +38,7 @@ const downloadPackages = pkg.createDownloadPackages(download)
 const runPackages      = pkg.createRunPackages(run)
 
 // Initialize calls
-const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages, log)
+const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages)
 const removePackage    = createRemovePackage   (params, dockerCompose)
 const togglePackage    = createTogglePackage   (params, dockerCompose)
 const logPackage       = createLogPackage      (params, dockerCompose)

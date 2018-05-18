@@ -11,8 +11,7 @@ const res =          require('../utils/res')
 
 function createInstallPackage(getAllDependenciesResolvedOrdered,
   downloadPackages,
-  runPackages,
-  log = () => {}) {
+  runPackages) {
 
   return async function installPackage(req) {
 
@@ -23,7 +22,6 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
     // > Returns an order to follow in order to install repecting dependencies
     let packageList = await getAllDependenciesResolvedOrdered(packageReq)
     console.log('\x1b[36m%s\x1b[0m', 'Finished getDeps');
-
     // -> install in paralel
     await downloadPackages(packageList)
     console.log('\x1b[36m%s\x1b[0m', 'Finished downloading');
@@ -31,7 +29,6 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
     await runPackages(packageList)
     console.log('\x1b[36m%s\x1b[0m', 'Finished running');
 
-    log({clear: true})
     return res.success('Installed ' + packageReq.name + ' version: ' + packageReq.ver)
   }
 }

@@ -80,9 +80,7 @@ function createDownload(params,
       _log,
       round
     )
-    log({pkg: PACKAGE_NAME, msg: 'loading image'})
-    await dockerCompose.loadImage(IMAGE_PATH)
-    log({pkg: PACKAGE_NAME, msg: 'loaded image'})
+
   }
 }
 
@@ -98,6 +96,10 @@ function createRun(params,
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
+
+    log({pkg: PACKAGE_NAME, msg: 'loading image'})
+    await dockerCompose.loadImage(IMAGE_PATH)
+    log({pkg: PACKAGE_NAME, msg: 'loaded image'})
 
     log({pkg: PACKAGE_NAME, msg: 'starting package... '})
     await dockerCompose.up(DOCKERCOMPOSE_PATH)
