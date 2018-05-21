@@ -8,7 +8,8 @@ const request = docker()
 // dedicated modules
 const params = require('../params')
 
-const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
+const DNP_CONTAINER_NAME_PREFIX = params.DNP_CONTAINER_NAME_PREFIX
+const CORE_CONTAINER_NAME_PREFIX = params.CORE_CONTAINER_NAME_PREFIX
 
 //////////////////////////////
 // Main functions
@@ -19,7 +20,13 @@ async function listContainers() {
   let containers = await dockerRequest('get', '/containers/json?all=true')
   return containers
     .map(format)
-    .filter(container => container.isDNP)
+}
+
+
+async function logContainer(id) {
+  let containers = await dockerRequest('get', '/containers/'+id+'/logs?stderr=1&stdout=1')
+  return containers
+    .map(format)
 }
 
 
@@ -58,9 +65,14 @@ function dockerRequest(method, url) {
 
 
 function format(c) {
-  let packageName = c.Names[0]
-  let isDNP = packageName.includes(CONTAINER_NAME_PREFIX)
-  let name = c.Names[0].split(CONTAINER_NAME_PREFIX)[1]
+  let packageName = c.Names[0].replace('/','')
+  let isDNP = packageName.includes(DNP_CONTAINER_NAME_PREFIX)
+  let isCORE = packageName.includes(CORE_CONTAINER_NAME_PREFIX)
+
+  let name;
+  if (isDNP) name = packageName.split(DNP_CONTAINER_NAME_PREFIX)[1]
+  // else if (isCORE) name = packageName.split(CORE_CONTAINER_NAME_PREFIX)[1]
+  else name = packageName
 
   let shortName;
   if (name && name.includes('.')) shortName = name.split('.')[0]
@@ -68,7 +80,8 @@ function format(c) {
 
   return {
     id: c.Id,
-    isDNP: isDNP,
+    isDNP,
+    isCORE,
     created: new Date(1000*c.Created),
     image: c.Image,
     name: name,
