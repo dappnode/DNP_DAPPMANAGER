@@ -37,10 +37,14 @@ function web3Existance (_web3) {
 
 async function web3Usability (_web3) {
 
-  const start = Date.now()
-  const isSyncing = await _web3.eth.isSyncing()
-  if (isSyncing) throw Error('Chain is still syncing, please wait until the chain is synced to perfom this action')
-  console.log(Date.now() - start, ' ms spent checking web3')
+  // Right now this function is empty as the code below
+  // was very slow ocassionally > 1000 ms. The check if the chain is syncing
+  // will be made directly in the ADMINUI
+
+  // const start = Date.now()
+  // const isSyncing = await _web3.eth.isSyncing()
+  // if (isSyncing) throw Error('Chain is still syncing, please wait until the chain is synced to perfom this action')
+  // console.log(Date.now() - start, ' ms spent checking web3')
 
 }
 
