@@ -28,7 +28,6 @@ class DockerCompose {
   // --build                    Build images before starting containers.
   // --exit-code-from SERVICE   Return the exit code of the selected service
   //                            container. Implies --abort-on-container-exit.
-
   up(dockerComposePath) {
     return this.exec('docker-compose -f ' + dockerComposePath + ' up -d')
   }
@@ -84,6 +83,13 @@ class DockerCompose {
   // --quiet , -q		Suppress the load output
   loadImage(imagePath) {
     return this.exec('docker load -i ' + imagePath)
+  }
+
+  // NOT A DOCKER-COMPOSE
+  // Usage: docker logs [OPTIONS] CONTAINER
+  // --timestamps , -t  Show timestamps
+  log(containerNameOrId) {
+    return this.exec('docker logs ' + containerNameOrId)
   }
 
 }

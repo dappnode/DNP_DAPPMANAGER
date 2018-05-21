@@ -199,11 +199,6 @@ describe('Util: package install / download', () => {
       sinon.assert.calledWith(ipfs_download_spy, IMAGE_PATH, IMAGE_HASH);
     });
 
-    it('dockerCompose.loadImage should be called with IMAGE_PATH', () => {
-      expect(dockerCompose_loadImage_spy.getCalls()[0].args)
-        .to.deep.equal( [IMAGE_PATH] )
-    });
-
   })
 
 
@@ -212,8 +207,10 @@ describe('Util: package install / download', () => {
     /////// Make mocks for dependencies
 
     // dockerCompose .loadImage .up
+    const dockerCompose_loadImage_spy = sinon.spy()
     const dockerCompose_up_spy = sinon.spy()
     const dockerComposeMock = {
+      loadImage: dockerCompose_loadImage_spy,
       up: dockerCompose_up_spy
     }
 
@@ -227,6 +224,11 @@ describe('Util: package install / download', () => {
       name: PACKAGE_NAME,
       manifest: dnpManifest
     })
+
+    it('dockerCompose.loadImage should be called with IMAGE_PATH', () => {
+      expect(dockerCompose_loadImage_spy.getCalls()[0].args)
+        .to.deep.equal( [IMAGE_PATH] )
+    });
 
     // generate_DockerCompose_spy - dnpManifest
     it('dockerCompose.up should be called with DOCKERCOMPOSE_PATH', () => {

@@ -1,15 +1,7 @@
 version: '3.4'
 
 services:
-  dnp_installer:
-    build: ./build
-    image: dappnode/dnp_installer
-    container_name: dnp_installer
-    privileged: true
-    environment:
-      - IPFS_REDIRECT=ipfs.io
-      - WEB3HOSTWS=wss://mainnet.infura.io/ws
-    volumes:  
-      - /var/run/docker.sock:/var/run/docker.sock 
-    ports:
-      - "8888:8888"
+    dnp_bind:
+        image: dappnode/dnp_bind 
+        container_name: dncore-dnp_bind
+        restart: always
