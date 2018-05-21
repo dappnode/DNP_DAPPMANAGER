@@ -56,7 +56,10 @@ function dockerComposeMockTest() {
       let res = await logPackage([PACKAGE_NAME])
       expect(JSON.parse(res)).to.deep.include({
         success: true,
-        result: 'LOGS'
+        result: {
+          name: PACKAGE_NAME,
+          logs: 'LOGS'
+        }
       });
     });
 
