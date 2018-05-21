@@ -15,11 +15,14 @@ function createLogPackage(params,
     const PACKAGE_NAME = req[0]
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
 
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
+    let logs
+    if (fs.existsSync(DOCKERCOMPOSE_PATH)) {
+      logs = await dockerCompose.logs(DOCKERCOMPOSE_PATH)
+    } else {
+      // If there is no dockerCompose try to log the container directly
+      logs = await dockerCompose.log(PACKAGE_NAME)
+      // throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
-
-    let logs = await dockerCompose.logs(DOCKERCOMPOSE_PATH)
 
     return res.success('Got logs of package: ' + PACKAGE_NAME, {
       name: PACKAGE_NAME,
