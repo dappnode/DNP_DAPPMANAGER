@@ -38,7 +38,8 @@ async function getWorkingWeb3Host(web3HostsArray) {
   throw Error('NO WEB3 HOST IS WORKING');
 }
 
-function testWeb3Host(web3Host) {
+async function testWeb3Host(web3Host) {
+  
   return new Promise(function(resolve, reject) {
     var _web3 = new Web3(web3Host);
     _web3.eth.isSyncing()

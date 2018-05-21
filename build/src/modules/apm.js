@@ -38,7 +38,7 @@ async function getRepoContract(reponame, web3) {
 
 async function getLatestVersion(repo, web3) {
 
-    validate.web3(web3)
+    validate.web3Existance(web3)
 
     const latest = await repo.methods.getLatest()
     .call()
@@ -53,7 +53,7 @@ async function getLatestVersion(repo, web3) {
 
 async function getSemanticVersion(repo, version, web3) {
 
-    validate.web3(web3)
+    validate.web3Existance(web3)
 
     const latest = await repo.methods.getBySemanticVersion(version)
     .call()
@@ -80,9 +80,12 @@ async function getSemanticVersion(repo, version, web3) {
 
 function createGetRepoHash(web3) {
 
-  validate.web3(web3)
+  validate.web3Existance(web3)
 
   return async function getRepoHash(packageReq) {
+
+    // verify that chain is synched and usable
+    await validate.web3Usability(web3)
 
     validate.packageReq(packageReq)
     const NAME = packageReq.name
@@ -117,20 +120,24 @@ function createGetRepoHash(web3) {
 
 function createGetRepoVersions(web3) {
 
+  validate.web3Existance(web3)
+
   return async function getRepoVersions(packageReq) {
 
-      validate.packageReq(packageReq)
-      const NAME = packageReq.name
-      const VERSION = packageReq.ver
-      validate.isEthDomain(NAME) // Validate the provided name, it only accepts .eth domains
-      validate.web3(web3)
+    // verify that chain is synched and usable
+    await validate.web3Usability(web3)
 
-      var repo = await getRepoContract(NAME, web3)
-      if (!repo) {
-        throw Error('Resolver could not found a match for ' + name)
-      }
+    validate.packageReq(packageReq)
+    const NAME = packageReq.name
+    const VERSION = packageReq.ver
+    validate.isEthDomain(NAME) // Validate the provided name, it only accepts .eth domains
 
-      return getVersions(repo, web3);
+    var repo = await getRepoContract(NAME, web3)
+    if (!repo) {
+      throw Error('Resolver could not found a match for ' + name)
+    }
+
+    return getVersions(repo, web3);
   }
 }
 

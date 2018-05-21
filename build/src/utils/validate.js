@@ -28,9 +28,19 @@ function isEthDomain (domain) {
 }
 
 
-function web3 (_web3) {
+function web3Existance (_web3) {
 
   if (!_web3) throw Error('VALIDATION ERROR: web3 is not defined')
+
+}
+
+
+async function web3Usability (_web3) {
+
+  const start = Date.now()
+  const isSyncing = await _web3.eth.isSyncing()
+  if (isSyncing) throw Error('Chain is still syncing, please wait until the chain is synced to perfom this action')
+  console.log(Date.now() - start, ' ms spent checking web3')
 
 }
 
@@ -60,6 +70,7 @@ function path (PATH) {
 module.exports = {
   packageReq,
   isEthDomain,
-  web3,
+  web3Existance,
+  web3Usability,
   path
 }
