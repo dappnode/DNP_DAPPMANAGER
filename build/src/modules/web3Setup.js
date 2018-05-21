@@ -8,14 +8,22 @@ function web3Setup(params) {
   const WEB3HOSTWS = possibleWeb3Hosts[0]
 
   var web3 = new Web3(WEB3HOSTWS)
+
+  setInterval(function () {
+    web3.eth.net.isListening().then().catch(e => {
+        console.log('[ - ] Lost connection to the node: ' + process.env.WEB3HOSTWS + ', reconnecting');
+        web3.setProvider(WEB3HOSTWS);
+    })
+  }, 10000)
+
   return web3
 
-  testWeb3Host(WEB3HOSTWS).then((res) => {
-    if (!res.works) {
-      throw Error(WEB3HOSTWS + ' DOES NOT work, reason: '+res.reason)
-    }
-
-  })
+  // testWeb3Host(WEB3HOSTWS).then((res) => {
+  //   if (!res.works) {
+  //     throw Error(WEB3HOSTWS + ' DOES NOT work, reason: '+res.reason)
+  //   }
+  //
+  // })
 
 }
 

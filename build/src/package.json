@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "TEST_INTEGRATION=false mocha \"./{,!(node_modules)/**}/*.test.js\" ",
     "test-nyc": "TEST_INTEGRATION=false nyc mocha \"./{,!(node_modules)/**}/*.test.js\" ",
     "test-integration": "TEST_INTEGRATION=true mocha \"./{,!(node_modules)/**}/*.test.js\" ",
