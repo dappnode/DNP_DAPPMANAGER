@@ -4,17 +4,19 @@ const expect = require('chai').expect
 const sinon = require('sinon')
 const fs = require('fs')
 const createTogglePackage = require('./createTogglePackage')
+const getPath = require('../utils/getPath')
+const validate = require('../utils/validate')
 
 chai.should();
 
 describe('Call function: togglePackage', function() {
 
-  dockerComposeMockTest()
+  mockTest()
 
 });
 
 
-function dockerComposeMockTest() {
+function mockTest() {
   describe('mock test', function() {
 
     // const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
@@ -28,19 +30,31 @@ function dockerComposeMockTest() {
 
     let hasStopped = false
     const PACKAGE_NAME = 'test.dnp.dappnode.eth'
-    const dockerComposeMock = {
-      ps: async (path) => {
-        return `Name                        Command                 State             Ports
-        ---------------------------------------------------------------------------------------------
-        ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
-        `
-      },
-      stop: async (path) => {
-        hasStopped = true
-      },
+    const dockerMock = {
+      compose: {
+        ps: async (path) => {
+          return `Name                        Command                 State             Ports
+          ---------------------------------------------------------------------------------------------
+          ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
+          `
+        },
+        stop: async (path) => {
+          hasStopped = true
+        },
+      }
     }
 
-    const togglePackage = createTogglePackage(params, dockerComposeMock)
+    const togglePackage = createTogglePackage(params, dockerMock)
+
+    before(() => {
+      const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
+      validate.path(DOCKERCOMPOSE_PATH)
+      fs.writeFileSync(DOCKERCOMPOSE_PATH, `version: '3.4'
+      services:
+          otpweb.dnp.dappnode.eth:
+              image: 'chentex/random-logger:latest'
+              container_name: DNP_INSTALLER_TEST_CONTAINER`)
+    })
 
     it('should stop the package with correct arguments', async () => {
       await togglePackage([PACKAGE_NAME])
