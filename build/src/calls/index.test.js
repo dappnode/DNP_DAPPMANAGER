@@ -52,7 +52,7 @@ function integrationTest() {
   // import dependencies
   const params = require('../params')
   const emitter = require('../modules/emitter')
-  const DockerCompose = require('../utils/DockerCompose')
+  const createDocker = require('../utils/Docker')
   const pkg = require('../utils/packages')
   const createGetAllResolvedOrdered = require('../utils/dependencies')
   const createGetManifest = require('../utils/getManifest')
@@ -67,22 +67,22 @@ function integrationTest() {
   const apm = createAPM(web3)
   const getDirectory = createGetDirectory(web3)
   const getManifest = createGetManifest(apm, ipfsCalls)
-  const dockerCompose = new DockerCompose()
+  const docker = createDocker()
   const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest)
-  const download = pkg.createDownload(params, ipfsCalls, dockerCompose, log)
-  const run      = pkg.createRun(params, dockerCompose, log)
+  const download = pkg.createDownload(params, ipfsCalls, docker, log)
+  const run      = pkg.createRun(params, docker, log)
   const downloadPackages = pkg.createDownloadPackages(download)
   const runPackages      = pkg.createRunPackages(run)
 
   // Initialize calls
   const installPackage   = createInstallPackage  (getDependencies, downloadPackages, runPackages)
-  const removePackage    = createRemovePackage   (params, dockerCompose)
-  const togglePackage    = createTogglePackage   (params, dockerCompose)
-  const logPackage       = createLogPackage      (params, dockerCompose)
+  const removePackage    = createRemovePackage   (params, docker)
+  const togglePackage    = createTogglePackage   (params, docker)
+  const logPackage       = createLogPackage      (params, docker)
   const listPackages     = createListPackages    (params) // Needs work
   const listDirectory    = createListDirectory   (getDirectory, getManifest, ipfsCalls)
   const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
-  const updatePackageEnv = createUpdatePackageEnv(params, dockerCompose)
+  const updatePackageEnv = createUpdatePackageEnv(params, docker)
 
   const packageReq = 'otpweb.dnp.dappnode.eth'
   const envs = JSON.stringify({VAR1: 'VALUE1'})
@@ -94,11 +94,11 @@ function integrationTest() {
   // add .skip to skip test
   describe('TEST 1, install package, log, toggle twice and delete it', () => {
 
-    beforeRemovePackage(dockerCompose, packageReq)
+    beforeRemovePackage(docker, packageReq)
     // The test will perfom intense tasks and could take up to some minutes
     // TEST - 1
     // (before)
-    beforeRemovePackage(dockerCompose, packageReq)
+    beforeRemovePackage(docker, packageReq)
     // - > updatePackageEnv (without restart, preinstall)
     testUpdatePackageEnv(updatePackageEnv, packageReq, false, params)
     // - > installPackage
@@ -127,7 +127,7 @@ function integrationTest() {
   })
 
 
-  describe.skip('TEST 2, updatePackageEnv', () => {
+  describe('TEST 2, updatePackageEnv', () => {
 
     // - > updatePackageEnv (of a non-existent package)
     testUpdatePackageEnv(updatePackageEnv, 'fake.eth', false, params)
@@ -135,7 +135,7 @@ function integrationTest() {
   })
 
 
-  describe.skip('TEST 3, list directory and fetch package info', () => {
+  describe('TEST 3, list directory and fetch package info', () => {
 
     // - > listDirectory
     testListDirectory(listDirectory, packageReq)
@@ -147,12 +147,12 @@ function integrationTest() {
 }
 
 
-function beforeRemovePackage(dockerCompose, packageReq) {
+function beforeRemovePackage(docker, packageReq) {
 
   it('Make sure the requested package in not installed', (done) => {
 
     console.log('\x1b[36m%s\x1b[0m', '>> (before) REMOVING')
-    dockerCompose.down('tmp_dnp_repo/'+packageReq+'/docker-compose.yml',{timeout: 0})
+    docker.compose.down('tmp_dnp_repo/'+packageReq+'/docker-compose.yml',{timeout: 0})
     .then((res) => {
       // console.log('\x1b[33m%s\x1b[0m', res)
       done()

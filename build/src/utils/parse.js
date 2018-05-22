@@ -1,3 +1,27 @@
+// node modules
+const fs = require('fs')
+const yaml = require('yamljs')
+
+
+function serviceVolumes(DOCKERCOMPOSE_PATH, SERVICE_NAME) {
+
+  const dcString = fs.readFileSync(DOCKERCOMPOSE_PATH, 'utf-8')
+  const dc = yaml.parse(dcString)
+
+  const externalVolumes = Object.getOwnPropertyNames(dc.volumes)
+
+  let packageVolumes = []
+  const volumes = dc.services[SERVICE_NAME].volumes || []
+  volumes.map(volume => {
+    if (volume.includes(':')) {
+      volumeName = volume.split(':')[0]
+      if (externalVolumes.includes(volumeName)) {
+        packageVolumes.push(volumeName)
+      }
+    }
+  })
+  return packageVolumes
+}
 
 
 function envFile(envFileData) {
@@ -71,6 +95,7 @@ const manifest = {
 
 
 module.exports = {
+  serviceVolumes,
   envFile,
   stringifyEnvs,
   packageReq,

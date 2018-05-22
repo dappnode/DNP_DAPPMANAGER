@@ -1,5 +1,4 @@
 const fs = require('fs')
-const DockerCompose = require('../utils/DockerCompose')
 const getPath =       require('../utils/getPath')
 const res =           require('../utils/res')
 const shellSync = require('../utils/shell')
@@ -9,7 +8,7 @@ const shellSync = require('../utils/shell')
 
 function createRemovePackage(params,
   // default option passed to allow testing
-  dockerCompose) {
+  docker) {
 
   return async function removePackage(req) {
 
@@ -23,7 +22,7 @@ function createRemovePackage(params,
     }
 
     // Remove container (and) volumes
-    await dockerCompose.down(DOCKERCOMPOSE_PATH, {volumes: Boolean(DELETE_VOLUMES)})
+    await docker.compose.down(DOCKERCOMPOSE_PATH, {volumes: Boolean(DELETE_VOLUMES)})
     // Remove DNP folder and files
     await shellSync('rm -r ' + PACKAGE_REPO_DIR_PATH)
 

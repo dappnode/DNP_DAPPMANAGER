@@ -6,7 +6,7 @@ const res =      require('../utils/res')
 
 
 // default option passed to allow testing
-function createUpdatePackageEnv(params, dockerCompose) {
+function createUpdatePackageEnv(params, docker) {
 
   return async function updatePackageEnv(req) {
 
@@ -25,8 +25,8 @@ function createUpdatePackageEnv(params, dockerCompose) {
       if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
         throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
       }
-      await dockerCompose.down(DOCKERCOMPOSE_PATH)
-      await dockerCompose.up(DOCKERCOMPOSE_PATH)
+      await docker.compose.down(DOCKERCOMPOSE_PATH)
+      await docker.compose.up(DOCKERCOMPOSE_PATH)
     }
 
     return res.success('Updated envs for package: ' + PACKAGE_NAME)

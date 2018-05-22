@@ -113,10 +113,12 @@ describe('Util: package install / download', () => {
       }
     }
 
-    // dockerCompose .loadImage .up
-    const dockerCompose_loadImage_spy = sinon.spy()
-    const dockerComposeMock = {
-      loadImage: dockerCompose_loadImage_spy
+    // docker .load .compose.up
+    const docker_load_spy = sinon.spy()
+    const dockerMock = {
+      compose: {
+        load: docker_load_spy
+      }
     }
 
     // validate .path --> blindly accept all paths
@@ -144,7 +146,7 @@ describe('Util: package install / download', () => {
 
     const download = pkg.createDownload(params,
       ipfsCallsMock,
-      dockerComposeMock,
+      dockerMock,
       emptyFunction,
       generateMock,
       validateMock,
@@ -206,33 +208,35 @@ describe('Util: package install / download', () => {
 
     /////// Make mocks for dependencies
 
-    // dockerCompose .loadImage .up
-    const dockerCompose_loadImage_spy = sinon.spy()
-    const dockerCompose_up_spy = sinon.spy()
-    const dockerComposeMock = {
-      loadImage: dockerCompose_loadImage_spy,
-      up: dockerCompose_up_spy
+    // docker .load .compose.up
+    const docker_load_spy = sinon.spy()
+    const docker_compose_up_spy = sinon.spy()
+    const dockerMock = {
+      compose: {
+        up: docker_compose_up_spy
+      },
+      load: docker_load_spy
     }
 
     // getManifest
     const getManifest_spy = sinon.spy()
 
     const run = pkg.createRun(params,
-      dockerComposeMock)
+      dockerMock)
 
     run({
       name: PACKAGE_NAME,
       manifest: dnpManifest
     })
 
-    it('dockerCompose.loadImage should be called with IMAGE_PATH', () => {
-      expect(dockerCompose_loadImage_spy.getCalls()[0].args)
+    it('docker.load should be called with IMAGE_PATH', () => {
+      expect(docker_load_spy.getCalls()[0].args)
         .to.deep.equal( [IMAGE_PATH] )
     });
 
     // generate_DockerCompose_spy - dnpManifest
-    it('dockerCompose.up should be called with DOCKERCOMPOSE_PATH', () => {
-      expect(dockerCompose_up_spy.getCalls()[0].args)
+    it('docker.compose.up should be called with DOCKERCOMPOSE_PATH', () => {
+      expect(docker_compose_up_spy.getCalls()[0].args)
         .to.deep.equal( [DOCKERCOMPOSE_PATH] )
     });
 
