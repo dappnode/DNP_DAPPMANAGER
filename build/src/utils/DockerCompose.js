@@ -58,6 +58,14 @@ class DockerCompose {
     return this.exec('docker-compose -f ' + dockerComposePath + ' stop'+optionsString)
   }
 
+  // Usage: restart [options] [SERVICE...]
+  // Options:
+  // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
+  restart(dockerComposePath, options={}) {
+    let optionsString = parseOptions(options)
+    return this.exec('docker-compose -f ' + dockerComposePath + ' restart'+optionsString)
+  }
+
   // Usage: logs [options] [SERVICE...]
   // Options:
   // --no-color          Produce monochrome output.
@@ -102,6 +110,8 @@ function parseOptions(options) {
   if (Number.isInteger(options.timeout)) optionsString += ' --timeout '+options.timeout
   // -t, --timestamps    Show timestamps
   if (options.timestamps) optionsString += ' --timestamps'
+  if (options.volumes) optionsString += ' --volumes'
+  if (options.core) optionsString += (' ' + options.core)
 
   return optionsString
 }
