@@ -56,7 +56,7 @@ function createListDirectory(getDirectory,
       }
     }
 
-    return res.success("Listing " + packages.length + " packages", packages)
+    return res.success("Listed directory with " + packages.length + " packages", packages)
 
   }
 }

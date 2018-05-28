@@ -31,7 +31,7 @@ function createRunPackages(run) {
 
 function createDownload(params,
   ipfsCalls,
-  dockerCompose,
+  docker,
   log = () => {},
   generate = generate_default,
   validate = validate_default,
@@ -86,7 +86,7 @@ function createDownload(params,
 
 
 function createRun(params,
-  dockerCompose,
+  docker,
   log = () => {}) {
 
   return async function run(pkg) {
@@ -98,11 +98,11 @@ function createRun(params,
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
 
     log({pkg: PACKAGE_NAME, msg: 'loading image'})
-    await dockerCompose.loadImage(IMAGE_PATH)
+    await docker.load(IMAGE_PATH)
     log({pkg: PACKAGE_NAME, msg: 'loaded image'})
 
     log({pkg: PACKAGE_NAME, msg: 'starting package... '})
-    await dockerCompose.up(DOCKERCOMPOSE_PATH)
+    await docker.compose.up(DOCKERCOMPOSE_PATH)
     log({pkg: PACKAGE_NAME, msg: 'package started'})
 
   }
