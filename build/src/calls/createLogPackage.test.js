@@ -4,17 +4,19 @@ const expect = require('chai').expect
 const sinon = require('sinon')
 const fs = require('fs')
 const createLogPackage = require('./createLogPackage')
+const getPath = require('../utils/getPath')
+const validate = require('../utils/validate')
 
 chai.should();
 
 describe('Call function: logPackage', function() {
 
-  dockerComposeMockTest()
+  mockTest()
 
 });
 
 
-function dockerComposeMockTest() {
+function mockTest() {
   describe('mock test', function() {
 
     // const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
@@ -28,14 +30,26 @@ function dockerComposeMockTest() {
 
     let hasLogged = false
     const PACKAGE_NAME = 'test.dnp.dappnode.eth'
-    const dockerComposeMock = {
-      logs: async (path) => {
-        hasLogged = true
-        return 'LOGS'
+    const dockerMock = {
+      compose: {
+        logs: async (path) => {
+          hasLogged = true
+          return 'LOGS'
+        }
       }
     }
 
-    const logPackage = createLogPackage(params, dockerComposeMock)
+    const logPackage = createLogPackage(params, dockerMock)
+
+    before(() => {
+      const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
+      validate.path(DOCKERCOMPOSE_PATH)
+      fs.writeFileSync(DOCKERCOMPOSE_PATH, `version: '3.4'
+      services:
+          otpweb.dnp.dappnode.eth:
+              image: 'chentex/random-logger:latest'
+              container_name: DNP_INSTALLER_TEST_CONTAINER`)
+    })
 
     it('should log the package with correct arguments', async () => {
       let res = await logPackage([PACKAGE_NAME])

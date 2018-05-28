@@ -24,13 +24,13 @@ function integrationTest() {
   const validate = require('../utils/validate')
   const dependencies = require('../utils/dependencies')
   const pkg = require('../utils/packages')
-  const DockerCompose = require('../utils/DockerCompose')
+  const createDocker = require('../utils/Docker')
 
   // initialize dependencies
   const web3 = web3Setup(params) // <-- web3
   validate.web3(web3)
   const apm = createAPM(web3)
-  const dockerCompose = new DockerCompose()
+  const docker = createDocker()
 
   // Construct getDependencies
   const getManifest = createGetManifest(apm, ipfsCalls)
@@ -38,7 +38,7 @@ function integrationTest() {
 
   // Construct single package downloader and runner
   const download = pkg.createDownload(params, ipfsCalls)
-  const run      = pkg.createRun(params, dockerCompose)
+  const run      = pkg.createRun(params, docker)
   const downloadPackages = pkg.createDownloadPackages(download)
   const runPackages      = pkg.createRunPackages(run)
 

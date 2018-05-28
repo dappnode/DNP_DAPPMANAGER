@@ -71,7 +71,7 @@ function format(c) {
 
   let name;
   if (isDNP) name = packageName.split(DNP_CONTAINER_NAME_PREFIX)[1]
-  // else if (isCORE) name = packageName.split(CORE_CONTAINER_NAME_PREFIX)[1]
+  else if (isCORE) name = packageName.split(CORE_CONTAINER_NAME_PREFIX)[1]
   else name = packageName
 
   let shortName;

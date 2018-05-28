@@ -5,13 +5,11 @@ const res =           require('../utils/res')
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
 
-// If it is core, send ['dnp_bind', true]
-
-function createLogPackage(params,
+function createRestartPackage(params,
   // default option passed to allow testing
   docker) {
 
-  return async function logPackage(req) {
+  return async function restartPackage(req) {
 
     const PACKAGE_NAME = req[0]
     const IS_CORE = req[1]
@@ -22,15 +20,13 @@ function createLogPackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
-    let logs = await docker.compose.logs(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    await docker.compose.up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
 
-    return res.success('Got logs of package: ' + PACKAGE_NAME, {
-      name: PACKAGE_NAME,
-      logs
-    })
+    return res.success('Restarted package: ' + PACKAGE_NAME)
 
   }
 }
 
 
-module.exports = createLogPackage
+module.exports = createRestartPackage
