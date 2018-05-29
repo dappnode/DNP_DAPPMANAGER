@@ -11,7 +11,7 @@ module.exports = {
     return params.REPO_DIR + PACKAGE_NAME + '/' + params.DAPPNODE_PACKAGE_NAME
   },
   DOCKERCOMPOSE: function(PACKAGE_NAME, params, IS_CORE) {
-    if (IS_CORE) return params.REPO_DIR + params.DNCORE_DIR + '/' + params.DOCKERCOMPOSE_NAME
+    if (IS_CORE) return params.DNCORE_DIR + '/' + params.DOCKERCOMPOSE_NAME
     else return params.REPO_DIR + PACKAGE_NAME + '/' + params.DOCKERCOMPOSE_NAME
   },
   ENV_FILE: function(PACKAGE_NAME, params) {
