@@ -12,7 +12,7 @@ module.exports = {
   // Installer paths
   CACHE_DIR: './cache/',
   // REPO_DIR: "./dnp_repo/" // ### Production name
-  REPO_DIR: "./tmp_dnp_repo/", // ### Temporary name for development
+  REPO_DIR: "./dnp_repo/", // ### Temporary name for development
   DNCORE_DIR: 'DNCORE',
   DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
   DOCKERCOMPOSE_NAME: 'docker-compose.yml',
