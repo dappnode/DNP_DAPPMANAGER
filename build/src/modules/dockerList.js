@@ -78,6 +78,15 @@ function format(c) {
   if (name && name.includes('.')) shortName = name.split('.')[0]
   else shortName = name
 
+  let version;
+  if (c.Labels[params.DNP_VERSION_TAG]) {
+    version = c.Labels[params.DNP_VERSION_TAG]
+  } else if (c.Image.includes(':')) {
+    version = c.Image.split(':')[1]
+  } else {
+    version = '0.0.0'
+  }
+
   return {
     id: c.Id,
     isDNP,
@@ -86,7 +95,7 @@ function format(c) {
     image: c.Image,
     name: name,
     shortName: shortName,
-    version: c.Labels[params.DNP_VERSION_TAG],
+    version,
     ports: mapPorts(c.Ports),
     state: c.State,
     running: !/^Exited /i.test(c.Status)
