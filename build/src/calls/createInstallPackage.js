@@ -11,11 +11,12 @@ const res =          require('../utils/res')
 
 function createInstallPackage(getAllDependenciesResolvedOrdered,
   downloadPackages,
-  runPackages) {
+  runPackages
+) {
 
   return async function installPackage(req) {
 
-    let packageReq = parse.packageReq(req[0])
+    const packageReq = parse.packageReq(req[0])
 
     // Returns a list of unique dep (highest requested version) + requested package
     // > getManifest needs IPFS

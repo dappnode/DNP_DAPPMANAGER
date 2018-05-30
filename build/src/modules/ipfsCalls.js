@@ -44,6 +44,11 @@ async function cat(HASH) {
 
 async function download(PATH, HASH, log=emptyFoo, round=emptyFoo) {
 
+  // Correct hash prefix
+  if (dnpHash.includes('ipfs/')) {
+    dnpHash = dnpHash.split('ipfs/')[1]
+  }
+
   // Make sure hash if valid
   if(!HASH.startsWith('Qm')) {
     throw Error('Invalid IPFS hash: ' + HASH)
