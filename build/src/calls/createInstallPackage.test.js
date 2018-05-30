@@ -42,7 +42,10 @@ function integrationTest() {
   const downloadPackages = pkg.createDownloadPackages(download)
   const runPackages      = pkg.createRunPackages(run)
 
-  const installPackage = createInstallPackage  (getDependencies, downloadPackages, runPackages)
+  const installPackage = createInstallPackage  (getDependencies,
+    downloadPackages,
+    runPackages
+  )
 
   describe('[INTEGRATION TEST] Call function installPackage', () => {
 
@@ -115,7 +118,8 @@ function mockTest() {
 
     const installPackage = createInstallPackage(getAllDependenciesResolvedOrdered_Mock,
       downloadPackages_Mock,
-      runPackages_Mock)
+      runPackages_Mock
+    )
 
     let res
 
