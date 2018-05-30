@@ -9,7 +9,7 @@ chai.should();
 
 describe('All Calls functions: installPackage', function() {
 
-  // integrationTest()
+  integrationTest()
 
 });
 
@@ -152,7 +152,7 @@ function beforeRemovePackage(docker, packageReq) {
   it('Make sure the requested package in not installed', (done) => {
 
     console.log('\x1b[36m%s\x1b[0m', '>> (before) REMOVING')
-    docker.compose.down('tmp_dnp_repo/'+packageReq+'/docker-compose.yml',{timeout: 0})
+    docker.compose.down('dnp_repo/'+packageReq+'/docker-compose.yml',{timeout: 0})
     .then((res) => {
       // console.log('\x1b[33m%s\x1b[0m', res)
       done()
