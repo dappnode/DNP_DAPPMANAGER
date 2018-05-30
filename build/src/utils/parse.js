@@ -80,7 +80,7 @@ function packageReq(req) {
 const manifest = {
 
   depObject: function(manifest) {
-    let depObject = manifest.dependencies
+    let depObject = manifest.dependencies || {}
     if ( !depObject || typeof(depObject) != typeof({}) ) {
       throw Error('BROKEN DEPENDENCY OBJECT, of package: '+JSON.stringify(packageReq)+' depObject: '+depObject)
     }
