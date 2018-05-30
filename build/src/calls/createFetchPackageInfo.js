@@ -21,11 +21,32 @@ function createFetchPackageInfo(getManifest, apm) {
   return async function fetchPackageInfo(req) {
 
     const packageReq = parse.packageReq(req[0])
-    let packageWithVersions = await getPackageVersions(packageReq)
 
-    await getManifestOfVersions(packageReq, packageWithVersions.versions)
+    if (packageReq.name.endsWith('.eth')) {
+      let packageWithVersions = await getPackageVersions(packageReq)
 
-    return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
+      await getManifestOfVersions(packageReq, packageWithVersions.versions)
+
+      return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
+
+
+    // if the name of the package is already an IFPS hash, skip:
+    } else if (packageReq.name.startsWith('/ipfs/Qm')) {
+      const manifest = await getManifest(packageReq)
+      return res.success("Fetched info of: " + packageReq.name, {
+        name: manifest.name,
+        versions: [
+          {
+            version: manifest.version,
+            manifest: manifest
+          }
+        ]
+      })
+
+
+    } else {
+      throw Error('Unkown package request: '+packageReq.name)
+    }
 
   }
 }

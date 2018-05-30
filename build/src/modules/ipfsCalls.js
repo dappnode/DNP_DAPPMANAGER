@@ -29,6 +29,10 @@ async function cat(HASH) {
     fs.mkdirSync(CACHE_DIR)
   }
 
+  if (!fs.existsSync(CACHE_DIR+'/ipfs')) {
+    fs.mkdirSync(CACHE_DIR+'/ipfs')
+  }
+
   if (fs.existsSync(FILE_PATH)) {
     // fs.fstatSync(fd)
     // stats.ctimeMs: 1318289051000.1 -> The timestamp indicating the last time the file status was changed expressed in milliseconds since the POSIX Epoch.
@@ -45,8 +49,8 @@ async function cat(HASH) {
 async function download(PATH, HASH, log=emptyFoo, round=emptyFoo) {
 
   // Correct hash prefix
-  if (dnpHash.includes('ipfs/')) {
-    dnpHash = dnpHash.split('ipfs/')[1]
+  if (HASH.includes('ipfs/')) {
+    HASH = HASH.split('ipfs/')[1]
   }
 
   // Make sure hash if valid
