@@ -2,6 +2,8 @@ const assert = require('assert')
 const sinon = require('sinon')
 const chai = require('chai')
 const expect = require('chai').expect
+const params = require('../params')
+const fs = require('fs')
 
 chai.should();
 
@@ -40,8 +42,6 @@ services:
     letsencrypt-nginx.dnp.dappnode.eth:
         image: 'letsencrypt-nginx.dnp.dappnode.eth:0.0.1'
         container_name: DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth
-        labels:
-            - dnp_version=0.0.1
         volumes:
             - '~/certs:/etc/nginx/certs:rw'
             - '/var/run/docker.sock:/var/run/docker.sock:ro'
@@ -50,6 +50,8 @@ services:
         networks:
             - dncore_network
         dns: 172.33.1.2
+        labels:
+            - dnp_version=0.0.1
 volumes:
     nginxproxydnpdappnodeeth_vhost.d:
         external:
@@ -62,25 +64,65 @@ networks:
         external: true
 `
 
-describe('generate, utils', function() {
+const manifestCORE = {
+    "name": "bind.dnp.dappnode.eth",
+    "version": "0.1.0",
+    "description": "Dappnode package responsible for providing DNS resolution",
+    "avatar": "/ipfs/QmXFGDiNDxBVZHLH5MgEstZwHFb2J3CWHmPKmc45zQWv1z",
+    "type": "dncore",
+    "image": {
+        "path": "bind.dnp.dappnode.eth_0.1.0.tar.xz",
+        "hash": "/ipfs/QmTz1c5RWT7qyKBhnv4tUbPcMarpTSsDd8r6GXG6LD176j",
+        "size": 3235875,
+        "volumes": [
+            "dnp_bind_data:/etc/bind"
+        ],
+        "restart": "always",
+        "subnet": "172.33.0.0/16",
+        "ipv4_address": "172.33.1.2"
+    }
+}
 
-  const params = {
-    DNP_VERSION_TAG: "dnp_version",
-    DNS_SERVICE: "172.33.1.2",
-    DNP_NETWORK: "dncore_network",
-    CONTAINER_NAME_PREFIX: "DAppNodePackage-",
-  }
+const dockerComposeCORE = `version: '3.4'
+services:
+    bind.dnp.dappnode.eth:
+        image: 'bind.dnp.dappnode.eth:0.1.0'
+        container_name: DAppNodeCore-bind.dnp.dappnode.eth
+        restart: always
+        volumes:
+            - 'dnp_bind_data:/etc/bind'
+        networks:
+            network:
+                ipv4_address: 172.33.1.2
+        dns: 172.33.1.2
+        labels:
+            - dnp_version=0.1.0
+volumes:
+    dnp_bind_data: {}
+networks:
+    network:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: 172.33.0.0/16
+`
+
+describe('generate, utils', function() {
 
   describe('generate docker-compose.yml file', function() {
 
-    const input = {
-      key: 'value'
-    }
-    const expected_result = '{\n  "key": "value"\n}'
-
+    // Non-CORE
     it('should generate the expected result', () => {
       generate.dockerCompose(manifest, params)
         .should.equal(dockerCompose)
+    });
+
+    // CORE packages
+    it('should generate the expected result', () => {
+      const isCORE = true
+      generate.dockerCompose(manifestCORE, params, isCORE)
+        .should.equal(dockerComposeCORE)
     });
 
   });
