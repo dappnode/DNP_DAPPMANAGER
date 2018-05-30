@@ -50,8 +50,6 @@ services:
         networks:
             - dncore_network
         dns: 172.33.1.2
-        labels:
-            - dnp_version=0.0.1
 volumes:
     nginxproxydnpdappnodeeth_vhost.d:
         external:
@@ -95,8 +93,6 @@ services:
             network:
                 ipv4_address: 172.33.1.2
         dns: 172.33.1.2
-        labels:
-            - dnp_version=0.1.0
 volumes:
     dnp_bind_data: {}
 networks:
@@ -107,6 +103,73 @@ networks:
                 -
                     subnet: 172.33.0.0/16
 `
+
+const ipfs = {
+  manifest: {
+    name: "ipfs.dnp.dappnode.eth",
+    version: "0.1.0",
+    description: "Dappnode package responsible for providing IPFS connectivity (go-ipfs v0.4.15)",
+    avatar: "/ipfs/QmViXy8BVb8dQ7J9jLK626kcB5Tz2pvvKE43KHo8RNDXxL",
+    type: "dncore",
+    image: {
+      path: "ipfs.dnp.dappnode.eth_0.1.0.tar.xz",
+      hash: "/ipfs/QmcVHo2T6qVCZHGPuVJumcDzHyyrGTRHPe3zJ55jitSt7C",
+      size: 9131772,
+      volumes: [
+        "export:/export",
+        "data:/data/ipfs"
+      ],
+      ports: [
+        "4001:4001",
+        "4002:4002/udp"
+      ],
+      restart: "always",
+      subnet: "172.33.0.0/16",
+      ipv4_address: "172.33.1.5"
+    },
+    author: "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
+    keywords: [
+      "DAppNodeCore",
+      "IPFS"
+    ],
+    homepage: "https://github.com/dappnode/DNP_IPFS#readme",
+    repository: {
+      type: "git",
+      url: "https://github.com/dappnode/DNP_IPFS"
+    },
+    bugs: {
+      url: "https://github.com/dappnode/DNP_IPFS/issues"
+    },
+    license: "GPL-3.0"
+  },
+  dc: `version: '3.4'
+services:
+    ipfs.dnp.dappnode.eth:
+        image: 'ipfs.dnp.dappnode.eth:0.1.0'
+        container_name: DAppNodeCore-ipfs.dnp.dappnode.eth
+        restart: always
+        volumes:
+            - 'export:/export'
+            - 'data:/data/ipfs'
+        ports:
+            - '4001:4001'
+            - '4002:4002/udp'
+        networks:
+            network:
+                ipv4_address: 172.33.1.5
+        dns: 172.33.1.2
+volumes:
+    export: {}
+    data: {}
+networks:
+    network:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: 172.33.0.0/16
+`
+}
 
 describe('generate, utils', function() {
 
@@ -123,6 +186,13 @@ describe('generate, utils', function() {
       const isCORE = true
       generate.dockerCompose(manifestCORE, params, isCORE)
         .should.equal(dockerComposeCORE)
+    });
+
+    // CORE package - IPFS
+    it('should generate the expected docker-compose of IPFS', () => {
+      const isCORE = true
+      generate.dockerCompose(ipfs.manifest, params, isCORE)
+        .should.equal(ipfs.dc)
     });
 
   });

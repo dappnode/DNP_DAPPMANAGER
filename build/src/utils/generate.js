@@ -57,8 +57,6 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
     service.dns = DNS_SERVICE
 
     // label handling
-    service.labels = [DNP_VERSION_TAG+"="+dpn_manifest.version]
-
     if(dpn_manifest.image.labels){
       dpn_manifest.image.labels.map(label => {
         service.labels.push(label)
