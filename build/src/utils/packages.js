@@ -46,24 +46,31 @@ function createDownload(params,
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
     const IMAGE_HASH = parse.manifest.IMAGE_HASH(MANIFEST)
     const IMAGE_SIZE = parse.manifest.IMAGE_SIZE(MANIFEST)
-    const MANIFEST_PATH = getPath.MANIFEST(PACKAGE_NAME, params)
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
-    const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
+    const TYPE = parse.manifest.TYPE(MANIFEST)
 
-    // Write manifest and docker-compose
     // isCORE?
     const isCORE = (MANIFEST.type == 'dncore' && pkg.allowCORE)
+    pkg.isCORE = isCORE
     // inform the user of improper usage
     if (MANIFEST.type == 'dncore' && !pkg.allowCORE) {
       throw Error ('Requesting to install an unverified dncore package')
     }
 
-    await fs.writeFileSync(
-      validate.path(MANIFEST_PATH),
-      generate.manifest(MANIFEST))
-    await fs.writeFileSync(
-      validate.path(DOCKERCOMPOSE_PATH),
-      generate.dockerCompose(MANIFEST, params, isCORE))
+    // Generate paths
+    const MANIFEST_PATH = getPath.MANIFEST(PACKAGE_NAME, params, isCORE)
+    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, isCORE)
+    const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params, isCORE)
+    // Validate paths
+    validate.path(MANIFEST_PATH)
+    validate.path(DOCKERCOMPOSE_PATH)
+    validate.path(IMAGE_PATH)
+    // Generate files
+    const MANIFEST_DATA = generate.manifest(MANIFEST)
+    const DOCKERCOMPOSE_DATA = generate.dockerCompose(MANIFEST, params, isCORE)
+
+    // Write manifest and docker-compose
+    await fs.writeFileSync(MANIFEST_PATH, MANIFEST_DATA)
+    await fs.writeFileSync(DOCKERCOMPOSE_PATH, DOCKERCOMPOSE_DATA)
 
     // Image validation
     if (fs.existsSync(IMAGE_PATH)) {
@@ -101,9 +108,10 @@ function createRun(params,
 
     const PACKAGE_NAME = pkg.name
     const MANIFEST = pkg.manifest
+    const isCORE = pkg.isCORE
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
-    const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
+    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, isCORE)
+    const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params, isCORE)
 
     log({pkg: PACKAGE_NAME, msg: 'loading image'})
     await docker.load(IMAGE_PATH)
