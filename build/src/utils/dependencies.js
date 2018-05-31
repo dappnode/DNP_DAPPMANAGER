@@ -1,5 +1,6 @@
 const semver = require('semver')
 const { highestVersion } = require('../utils/versions')
+const validate = require('../utils/validate')
 const { orderDependencies } = require('./orderDependencies')
 const dockerList_default = require('../modules/dockerList')
 const parse = require('./parse')
@@ -91,6 +92,15 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   // Validate the input, manifests are not controlled by the dappnode team
   let depObject = parse.manifest.depObject(manifest)
 
+  // Logic to allow core or not
+  const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
+
+  // Correct packageReq name in case it is a hash
+  // > must be done here before the dependency loop prevention
+  if (validate.isIPFShash(packageReq.name)) {
+    packageReq.name = manifest.name
+  }
+
   // Using a for loop instead of map or forEach to avoid hiding this code
   // and its errors inside a different function
   for (const depName of Object.getOwnPropertyNames(depObject)) {
@@ -108,9 +118,6 @@ async function getAll(packageReq, getManifest, packageList=[]) {
     await getAll(subDepReq, getManifest, packageList)
 
   }
-
-  // Logic to allow core or not
-  const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
 
   // Add dep to the packageList
   packageReturnObject = {
