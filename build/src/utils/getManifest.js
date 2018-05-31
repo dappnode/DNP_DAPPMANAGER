@@ -18,7 +18,7 @@ function createGetManifest(apm, ipfsCalls) {
     } else {
       throw Error('Unkown package request: '+packageReq.name)
     }
-    // let dnpHash = await apm.getRepoHash(packageReq)
+
 
     // cat the file and parse it
     return JSON.parse( await ipfsCalls.cat(dnpHash) )
