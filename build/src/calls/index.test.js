@@ -3,6 +3,7 @@ const chai = require('chai')
 const expect = require('chai').expect
 const sinon = require('sinon')
 const fs = require('fs')
+const shell = require('../utils/shell')
 const createInstallPackage = require('./createInstallPackage')
 
 chai.should();
@@ -94,7 +95,10 @@ function integrationTest() {
   }
 
   // add .skip to skip test
-  describe('TEST 1, install package, log, toggle twice and delete it', () => {
+  describe('TEST 1, install package, log, toggle twice and delete it', async () => {
+
+    await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
+    await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
 
     beforeRemovePackage(docker, packageReq)
     // The test will perfom intense tasks and could take up to some minutes
