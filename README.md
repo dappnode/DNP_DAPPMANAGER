@@ -1,4 +1,4 @@
-# DNP_INSTALLER
+# DNP_DAPPMANAGER
 Dappnode package responsible for providing the DappNode Package Manager
 
 ## Getting Started
@@ -24,13 +24,13 @@ These instructions will get you a copy of the project up and running on your loc
 ### Building
 
 ```
-$ git clone https://github.com/dappnode/DNP_INSTALLER.git
+$ git clone https://github.com/dappnode/DNP_DAPPMANAGER.git
 ```
 
 ```
 $ docker-compose build
 or 
-$ docker build --rm -f build/Dockerfile -t dnp_installer:dev build 
+$ docker build --rm -f build/Dockerfile -t DNP_DAPPMANAGER:dev build 
 ```
 
 ## Running
@@ -59,15 +59,15 @@ $ docker-compose logs -f
 [xz](https://tukaani.org/xz/) is required 
 
 ```
-$ docker save dnp_installer:dev | xz -9 > dnp_installer.tar.xz
+$ docker save DNP_DAPPMANAGER:dev | xz -9 > DNP_DAPPMANAGER.tar.xz
 ```
 
-You can download the latest tar.xz version from here [releases](https://github.com/dappnode/DNP_INSTALLER/releases).
+You can download the latest tar.xz version from here [releases](https://github.com/dappnode/DNP_DAPPMANAGER/releases).
 
 ### Loading a Docker image
 
 ```
-$docker load -i dnp_installer.tar.xz
+$docker load -i DNP_DAPPMANAGER.tar.xz
 ```
 
 ## Contributing
@@ -76,13 +76,13 @@ Please read [CONTRIBUTING.md](https://github.com/dappnode) for details on our co
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DNP_INSTALLER/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DNP_DAPPMANAGER/tags). 
 
 ## Authors
 
 * **Eduardo Antuña Díez** - *Initial work* - [eduadiez](https://github.com/eduadiez)
 
-See also the list of [contributors](https://github.com/dappnode/DNP_INSTALLER/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/dappnode/DNP_DAPPMANAGER/contributors) who participated in this project.
 
 ## License
 

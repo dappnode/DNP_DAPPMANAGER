@@ -62,7 +62,7 @@ function integrationTest() {
   describe('integration test', function() {
 
     const path = 'test/docker-compose.yml'
-    const container_name = 'DNP_INSTALLER_TEST_CONTAINER'
+    const container_name = 'DNP_DAPPMANAGER_TEST_CONTAINER'
 
     const docker = createDocker()
 
