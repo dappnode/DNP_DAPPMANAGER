@@ -22,7 +22,7 @@ module.exports = {
   TMP_REPO_DIR: "./tmp_dnp_repo/",
   DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
   DNP_CONTAINER_NAME_PREFIX: "DAppNodePackage-",
-  CORE_CONTAINER_NAME_PREFIX: "dncore-",
+  CORE_CONTAINER_NAME_PREFIX: "DAppNodeCore-",
 
   // Docker compose parameters
   DNP_VERSION_TAG: "dnp_version",
