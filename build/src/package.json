@@ -1,6 +1,6 @@
 {
-  "name": "DNP_PACKAGE_MANAGER",
-  "version": "1.0.0",
+  "name": "dnp_dappmanager",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,26 +13,22 @@
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
-    "autobahn": "^18.3.1",
+    "autobahn": "^18.3.2",
     "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
     "docker-remote-api": "^5.0.0",
-    "ethereum-ens": "^0.7.3",
-    "express": "^4.16.2",
-    "http-proxy": "^1.16.2",
     "ipfs-api": "^17.5.0",
     "js-yaml": "^3.11.0",
     "semver": "^5.5.0",
-    "shelljs": "^0.8.1",
-    "validator": "^9.2.0",
-    "web3": "^1.0.0-beta.29",
+    "shelljs": "^0.8.2",
+    "web3": "^1.0.0-beta.34",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "mocha": "^5.1.1",
-    "nyc": "^11.7.3",
-    "sinon": "^5.0.7",
-    "sinon-chai": "^3.0.0"
+    "mocha": "^5.2.0",
+    "nyc": "^11.8.0",
+    "sinon": "^5.0.10",
+    "sinon-chai": "^3.1.0"
   }
 }
