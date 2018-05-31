@@ -65,16 +65,16 @@ connection.onopen = function(session, details) {
       "\n   realm: "+autobahnRealm+
       "\n   session ID: "+details.authid)
 
-    register(session, 'installPackage.installer.dnp.dappnode.eth',   installPackage)
-    register(session, 'removePackage.installer.dnp.dappnode.eth',    removePackage)
-    register(session, 'togglePackage.installer.dnp.dappnode.eth',    togglePackage)
-    register(session, 'restartPackage.installer.dnp.dappnode.eth',    restartPackage)
-    register(session, 'restartPackageVolumes.installer.dnp.dappnode.eth', restartPackageVolumes)
-    register(session, 'logPackage.installer.dnp.dappnode.eth',       logPackage)
-    register(session, 'listPackages.installer.repo.dappnode.eth' ,   listPackages)
-    register(session, 'listDirectory.installer.repo.dappnode.eth',   listDirectory)
-    register(session, 'fetchPackageInfo.installer.dnp.dappnode.eth', fetchPackageInfo)
-    register(session, 'updatePackageEnv.installer.dnp.dappnode.eth', updatePackageEnv)
+    register(session, 'installPackage.dappmanager.dnp.dappnode.eth',   installPackage)
+    register(session, 'removePackage.dappmanager.dnp.dappnode.eth',    removePackage)
+    register(session, 'togglePackage.dappmanager.dnp.dappnode.eth',    togglePackage)
+    register(session, 'restartPackage.dappmanager.dnp.dappnode.eth',    restartPackage)
+    register(session, 'restartPackageVolumes.dappmanager.dnp.dappnode.eth', restartPackageVolumes)
+    register(session, 'logPackage.dappmanager.dnp.dappnode.eth',       logPackage)
+    register(session, 'listPackages.dappmanager.dnp.dappnode.eth' ,   listPackages)
+    register(session, 'listDirectory.dappmanager.dnp.dappnode.eth',   listDirectory)
+    register(session, 'fetchPackageInfo.dappmanager.dnp.dappnode.eth', fetchPackageInfo)
+    register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv)
 
     session_global = session
     // emitter.on('log', (log) => {
@@ -88,7 +88,7 @@ connection.onopen = function(session, details) {
 }
 
 function log(data) {
-  session_global.publish(autobahnTag.installerLog, [data])
+  session_global.publish(autobahnTag.DAppManagerLog, [data])
   console.log('\x1b[35m%s\x1b[0m',JSON.stringify(data))
 }
 

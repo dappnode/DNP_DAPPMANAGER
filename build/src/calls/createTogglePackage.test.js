@@ -53,7 +53,7 @@ function mockTest() {
       services:
           otpweb.dnp.dappnode.eth:
               image: 'chentex/random-logger:latest'
-              container_name: DNP_INSTALLER_TEST_CONTAINER`)
+              container_name: DNP_DAPPMANAGER_TEST_CONTAINER`)
     })
 
     it('should stop the package with correct arguments', async () => {
