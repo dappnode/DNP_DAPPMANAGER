@@ -1,6 +1,6 @@
 {
-  "name": "DNP_PACKAGE_MANAGER",
-  "version": "1.0.0",
+  "name": "dnp_dappmanager",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -17,14 +17,10 @@
     "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
     "docker-remote-api": "^5.0.0",
-    "ethereum-ens": "^0.7.4",
-    "express": "^4.16.3",
-    "http-proxy": "^1.17.0",
     "ipfs-api": "^17.5.0",
     "js-yaml": "^3.11.0",
     "semver": "^5.5.0",
     "shelljs": "^0.8.2",
-    "validator": "^9.4.1",
     "web3": "^1.0.0-beta.34",
     "yamljs": "^0.3.0"
   },
