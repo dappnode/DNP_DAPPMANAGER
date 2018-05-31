@@ -28,6 +28,17 @@ function isEthDomain (domain) {
 }
 
 
+function isIPFShash (HASH) {
+
+  if (!HASH) throw Error('VALIDATION ERROR: hash is undefined')
+
+  return ((HASH.startsWith('/ipfs/Qm')
+  || HASH.startsWith('ipfs/Qm')
+  || HASH.startsWith('Qm')
+  ) && !HASH.endsWith('.eth'))
+}
+
+
 function web3Existance (_web3) {
 
   if (!_web3) throw Error('VALIDATION ERROR: web3 is not defined')
@@ -76,5 +87,6 @@ module.exports = {
   isEthDomain,
   web3Existance,
   web3Usability,
+  isIPFShash,
   path
 }
