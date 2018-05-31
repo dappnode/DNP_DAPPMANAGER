@@ -137,8 +137,10 @@ function isfileHashValid(providedHash, PATH) {
 
       if (err) reject(new IPFSError(err))
 
-      let computedHash = res[0].hash
-      if (computedHash == providedHash) {
+      let computedHashClean = res[0].hash.replace('ipfs/','').replace('/','')
+      let providedHashClean = providedHash.replace('ipfs/','').replace('/','')
+
+      if (computedHashClean == providedHashClean) {
         resolve(true)
       } else {
         resolve(false)
