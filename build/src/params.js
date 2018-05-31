@@ -6,7 +6,7 @@ module.exports = {
   // autobahnRealm: 'realm1',
   autobahnRealm: 'dappnode_admin',
   autobahnTag: {
-    installerLog: "log.installer.repo.dappnode.eth"
+    DAppManagerLog: "log.dappmanager.dnp.dappnode.eth"
   },
 
   // Installer paths
