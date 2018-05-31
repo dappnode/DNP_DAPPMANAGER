@@ -113,13 +113,15 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
 
   // Add dep to the packageList
-  packageList.push({
+  packageReturnObject = {
     name: packageReq.name,
     ver: packageReq.ver,
-    allowCORE,
     dep: depObject,
     manifest: manifest
-  })
+  }
+  if (allowCORE) packageReturnObject.allowCORE = allowCORE
+
+  packageList.push(packageReturnObject)
   return packageList
 
 }
