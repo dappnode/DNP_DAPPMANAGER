@@ -11,7 +11,7 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
     const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
     const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX
 
-    var name = dpn_manifest.name.replace("/", "_").replace("@", "");
+    const PACKAGE_NAME = dpn_manifest.name.replace("/", "_").replace("@", "");
 
 
     // DOCKER COMPOSE YML - SERVICE
@@ -19,14 +19,14 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
     let service = {}
     if (isCORE) {
       service.image = dpn_manifest.name + ":" + dpn_manifest.version
-      service.container_name = CONTAINER_CORE_NAME_PREFIX + name
+      service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME
       service.restart = "always"
       if (dpn_manifest.image.privileged) {
         service.privileged = true
       }
     } else {
       service.image = dpn_manifest.image.name + ":" + dpn_manifest.image.version
-      service.container_name = CONTAINER_NAME_PREFIX + name
+      service.container_name = CONTAINER_NAME_PREFIX + PACKAGE_NAME
     }
 
     // Volumes
@@ -42,7 +42,7 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
 
     // Support for environment variables
     if(dpn_manifest.image.environment){
-        service.env_file = [name + ".env"]
+      service.env_file = [PACKAGE_NAME + ".env"]
     }
 
     // Networks
@@ -111,14 +111,14 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
       networks[DNP_NETWORK].external = true
     }
 
-    const dockerCompose = {
+    let dockerCompose = {
       version: '3.4',
       services: {
-        [name]: service
-      },
-      volumes,
-      networks
+        [PACKAGE_NAME]: service
+      }
     }
+    if (Object.getOwnPropertyNames(volumes).length) dockerCompose.volumes = volumes
+    if (Object.getOwnPropertyNames(networks).length) dockerCompose.networks = networks
 
     return yaml.dump(dockerCompose, {
       indent: 4

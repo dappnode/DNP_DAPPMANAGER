@@ -10,9 +10,9 @@ describe('docker calls', function() {
 
   argumentTest()
 
-  // if (process.env.TEST_INTEGRATION == 'true') {
-  //   integrationTest()
-  // }
+  if (process.env.TEST_INTEGRATION == 'true') {
+    integrationTest()
+  }
 
 });
 

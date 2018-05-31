@@ -17,12 +17,6 @@ describe('Util: get paths', function() {
   const packageName = 'some_package'
   const imageName = 'some_image.tar.xz'
 
-  it('return REPO_DIR path', () => {
-    let path = 'repo'
-    getPath.REPO_DIR(params)
-      .should.equal(REPO_PATH_MOCK)
-  });
-
   it('return PACKAGE_REPO_DIR path', () => {
     getPath.PACKAGE_REPO_DIR(packageName, params)
       .should.equal(REPO_PATH_MOCK + packageName)

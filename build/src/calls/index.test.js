@@ -9,7 +9,9 @@ chai.should();
 
 describe('All Calls functions: installPackage', function() {
 
-  integrationTest()
+  if (process.env.TEST_INTEGRATION == 'true') {
+    integrationTest()
+  }
 
 });
 

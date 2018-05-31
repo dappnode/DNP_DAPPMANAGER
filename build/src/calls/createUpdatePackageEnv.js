@@ -11,8 +11,9 @@ function createUpdatePackageEnv(params, docker) {
   return async function updatePackageEnv(req) {
 
     const PACKAGE_NAME = parse.packageReq(req[0]).name // parsing anyway for safety
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
-    const ENV_FILE_PATH = getPath.ENV_FILE(PACKAGE_NAME, params)
+    const IS_CORE = req[3]
+    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, IS_CORE)
+    const ENV_FILE_PATH = getPath.ENV_FILE(PACKAGE_NAME, params, IS_CORE)
     const envs = JSON.parse(req[1])
     const restart = req[2]
 
