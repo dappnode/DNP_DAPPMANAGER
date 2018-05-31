@@ -4,6 +4,7 @@ const generate_default = require('./generate')
 const fs_default = require('fs')
 const validate_default = require('./validate')
 
+
 // packageList should be an array of package objects, i.e.
 // [
 //   {
@@ -50,12 +51,19 @@ function createDownload(params,
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params)
 
     // Write manifest and docker-compose
+    // isCORE?
+    const isCORE = (MANIFEST.type == 'dncore' && pkg.allowCORE)
+    // inform the user of improper usage
+    if (MANIFEST.type == 'dncore' && !pkg.allowCORE) {
+      throw Error ('Requesting to install an unverified dncore package')
+    }
+
     await fs.writeFileSync(
       validate.path(MANIFEST_PATH),
       generate.manifest(MANIFEST))
     await fs.writeFileSync(
       validate.path(DOCKERCOMPOSE_PATH),
-      generate.dockerCompose(MANIFEST, params))
+      generate.dockerCompose(MANIFEST, params, isCORE))
 
     // Image validation
     if (fs.existsSync(IMAGE_PATH)) {

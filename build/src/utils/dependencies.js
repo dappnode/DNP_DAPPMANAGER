@@ -5,6 +5,9 @@ const dockerList_default = require('../modules/dockerList')
 const parse = require('./parse')
 
 
+const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION
+
+
 function createGetAllResolvedOrdered(getManifest,
   log = () => {},
   dockerList=dockerList_default) {
@@ -106,10 +109,14 @@ async function getAll(packageReq, getManifest, packageList=[]) {
 
   }
 
+  // Logic to allow core or not
+  const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
+
   // Add dep to the packageList
   packageList.push({
     name: packageReq.name,
     ver: packageReq.ver,
+    allowCORE,
     dep: depObject,
     manifest: manifest
   })
