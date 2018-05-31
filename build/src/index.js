@@ -76,18 +76,6 @@ connection.onopen = function(session, details) {
     register(session, 'fetchPackageInfo.installer.dnp.dappnode.eth', fetchPackageInfo)
     register(session, 'updatePackageEnv.installer.dnp.dappnode.eth', updatePackageEnv)
 
-    // ###### FOR DEVELOPMENT - simulating an install call
-    // ###### FOR DEVELOPMENT - simulating an install call
-
-    setTimeout(() => {
-      let link = 'otpweb.dnp.dappnode.eth'
-      // session.call('fetchPackageInfo.installer.dnp.dappnode.eth', [link])
-      session.call('listPackages.installer.repo.dappnode.eth', [link])
-    }, 1000)
-
-    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
-    // ^^^^^^ FOR DEVELOPMENT - simulating an install call
-
     session_global = session
     // emitter.on('log', (log) => {
     //   log.topic = log.topic || 'general'

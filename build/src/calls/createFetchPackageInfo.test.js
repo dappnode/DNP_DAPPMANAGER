@@ -66,7 +66,7 @@ function integrationTest() {
 
 function mockTest() {
 
-  const packageName = 'myPackage'
+  const packageName = 'myPackage.eth'
   const packageReq = {name: packageName, ver: 'latest'}
   const versions = [
     {version: '0.0.1'},
