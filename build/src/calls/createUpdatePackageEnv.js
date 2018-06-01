@@ -23,9 +23,15 @@ function createUpdatePackageEnv(params, docker) {
       parse.stringifyEnvs(envs))
 
     if (restart) {
+
       if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
         throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
       }
+      
+      if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+        throw Error('The installer cannot be restarted')
+      }
+
       await docker.compose.down(DOCKERCOMPOSE_PATH)
       await docker.compose.up(DOCKERCOMPOSE_PATH)
     }

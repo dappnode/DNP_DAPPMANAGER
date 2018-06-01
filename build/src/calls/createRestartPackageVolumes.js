@@ -21,6 +21,10 @@ function createRestartPackageVolumes(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
+    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+      throw Error('The installer cannot be restarted')
+    }
+
     const packageVolumes = parse.serviceVolumes(DOCKERCOMPOSE_PATH, PACKAGE_NAME)
 
     await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME, v: true})

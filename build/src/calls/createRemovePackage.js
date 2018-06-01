@@ -21,6 +21,10 @@ function createRemovePackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
+    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+      throw Error('The installer cannot be restarted')
+    }
+
     // Remove container (and) volumes
     await docker.compose.down(DOCKERCOMPOSE_PATH, {volumes: Boolean(DELETE_VOLUMES)})
     // Remove DNP folder and files

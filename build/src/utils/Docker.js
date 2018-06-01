@@ -63,6 +63,13 @@ function createDocker(shellSync = shellSync_default) {
         return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf'+optionsString)
       },
 
+      // Safe down & up
+      rm_up: (DOCKERCOMPOSE_PATH, options={}) => {
+        let optionsString = parseOptions(options)
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf'+optionsString
+        +' && docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d'+optionsString)
+      },
+
       // Usage: restart [options] [SERVICE...]
       // Options:
       // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
