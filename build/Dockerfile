@@ -8,15 +8,14 @@ ADD src .
 ADD entrypoint.sh .
 ADD dns_updater.sh .
 
-RUN npm install
-RUN npm install nodemon --save
+RUN npm install --production
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
-RUN apk add --no-cache bind-tools curl
+RUN apk add --no-cache curl
 
 RUN set -x && \
     apk add --no-cache -t .deps ca-certificates curl && \
@@ -39,7 +38,6 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
   && chmod +x /usr/local/bin/docker-compose
 
 # Copy files and do things that can change
-
 
 WORKDIR /usr/src/app
 
