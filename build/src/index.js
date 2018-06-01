@@ -69,6 +69,7 @@ connection.onopen = function(session, details) {
       "\n   realm: "+autobahnRealm+
       "\n   session ID: "+details.authid)
 
+    register(session, 'ping.dappmanager.dnp.dappnode.eth', x => x}
     register(session, 'installPackage.dappmanager.dnp.dappnode.eth',   installPackage)
     register(session, 'removePackage.dappmanager.dnp.dappnode.eth',    removePackage)
     register(session, 'togglePackage.dappmanager.dnp.dappnode.eth',    togglePackage)
