@@ -20,8 +20,12 @@ function createRestartPackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
-    await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
-    await docker.compose.up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+      throw Error('The installer cannot be restarted')
+    }
+
+    // Combining rm && up doesn't prevent the installer from crashing
+    await docker.compose.rm_up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
 
     return res.success('Restarted package: ' + PACKAGE_NAME)
 
