@@ -9,6 +9,7 @@ const api = new Api(provider);
 const INTERVAL_TIME = 5 * 60 * 1000 // 5 minutes
 const MIN_BLOCK_DIFF = 10000
 
+
 console.log('WATCHING ETHCHAIN - (line 12 ethchain.js)')
 
 let intervalID = setInterval(function() {
@@ -28,7 +29,17 @@ let intervalID = setInterval(function() {
         const isCORE = true
         eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE])
       } else {
-        console.log('PARITY IS FINE')
+
       }
     });
 }, INTERVAL_TIME);
+
+
+function isSyncing() {
+  return api.eth.syncing
+}
+
+
+module.exports = {
+  isSyncing
+}
