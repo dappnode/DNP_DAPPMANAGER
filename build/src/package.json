@@ -13,6 +13,7 @@
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
+    "@parity/api": "^2.1.22",
     "autobahn": "^18.3.2",
     "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
