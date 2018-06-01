@@ -6,7 +6,7 @@ const Api = require('@parity/api')
 const provider = new Api.Provider.Http('http://my.ethchain.dnp.dappnode.eth:8545');
 const api = new Api(provider);
 
-const INTERVAL_TIME = 0.25 * 60 * 1000 // 5 minutes
+const INTERVAL_TIME = 5 * 60 * 1000 // 5 minutes
 const MIN_BLOCK_DIFF = 10000
 
 console.log('WATCHING ETHCHAIN - (line 12 ethchain.js)')
