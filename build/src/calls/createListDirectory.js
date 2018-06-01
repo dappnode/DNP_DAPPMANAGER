@@ -4,6 +4,7 @@ const base64Img = require('base64-img')
 const dockerList_default = require('../modules/dockerList')
 const parse = require('../utils/parse')
 const res =   require('../utils/res')
+const ethchain = require('../watchers/ethchain')
 
 // CALL DOCUMENTATION:
 // > result = packages =
@@ -25,6 +26,11 @@ function createListDirectory(getDirectory,
   dockerList=dockerList_default) {
 
   return async function listDirectory() {
+
+    // Make sure the chain is synced
+    if(await ethchain.isSyncing()) {
+      return res.success("Mainnet is syncing", [])
+    }
 
     // List of available packages in the directory
     const packages = await getDirectory()
