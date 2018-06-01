@@ -1,7 +1,0 @@
-version: '3.4'
-
-services:
-    dnp_bind:
-        image: dappnode/dnp_bind 
-        container_name: dncore-dnp_bind
-        restart: always
