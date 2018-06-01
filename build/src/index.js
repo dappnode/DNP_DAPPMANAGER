@@ -1,6 +1,7 @@
 'use strict'
 // node modules
 const autobahn = require('autobahn')
+const eventBus = require('./eventBus')
 
 // import calls
 const createInstallPackage   = require('./calls/createInstallPackage')
@@ -26,6 +27,9 @@ const createAPM = require('./modules/apm')
 const ipfsCalls = require('./modules/ipfsCalls')
 const web3Setup = require('./modules/web3Setup')
 const createGetDirectory = require('./modules/createGetDirectory')
+
+// Initialize watchers
+require('./watchers')
 
 // initialize dependencies (by order)
 const web3 = web3Setup(params) // <-- web3
@@ -84,6 +88,13 @@ connection.onopen = function(session, details) {
     //   console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
     //   session.publish(autobahnTag.installerLog, [log])
     // })
+    eventBus.on('call', (call, args) => {
+      session.call(call, args)
+      .then(res => {
+        console.log('INTERNAL CALL TO: '+call)
+        console.trace(res)
+      })
+    })
 
 }
 
