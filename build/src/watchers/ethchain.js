@@ -8,6 +8,7 @@ const api = new Api(provider);
 
 const INTERVAL_TIME = 5 * 60 * 1000 // 5 minutes
 const MIN_BLOCK_DIFF = 10000
+const MIN_BLOCK_DIFF_SYNC = 100
 
 
 console.log('WATCHING ETHCHAIN - (line 12 ethchain.js)')
@@ -35,8 +36,17 @@ let intervalID = setInterval(function() {
 }, INTERVAL_TIME);
 
 
-function isSyncing() {
-  return api.eth.syncing
+async function isSyncing() {
+  const syncing = await api.eth.syncing()
+  if (
+    syncing
+    // Condition 1, big enough difference between current and highest block
+    && syncing.highestBlock.c[0] - syncing.currentBlock.c[0] > MIN_BLOCK_DIFF_SYNC
+  ) {
+    return true
+  } else {
+    return false
+  }
 }
 
 
