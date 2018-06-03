@@ -236,6 +236,7 @@ describe('Util: package install / download', () => {
 
     // generate_DockerCompose_spy - dnpManifest
     it('docker.compose.up should be called with DOCKERCOMPOSE_PATH', () => {
+
       expect(docker_compose_up_spy.getCalls()[0].args)
         .to.deep.equal( [DOCKERCOMPOSE_PATH] )
     });
