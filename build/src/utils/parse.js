@@ -90,8 +90,8 @@ const manifest = {
   IMAGE_NAME: manifest => manifest.image.path,
   IMAGE_HASH: manifest => manifest.image.hash,
   IMAGE_SIZE: manifest => manifest.image.size,
-  TYPE: manifest => manifest.type
-
+  TYPE: manifest => manifest.type,
+  VERSION: manifest => manifest.version
 }
 
 
