@@ -3,6 +3,7 @@ const parse = require('./parse')
 const generate_default = require('./generate')
 const fs_default = require('fs')
 const validate_default = require('./validate')
+const createRestartPatch = require('./createRestartPatch')
 
 
 // packageList should be an array of package objects, i.e.
@@ -104,6 +105,9 @@ function createRun(params,
   docker,
   log = () => {}) {
 
+  // patch to prevent installer from crashing
+  const restartPatch = createRestartPatch(params, docker)
+
   return async function run(pkg) {
 
     const PACKAGE_NAME = pkg.name
@@ -118,7 +122,12 @@ function createRun(params,
     log({pkg: PACKAGE_NAME, msg: 'loaded image'})
 
     log({pkg: PACKAGE_NAME, msg: 'starting package... '})
-    await docker.compose.up(DOCKERCOMPOSE_PATH)
+    // patch to prevent installer from crashing
+    if (PACKAGE_NAME == 'dappmanager.dnp.dappnode.eth') {
+      await restartPatch(IMAGE_NAME)
+    } else {
+      await docker.compose.up(DOCKERCOMPOSE_PATH)
+    }
     log({pkg: PACKAGE_NAME, msg: 'package started'})
 
   }
