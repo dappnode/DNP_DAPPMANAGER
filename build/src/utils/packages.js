@@ -113,6 +113,7 @@ function createRun(params,
     const PACKAGE_NAME = pkg.name
     const MANIFEST = pkg.manifest
     const isCORE = pkg.isCORE
+    const VERSION = parse.manifest.VERSION(MANIFEST)
     const IMAGE_NAME = parse.manifest.IMAGE_NAME(MANIFEST)
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, isCORE)
     const IMAGE_PATH = getPath.IMAGE(PACKAGE_NAME, IMAGE_NAME, params, isCORE)
@@ -124,7 +125,7 @@ function createRun(params,
     log({pkg: PACKAGE_NAME, msg: 'starting package... '})
     // patch to prevent installer from crashing
     if (PACKAGE_NAME == 'dappmanager.dnp.dappnode.eth') {
-      await restartPatch(IMAGE_NAME)
+      await restartPatch(PACKAGE_NAME+':'+VERSION)
     } else {
       await docker.compose.up(DOCKERCOMPOSE_PATH)
     }
