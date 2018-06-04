@@ -46,6 +46,7 @@ let intervalID = setInterval(function() {
 
 
 async function isSyncing() {
+  const api = new Api(provider)
   const syncing = await api.eth.syncing()
   if (
     syncing
