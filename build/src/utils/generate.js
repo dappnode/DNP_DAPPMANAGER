@@ -61,6 +61,7 @@ function dockerCompose(dpn_manifest, params, isCORE = false) {
 
     // label handling
     if(dpn_manifest.image.labels){
+      service.labels = []
       dpn_manifest.image.labels.map(label => {
         service.labels.push(label)
       })
