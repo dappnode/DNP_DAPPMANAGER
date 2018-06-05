@@ -69,6 +69,9 @@ function createListDirectory(getDirectory,
 
 
 function getTag(v_now, v_avail) {
+  // Prevent the function from crashing
+  if (semver.valid(v_now) || semver.valid(v_avail)) return 'Install (unk ver)'
+  // Compare versions and return appropiate tag
   if (!v_now) return 'Install'
   if (semver.lt(v_now, v_avail)) return 'Update'
   else return 'Installed'
