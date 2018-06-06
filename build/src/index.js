@@ -70,6 +70,7 @@ connection.onopen = function(session, details) {
       "\n   session ID: "+details.authid)
 
     register(session, 'ping.dappmanager.dnp.dappnode.eth', x => x)
+    register(session, 'greet.dappmanager.dnp.dappnode.eth', () => 'Hello from the dappmanager')
     register(session, 'installPackage.dappmanager.dnp.dappnode.eth',   installPackage)
     register(session, 'removePackage.dappmanager.dnp.dappnode.eth',    removePackage)
     register(session, 'togglePackage.dappmanager.dnp.dappnode.eth',    togglePackage)
@@ -99,10 +100,17 @@ connection.onopen = function(session, details) {
 
 }
 
+
+connection.onclose = function (reason, details) {
+  console.log('[index.js connection.onclose] reason: '+reason+' details '+JSON.stringify(details))
+};
+
+
 function log(data) {
   session_global.publish(autobahnTag.DAppManagerLog, [data])
   console.log('\x1b[35m%s\x1b[0m',JSON.stringify(data))
 }
+
 
 connection.open()
 
