@@ -32,13 +32,23 @@ function createListPackages(params,
 
     let dnpList = await dockerList.listContainers()
 
-    // Add env info
+
     dnpList.map((dnp) => {
-      let PACKAGE_NAME = dnp.name
-      let ENV_FILE = getPath.ENV_FILE(PACKAGE_NAME, params)
+      const PACKAGE_NAME = dnp.name
+      const IS_CORE = dnp.isCORE
+
+      // Add env info
+      let ENV_FILE = getPath.ENV_FILE(PACKAGE_NAME, params, IS_CORE)
       if (fs.existsSync(ENV_FILE)) {
         let envFileData = fs.readFileSync(ENV_FILE, 'utf8')
         dnp.envs = parse.envFile(envFileData)
+      }
+
+      // Add manifest
+      let MANIFEST_FILE = getPath.MANIFEST(PACKAGE_NAME, params, IS_CORE)
+      if (fs.existsSync(MANIFEST_FILE)) {
+        let manifestFileData = fs.readFileSync(MANIFEST_FILE, 'utf8')
+        dnp.manifest = JSON.parse(manifestFileData)
       }
     })
 
