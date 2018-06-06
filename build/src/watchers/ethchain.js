@@ -20,21 +20,13 @@ let intervalID = setInterval(function() {
 
     api.eth
       .syncing()
-      .then((syncing) => {
-        if (
-          syncing
-          // Condition 1, big enough difference between current and highest block
-          && syncing.highestBlock.c[0] - syncing.currentBlock.c[0] > MIN_BLOCK_DIFF
-          // Condition 2, parity is not in syncing from a snapshot
-          && syncing.warpChunksAmount.c[0] == 0
-        ) {
-          // Reset parity
+      .then((syncingInfo) => {
+        if (syncingInfo && shouldReset(syncingInfo)) {
+
           console.log('RESETING PARITY')
           const id = 'ethchain.dnp.dappnode.eth'
           const isCORE = true
           eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE])
-        } else {
-
         }
       });
 
@@ -57,6 +49,39 @@ async function isSyncing() {
   } else {
     return false
   }
+}
+
+
+const track = { blocks: [], chunks: [] }
+function isSyncingFromSnapshot(syncingInfo) {
+
+  if (!syncingInfo) return false
+  // Parse syncing object
+  const cB = syncingInfo.currentBlock.c[0]
+  const hB = syncingInfo.highestBlock.c[0]
+  const cC = syncingInfo.warpChunksProcessed.c[0]
+  const hC = syncingInfo.warpChunksAmount.c[0]
+
+  // Store progress
+  const time = (Date.now()-startTime)/1000 // convert to seconds
+  track.blocks.push([time, cB])
+  track.chunks.push([time, cC])
+  // Clean array limiting it to 60 values
+  if (track.blocks.length > TRACKER_MAX_LENGTH) track.blocks.shift()
+  if (track.chunks.length > TRACKER_MAX_LENGTH) track.chunks.shift()
+
+  // Compute slopes
+  const chunksPerSecond = linearRegression(track.chunks).m
+  const blocksPerSecond = linearRegression(track.blocks).m
+  // console.log('blocksPerSecond',blocksPerSecond,'chunksPerSecond',chunksPerSecond)
+
+  // Compare slopes
+  // chunksPerSecond = 0.1 ~ 1, blocksPerSecond = 100 ~ 1000
+  // OPTIONAL CONDITION syncingInfo.warpChunksAmount.c[0] == 0
+  const isSnapshot = (chunksPerSecond > blocksPerSecond/1000)
+
+  // Output for the user
+  return (isSnapshot && hB-cB > MIN_BLOCK_DIFF)
 }
 
 
