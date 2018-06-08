@@ -22,6 +22,7 @@
     "js-yaml": "^3.11.0",
     "semver": "^5.5.0",
     "shelljs": "^0.8.2",
+    "simple-statistics": "^6.0.1",
     "web3": "^1.0.0-beta.34",
     "yamljs": "^0.3.0"
   },
