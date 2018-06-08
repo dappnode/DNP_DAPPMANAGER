@@ -1,4 +1,6 @@
 const eventBus = require('../eventBus')
+const fs = require('fs')
+const linearRegression = require('simple-statistics').linearRegression
 // import the actual Api class
 const Api = require('@parity/api')
 
@@ -8,6 +10,7 @@ const provider = new Api.Provider.Http('http://my.ethchain.dnp.dappnode.eth:8545
 const INTERVAL_TIME = 5 * 60 * 1000 // 5 minutes
 const MIN_BLOCK_DIFF = 10000
 const MIN_BLOCK_DIFF_SYNC = 100
+let shouldReset = false
 
 
 console.log('WATCHING ETHCHAIN - (line 12 ethchain.js)')
@@ -21,17 +24,33 @@ let intervalID = setInterval(function() {
     api.eth
       .syncing()
       .then((syncingInfo) => {
-        if (syncingInfo && shouldReset(syncingInfo)) {
 
-          console.log('RESETING PARITY')
-          const id = 'ethchain.dnp.dappnode.eth'
-          const isCORE = true
-          eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE])
+        if (syncingInfo) {
+          shouldReset = isParitySyncingFromSnapshot(syncingInfo)
         }
+
       });
 
   } catch(e) {
-    console.log('(ethchain.js) - ERROR in ethchain watcher: '+e.message)
+    console.log('(ethchain.js) - ERROR 1s interval, in ethchain watcher: '+e.message)
+  }
+
+}, 1000);
+
+
+let intervalID2 = setInterval(function() {
+
+  try {
+
+    if (shouldReset) {
+      console.log('RESETING PARITY')
+      const id = 'ethchain.dnp.dappnode.eth'
+      const isCORE = true
+      eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE])
+    }
+
+  } catch(e) {
+    console.log('(ethchain.js) - ERROR reseting parity in ethchain watcher: '+e.message)
   }
 
 }, INTERVAL_TIME);
@@ -51,9 +70,10 @@ async function isSyncing() {
   }
 }
 
-
+const startTime = Date.now()
+const TRACKER_MAX_LENGTH = 60
 const track = { blocks: [], chunks: [] }
-function shouldReset(syncingInfo) {
+function isParitySyncingFromSnapshot(syncingInfo) {
 
   if (!syncingInfo) return false
 
@@ -67,9 +87,9 @@ function shouldReset(syncingInfo) {
   // Store the syncing object
   const SYNCLOG_PATH = 'DNCORE/syncLog.txt'
   if (fs.existsSync('DNCORE')) {
-    if (!fs.existsSync(SYNCLOG_PATH)) fs.writeFileSync(SYNCLOG_PATH, 'ts cB hB cC hC')
+    if (!fs.existsSync(SYNCLOG_PATH)) fs.writeFileSync(SYNCLOG_PATH, 'timestamp, currentBlock, highestBlock, currentChunk, highestChunk\n')
 
-    fs.appendFile(SYNCLOG_PATH, (ts+', '+cB+', '+hB+', '+cC+', '+hC), (err) => {
+    fs.appendFile(SYNCLOG_PATH, (ts+', '+cB+', '+hB+', '+cC+', '+hC+'\n'), (err) => {
       if (err) console.log('ERROR writing sync logs: '+err)
     });
   }
