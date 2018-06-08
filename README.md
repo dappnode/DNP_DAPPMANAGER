@@ -92,6 +92,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## Authors
 
 * **Eduardo Antuña Díez** - *Initial work* - [eduadiez](https://github.com/eduadiez)
+* **DAppLion** - [dapplion](https://github.com/dapplion)
 
 See also the list of [contributors](https://github.com/dappnode/DNP_DAPPMANAGER/contributors) who participated in this project.
 
