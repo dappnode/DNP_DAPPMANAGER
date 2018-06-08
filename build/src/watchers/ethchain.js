@@ -56,14 +56,26 @@ const track = { blocks: [], chunks: [] }
 function isSyncingFromSnapshot(syncingInfo) {
 
   if (!syncingInfo) return false
+
   // Parse syncing object
+  const ts = Date.now()
   const cB = syncingInfo.currentBlock.c[0]
   const hB = syncingInfo.highestBlock.c[0]
   const cC = syncingInfo.warpChunksProcessed.c[0]
   const hC = syncingInfo.warpChunksAmount.c[0]
 
+  // Store the syncing object
+  const SYNCLOG_PATH = 'DNCORE/syncLog'
+  if (fs.existsSync('DNCORE')) {
+    if (!fs.existsSync(SYNCLOG_PATH)) fs.writeFileSync(SYNCLOG_PATH, 'ts cB hB cC hC')
+
+    fs.appendFile(SYNCLOG_PATH, (ts+', '+cB+', '+hB+', '+cC+', '+hC), (err) => {
+      if (err) console.log('ERROR writing sync logs: '+err)
+    });
+  }
+
   // Store progress
-  const time = (Date.now()-startTime)/1000 // convert to seconds
+  const time = (ts-startTime)/1000 // convert to seconds
   track.blocks.push([time, cB])
   track.chunks.push([time, cC])
   // Clean array limiting it to 60 values
