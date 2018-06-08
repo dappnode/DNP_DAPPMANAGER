@@ -65,7 +65,7 @@ function isSyncingFromSnapshot(syncingInfo) {
   const hC = syncingInfo.warpChunksAmount.c[0]
 
   // Store the syncing object
-  const SYNCLOG_PATH = 'DNCORE/syncLog'
+  const SYNCLOG_PATH = 'DNCORE/syncLog.txt'
   if (fs.existsSync('DNCORE')) {
     if (!fs.existsSync(SYNCLOG_PATH)) fs.writeFileSync(SYNCLOG_PATH, 'ts cB hB cC hC')
 
