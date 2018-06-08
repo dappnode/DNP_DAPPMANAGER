@@ -53,7 +53,7 @@ async function isSyncing() {
 
 
 const track = { blocks: [], chunks: [] }
-function isSyncingFromSnapshot(syncingInfo) {
+function shouldReset(syncingInfo) {
 
   if (!syncingInfo) return false
 
