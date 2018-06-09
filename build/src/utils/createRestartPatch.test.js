@@ -43,7 +43,7 @@ describe('Util: createRestartPatch', () => {
 services:
     restart.dnp.dappnode.eth:
         image: dappmanager.tar.xz:0.0.9
-        container_name: DAppNodeCore-restart.dnp.dappnode.eth
+        container_name: DAppNodeTool-restart.dnp.dappnode.eth
         volumes:
             - '/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml:/usr/src/app/DNCORE/docker-compose-dappmanager.yml'
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'

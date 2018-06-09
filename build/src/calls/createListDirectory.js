@@ -39,26 +39,44 @@ function createListDirectory(getDirectory,
 
     // Extend package object contents
     for (const pkg of packages) {
-      const manifest = await getManifest(parse.packageReq(pkg.name))
-      const latestVersion = manifest.version
-      if (!latestVersion) throw Error('latestVersion is not defined')
 
-      // Fetch the current package version
-      const _package = dnpList.filter(c => c.name == pkg.name)[0]
-      const currentVersion = _package ? _package.version : null
+      let manifest
+      try {
+        manifest = await getManifest(parse.packageReq(pkg.name))
+      } catch(e) {
+        console.log('(createListDirectory.js line 47) Could not fetch manifest of '+pkg.name)
+      }
 
-      // Store info in package object
-      pkg.tag = getTag(currentVersion, latestVersion)
-      pkg.disableInstall = (pkg.tag == 'Installed')
-      pkg.manifest = manifest
-      // console.trace('\x1b[33m%s\x1b[0m', pkg.name + 'currentVersion: '+currentVersion+' latestVersion: '+latestVersion+' ==> '+pkg.tag)
+      // If the manifest was successfully fetched
+      if (manifest) {
+        const latestVersion = manifest.version
+        if (!latestVersion) throw Error('latestVersion is not defined')
 
-      // Fetch the package image
-      const avatarHash = manifest.avatar
-      if (avatarHash) {
-        await ipfsCalls.cat(avatarHash)
-        pkg.avatarHash = avatarHash
-        pkg.avatar = base64Img.base64Sync('cache/'+avatarHash)
+        // Fetch the current package version
+        const _package = dnpList.filter(c => c.name == pkg.name)[0]
+        const currentVersion = _package ? _package.version : null
+
+        // Store info in package object
+        pkg.tag = getTag(currentVersion, latestVersion)
+        pkg.disableInstall = (pkg.tag == 'Installed')
+        pkg.manifest = manifest
+        // console.trace('\x1b[33m%s\x1b[0m', pkg.name + 'currentVersion: '+currentVersion+' latestVersion: '+latestVersion+' ==> '+pkg.tag)
+
+        // Fetch the package image
+        const avatarHash = manifest.avatar
+        if (avatarHash) {
+
+          // If the avatar can not be fetched don't crash
+          try {
+            await ipfsCalls.cat(avatarHash)
+            pkg.avatarHash = avatarHash
+            pkg.avatar = base64Img.base64Sync('cache/'+avatarHash)
+
+          } catch(e) {
+            console.log('(createListDirectory.js line 67) Could not fetch avatar of '+pkg.name+' at '+avatarHash)
+          }
+
+        }
       }
     }
 
