@@ -51,7 +51,7 @@ const restartPackage   = createRestartPackage  (params, docker)
 const restartPackageVolumes = createRestartPackageVolumes (params, docker)
 const logPackage       = createLogPackage      (params, docker)
 const listPackages     = createListPackages    (params) // Needs work
-const listDirectory    = createListDirectory   (getDirectory, getManifest, ipfsCalls)
+const listDirectory    = createListDirectory   (getDirectory)
 const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
 const updatePackageEnv = createUpdatePackageEnv(params, docker)
 
