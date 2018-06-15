@@ -2,9 +2,9 @@ const shell = require('shelljs')
 
 const maxTime = 20*1000
 
-async function shellExecSync(command) {
+async function shellExecSync(command, silent = false) {
 
-  const res = await shell.exec(command, { silent: false, timeout: maxTime })
+  const res = await shell.exec(command, { silent: silent, timeout: maxTime })
 
   // When shell.exec timeout expires, res will be undefined
   if (!res) throw Error('ERROR: shell process: '+command+' expired timeout ('+maxTime+' ms)')
