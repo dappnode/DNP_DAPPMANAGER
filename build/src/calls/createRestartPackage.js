@@ -27,7 +27,7 @@ function createRestartPackage(params,
     // Combining rm && up doesn't prevent the installer from crashing
     await docker.compose.rm_up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
 
-    return res.success('Restarted package: ' + PACKAGE_NAME)
+    return res.success('Restarted package: ' + PACKAGE_NAME, {}, true)
 
   }
 }

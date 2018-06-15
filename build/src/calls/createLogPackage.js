@@ -1,6 +1,7 @@
 const fs = require('fs')
 const getPath =       require('../utils/getPath')
 const res =           require('../utils/res')
+const parse = require('../utils/parse')
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
@@ -22,7 +23,9 @@ function createLogPackage(params,
       throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
     }
 
-    let logs = await docker.compose.logs(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    const CONTAINER_NAME = parse.containerName(DOCKERCOMPOSE_PATH)
+
+    let logs = await docker.log(CONTAINER_NAME)
 
     return res.success('Got logs of package: ' + PACKAGE_NAME, {
       name: PACKAGE_NAME,

@@ -24,6 +24,16 @@ function serviceVolumes(DOCKERCOMPOSE_PATH, SERVICE_NAME) {
 }
 
 
+function containerName(DOCKERCOMPOSE_PATH) {
+
+  const dcString = fs.readFileSync(DOCKERCOMPOSE_PATH, 'utf-8')
+  const dc = yaml.parse(dcString)
+  const packageName = Object.getOwnPropertyNames(dc.services)[0]
+  return dc.services[packageName].container_name
+
+}
+
+
 function envFile(envFileData) {
 
   let res = {}
@@ -97,6 +107,7 @@ const manifest = {
 
 module.exports = {
   serviceVolumes,
+  containerName,
   envFile,
   stringifyEnvs,
   packageReq,

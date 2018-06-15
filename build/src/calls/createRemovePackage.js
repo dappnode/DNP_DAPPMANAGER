@@ -30,7 +30,7 @@ function createRemovePackage(params,
     // Remove DNP folder and files
     await shellSync('rm -r ' + PACKAGE_REPO_DIR_PATH)
 
-    return res.success('Removed package: ' + PACKAGE_NAME)
+    return res.success('Removed package: ' + PACKAGE_NAME, {}, true)
 
   }
 }

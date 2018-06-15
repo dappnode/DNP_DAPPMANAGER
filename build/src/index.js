@@ -13,6 +13,7 @@ const createLogPackage       = require('./calls/createLogPackage')
 const createListPackages     = require('./calls/createListPackages')
 const createListDirectory    = require('./calls/createListDirectory')
 const { createFetchPackageInfo } = require('./calls/createFetchPackageInfo')
+const createGetPackageData = require('./calls/createGetPackageData')
 const createUpdatePackageEnv = require('./calls/createUpdatePackageEnv')
 
 // import dependencies
@@ -51,9 +52,10 @@ const restartPackage   = createRestartPackage  (params, docker)
 const restartPackageVolumes = createRestartPackageVolumes (params, docker)
 const logPackage       = createLogPackage      (params, docker)
 const listPackages     = createListPackages    (params) // Needs work
-const listDirectory    = createListDirectory   (getDirectory, getManifest, ipfsCalls)
+const listDirectory    = createListDirectory   (getDirectory)
 const fetchPackageInfo = createFetchPackageInfo(getManifest, apm)
 const updatePackageEnv = createUpdatePackageEnv(params, docker)
+const getPackageData   = createGetPackageData(getManifest, ipfsCalls)
 
 const autobahnTag = params.autobahnTag
 const autobahnUrl = params.autobahnUrl
@@ -81,6 +83,8 @@ connection.onopen = function(session, details) {
     register(session, 'listDirectory.dappmanager.dnp.dappnode.eth',   listDirectory)
     register(session, 'fetchPackageInfo.dappmanager.dnp.dappnode.eth', fetchPackageInfo)
     register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv)
+    register(session, 'getPackageData.dappmanager.dnp.dappnode.eth', getPackageData)
+
 
     session_global = session
     // emitter.on('log', (log) => {
