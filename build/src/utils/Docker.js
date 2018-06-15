@@ -87,7 +87,7 @@ function createDocker(shellSync = shellSync_default) {
       //                     for each container.
       logs: (DOCKERCOMPOSE_PATH, options={}) => {
         let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs'+optionsString)
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs'+optionsString, true)
       },
 
       // Usage: ps [options] [SERVICE...]
@@ -119,7 +119,7 @@ function createDocker(shellSync = shellSync_default) {
     // Usage: docker logs [OPTIONS] CONTAINER
     // --timestamps , -t  Show timestamps
     log: (containerNameOrId) => {
-      return shellSync('docker logs ' + containerNameOrId)
+      return shellSync('docker logs ' + containerNameOrId+' -t', true)
     }
 
 
