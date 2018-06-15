@@ -17,9 +17,9 @@ verifyIPFS()
 function verifyIPFS() {
   ipfs.id(function (err, identity) {
     if (err) {
-      console.trace('IPFS ERROR: '+err.message)
+      console.log('(20 ipfsSetup.js) IPFS ERROR: '+err.message)
     } else {
-      console.log("CONNECTED to DAppnode's IPFS "+
+      console.log("(22 ipfsSetup.js) CONNECTED to DAppnode's IPFS "+
         "\n   ID "+(identity ? identity.id : 'UNKNOWN'));
     }
   })

@@ -30,7 +30,7 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
     await runPackages(packageList)
     console.log('\x1b[36m%s\x1b[0m', 'Finished running');
 
-    return res.success('Installed ' + packageReq.name + ' version: ' + packageReq.ver)
+    return res.success('Installed ' + packageReq.name + ' version: ' + packageReq.ver, {}, true)
   }
 }
 
