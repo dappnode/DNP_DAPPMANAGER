@@ -2,6 +2,7 @@
 const fs = require('fs')
 const through = require('through2')
 const createError = require('create-error')
+const isIPFS = require('is-ipfs')
 
 // dedicated modules
 const params = require('../params')
@@ -54,7 +55,7 @@ async function download(PATH, HASH, log=emptyFoo, round=emptyFoo) {
   }
 
   // Make sure hash if valid
-  if(!HASH.startsWith('Qm')) {
+  if(!isIPFS.multihash(HASH)) {
     throw Error('Invalid IPFS hash: ' + HASH)
   }
 
