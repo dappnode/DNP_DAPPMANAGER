@@ -85,9 +85,12 @@ async function getAllResolved(packageReq, getManifest) {
 
 
 async function getAll(packageReq, getManifest, packageList=[]) {
+  
+  // Parse request
+  
+
   // Expects packageReq = {name: packageName, ver: packageVersion}
   // >> Will attach the fetched manifest
-
   let manifest = await getManifest(packageReq);
   // Validate the input, manifests are not controlled by the dappnode team
   let depObject = parse.manifest.depObject(manifest)
