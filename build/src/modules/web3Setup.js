@@ -11,7 +11,7 @@ function web3Setup(params) {
 
   setInterval(function () {
     web3.eth.net.isListening().then().catch(e => {
-      console.log('Current web3 instance lost connection to node: ' + process.env.WEB3HOSTWS + ', reconnecting automatically');
+      console.log('(14 web3Setup.js) Current web3 instance lost connection to node: ' + process.env.WEB3HOSTWS + ', reconnecting automatically');
       web3.setProvider(WEB3HOSTWS);
     })
   }, 10000)

@@ -13,7 +13,7 @@ const MIN_BLOCK_DIFF_SYNC = 100
 let shouldReset = false
 
 
-console.log('WATCHING ETHCHAIN - (line 12 ethchain.js)')
+console.log('(12 ethchain.js) WATCHING ETHCHAIN')
 
 let computeShouldResetFlagInterval = setInterval(() => {
 
@@ -27,7 +27,7 @@ let computeShouldResetFlagInterval = setInterval(() => {
       });
 
   } catch(e) {
-    console.log('(ethchain.js) - ERROR 1s interval, in ethchain watcher: '+e.message)
+    console.log('(30 ethchain.js) - ERROR in 1s interval, in ethchain watcher: '+e.message)
   }
 
 }, 1000);
@@ -38,14 +38,14 @@ let watchEthchain = setInterval(() => {
   try {
 
     if (shouldReset) {
-      console.log('RESETING PARITY')
+      console.log('(41 ethchain.js) RESETING PARITY')
       const id = 'ethchain.dnp.dappnode.eth'
       const isCORE = true
       eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE])
     }
 
   } catch(e) {
-    console.log('(ethchain.js) - ERROR reseting parity in ethchain watcher: '+e.message)
+    console.log('(48 ethchain.js) - ERROR reseting parity in ethchain watcher: '+e.message)
   }
 
 }, INTERVAL_TIME);
@@ -110,7 +110,7 @@ function isParitySyncingFromSnapshot(syncingInfo) {
     if (!fs.existsSync(SYNCLOG_PATH)) fs.writeFileSync(SYNCLOG_PATH, 'timestamp, currentBlock, highestBlock, currentChunk, highestChunk\n')
 
     fs.appendFile(SYNCLOG_PATH, (ts+', '+cB+', '+hB+', '+cC+', '+hC+'\n'), (err) => {
-      if (err) console.log('ERROR writing sync logs: '+err)
+      if (err) console.log('(113 ethchain.js) ERROR writing sync logs: '+err)
     });
   }
 
