@@ -40,8 +40,8 @@ const manifest = {
 const dockerCompose = `version: '3.4'
 services:
     letsencrypt-nginx.dnp.dappnode.eth:
-        image: 'letsencrypt-nginx.dnp.dappnode.eth:0.0.1'
         container_name: DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth
+        image: 'letsencrypt-nginx.dnp.dappnode.eth:0.0.1'
         volumes:
             - '~/certs:/etc/nginx/certs:rw'
             - '/var/run/docker.sock:/var/run/docker.sock:ro'
@@ -84,9 +84,9 @@ const manifestCORE = {
 const dockerComposeCORE = `version: '3.4'
 services:
     bind.dnp.dappnode.eth:
-        image: 'bind.dnp.dappnode.eth:0.1.0'
         container_name: DAppNodeCore-bind.dnp.dappnode.eth
         restart: always
+        image: 'bind.dnp.dappnode.eth:0.1.0'
         volumes:
             - 'dnp_bind_data:/etc/bind'
         networks:
@@ -145,9 +145,9 @@ const ipfs = {
   dc: `version: '3.4'
 services:
     ipfs.dnp.dappnode.eth:
-        image: 'ipfs.dnp.dappnode.eth:0.1.0'
         container_name: DAppNodeCore-ipfs.dnp.dappnode.eth
         restart: always
+        image: 'ipfs.dnp.dappnode.eth:0.1.0'
         volumes:
             - 'export:/export'
             - 'data:/data/ipfs'
@@ -223,10 +223,10 @@ const vpn = {
   dc: `version: '3.4'
 services:
     vpn.dnp.dappnode.eth:
-        image: 'vpn.dnp.dappnode.eth:0.1.0'
         container_name: DAppNodeCore-vpn.dnp.dappnode.eth
         restart: always
         privileged: true
+        image: 'vpn.dnp.dappnode.eth:0.1.0'
         volumes:
             - '/etc/hostname:/etc/vpnname:ro'
             - '/lib/modules:/lib/modules:ro'
