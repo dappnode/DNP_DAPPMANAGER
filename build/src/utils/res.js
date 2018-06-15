@@ -6,12 +6,10 @@ module.exports = {
   // > const res = require('../utils/res')
   // > return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
 
-  success: (message, result = {}) => {
+  success: (message, result = {}, log = false) => {
 
-    console.trace("SUCCESS MESSAGE: " + message)
-    // console.log('--------------\n User called method with success')
-    // console.log('  response message: ' + message+ '\n  result: ')
-    // console.log(result)
+    if (log) console.log("(11 res.js)" + message)
+
     return JSON.stringify({
         success: true,
         message,

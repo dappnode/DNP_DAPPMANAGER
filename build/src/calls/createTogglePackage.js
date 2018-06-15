@@ -44,7 +44,7 @@ function createTogglePackage(params,
         throw Error('Unkown state: ' + packageState + ', for package: ' + PACKAGE_NAME)
     }
 
-    return res.success('successfully toggled package: ' + PACKAGE_NAME)
+    return res.success('successfully toggled package: ' + PACKAGE_NAME, {}, true)
 
   }
 

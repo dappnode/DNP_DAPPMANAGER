@@ -36,7 +36,7 @@ function createUpdatePackageEnv(params, docker) {
       await docker.compose.up(DOCKERCOMPOSE_PATH)
     }
 
-    return res.success('Updated envs for package: ' + PACKAGE_NAME)
+    return res.success('Updated envs for package: ' + PACKAGE_NAME, {}, true)
 
   }
 
