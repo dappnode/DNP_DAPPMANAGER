@@ -6,3 +6,4 @@
 /build/src/undefined/
 .DS_Store
 .nyc_output
+build_*
