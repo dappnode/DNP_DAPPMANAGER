@@ -17,7 +17,7 @@ async function shellExecSync(command, silent = false) {
     console.trace('SHELL JS ERROR, on command: ' + command)
     throw Error(stderr)
   }
-  return stdout + stderr
+  return stdout
 
 }
 
