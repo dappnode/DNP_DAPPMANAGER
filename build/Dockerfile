@@ -15,10 +15,10 @@ FROM node:8.9.4-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl bind-dev
 
 RUN set -x && \
-    apk add --no-cache -t .deps ca-certificates curl && \
+    apk add --no-cache -t .deps ca-certificates curl bind-dev && \
     # Install glibc on Alpine (required by docker-compose) from
     # https://github.com/sgerrand/alpine-pkg-glibc
     # See also https://github.com/gliderlabs/docker-alpine/issues/11
