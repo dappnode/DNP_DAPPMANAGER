@@ -34,7 +34,7 @@ async function cat(HASH) {
     fs.mkdirSync(CACHE_DIR+'/ipfs')
   }
 
-  if (fs.existsSync(FILE_PATH) && fs.statSync(FILE_PATH).size > 0 ) {
+  if (fs.existsSync(FILE_PATH) && fs.statSync(FILE_PATH).size > 0 && isfileHashValid(HASH, FILE_PATH) ) {
     // fs.fstatSync(fd)
     // stats.ctimeMs: 1318289051000.1 -> The timestamp indicating the last time the file status was changed expressed in milliseconds since the POSIX Epoch.
     // stats.ctime -> The timestamp indicating the last time the file status was changed.
