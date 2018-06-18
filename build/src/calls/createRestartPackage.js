@@ -1,7 +1,7 @@
 const fs = require('fs')
 const getPath =       require('../utils/getPath')
 const res =           require('../utils/res')
-const createRestartPatch = require('./utils/createRestartPatch')
+const createRestartPatch = require('../utils/createRestartPatch')
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
