@@ -1,6 +1,7 @@
 const fs = require('fs')
 const getPath =       require('../utils/getPath')
 const res =           require('../utils/res')
+const createRestartPatch = require('../utils/createRestartPatch')
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
@@ -8,6 +9,9 @@ const res =           require('../utils/res')
 function createRestartPackage(params,
   // default option passed to allow testing
   docker) {
+
+  // patch to prevent installer from crashing
+  const restartPatch = createRestartPatch(params, docker)
 
   return async function restartPackage(req) {
 
@@ -21,7 +25,7 @@ function createRestartPackage(params,
     }
 
     if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
-      throw Error('The installer cannot be restarted')
+      await restartPatch(PACKAGE_NAME)
     }
 
     // Combining rm && up doesn't prevent the installer from crashing
