@@ -1,13 +1,13 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
   "type": "dncore",
   "image": {
-    "path": "dappmanager.dnp.dappnode.eth_0.1.5.tar.xz",
-    "hash": "/ipfs/QmSPxVF3VFydwaAtxKVGGyGDbfj3uotEK1GJKTZeYhCRA3",
-    "size": 40734554,
+    "path": "dappmanager.dnp.dappnode.eth_0.1.6.tar.xz",
+    "hash": "/ipfs/QmR2xhTe8tbjbm4j7c9YkNXtsy2TZwA3eVHGrLytpc7ecC",
+    "size": 40412000,
     "volumes": [
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",

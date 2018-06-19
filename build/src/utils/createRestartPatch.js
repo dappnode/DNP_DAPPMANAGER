@@ -2,6 +2,7 @@ const shellSync_default = require('./shell')
 const fs = require('fs')
 const getPath = require('./getPath')
 const validate = require('./validate')
+const dockerList = require('../modules/dockerList')
 
 const TARGET_PACKAGE_NAME = "dappmanager.dnp.dappnode.eth"
 
@@ -9,6 +10,13 @@ const TARGET_PACKAGE_NAME = "dappmanager.dnp.dappnode.eth"
 function createRestartPatch(params, docker) {
 
   return async function restartPatch(IMAGE_NAME) {
+
+    if (!IMAGE_NAME.includes(':')) {
+        let dnpList = await dockerList.listContainers()
+        let container = dnpList.find(c => c.name.includes(IMAGE_NAME))
+        let version = container.version
+        IMAGE_NAME += (':' + version)
+    }
 
     const DOCKERCOMPOSE_RESTART_PATH = getPath.DOCKERCOMPOSE('restart.dnp.dappnode.eth', params, true)
     const DOCKERCOMPOSE_DATA = `version: '3.4'
