@@ -123,7 +123,7 @@ function createDocker(shellSync = shellSync_default) {
       let optionsString = ''
       // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
       if (options.hasOwnProperty("timestamps") && options.timestamps) optionsString += ' --timestamps'
-      if (options.hasOwnProperty("tail") && Number.isInteger(options.tail)) optionsString += ' --tail '+options.tail
+      if (options.hasOwnProperty("tail") && !isNaN(options.tail) ) optionsString += ' --tail '+options.tail
 
       return shellSync('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true)
     }
@@ -139,7 +139,7 @@ function parseOptions(options) {
   let optionsString = ''
 
   // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  if (Number.isInteger(options.timeout)) optionsString += ' --timeout '+options.timeout
+  if (!isNaN(options.timeout)) optionsString += ' --timeout '+options.timeout
   // -t, --timestamps    Show timestamps
   if (options.timestamps) optionsString += ' --timestamps'
   if (options.volumes) optionsString += ' --volumes'
