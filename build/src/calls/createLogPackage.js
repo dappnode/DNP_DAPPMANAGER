@@ -16,6 +16,7 @@ function createLogPackage(params,
 
     const PACKAGE_NAME = req[0]
     const IS_CORE = req[1]
+    const OPTIONS = req[2] ? JSON.parse(req[2]) : {}
     const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null
 
     const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, IS_CORE)
@@ -25,7 +26,7 @@ function createLogPackage(params,
 
     const CONTAINER_NAME = parse.containerName(DOCKERCOMPOSE_PATH)
 
-    let logs = await docker.log(CONTAINER_NAME)
+    let logs = await docker.log(CONTAINER_NAME, OPTIONS)
 
     return res.success('Got logs of package: ' + PACKAGE_NAME, {
       name: PACKAGE_NAME,
