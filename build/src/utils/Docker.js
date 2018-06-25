@@ -1,13 +1,8 @@
 // node modules
-const { promisify } = require('util');
-const shellSync_default = require('./shell')
-const fs = require('fs')
-const docker = require('docker-remote-api')
-const request = docker()
+const shellSyncDefault = require('./shell');
 
 
-function createDocker(shellSync = shellSync_default) {
-
+function createDocker(shellSync = shellSyncDefault) {
   return {
     compose: {
       // Usage: up [options] [--scale SERVICE=NUM...] [SERVICE...]
@@ -24,8 +19,8 @@ function createDocker(shellSync = shellSync_default) {
       // --exit-code-from SERVICE   Return the exit code of the selected service
       //                            container. Implies --abort-on-container-exit.
       up: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d'+optionsString);
       },
 
       // Usage: down [options]
@@ -37,45 +32,45 @@ function createDocker(shellSync = shellSync_default) {
       //     --remove-orphans        Remove containers for services not defined in the Compose file
       //     -t, --timeout TIMEOUT   Specify a shutdown timeout in seconds. (default: 10)
       down: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' down'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' down'+optionsString);
       },
 
       // Usage: start [SERVICE...]
       start: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' start'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' start'+optionsString);
       },
 
       // Usage: stop [options] [SERVICE...]
       // Options:
       // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
       stop: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' stop'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' stop'+optionsString);
       },
 
       // Usage: restart [options] [SERVICE...]
       // Options:
       // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
       rm: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf'+optionsString);
       },
 
       // Safe down & up
       rm_up: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
+        let optionsString = parseOptions(options);
         return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf'+optionsString
-        +' && docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d'+optionsString)
+        +' && docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d'+optionsString);
       },
 
       // Usage: restart [options] [SERVICE...]
       // Options:
       // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
       restart: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' restart'+optionsString)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' restart'+optionsString);
       },
 
       // Usage: logs [options] [SERVICE...]
@@ -86,16 +81,16 @@ function createDocker(shellSync = shellSync_default) {
       // --tail="all"        Number of lines to show from the end of the logs
       //                     for each container.
       logs: (DOCKERCOMPOSE_PATH, options={}) => {
-        let optionsString = parseOptions(options)
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs'+optionsString + ' 2>&1', true)
+        let optionsString = parseOptions(options);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs'+optionsString + ' 2>&1', true);
       },
 
       // Usage: ps [options] [SERVICE...]
       // Options:
       // -q    Only display IDs
       ps: (DOCKERCOMPOSE_PATH) => {
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' ps')
-      }
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' ps');
+      },
 
     },
 
@@ -103,8 +98,8 @@ function createDocker(shellSync = shellSync_default) {
       // docker volume rm [OPTIONS] VOLUME [VOLUME...]
       // --force , -f  Force the removal of one or more volumes
       rm: (VOLUME) => {
-        return shellSync('docker volume rm -f ' + VOLUME)
-      }
+        return shellSync('docker volume rm -f ' + VOLUME);
+      },
     },
 
     // NOT A DOCKER-COMPOSE
@@ -112,7 +107,7 @@ function createDocker(shellSync = shellSync_default) {
     // --input , -i		Read from tar archive file, instead of STDIN
     // --quiet , -q		Suppress the load output
     load: (imagePath) => {
-      return shellSync('docker load -i ' + imagePath)
+      return shellSync('docker load -i ' + imagePath);
     },
 
     // NOT A DOCKER-COMPOSE
@@ -120,35 +115,39 @@ function createDocker(shellSync = shellSync_default) {
     // --timestamps , -t  Show timestamps
     log: (containerNameOrId, options) => {
       // Parse options
-      let optionsString = ''
+      let optionsString = '';
       // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-      if (options.hasOwnProperty("timestamps") && options.timestamps) optionsString += ' --timestamps'
-      if (options.hasOwnProperty("tail") && !isNaN(options.tail) ) optionsString += ' --tail '+options.tail
+      if (
+        options.hasOwnProperty('timestamps')
+        && options.timestamps
+      ) optionsString += ' --timestamps';
 
-      return shellSync('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true)
-    }
+      if (
+        options.hasOwnProperty('tail')
+        && !isNaN(options.tail)
+      ) optionsString += ' --tail '+options.tail;
+
+      return shellSync('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true);
+    },
 
 
-  }
-
+  };
 }
-
 
 
 function parseOptions(options) {
-  let optionsString = ''
+  let optionsString = '';
 
   // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  if (!isNaN(options.timeout)) optionsString += ' --timeout '+options.timeout
+  if (!isNaN(options.timeout)) optionsString += ' --timeout '+options.timeout;
   // -t, --timestamps    Show timestamps
-  if (options.timestamps) optionsString += ' --timestamps'
-  if (options.volumes) optionsString += ' --volumes'
-  if (options.v) optionsString += ' -v'
-  if (options.core) optionsString += (' ' + options.core)
+  if (options.timestamps) optionsString += ' --timestamps';
+  if (options.volumes) optionsString += ' --volumes';
+  if (options.v) optionsString += ' -v';
+  if (options.core) optionsString += (' ' + options.core);
 
-  return optionsString
+  return optionsString;
 }
 
 
-
-module.exports = createDocker
+module.exports = createDocker;

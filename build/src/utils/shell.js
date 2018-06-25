@@ -1,24 +1,22 @@
-const shell = require('shelljs')
+const shell = require('shelljs');
 
-const maxTime = 20*1000
+const maxTime = 20*1000;
 
 async function shellExecSync(command, silent = false) {
-
-  const res = await shell.exec(command, { silent: silent, timeout: maxTime })
+  const res = await shell.exec(command, {silent: silent, timeout: maxTime});
 
   // When shell.exec timeout expires, res will be undefined
-  if (!res) throw Error('ERROR: shell process: '+command+' expired timeout ('+maxTime+' ms)')
+  if (!res) throw Error('ERROR: shell process: '+command+' expired timeout ('+maxTime+' ms)');
 
   // Otherwise, parse response
-  const code = res.code
-  const stdout = res.stdout
-  const stderr = res.stderr
+  const code = res.code;
+  const stdout = res.stdout;
+  const stderr = res.stderr;
   if (code !== 0) {
-    console.trace('SHELL JS ERROR, on command: ' + command)
-    throw Error(stderr)
+    console.trace('SHELL JS ERROR, on command: ' + command);
+    throw Error(stderr);
   }
-  return stdout
-
+  return stdout;
 }
 
-module.exports = shellExecSync
+module.exports = shellExecSync;

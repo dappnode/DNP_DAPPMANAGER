@@ -1,8 +1,8 @@
-const fs = require('fs')
-const dockerList_default = require('../modules/dockerList')
-const getPath = require('../utils/getPath')
-const parse =   require('../utils/parse')
-const res =     require('../utils/res')
+const fs = require('fs');
+const dockerListDefault = require('../modules/dockerList');
+const getPath = require('../utils/getPath');
+const parse = require('../utils/parse');
+const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = dnpList =
@@ -26,37 +26,33 @@ const res =     require('../utils/res')
 
 function createListPackages(params,
   // default option passed to allow testing
-  dockerList=dockerList_default) {
-
+  dockerList=dockerListDefault) {
   return async function listPackages(req) {
-
-    let dnpList = await dockerList.listContainers()
+    let dnpList = await dockerList.listContainers();
 
 
     dnpList.map((dnp) => {
-      const PACKAGE_NAME = dnp.name
-      const IS_CORE = dnp.isCORE
+      const PACKAGE_NAME = dnp.name;
+      const IS_CORE = dnp.isCORE;
 
       // Add env info
-      let ENV_FILE = getPath.ENV_FILE(PACKAGE_NAME, params, IS_CORE)
+      const ENV_FILE = getPath.envFile(PACKAGE_NAME, params, IS_CORE);
       if (fs.existsSync(ENV_FILE)) {
-        let envFileData = fs.readFileSync(ENV_FILE, 'utf8')
-        dnp.envs = parse.envFile(envFileData)
+        let envFileData = fs.readFileSync(ENV_FILE, 'utf8');
+        dnp.envs = parse.envFile(envFileData);
       }
 
       // Add manifest
-      let MANIFEST_FILE = getPath.MANIFEST(PACKAGE_NAME, params, IS_CORE)
+      let MANIFEST_FILE = getPath.manifest(PACKAGE_NAME, params, IS_CORE);
       if (fs.existsSync(MANIFEST_FILE)) {
-        let manifestFileData = fs.readFileSync(MANIFEST_FILE, 'utf8')
-        dnp.manifest = JSON.parse(manifestFileData)
+        let manifestFileData = fs.readFileSync(MANIFEST_FILE, 'utf8');
+        dnp.manifest = JSON.parse(manifestFileData);
       }
-    })
+    });
 
-    return res.success("Listing " + dnpList.length + " packages", dnpList)
-
-  }
+    return res.success('Listing ' + dnpList.length + ' packages', dnpList);
+  };
 }
 
 
-
-module.exports = createListPackages
+module.exports = createListPackages;

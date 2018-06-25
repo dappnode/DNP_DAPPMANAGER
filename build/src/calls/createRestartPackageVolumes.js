@@ -1,7 +1,7 @@
-const fs = require('fs')
-const getPath =       require('../utils/getPath')
-const res =           require('../utils/res')
-const parse = require('../utils/parse')
+const fs = require('fs');
+const getPath = require('../utils/getPath');
+const res = require('../utils/res');
+const parse = require('../utils/parse');
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
@@ -9,34 +9,31 @@ const parse = require('../utils/parse')
 function createRestartPackageVolumes(params,
   // default option passed to allow testing
   docker) {
-
   return async function restartPackageVolumes(req) {
+    const PACKAGE_NAME = req[0];
+    const IS_CORE = req[1];
+    const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null;
 
-    const PACKAGE_NAME = req[0]
-    const IS_CORE = req[1]
-    const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null
-
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, IS_CORE)
+    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
     if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
+      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH);
     }
 
     if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
-      throw Error('The installer cannot be restarted')
+      throw Error('The installer cannot be restarted');
     }
 
-    const packageVolumes = parse.serviceVolumes(DOCKERCOMPOSE_PATH, PACKAGE_NAME)
+    const packageVolumes = parse.serviceVolumes(DOCKERCOMPOSE_PATH, PACKAGE_NAME);
 
-    await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME, v: true})
-    for (volumeName of packageVolumes) {
-      await docker.volume.rm(volumeName)
+    await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME, v: true});
+    for (const volumeName of packageVolumes) {
+      await docker.volume.rm(volumeName);
     }
-    await docker.compose.up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    await docker.compose.up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME});
 
-    return res.success('Restarted '+PACKAGE_NAME+' volumes: ' + packageVolumes.join(', '))
-
-  }
+    return res.success('Restarted '+PACKAGE_NAME+' volumes: ' + packageVolumes.join(', '));
+  };
 }
 
 
-module.exports = createRestartPackageVolumes
+module.exports = createRestartPackageVolumes;
