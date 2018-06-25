@@ -9,9 +9,9 @@ const res = require('../utils/res');
 function createTogglePackage(params,
   // default option passed to allow testing
   docker) {
-  return async function togglePackage(req) {
-    const PACKAGE_NAME = req[0];
-    const timeout = req[1] || 10;
+  return async function togglePackage({args}) {
+    const PACKAGE_NAME = args[0];
+    const timeout = args[1] || 10;
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
 
     if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {

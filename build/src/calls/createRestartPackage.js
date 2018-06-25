@@ -12,9 +12,9 @@ function createRestartPackage(params,
   // patch to prevent installer from crashing
   const restartPatch = createRestartPatch(params, docker);
 
-  return async function restartPackage(req) {
-    const PACKAGE_NAME = req[0];
-    const IS_CORE = req[1];
+  return async function restartPackage({args}) {
+    const PACKAGE_NAME = args[0];
+    const IS_CORE = args[1];
     const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null;
 
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);

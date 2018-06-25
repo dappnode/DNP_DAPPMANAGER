@@ -9,9 +9,9 @@ const shellSync = require('../utils/shell');
 function createRemovePackage(params,
   // default option passed to allow testing
   docker) {
-  return async function removePackage(req) {
-    const PACKAGE_NAME = req[0];
-    const DELETE_VOLUMES = req[1] || false;
+  return async function removePackage({args}) {
+    const PACKAGE_NAME = args[0];
+    const DELETE_VOLUMES = args[1] || false;
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
     const PACKAGE_REPO_DIR_PATH = getPath.packageRepoDir(PACKAGE_NAME, params);
 

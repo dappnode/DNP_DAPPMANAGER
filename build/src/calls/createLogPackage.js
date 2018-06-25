@@ -11,10 +11,10 @@ const parse = require('../utils/parse');
 function createLogPackage(params,
   // default option passed to allow testing
   docker) {
-  return async function logPackage(req) {
-    const PACKAGE_NAME = req[0];
-    const IS_CORE = req[1];
-    const OPTIONS = req[2] ? JSON.parse(req[2]) : {};
+  return async function logPackage({args}) {
+    const PACKAGE_NAME = args[0];
+    const IS_CORE = args[1];
+    const OPTIONS = args[2] ? JSON.parse(args[2]) : {};
 
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
     if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {

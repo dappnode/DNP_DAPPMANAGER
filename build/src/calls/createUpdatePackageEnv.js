@@ -7,13 +7,13 @@ const res = require('../utils/res');
 
 // default option passed to allow testing
 function createUpdatePackageEnv(params, docker) {
-  return async function updatePackageEnv(req) {
-    const PACKAGE_NAME = parse.packageReq(req[0]).name; // parsing anyway for safety
-    const IS_CORE = req[3];
+  return async function updatePackageEnv({args}) {
+    const PACKAGE_NAME = parse.packageReq(args[0]).name; // parsing anyway for safety
+    const IS_CORE = args[3];
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
     const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params, IS_CORE);
-    const envs = JSON.parse(req[1]);
-    const restart = req[2];
+    const envs = JSON.parse(args[1]);
+    const restart = args[2];
 
     // Write envs
     await fs.writeFileSync(
