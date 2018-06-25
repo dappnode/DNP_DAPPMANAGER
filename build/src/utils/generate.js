@@ -1,140 +1,136 @@
 // node modules
-const yaml = require('js-yaml')
+const yaml = require('js-yaml');
 
 
-function dockerCompose(dpn_manifest, params, isCORE = false) {
-
+function dockerCompose(dpnManifest, params, isCORE = false) {
     // Define docker compose parameters
-    const DNS_SERVICE = params.DNS_SERVICE
-    const DNP_NETWORK = params.DNP_NETWORK
-    const DNP_VERSION_TAG = params.DNP_VERSION_TAG
-    const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX
-    const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX
+    const DNS_SERVICE = params.DNS_SERVICE;
+    const DNP_NETWORK = params.DNP_NETWORK;
+    const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
+    const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 
-    const PACKAGE_NAME = dpn_manifest.name.replace("/", "_").replace("@", "");
+    const PACKAGE_NAME = dpnManifest.name.replace('/', '_').replace('@', '');
 
 
     // DOCKER COMPOSE YML - SERVICE
     // ============================
-    let service = {}
+    let service = {};
     if (isCORE) {
-      service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME
-      service.restart = "always"
-      if (dpn_manifest.image.privileged) {
-        service.privileged = true
+      service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME;
+      service.restart = 'always';
+      if (dpnManifest.image.privileged) {
+        service.privileged = true;
       }
     } else {
-      service.container_name = CONTAINER_NAME_PREFIX + PACKAGE_NAME
+      service.container_name = CONTAINER_NAME_PREFIX + PACKAGE_NAME;
     }
 
     // Image name
-    service.image = dpn_manifest.name + ":" + dpn_manifest.version
+    service.image = dpnManifest.name + ':' + dpnManifest.version;
 
     // Volumes
     service.volumes = [
-      ...(dpn_manifest.image.volumes || []),
-      ...(dpn_manifest.image.external_vol || [])
-    ]
+      ...(dpnManifest.image.volumes || []),
+      ...(dpnManifest.image.external_vol || []),
+    ];
 
     // Ports
-    if(dpn_manifest.image.ports){
-        service.ports = dpn_manifest.image.ports
+    if (dpnManifest.image.ports) {
+        service.ports = dpnManifest.image.ports;
     }
 
     // Support for environment variables
-    if(dpn_manifest.image.environment){
-      service.env_file = [PACKAGE_NAME + ".env"]
+    if (dpnManifest.image.environment) {
+      service.env_file = [PACKAGE_NAME + '.env'];
     }
 
     // Networks
     if (isCORE) {
       service.networks = {
         network: {
-          ipv4_address: dpn_manifest.image.ipv4_address
-        }
-      }
+          ipv4_address: dpnManifest.image.ipv4_address,
+        },
+      };
     } else {
-      service.networks = [DNP_NETWORK]
+      service.networks = [DNP_NETWORK];
     }
 
     // DNS
-    service.dns = DNS_SERVICE
+    service.dns = DNS_SERVICE;
 
     // label handling
-    if(dpn_manifest.image.labels){
-      service.labels = []
-      dpn_manifest.image.labels.map(label => {
-        service.labels.push(label)
-      })
+    if (dpnManifest.image.labels) {
+      service.labels = [];
+      dpnManifest.image.labels.map((label) => {
+        service.labels.push(label);
+      });
     }
 
 
     // DOCKER COMPOSE YML - VOLUMES
     // ============================
-    let volumes = {}
+    let volumes = {};
     // Regular volumes
-    if(dpn_manifest.image.volumes) {
-      dpn_manifest.image.volumes.map(vol => {
+    if (dpnManifest.image.volumes) {
+      dpnManifest.image.volumes.map((vol) => {
         // Make sure it's a named volume
-        if(!vol.startsWith('/') && !vol.startsWith('~')){
-          const volName = vol.split(":")[0]
-          volumes[volName] = {}
+        if (!vol.startsWith('/') && !vol.startsWith('~')) {
+          const volName = vol.split(':')[0];
+          volumes[volName] = {};
         }
       });
     }
     // External volumes
-    if(dpn_manifest.image.external_vol) {
-      dpn_manifest.image.external_vol.map(vol => {
-        const volName = vol.split(":")[0]
+    if (dpnManifest.image.external_vol) {
+      dpnManifest.image.external_vol.map((vol) => {
+        const volName = vol.split(':')[0];
         volumes[volName] = {
           external: {
-            "name": volName
-          }
-        }
+            'name': volName,
+          },
+        };
       });
     }
 
 
     // DOCKER COMPOSE YML - NETWORKS
     // ============================
-    let networks = {}
-    if (isCORE && dpn_manifest.image.subnet) {
+    let networks = {};
+    if (isCORE && dpnManifest.image.subnet) {
       networks = {
         network: {
           driver: 'bridge',
           ipam: {
-            config: [ { subnet: dpn_manifest.image.subnet } ]
-          }
-        }
-      }
-
+            config: [{subnet: dpnManifest.image.subnet}],
+          },
+        },
+      };
     } else {
-      networks[DNP_NETWORK] = {}
-      networks[DNP_NETWORK].external = true
+      networks[DNP_NETWORK] = {};
+      networks[DNP_NETWORK].external = true;
     }
 
     let dockerCompose = {
       version: '3.4',
       services: {
-        [PACKAGE_NAME]: service
-      }
-    }
-    if (Object.getOwnPropertyNames(volumes).length) dockerCompose.volumes = volumes
-    if (Object.getOwnPropertyNames(networks).length) dockerCompose.networks = networks
+        [PACKAGE_NAME]: service,
+      },
+    };
+    if (Object.getOwnPropertyNames(volumes).length) dockerCompose.volumes = volumes;
+    if (Object.getOwnPropertyNames(networks).length) dockerCompose.networks = networks;
 
     return yaml.dump(dockerCompose, {
-      indent: 4
-    })
-
+      indent: 4,
+    });
 }
 
 
-function manifest (dnpManifest) {
-    return JSON.stringify(dnpManifest, null, 2)
+function manifest(dnpManifest) {
+    return JSON.stringify(dnpManifest, null, 2);
 }
 
 
 module.exports = {
   dockerCompose,
-  manifest
-}
+  manifest,
+};

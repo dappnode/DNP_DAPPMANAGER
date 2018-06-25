@@ -1,76 +1,71 @@
-const assert = require('assert')
-const chai = require('chai')
-const expect = require('chai').expect
-const sinon = require('sinon')
-const fs = require('fs')
-const createInstallPackage = require('./createInstallPackage')
+const chai = require('chai');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const createInstallPackage = require('./createInstallPackage');
 
 chai.should();
 
 describe('Call function: installPackage', function() {
-
-  mockTest()
+  mockTest();
   // integrationTest()
-
 });
 
 
 function integrationTest() {
-  const params = require('../params')
-  const createGetManifest = require('../utils/getManifest')
-  const createAPM = require('../modules/apm')
-  const ipfsCalls = require('../modules/ipfsCalls')
-  const web3Setup = require('../modules/web3Setup')
-  const validate = require('../utils/validate')
-  const dependencies = require('../utils/dependencies')
-  const pkg = require('../utils/packages')
-  const createDocker = require('../utils/Docker')
+  const params = require('../params');
+  const createGetManifest = require('../utils/getManifest');
+  const createAPM = require('../modules/apm');
+  const ipfsCalls = require('../modules/ipfsCalls');
+  const web3Setup = require('../modules/web3Setup');
+  const validate = require('../utils/validate');
+  const dependencies = require('../utils/dependencies');
+  const pkg = require('../utils/packages');
+  const createDocker = require('../utils/Docker');
 
   // initialize dependencies
-  const web3 = web3Setup(params) // <-- web3
-  validate.web3(web3)
-  const apm = createAPM(web3)
-  const docker = createDocker()
+  const web3 = web3Setup(params); // <-- web3
+  validate.web3(web3);
+  const apm = createAPM(web3);
+  const docker = createDocker();
 
   // Construct getDependencies
-  const getManifest = createGetManifest(apm, ipfsCalls)
-  const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest)
+  const getManifest = createGetManifest(apm, ipfsCalls);
+  const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
 
   // Construct single package downloader and runner
-  const download = pkg.createDownload(params, ipfsCalls)
-  const run      = pkg.createRun(params, docker)
-  const downloadPackages = pkg.createDownloadPackages(download)
-  const runPackages      = pkg.createRunPackages(run)
+  const download = pkg.createDownload(params, ipfsCalls);
+  const run = pkg.createRun(params, docker);
+  const downloadPackages = pkg.createDownloadPackages(download);
+  const runPackages = pkg.createRunPackages(run);
 
-  const installPackage = createInstallPackage  (getDependencies,
+  const installPackage = createInstallPackage(getDependencies,
     downloadPackages,
     runPackages
-  )
+  );
 
   describe('[INTEGRATION TEST] Call function installPackage', () => {
-
-    const packageReq = 'otpweb.dnp.dappnode.eth'
+    const packageReq = 'otpweb.dnp.dappnode.eth';
     let res;
 
     it('should run successfully', async (done) => {
-      let error
+      let error;
       try {
-        res = await installPackage([packageReq])
-      } catch(e) {
-        console.error(e)
-        error = e
+        res = await installPackage([packageReq]);
+      } catch (e) {
+        console.error(e);
+        error = e;
       }
-      expect( error ).to.be.undefined
-    }).timeout(10*1000)
+      expect( error ).to.be.undefined;
+    }).timeout(10*1000);
 
     it('should return a stringified response', async () => {
-      expect( res ).to.be.a('string')
-    })
+      expect( res ).to.be.a('string');
+    });
 
     it('should return success', async () => {
-      let parsedRes = JSON.parse(res)
-      expect( parsedRes.success ).to.be.true
-    })
+      let parsedRes = JSON.parse(res);
+      expect( parsedRes.success ).to.be.true;
+    });
 
     // it('should return a valid list of packages', async () => {
     //   let parsedRes = JSON.parse(res)
@@ -82,59 +77,56 @@ function integrationTest() {
     //   let parsedRes = JSON.parse(res)
     //   expect(parsedRes.result.versions[2].manifest.name).to.equal(packageReq)
     // })
-  })
-
+  });
 }
 
 
 function mockTest() {
   describe('mock test', function() {
-
-    // const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params)
-    const ipfs_download_spy = sinon.spy()
-    const STOP_MSG = 'stopped package'
-    const START_MSG = 'started package'
+    // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params)
+    const ipfs_download_spy = sinon.spy();
+    const STOP_MSG = 'stopped package';
+    const START_MSG = 'started package';
 
     const params = {
       REPO_DIR: 'test/',
-      DOCKERCOMPOSE_NAME: 'docker-compose.yml'
-    }
-    const packageList = ['a']
-    const PACKAGE_NAME = 'packageA'
+      DOCKERCOMPOSE_NAME: 'docker-compose.yml',
+    };
+    const packageList = ['a'];
+    const PACKAGE_NAME = 'packageA';
     // Create Mocks
-    const downloadPackages_spy = sinon.spy()
+    const downloadPackages_spy = sinon.spy();
     const downloadPackages_Mock = async (packageList) => {
-      downloadPackages_spy(packageList)
-    }
-    const runPackages_spy = sinon.spy()
+      downloadPackages_spy(packageList);
+    };
+    const runPackages_spy = sinon.spy();
     const runPackages_Mock = async (packageList) => {
-      runPackages_spy(packageList)
-    }
-    const getAllDependenciesResolvedOrdered_spy = sinon.spy()
+      runPackages_spy(packageList);
+    };
+    const getAllDependenciesResolvedOrdered_spy = sinon.spy();
     const getAllDependenciesResolvedOrdered_Mock = async (packageReq) => {
-      getAllDependenciesResolvedOrdered_spy(packageReq)
-      return packageList
-    }
+      getAllDependenciesResolvedOrdered_spy(packageReq);
+      return packageList;
+    };
 
     const installPackage = createInstallPackage(getAllDependenciesResolvedOrdered_Mock,
       downloadPackages_Mock,
       runPackages_Mock
-    )
+    );
 
-    let res
+    let res;
 
     it('downloadPackages should be called with packageList', async () => {
-
       // Call only once for efficiency
-      res = await installPackage([PACKAGE_NAME])
+      res = await installPackage([PACKAGE_NAME]);
 
       expect(downloadPackages_spy.getCalls()[0].args)
-        .to.deep.equal( [packageList] )
+        .to.deep.equal( [packageList] );
     });
 
     it('runPackages should be called with packageList', () => {
       expect(runPackages_spy.getCalls()[0].args)
-        .to.deep.equal( [packageList] )
+        .to.deep.equal( [packageList] );
     });
 
     // it('should stop the package with correct arguments', async () => {
@@ -154,9 +146,8 @@ function mockTest() {
 
     it('should return a stringified object containing success', async () => {
       expect(JSON.parse(res)).to.deep.include({
-        success: true
+        success: true,
       });
     });
-
-  })
+  });
 }
