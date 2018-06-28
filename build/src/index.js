@@ -1,7 +1,7 @@
 'use strict';
 // node modules
 const autobahn = require('autobahn');
-const eventBus = require('./eventBus');
+const {eventBus, eventBusTag} = require('./eventBus');
 
 // import calls
 const createInstallPackage = require('./calls/createInstallPackage');
@@ -18,7 +18,7 @@ const createUpdatePackageEnv = require('./calls/createUpdatePackageEnv');
 
 // import dependencies
 const params = require('./params');
-const createDocker = require('./utils/Docker');
+const {createDocker} = require('./utils/Docker');
 const pkg = require('./utils/packages');
 const createGetManifest = require('./utils/getManifest');
 const dependencies = require('./utils/dependencies');
@@ -36,14 +36,12 @@ const apm = createAPM(web3);
 const getDirectory = createGetDirectory(web3);
 const getManifest = createGetManifest(apm, ipfsCalls);
 const docker = createDocker();
-const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest, log);
-const download = pkg.createDownload(params, ipfsCalls, docker, log);
-const run = pkg.createRun(params, docker, log);
-const downloadPackages = pkg.createDownloadPackages(download);
-const runPackages = pkg.createRunPackages(run);
+const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
+const download = pkg.downloadFactory({params, ipfsCalls, docker});
+const run = pkg.runFactory({params, docker});
 
 // Initialize calls
-const installPackage = createInstallPackage(getDependencies, downloadPackages, runPackages);
+const installPackage = createInstallPackage(getDependencies, download, run);
 const removePackage = createRemovePackage(params, docker);
 const togglePackage = createTogglePackage(params, docker);
 const restartPackage = createRestartPackage(params, docker);
@@ -60,7 +58,6 @@ const autobahnUrl = params.autobahnUrl;
 const autobahnRealm = params.autobahnRealm;
 const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
 
-let sessionGlobal;
 
 connection.onopen = function(session, details) {
     console.log('CONNECTED to DAppnode\'s WAMP '+
@@ -83,7 +80,6 @@ connection.onopen = function(session, details) {
     register(session, 'getPackageData.dappmanager.dnp.dappnode.eth', getPackageData);
 
 
-    sessionGlobal = session;
     // emitter.on('log', (log) => {
     //   log.topic = log.topic || 'general'
     //   log.type = log.type || 'default'
@@ -91,12 +87,17 @@ connection.onopen = function(session, details) {
     //   console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
     //   session.publish(autobahnTag.installerLog, [log])
     // })
-    eventBus.on('call', (call, args) => {
+    eventBus.on(eventBusTag.call, (call, args) => {
       session.call(call, args)
       .then((res) => {
         console.log('INTERNAL CALL TO: '+call);
         console.trace(res);
       });
+    });
+
+    eventBus.on(eventBusTag.logUI, (data) => {
+      session.publish(autobahnTag.DAppManagerLog, [data]);
+      console.log('\x1b[35m%s\x1b[0m', JSON.stringify(data));
     });
 };
 
@@ -104,12 +105,6 @@ connection.onopen = function(session, details) {
 connection.onclose = function(reason, details) {
   console.log('[index.js connection.onclose] reason: '+reason+' details '+JSON.stringify(details));
 };
-
-
-function log(data) {
-  sessionGlobal.publish(autobahnTag.DAppManagerLog, [data]);
-  console.log('\x1b[35m%s\x1b[0m', JSON.stringify(data));
-}
 
 
 connection.open();
@@ -135,12 +130,11 @@ function wrapErrors(handler) {
   // 1. kwargs: an object with call arguments
   // 2. details: an object which provides call metadata
 
-  return async function(args, kwargs, details) {
+  return async function(args, kwargs) {
     try {
         return await handler({
           args,
           kwargs,
-          log: details.progress || function() {},
         });
     } catch (err) {
       console.log(err);

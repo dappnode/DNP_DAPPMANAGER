@@ -7,12 +7,12 @@ function createDocker(shellSync = shellSyncDefault) {
     compose: {
       // Usage: up [options] [--scale SERVICE=NUM...] [SERVICE...]
       // Options:
-      // -d, --detach               Detached mode: Run containers in the background, print new container names.
+      // -d, --detach               Detached mode: Run containers in the background.
       // --no-color                 Produce monochrome output.
       // --no-deps                  Don't start linked services.
-      // --force-recreate           Recreate containers even if their configuration and image haven't changed.
+      // --force-recreate           Recreate containers with configuration / image unchanged.
       // --always-recreate-deps     Recreate dependent containers. Incompatible with --no-recreate.
-      // --no-recreate              If containers already exist, don't recreate them. Incompatible with --force-recreate and -V.
+      // --no-recreate              If containers already exist, don't recreate them.
       // --no-build                 Don't build an image, even if it's missing.
       // --no-start                 Don't start the services after creating them.
       // --build                    Build images before starting containers.
@@ -27,7 +27,7 @@ function createDocker(shellSync = shellSyncDefault) {
       // Options:
       //     --rmi type              Remove images. Type must be one of:
       //                               'all': Remove all images used by any service.
-      //                               'local': Remove only images that don't have a custom tag set by the `image` field.
+      //                               'local': Remove only images that don't have a custom tag.
       //     -v, --volumes           Remove named volumes declared in the `volumes`
       //     --remove-orphans        Remove containers for services not defined in the Compose file
       //     -t, --timeout TIMEOUT   Specify a shutdown timeout in seconds. (default: 10)
@@ -82,7 +82,8 @@ function createDocker(shellSync = shellSyncDefault) {
       //                     for each container.
       logs: (DOCKERCOMPOSE_PATH, options={}) => {
         let optionsString = parseOptions(options);
-        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs'+optionsString + ' 2>&1', true);
+        return shellSync('docker-compose -f ' + DOCKERCOMPOSE_PATH
+          + ' logs'+optionsString + ' 2>&1', true);
       },
 
       // Usage: ps [options] [SERVICE...]
@@ -150,4 +151,7 @@ function parseOptions(options) {
 }
 
 
-module.exports = createDocker;
+module.exports = {
+  createDocker,
+  docker: createDocker(),
+};

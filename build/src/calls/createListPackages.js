@@ -27,7 +27,7 @@ const res = require('../utils/res');
 function createListPackages(params,
   // default option passed to allow testing
   dockerList=dockerListDefault) {
-  return async function listPackages(req) {
+  return async function listPackages() {
     let dnpList = await dockerList.listContainers();
 
 

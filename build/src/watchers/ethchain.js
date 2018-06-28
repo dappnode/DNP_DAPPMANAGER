@@ -1,4 +1,4 @@
-const eventBus = require('../eventBus');
+const {eventBus, eventBusTag} = require('../eventBus');
 const fs = require('fs');
 const linearRegression = require('simple-statistics').linearRegression;
 // import the actual Api class
@@ -36,7 +36,7 @@ setInterval(() => {
       console.log('(41 ethchain.js) RESETING PARITY');
       const id = 'ethchain.dnp.dappnode.eth';
       const isCORE = true;
-      eventBus.emit('call', 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE]);
+      eventBus.emit(eventBusTag.call, 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE]);
     }
   } catch (e) {
     console.log('(48 ethchain.js) - ERROR reseting parity in ethchain watcher: '+e.message);

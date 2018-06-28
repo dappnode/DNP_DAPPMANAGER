@@ -4,29 +4,29 @@ const validate = require('../utils/validate');
 const {orderDependencies} = require('./orderDependencies');
 const dockerListDefault = require('../modules/dockerList');
 const parse = require('./parse');
+const logUI = require('./logUI');
 
 
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
 
 
 function createGetAllResolvedOrdered(getManifest,
-  log = () => {},
   dockerList=dockerListDefault) {
-  return async function getAllResolvedOrdered(packageReq) {
-    log({clear: true, msg: 'fetching dependencies...'});
+  return async function getAllResolvedOrdered({packageReq, logId}) {
+    logUI({logId, clear: true, msg: 'fetching dependencies...'});
     let allResolvedDeps = await getAllResolved(packageReq, getManifest);
     // Dependencies will be ordered so they can be installed in series
     let allResolvedOrdered = orderDependencies(allResolvedDeps);
-    log({order: allResolvedOrdered.map((p) => p.name)});
+    logUI({logId, order: allResolvedOrdered.map((p) => p.name)});
 
     // Check which dependencies should be installed
-    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, log);
+    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, logId);
     return allResolvedOrderedChecked;
   };
 }
 
 
-async function shouldInstall(packageList, dockerList, log) {
+async function shouldInstall(packageList, dockerList, logId) {
   // This function verifies if vcurrent < vreq
   // otherwise, splices out the package of the list
   const dnpList = await dockerList.listContainers();
@@ -45,7 +45,7 @@ async function shouldInstall(packageList, dockerList, log) {
     if (semver.lt(currentVersion, requestedVersion)) {
       return true;
     } else {
-      log({pkg: packageReq.name, msg: 'Already updated'});
+      logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
       console.trace('IGNORING PACKAGE: '+packageReq.name);
       return false;
     }
