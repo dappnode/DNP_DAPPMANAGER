@@ -36,13 +36,11 @@ function createRemovePackage(params,
   };
 }
 
-async function closePorts(DOCKERCOMPOSE_PATH) {
+async function closePorts(DOCKERCOMPOSE_PATH, docker) {
   const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
-  console.log(ports);
-  // const ports = (MANIFEST && MANIFEST.image && MANIFEST.image.ports) ? MANIFEST.image.ports : [];
-  // for (const port of ports) {
-  //   await docker.closePort(port.split(':')[0]);
-  // }
+  for (const port of ports) {
+    await docker.closePort(port);
+  }
 }
 
 

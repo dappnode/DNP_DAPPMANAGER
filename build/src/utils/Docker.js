@@ -133,20 +133,26 @@ function createDocker(shellSync = shellSyncDefault) {
 
     // NOT A DOCKER, DOCKER-COMPOSE
     // Custom command to open and close ports
-    openPort: (port) => shellSync(getUPnPcommand(port, 'open')),
-    closePort: (port) => shellSync(getUPnPcommand(port, 'close')),
-
+    openPort: async (port) => {
+      const IMAGE = await shellSync(getVpnImageCmd());
+      return await shellSync(getUpnpCmd(port, 'open', IMAGE));
+    },
+    closePort: async (port) => {
+      const IMAGE = await shellSync(getVpnImageCmd());
+      return await shellSync(getUpnpCmd(port, 'close', IMAGE));
+    },
   };
 }
 
-function getUPnPcommand(port, type) {
+function getVpnImageCmd() {
+  return 'docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\'';
+}
+
+function getUpnpCmd(port, type, IMAGE) {
   let flag;
   if (type === 'open') flag = '-r';
   if (type === 'close') flag = '-d';
-  return [
-    'export IMAGE=$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\')',
-    'docker run --rm --net=host ${IMAGE} upnpc -e DAppNode '+flag+' '+port+' UDP',
-  ].join(' && ');
+  return 'docker run --rm --net=host '+IMAGE.trim()+' upnpc -e DAppNode '+flag+' '+port+' UDP';
 }
 
 function parseOptions(options) {
