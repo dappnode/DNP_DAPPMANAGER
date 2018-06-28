@@ -4,7 +4,8 @@ const generateDefault = require('./generate');
 const fsDefault = require('fs');
 const validateDefault = require('./validate');
 const createRestartPatch = require('./createRestartPatch');
-
+const logUI = require('./logUI');
+const {docker: dockerDefault} = require('./Docker');
 
 // packageList should be an array of package objects, i.e.
 // [
@@ -17,28 +18,12 @@ const createRestartPatch = require('./createRestartPatch');
 //   ...
 // ]
 
-function createDownloadPackages(download) {
-  return async function downloadPackages(packageList) {
-    return await runInParalel(packageList, download);
-  };
-}
-
-
-function createRunPackages(run) {
-  return async function runPackages(packageList) {
-    return await runInSerie(packageList, run);
-  };
-}
-
-
-function createDownload(params,
+function downloadFactory({params,
   ipfsCalls,
-  docker,
-  log = () => {},
   generate = generateDefault,
   validate = validateDefault,
-  fs = fsDefault) {
-  return async function download(pkg) {
+  fs = fsDefault}) {
+  return async function download({pkg, logId}) {
     // call IPFS, store the file in the repo's folder
     // load the image to docker
     const PACKAGE_NAME = pkg.name;
@@ -46,7 +31,6 @@ function createDownload(params,
     const IMAGE_NAME = parse.manifest.imageName(MANIFEST);
     const IMAGE_HASH = parse.manifest.imageHash(MANIFEST);
     const IMAGE_SIZE = parse.manifest.imageSize(MANIFEST);
-    const TYPE = parse.manifest.type(MANIFEST);
 
     // isCORE?
     const isCORE = (MANIFEST.type == 'dncore' && pkg.allowCORE);
@@ -86,9 +70,10 @@ function createDownload(params,
     // download and load image to docker
     const displayRes = 2;
     const round = (x) => displayRes*Math.ceil(100*x/IMAGE_SIZE/displayRes);
-    const _log = (percent) => log({pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'});
+    const _log = (percent) =>
+      logUI({logId, pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'});
 
-    log({pkg: PACKAGE_NAME, msg: 'starting download...'});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'starting download...'});
     await ipfsCalls.download(
       validate.path(IMAGE_PATH),
       IMAGE_HASH,
@@ -99,13 +84,13 @@ function createDownload(params,
 }
 
 
-function createRun(params,
-  docker,
-  log = () => {}) {
+function runFactory({params,
+  docker = dockerDefault,
+  }) {
   // patch to prevent installer from crashing
   const restartPatch = createRestartPatch(params, docker);
 
-  return async function run(pkg) {
+  return async function run({pkg, logId}) {
     const PACKAGE_NAME = pkg.name;
     const MANIFEST = pkg.manifest;
     const isCORE = pkg.isCORE;
@@ -114,41 +99,23 @@ function createRun(params,
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, isCORE);
     const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params, isCORE);
 
-    log({pkg: PACKAGE_NAME, msg: 'loading image'});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});
     await docker.load(IMAGE_PATH);
-    log({pkg: PACKAGE_NAME, msg: 'loaded image'});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'loaded image'});
 
-    log({pkg: PACKAGE_NAME, msg: 'starting package... '});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'starting package... '});
     // patch to prevent installer from crashing
     if (PACKAGE_NAME == 'dappmanager.dnp.dappnode.eth') {
       await restartPatch(PACKAGE_NAME+':'+VERSION);
     } else {
       await docker.compose.up(DOCKERCOMPOSE_PATH);
     }
-    log({pkg: PACKAGE_NAME, msg: 'package started'});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'package started'});
   };
 }
 
 
-async function runInParalel(array, asyncFunction) {
-  return await Promise.all(array.map(asyncFunction));
-}
-
-
-async function runInSerie(array, asyncFunction) {
-  let res = [];
-  for (const [i, element] of array.entries()) {
-    res[i] = await asyncFunction(element);
-  }
-  return res;
-}
-
-
 module.exports = {
-  createDownload,
-  createDownloadPackages,
-  createRun,
-  createRunPackages,
-  runInSerie,
-  runInParalel,
+  downloadFactory,
+  runFactory,
 };
