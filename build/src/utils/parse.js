@@ -2,15 +2,31 @@
 const fs = require('fs');
 const yaml = require('yamljs');
 
-
-function serviceVolumes(DOCKERCOMPOSE_PATH, SERVICE_NAME) {
+// Helper function, read and parse docker-compose
+function readDockerCompose(DOCKERCOMPOSE_PATH) {
+  if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
+    throw Error('docker-compose does not exist: '+DOCKERCOMPOSE_PATH);
+  }
   const dcString = fs.readFileSync(DOCKERCOMPOSE_PATH, 'utf-8');
-  const dc = yaml.parse(dcString);
+  return yaml.parse(dcString);
+}
+
+// Select the first service in a docker-compose
+function getUniqueDockerComposeService(DOCKERCOMPOSE_PATH) {
+  const dc = readDockerCompose(DOCKERCOMPOSE_PATH);
+  const packageName = Object.getOwnPropertyNames(dc.services)[0];
+  return dc.services[packageName];
+}
+
+// Get the volumes of a docker-compose service
+function serviceVolumes(DOCKERCOMPOSE_PATH) {
+  const dc = readDockerCompose(DOCKERCOMPOSE_PATH);
+  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
 
   const externalVolumes = Object.getOwnPropertyNames(dc.volumes);
 
   let packageVolumes = [];
-  const volumes = dc.services[SERVICE_NAME].volumes || [];
+  const volumes = service.volumes || [];
   volumes.map((volume) => {
     if (volume.includes(':')) {
       const volumeName = volume.split(':')[0];
@@ -22,14 +38,18 @@ function serviceVolumes(DOCKERCOMPOSE_PATH, SERVICE_NAME) {
   return packageVolumes;
 }
 
-
+// Get the container name of a docker-compose service
 function containerName(DOCKERCOMPOSE_PATH) {
-  const dcString = fs.readFileSync(DOCKERCOMPOSE_PATH, 'utf-8');
-  const dc = yaml.parse(dcString);
-  const packageName = Object.getOwnPropertyNames(dc.services)[0];
-  return dc.services[packageName].container_name;
+  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
+  return service.container_name;
 }
 
+// Get an array of ports of a docker-compose service
+function dockerComposePorts(DOCKERCOMPOSE_PATH) {
+  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
+  const ports = service.ports || [];
+  return ports.map((p) => p.split(':')[0]);
+}
 
 function envFile(envFileData) {
   let res = {};
@@ -108,6 +128,7 @@ const manifest = {
 module.exports = {
   serviceVolumes,
   containerName,
+  dockerComposePorts,
   envFile,
   stringifyEnvs,
   packageReq,

@@ -8,7 +8,7 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
   download,
   run
 ) {
-  return async function installPackage({args, kwargs}) {
+  return async function installPackage({args = [], kwargs = {}}) {
     const packageReq = parse.packageReq(args[0]);
     const logId = kwargs.logId;
 
