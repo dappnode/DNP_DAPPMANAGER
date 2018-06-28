@@ -131,10 +131,23 @@ function createDocker(shellSync = shellSyncDefault) {
       return shellSync('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true);
     },
 
+    // NOT A DOCKER, DOCKER-COMPOSE
+    // Custom command to open and close ports
+    openPort: (port) => shellSync(getUPnPcommand(port, 'open')),
+    closePort: (port) => shellSync(getUPnPcommand(port, 'close')),
 
   };
 }
 
+function getUPnPcommand(port, type) {
+  let flag;
+  if (type === 'open') flag = '-r';
+  if (type === 'close') flag = '-d';
+  return [
+    'export IMAGE=$(docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\')',
+    'docker run --rm --net=host ${IMAGE} upnpc -e DAppNode '+flag+' '+port+' UDP',
+  ].join(' && ');
+}
 
 function parseOptions(options) {
   let optionsString = '';

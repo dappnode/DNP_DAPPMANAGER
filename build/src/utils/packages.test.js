@@ -8,56 +8,6 @@ chai.use(require('sinon-chai'));
 
 
 describe('Util: package install / download', () => {
-  let log = [];
-  const asyncFunction = async (pkg) => {
-    log.push('start-'+pkg.name);
-    await delay(pkg.time);
-    log.push('ended-'+pkg.name);
-    return 'res-'+pkg.name;
-  };
-  const packageList = [
-    {name: 'A', time: 10},
-    {name: 'B', time: 1},
-  ];
-
-  const runPackages = pkg.createRunPackages(asyncFunction);
-  const downloadPackages = pkg.createDownloadPackages(asyncFunction);
-
-  describe('.runPackages', () => {
-    let res;
-
-    it('should run async tasks in series', async () => {
-      log = [];
-      res = await runPackages(packageList);
-      expect( log )
-        .to.deep.equal(['start-A', 'ended-A', 'start-B', 'ended-B']);
-    });
-
-    it('should return an ordered response', () => {
-      expect( res )
-        .to.deep.equal(['res-A', 'res-B']);
-    });
-  });
-
-
-  describe('.downloadPackages', () => {
-    let res;
-
-    it('should run async tasks in paralel', async () => {
-      log = [];
-
-      res = await downloadPackages(packageList);
-      expect( log )
-        .to.deep.equal(['start-A', 'start-B', 'ended-B', 'ended-A']);
-    });
-
-    it('should return an ordered response', () => {
-      expect( res )
-        .to.deep.equal(['res-A', 'res-B']);
-    });
-  });
-
-
   // ///// Make mocks for dependencies
 
   // params
@@ -75,45 +25,42 @@ describe('Util: package install / download', () => {
   const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params);
   const dnpManifest = {image: {path: IMAGE_NAME, hash: IMAGE_HASH}};
 
-  const emptyFunction = () => {};
-
-
   describe('.download', () => {
     // ipfsCalls .download, .isfileHashValid
-    const ipfs_download_spy = sinon.spy();
-    const ipfs_isfileHashValid_spy = sinon.spy();
-    let ipfs_isfileHashValid_RETURN = false;
+    const ipfsDownloadSpy = sinon.spy();
+    const ipfsIsfileHashValidSpy = sinon.spy();
+    let ipfsIsfileHashValidRETURN = false;
     const ipfsCallsMock = {
       download: async (hash, path) => {
-        ipfs_download_spy(hash, path);
+        ipfsDownloadSpy(hash, path);
       },
       isfileHashValid: async (hash, path) => {
-        ipfs_isfileHashValid_spy(hash, path);
-        return ipfs_isfileHashValid_RETURN;
+        ipfsIsfileHashValidSpy(hash, path);
+        return ipfsIsfileHashValidRETURN;
       },
     };
 
     // generate .DockerCompose .Manifest
-    const generate_Manifest_spy = sinon.spy();
-    const generate_DockerCompose_spy = sinon.spy();
+    const generateManifestSpy = sinon.spy();
+    const generateDockerComposeSpy = sinon.spy();
     const DockerCompose = 'DockerCompose';
     const Manifest = 'Manifest';
     const generateMock = {
       manifest: (dnpManifest) => {
-        generate_Manifest_spy(dnpManifest);
+        generateManifestSpy(dnpManifest);
         return 'Manifest';
       },
       dockerCompose: (dnpManifest) => {
-        generate_DockerCompose_spy(dnpManifest);
+        generateDockerComposeSpy(dnpManifest);
         return DockerCompose;
       },
     };
 
     // docker .load .compose.up
-    const docker_load_spy = sinon.spy();
+    const dockerLoadSpy = sinon.spy();
     const dockerMock = {
       compose: {
-        load: docker_load_spy,
+        load: dockerLoadSpy,
       },
     };
 
@@ -123,78 +70,78 @@ describe('Util: package install / download', () => {
     };
 
     // fs .writeFileSync, .existsSync, .unlinkSync
-    const fs_writeFileSync_spy = sinon.spy();
-    const fs_existsSync_spy = sinon.spy();
-    const fs_unlinkSync_spy = sinon.spy();
+    const fsWriteFileSyncSpy = sinon.spy();
+    const fsExistsSyncSpy = sinon.spy();
+    const fsUnlinkSyncSpy = sinon.spy();
     const fsMock = {
       writeFileSync: async (data, path) => {
-        fs_writeFileSync_spy(data, path);
+        fsWriteFileSyncSpy(data, path);
       },
       existsSync: async (path) => {
-        fs_existsSync_spy(path);
+        fsExistsSyncSpy(path);
         return true;
       },
       unlinkSync: async (path) => {
-        fs_unlinkSync_spy(path);
+        fsUnlinkSyncSpy(path);
       },
     };
 
-
-    const download = pkg.createDownload(params,
-      ipfsCallsMock,
-      dockerMock,
-      emptyFunction,
-      generateMock,
-      validateMock,
-      fsMock);
+    const download = pkg.downloadFactory({params,
+      ipfsCalls: ipfsCallsMock,
+      docker: dockerMock,
+      generate: generateMock,
+      validate: validateMock,
+      fs: fsMock});
 
 
     download({
-      name: PACKAGE_NAME,
-      manifest: dnpManifest,
+      pkg: {
+        name: PACKAGE_NAME,
+        manifest: dnpManifest,
+      },
     });
 
-    // generate_Manifest_spy - dnpManifest
+    // generateManifestSpy - dnpManifest
     it('generate.Manifest should be called with dnpManifest', () => {
-      sinon.assert.calledWith(generate_Manifest_spy, dnpManifest);
+      sinon.assert.calledWith(generateManifestSpy, dnpManifest);
     });
 
-    // generate_DockerCompose_spy - dnpManifest
+    // generateDockerComposeSpy - dnpManifest
     it('generate.DockerCompose should be called with dnpManifest', () => {
-      expect(generate_DockerCompose_spy.getCalls()[0].args)
+      expect(generateDockerComposeSpy.getCalls()[0].args)
         .to.deep.equal( [dnpManifest] );
     });
 
-    // fs_writeFileSync_spy - DockerCompose, DOCKERCOMPOSE_PATH
+    // fsWriteFileSyncSpy - DockerCompose, DOCKERCOMPOSE_PATH
     it('fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH', () => {
-      expect(fs_writeFileSync_spy.getCalls()[0].args)
+      expect(fsWriteFileSyncSpy.getCalls()[0].args)
         .to.deep.equal( [MANIFEST_PATH, Manifest] );
     });
 
     it('fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH', () => {
-      expect(fs_writeFileSync_spy.getCalls()[1].args)
+      expect(fsWriteFileSyncSpy.getCalls()[1].args)
         .to.deep.equal( [DOCKERCOMPOSE_PATH, DockerCompose] );
     });
 
-    // fs_existsSync_spy - IMAGE_PATH
+    // fsExistsSyncSpy - IMAGE_PATH
     it('fs.existsSync should be called with IMAGE_PATH', () => {
-      sinon.assert.calledWith(fs_existsSync_spy, IMAGE_PATH);
+      sinon.assert.calledWith(fsExistsSyncSpy, IMAGE_PATH);
     });
 
-    // ipfs_isfileHashValid_spy - IMAGE_HASH, IMAGE_PATH
+    // ipfsIsfileHashValidSpy - IMAGE_HASH, IMAGE_PATH
     it('ipfs.isfileHashValid should be called with IMAGE_HASH, IMAGE_PATH', () => {
-      expect(ipfs_isfileHashValid_spy.getCalls()[0].args)
+      expect(ipfsIsfileHashValidSpy.getCalls()[0].args)
         .to.deep.equal( [IMAGE_HASH, IMAGE_PATH] );
     });
 
-    // fs_unlinkSync_spy - IMAGE_PATH
+    // fsUnlinkSyncSpy - IMAGE_PATH
     it('fs.unlinkSync should be called with IMAGE_PATH', () => {
-      sinon.assert.calledWith(fs_unlinkSync_spy, IMAGE_PATH);
+      sinon.assert.calledWith(fsUnlinkSyncSpy, IMAGE_PATH);
     });
 
-    // ipfs_download_spy - IMAGE_HASH, IMAGE_PATH
+    // ipfsDownloadSpy - IMAGE_HASH, IMAGE_PATH
     it('ipfs.download should be called with IMAGE_HASH, IMAGE_PATH', () => {
-      sinon.assert.calledWith(ipfs_download_spy, IMAGE_PATH, IMAGE_HASH);
+      sinon.assert.calledWith(ipfsDownloadSpy, IMAGE_PATH, IMAGE_HASH);
     });
   });
 
@@ -203,42 +150,35 @@ describe('Util: package install / download', () => {
     // ///// Make mocks for dependencies
 
     // docker .load .compose.up
-    const docker_load_spy = sinon.spy();
-    const docker_compose_up_spy = sinon.spy();
+    const dockerLoadSpy = sinon.spy();
+    const dockerComposeUpSpy = sinon.spy();
     const dockerMock = {
       compose: {
-        up: docker_compose_up_spy,
+        up: dockerComposeUpSpy,
       },
-      load: docker_load_spy,
+      load: dockerLoadSpy,
     };
 
-    // getManifest
-    const getManifest_spy = sinon.spy();
-
-    const run = pkg.createRun(params,
-      dockerMock);
+    const run = pkg.runFactory({params,
+      docker: dockerMock,
+    });
 
     run({
-      name: PACKAGE_NAME,
-      manifest: dnpManifest,
+      pkg: {
+        name: PACKAGE_NAME,
+        manifest: dnpManifest,
+      },
     });
 
     it('docker.load should be called with IMAGE_PATH', () => {
-      expect(docker_load_spy.getCalls()[0].args)
+      expect(dockerLoadSpy.getCalls()[0].args)
         .to.deep.equal( [IMAGE_PATH] );
     });
 
-    // generate_DockerCompose_spy - dnpManifest
+    // generateDockerComposeSpy - dnpManifest
     it('docker.compose.up should be called with DOCKERCOMPOSE_PATH', () => {
-      expect(docker_compose_up_spy.getCalls()[0].args)
+      expect(dockerComposeUpSpy.getCalls()[0].args)
         .to.deep.equal( [DOCKERCOMPOSE_PATH] );
     });
   });
 });
-
-
-function delay(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

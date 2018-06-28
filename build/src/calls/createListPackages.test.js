@@ -1,7 +1,5 @@
-const assert = require('assert');
 const chai = require('chai');
 const expect = require('chai').expect;
-const sinon = require('sinon');
 const shell = require('shelljs');
 const fs = require('fs');
 const getPath = require('../utils/getPath');
@@ -24,7 +22,7 @@ function mockTest() {
     },
   ];
   // Result should extend the package list with the env variables
-  let expected_result = [Object.assign({envs}, mockList[0])];
+  let expectedResult = [Object.assign({envs}, mockList[0])];
 
   // Mock docker calls
   const dockerCalls = {
@@ -52,16 +50,16 @@ function mockTest() {
   });
 
   describe('mock test', function() {
+    let res;
     it('should list packages with correct arguments', async () => {
-      let res = await listPackage();
+      res = await listPackage();
       expect(hasListed).to.be.true;
     });
 
     it('should return a stringified object containing lists', async () => {
-      let res = await listPackage();
       expect(JSON.parse(res)).to.deep.include({
         success: true,
-        result: expected_result,
+        result: expectedResult,
       });
     });
   });
@@ -69,5 +67,5 @@ function mockTest() {
 
 
 function getParentDir(fullPath) {
-  return fullPath.replace(/\/[^\/]+$/, '');
+  return fullPath.replace(/\/[^/]+$/, '');
 }

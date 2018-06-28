@@ -2,6 +2,7 @@ const fs = require('fs');
 const getPath = require('../utils/getPath');
 const res = require('../utils/res');
 const shellSync = require('../utils/shell');
+const parse = require('../utils/parse');
 
 // CALL DOCUMENTATION:
 // > result = {}
@@ -23,6 +24,9 @@ function createRemovePackage(params,
       throw Error('The installer cannot be restarted');
     }
 
+    // Close ports
+    await closePorts(DOCKERCOMPOSE_PATH, docker);
+
     // Remove container (and) volumes
     await docker.compose.down(DOCKERCOMPOSE_PATH, {volumes: Boolean(DELETE_VOLUMES)});
     // Remove DNP folder and files
@@ -30,6 +34,15 @@ function createRemovePackage(params,
 
     return res.success('Removed package: ' + PACKAGE_NAME, {}, true);
   };
+}
+
+async function closePorts(DOCKERCOMPOSE_PATH) {
+  const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
+  console.log(ports);
+  // const ports = (MANIFEST && MANIFEST.image && MANIFEST.image.ports) ? MANIFEST.image.ports : [];
+  // for (const port of ports) {
+  //   await docker.closePort(port.split(':')[0]);
+  // }
 }
 
 
