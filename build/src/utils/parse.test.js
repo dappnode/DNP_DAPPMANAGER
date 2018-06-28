@@ -6,6 +6,7 @@ const fs = require('fs');
 chai.should();
 
 const DOCKERCOMPOSE_PATH = './test/docker-compose-test.yml';
+const DOCKERCOMPOSE_PATH2 = './test/docker-compose-test2.yml';
 const dockerComposeData = (`
 version: '3.4'
 services:
@@ -35,11 +36,39 @@ networks:
                     subnet: 172.33.0.0/16
 `).trim();
 
+const dockerComposeData2 = (`
+version: '3.4'
+services:
+    ipfs.dnp.dappnode.eth:
+        image: 'ipfs.dnp.dappnode.eth:0.1.0'
+        container_name: DAppNodeCore-ipfs.dnp.dappnode.eth
+        restart: always
+        volumes:
+            - 'export:/export'
+            - 'data:/data/ipfs'
+        networks:
+            network:
+                ipv4_address: 172.33.1.5
+        dns: 172.33.1.2
+volumes:
+    export: {}
+    data: {}
+networks:
+    network:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: 172.33.0.0/16
+`).trim();
+
 describe('Util: parse', function() {
   describe('docker-compose parsing utils', function() {
     before(() => {
       validate.path(DOCKERCOMPOSE_PATH);
       fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeData);
+      validate.path(DOCKERCOMPOSE_PATH2);
+      fs.writeFileSync(DOCKERCOMPOSE_PATH2, dockerComposeData2);
     });
 
     it('should parse ports', () => {
@@ -47,6 +76,13 @@ describe('Util: parse', function() {
       ports
         .should.deep.equal(['4001', '4002']);
     });
+
+    it('should parse ports when there are non', () => {
+      const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH2);
+      ports
+        .should.deep.equal([]);
+    });
+
 
     it('should parse container_name', () => {
       const ports = parse.containerName(DOCKERCOMPOSE_PATH);
