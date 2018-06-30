@@ -11,22 +11,17 @@ const parse = require('../utils/parse');
 function createLogPackage(params,
   // default option passed to allow testing
   docker) {
-  return async function logPackage({args}) {
-    const PACKAGE_NAME = args[0];
-    const IS_CORE = args[1];
-    const OPTIONS = args[2] ? JSON.parse(args[2]) : {};
-
-    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH);
+  return async function logPackage({id, options}) {
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found: ' + dockerComposePath);
     }
 
-    const CONTAINER_NAME = parse.containerName(DOCKERCOMPOSE_PATH);
+    const containerName = parse.containerName(dockerComposePath);
+    const logs = await docker.log(containerName, options);
 
-    let logs = await docker.log(CONTAINER_NAME, OPTIONS);
-
-    return res.success('Got logs of package: ' + PACKAGE_NAME, {
-      name: PACKAGE_NAME,
+    return res.success('Got logs of package: ' + id, {
+      id: id,
       logs,
     });
   };

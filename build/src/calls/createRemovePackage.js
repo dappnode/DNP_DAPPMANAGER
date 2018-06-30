@@ -3,6 +3,7 @@ const getPath = require('../utils/getPath');
 const res = require('../utils/res');
 const shellSync = require('../utils/shell');
 const parse = require('../utils/parse');
+const logUI = require('../utils/logUI');
 
 // CALL DOCUMENTATION:
 // > result = {}
@@ -10,34 +11,40 @@ const parse = require('../utils/parse');
 function createRemovePackage(params,
   // default option passed to allow testing
   docker) {
-  return async function removePackage({args}) {
-    const PACKAGE_NAME = args[0];
-    const DELETE_VOLUMES = args[1] || false;
-    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
-    const PACKAGE_REPO_DIR_PATH = getPath.packageRepoDir(PACKAGE_NAME, params);
+  return async function removePackage({id, deleteVolumes = false, logId}) {
+    const packageRepoDir = getPath.packageRepoDir(id, params);
 
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH);
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found: ' + dockerComposePath);
     }
 
-    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+    if (id.includes('dappmanager.dnp.dappnode.eth')) {
       throw Error('The installer cannot be restarted');
     }
 
     // Close ports
-    await closePorts(DOCKERCOMPOSE_PATH, docker);
+    logUI({logId, pkg: 'all', msg: 'closing ports...'});
+    try {
+      await closePorts(dockerComposePath, docker);
+    } catch (e) {
+      logUI({logId, pkg: 'all', msg: 'Error closing ports '+(e ? e.message : '')});
+    }
+
 
     // Remove container (and) volumes
-    await docker.compose.down(DOCKERCOMPOSE_PATH, {volumes: Boolean(DELETE_VOLUMES)});
+    logUI({logId, pkg: 'all', msg: 'Shutting down containers...'});
+    await docker.compose.down(dockerComposePath, {volumes: Boolean(deleteVolumes)});
     // Remove DNP folder and files
-    await shellSync('rm -r ' + PACKAGE_REPO_DIR_PATH);
+    logUI({logId, pkg: 'all', msg: 'Removing system files...'});
+    await shellSync('rm -r ' + packageRepoDir);
 
-    return res.success('Removed package: ' + PACKAGE_NAME, {}, true);
+    return res.success('Removed package: ' + id, {}, true);
   };
 }
 
-async function closePorts(DOCKERCOMPOSE_PATH, docker) {
-  const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
+async function closePorts(dockerComposePath, docker) {
+  const ports = parse.dockerComposePorts(dockerComposePath);
   for (const port of ports) {
     await docker.closePort(port);
   }

@@ -1,3 +1,4 @@
+const fs = require('fs');
 
 // Define paths
 module.exports = {
@@ -11,13 +12,25 @@ module.exports = {
     + manifestName(PACKAGE_NAME, params, IS_CORE);
   },
 
-  dockerCompose: function(PACKAGE_NAME, params, IS_CORE) {
-    return repoDir(PACKAGE_NAME, params, IS_CORE) + '/'
-    + dockerComposeName(PACKAGE_NAME, params, IS_CORE);
+  dockerCompose: dockerCompose,
+
+  dockerComposeSmart: function(PACKAGE_NAME, params) {
+    // First check for core docker-compose
+    let DOCKERCOMPOSE_PATH = dockerCompose(PACKAGE_NAME, params, true);
+    if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
+    // Then check for dnp docker-compose
+    return dockerCompose(PACKAGE_NAME, params, false);
   },
 
-  envFile: function(PACKAGE_NAME, params, IS_CORE) {
-    return repoDir(PACKAGE_NAME, params, IS_CORE) + '/' + PACKAGE_NAME + params.ENV_FILE_EXTENSION;
+  envFile: envFile,
+
+  envFileSmart: function(PACKAGE_NAME, params, isCORE) {
+    if (isCORE) return envFile(PACKAGE_NAME, params, true);
+    // First check for core docker-compose
+    let ENV_FILE_PATH = envFile(PACKAGE_NAME, params, true);
+    if (fs.existsSync(ENV_FILE_PATH)) return ENV_FILE_PATH;
+    // Then check for dnp docker-compose
+    return envFile(PACKAGE_NAME, params, false);
   },
 
   image: function(PACKAGE_NAME, IMAGE_NAME, params, IS_CORE) {
@@ -28,6 +41,14 @@ module.exports = {
 
 // Helper functions
 
+function dockerCompose(PACKAGE_NAME, params, IS_CORE) {
+  return repoDir(PACKAGE_NAME, params, IS_CORE) + '/'
+  + dockerComposeName(PACKAGE_NAME, params, IS_CORE);
+}
+
+function envFile(PACKAGE_NAME, params, IS_CORE) {
+  return repoDir(PACKAGE_NAME, params, IS_CORE) + '/' + PACKAGE_NAME + params.ENV_FILE_EXTENSION;
+}
 
 function repoDir(PACKAGE_NAME, params, IS_CORE) {
   if (IS_CORE) return params.DNCORE_DIR;

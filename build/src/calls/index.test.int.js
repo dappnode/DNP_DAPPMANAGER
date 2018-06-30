@@ -1,10 +1,7 @@
-const assert = require('assert');
 const chai = require('chai');
 const expect = require('chai').expect;
-const sinon = require('sinon');
 const fs = require('fs');
 const shell = require('../utils/shell');
-const createInstallPackage = require('./createInstallPackage');
 
 chai.should();
 
@@ -51,10 +48,8 @@ function integrationTest() {
 
   // import dependencies
   const params = require('../params');
-  const emitter = require('../modules/emitter');
   const createDocker = require('../utils/Docker');
   const pkg = require('../utils/packages');
-  const createGetAllResolvedOrdered = require('../utils/dependencies');
   const createGetManifest = require('../utils/getManifest');
   const dependencies = require('../utils/dependencies');
   const createGetDirectory = require('../modules/createGetDirectory');
@@ -77,15 +72,14 @@ function integrationTest() {
   // Initialize calls
   const installPackage = createInstallPackage(getDependencies, downloadPackages, runPackages);
   const removePackage = createRemovePackage(params, docker);
-  const togglePackage = createTogglePackage (params, docker);
+  const togglePackage = createTogglePackage(params, docker);
   const logPackage = createLogPackage(params, docker);
   const listPackages = createListPackages(params); // Needs work
-  const listDirectory = createListDirectory (getDirectory);
+  const listDirectory = createListDirectory(getDirectory);
   const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
   const updatePackageEnv = createUpdatePackageEnv(params, docker);
 
   const packageReq = 'otpweb.dnp.dappnode.eth';
-  const envs = JSON.stringify({VAR1: 'VALUE1'});
 
   function log(topic, packageName, res) {
     console.log('\x1b[33m%s\x1b[0m', topic, ' ', '\x1b[36m%s\x1b[0m', packageName, ' ', '\x1b[35m%s\x1b[0m', res);
@@ -216,10 +210,11 @@ function testListPackages(listPackages, packageName, state) {
         return e.name.includes(packageName);
       })[0];
       // console.log('\x1b[33m%s\x1b[0m', pkg)
-      if (state == 'down')
-        {expect(pkg).to.be.undefined};
-      else
-        {expect(pkg.state).to.equal(state)};
+      if (state == 'down') {
+        expect(pkg).to.be.undefined;
+      } else {
+        expect(pkg.state).to.equal(state);
+      }
       done();
     })
     .catch((e) => {

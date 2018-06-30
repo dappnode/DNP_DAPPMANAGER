@@ -8,9 +8,8 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
   download,
   run
 ) {
-  return async function installPackage({args = [], kwargs = {}}) {
-    const packageReq = parse.packageReq(args[0]);
-    const logId = kwargs.logId;
+  return async function installPackage({id, logId}) {
+    const packageReq = parse.packageReq(id);
 
     // Returns a list of unique dep (highest requested version) + requested package
     // > getManifest needs IPFS

@@ -23,7 +23,7 @@ function serviceVolumes(DOCKERCOMPOSE_PATH) {
   const dc = readDockerCompose(DOCKERCOMPOSE_PATH);
   const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
 
-  const externalVolumes = Object.getOwnPropertyNames(dc.volumes);
+  const externalVolumes = Object.getOwnPropertyNames(dc.volumes || []);
 
   let packageVolumes = [];
   const volumes = service.volumes || [];
@@ -56,6 +56,7 @@ function envFile(envFileData) {
   // Parses key1=value1 files, splited by new line
   //        key2=value2
   envFileData
+    .trim()
     .split('\n')
     .filter((row) => row.length > 0 )
     .map((row) => {
@@ -71,7 +72,7 @@ function stringifyEnvs(envs) {
       let envValue = envs[envName];
       return envName + '=' + envValue;
     })
-    .join('\n');
+    .join('\n').trim();
 }
 
 

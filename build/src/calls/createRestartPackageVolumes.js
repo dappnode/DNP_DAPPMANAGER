@@ -9,29 +9,30 @@ const parse = require('../utils/parse');
 function createRestartPackageVolumes(params,
   // default option passed to allow testing
   docker) {
-  return async function restartPackageVolumes(req) {
-    const PACKAGE_NAME = req[0];
-    const IS_CORE = req[1];
-    const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null;
-
-    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH);
+  return async function restartPackageVolumes({id}) {
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found: ' + dockerComposePath);
     }
 
-    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
+    if (id.includes('dappmanager.dnp.dappnode.eth')) {
       throw Error('The installer cannot be restarted');
     }
 
-    const packageVolumes = parse.serviceVolumes(DOCKERCOMPOSE_PATH, PACKAGE_NAME);
+    const packageVolumes = parse.serviceVolumes(dockerComposePath, id);
 
-    await docker.compose.rm(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME, v: true});
+    // If there are no volumes don't do anything
+    if (!packageVolumes.length) return res.success(id+' has no volumes ');
+
+    // Remove volumes
+    await docker.compose.rm(dockerComposePath, {v: true});
     for (const volumeName of packageVolumes) {
       await docker.volume.rm(volumeName);
     }
-    await docker.compose.up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME});
+    // Restart docker to apply changes
+    await docker.compose.up(dockerComposePath);
 
-    return res.success('Restarted '+PACKAGE_NAME+' volumes: ' + packageVolumes.join(', '));
+    return res.success('Restarted '+id+' volumes: ' + packageVolumes.join(', '));
   };
 }
 
