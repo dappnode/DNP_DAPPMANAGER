@@ -30,7 +30,6 @@ function mockTest() {
 
   let hasStopped = false;
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
-  const args = [PACKAGE_NAME];
   const dockerMock = {
     compose: {
       ps: async (path) => {
@@ -55,14 +54,14 @@ ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
   });
 
   it('should stop the package with correct arguments', async () => {
-    await togglePackage({args});
+    await togglePackage({id: PACKAGE_NAME});
     expect(hasStopped).to.be.true;
   });
 
   it('should throw an error with wrong package name', async () => {
     let error = '--- togglePackage did not throw ---';
     try {
-      await togglePackage({args: ['anotherPackage.dnp.eth']});
+      await togglePackage({id: 'anotherPackage.dnp.eth'});
     } catch (e) {
       error = e.message;
     }
@@ -70,7 +69,7 @@ ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
   });
 
   it('should return a stringified object containing success', async () => {
-    let res = await togglePackage({args});
+    let res = await togglePackage({id: PACKAGE_NAME});
     expect(JSON.parse(res)).to.deep.include({
       success: true,
     });

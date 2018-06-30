@@ -7,33 +7,35 @@ const res = require('../utils/res');
 
 // default option passed to allow testing
 function createUpdatePackageEnv(params, docker) {
-  return async function updatePackageEnv({args}) {
-    const PACKAGE_NAME = parse.packageReq(args[0]).name; // parsing anyway for safety
-    const IS_CORE = args[3];
-    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, IS_CORE);
-    const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params, IS_CORE);
-    const envs = JSON.parse(args[1]);
-    const restart = args[2];
+  return async function updatePackageEnv({id, envs, isCORE = false, restart}) {
+    id = parse.packageReq(id).name; // parsing anyway for safety
+    const envFilePath = getPath.envFileSmart(id, params, isCORE);
 
     // Write envs
+    console.trace(envs);
+    console.trace(parse.stringifyEnvs(envs));
     await fs.writeFileSync(
-      validate.path(ENV_FILE_PATH),
-      parse.stringifyEnvs(envs));
+      validate.path(envFilePath),
+      parse.stringifyEnvs(envs)
+    );
 
-    if (restart) {
-      if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-        throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH);
-      }
-
-      if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
-        throw Error('The installer cannot be restarted');
-      }
-
-      await docker.compose.down(DOCKERCOMPOSE_PATH);
-      await docker.compose.up(DOCKERCOMPOSE_PATH);
+    if (!restart) {
+      return res.success('Updated envs of ' + id, {}, true);
     }
 
-    return res.success('Updated envs for package: ' + PACKAGE_NAME, {}, true);
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found with at: ' + dockerComposePath);
+    }
+
+    if (id.includes('dappmanager.dnp.dappnode.eth')) {
+      throw Error('The installer cannot be restarted');
+    }
+
+    await docker.compose.down(dockerComposePath);
+    await docker.compose.up(dockerComposePath);
+
+    return res.success('Updated envs and restarted ' + id, {}, true);
   };
 }
 

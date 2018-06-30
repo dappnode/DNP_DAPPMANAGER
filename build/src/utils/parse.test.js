@@ -36,6 +36,7 @@ networks:
                     subnet: 172.33.0.0/16
 `).trim();
 
+// This one has no ports and no volumes
 const dockerComposeData2 = (`
 version: '3.4'
 services:
@@ -43,16 +44,11 @@ services:
         image: 'ipfs.dnp.dappnode.eth:0.1.0'
         container_name: DAppNodeCore-ipfs.dnp.dappnode.eth
         restart: always
-        volumes:
-            - 'export:/export'
-            - 'data:/data/ipfs'
+        volumes: []
         networks:
             network:
                 ipv4_address: 172.33.1.5
         dns: 172.33.1.2
-volumes:
-    export: {}
-    data: {}
 networks:
     network:
         driver: bridge
@@ -61,6 +57,7 @@ networks:
                 -
                     subnet: 172.33.0.0/16
 `).trim();
+
 
 describe('Util: parse', function() {
   describe('docker-compose parsing utils', function() {
@@ -83,7 +80,6 @@ describe('Util: parse', function() {
         .should.deep.equal([]);
     });
 
-
     it('should parse container_name', () => {
       const ports = parse.containerName(DOCKERCOMPOSE_PATH);
       ports
@@ -94,6 +90,12 @@ describe('Util: parse', function() {
       const ports = parse.serviceVolumes(DOCKERCOMPOSE_PATH);
       ports
         .should.deep.equal(['export', 'data']);
+    });
+
+    it('should parse the service volumes when there are non', () => {
+      const ports = parse.serviceVolumes(DOCKERCOMPOSE_PATH2);
+      ports
+        .should.deep.equal([]);
     });
   });
 

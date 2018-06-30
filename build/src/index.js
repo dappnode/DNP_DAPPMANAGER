@@ -132,16 +132,13 @@ function wrapErrors(handler) {
 
   return async function(args, kwargs) {
     try {
-        return await handler({
-          args,
-          kwargs,
-        });
+      return await handler(kwargs);
     } catch (err) {
       console.log(err);
 
       return JSON.stringify({
-          success: false,
-          message: err.message,
+        success: false,
+        message: err.message,
       });
     }
   };

@@ -24,8 +24,8 @@ function createFetchPackageInfo(getManifest, apm) {
   const getManifestOfVersions = createGetManifestOfVersions(getManifest);
   const getPackageVersions = createGetPackageVersions(apm);
 
-  return async function fetchPackageInfo({args}) {
-    const packageReq = parse.packageReq(args[0]);
+  return async function fetchPackageInfo({id}) {
+    const packageReq = parse.packageReq(id);
 
     if (packageReq.name.endsWith('.eth')) {
       let packageWithVersions = await getPackageVersions(packageReq);

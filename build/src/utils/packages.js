@@ -101,7 +101,12 @@ function runFactory({params,
 
     for (const port of getPorts(MANIFEST)) {
       logUI({logId, pkg: PACKAGE_NAME, msg: 'opening port '+port});
-      await docker.openPort(port);
+      try {
+        await docker.openPort(port);
+      } catch (e) {
+        logUI({logId, pkg: PACKAGE_NAME, msg: 'Error openning port '+port+' '
+          +(e ? e.message : '')});
+      }
     }
 
     logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});

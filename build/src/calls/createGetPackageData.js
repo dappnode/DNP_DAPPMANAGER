@@ -22,8 +22,8 @@ function createGetPackageData(
   getManifest,
   ipfsCalls,
   dockerList=dockerListDefault) {
-  return async function getPackageData({args}) {
-    const packageReq = parse.packageReq(args[0]);
+  return async function getPackageData({id}) {
+    const packageReq = parse.packageReq(id);
 
     // Make sure the chain is synced
     if (await ethchain.isSyncing()) {

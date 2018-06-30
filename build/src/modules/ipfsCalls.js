@@ -126,15 +126,22 @@ function checkFile(HASH, onSuccess, onError) {
 function isfileHashValid(providedHash, PATH) {
   return new Promise(function(resolve, reject) {
     ipfs.files.add([PATH], {onlyHash: true}, function(err, res) {
-      if (err) reject(new IPFSError(err));
+      if (err) return reject(new IPFSError(err));
+
+      // Prevent uncontrolled errors
+      if (!(res && res[0] && res[0].hash
+        && typeof res[0].hash === typeof 'String' && providedHash)
+      ) {
+        return reject(new IPFSError('Wrong parameters, res: '+JSON.stringify(res)));
+      }
 
       let computedHashClean = res[0].hash.replace('ipfs/', '').replace('/', '');
       let providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
 
       if (computedHashClean == providedHashClean) {
-        resolve(true);
+        return resolve(true);
       } else {
-        resolve(false);
+        return resolve(false);
       }
     });
   });

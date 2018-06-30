@@ -141,6 +141,12 @@ function createDocker(shellSync = shellSyncDefault) {
       const IMAGE = await shellSync(getVpnImageCmd());
       return await shellSync(getUpnpCmd(port, 'close', IMAGE));
     },
+    isUpnpAvailable: async () => {
+      const IMAGE = await shellSync(getVpnImageCmd());
+      return await shellSync('docker run --rm --net=host '
+        +IMAGE+' upnpc -l | awk -F\'= \'  \'/ExternalIPAddress/{print $2}\'')
+      .then((res) => (res && res.includes('.')), (err) => false);
+    },
   };
 }
 

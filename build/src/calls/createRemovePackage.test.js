@@ -27,7 +27,6 @@ function mockTest() {
 
   let hasRemoved = false;
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
-  const args = [PACKAGE_NAME];
   const dockerMock = {
     compose: {
       down: async (path) => {
@@ -46,7 +45,7 @@ function mockTest() {
 
   let res;
   it('should stop the package with correct arguments', async () => {
-    res = await removePackage({args});
+    res = await removePackage({id: PACKAGE_NAME});
     expect(hasRemoved).to.be.true;
   });
 
@@ -59,7 +58,7 @@ function mockTest() {
   it('should throw an error with wrong package name', async () => {
     let error = '--- removePackage did not throw ---';
     try {
-      await removePackage({args});
+      await removePackage({id: PACKAGE_NAME});
     } catch (e) {
       error = e.message;
     }

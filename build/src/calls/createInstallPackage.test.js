@@ -37,8 +37,7 @@ function mockTest() {
 
   it('downloadPackages should be called with packageList', async () => {
     // Call only once for efficiency
-    const args = [PACKAGE_NAME];
-    res = await installPackage({args});
+    res = await installPackage({id: PACKAGE_NAME});
 
     expect(downloadPackagesSpy.getCalls()[0].args[0].pkg)
       .to.deep.equal( packageList[0] );

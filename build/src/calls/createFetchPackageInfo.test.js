@@ -90,8 +90,7 @@ describe('Call function: fetchPackageInfo', function() {
 
     describe('Call function fetchPackageInfo', function() {
       it('should return success message and packageWithVersions', async () => {
-        const args = [packageName];
-        let res = await fetchPackageInfo({args});
+        let res = await fetchPackageInfo({id: packageName});
 
         let parsedRes = JSON.parse(res);
         expect( parsedRes.success ).to.be.true;

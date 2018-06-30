@@ -28,7 +28,6 @@ function mockTest() {
 
     let hasLogged = false;
     const PACKAGE_NAME = 'test.dnp.dappnode.eth';
-    const args = [PACKAGE_NAME];
     const dockerMock = {
       log: async (path) => {
         hasLogged = true;
@@ -45,15 +44,14 @@ function mockTest() {
     });
 
     it('should log the package with correct arguments', async () => {
-      await logPackage({args});
+      await logPackage({id: PACKAGE_NAME});
       expect(hasLogged).to.be.true;
     });
 
     it('should throw an error with wrong package name', async () => {
       let error = '--- logPackage did not throw ---';
       try {
-        const args = ['anotherPackage.dnp.eth'];
-        await logPackage({args});
+        await logPackage({id: 'anotherPackage.dnp.eth'});
       } catch (e) {
         error = e.message;
       }
@@ -61,11 +59,11 @@ function mockTest() {
     });
 
     it('should return a stringified object containing logs', async () => {
-      let res = await logPackage({args});
+      let res = await logPackage({id: PACKAGE_NAME});
       expect(JSON.parse(res)).to.deep.include({
         success: true,
         result: {
-          name: PACKAGE_NAME,
+          id: PACKAGE_NAME,
           logs: 'LOGS',
         },
       });
