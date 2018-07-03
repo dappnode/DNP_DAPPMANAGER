@@ -17,7 +17,6 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
     let service = {};
     if (isCORE) {
       service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME;
-      service.restart = 'always';
       if (dpnManifest.image.privileged) {
         service.privileged = true;
       }
@@ -27,6 +26,7 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
 
     // Image name
     service.image = dpnManifest.name + ':' + dpnManifest.version;
+    service.restart = 'always';
 
     // Volumes
     service.volumes = [
