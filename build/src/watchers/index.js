@@ -1,1 +1,1 @@
-require('./ethchain')
+require('./ethchain');

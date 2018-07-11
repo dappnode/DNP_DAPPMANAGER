@@ -1,11 +1,11 @@
-const validate = require('./validate')
+const validate = require('./validate');
 
 function createGetManifest(apm, ipfsCalls) {
-
   return async function getManifest(packageReq) {
     // Expects a package request object
     // returns and manifest object
-    validate.packageReq(packageReq)
+    validate.packageReq(packageReq);
+
 
     if (packageReq.name.endsWith('.eth')) {
       if (packageReq.ver.startsWith('/ipfs/Qm')) {
@@ -17,9 +17,8 @@ function createGetManifest(apm, ipfsCalls) {
     // if the name of the package is already an IFPS hash, skip:
     } else if (packageReq.name.startsWith('/ipfs/Qm')) {
       packageReq.hash = packageReq.name
-
     } else {
-      throw Error('Unkown package request: '+packageReq.name)
+      throw Error('Unkown package request: '+packageReq.name);
     }
 
 
@@ -37,4 +36,4 @@ function createGetManifest(apm, ipfsCalls) {
 }
 
 
-module.exports = createGetManifest
+module.exports = createGetManifest;

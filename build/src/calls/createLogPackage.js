@@ -1,7 +1,7 @@
-const fs = require('fs')
-const getPath =       require('../utils/getPath')
-const res =           require('../utils/res')
-const parse = require('../utils/parse')
+const fs = require('fs');
+const getPath = require('../utils/getPath');
+const res = require('../utils/res');
+const parse = require('../utils/parse');
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
@@ -11,30 +11,21 @@ const parse = require('../utils/parse')
 function createLogPackage(params,
   // default option passed to allow testing
   docker) {
-
-  return async function logPackage(req) {
-
-    const PACKAGE_NAME = req[0]
-    const IS_CORE = req[1]
-    const OPTIONS = req[2] ? JSON.parse(req[2]) : {}
-    const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null
-
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, IS_CORE)
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
+  return async function logPackage({id, options}) {
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found: ' + dockerComposePath);
     }
 
-    const CONTAINER_NAME = parse.containerName(DOCKERCOMPOSE_PATH)
+    const containerName = parse.containerName(dockerComposePath);
+    const logs = await docker.log(containerName, options);
 
-    let logs = await docker.log(CONTAINER_NAME, OPTIONS)
-
-    return res.success('Got logs of package: ' + PACKAGE_NAME, {
-      name: PACKAGE_NAME,
-      logs
-    })
-
-  }
+    return res.success('Got logs of package: ' + id, {
+      id: id,
+      logs,
+    });
+  };
 }
 
 
-module.exports = createLogPackage
+module.exports = createLogPackage;
