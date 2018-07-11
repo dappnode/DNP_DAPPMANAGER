@@ -93,7 +93,16 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   // >> Will attach the fetched manifest
   let manifest = await getManifest(packageReq);
   // Validate the input, manifests are not controlled by the dappnode team
+  // Basically returns manifest.dependencies
   let depObject = parse.manifest.depObject(manifest)
+
+  // Depobject can have the following formats
+  // {
+  //   dappmanager.dnp.dappnode.eth: "latest", -> Fetch latest from APM
+  //   dappmanager.dnp.dappnode.eth: "0.4.1", -> Fetch version from APM
+  //   dappmanager.dnp.dappnode.eth: "/ipfs/QmbeyNiayTHZadQNyXqdnEin1wsfaXZwcmSc6LTsWf8iyz", -> Fetch straight from IPFS
+  //   dappmanager.dnp.dappnode.eth: "fake" -> Throw error
+  // }
 
   // Logic to allow core or not
   const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
