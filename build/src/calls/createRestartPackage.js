@@ -1,7 +1,7 @@
-const fs = require('fs')
-const getPath =       require('../utils/getPath')
-const res =           require('../utils/res')
-const createRestartPatch = require('../utils/createRestartPatch')
+const fs = require('fs');
+const getPath = require('../utils/getPath');
+const res = require('../utils/res');
+const createRestartPatch = require('../utils/createRestartPatch');
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
@@ -9,32 +9,25 @@ const createRestartPatch = require('../utils/createRestartPatch')
 function createRestartPackage(params,
   // default option passed to allow testing
   docker) {
-
   // patch to prevent installer from crashing
-  const restartPatch = createRestartPatch(params, docker)
+  const restartPatch = createRestartPatch(params, docker);
 
-  return async function restartPackage(req) {
-
-    const PACKAGE_NAME = req[0]
-    const IS_CORE = req[1]
-    const CORE_PACKAGE_NAME = IS_CORE ? PACKAGE_NAME : null
-
-    const DOCKERCOMPOSE_PATH = getPath.DOCKERCOMPOSE(PACKAGE_NAME, params, IS_CORE)
-    if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-      throw Error('No docker-compose found with at: ' + DOCKERCOMPOSE_PATH)
+  return async function restartPackage({id}) {
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error('No docker-compose found: ' + dockerComposePath);
     }
 
-    if (PACKAGE_NAME.includes('dappmanager.dnp.dappnode.eth')) {
-      await restartPatch(PACKAGE_NAME)
+    if (id.includes('dappmanager.dnp.dappnode.eth')) {
+      await restartPatch(id);
     }
 
     // Combining rm && up doesn't prevent the installer from crashing
-    await docker.compose.rm_up(DOCKERCOMPOSE_PATH, {core: CORE_PACKAGE_NAME})
+    await docker.compose.rm_up(dockerComposePath);
 
-    return res.success('Restarted package: ' + PACKAGE_NAME, {}, true)
-
-  }
+    return res.success('Restarted package: ' + id, {}, true);
+  };
 }
 
 
-module.exports = createRestartPackage
+module.exports = createRestartPackage;

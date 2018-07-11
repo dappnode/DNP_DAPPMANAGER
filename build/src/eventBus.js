@@ -2,6 +2,14 @@ const EventEmitter = require('events');
 
 class MyEmitter extends EventEmitter {}
 
-const myEmitter = new MyEmitter();
+const eventBus = new MyEmitter();
 
-module.exports = myEmitter
+const eventBusTag = {
+    logUI: 'EVENT_BUS_LOGUI',
+    call: 'EVENT_BUS_CALL',
+  };
+
+module.exports = {
+    eventBus,
+    eventBusTag,
+};

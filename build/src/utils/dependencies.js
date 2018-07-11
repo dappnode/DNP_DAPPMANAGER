@@ -1,60 +1,55 @@
-const semver = require('semver')
-const { highestVersion } = require('../utils/versions')
-const validate = require('../utils/validate')
-const { orderDependencies } = require('./orderDependencies')
-const dockerList_default = require('../modules/dockerList')
-const parse = require('./parse')
+const semver = require('semver');
+const {highestVersion} = require('../utils/versions');
+const validate = require('../utils/validate');
+const {orderDependencies} = require('./orderDependencies');
+const dockerListDefault = require('../modules/dockerList');
+const parse = require('./parse');
+const logUI = require('./logUI');
 
 
-const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION
+const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
 
 
 function createGetAllResolvedOrdered(getManifest,
-  log = () => {},
-  dockerList=dockerList_default) {
-
-  return async function getAllResolvedOrdered(packageReq) {
-
-    log({clear: true, msg: 'fetching dependencies...'})
-    let allResolvedDeps = await getAllResolved(packageReq, getManifest)
+  dockerList=dockerListDefault) {
+  return async function getAllResolvedOrdered({packageReq, logId}) {
+    logUI({logId, clear: true, msg: 'fetching dependencies...'});
+    let allResolvedDeps = await getAllResolved(packageReq, getManifest);
     // Dependencies will be ordered so they can be installed in series
-    let allResolvedOrdered = orderDependencies(allResolvedDeps)
-    log({order: allResolvedOrdered.map(p => p.name)})
+    let allResolvedOrdered = orderDependencies(allResolvedDeps);
+    logUI({logId, order: allResolvedOrdered.map((p) => p.name)});
 
     // Check which dependencies should be installed
-    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, log)
-    return allResolvedOrderedChecked
-  }
+    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, logId);
+    return allResolvedOrderedChecked;
+  };
 }
 
 
-async function shouldInstall(packageList, dockerList, log) {
-
+async function shouldInstall(packageList, dockerList, logId) {
   // This function verifies if vcurrent < vreq
   // otherwise, splices out the package of the list
-  const dnpList = await dockerList.listContainers()
+  const dnpList = await dockerList.listContainers();
 
-  return packageList.filter(packageReq => {
-
-    const packageCurrent = dnpList.filter(c => c.name == packageReq.name)[0]
+  return packageList.filter((packageReq) => {
+    const packageCurrent = dnpList.filter((c) => c.name == packageReq.name)[0];
 
     // If there is no current package, install
-    if (!packageCurrent) return true
+    if (!packageCurrent) return true;
 
     // Otherwise, compare verions
-    const requestedVersion = packageReq.manifest.version
-    const currentVersion = packageCurrent.version
+    const requestedVersion = packageReq.manifest.version;
+    const currentVersion = packageCurrent.version;
 
-    console.trace('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion)
+    console.trace('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
     if (semver.lt(currentVersion, requestedVersion)) {
-      return true
+      return true;
     } else {
-      log({pkg: packageReq.name, msg: 'Already updated'})
-      console.trace('IGNORING PACKAGE: '+packageReq.name)
-      return false
+      logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
+      console.trace('IGNORING PACKAGE: '+packageReq.name);
+      return false;
     }
-  })
-
+  });
 }
 
 
@@ -77,17 +72,15 @@ async function getAllResolved(packageReq, getManifest) {
   //   ...
   //   ]
 
-  let dependencyList = await getAll(packageReq, getManifest)
+  let dependencyList = await getAll(packageReq, getManifest);
   // The dependecy list may contain the same package with different versions
-  return resolveConflictingVersions(dependencyList)
-
+  return resolveConflictingVersions(dependencyList);
 }
 
 
 async function getAll(packageReq, getManifest, packageList=[]) {
-  
   // Parse request
-  
+
 
   // Expects packageReq = {name: packageName, ver: packageVersion}
   // >> Will attach the fetched manifest
@@ -95,6 +88,7 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   // Validate the input, manifests are not controlled by the dappnode team
   // Basically returns manifest.dependencies
   let depObject = parse.manifest.depObject(manifest)
+
 
   // Depobject can have the following formats
   // {
@@ -105,77 +99,73 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   // }
 
   // Logic to allow core or not
-  const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION)
+  const allowCORE = (packageReq.name.endsWith('.dnp.dappnode.eth') || BYPASS_CORE_RESTRICTION);
 
   // Correct packageReq name in case it is a hash
   // > must be done here before the dependency loop prevention
   if (validate.isIPFShash(packageReq.name)) {
-    packageReq.name = manifest.name
+    packageReq.name = manifest.name;
   }
 
   // Using a for loop instead of map or forEach to avoid hiding this code
   // and its errors inside a different function
   for (const depName of Object.getOwnPropertyNames(depObject)) {
-
     // Prevent dependency loops
     if (packageReq.name == depName) {
-      throw Error('DEPENDENCY LOOP FOUND, successfully prevented')
+      throw Error('DEPENDENCY LOOP FOUND, successfully prevented');
     }
 
     // Fetch subdependencies of the dependencies
     let subDepReq = {
       name: depName,
-      ver: depObject[depName]
-    }
-    await getAll(subDepReq, getManifest, packageList)
-
+      ver: depObject[depName],
+    };
+    await getAll(subDepReq, getManifest, packageList);
   }
 
   // Add dep to the packageList
-  packageReturnObject = {
+  const packageReturnObject = {
     name: packageReq.name,
     ver: packageReq.ver,
     dep: depObject,
-    manifest: manifest
-  }
-  if (allowCORE) packageReturnObject.allowCORE = allowCORE
+    manifest: manifest,
+  };
+  if (allowCORE) packageReturnObject.allowCORE = allowCORE;
 
-  packageList.push(packageReturnObject)
-  return packageList
-
+  packageList.push(packageReturnObject);
+  return packageList;
 }
 
 
 function resolveConflictingVersions(dependencyList) {
-
-  let highestDepVer = {}
+  let highestDepVer = {};
   dependencyList.map((dep) => {
     // Keep rewritting the highest version on the object
-    highestDepVer[dep.name] = highestVersion(dep.ver, highestDepVer[dep.name])
-  })
+    highestDepVer[dep.name] = highestVersion(dep.ver, highestDepVer[dep.name]);
+  });
 
   // highestDependencyVersion contains a unique list of dep names
   return dependencyList
     .filter(byUniqueObjects)
-    .filter(dep => highestDepVer[dep.name] == dep.ver)
-
+    .filter((dep) => highestDepVer[dep.name] == dep.ver);
 }
 
 
-///////////////////////
+// /////////////////////
 // Dedicated utilities
 
 
 function byUniqueObjects(obj, index, arr) {
-  return arr.map(_obj => String(_obj.name+'@'+_obj.ver)).indexOf(String(obj.name+'@'+obj.ver)) === index;
+  return arr
+    .map((_obj) => String(_obj.name+'@'+_obj.ver)).indexOf(String(obj.name+'@'+obj.ver)) === index;
 }
 
 
-function sortByNameKey(a,b) {
+function sortByNameKey(a, b) {
   if (a.name < b.name)
-    return -1;
+    {return -1;}
   if (a.name > b.name)
-    return 1;
+    {return 1;}
   return 0;
 }
 
@@ -186,5 +176,5 @@ module.exports = {
   getAllResolved,
   sortByNameKey,
   byUniqueObjects,
-  resolveConflictingVersions
-}
+  resolveConflictingVersions,
+};
