@@ -1,6 +1,5 @@
 const fs = require('fs');
 const getPath = require('../utils/getPath');
-const res = require('../utils/res');
 const createRestartPatch = require('../utils/createRestartPatch');
 
 // CALL DOCUMENTATION:
@@ -25,7 +24,10 @@ function createRestartPackage(params,
     // Combining rm && up doesn't prevent the installer from crashing
     await docker.compose.rm_up(dockerComposePath);
 
-    return res.success('Restarted package: ' + id, {}, true);
+    return {
+      message: 'Restarted package: ' + id,
+      logMessage: true,
+    };
   };
 }
 

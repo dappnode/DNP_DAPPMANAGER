@@ -6,6 +6,7 @@ const validateDefault = require('./validate');
 const createRestartPatch = require('./createRestartPatch');
 const logUI = require('./logUI');
 const {docker: dockerDefault} = require('./Docker');
+const logs = require('../logs.js')(module);
 
 // packageList should be an array of package objects, i.e.
 // [

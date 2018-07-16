@@ -1,7 +1,6 @@
 const fs = require('fs');
 const {containerStateFromPs} = require('../utils/dockerUtils');
 const getPath = require('../utils/getPath');
-const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = {}
@@ -37,7 +36,10 @@ function createTogglePackage(params,
         throw Error('Unkown state: ' + packageState + ', for package: ' + id);
     }
 
-    return res.success('successfully toggled package: ' + id, {}, true);
+    return {
+      message: 'successfully toggled package: ' + id,
+      log: true,
+    };
   };
 }
 

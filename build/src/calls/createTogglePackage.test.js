@@ -70,8 +70,7 @@ ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
 
   it('should return a stringified object containing success', async () => {
     let res = await togglePackage({id: PACKAGE_NAME});
-    expect(JSON.parse(res)).to.deep.include({
-      success: true,
-    });
+    expect(res).to.be.ok;
+    expect(res).to.have.property('message');
   });
 }

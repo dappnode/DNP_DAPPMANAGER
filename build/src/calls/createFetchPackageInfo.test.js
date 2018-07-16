@@ -91,12 +91,9 @@ describe('Call function: fetchPackageInfo', function() {
     describe('Call function fetchPackageInfo', function() {
       it('should return success message and packageWithVersions', async () => {
         let res = await fetchPackageInfo({id: packageName});
-
-        let parsedRes = JSON.parse(res);
-        expect( parsedRes.success ).to.be.true;
-        expect( parsedRes.result.name ).to.equal(packageName);
-
-        let versions = parsedRes.result.versions;
+        expect( res ).to.be.ok;
+        expect( res.result.name ).to.equal(packageName);
+        let versions = res.result.versions;
         expect( versions.length ).to.equal(2);
         expect( versions[0].manifest.error ).to.be.true;
         expect( versions[1].manifest ).to.equal('manifest_0.0.1');
