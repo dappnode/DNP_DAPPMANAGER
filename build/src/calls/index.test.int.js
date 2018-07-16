@@ -59,18 +59,21 @@ function integrationTest() {
   const dependencies = require('../utils/dependencies');
   const createGetDirectory = require('../modules/createGetDirectory');
   const createAPM = require('../modules/apm');
-  const ipfsCalls = require('../modules/ipfsCalls');
+  const ipfsFactory = require('../modules/ipfs');
   const web3Setup = require('../modules/web3Setup');
 
   // initialize dependencies (by order)
   const web3 = web3Setup(params); // <-- web3
+  const ipfs = ipfsFactory({});
   const apm = createAPM(web3);
   const getDirectory = createGetDirectory(web3);
-  const getManifest = createGetManifest(apm, ipfsCalls);
-  const docker = createDocker(shellExec);
+  const getManifest = createGetManifest(apm, ipfs);
+  const docker = createDocker();
   const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-  const download = pkg.downloadFactory(params, ipfsCalls, docker, log);
-  const run = pkg.runFactory(params, docker, log);
+  const download = pkg.createDownload(params, ipfs, docker, log);
+  const run = pkg.createRun(params, docker, log);
+  const downloadPackages = pkg.createDownloadPackages(download);
+  const runPackages = pkg.createRunPackages(run);
 
   // Initialize calls
   const installPackage = createInstallPackage(getDependencies, download, run);

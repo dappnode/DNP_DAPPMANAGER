@@ -26,11 +26,11 @@ describe('Util: package install / download', () => {
   const dnpManifest = {image: {path: IMAGE_NAME, hash: IMAGE_HASH}};
 
   describe('.download', () => {
-    // ipfsCalls .download, .isfileHashValid
+    // ipfs .download, .isfileHashValid
     const ipfsDownloadSpy = sinon.spy();
     const ipfsIsfileHashValidSpy = sinon.spy();
     let ipfsIsfileHashValidRETURN = false;
-    const ipfsCallsMock = {
+    const ipfsMock = {
       download: async (hash, path) => {
         ipfsDownloadSpy(hash, path);
       },
@@ -87,7 +87,7 @@ describe('Util: package install / download', () => {
     };
 
     const download = pkg.downloadFactory({params,
-      ipfsCalls: ipfsCallsMock,
+      ipfs: ipfsMock,
       docker: dockerMock,
       generate: generateMock,
       validate: validateMock,
