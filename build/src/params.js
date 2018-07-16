@@ -34,9 +34,6 @@ module.exports = {
   IPFS: (process.env.IPFS_REDIRECT || 'my.ipfs.dnp.dappnode.eth'),
 
   // Wweb3 parameters
-  possibleWeb3Hosts: [
-    process.env.WEB3HOSTWS || 'ws://my.ethchain.dnp.dappnode.eth:8546',
-    'wss://mainnet.infura.io/ws',
-  ],
-
+  WEB3HOSTWS: 'ws://my.ethchain.dnp.dappnode.eth:8546',
+  // WEB3HOSTWS: 'wss://mainnet.infura.io/ws'
 };

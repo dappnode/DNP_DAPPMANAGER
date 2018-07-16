@@ -114,7 +114,7 @@ function createDocker(shellSync = shellSyncDefault) {
     // NOT A DOCKER-COMPOSE
     // Usage: docker logs [OPTIONS] CONTAINER
     // --timestamps , -t  Show timestamps
-    log: (containerNameOrId, options) => {
+    log: (containerNameOrId, options = {}) => {
       // Parse options
       let optionsString = '';
       // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).

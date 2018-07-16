@@ -1,16 +1,18 @@
 
 const Web3 = require('web3');
+const logs = require('../logs.js')(module);
 
 
 function web3Setup(params) {
-  const possibleWeb3Hosts = params.possibleWeb3Hosts;
-  const WEB3HOSTWS = possibleWeb3Hosts[0];
+  const WEB3HOSTWS = params.WEB3HOSTWS;
+  if (!WEB3HOSTWS) throw Error('WEB3HOSTWS is needed to connect to ethchain but it\'s undefined');
 
   let web3 = new Web3(WEB3HOSTWS);
+  logs.info('Web3 connection to: ' + WEB3HOSTWS);
 
   setInterval(function() {
     web3.eth.net.isListening().then().catch((e) => {
-      console.log('(14 web3Setup.js) Current web3 instance lost connection to node: ' + process.env.WEB3HOSTWS + ', reconnecting automatically');
+      logs.error('Web3 connection error to '+WEB3HOSTWS+': ', e.message);
       web3.setProvider(WEB3HOSTWS);
     });
   }, 10000);

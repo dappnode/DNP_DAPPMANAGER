@@ -13,6 +13,9 @@ describe('Call function: fetchPackageInfo', function() {
     const createAPM = require('../modules/apm');
     const ipfsCalls = require('../modules/ipfsCalls');
     const web3Setup = require('../modules/web3Setup');
+    // customize params:
+    params.WEB3HOSTWS = 'wss://mainnet.infura.io/ws';
+    params.IPFS = 'ipfs.infura.io';
 
     // initialize dependencies
     const web3 = web3Setup(params); // <-- web3

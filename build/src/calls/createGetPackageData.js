@@ -1,8 +1,8 @@
 const base64Img = require('base64-img');
 const dockerListDefault = require('../modules/dockerList');
 const parse = require('../utils/parse');
-const res = require('../utils/res');
 const ethchain = require('../watchers/ethchain');
+const logs = require('../logs.js')(module);
 
 // CALL DOCUMENTATION:
 // > result = packages =
@@ -27,7 +27,10 @@ function createGetPackageData(
 
     // Make sure the chain is synced
     if (await ethchain.isSyncing()) {
-      return res.success('Mainnet is syncing', []);
+      return {
+        message: 'Mainnet is syncing',
+        result: [],
+      };
     }
 
     const manifest = await getManifest(parse.packageReq(packageReq.name));
@@ -44,14 +47,17 @@ function createGetPackageData(
         await ipfsCalls.cat(avatarHash);
         avatar = base64Img.base64Sync('cache/'+avatarHash);
       } catch (e) {
-        console.log('(createGetPackageData.js line 49) Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
+        logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
       }
     }
 
-    return res.success('Got data of '+packageReq.name, {
-      manifest,
-      avatar,
-    });
+    return {
+      message: 'Got data of '+packageReq.name,
+      result: {
+        manifest,
+        avatar,
+      },
+    };
   };
 }
 

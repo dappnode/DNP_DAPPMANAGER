@@ -50,9 +50,8 @@ function mockTest() {
   });
 
   it('should return a stringified object containing success', async () => {
-    expect(JSON.parse(res)).to.deep.include({
-      success: true,
-    });
+    expect(res).to.be.ok;
+    expect(res).to.have.property('message');
   });
 
   it('should throw an error with wrong package name', async () => {

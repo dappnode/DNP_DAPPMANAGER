@@ -1,6 +1,5 @@
 const fs = require('fs');
 const getPath = require('../utils/getPath');
-const res = require('../utils/res');
 const parse = require('../utils/parse');
 
 // CALL DOCUMENTATION:
@@ -20,10 +19,13 @@ function createLogPackage(params,
     const containerName = parse.containerName(dockerComposePath);
     const logs = await docker.log(containerName, options);
 
-    return res.success('Got logs of package: ' + id, {
-      id: id,
-      logs,
-    });
+    return {
+      message: 'Got logs of ' + id,
+      result: {
+        id: id,
+        logs,
+      },
+    };
   };
 }
 

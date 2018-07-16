@@ -56,9 +56,10 @@ function mockTest() {
       expect(hasListed).to.be.true;
     });
 
-    it('should return a stringified object containing lists', async () => {
-      expect(JSON.parse(res)).to.deep.include({
-        success: true,
+    it('should return a stringified object containing lists', () => {
+      expect(res).to.be.ok;
+      expect(res).to.have.property('message');
+      expect(res).to.deep.include({
         result: expectedResult,
       });
     });
