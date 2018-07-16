@@ -1,13 +1,13 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const shell = require('../utils/shell');
+const yaml = require('yamljs');
 const logs = require('../logs.js')(module);
 
 chai.should();
 
-describe('Full integration test with REAL docker: ', function() {
-  // integrationTest();
+describe('Full integration test with mock docker: ', function() {
+  integrationTest();
 });
 
 // The test will perfom intense tasks and could take up to some minutes
@@ -46,9 +46,66 @@ function integrationTest() {
   const createUpdatePackageEnv = require('./createUpdatePackageEnv');
 
   // Mock key dependencies
+  let dockerContainers = [];
   const shellExec = async (command) => {
+    if (command.startsWith('docker-compose')) {
+      let subcommand = command.substr('docker-compose'.length);
+      let parsedCommand = {};
+      // Get the -f flag
+      if (subcommand.includes(' -f ')) {
+        parsedCommand.dockerFile = subcommand.split(' -f ')[1].split(' ')[0];
+        subcommand.replace(' -f '+parsedCommand.dockerFile, '');
+      }
+      // Get the main command
+      if (subcommand.includes(' up ')) parsedCommand.up = true;
+      if (subcommand.includes(' down ')) parsedCommand.down = true;
+      if (subcommand.includes(' start ')) parsedCommand.start = true;
+      if (subcommand.includes(' stop ')) parsedCommand.stop = true;
+
+      // >>>>> Execute action:
+      let containerName = getConainerName(parsedCommand);
+      // UP, add container
+      if (parsedCommand.up) {
+        dockerContainers.push({
+          name: containerName,
+          state: 'running',
+        });
+      }
+      // DOWN, remove container
+      if (parsedCommand.down) {
+        dockerContainers.filter((e) => e.name !== containerName);
+      }
+      // START, change state to running
+      if (parsedCommand.start) {
+        let pkg = dockerContainers.find((e) => e.name === containerName);
+        pkg.state = 'running';
+      }
+      // STOP, change state to running
+      if (parsedCommand.stop) {
+        let pkg = dockerContainers.find((e) => e.name === containerName);
+        pkg.state = 'exited';
+      }
+    }
     const stdout = 'Everything work great';
     return stdout;
+  };
+
+  // Docker mock helper functions
+  function getConainerName(parsedCommand) {
+    if (parsedCommand.dockerFile) {
+      let dcString = fs.readFileSync(parsedCommand.dockerFile, 'utf8');
+      let dc = yaml.parse(dcString);
+      let serviceName = Object.getOwnPropertyNames(dc.services)[0];
+      return dc.services[serviceName].container_name;
+    } else {
+      throw Error('No docker-compose file was specified');
+    }
+  }
+
+  const dockerListMock = {
+    listContainers: async () => {
+      return dockerContainers;
+    },
   };
 
   // import dependencies
@@ -59,25 +116,32 @@ function integrationTest() {
   const dependencies = require('../utils/dependencies');
   const createGetDirectory = require('../modules/createGetDirectory');
   const createAPM = require('../modules/apm');
-  const ipfsCalls = require('../modules/ipfsCalls');
+  const ipfsCallsFactory = require('../modules/ipfsCalls');
   const web3Setup = require('../modules/web3Setup');
+  const ipfsSetup = require('../modules/ipfsSetup');
+
+  // customize params:
+  params.WEB3HOSTWS = 'wss://mainnet.infura.io/ws';
+  params.IPFS = 'ipfs.infura.io';
 
   // initialize dependencies (by order)
   const web3 = web3Setup(params); // <-- web3
+  const ipfs = ipfsSetup(params); // <-- ipfs
   const apm = createAPM(web3);
+  const ipfsCalls = ipfsCallsFactory(ipfs);
   const getDirectory = createGetDirectory(web3);
   const getManifest = createGetManifest(apm, ipfsCalls);
   const docker = createDocker(shellExec);
   const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-  const download = pkg.downloadFactory(params, ipfsCalls, docker, log);
-  const run = pkg.runFactory(params, docker, log);
+  const download = pkg.downloadFactory({params, ipfsCalls});
+  const run = pkg.runFactory({params, docker});
 
   // Initialize calls
   const installPackage = createInstallPackage(getDependencies, download, run);
   const removePackage = createRemovePackage(params, docker);
   const togglePackage = createTogglePackage(params, docker);
   const logPackage = createLogPackage(params, docker);
-  const listPackages = createListPackages(params); // Needs work
+  const listPackages = createListPackages(params, dockerListMock); // Needs work
   const listDirectory = createListDirectory(getDirectory);
   const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
   const updatePackageEnv = createUpdatePackageEnv(params, docker);
@@ -90,36 +154,28 @@ function integrationTest() {
 
   // add .skip to skip test
   describe('TEST 1, install package, log, toggle twice and delete it', async () => {
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d');
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_html');
-
-    beforeRemovePackage(docker, packageReq);
-    // The test will perfom intense tasks and could take up to some minutes
-    // TEST - 1
-    // (before)
-    beforeRemovePackage(docker, packageReq);
     // - > updatePackageEnv (without restart, preinstall)
     testUpdatePackageEnv(updatePackageEnv, packageReq, false, params);
     // - > installPackage
-    testInstallPackage(installPackage, [packageReq]);
+    testInstallPackage(installPackage, {id: packageReq});
     // - > updatePackageEnv (with reset, after install)
     testUpdatePackageEnv(updatePackageEnv, packageReq, true, params);
     // - > installPackage - > expect error (already installed)
 
     // - > logPackage
-    testLogPackage(logPackage, [packageReq]);
+    testLogPackage(logPackage, {id: packageReq});
     // - > listPackages - > confirm success
     testListPackages(listPackages, packageReq, 'running');
     // - > togglePackage (stop)
-    testTogglePackage(togglePackage, [packageReq, 0]);
+    testTogglePackage(togglePackage, {id: packageReq, timeout: 0});
     // - > listPackages - > confirm success
     testListPackages(listPackages, packageReq, 'exited');
     // - > togglePackage (start)
-    testTogglePackage(togglePackage, [packageReq, 0]);
+    testTogglePackage(togglePackage, {id: packageReq, timeout: 0});
     // - > listPackages - > confirm success
     testListPackages(listPackages, packageReq, 'running');
     // - > removePackage
-    testRemovePackage(removePackage, [packageReq, 0]);
+    testRemovePackage(removePackage, {id: packageReq, timeout: 0});
     // - > listPackages - > confirm success
     testListPackages(listPackages, packageReq, 'down');
   });
@@ -135,103 +191,66 @@ function integrationTest() {
     // - > listDirectory
     testListDirectory(listDirectory, packageReq);
     // - > fetchPackageInfo
-    testFetchPackageInfo(fetchPackageInfo, [packageReq], packageReq);
+    testFetchPackageInfo(fetchPackageInfo, {id: packageReq}, packageReq);
   });
 }
-
-
-function beforeRemovePackage(docker, packageReq) {
-  it('Make sure the requested package in not installed', (done) => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> (before) REMOVING');
-    docker.compose.down('dnp_repo/'+packageReq+'/docker-compose.yml', {timeout: 0})
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      done();
-    })
-    .catch((e) => {
-      if (e) console.error(e);
-      expect(e).to.be.undefined;
-    });
-
-    // done()
-  }).timeout(10*1000);
-}
-
 
   // The test will perfom intense tasks and could take up to some minutes
   // TEST - 1
   // - > updatePackageEnv
 
-function testInstallPackage(installPackage, args) {
-  it('call installPackage', (done) => {
+function testInstallPackage(installPackage, kwargs) {
+  it('call installPackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> INSTALLING');
-    installPackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      expect(JSON.parse(res).success).to.be.true;
-      done();
-    })
-    .catch((e) => {
-      if (e) console.error(e);
-      expect(e).to.be.undefined;
-    });
+    let res = await installPackage(kwargs);
+    let parsedRes = JSON.parse(res);
+    expect(parsedRes).to.be.an('object');
+    expect(parsedRes.success).to.be.true;
   }).timeout(120*1000);
 }
 
 
-function testLogPackage(logPackage, args) {
-  it('call logPackage', (done) => {
+function testLogPackage(logPackage, kwargs) {
+  it('call logPackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> LOGGING');
-    logPackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      let parsedRes = JSON.parse(res);
-      expect(parsedRes.success).to.be.true;
-      expect(parsedRes.result).to.be.a('string');
-      expect(parsedRes.result).to.include('Attaching to DAppNodePackage-otpweb.dnp.dappnode.eth');
-      // let packageNames = parsedRes.result.map(e => name)
-      // expect(packageNames).to.include(packageReq)
-      done();
-    })
-    .catch((e) => {
-      if (e) console.error(e);
-      expect(e).to.be.undefined;
-    });
-  }).timeout(10*1000);
+    let res = await logPackage(kwargs);
+
+    let parsedRes = JSON.parse(res);
+    expect(parsedRes.success).to.be.true;
+    expect(parsedRes.result).to.have.property('id');
+    expect(parsedRes.result).to.have.property('logs');
+    expect(parsedRes.result.logs).to.be.a('string');
+    expect(parsedRes.result.logs).to.include(
+      'Attaching to DAppNodePackage-otpweb.dnp.dappnode.eth');
+    // let packageNames = parsedRes.result.map(e => name)
+    // expect(packageNames).to.include(packageReq)
+  });
 }
 
 
 function testListPackages(listPackages, packageName, state) {
-  it('call listPackages, to check '+packageName+' is '+state, (done) => {
+  it('call listPackages, to check '+packageName+' is '+state, async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> LISTING');
-    listPackages()
-    .then((res) => {
+    let res = await listPackages();
       let parsedRes = JSON.parse(res);
       expect(parsedRes.success).to.be.true;
       // filter returns an array of results (should have only one)
-      let pkg = parsedRes.result.filter((e) => {
-        return e.name.includes(packageName);
-      })[0];
-      // logs.info('\x1b[33m%s\x1b[0m', pkg)
+      let pkg = parsedRes.result.find((e) => e.name.includes(packageName));
       if (state == 'down') {
         expect(pkg).to.be.undefined;
       } else {
+        expect(pkg).to.be.an('object');
+        expect(pkg).to.have.property('state');
         expect(pkg.state).to.equal(state);
       }
-      done();
-    })
-    .catch((e) => {
-      if (e) console.error(e);
-      expect(e).to.be.undefined;
-    });
   }).timeout(10*1000);
 }
 
 
-function testTogglePackage(togglePackage, args) {
+function testTogglePackage(togglePackage, kwargs) {
   it('call togglePackage', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> TOGGLING START / STOP');
-    togglePackage(args)
+    togglePackage(kwargs)
     .then((res) => {
       // logs.info('\x1b[33m%s\x1b[0m', res)
       let parsedRes = JSON.parse(res);
@@ -248,10 +267,10 @@ function testTogglePackage(togglePackage, args) {
 }
 
 
-function testRemovePackage(removePackage, args) {
+function testRemovePackage(removePackage, kwargs) {
   it('call removePackage', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> REMOVING');
-    removePackage(args)
+    removePackage(kwargs)
     .then((res) => {
       // logs.info('\x1b[33m%s\x1b[0m', res)
       expect(JSON.parse(res).success).to.be.true;
@@ -270,10 +289,15 @@ function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
   const getPath = require('../utils/getPath');
   const envValue = Date.now();
   const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params);
+  const kwargs = {
+    id: packageReq,
+    envs: {time: envValue},
+    restart,
+  };
 
   it('call updatePackageEnv', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> UPDATING ENVS');
-    updatePackageEnv([packageReq, JSON.stringify({time: envValue}), restart])
+    updatePackageEnv(kwargs)
     .then((res) => {
       // logs.info('\x1b[33m%s\x1b[0m', res)
       expect(JSON.parse(res).success).to.be.true;
@@ -312,10 +336,10 @@ function testListDirectory(listDirectory, packageName) {
 }
 
 
-function testFetchPackageInfo(fetchPackageInfo, args, packageName) {
+function testFetchPackageInfo(fetchPackageInfo, kwargs, packageName) {
   it('call fetchPackageInfo', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> FETCHING PACKAGE INFO');
-    fetchPackageInfo(args)
+    fetchPackageInfo(kwargs)
     .then((res) => {
       // logs.info('\x1b[33m%s\x1b[0m', res)
       let parsedRes = JSON.parse(res);

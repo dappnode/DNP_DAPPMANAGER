@@ -2,7 +2,6 @@ const fs = require('fs');
 const dockerListDefault = require('../modules/dockerList');
 const getPath = require('../utils/getPath');
 const parse = require('../utils/parse');
-const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = dnpList =
@@ -50,7 +49,11 @@ function createListPackages(params,
       }
     });
 
-    return res.success('Listing ' + dnpList.length + ' packages', dnpList);
+    return {
+      message: 'Listing ' + dnpList.length + ' packages',
+      result: dnpList,
+      logMessage: true,
+    };
   };
 }
 

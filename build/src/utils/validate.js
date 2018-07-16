@@ -1,4 +1,5 @@
 const shell = require('shelljs');
+const logs = require('../logs.js')(module);
 
 function packageReq(packageReq) {
   if (!packageReq) throw Error('VALIDATION ERROR: packageReq is undefined');
@@ -28,7 +29,7 @@ function isEthDomain(domain) {
   }
 
   if (domain.substr(domain.length - 4) != '.eth') {
-    console.trace('reponame is not an .eth domain: ' + domain);
+    logs.error('ERROR: reponame is not an .eth domain: ' + domain);
     throw Error('reponame is not an .eth domain: ' + domain);
   }
 }
@@ -54,17 +55,13 @@ async function web3Usability(_web3) {
   // Right now this function is empty as the code below
   // was very slow ocassionally > 1000 ms. The check if the chain is syncing
   // will be made directly in the ADMINUI
-
-  // const start = Date.now()
   // const isSyncing = await _web3.eth.isSyncing()
   // if (isSyncing) throw Error('Chain is still syncing, please wait until the chain is synced')
-  // console.log(Date.now() - start, ' ms spent checking web3')
-
 }
 
 
 function path(PATH) {
-  if (!PATH) throw Error('VALIDATION ERROR: path is not defined');
+  if (!PATH) throw Error('VALIDATION ERROR: path is not defined: '+PATH);
   if (typeof(PATH) != 'string') throw Error('VALIDATION ERROR: path must be a string ' + PATH);
 
   // shell.mkdir('-p', fullPath);
@@ -72,7 +69,8 @@ function path(PATH) {
   const PARENT_PATH = PATH.replace(/\/[^/]+\/?$/, '');
   if (!shell.test('-e', PARENT_PATH)) {
     shell.mkdir('-p', PARENT_PATH);
-    console.trace('PARENT PATH DOES NOT EXIST, pwd: ' + shell.pwd() + ' parent: ' + PARENT_PATH + '\n > creating it');
+    logs.warn('Parent path doesn\'t exist, creating it.'
+      +' pwd: ' + shell.pwd() + ' parent: ' + PARENT_PATH + '\n > creating it');
   }
 
   // returning so it can be used as

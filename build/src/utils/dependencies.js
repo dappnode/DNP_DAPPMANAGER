@@ -5,6 +5,7 @@ const {orderDependencies} = require('./orderDependencies');
 const dockerListDefault = require('../modules/dockerList');
 const parse = require('./parse');
 const logUI = require('./logUI');
+const logs = require('../logs.js')(module);
 
 
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
@@ -41,12 +42,12 @@ async function shouldInstall(packageList, dockerList, logId) {
     const requestedVersion = packageReq.manifest.version;
     const currentVersion = packageCurrent.version;
 
-    console.trace('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
+    logs.info('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
     if (semver.lt(currentVersion, requestedVersion)) {
       return true;
     } else {
       logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
-      console.trace('IGNORING PACKAGE: '+packageReq.name);
+      logs.info('IGNORING PACKAGE: '+packageReq.name);
       return false;
     }
   });
@@ -87,7 +88,7 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   let manifest = await getManifest(packageReq);
   // Validate the input, manifests are not controlled by the dappnode team
   // Basically returns manifest.dependencies
-  let depObject = parse.manifest.depObject(manifest)
+  let depObject = parse.manifest.depObject(manifest);
 
 
   // Depobject can have the following formats
