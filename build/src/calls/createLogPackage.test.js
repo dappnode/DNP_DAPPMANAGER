@@ -60,8 +60,9 @@ function mockTest() {
 
     it('should return a stringified object containing logs', async () => {
       let res = await logPackage({id: PACKAGE_NAME});
-      expect(JSON.parse(res)).to.deep.include({
-        success: true,
+      expect(res).to.be.ok;
+      expect(res).to.have.property('message');
+      expect(res).to.deep.include({
         result: {
           id: PACKAGE_NAME,
           logs: 'LOGS',

@@ -1,5 +1,4 @@
 const parse = require('../utils/parse');
-const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = {}
@@ -24,7 +23,10 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
       await run({pkg, logId});
     }
 
-    return res.success('Installed ' + packageReq.name + ' version: ' + packageReq.ver, {}, true);
+    return {
+      message: 'Installed ' + packageReq.name + ' version: ' + packageReq.ver,
+      log: true,
+    };
   };
 }
 

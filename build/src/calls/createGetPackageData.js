@@ -43,14 +43,17 @@ function createGetPackageData(
         await ipfs.cat(avatarHash);
         avatar = base64Img.base64Sync('cache/'+avatarHash);
       } catch (e) {
-        console.log('(createGetPackageData.js line 49) Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
+        logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
       }
     }
 
-    return res.success('Got data of '+packageReq.name, {
-      manifest,
-      avatar,
-    });
+    return {
+      message: 'Got data of '+packageReq.name,
+      result: {
+        manifest,
+        avatar,
+      },
+    };
   };
 }
 

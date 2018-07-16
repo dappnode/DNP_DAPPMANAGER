@@ -32,12 +32,11 @@ async function getRepoContract(reponame, web3) {
 
     const resolver = new web3.eth.Contract(publicResolverAbi, resolverAddress);
     const repoAddr = await resolver.methods.addr(namehash(reponame, web3)).call();
-    return repo = new web3.eth.Contract(repoAbi, repoAddr);
+    return new web3.eth.Contract(repoAbi, repoAddr);
 }
 
 async function getLatestVersion(repo, web3) {
     validate.web3Existance(web3);
-
     const latest = await repo.methods.getLatest()
     .call()
     .then(function(result) {
