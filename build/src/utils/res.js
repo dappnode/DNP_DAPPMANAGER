@@ -7,7 +7,7 @@ module.exports = {
   // > return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
 
   success: (message, result = {}, log = false) => {
-    if (log) console.log('(11 res.js)' + message);
+    if (log) console.log('[res.js 11] ', message);
 
     return JSON.stringify({
         success: true,

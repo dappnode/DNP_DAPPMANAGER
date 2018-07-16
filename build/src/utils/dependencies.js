@@ -41,12 +41,12 @@ async function shouldInstall(packageList, dockerList, logId) {
     const requestedVersion = packageReq.manifest.version;
     const currentVersion = packageCurrent.version;
 
-    console.trace('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
+    console.log('[dependencies.js 44] ', 'COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
     if (semver.lt(currentVersion, requestedVersion)) {
       return true;
     } else {
       logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
-      console.trace('IGNORING PACKAGE: '+packageReq.name);
+      console.log('[dependencies.js 49] ', 'IGNORING PACKAGE: '+packageReq.name);
       return false;
     }
   });
