@@ -3,6 +3,7 @@ const ipfsAPI = require('ipfs-api');
 
 // dedicated modules
 const params = require('../params');
+const logs = require('../logs.js')(module);
 
 const IPFS = params.IPFS;
 const ipfs = ipfsAPI(IPFS, '5001', {protocol: 'http'});
@@ -17,9 +18,9 @@ verifyIPFS();
 function verifyIPFS() {
   ipfs.id(function(err, identity) {
     if (err) {
-      console.log('(20 ipfsSetup.js) IPFS ERROR: '+err.message);
+      logs.error('IPFS ERROR: '+err.message);
     } else {
-      console.log('(22 ipfsSetup.js) CONNECTED to DAppnode\'s IPFS '+
+      logs.info('CONNECTED to DAppnode\'s IPFS '+
         '\n   ID '+(identity ? identity.id : 'UNKNOWN'));
     }
   });

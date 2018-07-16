@@ -2,6 +2,7 @@
 // node modules
 const autobahn = require('autobahn');
 const {eventBus, eventBusTag} = require('./eventBus');
+const logs = require('./logs.js')(module);
 
 // import calls
 const createInstallPackage = require('./calls/createInstallPackage');
@@ -53,14 +54,55 @@ const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
 const updatePackageEnv = createUpdatePackageEnv(params, docker);
 const getPackageData = createGetPackageData(getManifest, ipfsCalls);
 
+// /////////////////////////////
+// Connection helper functions
+
+const register = (session, event, handler) => {
+  const wrapErrors = (handler) =>
+    async function(args, kwargs) {
+      logs.debug('In-call to '+event);
+      // 0. args: an array with call arguments
+      // 1. kwargs: an object with call arguments
+      // 2. details: an object which provides call metadata
+      try {
+        const res = await handler(kwargs);
+        // Log internally
+        const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
+        if (res.log && res.result) logs.info('Result of '+eventShort+': '+JSON.stringify(res));
+        else if (res.log && !res.result) logs.info('Result of '+eventShort+': '+res.message);
+        else if (res.logMessage) logs.info('Result of '+eventShort+': '+res.message);
+        // Return to crossbar
+        return JSON.stringify({
+          success: true,
+          message: res.message,
+          result: res.result || {},
+        });
+      } catch (err) {
+        logs.error(err);
+        return JSON.stringify({
+          success: false,
+          message: err.message,
+        });
+      }
+    };
+
+  return session.register(event, wrapErrors(handler)).then(
+    function(reg) {logs.info('CROSSBAR: registered '+event);},
+    function(err) {logs.error('CROSSBAR: error registering '+event, err);}
+  );
+};
+
+
+// /////////////////////////////
+// Configure connection:
+
 const autobahnTag = params.autobahnTag;
 const autobahnUrl = params.autobahnUrl;
 const autobahnRealm = params.autobahnRealm;
 const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
 
-
-connection.onopen = function(session, details) {
-    console.log('CONNECTED to DAppnode\'s WAMP '+
+connection.onopen = (session, details) => {
+    logs.info('CONNECTED to DAppnode\'s WAMP '+
       '\n   url '+autobahnUrl+
       '\n   realm: '+autobahnRealm+
       '\n   session ID: '+details.authid);
@@ -79,70 +121,27 @@ connection.onopen = function(session, details) {
     register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv);
     register(session, 'getPackageData.dappmanager.dnp.dappnode.eth', getPackageData);
 
-
-    // emitter.on('log', (log) => {
-    //   log.topic = log.topic || 'general'
-    //   log.type = log.type || 'default'
-    //   log.msg = String(log.msg) || ''
-    //   console.log('LOG, TOPIC: '+log.topic+' MSG('+log.type+'): '+log.msg)
-    //   session.publish(autobahnTag.installerLog, [log])
-    // })
     eventBus.on(eventBusTag.call, (call, args) => {
       session.call(call, args)
       .then((res) => {
-        console.log('INTERNAL CALL TO: '+call);
-        console.trace(res);
+        logs.info('INTERNAL CALL TO: '+call);
+        logs.info(res);
       });
     });
 
     eventBus.on(eventBusTag.logUI, (data) => {
       session.publish(autobahnTag.DAppManagerLog, [data]);
-      console.log('\x1b[35m%s\x1b[0m', JSON.stringify(data));
+      logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
     });
 };
 
 
-connection.onclose = function(reason, details) {
-  console.log('[index.js connection.onclose] reason: '+reason+' details '+JSON.stringify(details));
+connection.onclose = (reason, details) => {
+  logs.warn('Crossbar connection closed. Reason: '+reason+', details: '+JSON.stringify(details));
 };
 
 
 connection.open();
-
-
-// /////////////////////////////
-// Connection helper functions
-
-
-function register(session, event, handler) {
-  const SUCCESS_MESSAGE = '---------------------- \n procedure registered';
-  const ERROR_MESSAGE = '------------------------------ \n failed to register procedure ';
-
-  return session.register(event, wrapErrors(handler)).then(
-    function(reg) {console.log(SUCCESS_MESSAGE);},
-    function(err) {console.log(ERROR_MESSAGE, err);}
-  );
-}
-
-
-function wrapErrors(handler) {
-  // 0. args: an array with call arguments
-  // 1. kwargs: an object with call arguments
-  // 2. details: an object which provides call metadata
-
-  return async function(args, kwargs) {
-    try {
-      return await handler(kwargs);
-    } catch (err) {
-      console.log(err);
-
-      return JSON.stringify({
-        success: false,
-        message: err.message,
-      });
-    }
-  };
-}
 
 
 // /////////////////////////////

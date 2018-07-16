@@ -1,6 +1,5 @@
 const fs = require('fs');
 const getPath = require('../utils/getPath');
-const res = require('../utils/res');
 const shellSync = require('../utils/shell');
 const parse = require('../utils/parse');
 const logUI = require('../utils/logUI');
@@ -39,7 +38,10 @@ function createRemovePackage(params,
     logUI({logId, pkg: 'all', msg: 'Removing system files...'});
     await shellSync('rm -r ' + packageRepoDir);
 
-    return res.success('Removed package: ' + id, {}, true);
+    return {
+      message: 'Removed package: ' + id,
+      log: true,
+    };
   };
 }
 

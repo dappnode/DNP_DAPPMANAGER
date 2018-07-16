@@ -1,4 +1,4 @@
-
+const logs = require('../logs.js')(module);
 
 module.exports = {
 
@@ -7,7 +7,7 @@ module.exports = {
   // > return res.success("Fetched info of: " + packageReq.name, packageWithVersions)
 
   success: (message, result = {}, log = false) => {
-    if (log) console.log('[res.js 11] ', message);
+    if (log) logs.info('[res.js 11] ', message);
 
     return JSON.stringify({
         success: true,

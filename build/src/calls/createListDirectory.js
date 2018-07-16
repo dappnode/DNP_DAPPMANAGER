@@ -1,5 +1,4 @@
 const dockerListDefault = require('../modules/dockerList');
-const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = packages =
@@ -32,7 +31,11 @@ function createListDirectory(getDirectory,
       pkg.currentVersion = _package ? _package.version : null;
     }
 
-    return res.success('Listed directory with ' + packages.length + ' packages', packages);
+    return {
+      message: 'Listed directory with ' + packages.length + ' packages',
+      result: packages,
+      logMessage: true,
+    };
   };
 }
 

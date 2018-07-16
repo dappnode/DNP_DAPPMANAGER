@@ -33,7 +33,10 @@ function createUpdatePackageEnv(params, docker) {
     await docker.compose.down(dockerComposePath);
     await docker.compose.up(dockerComposePath);
 
-    return res.success('Updated envs and restarted ' + id, {}, true);
+    return {
+      message: 'Updated envs and restarted ' + id,
+      log: true,
+    };
   };
 }
 

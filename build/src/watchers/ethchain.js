@@ -1,6 +1,7 @@
 const {eventBus, eventBusTag} = require('../eventBus');
 const fs = require('fs');
 const linearRegression = require('simple-statistics').linearRegression;
+const logs = require('../logs.js')(module);
 // import the actual Api class
 const Api = require('@parity/api');
 
@@ -13,7 +14,7 @@ const MIN_BLOCK_DIFF_SYNC = 100;
 let shouldReset = false;
 
 
-console.log('[ethchain.js 16] WATCHER LAUNCHED - ETHCHAIN');
+logs.info('WATCHER LAUNCHED - ETHCHAIN');
 
 setInterval(() => {
   try {
@@ -25,7 +26,7 @@ setInterval(() => {
         shouldReset = computeShouldReset(syncingInfo);
       });
   } catch (e) {
-    console.log('[ethchain.js 30] - ERROR in 1s interval, in ethchain watcher: '+e.message);
+    logs.error('Error in ethchain watcher: '+e.message);
   }
 }, 1000);
 
@@ -33,13 +34,13 @@ setInterval(() => {
 setInterval(() => {
   try {
     if (shouldReset) {
-      console.log('[ethchain.js 36] RESETING PARITY');
+      logs.warn('Reseting parity');
       const id = 'ethchain.dnp.dappnode.eth';
       const isCORE = true;
       eventBus.emit(eventBusTag.call, 'restartPackage.dappmanager.dnp.dappnode.eth', [id, isCORE]);
     }
   } catch (e) {
-    console.log('[ethchain.js 42] - ERROR reseting parity in ethchain watcher: '+e.message);
+    logs.error('Could not reset parity in ethchain watcher: '+e.message);
   }
 }, INTERVAL_TIME);
 
@@ -104,7 +105,7 @@ function isParitySyncingFromSnapshot(syncingInfo) {
     }
 
     fs.appendFile(SYNCLOG_PATH, (ts+', '+cB+', '+hB+', '+cC+', '+hC+'\n'), (err) => {
-      if (err) console.log('[ethchain.js 107] ERROR writing sync logs: '+err);
+      if (err) logs.info('[ethchain.js 107] ERROR writing sync logs: '+err);
     });
   }
 
@@ -119,7 +120,7 @@ function isParitySyncingFromSnapshot(syncingInfo) {
   // Compute slopes
   const chunksPerSecond = linearRegression(track.chunks).m;
   const blocksPerSecond = linearRegression(track.blocks).m;
-  // console.log('blocksPerSecond',blocksPerSecond,'chunksPerSecond',chunksPerSecond)
+  // logs.info('blocksPerSecond',blocksPerSecond,'chunksPerSecond',chunksPerSecond)
 
   // Do not return positives if there is not enough info to compute reliable slopes
   if (track.blocks.length < TRACKER_MAX_LENGTH/2 || track.chunks.length < TRACKER_MAX_LENGTH/2) {
