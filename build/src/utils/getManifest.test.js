@@ -30,15 +30,15 @@ function argumentsTest() {
         return dnpHash;
       },
     };
-    const ipfsCalls_cat_spy = sinon.spy();
-    const ipfsCalls_Mock = {
+    const ipfs_cat_spy = sinon.spy();
+    const ipfs_Mock = {
       cat: async (dnpHash) => {
-        ipfsCalls_cat_spy(dnpHash);
+        ipfs_cat_spy(dnpHash);
         return manifest;
       },
     };
 
-    const getManifest = createGetManifest(apm_Mock, ipfsCalls_Mock);
+    const getManifest = createGetManifest(apm_Mock, ipfs_Mock);
 
     before();
     let res = await getManifest(packageReq);
@@ -49,8 +49,8 @@ function argumentsTest() {
     });
 
 
-    it('should call ipfsCalls.cat with dnpHash', () => {
-      expect(ipfsCalls_cat_spy.getCalls()[0].args)
+    it('should call ipfs.cat with dnpHash', () => {
+      expect(ipfs_cat_spy.getCalls()[0].args)
         .to.deep.equal( [dnpHash] );
     });
 

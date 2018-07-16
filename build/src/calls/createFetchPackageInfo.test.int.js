@@ -11,7 +11,7 @@ describe('Call function: fetchPackageInfo', function() {
     const params = require('../params');
     const createGetManifest = require('../utils/getManifest');
     const createAPM = require('../modules/apm');
-    const ipfsCalls = require('../modules/ipfsCalls');
+    const ipfsFactory = require('../modules/ipfs');
     const web3Setup = require('../modules/web3Setup');
     // customize params:
     params.WEB3HOSTWS = 'wss://mainnet.infura.io/ws';
@@ -19,8 +19,9 @@ describe('Call function: fetchPackageInfo', function() {
 
     // initialize dependencies
     const web3 = web3Setup(params); // <-- web3
+    const ipfs = ipfsFactory({});
     const apm = createAPM(web3);
-    const getManifest = createGetManifest(apm, ipfsCalls);
+    const getManifest = createGetManifest(apm, ipfs);
     const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
 
     const packageReq = 'otpweb.dnp.dappnode.eth';
