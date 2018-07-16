@@ -28,7 +28,7 @@ function isEthDomain(domain) {
   }
 
   if (domain.substr(domain.length - 4) != '.eth') {
-    console.trace('reponame is not an .eth domain: ' + domain);
+    console.log('[utils/validate 31] ERROR: reponame is not an .eth domain: ' + domain);
     throw Error('reponame is not an .eth domain: ' + domain);
   }
 }
@@ -64,7 +64,7 @@ async function web3Usability(_web3) {
 
 
 function path(PATH) {
-  if (!PATH) throw Error('VALIDATION ERROR: path is not defined');
+  if (!PATH) throw Error('VALIDATION ERROR: path is not defined: '+PATH);
   if (typeof(PATH) != 'string') throw Error('VALIDATION ERROR: path must be a string ' + PATH);
 
   // shell.mkdir('-p', fullPath);
@@ -72,7 +72,8 @@ function path(PATH) {
   const PARENT_PATH = PATH.replace(/\/[^/]+\/?$/, '');
   if (!shell.test('-e', PARENT_PATH)) {
     shell.mkdir('-p', PARENT_PATH);
-    console.trace('PARENT PATH DOES NOT EXIST, pwd: ' + shell.pwd() + ' parent: ' + PARENT_PATH + '\n > creating it');
+    console.trace('[utils/validate 75] Parent path doesn\'t exist, creating it.'
+      +' pwd: ' + shell.pwd() + ' parent: ' + PARENT_PATH + '\n > creating it');
   }
 
   // returning so it can be used as
