@@ -87,7 +87,7 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   let manifest = await getManifest(packageReq);
   // Validate the input, manifests are not controlled by the dappnode team
   // Basically returns manifest.dependencies
-  let depObject = parse.manifest.depObject(manifest)
+  let depObject = parse.manifest.depObject(manifest);
 
 
   // Depobject can have the following formats

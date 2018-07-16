@@ -1,6 +1,5 @@
 const dockerListDefault = require('../modules/dockerList');
 const res = require('../utils/res');
-const ethchain = require('../watchers/ethchain');
 
 // CALL DOCUMENTATION:
 // > result = packages =
@@ -17,9 +16,9 @@ function createListDirectory(getDirectory,
   dockerList=dockerListDefault) {
   return async function listDirectory() {
     // Make sure the chain is synced
-    if (await ethchain.isSyncing()) {
-      return res.success('Mainnet is syncing', []);
-    }
+    // if (await ethchain.isSyncing()) {
+    //   return res.success('Mainnet is syncing', []);
+    // }
 
     // List of available packages in the directory
     const packages = await getDirectory();
