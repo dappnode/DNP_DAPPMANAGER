@@ -19,7 +19,7 @@ const {docker: dockerDefault} = require('./Docker');
 // ]
 
 function downloadFactory({params,
-  ipfsCalls,
+  ipfs,
   generate = generateDefault,
   validate = validateDefault,
   fs = fsDefault}) {
@@ -56,29 +56,25 @@ function downloadFactory({params,
     await fs.writeFileSync(MANIFEST_PATH, MANIFEST_DATA);
     await fs.writeFileSync(DOCKERCOMPOSE_PATH, DOCKERCOMPOSE_DATA);
 
-    // Image validation
-    if (fs.existsSync(IMAGE_PATH)) {
-      // Image file exists and is valid -> do nothing
-      if (await ipfsCalls.isfileHashValid(IMAGE_HASH, IMAGE_PATH)) return;
-      // Image file exists and NOT valid -> delete and re-download
-      else {
-        console.trace('Previously downloaded image was defective and will be re-downloaded');
-        await fs.unlinkSync(IMAGE_PATH);
-      }
-    }
-
-    // download and load image to docker
+    // Define the logging function
+    const log = (percent) =>
+      logUI({logId, pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'});
+    // Define the rounding function to not spam updates
     const displayRes = 2;
     const round = (x) => displayRes*Math.ceil(100*x/IMAGE_SIZE/displayRes);
-    const _log = (percent) =>
-      logUI({logId, pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'});
+    // Keep track of the bytes downloaded
+    let bytes = 0; let prev = 0;
+    const logChunk = (chunk) => {
+      if (round(bytes += chunk.length) > prev) {
+        log(prev = round(bytes));
+      }
+    };
 
     logUI({logId, pkg: PACKAGE_NAME, msg: 'starting download...'});
-    await ipfsCalls.download(
-      validate.path(IMAGE_PATH),
+    await ipfs.download(
       IMAGE_HASH,
-      _log,
-      round
+      IMAGE_PATH,
+      logChunk,
     );
   };
 }

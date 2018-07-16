@@ -23,21 +23,22 @@ const pkg = require('./utils/packages');
 const createGetManifest = require('./utils/getManifest');
 const dependencies = require('./utils/dependencies');
 const createAPM = require('./modules/apm');
-const ipfsCalls = require('./modules/ipfsCalls');
+const ipfsFactory = require('./modules/ipfs');
 const web3Setup = require('./modules/web3Setup');
 const createGetDirectory = require('./modules/createGetDirectory');
 
 // Initialize watchers
-require('./watchers');
+// require('./watchers');
 
 // initialize dependencies (by order)
 const web3 = web3Setup(params); // <-- web3
+const ipfs = ipfsFactory({}); // <-- ipfs
 const apm = createAPM(web3);
 const getDirectory = createGetDirectory(web3);
-const getManifest = createGetManifest(apm, ipfsCalls);
+const getManifest = createGetManifest(apm, ipfs);
 const docker = createDocker();
 const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-const download = pkg.downloadFactory({params, ipfsCalls, docker});
+const download = pkg.downloadFactory({params, ipfs, docker});
 const run = pkg.runFactory({params, docker});
 
 // Initialize calls
@@ -51,7 +52,7 @@ const listPackages = createListPackages(params); // Needs work
 const listDirectory = createListDirectory(getDirectory);
 const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
 const updatePackageEnv = createUpdatePackageEnv(params, docker);
-const getPackageData = createGetPackageData(getManifest, ipfsCalls);
+const getPackageData = createGetPackageData(getManifest, ipfs);
 
 const autobahnTag = params.autobahnTag;
 const autobahnUrl = params.autobahnUrl;
