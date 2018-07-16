@@ -67,6 +67,13 @@ function envFile(envFileData) {
 }
 
 function stringifyEnvs(envs) {
+  if (typeof envs === typeof {}) {
+    // great
+  } else if (typeof envs === typeof 'string') {
+    throw Error('Attempting to stringify envs of type STRING. Must be an OBJECT: '+envs);
+  } else {
+    throw Error('Attempting to stringify envs of UNKOWN type. Must be an OBJECT: '+envs);
+  }
   return Object.getOwnPropertyNames(envs)
     .map((envName) => {
       let envValue = envs[envName];

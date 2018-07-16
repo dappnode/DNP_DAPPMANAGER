@@ -5,10 +5,8 @@ const shell = require('../utils/shell');
 
 chai.should();
 
-describe('All Calls functions: installPackage', function() {
-  if (process.env.TEST_INTEGRATION == 'true') {
-    integrationTest();
-  }
+describe('Full integration test with REAL docker: ', function() {
+  // integrationTest();
 });
 
 // The test will perfom intense tasks and could take up to some minutes
@@ -46,9 +44,15 @@ function integrationTest() {
   const {createFetchPackageInfo} = require('./createFetchPackageInfo');
   const createUpdatePackageEnv = require('./createUpdatePackageEnv');
 
+  // Mock key dependencies
+  const shellExec = async (command) => {
+    const stdout = 'Everything work great';
+    return stdout;
+  };
+
   // import dependencies
   const params = require('../params');
-  const createDocker = require('../utils/Docker');
+  const {createDocker} = require('../utils/Docker');
   const pkg = require('../utils/packages');
   const createGetManifest = require('../utils/getManifest');
   const dependencies = require('../utils/dependencies');
@@ -62,15 +66,13 @@ function integrationTest() {
   const apm = createAPM(web3);
   const getDirectory = createGetDirectory(web3);
   const getManifest = createGetManifest(apm, ipfsCalls);
-  const docker = createDocker();
+  const docker = createDocker(shellExec);
   const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-  const download = pkg.createDownload(params, ipfsCalls, docker, log);
-  const run = pkg.createRun(params, docker, log);
-  const downloadPackages = pkg.createDownloadPackages(download);
-  const runPackages = pkg.createRunPackages(run);
+  const download = pkg.downloadFactory(params, ipfsCalls, docker, log);
+  const run = pkg.runFactory(params, docker, log);
 
   // Initialize calls
-  const installPackage = createInstallPackage(getDependencies, downloadPackages, runPackages);
+  const installPackage = createInstallPackage(getDependencies, download, run);
   const removePackage = createRemovePackage(params, docker);
   const togglePackage = createTogglePackage(params, docker);
   const logPackage = createLogPackage(params, docker);
@@ -266,7 +268,7 @@ function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
   const PACKAGE_NAME = packageReq;
   const getPath = require('../utils/getPath');
   const envValue = Date.now();
-  const ENV_FILE_PATH = getPath.ENV_FILE(PACKAGE_NAME, params);
+  const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params);
 
   it('call updatePackageEnv', (done) => {
     console.log('\x1b[36m%s\x1b[0m', '>> UPDATING ENVS');

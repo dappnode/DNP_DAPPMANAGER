@@ -12,8 +12,6 @@ function createUpdatePackageEnv(params, docker) {
     const envFilePath = getPath.envFileSmart(id, params, isCORE);
 
     // Write envs
-    console.trace(envs);
-    console.trace(parse.stringifyEnvs(envs));
     await fs.writeFileSync(
       validate.path(envFilePath),
       parse.stringifyEnvs(envs)
