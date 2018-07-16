@@ -2,6 +2,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
 const yaml = require('yamljs');
+const logs = require('../logs.js')(module);
 
 chai.should();
 
@@ -148,7 +149,7 @@ function integrationTest() {
   const packageReq = 'otpweb.dnp.dappnode.eth';
 
   function log(topic, packageName, res) {
-    console.log('\x1b[33m%s\x1b[0m', topic, ' ', '\x1b[36m%s\x1b[0m', packageName, ' ', '\x1b[35m%s\x1b[0m', res);
+    logs.info('\x1b[33m%s\x1b[0m', topic, ' ', '\x1b[36m%s\x1b[0m', packageName, ' ', '\x1b[35m%s\x1b[0m', res);
   }
 
   // add .skip to skip test
@@ -200,7 +201,7 @@ function integrationTest() {
 
 function testInstallPackage(installPackage, kwargs) {
   it('call installPackage', async () => {
-    console.log('\x1b[36m%s\x1b[0m', '>> INSTALLING');
+    logs.info('\x1b[36m%s\x1b[0m', '>> INSTALLING');
     let res = await installPackage(kwargs);
     let parsedRes = JSON.parse(res);
     expect(parsedRes).to.be.an('object');
@@ -211,7 +212,7 @@ function testInstallPackage(installPackage, kwargs) {
 
 function testLogPackage(logPackage, kwargs) {
   it('call logPackage', async () => {
-    console.log('\x1b[36m%s\x1b[0m', '>> LOGGING');
+    logs.info('\x1b[36m%s\x1b[0m', '>> LOGGING');
     let res = await logPackage(kwargs);
 
     let parsedRes = JSON.parse(res);
@@ -229,7 +230,7 @@ function testLogPackage(logPackage, kwargs) {
 
 function testListPackages(listPackages, packageName, state) {
   it('call listPackages, to check '+packageName+' is '+state, async () => {
-    console.log('\x1b[36m%s\x1b[0m', '>> LISTING');
+    logs.info('\x1b[36m%s\x1b[0m', '>> LISTING');
     let res = await listPackages();
       let parsedRes = JSON.parse(res);
       expect(parsedRes.success).to.be.true;
@@ -248,10 +249,10 @@ function testListPackages(listPackages, packageName, state) {
 
 function testTogglePackage(togglePackage, kwargs) {
   it('call togglePackage', (done) => {
-    console.log('\x1b[36m%s\x1b[0m', '>> TOGGLING START / STOP');
+    logs.info('\x1b[36m%s\x1b[0m', '>> TOGGLING START / STOP');
     togglePackage(kwargs)
     .then((res) => {
-      // console.log('\x1b[33m%s\x1b[0m', res)
+      // logs.info('\x1b[33m%s\x1b[0m', res)
       let parsedRes = JSON.parse(res);
       expect(parsedRes.success).to.be.true;
       // let packageNames = parsedRes.result.map(e => name)
@@ -268,10 +269,10 @@ function testTogglePackage(togglePackage, kwargs) {
 
 function testRemovePackage(removePackage, kwargs) {
   it('call removePackage', (done) => {
-    console.log('\x1b[36m%s\x1b[0m', '>> REMOVING');
+    logs.info('\x1b[36m%s\x1b[0m', '>> REMOVING');
     removePackage(kwargs)
     .then((res) => {
-      // console.log('\x1b[33m%s\x1b[0m', res)
+      // logs.info('\x1b[33m%s\x1b[0m', res)
       expect(JSON.parse(res).success).to.be.true;
       done();
     })
@@ -295,10 +296,10 @@ function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
   };
 
   it('call updatePackageEnv', (done) => {
-    console.log('\x1b[36m%s\x1b[0m', '>> UPDATING ENVS');
+    logs.info('\x1b[36m%s\x1b[0m', '>> UPDATING ENVS');
     updatePackageEnv(kwargs)
     .then((res) => {
-      // console.log('\x1b[33m%s\x1b[0m', res)
+      // logs.info('\x1b[33m%s\x1b[0m', res)
       expect(JSON.parse(res).success).to.be.true;
       let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
       expect(envRes).to.equal('time='+envValue);
@@ -314,11 +315,11 @@ function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
 
 function testListDirectory(listDirectory, packageName) {
   it('call listDirectory', (done) => {
-    console.log('\x1b[36m%s\x1b[0m', '>> GETTING DIRECTORY');
+    logs.info('\x1b[36m%s\x1b[0m', '>> GETTING DIRECTORY');
     listDirectory()
     .then((res) => {
       let parsedRes = JSON.parse(res);
-      // console.log('\x1b[33m%s\x1b[0m', res)
+      // logs.info('\x1b[33m%s\x1b[0m', res)
       expect(parsedRes.success).to.be.true;
       // filter returns an array of results (should have only one)
       let pkg = parsedRes.result.filter((e) => {
@@ -337,10 +338,10 @@ function testListDirectory(listDirectory, packageName) {
 
 function testFetchPackageInfo(fetchPackageInfo, kwargs, packageName) {
   it('call fetchPackageInfo', (done) => {
-    console.log('\x1b[36m%s\x1b[0m', '>> FETCHING PACKAGE INFO');
+    logs.info('\x1b[36m%s\x1b[0m', '>> FETCHING PACKAGE INFO');
     fetchPackageInfo(kwargs)
     .then((res) => {
-      // console.log('\x1b[33m%s\x1b[0m', res)
+      // logs.info('\x1b[33m%s\x1b[0m', res)
       let parsedRes = JSON.parse(res);
       expect(parsedRes.success).to.be.true;
       expect(parsedRes.result).to.be.a('object');

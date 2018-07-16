@@ -6,6 +6,7 @@ const validateDefault = require('./validate');
 const createRestartPatch = require('./createRestartPatch');
 const logUI = require('./logUI');
 const {docker: dockerDefault} = require('./Docker');
+const logs = require('../logs.js')(module);
 
 // packageList should be an array of package objects, i.e.
 // [
@@ -62,7 +63,7 @@ function downloadFactory({params,
       if (await ipfsCalls.isfileHashValid(IMAGE_HASH, IMAGE_PATH)) return;
       // Image file exists and NOT valid -> delete and re-download
       else {
-        console.trace('Previously downloaded image was defective and will be re-downloaded');
+        logs.warn('Previously downloaded image was defective and will be re-downloaded');
         await fs.unlinkSync(IMAGE_PATH);
       }
     }

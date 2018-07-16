@@ -32,7 +32,10 @@ function createRestartPackageVolumes(params,
     // Restart docker to apply changes
     await docker.compose.up(dockerComposePath);
 
-    return res.success('Restarted '+id+' volumes: ' + packageVolumes.join(', '));
+    return {
+      message: 'Restarted '+id+' volumes: ' + packageVolumes.join(', '),
+      log: true,
+    };
   };
 }
 

@@ -1,5 +1,4 @@
 const parse = require('../utils/parse');
-const res = require('../utils/res');
 
 // CALL DOCUMENTATION:
 // > result = packageWithVersions =
@@ -32,21 +31,26 @@ function createFetchPackageInfo(getManifest, apm) {
 
       await getManifestOfVersions(packageReq, packageWithVersions.versions);
 
-      return res.success('Fetched info of: ' + packageReq.name, packageWithVersions);
-
+      return {
+        message: 'Fetched info of: ' + packageReq.name,
+        result: packageWithVersions,
+      };
 
     // if the name of the package is already an IFPS hash, skip:
     } else if (packageReq.name.startsWith('/ipfs/Qm')) {
       const manifest = await getManifest(packageReq);
-      return res.success('Fetched info of: ' + packageReq.name, {
-        name: manifest.name,
-        versions: [
-          {
-            version: manifest.version,
-            manifest: manifest,
-          },
-        ],
-      });
+      return {
+        message: 'Fetched info of: ' + packageReq.name,
+        result: {
+          name: manifest.name,
+          versions: [
+            {
+              version: manifest.version,
+              manifest: manifest,
+            },
+          ],
+        },
+      };
     } else {
       throw Error('Unkown package request: '+packageReq.name);
     }

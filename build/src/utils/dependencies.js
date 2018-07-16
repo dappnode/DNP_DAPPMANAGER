@@ -5,6 +5,7 @@ const {orderDependencies} = require('./orderDependencies');
 const dockerListDefault = require('../modules/dockerList');
 const parse = require('./parse');
 const logUI = require('./logUI');
+const logs = require('../logs.js')(module);
 
 
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
@@ -41,12 +42,12 @@ async function shouldInstall(packageList, dockerList, logId) {
     const requestedVersion = packageReq.manifest.version;
     const currentVersion = packageCurrent.version;
 
-    console.log('[dependencies.js 44] ', 'COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
+    logs.info('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
     if (semver.lt(currentVersion, requestedVersion)) {
       return true;
     } else {
       logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
-      console.log('[dependencies.js 49] ', 'IGNORING PACKAGE: '+packageReq.name);
+      logs.info('IGNORING PACKAGE: '+packageReq.name);
       return false;
     }
   });
