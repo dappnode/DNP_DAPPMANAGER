@@ -123,25 +123,9 @@ describe('Util: package install / download', () => {
         .to.deep.equal( [DOCKERCOMPOSE_PATH, DockerCompose] );
     });
 
-    // fsExistsSyncSpy - IMAGE_PATH
-    it('fs.existsSync should be called with IMAGE_PATH', () => {
-      sinon.assert.calledWith(fsExistsSyncSpy, IMAGE_PATH);
-    });
-
-    // ipfsIsfileHashValidSpy - IMAGE_HASH, IMAGE_PATH
-    it('ipfs.isfileHashValid should be called with IMAGE_HASH, IMAGE_PATH', () => {
-      expect(ipfsIsfileHashValidSpy.getCalls()[0].args)
-        .to.deep.equal( [IMAGE_HASH, IMAGE_PATH] );
-    });
-
-    // fsUnlinkSyncSpy - IMAGE_PATH
-    it('fs.unlinkSync should be called with IMAGE_PATH', () => {
-      sinon.assert.calledWith(fsUnlinkSyncSpy, IMAGE_PATH);
-    });
-
     // ipfsDownloadSpy - IMAGE_HASH, IMAGE_PATH
     it('ipfs.download should be called with IMAGE_HASH, IMAGE_PATH', () => {
-      sinon.assert.calledWith(ipfsDownloadSpy, IMAGE_PATH, IMAGE_HASH);
+      sinon.assert.calledWith(ipfsDownloadSpy, IMAGE_HASH, IMAGE_PATH);
     });
   });
 
