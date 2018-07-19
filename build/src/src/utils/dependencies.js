@@ -95,7 +95,7 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   // {
   //   dappmanager.dnp.dappnode.eth: "latest", -> Fetch latest from APM
   //   dappmanager.dnp.dappnode.eth: "0.4.1", -> Fetch version from APM
-  //   dappmanager.dnp.dappnode.eth: "/ipfs/QmbeyNiayTHZadQNyXqdnEin1wsfaXZwcmSc6LTsWf8iyz", -> Fetch straight from IPFS
+  //   dappmanager.dnp.dappnode.eth: "/ipfs/Qm...", -> Fetch straight from IPFS
   //   dappmanager.dnp.dappnode.eth: "fake" -> Throw error
   // }
 
