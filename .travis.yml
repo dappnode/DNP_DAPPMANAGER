@@ -6,10 +6,8 @@ sudo: required
 env:
   - ETHWS=wss://kovan.infura.io/ws
 
-  # node_js:
-#   - "9"
-#   - "8"
-#   - "7"
+node_js:
+  - "8.9.4"
 
 cache:
   directories:
