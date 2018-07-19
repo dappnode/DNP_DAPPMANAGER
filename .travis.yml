@@ -4,7 +4,7 @@ sudo: required
 
 # Test envs will overwrite defaults
 env:
-  - ETHWS=wss://kovan.infura.io/ws
+  - DAPPNODE=rocks
 
 node_js:
   - "8.9.4"
