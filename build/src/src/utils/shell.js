@@ -1,4 +1,5 @@
 const shell = require('shelljs');
+const logs = require('../logs.js')(module);
 
 const maxTime = 20*1000;
 
@@ -13,7 +14,7 @@ async function shellExecSync(command, silent = false) {
   const stdout = res.stdout;
   const stderr = res.stderr;
   if (code !== 0) {
-    console.trace('SHELL JS ERROR, on command: ' + command);
+    logs.error('SHELL JS ERROR, on command: ' + command);
     throw Error(stderr);
   }
   return stdout;

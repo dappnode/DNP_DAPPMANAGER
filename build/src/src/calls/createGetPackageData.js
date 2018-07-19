@@ -1,7 +1,7 @@
 const base64Img = require('base64-img');
 const dockerListDefault = require('../modules/dockerList');
 const parse = require('../utils/parse');
-const res = require('../utils/res');
+const logs = require('../logs.js')(module);
 
 // CALL DOCUMENTATION:
 // > result = packages =
@@ -38,11 +38,11 @@ function createGetPackageData(
     const avatarHash = manifest.avatar;
     let avatar;
     if (avatarHash) {
-      // If the avatar can not be fetched don't crash
       try {
         await ipfs.cat(avatarHash);
         avatar = base64Img.base64Sync('cache/'+avatarHash);
       } catch (e) {
+        // If the avatar can not be fetched don't crash
         logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
       }
     }

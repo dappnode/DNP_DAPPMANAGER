@@ -1,3 +1,4 @@
+const logs = require('../logs.js')(module);
 
 // Expects:
 // arg[0] a stdout string from a docker-compose ps
@@ -31,12 +32,12 @@ function parsePs(output) {
 
   // If the docker-compose ps format changes, this may alert it
   if (propNames.length != 4) {
-    console.trace('docker-compose ps format may have changed, raw output:\n'+output);
+    logs.warn('docker-compose ps format may have changed, raw output:\n'+output);
   } else if (propNames[0] != 'name'
   || propNames[1] != 'command'
   || propNames[2] != 'state'
   || propNames[3] != 'ports') {
-    console.trace('docker-compose ps format may have changed, raw output:\n'+output);
+    logs.warn('docker-compose ps format may have changed, raw output:\n'+output);
   }
 
   return containerRows

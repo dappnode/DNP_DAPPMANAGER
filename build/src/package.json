@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "test": "mocha \"./{,!(node_modules)/**}/*.test.js\" ",
     "test.int": "mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
     "test-nyc": "nyc npm run test",
-    "test.int-nyc": "nyc npm run test.int"
+    "test.int-nyc": "nyc npm run test.int",
+    "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
+    "lint": "./node_modules/.bin/eslint src/**/*.js --fix",
+    "show-config": "echo TODO: show-config script"
   },
   "author": "dappLion",
   "license": "ISC",
@@ -31,7 +34,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
-    "coveralls": "^3.0.1",
+    "coveralls": "^3.0.2",
     "eslint": "^5.0.0",
     "eslint-config-google": "^0.9.1",
     "eslint-config-prettier": "^2.9.0",
