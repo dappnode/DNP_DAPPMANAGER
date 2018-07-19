@@ -1,23 +1,26 @@
 language: node_js
 dist: trusty
 sudo: required
-env:
-  - ETHWS=wss://kovan.infura.io/ws TESTIPFS=0 APISOCKETPORT=8011 IPFSAPI=/ip4/127.0.0.1/tcp/5001 IPFSAPIHOST=127.0.0.1 IPFSAPIPORT=5001 HASHTAGPROXYCONTRACT=0xe2cfd139f2f7ce127e0ddae6147f42657d32dc02 HASHTAGPROXYSTARTBLOCK=7295529
 
-node_js:
-  - "9"
-  - "8"
-  - "7"
+# Test envs will overwrite defaults
+env:
+  - ETHWS=wss://kovan.infura.io/ws
+
+  # node_js:
+#   - "9"
+#   - "8"
+#   - "7"
+
 cache:
   directories:
     - build/src/node_modules
 install:
+  # This is a dockerized application, the node app is in /build/src
   - cd ./build/src
   - npm install
 before_script:
   - npm run lint
 script:
-  - npm run show-config
   - npm run test
 after_success:
   - npm run coverage

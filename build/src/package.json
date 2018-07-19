@@ -10,8 +10,7 @@
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "lint": "./node_modules/.bin/eslint src/**/*.js --fix",
-    "show-config": "echo TODO: show-config script"
+    "lint": "./node_modules/.bin/eslint src/**/*.js --fix"
   },
   "author": "dappLion",
   "license": "ISC",
