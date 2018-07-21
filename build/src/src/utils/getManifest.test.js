@@ -23,34 +23,34 @@ function argumentsTest() {
     };
     const dnpHash = 'dnpHash';
     const manifest = '{\n  "item": "manifest"\n}';
-    const apm_getRepoHash_spy = sinon.spy();
-    const apm_Mock = {
+    const apmGetRepoHashSpy = sinon.spy();
+    const apmMock = {
       getRepoHash: async (packageReq) => {
-        apm_getRepoHash_spy(packageReq);
+        apmGetRepoHashSpy(packageReq);
         return dnpHash;
       },
     };
-    const ipfs_cat_spy = sinon.spy();
-    const ipfs_Mock = {
+    const ipfsCatSpy = sinon.spy();
+    const ipfsMock = {
       cat: async (dnpHash) => {
-        ipfs_cat_spy(dnpHash);
+        ipfsCatSpy(dnpHash);
         return manifest;
       },
     };
 
-    const getManifest = createGetManifest(apm_Mock, ipfs_Mock);
+    const getManifest = createGetManifest(apmMock, ipfsMock);
 
     before();
     let res = await getManifest(packageReq);
 
     it('should call apm.getRepoHash with packageReq', () => {
-      expect(apm_getRepoHash_spy.getCalls()[0].args)
+      expect(apmGetRepoHashSpy.getCalls()[0].args)
         .to.deep.equal( [packageReq] );
     });
 
 
     it('should call ipfs.cat with dnpHash', () => {
-      expect(ipfs_cat_spy.getCalls()[0].args)
+      expect(ipfsCatSpy.getCalls()[0].args)
         .to.deep.equal( [dnpHash] );
     });
 

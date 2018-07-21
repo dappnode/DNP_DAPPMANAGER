@@ -20,14 +20,6 @@ async function listContainers() {
     .map(format);
 }
 
-
-async function logContainer(id) {
-  let containers = await dockerRequest('get', '/containers/'+id+'/logs?stderr=1&stdout=1');
-  return containers
-    .map(format);
-}
-
-
 async function runningPackagesInfo() {
   let containers = await listContainers();
   let containersObject = {};

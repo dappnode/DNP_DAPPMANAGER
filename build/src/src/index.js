@@ -89,7 +89,7 @@ const register = (session, event, handler) => {
 
   return session.register(event, wrapErrors(handler)).then(
     function(reg) {logs.info('CROSSBAR: registered '+event);},
-    function(err) {logs.error('CROSSBAR: error registering '+event, err);}
+    function(err) {logs.error('CROSSBAR: error registering '+event+'. Error message: '+err.error);}
   );
 };
 
