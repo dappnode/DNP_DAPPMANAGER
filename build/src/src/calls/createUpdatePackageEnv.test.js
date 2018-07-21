@@ -6,6 +6,7 @@ const fs = require('fs');
 const docker = require('modules/docker');
 const paramsDefault = require('params');
 const getPath = require('utils/getPath');
+const validate = require('utils/validate');
 
 chai.should();
 
@@ -32,7 +33,8 @@ describe('Call function: createUpdatePackageEnv', function() {
 
   describe('Call function createUpdatePackageEnv', function() {
     before(() => {
-        fs.writeFileSync(dockerComposePath, 'docker-compose');
+      validate.path(dockerComposePath);
+      fs.writeFileSync(dockerComposePath, 'docker-compose');
     });
 
     it('Should update the envs and reset the package', async () => {
