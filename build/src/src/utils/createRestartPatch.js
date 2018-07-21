@@ -18,6 +18,8 @@ function createRestartPatch(params, docker) {
         params,
         true
     );
+    const PATH_LOCAL = '/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml';
+    const PATH_REMOTE = '/usr/src/app/DNCORE/docker-compose-dappmanager.yml';
     const DOCKERCOMPOSE_DATA = `version: '3.4'
 
 services:
@@ -25,11 +27,11 @@ services:
         image: ${IMAGE_NAME}
         container_name: DAppNodeTool-restart.dnp.dappnode.eth
         volumes:
-            - '/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml:/usr/src/app/DNCORE/docker-compose-dappmanager.yml'
+            - '${PATH_LOCAL}:${PATH_REMOTE}'
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
             - '/var/run/docker.sock:/var/run/docker.sock'
         entrypoint:
-            docker-compose -f /usr/src/app/DNCORE/docker-compose-dappmanager.yml up -d`;
+            docker-compose -f ${PATH_REMOTE} up -d`;
 
     validate.path(DOCKERCOMPOSE_RESTART_PATH);
     await fs.writeFileSync(DOCKERCOMPOSE_RESTART_PATH, DOCKERCOMPOSE_DATA);

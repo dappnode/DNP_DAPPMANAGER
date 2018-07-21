@@ -1,3 +1,3 @@
 #!/bin/sh
 crond
-node index.js
+node src/index.js
