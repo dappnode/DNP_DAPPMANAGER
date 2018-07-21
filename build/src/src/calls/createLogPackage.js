@@ -1,16 +1,28 @@
 const fs = require('fs');
-const getPath = require('../utils/getPath');
-const parse = require('../utils/parse');
+const getPath = require('utils/getPath');
+const parse = require('utils/parse');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
 // CALL DOCUMENTATION:
-// > result = logs = <String with escape codes> (string)
+// > kwargs: {
+//     id,
+//     isCore,
+//     options
+//   }
+// > result: {
+//     id,
+//     logs: <String with escape codes> (string)
+//   }
 
-// If it is core, send ['dnp_bind', true]
-
-function createLogPackage(params,
-  // default option passed to allow testing
-  docker) {
-  return async function logPackage({id, options}) {
+function createLogPackage({
+  params = paramsDefault,
+  docker = dockerDefault,
+}) {
+  const logPackage = async ({
+    id,
+    options,
+  }) => {
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
     if (!fs.existsSync(dockerComposePath)) {
       throw Error('No docker-compose found: ' + dockerComposePath);
@@ -27,6 +39,9 @@ function createLogPackage(params,
       },
     };
   };
+
+  // Expose main method
+  return logPackage;
 }
 
 

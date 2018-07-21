@@ -1,11 +1,11 @@
 const semver = require('semver');
-const {highestVersion} = require('../utils/versions');
-const validate = require('../utils/validate');
-const {orderDependencies} = require('./orderDependencies');
-const dockerListDefault = require('../modules/dockerList');
-const parse = require('./parse');
-const logUI = require('./logUI');
-const logs = require('../logs.js')(module);
+const {highestVersion} = require('utils/versions');
+const validate = require('utils/validate');
+const {orderDependencies} = require('utils/orderDependencies');
+const dockerListDefault = require('modules/dockerList');
+const parse = require('utils/parse');
+const logUI = require('utils/logUI');
+const logs = require('logs.js')(module);
 
 
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;

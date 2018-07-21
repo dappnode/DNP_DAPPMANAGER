@@ -1,19 +1,27 @@
-const parse = require('../utils/parse');
+const parse = require('utils/parse');
 
 // CALL DOCUMENTATION:
-// > result = {}
+// > kwargs: {
+//     id,
+//     logId
+//   }
+// > result: empty = {}
 
-function createInstallPackage(getAllDependenciesResolvedOrdered,
+function createInstallPackage({
+  getAllDependencies,
   download,
-  run
-) {
-  return async function installPackage({id, logId}) {
+  run,
+}) {
+  const installPackage = async ({
+    id,
+    logId,
+  }) => {
     const packageReq = parse.packageReq(id);
 
     // Returns a list of unique dep (highest requested version) + requested package
     // > getManifest needs IPFS
     // > Returns an order to follow in order to install repecting dependencies
-    let packageList = await getAllDependenciesResolvedOrdered({packageReq, logId});
+    let packageList = await getAllDependencies({packageReq, logId});
 
     // -> install in paralel
     await Promise.all(packageList.map((pkg) => download({pkg, logId})));
@@ -28,6 +36,9 @@ function createInstallPackage(getAllDependenciesResolvedOrdered,
       log: true,
     };
   };
+
+  // Expose main method
+  return installPackage;
 }
 
 

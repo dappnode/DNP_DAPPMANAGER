@@ -1,9 +1,11 @@
 const chai = require('chai');
 const expect = require('chai').expect;
+const sinon = require('sinon');
 const fs = require('fs');
-const createTogglePackage = require('./createTogglePackage');
-const getPath = require('../utils/getPath');
-const validate = require('../utils/validate');
+const createTogglePackage = require('calls/createTogglePackage');
+const getPath = require('utils/getPath');
+const validate = require('utils/validate');
+const docker = require('modules/docker');
 
 chai.should();
 
@@ -28,34 +30,27 @@ function mockTest() {
     DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   };
 
-  let hasStopped = false;
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
-  const dockerMock = {
-    compose: {
-      ps: async (path) => {
-        return (`
-Name                        Command                 State             Ports
----------------------------------------------------------------------------------------------
-${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
-`).trim();
-      },
-      stop: async (path) => {
-        hasStopped = true;
-      },
-    },
-  };
-
-  const togglePackage = createTogglePackage(params, dockerMock);
+  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
+  sinon.restore();
+  sinon.replace(docker, 'status', sinon.fake.resolves('running'));
+  sinon.replace(docker.compose, 'stop', sinon.fake.resolves());
+  const togglePackage = createTogglePackage({
+    params,
+    docker,
+  });
 
   before(() => {
-    const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
     validate.path(DOCKERCOMPOSE_PATH);
     fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeTemplate);
   });
 
   it('should stop the package with correct arguments', async () => {
-    await togglePackage({id: PACKAGE_NAME});
-    expect(hasStopped).to.be.true;
+    let res = await togglePackage({id: PACKAGE_NAME});
+    sinon.assert.called(docker.status);
+    sinon.assert.called(docker.compose.stop);
+    expect(res).to.be.ok;
+    expect(res).to.have.property('message');
   });
 
   it('should throw an error with wrong package name', async () => {
@@ -65,12 +60,10 @@ ${PACKAGE_NAME}          docker-entrypoint.sh mysqld      Up (healthy)  3306/tcp
     } catch (e) {
       error = e.message;
     }
-    expect(error).to.include('No docker-compose found');
+    expect(error).to.include('docker-compose does not exist');
   });
 
-  it('should return a stringified object containing success', async () => {
-    let res = await togglePackage({id: PACKAGE_NAME});
-    expect(res).to.be.ok;
-    expect(res).to.have.property('message');
+  after(() => {
+    fs.unlinkSync(DOCKERCOMPOSE_PATH);
   });
 }

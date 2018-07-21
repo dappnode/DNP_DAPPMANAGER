@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test.int": "mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
+    "start": "NODE_PATH=src node src/index.js",
+    "test": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.js\" ",
+    "test.int": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
-    "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "lint": "./node_modules/.bin/eslint src/**/*.js --fix"
+    "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
+    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix"
   },
   "author": "dappLion",
   "license": "ISC",

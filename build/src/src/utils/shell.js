@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const logs = require('../logs.js')(module);
+const logs = require('logs.js')(module);
 
 const maxTime = 20*1000;
 

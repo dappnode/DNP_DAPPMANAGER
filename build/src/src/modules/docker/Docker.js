@@ -1,8 +1,8 @@
 // node modules
-const shellSyncDefault = require('./shell');
+const shellSyncDefault = require('utils/shell');
 
 
-function createDocker(shellSync = shellSyncDefault) {
+const dockerFactory = (shellSync = shellSyncDefault) => {
   return {
     compose: {
       // Usage: up [options] [--scale SERVICE=NUM...] [SERVICE...]
@@ -131,6 +131,10 @@ function createDocker(shellSync = shellSyncDefault) {
       return shellSync('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true);
     },
 
+    status: (containerNameOrId) => {
+      return shellSync('docker inspect --format=\'{{.State.Status}}\' ' + containerNameOrId, true);
+    },
+
     // NOT A DOCKER, DOCKER-COMPOSE
     // Custom command to open and close ports
     openPort: async (port) => {
@@ -148,7 +152,7 @@ function createDocker(shellSync = shellSyncDefault) {
       .then((res) => (res && res.includes('.')), (err) => false);
     },
   };
-}
+};
 
 function getVpnImageCmd() {
   return 'docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\'';
@@ -176,7 +180,4 @@ function parseOptions(options) {
 }
 
 
-module.exports = {
-  createDocker,
-  docker: createDocker(),
-};
+module.exports = dockerFactory;

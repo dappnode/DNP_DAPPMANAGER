@@ -7,7 +7,6 @@ const ipfsTasksFactory = require('./ipfsTasks');
 // Define test parameters
 const params = {
     CACHE_DIR: 'test/',
-    testing: true,
 };
 
 describe('ipfsTasksFactory', () => {
@@ -23,26 +22,27 @@ describe('ipfsTasksFactory', () => {
             },
         },
     };
+    const ipfsTasks = ipfsTasksFactory({
+        ipfs,
+        params,
+        testing: true,
+    });
 
     describe('for production', () => {
         // Fake only part of the original library
-        const paramsProd = {
-            CACHE_DIR: 'test/',
-            testing: false,
-        };
-        const ipfsTasks = ipfsTasksFactory({ipfs, params: paramsProd});
+        const ipfsTasksProd = ipfsTasksFactory({
+            ipfs,
+            params,
+        });
 
         it('Should export the necessary methods only', () => {
-            expect(ipfsTasks).to.have.property('download');
-            expect(ipfsTasks).to.have.property('cat');
-            expect(ipfsTasks).to.not.have.property('downloadHandler');
+            expect(ipfsTasksProd).to.have.property('download');
+            expect(ipfsTasksProd).to.have.property('cat');
+            expect(ipfsTasksProd).to.not.have.property('downloadHandler');
         });
     });
 
     describe('parseResHash', () => {
-        // Fake only part of the original library
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
-
         it('To parse correctly', () => {
             const res = [{hash: 'Qm'}];
             let hash = ipfsTasks.parseResHash(res);
@@ -58,9 +58,6 @@ describe('ipfsTasksFactory', () => {
     });
 
     describe('validateIpfsHash', () => {
-        // Fake only part of the original library
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
-
         it('To parse correctly', () => {
             let _HASH = ipfsTasks.validateIpfsHash('/ipfs/'+HASH);
             expect(_HASH).to.equal(HASH);
@@ -76,7 +73,6 @@ describe('ipfsTasksFactory', () => {
 
     describe('isFileHashValid', () => {
         // Fake only part of the original library
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
         const PATH1 = './test/test1';
         const PATH2 = './test/test2';
 
@@ -103,7 +99,6 @@ describe('ipfsTasksFactory', () => {
 
     describe('isFileHashValid', () => {
         // Fake only part of the original library
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
         const PATH1 = './test/test1';
         const PATH2 = './test/test2';
 
@@ -132,7 +127,6 @@ describe('ipfsTasksFactory', () => {
         // const ipfs = ipfsAPI('my.ipfs.dnp.dappnode.eth', '5001', {protocol: 'http'});
         const PATH = './test/hello-world.txt';
         const FILE_CONTENT = 'hello world!';
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
 
         before('Create files for the test', () => {
             fs.writeFileSync(PATH_SOURCE, FILE_CONTENT, 'utf8');
@@ -186,7 +180,6 @@ describe('ipfsTasksFactory', () => {
 
     describe('cat & download', () => {
         const FILE_CONTENT = 'hello world!';
-        const ipfsTasks = ipfsTasksFactory({ipfs, params});
 
         before('Create files for the test', () => {
             fs.writeFileSync(PATH_SOURCE, FILE_CONTENT, 'utf8');
