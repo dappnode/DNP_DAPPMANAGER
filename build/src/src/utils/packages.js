@@ -1,11 +1,13 @@
-const getPath = require('./getPath');
-const parse = require('./parse');
-const generateDefault = require('./generate');
+const getPath = require('utils/getPath');
+const parse = require('utils/parse');
+const generateDefault = require('utils/generate');
 const fsDefault = require('fs');
-const validateDefault = require('./validate');
-const createRestartPatch = require('./createRestartPatch');
-const logUI = require('./logUI');
-const {docker: dockerDefault} = require('./Docker');
+const validateDefault = require('utils/validate');
+const createRestartPatch = require('utils/createRestartPatch');
+const logUI = require('utils/logUI');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
+const ipfsDefault = require('modules/ipfs');
 
 // packageList should be an array of package objects, i.e.
 // [
@@ -18,8 +20,9 @@ const {docker: dockerDefault} = require('./Docker');
 //   ...
 // ]
 
-function downloadFactory({params,
-  ipfs,
+function downloadFactory({
+  params = paramsDefault,
+  ipfs = ipfsDefault,
   generate = generateDefault,
   validate = validateDefault,
   fs = fsDefault}) {
@@ -80,9 +83,10 @@ function downloadFactory({params,
 }
 
 
-function runFactory({params,
+function runFactory({
+  params = paramsDefault,
   docker = dockerDefault,
-  }) {
+}) {
   // patch to prevent installer from crashing
   const restartPatch = createRestartPatch(params, docker);
 

@@ -1,6 +1,10 @@
-const validate = require('./validate');
+const validate = require('utils/validate');
+const ipfsDefault = require('modules/ipfs');
 
-function createGetManifest(apm, ipfs) {
+function createGetManifest({
+  apm,
+  ipfs = ipfsDefault,
+}) {
   return async function getManifest(packageReq) {
     // Expects a package request object
     // returns and manifest object

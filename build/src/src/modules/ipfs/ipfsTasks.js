@@ -2,16 +2,17 @@
 const fsDefault = require('fs');
 const {promisify} = require('util');
 // dedicated modules
-const validate = require('../../utils/validate');
+const validate = require('utils/validate');
 const isIPFS = require('is-ipfs');
 // Depedencies
 const ipfsDefault = require('./ipfsSetup');
-const paramsDefault = require('../../params');
+const paramsDefault = require('params');
 
 const ipfsTasksFactory = ({
     ipfs = ipfsDefault({}),
     fs = fsDefault,
     params = paramsDefault,
+    testing,
 }) => {
     // Declare parameters for all methods to have access to
     const CACHE_DIR = params.CACHE_DIR;
@@ -118,22 +119,21 @@ const ipfsTasksFactory = ({
     };
 
     // Expose auxiliary methods for testing
-    if (params.testing) {
-        return {
-            parseResHash,
-            validateIpfsHash,
-            isfileHashValid,
-            downloadHandler,
-            download,
-            cat,
-        };
+    const auxMethods = {
+        parseResHash,
+        validateIpfsHash,
+        isfileHashValid,
+        downloadHandler,
+    };
     // Expose main methods for production
-    } else {
-        return {
-            download,
-            cat,
-        };
-    }
+    const mainMethods = {
+        download,
+        cat,
+    };
+    return Object.assign(
+        mainMethods,
+        testing ? auxMethods : {}
+    );
 };
 
 module.exports = ipfsTasksFactory;

@@ -1,16 +1,28 @@
 const fs = require('fs');
-const getPath = require('../utils/getPath');
-const shellSync = require('../utils/shell');
-const parse = require('../utils/parse');
-const logUI = require('../utils/logUI');
+const getPath = require('utils/getPath');
+const shellSync = require('utils/shell');
+const parse = require('utils/parse');
+const logUI = require('utils/logUI');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
 // CALL DOCUMENTATION:
-// > result = {}
+// > kwargs: {
+//     id,
+//     deleteVolumes,
+//     logId
+//   }
+// > result: empty = {}
 
-function createRemovePackage(params,
-  // default option passed to allow testing
-  docker) {
-  return async function removePackage({id, deleteVolumes = false, logId}) {
+function createRemovePackage({
+  params = paramsDefault,
+  docker = dockerDefault,
+}) {
+  const removePackage = async ({
+    id,
+    deleteVolumes = false,
+    logId,
+  }) => {
     const packageRepoDir = getPath.packageRepoDir(id, params);
 
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
@@ -43,6 +55,9 @@ function createRemovePackage(params,
       log: true,
     };
   };
+
+  // Expose main method
+  return removePackage;
 }
 
 async function closePorts(dockerComposePath, docker) {

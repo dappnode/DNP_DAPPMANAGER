@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const logs = require('../logs.js')(module);
+const logs = require('logs.js')(module);
 
 function packageReq(packageReq) {
   if (!packageReq) throw Error('VALIDATION ERROR: packageReq is undefined');

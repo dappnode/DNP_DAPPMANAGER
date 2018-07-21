@@ -1,10 +1,12 @@
 const fs = require('fs');
-const dockerListDefault = require('../modules/dockerList');
-const getPath = require('../utils/getPath');
-const parse = require('../utils/parse');
+const dockerListDefault = require('modules/dockerList');
+const getPath = require('utils/getPath');
+const parse = require('utils/parse');
+const paramsDefault = require('params');
 
 // CALL DOCUMENTATION:
-// > result = dnpList =
+// > kwargs: {}
+// > result: dnpList =
 //   [
 //     {
 //       id: '9238523572017423619487623894', (string)
@@ -23,10 +25,11 @@ const parse = require('../utils/parse');
 //     ...
 //   ]
 
-function createListPackages(params,
-  // default option passed to allow testing
-  dockerList=dockerListDefault) {
-  return async function listPackages() {
+function createListPackages({
+  params = paramsDefault,
+  dockerList=dockerListDefault,
+}) {
+  const listPackages = async () => {
     let dnpList = await dockerList.listContainers();
 
 
@@ -55,6 +58,9 @@ function createListPackages(params,
       logMessage: true,
     };
   };
+
+  // Expose main method
+  return listPackages;
 }
 
 
