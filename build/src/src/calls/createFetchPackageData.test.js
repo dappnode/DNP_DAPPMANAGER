@@ -1,11 +1,11 @@
 const chai = require('chai');
 const expect = require('chai').expect;
-const createGetPackageData = require('calls/createGetPackageData');
+const createFetchPackageData = require('calls/createFetchPackageData');
 const fs = require('fs');
 
 chai.should();
 
-describe('Call function: createGetPackageData', function() {
+describe('Call function: createFetchPackageData', function() {
     // This function gets the manifest of a package,
     // and then gets the avatar refered in the manifest if any
     // Finally returns this data objectified
@@ -25,19 +25,19 @@ describe('Call function: createGetPackageData', function() {
     CACHE_DIR: testDirectory,
   };
 
-  const getPackageData = createGetPackageData({
+  const fetchPackageData = createFetchPackageData({
     getManifest: getManifestMock,
     ipfs: ipfsMock,
     params: paramsMock,
   });
 
-  describe('Call function createGetPackageData', function() {
+  describe('Call function createFetchPackageData', function() {
     before(() => {
         fs.writeFileSync(testDirectory + avatarHash, 'data');
     });
 
     it('should return success message and the package data', async () => {
-      let res = await getPackageData({id: packageName});
+      let res = await fetchPackageData({id: packageName});
       expect( res ).to.be.ok;
       expect( res ).to.have.property('message');
       expect( res ).to.have.property('result');

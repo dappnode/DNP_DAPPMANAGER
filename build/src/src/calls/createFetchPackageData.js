@@ -12,7 +12,7 @@ const ipfsDefault = require('modules/ipfs');
 //     manifest,
 //   }
 
-function createGetPackageData({
+function createFetchPackageData({
   getManifest,
   ipfs = ipfsDefault,
   params = paramsDefault,
@@ -21,7 +21,7 @@ function createGetPackageData({
   const CACHE_DIR = params.CACHE_DIR;
 
   // Return main method
-  const getPackageData = async ({
+  const fetchPackageData = async ({
     id,
   }) => {
     const packageReq = parse.packageReq(id);
@@ -59,8 +59,8 @@ function createGetPackageData({
   };
 
   // Expose main method
-  return getPackageData;
+  return fetchPackageData;
 }
 
 
-module.exports = createGetPackageData;
+module.exports = createFetchPackageData;

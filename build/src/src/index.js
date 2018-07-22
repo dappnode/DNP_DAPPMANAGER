@@ -11,11 +11,11 @@ const createTogglePackage = require('calls/createTogglePackage');
 const createRestartPackage = require('calls/createRestartPackage');
 const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
 const createLogPackage = require('calls/createLogPackage');
-const createListPackages = require('calls/createListPackages');
-const createListDirectory = require('calls/createListDirectory');
-const createFetchPackageVersions = require('calls/createFetchPackageVersions');
-const createGetPackageData = require('calls/createGetPackageData');
 const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
+const createListPackages = require('calls/createListPackages');
+const createFetchDirectory = require('calls/createFetchDirectory');
+const createFetchPackageVersions = require('calls/createFetchPackageVersions');
+const createFetchPackageData = require('calls/createFetchPackageData');
 
 // import dependencies
 const params = require('params');
@@ -44,10 +44,10 @@ const restartPackage = createRestartPackage({});
 const restartPackageVolumes = createRestartPackageVolumes({});
 const logPackage = createLogPackage({});
 const listPackages = createListPackages({}); // Needs work
-const listDirectory = createListDirectory({getDirectory});
+const fetchDirectory = createFetchDirectory({getDirectory});
 const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
 const updatePackageEnv = createUpdatePackageEnv({});
-const getPackageData = createGetPackageData({getManifest});
+const fetchPackageData = createFetchPackageData({getManifest});
 
 // /////////////////////////////
 // Connection helper functions
@@ -109,11 +109,11 @@ connection.onopen = (session, details) => {
     register(session, 'restartPackage.dappmanager.dnp.dappnode.eth', restartPackage);
     register(session, 'restartPackageVolumes.dappmanager.dnp.dappnode.eth', restartPackageVolumes);
     register(session, 'logPackage.dappmanager.dnp.dappnode.eth', logPackage);
-    register(session, 'listPackages.dappmanager.dnp.dappnode.eth', listPackages);
-    register(session, 'listDirectory.dappmanager.dnp.dappnode.eth', listDirectory);
-    register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
     register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv);
-    register(session, 'getPackageData.dappmanager.dnp.dappnode.eth', getPackageData);
+    register(session, 'listPackages.dappmanager.dnp.dappnode.eth', listPackages);
+    register(session, 'fetchDirectory.dappmanager.dnp.dappnode.eth', fetchDirectory);
+    register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
+    register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
 
     eventBus.on(eventBusTag.call, (call, args) => {
       session.call(call, args)

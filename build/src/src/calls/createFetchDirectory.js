@@ -12,11 +12,11 @@ const dockerListDefault = require('modules/dockerList');
 //     ...
 //   ]
 
-function createListDirectory({
+function createFetchDirectory({
   getDirectory,
   dockerList = dockerListDefault,
 }) {
-  const listDirectory = async () => {
+  const fetchDirectory = async () => {
     // Make sure the chain is synced
     // if (await ethchain.isSyncing()) {
     //   return res.success('Mainnet is syncing', []);
@@ -51,8 +51,8 @@ function createListDirectory({
   };
 
   // Expose main method
-  return listDirectory;
+  return fetchDirectory;
 }
 
 
-module.exports = createListDirectory;
+module.exports = createFetchDirectory;
