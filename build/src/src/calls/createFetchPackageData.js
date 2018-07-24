@@ -1,27 +1,29 @@
 const base64Img = require('base64-img');
-const dockerListDefault = require('../modules/dockerList');
-const parse = require('../utils/parse');
-const logs = require('../logs.js')(module);
+const parse = require('utils/parse');
+const logs = require('logs.js')(module);
+const paramsDefault = require('params');
+const ipfsDefault = require('modules/ipfs');
 
 // CALL DOCUMENTATION:
-// > result = packages =
-//   [
-//     {
-//       name: packageName, (string)
-//       status: 'Preparing', (string)
-//       manifest: <Manifest>, (object)
-//       tag: 'Instaled', (string)
-//       avatar: <base64Img>, (string)
-//       avatarHash: <IPFS hash> (string)
-//     },
-//     ...
-//   ]
+// > kwargs: id
+// > result: packageData =
+//   {
+//     avatar,
+//     manifest,
+//   }
 
-function createGetPackageData(
+function createFetchPackageData({
   getManifest,
-  ipfs,
-  dockerList=dockerListDefault) {
-  return async function getPackageData({id}) {
+  ipfs = ipfsDefault,
+  params = paramsDefault,
+}) {
+  // Declare parameters for method to have access to
+  const CACHE_DIR = params.CACHE_DIR;
+
+  // Return main method
+  const fetchPackageData = async ({
+    id,
+  }) => {
     const packageReq = parse.packageReq(id);
 
     // Make sure the chain is synced
@@ -40,7 +42,7 @@ function createGetPackageData(
     if (avatarHash) {
       try {
         await ipfs.cat(avatarHash);
-        avatar = base64Img.base64Sync('cache/'+avatarHash);
+        avatar = base64Img.base64Sync(CACHE_DIR + avatarHash);
       } catch (e) {
         // If the avatar can not be fetched don't crash
         logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
@@ -55,7 +57,10 @@ function createGetPackageData(
       },
     };
   };
+
+  // Expose main method
+  return fetchPackageData;
 }
 
 
-module.exports = createGetPackageData;
+module.exports = createFetchPackageData;

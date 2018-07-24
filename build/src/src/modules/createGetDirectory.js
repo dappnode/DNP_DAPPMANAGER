@@ -1,8 +1,14 @@
-const logs = require('../logs.js')(module);
-const directoryContract = require('../contracts/directory.json');
-const DAppNodePackageStatus = ['Preparing', 'Develop', 'Active', 'Deprecated', 'Deleted'];
+const logs = require('logs.js')(module);
+const directoryContract = require('contracts/directory.json');
+const web3Default = require('./web3Setup');
 
-function createGetDirectory(web3) {
+function createGetDirectory({
+  web3 = web3Default({}),
+}) {
+  // Contract parameters
+  const DAppNodePackageStatus = ['Preparing', 'Develop', 'Active', 'Deprecated', 'Deleted'];
+
+  // Main method
   return async function getDirectory() {
     // Expects no input
     // Return an array of objects:

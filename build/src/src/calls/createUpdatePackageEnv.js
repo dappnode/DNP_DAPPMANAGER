@@ -1,13 +1,24 @@
 const fs = require('fs');
-const parse = require('../utils/parse');
-const getPath = require('../utils/getPath');
-const validate = require('../utils/validate');
-const res = require('../utils/res');
+const parse = require('utils/parse');
+const getPath = require('utils/getPath');
+const validate = require('utils/validate');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
+// CALL DOCUMENTATION:
+// > kwargs: id
+// > result: empty = {}
 
-// default option passed to allow testing
-function createUpdatePackageEnv(params, docker) {
-  return async function updatePackageEnv({id, envs, isCORE = false, restart}) {
+function createUpdatePackageEnv({
+  params = paramsDefault,
+  docker = dockerDefault,
+}) {
+  const updatePackageEnv = async ({
+    id,
+    envs,
+    isCORE = false,
+    restart,
+  }) => {
     id = parse.packageReq(id).name; // parsing anyway for safety
     const envFilePath = getPath.envFileSmart(id, params, isCORE);
 
@@ -18,7 +29,10 @@ function createUpdatePackageEnv(params, docker) {
     );
 
     if (!restart) {
-      return res.success('Updated envs of ' + id, {}, true);
+      return {
+        message: 'Updated envs of ' + id,
+        log: true,
+      };
     }
 
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
@@ -38,6 +52,9 @@ function createUpdatePackageEnv(params, docker) {
       log: true,
     };
   };
+
+  // Expose main method
+  return updatePackageEnv;
 }
 
 

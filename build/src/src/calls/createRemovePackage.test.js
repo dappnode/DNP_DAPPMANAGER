@@ -1,9 +1,9 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const createRemovePackage = require('./createRemovePackage');
-const getPath = require('../utils/getPath');
-const validate = require('../utils/validate');
+const createRemovePackage = require('calls/createRemovePackage');
+const getPath = require('utils/getPath');
+const validate = require('utils/validate');
 
 chai.should();
 
@@ -35,7 +35,10 @@ function mockTest() {
     },
   };
 
-  const removePackage = createRemovePackage(params, dockerMock);
+  const removePackage = createRemovePackage({
+    params,
+    docker: dockerMock,
+  });
 
   before(() => {
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);

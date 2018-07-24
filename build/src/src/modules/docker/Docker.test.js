@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
-const {createDocker} = require('./Docker');
+const dockerFactory = require('./Docker');
 const dockerUtils = require('./dockerUtils');
 
 describe('docker calls', function() {
@@ -18,7 +18,7 @@ function argumentTest() {
     const imagePath = './myImage';
     const execSpy = sinon.spy();
 
-    const docker = createDocker(execSpy);
+    const docker = dockerFactory(execSpy);
 
     it('.up should call docker/compose with correct arguments', () => {
       docker.compose.up(packageName);

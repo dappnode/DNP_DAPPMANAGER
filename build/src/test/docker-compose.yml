@@ -1,5 +1,0 @@
-version: '3.4'
-services:
-    otpweb.dnp.dappnode.eth:
-        image: 'chentex/random-logger:latest'
-        container_name: DNP_DAPPMANAGER_TEST_CONTAINER

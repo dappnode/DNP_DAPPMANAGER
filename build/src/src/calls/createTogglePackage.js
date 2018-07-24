@@ -1,37 +1,34 @@
-const fs = require('fs');
-const {containerStateFromPs} = require('../utils/dockerUtils');
-const getPath = require('../utils/getPath');
+const getPath = require('utils/getPath');
+const parse = require('utils/parse');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
 // CALL DOCUMENTATION:
-// > result = {}
+// > kwargs: id
+// > result: empty = {}
 
-function createTogglePackage(params,
-  // default option passed to allow testing
-  docker) {
-  return async function togglePackage({id, timeout = 10}) {
+function createTogglePackage({
+  params = paramsDefault,
+  docker = dockerDefault,
+}) {
+  const togglePackage = async ({
+    id,
+    timeout = 10,
+  }) => {
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
-    if (!fs.existsSync(dockerComposePath)) {
-      throw Error('No docker-compose found: ' + dockerComposePath);
-    }
+    // This parse utility already throws if no docker-compose found
+    let containerName = parse.containerName(dockerComposePath);
 
-    let packageState = containerStateFromPs(
-      await docker.compose.ps(dockerComposePath),
-      id
-    );
+    let packageState = await docker.status(containerName);
 
     // docker-compose states my contain extra info, i.e. Exit (137), Up (healthy)
-    switch (packageState.split(' ')[0]) {
-      case 'Up':
+    switch (packageState.split(' ')[0].trim()) {
+      case 'running':
         await docker.compose.stop(dockerComposePath, {timeout});
         break;
-
-      case 'Exit':
+      case 'exited':
         await docker.compose.start(dockerComposePath);
         break;
-
-      case 'Down':
-        throw Error('Package ' + id + ' is down, state: ' + packageState);
-
       default:
         throw Error('Unkown state: ' + packageState + ', for package: ' + id);
     }
@@ -41,6 +38,9 @@ function createTogglePackage(params,
       log: true,
     };
   };
+
+  // Expose main method
+  return togglePackage;
 }
 
 

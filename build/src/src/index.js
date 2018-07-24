@@ -1,59 +1,53 @@
 'use strict';
 // node modules
 const autobahn = require('autobahn');
-const {eventBus, eventBusTag} = require('./eventBus');
-const logs = require('./logs.js')(module);
+const {eventBus, eventBusTag} = require('eventBus');
+const logs = require('logs.js')(module);
 
 // import calls
-const createInstallPackage = require('./calls/createInstallPackage');
-const createRemovePackage = require('./calls/createRemovePackage');
-const createTogglePackage = require('./calls/createTogglePackage');
-const createRestartPackage = require('./calls/createRestartPackage');
-const createRestartPackageVolumes = require('./calls/createRestartPackageVolumes');
-const createLogPackage = require('./calls/createLogPackage');
-const createListPackages = require('./calls/createListPackages');
-const createListDirectory = require('./calls/createListDirectory');
-const {createFetchPackageInfo} = require('./calls/createFetchPackageInfo');
-const createGetPackageData = require('./calls/createGetPackageData');
-const createUpdatePackageEnv = require('./calls/createUpdatePackageEnv');
+const createInstallPackage = require('calls/createInstallPackage');
+const createRemovePackage = require('calls/createRemovePackage');
+const createTogglePackage = require('calls/createTogglePackage');
+const createRestartPackage = require('calls/createRestartPackage');
+const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
+const createLogPackage = require('calls/createLogPackage');
+const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
+const createListPackages = require('calls/createListPackages');
+const createFetchDirectory = require('calls/createFetchDirectory');
+const createFetchPackageVersions = require('calls/createFetchPackageVersions');
+const createFetchPackageData = require('calls/createFetchPackageData');
 
 // import dependencies
-const params = require('./params');
-const {createDocker} = require('./utils/Docker');
-const pkg = require('./utils/packages');
-const createGetManifest = require('./utils/getManifest');
-const dependencies = require('./utils/dependencies');
-const createAPM = require('./modules/apm');
-const ipfsFactory = require('./modules/ipfs');
-const web3Setup = require('./modules/web3Setup');
-const createGetDirectory = require('./modules/createGetDirectory');
+const params = require('params');
+const pkg = require('utils/packages');
+const createGetManifest = require('utils/getManifest');
+const dependencies = require('utils/dependencies');
+const apmFactory = require('modules/apm');
+const createGetDirectory = require('modules/createGetDirectory');
 
 // Initialize watchers
 // require('./watchers');
 
 // initialize dependencies (by order)
-const web3 = web3Setup(params); // <-- web3
-const ipfs = ipfsFactory({}); // <-- ipfs
-const apm = createAPM(web3);
-const getDirectory = createGetDirectory(web3);
-const getManifest = createGetManifest(apm, ipfs);
-const docker = createDocker();
-const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-const download = pkg.downloadFactory({params, ipfs, docker});
-const run = pkg.runFactory({params, docker});
+const apm = apmFactory({});
+const getDirectory = createGetDirectory({});
+const getManifest = createGetManifest({apm});
+const getAllDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
+const download = pkg.downloadFactory({});
+const run = pkg.runFactory({});
 
 // Initialize calls
-const installPackage = createInstallPackage(getDependencies, download, run);
-const removePackage = createRemovePackage(params, docker);
-const togglePackage = createTogglePackage(params, docker);
-const restartPackage = createRestartPackage(params, docker);
-const restartPackageVolumes = createRestartPackageVolumes(params, docker);
-const logPackage = createLogPackage(params, docker);
-const listPackages = createListPackages(params); // Needs work
-const listDirectory = createListDirectory(getDirectory);
-const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
-const updatePackageEnv = createUpdatePackageEnv(params, docker);
-const getPackageData = createGetPackageData(getManifest, ipfs);
+const installPackage = createInstallPackage({getAllDependencies, download, run});
+const removePackage = createRemovePackage({});
+const togglePackage = createTogglePackage({});
+const restartPackage = createRestartPackage({});
+const restartPackageVolumes = createRestartPackageVolumes({});
+const logPackage = createLogPackage({});
+const listPackages = createListPackages({}); // Needs work
+const fetchDirectory = createFetchDirectory({getDirectory});
+const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
+const updatePackageEnv = createUpdatePackageEnv({});
+const fetchPackageData = createFetchPackageData({getManifest});
 
 // /////////////////////////////
 // Connection helper functions
@@ -79,7 +73,7 @@ const register = (session, event, handler) => {
           result: res.result || {},
         });
       } catch (err) {
-        logs.error(err);
+        logs.error(' Event: '+event+' Stack: '+err.stack);
         return JSON.stringify({
           success: false,
           message: err.message,
@@ -109,18 +103,17 @@ connection.onopen = (session, details) => {
       '\n   session ID: '+details.authid);
 
     register(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
-    register(session, 'greet.dappmanager.dnp.dappnode.eth', () => 'Hello from the dappmanager');
     register(session, 'installPackage.dappmanager.dnp.dappnode.eth', installPackage);
     register(session, 'removePackage.dappmanager.dnp.dappnode.eth', removePackage);
     register(session, 'togglePackage.dappmanager.dnp.dappnode.eth', togglePackage);
     register(session, 'restartPackage.dappmanager.dnp.dappnode.eth', restartPackage);
     register(session, 'restartPackageVolumes.dappmanager.dnp.dappnode.eth', restartPackageVolumes);
     register(session, 'logPackage.dappmanager.dnp.dappnode.eth', logPackage);
-    register(session, 'listPackages.dappmanager.dnp.dappnode.eth', listPackages);
-    register(session, 'listDirectory.dappmanager.dnp.dappnode.eth', listDirectory);
-    register(session, 'fetchPackageInfo.dappmanager.dnp.dappnode.eth', fetchPackageInfo);
     register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv);
-    register(session, 'getPackageData.dappmanager.dnp.dappnode.eth', getPackageData);
+    register(session, 'listPackages.dappmanager.dnp.dappnode.eth', listPackages);
+    register(session, 'fetchDirectory.dappmanager.dnp.dappnode.eth', fetchDirectory);
+    register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
+    register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
 
     eventBus.on(eventBusTag.call, (call, args) => {
       session.call(call, args)

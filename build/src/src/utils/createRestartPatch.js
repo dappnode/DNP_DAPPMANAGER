@@ -1,7 +1,7 @@
 const fs = require('fs');
-const getPath = require('./getPath');
-const validate = require('./validate');
-const dockerList = require('../modules/dockerList');
+const getPath = require('utils/getPath');
+const validate = require('utils/validate');
+const dockerList = require('modules/dockerList');
 
 
 function createRestartPatch(params, docker) {
