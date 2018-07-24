@@ -1,7 +1,7 @@
 'use strict';
 // node modules
 const autobahn = require('autobahn');
-const {eventBus, eventBusTag} = require('./eventBus');
+const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
 
 // import calls
