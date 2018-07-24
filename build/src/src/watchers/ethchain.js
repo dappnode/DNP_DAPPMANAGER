@@ -1,7 +1,7 @@
-const {eventBus, eventBusTag} = require('../eventBus');
+const {eventBus, eventBusTag} = require('eventBus');
 const fs = require('fs');
 const linearRegression = require('simple-statistics').linearRegression;
-const logs = require('../logs.js')(module);
+const logs = require('logs.js')(module);
 // import the actual Api class
 const Api = require('@parity/api');
 

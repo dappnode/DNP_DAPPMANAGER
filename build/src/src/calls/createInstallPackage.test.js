@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const createInstallPackage = require('./createInstallPackage');
+const createInstallPackage = require('calls/createInstallPackage');
 
 chai.should();
 
@@ -15,23 +15,24 @@ function mockTest() {
   const PACKAGE_NAME = 'packageA';
   // Create Mocks
   const downloadPackagesSpy = sinon.spy();
-  const downloadPackagesMock = async (packageList) => {
+  const downloadMock = async (packageList) => {
     downloadPackagesSpy(packageList);
   };
   const runPackagesSpy = sinon.spy();
-  const runPackagesMock = async (packageList) => {
+  const runMock = async (packageList) => {
     runPackagesSpy(packageList);
   };
   const getAllDependenciesResolvedOrderedSpy = sinon.spy();
-  const getAllDependenciesResolvedOrderedMock = async (packageReq) => {
+  const getAllDependenciesMock = async (packageReq) => {
     getAllDependenciesResolvedOrderedSpy(packageReq);
     return packageList;
   };
 
-  const installPackage = createInstallPackage(getAllDependenciesResolvedOrderedMock,
-    downloadPackagesMock,
-    runPackagesMock
-  );
+  const installPackage = createInstallPackage({
+    getAllDependencies: getAllDependenciesMock,
+    download: downloadMock,
+    run: runMock,
+  });
 
   let res;
 

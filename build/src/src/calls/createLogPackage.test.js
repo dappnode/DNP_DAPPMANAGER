@@ -1,9 +1,9 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const createLogPackage = require('./createLogPackage');
-const getPath = require('../utils/getPath');
-const validate = require('../utils/validate');
+const createLogPackage = require('calls/createLogPackage');
+const getPath = require('utils/getPath');
+const validate = require('utils/validate');
 
 chai.should();
 
@@ -35,7 +35,10 @@ function mockTest() {
       },
     };
 
-    const logPackage = createLogPackage(params, dockerMock);
+    const logPackage = createLogPackage({
+      params,
+      docker: dockerMock,
+    });
 
     before(() => {
       const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);

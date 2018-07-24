@@ -1,32 +1,32 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const shell = require('../utils/shell');
-const logs = require('../logs.js')(module);
+const shell = require('utils/shell');
+const logs = require('logs.js')(module);
 
 chai.should();
 
 describe.skip('Full integration test with REAL docker: ', function() {
   // import calls
-  const createInstallPackage = require('./createInstallPackage');
-  const createRemovePackage = require('./createRemovePackage');
-  const createTogglePackage = require('./createTogglePackage');
-  const createLogPackage = require('./createLogPackage');
-  const createListPackages = require('./createListPackages');
-  const createListDirectory = require('./createListDirectory');
-  const {createFetchPackageInfo} = require('./createFetchPackageInfo');
-  const createUpdatePackageEnv = require('./createUpdatePackageEnv');
+  const createInstallPackage = require('calls/createInstallPackage');
+  const createRemovePackage = require('calls/createRemovePackage');
+  const createTogglePackage = require('calls/createTogglePackage');
+  const createLogPackage = require('calls/createLogPackage');
+  const createListPackages = require('calls/createListPackages');
+  const createListDirectory = require('calls/createListDirectory');
+  const {createFetchPackageInfo} = require('calls/createFetchPackageInfo');
+  const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
 
   // import dependencies
-  const params = require('../params');
-  const {createDocker} = require('../utils/Docker');
-  const pkg = require('../utils/packages');
-  const createGetManifest = require('../utils/getManifest');
-  const dependencies = require('../utils/dependencies');
-  const createGetDirectory = require('../modules/createGetDirectory');
-  const createAPM = require('../modules/apm');
-  const ipfsFactory = require('../modules/ipfs');
-  const web3Setup = require('../modules/web3Setup');
+  const params = require('params');
+  const {createDocker} = require('utils/Docker');
+  const pkg = require('utils/packages');
+  const createGetManifest = require('utils/getManifest');
+  const dependencies = require('utils/dependencies');
+  const createGetDirectory = require('modules/createGetDirectory');
+  const createAPM = require('modules/apm');
+  const ipfsFactory = require('modules/ipfs');
+  const web3Setup = require('modules/web3Setup');
 
   // initialize dependencies (by order)
   const web3 = web3Setup(params); // <-- web3
@@ -260,7 +260,7 @@ function testRemovePackage(removePackage, args) {
 
 function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
   const PACKAGE_NAME = packageReq;
-  const getPath = require('../utils/getPath');
+  const getPath = require('utils/getPath');
   const envValue = Date.now();
   const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params);
 

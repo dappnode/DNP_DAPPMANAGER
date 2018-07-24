@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
 const yaml = require('yamljs');
-const logs = require('../logs.js')(module);
+const logs = require('logs.js')(module);
 
 chai.should();
 
@@ -36,14 +36,14 @@ describe('Full integration test with mock docker: ', function() {
 
 function integrationTest() {
   // import calls
-  const createInstallPackage = require('./createInstallPackage');
-  const createRemovePackage = require('./createRemovePackage');
-  const createTogglePackage = require('./createTogglePackage');
-  const createLogPackage = require('./createLogPackage');
-  const createListPackages = require('./createListPackages');
-  const createListDirectory = require('./createListDirectory');
-  const {createFetchPackageInfo} = require('./createFetchPackageInfo');
-  const createUpdatePackageEnv = require('./createUpdatePackageEnv');
+  const createInstallPackage = require('calls/createInstallPackage');
+  const createRemovePackage = require('calls/createRemovePackage');
+  const createTogglePackage = require('calls/createTogglePackage');
+  const createLogPackage = require('calls/createLogPackage');
+  const createListPackages = require('calls/createListPackages');
+  const createListDirectory = require('calls/createListDirectory');
+  const {createFetchPackageInfo} = require('calls/createFetchPackageInfo');
+  const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
 
   // Mock key dependencies
   let dockerContainers = [];
@@ -109,16 +109,16 @@ function integrationTest() {
   };
 
   // import dependencies
-  const params = require('../params');
-  const {createDocker} = require('../utils/Docker');
-  const pkg = require('../utils/packages');
-  const createGetManifest = require('../utils/getManifest');
-  const dependencies = require('../utils/dependencies');
-  const createGetDirectory = require('../modules/createGetDirectory');
-  const createAPM = require('../modules/apm');
-  const ipfsCallsFactory = require('../modules/ipfsCalls');
-  const web3Setup = require('../modules/web3Setup');
-  const ipfsSetup = require('../modules/ipfsSetup');
+  const params = require('params');
+  const {createDocker} = require('utils/Docker');
+  const pkg = require('utils/packages');
+  const createGetManifest = require('utils/getManifest');
+  const dependencies = require('utils/dependencies');
+  const createGetDirectory = require('modules/createGetDirectory');
+  const createAPM = require('modules/apm');
+  const ipfsCallsFactory = require('modules/ipfsCalls');
+  const web3Setup = require('modules/web3Setup');
+  const ipfsSetup = require('modules/ipfsSetup');
 
   // customize params:
   params.WEB3HOSTWS = 'wss://mainnet.infura.io/ws';
@@ -282,7 +282,7 @@ function testRemovePackage(removePackage, kwargs) {
 
 function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
   const PACKAGE_NAME = packageReq;
-  const getPath = require('../utils/getPath');
+  const getPath = require('utils/getPath');
   const envValue = Date.now();
   const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params);
   const kwargs = {

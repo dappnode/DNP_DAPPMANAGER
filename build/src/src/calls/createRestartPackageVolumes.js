@@ -1,15 +1,20 @@
 const fs = require('fs');
-const getPath = require('../utils/getPath');
-const res = require('../utils/res');
-const parse = require('../utils/parse');
+const getPath = require('utils/getPath');
+const parseDefault = require('utils/parse');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
 // CALL DOCUMENTATION:
 // > result = logs = <String with escape codes> (string)
 
-function createRestartPackageVolumes(params,
-  // default option passed to allow testing
-  docker) {
-  return async function restartPackageVolumes({id}) {
+function createRestartPackageVolumes({
+  params = paramsDefault,
+  docker = dockerDefault,
+  parse = parseDefault,
+}) {
+  return async function restartPackageVolumes({
+    id,
+  }) {
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
     if (!fs.existsSync(dockerComposePath)) {
       throw Error('No docker-compose found: ' + dockerComposePath);
@@ -22,7 +27,11 @@ function createRestartPackageVolumes(params,
     const packageVolumes = parse.serviceVolumes(dockerComposePath, id);
 
     // If there are no volumes don't do anything
-    if (!packageVolumes.length) return res.success(id+' has no volumes ');
+    if (!packageVolumes.length) {
+      return {
+        message: id+' has no volumes ',
+      };
+    }
 
     // Remove volumes
     await docker.compose.rm(dockerComposePath, {v: true});

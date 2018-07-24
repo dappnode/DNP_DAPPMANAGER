@@ -1,17 +1,24 @@
 const fs = require('fs');
-const getPath = require('../utils/getPath');
-const createRestartPatch = require('../utils/createRestartPatch');
+const getPath = require('utils/getPath');
+const createRestartPatch = require('utils/createRestartPatch');
+const paramsDefault = require('params');
+const dockerDefault = require('modules/docker');
 
 // CALL DOCUMENTATION:
-// > result = logs = <String with escape codes> (string)
+// > kwargs: id
+// > result: empty = {}
 
-function createRestartPackage(params,
-  // default option passed to allow testing
-  docker) {
+function createRestartPackage({
+  params = paramsDefault,
+  docker = dockerDefault,
+}) {
   // patch to prevent installer from crashing
   const restartPatch = createRestartPatch(params, docker);
 
-  return async function restartPackage({id}) {
+  // Declare main method
+  const restartPackage = async ({
+    id,
+  }) => {
     const dockerComposePath = getPath.dockerComposeSmart(id, params);
     if (!fs.existsSync(dockerComposePath)) {
       throw Error('No docker-compose found: ' + dockerComposePath);
@@ -29,6 +36,9 @@ function createRestartPackage(params,
       logMessage: true,
     };
   };
+
+  // Expose main method
+  return restartPackage;
 }
 
 

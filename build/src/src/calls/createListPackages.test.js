@@ -2,9 +2,9 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const shell = require('shelljs');
 const fs = require('fs');
-const getPath = require('../utils/getPath');
-const {stringifyEnvs} = require('../utils/parse');
-const createListPackages = require('./createListPackages');
+const getPath = require('utils/getPath');
+const {stringifyEnvs} = require('utils/parse');
+const createListPackages = require('calls/createListPackages');
 
 chai.should();
 
@@ -40,7 +40,10 @@ function mockTest() {
   };
 
   // initialize call
-  const listPackage = createListPackages(params, dockerCalls);
+  const listPackage = createListPackages({
+    params,
+    dockerList: dockerCalls,
+  });
 
   before(() => {
     // Write mock data on the test folder

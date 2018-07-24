@@ -4,7 +4,7 @@ const shellExecSync = require('./shell');
 
 describe('Util: shell', function() {
   it('should return an error when cating a non-existing file', async () => {
-    let res = await shellExecSync('cat package.json');
+    let res = await shellExecSync('cat package.json', true);
     expect(res)
       .to.include('"dependencies": {');
   });
@@ -12,7 +12,7 @@ describe('Util: shell', function() {
   it('should return the content of a file when cating', async () => {
     let error = '--- shellExecSync did not throw ---';
     try {
-      await shellExecSync('cat jfnakjsdfnodfu9sadf');
+      await shellExecSync('cat jfnakjsdfnodfu9sadf', true);
     } catch (e) {
       error = e.message;
     }
