@@ -1,5 +1,5 @@
 const semver = require('semver');
-const {highestVersion} = require('utils/versions');
+const versions = require('utils/versions');
 const validate = require('utils/validate');
 const {orderDependencies} = require('utils/orderDependencies');
 const dockerListDefault = require('modules/dockerList');
@@ -73,13 +73,13 @@ async function getAllResolved(packageReq, getManifest) {
   //   ...
   //   ]
 
-  let dependencyList = await getAll(packageReq, getManifest);
-  // The dependecy list may contain the same package with different versions
-  return resolveConflictingVersions(dependencyList);
+  // getAll resolves dependencies, prevents duplication and ignores circular dependencies
+  let dependencies = await getAll(packageReq, getManifest);
+  return dependencies;
 }
 
 
-async function getAll(packageReq, getManifest, packageList=[]) {
+async function getAll(packageReq, getManifest, dependencies={}) {
   // Parse request
 
 
@@ -108,22 +108,6 @@ async function getAll(packageReq, getManifest, packageList=[]) {
     packageReq.name = manifest.name;
   }
 
-  // Using a for loop instead of map or forEach to avoid hiding this code
-  // and its errors inside a different function
-  for (const depName of Object.getOwnPropertyNames(depObject)) {
-    // Prevent dependency loops
-    if (packageReq.name == depName) {
-      throw Error('DEPENDENCY LOOP FOUND, successfully prevented');
-    }
-
-    // Fetch subdependencies of the dependencies
-    let subDepReq = {
-      name: depName,
-      ver: depObject[depName],
-    };
-    await getAll(subDepReq, getManifest, packageList);
-  }
-
   // Add dep to the packageList
   const packageReturnObject = {
     name: packageReq.name,
@@ -133,8 +117,33 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   };
   if (allowCORE) packageReturnObject.allowCORE = allowCORE;
 
-  packageList.push(packageReturnObject);
-  return packageList;
+  dependencies[packageReq.name] = packageReturnObject;
+
+  // Using a for loop instead of map or forEach to avoid hiding this code
+  // and its errors inside a different function
+  for (const depName of Object.getOwnPropertyNames(depObject)) {
+    const depVersion = depObject[depName];
+
+
+    // Verify that the dependency is not already in the loop
+    if (
+      // Either the dependency hasn't been fetched yet
+      !dependencies.hasOwnProperty(depName)
+      || (
+        // or the requested version is higher than the stored
+        dependencies.hasOwnProperty(depName)
+        && versions.isHigher(depVersion, dependencies[depName].ver)
+      )
+    ) {
+      // Fetch subdependencies of the dependencies
+      let subDepReq = {
+        name: depName,
+        ver: depVersion,
+      };
+      await getAll(subDepReq, getManifest, dependencies);
+    }
+  }
+  return dependencies;
 }
 
 
@@ -142,7 +151,7 @@ function resolveConflictingVersions(dependencyList) {
   let highestDepVer = {};
   dependencyList.map((dep) => {
     // Keep rewritting the highest version on the object
-    highestDepVer[dep.name] = highestVersion(dep.ver, highestDepVer[dep.name]);
+    highestDepVer[dep.name] = versions.highestVersion(dep.ver, highestDepVer[dep.name]);
   });
 
   // highestDependencyVersion contains a unique list of dep names

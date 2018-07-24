@@ -20,6 +20,16 @@ describe('Util: get dependencies', () => {
     packageE: {
       packageE: 'latest',
     },
+    dappmanager: {
+      admin: 'latest',
+    },
+    vpn: {
+      admin: 'latest',
+    },
+    admin: {
+      vpn: 'latest',
+      dappmanager: 'latest',
+    },
   };
 
   async function getManifestMock(packageReq) {
@@ -58,22 +68,22 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
       // B should appear 1 time, C 1 time
-      const expectedResult = [].concat(
-        Array(1).fill({
+      const expectedResult = {
+        packageB: {
           name: 'packageB', ver: 'latest',
           dep: dependencyObjectMock.packageB,
           manifest: await getManifestMock({name: 'packageB'}),
-        }),
-        Array(1).fill({
+        },
+        packageC: {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
-        })
-      );
+        },
+      };
       let res = await dependencies.getAll(packageReq, getManifestMock);
 
       // sorting object because deep equal and include is buggy sometimes
-      res = res.sort(dependencies.sortByNameKey);
+      // res = res.sort(dependencies.sortByNameKey);
 
       expect( res )
         .to.deep.equal( expectedResult );
@@ -85,33 +95,32 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
       // A should appear 1 time, B 2 times, C 4 times, D 1 time
-      const expectedResult = [].concat(
-        Array(1).fill({
+      const expectedResult = {
+        packageA: {
           name: 'packageA', ver: 'latest',
           dep: dependencyObjectMock.packageA,
           manifest: await getManifestMock({name: 'packageA'}),
-        }),
-        Array(2).fill({
+        },
+        packageB: {
           name: 'packageB', ver: 'latest',
           dep: dependencyObjectMock.packageB,
           manifest: await getManifestMock({name: 'packageB'}),
-        }),
-        Array(4).fill({
+        },
+        packageC: {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
-        }),
-        Array(1).fill({
+        },
+        packageD: {
           name: 'packageD', ver: 'latest',
           dep: dependencyObjectMock.packageD,
           manifest: await getManifestMock({name: 'packageD'}),
-        })
-      );
+        },
+      };
 
       let res = await dependencies.getAll(packageReq, getManifestMock);
 
       // sorting object because deep equal and include is buggy sometimes
-      res = res.sort(dependencies.sortByNameKey);
 
       expect( res )
         .to.deep.equal( expectedResult );
@@ -123,187 +132,102 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
 
-      let error = '--- getAll did not throw ---';
-      try {
-        await dependencies.getAll(packageReq, getManifestMock);
-      } catch (e) {
-        error = e.message;
-      }
-      expect(error).to.include('DEPENDENCY LOOP FOUND');
-    });
-  });
+      const expectedResult = {
+        packageE: {
+          name: 'packageE', ver: 'latest',
+          dep: dependencyObjectMock.packageE,
+          manifest: await getManifestMock({name: 'packageE'}),
+        },
+      };
 
-  describe('.resolveConflictingVersions', () => {
-    it('should clean up repeated versions', async () => {
-      const dependecyList = [].concat(
-        Array(3).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-          manifest: await getManifestMock({name: 'packageA'}),
-        })
-      );
-
-      const expectedResult = [].concat(
-        Array(1).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-          manifest: await getManifestMock({name: 'packageA'}),
-        })
-      );
-
-      let res = dependencies.resolveConflictingVersions(dependecyList);
+      let res = await dependencies.getAllResolved(packageReq, getManifestMock);
       expect( res )
         .to.deep.equal( expectedResult );
     });
 
-    it('should return only the highest version', () => {
-      const dependecyList = [
-        {
-          name: 'packageA', ver: '1.2.3',
-          dep: dependencyObjectMock.packageA,
+    it('should resolve circular dependencies requesting dappmanager', async () => {
+      const packageReq = {
+        name: 'dappmanager',
+        ver: 'latest',
+      };
+      const expectedResult = {
+        dappmanager: {
+          name: 'dappmanager', ver: 'latest',
+          dep: dependencyObjectMock.dappmanager,
+          manifest: await getManifestMock({name: 'dappmanager'}),
         },
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
+        vpn: {
+          name: 'vpn', ver: 'latest',
+          dep: dependencyObjectMock.vpn,
+          manifest: await getManifestMock({name: 'vpn'}),
         },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
+        admin: {
+          name: 'admin', ver: 'latest',
+          dep: dependencyObjectMock.admin,
+          manifest: await getManifestMock({name: 'admin'}),
         },
-        {
-          name: 'packageB', ver: '0.0.1',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      };
 
-      const expectedResult = [
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
-        },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      let res = await dependencies.getAll(packageReq, getManifestMock);
 
-      let res = dependencies.resolveConflictingVersions(dependecyList);
-      expect( res )
-        .to.deep.equal( expectedResult );
-    });
-  });
-
-  describe('.resolveConflictingVersions', () => {
-    it('should clean up repeated versions', () => {
-      const dependecyList = [].concat(
-        Array(3).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-        })
-      );
-
-      const expectedResult = [].concat(
-        Array(1).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-        })
-      );
-
-      let res = dependencies.resolveConflictingVersions(dependecyList);
       expect( res )
         .to.deep.equal( expectedResult );
     });
 
-    it('should return only the highest version', () => {
-      const dependecyList = [
-        {
-          name: 'packageA', ver: '1.2.3',
-          dep: dependencyObjectMock.packageA,
+    it('should resolve circular dependencies requesting dappmanager', async () => {
+      const packageReq = {
+        name: 'vpn',
+        ver: 'latest',
+      };
+      const expectedResult = {
+        dappmanager: {
+          name: 'dappmanager', ver: 'latest',
+          dep: dependencyObjectMock.dappmanager,
+          manifest: await getManifestMock({name: 'dappmanager'}),
         },
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
+        vpn: {
+          name: 'vpn', ver: 'latest',
+          dep: dependencyObjectMock.vpn,
+          manifest: await getManifestMock({name: 'vpn'}),
         },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
+        admin: {
+          name: 'admin', ver: 'latest',
+          dep: dependencyObjectMock.admin,
+          manifest: await getManifestMock({name: 'admin'}),
         },
-        {
-          name: 'packageB', ver: '0.0.1',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      };
 
-      const expectedResult = [
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
-        },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      let res = await dependencies.getAll(packageReq, getManifestMock);
 
-      let res = dependencies.resolveConflictingVersions(dependecyList);
-      expect( res )
-        .to.deep.equal( expectedResult );
-    });
-  });
-
-  describe('.resolveConflictingVersions', () => {
-    it('should clean up repeated versions', () => {
-      const dependecyList = [].concat(
-        Array(3).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-        })
-      );
-
-      const expectedResult = [].concat(
-        Array(1).fill({
-          name: 'packageA', ver: 'latest',
-          dep: dependencyObjectMock.packageA,
-        })
-      );
-
-      let res = dependencies.resolveConflictingVersions(dependecyList);
       expect( res )
         .to.deep.equal( expectedResult );
     });
 
-    it('should return only the highest version', () => {
-      const dependecyList = [
-        {
-          name: 'packageA', ver: '1.2.3',
-          dep: dependencyObjectMock.packageA,
+    it('should resolve circular dependencies requesting admin', async () => {
+      const packageReq = {
+        name: 'admin',
+        ver: 'latest',
+      };
+      const expectedResult = {
+        dappmanager: {
+          name: 'dappmanager', ver: 'latest',
+          dep: dependencyObjectMock.dappmanager,
+          manifest: await getManifestMock({name: 'dappmanager'}),
         },
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
+        vpn: {
+          name: 'vpn', ver: 'latest',
+          dep: dependencyObjectMock.vpn,
+          manifest: await getManifestMock({name: 'vpn'}),
         },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
+        admin: {
+          name: 'admin', ver: 'latest',
+          dep: dependencyObjectMock.admin,
+          manifest: await getManifestMock({name: 'admin'}),
         },
-        {
-          name: 'packageB', ver: '0.0.1',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      };
 
-      const expectedResult = [
-        {
-          name: 'packageA', ver: '1.4.2',
-          dep: dependencyObjectMock.packageA,
-        },
-        {
-          name: 'packageB', ver: 'latest',
-          dep: dependencyObjectMock.packageB,
-        },
-      ];
+      let res = await dependencies.getAll(packageReq, getManifestMock);
 
-      let res = dependencies.resolveConflictingVersions(dependecyList);
       expect( res )
         .to.deep.equal( expectedResult );
     });
@@ -316,16 +240,15 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
 
-      const expectedResult = [
-        {
+      const expectedResult = {
+        packageC: {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
         },
-      ];
+      };
 
       let res = await dependencies.getAllResolved(packageReq, getManifestMock);
-      res = res.sort(dependencies.sortByNameKey);
 
       expect( res )
         .to.deep.equal( expectedResult );
@@ -341,31 +264,30 @@ describe('Util: get dependencies', () => {
       dependencyObjectMock.packageA.packageB = '1.2.3';
       dependencyObjectMock.packageD.packageB = '1.4.2';
 
-      const expectedResult = [
-        {
+      const expectedResult = {
+        packageA: {
           name: 'packageA', ver: 'latest',
           dep: dependencyObjectMock.packageA,
           manifest: await getManifestMock({name: 'packageA'}),
         },
-        {
+        packageB: {
           name: 'packageB', ver: '1.4.2',
           dep: dependencyObjectMock.packageB,
           manifest: await getManifestMock({name: 'packageB'}),
         },
-        {
+        packageC: {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
         },
-        {
+        packageD: {
           name: 'packageD', ver: 'latest',
           dep: dependencyObjectMock.packageD,
           manifest: await getManifestMock({name: 'packageD'}),
         },
-      ];
+      };
 
       let res = await dependencies.getAllResolved(packageReq, getManifestMock);
-      res = res.sort(dependencies.sortByNameKey);
 
       expect( res )
         .to.deep.equal( expectedResult );
