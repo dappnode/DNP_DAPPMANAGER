@@ -2,6 +2,25 @@ const expect = require('chai').expect;
 const utils = require('./versions');
 
 describe('Util: versions', () => {
+  describe('.isHigher', () => {
+    it('should 0.0.0 > 0.0.1 = false', () => {
+      expect( utils.isHigher('0.0.0', '0.0.1') )
+        .to.equal( false );
+    });
+    it('should 0.0.1 > 0.0.0 = true', () => {
+      expect( utils.isHigher('0.0.1', '0.0.0') )
+        .to.equal( true );
+    });
+    it('should (undefined = latest = 9.9.9) > 0.0.0 = true', () => {
+      expect( utils.isHigher(undefined, '0.0.1') )
+        .to.equal( true );
+    });
+    it('should (undefined = latest = 9.9.9) > (undefined = latest = 9.9.9) = false', () => {
+      expect( utils.isHigher(undefined, undefined) )
+        .to.equal( false );
+    });
+  });
+
   describe('.highestVersion', () => {
     it('should return the second version', () => {
       expect( utils.highestVersion(null, '1.4.2') )
