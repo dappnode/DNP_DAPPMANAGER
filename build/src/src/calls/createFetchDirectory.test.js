@@ -1,13 +1,13 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const createListDirectory = require('calls/createListDirectory');
+const createFetchDirectory = require('calls/createFetchDirectory');
 const fs = require('fs');
 const dockerList = require('modules/dockerList');
 
 chai.should();
 
-describe('Call function: createListDirectory', function() {
+describe('Call function: createFetchDirectory', function() {
     // This function gets the manifest of a package,
     // and then gets the avatar refered in the manifest if any
     // Finally returns this data objectified
@@ -16,7 +16,7 @@ describe('Call function: createListDirectory', function() {
   const testDirectory = './test/';
 
 
-  describe('Call function createListDirectory', function() {
+  describe('Call function createFetchDirectory', function() {
     before(() => {
         fs.writeFileSync(testDirectory + avatarHash, 'data');
     });
@@ -25,11 +25,11 @@ describe('Call function: createListDirectory', function() {
       sinon.replace(dockerList, 'listContainers', sinon.fake.returns(['pkgA']));
       const getDirectory = sinon.stub();
       getDirectory.resolves(['pkgA']);
-      const listDirectory = createListDirectory({
+      const fetchDirectory = createFetchDirectory({
         getDirectory,
         dockerList,
       });
-      let res = await listDirectory({id: packageName});
+      let res = await fetchDirectory({id: packageName});
       expect( res ).to.be.ok;
       expect( res ).to.have.property('message');
       expect( res ).to.have.property('result');
