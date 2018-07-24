@@ -1,4 +1,4 @@
-const {eventBus, eventBusTag} = require('../eventBus');
+const {eventBus, eventBusTag} = require('eventBus');
 
 function logUI(data) {
     eventBus.emit(eventBusTag.logUI, data);
