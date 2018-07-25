@@ -1,7 +1,6 @@
 const semver = require('semver');
 const versions = require('utils/versions');
 const validate = require('utils/validate');
-const {orderDependencies} = require('utils/orderDependencies');
 const dockerListDefault = require('modules/dockerList');
 const parse = require('utils/parse');
 const logUI = require('utils/logUI');
@@ -17,11 +16,11 @@ function createGetAllResolvedOrdered(getManifest,
     logUI({logId, clear: true, msg: 'fetching dependencies...'});
     let allResolvedDeps = await getAllResolved(packageReq, getManifest);
     // Dependencies will be ordered so they can be installed in series
-    let allResolvedOrdered = orderDependencies(allResolvedDeps);
-    logUI({logId, order: allResolvedOrdered.map((p) => p.name)});
+    // let allResolvedOrdered = orderDependencies(allResolvedDeps);
+    logUI({logId, order: allResolvedDeps.map((p) => p.name)});
 
     // Check which dependencies should be installed
-    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, logId);
+    let allResolvedOrderedChecked = await shouldInstall(allResolvedDeps, dockerList, logId);
     return allResolvedOrderedChecked;
   };
 }
@@ -75,7 +74,20 @@ async function getAllResolved(packageReq, getManifest) {
 
   // getAll resolves dependencies, prevents duplication and ignores circular dependencies
   let dependencies = await getAll(packageReq, getManifest);
-  return dependencies;
+  // getAll will return an object:
+  // dependencies = {
+  //   packageA: {
+  //     name: 'packageA',
+  //     ver: '0.0.1',
+  //     dep: {
+  //       packageB: '0.0.2'
+  //     }
+  //   },
+  //   ...
+  // }
+
+  // You need to return an array:
+  return Object.values(dependencies);
 }
 
 
@@ -108,7 +120,7 @@ async function getAll(packageReq, getManifest, dependencies={}) {
     packageReq.name = manifest.name;
   }
 
-  // Add dep to the packageList
+  // Add the current dep to the packageList, before fetching its sub dependencies
   const packageReturnObject = {
     name: packageReq.name,
     ver: packageReq.ver,
@@ -119,13 +131,12 @@ async function getAll(packageReq, getManifest, dependencies={}) {
 
   dependencies[packageReq.name] = packageReturnObject;
 
-  // Using a for loop instead of map or forEach to avoid hiding this code
-  // and its errors inside a different function
   for (const depName of Object.getOwnPropertyNames(depObject)) {
     const depVersion = depObject[depName];
 
-
-    // Verify that the dependency is not already in the loop
+    // If the dependency requested is not in the list or the requested
+    // version is higher than the stored, proceed to fetch it.
+    // Otherwise ignore it.
     if (
       // Either the dependency hasn't been fetched yet
       !dependencies.hasOwnProperty(depName)
@@ -135,7 +146,7 @@ async function getAll(packageReq, getManifest, dependencies={}) {
         && versions.isHigher(depVersion, dependencies[depName].ver)
       )
     ) {
-      // Fetch subdependencies of the dependencies
+      // Fetch subdependencies of the dependencies recursively
       let subDepReq = {
         name: depName,
         ver: depVersion,

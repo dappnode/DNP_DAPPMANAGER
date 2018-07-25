@@ -1,4 +1,5 @@
 const semver = require('semver');
+const validate = require('./validate');
 
 function highestVersion(v1, v2) {
   // If no version is passed return the other
@@ -21,7 +22,11 @@ function highestVersion(v1, v2) {
 }
 
 function isHigher(v1, v2) {
+  const ipfs = '999.9.10';
   const latest = '999.9.9';
+  // if v1 and v2 are ipfs hashes, prioritize above latest
+  if (v1 && validate.isIPFShash(v1)) v1 = ipfs;
+  if (v2 && validate.isIPFShash(v2)) v2 = ipfs;
   // if v1 and v2 are undefined they are latest
   if (!semver.valid(v1)) v1 = latest;
   if (!semver.valid(v2)) v2 = latest;

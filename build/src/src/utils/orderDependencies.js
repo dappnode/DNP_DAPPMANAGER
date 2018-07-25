@@ -1,4 +1,9 @@
 
+/* ##### TODO
+############################################################
+           This function is currently deprecated
+############################################################
+*/
 
 function orderDependencies(packageList) {
   // Expects an array of objects
