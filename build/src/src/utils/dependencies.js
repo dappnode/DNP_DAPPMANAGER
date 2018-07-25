@@ -1,7 +1,6 @@
 const semver = require('semver');
-const {highestVersion} = require('utils/versions');
+const versions = require('utils/versions');
 const validate = require('utils/validate');
-const {orderDependencies} = require('utils/orderDependencies');
 const dockerListDefault = require('modules/dockerList');
 const parse = require('utils/parse');
 const logUI = require('utils/logUI');
@@ -17,11 +16,11 @@ function createGetAllResolvedOrdered(getManifest,
     logUI({logId, clear: true, msg: 'fetching dependencies...'});
     let allResolvedDeps = await getAllResolved(packageReq, getManifest);
     // Dependencies will be ordered so they can be installed in series
-    let allResolvedOrdered = orderDependencies(allResolvedDeps);
-    logUI({logId, order: allResolvedOrdered.map((p) => p.name)});
+    // let allResolvedOrdered = orderDependencies(allResolvedDeps);
+    logUI({logId, order: allResolvedDeps.map((p) => p.name)});
 
     // Check which dependencies should be installed
-    let allResolvedOrderedChecked = await shouldInstall(allResolvedOrdered, dockerList, logId);
+    let allResolvedOrderedChecked = await shouldInstall(allResolvedDeps, dockerList, logId);
     return allResolvedOrderedChecked;
   };
 }
@@ -73,13 +72,26 @@ async function getAllResolved(packageReq, getManifest) {
   //   ...
   //   ]
 
-  let dependencyList = await getAll(packageReq, getManifest);
-  // The dependecy list may contain the same package with different versions
-  return resolveConflictingVersions(dependencyList);
+  // getAll resolves dependencies, prevents duplication and ignores circular dependencies
+  let dependencies = await getAll(packageReq, getManifest);
+  // getAll will return an object:
+  // dependencies = {
+  //   packageA: {
+  //     name: 'packageA',
+  //     ver: '0.0.1',
+  //     dep: {
+  //       packageB: '0.0.2'
+  //     }
+  //   },
+  //   ...
+  // }
+
+  // You need to return an array:
+  return Object.values(dependencies);
 }
 
 
-async function getAll(packageReq, getManifest, packageList=[]) {
+async function getAll(packageReq, getManifest, dependencies={}) {
   // Parse request
 
 
@@ -108,23 +120,7 @@ async function getAll(packageReq, getManifest, packageList=[]) {
     packageReq.name = manifest.name;
   }
 
-  // Using a for loop instead of map or forEach to avoid hiding this code
-  // and its errors inside a different function
-  for (const depName of Object.getOwnPropertyNames(depObject)) {
-    // Prevent dependency loops
-    if (packageReq.name == depName) {
-      throw Error('DEPENDENCY LOOP FOUND, successfully prevented');
-    }
-
-    // Fetch subdependencies of the dependencies
-    let subDepReq = {
-      name: depName,
-      ver: depObject[depName],
-    };
-    await getAll(subDepReq, getManifest, packageList);
-  }
-
-  // Add dep to the packageList
+  // Add the current dep to the packageList, before fetching its sub dependencies
   const packageReturnObject = {
     name: packageReq.name,
     ver: packageReq.ver,
@@ -133,8 +129,32 @@ async function getAll(packageReq, getManifest, packageList=[]) {
   };
   if (allowCORE) packageReturnObject.allowCORE = allowCORE;
 
-  packageList.push(packageReturnObject);
-  return packageList;
+  dependencies[packageReq.name] = packageReturnObject;
+
+  for (const depName of Object.getOwnPropertyNames(depObject)) {
+    const depVersion = depObject[depName];
+
+    // If the dependency requested is not in the list or the requested
+    // version is higher than the stored, proceed to fetch it.
+    // Otherwise ignore it.
+    if (
+      // Either the dependency hasn't been fetched yet
+      !dependencies.hasOwnProperty(depName)
+      || (
+        // or the requested version is higher than the stored
+        dependencies.hasOwnProperty(depName)
+        && versions.isHigher(depVersion, dependencies[depName].ver)
+      )
+    ) {
+      // Fetch subdependencies of the dependencies recursively
+      let subDepReq = {
+        name: depName,
+        ver: depVersion,
+      };
+      await getAll(subDepReq, getManifest, dependencies);
+    }
+  }
+  return dependencies;
 }
 
 
@@ -142,7 +162,7 @@ function resolveConflictingVersions(dependencyList) {
   let highestDepVer = {};
   dependencyList.map((dep) => {
     // Keep rewritting the highest version on the object
-    highestDepVer[dep.name] = highestVersion(dep.ver, highestDepVer[dep.name]);
+    highestDepVer[dep.name] = versions.highestVersion(dep.ver, highestDepVer[dep.name]);
   });
 
   // highestDependencyVersion contains a unique list of dep names

@@ -101,10 +101,12 @@ describe('Util: install', function() {
     const A = {
       name: 'a',
       dep: {b: 'latest', c: 'latest'},
-    }; const B = {
+    };
+    const B = {
       name: 'b',
       dep: {},
-    }; const C = {
+    };
+    const C = {
       name: 'c',
       dep: {b: 'latest'},
     };
