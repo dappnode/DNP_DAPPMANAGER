@@ -115,13 +115,20 @@ connection.onopen = (session, details) => {
     register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
     register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
 
-    eventBus.on(eventBusTag.call, (call, args) => {
-      session.call(call, args)
+    eventBus.on(eventBusTag.call, (call, args, kwargs) => {
+      session.call(call, args, kwargs)
       .then((res) => {
         logs.info('INTERNAL CALL TO: '+call);
         logs.info(res);
       });
     });
+
+    // To call install:
+    // session.call(
+    //   'installPackage.dappmanager.dnp.dappnode.eth',
+    //   [],
+    //   { id }
+    // )
 
     eventBus.on(eventBusTag.logUI, (data) => {
       session.publish(autobahnTag.DAppManagerLog, [data]);
