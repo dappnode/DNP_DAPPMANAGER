@@ -83,6 +83,43 @@ describe('Util: get dependencies', () => {
   });
 
 
+  describe('.forceDappmanagerToBeTheLast', () => {
+    it('should put the dappmanager at the bottom', () => {
+      const input = [
+        {name: 'admin.dnp.dappnode.eth'},
+        {name: 'dappmanager.dnp.dappnode.eth'},
+        {name: 'vpn.dnp.dappnode.eth'},
+      ];
+      const expectedResult = [
+        {name: 'admin.dnp.dappnode.eth'},
+        {name: 'vpn.dnp.dappnode.eth'},
+        {name: 'dappmanager.dnp.dappnode.eth'},
+      ];
+
+      const orderedDeps = dependencies.forceDappmanagerToBeTheLast(input);
+
+      expect( orderedDeps )
+        .to.deep.equal( expectedResult );
+    });
+
+    it('should not do anything if there is no dappmanager in the list', () => {
+      const input = [
+        {name: 'admin.dnp.dappnode.eth'},
+        {name: 'vpn.dnp.dappnode.eth'},
+      ];
+      const expectedResult = [
+        {name: 'admin.dnp.dappnode.eth'},
+        {name: 'vpn.dnp.dappnode.eth'},
+      ];
+
+      const orderedDeps = dependencies.forceDappmanagerToBeTheLast(input);
+
+      expect( orderedDeps )
+        .to.deep.equal( expectedResult );
+    });
+  });
+
+
   describe('.getAll: should fetch deps', () => {
     it('should fetch deps', async () => {
       const packageReq = {

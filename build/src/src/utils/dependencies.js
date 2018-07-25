@@ -17,6 +17,7 @@ function createGetAllResolvedOrdered(getManifest,
     let allResolvedDeps = await getAllResolved(packageReq, getManifest);
     // Dependencies will be ordered so they can be installed in series
     // let allResolvedOrdered = orderDependencies(allResolvedDeps);
+    allResolvedDeps = forceDappmanagerToBeTheLast(allResolvedDeps);
     logUI({logId, order: allResolvedDeps.map((p) => p.name)});
 
     // Check which dependencies should be installed
@@ -25,6 +26,14 @@ function createGetAllResolvedOrdered(getManifest,
   };
 }
 
+function forceDappmanagerToBeTheLast(dependencyList) {
+  const index = dependencyList.findIndex((pkg) =>
+    pkg.name.includes('dappmanager.dnp.dappnode.eth'));
+  if (index >= 0) {
+    dependencyList.push(dependencyList.splice(index, 1)[0]);
+  }
+  return dependencyList;
+}
 
 async function shouldInstall(packageList, dockerList, logId) {
   // This function verifies if vcurrent < vreq
@@ -192,6 +201,7 @@ function sortByNameKey(a, b) {
 
 
 module.exports = {
+  forceDappmanagerToBeTheLast,
   createGetAllResolvedOrdered,
   getAll,
   getAllResolved,
