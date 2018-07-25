@@ -1,40 +1,62 @@
 const expect = require('chai').expect;
 const dependencies = require('./dependencies');
+const semver = require('semver');
 
 
 describe('Util: get dependencies', () => {
   let dependencyObjectMock = {
-    packageA: {
-      packageB: 'latest',
+    'packageA': {
+      packageB: '0.0.1',
       packageC: 'latest',
       packageD: 'latest',
     },
-    packageB: {
+    'packageB': {
       packageC: 'latest',
     },
-    packageC: {},
-    packageD: {
-      packageB: 'latest',
+    'packageB@0.0.1': {
       packageC: 'latest',
     },
-    packageE: {
+    'packageB@0.0.2': {
+      packageC: 'latest',
+    },
+    'packageC': {},
+    'packageD': {
+      packageB: '0.0.2',
+      packageC: 'latest',
+    },
+    'packageE': {
       packageE: 'latest',
     },
-    dappmanager: {
+    'dappmanager': {
       admin: 'latest',
     },
-    vpn: {
+    'vpn': {
       admin: 'latest',
     },
-    admin: {
+    'admin': {
       vpn: 'latest',
       dappmanager: 'latest',
+    },
+    'dappmanager@0.1.10': {
+      admin: '0.1.10',
+      vpn: '0.1.10',
+    },
+    'admin@0.1.10': {
+      dappmanager: '0.1.10',
+      vpn: '0.1.10',
+    },
+    'vpn@0.1.10': {
+      admin: '0.1.10',
+      dappmanager: '0.1.10',
     },
   };
 
   async function getManifestMock(packageReq) {
+    let packageReqSemver = semver.valid(packageReq.ver);
+    let id = packageReqSemver ? packageReq.name + '@' + packageReqSemver : packageReq.name;
+
     return {
-      dependencies: dependencyObjectMock[packageReq.name],
+      dependencies: dependencyObjectMock[id],
     };
   }
 
@@ -102,7 +124,7 @@ describe('Util: get dependencies', () => {
           manifest: await getManifestMock({name: 'packageA'}),
         },
         packageB: {
-          name: 'packageB', ver: 'latest',
+          name: 'packageB', ver: '0.0.2',
           dep: dependencyObjectMock.packageB,
           manifest: await getManifestMock({name: 'packageB'}),
         },
@@ -132,13 +154,13 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
 
-      const expectedResult = {
-        packageE: {
+      const expectedResult = [
+        {
           name: 'packageE', ver: 'latest',
           dep: dependencyObjectMock.packageE,
           manifest: await getManifestMock({name: 'packageE'}),
         },
-      };
+      ];
 
       let res = await dependencies.getAllResolved(packageReq, getManifestMock);
       expect( res )
@@ -174,7 +196,7 @@ describe('Util: get dependencies', () => {
         .to.deep.equal( expectedResult );
     });
 
-    it('should resolve circular dependencies requesting dappmanager', async () => {
+    it('should resolve circular dependencies requesting vpn', async () => {
       const packageReq = {
         name: 'vpn',
         ver: 'latest',
@@ -240,13 +262,13 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
 
-      const expectedResult = {
-        packageC: {
+      const expectedResult = [
+        {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
         },
-      };
+      ];
 
       let res = await dependencies.getAllResolved(packageReq, getManifestMock);
 
@@ -260,35 +282,59 @@ describe('Util: get dependencies', () => {
         ver: 'latest',
       };
 
-      // Edit the dependencyObjectMock to test version resolution
-      dependencyObjectMock.packageA.packageB = '1.2.3';
-      dependencyObjectMock.packageD.packageB = '1.4.2';
-
-      const expectedResult = {
-        packageA: {
+      const expectedResult = [
+        {
           name: 'packageA', ver: 'latest',
           dep: dependencyObjectMock.packageA,
           manifest: await getManifestMock({name: 'packageA'}),
         },
-        packageB: {
-          name: 'packageB', ver: '1.4.2',
+        {
+          name: 'packageB', ver: '0.0.2',
           dep: dependencyObjectMock.packageB,
           manifest: await getManifestMock({name: 'packageB'}),
         },
-        packageC: {
+        {
           name: 'packageC', ver: 'latest',
           dep: dependencyObjectMock.packageC,
           manifest: await getManifestMock({name: 'packageC'}),
         },
-        packageD: {
+        {
           name: 'packageD', ver: 'latest',
           dep: dependencyObjectMock.packageD,
           manifest: await getManifestMock({name: 'packageD'}),
         },
-      };
+      ];
 
       let res = await dependencies.getAllResolved(packageReq, getManifestMock);
 
+      expect( res )
+        .to.deep.equal( expectedResult );
+    });
+
+    it('should resolve circular dependencies requesting admin', async () => {
+      const packageReq = {
+        name: 'admin',
+        ver: '0.1.10',
+      };
+      const expectedResult = [
+        {
+          name: 'admin', ver: '0.1.10',
+          dep: dependencyObjectMock['admin@0.1.10'],
+          manifest: await getManifestMock({name: 'admin', ver: '0.1.10'}),
+        },
+        {
+          name: 'dappmanager', ver: '0.1.10',
+          dep: dependencyObjectMock['dappmanager@0.1.10'],
+          manifest: await getManifestMock({name: 'dappmanager', ver: '0.1.10'}),
+        },
+        {
+          name: 'vpn', ver: '0.1.10',
+          dep: dependencyObjectMock['vpn@0.1.10'],
+          manifest: await getManifestMock({name: 'vpn', ver: '0.1.10'}),
+        },
+      ];
+
+      let res = await dependencies.getAllResolved(packageReq, getManifestMock);
       expect( res )
         .to.deep.equal( expectedResult );
     });
