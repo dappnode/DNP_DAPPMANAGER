@@ -4,16 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "TEST_INTEGRATION=false mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test-nyc": "TEST_INTEGRATION=false nyc mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test-integration": "TEST_INTEGRATION=true mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test-integration-nyc": "TEST_INTEGRATION=true nyc mocha \"./{,!(node_modules)/**}/*.test.js\" "
+    "start": "NODE_PATH=src node src/index.js",
+    "test": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.js\" ",
+    "test.int": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
+    "test-nyc": "nyc npm run test",
+    "test.int-nyc": "nyc npm run test.int",
+    "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
+    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix"
   },
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
     "@parity/api": "^2.1.22",
+    "async": "^2.6.1",
     "autobahn": "^18.3.2",
     "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
@@ -25,12 +28,21 @@
     "shelljs": "^0.8.2",
     "simple-statistics": "^6.0.1",
     "web3": "^1.0.0-beta.34",
+    "winston": "^3.0.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.0.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-prettier": "^2.6.1",
+    "eslint-watch": "^3.1.5",
     "mocha": "^5.2.0",
     "nyc": "^11.8.0",
+    "prettier": "1.13.5",
     "sinon": "^5.0.10",
     "sinon-chai": "^3.1.0"
   }

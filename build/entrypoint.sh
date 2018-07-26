@@ -1,3 +1,3 @@
 #!/bin/sh
 crond
-node index.js
+NODE_PATH=src node src/index.js
