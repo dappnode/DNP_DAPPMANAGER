@@ -40,7 +40,7 @@
 	},
 	"license": "GPL-3.0",
 	"dependencies": {
-		"admin.dnp.dappnode.eth": "0.1.5",
-		"vpn.dnp.dappnode.eth": "0.1.8"
+		"admin.dnp.dappnode.eth": "0.1.4",
+		"vpn.dnp.dappnode.eth": "0.1.7"
 	}
 }
