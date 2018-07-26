@@ -1,0 +1,24 @@
+language: node_js
+dist: trusty
+sudo: required
+
+# Test envs will overwrite defaults
+env:
+  - DAPPNODE=rocks
+
+node_js:
+  - "8.9.4"
+
+cache:
+  directories:
+    - build/src/node_modules
+install:
+  # This is a dockerized application, the node app is in /build/src
+  - cd ./build/src
+  - npm install
+before_script:
+  - npm run lint
+script:
+  - npm run test
+after_success:
+  - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage
