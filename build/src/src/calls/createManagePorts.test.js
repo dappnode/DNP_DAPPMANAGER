@@ -18,7 +18,10 @@ describe('Call function: managePorts', function() {
 
       it('should open the requested ports', async () => {
         const ports = [5000, 5001];
-        const res = await managePorts({ports});
+        const res = await managePorts({
+          action: 'open',
+          ports,
+        });
         // Check opened ports
         expect(ports).to.deep.equal(openedPorts);
         // Check response message
@@ -29,7 +32,10 @@ describe('Call function: managePorts', function() {
       it('should throw an error with wrong ports variable', async () => {
         let error = '--- managePorts did not throw ---';
         try {
-          await managePorts({ports: 'not an array'});
+          await managePorts({
+            action: 'open',
+            ports: 'not an array',
+          });
         } catch (e) {
           error = e.message;
         }
