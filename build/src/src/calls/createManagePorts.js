@@ -17,13 +17,16 @@ function createManagePorts({
         throw Error('ports variable must be an array: '+JSON.stringify(ports));
     }
 
+    let msg;
     for (const port of ports) {
         switch (action) {
             case 'open':
                 await docker.openPort(port);
+                msg = 'Opened';
                 break;
             case 'close':
                 await docker.closePort(port);
+                msg = 'Closed';
                 break;
             default:
                 throw Error('Unkown manage ports action: '+action);
@@ -31,7 +34,7 @@ function createManagePorts({
     }
 
     return {
-      message: 'Opened ports '+ports.join(', '),
+      message: msg+' ports '+ports.join(', '),
       logMessage: true,
     };
   };
