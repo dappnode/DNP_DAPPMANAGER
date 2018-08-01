@@ -1,16 +1,15 @@
 const dockerDefault = require('modules/docker');
-const logUI = require('utils/logUI');
 
 // CALL DOCUMENTATION:
 // > kwargs: { ports, logId }
 // > result: -
 
-function createOpenPorts({
+function createManagePorts({
     docker = dockerDefault,
 }) {
-  const openPorts = async ({
+  const managePorts = async ({
+      action,
       ports,
-      logId,
   }) => {
     // ports should be an array of numerical ports
     // [5000, 5001]
@@ -19,12 +18,15 @@ function createOpenPorts({
     }
 
     for (const port of ports) {
-        logUI({logId, msg: 'opening port '+port});
-        try {
-            await docker.openPort(port);
-        } catch (e) {
-            throw Error('Error openning port '+port+' '
-                +(e ? e.message : ''));
+        switch (action) {
+            case 'open':
+                await docker.openPort(port);
+                break;
+            case 'close':
+                await docker.closePort(port);
+                break;
+            default:
+                throw Error('Unkown manage ports action: '+action);
         }
     }
 
@@ -35,7 +37,7 @@ function createOpenPorts({
   };
 
   // Expose main method
-  return openPorts;
+  return managePorts;
 }
 
 // function getPorts(MANIFEST) {
@@ -45,4 +47,4 @@ function createOpenPorts({
 //   }
 
 
-module.exports = createOpenPorts;
+module.exports = createManagePorts;

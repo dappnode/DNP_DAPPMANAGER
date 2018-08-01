@@ -16,7 +16,7 @@ const createListPackages = require('calls/createListPackages');
 const createFetchDirectory = require('calls/createFetchDirectory');
 const createFetchPackageVersions = require('calls/createFetchPackageVersions');
 const createFetchPackageData = require('calls/createFetchPackageData');
-const createOpenPorts = require('calls/createOpenPorts');
+const createManagePorts = require('calls/createManagePorts');
 
 // import dependencies
 const params = require('params');
@@ -49,7 +49,7 @@ const fetchDirectory = createFetchDirectory({getDirectory});
 const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
 const updatePackageEnv = createUpdatePackageEnv({});
 const fetchPackageData = createFetchPackageData({getManifest});
-const openPorts = createOpenPorts({});
+const managePorts = createManagePorts({});
 
 // /////////////////////////////
 // Connection helper functions
@@ -116,7 +116,7 @@ connection.onopen = (session, details) => {
     register(session, 'fetchDirectory.dappmanager.dnp.dappnode.eth', fetchDirectory);
     register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
     register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
-    register(session, 'openPorts.dappmanager.dnp.dappnode.eth', openPorts);
+    register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
 
     eventBus.on(eventBusTag.call, (call, args, kwargs) => {
       session.call(call, args, kwargs)

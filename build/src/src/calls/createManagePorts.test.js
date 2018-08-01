@@ -1,10 +1,10 @@
 const chai = require('chai');
 const expect = require('chai').expect;
-const createOpenPorts = require('calls/createOpenPorts');
+const createManagePorts = require('calls/createManagePorts');
 
 chai.should();
 
-describe('Call function: openPorts', function() {
+describe('Call function: managePorts', function() {
       const openedPorts = [];
       const dockerMock = {
         openPort: async (port) => {
@@ -12,13 +12,13 @@ describe('Call function: openPorts', function() {
         },
       };
 
-      const openPorts = createOpenPorts({
+      const managePorts = createManagePorts({
         docker: dockerMock,
       });
 
       it('should open the requested ports', async () => {
         const ports = [5000, 5001];
-        const res = await openPorts({ports});
+        const res = await managePorts({ports});
         // Check opened ports
         expect(ports).to.deep.equal(openedPorts);
         // Check response message
@@ -27,9 +27,9 @@ describe('Call function: openPorts', function() {
       });
 
       it('should throw an error with wrong ports variable', async () => {
-        let error = '--- openPorts did not throw ---';
+        let error = '--- managePorts did not throw ---';
         try {
-          await openPorts({ports: 'not an array'});
+          await managePorts({ports: 'not an array'});
         } catch (e) {
           error = e.message;
         }
