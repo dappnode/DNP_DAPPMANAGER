@@ -1,24 +1,17 @@
+const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 
-const dockerFactory = require('./Docker');
 const dockerUtils = require('./dockerUtils');
 
 describe('docker calls', function() {
-  argumentTest();
-
-  if (process.env.TEST_INTEGRATION == 'true') {
-    integrationTest();
-  }
-});
-
-function argumentTest() {
   describe('argument test', function() {
+    const execSpy = sinon.spy();
+    const docker = proxyquire('./Docker', {
+      'utils/shell': execSpy,
+    });
     const packageName = 'myPackage';
     const imagePath = './myImage';
-    const execSpy = sinon.spy();
-
-    const docker = dockerFactory(execSpy);
 
     it('.up should call docker/compose with correct arguments', () => {
       docker.compose.up(packageName);
@@ -50,15 +43,18 @@ function argumentTest() {
       sinon.assert.calledWith(execSpy, 'docker load -i ' + imagePath);
     });
   });
-}
 
+  if (process.env.TEST_INTEGRATION == 'true') {
+    integrationTest();
+  }
+});
 
 function integrationTest() {
+  const docker = require('./docker');
+
   describe('integration test', function() {
     const path = 'test/docker-compose.yml';
     const containerName = 'DNP_DAPPMANAGER_TEST_CONTAINER';
-
-    const docker = createDocker();
 
     before(async function() {
       await docker.compose.down(path, {timeout: 0});
