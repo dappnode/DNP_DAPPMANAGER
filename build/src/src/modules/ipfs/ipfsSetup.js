@@ -1,11 +1,14 @@
 // node modules
 const ipfsAPI = require('ipfs-api');
-const paramsDefault = require('params');
+const params = require('params');
 const logs = require('logs.js')(module);
+let ipfs;
 
-function ipfsSetup({
-  params = paramsDefault,
-}) {
+if (!process.env.TEST) {
+  ipfs = initIPFS();
+}
+
+function initIPFS() {
   const IPFS_HOST = params.IPFS;
   logs.info('Attempting IPFS connection to : '+IPFS_HOST);
   const ipfs = ipfsAPI(IPFS_HOST, '5001', {protocol: 'http'});
@@ -25,13 +28,4 @@ function verifyIPFS(ipfs) {
   });
 }
 
-// A singleton enforces one ipfs instance for the whole application
-// See that if you want to pass non-default parameters in a full application
-// context, there will be a race condition. Non-default parameters should only
-// be passed through testing are make those parameters process.env variables
-const ipfsSingleton = (() => {
-  let ipfs;
-  return (kwargs) => ipfs ? ipfs : ipfs = ipfsSetup(kwargs);
-})();
-
-module.exports = ipfsSingleton;
+module.exports = ipfs;

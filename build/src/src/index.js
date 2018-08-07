@@ -20,9 +20,9 @@ const createManagePorts = require('calls/createManagePorts');
 
 // import dependencies
 const params = require('params');
-const pkg = require('utils/packages');
-const createGetManifest = require('utils/getManifest');
-const dependencies = require('utils/dependencies');
+const pkg = require('modules/packages');
+const createGetManifest = require('modules/getManifest');
+const dependencies = require('modules/dependencies');
 const apmFactory = require('modules/apm');
 const createGetDirectory = require('modules/createGetDirectory');
 
@@ -56,7 +56,7 @@ const managePorts = createManagePorts({});
 
 const register = (session, event, handler) => {
   const wrapErrors = (handler) =>
-    async function(args, kwargs) {
+    async function(args, kwargs, details) {
       logs.debug('In-call to '+event);
       // 0. args: an array with call arguments
       // 1. kwargs: an object with call arguments

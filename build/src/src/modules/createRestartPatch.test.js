@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const createRestartPatch = require('./createRestartPatch');
-const getPath = require('./getPath');
+const getPath = require('utils/getPath');
 const fs = require('fs');
 
 
