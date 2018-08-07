@@ -1,6 +1,6 @@
 const fs = require('fs');
 const getPath = require('utils/getPath');
-const createRestartPatch = require('utils/createRestartPatch');
+const createRestartPatch = require('modules/createRestartPatch');
 const paramsDefault = require('params');
 const dockerDefault = require('modules/docker');
 
