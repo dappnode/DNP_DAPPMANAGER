@@ -1,3 +1,3 @@
-const dockerFactory = require('./Docker');
+const docker = require('./Docker');
 
-module.exports = dockerFactory();
+module.exports = docker;

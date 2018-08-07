@@ -111,9 +111,9 @@ function integrationTest() {
   // import dependencies
   const params = require('params');
   const {createDocker} = require('utils/Docker');
-  const pkg = require('utils/packages');
-  const createGetManifest = require('utils/getManifest');
-  const dependencies = require('utils/dependencies');
+  const pkg = require('modules/packages');
+  const createGetManifest = require('modules/getManifest');
+  const dependencies = require('modules/dependencies');
   const createGetDirectory = require('modules/createGetDirectory');
   const createAPM = require('modules/apm');
   const ipfsCallsFactory = require('modules/ipfsCalls');

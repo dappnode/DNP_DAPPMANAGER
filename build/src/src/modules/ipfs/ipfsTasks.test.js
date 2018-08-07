@@ -1,76 +1,34 @@
+const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
 
-const ipfsTasksFactory = require('./ipfsTasks');
+// With proxyrequire you stub before requiring
+
+const PATH_SOURCE = './test/hello-world_source.txt';
+const HASH = 'QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT';
+const ipfs = {
+    files: {
+        add: (PATH, options, callback) => {
+            callback(null, [{hash: HASH}]);
+        },
+        catReadableStream: (HASH) => {
+            return fs.createReadStream(PATH_SOURCE);
+        },
+    },
+};
 
 // Define test parameters
 const params = {
     CACHE_DIR: 'test/',
 };
 
+const ipfsTasks = proxyquire('./ipfsTasks', {
+    './ipfsSetup': ipfs,
+    'params': params,
+});
+
 describe('ipfsTasksFactory', () => {
-    const PATH_SOURCE = './test/hello-world_source.txt';
-    const HASH = 'QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT';
-    const ipfs = {
-        files: {
-            add: (PATH, options, callback) => {
-                callback(null, [{hash: HASH}]);
-            },
-            catReadableStream: (HASH) => {
-                return fs.createReadStream(PATH_SOURCE);
-            },
-        },
-    };
-    const ipfsTasks = ipfsTasksFactory({
-        ipfs,
-        params,
-        testing: true,
-    });
-
-    describe('for production', () => {
-        // Fake only part of the original library
-        const ipfsTasksProd = ipfsTasksFactory({
-            ipfs,
-            params,
-        });
-
-        it('Should export the necessary methods only', () => {
-            expect(ipfsTasksProd).to.have.property('download');
-            expect(ipfsTasksProd).to.have.property('cat');
-            expect(ipfsTasksProd).to.not.have.property('downloadHandler');
-        });
-    });
-
-    describe('parseResHash', () => {
-        it('To parse correctly', () => {
-            const res = [{hash: 'Qm'}];
-            let hash = ipfsTasks.parseResHash(res);
-            expect(hash).to.equal('Qm');
-        });
-
-        it('To throw if res is incorrect', () => {
-            const res = [{hashFake: 'Qm'}];
-            expect(function() {
-                ipfsTasks.parseResHash(res);
-            }).to.throw();
-        });
-    });
-
-    describe('validateIpfsHash', () => {
-        it('To parse correctly', () => {
-            let _HASH = ipfsTasks.validateIpfsHash('/ipfs/'+HASH);
-            expect(_HASH).to.equal(HASH);
-        });
-
-        it('To throw if res is incorrect', () => {
-            const HASH_BROKEN = 'QmFaKe';
-            expect(function() {
-                ipfsTasks.validateIpfsHash(HASH_BROKEN);
-            }).to.throw();
-        });
-    });
-
     describe('isFileHashValid', () => {
         // Fake only part of the original library
         const PATH1 = './test/test1';

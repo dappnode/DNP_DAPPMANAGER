@@ -1,6 +1,6 @@
 const fs = require('fs');
 const getPath = require('utils/getPath');
-const shellSync = require('utils/shell');
+const shell = require('utils/shell');
 const logUI = require('utils/logUI');
 const paramsDefault = require('params');
 const dockerDefault = require('modules/docker');
@@ -38,7 +38,7 @@ function createRemovePackage({
     await docker.compose.down(dockerComposePath, {volumes: Boolean(deleteVolumes)});
     // Remove DNP folder and files
     logUI({logId, pkg: 'all', msg: 'Removing system files...'});
-    await shellSync('rm -r ' + packageRepoDir);
+    await shell('rm -r ' + packageRepoDir);
 
     return {
       message: 'Removed package: ' + id,

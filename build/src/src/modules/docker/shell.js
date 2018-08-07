@@ -14,10 +14,8 @@ async function shellExecSync(command, silent = false) {
   const stdout = res.stdout;
   const stderr = res.stderr;
   if (code !== 0) {
-    // const err
-    const err = stderr.length ? stderr : stdout;
-    logs.error('SHELL JS ERROR, on command: ' + command+' err: '+err);
-    throw Error(err);
+    logs.error('SHELL JS ERROR, on command: ' + command);
+    throw Error(stderr);
   }
   return stdout;
 }
