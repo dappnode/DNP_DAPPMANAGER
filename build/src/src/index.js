@@ -3,6 +3,7 @@
 const autobahn = require('autobahn');
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
+const logUserAction = require('logUserAction.js');
 
 // import calls
 const createInstallPackage = require('calls/createInstallPackage');
@@ -17,6 +18,7 @@ const createFetchDirectory = require('calls/createFetchDirectory');
 const createFetchPackageVersions = require('calls/createFetchPackageVersions');
 const createFetchPackageData = require('calls/createFetchPackageData');
 const createManagePorts = require('calls/createManagePorts');
+const createGetUserActionLogs = require('calls/createGetUserActionLogs');
 
 // import dependencies
 const params = require('params');
@@ -50,6 +52,7 @@ const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
 const updatePackageEnv = createUpdatePackageEnv({});
 const fetchPackageData = createFetchPackageData({getManifest});
 const managePorts = createManagePorts({});
+const getUserActionLogs = createGetUserActionLogs({});
 
 // /////////////////////////////
 // Connection helper functions
@@ -63,11 +66,14 @@ const register = (session, event, handler) => {
       // 2. details: an object which provides call metadata
       try {
         const res = await handler(kwargs);
+
         // Log internally
+        logUserAction.log({level: 'info', event, ...res, kwargs});
         const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
-        if (res.log && res.result) logs.info('Result of '+eventShort+': '+JSON.stringify(res));
-        else if (res.log && !res.result) logs.info('Result of '+eventShort+': '+res.message);
-        else if (res.logMessage) logs.info('Result of '+eventShort+': '+res.message);
+        if (res.logMessage) {
+          logs.info('Call '+eventShort+' success: '+res.message);
+        }
+
         // Return to crossbar
         return JSON.stringify({
           success: true,
@@ -75,7 +81,8 @@ const register = (session, event, handler) => {
           result: res.result || {},
         });
       } catch (err) {
-        logs.error(' Event: '+event+' Stack: '+err.stack);
+        logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
+        logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
         return JSON.stringify({
           success: false,
           message: err.message,
@@ -88,6 +95,10 @@ const register = (session, event, handler) => {
     function(err) {logs.error('CROSSBAR: error registering '+event+'. Error message: '+err.error);}
   );
 };
+
+function error2obj(e) {
+  return {name: e.name, message: e.message, stack: e.stack, userAction: true};
+}
 
 
 // /////////////////////////////
@@ -117,6 +128,7 @@ connection.onopen = (session, details) => {
     register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
     register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
     register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
+    register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
 
     eventBus.on(eventBusTag.call, (call, args, kwargs) => {
       session.call(call, args, kwargs)
@@ -136,6 +148,14 @@ connection.onopen = (session, details) => {
     eventBus.on(eventBusTag.logUI, (data) => {
       session.publish(autobahnTag.DAppManagerLog, [data]);
       logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
+    });
+
+    eventBus.on(eventBusTag.logUserAction, (data) => {
+      session.publish(autobahnTag.logUserAction, [data]);
+    });
+
+    session.subscribe(autobahnTag.logUserActionToDappmanager, (args) => {
+      logUserAction.log(args[0]);
     });
 };
 
