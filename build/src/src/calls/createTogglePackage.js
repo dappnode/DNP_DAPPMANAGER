@@ -35,7 +35,8 @@ function createTogglePackage({
 
     return {
       message: 'successfully toggled package: ' + id,
-      log: true,
+      logMessage: true,
+      userAction: true,
     };
   };
 

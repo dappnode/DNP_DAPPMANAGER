@@ -36,6 +36,7 @@ function createManagePorts({
     return {
       message: msg+' ports '+ports.join(', '),
       logMessage: true,
+      userAction: true,
     };
   };
 

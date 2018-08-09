@@ -55,7 +55,6 @@ function createListPackages({
     return {
       message: 'Listing ' + dnpList.length + ' packages',
       result: dnpList,
-      logMessage: true,
     };
   };
 
