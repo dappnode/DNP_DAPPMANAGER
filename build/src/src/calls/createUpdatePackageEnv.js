@@ -31,7 +31,8 @@ function createUpdatePackageEnv({
     if (!restart) {
       return {
         message: 'Updated envs of ' + id,
-        log: true,
+        logMessage: true,
+        userAction: true,
       };
     }
 
@@ -49,7 +50,8 @@ function createUpdatePackageEnv({
 
     return {
       message: 'Updated envs and restarted ' + id,
-      log: true,
+      logMessage: true,
+      userAction: true,
     };
   };
 

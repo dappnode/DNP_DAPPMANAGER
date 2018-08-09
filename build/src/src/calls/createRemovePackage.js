@@ -42,7 +42,8 @@ function createRemovePackage({
 
     return {
       message: 'Removed package: ' + id,
-      log: true,
+      logMessage: true,
+      userAction: true,
     };
   };
 

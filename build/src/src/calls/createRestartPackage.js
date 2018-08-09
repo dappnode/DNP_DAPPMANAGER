@@ -34,6 +34,7 @@ function createRestartPackage({
     return {
       message: 'Restarted package: ' + id,
       logMessage: true,
+      userAction: true,
     };
   };
 
