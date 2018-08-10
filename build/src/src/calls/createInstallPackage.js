@@ -33,7 +33,8 @@ function createInstallPackage({
 
     return {
       message: 'Installed ' + packageReq.name + ' version: ' + packageReq.ver,
-      log: true,
+      logMessage: true,
+      userAction: true,
     };
   };
 

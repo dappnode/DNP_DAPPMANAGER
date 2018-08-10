@@ -99,16 +99,6 @@ function runFactory({
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, isCORE);
     const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params, isCORE);
 
-    for (const port of getPorts(MANIFEST)) {
-      logUI({logId, pkg: PACKAGE_NAME, msg: 'opening port '+port});
-      try {
-        await docker.openPort(port);
-      } catch (e) {
-        logUI({logId, pkg: PACKAGE_NAME, msg: 'Error openning port '+port+' '
-          +(e ? e.message : '')});
-      }
-    }
-
     logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});
     await docker.load(IMAGE_PATH);
     logUI({logId, pkg: PACKAGE_NAME, msg: 'loaded image'});
@@ -122,12 +112,6 @@ function runFactory({
     }
     logUI({logId, pkg: PACKAGE_NAME, msg: 'package started'});
   };
-}
-
-function getPorts(MANIFEST) {
-  return (MANIFEST && MANIFEST.image && MANIFEST.image.ports)
-  ? MANIFEST.image.ports.map((p) => p.split(':')[0])
-  : [];
 }
 
 module.exports = {
