@@ -1,6 +1,6 @@
 {
 	"name": "dappmanager.dnp.dappnode.eth",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"description": "Dappnode package responsible for providing the DappNode Package Manager",
 	"avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
 	"type": "dncore",
@@ -38,9 +38,5 @@
 	"bugs": {
 		"url": "https://github.com/dappnode/DNP_DAPPMANAGER/issues"
 	},
-	"license": "GPL-3.0",
-	"dependencies": {
-		"admin.dnp.dappnode.eth": "0.1.4",
-		"vpn.dnp.dappnode.eth": "0.1.7"
-	}
+	"license": "GPL-3.0"
 }

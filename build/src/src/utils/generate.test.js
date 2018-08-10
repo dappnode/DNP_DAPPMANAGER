@@ -244,6 +244,49 @@ networks:
 `,
 };
 
+const mysterium = {
+    manifest: {
+        'name': 'Mysterium',
+        'version': '',
+        'description': '',
+        'avatar': '',
+        'type': '',
+        'image': {
+          'path': '',
+          'hash': '',
+          'size': '',
+          'cap_add': [
+            'SYS_ADMIN',
+          ],
+          'cap_drop': [
+            'NET_ADMIN',
+          ],
+          'network_mode': 'host',
+          'command': '--command',
+        },
+      },
+    dc: `version: '3.4'
+services:
+    Mysterium:
+        container_name: DAppNodePackage-Mysterium
+        image: 'Mysterium:'
+        restart: always
+        volumes: []
+        networks:
+            - dncore_network
+        dns: 172.33.1.2
+        cap_add:
+            - SYS_ADMIN
+        cap_drop:
+            - NET_ADMIN
+        network_mode: host
+        command: '--command'
+networks:
+    dncore_network:
+        external: true
+`,
+};
+
 describe('generate, utils', function() {
   describe('generate docker-compose.yml file', function() {
     // Non-CORE
@@ -267,11 +310,17 @@ describe('generate, utils', function() {
     });
 
     // CORE package - VPN
-    it('should generate the expected docker-compose of IPFS', () => {
+    it('should generate the expected docker-compose of VPN', () => {
       const isCORE = true;
       generate.dockerCompose(vpn.manifest, params, isCORE)
         .should.equal(vpn.dc);
     });
+
+    // Mysterium package
+    it('should generate the expected docker-compose of Mysterium', () => {
+        generate.dockerCompose(mysterium.manifest, params)
+          .should.equal(mysterium.dc);
+      });
   });
 
   describe('generate a manifest file', function() {

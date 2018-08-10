@@ -66,6 +66,12 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
       });
     }
 
+    // Extra features
+    if (dpnManifest.image.cap_add) service.cap_add = dpnManifest.image.cap_add;
+    if (dpnManifest.image.cap_drop) service.cap_drop = dpnManifest.image.cap_drop;
+    if (dpnManifest.image.network_mode) service.network_mode = dpnManifest.image.network_mode;
+    if (dpnManifest.image.command) service.command = dpnManifest.image.command;
+
 
     // DOCKER COMPOSE YML - VOLUMES
     // ============================

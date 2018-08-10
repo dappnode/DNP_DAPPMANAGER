@@ -6,6 +6,8 @@ module.exports = {
   // autobahnRealm: 'realm1',
   autobahnRealm: 'dappnode_admin',
   autobahnTag: {
+    logUserActionToDappmanager: 'logUserActionToDappmanager',
+    logUserAction: 'logUserAction.dappmanager.dnp.dappnode.eth',
     DAppManagerLog: 'log.dappmanager.dnp.dappnode.eth',
   },
 
@@ -34,6 +36,9 @@ module.exports = {
   IPFS: (process.env.IPFS_REDIRECT || 'my.ipfs.dnp.dappnode.eth'),
 
   // Wweb3 parameters
-  WEB3HOSTWS: 'ws://172.33.1.6:8546',
+  WEB3HOSTWS: 'ws://my.ethchain.dnp.dappnode.eth:8546',
+
+  // User Action Logs filename
+  userActionLogsFilename: 'DNCORE/userActionLogs.log',
 
 };

@@ -1,5 +1,6 @@
 'use strict';
 const winston = require('winston');
+const {createLogger, format, transports} = winston;
 
 /*
 * > LEVELS:
@@ -9,7 +10,7 @@ const winston = require('winston');
 * logs.error('Something')
 */
 
-const scFormat = winston.format.printf((info) => {
+const scFormat = format.printf((info) => {
     let level = info.level.toUpperCase();
     let message = info.message;
     let filteredInfo = Object.assign({}, info, {
@@ -23,8 +24,11 @@ const scFormat = winston.format.printf((info) => {
     if (append != '{}') {
         message = message + ' ' + append;
     }
+    const variables = [];
+    if (info.admin) variables.push('ADMIN');
+
     // return `${info.timestamp} ${level} [${info.label}] : ${message}`;
-    return `${level} [${info.label}] : ${message}`;
+    return `${level} [${info.label}] [${variables.join('&')}] : ${message}`;
 });
 
 /**
@@ -43,19 +47,29 @@ function _getLabel(mod) {
         label = mod.id.replace('.js', '');
         label = label.replace(/^.*\/src\//, '');
     }
-    return winston.format.label({'label': label});
+    return format.label({'label': label});
 }
 
 module.exports = function(mod) {
-	const logger = winston.createLogger({
+	const logger = createLogger({
         level: process.env.LOG_LEVEL || 'info',
-		format: winston.format.combine(
-			winston.format.splat(),
-			winston.format.timestamp(),
+		format: format.combine(
+            format.splat(),
+			format.timestamp({
+                format: 'DD-MM-YYYY HH:mm:ss',
+            }),
             _getLabel(mod),
             scFormat
 		),
-		transports: [new winston.transports.Console()],
+		transports: [
+            new transports.Console({
+                // format: format.combine(
+                //   format.timestamp(),
+                //   format.colorize(),
+                //   format.simple()
+                // ),
+            }),
+        ],
 	});
     return logger;
 };
