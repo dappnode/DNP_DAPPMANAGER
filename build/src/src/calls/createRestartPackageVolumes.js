@@ -43,7 +43,8 @@ function createRestartPackageVolumes({
 
     return {
       message: 'Restarted '+id+' volumes: ' + packageVolumes.join(', '),
-      log: true,
+      logMessage: true,
+      userAction: true,
     };
   };
 }
