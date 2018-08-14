@@ -26,7 +26,9 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
 
     // Image name
     service.image = dpnManifest.name + ':' + dpnManifest.version;
-    service.restart = 'always';
+    if (dpnManifest.image.restart) {
+      service.restart = dpnManifest.image.restart;
+    }
 
     // Volumes
     service.volumes = [
@@ -46,11 +48,13 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
 
     // Networks
     if (isCORE) {
-      service.networks = {
-        network: {
-          ipv4_address: dpnManifest.image.ipv4_address,
-        },
-      };
+      if (dpnManifest.image.ipv4_address) {
+        service.networks = {
+          network: {
+            ipv4_address: dpnManifest.image.ipv4_address,
+          },
+        };
+      }
     } else {
       service.networks = [DNP_NETWORK];
     }
