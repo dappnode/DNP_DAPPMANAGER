@@ -47,11 +47,11 @@ async function shouldInstall(packageList, dockerList, logId) {
     if (!packageCurrent) return true;
 
     // Otherwise, compare verions
-    const requestedVersion = packageReq.manifest.version;
+    const newVersion = packageReq.manifest.version;
     const currentVersion = packageCurrent.version;
 
-    logs.info('COMPARING '+packageReq.name+' REQ: '+requestedVersion+' CURRENT '+currentVersion);
-    if (semver.lt(currentVersion, requestedVersion)) {
+    logs.info('COMPARING '+packageReq.name+' CURRENT '+currentVersion+' NEW: '+newVersion);
+    if (semverLt(currentVersion, newVersion)) {
       return true;
     } else {
       logUI({logId, pkg: packageReq.name, msg: 'Already updated'});
@@ -59,6 +59,13 @@ async function shouldInstall(packageList, dockerList, logId) {
       return false;
     }
   });
+}
+
+function semverLt(v1, v2) {
+  // currentVersion, newVersion
+  v1 = semver.valid(v1) || '999.9.9';
+  v2 = semver.valid(v2) || '999.9.9';
+  return semver.lt(v1, v2);
 }
 
 
