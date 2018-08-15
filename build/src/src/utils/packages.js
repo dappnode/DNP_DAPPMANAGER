@@ -25,6 +25,7 @@ function downloadFactory({
   ipfs = ipfsDefault,
   generate = generateDefault,
   validate = validateDefault,
+  docker = dockerDefault,
   fs = fsDefault}) {
   return async function download({pkg, logId}) {
     // call IPFS, store the file in the repo's folder
@@ -79,6 +80,10 @@ function downloadFactory({
       IMAGE_PATH,
       logChunk,
     );
+
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});
+    await docker.load(IMAGE_PATH);
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'loaded image'});
   };
 }
 
@@ -95,13 +100,7 @@ function runFactory({
     const MANIFEST = pkg.manifest;
     const isCORE = pkg.isCORE;
     const VERSION = parse.manifest.version(MANIFEST);
-    const IMAGE_NAME = parse.manifest.imageName(MANIFEST);
     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, isCORE);
-    const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params, isCORE);
-
-    logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});
-    await docker.load(IMAGE_PATH);
-    logUI({logId, pkg: PACKAGE_NAME, msg: 'loaded image'});
 
     logUI({logId, pkg: PACKAGE_NAME, msg: 'starting package... '});
     // patch to prevent installer from crashing
