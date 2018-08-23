@@ -59,9 +59,7 @@ describe('Util: package install / download', () => {
     // docker .load .compose.up
     const dockerLoadSpy = sinon.spy();
     const dockerMock = {
-      compose: {
-        load: dockerLoadSpy,
-      },
+      load: dockerLoadSpy,
     };
 
     // validate .path --> blindly accept all paths
@@ -127,6 +125,11 @@ describe('Util: package install / download', () => {
     it('ipfs.download should be called with IMAGE_HASH, IMAGE_PATH', () => {
       sinon.assert.calledWith(ipfsDownloadSpy, IMAGE_HASH, IMAGE_PATH);
     });
+
+    it('docker.load should be called with IMAGE_PATH', () => {
+      expect(dockerLoadSpy.getCalls()[0].args)
+        .to.deep.equal( [IMAGE_PATH] );
+    });
   });
 
 
@@ -134,13 +137,11 @@ describe('Util: package install / download', () => {
     // ///// Make mocks for dependencies
 
     // docker .load .compose.up
-    const dockerLoadSpy = sinon.spy();
     const dockerComposeUpSpy = sinon.spy();
     const dockerMock = {
       compose: {
         up: dockerComposeUpSpy,
       },
-      load: dockerLoadSpy,
     };
 
     const run = pkg.runFactory({params,
@@ -152,11 +153,6 @@ describe('Util: package install / download', () => {
         name: PACKAGE_NAME,
         manifest: dnpManifest,
       },
-    });
-
-    it('docker.load should be called with IMAGE_PATH', () => {
-      expect(dockerLoadSpy.getCalls()[0].args)
-        .to.deep.equal( [IMAGE_PATH] );
     });
 
     // generateDockerComposeSpy - dnpManifest

@@ -21,6 +21,11 @@ describe('ipfsTasksFactory', () => {
                 return fs.createReadStream(PATH_SOURCE);
             },
         },
+        pin: {
+            add: (HASH, callback) => {
+                callback(null, 'great success');
+            },
+        },
     };
     const ipfsTasks = ipfsTasksFactory({
         ipfs,
@@ -196,7 +201,7 @@ describe('ipfsTasksFactory', () => {
                     expect(fs.readFileSync(PATH, 'utf8')).to.equal(FILE_CONTENT);
                 },
                 (err) => {
-                    expect(err).to.be.undefined;
+                    expect(err.stack).to.be.undefined;
                 }
             );
         });
