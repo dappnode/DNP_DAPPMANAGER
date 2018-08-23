@@ -68,19 +68,21 @@ describe('Util: package install / download', () => {
     };
 
     // fs .writeFileSync, .existsSync, .unlinkSync
-    const fsWriteFileSyncSpy = sinon.spy();
+    const fsWriteFileSpy = sinon.spy();
     const fsExistsSyncSpy = sinon.spy();
-    const fsUnlinkSyncSpy = sinon.spy();
+    const fsUnlinkSpy = sinon.spy();
     const fsMock = {
-      writeFileSync: async (data, path) => {
-        fsWriteFileSyncSpy(data, path);
+      writeFile: async (data, path, callback) => {
+        fsWriteFileSpy(data, path);
+        callback(null, 'great success');
       },
       existsSync: async (path) => {
         fsExistsSyncSpy(path);
         return true;
       },
-      unlinkSync: async (path) => {
-        fsUnlinkSyncSpy(path);
+      unlink: (PATH, callback) => {
+        fsUnlinkSpy(PATH);
+        callback(null, 'great success');
       },
     };
 
@@ -110,14 +112,14 @@ describe('Util: package install / download', () => {
         .to.deep.equal( [dnpManifest] );
     });
 
-    // fsWriteFileSyncSpy - DockerCompose, DOCKERCOMPOSE_PATH
+    // fsWriteFileSpy - DockerCompose, DOCKERCOMPOSE_PATH
     it('fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH', () => {
-      expect(fsWriteFileSyncSpy.getCalls()[0].args)
+      expect(fsWriteFileSpy.getCalls()[0].args)
         .to.deep.equal( [MANIFEST_PATH, Manifest] );
     });
 
     it('fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH', () => {
-      expect(fsWriteFileSyncSpy.getCalls()[1].args)
+      expect(fsWriteFileSpy.getCalls()[1].args)
         .to.deep.equal( [DOCKERCOMPOSE_PATH, DockerCompose] );
     });
 
@@ -128,6 +130,11 @@ describe('Util: package install / download', () => {
 
     it('docker.load should be called with IMAGE_PATH', () => {
       expect(dockerLoadSpy.getCalls()[0].args)
+        .to.deep.equal( [IMAGE_PATH] );
+    });
+
+    it('fs.unlink promisified should be called with IMAGE_PATH', () => {
+      expect(fsUnlinkSpy.getCalls()[0].args)
         .to.deep.equal( [IMAGE_PATH] );
     });
   });
