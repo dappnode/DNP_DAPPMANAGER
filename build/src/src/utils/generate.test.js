@@ -21,6 +21,7 @@ const manifest = {
       'nginxproxydnpdappnodeeth_vhost.d:/etc/nginx/vhost.d',
       'nginxproxydnpdappnodeeth_html:/usr/share/nginx/html',
     ],
+    'restart': 'always',
     'name': 'letsencrypt-nginx.dnp.dappnode.eth',
     'version': '0.0.1',
   },
@@ -270,7 +271,6 @@ services:
     Mysterium:
         container_name: DAppNodePackage-Mysterium
         image: 'Mysterium:'
-        restart: always
         volumes: []
         networks:
             - dncore_network

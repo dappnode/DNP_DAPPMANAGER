@@ -7,6 +7,7 @@ const isIPFS = require('is-ipfs');
 // Depedencies
 const ipfsDefault = require('./ipfsSetup');
 const paramsDefault = require('params');
+const logs = require('logs.js')(module);
 
 const ipfsTasksFactory = ({
     ipfs = ipfsDefault({}),
@@ -68,8 +69,7 @@ const ipfsTasksFactory = ({
         return fileHashValid;
     };
 
-    const downloadHandler = (HASH, PATH, logChunks) =>
-        new Promise(function(resolve, reject) {
+    const downloadHandler = (HASH, PATH, logChunks) => new Promise((resolve, reject) => {
         // This function has to download the file but also verify that:
         // - The downloaded file is correct (checking the hash)
         // - The download is happening (with a timer)
@@ -109,7 +109,11 @@ const ipfsTasksFactory = ({
         validate.path(PATH);
         HASH = validateIpfsHash(HASH);
         // execute download
-        return await downloadHandler(HASH, PATH, logChunks);
+        await downloadHandler(HASH, PATH, logChunks);
+        // If download was successful, pin file. Pin paralelly, and don't propagate errors
+        ipfs.pin.add(HASH, (err) => {
+            if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
+        });
     };
 
     const cat = async (HASH) => {
