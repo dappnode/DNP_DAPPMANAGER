@@ -1,3 +1,4 @@
+const {promisify} = require('util');
 const getPath = require('utils/getPath');
 const parse = require('utils/parse');
 const generateDefault = require('utils/generate');
@@ -26,7 +27,13 @@ function downloadFactory({
   generate = generateDefault,
   validate = validateDefault,
   docker = dockerDefault,
-  fs = fsDefault}) {
+  fs = fsDefault,
+}) {
+  // Promisify fs methods
+  const removeFile = promisify(fs.unlink);
+  const writeFile = promisify(fs.writeFile);
+
+  // Return main method
   return async function download({pkg, logId}) {
     // call IPFS, store the file in the repo's folder
     // load the image to docker
@@ -57,8 +64,8 @@ function downloadFactory({
     const DOCKERCOMPOSE_DATA = generate.dockerCompose(MANIFEST, params, isCORE);
 
     // Write manifest and docker-compose
-    await fs.writeFileSync(MANIFEST_PATH, MANIFEST_DATA);
-    await fs.writeFileSync(DOCKERCOMPOSE_PATH, DOCKERCOMPOSE_DATA);
+    await writeFile(MANIFEST_PATH, MANIFEST_DATA);
+    await writeFile(DOCKERCOMPOSE_PATH, DOCKERCOMPOSE_DATA);
 
     // Define the logging function
     const log = (percent) =>
@@ -81,9 +88,11 @@ function downloadFactory({
       logChunk,
     );
 
-    logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image'});
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image...'});
     await docker.load(IMAGE_PATH);
-    logUI({logId, pkg: PACKAGE_NAME, msg: 'loaded image'});
+
+    logUI({logId, pkg: PACKAGE_NAME, msg: 'cleaning files...'});
+    await removeFile(IMAGE_PATH);
   };
 }
 
