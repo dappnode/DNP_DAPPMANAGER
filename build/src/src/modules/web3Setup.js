@@ -6,7 +6,7 @@ const paramsDefault = require('params');
 function web3Setup({
   params = paramsDefault,
 }) {
-  const WEB3HOSTWS = params.WEB3HOSTWS;
+  const WEB3HOSTWS = process.env.WEB3HOSTWS || params.WEB3HOSTWS;
   if (!WEB3HOSTWS) throw Error('WEB3HOSTWS is needed to connect to ethchain but it\'s undefined');
 
   let web3 = new Web3(WEB3HOSTWS);
