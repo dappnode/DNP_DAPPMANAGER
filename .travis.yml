@@ -15,8 +15,8 @@ services:
   - docker
 
 before_install:
-  - export WEB3HOSTWS=wss://mainnet.infura.io/_ws
-  - export IPFSHOST=https://ipfs.infura.io
+  - export WEB3HOSTWS=https://mainnet.infura.io/metamask
+  - export IPFSHOST=https://ipfs.infura.io:5001
 
 cache:
   directories:
