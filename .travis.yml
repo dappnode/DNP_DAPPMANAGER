@@ -32,6 +32,7 @@ before_script:
   - npm run lint
 script:
   - npm run test
+  - cd ../..
   - test/test.sh
 after_success:
   - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage
