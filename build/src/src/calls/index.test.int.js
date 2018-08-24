@@ -6,93 +6,125 @@ const logs = require('logs.js')(module);
 
 chai.should();
 
-describe.skip('Full integration test with REAL docker: ', function() {
+describe('Full integration test with REAL docker: ', function() {
   // import calls
   const createInstallPackage = require('calls/createInstallPackage');
   const createRemovePackage = require('calls/createRemovePackage');
   const createTogglePackage = require('calls/createTogglePackage');
+  // const createRestartPackage = require('calls/createRestartPackage');
+  // const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
   const createLogPackage = require('calls/createLogPackage');
-  const createListPackages = require('calls/createListPackages');
-  const createListDirectory = require('calls/createListDirectory');
-  const {createFetchPackageInfo} = require('calls/createFetchPackageInfo');
   const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
+  const createListPackages = require('calls/createListPackages');
+  const createFetchDirectory = require('calls/createFetchDirectory');
+  const createFetchPackageVersions = require('calls/createFetchPackageVersions');
+  // const createFetchPackageData = require('calls/createFetchPackageData');
+  // const createManagePorts = require('calls/createManagePorts');
+  // const createGetUserActionLogs = require('calls/createGetUserActionLogs');
 
   // import dependencies
   const params = require('params');
-  const {createDocker} = require('utils/Docker');
   const pkg = require('utils/packages');
   const createGetManifest = require('utils/getManifest');
   const dependencies = require('utils/dependencies');
   const createGetDirectory = require('modules/createGetDirectory');
-  const createAPM = require('modules/apm');
-  const ipfsFactory = require('modules/ipfs');
-  const web3Setup = require('modules/web3Setup');
+  const apmFactory = require('modules/apm');
 
   // initialize dependencies (by order)
-  const web3 = web3Setup(params); // <-- web3
-  const ipfs = ipfsFactory({});
-  const apm = createAPM(web3);
-  const getDirectory = createGetDirectory(web3);
-  const getManifest = createGetManifest(apm, ipfs);
-  const docker = createDocker();
-  const getDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-  const download = pkg.createDownload(params, ipfs, docker, log);
-  const run = pkg.createRun(params, docker, log);
+  const apm = apmFactory({});
+  const getDirectory = createGetDirectory({});
+  const getManifest = createGetManifest({apm});
+  const getAllDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
+  const download = pkg.downloadFactory({});
+  const run = pkg.runFactory({});
 
   // Initialize calls
-  const installPackage = createInstallPackage(getDependencies, download, run);
-  const removePackage = createRemovePackage(params, docker);
-  const togglePackage = createTogglePackage(params, docker);
-  const logPackage = createLogPackage(params, docker);
-  const listPackages = createListPackages(params); // Needs work
-  const listDirectory = createListDirectory(getDirectory);
-  const fetchPackageInfo = createFetchPackageInfo(getManifest, apm);
-  const updatePackageEnv = createUpdatePackageEnv(params, docker);
+  const installPackage = createInstallPackage({getAllDependencies, download, run});
+  const removePackage = createRemovePackage({});
+  const togglePackage = createTogglePackage({});
+  // const restartPackage = createRestartPackage({});
+  // const restartPackageVolumes = createRestartPackageVolumes({});
+  const logPackage = createLogPackage({});
+  const listPackages = createListPackages({}); // Needs work
+  const fetchDirectory = createFetchDirectory({getDirectory});
+  const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
+  const updatePackageEnv = createUpdatePackageEnv({});
+  // const fetchPackageData = createFetchPackageData({getManifest});
+  // const managePorts = createManagePorts({});
+  // const getUserActionLogs = createGetUserActionLogs({});
 
   const packageReq = 'otpweb.dnp.dappnode.eth';
-
-  function log(topic, packageName, res) {
-    logs.info(
-      '\x1b[33m%s\x1b[0m', topic, ' ',
-      '\x1b[36m%s\x1b[0m', packageName, ' ',
-      '\x1b[35m%s\x1b[0m', res
-    );
-  }
+  const id = packageReq;
 
   // add .skip to skip test
-  describe('TEST 1, install package, log, toggle twice and delete it', async () => {
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d');
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_html');
+  describe.skip('TEST 1, install package, log, toggle twice and delete it', async () => {
+    await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
+    .catch(() => {});
+    await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
+    .catch(() => {});
+    await shell('docker network create dncore_network')
+    .catch(() => {});
+    // Clean previous stuff
+    await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
+    .catch(() => {});
+    await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
+    .catch(() => {});
+    await shell('docker rm -f '
+      +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
+      +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
+    .catch(() => {});
 
-    beforeRemovePackage(docker, packageReq);
+
     // The test will perfom intense tasks and could take up to some minutes
     // TEST - 1
     // (before)
-    beforeRemovePackage(docker, packageReq);
+
     // - > updatePackageEnv (without restart, preinstall)
-    testUpdatePackageEnv(updatePackageEnv, packageReq, false, params);
+    testUpdatePackageEnv(updatePackageEnv, id, false, params);
+
     // - > installPackage
-    testInstallPackage(installPackage, [packageReq]);
-    // - > updatePackageEnv (with reset, after install)
-    testUpdatePackageEnv(updatePackageEnv, packageReq, true, params);
-    // - > installPackage - > expect error (already installed)
+    testInstallPackage(installPackage, {id});
 
     // - > logPackage
-    testLogPackage(logPackage, [packageReq]);
+    testLogPackage(logPackage, {
+      id,
+      options: {},
+    });
+    testLogPackage(logPackage, {
+      id: 'letsencrypt-nginx.dnp.dappnode.eth',
+      options: {},
+    });
+    testLogPackage(logPackage, {
+      id: 'nginx-proxy.dnp.dappnode.eth',
+      options: {},
+    });
+
+
+    // - > updatePackageEnv (with reset, after install)
+    testUpdatePackageEnv(updatePackageEnv, id, true, params);
+
+    // - > installPackage - > expect error (already installed)
+
     // - > listPackages - > confirm success
-    testListPackages(listPackages, packageReq, 'running');
+    testListPackages(listPackages, id, 'running');
+
     // - > togglePackage (stop)
-    testTogglePackage(togglePackage, [packageReq, 0]);
+    testTogglePackage(togglePackage, {id, timeout: 0});
+
     // - > listPackages - > confirm success
-    testListPackages(listPackages, packageReq, 'exited');
+    testListPackages(listPackages, id, 'exited');
+
     // - > togglePackage (start)
-    testTogglePackage(togglePackage, [packageReq, 0]);
+    testTogglePackage(togglePackage, {id, timeout: 0});
+
     // - > listPackages - > confirm success
-    testListPackages(listPackages, packageReq, 'running');
+    testListPackages(listPackages, id, 'running');
+
     // - > removePackage
-    testRemovePackage(removePackage, [packageReq, 0]);
+    testRemovePackage(removePackage, {id, deleteVolumes: false, timeout: 0});
+
     // - > listPackages - > confirm success
-    testListPackages(listPackages, packageReq, 'down');
+    testListPackages(listPackages, id, 'down');
   });
 
 
@@ -103,10 +135,11 @@ describe.skip('Full integration test with REAL docker: ', function() {
 
 
   describe('TEST 3, list directory and fetch package info', () => {
-    // - > listDirectory
-    testListDirectory(listDirectory, packageReq);
-    // - > fetchPackageInfo
-    testFetchPackageInfo(fetchPackageInfo, [packageReq], packageReq);
+    // - > fetchDirectory
+    const id = 'otpweb.dnp.dappnode.eth';
+    testFetchDirectory(fetchDirectory, id);
+    // - > fetchPackageVersions
+    testFetchPackageVersions(fetchPackageVersions, id);
   });
 });
 
@@ -130,196 +163,122 @@ describe.skip('Full integration test with REAL docker: ', function() {
 // - > listPackages - > confirm success
 
 // TEST - 2
-// - > listDirectory
-// - > fetchPackageInfo
-
-function beforeRemovePackage(docker, packageReq) {
-  it('Make sure the requested package in not installed', (done) => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> (before) REMOVING');
-    docker.compose.down('dnp_repo/'+packageReq+'/docker-compose.yml', {timeout: 0})
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
-
-    // done()
-  }).timeout(10*1000);
-}
+// - > fetchDirectory
+// - > fetchPackageVersions
 
 
-  // The test will perfom intense tasks and could take up to some minutes
-  // TEST - 1
-  // - > updatePackageEnv
+// The test will perfom intense tasks and could take up to some minutes
+// TEST - 1
+// - > updatePackageEnv
 
-function testInstallPackage(installPackage, args) {
+function testInstallPackage(installPackage, kwargs) {
   it('call installPackage', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> INSTALLING');
-    installPackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      expect(JSON.parse(res).success).to.be.true;
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
+    installPackage(kwargs)
+    .then(
+      (res) => {
+        // logs.info('\x1b[33m%s\x1b[0m', res)
+        expect(res).to.have.property('message');
+      },
+      (e) => {
+        if (e) logs.error(e.stack);
+        expect(e).to.be.undefined;
+      }
+    ).then(done);
   }).timeout(120*1000);
 }
 
 
-function testLogPackage(logPackage, args) {
-  it('call logPackage', (done) => {
+function testLogPackage(logPackage, kwargs) {
+  it('call logPackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> LOGGING');
-    logPackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      let parsedRes = JSON.parse(res);
-      expect(parsedRes.success).to.be.true;
-      expect(parsedRes.result).to.be.a('string');
-      expect(parsedRes.result).to.include('Attaching to DAppNodePackage-otpweb.dnp.dappnode.eth');
-      // let packageNames = parsedRes.result.map(e => name)
-      // expect(packageNames).to.include(packageReq)
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
+    const res = await logPackage(kwargs);
+    // logs.info('\x1b[33m%s\x1b[0m', res)
+    expect(res).to.have.property('message');
+    expect(res.result).to.be.a('object');
+    expect(res.result).to.have.property('logs');
+    expect(res.result.logs).to.be.a('string');
+    // let packageNames = parsedRes.result.map(e => name)
+    // expect(packageNames).to.include(packageReq)
   }).timeout(10*1000);
 }
 
 
 function testListPackages(listPackages, packageName, state) {
-  it('call listPackages, to check '+packageName+' is '+state, (done) => {
+  it('call listPackages, to check '+packageName+' is '+state, async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> LISTING');
-    listPackages()
-    .then((res) => {
-      let parsedRes = JSON.parse(res);
-      expect(parsedRes.success).to.be.true;
-      // filter returns an array of results (should have only one)
-      let pkg = parsedRes.result.filter((e) => {
-        return e.name.includes(packageName);
-      })[0];
-      // logs.info('\x1b[33m%s\x1b[0m', pkg)
-      if (state == 'down') {
-        expect(pkg).to.be.undefined;
-      } else {
-        expect(pkg.state).to.equal(state);
-      }
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
+    const res = await listPackages();
+    expect(res).to.have.property('message');
+    // filter returns an array of results (should have only one)
+    let pkg = res.result.filter((e) => {
+      return e.name.includes(packageName);
+    })[0];
+    // logs.info('\x1b[33m%s\x1b[0m', pkg)
+    if (state == 'down') expect(pkg).to.be.undefined;
+    else expect(pkg.state).to.equal(state);
   }).timeout(10*1000);
 }
 
 
-function testTogglePackage(togglePackage, args) {
-  it('call togglePackage', (done) => {
+function testTogglePackage(togglePackage, kwargs) {
+  it('call togglePackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> TOGGLING START / STOP');
-    togglePackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      let parsedRes = JSON.parse(res);
-      expect(parsedRes.success).to.be.true;
-      // let packageNames = parsedRes.result.map(e => name)
-      // expect(packageNames).to.include(packageReq)
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
-  }).timeout(30*1000);
+    const res = await togglePackage(kwargs);
+    expect(res).to.have.property('message');
+  }).timeout(20*1000);
 }
 
 
-function testRemovePackage(removePackage, args) {
-  it('call removePackage', (done) => {
+function testRemovePackage(removePackage, kwargs) {
+  it('call removePackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> REMOVING');
-    removePackage(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      expect(JSON.parse(res).success).to.be.true;
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
-  }).timeout(120*1000);
+    const res = await removePackage(kwargs);
+    expect(res).to.have.property('message');
+  }).timeout(20*1000);
 }
 
 
-function testUpdatePackageEnv(updatePackageEnv, packageReq, restart, params) {
-  const PACKAGE_NAME = packageReq;
+function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
   const getPath = require('utils/getPath');
   const envValue = Date.now();
-  const ENV_FILE_PATH = getPath.envFile(PACKAGE_NAME, params);
+  const ENV_FILE_PATH = getPath.envFile(id, params);
 
-  it('call updatePackageEnv', (done) => {
+  it('call updatePackageEnv', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> UPDATING ENVS');
-    updatePackageEnv([packageReq, JSON.stringify({time: envValue}), restart])
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      expect(JSON.parse(res).success).to.be.true;
-      let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
-      expect(envRes).to.equal('time='+envValue);
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
+    const res = await updatePackageEnv({
+      id,
+      envs: {time: envValue},
+      restart,
     });
+    expect(res).to.have.property('message');
+    let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
+    expect(envRes).to.equal('time='+envValue);
   }).timeout(120*1000);
 }
 
 
-function testListDirectory(listDirectory, packageName) {
-  it('call listDirectory', (done) => {
+function testFetchDirectory(fetchDirectory, packageName) {
+  it('call fetchDirectory', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> GETTING DIRECTORY');
-    listDirectory()
-    .then((res) => {
-      let parsedRes = JSON.parse(res);
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      expect(parsedRes.success).to.be.true;
-      // filter returns an array of results (should have only one)
-      let pkg = parsedRes.result.filter((e) => {
-        return e.name.includes(packageName);
-      });
-      expect(pkg.length).to.equal(1);
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
+    const res = await fetchDirectory();
+    expect(res).to.have.property('message');
+    // filter returns an array of results (should have only one)
+    let pkg = res.result.find((e) => e.name.includes(packageName));
+    expect(pkg).to.exist;
+    expect(pkg).to.have.property('status');
   }).timeout(10*1000);
 }
 
 
-function testFetchPackageInfo(fetchPackageInfo, args, packageName) {
-  it('call fetchPackageInfo', (done) => {
+function testFetchPackageVersions(fetchPackageVersions, id) {
+  it('call fetchPackageVersions', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> FETCHING PACKAGE INFO');
-    fetchPackageInfo(args)
-    .then((res) => {
-      // logs.info('\x1b[33m%s\x1b[0m', res)
-      let parsedRes = JSON.parse(res);
-      expect(parsedRes.success).to.be.true;
-      expect(parsedRes.result).to.be.a('object');
-      expect(parsedRes.result.versions[0].manifest.name).to.equal(packageName);
-      done();
-    })
-    .catch((e) => {
-      if (e) logs.error(e);
-      expect(e).to.be.undefined;
-    });
+    const res = await fetchPackageVersions({id});
+    expect(res).to.have.property('message');
+    expect(res.result).to.be.a('array');
+    const firstVersion = res.result[res.result.length - 1];
+    expect(firstVersion).to.be.a('object');
+    expect(firstVersion.manifest.name).to.equal(id);
+    expect(firstVersion.version).to.equal('0.0.1');
   }).timeout(10*1000);
 }

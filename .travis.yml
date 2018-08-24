@@ -5,9 +5,20 @@ sudo: required
 # Test envs will overwrite defaults
 env:
   - DAPPNODE=rocks
+  - WEB3HOSTWS=wss://mainnet.infura.io/_ws
+  - IPFSHOST=https://ipfs.infura.io
 
 node_js:
   - "8.9.4"
+
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - chmod +x test/test.sh
+  - test/test.sh
 
 cache:
   directories:
@@ -20,5 +31,6 @@ before_script:
   - npm run lint
 script:
   - npm run test
+  - npm run test.int
 after_success:
   - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage
