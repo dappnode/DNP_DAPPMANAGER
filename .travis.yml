@@ -17,6 +17,7 @@ services:
 before_install:
   - export WEB3HOSTWS=https://mainnet.infura.io/metamask
   - export IPFSHOST=https://ipfs.infura.io:5001
+  - chmod +x test/test.sh
 
 cache:
   directories:
@@ -29,6 +30,6 @@ before_script:
   - npm run lint
 script:
   - npm run test
-  - npm run test.int
+  - test/test.sh
 after_success:
   - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage
