@@ -5,8 +5,6 @@ sudo: required
 # Test envs will overwrite defaults
 env:
   - DAPPNODE=rocks
-  - WEB3HOSTWS=wss://mainnet.infura.io/_ws
-  - IPFSHOST=https://ipfs.infura.io
 
 node_js:
   - "8.9.4"
@@ -17,8 +15,8 @@ services:
   - docker
 
 before_install:
-  - chmod +x test/test.sh
-  - test/test.sh
+  - export WEB3HOSTWS=wss://mainnet.infura.io/_ws
+  - export IPFSHOST=https://ipfs.infura.io
 
 cache:
   directories:
