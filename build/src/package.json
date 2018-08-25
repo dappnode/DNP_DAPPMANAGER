@@ -6,8 +6,8 @@
   "scripts": {
     "start": "NODE_PATH=src node src/index.js",
     "test": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test.int": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
-    "test.int.single": "NODE_PATH=src mocha",
+    "test.int": "NODE_PATH=src mocha --exit \"./{,!(node_modules)/**}/*.test.int.js\" ",
+    "test.single": "NODE_PATH=src mocha --exit",
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
