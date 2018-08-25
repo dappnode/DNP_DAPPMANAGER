@@ -51,7 +51,6 @@ docker-compose -f $WAMP_YML_FILE up -d
 ##############
 
 cp -r build $DAPPNODE_DIR
-cp docker-compose-dappmanager.yml $DAPPNODE_DIR
 cp -r test/* $DAPPNODE_DIR
 
 docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml build
