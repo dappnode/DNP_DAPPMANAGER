@@ -15,10 +15,8 @@ services:
   - docker
 
 before_install:
-  - export WEB3HOSTWS=https://mainnet.infura.io/metamask
-  - export IPFSHOST=https://ipfs.infura.io:5001
-  - chmod +x test/test.sh
   - chmod +x test/before_install.sh
+  - chmod +x test/test_integration.sh
   - test/before_install.sh
 
 cache:
@@ -33,6 +31,6 @@ before_script:
 script:
   - npm run test
   - cd ../..
-  - test/test.sh
+  - test/test_integration.sh
 after_success:
   - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage
