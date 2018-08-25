@@ -9,6 +9,16 @@ env:
 node_js:
   - "8.9.4"
 
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - chmod +x test/before_install.sh
+  - chmod +x test/test_integration.sh
+  - test/before_install.sh
+
 cache:
   directories:
     - build/src/node_modules
@@ -20,5 +30,7 @@ before_script:
   - npm run lint
 script:
   - npm run test
+  - cd ../..
+  - test/test_integration.sh
 after_success:
   - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coverage

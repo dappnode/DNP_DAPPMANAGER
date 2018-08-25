@@ -1,12 +1,5 @@
 version: "3.4"
 
-networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
-
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 
@@ -21,6 +14,15 @@ services:
       - /usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/
       - /var/run/docker.sock:/var/run/docker.sock
     dns: 172.33.1.2
+    environment:
+      - WEB3HOSTWS=https://mainnet.infura.io/metamask
     networks:
       network:
         ipv4_address: 172.33.1.7
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.33.0.0/16

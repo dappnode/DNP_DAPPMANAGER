@@ -6,18 +6,20 @@ const paramsDefault = require('params');
 function web3Setup({
   params = paramsDefault,
 }) {
-  const WEB3HOSTWS = params.WEB3HOSTWS;
+  const WEB3HOSTWS = process.env.WEB3HOSTWS || params.WEB3HOSTWS;
   if (!WEB3HOSTWS) throw Error('WEB3HOSTWS is needed to connect to ethchain but it\'s undefined');
 
   let web3 = new Web3(WEB3HOSTWS);
   logs.info('Web3 connection to: ' + WEB3HOSTWS);
 
-  setInterval(function() {
+  const webWatch = setInterval(function() {
     web3.eth.net.isListening().then().catch((e) => {
       logs.error('Web3 connection error to '+WEB3HOSTWS+': ', e.message);
       web3.setProvider(WEB3HOSTWS);
     });
   }, 10000);
+
+  web3.clearWatch = () => clearInterval(webWatch);
 
   return web3;
 
