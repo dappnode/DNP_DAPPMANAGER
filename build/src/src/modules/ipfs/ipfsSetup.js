@@ -6,7 +6,7 @@ const logs = require('logs.js')(module);
 function ipfsSetup({
   params = paramsDefault,
 }) {
-  const IPFS_HOST = params.IPFS;
+  const IPFS_HOST = process.env.IPFSHOST || params.IPFS;
   logs.info('Attempting IPFS connection to : '+IPFS_HOST);
   const ipfs = ipfsAPI(IPFS_HOST, '5001', {protocol: 'http'});
   // verify on the background, don't stop execution
