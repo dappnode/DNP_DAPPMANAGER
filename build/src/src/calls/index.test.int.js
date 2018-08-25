@@ -57,23 +57,25 @@ describe('Full integration test with REAL docker: ', function() {
   const id = packageReq;
 
   // add .skip to skip test
-  describe.skip('TEST 1, install package, log, toggle twice and delete it', async () => {
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
-    .catch(() => {});
-    await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
-    .catch(() => {});
-    await shell('docker network create dncore_network')
-    .catch(() => {});
-    // Clean previous stuff
-    await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
-    .catch(() => {});
-    await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
-    .catch(() => {});
-    await shell('docker rm -f '
-      +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
-      +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
-    .catch(() => {});
-
+  describe('TEST 1, install package, log, toggle twice and delete it', () => {
+    before(async () => {
+      // runs before all tests in this block
+      await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
+      .catch(() => {});
+      await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
+      .catch(() => {});
+      await shell('docker network create dncore_network')
+      .catch(() => {});
+      // Clean previous stuff
+      await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
+      .catch(() => {});
+      await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
+      .catch(() => {});
+      await shell('docker rm -f '
+        +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
+        +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
+      .catch(() => {});
+    });
 
     // The test will perfom intense tasks and could take up to some minutes
     // TEST - 1
@@ -142,8 +144,8 @@ describe('Full integration test with REAL docker: ', function() {
     testFetchPackageVersions(fetchPackageVersions, id);
   });
 
-  describe('Close test', () => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> LOGGING');
+  after(async () => {
+    logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
     const web3Setup = require('modules/web3Setup');
     const web3 = web3Setup({});
     web3.clearWatch();

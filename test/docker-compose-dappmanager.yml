@@ -17,8 +17,12 @@ services:
     environment:
       - WEB3HOSTWS=https://mainnet.infura.io/metamask
     networks:
-      - testbuild_network
+      network:
+        ipv4_address: 172.33.1.7
 
 networks:
-  testbuild_network:
-    external: true
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.33.0.0/16
