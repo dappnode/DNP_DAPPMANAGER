@@ -1,5 +1,6 @@
 #!/bin/bash
 
+DAPPNODE_DIR="test_build"
 docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml up -d
 
 sleep 60
