@@ -141,6 +141,21 @@ describe('Full integration test with REAL docker: ', function() {
     // - > fetchPackageVersions
     testFetchPackageVersions(fetchPackageVersions, id);
   });
+
+  describe('Close test', () => {
+    logs.info('\x1b[36m%s\x1b[0m', '>> LOGGING');
+    const web3Setup = require('modules/web3Setup');
+    const web3 = web3Setup({});
+    web3.clearWatch();
+    if (web3.currentProvider.host.startsWith('ws')) {
+      logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: '+web3.currentProvider.host);
+      web3.currentProvider.connection.close();
+    } else if (web3.currentProvider.host.startsWith('http')) {
+      logs.info('\x1b[36m%s\x1b[0m', '>> IGNORING HTTP PROVIDER: '+web3.currentProvider.host);
+    } else {
+      logs.info('\x1b[36m%s\x1b[0m', '>> UNKNOWN PROVIDER: '+web3.currentProvider.host);
+    }
+  });
 });
 
 // The test will perfom intense tasks and could take up to some minutes
