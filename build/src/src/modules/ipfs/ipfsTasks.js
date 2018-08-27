@@ -5,8 +5,8 @@ const {promisify} = require('util');
 const validate = require('utils/validate');
 
 // Depedencies
-const ipfsDefault = require('./ipfsSetup');
-const paramsDefault = require('params');
+const ipfs = require('./ipfsSetup');
+const params = require('params');
 const logs = require('logs.js')(module);
 const {parseResHash, validateIpfsHash} = require('./utils');
 
@@ -50,51 +50,10 @@ const downloadHandler = (HASH, PATH, logChunks) =>
         reject(new Error('Timeout to cancel expired'));
     }, timeoutTime);
 
-    const downloadHandler = (HASH, PATH, logChunks) => new Promise((resolve, reject) => {
-        // This function has to download the file but also verify that:
-        // - The downloaded file is correct (checking the hash)
-        // - The download is happening (with a timer)
-
-        // Timeout cancel mechanism
-        const timeoutToCancel = setTimeout(() => {
-            reject(new Error('Timeout to cancel expired'));
-        }, timeoutTime);
-
-        // Construct handlers
-        const handleError = (origin) => (err) => {
-            clearTimeout(timeoutToCancel);
-            reject(Error(origin+': '+err));
-        };
-        const trackProgress = (chunk) => {
-            clearTimeout(timeoutToCancel);
-            if (logChunks) logChunks(chunk);
-        };
-        const checkFileHash = async () => {
-            if (await isfileHashValid(HASH, PATH)) resolve();
-            else reject(Error('Downloaded file: '+PATH+', is corrupt'));
-        };
-        const readStream = ipfs.files.catReadableStream(HASH)
-        .on('data', trackProgress)
-        .on('error', handleError('ReadableStream'));
-        const writeStream = fs.createWriteStream(PATH)
-        .on('finish', checkFileHash)
-        .on('error', handleError('WriteStream'));
-        readStream.pipe(writeStream);
-    });
-
-    const download = async (HASH, PATH, logChunks) => {
-        // console.trace('ABOUT TO DOWNLOAD', ' $$ ', HASH, ' $$ ', PATH, ' $$ ', logChunks);
-        // If the file is already downloaded and valid, skip
-        if (await isfileHashValid(HASH, PATH)) return;
-        // Validate arguments
-        validate.path(PATH);
-        HASH = validateIpfsHash(HASH);
-        // execute download
-        await downloadHandler(HASH, PATH, logChunks);
-        // If download was successful, pin file. Pin paralelly, and don't propagate errors
-        ipfs.pin.add(HASH, (err) => {
-            if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
-        });
+    // Construct handlers
+    const handleError = (origin) => (err) => {
+        clearTimeout(timeoutToCancel);
+        reject(Error(origin+': '+err));
     };
     const trackProgress = (chunk) => {
         clearTimeout(timeoutToCancel);
@@ -121,8 +80,13 @@ const download = async (HASH, PATH, logChunks) => {
     validate.path(PATH);
     HASH = validateIpfsHash(HASH);
     // execute download
-    return await downloadHandler(HASH, PATH, logChunks);
+    await downloadHandler(HASH, PATH, logChunks);
+    // If download was successful, pin file. Pin paralelly, and don't propagate errors
+    ipfs.pin.add(HASH, (err) => {
+        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
+    });
 };
+
 
 const cat = async (HASH) => {
     const PATH = CACHE_DIR + HASH;

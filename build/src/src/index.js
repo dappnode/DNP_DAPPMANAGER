@@ -6,53 +6,22 @@ const logs = require('logs.js')(module);
 const logUserAction = require('logUserAction.js');
 
 // import calls
-const createInstallPackage = require('calls/createInstallPackage');
-const createRemovePackage = require('calls/createRemovePackage');
-const createTogglePackage = require('calls/createTogglePackage');
-const createRestartPackage = require('calls/createRestartPackage');
-const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
-const createLogPackage = require('calls/createLogPackage');
-const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
-const createListPackages = require('calls/createListPackages');
-const createFetchDirectory = require('calls/createFetchDirectory');
-const createFetchPackageVersions = require('calls/createFetchPackageVersions');
-const createFetchPackageData = require('calls/createFetchPackageData');
-const createManagePorts = require('calls/createManagePorts');
-const createGetUserActionLogs = require('calls/createGetUserActionLogs');
+const installPackage = require('calls/installPackage');
+const removePackage = require('calls/removePackage');
+const togglePackage = require('calls/togglePackage');
+const restartPackage = require('calls/restartPackage');
+const restartPackageVolumes = require('calls/restartPackageVolumes');
+const logPackage = require('calls/logPackage');
+const updatePackageEnv = require('calls/updatePackageEnv');
+const listPackages = require('calls/listPackages');
+const fetchDirectory = require('calls/fetchDirectory');
+const fetchPackageVersions = require('calls/fetchPackageVersions');
+const fetchPackageData = require('calls/fetchPackageData');
+const managePorts = require('calls/managePorts');
+const getUserActionLogs = require('calls/getUserActionLogs');
 
 // import dependencies
 const params = require('params');
-const pkg = require('modules/packages');
-const createGetManifest = require('modules/getManifest');
-const dependencies = require('modules/dependencies');
-const apmFactory = require('modules/apm');
-const createGetDirectory = require('modules/createGetDirectory');
-
-// Initialize watchers
-// require('./watchers');
-
-// initialize dependencies (by order)
-const apm = apmFactory({});
-const getDirectory = createGetDirectory({});
-const getManifest = createGetManifest({apm});
-const getAllDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-const download = pkg.downloadFactory({});
-const run = pkg.runFactory({});
-
-// Initialize calls
-const installPackage = createInstallPackage({getAllDependencies, download, run});
-const removePackage = createRemovePackage({});
-const togglePackage = createTogglePackage({});
-const restartPackage = createRestartPackage({});
-const restartPackageVolumes = createRestartPackageVolumes({});
-const logPackage = createLogPackage({});
-const listPackages = createListPackages({}); // Needs work
-const fetchDirectory = createFetchDirectory({getDirectory});
-const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
-const updatePackageEnv = createUpdatePackageEnv({});
-const fetchPackageData = createFetchPackageData({getManifest});
-const managePorts = createManagePorts({});
-const getUserActionLogs = createGetUserActionLogs({});
 
 // /////////////////////////////
 // Connection helper functions
