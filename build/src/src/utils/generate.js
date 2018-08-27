@@ -1,6 +1,10 @@
-// node modules
 const yaml = require('js-yaml');
 
+/*
+ * Generates files needed by DNPs
+ * - dockerCompose
+ * - manifest
+*/
 
 function dockerCompose(dpnManifest, params, isCORE = false) {
     // Define docker compose parameters

@@ -1,9 +1,12 @@
-'use strict';
-
 const async = require('async');
 const {promisify} = require('util');
 const ipfsTasks = require('./ipfsTasks');
 const ipfsParams = require('./ipfsParams');
+
+/**
+ * IPFS queue. Wraps the methods exported in ipfsTasks.js
+ *
+ */
 
 // Parameters
 const times = ipfsParams.times || 3;

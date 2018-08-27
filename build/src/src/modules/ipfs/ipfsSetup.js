@@ -1,10 +1,20 @@
-// node modules
 const ipfsAPI = require('ipfs-api');
 const params = require('params');
 const logs = require('logs.js')(module);
 
+/**
+ * IPFS client setup.
+ *
+ * Notice that this script takes advantatge of the singleton nature of nodejs imports.
+ * The exported ipfs object will only be initialized once in the entire application.
+ */
+
 let ipfs;
 
+/**
+ * Prevents web3 from executing to unit-testing.
+ * It can result in infinite non-ending tests
+ */
 if (!process.env.TEST) {
   ipfs = initIPFS();
 }

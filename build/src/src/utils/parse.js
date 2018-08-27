@@ -1,6 +1,10 @@
-// node modules
 const fs = require('fs');
 const yaml = require('yamljs');
+
+/*
+ * Reads and parses files. This util is used to abstract some logic
+ * out of other files and ease testing.
+*/
 
 // Helper function, read and parse docker-compose
 function readDockerCompose(DOCKERCOMPOSE_PATH) {

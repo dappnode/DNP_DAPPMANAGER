@@ -6,18 +6,18 @@ const web3 = require('./web3Setup');
 // Contract parameters
 const DAppNodePackageStatus = ['Preparing', 'Develop', 'Active', 'Deprecated', 'Deleted'];
 
-/**
- * Stops or starts after fetching its status
- *
- * @return {Array} An array of objects:
- *  [
- *    {
- *      name: packageName,  (string)
- *      status: 'Preparing' (string)
- *    },
- *    ...
- *  ]
- */
+ /**
+  * Fetches all package names in the custom dappnode directory.
+  *
+  * @return {Array} An array of objects:
+  *  [
+  *    {
+  *      name: packageName,  (string)
+  *      status: 'Preparing' (string)
+  *    },
+  *    ...
+  *  ]
+  */
 async function getDirectory() {
   const directory = new web3.eth.Contract(directoryContract.abi, directoryContract.address);
   const numberOfDAppNodePackages = parseFloat(

@@ -1,9 +1,11 @@
-// console.trace('CHANGE BACK THE REALM to: dappnode_admin')
+/**
+ * DAPPMANAGER Parameters. This parameters are modified on execution for testing
+ */
+
 module.exports = {
 
   // Autobahn parameters
   autobahnUrl: 'ws://my.wamp.dnp.dappnode.eth:8080/ws',
-  // autobahnRealm: 'realm1',
   autobahnRealm: 'dappnode_admin',
   autobahnTag: {
     logUserActionToDappmanager: 'logUserActionToDappmanager',
@@ -13,8 +15,7 @@ module.exports = {
 
   // Installer paths
   CACHE_DIR: './cache/',
-  // REPO_DIR: "./dnp_repo/" // ### Production name
-  REPO_DIR: './dnp_repo/', // ### Temporary name for development
+  REPO_DIR: './dnp_repo/',
   DNCORE_DIR: 'DNCORE',
   DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
   DOCKERCOMPOSE_NAME: 'docker-compose.yml',
@@ -35,7 +36,7 @@ module.exports = {
   // IPFS parameters
   IPFS: (process.env.IPFS_REDIRECT || 'my.ipfs.dnp.dappnode.eth'),
 
-  // Wweb3 parameters
+  // Web3 parameters
   WEB3HOSTWS: 'ws://my.ethchain.dnp.dappnode.eth:8546',
 
   // User Action Logs filename
