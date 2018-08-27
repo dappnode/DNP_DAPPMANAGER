@@ -4,7 +4,8 @@
 /build/src/DNCORE/
 /build/src/cache/
 /build/src/undefined/
-/build/src/test/*
+/build/src/test_files/
+/build/src/test_files/*
 .DS_Store
 .nyc_output
 build_*

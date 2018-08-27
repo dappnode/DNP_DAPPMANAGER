@@ -1,7 +1,8 @@
 const semver = require('semver');
 const versions = require('utils/versions');
 const validate = require('utils/validate');
-const dockerListDefault = require('modules/dockerList');
+const dockerList = require('modules/dockerList');
+const getManifest = require('modules/getManifest');
 const parse = require('utils/parse');
 const logUI = require('utils/logUI');
 const logs = require('logs.js')(module);
@@ -10,21 +11,19 @@ const logs = require('logs.js')(module);
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
 
 
-function createGetAllResolvedOrdered(getManifest,
-  dockerList=dockerListDefault) {
-  return async function getAllResolvedOrdered({packageReq, logId}) {
-    logUI({logId, clear: true, msg: 'fetching dependencies...'});
-    let allResolvedDeps = await getAllResolved(packageReq, getManifest);
-    // Dependencies will be ordered so they can be installed in series
-    // let allResolvedOrdered = orderDependencies(allResolvedDeps);
-    allResolvedDeps = forceDappmanagerToBeTheLast(allResolvedDeps);
-    logUI({logId, order: allResolvedDeps.map((p) => p.name)});
+async function getAllResolvedOrdered({packageReq, logId}) {
+  logUI({logId, clear: true, msg: 'fetching dependencies...'});
+  let allResolvedDeps = await getAllResolved(packageReq, getManifest);
+  // Dependencies will be ordered so they can be installed in series
+  // let allResolvedOrdered = orderDependencies(allResolvedDeps);
+  allResolvedDeps = forceDappmanagerToBeTheLast(allResolvedDeps);
+  logUI({logId, order: allResolvedDeps.map((p) => p.name)});
 
-    // Check which dependencies should be installed
-    let allResolvedOrderedChecked = await shouldInstall(allResolvedDeps, dockerList, logId);
-    return allResolvedOrderedChecked;
-  };
+  // Check which dependencies should be installed
+  let allResolvedOrderedChecked = await shouldInstall(allResolvedDeps, dockerList, logId);
+  return allResolvedOrderedChecked;
 }
+
 
 function forceDappmanagerToBeTheLast(dependencyList) {
   const index = dependencyList.findIndex((pkg) =>
@@ -207,12 +206,17 @@ function sortByNameKey(a, b) {
 }
 
 
-module.exports = {
-  forceDappmanagerToBeTheLast,
-  createGetAllResolvedOrdered,
-  getAll,
-  getAllResolved,
-  sortByNameKey,
-  byUniqueObjects,
-  resolveConflictingVersions,
-};
+if (process.env.TEST) {
+  module.exports = {
+    forceDappmanagerToBeTheLast,
+    getAllResolvedOrdered,
+    getAll,
+    getAllResolved,
+    sortByNameKey,
+    byUniqueObjects,
+    resolveConflictingVersions,
+  };
+} else {
+  module.exports = getAllResolvedOrdered;
+}
+
