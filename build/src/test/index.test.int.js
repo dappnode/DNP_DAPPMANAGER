@@ -8,50 +8,22 @@ chai.should();
 
 describe('Full integration test with REAL docker: ', function() {
   // import calls
-  const createInstallPackage = require('calls/createInstallPackage');
-  const createRemovePackage = require('calls/createRemovePackage');
-  const createTogglePackage = require('calls/createTogglePackage');
-  // const createRestartPackage = require('calls/createRestartPackage');
-  // const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
-  const createLogPackage = require('calls/createLogPackage');
-  const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
-  const createListPackages = require('calls/createListPackages');
-  const createFetchDirectory = require('calls/createFetchDirectory');
-  const createFetchPackageVersions = require('calls/createFetchPackageVersions');
-  // const createFetchPackageData = require('calls/createFetchPackageData');
-  // const createManagePorts = require('calls/createManagePorts');
-  // const createGetUserActionLogs = require('calls/createGetUserActionLogs');
+  const installPackage = require('calls/installPackage');
+  const removePackage = require('calls/removePackage');
+  const togglePackage = require('calls/togglePackage');
+  // const restartPackage = require('calls/restartPackage');
+  // const restartPackageVolumes = require('calls/restartPackageVolumes');
+  const logPackage = require('calls/logPackage');
+  const updatePackageEnv = require('calls/updatePackageEnv');
+  const listPackages = require('calls/listPackages');
+  const fetchDirectory = require('calls/fetchDirectory');
+  const fetchPackageVersions = require('calls/fetchPackageVersions');
+  // const fetchPackageData = require('calls/fetchPackageData');
+  // const managePorts = require('calls/managePorts');
+  // const getUserActionLogs = require('calls/getUserActionLogs');
 
   // import dependencies
   const params = require('params');
-  const pkg = require('utils/packages');
-  const createGetManifest = require('utils/getManifest');
-  const dependencies = require('utils/dependencies');
-  const createGetDirectory = require('modules/createGetDirectory');
-  const apmFactory = require('modules/apm');
-
-  // initialize dependencies (by order)
-  const apm = apmFactory({});
-  const getDirectory = createGetDirectory({});
-  const getManifest = createGetManifest({apm});
-  const getAllDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-  const download = pkg.downloadFactory({});
-  const run = pkg.runFactory({});
-
-  // Initialize calls
-  const installPackage = createInstallPackage({getAllDependencies, download, run});
-  const removePackage = createRemovePackage({});
-  const togglePackage = createTogglePackage({});
-  // const restartPackage = createRestartPackage({});
-  // const restartPackageVolumes = createRestartPackageVolumes({});
-  const logPackage = createLogPackage({});
-  const listPackages = createListPackages({}); // Needs work
-  const fetchDirectory = createFetchDirectory({getDirectory});
-  const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
-  const updatePackageEnv = createUpdatePackageEnv({});
-  // const fetchPackageData = createFetchPackageData({getManifest});
-  // const managePorts = createManagePorts({});
-  // const getUserActionLogs = createGetUserActionLogs({});
 
   const packageReq = 'otpweb.dnp.dappnode.eth';
   const id = packageReq;
@@ -59,22 +31,25 @@ describe('Full integration test with REAL docker: ', function() {
   // add .skip to skip test
   describe('TEST 1, install package, log, toggle twice and delete it', () => {
     before(async () => {
+      this.timeout(10000);
       // runs before all tests in this block
-      await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
-      .catch(() => {});
-      await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
-      .catch(() => {});
-      await shell('docker network create dncore_network')
-      .catch(() => {});
-      // Clean previous stuff
-      await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
-      .catch(() => {});
-      await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
-      .catch(() => {});
-      await shell('docker rm -f '
-        +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
-        +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
-      .catch(() => {});
+      await Promise.all([
+        await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
+        .catch(() => {}),
+        await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
+        .catch(() => {}),
+        await shell('docker network create dncore_network')
+        .catch(() => {}),
+        // Clean previous stuff
+        await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
+        .catch(() => {}),
+        await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
+        .catch(() => {}),
+        await shell('docker rm -f '
+          +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
+          +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
+        .catch(() => {}),
+      ]);
     });
 
     // The test will perfom intense tasks and could take up to some minutes
@@ -144,18 +119,16 @@ describe('Full integration test with REAL docker: ', function() {
     testFetchPackageVersions(fetchPackageVersions, id);
   });
 
-  after(async () => {
+  after(() => {
     logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
-    const web3Setup = require('modules/web3Setup');
-    const web3 = web3Setup({});
+    const web3 = require('modules/web3Setup');
     web3.clearWatch();
-    if (web3.currentProvider.host.startsWith('ws')) {
+    if (web3.currentProvider
+      && web3.currentProvider.connection
+      && web3.currentProvider.connection.close
+    ) {
       logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: '+web3.currentProvider.host);
       web3.currentProvider.connection.close();
-    } else if (web3.currentProvider.host.startsWith('http')) {
-      logs.info('\x1b[36m%s\x1b[0m', '>> IGNORING HTTP PROVIDER: '+web3.currentProvider.host);
-    } else {
-      logs.info('\x1b[36m%s\x1b[0m', '>> UNKNOWN PROVIDER: '+web3.currentProvider.host);
     }
   });
 });

@@ -29,7 +29,7 @@ function mockTest() {
   };
 
   const installPackage = proxyquire('calls/installPackage', {
-    'modules/dependencies': getAllDependencies,
+    'modules/dependencies': {getAllDependencies},
     'modules/packages': {download, run},
   });
 

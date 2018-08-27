@@ -11,7 +11,7 @@ const logs = require('logs.js')(module);
 const BYPASS_CORE_RESTRICTION = process.env.BYPASS_CORE_RESTRICTION;
 
 
-async function getAllResolvedOrdered({packageReq, logId}) {
+async function getAllDependencies({packageReq, logId}) {
   logUI({logId, clear: true, msg: 'fetching dependencies...'});
   let allResolvedDeps = await getAllResolved(packageReq, getManifest);
   // Dependencies will be ordered so they can be installed in series
@@ -206,17 +206,14 @@ function sortByNameKey(a, b) {
 }
 
 
-if (process.env.TEST) {
-  module.exports = {
-    forceDappmanagerToBeTheLast,
-    getAllResolvedOrdered,
-    getAll,
-    getAllResolved,
-    sortByNameKey,
-    byUniqueObjects,
-    resolveConflictingVersions,
-  };
-} else {
-  module.exports = getAllResolvedOrdered;
-}
+module.exports = {
+  forceDappmanagerToBeTheLast,
+  getAllDependencies,
+  getAll,
+  getAllResolved,
+  sortByNameKey,
+  byUniqueObjects,
+  resolveConflictingVersions,
+};
+
 
