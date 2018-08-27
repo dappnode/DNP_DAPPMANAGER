@@ -2,7 +2,6 @@
 const ipfsAPI = require('ipfs-api');
 const params = require('params');
 const logs = require('logs.js')(module);
-let ipfs;
 
 let ipfs;
 

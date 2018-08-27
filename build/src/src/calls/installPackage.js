@@ -1,6 +1,6 @@
 const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
-const getAllDependencies = require('modules/dependencies');
+const {getAllDependencies} = require('modules/dependencies');
 
 
 /**
