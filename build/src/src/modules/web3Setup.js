@@ -1,10 +1,10 @@
-
 const Web3 = require('web3');
 const logs = require('logs.js')(module);
 const params = require('params');
 
 let web3;
 
+// Prevent web3 from executing to testing. Can result in infinite non-ending tests
 if (!process.env.TEST) {
   web3 = web3Setup();
 }

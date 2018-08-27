@@ -1,8 +1,11 @@
-// node modules
 const fs = require('fs');
 const {promisify} = require('util');
-// dedicated modules
 const validate = require('utils/validate');
+
+/**
+ * IPFS methods.
+ *
+ */
 
 // Depedencies
 const ipfs = require('./ipfsSetup');

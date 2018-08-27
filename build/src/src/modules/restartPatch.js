@@ -5,6 +5,17 @@ const dockerList = require('modules/dockerList');
 const docker = require('modules/docker');
 const params = require('params');
 
+/**
+ * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it
+ * will first stop the current package which cancels the call and the container
+ * stays exited forcing the user to ssh into the server to regain control of
+ * her/his DAppNode.
+ *
+ * This package spins a secondary container with the sole purpose of calling
+ * docker-compose up on the DAPPMANAGER. Then it will end execution and remain exited
+ * The name of the container is DAppNodeTool-restart.dnp.dappnode.eth so it doesn't
+ * shows up in the ADMIN UI's package list
+ */
 
 async function restartPatch(IMAGE_NAME) {
     if (!IMAGE_NAME.includes(':')) {

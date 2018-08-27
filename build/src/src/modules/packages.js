@@ -10,23 +10,19 @@ const params = require('params');
 const docker = require('modules/docker');
 const ipfs = require('modules/ipfs');
 
-// packageList should be an array of package objects, i.e.
-// [
-//   {
-//     name: 'packageA',
-//     ver: 'latest',
-//     dep: <dep object>,
-//     manifest: <manifest object>
-//   },
-//   ...
-// ]
-
 
 // Promisify fs methods
 const removeFile = promisify(fs.unlink);
 const writeFile = promisify(fs.writeFile);
 
-// Return main method
+/**
+ * Handles the download of a package.
+ * @param {object} kwargs which should contain at least
+ * - pkg: packageReq + its manifest. It is expected that in the previous step of the
+ *        installation the manifest is attached to this object.
+ * - logId: task id to allow progress updates
+ * @return {*}
+ */
 async function download({pkg, logId}) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
@@ -88,7 +84,14 @@ async function download({pkg, logId}) {
   await removeFile(IMAGE_PATH);
 }
 
-
+/**
+ * Handles the execution of a package.
+ * @param {object} kwargs which should contain at least
+ * - pkg: packageReq + its manifest. It is expected that in the previous step of the
+ *        installation the manifest is attached to this object.
+ * - logId: task id to allow progress updates
+ * @return {*}
+ */
 async function run({pkg, logId}) {
   const PACKAGE_NAME = pkg.name;
   const MANIFEST = pkg.manifest;

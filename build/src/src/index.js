@@ -20,11 +20,12 @@ const fetchPackageData = require('calls/fetchPackageData');
 const managePorts = require('calls/managePorts');
 const getUserActionLogs = require('calls/getUserActionLogs');
 
-// import dependencies
-const params = require('params');
-
-// /////////////////////////////
-// Connection helper functions
+/*
+ * RPC register wrapper
+ * ********************
+ * This function absctracts and standarizes the response formating, error handling
+ * and logging of errors and actions.
+ */
 
 const register = (session, event, handler) => {
   const wrapErrors = (handler) =>
@@ -69,9 +70,19 @@ function error2obj(e) {
   return {name: e.name, message: e.message, stack: e.stack, userAction: true};
 }
 
+/*
+ * Connection configuration
+ * ************************
+ * Autobahn.js connects to the WAMP, whos url in defined in params.js
+ * On connection open:
+ * - all handlers are registered
+ * - the native event bus is linked to the session to:
+ *   - allow internal calls
+ *   - publish progress logs and userAction logs
+ * - it subscribe to userAction logs sent by the VPN to store them locally
+ */
 
-// /////////////////////////////
-// Configure connection:
+const params = require('params');
 
 const autobahnTag = params.autobahnTag;
 const autobahnUrl = params.autobahnUrl;
@@ -99,6 +110,11 @@ connection.onopen = (session, details) => {
     register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
     register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
 
+
+    /**
+     * Allows internal calls to autobahn. For example, to call install do:
+     * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
+     */
     eventBus.on(eventBusTag.call, (call, args, kwargs) => {
       session.call(call, args, kwargs)
       .then((res) => {
@@ -107,44 +123,32 @@ connection.onopen = (session, details) => {
       });
     });
 
-    // To call install:
-    // session.call(
-    //   'installPackage.dappmanager.dnp.dappnode.eth',
-    //   [],
-    //   { id }
-    // )
-
+    /**
+     * Emits progress logs to the ADMIN UI
+     */
     eventBus.on(eventBusTag.logUI, (data) => {
       session.publish(autobahnTag.DAppManagerLog, [data]);
       logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
     });
 
+    /**
+     * Emits userAction logs to the ADMIN UI
+     */
     eventBus.on(eventBusTag.logUserAction, (data) => {
       session.publish(autobahnTag.logUserAction, [data]);
     });
 
+    /**
+     * Receives userAction logs from the VPN nodejs app
+     */
     session.subscribe(autobahnTag.logUserActionToDappmanager, (args) => {
       logUserAction.log(args[0]);
     });
 };
 
-
 connection.onclose = (reason, details) => {
   logs.warn('Crossbar connection closed. Reason: '+reason+', details: '+JSON.stringify(details));
 };
 
-
 connection.open();
 
-
-// /////////////////////////////
-// Main functions
-
-
-// async function getPackagesVersions(packages) {
-//   return await Promise.all(packages.map(getPackageVersions))
-// }
-
-
-// /////////////////////////////
-// Helper functions

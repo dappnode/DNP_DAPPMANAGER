@@ -2,9 +2,12 @@ const validate = require('utils/validate');
 const ipfs = require('modules/ipfs');
 const apm = require('modules/apm');
 
+/**
+ * Resolves the package request to the APM and fetches the manifest from IPFS.
+ * @param {object} packageReq package request
+ * @return {object} parsed manifest
+ */
 async function getManifest(packageReq) {
-  // Expects a package request object
-  // returns and manifest object
   validate.packageReq(packageReq);
   if (packageReq.name.endsWith('.eth')) {
     if (packageReq.ver.startsWith('/ipfs/Qm')) {
