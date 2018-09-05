@@ -10,7 +10,7 @@ const ipfsParams = require('./ipfsParams');
 
 // Parameters
 const times = ipfsParams.times || 3;
-const concurrency = ipfsParams.concurrency || 2;
+const concurrency = ipfsParams.concurrency || 10;
 const intervalBase = ipfsParams.intervalBase || 225;
 
 // create a queue object with concurrency 2
