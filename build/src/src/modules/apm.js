@@ -126,8 +126,9 @@ const getRepoHash = async (packageReq) => {
 // ////////////  getRepoVersions
 
 const getRepoVersions = async (packageReq) => {
-  validate.packageReq(packageReq);
+  if (!packageReq || typeof packageReq !== 'object') throw Error('Wrong packageReq: '+packageReq);
   const NAME = packageReq.name;
+  if (!NAME) throw Error('packageReq must contain a name property: '+packageReq);
   validate.isEthDomain(NAME); // Validate the provided name, it only accepts .eth domains
 
   let repo = await getRepoContract(NAME, web3);

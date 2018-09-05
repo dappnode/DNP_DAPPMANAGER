@@ -10,7 +10,6 @@ module.exports = {
   autobahnTag: {
     logUserActionToDappmanager: 'logUserActionToDappmanager',
     logUserAction: 'logUserAction.dappmanager.dnp.dappnode.eth',
-    DAppManagerLog: 'log.dappmanager.dnp.dappnode.eth',
   },
 
   // Installer paths

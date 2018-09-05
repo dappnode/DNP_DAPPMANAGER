@@ -29,7 +29,7 @@ const fetchPackageData = async ({
   //   return res.success('Mainnet is syncing', []);
   // }
 
-  const manifest = await getManifest(parse.packageReq(packageReq.name));
+  const manifest = await getManifest(packageReq);
 
   // Correct manifest
   if (!manifest.type) manifest.type = 'library';
