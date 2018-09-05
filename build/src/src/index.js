@@ -127,7 +127,7 @@ connection.onopen = (session, details) => {
      * Emits progress logs to the ADMIN UI
      */
     eventBus.on(eventBusTag.logUI, (data) => {
-      session.publish(autobahnTag.DAppManagerLog, [data]);
+      session.publish('log.dappmanager.dnp.dappnode.eth', [data]);
       logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
     });
 
