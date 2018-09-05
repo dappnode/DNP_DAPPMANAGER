@@ -287,6 +287,47 @@ networks:
 `,
 };
 
+const emptyArrays = {
+    manifest: {
+        'name': 'EmptyArray',
+        'version': '',
+        'description': '',
+        'avatar': '',
+        'type': '',
+        'image': {
+          'path': '',
+          'hash': '',
+          'size': '',
+          'volumes': [
+            '',
+          ],
+          'ports': [
+            '',
+          ],
+          'command': '--command',
+        },
+      },
+    dc: `version: '3.4'
+services:
+    EmptyArray:
+        container_name: DAppNodePackage-EmptyArray
+        image: 'EmptyArray:'
+        volumes:
+            - ''
+        ports:
+            - ''
+        networks:
+            - dncore_network
+        dns: 172.33.1.2
+        command: '--command'
+volumes:
+    '': {}
+networks:
+    dncore_network:
+        external: true
+`,
+};
+
 describe('generate, utils', function() {
   describe('generate docker-compose.yml file', function() {
     // Non-CORE
@@ -320,7 +361,13 @@ describe('generate, utils', function() {
     it('should generate the expected docker-compose of Mysterium', () => {
         generate.dockerCompose(mysterium.manifest, params)
           .should.equal(mysterium.dc);
-      });
+    });
+
+    // EmptyArrays package
+    it('should generate the expected docker-compose of EmptyArray', () => {
+        generate.dockerCompose(emptyArrays.manifest, params)
+          .should.equal(emptyArrays.dc);
+    });
   });
 
   describe('generate a manifest file', function() {
