@@ -70,8 +70,7 @@ const getManifestOfVersions = async (packageReq, versions) => {
 // Reverse to have newer versions on top
 const getPackageVersions = async (packageReq) => {
   const versionsObj = await apm.getRepoVersions(packageReq);
-  Object.keys(versionsObj)
-  .sort(semver.rcompare)
+  return Object.keys(versionsObj)
   .map((version) => ({
     version,
     manifestHash: versionsObj[version],

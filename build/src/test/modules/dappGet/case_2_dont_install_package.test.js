@@ -1,4 +1,4 @@
-const resolveRequest = require('modules/dappGet/resolveRequest');
+const resolveRequest = require('modules/dappGet/resolver');
 const assert = require('assert');
 const repo = getRepo();
 
