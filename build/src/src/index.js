@@ -19,6 +19,7 @@ const fetchPackageVersions = require('calls/fetchPackageVersions');
 const fetchPackageData = require('calls/fetchPackageData');
 const managePorts = require('calls/managePorts');
 const getUserActionLogs = require('calls/getUserActionLogs');
+const resolveRequest = require('calls/resolveRequest');
 
 /*
  * RPC register wrapper
@@ -84,6 +85,11 @@ function error2obj(e) {
 
 const params = require('params');
 
+if (process.env.NODE_ENV === 'development') {
+  params.autobahnUrl = 'ws://localhost:8080/ws';
+  params.autobahnRealm = 'realm1';
+}
+
 const autobahnTag = params.autobahnTag;
 const autobahnUrl = params.autobahnUrl;
 const autobahnRealm = params.autobahnRealm;
@@ -109,6 +115,7 @@ connection.onopen = (session, details) => {
     register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
     register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
     register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
+    register(session, 'resolveRequest.dappmanager.dnp.dappnode.eth', resolveRequest);
 
 
     /**
@@ -151,4 +158,5 @@ connection.onclose = (reason, details) => {
 };
 
 connection.open();
+logs.info('Attempting WAMP connection to '+autobahnUrl+', realm '+autobahnRealm);
 

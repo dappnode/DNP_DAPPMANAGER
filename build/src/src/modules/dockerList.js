@@ -17,7 +17,8 @@ const CORE_CONTAINER_NAME_PREFIX = params.CORE_CONTAINER_NAME_PREFIX;
 async function listContainers() {
   let containers = await dockerRequest('get', '/containers/json?all=true');
   return containers
-    .map(format);
+    .map(format)
+    .filter((pkg) => pkg.isDNP || pkg.isCORE);
 }
 
 async function runningPackagesInfo() {

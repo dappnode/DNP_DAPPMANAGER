@@ -67,8 +67,14 @@ const getManifestOfVersions = async (packageReq, versions) => {
 };
 
 // Reverse to have newer versions on top
-const getPackageVersions = async (packageReq) =>
-  ( await apm.getRepoVersions(packageReq) ).reverse();
+const getPackageVersions = async (packageReq) => {
+  const versionsObj = await apm.getRepoVersions(packageReq);
+  return Object.keys(versionsObj)
+  .map((version) => ({
+    version,
+    manifestHash: versionsObj[version],
+  }));
+};
 
 if (process.env.TEST) {
   module.exports = {
