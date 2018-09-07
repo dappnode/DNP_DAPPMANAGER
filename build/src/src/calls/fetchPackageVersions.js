@@ -1,6 +1,5 @@
 const parse = require('utils/parse');
 const apm = require('modules/apm');
-const semver = require('semver');
 const getManifest = require('modules/getManifest');
 
 /**
