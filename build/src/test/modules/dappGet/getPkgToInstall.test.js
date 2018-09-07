@@ -1,5 +1,5 @@
 const assert = require('assert');
-const getPkgsToInstall = require('modules/dappGet/getPkgsToInstall');
+const getPkgsToInstall = require('modules/dappGet/resolver/getPkgsToInstall');
 const repo = getRepo();
 
 describe('pkgToInstallState', () => {

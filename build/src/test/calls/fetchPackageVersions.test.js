@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 chai.should();
 
-describe('Call function: fetchPackageVersions', function() {
+describe.skip('Call function: fetchPackageVersions', function() {
   const packageName = 'myPackage.eth';
   const packageReq = {name: packageName, ver: 'latest'};
   const versions = [
@@ -83,8 +83,11 @@ describe('Call function: fetchPackageVersions', function() {
     });
 
     it('the versions array should be extended even if fetching a manifest fails', () => {
-      expect(versions[1].manifest.error)
-        .to.be.true;
+      expect( versions[0] ).to.be.an('object');
+      expect( versions[0] ).to.be.have.property('manifest');
+      expect( versions[0].manifest ).to.be.an('object');
+      expect( versions[0].manifest ).to.be.have.property('error');
+      expect( versions[0].manifest.error ).to.be.true;
     });
   });
 
@@ -95,6 +98,10 @@ describe('Call function: fetchPackageVersions', function() {
       expect( res ).to.be.ok;
       let versions = res.result;
       expect( versions.length ).to.equal(2);
+      expect( versions[0] ).to.be.an('object');
+      expect( versions[0] ).to.be.have.property('manifest');
+      expect( versions[0].manifest ).to.be.an('object');
+      expect( versions[0].manifest ).to.be.have.property('error');
       expect( versions[0].manifest.error ).to.be.true;
       expect( versions[1].manifest ).to.equal('manifest_0.0.1');
     });
