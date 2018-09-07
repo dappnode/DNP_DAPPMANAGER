@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_PATH=src node src/index.js",
+    "dev": "NODE_ENV=development npm start",
+    "file": "NODE_PATH=src node",
     "test": "NODE_PATH=src TEST=true mocha \"./{,!(node_modules)/**}/*.test.js\" ",
     "test.int": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
     "test-nyc": "nyc npm run test",

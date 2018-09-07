@@ -10,6 +10,9 @@ if (!process.env.TEST) {
 }
 
 function web3Setup() {
+  if (process.env.NODE_ENV === 'development') {
+    params.WEB3HOSTWS = 'https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d';
+  }
   const WEB3HOSTWS = process.env.WEB3HOSTWS || params.WEB3HOSTWS;
   if (!WEB3HOSTWS) throw Error('WEB3HOSTWS is needed to connect to ethchain but it\'s undefined');
 
