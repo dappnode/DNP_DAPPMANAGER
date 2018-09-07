@@ -19,6 +19,8 @@ module.exports = {
   DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
   DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   ENV_FILE_EXTENSION: '.env',
+  // dappGet file paths
+  REPO_FILE: 'DNCORE/repo.json',
 
   // Docker parameters
   TMP_REPO_DIR: './tmp_dnp_repo/',

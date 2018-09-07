@@ -1,5 +1,6 @@
 const parse = require('utils/parse');
 const apm = require('modules/apm');
+const semver = require('semver');
 const getManifest = require('modules/getManifest');
 
 /**
@@ -67,8 +68,15 @@ const getManifestOfVersions = async (packageReq, versions) => {
 };
 
 // Reverse to have newer versions on top
-const getPackageVersions = async (packageReq) =>
-  ( await apm.getRepoVersions(packageReq) ).reverse();
+const getPackageVersions = async (packageReq) => {
+  const versionsObj = await apm.getRepoVersions(packageReq);
+  Object.keys(versionsObj)
+  .sort(semver.rcompare)
+  .map((version) => ({
+    version,
+    manifestHash: versionsObj[version],
+  }));
+};
 
 if (process.env.TEST) {
   module.exports = {
