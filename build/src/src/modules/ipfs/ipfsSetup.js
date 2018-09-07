@@ -20,6 +20,9 @@ if (!process.env.TEST) {
 }
 
 function initIPFS() {
+  if (process.env.NODE_ENV === 'development') {
+    params.IPFS = '127.0.0.1';
+  }
   const IPFS_HOST = params.IPFS;
   logs.info('Attempting IPFS connection to : '+IPFS_HOST);
   const ipfs = ipfsAPI(IPFS_HOST, '5001', {protocol: 'http'});
