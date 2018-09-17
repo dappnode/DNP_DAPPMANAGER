@@ -1,11 +1,18 @@
-
 const Web3 = require('web3');
 const logs = require('logs.js')(module);
-const paramsDefault = require('params');
+const params = require('params');
 
-function web3Setup({
-  params = paramsDefault,
-}) {
+let web3;
+
+// Prevent web3 from executing to testing. Can result in infinite non-ending tests
+if (!process.env.TEST) {
+  web3 = web3Setup();
+}
+
+function web3Setup() {
+  if (process.env.NODE_ENV === 'development') {
+    params.WEB3HOSTWS = 'https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d';
+  }
   const WEB3HOSTWS = process.env.WEB3HOSTWS || params.WEB3HOSTWS;
   if (!WEB3HOSTWS) throw Error('WEB3HOSTWS is needed to connect to ethchain but it\'s undefined');
 
@@ -22,22 +29,6 @@ function web3Setup({
   web3.clearWatch = () => clearInterval(webWatch);
 
   return web3;
-
-  // testWeb3Host(WEB3HOSTWS).then((res) => {
-  //   if (!res.works) {
-  //     throw Error(WEB3HOSTWS + ' DOES NOT work, reason: '+res.reason)
-  //   }
-  //
-  // })
 }
 
-// A singleton enforces one ipfs instance for the whole application
-// See that if you want to pass non-default parameters in a full application
-// context, there will be a race condition. Non-default parameters should only
-// be passed through testing are make those parameters process.env variables
-const web3Singleton = (() => {
-  let web3;
-  return (kwargs) => web3 ? web3 : web3 = web3Setup(kwargs);
-})();
-
-module.exports = web3Singleton;
+module.exports = web3;

@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_PATH=src node src/index.js",
-    "test": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.js\" ",
-    "test.int": "NODE_PATH=src mocha --exit \"./{,!(node_modules)/**}/*.test.int.js\" ",
-    "test.single": "NODE_PATH=src mocha --exit",
+    "dev": "NODE_ENV=development npm start",
+    "file": "NODE_PATH=src node",
+    "test": "NODE_PATH=src TEST=true mocha \"./{,!(node_modules)/**}/*.test.js\" ",
+    "test.int": "NODE_PATH=src mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
@@ -25,6 +26,7 @@
     "ipfs-api": "^17.5.0",
     "is-ipfs": "^0.3.2",
     "js-yaml": "^3.11.0",
+    "node-docker-api": "^1.1.22",
     "semver": "^5.5.0",
     "shelljs": "^0.8.2",
     "simple-statistics": "^6.0.1",
@@ -44,6 +46,7 @@
     "mocha": "^5.2.0",
     "nyc": "^11.8.0",
     "prettier": "1.13.5",
+    "proxyquire": "^2.0.1",
     "sinon": "^5.0.10",
     "sinon-chai": "^3.1.0"
   }
