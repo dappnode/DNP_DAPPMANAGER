@@ -1,6 +1,4 @@
-const semver = require('semver');
-const byVerReq = require('../utils/byVerReq');
-const safeSort = require('../utils/safeSort');
+const safeSemver = require('../utils/safeSemver');
 
 function prioritizeVersions(pkgToInstall, name, verReq, state) {
     // Order the versions to prioritize which successful case will be picked first
@@ -13,19 +11,21 @@ function prioritizeVersions(pkgToInstall, name, verReq, state) {
         if (pkg === name) {
             // Requested package
             pkgToInstall[pkg] = pkgToInstall[pkg]
-            .filter(byVerReq(verReq))
-            .sort(safeSort(semver.rcompare));
+            .filter((ver) => safeSemver.satisfies(ver, verReq))
+            .sort(safeSemver.rcompare);
         } else if (Object.keys(state).includes(pkg)) {
             // State packages
             pkgToInstall[pkg] = pkgToInstall[pkg]
-            .sort(safeSort(semver.compare));
+            .sort(safeSemver.compare);
             // State package must be given the option of not upgrading.
             // The current algorithm needs this option to be passed explicitly to be considered
             pkgToInstall[pkg].unshift(state[pkg]);
+            // Ensure uniqness
+            pkgToInstall[pkg] = uniqueArray(pkgToInstall[pkg]);
         } else {
             // Others = new packages
             pkgToInstall[pkg] = pkgToInstall[pkg]
-            .sort(safeSort(semver.rcompare));
+            .sort(safeSemver.rcompare);
             // Newly install packages must be given the option of not being installed.
             // The current algorithm needs this option to be passed explicitly to be considered
             pkgToInstall[pkg].unshift(null);
@@ -33,5 +33,10 @@ function prioritizeVersions(pkgToInstall, name, verReq, state) {
     }
     return pkgToInstall;
 }
+
+function uniqueArray(a) {
+    return a ? a.filter((item, pos, self) => self.indexOf(item) == pos) : a;
+}
+
 
 module.exports = prioritizeVersions;

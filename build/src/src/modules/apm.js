@@ -140,7 +140,7 @@ const getLatestWithVersion = async (packageReq) => {
     if (String(e).includes('decode uint16 from ABI')) {
       logs.error('Attempting to fetch an inexistent version');
     } else {
-      logs.error(e);
+      logs.error('Error getting latest version of '+name+': '+e.stack);
     }
   }
   return versions;
@@ -150,14 +150,19 @@ const getLatestWithVersion = async (packageReq) => {
  * Versions
  *
  * @param {*} packageReq
+ * @param {*} verReq
  * @return {*}
  */
-const getRepoVersions = async (packageReq) => {
+const getRepoVersions = async (packageReq, verReq) => {
   if (!packageReq || typeof packageReq !== 'object') {
     throw Error('Wrong packageReq: '+packageReq);
   }
   if (!packageReq.name) {
     throw Error('packageReq must contain a name property: '+packageReq);
+  }
+  // If verReq is not provided or invalid, default to all versions
+  if (!verReq || semver.validRange(verReq)) {
+    verReq = '*';
   }
 
   const {name} = packageReq;
@@ -186,10 +191,13 @@ const getRepoVersions = async (packageReq) => {
    */
   await Promise.all(versionIndexes.map(async (i) => {
     try {
-      const {semanticVersion} = await repo.methods.getByVersionId(i).call();
+      const verArray = ( await repo.methods.getByVersionId(i).call() ).semanticVersion;
       // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
+      const ver = verArray.join('.');
       // Append version result to the versions object
-      versions[semanticVersion.join('.')] = await getSemanticVersion(repo, semanticVersion, web3);
+      if (semver.satisfies(ver, verReq)) {
+        versions[ver] = await getSemanticVersion(repo, verArray, web3);
+      }
     } catch (e) {
       // If you request an inexistent ID to the contract, web3 will throw
       // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
@@ -197,7 +205,7 @@ const getRepoVersions = async (packageReq) => {
       if (String(e).includes('decode uint16 from ABI')) {
         logs.error('Attempting to fetch an inexistent version');
       } else {
-        logs.error(e);
+        logs.error('Error getting versions of '+name+': '+e.stack);
       }
     }
   }));

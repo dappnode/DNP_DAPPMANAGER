@@ -4,6 +4,7 @@ const appendStatePkgToInstall = require('./appendStatePkgToInstall');
 const prioritizeVersions = require('./prioritizeVersions');
 const {getPermutation, getPermutationsTable} = require('./permutations');
 const {filterObj} = require('../utils/objUtils');
+const isIpfs = require('../utils/isIpfs');
 
 /**
  * Resolves a request given a repository of package dependencies and a state
@@ -36,9 +37,6 @@ function resolveRequest(req, repo, state) {
     // Compute packages to install
     let pkgToInstall = getPkgsToInstall(name, ver, repo);
 
-    // ######
-    // console.log('pkgToInstall', pkgToInstall);
-
     // Append affected state packages
     pkgToInstall = appendStatePkgToInstall(pkgToInstall, state, repo);
     pkgToInstall = prioritizeVersions(pkgToInstall, name, ver, state);
@@ -49,7 +47,7 @@ function resolveRequest(req, repo, state) {
 
     const {x: permutationsTable, m: totalCases} = getPermutationsTable(pkgToInstall, name, state);
 
-    // ######
+    // ####### debug
     // console.log('permutationsTable', permutationsTable);
 
     const now = Date.now();
@@ -77,6 +75,7 @@ function resolveRequest(req, repo, state) {
         }
     }
 
+    let manifests;
     if (success) {
         // Prepare the success result
         // 1. Filter out packages that will not be installed
@@ -90,6 +89,17 @@ function resolveRequest(req, repo, state) {
         //         delete state[pkg];
         //     }
         // });
+
+        // Append manifests
+        manifests = {};
+        Object.keys(success).forEach((pkg) => {
+            const ver = success[pkg];
+            manifests[pkg] = {
+                ...repo[pkg][ver],
+                // #### This helps keeping track of IPFS versions
+                origin: isIpfs(ver) ? ver : null,
+            };
+        });
     }
 
 
@@ -99,6 +109,7 @@ function resolveRequest(req, repo, state) {
         success,
         errors,
         state,
+        manifests,
         casesChecked: caseId,
         totalCases,
         hasTimedOut,

@@ -1,5 +1,5 @@
 // node modules
-const shell = require('utils/shell');
+let shell = require('./shell');
 
 const docker = {
   compose: {
@@ -107,6 +107,12 @@ const docker = {
   // --quiet , -q		Suppress the load output
   load: (imagePath) => {
     return shell('docker load -i ' + imagePath);
+  },
+
+  // NOT A DOCKER-COMPOSE
+  // Usage: docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+  tag: (sourceImage, targetImage) => {
+    return shell('docker tag ' + sourceImage + ' ' + targetImage);
   },
 
   // NOT A DOCKER-COMPOSE
