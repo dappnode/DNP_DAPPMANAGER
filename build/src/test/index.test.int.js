@@ -111,14 +111,6 @@ describe('Full integration test with REAL docker: ', function() {
   });
 
 
-  describe('TEST 3, list directory and fetch package info', () => {
-    // - > fetchDirectory
-    const id = 'otpweb.dnp.dappnode.eth';
-    testFetchDirectory(fetchDirectory, id);
-    // - > fetchPackageVersions
-    testFetchPackageVersions(fetchPackageVersions, id);
-  });
-
   after(() => {
     logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
     const web3 = require('modules/web3Setup');
@@ -246,29 +238,3 @@ function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
   }).timeout(120*1000);
 }
 
-
-function testFetchDirectory(fetchDirectory, packageName) {
-  it('call fetchDirectory', async () => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> GETTING DIRECTORY');
-    const res = await fetchDirectory();
-    expect(res).to.have.property('message');
-    // filter returns an array of results (should have only one)
-    let pkg = res.result.find((e) => e.name.includes(packageName));
-    expect(pkg).to.exist;
-    expect(pkg).to.have.property('status');
-  }).timeout(10*1000);
-}
-
-
-function testFetchPackageVersions(fetchPackageVersions, id) {
-  it('call fetchPackageVersions', async () => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> FETCHING PACKAGE INFO');
-    const res = await fetchPackageVersions({id});
-    expect(res).to.have.property('message');
-    expect(res.result).to.be.a('array');
-    const firstVersion = res.result[res.result.length - 1];
-    expect(firstVersion).to.be.a('object');
-    expect(firstVersion.manifest.name).to.equal(id);
-    expect(firstVersion.version).to.equal('0.0.1');
-  }).timeout(10*1000);
-}
