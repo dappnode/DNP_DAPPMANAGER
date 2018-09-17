@@ -4,7 +4,7 @@ const sinon = require('sinon');
 describe('docker calls', function() {
   const execSpy = sinon.spy();
   const docker = proxyquire('modules/docker/Docker', {
-    'utils/shell': execSpy,
+    './shell': execSpy,
   });
   const packageName = 'myPackage';
   const imagePath = './myImage';

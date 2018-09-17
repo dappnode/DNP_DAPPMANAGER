@@ -6,7 +6,7 @@ const logs = require('logs.js')(module);
  * It implements a default timeout, and exposes the silent flag.
 */
 
-const maxTime = 20*1000;
+const maxTime = 3*60*1000;
 
 async function shellExecSync(command, silent = false) {
   const res = await shell.exec(command, {silent: silent, timeout: maxTime});

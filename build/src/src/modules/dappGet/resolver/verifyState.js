@@ -1,4 +1,5 @@
-const semver = require('semver');
+const safeSemver = require('../utils/safeSemver');
+const getFromRepo = require('../utils/getFromRepo');
 
 /**
  * Checks if a specific combination of package versions is valid
@@ -27,9 +28,9 @@ function verifyState(state, repo) {
         } else if (!repo[statePkg][stateVer]) {
             throw Error('package version '+statePkg+'@'+stateVer+' not in repo');
         }
-        let deps = repo[statePkg][stateVer];
+        let deps = getFromRepo(repo, statePkg, stateVer);
         for (const depPkg of Object.keys(deps)) {
-            if (!semver.satisfies(state[depPkg], deps[depPkg])) {
+            if (!safeSemver.satisfies(state[depPkg], deps[depPkg])) {
                 // This dependency is incompatible
                 return {
                     valid: false,

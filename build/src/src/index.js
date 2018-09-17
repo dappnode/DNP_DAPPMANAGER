@@ -1,4 +1,5 @@
 'use strict';
+
 // node modules
 const autobahn = require('autobahn');
 const {eventBus, eventBusTag} = require('eventBus');
@@ -28,40 +29,40 @@ const resolveRequest = require('calls/resolveRequest');
  * and logging of errors and actions.
  */
 
-const register = (session, event, handler) => {
-  const wrapErrors = (handler) =>
-    async function(args, kwargs, details) {
-      logs.debug('In-call to '+event);
-      // 0. args: an array with call arguments
-      // 1. kwargs: an object with call arguments
-      // 2. details: an object which provides call metadata
-      try {
-        const res = await handler(kwargs);
+const wrapErrors = (handler, event) =>
+  async function(args, kwargs, details) {
+    logs.debug('In-call to '+event);
+    // 0. args: an array with call arguments
+    // 1. kwargs: an object with call arguments
+    // 2. details: an object which provides call metadata
+    try {
+      const res = await handler(kwargs);
 
-        // Log internally
-        logUserAction.log({level: 'info', event, ...res, kwargs});
-        const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
-        if (res.logMessage) {
-          logs.info('Call '+eventShort+' success: '+res.message);
-        }
-
-        // Return to crossbar
-        return JSON.stringify({
-          success: true,
-          message: res.message,
-          result: res.result || {},
-        });
-      } catch (err) {
-        logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
-        logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
-        return JSON.stringify({
-          success: false,
-          message: err.message,
-        });
+      // Log internally
+      logUserAction.log({level: 'info', event, ...res, kwargs});
+      const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
+      if (res.logMessage) {
+        logs.info('Call '+eventShort+' success: '+res.message);
       }
-    };
 
-  return session.register(event, wrapErrors(handler)).then(
+      // Return to crossbar
+      return JSON.stringify({
+        success: true,
+        message: res.message,
+        result: res.result || {},
+      });
+    } catch (err) {
+      logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
+      logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
+      return JSON.stringify({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
+
+const register = (session, event, handler) => {
+  return session.register(event, wrapErrors(handler, event)).then(
     function(reg) {logs.info('CROSSBAR: registered '+event);},
     function(err) {logs.error('CROSSBAR: error registering '+event+'. Error message: '+err.error);}
   );
@@ -90,7 +91,6 @@ if (process.env.NODE_ENV === 'development') {
   params.autobahnRealm = 'realm1';
 }
 
-const autobahnTag = params.autobahnTag;
 const autobahnUrl = params.autobahnUrl;
 const autobahnRealm = params.autobahnRealm;
 const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
@@ -117,39 +117,89 @@ connection.onopen = (session, details) => {
     register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
     register(session, 'resolveRequest.dappmanager.dnp.dappnode.eth', resolveRequest);
 
+    /**
+     * All the session uses below can throw errors if the session closes.
+     * so each single callback is wrapped in a try/catch block
+     */
 
     /**
      * Allows internal calls to autobahn. For example, to call install do:
      * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
      */
     eventBus.on(eventBusTag.call, (call, args, kwargs) => {
-      session.call(call, args, kwargs)
-      .then((res) => {
-        logs.info('INTERNAL CALL TO: '+call);
-        logs.info(res);
-      });
+      try {
+        session.call(call, args, kwargs)
+        .then((res) => {
+          logs.info('INTERNAL CALL TO: '+call);
+          logs.info(res);
+        });
+      } catch (e) {
+        logs.error('Error on internal call to '+call+': '+e.stack);
+      }
     });
+
+    /**
+     * Emits the list of packages
+     */
+    const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
+    const listPackagesWrapped = wrapErrors(listPackages, eventPackages);
+    eventBus.on(eventBusTag.emitPackages, () => {
+      try {
+        listPackagesWrapped().then((res) => {
+          session.publish(eventPackages, [], JSON.parse(res));
+        });
+      } catch (e) {
+        logs.error('Error listing packages: '+e.stack);
+      }
+    });
+
+    /**
+     * Emits the directory
+     */
+    const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
+    eventBus.on(eventBusTag.emitDirectory, (pkgs) => {
+      try {
+        session.publish(eventDirectory, [], pkgs);
+      } catch (e) {
+        logs.error('Error publishing directory: '+e.stack);
+      }
+    });
+
 
     /**
      * Emits progress logs to the ADMIN UI
      */
     eventBus.on(eventBusTag.logUI, (data) => {
-      session.publish('log.dappmanager.dnp.dappnode.eth', [data]);
-      logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
+      try {
+        session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
+        if (data && data.msg && !data.msg.includes('%')) {
+          logs.info(JSON.stringify(data));
+        }
+      } catch (e) {
+        logs.error('Error publishing progressLog: '+e.stack);
+      }
     });
 
     /**
      * Emits userAction logs to the ADMIN UI
      */
     eventBus.on(eventBusTag.logUserAction, (data) => {
-      session.publish(autobahnTag.logUserAction, [data]);
+      try {
+        session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
+      } catch (e) {
+        logs.error('Error publishing user action: '+e.stack);
+      }
     });
 
     /**
      * Receives userAction logs from the VPN nodejs app
      */
-    session.subscribe(autobahnTag.logUserActionToDappmanager, (args) => {
-      logUserAction.log(args[0]);
+    session.subscribe('logUserActionToDappmanager', (args) => {
+      try {
+        logUserAction.log(args[0]);
+      } catch (e) {
+        logs.error('Error logging user action: '+e.stack);
+      }
     });
 };
 

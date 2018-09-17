@@ -1,9 +1,11 @@
 const fs = require('fs');
+const ipfs = require('modules/ipfs');
 const parse = require('utils/parse');
 const getPath = require('utils/getPath');
 const validate = require('utils/validate');
 const params = require('params');
 const docker = require('modules/docker');
+const {eventBus, eventBusTag} = require('eventBus');
 
 
 /**
@@ -25,6 +27,14 @@ const updatePackageEnv = async ({
   restart,
 }) => {
   id = parse.packageReq(id).name; // parsing anyway for safety
+  if (id.startsWith('/ipfs/')) {
+    try {
+      const manifest = JSON.parse( await ipfs.cat(id) );
+      id = manifest.name;
+    } catch (e) {
+      throw Error('Could not retrieve package name from manifest of '+id, e.stack);
+    }
+  }
   const envFilePath = getPath.envFileSmart(id, params, isCORE);
 
   // Write envs
@@ -52,6 +62,9 @@ const updatePackageEnv = async ({
 
   await docker.compose.down(dockerComposePath);
   await docker.compose.up(dockerComposePath);
+
+  // Emit packages update
+  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: 'Updated envs and restarted ' + id,

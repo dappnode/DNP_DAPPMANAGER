@@ -133,8 +133,8 @@ describe('Util: parse', function() {
       parse.packageReq('package_name')
         .should.deep.equal({
           name: 'package_name',
-          ver: 'latest',
-          req: 'package_name@latest',
+          ver: '*',
+          req: 'package_name',
         });
     });
   });
