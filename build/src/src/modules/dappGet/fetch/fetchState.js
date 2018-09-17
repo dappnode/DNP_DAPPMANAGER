@@ -1,5 +1,6 @@
 
 const getPkgDeps = require('./getPkgDeps');
+const isIpfs = require('../utils/isIpfs');
 
 /**
  * Fetches the dependencies and subdependencies of all packages
@@ -27,7 +28,11 @@ const getPkgDeps = require('./getPkgDeps');
 async function fetchState(state, repo) {
     const checked = {};
     await Promise.all(Object.keys(state).map((name) =>
-        getPkgDeps(name, '>='+state[name], repo, checked)
+        getPkgDeps(
+            name,
+            isIpfs(state[name]) ? state[name] : '>='+state[name],
+            repo,
+            checked)
     ));
 }
 

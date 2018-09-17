@@ -53,6 +53,10 @@ describe('Get manifest', function() {
 
   it('should return a parsed manifest', () => {
     expect(res)
-      .to.deep.equal(JSON.parse(manifest));
+      .to.deep.equal({
+        fromIpfs: undefined,
+        isCore: undefined,
+        item: 'manifest',
+      });
   });
 });

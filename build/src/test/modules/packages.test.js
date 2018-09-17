@@ -21,7 +21,13 @@ describe('Util: package install / download', () => {
   const MANIFEST_PATH = getPath.manifest(PACKAGE_NAME, params);
   const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
   const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params);
-  const dnpManifest = {image: {path: IMAGE_NAME, hash: IMAGE_HASH}};
+  const dnpManifest = {
+    name: PACKAGE_NAME,
+    image: {
+      path: IMAGE_NAME,
+      hash: IMAGE_HASH,
+    },
+  };
 
 
   // ipfs .download, .isfileHashValid
@@ -66,7 +72,7 @@ describe('Util: package install / download', () => {
 
   // validate .path --> blindly accept all paths
   const validate = {
-    path: (path) => {return path;},
+    path: (path) => path,
   };
 
   // fs .writeFileSync, .existsSync, .unlinkSync

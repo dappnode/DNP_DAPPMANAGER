@@ -11,8 +11,8 @@ describe('Call function: installPackage', function() {
 
 function mockTest() {
   // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params)
-  const packageList = ['a'];
-  const PACKAGE_NAME = 'packageA';
+  const PACKAGE_NAME = 'packageA.dnp.dappnode.eth';
+  const PACKAGE_VER = '0.0.1';
   // Create Mocks
   const downloadPackagesSpy = sinon.spy();
   const download = async (packageList) => {
@@ -22,15 +22,19 @@ function mockTest() {
   const run = async (packageList) => {
     runPackagesSpy(packageList);
   };
-  const getAllDependenciesSpy = sinon.spy();
-  const getAllDependencies = async (packageReq) => {
-    getAllDependenciesSpy(packageReq);
-    return packageList;
+
+  const dappGet = {
+    update: async () => {},
+    resolve: async (res) => ({
+      success: {[PACKAGE_NAME]: PACKAGE_VER},
+      state: {},
+      manifests: {[PACKAGE_NAME]: {}},
+    }),
   };
 
   const installPackage = proxyquire('calls/installPackage', {
-    'modules/dependencies': {getAllDependencies},
     'modules/packages': {download, run},
+    'modules/dappGet': dappGet,
   });
 
   let res;
@@ -40,12 +44,20 @@ function mockTest() {
     res = await installPackage({id: PACKAGE_NAME});
 
     expect(downloadPackagesSpy.getCalls()[0].args[0].pkg)
-      .to.deep.equal( packageList[0] );
+      .to.deep.equal({
+        name: PACKAGE_NAME,
+        ver: PACKAGE_VER,
+        manifest: {},
+      });
   });
 
   it('runPackages should be called with packageList', () => {
     expect(runPackagesSpy.getCalls()[0].args[0].pkg)
-      .to.deep.equal( packageList[0] );
+      .to.deep.equal({
+        name: PACKAGE_NAME,
+        ver: PACKAGE_VER,
+        manifest: {},
+      });
   });
 
   // it('should stop the package with correct arguments', async () => {

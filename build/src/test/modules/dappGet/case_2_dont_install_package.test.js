@@ -31,12 +31,12 @@ describe('case 2, upgrade state package because of a dependency', () => {
 function getRepo() {
     return {
       'A': {
-        '0.1.0': {},
-        '0.1.1': {'B': '^1.0.0'},
-        '0.1.2': {},
+        '0.1.0': {dependencies: {}},
+        '0.1.1': {dependencies: {'B': '^1.0.0'}},
+        '0.1.2': {dependencies: {}},
       },
       'B': {
-        '1.0.0': {},
+        '1.0.0': {dependencies: {}},
       },
     };
   }

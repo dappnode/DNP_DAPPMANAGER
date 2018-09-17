@@ -3,6 +3,7 @@ const getPath = require('utils/getPath');
 const restartPatch = require('modules/restartPatch');
 const params = require('params');
 const docker = require('modules/docker');
+const {eventBus, eventBusTag} = require('eventBus');
 
 
 /**
@@ -28,6 +29,9 @@ const restartPackage = async ({
 
   // Combining rm && up doesn't prevent the installer from crashing
   await docker.compose.rm_up(dockerComposePath);
+
+  // Emit packages update
+  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: 'Restarted package: ' + id,

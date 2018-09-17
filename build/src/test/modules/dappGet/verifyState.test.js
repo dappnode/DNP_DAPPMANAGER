@@ -46,14 +46,14 @@ describe('verifyState', () => {
 function getRepo() {
   return {
     'A': {
-      '1.0.0': {'C': '^1.0.0'},
+      '1.0.0': {dependencies: {'C': '^1.0.0'}},
     },
     'B': {
-      '1.0.0': {'C': '^1.0.0'},
+      '1.0.0': {dependencies: {'C': '^1.0.0'}},
     },
     'C': {
-      '1.0.0': {},
-      '2.0.0': {},
+      '1.0.0': {dependencies: {}},
+      '2.0.0': {dependencies: {}},
     },
   };
 }

@@ -1,6 +1,5 @@
 const {promisify} = require('util');
 const getPath = require('utils/getPath');
-const parse = require('utils/parse');
 const generate = require('utils/generate');
 const fs = require('fs');
 const validate = require('utils/validate');
@@ -26,42 +25,28 @@ const writeFile = promisify(fs.writeFile);
 async function download({pkg, logId}) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
-  const PACKAGE_NAME = pkg.name;
-  const MANIFEST = pkg.manifest;
-  const IMAGE_NAME = parse.manifest.imageName(MANIFEST);
-  const IMAGE_HASH = parse.manifest.imageHash(MANIFEST);
-  const IMAGE_SIZE = parse.manifest.imageSize(MANIFEST);
-
-  // isCORE?
-  const isCORE = (MANIFEST.type == 'dncore' && pkg.allowCORE);
-  pkg.isCORE = isCORE;
-  // inform the user of improper usage
-  if (MANIFEST.type == 'dncore' && !pkg.allowCORE) {
-    throw Error('Requesting to install an unverified dncore package');
-  }
-
-  // Generate paths
-  const MANIFEST_PATH = getPath.manifest(PACKAGE_NAME, params, isCORE);
-  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, isCORE);
-  const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params, isCORE);
-  // Validate paths
-  validate.path(MANIFEST_PATH);
-  validate.path(DOCKERCOMPOSE_PATH);
-  validate.path(IMAGE_PATH);
-  // Generate files
-  const MANIFEST_DATA = generate.manifest(MANIFEST);
-  const DOCKERCOMPOSE_DATA = generate.dockerCompose(MANIFEST, params, isCORE);
+  const {manifest} = pkg;
+  const {name, version, isCore, fromIpfs} = manifest;
+  const imageName = manifest.image.path;
+  const imageHash = manifest.image.hash;
+  const imageSize = manifest.image.size;
 
   // Write manifest and docker-compose
-  await writeFile(MANIFEST_PATH, MANIFEST_DATA);
-  await writeFile(DOCKERCOMPOSE_PATH, DOCKERCOMPOSE_DATA);
+  await writeFile(
+    validate.path(getPath.manifest(name, params, isCore)),
+    generate.manifest(manifest)
+  );
+  await writeFile(
+    validate.path(getPath.dockerCompose(name, params, isCore)),
+    generate.dockerCompose(manifest, params, isCore, fromIpfs)
+  );
 
   // Define the logging function
   const log = (percent) =>
-    logUI({logId, pkg: PACKAGE_NAME, msg: 'Downloading... '+percent+' %'});
+    logUI({logId, pkg: name, msg: 'Downloading '+percent+'%'});
   // Define the rounding function to not spam updates
   const displayRes = 2;
-  const round = (x) => displayRes*Math.ceil(100*x/IMAGE_SIZE/displayRes);
+  const round = (x) => displayRes*Math.ceil(100*x/imageSize/displayRes);
   // Keep track of the bytes downloaded
   let bytes = 0; let prev = 0;
   const logChunk = (chunk) => {
@@ -70,18 +55,28 @@ async function download({pkg, logId}) {
     }
   };
 
-  logUI({logId, pkg: PACKAGE_NAME, msg: 'starting download...'});
+  logUI({logId, pkg: name, msg: 'Starting download...'});
+  const imagePath = validate.path(getPath.image(name, imageName, params, isCore));
   await ipfs.download(
-    IMAGE_HASH,
-    IMAGE_PATH,
+    imageHash,
+    imagePath,
     logChunk,
   );
 
-  logUI({logId, pkg: PACKAGE_NAME, msg: 'loading image...'});
-  await docker.load(IMAGE_PATH);
+  logUI({logId, pkg: name, msg: 'Loading image...'});
+  await docker.load(imagePath);
 
-  logUI({logId, pkg: PACKAGE_NAME, msg: 'cleaning files...'});
-  await removeFile(IMAGE_PATH);
+  // For IPFS downloads, retag image
+  // 0.1.11 => 0.1.11-ipfs-QmSaHiGWDStTZg6G3YQi5herfaNYoonPihjFzCcQoJy8Wc
+  if (fromIpfs) {
+    await docker.tag(name + ':' + version, name + ':' + fromIpfs);
+  }
+
+  logUI({logId, pkg: name, msg: 'Cleaning files...'});
+  await removeFile(imagePath);
+
+  // Final log
+  logUI({logId, pkg: name, msg: 'Package donwloaded'});
 }
 
 /**
@@ -93,20 +88,20 @@ async function download({pkg, logId}) {
  * @return {*}
  */
 async function run({pkg, logId}) {
-  const PACKAGE_NAME = pkg.name;
-  const MANIFEST = pkg.manifest;
-  const isCORE = pkg.isCORE;
-  const VERSION = parse.manifest.version(MANIFEST);
-  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, isCORE);
+  const {name, manifest} = pkg;
+  const {isCore, version} = manifest;
+  const dockerComposePath = getPath.dockerCompose(name, params, isCore);
 
-  logUI({logId, pkg: PACKAGE_NAME, msg: 'starting package... '});
+  logUI({logId, pkg: name, msg: 'starting package... '});
   // patch to prevent installer from crashing
-  if (PACKAGE_NAME == 'dappmanager.dnp.dappnode.eth') {
-    await restartPatch(PACKAGE_NAME+':'+VERSION);
+  if (name == 'dappmanager.dnp.dappnode.eth') {
+    await restartPatch(name+':'+version);
   } else {
-    await docker.compose.up(DOCKERCOMPOSE_PATH);
+    await docker.compose.up(dockerComposePath);
   }
-  logUI({logId, pkg: PACKAGE_NAME, msg: 'package started'});
+
+  // Final log
+  logUI({logId, pkg: name, msg: 'package started'});
 }
 
 

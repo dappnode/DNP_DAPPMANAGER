@@ -103,8 +103,8 @@ describe('ipfsTasksFactory', () => {
                     expect(res).to.be.undefined;
                 },
                 (err) => {
-                    expect(err).to.be.an('Error');
-                    expect(err.message).to.include('corrupt');
+                    expect(err).to.be.a('String');
+                    expect(err).to.include('corrupt');
                 }
             );
         });

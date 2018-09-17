@@ -4,7 +4,7 @@ async function getState() {
     let state = {};
     let dnpList = await dockerList.listContainers();
     dnpList.forEach((pkg) => {
-        state[pkg.name] = pkg.version;
+        state[pkg.name] = pkg.origin || pkg.version;
     });
     return state;
 }

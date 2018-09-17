@@ -14,6 +14,8 @@ class MyEmitter extends EventEmitter {}
 const eventBus = new MyEmitter();
 
 const eventBusTag = {
+    emitDirectory: 'EMIT_DIRECTORY',
+    emitPackages: 'EMIT_PACKAGES',
     logUI: 'EVENT_BUS_LOGUI',
     call: 'EVENT_BUS_CALL',
     logUserAction: 'EVENT_BUS_LOGUSERACTION',
