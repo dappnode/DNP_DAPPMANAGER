@@ -1,6 +1,16 @@
 const shell = require('shelljs');
 const logs = require('logs.js')(module);
 
+/*
+ * Multipurpose util, it will check for a condition and correct it or throw an error.
+ * It valides:
+ * - packageReq: Standard object in multiple RPCs
+ * - ethDomain: Ensures *.eth
+ * - IPFShash
+ * - path: Extensively used. It verifies that a path exists, otherwise creates its
+ *         parent directory recursively with mkdir -p
+*/
+
 function packageReq(packageReq) {
   if (!packageReq) throw Error('VALIDATION ERROR: packageReq is undefined');
 

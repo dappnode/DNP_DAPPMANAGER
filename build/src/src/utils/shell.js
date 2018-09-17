@@ -1,7 +1,12 @@
 const shell = require('shelljs');
 const logs = require('logs.js')(module);
 
-const maxTime = 20*1000;
+/*
+ * Wrapper for shelljs. It the execution is not successful it throws an error.
+ * It implements a default timeout, and exposes the silent flag.
+*/
+
+const maxTime = 3*60*1000;
 
 async function shellExecSync(command, silent = false) {
   const res = await shell.exec(command, {silent: silent, timeout: maxTime});

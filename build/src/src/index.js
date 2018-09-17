@@ -1,4 +1,5 @@
 'use strict';
+
 // node modules
 const autobahn = require('autobahn');
 const {eventBus, eventBusTag} = require('eventBus');
@@ -6,91 +7,62 @@ const logs = require('logs.js')(module);
 const logUserAction = require('logUserAction.js');
 
 // import calls
-const createInstallPackage = require('calls/createInstallPackage');
-const createRemovePackage = require('calls/createRemovePackage');
-const createTogglePackage = require('calls/createTogglePackage');
-const createRestartPackage = require('calls/createRestartPackage');
-const createRestartPackageVolumes = require('calls/createRestartPackageVolumes');
-const createLogPackage = require('calls/createLogPackage');
-const createUpdatePackageEnv = require('calls/createUpdatePackageEnv');
-const createListPackages = require('calls/createListPackages');
-const createFetchDirectory = require('calls/createFetchDirectory');
-const createFetchPackageVersions = require('calls/createFetchPackageVersions');
-const createFetchPackageData = require('calls/createFetchPackageData');
-const createManagePorts = require('calls/createManagePorts');
-const createGetUserActionLogs = require('calls/createGetUserActionLogs');
+const installPackage = require('calls/installPackage');
+const removePackage = require('calls/removePackage');
+const togglePackage = require('calls/togglePackage');
+const restartPackage = require('calls/restartPackage');
+const restartPackageVolumes = require('calls/restartPackageVolumes');
+const logPackage = require('calls/logPackage');
+const updatePackageEnv = require('calls/updatePackageEnv');
+const listPackages = require('calls/listPackages');
+const fetchDirectory = require('calls/fetchDirectory');
+const fetchPackageVersions = require('calls/fetchPackageVersions');
+const fetchPackageData = require('calls/fetchPackageData');
+const managePorts = require('calls/managePorts');
+const getUserActionLogs = require('calls/getUserActionLogs');
+const resolveRequest = require('calls/resolveRequest');
 
-// import dependencies
-const params = require('params');
-const pkg = require('utils/packages');
-const createGetManifest = require('utils/getManifest');
-const dependencies = require('utils/dependencies');
-const apmFactory = require('modules/apm');
-const createGetDirectory = require('modules/createGetDirectory');
+/*
+ * RPC register wrapper
+ * ********************
+ * This function absctracts and standarizes the response formating, error handling
+ * and logging of errors and actions.
+ */
 
-// Initialize watchers
-// require('./watchers');
+const wrapErrors = (handler, event) =>
+  async function(args, kwargs, details) {
+    logs.debug('In-call to '+event);
+    // 0. args: an array with call arguments
+    // 1. kwargs: an object with call arguments
+    // 2. details: an object which provides call metadata
+    try {
+      const res = await handler(kwargs);
 
-// initialize dependencies (by order)
-const apm = apmFactory({});
-const getDirectory = createGetDirectory({});
-const getManifest = createGetManifest({apm});
-const getAllDependencies = dependencies.createGetAllResolvedOrdered(getManifest);
-const download = pkg.downloadFactory({});
-const run = pkg.runFactory({});
+      // Log internally
+      logUserAction.log({level: 'info', event, ...res, kwargs});
+      const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
+      if (res.logMessage) {
+        logs.info('Call '+eventShort+' success: '+res.message);
+      }
 
-// Initialize calls
-const installPackage = createInstallPackage({getAllDependencies, download, run});
-const removePackage = createRemovePackage({});
-const togglePackage = createTogglePackage({});
-const restartPackage = createRestartPackage({});
-const restartPackageVolumes = createRestartPackageVolumes({});
-const logPackage = createLogPackage({});
-const listPackages = createListPackages({}); // Needs work
-const fetchDirectory = createFetchDirectory({getDirectory});
-const fetchPackageVersions = createFetchPackageVersions({getManifest, apm});
-const updatePackageEnv = createUpdatePackageEnv({});
-const fetchPackageData = createFetchPackageData({getManifest});
-const managePorts = createManagePorts({});
-const getUserActionLogs = createGetUserActionLogs({});
-
-// /////////////////////////////
-// Connection helper functions
+      // Return to crossbar
+      return JSON.stringify({
+        success: true,
+        message: res.message,
+        result: res.result || {},
+      });
+    } catch (err) {
+      logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
+      logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
+      return JSON.stringify({
+        success: false,
+        message: err.message,
+      });
+    }
+  };
 
 const register = (session, event, handler) => {
-  const wrapErrors = (handler) =>
-    async function(args, kwargs) {
-      logs.debug('In-call to '+event);
-      // 0. args: an array with call arguments
-      // 1. kwargs: an object with call arguments
-      // 2. details: an object which provides call metadata
-      try {
-        const res = await handler(kwargs);
-
-        // Log internally
-        logUserAction.log({level: 'info', event, ...res, kwargs});
-        const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
-        if (res.logMessage) {
-          logs.info('Call '+eventShort+' success: '+res.message);
-        }
-
-        // Return to crossbar
-        return JSON.stringify({
-          success: true,
-          message: res.message,
-          result: res.result || {},
-        });
-      } catch (err) {
-        logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
-        logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
-        return JSON.stringify({
-          success: false,
-          message: err.message,
-        });
-      }
-    };
-
-  return session.register(event, wrapErrors(handler)).then(
+  return session.register(event, wrapErrors(handler, event)).then(
     function(reg) {logs.info('CROSSBAR: registered '+event);},
     function(err) {logs.error('CROSSBAR: error registering '+event+'. Error message: '+err.error);}
   );
@@ -100,11 +72,25 @@ function error2obj(e) {
   return {name: e.name, message: e.message, stack: e.stack, userAction: true};
 }
 
+/*
+ * Connection configuration
+ * ************************
+ * Autobahn.js connects to the WAMP, whos url in defined in params.js
+ * On connection open:
+ * - all handlers are registered
+ * - the native event bus is linked to the session to:
+ *   - allow internal calls
+ *   - publish progress logs and userAction logs
+ * - it subscribe to userAction logs sent by the VPN to store them locally
+ */
 
-// /////////////////////////////
-// Configure connection:
+const params = require('params');
 
-const autobahnTag = params.autobahnTag;
+if (process.env.NODE_ENV === 'development') {
+  params.autobahnUrl = 'ws://localhost:8080/ws';
+  params.autobahnRealm = 'realm1';
+}
+
 const autobahnUrl = params.autobahnUrl;
 const autobahnRealm = params.autobahnRealm;
 const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
@@ -129,53 +115,98 @@ connection.onopen = (session, details) => {
     register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
     register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
     register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
+    register(session, 'resolveRequest.dappmanager.dnp.dappnode.eth', resolveRequest);
 
+    /**
+     * All the session uses below can throw errors if the session closes.
+     * so each single callback is wrapped in a try/catch block
+     */
+
+    /**
+     * Allows internal calls to autobahn. For example, to call install do:
+     * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
+     */
     eventBus.on(eventBusTag.call, (call, args, kwargs) => {
-      session.call(call, args, kwargs)
-      .then((res) => {
-        logs.info('INTERNAL CALL TO: '+call);
-        logs.info(res);
-      });
+      try {
+        session.call(call, args, kwargs)
+        .then((res) => {
+          logs.info('INTERNAL CALL TO: '+call);
+          logs.info(res);
+        });
+      } catch (e) {
+        logs.error('Error on internal call to '+call+': '+e.stack);
+      }
     });
 
-    // To call install:
-    // session.call(
-    //   'installPackage.dappmanager.dnp.dappnode.eth',
-    //   [],
-    //   { id }
-    // )
+    /**
+     * Emits the list of packages
+     */
+    const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
+    const listPackagesWrapped = wrapErrors(listPackages, eventPackages);
+    eventBus.on(eventBusTag.emitPackages, () => {
+      try {
+        listPackagesWrapped().then((res) => {
+          session.publish(eventPackages, [], JSON.parse(res));
+        });
+      } catch (e) {
+        logs.error('Error listing packages: '+e.stack);
+      }
+    });
 
+    /**
+     * Emits the directory
+     */
+    const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
+    eventBus.on(eventBusTag.emitDirectory, (pkgs) => {
+      try {
+        session.publish(eventDirectory, [], pkgs);
+      } catch (e) {
+        logs.error('Error publishing directory: '+e.stack);
+      }
+    });
+
+
+    /**
+     * Emits progress logs to the ADMIN UI
+     */
     eventBus.on(eventBusTag.logUI, (data) => {
-      session.publish(autobahnTag.DAppManagerLog, [data]);
-      logs.info('\x1b[35m%s\x1b[0m', JSON.stringify(data));
+      try {
+        session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
+        if (data && data.msg && !data.msg.includes('%')) {
+          logs.info(JSON.stringify(data));
+        }
+      } catch (e) {
+        logs.error('Error publishing progressLog: '+e.stack);
+      }
     });
 
+    /**
+     * Emits userAction logs to the ADMIN UI
+     */
     eventBus.on(eventBusTag.logUserAction, (data) => {
-      session.publish(autobahnTag.logUserAction, [data]);
+      try {
+        session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
+      } catch (e) {
+        logs.error('Error publishing user action: '+e.stack);
+      }
     });
 
-    session.subscribe(autobahnTag.logUserActionToDappmanager, (args) => {
-      logUserAction.log(args[0]);
+    /**
+     * Receives userAction logs from the VPN nodejs app
+     */
+    session.subscribe('logUserActionToDappmanager', (args) => {
+      try {
+        logUserAction.log(args[0]);
+      } catch (e) {
+        logs.error('Error logging user action: '+e.stack);
+      }
     });
 };
-
 
 connection.onclose = (reason, details) => {
   logs.warn('Crossbar connection closed. Reason: '+reason+', details: '+JSON.stringify(details));
 };
 
-
 connection.open();
+logs.info('Attempting WAMP connection to '+autobahnUrl+', realm '+autobahnRealm);
 
-
-// /////////////////////////////
-// Main functions
-
-
-// async function getPackagesVersions(packages) {
-//   return await Promise.all(packages.map(getPackageVersions))
-// }
-
-
-// /////////////////////////////
-// Helper functions
