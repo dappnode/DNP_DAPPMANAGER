@@ -3,6 +3,7 @@ const getPath = require('utils/getPath');
 const parse = require('utils/parse');
 const params = require('params');
 const docker = require('modules/docker');
+const {eventBus, eventBusTag} = require('eventBus');
 
 
 /**
@@ -42,6 +43,9 @@ async function restartPackageVolumes({
   }
   // Restart docker to apply changes
   await docker.compose.up(dockerComposePath);
+
+  // Emit packages update
+  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: 'Restarted '+id+' volumes: ' + packageVolumes.join(', '),

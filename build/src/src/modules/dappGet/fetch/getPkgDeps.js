@@ -1,4 +1,4 @@
-const getManifest = require('modules/getManifest');
+const ipfs = require('modules/ipfs');
 const getVersions = require('./getVersions');
 const logs = require('logs.js')(module);
 
@@ -29,6 +29,7 @@ async function getPkgDeps(name, verReq, repo, checked = {}) {
     }
     if (!repo[name]) repo[name] = {};
 
+
     let versions = await getVersions(name, verReq);
     //  versionsObj = {
     //    '0.8.0': '/ipfs/QmZ1aaB41vXI...',
@@ -39,24 +40,35 @@ async function getPkgDeps(name, verReq, repo, checked = {}) {
     // ######
     // console.log('name', name, 'ver', verReq, 'versions', versions);
 
-    for (const ver of Object.keys(versions)) {
+    for (let ver of Object.keys(versions)) {
         if (repo[name][ver]) {
             // Already checked, skip
         } else {
             // Get the dependencies of a specific package and version.
             // Will pass the manifest hash to getManifest instead of the version
             // to avoid calling apm again. allVersions[ver] = /ipfs/QmZ4ops2...
-            const manifest = await getManifest({name, ver: versions[ver]})
-            // ##### WARNING, this swallows errors,
-            .catch((e) => null);
+            // ##### EXTERNAL INPUT: manifest
+            // ##### WARNING, this swallows errors
+            const hash = versions[ver];
+            let manifest;
+            try {
+                manifest = JSON.parse( await ipfs.cat(hash) );
+            } catch (e) {
+                logs.debug('Error downloading manifest '+name+' '+versions[ver]+': '+e.stack);
+            }
             const deps = (manifest || {}).dependencies || {};
-            repo[name][ver] = deps;
+            repo[name][ver] = manifest;
 
             // ######
             // console.log('name', name, 'ver', ver, 'deps', deps);
 
             for (const depName of Object.keys(deps)) {
-                const depVerReq = deps[depName];
+                let depVerReq = deps[depName];
+                // ###### EXTERNAL INUT, deps
+                if (depVerReq === 'latest') {
+                    repo[name][ver].dependencies[depName] = '*';
+                    depVerReq = '*';
+                }
                 if (checked[depName+'@'+depVerReq]) {
                     // Skipping requirement
                 } else {

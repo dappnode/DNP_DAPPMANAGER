@@ -16,6 +16,7 @@ describe('Call function: fetchDirectory', function() {
   const packageName = 'myPackage.eth';
   const avatarHash = 'FakeFileAvatarHash';
   const testDirectory = './test_files/';
+  const manifest = {name: 'pkgA'};
 
 
   describe('Call function fetchDirectory', function() {
@@ -27,17 +28,26 @@ describe('Call function: fetchDirectory', function() {
     it('should return success message and the directory data', async () => {
       sinon.replace(dockerList, 'listContainers', sinon.fake.returns(['pkgA']));
       const getDirectory = sinon.stub();
-      getDirectory.resolves(['pkgA']);
+      getDirectory.resolves([{name: 'pkgA'}]);
+      const getManifest = sinon.stub();
+      getManifest.resolves(manifest);
       const fetchDirectory = proxyquire('calls/fetchDirectory', {
         'modules/getDirectory': getDirectory,
         'modules/dockerList': dockerList,
+        'modules/getManifest': getManifest,
       });
       let res = await fetchDirectory({id: packageName});
       expect( res ).to.be.ok;
       expect( res ).to.have.property('message');
       expect( res ).to.have.property('result');
       expect( res.result ).to.be.an('array');
-      expect( res.result ).to.deep.equal(['pkgA']);
+      expect( res.result ).to.deep.equal([
+        {
+          'avatar': undefined,
+          'manifest': manifest,
+          'name': 'pkgA',
+        },
+      ]);
     });
 
     after(async () => {

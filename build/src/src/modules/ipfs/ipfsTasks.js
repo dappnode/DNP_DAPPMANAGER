@@ -36,8 +36,6 @@ const isfileHashValid = async (providedHash, PATH) => {
     const computedHashClean = computedHash.replace('ipfs/', '').replace('/', '');
     const providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
     const fileHashValid = (computedHashClean == providedHashClean);
-    // if the file's hash is not valid remove it.
-    if (!fileHashValid) await fs.unlinkSync(PATH);
     // Return the boolean
     return fileHashValid;
 };
@@ -63,8 +61,16 @@ const downloadHandler = (HASH, PATH, logChunks) =>
         if (logChunks) logChunks(chunk);
     };
     const checkFileHash = async () => {
-        if (await isfileHashValid(HASH, PATH)) resolve();
-        else reject(Error('Downloaded file: '+PATH+', is corrupt'));
+        if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) {
+            reject('Downloaded file: '+PATH+', is empty or not existent');
+        }
+        else if (await isfileHashValid(HASH, PATH)) {
+            resolve();
+        } else {
+            reject('Downloaded file: '+PATH+', is corrupt');
+            // if the file's hash is not valid remove it.
+            await fs.unlinkSync(PATH);
+        }
     };
     const readStream = ipfs.files.catReadableStream(HASH)
     .on('data', trackProgress)

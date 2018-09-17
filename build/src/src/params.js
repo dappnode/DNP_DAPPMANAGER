@@ -7,10 +7,6 @@ module.exports = {
   // Autobahn parameters
   autobahnUrl: 'ws://my.wamp.dnp.dappnode.eth:8080/ws',
   autobahnRealm: 'dappnode_admin',
-  autobahnTag: {
-    logUserActionToDappmanager: 'logUserActionToDappmanager',
-    logUserAction: 'logUserAction.dappmanager.dnp.dappnode.eth',
-  },
 
   // Installer paths
   CACHE_DIR: './cache/',

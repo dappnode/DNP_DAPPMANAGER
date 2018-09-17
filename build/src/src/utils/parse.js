@@ -100,13 +100,12 @@ function packageReq(req) {
       + 'packageReq: ' + req);
   }
 
-  let name = req.split('@')[0];
-  let ver = req.split('@')[1] || 'latest';
+  const [name, ver] = req.split('@');
 
   return {
     name,
-    ver,
-    req: name + '@' + ver,
+    ver: ver || '*',
+    req,
   };
 }
 

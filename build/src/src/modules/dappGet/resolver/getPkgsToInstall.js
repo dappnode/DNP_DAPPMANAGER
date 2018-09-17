@@ -1,5 +1,7 @@
 const {mapObj} = require('../utils/objUtils');
-const byVerReq = require('../utils/byVerReq');
+const safeSemver = require('../utils/safeSemver');
+const getFromRepo = require('../utils/getFromRepo');
+const isIpfs = require('../utils/isIpfs');
 
 /**
  * Fetches a package's dependencies recursively
@@ -40,7 +42,13 @@ function getPkgsToInstall(name, verReq, repo, obj = {}) {
     //   "/ipfs/Qmabr9X4JeuUFEmSngFunBCTmKeSMtuKfnjckWkQY7EPRs": {},
     //   ...
     // }
-    const vers = Object.keys(repo[name]).filter(byVerReq(verReq));
+
+    // It is important to just pick ipfs version if they are requested
+    const vers = isIpfs(verReq) ?
+        Object.keys(repo[name]).filter((ver) => ver === verReq)
+        : Object.keys(repo[name])
+        .filter((ver) => !isIpfs(ver))
+        .filter((ver) => safeSemver.satisfies(ver, verReq));
     // ##### Not sure if this check is necessary in production
     if (!vers.length) {
         throw Error('No valid versions found for '+name+' @ '+verReq+
@@ -51,7 +59,8 @@ function getPkgsToInstall(name, verReq, repo, obj = {}) {
             // Prevent dependency loops
             !obj[name][ver]
         ) {
-            let deps = repo[name][ver];
+            // #### External input
+            let deps = getFromRepo(repo, name, ver);
             obj[name][ver] = deps;
             Object.keys(deps).forEach((dep) => {
                 getPkgsToInstall(dep, deps[dep], repo, obj);

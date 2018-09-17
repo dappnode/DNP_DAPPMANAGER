@@ -62,15 +62,22 @@ function format(c) {
   if (name && name.includes('.')) shortName = name.split('.')[0];
   else shortName = name;
 
+  let version = c.Image.split(':')[1] || '0.0.0';
+  // IPFS path
+  if (version && version.startsWith('ipfs-')) {
+    version = version.replace('ipfs-', '/ipfs/');
+  }
+
   return {
     id: c.Id,
+    version,
+    origin: c.Labels.origin,
     isDNP,
     isCORE,
     created: new Date(1000*c.Created),
     image: c.Image,
     name: name,
     shortName: shortName,
-    version: c.Image.split(':')[1] || '0.0.0',
     ports: mapPorts(c.Ports),
     state: c.State,
     running: !/^Exited /i.test(c.Status),

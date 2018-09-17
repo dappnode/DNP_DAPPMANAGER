@@ -4,6 +4,7 @@ const shell = require('utils/shell');
 const logUI = require('utils/logUI');
 const params = require('params');
 const docker = require('modules/docker');
+const {eventBus, eventBusTag} = require('eventBus');
 
 /**
  * Remove package data: docker down + disk files
@@ -38,6 +39,9 @@ const removePackage = async ({
   // Remove DNP folder and files
   logUI({logId, pkg: 'all', msg: 'Removing system files...'});
   await shell('rm -r ' + packageRepoDir);
+
+  // Emit packages update
+  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: 'Removed package: ' + id,

@@ -17,15 +17,6 @@ async function fetch({req, state, directory}) {
         await fetchDirectory(repo);
     }
 
-    // #### Fix latest tag. Change for 'X'
-    for (const pkg of Object.keys(repo)) {
-        for (const ver of Object.keys(repo[pkg])) {
-            for (const dep of Object.keys(repo[pkg][ver])) {
-                if (repo[pkg][ver][dep] === 'latest') repo[pkg][ver][dep] = 'X';
-            }
-        }
-    }
-
     await setRepo(repo);
 }
 
