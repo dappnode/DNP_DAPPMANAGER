@@ -1,8 +1,7 @@
 const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
-const dappGet = require('modules/dappGet');
-const logUI = require('utils/logUI');
 const {eventBus, eventBusTag} = require('eventBus');
+const getManifest = require('modules/getManifest');
 
 
 /**
@@ -25,7 +24,7 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-const installPackage = async ({
+const installPackageSafe = async ({
   id,
   logId,
   options = {},
@@ -35,50 +34,42 @@ const installPackage = async ({
   // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }
   const req = parse.packageReq(id);
 
-  // 2. Resolve the request
-  await dappGet.update(req);
-  const result = await dappGet.resolve(req);
+  // 2. Only get first order dependencies
+  const manifest = await getManifest(req);
+  if (!manifest) {
+    throw Error('Manifest could not be found for: '+req.name+'@'+req.ver);
+  }
+  const pkgs = [
+    {
+      name: req.name,
+      ver: req.ver,
+      manifest,
+    },
+  ];
+  const dependencies = manifest.dependencies || {};
+  await Promise.all(Object.keys(dependencies).map(async (dep) => {
+      const depManifest = await getManifest(parse.packageReq(dep));
+      if (!depManifest) {
+        throw Error('Manifest could not be found for: '+dep);
+      }
+      pkgs.push({
+        name: dep,
+        ver: depManifest.version,
+        manifest: depManifest,
+      });
+  }));
+
   // res = {
   // success: {'bind.dnp.dappnode.eth': '0.1.4'}
   // state: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
   // Return error if the req couldn't be resolved
-  if (!result.success) {
-    throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
-  }
-  const {success: newState, state, manifests} = result;
 
-  // 3. Format the request and filter out already updated packages
-  let pkgs = Object.keys(newState).filter((pkg) => {
-    // Check if the requested version is different than the current
-    const shouldInstall = newState[pkg] !== state[pkg];
-    if (!shouldInstall) {
-      logUI({logId, pkg, msg: 'Already updated'});
-      delete state[pkg];
-    }
-    return shouldInstall;
-  }).map((pkg) => {
-    // Fetch manifest
-    const manifest = manifests[pkg];
-    if (!manifest) throw Error('Missing manifest for '+pkg);
-    // Verify dncore condition
-    if (manifest.type == 'dncore') {
-      if (options.BYPASS_CORE_RESTRICTION || pkg.endsWith('.dnp.dappnode.eth')) {
-        manifest.isCore = true;
-      } else {
-        // inform the user of improper usage
-        throw Error('Unverified CORE package request: '+pkg);
-      }
-    }
-    return {
-      name: pkg,
-      ver: newState[pkg],
-      manifest,
-    };
-  });
 
   // 4. Download requested packages
   await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
+
+  // 5. Run requested packages
   // Patch, install the dappmanager the last always
   let dappmanagerPkg;
   await Promise.all(pkgs
@@ -93,9 +84,6 @@ const installPackage = async ({
 
   if (dappmanagerPkg) await run({pkg: dappmanagerPkg, logId});
 
-  // 5. Run requested packages
-  await Promise.all(pkgs.map((pkg) => run({pkg, logId})));
-
   // 6. Clean install files
 
   // Emit packages update
@@ -109,4 +97,4 @@ const installPackage = async ({
 };
 
 
-module.exports = installPackage;
+module.exports = installPackageSafe;
