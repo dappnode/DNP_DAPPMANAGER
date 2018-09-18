@@ -8,6 +8,7 @@ const logUserAction = require('logUserAction.js');
 
 // import calls
 const installPackage = require('calls/installPackage');
+const installPackageSafe = require('calls/installPackageSafe');
 const removePackage = require('calls/removePackage');
 const togglePackage = require('calls/togglePackage');
 const restartPackage = require('calls/restartPackage');
@@ -103,6 +104,7 @@ connection.onopen = (session, details) => {
 
     register(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
     register(session, 'installPackage.dappmanager.dnp.dappnode.eth', installPackage);
+    register(session, 'installPackageSafe.dnp.dappmanager.dnp.dappnode.eth', installPackageSafe);
     register(session, 'removePackage.dappmanager.dnp.dappnode.eth', removePackage);
     register(session, 'togglePackage.dappmanager.dnp.dappnode.eth', togglePackage);
     register(session, 'restartPackage.dappmanager.dnp.dappnode.eth', restartPackage);
