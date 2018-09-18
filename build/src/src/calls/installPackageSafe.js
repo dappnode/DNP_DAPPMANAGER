@@ -2,6 +2,8 @@ const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
 const {eventBus, eventBusTag} = require('eventBus');
 const getManifest = require('modules/getManifest');
+const dockerList = require('modules/dockerList');
+const logs = require('logs.js')(module);
 
 
 /**
@@ -39,7 +41,7 @@ const installPackageSafe = async ({
   if (!manifest) {
     throw Error('Manifest could not be found for: '+req.name+'@'+req.ver);
   }
-  const pkgs = [
+  let pkgs = [
     {
       name: req.name,
       ver: req.ver,
@@ -59,11 +61,22 @@ const installPackageSafe = async ({
       });
   }));
 
-  // res = {
-  // success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  // state: {'bind.dnp.dappnode.eth': '0.1.2'}
-  // }
-  // Return error if the req couldn't be resolved
+  // 3. Only install packages that have to be updated
+  let dnpList = [];
+  try {
+    dnpList = await dockerList.listContainers();
+  } catch (e) {
+    logs.error('Error listing current containers: '+e);
+  }
+
+  pkgs = pkgs.filter((pkg) => {
+    const currentPkg = dnpList.find((_pkg) => _pkg.name === pkg.name);
+    if (currentPkg && currentPkg.version && pkg.ver) {
+      return currentPkg.version !== pkg.ver;
+    } else {
+      return true;
+    }
+  });
 
 
   // 4. Download requested packages
