@@ -5,7 +5,7 @@ const sinon = require('sinon');
 
 chai.should();
 
-describe('Call function: installPackage', function() {
+describe.skip('Call function: installPackage', function() {
   describe('mock test', mockTest);
 });
 
