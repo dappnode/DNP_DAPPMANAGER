@@ -11,16 +11,16 @@ volumes:
   dappmanagerdnpdappnodeeth_data: {}
 
 services:
-  dappmanager.dnp.dappnode.eth:
-    build: ./build
-    image: dappmanager.dnp.dappnode.eth:0.1.11
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    volumes:
-      - dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/
-      - /usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/
-      - /var/run/docker.sock:/var/run/docker.sock
-    dns: 172.33.1.2
-    networks:
-      network:
-        ipv4_address: 172.33.1.7
+    dappmanager.dnp.dappnode.eth:
+        build: ./build
+        image: dappmanager.dnp.dappnode.eth:0.1.12
+        container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
+        restart: always
+        volumes:
+            - dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/
+            - /usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/
+            - /var/run/docker.sock:/var/run/docker.sock
+        dns: 172.33.1.2
+        networks:
+            network:
+                ipv4_address: 172.33.1.7
