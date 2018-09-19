@@ -6,6 +6,14 @@ const {eventBus, eventBusTag} = require('eventBus');
 const params = require('params');
 
 /*
+ * To facilitate debugging, actions involving user interaction are stored in a file
+ * to be latter sent to Support in the case of errors. The format of this logger is
+ * not human readable and should be parsed by a dedicated tool.
+ * Specific RPCs will have a ```userAction``` flag to indicate that the result
+ * should be logged by this module.
+ */
+
+/*
 * > LEVELS:
 * ---------------------
 * logs.info('Something')

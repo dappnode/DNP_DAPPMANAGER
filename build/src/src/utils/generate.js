@@ -1,8 +1,12 @@
-// node modules
 const yaml = require('js-yaml');
 
+/*
+ * Generates files needed by DNPs
+ * - dockerCompose
+ * - manifest
+*/
 
-function dockerCompose(dpnManifest, params, isCORE = false) {
+function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     // Define docker compose parameters
     const DNS_SERVICE = params.DNS_SERVICE;
     const DNP_NETWORK = params.DNP_NETWORK;
@@ -25,7 +29,7 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
     }
 
     // Image name
-    service.image = dpnManifest.name + ':' + dpnManifest.version;
+    service.image = dpnManifest.name + ':' + (fromIpfs ? fromIpfs : dpnManifest.version);
     if (dpnManifest.image.restart) {
       service.restart = dpnManifest.image.restart;
     }
@@ -64,10 +68,14 @@ function dockerCompose(dpnManifest, params, isCORE = false) {
 
     // label handling
     if (dpnManifest.image.labels) {
-      service.labels = [];
+      service.labels = service.labels || [];
       dpnManifest.image.labels.map((label) => {
         service.labels.push(label);
       });
+    }
+    if (dpnManifest.origin) {
+      service.labels = service.labels || [];
+      service.labels.push('origin='+dpnManifest.origin);
     }
 
     // Extra features
