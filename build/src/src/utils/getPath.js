@@ -1,5 +1,22 @@
 const fs = require('fs');
 
+/*
+ * Generates file paths given a set of parameters. This tool helps
+ * reduce the possiblity of fileNotFound errors acting as a unique
+ * source of truth for locating files.
+ *
+ * It returns paths for this files
+ * - packageRepoDir
+ * - manifest
+ * - dockerCompose
+ * - envFile
+ * - image
+ *
+ * Core DNPs and regular DNPs are located in different folders.
+ * That's why there is an IS_CORE flag. Also the "Smart" functions
+ * try to guess if the requested package is a core or not.
+*/
+
 // Define paths
 module.exports = {
 

@@ -3,6 +3,10 @@ const winston = require('winston');
 const {createLogger, format, transports} = winston;
 
 /*
+* Generic logger to the console and therefore the container logs
+*/
+
+/*
 * > LEVELS:
 * ---------------------
 * logs.info('Something')
