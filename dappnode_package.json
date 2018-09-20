@@ -1,42 +1,42 @@
 {
-	"name": "dappmanager.dnp.dappnode.eth",
-	"version": "0.1.11",
-	"description": "Dappnode package responsible for providing the DappNode Package Manager",
-	"avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
-	"type": "dncore",
-	"image": {
-	  "path": "dappmanager.dnp.dappnode.eth_0.1.11.tar.xz",
-	  "hash": "/ipfs/QmeREPjAQHA18J3V2wdPE6qAEY7oykCosQqE6Jv3VwP4HQ",
-	  "size": 40498096,
-	  "volumes": [
-		"dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
-		"/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
-		"/var/run/docker.sock:/var/run/docker.sock"
-	  ],
-	  "restart": "always",
-	  "subnet": "172.33.0.0/16",
-	  "ipv4_address": "172.33.1.7"
-	},
-	"author": "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
-	"contributors": [
-	  "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
-	],
-	"keywords": [
-	  "DAppNodeCore",
-	  "DAPP",
-	  "Manager",
-	  "Installer"
-	],
-	"homepage": {
-	  "adminui": "http://my.admin.dnp.dappnode.eth/",
-	  "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
-	},
-	"repository": {
-	  "type": "git",
-	  "url": "https://github.com/dappnode/DNP_DAPPMANAGER"
-	},
-	"bugs": {
-	  "url": "https://github.com/dappnode/DNP_DAPPMANAGER/issues"
-	},
-	"license": "GPL-3.0"
-  }
+  "name": "dappmanager.dnp.dappnode.eth",
+  "version": "0.1.12",
+  "description": "Dappnode package responsible for providing the DappNode Package Manager",
+  "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
+  "type": "dncore",
+  "image": {
+    "path": "",
+    "hash": "",
+    "size": "",
+    "volumes": [
+      "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
+      "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
+      "/var/run/docker.sock:/var/run/docker.sock"
+    ],
+    "restart": "always",
+    "subnet": "172.33.0.0/16",
+    "ipv4_address": "172.33.1.7"
+  },
+  "author": "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
+  "contributors": [
+    "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
+  ],
+  "keywords": [
+    "DAppNodeCore",
+    "DAPP",
+    "Manager",
+    "Installer"
+  ],
+  "homepage": {
+    "adminui": "http://my.admin.dnp.dappnode.eth/",
+    "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dappnode/DNP_DAPPMANAGER"
+  },
+  "bugs": {
+    "url": "https://github.com/dappnode/DNP_DAPPMANAGER/issues"
+  },
+  "license": "GPL-3.0"
+}

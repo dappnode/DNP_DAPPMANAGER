@@ -1,11 +1,28 @@
-// node modules
 const ipfsAPI = require('ipfs-api');
-const paramsDefault = require('params');
+const params = require('params');
 const logs = require('logs.js')(module);
 
-function ipfsSetup({
-  params = paramsDefault,
-}) {
+/**
+ * IPFS client setup.
+ *
+ * Notice that this script takes advantatge of the singleton nature of nodejs imports.
+ * The exported ipfs object will only be initialized once in the entire application.
+ */
+
+let ipfs;
+
+/**
+ * Prevents web3 from executing to unit-testing.
+ * It can result in infinite non-ending tests
+ */
+if (!process.env.TEST) {
+  ipfs = initIPFS();
+}
+
+function initIPFS() {
+  if (process.env.NODE_ENV === 'development') {
+    params.IPFS = '127.0.0.1';
+  }
   const IPFS_HOST = params.IPFS;
   logs.info('Attempting IPFS connection to : '+IPFS_HOST);
   const ipfs = ipfsAPI(IPFS_HOST, '5001', {protocol: 'http'});
@@ -25,13 +42,4 @@ function verifyIPFS(ipfs) {
   });
 }
 
-// A singleton enforces one ipfs instance for the whole application
-// See that if you want to pass non-default parameters in a full application
-// context, there will be a race condition. Non-default parameters should only
-// be passed through testing are make those parameters process.env variables
-const ipfsSingleton = (() => {
-  let ipfs;
-  return (kwargs) => ipfs ? ipfs : ipfs = ipfsSetup(kwargs);
-})();
-
-module.exports = ipfsSingleton;
+module.exports = ipfs;
