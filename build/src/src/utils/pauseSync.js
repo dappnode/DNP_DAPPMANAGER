@@ -1,5 +1,5 @@
+/*
+ * pauseSync: General purpose util
+*/
 
-
-module.exports = function pauseSync(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};
+module.exports = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

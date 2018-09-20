@@ -4,7 +4,7 @@ const semver = require('semver');
 // dedicated modules
 const logs = require('logs.js')(module);
 const validate = require('utils/validate');
-const web3Default = require('./web3Setup');
+const web3 = require('./web3Setup');
 
 const ensContract = require('contracts/ens.json');
 const publicResolverContract = require('contracts/publicResolver.json');
@@ -21,146 +21,204 @@ function namehash(name, web3) {
     return node.toString();
 }
 
-const apmFactory = ({
-  web3 = web3Default({}),
-  testing,
-}) => {
-  // Declare parameters for all methods to have access to
-  validate.web3Existance(web3);
+// Declare utility methods
+const getRepoContract = async (reponame) => {
+  const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
+  const resolverAddress = await ens.methods.resolver(namehash(reponame, web3)).call();
 
-  // Declare utility methods
-  const getRepoContract = async (reponame) => {
-    const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
-    const resolverAddress = await ens.methods.resolver(namehash(reponame, web3)).call();
+  if (resolverAddress == '0x0000000000000000000000000000000000000000') {
+    return;
+  }
 
-    if (resolverAddress == '0x0000000000000000000000000000000000000000') {
-      return;
+  const resolver = new web3.eth.Contract(publicResolverContract.abi, resolverAddress);
+  const repoAddr = await resolver.methods.addr(namehash(reponame, web3)).call();
+  return new web3.eth.Contract(repoContract.abi, repoAddr);
+};
+
+const getLatestVersion = async (repo) => {
+  const latest = await repo.methods.getLatest()
+  .call()
+  .then(function(result) {
+      return web3.utils.hexToAscii(result.contentURI);
+  })
+  .catch((err) => {
+      throw Error(err);
+  });
+  return latest;
+};
+
+const getSemanticVersion = async (repo, version) => {
+  const latest = await repo.methods.getBySemanticVersion(version)
+  .call()
+  .then(function(result) {
+      return web3.utils.hexToAscii(result.contentURI);
+  })
+  .catch((err) => {
+      if (err.message == 'Couldn\'t decode uint16 from ABI: 0x') {
+          return 'NOT_VALID_VERSION';
+      } else {
+          throw Error(err);
+      }
+  });
+  return latest;
+};
+
+// Declare methods
+
+// /////////////  getRepoHash
+// /////////////  getRepoHash
+// /////////////  getRepoHash
+// /////////////  getRepoHash
+// /////////////  getRepoHash
+
+const getRepoHash = async (packageReq) => {
+  validate.packageReq(packageReq);
+  const NAME = packageReq.name;
+  const VERSION = packageReq.ver;
+  validate.isEthDomain(NAME); // Validate the provided name, it only accepts .eth domains
+
+  let repo = await getRepoContract(NAME, web3);
+  if (!repo) {
+    throw Error('Resolver could not found a match for ' + NAME);
+  }
+
+  if (semver.valid(VERSION)) {
+    // Getting the specific version provided
+    let versionArray = semver.clean(VERSION).split('.');
+    return getSemanticVersion(repo, versionArray, web3);
+  } else {
+    return getLatestVersion(repo, web3);
+  }
+};
+
+/**
+ * Versions
+ *
+ * @param {*} packageReq
+ * @return {*}
+ */
+const getLatestWithVersion = async (packageReq) => {
+  if (!packageReq || typeof packageReq !== 'object') {
+    throw Error('Wrong packageReq: '+packageReq);
+  }
+  if (!packageReq.name) {
+    throw Error('packageReq must contain a name property: '+packageReq);
+  }
+
+  const {name} = packageReq;
+  validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
+
+  const repo = await getRepoContract(name, web3);
+  if (!repo) {
+    throw Error('Resolver could not found a match for ' + name);
+  }
+
+  const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
+  const versions = {};
+  // versionIndexes = [1, 2, 3, 4, 5, ...]
+
+  /**
+   * Versions called by id are ordered in ascending order.
+   * The min version = 1 and the latest = versionCount
+   *
+   *  i | semanticVersion
+   * ---|------------------
+   *  1 | [ '0', '0', '1' ]
+   *  2 | [ '0', '0', '2' ]
+   *  3 | [ '0', '0', '3' ]
+   *  4 | [ '0', '0', '4' ]
+   */
+  try {
+    const {semanticVersion} = await repo.methods.getByVersionId(versionCount).call();
+    // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
+    // Append version result to the versions object
+    versions[semanticVersion.join('.')] = await getSemanticVersion(repo, semanticVersion, web3);
+  } catch (e) {
+    // If you request an inexistent ID to the contract, web3 will throw
+    // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
+    // and log other errors
+    if (String(e).includes('decode uint16 from ABI')) {
+      logs.error('Attempting to fetch an inexistent version');
+    } else {
+      logs.error('Error getting latest version of '+name+': '+e.stack);
     }
+  }
+  return versions;
+};
 
-    const resolver = new web3.eth.Contract(publicResolverContract.abi, resolverAddress);
-    const repoAddr = await resolver.methods.addr(namehash(reponame, web3)).call();
-    return new web3.eth.Contract(repoContract.abi, repoAddr);
-  };
+/**
+ * Versions
+ *
+ * @param {*} packageReq
+ * @param {*} verReq
+ * @return {*}
+ */
+const getRepoVersions = async (packageReq, verReq) => {
+  if (!packageReq || typeof packageReq !== 'object') {
+    throw Error('Wrong packageReq: '+packageReq);
+  }
+  if (!packageReq.name) {
+    throw Error('packageReq must contain a name property: '+packageReq);
+  }
+  // If verReq is not provided or invalid, default to all versions
+  if (!verReq || semver.validRange(verReq)) {
+    verReq = '*';
+  }
 
-  const getLatestVersion = async (repo) => {
-    const latest = await repo.methods.getLatest()
-    .call()
-    .then(function(result) {
-        return web3.utils.hexToAscii(result.contentURI);
-    })
-    .catch((err) => {
-        throw Error(err);
-    });
-    return latest;
-  };
+  const {name} = packageReq;
+  validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const getSemanticVersion = async (repo, version) => {
-    const latest = await repo.methods.getBySemanticVersion(version)
-    .call()
-    .then(function(result) {
-        return web3.utils.hexToAscii(result.contentURI);
-    })
-    .catch((err) => {
-        if (err.message == 'Couldn\'t decode uint16 from ABI: 0x') {
-            return 'NOT_VALID_VERSION';
-        } else {
-            throw Error(err);
-        }
-    });
-    return latest;
-  };
+  const repo = await getRepoContract(name, web3);
+  if (!repo) {
+    throw Error('Resolver could not found a match for ' + name);
+  }
 
-  const getVersions = async (repo) => {
-    let versionCount = parseFloat(await repo.methods.getVersionsCount().call());
-    let versions = [];
-    for (let i = 1; i <= versionCount; i++) {
+  const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
+  const versions = {};
+  // versionIndexes = [1, 2, 3, 4, 5, ...]
+  const versionIndexes = [...Array(versionCount).keys()].map((i) => i+1);
+
+  /**
+   * Versions called by id are ordered in ascending order.
+   * The min version = 1 and the latest = versionCount
+   *
+   *  i | semanticVersion
+   * ---|------------------
+   *  1 | [ '0', '0', '1' ]
+   *  2 | [ '0', '0', '2' ]
+   *  3 | [ '0', '0', '3' ]
+   *  4 | [ '0', '0', '4' ]
+   */
+  await Promise.all(versionIndexes.map(async (i) => {
+    try {
+      const verArray = ( await repo.methods.getByVersionId(i).call() ).semanticVersion;
+      // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
+      const ver = verArray.join('.');
+      // Append version result to the versions object
+      if (semver.satisfies(ver, verReq)) {
+        versions[ver] = await getSemanticVersion(repo, verArray, web3);
+      }
+    } catch (e) {
       // If you request an inexistent ID to the contract, web3 will throw
       // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
       // and log other errors
-      try {
-        let res = await repo.methods.getByVersionId(i).call();
-        let version = res.semanticVersion;
-        let hash = await getSemanticVersion(repo, version, web3);
-        versions.push({
-          version: version.join('.'),
-          manifestHash: hash,
-        });
-      }
-      catch (error) {
-        if (String(error).includes('decode uint16 from ABI')) {
-          logs.error('Attempting to fetch an inexistent version');
-        } else {
-          logs.error(error);
-        }
+      if (String(e).includes('decode uint16 from ABI')) {
+        logs.error('Attempting to fetch an inexistent version');
+      } else {
+        logs.error('Error getting versions of '+name+': '+e.stack);
       }
     }
-    return versions;
-  };
+  }));
 
-  // Declare methods
-
-  // /////////////  getRepoHash
-  // /////////////  getRepoHash
-  // /////////////  getRepoHash
-  // /////////////  getRepoHash
-  // /////////////  getRepoHash
-
-  const getRepoHash = async (packageReq) => {
-    validate.packageReq(packageReq);
-    const NAME = packageReq.name;
-    const VERSION = packageReq.ver;
-    validate.isEthDomain(NAME); // Validate the provided name, it only accepts .eth domains
-
-    let repo = await getRepoContract(NAME, web3);
-    if (!repo) {
-      throw Error('Resolver could not found a match for ' + NAME);
-    }
-
-    if (semver.valid(VERSION)) {
-      // Getting the specific version provided
-      let versionArray = semver.clean(VERSION).split('.');
-      return getSemanticVersion(repo, versionArray, web3);
-    } else {
-      return getLatestVersion(repo, web3);
-    }
-  };
-
-  // ////////////  getRepoVersions
-  // ////////////  getRepoVersions
-  // ////////////  getRepoVersions
-  // ////////////  getRepoVersions
-  // ////////////  getRepoVersions
-  // ////////////  getRepoVersions
-
-  const getRepoVersions = async (packageReq) => {
-    validate.packageReq(packageReq);
-    const NAME = packageReq.name;
-    validate.isEthDomain(NAME); // Validate the provided name, it only accepts .eth domains
-
-    let repo = await getRepoContract(NAME, web3);
-    if (!repo) {
-      throw Error('Resolver could not found a match for ' + NAME);
-    }
-
-    return getVersions(repo, web3);
-  };
-
-  // Expose auxiliary methods for testing
-    const auxMethods = {
-      getRepoContract,
-      getLatestVersion,
-      getSemanticVersion,
-      getVersions,
-    };
-    // Expose main methods for production
-    const mainMethods = {
-      getRepoVersions,
-      getRepoHash,
-    };
-    return Object.assign(
-        mainMethods,
-        testing ? auxMethods : {}
-    );
+  return versions;
 };
 
-module.exports = apmFactory;
+
+module.exports = {
+  getRepoVersions,
+  getRepoHash,
+  getRepoContract,
+  getLatestVersion,
+  getSemanticVersion,
+  getLatestWithVersion,
+};
