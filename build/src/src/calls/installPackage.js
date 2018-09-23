@@ -111,8 +111,6 @@ const installPackage = async ({
   // 5. Run requested packages
   await Promise.all(pkgs.map((pkg) => run({pkg, logId})));
 
-  // 6. Clean install files
-
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
 
