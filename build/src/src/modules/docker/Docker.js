@@ -101,6 +101,14 @@ const docker = {
     },
   },
 
+  // SPECIAL OPERATION
+  // Searches for semver
+  /* eslint-disable no-useless-escape *//* eslint-disable max-len */
+  rmOldSemverImages: (packageName) => {
+    return shell(`docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${packageName}:[0-9]\+.[0-9]\+.[0-9]\+")`);
+  },
+  /* eslint-enable no-useless-escape *//* eslint-enable max-len */
+
   // NOT A DOCKER-COMPOSE
   // Usage: docker load [OPTIONS]
   // --input , -i		Read from tar archive file, instead of STDIN
