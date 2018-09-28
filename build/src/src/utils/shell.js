@@ -8,7 +8,7 @@ const logs = require('logs.js')(module);
 
 const maxTime = 3*60*1000;
 
-async function shellExecSync(command, silent = false) {
+async function shellExec(command, silent = false) {
   const res = await shell.exec(command, {silent: silent, timeout: maxTime});
 
   // When shell.exec timeout expires, res will be undefined
@@ -27,4 +27,4 @@ async function shellExecSync(command, silent = false) {
   return stdout;
 }
 
-module.exports = shellExecSync;
+module.exports = shellExec;
