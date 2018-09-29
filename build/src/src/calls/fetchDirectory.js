@@ -16,13 +16,13 @@ function emitPkg(pkg) {
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
 
-function emitPkgs(pkgs) {
-  const pkgsObj = {};
-  for (const pkg of pkgs) {
-    pkgsObj[pkg.name] = pkg;
-  }
-  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-}
+// function emitPkgs(pkgs) {
+//   const pkgsObj = {};
+//   for (const pkg of pkgs) {
+//     pkgsObj[pkg.name] = pkg;
+//   }
+//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
+// }
 
 /**
  * Fetches all package names in the custom dappnode directory.
@@ -48,7 +48,8 @@ const fetchDirectory = async () => {
 
   // Emit a cached version right away
   if (packagesCache && Array.isArray(packagesCache)) {
-    emitPkgs(packagesCache);
+    // Send packages one by one. This should help on extremely slow connections
+    packagesCache.forEach(emitPkg);
   }
 
   // List of available packages in the directory
