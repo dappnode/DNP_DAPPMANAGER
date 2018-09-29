@@ -1,8 +1,7 @@
 const parse = require('utils/parse');
 const logs = require('logs.js')(module);
-const ipfs = require('modules/ipfs');
 const getManifest = require('modules/getManifest');
-const compressAvatar = require('utils/compressAvatar');
+const getAvatar = require('modules/getAvatar');
 
 /**
  * Fetches the manifest of the latest version and its avatar.
@@ -38,13 +37,7 @@ const fetchPackageData = async ({
   let avatar;
   if (avatarHash) {
     try {
-      const imageBuffer = await ipfs.cat(avatarHash, {buffer: true});
-      try {
-        avatar = await compressAvatar(imageBuffer, 200);
-      } catch (e) {
-        logs.warn(`Error compressing avatar ${avatarHash} of ${id}: ${e.stack}`);
-        avatar = imageBuffer.toString('base64');
-      }
+      avatar = await getAvatar(avatarHash);
     } catch (e) {
       // If the avatar can not be fetched don't crash
       logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);

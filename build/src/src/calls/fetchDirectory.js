@@ -2,9 +2,9 @@ const getDirectory = require('modules/getDirectory');
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
-const ipfs = require('modules/ipfs');
+const getAvatar = require('modules/getAvatar');
 const parse = require('utils/parse');
-const compressAvatar = require('utils/compressAvatar');
+
 
 let packagesCache;
 let avatarCache = {};
@@ -84,13 +84,7 @@ const fetchDirectory = async () => {
         if (avatarCache[avatarHash]) {
           avatar = avatarCache[avatarHash];
         } else {
-          const imageBuffer = await ipfs.cat(avatarHash, {buffer: true});
-          try {
-            avatar = await compressAvatar(imageBuffer, 200);
-          } catch (e) {
-            logs.warn(`Error compressing avatar ${avatarHash} of ${name}: ${e.stack}`);
-            avatar = imageBuffer.toString('base64');
-          }
+          avatar = await getAvatar(avatarHash);
           avatarCache[avatarHash] = avatar;
         }
         emitPkg({name, avatar});
