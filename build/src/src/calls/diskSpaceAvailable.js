@@ -2,28 +2,16 @@ const shellExec = require('utils/shell');
 const fs = require('fs');
 
 /**
- * Returns the list of current containers associated to packages
+ * Returns the current disk space available of a requested path
  *
  * @param {Object} kwargs: {path}
  * @return {Object} A formated success message.
- * result: packages =
- *   [
- *     {
- *       id: '9238523572017423619487623894', (string)
- *       isDNP: true, (boolean)
- *       created: <Date string>,
- *       image: <Image Name>, (string)
- *       name: otpweb.dnp.dappnode.eth, (string)
- *       shortName: otpweb, (string)
- *       version: '0.0.4', (string)
- *       ports: <list of ports>, (string)
- *       state: 'exited', (string)
- *       running: true, (boolean)
- *       ...
- *       envs: <Env variables> (object)
- *     },
- *     ...
- *   ]
+ * result: status =
+ *   {
+ *     exists, <Bool>
+ *     totalSize, <String>
+ *     availableSize, <String>
+ *   }
  */
 const diskSpaceAvailable = async ({path}) => {
     if (!fs.existsSync(path)) {
