@@ -22,7 +22,8 @@ const fetchPackageData = require('calls/fetchPackageData');
 const managePorts = require('calls/managePorts');
 const getUserActionLogs = require('calls/getUserActionLogs');
 const resolveRequest = require('calls/resolveRequest');
-
+const diskSpaceAvailable = require('calls/diskSpaceAvailable');
+const getStats = require('calls/getStats');
 /*
  * RPC register wrapper
  * ********************
@@ -118,6 +119,9 @@ connection.onopen = (session, details) => {
     register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
     register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
     register(session, 'resolveRequest.dappmanager.dnp.dappnode.eth', resolveRequest);
+    register(session, 'diskSpaceAvailable.dappmanager.dnp.dappnode.eth', diskSpaceAvailable);
+    register(session, 'getStats.dappmanager.dnp.dappnode.eth', getStats);
+
 
     /**
      * All the session uses below can throw errors if the session closes.

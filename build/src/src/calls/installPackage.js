@@ -27,6 +27,7 @@ const {eventBus, eventBusTag} = require('eventBus');
  */
 const installPackage = async ({
   id,
+  vols = {},
   logId,
   options = {},
 }) => {
@@ -49,30 +50,44 @@ const installPackage = async ({
   const {success: newState, state, manifests} = result;
 
   // 3. Format the request and filter out already updated packages
-  let pkgs = Object.keys(newState).filter((pkg) => {
-    // Check if the requested version is different than the current
-    const shouldInstall = newState[pkg] !== state[pkg];
+  let pkgs = Object.keys(newState).filter((pkgName) => {
+    // 3.1 Check if the requested version is different than the current
+    const shouldInstall = newState[pkgName] !== state[pkgName];
     if (!shouldInstall) {
-      logUI({logId, pkg, msg: 'Already updated'});
-      delete state[pkg];
+      logUI({logId, pkgName, msg: 'Already updated'});
+      delete state[pkgName];
     }
     return shouldInstall;
-  }).map((pkg) => {
-    // Fetch manifest
-    const manifest = manifests[pkg];
-    if (!manifest) throw Error('Missing manifest for '+pkg);
-    // Verify dncore condition
+  }).map((pkgName) => {
+    // 3.2 Fetch manifest
+    const manifest = manifests[pkgName];
+    if (!manifest) throw Error('Missing manifest for '+pkgName);
+
+    // 3.3 Verify dncore condition
     if (manifest.type == 'dncore') {
-      if (options.BYPASS_CORE_RESTRICTION || pkg.endsWith('.dnp.dappnode.eth')) {
+      if (options.BYPASS_CORE_RESTRICTION || pkgName.endsWith('.dnp.dappnode.eth')) {
         manifest.isCore = true;
       } else {
         // inform the user of improper usage
-        throw Error('Unverified CORE package request: '+pkg);
+        throw Error('Unverified CORE package request: '+pkgName);
       }
     }
+
+    // 3.4 Edit volumes if provided by the user
+    // "vols": {
+    //   "data:/root/.bitmonero": "monero_data"
+    // },
+    if (pkgName === req.name && Object.keys(vols).length) {
+      const {volumes = []} = ((manifest || {}).image || {});
+      volumes.forEach((vol, i) => {
+        if (vols[vol]) manifest.image.volumes[i] = vols[vol]+':'+vol.split(':')[1];
+      });
+    }
+
+    // Return pkg object
     return {
-      name: pkg,
-      ver: newState[pkg],
+      name: pkgName,
+      ver: newState[pkgName],
       manifest,
     };
   });
@@ -95,8 +110,6 @@ const installPackage = async ({
 
   // 5. Run requested packages
   await Promise.all(pkgs.map((pkg) => run({pkg, logId})));
-
-  // 6. Clean install files
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);

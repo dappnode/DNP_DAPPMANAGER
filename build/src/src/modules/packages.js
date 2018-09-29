@@ -100,6 +100,11 @@ async function run({pkg, logId}) {
     await docker.compose.up(dockerComposePath);
   }
 
+  // Clean old images. This command will throw at least one error,
+  // as it is trying to remove the current version
+  logUI({logId, pkg: name, msg: 'cleaning old images'});
+  await docker.rmOldSemverImages(name).catch((err) => {});
+
   // Final log
   logUI({logId, pkg: name, msg: 'package started'});
 }

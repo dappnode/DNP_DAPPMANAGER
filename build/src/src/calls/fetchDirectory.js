@@ -2,10 +2,9 @@ const getDirectory = require('modules/getDirectory');
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
-const base64Img = require('base64-img');
 const ipfs = require('modules/ipfs');
-const params = require('params');
 const parse = require('utils/parse');
+const compressAvatar = require('utils/compressAvatar');
 
 let packagesCache;
 
@@ -48,6 +47,10 @@ const fetchDirectory = async () => {
 
   // Emit a cached version right away
   if (packagesCache && Array.isArray(packagesCache)) {
+    // Send packages one by one. This should help on extremely slow connections
+    // packagesCache.forEach(emitPkg);
+
+    // With reduced image size, maybe it's not necessary
     emitPkgs(packagesCache);
   }
 
@@ -78,8 +81,13 @@ const fetchDirectory = async () => {
     let avatar;
     if (avatarHash) {
       try {
-        await ipfs.cat(avatarHash);
-        avatar = base64Img.base64Sync(params.CACHE_DIR + avatarHash);
+        const imageBuffer = await ipfs.cat(avatarHash, {buffer: true});
+        try {
+          avatar = await compressAvatar(imageBuffer, 200);
+        } catch (e) {
+          logs.warn(`Error compressing avatar ${avatarHash} of ${name}: ${e.stack}`);
+          avatar = imageBuffer.toString('base64');
+        }
         emitPkg({name, avatar});
       } catch (e) {
         // If the avatar can not be fetched don't crash
@@ -95,8 +103,9 @@ const fetchDirectory = async () => {
     };
   }));
 
+  const payloadSize = Math.floor(Buffer.byteLength(JSON.stringify(packagesCache), 'utf8')/1000);
   return {
-    message: 'Listed directory with ' + packagesCache.length + ' packages',
+    message: `Listed directory with ${packagesCache.length} packages (${payloadSize} KB)`,
     result: packagesCache,
     logMessage: true,
   };
