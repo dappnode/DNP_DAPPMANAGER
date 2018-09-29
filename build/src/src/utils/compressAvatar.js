@@ -1,8 +1,5 @@
-const sharp = require('sharp');
-const imagemin = require('imagemin');
+const resizeImg = require('./resizeImg');
 const imageminPngquant = require('imagemin-pngquant');
-const fs = require('fs');
-const {promisify} = require('util');
 
 /**
  * Fetching DAppNode's directory can be slow. The highest payload are the packages' avatars
@@ -26,20 +23,6 @@ const {promisify} = require('util');
  * 120 ms / avatar
  */
 
-const randomString = () => Date.now()+String(Math.random()).replace('.', '');
-
-const resizeImg = (input, pixelWidth) => new Promise((resolve, reject) => {
-    const outputPath = `cache/${randomString()}.png`;
-    sharp(input)
-    .resize(pixelWidth, pixelWidth)
-    .background('white')
-    .embed()
-    .toFile(outputPath, (err) => {
-        if (err) reject(Error(err));
-        else resolve(outputPath);
-    });
-});
-
 /**
  * Resizes and compresses an image to a specific size. Returns square png
  *
@@ -49,11 +32,11 @@ const resizeImg = (input, pixelWidth) => new Promise((resolve, reject) => {
  * @return {String} base64 representation of the image
  */
 async function compressAvatar(inputDataOrFile, outPutResolution) {
-    const resizedImgPath = await resizeImg(inputDataOrFile, outPutResolution);
-    const files = await imagemin([resizedImgPath], {use: [imageminPngquant()]});
-    await promisify(fs.unlink)(resizedImgPath);
-    const compressedImg = files[0].data;
-    return compressedImg.toString('base64');
+    const resizedImgBuffer = await resizeImg(inputDataOrFile, outPutResolution);
+    const compressedImgBuffer = await imageminPngquant({
+        quality: '0-95',
+    })(resizedImgBuffer);
+    return compressedImgBuffer.toString('base64');
 }
 
 module.exports = compressAvatar;

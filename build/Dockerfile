@@ -4,11 +4,13 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 
 WORKDIR /usr/src/app
 
+# Copy only package json to cache the dependencies installation
+COPY src/package*.json ./
+RUN npm install --production
+
 ADD src .
 ADD entrypoint.sh .
 ADD dns_updater.sh .
-
-RUN npm install --production
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
