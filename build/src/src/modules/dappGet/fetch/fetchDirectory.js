@@ -1,4 +1,4 @@
-const getDirectory = require('modules/getDirectory');
+const getDirectory = require('../../../modules/getDirectory');
 const getPkgDeps = require('./getPkgDeps');
 
 /**

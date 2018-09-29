@@ -2,8 +2,8 @@
 const winston = require('winston');
 const {createLogger, format, transports} = winston;
 const Transport = require('winston-transport');
-const {eventBus, eventBusTag} = require('eventBus');
-const params = require('params');
+const {eventBus, eventBusTag} = require('./eventBus');
+const params = require('./params');
 
 /*
  * To facilitate debugging, actions involving user interaction are stored in a file

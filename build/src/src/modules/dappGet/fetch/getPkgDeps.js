@@ -1,6 +1,6 @@
-const ipfs = require('modules/ipfs');
+const ipfs = require('../../../modules/ipfs');
 const getVersions = require('./getVersions');
-const logs = require('logs.js')(module);
+const logs = require('../../../logs')(module);
 
 /**
  * Modifies the repo in place, appending this package dependencies

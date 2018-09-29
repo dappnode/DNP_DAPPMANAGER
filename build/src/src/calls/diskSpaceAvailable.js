@@ -1,4 +1,4 @@
-const shellExec = require('utils/shell');
+const shellExec = require('../utils/shell');
 const fs = require('fs');
 
 /**

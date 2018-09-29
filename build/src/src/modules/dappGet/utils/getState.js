@@ -1,4 +1,4 @@
-const dockerList = require('modules/dockerList');
+const dockerList = require('../../../modules/dockerList');
 
 async function getState() {
     let state = {};

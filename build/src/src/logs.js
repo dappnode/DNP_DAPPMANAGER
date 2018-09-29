@@ -48,8 +48,12 @@ function _getLabel(mod) {
         mod = module;
     }
     if (mod.id) {
-        label = mod.id.replace('.js', '');
-        label = label.replace(/^.*\/src\//, '');
+        try {
+            label = mod.id.replace('.js', '');
+            label = label.replace(/^.*\/src\//, '');
+        } catch (e) {
+            // Compressing the app with webpack, id is not a String
+        }
     }
     return format.label({'label': label});
 }

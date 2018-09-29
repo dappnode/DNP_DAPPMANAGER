@@ -1,6 +1,6 @@
-const validate = require('utils/validate');
-const ipfs = require('modules/ipfs');
-const apm = require('modules/apm');
+const validate = require('../utils/validate');
+const ipfs = require('../modules/ipfs');
+const apm = require('../modules/apm');
 
 /**
  * Resolves the package request to the APM and fetches the manifest from IPFS.

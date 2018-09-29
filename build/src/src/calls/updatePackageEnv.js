@@ -1,11 +1,11 @@
 const fs = require('fs');
-const ipfs = require('modules/ipfs');
-const parse = require('utils/parse');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const params = require('params');
-const docker = require('modules/docker');
-const {eventBus, eventBusTag} = require('eventBus');
+const ipfs = require('../modules/ipfs');
+const parse = require('../utils/parse');
+const getPath = require('../utils/getPath');
+const validate = require('../utils/validate');
+const params = require('../params');
+const docker = require('../modules/docker');
+const {eventBus, eventBusTag} = require('../eventBus');
 
 
 /**

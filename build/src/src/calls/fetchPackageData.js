@@ -1,8 +1,8 @@
-const parse = require('utils/parse');
-const logs = require('logs.js')(module);
-const ipfs = require('modules/ipfs');
-const getManifest = require('modules/getManifest');
-const compressAvatar = require('utils/compressAvatar');
+const parse = require('../utils/parse');
+const logs = require('../logs')(module);
+const ipfs = require('../modules/ipfs');
+const getManifest = require('../modules/getManifest');
+const compressAvatar = require('../utils/compressAvatar');
 
 /**
  * Fetches the manifest of the latest version and its avatar.

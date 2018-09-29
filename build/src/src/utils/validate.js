@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const logs = require('logs.js')(module);
+const logs = require('../logs')(module);
 
 /*
  * Multipurpose util, it will check for a condition and correct it or throw an error.

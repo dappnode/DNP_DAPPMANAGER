@@ -1,4 +1,5 @@
 /build/src/node_modules/
+/build/src/dist/
 /build/src/tmp_dnp_repo/
 /build/src/dnp_repo/
 /build/src/DNCORE/

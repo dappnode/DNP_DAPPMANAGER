@@ -1,10 +1,10 @@
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const shell = require('utils/shell');
-const logUI = require('utils/logUI');
-const params = require('params');
-const docker = require('modules/docker');
-const {eventBus, eventBusTag} = require('eventBus');
+const getPath = require('../utils/getPath');
+const shell = require('../utils/shell');
+const logUI = require('../utils/logUI');
+const params = require('../params');
+const docker = require('../modules/docker');
+const {eventBus, eventBusTag} = require('../eventBus');
 
 /**
  * Remove package data: docker down + disk files

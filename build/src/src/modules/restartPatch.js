@@ -1,9 +1,9 @@
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const dockerList = require('modules/dockerList');
-const docker = require('modules/docker');
-const params = require('params');
+const getPath = require('../utils/getPath');
+const validate = require('../utils/validate');
+const dockerList = require('../modules/dockerList');
+const docker = require('../modules/docker');
+const params = require('../params');
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it

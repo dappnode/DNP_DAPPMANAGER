@@ -1,13 +1,13 @@
 const {promisify} = require('util');
-const getPath = require('utils/getPath');
-const generate = require('utils/generate');
+const getPath = require('../utils/getPath');
+const generate = require('../utils/generate');
 const fs = require('fs');
-const validate = require('utils/validate');
-const restartPatch = require('modules/restartPatch');
-const logUI = require('utils/logUI');
-const params = require('params');
-const docker = require('modules/docker');
-const ipfs = require('modules/ipfs');
+const validate = require('../utils/validate');
+const restartPatch = require('../modules/restartPatch');
+const logUI = require('../utils/logUI');
+const params = require('../params');
+const docker = require('../modules/docker');
+const ipfs = require('../modules/ipfs');
 
 
 // Promisify fs methods

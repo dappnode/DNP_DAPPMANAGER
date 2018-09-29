@@ -1,7 +1,7 @@
 const fs = require('fs');
 const {promisify} = require('util');
-const logs = require('logs.js')(module);
-const params = require('params');
+const logs = require('../../../logs')(module);
+const params = require('../../../params');
 
 const {REPO_FILE} = params;
 

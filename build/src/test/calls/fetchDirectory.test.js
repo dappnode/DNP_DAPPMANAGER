@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const fs = require('fs');
 const dockerList = require('modules/dockerList');
 const {promisify} = require('util');
-const logs = require('logs.js')(module);
+const logs = require('../logs')(module);
 
 chai.should();
 

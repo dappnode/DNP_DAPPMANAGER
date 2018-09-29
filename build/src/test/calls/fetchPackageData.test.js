@@ -3,7 +3,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
 const {promisify} = require('util');
-const logs = require('logs.js')(module);
+const logs = require('../logs')(module);
 
 chai.should();
 

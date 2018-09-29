@@ -1,6 +1,6 @@
 const fs = require('fs');
 const {promisify} = require('util');
-const params = require('params');
+const params = require('../../../params');
 
 const {REPO_FILE} = params;
 

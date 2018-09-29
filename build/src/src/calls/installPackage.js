@@ -1,8 +1,8 @@
-const parse = require('utils/parse');
-const {download, run} = require('modules/packages');
-const dappGet = require('modules/dappGet');
-const logUI = require('utils/logUI');
-const {eventBus, eventBusTag} = require('eventBus');
+const parse = require('../utils/parse');
+const {download, run} = require('../modules/packages');
+const dappGet = require('../modules/dappGet');
+const logUI = require('../utils/logUI');
+const {eventBus, eventBusTag} = require('../eventBus');
 
 
 /**

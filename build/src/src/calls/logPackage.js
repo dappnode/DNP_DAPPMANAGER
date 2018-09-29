@@ -1,8 +1,8 @@
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const parse = require('utils/parse');
-const params = require('params');
-const docker = require('modules/docker');
+const getPath = require('../utils/getPath');
+const parse = require('../utils/parse');
+const params = require('../params');
+const docker = require('../modules/docker');
 
 
 /**

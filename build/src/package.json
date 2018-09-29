@@ -12,12 +12,13 @@
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix"
+    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix",
+    "build": "./node_modules/.bin/webpack",
+    "build-pkg": "node_modules/.bin/pkg -t node8-alpine-x64 src/index.js --output index-pkg"
   },
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
-    "@parity/api": "^2.1.22",
     "async": "^2.6.1",
     "autobahn": "^18.3.2",
     "create-error": "^0.3.1",
@@ -47,9 +48,13 @@
     "eslint-watch": "^3.1.5",
     "mocha": "^5.2.0",
     "nyc": "^11.8.0",
+    "pkg": "^4.3.4",
     "prettier": "1.13.5",
     "proxyquire": "^2.0.1",
     "sinon": "^5.0.10",
-    "sinon-chai": "^3.1.0"
+    "sinon-chai": "^3.1.0",
+    "webpack": "^4.20.2",
+    "webpack-bundle-analyzer": "^3.0.2",
+    "webpack-cli": "^3.1.1"
   }
 }

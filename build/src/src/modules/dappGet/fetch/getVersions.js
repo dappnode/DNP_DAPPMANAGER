@@ -1,4 +1,4 @@
-const apm = require('modules/apm');
+const apm = require('../../../modules/apm');
 const semver = require('semver');
 
 /**

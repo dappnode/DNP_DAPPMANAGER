@@ -1,5 +1,5 @@
 const shell = require('shelljs');
-const logs = require('logs.js')(module);
+const logs = require('../../logs')(module);
 
 /*
  * Wrapper for shelljs. It the execution is not successful it throws an error.

@@ -1,4 +1,4 @@
-const {eventBus, eventBusTag} = require('eventBus');
+const {eventBus, eventBusTag} = require('../eventBus');
 
 /*
  * Some remote procedure calls (RPC) need a continuous update.

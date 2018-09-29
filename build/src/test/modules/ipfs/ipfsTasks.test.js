@@ -2,7 +2,7 @@ const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const logs = require('logs.js')(module);
+const logs = require('logs')(module);
 const {promisify} = require('util');
 
 // With proxyrequire you stub before requiring

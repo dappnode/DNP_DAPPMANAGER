@@ -2,13 +2,13 @@
 const semver = require('semver');
 
 // dedicated modules
-const logs = require('logs.js')(module);
-const validate = require('utils/validate');
+const logs = require('../logs')(module);
+const validate = require('../utils/validate');
 const web3 = require('./web3Setup');
 
-const ensContract = require('contracts/ens.json');
-const publicResolverContract = require('contracts/publicResolver.json');
-const repoContract = require('contracts/repository.json');
+const ensContract = require('../contracts/ens.json');
+const publicResolverContract = require('../contracts/publicResolver.json');
+const repoContract = require('../contracts/repository.json');
 
 function namehash(name, web3) {
     let node = '0x0000000000000000000000000000000000000000000000000000000000000000';

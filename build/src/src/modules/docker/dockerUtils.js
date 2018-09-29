@@ -1,4 +1,4 @@
-const logs = require('logs.js')(module);
+const logs = require('../../logs')(module);
 
 // Expects:
 // arg[0] a stdout string from a docker-compose ps

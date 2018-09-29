@@ -1,4 +1,4 @@
-const dappGet = require('modules/dappGet');
+const dappGet = require('../modules/dappGet');
 
 /**
  * Remove package data: docker down + disk files

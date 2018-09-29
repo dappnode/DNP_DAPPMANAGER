@@ -1,4 +1,4 @@
-const docker = require('modules/docker');
+const docker = require('../modules/docker');
 
 
 /**

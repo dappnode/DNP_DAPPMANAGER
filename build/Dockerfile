@@ -5,12 +5,12 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 WORKDIR /usr/src/app
 
 # Copy only package json to cache the dependencies installation
-COPY src/package*.json ./
+COPY src/package.json ./
 RUN npm install --production
 
+# Build src, output is ./server.bundle.js
 ADD src .
-ADD entrypoint.sh .
-ADD dns_updater.sh .
+RUN npm run build-pkg
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
@@ -57,9 +57,13 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
 
 WORKDIR /usr/src/app
 
-COPY --from=build /usr/src/app /usr/src/app
+ADD entrypoint.sh .
+ADD dns_updater.sh .
+
+COPY --from=build /usr/src/app/index-pkg /usr/src/app
 COPY --from=build /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build /usr/bin/docker /usr/bin/docker
+RUN ls -ltr
 
 COPY ./dns_updater.sh /etc/periodic/1min/dns_updater
 RUN chmod +x /etc/periodic/1min/dns_updater

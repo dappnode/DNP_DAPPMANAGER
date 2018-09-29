@@ -1,6 +1,6 @@
-const parse = require('utils/parse');
-const apm = require('modules/apm');
-const getManifest = require('modules/getManifest');
+const parse = require('../utils/parse');
+const apm = require('../modules/apm');
+const getManifest = require('../modules/getManifest');
 
 /**
  * Fetches all available version manifests from a package APM repo

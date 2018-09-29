@@ -1,5 +1,5 @@
-const logs = require('logs.js')(module);
-const directoryContract = require('contracts/directory.json');
+const logs = require('../logs')(module);
+const directoryContract = require('../contracts/directory.json');
 const web3 = require('./web3Setup');
 
 

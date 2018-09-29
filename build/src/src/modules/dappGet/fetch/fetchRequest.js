@@ -1,5 +1,5 @@
 const getPkgDeps = require('./getPkgDeps');
-const validate = require('utils/validate');
+const validate = require('../../../utils/validate');
 
 /**
  * Fetches the dependencies and subdependencies of a single package

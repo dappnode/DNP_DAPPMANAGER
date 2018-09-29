@@ -1,9 +1,9 @@
-const parse = require('utils/parse');
-const {download, run} = require('modules/packages');
-const {eventBus, eventBusTag} = require('eventBus');
-const getManifest = require('modules/getManifest');
-const dockerList = require('modules/dockerList');
-const logs = require('logs.js')(module);
+const parse = require('../utils/parse');
+const {download, run} = require('../modules/packages');
+const {eventBus, eventBusTag} = require('../eventBus');
+const getManifest = require('../modules/getManifest');
+const dockerList = require('../modules/dockerList');
+const logs = require('../logs')(module);
 
 
 /**

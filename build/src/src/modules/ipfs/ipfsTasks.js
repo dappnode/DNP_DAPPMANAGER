@@ -1,6 +1,6 @@
 const fs = require('fs');
 const {promisify} = require('util');
-const validate = require('utils/validate');
+const validate = require('../../utils/validate');
 
 /**
  * IPFS methods.
@@ -9,8 +9,8 @@ const validate = require('utils/validate');
 
 // Depedencies
 const ipfs = require('./ipfsSetup');
-const params = require('params');
-const logs = require('logs.js')(module);
+const params = require('../../params');
+const logs = require('../../logs')(module);
 const {parseResHash, validateIpfsHash} = require('./utils');
 
 // Declare parameters for all methods to have access to

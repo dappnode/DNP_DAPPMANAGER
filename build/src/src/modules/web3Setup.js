@@ -1,6 +1,6 @@
 const Web3 = require('web3');
-const logs = require('logs.js')(module);
-const params = require('params');
+const logs = require('../logs')(module);
+const params = require('../params');
 
 let web3;
 
