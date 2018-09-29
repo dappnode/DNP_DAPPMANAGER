@@ -2,9 +2,7 @@ const getDirectory = require('modules/getDirectory');
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
-const base64Img = require('base64-img');
 const ipfs = require('modules/ipfs');
-const params = require('params');
 const parse = require('utils/parse');
 const compressAvatar = require('utils/compressAvatar');
 
@@ -17,13 +15,13 @@ function emitPkg(pkg) {
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
 
-// function emitPkgs(pkgs) {
-//   const pkgsObj = {};
-//   for (const pkg of pkgs) {
-//     pkgsObj[pkg.name] = pkg;
-//   }
-//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-// }
+function emitPkgs(pkgs) {
+  const pkgsObj = {};
+  for (const pkg of pkgs) {
+    pkgsObj[pkg.name] = pkg;
+  }
+  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
+}
 
 /**
  * Fetches all package names in the custom dappnode directory.
@@ -50,7 +48,10 @@ const fetchDirectory = async () => {
   // Emit a cached version right away
   if (packagesCache && Array.isArray(packagesCache)) {
     // Send packages one by one. This should help on extremely slow connections
-    packagesCache.forEach(emitPkg);
+    // packagesCache.forEach(emitPkg);
+
+    // With reduced image size, maybe it's not necessary
+    emitPkgs(packagesCache);
   }
 
   // List of available packages in the directory
@@ -85,7 +86,7 @@ const fetchDirectory = async () => {
           avatar = await compressAvatar(imageBuffer, 200);
         } catch (e) {
           logs.warn(`Error compressing avatar ${avatarHash} of ${name}: ${e.stack}`);
-          avatar = base64Img.base64Sync(params.CACHE_DIR + avatarHash);
+          avatar = imageBuffer.toString('base64');
         }
         emitPkg({name, avatar});
       } catch (e) {

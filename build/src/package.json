@@ -20,7 +20,6 @@
     "@parity/api": "^2.1.22",
     "async": "^2.6.1",
     "autobahn": "^18.3.2",
-    "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
     "docker-remote-api": "^5.0.0",
     "imagemin": "^6.0.0",
