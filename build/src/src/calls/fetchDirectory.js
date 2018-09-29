@@ -16,13 +16,13 @@ function emitPkg(pkg) {
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
 
-function emitPkgs(pkgs) {
-  const pkgsObj = {};
-  for (const pkg of pkgs) {
-    pkgsObj[pkg.name] = pkg;
-  }
-  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-}
+// function emitPkgs(pkgs) {
+//   const pkgsObj = {};
+//   for (const pkg of pkgs) {
+//     pkgsObj[pkg.name] = pkg;
+//   }
+//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
+// }
 
 /**
  * Fetches all package names in the custom dappnode directory.
