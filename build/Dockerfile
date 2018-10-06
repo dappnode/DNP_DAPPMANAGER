@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 # Copy only package json to cache the dependencies installation
 COPY src/package.json ./
-RUN npm install --production
+RUN npm install
 
 # Build src, output is ./server.bundle.js
 ADD src .
