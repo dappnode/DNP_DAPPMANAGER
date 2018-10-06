@@ -55,7 +55,6 @@ describe('Get manifest', function() {
     expect(res)
       .to.deep.equal({
         fromIpfs: undefined,
-        isCore: undefined,
         item: 'manifest',
       });
   });

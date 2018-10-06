@@ -2,6 +2,7 @@ const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const logUI = require('utils/logUI');
+const getManifest = require('modules/getManifest');
 const {eventBus, eventBusTag} = require('eventBus');
 
 
@@ -37,39 +38,58 @@ const installPackage = async ({
   const req = parse.packageReq(id);
 
   // 2. Resolve the request
-  await dappGet.update(req);
-  const result = await dappGet.resolve(req);
+  try {
+    await dappGet.update(req);
+  } catch (e) {
+    throw Error(`Error updating DNP repo: ${e.stack || e.message}`);
+  }
+
+  let result;
   // res = {
-  // success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  // state: {'bind.dnp.dappnode.eth': '0.1.2'}
+  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
+  //     state: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
+  try {
+    result = await dappGet.resolve(req);
+  } catch (e) {
+    throw Error(`Error resolving dependencies: ${e.stack || e.message}`);
+  }
   // Return error if the req couldn't be resolved
   if (!result.success) {
     throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
   }
-  const {success: newState, state, manifests} = result;
+
+  const {success: newState, state} = result;
 
   // 3. Format the request and filter out already updated packages
-  let pkgs = Object.keys(newState).filter((pkgName) => {
+  let pkgs = await Promise.all(Object.keys(newState).filter((name) => {
     // 3.1 Check if the requested version is different than the current
-    const shouldInstall = newState[pkgName] !== state[pkgName];
+    const shouldInstall = newState[name] !== state[name];
     if (!shouldInstall) {
-      logUI({logId, pkgName, msg: 'Already updated'});
-      delete state[pkgName];
+      logUI({logId, name, msg: 'Already updated'});
+      delete state[name];
     }
     return shouldInstall;
-  }).map((pkgName) => {
+  }).map(async (name) => {
     // 3.2 Fetch manifest
-    const manifest = manifests[pkgName];
-    if (!manifest) throw Error('Missing manifest for '+pkgName);
+    const ver = newState[name];
+    const manifest = await getManifest({name, ver});
+    if (!manifest) throw Error('Missing manifest for '+name);
 
     // 3.3 Verify dncore condition
+    // Prevent default values. Someone can try to spoof "isCore" in the manifest
+    manifest.isCore = false;
     if (manifest.type == 'dncore') {
-      if (options.BYPASS_CORE_RESTRICTION || pkgName.endsWith('.dnp.dappnode.eth')) {
+      if (
+        // Package has to come from a dappnode's APM repo.
+        name.endsWith('.dnp.dappnode.eth') && ver.startsWith('/ipfs/')
+        // Or the user can bypass this restriction
+        || options.BYPASS_CORE_RESTRICTION
+      ) {
         manifest.isCore = true;
       } else {
         // inform the user of improper usage
-        throw Error('Unverified CORE package request: '+pkgName);
+        throw Error('Unverified CORE package request: '+name);
       }
     }
 
@@ -77,7 +97,7 @@ const installPackage = async ({
     // "vols": {
     //   "data:/root/.bitmonero": "monero_data"
     // },
-    if (pkgName === req.name && Object.keys(vols).length) {
+    if (name === req.name && Object.keys(vols).length) {
       const {volumes = []} = ((manifest || {}).image || {});
       volumes.forEach((vol, i) => {
         if (vols[vol]) manifest.image.volumes[i] = vols[vol]+':'+vol.split(':')[1];
@@ -86,11 +106,11 @@ const installPackage = async ({
 
     // Return pkg object
     return {
-      name: pkgName,
-      ver: newState[pkgName],
+      name,
+      ver,
       manifest,
     };
-  });
+  }));
 
   // 4. Download requested packages
   await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
