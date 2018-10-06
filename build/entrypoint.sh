@@ -1,3 +1,3 @@
 #!/bin/sh
 crond
-./index-pkg
+node server.bundle.js

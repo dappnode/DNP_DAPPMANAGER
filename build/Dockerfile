@@ -10,11 +10,12 @@ RUN npm install --production
 
 # Build src, output is ./server.bundle.js
 ADD src .
-RUN npm run build-pkg
+RUN npm run build
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
 
+ENV NODE_ENV=production
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
 RUN apk add --no-cache curl bind-dev
@@ -60,7 +61,7 @@ WORKDIR /usr/src/app
 ADD entrypoint.sh .
 ADD dns_updater.sh .
 
-COPY --from=build /usr/src/app/index-pkg /usr/src/app
+COPY --from=build /usr/src/app/dist/server.bundle.js /usr/src/app
 COPY --from=build /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build /usr/bin/docker /usr/bin/docker
 RUN ls -ltr
