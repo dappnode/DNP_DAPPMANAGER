@@ -8,6 +8,7 @@ const logUI = require('utils/logUI');
 const params = require('params');
 const docker = require('modules/docker');
 const ipfs = require('modules/ipfs');
+const semver = require('semver');
 
 
 // Promisify fs methods
@@ -100,10 +101,15 @@ async function run({pkg, logId}) {
     await docker.compose.up(dockerComposePath);
   }
 
-  // Clean old images. This command will throw at least one error,
-  // as it is trying to remove the current version
+  // Clean old images. This command can throw errors.
+  // If the images were removed successfuly the dappmanger will print logs:
+  // Untagged: package.dnp.dappnode.eth:0.1.6
   logUI({logId, pkg: name, msg: 'cleaning old images'});
-  await docker.rmOldSemverImages(name).catch((err) => {});
+  const currentImgs = await docker.images().catch(() => '');
+  await docker.rmi(currentImgs.split(/\r|\n/).filter((p) => {
+    const [pName, pVer] = p.split(':');
+    return pName === name && semver.valid(pVer) && pVer !== version;
+  })).catch(() => {});
 
   // Final log
   logUI({logId, pkg: name, msg: 'package started'});
