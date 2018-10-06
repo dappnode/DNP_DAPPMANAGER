@@ -104,6 +104,12 @@ const docker = {
   // SPECIAL OPERATION
   // Searches for semver
   /* eslint-disable no-useless-escape *//* eslint-disable max-len */
+  images: () => {
+    return shell(`docker images --format "{{.Repository}}:{{.Tag}}"`, true);
+  },
+  rmi: (imgsToDelete) => {
+    return shell(`docker rmi ${imgsToDelete.join(' ')}`);
+  },
   rmOldSemverImages: (packageName) => {
     return shell(`docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${packageName}:[0-9]\+.[0-9]\+.[0-9]\+")`);
   },
