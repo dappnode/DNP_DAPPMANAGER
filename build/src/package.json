@@ -22,6 +22,7 @@
     "autobahn": "^18.3.2",
     "base64-img": "^1.0.4",
     "create-error": "^0.3.1",
+    "deepmerge": "^2.2.1",
     "docker-remote-api": "^5.0.0",
     "ipfs-api": "^17.5.0",
     "is-ipfs": "^0.3.2",

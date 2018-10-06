@@ -1,5 +1,26 @@
 # Special cases
 
+# New problems
+## Slow fetch
+### Cause
+The fetch process is very slow. It was caused by 2 faulty versions of the bind.dnp.dappnode.eth package. As they were never returning a manifest, they were never cached, and the error was repeated every fetch.
+
+### Solution
+- Fetch only state packages that matter. Run a similar code to `appendStatePackages` to only fetch those that have dependencies of to be installed packages.
+- Rewrite the data flow. Before it was `fetch(state) -> repo && fetch(req) -> repo`, `(repo, state) -> resolver`. Now do `fetch(state) + repo -> resolver`, to take advantage of filtering according to the package's state.
+- Rewrite the resolver `appendStatePackages` to tolerate and ignore missing packages
+
+
+## Wierd versions breaking the code
+package:dev versions where breaking the resolver.
+
+## Cryptic error shown in the UI
+In the cases shown above, the user would see an error stating:
+```
+Faulty response object
+```
+
+
 # Implementation
 
 - The versions are stored in the repo.json as 0.1.0 and /ipfs/Qm.
