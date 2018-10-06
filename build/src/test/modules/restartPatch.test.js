@@ -1,6 +1,6 @@
 const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
-const getPath = require('utils/getPath');
+const getPath = require('../../src/utils/getPath');
 const fs = require('fs');
 
 
@@ -21,9 +21,9 @@ describe('Util: restartPatch', () => {
   const DOCKERCOMPOSE_RESTART_PATH =
     getPath.dockerCompose('restart.dnp.dappnode.eth', params, true);
 
-  const restartPatch = proxyquire('modules/restartPatch', {
-    'docker': docker,
-    'params': params,
+  const restartPatch = proxyquire('../../src/modules/restartPatch', {
+    '../modules/docker': docker,
+    '../params': params,
   });
 
   it('Should call docker.compose.up with the correct arguments', () => {

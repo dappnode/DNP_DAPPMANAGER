@@ -3,10 +3,10 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const docker = require('modules/docker');
-const parse = require('utils/parse');
+const getPath = require('../../src/utils/getPath');
+const validate = require('../../src/utils/validate');
+const docker = require('../../src/modules/docker');
+const parse = require('../../src/utils/parse');
 
 chai.should();
 
@@ -32,11 +32,19 @@ describe('Call function: restartPackageVolumes', function() {
     // Mock parse
     const packageVolumes = ['vol1', 'vol2'];
     sinon.replace(parse, 'serviceVolumes', sinon.fake.returns(packageVolumes));
+
+    /**
+     * PROXYQUIRE
+     */
     const restartPackageVolumes = proxyquire('calls/restartPackageVolumes', {
-      'utils/parse': parse,
-      'modules/docker': docker,
-      'params': params,
+      '../utils/parse': parse,
+      '../modules/docker': docker,
+      '../params': params,
     });
+    /**
+     * PROXYQUIRE
+     */
+
     let res = await restartPackageVolumes({id: PACKAGE_NAME});
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.calledWith(docker.volume.rm.firstCall, 'vol1');

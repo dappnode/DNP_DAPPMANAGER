@@ -12,9 +12,15 @@ describe('Call function: managePorts', function() {
         },
       };
 
+      /**
+       * PROXYQUIRE
+       */
       const managePorts = proxyquire('calls/managePorts', {
-        'modules/docker': docker,
+        '../modules/docker': docker,
       });
+      /**
+       * PROXYQUIRE
+       */
 
       it('should open the requested ports', async () => {
         const ports = [5000, 5001];

@@ -3,7 +3,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
 const {promisify} = require('util');
-const logs = require('../logs')(module);
+const logs = require('../../src/logs')(module);
 
 chai.should();
 
@@ -25,11 +25,17 @@ describe('Call function: fetchPackageData', function() {
     CACHE_DIR: testDirectory,
   };
 
+  /**
+   * PROXYQUIRE
+   */
   const fetchPackageData = proxyquire('calls/fetchPackageData', {
-    'modules/getManifest': getManifest,
-    'modules/getAvatar': getAvatar,
-    'params': params,
+    '../modules/getManifest': getManifest,
+    '../modules/getAvatar': getAvatar,
+    '../params': params,
   });
+  /**
+   * PROXYQUIRE
+   */
 
   describe('Call function fetchPackageData', function() {
     before(async () => {

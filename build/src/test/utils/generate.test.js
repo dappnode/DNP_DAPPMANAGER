@@ -1,9 +1,9 @@
 const chai = require('chai');
-const params = require('params');
+const params = require('../../src/params');
 
 chai.should();
 
-const generate = require('utils/generate');
+const generate = require('../../src/utils/generate');
 
 const manifest = {
   'name': 'letsencrypt-nginx.dnp.dappnode.eth',

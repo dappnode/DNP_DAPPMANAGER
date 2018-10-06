@@ -24,6 +24,7 @@
     "create-error": "^0.3.1",
     "docker-remote-api": "^5.0.0",
     "ethjs": "^0.4.0",
+    "ethjs-ens": "^2.0.1",
     "imagemin-pngquant": "^6.0.0",
     "ipfs-api": "^17.5.0",
     "is-ipfs": "^0.3.2",
@@ -40,7 +41,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
-    "eslint": "^5.0.0",
+    "eslint": "^5.6.1",
     "eslint-config-google": "^0.9.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-standard": "^11.0.0",

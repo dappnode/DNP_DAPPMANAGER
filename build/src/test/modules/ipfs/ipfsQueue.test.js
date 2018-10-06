@@ -19,7 +19,7 @@ const ipfsTasks = {
 
 const times = 2;
 
-const ipfsQueue = proxyquire('modules/ipfs/ipfsQueue', {
+const ipfsQueue = proxyquire('../../../src/modules/ipfs/ipfsQueue', {
     './ipfsTasks': ipfsTasks,
     './ipfsParams': {
         times,

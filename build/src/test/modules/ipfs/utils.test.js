@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const utils = require('modules/ipfs/utils');
+const utils = require('../../../src/modules/ipfs/utils');
 
 describe('ipfsTasksFactory', () => {
     const HASH = 'QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT';

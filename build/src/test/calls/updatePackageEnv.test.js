@@ -3,10 +3,10 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const docker = require('modules/docker');
-const paramsDefault = require('params');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
+const docker = require('../../src/modules/docker');
+const paramsDefault = require('../../src/params');
+const getPath = require('../../src/utils/getPath');
+const validate = require('../../src/utils/validate');
 
 chai.should();
 
@@ -26,10 +26,16 @@ describe('Call function: updatePackageEnv', function() {
   const dockerComposePath = getPath.dockerComposeSmart(packageName, params);
   const envFilePath = getPath.envFileSmart(packageName, params);
 
+  /**
+   * PROXYQUIRE
+   */
   const updatePackageEnv = proxyquire('calls/updatePackageEnv', {
-    'modules/docker': docker,
-    'params': params,
+    '../modules/docker': docker,
+    '../params': params,
   });
+  /**
+   * PROXYQUIRE
+   */
 
   describe('Call function updatePackageEnv', function() {
     before(() => {

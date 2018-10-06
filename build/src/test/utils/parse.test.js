@@ -1,6 +1,6 @@
 const chai = require('chai');
-const parse = require('utils/parse');
-const validate = require('utils/validate');
+const parse = require('../../src/utils/parse');
+const validate = require('../../src/utils/validate');
 const fs = require('fs');
 
 chai.should();

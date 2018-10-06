@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const utils = require('utils/versions');
+const utils = require('../../src/utils/versions');
 
 describe('Util: versions', () => {
   describe('.isHigher', () => {

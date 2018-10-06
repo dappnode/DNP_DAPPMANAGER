@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 describe('docker calls', function() {
   const execSpy = sinon.spy();
-  const docker = proxyquire('modules/docker/Docker', {
+  const docker = proxyquire('../../../src/modules/docker/Docker', {
     './shell': execSpy,
   });
   const packageName = 'myPackage';

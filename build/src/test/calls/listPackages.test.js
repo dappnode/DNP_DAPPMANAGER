@@ -3,8 +3,8 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const shell = require('shelljs');
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const {stringifyEnvs} = require('utils/parse');
+const getPath = require('../../src/utils/getPath');
+const {stringifyEnvs} = require('../../src/utils/parse');
 
 chai.should();
 
@@ -39,11 +39,16 @@ function mockTest() {
     ENV_FILE_EXTENSION: '.env',
   };
 
-  // initialize call
+  /**
+   * PROXYQUIRE
+   */
   const listPackages = proxyquire('calls/listPackages', {
-    'modules/dockerList': dockerCalls,
-    'params': params,
+    '../modules/dockerList': dockerCalls,
+    '../params': params,
   });
+  /**
+   * PROXYQUIRE
+   */
 
   before(() => {
     // Write mock data on the test folder

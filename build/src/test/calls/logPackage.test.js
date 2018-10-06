@@ -2,8 +2,8 @@ const proxyquire = require('proxyquire');
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
+const getPath = require('../../src/utils/getPath');
+const validate = require('../../src/utils/validate');
 
 chai.should();
 
@@ -35,10 +35,16 @@ function mockTest() {
       },
     };
 
+    /**
+     * PROXYQUIRE
+     */
     const logPackage = proxyquire('calls/logPackage', {
-      'modules/docker': docker,
-      'params': params,
+      '../modules/docker': docker,
+      '../params': params,
     });
+    /**
+     * PROXYQUIRE
+     */
 
     before(() => {
       const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);

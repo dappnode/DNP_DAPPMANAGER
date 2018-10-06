@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const shellExecSync = require('modules/docker/shell');
+const shellExecSync = require('../../../src/modules/docker/shell');
 
 describe('Util: shell', function() {
   it('should return an error when cating a non-existing file', async () => {

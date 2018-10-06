@@ -3,9 +3,9 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const docker = require('modules/docker');
+const getPath = require('../../src/utils/getPath');
+const validate = require('../../src/utils/validate');
+const docker = require('../../src/modules/docker');
 
 chai.should();
 
@@ -26,11 +26,18 @@ describe('Call function: restartPackage', function() {
   it('should restart the package', async () => {
     // Mock docker
     sinon.replace(docker.compose, 'rm_up', sinon.fake());
-    // Mock parse
+
+    /**
+     * PROXYQUIRE
+     */
     const restartPackage = proxyquire('calls/restartPackage', {
-      'modules/docker': docker,
-      'params': params,
+      '../modules/docker': docker,
+      '../params': params,
     });
+    /**
+     * PROXYQUIRE
+     */
+
     let res = await restartPackage({id: PACKAGE_NAME});
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.calledWith(docker.compose.rm_up, DOCKERCOMPOSE_PATH);

@@ -3,7 +3,7 @@ const expect = require('chai').expect;
 
 chai.should();
 
-const dockerUtils = require('modules/docker/dockerUtils');
+const dockerUtils = require('../../../src/modules/docker/dockerUtils');
 
 describe('docker-compose calls utils', function() {
   describe('parse docker-compose ps output', function() {

@@ -1,9 +1,9 @@
-const getDirectory = require('modules/getDirectory');
-const {eventBus, eventBusTag} = require('eventBus');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
-const parse = require('utils/parse');
+const getDirectory = require('../modules/getDirectory');
+const {eventBus, eventBusTag} = require('../eventBus');
+const logs = require('../logs')(module);
+const getManifest = require('../modules/getManifest');
+const getAvatar = require('../modules/getAvatar');
+const parse = require('../utils/parse');
 
 
 let packagesCache;

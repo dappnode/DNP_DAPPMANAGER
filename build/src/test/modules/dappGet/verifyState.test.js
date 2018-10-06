@@ -1,5 +1,5 @@
 const assert = require('assert');
-const verifyState = require('modules/dappGet/resolver/verifyState');
+const verifyState = require('../../../src/modules/dappGet/resolver/verifyState');
 const repo = getRepo();
 
 describe('verifyState', () => {

@@ -1,7 +1,7 @@
-const parse = require('utils/parse');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
+const parse = require('../utils/parse');
+const logs = require('../logs')(module);
+const getManifest = require('../modules/getManifest');
+const getAvatar = require('../modules/getAvatar');
 
 /**
  * Fetches the manifest of the latest version and its avatar.

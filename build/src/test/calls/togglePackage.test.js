@@ -3,9 +3,9 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const docker = require('modules/docker');
+const getPath = require('../../src/utils/getPath');
+const validate = require('../../src/utils/validate');
+const docker = require('../../src/modules/docker');
 
 chai.should();
 
@@ -35,10 +35,17 @@ function mockTest() {
   sinon.restore();
   sinon.replace(docker, 'status', sinon.fake.resolves('running'));
   sinon.replace(docker.compose, 'stop', sinon.fake.resolves());
+
+  /**
+   * PROXYQUIRE
+   */
   const togglePackage = proxyquire('calls/togglePackage', {
-    'modules/docker': docker,
-    'params': params,
+    '../modules/docker': docker,
+    '../params': params,
   });
+  /**
+   * PROXYQUIRE
+   */
 
   before(() => {
     validate.path(DOCKERCOMPOSE_PATH);

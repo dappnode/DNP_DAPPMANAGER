@@ -1,29 +1,29 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const shell = require('utils/shell');
-const logs = require('logs')(module);
+const shell = require('../src/utils/shell');
+const logs = require('../src/logs')(module);
 
 chai.should();
 
 describe('Full integration test with REAL docker: ', function() {
   // import calls
-  const installPackage = require('calls/installPackage');
-  const removePackage = require('calls/removePackage');
-  const togglePackage = require('calls/togglePackage');
+  const installPackage = require('../src/calls/installPackage');
+  const removePackage = require('../src/calls/removePackage');
+  const togglePackage = require('../src/calls/togglePackage');
   // const restartPackage = require('calls/restartPackage');
   // const restartPackageVolumes = require('calls/restartPackageVolumes');
-  const logPackage = require('calls/logPackage');
-  const updatePackageEnv = require('calls/updatePackageEnv');
-  const listPackages = require('calls/listPackages');
-  const fetchDirectory = require('calls/fetchDirectory');
-  const fetchPackageVersions = require('calls/fetchPackageVersions');
+  const logPackage = require('../src/calls/logPackage');
+  const updatePackageEnv = require('../src/calls/updatePackageEnv');
+  const listPackages = require('../src/calls/listPackages');
+  const fetchDirectory = require('../src/calls/fetchDirectory');
+  const fetchPackageVersions = require('../src/calls/fetchPackageVersions');
   // const fetchPackageData = require('calls/fetchPackageData');
   // const managePorts = require('calls/managePorts');
   // const getUserActionLogs = require('calls/getUserActionLogs');
 
   // import dependencies
-  const params = require('params');
+  const params = require('../src/params');
 
   const packageReq = 'otpweb.dnp.dappnode.eth';
   const id = packageReq;

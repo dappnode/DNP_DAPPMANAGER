@@ -30,9 +30,9 @@ describe('Get manifest', function() {
     },
   };
 
-  const getManifest = proxyquire('modules/getManifest', {
-    'modules/ipfs': ipfs,
-    'modules/apm': apm,
+  const getManifest = proxyquire('../../src/modules/getManifest', {
+    '../modules/ipfs': ipfs,
+    '../modules/apm': apm,
   });
 
   let res;

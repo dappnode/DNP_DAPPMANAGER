@@ -2,7 +2,7 @@ const chai = require('chai');
 
 chai.should();
 
-const getPath = require('utils/getPath');
+const getPath = require('../../src/utils/getPath');
 
 describe('Util: get paths', function() {
   const REPO_PATH_MOCK = 'repo/';

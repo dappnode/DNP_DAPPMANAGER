@@ -1,8 +1,8 @@
 const proxyquire = require('proxyquire');
 const chai = require('chai');
 const sinon = require('sinon');
-const getPath = require('utils/getPath');
-const params = require('params');
+const getPath = require('../../src/utils/getPath');
+const params = require('../../src/params');
 
 const expect = require('chai').expect;
 chai.use(require('sinon-chai'));
@@ -94,13 +94,13 @@ describe('Util: package install / download', () => {
     },
   };
 
-  const {download, run} = proxyquire('modules/packages', {
-    'modules/ipfs': ipfs,
-    'modules/docker': docker,
-    'utils/generate': generate,
-    'utils/validate': validate,
+  const {download, run} = proxyquire('../../src/modules/packages', {
+    '../modules/ipfs': ipfs,
+    '../modules/docker': docker,
+    '../utils/generate': generate,
+    '../utils/validate': validate,
     'fs': fs,
-    'params': params,
+    '../params': params,
   });
 
 

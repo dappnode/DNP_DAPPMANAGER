@@ -3,9 +3,9 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const dockerList = require('modules/dockerList');
+const dockerList = require('../../src/modules/dockerList');
 const {promisify} = require('util');
-const logs = require('../logs')(module);
+const logs = require('../../src/logs')(module);
 
 chai.should();
 
@@ -31,11 +31,19 @@ describe('Call function: fetchDirectory', function() {
       getDirectory.resolves([{name: 'pkgA'}]);
       const getManifest = sinon.stub();
       getManifest.resolves(manifest);
+
+      /**
+       * PROXYQUIRE
+       */
       const fetchDirectory = proxyquire('calls/fetchDirectory', {
-        'modules/getDirectory': getDirectory,
-        'modules/dockerList': dockerList,
-        'modules/getManifest': getManifest,
+        '../modules/getDirectory': getDirectory,
+        '../modules/dockerList': dockerList,
+        '../modules/getManifest': getManifest,
       });
+      /**
+       * PROXYQUIRE
+       */
+
       let res = await fetchDirectory({id: packageName});
       expect( res ).to.be.ok;
       expect( res ).to.have.property('message');

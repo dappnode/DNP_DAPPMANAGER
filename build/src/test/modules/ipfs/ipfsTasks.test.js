@@ -2,7 +2,7 @@ const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const fs = require('fs');
-const logs = require('logs')(module);
+const logs = require('../../../src/logs')(module);
 const {promisify} = require('util');
 
 // With proxyrequire you stub before requiring
@@ -32,9 +32,9 @@ const params = {
     CACHE_DIR: 'test_files/',
 };
 
-const ipfsTasks = proxyquire('modules/ipfs/ipfsTasks', {
+const ipfsTasks = proxyquire('../../../src/modules/ipfs/ipfsTasks', {
     './ipfsSetup': ipfs,
-    'params': params,
+    '../../params': params,
 });
 
 describe('ipfsTasksFactory', () => {
