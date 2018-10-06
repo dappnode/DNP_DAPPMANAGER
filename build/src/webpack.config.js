@@ -1,5 +1,6 @@
 const path = require('path');
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   target: 'node',
@@ -20,7 +21,8 @@ module.exports = {
     net: 'empty',
   },
   mode: 'production',
-//   plugins: [
-//     new BundleAnalyzerPlugin(),
-//   ],
+  plugins: [
+    new webpack.IgnorePlugin(/vertx/),
+    // new BundleAnalyzerPlugin(),
+  ],
 };
