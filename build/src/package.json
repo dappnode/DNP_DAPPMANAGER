@@ -24,6 +24,8 @@
     "create-error": "^0.3.1",
     "deepmerge": "^2.2.1",
     "docker-remote-api": "^5.0.0",
+    "ethjs-provider-http": "^0.1.6",
+    "ethjs-rpc": "^0.2.0",
     "ipfs-api": "^17.5.0",
     "is-ipfs": "^0.3.2",
     "js-yaml": "^3.11.0",

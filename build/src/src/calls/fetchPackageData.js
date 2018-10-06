@@ -4,6 +4,7 @@ const logs = require('logs.js')(module);
 const params = require('params');
 const ipfs = require('modules/ipfs');
 const getManifest = require('modules/getManifest');
+const isSyncing = require('utils/isSyncing');
 
 /**
  * Fetches the manifest of the latest version and its avatar.
@@ -22,6 +23,10 @@ const getManifest = require('modules/getManifest');
 const fetchPackageData = async ({
   id,
 }) => {
+  if (await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
+
   const packageReq = parse.packageReq(id);
 
   // Make sure the chain is synced
