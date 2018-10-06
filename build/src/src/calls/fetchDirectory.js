@@ -61,6 +61,7 @@ const fetchDirectory = async () => {
   //     },
   //     ...
   //   ]
+
   const packages = await getDirectory();
 
   // Extend package object contents
