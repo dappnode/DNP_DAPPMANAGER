@@ -6,6 +6,7 @@ const base64Img = require('base64-img');
 const ipfs = require('modules/ipfs');
 const params = require('params');
 const parse = require('utils/parse');
+const isSyncing = require('utils/isSyncing');
 
 let packagesCache;
 
@@ -41,10 +42,9 @@ function emitPkg(pkg) {
  *   ]
  */
 const fetchDirectory = async () => {
-  // Make sure the chain is synced
-  // if (await ethchain.isSyncing()) {
-  //   return res.success('Mainnet is syncing', []);
-  // }
+  if (await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
 
   // Emit a cached version right away
   if (packagesCache && Array.isArray(packagesCache)) {

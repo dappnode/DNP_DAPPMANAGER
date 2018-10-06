@@ -24,6 +24,7 @@ const getUserActionLogs = require('calls/getUserActionLogs');
 const resolveRequest = require('calls/resolveRequest');
 const diskSpaceAvailable = require('calls/diskSpaceAvailable');
 const getStats = require('calls/getStats');
+
 /*
  * RPC register wrapper
  * ********************
@@ -54,6 +55,9 @@ const wrapErrors = (handler, event) =>
         result: res.result || {},
       });
     } catch (err) {
+      if (err.message && err.message.includes('decode 0x from ABI')) {
+        err.message = 'Chain is still syncing: '+err.message;
+      }
       logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
       logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
       return JSON.stringify({

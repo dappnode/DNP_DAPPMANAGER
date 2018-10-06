@@ -1,6 +1,7 @@
 const parse = require('utils/parse');
 const apm = require('modules/apm');
 const getManifest = require('modules/getManifest');
+const isSyncing = require('utils/isSyncing');
 
 /**
  * Fetches all available version manifests from a package APM repo
@@ -21,6 +22,10 @@ const getManifest = require('modules/getManifest');
 const fetchPackageVersions = async ({
   id,
 }) => {
+  if (await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
+
   const packageReq = parse.packageReq(id);
 
   if (packageReq.name.endsWith('.eth')) {
