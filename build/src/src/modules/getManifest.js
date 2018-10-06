@@ -39,8 +39,9 @@ async function getManifest(packageReq, options = {}) {
   // Verify that the request was correct
   if (packageReq.name && packageReq.name.endsWith('.eth')
   && manifest && manifest.name
-  && packageReq.name !== manifest.name) {
-    throw Error('Package name requested doesn\'t match its manifest');
+  && packageReq.name !== manifest.name
+  ) {
+    throw Error(`Req package name ${packageReq.name} not equal to manifest name ${manifest.name}`);
   }
 
   // Allow core only if the package is verified

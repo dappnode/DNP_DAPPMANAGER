@@ -25,4 +25,8 @@ module.exports = {
     new webpack.IgnorePlugin(/vertx/),
     // new BundleAnalyzerPlugin(),
   ],
+  optimization: {
+		// We no not want to minimize our code.
+		minimize: false,
+	},
 };

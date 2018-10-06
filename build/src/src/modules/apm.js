@@ -24,7 +24,7 @@ const ens = new ENS({provider: eth.currentProvider, network: '1'});
 
 // Declare utility methods
 const getRepoContract = async (reponame) => {
-  const repoAddress = await ens.lookup('admin.dnp.dappnode.eth')
+  const repoAddress = await ens.lookup(reponame)
   .catch((e) => {
     if (e.message && e.message.includes('ENS name not defined')) {
       throw Error(`Could not find a repo for ${reponame}`);
