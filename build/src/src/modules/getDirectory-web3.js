@@ -10,23 +10,24 @@ const directory = eth.contract(directoryContract.abi).at(directoryContract.addre
 // Contract parameters
 const DAppNodePackageStatus = ['Preparing', 'Develop', 'Active', 'Deprecated', 'Deleted'];
 
-/**
- * Fetches all package names in the custom dappnode directory.
- *
- * @return {Array} An array of objects:
- *  [
- *    {
- *      name: packageName,  (string)
- *      status: 'Preparing' (string)
- *    },
- *    ...
- *  ]
- */
+ /**
+  * Fetches all package names in the custom dappnode directory.
+  *
+  * @return {Array} An array of objects:
+  *  [
+  *    {
+  *      name: packageName,  (string)
+  *      status: 'Preparing' (string)
+  *    },
+  *    ...
+  *  ]
+  */
 async function getDirectory() {
-  const numberOfDAppNodePackages = await directory.numberOfDAppNodePackages()
-  .then((res) => res[0].toNumber());
+  const numberOfDAppNodePackages = parseFloat(
+    await directory.numberOfDAppNodePackages()
+  );
 
-  const packages = [];
+  let packages = [];
   for (let i = 0; i < numberOfDAppNodePackages; i++) {
     try {
       const pkg = await directory.getPackage(i);

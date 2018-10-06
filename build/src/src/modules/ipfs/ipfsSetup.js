@@ -12,7 +12,7 @@ const logs = require('../../logs')(module);
 let ipfs;
 
 /**
- * Prevents web3 from executing to unit-testing.
+ * Prevents ipfs from executing to unit-testing.
  * It can result in infinite non-ending tests
  */
 if (!process.env.TEST) {

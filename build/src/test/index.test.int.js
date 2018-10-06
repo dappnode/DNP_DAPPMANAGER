@@ -112,16 +112,16 @@ describe('Full integration test with REAL docker: ', function() {
 
 
   after(() => {
-    logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
-    const web3 = require('modules/web3Setup');
-    web3.clearWatch();
-    if (web3.currentProvider
-      && web3.currentProvider.connection
-      && web3.currentProvider.connection.close
-    ) {
-      logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: '+web3.currentProvider.host);
-      web3.currentProvider.connection.close();
-    }
+    // logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
+    // const web3 = require('modules/web3Setup');
+    // web3.clearWatch();
+    // if (web3.currentProvider
+    //   && web3.currentProvider.connection
+    //   && web3.currentProvider.connection.close
+    // ) {
+    //   logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: '+web3.currentProvider.host);
+    //   web3.currentProvider.connection.close();
+    // }
   });
 });
 

@@ -2,20 +2,34 @@
 const semver = require('semver');
 
 // dedicated modules
-const logs = require('../logs')(module);
-const validate = require('../utils/validate');
-const web3 = require('./web3Setup');
+const logs = require('logs.js')(module);
+const validate = require('utils/validate');
+const eth = require('./ethSetup');
 
-const ensContract = require('../contracts/ens.json');
-const publicResolverContract = require('../contracts/publicResolver.json');
-const repoContract = require('../contracts/repository.json');
+// Import contract data
+const ensContract = require('contracts/ens.json');
+const publicResolverContract = require('contracts/publicResolver.json');
+const repoContract = require('contracts/repository.json');
 
-function namehash(name, web3) {
+// Setup instances
+const ens = eth.contract(ensContract.abi).at(ensContract.address);
+const Resolver = eth.contract(publicResolverContract.abi);
+const Repo = eth.contract(repoContract.abi);
+
+// eth.js HOW TO
+//
+// const token = eth.contract(tokenABI).at('0x6e0E0e02377Bc1d90E8a7c21f12BA385C2C35f78');
+// token.totalSupply().then((totalSupply) => {
+//   // result <BN ...>  4500000
+// });
+
+async function namehash(name) {
     let node = '0x0000000000000000000000000000000000000000000000000000000000000000';
     if (name != '') {
         let labels = name.split('.');
         for (let i = labels.length - 1; i >= 0; i--) {
-            node = web3.utils.sha3(node + web3.utils.sha3(labels[i]).slice(2), {encoding: 'hex'});
+            const labelHash = await eth.web3_sha3(labels[i]);
+            node = await eth.web3_sha3(node + labelHash.slice(2), {encoding: 'hex'});
         }
     }
     return node.toString();
@@ -23,36 +37,32 @@ function namehash(name, web3) {
 
 // Declare utility methods
 const getRepoContract = async (reponame) => {
-  const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
-  const resolverAddress = await ens.methods.resolver(namehash(reponame, web3)).call();
+  console.log('reponame');
+  console.log(reponame);
+  const reponameHash = await namehash(reponame);
+  console.log('reponameHash');
+  console.log(reponameHash);
+  const resolverAddress = await ens.resolver(reponameHash);
+  console.log('resolverAddress');
+  console.log(resolverAddress);
 
   if (resolverAddress == '0x0000000000000000000000000000000000000000') {
     return;
   }
 
-  const resolver = new web3.eth.Contract(publicResolverContract.abi, resolverAddress);
-  const repoAddr = await resolver.methods.addr(namehash(reponame, web3)).call();
-  return new web3.eth.Contract(repoContract.abi, repoAddr);
+  const resolver = Resolver.at(resolverAddress);
+  const repoAddr = await resolver.addr( await namehash(reponame) );
+  return Repo.at(repoAddr);
 };
 
-const getLatestVersion = async (repo) => {
-  const latest = await repo.methods.getLatest()
-  .call()
-  .then(function(result) {
-      return web3.utils.hexToAscii(result.contentURI);
-  })
+const getLatestVersion = (repo) => repo.getLatest()
+  .then((result) => eth.toAscii(result.contentURI))
   .catch((err) => {
       throw Error(err);
   });
-  return latest;
-};
 
-const getSemanticVersion = async (repo, version) => {
-  const latest = await repo.methods.getBySemanticVersion(version)
-  .call()
-  .then(function(result) {
-      return web3.utils.hexToAscii(result.contentURI);
-  })
+const getSemanticVersion = async (repo, version) => repo.getBySemanticVersion(version)
+  .then((result) => eth.toAscii(result.contentURI))
   .catch((err) => {
       if (err.message == 'Couldn\'t decode uint16 from ABI: 0x') {
           return 'NOT_VALID_VERSION';
@@ -60,34 +70,30 @@ const getSemanticVersion = async (repo, version) => {
           throw Error(err);
       }
   });
-  return latest;
-};
 
-// Declare methods
 
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
+/**
+ * Declare methods
+ */
+
 
 const getRepoHash = async (packageReq) => {
   validate.packageReq(packageReq);
   const NAME = packageReq.name;
   const VERSION = packageReq.ver;
-  validate.isEthDomain(NAME); // Validate the provided name, it only accepts .eth domains
+  // Validate the provided name, it only accepts .eth domains
+  validate.isEthDomain(NAME);
 
-  let repo = await getRepoContract(NAME, web3);
+  const repo = await getRepoContract(NAME);
   if (!repo) {
     throw Error('Resolver could not found a match for ' + NAME);
   }
 
   if (semver.valid(VERSION)) {
-    // Getting the specific version provided
-    let versionArray = semver.clean(VERSION).split('.');
-    return getSemanticVersion(repo, versionArray, web3);
+    const versionArray = semver.clean(VERSION).split('.');
+    return getSemanticVersion(repo, versionArray);
   } else {
-    return getLatestVersion(repo, web3);
+    return getLatestVersion(repo);
   }
 };
 
@@ -108,12 +114,12 @@ const getLatestWithVersion = async (packageReq) => {
   const {name} = packageReq;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name, web3);
+  const repo = await getRepoContract(name);
   if (!repo) {
     throw Error('Resolver could not found a match for ' + name);
   }
 
-  const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
+  const versionCount = parseFloat(await repo.getVersionsCount());
   const versions = {};
   // versionIndexes = [1, 2, 3, 4, 5, ...]
 
@@ -129,10 +135,10 @@ const getLatestWithVersion = async (packageReq) => {
    *  4 | [ '0', '0', '4' ]
    */
   try {
-    const {semanticVersion} = await repo.methods.getByVersionId(versionCount).call();
+    const {semanticVersion} = await repo.getByVersionId(versionCount);
     // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
     // Append version result to the versions object
-    versions[semanticVersion.join('.')] = await getSemanticVersion(repo, semanticVersion, web3);
+    versions[semanticVersion.join('.')] = await getSemanticVersion(repo, semanticVersion);
   } catch (e) {
     // If you request an inexistent ID to the contract, web3 will throw
     // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
@@ -168,12 +174,12 @@ const getRepoVersions = async (packageReq, verReq) => {
   const {name} = packageReq;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name, web3);
+  const repo = await getRepoContract(name);
   if (!repo) {
     throw Error('Resolver could not found a match for ' + name);
   }
 
-  const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
+  const versionCount = parseFloat(await repo.getVersionsCount());
   const versions = {};
   // versionIndexes = [1, 2, 3, 4, 5, ...]
   const versionIndexes = [...Array(versionCount).keys()].map((i) => i+1);
@@ -191,12 +197,12 @@ const getRepoVersions = async (packageReq, verReq) => {
    */
   await Promise.all(versionIndexes.map(async (i) => {
     try {
-      const verArray = ( await repo.methods.getByVersionId(i).call() ).semanticVersion;
+      const verArray = ( await repo.getByVersionId(i) ).semanticVersion;
       // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
       const ver = verArray.join('.');
       // Append version result to the versions object
       if (semver.satisfies(ver, verReq)) {
-        versions[ver] = await getSemanticVersion(repo, verArray, web3);
+        versions[ver] = await getSemanticVersion(repo, verArray);
       }
     } catch (e) {
       // If you request an inexistent ID to the contract, web3 will throw
