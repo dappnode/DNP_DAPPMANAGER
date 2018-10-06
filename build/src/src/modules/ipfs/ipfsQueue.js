@@ -47,11 +47,15 @@ const pushTaskAsync = promisify(q.push);
 * It will resolve with the result of ipfsTasks.download,
 * and reject with its error
 */
-const download = (HASH, PATH, logChunks) =>
-    pushTaskAsync(async () => await ipfsTasks.download(HASH, PATH, logChunks));
 
-const cat = (HASH) =>
-    pushTaskAsync(async () => await ipfsTasks.cat(HASH));
+function wrapMethods(library, methodsToWrap) {
+    const wrappedMethods = {};
+    for (const method of methodsToWrap || Object.keys(library)) {
+        wrappedMethods[method] = (...args) =>
+            pushTaskAsync(async () => await library[method](...args));
+    }
+    return wrappedMethods;
+}
 
 /*
 * With the current construction you can just await the download function
@@ -61,8 +65,8 @@ const cat = (HASH) =>
 
 // Expose methods
 
-module.exports = {
-    download,
-    cat,
-};
+module.exports = wrapMethods(ipfsTasks, [
+    'download',
+    'cat',
+]);
 
