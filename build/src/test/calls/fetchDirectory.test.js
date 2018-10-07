@@ -35,6 +35,7 @@ describe('Call function: fetchDirectory', function() {
         'modules/getDirectory': getDirectory,
         'modules/dockerList': dockerList,
         'modules/getManifest': getManifest,
+        'utils/isSyncing': async () => true,
       });
       let res = await fetchDirectory({id: packageName});
       expect( res ).to.be.ok;

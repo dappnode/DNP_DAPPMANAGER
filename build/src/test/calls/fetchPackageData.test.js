@@ -24,6 +24,7 @@ describe('Call function: fetchPackageData', function() {
   const fetchPackageData = proxyquire('calls/fetchPackageData', {
     'modules/getManifest': getManifest,
     'modules/getAvatar': getAvatar,
+    'utils/isSyncing': async () => true,
   });
 
   describe('Call function fetchPackageData', function() {
