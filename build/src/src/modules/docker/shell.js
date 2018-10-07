@@ -1,40 +1,26 @@
-const shell = require('shelljs');
+const shell = require('../../utils/shell');
 const logs = require('../../logs')(module);
 
 /*
- * Wrapper for shelljs. It the execution is not successful it throws an error.
- * It implements a default timeout, and exposes the silent flag.
- * Timeout set at 3 minutes as docker.load can take very long.
+ * Wrapper for shell.js, adding a protection against missing env files.
+ * If a docker-compose references a .env file and it's missing,
+ * all commands (docker-compose up, stop, down) will fail, blocking the package.
+ * This solution allows the user to be able to reset or reinstall a broken package.
 */
 
-const maxTime = 3*60*1000;
-
-async function shellExecSync(command, silent = false, firstTry = true) {
-  const res = await shell.exec(command, {silent: silent, timeout: maxTime});
-
-  // When shell.exec timeout expires, res will be undefined
-  if (!res) throw Error('ERROR: shell process: '+command+' expired timeout ('+maxTime+' ms)');
-
-  // Otherwise, parse response
-  const code = res.code;
-  const stdout = res.stdout;
-  const stderr = res.stderr;
-  if (code !== 0) {
-    // const err
-    const err = stderr.length ? stderr : stdout;
-    logs.error('SHELL JS ERROR, on command: ' + command+' err: '+err);
-
-    // Automatically deal with specific docker errors:
-    if (err.includes('find env file:')) {
-      const envPath = err.split('Couldn\'t find env file:')[1].trim();
+async function shellWrap(cmd) {
+  try {
+    return await shell(cmd);
+  } catch (e) {
+    if (e.message && e.message.includes('Couldn\'t find env file:')) {
+      const envPath = e.message.split('Couldn\'t find env file:')[1].trim();
       logs.warn('RETRY SHELL JS command, creating envFile '+envPath);
-      await shell.touch(envPath);
-      await shellExecSync(command, silent, false);
+      await shell(`touch ${envPath}`);
+      return await shell(cmd);
     } else {
-      throw Error(err);
+      throw e;
     }
   }
-  return stdout;
 }
 
-module.exports = shellExecSync;
+module.exports = shellWrap;

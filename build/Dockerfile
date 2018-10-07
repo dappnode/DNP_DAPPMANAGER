@@ -1,4 +1,4 @@
-FROM node:8.9.4-alpine as build
+FROM node:8.12.0-alpine as build
 
 RUN apk add --no-cache git python build-base bind-tools docker bash
 
@@ -13,7 +13,7 @@ ADD src .
 RUN npm run build
 
 # This results in a single layer image
-FROM node:8.9.4-alpine
+FROM node:8.12.0-alpine
 
 ENV NODE_ENV=production
 ENV DOCKER_COMPOSE_VERSION 1.20.1
