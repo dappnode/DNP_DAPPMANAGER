@@ -2,28 +2,13 @@
 
 // node modules
 const autobahn = require('autobahn');
-const {eventBus, eventBusTag} = require('eventBus');
-const logs = require('logs.js')(module);
-const logUserAction = require('logUserAction.js');
+const {eventBus, eventBusTag} = require('./eventBus');
+const logs = require('./logs')(module);
+const logUserAction = require('./logUserAction');
+const params = require('./params');
 
 // import calls
-const installPackage = require('calls/installPackage');
-const installPackageSafe = require('calls/installPackageSafe');
-const removePackage = require('calls/removePackage');
-const togglePackage = require('calls/togglePackage');
-const restartPackage = require('calls/restartPackage');
-const restartPackageVolumes = require('calls/restartPackageVolumes');
-const logPackage = require('calls/logPackage');
-const updatePackageEnv = require('calls/updatePackageEnv');
-const listPackages = require('calls/listPackages');
-const fetchDirectory = require('calls/fetchDirectory');
-const fetchPackageVersions = require('calls/fetchPackageVersions');
-const fetchPackageData = require('calls/fetchPackageData');
-const managePorts = require('calls/managePorts');
-const getUserActionLogs = require('calls/getUserActionLogs');
-const resolveRequest = require('calls/resolveRequest');
-const diskSpaceAvailable = require('calls/diskSpaceAvailable');
-const getStats = require('calls/getStats');
+const calls = require('./calls');
 
 /*
  * RPC register wrapper
@@ -90,8 +75,6 @@ function error2obj(e) {
  * - it subscribe to userAction logs sent by the VPN to store them locally
  */
 
-const params = require('params');
-
 if (process.env.NODE_ENV === 'development') {
   params.autobahnUrl = 'ws://localhost:8080/ws';
   params.autobahnRealm = 'realm1';
@@ -108,23 +91,9 @@ connection.onopen = (session, details) => {
       '\n   session ID: '+details.authid);
 
     register(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
-    register(session, 'installPackage.dappmanager.dnp.dappnode.eth', installPackage);
-    register(session, 'installPackageSafe.dnp.dappmanager.dnp.dappnode.eth', installPackageSafe);
-    register(session, 'removePackage.dappmanager.dnp.dappnode.eth', removePackage);
-    register(session, 'togglePackage.dappmanager.dnp.dappnode.eth', togglePackage);
-    register(session, 'restartPackage.dappmanager.dnp.dappnode.eth', restartPackage);
-    register(session, 'restartPackageVolumes.dappmanager.dnp.dappnode.eth', restartPackageVolumes);
-    register(session, 'logPackage.dappmanager.dnp.dappnode.eth', logPackage);
-    register(session, 'updatePackageEnv.dappmanager.dnp.dappnode.eth', updatePackageEnv);
-    register(session, 'listPackages.dappmanager.dnp.dappnode.eth', listPackages);
-    register(session, 'fetchDirectory.dappmanager.dnp.dappnode.eth', fetchDirectory);
-    register(session, 'fetchPackageVersions.dappmanager.dnp.dappnode.eth', fetchPackageVersions);
-    register(session, 'fetchPackageData.dappmanager.dnp.dappnode.eth', fetchPackageData);
-    register(session, 'managePorts.dappmanager.dnp.dappnode.eth', managePorts);
-    register(session, 'getUserActionLogs.dappmanager.dnp.dappnode.eth', getUserActionLogs);
-    register(session, 'resolveRequest.dappmanager.dnp.dappnode.eth', resolveRequest);
-    register(session, 'diskSpaceAvailable.dappmanager.dnp.dappnode.eth', diskSpaceAvailable);
-    register(session, 'getStats.dappmanager.dnp.dappnode.eth', getStats);
+    for (const callId of Object.keys(calls)) {
+      register(session, callId+'.dappmanager.dnp.dappnode.eth', calls[callId]);
+    }
 
 
     /**
@@ -152,7 +121,7 @@ connection.onopen = (session, details) => {
      * Emits the list of packages
      */
     const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
-    const listPackagesWrapped = wrapErrors(listPackages, eventPackages);
+    const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
     eventBus.on(eventBusTag.emitPackages, () => {
       try {
         listPackagesWrapped().then((res) => {
