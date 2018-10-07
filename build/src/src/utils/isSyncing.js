@@ -7,8 +7,12 @@ const params = require('../params');
 
 const blockDiff = 50;
 const cacheTime = 30 * 1000; // ms
-const eth = new EthRPC(new HttpProvider(params.WEB3HOSTHTTP));
 
+if (process.env.NODE_ENV === 'development') {
+    params.WEB3HOSTHTTP = 'https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d';
+}
+const WEB3HOSTHTTP = process.env.WEB3HOSTHTTP || params.WEB3HOSTHTTP;
+const eth = new EthRPC(new HttpProvider(WEB3HOSTHTTP));
 
 /**
  * RPC CALL
@@ -24,7 +28,7 @@ const isSyncingRpcCall = () => new Promise((resolve, reject) => {
     eth.sendAsync({method: 'eth_syncing'}, (err, res) => {
         if (err) {
             if (err.message && err.message.includes('Invalid JSON RPC response from provider')) {
-                return reject(Error(`Can't connect to ${params.WEB3HOSTHTTP}`));
+                return reject(Error(`Can't connect to ${WEB3HOSTHTTP}`));
             } else {
                 return reject(err);
             }
