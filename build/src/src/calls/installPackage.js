@@ -119,22 +119,21 @@ const installPackage = async ({
 
   // 4. Download requested packages
   await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
-  // Patch, install the dappmanager the last always
-  let dappmanagerPkg;
-  await Promise.all(pkgs
-    .filter((pkg) => {
-      if (pkg.manifest.name.includes('dappmanager.dnp.dappnode.eth')) {
-        dappmanagerPkg = pkg;
-        return false;
-      } else {
-        return true;
-      }
-    }).map((pkg) => run({pkg, logId})));
-
-  if (dappmanagerPkg) await run({pkg: dappmanagerPkg, logId});
 
   // 5. Run requested packages
-  await Promise.all(pkgs.map((pkg) => run({pkg, logId})));
+  // Patch, install the dappmanager the last always
+  const isDappmanager = (pkg) => pkg.manifest && pkg.manifest.name
+    && pkg.manifest.name.includes('dappmanager.dnp.dappnode.eth');
+
+  await Promise.all(pkgs
+    .filter((pkg) => !isDappmanager(pkg))
+    .map((pkg) => run({pkg, logId}))
+  );
+
+  const dappmanagerPkg = pkgs.find(isDappmanager);
+  if (dappmanagerPkg) {
+    await run({pkg: dappmanagerPkg, logId});
+  }
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
