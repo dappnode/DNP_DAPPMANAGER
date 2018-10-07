@@ -15,22 +15,15 @@ describe('Call function: fetchPackageData', function() {
   const avatarHash = 'FakeFileAvatarHash';
   const testDirectory = './test_files/';
 
-  const getManifest = async (packageReq) => ({
+  const getManifest = async () => ({
     avatar: avatarHash,
   });
 
-  const ipfs = {
-    cat: async () => 'avatar',
-  };
-
-  const params = {
-    CACHE_DIR: testDirectory,
-  };
+  const getAvatar = async () => 'data:image/png;base64,avatarb23ib32';
 
   const fetchPackageData = proxyquire('calls/fetchPackageData', {
     'modules/getManifest': getManifest,
-    'modules/ipfs': ipfs,
-    'params': params,
+    'modules/getAvatar': getAvatar,
   });
 
   describe('Call function fetchPackageData', function() {
@@ -51,7 +44,7 @@ describe('Call function: fetchPackageData', function() {
           avatar: avatarHash,
       });
       expect( avatar ).to.be.a('String');
-      expect( avatar ).to.include('data:image/png;base64');
+      expect( avatar ).to.include('data:image/png;base64,');
     });
 
     after(async () => {
