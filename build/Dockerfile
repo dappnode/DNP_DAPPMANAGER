@@ -6,11 +6,11 @@ WORKDIR /usr/src/app
 
 # Copy only package json to cache the dependencies installation
 COPY src/package.json ./
-RUN npm install
+RUN npm install --production
 
 # Build src, output is ./server.bundle.js
 ADD src .
-RUN npm run build
+# RUN npm run build
 
 # This results in a single layer image
 FROM node:8.12.0-alpine
@@ -61,10 +61,9 @@ WORKDIR /usr/src/app
 ADD entrypoint.sh .
 ADD dns_updater.sh .
 
-COPY --from=build /usr/src/app/dist/server.bundle.js /usr/src/app
+COPY --from=build /usr/src/app /usr/src/app
 COPY --from=build /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build /usr/bin/docker /usr/bin/docker
-RUN ls -ltr
 
 COPY ./dns_updater.sh /etc/periodic/1min/dns_updater
 RUN chmod +x /etc/periodic/1min/dns_updater

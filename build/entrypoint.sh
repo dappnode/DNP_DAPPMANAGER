@@ -1,3 +1,3 @@
 #!/bin/sh
 crond
-node server.bundle.js
+node index.js
