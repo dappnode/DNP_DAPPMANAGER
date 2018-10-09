@@ -34,10 +34,10 @@ const removePackage = async ({
   }
 
   // Remove container (and) volumes
-  logUI({logId, pkg: 'all', msg: 'Shutting down containers...'});
+  logUI({logId, name: 'all', msg: 'Shutting down containers...'});
   await docker.compose.down(dockerComposePath, {volumes: Boolean(deleteVolumes)});
   // Remove DNP folder and files
-  logUI({logId, pkg: 'all', msg: 'Removing system files...'});
+  logUI({logId, name: 'all', msg: 'Removing system files...'});
   await shell('rm -r ' + packageRepoDir);
 
   // Emit packages update

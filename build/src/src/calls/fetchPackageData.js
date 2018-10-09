@@ -1,9 +1,8 @@
-const base64Img = require('base64-img');
 const parse = require('utils/parse');
 const logs = require('logs.js')(module);
-const params = require('params');
-const ipfs = require('modules/ipfs');
 const getManifest = require('modules/getManifest');
+const getAvatar = require('modules/getAvatar');
+const isSyncing = require('utils/isSyncing');
 
 /**
  * Fetches the manifest of the latest version and its avatar.
@@ -22,6 +21,10 @@ const getManifest = require('modules/getManifest');
 const fetchPackageData = async ({
   id,
 }) => {
+  if (await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
+
   const packageReq = parse.packageReq(id);
 
   // Make sure the chain is synced
@@ -39,8 +42,7 @@ const fetchPackageData = async ({
   let avatar;
   if (avatarHash) {
     try {
-      await ipfs.cat(avatarHash);
-      avatar = base64Img.base64Sync(params.CACHE_DIR + avatarHash);
+      avatar = await getAvatar(avatarHash);
     } catch (e) {
       // If the avatar can not be fetched don't crash
       logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
