@@ -18,6 +18,12 @@ const CACHE_DIR = params.CACHE_DIR;
 const timeoutTime = 3000;
 
 // Declare methods
+const pinHash = (HASH) => {
+    ipfs.pin.add(HASH, (err) => {
+        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
+    });
+};
+
 const isfileHashValid = async (providedHash, PATH) => {
     // First, ensure that the PATH file is correct
     if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) return false;
@@ -91,11 +97,8 @@ const download = async (HASH, PATH, logChunks) => {
     // execute download
     await downloadHandler(HASH, PATH, logChunks);
     // If download was successful, pin file. Pin paralelly, and don't propagate errors
-    ipfs.pin.add(HASH, (err) => {
-        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
-    });
+    pinHash(HASH);
 };
-
 
 const cat = async (HASH, options = {}) => {
     const PATH = CACHE_DIR + HASH;
