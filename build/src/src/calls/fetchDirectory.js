@@ -2,12 +2,12 @@ const getDirectory = require('modules/getDirectory');
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
-const base64Img = require('base64-img');
-const ipfs = require('modules/ipfs');
-const params = require('params');
+const getAvatar = require('modules/getAvatar');
 const parse = require('utils/parse');
+const isSyncing = require('utils/isSyncing');
 
 let packagesCache;
+let avatarCache = {};
 
 function emitPkg(pkg) {
   const pkgsObj = {
@@ -16,13 +16,13 @@ function emitPkg(pkg) {
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
 
-function emitPkgs(pkgs) {
-  const pkgsObj = {};
-  for (const pkg of pkgs) {
-    pkgsObj[pkg.name] = pkg;
-  }
-  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-}
+// function emitPkgs(pkgs) {
+//   const pkgsObj = {};
+//   for (const pkg of pkgs) {
+//     pkgsObj[pkg.name] = pkg;
+//   }
+//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
+// }
 
 /**
  * Fetches all package names in the custom dappnode directory.
@@ -41,14 +41,14 @@ function emitPkgs(pkgs) {
  *   ]
  */
 const fetchDirectory = async () => {
-  // Make sure the chain is synced
-  // if (await ethchain.isSyncing()) {
-  //   return res.success('Mainnet is syncing', []);
-  // }
+  if (await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
 
   // Emit a cached version right away
   if (packagesCache && Array.isArray(packagesCache)) {
-    emitPkgs(packagesCache);
+    // Send packages one by one. This should help on extremely slow connections
+    packagesCache.forEach(emitPkg);
   }
 
   // List of available packages in the directory
@@ -75,11 +75,17 @@ const fetchDirectory = async () => {
 
     // Fetch the package image
     const avatarHash = manifest.avatar;
+
     let avatar;
     if (avatarHash) {
       try {
-        await ipfs.cat(avatarHash);
-        avatar = base64Img.base64Sync(params.CACHE_DIR + avatarHash);
+        // Retrieve cached avatar or fetch it
+        if (avatarCache[avatarHash]) {
+          avatar = avatarCache[avatarHash];
+        } else {
+          avatar = await getAvatar(avatarHash);
+          avatarCache[avatarHash] = avatar;
+        }
         emitPkg({name, avatar});
       } catch (e) {
         // If the avatar can not be fetched don't crash
@@ -95,8 +101,9 @@ const fetchDirectory = async () => {
     };
   }));
 
+  const payloadSize = Math.floor(Buffer.byteLength(JSON.stringify(packagesCache), 'utf8')/1000);
   return {
-    message: 'Listed directory with ' + packagesCache.length + ' packages',
+    message: `Listed directory with ${packagesCache.length} packages (${payloadSize} KB)`,
     result: packagesCache,
     logMessage: true,
   };

@@ -35,6 +35,7 @@ module.exports = {
 
   // Web3 parameters
   WEB3HOSTWS: 'ws://my.ethchain.dnp.dappnode.eth:8546',
+  WEB3HOSTHTTP: 'http://my.ethchain.dnp.dappnode.eth:8545',
 
   // User Action Logs filename
   userActionLogsFilename: 'DNCORE/userActionLogs.log',

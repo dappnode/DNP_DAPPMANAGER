@@ -1,6 +1,8 @@
 
 const getPkgDeps = require('./getPkgDeps');
 const isIpfs = require('../utils/isIpfs');
+const logs = require('logs.js')(module);
+const semver = require('semver');
 
 /**
  * Fetches the dependencies and subdependencies of all packages
@@ -26,14 +28,21 @@ const isIpfs = require('../utils/isIpfs');
  * @return {none} doesn't return anything, repo is modified in place
  */
 async function fetchState(state, repo) {
-    const checked = {};
-    await Promise.all(Object.keys(state).map((name) =>
-        getPkgDeps(
-            name,
-            isIpfs(state[name]) ? state[name] : '>='+state[name],
-            repo,
-            checked)
-    ));
+    await Promise.all(Object.keys(state).map(async (name) => {
+        try {
+            if (semver.valid(state[name])) {
+                // For valid semvers, fetch any greater version than the current
+                await getPkgDeps(name, '>='+state[name], repo);
+            } else if (isIpfs(state[name])) {
+                // For ipfs versions, fetch only the current version
+                await getPkgDeps(name, state[name], repo);
+            } else {
+                // Ignore non-ipfs or non-semver versions
+            }
+        } catch (e) {
+            logs.warn(`Error fetching state package ${name}: ${e.stack || e.message}`);
+        }
+    }));
 }
 
 module.exports = fetchState;
