@@ -9,6 +9,7 @@ chai.should();
 describe('Full integration test with REAL docker: ', function() {
   // import calls
   const installPackage = require('calls/installPackage');
+  const installPackageSafe = require('calls/installPackageSafe');
   const removePackage = require('calls/removePackage');
   const togglePackage = require('calls/togglePackage');
   // const restartPackage = require('calls/restartPackage');
@@ -60,7 +61,7 @@ describe('Full integration test with REAL docker: ', function() {
     testUpdatePackageEnv(updatePackageEnv, id, false, params);
 
     // - > installPackage
-    testInstallPackage(installPackage, {id});
+    testInstallPackage(installPackageSafe, {id});
 
     // - > logPackage
     testLogPackage(logPackage, {
@@ -153,10 +154,10 @@ describe('Full integration test with REAL docker: ', function() {
 // TEST - 1
 // - > updatePackageEnv
 
-function testInstallPackage(installPackage, kwargs) {
-  it('call installPackage', (done) => {
+function testInstallPackage(installPackageSafe, kwargs) {
+  it('call installPackageSafe', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> INSTALLING');
-    installPackage(kwargs)
+    installPackageSafe(kwargs)
     .then(
       (res) => {
         // logs.info('\x1b[33m%s\x1b[0m', res)
