@@ -25,11 +25,8 @@ async function fetchDirectory(repo) {
     //     { name: 'monero.dnp.dappnode.eth', status: 'Preparing' },
     //     ...
     //   ]
-
-    // Declare checked outside to avoid double checks and speed up this call
-    const checked = {};
     await Promise.all(directoryPackages.map((pkg) =>
-        getPkgDeps(pkg.name, '*', repo, checked)
+        getPkgDeps(pkg.name, '*', repo)
     ));
 }
 

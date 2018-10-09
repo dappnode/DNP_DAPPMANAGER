@@ -14,14 +14,23 @@ const si = require('systeminformation');
  */
 const getStats = async () => {
     const cpu = await si.currentLoad();
-    const mem = await si.mem();
     const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`, true);
+    // Attempt two mem fetchs
+    let memUsedRatio;
+    const memObj = await si.mem();
+    const memTotal = await shellExec(`free / | awk 'NR==2 { print $2}'`, true).catch(() => null);
+    const memUsed = await shellExec(`free / | awk 'NR==3 { print $3}'`, true).catch(() => null);
+    if (memObj && memObj.available && memObj.total) {
+        memUsedRatio = Math.floor(100*memObj.available/memObj.total)+'%';
+    } else if (memUsed && memTotal) {
+        memUsedRatio = Math.floor(100*memUsed/memTotal)+'%';
+    }
 
     return {
         message: `Checked stats of this DAppNode server`,
         result: {
-            cpu: Math.floor(cpu.currentload)+'%',
-            memory: Math.floor(100*mem.available/mem.total)+'%',
+            cpu: cpu.currentload ? Math.floor(cpu.currentload)+'%' : null,
+            memory: memUsedRatio,
             disk: disk.trim(),
         },
     };

@@ -65,11 +65,12 @@ const getSemanticVersion = async (repo, version) => {
 
 // Declare methods
 
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
-// /////////////  getRepoHash
+// Util to check if a repo exists for a given name
+const repoExists = async (reponame) => {
+  const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
+  const resolverAddress = await ens.methods.resolver(namehash(reponame, web3)).call();
+  return resolverAddress !== '0x0000000000000000000000000000000000000000';
+};
 
 const getRepoHash = async (packageReq) => {
   validate.packageReq(packageReq);
@@ -215,6 +216,7 @@ const getRepoVersions = async (packageReq, verReq) => {
 
 
 module.exports = {
+  repoExists,
   getRepoVersions,
   getRepoHash,
   getRepoContract,
