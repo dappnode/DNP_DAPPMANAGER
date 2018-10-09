@@ -1,10 +1,10 @@
 const verifyState = require('./verifyState');
 const getPkgsToInstall = require('./getPkgsToInstall');
-const appendStatePkgToInstall = require('./appendStatePkgToInstall');
+const getStatePkgToInstall = require('./getStatePkgToInstall');
 const prioritizeVersions = require('./prioritizeVersions');
 const {getPermutation, getPermutationsTable} = require('./permutations');
 const {filterObj} = require('../utils/objUtils');
-const isIpfs = require('../utils/isIpfs');
+const mergePkgs = require('../utils/mergePkgs');
 
 /**
  * Resolves a request given a repository of package dependencies and a state
@@ -21,7 +21,7 @@ const isIpfs = require('../utils/isIpfs');
  * an incompatibility
  */
 
-const timeoutMs = 10000; // ms
+const timeoutMs = 10 * 1000; // ms
 
 function resolveRequest(req, repo, state) {
     let name; let ver;
@@ -38,7 +38,8 @@ function resolveRequest(req, repo, state) {
     let pkgToInstall = getPkgsToInstall(name, ver, repo);
 
     // Append affected state packages
-    pkgToInstall = appendStatePkgToInstall(pkgToInstall, state, repo);
+    const statePkgToInstall = getStatePkgToInstall(pkgToInstall, state, repo);
+    pkgToInstall = mergePkgs(pkgToInstall, statePkgToInstall);
     pkgToInstall = prioritizeVersions(pkgToInstall, name, ver, state);
     // pkgToInstall sample contents
     //  { A: [ '2.0.0' ],
@@ -65,7 +66,7 @@ function resolveRequest(req, repo, state) {
         } else {
             // Keep track of how many incompatibilities are due to a specific reason
             const {req, dep, range} = result.reason;
-            const key = req+'#'+dep+'#'+range;
+            const key = `${req}#${dep}#${range}`;
             key in errors ? errors[key]++ : errors[key] = 1;
         }
         // Prevent the for loop to run for too long
@@ -75,7 +76,6 @@ function resolveRequest(req, repo, state) {
         }
     }
 
-    let manifests;
     if (success) {
         // Prepare the success result
         // 1. Filter out packages that will not be installed
@@ -89,17 +89,36 @@ function resolveRequest(req, repo, state) {
         //         delete state[pkg];
         //     }
         // });
+    }
 
-        // Append manifests
-        manifests = {};
-        Object.keys(success).forEach((pkg) => {
-            const ver = success[pkg];
-            manifests[pkg] = {
-                ...repo[pkg][ver],
-                // #### This helps keeping track of IPFS versions
-                origin: isIpfs(ver) ? ver : null,
-            };
-        });
+    // Format an error message
+    let error;
+    if (!success) {
+        // Timeout message
+        if (hasTimedOut) error = `Resolver timed out (${timeoutMs} ms). \n`;
+        else error = '';
+        // Blame message
+        try {
+            const blameDep = {};
+            const blameDepReq = {};
+            for (const key of Object.keys(errors)) {
+                const [_req, _dep] = key.split('#');
+                const req = _req.split('@')[0];
+                const dep = _dep.split('@')[0];
+                blameDep[dep] = (blameDep[dep] || 0) + errors[key];
+                if (!blameDepReq[dep]) blameDepReq[dep] = {};
+                blameDepReq[dep][req] = true;
+            }
+            const highestDep = Object.keys(blameDep)
+                .reduce((a, b) => blameDep[a] > blameDep[b] ? a : b);
+            const blamePackages = Object.keys(blameDepReq[highestDep]).join(', ');
+            error += `Packages ${blamePackages} request incompatible versions of ${highestDep}`;
+        } catch (e) {
+            // Ignore possible errors from the message processing
+        }
+        error += `Checked ${caseId}/${totalCases} total cases \n`;
+        // Cases checked message
+        error += `Checked ${caseId}/${totalCases} total cases \n`;
     }
 
 
@@ -107,12 +126,8 @@ function resolveRequest(req, repo, state) {
         // Some package can have null version because they don't have to be installed
         // Don't include them in the result
         success,
-        errors,
+        error,
         state,
-        manifests,
-        casesChecked: caseId,
-        totalCases,
-        hasTimedOut,
     };
 }
 
