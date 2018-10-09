@@ -1,6 +1,8 @@
 const ipfs = require('modules/ipfs');
-const getVersions = require('./getVersions');
 const logs = require('logs.js')(module);
+const isIpfsHash = require('utils/isIpfsHash');
+const apm = require('modules/apm');
+const semver = require('semver');
 
 /**
  * Modifies the repo in place, appending this package dependencies
@@ -17,25 +19,50 @@ const logs = require('logs.js')(module);
  *   },
  *   "B": ...
  *    ...
- * @param {object} checked Used to track with ranges have been checked
- *                         Helps speed up the search.
- * { A@^1.0.0: true,
- *   C@~2.3.1: true }
  * @return {none} doesn't return anything, repo is modified in place
  */
-async function getPkgDeps(name, verReq, repo, checked = {}) {
+async function getPkgDeps(name, verReq, repo) {
     if (!repo || typeof repo !== 'object') {
         throw Error('A valid repo must be passed as a 3rd argument');
     }
     if (!repo[name]) repo[name] = {};
 
-
-    let versions = await getVersions(name, verReq);
-    //  versionsObj = {
+    let versions;
+    //  Filtered versions object according to the verReq
+    //  versions = {
     //    '0.8.0': '/ipfs/QmZ1aaB41vXI...',
     //    '1.0.0': '/ipfs/QmZvasj33j2k...',
     //    ...
     //  }
+
+    // Case 1. The version is a valid semver version or range.
+    if (semver.validRange(verReq)) {
+        // Only for semver: speed up the fetch by checking if there is a new version
+        // If there isn't a repo for this package, apm.getRepoHash will throw:
+        // "Error: Resolver could not found a match for dnpinner.dnp.dappnode.eth"
+        // The error will be ignored for state packages.
+        const latestHash = await apm.getRepoHash({name, ver: 'latest'});
+        const updated = Object.values(repo[name]).map((v) => v.hash).includes(latestHash);
+        if (updated) {
+            return;
+        }
+        // Case 1A It is a specific version, fetch only that version
+        if (semver.valid(verReq)) {
+            versions = {[verReq]: await apm.getRepoHash({name, ver: verReq})};
+        }
+        // Case 1B. It is a semver range: apply semver logic to filter
+        else {
+            versions = await apm.getRepoVersions({name}, verReq);
+        }
+    }
+    // Case 2. The version is an IPFS hash. The version is already the hash.
+    if (verReq && verReq.startsWith('/ipfs/')) {
+        versions = {[verReq]: verReq};
+    }
+    // Case 3. The version is 'latest'. Pick the latest version.
+    else if (verReq === 'latest') {
+        versions = await apm.getLatestWithVersion({name});
+    }
 
     // ######
     // console.log('name', name, 'ver', verReq, 'versions', versions);
@@ -43,6 +70,9 @@ async function getPkgDeps(name, verReq, repo, checked = {}) {
     for (let ver of Object.keys(versions)) {
         if (repo[name][ver]) {
             // Already checked, skip
+        } else if (!isIpfsHash(versions[ver])) {
+            // Ignore corrupted hash. At least in the bind.dnp.dappnode.eth
+            // ver 0.1.2-0.1.3 the hash is incorrect.
         } else {
             // Get the dependencies of a specific package and version.
             // Will pass the manifest hash to getManifest instead of the version
@@ -53,6 +83,7 @@ async function getPkgDeps(name, verReq, repo, checked = {}) {
             let manifest;
             try {
                 manifest = JSON.parse( await ipfs.cat(hash) );
+                manifest.hash = hash;
             } catch (e) {
                 logs.debug('Error downloading manifest '+name+' '+versions[ver]+': '+e.stack);
             }
@@ -69,19 +100,11 @@ async function getPkgDeps(name, verReq, repo, checked = {}) {
                     repo[name][ver].dependencies[depName] = '*';
                     depVerReq = '*';
                 }
-                if (checked[depName+'@'+depVerReq]) {
-                    // Skipping requirement
-                } else {
-                    // Recursive call, fetch a specific dependency
-                    checked[depName+'@'+depVerReq] = true;
-
-                    // ######
+                // ######
                     // console.log('DEP name', depName, 'depVerReq', depVerReq);
-
-                    await getPkgDeps(depName, depVerReq, repo, checked).catch((e) => {
-                        logs.error('Error fetching DEP '+depName+'@'+depVerReq+': '+e);
-                    });
-                }
+                await getPkgDeps(depName, depVerReq, repo).catch((e) => {
+                    logs.error('Error fetching DEP '+depName+'@'+depVerReq+': '+e);
+                });
             }
         }
     }

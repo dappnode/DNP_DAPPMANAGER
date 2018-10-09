@@ -8,6 +8,7 @@ const logUI = require('utils/logUI');
 const params = require('params');
 const docker = require('modules/docker');
 const ipfs = require('modules/ipfs');
+const semver = require('semver');
 
 
 // Promisify fs methods
@@ -43,7 +44,7 @@ async function download({pkg, logId}) {
 
   // Define the logging function
   const log = (percent) =>
-    logUI({logId, pkg: name, msg: 'Downloading '+percent+'%'});
+    logUI({logId, name, msg: 'Downloading '+percent+'%'});
   // Define the rounding function to not spam updates
   const displayRes = 2;
   const round = (x) => displayRes*Math.ceil(100*x/imageSize/displayRes);
@@ -55,7 +56,7 @@ async function download({pkg, logId}) {
     }
   };
 
-  logUI({logId, pkg: name, msg: 'Starting download...'});
+  logUI({logId, name, msg: 'Starting download...'});
   const imagePath = validate.path(getPath.image(name, imageName, params, isCore));
   await ipfs.download(
     imageHash,
@@ -63,7 +64,7 @@ async function download({pkg, logId}) {
     logChunk,
   );
 
-  logUI({logId, pkg: name, msg: 'Loading image...'});
+  logUI({logId, name, msg: 'Loading image...'});
   await docker.load(imagePath);
 
   // For IPFS downloads, retag image
@@ -72,11 +73,11 @@ async function download({pkg, logId}) {
     await docker.tag(name + ':' + version, name + ':' + fromIpfs);
   }
 
-  logUI({logId, pkg: name, msg: 'Cleaning files...'});
+  logUI({logId, name, msg: 'Cleaning files...'});
   await removeFile(imagePath);
 
   // Final log
-  logUI({logId, pkg: name, msg: 'Package donwloaded'});
+  logUI({logId, name, msg: 'Package donwloaded'});
 }
 
 /**
@@ -92,7 +93,7 @@ async function run({pkg, logId}) {
   const {isCore, version} = manifest;
   const dockerComposePath = getPath.dockerCompose(name, params, isCore);
 
-  logUI({logId, pkg: name, msg: 'starting package... '});
+  logUI({logId, name, msg: 'starting package... '});
   // patch to prevent installer from crashing
   if (name == 'dappmanager.dnp.dappnode.eth') {
     await restartPatch(name+':'+version);
@@ -100,13 +101,18 @@ async function run({pkg, logId}) {
     await docker.compose.up(dockerComposePath);
   }
 
-  // Clean old images. This command will throw at least one error,
-  // as it is trying to remove the current version
-  logUI({logId, pkg: name, msg: 'cleaning old images'});
-  await docker.rmOldSemverImages(name).catch((err) => {});
+  // Clean old images. This command can throw errors.
+  // If the images were removed successfuly the dappmanger will print logs:
+  // Untagged: package.dnp.dappnode.eth:0.1.6
+  logUI({logId, name, msg: 'cleaning old images'});
+  const currentImgs = await docker.images().catch(() => '');
+  await docker.rmi(currentImgs.split(/\r|\n/).filter((p) => {
+    const [pName, pVer] = p.split(':');
+    return pName === name && semver.valid(pVer) && pVer !== version;
+  })).catch(() => {});
 
   // Final log
-  logUI({logId, pkg: name, msg: 'package started'});
+  logUI({logId, name, msg: 'package started'});
 }
 
 

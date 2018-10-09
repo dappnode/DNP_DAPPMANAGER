@@ -8,6 +8,7 @@ const {eventBus, eventBusTag} = require('eventBus');
  */
 
 function logUI(data) {
+    if (data.name) data.pkg = data.name;
     eventBus.emit(eventBusTag.logUI, data);
 }
 
