@@ -9,15 +9,19 @@ const validate = require('utils/validate');
 
 // Depedencies
 const ipfs = require('./ipfsSetup');
-const params = require('params');
 const logs = require('logs.js')(module);
 const {parseResHash, validateIpfsHash} = require('./utils');
 
 // Declare parameters for all methods to have access to
-const CACHE_DIR = params.CACHE_DIR;
 const timeoutTime = 3000;
 
 // Declare methods
+const pinHash = (HASH) => {
+    ipfs.pin.add(HASH, (err) => {
+        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
+    });
+};
+
 const isfileHashValid = async (providedHash, PATH) => {
     // First, ensure that the PATH file is correct
     if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) return false;
@@ -91,20 +95,15 @@ const download = async (HASH, PATH, logChunks) => {
     // execute download
     await downloadHandler(HASH, PATH, logChunks);
     // If download was successful, pin file. Pin paralelly, and don't propagate errors
-    ipfs.pin.add(HASH, (err) => {
-        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
-    });
+    pinHash(HASH);
 };
 
-
 const cat = async (HASH, options = {}) => {
-    const PATH = CACHE_DIR + HASH;
-    await download(HASH, PATH);
-    if (options.buffer) {
-        return await promisify(fs.readFile)(PATH);
-    } else {
-        return await promisify(fs.readFile)(PATH, 'utf8');
-    }
+    const file = await promisify(ipfs.files.cat)(HASH);
+    // If cat was successful, pin file. Pin paralelly, and don't propagate errors
+    pinHash(HASH);
+    // Return buffer or string
+    return options.buffer ? file : file.toString('utf8');
 };
 
 module.exports = {
