@@ -27,4 +27,43 @@ function shell(cmd) {
     });
 }
 
+
+/**
+ * About the error object
+ * ======================
+ *
+ * Sample error object:
+
+Error: Command failed: cat aa.txt
+cat: aa.txt: No such file or directory
+
+Guillems-MacBook-Pro:src LION$ node src/utils/test.js
+{ Error: Command failed: cat aa.txt
+cat: aa.txt: No such file or directory
+
+    at ChildProcess.exithandler (child_process.js:276:12)
+    at emitTwo (events.js:126:13)
+    at ChildProcess.emit (events.js:214:7)
+    at maybeClose (internal/child_process.js:915:16)
+    at Socket.stream.socket.on (internal/child_process.js:336:11)
+    at emitOne (events.js:116:13)
+    at Socket.emit (events.js:211:7)
+    at Pipe._handle.close [as _onclose] (net.js:561:12)
+  killed: false,
+  code: 1,
+  signal: null,
+  cmd: 'cat aa.txt',
+  stdout: '',
+  stderr: 'cat: aa.txt: No such file or directory\n' }
+
+ * console.log(err) will return all the info above
+ * console.log(`${err}`) will return the same as err.message
+ *
+ * Conclusion
+ * ==========
+ *
+ * Using child_process it's best to just rethrow the recieved error.
+ */
+
+
 module.exports = shell;
