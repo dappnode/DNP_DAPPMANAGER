@@ -68,14 +68,16 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
 
     // label handling
     if (dpnManifest.image.labels) {
-      service.labels = service.labels || [];
-      dpnManifest.image.labels.map((label) => {
-        service.labels.push(label);
-      });
+      service.labels = [
+        ...(service.labels || []),
+        ...dpnManifest.image.labels,
+      ];
     }
     if (dpnManifest.origin) {
-      service.labels = service.labels || [];
-      service.labels.push('origin='+dpnManifest.origin);
+      service.labels = [
+        ...(service.labels || []),
+        'origin='+dpnManifest.origin,
+      ];
     }
 
     // Extra features
@@ -90,7 +92,7 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     let volumes = {};
     // Regular volumes
     if (dpnManifest.image.volumes) {
-      dpnManifest.image.volumes.map((vol) => {
+      dpnManifest.image.volumes.forEach((vol) => {
         // Make sure it's a named volume
         if (!vol.startsWith('/') && !vol.startsWith('~')) {
           const volName = vol.split(':')[0];
@@ -100,7 +102,7 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     }
     // External volumes
     if (dpnManifest.image.external_vol) {
-      dpnManifest.image.external_vol.map((vol) => {
+      dpnManifest.image.external_vol.forEach((vol) => {
         const volName = vol.split(':')[0];
         volumes[volName] = {
           external: {
@@ -124,8 +126,9 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
         },
       };
     } else {
-      networks[DNP_NETWORK] = {};
-      networks[DNP_NETWORK].external = true;
+      networks[DNP_NETWORK] = {
+        external: true,
+      };
     }
 
     let dockerCompose = {
