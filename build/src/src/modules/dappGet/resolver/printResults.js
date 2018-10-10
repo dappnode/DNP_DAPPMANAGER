@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 function printResults({success, errors, casesChecked, totalCases, hasTimedOut}) {
     if (hasTimedOut) {
         console.log('TIMED OUT!');

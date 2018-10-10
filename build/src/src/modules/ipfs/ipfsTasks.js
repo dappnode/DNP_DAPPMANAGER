@@ -97,10 +97,14 @@ const download = async (HASH, PATH, logChunks) => {
 };
 
 
-const cat = async (HASH) => {
+const cat = async (HASH, options = {}) => {
     const PATH = CACHE_DIR + HASH;
     await download(HASH, PATH);
-    return fs.readFileSync(PATH, 'utf8');
+    if (options.buffer) {
+        return await promisify(fs.readFile)(PATH);
+    } else {
+        return await promisify(fs.readFile)(PATH, 'utf8');
+    }
 };
 
 module.exports = {

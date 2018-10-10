@@ -8,11 +8,11 @@ const apm = require('modules/apm');
  * @param {object} options package request
  * @return {object} parsed manifest
  */
-async function getManifest(packageReq, options = {}) {
+async function getManifest(packageReq) {
   validate.packageReq(packageReq);
+
   let fromIpfs;
-  let verified;
-  let isCore;
+
   if (packageReq.hash && packageReq.hash.startsWith('/ipfs/')) {
     fromIpfs = packageReq.hash.replace('/ipfs/', 'ipfs-');
   } else if (packageReq.name.endsWith('.eth')) {
@@ -22,7 +22,6 @@ async function getManifest(packageReq, options = {}) {
       fromIpfs = packageReq.ver.replace('/ipfs/', 'ipfs-');
     } else {
       packageReq.hash = await apm.getRepoHash(packageReq);
-      verified = packageReq.name.endsWith('.dnp.dappnode.eth');
     }
   // if the name of the package is already an IFPS hash, skip:
   } else if (packageReq.name.startsWith('/ipfs/')) {
@@ -31,7 +30,6 @@ async function getManifest(packageReq, options = {}) {
   } else {
     throw Error('Unkown package request: '+packageReq.name);
   }
-
 
   // cat the file and parse it
   const manifest = JSON.parse( await ipfs.cat(packageReq.hash) );
@@ -43,19 +41,8 @@ async function getManifest(packageReq, options = {}) {
     throw Error('Package name requested doesn\'t match its manifest');
   }
 
-  // Allow core only if the package is verified
-  if (manifest.type == 'dncore') {
-    if (options.BYPASS_CORE_RESTRICTION || verified) {
-      isCore = true;
-    } else {
-      // inform the user of improper usage
-      throw Error('Unverified CORE package request');
-    }
-  }
-
   return {
     ...manifest,
-    isCore,
     fromIpfs,
   };
 }

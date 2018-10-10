@@ -11,7 +11,7 @@ async function fetch({req, state, directory}) {
         await fetchRequest(req, repo);
     }
     if (state) {
-        await fetchState(state, repo);
+        await fetchState(state, repo, req);
     }
     if (directory) {
         await fetchDirectory(repo);
