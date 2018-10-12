@@ -15,7 +15,7 @@ const si = require('systeminformation');
 const getStats = async () => {
     /* eslint-disable max-len */
     const cpuRatioRaw = await shellExec(`grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'`);
-    const cpuRatio = isNaN(cpuRatioRaw) ? null : parseInt(cpuRatioRaw);
+    const cpuRatio = isNaN(cpuRatioRaw) ? null : `${parseInt(cpuRatioRaw)}%`;
     const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`, true);
     // Attempt two mem fetchs
     let memUsedRatio;
