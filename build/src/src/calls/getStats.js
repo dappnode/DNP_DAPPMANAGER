@@ -13,7 +13,9 @@ const si = require('systeminformation');
  *   }
  */
 const getStats = async () => {
-    const cpu = await si.currentLoad();
+    /* eslint-disable max-len */
+    const cpuRatioRaw = await shellExec(`grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'`);
+    const cpuRatio = isNaN(cpuRatioRaw) ? null : parseInt(cpuRatioRaw);
     const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`, true);
     // Attempt two mem fetchs
     let memUsedRatio;
@@ -25,11 +27,12 @@ const getStats = async () => {
     } else if (memUsed && memTotal) {
         memUsedRatio = Math.floor(100*memUsed/memTotal)+'%';
     }
+    /* eslint-enable max-len */
 
     return {
         message: `Checked stats of this DAppNode server`,
         result: {
-            cpu: cpu.currentload ? Math.floor(cpu.currentload)+'%' : null,
+            cpu: cpuRatio,
             memory: memUsedRatio,
             disk: disk.trim(),
         },
