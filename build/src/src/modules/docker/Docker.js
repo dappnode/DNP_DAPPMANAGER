@@ -175,11 +175,26 @@ function getVpnImageCmd() {
   return 'docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\'';
 }
 
-function getUpnpCmd(port, type, IMAGE) {
+/**
+ *
+ * @param {String} port Must be in the format "30303 UDP" / "30303 TCP"
+ * There are two protections: "30303/udp" => "30303 UDP", "30303" => "30303 TCP"
+ * @param {String} type
+ * @param {String} IMAGE
+ * @return {String}
+ */
+function getUpnpCmd(port = '', type, IMAGE) {
+  if (port.includes('/')) {
+    const [portNumber, portType] = port.split('/');
+    port = `${portNumber} ${portType ? portType.toUpperCase() : 'TCP'}`;
+  }
+  if (!port.includes('UDP') || !port.includes('TCP')) {
+    port = `${port} TCP`;
+  }
   let flag;
   if (type === 'open') flag = '-r';
   if (type === 'close') flag = '-d';
-  return 'docker run --rm --net=host '+IMAGE.trim()+' upnpc -e DAppNode '+flag+' '+port+' UDP';
+  return `docker run --rm --net=host ${IMAGE.trim()} upnpc -e DAppNode ${flag} ${port}`;
 }
 
 function parseOptions(options) {
