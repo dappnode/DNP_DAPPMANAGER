@@ -177,24 +177,27 @@ function getVpnImageCmd() {
 
 /**
  *
- * @param {String} port Must be in the format "30303 UDP" / "30303 TCP"
- * There are two protections: "30303/udp" => "30303 UDP", "30303" => "30303 TCP"
+ * @param {String} port Must be in the format port = {
+ *   number: 30303,
+ *   type: TCP
+ * }
  * @param {String} type
  * @param {String} IMAGE
  * @return {String}
  */
-function getUpnpCmd(port = '', type, IMAGE) {
-  if (port.includes('/')) {
-    const [portNumber, portType] = port.split('/');
-    port = `${portNumber} ${portType ? portType.toUpperCase() : 'TCP'}`;
+function getUpnpCmd(port = {}, type, IMAGE) {
+  if (typeof port !== 'object') {
+    throw Error(`port must be an object: port = { number: 30303, type: 'UDP' }`);
   }
-  if (!port.includes('UDP') || !port.includes('TCP')) {
-    port = `${port} TCP`;
+  if (!port.number) {
+    throw Error(`port must container a number property: port = { number: 30303, type: 'UDP' }`);
   }
   let flag;
   if (type === 'open') flag = '-r';
   if (type === 'close') flag = '-d';
-  return `docker run --rm --net=host ${IMAGE.trim()} upnpc -e DAppNode ${flag} ${port}`;
+  /* eslint-disable max-len */
+  return `docker run --rm --net=host ${IMAGE.trim()} upnpc -e DAppNode ${flag} ${port.number} ${port.type || 'TCP'}`;
+  /* eslint-enable max-len */
 }
 
 function parseOptions(options) {
