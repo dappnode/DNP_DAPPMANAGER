@@ -30,7 +30,7 @@ async function restartPatch(IMAGE_NAME) {
         params,
         true
     );
-    const PATH_LOCAL = '/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml';
+    const PATH_LOCAL = '/opt/dappnode/DNCORE/docker-compose-dappmanager.yml';
     const PATH_REMOTE = '/usr/src/app/DNCORE/docker-compose-dappmanager.yml';
     const DOCKERCOMPOSE_DATA = `version: '3.4'
 

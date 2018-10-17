@@ -11,7 +11,7 @@ services:
     restart: always
     volumes:
       - dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/
-      - /usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/
+      - /opt/dappnode/DNCORE/:/usr/src/app/DNCORE/
       - /var/run/docker.sock:/var/run/docker.sock
     dns: 172.33.1.2
     environment:
