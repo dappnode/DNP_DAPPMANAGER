@@ -23,7 +23,11 @@ const fetchPackageVersions = async ({
   id,
 }) => {
   if (await isSyncing()) {
-    throw Error('Mainnet is syncing');
+    return {
+      message: `Mainnet is still syncing`,
+      result: [],
+      logMessage: true,
+    };
   }
 
   const packageReq = parse.packageReq(id);
