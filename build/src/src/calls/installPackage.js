@@ -85,16 +85,20 @@ const installPackage = async ({
     // Prevent default values. Someone can try to spoof "isCore" in the manifest
     manifest.isCore = false;
     if (manifest.type == 'dncore') {
-      if (
-        // Package has to come from a dappnode's APM repo.
-        name.endsWith('.dnp.dappnode.eth') && ver.startsWith('/ipfs/')
-        // Or the user can bypass this restriction
-        || options.BYPASS_CORE_RESTRICTION
+      if (options.BYPASS_CORE_RESTRICTION) {
+        manifest.isCore = true;
+      } else if (
+        // The origin must be the registry controlled by the DAppNode team
+        name.endsWith('.dnp.dappnode.eth')
+        // It must NOT come from ipfs, thus APM
+        && !ver.startsWith('/ipfs/')
       ) {
         manifest.isCore = true;
       } else {
         // inform the user of improper usage
-        throw Error('Unverified CORE package request: '+name);
+        /* eslint-disable max-len */
+        throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
+        /* eslint-enable max-len */
       }
     }
 
