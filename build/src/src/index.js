@@ -40,9 +40,16 @@ const wrapErrors = (handler, event) =>
         result: res.result || {},
       });
     } catch (err) {
+      // Rename known shit-errors
+      // When attempting to call a contract while the chain is syncing:
       if (err.message && err.message.includes('decode 0x from ABI')) {
-        err.message = 'Chain is still syncing: '+err.message;
+        err.message = `Chain is still syncing: ${err.message}`;
       }
+      // When attempting an JSON RPC but the connection with the node is closed:
+      if (err.message && err.message.includes('connection not open')) {
+        err.message = `Could not connect to ethchain: ${err.message}`;
+      }
+
       logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
       logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
       return JSON.stringify({

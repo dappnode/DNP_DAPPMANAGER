@@ -36,7 +36,7 @@ const managePorts = async ({
     }
 
     return {
-        message: msg+' ports '+ports.join(', '),
+        message: `${msg} ports ${ports.map((p) => `${p.number} ${p.type}`).join(', ')}`,
         logMessage: true,
         userAction: true,
     };
