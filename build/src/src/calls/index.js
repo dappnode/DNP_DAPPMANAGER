@@ -22,4 +22,5 @@ module.exports = {
     resolveRequest: require('./resolveRequest'),
     diskSpaceAvailable: require('./diskSpaceAvailable'),
     getStats: require('./getStats'),
+    changeIpfsTimeout: require('./changeIpfsTimeout'),
 };
