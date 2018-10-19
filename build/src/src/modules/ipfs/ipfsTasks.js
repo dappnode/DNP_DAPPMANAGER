@@ -15,7 +15,6 @@ const {parseResHash, validateIpfsHash} = require('./utils');
 
 // Declare parameters for all methods to have access to
 const CACHE_DIR = params.CACHE_DIR;
-const timeoutTime = 3000;
 
 // Declare methods
 const isfileHashValid = async (providedHash, PATH) => {
@@ -49,7 +48,7 @@ const downloadHandler = (HASH, PATH, logChunks) =>
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
         reject(new Error('Timeout to cancel expired'));
-    }, timeoutTime);
+    }, params.IPFS_TIMEOUT);
 
     // Construct handlers
     const handleError = (origin) => (err) => {
