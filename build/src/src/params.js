@@ -32,6 +32,7 @@ module.exports = {
 
   // IPFS parameters
   IPFS: (process.env.IPFS_REDIRECT || 'my.ipfs.dnp.dappnode.eth'),
+  IPFS_TIMEOUT: 30*1000,
 
   // Web3 parameters
   WEB3HOSTWS: 'ws://my.ethchain.dnp.dappnode.eth:8546',
@@ -39,5 +40,7 @@ module.exports = {
 
   // User Action Logs filename
   userActionLogsFilename: 'DNCORE/userActionLogs.log',
+
+  // IPFS
 
 };
