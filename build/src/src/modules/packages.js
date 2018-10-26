@@ -43,8 +43,10 @@ async function download({pkg, logId}) {
   );
 
   // Define the logging function
-  const log = (percent) =>
+  const log = (percent) => {
+    if (percent > 99) percent = 99;
     logUI({logId, name, msg: 'Downloading '+percent+'%'});
+  };
   // Define the rounding function to not spam updates
   const displayRes = 2;
   const round = (x) => displayRes*Math.ceil(100*x/imageSize/displayRes);
