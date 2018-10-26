@@ -3,6 +3,7 @@ const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
 const getAvatar = require('modules/getAvatar');
 const isSyncing = require('utils/isSyncing');
+const isIpfsRequest = require('utils/isIpfsRequest');
 
 /**
  * Fetches the manifest of the latest version and its avatar.
@@ -21,7 +22,10 @@ const isSyncing = require('utils/isSyncing');
 const fetchPackageData = async ({
   id,
 }) => {
-  if (await isSyncing()) {
+  const packageReq = parse.packageReq(id);
+
+  // Make sure the chain is synced
+  if (!isIpfsRequest(packageReq) && await isSyncing()) {
     return {
       message: `Mainnet is still syncing`,
       result: {},
@@ -29,12 +33,6 @@ const fetchPackageData = async ({
     };
   }
 
-  const packageReq = parse.packageReq(id);
-
-  // Make sure the chain is synced
-  // if (await ethchain.isSyncing()) {
-  //   return res.success('Mainnet is syncing', []);
-  // }
 
   const manifest = await getManifest(packageReq);
 
