@@ -2,6 +2,7 @@ const parse = require('utils/parse');
 const apm = require('modules/apm');
 const getManifest = require('modules/getManifest');
 const isSyncing = require('utils/isSyncing');
+const isIpfsRequest = require('utils/isIpfsRequest');
 
 /**
  * Fetches all available version manifests from a package APM repo
@@ -22,15 +23,15 @@ const isSyncing = require('utils/isSyncing');
 const fetchPackageVersions = async ({
   id,
 }) => {
-  if (await isSyncing()) {
+  const packageReq = parse.packageReq(id);
+
+  if (!isIpfsRequest(packageReq) && await isSyncing()) {
     return {
       message: `Mainnet is still syncing`,
       result: [],
       logMessage: true,
     };
   }
-
-  const packageReq = parse.packageReq(id);
 
   if (packageReq.name.endsWith('.eth')) {
     let packageVersions = await getPackageVersions(packageReq);

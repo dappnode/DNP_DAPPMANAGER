@@ -2,6 +2,7 @@ const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const logUI = require('utils/logUI');
+const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
@@ -33,14 +34,15 @@ const installPackage = async ({
   logId,
   options = {},
 }) => {
-  if (await isSyncing()) {
-    throw Error('Mainnet is syncing');
-  }
-
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
   // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }
   const req = parse.packageReq(id);
+
+  // If the request is not from IPFS, check if the chain is syncing
+  if (!isIpfsRequest(req) && await isSyncing()) {
+    throw Error('Mainnet is syncing');
+  }
 
   // 2. Resolve the request
   try {
