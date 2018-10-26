@@ -2,9 +2,12 @@ const parse = require('utils/parse');
 const {download, run} = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const logUI = require('utils/logUI');
+const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
+const dockerList = require('modules/dockerList');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
+const logs = require('logs.js')(module);
 
 
 /**
@@ -33,35 +36,75 @@ const installPackage = async ({
   logId,
   options = {},
 }) => {
-  if (await isSyncing()) {
-    throw Error('Mainnet is syncing');
-  }
-
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
   // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }
   const req = parse.packageReq(id);
 
-  // 2. Resolve the request
-  try {
-    await dappGet.update(req);
-  } catch (e) {
-    throw Error(`Error updating DNP repo: ${e.stack || e.message}`);
+  // If the request is not from IPFS, check if the chain is syncing
+  if (!isIpfsRequest(req) && await isSyncing()) {
+    throw Error('Mainnet is syncing');
   }
 
+  // 2. Resolve the request
   let result;
-  // res = {
-  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  //     state: {'bind.dnp.dappnode.eth': '0.1.2'}
-  // }
-  try {
-    result = await dappGet.resolve(req);
-  } catch (e) {
-    throw Error(`Error resolving dependencies: ${e.stack || e.message}`);
-  }
-  // Return error if the req couldn't be resolved
-  if (!result.success) {
-    throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
+  if (options.BYPASS_RESOLVER) {
+    /**
+     * The dappGet resolver may cause errors.
+     * Updating the core will never require dependency resolution,
+     * therefore for a system update the dappGet resolver will be emitted
+     *
+     * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
+     */
+    const reqManifest = await getManifest(req);
+    // reqManifest.dependencies = {
+    //     'bind.dnp.dappnode.eth': '0.1.4',
+    //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
+    // }
+
+    // Append dependencies in the list of packages to install
+    result = {
+      success: (reqManifest || {}).dependencies || {},
+      state: {},
+    };
+    // Add current request to pacakages to install
+    result.success[req.name] = req.ver;
+
+    // The function below does not directly affect funcionality.
+    // However it would prevent already installed packages from installing
+    try {
+      (await dockerList.listContainers()).forEach((pkg) => {
+        if (pkg.name && pkg.version
+          && result.success && result.success[pkg.name]
+          && result.success[pkg.name] === pkg.version) {
+            delete result.success[pkg.name];
+          }
+      });
+    } catch (e) {
+      logs.error('Error listing current containers: '+e);
+    }
+  } else {
+    /**
+     * If BYPASS_RESOLVER == false, use the resolver
+     */
+    try {
+      await dappGet.update(req);
+    } catch (e) {
+      throw Error(`Error updating DNP repo: ${e.stack || e.message}`);
+    }
+    // res = {
+    //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
+    //     state: {'bind.dnp.dappnode.eth': '0.1.2'}
+    // }
+    try {
+      result = await dappGet.resolve(req);
+    } catch (e) {
+      throw Error(`Error resolving dependencies: ${e.stack || e.message}`);
+    }
+    // Return error if the req couldn't be resolved
+    if (!result.success) {
+      throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
+    }
   }
 
   const {success: newState, state} = result;
