@@ -42,7 +42,9 @@ const wrapErrors = (handler, event) =>
     } catch (err) {
       // Rename known shit-errors
       // When attempting to call a contract while the chain is syncing:
-      if (err.message && err.message.includes('decode 0x from ABI')) {
+      if (err.message && (err.message.includes('decode 0x from ABI')
+        || err.message.includes('decode address from ABI'))) {
+        err.code = 'SYNCING';
         err.message = `Chain is still syncing: ${err.message}`;
       }
       // When attempting an JSON RPC but the connection with the node is closed:
@@ -50,7 +52,14 @@ const wrapErrors = (handler, event) =>
         err.message = `Could not connect to ethchain: ${err.message}`;
       }
 
-      logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
+      // ##### Don't reflect logId in the userActions logs (delete w/ immutable method)
+      const _kwargs = Object.assign({}, kwargs);
+      if (_kwargs && _kwargs.logId) delete _kwargs.logId;
+
+      // Don't log to userActions is "SYNCING" errors
+      if (err.code !== 'SYNCING') {
+        logUserAction.log({level: 'error', event, ...error2obj(err), kwargs: _kwargs});
+      }
       logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
       return JSON.stringify({
         success: false,
