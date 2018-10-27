@@ -50,7 +50,11 @@ const wrapErrors = (handler, event) =>
         err.message = `Could not connect to ethchain: ${err.message}`;
       }
 
-      logUserAction.log({level: 'error', event, ...error2obj(err), kwargs});
+      // ##### Don't reflect logId in the userActions logs (delete w/ immutable method)
+      const _kwargs = Object.assign({}, kwargs);
+      if (_kwargs && _kwargs.logId) delete _kwargs.logId;
+
+      {logUserAction.log({level: 'error', event, ...error2obj(err), kwargs: _kwargs});}
       logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
       return JSON.stringify({
         success: false,
