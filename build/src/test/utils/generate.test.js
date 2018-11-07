@@ -30,6 +30,7 @@ const manifest = {
   'dependencies': {
     'nginx-proxy.dnp.dappnode.eth': 'latest',
   },
+  'origin': '/ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34',
 };
 
 const dockerCompose = `version: '3.4'
@@ -46,6 +47,9 @@ services:
         networks:
             - dncore_network
         dns: 172.33.1.2
+        labels:
+            dappnode.dnp.dependencies: '{"nginx-proxy.dnp.dappnode.eth":"latest"}'
+            dappnode.dnp.origin: /ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34
 volumes:
     nginxproxydnpdappnodeeth_vhost.d:
         external:

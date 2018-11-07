@@ -2,8 +2,20 @@ const validate = require('utils/validate');
 const ipfs = require('modules/ipfs');
 const apm = require('modules/apm');
 
+// Used by
+// calls / fetchDirectory;
+// calls / fetchPackageData;
+// calls / fetchPackageVersions;
+// calls / installPackage;
+// dappGet / getPkgDeps;
+
 /**
  * Resolves the package request to the APM and fetches the manifest from IPFS.
+ * It recognizes different types of requests:
+ * - {name: kovan.dnp.dappnode.eth, ver: 0.1.0}
+ * - {name: kovan.dnp.dappnode.eth, ver: 'ipfs/QmUHFxFbYdJDueBWzYZnvpzkjwBmMt3bmNDLQBTZzY18UZ'}
+ * - {name: 'ipfs/QmUHFxFbYdJDueBWzYZnvpzkjwBmMt3bmNDLQBTZzY18UZ', ver: ''}
+ *
  * @param {object} packageReq package request
  * @param {object} options package request
  * @return {object} parsed manifest
