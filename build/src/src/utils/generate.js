@@ -67,17 +67,44 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     service.dns = DNS_SERVICE;
 
     // label handling
+    // Append existing labels
     if (dpnManifest.image.labels) {
-      service.labels = [
-        ...(service.labels || []),
+      // Correct labels as array to be an object
+      if (Array.isArray(dpnManifest.image.labels)) {
+        let _obj = {};
+        dpnManifest.image.labels.forEach((e) => {
+          if (typeof e === 'string') {
+            let [key, value] = e.split('=');
+            _obj[key] = value || '';
+          }
+        });
+        dpnManifest.image.labels = _obj;
+      }
+      // Merge labels:
+      // service.labels = {
+      //   label: "value",
+      //   label-without-value: "" }
+      service.labels = {
+        ...(service.labels || {}),
         ...dpnManifest.image.labels,
-      ];
+      };
     }
+    // Add the dependencies of the package in its labels
+    // This will help the resolver not need to access IPFS (and ENS)
+    // to know its dependencies
+    if (dpnManifest.dependencies) {
+      service.labels = {
+        ...(service.labels || {}),
+        'dappnode.dnp.dependencies': JSON.stringify(dpnManifest.dependencies),
+      };
+    }
+    // Adding the origin of the package as a label to be used in the resolve
+    // This is important to recognize if this package comes from IPFS or ENS
     if (dpnManifest.origin) {
-      service.labels = [
-        ...(service.labels || []),
-        'origin='+dpnManifest.origin,
-      ];
+      service.labels = {
+        ...(service.labels || {}),
+        'dappnode.dnp.origin': dpnManifest.origin,
+      };
     }
 
     // Extra features

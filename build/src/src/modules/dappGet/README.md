@@ -79,6 +79,11 @@ semver.satisfies("0.1.1-ipfs-Qm", ">=0.1.0"); // returns true
 - 0.2.0-ipfs-Qm: No prob, it's semver.
 - /ipfs/Qm: ### How to?
 
+state packages:
+1. Get current list of state packages
+2. Get their dependencies
+3. Crosscheck with the request to see if there is any dependency of interest 
+
 5.  The same package is updated and its current version is used to determine if it should be updated or it has the same version
 
 - Origin idea: If you want to install the same version you should remove it first
