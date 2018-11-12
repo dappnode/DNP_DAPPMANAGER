@@ -25,9 +25,7 @@ async function fetch(req) {
         // Only consider valid versions, ignore:
         // - pkg.dnp.dappnode.eth:dev
         // - pkg.dnp.dappnode.eth:c5ashf61
-        .filter((pkg) => semver.valid(pkg.version))
-        // Only consider packages with dependencies
-        .filter((pkg) => pkg.dependencies);
+        .filter((pkg) => semver.valid(pkg.version));
 
     const relevantInstalledPackages = getRelevantInstalledPackages(
         requestedPackages,
@@ -50,10 +48,6 @@ async function fetch(req) {
             logs.warn(`Error fetching state package ${pkg.name}: ${e.stack || e.message}`);
         }
     }));
-
-    // if (directory) {
-    //     await fetchDirectory(repo);
-    // }
 
     await setRepo(repo);
 }
