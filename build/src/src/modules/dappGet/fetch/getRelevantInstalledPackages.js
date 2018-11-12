@@ -19,14 +19,28 @@ const intersect = require('../utils/intersect');
  */
 
 function getRelevantInstalledPackages(requestedPackages, installedPackages) {
+  // Prevent possible recursive loops
+  const start = Date.now();
+
   const state = {};
-  const intersectedPackages = intersect(requestedPackages, installedPackages);
-  intersectedPackages.forEach(addDependants);
-  return Object.values(state);
+  const intersectedPackages = intersect(
+    requestedPackages,
+    installedPackages.map((pkg) => pkg.name)
+  );
+  const installedPackagesWithDeps = installedPackages.filter((pkg) => pkg.dependencies);
+  intersectedPackages.forEach((pkgName) => {
+    const pkg = installedPackages.find((pkg) => pkg.name === pkgName);
+    addDependants(pkg);
+  });
+  // Return only packages that are not already included in the requestedPackages array
+  return Object.values(state).filter((pkg) => !requestedPackages.includes(pkg.name));
 
   function addDependants(pkg) {
+    // Prevent possible recursive loops
+    if (Date.now() - start > 2000) return;
+
     addToState(pkg);
-    installedPackages.forEach((dependantPkg) => {
+    installedPackagesWithDeps.forEach((dependantPkg) => {
       if (dependsOn(dependantPkg, pkg) && !isInState(dependantPkg)) {
         addDependants(dependantPkg);
       }
