@@ -1,6 +1,6 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
   "type": "dncore",
@@ -17,8 +17,9 @@
     "subnet": "172.33.0.0/16",
     "ipv4_address": "172.33.1.7"
   },
-  "author": "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
+  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "contributors": [
+    "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
   ],
   "keywords": [
