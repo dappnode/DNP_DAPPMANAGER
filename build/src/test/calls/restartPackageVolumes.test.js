@@ -5,8 +5,6 @@ const sinon = require('sinon');
 const fs = require('fs');
 const getPath = require('utils/getPath');
 const validate = require('utils/validate');
-const docker = require('modules/docker');
-const parse = require('utils/parse');
 
 chai.should();
 
@@ -17,30 +15,68 @@ describe('Call function: restartPackageVolumes', function() {
   };
 
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
+  const CORE_PACKAGE_NAME = 'testCore.dnp.dappnode.eth';
   const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
+  const CORE_DOCKERCOMPOSE_PATH = getPath.dockerCompose(CORE_PACKAGE_NAME, params);
 
-  before(() => {
-    validate.path(DOCKERCOMPOSE_PATH);
-    fs.writeFileSync(DOCKERCOMPOSE_PATH, 'docker-compose');
+  const docker = {
+    compose: {
+      rm: sinon.stub(),
+      down: sinon.stub(),
+      up: sinon.stub(),
+    },
+    volume: {
+      rm: sinon.stub(),
+    },
+  };
+  // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
+
+  const dockerList = {
+    listContainers: async () => ([
+      {
+        name: CORE_PACKAGE_NAME,
+        isCORE: true,
+        volumes: [
+          {name: 'vol1'},
+          {name: 'vol2'},
+        ],
+      },
+      {
+        name: PACKAGE_NAME,
+        volumes: [
+          {name: 'vol3'},
+        ],
+      },
+    ]),
+  };
+
+  const restartPackageVolumes = proxyquire('calls/restartPackageVolumes', {
+    'modules/docker': docker,
+    'modules/dockerList': dockerList,
+    'params': params,
   });
 
-  it('should remove the package volumes', async () => {
-    // Mock docker
-    sinon.replace(docker.volume, 'rm', sinon.fake());
-    sinon.replace(docker.compose, 'rm', sinon.fake());
-    sinon.replace(docker.compose, 'up', sinon.fake());
-    // Mock parse
-    const packageVolumes = ['vol1', 'vol2'];
-    sinon.replace(parse, 'serviceVolumes', sinon.fake.returns(packageVolumes));
-    const restartPackageVolumes = proxyquire('calls/restartPackageVolumes', {
-      'utils/parse': parse,
-      'modules/docker': docker,
-      'params': params,
-    });
-    let res = await restartPackageVolumes({id: PACKAGE_NAME});
+  before(() => {
+    for (const path of [DOCKERCOMPOSE_PATH, CORE_DOCKERCOMPOSE_PATH]) {
+      validate.path(path);
+      fs.writeFileSync(path, 'docker-compose');
+    }
+  });
+
+  it('should remove the package volumes of a CORE', async () => {
+    const res = await restartPackageVolumes({id: CORE_PACKAGE_NAME});
     // sinon.assert.called(docker.compose.rm);
-    sinon.assert.calledWith(docker.volume.rm.firstCall, 'vol1');
-    sinon.assert.calledWith(docker.volume.rm.secondCall, 'vol2');
+    sinon.assert.called(docker.compose.rm);
+    sinon.assert.calledWith(docker.volume.rm, 'vol1 vol2');
+    sinon.assert.called(docker.compose.up);
+    expect(res).to.be.ok;
+    expect(res).to.have.property('message');
+  });
+
+  it('should remove the package volumes of a NOT CORE', async () => {
+    const res = await restartPackageVolumes({id: PACKAGE_NAME});
+    // sinon.assert.called(docker.compose.rm);
+    sinon.assert.called(docker.compose.down);
     sinon.assert.called(docker.compose.up);
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
@@ -48,5 +84,6 @@ describe('Call function: restartPackageVolumes', function() {
 
   after(() => {
     fs.unlinkSync(DOCKERCOMPOSE_PATH);
+    fs.unlinkSync(CORE_DOCKERCOMPOSE_PATH);
   });
 });
