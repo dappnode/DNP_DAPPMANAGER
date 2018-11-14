@@ -60,7 +60,6 @@ const updatePackageEnv = async ({
     throw Error('The installer cannot be restarted');
   }
 
-  await docker.compose.down(dockerComposePath);
   await docker.compose.up(dockerComposePath);
 
   // Emit packages update
