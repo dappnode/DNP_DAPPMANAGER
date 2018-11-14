@@ -50,7 +50,6 @@ describe('Call function: updatePackageEnv', function() {
       });
       // Verify
       // docker.compose should be used to reset the package
-      sinon.assert.calledWith(docker.compose.down, dockerComposePath);
       sinon.assert.calledWith(docker.compose.up, dockerComposePath);
       // The envs should have been written
       let envString = fs.readFileSync(envFilePath, 'utf8');
