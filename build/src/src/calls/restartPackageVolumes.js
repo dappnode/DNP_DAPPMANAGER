@@ -36,11 +36,8 @@ async function restartPackageVolumes({
     };
   }
 
-  // Remove volumes
-  await docker.compose.rm(dockerComposePath, {v: true});
-  for (const volumeName of packageVolumes) {
-    await docker.volume.rm(volumeName);
-  }
+  await docker.compose.down(dockerComposePath, {volumes: true});
+
   // Restart docker to apply changes
   await docker.compose.up(dockerComposePath);
 
