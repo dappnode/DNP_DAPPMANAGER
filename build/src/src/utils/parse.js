@@ -64,7 +64,8 @@ function envFile(envFileData) {
     .split('\n')
     .filter((row) => row.length > 0 )
     .map((row) => {
-      res[row.split('=')[0]] = row.split('=')[1];
+      const [key, value] = row.split(/=(.+)/);
+      res[key] = value;
     });
 
   return res;
