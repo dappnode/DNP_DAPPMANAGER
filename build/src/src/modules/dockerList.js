@@ -79,6 +79,7 @@ function format(c) {
     name: name,
     shortName: shortName,
     ports: mapPorts(c.Ports),
+    volumes: c.Mounts.map(({Name, Source}) => ({name: Name, path: Source})),
     state: c.State,
     running: !/^Exited /i.test(c.Status),
   };
