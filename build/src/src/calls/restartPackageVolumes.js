@@ -1,8 +1,8 @@
 const fs = require('fs');
 const getPath = require('utils/getPath');
-const parse = require('utils/parse');
 const params = require('params');
 const docker = require('modules/docker');
+const dockerList = require('modules/dockerList');
 const {eventBus, eventBusTag} = require('eventBus');
 
 
@@ -18,28 +18,32 @@ const {eventBus, eventBusTag} = require('eventBus');
 async function restartPackageVolumes({
   id,
 }) {
+  const dnpList = await dockerList.listContainers();
+  const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(id));
+  if (!dnp) {
+    throw Error(`Could not found an container with the name: ${id}`);
+  }
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error('No docker-compose found: ' + dockerComposePath);
   }
-
   if (id.includes('dappmanager.dnp.dappnode.eth')) {
     throw Error('The installer cannot be restarted');
   }
 
-  const packageVolumes = parse.serviceVolumes(dockerComposePath, id);
-
   // If there are no volumes don't do anything
-  if (!packageVolumes.length) {
+  if (!dnp.volumes || !dnp.volumes.length) {
     return {
       message: id+' has no volumes ',
     };
   }
 
-  // Remove volumes
-  await docker.compose.rm(dockerComposePath, {v: true});
-  for (const volumeName of packageVolumes) {
-    await docker.volume.rm(volumeName);
+  if (dnp.isCORE) {
+    // docker-compose down can't be called because of the shared network
+    await docker.compose.rm(dockerComposePath);
+    await docker.volume.rm(dnp.volumes.map((v) => v.name).join(' '));
+  } else {
+    await docker.compose.down(dockerComposePath, {volumes: true});
   }
   // Restart docker to apply changes
   await docker.compose.up(dockerComposePath);
@@ -48,7 +52,7 @@ async function restartPackageVolumes({
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: 'Restarted '+id+' volumes: ' + packageVolumes.join(', '),
+    message: 'Restarted '+id+' volumes',
     logMessage: true,
     userAction: true,
   };
