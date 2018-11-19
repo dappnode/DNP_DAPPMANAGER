@@ -118,6 +118,7 @@ const ipfs = {
       ports: [
         '4001:4001',
         '4002:4002/udp',
+        '5000',
       ],
       restart: 'always',
       subnet: '172.33.0.0/16',
@@ -150,6 +151,7 @@ services:
         ports:
             - '4001:4001'
             - '4002:4002/udp'
+            - '5000'
         networks:
             network:
                 ipv4_address: 172.33.1.5
