@@ -78,7 +78,7 @@ function format(c) {
     image: c.Image,
     name: name,
     shortName: shortName,
-    ports: mapPorts(c.Ports),
+    ports: c.Ports,
     volumes: c.Mounts.map(({Name, Source}) => ({name: Name, path: Source})),
     state: c.State,
     running: !/^Exited /i.test(c.Status),
@@ -86,16 +86,16 @@ function format(c) {
 }
 
 
-function mapPorts(ports) {
-  if (!ports || ports.length === 0) return '';
-  let res = [];
-  ports.forEach(function(p) {
-    let publicPort = p.PublicPort || '';
-    let privatePort = p.PrivatePort || '';
-    res.push(publicPort+'->'+privatePort);
-  });
-  return res.join(', ');
-}
+// function mapPorts(ports) {
+//   if (!ports || ports.length === 0) return '';
+//   let res = [];
+//   ports.forEach(function(p) {
+//     let publicPort = p.PublicPort || '';
+//     let privatePort = p.PrivatePort || '';
+//     res.push(publicPort+'->'+privatePort);
+//   });
+//   return res.join(', ');
+// }
 
 
 module.exports = {

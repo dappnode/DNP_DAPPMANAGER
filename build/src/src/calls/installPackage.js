@@ -5,6 +5,8 @@ const logUI = require('utils/logUI');
 const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
 const dockerList = require('modules/dockerList');
+const lockPorts = require('modules/lockPorts');
+const managePorts = require('./managePorts');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
 const logs = require('logs.js')(module);
@@ -181,6 +183,24 @@ const installPackage = async ({
   if (dappmanagerPkg) {
     await run({pkg: dappmanagerPkg, logId});
   }
+
+  // 6. P2P ports: modify docker-compose + open ports
+  // - lockPorts modifies the docker-compose and returns
+  //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+  // - managePorts calls UPnP to open the ports
+
+  // ##########
+  const shouldOpenPorts = true;
+  // ##########
+
+  await Promise.all(pkgs.map(async (pkg) => {
+    const portsToOpen = await lockPorts(pkg);
+    // Abort if there are no ports to open
+    // Don't attempt to call UPnP if not necessary
+    if (portsToOpen.length && shouldOpenPorts) {
+      await managePorts({action: 'open', ports: portsToOpen});
+    }
+  }));
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
