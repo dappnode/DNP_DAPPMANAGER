@@ -118,6 +118,8 @@ services:
         ports:
             - '32768:30303/udp'
             - '32768:30303'
+        labels:
+            portsToClose: '["32768/udp","32768/tcp"]'
 `);
     });
 
@@ -137,6 +139,8 @@ services:
         ports:
             - '32769:30303/udp'
             - '32769:30303'
+        labels:
+            portsToClose: '["32769/udp","32769/tcp"]'
 `);
     });
 
