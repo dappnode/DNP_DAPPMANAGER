@@ -23,7 +23,7 @@ const getStats = async () => {
     const memTotal = await shellExec(`free / | awk 'NR==2 { print $2}'`, true).catch(() => null);
     const memUsed = await shellExec(`free / | awk 'NR==3 { print $3}'`, true).catch(() => null);
     if (memObj && memObj.available && memObj.total) {
-        memUsedRatio = Math.floor(100*memObj.available/memObj.total)+'%';
+        memUsedRatio = Math.floor(100*(1 - memObj.available/memObj.total))+'%';
     } else if (memUsed && memTotal) {
         memUsedRatio = Math.floor(100*memUsed/memTotal)+'%';
     }
