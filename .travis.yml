@@ -47,7 +47,7 @@ jobs:
       services:
         - docker
       script:
-        - docker-compose -f "$(find . -maxdepth 1 -name "docker-compose-*")" build
+        - docker-compose -f "$(find . -maxdepth 1 -name "docker-compose*")" build
 
     # Deploy stage, all code below is common between DAppNode packages
     ##################################################################
@@ -98,4 +98,3 @@ jobs:
         # - git commit -m "message"
         # - git checkout -b "v0.1.15"
         # - git push origin "v0.1.15"
-        
