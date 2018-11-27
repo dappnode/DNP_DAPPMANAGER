@@ -11,7 +11,8 @@ const validate = require('utils/validate');
 const ipfs = require('./ipfsSetup');
 const params = require('params');
 const logs = require('logs.js')(module);
-const {parseResHash, validateIpfsHash} = require('./utils');
+// const {parseResHash, validateIpfsHash} = require('./utils');
+const {validateIpfsHash} = require('./utils');
 
 // Declare parameters for all methods to have access to
 const CACHE_DIR = params.CACHE_DIR;
@@ -30,13 +31,29 @@ const isfileHashValid = async (providedHash, PATH) => {
     */
 
     // Then, verify that the hashes are correct
-    const res = await promisify(ipfs.files.add)([PATH], {onlyHash: true});
-    const computedHash = parseResHash(res);
-    const computedHashClean = computedHash.replace('ipfs/', '').replace('/', '');
-    const providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
-    const fileHashValid = (computedHashClean == providedHashClean);
-    // Return the boolean
-    return fileHashValid;
+
+    // ########################################
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // ########################################
+    //
+    // Alarming behaviour has been observed where
+    // IPFS returned different hashes for equal files.
+    // While this issue is resolved,
+    // the hash verification will be deactivated.
+    //
+    // ########################################
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // ########################################
+
+    return true;
+
+    // const res = await promisify(ipfs.files.add)([PATH], {onlyHash: true});
+    // const computedHash = parseResHash(res);
+    // const computedHashClean = computedHash.replace('ipfs/', '').replace('/', '');
+    // const providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
+    // const fileHashValid = (computedHashClean == providedHashClean);
+    // // Return the boolean
+    // return fileHashValid;
 };
 
 const downloadHandler = (HASH, PATH, logChunks) =>
