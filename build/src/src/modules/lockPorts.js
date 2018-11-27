@@ -105,7 +105,6 @@ async function lockPorts(pkg) {
 
     // Track and return host ports in case they have to be openned
     const portsToOpen = [];
-    const portsToClose = [];
 
     // the dcPorts array are only ports that do not include ":",
     // port = "5000"
@@ -129,7 +128,6 @@ async function lockPorts(pkg) {
             number: dnpListPort.PublicPort,
             type: portType.toUpperCase(),
         });
-        portsToClose.push(`${dnpListPort.PublicPort}/${portType}`);
 
         // Now convert "30303/udp" to "32769:30303/udp"
         return `${dnpListPort.PublicPort}:${portString}`;
@@ -138,19 +136,10 @@ async function lockPorts(pkg) {
     // Set ports to docker-compose object
     dc.services[Object.getOwnPropertyNames(dc.services)[0]].ports = dcPorts;
     // Add ports to close in the docker-compose labels
-    if (dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels) {
-        if (Array.isArray(dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels)) {
-            dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels
-                .push(`portsToClose=${JSON.stringify(portsToClose)}`);
-        } else {
-            dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels
-                .portsToClose = JSON.stringify(portsToClose);
-        }
-    } else {
-        dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels = {
-            portsToClose: JSON.stringify(portsToClose),
-        };
-    }
+    dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels = {
+        ...(dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels || {}),
+        portsToClose: JSON.stringify(portsToOpen),
+    };
     // Write docker-compose
     parse.writeDockerCompose(dockerComposePath, dc);
 
