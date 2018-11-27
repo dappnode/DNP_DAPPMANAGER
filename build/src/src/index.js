@@ -121,15 +121,22 @@ connection.onopen = (session, details) => {
      * Allows internal calls to autobahn. For example, to call install do:
      * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
      */
-    eventBus.on(eventBusTag.call, (call, args, kwargs) => {
+    eventBus.on(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
       try {
-        session.call(call, args, kwargs)
+        // Use "callId" to call internal dappmanager methods.
+        // Use "event" to call external methods.
+        if (callId && !Object.keys(calls).includes(callId)) {
+          throw Error(`Requested internal call event does not exist: ${callId}`);
+        }
+        if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
+        session.call(event, args, kwargs)
         .then((res) => {
-          logs.info('INTERNAL CALL TO: '+call);
+          logs.info(`INTERNAL CALL TO: ${event}`);
           logs.info(res);
+          if (callback) callback(res);
         });
       } catch (e) {
-        logs.error('Error on internal call to '+call+': '+e.stack);
+        logs.error(`Error on internal call to ${event}: ${e.stack}`);
       }
     });
 

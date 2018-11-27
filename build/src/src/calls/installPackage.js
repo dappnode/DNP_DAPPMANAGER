@@ -6,7 +6,7 @@ const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
 const dockerList = require('modules/dockerList');
 const lockPorts = require('modules/lockPorts');
-const managePorts = require('./managePorts');
+const shouldOpenPorts = require('modules/shouldOpenPorts');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
 const logs = require('logs.js')(module);
@@ -189,16 +189,13 @@ const installPackage = async ({
   //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
   // - managePorts calls UPnP to open the ports
 
-  // ##########
-  const shouldOpenPorts = true;
-  // ##########
-
   await Promise.all(pkgs.map(async (pkg) => {
     const portsToOpen = await lockPorts(pkg);
     // Abort if there are no ports to open
     // Don't attempt to call UPnP if not necessary
-    if (portsToOpen.length && shouldOpenPorts) {
-      await managePorts({action: 'open', ports: portsToOpen});
+    if (portsToOpen.length && await shouldOpenPorts()) {
+      const kwargs = {action: 'open', ports: portsToOpen};
+      eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
     }
   }));
 
