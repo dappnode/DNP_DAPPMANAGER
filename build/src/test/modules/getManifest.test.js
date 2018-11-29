@@ -55,7 +55,7 @@ describe('Get manifest', function() {
     expect(res)
       .to.deep.equal({
         image: {hash: '/ipfs/Qm'},
-        fromIpfs: undefined
+        fromIpfs: undefined,
       });
   });
 });
