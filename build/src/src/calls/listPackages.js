@@ -1,8 +1,11 @@
 const fs = require('fs');
 const dockerList = require('modules/dockerList');
+const docker = require('modules/docker');
+const parseDockerSystemDf = require('utils/parseDockerSystemDf');
 const getPath = require('utils/getPath');
 const parse = require('utils/parse');
 const params = require('params');
+const logs = require('logs.js')(module);
 
 
 /**
@@ -32,6 +35,18 @@ const params = require('params');
 const listPackages = async () => {
   let dnpList = await dockerList.listContainers();
 
+  // Append volume info
+  // This call can fail because of:
+  //   Error response from daemon: a disk usage operation is already running
+  try {
+    const dockerSystemDfData = await docker.systemDf();
+    dnpList = parseDockerSystemDf({data: dockerSystemDfData, dnpList});
+  } catch (e) {
+    logs.error('Error appending volume info in listPackages call: '+e.stack);
+  }
+
+
+  // Append envFile and manifest
   dnpList.map((dnp) => {
     const PACKAGE_NAME = dnp.name;
     const IS_CORE = dnp.isCORE;
