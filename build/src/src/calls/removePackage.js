@@ -4,6 +4,8 @@ const shell = require('utils/shell');
 const logUI = require('utils/logUI');
 const params = require('params');
 const docker = require('modules/docker');
+const dockerList = require('modules/dockerList');
+const shouldOpenPorts = require('modules/shouldOpenPorts');
 const {eventBus, eventBusTag} = require('eventBus');
 
 /**
@@ -31,6 +33,18 @@ const removePackage = async ({
 
   if (id.includes('dappmanager.dnp.dappnode.eth')) {
     throw Error('The installer cannot be restarted');
+  }
+
+  // CLOSE PORTS
+  // portsToClose: '["32768/udp","32768/tcp"]'
+  const dnpList = await dockerList.listContainers();
+  const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(id));
+  if (!dnp) {
+    throw Error(`No DNP was found for name ${id}, so its ports cannot be closed`);
+  }
+  if (dnp.portsToClose.length && await shouldOpenPorts()) {
+    const kwargs = {action: 'close', ports: dnp.portsToClose};
+    eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
   }
 
   // Remove container (and) volumes
