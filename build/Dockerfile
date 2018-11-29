@@ -5,7 +5,7 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 WORKDIR /usr/src/app
 
 # Install app dependencies to use docker's layer cache
-ADD src/package*.json .
+ADD src/package*.json ./
 RUN npm install --production
 
 ADD src .
