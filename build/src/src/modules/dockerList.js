@@ -68,10 +68,13 @@ function format(c) {
     version = version.replace('ipfs-', '/ipfs/');
   }
 
+  const portsToClose = c.Labels.portsToClose ? JSON.parse(c.Labels.portsToClose) : [];
+
   return {
     id: c.Id,
     version,
     origin: c.Labels.origin,
+    portsToClose,
     isDNP,
     isCORE,
     created: new Date(1000*c.Created),
