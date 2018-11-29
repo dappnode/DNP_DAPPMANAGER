@@ -130,8 +130,9 @@ connection.onopen = (session, details) => {
         }
         if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
         session.call(event, args, kwargs)
+        .then(JSON.parse)
         .then((res) => {
-          logs.info(`INTERNAL CALL TO: ${event}`);
+          logs.info(`Internal call to "${event}" result:`);
           logs.info(res);
           if (callback) callback(res);
         });
