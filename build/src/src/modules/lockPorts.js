@@ -1,5 +1,6 @@
 const parse = require('utils/parse');
 const dockerList = require('modules/dockerList');
+const docker = require('modules/docker');
 const getPath = require('utils/getPath');
 const params = require('params');
 
@@ -142,6 +143,9 @@ async function lockPorts(pkg) {
     };
     // Write docker-compose
     parse.writeDockerCompose(dockerComposePath, dc);
+
+    // In order to apply the labels to the current container, re-up it
+    await docker.compose.up(dockerComposePath);
 
     // Track and return host ports in case they have to be openned
     return portsToOpen;
