@@ -1,5 +1,5 @@
 const parse = require('utils/parse');
-const {download, run} = require('modules/packages');
+const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const logUI = require('utils/logUI');
 const isIpfsRequest = require('utils/isIpfsRequest');
@@ -69,7 +69,7 @@ const installPackage = async ({
       success: (reqManifest || {}).dependencies || {},
       state: {},
     };
-    // Add current request to pacakages to install
+    // Add current request to packages to install
     result.success[req.name] = req.ver;
 
     // The function below does not directly affect funcionality.
@@ -167,7 +167,7 @@ const installPackage = async ({
   }));
 
   // 4. Download requested packages
-  await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
+  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
 
   // 5. Run requested packages
   // Patch, install the dappmanager the last always
@@ -176,12 +176,12 @@ const installPackage = async ({
 
   await Promise.all(pkgs
     .filter((pkg) => !isDappmanager(pkg))
-    .map((pkg) => run({pkg, logId}))
+    .map((pkg) => packages.run({pkg, logId}))
   );
 
   const dappmanagerPkg = pkgs.find(isDappmanager);
   if (dappmanagerPkg) {
-    await run({pkg: dappmanagerPkg, logId});
+    await packages.run({pkg: dappmanagerPkg, logId});
   }
 
   // 6. P2P ports: modify docker-compose + open ports
