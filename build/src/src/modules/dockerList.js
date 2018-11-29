@@ -81,8 +81,8 @@ function format(c) {
     image: c.Image,
     name: name,
     shortName: shortName,
-    ports: c.Ports,
-    volumes: c.Mounts.map(({Name, Source}) => ({name: Name, path: Source})),
+    ports: mapPorts(c.Ports),
+    volumes: c.Mounts.map(({Type, Name, Source}) => ({type: Type, name: Name, path: Source})),
     state: c.State,
     running: !/^Exited /i.test(c.Status),
   };
