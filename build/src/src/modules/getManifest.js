@@ -32,7 +32,22 @@ async function getManifest(packageReq) {
   }
 
   // cat the file and parse it
-  const manifest = JSON.parse( await ipfs.cat(packageReq.hash) );
+  // pass a maxSize = 100KB option which will throw an error if that size is exceeded
+  const manifestUnparsed = await ipfs.cat(packageReq.hash, {maxSize: 100000});
+  let manifest;
+  try {
+    manifest = JSON.parse(manifestUnparsed);
+  } catch (e) {
+    throw Error(`Error JSON parsing the manifest: ${e.message}`);
+  }
+
+  // Verify the manifest
+  if (!manifest.image || typeof manifest.image !== 'object') {
+    throw Error(`Invalid manifest: it does not contain the expected property 'image'`);
+  }
+  if (!manifest.image.hash) {
+    throw Error(`Invalid manifest: it does not contain the expected property 'image.hash'`);
+  }
 
   // Verify that the request was correct
   if (packageReq.name && packageReq.name.endsWith('.eth')
