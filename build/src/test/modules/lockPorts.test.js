@@ -73,9 +73,15 @@ describe('Module: lockPorts', function() {
     const dockerList = {
         listContainers: async () => listContainersResult,
     };
+    const docker = {
+        compose: {
+            up: async () => {},
+        },
+    };
 
     const lockPorts = proxyquire('modules/lockPorts', {
         'modules/dockerList': dockerList,
+        'modules/docker': docker,
         'params': params,
     });
 
