@@ -1,10 +1,12 @@
 const parse = require('utils/parse');
-const {download, run} = require('modules/packages');
+const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const logUI = require('utils/logUI');
 const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
 const dockerList = require('modules/dockerList');
+const lockPorts = require('modules/lockPorts');
+const shouldOpenPorts = require('modules/shouldOpenPorts');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
 const logs = require('logs.js')(module);
@@ -67,7 +69,7 @@ const installPackage = async ({
       success: (reqManifest || {}).dependencies || {},
       state: {},
     };
-    // Add current request to pacakages to install
+    // Add current request to packages to install
     result.success[req.name] = req.ver;
 
     // The function below does not directly affect funcionality.
@@ -165,7 +167,7 @@ const installPackage = async ({
   }));
 
   // 4. Download requested packages
-  await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
+  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
 
   // 5. Run requested packages
   // Patch, install the dappmanager the last always
@@ -174,13 +176,28 @@ const installPackage = async ({
 
   await Promise.all(pkgs
     .filter((pkg) => !isDappmanager(pkg))
-    .map((pkg) => run({pkg, logId}))
+    .map((pkg) => packages.run({pkg, logId}))
   );
 
   const dappmanagerPkg = pkgs.find(isDappmanager);
   if (dappmanagerPkg) {
-    await run({pkg: dappmanagerPkg, logId});
+    await packages.run({pkg: dappmanagerPkg, logId});
   }
+
+  // 6. P2P ports: modify docker-compose + open ports
+  // - lockPorts modifies the docker-compose and returns
+  //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+  // - managePorts calls UPnP to open the ports
+
+  await Promise.all(pkgs.map(async (pkg) => {
+    const portsToOpen = await lockPorts(pkg);
+    // Abort if there are no ports to open
+    // Don't attempt to call UPnP if not necessary
+    if (portsToOpen.length && await shouldOpenPorts()) {
+      const kwargs = {action: 'open', ports: portsToOpen};
+      eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+    }
+  }));
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
