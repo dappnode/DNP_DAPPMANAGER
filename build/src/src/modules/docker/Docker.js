@@ -184,10 +184,8 @@ function getVpnImageCmd() {
 
 /**
  *
- * @param {String} port Must be in the format port = {
- *   number: 30303,
- *   type: TCP
- * }
+ * @param {String} port Must be in the format port =
+ *   { number: 30303, type: TCP }
  * @param {String} type
  * @param {String} IMAGE
  * @return {String}
