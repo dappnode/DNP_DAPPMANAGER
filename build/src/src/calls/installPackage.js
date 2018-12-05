@@ -190,7 +190,7 @@ const installPackage = async ({
   // - managePorts calls UPnP to open the ports
 
   await Promise.all(pkgs.map(async (pkg) => {
-    const portsToOpen = await lockPorts(pkg);
+    const portsToOpen = await lockPorts({pkg});
     // Abort if there are no ports to open
     // Don't attempt to call UPnP if not necessary
     if (portsToOpen.length && await shouldOpenPorts()) {
