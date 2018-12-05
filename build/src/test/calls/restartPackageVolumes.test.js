@@ -25,6 +25,11 @@ describe('Call function: restartPackageVolumes', function() {
       down: sinon.stub(),
       up: sinon.stub(),
     },
+    safe: {
+      compose: {
+        up: sinon.stub(),
+      },
+    },
     volume: {
       rm: sinon.stub(),
     },
@@ -68,7 +73,7 @@ describe('Call function: restartPackageVolumes', function() {
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.called(docker.compose.rm);
     sinon.assert.calledWith(docker.volume.rm, 'vol1 vol2');
-    sinon.assert.called(docker.compose.up);
+    sinon.assert.called(docker.safe.compose.up);
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
   });
@@ -77,7 +82,7 @@ describe('Call function: restartPackageVolumes', function() {
     const res = await restartPackageVolumes({id: PACKAGE_NAME});
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.called(docker.compose.down);
-    sinon.assert.called(docker.compose.up);
+    sinon.assert.called(docker.safe.compose.up);
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
   });

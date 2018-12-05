@@ -74,34 +74,40 @@ const params = require('params');
  * @param {Object} pkg {name, ver, manifest}
  * @return {Array} portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
  */
-async function lockPorts(pkg) {
-    // First, check if the package has ephemeral ports (to skip quicly if necessary)
-    const manifestPorts = (((pkg.manifest || {}).image || {}).ports || []);
-    if ( !manifestPorts.filter((port) => !port.includes(':')).length ) {
-        // No ephemeral ports on this package, returns no portsToOpen
-        return [];
+async function lockPorts({pkg, dockerComposePath}) {
+    // Load the docker compose
+    if (pkg) {
+        // First, check if the package has ephemeral ports (to skip quicly if necessary)
+        const manifestPorts = (((pkg.manifest || {}).image || {}).ports || []);
+        if ( !manifestPorts.filter((port) => !port.includes(':')).length ) {
+            // No ephemeral ports on this package, returns no portsToOpen
+            return [];
+        }
+        dockerComposePath = getPath.dockerCompose(pkg.name, params, pkg.manifest.isCore);
+    } else if (dockerComposePath) {
+        //
+    } else {
+        throw Error('lockPorts first argument must be an object with either a pkg or a dockerComposePath');
     }
 
-    // Load the docker compose
-    const dockerComposePath = getPath.dockerCompose(pkg.name, params, pkg.manifest.isCore);
     const dc = parse.readDockerCompose(dockerComposePath);
-    let dcPorts = dc.services[Object.getOwnPropertyNames(dc.services)[0]].ports;
+    let name = Object.getOwnPropertyNames(dc.services)[0];
+    let dcPorts = dc.services[name].ports;
     if (!Array.isArray(dcPorts)) {
-        throw Error(`${pkg.name}'s docker-compose's image ports is not an array: ${dcPorts}`);
+        throw Error(`${name}'s docker-compose's image ports is not an array: ${dcPorts}`);
     }
-    dcPorts = dcPorts.filter((port) => !port.includes(':'));
-    if (!dcPorts.length) {
-        throw Error(`${pkg.name}'s docker-compose's image ports has no expected ephemeral ports`);
+    if (!dcPorts.filter((port) => !port.includes(':')).length) {
+        throw Error(`${name}'s docker-compose's image ports has no expected ephemeral ports`);
     }
 
     // Get the current state of the package to know which port was chosen by docker
     const dnpList = await dockerList.listContainers();
-    const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(pkg.name));
+    const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(name));
     if (!dnp) {
-        throw Error(`No DNP was found for name ${pkg.name}, so its ports cannot be checked`);
+        throw Error(`No DNP was found for name ${name}, so its ports cannot be checked`);
     }
     if (!dnp.ports.length) {
-        throw Error(`${pkg.name}'s container's ports array has length 0`);
+        throw Error(`${name}'s container's ports array has length 0`);
     }
 
     // Track and return host ports in case they have to be openned
@@ -111,9 +117,13 @@ async function lockPorts(pkg) {
     // port = "5000"
     // port = "5000/udp"
     dcPorts = dcPorts.map((portString) => {
+        if (portString.includes(':')) {
+            return portString;
+        }
+
         let [portNumber, portType = 'tcp'] = portString.split('/');
         if (isNaN(portNumber)) {
-            throw Error(`Port declared in ${pkg.name} docker-compose, must be num : ${portNumber}`);
+            throw Error(`Port declared in ${name} docker-compose, must be num : ${portNumber}`);
         }
         const dnpListPort = dnp.ports.find((p) => (
             // portNumber or p.PrivatePort may be of type integer
@@ -121,7 +131,7 @@ async function lockPorts(pkg) {
             && portType === p.Type
         ));
         if (!dnpListPort) {
-            throw Error(`Port ${portString} of ${pkg.name} not in ${JSON.stringify(dnp.ports)}`);
+            throw Error(`Port ${portString} of ${name} not in ${JSON.stringify(dnp.ports)}`);
         }
 
         // Store the host port in the ports to open array
@@ -135,10 +145,10 @@ async function lockPorts(pkg) {
     });
 
     // Set ports to docker-compose object
-    dc.services[Object.getOwnPropertyNames(dc.services)[0]].ports = dcPorts;
+    dc.services[name].ports = dcPorts;
     // Add ports to close in the docker-compose labels
-    dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels = {
-        ...(dc.services[Object.getOwnPropertyNames(dc.services)[0]].labels || {}),
+    dc.services[name].labels = {
+        ...(dc.services[name].labels || {}),
         portsToClose: JSON.stringify(portsToOpen),
     };
     // Write docker-compose
