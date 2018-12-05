@@ -60,7 +60,7 @@ describe('Call function: installPackage', function() {
     };
 
     // Simulate that only the dependency has p2p ports
-    const lockPorts = sinon.stub().callsFake(async function(pkg) {
+    const lockPorts = sinon.stub().callsFake(async ({pkg}) => {
         if (pkg.name === depName) return depPortsToOpen;
         else return [];
     });
