@@ -1,5 +1,4 @@
 const params = require('../params');
-const {eventBus, eventBusTag} = require('eventBus');
 
 /**
  * Requests chain data. Also instructs the DAPPMANAGER
@@ -9,7 +8,6 @@ const {eventBus, eventBusTag} = require('eventBus');
  */
 const requestChainData = async () => {
     params.CHAIN_DATA_UNTIL = Date.now() + 5*60*1000;
-    eventBus.emit(eventBusTag.call, {callId: 'emitChainData'});
 
     return {
         message: `Requested chain data until ${params.CHAIN_DATA_UNTIL}`,
