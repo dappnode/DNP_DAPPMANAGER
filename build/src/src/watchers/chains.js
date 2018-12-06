@@ -125,8 +125,8 @@ function getChainData(chains) {
             if (syncing && syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC) {
                 res.syncing = true;
                 res.msg = (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0)
-                    ? `Syncing snapshot: ${syncing.warpChunksProcessed} / ${syncing.warpChunksAmount}`
-                    : `Blocks synced: ${syncing.currentBlock} / ${syncing.highestBlock}`;
+                    ? `Syncing snapshot: ${parseSyncing(syncing.warpChunksProcessed, syncing.warpChunksAmount)}`
+                    : `Blocks synced: ${parseSyncing(syncing.currentBlock, syncing.highestBlock)}`;
             } else {
                 res.syncing = false;
                 res.msg = 'Synced #' + blockNumber;
@@ -136,4 +136,14 @@ function getChainData(chains) {
         }
         return res;
     }));
+}
+
+function parseSyncing(current, total) {
+    return `${parseHexOrDecimal(current)} / ${parseHexOrDecimal(total)}`;
+}
+
+// Current versions of parseInt are able to recognize hex numbers
+// and automatically use a radix parameter of 16.
+function parseHexOrDecimal(hexOrDecimal) {
+    return parseInt(hexOrDecimal);
 }
