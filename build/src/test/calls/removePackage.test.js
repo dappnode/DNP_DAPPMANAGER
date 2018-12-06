@@ -82,7 +82,7 @@ describe('Call function: removePackage', function() {
 
   it('should emit an internal call to the eventBus', async () => {
     // eventBus should be called once to close ports, and then to emitPackages
-    sinon.assert.callCount(eventBusPackage.eventBus.emit, 2);
+    sinon.assert.callCount(eventBusPackage.eventBus.emit, 3);
     expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal([
         eventBusTag.call,
         {callId: 'managePorts', kwargs: {
