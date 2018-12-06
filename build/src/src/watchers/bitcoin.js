@@ -26,6 +26,7 @@ async function bitcoin(chain) {
     } catch (e) {
         res.error = e.message;
     }
+    return res;
 }
 
 module.exports = bitcoin;
