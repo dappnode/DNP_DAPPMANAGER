@@ -11,7 +11,6 @@ const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
 const logs = require('logs.js')(module);
 
-
 /**
  * Installs a package. It resolves dependencies, downloads
  * manifests and images, loads the images to docker, and calls
@@ -201,6 +200,7 @@ const installPackage = async ({
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
+  eventBus.emit(eventBusTag.packageModified);
 
   return {
     message: 'Installed ' + req.req,
