@@ -1,12 +1,16 @@
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs')(module);
 const dockerList = require('modules/dockerList');
-const Web3 = require('web3');
 const params = require('params');
+const ethereum = require('./ethereum');
+const bitcoin = require('./bitcoin');
+
+const modules = {
+    ethereum,
+    bitcoin,
+};
 
 /* eslint-disable max-len */
-
-const MIN_BLOCK_DIFF_SYNC = 10;
 
 // This module contains watchers to the different active chains
 // It will only emit chain information when at least one ADMIN UI is active
@@ -15,23 +19,32 @@ const MIN_BLOCK_DIFF_SYNC = 10;
 const supportedProviders = {
     'ethchain.dnp.dappnode.eth': {
       'name': 'Mainnet',
-      'http': 'http://my.ethchain.dnp.dappnode.eth:8545',
-      'ws': 'ws://my.ethchain.dnp.dappnode.eth:8546',
+      'module': 'ethereum',
+      'api': 'http://my.ethchain.dnp.dappnode.eth:8545',
+    //   'api': 'ws://my.ethchain.dnp.dappnode.eth:8546',
     },
     'ropsten.dnp.dappnode.eth': {
       'name': 'Ropsten',
-      'http': 'http://my.ropsten.dnp.dappnode.eth:8545',
-      'ws': 'ws://my.ropsten.dnp.dappnode.eth:8546',
+      'module': 'ethereum',
+      'api': 'http://my.ropsten.dnp.dappnode.eth:8545',
+    //   'api': 'ws://my.ropsten.dnp.dappnode.eth:8546',
     },
     'rinkeby.dnp.dappnode.eth': {
       'name': 'Rinkeby',
-      'http': 'http://my.rinkeby.dnp.dappnode.eth:8545',
-      'ws': 'ws://my.rinkeby.dnp.dappnode.eth:8546',
+      'module': 'ethereum',
+      'api': 'http://my.rinkeby.dnp.dappnode.eth:8545',
+    //   'api': 'ws://my.rinkeby.dnp.dappnode.eth:8546',
     },
     'kovan.dnp.dappnode.eth': {
       'name': 'Kovan',
-      'http': 'http://my.kovan.dnp.dappnode.eth:8545',
-      'ws': 'ws://my.kovan.dnp.dappnode.eth:8546',
+      'module': 'ethereum',
+      'api': 'http://my.kovan.dnp.dappnode.eth:8545',
+    //   'api': 'ws://my.kovan.dnp.dappnode.eth:8546',
+    },
+    'bitcoin.dnp.dappnode.eth': {
+        'name': 'Bitcoin',
+        'module': 'bitcoin',
+        'api': 'my.bitcoin.dnp.dappnode.eth',
     },
 };
 
@@ -109,60 +122,8 @@ setInterval(async () => {
 eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 
 async function getAndEmitChainData() {
-    const chainData = await getChainData(Object.values(activeChains));
+    const chainData = await Promise.all(Object.values(activeChains).map(
+        (chain) => modules[chain.module](chain)
+    ));
     eventBus.emit(eventBusTag.emitChainData, {chainData});
-}
-
-/**
- * Fetches multiple ethereum chain states at once via HTTP
- *
- * @param {Array} chains =
- *  [
- *    { name: 'Mainnet',
- *      http: 'http://my.ethchain.dnp.dappnode.eth:8545',
- *      ws: 'ws://my.ethchain.dnp.dappnode.eth:8546', },
- *    ...
- *  ]
- * @return {Array} chainData =
- *  [
- *     { name: 'Mainnet',
- *       syncing: true,
- *       msg: 'Syncing snapshot: 235/1432' },
- *     { name: 'Kovan',
- *       syncing: false,
- *       msg: 'Synced #8946123' },
- *     { name: 'Ropstep',
- *       error: 'Could not connect' },
- *  ];
- */
-function getChainData(chains) {
-    return Promise.all(chains.map(async (chain) => {
-        const res = {name: chain.name};
-        try {
-            const web3 = new Web3(chain.http);
-            const [syncing, blockNumber] = await Promise.all([web3.eth.isSyncing(), web3.eth.getBlockNumber()]);
-            if (syncing && syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC) {
-                res.syncing = true;
-                res.msg = (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0)
-                    ? `Syncing snapshot: ${parseSyncing(syncing.warpChunksProcessed, syncing.warpChunksAmount)}`
-                    : `Blocks synced: ${parseSyncing(syncing.currentBlock, syncing.highestBlock)}`;
-            } else {
-                res.syncing = false;
-                res.msg = 'Synced #' + blockNumber;
-            }
-        } catch (e) {
-            res.error = e.message;
-        }
-        return res;
-    }));
-}
-
-function parseSyncing(current, total) {
-    return `${parseHexOrDecimal(current)} / ${parseHexOrDecimal(total)}`;
-}
-
-// Current versions of parseInt are able to recognize hex numbers
-// and automatically use a radix parameter of 16.
-function parseHexOrDecimal(hexOrDecimal) {
-    return parseInt(hexOrDecimal);
 }
