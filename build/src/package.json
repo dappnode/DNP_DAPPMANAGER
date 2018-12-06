@@ -20,6 +20,7 @@
     "@parity/api": "^2.1.22",
     "async": "^2.6.1",
     "autobahn": "^18.3.2",
+    "bitcoin-core": "^2.0.0",
     "create-error": "^0.3.1",
     "deepmerge": "^2.2.1",
     "docker-remote-api": "^5.0.0",
