@@ -96,7 +96,35 @@ eventBus.on(eventBusTag.packageModified, () => {
 /**
  * chain data specs
  *
- * chainData = [
+ *
+ */
+
+// When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL
+// to the current time + 5 minutes. During that time, emitChain data every 5 seconds
+setInterval(async () => {
+    if (params.CHAIN_DATA_UNTIL > Date.now()) getAndEmitChainData();
+}, 5000);
+
+// Also get and emit chain data immediately after the UI has requested it
+eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
+
+async function getAndEmitChainData() {
+    const chainData = await getChainData(Object.values(activeChains));
+    eventBus.emit(eventBusTag.emitChainData, {chainData});
+}
+
+/**
+ * Fetches multiple ethereum chain states at once via HTTP
+ *
+ * @param {Array} chains =
+ *  [
+ *    { name: 'Mainnet',
+ *      http: 'http://my.ethchain.dnp.dappnode.eth:8545',
+ *      ws: 'ws://my.ethchain.dnp.dappnode.eth:8546', },
+ *    ...
+ *  ]
+ * @return {Array} chainData =
+ *  [
  *     { name: 'Mainnet',
  *       syncing: true,
  *       msg: 'Syncing snapshot: 235/1432' },
@@ -105,17 +133,8 @@ eventBus.on(eventBusTag.packageModified, () => {
  *       msg: 'Synced #8946123' },
  *     { name: 'Ropstep',
  *       error: 'Could not connect' },
- * ];
+ *  ];
  */
-setInterval(async () => {
-    // When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL
-    // to the current time + 5 minutes. During that time, emitChain data every 5 seconds
-    if (params.CHAIN_DATA_UNTIL > Date.now()) {
-        const chainData = await getChainData(Object.values(activeChains));
-        eventBus.emit(eventBusTag.emitChainData, {chainData});
-    }
-}, 5000);
-
 function getChainData(chains) {
     return Promise.all(chains.map(async (chain) => {
         const res = {name: chain.name};
