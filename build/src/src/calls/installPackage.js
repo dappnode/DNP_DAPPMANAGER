@@ -1,14 +1,15 @@
 const parse = require('utils/parse');
+const merge = require('utils/merge');
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
-const logUI = require('utils/logUI');
-const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
 const dockerList = require('modules/dockerList');
 const lockPorts = require('modules/lockPorts');
 const shouldOpenPorts = require('modules/shouldOpenPorts');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
+const logUI = require('utils/logUI');
+const isIpfsRequest = require('utils/isIpfsRequest');
 const logs = require('logs.js')(module);
 
 
@@ -25,16 +26,26 @@ const logs = require('logs.js')(module);
  *   1. ver = 'latest'
  *   2. ver = '/ipfs/QmZ87fb2...'
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   logId: task id (string)
+ * @param {Object} kwargs = {
+ *   id: package .eth name {String}
+ *   userSetVols: user set volumes {Object} = {
+ *     "kovan.dnp.dappnode.eth": {
+ *       "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
+ *     }, ... }
+ *   userSetPorts: user set ports {Object} = {
+ *     "kovan.dnp.dappnode.eth": {
+ *       "30303": "31313:30303",
+ *       "30303/udp": "31313:30303/udp"
+ *     }, ... }
+ *   logId: task id {String}
  * }
  * @return {Object} A formated success message.
  * result: empty
  */
 const installPackage = async ({
   id,
-  vols = {},
+  userSetVols = {},
+  userSetPorts = {},
   logId,
   options = {},
 }) => {
@@ -123,7 +134,7 @@ const installPackage = async ({
   }).map(async (name) => {
     // 3.2 Fetch manifest
     const ver = newState[name];
-    const manifest = await getManifest({name, ver});
+    let manifest = await getManifest({name, ver});
     if (!manifest) throw Error('Missing manifest for '+name);
 
     // 3.3 Verify dncore condition
@@ -133,30 +144,19 @@ const installPackage = async ({
       if (options.BYPASS_CORE_RESTRICTION) {
         manifest.isCore = true;
       } else if (
-        // The origin must be the registry controlled by the DAppNode team
-        name.endsWith('.dnp.dappnode.eth')
-        // It must NOT come from ipfs, thus APM
-        && !ver.startsWith('/ipfs/')
+        // The origin must be the registry controlled by the DAppNode team,
+        // and it must NOT come from ipfs, thus APM
+        name.endsWith('.dnp.dappnode.eth') && !ver.startsWith('/ipfs/')
       ) {
         manifest.isCore = true;
       } else {
-        // inform the user of improper usage
-        /* eslint-disable max-len */
         throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
-        /* eslint-enable max-len */
       }
     }
 
-    // 3.4 Edit volumes if provided by the user
-    // "vols": {
-    //   "data:/root/.bitmonero": "monero_data"
-    // },
-    if (name === req.name && Object.keys(vols).length) {
-      const {volumes = []} = ((manifest || {}).image || {});
-      volumes.forEach((vol, i) => {
-        if (vols[vol]) manifest.image.volumes[i] = vols[vol]+':'+vol.split(':')[1];
-      });
-    }
+    // 3.4 Merge user set vols and ports
+    manifest = merge.manifest.vols(manifest, userSetVols);
+    manifest = merge.manifest.ports(manifest, userSetPorts);
 
     // Return pkg object
     return {
@@ -190,7 +190,7 @@ const installPackage = async ({
   // - managePorts calls UPnP to open the ports
 
   await Promise.all(pkgs.map(async (pkg) => {
-    const portsToOpen = await lockPorts(pkg);
+    const portsToOpen = await lockPorts({pkg});
     // Abort if there are no ports to open
     // Don't attempt to call UPnP if not necessary
     if (portsToOpen.length && await shouldOpenPorts()) {

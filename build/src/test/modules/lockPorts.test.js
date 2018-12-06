@@ -73,9 +73,15 @@ describe('Module: lockPorts', function() {
     const dockerList = {
         listContainers: async () => listContainersResult,
     };
+    const docker = {
+        compose: {
+            up: async () => {},
+        },
+    };
 
     const lockPorts = proxyquire('modules/lockPorts', {
         'modules/dockerList': dockerList,
+        'modules/docker': docker,
         'params': params,
     });
 
@@ -103,7 +109,7 @@ services:
     });
 
     it('should lock ports and return portsToOpen (NON core)', async () => {
-        const portsToOpen = await lockPorts(pkg);
+        const portsToOpen = await lockPorts({pkg});
         expect(portsToOpen).to.deep.equal([
             {number: 32768, type: 'UDP'},
             {number: 32768, type: 'TCP'},
@@ -124,7 +130,7 @@ services:
     });
 
     it('should lock ports and return portsToOpen (core)', async () => {
-        const portsToOpen = await lockPorts(corePkg);
+        const portsToOpen = await lockPorts({pkg: corePkg});
         expect(portsToOpen).to.deep.equal([
             {number: 32769, type: 'UDP'},
             {number: 32769, type: 'TCP'},
@@ -145,7 +151,7 @@ services:
     });
 
     it('should skip the process early on a package without ephemeral ports', async () => {
-        const portsToOpen = await lockPorts(nonPortsPkg);
+        const portsToOpen = await lockPorts({pkg: nonPortsPkg});
         expect(portsToOpen).to.deep.equal([]);
     });
 
