@@ -4,10 +4,12 @@ const dockerList = require('modules/dockerList');
 const params = require('params');
 const ethereum = require('./ethereum');
 const bitcoin = require('./bitcoin');
+const monero = require('./monero');
 
 const modules = {
     ethereum,
     bitcoin,
+    monero,
 };
 
 /* eslint-disable max-len */
@@ -18,33 +20,38 @@ const modules = {
 
 const supportedProviders = {
     'ethchain.dnp.dappnode.eth': {
-      'name': 'Mainnet',
-      'module': 'ethereum',
-      'api': 'http://my.ethchain.dnp.dappnode.eth:8545',
-    //   'api': 'ws://my.ethchain.dnp.dappnode.eth:8546',
+        name: 'Mainnet',
+        module: 'ethereum',
+        api: 'http://my.ethchain.dnp.dappnode.eth:8545',
+    //  api: 'ws://my.ethchain.dnp.dappnode.eth:8546',
     },
     'ropsten.dnp.dappnode.eth': {
-      'name': 'Ropsten',
-      'module': 'ethereum',
-      'api': 'http://my.ropsten.dnp.dappnode.eth:8545',
-    //   'api': 'ws://my.ropsten.dnp.dappnode.eth:8546',
+        name: 'Ropsten',
+        module: 'ethereum',
+        api: 'http://my.ropsten.dnp.dappnode.eth:8545',
+    //  api: 'ws://my.ropsten.dnp.dappnode.eth:8546',
     },
     'rinkeby.dnp.dappnode.eth': {
-      'name': 'Rinkeby',
-      'module': 'ethereum',
-      'api': 'http://my.rinkeby.dnp.dappnode.eth:8545',
-    //   'api': 'ws://my.rinkeby.dnp.dappnode.eth:8546',
+        name: 'Rinkeby',
+        module: 'ethereum',
+        api: 'http://my.rinkeby.dnp.dappnode.eth:8545',
+    //  api: 'ws://my.rinkeby.dnp.dappnode.eth:8546',
     },
     'kovan.dnp.dappnode.eth': {
-      'name': 'Kovan',
-      'module': 'ethereum',
-      'api': 'http://my.kovan.dnp.dappnode.eth:8545',
-    //   'api': 'ws://my.kovan.dnp.dappnode.eth:8546',
+        name: 'Kovan',
+        module: 'ethereum',
+        api: 'http://my.kovan.dnp.dappnode.eth:8545',
+    //  api: 'ws://my.kovan.dnp.dappnode.eth:8546',
     },
     'bitcoin.dnp.dappnode.eth': {
-        'name': 'Bitcoin',
-        'module': 'bitcoin',
-        'api': 'my.bitcoin.dnp.dappnode.eth',
+        name: 'Bitcoin',
+        module: 'bitcoin',
+        api: 'my.bitcoin.dnp.dappnode.eth',
+    },
+    'monero.dnp.dappnode.eth': {
+        name: 'Monero',
+        module: 'monero',
+        api: 'http://my.monero.dnp.dappnode.eth:18081',
     },
 };
 
