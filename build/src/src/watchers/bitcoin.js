@@ -3,7 +3,7 @@ const shell = require('utils/shell');
 
 /* eslint-disable max-len */
 
-const MIN_BLOCK_DIFF_SYNC = 10;
+const MIN_BLOCK_DIFF_SYNC = 3;
 
 async function bitcoin(chain) {
     const res = {name: chain.name};

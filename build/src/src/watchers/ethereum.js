@@ -2,7 +2,7 @@ const Web3 = require('web3');
 
 /* eslint-disable max-len */
 
-const MIN_BLOCK_DIFF_SYNC = 10;
+const MIN_BLOCK_DIFF_SYNC = 60;
 
 /**
  * Fetches multiple ethereum chain states at once via HTTP
