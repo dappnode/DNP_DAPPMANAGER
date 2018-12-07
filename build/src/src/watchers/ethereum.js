@@ -33,9 +33,13 @@ async function ethereum(chain) {
         const [syncing, blockNumber] = await Promise.all([web3.eth.isSyncing(), web3.eth.getBlockNumber()]);
         if (syncing && syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC) {
             res.syncing = true;
-            res.message = (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0)
-                ? `Syncing snapshot: ${parseSyncing(syncing.warpChunksProcessed, syncing.warpChunksAmount)}`
-                : `Blocks synced: ${parseSyncing(syncing.currentBlock, syncing.highestBlock)}`;
+            if (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0) {
+                res.message = `Syncing snapshot: ${parseSyncing(syncing.warpChunksProcessed, syncing.warpChunksAmount)}`;
+                res.progress = syncing.warpChunksProcessed/syncing.warpChunksAmount;
+            } else {
+                res.message = `Blocks synced: ${parseSyncing(syncing.currentBlock, syncing.highestBlock)}`;
+                res.progress = syncing.currentBlock/syncing.highestBlock;
+            }
         } else {
             res.syncing = false;
             res.message = 'Synced #' + blockNumber;
