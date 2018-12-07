@@ -19,6 +19,7 @@ const eventBusTag = {
     logUI: 'EVENT_BUS_LOGUI',
     call: 'EVENT_BUS_CALL',
     logUserAction: 'EVENT_BUS_LOGUSERACTION',
+    emitChainData: 'EMIT_CHAIN_DATA',
   };
 
 module.exports = {
