@@ -1,5 +1,5 @@
 const Client = require('bitcoin-core');
-const shell = require('./shell');
+const shell = require('utils/shell');
 
 /* eslint-disable max-len */
 
