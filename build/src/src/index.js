@@ -10,6 +10,9 @@ const params = require('./params');
 // import calls
 const calls = require('./calls');
 
+// Start watchers
+require('./watchers/chains');
+
 /*
  * RPC register wrapper
  * ********************
@@ -138,6 +141,18 @@ connection.onopen = (session, details) => {
         });
       } catch (e) {
         logs.error(`Error on internal call to ${event}: ${e.stack}`);
+      }
+    });
+
+    /**
+     * Emit chain data
+     */
+    const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
+    eventBus.on(eventBusTag.emitChainData, ({chainData}) => {
+      try {
+        session.publish(eventChainData, chainData); // chainData is an array
+      } catch (e) {
+        logs.error(`Error emitting chain data: ${e.stack}`);
       }
     });
 

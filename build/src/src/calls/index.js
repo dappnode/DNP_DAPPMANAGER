@@ -23,4 +23,5 @@ module.exports = {
     diskSpaceAvailable: require('./diskSpaceAvailable'),
     getStats: require('./getStats'),
     changeIpfsTimeout: require('./changeIpfsTimeout'),
+    requestChainData: require('./requestChainData'),
 };
