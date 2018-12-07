@@ -1,15 +1,9 @@
 const params = require('../params');
 
 /**
- * Returns the current disk space available of a requested path
+ * Used to test different IPFS timeout parameters live from the ADMIN UI.
  *
- * @return {Object} A formated success message.
- * result: status =
- *   {
- *     cpu, <String>
- *     memory, <String>
- *     disk, <String>
- *   }
+ * @return {Object}
  */
 const getStats = async ({timeout}) => {
     params.IPFS_TIMEOUT = timeout;

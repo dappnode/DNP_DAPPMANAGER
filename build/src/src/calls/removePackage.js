@@ -56,6 +56,7 @@ const removePackage = async ({
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
+  eventBus.emit(eventBusTag.packageModified);
 
   return {
     message: 'Removed package: ' + id,
