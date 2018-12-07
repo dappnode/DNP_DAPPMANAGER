@@ -35,6 +35,7 @@ async function bitcoin(chain) {
         if (blockDiffAprox > MIN_BLOCK_DIFF_SYNC) {
             res.syncing = true;
             res.message = `Blocks synced: ${blockIndex} / ${blockDiffAprox + blockIndex}`;
+            res.progress = blockIndex/(blockDiffAprox + blockIndex);
         } else {
             res.syncing = false;
             res.message = 'Synced #' + blockIndex;

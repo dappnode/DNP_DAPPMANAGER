@@ -15,6 +15,7 @@ async function monero(chain) {
         if (highestBlock - currentBlock > MIN_BLOCK_DIFF_SYNC) {
             res.syncing = true;
             res.message = `Blocks synced: ${currentBlock} / ${highestBlock}`;
+            res.progress = currentBlock/highestBlock;
         } else {
             res.syncing = false;
             res.message = `Synced #${currentBlock}`;
