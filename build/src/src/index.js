@@ -12,6 +12,7 @@ const calls = require('./calls');
 
 // Start watchers
 require('./watchers/chains');
+require('./watchers/diskUsage');
 
 /*
  * RPC register wrapper
