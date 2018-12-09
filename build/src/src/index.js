@@ -126,94 +126,57 @@ connection.onopen = (session, details) => {
      * Allows internal calls to autobahn. For example, to call install do:
      * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
      */
-    eventBus.on(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
-      try {
-        // Use "callId" to call internal dappmanager methods.
-        // Use "event" to call external methods.
-        if (callId && !Object.keys(calls).includes(callId)) {
-          throw Error(`Requested internal call event does not exist: ${callId}`);
-        }
-        if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
-        session.call(event, args, kwargs)
-        .then(JSON.parse)
-        .then((res) => {
-          logs.info(`Internal call to "${event}" result:`);
-          logs.info(res);
-          if (callback) callback(res);
-        });
-      } catch (e) {
-        logs.error(`Error on internal call to ${event}: ${e.stack}`);
+    eventBus.onSafe(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
+      // Use "callId" to call internal dappmanager methods.
+      // Use "event" to call external methods.
+      if (callId && !Object.keys(calls).includes(callId)) {
+        throw Error(`Requested internal call event does not exist: ${callId}`);
       }
+      if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
+      session.call(event, args, kwargs)
+      .then(JSON.parse)
+      .then((res) => {
+        logs.info(`Internal call to "${event}" result:`);
+        logs.info(res);
+        if (callback) callback(res);
+      });
     });
 
-    /**
-     * Emit chain data
-     */
+    // Emit chain data
     const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
-    eventBus.on(eventBusTag.emitChainData, ({chainData}) => {
-      try {
-        session.publish(eventChainData, chainData); // chainData is an array
-      } catch (e) {
-        logs.error(`Error emitting chain data: ${e.stack}`);
-      }
+    eventBus.onSafe(eventBusTag.emitChainData, ({chainData}) => {
+      session.publish(eventChainData, chainData); // chainData is an array
     });
 
-    /**
-     * Emits the list of packages
-     */
+    // Emits the list of packages
     const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
     const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
-    eventBus.on(eventBusTag.emitPackages, () => {
-      try {
-        listPackagesWrapped().then((res) => {
-          session.publish(eventPackages, [], JSON.parse(res));
-        });
-      } catch (e) {
-        logs.error('Error listing packages: '+e.stack);
-      }
+    eventBus.onSafe(eventBusTag.emitPackages, () => {
+      listPackagesWrapped().then((res) => {
+        session.publish(eventPackages, [], JSON.parse(res));
+      });
     });
 
-    /**
-     * Emits the directory
-     */
+    // Emits the directory
     const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
-    eventBus.on(eventBusTag.emitDirectory, (pkgs) => {
-      try {
-        session.publish(eventDirectory, [], pkgs);
-      } catch (e) {
-        logs.error('Error publishing directory: '+e.stack);
+    eventBus.onSafe(eventBusTag.emitDirectory, (pkgs) => {
+      session.publish(eventDirectory, [], pkgs);
+    });
+
+    // Emits progress logs to the ADMIN UI
+    eventBus.onSafe(eventBusTag.logUI, (data) => {
+      session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
+      if (data && data.msg && !data.msg.includes('%')) {
+        logs.info(JSON.stringify(data));
       }
     });
 
-
-    /**
-     * Emits progress logs to the ADMIN UI
-     */
-    eventBus.on(eventBusTag.logUI, (data) => {
-      try {
-        session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
-        if (data && data.msg && !data.msg.includes('%')) {
-          logs.info(JSON.stringify(data));
-        }
-      } catch (e) {
-        logs.error('Error publishing progressLog: '+e.stack);
-      }
+    // Emits userAction logs to the ADMIN UI
+    eventBus.onSafe(eventBusTag.logUserAction, (data) => {
+      session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
     });
 
-    /**
-     * Emits userAction logs to the ADMIN UI
-     */
-    eventBus.on(eventBusTag.logUserAction, (data) => {
-      try {
-        session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
-      } catch (e) {
-        logs.error('Error publishing user action: '+e.stack);
-      }
-    });
-
-    /**
-     * Receives userAction logs from the VPN nodejs app
-     */
+    // Receives userAction logs from the VPN nodejs app
     session.subscribe('logUserActionToDappmanager', (args) => {
       try {
         logUserAction.log(args[0]);
@@ -222,29 +185,10 @@ connection.onopen = (session, details) => {
       }
     });
 
-    /**
-     * Emits push notification to the UI and to the local db
-     */
-    eventBus.on(eventBusTag.pushNotification, async (notification) => {
-      try {
-        await db.set(`notification.${notification.id}`, notification);
-        session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
-      } catch (e) {
-        logs.error('Error pushing notification: '+e.stack);
-      }
-    });
-
-    /**
-     * Marks a notification as seen, when the UI says so
-     */
-    session.subscribe('removeNotification.dappmanager.dnp.dappnode.eth', async (ids) => {
-      try {
-        for (const id of ids) {
-          await db.remove(`notification.${id}`);
-        }
-      } catch (e) {
-        logs.error('Error removing notifications: '+e.stack);
-      }
+    // Emits push notification to the UI and to the local db
+    eventBus.onSafe(eventBusTag.pushNotification, async (notification) => {
+      await db.set(`notification.${notification.id}`, notification);
+      session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
     });
 };
 
