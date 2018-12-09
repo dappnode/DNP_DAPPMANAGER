@@ -1,6 +1,7 @@
 const shellExec = require('utils/shell');
 const dockerList = require('modules/dockerList');
 const logs = require('logs.js')(module);
+const {eventBus, eventBusTag} = require('eventBus');
 
 const diskAvailableThresholdKB = 1e6; // ~ 1 GB
 const monitoringInterval = 60 * 1000; // (ms)
@@ -31,9 +32,20 @@ async function monitorDiskUsage() {
             )
             .map((dnp) => dnp.packageName)
             .join(' ');
+
             await shellExec(`docker stop ${packagesToStop}`);
-            logs.warn(`WARNING: DAppNode has preventively stopped these containers to prevent the disk from running out of space: \n${packagesToStop}`);
+
+            logs.warn(`WARNING: DAppNode has stopped these containers to prevent the disk from running out of space: \n${packagesToStop}`);
+            eventBus.emit(eventBusTag.pushNotification, {
+                id: 'diskSpaceRanOut-stoppedPackages',
+                type: 'error',
+                title: 'Disk space ran out, stopped packages',
+                body: `Available disk space is less than a safe limit. To prevent your DAppNode from becoming unusable some packages where stopped: ${packagesToStop}. Please free up disk space and start them again.`,
+            });
             stoppedPackages = true;
+
+            // Emit packages update
+            eventBus.emit(eventBusTag.emitPackages);
         } else if (diskAvailableBytes > 1.2*diskAvailableThresholdKB) {
             // If there is again enough free space, allow packages to be stopped
             // if disk space runs out agains

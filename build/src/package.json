@@ -31,6 +31,7 @@
     "is-ipfs": "^0.3.2",
     "jimp": "^0.5.3",
     "js-yaml": "^3.11.0",
+    "lowdb": "^1.0.0",
     "monero-rpc": "^0.5.0",
     "node-docker-api": "^1.1.22",
     "semver": "^5.5.0",

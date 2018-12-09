@@ -24,4 +24,5 @@ module.exports = {
     getStats: require('./getStats'),
     changeIpfsTimeout: require('./changeIpfsTimeout'),
     requestChainData: require('./requestChainData'),
+    getNotifications: require('./getNotifications'),
 };

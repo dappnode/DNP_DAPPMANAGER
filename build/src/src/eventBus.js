@@ -20,6 +20,7 @@ const eventBusTag = {
     call: 'EVENT_BUS_CALL',
     logUserAction: 'EVENT_BUS_LOGUSERACTION',
     emitChainData: 'EMIT_CHAIN_DATA',
+    pushNotification: 'PUSH_NOTIFICATION',
   };
 
 module.exports = {
