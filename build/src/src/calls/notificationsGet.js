@@ -15,7 +15,7 @@ const db = require('../db');
  * }
  */
 
-const getNotifications = async () => {
+const notificationsGet = async () => {
     const notifications = await db.get(`notification`) || {};
 
     return {
@@ -25,4 +25,4 @@ const getNotifications = async () => {
 };
 
 
-module.exports = getNotifications;
+module.exports = notificationsGet;
