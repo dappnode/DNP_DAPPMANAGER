@@ -6,6 +6,7 @@ const {eventBus, eventBusTag} = require('./eventBus');
 const logs = require('./logs')(module);
 const logUserAction = require('./logUserAction');
 const params = require('./params');
+const db = require('./db');
 
 // import calls
 const calls = require('./calls');
@@ -220,6 +221,31 @@ connection.onopen = (session, details) => {
         logs.error('Error logging user action: '+e.stack);
       }
     });
+
+    /**
+     * Emits push notification to the UI and to the local db
+     */
+    eventBus.on(eventBusTag.pushNotification, async (notification) => {
+      try {
+        await db.set(`notification.${notification.id}`, notification);
+        session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
+      } catch (e) {
+        logs.error('Error pushing notification: '+e.stack);
+      }
+    });
+
+    /**
+     * Marks a notification as seen, when the UI says so
+     */
+    session.subscribe('removeNotification.dappmanager.dnp.dappnode.eth', async (ids) => {
+      try {
+        for (const id of ids) {
+          await db.remove(`notification.${id}`);
+        }
+      } catch (e) {
+        logs.error('Error removing notifications: '+e.stack);
+      }
+    });
 };
 
 connection.onclose = (reason, details) => {
@@ -228,4 +254,5 @@ connection.onclose = (reason, details) => {
 
 connection.open();
 logs.info('Attempting WAMP connection to '+autobahnUrl+', realm '+autobahnRealm);
+
 
