@@ -67,4 +67,6 @@ COPY ./dns_updater.sh /etc/periodic/1min/dns_updater
 RUN chmod +x /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
 
+ENV DB_PATH /usr/src/app/DNCORE/dappmanagerdb.json
+
 ENTRYPOINT /usr/src/app/entrypoint.sh

@@ -26,4 +26,5 @@ module.exports = {
     requestChainData: require('./requestChainData'),
     notificationsGet: require('./notificationsGet'),
     notificationsRemove: require('./notificationsRemove'),
+    notificationsTest: require('./notificationsTest'),
 };
