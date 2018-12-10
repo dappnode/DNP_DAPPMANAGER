@@ -72,6 +72,7 @@ function format(c) {
 
   return {
     id: c.Id,
+    packageName,
     version,
     origin: c.Labels.origin,
     portsToClose,
