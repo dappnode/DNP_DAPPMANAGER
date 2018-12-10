@@ -38,7 +38,7 @@ async function monitorDiskUsage() {
             logs.warn(`WARNING: DAppNode has stopped these containers to prevent the disk from running out of space: \n${packagesToStop}`);
             eventBus.emit(eventBusTag.pushNotification, {
                 id: 'diskSpaceRanOut-stoppedPackages',
-                type: 'error',
+                type: 'danger',
                 title: 'Disk space ran out, stopped packages',
                 body: `Available disk space is less than a safe limit. To prevent your DAppNode from becoming unusable some packages where stopped: ${packagesToStop}. Please free up disk space and start them again.`,
             });
