@@ -16,8 +16,9 @@ const params = require('params');
 
 const getUserActionLogs = async ({
   options,
+  fromLog = 0,
+  numLogs = 50,
 }) => {
-  const readFileAsync = promisify(fs.readFile);
   const {userActionLogsFilename} = params;
 
   if (!fs.existsSync(userActionLogsFilename)) {
@@ -26,14 +27,22 @@ const getUserActionLogs = async ({
         result: '',
     };
   }
-  const userActionLogs = await readFileAsync(
+
+  const userActionLogs = await promisify(fs.readFile)(
       userActionLogsFilename,
       {encoding: 'utf8'}
   );
 
+  // The userActionLogs file can grow a lot. Only a part of it will be returned
+  // The user can specify which part of the file wants
+  const userActionLogsSelected = (userActionLogs || '')
+    .split(/\r?\n/)
+    .slice(fromLog, fromLog + numLogs)
+    .join('\n');
+
   return {
     message: 'Got userActionLogs',
-    result: userActionLogs,
+    result: userActionLogsSelected,
   };
 };
 
