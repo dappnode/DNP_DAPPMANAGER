@@ -12,7 +12,8 @@
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix"
+    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix",
+    "pre-commit": "npm run lint && npm run test && npm run dev"
   },
   "author": "dappLion",
   "license": "ISC",
