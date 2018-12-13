@@ -1,4 +1,5 @@
 // node modules
+const logs = require('logs.js')(module);
 const {promisify} = require('util');
 const docker = require('docker-remote-api');
 const request = docker();
@@ -15,15 +16,15 @@ const CORE_CONTAINER_NAME_PREFIX = params.CORE_CONTAINER_NAME_PREFIX;
 //  endpoint documentation https://docs.docker.com/engine/api/v1.24/#31-containers
 
 async function listContainers() {
-  let containers = await dockerRequest('get', '/containers/json?all=true');
+  const containers = await dockerRequest('get', '/containers/json?all=true');
   return containers
     .map(format)
     .filter((pkg) => pkg.isDNP || pkg.isCORE);
 }
 
 async function runningPackagesInfo() {
-  let containers = await listContainers();
-  let containersObject = {};
+  const containers = await listContainers();
+  const containersObject = {};
   containers.forEach(function(container) {
     containersObject[container.name] = container;
   });
@@ -49,23 +50,39 @@ function dockerRequest(method, url) {
 
 
 function format(c) {
-  let packageName = c.Names[0].replace('/', '');
-  let isDNP = packageName.includes(DNP_CONTAINER_NAME_PREFIX);
-  let isCORE = packageName.includes(CORE_CONTAINER_NAME_PREFIX);
+  const packageName = c.Names[0].replace('/', '');
+  const isDNP = packageName.includes(DNP_CONTAINER_NAME_PREFIX);
+  const isCORE = packageName.includes(CORE_CONTAINER_NAME_PREFIX);
 
   let name;
   if (isDNP) name = packageName.split(DNP_CONTAINER_NAME_PREFIX)[1];
   else if (isCORE) name = packageName.split(CORE_CONTAINER_NAME_PREFIX)[1];
   else name = packageName;
 
-  let shortName;
-  if (name && name.includes('.')) shortName = name.split('.')[0];
-  else shortName = name;
+  const shortName = name && name.includes('.') ? name.split('.')[0] : name;
 
   let version = c.Image.split(':')[1] || '0.0.0';
   // IPFS path
   if (version && version.startsWith('ipfs-')) {
     version = version.replace('ipfs-', '/ipfs/');
+  }
+
+  // Process dappnode.dnp tags
+  //   dappnode.dnp.dependencies
+  //   dappnode.dnp.origin
+  let origin;
+  let dependencies;
+  if (c.Labels && typeof c.Labels === 'object') {
+    origin = c.Labels['dappnode.dnp.origin'];
+    if (c.Labels['dappnode.dnp.dependencies']) {
+      try {
+        dependencies = JSON.parse(c.Labels['dappnode.dnp.dependencies']);
+      } catch (e) {
+        /* eslint-disable max-len */
+        logs.warn(`Error parsing ${name} container dependencies label "${c.Labels['dappnode.dnp.dependencies']}": ${e.stack}`);
+        /* eslint-enable max-len */
+      }
+    }
   }
 
   const portsToClose = c.Labels.portsToClose ? JSON.parse(c.Labels.portsToClose) : [];
@@ -74,7 +91,8 @@ function format(c) {
     id: c.Id,
     packageName,
     version,
-    origin: c.Labels.origin,
+    origin,
+    dependencies,
     portsToClose,
     isDNP,
     isCORE,
