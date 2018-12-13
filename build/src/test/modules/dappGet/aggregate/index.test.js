@@ -72,10 +72,11 @@ const aggregate =
 describe('dappGet/aggregate', () => {
     let dnps;
     it('Should call aggregate without crashing', async () => {
-        dnps = await aggregate({
+        const req = {
             name: 'nginx-proxy.dnp.dappnode.eth',
             ver: '^0.1.0',
-        });
+        };
+        dnps = await aggregate({req});
     });
 
     it('Should call list containers once', () => {

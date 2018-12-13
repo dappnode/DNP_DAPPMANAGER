@@ -51,7 +51,7 @@ const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
  *   },
  * };
  */
-async function aggregate(req) {
+async function aggregate({req, dnpList}) {
     const dnps = {};
 
     // First fetch the request
@@ -59,7 +59,7 @@ async function aggregate(req) {
     await aggregateDependencies({name: req.name, versionRange: req.ver, dnps});
 
     // Get the list of relevant installed dnps
-    const dnpList = await dockerList.listContainers();
+    if (!dnpList) dnpList = await dockerList.listContainers();
     const relevantInstalledDnps = getRelevantInstalledDnps({
         // requestedDnps = ["A", "B", "C"]
         requestedDnps: Object.keys(dnps),
@@ -91,6 +91,10 @@ async function aggregate(req) {
         // > Label isNotInstalled
         else if (!installedDnpNames.includes(dnpName)) dnps[dnpName].isNotInstalled = true;
     });
+
+    // Enfore conditions:
+    // - requested DNP versions must match the provided versionRange
+    // - installed DNPs cannot be downgraded
 
     return dnps;
 }
