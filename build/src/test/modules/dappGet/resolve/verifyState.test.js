@@ -1,6 +1,6 @@
 const assert = require('assert');
-const verifyState = require('modules/dappGet/resolver/verifyState');
-const repo = getRepo();
+const verifyState = require('modules/dappGet/resolve/verifyState');
+const dnps = getDnps();
 
 describe('verifyState', () => {
   it('should return true for a valid state', () => {
@@ -9,7 +9,7 @@ describe('verifyState', () => {
       B: '1.0.0',
       C: '1.0.0',
     };
-    const res = verifyState(state, repo);
+    const res = verifyState(state, dnps);
     assert.equal(res.valid, true);
   });
 
@@ -18,7 +18,7 @@ describe('verifyState', () => {
       A: '1.0.0',
     };
     // { req: 'A@1.0.0', dep: 'C', depVer: undefined, reqRange: '^1.0.0' }
-    const res = verifyState(state, repo);
+    const res = verifyState(state, dnps);
     assert.equal(res.valid, false);
     assert.deepStrictEqual(res.reason, {
       req: 'A@1.0.0',
@@ -33,7 +33,7 @@ describe('verifyState', () => {
       C: '2.0.0',
     };
     // { req: 'A@1.0.0', dep: 'C', depVer: '2.0.0', reqRange: '^1.0.0' }
-    const res = verifyState(state, repo);
+    const res = verifyState(state, dnps);
     assert.equal(res.valid, false);
     assert.deepStrictEqual(res.reason, {
       req: 'A@1.0.0',
@@ -43,17 +43,23 @@ describe('verifyState', () => {
   });
 });
 
-function getRepo() {
+function getDnps() {
   return {
     'A': {
-      '1.0.0': {dependencies: {'C': '^1.0.0'}},
+      versions: {
+        '1.0.0': {'C': '^1.0.0'},
+      },
     },
     'B': {
-      '1.0.0': {dependencies: {'C': '^1.0.0'}},
+      versions: {
+        '1.0.0': {'C': '^1.0.0'},
+      },
     },
     'C': {
-      '1.0.0': {dependencies: {}},
-      '2.0.0': {dependencies: {}},
+      versions: {
+        '1.0.0': {},
+        '2.0.0': {},
+      },
     },
   };
 }

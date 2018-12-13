@@ -2,15 +2,16 @@ const parse = require('utils/parse');
 const merge = require('utils/merge');
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
-const getManifest = require('modules/getManifest');
-const dockerList = require('modules/dockerList');
-const lockPorts = require('modules/lockPorts');
-const shouldOpenPorts = require('modules/shouldOpenPorts');
-const {eventBus, eventBusTag} = require('eventBus');
-const isSyncing = require('utils/isSyncing');
+const dappGetBasic = require('modules/dappGet/basic');
 const logUI = require('utils/logUI');
 const isIpfsRequest = require('utils/isIpfsRequest');
-const logs = require('logs.js')(module);
+const getManifest = require('modules/getManifest');
+const {eventBus, eventBusTag} = require('eventBus');
+const isSyncing = require('utils/isSyncing');
+const lockPorts = require('modules/lockPorts');
+const shouldOpenPorts = require('modules/shouldOpenPorts');
+
+/* eslint-disable max-len */
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -59,80 +60,32 @@ const installPackage = async ({
   }
 
   // 2. Resolve the request
-  let result;
-  if (options.BYPASS_RESOLVER) {
-    /**
-     * The dappGet resolver may cause errors.
-     * Updating the core will never require dependency resolution,
-     * therefore for a system update the dappGet resolver will be emitted
-     *
-     * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
-     */
-    const reqManifest = await getManifest(req);
-    // reqManifest.dependencies = {
-    //     'bind.dnp.dappnode.eth': '0.1.4',
-    //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
-    // }
-
-    // Append dependencies in the list of packages to install
-    result = {
-      success: (reqManifest || {}).dependencies || {},
-      state: {},
-    };
-    // Add current request to packages to install
-    result.success[req.name] = req.ver;
-
-    // The function below does not directly affect funcionality.
-    // However it would prevent already installed packages from installing
-    try {
-      (await dockerList.listContainers()).forEach((pkg) => {
-        if (pkg.name && pkg.version
-          && result.success && result.success[pkg.name]
-          && result.success[pkg.name] === pkg.version) {
-            delete result.success[pkg.name];
-          }
-      });
-    } catch (e) {
-      logs.error('Error listing current containers: '+e);
-    }
-  } else {
-    /**
-     * If BYPASS_RESOLVER == false, use the resolver
-     */
-    try {
-      await dappGet.update(req);
-    } catch (e) {
-      throw Error(`Error updating DNP repo: ${e.stack || e.message}`);
-    }
-    // res = {
-    //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-    //     state: {'bind.dnp.dappnode.eth': '0.1.2'}
-    // }
-    try {
-      result = await dappGet.resolve(req);
-    } catch (e) {
-      throw Error(`Error resolving dependencies: ${e.stack || e.message}`);
-    }
-    // Return error if the req couldn't be resolved
-    if (!result.success) {
-      throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
+  // result = {
+  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
+  //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
+  // }
+  const result = options.BYPASS_RESOLVER
+    ? await dappGetBasic(req)
+    : await dappGet(req);
+  // Return error if the req couldn't be resolved
+  if (!result.success) {
+    const errorMessage = `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`;
+    if (result.e) {
+      result.e.message = errorMessage;
+      throw result.e;
+    } else {
+      throw Error(errorMessage);
     }
   }
 
-  const {success: newState, state} = result;
-
   // 3. Format the request and filter out already updated packages
-  let pkgs = await Promise.all(Object.keys(newState).filter((name) => {
-    // 3.1 Check if the requested version is different than the current
-    const shouldInstall = newState[name] !== state[name];
-    if (!shouldInstall) {
-      logUI({logId, name, msg: 'Already updated'});
-      delete state[name];
-    }
-    return shouldInstall;
-  }).map(async (name) => {
+  Object.keys(result.alreadyUpdated || {}).forEach((name) => {
+    logUI({logId, name, msg: 'Already updated'});
+  });
+
+  let pkgs = await Promise.all(Object.keys(result.success).map(async (name) => {
     // 3.2 Fetch manifest
-    const ver = newState[name];
+    const ver = result.success[name];
     let manifest = await getManifest({name, ver});
     if (!manifest) throw Error('Missing manifest for '+name);
 

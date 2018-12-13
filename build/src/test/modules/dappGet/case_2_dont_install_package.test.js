@@ -1,6 +1,5 @@
-const resolveRequest = require('modules/dappGet/resolver');
-const assert = require('assert');
-const repo = getRepo();
+const resolve = require('modules/dappGet/resolve');
+const expect = require('chai').expect;
 
 /**
  * Case: Don't install a package if not necessary
@@ -13,32 +12,28 @@ const repo = getRepo();
  * as the first possible version of each newly install package
  */
 
-const state = {
-    A: '0.1.0',
-};
-
 describe('case 2, upgrade state package because of a dependency', () => {
     it('should get correct result', () => {
-        const req = 'A@^0.1.1';
-        const res = resolveRequest(req, repo, state);
-        assert.deepStrictEqual(res.success, {
+        const dnps = {
+            'A': {
+              isRequest: true,
+              versions: {
+                  '0.1.0': {},
+                  '0.1.1': {'B': '^1.0.0'},
+                  '0.1.2': {},
+              },
+            },
+            'B': {
+                isNotInstalled: true,
+                versions: {
+                  '1.0.0': {},
+                },
+            },
+          };
+        const res = resolve(dnps);
+        expect(res.message).to.equal('Found compatible state with case 1/6');
+        expect(res.success).to.deep.equal({
             A: '0.1.2',
         });
     });
 });
-
-
-function getRepo() {
-    return {
-      'A': {
-        '0.1.0': {dependencies: {}},
-        '0.1.1': {dependencies: {'B': '^1.0.0'}},
-        '0.1.2': {dependencies: {}},
-      },
-      'B': {
-        '1.0.0': {dependencies: {}},
-      },
-    };
-  }
-
-
