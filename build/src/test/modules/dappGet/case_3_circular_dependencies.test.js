@@ -1,4 +1,4 @@
-const resolveRequest = require('modules/dappGet/resolver');
+const resolve = require('modules/dappGet/resolve');
 const expect = require('chai').expect;
 
 /**
@@ -29,7 +29,8 @@ describe('case 3, upgrade state package because of a dependency', () => {
             },
           },
         };
-        const res = resolveRequest(dnps);
+        const res = resolve(dnps);
+        expect(res.message).to.equal('Found compatible state with case 1/1');
         expect(res.success).to.deep.equal({
           'C1-A': '1.0.0',
         });
@@ -50,7 +51,8 @@ describe('case 3, upgrade state package because of a dependency', () => {
             },
           },
         };
-        const res = resolveRequest(dnps);
+        const res = resolve(dnps);
+        expect(res.message).to.equal('Found compatible state with case 2/2');
         expect(res.success).to.deep.equal({
           'C2-A': '1.0.0',
           'C2-B': '1.0.0',
@@ -78,7 +80,8 @@ describe('case 3, upgrade state package because of a dependency', () => {
             },
           },
         };
-        const res = resolveRequest(dnps);
+        const res = resolve(dnps);
+        expect(res.message).to.equal('Found compatible state with case 4/4');
         expect(res.success).to.deep.equal({
           'C3-A': '1.0.0',
           'C3-B': '1.0.0',

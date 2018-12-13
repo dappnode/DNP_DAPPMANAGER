@@ -1,6 +1,8 @@
 const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 
+/* eslint-disable max-len */
+
 /**
  * Purpose of the test. Make sure the DNPs are ordered correctly
  *
@@ -81,15 +83,15 @@ describe('dappGet/resolve/findCompatibleState', () => {
             'lnd.dnp.dappnode.eth': {
               isRequest: true,
               versions: {
-                '/ipfs/Qm1234': {
-                    'bitcoind.dnp.dappnode.eth': '/ipfs/Qm9876',
+                '/ipfs/QmV33iaboYzMgtcKur9JXbRmvkeeKbQSav8DSk1Emeyw1X': {
+                    'bitcoind.dnp.dappnode.eth': '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws',
                 },
               },
             },
             'bitcoind.dnp.dappnode.eth': {
                 isState: true,
                 versions: {
-                    '/ipfs/Qm9876': {},
+                    '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws': {},
                     '0.1.0': {},
                     '0.1.1': {},
                     '0.1.2': {},
@@ -103,8 +105,8 @@ describe('dappGet/resolve/findCompatibleState', () => {
             'Found compatible state with case 1/5'
         );
         expect(result.success).to.deep.equal({
-            'bitcoind.dnp.dappnode.eth': '/ipfs/Qm9876',
-            'lnd.dnp.dappnode.eth': '/ipfs/Qm1234',
+            'bitcoind.dnp.dappnode.eth': '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws',
+            'lnd.dnp.dappnode.eth': '/ipfs/QmV33iaboYzMgtcKur9JXbRmvkeeKbQSav8DSk1Emeyw1X',
         });
     });
 });
