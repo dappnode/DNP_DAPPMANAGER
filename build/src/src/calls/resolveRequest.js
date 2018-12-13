@@ -24,7 +24,6 @@ const removePackage = async ({
     const result = options.BYPASS_RESOLVER
     ? await dappGetBasic(req)
     : await dappGet(req);
-    await dappGet.update(req);
 
     return {
         message: 'Resolve request for ' + req.name + '@' + req.ver+

@@ -34,7 +34,7 @@ async function getManifest({name, ver, version}) {
     if (isIpfsHash(ver)) {
         origin = hash = ver;
     } else if (isEnsDomain(name)) {
-        const key = `apm-${name}-${ver}`;
+        const key = `${name}-${ver}`.split('.').join('-'); // goerli-pantheon-dnp-dappnode-eth-0-1-0
         hash = await db.get(key) || await apm.getRepoHash({name, ver});
         await db.set(key, hash);
     } else {
@@ -62,7 +62,7 @@ async function getManifest({name, ver, version}) {
         throw Error(`Invalid manifest: it does not contain the expected property 'image.hash', manifest: ${JSON.stringify(manifest, null, 2)}`);
     }
     if (isEnsDomain(name) && (manifest || {}).name !== name) {
-        throw Error(`Package name requested: "${name}" doesn't match its manifest: ${manifest.name}, ${JSON.stringify(manifest, null, 2)}`);
+        throw Error(`Package name requested: "${name}" doesn't match the name in its manifest: "${manifest.name}"`);
     }
 
     return {

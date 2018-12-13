@@ -1,6 +1,7 @@
 const fetchVersions = require('./fetchVersions');
 const fetchDependencies = require('./fetchDependencies');
 const {hasVersion, setVersion} = require('../utils/dnpUtils');
+const logs = require('logs.js')(module);
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -33,7 +34,10 @@ async function aggregateDependencies({name, versionRange, dnps, recursiveCount})
         else setVersion(dnps, name, version, {});
         // 2. Get dependencies of this specific version
         //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-        const dependencies = await fetchDependencies({name, version});
+        const dependencies = await fetchDependencies({name, version}).catch((e) => {
+            logs.warn(`Error fetching ${name}@${version} dependencies (assuming it has none). Error stack: ${e.stack}`);
+            return {};
+        });
         // 3. Store dependencies
         setVersion(dnps, name, version, dependencies);
         // 4. Fetch sub-dependencies recursively
