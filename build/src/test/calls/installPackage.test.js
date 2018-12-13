@@ -33,15 +33,11 @@ describe('Call function: installPackage', function() {
         run: sinon.fake.resolves(),
     };
 
-    const dappGet = {
-        update: async () => {
-            // No need to return anything
-        },
-        resolve: sinon.fake.resolves({
-            success: {[pkgName]: pkgVer, [depName]: depVer},
-            state: {[pkgName]: '0.1.0'},
-        }),
-    };
+    const dappGet = sinon.fake.resolves({
+        success: {[pkgName]: pkgVer, [depName]: depVer},
+        state: {[pkgName]: '0.1.0'},
+    });
+
     const getManifest = sinon.stub().callsFake(async function(pkg) {
         if (pkg.name === pkgName) return pkgManifest;
         else if (pkg.name === depName) return depManifest;
@@ -98,7 +94,7 @@ describe('Call function: installPackage', function() {
     // Step 1: Parse request
     // Step 2: Resolve the request
     it('should have called dappGet with correct arguments', async () => {
-        sinon.assert.calledWith(dappGet.resolve, {name: pkgName, req: pkgName, ver: '*'});
+        sinon.assert.calledWith(dappGet, {name: pkgName, req: pkgName, ver: '*'});
     });
 
     // Step 3: Format the request and filter out already updated packages
