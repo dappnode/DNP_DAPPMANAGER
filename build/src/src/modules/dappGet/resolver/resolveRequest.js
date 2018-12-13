@@ -94,9 +94,9 @@ function resolveRequest(req, repo, state) {
     // Format an error message
     let error;
     if (!success) {
+        const errorMsgs = [];
         // Timeout message
-        if (hasTimedOut) error = `Resolver timed out (${timeoutMs} ms). \n`;
-        else error = '';
+        if (hasTimedOut) errorMsgs.push(`Resolver timed out (${timeoutMs} ms).`);
         // Blame message
         try {
             const blameDep = {};
@@ -112,15 +112,17 @@ function resolveRequest(req, repo, state) {
             const highestDep = Object.keys(blameDep)
                 .reduce((a, b) => blameDep[a] > blameDep[b] ? a : b);
             const blamePackages = Object.keys(blameDepReq[highestDep]).join(', ');
-            error += `Packages ${blamePackages} request incompatible versions of ${highestDep}`;
+            errorMsgs.push(
+                `Packages ${blamePackages} request incompatible versions of ${highestDep}.`
+            );
         } catch (e) {
             // Ignore possible errors from the message processing
         }
-        error += `Checked ${caseId}/${totalCases} total cases \n`;
-        // Cases checked message
-        error += `Checked ${caseId}/${totalCases} total cases \n`;
+        // Report how many cases have been checked
+        errorMsgs.push(`Checked ${caseId}/${totalCases} total cases.`);
+        // Construct the message
+        error = errorMsgs.join(' \n');
     }
-
 
     return {
         // Some package can have null version because they don't have to be installed
