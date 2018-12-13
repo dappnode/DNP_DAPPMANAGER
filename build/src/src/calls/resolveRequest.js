@@ -1,4 +1,5 @@
 const dappGet = require('modules/dappGet');
+const dappGetBasic = require('modules/dappGet/basic');
 
 /**
  * Remove package data: docker down + disk files
@@ -14,9 +15,16 @@ const dappGet = require('modules/dappGet');
  */
 const removePackage = async ({
   req,
+  options = {},
 }) => {
+    // result = {
+    //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
+    //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
+    // }
+    const result = options.BYPASS_RESOLVER
+    ? await dappGetBasic(req)
+    : await dappGet(req);
     await dappGet.update(req);
-    const result = await dappGet.resolve(req);
 
     return {
         message: 'Resolve request for ' + req.name + '@' + req.ver+

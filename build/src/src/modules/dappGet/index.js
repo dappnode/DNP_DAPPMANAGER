@@ -1,5 +1,6 @@
-const resolve = require('./resolve');
 const aggregate = require('./aggregate');
+const resolve = require('./resolve');
+const dockerList = require('modules/dockerList');
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -44,8 +45,45 @@ const aggregate = require('./aggregate');
  * }
  */
 async function dappGet(req) {
-    const dnps = await aggregate(req);
-    return resolve(dnps);
+    const dnpList = await dockerList.listContainers();
+
+    // Aggregate
+    let dnps;
+    try {
+        dnps = await aggregate({req, dnpList});
+    } catch (e) {
+        return {
+            e,
+            success: false,
+            message: `dappGet error aggregating packages: ${e.message}`,
+        };
+    }
+
+    // Resolve
+    let result;
+    try {
+        result = resolve(dnps);
+    } catch (e) {
+        return {
+            e,
+            success: false,
+            message: `dappGet error resolving packages: ${e.message}`,
+        };
+    }
+
+    // Format output only on success
+    if (!result.success) return result;
+    dnpList.forEach((dnp) => {
+        if (result.success[dnp.name] && result.success[dnp.name] === dnp.version) {
+            // DNP is already updated.
+            // Remove from the success object and add it to the alreadyUpdatedd
+            if (!result.alreadyUpdated) result.alreadyUpdated = {};
+            result.alreadyUpdated[dnp.name] = result.success[dnp.name];
+            delete result.success[dnp.name];
+        }
+    });
+
+    return result;
 }
 
 module.exports = dappGet;
