@@ -17,7 +17,8 @@ const apm = require('modules/apm');
 async function fetchVersions({name, versionRange}) {
     // Case 1. Valid semver range: Fetch the valid versions from APM
     if (semver.validRange(versionRange) && !semver.valid(versionRange)) {
-        return await apm.getRepoVersions({name}, versionRange);
+        const versionsObj = await apm.getRepoVersions({name}, versionRange);
+        return Object.keys(versionsObj);
     }
     // Case 2. Valid semver version (not range): Return that version
     if (semver.validRange(versionRange) && semver.valid(versionRange)) {
