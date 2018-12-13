@@ -1,5 +1,6 @@
 const fetchVersions = require('./fetchVersions');
 const fetchDependencies = require('./fetchDependencies');
+const {hasVersion, setVersion} = require('../utils/dnpUtils');
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -26,34 +27,25 @@ async function aggregateDependencies({name, versionRange, dnps, recursiveCount})
     // 1. Fetch versions of "name" that match this request
     //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
     const versions = await fetchVersions({name, versionRange});
-    for (const version of versions) {
-        // Already checked, skip
-        if (hasVersion(dnps, name, version)) continue;
+    await Promise.all(versions.map(async (version) => {
+        // Already checked, skip. Otherwise lock request to prevent duplicate fetches
+        if (hasVersion(dnps, name, version)) return;
+        else setVersion(dnps, name, version, {});
         // 2. Get dependencies of this specific version
         //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
         const dependencies = await fetchDependencies({name, version});
         // 3. Store dependencies
         setVersion(dnps, name, version, dependencies);
         // 4. Fetch sub-dependencies recursively
-        for (const dependencyName of Object.keys(dependencies)) {
+        await Promise.all(Object.keys(dependencies).map(async (dependencyName) => {
             await aggregateDependencies({
                 name: dependencyName,
                 versionRange: dependencies[dependencyName],
                 dnps,
                 recursiveCount,
             });
-        }
-    }
+        }));
+    }));
 }
-
-function hasVersion(dnps, name, version) {
-    return ((dnps[name] || {}).versions || {})[version];
-}
-
-function setVersion(dnps, name, version, dependencies) {
-    if (!dnps[name]) dnps[name] = {versions: {}};
-    dnps[name].versions[version] = dependencies;
-}
-
 
 module.exports = aggregateDependencies;
