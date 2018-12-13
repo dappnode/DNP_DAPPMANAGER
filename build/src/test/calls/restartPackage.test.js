@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const fs = require('fs');
 const getPath = require('utils/getPath');
 const validate = require('utils/validate');
-const docker = require('modules/docker');
 
 chai.should();
 
@@ -25,7 +24,16 @@ describe('Call function: restartPackage', function() {
 
   it('should restart the package', async () => {
     // Mock docker
-    sinon.replace(docker.compose, 'rm_up', sinon.fake());
+    const docker = {
+      safe: {
+        compose: {
+          up: sinon.fake(),
+        },
+      },
+      compose: {
+        rm: sinon.fake(),
+      },
+    };
     // Mock parse
     const restartPackage = proxyquire('calls/restartPackage', {
       'modules/docker': docker,
@@ -33,7 +41,8 @@ describe('Call function: restartPackage', function() {
     });
     let res = await restartPackage({id: PACKAGE_NAME});
     // sinon.assert.called(docker.compose.rm);
-    sinon.assert.calledWith(docker.compose.rm_up, DOCKERCOMPOSE_PATH);
+    sinon.assert.calledWith(docker.compose.rm, DOCKERCOMPOSE_PATH);
+    sinon.assert.calledWith(docker.safe.compose.up, DOCKERCOMPOSE_PATH);
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
   });

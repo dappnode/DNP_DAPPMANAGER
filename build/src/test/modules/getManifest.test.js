@@ -14,7 +14,7 @@ describe('Get manifest', function() {
     ver: 'latest',
   };
   const dnpHash = 'dnpHash';
-  const manifest = '{\n  "item": "manifest"\n}';
+  const manifest = '{"image":{"hash":"/ipfs/Qm"}}';
   const apmGetRepoHashSpy = sinon.spy();
   const apm = {
     getRepoHash: async (packageReq) => {
@@ -54,8 +54,8 @@ describe('Get manifest', function() {
   it('should return a parsed manifest', () => {
     expect(res)
       .to.deep.equal({
+        image: {hash: '/ipfs/Qm'},
         fromIpfs: undefined,
-        item: 'manifest',
       });
   });
 });
