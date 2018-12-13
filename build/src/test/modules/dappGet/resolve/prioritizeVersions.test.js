@@ -1,6 +1,8 @@
 const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 
+/* eslint-disable max-len */
+
 /**
  * Purpose of the test. Make sure the versions are ordered correctly
  *
@@ -28,10 +30,10 @@ describe('dappGet/resolve/prioritizeVersions', () => {
     it('should deal with non-semver versions and prioritize them', async () => {
         const dnp = {
             isRequest: true,
-            versions: {'0.1.0': {}, '0.1.1': {}, '/ipfs/Qm1234': {}},
+            versions: {'0.1.0': {}, '0.1.1': {}, '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws': {}},
         };
         const versions = prioritizeVersions(dnp);
-        expect(versions).to.deep.equal(['/ipfs/Qm1234', '0.1.1', '0.1.0']);
+        expect(versions).to.deep.equal(['/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws', '0.1.1', '0.1.0']);
     });
 
     it('should order versions: state DNP. Prioritize older versions', async () => {
