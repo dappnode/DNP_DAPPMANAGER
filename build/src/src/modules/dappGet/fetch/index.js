@@ -41,7 +41,6 @@ async function fetch(req) {
                 // Otherwise asume it came from ENS
                 // First check if the repo exists
                 // await apm.repoExists(pkg.name).catch(() => false);
-
                 await getPkgDeps(pkg.name, '>='+pkg.version, repo);
             }
         } catch (e) {

@@ -6,6 +6,7 @@
 /build/src/undefined/
 /build/src/test_files/
 /build/src/test_files/*
+build/src/dappmanagerdb.json
 .DS_Store
 .nyc_output
 build_*
