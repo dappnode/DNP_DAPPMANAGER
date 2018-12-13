@@ -1,31 +1,49 @@
 const fs = require('fs');
 const yaml = require('yamljs');
+const validate = require('utils/validate');
 
 /*
  * Reads and parses files. This util is used to abstract some logic
  * out of other files and ease testing.
 */
 
-// Helper function, read and parse docker-compose
-function readDockerCompose(DOCKERCOMPOSE_PATH) {
-  if (!fs.existsSync(DOCKERCOMPOSE_PATH)) {
-    throw Error('docker-compose does not exist: '+DOCKERCOMPOSE_PATH);
-  }
-  const dcString = fs.readFileSync(DOCKERCOMPOSE_PATH, 'utf-8');
+function parseDockerCompose(dcString) {
   return yaml.parse(dcString);
 }
 
+function stringifyDockerCompose(dcObject) {
+  return yaml.dump(dcObject, {
+    indent: 4,
+  });
+}
+
+// Helper function, read and parse docker-compose
+function readDockerCompose(dockerComposePath) {
+  if (!fs.existsSync(dockerComposePath)) {
+    throw Error('docker-compose does not exist: '+dockerComposePath);
+  }
+  const dcString = fs.readFileSync(dockerComposePath, 'utf-8');
+  return parseDockerCompose(dcString);
+}
+
+function writeDockerCompose(dockerComposePath, dcObject) {
+  validate.path(dockerComposePath);
+  const dcString = stringifyDockerCompose(dcObject);
+  fs.writeFileSync(dockerComposePath, dcString, 'utf-8');
+}
+
+
 // Select the first service in a docker-compose
-function getUniqueDockerComposeService(DOCKERCOMPOSE_PATH) {
-  const dc = readDockerCompose(DOCKERCOMPOSE_PATH);
+function getUniqueDockerComposeService(dockerComposePath) {
+  const dc = readDockerCompose(dockerComposePath);
   const packageName = Object.getOwnPropertyNames(dc.services)[0];
   return dc.services[packageName];
 }
 
 // Get the volumes of a docker-compose service
-function serviceVolumes(DOCKERCOMPOSE_PATH) {
-  const dc = readDockerCompose(DOCKERCOMPOSE_PATH);
-  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
+function serviceVolumes(dockerComposePath) {
+  const dc = readDockerCompose(dockerComposePath);
+  const service = getUniqueDockerComposeService(dockerComposePath);
 
   const externalVolumes = Object.getOwnPropertyNames(dc.volumes || []);
 
@@ -43,14 +61,14 @@ function serviceVolumes(DOCKERCOMPOSE_PATH) {
 }
 
 // Get the container name of a docker-compose service
-function containerName(DOCKERCOMPOSE_PATH) {
-  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
+function containerName(dockerComposePath) {
+  const service = getUniqueDockerComposeService(dockerComposePath);
   return service.container_name;
 }
 
 // Get an array of ports of a docker-compose service
-function dockerComposePorts(DOCKERCOMPOSE_PATH) {
-  const service = getUniqueDockerComposeService(DOCKERCOMPOSE_PATH);
+function dockerComposePorts(dockerComposePath) {
+  const service = getUniqueDockerComposeService(dockerComposePath);
   const ports = service.ports || [];
   return ports.map((p) => p.split(':')[0]);
 }
@@ -64,7 +82,8 @@ function envFile(envFileData) {
     .split('\n')
     .filter((row) => row.length > 0 )
     .map((row) => {
-      res[row.split('=')[0]] = row.split('=')[1];
+      const [key, value] = row.split(/=(.+)/);
+      res[key] = value;
     });
 
   return res;
@@ -137,6 +156,10 @@ const manifest = {
 
 
 module.exports = {
+  parseDockerCompose,
+  stringifyDockerCompose,
+  readDockerCompose,
+  writeDockerCompose,
   serviceVolumes,
   containerName,
   dockerComposePorts,

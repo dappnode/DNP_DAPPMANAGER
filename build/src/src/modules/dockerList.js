@@ -85,36 +85,27 @@ function format(c) {
     }
   }
 
+  const portsToClose = c.Labels.portsToClose ? JSON.parse(c.Labels.portsToClose) : [];
 
   return {
     id: c.Id,
+    packageName,
     version,
     origin,
     dependencies,
+    portsToClose,
     isDNP,
     isCORE,
     created: new Date(1000*c.Created),
     image: c.Image,
     name: name,
     shortName: shortName,
-    ports: mapPorts(c.Ports),
+    ports: c.Ports,
+    volumes: c.Mounts.map(({Type, Name, Source}) => ({type: Type, name: Name, path: Source})),
     state: c.State,
     running: !/^Exited /i.test(c.Status),
   };
 }
-
-
-function mapPorts(ports) {
-  if (!ports || ports.length === 0) return '';
-  const res = [];
-  ports.forEach(function(p) {
-    const publicPort = p.PublicPort || '';
-    const privatePort = p.PrivatePort || '';
-    res.push(publicPort+'->'+privatePort);
-  });
-  return res.join(', ');
-}
-
 
 module.exports = {
   listContainers,
