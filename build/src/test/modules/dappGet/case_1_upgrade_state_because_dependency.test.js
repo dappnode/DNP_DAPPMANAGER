@@ -1,6 +1,5 @@
 const resolveRequest = require('modules/dappGet/resolver');
-const assert = require('assert');
-const repo = getRepo();
+const expect = require('chai').expect;
 
 /**
  * Comments about semver
@@ -10,40 +9,36 @@ const repo = getRepo();
  * semver.satisfies('1.2.3', '1.2.3')  -> true
  */
 
-const state = {
-    A: '1.0.0',
-    B: '1.0.0',
-    C: '1.0.0',
-};
-
 describe('case 1, upgrade state package because of a dependency', () => {
     it('should get correct result', () => {
-        const req = 'A@^2.0.0';
-        const res = resolveRequest(req, repo, state);
-        assert.deepStrictEqual(res.success, {
+        const dnps = {
+          'A': {
+            isRequest: true,
+            versions: {
+              '1.0.0': {'C': '^1.0.0'},
+              '2.0.0': {'C': '^2.0.0'},
+            },
+          },
+          'B': {
+            isState: true,
+            versions: {
+              '1.0.0': {'C': '^1.0.0'},
+              '2.0.0': {'C': '^2.0.0'},
+            },
+          },
+          'C': {
+            isState: true,
+            versions: {
+              '1.0.0': {},
+              '2.0.0': {},
+            },
+          },
+        };
+        const res = resolveRequest(dnps);
+        expect(res.success).to.deep.equal({
             A: '2.0.0',
             B: '2.0.0',
             C: '2.0.0',
         });
     });
 });
-
-
-function getRepo() {
-    return {
-      'A': {
-        '1.0.0': {dependencies: {'C': '^1.0.0'}},
-        '2.0.0': {dependencies: {'C': '^2.0.0'}},
-      },
-      'B': {
-        '1.0.0': {dependencies: {'C': '^1.0.0'}},
-        '2.0.0': {dependencies: {'C': '^2.0.0'}},
-      },
-      'C': {
-        '1.0.0': {dependencies: {}},
-        '2.0.0': {dependencies: {}},
-      },
-    };
-  }
-
-
