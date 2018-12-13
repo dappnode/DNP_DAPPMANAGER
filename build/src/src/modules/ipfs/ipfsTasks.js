@@ -11,7 +11,8 @@ const validate = require('utils/validate');
 const ipfs = require('./ipfsSetup');
 const params = require('params');
 const logs = require('logs.js')(module);
-const {parseResHash, validateIpfsHash} = require('./utils');
+// const {parseResHash, validateIpfsHash} = require('./utils');
+const {validateIpfsHash} = require('./utils');
 
 // Declare parameters for all methods to have access to
 const CACHE_DIR = params.CACHE_DIR;
@@ -30,24 +31,39 @@ const isfileHashValid = async (providedHash, PATH) => {
     */
 
     // Then, verify that the hashes are correct
-    const res = await promisify(ipfs.files.add)([PATH], {onlyHash: true});
-    const computedHash = parseResHash(res);
-    const computedHashClean = computedHash.replace('ipfs/', '').replace('/', '');
-    const providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
-    const fileHashValid = (computedHashClean == providedHashClean);
-    // Return the boolean
-    return fileHashValid;
+
+    // ########################################
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // ########################################
+    //
+    // Alarming behaviour has been observed where
+    // IPFS returned different hashes for equal files.
+    // While this issue is resolved,
+    // the hash verification will be deactivated.
+    //
+    // ########################################
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // ########################################
+
+    return true;
+
+    // const res = await promisify(ipfs.files.add)([PATH], {onlyHash: true});
+    // const computedHash = parseResHash(res);
+    // const computedHashClean = computedHash.replace('ipfs/', '').replace('/', '');
+    // const providedHashClean = providedHash.replace('ipfs/', '').replace('/', '');
+    // const fileHashValid = (computedHashClean == providedHashClean);
+    // // Return the boolean
+    // return fileHashValid;
 };
 
-const downloadHandler = (HASH, PATH, logChunks) =>
-    new Promise(function(resolve, reject) {
+const downloadHandler = (HASH, PATH, logChunks, options = {}) => new Promise((resolve, reject) => {
     // This function has to download the file but also verify that:
     // - The downloaded file is correct (checking the hash)
     // - The download is happening (with a timer)
 
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
-        reject(new Error('Timeout to cancel expired'));
+        reject(Error('Timeout to cancel expired'));
     }, params.IPFS_TIMEOUT);
 
     // Construct handlers
@@ -55,9 +71,14 @@ const downloadHandler = (HASH, PATH, logChunks) =>
         clearTimeout(timeoutToCancel);
         reject(Error(origin+': '+err));
     };
+    let downloadedSize = 0;
     const trackProgress = (chunk) => {
         clearTimeout(timeoutToCancel);
         if (logChunks) logChunks(chunk);
+        downloadedSize += chunk.length;
+        if (options.maxSize && downloadedSize > options.maxSize) {
+            reject(Error(`Downloaded size exceeds maximum allowed ${options.maxSize} bytes`));
+        }
     };
     const checkFileHash = async () => {
         if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) {
@@ -80,7 +101,7 @@ const downloadHandler = (HASH, PATH, logChunks) =>
     readStream.pipe(writeStream);
 });
 
-const download = async (HASH, PATH, logChunks) => {
+const download = async (HASH, PATH, logChunks, options) => {
     // console.trace('ABOUT TO DOWNLOAD', ' $$ ', HASH, ' $$ ', PATH, ' $$ ', logChunks);
     // If the file is already downloaded and valid, skip
     if (await isfileHashValid(HASH, PATH)) return;
@@ -88,7 +109,7 @@ const download = async (HASH, PATH, logChunks) => {
     validate.path(PATH);
     HASH = validateIpfsHash(HASH);
     // execute download
-    await downloadHandler(HASH, PATH, logChunks);
+    await downloadHandler(HASH, PATH, logChunks, options);
     // If download was successful, pin file. Pin paralelly, and don't propagate errors
     ipfs.pin.add(HASH, (err) => {
         if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
@@ -98,7 +119,7 @@ const download = async (HASH, PATH, logChunks) => {
 
 const cat = async (HASH, options = {}) => {
     const PATH = CACHE_DIR + HASH;
-    await download(HASH, PATH);
+    await download(HASH, PATH, null, options);
     if (options.buffer) {
         return await promisify(fs.readFile)(PATH);
     } else {

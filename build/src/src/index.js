@@ -6,9 +6,14 @@ const {eventBus, eventBusTag} = require('./eventBus');
 const logs = require('./logs')(module);
 const logUserAction = require('./logUserAction');
 const params = require('./params');
+const db = require('./db');
 
 // import calls
 const calls = require('./calls');
+
+// Start watchers
+require('./watchers/chains');
+require('./watchers/diskUsage');
 
 /*
  * RPC register wrapper
@@ -121,80 +126,69 @@ connection.onopen = (session, details) => {
      * Allows internal calls to autobahn. For example, to call install do:
      * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
      */
-    eventBus.on(eventBusTag.call, (call, args, kwargs) => {
-      try {
-        session.call(call, args, kwargs)
-        .then((res) => {
-          logs.info('INTERNAL CALL TO: '+call);
-          logs.info(res);
-        });
-      } catch (e) {
-        logs.error('Error on internal call to '+call+': '+e.stack);
+    eventBus.onSafe(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
+      // Use "callId" to call internal dappmanager methods.
+      // Use "event" to call external methods.
+      if (callId && !Object.keys(calls).includes(callId)) {
+        throw Error(`Requested internal call event does not exist: ${callId}`);
       }
+      if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
+      session.call(event, args, kwargs)
+      .then(JSON.parse)
+      .then((res) => {
+        logs.info(`Internal call to "${event}" result:`);
+        logs.info(res);
+        if (callback) callback(res);
+      });
     });
 
-    /**
-     * Emits the list of packages
-     */
+    // Emit chain data
+    const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
+    eventBus.onSafe(eventBusTag.emitChainData, ({chainData}) => {
+      session.publish(eventChainData, chainData); // chainData is an array
+    });
+
+    // Emits the list of packages
     const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
     const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
-    eventBus.on(eventBusTag.emitPackages, () => {
-      try {
-        listPackagesWrapped().then((res) => {
-          session.publish(eventPackages, [], JSON.parse(res));
-        });
-      } catch (e) {
-        logs.error('Error listing packages: '+e.stack);
-      }
+    eventBus.onSafe(eventBusTag.emitPackages, () => {
+      listPackagesWrapped().then((res) => {
+        session.publish(eventPackages, [], JSON.parse(res));
+      });
     });
 
-    /**
-     * Emits the directory
-     */
+    // Emits the directory
     const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
-    eventBus.on(eventBusTag.emitDirectory, (pkgs) => {
-      try {
-        session.publish(eventDirectory, [], pkgs);
-      } catch (e) {
-        logs.error('Error publishing directory: '+e.stack);
+    eventBus.onSafe(eventBusTag.emitDirectory, (pkgs) => {
+      session.publish(eventDirectory, [], pkgs);
+    });
+
+    // Emits progress logs to the ADMIN UI
+    eventBus.onSafe(eventBusTag.logUI, (data) => {
+      session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
+      if (data && data.msg && !data.msg.includes('%')) {
+        logs.info(JSON.stringify(data));
       }
     });
 
-
-    /**
-     * Emits progress logs to the ADMIN UI
-     */
-    eventBus.on(eventBusTag.logUI, (data) => {
-      try {
-        session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
-        if (data && data.msg && !data.msg.includes('%')) {
-          logs.info(JSON.stringify(data));
-        }
-      } catch (e) {
-        logs.error('Error publishing progressLog: '+e.stack);
-      }
+    // Emits userAction logs to the ADMIN UI
+    eventBus.onSafe(eventBusTag.logUserAction, (data) => {
+      session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
     });
 
-    /**
-     * Emits userAction logs to the ADMIN UI
-     */
-    eventBus.on(eventBusTag.logUserAction, (data) => {
-      try {
-        session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
-      } catch (e) {
-        logs.error('Error publishing user action: '+e.stack);
-      }
-    });
-
-    /**
-     * Receives userAction logs from the VPN nodejs app
-     */
+    // Receives userAction logs from the VPN nodejs app
     session.subscribe('logUserActionToDappmanager', (args) => {
       try {
         logUserAction.log(args[0]);
       } catch (e) {
         logs.error('Error logging user action: '+e.stack);
       }
+    });
+
+    // Emits push notification to the UI and to the local db
+    eventBus.onSafe(eventBusTag.pushNotification, async (notification) => {
+      await db.set(`notification.${notification.id}`, notification);
+      session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
     });
 };
 
@@ -204,4 +198,5 @@ connection.onclose = (reason, details) => {
 
 connection.open();
 logs.info('Attempting WAMP connection to '+autobahnUrl+', realm '+autobahnRealm);
+
 
