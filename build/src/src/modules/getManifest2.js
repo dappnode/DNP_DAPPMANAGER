@@ -2,6 +2,7 @@ const isIpfsHash = require('utils/isIpfsHash');
 const isEnsDomain = require('utils/isEnsDomain');
 const ipfs = require('modules/ipfs');
 const apm = require('modules/apm');
+const db = require('../db');
 
 // Used by
 // calls / fetchDirectory;
@@ -33,30 +34,35 @@ async function getManifest({name, ver, version}) {
     if (isIpfsHash(ver)) {
         origin = hash = ver;
     } else if (isEnsDomain(name)) {
-        hash = await apm.getRepoHash({name, ver});
+        const key = `apm-${name}-${ver}`;
+        hash = await db.get(key) || await apm.getRepoHash({name, ver});
+        await db.set(key, hash);
     } else {
         throw Error(`Unkown package request name: ${name}, ver: ${ver}`);
     }
 
     // 2. Download manifest and parse it
-    // pass a maxSize = 100KB option which will throw an error if that size is exceeded
-    const manifestUnparsed = await ipfs.cat(hash, {maxSize: 100000});
+    // Automatic cache using local db
+    // Pass a maxSize = 100KB option which will throw an error if that size is exceeded
+    const manifestUnparsed = await db.get(hash) || await ipfs.cat(hash, {maxSize: 100000});
     let manifest;
     try {
         manifest = JSON.parse(manifestUnparsed);
+        // Delay caching to be sure that the manifestUnparsed is valid
+        await db.set(hash, manifestUnparsed);
     } catch (e) {
         throw Error(`Error JSON parsing the manifest: ${e.message}`);
     }
 
     // Verify the manifest
     if (!manifest.image || typeof manifest.image !== 'object') {
-        throw Error(`Invalid manifest: it does not contain the expected property 'image'`);
+        throw Error(`Invalid manifest: it does not contain the expected property 'image', manifest: ${JSON.stringify(manifest, null, 2)}`);
     }
     if (!manifest.image.hash) {
-        throw Error(`Invalid manifest: it does not contain the expected property 'image.hash'`);
+        throw Error(`Invalid manifest: it does not contain the expected property 'image.hash', manifest: ${JSON.stringify(manifest, null, 2)}`);
     }
     if (isEnsDomain(name) && (manifest || {}).name !== name) {
-        throw Error('Package name requested doesn\'t match its manifest');
+        throw Error(`Package name requested: "${name}" doesn't match its manifest: ${manifest.name}, ${JSON.stringify(manifest, null, 2)}`);
     }
 
     return {
