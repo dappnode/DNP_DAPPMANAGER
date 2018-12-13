@@ -10,7 +10,6 @@ const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
 const lockPorts = require('modules/lockPorts');
 const shouldOpenPorts = require('modules/shouldOpenPorts');
-const logs = require('logs.js')(module);
 
 /* eslint-disable max-len */
 
@@ -87,7 +86,7 @@ const installPackage = async ({
   let pkgs = await Promise.all(Object.keys(result.success).map(async (name) => {
     // 3.2 Fetch manifest
     const ver = result.success[name];
-    const manifest = await getManifest({name, ver});
+    let manifest = await getManifest({name, ver});
     if (!manifest) throw Error('Missing manifest for '+name);
 
     // 3.3 Verify dncore condition
