@@ -54,8 +54,10 @@ const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
 async function aggregate({req, dnpList}) {
     const dnps = {};
 
-    // First fetch the request
+    // WARNING: req is a user external input, must verify
     validate.packageReq(req);
+    if (!req.ver || req.ver.toLowerCase().includes('latest')) req.ver = '*';
+
     await aggregateDependencies({name: req.name, versionRange: req.ver, dnps});
 
     // Get the list of relevant installed dnps
