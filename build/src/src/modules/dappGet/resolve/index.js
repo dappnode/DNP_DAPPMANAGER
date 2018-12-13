@@ -57,7 +57,7 @@ function resolver(dnps) {
     } catch (e) {
         return {
             success: false,
-            message: e.message,
+            message: e.stack,
         };
     }
 }

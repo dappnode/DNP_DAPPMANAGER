@@ -27,7 +27,7 @@ describe('dappGet/resolve/permutations', () => {
               isNotInstalled: true,
               versions: {
                 '0.1.0': {},
-                '/ipfs/QmABCD': {},
+                '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws': {},
               },
             },
             'letsencrypt-nginx.dnp.dappnode.eth': {
@@ -56,7 +56,7 @@ describe('dappGet/resolve/permutations', () => {
         expect(permutationsTable).to.deep.equal([
             {
               name: 'dependency.dnp.dappnode.eth',
-              versions: [null, '/ipfs/QmABCD', '0.1.0'],
+              versions: [null, '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws', '0.1.0'],
               n: 3,
               m: 1,
             },

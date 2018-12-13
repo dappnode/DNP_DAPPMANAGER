@@ -14,7 +14,7 @@ const sinon = require('sinon');
 const apmVersionRange = ['0.1.0', '0.1.1', '0.1.2'];
 const apm = {
     getRepoVersions: sinon.stub().callsFake(async ({name}, versionRange) => {
-        return apmVersionRange;
+        return {'0.1.0': '', '0.1.1': '', '0.1.2': ''};
     }),
 };
 
@@ -43,7 +43,7 @@ describe('dappGet/aggregate/fetchVersions', () => {
     });
 
     it('Should call return that single version given an invalid semver version', async () => {
-        const ipfsHash = '/ipfs/Qmr3d...';
+        const ipfsHash = '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws';
         const versions = await fetchVersions({
             name: 'kovan.dnp.dappnode.eth',
             versionRange: ipfsHash,
