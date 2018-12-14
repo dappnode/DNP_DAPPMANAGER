@@ -25,6 +25,9 @@ const removePackage = async ({
     ? await dappGetBasic(req)
     : await dappGet(req);
 
+    // Prevent old UIs from crashing
+    result.state = {};
+
     return {
         message: 'Resolve request for ' + req.name + '@' + req.ver+
             ', resolved: '+Boolean(result.success),
