@@ -28,7 +28,8 @@ const restartPackage = async ({
   }
 
   // Combining rm && up doesn't prevent the installer from crashing
-  await docker.compose.rm_up(dockerComposePath);
+  await docker.compose.rm(dockerComposePath);
+  await docker.safe.compose.up(dockerComposePath);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);

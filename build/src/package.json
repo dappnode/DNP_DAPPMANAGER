@@ -12,7 +12,8 @@
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",
     "coverage": "NODE_PATH=src ./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
-    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix"
+    "lint": "NODE_PATH=src ./node_modules/.bin/eslint src/**/*.js --fix",
+    "pre-commit": "npm run lint && npm run test && npm run dev"
   },
   "author": "dappLion",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "@parity/api": "^2.1.22",
     "async": "^2.6.1",
     "autobahn": "^18.3.2",
+    "bitcoin-core": "^2.0.0",
     "create-error": "^0.3.1",
     "deepmerge": "^2.2.1",
     "docker-remote-api": "^5.0.0",
@@ -30,11 +32,13 @@
     "is-ipfs": "^0.3.2",
     "jimp": "^0.5.3",
     "js-yaml": "^3.11.0",
+    "lowdb": "^1.0.0",
+    "monero-rpc": "^0.5.0",
     "node-docker-api": "^1.1.22",
     "semver": "^5.5.0",
     "shelljs": "^0.8.2",
     "simple-statistics": "^6.0.1",
-    "systeminformation": "^3.45.6",
+    "table-parser": "^1.0.1",
     "web3": "^1.0.0-beta.34",
     "winston": "^3.0.0",
     "yamljs": "^0.3.0"
