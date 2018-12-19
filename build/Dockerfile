@@ -4,11 +4,15 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 
 WORKDIR /usr/src/app
 
+# Install app dependencies to use docker's layer cache
+ADD src/package*.json ./
+RUN npm install --production
+
 ADD src .
 ADD entrypoint.sh .
 ADD dns_updater.sh .
 
-RUN npm install --production
+
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
@@ -62,5 +66,7 @@ COPY --from=build /usr/bin/docker /usr/bin/docker
 COPY ./dns_updater.sh /etc/periodic/1min/dns_updater
 RUN chmod +x /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
+
+ENV DB_PATH /usr/src/app/DNCORE/dappmanagerdb.json
 
 ENTRYPOINT /usr/src/app/entrypoint.sh
