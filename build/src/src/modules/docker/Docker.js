@@ -149,6 +149,13 @@ const docker = {
     return shell('docker logs ' + containerNameOrId+' '+optionsString+' 2>&1', true);
   },
 
+  // NOT A DOCKER-COMPOSE
+  // Usage: docker system df [OPTIONS]
+  // --verbose , -v		Show detailed information on space usage
+  systemDf: () => {
+    return shell('docker system df --verbose');
+  },
+
   status: (containerNameOrId) => {
     return shell('docker inspect --format=\'{{.State.Status}}\' ' + containerNameOrId, true);
   },
@@ -177,10 +184,8 @@ function getVpnImageCmd() {
 
 /**
  *
- * @param {String} port Must be in the format port = {
- *   number: 30303,
- *   type: TCP
- * }
+ * @param {String} port Must be in the format port =
+ *   { number: 30303, type: TCP }
  * @param {String} type
  * @param {String} IMAGE
  * @return {String}

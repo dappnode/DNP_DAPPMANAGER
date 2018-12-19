@@ -6,7 +6,9 @@ const docker = require('modules/docker');
  *
  * @param {Object} kwargs: {
  *   action: 'open' or 'close' (string)
- *   ports: array of numerical ports [5000, 5001] (array)
+ *   ports: array of port objects = [
+ *      { number: 30303, type: TCP },
+ *      ... ]
  * }
  * @return {Object} A formated success message.
  * result: empty
