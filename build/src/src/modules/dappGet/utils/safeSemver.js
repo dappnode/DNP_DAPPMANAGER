@@ -1,5 +1,5 @@
 const semver = require('semver');
-const isIpfs = require('./isIpfs');
+const isIpfsHash = require('utils/isIpfsHash');
 
 /**
  * semver comparision functions semver.compare and semver.rcompare
@@ -16,8 +16,8 @@ const isIpfs = require('./isIpfs');
 function safeSort(sortFunction) {
     return (v1, v2) => {
         // 1. Put IPFS versions the first
-        if (isIpfs(v1)) return -1;
-        if (isIpfs(v2)) return 1;
+        if (isIpfsHash(v1)) return -1;
+        if (isIpfsHash(v2)) return 1;
         // 2. Put invalid versions the latest
         if (!semver.valid(v1)) return 1;
         if (!semver.valid(v2)) return -1;
@@ -31,8 +31,8 @@ const safeSemver = {
         // satisfies(ver, range)
         // 1. an IPFS ver satisfies any range
         // 2. an IPFS range only allows that exact ver
-        if (isIpfs(ver)) return true;
-        if (isIpfs(range)) return ver === range;
+        if (isIpfsHash(ver)) return true;
+        if (isIpfsHash(range)) return ver === range;
         if (!semver.valid(ver)) return false;
         if (!semver.validRange(range)) return false;
         return semver.satisfies(ver, range);

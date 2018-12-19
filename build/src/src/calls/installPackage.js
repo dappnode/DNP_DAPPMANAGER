@@ -1,14 +1,17 @@
 const parse = require('utils/parse');
-const {download, run} = require('modules/packages');
+const merge = require('utils/merge');
+const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
+const dappGetBasic = require('modules/dappGet/basic');
 const logUI = require('utils/logUI');
 const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
-const dockerList = require('modules/dockerList');
 const {eventBus, eventBusTag} = require('eventBus');
 const isSyncing = require('utils/isSyncing');
-const logs = require('logs.js')(module);
+const lockPorts = require('modules/lockPorts');
+const shouldOpenPorts = require('modules/shouldOpenPorts');
 
+/* eslint-disable max-len */
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -23,16 +26,26 @@ const logs = require('logs.js')(module);
  *   1. ver = 'latest'
  *   2. ver = '/ipfs/QmZ87fb2...'
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   logId: task id (string)
+ * @param {Object} kwargs = {
+ *   id: package .eth name {String}
+ *   userSetVols: user set volumes {Object} = {
+ *     "kovan.dnp.dappnode.eth": {
+ *       "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
+ *     }, ... }
+ *   userSetPorts: user set ports {Object} = {
+ *     "kovan.dnp.dappnode.eth": {
+ *       "30303": "31313:30303",
+ *       "30303/udp": "31313:30303/udp"
+ *     }, ... }
+ *   logId: task id {String}
  * }
  * @return {Object} A formated success message.
  * result: empty
  */
 const installPackage = async ({
   id,
-  vols = {},
+  userSetVols = {},
+  userSetPorts = {},
   logId,
   options = {},
 }) => {
@@ -47,81 +60,33 @@ const installPackage = async ({
   }
 
   // 2. Resolve the request
-  let result;
-  if (options.BYPASS_RESOLVER) {
-    /**
-     * The dappGet resolver may cause errors.
-     * Updating the core will never require dependency resolution,
-     * therefore for a system update the dappGet resolver will be emitted
-     *
-     * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
-     */
-    const reqManifest = await getManifest(req);
-    // reqManifest.dependencies = {
-    //     'bind.dnp.dappnode.eth': '0.1.4',
-    //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
-    // }
-
-    // Append dependencies in the list of packages to install
-    result = {
-      success: (reqManifest || {}).dependencies || {},
-      state: {},
-    };
-    // Add current request to pacakages to install
-    result.success[req.name] = req.ver;
-
-    // The function below does not directly affect funcionality.
-    // However it would prevent already installed packages from installing
-    try {
-      (await dockerList.listContainers()).forEach((pkg) => {
-        if (pkg.name && pkg.version
-          && result.success && result.success[pkg.name]
-          && result.success[pkg.name] === pkg.version) {
-            delete result.success[pkg.name];
-          }
-      });
-    } catch (e) {
-      logs.error('Error listing current containers: '+e);
-    }
-  } else {
-    /**
-     * If BYPASS_RESOLVER == false, use the resolver
-     */
-    try {
-      await dappGet.update(req);
-    } catch (e) {
-      throw Error(`Error updating DNP repo: ${e.stack || e.message}`);
-    }
-    // res = {
-    //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-    //     state: {'bind.dnp.dappnode.eth': '0.1.2'}
-    // }
-    try {
-      result = await dappGet.resolve(req);
-    } catch (e) {
-      throw Error(`Error resolving dependencies: ${e.stack || e.message}`);
-    }
-    // Return error if the req couldn't be resolved
-    if (!result.success) {
-      throw Error('Request could not be resolved: '+req.name+'@'+req.ver);
+  // result = {
+  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
+  //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
+  // }
+  const result = options.BYPASS_RESOLVER
+    ? await dappGetBasic(req)
+    : await dappGet(req);
+  // Return error if the req couldn't be resolved
+  if (!result.success) {
+    const errorMessage = `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`;
+    if (result.e) {
+      result.e.message = errorMessage;
+      throw result.e;
+    } else {
+      throw Error(errorMessage);
     }
   }
 
-  const {success: newState, state} = result;
-
   // 3. Format the request and filter out already updated packages
-  let pkgs = await Promise.all(Object.keys(newState).filter((name) => {
-    // 3.1 Check if the requested version is different than the current
-    const shouldInstall = newState[name] !== state[name];
-    if (!shouldInstall) {
-      logUI({logId, name, msg: 'Already updated'});
-      delete state[name];
-    }
-    return shouldInstall;
-  }).map(async (name) => {
+  Object.keys(result.alreadyUpdated || {}).forEach((name) => {
+    logUI({logId, name, msg: 'Already updated'});
+  });
+
+  let pkgs = await Promise.all(Object.keys(result.success).map(async (name) => {
     // 3.2 Fetch manifest
-    const ver = newState[name];
-    const manifest = await getManifest({name, ver});
+    const ver = result.success[name];
+    let manifest = await getManifest({name, ver});
     if (!manifest) throw Error('Missing manifest for '+name);
 
     // 3.3 Verify dncore condition
@@ -131,30 +96,19 @@ const installPackage = async ({
       if (options.BYPASS_CORE_RESTRICTION) {
         manifest.isCore = true;
       } else if (
-        // The origin must be the registry controlled by the DAppNode team
-        name.endsWith('.dnp.dappnode.eth')
-        // It must NOT come from ipfs, thus APM
-        && !ver.startsWith('/ipfs/')
+        // The origin must be the registry controlled by the DAppNode team,
+        // and it must NOT come from ipfs, thus APM
+        name.endsWith('.dnp.dappnode.eth') && !ver.startsWith('/ipfs/')
       ) {
         manifest.isCore = true;
       } else {
-        // inform the user of improper usage
-        /* eslint-disable max-len */
         throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
-        /* eslint-enable max-len */
       }
     }
 
-    // 3.4 Edit volumes if provided by the user
-    // "vols": {
-    //   "data:/root/.bitmonero": "monero_data"
-    // },
-    if (name === req.name && Object.keys(vols).length) {
-      const {volumes = []} = ((manifest || {}).image || {});
-      volumes.forEach((vol, i) => {
-        if (vols[vol]) manifest.image.volumes[i] = vols[vol]+':'+vol.split(':')[1];
-      });
-    }
+    // 3.4 Merge user set vols and ports
+    manifest = merge.manifest.vols(manifest, userSetVols);
+    manifest = merge.manifest.ports(manifest, userSetPorts);
 
     // Return pkg object
     return {
@@ -165,7 +119,7 @@ const installPackage = async ({
   }));
 
   // 4. Download requested packages
-  await Promise.all(pkgs.map((pkg) => download({pkg, logId})));
+  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
 
   // 5. Run requested packages
   // Patch, install the dappmanager the last always
@@ -174,16 +128,32 @@ const installPackage = async ({
 
   await Promise.all(pkgs
     .filter((pkg) => !isDappmanager(pkg))
-    .map((pkg) => run({pkg, logId}))
+    .map((pkg) => packages.run({pkg, logId}))
   );
 
   const dappmanagerPkg = pkgs.find(isDappmanager);
   if (dappmanagerPkg) {
-    await run({pkg: dappmanagerPkg, logId});
+    await packages.run({pkg: dappmanagerPkg, logId});
   }
+
+  // 6. P2P ports: modify docker-compose + open ports
+  // - lockPorts modifies the docker-compose and returns
+  //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+  // - managePorts calls UPnP to open the ports
+
+  await Promise.all(pkgs.map(async (pkg) => {
+    const portsToOpen = await lockPorts({pkg});
+    // Abort if there are no ports to open
+    // Don't attempt to call UPnP if not necessary
+    if (portsToOpen.length && await shouldOpenPorts()) {
+      const kwargs = {action: 'open', ports: portsToOpen};
+      eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+    }
+  }));
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
+  eventBus.emit(eventBusTag.packageModified);
 
   return {
     message: 'Installed ' + req.req,
