@@ -46,7 +46,7 @@ async function restartPackageVolumes({
     await docker.compose.down(dockerComposePath, {volumes: true});
   }
   // Restart docker to apply changes
-  await docker.compose.up(dockerComposePath);
+  await docker.safe.compose.up(dockerComposePath);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
