@@ -6,9 +6,11 @@ const shellExec = require('utils/shell');
  * @return {Object} A formated list of messages.
  * result: diagnose =
  *   {
- *     cpu, <String>
- *     memory, <String>
- *     disk, <String>
+ *     dockerVersion: {
+ *       name: 'docker version',
+ *       result: 'Docker version 18.06.1-ce, build e68fc7a' <or>
+ *       error: 'sh: docker: not found'
+ *     }
  *   }
  */
 const getStats = async () => {
@@ -19,6 +21,7 @@ const getStats = async () => {
     diagnose.dockerVersion = {
         name: 'docker version',
         ...(await shellExec(`docker -v`)
+            .then((data) => data.trim())
             .then((result) => ({result}))
             .catch((e) => ({error: e.message}))),
     };
@@ -27,6 +30,7 @@ const getStats = async () => {
     diagnose.dockerComposeVersion = {
         name: 'docker compose version',
         ...(await shellExec(`docker-compose -v`)
+            .then((data) => data.trim())
             .then((result) => ({result}))
             .catch((e) => ({error: e.message}))),
     };
