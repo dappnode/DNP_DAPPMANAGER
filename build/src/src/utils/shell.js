@@ -37,7 +37,7 @@ function shell(cmd) {
 Error: Command failed: cat aa.txt
 cat: aa.txt: No such file or directory
 
-Guillems-MacBook-Pro:src LION$ node src/utils/test.js
+user-laptop:src user$ node src/utils/test.js
 { Error: Command failed: cat aa.txt
 cat: aa.txt: No such file or directory
 
