@@ -17,7 +17,6 @@ const requestChainData = async () => {
     return {
         message: `Requested chain data until ${params.CHAIN_DATA_UNTIL}`,
         logMessage: true,
-        userAction: true,
     };
 };
 
