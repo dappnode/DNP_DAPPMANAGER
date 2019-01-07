@@ -22,7 +22,8 @@ async function unlockPorts(dockerComposePath) {
     if (!service) {
         throw Error(`Broken docker-compose (${dockerComposePath}) found while solving a port conflict: \n${JSON.stringify(dc, null, 2)}`);
     }
-    const portsToClose = JSON.parse(((service.labels || {}).portsToClose || []));
+    const portsToCloseString = (service.labels || {}).portsToClose;
+    const portsToClose = portsToCloseString ? JSON.parse(portsToCloseString) : [];
     if (!portsToClose.length) {
         // This package has no locked ephemeral ports, so there is no way to solve it
         return [];
