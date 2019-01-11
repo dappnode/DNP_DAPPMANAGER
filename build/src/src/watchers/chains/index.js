@@ -138,9 +138,22 @@ setInterval(async () => {
 // Also get and emit chain data immediately after the UI has requested it
 eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 
+// Don't start new requests if the previous one is still active.
+// If it is still active return the last result.
+// The current ADMIN UI requires a full array of chain data
+const cache = {};
 async function getAndEmitChainData() {
-    const chainData = await Promise.all(Object.values(activeChains).map(
-        (chain) => modules[chain.module](chain)
-    ));
+    const chainData = await Promise.all(Object.values(activeChains).map(async (chain) => {
+        const id = chain.api;
+        if (!cache[id]) cache[id] = {};
+        // Return last result if previous call is still active
+        if (cache[id].active) return cache[id].lastResult;
+        // Otherwise raise active flag and perform the request
+        cache[id].active = true;
+        const result = await modules[chain.module](chain);
+        cache[id].active = false;
+        cache[id].lastResult = result;
+        return result;
+    }));
     eventBus.emit(eventBusTag.emitChainData, {chainData});
 }
