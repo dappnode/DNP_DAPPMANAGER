@@ -79,7 +79,7 @@ async function download({pkg, logId}) {
   await removeFile(imagePath);
 
   // Final log
-  logUI({logId, name, msg: 'Package donwloaded'});
+  logUI({logId, name, msg: 'Package downloaded'});
 }
 
 /**
