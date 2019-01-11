@@ -43,6 +43,16 @@ const supportedProviders = {
         api: 'http://my.kovan.dnp.dappnode.eth:8545',
     //  api: 'ws://my.kovan.dnp.dappnode.eth:8546',
     },
+    'goerli-geth.dnp.dappnode.eth': {
+        name: 'Goerli-geth',
+        module: 'ethereum',
+        api: 'http://my.goerli-geth.dnp.dappnode.eth:8545',
+    },
+    'goerli-pantheon.dnp.dappnode.eth': {
+        name: 'Goerli-pantheon',
+        module: 'ethereum',
+        api: 'http://my.goerli-pantheon.dnp.dappnode.eth:8545',
+    },
     'bitcoin.dnp.dappnode.eth': {
         name: 'Bitcoin',
         module: 'bitcoin',
