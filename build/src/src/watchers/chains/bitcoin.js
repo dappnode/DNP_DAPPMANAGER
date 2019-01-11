@@ -7,6 +7,8 @@ const MIN_BLOCK_DIFF_SYNC = 3;
 
 async function bitcoin(chain) {
     const res = {name: chain.name};
+async function bitcoin({name, api}) {
+    const res = {name};
     try {
         // To initialize the bitcoin client, the RPC user and password are necessary
         // They are stored in the package envs
@@ -22,7 +24,7 @@ async function bitcoin(chain) {
         });
 
         const client = new Client({
-            host: chain.api,
+            host: api,
             password: rpcUser,
             username: rpcPassword,
         });
