@@ -26,10 +26,10 @@ const MIN_BLOCK_DIFF_SYNC = 60;
  *     { name: 'Ropstep',
  *       error: 'Could not connect' },
  */
-async function ethereum(chain) {
-    const res = {name: chain.name};
+async function ethereum({name, api}) {
+    const res = {name};
     try {
-        const web3 = new Web3(chain.api);
+        const web3 = new Web3(api);
         const [syncing, blockNumber] = await Promise.all([web3.eth.isSyncing(), web3.eth.getBlockNumber()]);
         if (syncing && syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC) {
             res.syncing = true;
