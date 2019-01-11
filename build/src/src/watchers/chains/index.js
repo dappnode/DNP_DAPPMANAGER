@@ -143,7 +143,12 @@ eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 // The current ADMIN UI requires a full array of chain data
 const cache = {};
 async function getAndEmitChainData() {
-    const chainData = await Promise.all(Object.values(activeChains).map(async (chain) => {
+    const dnpList = await dockerList.listContainers();
+    const chainData = await Promise.all(Object.keys(activeChains).filter((dnpName) => {
+        const dnp = dnpList.find((_dnp) => _dnp.name === dnpName);
+        return dnp && dnp.running;
+    }).map(async (dnpName) => {
+        const chain = activeChains[dnpName];
         const id = chain.api;
         if (!cache[id]) cache[id] = {};
         // Return last result if previous call is still active
