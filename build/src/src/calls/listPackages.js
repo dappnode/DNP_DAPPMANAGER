@@ -7,6 +7,19 @@ const parse = require('utils/parse');
 const params = require('params');
 const logs = require('logs.js')(module);
 
+// This call can fail because of:
+//   Error response from daemon: a disk usage operation is already running
+// Prevent running it twice
+let isRunning;
+let cacheResult;
+async function dockerSystemDf() {
+  if (isRunning && cacheResult) return cacheResult;
+  isRunning = true;
+  cacheResult = await docker.systemDf();
+  isRunning = false;
+  return cacheResult;
+}
+
 
 /**
  * Returns the list of current containers associated to packages
@@ -39,7 +52,7 @@ const listPackages = async () => {
   // This call can fail because of:
   //   Error response from daemon: a disk usage operation is already running
   try {
-    const dockerSystemDfData = await docker.systemDf();
+    const dockerSystemDfData = await dockerSystemDf();
     dnpList = parseDockerSystemDf({data: dockerSystemDfData, dnpList});
   } catch (e) {
     logs.error('Error appending volume info in listPackages call: '+e.stack);
