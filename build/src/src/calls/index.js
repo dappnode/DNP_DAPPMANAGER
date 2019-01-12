@@ -27,4 +27,5 @@ module.exports = {
     notificationsGet: require('./notificationsGet'),
     notificationsRemove: require('./notificationsRemove'),
     notificationsTest: require('./notificationsTest'),
+    diagnose: require('./diagnose'),
 };

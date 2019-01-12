@@ -4,43 +4,6 @@ sudo: required
 
 jobs:
   include:
-    # In app tests
-    ##############
-    - stage: test
-      env:
-        - IN_APP_TEST
-      node_js:
-        - "8.9.4"
-      cache:
-        directories:
-          - build/src/node_modules
-      install:
-        # This is a dockerized application, the node app is in /build/src
-        - cd ./build/src
-        - npm install
-      before_script:
-        - npm run lint
-      script:
-        - npm test -- --coverage # Include coverage when running tests
-      after_success: # Upload coverage reports
-        - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coveralls
-
-    # integration tests
-    ###################
-    - stage: test
-      env:
-        - INTEGRATION_TEST
-      node_js:
-        - "8.9.4"
-      services:
-        - docker
-      before_script:
-        - chmod +x test/before_install.sh
-        - chmod +x test/test_integration.sh
-        - test/before_install.sh
-      script:
-        - test/test_integration.sh
-
     # Test that it builds correctly
     ###############################
     - stage: build test
@@ -49,52 +12,32 @@ jobs:
       script:
         - docker-compose -f "$(find . -maxdepth 1 -name "docker-compose*")" build
 
-    # Deploy stage, all code below is common between DAppNode packages
-    ##################################################################
+    # Deploy stage
+    # - code below is common between DAppNode packages
+    ##################################################
     - stage: release
       services:
         - docker
       script: skip
       node_js: lts/*
       before_deploy:
-        # Run the dappnodesdk
-        - travis_retry npm install -g @dappnode/dappnodesdk
-        - export TRAVIS_TAG=$(IPFS_PROVIDER=ipfs.infura.io IPFS_PROTO=https PROVIDER=wss://mainnet.infura.io/ws dappnodesdk next patch)
-        - echo "NEXT TRAVIS_TAG $TRAVIS_TAG"
-        - IPFS_PROVIDER=ipfs.infura.io IPFS_PROTO=https PROVIDER=wss://mainnet.infura.io/ws SILENT=true dappnodesdk publish patch
-        # Set up git user name
-        - git config --global user.email "dappnode@dappnode.io"
-        - git config --global user.name "dappnode"
-        # Correct origin to push new branch
-        - git remote rm origin
-        - git remote add origin https://user:${GITHUB_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git
-        # Check if the tag exists, if so delete it
-        - if [ $(git tag -l "$TRAVIS_TAG") ]; then export DELETE_TAG=true ; fi
-        - if [ $DELETE_TAG ]; then git push --delete origin $TRAVIS_TAG || echo "Error deleting tag from origin" ; fi
-        - if [ $DELETE_TAG ]; then git tag --delete $TRAVIS_TAG || echo "Error deleting tag locally" ; fi
-        # Tag this commit
-        - git tag $TRAVIS_TAG
-        # Return to master.
-        - git checkout master
+        - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/before_deploy.sh
+        - source before_deploy.sh
       deploy:
         provider: releases
         prerelease: true
-        overwrite: true
         api_key: "$GITHUB_TOKEN"
         file_glob: true
-        file: build_${TRAVIS_TAG}/*
+        # $RELEASE_VERSION is exported on before_deploy.sh
+        file: build_${RELEASE_VERSION}/*
         skip_cleanup: true
-        name: "v$TRAVIS_TAG"
+        # $TRAVIS_TAG is exported on before_deploy.sh
+        name: "$TRAVIS_TAG"
         body: "# Changelog"
         on:
           branch: master
+          tags: true
+          condition: "$TRAVIS_TAG =~ ^release*$"
       after_deploy:
-        echo "Successfully released"
-        # - export GIT_BRANCH="master"
-        # - bash github_release_script.sh
-        # - echo "FINAL AFTER RELEASE SCRIPT"
-        # - echo "$(Date)" > a.text
-        # - git add .
-        # - git commit -m "message"
-        # - git checkout -b "v0.1.15"
-        # - git push origin "v0.1.15"
+        - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
+        - source after_deploy.sh
