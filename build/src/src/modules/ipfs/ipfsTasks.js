@@ -112,7 +112,7 @@ const download = async (HASH, PATH, logChunks, options) => {
     await downloadHandler(HASH, PATH, logChunks, options);
     // If download was successful, pin file. Pin paralelly, and don't propagate errors
     ipfs.pin.add(HASH, (err) => {
-        if (err) logs.error('Error pinging hash '+HASH+': '+err.message);
+        if (err) logs.error('Error pinning hash '+HASH+': '+err.message);
     });
 };
 
