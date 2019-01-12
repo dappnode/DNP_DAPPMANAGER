@@ -23,6 +23,9 @@ const logPackage = async ({
   id,
   options,
 }) => {
+  if (!id) {
+    throw Error('A valid DNP id must be passed as a kwargs to logPackage: ');
+  }
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error('No docker-compose found: ' + dockerComposePath);
