@@ -5,8 +5,14 @@ const shell = require('utils/shell');
 
 const MIN_BLOCK_DIFF_SYNC = 3;
 
-async function bitcoin(chain) {
-    const res = {name: chain.name};
+// After revising 'bitcoin-core' source code,
+// there is no problem in creating a new instance of Client on each request
+
+// Cache the blockIndex to prevent unnecessary calls
+const cache = {};
+
+async function bitcoin({name, api}) {
+    const res = {name};
     try {
         // To initialize the bitcoin client, the RPC user and password are necessary
         // They are stored in the package envs
@@ -22,13 +28,17 @@ async function bitcoin(chain) {
         });
 
         const client = new Client({
-            host: chain.api,
+            host: api,
             password: rpcUser,
             username: rpcPassword,
         });
         const blockIndex = await client.getBlockCount();
-        const blockHash = await client.getBlockHash(blockIndex);
-        const block = await client.getBlock(blockHash);
+        // If the cached blockIndex is the same, return cached block
+        const block = (cache[api] || {}).blockIndex === blockIndex
+            ? cache[api].block
+            : await client.getBlockHash(blockIndex).then(client.getBlock);
+        // Update cached values
+        cache[api] = {blockIndex, block};
         const secondsDiff = Math.floor(Date.now()/1000) - block.time;
         const blockDiffAprox = Math.floor(secondsDiff/(60*10));
 

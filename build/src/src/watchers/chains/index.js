@@ -43,6 +43,16 @@ const supportedProviders = {
         api: 'http://my.kovan.dnp.dappnode.eth:8545',
     //  api: 'ws://my.kovan.dnp.dappnode.eth:8546',
     },
+    'goerli-geth.dnp.dappnode.eth': {
+        name: 'Goerli-geth',
+        module: 'ethereum',
+        api: 'http://my.goerli-geth.dnp.dappnode.eth:8545',
+    },
+    'goerli-pantheon.dnp.dappnode.eth': {
+        name: 'Goerli-pantheon',
+        module: 'ethereum',
+        api: 'http://my.goerli-pantheon.dnp.dappnode.eth:8545',
+    },
     'bitcoin.dnp.dappnode.eth': {
         name: 'Bitcoin',
         module: 'bitcoin',
@@ -128,9 +138,27 @@ setInterval(async () => {
 // Also get and emit chain data immediately after the UI has requested it
 eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 
+// Don't start new requests if the previous one is still active.
+// If it is still active return the last result.
+// The current ADMIN UI requires a full array of chain data
+const cache = {};
 async function getAndEmitChainData() {
-    const chainData = await Promise.all(Object.values(activeChains).map(
-        (chain) => modules[chain.module](chain)
-    ));
+    const dnpList = await dockerList.listContainers();
+    const chainData = await Promise.all(Object.keys(activeChains).filter((dnpName) => {
+        const dnp = dnpList.find((_dnp) => _dnp.name === dnpName);
+        return dnp && dnp.running;
+    }).map(async (dnpName) => {
+        const chain = activeChains[dnpName];
+        const id = chain.api;
+        if (!cache[id]) cache[id] = {};
+        // Return last result if previous call is still active
+        if (cache[id].active) return cache[id].lastResult;
+        // Otherwise raise active flag and perform the request
+        cache[id].active = true;
+        const result = await modules[chain.module](chain);
+        cache[id].active = false;
+        cache[id].lastResult = result;
+        return result;
+    }));
     eventBus.emit(eventBusTag.emitChainData, {chainData});
 }
