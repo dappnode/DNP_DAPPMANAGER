@@ -21,10 +21,14 @@ const fs = require('fs');
 module.exports = {
 
   packageRepoDir: function(PACKAGE_NAME, params, IS_CORE) {
+    if (!PACKAGE_NAME) throw Error('Package name must be defined');
+    if (!params) throw Error('Package name must be defined');
     return repoDir(PACKAGE_NAME, params, IS_CORE);
   },
 
   manifest: function(PACKAGE_NAME, params, IS_CORE) {
+    if (!PACKAGE_NAME) throw Error('Package name must be defined');
+    if (!params) throw Error('Package name must be defined');
     return repoDir(PACKAGE_NAME, params, IS_CORE) + '/'
     + manifestName(PACKAGE_NAME, params, IS_CORE);
   },
@@ -32,6 +36,8 @@ module.exports = {
   dockerCompose: dockerCompose,
 
   dockerComposeSmart: function(PACKAGE_NAME, params) {
+    if (!PACKAGE_NAME) throw Error('Package name must be defined');
+    if (!params) throw Error('Package name must be defined');
     // First check for core docker-compose
     let DOCKERCOMPOSE_PATH = dockerCompose(PACKAGE_NAME, params, true);
     if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
@@ -42,6 +48,8 @@ module.exports = {
   envFile: envFile,
 
   envFileSmart: function(PACKAGE_NAME, params, isCORE) {
+    if (!PACKAGE_NAME) throw Error('Package name must be defined');
+    if (!params) throw Error('Package name must be defined');
     if (isCORE) return envFile(PACKAGE_NAME, params, true);
     // First check for core docker-compose
     let ENV_FILE_PATH = envFile(PACKAGE_NAME, params, true);

@@ -4,10 +4,10 @@ const Daemon = require('monero-rpc').Daemon;
 
 const MIN_BLOCK_DIFF_SYNC = 15;
 
-async function monero(chain) {
-    const res = {name: chain.name};
+async function monero({name, api}) {
+    const res = {name};
     try {
-        const daemon = new Daemon(chain.api);
+        const daemon = new Daemon(api);
         // Promisify the callback style daemon.getInfo. One-liner ugly syntax
         const info = await new Promise((res, rej) => daemon.getInfo((e, r) => e ? rej(e) : res(r)));
         const highestBlock = info.target_height;
