@@ -3,6 +3,7 @@ dist: trusty
 sudo: required
 
 stages:
+  - name: test
   - name: build-test
     if: tag != "release"
   - name: release
