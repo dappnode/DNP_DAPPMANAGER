@@ -22,16 +22,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 - git
 
-   Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) commandline tool.
+  Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) commandline tool.
 
 - docker
 
-   Install [docker](https://docs.docker.com/engine/installation). The community edition (docker-ce) will work. In Linux make sure you grant permissions to the current user to use docker by adding current user to docker group, `sudo usermod -aG docker $USER`. Once you update the users group, exit from the current terminal and open a new one to make effect.
+  Install [docker](https://docs.docker.com/engine/installation). The community edition (docker-ce) will work. In Linux make sure you grant permissions to the current user to use docker by adding current user to docker group, `sudo usermod -aG docker $USER`. Once you update the users group, exit from the current terminal and open a new one to make effect.
 
 - docker-compose
 
-   Install [docker-compose](https://docs.docker.com/compose/install)
-   
+  Install [docker-compose](https://docs.docker.com/compose/install)
+
 **Note**: Make sure you can run `git`, `docker ps`, `docker-compose` without any issue and without sudo command.
 
 ### Building
@@ -42,25 +42,32 @@ $ git clone https://github.com/dappnode/DNP_DAPPMANAGER.git
 
 ```
 $ docker-compose build
-or 
-$ docker build --rm -f build/Dockerfile -t DNP_DAPPMANAGER:dev build 
+or
+$ docker build --rm -f build/Dockerfile -t dappmanager.dnp.dappnode.eth:dev build
 ```
 
 ## Running
 
 ### Start
+
 ```
 $ docker-compose up -d
 ```
+
 ### Stop
+
 ```
 $ docker-compose down
 ```
+
 ### Status
+
 ```
 $ docker-compose ps
 ```
+
 ### Logs
+
 ```
 $ docker-compose logs -f
 ```
@@ -69,10 +76,10 @@ $ docker-compose logs -f
 
 ## Generating a tar.xz image
 
-[xz](https://tukaani.org/xz/) is required 
+[xz](https://tukaani.org/xz/) is required
 
 ```
-$ docker save DNP_DAPPMANAGER:dev | xz -9 > DNP_DAPPMANAGER.tar.xz
+$ docker save dappmanager.dnp.dappnode.eth:dev | xz -9 > dappmanager.dnp.dappnode.eth_x.y.z.tar.xz
 ```
 
 You can download the latest tar.xz version from here [releases](https://github.com/dappnode/DNP_DAPPMANAGER/releases).
@@ -80,7 +87,7 @@ You can download the latest tar.xz version from here [releases](https://github.c
 ### Loading a Docker image
 
 ```
-$docker load -i DNP_DAPPMANAGER.tar.xz
+$docker load -i dappmanager.dnp.dappnode.eth.x.y.z.tar.xz
 ```
 
 ## Contributing
@@ -89,12 +96,12 @@ Please read [CONTRIBUTING.md](https://github.com/dappnode) for details on our co
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DNP_DAPPMANAGER/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/dappnode/DNP_DAPPMANAGER/tags).
 
 ## Authors
 
-* **Eduardo Antuña Díez** - *Initial work* - [eduadiez](https://github.com/eduadiez)
-* **DAppLion** - [dapplion](https://github.com/dapplion)
+- **Eduardo Antuña Díez** - _Initial work_ - [eduadiez](https://github.com/eduadiez)
+- **DAppLion** - [dapplion](https://github.com/dapplion)
 
 See also the list of [contributors](https://github.com/dappnode/DNP_DAPPMANAGER/contributors) who participated in this project.
 
