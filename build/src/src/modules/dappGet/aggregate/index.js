@@ -1,7 +1,6 @@
 const dockerList = require('modules/dockerList');
 const validate = require('utils/validate');
 const semver = require('semver');
-const safeSemver = require('../utils/safeSemver');
 const logs = require('logs.js')(module);
 const aggregateDependencies = require('./aggregateDependencies');
 const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
@@ -97,27 +96,7 @@ async function aggregate({req, dnpList}) {
 
     // Enfore conditions:
     // - requested DNP versions must match the provided versionRange
-    Object.keys(dnps)
-    .filter((dnpName) => dnps[dnpName].isRequest)
-    .forEach((dnpName) => {
-        Object.keys(dnps[dnpName].versions).forEach((version) => {
-            if (safeSemver.satisfies(version, req.ver)) {
-                delete dnps[dnpName].versions[version];
-            }
-        });
-    });
     // - installed DNPs cannot be downgraded
-    Object.keys(dnps)
-    .filter((dnpName) => dnps[dnpName].isState)
-    .forEach((dnpName) => {
-        const currentVersion = (dnpList.find((dnp) => dnp.name === dnpName) || {}).version;
-        Object.keys(dnps[dnpName].versions).forEach((version) => {
-            if (semver.valid(version) && semver.valid(currentVersion)
-            && semver.lt(version, currentVersion)) {
-                delete dnps[dnpName].versions[version];
-            }
-        });
-    });
 
     return dnps;
 }
