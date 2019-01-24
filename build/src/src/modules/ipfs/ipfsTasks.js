@@ -1,6 +1,7 @@
 const fs = require('fs');
 const {promisify} = require('util');
 const validate = require('utils/validate');
+const verifyXz = require('utils/verifyXz');
 
 /**
  * IPFS methods.
@@ -21,6 +22,11 @@ const CACHE_DIR = params.CACHE_DIR;
 const isfileHashValid = async (providedHash, PATH) => {
     // First, ensure that the PATH file is correct
     if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) return false;
+
+    // If the file is a .xz, verify it. If the test succeeds, continue execution
+    if (PATH && PATH.endsWith('.xz') && !(await verifyXz(PATH))) {
+        return false;
+    }
 
     /*
     * > TODO: Verify that the file is not too old
