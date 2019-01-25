@@ -1,6 +1,6 @@
-const fetchVersions = require('./fetchVersions');
-const fetchDependencies = require('./fetchDependencies');
 const {hasVersion, setVersion} = require('../utils/dnpUtils');
+const sanitizeVersions = require('./sanitizeVersions');
+const sanitizeDependencies = require('./sanitizeDependencies');
 const logs = require('logs.js')(module);
 
 /**
@@ -20,21 +20,33 @@ const logs = require('logs.js')(module);
  * Non-semver versions
  */
 
-async function aggregateDependencies({name, versionRange, dnps, recursiveCount}) {
+async function aggregateDependencies({
+    name,
+    versionRange,
+    dnps,
+    recursiveCount,
+    fetch,
+}) {
     // Control infinite loops
     if (!recursiveCount) recursiveCount = 1;
     else if (recursiveCount++ > 1000) return;
 
+    // Check injected dependency
+    if (!fetch) throw Error('injected dependency "fetch" is not defined');
+
     // 1. Fetch versions of "name" that match this request
     //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
-    const versions = await fetchVersions({name, versionRange});
+    const versions = await fetch.versions({name, versionRange})
+    .then(sanitizeVersions);
     await Promise.all(versions.map(async (version) => {
         // Already checked, skip. Otherwise lock request to prevent duplicate fetches
         if (hasVersion(dnps, name, version)) return;
         else setVersion(dnps, name, version, {});
         // 2. Get dependencies of this specific version
         //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-        const dependencies = await fetchDependencies({name, version}).catch((e) => {
+        const dependencies = await fetch.dependencies({name, version})
+        .then(sanitizeDependencies)
+        .catch((e) => {
             logs.warn(`Error fetching ${name}@${version} dependencies (assuming it has none). Error stack: ${e.stack}`);
             return {};
         });
@@ -47,6 +59,7 @@ async function aggregateDependencies({name, versionRange, dnps, recursiveCount})
                 versionRange: dependencies[dependencyName],
                 dnps,
                 recursiveCount,
+                fetch,
             });
         }));
     }));

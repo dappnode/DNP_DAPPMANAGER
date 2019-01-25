@@ -8,6 +8,7 @@
     "dev": "NODE_ENV=development npm start",
     "file": "NODE_PATH=src node",
     "test": "NODE_PATH=src TEST=true mocha \"./{,!(node_modules)/**}/*.test.js\" ",
+    "test-file": "NODE_PATH=src TEST=true mocha ",
     "test.int": "NODE_PATH=src NODE_ENV=development LOG_LEVEL=debug mocha \"./{,!(node_modules)/**}/*.test.int.js\" ",
     "test-nyc": "nyc npm run test",
     "test.int-nyc": "nyc npm run test.int",

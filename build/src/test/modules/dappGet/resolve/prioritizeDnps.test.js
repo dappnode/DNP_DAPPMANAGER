@@ -19,8 +19,8 @@ describe('dappGet/resolve/prioritizeDnps', () => {
     it('should order dnps: Others > state > request', async () => {
         const dnps = {
             A: {isRequest: true, versions: []},
-            B: {isState: true, versions: []},
-            C: {isState: true, versions: []},
+            B: {isInstalled: true, versions: []},
+            C: {isInstalled: true, versions: []},
             D: {versions: []},
             E: {versions: []},
         };
@@ -28,8 +28,8 @@ describe('dappGet/resolve/prioritizeDnps', () => {
         expect(dnpsArray).to.deep.equal([
             {name: 'D', versions: []},
             {name: 'E', versions: []},
-            {name: 'B', isState: true, versions: []},
-            {name: 'C', isState: true, versions: []},
+            {name: 'B', isInstalled: true, versions: []},
+            {name: 'C', isInstalled: true, versions: []},
             {name: 'A', isRequest: true, versions: []},
         ]);
     });

@@ -34,20 +34,24 @@ const aggregateDependencies = sinon.stub().callsFake(async ({name, versionRange,
     if (name === 'nginx-proxy.dnp.dappnode.eth') {
         dnps['nginx-proxy.dnp.dappnode.eth'] = {
             versions: {
+                ...((dnps['nginx-proxy.dnp.dappnode.eth'] || {}).versions || {}),
                 '0.1.0': {'dependency.dnp.dappnode.eth': '^0.1.1'},
             },
         };
         dnps['dependency.dnp.dappnode.eth'] = {
             versions: {
+                ...((dnps['dependency.dnp.dappnode.eth'] || {}).versions || {}),
                 '0.1.1': {},
                 '0.1.2': {},
             },
         };
+        return;
     }
     const dnp = dnpList.find((dnp) => dnp.name === name);
     if (dnp) {
         dnps[dnp.name] = {
             versions: {
+                ...((dnps[dnp.name] || {}).versions || {}),
                 [dnp.version]: dnp.dependencies,
             },
         };
@@ -79,6 +83,42 @@ describe('dappGet/aggregate', () => {
         dnps = await aggregate({req});
     });
 
+    it('Should aggregate labeled the packages correctly', () => {
+        expect(dnps).to.deep.equal({
+            'dependency.dnp.dappnode.eth': {
+              versions: {
+                '0.1.1': {},
+                '0.1.2': {},
+              },
+            },
+            'letsencrypt-nginx.dnp.dappnode.eth': {
+              isInstalled: true,
+              versions: {
+                '0.0.4': {
+                  'web.dnp.dappnode.eth': 'latest',
+                },
+              },
+            },
+            'nginx-proxy.dnp.dappnode.eth': {
+              isRequest: true,
+              versions: {
+                '0.1.0': {
+                  'dependency.dnp.dappnode.eth': '^0.1.1',
+                },
+              },
+            },
+            'web.dnp.dappnode.eth': {
+              isInstalled: true,
+              versions: {
+                '0.0.0': {
+                  'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
+                  'nginx-proxy.dnp.dappnode.eth': 'latest',
+                },
+              },
+            },
+        });
+    });
+
     it('Should call list containers once', () => {
         sinon.assert.calledOnce(dockerList.listContainers);
     });
@@ -97,43 +137,6 @@ describe('dappGet/aggregate', () => {
             const {name, versionRange} = aggregateDependencies.getCall(i).args[0];
             expect(name).to.equal(dnp.name, `aggregateDependencies call ${i} should be for dnp name: "${dnp.name}"`);
             expect(versionRange).to.equal(dnp.versionRange, `aggregateDependencies call ${i} should be for dnp ${dnp.name} versionRange: "${dnp.versionRange}"`);
-        });
-    });
-
-    it('Should aggregate labeled the packages correctly', () => {
-        expect(dnps).to.deep.equal({
-            'dependency.dnp.dappnode.eth': {
-              isNotInstalled: true,
-              versions: {
-                '0.1.1': {},
-                '0.1.2': {},
-              },
-            },
-            'letsencrypt-nginx.dnp.dappnode.eth': {
-              isState: true,
-              versions: {
-                '0.0.4': {
-                  'web.dnp.dappnode.eth': 'latest',
-                },
-              },
-            },
-            'nginx-proxy.dnp.dappnode.eth': {
-              isRequest: true,
-              versions: {
-                '0.0.3': {
-                  'nginx-proxy.dnp.dappnode.eth': 'latest',
-                },
-              },
-            },
-            'web.dnp.dappnode.eth': {
-              isState: true,
-              versions: {
-                '0.0.0': {
-                  'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
-                  'nginx-proxy.dnp.dappnode.eth': 'latest',
-                },
-              },
-            },
         });
     });
 });

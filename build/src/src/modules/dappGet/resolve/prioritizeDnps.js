@@ -26,16 +26,16 @@
  *
  * @param {Object} dnps = {
  *   A: {isRequest: true, versions: []},
- *   B: {isState: true, versions: []},
- *   C: {isState: true, versions: []},
+ *   B: {isInstalled: true, versions: []},
+ *   C: {isInstalled: true, versions: []},
  *   D: {versions: []},
  *   E: {versions: []},
  * }
  * @return {Array} dnpsArray = [
  *   {name: 'D', versions: []},
  *   {name: 'E', versions: []},
- *   {name: 'B', isState: true, versions: []},
- *   {name: 'C', isState: true, versions: []},
+ *   {name: 'B', isInstalled: true, versions: []},
+ *   {name: 'C', isInstalled: true, versions: []},
  *   {name: 'A', isRequest: true, versions: []},
  * ]
  */
@@ -46,8 +46,8 @@ function prioritizeDnps(dnps) {
     .sort((dnpA, dnpB) => {
         if (dnpA.isRequest) return 1;
         else if (dnpB.isRequest) return -1;
-        else if (dnpA.isState && !dnpB.isState) return 1;
-        else if (!dnpA.isState && dnpB.isState) return -1;
+        else if (dnpA.isInstalled && !dnpB.isInstalled) return 1;
+        else if (!dnpA.isInstalled && dnpB.isInstalled) return -1;
         else return 0;
     });
 }
