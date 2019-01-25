@@ -2,7 +2,7 @@ const dockerList = require('modules/dockerList');
 const validate = require('utils/validate');
 const semver = require('semver');
 const logs = require('logs.js')(module);
-const aggregateDependencies = require('./aggregateDependencies');
+const _aggregateDependencies = require('./aggregateDependencies');
 const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
 
 /**
@@ -51,7 +51,9 @@ const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
  *   },
  * };
  */
-async function aggregate({req, dnpList}) {
+async function aggregate({req, dnpList, fetch}) {
+    // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
+    const aggregateDependencies = (kwargs) => _aggregateDependencies({...kwargs, fetch});
     const dnps = {};
 
     // WARNING: req is a user external input, must verify
