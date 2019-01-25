@@ -2,23 +2,72 @@ language: node_js
 dist: trusty
 sudo: required
 
+stages:
+  - name: test
+  - name: build-test
+    if: tag != "release"
+  - name: release
+    if: tag = "release"
+
 jobs:
   include:
+    # In app tests
+    ##############
+    - stage: test
+      env:
+        - IN_APP_TEST
+      node_js:
+        - "8.9.4"
+      cache:
+        directories:
+          - build/src/node_modules
+      install:
+        # This is a dockerized application, the node app is in /build/src
+        - cd ./build/src
+        - npm install
+      before_script:
+        - npm run lint
+      script:
+        - npm test -- --coverage # Include coverage when running tests
+      after_success: # Upload coverage reports
+        - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coveralls
+
+    # integration tests
+    ###################
+    - stage: test
+      env:
+        - INTEGRATION_TEST
+      node_js:
+        - "8.9.4"
+      services:
+        - docker
+      before_script:
+        - chmod +x test/before_install.sh
+        - chmod +x test/test_integration.sh
+        - test/before_install.sh
+      script:
+        - test/test_integration.sh
+
     # Test that it builds correctly
     ###############################
-    - stage: build test
+    - stage: build-test
+      name: build-test
       services:
         - docker
       script:
-        - docker-compose -f "$(find . -maxdepth 1 -name "docker-compose*")" build
+        - docker-compose build
 
     # Deploy stage
     # - code below is common between DAppNode packages
     ##################################################
     - stage: release
+      name: release
       services:
         - docker
-      script: skip
+      script:
+        - npm install -g @dappnode/dappnodesdk
+        - docker-compose build
+        - dappnodesdk publish patch -p infura
       node_js: lts/*
       before_deploy:
         - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/before_deploy.sh
