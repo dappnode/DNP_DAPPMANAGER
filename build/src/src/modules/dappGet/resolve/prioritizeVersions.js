@@ -10,7 +10,8 @@ const {getVersionsFromDnp} = require('../utils/dnpUtils');
  *
  * @param {Object} dnp: {
  *   versions: ['0.1.0', '0.1.2', '/ipfs/Qm443d2...']
- *   isRequest: true // or isState or isNotInstalled
+ *   isRequest: true / false
+ *   isInstalled true / false
  * }
  * @return {Array} versions: ['0.1.2', '0.1.0']
  */
@@ -22,17 +23,13 @@ function prioritizeVersions(dnp) {
         return versions.sort(safeSemver.rcompare);
     }
     // 2. State package, oldest first
-    if (dnp.isState) {
+    else if (dnp.isInstalled) {
         return versions.sort(safeSemver.compare);
     }
     // 3. New packages, newest first
     // + Prioritize not installing new packages, first version = null.
-    if (dnp.isNotInstalled) {
-        return [null, ...versions.sort(safeSemver.rcompare)];
-    }
-    // In case of error return default ordering
     else {
-        return versions.sort(safeSemver.rcompare);
+        return [null, ...versions.sort(safeSemver.rcompare)];
     }
 }
 

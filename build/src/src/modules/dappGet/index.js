@@ -1,6 +1,8 @@
+const fetch = require('./fetch');
 const aggregate = require('./aggregate');
 const resolve = require('./resolve');
 const dockerList = require('modules/dockerList');
+const logs = require('logs.js')(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -50,8 +52,10 @@ async function dappGet(req) {
     // Aggregate
     let dnps;
     try {
-        dnps = await aggregate({req, dnpList});
+        // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
+        dnps = await aggregate({req, dnpList, fetch});
     } catch (e) {
+        logs.error(`dappGet aggregate error: ${e.stack}`);
         return {
             e,
             success: false,
@@ -64,6 +68,7 @@ async function dappGet(req) {
     try {
         result = resolve(dnps);
     } catch (e) {
+        logs.error(`dappGet resolve error: ${e.stack}`);
         return {
             e,
             success: false,
