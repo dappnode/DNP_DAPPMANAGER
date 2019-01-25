@@ -20,7 +20,7 @@ Given the complexity of the dependencies relations, the chosen way to solve a re
 
 Given a specific request, the resolver aggreates all possible versions of requested DNP and its recursive dependencies.
 
-```javascript
+```js
 const versionPermutations = [
   { name: "A", versions: ["2.2.0", "2.1.0", "2.0.0"], n: 3, m: 1 },
   { name: "C", versions: ["2.0.0", "1.0.0"], n: 2, m: 3 },
@@ -30,7 +30,7 @@ const versionPermutations = [
 
 Properties `n` and `m` are use by the permutator to compute each version permutation as such:
 
-```javascript
+```js
 const versionPermutation = {};
 for (const dnp of versionPermutations) {
   versionPermutation[dnp.name] = dnp.versions[Math.floor(i / dnp.m) % dnp.n];
@@ -56,7 +56,7 @@ After explaining the resolver algorythm, notice that it needs a list of DNPs and
 
 User requests DNP A@1.0.0. The aggregator will fetch the dependencies of A@1.0.0:
 
-```javascript
+```js
 A.dependencies = { B: "^1.0.0", C: "/ipfs/QmZcg3..." };
 ```
 
@@ -79,7 +79,7 @@ The first job of the module is to realise that packages C and D are of insterest
 1.  Resolve the dependencies of the user's request: `packagesRequested = ["A", "C"]`
 2.  Check if any installed package depends on that
 
-```javascript
+```js
 packagesRequested = ["A", "C"];
 packagesInstalled = ["B", "C", "D"];
 // Now interest packagesRequested ∩ packagesInstalled
@@ -99,3 +99,65 @@ function addDependants(pkg) {
 }
 // First round will add only C. Second round will see that B => C and add B. Third round will see that D => B and add D.
 ```
+
+## Types of versions
+
+### APM version
+
+DNPs are managed by an Aragon Package Manager (APM). For a DNP request
+
+```js
+{
+    name: 'kovan.dnp.dappnode.eth',
+    ver: '0.1.0'
+}
+```
+
+the resolver and the DNP_DAPPMANAGER assume that the ENS domain `kovan.dnp.dappnode.eth` will resolve to an APM contract where the version `[0,1,0]` resolves to the IPFS hash of a valid manifest.
+
+Semver ranges are supported, so for the request
+
+```js
+{
+    name: 'kovan.dnp.dappnode.eth',
+    ver: '^0.1.0'
+}
+```
+
+the resolver will go to the `kovan.dnp.dappnode.eth` APM, query all versions and return the ones that satisfy the range `^0.1.0`.
+
+### IPFS version
+
+Alternatively, a DNP version can be refered to directly by their IPFS hash
+
+```js
+{
+    name: 'kovan.dnp.dappnode.eth',
+    ver: 'ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C'
+}
+```
+
+IPFS versions refer to a specific version, which is found in the manifest after resolving the hash. Unlike regular semver versions (APM versions) these do not support ranges.
+
+Conceptually, (assuming ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C resolves to version `0.1.1`) the resolver will convert the request above to
+
+```js
+{
+    name: 'kovan.dnp.dappnode.eth',
+    ver: '0.1.1',
+    origin: 'ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C'
+}
+```
+
+Now the resolver can understand and process this version while tracking its origin to perform the installation latter.
+
+#### IPFS + semver version
+
+> WIP
+
+What happens when a DNP requests `dnp-a@0.1.0` while another requests `dnp-a@ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C (0.1.0)`? There are two requests for the same semver version but they actually point to different content.
+
+Rules:
+
+- An IPFS version must always have priority and be installed. If `dnp-a@ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C (0.1.0)` is requested and `dnp-a@0.1.0` is installed, the IPFS version should be installed.
+- If `dnp-a@0.1.0` is request and `dnp-a@ipfs/QmRJyLJDiHjd1jbDGJsxEvMqcibaYmkkHLQHvDudYpRB6C (0.1.0)` is installed, the non-IPFS version should be installed.
