@@ -23,17 +23,19 @@ const sinon = require('sinon');
  *   - 'dnpC.dnp.dappnode.eth' => 'dnpA.dnp.dappnode.eth'
  */
 
+const aggregateDependencies = proxyquire('modules/dappGet/aggregate/aggregateDependencies', {});
+
 
 const fetchVersions = (versions) => sinon.stub().callsFake(async ({name, versionRange}) => {
     if (!versions[name]) throw Error(`No versions found for dnp: ${name}`);
     return versions[name].filter((version) => semver.satisfies(version, versionRange));
 });
 
-
 const fetchDependencies = (dependencies) => sinon.stub().callsFake(async ({name, version}) => {
     if (!dependencies[name]) throw Error(`No dependencies found for dnp: ${name}`);
     return dependencies[name];
 });
+
 
 describe('dappGet/aggregate/aggregateDependencies', () => {
     it('should fetch the correct dependencies', async () => {
@@ -48,15 +50,16 @@ describe('dappGet/aggregate/aggregateDependencies', () => {
             },
             'dependency.dnp.dappnode.eth': {},
         };
-        const aggregateDependencies =
-            proxyquire('modules/dappGet/aggregate/aggregateDependencies', {
-                './fetchVersions': fetchVersions(versions),
-                './fetchDependencies': fetchDependencies(dependencies),
-            });
+
+        const fetch = {
+            dependencies: fetchDependencies(dependencies),
+            versions: fetchVersions(versions),
+        };
+
         const name = 'kovan.dnp.dappnode.eth';
         const versionRange = '0.1.0';
         const dnps = {};
-        await aggregateDependencies({name, versionRange, dnps});
+        await aggregateDependencies({name, versionRange, dnps, fetch});
 
         expect(dnps).to.deep.equal({
             'kovan.dnp.dappnode.eth': {
@@ -85,15 +88,16 @@ describe('dappGet/aggregate/aggregateDependencies', () => {
             'dnpB.dnp.dappnode.eth': {'dnpC.dnp.dappnode.eth': '^0.1.0'},
             'dnpC.dnp.dappnode.eth': {'dnpA.dnp.dappnode.eth': '^0.1.0'},
         };
-        const aggregateDependencies =
-            proxyquire('modules/dappGet/aggregate/aggregateDependencies', {
-                './fetchVersions': fetchVersions(versions),
-                './fetchDependencies': fetchDependencies(dependencies),
-            });
+
+        const fetch = {
+            dependencies: fetchDependencies(dependencies),
+            versions: fetchVersions(versions),
+        };
+
         const name = 'dnpA.dnp.dappnode.eth';
         const versionRange = '0.1.0';
         const dnps = {};
-        await aggregateDependencies({name, versionRange, dnps});
+        await aggregateDependencies({name, versionRange, dnps, fetch});
 
         expect(dnps).to.deep.equal({
             'dnpA.dnp.dappnode.eth': {versions: {'0.1.0': {'dnpB.dnp.dappnode.eth': '^0.1.0'}}},
