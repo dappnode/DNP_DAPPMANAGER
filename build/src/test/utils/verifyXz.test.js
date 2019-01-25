@@ -20,22 +20,24 @@ describe('Util: verifyXz', function() {
         await cleanFiles();
         await shell(`echo "some content" > ${okFilePreCompress}`);
         await shell(`xz ${okFilePreCompress}`);
-        await shell(`echo "bad content" > ${corruptFilePath.replace('.xz', '')}`);
+        await shell(`echo "bad content" > ${corruptFilePath}`);
     });
 
     it('okFilePath should be OK', async () => {
-        const isOk = await verifyXz(okFilePath);
-        expect(isOk).equal(true);
+        const result = await verifyXz(okFilePath);
+        expect(result.success).equal(true);
     });
 
     it('corruptFilePath should NOT be ok', async () => {
-        const isOk = await verifyXz(corruptFilePath);
-        expect(isOk).equal(false);
+        const result = await verifyXz(corruptFilePath);
+        expect(result.success).equal(false);
+        expect(result.message).to.include('File format not recognized');
     });
 
     it('missingFilePath should NOT be ok', async () => {
-        const isOk = await verifyXz(missingFilePath);
-        expect(isOk).equal(false);
+        const result = await verifyXz(missingFilePath);
+        expect(result.success).equal(false);
+        expect(result.message).to.include('No such file or directory');
     });
 
     after(async () => {
