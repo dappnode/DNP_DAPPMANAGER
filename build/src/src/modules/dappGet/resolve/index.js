@@ -8,19 +8,18 @@ const findCompatibleState = require('./findCompatibleState');
  * The criteria to qualify the "first" found combination is:
  * - The requested package has the highest version
  * - The already installed packages have the closest version to the current one
- * - Newly installed packages have the highest versions
+ * - Not installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
  * @param {Object} dnps = {
  *  "dependency.dnp.dappnode.eth": {
- *    isNotInstalled: true,
  *    versions: {
  *      "0.1.1": {},
  *      "0.1.2": {}
  *    }
  *  },
  *  "letsencrypt-nginx.dnp.dappnode.eth": {
- *    isState: true,
+ *    isInstalled: true,
  *    versions: {
  *      "0.0.4": { "web.dnp.dappnode.eth": "latest" }
  *    }
