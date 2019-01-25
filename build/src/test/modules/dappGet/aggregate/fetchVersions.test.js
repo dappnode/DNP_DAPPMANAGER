@@ -19,11 +19,11 @@ const apm = {
 };
 
 const fetchVersions =
-    proxyquire('modules/dappGet/aggregate/fetchVersions', {
+    proxyquire('modules/dappGet/fetch/fetchVersions', {
         'modules/apm': apm,
     });
 
-describe('dappGet/aggregate/fetchVersions', () => {
+describe('dappGet/fetch/fetchVersions', () => {
     it('Should call APM given a valid semver range', async () => {
         const versions = await fetchVersions({
             name: 'kovan.dnp.dappnode.eth',
