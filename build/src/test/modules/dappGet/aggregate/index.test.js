@@ -34,20 +34,24 @@ const aggregateDependencies = sinon.stub().callsFake(async ({name, versionRange,
     if (name === 'nginx-proxy.dnp.dappnode.eth') {
         dnps['nginx-proxy.dnp.dappnode.eth'] = {
             versions: {
+                ...((dnps['nginx-proxy.dnp.dappnode.eth'] || {}).versions || {}),
                 '0.1.0': {'dependency.dnp.dappnode.eth': '^0.1.1'},
             },
         };
         dnps['dependency.dnp.dappnode.eth'] = {
             versions: {
+                ...((dnps['dependency.dnp.dappnode.eth'] || {}).versions || {}),
                 '0.1.1': {},
                 '0.1.2': {},
             },
         };
+        return;
     }
     const dnp = dnpList.find((dnp) => dnp.name === name);
     if (dnp) {
         dnps[dnp.name] = {
             versions: {
+                ...((dnps[dnp.name] || {}).versions || {}),
                 [dnp.version]: dnp.dependencies,
             },
         };
@@ -79,27 +83,6 @@ describe('dappGet/aggregate', () => {
         dnps = await aggregate({req});
     });
 
-    it('Should call list containers once', () => {
-        sinon.assert.calledOnce(dockerList.listContainers);
-    });
-
-    it('Should call aggregateDependencies in the correct order, for each package and version range', () => {
-        const dnpAggregateDependenciesCalls = [
-            // For user request, the version range is the one set by the user
-            {name: 'nginx-proxy.dnp.dappnode.eth', versionRange: '^0.1.0'},
-            // For state packages, the version range is greater or equal than the current
-            {name: 'web.dnp.dappnode.eth', versionRange: '>=0.0.0'},
-            // For state packages, if there is a specified origin, only fetch that
-            {name: 'letsencrypt-nginx.dnp.dappnode.eth', versionRange: '/ipfs/Qm1234'},
-        ];
-        sinon.assert.callCount(aggregateDependencies, dnpAggregateDependenciesCalls.length);
-        dnpAggregateDependenciesCalls.forEach((dnp, i) => {
-            const {name, versionRange} = aggregateDependencies.getCall(i).args[0];
-            expect(name).to.equal(dnp.name, `aggregateDependencies call ${i} should be for dnp name: "${dnp.name}"`);
-            expect(versionRange).to.equal(dnp.versionRange, `aggregateDependencies call ${i} should be for dnp ${dnp.name} versionRange: "${dnp.versionRange}"`);
-        });
-    });
-
     it('Should aggregate labeled the packages correctly', () => {
         expect(dnps).to.deep.equal({
             'dependency.dnp.dappnode.eth': {
@@ -119,8 +102,8 @@ describe('dappGet/aggregate', () => {
             'nginx-proxy.dnp.dappnode.eth': {
               isRequest: true,
               versions: {
-                '0.0.3': {
-                  'nginx-proxy.dnp.dappnode.eth': 'latest',
+                '0.1.0': {
+                  'dependency.dnp.dappnode.eth': '^0.1.1',
                 },
               },
             },
@@ -133,6 +116,27 @@ describe('dappGet/aggregate', () => {
                 },
               },
             },
+        });
+    });
+
+    it('Should call list containers once', () => {
+        sinon.assert.calledOnce(dockerList.listContainers);
+    });
+
+    it('Should call aggregateDependencies in the correct order, for each package and version range', () => {
+        const dnpAggregateDependenciesCalls = [
+            // For user request, the version range is the one set by the user
+            {name: 'nginx-proxy.dnp.dappnode.eth', versionRange: '^0.1.0'},
+            // For state packages, the version range is greater or equal than the current
+            {name: 'web.dnp.dappnode.eth', versionRange: '>=0.0.0'},
+            // For state packages, if there is a specified origin, only fetch that
+            {name: 'letsencrypt-nginx.dnp.dappnode.eth', versionRange: '/ipfs/Qm1234'},
+        ];
+        sinon.assert.callCount(aggregateDependencies, dnpAggregateDependenciesCalls.length);
+        dnpAggregateDependenciesCalls.forEach((dnp, i) => {
+            const {name, versionRange} = aggregateDependencies.getCall(i).args[0];
+            expect(name).to.equal(dnp.name, `aggregateDependencies call ${i} should be for dnp name: "${dnp.name}"`);
+            expect(versionRange).to.equal(dnp.versionRange, `aggregateDependencies call ${i} should be for dnp ${dnp.name} versionRange: "${dnp.versionRange}"`);
         });
     });
 });
