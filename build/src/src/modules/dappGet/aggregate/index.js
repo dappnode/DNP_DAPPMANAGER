@@ -67,7 +67,8 @@ async function aggregate({req, dnpList, fetch}) {
         // requestedDnps = ["A", "B", "C"]
         requestedDnps: Object.keys(dnps),
         // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
-        installedDnps: dnpList.filter((dnp) => semver.valid(dnp.version)),
+        // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
+        installedDnps: dnpList.filter((dnp) => semver.valid(dnp.version) && dnp.name !== 'core.dnp.dappnode.eth'),
     });
     // Add relevant installed dnps and their dependencies to the dnps object
     await Promise.all(relevantInstalledDnps.map(async (dnp) => {
