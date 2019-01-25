@@ -62,13 +62,15 @@ jobs:
     ##################################################
     - stage: release
       name: release
+      node_js:
+        - "8.9.4"
       services:
         - docker
       script:
         - npm install -g @dappnode/dappnodesdk
         - docker-compose build
         - dappnodesdk publish patch -p infura
-      node_js: lts/*
+
       before_deploy:
         - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/before_deploy.sh
         - source before_deploy.sh
