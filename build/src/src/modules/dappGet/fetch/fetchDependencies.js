@@ -12,15 +12,7 @@ const getManifest = require('modules/getManifest2');
  */
 async function fetchDependencies({name, version}) {
     const manifest = await getManifest({name, version});
-
-    // WARNING: a manifest is an external uncontrolled input, verify
-    const dependencies = manifest.dependencies || {};
-    Object.keys(dependencies).forEach((name) => {
-        const ver = dependencies[name];
-        if (!ver || ver.toLowerCase().includes('latest')) dependencies[name] = '*';
-    });
-
-    return dependencies;
+    return manifest.dependencies || {};
 }
 
 module.exports = fetchDependencies;
