@@ -24,14 +24,13 @@ describe('dappGet/resolve/permutations', () => {
     it('should generate the permutations table correctly', () => {
         const dnps = {
             'dependency.dnp.dappnode.eth': {
-              isNotInstalled: true,
               versions: {
                 '0.1.0': {},
                 '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws': {},
               },
             },
             'letsencrypt-nginx.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.1.0': {'web.dnp.dappnode.eth': 'latest'},
                 '0.1.1': {'web.dnp.dappnode.eth': 'latest'},
@@ -45,7 +44,7 @@ describe('dappGet/resolve/permutations', () => {
               },
             },
             'web.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.1.2': {'letsencrypt-nginx.dnp.dappnode.eth': 'latest'},
               },
@@ -98,8 +97,8 @@ describe('dappGet/resolve/permutations', () => {
         // The purpose of this example is to show how the permutations table looks like
         const dnps = {
             'A': {isRequest: true, versions: {'1.0.0': {}, '2.0.0': {}}},
-            'B': {isState: true, versions: {'1.0.0': {}, '2.0.0': {}}},
-            'C': {isNotInstalled: true, versions: {'1.0.0': {}, '2.0.0': {}}},
+            'B': {isInstalled: true, versions: {'1.0.0': {}, '2.0.0': {}}},
+            'C': {versions: {'1.0.0': {}, '2.0.0': {}}},
         };
         const permutationsTable = permutations.getPermutationsTable(dnps);
         const permutationsNumber = permutations.getTotalPermutations(permutationsTable);

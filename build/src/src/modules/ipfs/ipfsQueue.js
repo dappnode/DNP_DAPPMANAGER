@@ -24,11 +24,6 @@ const q = async.queue(function(task, callback) {
         },
     }, task, callback);
 }, concurrency);
-/* If you want to log out when the queue is empty (for debugging)
-* q.drain = function() {
-*     console.log('all items have been processed');
-* };
-*/
 
 /*
 * Standard: q.push(async_function, callback)

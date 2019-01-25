@@ -38,7 +38,7 @@ describe('dappGet/resolve/prioritizeVersions', () => {
 
     it('should order versions: state DNP. Prioritize older versions', async () => {
         const dnp = {
-            isState: true,
+            isInstalled: true,
             versions: {'0.1.0': {}, '0.1.1': {}},
         };
         const versions = prioritizeVersions(dnp);
@@ -47,7 +47,6 @@ describe('dappGet/resolve/prioritizeVersions', () => {
 
     it('should order versions: not installed DNP. Prioritize newer versions + null', async () => {
         const dnp = {
-            isNotInstalled: true,
             versions: {'0.1.0': {}, '0.1.1': {}},
         };
         const versions = prioritizeVersions(dnp);
