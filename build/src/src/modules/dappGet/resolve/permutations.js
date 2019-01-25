@@ -7,14 +7,13 @@ const prioritizeDnps = require('./prioritizeDnps');
  * @param {object} dnps An object with the list of DNPs to install
  * dnps = {
  *  "dependency.dnp.dappnode.eth": {
- *    isNotInstalled: true,
  *    versions: {
  *      "0.1.1": {},
  *      "0.1.2": {}
  *    }
  *  },
  *  "letsencrypt-nginx.dnp.dappnode.eth": {
- *    isState: true,
+ *    isInstalled: true,
  *    versions: {
  *      "0.0.4": { "web.dnp.dappnode.eth": "latest" }
  *    }

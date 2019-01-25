@@ -45,7 +45,6 @@ describe('case 3, upgrade state package because of a dependency', () => {
             },
           },
           'C2-B': {
-            isNotInstalled: true,
             versions: {
               '1.0.0': {'C2-A': '1.0.0'},
             },
@@ -68,13 +67,11 @@ describe('case 3, upgrade state package because of a dependency', () => {
             },
           },
           'C3-B': {
-            isNotInstalled: true,
             versions: {
               '1.0.0': {'C3-C': '1.0.0'},
             },
           },
           'C3-C': {
-            isNotInstalled: true,
             versions: {
               '1.0.0': {'C3-A': '1.0.0'},
             },

@@ -103,14 +103,13 @@ describe('dappGet/aggregate', () => {
     it('Should aggregate labeled the packages correctly', () => {
         expect(dnps).to.deep.equal({
             'dependency.dnp.dappnode.eth': {
-              isNotInstalled: true,
               versions: {
                 '0.1.1': {},
                 '0.1.2': {},
               },
             },
             'letsencrypt-nginx.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.0.4': {
                   'web.dnp.dappnode.eth': 'latest',
@@ -126,7 +125,7 @@ describe('dappGet/aggregate', () => {
               },
             },
             'web.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.0.0': {
                   'letsencrypt-nginx.dnp.dappnode.eth': 'latest',

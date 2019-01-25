@@ -20,14 +20,14 @@ describe('case 1, upgrade state package because of a dependency', () => {
             },
           },
           'B': {
-            isState: true,
+            isInstalled: true,
             versions: {
               '1.0.0': {'C': '^1.0.0'},
               '2.0.0': {'C': '^2.0.0'},
             },
           },
           'C': {
-            isState: true,
+            isInstalled: true,
             versions: {
               '1.0.0': {},
               '2.0.0': {},

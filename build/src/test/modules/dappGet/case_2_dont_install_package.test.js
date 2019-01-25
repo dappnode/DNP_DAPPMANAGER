@@ -24,7 +24,6 @@ describe('case 2, upgrade state package because of a dependency', () => {
               },
             },
             'B': {
-                isNotInstalled: true,
                 versions: {
                   '1.0.0': {},
                 },

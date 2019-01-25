@@ -21,14 +21,13 @@ describe('dappGet/resolve/findCompatibleState', () => {
     it('Should find a compatible state for a standard case', async () => {
         const dnps = {
             'dependency.dnp.dappnode.eth': {
-              isNotInstalled: true,
               versions: {
                 '0.1.1': {},
                 '0.1.2': {},
               },
             },
             'letsencrypt-nginx.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.0.4': {'web.dnp.dappnode.eth': '*'},
               },
@@ -40,7 +39,7 @@ describe('dappGet/resolve/findCompatibleState', () => {
               },
             },
             'web.dnp.dappnode.eth': {
-              isState: true,
+              isInstalled: true,
               versions: {
                 '0.1.0': {'letsencrypt-nginx.dnp.dappnode.eth': '*'},
               },
@@ -89,7 +88,7 @@ describe('dappGet/resolve/findCompatibleState', () => {
               },
             },
             'bitcoind.dnp.dappnode.eth': {
-                isState: true,
+                isInstalled: true,
                 versions: {
                     '/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws': {},
                     '0.1.0': {},
