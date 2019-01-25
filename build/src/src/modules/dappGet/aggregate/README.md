@@ -25,21 +25,19 @@ const req = {
 Local repo of packages of interest that may be installed. They include the name of the package, their versions and dependencies and a tag:
 
 - isRequest
-- isState
-- isNotInstalled
+- isInstalled
   The tags are used latter to order the packages in order to minimize the number of attempts to find a valid solutions
 
 ```javascript
 dnps = {
   "dependency.dnp.dappnode.eth": {
-    isNotInstalled: true,
     versions: {
       "0.1.1": {},
       "0.1.2": {}
     }
   },
   "letsencrypt-nginx.dnp.dappnode.eth": {
-    isState: true,
+    isInstalled: true,
     versions: {
       "0.0.4": { "web.dnp.dappnode.eth": "latest" }
     }
@@ -51,7 +49,7 @@ dnps = {
     }
   },
   "web.dnp.dappnode.eth": {
-    isState: true,
+    isInstalled: true,
     versions: {
       "0.0.0": { "letsencrypt-nginx.dnp.dappnode.eth": "latest" }
     }
