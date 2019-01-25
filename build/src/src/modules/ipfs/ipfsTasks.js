@@ -21,11 +21,25 @@ const CACHE_DIR = params.CACHE_DIR;
 // Declare methods
 const isfileHashValid = async (providedHash, PATH) => {
     // First, ensure that the PATH file is correct
-    if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) return false;
+    if (!fs.existsSync(PATH)) {
+        // When a file is downloaded for the first time this check will be true. Don't log a warning
+        return false;
+    }
+    if (fs.statSync(PATH).size == 0) {
+        logs.warn(`IPFS downloaded file ${PATH} is invalid: it's size is 0 bytes`);
+        return false;
+    }
 
     // If the file is a .xz, verify it. If the test succeeds, continue execution
-    if (PATH && PATH.endsWith('.xz') && !(await verifyXz(PATH))) {
-        return false;
+    if (PATH && PATH.endsWith('.xz')) {
+        const result = await verifyXz(PATH);
+        if (result.success) {
+            // Successful .xz verification
+        } else {
+            // Failed .xz verification
+            logs.warn(`IPFS downloaded file ${PATH} is invalid: Failed .xz verification: ${result.message}`);
+            return false;
+        }
     }
 
     /*
