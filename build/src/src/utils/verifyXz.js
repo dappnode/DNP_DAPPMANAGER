@@ -11,7 +11,12 @@ const shell = require('./shell');
  * - If the file is corrupted, returns false
  */
 const verifyXz = (PATH) => shell(`xz -t ${PATH}`)
-    .then(() => true)
-    .catch(() => false);
+    .then(() => ({
+        success: true,
+    }))
+    .catch((e) => ({
+        success: false,
+        message: e.message,
+    }));
 
 module.exports = verifyXz;
