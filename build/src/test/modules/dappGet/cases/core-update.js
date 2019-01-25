@@ -14,28 +14,6 @@ module.exports = {
         '0.1.2': {},
       },
     },
-    'core.dnp.dappnode.eth': {
-      'isInstalled': true,
-      'versions': {
-        '0.1.1': {
-          'dappmanager.dnp.dappnode.eth': '0.1.0',
-          'ethforward.dnp.dappnode.eth': '0.1.1',
-          'vnp.dnp.dappnode.eth': '0.1.1',
-        },
-      },
-    },
-    'dappmanager.dnp.dappnode.eth': {
-      'isInstalled': true,
-      'versions': {
-        '0.1.0': {},
-      },
-    },
-    'vnp.dnp.dappnode.eth': {
-      'isInstalled': true,
-      'versions': {
-        '0.1.1': {},
-      },
-    },
   },
   dnps: {
     'ethforward.dnp.dappnode.eth': {
