@@ -2,6 +2,7 @@ const verifyState = require('./verifyState');
 const permutations = require('./permutations');
 const {filterObj} = require('../utils/objUtils');
 const generateErrorMessage = require('./generateErrorMessage');
+const logs = require('logs.js')(module);
 
 /**
  * Resolves a combination of DNPs.
@@ -71,7 +72,7 @@ function findCompatibleState(dnps) {
         // Creates a states from all the possible permutations
         // { A: '2.0.0', B: '1.0.0', C: '2.0.0' }
         const state = permutations.getPermutation(permutationsTable, caseId);
-        console.log(`CASE-ID ${caseId}`, JSON.stringify(state));
+        logs.debug(`CASE-ID ${caseId}: ${JSON.stringify(state)}`);
         // Check if this combination of versions is valid
         const result = verifyState(state, dnps);
         if (result.valid) {

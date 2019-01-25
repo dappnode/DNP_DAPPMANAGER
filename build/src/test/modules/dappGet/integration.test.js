@@ -6,9 +6,10 @@ const cases = require('./cases');
 
 /* eslint-disable no-console */ /* eslint-disable max-len */
 
+const log = false;
 function logBig(...args) {
     const b = '='.repeat(20);
-    console.log(`\n${b}\n${args.map((s) => String(s)).join(`\n${b}\n`)}\n${b}'\n`);
+    if (log) console.log(`\n${b}\n${args.map((s) => String(s)).join(`\n${b}\n`)}\n${b}'\n`);
 }
 
 /**
