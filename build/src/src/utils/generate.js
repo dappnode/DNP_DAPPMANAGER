@@ -6,7 +6,7 @@ const yaml = require('js-yaml');
  * - manifest
 */
 
-function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
+function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
     // Define docker compose parameters
     const DNS_SERVICE = params.DNS_SERVICE;
     const DNP_NETWORK = params.DNP_NETWORK;
@@ -15,11 +15,13 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
 
     const PACKAGE_NAME = dpnManifest.name.replace('/', '_').replace('@', '');
 
+    // Assume not allowed core condition is already verified
+    const isCore = dpnManifest.type === 'dncore';
 
     // DOCKER COMPOSE YML - SERVICE
     // ============================
     let service = {};
-    if (isCORE) {
+    if (isCore) {
       service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME;
       if (dpnManifest.image.privileged) {
         service.privileged = true;
@@ -51,7 +53,7 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     }
 
     // Networks
-    if (isCORE) {
+    if (isCore) {
       if (dpnManifest.image.ipv4_address) {
         service.networks = {
           network: {
@@ -143,7 +145,7 @@ function dockerCompose(dpnManifest, params, isCORE = false, fromIpfs = false) {
     // DOCKER COMPOSE YML - NETWORKS
     // ============================
     let networks = {};
-    if (isCORE && dpnManifest.image.subnet) {
+    if (isCore && dpnManifest.image.subnet) {
       networks = {
         network: {
           driver: 'bridge',
