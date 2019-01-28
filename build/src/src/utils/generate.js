@@ -6,24 +6,24 @@ const yaml = require('js-yaml');
  * - manifest
 */
 
-function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
+function dockerCompose(manifest, params, _, fromIpfs = false) {
     // Define docker compose parameters
     const DNS_SERVICE = params.DNS_SERVICE;
     const DNP_NETWORK = params.DNP_NETWORK;
     const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
     const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 
-    const PACKAGE_NAME = dpnManifest.name.replace('/', '_').replace('@', '');
+    const PACKAGE_NAME = manifest.name.replace('/', '_').replace('@', '');
 
     // Assume not allowed core condition is already verified
-    const isCore = dpnManifest.type === 'dncore';
+    const isCore = manifest.type === 'dncore';
 
     // DOCKER COMPOSE YML - SERVICE
     // ============================
     let service = {};
     if (isCore) {
       service.container_name = CONTAINER_CORE_NAME_PREFIX + PACKAGE_NAME;
-      if (dpnManifest.image.privileged) {
+      if (manifest.image.privileged) {
         service.privileged = true;
       }
     } else {
@@ -31,33 +31,33 @@ function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
     }
 
     // Image name
-    service.image = dpnManifest.name + ':' + (fromIpfs ? fromIpfs : dpnManifest.version);
-    if (dpnManifest.image.restart) {
-      service.restart = dpnManifest.image.restart;
+    service.image = manifest.name + ':' + (fromIpfs ? fromIpfs : manifest.version);
+    if (manifest.image.restart) {
+      service.restart = manifest.image.restart;
     }
 
     // Volumes
     service.volumes = [
-      ...(dpnManifest.image.volumes || []),
-      ...(dpnManifest.image.external_vol || []),
+      ...(manifest.image.volumes || []),
+      ...(manifest.image.external_vol || []),
     ];
 
     // Ports
-    if (dpnManifest.image.ports) {
-        service.ports = dpnManifest.image.ports;
+    if (manifest.image.ports) {
+        service.ports = manifest.image.ports;
     }
 
     // Support for environment variables
-    if (dpnManifest.image.environment) {
+    if (manifest.image.environment) {
       service.env_file = [PACKAGE_NAME + '.env'];
     }
 
     // Networks
     if (isCore) {
-      if (dpnManifest.image.ipv4_address) {
+      if (manifest.image.ipv4_address) {
         service.networks = {
           network: {
-            ipv4_address: dpnManifest.image.ipv4_address,
+            ipv4_address: manifest.image.ipv4_address,
           },
         };
       }
@@ -70,17 +70,17 @@ function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
 
     // label handling
     // Append existing labels
-    if (dpnManifest.image.labels) {
+    if (manifest.image.labels) {
       // Correct labels as array to be an object
-      if (Array.isArray(dpnManifest.image.labels)) {
+      if (Array.isArray(manifest.image.labels)) {
         let _obj = {};
-        dpnManifest.image.labels.forEach((e) => {
+        manifest.image.labels.forEach((e) => {
           if (typeof e === 'string') {
             let [key, value] = e.split('=');
             _obj[key] = value || '';
           }
         });
-        dpnManifest.image.labels = _obj;
+        manifest.image.labels = _obj;
       }
       // Merge labels:
       // service.labels = {
@@ -88,40 +88,48 @@ function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
       //   label-without-value: "" }
       service.labels = {
         ...(service.labels || {}),
-        ...dpnManifest.image.labels,
+        ...manifest.image.labels,
       };
     }
     // Add the dependencies of the package in its labels
     // This will help the resolver not need to access IPFS (and ENS)
     // to know its dependencies
-    if (dpnManifest.dependencies) {
+    if (manifest.dependencies) {
       service.labels = {
         ...(service.labels || {}),
-        'dappnode.dnp.dependencies': JSON.stringify(dpnManifest.dependencies),
+        'dappnode.dnp.dependencies': JSON.stringify(manifest.dependencies),
       };
     }
     // Adding the origin of the package as a label to be used in the resolve
     // This is important to recognize if this package comes from IPFS or ENS
-    if (dpnManifest.origin) {
+    if (manifest.origin) {
       service.labels = {
         ...(service.labels || {}),
-        'dappnode.dnp.origin': dpnManifest.origin,
+        'dappnode.dnp.origin': manifest.origin,
+      };
+    }
+    // Add the chain driver
+    // This will automatically trigger the chain watcher
+    if (manifest.chain) {
+      service.labels = {
+        ...(service.labels || {}),
+        'dappnode.dnp.chain': manifest.chain,
       };
     }
 
     // Extra features
-    if (dpnManifest.image.cap_add) service.cap_add = dpnManifest.image.cap_add;
-    if (dpnManifest.image.cap_drop) service.cap_drop = dpnManifest.image.cap_drop;
-    if (dpnManifest.image.network_mode) service.network_mode = dpnManifest.image.network_mode;
-    if (dpnManifest.image.command) service.command = dpnManifest.image.command;
+    if (manifest.image.cap_add) service.cap_add = manifest.image.cap_add;
+    if (manifest.image.cap_drop) service.cap_drop = manifest.image.cap_drop;
+    if (manifest.image.network_mode) service.network_mode = manifest.image.network_mode;
+    if (manifest.image.command) service.command = manifest.image.command;
 
 
     // DOCKER COMPOSE YML - VOLUMES
     // ============================
     let volumes = {};
     // Regular volumes
-    if (dpnManifest.image.volumes) {
-      dpnManifest.image.volumes.forEach((vol) => {
+    if (manifest.image.volumes) {
+      manifest.image.volumes.forEach((vol) => {
         // Make sure it's a named volume
         if (!vol.startsWith('/') && !vol.startsWith('~')) {
           const volName = vol.split(':')[0];
@@ -130,8 +138,8 @@ function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
       });
     }
     // External volumes
-    if (dpnManifest.image.external_vol) {
-      dpnManifest.image.external_vol.forEach((vol) => {
+    if (manifest.image.external_vol) {
+      manifest.image.external_vol.forEach((vol) => {
         const volName = vol.split(':')[0];
         volumes[volName] = {
           external: {
@@ -145,12 +153,12 @@ function dockerCompose(dpnManifest, params, _, fromIpfs = false) {
     // DOCKER COMPOSE YML - NETWORKS
     // ============================
     let networks = {};
-    if (isCore && dpnManifest.image.subnet) {
+    if (isCore && manifest.image.subnet) {
       networks = {
         network: {
           driver: 'bridge',
           ipam: {
-            config: [{subnet: dpnManifest.image.subnet}],
+            config: [{subnet: manifest.image.subnet}],
           },
         },
       };
