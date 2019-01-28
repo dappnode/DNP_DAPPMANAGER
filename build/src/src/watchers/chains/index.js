@@ -2,14 +2,11 @@ const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs')(module);
 const dockerList = require('modules/dockerList');
 const params = require('params');
-const ethereum = require('./ethereum');
-const bitcoin = require('./bitcoin');
-const monero = require('./monero');
 
-const modules = {
-    ethereum,
-    bitcoin,
-    monero,
+const drivers = {
+    ethereum: require('./ethereum'),
+    bitcoin: require('./bitcoin'),
+    monero: require('./monero'),
 };
 
 /* eslint-disable max-len */
@@ -53,6 +50,11 @@ const supportedProviders = {
         module: 'ethereum',
         api: 'http://my.goerli-pantheon.dnp.dappnode.eth:8545',
     },
+    'goerli-parity.dnp.dappnode.eth': {
+        name: 'Goerli-parity',
+        module: 'ethereum',
+        api: 'http://my.goerli-parity.dnp.dappnode.eth:8545',
+    },
     'bitcoin.dnp.dappnode.eth': {
         name: 'Bitcoin',
         module: 'bitcoin',
@@ -65,6 +67,18 @@ const supportedProviders = {
     },
 };
 
+const shortName = (ensName = '') => ensName.split('.')[0];
+const capitalize = (s = '') => s.charAt(0).toUpperCase() + s.slice(1);
+
+const getDriveApi = {
+    // 'http://my.ropsten.dnp.dappnode.eth:8545'
+    'ethereum': (dnpName) => `http://my.${dnpName}:8545`,
+    // 'my.bitcoin.dnp.dappnode.eth'
+    'bitcoin': (dnpName) => dnpName,
+    // 'http://my.monero.dnp.dappnode.eth:18081'
+    'monero': (dnpName) => `http://my.${dnpName}:18081`,
+};
+
 const activeChains = {};
 
 /**
@@ -75,8 +89,16 @@ const activeChains = {};
  * fetch data from those only
 */
 
-async function addChain(dnpName) {
-    activeChains[dnpName] = supportedProviders[dnpName];
+async function addChain(dnpName, driverName) {
+    if (driverName) {
+        activeChains[dnpName] = {
+            name: capitalize(shortName(dnpName)),
+            module: driverName,
+            api: getDriveApi[driverName](dnpName),
+        };
+    } else {
+        activeChains[dnpName] = supportedProviders[dnpName];
+    }
 }
 
 async function removeChain(dnpName) {
@@ -96,7 +118,14 @@ async function checkChainWatchers() {
         // Add new chains
         for (const dnp of dnpList) {
             // If this dnp is a supported chain, and not currently watched
-            if (supportedProviders[dnp.name] && !activeChains[dnp.name]) {
+            if (dnp.chain && !activeChains[dnp.name]) {
+                if (drivers[dnp.chain]) {
+                    addChain(dnp.name, dnp.chain);
+                } else {
+                    logs.warn(`DNP ${dnp.name} is requesting an unsupported chain driver: ${dnp.chain}`);
+                }
+            }
+            else if (supportedProviders[dnp.name] && !activeChains[dnp.name]) {
                 addChain(dnp.name);
             }
         }
@@ -155,7 +184,7 @@ async function getAndEmitChainData() {
         if (cache[id].active) return cache[id].lastResult;
         // Otherwise raise active flag and perform the request
         cache[id].active = true;
-        const result = await modules[chain.module](chain);
+        const result = await drivers[chain.module](chain);
         cache[id].active = false;
         cache[id].lastResult = result;
         return result;
