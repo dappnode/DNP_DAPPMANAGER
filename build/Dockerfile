@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 # Install app dependencies to use docker's layer cache
 ADD src/package*.json ./
 RUN npm install --production
+RUN npm install -g modclean && modclean -r
 
 ADD src .
 ADD entrypoint.sh .
@@ -25,10 +26,10 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
-    wget \
+    wget -nv \
         "https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub" \
         -O "/etc/apk/keys/sgerrand.rsa.pub" && \
-    wget \
+    wget -nv \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
@@ -57,6 +58,7 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
 
 WORKDIR /usr/src/app
 
+# app dir size = 171MB
 COPY --from=build /usr/src/app /usr/src/app
 COPY --from=build /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build /usr/bin/docker /usr/bin/docker
