@@ -1,8 +1,8 @@
 const proxyquire = require('proxyquire');
 const expect = require('chai').expect;
 const safeSemver = require('modules/dappGet/utils/safeSemver');
-
-const cases = require('./cases');
+const fs = require('fs');
+const path = require('path');
 
 /* eslint-disable no-console */ /* eslint-disable max-len */
 
@@ -17,7 +17,16 @@ function logBig(...args) {
  */
 
 describe('dappGet integration test', () => {
-    for (const _case of cases) {
+    /**
+     * Loads all files in the ./cases folder
+     * Each file describes a case with a req, dnps info and an expected result
+     */
+    const casesFolder = path.resolve(__dirname, 'cases');
+    fs.readdirSync(casesFolder)
+    // Ignore README.md
+    .filter((fileName) => fileName.endsWith('.js'))
+    .forEach((casePath) => {
+        const _case = require(path.resolve(casesFolder, casePath));
         describe(`Case: ${_case.name}`, () => {
             // Prepare dependencies
 
@@ -89,5 +98,5 @@ describe('dappGet integration test', () => {
                 }
             });
         });
-    }
+    });
 });

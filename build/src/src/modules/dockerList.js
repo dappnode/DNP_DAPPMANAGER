@@ -70,13 +70,18 @@ function format(c) {
   // Process dappnode.dnp tags
   //   dappnode.dnp.dependencies
   //   dappnode.dnp.origin
-  let origin;
-  let dependencies;
+  //   dappnode.dnp.chain
+  const fromLabels = {};
   if (c.Labels && typeof c.Labels === 'object') {
-    origin = c.Labels['dappnode.dnp.origin'];
+    if (c.Labels['dappnode.dnp.origin']) {
+      fromLabels.origin = c.Labels['dappnode.dnp.origin'];
+    }
+    if (c.Labels['dappnode.dnp.chain']) {
+      fromLabels.chain = c.Labels['dappnode.dnp.chain'];
+    }
     if (c.Labels['dappnode.dnp.dependencies']) {
       try {
-        dependencies = JSON.parse(c.Labels['dappnode.dnp.dependencies']);
+        fromLabels.dependencies = JSON.parse(c.Labels['dappnode.dnp.dependencies']);
       } catch (e) {
         /* eslint-disable max-len */
         logs.warn(`Error parsing ${name} container dependencies label "${c.Labels['dappnode.dnp.dependencies']}": ${e.stack}`);
@@ -91,8 +96,7 @@ function format(c) {
     id: c.Id,
     packageName,
     version,
-    origin,
-    dependencies,
+    ...fromLabels,
     portsToClose,
     isDNP,
     isCORE,
