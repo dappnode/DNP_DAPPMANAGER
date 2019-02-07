@@ -13,6 +13,7 @@ const merge = require('utils/merge');
 const isIpfsRequest = require('utils/isIpfsRequest');
 const isSyncing = require('utils/isSyncing');
 const envsHelper = require('utils/envsHelper');
+const parseManifestPorts = require('utils/parseManifestPorts');
 
 /* eslint-disable max-len */
 
@@ -144,19 +145,25 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
     await packages.run({pkg, logId});
 
     // 7. Open ports
-    // 7A. Mapped ports:
-    // ##### Open ports
-    console.log('Open ports');
+    // 7A. Mapped ports: mappedPortsToOpen = [ {number: '30303', type: 'TCP'}, ... ]
+    const mappedPortsToOpen = parseManifestPorts(pkg.manifest);
 
     // 7B. P2P ports: modify docker-compose + open ports
     // - lockPorts modifies the docker-compose and returns
-    //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+    //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
-    const portsToOpen = await lockPorts({pkg});
+    const lockedPortsToOpen = await lockPorts({pkg});
+
     // Skip if there are no ports to open or if UPnP is not available
+    const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
     if (portsToOpen.length && (await shouldOpenPorts())) {
-      const kwargs = {action: 'open', ports: portsToOpen};
-      eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+      eventBus.emit(eventBusTag.call, {
+        callId: 'managePorts',
+        kwargs: {
+          action: 'open',
+          ports: portsToOpen,
+        },
+      });
     }
   }
 
