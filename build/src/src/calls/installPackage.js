@@ -1,17 +1,33 @@
-const parse = require('utils/parse');
-const merge = require('utils/merge');
+const {eventBus, eventBusTag} = require('eventBus');
+// Modules
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const dappGetBasic = require('modules/dappGet/basic');
-const logUI = require('utils/logUI');
-const isIpfsRequest = require('utils/isIpfsRequest');
 const getManifest = require('modules/getManifest');
-const {eventBus, eventBusTag} = require('eventBus');
-const isSyncing = require('utils/isSyncing');
 const lockPorts = require('modules/lockPorts');
 const shouldOpenPorts = require('modules/shouldOpenPorts');
+// Utils
+const logUI = require('utils/logUI');
+const parse = require('utils/parse');
+const merge = require('utils/merge');
+const isIpfsRequest = require('utils/isIpfsRequest');
+const isSyncing = require('utils/isSyncing');
+const envsHelper = require('utils/envsHelper');
 
 /* eslint-disable max-len */
+
+//  userSetEnvs = {
+//    "kovan.dnp.dappnode.eth": {
+//      "ENV_NAME": "VALUE1"
+//    }, ... }
+//  userSetVols = "kovan.dnp.dappnode.eth": {
+//      "old_path:/root/.local": "new_path:/root/.local"
+//    }, ... }
+//  userSetPorts = {
+//    "kovan.dnp.dappnode.eth": {
+//      "30303": "31313:30303",
+//      "30303/udp": "31313:30303/udp"
+//    }, ... }
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -28,6 +44,10 @@ const shouldOpenPorts = require('modules/shouldOpenPorts');
  *
  * @param {Object} kwargs = {
  *   id: package .eth name {String}
+ *   userSetEnvs = {
+ *     "kovan.dnp.dappnode.eth": {
+ *       "ENV_NAME": "VALUE1"
+ *     }, ... }
  *   userSetVols: user set volumes {Object} = {
  *     "kovan.dnp.dappnode.eth": {
  *       "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
@@ -42,20 +62,14 @@ const shouldOpenPorts = require('modules/shouldOpenPorts');
  * @return {Object} A formated success message.
  * result: empty
  */
-const installPackage = async ({
-  id,
-  userSetVols = {},
-  userSetPorts = {},
-  logId,
-  options = {},
-}) => {
+const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPorts = {}, logId, options = {}}) => {
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
   // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }
   const req = parse.packageReq(id);
 
   // If the request is not from IPFS, check if the chain is syncing
-  if (!isIpfsRequest(req) && await isSyncing()) {
+  if (!isIpfsRequest(req) && (await isSyncing())) {
     throw Error('Mainnet is syncing');
   }
 
@@ -64,9 +78,7 @@ const installPackage = async ({
   //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
   //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
-  const result = options.BYPASS_RESOLVER
-    ? await dappGetBasic(req)
-    : await dappGet(req);
+  const result = options.BYPASS_RESOLVER ? await dappGetBasic(req) : await dappGet(req);
   // Return error if the req couldn't be resolved
   if (!result.success) {
     const errorMessage = `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`;
@@ -83,73 +95,70 @@ const installPackage = async ({
     logUI({logId, name, msg: 'Already updated'});
   });
 
-  let pkgs = await Promise.all(Object.keys(result.success).map(async (name) => {
-    // 3.2 Fetch manifest
-    const ver = result.success[name];
-    let manifest = await getManifest({name, ver});
-    if (!manifest) throw Error('Missing manifest for '+name);
+  let pkgs = await Promise.all(
+    Object.keys(result.success).map(async (name) => {
+      // 3.2 Fetch manifest
+      const ver = result.success[name];
+      let manifest = await getManifest({name, ver});
+      if (!manifest) throw Error('Missing manifest for ' + name);
 
-    // 3.3 Verify dncore condition
-    // Prevent default values. Someone can try to spoof "isCore" in the manifest
-    manifest.isCore = false;
-    if (manifest.type == 'dncore') {
-      if (options.BYPASS_CORE_RESTRICTION) {
+      // 3.3 Verify dncore condition
+      // Prevent default values. Someone can try to spoof "isCore" in the manifest
+      // The origin must be the registry controlled by the DAppNode team, and it must NOT come from ipfs, thus APM
+      if (manifest.type == 'dncore') {
+        if (!options.BYPASS_CORE_RESTRICTION && (!name.endsWith('.dnp.dappnode.eth') || ver.startsWith('/ipfs/'))) {
+          throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
+        }
         manifest.isCore = true;
-      } else if (
-        // The origin must be the registry controlled by the DAppNode team,
-        // and it must NOT come from ipfs, thus APM
-        name.endsWith('.dnp.dappnode.eth') && !ver.startsWith('/ipfs/')
-      ) {
-        manifest.isCore = true;
-      } else {
-        throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
       }
-    }
 
-    // 3.4 Merge user set vols and ports
-    manifest = merge.manifest.vols(manifest, userSetVols);
-    manifest = merge.manifest.ports(manifest, userSetPorts);
+      // 3.4 Merge user set vols and ports
+      manifest = merge.manifest.vols(manifest, userSetVols);
+      manifest = merge.manifest.ports(manifest, userSetPorts);
 
-    // Return pkg object
-    return {
-      name,
-      ver,
-      manifest,
-    };
-  }));
-
-  // 4. Download requested packages
-  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
-
-  // 5. Run requested packages
-  // Patch, install the dappmanager the last always
-  const isDappmanager = (pkg) => pkg.manifest && pkg.manifest.name
-    && pkg.manifest.name.includes('dappmanager.dnp.dappnode.eth');
-
-  await Promise.all(pkgs
-    .filter((pkg) => !isDappmanager(pkg))
-    .map((pkg) => packages.run({pkg, logId}))
+      // Return pkg object
+      return {
+        name,
+        ver,
+        manifest,
+      };
+    })
   );
 
-  const dappmanagerPkg = pkgs.find(isDappmanager);
-  if (dappmanagerPkg) {
-    await packages.run({pkg: dappmanagerPkg, logId});
-  }
+  // Order packages
 
-  // 6. P2P ports: modify docker-compose + open ports
-  // - lockPorts modifies the docker-compose and returns
-  //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
-  // - managePorts calls UPnP to open the ports
+  // 4. Download requested packages in paralel
+  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
 
-  await Promise.all(pkgs.map(async (pkg) => {
+  // Patch, install the dappmanager the last always
+  const isDappmanager = (pkg) => (pkg.manifest.name || '').includes('dappmanager.dnp.dappnode.eth');
+  for (const pkg of pkgs.sort((pkg) => (isDappmanager(pkg) ? 1 : -1))) {
+    // 5. Set ENVs. Set userSetEnvs + the manifest defaults (if not previously set)
+    const {name, isCore} = pkg.manifest;
+    const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest);
+    const previousEnvs = envsHelper.load(name, isCore);
+    const envs = {...defaultEnvs, ...previousEnvs, ...userSetEnvs[pkg.manifest.name]};
+    envsHelper.write(name, isCore, envs);
+
+    // 6. Run requested packages
+    await packages.run({pkg, logId});
+
+    // 7. Open ports
+    // 7A. Mapped ports:
+    // ##### Open ports
+    console.log('Open ports');
+
+    // 7B. P2P ports: modify docker-compose + open ports
+    // - lockPorts modifies the docker-compose and returns
+    //   portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+    // - managePorts calls UPnP to open the ports
     const portsToOpen = await lockPorts({pkg});
-    // Abort if there are no ports to open
-    // Don't attempt to call UPnP if not necessary
-    if (portsToOpen.length && await shouldOpenPorts()) {
+    // Skip if there are no ports to open or if UPnP is not available
+    if (portsToOpen.length && (await shouldOpenPorts())) {
       const kwargs = {action: 'open', ports: portsToOpen};
       eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
     }
-  }));
+  }
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
@@ -161,6 +170,5 @@ const installPackage = async ({
     userAction: true,
   };
 };
-
 
 module.exports = installPackage;
