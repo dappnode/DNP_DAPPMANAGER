@@ -54,6 +54,14 @@ describe('Full integration test with REAL docker: ', function() {
     // - > installPackage
     testInstallPackage(installPackage, {id});
 
+    // EXTRA, verify that the envs were set correctly
+    it('should had to update DNP ENVs during the installation', async () => {
+      const getPath = require('utils/getPath');
+      const ENV_FILE_PATH = getPath.envFile(id, params);
+      let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
+      expect(envRes).to.include('VIRTUAL_HOST=\nLETSENCRYPT_HOST=');
+    }).timeout(10 * 1000);
+
     // - > logPackage
     testLogPackage(logPackage, {
       id,
@@ -215,12 +223,6 @@ function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
     });
     expect(res).to.have.property('message');
     let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
-    expect(envRes).to.equal(
-      `
-VIRTUAL_HOST=
-LETSENCRYPT_HOST=
-time=${envValue}
-`.trim()
-    );
+    expect(envRes).to.include(`time=${envValue}`);
   }).timeout(120 * 1000);
 }
