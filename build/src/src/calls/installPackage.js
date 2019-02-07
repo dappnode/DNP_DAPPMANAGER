@@ -1,4 +1,5 @@
 const {eventBus, eventBusTag} = require('eventBus');
+const logs = require('logs.js')(module);
 // Modules
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
@@ -90,6 +91,7 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
       throw Error(errorMessage);
     }
   }
+  logs.debug(`Successfully resolved req ${JSON.stringify(req)}:\n ${JSON.stringify(result, null, 2)}`);
 
   // 3. Format the request and filter out already updated packages
   Object.keys(result.alreadyUpdated || {}).forEach((name) => {
@@ -125,11 +127,11 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
       };
     })
   );
-
-  // Order packages
+  logs.debug(`Processed manifests for: ${pkgs.map(({name}) => name).join(', ')}`);
 
   // 4. Download requested packages in paralel
   await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
+  logs.debug(`Successfully downloaded DNPs ${pkgs.map(({name}) => name).join(', ')}`);
 
   // Patch, install the dappmanager the last always
   const isDappmanager = (pkg) => (pkg.manifest.name || '').includes('dappmanager.dnp.dappnode.eth');
@@ -140,9 +142,11 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
     const previousEnvs = envsHelper.load(name, isCore);
     const envs = {...defaultEnvs, ...previousEnvs, ...userSetEnvs[pkg.manifest.name]};
     envsHelper.write(name, isCore, envs);
+    logs.debug(`Wrote envs for DNP ${name} ${isCore ? '(Core)' : ''}:\n ${JSON.stringify(envs, null, 2)}`);
 
     // 6. Run requested packages
     await packages.run({pkg, logId});
+    logs.debug(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports
     // 7A. Mapped ports: mappedPortsToOpen = [ {number: '30303', type: 'TCP'}, ... ]
@@ -153,6 +157,7 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
     //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
     const lockedPortsToOpen = await lockPorts({pkg});
+    logs.debug(`Locked ${lockedPortsToOpen.length} ports of DNP ${pkg.name}: ${JSON.stringify(lockedPortsToOpen)}`);
 
     // Skip if there are no ports to open or if UPnP is not available
     const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
@@ -164,6 +169,7 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
           ports: portsToOpen,
         },
       });
+      logs.debug(`Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`);
     }
   }
 
