@@ -215,6 +215,12 @@ function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
     });
     expect(res).to.have.property('message');
     let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
-    expect(envRes).to.equal('time=' + envValue);
+    expect(envRes).to.equal(
+      `
+VIRTUAL_HOST=
+LETSENCRYPT_HOST=
+time=${envValue}
+`.trim()
+    );
   }).timeout(120 * 1000);
 }
