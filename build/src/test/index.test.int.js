@@ -16,8 +16,8 @@ describe('Full integration test with REAL docker: ', function() {
   const logPackage = require('calls/logPackage');
   const updatePackageEnv = require('calls/updatePackageEnv');
   const listPackages = require('calls/listPackages');
-  const fetchDirectory = require('calls/fetchDirectory');
-  const fetchPackageVersions = require('calls/fetchPackageVersions');
+  // const fetchDirectory = require('calls/fetchDirectory');
+  // const fetchPackageVersions = require('calls/fetchPackageVersions');
   // const fetchPackageData = require('calls/fetchPackageData');
   // const managePorts = require('calls/managePorts');
   // const getUserActionLogs = require('calls/getUserActionLogs');

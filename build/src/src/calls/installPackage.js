@@ -1,12 +1,12 @@
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
+const db = require('../db');
 // Modules
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');
 const dappGetBasic = require('modules/dappGet/basic');
 const getManifest = require('modules/getManifest');
 const lockPorts = require('modules/lockPorts');
-const shouldOpenPorts = require('modules/shouldOpenPorts');
 // Utils
 const logUI = require('utils/logUI');
 const parse = require('utils/parse');
@@ -161,7 +161,8 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
 
     // Skip if there are no ports to open or if UPnP is not available
     const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
-    if (portsToOpen.length && (await shouldOpenPorts())) {
+    const upnpAvailable = await db.get('upnpAvailable');
+    if (portsToOpen.length && upnpAvailable) {
       eventBus.emit(eventBusTag.call, {
         callId: 'managePorts',
         kwargs: {
