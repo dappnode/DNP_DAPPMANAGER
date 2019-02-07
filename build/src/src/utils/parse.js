@@ -73,19 +73,17 @@ function dockerComposePorts(dockerComposePath) {
 }
 
 function envFile(envFileData) {
-  let res = {};
   // Parses key1=value1 files, splited by new line
   //        key2=value2
-  envFileData
+  return envFileData
     .trim()
     .split('\n')
     .filter((row) => row.length > 0)
-    .map((row) => {
-      const [key, value] = row.split(/=(.+)/);
-      res[key] = value;
-    });
-
-  return res;
+    .reduce((obj, row) => {
+      const [key, value] = row.split(/=(.*)/);
+      obj[key] = value;
+      return obj;
+    }, {});
 }
 
 function stringifyEnvs(envs) {

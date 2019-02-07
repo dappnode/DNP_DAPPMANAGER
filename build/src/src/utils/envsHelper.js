@@ -44,7 +44,7 @@ function writeEnvs(name, isCore, envs) {
 function getManifestEnvs(manifest) {
   const envsArray = (manifest.image || {}).environment || [];
   return envsArray.reduce((obj, row) => {
-    const [key, value] = (row || '').trim().split('=');
+    const [key, value] = (row || '').trim().split(/=(.*)/);
     obj[key] = value || '';
     return obj;
   }, {});
