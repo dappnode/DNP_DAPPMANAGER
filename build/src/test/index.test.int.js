@@ -34,21 +34,13 @@ describe('Full integration test with REAL docker: ', function() {
       this.timeout(10000);
       // runs before all tests in this block
       await Promise.all([
-        await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d')
-        .catch(() => {}),
-        await shell('docker volume create --name=nginxproxydnpdappnodeeth_html')
-        .catch(() => {}),
-        await shell('docker network create dncore_network')
-        .catch(() => {}),
+        await shell('docker volume create --name=nginxproxydnpdappnodeeth_vhost.d').catch(() => {}),
+        await shell('docker volume create --name=nginxproxydnpdappnodeeth_html').catch(() => {}),
+        await shell('docker network create dncore_network').catch(() => {}),
         // Clean previous stuff
-        await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/')
-        .catch(() => {}),
-        await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/')
-        .catch(() => {}),
-        await shell('docker rm -f '
-          +'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth '
-          +'DAppNodePackage-nginx-proxy.dnp.dappnode.eth')
-        .catch(() => {}),
+        await shell('rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/').catch(() => {}),
+        await shell('rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/').catch(() => {}),
+        await shell('docker rm -f ' + 'DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth ' + 'DAppNodePackage-nginx-proxy.dnp.dappnode.eth').catch(() => {}),
       ]);
     });
 
@@ -75,7 +67,6 @@ describe('Full integration test with REAL docker: ', function() {
       id: 'nginx-proxy.dnp.dappnode.eth',
       options: {},
     });
-
 
     // - > updatePackageEnv (with reset, after install)
     testUpdatePackageEnv(updatePackageEnv, id, true, params);
@@ -104,22 +95,17 @@ describe('Full integration test with REAL docker: ', function() {
     testListPackages(listPackages, id, 'down');
   });
 
-
   describe('TEST 2, updatePackageEnv', () => {
     // - > updatePackageEnv (of a non-existent package)
     testUpdatePackageEnv(updatePackageEnv, 'fake.eth', false, params);
   });
 
-
   after(() => {
     logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING TEST');
     const web3 = require('modules/web3Setup');
     web3.clearWatch();
-    if (web3.currentProvider
-      && web3.currentProvider.connection
-      && web3.currentProvider.connection.close
-    ) {
-      logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: '+web3.currentProvider.host);
+    if (web3.currentProvider && web3.currentProvider.connection && web3.currentProvider.connection.close) {
+      logs.info('\x1b[36m%s\x1b[0m', '>> CLOSING WS: ' + web3.currentProvider.host);
       web3.currentProvider.connection.close();
     }
   });
@@ -148,7 +134,6 @@ describe('Full integration test with REAL docker: ', function() {
 // - > fetchDirectory
 // - > fetchPackageVersions
 
-
 // The test will perfom intense tasks and could take up to some minutes
 // TEST - 1
 // - > updatePackageEnv
@@ -157,19 +142,19 @@ function testInstallPackage(installPackage, kwargs) {
   it('call installPackage', (done) => {
     logs.info('\x1b[36m%s\x1b[0m', '>> INSTALLING');
     installPackage(kwargs)
-    .then(
-      (res) => {
-        // logs.info('\x1b[33m%s\x1b[0m', res)
-        expect(res).to.have.property('message');
-      },
-      (e) => {
-        if (e) logs.error(e.stack);
-        expect(e).to.be.undefined;
-      }
-    ).then(done);
-  }).timeout(120*1000);
+      .then(
+        (res) => {
+          // logs.info('\x1b[33m%s\x1b[0m', res)
+          expect(res).to.have.property('message');
+        },
+        (e) => {
+          if (e) logs.error(e.stack);
+          expect(e).to.be.undefined;
+        }
+      )
+      .then(done);
+  }).timeout(5 * 60 * 1000);
 }
-
 
 function testLogPackage(logPackage, kwargs) {
   it('call logPackage', async () => {
@@ -182,12 +167,11 @@ function testLogPackage(logPackage, kwargs) {
     expect(res.result.logs).to.be.a('string');
     // let packageNames = parsedRes.result.map(e => name)
     // expect(packageNames).to.include(packageReq)
-  }).timeout(10*1000);
+  }).timeout(10 * 1000);
 }
 
-
 function testListPackages(listPackages, packageName, state) {
-  it('call listPackages, to check '+packageName+' is '+state, async () => {
+  it('call listPackages, to check ' + packageName + ' is ' + state, async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> LISTING');
     const res = await listPackages();
     expect(res).to.have.property('message');
@@ -198,27 +182,24 @@ function testListPackages(listPackages, packageName, state) {
     // logs.info('\x1b[33m%s\x1b[0m', pkg)
     if (state == 'down') expect(pkg).to.be.undefined;
     else expect(pkg.state).to.equal(state);
-  }).timeout(10*1000);
+  }).timeout(10 * 1000);
 }
-
 
 function testTogglePackage(togglePackage, kwargs) {
   it('call togglePackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> TOGGLING START / STOP');
     const res = await togglePackage(kwargs);
     expect(res).to.have.property('message');
-  }).timeout(20*1000);
+  }).timeout(20 * 1000);
 }
-
 
 function testRemovePackage(removePackage, kwargs) {
   it('call removePackage', async () => {
     logs.info('\x1b[36m%s\x1b[0m', '>> REMOVING');
     const res = await removePackage(kwargs);
     expect(res).to.have.property('message');
-  }).timeout(20*1000);
+  }).timeout(20 * 1000);
 }
-
 
 function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
   const getPath = require('utils/getPath');
@@ -234,7 +215,6 @@ function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
     });
     expect(res).to.have.property('message');
     let envRes = fs.readFileSync(ENV_FILE_PATH, 'utf8');
-    expect(envRes).to.equal('time='+envValue);
-  }).timeout(120*1000);
+    expect(envRes).to.equal('time=' + envValue);
+  }).timeout(120 * 1000);
 }
-
