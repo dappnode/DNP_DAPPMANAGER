@@ -1,18 +1,17 @@
 const expect = require('chai').expect;
 
-const shellExecSync = require('utils/shell');
+const shell = require('utils/shell');
 
-describe('Util: shell', function() {
+describe('Util: shell', () => {
   it('should return an error when cating a non-existing file', async () => {
-    let res = await shellExecSync('cat package.json', true);
-    expect(res)
-      .to.include('"dependencies": {');
+    let res = await shell('cat package.json');
+    expect(res).to.include('"dependencies": {');
   });
 
   it('should return the content of a file when cating', async () => {
-    let error = '--- shellExecSync did not throw ---';
+    let error = '--- shell did not throw ---';
     try {
-      await shellExecSync('cat jfnakjsdfnodfu9sadf', true);
+      await shell('cat jfnakjsdfnodfu9sadf');
     } catch (e) {
       error = e.message;
     }
