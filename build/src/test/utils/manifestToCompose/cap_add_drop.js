@@ -4,24 +4,20 @@
 const name = 'Special case with "cap_add" and "cap_drop" fields';
 
 const manifest = {
-    name: 'Mysterium',
-    version: '',
-    description: '',
-    avatar: '',
-    type: '',
-    image: {
-        path: '',
-        hash: '',
-        size: '',
-        cap_add: [
-            'SYS_ADMIN',
-        ],
-        cap_drop: [
-            'NET_ADMIN',
-        ],
-        network_mode: 'host',
-        command: '--command',
-    },
+  name: 'Mysterium',
+  version: '',
+  description: '',
+  avatar: '',
+  type: '',
+  image: {
+    path: '',
+    hash: '',
+    size: '',
+    cap_add: ['SYS_ADMIN'],
+    cap_drop: ['NET_ADMIN'],
+    network_mode: 'host',
+    command: '--command',
+  },
 };
 
 const dc = `version: '3.4'
@@ -39,6 +35,10 @@ services:
             - NET_ADMIN
         network_mode: host
         command: '--command'
+        logging:
+            options:
+                max-size: 10m
+                max-file: '3'
 networks:
     dncore_network:
         external: true
