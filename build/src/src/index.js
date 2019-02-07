@@ -5,8 +5,10 @@ const autobahn = require('autobahn');
 const {eventBus, eventBusTag} = require('./eventBus');
 const logs = require('./logs')(module);
 const logUserAction = require('./logUserAction');
+const {registerHandler, wrapErrors} = require('./utils/registerHandler');
 const params = require('./params');
 const db = require('./db');
+const upnpc = require('./modules/upnpc');
 
 // import calls
 const calls = require('./calls');
@@ -14,75 +16,6 @@ const calls = require('./calls');
 // Start watchers
 require('./watchers/chains');
 require('./watchers/diskUsage');
-
-/*
- * RPC register wrapper
- * ********************
- * This function absctracts and standarizes the response formating, error handling
- * and logging of errors and actions.
- */
-
-const wrapErrors = (handler, event) =>
-  async function(args, kwargs, details) {
-    logs.debug('In-call to '+event);
-    // 0. args: an array with call arguments
-    // 1. kwargs: an object with call arguments
-    // 2. details: an object which provides call metadata
-    try {
-      const res = await handler(kwargs);
-
-      // Log internally
-      logUserAction.log({level: 'info', event, ...res, kwargs});
-      const eventShort = event.replace('.dappmanager.dnp.dappnode.eth', '');
-      if (res.logMessage) {
-        logs.info('Call '+eventShort+' success: '+res.message);
-      }
-
-      // Return to crossbar
-      return JSON.stringify({
-        success: true,
-        message: res.message,
-        result: res.result || {},
-      });
-    } catch (err) {
-      // Rename known shit-errors
-      // When attempting to call a contract while the chain is syncing:
-      if (err.message && (err.message.includes('decode 0x from ABI')
-        || err.message.includes('decode address from ABI'))) {
-        err.code = 'SYNCING';
-        err.message = `Chain is still syncing: ${err.message}`;
-      }
-      // When attempting an JSON RPC but the connection with the node is closed:
-      if (err.message && err.message.includes('connection not open')) {
-        err.message = `Could not connect to ethchain: ${err.message}`;
-      }
-
-      // ##### Don't reflect logId in the userActions logs (delete w/ immutable method)
-      const _kwargs = Object.assign({}, kwargs);
-      if (_kwargs && _kwargs.logId) delete _kwargs.logId;
-
-      // Don't log to userActions is "SYNCING" errors
-      if (err.code !== 'SYNCING') {
-        logUserAction.log({level: 'error', event, ...error2obj(err), kwargs: _kwargs});
-      }
-      logs.error('Call '+event+' error: '+err.message+'\nStack: '+err.stack);
-      return JSON.stringify({
-        success: false,
-        message: err.message,
-      });
-    }
-  };
-
-const register = (session, event, handler) => {
-  return session.register(event, wrapErrors(handler, event)).then(
-    function(reg) {logs.info('CROSSBAR: registered '+event);},
-    function(err) {logs.error('CROSSBAR: error registering '+event+'. Error message: '+err.error);}
-  );
-};
-
-function error2obj(e) {
-  return {name: e.name, message: e.message, stack: e.stack, userAction: true};
-}
 
 /*
  * Connection configuration
@@ -106,97 +39,115 @@ const autobahnRealm = params.autobahnRealm;
 const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
 
 connection.onopen = (session, details) => {
-    logs.info('CONNECTED to DAppnode\'s WAMP '+
-      '\n   url '+autobahnUrl+
-      '\n   realm: '+autobahnRealm+
-      '\n   session ID: '+details.authid);
+  logs.info('CONNECTED to DAppnode\'s WAMP ' + '\n   url ' + autobahnUrl + '\n   realm: ' + autobahnRealm + '\n   session ID: ' + details.authid);
 
-    register(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
-    for (const callId of Object.keys(calls)) {
-      register(session, callId+'.dappmanager.dnp.dappnode.eth', calls[callId]);
+  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
+  for (const callId of Object.keys(calls)) {
+    registerHandler(session, callId + '.dappmanager.dnp.dappnode.eth', calls[callId]);
+  }
+
+  /**
+   * All the session uses below can throw errors if the session closes.
+   * so each single callback is wrapped in a try/catch block
+   */
+
+  /**
+   * Allows internal calls to autobahn. For example, to call install do:
+   * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
+   */
+  eventBus.onSafe(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
+    // Use "callId" to call internal dappmanager methods.
+    // Use "event" to call external methods.
+    if (callId && !Object.keys(calls).includes(callId)) {
+      throw Error(`Requested internal call event does not exist: ${callId}`);
     }
-
-
-    /**
-     * All the session uses below can throw errors if the session closes.
-     * so each single callback is wrapped in a try/catch block
-     */
-
-    /**
-     * Allows internal calls to autobahn. For example, to call install do:
-     * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
-     */
-    eventBus.onSafe(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
-      // Use "callId" to call internal dappmanager methods.
-      // Use "event" to call external methods.
-      if (callId && !Object.keys(calls).includes(callId)) {
-        throw Error(`Requested internal call event does not exist: ${callId}`);
-      }
-      if (!event) event = callId+'.dappmanager.dnp.dappnode.eth';
-      session.call(event, args, kwargs)
+    if (!event) event = callId + '.dappmanager.dnp.dappnode.eth';
+    session
+      .call(event, args, kwargs)
       .then(JSON.parse)
       .then((res) => {
         logs.info(`Internal call to "${event}" result:`);
         logs.info(res);
         if (callback) callback(res);
       });
-    });
+  });
 
-    // Emit chain data
-    const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
-    eventBus.onSafe(eventBusTag.emitChainData, ({chainData}) => {
-      session.publish(eventChainData, chainData); // chainData is an array
-    });
+  // Emit chain data
+  const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
+  eventBus.onSafe(eventBusTag.emitChainData, ({chainData}) => {
+    session.publish(eventChainData, chainData); // chainData is an array
+  });
 
-    // Emits the list of packages
-    const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
-    const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
-    eventBus.onSafe(eventBusTag.emitPackages, () => {
-      listPackagesWrapped().then((res) => {
-        session.publish(eventPackages, [], JSON.parse(res));
-      });
+  // Emits the list of packages
+  const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
+  const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
+  eventBus.onSafe(eventBusTag.emitPackages, () => {
+    listPackagesWrapped().then((res) => {
+      session.publish(eventPackages, [], JSON.parse(res));
     });
+  });
 
-    // Emits the directory
-    const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
-    eventBus.onSafe(eventBusTag.emitDirectory, (pkgs) => {
-      session.publish(eventDirectory, [], pkgs);
-    });
+  // Emits the directory
+  const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
+  eventBus.onSafe(eventBusTag.emitDirectory, (pkgs) => {
+    session.publish(eventDirectory, [], pkgs);
+  });
 
-    // Emits progress logs to the ADMIN UI
-    eventBus.onSafe(eventBusTag.logUI, (data) => {
-      session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
-      if (data && data.msg && !data.msg.includes('%')) {
-        logs.info(JSON.stringify(data));
-      }
-    });
+  // Emits progress logs to the ADMIN UI
+  eventBus.onSafe(eventBusTag.logUI, (data) => {
+    session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
+    if (data && data.msg && !data.msg.includes('%')) {
+      logs.info(JSON.stringify(data));
+    }
+  });
 
-    // Emits userAction logs to the ADMIN UI
-    eventBus.onSafe(eventBusTag.logUserAction, (data) => {
-      session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
-    });
+  // Emits userAction logs to the ADMIN UI
+  eventBus.onSafe(eventBusTag.logUserAction, (data) => {
+    session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
+  });
 
-    // Receives userAction logs from the VPN nodejs app
-    session.subscribe('logUserActionToDappmanager', (args) => {
-      try {
-        logUserAction.log(args[0]);
-      } catch (e) {
-        logs.error('Error logging user action: '+e.stack);
-      }
-    });
+  // Receives userAction logs from the VPN nodejs app
+  session.subscribe('logUserActionToDappmanager', (args) => {
+    try {
+      logUserAction.log(args[0]);
+    } catch (e) {
+      logs.error('Error logging user action: ' + e.stack);
+    }
+  });
 
-    // Emits push notification to the UI and to the local db
-    eventBus.onSafe(eventBusTag.pushNotification, async (notification) => {
-      await db.set(`notification.${notification.id}`, notification);
-      session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
-    });
+  // Emits push notification to the UI and to the local db
+  eventBus.onSafe(eventBusTag.pushNotification, async (notification) => {
+    await db.set(`notification.${notification.id}`, notification);
+    session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
+  });
 };
 
 connection.onclose = (reason, details) => {
-  logs.warn('Crossbar connection closed. Reason: '+reason+', details: '+JSON.stringify(details));
+  logs.warn('Crossbar connection closed. Reason: ' + reason + ', details: ' + JSON.stringify(details));
 };
 
 connection.open();
-logs.info('Attempting WAMP connection to '+autobahnUrl+', realm '+autobahnRealm);
+logs.info('Attempting WAMP connection to ' + autobahnUrl + ', realm ' + autobahnRealm);
 
+/**
+ * Initials calls
+ */
 
+/**
+ * 1. Query UPnP to check if it's available
+ */
+checkIfUpnpIsAvailable();
+async function checkIfUpnpIsAvailable() {
+  try {
+    const currentPortMappings = await upnpc.list();
+    logs.info('UPnP device available');
+    logs.info(`currentPortMappings: ${JSON.stringify(currentPortMappings, null, 2)}`);
+    await db.set('upnpAvailable', true);
+  } catch (e) {
+    if (e.message.includes('NOUPNP')) {
+      logs.info('UPnP device NOT available');
+    } else {
+      logs.error(`Error checking if UPnP device is available: ${e.stack}`);
+    }
+  }
+}

@@ -66,6 +66,13 @@ describe('Call function: installPackage', function() {
   // Simulated the chain is already synced
   const isSyncing = async () => false;
 
+  // db to know UPnP state
+  const db = {
+    get: async (key) => {
+      if (key === 'upnpAvailable') return true;
+    },
+  };
+
   const installPackage = proxyquire('calls/installPackage', {
     'modules/packages': packages,
     'modules/dappGet': dappGet,
@@ -76,6 +83,7 @@ describe('Call function: installPackage', function() {
     'eventBus': eventBusPackage,
     'utils/isSyncing': isSyncing,
     'params': params,
+    '../db': db,
   });
 
   // before(() => {
