@@ -18,19 +18,6 @@ const parseManifestPorts = require('utils/parseManifestPorts');
 
 /* eslint-disable max-len */
 
-//  userSetEnvs = {
-//    "kovan.dnp.dappnode.eth": {
-//      "ENV_NAME": "VALUE1"
-//    }, ... }
-//  userSetVols = "kovan.dnp.dappnode.eth": {
-//      "old_path:/root/.local": "new_path:/root/.local"
-//    }, ... }
-//  userSetPorts = {
-//    "kovan.dnp.dappnode.eth": {
-//      "30303": "31313:30303",
-//      "30303/udp": "31313:30303/udp"
-//    }, ... }
-
 /**
  * Installs a package. It resolves dependencies, downloads
  * manifests and images, loads the images to docker, and calls
@@ -46,7 +33,7 @@ const parseManifestPorts = require('utils/parseManifestPorts');
  *
  * @param {Object} kwargs = {
  *   id: package .eth name {String}
- *   userSetEnvs = {
+ *   userSetEnvs: {
  *     "kovan.dnp.dappnode.eth": {
  *       "ENV_NAME": "VALUE1"
  *     }, ... }
@@ -60,6 +47,10 @@ const parseManifestPorts = require('utils/parseManifestPorts');
  *       "30303/udp": "31313:30303/udp"
  *     }, ... }
  *   logId: task id {String}
+ *   options: {
+ *     BYPASS_RESOLVER: true,
+ *     ...
+ *   }
  * }
  * @return {Object} A formated success message.
  * result: empty
@@ -81,17 +72,10 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
   //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
   const result = options.BYPASS_RESOLVER ? await dappGetBasic(req) : await dappGet(req);
-  // Return error if the req couldn't be resolved
   if (!result.success) {
-    const errorMessage = `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`;
-    if (result.e) {
-      result.e.message = errorMessage;
-      throw result.e;
-    } else {
-      throw Error(errorMessage);
-    }
+    throw Error(`Request ${req.name}@${req.ver} could not be resolved: ${result.message}`);
   }
-  logs.debug(`Successfully resolved req ${JSON.stringify(req)}:\n ${JSON.stringify(result, null, 2)}`);
+  logs.debug(`Successfully resolved request ${JSON.stringify(req)}:\n ${JSON.stringify(result, null, 2)}`);
 
   // 3. Format the request and filter out already updated packages
   Object.keys(result.alreadyUpdated || {}).forEach((name) => {
@@ -120,11 +104,7 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
       manifest = merge.manifest.ports(manifest, userSetPorts);
 
       // Return pkg object
-      return {
-        name,
-        ver,
-        manifest,
-      };
+      return {name, ver, manifest};
     })
   );
   logs.debug(`Processed manifests for: ${pkgs.map(({name}) => name).join(', ')}`);
@@ -138,9 +118,11 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
   for (const pkg of pkgs.sort((pkg) => (isDappmanager(pkg) ? 1 : -1))) {
     // 5. Set ENVs. Set userSetEnvs + the manifest defaults (if not previously set)
     const {name, isCore} = pkg.manifest;
-    const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest);
-    const previousEnvs = envsHelper.load(name, isCore);
-    const envs = {...defaultEnvs, ...previousEnvs, ...userSetEnvs[pkg.manifest.name]};
+    const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest) || {};
+    const previousEnvs = envsHelper.load(name, isCore) || {};
+    const _userSetEnvs = userSetEnvs[pkg.manifest.name] || {};
+    // Merge ENVs by priority, first userSet on installation, then previously set (on updates), or defaults (manifest)
+    const envs = {...defaultEnvs, ...previousEnvs, ..._userSetEnvs};
     envsHelper.write(name, isCore, envs);
     logs.debug(`Wrote envs for DNP ${name} ${isCore ? '(Core)' : ''}:\n ${JSON.stringify(envs, null, 2)}`);
 

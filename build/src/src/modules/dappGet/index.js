@@ -47,48 +47,42 @@ const logs = require('logs.js')(module);
  * }
  */
 async function dappGet(req) {
-    const dnpList = await dockerList.listContainers();
+  const dnpList = await dockerList.listContainers();
 
-    // Aggregate
-    let dnps;
-    try {
-        // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-        dnps = await aggregate({req, dnpList, fetch});
-    } catch (e) {
-        logs.error(`dappGet aggregate error: ${e.stack}`);
-        return {
-            e,
-            success: false,
-            message: `dappGet error aggregating packages: ${e.message}`,
-        };
+  // Aggregate
+  let dnps;
+  try {
+    // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
+    dnps = await aggregate({req, dnpList, fetch});
+  } catch (e) {
+    logs.error(`dappGet aggregate error: ${e.stack}`);
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on aggregate stage: ${e.message}`;
+    throw e;
+  }
+
+  // Resolve
+  let result;
+  try {
+    result = resolve(dnps);
+  } catch (e) {
+    logs.error(`dappGet resolve error: ${e.stack}`);
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on resolve stage: ${e.message}`;
+    throw e;
+  }
+
+  // Format output only on success
+  if (!result.success) return result;
+  dnpList.forEach((dnp) => {
+    if (result.success[dnp.name] && result.success[dnp.name] === dnp.version) {
+      // DNP is already updated.
+      // Remove from the success object and add it to the alreadyUpdatedd
+      if (!result.alreadyUpdated) result.alreadyUpdated = {};
+      result.alreadyUpdated[dnp.name] = result.success[dnp.name];
+      delete result.success[dnp.name];
     }
+  });
 
-    // Resolve
-    let result;
-    try {
-        result = resolve(dnps);
-    } catch (e) {
-        logs.error(`dappGet resolve error: ${e.stack}`);
-        return {
-            e,
-            success: false,
-            message: `dappGet error resolving packages: ${e.message}`,
-        };
-    }
-
-    // Format output only on success
-    if (!result.success) return result;
-    dnpList.forEach((dnp) => {
-        if (result.success[dnp.name] && result.success[dnp.name] === dnp.version) {
-            // DNP is already updated.
-            // Remove from the success object and add it to the alreadyUpdatedd
-            if (!result.alreadyUpdated) result.alreadyUpdated = {};
-            result.alreadyUpdated[dnp.name] = result.success[dnp.name];
-            delete result.success[dnp.name];
-        }
-    });
-
-    return result;
+  return result;
 }
 
 module.exports = dappGet;
