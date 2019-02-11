@@ -1,7 +1,7 @@
 const docker = require('./Docker');
+const db = require('db');
 const lockPorts = require('modules/lockPorts');
 const unlockPorts = require('modules/unlockPorts');
-const shouldOpenPorts = require('modules/shouldOpenPorts');
 const {eventBus, eventBusTag} = require('eventBus');
 
 // Ports error example error
@@ -15,36 +15,38 @@ const {eventBus, eventBusTag} = require('eventBus');
 // ERROR: Encountered errors while bringing up the project.
 
 async function dockerComposeUpSafe(dockerComposePath, options) {
-    try {
-        return await docker.compose.up(dockerComposePath, options);
-    } catch (e) {
-        if (e.message.includes('port is already allocated')) {
-            // Don't try to find which port caused the error.
-            // In case of multiple collitions you would need to call this function recursively
-            // Just reset all ephemeral ports
+  try {
+    return await docker.compose.up(dockerComposePath, options);
+  } catch (e) {
+    if (e.message.includes('port is already allocated')) {
+      const upnpAvailable = await db.get('upnpAvailable');
+      if (upnpAvailable) {
+        // Don't try to find which port caused the error.
+        // In case of multiple collitions you would need to call this function recursively
+        // Just reset all ephemeral ports
 
-            // unlockPorts will modify the docker-compose to remove the port bidnings
-            // in order to let docker to assign new ones
-            const portsToClose = await unlockPorts(dockerComposePath);
-            if (portsToClose.length && await shouldOpenPorts()) {
-                const kwargs = {action: 'close', ports: portsToClose};
-                eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
-            }
-
-            // Up the package and lock the ports again
-            await docker.compose.up(dockerComposePath);
-            const portsToOpen = await lockPorts({dockerComposePath});
-            if (portsToOpen.length && await shouldOpenPorts()) {
-                const kwargs = {action: 'open', ports: portsToOpen};
-                eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
-            }
+        // unlockPorts will modify the docker-compose to remove the port bidnings
+        // in order to let docker to assign new ones
+        const portsToClose = await unlockPorts(dockerComposePath);
+        if (portsToClose.length) {
+          const kwargs = {action: 'close', ports: portsToClose};
+          eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
         }
+
+        // Up the package and lock the ports again
+        await docker.compose.up(dockerComposePath);
+        const portsToOpen = await lockPorts({dockerComposePath});
+        if (portsToOpen.length) {
+          const kwargs = {action: 'open', ports: portsToOpen};
+          eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+        }
+      }
     }
+  }
 }
 
-
 module.exports = {
-    compose: {
-        up: dockerComposeUpSafe,
-    },
+  compose: {
+    up: dockerComposeUpSafe,
+  },
 };
