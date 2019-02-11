@@ -1,10 +1,12 @@
 const fs = require('fs');
-const dockerList = require('modules/dockerList');
-const docker = require('modules/docker');
-const parseDockerSystemDf = require('utils/parseDockerSystemDf');
-const getPath = require('utils/getPath');
 const params = require('params');
 const logs = require('logs.js')(module);
+// Modules
+const dockerList = require('modules/dockerList');
+const docker = require('modules/docker');
+// Utils
+const parseDockerSystemDf = require('utils/parseDockerSystemDf');
+const getPath = require('utils/getPath');
 const envsHelper = require('utils/envsHelper');
 
 // This call can fail because of:
@@ -60,13 +62,13 @@ const listPackages = async () => {
   // Append envFile and manifest
   dnpList.map((dnp) => {
     // Add env info, only if there are ENVs
-    const envs = envsHelper.load(dnp.name, dnp.isCORE);
+    const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
     if (Object.keys(envs).length) dnp.envs = envs;
 
     // Add manifest
-    let MANIFEST_FILE = getPath.manifest(dnp.name, params, dnp.isCORE);
-    if (fs.existsSync(MANIFEST_FILE)) {
-      let manifestFileData = fs.readFileSync(MANIFEST_FILE, 'utf8');
+    const manifestPath = getPath.manifest(dnp.name, params, dnp.isCORE || dnp.isCore);
+    if (fs.existsSync(manifestPath)) {
+      const manifestFileData = fs.readFileSync(manifestPath, 'utf8');
       dnp.manifest = JSON.parse(manifestFileData);
     }
   });

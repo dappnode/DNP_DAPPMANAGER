@@ -1,6 +1,6 @@
 const {eventBus, eventBusTag} = require('eventBus');
 const logs = require('logs.js')(module);
-const db = require('../db');
+const db = require('db');
 // Modules
 const packages = require('modules/packages');
 const dappGet = require('modules/dappGet');

@@ -60,9 +60,6 @@ describe('Call function: installPackage', function() {
     else return [];
   });
 
-  // Simulate you are in a physical DAppNode behind an UPnP capable router
-  const shouldOpenPorts = async () => true;
-
   // Simulated the chain is already synced
   const isSyncing = async () => false;
 
@@ -79,11 +76,10 @@ describe('Call function: installPackage', function() {
     'modules/getManifest': getManifest,
     'modules/dockerList': dockerList,
     'modules/lockPorts': lockPorts,
-    'modules/shouldOpenPorts': shouldOpenPorts,
     'eventBus': eventBusPackage,
     'utils/isSyncing': isSyncing,
     'params': params,
-    '../db': db,
+    'db': db,
   });
 
   // before(() => {
