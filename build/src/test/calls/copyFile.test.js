@@ -16,28 +16,40 @@ const modifiedParams = {
 };
 const containerSimulatedFolder = `${testDir}/container-volume`;
 const dockerPath = (_path) => containerSimulatedFolder + _path;
-const containerName = 'kovan.dnp.dappnode.eth';
+const id = 'kovan.dnp.dappnode.eth';
+const containerName = 'DAppNodePackage-kovan.dnp.dappnode.eth';
 
 const docker = {
   copyFileFrom: async (id, fromPath, toPath) => {
-    if (id !== containerName) throw Error(`Container not found: ${id}`);
+    if (id !== containerName) throw Error(`Fake docker: Container not found: ${id}`);
     await shell(`mkdir -p ${path.dirname(dockerPath(fromPath))}`);
     await shell(`cp ${dockerPath(fromPath)} ${toPath}`);
   },
   copyFileTo: async (id, fromPath, toPath) => {
-    if (id !== containerName) throw Error(`Container not found: ${id}`);
+    if (id !== containerName) throw Error(`Fake docker: Container not found: ${id}`);
     await shell(`mkdir -p ${path.dirname(dockerPath(toPath))}`);
     await shell(`cp ${fromPath} ${dockerPath(toPath)}`);
   },
 };
 
+const dockerList = {
+  listContainers: async () => [
+    {
+      name: id,
+      packageName: containerName,
+    },
+  ],
+};
+
 const copyFileTo = proxyquire('calls/copyFileTo', {
   'params': modifiedParams,
   'modules/docker': docker,
+  'modules/dockerList': dockerList,
 });
 const copyFileFrom = proxyquire('calls/copyFileFrom', {
   'params': modifiedParams,
   'modules/docker': docker,
+  'modules/dockerList': dockerList,
 });
 
 const dataUri = 'data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==';
@@ -49,19 +61,19 @@ describe('Call function: copyFileTo and copyFileFrom', () => {
   });
 
   it('should copy a file to a container', async () => {
-    const res = await copyFileTo({id: containerName, dataUri, toPath: containerPath});
+    const res = await copyFileTo({id, dataUri, toPath: containerPath});
     // Check response message
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
   });
 
   it('should copy a file from a container', async () => {
-    const res = await copyFileFrom({id: containerName, fromPath: containerPath});
+    const res = await copyFileFrom({id, fromPath: containerPath});
     // Check response message
     expect(res).to.be.ok;
     expect(res).to.have.property('message');
-    expect(res).to.have.property('dataUri');
-    expect(res.dataUri).to.equal(dataUri);
+    expect(res).to.have.property('result');
+    expect(res.result).to.equal(dataUri);
   });
 
   after(async () => {
