@@ -7,8 +7,8 @@ const request = docker();
 // dedicated modules
 const params = require('../params');
 
-const DNP_CONTAINER_NAME_PREFIX = params.DNP_CONTAINER_NAME_PREFIX;
-const CORE_CONTAINER_NAME_PREFIX = params.CORE_CONTAINER_NAME_PREFIX;
+const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
+const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 
 // ////////////////////////////
 // Main functions
@@ -17,9 +17,7 @@ const CORE_CONTAINER_NAME_PREFIX = params.CORE_CONTAINER_NAME_PREFIX;
 
 async function listContainers() {
   const containers = await dockerRequest('get', '/containers/json?all=true');
-  return containers
-    .map(format)
-    .filter((pkg) => pkg.isDNP || pkg.isCORE);
+  return containers.map(format).filter((pkg) => pkg.isDNP || pkg.isCORE);
 }
 
 async function runningPackagesInfo() {
@@ -31,10 +29,8 @@ async function runningPackagesInfo() {
   return containersObject;
 }
 
-
 // /////////////////
 // Helper functions
-
 
 function dockerRequest(method, url) {
   const options = {json: true};
@@ -44,19 +40,17 @@ function dockerRequest(method, url) {
   return dockerRequestPromise(url, options);
 }
 
-
 // /////////
 // utils
 
-
 function format(c) {
   const packageName = c.Names[0].replace('/', '');
-  const isDNP = packageName.includes(DNP_CONTAINER_NAME_PREFIX);
-  const isCORE = packageName.includes(CORE_CONTAINER_NAME_PREFIX);
+  const isDNP = packageName.includes(CONTAINER_NAME_PREFIX);
+  const isCORE = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   let name;
-  if (isDNP) name = packageName.split(DNP_CONTAINER_NAME_PREFIX)[1];
-  else if (isCORE) name = packageName.split(CORE_CONTAINER_NAME_PREFIX)[1];
+  if (isDNP) name = packageName.split(CONTAINER_NAME_PREFIX)[1];
+  else if (isCORE) name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1];
   else name = packageName;
 
   const shortName = name && name.includes('.') ? name.split('.')[0] : name;
@@ -100,7 +94,7 @@ function format(c) {
     portsToClose,
     isDNP,
     isCORE,
-    created: new Date(1000*c.Created),
+    created: new Date(1000 * c.Created),
     image: c.Image,
     name: name,
     shortName: shortName,

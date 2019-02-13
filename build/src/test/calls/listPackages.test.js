@@ -12,7 +12,6 @@ describe('Call function: listPackages', function() {
   mockTest();
 });
 
-
 function mockTest() {
   let hasListed = false;
   let envs = {VAR1: 'VALUE1'};
@@ -34,9 +33,8 @@ function mockTest() {
 
   // Mock params
   const params = {
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
-    ENV_FILE_EXTENSION: '.env',
   };
 
   // initialize call
@@ -68,7 +66,6 @@ function mockTest() {
     });
   });
 }
-
 
 function getParentDir(fullPath) {
   return fullPath.replace(/\/[^/]+$/, '');

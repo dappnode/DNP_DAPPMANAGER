@@ -5,8 +5,8 @@ const {eventBusTag} = require('eventBus');
 
 describe('Call function: installPackage', function() {
   const params = {
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   };
 
   const pkgName = 'dapp.dnp.dappnode.eth';

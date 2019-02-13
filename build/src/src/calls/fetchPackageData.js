@@ -19,9 +19,9 @@ const getAvatar = require('modules/getAvatar');
  *     manifest, (object)
  *   },
  */
-const fetchPackageData = async ({
-  id,
-}) => {
+const fetchPackageData = async ({id}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const packageReq = parse.packageReq(id);
 
   // Make sure the chain is synced
@@ -32,7 +32,6 @@ const fetchPackageData = async ({
   //     logMessage: true,
   //   };
   // }
-
 
   const manifest = await getManifest(packageReq);
 
@@ -47,18 +46,17 @@ const fetchPackageData = async ({
       avatar = await getAvatar(avatarHash);
     } catch (e) {
       // If the avatar can not be fetched don't crash
-      logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
+      logs.error('Could not fetch avatar of ' + packageReq.name + ' at ' + avatarHash);
     }
   }
 
   return {
-    message: 'Got data of '+packageReq.name,
+    message: 'Got data of ' + packageReq.name,
     result: {
       manifest,
       avatar,
     },
   };
 };
-
 
 module.exports = fetchPackageData;

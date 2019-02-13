@@ -10,8 +10,8 @@ chai.should();
 
 describe('Call function: restartPackageVolumes', function() {
   const params = {
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   };
 
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
@@ -37,22 +37,17 @@ describe('Call function: restartPackageVolumes', function() {
   // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
 
   const dockerList = {
-    listContainers: async () => ([
+    listContainers: async () => [
       {
         name: CORE_PACKAGE_NAME,
         isCORE: true,
-        volumes: [
-          {name: 'vol1'},
-          {name: 'vol2'},
-        ],
+        volumes: [{name: 'vol1'}, {name: 'vol2'}],
       },
       {
         name: PACKAGE_NAME,
-        volumes: [
-          {name: 'vol3'},
-        ],
+        volumes: [{name: 'vol3'}],
       },
-    ]),
+    ],
   };
 
   const restartPackageVolumes = proxyquire('calls/restartPackageVolumes', {

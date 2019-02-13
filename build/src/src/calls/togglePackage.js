@@ -4,7 +4,6 @@ const params = require('params');
 const docker = require('modules/docker');
 const {eventBus, eventBusTag} = require('eventBus');
 
-
 /**
  * Stops or starts after fetching its status
  *
@@ -15,10 +14,9 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-const togglePackage = async ({
-  id,
-  timeout = 10,
-}) => {
+const togglePackage = async ({id, timeout = 10}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   // This parse utility already throws if no docker-compose found
   let containerName = parse.containerName(dockerComposePath);
@@ -46,6 +44,5 @@ const togglePackage = async ({
     userAction: true,
   };
 };
-
 
 module.exports = togglePackage;

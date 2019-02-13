@@ -22,6 +22,9 @@ const envsHelper = require('utils/envsHelper');
  * result: empty
  */
 const updatePackageEnv = async ({id, envs, isCORE, isCore, restart}) => {
+  if (!id) throw Error('kwarg id must be defined');
+  if (!envs) throw Error('kwarg envs must be defined');
+
   id = parse.packageReq(id).name; // parsing anyway for safety
   if (id.startsWith('/ipfs/')) {
     try {

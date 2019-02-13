@@ -13,21 +13,20 @@ describe('Call function: togglePackage', function() {
   describe('mock test', mockTest);
 });
 
-const dockerComposeTemplate = (`
+const dockerComposeTemplate = `
 version: '3.4'
 services:
     otpweb.dnp.dappnode.eth:
         image: 'chentex/random-logger:latest'
         container_name: DNP_DAPPMANAGER_TEST_CONTAINER
-`).trim();
-
+`.trim();
 
 function mockTest() {
   // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params)
 
   const params = {
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   };
 
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';
