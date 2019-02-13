@@ -5,7 +5,6 @@ const params = require('params');
 const docker = require('modules/docker');
 const {eventBus, eventBusTag} = require('eventBus');
 
-
 /**
  * Calls docker rm and docker up on a package
  *
@@ -15,9 +14,9 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-const restartPackage = async ({
-  id,
-}) => {
+const restartPackage = async ({id}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error('No docker-compose found: ' + dockerComposePath);
@@ -40,6 +39,5 @@ const restartPackage = async ({
     userAction: true,
   };
 };
-
 
 module.exports = restartPackage;

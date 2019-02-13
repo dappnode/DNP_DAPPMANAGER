@@ -14,6 +14,8 @@ const dappGetBasic = require('modules/dappGet/basic');
  * result: empty
  */
 const removePackage = async ({req, options = {}}) => {
+  if (!req) throw Error('kwarg req must be defined');
+
   // result = {
   //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
   //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}

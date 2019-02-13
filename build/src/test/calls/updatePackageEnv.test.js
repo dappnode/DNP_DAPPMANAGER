@@ -11,15 +11,16 @@ const validate = require('utils/validate');
 chai.should();
 
 describe('Call function: updatePackageEnv', function() {
-    // This function gets the manifest of a package,
-    // and then gets the avatar refered in the manifest if any
-    // Finally returns this data objectified
+  // This function gets the manifest of a package,
+  // and then gets the avatar refered in the manifest if any
+  // Finally returns this data objectified
   const packageName = 'myPackage.eth';
   const testDirectory = './test_files/';
 
   const params = {
     ...paramsDefault,
     CACHE_DIR: testDirectory,
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: testDirectory,
   };
 
@@ -53,7 +54,7 @@ describe('Call function: updatePackageEnv', function() {
       sinon.assert.calledWith(docker.compose.up, dockerComposePath);
       // The envs should have been written
       let envString = fs.readFileSync(envFilePath, 'utf8');
-      expect( envString ).to.include('key=val');
+      expect(envString).to.include('key=val');
       // And return correctly
       expect(res).to.be.ok;
       expect(res).to.have.property('message');
@@ -79,10 +80,8 @@ describe('Call function: updatePackageEnv', function() {
     });
 
     after(() => {
-        fs.unlinkSync(dockerComposePath);
-        fs.unlinkSync(envFilePath);
+      fs.unlinkSync(dockerComposePath);
+      fs.unlinkSync(envFilePath);
     });
   });
 });
-
-

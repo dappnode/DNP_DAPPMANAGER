@@ -4,40 +4,34 @@ chai.should();
 
 const getPath = require('utils/getPath');
 
+const testDir = 'test_files/';
+
 describe('Util: get paths', function() {
-  const REPO_PATH_MOCK = 'repo/';
   const params = {
-    REPO_DIR: REPO_PATH_MOCK, // ### Temporary name for development
-    DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
-    ENV_FILE_EXTENSION: '.env',
+    DNCORE_DIR: 'DNCORE',
+    REPO_DIR: testDir, // ### Temporary name for development
   };
 
   const packageName = 'some_package';
   const imageName = 'some_image.tar.xz';
 
   it('return PACKAGE_REPO_DIR path', () => {
-    getPath.packageRepoDir(packageName, params)
-      .should.equal(REPO_PATH_MOCK + packageName);
+    getPath.packageRepoDir(packageName, params).should.equal(testDir + packageName);
   });
 
   it('return MANIFEST path', () => {
-    getPath.manifest(packageName, params)
-      .should.equal(REPO_PATH_MOCK + packageName + '/' + params.DAPPNODE_PACKAGE_NAME);
+    getPath.manifest(packageName, params).should.equal(testDir + packageName + '/' + 'dappnode_package.json');
   });
 
   it('return DOCKERCOMPOSE path', () => {
-    getPath.dockerCompose(packageName, params)
-      .should.equal(REPO_PATH_MOCK + packageName + '/' + params.DOCKERCOMPOSE_NAME);
+    getPath.dockerCompose(packageName, params).should.equal(testDir + packageName + '/' + 'docker-compose.yml');
   });
 
   it('return ENV_FILE path', () => {
-    getPath.envFile(packageName, params)
-      .should.equal(REPO_PATH_MOCK + packageName + '/' + packageName + params.ENV_FILE_EXTENSION);
+    getPath.envFile(packageName, params).should.equal(testDir + packageName + '/' + packageName + '.env');
   });
 
   it('return IMAGE path', () => {
-    getPath.image(packageName, imageName, params)
-      .should.equal(REPO_PATH_MOCK + packageName + '/' + imageName);
+    getPath.image(packageName, imageName, params).should.equal(testDir + packageName + '/' + imageName);
   });
 });

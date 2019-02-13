@@ -24,6 +24,8 @@ const logUI = require('utils/logUI');
  * result: empty
  */
 const removePackage = async ({id, deleteVolumes = false, logId}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const packageRepoDir = getPath.packageRepoDir(id, params);
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);

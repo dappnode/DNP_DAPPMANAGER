@@ -6,15 +6,15 @@ const params = require('../params');
  * @return {Object}
  */
 const getStats = async ({timeout}) => {
-    params.IPFS_TIMEOUT = timeout;
+  if (!timeout) throw Error('kwarg timeout must be defined');
 
-    return {
-        message: `IPFS timeout set to ${timeout}`,
-        logMessage: true,
-        userAction: true,
-    };
+  params.IPFS_TIMEOUT = timeout;
+
+  return {
+    message: `IPFS timeout set to ${timeout}`,
+    logMessage: true,
+    userAction: true,
+  };
 };
 
-
 module.exports = getStats;
-
