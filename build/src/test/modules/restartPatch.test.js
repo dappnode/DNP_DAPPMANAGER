@@ -3,7 +3,6 @@ const expect = require('chai').expect;
 const getPath = require('utils/getPath');
 const fs = require('fs');
 
-
 describe('Util: restartPatch', () => {
   let dockerComposeUpArg;
   const docker = {
@@ -15,21 +14,19 @@ describe('Util: restartPatch', () => {
   };
   const params = {
     DNCORE_DIR: 'test_files',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
+    REPO_DIR: 'test_files/',
   };
   const IMAGE_NAME = 'dappmanager.tar.xz:0.0.9';
-  const DOCKERCOMPOSE_RESTART_PATH =
-    getPath.dockerCompose('restart.dnp.dappnode.eth', params, true);
+  const DOCKERCOMPOSE_RESTART_PATH = getPath.dockerCompose('restart.dnp.dappnode.eth', params, true);
 
   const restartPatch = proxyquire('modules/restartPatch', {
-    'docker': docker,
-    'params': params,
+    docker: docker,
+    params: params,
   });
 
   it('Should call docker.compose.up with the correct arguments', () => {
     restartPatch(IMAGE_NAME).then(() => {
-      expect(dockerComposeUpArg)
-        .to.be.equal(DOCKERCOMPOSE_RESTART_PATH);
+      expect(dockerComposeUpArg).to.be.equal(DOCKERCOMPOSE_RESTART_PATH);
     });
   });
 

@@ -4,7 +4,6 @@ const parse = require('utils/parse');
 const params = require('params');
 const docker = require('modules/docker');
 
-
 /**
  * Returns the logs of the docker container of a package
  *
@@ -19,13 +18,9 @@ const docker = require('modules/docker');
  *     logs: <String with escape codes> (string)
  *   },
  */
-const logPackage = async ({
-  id,
-  options,
-}) => {
-  if (!id) {
-    throw Error('A valid DNP id must be passed as a kwargs to logPackage: ');
-  }
+const logPackage = async ({id, options}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error('No docker-compose found: ' + dockerComposePath);
@@ -42,6 +37,5 @@ const logPackage = async ({
     },
   };
 };
-
 
 module.exports = logPackage;

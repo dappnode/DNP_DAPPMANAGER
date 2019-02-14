@@ -56,6 +56,8 @@ const parseManifestPorts = require('utils/parseManifestPorts');
  * result: empty
  */
 const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPorts = {}, logId, options = {}}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
   // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }

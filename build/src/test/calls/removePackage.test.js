@@ -11,8 +11,7 @@ describe('Call function: removePackage', function() {
   const testDir = 'test_files/';
   const params = {
     REPO_DIR: testDir,
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
-    DAPPNODE_PACKAGE_NAME: 'dappnode_package.json',
+    DNCORE_DIR: 'DNCORE',
   };
 
   const id = 'test.dnp.dappnode.eth';

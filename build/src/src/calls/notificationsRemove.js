@@ -12,17 +12,16 @@ const db = require('../db');
  * @return {Object} A formated success message.
  */
 
-const notificationsGet = async ({
-    ids = [],
-}) => {
-    for (const id of ids) {
-        await db.remove(`notification.${id}`);
-    }
+const notificationsGet = async ({ids = []}) => {
+  if (!ids) throw Error('kwarg ids must be defined');
 
-    return {
-        message: `Removed notifications: ${ids.join(', ')}`,
-    };
+  for (const id of ids) {
+    await db.remove(`notification.${id}`);
+  }
+
+  return {
+    message: `Removed notifications: ${ids.join(', ')}`,
+  };
 };
-
 
 module.exports = notificationsGet;
