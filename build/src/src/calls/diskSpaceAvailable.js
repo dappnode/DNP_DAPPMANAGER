@@ -14,28 +14,29 @@ const fs = require('fs');
  *   }
  */
 const diskSpaceAvailable = async ({path}) => {
-    if (!fs.existsSync(path)) {
-        return {
-            exists: false,
-            totalSize: 0,
-            availableSize: 0,
-        };
-    }
-    const res = await shellExec(`df -h ${path} | awk 'NR>1 { print $2,$4}'`, true);
-    const [totalSize, availableSize] = res.split(/\s+/);
-    //  df . -h --output='avail'
-    //  Used Avail
-    //  192G  9.9G
+  if (!path) throw Error('kwarg path must be defined');
 
+  if (!fs.existsSync(path)) {
     return {
-        message: `Checked space of ${path}`,
-        result: {
-            exists: true,
-            totalSize,
-            availableSize,
-        },
+      exists: false,
+      totalSize: 0,
+      availableSize: 0,
     };
-};
+  }
+  const res = await shellExec(`df -h ${path} | awk 'NR>1 { print $2,$4}'`, true);
+  const [totalSize, availableSize] = res.split(/\s+/);
+  //  df . -h --output='avail'
+  //  Used Avail
+  //  192G  9.9G
 
+  return {
+    message: `Checked space of ${path}`,
+    result: {
+      exists: true,
+      totalSize,
+      availableSize,
+    },
+  };
+};
 
 module.exports = diskSpaceAvailable;

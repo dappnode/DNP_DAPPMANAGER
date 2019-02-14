@@ -11,19 +11,19 @@ describe('Call function: logPackage', function() {
   mockTest();
 });
 
-const dockerComposeTemplate = (`
+const dockerComposeTemplate = `
 version: '3.4'
 services:
     otpweb.dnp.dappnode.eth:
         image: 'chentex/random-logger:latest'
         container_name: DNP_DAPPMANAGER_TEST_CONTAINER
-`).trim();
+`.trim();
 
 function mockTest() {
   describe('mock test', function() {
     const params = {
+      DNCORE_DIR: 'DNCORE',
       REPO_DIR: 'test_files/',
-      DOCKERCOMPOSE_NAME: 'docker-compose.yml',
     };
 
     let hasLogged = false;

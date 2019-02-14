@@ -20,12 +20,12 @@ const isIpfsRequest = require('utils/isIpfsRequest');
  *     ...
  *   ]
  */
-const fetchPackageVersions = async ({
-  id,
-}) => {
+const fetchPackageVersions = async ({id}) => {
+  if (!id) throw Error('kwarg id must be defined');
+
   const packageReq = parse.packageReq(id);
 
-  if (!isIpfsRequest(packageReq) && await isSyncing()) {
+  if (!isIpfsRequest(packageReq) && (await isSyncing())) {
     return {
       message: `Mainnet is still syncing`,
       result: [],
@@ -43,7 +43,7 @@ const fetchPackageVersions = async ({
       result: packageVersions,
     };
 
-  // if the name of the package is already an IFPS hash, skip:
+    // if the name of the package is already an IFPS hash, skip:
   } else if (packageReq.name.startsWith('/ipfs/Qm')) {
     const manifest = await getManifest(packageReq);
     return {
@@ -56,14 +56,14 @@ const fetchPackageVersions = async ({
       ],
     };
   } else {
-    throw Error('Unkown package request: '+packageReq.name);
+    throw Error('Unkown package request: ' + packageReq.name);
   }
 };
 
 // Utility methods
 const getManifestOfVersions = async (packageReq, versions) => {
   await Promise.all(
-    versions.map( async (version) => {
+    versions.map(async (version) => {
       try {
         version.manifest = await getManifest({
           name: packageReq.name,
@@ -79,8 +79,7 @@ const getManifestOfVersions = async (packageReq, versions) => {
 // Reverse to have newer versions on top
 const getPackageVersions = async (packageReq) => {
   const versionsObj = await apm.getRepoVersions(packageReq);
-  return Object.keys(versionsObj)
-  .map((version) => ({
+  return Object.keys(versionsObj).map((version) => ({
     version,
     manifestHash: versionsObj[version],
   }));
@@ -95,4 +94,3 @@ if (process.env.TEST) {
 } else {
   module.exports = fetchPackageVersions;
 }
-

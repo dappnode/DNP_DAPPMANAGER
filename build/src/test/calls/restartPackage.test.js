@@ -10,8 +10,8 @@ chai.should();
 
 describe('Call function: restartPackage', function() {
   const params = {
+    DNCORE_DIR: 'DNCORE',
     REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
   };
 
   const PACKAGE_NAME = 'test.dnp.dappnode.eth';

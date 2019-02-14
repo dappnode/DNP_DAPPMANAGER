@@ -5,7 +5,6 @@ const docker = require('modules/docker');
 const dockerList = require('modules/dockerList');
 const {eventBus, eventBusTag} = require('eventBus');
 
-
 /**
  * Removes a package volumes. The re-ups the package
  *
@@ -15,9 +14,9 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-async function restartPackageVolumes({
-  id,
-}) {
+async function restartPackageVolumes({id}) {
+  if (!id) throw Error('kwarg id must be defined');
+
   const dnpList = await dockerList.listContainers();
   const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(id));
   if (!dnp) {
@@ -34,7 +33,7 @@ async function restartPackageVolumes({
   // If there are no volumes don't do anything
   if (!dnp.volumes || !dnp.volumes.length) {
     return {
-      message: id+' has no volumes ',
+      message: id + ' has no volumes ',
     };
   }
 
@@ -52,11 +51,10 @@ async function restartPackageVolumes({
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: 'Restarted '+id+' volumes',
+    message: 'Restarted ' + id + ' volumes',
     logMessage: true,
     userAction: true,
   };
 }
-
 
 module.exports = restartPackageVolumes;

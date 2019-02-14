@@ -2,7 +2,6 @@ const fs = require('fs');
 const {promisify} = require('util');
 const params = require('params');
 
-
 /**
  * Returns the user action logs. This logs are stored in a different
  * file and format, and are meant to ease user support
@@ -14,24 +13,17 @@ const params = require('params');
  * result: = logs (string)
  */
 
-const getUserActionLogs = async ({
-  options,
-  fromLog = 0,
-  numLogs = 50,
-}) => {
+const getUserActionLogs = async ({options, fromLog = 0, numLogs = 50}) => {
   const {userActionLogsFilename} = params;
 
   if (!fs.existsSync(userActionLogsFilename)) {
     return {
-        message: 'UserActionLogs are still empty, returning black',
-        result: '',
+      message: 'UserActionLogs are still empty, returning black',
+      result: '',
     };
   }
 
-  const userActionLogs = await promisify(fs.readFile)(
-      userActionLogsFilename,
-      {encoding: 'utf8'}
-  );
+  const userActionLogs = await promisify(fs.readFile)(userActionLogsFilename, {encoding: 'utf8'});
 
   // The userActionLogs file can grow a lot. Only a part of it will be returned
   // The user can specify which part of the file wants
@@ -45,6 +37,5 @@ const getUserActionLogs = async ({
     result: userActionLogsSelected,
   };
 };
-
 
 module.exports = getUserActionLogs;
