@@ -11,11 +11,10 @@ stages:
 
 jobs:
   include:
-    # In app tests
+    # In app unit tests
     ##############
     - stage: test
-      env:
-        - IN_APP_TEST
+      name: In app unit tests
       node_js:
         - "8.9.4"
       cache:
@@ -32,11 +31,10 @@ jobs:
       after_success: # Upload coverage reports
         - COVERALLS_REPO_TOKEN=$coveralls_repo_token npm run coveralls
 
-    # integration tests
+    # Integration tests
     ###################
     - stage: test
-      env:
-        - INTEGRATION_TEST
+      name: Integration tests
       node_js:
         - "8.9.4"
       services:

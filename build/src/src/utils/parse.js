@@ -20,7 +20,7 @@ function stringifyDockerCompose(dcObject) {
 // Helper function, read and parse docker-compose
 function readDockerCompose(dockerComposePath) {
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error('docker-compose does not exist: '+dockerComposePath);
+    throw Error('docker-compose does not exist: ' + dockerComposePath);
   }
   const dcString = fs.readFileSync(dockerComposePath, 'utf-8');
   return parseDockerCompose(dcString);
@@ -31,7 +31,6 @@ function writeDockerCompose(dockerComposePath, dcObject) {
   const dcString = stringifyDockerCompose(dcObject);
   fs.writeFileSync(dockerComposePath, dcString, 'utf-8');
 }
-
 
 // Select the first service in a docker-compose
 function getUniqueDockerComposeService(dockerComposePath) {
@@ -74,49 +73,46 @@ function dockerComposePorts(dockerComposePath) {
 }
 
 function envFile(envFileData) {
-  let res = {};
   // Parses key1=value1 files, splited by new line
   //        key2=value2
-  envFileData
+  return envFileData
     .trim()
     .split('\n')
-    .filter((row) => row.length > 0 )
-    .map((row) => {
-      const [key, value] = row.split(/=(.+)/);
-      res[key] = value;
-    });
-
-  return res;
+    .filter((row) => row.length > 0)
+    .reduce((obj, row) => {
+      const [key, value] = row.split(/=(.*)/);
+      obj[key] = value;
+      return obj;
+    }, {});
 }
 
 function stringifyEnvs(envs) {
   if (typeof envs === typeof {}) {
     // great
   } else if (typeof envs === typeof 'string') {
-    throw Error('Attempting to stringify envs of type STRING. Must be an OBJECT: '+envs);
+    throw Error('Attempting to stringify envs of type STRING. Must be an OBJECT: ' + envs);
   } else {
-    throw Error('Attempting to stringify envs of UNKOWN type. Must be an OBJECT: '+envs);
+    throw Error('Attempting to stringify envs of UNKOWN type. Must be an OBJECT: ' + envs);
   }
-  return Object.getOwnPropertyNames(envs)
-    .map((envName) => {
-      let envValue = envs[envName];
-      return envName + '=' + envValue;
-    })
-    .join('\n').trim();
+  return (
+    Object.getOwnPropertyNames(envs)
+      // Use join() to prevent "ENV_NAME=undefined"
+      .map((envName) => [envName, envs[envName] || ''].join('='))
+      .join('\n')
+      .trim()
+  );
 }
-
 
 function packageReq(req) {
   if (!req) throw Error('PARSE ERROR: packageReq is undefined');
 
-  if (typeof(req) != 'string') {
+  if (typeof req != 'string') {
     throw Error('PARSE ERROR: packageReq must be a string, packageReq: ' + req);
   }
 
   // Added for debugging on development
   if (req.length == 1) {
-    throw Error('WARNING: packageReq has only one character, this should not happen, '
-      + 'packageReq: ' + req);
+    throw Error('WARNING: packageReq has only one character, this should not happen, ' + 'packageReq: ' + req);
   }
 
   const [name, ver] = req.split('@');
@@ -137,12 +133,10 @@ function packageReq(req) {
 // }
 
 const manifest = {
-
   depObject: function(manifest) {
     let depObject = manifest.dependencies || {};
-    if ( !depObject || typeof(depObject) != typeof({}) ) {
-      throw Error('BROKEN DEPENDENCY OBJECT, of package: '
-        + JSON.stringify(packageReq)+' depObject: '+depObject);
+    if (!depObject || typeof depObject != typeof {}) {
+      throw Error('BROKEN DEPENDENCY OBJECT, of package: ' + JSON.stringify(packageReq) + ' depObject: ' + depObject);
     }
     return depObject;
   },
@@ -153,7 +147,6 @@ const manifest = {
   type: (manifest) => manifest.type,
   version: (manifest) => manifest.version,
 };
-
 
 module.exports = {
   parseDockerCompose,

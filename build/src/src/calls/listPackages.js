@@ -1,11 +1,13 @@
 const fs = require('fs');
-const dockerList = require('modules/dockerList');
-const docker = require('modules/docker');
-const parseDockerSystemDf = require('utils/parseDockerSystemDf');
-const getPath = require('utils/getPath');
-const parse = require('utils/parse');
 const params = require('params');
 const logs = require('logs.js')(module);
+// Modules
+const dockerList = require('modules/dockerList');
+const docker = require('modules/docker');
+// Utils
+const parseDockerSystemDf = require('utils/parseDockerSystemDf');
+const getPath = require('utils/getPath');
+const envsHelper = require('utils/envsHelper');
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
@@ -19,7 +21,6 @@ async function dockerSystemDf() {
   isRunning = false;
   return cacheResult;
 }
-
 
 /**
  * Returns the list of current containers associated to packages
@@ -55,26 +56,19 @@ const listPackages = async () => {
     const dockerSystemDfData = await dockerSystemDf();
     dnpList = parseDockerSystemDf({data: dockerSystemDfData, dnpList});
   } catch (e) {
-    logs.error('Error appending volume info in listPackages call: '+e.stack);
+    logs.error('Error appending volume info in listPackages call: ' + e.stack);
   }
-
 
   // Append envFile and manifest
   dnpList.map((dnp) => {
-    const PACKAGE_NAME = dnp.name;
-    const IS_CORE = dnp.isCORE;
-
-    // Add env info
-    const ENV_FILE = getPath.envFile(PACKAGE_NAME, params, IS_CORE);
-    if (fs.existsSync(ENV_FILE)) {
-      let envFileData = fs.readFileSync(ENV_FILE, 'utf8');
-      dnp.envs = parse.envFile(envFileData);
-    }
+    // Add env info, only if there are ENVs
+    const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
+    if (Object.keys(envs).length) dnp.envs = envs;
 
     // Add manifest
-    let MANIFEST_FILE = getPath.manifest(PACKAGE_NAME, params, IS_CORE);
-    if (fs.existsSync(MANIFEST_FILE)) {
-      let manifestFileData = fs.readFileSync(MANIFEST_FILE, 'utf8');
+    const manifestPath = getPath.manifest(dnp.name, params, dnp.isCORE || dnp.isCore);
+    if (fs.existsSync(manifestPath)) {
+      const manifestFileData = fs.readFileSync(manifestPath, 'utf8');
       dnp.manifest = JSON.parse(manifestFileData);
     }
   });
@@ -84,6 +78,5 @@ const listPackages = async () => {
     result: dnpList,
   };
 };
-
 
 module.exports = listPackages;
