@@ -166,6 +166,14 @@ const docker = {
     const IMAGE = await shell(getVpnImageCmd());
     return await shell('docker run --rm --net=host ' + IMAGE + ' upnpc -l | awk -F\'= \'  \'/ExternalIPAddress/{print $2}\'').then((res) => res && res.includes('.'), (err) => false);
   },
+
+  // File manager, copy command
+  copyFileFrom: (id, fromPath, toPath) => {
+    return shell(`docker cp --follow-link ${id}:${fromPath} ${toPath}`);
+  },
+  copyFileTo: (id, fromPath, toPath) => {
+    return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
+  },
 };
 
 function getVpnImageCmd() {
