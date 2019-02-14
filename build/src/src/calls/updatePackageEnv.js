@@ -1,12 +1,13 @@
 const fs = require('fs');
+const {eventBus, eventBusTag} = require('eventBus');
+const params = require('params');
+// Modules
 const ipfs = require('modules/ipfs');
+const docker = require('modules/docker');
+// Utils
 const parse = require('utils/parse');
 const getPath = require('utils/getPath');
-const validate = require('utils/validate');
-const params = require('params');
-const docker = require('modules/docker');
-const {eventBus, eventBusTag} = require('eventBus');
-
+const envsHelper = require('utils/envsHelper');
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -20,28 +21,23 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-const updatePackageEnv = async ({
-  id,
-  envs,
-  isCORE = false,
-  restart,
-}) => {
+const updatePackageEnv = async ({id, envs, isCORE, isCore, restart}) => {
   id = parse.packageReq(id).name; // parsing anyway for safety
   if (id.startsWith('/ipfs/')) {
     try {
-      const manifest = JSON.parse( await ipfs.cat(id) );
+      const manifest = JSON.parse(await ipfs.cat(id));
       id = manifest.name;
     } catch (e) {
-      throw Error('Could not retrieve package name from manifest of '+id, e.stack);
+      throw Error('Could not retrieve package name from manifest of ' + id, e.stack);
     }
   }
-  const envFilePath = getPath.envFileSmart(id, params, isCORE);
+
+  // Support both notations
+  isCore = isCore || isCORE;
 
   // Write envs
-  await fs.writeFileSync(
-    validate.path(envFilePath),
-    parse.stringifyEnvs(envs)
-  );
+  const previousEnvs = envsHelper.load(id, isCore);
+  envsHelper.write(id, isCore, {...previousEnvs, ...envs});
 
   if (!restart) {
     return {
@@ -71,6 +67,5 @@ const updatePackageEnv = async ({
     userAction: true,
   };
 };
-
 
 module.exports = updatePackageEnv;
