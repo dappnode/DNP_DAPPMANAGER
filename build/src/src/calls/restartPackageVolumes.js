@@ -21,7 +21,7 @@ async function restartPackageVolumes({
   const dnpList = await dockerList.listContainers();
   const dnp = dnpList.find((_dnp) => _dnp.name && _dnp.name.includes(id));
   if (!dnp) {
-    throw Error(`Could not found an container with the name: ${id}`);
+    throw Error(`Could not find an container with the name: ${id}`);
   }
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
