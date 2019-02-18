@@ -67,8 +67,8 @@ jobs:
       script:
         - npm install -g @dappnode/dappnodesdk
         - docker-compose build
-        - dappnodesdk publish patch -p infura
-
+        - TYPE=${PUBLISH:-patch}
+        - dappnodesdk publish ${TYPE} -p infura
       before_deploy:
         - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/before_deploy.sh
         - source before_deploy.sh
