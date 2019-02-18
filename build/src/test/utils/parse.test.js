@@ -7,9 +7,9 @@ chai.should();
 
 const testDirectory = './test_files/';
 
-const DOCKERCOMPOSE_PATH = testDirectory+'docker-compose-test.yml';
-const DOCKERCOMPOSE_PATH2 = testDirectory+'docker-compose-test2.yml';
-const dockerComposeData = (`
+const DOCKERCOMPOSE_PATH = testDirectory + 'docker-compose-test.yml';
+const DOCKERCOMPOSE_PATH2 = testDirectory + 'docker-compose-test2.yml';
+const dockerComposeData = `
 version: '3.4'
 services:
     ipfs.dnp.dappnode.eth:
@@ -36,10 +36,10 @@ networks:
             config:
                 -
                     subnet: 172.33.0.0/16
-`).trim();
+`.trim();
 
 // This one has no ports and no volumes
-const dockerComposeData2 = (`
+const dockerComposeData2 = `
 version: '3.4'
 services:
     ipfs.dnp.dappnode.eth:
@@ -58,8 +58,7 @@ networks:
             config:
                 -
                     subnet: 172.33.0.0/16
-`).trim();
-
+`.trim();
 
 describe('Util: parse', function() {
   describe('docker-compose parsing utils', function() {
@@ -72,32 +71,27 @@ describe('Util: parse', function() {
 
     it('should parse ports', () => {
       const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
-      ports
-        .should.deep.equal(['4001', '4002']);
+      ports.should.deep.equal(['4001', '4002']);
     });
 
     it('should parse ports when there are non', () => {
       const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH2);
-      ports
-        .should.deep.equal([]);
+      ports.should.deep.equal([]);
     });
 
     it('should parse container_name', () => {
       const ports = parse.containerName(DOCKERCOMPOSE_PATH);
-      ports
-        .should.deep.equal('DAppNodeCore-ipfs.dnp.dappnode.eth');
+      ports.should.deep.equal('DAppNodeCore-ipfs.dnp.dappnode.eth');
     });
 
     it('should parse the service volumes', () => {
       const ports = parse.serviceVolumes(DOCKERCOMPOSE_PATH);
-      ports
-        .should.deep.equal(['export', 'data']);
+      ports.should.deep.equal(['export', 'data']);
     });
 
     it('should parse the service volumes when there are non', () => {
       const ports = parse.serviceVolumes(DOCKERCOMPOSE_PATH2);
-      ports
-        .should.deep.equal([]);
+      ports.should.deep.equal([]);
     });
   });
 
@@ -106,36 +100,55 @@ describe('Util: parse', function() {
       VAR1: 'VALUE1',
       VAR2: 'VALUE2',
     };
-    const envString = 'VAR1=VALUE1\nVAR2=VALUE2';
+    const envString = `
+VAR1=VALUE1\nVAR2=VALUE2
+`.trim();
 
     it('should stringify an envs object', () => {
-      parse.stringifyEnvs(envs)
-        .should.equal(envString);
+      parse.stringifyEnvs(envs).should.equal(envString);
     });
 
     it('should parse an env string', () => {
-      parse.envFile(envString)
-        .should.deep.equal(envs);
+      parse.envFile(envString).should.deep.equal(envs);
+    });
+  });
+
+  describe('parse and stringify empty envs', function() {
+    const envs = {
+      VIRTUAL_HOST: '',
+      LETSENCRYPT_HOST: '',
+      time: '1549562581242',
+    };
+    const envString = `
+VIRTUAL_HOST=
+LETSENCRYPT_HOST=
+time=1549562581242
+`.trim();
+
+    it('should stringify an envs object', () => {
+      parse.stringifyEnvs(envs).should.equal(envString);
+    });
+
+    it('should parse an env string', () => {
+      parse.envFile(envString).should.deep.equal(envs);
     });
   });
 
   describe('parse Package request', function() {
     it('should parse a package request', () => {
-      parse.packageReq('package_name@version')
-        .should.deep.equal({
-          name: 'package_name',
-          ver: 'version',
-          req: 'package_name@version',
-        });
+      parse.packageReq('package_name@version').should.deep.equal({
+        name: 'package_name',
+        ver: 'version',
+        req: 'package_name@version',
+      });
     });
 
     it('should add latest to verionless requests', () => {
-      parse.packageReq('package_name')
-        .should.deep.equal({
-          name: 'package_name',
-          ver: '*',
-          req: 'package_name',
-        });
+      parse.packageReq('package_name').should.deep.equal({
+        name: 'package_name',
+        ver: '*',
+        req: 'package_name',
+      });
     });
   });
 });

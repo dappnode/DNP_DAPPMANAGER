@@ -14,19 +14,20 @@ const exec = util.promisify(require('child_process').exec);
  * identified by the killSignal property (the default is 'SIGTERM')
  * if the child runs longer than timeout milliseconds.
  */
-const timeout = 3*60*1000; // ms
+const defaultTimeout = 3 * 60 * 1000; // ms
 
-function shell(cmd) {
-    return exec(cmd, {timeout})
-    .then((res) => res.stdout)
+function shell(cmd, _options) {
+  const options = typeof _options === 'object' ? _options : {};
+  const timeout = options.timeout || defaultTimeout;
+  return exec(cmd, {timeout})
+    .then((res) => (res.stdout || '').trim())
     .catch((err) => {
-        if (err.signal === 'SIGTERM') {
-            throw Error(`cmd "${err.cmd}" timed out (${timeout} ms)`);
-        }
-        throw err;
+      if (err.signal === 'SIGTERM') {
+        throw Error(`cmd "${err.cmd}" timed out (${timeout} ms)`);
+      }
+      throw err;
     });
 }
-
 
 /**
  * About the error object
@@ -64,6 +65,5 @@ cat: aa.txt: No such file or directory
  *
  * Using child_process it's best to just rethrow the recieved error.
  */
-
 
 module.exports = shell;
