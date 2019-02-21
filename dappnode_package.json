@@ -1,6 +1,6 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
   "type": "dncore",
@@ -12,6 +12,9 @@
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
       "/var/run/docker.sock:/var/run/docker.sock"
+    ],
+    "environment": [
+      "LOG_LEVEL"
     ],
     "restart": "always",
     "subnet": "172.33.0.0/16",
