@@ -13,6 +13,9 @@
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
       "/var/run/docker.sock:/var/run/docker.sock"
     ],
+    "environment": [
+      "LOG_LEVEL"
+    ],
     "restart": "always",
     "subnet": "172.33.0.0/16",
     "ipv4_address": "172.33.1.7"
