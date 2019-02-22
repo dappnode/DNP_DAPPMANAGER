@@ -17,6 +17,20 @@ const calls = require('./calls');
 require('./watchers/chains');
 require('./watchers/diskUsage');
 
+/**
+ * For debugging, print current version, branch and commit
+ * { "version": "0.1.21",
+ *   "branch": "master",
+ *   "commit": "ab991e1482b44065ee4d6f38741bd89aeaeb3cec" }
+ */
+let versionData = {};
+try {
+  versionData = require('../.version.json');
+  logs.info(`Version info: \n${JSON.stringify(versionData, null, 2)}`);
+} catch (e) {
+  logs.error(`Error printing current version ${e.stack}`);
+}
+
 /*
  * Connection configuration
  * ************************
@@ -41,7 +55,7 @@ const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRea
 connection.onopen = (session, details) => {
   logs.info('CONNECTED to DAppnode\'s WAMP ' + '\n   url ' + autobahnUrl + '\n   realm: ' + autobahnRealm + '\n   session ID: ' + details.authid);
 
-  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
+  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', () => versionData);
   for (const callId of Object.keys(calls)) {
     registerHandler(session, callId + '.dappmanager.dnp.dappnode.eth', calls[callId]);
   }

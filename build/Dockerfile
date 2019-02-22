@@ -5,12 +5,17 @@ RUN apk add --no-cache git python build-base bind-tools docker bash
 WORKDIR /usr/src/app
 
 # Install app dependencies to use docker's layer cache
-ADD src/package*.json ./
+ADD build/src/package*.json ./
 RUN npm install --production
 
-ADD src .
-ADD entrypoint.sh .
-ADD dns_updater.sh .
+# Add source
+ADD build/src .
+
+# Get this DNP version and git hash. Results in /usr/src/app/.version.json
+ADD .git .git
+ADD dappnode_package.json .
+RUN node getVersion
+RUN rm dappnode_package.json && rm -r .git
 
 # This results in a single layer image
 FROM node:8.9.4-alpine
@@ -57,14 +62,17 @@ RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_
 
 WORKDIR /usr/src/app
 
-COPY --from=build /usr/src/app /usr/src/app
 COPY --from=build /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build /usr/bin/docker /usr/bin/docker
 
-COPY ./dns_updater.sh /etc/periodic/1min/dns_updater
+COPY build/dns_updater.sh /etc/periodic/1min/dns_updater
+COPY build/entrypoint.sh .
 RUN chmod +x /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
 
 ENV DB_PATH /usr/src/app/DNCORE/dappmanagerdb.json
+
+# Copy the src the last as it's the more likely layer to change
+COPY --from=build /usr/src/app /usr/src/app
 
 ENTRYPOINT /usr/src/app/entrypoint.sh
