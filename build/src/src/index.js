@@ -55,7 +55,7 @@ const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRea
 connection.onopen = (session, details) => {
   logs.info('CONNECTED to DAppnode\'s WAMP ' + '\n   url ' + autobahnUrl + '\n   realm: ' + autobahnRealm + '\n   session ID: ' + details.authid);
 
-  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', () => versionData);
+  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', () => ({result: versionData}));
   for (const callId of Object.keys(calls)) {
     registerHandler(session, callId + '.dappmanager.dnp.dappnode.eth', calls[callId]);
   }
