@@ -1,23 +1,24 @@
-version: '3.4'
+version: "3.4"
 networks:
     network:
         driver: bridge
         ipam:
             config:
-                -
-                    subnet: 172.33.0.0/16
+              - subnet: 172.33.0.0/16
 volumes:
     dappmanagerdnpdappnodeeth_data: {}
 services:
     dappmanager.dnp.dappnode.eth:
-        build: ./build
-        image: 'dappmanager.dnp.dappnode.eth:0.1.21'
+        build:
+            context: .
+            dockerfile: ./build/Dockerfile
+        image: "dappmanager.dnp.dappnode.eth:0.1.21"
         container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
         restart: always
         volumes:
-            - 'dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/'
-            - '/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/'
-            - '/var/run/docker.sock:/var/run/docker.sock'
+          - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
+          - "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/"
+          - "/var/run/docker.sock:/var/run/docker.sock"
         dns: 172.33.1.2
         networks:
             network:
