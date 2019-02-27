@@ -12,44 +12,44 @@ const semver = require('semver');
  */
 
 async function dappGetBasic(req) {
-  const reqManifest = await getManifest(req);
-  // reqManifest.dependencies = {
-  //     'bind.dnp.dappnode.eth': '0.1.4',
-  //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
-  // }
+    const reqManifest = await getManifest(req);
+    // reqManifest.dependencies = {
+    //     'bind.dnp.dappnode.eth': '0.1.4',
+    //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
+    // }
 
-  // Append dependencies in the list of DNPs to install
-  const result = {
-    success: (reqManifest || {}).dependencies || {},
-  };
-  // Add current request to pacakages to install
-  result.success[req.name] = req.ver;
+    // Append dependencies in the list of DNPs to install
+    const result = {
+        success: (reqManifest || {}).dependencies || {},
+    };
+    // Add current request to pacakages to install
+    result.success[req.name] = req.ver;
 
-  // The function below does not directly affect funcionality.
-  // However it would prevent already installed DNPs from installing
-  try {
-    const dnps = await dockerList.listContainers();
-    dnps.forEach((dnp) => {
-      if (dnp.name && dnp.version && result.success && result.success[dnp.name]) {
-        const currentVersion = dnp.version;
-        const newVersion = result.success[dnp.name];
-        if (!shouldUpdate(currentVersion, newVersion)) {
-          delete result.success[dnp.name];
-        }
-      }
-    });
-  } catch (e) {
-    logs.error('Error listing current containers: ' + e);
-  }
+    // The function below does not directly affect funcionality.
+    // However it would prevent already installed DNPs from installing
+    try {
+        const dnps = await dockerList.listContainers();
+        dnps.forEach((dnp) => {
+            if (dnp.name && dnp.version && result.success && result.success[dnp.name]) {
+                const currentVersion = dnp.version;
+                const newVersion = result.success[dnp.name];
+                if (!shouldUpdate(currentVersion, newVersion)) {
+                    delete result.success[dnp.name];
+                }
+            }
+        });
+    } catch (e) {
+        logs.error('Error listing current containers: ' + e);
+    }
 
-  return result;
+    return result;
 }
 
 function shouldUpdate(v1, v2) {
-  // currentVersion, newVersion
-  v1 = semver.valid(v1) || '999.9.9';
-  v2 = semver.valid(v2) || '9999.9.9';
-  return semver.lt(v1, v2);
+    // currentVersion, newVersion
+    v1 = semver.valid(v1) || '999.9.9';
+    v2 = semver.valid(v2) || '9999.9.9';
+    return semver.lt(v1, v2);
 }
 
 module.exports = dappGetBasic;
