@@ -11,7 +11,7 @@ volumes:
 services:
     dappmanager.dnp.dappnode.eth:
         build: ./build
-        image: 'dappmanager.dnp.dappnode.eth:0.1.21'
+        image: 'dappmanager.dnp.dappnode.eth:0.1.22'
         container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
         restart: always
         volumes:
