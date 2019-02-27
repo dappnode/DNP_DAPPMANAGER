@@ -23,7 +23,32 @@ const sinon = require('sinon');
  * > Also, should not crash due to a dependency loop
  */
 
-const dnpList = getDnpList();
+const dnpList = [
+    {
+        name: 'web.dnp.dappnode.eth',
+        version: '0.0.0',
+        dependencies: {
+            'nginx-proxy.dnp.dappnode.eth': 'latest',
+            'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
+        },
+    },
+    {
+        name: 'vpn.dnp.dappnode.eth',
+        version: '0.1.16',
+        dependencies: undefined,
+    },
+    {
+        name: 'nginx-proxy.dnp.dappnode.eth',
+        version: '0.0.3',
+        dependencies: {'nginx-proxy.dnp.dappnode.eth': 'latest'},
+    },
+    {
+        name: 'letsencrypt-nginx.dnp.dappnode.eth',
+        version: '0.0.4',
+        origin: '/ipfs/Qm1234',
+        dependencies: {'web.dnp.dappnode.eth': 'latest'},
+    },
+];
 const dockerList = {
     listContainers: sinon.stub().callsFake(async () => {
         return dnpList;
@@ -59,19 +84,15 @@ const aggregateDependencies = sinon.stub().callsFake(async ({name, versionRange,
 });
 
 const getRelevantInstalledDnps = sinon.stub().callsFake(({requestedDnps, installedDnps}) => {
-    const relevantInstalledDnpNames = [
-        'web.dnp.dappnode.eth',
-        'letsencrypt-nginx.dnp.dappnode.eth',
-    ];
+    const relevantInstalledDnpNames = ['web.dnp.dappnode.eth', 'letsencrypt-nginx.dnp.dappnode.eth'];
     return dnpList.filter((dnp) => relevantInstalledDnpNames.includes(dnp.name));
 });
 
-const aggregate =
-    proxyquire('modules/dappGet/aggregate/index', {
-        './getRelevantInstalledDnps': getRelevantInstalledDnps,
-        './aggregateDependencies': aggregateDependencies,
-        'modules/dockerList': dockerList,
-    });
+const aggregate = proxyquire('modules/dappGet/aggregate/index', {
+    './getRelevantInstalledDnps': getRelevantInstalledDnps,
+    './aggregateDependencies': aggregateDependencies,
+    'modules/dockerList': dockerList,
+});
 
 describe('dappGet/aggregate', () => {
     let dnps;
@@ -86,35 +107,35 @@ describe('dappGet/aggregate', () => {
     it('Should aggregate labeled the packages correctly', () => {
         expect(dnps).to.deep.equal({
             'dependency.dnp.dappnode.eth': {
-              versions: {
-                '0.1.1': {},
-                '0.1.2': {},
-              },
+                versions: {
+                    '0.1.1': {},
+                    '0.1.2': {},
+                },
             },
             'letsencrypt-nginx.dnp.dappnode.eth': {
-              isInstalled: true,
-              versions: {
-                '0.0.4': {
-                  'web.dnp.dappnode.eth': 'latest',
+                isInstalled: true,
+                versions: {
+                    '0.0.4': {
+                        'web.dnp.dappnode.eth': 'latest',
+                    },
                 },
-              },
             },
             'nginx-proxy.dnp.dappnode.eth': {
-              isRequest: true,
-              versions: {
-                '0.1.0': {
-                  'dependency.dnp.dappnode.eth': '^0.1.1',
+                isRequest: true,
+                versions: {
+                    '0.1.0': {
+                        'dependency.dnp.dappnode.eth': '^0.1.1',
+                    },
                 },
-              },
             },
             'web.dnp.dappnode.eth': {
-              isInstalled: true,
-              versions: {
-                '0.0.0': {
-                  'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
-                  'nginx-proxy.dnp.dappnode.eth': 'latest',
+                isInstalled: true,
+                versions: {
+                    '0.0.0': {
+                        'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
+                        'nginx-proxy.dnp.dappnode.eth': 'latest',
+                    },
                 },
-              },
             },
         });
     });
@@ -140,35 +161,3 @@ describe('dappGet/aggregate', () => {
         });
     });
 });
-
-function getDnpList() {
-    return [
-        {
-            dependencies: {
-                'nginx-proxy.dnp.dappnode.eth': 'latest',
-                'letsencrypt-nginx.dnp.dappnode.eth': 'latest',
-            },
-            name: 'web.dnp.dappnode.eth',
-            version: '0.0.0',
-            origin: undefined,
-        },
-        {
-            dependencies: undefined,
-            name: 'vpn.dnp.dappnode.eth',
-            version: '0.1.16',
-            origin: undefined,
-        },
-        {
-            dependencies: {'nginx-proxy.dnp.dappnode.eth': 'latest'},
-            name: 'nginx-proxy.dnp.dappnode.eth',
-            version: '0.0.3',
-            origin: undefined,
-        },
-        {
-            dependencies: {'web.dnp.dappnode.eth': 'latest'},
-            name: 'letsencrypt-nginx.dnp.dappnode.eth',
-            version: '0.0.4',
-            origin: '/ipfs/Qm1234',
-        },
-    ];
-}
