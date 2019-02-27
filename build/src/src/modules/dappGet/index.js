@@ -3,6 +3,7 @@ const aggregate = require('./aggregate');
 const resolve = require('./resolve');
 const dockerList = require('modules/dockerList');
 const logs = require('logs.js')(module);
+const shouldUpdate = require('./utils/shouldUpdate');
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -71,15 +72,20 @@ async function dappGet(req) {
   }
 
   // Format output only on success
-  if (!result.success) return result;
-  dnpList.forEach((dnp) => {
-    if (result.success[dnp.name] && result.success[dnp.name] === dnp.version) {
-      // DNP is already updated.
-      // Remove from the success object and add it to the alreadyUpdatedd
-      if (!result.alreadyUpdated) result.alreadyUpdated = {};
-      result.alreadyUpdated[dnp.name] = result.success[dnp.name];
-      delete result.success[dnp.name];
-    }
+    if (!result.success) return result;
+    dnpList.forEach((dnp) => {
+        if (result.success[dnp.name]) {
+            // DNP is installed
+            const currentVersion = dnp.version;
+            const newVersion = result.success[dnp.name];
+            if (!shouldUpdate(currentVersion, newVersion)) {
+                // DNP is already updated.
+                // Remove from the success object and add it to the alreadyUpdatedd
+                if (!result.alreadyUpdated) result.alreadyUpdated = {};
+                result.alreadyUpdated[dnp.name] = result.success[dnp.name];
+                delete result.success[dnp.name];
+            }
+        }
   });
 
   return result;
