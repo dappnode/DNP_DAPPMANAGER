@@ -1,7 +1,7 @@
 const dockerList = require('modules/dockerList');
 const logs = require('logs.js')(module);
 const getManifest = require('modules/getManifest');
-const semver = require('semver');
+const shouldUpdate = require('./utils/shouldUpdate');
 
 /**
  * The dappGet resolver may cause errors.
@@ -43,13 +43,6 @@ async function dappGetBasic(req) {
     }
 
     return result;
-}
-
-function shouldUpdate(v1, v2) {
-    // currentVersion, newVersion
-    v1 = semver.valid(v1) || '999.9.9';
-    v2 = semver.valid(v2) || '9999.9.9';
-    return semver.lt(v1, v2);
 }
 
 module.exports = dappGetBasic;
