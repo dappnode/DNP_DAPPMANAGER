@@ -25,13 +25,14 @@ function mockTest() {
       DNCORE_DIR: "DNCORE",
       REPO_DIR: "test_files/"
     };
+    const logsString = "LOGS";
 
     let hasLogged = false;
     const PACKAGE_NAME = "test.dnp.dappnode.eth";
     const docker = {
-      log: async path => {
+      log: async () => {
         hasLogged = true;
-        return "LOGS";
+        return logsString;
       }
     };
 
@@ -66,10 +67,7 @@ function mockTest() {
       expect(res).to.be.ok;
       expect(res).to.have.property("message");
       expect(res).to.deep.include({
-        result: {
-          id: PACKAGE_NAME,
-          logs: "LOGS"
-        }
+        result: logsString
       });
     });
   });

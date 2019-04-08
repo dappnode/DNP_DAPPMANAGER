@@ -12,11 +12,7 @@ const docker = require("modules/docker");
  *   options: log options (object)
  * }
  * @return {Object} A formated success message.
- * result:
- *   {
- *     id: packageName, (string)
- *     logs: <String with escape codes> (string)
- *   },
+ * result: logs: <String with escape codes> (string)
  */
 const logPackage = async ({ id, options }) => {
   if (!id) throw Error("kwarg id must be defined");
@@ -31,10 +27,7 @@ const logPackage = async ({ id, options }) => {
 
   return {
     message: "Got logs of " + id,
-    result: {
-      id: id,
-      logs
-    }
+    result: logs
   };
 };
 
