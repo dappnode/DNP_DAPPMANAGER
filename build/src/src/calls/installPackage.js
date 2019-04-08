@@ -155,7 +155,14 @@ const installPackage = async ({
     const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest) || {};
     const previousEnvs = envsHelper.load(name, isCore) || {};
     const _userSetEnvs = userSetEnvs[pkg.manifest.name] || {};
-    // Merge ENVs by priority, first userSet on installation, then previously set (on updates), or defaults (manifest)
+    /**
+     * Merge ENVs by priority
+     * 1. userSet on installation
+     * 2. previously set (already installed DNPs)
+     * 3. default values from the manifest
+     * Empty values will NOT be replaced on updates. If values DO need to be replaced use:
+     *   envs = require("utils/merge").envs(defaultEnvs, previousEnvs, userSetEnvs)
+     */
     const envs = { ...defaultEnvs, ...previousEnvs, ..._userSetEnvs };
     envsHelper.write(name, isCore, envs);
     logs.debug(

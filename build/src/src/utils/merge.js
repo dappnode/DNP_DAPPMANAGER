@@ -96,9 +96,28 @@ function mergeManifestPorts(manifest, userSetPorts) {
   };
 }
 
+/**
+ * Merge ENVS. Slightly modified object merge where values = "" are ignored,
+ * @param {...Object} envObj, list of envObjs ordered by priority
+ * mergeEnvs(envsLessPriotiry, envsMorePriority)
+ * envObj = { ENV_NAME: "ENV_VALUE" }
+ * @returns {Object} envs = { ENV_NAME: "ENV_VALUE" }
+ */
+function mergeEnvs(...envObjs) {
+  const envNames = Object.keys(Object.assign({}, ...envObjs));
+  return envNames.reduce((envs, envName) => {
+    envs[envName] = envObjs.reduce(
+      (value, envObj) => envObj[envName] || value,
+      ""
+    );
+    return envs;
+  }, {});
+}
+
 module.exports = {
   manifest: {
     vols: mergeManifestVols,
     ports: mergeManifestPorts
-  }
+  },
+  envs: mergeEnvs
 };
