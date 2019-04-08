@@ -9,9 +9,9 @@ const { createLogger, format, transports } = winston;
 /*
  * > LEVELS:
  * ---------------------
- * logs.info('Something')
- * logs.warn('Something')
- * logs.error('Something')
+ * logs.info("Something")
+ * logs.warn("Something")
+ * logs.error("Something")
  */
 
 const scFormat = format.printf(info => {

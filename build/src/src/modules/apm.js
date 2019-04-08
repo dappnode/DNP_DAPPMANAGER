@@ -159,7 +159,7 @@ const getLatestWithVersion = async packageReq => {
     if (String(e).includes("decode uint16 from ABI")) {
       logs.error("Attempting to fetch an inexistent version");
     } else {
-      logs.error("Error getting latest version of " + name + ": " + e.stack);
+      logs.error(`Error getting latest version of ${name}: ${e.stack}`);
     }
   }
   return versions;
@@ -226,7 +226,7 @@ const getRepoVersions = async (packageReq, verReq) => {
         if (String(e).includes("decode uint16 from ABI")) {
           logs.error("Attempting to fetch an inexistent version");
         } else {
-          logs.error("Error getting versions of " + name + ": " + e.stack);
+          logs.error(`Error getting versions of ${name}: ${e.stack}`);
         }
       }
     })

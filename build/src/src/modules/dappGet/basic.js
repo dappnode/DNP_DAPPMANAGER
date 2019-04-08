@@ -39,7 +39,7 @@ async function dappGetBasic(req) {
       }
     });
   } catch (e) {
-    logs.error("Error listing current containers: " + e);
+    logs.error(`Error listing current containers: ${e.stack}`);
   }
 
   return result;

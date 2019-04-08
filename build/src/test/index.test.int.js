@@ -121,7 +121,7 @@ describe("Full integration test with REAL docker: ", function() {
   });
 
   after(() => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> CLOSING TEST");
+    logs.info("\x1b[36m%s\x1b[0m >> CLOSING TEST");
     const web3 = require("modules/web3Setup");
     web3.clearWatch();
     if (
@@ -167,11 +167,10 @@ describe("Full integration test with REAL docker: ", function() {
 
 function testInstallPackage(installPackage, kwargs) {
   it("call installPackage", done => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> INSTALLING");
+    logs.info("\x1b[36m%s\x1b[0m >> INSTALLING");
     installPackage(kwargs)
       .then(
         res => {
-          // logs.info('\x1b[33m%s\x1b[0m', res)
           expect(res).to.have.property("message");
         },
         e => {
@@ -185,9 +184,8 @@ function testInstallPackage(installPackage, kwargs) {
 
 function testLogPackage(logPackage, kwargs) {
   it("call logPackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> LOGGING");
+    logs.info("\x1b[36m%s\x1b[0m >> LOGGING");
     const res = await logPackage(kwargs);
-    // logs.info('\x1b[33m%s\x1b[0m', res)
     expect(res).to.have.property("message");
     expect(res.result).to.be.a("object");
     expect(res.result).to.have.property("logs");
@@ -201,14 +199,13 @@ function testListPackages(listPackages, packageName, state) {
   it(
     "call listPackages, to check " + packageName + " is " + state,
     async () => {
-      logs.info("\x1b[36m%s\x1b[0m", ">> LISTING");
+      logs.info("\x1b[36m%s\x1b[0m >> LISTING");
       const res = await listPackages();
       expect(res).to.have.property("message");
       // filter returns an array of results (should have only one)
       let pkg = res.result.filter(e => {
         return e.name.includes(packageName);
       })[0];
-      // logs.info('\x1b[33m%s\x1b[0m', pkg)
       if (state == "down") expect(pkg).to.be.undefined;
       else expect(pkg.state).to.equal(state);
     }
@@ -217,7 +214,7 @@ function testListPackages(listPackages, packageName, state) {
 
 function testTogglePackage(togglePackage, kwargs) {
   it("call togglePackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> TOGGLING START / STOP");
+    logs.info("\x1b[36m%s\x1b[0m >> TOGGLING START / STOP");
     const res = await togglePackage(kwargs);
     expect(res).to.have.property("message");
   }).timeout(20 * 1000);
@@ -225,7 +222,7 @@ function testTogglePackage(togglePackage, kwargs) {
 
 function testRemovePackage(removePackage, kwargs) {
   it("call removePackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> REMOVING");
+    logs.info("\x1b[36m%s\x1b[0m >> REMOVING");
     const res = await removePackage(kwargs);
     expect(res).to.have.property("message");
   }).timeout(20 * 1000);
@@ -237,7 +234,7 @@ function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
   const ENV_FILE_PATH = getPath.envFile(id, params);
 
   it("call updatePackageEnv", async () => {
-    logs.info("\x1b[36m%s\x1b[0m", ">> UPDATING ENVS");
+    logs.info("\x1b[36m%s\x1b[0m >> UPDATING ENVS");
     const res = await updatePackageEnv({
       id,
       envs: { time: envValue },

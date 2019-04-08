@@ -44,7 +44,7 @@ function isEthDomain(domain) {
   }
 
   if (domain.substr(domain.length - 4) != ".eth") {
-    logs.error("ERROR: reponame is not an .eth domain: " + domain);
+    logs.error(`Error: reponame is not an .eth domain: ${domain}`);
     throw Error("reponame is not an .eth domain: " + domain);
   }
 }

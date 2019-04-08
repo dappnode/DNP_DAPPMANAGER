@@ -93,14 +93,9 @@ const fetchDirectory = async () => {
           }
           emitPkg({ name, avatar });
         } catch (e) {
-          // If the avatar can not be fetched don't crash
+          // If the avatar can not be fetched don't stop the function
           logs.error(
-            "Could not fetch avatar of " +
-              name +
-              " at " +
-              avatarHash +
-              ": " +
-              e.message
+            `Error fetching avatar of ${name} at ${avatarHash}: ${e.message}`
           );
         }
       }

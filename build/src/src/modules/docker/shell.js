@@ -14,7 +14,7 @@ async function shellWrap(cmd, options) {
   } catch (e) {
     if (e.message && e.message.includes("Couldn't find env file:")) {
       const envPath = e.message.split("Couldn't find env file:")[1].trim();
-      logs.warn("RETRY SHELL JS command, creating envFile " + envPath);
+      logs.warn(`RETRY SHELL JS command, creating envFile: ${envPath}`);
       await shell(`touch ${envPath}`);
       return await shell(cmd);
     } else {

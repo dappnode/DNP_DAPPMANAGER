@@ -47,7 +47,9 @@ const fetchPackageData = async ({ id }) => {
     } catch (e) {
       // If the avatar can not be fetched don't crash
       logs.error(
-        "Could not fetch avatar of " + packageReq.name + " at " + avatarHash
+        `Error fetching avatar of ${packageReq.name} at ${avatarHash}: ${
+          e.message
+        }`
       );
     }
   }

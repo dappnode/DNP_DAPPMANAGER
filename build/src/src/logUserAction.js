@@ -17,9 +17,9 @@ const params = require("params");
 /*
  * > LEVELS:
  * ---------------------
- * logs.info('Something')
- * logs.warn('Something')
- * logs.error('Something')
+ * logs.info("Something")
+ * logs.warn("Something")
+ * logs.error("Something")
  */
 
 /**

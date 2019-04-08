@@ -21,14 +21,14 @@ function web3Setup() {
     );
 
   let web3 = new Web3(WEB3HOSTWS);
-  logs.info("Web3 connection to: " + WEB3HOSTWS);
+  logs.info(`Web3 connection to: ${WEB3HOSTWS}`);
 
   const webWatch = setInterval(function() {
     web3.eth.net
       .isListening()
       .then()
       .catch(e => {
-        logs.error("Web3 connection error to " + WEB3HOSTWS + ": ", e.message);
+        logs.error(`Web3 connection error to ${WEB3HOSTWS}: ${e.message}`);
         web3.setProvider(WEB3HOSTWS);
       });
   }, 10000);

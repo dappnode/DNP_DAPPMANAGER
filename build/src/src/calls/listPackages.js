@@ -56,7 +56,7 @@ const listPackages = async () => {
     const dockerSystemDfData = await dockerSystemDf();
     dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
   } catch (e) {
-    logs.error("Error appending volume info in listPackages call: " + e.stack);
+    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
   }
 
   // Append envFile and manifest
@@ -78,7 +78,7 @@ const listPackages = async () => {
   });
 
   return {
-    message: "Listing " + dnpList.length + " packages",
+    message: `Listing ${dnpList.length} packages`,
     result: dnpList
   };
 };

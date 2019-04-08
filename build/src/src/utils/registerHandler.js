@@ -25,7 +25,7 @@ const wrapErrors = (handler, event) =>
       logUserAction.log({ level: "info", event, ...res, kwargs });
       const eventShort = event.replace(".dappmanager.dnp.dappnode.eth", "");
       if (res.logMessage) {
-        logs.info("Call " + eventShort + " success: " + res.message);
+        logs.info(`RPC ${eventShort} success: ${res.message}`);
       }
 
       // Return to crossbar
