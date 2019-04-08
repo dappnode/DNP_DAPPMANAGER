@@ -15,6 +15,7 @@ module.exports = {
   fetchPackageData: require("./fetchPackageData"),
   getStats: require("./getStats"),
   getUserActionLogs: require("./getUserActionLogs"),
+  getVersionData: require("./getVersionData"),
   installPackage: require("./installPackage"),
   installPackageSafe: require("./installPackageSafe"),
   listPackages: require("./listPackages"),
