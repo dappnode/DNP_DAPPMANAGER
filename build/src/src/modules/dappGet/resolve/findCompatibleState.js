@@ -67,6 +67,7 @@ function findCompatibleState(dnps) {
 
   if (!totalCases) throw Error("Aggregation error, total cases must be > 0");
 
+  // Keep track of start time to abort if the loop runs for too long
   const startTime = Date.now();
   let hasTimedOut = false;
   let caseId;
@@ -96,6 +97,7 @@ function findCompatibleState(dnps) {
     }
   }
 
+  // This point will be reached if no compatible state was found. Then, return error
   return {
     success: false,
     message: generateErrorMessage({
