@@ -142,7 +142,7 @@ const installPackage = async ({
 
   // 4. Download requested packages in paralel
   await Promise.all(pkgs.map(pkg => packages.download({ pkg, id })));
-  logs.debug(
+  logs.info(
     `Successfully downloaded DNPs ${pkgs.map(({ name }) => name).join(", ")}`
   );
 
@@ -165,7 +165,7 @@ const installPackage = async ({
      */
     const envs = { ...defaultEnvs, ...previousEnvs, ..._userSetEnvs };
     envsHelper.write(name, isCore, envs);
-    logs.debug(
+    logs.info(
       `Wrote envs for DNP ${name} ${isCore ? "(Core)" : ""}:\n ${JSON.stringify(
         envs,
         null,
@@ -186,11 +186,12 @@ const installPackage = async ({
     //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
     const lockedPortsToOpen = await lockPorts({ pkg });
-    logs.debug(
-      `Locked ${lockedPortsToOpen.length} ports of DNP ${
-        pkg.name
-      }: ${JSON.stringify(lockedPortsToOpen)}`
-    );
+    if (lockedPortsToOpen.length)
+      logs.info(
+        `Locked ${lockedPortsToOpen.length} ports of DNP ${
+          pkg.name
+        }: ${JSON.stringify(lockedPortsToOpen)}`
+      );
 
     // Skip if there are no ports to open or if UPnP is not available
     const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
