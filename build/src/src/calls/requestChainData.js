@@ -14,9 +14,9 @@ const requestChainData = async () => {
   // it is shown as quick as possible in the front-end
   eventBus.emit(eventBusTag.requestedChainData);
 
+  // Do NOT log a message or a user action as this method is call too often
   return {
-    message: `Requested chain data until ${params.CHAIN_DATA_UNTIL}`,
-    logMessage: true
+    message: `Requested chain data until ${params.CHAIN_DATA_UNTIL}`
   };
 };
 
