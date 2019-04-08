@@ -31,41 +31,45 @@ const wrapErrors = (handler, event) =>
         message: res.message,
         result: res.result || {}
       });
-    } catch (err) {
-      // Rename known shit-errors
-      // When attempting to call a contract while the chain is syncing:
+    } catch (e) {
+      const msg = e.message || ""; // alias to simplify code
+
+      /**
+       * Rename known shit-errors
+       * 1. Ethchain is still syncing
+       * 2. Ethcain's JSON RPC is unreachable
+       */
       if (
-        err.message &&
-        (err.message.includes("decode 0x from ABI") ||
-          err.message.includes("decode address from ABI"))
+        msg.includes("decode 0x from ABI") ||
+        msg.includes("decode address from ABI")
       ) {
-        err.code = "SYNCING";
-        err.message = `Chain is still syncing: ${err.message}`;
-      }
-      // When attempting an JSON RPC but the connection with the node is closed:
-      if (err.message && err.message.includes("connection not open")) {
-        err.message = `Could not connect to ethchain: ${err.message}`;
+        /**
+         * 1. When attempting to call a contract while the chain is syncing
+         * - Do not emit a userActionLog
+         * - Print a warning only
+         */
+        logs.warn(`Chain is still syncing, on ${event}: ${msg}`);
+      } else if (msg.includes("connection not open")) {
+        /**
+         * 2. When attempting an JSON RPC but the connection with the node is closed
+         * - Emit a userActionLog
+         * - Print a warning only
+         */
+        logs.warn(`Could not connect to ethchain node, on ${event}: ${msg}`);
+        logUserAction.log({ level: "error", event, ...error2obj(e), kwargs });
+      } else {
+        /**
+         * 0. Else
+         * - Emit a userActionLog
+         * - Print an error
+         */
+        logs.error(`Error on ${event}: ${e.stack}`);
+        logUserAction.log({ level: "error", event, ...error2obj(e), kwargs });
       }
 
-      // ##### Don't reflect logId in the userActions logs (delete w/ immutable method)
-      const _kwargs = Object.assign({}, kwargs);
-      if (_kwargs && _kwargs.logId) delete _kwargs.logId;
-
-      // Don't log to userActions is "SYNCING" errors
-      if (err.code !== "SYNCING") {
-        logUserAction.log({
-          level: "error",
-          event,
-          ...error2obj(err),
-          kwargs: _kwargs
-        });
-      }
-      logs.error(
-        "Call " + event + " error: " + err.message + "\nStack: " + err.stack
-      );
       return JSON.stringify({
         success: false,
-        message: err.message
+        message: e.message
       });
     }
   };
