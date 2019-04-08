@@ -1,23 +1,23 @@
 /**
  * Normal case for a core DNP
  */
-const name = 'Normal case for a core DNP';
+const name = "Normal case for a core DNP";
 
 const manifest = {
-  name: 'bind.dnp.dappnode.eth',
-  version: '0.1.0',
-  description: 'Dappnode package responsible for providing DNS resolution',
-  avatar: '/ipfs/QmXFGDiNDxBVZHLH5MgEstZwHFb2J3CWHmPKmc45zQWv1z',
-  type: 'dncore',
+  name: "bind.dnp.dappnode.eth",
+  version: "0.1.0",
+  description: "Dappnode package responsible for providing DNS resolution",
+  avatar: "/ipfs/QmXFGDiNDxBVZHLH5MgEstZwHFb2J3CWHmPKmc45zQWv1z",
+  type: "dncore",
   image: {
-    path: 'bind.dnp.dappnode.eth_0.1.0.tar.xz',
-    hash: '/ipfs/QmTz1c5RWT7qyKBhnv4tUbPcMarpTSsDd8r6GXG6LD176j',
+    path: "bind.dnp.dappnode.eth_0.1.0.tar.xz",
+    hash: "/ipfs/QmTz1c5RWT7qyKBhnv4tUbPcMarpTSsDd8r6GXG6LD176j",
     size: 3235875,
-    volumes: ['dnp_bind_data:/etc/bind'],
-    restart: 'always',
-    subnet: '172.33.0.0/16',
-    ipv4_address: '172.33.1.2',
-  },
+    volumes: ["dnp_bind_data:/etc/bind"],
+    restart: "always",
+    subnet: "172.33.0.0/16",
+    ipv4_address: "172.33.1.2"
+  }
 };
 
 const dc = `version: '3.4'
@@ -47,4 +47,4 @@ networks:
                     subnet: 172.33.0.0/16
 `;
 
-module.exports = {name, manifest, dc};
+module.exports = { name, manifest, dc };

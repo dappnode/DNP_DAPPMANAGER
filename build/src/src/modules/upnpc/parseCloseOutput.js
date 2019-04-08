@@ -1,7 +1,5 @@
-const parseGeneralErrors = require('./parseGeneralErrors');
-const validateKwargs = require('./validateKwargs');
-
-/* eslint-disable max-len */
+const parseGeneralErrors = require("./parseGeneralErrors");
+const validateKwargs = require("./validateKwargs");
 
 // SUCCESSFUL: Close an existing port
 
@@ -48,7 +46,7 @@ const validateKwargs = require('./validateKwargs');
  * @return {*}
  */
 function parseCloseOutput(terminalOutput) {
-  validateKwargs({terminalOutput});
+  validateKwargs({ terminalOutput });
   parseGeneralErrors(terminalOutput);
 
   // Get the last line of the output
@@ -56,8 +54,8 @@ function parseCloseOutput(terminalOutput) {
   const lastLine = lines[lines.length - 1];
 
   // Check if it contains "failed"
-  if (lastLine.includes('failed')) {
-    const errorMessage = 'failed ' + (lastLine.split('failed')[1] || '').trim();
+  if (lastLine.includes("failed")) {
+    const errorMessage = "failed " + (lastLine.split("failed")[1] || "").trim();
     throw Error(`Error closing port: ${errorMessage}`);
   }
 

@@ -1,5 +1,5 @@
-const prioritizeVersions = require('./prioritizeVersions');
-const prioritizeDnps = require('./prioritizeDnps');
+const prioritizeVersions = require("./prioritizeVersions");
+const prioritizeDnps = require("./prioritizeDnps");
 
 /**
  * Computes key parameters to construct all version permutations
@@ -28,34 +28,33 @@ const prioritizeDnps = require('./prioritizeDnps');
  * ]
  */
 function getPermutationsTable(dnps) {
-    let m = 1;
-    // This sort is extremely important. It prioritizes the first successful version
-    // The sort orders the priority criterias as follows
-    // - The requested DNP has the highest version
-    // - The already installed DNPs have the closest version to the current one
-    // - Newly installed DNPs have the highest versions
-    //
-    // If a DNP is at the end of the array, its first version will be tested
-    // against all possible permutations
-    //
-    // Order 1          Order 2
-    // [A, B]           [B, A]
-    // {A: 1, B: 1}     {B: 1, A: 1}
-    // {A: 2, B: 1}     {B: 2, A: 1}
-    // {A: 1, B: 2}     {B: 1, A: 2}
-    // {A: 2, B: 2}     {B: 2, A: 2}
-    //
-    // It is more important for A to have a specific version than B,
-    // then order 2 should be followed
-    return prioritizeDnps(dnps).map((dnp) => {
-        const versions = prioritizeVersions(dnp);
-        const n = versions.length;
-        const _m = m;
-        m = m * n;
-        return {name: dnp.name, versions, n, m: _m};
-    });
+  let m = 1;
+  // This sort is extremely important. It prioritizes the first successful version
+  // The sort orders the priority criterias as follows
+  // - The requested DNP has the highest version
+  // - The already installed DNPs have the closest version to the current one
+  // - Newly installed DNPs have the highest versions
+  //
+  // If a DNP is at the end of the array, its first version will be tested
+  // against all possible permutations
+  //
+  // Order 1          Order 2
+  // [A, B]           [B, A]
+  // {A: 1, B: 1}     {B: 1, A: 1}
+  // {A: 2, B: 1}     {B: 2, A: 1}
+  // {A: 1, B: 2}     {B: 1, A: 2}
+  // {A: 2, B: 2}     {B: 2, A: 2}
+  //
+  // It is more important for A to have a specific version than B,
+  // then order 2 should be followed
+  return prioritizeDnps(dnps).map(dnp => {
+    const versions = prioritizeVersions(dnp);
+    const n = versions.length;
+    const _m = m;
+    m = m * n;
+    return { name: dnp.name, versions, n, m: _m };
+  });
 }
-
 
 /**
  * Computes the total number of possible permutations
@@ -68,9 +67,11 @@ function getPermutationsTable(dnps) {
  * @return {Integer} total number of possible permutations
  */
 function getTotalPermutations(permutationsTable) {
-    return Object.values(permutationsTable).reduce((num, dnp) => num * dnp.versions.length, 1);
+  return Object.values(permutationsTable).reduce(
+    (num, dnp) => num * dnp.versions.length,
+    1
+  );
 }
-
 
 /**
  * Computes the # i permutation of DNP versions of the set defined by x.
@@ -89,15 +90,15 @@ function getTotalPermutations(permutationsTable) {
  * { A: '2.2.0', C: '2.0.0', D: '1.1.0' }
  */
 function getPermutation(permutationsTable, i) {
-    let permutation = {};
-    for (const dnp of permutationsTable) {
-        permutation[dnp.name] = dnp.versions[Math.floor(i/dnp.m)%dnp.n];
-    }
-    return permutation;
+  let permutation = {};
+  for (const dnp of permutationsTable) {
+    permutation[dnp.name] = dnp.versions[Math.floor(i / dnp.m) % dnp.n];
+  }
+  return permutation;
 }
 
 module.exports = {
-    getPermutation,
-    getPermutationsTable,
-    getTotalPermutations,
+  getPermutation,
+  getPermutationsTable,
+  getTotalPermutations
 };

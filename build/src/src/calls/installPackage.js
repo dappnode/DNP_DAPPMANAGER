@@ -1,20 +1,20 @@
-const {eventBus, eventBusTag} = require('eventBus');
-const logs = require('logs.js')(module);
-const db = require('db');
+const { eventBus, eventBusTag } = require("eventBus");
+const logs = require("logs.js")(module);
+const db = require("db");
 // Modules
-const packages = require('modules/packages');
-const dappGet = require('modules/dappGet');
-const dappGetBasic = require('modules/dappGet/basic');
-const getManifest = require('modules/getManifest');
-const lockPorts = require('modules/lockPorts');
+const packages = require("modules/packages");
+const dappGet = require("modules/dappGet");
+const dappGetBasic = require("modules/dappGet/basic");
+const getManifest = require("modules/getManifest");
+const lockPorts = require("modules/lockPorts");
 // Utils
-const logUI = require('utils/logUI');
-const parse = require('utils/parse');
-const merge = require('utils/merge');
-const isIpfsRequest = require('utils/isIpfsRequest');
-const isSyncing = require('utils/isSyncing');
-const envsHelper = require('utils/envsHelper');
-const parseManifestPorts = require('utils/parseManifestPorts');
+const logUI = require("utils/logUI");
+const parse = require("utils/parse");
+const merge = require("utils/merge");
+const isIpfsRequest = require("utils/isIpfsRequest");
+const isSyncing = require("utils/isSyncing");
+const envsHelper = require("utils/envsHelper");
+const parseManifestPorts = require("utils/parseManifestPorts");
 
 /* eslint-disable max-len */
 
@@ -55,8 +55,15 @@ const parseManifestPorts = require('utils/parseManifestPorts');
  * @return {Object} A formated success message.
  * result: empty
  */
-const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPorts = {}, logId, options = {}}) => {
-  if (!id) throw Error('kwarg id must be defined');
+const installPackage = async ({
+  id,
+  userSetEnvs = {},
+  userSetVols = {},
+  userSetPorts = {},
+  logId,
+  options = {}
+}) => {
+  if (!id) throw Error("kwarg id must be defined");
 
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
@@ -65,7 +72,7 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
 
   // If the request is not from IPFS, check if the chain is syncing
   if (!isIpfsRequest(req) && (await isSyncing())) {
-    throw Error('Mainnet is syncing');
+    throw Error("Mainnet is syncing");
   }
 
   // 2. Resolve the request
@@ -73,30 +80,45 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
   //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
   //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
-  const result = options.BYPASS_RESOLVER ? await dappGetBasic(req) : await dappGet(req);
+  const result = options.BYPASS_RESOLVER
+    ? await dappGetBasic(req)
+    : await dappGet(req);
   if (!result.success) {
-    throw Error(`Request ${req.name}@${req.ver} could not be resolved: ${result.message}`);
+    throw Error(
+      `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`
+    );
   }
-  logs.debug(`Successfully resolved request ${JSON.stringify(req)}:\n ${JSON.stringify(result, null, 2)}`);
+  logs.debug(
+    `Successfully resolved request ${JSON.stringify(req)}:\n ${JSON.stringify(
+      result,
+      null,
+      2
+    )}`
+  );
 
   // 3. Format the request and filter out already updated packages
-  Object.keys(result.alreadyUpdated || {}).forEach((name) => {
-    logUI({logId, name, msg: 'Already updated'});
+  Object.keys(result.alreadyUpdated || {}).forEach(name => {
+    logUI({ logId, name, msg: "Already updated" });
   });
 
   let pkgs = await Promise.all(
-    Object.keys(result.success).map(async (name) => {
+    Object.keys(result.success).map(async name => {
       // 3.2 Fetch manifest
       const ver = result.success[name];
-      let manifest = await getManifest({name, ver});
-      if (!manifest) throw Error('Missing manifest for ' + name);
+      let manifest = await getManifest({ name, ver });
+      if (!manifest) throw Error("Missing manifest for " + name);
 
       // 3.3 Verify dncore condition
       // Prevent default values. Someone can try to spoof "isCore" in the manifest
       // The origin must be the registry controlled by the DAppNode team, and it must NOT come from ipfs, thus APM
-      if (manifest.type == 'dncore') {
-        if (!options.BYPASS_CORE_RESTRICTION && (!name.endsWith('.dnp.dappnode.eth') || ver.startsWith('/ipfs/'))) {
-          throw Error(`Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`);
+      if (manifest.type == "dncore") {
+        if (
+          !options.BYPASS_CORE_RESTRICTION &&
+          (!name.endsWith(".dnp.dappnode.eth") || ver.startsWith("/ipfs/"))
+        ) {
+          throw Error(
+            `Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`
+          );
         }
         manifest.isCore = true;
       }
@@ -106,30 +128,41 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
       manifest = merge.manifest.ports(manifest, userSetPorts);
 
       // Return pkg object
-      return {name, ver, manifest};
+      return { name, ver, manifest };
     })
   );
-  logs.debug(`Processed manifests for: ${pkgs.map(({name}) => name).join(', ')}`);
+  logs.debug(
+    `Processed manifests for: ${pkgs.map(({ name }) => name).join(", ")}`
+  );
 
   // 4. Download requested packages in paralel
-  await Promise.all(pkgs.map((pkg) => packages.download({pkg, logId})));
-  logs.debug(`Successfully downloaded DNPs ${pkgs.map(({name}) => name).join(', ')}`);
+  await Promise.all(pkgs.map(pkg => packages.download({ pkg, logId })));
+  logs.debug(
+    `Successfully downloaded DNPs ${pkgs.map(({ name }) => name).join(", ")}`
+  );
 
   // Patch, install the dappmanager the last always
-  const isDappmanager = (pkg) => (pkg.manifest.name || '').includes('dappmanager.dnp.dappnode.eth');
-  for (const pkg of pkgs.sort((pkg) => (isDappmanager(pkg) ? 1 : -1))) {
+  const isDappmanager = pkg =>
+    (pkg.manifest.name || "").includes("dappmanager.dnp.dappnode.eth");
+  for (const pkg of pkgs.sort(pkg => (isDappmanager(pkg) ? 1 : -1))) {
     // 5. Set ENVs. Set userSetEnvs + the manifest defaults (if not previously set)
-    const {name, isCore} = pkg.manifest;
+    const { name, isCore } = pkg.manifest;
     const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest) || {};
     const previousEnvs = envsHelper.load(name, isCore) || {};
     const _userSetEnvs = userSetEnvs[pkg.manifest.name] || {};
     // Merge ENVs by priority, first userSet on installation, then previously set (on updates), or defaults (manifest)
-    const envs = {...defaultEnvs, ...previousEnvs, ..._userSetEnvs};
+    const envs = { ...defaultEnvs, ...previousEnvs, ..._userSetEnvs };
     envsHelper.write(name, isCore, envs);
-    logs.debug(`Wrote envs for DNP ${name} ${isCore ? '(Core)' : ''}:\n ${JSON.stringify(envs, null, 2)}`);
+    logs.debug(
+      `Wrote envs for DNP ${name} ${isCore ? "(Core)" : ""}:\n ${JSON.stringify(
+        envs,
+        null,
+        2
+      )}`
+    );
 
     // 6. Run requested packages
-    await packages.run({pkg, logId});
+    await packages.run({ pkg, logId });
     logs.debug(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports
@@ -140,21 +173,27 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
     // - lockPorts modifies the docker-compose and returns
     //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
-    const lockedPortsToOpen = await lockPorts({pkg});
-    logs.debug(`Locked ${lockedPortsToOpen.length} ports of DNP ${pkg.name}: ${JSON.stringify(lockedPortsToOpen)}`);
+    const lockedPortsToOpen = await lockPorts({ pkg });
+    logs.debug(
+      `Locked ${lockedPortsToOpen.length} ports of DNP ${
+        pkg.name
+      }: ${JSON.stringify(lockedPortsToOpen)}`
+    );
 
     // Skip if there are no ports to open or if UPnP is not available
     const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
-    const upnpAvailable = await db.get('upnpAvailable');
+    const upnpAvailable = await db.get("upnpAvailable");
     if (portsToOpen.length && upnpAvailable) {
       eventBus.emit(eventBusTag.call, {
-        callId: 'managePorts',
+        callId: "managePorts",
         kwargs: {
-          action: 'open',
-          ports: portsToOpen,
-        },
+          action: "open",
+          ports: portsToOpen
+        }
       });
-      logs.debug(`Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`);
+      logs.debug(
+        `Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`
+      );
     }
   }
 
@@ -163,9 +202,9 @@ const installPackage = async ({id, userSetEnvs = {}, userSetVols = {}, userSetPo
   eventBus.emit(eventBusTag.packageModified);
 
   return {
-    message: 'Installed ' + req.req,
+    message: "Installed " + req.req,
     logMessage: true,
-    userAction: true,
+    userAction: true
   };
 };
 

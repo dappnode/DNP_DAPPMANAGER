@@ -1,4 +1,4 @@
-const shell = require('./shell');
+const shell = require("./shell");
 
 /**
  * Verify a compressed .xz file
@@ -10,13 +10,14 @@ const shell = require('./shell');
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-const verifyXz = (PATH) => shell(`xz -t ${PATH}`)
+const verifyXz = PATH =>
+  shell(`xz -t ${PATH}`)
     .then(() => ({
-        success: true,
+      success: true
     }))
-    .catch((e) => ({
-        success: false,
-        message: e.message,
+    .catch(e => ({
+      success: false,
+      message: e.message
     }));
 
 module.exports = verifyXz;

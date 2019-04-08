@@ -1,8 +1,8 @@
-const fs = require('fs');
-const parse = require('utils/parse');
-const params = require('params');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
+const fs = require("fs");
+const parse = require("utils/parse");
+const params = require("params");
+const getPath = require("utils/getPath");
+const validate = require("utils/validate");
 
 /**
  * Loads a `.env` file from disk and parses its envs
@@ -17,7 +17,7 @@ function loadEnvs(name, isCore) {
   if (!fs.existsSync(envFilePath)) {
     return {};
   }
-  const envFileData = fs.readFileSync(envFilePath, 'utf8');
+  const envFileData = fs.readFileSync(envFilePath, "utf8");
   return parse.envFile(envFileData);
 }
 
@@ -44,8 +44,8 @@ function writeEnvs(name, isCore, envs) {
 function getManifestEnvs(manifest) {
   const envsArray = (manifest.image || {}).environment || [];
   return envsArray.reduce((obj, row) => {
-    const [key, value] = (row || '').trim().split(/=(.*)/);
-    obj[key] = value || '';
+    const [key, value] = (row || "").trim().split(/=(.*)/);
+    obj[key] = value || "";
     return obj;
   }, {});
 }
@@ -53,5 +53,5 @@ function getManifestEnvs(manifest) {
 module.exports = {
   load: loadEnvs,
   write: writeEnvs,
-  getManifestEnvs,
+  getManifestEnvs
 };

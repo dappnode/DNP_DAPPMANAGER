@@ -1,7 +1,7 @@
-const {hasVersion, setVersion} = require('../utils/dnpUtils');
-const sanitizeVersions = require('./sanitizeVersions');
-const sanitizeDependencies = require('./sanitizeDependencies');
-const logs = require('logs.js')(module);
+const { hasVersion, setVersion } = require("../utils/dnpUtils");
+const sanitizeVersions = require("./sanitizeVersions");
+const sanitizeDependencies = require("./sanitizeDependencies");
+const logs = require("logs.js")(module);
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -21,48 +21,58 @@ const logs = require('logs.js')(module);
  */
 
 async function aggregateDependencies({
-    name,
-    versionRange,
-    dnps,
-    recursiveCount,
-    fetch,
+  name,
+  versionRange,
+  dnps,
+  recursiveCount,
+  fetch
 }) {
-    // Control infinite loops
-    if (!recursiveCount) recursiveCount = 1;
-    else if (recursiveCount++ > 1000) return;
+  // Control infinite loops
+  if (!recursiveCount) recursiveCount = 1;
+  else if (recursiveCount++ > 1000) return;
 
-    // Check injected dependency
-    if (!fetch) throw Error('injected dependency "fetch" is not defined');
+  // Check injected dependency
+  if (!fetch) throw Error('injected dependency "fetch" is not defined');
 
-    // 1. Fetch versions of "name" that match this request
-    //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
-    const versions = await fetch.versions({name, versionRange})
+  // 1. Fetch versions of "name" that match this request
+  //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
+  const versions = await fetch
+    .versions({ name, versionRange })
     .then(sanitizeVersions);
-    await Promise.all(versions.map(async (version) => {
-        // Already checked, skip. Otherwise lock request to prevent duplicate fetches
-        if (hasVersion(dnps, name, version)) return;
-        else setVersion(dnps, name, version, {});
-        // 2. Get dependencies of this specific version
-        //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-        const dependencies = await fetch.dependencies({name, version})
+  await Promise.all(
+    versions.map(async version => {
+      // Already checked, skip. Otherwise lock request to prevent duplicate fetches
+      if (hasVersion(dnps, name, version)) return;
+      else setVersion(dnps, name, version, {});
+      // 2. Get dependencies of this specific version
+      //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
+      const dependencies = await fetch
+        .dependencies({ name, version })
         .then(sanitizeDependencies)
-        .catch((e) => {
-            logs.warn(`Error fetching ${name}@${version} dependencies (assuming it has none). Error stack: ${e.stack}`);
-            return {};
+        .catch(e => {
+          logs.warn(
+            `Error fetching ${name}@${version} dependencies (assuming it has none). Error stack: ${
+              e.stack
+            }`
+          );
+          return {};
         });
-        // 3. Store dependencies
-        setVersion(dnps, name, version, dependencies);
-        // 4. Fetch sub-dependencies recursively
-        await Promise.all(Object.keys(dependencies).map(async (dependencyName) => {
-            await aggregateDependencies({
-                name: dependencyName,
-                versionRange: dependencies[dependencyName],
-                dnps,
-                recursiveCount,
-                fetch,
-            });
-        }));
-    }));
+      // 3. Store dependencies
+      setVersion(dnps, name, version, dependencies);
+      // 4. Fetch sub-dependencies recursively
+      await Promise.all(
+        Object.keys(dependencies).map(async dependencyName => {
+          await aggregateDependencies({
+            name: dependencyName,
+            versionRange: dependencies[dependencyName],
+            dnps,
+            recursiveCount,
+            fetch
+          });
+        })
+      );
+    })
+  );
 }
 
 module.exports = aggregateDependencies;

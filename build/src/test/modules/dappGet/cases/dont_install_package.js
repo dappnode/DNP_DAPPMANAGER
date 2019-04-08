@@ -10,42 +10,41 @@
  */
 
 module.exports = {
-    name: 'dont install DNP if not necessary',
-    req: {
-      name: 'dnp-a.eth',
-      ver: '^0.1.0',
+  name: "dont install DNP if not necessary",
+  req: {
+    name: "dnp-a.eth",
+    ver: "^0.1.0"
+  },
+  expectedSuccess: {
+    "dnp-a.eth": "0.1.2"
+  },
+  expectedAggregate: {
+    "dnp-a.eth": {
+      isRequest: true,
+      versions: {
+        "0.1.0": {},
+        "0.1.1": { "dnp-c.eth": "0.1.0" },
+        "0.1.2": {}
+      }
     },
-    expectedSuccess: {
-      'dnp-a.eth': '0.1.2',
+    "dnp-c.eth": {
+      versions: {
+        "0.1.0": {}
+      }
+    }
+  },
+  dnps: {
+    "dnp-a.eth": {
+      versions: {
+        "0.1.0": { dependencies: {} },
+        "0.1.1": { dependencies: { "dnp-c.eth": "0.1.0" } },
+        "0.1.2": { dependencies: {} }
+      }
     },
-    expectedAggregate: {
-        'dnp-a.eth': {
-            isRequest: true,
-            versions: {
-                '0.1.0': {},
-                '0.1.1': {'dnp-c.eth': '0.1.0'},
-                '0.1.2': {},
-            },
-        },
-        'dnp-c.eth': {
-            versions: {
-                '0.1.0': {},
-            },
-        },
-    },
-    dnps: {
-      'dnp-a.eth': {
-        versions: {
-          '0.1.0': {dependencies: {}},
-          '0.1.1': {dependencies: {'dnp-c.eth': '0.1.0'}},
-          '0.1.2': {dependencies: {}},
-        },
-      },
-      'dnp-c.eth': {
-        versions: {
-          '0.1.0': {dependencies: {}},
-        },
-      },
-    },
+    "dnp-c.eth": {
+      versions: {
+        "0.1.0": { dependencies: {} }
+      }
+    }
+  }
 };
-

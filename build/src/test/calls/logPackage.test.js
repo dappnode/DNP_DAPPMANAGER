@@ -1,13 +1,13 @@
-const proxyquire = require('proxyquire');
-const chai = require('chai');
-const expect = require('chai').expect;
-const fs = require('fs');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
+const proxyquire = require("proxyquire");
+const chai = require("chai");
+const expect = require("chai").expect;
+const fs = require("fs");
+const getPath = require("utils/getPath");
+const validate = require("utils/validate");
 
 chai.should();
 
-describe('Call function: logPackage', function() {
+describe("Call function: logPackage", function() {
   mockTest();
 });
 
@@ -20,24 +20,24 @@ services:
 `.trim();
 
 function mockTest() {
-  describe('mock test', function() {
+  describe("mock test", function() {
     const params = {
-      DNCORE_DIR: 'DNCORE',
-      REPO_DIR: 'test_files/',
+      DNCORE_DIR: "DNCORE",
+      REPO_DIR: "test_files/"
     };
 
     let hasLogged = false;
-    const PACKAGE_NAME = 'test.dnp.dappnode.eth';
+    const PACKAGE_NAME = "test.dnp.dappnode.eth";
     const docker = {
-      log: async (path) => {
+      log: async path => {
         hasLogged = true;
-        return 'LOGS';
-      },
+        return "LOGS";
+      }
     };
 
-    const logPackage = proxyquire('calls/logPackage', {
-      'modules/docker': docker,
-      'params': params,
+    const logPackage = proxyquire("calls/logPackage", {
+      "modules/docker": docker,
+      params: params
     });
 
     before(() => {
@@ -46,30 +46,30 @@ function mockTest() {
       fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeTemplate);
     });
 
-    it('should log the package with correct arguments', async () => {
-      await logPackage({id: PACKAGE_NAME});
+    it("should log the package with correct arguments", async () => {
+      await logPackage({ id: PACKAGE_NAME });
       expect(hasLogged).to.be.true;
     });
 
-    it('should throw an error with wrong package name', async () => {
-      let error = '--- logPackage did not throw ---';
+    it("should throw an error with wrong package name", async () => {
+      let error = "--- logPackage did not throw ---";
       try {
-        await logPackage({id: 'anotherPackage.dnp.eth'});
+        await logPackage({ id: "anotherPackage.dnp.eth" });
       } catch (e) {
         error = e.message;
       }
-      expect(error).to.include('No docker-compose found');
+      expect(error).to.include("No docker-compose found");
     });
 
-    it('should return a stringified object containing logs', async () => {
-      let res = await logPackage({id: PACKAGE_NAME});
+    it("should return a stringified object containing logs", async () => {
+      let res = await logPackage({ id: PACKAGE_NAME });
       expect(res).to.be.ok;
-      expect(res).to.have.property('message');
+      expect(res).to.have.property("message");
       expect(res).to.deep.include({
         result: {
           id: PACKAGE_NAME,
-          logs: 'LOGS',
-        },
+          logs: "LOGS"
+        }
       });
     });
   });

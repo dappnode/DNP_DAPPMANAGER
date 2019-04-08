@@ -1,17 +1,17 @@
-const getDirectory = require('modules/getDirectory');
-const {eventBus, eventBusTag} = require('eventBus');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
-const parse = require('utils/parse');
-const isSyncing = require('utils/isSyncing');
+const getDirectory = require("modules/getDirectory");
+const { eventBus, eventBusTag } = require("eventBus");
+const logs = require("logs.js")(module);
+const getManifest = require("modules/getManifest");
+const getAvatar = require("modules/getAvatar");
+const parse = require("utils/parse");
+const isSyncing = require("utils/isSyncing");
 
 let packagesCache;
 let avatarCache = {};
 
 function emitPkg(pkg) {
   const pkgsObj = {
-    [pkg.name]: pkg,
+    [pkg.name]: pkg
   };
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
@@ -45,7 +45,7 @@ const fetchDirectory = async () => {
     return {
       message: `Mainnet is still syncing`,
       result: [],
-      logMessage: true,
+      logMessage: true
     };
   }
 
@@ -67,51 +67,63 @@ const fetchDirectory = async () => {
   const packages = await getDirectory();
 
   // Extend package object contents
-  packagesCache = await Promise.all(packages.map(async (pkg) => {
-    const {name} = pkg;
-    emitPkg(pkg);
+  packagesCache = await Promise.all(
+    packages.map(async pkg => {
+      const { name } = pkg;
+      emitPkg(pkg);
 
-    // Now resolve the last version of the package
-    const manifest = await getManifest(parse.packageReq(name));
-    // Correct manifest
-    if (!manifest.type) manifest.type = 'library';
-    emitPkg({name, manifest});
+      // Now resolve the last version of the package
+      const manifest = await getManifest(parse.packageReq(name));
+      // Correct manifest
+      if (!manifest.type) manifest.type = "library";
+      emitPkg({ name, manifest });
 
-    // Fetch the package image
-    const avatarHash = manifest.avatar;
+      // Fetch the package image
+      const avatarHash = manifest.avatar;
 
-    let avatar;
-    if (avatarHash) {
-      try {
-        // Retrieve cached avatar or fetch it
-        if (avatarCache[avatarHash]) {
-          avatar = avatarCache[avatarHash];
-        } else {
-          avatar = await getAvatar(avatarHash);
-          avatarCache[avatarHash] = avatar;
+      let avatar;
+      if (avatarHash) {
+        try {
+          // Retrieve cached avatar or fetch it
+          if (avatarCache[avatarHash]) {
+            avatar = avatarCache[avatarHash];
+          } else {
+            avatar = await getAvatar(avatarHash);
+            avatarCache[avatarHash] = avatar;
+          }
+          emitPkg({ name, avatar });
+        } catch (e) {
+          // If the avatar can not be fetched don't crash
+          logs.error(
+            "Could not fetch avatar of " +
+              name +
+              " at " +
+              avatarHash +
+              ": " +
+              e.message
+          );
         }
-        emitPkg({name, avatar});
-      } catch (e) {
-        // If the avatar can not be fetched don't crash
-        logs.error('Could not fetch avatar of '+name+' at '+avatarHash+': '+e.message);
       }
-    }
 
-    // Merge results and return
-    return {
-      ...pkg,
-      manifest,
-      avatar,
-    };
-  }));
+      // Merge results and return
+      return {
+        ...pkg,
+        manifest,
+        avatar
+      };
+    })
+  );
 
-  const payloadSize = Math.floor(Buffer.byteLength(JSON.stringify(packagesCache), 'utf8')/1000);
+  const payloadSize = Math.floor(
+    Buffer.byteLength(JSON.stringify(packagesCache), "utf8") / 1000
+  );
   return {
-    message: `Listed directory with ${packagesCache.length} packages (${payloadSize} KB)`,
+    message: `Listed directory with ${
+      packagesCache.length
+    } packages (${payloadSize} KB)`,
     result: packagesCache,
-    logMessage: true,
+    logMessage: true
   };
 };
-
 
 module.exports = fetchDirectory;

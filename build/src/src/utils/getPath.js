@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 
 /*
  * Generates file paths given a set of parameters. This tool helps
@@ -15,31 +15,35 @@ const fs = require('fs');
  * Core DNPs and regular DNPs are located in different folders.
  * That's why there is an isCore flag. Also the "Smart" functions
  * try to guess if the requested package is a core or not.
-*/
+ */
 
 // Define paths
 module.exports = {
   packageRepoDir: (dnpName, params, isCore) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     return getRepoDirPath(dnpName, params, isCore);
   },
 
   manifest: (dnpName, params, isCore) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
-    return getRepoDirPath(dnpName, params, isCore) + '/' + getManifestName(dnpName, isCore);
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    return (
+      getRepoDirPath(dnpName, params, isCore) +
+      "/" +
+      getManifestName(dnpName, isCore)
+    );
   },
 
   dockerCompose: (dnpName, params, isCore) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     return getDockerComposePath(dnpName, params, isCore);
   },
 
   dockerComposeSmart: (dnpName, params) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     // First check for core docker-compose
     let DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, params, true);
     if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
@@ -48,14 +52,14 @@ module.exports = {
   },
 
   envFile: (dnpName, params, isCore) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     return getEnvFilePath(dnpName, params, isCore);
   },
 
   envFileSmart: (dnpName, params, isCORE) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!params) throw Error('params must be defined');
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     if (isCORE) return getEnvFilePath(dnpName, params, true);
     // First check for core docker-compose
     let ENV_FILE_PATH = getEnvFilePath(dnpName, params, true);
@@ -65,44 +69,48 @@ module.exports = {
   },
 
   image: (dnpName, imageName, params, isCore) => {
-    if (!dnpName) throw Error('dnpName must be defined');
-    if (!imageName) throw Error('imageName must be defined');
-    if (!params) throw Error('params must be defined');
-    return getRepoDirPath(dnpName, params, isCore) + '/' + imageName;
-  },
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!imageName) throw Error("imageName must be defined");
+    if (!params) throw Error("params must be defined");
+    return getRepoDirPath(dnpName, params, isCore) + "/" + imageName;
+  }
 };
 
 // Helper functions
 
 function getDockerComposePath(dnpName, params, isCore) {
-  return getRepoDirPath(dnpName, params, isCore) + '/' + getDockerComposeName(dnpName, isCore);
+  return (
+    getRepoDirPath(dnpName, params, isCore) +
+    "/" +
+    getDockerComposeName(dnpName, isCore)
+  );
 }
 
 function getEnvFilePath(dnpName, params, isCore) {
-  return getRepoDirPath(dnpName, params, isCore) + '/' + dnpName + '.env';
+  return getRepoDirPath(dnpName, params, isCore) + "/" + dnpName + ".env";
 }
 
 function getRepoDirPath(dnpName, params, isCore) {
-  if (!params.DNCORE_DIR) throw Error('params.DNCORE_DIR must be defined');
-  if (!params.REPO_DIR) throw Error('params.REPO_DIR must be defined');
+  if (!params.DNCORE_DIR) throw Error("params.DNCORE_DIR must be defined");
+  if (!params.REPO_DIR) throw Error("params.REPO_DIR must be defined");
   if (isCore) return params.DNCORE_DIR;
   return params.REPO_DIR + dnpName;
 }
 
 function getDockerComposeName(dnpName, isCore) {
   if (isCore) {
-    const dnpShortName = dnpName.split('.')[0];
+    const dnpShortName = dnpName.split(".")[0];
     return `docker-compose-${dnpShortName}.yml`;
   } else {
-    return 'docker-compose.yml';
+    return "docker-compose.yml";
   }
 }
 
 function getManifestName(dnpName, isCore) {
   if (isCore) {
-    const dnpShortName = dnpName.split('.')[0];
+    const dnpShortName = dnpName.split(".")[0];
     return `dappnode_package-${dnpShortName}.json`;
   } else {
-    return 'dappnode_package.json';
+    return "dappnode_package.json";
   }
 }

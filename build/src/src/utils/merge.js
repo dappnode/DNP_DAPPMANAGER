@@ -1,4 +1,3 @@
-
 /**
  * The general specification is to provide an object in the form of:
  * {
@@ -29,24 +28,25 @@
  * @return {Object} edited or original manifest
  */
 function mergeManifestVols(manifest, userSetVols) {
-    const name = (manifest || {}).name;
-    const manifestVols = ((manifest || {}).image || {}).volumes; // is an array
-    // No volumes for this specific manifest
-    if (!userSetVols[name] || !Object.keys(userSetVols[name]).length) return manifest;
-    if (!manifestVols || !manifestVols.length) return manifest;
+  const name = (manifest || {}).name;
+  const manifestVols = ((manifest || {}).image || {}).volumes; // is an array
+  // No volumes for this specific manifest
+  if (!userSetVols[name] || !Object.keys(userSetVols[name]).length)
+    return manifest;
+  if (!manifestVols || !manifestVols.length) return manifest;
 
-    // For every volume in the manifest:
-    // check if the user has set a new value, otherwise return old value
-    const volumes = manifestVols.map((vol) => {
-        return userSetVols[name][vol] || vol;
-    });
-    return {
-        ...manifest,
-        image: {
-            ...manifest.image,
-            volumes,
-        },
-    };
+  // For every volume in the manifest:
+  // check if the user has set a new value, otherwise return old value
+  const volumes = manifestVols.map(vol => {
+    return userSetVols[name][vol] || vol;
+  });
+  return {
+    ...manifest,
+    image: {
+      ...manifest.image,
+      volumes
+    }
+  };
 }
 
 /**
@@ -75,29 +75,30 @@ function mergeManifestVols(manifest, userSetVols) {
  * @return {Object} edited or original manifest
  */
 function mergeManifestPorts(manifest, userSetPorts) {
-    const name = (manifest || {}).name;
-    const manifestPorts = ((manifest || {}).image || {}).ports; // is an array
-    // No ports for this specific manifest
-    if (!userSetPorts[name] || !Object.keys(userSetPorts[name]).length) return manifest;
-    if (!manifestPorts || !manifestPorts.length) return manifest;
+  const name = (manifest || {}).name;
+  const manifestPorts = ((manifest || {}).image || {}).ports; // is an array
+  // No ports for this specific manifest
+  if (!userSetPorts[name] || !Object.keys(userSetPorts[name]).length)
+    return manifest;
+  if (!manifestPorts || !manifestPorts.length) return manifest;
 
-    // For every port in the manifest:
-    // check if the user has set a new value, otherwise return old value
-    const ports = manifestPorts.map((port) => {
-        return userSetPorts[name][port] || port;
-    });
-    return {
-        ...manifest,
-        image: {
-            ...manifest.image,
-            ports,
-        },
-    };
+  // For every port in the manifest:
+  // check if the user has set a new value, otherwise return old value
+  const ports = manifestPorts.map(port => {
+    return userSetPorts[name][port] || port;
+  });
+  return {
+    ...manifest,
+    image: {
+      ...manifest.image,
+      ports
+    }
+  };
 }
 
 module.exports = {
-    manifest: {
-        vols: mergeManifestVols,
-        ports: mergeManifestPorts,
-    },
+  manifest: {
+    vols: mergeManifestVols,
+    ports: mergeManifestPorts
+  }
 };

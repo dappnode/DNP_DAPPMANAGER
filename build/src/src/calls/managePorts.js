@@ -1,4 +1,4 @@
-const docker = require('modules/docker');
+const docker = require("modules/docker");
 
 /**
  * Open or closes requested ports
@@ -12,31 +12,33 @@ const docker = require('modules/docker');
  * @return {Object} A formated success message.
  * result: empty
  */
-const managePorts = async ({action, ports}) => {
+const managePorts = async ({ action, ports }) => {
   if (!Array.isArray(ports)) {
-    throw Error('kwarg ports must be an array: ' + JSON.stringify(ports));
+    throw Error("kwarg ports must be an array: " + JSON.stringify(ports));
   }
 
   let msg;
   for (const port of ports) {
     switch (action) {
-      case 'open':
+      case "open":
         await docker.openPort(port);
-        msg = 'Opened';
+        msg = "Opened";
         break;
-      case 'close':
+      case "close":
         await docker.closePort(port);
-        msg = 'Closed';
+        msg = "Closed";
         break;
       default:
-        throw Error('Unkown manage ports action: ' + action);
+        throw Error("Unkown manage ports action: " + action);
     }
   }
 
   return {
-    message: `${msg} ports ${ports.map((p) => `${p.number} ${p.type}`).join(', ')}`,
+    message: `${msg} ports ${ports
+      .map(p => `${p.number} ${p.type}`)
+      .join(", ")}`,
     logMessage: true,
-    userAction: true,
+    userAction: true
   };
 };
 

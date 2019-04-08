@@ -1,4 +1,4 @@
-const installPackage = require('./installPackage');
+const installPackage = require("./installPackage");
 
 /**
  * Installs a package in safe mode, by setting options.BYPASS_RESOLVER = true
@@ -10,11 +10,11 @@ const installPackage = require('./installPackage');
  * @return {Object} A formated success message.
  * result: empty
  */
-const installPackageSafe = async ({id, vols = {}, logId, options = {}}) => {
-  if (!id) throw Error('kwarg id must be defined');
+const installPackageSafe = async ({ id, vols = {}, logId, options = {} }) => {
+  if (!id) throw Error("kwarg id must be defined");
 
   options.BYPASS_RESOLVER = true;
-  return await installPackage({id, vols, logId, options});
+  return await installPackage({ id, vols, logId, options });
 };
 
 module.exports = installPackageSafe;

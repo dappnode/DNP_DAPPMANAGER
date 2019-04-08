@@ -1,4 +1,4 @@
-const {eventBus, eventBusTag} = require('eventBus');
+const { eventBus, eventBusTag } = require("eventBus");
 
 /*
  * Some remote procedure calls (RPC) need a continuous update.
@@ -8,8 +8,8 @@ const {eventBus, eventBusTag} = require('eventBus');
  */
 
 function logUI(data) {
-    if (data.name) data.pkg = data.name;
-    eventBus.emit(eventBusTag.logUI, data);
+  if (data.name) data.pkg = data.name;
+  eventBus.emit(eventBusTag.logUI, data);
 }
 
 module.exports = logUI;

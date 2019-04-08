@@ -1,9 +1,7 @@
-const expect = require('chai').expect;
-const parseListOutput = require('modules/upnpc/parseListOutput');
+const expect = require("chai").expect;
+const parseListOutput = require("modules/upnpc/parseListOutput");
 
-/* eslint-disable max-len */
-
-describe('upnpn: parseListOutput', () => {
+describe("upnpn: parseListOutput", () => {
   const terminalOutputSuccess = `upnpc : miniupnpc library test client, version 2.0.
  (c) 2005-2017 Thomas Bernard.
 Go to http://miniupnp.free.fr/ or https://miniupnp.tuxfamily.org/
@@ -39,18 +37,26 @@ for more information.
 No IGD UPnP Device found on the network !
 `;
 
-  it('On success, it should return the current port mappings', async () => {
+  it("On success, it should return the current port mappings", async () => {
     const ports = parseListOutput(terminalOutputSuccess);
-    expect(ports).to.deep.equal([{protocol: 'UDP', exPort: '500', inPort: '500'}, {protocol: 'UDP', exPort: '4500', inPort: '4500'}, {protocol: 'TCP', exPort: '22', inPort: '22'}, {protocol: 'UDP', exPort: '30303', inPort: '30303'}, {protocol: 'TCP', exPort: '30303', inPort: '30303'}, {protocol: 'TCP', exPort: '4001', inPort: '4001'}, {protocol: 'UDP', exPort: '4002', inPort: '4002'}]);
+    expect(ports).to.deep.equal([
+      { protocol: "UDP", exPort: "500", inPort: "500" },
+      { protocol: "UDP", exPort: "4500", inPort: "4500" },
+      { protocol: "TCP", exPort: "22", inPort: "22" },
+      { protocol: "UDP", exPort: "30303", inPort: "30303" },
+      { protocol: "TCP", exPort: "30303", inPort: "30303" },
+      { protocol: "TCP", exPort: "4001", inPort: "4001" },
+      { protocol: "UDP", exPort: "4002", inPort: "4002" }
+    ]);
   });
 
-  it('On error, it should return error', () => {
+  it("On error, it should return error", () => {
     let error;
     try {
       parseListOutput(terminalOutputErrorNoDevice);
     } catch (e) {
       error = e.message;
     }
-    expect(error).to.equal('NOUPNP: No UPnP device available');
+    expect(error).to.equal("NOUPNP: No UPnP device available");
   });
 });

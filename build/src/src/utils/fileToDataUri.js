@@ -1,4 +1,4 @@
-const getDataUri = require('datauri').promise;
+const getDataUri = require("datauri").promise;
 
 /**
  * Converts a file to data URI.

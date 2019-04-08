@@ -1,13 +1,13 @@
-const fs = require('fs');
-const params = require('params');
-const logs = require('logs.js')(module);
+const fs = require("fs");
+const params = require("params");
+const logs = require("logs.js")(module);
 // Modules
-const dockerList = require('modules/dockerList');
-const docker = require('modules/docker');
+const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 // Utils
-const parseDockerSystemDf = require('utils/parseDockerSystemDf');
-const getPath = require('utils/getPath');
-const envsHelper = require('utils/envsHelper');
+const parseDockerSystemDf = require("utils/parseDockerSystemDf");
+const getPath = require("utils/getPath");
+const envsHelper = require("utils/envsHelper");
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
@@ -54,28 +54,32 @@ const listPackages = async () => {
   //   Error response from daemon: a disk usage operation is already running
   try {
     const dockerSystemDfData = await dockerSystemDf();
-    dnpList = parseDockerSystemDf({data: dockerSystemDfData, dnpList});
+    dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
   } catch (e) {
-    logs.error('Error appending volume info in listPackages call: ' + e.stack);
+    logs.error("Error appending volume info in listPackages call: " + e.stack);
   }
 
   // Append envFile and manifest
-  dnpList.map((dnp) => {
+  dnpList.map(dnp => {
     // Add env info, only if there are ENVs
     const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
     if (Object.keys(envs).length) dnp.envs = envs;
 
     // Add manifest
-    const manifestPath = getPath.manifest(dnp.name, params, dnp.isCORE || dnp.isCore);
+    const manifestPath = getPath.manifest(
+      dnp.name,
+      params,
+      dnp.isCORE || dnp.isCore
+    );
     if (fs.existsSync(manifestPath)) {
-      const manifestFileData = fs.readFileSync(manifestPath, 'utf8');
+      const manifestFileData = fs.readFileSync(manifestPath, "utf8");
       dnp.manifest = JSON.parse(manifestFileData);
     }
   });
 
   return {
-    message: 'Listing ' + dnpList.length + ' packages',
-    result: dnpList,
+    message: "Listing " + dnpList.length + " packages",
+    result: dnpList
   };
 };
 

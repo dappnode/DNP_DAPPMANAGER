@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require("../db");
 
 /**
  * Returns not viewed notifications
@@ -16,13 +16,12 @@ const db = require('../db');
  */
 
 const notificationsGet = async () => {
-    const notifications = await db.get(`notification`) || {};
+  const notifications = (await db.get(`notification`)) || {};
 
-    return {
-        message: `Got ${Object.keys(notifications).length} notifications`,
-        result: notifications,
-    };
+  return {
+    message: `Got ${Object.keys(notifications).length} notifications`,
+    result: notifications
+  };
 };
-
 
 module.exports = notificationsGet;

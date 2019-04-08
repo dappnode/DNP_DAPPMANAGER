@@ -1,7 +1,6 @@
 // node modules
-let shell = require('./shell');
+let shell = require("./shell");
 
-/* eslint-disable max-len */
 /* eslint-disable no-useless-escape */
 
 const docker = {
@@ -21,7 +20,9 @@ const docker = {
     //                            container. Implies --abort-on-container-exit.
     up: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " up -d" + optionsString
+      );
     },
 
     // Usage: down [options]
@@ -34,13 +35,17 @@ const docker = {
     //     -t, --timeout TIMEOUT   Specify a shutdown timeout in seconds. (default: 10)
     down: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' down' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " down" + optionsString
+      );
     },
 
     // Usage: start [SERVICE...]
     start: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' start' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " start" + optionsString
+      );
     },
 
     // Usage: stop [options] [SERVICE...]
@@ -48,7 +53,9 @@ const docker = {
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
     stop: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' stop' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " stop" + optionsString
+      );
     },
 
     // Usage: restart [options] [SERVICE...]
@@ -56,13 +63,24 @@ const docker = {
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
     rm: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " rm -sf" + optionsString
+      );
     },
 
     // Safe down & up
     rm_up: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' rm -sf' + optionsString + ' && docker-compose -f ' + DOCKERCOMPOSE_PATH + ' up -d' + optionsString);
+      return shell(
+        "docker-compose -f " +
+          DOCKERCOMPOSE_PATH +
+          " rm -sf" +
+          optionsString +
+          " && docker-compose -f " +
+          DOCKERCOMPOSE_PATH +
+          " up -d" +
+          optionsString
+      );
     },
 
     // Usage: restart [options] [SERVICE...]
@@ -70,7 +88,9 @@ const docker = {
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
     restart: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' restart' + optionsString);
+      return shell(
+        "docker-compose -f " + DOCKERCOMPOSE_PATH + " restart" + optionsString
+      );
     },
 
     // Usage: logs [options] [SERVICE...]
@@ -82,23 +102,29 @@ const docker = {
     //                     for each container.
     logs: (DOCKERCOMPOSE_PATH, options = {}) => {
       let optionsString = parseOptions(options);
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' logs' + optionsString + ' 2>&1');
+      return shell(
+        "docker-compose -f " +
+          DOCKERCOMPOSE_PATH +
+          " logs" +
+          optionsString +
+          " 2>&1"
+      );
     },
 
     // Usage: ps [options] [SERVICE...]
     // Options:
     // -q    Only display IDs
-    ps: (DOCKERCOMPOSE_PATH) => {
-      return shell('docker-compose -f ' + DOCKERCOMPOSE_PATH + ' ps');
-    },
+    ps: DOCKERCOMPOSE_PATH => {
+      return shell("docker-compose -f " + DOCKERCOMPOSE_PATH + " ps");
+    }
   },
 
   volume: {
     // docker volume rm [OPTIONS] VOLUME [VOLUME...]
     // --force , -f  Force the removal of one or more volumes
-    rm: (VOLUME) => {
-      return shell('docker volume rm -f ' + VOLUME);
-    },
+    rm: VOLUME => {
+      return shell("docker volume rm -f " + VOLUME);
+    }
   },
 
   // SPECIAL OPERATION
@@ -107,26 +133,28 @@ const docker = {
     return shell(`docker images --format "{{.Repository}}:{{.Tag}}"`);
   },
 
-  rmi: (imgsToDelete) => {
-    return shell(`docker rmi ${imgsToDelete.join(' ')}`);
+  rmi: imgsToDelete => {
+    return shell(`docker rmi ${imgsToDelete.join(" ")}`);
   },
 
-  rmOldSemverImages: (packageName) => {
-    return shell(`docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${packageName}:[0-9]\+.[0-9]\+.[0-9]\+")`);
+  rmOldSemverImages: packageName => {
+    return shell(
+      `docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${packageName}:[0-9]\+.[0-9]\+.[0-9]\+")`
+    );
   },
 
   // NOT A DOCKER-COMPOSE
   // Usage: docker load [OPTIONS]
   // --input , -i		Read from tar archive file, instead of STDIN
   // --quiet , -q		Suppress the load output
-  load: (imagePath) => {
-    return shell('docker load -i ' + imagePath, {timeout: 15 * 60 * 1000});
+  load: imagePath => {
+    return shell("docker load -i " + imagePath, { timeout: 15 * 60 * 1000 });
   },
 
   // NOT A DOCKER-COMPOSE
   // Usage: docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
   tag: (sourceImage, targetImage) => {
-    return shell('docker tag ' + sourceImage + ' ' + targetImage);
+    return shell("docker tag " + sourceImage + " " + targetImage);
   },
 
   // NOT A DOCKER-COMPOSE
@@ -134,37 +162,47 @@ const docker = {
   // --timestamps , -t  Show timestamps
   log: (containerNameOrId, options = {}) => {
     // Parse options
-    let optionsString = '';
+    let optionsString = "";
     // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-    if (options.hasOwnProperty('timestamps') && options.timestamps) optionsString += ' --timestamps';
-    if (options.hasOwnProperty('tail') && !isNaN(options.tail)) optionsString += ' --tail ' + options.tail;
-    return shell('docker logs ' + containerNameOrId + ' ' + optionsString + ' 2>&1');
+    if (options.hasOwnProperty("timestamps") && options.timestamps)
+      optionsString += " --timestamps";
+    if (options.hasOwnProperty("tail") && !isNaN(options.tail))
+      optionsString += " --tail " + options.tail;
+    return shell(
+      "docker logs " + containerNameOrId + " " + optionsString + " 2>&1"
+    );
   },
 
   // NOT A DOCKER-COMPOSE
   // Usage: docker system df [OPTIONS]
   // --verbose , -v		Show detailed information on space usage
   systemDf: () => {
-    return shell('docker system df --verbose');
+    return shell("docker system df --verbose");
   },
 
-  status: (containerNameOrId) => {
-    return shell('docker inspect --format=\'{{.State.Status}}\' ' + containerNameOrId);
+  status: containerNameOrId => {
+    return shell(
+      "docker inspect --format='{{.State.Status}}' " + containerNameOrId
+    );
   },
 
   // NOT A DOCKER, DOCKER-COMPOSE
   // Custom command to open and close ports
-  openPort: async (port) => {
+  openPort: async port => {
     const IMAGE = await shell(getVpnImageCmd());
-    return await shell(getUpnpCmd(port, 'open', IMAGE));
+    return await shell(getUpnpCmd(port, "open", IMAGE));
   },
-  closePort: async (port) => {
+  closePort: async port => {
     const IMAGE = await shell(getVpnImageCmd());
-    return await shell(getUpnpCmd(port, 'close', IMAGE));
+    return await shell(getUpnpCmd(port, "close", IMAGE));
   },
   isUpnpAvailable: async () => {
     const IMAGE = await shell(getVpnImageCmd());
-    return await shell('docker run --rm --net=host ' + IMAGE + ' upnpc -l | awk -F\'= \'  \'/ExternalIPAddress/{print $2}\'').then((res) => res && res.includes('.'), (err) => false);
+    return await shell(
+      "docker run --rm --net=host " +
+        IMAGE +
+        " upnpc -l | awk -F'= '  '/ExternalIPAddress/{print $2}'"
+    ).then(res => res && res.includes("."), () => false);
   },
 
   // File manager, copy command
@@ -173,11 +211,11 @@ const docker = {
   },
   copyFileTo: (id, fromPath, toPath) => {
     return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
-  },
+  }
 };
 
 function getVpnImageCmd() {
-  return 'docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f \'{{.Config.Image}}\'';
+  return "docker inspect DAppNodeCore-vpn.dnp.dappnode.eth -f '{{.Config.Image}}'";
 }
 
 /**
@@ -189,29 +227,35 @@ function getVpnImageCmd() {
  * @return {String}
  */
 function getUpnpCmd(port = {}, type, IMAGE) {
-  if (typeof port !== 'object') {
-    throw Error(`port must be an object: port = { number: 30303, type: 'UDP' }`);
+  if (typeof port !== "object") {
+    throw Error(
+      `port must be an object: port = { number: 30303, type: 'UDP' }`
+    );
   }
   if (!port.number) {
-    throw Error(`port must container a number property: port = { number: 30303, type: 'UDP' }`);
+    throw Error(
+      `port must container a number property: port = { number: 30303, type: 'UDP' }`
+    );
   }
   let flag;
-  if (type === 'open') flag = '-r';
-  if (type === 'close') flag = '-d';
+  if (type === "open") flag = "-r";
+  if (type === "close") flag = "-d";
 
-  return `docker run --rm --net=host ${IMAGE.trim()} upnpc -e DAppNode ${flag} ${port.number} ${port.type || 'TCP'}`;
+  return `docker run --rm --net=host ${IMAGE.trim()} upnpc -e DAppNode ${flag} ${
+    port.number
+  } ${port.type || "TCP"}`;
 }
 
 function parseOptions(options) {
-  let optionsString = '';
+  let optionsString = "";
 
   // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  if (!isNaN(options.timeout)) optionsString += ' --timeout ' + options.timeout;
+  if (!isNaN(options.timeout)) optionsString += " --timeout " + options.timeout;
   // -t, --timestamps    Show timestamps
-  if (options.timestamps) optionsString += ' --timestamps';
-  if (options.volumes) optionsString += ' --volumes';
-  if (options.v) optionsString += ' -v';
-  if (options.core) optionsString += ' ' + options.core;
+  if (options.timestamps) optionsString += " --timestamps";
+  if (options.volumes) optionsString += " --volumes";
+  if (options.v) optionsString += " -v";
+  if (options.core) optionsString += " " + options.core;
 
   return optionsString;
 }

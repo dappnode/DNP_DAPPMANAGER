@@ -1,13 +1,13 @@
-const fs = require('fs');
-const {eventBus, eventBusTag} = require('eventBus');
-const params = require('params');
+const fs = require("fs");
+const { eventBus, eventBusTag } = require("eventBus");
+const params = require("params");
 // Modules
-const ipfs = require('modules/ipfs');
-const docker = require('modules/docker');
+const ipfs = require("modules/ipfs");
+const docker = require("modules/docker");
 // Utils
-const parse = require('utils/parse');
-const getPath = require('utils/getPath');
-const envsHelper = require('utils/envsHelper');
+const parse = require("utils/parse");
+const getPath = require("utils/getPath");
+const envsHelper = require("utils/envsHelper");
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -21,17 +21,20 @@ const envsHelper = require('utils/envsHelper');
  * @return {Object} A formated success message.
  * result: empty
  */
-const updatePackageEnv = async ({id, envs, isCORE, isCore, restart}) => {
-  if (!id) throw Error('kwarg id must be defined');
-  if (!envs) throw Error('kwarg envs must be defined');
+const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
+  if (!id) throw Error("kwarg id must be defined");
+  if (!envs) throw Error("kwarg envs must be defined");
 
   id = parse.packageReq(id).name; // parsing anyway for safety
-  if (id.startsWith('/ipfs/')) {
+  if (id.startsWith("/ipfs/")) {
     try {
       const manifest = JSON.parse(await ipfs.cat(id));
       id = manifest.name;
     } catch (e) {
-      throw Error('Could not retrieve package name from manifest of ' + id, e.stack);
+      throw Error(
+        "Could not retrieve package name from manifest of " + id,
+        e.stack
+      );
     }
   }
 
@@ -40,23 +43,23 @@ const updatePackageEnv = async ({id, envs, isCORE, isCore, restart}) => {
 
   // Write envs
   const previousEnvs = envsHelper.load(id, isCore);
-  envsHelper.write(id, isCore, {...previousEnvs, ...envs});
+  envsHelper.write(id, isCore, { ...previousEnvs, ...envs });
 
   if (!restart) {
     return {
-      message: 'Updated envs of ' + id,
+      message: "Updated envs of " + id,
       logMessage: true,
-      userAction: true,
+      userAction: true
     };
   }
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error('No docker-compose found with at: ' + dockerComposePath);
+    throw Error("No docker-compose found with at: " + dockerComposePath);
   }
 
-  if (id.includes('dappmanager.dnp.dappnode.eth')) {
-    throw Error('The installer cannot be restarted');
+  if (id.includes("dappmanager.dnp.dappnode.eth")) {
+    throw Error("The installer cannot be restarted");
   }
 
   await docker.safe.compose.up(dockerComposePath);
@@ -65,9 +68,9 @@ const updatePackageEnv = async ({id, envs, isCORE, isCore, restart}) => {
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: 'Updated envs and restarted ' + id,
+    message: "Updated envs and restarted " + id,
     logMessage: true,
-    userAction: true,
+    userAction: true
   };
 };
 

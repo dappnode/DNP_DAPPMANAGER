@@ -1,9 +1,9 @@
-const fs = require('fs');
-const getPath = require('utils/getPath');
-const restartPatch = require('modules/restartPatch');
-const params = require('params');
-const docker = require('modules/docker');
-const {eventBus, eventBusTag} = require('eventBus');
+const fs = require("fs");
+const getPath = require("utils/getPath");
+const restartPatch = require("modules/restartPatch");
+const params = require("params");
+const docker = require("modules/docker");
+const { eventBus, eventBusTag } = require("eventBus");
 
 /**
  * Calls docker rm and docker up on a package
@@ -14,15 +14,15 @@ const {eventBus, eventBusTag} = require('eventBus');
  * @return {Object} A formated success message.
  * result: empty
  */
-const restartPackage = async ({id}) => {
-  if (!id) throw Error('kwarg id must be defined');
+const restartPackage = async ({ id }) => {
+  if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error('No docker-compose found: ' + dockerComposePath);
+    throw Error("No docker-compose found: " + dockerComposePath);
   }
 
-  if (id.includes('dappmanager.dnp.dappnode.eth')) {
+  if (id.includes("dappmanager.dnp.dappnode.eth")) {
     await restartPatch(id);
   }
 
@@ -34,9 +34,9 @@ const restartPackage = async ({id}) => {
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: 'Restarted package: ' + id,
+    message: "Restarted package: " + id,
     logMessage: true,
-    userAction: true,
+    userAction: true
   };
 };
 

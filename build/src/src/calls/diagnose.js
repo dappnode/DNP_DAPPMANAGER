@@ -1,4 +1,4 @@
-const shellExec = require('utils/shell');
+const shellExec = require("utils/shell");
 
 /**
  * @param {String} cmd
@@ -7,9 +7,10 @@ const shellExec = require('utils/shell');
  *   in case of error:
  * { error: 'sh: docker: not found' }
  */
-const shellExecFormated = (cmd) => shellExec(cmd)
-    .then((data) => ({result: (data || '').trim()}))
-    .catch((e) => ({error: e.message}));
+const shellExecFormated = cmd =>
+  shellExec(cmd)
+    .then(data => ({ result: (data || "").trim() }))
+    .catch(e => ({ error: e.message }));
 
 /**
  * Returns a list of checks done as a diagnose
@@ -26,27 +27,24 @@ const shellExecFormated = (cmd) => shellExec(cmd)
  *   }
  */
 const getStats = async () => {
-    /* eslint-disable max-len */
-    const diagnose = {};
+  const diagnose = {};
 
-    // Get docker version
-    diagnose.dockerVersion = {
-        name: 'docker version',
-        ...(await shellExecFormated(`docker -v`)),
-    };
+  // Get docker version
+  diagnose.dockerVersion = {
+    name: "docker version",
+    ...(await shellExecFormated(`docker -v`))
+  };
 
-    // Get docker compose version
-    diagnose.dockerComposeVersion = {
-        name: 'docker compose version',
-        ...(await shellExecFormated(`docker-compose -v`)),
-    };
+  // Get docker compose version
+  diagnose.dockerComposeVersion = {
+    name: "docker compose version",
+    ...(await shellExecFormated(`docker-compose -v`))
+  };
 
-    return {
-        message: `Diagnose of this DAppNode server`,
-        result: diagnose,
-    };
+  return {
+    message: `Diagnose of this DAppNode server`,
+    result: diagnose
+  };
 };
 
-
 module.exports = getStats;
-

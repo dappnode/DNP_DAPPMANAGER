@@ -1,5 +1,5 @@
-const semver = require('semver');
-const apm = require('modules/apm');
+const semver = require("semver");
+const apm = require("modules/apm");
 
 /**
  * Fetches the available versions given a request.
@@ -14,18 +14,18 @@ const apm = require('modules/apm');
  * }
  * @return {Set} set of versions
  */
-async function fetchVersions({name, versionRange}) {
-    // Case 1. Valid semver range: Fetch the valid versions from APM
-    if (semver.validRange(versionRange) && !semver.valid(versionRange)) {
-        const versionsObj = await apm.getRepoVersions({name}, versionRange);
-        return Object.keys(versionsObj);
-    }
-    // Case 2. Valid semver version (not range): Return that version
-    if (semver.validRange(versionRange) && semver.valid(versionRange)) {
-        return [versionRange];
-    }
-    // Case 3. unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
+async function fetchVersions({ name, versionRange }) {
+  // Case 1. Valid semver range: Fetch the valid versions from APM
+  if (semver.validRange(versionRange) && !semver.valid(versionRange)) {
+    const versionsObj = await apm.getRepoVersions({ name }, versionRange);
+    return Object.keys(versionsObj);
+  }
+  // Case 2. Valid semver version (not range): Return that version
+  if (semver.validRange(versionRange) && semver.valid(versionRange)) {
     return [versionRange];
+  }
+  // Case 3. unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
+  return [versionRange];
 }
 
 module.exports = fetchVersions;

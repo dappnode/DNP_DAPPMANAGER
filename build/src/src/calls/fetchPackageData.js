@@ -1,7 +1,7 @@
-const parse = require('utils/parse');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
+const parse = require("utils/parse");
+const logs = require("logs.js")(module);
+const getManifest = require("modules/getManifest");
+const getAvatar = require("modules/getAvatar");
 // const isSyncing = require('utils/isSyncing');
 // const isIpfsRequest = require('utils/isIpfsRequest');
 
@@ -19,8 +19,8 @@ const getAvatar = require('modules/getAvatar');
  *     manifest, (object)
  *   },
  */
-const fetchPackageData = async ({id}) => {
-  if (!id) throw Error('kwarg id must be defined');
+const fetchPackageData = async ({ id }) => {
+  if (!id) throw Error("kwarg id must be defined");
 
   const packageReq = parse.packageReq(id);
 
@@ -36,7 +36,7 @@ const fetchPackageData = async ({id}) => {
   const manifest = await getManifest(packageReq);
 
   // Correct manifest
-  if (!manifest.type) manifest.type = 'library';
+  if (!manifest.type) manifest.type = "library";
 
   // Fetch the package image
   const avatarHash = manifest.avatar;
@@ -46,16 +46,18 @@ const fetchPackageData = async ({id}) => {
       avatar = await getAvatar(avatarHash);
     } catch (e) {
       // If the avatar can not be fetched don't crash
-      logs.error('Could not fetch avatar of ' + packageReq.name + ' at ' + avatarHash);
+      logs.error(
+        "Could not fetch avatar of " + packageReq.name + " at " + avatarHash
+      );
     }
   }
 
   return {
-    message: 'Got data of ' + packageReq.name,
+    message: "Got data of " + packageReq.name,
     result: {
       manifest,
-      avatar,
-    },
+      avatar
+    }
   };
 };
 

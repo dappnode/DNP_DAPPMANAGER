@@ -1,11 +1,11 @@
-const params = require('params');
-const fs = require('fs');
+const params = require("params");
+const fs = require("fs");
 // Modules
-const docker = require('modules/docker');
-const dockerList = require('modules/dockerList');
+const docker = require("modules/docker");
+const dockerList = require("modules/dockerList");
 // Utils
-const randomToken = require('utils/randomToken');
-const dataUriToFile = require('utils/dataUriToFile');
+const randomToken = require("utils/randomToken");
+const dataUriToFile = require("utils/dataUriToFile");
 
 /**
  * Copy file to a DNP:
@@ -18,14 +18,14 @@ const dataUriToFile = require('utils/dataUriToFile');
  * @return {Object} A formated success message.
  * result: {}
  */
-const copyFileTo = async ({id, dataUri, toPath}) => {
-  if (!id) throw Error('Argument id must be defined');
-  if (!dataUri) throw Error('Argument dataUri must be defined');
-  if (!toPath) throw Error('Argument toPath must be defined');
+const copyFileTo = async ({ id, dataUri, toPath }) => {
+  if (!id) throw Error("Argument id must be defined");
+  if (!dataUri) throw Error("Argument dataUri must be defined");
+  if (!toPath) throw Error("Argument toPath must be defined");
 
   // Get container name
   const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find((p) => p.name === id);
+  const dnp = dnpList.find(p => p.name === id);
   if (!dnp) throw Error(`No DNP found for id ${id}`);
   const containerName = dnp.packageName;
 
@@ -42,7 +42,7 @@ const copyFileTo = async ({id, dataUri, toPath}) => {
   return {
     message: `Copied file to ${id} ${toPath}`,
     logMessage: true,
-    userAction: true,
+    userAction: true
   };
 };
 

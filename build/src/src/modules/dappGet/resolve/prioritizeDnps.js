@@ -40,16 +40,19 @@
  * ]
  */
 function prioritizeDnps(dnps) {
-    // Convert the dnps object into an array of objects appending the name
-    return Object.keys(dnps).map((name) => ({...dnps[name], name}))
-    // Sort the package ordening
-    .sort((dnpA, dnpB) => {
+  // Convert the dnps object into an array of objects appending the name
+  return (
+    Object.keys(dnps)
+      .map(name => ({ ...dnps[name], name }))
+      // Sort the package ordening
+      .sort((dnpA, dnpB) => {
         if (dnpA.isRequest) return 1;
         else if (dnpB.isRequest) return -1;
         else if (dnpA.isInstalled && !dnpB.isInstalled) return 1;
         else if (!dnpA.isInstalled && dnpB.isInstalled) return -1;
         else return 0;
-    });
+      })
+  );
 }
 
 module.exports = prioritizeDnps;

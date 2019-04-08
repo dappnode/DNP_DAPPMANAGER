@@ -1,5 +1,5 @@
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 
 /**
  * If this method is invoked as its util.promisify()ed version,
@@ -17,12 +17,12 @@ const exec = util.promisify(require('child_process').exec);
 const defaultTimeout = 3 * 60 * 1000; // ms
 
 function shell(cmd, _options) {
-  const options = typeof _options === 'object' ? _options : {};
+  const options = typeof _options === "object" ? _options : {};
   const timeout = options.timeout || defaultTimeout;
-  return exec(cmd, {timeout})
-    .then((res) => (res.stdout || '').trim())
-    .catch((err) => {
-      if (err.signal === 'SIGTERM') {
+  return exec(cmd, { timeout })
+    .then(res => (res.stdout || "").trim())
+    .catch(err => {
+      if (err.signal === "SIGTERM") {
         throw Error(`cmd "${err.cmd}" timed out (${timeout} ms)`);
       }
       throw err;

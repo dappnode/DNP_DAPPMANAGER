@@ -1,27 +1,33 @@
 /**
  * Normal case for a non-core DNP
  */
-const name = 'Normal case for a non-core DNP';
+const name = "Normal case for a non-core DNP";
 
 const manifest = {
-  name: 'letsencrypt-nginx.dnp.dappnode.eth',
-  version: '0.0.1',
-  description: 'letsencrypt-nginx-proxy-companion version for DAppNode',
+  name: "letsencrypt-nginx.dnp.dappnode.eth",
+  version: "0.0.1",
+  description: "letsencrypt-nginx-proxy-companion version for DAppNode",
   image: {
-    path: 'letsencrypt-nginx.dnp.dappnode.eth_0.0.1.tar.xz',
-    hash: 'Qmbii5osjvJw9CmiRe6huDCb3nabjiyMhA4SNaeubtAAw2',
+    path: "letsencrypt-nginx.dnp.dappnode.eth_0.0.1.tar.xz",
+    hash: "Qmbii5osjvJw9CmiRe6huDCb3nabjiyMhA4SNaeubtAAw2",
     size: 23781268,
-    volumes: ['~/certs:/etc/nginx/certs:rw', '/var/run/docker.sock:/var/run/docker.sock:ro'],
-    external_vol: ['nginxproxydnpdappnodeeth_vhost.d:/etc/nginx/vhost.d', 'nginxproxydnpdappnodeeth_html:/usr/share/nginx/html'],
-    restart: 'always',
-    version: '0.0.1',
+    volumes: [
+      "~/certs:/etc/nginx/certs:rw",
+      "/var/run/docker.sock:/var/run/docker.sock:ro"
+    ],
+    external_vol: [
+      "nginxproxydnpdappnodeeth_vhost.d:/etc/nginx/vhost.d",
+      "nginxproxydnpdappnodeeth_html:/usr/share/nginx/html"
+    ],
+    restart: "always",
+    version: "0.0.1"
   },
-  author: 'Eduardo Antuña Díez (eduadiez)',
-  license: 'MIT',
+  author: "Eduardo Antuña Díez (eduadiez)",
+  license: "MIT",
   dependencies: {
-    'nginx-proxy.dnp.dappnode.eth': 'latest',
+    "nginx-proxy.dnp.dappnode.eth": "latest"
   },
-  origin: '/ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34',
+  origin: "/ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34"
 };
 
 const dc = `version: '3.4'
@@ -57,4 +63,4 @@ networks:
         external: true
 `;
 
-module.exports = {name, manifest, dc};
+module.exports = { name, manifest, dc };

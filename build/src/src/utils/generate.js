@@ -1,10 +1,10 @@
-const yaml = require('js-yaml');
+const yaml = require("js-yaml");
 
 /*
  * Generates files needed by DNPs
  * - dockerCompose
  * - manifest
-*/
+ */
 
 function dockerCompose(manifest, params, _, fromIpfs = false) {
   // Define docker compose parameters
@@ -13,10 +13,10 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
   const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 
-  const PACKAGE_NAME = manifest.name.replace('/', '_').replace('@', '');
+  const PACKAGE_NAME = manifest.name.replace("/", "_").replace("@", "");
 
   // Assume not allowed core condition is already verified
-  const isCore = manifest.type === 'dncore';
+  const isCore = manifest.type === "dncore";
 
   // DOCKER COMPOSE YML - SERVICE
   // ============================
@@ -31,13 +31,17 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   }
 
   // Image name
-  service.image = manifest.name + ':' + (fromIpfs ? fromIpfs : manifest.version);
+  service.image =
+    manifest.name + ":" + (fromIpfs ? fromIpfs : manifest.version);
   if (manifest.image.restart) {
     service.restart = manifest.image.restart;
   }
 
   // Volumes
-  service.volumes = [...(manifest.image.volumes || []), ...(manifest.image.external_vol || [])];
+  service.volumes = [
+    ...(manifest.image.volumes || []),
+    ...(manifest.image.external_vol || [])
+  ];
 
   // Ports
   if (manifest.image.ports) {
@@ -46,7 +50,7 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
 
   // Support for environment variables
   if (manifest.image.environment) {
-    service.env_file = [PACKAGE_NAME + '.env'];
+    service.env_file = [PACKAGE_NAME + ".env"];
   }
 
   // Networks
@@ -54,8 +58,8 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
     if (manifest.image.ipv4_address) {
       service.networks = {
         network: {
-          ipv4_address: manifest.image.ipv4_address,
-        },
+          ipv4_address: manifest.image.ipv4_address
+        }
       };
     }
   } else {
@@ -71,10 +75,10 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
     // Correct labels as array to be an object
     if (Array.isArray(manifest.image.labels)) {
       let _obj = {};
-      manifest.image.labels.forEach((e) => {
-        if (typeof e === 'string') {
-          let [key, value] = e.split('=');
-          _obj[key] = value || '';
+      manifest.image.labels.forEach(e => {
+        if (typeof e === "string") {
+          let [key, value] = e.split("=");
+          _obj[key] = value || "";
         }
       });
       manifest.image.labels = _obj;
@@ -85,7 +89,7 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
     //   label-without-value: "" }
     service.labels = {
       ...(service.labels || {}),
-      ...manifest.image.labels,
+      ...manifest.image.labels
     };
   }
   // Add the dependencies of the package in its labels
@@ -94,7 +98,7 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   if (manifest.dependencies) {
     service.labels = {
       ...(service.labels || {}),
-      'dappnode.dnp.dependencies': JSON.stringify(manifest.dependencies),
+      "dappnode.dnp.dependencies": JSON.stringify(manifest.dependencies)
     };
   }
   // Adding the origin of the package as a label to be used in the resolve
@@ -102,7 +106,7 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   if (manifest.origin) {
     service.labels = {
       ...(service.labels || {}),
-      'dappnode.dnp.origin': manifest.origin,
+      "dappnode.dnp.origin": manifest.origin
     };
   }
   // Add the chain driver
@@ -110,14 +114,15 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   if (manifest.chain) {
     service.labels = {
       ...(service.labels || {}),
-      'dappnode.dnp.chain': manifest.chain,
+      "dappnode.dnp.chain": manifest.chain
     };
   }
 
   // Extra features
   if (manifest.image.cap_add) service.cap_add = manifest.image.cap_add;
   if (manifest.image.cap_drop) service.cap_drop = manifest.image.cap_drop;
-  if (manifest.image.network_mode) service.network_mode = manifest.image.network_mode;
+  if (manifest.image.network_mode)
+    service.network_mode = manifest.image.network_mode;
   if (manifest.image.command) service.command = manifest.image.command;
 
   // Logging. Limit logs size, chains can grow the logs to > 20 GB
@@ -125,9 +130,9 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   // https://docs.docker.com/config/containers/logging/configure/#configure-the-default-logging-driver
   service.logging = {
     options: {
-      'max-size': '10m',
-      'max-file': '3',
-    },
+      "max-size": "10m",
+      "max-file": "3"
+    }
   };
 
   // DOCKER COMPOSE YML - VOLUMES
@@ -135,22 +140,22 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   let volumes = {};
   // Regular volumes
   if (manifest.image.volumes) {
-    manifest.image.volumes.forEach((vol) => {
+    manifest.image.volumes.forEach(vol => {
       // Make sure it's a named volume
-      if (!vol.startsWith('/') && !vol.startsWith('~')) {
-        const volName = vol.split(':')[0];
+      if (!vol.startsWith("/") && !vol.startsWith("~")) {
+        const volName = vol.split(":")[0];
         volumes[volName] = {};
       }
     });
   }
   // External volumes
   if (manifest.image.external_vol) {
-    manifest.image.external_vol.forEach((vol) => {
-      const volName = vol.split(':')[0];
+    manifest.image.external_vol.forEach(vol => {
+      const volName = vol.split(":")[0];
       volumes[volName] = {
         external: {
-          name: volName,
-        },
+          name: volName
+        }
       };
     });
   }
@@ -161,29 +166,31 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   if (isCore && manifest.image.subnet) {
     networks = {
       network: {
-        driver: 'bridge',
+        driver: "bridge",
         ipam: {
-          config: [{subnet: manifest.image.subnet}],
-        },
-      },
+          config: [{ subnet: manifest.image.subnet }]
+        }
+      }
     };
   } else {
     networks[DNP_NETWORK] = {
-      external: true,
+      external: true
     };
   }
 
   let dockerCompose = {
-    version: '3.4',
+    version: "3.4",
     services: {
-      [PACKAGE_NAME]: service,
-    },
+      [PACKAGE_NAME]: service
+    }
   };
-  if (Object.getOwnPropertyNames(volumes).length) dockerCompose.volumes = volumes;
-  if (Object.getOwnPropertyNames(networks).length) dockerCompose.networks = networks;
+  if (Object.getOwnPropertyNames(volumes).length)
+    dockerCompose.volumes = volumes;
+  if (Object.getOwnPropertyNames(networks).length)
+    dockerCompose.networks = networks;
 
   return yaml.dump(dockerCompose, {
-    indent: 4,
+    indent: 4
   });
 }
 
@@ -193,5 +200,5 @@ function manifest(dnpManifest) {
 
 module.exports = {
   dockerCompose,
-  manifest,
+  manifest
 };

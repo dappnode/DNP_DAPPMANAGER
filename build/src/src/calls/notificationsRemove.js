@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require("../db");
 
 /**
  * Marks notifications as view by deleting them from the db
@@ -12,15 +12,15 @@ const db = require('../db');
  * @return {Object} A formated success message.
  */
 
-const notificationsGet = async ({ids = []}) => {
-  if (!ids) throw Error('kwarg ids must be defined');
+const notificationsGet = async ({ ids = [] }) => {
+  if (!ids) throw Error("kwarg ids must be defined");
 
   for (const id of ids) {
     await db.remove(`notification.${id}`);
   }
 
   return {
-    message: `Removed notifications: ${ids.join(', ')}`,
+    message: `Removed notifications: ${ids.join(", ")}`
   };
 };
 

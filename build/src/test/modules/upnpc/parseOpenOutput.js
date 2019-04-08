@@ -1,9 +1,7 @@
-const expect = require('chai').expect;
-const parseOpenOutput = require('modules/upnpc/parseOpenOutput');
+const expect = require("chai").expect;
+const parseOpenOutput = require("modules/upnpc/parseOpenOutput");
 
-/* eslint-disable max-len */
-
-describe('upnpn: parseOpenOutput', () => {
+describe("upnpn: parseOpenOutput", () => {
   const terminalOutputSuccess = `upnpc : miniupnpc library test client, version 2.0.
  (c) 2005-2017 Thomas Bernard.
 Go to http://miniupnp.free.fr/ or https://miniupnp.tuxfamily.org/
@@ -19,7 +17,7 @@ InternalIP:Port = 192.168.1.01:4002
 external 85.84.83.82:4002 UDP is redirected to internal 192.168.1.01:4002 (duration=0)
 `;
 
-  it('On success, it should return ok', async () => {
+  it("On success, it should return ok", async () => {
     const ok = parseOpenOutput(terminalOutputSuccess);
     expect(ok).to.be.ok;
   });

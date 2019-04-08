@@ -8,8 +8,8 @@
 
 function parseGeneralErrors(terminalOutput) {
   const noDeviceFoundRegex = RegExp(/no.+device found/);
-  if (noDeviceFoundRegex.test((terminalOutput || '').toLowerCase())) {
-    throw Error('NOUPNP: No UPnP device available');
+  if (noDeviceFoundRegex.test((terminalOutput || "").toLowerCase())) {
+    throw Error("NOUPNP: No UPnP device available");
   }
   return terminalOutput;
 }

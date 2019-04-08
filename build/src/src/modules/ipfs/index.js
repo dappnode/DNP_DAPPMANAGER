@@ -1,3 +1,3 @@
-const ipfsQueue = require('./ipfsQueue');
+const ipfsQueue = require("./ipfsQueue");
 
 module.exports = ipfsQueue;

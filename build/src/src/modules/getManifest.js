@@ -1,6 +1,6 @@
-const validate = require('utils/validate');
-const ipfs = require('modules/ipfs');
-const apm = require('modules/apm');
+const validate = require("utils/validate");
+const ipfs = require("modules/ipfs");
+const apm = require("modules/apm");
 
 // Used by
 // calls / fetchDirectory;
@@ -25,27 +25,27 @@ async function getManifest(packageReq) {
 
   let fromIpfs;
 
-  if (packageReq.hash && packageReq.hash.startsWith('/ipfs/')) {
-    fromIpfs = packageReq.hash.replace('/ipfs/', 'ipfs-');
-  } else if (packageReq.name.endsWith('.eth')) {
-    if (packageReq.ver.startsWith('/ipfs/')) {
+  if (packageReq.hash && packageReq.hash.startsWith("/ipfs/")) {
+    fromIpfs = packageReq.hash.replace("/ipfs/", "ipfs-");
+  } else if (packageReq.name.endsWith(".eth")) {
+    if (packageReq.ver.startsWith("/ipfs/")) {
       // packageReq.hash = 'ipfs/QmUHFxFbYdJDueBWzYZnvpzkjwBmMt3bmNDLQBTZzY18UZ';
       packageReq.hash = packageReq.ver;
-      fromIpfs = packageReq.ver.replace('/ipfs/', 'ipfs-');
+      fromIpfs = packageReq.ver.replace("/ipfs/", "ipfs-");
     } else {
       packageReq.hash = await apm.getRepoHash(packageReq);
     }
-  // if the name of the package is already an IFPS hash, skip:
-  } else if (packageReq.name.startsWith('/ipfs/')) {
+    // if the name of the package is already an IFPS hash, skip:
+  } else if (packageReq.name.startsWith("/ipfs/")) {
     packageReq.hash = packageReq.name;
-    fromIpfs = packageReq.name.replace('/ipfs/', 'ipfs-');
+    fromIpfs = packageReq.name.replace("/ipfs/", "ipfs-");
   } else {
-    throw Error('Unkown package request: '+packageReq.name);
+    throw Error("Unkown package request: " + packageReq.name);
   }
 
   // cat the file and parse it
   // pass a maxSize = 100KB option which will throw an error if that size is exceeded
-  const manifestUnparsed = await ipfs.cat(packageReq.hash, {maxSize: 100000});
+  const manifestUnparsed = await ipfs.cat(packageReq.hash, { maxSize: 100000 });
   let manifest;
   try {
     manifest = JSON.parse(manifestUnparsed);
@@ -54,25 +54,32 @@ async function getManifest(packageReq) {
   }
 
   // Verify the manifest
-  if (!manifest.image || typeof manifest.image !== 'object') {
-    throw Error(`Invalid manifest: it does not contain the expected property 'image'`);
+  if (!manifest.image || typeof manifest.image !== "object") {
+    throw Error(
+      `Invalid manifest: it does not contain the expected property 'image'`
+    );
   }
   if (!manifest.image.hash) {
-    throw Error(`Invalid manifest: it does not contain the expected property 'image.hash'`);
+    throw Error(
+      `Invalid manifest: it does not contain the expected property 'image.hash'`
+    );
   }
 
   // Verify that the request was correct
-  if (packageReq.name && packageReq.name.endsWith('.eth')
-  && manifest && manifest.name
-  && packageReq.name !== manifest.name) {
-    throw Error('Package name requested doesn\'t match its manifest');
+  if (
+    packageReq.name &&
+    packageReq.name.endsWith(".eth") &&
+    manifest &&
+    manifest.name &&
+    packageReq.name !== manifest.name
+  ) {
+    throw Error("Package name requested doesn't match its manifest");
   }
 
   return {
     ...manifest,
-    fromIpfs,
+    fromIpfs
   };
 }
-
 
 module.exports = getManifest;

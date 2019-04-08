@@ -1,5 +1,5 @@
-const dataUriToBuffer = require('data-uri-to-buffer');
-const fs = require('fs');
+const dataUriToBuffer = require("data-uri-to-buffer");
+const fs = require("fs");
 
 /**
  * Converts a data URI feeded from the server to a downloadable blob

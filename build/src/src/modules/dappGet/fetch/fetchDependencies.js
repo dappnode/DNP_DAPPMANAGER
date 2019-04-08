@@ -1,4 +1,4 @@
-const getManifest = require('modules/getManifest2');
+const getManifest = require("modules/getManifest2");
 
 /**
  * Fetches the dependencies of a given DNP name and version
@@ -10,9 +10,9 @@ const getManifest = require('modules/getManifest2');
  * @return {Object} dependencies:
  *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
  */
-async function fetchDependencies({name, version}) {
-    const manifest = await getManifest({name, version});
-    return manifest.dependencies || {};
+async function fetchDependencies({ name, version }) {
+  const manifest = await getManifest({ name, version });
+  return manifest.dependencies || {};
 }
 
 module.exports = fetchDependencies;

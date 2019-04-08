@@ -1,8 +1,8 @@
-const fetch = require('./fetch');
-const aggregate = require('./aggregate');
-const resolve = require('./resolve');
-const dockerList = require('modules/dockerList');
-const logs = require('logs.js')(module);
+const fetch = require("./fetch");
+const aggregate = require("./aggregate");
+const resolve = require("./resolve");
+const dockerList = require("modules/dockerList");
+const logs = require("logs.js")(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -53,10 +53,12 @@ async function dappGet(req) {
   let dnps;
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-    dnps = await aggregate({req, dnpList, fetch});
+    dnps = await aggregate({ req, dnpList, fetch });
   } catch (e) {
     logs.error(`dappGet aggregate error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on aggregate stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${
+      req.ver
+    }, error on aggregate stage: ${e.message}`;
     throw e;
   }
 
@@ -66,13 +68,15 @@ async function dappGet(req) {
     result = resolve(dnps);
   } catch (e) {
     logs.error(`dappGet resolve error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on resolve stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${
+      req.ver
+    }, error on resolve stage: ${e.message}`;
     throw e;
   }
 
   // Format output only on success
   if (!result.success) return result;
-  dnpList.forEach((dnp) => {
+  dnpList.forEach(dnp => {
     if (result.success[dnp.name] && result.success[dnp.name] === dnp.version) {
       // DNP is already updated.
       // Remove from the success object and add it to the alreadyUpdatedd

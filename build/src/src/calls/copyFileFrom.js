@@ -1,13 +1,13 @@
-'use strict'; // 'datauri' requested to use 'use strict';
-const params = require('params');
-const fs = require('fs');
-const path = require('path');
+"use strict"; // 'datauri' requested to use 'use strict';
+const params = require("params");
+const fs = require("fs");
+const path = require("path");
 // Modules
-const docker = require('modules/docker');
-const dockerList = require('modules/dockerList');
+const docker = require("modules/docker");
+const dockerList = require("modules/dockerList");
 // Utils
-const randomToken = require('utils/randomToken');
-const fileToDataUri = require('utils/fileToDataUri');
+const randomToken = require("utils/randomToken");
+const fileToDataUri = require("utils/fileToDataUri");
 
 /**
  * Copy file from a DNP:
@@ -19,13 +19,13 @@ const fileToDataUri = require('utils/fileToDataUri');
  * @return {Object} A formated success message.
  * result: data Uri: "data:application/zip;base64,UEsDBBQAAAg..."
  */
-const copyFileFrom = async ({id, fromPath}) => {
-  if (!id) throw Error('Argument id must be defined');
-  if (!fromPath) throw Error('Argument fromPath must be defined');
+const copyFileFrom = async ({ id, fromPath }) => {
+  if (!id) throw Error("Argument id must be defined");
+  if (!fromPath) throw Error("Argument fromPath must be defined");
 
   // Get container name
   const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find((p) => p.name === id);
+  const dnp = dnpList.find(p => p.name === id);
   if (!dnp) throw Error(`No DNP found for id ${id}`);
   const containerName = dnp.packageName;
 
@@ -44,7 +44,7 @@ const copyFileFrom = async ({id, fromPath}) => {
     message: `Copied file from ${id} ${fromPath}`,
     logMessage: true,
     userAction: true,
-    result: dataUri,
+    result: dataUri
   };
 };
 

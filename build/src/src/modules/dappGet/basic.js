@@ -1,6 +1,6 @@
-const dockerList = require('modules/dockerList');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
+const dockerList = require("modules/dockerList");
+const logs = require("logs.js")(module);
+const getManifest = require("modules/getManifest");
 
 /**
  * The dappGet resolver may cause errors.
@@ -11,34 +11,38 @@ const getManifest = require('modules/getManifest');
  */
 
 async function dappGetBasic(req) {
-    const reqManifest = await getManifest(req);
-    // reqManifest.dependencies = {
-    //     'bind.dnp.dappnode.eth': '0.1.4',
-    //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
-    // }
+  const reqManifest = await getManifest(req);
+  // reqManifest.dependencies = {
+  //     'bind.dnp.dappnode.eth': '0.1.4',
+  //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
+  // }
 
-    // Append dependencies in the list of DNPs to install
-    const result = {
-        success: (reqManifest || {}).dependencies || {},
-    };
-    // Add current request to pacakages to install
-    result.success[req.name] = req.ver;
+  // Append dependencies in the list of DNPs to install
+  const result = {
+    success: (reqManifest || {}).dependencies || {}
+  };
+  // Add current request to pacakages to install
+  result.success[req.name] = req.ver;
 
-    // The function below does not directly affect funcionality.
-    // However it would prevent already installed DNPs from installing
-    try {
-        (await dockerList.listContainers()).forEach((dnp) => {
-        if (dnp.name && dnp.version
-            && result.success && result.success[dnp.name]
-            && result.success[dnp.name] === dnp.version) {
-            delete result.success[dnp.name];
-            }
-        });
-    } catch (e) {
-        logs.error('Error listing current containers: '+e);
-    }
+  // The function below does not directly affect funcionality.
+  // However it would prevent already installed DNPs from installing
+  try {
+    (await dockerList.listContainers()).forEach(dnp => {
+      if (
+        dnp.name &&
+        dnp.version &&
+        result.success &&
+        result.success[dnp.name] &&
+        result.success[dnp.name] === dnp.version
+      ) {
+        delete result.success[dnp.name];
+      }
+    });
+  } catch (e) {
+    logs.error("Error listing current containers: " + e);
+  }
 
-    return result;
+  return result;
 }
 
 module.exports = dappGetBasic;

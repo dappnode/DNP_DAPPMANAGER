@@ -1,10 +1,10 @@
-const dockerList = require('modules/dockerList');
-const validate = require('utils/validate');
-const semver = require('semver');
-const safeSemver = require('../utils/safeSemver');
-const logs = require('logs.js')(module);
-const _aggregateDependencies = require('./aggregateDependencies');
-const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
+const dockerList = require("modules/dockerList");
+const validate = require("utils/validate");
+const semver = require("semver");
+const safeSemver = require("../utils/safeSemver");
+const logs = require("logs.js")(module);
+const _aggregateDependencies = require("./aggregateDependencies");
+const getRelevantInstalledDnps = require("./getRelevantInstalledDnps");
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -50,73 +50,88 @@ const getRelevantInstalledDnps = require('./getRelevantInstalledDnps');
  *   },
  * };
  */
-async function aggregate({req, dnpList, fetch}) {
-    // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-    const aggregateDependencies = (kwargs) => _aggregateDependencies({...kwargs, fetch});
-    const dnps = {};
+async function aggregate({ req, dnpList, fetch }) {
+  // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
+  const aggregateDependencies = kwargs =>
+    _aggregateDependencies({ ...kwargs, fetch });
+  const dnps = {};
 
-    // WARNING: req is a user external input, must verify
-    validate.packageReq(req);
-    if (!req.ver || req.ver.toLowerCase().includes('latest')) req.ver = '*';
+  // WARNING: req is a user external input, must verify
+  validate.packageReq(req);
+  if (!req.ver || req.ver.toLowerCase().includes("latest")) req.ver = "*";
 
-    await aggregateDependencies({name: req.name, versionRange: req.ver, dnps});
+  await aggregateDependencies({ name: req.name, versionRange: req.ver, dnps });
 
-    // Get the list of relevant installed dnps
-    if (!dnpList) dnpList = await dockerList.listContainers();
-    const relevantInstalledDnps = getRelevantInstalledDnps({
-        // requestedDnps = ["A", "B", "C"]
-        requestedDnps: Object.keys(dnps),
-        // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
-        // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
-        installedDnps: dnpList.filter((dnp) => semver.valid(dnp.version) && dnp.name !== 'core.dnp.dappnode.eth'),
-    });
-    // Add relevant installed dnps and their dependencies to the dnps object
-    await Promise.all(relevantInstalledDnps.map(async (dnp) => {
-        try {
-            // Fetch exact version if doesn't came from ENS. Otherwise fetch all newer versions
-            await aggregateDependencies({
-                name: dnp.name,
-                versionRange: dnp.origin || `>=${dnp.version}`,
-                dnps,
-            });
-        } catch (e) {
-            logs.warn(`Error fetching installed dnp ${dnp.name}: ${e.stack || e.message}`);
+  // Get the list of relevant installed dnps
+  if (!dnpList) dnpList = await dockerList.listContainers();
+  const relevantInstalledDnps = getRelevantInstalledDnps({
+    // requestedDnps = ["A", "B", "C"]
+    requestedDnps: Object.keys(dnps),
+    // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
+    // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
+    installedDnps: dnpList.filter(
+      dnp => semver.valid(dnp.version) && dnp.name !== "core.dnp.dappnode.eth"
+    )
+  });
+  // Add relevant installed dnps and their dependencies to the dnps object
+  await Promise.all(
+    relevantInstalledDnps.map(async dnp => {
+      try {
+        // Fetch exact version if doesn't came from ENS. Otherwise fetch all newer versions
+        await aggregateDependencies({
+          name: dnp.name,
+          versionRange: dnp.origin || `>=${dnp.version}`,
+          dnps
+        });
+      } catch (e) {
+        logs.warn(
+          `Error fetching installed dnp ${dnp.name}: ${e.stack || e.message}`
+        );
+      }
+    })
+  );
+
+  // Label dnps. They are used to order versions
+  Object.keys(dnps).forEach(dnpName => {
+    const dnp = dnpList.find(dnp => dnp.name === dnpName);
+
+    // > Label isRequest + Enfore conditions:
+    //   - requested DNP versions must match the provided versionRange
+    if (dnpName === req.name) {
+      dnps[dnpName].isRequest = true;
+      Object.keys(dnps[dnpName].versions).forEach(version => {
+        if (!safeSemver.satisfies(version, req.ver)) {
+          delete dnps[dnpName].versions[version];
         }
-    }));
-
-    // Label dnps. They are used to order versions
-    Object.keys(dnps).forEach((dnpName) => {
-        const dnp = dnpList.find((dnp) => dnp.name === dnpName);
-
-        // > Label isRequest + Enfore conditions:
-        //   - requested DNP versions must match the provided versionRange
-        if (dnpName === req.name) {
-            dnps[dnpName].isRequest = true;
-            Object.keys(dnps[dnpName].versions).forEach((version) => {
-                if (!safeSemver.satisfies(version, req.ver)) {
-                    delete dnps[dnpName].versions[version];
-                }
-            });
-        }
-        // > Label isInstalled + Enfore conditions:
-        //   - installed DNPs cannot be downgraded (don't apply this condition to the request)
-        else if (dnp) {
-            dnps[dnpName].isInstalled = true;
-            Object.keys(dnps[dnpName].versions).forEach((version) => {
-                if (semver.valid(version) && semver.valid(dnp.version) && semver.lt(version, dnp.version)) {
-                    delete dnps[dnpName].versions[version];
-                }
-            });
-        }
-    });
-
-    // Validate aggregated dnps
-    // - dnps must contain at least one version of the requested package
-    if (!Object.keys((dnps[req.name] || {}).versions || {}).length) {
-        throw Error(`Aggregated dnps must contain at least one version of the requested DNP ${req.name} @ ${req.ver}`);
+      });
     }
+    // > Label isInstalled + Enfore conditions:
+    //   - installed DNPs cannot be downgraded (don't apply this condition to the request)
+    else if (dnp) {
+      dnps[dnpName].isInstalled = true;
+      Object.keys(dnps[dnpName].versions).forEach(version => {
+        if (
+          semver.valid(version) &&
+          semver.valid(dnp.version) &&
+          semver.lt(version, dnp.version)
+        ) {
+          delete dnps[dnpName].versions[version];
+        }
+      });
+    }
+  });
 
-    return dnps;
+  // Validate aggregated dnps
+  // - dnps must contain at least one version of the requested package
+  if (!Object.keys((dnps[req.name] || {}).versions || {}).length) {
+    throw Error(
+      `Aggregated dnps must contain at least one version of the requested DNP ${
+        req.name
+      } @ ${req.ver}`
+    );
+  }
+
+  return dnps;
 }
 
 module.exports = aggregate;
