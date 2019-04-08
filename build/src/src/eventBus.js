@@ -3,12 +3,12 @@ const logs = require("./logs")(module);
 
 /** HOW TO:
  * - ON:
- * eventBus.on(eventBusTag.logUI, (data) => {
+ * eventBus.on(eventBusTag.logUi, (data) => {
  *   doStuff(data);
  * });
  *
  * - EMIT:
- * eventBus.emit(eventBusTag.logUI, data);
+ * eventBus.emit(eventBusTag.logUi, data);
  */
 class MyEmitter extends EventEmitter {}
 
@@ -17,7 +17,7 @@ const eventBus = new MyEmitter();
 const eventBusTag = {
   emitDirectory: "EMIT_DIRECTORY",
   emitPackages: "EMIT_PACKAGES",
-  logUI: "EVENT_BUS_LOGUI",
+  logUi: "EVENT_BUS_LOGUI",
   call: "INTERNAL_CALL",
   logUserAction: "EVENT_BUS_LOGUSERACTION",
   emitChainData: "EMIT_CHAIN_DATA",

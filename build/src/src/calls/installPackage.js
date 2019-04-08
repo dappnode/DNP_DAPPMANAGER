@@ -8,7 +8,7 @@ const dappGetBasic = require("modules/dappGet/basic");
 const getManifest = require("modules/getManifest");
 const lockPorts = require("modules/lockPorts");
 // Utils
-const logUI = require("utils/logUI");
+const logUi = require("utils/logUi");
 const parse = require("utils/parse");
 const merge = require("utils/merge");
 const isIpfsRequest = require("utils/isIpfsRequest");
@@ -46,7 +46,6 @@ const parseManifestPorts = require("utils/parseManifestPorts");
  *       "30303": "31313:30303",
  *       "30303/udp": "31313:30303/udp"
  *     }, ... }
- *   logId: task id {String}
  *   options: {
  *     BYPASS_RESOLVER: true,
  *     ...
@@ -60,10 +59,16 @@ const installPackage = async ({
   userSetEnvs = {},
   userSetVols = {},
   userSetPorts = {},
-  logId,
   options = {}
 }) => {
   if (!id) throw Error("kwarg id must be defined");
+
+  /**
+   * The logId is the requested id.
+   * - Doesn't require the generation of a random number
+   * - Two install calls of the same DNP will be bundled in the userActionLogs
+   * - The progressLogs in the UI will know which DNP triggered them
+   */
 
   // 1. Parse the id into a request
   // id = 'otpweb.dnp.dappnode.eth@0.1.4'
@@ -98,7 +103,7 @@ const installPackage = async ({
 
   // 3. Format the request and filter out already updated packages
   Object.keys(result.alreadyUpdated || {}).forEach(name => {
-    logUI({ logId, name, msg: "Already updated" });
+    logUi({ id, name, msg: "Already updated" });
   });
 
   let pkgs = await Promise.all(
@@ -136,7 +141,7 @@ const installPackage = async ({
   );
 
   // 4. Download requested packages in paralel
-  await Promise.all(pkgs.map(pkg => packages.download({ pkg, logId })));
+  await Promise.all(pkgs.map(pkg => packages.download({ pkg, id })));
   logs.debug(
     `Successfully downloaded DNPs ${pkgs.map(({ name }) => name).join(", ")}`
   );
@@ -162,7 +167,7 @@ const installPackage = async ({
     );
 
     // 6. Run requested packages
-    await packages.run({ pkg, logId });
+    await packages.run({ pkg, id });
     logs.debug(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports

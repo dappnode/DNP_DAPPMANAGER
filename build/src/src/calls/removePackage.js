@@ -10,7 +10,6 @@ const dockerList = require("modules/dockerList");
 const parseManifestPorts = require("utils/parseManifestPorts");
 const getPath = require("utils/getPath");
 const shell = require("utils/shell");
-const logUI = require("utils/logUI");
 
 /**
  * Remove package data: docker down + disk files
@@ -23,7 +22,7 @@ const logUI = require("utils/logUI");
  * @return {Object} A formated success message.
  * result: empty
  */
-const removePackage = async ({ id, deleteVolumes = false, logId }) => {
+const removePackage = async ({ id, deleteVolumes = false }) => {
   if (!id) throw Error("kwarg id must be defined");
 
   const packageRepoDir = getPath.packageRepoDir(id, params);
@@ -75,12 +74,10 @@ const removePackage = async ({ id, deleteVolumes = false, logId }) => {
   }
 
   // Remove container (and) volumes
-  logUI({ logId, name: "all", msg: "Shutting down containers..." });
   await docker.compose.down(dockerComposePath, {
     volumes: Boolean(deleteVolumes)
   });
   // Remove DNP folder and files
-  logUI({ logId, name: "all", msg: "Removing system files..." });
   await shell("rm -r " + packageRepoDir);
 
   // Emit packages update

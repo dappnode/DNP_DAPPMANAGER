@@ -27,8 +27,6 @@ describe("Call function: installPackage", function() {
     { number: 32769, type: "TCP" }
   ];
 
-  const logId = "1234abcd";
-
   // Stub packages module. Resolve always returning nothing
   const packages = {
     download: sinon.fake.resolves(),
@@ -92,7 +90,7 @@ describe("Call function: installPackage", function() {
   // });
 
   it("should install the package with correct arguments", async () => {
-    const res = await installPackage({ id: pkgName, logId });
+    const res = await installPackage({ id: pkgName });
     expect(res).to.be.an("object");
     expect(res).to.have.property("message");
   });
@@ -110,7 +108,7 @@ describe("Call function: installPackage", function() {
     expect(packages.download.getCall(0).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
             manifest: { ...pkgManifest },
             name: pkgName,
@@ -123,7 +121,7 @@ describe("Call function: installPackage", function() {
     expect(packages.download.getCall(1).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
             manifest: { ...depManifest },
             name: depName,
@@ -141,7 +139,7 @@ describe("Call function: installPackage", function() {
     expect(packages.run.getCall(0).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
             manifest: { ...pkgManifest },
             name: pkgName,
@@ -154,7 +152,7 @@ describe("Call function: installPackage", function() {
     expect(packages.run.getCall(1).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
             manifest: { ...depManifest },
             name: depName,

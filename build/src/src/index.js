@@ -115,7 +115,7 @@ connection.onopen = (session, details) => {
   });
 
   // Emits progress logs to the ADMIN UI
-  eventBus.onSafe(eventBusTag.logUI, data => {
+  eventBus.onSafe(eventBusTag.logUi, data => {
     session.publish("log.dappmanager.dnp.dappnode.eth", [], data);
     if (data && data.msg && !data.msg.includes("%")) {
       logs.info(JSON.stringify(data));
