@@ -1,4 +1,4 @@
-const ipfsAPI = require("ipfs-api");
+const ipfsAPI = require("ipfs-http-client");
 const params = require("params");
 const logs = require("logs.js")(module);
 

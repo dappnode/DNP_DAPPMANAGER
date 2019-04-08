@@ -1,23 +1,24 @@
-FROM node:8.9.4-alpine as build
+FROM node:10.15.3-alpine as build
 
 RUN apk add --no-cache git python build-base bind-tools docker bash jq
 
 WORKDIR /usr/src/app
 
 # Install app dependencies to use docker's layer cache
-ADD build/src/package*.json ./
-RUN npm install --production
+COPY build/src/package.json ./
+COPY build/src/yarn.lock ./
+RUN yarn install --production
 
 # Add source
-ADD build/src .
+COPY build/src .
 
 # Get this DNP version and git hash. Results in /usr/src/app/.version.json
-ADD .git .git
-ADD dappnode_package.json .
+COPY .git .git
+COPY dappnode_package.json .
 RUN ./getVersionData.sh
 
 # This results in a single layer image
-FROM node:8.9.4-alpine
+FROM node:10.15.3-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
@@ -29,10 +30,10 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
-    wget \
+    wget --no-verbose \
         "https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub" \
         -O "/etc/apk/keys/sgerrand.rsa.pub" && \
-    wget \
+    wget --no-verbose \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
         "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \

@@ -1,7 +1,7 @@
 # Prevent Dockerfile modifications to trigger layer recomputation
 build/Dockerfile
 
-# Acelerate ADD build/src . command
+# Accelerate COPY build/src . command
 build/src/node_modules/
 build/src/tmp_dnp_repo/
 build/src/dnp_repo/
