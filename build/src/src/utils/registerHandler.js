@@ -17,6 +17,9 @@ const wrapErrors = (handler, event) =>
     // 2. details: an object which provides call metadata
     try {
       const res = await handler(kwargs);
+      /**
+       * res = { message, result, ... }
+       */
 
       // Log internally
       logUserAction.log({ level: "info", event, ...res, kwargs });

@@ -3,6 +3,7 @@ const winston = require("winston");
 const { createLogger, format, transports } = winston;
 const Transport = require("winston-transport");
 const { eventBus, eventBusTag } = require("eventBus");
+const limitObjValuesSize = require("utils/limitObjValuesSize");
 const params = require("params");
 
 /*
@@ -21,14 +22,27 @@ const params = require("params");
  * logs.error('Something')
  */
 
-// Format function to filter out unrelevant logs
-const onlyUserAction = format((info, opts) => {
-  if (!info.userAction) {
-    return false;
-  }
-  delete info.userAction;
-  delete info.logMessage;
-  return info;
+/**
+ * Format function to filter out unrelevant log properties
+ */
+//                           (info, opts)
+const onlyUserAction = format(info => {
+  if (!info.userAction) return false;
+  const _info = Object.assign({}, info);
+  delete _info.userAction;
+  delete _info.logMessage;
+  return _info;
+});
+
+/**
+ * Limit the length of objects.
+ * RPC calls like copyTo may content really big dataUrls as kwargs,
+ * prevent them from cluttering the userActionLogs file
+ */
+const maxLen = 500;
+const limitLength = format(info => {
+  if (info.kwargs) info.kwargs = limitObjValuesSize(info.kwargs, maxLen);
+  if (info.result) info.result = limitObjValuesSize(info.result, maxLen);
 });
 
 // Custom transport to broadcast new logs to the admin directly
@@ -54,7 +68,12 @@ const logger = createLogger({
     }),
     new EmitToAdmin()
   ],
-  format: format.combine(onlyUserAction(), format.timestamp(), format.json())
+  format: format.combine(
+    onlyUserAction(),
+    limitLength(),
+    format.timestamp(),
+    format.json()
+  )
 });
 
 module.exports = logger;
