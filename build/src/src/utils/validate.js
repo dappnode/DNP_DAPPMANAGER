@@ -64,14 +64,6 @@ function web3Existance(_web3) {
   if (!_web3) throw Error("VALIDATION ERROR: web3 is not defined");
 }
 
-async function web3Usability(_web3) {
-  // Right now this function is empty as the code below
-  // was very slow ocassionally > 1000 ms. The check if the chain is syncing
-  // will be made directly in the ADMINUI
-  // const isSyncing = await _web3.eth.isSyncing()
-  // if (isSyncing) throw Error('Chain is still syncing, please wait until the chain is synced')
-}
-
 function path(PATH) {
   if (!PATH) throw Error("VALIDATION ERROR: path is not defined: " + PATH);
   if (typeof PATH != "string")
@@ -101,7 +93,6 @@ module.exports = {
   packageReq,
   isEthDomain,
   web3Existance,
-  web3Usability,
   isIPFShash,
   path
 };
