@@ -7,12 +7,11 @@ const db = require("../db");
  * @return {Object} A formated success message.
  * result: = notifications = {
  *   "diskSpaceRanOut-stoppedPackages": {
- *     id: 'diskSpaceRanOut-stoppedPackages',
- *     type: 'error',
- *     title: 'Disk space ran out, stopped packages',
- *     body: `Available disk space is less than a safe ...`,
- *   }
- * }
+ *     id: "diskSpaceRanOut-stoppedPackages",
+ *     type: "error",
+ *     title: "Disk space ran out, stopped packages",
+ *     body: "Available disk space is less than a safe ..."",
+ *   }, ... }
  */
 
 const notificationsGet = async () => {

@@ -174,6 +174,18 @@ eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 const cache = {};
 async function getAndEmitChainData() {
   const dnpList = await dockerList.listContainers();
+  /**
+   * @param {Array} chainData = [
+   *   {
+   *     syncing: true, {Bool}
+   *     message: "Blocks synced: 543000 / 654000", {String}
+   *     progress: 0.83027522935,
+   *   },
+   *   {
+   *     message: "Could not connect to RPC", {String}
+   *     error: true {Bool},
+   *   }, ... ]
+   */
   const chainData = await Promise.all(
     Object.keys(activeChains)
       .filter(dnpName => {

@@ -14,7 +14,18 @@ const params = require("params");
  *   numLogs
  * }
  * @return {Object} A formated success message.
- * result: = logs (string)
+ * result: stringified userActionLog JSON objects appended on new lines
+ *
+ * @param {object} userActionLog = {
+ *   level: "info" | "error", {string}
+ *   event: "installPackage.dnp.dappnode.eth", {string}
+ *   message: "Successfully install DNP", {string} Returned message from the call function
+ *   result: { data: "contents" }, {*} Returned result from the call function
+ *   kwargs: { id: "dnpName" }, {object} RPC key-word arguments
+ *   // Only if error
+ *   message: e.message, {string}
+ *   stack.e.stack {string}
+ * }
  */
 
 const getUserActionLogs = async ({ fromLog = 0, numLogs = 50 }) => {
@@ -22,7 +33,7 @@ const getUserActionLogs = async ({ fromLog = 0, numLogs = 50 }) => {
 
   if (!fs.existsSync(userActionLogsFilename)) {
     return {
-      message: "UserActionLogs are still empty, returning black",
+      message: "userActionLogs are empty, returning an empty string",
       result: ""
     };
   }

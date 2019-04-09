@@ -4,6 +4,21 @@ const Daemon = require("monero-rpc").Daemon;
 
 const MIN_BLOCK_DIFF_SYNC = 15;
 
+/**
+ * Returns a chain data object for an [monero] API
+ * @param {String} name = "Monero"
+ * @param {String} api = "http://my.monero.dnp.dappnode.eth:18081"
+ * @returns {Object}
+ * - On success: {
+ *   syncing: true, {Bool}
+ *   message: "Blocks synced: 543000 / 654000", {String}
+ *   progress: 0.83027522935,
+ * }
+ * - On error: {
+ *   message: "Could not connect to RPC", {String}
+ *   error: true {Bool},
+ * }
+ */
 async function monero({ name, api }) {
   const res = { name };
   try {

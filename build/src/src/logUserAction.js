@@ -22,10 +22,37 @@ const params = require("params");
  * logs.error("Something")
  */
 
+// Custom transport to broadcast new logs to the admin directly
+class EmitToAdmin extends Transport {
+  constructor(opts) {
+    super(opts);
+  }
+
+  /**
+   * @param {object} info = userActionLog
+   *   @property {string} level - "info" | "error".
+   *   @property {string} event - Crossbar RPC event, "installPackage.dnp.dappnode.eth".
+   *   @property {string} message - Returned message from the call function, "Successfully install DNP"
+   *   @property {*} result - Returned result from the call function
+   *   @property {object} kwargs - RPC key-word arguments, { id: "dnpName" }
+   *   // Only if error
+   *   @property {object} message - e.message
+   *   @property {object} stack - e.stack
+   */
+  log(info, callback) {
+    setImmediate(() => {
+      eventBus.emit(eventBusTag.logUserAction, info);
+    });
+    callback();
+  }
+}
+
+// Utilities to format
+
 /**
  * Format function to filter out unrelevant log properties
+ * Note: format((info, opts) => ... )
  */
-//                           (info, opts)
 const onlyUserAction = format(info => {
   if (!info.userAction) return false;
   const _info = Object.assign({}, info);
@@ -45,21 +72,8 @@ const limitLength = format(info => {
   if (info.result) info.result = limitObjValuesSize(info.result, maxLen);
 });
 
-// Custom transport to broadcast new logs to the admin directly
-class EmitToAdmin extends Transport {
-  constructor(opts) {
-    super(opts);
-  }
-
-  log(info, callback) {
-    setImmediate(() => {
-      eventBus.emit(eventBusTag.logUserAction, info);
-    });
-    callback();
-  }
-}
-
 // Actual logger
+
 const logger = createLogger({
   transports: [
     new transports.File({

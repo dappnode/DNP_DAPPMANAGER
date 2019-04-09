@@ -3,26 +3,19 @@ const Web3 = require("web3");
 const MIN_BLOCK_DIFF_SYNC = 60;
 
 /**
- * Fetches multiple ethereum chain states at once via HTTP
- *
- * @param {Array} chain =
- *    { name: 'Mainnet',
- *      api: 'http://my.ethchain.dnp.dappnode.eth:8545' },
- * @return {Array} chainData =
- *     { name: 'Mainnet',
- *       syncing: true,
- *       msg: 'Syncing snapshot: 235/1432' },
- *
- *      <or>
- *
- *     { name: 'Kovan',
- *       syncing: false,
- *       msg: 'Synced #8946123' },
- *
- *      <or>
- *
- *     { name: 'Ropstep',
- *       error: 'Could not connect' },
+ * Returns a chain data object for an [ethereum] API
+ * @param {String} name = "Mainnet"
+ * @param {String} api = "http://my.ethchain.dnp.dappnode.eth:8545"
+ * @returns {Object}
+ * - On success: {
+ *   syncing: true, {Bool}
+ *   message: "Blocks synced: 543000 / 654000", {String}
+ *   progress: 0.83027522935,
+ * }
+ * - On error: {
+ *   message: "Could not connect to RPC", {String}
+ *   error: true {Bool},
+ * }
  */
 async function ethereum({ name, api }) {
   const res = { name };

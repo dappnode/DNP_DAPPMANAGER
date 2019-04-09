@@ -9,6 +9,21 @@ const MIN_BLOCK_DIFF_SYNC = 3;
 // Cache the blockIndex to prevent unnecessary calls
 const cache = {};
 
+/**
+ * Returns a chain data object for a [bitcoin] API
+ * @param {String} name = "Bitcoin"
+ * @param {String} api = "my.bitcoin.dnp.dappnode.eth"
+ * @returns {Object}
+ * - On success: {
+ *   syncing: true, {Bool}
+ *   message: "Blocks synced: 543000 / 654000", {String}
+ *   progress: 0.83027522935,
+ * }
+ * - On error: {
+ *   message: "Could not connect to RPC", {String}
+ *   error: true {Bool},
+ * }
+ */
 async function bitcoin({ name, api }) {
   const res = { name };
   try {
