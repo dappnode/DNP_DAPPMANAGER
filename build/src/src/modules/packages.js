@@ -44,7 +44,7 @@ async function download({ pkg, id }) {
   // Define the logging function
   const log = percent => {
     if (percent > 99) percent = 99;
-    logUi({ id, name, msg: "Downloading " + percent + "%" });
+    logUi({ id, name, message: "Downloading " + percent + "%" });
   };
   // Define the rounding function to not spam updates
   const displayRes = 2;
@@ -58,13 +58,13 @@ async function download({ pkg, id }) {
     }
   };
 
-  logUi({ id, name, msg: "Starting download..." });
+  logUi({ id, name, message: "Starting download..." });
   const imagePath = validate.path(
     getPath.image(name, imageName, params, isCore)
   );
   await ipfs.download(imageHash, imagePath, logChunk);
 
-  logUi({ id, name, msg: "Loading image..." });
+  logUi({ id, name, message: "Loading image..." });
   await docker.load(imagePath);
 
   // For IPFS downloads, retag image
@@ -73,11 +73,11 @@ async function download({ pkg, id }) {
     await docker.tag(name + ":" + version, name + ":" + fromIpfs);
   }
 
-  logUi({ id, name, msg: "Cleaning files..." });
+  logUi({ id, name, message: "Cleaning files..." });
   await removeFile(imagePath);
 
   // Final log
-  logUi({ id, name, msg: "Package downloaded" });
+  logUi({ id, name, message: "Package downloaded" });
 }
 
 /**
@@ -93,7 +93,7 @@ async function run({ pkg, id }) {
   const { isCore, version } = manifest;
   const dockerComposePath = getPath.dockerCompose(name, params, isCore);
 
-  logUi({ id, name, msg: "starting package... " });
+  logUi({ id, name, message: "starting package... " });
   // patch to prevent installer from crashing
   if (name == "dappmanager.dnp.dappnode.eth") {
     await restartPatch(name + ":" + version);
@@ -104,7 +104,7 @@ async function run({ pkg, id }) {
   // Clean old images. This command can throw errors.
   // If the images were removed successfuly the dappmanger will print logs:
   // Untagged: package.dnp.dappnode.eth:0.1.6
-  logUi({ id, name, msg: "cleaning old images" });
+  logUi({ id, name, message: "cleaning old images" });
   const currentImgs = await docker.images().catch(() => "");
   await docker
     .rmi(
@@ -116,7 +116,7 @@ async function run({ pkg, id }) {
     .catch(() => {});
 
   // Final log
-  logUi({ id, name, msg: "package started" });
+  logUi({ id, name, message: "package started" });
 }
 
 module.exports = {

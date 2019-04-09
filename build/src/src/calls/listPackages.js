@@ -62,18 +62,26 @@ const listPackages = async () => {
   // Append envFile and manifest
   dnpList.map(dnp => {
     // Add env info, only if there are ENVs
-    const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
-    if (Object.keys(envs).length) dnp.envs = envs;
+    try {
+      const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
+      if (Object.keys(envs).length) dnp.envs = envs;
+    } catch (e) {
+      logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
+    }
 
     // Add manifest
-    const manifestPath = getPath.manifest(
-      dnp.name,
-      params,
-      dnp.isCORE || dnp.isCore
-    );
-    if (fs.existsSync(manifestPath)) {
-      const manifestFileData = fs.readFileSync(manifestPath, "utf8");
-      dnp.manifest = JSON.parse(manifestFileData);
+    try {
+      const manifestPath = getPath.manifest(
+        dnp.name,
+        params,
+        dnp.isCORE || dnp.isCore
+      );
+      if (fs.existsSync(manifestPath)) {
+        const manifestFileData = fs.readFileSync(manifestPath, "utf8");
+        dnp.manifest = JSON.parse(manifestFileData);
+      }
+    } catch (e) {
+      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.stack}`);
     }
   });
 

@@ -18,7 +18,7 @@ const wrapErrors = (handler, event) =>
     try {
       const res = await handler(kwargs);
       /**
-       * res = { message, result, ... }
+       * res = { message, result }
        */
 
       // Log internally
@@ -32,7 +32,7 @@ const wrapErrors = (handler, event) =>
       return JSON.stringify({
         success: true,
         message: res.message,
-        result: res.result || {}
+        result: res.result
       });
     } catch (e) {
       const msg = e.message || ""; // alias to simplify code

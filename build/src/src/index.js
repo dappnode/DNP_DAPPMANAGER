@@ -94,9 +94,7 @@ connection.onopen = (session, details) => {
    * - Publisher:
    *     publish("event.name", arg1, arg2)
    * - Subscriber:
-   *     session.subscribe("event.name", args => {
-   *       listener(...args)
-   *     })
+   *     subscribe("event.name", function(arg1, arg2) {})
    */
   function publish(event, ...args) {
     // session.publish(topic, args, kwargs, options)
@@ -140,7 +138,7 @@ connection.onopen = (session, details) => {
 
   // Emits the directory
   eventBus.onSafe(eventBusTag.emitDirectory, pkgs => {
-    session.publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
+    publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
   /**
@@ -152,7 +150,7 @@ connection.onopen = (session, details) => {
    * }
    */
   eventBus.onSafe(eventBusTag.logUi, logData => {
-    session.publish("log.dappmanager.dnp.dappnode.eth", logData);
+    publish("log.dappmanager.dnp.dappnode.eth", logData);
     // Also, log them internally. But skip download progress logs, too spam-y
     if (!((logData || {}).message || "").includes("%")) {
       logs.info(JSON.stringify(logData));

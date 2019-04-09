@@ -16,8 +16,6 @@ const isSyncing = require("utils/isSyncing");
 const envsHelper = require("utils/envsHelper");
 const parseManifestPorts = require("utils/parseManifestPorts");
 
-/* eslint-disable max-len */
-
 /**
  * Installs a package. It resolves dependencies, downloads
  * manifests and images, loads the images to docker, and calls
@@ -85,6 +83,7 @@ const installPackage = async ({
   //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
   //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
   // }
+  logUi({ id, name: req.name, message: "Resolving dependencies..." });
   const result = options.BYPASS_RESOLVER
     ? await dappGetBasic(req)
     : await dappGet(req);
@@ -103,7 +102,7 @@ const installPackage = async ({
 
   // 3. Format the request and filter out already updated packages
   Object.keys(result.alreadyUpdated || {}).forEach(name => {
-    logUi({ id, name, msg: "Already updated" });
+    logUi({ id, name, message: "Already updated" });
   });
 
   let pkgs = await Promise.all(
