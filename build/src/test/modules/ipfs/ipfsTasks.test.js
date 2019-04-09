@@ -12,13 +12,11 @@ const testDirectory = "./test_files/";
 const PATH_SOURCE = testDirectory + "/hello-world_source.txt";
 const HASH = "QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT";
 const ipfs = {
-  files: {
-    add: (PATH, options, callback) => {
-      callback(null, [{ hash: HASH }]);
-    },
-    catReadableStream: HASH => {
-      return fs.createReadStream(PATH_SOURCE);
-    }
+  add: (PATH, options, callback) => {
+    callback(null, [{ hash: HASH }]);
+  },
+  catReadableStream: () => {
+    return fs.createReadStream(PATH_SOURCE);
   },
   pin: {
     add: (HASH, callback) => {

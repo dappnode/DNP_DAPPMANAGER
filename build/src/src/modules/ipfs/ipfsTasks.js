@@ -120,7 +120,7 @@ const downloadHandler = (HASH, PATH, logChunks, options = {}) =>
         await fs.unlinkSync(PATH);
       }
     };
-    const readStream = ipfs.files
+    const readStream = ipfs
       .catReadableStream(HASH)
       .on("data", trackProgress)
       .on("error", handleError("ReadableStream"));
