@@ -1,5 +1,5 @@
 const semver = require("semver");
-const validate = require("./validate");
+const isIpfsHash = require("./isIpfsHash");
 
 /*
  * Wrapper for the semver library. In the DAPPMANAGER versions can be:
@@ -14,8 +14,8 @@ function isHigher(v1, v2) {
   const ipfs = "999.9.10";
   const latest = "999.9.9";
   // if v1 and v2 are ipfs hashes, prioritize above latest
-  if (v1 && validate.isIPFShash(v1)) v1 = ipfs;
-  if (v2 && validate.isIPFShash(v2)) v2 = ipfs;
+  if (v1 && isIpfsHash(v1)) v1 = ipfs;
+  if (v2 && isIpfsHash(v2)) v2 = ipfs;
   // if v1 and v2 are undefined they are latest
   if (!semver.valid(v1)) v1 = latest;
   if (!semver.valid(v2)) v2 = latest;

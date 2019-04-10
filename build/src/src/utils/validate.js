@@ -49,18 +49,6 @@ function isEthDomain(domain) {
   }
 }
 
-function isIPFShash(hash) {
-  if (!hash || typeof hash !== "string")
-    throw Error("VALIDATION ERROR: hash is undefined");
-
-  return (
-    (hash.startsWith("/ipfs/Qm") ||
-      hash.startsWith("ipfs/Qm") ||
-      hash.startsWith("Qm")) &&
-    !hash.endsWith(".eth")
-  );
-}
-
 function web3Existance(_web3) {
   if (!_web3) throw Error("VALIDATION ERROR: web3 is not defined");
 }
@@ -89,6 +77,5 @@ module.exports = {
   packageReq,
   isEthDomain,
   web3Existance,
-  isIPFShash,
   path
 };
