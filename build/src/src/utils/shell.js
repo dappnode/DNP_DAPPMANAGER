@@ -14,7 +14,7 @@ const exec = util.promisify(require("child_process").exec);
  * identified by the killSignal property (the default is 'SIGTERM')
  * if the child runs longer than timeout milliseconds.
  */
-const defaultTimeout = 3 * 60 * 1000; // ms
+const defaultTimeout = 15 * 60 * 1000; // ms
 
 function shell(cmd, _options) {
   const options = typeof _options === "object" ? _options : {};

@@ -22,7 +22,7 @@ describe("verifyState", () => {
     assert.equal(res.valid, false);
     assert.deepStrictEqual(res.reason, {
       req: "A@1.0.0",
-      dep: "C@undefined",
+      dep: "C@no-version",
       range: "^1.0.0"
     });
   });

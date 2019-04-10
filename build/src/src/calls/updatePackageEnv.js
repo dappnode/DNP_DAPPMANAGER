@@ -32,7 +32,7 @@ const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
       id = manifest.name;
     } catch (e) {
       throw Error(
-        "Could not retrieve package name from manifest of " + id,
+        `Could not retrieve package name from manifest of ${id}`,
         e.stack
       );
     }
@@ -45,30 +45,24 @@ const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
   const previousEnvs = envsHelper.load(id, isCore);
   envsHelper.write(id, isCore, { ...previousEnvs, ...envs });
 
-  if (!restart) {
-    return {
-      message: "Updated envs of " + id,
-      logMessage: true,
-      userAction: true
-    };
+  if (restart) {
+    const dockerComposePath = getPath.dockerComposeSmart(id, params);
+    if (!fs.existsSync(dockerComposePath)) {
+      throw Error(`No docker-compose found with at: ${dockerComposePath}`);
+    }
+
+    if (id.includes("dappmanager.dnp.dappnode.eth")) {
+      throw Error("The installer cannot be restarted");
+    }
+
+    await docker.safe.compose.up(dockerComposePath);
+
+    // Emit packages update
+    eventBus.emit(eventBusTag.emitPackages);
   }
-
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
-  if (!fs.existsSync(dockerComposePath)) {
-    throw Error("No docker-compose found with at: " + dockerComposePath);
-  }
-
-  if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    throw Error("The installer cannot be restarted");
-  }
-
-  await docker.safe.compose.up(dockerComposePath);
-
-  // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: "Updated envs and restarted " + id,
+    message: `Updated envs of ${id} ${restart ? "and restarted" : ""} `,
     logMessage: true,
     userAction: true
   };

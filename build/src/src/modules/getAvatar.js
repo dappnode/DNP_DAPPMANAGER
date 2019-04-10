@@ -13,7 +13,7 @@ async function getAvatar(avatarHash) {
     );
     avatar = imageBuffer.toString("base64");
   }
-  return "data:image/png;base64," + avatar;
+  return `data:image/png;base64,${avatar}`;
 }
 
 module.exports = getAvatar;

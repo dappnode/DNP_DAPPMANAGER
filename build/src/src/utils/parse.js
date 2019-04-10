@@ -20,7 +20,7 @@ function stringifyDockerCompose(dcObject) {
 // Helper function, read and parse docker-compose
 function readDockerCompose(dockerComposePath) {
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error("docker-compose does not exist: " + dockerComposePath);
+    throw Error(`docker-compose does not exist: ${dockerComposePath}`);
   }
   const dcString = fs.readFileSync(dockerComposePath, "utf-8");
   return parseDockerCompose(dcString);
@@ -117,9 +117,7 @@ function packageReq(req) {
   // Added for debugging on development
   if (req.length == 1) {
     throw Error(
-      "WARNING: packageReq has only one character, this should not happen, " +
-        "packageReq: " +
-        req
+      `packageReq has only one character, this should not happen, packageReq: ${req}`
     );
   }
 
@@ -145,10 +143,9 @@ const manifest = {
     let depObject = manifest.dependencies || {};
     if (!depObject || typeof depObject != typeof {}) {
       throw Error(
-        "BROKEN DEPENDENCY OBJECT, of package: " +
-          JSON.stringify(packageReq) +
-          " depObject: " +
-          depObject
+        `Broken dependency object, of: ${JSON.stringify(
+          packageReq
+        )} depObject: ${depObject}`
       );
     }
     return depObject;

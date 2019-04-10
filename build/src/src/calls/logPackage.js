@@ -19,14 +19,14 @@ const logPackage = async ({ id, options }) => {
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error("No docker-compose found: " + dockerComposePath);
+    throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
 
   const containerName = parse.containerName(dockerComposePath);
   const logs = await docker.log(containerName, options);
 
   return {
-    message: "Got logs of " + id,
+    message: `Got logs of ${id}`,
     result: logs
   };
 };

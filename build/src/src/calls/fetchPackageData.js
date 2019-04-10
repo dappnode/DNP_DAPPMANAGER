@@ -55,7 +55,7 @@ const fetchPackageData = async ({ id }) => {
   }
 
   return {
-    message: "Got data of " + packageReq.name,
+    message: `Got data of ${packageReq.name}`,
     result: {
       manifest,
       avatar

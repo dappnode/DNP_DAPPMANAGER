@@ -44,7 +44,7 @@ async function download({ pkg, id }) {
   // Define the logging function
   const log = percent => {
     if (percent > 99) percent = 99;
-    logUi({ id, name, message: "Downloading " + percent + "%" });
+    logUi({ id, name, message: `Downloading ${percent}%` });
   };
   // Define the rounding function to not spam updates
   const displayRes = 2;
@@ -70,7 +70,9 @@ async function download({ pkg, id }) {
   // For IPFS downloads, retag image
   // 0.1.11 => 0.1.11-ipfs-QmSaHiGWDStTZg6G3YQi5herfaNYoonPihjFzCcQoJy8Wc
   if (fromIpfs) {
-    await docker.tag(name + ":" + version, name + ":" + fromIpfs);
+    const fromTag = name + ":" + version;
+    const toTag = name + ":" + fromIpfs;
+    await docker.tag(fromTag, toTag);
   }
 
   logUi({ id, name, message: "Cleaning files..." });

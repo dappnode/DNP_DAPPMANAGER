@@ -111,11 +111,11 @@ const downloadHandler = (HASH, PATH, logChunks, options = {}) =>
     };
     const checkFileHash = async () => {
       if (!fs.existsSync(PATH) || fs.statSync(PATH).size == 0) {
-        reject("Downloaded file: " + PATH + ", is empty or not existent");
+        reject(Error(`Downloaded file: ${PATH}, is empty or not existent`));
       } else if (await isfileHashValid(HASH, PATH)) {
         resolve();
       } else {
-        reject("Downloaded file: " + PATH + ", is corrupt");
+        reject(Error(`Downloaded file: ${PATH}, is corrupt`));
         // if the file's hash is not valid remove it.
         await fs.unlinkSync(PATH);
       }

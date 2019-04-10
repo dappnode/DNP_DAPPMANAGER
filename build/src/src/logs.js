@@ -26,7 +26,7 @@ const scFormat = format.printf(info => {
   });
   let append = JSON.stringify(filteredInfo, null, 4);
   if (append != "{}") {
-    message = message + " " + append;
+    message = `${message} - ${append}`;
   }
   const variables = [];
   if (info.admin) variables.push("ADMIN");

@@ -37,18 +37,15 @@ if (process.env.NODE_ENV === "development") {
   params.autobahnRealm = "realm1";
 }
 
-const autobahnUrl = params.autobahnUrl;
-const autobahnRealm = params.autobahnRealm;
-const connection = new autobahn.Connection({
-  url: autobahnUrl,
-  realm: autobahnRealm
-});
+const url = params.autobahnUrl;
+const realm = params.autobahnRealm;
+const connection = new autobahn.Connection({ url, realm });
 
 connection.onopen = (session, details) => {
   logs.info(`Connected to DAppNode's WAMP
-  url:     ${autobahnUrl}
-  realm:   ${autobahnRealm}
-  session: ${details.authid}`);
+  url:     ${url}
+  realm:   ${realm}
+  session: ${(details || {}).authid}`);
 
   registerHandler(session, "ping.dappmanager.dnp.dappnode.eth", x => x);
   for (const callId of Object.keys(calls)) {
@@ -208,9 +205,7 @@ connection.onclose = (reason, details) => {
 };
 
 connection.open();
-logs.info(
-  "Attempting WAMP connection to " + autobahnUrl + ", realm " + autobahnRealm
-);
+logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 /**
  * Initials calls

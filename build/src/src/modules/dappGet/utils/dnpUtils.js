@@ -19,10 +19,15 @@ function getVersionsFromDnp(dnp) {
   return dnp.versions;
 }
 
+function toReq(name, version) {
+  return [name || "no-name", version || "no-version"].join("@");
+}
+
 module.exports = {
   getVersion,
   hasVersion,
   setVersion,
   getDependencies,
-  getVersionsFromDnp
+  getVersionsFromDnp,
+  toReq
 };

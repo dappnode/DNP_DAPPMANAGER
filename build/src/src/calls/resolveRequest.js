@@ -13,7 +13,7 @@ const dappGetBasic = require("modules/dappGet/basic");
  * @return {Object} A formated success message.
  * result: empty
  */
-const removePackage = async ({ req, options = {} }) => {
+const resolveRequest = async ({ req, options = {} }) => {
   if (!req) throw Error("kwarg req must be defined");
 
   // result = {
@@ -28,15 +28,11 @@ const removePackage = async ({ req, options = {} }) => {
   result.state = {};
 
   return {
-    message:
-      "Resolve request for " +
-      req.name +
-      "@" +
-      req.ver +
-      ", resolved: " +
-      Boolean(result.success),
+    message: `Resolve request for ${req.name}@${
+      req.ver
+    }, resolved: Boolean(result.success)`,
     result
   };
 };
 
-module.exports = removePackage;
+module.exports = resolveRequest;

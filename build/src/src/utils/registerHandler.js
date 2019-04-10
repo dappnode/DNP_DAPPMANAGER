@@ -11,7 +11,7 @@ const logs = require("../logs")(module);
 const wrapErrors = (handler, event) =>
   // function(args, kwargs, details)
   async function(_, kwargs) {
-    logs.debug("In-call to " + event);
+    logs.debug(`In-call to ${event}`);
     // 0. args: an array with call arguments
     // 1. kwargs: an object with call arguments
     // 2. details: an object which provides call metadata

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 /*
  * Generates file paths given a set of parameters. This tool helps
@@ -28,9 +29,8 @@ module.exports = {
   manifest: (dnpName, params, isCore) => {
     if (!dnpName) throw Error("dnpName must be defined");
     if (!params) throw Error("params must be defined");
-    return (
-      getRepoDirPath(dnpName, params, isCore) +
-      "/" +
+    return path.join(
+      getRepoDirPath(dnpName, params, isCore),
       getManifestName(dnpName, isCore)
     );
   },
@@ -72,22 +72,21 @@ module.exports = {
     if (!dnpName) throw Error("dnpName must be defined");
     if (!imageName) throw Error("imageName must be defined");
     if (!params) throw Error("params must be defined");
-    return getRepoDirPath(dnpName, params, isCore) + "/" + imageName;
+    return path.join(getRepoDirPath(dnpName, params, isCore), imageName);
   }
 };
 
 // Helper functions
 
 function getDockerComposePath(dnpName, params, isCore) {
-  return (
-    getRepoDirPath(dnpName, params, isCore) +
-    "/" +
+  return path.join(
+    getRepoDirPath(dnpName, params, isCore),
     getDockerComposeName(dnpName, isCore)
   );
 }
 
 function getEnvFilePath(dnpName, params, isCore) {
-  return getRepoDirPath(dnpName, params, isCore) + "/" + dnpName + ".env";
+  return path.join(getRepoDirPath(dnpName, params, isCore), `${dnpName}.env`);
 }
 
 function getRepoDirPath(dnpName, params, isCore) {

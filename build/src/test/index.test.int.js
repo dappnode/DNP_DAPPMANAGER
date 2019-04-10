@@ -49,9 +49,11 @@ describe("Full integration test with REAL docker: ", function() {
           "rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/"
         ).catch(() => {}),
         await shell(
-          "docker rm -f " +
-            "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth " +
-            "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
+          `docker rm -f
+            ${[
+              "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
+              "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
+            ].join(" ")}`
         ).catch(() => {})
       ]);
     });
@@ -130,8 +132,7 @@ describe("Full integration test with REAL docker: ", function() {
       web3.currentProvider.connection.close
     ) {
       logs.info(
-        "\x1b[36m%s\x1b[0m",
-        ">> CLOSING WS: " + web3.currentProvider.host
+        `\x1b[36m%s\x1b[0m >> CLOSING WS: ${web3.currentProvider.host}`
       );
       web3.currentProvider.connection.close();
     }
@@ -196,20 +197,17 @@ function testLogPackage(logPackage, kwargs) {
 }
 
 function testListPackages(listPackages, packageName, state) {
-  it(
-    "call listPackages, to check " + packageName + " is " + state,
-    async () => {
-      logs.info("\x1b[36m%s\x1b[0m >> LISTING");
-      const res = await listPackages();
-      expect(res).to.have.property("message");
-      // filter returns an array of results (should have only one)
-      let pkg = res.result.filter(e => {
-        return e.name.includes(packageName);
-      })[0];
-      if (state == "down") expect(pkg).to.be.undefined;
-      else expect(pkg.state).to.equal(state);
-    }
-  ).timeout(10 * 1000);
+  it(`calling listPackages, to check ${packageName} is ${state}`, async () => {
+    logs.info("\x1b[36m%s\x1b[0m >> LISTING");
+    const res = await listPackages();
+    expect(res).to.have.property("message");
+    // filter returns an array of results (should have only one)
+    let pkg = res.result.filter(e => {
+      return e.name.includes(packageName);
+    })[0];
+    if (state == "down") expect(pkg).to.be.undefined;
+    else expect(pkg.state).to.equal(state);
+  }).timeout(10 * 1000);
 }
 
 function testTogglePackage(togglePackage, kwargs) {

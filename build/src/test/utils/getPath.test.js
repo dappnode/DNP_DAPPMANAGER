@@ -1,4 +1,5 @@
 const chai = require("chai");
+const path = require("path");
 
 chai.should();
 
@@ -24,24 +25,24 @@ describe("Util: get paths", function() {
   it("return MANIFEST path", () => {
     getPath
       .manifest(packageName, params)
-      .should.equal(testDir + packageName + "/" + "dappnode_package.json");
+      .should.equal(path.join(testDir, packageName, "dappnode_package.json"));
   });
 
   it("return DOCKERCOMPOSE path", () => {
     getPath
       .dockerCompose(packageName, params)
-      .should.equal(testDir + packageName + "/" + "docker-compose.yml");
+      .should.equal(path.join(testDir, packageName, "docker-compose.yml"));
   });
 
   it("return ENV_FILE path", () => {
     getPath
       .envFile(packageName, params)
-      .should.equal(testDir + packageName + "/" + packageName + ".env");
+      .should.equal(path.join(testDir, packageName, `${packageName}.env`));
   });
 
   it("return IMAGE path", () => {
     getPath
       .image(packageName, imageName, params)
-      .should.equal(testDir + packageName + "/" + imageName);
+      .should.equal(path.join(testDir, packageName, imageName));
   });
 });

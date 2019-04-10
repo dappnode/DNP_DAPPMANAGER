@@ -8,15 +8,15 @@ const parseCloseOutput = require("./parseCloseOutput");
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 500 UDP
  *
  * @param {Object} kwargs: {
- *   protocol: 'TCP',
- *   portNumber: '3000'
+ *   number: '3000',
+ *   type: 'TCP',
  * }
  * @return {*}
  */
-async function close({ protocol, portNumber }) {
-  validateKwargs({ protocol, portNumber });
+async function close({ number, type }) {
+  validateKwargs({ number, type });
   try {
-    const res = await upnpcCommand(`-e DAppNode -d ${portNumber} ${protocol}`);
+    const res = await upnpcCommand(`-e DAppNode -d ${number} ${type}`);
     return parseCloseOutput(res);
   } catch (e) {
     parseCloseOutput(e.message);

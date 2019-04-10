@@ -24,7 +24,7 @@ async function restartPackageVolumes({ id }) {
   }
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error("No docker-compose found: " + dockerComposePath);
+    throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
     throw Error("The installer cannot be restarted");
@@ -51,7 +51,7 @@ async function restartPackageVolumes({ id }) {
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: "Restarted " + id + " volumes",
+    message: `Restarted ${id} volumes`,
     logMessage: true,
     userAction: true
   };

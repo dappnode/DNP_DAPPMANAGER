@@ -41,9 +41,7 @@ async function getDirectory() {
         status: DAppNodePackageStatus[pkg.status]
       });
     } catch (e) {
-      logs.error(
-        "Error retrieving package #" + i + " from directory, err: " + e
-      );
+      logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
     }
   }
   return packages;

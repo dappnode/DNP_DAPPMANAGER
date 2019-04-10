@@ -110,7 +110,7 @@ const installPackage = async ({
       // 3.2 Fetch manifest
       const ver = result.success[name];
       let manifest = await getManifest({ name, ver });
-      if (!manifest) throw Error("Missing manifest for " + name);
+      if (!manifest) throw Error(`Missing manifest for ${name}`);
 
       // 3.3 Verify dncore condition
       // Prevent default values. Someone can try to spoof "isCore" in the manifest
@@ -214,7 +214,7 @@ const installPackage = async ({
   eventBus.emit(eventBusTag.packageModified);
 
   return {
-    message: "Installed " + req.req,
+    message: `Installed ${req.req}`,
     logMessage: true,
     userAction: true
   };

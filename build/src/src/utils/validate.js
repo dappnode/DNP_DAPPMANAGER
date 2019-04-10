@@ -40,23 +40,23 @@ function isEthDomain(domain) {
   if (!domain) throw Error("VALIDATION ERROR: domain is undefined");
 
   if (typeof domain != "string") {
-    throw Error("VALIDATION ERROR: domain must be a string: " + domain);
+    throw Error(`VALIDATION ERROR: domain must be a string: ${domain}`);
   }
 
   if (domain.substr(domain.length - 4) != ".eth") {
     logs.error(`Error: reponame is not an .eth domain: ${domain}`);
-    throw Error("reponame is not an .eth domain: " + domain);
+    throw Error(`reponame is not an .eth domain: ${domain}`);
   }
 }
 
-function isIPFShash(HASH) {
-  if (!HASH) throw Error("VALIDATION ERROR: hash is undefined");
+function isIPFShash(hash) {
+  if (!hash) throw Error("VALIDATION ERROR: hash is undefined");
 
   return (
-    (HASH.startsWith("/ipfs/Qm") ||
-      HASH.startsWith("ipfs/Qm") ||
-      HASH.startsWith("Qm")) &&
-    !HASH.endsWith(".eth")
+    (hash.startsWith("/ipfs/Qm") ||
+      hash.startsWith("ipfs/Qm") ||
+      hash.startsWith("Qm")) &&
+    !hash.endsWith(".eth")
   );
 }
 
@@ -64,29 +64,24 @@ function web3Existance(_web3) {
   if (!_web3) throw Error("VALIDATION ERROR: web3 is not defined");
 }
 
-function path(PATH) {
-  if (!PATH) throw Error("VALIDATION ERROR: path is not defined: " + PATH);
-  if (typeof PATH != "string")
-    throw Error("VALIDATION ERROR: path must be a string " + PATH);
+function path(path) {
+  if (!path) throw Error(`VALIDATION ERROR: path is not defined: ${path}`);
+  if (typeof path != "string")
+    throw Error(`VALIDATION ERROR: path must be a string ${path}`);
 
   // shell.mkdir('-p', fullPath);
   // directory exists
-  const PARENT_PATH = PATH.replace(/\/[^/]+\/?$/, "");
-  if (!shell.test("-e", PARENT_PATH)) {
-    shell.mkdir("-p", PARENT_PATH);
+  const parentPath = path.replace(/\/[^/]+\/?$/, "");
+  if (!shell.test("-e", parentPath)) {
     logs.warn(
-      "Parent path doesn't exist, creating it." +
-        " pwd: " +
-        shell.pwd() +
-        " parent: " +
-        PARENT_PATH +
-        "\n > creating it"
+      `Parent path doesn't exist, creating it. pwd: ${shell.pwd()}, parent: ${parentPath}`
     );
+    shell.mkdir("-p", parentPath);
   }
 
   // returning so it can be used as
-  // > await fs.writeFileSync(validate.path(PATH), data)
-  return PATH;
+  // > await fs.writeFileSync(validate.path(path), data)
+  return path;
 }
 
 module.exports = {

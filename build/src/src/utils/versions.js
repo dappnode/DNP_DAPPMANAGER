@@ -35,10 +35,7 @@ function highestVersion(v1, v2) {
   // Compare semantic versions
   if (!semver.valid(v1) || !semver.valid(v2)) {
     throw new Error(
-      "Attempting to compare invalid versions, version1: " +
-        v1 +
-        " version2: " +
-        v2
+      `Attempting to compare invalid versions, version1: ${v1} version2: ${v2}`
     );
   }
   if (semver.gt(v1, v2)) {

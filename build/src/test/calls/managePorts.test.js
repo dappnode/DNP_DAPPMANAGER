@@ -6,14 +6,14 @@ chai.should();
 
 describe("Call function: managePorts", function() {
   const openedPorts = [];
-  const docker = {
-    openPort: async port => {
+  const upnpc = {
+    open: async port => {
       openedPorts.push(port);
     }
   };
 
   const managePorts = proxyquire("calls/managePorts", {
-    "modules/docker": docker
+    "modules/upnpc": upnpc
   });
 
   it("should open the requested ports", async () => {
@@ -23,7 +23,7 @@ describe("Call function: managePorts", function() {
       ports
     });
     // Check opened ports
-    expect(ports).to.deep.equal(openedPorts);
+    expect(openedPorts).to.deep.equal(ports);
     // Check response message
     expect(res).to.be.ok;
     expect(res).to.have.property("message");

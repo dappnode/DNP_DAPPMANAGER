@@ -1,5 +1,7 @@
 const logs = require("logs.js")(module);
 
+// ##### TODO Is this file still necessary?
+
 // Expects:
 // arg[0] a stdout string from a docker-compose ps
 // arg[1] a string with the packageName: i.e. otpweb.dnp.dappnode.eth
@@ -29,9 +31,7 @@ function parsePs(output) {
 
   // If the docker-compose ps format changes, this may alert it
   if (propNames.length != 4) {
-    logs.warn(
-      "docker-compose ps format may have changed, raw output:\n" + output
-    );
+    logs.warn(`docker-compose ps output must have 4 props: \n${output}`);
   } else if (
     propNames[0] != "name" ||
     propNames[1] != "command" ||
@@ -39,7 +39,7 @@ function parsePs(output) {
     propNames[3] != "ports"
   ) {
     logs.warn(
-      "docker-compose ps format may have changed, raw output:\n" + output
+      `docker-compose ps output headers must be "name, command, state, ports": \n${output}`
     );
   }
 

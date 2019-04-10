@@ -1,4 +1,4 @@
-const docker = require("modules/docker");
+const upnpc = require("modules/upnpc");
 
 /**
  * Open or closes requested ports
@@ -14,27 +14,17 @@ const docker = require("modules/docker");
  */
 const managePorts = async ({ action, ports }) => {
   if (!Array.isArray(ports)) {
-    throw Error("kwarg ports must be an array: " + JSON.stringify(ports));
+    throw Error(`kwarg ports must be an array: ${JSON.stringify(ports)}`);
   }
 
-  let msg;
   for (const port of ports) {
-    switch (action) {
-      case "open":
-        await docker.openPort(port);
-        msg = "Opened";
-        break;
-      case "close":
-        await docker.closePort(port);
-        msg = "Closed";
-        break;
-      default:
-        throw Error("Unkown manage ports action: " + action);
-    }
+    if (action === "open") upnpc.open(port);
+    else if (action === "close") upnpc.close(port);
+    else throw Error(`Unkown manage ports action: ${action}`);
   }
 
   return {
-    message: `${msg} ports ${ports
+    message: `${action === "open" ? "Opened" : "Closed"} ports ${ports
       .map(p => `${p.number} ${p.type}`)
       .join(", ")}`,
     logMessage: true,

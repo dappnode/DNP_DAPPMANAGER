@@ -40,7 +40,7 @@ async function getManifest(packageReq) {
     packageReq.hash = packageReq.name;
     fromIpfs = packageReq.name.replace("/ipfs/", "ipfs-");
   } else {
-    throw Error("Unkown package request: " + packageReq.name);
+    throw Error(`Unkown package request name: ${packageReq.name}`);
   }
 
   // cat the file and parse it

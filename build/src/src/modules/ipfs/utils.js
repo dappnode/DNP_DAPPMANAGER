@@ -6,7 +6,7 @@ const parseResHash = res => {
   if (
     !(res && res[0] && res[0].hash && typeof res[0].hash === typeof "String")
   ) {
-    throw new Error("Wrong parameters, res: " + JSON.stringify(res));
+    throw new Error(`Wrong parameters, res: ${JSON.stringify(res)}`);
   }
   return res[0].hash;
 };
@@ -19,7 +19,7 @@ const validateIpfsHash = HASH => {
   HASH.replace("/", "");
   // Make sure hash if valid
   if (!isIPFS.multihash(HASH)) {
-    throw Error("Invalid IPFS hash: " + HASH);
+    throw Error(`Invalid IPFS hash: ${HASH}`);
   }
   return HASH;
 };

@@ -29,7 +29,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error("No docker-compose found: " + dockerComposePath);
+    throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
@@ -78,14 +78,14 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
     volumes: Boolean(deleteVolumes)
   });
   // Remove DNP folder and files
-  await shell("rm -r " + packageRepoDir);
+  await shell(`rm -r ${packageRepoDir}`);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
   eventBus.emit(eventBusTag.packageModified);
 
   return {
-    message: "Removed package: " + id,
+    message: `Removed package: ${id}`,
     logMessage: true,
     userAction: true
   };

@@ -19,7 +19,7 @@ const restartPackage = async ({ id }) => {
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
   if (!fs.existsSync(dockerComposePath)) {
-    throw Error("No docker-compose found: " + dockerComposePath);
+    throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
@@ -34,7 +34,7 @@ const restartPackage = async ({ id }) => {
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: "Restarted package: " + id,
+    message: `Restarted package: ${id}`,
     logMessage: true,
     userAction: true
   };

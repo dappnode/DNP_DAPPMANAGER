@@ -32,14 +32,14 @@ const togglePackage = async ({ id, timeout = 10 }) => {
       await docker.compose.start(dockerComposePath);
       break;
     default:
-      throw Error("Unkown state: " + packageState + ", for package: " + id);
+      throw Error(`Unkown state: ${packageState} for package ${id}`);
   }
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);
 
   return {
-    message: "successfully toggled package: " + id,
+    message: `Successfully toggled package: ${id}`,
     logMessage: true,
     userAction: true
   };

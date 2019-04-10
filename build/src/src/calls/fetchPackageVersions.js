@@ -39,7 +39,7 @@ const fetchPackageVersions = async ({ id }) => {
     await getManifestOfVersions(packageReq, packageVersions);
 
     return {
-      message: "Fetched versions of: " + packageReq.name,
+      message: `Fetched versions of: ${packageReq.name}`,
       result: packageVersions
     };
 
@@ -47,7 +47,7 @@ const fetchPackageVersions = async ({ id }) => {
   } else if (packageReq.name.startsWith("/ipfs/Qm")) {
     const manifest = await getManifest(packageReq);
     return {
-      message: "Fetched versions of: " + packageReq.name,
+      message: `Fetched versions of: ${packageReq.name}`,
       result: [
         {
           version: manifest.version,
@@ -56,7 +56,7 @@ const fetchPackageVersions = async ({ id }) => {
       ]
     };
   } else {
-    throw Error("Unkown package request: " + packageReq.name);
+    throw Error(`Unkown package request: ${packageReq.name}`);
   }
 };
 

@@ -92,7 +92,7 @@ const getRepoHash = async packageReq => {
 
   let repo = await getRepoContract(NAME, web3);
   if (!repo) {
-    throw Error("Resolver could not find a match for " + NAME);
+    throw Error(`Resolver could not find a match for ${NAME}`);
   }
 
   if (semver.valid(VERSION)) {
@@ -123,7 +123,7 @@ const getLatestWithVersion = async packageReq => {
 
   const repo = await getRepoContract(name, web3);
   if (!repo) {
-    throw Error("Resolver could not find a match for " + name);
+    throw Error(`Resolver could not find a match for ${name}`);
   }
 
   const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
@@ -189,7 +189,7 @@ const getRepoVersions = async (packageReq, verReq) => {
 
   const repo = await getRepoContract(name, web3);
   if (!repo) {
-    throw Error("Resolver could not find a match for " + name);
+    throw Error(`Resolver could not find a match for ${name}`);
   }
 
   const versionCount = parseFloat(await repo.methods.getVersionsCount().call());

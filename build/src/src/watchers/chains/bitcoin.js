@@ -66,7 +66,7 @@ async function bitcoin({ name, api }) {
       res.progress = blockIndex / (blockDiffAprox + blockIndex);
     } else {
       res.syncing = false;
-      res.message = "Synced #" + blockIndex;
+      res.message = `Synced #${blockIndex}`;
     }
   } catch (e) {
     res.message = e.message;
