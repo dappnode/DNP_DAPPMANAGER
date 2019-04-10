@@ -1,3 +1,5 @@
+const { stringIncludes } = require("utils/strings");
+
 // WARNING: manifest's dependencies is an external uncontrolled input, verify
 
 function sanitizeDependencies(dependencies) {
@@ -12,10 +14,7 @@ function sanitizeDependencies(dependencies) {
     );
   }
   Object.keys(dependencies).forEach(name => {
-    if (
-      !dependencies[name] ||
-      dependencies[name].toLowerCase().includes("latest")
-    ) {
+    if (stringIncludes(dependencies[name], "latest")) {
       dependencies[name] = "*";
     }
   });

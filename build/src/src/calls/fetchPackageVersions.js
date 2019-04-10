@@ -33,7 +33,7 @@ const fetchPackageVersions = async ({ id }) => {
     };
   }
 
-  if (packageReq.name.endsWith(".eth")) {
+  if ((packageReq.name || "").endsWith(".eth")) {
     let packageVersions = await getPackageVersions(packageReq);
 
     await getManifestOfVersions(packageReq, packageVersions);
@@ -44,7 +44,7 @@ const fetchPackageVersions = async ({ id }) => {
     };
 
     // if the name of the package is already an IFPS hash, skip:
-  } else if (packageReq.name.startsWith("/ipfs/Qm")) {
+  } else if ((packageReq.name || "").startsWith("/ipfs/Qm")) {
     const manifest = await getManifest(packageReq);
     return {
       message: `Fetched versions of: ${packageReq.name}`,

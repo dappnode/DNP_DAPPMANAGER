@@ -17,11 +17,11 @@ function containerStateFromPs(dockerPsOutput, containerName) {
   }
 }
 
-function parsePs(output) {
+function parsePs(output = "") {
   let rows = output.split("\n").filter(row => row.replace(/\s/g, "").length);
   // remove row only contained whitespace (ie. spaces, tabs or line breaks)
 
-  const namesRow = rows[0];
+  const namesRow = rows[0] || "";
   const containerRows = rows.slice(2);
 
   let propNames = namesRow

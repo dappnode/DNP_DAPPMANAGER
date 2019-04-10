@@ -25,7 +25,7 @@ async function getManifest(packageReq) {
 
   let fromIpfs;
 
-  if (packageReq.hash && packageReq.hash.startsWith("/ipfs/")) {
+  if ((packageReq.hash || "").startsWith("/ipfs/")) {
     fromIpfs = packageReq.hash.replace("/ipfs/", "ipfs-");
   } else if (packageReq.name.endsWith(".eth")) {
     if (packageReq.ver.startsWith("/ipfs/")) {

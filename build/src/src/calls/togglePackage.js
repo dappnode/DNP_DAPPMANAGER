@@ -24,7 +24,7 @@ const togglePackage = async ({ id, timeout = 10 }) => {
   let packageState = await docker.status(containerName);
 
   // docker-compose states my contain extra info, i.e. Exit (137), Up (healthy)
-  switch (packageState.split(" ")[0].trim()) {
+  switch ((packageState || "").split(" ")[0].trim()) {
     case "running":
       await docker.compose.stop(dockerComposePath, { timeout });
       break;

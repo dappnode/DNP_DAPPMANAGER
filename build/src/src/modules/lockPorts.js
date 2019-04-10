@@ -78,7 +78,7 @@ async function lockPorts({ pkg, dockerComposePath }) {
   if (pkg) {
     // First, check if the package has ephemeral ports (to skip quicly if necessary)
     const manifestPorts = ((pkg.manifest || {}).image || {}).ports || [];
-    if (!manifestPorts.filter(port => !port.includes(":")).length) {
+    if (!manifestPorts.filter(port => !(port || "").includes(":")).length) {
       // No ephemeral ports on this package, returns no portsToOpen
       return [];
     }
@@ -103,7 +103,7 @@ async function lockPorts({ pkg, dockerComposePath }) {
       `${name}'s docker-compose's image ports is not an array: ${dcPorts}`
     );
   }
-  if (!dcPorts.filter(port => !port.includes(":")).length) {
+  if (!dcPorts.filter(port => !(port || "").includes(":")).length) {
     throw Error(
       `${name}'s docker-compose's image ports has no expected ephemeral ports`
     );

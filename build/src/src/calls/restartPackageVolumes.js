@@ -4,6 +4,7 @@ const params = require("params");
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
 const { eventBus, eventBusTag } = require("eventBus");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -18,7 +19,7 @@ async function restartPackageVolumes({ id }) {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name && _dnp.name.includes(id));
+  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
   if (!dnp) {
     throw Error(`Could not find an container with the name: ${id}`);
   }

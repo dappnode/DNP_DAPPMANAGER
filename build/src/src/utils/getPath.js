@@ -98,7 +98,7 @@ function getRepoDirPath(dnpName, params, isCore) {
 
 function getDockerComposeName(dnpName, isCore) {
   if (isCore) {
-    const dnpShortName = dnpName.split(".")[0];
+    const dnpShortName = (dnpName || "").split(".")[0];
     return `docker-compose-${dnpShortName}.yml`;
   } else {
     return "docker-compose.yml";
@@ -107,7 +107,7 @@ function getDockerComposeName(dnpName, isCore) {
 
 function getManifestName(dnpName, isCore) {
   if (isCore) {
-    const dnpShortName = dnpName.split(".")[0];
+    const dnpShortName = (dnpName || "").split(".")[0];
     return `dappnode_package-${dnpShortName}.json`;
   } else {
     return "dappnode_package.json";

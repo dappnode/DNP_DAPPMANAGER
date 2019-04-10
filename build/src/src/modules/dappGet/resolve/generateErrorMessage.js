@@ -15,8 +15,8 @@ function generateErrorMessage({
     const blameDepReq = {};
     for (const key of Object.keys(errors)) {
       const [_req, _dep] = key.split("#");
-      const req = _req.split("@")[0];
-      const dep = _dep.split("@")[0];
+      const req = stripVersion(_req);
+      const dep = stripVersion(_dep);
       blameDep[dep] = (blameDep[dep] || 0) + errors[key];
       if (!blameDepReq[dep]) blameDepReq[dep] = {};
       blameDepReq[dep][req] = true;
@@ -35,6 +35,11 @@ function generateErrorMessage({
   errorMsgs.push(`Checked ${caseId}/${totalCases} possible states.`);
   // Construct the message
   return errorMsgs.join(" ");
+}
+
+function stripVersion(s) {
+  if (!s || typeof s !== "string") return s;
+  return s.split("@")[0];
 }
 
 module.exports = generateErrorMessage;

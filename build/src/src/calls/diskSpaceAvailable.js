@@ -27,7 +27,7 @@ const diskSpaceAvailable = async ({ path }) => {
     `df -h ${path} | awk 'NR>1 { print $2,$4}'`,
     true
   );
-  const [totalSize, availableSize] = res.split(/\s+/);
+  const [totalSize, availableSize] = (res || "").split(/\s+/);
   //  df . -h --output='avail'
   //  Used Avail
   //  192G  9.9G

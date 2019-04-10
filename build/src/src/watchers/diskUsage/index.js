@@ -35,7 +35,13 @@ async function monitorDiskUsage() {
       `df -k / | awk 'NR>1 { print $4}'`,
       true
     );
+    if (!diskAvailable || typeof diskAvailable !== "string")
+      throw Error("diskAvailable return must be a string");
+
     const diskAvailableBytes = parseInt(diskAvailable.trim());
+    if (isNaN(diskAvailable))
+      throw Error("diskAvailableBytes must be a number");
+
     for (const threshold of thresholds) {
       if (diskAvailableBytes < threshold.kb) {
         // If packages have already been stopped, skip

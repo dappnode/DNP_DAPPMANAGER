@@ -31,7 +31,7 @@ const isfileHashValid = async (providedHash, PATH) => {
   }
 
   // If the file is a .xz, verify it. If the test succeeds, continue execution
-  if (PATH && PATH.endsWith(".xz")) {
+  if ((PATH || "").endsWith(".xz")) {
     const result = await verifyXz(PATH);
     if (result.success) {
       // Successful .xz verification

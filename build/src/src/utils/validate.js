@@ -50,7 +50,8 @@ function isEthDomain(domain) {
 }
 
 function isIPFShash(hash) {
-  if (!hash) throw Error("VALIDATION ERROR: hash is undefined");
+  if (!hash || typeof hash !== "string")
+    throw Error("VALIDATION ERROR: hash is undefined");
 
   return (
     (hash.startsWith("/ipfs/Qm") ||

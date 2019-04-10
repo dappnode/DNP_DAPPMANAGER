@@ -3,7 +3,7 @@ let Parser = require("table-parser");
 function parseDockerSystemDf({ data, dnpList }) {
   if (!data) throw Error("on parseDockerSystemDf, data is not defined");
 
-  const volumeData = data.split("Local Volumes space usage:")[1];
+  const volumeData = data.split("Local Volumes space usage:")[1] || "";
   // return output;
   let parsedData = Parser.parse(volumeData.trim());
   // Correct output, turn arrays into strings

@@ -9,6 +9,7 @@ const { registerHandler } = require("./utils/registerHandler");
 const params = require("./params");
 const db = require("./db");
 const upnpc = require("./modules/upnpc");
+const { stringIncludes } = require("utils/strings");
 
 // import calls
 const calls = require("./calls");
@@ -149,7 +150,7 @@ connection.onopen = (session, details) => {
   eventBus.onSafe(eventBusTag.logUi, logData => {
     publish("log.dappmanager.dnp.dappnode.eth", logData);
     // Also, log them internally. But skip download progress logs, too spam-y
-    if (!((logData || {}).message || "").includes("%")) {
+    if (!stringIncludes((logData || {}).message, "%")) {
       logs.info(JSON.stringify(logData));
     }
   });
@@ -224,7 +225,7 @@ async function checkIfUpnpIsAvailable() {
     );
     await db.set("upnpAvailable", true);
   } catch (e) {
-    if (e.message.includes("NOUPNP")) {
+    if (stringIncludes((e || {}).message, "NOUPNP")) {
       logs.info("UPnP device NOT available");
     } else {
       logs.error(`Error checking if UPnP device is available: ${e.stack}`);

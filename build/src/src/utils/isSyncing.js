@@ -3,6 +3,7 @@ const { promisify } = require("util");
 const HttpProvider = require("ethjs-provider-http");
 const EthRPC = require("ethjs-rpc");
 const params = require("../params");
+const { stringIncludes } = require("utils/strings");
 
 const blockDiff = 50;
 const cacheTime = 30 * 1000; // ms
@@ -29,8 +30,10 @@ const isSyncingRpcCall = () =>
     eth.sendAsync({ method: "eth_syncing" }, (err, res) => {
       if (err) {
         if (
-          err.message &&
-          err.message.includes("Invalid JSON RPC response from provider")
+          stringIncludes(
+            (err || {}).message,
+            "Invalid JSON RPC response from provider"
+          )
         ) {
           return reject(Error(`Can't connect to ${WEB3HOSTHTTP}`));
         } else {

@@ -9,6 +9,7 @@ const web3 = require("./web3Setup");
 const ensContract = require("contracts/ens.json");
 const publicResolverContract = require("contracts/publicResolver.json");
 const repoContract = require("contracts/repository.json");
+const stringIncludes = require("utils/strings");
 
 function namehash(name, web3) {
   let node =
@@ -156,7 +157,7 @@ const getLatestWithVersion = async packageReq => {
     // If you request an inexistent ID to the contract, web3 will throw
     // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
     // and log other errors
-    if (String(e).includes("decode uint16 from ABI")) {
+    if (stringIncludes((e || {}).message, "decode uint16 from ABI")) {
       logs.error("Attempting to fetch an inexistent version");
     } else {
       logs.error(`Error getting latest version of ${name}: ${e.stack}`);
@@ -223,7 +224,7 @@ const getRepoVersions = async (packageReq, verReq) => {
         // If you request an inexistent ID to the contract, web3 will throw
         // Error: couldn't decode uint16 from ABI. The try, catch block will catch that
         // and log other errors
-        if (String(e).includes("decode uint16 from ABI")) {
+        if (stringIncludes((e || {}).message, "decode uint16 from ABI")) {
           logs.error("Attempting to fetch an inexistent version");
         } else {
           logs.error(`Error getting versions of ${name}: ${e.stack}`);

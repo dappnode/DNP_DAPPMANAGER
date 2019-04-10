@@ -110,7 +110,7 @@ async function run({ pkg, id }) {
   const currentImgs = await docker.images().catch(() => "");
   await docker
     .rmi(
-      currentImgs.split(/\r|\n/).filter(p => {
+      (currentImgs || "").split(/\r|\n/).filter(p => {
         const [pName, pVer] = p.split(":");
         return pName === name && semver.valid(pVer) && pVer !== version;
       })

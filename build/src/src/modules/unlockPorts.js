@@ -1,4 +1,5 @@
 const parse = require("utils/parse");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Unlocks locked ephemeral ports of stopped container
@@ -48,7 +49,7 @@ async function unlockPorts(dockerComposePath) {
     const isPortLocked = portsToClose.find(
       p =>
         String(p.number) === String(portHost) &&
-        p.type.toLowerCase() === portType.toLowerCase()
+        stringIncludes((p || {}).type, portType)
     );
     return isPortLocked ? portString.split(":")[1] : portString;
   });

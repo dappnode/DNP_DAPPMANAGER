@@ -26,7 +26,7 @@ const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
   if (!envs) throw Error("kwarg envs must be defined");
 
   id = parse.packageReq(id).name; // parsing anyway for safety
-  if (id.startsWith("/ipfs/")) {
+  if ((id || "").startsWith("/ipfs/")) {
     try {
       const manifest = JSON.parse(await ipfs.cat(id));
       id = manifest.name;

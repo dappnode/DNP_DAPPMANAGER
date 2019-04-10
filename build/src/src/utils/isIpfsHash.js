@@ -1,7 +1,7 @@
 const isIPFS = require("is-ipfs");
 
 const isIpfsHash = HASH => {
-  if (!HASH) return false;
+  if (!HASH || typeof HASH !== "string") return false;
   // Correct hash prefix
   if (HASH.includes("ipfs/")) {
     HASH = HASH.split("ipfs/")[1];

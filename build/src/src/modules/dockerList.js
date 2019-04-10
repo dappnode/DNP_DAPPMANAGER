@@ -3,6 +3,7 @@ const logs = require("logs.js")(module);
 const { promisify } = require("util");
 const docker = require("docker-remote-api");
 const request = docker();
+const { shortName } = require("utils/strings");
 
 // dedicated modules
 const params = require("../params");
@@ -44,20 +45,19 @@ function dockerRequest(method, url) {
 // utils
 
 function format(c) {
-  const packageName = c.Names[0].replace("/", "");
+  const packageName = (c.Names[0] || "").replace("/", "");
   const isDNP = packageName.includes(CONTAINER_NAME_PREFIX);
   const isCORE = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   let name;
-  if (isDNP) name = packageName.split(CONTAINER_NAME_PREFIX)[1];
-  else if (isCORE) name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1];
+  if (isDNP) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
+  else if (isCORE)
+    name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
   else name = packageName;
 
-  const shortName = name && name.includes(".") ? name.split(".")[0] : name;
-
-  let version = c.Image.split(":")[1] || "0.0.0";
+  let version = (c.Image || "").split(":")[1] || "0.0.0";
   // IPFS path
-  if (version && version.startsWith("ipfs-")) {
+  if ((version || "").startsWith("ipfs-")) {
     version = version.replace("ipfs-", "/ipfs/");
   }
 
@@ -70,9 +70,11 @@ function format(c) {
     if (c.Labels["dappnode.dnp.origin"]) {
       fromLabels.origin = c.Labels["dappnode.dnp.origin"];
     }
+
     if (c.Labels["dappnode.dnp.chain"]) {
       fromLabels.chain = c.Labels["dappnode.dnp.chain"];
     }
+
     if (c.Labels["dappnode.dnp.dependencies"]) {
       try {
         fromLabels.dependencies = JSON.parse(
@@ -86,24 +88,30 @@ function format(c) {
         );
       }
     }
-  }
 
-  const portsToClose = c.Labels.portsToClose
-    ? JSON.parse(c.Labels.portsToClose)
-    : [];
+    if (c.Labels["portsToClose"]) {
+      try {
+        fromLabels.portsToClose = JSON.parse(c.Labels.portsToClose);
+      } catch (e) {
+        logs.warn(`Error parsing ${name} container portsToClose: ${e.stack}`);
+        fromLabels.portsToClose = [];
+      }
+    } else {
+      fromLabels.portsToClose = [];
+    }
+  }
 
   return {
     id: c.Id,
     packageName,
     version,
     ...fromLabels,
-    portsToClose,
     isDNP,
     isCORE,
     created: new Date(1000 * c.Created),
     image: c.Image,
     name: name,
-    shortName: shortName,
+    shortName: shortName(name),
     ports: c.Ports,
     volumes: c.Mounts.map(({ Type, Name, Source }) => ({
       type: Type,

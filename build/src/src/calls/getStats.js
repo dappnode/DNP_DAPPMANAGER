@@ -43,7 +43,7 @@ const getStats = async () => {
   let diskUsedPercent;
   try {
     const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`, true);
-    diskUsedPercent = disk.trim();
+    diskUsedPercent = (disk || "").trim();
   } catch (e) {
     logs.warn(`Error fetching diskUsedPercent: ${e.stack}`);
   }

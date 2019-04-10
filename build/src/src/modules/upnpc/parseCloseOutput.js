@@ -51,7 +51,7 @@ function parseCloseOutput(terminalOutput) {
 
   // Get the last line of the output
   const lines = terminalOutput.trim().split(/\r?\n/);
-  const lastLine = lines[lines.length - 1];
+  const lastLine = lines[lines.length - 1] || "";
 
   // Check if it contains "failed"
   if (lastLine.includes("failed")) {

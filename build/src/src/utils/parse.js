@@ -72,7 +72,7 @@ function dockerComposePorts(dockerComposePath) {
   return ports.map(p => p.split(":")[0]);
 }
 
-function envFile(envFileData) {
+function envFile(envFileData = "") {
   // Parses key1=value1 files, splited by new line
   //        key2=value2
   return envFileData

@@ -31,6 +31,7 @@ async function bitcoin({ name, api }) {
     // They are stored in the package envs
     const cmd = `docker inspect --format='{{.Config.Env}}' DAppNodePackage-bitcoin.dnp.dappnode.eth`;
     let envsString = await shell(cmd);
+    if (typeof envsString !== "string") throw Error("Can't read bitcoin ENVs");
     // envsString = '[BTC_RPCUSER=dappnode BTC_RPCPASSWORD=dappnode BTC_TXINDEX=1 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]';
     if (envsString.startsWith("[")) envsString = envsString.substring(1);
     if (envsString.endsWith("]"))
@@ -42,6 +43,9 @@ async function bitcoin({ name, api }) {
       if (envPair.startsWith("BTC_RPCPASSWORD"))
         rpcPassword = envPair.split("=")[1];
     });
+    if (typeof rpcUser !== "string") throw Error("Couldn't get rpcUser");
+    if (typeof rpcPassword !== "string")
+      throw Error("Couldn't get rpcPassword");
 
     const client = new Client({
       host: api,

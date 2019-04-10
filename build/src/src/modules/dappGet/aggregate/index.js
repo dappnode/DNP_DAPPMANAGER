@@ -5,6 +5,7 @@ const safeSemver = require("../utils/safeSemver");
 const logs = require("logs.js")(module);
 const _aggregateDependencies = require("./aggregateDependencies");
 const getRelevantInstalledDnps = require("./getRelevantInstalledDnps");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -58,7 +59,7 @@ async function aggregate({ req, dnpList, fetch }) {
 
   // WARNING: req is a user external input, must verify
   validate.packageReq(req);
-  if (!req.ver || req.ver.toLowerCase().includes("latest")) req.ver = "*";
+  if (stringIncludes(req.ver, "latest")) req.ver = "*";
 
   await aggregateDependencies({ name: req.name, versionRange: req.ver, dnps });
 

@@ -3,6 +3,7 @@ const db = require("db");
 const lockPorts = require("modules/lockPorts");
 const unlockPorts = require("modules/unlockPorts");
 const { eventBus, eventBusTag } = require("eventBus");
+const { stringIncludes } = require("utils/strings");
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -18,7 +19,7 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
   try {
     return await docker.compose.up(dockerComposePath, options);
   } catch (e) {
-    if (e.message.includes("port is already allocated")) {
+    if (stringIncludes((e || {}).message, "port is already allocated")) {
       const upnpAvailable = await db.get("upnpAvailable");
       if (upnpAvailable) {
         // Don't try to find which port caused the error.

@@ -15,6 +15,7 @@ const isIpfsRequest = require("utils/isIpfsRequest");
 const isSyncing = require("utils/isSyncing");
 const envsHelper = require("utils/envsHelper");
 const parseManifestPorts = require("utils/parseManifestPorts");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -118,7 +119,8 @@ const installPackage = async ({
       if (manifest.type == "dncore") {
         if (
           !options.BYPASS_CORE_RESTRICTION &&
-          (!name.endsWith(".dnp.dappnode.eth") || ver.startsWith("/ipfs/"))
+          (!(name || "").endsWith(".dnp.dappnode.eth") ||
+            (ver || "").startsWith("/ipfs/"))
         ) {
           throw Error(
             `Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`
@@ -147,7 +149,8 @@ const installPackage = async ({
 
   // Patch, install the dappmanager the last always
   const isDappmanager = pkg =>
-    (pkg.manifest.name || "").includes("dappmanager.dnp.dappnode.eth");
+    stringIncludes((pkg.manifest || {}).name, "dappmanager.dnp.dappnode.eth");
+
   for (const pkg of pkgs.sort(pkg => (isDappmanager(pkg) ? 1 : -1))) {
     // 5. Set ENVs. Set userSetEnvs + the manifest defaults (if not previously set)
     const { name, isCore } = pkg.manifest;

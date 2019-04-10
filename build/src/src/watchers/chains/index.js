@@ -1,6 +1,7 @@
 const { eventBus, eventBusTag } = require("eventBus");
 const logs = require("logs")(module);
 const dockerList = require("modules/dockerList");
+const { shortNameCapitalized } = require("utils/strings");
 const params = require("params");
 
 const drivers = {
@@ -65,9 +66,6 @@ const supportedProviders = {
   }
 };
 
-const shortName = (ensName = "") => ensName.split(".")[0];
-const capitalize = (s = "") => s.charAt(0).toUpperCase() + s.slice(1);
-
 const getDriveApi = {
   // 'http://my.ropsten.dnp.dappnode.eth:8545'
   ethereum: dnpName => `http://my.${dnpName}:8545`,
@@ -90,7 +88,7 @@ const activeChains = {};
 async function addChain(dnpName, driverName) {
   if (driverName) {
     activeChains[dnpName] = {
-      name: capitalize(shortName(dnpName)),
+      name: shortNameCapitalized(dnpName),
       module: driverName,
       api: getDriveApi[driverName](dnpName)
     };

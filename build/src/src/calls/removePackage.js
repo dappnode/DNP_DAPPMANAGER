@@ -10,6 +10,7 @@ const dockerList = require("modules/dockerList");
 const parseManifestPorts = require("utils/parseManifestPorts");
 const getPath = require("utils/getPath");
 const shell = require("utils/shell");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Remove package data: docker down + disk files
@@ -39,7 +40,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   // CLOSE PORTS
   // portsToClose: '["32768/udp","32768/tcp"]'
   const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name && _dnp.name.includes(id));
+  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
   if (!dnp) {
     throw Error(
       `No DNP was found for name ${id}, so its ports cannot be closed`

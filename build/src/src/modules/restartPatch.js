@@ -17,10 +17,10 @@ const params = require("params");
  * shows up in the ADMIN UI's package list
  */
 
-async function restartPatch(IMAGE_NAME) {
+async function restartPatch(IMAGE_NAME = "") {
   if (!IMAGE_NAME.includes(":")) {
     let dnpList = await dockerList.listContainers();
-    let container = dnpList.find(c => c.name.includes(IMAGE_NAME));
+    let container = dnpList.find(c => (c.name || "").includes(IMAGE_NAME));
     let version = container.version;
     IMAGE_NAME += ":" + version;
   }

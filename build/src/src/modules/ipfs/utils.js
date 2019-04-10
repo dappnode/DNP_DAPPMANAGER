@@ -11,17 +11,18 @@ const parseResHash = res => {
   return res[0].hash;
 };
 
-const validateIpfsHash = HASH => {
+const validateIpfsHash = hash => {
+  if (!hash || typeof hash !== "string") throw Error("Hash must be a string");
   // Correct hash prefix
-  if (HASH.includes("ipfs/")) {
-    HASH = HASH.split("ipfs/")[1];
+  if (hash.includes("ipfs/")) {
+    hash = hash.split("ipfs/")[1];
   }
-  HASH.replace("/", "");
+  hash.replace("/", "");
   // Make sure hash if valid
-  if (!isIPFS.multihash(HASH)) {
-    throw Error(`Invalid IPFS hash: ${HASH}`);
+  if (!isIPFS.multihash(hash)) {
+    throw Error(`Invalid IPFS hash: ${hash}`);
   }
-  return HASH;
+  return hash;
 };
 
 module.exports = {
