@@ -1,50 +1,54 @@
 const shellExec = require("utils/shell");
 
 /**
- * @param {String} cmd
- * @return {Object} in case of success:
- * { result: 'Docker version 18.06.1-ce, build e68fc7a' }
- *   in case of error:
- * { error: 'sh: docker: not found' }
- */
-const shellExecFormated = cmd =>
-  shellExec(cmd)
-    .then(data => ({ result: (data || "").trim() }))
-    .catch(e => ({ error: e.message }));
-
-/**
  * Returns a list of checks done as a diagnose
  *
- * @return {Object} A formated list of messages.
- * result: diagnose =
- *   {
- *     dockerVersion: {
- *       name: 'docker version',
- *       result: 'Docker version 18.06.1-ce, build e68fc7a'
+ * @returns {object} diagnoses object, by diagnose id
+ * diagnoses = {
+ *   "dockerVersion": {
+ *     name: "docker version",
+ *     result: "Docker version 18.06.1-ce, build e68fc7a"
  *       <or>
- *       error: 'sh: docker: not found'
- *     }
+ *     error: "sh: docker: not found"
  *   }
+ * }
  */
-const getStats = async () => {
-  const diagnose = {};
-
+const diagnose = async () => {
   // Get docker version
-  diagnose.dockerVersion = {
+  const dockerVersion = {
     name: "docker version",
     ...(await shellExecFormated(`docker -v`))
   };
 
   // Get docker compose version
-  diagnose.dockerComposeVersion = {
+  const dockerComposeVersion = {
     name: "docker compose version",
     ...(await shellExecFormated(`docker-compose -v`))
   };
 
   return {
     message: `Diagnose of this DAppNode server`,
-    result: diagnose
+    result: {
+      dockerVersion,
+      dockerComposeVersion
+    }
   };
 };
 
-module.exports = getStats;
+// Utils
+
+/**
+ * @param {string} cmd
+ * @returns {object} Returns a formated object for the diagnose call
+ * - On success:
+ *   { result: 'Docker version 18.06.1-ce, build e68fc7a' }
+ * - On error:
+ *   { error: 'sh: docker: not found' }
+ */
+function shellExecFormated(cmd) {
+  return shellExec(cmd)
+    .then(data => ({ result: (data || "").trim() }))
+    .catch(e => ({ error: e.message }));
+}
+
+module.exports = diagnose;

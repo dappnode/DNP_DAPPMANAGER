@@ -76,6 +76,9 @@ async function getManifest(packageReq) {
     throw Error("Package name requested doesn't match its manifest");
   }
 
+  // Correct manifest
+  if (!manifest.type) manifest.type = "library";
+
   return {
     ...manifest,
     fromIpfs

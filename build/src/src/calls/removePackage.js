@@ -33,7 +33,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   }
 
   // CLOSE PORTS
-  // portsToClose: '["32768/udp","32768/tcp"]'
+  // portsToClose: [ {number: 30303, type: 'UDP'}, ...]
   const dnpList = await dockerList.listContainers();
   const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
   if (!dnp) {

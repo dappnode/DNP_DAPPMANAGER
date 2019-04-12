@@ -4,49 +4,30 @@ const logs = require("logs.js")(module);
 /**
  * Returns the current disk space available of a requested path
  *
- * @return {Object} A formated success message.
- * result: status =
- *   {
- *     cpu, <String>
- *     memory, <String>
- *     disk, <String>
- *   }
+ * @returns {object} status = {
+ *   cpu: "35%", {string}
+ *   memory: "46%", {string}
+ *   disk: "57%", {string}
+ * }
  */
 const getStats = async () => {
-  let cpuUsedPercent;
-  try {
+  const cpuUsedPercent = await wrapErrors(async () => {
     const cpuRatioRaw = await shellExec(
       `grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'`
     );
-    cpuUsedPercent = isNaN(cpuRatioRaw) ? null : `${parseInt(cpuRatioRaw)}%`;
-  } catch (e) {
-    logs.warn(`Error fetching memUsedRatio: ${e.stack}`);
-  }
+    return isNaN(cpuRatioRaw) ? null : `${parseInt(cpuRatioRaw)}%`;
+  }, "cpuUsedPercent");
 
-  let memUsedPercent;
-  try {
-    const memTotal = await shellExec(
-      `free / | awk 'NR==2 { print $2}'`,
-      true
-    ).catch(() => null);
-    const memUsed = await shellExec(
-      `free / | awk 'NR==3 { print $3}'`,
-      true
-    ).catch(() => null);
-    memUsedPercent = `${Math.floor(
-      (100 * parseInt(memUsed)) / parseInt(memTotal)
-    )}%`;
-  } catch (e) {
-    logs.warn(`Error fetching memUsedRatio: ${e.stack}`);
-  }
+  const memUsedPercent = await wrapErrors(async () => {
+    const memTotal = await shellExec(`free / | awk 'NR==2 { print $2}'`, true);
+    const memUsed = await shellExec(`free / | awk 'NR==3 { print $3}'`, true);
+    return Math.floor((100 * parseInt(memUsed)) / parseInt(memTotal)) + "%";
+  }, "memUsedPercent");
 
-  let diskUsedPercent;
-  try {
+  const diskUsedPercent = await wrapErrors(async () => {
     const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`, true);
-    diskUsedPercent = (disk || "").trim();
-  } catch (e) {
-    logs.warn(`Error fetching diskUsedPercent: ${e.stack}`);
-  }
+    return (disk || "").trim();
+  }, "diskUsedPercent");
 
   return {
     message: `Checked stats of this DAppNode server`,
@@ -57,5 +38,20 @@ const getStats = async () => {
     }
   };
 };
+
+// Utils
+
+/**
+ * Wraps the shell calls to return null in case of error
+ * @param {function} fn async getter
+ * @param {string} name for the message
+ */
+async function wrapErrors(fn, name) {
+  try {
+    return await fn();
+  } catch (e) {
+    logs.warn(`Error fetching ${name}: ${e.stack}`);
+  }
+}
 
 module.exports = getStats;

@@ -1,5 +1,5 @@
-const logUserAction = require("../logUserAction");
-const logs = require("../logs")(module);
+const logUserAction = require("./logUserAction");
+const logs = require("./logs")(module);
 
 /*
  * RPC register wrapper
@@ -89,7 +89,7 @@ const registerHandler = (session, event, handler) => {
 };
 
 function error2obj(e) {
-  return { name: e.name, message: e.message, stack: e.stack, userAction: true };
+  return { message: e.message, stack: e.stack, userAction: true };
 }
 
 module.exports = {

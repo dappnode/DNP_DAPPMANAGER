@@ -3,14 +3,9 @@ const upnpc = require("modules/upnpc");
 /**
  * Open or closes requested ports
  *
- * @param {Object} kwargs: {
- *   action: 'open' or 'close' (string)
- *   ports: array of port objects = [
- *      { number: 30303, type: TCP },
- *      ... ]
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} action: "open" or "close" (string)
+ * @param {array} ports: array of port objects
+ * ports = [ { number: 30303, type: TCP }, ... ]
  */
 const managePorts = async ({ action, ports }) => {
   if (!Array.isArray(ports)) {
@@ -23,10 +18,11 @@ const managePorts = async ({ action, ports }) => {
     else throw Error(`Unkown manage ports action: ${action}`);
   }
 
+  // portsString = "30303 TCP, 30303 UDP"
+  const portsString = ports.map(p => `${p.number} ${p.type}`).join(", ");
+
   return {
-    message: `${action === "open" ? "Opened" : "Closed"} ports ${ports
-      .map(p => `${p.number} ${p.type}`)
-      .join(", ")}`,
+    message: `${action === "open" ? "Opened" : "Closed"} ports ${portsString}`,
     logMessage: true,
     userAction: true
   };

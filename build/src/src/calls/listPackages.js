@@ -25,13 +25,12 @@ async function dockerSystemDf() {
 /**
  * Returns the list of current containers associated to packages
  *
- * @param {object} kwargs: {}
  * @returns {array} dnpInstalled = [{
  *   id: "923852...", {string}
  *   packageName: "DAppNodePackage-admin...", {string}
  *   version: "0.1.8", {string}
- *   isDnp: true, {bool}
- *   isCore: false, {bool}
+ *   isDNP: true, {bool}
+ *   isCORE: false, {bool}
  *   created: <data string>, {string}
  *   image: "admin.dnp.dappnode.eth-0.1.8", {string}
  *   name: "admin.dnp.dappnode.eth", {string}

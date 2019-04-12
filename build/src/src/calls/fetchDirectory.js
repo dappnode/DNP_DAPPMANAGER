@@ -5,6 +5,7 @@ const getManifest = require("modules/getManifest");
 const getAvatar = require("modules/getAvatar");
 const parse = require("utils/parse");
 const isSyncing = require("utils/isSyncing");
+const isIpfsHash = require("utils/isIpfsHash");
 
 let packagesCache;
 let avatarCache = {};
@@ -16,29 +17,17 @@ function emitPkg(pkg) {
   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
 }
 
-// function emitPkgs(pkgs) {
-//   const pkgsObj = {};
-//   for (const pkg of pkgs) {
-//     pkgsObj[pkg.name] = pkg;
-//   }
-//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-// }
-
 /**
  * Fetches all package names in the custom dappnode directory.
- * This feature helps the ADMIN UI load the directory data faster.
+ * This feature helps the UI to load the directory data faster.
  *
- * @param {Object} kwargs: {}
- * @return {Object} A formated success message.
- * result: packages =
- *   [
- *     {
- *       name: packageName, (string)
- *       status: 'Preparing', (string)
- *       currentVersion: '0.1.2' or null, (String)
- *     },
- *     ...
- *   ]
+ * @returns {array} A formated success message.
+ * result: packages = [{
+ *   name: "bitcoin.dnp.dappnode.eth", {string}
+ *   status: "preparing", {string}
+ *   manifest: <manifest object>, {object}
+ *   avatar: <base64 image>, {string}
+ * }, ... ]
  */
 const fetchDirectory = async () => {
   if (await isSyncing()) {
@@ -55,34 +44,27 @@ const fetchDirectory = async () => {
     packagesCache.forEach(emitPkg);
   }
 
-  // List of available packages in the directory
-  // Return an array of objects:
-  //   [
-  //     {
-  //       name: packageName,  (string)
-  //       status: 'Preparing' (string)
-  //     },
-  //     ...
-  //   ]
-  const packages = await getDirectory();
+  /**
+   * List of available packages in the directory
+   * @param {array} dnpsFromDirectory = [{
+   *   name: "bitcoin.dnp.dappnode.eth", {string}
+   *   status: "preparing", {string}
+   * }, ... ]
+   */
+  const dnpsFromDirectory = await getDirectory();
 
   // Extend package object contents
   packagesCache = await Promise.all(
-    packages.map(async pkg => {
-      const { name } = pkg;
-      emitPkg(pkg);
-
+    dnpsFromDirectory.map(async ({ name, status }) => {
       // Now resolve the last version of the package
       const manifest = await getManifest(parse.packageReq(name));
-      // Correct manifest
-      if (!manifest.type) manifest.type = "library";
-      emitPkg({ name, manifest });
+      emitPkg({ name, status, manifest });
 
       // Fetch the package image
       const avatarHash = manifest.avatar;
 
       let avatar;
-      if (avatarHash) {
+      if (isIpfsHash(avatarHash)) {
         try {
           // Retrieve cached avatar or fetch it
           if (avatarCache[avatarHash]) {
@@ -102,7 +84,8 @@ const fetchDirectory = async () => {
 
       // Merge results and return
       return {
-        ...pkg,
+        name,
+        status,
         manifest,
         avatar
       };
@@ -113,9 +96,9 @@ const fetchDirectory = async () => {
     Buffer.byteLength(JSON.stringify(packagesCache), "utf8") / 1000
   );
   return {
-    message: `Listed directory with ${
+    message: `Listed directory: ${
       packagesCache.length
-    } packages (${payloadSize} KB)`,
+    } DNPs, ${payloadSize} KB`,
     result: packagesCache,
     logMessage: true
   };
