@@ -43,7 +43,7 @@ describe("Call function: restartPackageVolumes", function() {
     listContainers: async () => [
       {
         name: CORE_PACKAGE_NAME,
-        isCORE: true,
+        isCore: true,
         volumes: [{ name: "vol1" }, { name: "vol2" }]
       },
       {

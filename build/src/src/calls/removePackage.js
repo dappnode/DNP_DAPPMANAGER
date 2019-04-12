@@ -44,7 +44,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   // Get manifest
   let mappedPortsToClose = [];
   try {
-    const manifestPath = getPath.manifest(id, params, dnp.isCORE || dnp.isCore);
+    const manifestPath = getPath.manifest(id, params, dnp.isCore);
     const manifestFileData = fs.readFileSync(manifestPath, "utf8");
     const manifest = JSON.parse(manifestFileData);
     mappedPortsToClose = parseManifestPorts(manifest);

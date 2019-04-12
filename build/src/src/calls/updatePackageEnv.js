@@ -4,10 +4,12 @@ const params = require("params");
 // Modules
 const ipfs = require("modules/ipfs");
 const docker = require("modules/docker");
+const dockerList = require("modules/dockerList");
 // Utils
 const parse = require("utils/parse");
 const getPath = require("utils/getPath");
 const envsHelper = require("utils/envsHelper");
+const { stringIncludes } = require("utils/strings");
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -19,7 +21,7 @@ const envsHelper = require("utils/envsHelper");
  * }
  * @param {bool} restart flag to restart the DNP
  */
-const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
+const updatePackageEnv = async ({ id, envs, restart }) => {
   if (!id) throw Error("kwarg id must be defined");
   if (!envs) throw Error("kwarg envs must be defined");
 
@@ -36,12 +38,15 @@ const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
     }
   }
 
-  // Support both notations
-  isCore = isCore || isCORE;
+  const dnpList = await dockerList.listContainers();
+  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
+  if (!dnp) {
+    throw Error(`No DNP was found for name ${id}`);
+  }
 
   // Write envs
-  const previousEnvs = envsHelper.load(id, isCore);
-  envsHelper.write(id, isCore, { ...previousEnvs, ...envs });
+  const previousEnvs = envsHelper.load(id, dnp.isCore);
+  envsHelper.write(id, dnp.isCore, { ...previousEnvs, ...envs });
 
   if (restart) {
     const dockerComposePath = getPath.dockerComposeSmart(id, params);

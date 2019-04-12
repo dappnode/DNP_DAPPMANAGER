@@ -27,18 +27,37 @@ async function dockerSystemDf() {
  *
  * @param {object} kwargs: {}
  * @returns {array} dnpInstalled = [{
- *   id: '9238523572017423619487623894', (string)
- *   isDNP: true, (boolean)
- *   created: <Date string>,
- *   image: <Image Name>, (string)
- *   name: otpweb.dnp.dappnode.eth, (string)
- *   shortName: otpweb, (string)
- *   version: '0.0.4', (string)
- *   ports: <list of ports>, (string)
- *   state: 'exited', (string)
- *   running: true, (boolean)
- *   ...
- *   envs: <Env variables> (object)
+ *   id: "923852...", {string}
+ *   packageName: "DAppNodePackage-admin...", {string}
+ *   version: "0.1.8", {string}
+ *   isDnp: true, {bool}
+ *   isCore: false, {bool}
+ *   created: <data string>, {string}
+ *   image: "admin.dnp.dappnode.eth-0.1.8", {string}
+ *   name: "admin.dnp.dappnode.eth", {string}
+ *   shortName: "admin", {string}
+ *   ports: [{
+ *     PrivatePort: 2222, {number}
+ *     PublicPort: 3333, {number}
+ *     Type: "tcp" {string}
+ *   }, ... ], {array}
+ *   volumes: [{
+ *     type: "bind", {string}
+ *     name: "admin_data", {string}
+ *     path: "source path" {string}
+ *   }, ... ] {array}
+ *   state: "running", {string}
+ *   running: true, {bool}
+ *
+ *   // From labels
+ *   origin: "/ipfs/Qmabcd...", {string}
+ *   chain: "ethereum", {string}
+ *   dependencies: { dependency.dnp.dappnode.eth: "0.1.8" }, {object}
+ *   portsToClose: [ {number: 30303, type: 'UDP'}, ...], {array}
+ *
+ *   // Appended here
+ *   envs: { ENV_NAME: "ENV_VALUE" }, {object}
+ *   manifest: <manifest object> {object}
  * }, ... ]
  */
 const listPackages = async () => {
@@ -58,7 +77,7 @@ const listPackages = async () => {
   dnpList.map(dnp => {
     // Add env info, only if there are ENVs
     try {
-      const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
+      const envs = envsHelper.load(dnp.name, dnp.isCore);
       if (Object.keys(envs).length) dnp.envs = envs;
     } catch (e) {
       logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
@@ -66,11 +85,7 @@ const listPackages = async () => {
 
     // Add manifest
     try {
-      const manifestPath = getPath.manifest(
-        dnp.name,
-        params,
-        dnp.isCORE || dnp.isCore
-      );
+      const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
       if (fs.existsSync(manifestPath)) {
         const manifestFileData = fs.readFileSync(manifestPath, "utf8");
         dnp.manifest = JSON.parse(manifestFileData);

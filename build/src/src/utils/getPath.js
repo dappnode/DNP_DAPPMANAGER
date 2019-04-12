@@ -57,10 +57,10 @@ module.exports = {
     return getEnvFilePath(dnpName, params, isCore);
   },
 
-  envFileSmart: (dnpName, params, isCORE) => {
+  envFileSmart: (dnpName, params, isCore) => {
     if (!dnpName) throw Error("dnpName must be defined");
     if (!params) throw Error("params must be defined");
-    if (isCORE) return getEnvFilePath(dnpName, params, true);
+    if (isCore) return getEnvFilePath(dnpName, params, true);
     // First check for core docker-compose
     let ENV_FILE_PATH = getEnvFilePath(dnpName, params, true);
     if (fs.existsSync(ENV_FILE_PATH)) return ENV_FILE_PATH;
