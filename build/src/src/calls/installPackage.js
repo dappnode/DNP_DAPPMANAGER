@@ -4,7 +4,6 @@ const db = require("db");
 // Modules
 const packages = require("modules/packages");
 const dappGet = require("modules/dappGet");
-const dappGetBasic = require("modules/dappGet/basic");
 const getManifest = require("modules/getManifest");
 const lockPorts = require("modules/lockPorts");
 // Utils
@@ -79,37 +78,32 @@ const installPackage = async ({
     throw Error("Mainnet is syncing");
   }
 
-  // 2. Resolve the request
-  // result = {
-  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
-  // }
+  /**
+   * 2. Resolve the request
+   * @param {object} state = {
+   * 'admin.dnp.dappnode.eth': '0.1.5'
+   * }
+   * @param {object} alreadyUpdated = {
+   * 'bind.dnp.dappnode.eth': '0.1.4'
+   * }
+   * Forwards the options to dappGet:
+   * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
+   */
   logUi({ id, name: req.name, message: "Resolving dependencies..." });
-  const result = options.BYPASS_RESOLVER
-    ? await dappGetBasic(req)
-    : await dappGet(req);
-  if (!result.success) {
-    throw Error(
-      `Request ${req.name}@${req.ver} could not be resolved: ${result.message}`
-    );
-  }
+  const { state, alreadyUpdated } = await dappGet(req, options);
+
   logs.debug(
-    `Successfully resolved request ${JSON.stringify(req)}:\n ${JSON.stringify(
-      result,
-      null,
-      2
-    )}`
+    `Resolved request ${req.name}@${req.ver}:\n ${JSON.stringify(state)}`
   );
 
   // 3. Format the request and filter out already updated packages
-  Object.keys(result.alreadyUpdated || {}).forEach(name => {
+  Object.keys(alreadyUpdated || {}).forEach(name => {
     logUi({ id, name, message: "Already updated" });
   });
 
   let pkgs = await Promise.all(
-    Object.keys(result.success).map(async name => {
+    Object.entries(state).map(async ([name, ver]) => {
       // 3.2 Fetch manifest
-      const ver = result.success[name];
       let manifest = await getManifest({ name, ver });
       if (!manifest) throw Error(`Missing manifest for ${name}`);
 

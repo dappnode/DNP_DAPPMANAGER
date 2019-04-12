@@ -7,7 +7,7 @@ const getManifest = require("modules/getManifest");
  * Updating the core will never require dependency resolution,
  * therefore for a system update the dappGet resolver will be emitted
  *
- * If BYPASS_   RESOLVER == true, just fetch the first level dependencies of the request
+ * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
  */
 
 async function dappGetBasic(req) {
@@ -18,31 +18,29 @@ async function dappGetBasic(req) {
   // }
 
   // Append dependencies in the list of DNPs to install
-  const result = {
-    success: (reqManifest || {}).dependencies || {}
-  };
   // Add current request to pacakages to install
-  result.success[req.name] = req.ver;
+  const state = {
+    ...((reqManifest || {}).dependencies || {}),
+    [req.name]: req.ver
+  };
 
   // The function below does not directly affect funcionality.
   // However it would prevent already installed DNPs from installing
   try {
-    (await dockerList.listContainers()).forEach(dnp => {
-      if (
-        dnp.name &&
-        dnp.version &&
-        result.success &&
-        result.success[dnp.name] &&
-        result.success[dnp.name] === dnp.version
-      ) {
-        delete result.success[dnp.name];
-      }
-    });
+    const installedDnps = await dockerList.listContainers();
+    for (const { name, version } of installedDnps) {
+      if (name && version && state[name] && state[name] === version)
+        delete state[name];
+    }
   } catch (e) {
     logs.error(`Error listing current containers: ${e.stack}`);
   }
 
-  return result;
+  return {
+    message: "dappGet basic resolved first level dependencies",
+    state,
+    alreadyUpdated: {}
+  };
 }
 
 module.exports = dappGetBasic;

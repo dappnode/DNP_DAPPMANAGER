@@ -4,7 +4,7 @@ module.exports = {
     name: "nginx-proxy.dnp.dappnode.eth",
     ver: "^0.1.1"
   },
-  expectedSuccess: {
+  expectedState: {
     "nginx-proxy.dnp.dappnode.eth": "0.1.1"
   },
   dnps: {

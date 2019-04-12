@@ -1,5 +1,4 @@
 const dappGet = require("modules/dappGet");
-const dappGetBasic = require("modules/dappGet/basic");
 
 /**
  * Remove package data: docker down + disk files
@@ -16,22 +15,25 @@ const dappGetBasic = require("modules/dappGet/basic");
 const resolveRequest = async ({ req, options = {} }) => {
   if (!req) throw Error("kwarg req must be defined");
 
-  // result = {
-  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
-  // }
-  const result = options.BYPASS_RESOLVER
-    ? await dappGetBasic(req)
-    : await dappGet(req);
-
-  // Prevent old UIs from crashing
-  result.state = {};
+  /**
+   * Resolve the request
+   * @param {object} state = {
+   * 'admin.dnp.dappnode.eth': '0.1.5'
+   * }
+   * @param {object} alreadyUpdated = {
+   * 'bind.dnp.dappnode.eth': '0.1.4'
+   * }
+   * Forwards the options to dappGet:
+   * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
+   */
+  const { message, state, alreadyUpdated } = await dappGet(req, options);
 
   return {
-    message: `Resolve request for ${req.name}@${
-      req.ver
-    }, resolved: Boolean(result.success)`,
-    result
+    message,
+    result: {
+      state,
+      alreadyUpdated
+    }
   };
 };
 

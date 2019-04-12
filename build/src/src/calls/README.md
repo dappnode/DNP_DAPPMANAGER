@@ -418,7 +418,7 @@ DappGet result object. Refer to the dappGet documentation.
         'bind.dnp.dappnode.eth': '0.1.4',
         'core.dnp.dappnode.eth': '/ipfs/Qmabuy2rTUEWA5jKyUKJmUDCH375e75tpUnAAwyi1PbLq1'
     },
-    message: 'Found compatible state with case 1/256',
+    message: 'Found compatible state at case 1/256',
  }
 ```
 

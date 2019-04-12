@@ -6,7 +6,7 @@ function generateErrorMessage({
   totalCases,
   errors
 }) {
-  const errorMsgs = [`Could not find a compatible state.`];
+  const errorMsgs = [];
   // Timeout message
   if (hasTimedOut) errorMsgs.push(`Resolver timed out (${timeoutMs} ms).`);
   // Blame message

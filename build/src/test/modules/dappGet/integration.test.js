@@ -111,33 +111,25 @@ describe("dappGet integration test", () => {
 
         it("Should return the expect result", async () => {
           const result = await dappGet(_case.req);
+          const { state, alreadyUpdated } = result;
           logBig("  DNPs result", JSON.stringify(result, null, 2));
-          if (result.success) {
-            expect(Boolean(result.success)).to.equal(
-              true,
-              `The result was not successful: ${result.message}`
-            );
-            expect(Boolean(Object.keys(result.success).length)).to.equal(
-              true,
-              `Make sure the success object is not empty: ${JSON.stringify(
-                result,
-                null,
-                2
-              )}`
-            );
-            expect(Boolean(result.success[_case.req.name])).to.equal(
-              true,
-              "Make sure the success object includes the requested package"
-            );
-            expect(result.success).to.deep.equal(_case.expectedSuccess);
-          } else {
-            expect(Boolean(result.success)).to.equal(
-              false,
-              `The result should NOT be successful: ${result.message}`
-            );
-          }
+
+          expect(Boolean(Object.keys(state).length)).to.equal(
+            true,
+            `Make sure the success object is not empty: ${JSON.stringify(
+              result,
+              null,
+              2
+            )}`
+          );
+          expect(Boolean(state[_case.req.name])).to.equal(
+            true,
+            "Make sure the success object includes the requested package"
+          );
+          expect(state).to.deep.equal(_case.expectedState);
+
           if (_case.alreadyUpdated) {
-            expect(result.alreadyUpdated).to.deep.equal(_case.alreadyUpdated);
+            expect(alreadyUpdated).to.deep.equal(_case.alreadyUpdated);
           }
         });
       });

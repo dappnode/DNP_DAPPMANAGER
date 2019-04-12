@@ -34,8 +34,8 @@ describe("Call function: installPackage", function() {
   };
 
   const dappGet = sinon.fake.resolves({
-    success: { [pkgName]: pkgVer, [depName]: depVer },
-    state: { [pkgName]: "0.1.0" }
+    message: "Found compatible state",
+    state: { [pkgName]: pkgVer, [depName]: depVer }
   });
 
   const getManifest = sinon.stub().callsFake(async function(pkg) {
