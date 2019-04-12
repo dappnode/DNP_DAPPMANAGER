@@ -20,7 +20,7 @@ const writeFile = promisify(fs.writeFile);
  * - pkg: packageReq + its manifest. It is expected that in the previous step of the
  *        installation the manifest is attached to this object.
  * - id: task id to allow progress updates
- * @return {*}
+ * @returns {*}
  */
 async function download({ pkg, id }) {
   // call IPFS, store the file in the repo's folder
@@ -88,7 +88,7 @@ async function download({ pkg, id }) {
  * - pkg: packageReq + its manifest. It is expected that in the previous step of the
  *        installation the manifest is attached to this object.
  * - id: task id to allow progress updates
- * @return {*}
+ * @returns {*}
  */
 async function run({ pkg, id }) {
   const { name, manifest } = pkg;

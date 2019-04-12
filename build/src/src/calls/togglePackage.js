@@ -7,12 +7,8 @@ const { eventBus, eventBusTag } = require("eventBus");
 /**
  * Stops or starts after fetching its status
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   timeout: seconds to stop the package (int)
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} id DNP .eth name
+ * @param {number} timeout seconds to stop the package
  */
 const togglePackage = async ({ id, timeout = 10 }) => {
   if (!id) throw Error("kwarg id must be defined");

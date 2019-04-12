@@ -16,7 +16,7 @@ const { hasVersion, getDependencies, toReq } = require("../utils/dnpUtils");
     },
     "B": ...
     ...
- * @return {obj} Object with two properties:
+ * @returns {obj} Object with two properties:
  * - res: boolean, true if the state is valid
  * - msg: metadata of which pkg and dep invalidated the state
  */

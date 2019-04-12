@@ -29,8 +29,8 @@ const validateKwargs = require("./validateKwargs");
 
 /**
  *
- * @param {String} terminalOutput A sample can be found above
- * @return {*}
+ * @param {string} terminalOutput A sample can be found above
+ * @returns {*}
  */
 function parseOpenOutput(terminalOutput) {
   validateKwargs({ terminalOutput });

@@ -3,15 +3,15 @@ const db = require("../db");
 /**
  * Returns not viewed notifications
  *
- * @param {Object} kwargs: {}
- * @return {Object} A formated success message.
- * result: = notifications = {
+ * @returns {object} notifications object, by notification id
+ * notifications = {
  *   "diskSpaceRanOut-stoppedPackages": {
  *     id: "diskSpaceRanOut-stoppedPackages",
- *     type: "error",
+ *     type: "danger",
  *     title: "Disk space ran out, stopped packages",
- *     body: "Available disk space is less than a safe ..."",
- *   }, ... }
+ *     body: "Available disk space is less than a safe ...",
+ *   }
+ * }
  */
 
 const notificationsGet = async () => {

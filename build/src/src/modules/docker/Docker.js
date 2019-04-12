@@ -15,7 +15,7 @@ const { mapValues } = require("lodash");
  *
  * It does so recursively, because the commands are organized at
  * more than 1 level deep
- * @param {Object} obj
+ * @param {object} obj
  */
 function wrapCommands(obj) {
   return mapValues(obj, commandGetter => {

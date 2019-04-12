@@ -109,7 +109,7 @@ const getRepoHash = async packageReq => {
  * Versions
  *
  * @param {*} packageReq
- * @return {*}
+ * @returns {*}
  */
 const getLatestWithVersion = async packageReq => {
   if (!packageReq || typeof packageReq !== "object") {
@@ -171,7 +171,7 @@ const getLatestWithVersion = async packageReq => {
  *
  * @param {*} packageReq
  * @param {*} verReq
- * @return {*}
+ * @returns {*}
  */
 const getRepoVersions = async (packageReq, verReq) => {
   if (!packageReq || typeof packageReq !== "object") {

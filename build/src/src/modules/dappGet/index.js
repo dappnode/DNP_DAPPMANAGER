@@ -17,13 +17,13 @@ const logs = require("logs.js")(module);
  * - Newly installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
- * @param {Object} req: The package request:
+ * @param {object} req: The package request:
  * req = {
  *   name: 'nginx-proxy.dnp.dappnode.eth',
  *   ver: '^0.1.0',
  * }
  *
- * @return {Object} Result object = {
+ * @returns {object} Result object = {
  *   message: 'Found compatible state at case 1/256',
  *   state: {
  *     'ipfs.dnp.dappnode.eth': '0.1.3',

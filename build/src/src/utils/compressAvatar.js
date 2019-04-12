@@ -29,7 +29,7 @@ const imageminPngquant = require("imagemin-pngquant");
  * @param {Buffer} inputDataOrFile Can be a Buffer or path to the image
  * @param {Integer} outPutResolution The image is forced to be a square of
  *                                   outPutResolution x outPutResolution px
- * @return {String} base64 representation of the image
+ * @returns {string} base64 representation of the image
  */
 async function compressAvatar(inputDataOrFile, outPutResolution) {
   const resizedImgBuffer = await resizeImg(inputDataOrFile, outPutResolution);

@@ -7,12 +7,12 @@ const docker = require("modules/docker");
 /**
  * Returns the logs of the docker container of a package
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   options: log options (object)
- * }
- * @return {Object} A formated success message.
- * result: logs: <String with escape codes> (string)
+ * @param {string} id DNP .eth name
+ * @param {object} options log options
+ * - timestamp {bool}: Show timestamps
+ * - tail {number}: Number of lines to return from bottom
+ * options = { timestamp: true, tail: 200 }
+ * @returns {string} logs: <string with escape codes>
  */
 const logPackage = async ({ id, options }) => {
   if (!id) throw Error("kwarg id must be defined");

@@ -70,8 +70,8 @@ const params = require("params");
 /**
  * Edits docker-compose of a package to lock ephemeral ports
  * Must be run after a `docker-compose up` on the last step of the installation
- * @param {Object} pkg {name, ver, manifest}
- * @return {Array} portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+ * @param {object} pkg {name, ver, manifest}
+ * @returns {array} portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
  */
 async function lockPorts({ pkg, dockerComposePath }) {
   // Load the docker compose

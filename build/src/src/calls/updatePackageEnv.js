@@ -12,14 +12,12 @@ const envsHelper = require("utils/envsHelper");
 /**
  * Updates the .env file of a package. If requested, also re-ups it
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   envs: enviroment variables (object)
- *   isCore: (boolean)
- *   restart: flag to restart the package (boolean)
+ * @param {string} id DNP .eth name
+ * @param {object} envs environment variables
+ * envs = {
+ *   ENV_NAME: ENV_VALUE
  * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {bool} restart flag to restart the DNP
  */
 const updatePackageEnv = async ({ id, envs, isCORE, isCore, restart }) => {
   if (!id) throw Error("kwarg id must be defined");

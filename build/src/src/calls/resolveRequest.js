@@ -1,16 +1,18 @@
 const dappGet = require("modules/dappGet");
 
 /**
- * Remove package data: docker down + disk files
+ * Resolves a DNP request given the current repo state fetched
+ * from the blockchain and the current installed DNPs versions
  *
- * @param {Object} kwargs: {
- *   req: {
- *        name: 'otpweb.dnp.dappnode.eth', <string>
- *        ver: '0.1.4' <string>
- *      }
+ * @param {object} req, DNP request to resolve
+ * req = {
+ *   name: "otpweb.dnp.dappnode.eth", {string}
+ *   ver: "0.1.4" {string}
  * }
- * @return {Object} A formated success message.
- * result: empty
+ * @returns {object} result  = {
+ *   state: {"admin.dnp.dappnode.eth": "0.1.4"},
+ *   alreadyUpdated: {"bind.dnp.dappnode.eth": "0.1.2"},
+ * }
  */
 const resolveRequest = async ({ req, options = {} }) => {
   if (!req) throw Error("kwarg req must be defined");
@@ -25,6 +27,13 @@ const resolveRequest = async ({ req, options = {} }) => {
    * }
    * Forwards the options to dappGet:
    * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
+   * @returns {object} = {
+   *   message: "Found compatible state with case 1/256",
+   *   state,
+   *   alreadyUpdated
+   * }
+   *
+   * In case of error, it will throw an error with a formated message
    */
   const { message, state, alreadyUpdated } = await dappGet(req, options);
 

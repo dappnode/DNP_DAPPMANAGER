@@ -11,17 +11,17 @@ const cache = {};
 
 /**
  * Returns a chain data object for a [bitcoin] API
- * @param {String} name = "Bitcoin"
- * @param {String} api = "my.bitcoin.dnp.dappnode.eth"
- * @returns {Object}
+ * @param {string} name = "Bitcoin"
+ * @param {string} api = "my.bitcoin.dnp.dappnode.eth"
+ * @returns {object}
  * - On success: {
- *   syncing: true, {Bool}
- *   message: "Blocks synced: 543000 / 654000", {String}
+ *   syncing: true, {bool}
+ *   message: "Blocks synced: 543000 / 654000", {string}
  *   progress: 0.83027522935,
  * }
  * - On error: {
- *   message: "Could not connect to RPC", {String}
- *   error: true {Bool},
+ *   message: "Could not connect to RPC", {string}
+ *   error: true {bool},
  * }
  */
 async function bitcoin({ name, api }) {

@@ -20,7 +20,7 @@ const db = require("../db");
  *
  * @param {object} packageReq package request
  * @param {object} options package request
- * @return {object} parsed manifest
+ * @returns {object} parsed manifest
  */
 async function getManifest({ name, ver, version }) {
   // Make the arguments compatible with old stardard

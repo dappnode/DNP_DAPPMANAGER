@@ -173,15 +173,15 @@ const cache = {};
 async function getAndEmitChainData() {
   const dnpList = await dockerList.listContainers();
   /**
-   * @param {Array} chainData = [
+   * @param {array} chainData = [
    *   {
-   *     syncing: true, {Bool}
-   *     message: "Blocks synced: 543000 / 654000", {String}
+   *     syncing: true, {bool}
+   *     message: "Blocks synced: 543000 / 654000", {string}
    *     progress: 0.83027522935,
    *   },
    *   {
-   *     message: "Could not connect to RPC", {String}
-   *     error: true {Bool},
+   *     message: "Could not connect to RPC", {string}
+   *     error: true {bool},
    *   }, ... ]
    */
   const chainData = await Promise.all(

@@ -8,8 +8,8 @@ const { stringIncludes } = require("utils/strings");
  * 3. Write the docker-compose (no need to up the package)
  *
  * Used when trying to up a container and its ports collide
- * @param {String} dockerComposePath
- * @return {Array} portsToClose = [ {number: 32769, type: 'UDP'}, ... ]
+ * @param {string} dockerComposePath
+ * @returns {array} portsToClose = [ {number: 32769, type: 'UDP'}, ... ]
  */
 async function unlockPorts(dockerComposePath) {
   if (typeof dockerComposePath !== "string") {

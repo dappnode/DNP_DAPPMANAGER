@@ -8,11 +8,7 @@ const { eventBus, eventBusTag } = require("eventBus");
 /**
  * Calls docker rm and docker up on a package
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} id DNP .eth name
  */
 const restartPackage = async ({ id }) => {
   if (!id) throw Error("kwarg id must be defined");

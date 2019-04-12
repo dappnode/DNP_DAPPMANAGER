@@ -4,8 +4,8 @@ const fs = require("fs");
 /**
  * Converts a data URI feeded from the server to a downloadable blob
  *
- * @param {String} dataUri = data:application/zip;base64,UEsDBBQAAAg...
- * @param {String} pathTo = DNCORE/tempfile
+ * @param {string} dataUri = data:application/zip;base64,UEsDBBQAAAg...
+ * @param {string} pathTo = DNCORE/tempfile
  */
 function dataUriToFile(dataUri, pathTo) {
   const decodedBuffer = dataUriToBuffer(dataUri);

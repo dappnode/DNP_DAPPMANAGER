@@ -11,7 +11,7 @@ const isIpfsHash = require("utils/isIpfsHash");
  *   ['/ipfs/QmHc33SZmas', '0.1.0', '0.2.0', 'fake'], or
  *   ['/ipfs/QmHc33SZmas', '0.2.0', '0.1.0', 'fake']
  * @param {function} sortFunction can be semver.rcompare for example
- * @return {function} wrapped sort function
+ * @returns {function} wrapped sort function
  */
 function safeSort(sortFunction) {
   return (v1, v2) => {

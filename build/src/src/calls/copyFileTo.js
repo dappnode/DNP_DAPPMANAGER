@@ -10,13 +10,9 @@ const dataUriToFile = require("utils/dataUriToFile");
 /**
  * Copy file to a DNP:
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   dataUri: "data:application/zip;base64,UEsDBBQAAAg..."
- *   toPath: task id (string)
- * }
- * @return {Object} A formated success message.
- * result: {}
+ * @param {string} id DNP .eth name
+ * @param {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
+ * @param {string} toPath = "/usr/src/app/config.json"
  */
 const copyFileTo = async ({ id, dataUri, toPath }) => {
   if (!id) throw Error("Argument id must be defined");

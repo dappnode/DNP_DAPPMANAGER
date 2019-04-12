@@ -7,11 +7,11 @@ const parseCloseOutput = require("./parseCloseOutput");
  * Actual command example:
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 500 UDP
  *
- * @param {Object} kwargs: {
+ * @param {object} kwargs: {
  *   number: '3000',
  *   type: 'TCP',
  * }
- * @return {*}
+ * @returns {*}
  */
 async function close({ number, type }) {
   validateKwargs({ number, type });

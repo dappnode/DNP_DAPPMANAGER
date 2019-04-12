@@ -29,28 +29,27 @@ const { stringIncludes } = require("utils/strings");
  *   1. ver = 'latest'
  *   2. ver = '/ipfs/QmZ87fb2...'
  *
- * @param {Object} kwargs = {
- *   id: package .eth name {String}
- *   userSetEnvs: {
- *     "kovan.dnp.dappnode.eth": {
- *       "ENV_NAME": "VALUE1"
- *     }, ... }
- *   userSetVols: user set volumes {Object} = {
- *     "kovan.dnp.dappnode.eth": {
- *       "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
- *     }, ... }
- *   userSetPorts: user set ports {Object} = {
- *     "kovan.dnp.dappnode.eth": {
- *       "30303": "31313:30303",
- *       "30303/udp": "31313:30303/udp"
- *     }, ... }
- *   options: {
- *     BYPASS_RESOLVER: true,
- *     ...
- *   }
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} id DNP .eth name
+ * @param {object} userSetEnvs
+ * userSetEnvs= {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "ENV_NAME": "VALUE1"
+ * }, ... }
+ * @param {object} userSetVols user set volumes
+ * userSetVols = {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
+ * }, ... }
+ * @param {object} userSetPorts user set ports
+ * userSetPorts = {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "30303": "31313:30303",
+ *     "30303/udp": "31313:30303/udp"
+ * }, ... }
+ * @param {object} options install options
+ * - BYPASS_RESOLVER {bool}: Skips dappGet and just fetches first level dependencies
+ * - BYPASS_CORE_RESTRICTION {bool}: Allows dncore DNPs from unverified sources (IPFS)
+ * options = { BYPASS_RESOLVER: true, BYPASS_CORE_RESTRICTION: true }
  */
 const installPackage = async ({
   id,

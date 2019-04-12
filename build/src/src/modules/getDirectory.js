@@ -14,7 +14,7 @@ const DAppNodePackageStatus = [
 /**
  * Fetches all package names in the custom dappnode directory.
  *
- * @return {Array} An array of objects:
+ * @returns {array} An array of objects:
  *  [
  *    {
  *      name: packageName,  (string)

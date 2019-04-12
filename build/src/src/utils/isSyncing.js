@@ -22,7 +22,7 @@ const eth = new EthRPC(new HttpProvider(WEB3HOSTHTTP));
  * Each call takes ~600ms (500ms minimum, 1500ms maximum observed)
  * Using this raw methodology to avoid expensive libraries (web3)
  *
- * @return {Bool} Returns true if it's syncing and the blockDiff
+ * @returns {bool} Returns true if it's syncing and the blockDiff
  * is big enough. Returns false otherwise
  */
 const isSyncingRpcCall = () =>
@@ -64,7 +64,7 @@ const isSyncingCache = {
  * is happening, future calls will still get the old value, but this
  * ensures the minimum number of calls
  *
- * @return {Bool} isSyncing: true / false
+ * @returns {bool} isSyncing: true / false
  */
 async function isSyncingWrap() {
   if (Date.now() - isSyncingCache.lastCheck > cacheTime) {
@@ -88,7 +88,7 @@ const pushTaskAsync = promisify(q.push);
 
 /**
  * Export
- * @return {Bool}
+ * @returns {bool}
  */
 const isSyncing = () => pushTaskAsync(async () => await isSyncingWrap());
 module.exports = isSyncing;

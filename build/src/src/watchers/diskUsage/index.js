@@ -27,7 +27,7 @@ const thresholdIsActive = {};
  * If disk usage reaches a critical level (< 1GB)
  * it will stop all non cores + etchain + ipfs
  *
- * @return {*}
+ * @returns {*}
  */
 async function monitorDiskUsage() {
   try {

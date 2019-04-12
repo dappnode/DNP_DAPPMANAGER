@@ -24,14 +24,14 @@
  *  It is more important for A to have a specific version than B,
  *  then order 2 should be followed
  *
- * @param {Object} dnps = {
+ * @param {object} dnps = {
  *   A: {isRequest: true, versions: []},
  *   B: {isInstalled: true, versions: []},
  *   C: {isInstalled: true, versions: []},
  *   D: {versions: []},
  *   E: {versions: []},
  * }
- * @return {Array} dnpsArray = [
+ * @returns {array} dnpsArray = [
  *   {name: 'D', versions: []},
  *   {name: 'E', versions: []},
  *   {name: 'B', isInstalled: true, versions: []},

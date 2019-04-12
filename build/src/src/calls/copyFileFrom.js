@@ -10,14 +10,11 @@ const randomToken = require("utils/randomToken");
 const fileToDataUri = require("utils/fileToDataUri");
 
 /**
- * Copy file from a DNP:
+ * Copy file from a DNP and downloaded on the client
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   fromPath: "/usr/src/app/config.json"
- * }
- * @return {Object} A formated success message.
- * result: data Uri: "data:application/zip;base64,UEsDBBQAAAg..."
+ * @param {string} id DNP .eth name
+ * @param {string} fromPath = "/usr/src/app/config.json"
+ * @returns {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
  */
 const copyFileFrom = async ({ id, fromPath }) => {
   if (!id) throw Error("Argument id must be defined");

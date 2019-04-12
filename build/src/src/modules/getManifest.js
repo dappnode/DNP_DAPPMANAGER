@@ -18,7 +18,7 @@ const apm = require("modules/apm");
  *
  * @param {object} packageReq package request
  * @param {object} options package request
- * @return {object} parsed manifest
+ * @returns {object} parsed manifest
  */
 async function getManifest(packageReq) {
   validate.packageReq(packageReq);

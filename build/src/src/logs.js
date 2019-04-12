@@ -38,9 +38,9 @@ const scFormat = format.printf(info => {
 /**
  * Get a label to desribe the module we're logging for.
  *
- * @param {Object}  mod The module we're logging for or a description of the
+ * @param {object}  mod The module we're logging for or a description of the
  *                      logger.
- * @return {winston.format.label}
+ * @returns {winston.format.label}
  */
 function _getLabel(mod) {
   let label = mod;
