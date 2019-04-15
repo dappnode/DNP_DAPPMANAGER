@@ -1,6 +1,7 @@
 const logs = require("logs.js")(module);
 const directoryContract = require("contracts/directory.json");
 const web3 = require("./web3Setup");
+const isEnsDomain = require("utils/isEnsDomain");
 
 // Contract parameters
 const DAppNodePackageStatus = [
@@ -36,11 +37,13 @@ async function getDirectory() {
   for (let i = 0; i < numberOfDAppNodePackages; i++) {
     try {
       const { name, status } = await directory.methods.getPackage(i).call();
-      packages.push({
-        name,
-        status: DAppNodePackageStatus[status],
-        directoryId: i
-      });
+      // Make sure the DNP is not Deprecated or Deleted
+      if (isEnsDomain(name) && status < 3)
+        packages.push({
+          name,
+          status: DAppNodePackageStatus[status],
+          directoryId: i
+        });
     } catch (e) {
       logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
     }
