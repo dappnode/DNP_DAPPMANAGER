@@ -1,6 +1,6 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.1.21",
+  "version": "0.2.0",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
   "type": "dncore",
@@ -22,12 +22,7 @@
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
   ],
-  "keywords": [
-    "DAppNodeCore",
-    "DAPP",
-    "Manager",
-    "Installer"
-  ],
+  "keywords": ["DAppNodeCore", "DAPP", "Manager", "Installer"],
   "homepage": {
     "adminui": "http://my.admin.dnp.dappnode.eth/",
     "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
