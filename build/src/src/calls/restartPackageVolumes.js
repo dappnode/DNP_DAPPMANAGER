@@ -9,11 +9,7 @@ const { stringIncludes } = require("utils/strings");
 /**
  * Removes a package volumes. The re-ups the package
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} id DNP .eth name
  */
 async function restartPackageVolumes({ id }) {
   if (!id) throw Error("kwarg id must be defined");
@@ -38,7 +34,7 @@ async function restartPackageVolumes({ id }) {
     };
   }
 
-  if (dnp.isCORE) {
+  if (dnp.isCore) {
     // docker-compose down can't be called because of the shared network
     await docker.compose.rm(dockerComposePath);
     await docker.volume.rm(dnp.volumes.map(v => v.name).join(" "));

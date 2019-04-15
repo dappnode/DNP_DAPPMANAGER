@@ -35,11 +35,11 @@ setInterval(() => {
     if (shouldReset) {
       logs.warn("Reseting parity");
       const id = "ethchain.dnp.dappnode.eth";
-      const isCORE = true;
+      const isCore = true;
       eventBus.emit(
         eventBusTag.call,
         "restartPackage.dappmanager.dnp.dappnode.eth",
-        [id, isCORE]
+        [id, isCore]
       );
     }
   } catch (e) {

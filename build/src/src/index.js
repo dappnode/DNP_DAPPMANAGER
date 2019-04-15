@@ -5,7 +5,7 @@ const autobahn = require("autobahn");
 const { eventBus, eventBusTag } = require("./eventBus");
 const logs = require("./logs")(module);
 const logUserAction = require("./logUserAction");
-const { registerHandler } = require("./utils/registerHandler");
+const { registerHandler } = require("./registerHandler");
 const params = require("./params");
 const db = require("./db");
 const upnpc = require("./modules/upnpc");
@@ -111,13 +111,13 @@ connection.onopen = (session, details) => {
 
   /**
    * Emit chain data to the UI
-   * @param {Array} chainData = [{
-   *     syncing: true, {Bool}
-   *     message: "Blocks synced: 543000 / 654000", {String}
+   * @param {array} chainData = [{
+   *     syncing: true, {bool}
+   *     message: "Blocks synced: 543000 / 654000", {string}
    *     progress: 0.83027522935,
    *   }, {
-   *     message: "Could not connect to RPC", {String}
-   *     error: true {Bool},
+   *     message: "Could not connect to RPC", {string}
+   *     error: true {bool},
    *   }, ... ]
    */
   eventBus.onSafe(eventBusTag.emitChainData, ({ chainData }) => {
@@ -141,10 +141,10 @@ connection.onopen = (session, details) => {
 
   /**
    * Emit progress logs to the ADMIN UI
-   * @param {Object} logData = {
-   *   id: "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", {String} overall log id (to bundle multiple logs)
-   *   name: "bitcoin.dnp.dappnode.eth", {String} dnpName the log is referring to
-   *   message: "Downloading 75%", {String} log message
+   * @param {object} logData = {
+   *   id: "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", {string} overall log id (to bundle multiple logs)
+   *   name: "bitcoin.dnp.dappnode.eth", {string} dnpName the log is referring to
+   *   message: "Downloading 75%", {string} log message
    * }
    */
   eventBus.onSafe(eventBusTag.logUi, logData => {
@@ -182,7 +182,7 @@ connection.onopen = (session, details) => {
 
   /**
    * Emits push notification to the UI and to the local db
-   * @param {Object} notification = {
+   * @param {object} notification = {
    *   id: "diskSpaceRanOut-stoppedPackages",
    *   type: "error",
    *   title: "Disk space ran out, stopped packages",

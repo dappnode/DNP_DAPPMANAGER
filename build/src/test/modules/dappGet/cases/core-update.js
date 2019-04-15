@@ -4,7 +4,7 @@ module.exports = {
     name: "ethforward.dnp.dappnode.eth",
     ver: "0.1.2"
   },
-  expectedSuccess: {
+  expectedState: {
     "ethforward.dnp.dappnode.eth": "0.1.2"
   },
   expectedAggregate: {

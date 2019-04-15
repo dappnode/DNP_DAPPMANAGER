@@ -3,7 +3,7 @@
  *
  * @param {object} obj Object to be transformed
  * @param {function} fn Callback, will receive one argument, an object value
- * @return {object} New object transformed
+ * @returns {object} New object transformed
  */
 function mapObj(obj, fn) {
   const _obj = {};
@@ -19,7 +19,7 @@ function mapObj(obj, fn) {
  * @param {object} obj Object to be transformed
  * @param {function} fn Callback, will receive one argument, an object value
  * @param {boolean} byKey if the filtering will be done by key or value
- * @return {object} New object transformed
+ * @returns {object} New object transformed
  */
 function filterObj(obj, fn, byKey = false) {
   const _obj = {};

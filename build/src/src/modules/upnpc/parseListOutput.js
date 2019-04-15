@@ -42,8 +42,8 @@ const validateKwargs = require("./validateKwargs");
 
 /**
  *
- * @param {String} terminalOutput A sample can be found above
- * @return {Array} port mappings = [
+ * @param {string} terminalOutput A sample can be found above
+ * @returns {array} port mappings = [
  *   {protocol: 'UDP', exPort: '500', inPort: '500'},
  *   {protocol: 'UDP', exPort: '4500', inPort: '4500'},
  *   {protocol: 'UDP', exPort: '30303', inPort: '30303'},

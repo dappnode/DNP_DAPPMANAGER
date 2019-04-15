@@ -1,4 +1,10 @@
-const findCompatibleState = require("./findCompatibleState");
+const verifyState = require("./verifyState");
+const permutations = require("./permutations");
+const { filterObj } = require("../utils/objUtils");
+const generateErrorMessage = require("./generateErrorMessage");
+const logs = require("logs.js")(module);
+
+const timeoutMs = 10 * 1000; // ms
 
 /**
  * Resolves a combination of DNPs.
@@ -11,7 +17,7 @@ const findCompatibleState = require("./findCompatibleState");
  * - Not installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
- * @param {Object} dnps = {
+ * @param {object} dnps = {
  *  "dependency.dnp.dappnode.eth": {
  *    versions: {
  *      "0.1.1": {},
@@ -25,8 +31,10 @@ const findCompatibleState = require("./findCompatibleState");
  *    }
  *  },
  *};
- * @return {Object} Result object = {
- *   success: {
+ * @returns {object} Result object = {
+ *   success: true,
+ *   message: 'Found compatible state at case 1/256',
+ *   state: {
  *     'bind.dnp.dappnode.eth': '0.1.4',
  *     'ipfs.dnp.dappnode.eth': '0.1.3',
  *     'ethchain.dnp.dappnode.eth': '0.1.4',
@@ -37,28 +45,73 @@ const findCompatibleState = require("./findCompatibleState");
  *     'dappmanager.dnp.dappnode.eth': '0.1.10',
  *     'core.dnp.dappnode.eth': '/ipfs/Qmabuy2rTUEWA5jKyUKJmUDCH375e75tpUnAAwyi1PbLq1'
  *   },
- *   message: 'Found compatible state with case 1/256',
  * }
  *
  * <or in case of error>
  *
  * Result object = {
  *   success: false,
- *   message: 'Could not find a compatible state.
- *     Packages x.dnp.dappnode.eth request incompatible versions of y.dnp.dappnode.eth.
- *     Checked 256/256 possible states.'
+ *   message: 'Packages x.dnp.dappnode.eth request incompatible
+ *     versions of y.dnp.dappnode.eth. Checked 256/256 possible states.'
  * }
  */
 function resolver(dnps) {
-  try {
-    const result = findCompatibleState(dnps);
-    return result;
-  } catch (e) {
-    return {
-      success: false,
-      message: e.stack
-    };
+  const errors = {};
+
+  const permutationsTable = permutations.getPermutationsTable(dnps);
+  const totalCases = permutations.getTotalPermutations(permutationsTable);
+
+  if (!totalCases) throw Error("Aggregation error, total cases must be > 0");
+
+  // Keep track of start time to abort if the loop runs for too long
+  const startTime = Date.now();
+  let hasTimedOut = false;
+  let caseId;
+  for (caseId = 0; caseId < totalCases; caseId++) {
+    // Creates a states from all the possible permutations
+    // { A: '2.0.0', B: '1.0.0', C: '2.0.0' }
+    const state = permutations.getPermutation(permutationsTable, caseId);
+    logs.debug(`CASE-ID ${caseId}: ${JSON.stringify(state)}`);
+    // Check if this combination of versions is valid
+    const result = verifyState(state, dnps);
+    if (result.valid) {
+      // If success => Filter out packages that will not be installed
+      return {
+        success: true,
+        message: `Found compatible state at case ${caseId + 1}/${totalCases}`,
+        state: filterObj(state, ver => ver)
+      };
+    } else {
+      // Keep track of how many incompatibilities are due to a specific reason
+      const { req, dep, range } = result.reason;
+      const key = `${req}#${dep}#${range}`;
+      key in errors ? errors[key]++ : (errors[key] = 1);
+    }
+    // Prevent the loop to run for too long
+    if (Date.now() - startTime > timeoutMs) {
+      hasTimedOut = true;
+      break;
+    }
   }
+
+  /**
+   * This point will be reached if no compatible state was found.
+   * Then, throw and Error with a message with this format:
+   *  `Packages x.dnp.dappnode.eth request incompatible versions of y.dnp.dappnode.eth.
+   *   Checked 256/256 possible states.`
+   * }
+   */
+  const errorMessage = generateErrorMessage({
+    hasTimedOut,
+    timeoutMs,
+    caseId,
+    totalCases,
+    errors
+  });
+  return {
+    success: false,
+    message: errorMessage
+  };
 }
 
 module.exports = resolver;

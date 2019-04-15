@@ -15,7 +15,7 @@ module.exports = {
     name: "dnp-a.eth",
     ver: "^0.1.0"
   },
-  expectedSuccess: {
+  expectedState: {
     "dnp-a.eth": "0.1.2"
   },
   expectedAggregate: {

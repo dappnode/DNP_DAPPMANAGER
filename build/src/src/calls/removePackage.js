@@ -15,13 +15,8 @@ const { stringIncludes } = require("utils/strings");
 /**
  * Remove package data: docker down + disk files
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- *   deleteVolumes: flag to also clear permanent package data
- *   logId: task id (string)
- * }
- * @return {Object} A formated success message.
- * result: empty
+ * @param {string} id DNP .eth name
+ * @param {bool} deleteVolumes flag to also clear permanent package data
  */
 const removePackage = async ({ id, deleteVolumes = false }) => {
   if (!id) throw Error("kwarg id must be defined");
@@ -38,7 +33,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   }
 
   // CLOSE PORTS
-  // portsToClose: '["32768/udp","32768/tcp"]'
+  // portsToClose: [ {number: 30303, type: 'UDP'}, ...]
   const dnpList = await dockerList.listContainers();
   const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
   if (!dnp) {
@@ -49,7 +44,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   // Get manifest
   let mappedPortsToClose = [];
   try {
-    const manifestPath = getPath.manifest(id, params, dnp.isCORE || dnp.isCore);
+    const manifestPath = getPath.manifest(id, params, dnp.isCore);
     const manifestFileData = fs.readFileSync(manifestPath, "utf8");
     const manifest = JSON.parse(manifestFileData);
     mappedPortsToClose = parseManifestPorts(manifest);

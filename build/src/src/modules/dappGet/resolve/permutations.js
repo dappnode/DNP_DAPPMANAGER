@@ -18,7 +18,7 @@ const prioritizeDnps = require("./prioritizeDnps");
  *      "0.0.4": { "web.dnp.dappnode.eth": "latest" }
  *    }
  *  },
- * @return {Array} Array of length = # of DNPs with key parameters
+ * @returns {array} Array of length = # of DNPs with key parameters
  * to compute their permutation. The ordering of the versions is done careful
  * to test first the states with higher priority. 'm' is the total # of permutations
  * permutationsTable = [
@@ -59,12 +59,12 @@ function getPermutationsTable(dnps) {
 /**
  * Computes the total number of possible permutations
  *
- * @param {Array} permutationsTable = [
+ * @param {array} permutationsTable = [
  *   { name: 'A', versions: [ '2.2.0', '2.1.0', '2.0.0' ], n: 3, m: 1 },
  *   { name: 'C', versions: [ '2.0.0', '1.0.0' ], n: 2, m: 3 },
  *   { name: 'D', versions: [ '1.1.0', '1.0.0' ], n: 2, m: 6 }
  * ]
- * @return {Integer} total number of possible permutations
+ * @returns {Integer} total number of possible permutations
  */
 function getTotalPermutations(permutationsTable) {
   return Object.values(permutationsTable).reduce(
@@ -78,7 +78,7 @@ function getTotalPermutations(permutationsTable) {
  * First permutation => i = 0
  * Last permutation ==> i = permutationsNumber - 1
  *
- * @param {Array} permutationsTable Array of length = # of DNPs with key parameters
+ * @param {array} permutationsTable Array of length = # of DNPs with key parameters
  * to compute their permutation. The ordering of the versions is done careful
  * to test first the states with higher priority. 'm' is the total # of permutations
  * [ { name: 'A', versions: [ '2.2.0', '2.1.0', '2.0.0' ], n: 3, m: 1 },
@@ -86,7 +86,7 @@ function getTotalPermutations(permutationsTable) {
  *   { name: 'D', versions: [ '1.1.0', '1.0.0' ], n: 2, m: 6 }
  * ]
  * @param {integer} i #th permutation
- * @return {object} A state with a specific set of versions
+ * @returns {object} A state with a specific set of versions
  * { A: '2.2.0', C: '2.0.0', D: '1.1.0' }
  */
 function getPermutation(permutationsTable, i) {

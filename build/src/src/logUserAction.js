@@ -56,7 +56,7 @@ class EmitToAdmin extends Transport {
 const onlyUserAction = format(info => {
   if (!info.userAction) return false;
   const _info = Object.assign({}, info);
-  delete _info.userAction;
+  delete _info.userAction; // ES6 immutable object delete looks worse
   delete _info.logMessage;
   return _info;
 });
@@ -70,6 +70,7 @@ const maxLen = 500;
 const limitLength = format(info => {
   if (info.kwargs) info.kwargs = limitObjValuesSize(info.kwargs, maxLen);
   if (info.result) info.result = limitObjValuesSize(info.result, maxLen);
+  return info;
 });
 
 // Actual logger

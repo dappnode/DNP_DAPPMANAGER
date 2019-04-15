@@ -18,7 +18,7 @@ const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 
 async function listContainers() {
   const containers = await dockerRequest("get", "/containers/json?all=true");
-  return containers.map(format).filter(pkg => pkg.isDNP || pkg.isCORE);
+  return containers.map(format).filter(pkg => pkg.isDnp || pkg.isCore);
 }
 
 async function runningPackagesInfo() {
@@ -46,12 +46,12 @@ function dockerRequest(method, url) {
 
 function format(c) {
   const packageName = (c.Names[0] || "").replace("/", "");
-  const isDNP = packageName.includes(CONTAINER_NAME_PREFIX);
-  const isCORE = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
+  const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
+  const isCore = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   let name;
-  if (isDNP) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
-  else if (isCORE)
+  if (isDnp) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
+  else if (isCore)
     name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
   else name = packageName;
 
@@ -106,8 +106,8 @@ function format(c) {
     packageName,
     version,
     ...fromLabels,
-    isDNP,
-    isCORE,
+    isDnp,
+    isCore,
     created: new Date(1000 * c.Created),
     image: c.Image,
     name: name,

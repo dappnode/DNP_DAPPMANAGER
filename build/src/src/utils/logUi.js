@@ -7,11 +7,11 @@ const { eventBus, eventBusTag } = require("eventBus");
  * which will be broadcasted to clients.
  *
  * [NOTE]: Params are de-structured to expose them
- * @param {String} id, overall log id (to bundle multiple logs)
+ * @param {string} id, overall log id (to bundle multiple logs)
  * id = "ln.dnp.dappnode.eth@/ipfs/Qmabcdf"
  * @param {Sting} name, dnpName the log is referring to
  * name = "bitcoin.dnp.dappnode.eth"
- * @param {String} message, log message
+ * @param {string} message, log message
  * message = "Downloading 75%"
  */
 function logUi({ id, name, message }) {

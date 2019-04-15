@@ -4,14 +4,14 @@ const fs = require("fs");
 /**
  * Returns the current disk space available of a requested path
  *
- * @param {Object} kwargs: {path}
- * @return {Object} A formated success message.
- * result: status =
- *   {
- *     exists, <Bool>
- *     totalSize, <String>
- *     availableSize, <String>
- *   }
+ * [WARNING] Does not work as expected
+ *
+ * @param {string} path
+ * @returns {object} status = {
+ *   exists, {bool}
+ *   totalSize, {string}
+ *   availableSize, {string}
+ * }
  */
 const diskSpaceAvailable = async ({ path }) => {
   if (!path) throw Error("kwarg path must be defined");

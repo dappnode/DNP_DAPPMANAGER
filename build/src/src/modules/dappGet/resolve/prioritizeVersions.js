@@ -8,12 +8,12 @@ const { getVersionsFromDnp } = require("../utils/dnpUtils");
  * 3. New packages, newest first.
  * + Prioritize not installing new packages, first version = null.
  *
- * @param {Object} dnp: {
+ * @param {object} dnp: {
  *   versions: ['0.1.0', '0.1.2', '/ipfs/Qm443d2...']
  *   isRequest: true / false
  *   isInstalled true / false
  * }
- * @return {Array} versions: ['0.1.2', '0.1.0']
+ * @returns {array} versions: ['0.1.2', '0.1.0']
  */
 function prioritizeVersions(dnp) {
   const versions = Object.keys(getVersionsFromDnp(dnp));

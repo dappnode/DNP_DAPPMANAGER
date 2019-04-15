@@ -28,42 +28,33 @@ describe("Full integration test with REAL docker: ", function() {
   const packageReq = "otpweb.dnp.dappnode.eth";
   const id = packageReq;
 
+  const shellSafe = cmd => shell(cmd).catch(() => {});
+
   // add .skip to skip test
   describe("TEST 1, install package, log, toggle twice and delete it", () => {
     before(async () => {
-      this.timeout(10000);
+      this.timeout(60000);
       // runs before all tests in this block
-      await Promise.all([
-        await shell(
-          "docker volume create --name=nginxproxydnpdappnodeeth_vhost.d"
-        ).catch(() => {}),
-        await shell(
-          "docker volume create --name=nginxproxydnpdappnodeeth_html"
-        ).catch(() => {}),
-        await shell("docker network create dncore_network").catch(() => {}),
+      const cmds = [
+        "docker volume create --name=nginxproxydnpdappnodeeth_vhost.d",
+        "docker volume create --name=nginxproxydnpdappnodeeth_html",
+        "docker network create dncore_network",
         // Clean previous stuff
-        await shell("rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/").catch(
-          () => {}
-        ),
-        await shell(
-          "rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/"
-        ).catch(() => {}),
-        await shell(
-          `docker rm -f
-            ${[
-              "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
-              "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
-            ].join(" ")}`
-        ).catch(() => {})
-      ]);
+        "rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/",
+        "rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/",
+        `docker rm -f ${[
+          "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
+          "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
+        ].join(" ")}`
+      ];
+      for (const cmd of cmds) {
+        await shellSafe(cmd);
+      }
     });
 
     // The test will perfom intense tasks and could take up to some minutes
     // TEST - 1
     // (before)
-
-    // - > updatePackageEnv (without restart, preinstall)
-    testUpdatePackageEnv(updatePackageEnv, id, false, params);
 
     // - > installPackage
     testInstallPackage(installPackage, { id });
@@ -117,12 +108,8 @@ describe("Full integration test with REAL docker: ", function() {
     testListPackages(listPackages, id, "down");
   });
 
-  describe("TEST 2, updatePackageEnv", () => {
-    // - > updatePackageEnv (of a non-existent package)
-    testUpdatePackageEnv(updatePackageEnv, "fake.eth", false, params);
-  });
-
-  after(() => {
+  after(async () => {
+    this.timeout(60000);
     logs.info("\x1b[36m%s\x1b[0m >> CLOSING TEST");
     const web3 = require("modules/web3Setup");
     web3.clearWatch();
@@ -135,6 +122,18 @@ describe("Full integration test with REAL docker: ", function() {
         `\x1b[36m%s\x1b[0m >> CLOSING WS: ${web3.currentProvider.host}`
       );
       web3.currentProvider.connection.close();
+    }
+    const cmds = [
+      // Clean stuff
+      "rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/",
+      "rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/",
+      `docker rm -f ${[
+        "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
+        "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
+      ].join(" ")}`
+    ];
+    for (const cmd of cmds) {
+      await shellSafe(cmd);
     }
   });
 });
@@ -188,9 +187,7 @@ function testLogPackage(logPackage, kwargs) {
     logs.info("\x1b[36m%s\x1b[0m >> LOGGING");
     const res = await logPackage(kwargs);
     expect(res).to.have.property("message");
-    expect(res.result).to.be.a("object");
-    expect(res.result).to.have.property("logs");
-    expect(res.result.logs).to.be.a("string");
+    expect(res.result).to.be.a("string");
     // let packageNames = parsedRes.result.map(e => name)
     // expect(packageNames).to.include(packageReq)
   }).timeout(10 * 1000);

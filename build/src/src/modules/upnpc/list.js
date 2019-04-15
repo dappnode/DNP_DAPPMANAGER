@@ -6,7 +6,7 @@ const parseListOutput = require("./parseListOutput");
  * Actual command:
  *   docker run --rm --net=host ${IMAGE} upnpc -l
  *
- * @return {Array} port mappings = [
+ * @returns {array} port mappings = [
  *   {protocol: 'UDP', exPort: '500', inPort: '500'},
  *   {protocol: 'UDP', exPort: '4500', inPort: '4500'},
  *   {protocol: 'UDP', exPort: '30303', inPort: '30303'},

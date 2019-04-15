@@ -1,7 +1,7 @@
 /**
  * Parses ports
- * @param {Object} manifest or portsArray = ['32323:30303/udp']
- * @return {Array} [ {number: '32323', type: 'UDP'}, ... ]
+ * @param {object} manifest or portsArray = ['32323:30303/udp']
+ * @returns {array} [ {number: '32323', type: 'UDP'}, ... ]
  */
 function parseManifestPorts(manifest = {}) {
   if (!manifest) return [];

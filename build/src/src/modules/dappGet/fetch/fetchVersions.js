@@ -8,11 +8,11 @@ const apm = require("modules/apm");
  * - valid semver version (not range): Return that version
  * - unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
  *
- * @param {Object} kwargs: {
+ * @param {object} kwargs: {
  *   name: Name of package i.e. "kovan.dnp.dappnode.eth"
  *   versionRange: version range requested i.e. "^0.1.0" or "0.1.0" or "/ipfs/Qmre4..."
  * }
- * @return {Set} set of versions
+ * @returns {Set} set of versions
  */
 async function fetchVersions({ name, versionRange }) {
   // Case 1. Valid semver range: Fetch the valid versions from APM

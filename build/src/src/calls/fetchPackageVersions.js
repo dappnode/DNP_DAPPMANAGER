@@ -7,18 +7,11 @@ const isIpfsRequest = require("utils/isIpfsRequest");
 /**
  * Fetches all available version manifests from a package APM repo
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
- * }
- * @return {Object} A formated success message.
- * result: packageWithVersions =
- *   [
- *     {
- *       version: '0.0.4', (string)
- *       manifest: <Manifest> (object)
- *     },
- *     ...
- *   ]
+ * @param {string} id DNP .eth name
+ * @returns {array} versions = [{
+ *   version: '0.0.4', {string},
+ *   manifest: <manifest object> {object}
+ * }, ... ]
  */
 const fetchPackageVersions = async ({ id }) => {
   if (!id) throw Error("kwarg id must be defined");

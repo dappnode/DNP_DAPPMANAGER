@@ -9,14 +9,11 @@ const params = require("params");
  * - Newest log has index = 0
  * - If the param fromLog is out of bounds, the result will be an empty array: []
  *
- * @param {Object} kwargs: {
- *   fromLog,
- *   numLogs
- * }
- * @return {Object} A formated success message.
- * result: stringified userActionLog JSON objects appended on new lines
- *
- * @param {object} userActionLog = {
+ * @param {number} fromLog, default value = 0
+ * @param {number} numLogs, default value = 50
+ * @returns {string} logs, stringified userActionLog JSON objects appended on new lines
+ * To parse, by newline and then parse each line individually.
+ * userActionLog = {
  *   level: "info" | "error", {string}
  *   event: "installPackage.dnp.dappnode.eth", {string}
  *   message: "Successfully install DNP", {string} Returned message from the call function
@@ -42,8 +39,12 @@ const getUserActionLogs = async ({ fromLog = 0, numLogs = 50 }) => {
     encoding: "utf8"
   });
 
-  // The userActionLogs file can grow a lot. Only a part of it will be returned
-  // The user can specify which part of the file wants
+  /**
+   * The userActionLogs file can grow a lot. Only a part of it will be returned
+   * The client can specify which part of the file wants
+   * - reverse the array so the 0 index corresponds to the latest log
+   * - do not parse the logs to save resources
+   */
   const userActionLogsSelected = (userActionLogs || "")
     .split(/\r?\n/)
     .reverse()

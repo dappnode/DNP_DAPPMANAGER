@@ -7,7 +7,7 @@
 
 /**
  *
- * @param {Object} manifest = {
+ * @param {object} manifest = {
  *   name: "kovan.dnp.dappnode.eth",
  *   image: {
  *     volumes: [
@@ -17,7 +17,7 @@
  *   }
  *   ...
  * }
- * @param {Object} userSetVols = {
+ * @param {object} userSetVols = {
  *   "kovan.dnp.dappnode.eth": {
  *     "old_path:/root/.local": "new_path:/root/.local"
  *   },
@@ -25,7 +25,7 @@
  *     "/dev:/root/.data": "/hd/dev:/root/.data"
  *   }
  * }
- * @return {Object} edited or original manifest
+ * @returns {object} edited or original manifest
  */
 function mergeManifestVols(manifest, userSetVols) {
   const name = (manifest || {}).name;
@@ -51,7 +51,7 @@ function mergeManifestVols(manifest, userSetVols) {
 
 /**
  *
- * @param {Object} manifest = {
+ * @param {object} manifest = {
  *   name: "kovan.dnp.dappnode.eth",
  *   image: {
  *     ports: [
@@ -63,7 +63,7 @@ function mergeManifestVols(manifest, userSetVols) {
  *   }
  *   ...
  * }
- * @param {Object} userSetPorts = {
+ * @param {object} userSetPorts = {
  *   "kovan.dnp.dappnode.eth": {
  *     "30303": "31313:30303",
  *     "30303/udp": "31313:30303/udp"
@@ -72,7 +72,7 @@ function mergeManifestVols(manifest, userSetVols) {
  *     "5001:5001": "5001"
  *   }
  * }
- * @return {Object} edited or original manifest
+ * @returns {object} edited or original manifest
  */
 function mergeManifestPorts(manifest, userSetPorts) {
   const name = (manifest || {}).name;
@@ -101,7 +101,7 @@ function mergeManifestPorts(manifest, userSetPorts) {
  * @param {...Object} envObj, list of envObjs ordered by priority
  * mergeEnvs(envsLessPriotiry, envsMorePriority)
  * envObj = { ENV_NAME: "ENV_VALUE" }
- * @returns {Object} envs = { ENV_NAME: "ENV_VALUE" }
+ * @returns {object} envs = { ENV_NAME: "ENV_VALUE" }
  */
 function mergeEnvs(...envObjs) {
   const envNames = Object.keys(Object.assign({}, ...envObjs));

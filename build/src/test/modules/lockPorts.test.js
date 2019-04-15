@@ -67,7 +67,7 @@ describe("Module: lockPorts", function() {
     },
     {
       name: corePkg.name,
-      isCORE: true,
+      isCore: true,
       ports: getListContainerPorts(corePkg.manifest.image.ports)
     }
   ];

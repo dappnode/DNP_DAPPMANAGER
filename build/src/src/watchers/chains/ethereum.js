@@ -4,17 +4,17 @@ const MIN_BLOCK_DIFF_SYNC = 60;
 
 /**
  * Returns a chain data object for an [ethereum] API
- * @param {String} name = "Mainnet"
- * @param {String} api = "http://my.ethchain.dnp.dappnode.eth:8545"
- * @returns {Object}
+ * @param {string} name = "Mainnet"
+ * @param {string} api = "http://my.ethchain.dnp.dappnode.eth:8545"
+ * @returns {object}
  * - On success: {
- *   syncing: true, {Bool}
- *   message: "Blocks synced: 543000 / 654000", {String}
+ *   syncing: true, {bool}
+ *   message: "Blocks synced: 543000 / 654000", {string}
  *   progress: 0.83027522935,
  * }
  * - On error: {
- *   message: "Could not connect to RPC", {String}
- *   error: true {Bool},
+ *   message: "Could not connect to RPC", {string}
+ *   error: true {bool},
  * }
  */
 async function ethereum({ name, api }) {

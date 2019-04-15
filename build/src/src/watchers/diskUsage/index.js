@@ -7,13 +7,13 @@ const thresholds = [
   {
     id: "dangerous level of 5 GB",
     kb: 5 * 1e6, // ~ 5 GB
-    filter: dnp => dnp.isDNP
+    filter: dnp => dnp.isDnp
   },
   {
     id: "critical level of 1 GB",
     kb: 1 * 1e6, // ~ 1 GB
     filter: dnp =>
-      dnp.isDNP ||
+      dnp.isDnp ||
       dnp.name === "ethchain.dnp.dappnode.eth" ||
       dnp.name === "ipfs.dnp.dappnode.eth"
   }
@@ -27,7 +27,7 @@ const thresholdIsActive = {};
  * If disk usage reaches a critical level (< 1GB)
  * it will stop all non cores + etchain + ipfs
  *
- * @return {*}
+ * @returns {*}
  */
 async function monitorDiskUsage() {
   try {

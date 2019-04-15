@@ -131,8 +131,8 @@ const docker = {
 
 /**
  * Wrapper for parseOptions. Will only extend the command string if necessary
- * @param {String} command
- * @param {Object} options
+ * @param {string} command
+ * @param {object} options
  */
 function withOptions(command, options = {}) {
   return [command, parseOptions(options)].filter(x => x).join(" ");

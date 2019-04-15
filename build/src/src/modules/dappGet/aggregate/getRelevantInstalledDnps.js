@@ -1,13 +1,13 @@
 const intersect = require("../utils/intersect");
 
 /**
- * @param {Array} requestedDnps = [
+ * @param {array} requestedDnps = [
  *   'nginx-proxy.dnp.dappnode.eth',
  *   'otpweb.dnp.dappnode.eth',
  *   'kovan.dnp.dappnode.eth'
  * ]
  *
- * @param {Array} installedDnps = [
+ * @param {array} installedDnps = [
  *    {
  *      version: '0.0.3',
  *      origin: '/ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34',
@@ -16,7 +16,7 @@ const intersect = require("../utils/intersect");
  *    },
  *    ...
  *  ]
- * @returns {Array}
+ * @returns {array}
  */
 
 function getRelevantInstalledDnps({ requestedDnps, installedDnps }) {

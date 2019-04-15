@@ -29,7 +29,9 @@ describe("Call function: fetchDirectory", function() {
     it("should return success message and the directory data", async () => {
       sinon.replace(dockerList, "listContainers", sinon.fake.returns(["pkgA"]));
       const getDirectory = sinon.stub();
-      getDirectory.resolves([{ name: "pkgA" }]);
+      getDirectory.resolves([
+        { name: "pkgA", status: "preparing", directoryId: 1 }
+      ]);
       const getManifest = sinon.stub();
       getManifest.resolves(manifest);
       const fetchDirectory = proxyquire("calls/fetchDirectory", {
@@ -47,7 +49,9 @@ describe("Call function: fetchDirectory", function() {
         {
           avatar: undefined,
           manifest: manifest,
-          name: "pkgA"
+          name: "pkgA",
+          status: "preparing",
+          directoryId: 1
         }
       ]);
     });

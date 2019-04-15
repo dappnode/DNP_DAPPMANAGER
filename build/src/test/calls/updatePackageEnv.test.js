@@ -27,8 +27,13 @@ describe("Call function: updatePackageEnv", function() {
   const dockerComposePath = getPath.dockerComposeSmart(packageName, params);
   const envFilePath = getPath.envFileSmart(packageName, params);
 
+  const dockerList = {
+    listContainers: sinon.stub().resolves([{ name: packageName }])
+  };
+
   const updatePackageEnv = proxyquire("calls/updatePackageEnv", {
     "modules/docker": docker,
+    "modules/dockerList": dockerList,
     params: params
   });
 

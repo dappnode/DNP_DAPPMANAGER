@@ -9,7 +9,7 @@ const PNG = require("pngjs").PNG;
  * @param {Buffer} inputBuffer source image buffer
  * @param {Int} _width target width
  * @param {Int} _height target heigth
- * @return {Buffer} png buffer with the target dimensions
+ * @returns {Buffer} png buffer with the target dimensions
  */
 function downsizePng(inputBuffer, _width, _height) {
   const inputPng = PNG.sync.read(inputBuffer);
@@ -35,7 +35,7 @@ function downsizePng(inputBuffer, _width, _height) {
  * @param {Buffer} data source pixel buffer array
  * @param {Int} _width target width
  * @param {Int} _height target heigth
- * @return {Buffer} pixel buffer array with the target dimensions
+ * @returns {Buffer} pixel buffer array with the target dimensions
  */
 function downSizeAlgorithm(width, height, data, _width, _height) {
   const wr = _width / width;

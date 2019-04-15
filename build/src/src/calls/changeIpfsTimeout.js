@@ -2,10 +2,9 @@ const params = require("../params");
 
 /**
  * Used to test different IPFS timeout parameters live from the ADMIN UI.
- *
- * @return {Object}
+ * @param {(string|number)} timeout new IPFS timeout in ms
  */
-const getStats = async ({ timeout }) => {
+const changeIpfsTimeout = async ({ timeout }) => {
   if (!timeout) throw Error("kwarg timeout must be defined");
 
   params.IPFS_TIMEOUT = timeout;
@@ -17,4 +16,4 @@ const getStats = async ({ timeout }) => {
   };
 };
 
-module.exports = getStats;
+module.exports = changeIpfsTimeout;
