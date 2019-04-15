@@ -10,11 +10,13 @@ const isIpfsHash = require("utils/isIpfsHash");
 let packagesCache;
 let avatarCache = {};
 
+/**
+ * Emits a DNP object to the UI for a progressive update response.
+ * The first argument of `emitDirectory` must be an array of DNP objects
+ * @param {object} pkg
+ */
 function emitPkg(pkg) {
-  const pkgsObj = {
-    [pkg.name]: pkg
-  };
-  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
+  eventBus.emit(eventBusTag.emitDirectory, [pkg]);
 }
 
 /**

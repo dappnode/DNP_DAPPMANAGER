@@ -15,12 +15,12 @@ const { eventBus, eventBusTag } = require("eventBus");
 
 const notificationsTest = async ({ notification }) => {
   if (!notification) {
-    const randomName = `notification-${String(Math.random()).slice(2)}`;
+    const id = String(Math.random()).slice(2);
     notification = {
-      id: randomName,
+      id,
       type: randomType(),
-      title: randomName,
-      body: randomSentence()
+      title: randomSentence(3),
+      body: randomSentence(20)
     };
   }
   eventBus.emit(eventBusTag.pushNotification, notification);
@@ -34,7 +34,7 @@ const notificationsTest = async ({ notification }) => {
 
 // Utils
 
-function randomSentence() {
+function randomSentence(numOfWords) {
   const words = [
     "successful",
     "science",
@@ -58,7 +58,7 @@ function randomSentence() {
     "waiting"
   ];
   let sentence = "";
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < numOfWords; i++) {
     sentence += words[Math.floor(Math.random() * words.length)] + " ";
   }
   return sentence;

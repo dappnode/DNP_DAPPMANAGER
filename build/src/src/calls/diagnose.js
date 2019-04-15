@@ -8,9 +8,8 @@ const shellExec = require("utils/shell");
  *   "dockerVersion": {
  *     name: "docker version",
  *     result: "Docker version 18.06.1-ce, build e68fc7a"
- *       <or>
  *     error: "sh: docker: not found"
- *   }
+ *   } // either "result" or "error" prop will exist
  * }
  */
 const diagnose = async () => {
@@ -28,10 +27,7 @@ const diagnose = async () => {
 
   return {
     message: `Diagnose of this DAppNode server`,
-    result: {
-      dockerVersion,
-      dockerComposeVersion
-    }
+    result: [dockerVersion, dockerComposeVersion]
   };
 };
 
