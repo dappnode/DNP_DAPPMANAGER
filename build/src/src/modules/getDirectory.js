@@ -35,10 +35,11 @@ async function getDirectory() {
   let packages = [];
   for (let i = 0; i < numberOfDAppNodePackages; i++) {
     try {
-      const pkg = await directory.methods.getPackage(i).call();
+      const { name, status } = await directory.methods.getPackage(i).call();
       packages.push({
-        name: pkg.name,
-        status: DAppNodePackageStatus[pkg.status]
+        name,
+        status: DAppNodePackageStatus[status],
+        directoryId: i
       });
     } catch (e) {
       logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
