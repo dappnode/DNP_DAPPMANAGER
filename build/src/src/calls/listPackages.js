@@ -87,10 +87,14 @@ const listPackages = async () => {
       const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
       if (fs.existsSync(manifestPath)) {
         const manifestFileData = fs.readFileSync(manifestPath, "utf8");
-        dnp.manifest = JSON.parse(manifestFileData);
+        try {
+          dnp.manifest = JSON.parse(manifestFileData);
+        } catch (e) {
+          // Silence parsing errors
+        }
       }
     } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.stack}`);
+      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
     }
   });
 
