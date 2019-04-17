@@ -48,6 +48,11 @@ async function getManifest({ name, ver, version }) {
   // Verify the manifest
   validateManifest(manifest);
   // Verify that the request was correct: hash mismatch
+  // Except if the id is = "/ipfs/Qm...", there is no provided name
+  if (isIpfsHash(name)) {
+    ver = name;
+    name = manifest.name;
+  }
   if (name !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
   // Correct manifest: type missing
@@ -55,7 +60,9 @@ async function getManifest({ name, ver, version }) {
 
   return {
     ...manifest,
-    origin: isSemverRange(ver) ? null : ver
+    // origin is critical for dappGet/aggregate on IPFS DNPs
+    // used in packages.download > generate.dockerCompose
+    origin: isSemverRange(ver) ? null : ver || name
   };
 }
 
@@ -82,6 +89,14 @@ async function fetchManifestHash({ name, ver }) {
    */
   if (isEnsDomain(name) && isIpfsHash(ver)) {
     return ver;
+  }
+
+  /**
+   * 3. When requesting IPFS hashes for the first time, their name is unknown
+   *    name = IPFS hash, ver = null
+   */
+  if (isIpfsHash(name)) {
+    return name;
   }
 
   /**

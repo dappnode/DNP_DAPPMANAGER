@@ -26,7 +26,7 @@ async function download({ pkg, id }) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
-  const { name, version, isCore, origin } = manifest;
+  const { name, isCore } = manifest;
   const imageName = manifest.image.path;
   const imageHash = manifest.image.hash;
   const imageSize = manifest.image.size;
@@ -38,7 +38,7 @@ async function download({ pkg, id }) {
   );
   await writeFile(
     validate.path(getPath.dockerCompose(name, params, isCore)),
-    generate.dockerCompose(manifest, params, isCore, origin)
+    generate.dockerCompose(manifest, params)
   );
 
   logUi({ id, name, message: "Starting download..." });
@@ -64,14 +64,6 @@ async function download({ pkg, id }) {
 
   logUi({ id, name, message: "Loading image..." });
   await docker.load(imagePath);
-
-  // For IPFS downloads, retag image
-  // 0.1.11 => 0.1.11-ipfs-QmSaHiGWDStTZg6G3YQi5herfaNYoonPihjFzCcQoJy8Wc
-  if (origin) {
-    const fromTag = name + ":" + version;
-    const toTag = name + ":" + origin;
-    await docker.tag(fromTag, toTag);
-  }
 
   logUi({ id, name, message: "Cleaning files..." });
   await removeFile(imagePath);

@@ -38,7 +38,7 @@ async function downloadAvatar(hash) {
     e.message = `Can't download avatar: ${e.message}`;
     throw e;
   }
-  const avatar = formatAndCompressAvatar(avatarBuffer);
+  const avatar = await formatAndCompressAvatar(avatarBuffer);
 
   /**
    * 3. Validate downloaded image

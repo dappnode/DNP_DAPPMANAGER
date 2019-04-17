@@ -68,6 +68,7 @@ function format(c) {
   const fromLabels = {};
   if (c.Labels && typeof c.Labels === "object") {
     if (c.Labels["dappnode.dnp.origin"]) {
+      // Critical for dappGet/aggregate on IPFS DNPs
       fromLabels.origin = c.Labels["dappnode.dnp.origin"];
     }
 

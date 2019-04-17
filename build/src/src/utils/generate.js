@@ -6,7 +6,7 @@ const yaml = require("js-yaml");
  * - manifest
  */
 
-function dockerCompose(manifest, params, _, origin = false) {
+function dockerCompose(manifest, params) {
   // Define docker compose parameters
   const DNS_SERVICE = params.DNS_SERVICE;
   const DNP_NETWORK = params.DNP_NETWORK;
@@ -31,7 +31,7 @@ function dockerCompose(manifest, params, _, origin = false) {
   }
 
   // Image name
-  service.image = manifest.name + ":" + (origin ? origin : manifest.version);
+  service.image = manifest.name + ":" + manifest.version;
   if (manifest.image.restart) {
     service.restart = manifest.image.restart;
   }
@@ -102,6 +102,7 @@ function dockerCompose(manifest, params, _, origin = false) {
   }
   // Adding the origin of the package as a label to be used in the resolve
   // This is important to recognize if this package comes from IPFS or ENS
+  // origin is critical for dappGet/aggregate on IPFS DNPs
   if (manifest.origin) {
     service.labels = {
       ...(service.labels || {}),

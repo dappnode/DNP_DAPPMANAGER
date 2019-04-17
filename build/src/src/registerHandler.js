@@ -60,6 +60,11 @@ const wrapErrors = (handler, event) =>
          */
         logs.warn(`Could not connect to ethchain node, on ${event}: ${msg}`);
         logUserAction.log({ level: "error", event, ...error2obj(e), kwargs });
+      } else if (kwargs.dontLogError) {
+        /**
+         * 3. Special feature so the UI can suppress noisy errors on recurring calls
+         *    This is necessary for the fetchPackageData while the user is typing a name
+         */
       } else {
         /**
          * 0. Else
