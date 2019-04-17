@@ -39,6 +39,7 @@ async function aggregateDependencies({
   const versions = await fetch
     .versions({ name, versionRange })
     .then(sanitizeVersions);
+
   await Promise.all(
     versions.map(async version => {
       // Already checked, skip. Otherwise lock request to prevent duplicate fetches

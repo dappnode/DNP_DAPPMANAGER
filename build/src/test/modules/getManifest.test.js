@@ -6,32 +6,38 @@ const sinon = require("sinon");
 chai.should();
 
 describe("Get manifest", function() {
-  // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params)
+  // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(name, params)
 
-  const PACKAGE_NAME = "test.dnp.dappnode.eth";
+  const name = "test.dnp.dappnode.eth";
+  const sampleHash = "/ipfs/QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD";
   const packageReq = {
-    name: PACKAGE_NAME,
+    name: name,
     ver: "latest"
   };
-  const dnpHash = "dnpHash";
-  const manifest = '{"image":{"hash":"/ipfs/Qm"},"type":"service"}';
+  const manifest = {
+    name,
+    version: "0.1.8",
+    type: "service",
+    image: {
+      hash: sampleHash
+    }
+  };
+
   const apmGetRepoHashSpy = sinon.spy();
   const apm = {
     getRepoHash: async packageReq => {
       apmGetRepoHashSpy(packageReq);
-      return dnpHash;
+      return sampleHash;
     }
   };
-  const ipfsCatSpy = sinon.spy();
-  const ipfs = {
-    cat: async dnpHash => {
-      ipfsCatSpy(dnpHash);
-      return manifest;
-    }
+  const downloadManifestSpy = sinon.spy();
+  const downloadManifest = async _hash => {
+    downloadManifestSpy(_hash);
+    return manifest;
   };
 
   const getManifest = proxyquire("modules/getManifest", {
-    "modules/ipfs": ipfs,
+    "modules/downloadManifest": downloadManifest,
     "modules/apm": apm
   });
 
@@ -40,19 +46,10 @@ describe("Get manifest", function() {
     res = await getManifest(packageReq);
   });
 
-  it("should call apm.getRepoHash with packageReq", () => {
-    expect(apmGetRepoHashSpy.getCalls()[0].args).to.deep.equal([packageReq]);
-  });
-
-  it("should call ipfs.cat with dnpHash", () => {
-    expect(ipfsCatSpy.getCalls()[0].args).to.deep.equal([dnpHash]);
-  });
-
   it("should return a parsed manifest", () => {
     expect(res).to.deep.equal({
-      fromIpfs: undefined,
-      image: { hash: "/ipfs/Qm" },
-      type: "service"
+      origin: null,
+      ...manifest
     });
   });
 });

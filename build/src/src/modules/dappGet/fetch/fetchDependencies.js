@@ -1,4 +1,4 @@
-const getManifest = require("modules/getManifest2");
+const getManifest = require("modules/getManifest");
 
 /**
  * Fetches the dependencies of a given DNP name and version

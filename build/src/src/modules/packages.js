@@ -7,7 +7,7 @@ const restartPatch = require("modules/restartPatch");
 const logUi = require("utils/logUi");
 const params = require("params");
 const docker = require("modules/docker");
-const ipfs = require("modules/ipfs");
+const downloadImage = require("modules/downloadImage");
 const semver = require("semver");
 
 // Promisify fs methods
@@ -26,7 +26,7 @@ async function download({ pkg, id }) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
-  const { name, version, isCore, fromIpfs } = manifest;
+  const { name, version, isCore, origin } = manifest;
   const imageName = manifest.image.path;
   const imageHash = manifest.image.hash;
   const imageSize = manifest.image.size;
@@ -38,40 +38,38 @@ async function download({ pkg, id }) {
   );
   await writeFile(
     validate.path(getPath.dockerCompose(name, params, isCore)),
-    generate.dockerCompose(manifest, params, isCore, fromIpfs)
+    generate.dockerCompose(manifest, params, isCore, origin)
   );
-
-  // Define the logging function
-  const log = percent => {
-    if (percent > 99) percent = 99;
-    logUi({ id, name, message: `Downloading ${percent}%` });
-  };
-  // Define the rounding function to not spam updates
-  const displayRes = 2;
-  const round = x => displayRes * Math.ceil((100 * x) / imageSize / displayRes);
-  // Keep track of the bytes downloaded
-  let bytes = 0;
-  let prev = 0;
-  const logChunk = chunk => {
-    if (round((bytes += chunk.length)) > prev) {
-      log((prev = round(bytes)));
-    }
-  };
 
   logUi({ id, name, message: "Starting download..." });
   const imagePath = validate.path(
     getPath.image(name, imageName, params, isCore)
   );
-  await ipfs.download(imageHash, imagePath, logChunk);
+  // Keep track of the bytes downloaded. Log UI every 2%
+  const onChunk = onChunkFactory(imageSize, 2, function(percent, bytes) {
+    const message =
+      percent > 100
+        ? `Downloading (${bytes} / ${imageSize} expected bytes) 100%`
+        : `Downloading ${percent}%`;
+    logUi({ id, name, message });
+  });
+
+  // Wrap in try / catch to format the error
+  try {
+    await downloadImage(imageHash, imagePath, { onChunk });
+  } catch (e) {
+    e.message = `Can't download ${name} image: ${e.message}`;
+    throw e;
+  }
 
   logUi({ id, name, message: "Loading image..." });
   await docker.load(imagePath);
 
   // For IPFS downloads, retag image
   // 0.1.11 => 0.1.11-ipfs-QmSaHiGWDStTZg6G3YQi5herfaNYoonPihjFzCcQoJy8Wc
-  if (fromIpfs) {
+  if (origin) {
     const fromTag = name + ":" + version;
-    const toTag = name + ":" + fromIpfs;
+    const toTag = name + ":" + origin;
     await docker.tag(fromTag, toTag);
   }
 
@@ -119,6 +117,28 @@ async function run({ pkg, id }) {
 
   // Final log
   logUi({ id, name, message: "package started" });
+}
+
+// Utilities
+
+/**
+ * Utility to abstract the chunk progress tracking
+ * @param {number} totalAmount Total amount to compute the ratio against
+ * @param {number} resolution callback is called every ${resolution} %
+ * @param {function} callback function(percent, currentAmount) {}
+ */
+function onChunkFactory(totalAmount, resolution, callback) {
+  let currentAmount = 0;
+  let prevPercent = 0;
+  return function(chunk) {
+    currentAmount += chunk.length;
+    const ratio = currentAmount / totalAmount;
+    const percent = resolution * Math.ceil((100 * ratio) / resolution);
+    if (percent > prevPercent) {
+      prevPercent = percent;
+      callback(percent, currentAmount);
+    }
+  };
 }
 
 module.exports = {

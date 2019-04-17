@@ -23,19 +23,27 @@ const db = low(adapter);
 
 const get = async key => {
   if (key) {
-    return db.get(key).value();
+    return db.get(formatKey(key)).value();
   } else {
     return Object.assign({}, db.getState());
   }
 };
 
 const set = async (key, value) => {
-  return db.set(key, value).write();
+  return db.set(formatKey(key), value).write();
 };
 
 const remove = async key => {
-  return db.unset(key).write();
+  return db.unset(formatKey(key)).write();
 };
+
+// Format keys to make sure they are consistent
+function formatKey(key) {
+  // Check if key exist before calling String.prototype
+  if (!key) return key;
+  if (key.includes("ipfs/")) return key.split("ipfs/")[1];
+  return key;
+}
 
 module.exports = {
   set,

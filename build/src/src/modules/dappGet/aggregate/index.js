@@ -125,6 +125,10 @@ async function aggregate({ req, dnpList, fetch }) {
   // Validate aggregated dnps
   // - dnps must contain at least one version of the requested package
   if (!Object.keys((dnps[req.name] || {}).versions || {}).length) {
+    logs.error(
+      `Faulty dnps object for ${req.name}@${req.ver}: ` +
+        JSON.stringify(dnps, null, 2)
+    );
     throw Error(
       `Aggregated dnps must contain at least one version of the requested DNP ${
         req.name

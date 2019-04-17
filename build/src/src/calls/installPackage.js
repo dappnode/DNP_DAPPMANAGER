@@ -91,8 +91,8 @@ const installPackage = async ({
   logUi({ id, name: req.name, message: "Resolving dependencies..." });
   const { state, alreadyUpdated } = await dappGet(req, options);
 
-  logs.debug(
-    `Resolved request ${req.name}@${req.ver}:\n ${JSON.stringify(state)}`
+  logs.info(
+    `Resolved request ${id} ver ${req.ver}:\n ${JSON.stringify(state, null, 2)}`
   );
 
   // 3. Format the request and filter out already updated packages
@@ -170,7 +170,7 @@ const installPackage = async ({
 
     // 6. Run requested packages
     await packages.run({ pkg, id });
-    logs.debug(`Started (docker-compose up) DNP ${pkg.name}`);
+    logs.info(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports
     // 7A. Mapped ports: mappedPortsToOpen = [ {number: '30303', type: 'TCP'}, ... ]

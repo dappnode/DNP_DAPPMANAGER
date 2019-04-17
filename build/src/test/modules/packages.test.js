@@ -29,17 +29,9 @@ describe("Util: package install / download", () => {
   };
 
   // ipfs .download, .isfileHashValid
-  const ipfsDownloadSpy = sinon.spy();
-  const ipfsIsfileHashValidSpy = sinon.spy();
-  let ipfsIsfileHashValidRETURN = false;
-  const ipfs = {
-    download: async (hash, path) => {
-      ipfsDownloadSpy(hash, path);
-    },
-    isfileHashValid: async (hash, path) => {
-      ipfsIsfileHashValidSpy(hash, path);
-      return ipfsIsfileHashValidRETURN;
-    }
+  const downloadImageSpy = sinon.spy();
+  const downloadImage = async (hash, path) => {
+    downloadImageSpy(hash, path);
   };
 
   // generate .DockerCompose .Manifest
@@ -93,7 +85,7 @@ describe("Util: package install / download", () => {
   };
 
   const { download, run } = proxyquire("modules/packages", {
-    "modules/ipfs": ipfs,
+    "modules/downloadImage": downloadImage,
     "modules/docker": docker,
     "utils/generate": generate,
     "utils/validate": validate,
@@ -136,9 +128,9 @@ describe("Util: package install / download", () => {
       ]);
     });
 
-    // ipfsDownloadSpy - IMAGE_HASH, IMAGE_PATH
+    // downloadImageSpy - IMAGE_HASH, IMAGE_PATH
     it("ipfs.download should be called with IMAGE_HASH, IMAGE_PATH", () => {
-      sinon.assert.calledWith(ipfsDownloadSpy, IMAGE_HASH, IMAGE_PATH);
+      sinon.assert.calledWith(downloadImageSpy, IMAGE_HASH, IMAGE_PATH);
     });
 
     it("docker.load should be called with IMAGE_PATH", () => {
