@@ -5,26 +5,26 @@
 ### Setup
 
 ```javascript
-const ipfs = import 'modules/ipfs'
+const ipfs = require("modules/ipfs");
 ```
 
 ### Cat
 
 ```javascript
-const HASH = 'QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT'
-const fileData = await ipfs.cat(HASH)
+const HASH = "QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT";
+const fileData = await ipfs.cat(HASH);
 ```
 
 ### Download
 
 ```javascript
-const HASH = 'QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT'
-const PATH = './local/path/file.ext'
+const HASH = "QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYPbKT";
+const PATH = "./local/path/file.ext";
 function logChunks(chunk) {
-    // Called on every chunk received. It's used to show the download progress.
-    // See an implementation in packages.js (download function)
+  // Called on every chunk received. It's used to show the download progress.
+  // See an implementation in packages.js (download function)
 }
-await ipfs.download(HASH, PATH, logChunks)
+await ipfs.download(HASH, PATH, logChunks);
 ```
 
 ## Implementation

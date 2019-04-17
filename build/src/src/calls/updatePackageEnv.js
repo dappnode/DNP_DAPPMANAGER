@@ -2,7 +2,7 @@ const fs = require("fs");
 const { eventBus, eventBusTag } = require("eventBus");
 const params = require("params");
 // Modules
-const ipfs = require("modules/ipfs");
+const downloadManifest = require("modules/downloadManifest");
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
 // Utils
@@ -28,7 +28,7 @@ const updatePackageEnv = async ({ id, envs, restart }) => {
   id = parse.packageReq(id).name; // parsing anyway for safety
   if ((id || "").startsWith("/ipfs/")) {
     try {
-      const manifest = JSON.parse(await ipfs.cat(id));
+      const manifest = await downloadManifest(id); // ##### TODO: WTF is this?
       id = manifest.name;
     } catch (e) {
       throw Error(

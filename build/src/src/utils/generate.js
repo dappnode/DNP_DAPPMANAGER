@@ -6,7 +6,7 @@ const yaml = require("js-yaml");
  * - manifest
  */
 
-function dockerCompose(manifest, params, _, fromIpfs = false) {
+function dockerCompose(manifest, params, _, origin = false) {
   // Define docker compose parameters
   const DNS_SERVICE = params.DNS_SERVICE;
   const DNP_NETWORK = params.DNP_NETWORK;
@@ -31,8 +31,7 @@ function dockerCompose(manifest, params, _, fromIpfs = false) {
   }
 
   // Image name
-  service.image =
-    manifest.name + ":" + (fromIpfs ? fromIpfs : manifest.version);
+  service.image = manifest.name + ":" + (origin ? origin : manifest.version);
   if (manifest.image.restart) {
     service.restart = manifest.image.restart;
   }

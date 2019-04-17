@@ -1,5 +1,8 @@
 const resizeImg = require("./resizeImg");
 const imageminPngquant = require("imagemin-pngquant");
+const logs = require("logs.js")(module);
+
+const outputResolution = 200;
 
 /**
  * Fetching DAppNode's directory can be slow. The highest payload are the packages' avatars
@@ -26,17 +29,28 @@ const imageminPngquant = require("imagemin-pngquant");
 /**
  * Resizes and compresses an image to a specific size. Returns square png
  *
- * @param {Buffer} inputDataOrFile Can be a Buffer or path to the image
- * @param {Integer} outPutResolution The image is forced to be a square of
- *                                   outPutResolution x outPutResolution px
+ * @param {Buffer} inputBuffer Can be a Buffer or path to the image
+ * @param {Integer} outputResolution The image is forced to be a square of
+ *                                   outputResolution x outputResolution px
  * @returns {string} base64 representation of the image
  */
-async function compressAvatar(inputDataOrFile, outPutResolution) {
-  const resizedImgBuffer = await resizeImg(inputDataOrFile, outPutResolution);
-  const compressedImgBuffer = await imageminPngquant({
-    quality: "0-95"
-  })(resizedImgBuffer);
-  return compressedImgBuffer.toString("base64");
+async function formatAndCompressAvatar(inputBuffer) {
+  let compressedImgBuffer;
+  try {
+    const resizedImgBuffer = await resizeImg(inputBuffer, outputResolution);
+    compressedImgBuffer = await imageminPngquant({
+      quality: "0-95"
+    })(resizedImgBuffer);
+  } catch (e) {
+    logs.warn(`Error compressing avatar: ${e.stack}`);
+  }
+
+  const outputBuffer =
+    compressedImgBuffer && compressedImgBuffer.length < inputBuffer.length
+      ? compressedImgBuffer
+      : inputBuffer;
+
+  return "data:image/png;base64," + outputBuffer.toString("base64");
 }
 
-module.exports = compressAvatar;
+module.exports = formatAndCompressAvatar;
