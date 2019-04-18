@@ -34,9 +34,19 @@ function stringIncludes(s1, s2) {
   return s1.toLowerCase().includes(s2.toLowerCase());
 }
 
+/**
+ * Strips any number of trailing slashs "/"
+ * @param {string} s
+ */
+function stripTrailingSlash(s) {
+  if (!s || typeof s !== "string") return s;
+  return s.replace(/^(.+?)\/*?$/, "$1");
+}
+
 module.exports = {
   capitalize,
   shortName,
   shortNameCapitalized,
-  stringIncludes
+  stringIncludes,
+  stripTrailingSlash
 };
