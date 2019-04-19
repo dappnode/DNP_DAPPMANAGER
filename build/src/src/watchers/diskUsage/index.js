@@ -59,7 +59,7 @@ async function monitorDiskUsage() {
          */
 
         // If packages have already been stopped, skip
-        if (thresholdIsActive[threshold.id]) return;
+        if (thresholdIsActive[threshold.id]) continue;
         else thresholdIsActive[threshold.id] = true;
 
         // Log that the threshold has been triggered
