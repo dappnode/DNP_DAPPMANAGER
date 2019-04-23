@@ -1,5 +1,9 @@
+const os = require("os");
 const shellExec = require("utils/shell");
 const logs = require("logs.js")(module);
+
+// Cache static values
+const numCores = os.cpus().length;
 
 /**
  * Returns the current disk space available of a requested path
@@ -12,10 +16,7 @@ const logs = require("logs.js")(module);
  */
 const getStats = async () => {
   const cpuUsedPercent = await wrapErrors(async () => {
-    const cpuRatioRaw = await shellExec(
-      `grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'`
-    );
-    return isNaN(cpuRatioRaw) ? null : `${parseInt(cpuRatioRaw)}%`;
+    return getDiskPercent();
   }, "cpuUsedPercent");
 
   const memUsedPercent = await wrapErrors(async () => {
@@ -40,6 +41,19 @@ const getStats = async () => {
 };
 
 // Utils
+
+/**
+ * Uses nodejs native os.loadavg, which returns three factors
+ * [0.124352, 0.16262, 0.32514]
+ * [1 min, 5 min, 15 min] averages
+ * This util takes only the 1min and limits it to 100%
+ * @returns {string} cpu usage percent "36%"
+ */
+function getDiskPercent() {
+  let cpuFraction = os.loadavg()[0] / numCores;
+  if (cpuFraction > 1) cpuFraction = 1;
+  return Math.round(cpuFraction * 100) + "%";
+}
 
 /**
  * Wraps the shell calls to return null in case of error
