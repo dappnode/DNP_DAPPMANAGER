@@ -126,7 +126,11 @@ const docker = {
     `docker cp --follow-link ${id}:${fromPath} ${toPath}`,
 
   copyFileTo: (id, fromPath, toPath) =>
-    `docker cp --follow-link ${fromPath} ${id}:${toPath}`
+    `docker cp --follow-link ${fromPath} ${id}:${toPath}`,
+
+  // Metadata getters
+  getContainerWorkingDir: id =>
+    `docker inspect --format='{{json .Config.WorkingDir}}' ${id}`
 };
 
 /**

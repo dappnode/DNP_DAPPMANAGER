@@ -1,4 +1,5 @@
 const params = require("params");
+const path = require("path");
 // Modules
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
@@ -6,7 +7,7 @@ const dockerList = require("modules/dockerList");
 const shell = require("utils/shell");
 const dataUriToFile = require("utils/dataUriToFile");
 
-const tempDir = `${params.DNCORE_DIR}/.temp-transfer/`;
+const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
  * Copy file to a DNP:
@@ -23,12 +24,14 @@ const tempDir = `${params.DNCORE_DIR}/.temp-transfer/`;
  * - If path = relative path: "config.json".
  *   Path becomes $WORKDIR/config.json, then copies the contents of dataUri there
  *   Same for relative paths to directories.
+ * - If empty, defaults to $WORKDIR
  */
 const copyFileTo = async ({ id, dataUri, filename, toPath }) => {
   if (!id) throw Error("Argument id must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");
-  if (!toPath) throw Error("Argument toPath must be defined");
+  // toPath is allowed to be empty, it will default to WORKDIR
+  // if (!toPath) throw Error("Argument toPath must be defined");
   if (filename.includes("/"))
     throw Error(`filename must not be a path: ${filename}`);
 
@@ -38,9 +41,18 @@ const copyFileTo = async ({ id, dataUri, filename, toPath }) => {
   if (!dnp) throw Error(`No DNP found for id ${id}`);
   const containerName = dnp.packageName;
 
+  // Construct relative paths to container
+  // Fetch the WORKDIR from a docker inspect
+  if (!toPath || !path.isAbsolute(toPath)) {
+    // workingDir = "/usr/src/app" (Must clean the double quotes)
+    let workingDir = await docker.getContainerWorkingDir(containerName);
+    workingDir = (workingDir || "/").replace(/['"]+/g, "");
+    toPath = path.join(workingDir, toPath);
+  }
+
   // Intermediate step, the file is in local file system
-  await shell(`mkdir -p ${tempDir}`); // Never throws
-  const fromPath = `${tempDir}/${filename}`;
+  await shell(`mkdir -p ${tempTransferDir}`); // Never throws
+  const fromPath = path.join(tempTransferDir, filename);
   await shell(`rm -rf ${fromPath}`); // Just to be sure it's clean
 
   /**
