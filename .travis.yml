@@ -5,9 +5,9 @@ sudo: required
 stages:
   - name: test
   - name: build-test
-    if: tag != "release"
+    if: tag =~ /^(?!release\/).*/
   - name: release
-    if: tag = "release"
+    if: tag =~ /^release\/(major|minor|patch)$/
 
 jobs:
   include:
@@ -85,7 +85,7 @@ jobs:
         on:
           branch: master
           tags: true
-          condition: "$TRAVIS_TAG =~ ^release*$"
+          condition: "$TRAVIS_TAG = release || $TRAVIS_TAG = release/patch || $TRAVIS_TAG = release/minor || $TRAVIS_TAG = release/major"
       after_deploy:
-        - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
-        - source after_deploy.sh
+        # - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
+        # - source after_deploy.sh
