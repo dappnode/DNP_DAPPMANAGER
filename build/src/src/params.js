@@ -11,6 +11,7 @@ module.exports = {
   CACHE_DIR: "./cache/",
   REPO_DIR: "./dnp_repo/",
   DNCORE_DIR: "DNCORE",
+  TEMP_TRANSFER_DIR: "DNCORE/.temp-transfer",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
