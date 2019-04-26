@@ -24,14 +24,22 @@ const eventBusTag = {
   pushNotification: "PUSH_NOTIFICATION"
 };
 
-// Offer a default mechanism to run listeners within a try/catch block
+/**
+ * Offer a default mechanism to run listeners within a try/catch block
+ *
+ * [NOTE] Error parsing `e.stack || e.message || e` is necessary because
+ * there has been instances where the error captured didn't had the stack
+ * property
+ */
 eventBus.onSafe = (eventName, listener, options = {}) => {
   if (options.isAsync) {
     eventBus.on(eventName, async (...args) => {
       try {
         await listener(...args);
       } catch (e) {
-        logs.error(`Error on event '${eventName}': ${e.stack}`);
+        logs.error(
+          `Error on event '${eventName}': ${e.stack || e.message || e}`
+        );
       }
     });
   } else {
@@ -39,7 +47,9 @@ eventBus.onSafe = (eventName, listener, options = {}) => {
       try {
         listener(...args);
       } catch (e) {
-        logs.error(`Error on event '${eventName}': ${e.stack}`);
+        logs.error(
+          `Error on event '${eventName}': ${e.stack || e.message || e}`
+        );
       }
     });
   }

@@ -6,12 +6,11 @@ const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
 // Utils
 const shell = require("utils/shell");
-const randomToken = require("utils/randomToken");
 const fileToDataUri = require("utils/fileToDataUri");
 const fs = require("fs");
-// const { stripTrailingSlash } = require("utils/strings");
 
-const tempDir = `${params.DNCORE_DIR}/.temp-transfer/`;
+const maxSizeKb = 10e3;
+const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
  * Copy file from a DNP and downloaded on the client
@@ -37,43 +36,71 @@ const copyFileFrom = async ({ id, fromPath }) => {
   if (!dnp) throw Error(`No DNP found for id ${id}`);
   const containerName = dnp.packageName;
 
+  // Construct relative paths to container
+  // Fetch the WORKDIR from a docker inspect
+  if (!path.isAbsolute(fromPath)) {
+    // workingDir = "/usr/src/app"
+    let workingDir = await docker.getContainerWorkingDir(containerName);
+    workingDir = (workingDir || "/").replace(/['"]+/g, "");
+    fromPath = path.join(workingDir, fromPath);
+  }
+
   /**
    * Intermediate step, the file is in local file system
    *
    * Get the file extension so fileToDataUri can find the correct mime type
-   * path.extname("config.json") -> `".json"`
-   * path.extname("config")      -> `""`
-   * path.extname("app/")        -> `""`
+   * path.parse("config.json").base -> `"config.json"`
+   * path.parse("config").base      -> `"config"`
+   * path.parse("app/").base        -> `"app"`
    */
-  await shell(`mkdir -p ${tempDir}`); // Never throws
-  const extension = path.extname(fromPath);
-  let toPath = `${tempDir}/${await randomToken()}${extension}`;
+  await shell(`mkdir -p ${tempTransferDir}`); // Never throws
+  const { base } = path.parse(fromPath);
+  let toPath = path.join(tempTransferDir, base);
 
   // Copy file from container to local file system
   await docker.copyFileFrom(containerName, fromPath, toPath);
 
-  // /**
-  //  * Allow directories by automatically compressing them to .tar.gz files
-  //  * 1. Test if directory
-  //  * 2. Compress (use stripTrailingSlash to clean path, just in case)
-  //  * 3. Clean original files and rename toPath variable
-  //  */
-  // if (fs.lstatSync(toPath).isDirectory()) {
-  //   const toPathCompressed = `${stripTrailingSlash(toPath)}.tar.gz`;
-  //   await shell(`tar -czf ${toPathCompressed} ${toPath}`);
-  //   await shell(`rm -rf ${toPath}`);
-  //   toPath = toPathCompressed;
-  // }
-
   /**
-   * Do NOT allow directories for now
+   * Limit max file size until a DAppNode <-> client transport method is adopted
+   * $ du --max-depth=0 -k app/file.gz
+   * 12 app/file.gz
    */
-  if (fs.lstatSync(toPath).isDirectory()) {
+  const toPathSizeKb = await getFileOrDirSize(toPath);
+  if (toPathSizeKb > 10e3) {
     await shell(`rm -rf ${toPath}`);
     throw Error(
-      `path ${fromPath} is a directory. Only single files are allowed`
+      `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${toPathSizeKb} KB`
     );
   }
+
+  /**
+   * Allow directories by automatically compressing them to .tar.gz files
+   * 1. Test if directory
+   * 2. Compress (use stripTrailingSlash to clean path, just in case)
+   * 3. Clean original files and rename toPath variable
+   */
+
+  if (fs.lstatSync(toPath).isDirectory()) {
+    // Use node.js util to get the file / dir name safely
+    const toPathCompressed = `${toPath}.tar.gz`;
+    /**
+     * Use the -C option to cd in directory before doing the tar
+     * `tar -czf not/hello.tar.gz -C not hello`
+     */
+    await shell(`tar -czf ${toPathCompressed} -C ${tempTransferDir} ${base}`);
+    await shell(`rm -rf ${toPath}`);
+    toPath = toPathCompressed;
+  }
+
+  // /**
+  //  * Do NOT allow directories for now
+  //  */
+  // if (fs.lstatSync(toPath).isDirectory()) {
+  //   await shell(`rm -rf ${toPath}`);
+  //   throw Error(
+  //     `path ${fromPath} is a directory. Only single files are allowed`
+  //   );
+  // }
 
   /**
    * Converts a file to data URI.
@@ -101,5 +128,23 @@ const copyFileFrom = async ({ id, fromPath }) => {
     result: dataUri
   };
 };
+
+// Utility
+
+/**
+ * Limit max file size until a DAppNode <-> client transport method is adopted
+ * $ du --max-depth=0 -k app/file.gz
+ * 12 app/file.gz
+ * @param {string} path "app/file.gz"
+ * @returns {string} size in KB "12"
+ */
+async function getFileOrDirSize(path) {
+  const output = await shell(`du --max-depth=0 -k ${path}`);
+  const sizeString = output
+    .trim()
+    .replace(/\t/g, " ")
+    .split(" ")[0];
+  return parseInt(sizeString || "0");
+}
 
 module.exports = copyFileFrom;
