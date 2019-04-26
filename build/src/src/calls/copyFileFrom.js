@@ -62,7 +62,7 @@ const copyFileFrom = async ({ id, fromPath }) => {
 
   /**
    * Limit max file size until a DAppNode <-> client transport method is adopted
-   * $ du --max-depth=0 -k app/file.gz
+   * $ du -s -k app/file.gz
    * 12 app/file.gz
    */
   const toPathSizeKb = await getFileOrDirSize(toPath);
@@ -133,13 +133,13 @@ const copyFileFrom = async ({ id, fromPath }) => {
 
 /**
  * Limit max file size until a DAppNode <-> client transport method is adopted
- * $ du --max-depth=0 -k app/file.gz
+ * $ du -s -k app/file.gz
  * 12 app/file.gz
  * @param {string} path "app/file.gz"
  * @returns {string} size in KB "12"
  */
 async function getFileOrDirSize(path) {
-  const output = await shell(`du --max-depth=0 -k ${path}`);
+  const output = await shell(`du -s -k ${path}`);
   const sizeString = output
     .trim()
     .replace(/\t/g, " ")
