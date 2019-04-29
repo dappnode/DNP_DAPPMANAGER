@@ -22,9 +22,9 @@
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
   ],
-  "keywords": ["DAppNodeCore", "DAPP", "Manager", "Installer"],
-  "homepage": {
-    "adminui": "http://my.admin.dnp.dappnode.eth/",
+  "keywords": ["DAppNodeCore", "Manager", "Installer"],
+  "links": {
+    "ui": "http://my.dappnode/",
     "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
   },
   "repository": {

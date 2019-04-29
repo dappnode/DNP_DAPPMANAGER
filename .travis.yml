@@ -1,11 +1,21 @@
 language: node_js
-dist: trusty
+dist: xenial
 sudo: required
+
+# ########################
+# How to trigger a release
+#
+# Push a tag to origin:
+# - "release" (= patch)
+# - "release/patch"
+# - "release/minor"
+# - "release/major"
+# ########################
 
 stages:
   - name: test
   - name: build-test
-    if: tag =~ /^(?!release\/).*/
+    if: tag !~ /^release\/(major|minor|patch)$/
   - name: release
     if: tag =~ /^release\/(major|minor|patch)$/
 
@@ -59,21 +69,23 @@ jobs:
     ##################################################
     - stage: release
       name: release
-      node_js:
-        - "10.15.3"
       services:
         - docker
       script:
         - npm install -g @dappnode/dappnodesdk
         - docker-compose build
-        - dappnodesdk publish patch -p infura
-
+        - "TYPE=${TRAVIS_TAG##*/}"
+        - "[ ! '$TYPE' = 'release' ] || TYPE='patch'"
+        - dappnodesdk publish ${TYPE} -p infura
+      node_js:
+        - "10.15.3"
       before_deploy:
         - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/before_deploy.sh
         - source before_deploy.sh
       deploy:
         provider: releases
         prerelease: true
+        overwrite: true
         api_key: "$GITHUB_TOKEN"
         file_glob: true
         # $RELEASE_VERSION is exported on before_deploy.sh
@@ -83,9 +95,8 @@ jobs:
         name: "$TRAVIS_TAG"
         body: "# Changelog"
         on:
-          branch: master
           tags: true
           condition: "$TRAVIS_TAG = release || $TRAVIS_TAG = release/patch || $TRAVIS_TAG = release/minor || $TRAVIS_TAG = release/major"
-      after_deploy:
-        # - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
-        # - source after_deploy.sh
+      # after_deploy:
+      #   - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
+      #   - source after_deploy.sh

@@ -26,8 +26,10 @@ async function download({ pkg, id }) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
-  const { name, isCore } = manifest;
-  const imageName = manifest.image.path;
+  const { name, version, isCore } = manifest;
+  // Construct image path, if not provided
+  // "admin.dnp.dappnode.eth_0.2.0.tar.xz"
+  const imageName = manifest.image.path || `${name}_${version}.tar.xz`;
   const imageHash = manifest.image.hash;
   const imageSize = manifest.image.size;
 

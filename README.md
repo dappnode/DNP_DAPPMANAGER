@@ -1,5 +1,11 @@
 <p align="center"><a href="https://github.com/dappnode/DAppNode"><img width="400" title="DAPPMANAGER" src='banner-dappmanager.png' /></a></p>
 
+[![Website dappnode.io](https://img.shields.io/badge/Website-dappnode.io-brightgreen.svg)](https://dappnode.io/)
+[![Documentation Wiki](https://img.shields.io/badge/Documentation-Wiki-brightgreen.svg)](https://docs.dappnode.io)
+[![GIVETH Campaign](https://img.shields.io/badge/GIVETH-Campaign-1e083c.svg)](https://donate.dappnode.io)
+[![RIOT DAppNode](https://img.shields.io/badge/RIOT-DAppNode-blue.svg)](https://riot.dappnode.io)
+[![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.dappnode.io)
+
 The **DNP_DAPPMANAGER** handles the DAppNode core DNPs and any installed DNPs. It also performs maintenance checks.
 
 - :bust_in_silhouette: For user / usage documentation go to the [user manual](https://dappnode.readthedocs.io/en/latest/user-manual.html#dappmanager)
