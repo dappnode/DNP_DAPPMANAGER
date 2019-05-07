@@ -1,94 +1,75 @@
-# DNP_DAPPMANAGER
+<p align="center"><a href="https://github.com/dappnode/DAppNode"><img width="400" title="DAPPMANAGER" src='banner-dappmanager.png' /></a></p>
 
 [![Website dappnode.io](https://img.shields.io/badge/Website-dappnode.io-brightgreen.svg)](https://dappnode.io/)
-[![Documentation Wiki](https://img.shields.io/badge/Documentation-Wiki-brightgreen.svg)](https://github.com/dappnode/DAppNode/wiki)
-[![GIVETH Campaign](https://img.shields.io/badge/GIVETH-Campaign-1e083c.svg)](https://beta.giveth.io/campaigns/5b44b198647f33526e67c262)
-[![RIOT DAppNode](https://img.shields.io/badge/RIOT-DAppNode-blue.svg)](https://riot.im/app/#/room/#DAppNode:matrix.org)
-[![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.com/DAppNODE?lang=es)
+[![Documentation Wiki](https://img.shields.io/badge/Documentation-Wiki-brightgreen.svg)](https://docs.dappnode.io)
+[![GIVETH Campaign](https://img.shields.io/badge/GIVETH-Campaign-1e083c.svg)](https://donate.dappnode.io)
+[![RIOT DAppNode](https://img.shields.io/badge/RIOT-DAppNode-blue.svg)](https://riot.dappnode.io)
+[![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.dappnode.io)
 
-<p align="left">
-  <img src="DAPPMANAGER-min.png" width="200"/>
-</p>
+The **DNP_DAPPMANAGER** handles the DAppNode core DNPs and any installed DNPs. It also performs maintenance checks.
 
-Dappnode package responsible for providing the DappNode Package Manager
+- :bust_in_silhouette: For user / usage documentation go to the [user manual](https://dappnode.readthedocs.io/en/latest/user-manual.html#dappmanager)
+- :wrench: For developers check the [technical documentation](build/src)
+- :speech_balloon: For feedback and reporting problems please [submit an issue](https://github.com/dappnode/DNP_ADMIN/issues/new) or contact us on [RIOT•IM](https://riot.im/app/#/room/#DAppNode:matrix.org)
 
 It is an AragonApp whose repo is deployed at this address: [0x0c564ca7b948008fb324268d8baedaeb1bd47bce](https://etherscan.io/address/0x0c564ca7b948008fb324268d8baedaeb1bd47bce) and whose ENS address is: [dappmanager.dnp.dappnode.eth](https://etherscan.io/enslookup?q=dappmanager.dnp.dappnode.eth])
 
 ## Getting Started
 
+This repo is a single piece of DAppNode. To install and use DAppNode go to the [installation guide](https://github.com/dappnode/DAppNode/wiki/DAppNode-Installation-Guide).
+
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
-- git
+You must have git, docker and docker-compose in your environment to run this repo. To verify so, run the following commands.
 
-  Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) commandline tool.
+```bash
+git --version
+docker --version
+docker-compose --version
+```
 
-- docker
+Go to the pre-requisites setup guide if you any command returned an error and need to install a pre-requisite.
 
-  Install [docker](https://docs.docker.com/engine/installation). The community edition (docker-ce) will work. In Linux make sure you grant permissions to the current user to use docker by adding current user to docker group, `sudo usermod -aG docker $USER`. Once you update the users group, exit from the current terminal and open a new one to make effect.
+### Installing
 
-- docker-compose
-
-  Install [docker-compose](https://docs.docker.com/compose/install)
-
-**Note**: Make sure you can run `git`, `docker ps`, `docker-compose` without any issue and without sudo command.
-
-### Building
+To get started, clone the project locally.
 
 ```
 $ git clone https://github.com/dappnode/DNP_DAPPMANAGER.git
 ```
 
+To develop locally, cd into the src folder and start the nodejs application
+
 ```
-$ docker-compose build
-or
+cd build/src
+npm i
+npm start
+```
+
+The DNP_DAPPMANAGER expects to be in a DAppNode network to connect to its WAMP module, Ethereum node and IPFS node. If you wish to use a different providers for such services you can edit their urls in the [`build/src/src/params.js` file](build/src/src/params.js).
+
+### Building
+
+After making sure that the nodejs app runs successfully on it own and passes the tests `npm test`, you can dockerize the package.
+
+```
+docker-compose build
+docker-compose up -d
+docker-compose logs -f
+```
+
+### Distributing
+
+Now, generate a tar.xz image ([get the xz library](https://tukaani.org/xz/)).
+
+```bash
 $ docker build --rm -f build/Dockerfile -t dappmanager.dnp.dappnode.eth:dev build
-```
-
-## Running
-
-### Start
-
-```
-$ docker-compose up -d
-```
-
-### Stop
-
-```
-$ docker-compose down
-```
-
-### Status
-
-```
-$ docker-compose ps
-```
-
-### Logs
-
-```
-$ docker-compose logs -f
-```
-
-**Note**: In case of having the port 8080 occupied, you should change them in the file docker-compose.yml by other.
-
-## Generating a tar.xz image
-
-[xz](https://tukaani.org/xz/) is required
-
-```
 $ docker save dappmanager.dnp.dappnode.eth:dev | xz -9 > dappmanager.dnp.dappnode.eth_x.y.z.tar.xz
 ```
 
 You can download the latest tar.xz version from here [releases](https://github.com/dappnode/DNP_DAPPMANAGER/releases).
-
-### Loading a Docker image
-
-```
-$docker load -i dappmanager.dnp.dappnode.eth.x.y.z.tar.xz
-```
 
 ## Contributing
 
@@ -116,3 +97,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 [docker](https://www.docker.com/)
 
 [docker-compose](https://docs.docker.com/compose/)
+
+```
+
+```

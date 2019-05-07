@@ -1,11 +1,5 @@
-const expect = require('chai').expect;
-const parseDockerSystemDf = require('utils/parseDockerSystemDf');
-// const fs = require('fs');
-
-
-// const testDirectory = './test_files/';
-
-/* eslint-disable max-len */
+const expect = require("chai").expect;
+const parseDockerSystemDf = require("utils/parseDockerSystemDf");
 
 const output = `Images space usage:
 
@@ -50,61 +44,61 @@ const dockerListOutput = [
     volumes: [
       {
         name: undefined,
-        type: 'bind',
-        path: '/etc/hostname',
+        type: "bind",
+        path: "/etc/hostname"
       },
       {
-        type: 'volume',
-        name: 'dncore_vpndnpdappnodeeth_data',
-        path: '/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data',
-      },
-    ],
-  },
+        type: "volume",
+        name: "dncore_vpndnpdappnodeeth_data",
+        path: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data"
+      }
+    ]
+  }
 ];
 
+describe("Util: parseDockerSystemDf", function() {
+  // before(() => {
+  //   validate.path(DOCKERCOMPOSE_PATH);
+  //   fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeData);
+  //   validate.path(DOCKERCOMPOSE_PATH2);
+  //   fs.writeFileSync(DOCKERCOMPOSE_PATH2, dockerComposeData2);
+  // });
 
-describe('Util: parseDockerSystemDf', function() {
-    // before(() => {
-    //   validate.path(DOCKERCOMPOSE_PATH);
-    //   fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeData);
-    //   validate.path(DOCKERCOMPOSE_PATH2);
-    //   fs.writeFileSync(DOCKERCOMPOSE_PATH2, dockerComposeData2);
-    // });
-
-    it('should parse dockerSystemDf output', () => {
-      const res = parseDockerSystemDf({data: output});
-      expect(res).to.deep.equal({
-        dncore_binddnpdappnodeeth_data: {links: '1', size: '10.52kB'},
-        dncore_ipfsdnpdappnodeeth_export: {links: '1', size: '0B'},
-        dncore_ipfsdnpdappnodeeth_data: {links: '1', size: '40.44MB'},
-        dncore_ethchaindnpdappnodeeth_data: {links: '1', size: '142.3GB'},
-        dncore_vpndnpdappnodeeth_data: {links: '1', size: '866B'},
-        dncore_dappmanagerdnpdappnodeeth_data: {links: '1', size: '1.319kB'},
-        swarmdnpdappnodeeth_swarm: {links: '1', size: '2.72MB'},
-      });
+  it("should parse dockerSystemDf output", () => {
+    const res = parseDockerSystemDf({ data: output });
+    expect(res).to.deep.equal({
+      dncore_binddnpdappnodeeth_data: { links: "1", size: "10.52kB" },
+      dncore_ipfsdnpdappnodeeth_export: { links: "1", size: "0B" },
+      dncore_ipfsdnpdappnodeeth_data: { links: "1", size: "40.44MB" },
+      dncore_ethchaindnpdappnodeeth_data: { links: "1", size: "142.3GB" },
+      dncore_vpndnpdappnodeeth_data: { links: "1", size: "866B" },
+      dncore_dappmanagerdnpdappnodeeth_data: { links: "1", size: "1.319kB" },
+      swarmdnpdappnodeeth_swarm: { links: "1", size: "2.72MB" }
     });
+  });
 
-    it('should extend the dnpList', () => {
-      const res = parseDockerSystemDf({data: output, dnpList: dockerListOutput});
-      expect(res).to.deep.equal([
-        {
-          volumes: [
-            {
-              name: undefined,
-              type: 'bind',
-              path: '/etc/hostname',
-            },
-            {
-              type: 'volume',
-              name: 'dncore_vpndnpdappnodeeth_data',
-              path: '/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data',
-              links: '1',
-              size: '866B',
-            },
-          ],
-        },
-      ]);
+  it("should extend the dnpList", () => {
+    const res = parseDockerSystemDf({
+      data: output,
+      dnpList: dockerListOutput
     });
+    expect(res).to.deep.equal([
+      {
+        volumes: [
+          {
+            name: undefined,
+            type: "bind",
+            path: "/etc/hostname"
+          },
+          {
+            type: "volume",
+            name: "dncore_vpndnpdappnodeeth_data",
+            path: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
+            links: "1",
+            size: "866B"
+          }
+        ]
+      }
+    ]);
+  });
 });
-
-

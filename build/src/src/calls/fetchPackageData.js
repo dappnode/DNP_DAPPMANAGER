@@ -1,7 +1,7 @@
-const parse = require('utils/parse');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
+const parse = require("utils/parse");
+const logs = require("logs.js")(module);
+const getManifest = require("modules/getManifest");
+const getAvatar = require("modules/getAvatar");
 // const isSyncing = require('utils/isSyncing');
 // const isIpfsRequest = require('utils/isIpfsRequest');
 
@@ -9,35 +9,16 @@ const getAvatar = require('modules/getAvatar');
  * Fetches the manifest of the latest version and its avatar.
  * This feature helps the ADMIN UI load the directory data faster.
  *
- * @param {Object} kwargs: {
- *   id: package .eth name (string)
+ * @param {string} id DNP .eth name
+ * @returns {object} result = {
+ *   avatar: "data:image/png;base64..." {string},
+ *   manifest: <manifest object> {object}
  * }
- * @return {Object} A formated success message.
- * result: packageData =
- *   {
- *     avatar, (string)
- *     manifest, (object)
- *   },
  */
-const fetchPackageData = async ({
-  id,
-}) => {
-  const packageReq = parse.packageReq(id);
+const fetchPackageData = async ({ id }) => {
+  if (!id) throw Error("kwarg id must be defined");
 
-  // Make sure the chain is synced
-  // if (!isIpfsRequest(packageReq) && await isSyncing()) {
-  //   return {
-  //     message: `Mainnet is still syncing`,
-  //     result: {},
-  //     logMessage: true,
-  //   };
-  // }
-
-
-  const manifest = await getManifest(packageReq);
-
-  // Correct manifest
-  if (!manifest.type) manifest.type = 'library';
+  const manifest = await getManifest(parse.packageReq(id));
 
   // Fetch the package image
   const avatarHash = manifest.avatar;
@@ -47,18 +28,19 @@ const fetchPackageData = async ({
       avatar = await getAvatar(avatarHash);
     } catch (e) {
       // If the avatar can not be fetched don't crash
-      logs.error('Could not fetch avatar of '+packageReq.name+' at '+avatarHash);
+      logs.error(
+        `Error fetching avatar of ${id} at ${avatarHash}: ${e.message}`
+      );
     }
   }
 
   return {
-    message: 'Got data of '+packageReq.name,
+    message: `Got data of ${id}`,
     result: {
       manifest,
-      avatar,
-    },
+      avatar
+    }
   };
 };
-
 
 module.exports = fetchPackageData;

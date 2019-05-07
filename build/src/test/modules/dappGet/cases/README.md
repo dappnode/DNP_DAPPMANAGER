@@ -6,7 +6,7 @@ The case object definition must contain:
 
 - **name**: Case definition, will show up in the mocha test title
 - **req**: The request to be resolved
-- **expectedSuccess**: The expected outcome of the resolver
+- **expectedState**: The expected outcome of the resolver
 - **dnps**: All the info about dependencies, versions, and which DNP is installed at which version.
 
 Optional parameteres

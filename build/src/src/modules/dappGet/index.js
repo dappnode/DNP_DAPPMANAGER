@@ -1,9 +1,9 @@
-const fetch = require('./fetch');
-const aggregate = require('./aggregate');
-const resolve = require('./resolve');
-const dockerList = require('modules/dockerList');
-const logs = require('logs.js')(module);
-const shouldUpdate = require('./utils/shouldUpdate');
+const fetch = require("./fetch");
+const aggregate = require("./aggregate");
+const resolve = require("./resolve");
+const dappGetBasic = require("./basic");
+const dockerList = require("modules/dockerList");
+const logs = require("logs.js")(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -17,15 +17,15 @@ const shouldUpdate = require('./utils/shouldUpdate');
  * - Newly installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
- * @param {Object} req: The package request:
+ * @param {object} req: The package request:
  * req = {
  *   name: 'nginx-proxy.dnp.dappnode.eth',
  *   ver: '^0.1.0',
  * }
  *
- * @return {Object} Result object = {
- *   success: {
- *     'bind.dnp.dappnode.eth': '0.1.4',
+ * @returns {object} Result object = {
+ *   message: 'Found compatible state at case 1/256',
+ *   state: {
  *     'ipfs.dnp.dappnode.eth': '0.1.3',
  *     'ethchain.dnp.dappnode.eth': '0.1.4',
  *     'ethforward.dnp.dappnode.eth': '0.1.1',
@@ -35,29 +35,37 @@ const shouldUpdate = require('./utils/shouldUpdate');
  *     'dappmanager.dnp.dappnode.eth': '0.1.10',
  *     'core.dnp.dappnode.eth': '/ipfs/Qmabuy2rTUEWA5jKyUKJmUDCH375e75tpUnAAwyi1PbLq1'
  *   },
- *   message: 'Found compatible state with case 1/256',
+ *   alreadyUpdated: {
+ *     'bind.dnp.dappnode.eth': '0.1.4',
+ *   }
  * }
  *
- * <or in case of error>
- *
- * Result object = {
- *   success: false,
- *   message: 'Could not find a compatible state.
- *     Packages x.dnp.dappnode.eth request incompatible versions of y.dnp.dappnode.eth.
- *     Checked 256/256 possible states.'
+ * Or in case of error, throws and error with the message:
+ *  'Could not find a compatible state. Packages x.dnp.dappnode.eth
+ *   request incompatible versions of y.dnp.dappnode.eth.
+ *   Checked 256/256 possible states.'
  * }
  */
-async function dappGet(req) {
+async function dappGet(req, options = {}) {
+  /**
+   * If BYPASS_RESOLVER=true, use the dappGet basic.
+   * It will not use the fetch or resolver module and only
+   * fetch the first level dependencies of the request
+   */
+  if (options.BYPASS_RESOLVER) return await dappGetBasic(req);
+
   const dnpList = await dockerList.listContainers();
 
   // Aggregate
   let dnps;
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-    dnps = await aggregate({req, dnpList, fetch});
+    dnps = await aggregate({ req, dnpList, fetch });
   } catch (e) {
-    logs.error(`dappGet aggregate error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on aggregate stage: ${e.message}`;
+    logs.error(`dappGet/aggregate error: ${e.stack}`);
+    e.message = `dappGet could not resolve request ${req.name}@${
+      req.ver
+    }, error on aggregate stage: ${e.message}`;
     throw e;
   }
 
@@ -66,29 +74,33 @@ async function dappGet(req) {
   try {
     result = resolve(dnps);
   } catch (e) {
-    logs.error(`dappGet resolve error: ${e.stack}`);
-    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on resolve stage: ${e.message}`;
+    logs.error(`dappGet/resolve error: ${e.stack}`);
+    e.message = `dappGet could not resolve request ${req.name}@${
+      req.ver
+    }, error on resolve stage: ${e.message}`;
     throw e;
   }
 
-  // Format output only on success
-    if (!result.success) return result;
-    dnpList.forEach((dnp) => {
-        if (result.success[dnp.name]) {
-            // DNP is installed
-            const currentVersion = dnp.version;
-            const newVersion = result.success[dnp.name];
-            if (!shouldUpdate(currentVersion, newVersion)) {
-                // DNP is already updated.
-                // Remove from the success object and add it to the alreadyUpdatedd
-                if (!result.alreadyUpdated) result.alreadyUpdated = {};
-                result.alreadyUpdated[dnp.name] = result.success[dnp.name];
-                delete result.success[dnp.name];
-            }
-        }
+  const { success, message, state } = result;
+  // If the request could not be resolved, output a formated error:
+  if (!success) throw Error(`Could not find compatible state. ${message}`);
+
+  // Otherwise, format the output
+  let alreadyUpdated = {};
+  dnpList.forEach(dnp => {
+    if (state[dnp.name] && state[dnp.name] === dnp.version) {
+      // DNP is already updated.
+      // Remove from the success object and add it to the alreadyUpdatedd
+      alreadyUpdated[dnp.name] = state[dnp.name];
+      delete state[dnp.name];
+    }
   });
 
-  return result;
+  return {
+    message,
+    state,
+    alreadyUpdated
+  };
 }
 
 module.exports = dappGet;

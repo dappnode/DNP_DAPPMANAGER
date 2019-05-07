@@ -1,9 +1,10 @@
-'use strict';
-const winston = require('winston');
-const {createLogger, format, transports} = winston;
-const Transport = require('winston-transport');
-const {eventBus, eventBusTag} = require('eventBus');
-const params = require('params');
+"use strict";
+const winston = require("winston");
+const { createLogger, format, transports } = winston;
+const Transport = require("winston-transport");
+const { eventBus, eventBusTag } = require("eventBus");
+const limitObjValuesSize = require("utils/limitObjValuesSize");
+const params = require("params");
 
 /*
  * To facilitate debugging, actions involving user interaction are stored in a file
@@ -14,20 +15,12 @@ const params = require('params');
  */
 
 /*
-* > LEVELS:
-* ---------------------
-* logs.info('Something')
-* logs.warn('Something')
-* logs.error('Something')
-*/
-
-// Format function to filter out unrelevant logs
-const onlyUserAction = format((info, opts) => {
-  if (!info.userAction) {return false;}
-  delete info.userAction;
-  delete info.logMessage;
-  return info;
-});
+ * > LEVELS:
+ * ---------------------
+ * logs.info("Something")
+ * logs.warn("Something")
+ * logs.error("Something")
+ */
 
 // Custom transport to broadcast new logs to the admin directly
 class EmitToAdmin extends Transport {
@@ -35,6 +28,17 @@ class EmitToAdmin extends Transport {
     super(opts);
   }
 
+  /**
+   * @param {object} info = userActionLog
+   *   @property {string} level - "info" | "error".
+   *   @property {string} event - Crossbar RPC event, "installPackage.dnp.dappnode.eth".
+   *   @property {string} message - Returned message from the call function, "Successfully install DNP"
+   *   @property {*} result - Returned result from the call function
+   *   @property {object} kwargs - RPC key-word arguments, { id: "dnpName" }
+   *   // Only if error
+   *   @property {object} message - e.message
+   *   @property {object} stack - e.stack
+   */
   log(info, callback) {
     setImmediate(() => {
       eventBus.emit(eventBusTag.logUserAction, info);
@@ -43,20 +47,48 @@ class EmitToAdmin extends Transport {
   }
 }
 
+// Utilities to format
+
+/**
+ * Format function to filter out unrelevant log properties
+ * Note: format((info, opts) => ... )
+ */
+const onlyUserAction = format(info => {
+  if (!info.userAction) return false;
+  const _info = Object.assign({}, info);
+  delete _info.userAction; // ES6 immutable object delete looks worse
+  delete _info.logMessage;
+  return _info;
+});
+
+/**
+ * Limit the length of objects.
+ * RPC calls like copyTo may content really big dataUrls as kwargs,
+ * prevent them from cluttering the userActionLogs file
+ */
+const maxLen = 500;
+const limitLength = format(info => {
+  if (info.kwargs) info.kwargs = limitObjValuesSize(info.kwargs, maxLen);
+  if (info.result) info.result = limitObjValuesSize(info.result, maxLen);
+  return info;
+});
+
 // Actual logger
+
 const logger = createLogger({
-    transports: [
-      new transports.File({
-        filename: params.userActionLogsFilename,
-        level: 'info',
-      }),
-      new EmitToAdmin(),
-    ],
-    format: format.combine(
-      onlyUserAction(),
-      format.timestamp(),
-      format.json()
-    ),
+  transports: [
+    new transports.File({
+      filename: params.userActionLogsFilename,
+      level: "info"
+    }),
+    new EmitToAdmin()
+  ],
+  format: format.combine(
+    onlyUserAction(),
+    limitLength(),
+    format.timestamp(),
+    format.json()
+  )
 });
 
 module.exports = logger;

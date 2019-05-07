@@ -4,18 +4,18 @@
 const name = 'Special case with "cap_add" and "cap_drop" fields';
 
 const manifest = {
-  name: 'custom-chain.dnp.dappnode.eth',
-  version: '0.1.0',
-  type: 'service',
-  chain: 'ethereum',
+  name: "custom-chain.dnp.dappnode.eth",
+  version: "0.1.0",
+  type: "service",
+  chain: "ethereum",
   image: {
-    path: '',
-    hash: '',
-    size: '',
+    path: "",
+    hash: "",
+    size: ""
   },
   dependencies: {
-    'another-chain.dnp.dappnode.eth': '*',
-  },
+    "another-chain.dnp.dappnode.eth": "*"
+  }
 };
 
 const dc = `version: '3.4'
@@ -39,4 +39,4 @@ networks:
         external: true
 `;
 
-module.exports = {name, manifest, dc};
+module.exports = { name, manifest, dc };

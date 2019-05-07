@@ -1,8 +1,9 @@
-const docker = require('./Docker');
-const db = require('db');
-const lockPorts = require('modules/lockPorts');
-const unlockPorts = require('modules/unlockPorts');
-const {eventBus, eventBusTag} = require('eventBus');
+const docker = require("./Docker");
+const db = require("db");
+const lockPorts = require("modules/lockPorts");
+const unlockPorts = require("modules/unlockPorts");
+const { eventBus, eventBusTag } = require("eventBus");
+const { stringIncludes } = require("utils/strings");
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -18,8 +19,8 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
   try {
     return await docker.compose.up(dockerComposePath, options);
   } catch (e) {
-    if (e.message.includes('port is already allocated')) {
-      const upnpAvailable = await db.get('upnpAvailable');
+    if (stringIncludes((e || {}).message, "port is already allocated")) {
+      const upnpAvailable = await db.get("upnpAvailable");
       if (upnpAvailable) {
         // Don't try to find which port caused the error.
         // In case of multiple collitions you would need to call this function recursively
@@ -29,16 +30,16 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
         // in order to let docker to assign new ones
         const portsToClose = await unlockPorts(dockerComposePath);
         if (portsToClose.length) {
-          const kwargs = {action: 'close', ports: portsToClose};
-          eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+          const kwargs = { action: "close", ports: portsToClose };
+          eventBus.emit(eventBusTag.call, { callId: "managePorts", kwargs });
         }
 
         // Up the package and lock the ports again
         await docker.compose.up(dockerComposePath);
-        const portsToOpen = await lockPorts({dockerComposePath});
+        const portsToOpen = await lockPorts({ dockerComposePath });
         if (portsToOpen.length) {
-          const kwargs = {action: 'open', ports: portsToOpen};
-          eventBus.emit(eventBusTag.call, {callId: 'managePorts', kwargs});
+          const kwargs = { action: "open", ports: portsToOpen };
+          eventBus.emit(eventBusTag.call, { callId: "managePorts", kwargs });
         }
       }
     }
@@ -47,6 +48,6 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
 
 module.exports = {
   compose: {
-    up: dockerComposeUpSafe,
-  },
+    up: dockerComposeUpSafe
+  }
 };

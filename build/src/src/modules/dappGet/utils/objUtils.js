@@ -3,14 +3,14 @@
  *
  * @param {object} obj Object to be transformed
  * @param {function} fn Callback, will receive one argument, an object value
- * @return {object} New object transformed
+ * @returns {object} New object transformed
  */
 function mapObj(obj, fn) {
-    const _obj = {};
-    for (let key of Object.keys(obj)) {
-        _obj[key] = fn(obj[key]);
-    }
-    return _obj;
+  const _obj = {};
+  for (let key of Object.keys(obj)) {
+    _obj[key] = fn(obj[key]);
+  }
+  return _obj;
 }
 
 /**
@@ -19,19 +19,19 @@ function mapObj(obj, fn) {
  * @param {object} obj Object to be transformed
  * @param {function} fn Callback, will receive one argument, an object value
  * @param {boolean} byKey if the filtering will be done by key or value
- * @return {object} New object transformed
+ * @returns {object} New object transformed
  */
 function filterObj(obj, fn, byKey = false) {
-    const _obj = {};
-    for (let key of Object.keys(obj)) {
-        if (fn(byKey ? key : obj[key])) {
-            _obj[key] = obj[key];
-        }
+  const _obj = {};
+  for (let key of Object.keys(obj)) {
+    if (fn(byKey ? key : obj[key])) {
+      _obj[key] = obj[key];
     }
-    return _obj;
+  }
+  return _obj;
 }
 
 module.exports = {
-    mapObj,
-    filterObj,
+  mapObj,
+  filterObj
 };

@@ -1,0 +1,19 @@
+# Prevent Dockerfile modifications to trigger layer recomputation
+build/Dockerfile
+
+# Accelerate COPY build/src . command
+build/src/node_modules/
+build/src/tmp_dnp_repo/
+build/src/dnp_repo/
+build/src/DNCORE/
+build/src/cache/
+build/src/dappmanagerdb.json
+
+# Test artifacts
+test_build/
+build/src/undefined/
+build/src/test_files/
+build/src/test_files/*
+
+# Version data file
+.version.json

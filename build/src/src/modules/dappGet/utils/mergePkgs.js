@@ -1,21 +1,22 @@
-const merge = require('deepmerge');
+const merge = require("deepmerge");
 
 /**
  * Util to remove repeated elements from an array
- * @param {Array} arrArg array
- * @return {Array} Array without duplicated arguments
+ * @param {array} arrArg array
+ * @returns {array} Array without duplicated arguments
  */
-const uniqArray = (arrArg) => arrArg.filter((elem, pos, arr) => arr.indexOf(elem) == pos);
+const uniqArray = arrArg =>
+  arrArg.filter((elem, pos, arr) => arr.indexOf(elem) == pos);
 
 /**
  * Util for the deepmerge library. Overwrites default array merging behaviour
  * to return a deduplicated copy of an array
- * @param {Array} destinationArray
- * @param {Array} sourceArray
- * @return {Array} Merge of the two arrays without duplicate items
+ * @param {array} destinationArray
+ * @param {array} sourceArray
+ * @returns {array} Merge of the two arrays without duplicate items
  */
 const uniqueArrays = (destinationArray, sourceArray) =>
-    uniqArray(merge(destinationArray, sourceArray));
+  uniqArray(merge(destinationArray, sourceArray));
 
 /**
  * Merges object packages, returning unique arrays.
@@ -27,16 +28,16 @@ const uniqueArrays = (destinationArray, sourceArray) =>
  * }
  * @param {*} pkgsObj1
  * @param {*} pkgsObj2
- * @return {Object} pkgsObjects merged
+ * @returns {object} pkgsObjects merged
  */
 const mergePkgs = (pkgsObj1, pkgsObj2) => {
-    // Check arguments
-    if (!pkgsObj1) throw Error('pkgsObj1 is undefined');
-    if (!pkgsObj2) throw Error('pkgsObj2 is undefined');
+  // Check arguments
+  if (!pkgsObj1) throw Error("pkgsObj1 is undefined");
+  if (!pkgsObj2) throw Error("pkgsObj2 is undefined");
 
-    return merge(pkgsObj1, pkgsObj2, {
-        arrayMerge: uniqueArrays,
-    });
+  return merge(pkgsObj1, pkgsObj2, {
+    arrayMerge: uniqueArrays
+  });
 };
 
 module.exports = mergePkgs;

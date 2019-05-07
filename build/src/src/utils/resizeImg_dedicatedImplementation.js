@@ -1,4 +1,4 @@
-const PNG = require('pngjs').PNG;
+const PNG = require("pngjs").PNG;
 
 /**
  * Downsizes a png buffer.
@@ -9,21 +9,20 @@ const PNG = require('pngjs').PNG;
  * @param {Buffer} inputBuffer source image buffer
  * @param {Int} _width target width
  * @param {Int} _height target heigth
- * @return {Buffer} png buffer with the target dimensions
+ * @returns {Buffer} png buffer with the target dimensions
  */
 function downsizePng(inputBuffer, _width, _height) {
-    const inputPng = PNG.sync.read(inputBuffer);
-    // Input img
-    const {width, height, data} = inputPng;
-    if (_width > width || _height > height) {
-        return inputBuffer;
-    }
-    // Output img
-    const outputPng = new PNG({width: _width, height: _height});
-    outputPng.data = downSizeAlgorithm(width, height, data, _width, _height);
-    return PNG.sync.write(outputPng);
+  const inputPng = PNG.sync.read(inputBuffer);
+  // Input img
+  const { width, height, data } = inputPng;
+  if (_width > width || _height > height) {
+    return inputBuffer;
+  }
+  // Output img
+  const outputPng = new PNG({ width: _width, height: _height });
+  outputPng.data = downSizeAlgorithm(width, height, data, _width, _height);
+  return PNG.sync.write(outputPng);
 }
-
 
 /**
  * Downsizes a pixelmap.
@@ -36,40 +35,42 @@ function downsizePng(inputBuffer, _width, _height) {
  * @param {Buffer} data source pixel buffer array
  * @param {Int} _width target width
  * @param {Int} _height target heigth
- * @return {Buffer} pixel buffer array with the target dimensions
+ * @returns {Buffer} pixel buffer array with the target dimensions
  */
 function downSizeAlgorithm(width, height, data, _width, _height) {
-    const wr = _width/width;
-    const hr = _height/height;
-    const _data = [];
-    const pxReg = [];
+  const wr = _width / width;
+  const hr = _height / height;
+  const _data = [];
+  const pxReg = [];
 
-    if (_width > width || _height > height) {
-        throw Error(`Unable to downsize data: ${width}x${height} => ${_width}x${_height}`);
-    }
+  if (_width > width || _height > height) {
+    throw Error(
+      `Unable to downsize data: ${width}x${height} => ${_width}x${_height}`
+    );
+  }
 
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const idx = (width * y + x) << 2;
-            const _y = Math.round(y*hr);
-            const _x = Math.round(x*wr);
-            const _idx = (_width * _y + _x) << 2;
-            for (let i of [0, 1, 2, 3]) {
-                _data[_idx+i] = (_data[_idx+i] || 0) + data[idx+i];
-            }
-            pxReg[_idx] = (pxReg[_idx] || 0) + 1;
-        }
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = (width * y + x) << 2;
+      const _y = Math.round(y * hr);
+      const _x = Math.round(x * wr);
+      const _idx = (_width * _y + _x) << 2;
+      for (let i of [0, 1, 2, 3]) {
+        _data[_idx + i] = (_data[_idx + i] || 0) + data[idx + i];
+      }
+      pxReg[_idx] = (pxReg[_idx] || 0) + 1;
     }
+  }
 
-    for (let _y = 0; _y < _height; _y++) {
-        for (let _x = 0; _x < _width; _x++) {
-            const _idx = (_width * _y + _x) << 2;
-            for (let i of [0, 1, 2, 3]) {
-                _data[_idx+i] = Math.round(_data[_idx+i]/pxReg[_idx]);
-            }
-        }
+  for (let _y = 0; _y < _height; _y++) {
+    for (let _x = 0; _x < _width; _x++) {
+      const _idx = (_width * _y + _x) << 2;
+      for (let i of [0, 1, 2, 3]) {
+        _data[_idx + i] = Math.round(_data[_idx + i] / pxReg[_idx]);
+      }
     }
-    return _data;
+  }
+  return _data;
 }
 
 module.exports = downsizePng;

@@ -1,4 +1,5 @@
-const fs = require('fs');
+const fs = require("fs");
+const path = require("path");
 
 /*
  * Generates file paths given a set of parameters. This tool helps
@@ -13,91 +14,102 @@ const fs = require('fs');
  * - image
  *
  * Core DNPs and regular DNPs are located in different folders.
- * That's why there is an IS_CORE flag. Also the "Smart" functions
+ * That's why there is an isCore flag. Also the "Smart" functions
  * try to guess if the requested package is a core or not.
-*/
+ */
 
 // Define paths
 module.exports = {
-
-  packageRepoDir: function(PACKAGE_NAME, params, IS_CORE) {
-    if (!PACKAGE_NAME) throw Error('Package name must be defined');
-    if (!params) throw Error('Package name must be defined');
-    return repoDir(PACKAGE_NAME, params, IS_CORE);
+  packageRepoDir: (dnpName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    return getRepoDirPath(dnpName, params, isCore);
   },
 
-  manifest: function(PACKAGE_NAME, params, IS_CORE) {
-    if (!PACKAGE_NAME) throw Error('Package name must be defined');
-    if (!params) throw Error('Package name must be defined');
-    return repoDir(PACKAGE_NAME, params, IS_CORE) + '/'
-    + manifestName(PACKAGE_NAME, params, IS_CORE);
+  manifest: (dnpName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    return path.join(
+      getRepoDirPath(dnpName, params, isCore),
+      getManifestName(dnpName, isCore)
+    );
   },
 
-  dockerCompose: dockerCompose,
+  dockerCompose: (dnpName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    return getDockerComposePath(dnpName, params, isCore);
+  },
 
-  dockerComposeSmart: function(PACKAGE_NAME, params) {
-    if (!PACKAGE_NAME) throw Error('Package name must be defined');
-    if (!params) throw Error('Package name must be defined');
+  dockerComposeSmart: (dnpName, params) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
     // First check for core docker-compose
-    let DOCKERCOMPOSE_PATH = dockerCompose(PACKAGE_NAME, params, true);
+    let DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, params, true);
     if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
     // Then check for dnp docker-compose
-    return dockerCompose(PACKAGE_NAME, params, false);
+    return getDockerComposePath(dnpName, params, false);
   },
 
-  envFile: envFile,
+  envFile: (dnpName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    return getEnvFilePath(dnpName, params, isCore);
+  },
 
-  envFileSmart: function(PACKAGE_NAME, params, isCORE) {
-    if (!PACKAGE_NAME) throw Error('Package name must be defined');
-    if (!params) throw Error('Package name must be defined');
-    if (isCORE) return envFile(PACKAGE_NAME, params, true);
+  envFileSmart: (dnpName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!params) throw Error("params must be defined");
+    if (isCore) return getEnvFilePath(dnpName, params, true);
     // First check for core docker-compose
-    let ENV_FILE_PATH = envFile(PACKAGE_NAME, params, true);
+    let ENV_FILE_PATH = getEnvFilePath(dnpName, params, true);
     if (fs.existsSync(ENV_FILE_PATH)) return ENV_FILE_PATH;
     // Then check for dnp docker-compose
-    return envFile(PACKAGE_NAME, params, false);
+    return getEnvFilePath(dnpName, params, false);
   },
 
-  image: function(PACKAGE_NAME, IMAGE_NAME, params, IS_CORE) {
-    return repoDir(PACKAGE_NAME, params, IS_CORE) + '/' + IMAGE_NAME;
-  },
+  image: (dnpName, imageName, params, isCore) => {
+    if (!dnpName) throw Error("dnpName must be defined");
+    if (!imageName) throw Error("imageName must be defined");
+    if (!params) throw Error("params must be defined");
+    return path.join(getRepoDirPath(dnpName, params, isCore), imageName);
+  }
 };
-
 
 // Helper functions
 
-function dockerCompose(PACKAGE_NAME, params, IS_CORE) {
-  return repoDir(PACKAGE_NAME, params, IS_CORE) + '/'
-  + dockerComposeName(PACKAGE_NAME, params, IS_CORE);
+function getDockerComposePath(dnpName, params, isCore) {
+  return path.join(
+    getRepoDirPath(dnpName, params, isCore),
+    getDockerComposeName(dnpName, isCore)
+  );
 }
 
-function envFile(PACKAGE_NAME, params, IS_CORE) {
-  return repoDir(PACKAGE_NAME, params, IS_CORE) + '/' + PACKAGE_NAME + params.ENV_FILE_EXTENSION;
+function getEnvFilePath(dnpName, params, isCore) {
+  return path.join(getRepoDirPath(dnpName, params, isCore), `${dnpName}.env`);
 }
 
-function repoDir(PACKAGE_NAME, params, IS_CORE) {
-  if (IS_CORE) return params.DNCORE_DIR;
-  return params.REPO_DIR + PACKAGE_NAME;
+function getRepoDirPath(dnpName, params, isCore) {
+  if (!params.DNCORE_DIR) throw Error("params.DNCORE_DIR must be defined");
+  if (!params.REPO_DIR) throw Error("params.REPO_DIR must be defined");
+  if (isCore) return params.DNCORE_DIR;
+  return params.REPO_DIR + dnpName;
 }
 
-
-function dockerComposeName(PACKAGE_NAME, params, IS_CORE) {
-  if (!IS_CORE) return params.DOCKERCOMPOSE_NAME;
-
-  const FILE_PREFIX = params.DOCKERCOMPOSE_NAME.split('.')[0];
-  const EXTENSION = params.DOCKERCOMPOSE_NAME.split('.')[1];
-  const PACKAGE_SHORT_NAME = PACKAGE_NAME.split('.')[0];
-
-  return FILE_PREFIX + '-' + PACKAGE_SHORT_NAME + '.' + EXTENSION;
+function getDockerComposeName(dnpName, isCore) {
+  if (isCore) {
+    const dnpShortName = (dnpName || "").split(".")[0];
+    return `docker-compose-${dnpShortName}.yml`;
+  } else {
+    return "docker-compose.yml";
+  }
 }
 
-
-function manifestName(PACKAGE_NAME, params, IS_CORE) {
-  if (!IS_CORE) return params.DAPPNODE_PACKAGE_NAME;
-
-  const FILE_PREFIX = params.DAPPNODE_PACKAGE_NAME.split('.')[0];
-  const EXTENSION = params.DAPPNODE_PACKAGE_NAME.split('.')[1];
-  const PACKAGE_SHORT_NAME = PACKAGE_NAME.split('.')[0];
-
-  return FILE_PREFIX + '-' + PACKAGE_SHORT_NAME + '.' + EXTENSION;
+function getManifestName(dnpName, isCore) {
+  if (isCore) {
+    const dnpShortName = (dnpName || "").split(".")[0];
+    return `dappnode_package-${dnpShortName}.json`;
+  } else {
+    return "dappnode_package.json";
+  }
 }

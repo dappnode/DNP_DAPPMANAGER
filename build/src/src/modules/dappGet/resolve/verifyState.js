@@ -1,5 +1,5 @@
-const safeSemver = require('../utils/safeSemver');
-const {hasVersion, getDependencies} = require('../utils/dnpUtils');
+const safeSemver = require("../utils/safeSemver");
+const { hasVersion, getDependencies, toReq } = require("../utils/dnpUtils");
 
 /**
  * Checks if a specific combination of DNP versions is valid
@@ -16,36 +16,36 @@ const {hasVersion, getDependencies} = require('../utils/dnpUtils');
     },
     "B": ...
     ...
- * @return {obj} Object with two properties:
+ * @returns {obj} Object with two properties:
  * - res: boolean, true if the state is valid
  * - msg: metadata of which pkg and dep invalidated the state
  */
 function verifyState(state, dnps) {
-    for (const stateDnp of Object.keys(state).filter((pkg) => state[pkg])) {
-        const stateVer = state[stateDnp];
-        if (!dnps[stateDnp]) {
-            throw Error('DNP '+stateDnp+' not in dnps');
-        } else if (!hasVersion(dnps, stateDnp, stateVer)) {
-            throw Error('DNP version '+stateDnp+'@'+stateVer+' not in dnps');
-        }
-        let deps = getDependencies(dnps, stateDnp, stateVer);
-        for (const depDnp of Object.keys(deps)) {
-            if (!safeSemver.satisfies(state[depDnp], deps[depDnp])) {
-                // This dependency is incompatible
-                return {
-                    valid: false,
-                    reason: {
-                        req: stateDnp+'@'+stateVer,
-                        dep: depDnp+'@'+state[depDnp],
-                        range: deps[depDnp],
-                    },
-                };
-            }
-        }
+  for (const stateDnp of Object.keys(state).filter(pkg => state[pkg])) {
+    const stateVer = state[stateDnp];
+    if (!dnps[stateDnp]) {
+      throw Error(`DNP ${stateDnp} not in dnps`);
+    } else if (!hasVersion(dnps, stateDnp, stateVer)) {
+      throw Error(`DNP ${toReq(stateDnp, stateVer)} not in dnps`);
     }
-    return {
-        valid: true,
-    };
+    let deps = getDependencies(dnps, stateDnp, stateVer);
+    for (const depDnp of Object.keys(deps)) {
+      if (!safeSemver.satisfies(state[depDnp], deps[depDnp])) {
+        // This dependency is incompatible
+        return {
+          valid: false,
+          reason: {
+            req: toReq(stateDnp, stateVer),
+            dep: toReq(depDnp, state[depDnp]),
+            range: deps[depDnp]
+          }
+        };
+      }
+    }
+  }
+  return {
+    valid: true
+  };
 }
 
 module.exports = verifyState;

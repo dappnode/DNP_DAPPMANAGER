@@ -1,28 +1,22 @@
-const db = require('../db');
+const db = require("../db");
 
 /**
  * Marks notifications as view by deleting them from the db
  *
- * @param {Object} kwargs: {
- *   ids: [
- *     'diskSpaceRanOut-stoppedPackages',
- *     'diskSpaceRanOut-stoppedPackages2'
- *   ]
- * }
- * @return {Object} A formated success message.
+ * @param {array} ids Array of ids to be marked as read
+ * ids = [ "notification-id1", "notification-id2" ]
  */
 
-const notificationsGet = async ({
-    ids = [],
-}) => {
-    for (const id of ids) {
-        await db.remove(`notification.${id}`);
-    }
+const notificationsRemove = async ({ ids }) => {
+  if (!ids) throw Error("kwarg ids must be defined");
 
-    return {
-        message: `Removed notifications: ${ids.join(', ')}`,
-    };
+  for (const id of ids) {
+    await db.remove(`notification.${id}`);
+  }
+
+  return {
+    message: `Removed notifications: ${ids.join(", ")}`
+  };
 };
 
-
-module.exports = notificationsGet;
+module.exports = notificationsRemove;

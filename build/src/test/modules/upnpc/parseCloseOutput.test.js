@@ -1,9 +1,7 @@
-const expect = require('chai').expect;
-const parseCloseOutput = require('modules/upnpc/parseCloseOutput');
+const expect = require("chai").expect;
+const parseCloseOutput = require("modules/upnpc/parseCloseOutput");
 
-/* eslint-disable max-len */
-
-describe('upnpn: parseCloseOutput', () => {
+describe("upnpn: parseCloseOutput", () => {
   const terminalOutputSuccess = `upnpc : miniupnpc library test client, version 2.0.
   (c) 2005-2017 Thomas Bernard.
 Go to http://miniupnp.free.fr/ or https://miniupnp.tuxfamily.org/
@@ -29,18 +27,18 @@ Found valid IGD : http://192.168.1.1:5001/uuid:0011-0011-0011-0011/WANPPPConnect
 Local LAN ip address : 192.168.1.01
 UPNP_DeletePortMapping() failed with code : 714`;
 
-  it('On success, it should return ok', async () => {
+  it("On success, it should return ok", async () => {
     const ok = parseCloseOutput(terminalOutputSuccess);
     expect(ok).to.be.ok;
   });
 
-  it('On error, it should return error', () => {
+  it("On error, it should return error", () => {
     let error;
     try {
       parseCloseOutput(terminalOutputErrorNoPort);
     } catch (e) {
       error = e.message;
     }
-    expect(error).to.equal('Error closing port: failed with code : 714');
+    expect(error).to.equal("Error closing port: failed with code : 714");
   });
 });

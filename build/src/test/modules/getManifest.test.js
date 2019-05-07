@@ -1,61 +1,55 @@
-const proxyquire = require('proxyquire');
-const chai = require('chai');
-const expect = require('chai').expect;
-const sinon = require('sinon');
+const proxyquire = require("proxyquire");
+const chai = require("chai");
+const expect = require("chai").expect;
+const sinon = require("sinon");
 
 chai.should();
 
-describe('Get manifest', function() {
-  // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params)
+describe("Get manifest", function() {
+  // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(name, params)
 
-  const PACKAGE_NAME = 'test.dnp.dappnode.eth';
+  const name = "test.dnp.dappnode.eth";
+  const sampleHash = "/ipfs/QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD";
   const packageReq = {
-    name: PACKAGE_NAME,
-    ver: 'latest',
+    name: name,
+    ver: "latest"
   };
-  const dnpHash = 'dnpHash';
-  const manifest = '{"image":{"hash":"/ipfs/Qm"}}';
+  const manifest = {
+    name,
+    version: "0.1.8",
+    type: "service",
+    image: {
+      hash: sampleHash
+    }
+  };
+
   const apmGetRepoHashSpy = sinon.spy();
   const apm = {
-    getRepoHash: async (packageReq) => {
+    getRepoHash: async packageReq => {
       apmGetRepoHashSpy(packageReq);
-      return dnpHash;
-    },
+      return sampleHash;
+    }
   };
-  const ipfsCatSpy = sinon.spy();
-  const ipfs = {
-    cat: async (dnpHash) => {
-      ipfsCatSpy(dnpHash);
-      return manifest;
-    },
+  const downloadManifestSpy = sinon.spy();
+  const downloadManifest = async _hash => {
+    downloadManifestSpy(_hash);
+    return manifest;
   };
 
-  const getManifest = proxyquire('modules/getManifest', {
-    'modules/ipfs': ipfs,
-    'modules/apm': apm,
+  const getManifest = proxyquire("modules/getManifest", {
+    "modules/downloadManifest": downloadManifest,
+    "modules/apm": apm
   });
 
   let res;
-  it('should call getManifest without throwing', async () => {
+  it("should call getManifest without throwing", async () => {
     res = await getManifest(packageReq);
   });
 
-  it('should call apm.getRepoHash with packageReq', () => {
-    expect(apmGetRepoHashSpy.getCalls()[0].args)
-      .to.deep.equal( [packageReq] );
-  });
-
-
-  it('should call ipfs.cat with dnpHash', () => {
-    expect(ipfsCatSpy.getCalls()[0].args)
-      .to.deep.equal( [dnpHash] );
-  });
-
-  it('should return a parsed manifest', () => {
-    expect(res)
-      .to.deep.equal({
-        image: {hash: '/ipfs/Qm'},
-        fromIpfs: undefined,
-      });
+  it("should return a parsed manifest", () => {
+    expect(res).to.deep.equal({
+      origin: null,
+      ...manifest
+    });
   });
 });

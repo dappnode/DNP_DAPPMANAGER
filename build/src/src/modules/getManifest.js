@@ -1,6 +1,10 @@
-const validate = require('utils/validate');
-const ipfs = require('modules/ipfs');
-const apm = require('modules/apm');
+const downloadManifest = require("modules/downloadManifest");
+const apm = require("modules/apm");
+const db = require("../db");
+const isIpfsHash = require("utils/isIpfsHash");
+const isEnsDomain = require("utils/isEnsDomain");
+const isSemverRange = require("utils/isSemverRange");
+const Joi = require("joi");
 
 // Used by
 // calls / fetchDirectory;
@@ -18,61 +22,128 @@ const apm = require('modules/apm');
  *
  * @param {object} packageReq package request
  * @param {object} options package request
- * @return {object} parsed manifest
+ * @returns {object} parsed manifest
  */
-async function getManifest(packageReq) {
-  validate.packageReq(packageReq);
+async function getManifest({ name, ver, version }) {
+  // Make the arguments compatible with old stardard
+  if (!ver && version) ver = version;
+  if (ver === "latest") ver = "*";
+  // Assert kwargs
+  if (!name) throw Error(`getManifest kwargs must contain property "name"`);
+  if (!ver) throw Error(`getManifest kwargs must contain property "ver"`);
 
-  let fromIpfs;
+  // 1. Get manifest hash
+  const hash = await fetchManifestHash({ name, ver });
 
-  if (packageReq.hash && packageReq.hash.startsWith('/ipfs/')) {
-    fromIpfs = packageReq.hash.replace('/ipfs/', 'ipfs-');
-  } else if (packageReq.name.endsWith('.eth')) {
-    if (packageReq.ver.startsWith('/ipfs/')) {
-      // packageReq.hash = 'ipfs/QmUHFxFbYdJDueBWzYZnvpzkjwBmMt3bmNDLQBTZzY18UZ';
-      packageReq.hash = packageReq.ver;
-      fromIpfs = packageReq.ver.replace('/ipfs/', 'ipfs-');
-    } else {
-      packageReq.hash = await apm.getRepoHash(packageReq);
-    }
-  // if the name of the package is already an IFPS hash, skip:
-  } else if (packageReq.name.startsWith('/ipfs/')) {
-    packageReq.hash = packageReq.name;
-    fromIpfs = packageReq.name.replace('/ipfs/', 'ipfs-');
-  } else {
-    throw Error('Unkown package request: '+packageReq.name);
-  }
-
-  // cat the file and parse it
-  // pass a maxSize = 100KB option which will throw an error if that size is exceeded
-  const manifestUnparsed = await ipfs.cat(packageReq.hash, {maxSize: 100000});
+  // 2. Download the manifest
+  // wrap in try / catch to format error
   let manifest;
   try {
-    manifest = JSON.parse(manifestUnparsed);
+    manifest = await downloadManifest(hash);
   } catch (e) {
-    throw Error(`Error JSON parsing the manifest: ${e.message}`);
+    e.message = `Can't download ${name} manifest: ${e.message}`;
+    throw e;
   }
 
   // Verify the manifest
-  if (!manifest.image || typeof manifest.image !== 'object') {
-    throw Error(`Invalid manifest: it does not contain the expected property 'image'`);
+  validateManifest(manifest);
+  // Verify that the request was correct: hash mismatch
+  // Except if the id is = "/ipfs/Qm...", there is no provided name
+  if (isIpfsHash(name)) {
+    ver = name;
+    name = manifest.name;
   }
-  if (!manifest.image.hash) {
-    throw Error(`Invalid manifest: it does not contain the expected property 'image.hash'`);
-  }
-
-  // Verify that the request was correct
-  if (packageReq.name && packageReq.name.endsWith('.eth')
-  && manifest && manifest.name
-  && packageReq.name !== manifest.name) {
-    throw Error('Package name requested doesn\'t match its manifest');
-  }
+  if (name !== manifest.name)
+    throw Error("DNP's name doesn't match the manifest's name");
+  // Correct manifest: type missing
+  if (!manifest.type) manifest.type = "library";
 
   return {
     ...manifest,
-    fromIpfs,
+    // origin is critical for dappGet/aggregate on IPFS DNPs
+    // used in packages.download > generate.dockerCompose
+    origin: isSemverRange(ver) ? null : ver || name
   };
 }
 
+// Utilities
+
+/**
+ * Handles different request formats and fetches the manifest hash if necessary
+ *
+ * @param {string} name
+ * @param {string} ver
+ * @returns {object} = { hash, origin }
+ */
+async function fetchManifestHash({ name, ver }) {
+  /**
+   * 1. Normal case, name = eth domain & ver = semver
+   * Go fetch to the APM
+   */
+  if (isEnsDomain(name) && isSemverRange(ver)) {
+    return await resolveApmVersion({ name, ver });
+  }
+
+  /**
+   * 2. IPFS normal case, name = eth domain & ver = IPFS hash
+   */
+  if (isEnsDomain(name) && isIpfsHash(ver)) {
+    return ver;
+  }
+
+  /**
+   * 3. When requesting IPFS hashes for the first time, their name is unknown
+   *    name = IPFS hash, ver = null
+   */
+  if (isIpfsHash(name)) {
+    return name;
+  }
+
+  /**
+   * 3. All other cases are invalid
+   */
+  if (isEnsDomain(name))
+    throw Error(`Invalid version, must be a semver or IPFS hash: ${ver}`);
+  else throw Error(`Invalid DNP name, must be a ENS domain: ${name}`);
+}
+
+/**
+ * Fetches the manifest hash and handles cache
+ *
+ * @param {string} name
+ * @param {string} ver
+ * @returns {string} manifestHash
+ */
+async function resolveApmVersion({ name, ver }) {
+  /**
+   * Construct a key for the db. The semver CANNOT be 0.1.0 as that would mean {0: {1: {0: {}}}
+   * id = goerli-pantheon-dnp-dappnode-eth-0-1-0
+   */
+  const key = `${name}-${ver}`.split(".").join("-");
+
+  // Check if the key is stored in cache. This key-value will never change
+  const hashCache = await db.get(key);
+  if (hashCache) return hashCache;
+
+  const hash = await apm.getRepoHash({ name, ver });
+  await db.set(key, hash);
+  return hash;
+}
+
+function validateManifest(manifest) {
+  // Minimal (very relaxed) manifest check
+  const manifestSchema = Joi.object({
+    name: Joi.string().required(),
+    version: Joi.string().required(),
+    image: Joi.object({
+      hash: Joi.string().required()
+    })
+      .pattern(/./, Joi.any())
+      .required()
+  }).pattern(/./, Joi.any());
+
+  // Throws error if invalid
+  Joi.assert(manifest, manifestSchema, "Manifest");
+}
 
 module.exports = getManifest;

@@ -1,117 +1,139 @@
-const getDirectory = require('modules/getDirectory');
-const {eventBus, eventBusTag} = require('eventBus');
-const logs = require('logs.js')(module);
-const getManifest = require('modules/getManifest');
-const getAvatar = require('modules/getAvatar');
-const parse = require('utils/parse');
-const isSyncing = require('utils/isSyncing');
+const getDirectory = require("modules/getDirectory");
+const { eventBus, eventBusTag } = require("eventBus");
+const logs = require("logs.js")(module);
+const getManifest = require("modules/getManifest");
+const getAvatar = require("modules/getAvatar");
+const parse = require("utils/parse");
+const isSyncing = require("utils/isSyncing");
+const isIpfsHash = require("utils/isIpfsHash");
 
-let packagesCache;
+let dnpsCache = [];
 let avatarCache = {};
-
-function emitPkg(pkg) {
-  const pkgsObj = {
-    [pkg.name]: pkg,
-  };
-  eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-}
-
-// function emitPkgs(pkgs) {
-//   const pkgsObj = {};
-//   for (const pkg of pkgs) {
-//     pkgsObj[pkg.name] = pkg;
-//   }
-//   eventBus.emit(eventBusTag.emitDirectory, pkgsObj);
-// }
 
 /**
  * Fetches all package names in the custom dappnode directory.
- * This feature helps the ADMIN UI load the directory data faster.
+ * This feature helps the UI to load the directory data faster.
  *
- * @param {Object} kwargs: {}
- * @return {Object} A formated success message.
- * result: packages =
- *   [
- *     {
- *       name: packageName, (string)
- *       status: 'Preparing', (string)
- *       currentVersion: '0.1.2' or null, (String)
- *     },
- *     ...
- *   ]
+ * @returns {array} A formated success message.
+ * result: packages = [{
+ *   name: "bitcoin.dnp.dappnode.eth", {string}
+ *   status: "preparing", {string}
+ *   manifest: <manifest object>, {object}
+ *   avatar: <base64 image>, {string}
+ * }, ... ]
  */
 const fetchDirectory = async () => {
   if (await isSyncing()) {
     return {
       message: `Mainnet is still syncing`,
       result: [],
-      logMessage: true,
+      logMessage: true
     };
   }
 
-  // Emit a cached version right away
-  if (packagesCache && Array.isArray(packagesCache)) {
-    // Send packages one by one. This should help on extremely slow connections
-    packagesCache.forEach(emitPkg);
+  // Emit the cached DNPs right away
+  if (Array.isArray(dnpsCache) && dnpsCache.length) {
+    eventBus.emit(eventBusTag.emitDirectory, dnpsCache);
   }
 
-  // List of available packages in the directory
-  // Return an array of objects:
-  //   [
-  //     {
-  //       name: packageName,  (string)
-  //       status: 'Preparing' (string)
-  //     },
-  //     ...
-  //   ]
-  const packages = await getDirectory();
+  /**
+   * List of available packages in the directory
+   * @param {array} dnpsFromDirectory = [{
+   *   name: "bitcoin.dnp.dappnode.eth", {string}
+   *   status: "preparing", {string}
+   * }, ... ]
+   */
+  const dnpsFromDirectory = await getDirectory();
 
   // Extend package object contents
-  packagesCache = await Promise.all(packages.map(async (pkg) => {
-    const {name} = pkg;
-    emitPkg(pkg);
+  dnpsCache = await Promise.all(
+    dnpsFromDirectory.map(async ({ name, status, directoryId }) => {
+      // Now resolve the last version of the package
+      const manifest = await getManifest(parse.packageReq(name));
+      emitPkg({
+        name,
+        status,
+        directoryId,
+        manifest
+      });
 
-    // Now resolve the last version of the package
-    const manifest = await getManifest(parse.packageReq(name));
-    // Correct manifest
-    if (!manifest.type) manifest.type = 'library';
-    emitPkg({name, manifest});
+      // Fetch the package image
+      const avatarHash = manifest.avatar;
 
-    // Fetch the package image
-    const avatarHash = manifest.avatar;
-
-    let avatar;
-    if (avatarHash) {
-      try {
-        // Retrieve cached avatar or fetch it
-        if (avatarCache[avatarHash]) {
-          avatar = avatarCache[avatarHash];
-        } else {
-          avatar = await getAvatar(avatarHash);
-          avatarCache[avatarHash] = avatar;
+      let avatar;
+      if (isIpfsHash(avatarHash)) {
+        try {
+          // Retrieve cached avatar or fetch it
+          if (avatarCache[avatarHash]) {
+            avatar = avatarCache[avatarHash];
+          } else {
+            avatar = await getAvatar(avatarHash);
+            avatarCache[avatarHash] = avatar;
+          }
+          emitPkg({
+            name,
+            avatar
+          });
+        } catch (e) {
+          // If the avatar can not be fetched don't stop the function
+          logs.error(
+            `Error fetching avatar of ${name} at ${avatarHash}: ${e.message}`
+          );
         }
-        emitPkg({name, avatar});
-      } catch (e) {
-        // If the avatar can not be fetched don't crash
-        logs.error('Could not fetch avatar of '+name+' at '+avatarHash+': '+e.message);
       }
-    }
 
-    // Merge results and return
-    return {
-      ...pkg,
-      manifest,
-      avatar,
-    };
-  }));
+      // Merge results and return
+      return {
+        name,
+        status,
+        directoryId,
+        // Appended
+        manifest,
+        avatar
+      };
+    })
+  );
 
-  const payloadSize = Math.floor(Buffer.byteLength(JSON.stringify(packagesCache), 'utf8')/1000);
+  const payloadSize = Math.floor(
+    Buffer.byteLength(JSON.stringify(dnpsCache), "utf8") / 1000
+  );
   return {
-    message: `Listed directory with ${packagesCache.length} packages (${payloadSize} KB)`,
-    result: packagesCache,
-    logMessage: true,
+    message: `Listed directory: ${dnpsCache.length} DNPs, ${payloadSize} KB`,
+    result: dnpsCache,
+    logMessage: true
   };
 };
 
+// Utils / Cache managment
+
+/**
+ * Emits a DNP object to the UI for a progressive update response.
+ * The first argument of `emitDirectory` must be an array of DNP objects
+ *
+ * - Emit the dnp only if the cache has changed. Prevent too much UI re-renders
+ * @param {object} dnp
+ */
+function emitPkg(dnp) {
+  const dnpCache = dnpsCache.find(({ name }) => name === dnp.name);
+  if (!dnpCache || isCacheInvalid(dnpCache, dnp))
+    eventBus.emit(eventBusTag.emitDirectory, [dnp]);
+}
+
+function isCacheInvalid(dnpCache, dnpNew) {
+  const manifestNew = (dnpNew || {}).manifest;
+  const versionNew = (manifestNew || {}).version;
+  const versionCache = ((dnpCache || {}).manifest || {}).version;
+  const avatarNew = (dnpNew || {}).avatar;
+  const avatarCache = (dnpCache || {}).avatar;
+  /**
+   * Only two elements can change, the manifest and the avatar
+   * - Since these DNPs are fetched from an APM, there will never be two
+   *   different manifest for the same version
+   * - The avatar is a raw string, so it can be compared with a simple equality
+   */
+  if (manifestNew && !versionNew) return true;
+  if (manifestNew && versionNew !== versionCache) return true;
+  if (avatarNew && avatarNew !== avatarCache) return true;
+}
 
 module.exports = fetchDirectory;

@@ -1,14 +1,14 @@
-const fs = require('fs');
-const parse = require('utils/parse');
-const params = require('params');
-const getPath = require('utils/getPath');
-const validate = require('utils/validate');
+const fs = require("fs");
+const parse = require("utils/parse");
+const params = require("params");
+const getPath = require("utils/getPath");
+const validate = require("utils/validate");
 
 /**
  * Loads a `.env` file from disk and parses its envs
- * @param {String} name
- * @param {Bool} isCore
- * @return {Object} envs = {
+ * @param {string} name
+ * @param {bool} isCore
+ * @returns {object} envs = {
  *   ENV_NAME: 'value'
  * }
  */
@@ -17,15 +17,15 @@ function loadEnvs(name, isCore) {
   if (!fs.existsSync(envFilePath)) {
     return {};
   }
-  const envFileData = fs.readFileSync(envFilePath, 'utf8');
+  const envFileData = fs.readFileSync(envFilePath, "utf8");
   return parse.envFile(envFileData);
 }
 
 /**
  * Stringifies an env object and write to an `.env` file to disk
- * @param {String} name
- * @param {Bool} isCore
- * @param {Object} envs = {
+ * @param {string} name
+ * @param {bool} isCore
+ * @param {object} envs = {
  *   ENV_NAME: 'value'
  * }
  */
@@ -36,16 +36,16 @@ function writeEnvs(name, isCore, envs) {
 
 /**
  * Parses a manifest object to return an envs object
- * @param {Object} manifest
- * @return {Object} envs = {
+ * @param {object} manifest
+ * @returns {object} envs = {
  *   ENV_NAME: 'value'
  * }
  */
 function getManifestEnvs(manifest) {
   const envsArray = (manifest.image || {}).environment || [];
   return envsArray.reduce((obj, row) => {
-    const [key, value] = (row || '').trim().split(/=(.*)/);
-    obj[key] = value || '';
+    const [key, value] = (row || "").trim().split(/=(.*)/);
+    obj[key] = value || "";
     return obj;
   }, {});
 }
@@ -53,5 +53,5 @@ function getManifestEnvs(manifest) {
 module.exports = {
   load: loadEnvs,
   write: writeEnvs,
-  getManifestEnvs,
+  getManifestEnvs
 };

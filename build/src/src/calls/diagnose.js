@@ -1,52 +1,50 @@
-const shellExec = require('utils/shell');
-
-/**
- * @param {String} cmd
- * @return {Object} in case of success:
- * { result: 'Docker version 18.06.1-ce, build e68fc7a' }
- *   in case of error:
- * { error: 'sh: docker: not found' }
- */
-const shellExecFormated = (cmd) => shellExec(cmd)
-    .then((data) => ({result: (data || '').trim()}))
-    .catch((e) => ({error: e.message}));
+const shellExec = require("utils/shell");
 
 /**
  * Returns a list of checks done as a diagnose
  *
- * @return {Object} A formated list of messages.
- * result: diagnose =
- *   {
- *     dockerVersion: {
- *       name: 'docker version',
- *       result: 'Docker version 18.06.1-ce, build e68fc7a'
- *       <or>
- *       error: 'sh: docker: not found'
- *     }
- *   }
+ * @returns {object} diagnoses object, by diagnose id
+ * diagnoses = {
+ *   "dockerVersion": {
+ *     name: "docker version",
+ *     result: "Docker version 18.06.1-ce, build e68fc7a"
+ *     error: "sh: docker: not found"
+ *   } // either "result" or "error" prop will exist
+ * }
  */
-const getStats = async () => {
-    /* eslint-disable max-len */
-    const diagnose = {};
+const diagnose = async () => {
+  // Get docker version
+  const dockerVersion = {
+    name: "docker version",
+    ...(await shellExecFormated(`docker -v`))
+  };
 
-    // Get docker version
-    diagnose.dockerVersion = {
-        name: 'docker version',
-        ...(await shellExecFormated(`docker -v`)),
-    };
+  // Get docker compose version
+  const dockerComposeVersion = {
+    name: "docker compose version",
+    ...(await shellExecFormated(`docker-compose -v`))
+  };
 
-    // Get docker compose version
-    diagnose.dockerComposeVersion = {
-        name: 'docker compose version',
-        ...(await shellExecFormated(`docker-compose -v`)),
-    };
-
-    return {
-        message: `Diagnose of this DAppNode server`,
-        result: diagnose,
-    };
+  return {
+    message: `Diagnose of this DAppNode server`,
+    result: [dockerVersion, dockerComposeVersion]
+  };
 };
 
+// Utils
 
-module.exports = getStats;
+/**
+ * @param {string} cmd
+ * @returns {object} Returns a formated object for the diagnose call
+ * - On success:
+ *   { result: 'Docker version 18.06.1-ce, build e68fc7a' }
+ * - On error:
+ *   { error: 'sh: docker: not found' }
+ */
+function shellExecFormated(cmd) {
+  return shellExec(cmd)
+    .then(data => ({ result: (data || "").trim() }))
+    .catch(e => ({ error: e.message }));
+}
 
+module.exports = diagnose;

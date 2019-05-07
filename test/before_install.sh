@@ -8,7 +8,7 @@
 ##############
 
 DAPPNODE_DIR="test_build"
-mkdir $DAPPNODE_DIR
+mkdir -p $DAPPNODE_DIR
 
 export BIND_VERSION="0.1.5"
 export IPFS_VERSION="0.1.3"
@@ -52,5 +52,7 @@ docker-compose -f $WAMP_YML_FILE up -d
 
 cp -r build $DAPPNODE_DIR
 cp -r test/* $DAPPNODE_DIR
+mkdir -p $DAPPNODE_DIR/.git && cp -r .git/* $DAPPNODE_DIR/.git
+cp dappnode_package.json $DAPPNODE_DIR
 
 docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml build

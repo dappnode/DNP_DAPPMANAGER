@@ -1,22 +1,22 @@
 /**
  * Deal with empty fields without throwing errors
  */
-const name = 'Deal with empty fields without throwing errors';
+const name = "Deal with empty fields without throwing errors";
 
 const manifest = {
-  name: 'EmptyArray',
-  version: '',
-  description: '',
-  avatar: '',
-  type: '',
+  name: "EmptyArray",
+  version: "",
+  description: "",
+  avatar: "",
+  type: "",
   image: {
-    path: '',
-    hash: '',
-    size: '',
-    volumes: [''],
-    ports: [''],
-    command: '--command',
-  },
+    path: "",
+    hash: "",
+    size: "",
+    volumes: [""],
+    ports: [""],
+    command: "--command"
+  }
 };
 
 const dc = `version: '3.4'
@@ -43,4 +43,4 @@ networks:
         external: true
 `;
 
-module.exports = {name, manifest, dc};
+module.exports = { name, manifest, dc };

@@ -1,13 +1,13 @@
-const fs = require('fs');
-const params = require('params');
-const logs = require('logs.js')(module);
+const fs = require("fs");
+const params = require("params");
+const logs = require("logs.js")(module);
 // Modules
-const dockerList = require('modules/dockerList');
-const docker = require('modules/docker');
+const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 // Utils
-const parseDockerSystemDf = require('utils/parseDockerSystemDf');
-const getPath = require('utils/getPath');
-const envsHelper = require('utils/envsHelper');
+const parseDockerSystemDf = require("utils/parseDockerSystemDf");
+const getPath = require("utils/getPath");
+const envsHelper = require("utils/envsHelper");
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
@@ -25,26 +25,39 @@ async function dockerSystemDf() {
 /**
  * Returns the list of current containers associated to packages
  *
- * @param {Object} kwargs: {}
- * @return {Object} A formated success message.
- * result: packages =
- *   [
- *     {
- *       id: '9238523572017423619487623894', (string)
- *       isDNP: true, (boolean)
- *       created: <Date string>,
- *       image: <Image Name>, (string)
- *       name: otpweb.dnp.dappnode.eth, (string)
- *       shortName: otpweb, (string)
- *       version: '0.0.4', (string)
- *       ports: <list of ports>, (string)
- *       state: 'exited', (string)
- *       running: true, (boolean)
- *       ...
- *       envs: <Env variables> (object)
- *     },
- *     ...
- *   ]
+ * @returns {array} dnpInstalled = [{
+ *   id: "923852...", {string}
+ *   packageName: "DAppNodePackage-admin...", {string}
+ *   version: "0.1.8", {string}
+ *   isDNP: true, {bool}
+ *   isCORE: false, {bool}
+ *   created: <data string>, {string}
+ *   image: "admin.dnp.dappnode.eth-0.1.8", {string}
+ *   name: "admin.dnp.dappnode.eth", {string}
+ *   shortName: "admin", {string}
+ *   ports: [{
+ *     PrivatePort: 2222, {number}
+ *     PublicPort: 3333, {number}
+ *     Type: "tcp" {string}
+ *   }, ... ], {array}
+ *   volumes: [{
+ *     type: "bind", {string}
+ *     name: "admin_data", {string}
+ *     path: "source path" {string}
+ *   }, ... ] {array}
+ *   state: "running", {string}
+ *   running: true, {bool}
+ *
+ *   // From labels
+ *   origin: "/ipfs/Qmabcd...", {string}
+ *   chain: "ethereum", {string}
+ *   dependencies: { dependency.dnp.dappnode.eth: "0.1.8" }, {object}
+ *   portsToClose: [ {number: 30303, type: 'UDP'}, ...], {array}
+ *
+ *   // Appended here
+ *   envs: { ENV_NAME: "ENV_VALUE" }, {object}
+ *   manifest: <manifest object> {object}
+ * }, ... ]
  */
 const listPackages = async () => {
   let dnpList = await dockerList.listContainers();
@@ -54,28 +67,40 @@ const listPackages = async () => {
   //   Error response from daemon: a disk usage operation is already running
   try {
     const dockerSystemDfData = await dockerSystemDf();
-    dnpList = parseDockerSystemDf({data: dockerSystemDfData, dnpList});
+    dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
   } catch (e) {
-    logs.error('Error appending volume info in listPackages call: ' + e.stack);
+    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
   }
 
   // Append envFile and manifest
-  dnpList.map((dnp) => {
+  dnpList.map(dnp => {
     // Add env info, only if there are ENVs
-    const envs = envsHelper.load(dnp.name, dnp.isCORE || dnp.isCore);
-    if (Object.keys(envs).length) dnp.envs = envs;
+    try {
+      const envs = envsHelper.load(dnp.name, dnp.isCore);
+      if (Object.keys(envs).length) dnp.envs = envs;
+    } catch (e) {
+      logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
+    }
 
     // Add manifest
-    const manifestPath = getPath.manifest(dnp.name, params, dnp.isCORE || dnp.isCore);
-    if (fs.existsSync(manifestPath)) {
-      const manifestFileData = fs.readFileSync(manifestPath, 'utf8');
-      dnp.manifest = JSON.parse(manifestFileData);
+    try {
+      const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
+      if (fs.existsSync(manifestPath)) {
+        const manifestFileData = fs.readFileSync(manifestPath, "utf8");
+        try {
+          dnp.manifest = JSON.parse(manifestFileData);
+        } catch (e) {
+          // Silence parsing errors
+        }
+      }
+    } catch (e) {
+      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
     }
   });
 
   return {
-    message: 'Listing ' + dnpList.length + ' packages',
-    result: dnpList,
+    message: `Listing ${dnpList.length} packages`,
+    result: dnpList
   };
 };
 

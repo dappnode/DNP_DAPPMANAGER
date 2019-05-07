@@ -1,32 +1,49 @@
-const dappGet = require('modules/dappGet');
-const dappGetBasic = require('modules/dappGet/basic');
+const dappGet = require("modules/dappGet");
 
 /**
- * Remove package data: docker down + disk files
+ * Resolves a DNP request given the current repo state fetched
+ * from the blockchain and the current installed DNPs versions
  *
- * @param {Object} kwargs: {
- *   req: {
- *        name: 'otpweb.dnp.dappnode.eth', <string>
- *        ver: '0.1.4' <string>
- *      }
+ * @param {object} req, DNP request to resolve
+ * req = {
+ *   name: "otpweb.dnp.dappnode.eth", {string}
+ *   ver: "0.1.4" {string}
  * }
- * @return {Object} A formated success message.
- * result: empty
+ * @returns {object} result  = {
+ *   state: {"admin.dnp.dappnode.eth": "0.1.4"},
+ *   alreadyUpdated: {"bind.dnp.dappnode.eth": "0.1.2"},
+ * }
  */
-const removePackage = async ({req, options = {}}) => {
-  // result = {
-  //     success: {'bind.dnp.dappnode.eth': '0.1.4'}
-  //     alreadyUpdated: {'bind.dnp.dappnode.eth': '0.1.2'}
-  // }
-  const result = options.BYPASS_RESOLVER ? await dappGetBasic(req) : await dappGet(req);
+const resolveRequest = async ({ req, options = {} }) => {
+  if (!req) throw Error("kwarg req must be defined");
 
-  // Prevent old UIs from crashing
-  result.state = {};
+  /**
+   * Resolve the request
+   * @param {object} state = {
+   * 'admin.dnp.dappnode.eth': '0.1.5'
+   * }
+   * @param {object} alreadyUpdated = {
+   * 'bind.dnp.dappnode.eth': '0.1.4'
+   * }
+   * Forwards the options to dappGet:
+   * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
+   * @returns {object} = {
+   *   message: "Found compatible state with case 1/256",
+   *   state,
+   *   alreadyUpdated
+   * }
+   *
+   * In case of error, it will throw an error with a formated message
+   */
+  const { message, state, alreadyUpdated } = await dappGet(req, options);
 
   return {
-    message: 'Resolve request for ' + req.name + '@' + req.ver + ', resolved: ' + Boolean(result.success),
-    result,
+    message,
+    result: {
+      state,
+      alreadyUpdated
+    }
   };
 };
 
-module.exports = removePackage;
+module.exports = resolveRequest;

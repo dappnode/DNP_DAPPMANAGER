@@ -1,21 +1,25 @@
-'use strict';
+"use strict";
 
 // node modules
-const autobahn = require('autobahn');
-const {eventBus, eventBusTag} = require('./eventBus');
-const logs = require('./logs')(module);
-const logUserAction = require('./logUserAction');
-const {registerHandler, wrapErrors} = require('./utils/registerHandler');
-const params = require('./params');
-const db = require('./db');
-const upnpc = require('./modules/upnpc');
+const autobahn = require("autobahn");
+const { eventBus, eventBusTag } = require("./eventBus");
+const logs = require("./logs")(module);
+const logUserAction = require("./logUserAction");
+const { registerHandler } = require("./registerHandler");
+const params = require("./params");
+const db = require("./db");
+const upnpc = require("./modules/upnpc");
+const { stringIncludes } = require("utils/strings");
 
 // import calls
-const calls = require('./calls');
+const calls = require("./calls");
 
 // Start watchers
-require('./watchers/chains');
-require('./watchers/diskUsage');
+require("./watchers/chains");
+require("./watchers/diskUsage");
+
+// Print version data
+require("./utils/getVersionData");
 
 /*
  * Connection configuration
@@ -29,105 +33,180 @@ require('./watchers/diskUsage');
  * - it subscribe to userAction logs sent by the VPN to store them locally
  */
 
-if (process.env.NODE_ENV === 'development') {
-  params.autobahnUrl = 'ws://localhost:8080/ws';
-  params.autobahnRealm = 'realm1';
+if (process.env.NODE_ENV === "development") {
+  params.autobahnUrl = "ws://localhost:8080/ws";
+  params.autobahnRealm = "realm1";
 }
 
-const autobahnUrl = params.autobahnUrl;
-const autobahnRealm = params.autobahnRealm;
-const connection = new autobahn.Connection({url: autobahnUrl, realm: autobahnRealm});
+const url = params.autobahnUrl;
+const realm = params.autobahnRealm;
+const connection = new autobahn.Connection({ url, realm });
 
 connection.onopen = (session, details) => {
-  logs.info('CONNECTED to DAppnode\'s WAMP ' + '\n   url ' + autobahnUrl + '\n   realm: ' + autobahnRealm + '\n   session ID: ' + details.authid);
+  logs.info(`Connected to DAppNode's WAMP
+  url:     ${url}
+  realm:   ${realm}
+  session: ${(details || {}).authid}`);
 
-  registerHandler(session, 'ping.dappmanager.dnp.dappnode.eth', (x) => x);
+  registerHandler(session, "ping.dappmanager.dnp.dappnode.eth", x => x);
   for (const callId of Object.keys(calls)) {
-    registerHandler(session, callId + '.dappmanager.dnp.dappnode.eth', calls[callId]);
+    registerHandler(
+      session,
+      callId + ".dappmanager.dnp.dappnode.eth",
+      calls[callId]
+    );
   }
 
   /**
    * All the session uses below can throw errors if the session closes.
-   * so each single callback is wrapped in a try/catch block
+   * so each single callback is wrapped in a try/catch block,
+   * via the `eventBus.onSafe` method
    */
 
   /**
    * Allows internal calls to autobahn. For example, to call install do:
    * eventBus.emit(eventBusTag.call, 'installPackage.dappmanager.dnp.dappnode.eth', [], { id })
    */
-  eventBus.onSafe(eventBusTag.call, ({event, callId, args = [], kwargs = {}, callback}) => {
-    // Use "callId" to call internal dappmanager methods.
-    // Use "event" to call external methods.
-    if (callId && !Object.keys(calls).includes(callId)) {
-      throw Error(`Requested internal call event does not exist: ${callId}`);
+  eventBus.onSafe(
+    eventBusTag.call,
+    ({ event, callId, args = [], kwargs = {}, callback }) => {
+      // Use "callId" to call internal dappmanager methods.
+      // Use "event" to call external methods.
+      if (callId && !Object.keys(calls).includes(callId)) {
+        throw Error(`Requested internal call event does not exist: ${callId}`);
+      }
+      if (!event) event = callId + ".dappmanager.dnp.dappnode.eth";
+      session
+        .call(event, args, kwargs)
+        .then(JSON.parse)
+        .then(res => {
+          logs.info(`Internal call to "${event}" result:`);
+          logs.info(res);
+          if (callback) callback(res);
+        });
     }
-    if (!event) event = callId + '.dappmanager.dnp.dappnode.eth';
-    session
-      .call(event, args, kwargs)
-      .then(JSON.parse)
-      .then((res) => {
-        logs.info(`Internal call to "${event}" result:`);
-        logs.info(res);
-        if (callback) callback(res);
-      });
-  });
+  );
 
-  // Emit chain data
-  const eventChainData = 'chainData.dappmanager.dnp.dappnode.eth';
-  eventBus.onSafe(eventBusTag.emitChainData, ({chainData}) => {
-    session.publish(eventChainData, chainData); // chainData is an array
+  /**
+   * Utilities to encode arguments to publish with the Crossbar format (args, kwargs)
+   * - Publisher:
+   *     publish("event.name", arg1, arg2)
+   * - Subscriber:
+   *     subscribe("event.name", function(arg1, arg2) {})
+   */
+  function publish(event, ...args) {
+    // session.publish(topic, args, kwargs, options)
+    session.publish(event, args);
+  }
+  function subscribe(event, cb) {
+    // session.subscribe(topic, function(args, kwargs, details) )
+    session.subscribe(event, args => {
+      try {
+        cb(...args);
+      } catch (e) {
+        logs.error(`Error on WAMP ${event}: ${e.stack}`);
+      }
+    });
+  }
+
+  /**
+   * Emit chain data to the UI
+   * @param {array} chainData = [{
+   *     syncing: true, {bool}
+   *     message: "Blocks synced: 543000 / 654000", {string}
+   *     progress: 0.83027522935,
+   *   }, {
+   *     message: "Could not connect to RPC", {string}
+   *     error: true {bool},
+   *   }, ... ]
+   */
+  eventBus.onSafe(eventBusTag.emitChainData, ({ chainData }) => {
+    publish("chainData.dappmanager.dnp.dappnode.eth", chainData);
   });
 
   // Emits the list of packages
-  const eventPackages = 'packages.dappmanager.dnp.dappnode.eth';
-  const listPackagesWrapped = wrapErrors(calls.listPackages, eventPackages);
-  eventBus.onSafe(eventBusTag.emitPackages, () => {
-    listPackagesWrapped().then((res) => {
-      session.publish(eventPackages, [], JSON.parse(res));
-    });
-  });
+  eventBus.onSafe(
+    eventBusTag.emitPackages,
+    async () => {
+      const dnpList = (await calls.listPackages()).result;
+      publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
+    },
+    { isAsync: true }
+  );
 
   // Emits the directory
-  const eventDirectory = 'directory.dappmanager.dnp.dappnode.eth';
-  eventBus.onSafe(eventBusTag.emitDirectory, (pkgs) => {
-    session.publish(eventDirectory, [], pkgs);
+  eventBus.onSafe(eventBusTag.emitDirectory, pkgs => {
+    publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
-  // Emits progress logs to the ADMIN UI
-  eventBus.onSafe(eventBusTag.logUI, (data) => {
-    session.publish('log.dappmanager.dnp.dappnode.eth', [], data);
-    if (data && data.msg && !data.msg.includes('%')) {
-      logs.info(JSON.stringify(data));
+  /**
+   * Emit progress logs to the ADMIN UI
+   * @param {object} logData = {
+   *   id: "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", {string} overall log id (to bundle multiple logs)
+   *   name: "bitcoin.dnp.dappnode.eth", {string} dnpName the log is referring to
+   *   message: "Downloading 75%", {string} log message
+   * }
+   */
+  eventBus.onSafe(eventBusTag.logUi, logData => {
+    publish("log.dappmanager.dnp.dappnode.eth", logData);
+    // Also, log them internally. But skip download progress logs, too spam-y
+    if (!stringIncludes((logData || {}).message, "%")) {
+      logs.info(JSON.stringify(logData));
     }
   });
 
-  // Emits userAction logs to the ADMIN UI
-  eventBus.onSafe(eventBusTag.logUserAction, (data) => {
-    session.publish('logUserAction.dappmanager.dnp.dappnode.eth', [], data);
+  /**
+   * Emits userAction logs to the UI
+   * @param {object} userActionLog = {
+   *   level: "info" | "error", {string}
+   *   event: "installPackage.dnp.dappnode.eth", {string}
+   *   message: "Successfully install DNP", {string} Returned message from the call function
+   *   result: { data: "contents" }, {*} Returned result from the call function
+   *   kwargs: { id: "dnpName" }, {object} RPC key-word arguments
+   *   // Only if error
+   *   message: e.message, {string}
+   *   stack.e.stack {string}
+   * }
+   */
+  eventBus.onSafe(eventBusTag.logUserAction, userActionLog => {
+    publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
   });
 
-  // Receives userAction logs from the VPN nodejs app
-  session.subscribe('logUserActionToDappmanager', (args) => {
-    try {
-      logUserAction.log(args[0]);
-    } catch (e) {
-      logs.error('Error logging user action: ' + e.stack);
-    }
+  /**
+   * Receives userAction logs from the VPN nodejs app
+   * See above for more details on userActionLog
+   */
+  subscribe("logUserActionToDappmanager", userActionLog => {
+    logUserAction.log(userActionLog);
   });
 
-  // Emits push notification to the UI and to the local db
-  eventBus.onSafe(eventBusTag.pushNotification, async (notification) => {
-    await db.set(`notification.${notification.id}`, notification);
-    session.publish('pushNotification.dappmanager.dnp.dappnode.eth', [], notification);
-  });
+  /**
+   * Emits push notification to the UI and to the local db
+   * @param {object} notification = {
+   *   id: "diskSpaceRanOut-stoppedPackages",
+   *   type: "error",
+   *   title: "Disk space ran out, stopped packages",
+   *   body: "Available disk space is less than a safe ..."",
+   * }
+   */
+  eventBus.onSafe(
+    eventBusTag.pushNotification,
+    async notification => {
+      await db.set(`notification.${notification.id}`, notification);
+      publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
+    },
+    { isAsync: true }
+  );
 };
 
 connection.onclose = (reason, details) => {
-  logs.warn('Crossbar connection closed. Reason: ' + reason + ', details: ' + JSON.stringify(details));
+  logs.warn(
+    `WAMP connection closed: ${reason} ${(details || {}).message || ""}`
+  );
 };
 
 connection.open();
-logs.info('Attempting WAMP connection to ' + autobahnUrl + ', realm ' + autobahnRealm);
+logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 /**
  * Initials calls
@@ -140,12 +219,14 @@ checkIfUpnpIsAvailable();
 async function checkIfUpnpIsAvailable() {
   try {
     const currentPortMappings = await upnpc.list();
-    logs.info('UPnP device available');
-    logs.info(`currentPortMappings: ${JSON.stringify(currentPortMappings, null, 2)}`);
-    await db.set('upnpAvailable', true);
+    logs.info("UPnP device available");
+    logs.info(
+      `currentPortMappings: ${JSON.stringify(currentPortMappings, null, 2)}`
+    );
+    await db.set("upnpAvailable", true);
   } catch (e) {
-    if (e.message.includes('NOUPNP')) {
-      logs.info('UPnP device NOT available');
+    if (stringIncludes((e || {}).message, "NOUPNP")) {
+      logs.info("UPnP device NOT available");
     } else {
       logs.error(`Error checking if UPnP device is available: ${e.stack}`);
     }

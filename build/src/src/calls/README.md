@@ -1,6 +1,6 @@
 # Calls
 
-Each call function is a Remote procedure call (RPC) registered to autobahn.js (crossbar). All files return an async function with has only one argument (key-word arguments, kwargs) and returns a response object. The kwargs is es6-deconstructed to access the arguments sent by the callee to execute the task.
+Each call function is a Remote procedure call (RPC) registered to autobahn.js (crossbar). All files return an async function with only one argument (key-word arguments, kwargs) and returns a response object. The kwargs is es6-deconstructed to access the arguments sent by the callee to execute the task.
 
 ```javascript
 const someCall = async ({ arg1, arg2 }) => {

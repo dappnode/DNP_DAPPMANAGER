@@ -1,40 +1,41 @@
-const proxyquire = require('proxyquire');
-const expect = require('chai').expect;
-const sinon = require('sinon');
-const {eventBusTag} = require('eventBus');
+const proxyquire = require("proxyquire");
+const expect = require("chai").expect;
+const sinon = require("sinon");
+const { eventBusTag } = require("eventBus");
 
-describe('Call function: installPackage', function() {
+describe("Call function: installPackage", function() {
   const params = {
-    REPO_DIR: 'test_files/',
-    DOCKERCOMPOSE_NAME: 'docker-compose.yml',
+    DNCORE_DIR: "DNCORE",
+    REPO_DIR: "test_files/"
   };
 
-  const pkgName = 'dapp.dnp.dappnode.eth';
-  const pkgVer = '0.1.1';
+  const pkgName = "dapp.dnp.dappnode.eth";
+  const pkgVer = "0.1.1";
   const pkgManifest = {
     name: pkgName,
-    type: 'service',
+    type: "service"
   };
 
-  const depName = 'kovan.dnp.dappnode.eth';
-  const depVer = '0.1.1';
+  const depName = "kovan.dnp.dappnode.eth";
+  const depVer = "0.1.1";
   const depManifest = {
     name: depName,
-    type: 'library',
+    type: "library"
   };
-  const depPortsToOpen = [{number: 32769, type: 'UDP'}, {number: 32769, type: 'TCP'}];
-
-  const logId = '1234abcd';
+  const depPortsToOpen = [
+    { number: 32769, type: "UDP" },
+    { number: 32769, type: "TCP" }
+  ];
 
   // Stub packages module. Resolve always returning nothing
   const packages = {
     download: sinon.fake.resolves(),
-    run: sinon.fake.resolves(),
+    run: sinon.fake.resolves()
   };
 
   const dappGet = sinon.fake.resolves({
-    success: {[pkgName]: pkgVer, [depName]: depVer},
-    state: {[pkgName]: '0.1.0'},
+    message: "Found compatible state",
+    state: { [pkgName]: pkgVer, [depName]: depVer }
   });
 
   const getManifest = sinon.stub().callsFake(async function(pkg) {
@@ -45,17 +46,17 @@ describe('Call function: installPackage', function() {
 
   const eventBusPackage = {
     eventBus: {
-      emit: sinon.stub(),
+      emit: sinon.stub()
     },
-    eventBusTag,
+    eventBusTag
   };
 
   const dockerList = {
-    listContainers: async () => {},
+    listContainers: async () => {}
   };
 
   // Simulate that only the dependency has p2p ports
-  const lockPorts = sinon.stub().callsFake(async ({pkg}) => {
+  const lockPorts = sinon.stub().callsFake(async ({ pkg }) => {
     if (pkg.name === depName) return depPortsToOpen;
     else return [];
   });
@@ -65,21 +66,21 @@ describe('Call function: installPackage', function() {
 
   // db to know UPnP state
   const db = {
-    get: async (key) => {
-      if (key === 'upnpAvailable') return true;
-    },
+    get: async key => {
+      if (key === "upnpAvailable") return true;
+    }
   };
 
-  const installPackage = proxyquire('calls/installPackage', {
-    'modules/packages': packages,
-    'modules/dappGet': dappGet,
-    'modules/getManifest': getManifest,
-    'modules/dockerList': dockerList,
-    'modules/lockPorts': lockPorts,
-    'eventBus': eventBusPackage,
-    'utils/isSyncing': isSyncing,
-    'params': params,
-    'db': db,
+  const installPackage = proxyquire("calls/installPackage", {
+    "modules/packages": packages,
+    "modules/dappGet": dappGet,
+    "modules/getManifest": getManifest,
+    "modules/dockerList": dockerList,
+    "modules/lockPorts": lockPorts,
+    eventBus: eventBusPackage,
+    "utils/isSyncing": isSyncing,
+    params: params,
+    db: db
   });
 
   // before(() => {
@@ -88,83 +89,83 @@ describe('Call function: installPackage', function() {
   //     fs.writeFileSync(DOCKERCOMPOSE_PATH, dockerComposeTemplate);
   // });
 
-  it('should install the package with correct arguments', async () => {
-    const res = await installPackage({id: pkgName, logId});
-    expect(res).to.be.an('object');
-    expect(res).to.have.property('message');
+  it("should install the package with correct arguments", async () => {
+    const res = await installPackage({ id: pkgName });
+    expect(res).to.be.an("object");
+    expect(res).to.have.property("message");
   });
 
   // Step 1: Parse request
   // Step 2: Resolve the request
-  it('should have called dappGet with correct arguments', async () => {
-    sinon.assert.calledWith(dappGet, {name: pkgName, req: pkgName, ver: '*'});
+  it("should have called dappGet with correct arguments", async () => {
+    sinon.assert.calledWith(dappGet, { name: pkgName, req: pkgName, ver: "*" });
   });
 
   // Step 3: Format the request and filter out already updated packages
   // Step 4: Download requested packages
-  it('should have called download', async () => {
+  it("should have called download", async () => {
     sinon.assert.callCount(packages.download, 2);
     expect(packages.download.getCall(0).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
-            manifest: {...pkgManifest},
+            manifest: { ...pkgManifest },
             name: pkgName,
-            ver: pkgVer,
-          },
-        },
+            ver: pkgVer
+          }
+        }
       ],
       `should call packages.download first for package ${pkgName}`
     );
     expect(packages.download.getCall(1).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
-            manifest: {...depManifest},
+            manifest: { ...depManifest },
             name: depName,
-            ver: depVer,
-          },
-        },
+            ver: depVer
+          }
+        }
       ],
       `should call packages.download second for dependency ${depName}`
     );
   });
 
   // Step 5: Run requested packages
-  it('should have called run', async () => {
+  it("should have called run", async () => {
     sinon.assert.callCount(packages.run, 2);
     expect(packages.run.getCall(0).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
-            manifest: {...pkgManifest},
+            manifest: { ...pkgManifest },
             name: pkgName,
-            ver: pkgVer,
-          },
-        },
+            ver: pkgVer
+          }
+        }
       ],
       `should call packages.run second for dependency ${depName}`
     );
     expect(packages.run.getCall(1).args).to.deep.equal(
       [
         {
-          logId,
+          id: pkgName,
           pkg: {
-            manifest: {...depManifest},
+            manifest: { ...depManifest },
             name: depName,
-            ver: depVer,
-          },
-        },
+            ver: depVer
+          }
+        }
       ],
       `should call packages.run second for dependency ${depName}`
     );
   });
 
   // Step 6: P2P ports: modify docker-compose + open ports
-  it('should emit an internal call to the eventBus', async () => {
+  it("should emit an internal call to the eventBus", async () => {
     sinon.assert.callCount(lockPorts, 2);
     // eventBus should be called once to open ports, and then to emitPackages
     sinon.assert.callCount(eventBusPackage.eventBus.emit, 3);
@@ -172,20 +173,23 @@ describe('Call function: installPackage', function() {
       [
         eventBusTag.call,
         {
-          callId: 'managePorts',
+          callId: "managePorts",
           kwargs: {
-            action: 'open',
-            ports: depPortsToOpen,
-          },
-        },
+            action: "open",
+            ports: depPortsToOpen
+          }
+        }
       ],
       `eventBus.emit first call must be to open the dependencies' ports`
     );
   });
 
   // Step FINAL:
-  it('should request to emit packages to refresh the UI', async () => {
-    expect(eventBusPackage.eventBus.emit.getCall(1).args).to.deep.equal([eventBusTag.emitPackages], `eventBus.emit second call must be to request emit packages`);
+  it("should request to emit packages to refresh the UI", async () => {
+    expect(eventBusPackage.eventBus.emit.getCall(1).args).to.deep.equal(
+      [eventBusTag.emitPackages],
+      `eventBus.emit second call must be to request emit packages`
+    );
   });
 
   // it('should throw an error with wrong package name', async () => {

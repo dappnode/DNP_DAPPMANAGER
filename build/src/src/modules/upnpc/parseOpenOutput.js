@@ -1,7 +1,5 @@
-const parseGeneralErrors = require('./parseGeneralErrors');
-const validateKwargs = require('./validateKwargs');
-
-/* eslint-disable max-len */
+const parseGeneralErrors = require("./parseGeneralErrors");
+const validateKwargs = require("./validateKwargs");
 
 // SUCCESSFUL: Open a NON existing port
 // (ERROR): Open an already openned port (same output)
@@ -31,11 +29,11 @@ const validateKwargs = require('./validateKwargs');
 
 /**
  *
- * @param {String} terminalOutput A sample can be found above
- * @return {*}
+ * @param {string} terminalOutput A sample can be found above
+ * @returns {*}
  */
 function parseOpenOutput(terminalOutput) {
-  validateKwargs({terminalOutput});
+  validateKwargs({ terminalOutput });
   parseGeneralErrors(terminalOutput);
 
   // Get the last line of the output
