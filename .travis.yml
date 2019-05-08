@@ -97,6 +97,6 @@ jobs:
         on:
           tags: true
           condition: "$TRAVIS_TAG = release || $TRAVIS_TAG = release/patch || $TRAVIS_TAG = release/minor || $TRAVIS_TAG = release/major"
-      # after_deploy:
-      #   - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
-      #   - source after_deploy.sh
+      after_deploy:
+        - wget https://raw.githubusercontent.com/dappnode/DAppNode/master/scripts/after_deploy.sh
+        - source after_deploy.sh

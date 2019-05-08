@@ -4,6 +4,7 @@ const db = require("../db");
 const isIpfsHash = require("utils/isIpfsHash");
 const isEnsDomain = require("utils/isEnsDomain");
 const isSemverRange = require("utils/isSemverRange");
+const isSemver = require("utils/isSemver");
 const Joi = require("joi");
 
 // Used by
@@ -77,7 +78,16 @@ async function getManifest({ name, ver, version }) {
  */
 async function fetchManifestHash({ name, ver }) {
   /**
-   * 1. Normal case, name = eth domain & ver = semver
+   * 0. Normal case, name = eth domain & ver = semverVersion
+   * Go fetch to the APM
+   */
+  if (isEnsDomain(name) && isSemver(ver)) {
+    return await resolveApmVersionAndCache({ name, ver });
+  }
+
+  /**
+   * 1. Normal case, name = eth domain & ver = semverRange
+   * [DO-NOT-CACHE] as the version is dynamic
    * Go fetch to the APM
    */
   if (isEnsDomain(name) && isSemverRange(ver)) {
@@ -114,7 +124,7 @@ async function fetchManifestHash({ name, ver }) {
  * @param {string} ver
  * @returns {string} manifestHash
  */
-async function resolveApmVersion({ name, ver }) {
+async function resolveApmVersionAndCache({ name, ver }) {
   /**
    * Construct a key for the db. The semver CANNOT be 0.1.0 as that would mean {0: {1: {0: {}}}
    * id = goerli-pantheon-dnp-dappnode-eth-0-1-0
@@ -125,9 +135,20 @@ async function resolveApmVersion({ name, ver }) {
   const hashCache = await db.get(key);
   if (hashCache) return hashCache;
 
-  const hash = await apm.getRepoHash({ name, ver });
+  const hash = await resolveApmVersion({ name, ver });
   await db.set(key, hash);
   return hash;
+}
+
+/**
+ * Fetches the manifest hash
+ *
+ * @param {string} name
+ * @param {string} ver
+ * @returns {string} manifestHash
+ */
+async function resolveApmVersion({ name, ver }) {
+  return await apm.getRepoHash({ name, ver });
 }
 
 function validateManifest(manifest) {
