@@ -112,8 +112,10 @@ async function aggregate({ req, dnpList, fetch }) {
       dnps[dnpName].isInstalled = true;
       Object.keys(dnps[dnpName].versions).forEach(version => {
         if (
+          // Exclusively apply this condition to semver versions.
           semver.valid(version) &&
           semver.valid(dnp.version) &&
+          // If the new version = "version" is strictly less than the current version "dnp.version", ignore
           semver.lt(version, dnp.version)
         ) {
           delete dnps[dnpName].versions[version];
