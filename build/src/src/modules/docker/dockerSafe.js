@@ -1,7 +1,5 @@
 const docker = require("./Docker");
 const db = require("db");
-const lockPorts = require("modules/lockPorts");
-const unlockPorts = require("modules/unlockPorts");
 const { eventBus, eventBusTag } = require("eventBus");
 const { stringIncludes } = require("utils/strings");
 
@@ -19,6 +17,14 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
   try {
     return await docker.compose.up(dockerComposePath, options);
   } catch (e) {
+    /**
+     * These port two modules use docker. If they are imported above,
+     * docker will no be defined yet, then they must be imported dynamically
+     * to ensure a proper import order
+     */
+    const lockPorts = require("modules/lockPorts");
+    const unlockPorts = require("modules/unlockPorts");
+
     if (stringIncludes((e || {}).message, "port is already allocated")) {
       const upnpAvailable = await db.get("upnpAvailable");
       if (upnpAvailable) {
