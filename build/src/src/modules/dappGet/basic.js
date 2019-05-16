@@ -1,6 +1,7 @@
 const dockerList = require("modules/dockerList");
 const logs = require("logs.js")(module);
 const getManifest = require("modules/getManifest");
+const shouldUpdate = require("./utils/shouldUpdate");
 
 /**
  * The dappGet resolver may cause errors.
@@ -28,9 +29,11 @@ async function dappGetBasic(req) {
   // However it would prevent already installed DNPs from installing
   try {
     const installedDnps = await dockerList.listContainers();
-    for (const { name, version } of installedDnps) {
-      if (name && version && state[name] && state[name] === version)
-        delete state[name];
+    for (const dnp of installedDnps) {
+      const currentVersion = dnp.version;
+      const newVersion = state[dnp.name];
+      if (newVersion && !shouldUpdate(currentVersion, newVersion))
+        delete state[dnp.name];
     }
   } catch (e) {
     logs.error(`Error listing current containers: ${e.stack}`);

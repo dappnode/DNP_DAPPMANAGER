@@ -4,6 +4,7 @@ const resolve = require("./resolve");
 const dappGetBasic = require("./basic");
 const dockerList = require("modules/dockerList");
 const logs = require("logs.js")(module);
+const shouldUpdate = require("./utils/shouldUpdate");
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -88,7 +89,9 @@ async function dappGet(req, options = {}) {
   // Otherwise, format the output
   let alreadyUpdated = {};
   dnpList.forEach(dnp => {
-    if (state[dnp.name] && state[dnp.name] === dnp.version) {
+    const currentVersion = dnp.version;
+    const newVersion = state[dnp.name];
+    if (newVersion && !shouldUpdate(currentVersion, newVersion)) {
       // DNP is already updated.
       // Remove from the success object and add it to the alreadyUpdatedd
       alreadyUpdated[dnp.name] = state[dnp.name];
