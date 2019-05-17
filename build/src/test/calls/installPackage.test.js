@@ -30,6 +30,7 @@ describe("Call function: installPackage", function() {
   // Stub packages module. Resolve always returning nothing
   const packages = {
     download: sinon.fake.resolves(),
+    load: sinon.fake.resolves(),
     run: sinon.fake.resolves()
   };
 
@@ -101,35 +102,37 @@ describe("Call function: installPackage", function() {
     sinon.assert.calledWith(dappGet, { name: pkgName, req: pkgName, ver: "*" });
   });
 
+  const callKwargPkg = {
+    id: pkgName,
+    pkg: { manifest: { ...pkgManifest }, name: pkgName, ver: pkgVer }
+  };
+  const callKwargDep = {
+    id: pkgName,
+    pkg: { manifest: { ...depManifest }, name: depName, ver: depVer }
+  };
   // Step 3: Format the request and filter out already updated packages
   // Step 4: Download requested packages
   it("should have called download", async () => {
     sinon.assert.callCount(packages.download, 2);
     expect(packages.download.getCall(0).args).to.deep.equal(
-      [
-        {
-          id: pkgName,
-          pkg: {
-            manifest: { ...pkgManifest },
-            name: pkgName,
-            ver: pkgVer
-          }
-        }
-      ],
+      [callKwargPkg],
       `should call packages.download first for package ${pkgName}`
     );
     expect(packages.download.getCall(1).args).to.deep.equal(
-      [
-        {
-          id: pkgName,
-          pkg: {
-            manifest: { ...depManifest },
-            name: depName,
-            ver: depVer
-          }
-        }
-      ],
+      [callKwargDep],
       `should call packages.download second for dependency ${depName}`
+    );
+  });
+
+  it("should have called load", async () => {
+    sinon.assert.callCount(packages.load, 2);
+    expect(packages.load.getCall(0).args).to.deep.equal(
+      [callKwargPkg],
+      `should call packages.load first for package ${pkgName}`
+    );
+    expect(packages.load.getCall(1).args).to.deep.equal(
+      [callKwargDep],
+      `should call packages.load second for dependency ${depName}`
     );
   });
 
@@ -137,29 +140,11 @@ describe("Call function: installPackage", function() {
   it("should have called run", async () => {
     sinon.assert.callCount(packages.run, 2);
     expect(packages.run.getCall(0).args).to.deep.equal(
-      [
-        {
-          id: pkgName,
-          pkg: {
-            manifest: { ...pkgManifest },
-            name: pkgName,
-            ver: pkgVer
-          }
-        }
-      ],
+      [callKwargPkg],
       `should call packages.run second for dependency ${depName}`
     );
     expect(packages.run.getCall(1).args).to.deep.equal(
-      [
-        {
-          id: pkgName,
-          pkg: {
-            manifest: { ...depManifest },
-            name: depName,
-            ver: depVer
-          }
-        }
-      ],
+      [callKwargDep],
       `should call packages.run second for dependency ${depName}`
     );
   });

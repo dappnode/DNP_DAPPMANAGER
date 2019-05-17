@@ -84,7 +84,7 @@ describe("Util: package install / download", () => {
     }
   };
 
-  const { download, run } = proxyquire("modules/packages", {
+  const { download, load, run } = proxyquire("modules/packages", {
     "modules/downloadImage": downloadImage,
     "modules/docker": docker,
     "utils/generate": generate,
@@ -95,6 +95,20 @@ describe("Util: package install / download", () => {
 
   describe(".download", () => {
     download({
+      pkg: {
+        name: PACKAGE_NAME,
+        manifest: dnpManifest
+      }
+    });
+
+    // downloadImageSpy - IMAGE_HASH, IMAGE_PATH
+    it("ipfs.download should be called with IMAGE_HASH, IMAGE_PATH", () => {
+      sinon.assert.calledWith(downloadImageSpy, IMAGE_HASH, IMAGE_PATH);
+    });
+  });
+
+  describe(".load", () => {
+    load({
       pkg: {
         name: PACKAGE_NAME,
         manifest: dnpManifest
@@ -126,11 +140,6 @@ describe("Util: package install / download", () => {
         DOCKERCOMPOSE_PATH,
         DockerCompose
       ]);
-    });
-
-    // downloadImageSpy - IMAGE_HASH, IMAGE_PATH
-    it("ipfs.download should be called with IMAGE_HASH, IMAGE_PATH", () => {
-      sinon.assert.calledWith(downloadImageSpy, IMAGE_HASH, IMAGE_PATH);
     });
 
     it("docker.load should be called with IMAGE_PATH", () => {
