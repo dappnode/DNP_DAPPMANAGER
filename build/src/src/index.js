@@ -17,6 +17,7 @@ const calls = require("./calls");
 // Start watchers
 require("./watchers/chains");
 require("./watchers/diskUsage");
+require("./watchers/natRenewal");
 
 // Print version data
 require("./utils/getVersionData");
