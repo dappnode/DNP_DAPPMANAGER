@@ -75,7 +75,14 @@ async function load({ pkg, id }) {
   // "admin.dnp.dappnode.eth_0.2.0.tar.xz"
   const imageName = manifest.image.path || `${name}_${version}.tar.xz`;
 
-  // Write manifest and docker-compose
+  const imagePath = validate.path(
+    getPath.image(name, imageName, params, isCore)
+  );
+
+  logUi({ id, name, message: "Loading image..." });
+  await docker.load(imagePath);
+
+  // Write manifest and docker-compose AFTER loading image
   await writeFile(
     validate.path(getPath.manifest(name, params, isCore)),
     generate.manifest(manifest)
@@ -84,13 +91,6 @@ async function load({ pkg, id }) {
     validate.path(getPath.dockerCompose(name, params, isCore)),
     generate.dockerCompose(manifest, params)
   );
-
-  const imagePath = validate.path(
-    getPath.image(name, imageName, params, isCore)
-  );
-
-  logUi({ id, name, message: "Loading image..." });
-  await docker.load(imagePath);
 
   logUi({ id, name, message: "Cleaning files..." });
   await removeFile(imagePath);
