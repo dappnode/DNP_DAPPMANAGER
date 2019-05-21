@@ -20,7 +20,8 @@ module.exports = {
   REPO_DIR,
   DNCORE_DIR,
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
-  DB_PATH: path.join(DNCORE_DIR, "dappmanagerdb.json"),
+  // lowdb requires an absolute path
+  DB_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
   TEMP_TRANSFER_DIR: path.join(DNCORE_DIR, ".temp-transfer"),
 
   // Docker compose parameters
