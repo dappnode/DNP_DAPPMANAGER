@@ -1,4 +1,5 @@
 const params = require("params");
+const restartPatch = require("modules/restartPatch");
 // Utils
 const shell = require("utils/shell");
 
@@ -17,6 +18,8 @@ const cleanCache = async () => {
   for (const path of pathsToDelete) {
     await shell(`rm -rf ${path}`);
   }
+  // Restart DAPPMANAGER to prevent app breaks after deleting the db
+  await restartPatch("dappmanager.dnp.dappnode.eth");
 
   return {
     message: `Cleaned cache`,
