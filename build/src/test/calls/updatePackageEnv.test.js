@@ -19,7 +19,6 @@ describe("Call function: updatePackageEnv", function() {
 
   const params = {
     ...paramsDefault,
-    CACHE_DIR: testDirectory,
     DNCORE_DIR: "DNCORE",
     REPO_DIR: testDirectory
   };

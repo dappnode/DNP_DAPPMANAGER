@@ -21,9 +21,7 @@ const ipfs = {
 };
 
 // Define test parameters
-const params = {
-  CACHE_DIR: "test_files/"
-};
+const params = {};
 
 const catStreamToFs = proxyquire("modules/ipfs/methods/catStreamToFs", {
   "../ipfsSetup": ipfs,

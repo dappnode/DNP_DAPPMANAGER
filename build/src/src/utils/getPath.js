@@ -93,7 +93,7 @@ function getRepoDirPath(dnpName, params, isCore) {
   if (!params.DNCORE_DIR) throw Error("params.DNCORE_DIR must be defined");
   if (!params.REPO_DIR) throw Error("params.REPO_DIR must be defined");
   if (isCore) return params.DNCORE_DIR;
-  return params.REPO_DIR + dnpName;
+  return path.join(params.REPO_DIR + dnpName);
 }
 
 function getDockerComposeName(dnpName, isCore) {

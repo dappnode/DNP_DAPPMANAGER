@@ -1,6 +1,15 @@
+const path = require("path");
+
 /**
  * DAPPMANAGER Parameters. This parameters are modified on execution for testing
  */
+
+/**
+ * Main persistent folders, linked with docker volumes
+ * - No need to prefix or sufix with slashes, path.join() is used in the whole app
+ */
+const DNCORE_DIR = "DNCORE"; // Bind volume (NOT deletable)
+const REPO_DIR = "dnp_repo"; // Named volume (deletable)
 
 module.exports = {
   // Autobahn parameters
@@ -8,10 +17,9 @@ module.exports = {
   autobahnRealm: "dappnode_admin",
 
   // Installer paths
-  CACHE_DIR: "./cache/",
-  REPO_DIR: "./dnp_repo/",
-  DNCORE_DIR: "DNCORE",
-  TEMP_TRANSFER_DIR: "DNCORE/.temp-transfer",
+  REPO_DIR,
+  DNCORE_DIR,
+  TEMP_TRANSFER_DIR: path.join(REPO_DIR, ".temp-transfer"),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -29,5 +37,5 @@ module.exports = {
   CHAIN_DATA_UNTIL: 0,
 
   // User Action Logs filename
-  userActionLogsFilename: "DNCORE/userActionLogs.log"
+  userActionLogsFilename: path.join(REPO_DIR, "userActionLogs.log")
 };
