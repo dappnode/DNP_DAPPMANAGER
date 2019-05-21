@@ -20,6 +20,7 @@ const restartPackage = async ({ id }) => {
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
     await restartPatch(id);
+    throw Error("The application should have stopped before this line");
   }
 
   // Combining rm && up doesn't prevent the installer from crashing

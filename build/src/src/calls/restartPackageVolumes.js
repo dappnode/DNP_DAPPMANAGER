@@ -1,5 +1,6 @@
 const fs = require("fs");
 const getPath = require("utils/getPath");
+const restartPatch = require("modules/restartPatch");
 const params = require("params");
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
@@ -24,7 +25,8 @@ async function restartPackageVolumes({ id }) {
     throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    throw Error("The installer cannot be restarted");
+    await restartPatch(id, { restartVolumes: true });
+    throw Error("The application should have stopped before this line");
   }
 
   // If there are no volumes don't do anything
