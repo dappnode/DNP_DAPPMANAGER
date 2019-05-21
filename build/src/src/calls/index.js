@@ -6,6 +6,7 @@
 
 module.exports = {
   changeIpfsTimeout: require("./changeIpfsTimeout"),
+  cleanCache: require("./cleanCache"),
   copyFileFrom: require("./copyFileFrom"),
   copyFileTo: require("./copyFileTo"),
   diagnose: require("./diagnose"),

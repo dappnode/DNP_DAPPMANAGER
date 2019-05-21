@@ -1,7 +1,8 @@
+const params = require("params");
 const low = require("lowdb");
 const FileSync = require("lowdb/adapters/FileSync");
 
-const dbPath = process.env.DB_PATH || "./dappmanagerdb.json";
+const dbPath = params.DB_PATH || "./dappmanagerdb.json";
 
 // Initialize db
 const adapter = new FileSync(dbPath);
