@@ -130,15 +130,20 @@ const installPackage = async ({
       return { name, ver, manifest };
     })
   );
-  logs.debug(
-    `Processed manifests for: ${pkgs.map(({ name }) => name).join(", ")}`
-  );
+  const dnpNames = pkgs.map(({ name }) => name).join(", ");
+  logs.debug(`Processed manifests for: ${dnpNames}`);
 
   // 4. Download requested packages in paralel
   await Promise.all(pkgs.map(pkg => packages.download({ pkg, id })));
-  logs.info(
-    `Successfully downloaded DNPs ${pkgs.map(({ name }) => name).join(", ")}`
-  );
+  logs.info(`Successfully downloaded DNPs ${dnpNames}`);
+
+  // 5. Load requested packages in paralel
+  //    Do this in a separate stage. If the download fails, the files will not be persisted
+  //    If a dependency fails, some future version of another DNP could be loaded
+  //    creating wierd bugs of unstable versions
+  //    ###### NOTE: this a temporary solution until a proper rollback is implemented
+  await Promise.all(pkgs.map(pkg => packages.load({ pkg, id })));
+  logs.info(`Successfully loaded DNPs ${dnpNames}`);
 
   // Patch, install the dappmanager the last always
   const isDappmanager = pkg =>

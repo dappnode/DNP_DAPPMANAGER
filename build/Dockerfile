@@ -69,8 +69,6 @@ COPY build/entrypoint.sh .
 COPY build/dns_updater.sh /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
 
-ENV DB_PATH /usr/src/app/DNCORE/dappmanagerdb.json
-
 # Copy the src the last as it's the more likely layer to change
 COPY --from=build /usr/src/app /usr/src/app
 

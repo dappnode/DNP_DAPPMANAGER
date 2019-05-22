@@ -70,7 +70,7 @@ const getDriveApi = {
   // 'http://my.ropsten.dnp.dappnode.eth:8545'
   ethereum: dnpName => `http://my.${dnpName}:8545`,
   // 'my.bitcoin.dnp.dappnode.eth'
-  bitcoin: dnpName => dnpName,
+  bitcoin: dnpName => `my.${dnpName}`,
   // 'http://my.monero.dnp.dappnode.eth:18081'
   monero: dnpName => `http://my.${dnpName}:18081`
 };
