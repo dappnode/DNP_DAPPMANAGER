@@ -34,13 +34,20 @@ async function restartPackageVolumes({ id }) {
     };
   }
 
-  if (dnp.isCore) {
-    // docker-compose down can't be called because of the shared network
-    await docker.compose.rm(dockerComposePath);
-    await docker.volume.rm(dnp.volumes.map(v => v.name).join(" "));
-  } else {
-    await docker.compose.down(dockerComposePath, { volumes: true });
+  try {
+    if (dnp.isCore) {
+      // docker-compose down can't be called because of the shared network
+      await docker.compose.rm(dockerComposePath);
+      await docker.volume.rm(dnp.volumes.map(v => v.name).join(" "));
+    } else {
+      await docker.compose.down(dockerComposePath, { volumes: true });
+    }
+  } catch (e) {
+    // In case of error: FIRST up the dnp, THEN throw the error
+    await docker.safe.compose.up(dockerComposePath);
+    throw e;
   }
+
   // Restart docker to apply changes
   await docker.safe.compose.up(dockerComposePath);
 
