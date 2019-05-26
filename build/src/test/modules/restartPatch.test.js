@@ -48,7 +48,7 @@ services:
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
             - '/var/run/docker.sock:/var/run/docker.sock'
         entrypoint:
-            docker-compose -f /usr/src/app/DNCORE/docker-compose-dappmanager.yml up -d`;
+            docker-compose -f /usr/src/app/DNCORE/docker-compose-dappmanager.yml up -d --force-recreate`;
 
     expect(dc).to.equal(expectedDc);
     fs.unlinkSync(DOCKERCOMPOSE_RESTART_PATH);

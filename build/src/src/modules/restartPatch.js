@@ -43,7 +43,7 @@ services:
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
             - '/var/run/docker.sock:/var/run/docker.sock'
         entrypoint:
-            docker-compose -f ${PATH_REMOTE} up -d`;
+            docker-compose -f ${PATH_REMOTE} up -d --force-recreate`;
 
   validate.path(DOCKERCOMPOSE_RESTART_PATH);
   await fs.writeFileSync(DOCKERCOMPOSE_RESTART_PATH, DOCKERCOMPOSE_DATA);

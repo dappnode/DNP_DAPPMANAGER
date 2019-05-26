@@ -20,14 +20,14 @@ const restartPackage = async ({ id }) => {
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
     await restartPatch(id);
+  } else {
+    // Combining rm && up doesn't prevent the installer from crashing
+    await docker.compose.rm(dockerComposePath);
+    await docker.safe.compose.up(dockerComposePath);
+
+    // Emit packages update
+    eventBus.emit(eventBusTag.emitPackages);
   }
-
-  // Combining rm && up doesn't prevent the installer from crashing
-  await docker.compose.rm(dockerComposePath);
-  await docker.safe.compose.up(dockerComposePath);
-
-  // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: `Restarted package: ${id}`,
