@@ -44,10 +44,10 @@ const validateKwargs = require("./validateKwargs");
  *
  * @param {string} terminalOutput A sample can be found above
  * @returns {array} port mappings = [
- *   {protocol: 'UDP', exPort: '500', inPort: '500'},
- *   {protocol: 'UDP', exPort: '4500', inPort: '4500'},
- *   {protocol: 'UDP', exPort: '30303', inPort: '30303'},
- *   {protocol: 'TCP', exPort: '30303', inPort: '30303'},
+ *   { protocol: "UDP", exPort: "500", inPort: "500", ip: "192.168.1.42" },
+ *   { protocol: "UDP", exPort: "4500", inPort: "4500", ip: "192.168.1.42" },
+ *   { protocol: "UDP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
+ *   { protocol: "TCP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
  * ]
  */
 function parseListOutput(terminalOutput) {
@@ -68,12 +68,13 @@ function parseListOutput(terminalOutput) {
       )
       // Parse the line to extract the protocol and port mapping
       .map(line => {
+        //  3 UDP 30303->192.168.1.42:30303 'DAppNode' '' 0
         const [, protocol, mapping] = line.trim().split(/\s+/);
         const exPort = mapping.split("->")[0];
-        const [, inPort] = (mapping.split("->")[1] || "").split(":");
-        return { protocol, exPort, inPort };
+        const [ip, inPort] = (mapping.split("->")[1] || "").split(":");
+        return { protocol, exPort, inPort, ip };
       })
-      // Make sure that the result is correct, otherwise remove it
+      // Make sure each result is correct, otherwise remove it
       .filter(
         ({ protocol, exPort, inPort }) =>
           (protocol === "UDP" || protocol === "TCP") &&

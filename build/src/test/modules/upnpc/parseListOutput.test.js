@@ -40,13 +40,13 @@ No IGD UPnP Device found on the network !
   it("On success, it should return the current port mappings", async () => {
     const ports = parseListOutput(terminalOutputSuccess);
     expect(ports).to.deep.equal([
-      { protocol: "UDP", exPort: "500", inPort: "500" },
-      { protocol: "UDP", exPort: "4500", inPort: "4500" },
-      { protocol: "TCP", exPort: "22", inPort: "22" },
-      { protocol: "UDP", exPort: "30303", inPort: "30303" },
-      { protocol: "TCP", exPort: "30303", inPort: "30303" },
-      { protocol: "TCP", exPort: "4001", inPort: "4001" },
-      { protocol: "UDP", exPort: "4002", inPort: "4002" }
+      { protocol: "UDP", exPort: "500", inPort: "500", ip: "192.168.1.42" },
+      { protocol: "UDP", exPort: "4500", inPort: "4500", ip: "192.168.1.42" },
+      { protocol: "TCP", exPort: "22", inPort: "22", ip: "192.168.1.42" },
+      { protocol: "UDP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
+      { protocol: "TCP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
+      { protocol: "TCP", exPort: "4001", inPort: "4001", ip: "192.168.1.42" },
+      { protocol: "UDP", exPort: "4002", inPort: "4002", ip: "192.168.1.42" }
     ]);
   });
 
