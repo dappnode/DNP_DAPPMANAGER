@@ -81,12 +81,13 @@ const copyFileFrom = async ({ id, fromPath }) => {
       );
     }
     // Use node.js util to get the file / dir name safely
-    const toPathCompressed = `${toPath}.tar.gz`;
+    const toPathCompressed = `${toPath}.zip`;
     /**
-     * Use the -C option to cd in directory before doing the tar
-     * `tar -czf not/hello.tar.gz -C not hello`
+     * To preserve the folder's relative structure while calling zip from a different dir
+     * Ref: https://unix.stackexchange.com/a/77616
+     * `(cd test/npm-test && zip -r - .) > npm-test.zip`
      */
-    await shell(`tar -czf ${toPathCompressed} -C ${tempTransferDir} ${base}`);
+    await shell(`(cd ${toPath} && zip -r - .) > ${toPathCompressed}`);
     await shell(`rm -rf ${toPath}`);
     toPath = toPathCompressed;
   }
