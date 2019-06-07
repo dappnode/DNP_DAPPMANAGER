@@ -61,19 +61,6 @@ const copyFileFrom = async ({ id, fromPath }) => {
   await docker.copyFileFrom(containerName, fromPath, toPath);
 
   /**
-   * Limit max file size until a DAppNode <-> client transport method is adopted
-   * $ du -s -k app/file.gz
-   * 12 app/file.gz
-   */
-  const toPathSizeKb = await getFileOrDirSize(toPath);
-  if (toPathSizeKb > 10e3) {
-    await shell(`rm -rf ${toPath}`);
-    throw Error(
-      `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${toPathSizeKb} KB`
-    );
-  }
-
-  /**
    * Allow directories by automatically compressing them to .tar.gz files
    * 1. Test if directory
    * 2. Compress (use stripTrailingSlash to clean path, just in case)
@@ -81,26 +68,42 @@ const copyFileFrom = async ({ id, fromPath }) => {
    */
 
   if (fs.lstatSync(toPath).isDirectory()) {
-    // Use node.js util to get the file / dir name safely
-    const toPathCompressed = `${toPath}.tar.gz`;
     /**
-     * Use the -C option to cd in directory before doing the tar
-     * `tar -czf not/hello.tar.gz -C not hello`
+     * Limit max file size until a DAppNode <-> client transport method is adopted
+     * $ du -s -k app/file.gz
+     * 12 app/file.gz
      */
-    await shell(`tar -czf ${toPathCompressed} -C ${tempTransferDir} ${base}`);
+    const dirSizeKb = await getFileOrDirSize(toPath);
+    if (dirSizeKb > 200e3) {
+      await shell(`rm -rf ${toPath}`);
+      throw Error(
+        `Dir file transfers > ${maxSizeKb} KB are not allowed. Attempting ${dirSizeKb} KB`
+      );
+    }
+    // Use node.js util to get the file / dir name safely
+    const toPathCompressed = `${toPath}.zip`;
+    /**
+     * To preserve the folder's relative structure while calling zip from a different dir
+     * Ref: https://unix.stackexchange.com/a/77616
+     * `(cd test/npm-test && zip -r - .) > npm-test.zip`
+     */
+    await shell(`(cd ${toPath} && zip -r - .) > ${toPathCompressed}`);
     await shell(`rm -rf ${toPath}`);
     toPath = toPathCompressed;
   }
 
-  // /**
-  //  * Do NOT allow directories for now
-  //  */
-  // if (fs.lstatSync(toPath).isDirectory()) {
-  //   await shell(`rm -rf ${toPath}`);
-  //   throw Error(
-  //     `path ${fromPath} is a directory. Only single files are allowed`
-  //   );
-  // }
+  /**
+   * Limit max file size until a DAppNode <-> client transport method is adopted
+   * $ du -s -k app/file.gz
+   * 12 app/file.gz
+   */
+  const fileSizeKb = await getFileOrDirSize(toPath);
+  if (fileSizeKb > 20e3) {
+    await shell(`rm -rf ${toPath}`);
+    throw Error(
+      `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${fileSizeKb} KB`
+    );
+  }
 
   /**
    * Converts a file to data URI.
