@@ -50,7 +50,6 @@ jobs:
       services:
         - docker
       before_script:
-        - chmod +x test/before_install.sh test/test_integration.sh
         - test/before_install.sh
       script:
         - test/test_integration.sh

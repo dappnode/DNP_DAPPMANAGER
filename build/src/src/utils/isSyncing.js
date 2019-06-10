@@ -9,11 +9,11 @@ const blockDiff = 50;
 const cacheTime = 30 * 1000; // ms
 
 if (process.env.NODE_ENV === "development") {
-  params.WEB3HOSTHTTP =
+  params.WEB3_HOST_HTTP =
     "https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d";
 }
-const WEB3HOSTHTTP = process.env.WEB3HOSTHTTP || params.WEB3HOSTHTTP;
-const eth = new EthRPC(new HttpProvider(WEB3HOSTHTTP));
+const WEB3_HOST_HTTP = process.env.WEB3_HOST_HTTP || params.WEB3_HOST_HTTP;
+const eth = new EthRPC(new HttpProvider(WEB3_HOST_HTTP));
 
 /**
  * RPC CALL
@@ -35,7 +35,7 @@ const isSyncingRpcCall = () =>
             "Invalid JSON RPC response from provider"
           )
         ) {
-          return reject(Error(`Can't connect to ${WEB3HOSTHTTP}`));
+          return reject(Error(`Can't connect to ${WEB3_HOST_HTTP}`));
         } else {
           return reject(err);
         }
