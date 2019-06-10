@@ -31,11 +31,11 @@ module.exports = {
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
 
   // IPFS parameters
-  IPFS: process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth",
+  IPFS_HOST: process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth",
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters
-  WEB3HOSTWS: "ws://my.ethchain.dnp.dappnode.eth:8546",
-  WEB3HOSTHTTP: "http://my.ethchain.dnp.dappnode.eth:8545",
+  WEB3_HOST_WS: "ws://my.ethchain.dnp.dappnode.eth:8546",
+  WEB3_HOST_HTTP: "http://my.ethchain.dnp.dappnode.eth:8545",
   CHAIN_DATA_UNTIL: 0
 };

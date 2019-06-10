@@ -11,25 +11,25 @@ if (!process.env.TEST) {
 
 function web3Setup() {
   if (process.env.NODE_ENV === "development") {
-    params.WEB3HOSTWS =
+    params.WEB3_HOST_WS =
       "https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d";
   }
-  const WEB3HOSTWS = process.env.WEB3HOSTWS || params.WEB3HOSTWS;
-  if (!WEB3HOSTWS)
+  const WEB3_HOST_WS = process.env.WEB3_HOST_WS || params.WEB3_HOST_WS;
+  if (!WEB3_HOST_WS)
     throw Error(
-      "WEB3HOSTWS is needed to connect to ethchain but it's undefined"
+      "WEB3_HOST_WS is needed to connect to ethchain but it's undefined"
     );
 
-  let web3 = new Web3(WEB3HOSTWS);
-  logs.info(`Web3 connection to: ${WEB3HOSTWS}`);
+  let web3 = new Web3(WEB3_HOST_WS);
+  logs.info(`Web3 connection to: ${WEB3_HOST_WS}`);
 
   const webWatch = setInterval(function() {
     web3.eth.net
       .isListening()
       .then()
       .catch(e => {
-        logs.error(`Web3 connection error to ${WEB3HOSTWS}: ${e.message}`);
-        web3.setProvider(WEB3HOSTWS);
+        logs.error(`Web3 connection error to ${WEB3_HOST_WS}: ${e.message}`);
+        web3.setProvider(WEB3_HOST_WS);
       });
   }, 10000);
 
