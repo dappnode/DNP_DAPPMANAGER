@@ -3,23 +3,34 @@ const expect = require("chai").expect;
 const fs = require("fs");
 const shell = require("utils/shell");
 const logs = require("logs.js")(module);
+const calls = require("calls");
+const getPath = require("utils/getPath");
+const getDataUri = require("datauri").promise;
 
 chai.should();
 
+// Utils
+async function getDnpFromListPackages(id) {
+  const res = await calls.listPackages();
+  if (!Array.isArray(res.result))
+    throw Error("listPackages must return an array");
+  return res.result.find(e => e.name.includes(id));
+}
+
+async function getDnpState(id) {
+  const dnp = await getDnpFromListPackages(id);
+  return dnp ? dnp.state : "down";
+}
+
 describe("Full integration test with REAL docker: ", function() {
   // import calls
-  const installPackage = require("calls/installPackage");
-  const removePackage = require("calls/removePackage");
-  const togglePackage = require("calls/togglePackage");
-  // const restartPackage = require('calls/restartPackage');
+
   // const restartPackageVolumes = require('calls/restartPackageVolumes');
-  const logPackage = require("calls/logPackage");
-  const updatePackageEnv = require("calls/updatePackageEnv");
-  const listPackages = require("calls/listPackages");
+
   // const fetchDirectory = require('calls/fetchDirectory');
   // const fetchPackageVersions = require('calls/fetchPackageVersions');
   // const fetchPackageData = require('calls/fetchPackageData');
-  // const managePorts = require('calls/managePorts');
+
   // const getUserActionLogs = require('calls/getUserActionLogs');
 
   // import dependencies
@@ -52,60 +63,124 @@ describe("Full integration test with REAL docker: ", function() {
       }
     });
 
-    // The test will perfom intense tasks and could take up to some minutes
-    // TEST - 1
-    // (before)
+    /**
+     * 1. Install DNP
+     */
 
-    // - > installPackage
-    testInstallPackage(installPackage, { id });
+    it("Should install DNP", async () => {
+      await calls.installPackage({ id });
+    }).timeout(5 * 60 * 1000);
 
     // EXTRA, verify that the envs were set correctly
-    it("should had to update DNP ENVs during the installation", async () => {
-      const getPath = require("utils/getPath");
-      const ENV_FILE_PATH = getPath.envFile(id, params);
-      let envRes = fs.readFileSync(ENV_FILE_PATH, "utf8");
+    it("should had to update DNP ENVs during the installation", () => {
+      let envRes = fs.readFileSync(getPath.envFile(id, params), "utf8");
       expect(envRes).to.include("VIRTUAL_HOST=\nLETSENCRYPT_HOST=");
     }).timeout(10 * 1000);
 
     // - > logPackage
-    testLogPackage(logPackage, {
-      id,
-      options: {}
+    it(`Should call logPackage for ${id}`, async () => {
+      const res = await calls.logPackage({ id });
+      expect(res).to.have.property("message");
+      expect(res.result).to.be.a("string");
+    }).timeout(10 * 1000);
+
+    it(`Should call logPackage for letsencrypt-nginx.dnp.dappnode.eth`, async () => {
+      const res = await calls.logPackage({
+        id: "letsencrypt-nginx.dnp.dappnode.eth"
+      });
+      expect(res).to.have.property("message");
+      expect(res.result).to.be.a("string");
+    }).timeout(10 * 1000);
+
+    it(`Should call logPackage for nginx-proxy.dnp.dappnode.eth`, async () => {
+      const res = await calls.logPackage({
+        id: "nginx-proxy.dnp.dappnode.eth"
+      });
+      expect(res).to.have.property("message");
+      expect(res.result).to.be.a("string");
+    }).timeout(10 * 1000);
+
+    it("Should update DNP envs and reset", async () => {
+      // Use randomize value, different on each run
+      const envValue = Date.now();
+      const res = await calls.updatePackageEnv({
+        id,
+        envs: { time: envValue },
+        restart: true
+      });
+      expect(res).to.have.property("message");
+      let envRes = fs.readFileSync(getPath.envFile(id, params), "utf8");
+      expect(envRes).to.include(`time=${envValue}`);
+    }).timeout(120 * 1000);
+
+    /**
+     * 2. Test stopping and removing
+     */
+
+    it(`DNP should be running`, async () => {
+      const state = await getDnpState(id);
+      expect(state).to.equal("running");
     });
-    testLogPackage(logPackage, {
-      id: "letsencrypt-nginx.dnp.dappnode.eth",
-      options: {}
+
+    it("Should stop the DNP", async () => {
+      await calls.togglePackage({ id, timeout: 0 });
+    }).timeout(20 * 1000);
+
+    it(`DNP should be running`, async () => {
+      const state = await getDnpState(id);
+      expect(state).to.equal("exited");
     });
-    testLogPackage(logPackage, {
-      id: "nginx-proxy.dnp.dappnode.eth",
-      options: {}
+
+    it("Should start the DNP", async () => {
+      await calls.togglePackage({ id, timeout: 0 });
+    }).timeout(20 * 1000);
+
+    it(`DNP should be running`, async () => {
+      const state = await getDnpState(id);
+      expect(state).to.equal("running");
     });
 
-    // - > updatePackageEnv (with reset, after install)
-    testUpdatePackageEnv(updatePackageEnv, id, true, params);
+    it("Should restart the DNP", async () => {
+      await calls.restartPackage({ id });
+    }).timeout(20 * 1000);
 
-    // - > installPackage - > expect error (already installed)
+    it(`DNP should be running`, async () => {
+      const state = await getDnpState(id);
+      expect(state).to.equal("running");
+    });
 
-    // - > listPackages - > confirm success
-    testListPackages(listPackages, id, "running");
+    /**
+     * Test the file transfer
+     * - Copy to the container
+     * - Copy from the container
+     */
+    let dataUri;
+    const filename = "test.file";
+    const toPath = "";
 
-    // - > togglePackage (stop)
-    testTogglePackage(togglePackage, { id, timeout: 0 });
+    it("Should copy the file to the container", async () => {
+      dataUri = await getDataUri("./package.json");
+      await calls.copyFileTo({ id, dataUri, filename, toPath });
+    }).timeout(20 * 1000);
 
-    // - > listPackages - > confirm success
-    testListPackages(listPackages, id, "exited");
+    it("Should copy the file to the container", async () => {
+      dataUri = await getDataUri("./package.json");
+      const res = await calls.copyFileFrom({ id, fromPath: filename });
+      expect(res.result).to.equal(dataUri, "Wrong dataUri");
+    }).timeout(20 * 1000);
 
-    // - > togglePackage (start)
-    testTogglePackage(togglePackage, { id, timeout: 0 });
+    /**
+     * Uninstall the DNP
+     */
 
-    // - > listPackages - > confirm success
-    testListPackages(listPackages, id, "running");
+    it("Should remove DNP", async () => {
+      await calls.removePackage({ id, deleteVolumes: false, timeout: 0 });
+    }).timeout(20 * 1000);
 
-    // - > removePackage
-    testRemovePackage(removePackage, { id, deleteVolumes: false, timeout: 0 });
-
-    // - > listPackages - > confirm success
-    testListPackages(listPackages, id, "down");
+    it(`DNP should be removed`, async () => {
+      const state = await getDnpState(id);
+      expect(state).to.equal("down");
+    });
   });
 
   after(async () => {
@@ -137,106 +212,3 @@ describe("Full integration test with REAL docker: ", function() {
     }
   });
 });
-
-// The test will perfom intense tasks and could take up to some minutes
-// TEST - 1
-// - > updatePackageEnv
-// - > installPackage
-// - > listPackages - > confirm success
-
-// - > installPackage - > expect error (already installed)
-
-// - > logPackage
-
-// - > togglePackage (stop)
-// - > listPackages - > confirm success
-
-// - > togglePackage (start)
-// - > listPackages - > confirm success
-
-// - > removePackage
-// - > listPackages - > confirm success
-
-// TEST - 2
-// - > fetchDirectory
-// - > fetchPackageVersions
-
-// The test will perfom intense tasks and could take up to some minutes
-// TEST - 1
-// - > updatePackageEnv
-
-function testInstallPackage(installPackage, kwargs) {
-  it("call installPackage", done => {
-    logs.info("\x1b[36m%s\x1b[0m >> INSTALLING");
-    installPackage(kwargs)
-      .then(
-        res => {
-          expect(res).to.have.property("message");
-        },
-        e => {
-          if (e) logs.error(e.stack);
-          expect(e).to.be.undefined;
-        }
-      )
-      .then(done);
-  }).timeout(5 * 60 * 1000);
-}
-
-function testLogPackage(logPackage, kwargs) {
-  it("call logPackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m >> LOGGING");
-    const res = await logPackage(kwargs);
-    expect(res).to.have.property("message");
-    expect(res.result).to.be.a("string");
-    // let packageNames = parsedRes.result.map(e => name)
-    // expect(packageNames).to.include(packageReq)
-  }).timeout(10 * 1000);
-}
-
-function testListPackages(listPackages, packageName, state) {
-  it(`calling listPackages, to check ${packageName} is ${state}`, async () => {
-    logs.info("\x1b[36m%s\x1b[0m >> LISTING");
-    const res = await listPackages();
-    expect(res).to.have.property("message");
-    // filter returns an array of results (should have only one)
-    let pkg = res.result.filter(e => {
-      return e.name.includes(packageName);
-    })[0];
-    if (state == "down") expect(pkg).to.be.undefined;
-    else expect(pkg.state).to.equal(state);
-  }).timeout(10 * 1000);
-}
-
-function testTogglePackage(togglePackage, kwargs) {
-  it("call togglePackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m >> TOGGLING START / STOP");
-    const res = await togglePackage(kwargs);
-    expect(res).to.have.property("message");
-  }).timeout(20 * 1000);
-}
-
-function testRemovePackage(removePackage, kwargs) {
-  it("call removePackage", async () => {
-    logs.info("\x1b[36m%s\x1b[0m >> REMOVING");
-    const res = await removePackage(kwargs);
-    expect(res).to.have.property("message");
-  }).timeout(20 * 1000);
-}
-
-function testUpdatePackageEnv(updatePackageEnv, id, restart, params) {
-  const getPath = require("utils/getPath");
-  const envValue = Date.now();
-  const ENV_FILE_PATH = getPath.envFile(id, params);
-
-  it("call updatePackageEnv", async () => {
-    logs.info("\x1b[36m%s\x1b[0m >> UPDATING ENVS");
-    const res = await updatePackageEnv({
-      id,
-      envs: { time: envValue },
-      restart
-    });
-    expect(res).to.have.property("message");
-    let envRes = fs.readFileSync(ENV_FILE_PATH, "utf8");
-    expect(envRes).to.include(`time=${envValue}`);
-  }).timeout(120 * 1000);
-}
