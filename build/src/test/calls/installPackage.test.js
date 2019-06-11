@@ -3,7 +3,7 @@ const expect = require("chai").expect;
 const sinon = require("sinon");
 const { eventBusTag } = require("eventBus");
 
-describe("Call function: installPackage", function() {
+describe("Call function: installPackage", function () {
   const params = {
     DNCORE_DIR: "DNCORE",
     REPO_DIR: "test_files/"
@@ -23,8 +23,8 @@ describe("Call function: installPackage", function() {
     type: "library"
   };
   const depPortsToOpen = [
-    { number: 32769, type: "UDP" },
-    { number: 32769, type: "TCP" }
+    { portNumber: 32769, protocol: "UDP" },
+    { portNumber: 32769, protocol: "TCP" }
   ];
 
   // Stub packages module. Resolve always returning nothing
@@ -39,7 +39,7 @@ describe("Call function: installPackage", function() {
     state: { [pkgName]: pkgVer, [depName]: depVer }
   });
 
-  const getManifest = sinon.stub().callsFake(async function(pkg) {
+  const getManifest = sinon.stub().callsFake(async function (pkg) {
     if (pkg.name === pkgName) return pkgManifest;
     else if (pkg.name === depName) return depManifest;
     else throw Error(`[SINON STUB] Manifest of ${pkg.name} not available`);
@@ -53,7 +53,7 @@ describe("Call function: installPackage", function() {
   };
 
   const dockerList = {
-    listContainers: async () => {}
+    listContainers: async () => { }
   };
 
   // Simulate that only the dependency has p2p ports

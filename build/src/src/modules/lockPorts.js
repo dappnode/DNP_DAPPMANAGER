@@ -71,7 +71,7 @@ const params = require("params");
  * Edits docker-compose of a package to lock ephemeral ports
  * Must be run after a `docker-compose up` on the last step of the installation
  * @param {object} pkg {name, ver, manifest}
- * @returns {array} portsToOpen = [ {number: 32769, type: 'UDP'}, ... ]
+ * @returns {array} portsToOpen = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
 async function lockPorts({ pkg, dockerComposePath }) {
   // Load the docker compose
@@ -151,8 +151,8 @@ async function lockPorts({ pkg, dockerComposePath }) {
 
     // Store the host port in the ports to open array
     portsToOpen.push({
-      number: dnpListPort.PublicPort,
-      type: portType.toUpperCase()
+      portNumber: dnpListPort.PublicPort,
+      protocol: portType.toUpperCase()
     });
 
     // Now convert "30303/udp" to "32769:30303/udp"

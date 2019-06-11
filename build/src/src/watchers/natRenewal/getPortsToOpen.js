@@ -37,7 +37,7 @@ async function getPortsToOpen() {
      *     Type: "tcp" {string}
      *   }, ... ], {array}
      *   running: true, {bool}
-     *   portsToClose: [ {number: 30303, type: 'UDP'}, ...], {array}
+     *   portsToClose: [ {portNumber: 30303, protocol: 'UDP'}, ...], {array}
      * }, ... ]
      *
      * [NOTE]: PublicPort is the host's port
@@ -75,7 +75,7 @@ async function getPortsToOpen() {
         } catch (e) {
           logs.error(
             `Error getting ports of "${
-              (dnp || {}).name
+            (dnp || {}).name
             }" from docker-compose: ${e.stack}`
           );
         }

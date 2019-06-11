@@ -3,20 +3,20 @@ const validateKwargs = require("./validateKwargs");
 const parseCloseOutput = require("./parseCloseOutput");
 
 /**
- * Opens port = maps requested port to host
+ * Close port = deletes the map requested port to host
  * Actual command example:
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 500 UDP
  *
  * @param {object} kwargs: {
- *   number: '3000',
- *   type: 'TCP',
+ *   portNumber: '3000',
+ *   protocol: 'TCP',
  * }
  * @returns {*}
  */
-async function close({ number, type }) {
-  validateKwargs({ number, type });
+async function close({ portNumber, protocol }) {
+  validateKwargs({ portNumber, protocol });
   try {
-    const res = await upnpcCommand(`-e DAppNode -d ${number} ${type}`);
+    const res = await upnpcCommand(`-e DAppNode -d ${portNumber} ${protocol}`);
     return parseCloseOutput(res);
   } catch (e) {
     parseCloseOutput(e.message);

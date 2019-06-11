@@ -33,7 +33,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   }
 
   // CLOSE PORTS
-  // portsToClose: [ {number: 30303, type: 'UDP'}, ...]
+  // portsToClose: [ {portNumber: 30303, protocol: 'UDP'}, ...]
   const dnpList = await dockerList.listContainers();
   const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
   if (!dnp) {
@@ -51,13 +51,13 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   } catch (e) {
     logs.error(
       `Error getting mappedPortsToClose from manifest of ${dnp.name}: ${
-        e.stack
+      e.stack
       }`
     );
   }
   // Skip if there are no ports to open or if UPnP is not available
   const upnpAvailable = await db.get("upnpAvailable");
-  // dnp.portsToClose = [ {number: 30303, type: 'UDP'}, ...] - will always be defined and an array
+  // dnp.portsToClose = [ {portNumber: 30303, protocol: 'UDP'}, ...] - will always be defined and an array
   const portsToClose = [...mappedPortsToClose, ...dnp.portsToClose];
   if (dnp.portsToClose.length && upnpAvailable) {
     eventBus.emit(eventBusTag.call, {

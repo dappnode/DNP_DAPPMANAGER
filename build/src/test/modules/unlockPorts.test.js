@@ -4,7 +4,7 @@ const fs = require("fs");
 const getPath = require("utils/getPath");
 const validate = require("utils/validate");
 
-describe("Module: unlockPorts", function() {
+describe("Module: unlockPorts", function () {
   const params = {
     DNCORE_DIR: "DNCORE",
     REPO_DIR: "test_files/"
@@ -25,7 +25,7 @@ describe("Module: unlockPorts", function() {
 
   const docker = {
     compose: {
-      up: async () => {}
+      up: async () => { }
     }
   };
 
@@ -45,7 +45,7 @@ services:
             - '32768:30303'
             - '5001:5001'
         labels:
-            portsToClose: '[{"number":32768,"type":"UDP"},{"number":32768,"type":"TCP"}]'
+            portsToClose: '[{"portNumber":32768,"protocol":"UDP"},{"portNumber":32768,"protocol":"TCP"}]'
 `;
     fs.writeFileSync(dockerComposePath, dockerComposeString);
   });
@@ -53,8 +53,8 @@ services:
   it("should unlock ports and return portsToClose (NON core)", async () => {
     const portsToClose = await unlockPorts(dockerComposePath);
     expect(portsToClose).to.deep.equal([
-      { number: 32768, type: "UDP" },
-      { number: 32768, type: "TCP" }
+      { portNumber: 32768, protocol: "UDP" },
+      { portNumber: 32768, protocol: "TCP" }
     ]);
   });
 

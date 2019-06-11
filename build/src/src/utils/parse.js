@@ -146,7 +146,7 @@ function packageReq(req) {
 // }
 
 const manifest = {
-  depObject: function(manifest) {
+  depObject: function (manifest) {
     let depObject = manifest.dependencies || {};
     if (!depObject || typeof depObject != typeof {}) {
       throw Error(

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const parseManifestPorts = require("utils/parseManifestPorts");
 
-describe("Util: parseManifestPorts", function() {
+describe("Util: parseManifestPorts", function () {
   it("should parse manifest ports", () => {
     const manifest = {
       image: {
@@ -10,8 +10,8 @@ describe("Util: parseManifestPorts", function() {
     };
     const ports = parseManifestPorts(manifest);
     expect(ports).to.deep.equal([
-      { number: "30303", type: "UDP" },
-      { number: "30304", type: "TCP" }
+      { portNumber: "30303", protocol: "UDP" },
+      { portNumber: "30304", protocol: "TCP" }
     ]);
   });
 });

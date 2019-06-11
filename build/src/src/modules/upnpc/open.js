@@ -8,18 +8,18 @@ const parseOpenOutput = require("./parseOpenOutput");
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -r 500 UDP 7200
  *
  * @param {object} kwargs: {
- *   number: '3000',
- *   type: 'TCP',
+ *   portNumber: '3000',
+ *   protocol: 'TCP',
  * }
  * @returns {*}
  */
 // Timeout in seconds. Should be greater than the natRenewalInterval
 const natRenewalTimeout = 120 * 60;
 
-async function open({ number, type }) {
-  validateKwargs({ number, type });
+async function open({ portNumber, protocol }) {
+  validateKwargs({ portNumber, protocol });
   try {
-    const res = await upnpcCommand(`-e DAppNode -r ${number} ${type} ${natRenewalTimeout}`);
+    const res = await upnpcCommand(`-e DAppNode -r ${portNumber} ${protocol} ${natRenewalTimeout}`);
     return parseOpenOutput(res);
   } catch (e) {
     parseOpenOutput(e.message);
