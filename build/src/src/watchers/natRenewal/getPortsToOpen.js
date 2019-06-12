@@ -70,12 +70,12 @@ async function getPortsToOpen() {
           );
           for (const port of dockerComposePorts || []) {
             // Only consider ports that are mapped (not ephemeral ports)
-            if (port.host) addPort(port.type, port.host);
+            if (port.host) addPort(port.protocol, port.host);
           }
         } catch (e) {
           logs.error(
             `Error getting ports of "${
-            (dnp || {}).name
+              (dnp || {}).name
             }" from docker-compose: ${e.stack}`
           );
         }
