@@ -3,7 +3,7 @@ const expect = require("chai").expect;
 const sinon = require("sinon");
 const { eventBusTag } = require("eventBus");
 
-describe("Call function: installPackage", function () {
+describe("Call function: installPackage", function() {
   const params = {
     DNCORE_DIR: "DNCORE",
     REPO_DIR: "test_files/"
@@ -39,7 +39,7 @@ describe("Call function: installPackage", function () {
     state: { [pkgName]: pkgVer, [depName]: depVer }
   });
 
-  const getManifest = sinon.stub().callsFake(async function (pkg) {
+  const getManifest = sinon.stub().callsFake(async function(pkg) {
     if (pkg.name === pkgName) return pkgManifest;
     else if (pkg.name === depName) return depManifest;
     else throw Error(`[SINON STUB] Manifest of ${pkg.name} not available`);
@@ -53,7 +53,7 @@ describe("Call function: installPackage", function () {
   };
 
   const dockerList = {
-    listContainers: async () => { }
+    listContainers: async () => {}
   };
 
   // Simulate that only the dependency has p2p ports
@@ -141,7 +141,7 @@ describe("Call function: installPackage", function () {
     sinon.assert.callCount(packages.run, 2);
     expect(packages.run.getCall(0).args).to.deep.equal(
       [callKwargPkg],
-      `should call packages.run second for dependency ${depName}`
+      `should call packages.run second for dependency ${pkgName}`
     );
     expect(packages.run.getCall(1).args).to.deep.equal(
       [callKwargDep],

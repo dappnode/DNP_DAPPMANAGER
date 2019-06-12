@@ -91,7 +91,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
         }
       },
       "utils/parse": {
-        dockerComposePorts: () => { }
+        dockerComposePorts: () => {}
       }
     });
 

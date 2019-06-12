@@ -19,7 +19,9 @@ const natRenewalTimeout = 120 * 60;
 async function open({ portNumber, protocol }) {
   validateKwargs({ portNumber, protocol });
   try {
-    const res = await upnpcCommand(`-e DAppNode -r ${portNumber} ${protocol} ${natRenewalTimeout}`);
+    const res = await upnpcCommand(
+      `-e DAppNode -r ${portNumber} ${protocol} ${natRenewalTimeout}`
+    );
     return parseOpenOutput(res);
   } catch (e) {
     parseOpenOutput(e.message);

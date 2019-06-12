@@ -4,7 +4,7 @@ const fs = require("fs");
 const getPath = require("utils/getPath");
 const validate = require("utils/validate");
 
-describe("Module: lockPorts", function () {
+describe("Module: lockPorts", function() {
   const params = {
     DNCORE_DIR: "DNCORE",
     REPO_DIR: "test_files/"
@@ -76,7 +76,7 @@ describe("Module: lockPorts", function () {
   };
   const docker = {
     compose: {
-      up: async () => { }
+      up: async () => {}
     }
   };
 

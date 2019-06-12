@@ -51,7 +51,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   } catch (e) {
     logs.error(
       `Error getting mappedPortsToClose from manifest of ${dnp.name}: ${
-      e.stack
+        e.stack
       }`
     );
   }

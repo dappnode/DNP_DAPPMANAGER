@@ -7,7 +7,7 @@ const validate = require("utils/validate");
 const { eventBusTag } = require("eventBus");
 const shell = require("utils/shell");
 
-describe("Call function: removePackage", function () {
+describe("Call function: removePackage", function() {
   const testDir = "test_files/";
   const params = {
     REPO_DIR: testDir,

@@ -20,7 +20,9 @@ const managePorts = async ({ action, ports }) => {
   }
 
   // portsString = "30303 TCP, 30303 UDP"
-  const portsString = ports.map(p => `${p.portNumber} ${p.protocol}`).join(", ");
+  const portsString = ports
+    .map(p => `${p.portNumber} ${p.protocol}`)
+    .join(", ");
 
   return {
     message: `${action === "open" ? "Opened" : "Closed"} ports ${portsString}`,

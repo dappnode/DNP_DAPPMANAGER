@@ -189,7 +189,7 @@ const installPackage = async ({
     if (lockedPortsToOpen.length)
       logs.info(
         `Locked ${lockedPortsToOpen.length} ports of DNP ${
-        pkg.name
+          pkg.name
         }: ${JSON.stringify(lockedPortsToOpen)}`
       );
 

@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const parseManifestPorts = require("utils/parseManifestPorts");
 
-describe("Util: parseManifestPorts", function () {
+describe("Util: parseManifestPorts", function() {
   it("should parse manifest ports", () => {
     const manifest = {
       image: {
