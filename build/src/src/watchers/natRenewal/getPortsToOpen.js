@@ -48,7 +48,9 @@ async function getPortsToOpen() {
         // If DNP is running the port mapping is available in the dnpList
         for (const port of dnp.ports || []) {
           // PublicPort is the host's port
-          addPort(port.Type, port.PublicPort);
+          if (port.PublicPort) {
+            addPort(port.Type, port.PublicPort);
+          }
         }
       } else {
         try {
