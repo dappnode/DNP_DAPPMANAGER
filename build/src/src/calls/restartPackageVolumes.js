@@ -7,7 +7,7 @@ const { eventBus, eventBusTag } = require("eventBus");
 // Utils
 const getPath = require("utils/getPath");
 const { stringIncludes } = require("utils/strings");
-const getNamedOwnedVolumes = require("utils/getNamedOwnedVolumes");
+const { uniqueValues } = require("utils/arrays");
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -30,19 +30,24 @@ async function restartPackageVolumes({ id, doNotRestart }) {
    *     "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
    *     "nginxproxydnpdappnodeeth_vhost.d"
    *   ],
-   *   dnpsToRemove: ["letsencrypt-nginx.dnp.dappnode.eth"]
+   *   dnpsToRemove: [
+   *     "letsencrypt-nginx.dnp.dappnode.eth",
+   *     "nginx-proxy.dnp.dappnode.eth"
+   *   ]
    * }
    */
-  const namedOwnedVolumes = getNamedOwnedVolumes(dnpList, id, {
-    aggregate: true
-  });
+  const namedOwnedVolumes = (dnp.volumes || []).filter(
+    vol => vol.name && vol.isOwner
+  );
+  // If there are no volumes don't do anything
+  if (!namedOwnedVolumes.length)
+    return { message: `${id} has no named volumes` };
 
   // Destructure result and append the current requested DNP (id)
-  const volumeNames = namedOwnedVolumes.names;
-  const dnpsToRemove = [...namedOwnedVolumes.dnpsToRemove, dnp.name];
-
-  // If there are no volumes don't do anything
-  if (!volumeNames.length) return { message: `${id} has no named volumes` };
+  const volumeNames = namedOwnedVolumes.map(vol => vol.name);
+  const dnpsToRemove = namedOwnedVolumes.reduce((dnps, vol) => {
+    return uniqueValues([...dnps, ...vol.users]);
+  }, []);
 
   // Verify results
   const dockerComposePaths = {};
