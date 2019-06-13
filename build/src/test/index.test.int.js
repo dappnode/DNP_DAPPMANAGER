@@ -36,8 +36,8 @@ describe("Full integration test with REAL docker: ", function() {
   // import dependencies
   const params = require("params");
 
-  const packageReq = "otpweb.dnp.dappnode.eth";
-  const id = packageReq;
+  const idOtpweb = "otpweb.dnp.dappnode.eth";
+  const idNginx = "nginx-proxy.dnp.dappnode.eth";
 
   const shellSafe = cmd => shell(cmd).catch(() => {});
 
@@ -68,18 +68,18 @@ describe("Full integration test with REAL docker: ", function() {
    */
 
   it("Should install DNP", async () => {
-    await calls.installPackage({ id });
+    await calls.installPackage({ id: idOtpweb });
   }).timeout(5 * 60 * 1000);
 
   // EXTRA, verify that the envs were set correctly
   it("should had to update DNP ENVs during the installation", () => {
-    let envRes = fs.readFileSync(getPath.envFile(id, params), "utf8");
+    let envRes = fs.readFileSync(getPath.envFile(idOtpweb, params), "utf8");
     expect(envRes).to.include("VIRTUAL_HOST=\nLETSENCRYPT_HOST=");
   }).timeout(10 * 1000);
 
   // - > logPackage
-  it(`Should call logPackage for ${id}`, async () => {
-    const res = await calls.logPackage({ id });
+  it(`Should call logPackage for ${idOtpweb}`, async () => {
+    const res = await calls.logPackage({ id: idOtpweb });
     expect(res).to.have.property("message");
     expect(res.result).to.be.a("string");
   }).timeout(10 * 1000);
@@ -104,12 +104,12 @@ describe("Full integration test with REAL docker: ", function() {
     // Use randomize value, different on each run
     const envValue = Date.now();
     const res = await calls.updatePackageEnv({
-      id,
+      id: idOtpweb,
       envs: { time: envValue },
       restart: true
     });
     expect(res).to.have.property("message");
-    let envRes = fs.readFileSync(getPath.envFile(id, params), "utf8");
+    let envRes = fs.readFileSync(getPath.envFile(idOtpweb, params), "utf8");
     expect(envRes).to.include(`time=${envValue}`);
   }).timeout(120 * 1000);
 
@@ -118,34 +118,34 @@ describe("Full integration test with REAL docker: ", function() {
    */
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(id);
+    const state = await getDnpState(idOtpweb);
     expect(state).to.equal("running");
   });
 
   it("Should stop the DNP", async () => {
-    await calls.togglePackage({ id, timeout: 0 });
+    await calls.togglePackage({ id: idOtpweb, timeout: 0 });
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(id);
+    const state = await getDnpState(idOtpweb);
     expect(state).to.equal("exited");
   });
 
   it("Should start the DNP", async () => {
-    await calls.togglePackage({ id, timeout: 0 });
+    await calls.togglePackage({ id: idOtpweb, timeout: 0 });
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(id);
+    const state = await getDnpState(idOtpweb);
     expect(state).to.equal("running");
   });
 
   it("Should restart the DNP", async () => {
-    await calls.restartPackage({ id });
+    await calls.restartPackage({ id: idOtpweb });
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(id);
+    const state = await getDnpState(idOtpweb);
     expect(state).to.equal("running");
   });
 
@@ -160,7 +160,7 @@ describe("Full integration test with REAL docker: ", function() {
 
   it("Should copy the file TO the container", async () => {
     dataUri = await getDataUri("./package.json");
-    await calls.copyFileTo({ id, dataUri, filename, toPath });
+    await calls.copyFileTo({ id: idOtpweb, dataUri, filename, toPath });
   }).timeout(20 * 1000);
 
   // ### TODO, mime-types do not match
@@ -172,21 +172,60 @@ describe("Full integration test with REAL docker: ", function() {
   // }).timeout(20 * 1000);
 
   /**
-   * Uninstall the DNP
+   * Restart volumes
    */
-
-  it("Should remove DNP", async () => {
-    await calls.removePackage({ id, deleteVolumes: false, timeout: 0 });
+  it(`Should restart the package volumes of ${idOtpweb}`, async () => {
+    if (idOtpweb !== "otpweb.dnp.dappnode.eth")
+      throw Error(`Test expects idOtpweb to equal otpweb.dnp.dappnode.eth`);
+    const res = await calls.restartPackageVolumes({ id: idOtpweb });
+    expect(res.message).to.equal(
+      "otpweb.dnp.dappnode.eth has no named volumes"
+    );
   }).timeout(20 * 1000);
 
-  it(`DNP should be removed`, async () => {
-    const state = await getDnpState(id);
+  it(`Should restart the package volumes of ${idNginx}`, async () => {
+    const res = await calls.restartPackageVolumes({ id: idNginx });
+    /**
+     * nginx-proxy.dnp.dappnode.eth has one named undeclared volume,
+     * so its name will be an unpredictable hash. Full message example:
+     * "Restarted nginx-proxy.dnp.dappnode.eth volumes: nginxproxydnpdappnodeeth_html ad09c24035959430f416a259d419d5967ae09d65337ce65e9c9f361a5a3fa1d1 nginxproxydnpdappnodeeth_vhost.d"
+     */
+    expect(res.message).to.include(
+      "Restarted nginx-proxy.dnp.dappnode.eth volumes"
+    );
+    expect(res.message).to.include("nginxproxydnpdappnodeeth_html");
+    expect(res.message).to.include("nginxproxydnpdappnodeeth_vhost.d");
+  }).timeout(20 * 1000);
+
+  /**
+   * Uninstall the DNP
+   * - Test `deleteVolumes: true` for nginx-proxy.dnp.dappnode.eth
+   * - Test a normal delete for otpweb
+   */
+  it(`Should remove DNP ${idNginx}`, async () => {
+    await calls.removePackage({ id: idNginx, deleteVolumes: true, timeout: 0 });
+  }).timeout(20 * 1000);
+
+  it(`DNP ${idNginx} should be removed`, async () => {
+    const state = await getDnpState(idNginx);
+    expect(state).to.equal("down");
+  });
+
+  it(`Should remove DNP ${idOtpweb}`, async () => {
+    await calls.removePackage({
+      id: idOtpweb,
+      deleteVolumes: false,
+      timeout: 0
+    });
+  }).timeout(20 * 1000);
+
+  it(`DNP ${idOtpweb} should be removed`, async () => {
+    const state = await getDnpState(idOtpweb);
     expect(state).to.equal("down");
   });
 
   after(async () => {
     this.timeout(60000);
-    logs.info("\x1b[36m%s\x1b[0m >> CLOSING TEST");
     const web3 = require("modules/web3Setup");
     web3.clearWatch();
     if (

@@ -98,6 +98,7 @@ function getRepoDirPath(dnpName, params, isCore) {
 
 function getDockerComposeName(dnpName, isCore) {
   if (isCore) {
+    verifyDnpName(dnpName);
     const dnpShortName = (dnpName || "").split(".")[0];
     return `docker-compose-${dnpShortName}.yml`;
   } else {
@@ -107,9 +108,22 @@ function getDockerComposeName(dnpName, isCore) {
 
 function getManifestName(dnpName, isCore) {
   if (isCore) {
+    verifyDnpName(dnpName);
     const dnpShortName = (dnpName || "").split(".")[0];
     return `dappnode_package-${dnpShortName}.json`;
   } else {
     return "dappnode_package.json";
   }
+}
+
+// Utils
+
+function verifyDnpName(dnpName) {
+  if (!dnpName) throw Error("dnpName must be defined");
+  if (typeof dnpName !== "string")
+    throw Error(
+      `dnpName must be a string, but it's ${typeof dnpName}: ${JSON.stringify(
+        dnpName
+      )}`
+    );
 }

@@ -14,18 +14,14 @@ describe("Call function: restartPackageVolumes", function() {
     REPO_DIR: "test_files/"
   };
 
-  const PACKAGE_NAME = "test.dnp.dappnode.eth";
-  const CORE_PACKAGE_NAME = "testCore.dnp.dappnode.eth";
-  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
-  const CORE_DOCKERCOMPOSE_PATH = getPath.dockerCompose(
-    CORE_PACKAGE_NAME,
-    params
-  );
+  const dnpName = "testCore.dnp.dappnode.eth";
+  const dappmanagerId = "dappmanager.dnp.dappnode.eth";
+  const noVolsDnpName = "no-vols.dnp.dappnode.eth";
+  const dockerComposePath = getPath.dockerCompose(dnpName, params);
 
   const docker = {
     compose: {
       rm: sinon.stub(),
-      down: sinon.stub(),
       up: sinon.stub()
     },
     safe: {
@@ -42,13 +38,18 @@ describe("Call function: restartPackageVolumes", function() {
   const dockerList = {
     listContainers: async () => [
       {
-        name: CORE_PACKAGE_NAME,
+        name: dnpName,
         isCore: true,
         volumes: [{ name: "vol1" }, { name: "vol2" }]
       },
       {
-        name: PACKAGE_NAME,
-        volumes: [{ name: "vol3" }]
+        name: dappmanagerId,
+        isCore: true,
+        volumes: [{ name: "dappmanager_vol" }]
+      },
+      {
+        name: noVolsDnpName,
+        volumes: []
       }
     ]
   };
@@ -60,14 +61,14 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   before(() => {
-    for (const path of [DOCKERCOMPOSE_PATH, CORE_DOCKERCOMPOSE_PATH]) {
+    for (const path of [dockerComposePath, dockerComposePath]) {
       validate.path(path);
       fs.writeFileSync(path, "docker-compose");
     }
   });
 
   it("should remove the package volumes of a CORE", async () => {
-    const res = await restartPackageVolumes({ id: CORE_PACKAGE_NAME });
+    const res = await restartPackageVolumes({ id: dnpName });
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.called(docker.compose.rm);
     sinon.assert.calledWith(docker.volume.rm, "vol1 vol2");
@@ -76,17 +77,27 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.have.property("message");
   });
 
-  it("should remove the package volumes of a NOT CORE", async () => {
-    const res = await restartPackageVolumes({ id: PACKAGE_NAME });
+  it("should NOT allow id = dappmanager.dnp.dappnode.eth", async () => {
+    let err = "did not throw";
+    try {
+      await restartPackageVolumes({ id: "dappmanager.dnp.dappnode.eth" });
+    } catch (e) {
+      err = e.message;
+    }
+    expect(err).to.equal("The dappmanager cannot be restarted");
+  });
+
+  it("should early return if the DNP has no volumes", async () => {
+    const res = await restartPackageVolumes({ id: noVolsDnpName });
     // sinon.assert.called(docker.compose.rm);
-    sinon.assert.called(docker.compose.down);
-    sinon.assert.called(docker.safe.compose.up);
     expect(res).to.be.ok;
     expect(res).to.have.property("message");
+    expect(res.message).to.equal(
+      "no-vols.dnp.dappnode.eth has no named volumes"
+    );
   });
 
   after(() => {
-    fs.unlinkSync(DOCKERCOMPOSE_PATH);
-    fs.unlinkSync(CORE_DOCKERCOMPOSE_PATH);
+    fs.unlinkSync(dockerComposePath);
   });
 });
