@@ -1,4 +1,5 @@
 const fs = require("fs");
+const logs = require("logs.js")(module);
 const params = require("params");
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
@@ -13,7 +14,7 @@ const getNamedOwnedVolumes = require("utils/getNamedOwnedVolumes");
  *
  * @param {string} id DNP .eth name
  */
-async function restartPackageVolumes({ id }) {
+async function restartPackageVolumes({ id, doNotRestart }) {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await dockerList.listContainers();
@@ -72,9 +73,15 @@ async function restartPackageVolumes({ id }) {
     err = e;
   }
   // Restart docker to apply changes
-  for (const dnpName of dnpsToRemove) {
-    await docker.safe.compose.up(dockerComposePaths[dnpName]);
+  // Offer a doNotRestart option for the removePackage call
+  if (doNotRestart) {
+    logs.warn(`On restartPackageVolumes, doNotRestart = true`);
+  } else {
+    for (const dnpName of dnpsToRemove) {
+      await docker.safe.compose.up(dockerComposePaths[dnpName]);
+    }
   }
+
   // In case of error: FIRST up the dnp, THEN throw the error
   if (err) throw err;
 
