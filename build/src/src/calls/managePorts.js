@@ -1,4 +1,5 @@
 const upnpc = require("modules/upnpc");
+const getLocalIp = require("utils/getLocalIp");
 
 /**
  * Open or closes requested ports
@@ -12,9 +13,9 @@ const managePorts = async ({ action, ports }) => {
   if (!Array.isArray(ports)) {
     throw Error(`kwarg ports must be an array: ${JSON.stringify(ports)}`);
   }
-
+  const localIp = await getLocalIp();
   for (const port of ports) {
-    if (action === "open") upnpc.open(port);
+    if (action === "open") upnpc.open(port, localIp);
     else if (action === "close") upnpc.close(port);
     else throw Error(`Unknown manage ports action: ${action}`);
   }
