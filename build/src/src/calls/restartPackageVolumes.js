@@ -27,10 +27,23 @@ async function restartPackageVolumes({ id }) {
     throw Error("The installer cannot be restarted");
   }
 
+  /**
+   * The volumes object of the docker API will is
+   * {
+   *   type: Type,
+   *   name: Name, // Will be null if it's not a named volumed
+   *   path: Source,
+   *   dest: Destination
+   * }
+   */
+  const namedVolumes = (dnp.volumes || [])
+    .map(v => v.name)
+    .filter(name => name);
+
   // If there are no volumes don't do anything
-  if (!dnp.volumes || !dnp.volumes.length) {
+  if (!namedVolumes.length) {
     return {
-      message: id + " has no volumes "
+      message: id + " has no named volumes "
     };
   }
 
@@ -38,7 +51,7 @@ async function restartPackageVolumes({ id }) {
     if (dnp.isCore) {
       // docker-compose down can't be called because of the shared network
       await docker.compose.rm(dockerComposePath);
-      await docker.volume.rm(dnp.volumes.map(v => v.name).join(" "));
+      await docker.volume.rm(namedVolumes.join(" "));
     } else {
       await docker.compose.down(dockerComposePath, { volumes: true });
     }
