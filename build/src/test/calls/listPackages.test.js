@@ -30,6 +30,11 @@ function mockTest() {
       return mockList;
     }
   };
+  const docker = {
+    systemDf: async () => {
+      return [];
+    }
+  };
 
   // Mock params
   const params = {
@@ -40,6 +45,7 @@ function mockTest() {
   // initialize call
   const listPackages = proxyquire("calls/listPackages", {
     "modules/dockerList": dockerCalls,
+    "modules/docker": docker,
     params: params
   });
 

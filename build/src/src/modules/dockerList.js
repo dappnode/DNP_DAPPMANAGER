@@ -1,10 +1,7 @@
 // node modules
 const logs = require("logs.js")(module);
-const { promisify } = require("util");
-const docker = require("docker-remote-api");
-const request = docker();
-const { shortName } = require("utils/strings");
-
+const { shortName, stringIncludes } = require("utils/strings");
+const dockerRequest = require("modules/dockerRequest");
 // dedicated modules
 const params = require("../params");
 
@@ -15,34 +12,6 @@ const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 // Main functions
 //  (Docker API)
 //  endpoint documentation https://docs.docker.com/engine/api/v1.24/#31-containers
-
-async function listContainers() {
-  const containers = await dockerRequest("get", "/containers/json?all=true");
-  return containers.map(format).filter(pkg => pkg.isDnp || pkg.isCore);
-}
-
-async function runningPackagesInfo() {
-  const containers = await listContainers();
-  const containersObject = {};
-  containers.forEach(function(container) {
-    containersObject[container.name] = container;
-  });
-  return containersObject;
-}
-
-// /////////////////
-// Helper functions
-
-function dockerRequest(method, url) {
-  const options = { json: true };
-  if (method == "post") options.body = null;
-
-  const dockerRequestPromise = promisify(request[method].bind(request));
-  return dockerRequestPromise(url, options);
-}
-
-// /////////
-// utils
 
 // Sample response:
 // curl --unix-socket /var/run/docker.sock http:/v1.24/containers/json?all=1 | python -m json.tool
@@ -119,88 +88,175 @@ function dockerRequest(method, url) {
 //   "Status": "Up 3 weeks"
 // },
 
-function format(c) {
-  const packageName = (c.Names[0] || "").replace("/", "");
-  const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
-  const isCore = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
+/**
+ * @returns {array} dnpList = [{
+ *   id: c.Id,
+ *   packageName,
+ *   version: "0.1.0",
+ *   ...fromLabels,
+ *   isDnp: true,
+ *   isCore: false,
+ *   created: c.Created,
+ *   image: "ln.dnp.dappnode.eth:0.1.0",
+ *   name: "ln.dnp.dappnode.eth",
+ *   shortName: "ln",
+ *   ports: c.Ports,
+ *   volumes: [{
+ *     type: "volume",
+ *     name: "lndnpdappnodeeth_lndconfig_data",
+ *     path: "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
+ *     dest: "/root/.lnd",
+ *     users: ["ln.dnp.dappnode.eth"],
+ *     owner: "ln.dnp.dappnode.eth",
+ *     isOwner: true
+ *   }, ... ],
+ *   state: "running",
+ *   running: true
+ * }, ... ]
+ */
+async function listContainers() {
+  const containers = await dockerRequest("get", "/containers/json?all=true");
+  const dnpList = containers
+    .map(c => {
+      const packageName = (c.Names[0] || "").replace("/", "");
+      const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
+      const isCore = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
-  let name;
-  if (isDnp) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
-  else if (isCore)
-    name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
-  else name = packageName;
+      let name;
+      if (isDnp) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
+      else if (isCore)
+        name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
+      else name = packageName;
 
-  let version = (c.Image || "").split(":")[1] || "0.0.0";
-  // IPFS path
-  if ((version || "").startsWith("ipfs-")) {
-    version = version.replace("ipfs-", "/ipfs/");
+      let version = (c.Image || "").split(":")[1] || "0.0.0";
+      // IPFS path
+      if ((version || "").startsWith("ipfs-")) {
+        version = version.replace("ipfs-", "/ipfs/");
+      }
+
+      // Process dappnode.dnp tags
+      //   dappnode.dnp.dependencies
+      //   dappnode.dnp.origin
+      //   dappnode.dnp.chain
+      const fromLabels = {};
+      if (c.Labels && typeof c.Labels === "object") {
+        if (c.Labels["dappnode.dnp.origin"]) {
+          // Critical for dappGet/aggregate on IPFS DNPs
+          fromLabels.origin = c.Labels["dappnode.dnp.origin"];
+        }
+
+        if (c.Labels["dappnode.dnp.chain"]) {
+          fromLabels.chain = c.Labels["dappnode.dnp.chain"];
+        }
+
+        if (c.Labels["dappnode.dnp.dependencies"]) {
+          try {
+            fromLabels.dependencies = JSON.parse(
+              c.Labels["dappnode.dnp.dependencies"]
+            );
+          } catch (e) {
+            logs.warn(
+              `Error parsing ${name} container dependencies label "${
+                c.Labels["dappnode.dnp.dependencies"]
+              }": ${e.stack}`
+            );
+          }
+        }
+
+        if (c.Labels["portsToClose"]) {
+          try {
+            fromLabels.portsToClose = JSON.parse(c.Labels.portsToClose);
+          } catch (e) {
+            logs.warn(
+              `Error parsing ${name} container portsToClose: ${e.stack}`
+            );
+            fromLabels.portsToClose = [];
+          }
+        } else {
+          fromLabels.portsToClose = [];
+        }
+      }
+
+      return {
+        id: c.Id,
+        packageName,
+        version,
+        ...fromLabels,
+        isDnp,
+        isCore,
+        created: c.Created,
+        image: c.Image,
+        name: name,
+        shortName: shortName(name),
+        ports: c.Ports,
+        volumes: c.Mounts.map(({ Type, Name, Source, Destination }) => ({
+          type: Type,
+          path: Source,
+          dest: Destination,
+          // "Name" will be null if it's not a named volumed
+          ...(Name ? { name: Name } : {})
+        })),
+        state: c.State,
+        running: !/^Exited /i.test(c.Status)
+      };
+    })
+    .filter(pkg => pkg.isDnp || pkg.isCore);
+
+  /**
+   * [EXTENDS]
+   * Do data manipulation that requires info from other DNPs
+   */
+
+  /**
+   * Compile volume users
+   * @param {object} namedVolumesUsers = {
+   *   "nginxproxydnpdappnodeeth_html": [
+   *     "letsencrypt-nginx.dnp.dappnode.eth",
+   *     "nginx-proxy.dnp.dappnode.eth"
+   *   ]
+   * }
+   * @param {object} namedVolumesOwners = {
+   *   "nginxproxydnpdappnodeeth_html": "nginx-proxy.dnp.dappnode.eth"
+   * }
+   */
+  const namedVolumesUsers = {};
+  for (const dnp of dnpList) {
+    for (const vol of dnp.volumes || []) {
+      if (!vol.name) continue;
+      if (!namedVolumesUsers[vol.name])
+        namedVolumesUsers[vol.name] = [dnp.name];
+      else if (!namedVolumesUsers[vol.name].includes(dnp.name))
+        namedVolumesUsers[vol.name].push(dnp.name);
+    }
+  }
+  const namedVolumesOwners = {};
+  for (const [volName, users] of Object.entries(namedVolumesUsers)) {
+    for (const dnpName of users) {
+      // "nginx-proxy.dnp.dappnode.eth" => "nginxproxydnpdappnodeeth"
+      if (stringIncludes(volName, dnpName.replace(/[^0-9a-z]/gi, "")))
+        namedVolumesOwners[volName] = dnpName;
+    }
+    // Fallback, assign ownership to the first user
+    if (!namedVolumesOwners[volName]) namedVolumesOwners[volName] = users[0];
   }
 
-  // Process dappnode.dnp tags
-  //   dappnode.dnp.dependencies
-  //   dappnode.dnp.origin
-  //   dappnode.dnp.chain
-  const fromLabels = {};
-  if (c.Labels && typeof c.Labels === "object") {
-    if (c.Labels["dappnode.dnp.origin"]) {
-      // Critical for dappGet/aggregate on IPFS DNPs
-      fromLabels.origin = c.Labels["dappnode.dnp.origin"];
-    }
+  const dnpListExtended = dnpList.map(dnp => {
+    if (!dnp.volumes) return dnp;
+    const volumes = dnp.volumes.map(vol => {
+      if (!vol.name) return vol;
+      return {
+        ...vol,
+        users: namedVolumesUsers[vol.name],
+        owner: namedVolumesOwners[vol.name],
+        isOwner: namedVolumesOwners[vol.name] === dnp.name
+      };
+    });
+    return { ...dnp, volumes };
+  });
 
-    if (c.Labels["dappnode.dnp.chain"]) {
-      fromLabels.chain = c.Labels["dappnode.dnp.chain"];
-    }
-
-    if (c.Labels["dappnode.dnp.dependencies"]) {
-      try {
-        fromLabels.dependencies = JSON.parse(
-          c.Labels["dappnode.dnp.dependencies"]
-        );
-      } catch (e) {
-        logs.warn(
-          `Error parsing ${name} container dependencies label "${
-            c.Labels["dappnode.dnp.dependencies"]
-          }": ${e.stack}`
-        );
-      }
-    }
-
-    if (c.Labels["portsToClose"]) {
-      try {
-        fromLabels.portsToClose = JSON.parse(c.Labels.portsToClose);
-      } catch (e) {
-        logs.warn(`Error parsing ${name} container portsToClose: ${e.stack}`);
-        fromLabels.portsToClose = [];
-      }
-    } else {
-      fromLabels.portsToClose = [];
-    }
-  }
-
-  return {
-    id: c.Id,
-    packageName,
-    version,
-    ...fromLabels,
-    isDnp,
-    isCore,
-    created: new Date(1000 * c.Created),
-    image: c.Image,
-    name: name,
-    shortName: shortName(name),
-    ports: c.Ports,
-    volumes: c.Mounts.map(({ Type, Name, Source, Destination }) => ({
-      type: Type,
-      name: Name, // Will be null if it's not a named volumed
-      path: Source,
-      dest: Destination
-    })),
-    state: c.State,
-    running: !/^Exited /i.test(c.Status)
-  };
+  return dnpListExtended;
 }
 
 module.exports = {
-  listContainers,
-  runningPackagesInfo
+  listContainers
 };
