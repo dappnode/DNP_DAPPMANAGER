@@ -7,7 +7,7 @@ const docker = require("../dockerApiSetup");
  */
 function listContainers() {
   return new Promise((resolve, reject) => {
-    docker.listContainers((err, containers) => {
+    docker.listContainers({ all: true }, (err, containers) => {
       if (err) reject(err);
       else resolve(containers);
     });
