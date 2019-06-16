@@ -1,5 +1,5 @@
 const params = require("params");
-const restartPatch = require("modules/restartPatch");
+const docker = require("modules/docker");
 // Utils
 const shell = require("utils/shell");
 
@@ -19,7 +19,7 @@ const cleanCache = async () => {
     await shell(`rm -rf ${path}`);
   }
   // Restart DAPPMANAGER to prevent app breaks after deleting the db
-  await restartPatch("dappmanager.dnp.dappnode.eth");
+  await docker.restartDnp("dappmanager.dnp.dappnode.eth");
 
   return {
     message: `Cleaned cache`,

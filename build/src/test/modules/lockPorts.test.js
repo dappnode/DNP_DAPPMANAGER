@@ -3,13 +3,9 @@ const expect = require("chai").expect;
 const fs = require("fs");
 const getPath = require("utils/getPath");
 const validate = require("utils/validate");
+const params = require("params");
 
 describe("Module: lockPorts", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   const pkg = {
     name: "kovan.dnp.dappnode.eth",
     ver: "0.1.0",
@@ -60,28 +56,26 @@ describe("Module: lockPorts", function() {
         };
       });
   }
-  const listContainersResult = [
-    {
-      name: pkg.name,
-      ports: getListContainerPorts(pkg.manifest.image.ports)
-    },
-    {
-      name: corePkg.name,
-      isCore: true,
-      ports: getListContainerPorts(corePkg.manifest.image.ports)
-    }
-  ];
-  const dockerList = {
-    listContainers: async () => listContainersResult
-  };
+
   const docker = {
-    compose: {
-      up: async () => {}
-    }
+    getDnpData: async id => {
+      if (id === pkg.name)
+        return {
+          name: pkg.name,
+          ports: getListContainerPorts(pkg.manifest.image.ports)
+        };
+      else if (id === corePkg.name)
+        return {
+          name: corePkg.name,
+          isCore: true,
+          ports: getListContainerPorts(corePkg.manifest.image.ports)
+        };
+      else throw Error(`(TEST) No DNP found for ${id}`);
+    },
+    composeUp: async () => {}
   };
 
   const lockPorts = proxyquire("modules/lockPorts", {
-    "modules/dockerList": dockerList,
     "modules/docker": docker,
     params: params
   });
@@ -111,15 +105,14 @@ services:
 
   it("should lock ports and return portsToOpen (NON core)", async () => {
     const portsToOpen = await lockPorts({ pkg });
-    expect(portsToOpen).to.deep.equal([
-      { number: 32768, type: "UDP" },
-      { number: 32768, type: "TCP" }
-    ]);
-  });
+    expect(portsToOpen).to.deep.equal(
+      [{ number: 32768, type: "UDP" }, { number: 32768, type: "TCP" }],
+      "Wrong portsToOpen return"
+    );
 
-  it("should have modified the docker-compose (NON core)", async () => {
     const dc = fs.readFileSync(dockerComposePath, "utf8");
-    expect(dc).to.equal(`version: '3.4'
+    expect(dc).to.equal(
+      `version: '3.4'
 services:
     ${pkg.name}:
         ports:
@@ -127,20 +120,21 @@ services:
             - '32768:30303'
         labels:
             portsToClose: '[{"number":32768,"type":"UDP"},{"number":32768,"type":"TCP"}]'
-`);
+`,
+      "Wrong resulting docker-compose"
+    );
   });
 
   it("should lock ports and return portsToOpen (core)", async () => {
     const portsToOpen = await lockPorts({ pkg: corePkg });
-    expect(portsToOpen).to.deep.equal([
-      { number: 32769, type: "UDP" },
-      { number: 32769, type: "TCP" }
-    ]);
-  });
+    expect(portsToOpen).to.deep.equal(
+      [{ number: 32769, type: "UDP" }, { number: 32769, type: "TCP" }],
+      "Wrong portsToOpen return"
+    );
 
-  it("should have modified the docker-compose (core)", async () => {
     const dc = fs.readFileSync(coreDockerComposePath, "utf8");
-    expect(dc).to.equal(`version: '3.4'
+    expect(dc).to.equal(
+      `version: '3.4'
 services:
     ${corePkg.name}:
         ports:
@@ -148,7 +142,9 @@ services:
             - '32769:30303'
         labels:
             portsToClose: '[{"number":32769,"type":"UDP"},{"number":32769,"type":"TCP"}]'
-`);
+`,
+      "Wrong resulting docker-compose"
+    );
   });
 
   it("should skip the process early on a package without ephemeral ports", async () => {

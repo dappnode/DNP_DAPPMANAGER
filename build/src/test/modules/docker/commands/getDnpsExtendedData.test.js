@@ -1,21 +1,20 @@
-const proxyquire = require("proxyquire");
 const expect = require("chai").expect;
-const dockerApiResponseContainers = require("./dockerApiSamples/containers.json");
+const proxyquire = require("proxyquire");
 
-describe("dockerList", function() {
-  // const DOCKERCOMPOSE_PATH = getPath.dockerCompose(name, params)
+// Mock data
+const dockerApiResponseContainers = require("../dockerApiSamples/containers.json");
 
-  async function dockerRequest() {
-    return dockerApiResponseContainers;
-  }
-
-  const dockerList = proxyquire("modules/dockerList", {
-    "modules/dockerRequest": dockerRequest
-  });
+describe("docker > getDnpsExtendedData", function() {
+  const getDnpsExtendedData = proxyquire(
+    "modules/docker/commands/getDnpsExtendedData",
+    {
+      "../lowLevelCommands/listContainers": async () =>
+        dockerApiResponseContainers
+    }
+  );
 
   it("should parse an entire dockerList", async () => {
-    const dnpList = await dockerList.listContainers();
-
+    const dnpList = await getDnpsExtendedData();
     expect(dnpList).to.deep.equal([
       {
         id: "5407d28e2cca82b4e83351b2f55d07469703223e2296934f5034a8922e99d76d",

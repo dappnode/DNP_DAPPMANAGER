@@ -1,14 +1,10 @@
 const proxyquire = require("proxyquire");
 const expect = require("chai").expect;
 const sinon = require("sinon");
+const params = require("params");
 const { eventBusTag } = require("eventBus");
 
 describe("Call function: installPackage", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   const pkgName = "dapp.dnp.dappnode.eth";
   const pkgVer = "0.1.1";
   const pkgManifest = {
@@ -52,10 +48,6 @@ describe("Call function: installPackage", function() {
     eventBusTag
   };
 
-  const dockerList = {
-    listContainers: async () => {}
-  };
-
   // Simulate that only the dependency has p2p ports
   const lockPorts = sinon.stub().callsFake(async ({ pkg }) => {
     if (pkg.name === depName) return depPortsToOpen;
@@ -76,7 +68,6 @@ describe("Call function: installPackage", function() {
     "modules/packages": packages,
     "modules/dappGet": dappGet,
     "modules/getManifest": getManifest,
-    "modules/dockerList": dockerList,
     "modules/lockPorts": lockPorts,
     eventBus: eventBusPackage,
     "utils/isSyncing": isSyncing,

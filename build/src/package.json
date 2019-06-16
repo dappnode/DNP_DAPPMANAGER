@@ -27,6 +27,7 @@
     "datauri": "^1.1.0",
     "deepmerge": "^2.2.1",
     "docker-remote-api": "^5.0.0",
+    "dockerode": "^2.5.8",
     "ethjs-provider-http": "^0.1.6",
     "ethjs-rpc": "^0.2.0",
     "imagemin-pngquant": "^6.0.0",
@@ -41,7 +42,8 @@
     "semver": "^5.5.0",
     "shelljs": "^0.8.2",
     "simple-statistics": "^6.0.1",
-    "table-parser": "^1.0.1",
+    "tar-stream": "^2.1.0",
+    "tar-to-zip": "^2.0.0",
     "web3": "^1.0.0-beta.34",
     "winston": "^3.0.0",
     "yamljs": "^0.3.0"

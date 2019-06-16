@@ -10,16 +10,20 @@ const getDataUri = require("datauri").promise;
 chai.should();
 
 // Utils
-async function getDnpFromListPackages(id) {
+async function expectState(id, expectedState) {
   const res = await calls.listPackages();
-  if (!Array.isArray(res.result))
-    throw Error("listPackages must return an array");
-  return res.result.find(e => e.name.includes(id));
-}
-
-async function getDnpState(id) {
-  const dnp = await getDnpFromListPackages(id);
-  return dnp ? dnp.state : "down";
+  const dnps = res.result;
+  if (!Array.isArray(dnps)) throw Error("listPackages must return an array");
+  const dnp = dnps.find(e => e.name.includes(id));
+  const state = dnp ? dnp.state : "down";
+  if (state !== expectedState) {
+    /* eslint-disable no-console */
+    if (!dnp) console.log(dnps);
+    /* eslint-enable no-console */
+    throw Error(
+      `Expected state of ${id} to be "${expectedState}" but it's ${state}`
+    );
+  }
 }
 
 describe("Full integration test with REAL docker: ", function() {
@@ -118,8 +122,7 @@ describe("Full integration test with REAL docker: ", function() {
    */
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(idOtpweb);
-    expect(state).to.equal("running");
+    await expectState(idOtpweb, "running");
   });
 
   it("Should stop the DNP", async () => {
@@ -127,8 +130,7 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(idOtpweb);
-    expect(state).to.equal("exited");
+    await expectState(idOtpweb, "exited");
   });
 
   it("Should start the DNP", async () => {
@@ -136,8 +138,7 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(idOtpweb);
-    expect(state).to.equal("running");
+    await expectState(idOtpweb, "running");
   });
 
   it("Should restart the DNP", async () => {
@@ -145,8 +146,7 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`DNP should be running`, async () => {
-    const state = await getDnpState(idOtpweb);
-    expect(state).to.equal("running");
+    await expectState(idOtpweb, "running");
   });
 
   /**
@@ -207,8 +207,7 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`DNP ${idNginx} should be removed`, async () => {
-    const state = await getDnpState(idNginx);
-    expect(state).to.equal("down");
+    await expectState(idNginx, "down");
   });
 
   it(`Should remove DNP ${idOtpweb}`, async () => {
@@ -220,8 +219,7 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`DNP ${idOtpweb} should be removed`, async () => {
-    const state = await getDnpState(idOtpweb);
-    expect(state).to.equal("down");
+    await expectState(idOtpweb, "down");
   });
 
   after(async () => {

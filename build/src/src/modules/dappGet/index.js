@@ -2,7 +2,7 @@ const fetch = require("./fetch");
 const aggregate = require("./aggregate");
 const resolve = require("./resolve");
 const dappGetBasic = require("./basic");
-const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 const logs = require("logs.js")(module);
 const shouldUpdate = require("./utils/shouldUpdate");
 
@@ -55,7 +55,7 @@ async function dappGet(req, options = {}) {
    */
   if (options.BYPASS_RESOLVER) return await dappGetBasic(req);
 
-  const dnpList = await dockerList.listContainers();
+  const dnpList = await docker.getDnps();
 
   // Aggregate
   let dnps;

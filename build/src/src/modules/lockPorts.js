@@ -1,5 +1,4 @@
 const parse = require("utils/parse");
-const dockerList = require("modules/dockerList");
 const docker = require("modules/docker");
 const getPath = require("utils/getPath");
 const params = require("params");
@@ -110,13 +109,7 @@ async function lockPorts({ pkg, dockerComposePath }) {
   }
 
   // Get the current state of the package to know which port was chosen by docker
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name && _dnp.name.includes(name));
-  if (!dnp) {
-    throw Error(
-      `No DNP was found for name ${name}, so its ports cannot be checked`
-    );
-  }
+  const dnp = await docker.getDnpData(pkg.name);
   if (!dnp.ports.length) {
     throw Error(`${name}'s container's ports array has length 0`);
   }
@@ -170,7 +163,7 @@ async function lockPorts({ pkg, dockerComposePath }) {
   parse.writeDockerCompose(dockerComposePath, dc);
 
   // In order to apply the labels to the current container, re-up it
-  await docker.compose.up(dockerComposePath);
+  await docker.composeUp(dockerComposePath, { isPath: true });
 
   // Track and return host ports in case they have to be openned
   return portsToOpen;

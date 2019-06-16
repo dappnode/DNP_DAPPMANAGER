@@ -1,4 +1,4 @@
-const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 const logs = require("logs.js")(module);
 const getManifest = require("modules/getManifest");
 const shouldUpdate = require("./utils/shouldUpdate");
@@ -28,7 +28,7 @@ async function dappGetBasic(req) {
   // The function below does not directly affect funcionality.
   // However it would prevent already installed DNPs from installing
   try {
-    const installedDnps = await dockerList.listContainers();
+    const installedDnps = await docker.getDnps();
     for (const dnp of installedDnps) {
       const currentVersion = dnp.version;
       const newVersion = state[dnp.name];

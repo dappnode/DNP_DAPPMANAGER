@@ -3,7 +3,6 @@ const chai = require("chai");
 const expect = require("chai").expect;
 const sinon = require("sinon");
 const fs = require("fs");
-const dockerList = require("modules/dockerList");
 const { promisify } = require("util");
 const logs = require("logs.js")(module);
 
@@ -27,7 +26,6 @@ describe("Call function: fetchDirectory", function() {
     });
 
     it("should return success message and the directory data", async () => {
-      sinon.replace(dockerList, "listContainers", sinon.fake.returns(["pkgA"]));
       const getDirectory = sinon.stub();
       getDirectory.resolves([
         { name: "pkgA", status: "preparing", directoryId: 1 }
@@ -36,7 +34,6 @@ describe("Call function: fetchDirectory", function() {
       getManifest.resolves(manifest);
       const fetchDirectory = proxyquire("calls/fetchDirectory", {
         "modules/getDirectory": getDirectory,
-        "modules/dockerList": dockerList,
         "modules/getManifest": getManifest,
         "utils/isSyncing": async () => false
       });

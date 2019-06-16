@@ -34,8 +34,8 @@ describe("dappGet integration test", () => {
         // Prepare dependencies
 
         // Autogenerate a dockerList reponse from the _case object
-        const dockerList = {
-          listContainers: async () =>
+        const docker = {
+          getDnps: async () =>
             Object.keys(_case.dnps)
               .filter(dnpName => _case.dnps[dnpName].installed)
               .map(dnpName => {
@@ -86,11 +86,11 @@ describe("dappGet integration test", () => {
 
         const dappGet = proxyquire("modules/dappGet", {
           "./fetch": fetch,
-          "modules/dockerList": dockerList
+          "modules/docker": docker
         });
 
         const aggregate = proxyquire("modules/dappGet/aggregate", {
-          "modules/dockerList": dockerList
+          "modules/docker": docker
         });
 
         it("Agreggate dnps for the integration test", async () => {

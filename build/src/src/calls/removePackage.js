@@ -5,14 +5,10 @@ const { eventBus, eventBusTag } = require("eventBus");
 const logs = require("logs.js")(module);
 // Modules
 const docker = require("modules/docker");
-const dockerList = require("modules/dockerList");
-// External call
-const restartPackageVolumes = require("./restartPackageVolumes");
 // Utils
 const parseManifestPorts = require("utils/parseManifestPorts");
 const getPath = require("utils/getPath");
 const shell = require("utils/shell");
-const { stringIncludes } = require("utils/strings");
 
 /**
  * Remove package data: docker down + disk files
@@ -23,26 +19,14 @@ const { stringIncludes } = require("utils/strings");
 const removePackage = async ({ id, deleteVolumes = false }) => {
   if (!id) throw Error("kwarg id must be defined");
 
-  const packageRepoDir = getPath.packageRepoDir(id, params);
-
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
-  if (!fs.existsSync(dockerComposePath)) {
-    throw Error(`No docker-compose found: ${dockerComposePath}`);
-  }
-
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
     throw Error("The installer cannot be removed");
   }
 
   // CLOSE PORTS
   // portsToClose: [ {number: 30303, type: 'UDP'}, ...]
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
-  if (!dnp) {
-    throw Error(
-      `No DNP was found for name ${id}, so its ports cannot be closed`
-    );
-  }
+  const dnp = await docker.getDnpData(id);
+
   // Get manifest
   let mappedPortsToClose = [];
   try {
@@ -71,14 +55,15 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
     });
   }
 
-  // Call restartPackageVolumes to safely delete dependant volumes
-  if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
-  // Remove container (and) volumes
-  await docker.compose.down(dockerComposePath, {
-    volumes: Boolean(deleteVolumes)
-  });
+  // Remove container (and volumes)
+  if (deleteVolumes)
+    await docker.removeDnpVolumes(id, {
+      restartDnpsAfter: false
+    });
+  else await docker.composeRm(id);
+
   // Remove DNP folder and files
-  await shell(`rm -r ${packageRepoDir}`);
+  await shell(`rm -r ${getPath.packageRepoDir(id, params)}`);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);

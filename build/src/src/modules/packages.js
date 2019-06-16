@@ -3,16 +3,13 @@ const getPath = require("utils/getPath");
 const generate = require("utils/generate");
 const fs = require("fs");
 const validate = require("utils/validate");
-const restartPatch = require("modules/restartPatch");
 const logUi = require("utils/logUi");
 const params = require("params");
 const docker = require("modules/docker");
 const downloadImage = require("modules/downloadImage");
-const semver = require("semver");
 
 // Promisify fs methods
-const removeFile = promisify(fs.unlink);
-const writeFile = promisify(fs.writeFile);
+const writeFileAsync = promisify(fs.writeFile);
 
 /**
  * Handles the download of a package.
@@ -71,29 +68,19 @@ async function load({ pkg, id }) {
   // load the image to docker
   const { manifest } = pkg;
   const { name, version, isCore } = manifest;
-  // Construct image path, if not provided
-  // "admin.dnp.dappnode.eth_0.2.0.tar.xz"
-  const imageName = manifest.image.path || `${name}_${version}.tar.xz`;
-
-  const imagePath = validate.path(
-    getPath.image(name, imageName, params, isCore)
-  );
 
   logUi({ id, name, message: "Loading image..." });
-  await docker.load(imagePath);
+  await docker.loadImage(name, version, isCore);
 
   // Write manifest and docker-compose AFTER loading image
-  await writeFile(
+  await writeFileAsync(
     validate.path(getPath.manifest(name, params, isCore)),
     generate.manifest(manifest)
   );
-  await writeFile(
+  await writeFileAsync(
     validate.path(getPath.dockerCompose(name, params, isCore)),
     generate.dockerCompose(manifest, params)
   );
-
-  logUi({ id, name, message: "Cleaning files..." });
-  await removeFile(imagePath);
 
   // Final log
   logUi({ id, name, message: "Package Loaded" });
@@ -110,29 +97,15 @@ async function load({ pkg, id }) {
 async function run({ pkg, id }) {
   const { name, manifest } = pkg;
   const { isCore, version } = manifest;
-  const dockerComposePath = getPath.dockerCompose(name, params, isCore);
 
   logUi({ id, name, message: "starting package... " });
-  // patch to prevent installer from crashing
-  if (name == "dappmanager.dnp.dappnode.eth") {
-    await restartPatch(name + ":" + version);
-  } else {
-    await docker.compose.up(dockerComposePath);
-  }
+  await docker.composeUp(name, { isCore });
 
   // Clean old images. This command can throw errors.
   // If the images were removed successfuly the dappmanger will print logs:
   // Untagged: package.dnp.dappnode.eth:0.1.6
   logUi({ id, name, message: "cleaning old images" });
-  const currentImgs = await docker.images().catch(() => "");
-  await docker
-    .rmi(
-      (currentImgs || "").split(/\r|\n/).filter(p => {
-        const [pName, pVer] = p.split(":");
-        return pName === name && semver.valid(pVer) && pVer !== version;
-      })
-    )
-    .catch(() => {});
+  await docker.cleanOldImages(name, version).catch(() => {});
 
   // Final log
   logUi({ id, name, message: "package started" });

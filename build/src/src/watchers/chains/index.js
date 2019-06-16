@@ -1,6 +1,6 @@
 const { eventBus, eventBusTag } = require("eventBus");
 const logs = require("logs")(module);
-const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 const { shortNameCapitalized } = require("utils/strings");
 const params = require("params");
 
@@ -103,7 +103,7 @@ async function removeChain(dnpName) {
 
 async function checkChainWatchers() {
   try {
-    const dnpList = await dockerList.listContainers();
+    const dnpList = await docker.getDnps();
     // Remove chains
     for (const dnpName of Object.keys(activeChains)) {
       // If a chain is being watched but is not in the current dnpList
@@ -171,7 +171,7 @@ eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
 // The current ADMIN UI requires a full array of chain data
 const cache = {};
 async function getAndEmitChainData() {
-  const dnpList = await dockerList.listContainers();
+  const dnpList = await docker.getDnps();
   /**
    * @param {array} chainData = [
    *   {

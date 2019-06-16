@@ -14,17 +14,21 @@ describe("Util: package install / download", () => {
   params.REPO_DIR = "test_files/";
 
   // getManifest
-  const PACKAGE_NAME = "myPackage";
-  const IMAGE_HASH = "imageHash";
-  const IMAGE_NAME = "imageName";
-  const MANIFEST_PATH = getPath.manifest(PACKAGE_NAME, params);
-  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
-  const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params);
+  const dnpName = "myPackage";
+  const imageHash = "imageHash";
+  const imageName = "imageName";
+  const manifestPath = getPath.manifest(dnpName, params);
+  const dockerComposePath = getPath.dockerCompose(dnpName, params);
+  const imagePath = getPath.image(dnpName, imageName, params);
+  const isCore = false;
+  const version = "0.2.0";
   const dnpManifest = {
-    name: PACKAGE_NAME,
+    name: dnpName,
+    version,
+    isCore,
     image: {
-      path: IMAGE_NAME,
-      hash: IMAGE_HASH
+      path: imageName,
+      hash: imageHash
     }
   };
 
@@ -54,10 +58,8 @@ describe("Util: package install / download", () => {
   const dockerLoadSpy = sinon.spy();
   const dockerComposeUpSpy = sinon.spy();
   const docker = {
-    load: dockerLoadSpy,
-    compose: {
-      up: dockerComposeUpSpy
-    }
+    loadImage: dockerLoadSpy,
+    composeUp: dockerComposeUpSpy
   };
 
   // validate .path --> blindly accept all paths
@@ -68,7 +70,6 @@ describe("Util: package install / download", () => {
   // fs .writeFileSync, .existsSync, .unlinkSync
   const fsWriteFileSpy = sinon.spy();
   const fsExistsSyncSpy = sinon.spy();
-  const fsUnlinkSpy = sinon.spy();
   const fs = {
     writeFile: async (data, path, callback) => {
       fsWriteFileSpy(data, path);
@@ -77,10 +78,6 @@ describe("Util: package install / download", () => {
     existsSync: async path => {
       fsExistsSyncSpy(path);
       return true;
-    },
-    unlink: (PATH, callback) => {
-      fsUnlinkSpy(PATH);
-      callback(null, "great success");
     }
   };
 
@@ -93,77 +90,46 @@ describe("Util: package install / download", () => {
     params: params
   });
 
-  describe(".download", () => {
-    download({
-      pkg: {
-        name: PACKAGE_NAME,
-        manifest: dnpManifest
-      }
+  it("Should download a DNP", async () => {
+    await download({
+      pkg: { name: dnpName, manifest: dnpManifest }
     });
-
-    // downloadImageSpy - IMAGE_HASH, IMAGE_PATH
-    it("ipfs.download should be called with IMAGE_HASH, IMAGE_PATH", () => {
-      sinon.assert.calledWith(downloadImageSpy, IMAGE_HASH, IMAGE_PATH);
-    });
+    sinon.assert.calledWith(downloadImageSpy, imageHash, imagePath);
   });
 
-  describe(".load", () => {
-    load({
+  it("Should load a DNP image", async () => {
+    await load({
       pkg: {
-        name: PACKAGE_NAME,
+        name: dnpName,
         manifest: dnpManifest
       }
     });
-
-    // generateManifestSpy - dnpManifest
-    it("generate.Manifest should be called with dnpManifest", () => {
-      sinon.assert.calledWith(generateManifestSpy, dnpManifest);
-    });
-
-    // generateDockerComposeSpy - dnpManifest
-    it("generate.DockerCompose should be called with dnpManifest", () => {
-      expect(generateDockerComposeSpy.getCalls()[0].args).to.deep.equal([
-        dnpManifest
-      ]);
-    });
-
-    // fsWriteFileSpy - DockerCompose, DOCKERCOMPOSE_PATH
-    it("fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH", () => {
-      expect(fsWriteFileSpy.getCalls()[0].args).to.deep.equal([
-        MANIFEST_PATH,
-        Manifest
-      ]);
-    });
-
-    it("fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH", () => {
-      expect(fsWriteFileSpy.getCalls()[1].args).to.deep.equal([
-        DOCKERCOMPOSE_PATH,
-        DockerCompose
-      ]);
-    });
-
-    it("docker.load should be called with IMAGE_PATH", () => {
-      expect(dockerLoadSpy.getCalls()[0].args).to.deep.equal([IMAGE_PATH]);
-    });
-
-    it("fs.unlink promisified should be called with IMAGE_PATH", () => {
-      expect(fsUnlinkSpy.getCalls()[0].args).to.deep.equal([IMAGE_PATH]);
-    });
+    sinon.assert.calledWith(generateManifestSpy, dnpManifest);
+    expect(generateDockerComposeSpy.getCalls()[0].args).to.deep.equal(
+      [dnpManifest],
+      "wrong arguments for generateDockerCompose"
+    );
+    expect(fsWriteFileSpy.getCalls()[0].args).to.deep.equal(
+      [manifestPath, Manifest],
+      "wrong arguments for fsWriteFileSpy first call"
+    );
+    expect(fsWriteFileSpy.getCalls()[1].args).to.deep.equal(
+      [dockerComposePath, DockerCompose],
+      "wrong arguments for fs.writeFileSync SECOND call"
+    );
+    expect(dockerLoadSpy.getCalls()[0].args).to.deep.equal(
+      [dnpName, version, isCore],
+      "wrong arguments for docker.load"
+    );
   });
 
-  describe(".run", () => {
-    run({
-      pkg: {
-        name: PACKAGE_NAME,
-        manifest: dnpManifest
-      }
+  it("Should run a DNP", async () => {
+    await run({
+      pkg: { name: dnpName, manifest: dnpManifest }
     });
-
-    // generateDockerComposeSpy - dnpManifest
-    it("docker.compose.up should be called with DOCKERCOMPOSE_PATH", () => {
-      expect(dockerComposeUpSpy.getCalls()[0].args).to.deep.equal([
-        DOCKERCOMPOSE_PATH
-      ]);
-    });
+    expect(dockerComposeUpSpy.getCalls()[0].args).to.deep.equal(
+      [dnpName, { isCore }],
+      "wrong arguments for docker.compose.up"
+    );
   });
 });

@@ -1,4 +1,4 @@
-const dockerList = require("modules/dockerList");
+const docker = require("modules/docker");
 const validate = require("utils/validate");
 const semver = require("semver");
 const safeSemver = require("../utils/safeSemver");
@@ -64,7 +64,7 @@ async function aggregate({ req, dnpList, fetch }) {
   await aggregateDependencies({ name: req.name, versionRange: req.ver, dnps });
 
   // Get the list of relevant installed dnps
-  if (!dnpList) dnpList = await dockerList.listContainers();
+  if (!dnpList) dnpList = await docker.getDnps();
   const relevantInstalledDnps = getRelevantInstalledDnps({
     // requestedDnps = ["A", "B", "C"]
     requestedDnps: Object.keys(dnps),

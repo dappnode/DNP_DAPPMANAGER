@@ -1,17 +1,11 @@
-const proxyquire = require("proxyquire");
 const expect = require("chai").expect;
 const shell = require("utils/shell");
 const fs = require("fs");
+const params = require("params");
 
-const testDirectory = "./test_files/";
+const testDirectory = params.DNCORE_DIR;
 
-const envsHelper = proxyquire("utils/envsHelper", {
-  params: {
-    ...require("params"),
-    REPO_DIR: testDirectory,
-    DNCORE_DIR: testDirectory
-  }
-});
+const envsHelper = require("utils/envsHelper");
 
 // module.exports = {
 //     load: loadEnvs,

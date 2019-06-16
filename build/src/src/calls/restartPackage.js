@@ -1,7 +1,3 @@
-const fs = require("fs");
-const getPath = require("utils/getPath");
-const restartPatch = require("modules/restartPatch");
-const params = require("params");
 const docker = require("modules/docker");
 const { eventBus, eventBusTag } = require("eventBus");
 
@@ -13,21 +9,10 @@ const { eventBus, eventBusTag } = require("eventBus");
 const restartPackage = async ({ id }) => {
   if (!id) throw Error("kwarg id must be defined");
 
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
-  if (!fs.existsSync(dockerComposePath)) {
-    throw Error(`No docker-compose found: ${dockerComposePath}`);
-  }
+  await docker.restartDnp(id);
 
-  if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    await restartPatch(id);
-  } else {
-    // Combining rm && up doesn't prevent the installer from crashing
-    await docker.compose.rm(dockerComposePath);
-    await docker.safe.compose.up(dockerComposePath);
-
-    // Emit packages update
-    eventBus.emit(eventBusTag.emitPackages);
-  }
+  // Emit packages update
+  eventBus.emit(eventBusTag.emitPackages);
 
   return {
     message: `Restarted package: ${id}`,

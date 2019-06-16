@@ -1,25 +1,21 @@
 const chai = require("chai");
 const path = require("path");
+const params = require("params");
 
 chai.should();
 
 const getPath = require("utils/getPath");
 
-const testDir = "test_files/";
+const testDir = params.DNCORE_DIR;
 
 describe("Util: get paths", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: testDir // ### Temporary name for development
-  };
-
   const packageName = "some_package";
   const imageName = "some_image.tar.xz";
 
   it("return PACKAGE_REPO_DIR path", () => {
     getPath
       .packageRepoDir(packageName, params)
-      .should.equal(testDir + packageName);
+      .should.equal(path.join(testDir, packageName));
   });
 
   it("return MANIFEST path", () => {

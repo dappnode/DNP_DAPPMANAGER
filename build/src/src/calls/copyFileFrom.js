@@ -3,7 +3,6 @@ const params = require("params");
 const path = require("path");
 // Modules
 const docker = require("modules/docker");
-const dockerList = require("modules/dockerList");
 // Utils
 const shell = require("utils/shell");
 const fileToDataUri = require("utils/fileToDataUri");
@@ -30,21 +29,6 @@ const copyFileFrom = async ({ id, fromPath }) => {
   if (!id) throw Error("Argument id must be defined");
   if (!fromPath) throw Error("Argument fromPath must be defined");
 
-  // Get container name
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(p => p.name === id);
-  if (!dnp) throw Error(`No DNP found for id ${id}`);
-  const containerName = dnp.packageName;
-
-  // Construct relative paths to container
-  // Fetch the WORKDIR from a docker inspect
-  if (!path.isAbsolute(fromPath)) {
-    // workingDir = "/usr/src/app"
-    let workingDir = await docker.getContainerWorkingDir(containerName);
-    workingDir = (workingDir || "/").replace(/['"]+/g, "");
-    fromPath = path.join(workingDir, fromPath);
-  }
-
   /**
    * Intermediate step, the file is in local file system
    *
@@ -56,9 +40,19 @@ const copyFileFrom = async ({ id, fromPath }) => {
   await shell(`mkdir -p ${tempTransferDir}`); // Never throws
   const { base } = path.parse(fromPath);
   let toPath = path.join(tempTransferDir, base);
+  let toPathTar = toPath + ".tar";
 
-  // Copy file from container to local file system
-  await docker.copyFileFrom(containerName, fromPath, toPath);
+  /**
+   * Copy file from container to local file system
+   * - copyFileFrom will always return a tarball (.tar), even if it's a single file
+   * - clean .tar file afterwards
+   */
+  await docker.copyFileFrom(id, {
+    pathContainer: fromPath,
+    pathHost: toPathTar
+  });
+  await shell(`tar -C ${tempTransferDir} -xvf ${toPathTar}`);
+  await shell(`rm -rf ${toPathTar}`);
 
   /**
    * Allow directories by automatically compressing them to .tar.gz files
@@ -125,7 +119,7 @@ const copyFileFrom = async ({ id, fromPath }) => {
   await shell(`rm -rf ${toPath}`);
 
   return {
-    message: `Copied file from ${id} ${fromPath}`,
+    message: `Copied file from: ${id} path: ${fromPath}`,
     logMessage: true,
     userAction: true,
     result: dataUri

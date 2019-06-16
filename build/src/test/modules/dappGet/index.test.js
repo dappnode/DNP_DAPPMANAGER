@@ -8,8 +8,8 @@ const sinon = require("sinon");
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-const dockerList = {
-  listContainers: sinon.stub().callsFake(async () => {
+const docker = {
+  getDnps: sinon.stub().callsFake(async () => {
     return [
       {
         dependencies: {
@@ -55,7 +55,7 @@ const resolve = sinon.stub().callsFake(() => {
 const dappGet = proxyquire("modules/dappGet", {
   "./aggregate": aggregate,
   "./resolve": resolve,
-  "modules/dockerList": dockerList
+  "modules/docker": docker
 });
 
 describe("dappGet", () => {
@@ -68,7 +68,7 @@ describe("dappGet", () => {
   });
 
   it("Should call list containers once", () => {
-    sinon.assert.calledOnce(dockerList.listContainers);
+    sinon.assert.calledOnce(docker.getDnps);
   });
 
   it("Should add packages to the alreadyUpdated object", () => {

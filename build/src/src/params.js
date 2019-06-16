@@ -8,10 +8,16 @@ const path = require("path");
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
-const DNCORE_DIR = "DNCORE"; // Bind volume
-const REPO_DIR = "dnp_repo"; // Named volume
 
-module.exports = {
+let DNCORE_DIR = "DNCORE"; // Bind volume
+let REPO_DIR = "dnp_repo"; // Named volume
+
+if (process.env.TEST) {
+  REPO_DIR = "test_files/";
+  DNCORE_DIR = "test_files/";
+}
+
+const params = {
   // Autobahn parameters
   autobahnUrl: "ws://my.wamp.dnp.dappnode.eth:8080/ws",
   autobahnRealm: "dappnode_admin",
@@ -39,3 +45,5 @@ module.exports = {
   WEB3_HOST_HTTP: "http://my.ethchain.dnp.dappnode.eth:8545",
   CHAIN_DATA_UNTIL: 0
 };
+
+module.exports = params;

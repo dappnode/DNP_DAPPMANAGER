@@ -3,6 +3,7 @@ const chai = require("chai");
 const expect = require("chai").expect;
 const shell = require("shelljs");
 const fs = require("fs");
+const params = require("params");
 const getPath = require("utils/getPath");
 const { stringifyEnvs } = require("utils/parse");
 
@@ -24,29 +25,19 @@ function mockTest() {
   let expectedResult = [Object.assign({ envs }, mockList[0])];
 
   // Mock docker calls
-  const dockerCalls = {
-    listContainers: async () => {
+  const docker = {
+    getDnps: async () => {
       hasListed = true;
       return mockList;
-    }
-  };
-  const docker = {
+    },
     systemDf: async () => {
       return [];
     }
   };
 
-  // Mock params
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   // initialize call
   const listPackages = proxyquire("calls/listPackages", {
-    "modules/dockerList": dockerCalls,
-    "modules/docker": docker,
-    params: params
+    "modules/docker": docker
   });
 
   before(() => {

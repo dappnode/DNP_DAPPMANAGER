@@ -5,15 +5,11 @@ const sinon = require("sinon");
 const fs = require("fs");
 const getPath = require("utils/getPath");
 const validate = require("utils/validate");
+const params = require("params");
 
 chai.should();
 
-describe("Call function: restartPackage", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
+describe.skip("Call function: restartPackage", function() {
   const PACKAGE_NAME = "test.dnp.dappnode.eth";
   const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
 

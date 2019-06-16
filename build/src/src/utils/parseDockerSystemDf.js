@@ -1,30 +1,27 @@
-let Parser = require("table-parser");
-
 function parseDockerSystemDf({ data, dnpList }) {
   if (!data) throw Error("on parseDockerSystemDf, data is not defined");
 
-  const volumeData = data.split("Local Volumes space usage:")[1] || "";
-  // return output;
-  let parsedData = Parser.parse(volumeData.trim());
-  // Correct output, turn arrays into strings
-  // parsedData = [
-  //   { VOLUME: [ 'dncore_dappmanagerdnpdappnodeeth_data', '1' ],
-  //   NAME: [ 'dncore_dappmanagerdnpdappnodeeth_data' ],
-  //   LINKS: [ '1' ],
-  //   SIZE: [ '1.319kB' ]
-  // }, ...]
-  // ==== into ====>
-  // {
-  //   'dncore_dappmanagerdnpdappnodeeth_data': {
-  //     links: '1',
-  //     size: '1.319kB'
-  //   }, ...
-  // }
+  // data = {
+  //   Volumes: [
+  //     {
+  //       Name: "my-volume",
+  //       Driver: "local",
+  //       Mountpoint: "/var/lib/docker/volumes/my-volume/_data",
+  //       Labels: null,
+  //       Scope: "local",
+  //       Options: null,
+  //       UsageData: {
+  //         Size: 10920104,
+  //         RefCount: 2
+  //       }
+  //     }
+  //   ]
+  // };
   const correctedParsedDataObj = {};
-  parsedData.forEach(volumeObj => {
-    const name = (volumeObj.VOLUME || [])[0];
-    const links = (volumeObj.LINKS || [])[0];
-    const size = (volumeObj.SIZE || [])[0];
+  data.Volumes.forEach(vol => {
+    const name = vol.Name;
+    const links = vol.UsageData.RefCount;
+    const size = vol.UsageData.Size;
     correctedParsedDataObj[name] = { links, size };
   });
 
