@@ -14,7 +14,7 @@ describe("Util: fileToDataUri", () => {
     const dataUri = "data:image/png;base64,iVBORw0KGgo=";
     const pngSignature = "89504e470d0a1a0a";
     const fileData = Buffer.from(pngSignature, "hex");
-    const _dataUri = await fileToDataUri(fileData, ".png");
+    const _dataUri = await fileToDataUri(fileData, "pic.png");
 
     // Verify generated dataUri:
     // Some of the base64 add trailing characters. Will only compare the same lengths
@@ -46,7 +46,7 @@ describe("Util: fileToDataUri", () => {
     );
     const dataUri =
       "data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==";
-    const _dataUri = await fileToDataUri(fileData, ".json");
+    const _dataUri = await fileToDataUri(fileData, "file.json");
 
     // Verify generated dataUri:
     // Some of the base64 add trailing characters. Will only compare the same lengths
@@ -77,7 +77,7 @@ describe("Util: fileToDataUri", () => {
 
     const dataUri =
       "data:application/gzip;base64,H4sIANafuFwAA+3RQQrCMBBA0aw9RS6gzaRJ5zjSRYVC0WIjeHzNoqAFK0iLiP9tJpBABn5qhrQ/tF0zFHXfF2YN7k5jzFM0usc5MlKGWImo+so48UHV2LjKNhOXIdVna03Xno5z797d/6j03D+fZJeuack/cuAqhJn+OukffBmNdUsu8cqf";
-    const _dataUri = await fileToDataUri(fileData, ".tar.gz");
+    const _dataUri = await fileToDataUri(fileData, "pack.tar.gz");
 
     // Verify generated dataUri:
     // Some of the base64 add trailing characters. Will only compare the same lengths

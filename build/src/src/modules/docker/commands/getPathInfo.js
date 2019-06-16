@@ -26,7 +26,11 @@ const header = "X-Docker-Container-Path-Stat";
 async function getPathInfo(id, { pathContainer }) {
   const container = await getContainerInstance(id);
 
-  const res = await container.infoArchive({ path: pathContainer });
+  const res = await container.infoArchive({ path: pathContainer }).catch(e => {
+    if (e.message.includes("404"))
+      throw Error(`Path does not exist ${pathContainer}`);
+    else throw e;
+  });
   // The path info is in a specific header, base64 encoded
   const dataBase64 = res.headers[header] || res.headers[header.toLowerCase()];
   let info;
@@ -34,7 +38,7 @@ async function getPathInfo(id, { pathContainer }) {
     if (!dataBase64) throw Error("No data found on header");
     info = JSON.parse(Buffer.from(dataBase64, "base64").toString("utf8"));
   } catch (e) {
-    e.message = `Error parsing path info: ${e.message}`;
+    e.message = `Cannot parse path info: ${e.message}`;
     throw e;
   }
   // Parse if path is a directory

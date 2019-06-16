@@ -1,5 +1,6 @@
-"use strict"; // 'datauri' requested to use 'use strict';
-const Datauri = require("datauri");
+const mime = require("mime");
+
+const fallbackMime = "application/octet-stream";
 
 /**
  * Converts a file to data URI.
@@ -16,22 +17,26 @@ const Datauri = require("datauri");
  * @param {string} extension ".json"
  * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
  */
-async function fileToDataUri(content, extension = ".") {
-  const datauri = new Datauri();
-  datauri.format(extension, content);
-  let dataUriString = datauri.content;
+async function fileToDataUri(content, _path) {
+  // mime.getType returns null if no mime type is found
+  const mimeType = parseMimeType(_path);
+  const base64String = content.toString("base64");
 
+  return `data:${mimeType};base64,${base64String}`;
+}
+
+/**
+ * Deals with parsing paths that are directories i.e. "test"
+ * which the mime library can misslabel
+ */
+function parseMimeType(_path) {
+  if (!_path || !_path.includes(".")) return fallbackMime;
   /**
-   * the npm package "datauri" is not able to process .tar.gz correctly,
+   * mime is not able to process .tar.gz correctly,
    * Correct it to the correct MIME type: "application/gzip"
    */
-  if (extension === ".tar.gz")
-    dataUriString = dataUriString.replace(
-      "application/octet-stream",
-      "application/gzip"
-    );
-
-  return dataUriString;
+  if (_path.endsWith(".tar.gz")) return "application/gzip";
+  return mime.getType(_path) || fallbackMime;
 }
 
 module.exports = fileToDataUri;

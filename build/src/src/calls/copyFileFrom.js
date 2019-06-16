@@ -1,7 +1,4 @@
-const path = require("path");
-// Modules
 const docker = require("modules/docker");
-// Utils
 const fileToDataUri = require("utils/fileToDataUri");
 
 const maxSizeBytes = 20e6;
@@ -65,7 +62,7 @@ const copyFileFrom = async ({ id, fromPath }) => {
    * @param {string} extension ".json"
    * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
    */
-  const dataUri = await fileToDataUri(content, path.parse(fromPath).ext);
+  const dataUri = await fileToDataUri(content, fromPath);
 
   return {
     message: `Copied file from: ${id} path: ${fromPath}`,
