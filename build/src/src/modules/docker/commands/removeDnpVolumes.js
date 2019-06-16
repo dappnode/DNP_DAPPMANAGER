@@ -6,7 +6,7 @@ const volumeRm = require("../lowLevelCommands/volumeRm");
 const getDnpExtendedData = require("./getDnpExtendedData");
 const { uniqueValues } = require("utils/arrays");
 
-async function removeDnpVolumes(id, { restartDnpsAfter = true }) {
+async function removeDnpVolumes(id, { restartDnpsAfter = true } = {}) {
   const dnp = await getDnpExtendedData(id);
   /**
    * @param {object} namedOwnedVolumes = {
@@ -21,10 +21,15 @@ async function removeDnpVolumes(id, { restartDnpsAfter = true }) {
 
   // Destructure result and append the current requested DNP (id)
   const volumeNames = namedOwnedVolumes.map(vol => vol.name);
-  const dnpsToRemove = namedOwnedVolumes.reduce(
-    (dnps, vol) => uniqueValues([...dnps, ...vol.users]),
-    []
-  );
+  const dnpsToRemove = namedOwnedVolumes
+    .reduce((dnps, vol) => uniqueValues([...dnps, ...vol.users]), [])
+    /**
+     * It is critical up packages in the correct order,
+     * so that the named volumes are created before the users are started
+     * [NOTE] the next sort function is a simplified solution, where the
+     * id will always be the owner of the volumes, and other DNPs, the users.
+     */
+    .sort(dnpName => (dnpName === id ? -1 : 1));
 
   // Make sure you are not calling down on blacklisted DNPs (e.j. dappmanager)
   for (const dnpName of dnpsToRemove) {
