@@ -29,9 +29,18 @@ async function getPathInfo(id, { pathContainer }) {
   const res = await container.infoArchive({ path: pathContainer });
   // The path info is in a specific header, base64 encoded
   const dataBase64 = res.headers[header] || res.headers[header.toLowerCase()];
-  return dataBase64
-    ? JSON.parse(Buffer.from(dataBase64, "base64").toString("utf8"))
-    : null;
+  let info;
+  try {
+    if (!dataBase64) throw Error("No data found on header");
+    info = JSON.parse(Buffer.from(dataBase64, "base64").toString("utf8"));
+  } catch (e) {
+    e.message = `Error parsing path info: ${e.message}`;
+    throw e;
+  }
+  // Parse if path is a directory
+  const modeString = String(info.mode);
+  info.isDirectory = modeString.length > 6 && modeString.startsWith("2");
+  return info;
 }
 
 module.exports = getPathInfo;

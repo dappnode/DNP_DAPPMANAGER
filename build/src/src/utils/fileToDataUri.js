@@ -1,4 +1,5 @@
-const getDataUri = require("datauri").promise;
+"use strict"; // 'datauri' requested to use 'use strict';
+const Datauri = require("datauri");
 
 /**
  * Converts a file to data URI.
@@ -11,20 +12,26 @@ const getDataUri = require("datauri").promise;
  * [NOTE] does not support directories, it will throw an error:
  *   Error: EISDIR: illegal operation on a directory, read
  *
- * @param {object} path file path, will read the file at this path
+ * @param {buffer} content Contents of the file
+ * @param {string} extension ".json"
  * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
  */
-async function fileToDataUri(path) {
-  let dataUri = await getDataUri(path);
+async function fileToDataUri(content, extension = ".") {
+  const datauri = new Datauri();
+  datauri.format(extension, content);
+  let dataUriString = datauri.content;
 
   /**
    * the npm package "datauri" is not able to process .tar.gz correctly,
    * Correct it to the correct MIME type: "application/gzip"
    */
-  if (path.endsWith(".tar.gz"))
-    dataUri = dataUri.replace("application/octet-stream", "application/gzip");
+  if (extension === ".tar.gz")
+    dataUriString = dataUriString.replace(
+      "application/octet-stream",
+      "application/gzip"
+    );
 
-  return dataUri;
+  return dataUriString;
 }
 
 module.exports = fileToDataUri;

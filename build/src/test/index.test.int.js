@@ -155,7 +155,7 @@ describe("Full integration test with REAL docker: ", function() {
    * - Copy from the container
    */
   let dataUri;
-  const filename = "test.file";
+  const filename = "test.json";
   const toPath = "";
 
   it("Should copy the file TO the container", async () => {
@@ -165,11 +165,11 @@ describe("Full integration test with REAL docker: ", function() {
 
   // ### TODO, mime-types do not match
 
-  // it("Should copy the file FROM the container", async () => {
-  //   dataUri = await getDataUri("./package.json");
-  //   const res = await calls.copyFileFrom({ id, fromPath: filename });
-  //   expect(res.result).to.equal(dataUri, "Wrong dataUri");
-  // }).timeout(20 * 1000);
+  it("Should copy the file FROM the container", async () => {
+    dataUri = await getDataUri("./package.json");
+    const res = await calls.copyFileFrom({ id: idOtpweb, fromPath: filename });
+    expect(res.result).to.equal(dataUri, "Wrong dataUri");
+  }).timeout(20 * 1000);
 
   /**
    * Restart volumes

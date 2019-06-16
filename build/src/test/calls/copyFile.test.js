@@ -3,10 +3,6 @@ const expect = require("chai").expect;
 const params = require("params");
 const shell = require("utils/shell");
 const path = require("path");
-const { promisify } = require("util");
-const fs = require("fs");
-
-const writeFileAsync = promisify(fs.writeFile);
 
 const testDir = params.DNCORE_DIR;
 
@@ -15,33 +11,20 @@ const testDir = params.DNCORE_DIR;
  * For this test to be a unit test, docker is mocked
  */
 
-const containerSimulatedFolder = `${testDir}/container-volume`;
-const dockerPath = _path => path.join(containerSimulatedFolder, _path);
+const memoryFs = {};
+
 const id = "kovan.dnp.dappnode.eth";
 
 const docker = {
-  copyFileFrom: async (_id, { pathContainer, pathHost }) => {
+  copyFileFrom: async (_id, { pathContainer }) => {
     if (_id !== id) throw Error(`Fake docker: Container not found: ${_id}`);
-    const pathContainerReal = dockerPath(pathContainer);
-    if (!fs.existsSync(pathContainerReal))
-      throw Error(`Fake docker: container path ${pathContainerReal} not found`);
-    const filePath = pathContainerReal;
-    const filePathTar = filePath + ".tar";
-    // Use tar with the relative path option
-    const { dir, base } = path.parse(filePath);
-    await shell(`tar cvf ${filePathTar} -C ${dir} ${base}`);
-    await shell(`mv ${filePathTar} ${pathHost}`);
+    if (!memoryFs[pathContainer])
+      throw Error(`Fake docker: container path ${pathContainer} not found`);
+    return memoryFs[pathContainer];
   },
   copyFileTo: async (_id, { pathContainer, content, filename }) => {
     if (_id !== id) throw Error(`Fake docker: Container not found: ${_id}`);
-    await shell(`mkdir -p ${dockerPath(pathContainer)}`);
-    // Content is a buffer, convert to utf8 for writeFile
-    const filePath = path.join(dockerPath(pathContainer), filename);
-    const contentString = content.toString("utf8");
-    if (!contentString) throw Error(`Empty content string for ${content}`);
-    await writeFileAsync(filePath, contentString);
-    if (!fs.existsSync(filePath))
-      throw Error(`Error copying contents to ${filePath}, file does not exist`);
+    memoryFs[path.join(pathContainer, filename)] = content;
   }
 };
 
