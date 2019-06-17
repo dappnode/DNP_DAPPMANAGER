@@ -1,7 +1,8 @@
 // Higher level commands
 
 const cleanOldImages = require("./commands/cleanOldImages");
-const copyFileFrom = require("./commands/copyFileFrom");
+const copyFileFromToBuffer = require("./commands/copyFileFromToBuffer");
+const copyFileFromToFs = require("./commands/copyFileFromToFs");
 const copyFileTo = require("./commands/copyFileTo");
 const getContainerWorkingDir = require("./commands/getContainerWorkingDir");
 const getDnpData = require("./commands/getDnpData");
@@ -23,7 +24,8 @@ const systemDf = require("./lowLevelCommands/systemDf");
 module.exports = {
   // Higher level commands
   cleanOldImages,
-  copyFileFrom,
+  copyFileFromToBuffer,
+  copyFileFromToFs,
   copyFileTo,
   getContainerWorkingDir,
   getDnpData,

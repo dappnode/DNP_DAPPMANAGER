@@ -13,7 +13,7 @@ const getPathInfo = require("./getPathInfo");
  * @param {string} pathContainer "/temp/config"
  * @returns {buffer} content
  */
-async function copyFileFrom(id, { pathContainer }) {
+async function copyFileFromToBuffer(id, { pathContainer }) {
   const container = await getContainerInstance(id);
 
   /**
@@ -96,4 +96,4 @@ async function copyFileFrom(id, { pathContainer }) {
   }
 }
 
-module.exports = copyFileFrom;
+module.exports = copyFileFromToBuffer;

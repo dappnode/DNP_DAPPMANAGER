@@ -3,6 +3,7 @@ const expect = require("chai").expect;
 const params = require("params");
 const shell = require("utils/shell");
 const path = require("path");
+const fs = require("fs");
 
 const testDir = params.DNCORE_DIR;
 
@@ -16,11 +17,16 @@ const memoryFs = {};
 const id = "kovan.dnp.dappnode.eth";
 
 const docker = {
-  copyFileFrom: async (_id, { pathContainer }) => {
+  copyFileFromToFs: async (_id, { pathContainer, pathHost }) => {
     if (_id !== id) throw Error(`Fake docker: Container not found: ${_id}`);
     if (!memoryFs[pathContainer])
       throw Error(`Fake docker: container path ${pathContainer} not found`);
-    return memoryFs[pathContainer];
+
+    const filePathNoTar = pathHost.replace(".tar", "");
+    fs.writeFileSync(filePathNoTar, memoryFs[pathContainer]);
+    // Use tar with the relative path option
+    const { dir, base } = path.parse(filePathNoTar);
+    await shell(`tar cvf ${pathHost} -C ${dir} ${base}`);
   },
   copyFileTo: async (_id, { pathContainer, content, filename }) => {
     if (_id !== id) throw Error(`Fake docker: Container not found: ${_id}`);

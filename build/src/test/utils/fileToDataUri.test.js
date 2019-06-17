@@ -57,7 +57,7 @@ describe("Util: fileToDataUri", () => {
   it("should convert a file without extension", async () => {
     const fileData = Buffer.from(`config: TEST`);
     const dataUri = "data:application/octet-stream;base64,Y29uZmlnOiBURVNU";
-    const _dataUri = await fileToDataUri(fileData);
+    const _dataUri = await fileToDataUri(fileData, "test");
 
     // Verify generated dataUri:
     // Some of the base64 add trailing characters. Will only compare the same lengths
