@@ -1,15 +1,15 @@
 /**
  * Parses ports
  * @param {object} manifest or portsArray = ['32323:30303/udp']
- * @returns {array} [ {number: '32323', type: 'UDP'}, ... ]
+ * @returns {array} [ {portNumber: '32323', protocol: 'UDP'}, ... ]
  */
 function parseManifestPorts(manifest = {}) {
   if (!manifest) return [];
   const portsArray = (manifest.image || {}).ports || [];
 
-  //                host : container / type
+  //                host : container / protocol
   // portsArray = ['32323:30303/udp']
-  //               container / type
+  //               container / protocol
   // portsArray = ['30303/udp']
   return (
     portsArray
@@ -17,13 +17,13 @@ function parseManifestPorts(manifest = {}) {
       .filter((item, i, ar) => ar.indexOf(item) === i)
       // Ignore ports that are not mapped
       .filter(e => e.includes(":"))
-      // Transform ['30303:30303/udp'] => [ {number: '30303', type: 'UDP'} ]
+      // Transform ['30303:30303/udp'] => [ {portNumber: '30303', protocol: 'UDP'} ]
       .map(p => {
         const hostPortNumber = p.split(":")[0];
         const portType = p.split("/")[1] || "TCP";
         return {
-          number: hostPortNumber,
-          type: (portType || "").toUpperCase()
+          portNumber: hostPortNumber,
+          protocol: (portType || "").toUpperCase()
         };
       })
   );

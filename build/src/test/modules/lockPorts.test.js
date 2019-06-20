@@ -112,8 +112,8 @@ services:
   it("should lock ports and return portsToOpen (NON core)", async () => {
     const portsToOpen = await lockPorts({ pkg });
     expect(portsToOpen).to.deep.equal([
-      { number: 32768, type: "UDP" },
-      { number: 32768, type: "TCP" }
+      { portNumber: 32768, protocol: "UDP" },
+      { portNumber: 32768, protocol: "TCP" }
     ]);
   });
 
@@ -126,15 +126,15 @@ services:
             - '32768:30303/udp'
             - '32768:30303'
         labels:
-            portsToClose: '[{"number":32768,"type":"UDP"},{"number":32768,"type":"TCP"}]'
+            portsToClose: '[{"portNumber":32768,"protocol":"UDP"},{"portNumber":32768,"protocol":"TCP"}]'
 `);
   });
 
   it("should lock ports and return portsToOpen (core)", async () => {
     const portsToOpen = await lockPorts({ pkg: corePkg });
     expect(portsToOpen).to.deep.equal([
-      { number: 32769, type: "UDP" },
-      { number: 32769, type: "TCP" }
+      { portNumber: 32769, protocol: "UDP" },
+      { portNumber: 32769, protocol: "TCP" }
     ]);
   });
 
@@ -147,7 +147,7 @@ services:
             - '32769:30303/udp'
             - '32769:30303'
         labels:
-            portsToClose: '[{"number":32769,"type":"UDP"},{"number":32769,"type":"TCP"}]'
+            portsToClose: '[{"portNumber":32769,"protocol":"UDP"},{"portNumber":32769,"protocol":"TCP"}]'
 `);
   });
 

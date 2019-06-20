@@ -9,7 +9,7 @@ const { stringIncludes } = require("utils/strings");
  *
  * Used when trying to up a container and its ports collide
  * @param {string} dockerComposePath
- * @returns {array} portsToClose = [ {number: 32769, type: 'UDP'}, ... ]
+ * @returns {array} portsToClose = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
 async function unlockPorts(dockerComposePath) {
   if (typeof dockerComposePath !== "string") {
@@ -41,15 +41,15 @@ async function unlockPorts(dockerComposePath) {
   }
 
   // 2. Reset the docker-compose to make them epheremal again
-  // portsToClose: '[{"number":32768,"type":"UDP"},{"number":32768,"type":"TCP"}]'
+  // portsToClose: '[{"portNumber":32768,"protocol":"UDP"},{"portNumber":32768,"protocol":"TCP"}]'
   service.ports = service.ports.map(portString => {
     if (!portString.includes(":")) return portString;
     const [portHost, portContainer] = portString.split(":");
     const [, portType = "tcp"] = portContainer.split("/");
     const isPortLocked = portsToClose.find(
       p =>
-        String(p.number) === String(portHost) &&
-        stringIncludes((p || {}).type, portType)
+        String(p.portNumber) === String(portHost) &&
+        stringIncludes((p || {}).protocol, portType)
     );
     return isPortLocked ? portString.split(":")[1] : portString;
   });

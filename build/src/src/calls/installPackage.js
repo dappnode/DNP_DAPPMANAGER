@@ -178,12 +178,12 @@ const installPackage = async ({
     logs.info(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports
-    // 7A. Mapped ports: mappedPortsToOpen = [ {number: '30303', type: 'TCP'}, ... ]
+    // 7A. Mapped ports: mappedPortsToOpen = [ {portNumber: '30303', protocol: 'TCP'}, ... ]
     const mappedPortsToOpen = parseManifestPorts(pkg.manifest);
 
     // 7B. P2P ports: modify docker-compose + open ports
     // - lockPorts modifies the docker-compose and returns
-    //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
+    //   lockedPortsToOpen = [ {portNumber: '32769', protocol: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
     const lockedPortsToOpen = await lockPorts({ pkg });
     if (lockedPortsToOpen.length)

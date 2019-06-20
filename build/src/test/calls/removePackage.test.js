@@ -32,10 +32,10 @@ describe("Call function: removePackage", function() {
     }
   });
   const portsToClose = [
-    { number: 32769, type: "UDP" },
-    { number: 32769, type: "TCP" }
+    { portNumber: 32769, protocol: "UDP" },
+    { portNumber: 32769, protocol: "TCP" }
   ];
-  const manifestParsedPorts = [{ number: "30303", type: "UDP" }];
+  const manifestParsedPorts = [{ portNumber: "30303", protocol: "UDP" }];
 
   const idWrong = "missing.dnp.dappnode.eth";
 

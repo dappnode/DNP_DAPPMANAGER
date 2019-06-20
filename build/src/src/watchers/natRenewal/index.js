@@ -2,6 +2,7 @@ const upnpc = require("modules/upnpc");
 const logs = require("logs.js")(module);
 const db = require("db");
 const getPortsToOpen = require("./getPortsToOpen");
+const getLocalIp = require("utils/getLocalIp");
 
 const natRenewalInterval = 60 * 60 * 1000;
 
@@ -39,6 +40,8 @@ async function natRenewal() {
         `NAT renewal portsToOpen: ${JSON.stringify(portsToOpen, null, 2)}`
       );
 
+    const localIp = await getLocalIp();
+
     // NOTE: Open the ports regardless if it is already open
 
     // 2. Renew NAT mapping
@@ -59,7 +62,7 @@ async function natRenewal() {
 
       try {
         // Run first open, and every interval to refresh the mapping.
-        await upnpc.open(portToOpen);
+        await upnpc.open(portToOpen, localIp);
       } catch (e) {
         // Error stack of shell processes do not matter. The message contains all the info
         logs.error(`Error openning port ${portId(portToOpen)}: ${e.message}`);

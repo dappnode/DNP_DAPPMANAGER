@@ -41,16 +41,16 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
             ],
             running: true,
             portsToClose: [
-              { number: 32769, Type: "TCP" },
-              { number: 32771, Type: "UDP" },
-              { number: 32770, Type: "UDP" }
+              { portNumber: 32769, Type: "TCP" },
+              { portNumber: 32771, Type: "UDP" },
+              { portNumber: 32770, Type: "UDP" }
             ]
           },
           {
             isCore: false,
             name: stoppedDnp,
             running: false,
-            portsToClose: [{ number: 30303, type: "UDP" }]
+            portsToClose: [{ portNumber: 30303, protocol: "UDP" }]
           }
         ]
       },
@@ -58,8 +58,8 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
         dockerComposePorts: dockerComposePath => {
           if (dockerComposePath.includes(stoppedDnp))
             return [
-              { host: 4001, container: 4001, type: "udp" },
-              { host: 4001, container: 4001, type: "tcp" }
+              { host: 4001, container: 4001, protocol: "udp" },
+              { host: 4001, container: 4001, protocol: "tcp" }
             ];
           else throw Error(`Unknown dockerComposePath "${dockerComposePath}"`);
         }

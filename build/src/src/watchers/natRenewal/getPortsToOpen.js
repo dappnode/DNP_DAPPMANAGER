@@ -37,7 +37,7 @@ async function getPortsToOpen() {
      *     Type: "tcp" {string}
      *   }, ... ], {array}
      *   running: true, {bool}
-     *   portsToClose: [ {number: 30303, type: 'UDP'}, ...], {array}
+     *   portsToClose: [ {portNumber: 30303, protocol: 'UDP'}, ...], {array}
      * }, ... ]
      *
      * [NOTE]: PublicPort is the host's port
@@ -48,7 +48,9 @@ async function getPortsToOpen() {
         // If DNP is running the port mapping is available in the dnpList
         for (const port of dnp.ports || []) {
           // PublicPort is the host's port
-          addPort(port.Type, port.PublicPort);
+          if (port.PublicPort) {
+            addPort(port.Type, port.PublicPort);
+          }
         }
       } else {
         try {
@@ -70,7 +72,7 @@ async function getPortsToOpen() {
           );
           for (const port of dockerComposePorts || []) {
             // Only consider ports that are mapped (not ephemeral ports)
-            if (port.host) addPort(port.type, port.host);
+            if (port.host) addPort(port.protocol, port.host);
           }
         } catch (e) {
           logs.error(
