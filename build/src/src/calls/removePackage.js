@@ -6,6 +6,8 @@ const logs = require("logs.js")(module);
 // Modules
 const docker = require("modules/docker");
 const dockerList = require("modules/dockerList");
+// External call
+const restartPackageVolumes = require("./restartPackageVolumes");
 // Utils
 const parseManifestPorts = require("utils/parseManifestPorts");
 const getPath = require("utils/getPath");
@@ -29,7 +31,7 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   }
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    throw Error("The installer cannot be restarted");
+    throw Error("The installer cannot be removed");
   }
 
   // CLOSE PORTS
@@ -69,6 +71,8 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
     });
   }
 
+  // Call restartPackageVolumes to safely delete dependant volumes
+  if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
   // Remove container (and) volumes
   await docker.compose.down(dockerComposePath, {
     volumes: Boolean(deleteVolumes)

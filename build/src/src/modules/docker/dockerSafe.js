@@ -48,6 +48,8 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
           eventBus.emit(eventBusTag.call, { callId: "managePorts", kwargs });
         }
       }
+    } else {
+      throw e;
     }
   }
 }

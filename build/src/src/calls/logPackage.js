@@ -14,7 +14,7 @@ const docker = require("modules/docker");
  * options = { timestamp: true, tail: 200 }
  * @returns {string} logs: <string with escape codes>
  */
-const logPackage = async ({ id, options }) => {
+const logPackage = async ({ id, options = {} }) => {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
