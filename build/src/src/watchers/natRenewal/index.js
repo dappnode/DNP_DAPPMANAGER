@@ -57,7 +57,6 @@ async function natRenewal() {
           );
           logs.debug(`Error closing port ${portId(portToOpen)}: ${e.stack}`);
         }
-        isFirstRun = false;
       }
 
       try {
@@ -68,6 +67,8 @@ async function natRenewal() {
         logs.error(`Error openning port ${portId(portToOpen)}: ${e.message}`);
       }
     }
+    // Signal it's no longer the first run
+    isFirstRun = false;
 
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
