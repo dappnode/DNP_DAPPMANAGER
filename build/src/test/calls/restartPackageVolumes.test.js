@@ -68,18 +68,12 @@ describe("Call function: restartPackageVolumes", function() {
             path: "/root/certs",
             dest: "/etc/nginx/certs"
           },
-          {
-            name:
-              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
-            users: ["nginx-proxy.dnp.dappnode.eth"],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: true
-          },
+
           {
             name: "nginxproxydnpdappnodeeth_vhost.d",
             users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
+              "letsencrypt-nginx.dnp.dappnode.eth",
+              "nginx-proxy.dnp.dappnode.eth"
             ],
             owner: "nginx-proxy.dnp.dappnode.eth",
             isOwner: true
@@ -92,9 +86,16 @@ describe("Call function: restartPackageVolumes", function() {
           {
             name: "nginxproxydnpdappnodeeth_html",
             users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
+              "letsencrypt-nginx.dnp.dappnode.eth",
+              "nginx-proxy.dnp.dappnode.eth"
             ],
+            owner: "nginx-proxy.dnp.dappnode.eth",
+            isOwner: true
+          },
+          {
+            name:
+              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
+            users: ["nginx-proxy.dnp.dappnode.eth"],
             owner: "nginx-proxy.dnp.dappnode.eth",
             isOwner: true
           }
@@ -117,33 +118,66 @@ describe("Call function: restartPackageVolumes", function() {
     }
   });
 
-  it(`Should remove the package volumes of ${nginxId}`, async () => {
-    const res = await restartPackageVolumes({ id: nginxId });
-    // Assert docker rm
-    sinon.assert.called(docker.compose.rm);
-    expect(docker.compose.rm.getCall(0).args[0]).to.include(nginxId);
-    expect(docker.compose.rm.getCall(1).args[0]).to.include(letsencryptId);
-    // Assert docker volume rm
-    sinon.assert.calledWith(
-      docker.volume.rm,
-      "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b nginxproxydnpdappnodeeth_vhost.d nginxproxydnpdappnodeeth_html"
-    );
-    // Assert docker up
-    sinon.assert.called(docker.safe.compose.up);
-    expect(docker.safe.compose.up.getCall(0).args[0]).to.include(nginxId);
-    expect(docker.safe.compose.up.getCall(1).args[0]).to.include(letsencryptId);
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
+  beforeEach(() => {
+    docker.compose.rm.resetHistory();
+    docker.safe.compose.up.resetHistory();
+    docker.volume.rm.resetHistory();
   });
 
-  it("Should remove the package volumes of a CORE", async () => {
-    const res = await restartPackageVolumes({ id: dnpNameCore });
-    // sinon.assert.called(docker.compose.rm);
-    sinon.assert.called(docker.compose.rm);
-    sinon.assert.calledWith(docker.volume.rm, "vol1 vol2");
-    sinon.assert.called(docker.safe.compose.up);
+  it(`Should remove the package volumes of ${nginxId}`, async () => {
+    const res = await restartPackageVolumes({ id: nginxId });
     expect(res).to.be.ok;
     expect(res).to.have.property("message");
+
+    // Assert correct call order docker rm
+    sinon.assert.called(docker.compose.rm);
+    const dnpsInOrder = [nginxId, letsencryptId];
+    dnpsInOrder.forEach((volName, i) => {
+      expect(docker.compose.rm.getCall(i).args[0]).to.include(
+        volName,
+        `Wrong dnpName on docker.compose.rm call #${i}`
+      );
+    });
+
+    // Assert correct call order for volumeRm
+    const volumesInOrder = [
+      "nginxproxydnpdappnodeeth_vhost.d",
+      "nginxproxydnpdappnodeeth_html",
+      "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
+    ];
+    volumesInOrder.forEach((volName, i) => {
+      expect(docker.volume.rm.getCall(i).args[0]).to.equal(
+        volName,
+        `Wrong volume name on docker.volume.rm call #${i}`
+      );
+    });
+
+    // Assert correct call order docker up
+    sinon.assert.called(docker.safe.compose.up);
+    dnpsInOrder.forEach((volName, i) => {
+      expect(docker.safe.compose.up.getCall(i).args[0]).to.includes(
+        volName,
+        `Wrong dnpName on docker.safe.compose.up call #${i}`
+      );
+    });
+  });
+
+  it(`Should remove the package volumes of ${dnpNameCore} (core)`, async () => {
+    const res = await restartPackageVolumes({ id: dnpNameCore });
+    expect(res).to.be.ok;
+    expect(res).to.have.property("message");
+
+    // sinon.assert.called(docker.compose.rm);
+    sinon.assert.called(docker.compose.rm);
+    // Assert correct call order for volumeRm
+    const volumesInOrder = ["vol1", "vol2"];
+    volumesInOrder.forEach((volName, i) => {
+      expect(docker.volume.rm.getCall(i).args[0]).to.equal(
+        volName,
+        `Wrong volume name on docker.volume.rm call #${i}`
+      );
+    });
+    sinon.assert.called(docker.safe.compose.up);
   });
 
   it("Should NOT allow id = dappmanager.dnp.dappnode.eth", async () => {

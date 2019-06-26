@@ -45,9 +45,15 @@ async function restartPackageVolumes({ id, doNotRestart }) {
 
   // Destructure result and append the current requested DNP (id)
   const volumeNames = namedOwnedVolumes.map(vol => vol.name);
-  const dnpsToRemove = namedOwnedVolumes.reduce((dnps, vol) => {
-    return uniqueValues([...dnps, ...vol.users]);
-  }, []);
+  const dnpsToRemove = namedOwnedVolumes
+    .reduce((dnps, vol) => uniqueValues([...dnps, ...vol.users]), [])
+    /**
+     * It is critical up packages in the correct order,
+     * so that the named volumes are created before the users are started
+     * [NOTE] the next sort function is a simplified solution, where the
+     * id will always be the owner of the volumes, and other DNPs, the users.
+     */
+    .sort(dnpName => (dnpName === id ? -1 : 1));
 
   // Verify results
   const dockerComposePaths = {};
@@ -73,7 +79,9 @@ async function restartPackageVolumes({ id, doNotRestart }) {
     for (const dnpName of dnpsToRemove) {
       await docker.compose.rm(dockerComposePaths[dnpName]);
     }
-    await docker.volume.rm(volumeNames.join(" "));
+    for (const volName of volumeNames) {
+      await docker.volume.rm(volName);
+    }
   } catch (e) {
     err = e;
   }
