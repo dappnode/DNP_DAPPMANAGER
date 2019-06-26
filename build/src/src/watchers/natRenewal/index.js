@@ -40,9 +40,10 @@ async function natRenewal() {
         `NAT renewal portsToOpen: ${JSON.stringify(portsToOpen, null, 2)}`
       );
 
+    // Fetch the localIp only once for all the portsToOpen
     const localIp = await getLocalIp();
 
-    // NOTE: Open the ports regardless if it is already open
+    // NOTE: Open every port regardless if it's already open
 
     // 2. Renew NAT mapping
     for (const portToOpen of portsToOpen) {

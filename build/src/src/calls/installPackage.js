@@ -100,7 +100,7 @@ const installPackage = async ({
     logUi({ id, name, message: "Already updated" });
   });
 
-  let pkgs = await Promise.all(
+  const pkgs = await Promise.all(
     Object.entries(state).map(async ([name, ver]) => {
       // 3.2 Fetch manifest
       let manifest = await getManifest({ name, ver });
@@ -199,12 +199,9 @@ const installPackage = async ({
     if (portsToOpen.length && upnpAvailable) {
       eventBus.emit(eventBusTag.call, {
         callId: "managePorts",
-        kwargs: {
-          action: "open",
-          ports: portsToOpen
-        }
+        kwargs: { action: "open", ports: portsToOpen }
       });
-      logs.debug(
+      logs.info(
         `Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`
       );
     }

@@ -24,29 +24,7 @@ describe("Call function: removePackage", function() {
               container_name: DNP_DAPPMANAGER_TEST_CONTAINER
   `.trim();
 
-  const manifestPath = getPath.manifest(id, params);
-  const manifestTemplate = JSON.stringify({
-    name: id,
-    image: {
-      ports: ["30303:30303/udp", "4001", "4001/udp"]
-    }
-  });
-  const portsToClose = [
-    { portNumber: 32769, protocol: "UDP" },
-    { portNumber: 32769, protocol: "TCP" }
-  ];
-  const manifestParsedPorts = [{ portNumber: "30303", protocol: "UDP" }];
-
   const idWrong = "missing.dnp.dappnode.eth";
-
-  const dockerList = {
-    listContainers: sinon.stub().resolves([
-      {
-        name: id,
-        portsToClose
-      }
-    ])
-  };
 
   const docker = {
     compose: {
@@ -70,7 +48,6 @@ describe("Call function: removePackage", function() {
 
   const removePackage = proxyquire("calls/removePackage", {
     "modules/docker": docker,
-    "modules/dockerList": dockerList,
     eventBus: eventBusPackage,
     params: params,
     db: db
@@ -79,7 +56,6 @@ describe("Call function: removePackage", function() {
   before(async () => {
     validate.path(dockerComposePath);
     fs.writeFileSync(dockerComposePath, dockerComposeTemplate);
-    fs.writeFileSync(manifestPath, manifestTemplate);
   });
 
   it("should stop the package with correct arguments", async () => {
@@ -96,28 +72,10 @@ describe("Call function: removePackage", function() {
     );
   });
 
-  it("should emit an internal call to the eventBus", async () => {
-    // eventBus should be called once to close ports, and then to emitPackages
-    sinon.assert.callCount(eventBusPackage.eventBus.emit, 3);
-    expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal(
-      [
-        eventBusTag.call,
-        {
-          callId: "managePorts",
-          kwargs: {
-            action: "close",
-            ports: [...manifestParsedPorts, ...portsToClose]
-          }
-        }
-      ],
-      `eventBus.emit first call must be to close the package's ports`
-    );
-  });
-
   it("should request to emit packages to refresh the UI", async () => {
-    expect(eventBusPackage.eventBus.emit.getCall(1).args).to.deep.equal(
+    expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal(
       [eventBusTag.emitPackages],
-      `eventBus.emit second call must be to request emit packages`
+      `eventBus.emit first call must be to request emit packages`
     );
   });
 
