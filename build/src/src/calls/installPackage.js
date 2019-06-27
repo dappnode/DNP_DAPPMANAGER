@@ -100,7 +100,7 @@ const installPackage = async ({
     logUi({ id, name, message: "Already updated" });
   });
 
-  let pkgs = await Promise.all(
+  const pkgs = await Promise.all(
     Object.entries(state).map(async ([name, ver]) => {
       // 3.2 Fetch manifest
       let manifest = await getManifest({ name, ver });
@@ -179,12 +179,12 @@ const installPackage = async ({
     logs.info(`Started (docker-compose up) DNP ${pkg.name}`);
 
     // 7. Open ports
-    // 7A. Mapped ports: mappedPortsToOpen = [ {number: '30303', type: 'TCP'}, ... ]
+    // 7A. Mapped ports: mappedPortsToOpen = [ {portNumber: '30303', protocol: 'TCP'}, ... ]
     const mappedPortsToOpen = parseManifestPorts(pkg.manifest);
 
     // 7B. P2P ports: modify docker-compose + open ports
     // - lockPorts modifies the docker-compose and returns
-    //   lockedPortsToOpen = [ {number: '32769', type: 'UDP'}, ... ]
+    //   lockedPortsToOpen = [ {portNumber: '32769', protocol: 'UDP'}, ... ]
     // - managePorts calls UPnP to open the ports
     const lockedPortsToOpen = await lockPorts({ pkg });
     if (lockedPortsToOpen.length)
@@ -200,12 +200,9 @@ const installPackage = async ({
     if (portsToOpen.length && upnpAvailable) {
       eventBus.emit(eventBusTag.call, {
         callId: "managePorts",
-        kwargs: {
-          action: "open",
-          ports: portsToOpen
-        }
+        kwargs: { action: "open", ports: portsToOpen }
       });
-      logs.debug(
+      logs.info(
         `Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`
       );
     }

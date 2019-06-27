@@ -23,8 +23,8 @@ describe("Call function: installPackage", function() {
     type: "library"
   };
   const depPortsToOpen = [
-    { number: 32769, type: "UDP" },
-    { number: 32769, type: "TCP" }
+    { portNumber: 32769, protocol: "UDP" },
+    { portNumber: 32769, protocol: "TCP" }
   ];
 
   // Stub packages module. Resolve always returning nothing
@@ -141,7 +141,7 @@ describe("Call function: installPackage", function() {
     sinon.assert.callCount(packages.run, 2);
     expect(packages.run.getCall(0).args).to.deep.equal(
       [callKwargPkg],
-      `should call packages.run second for dependency ${depName}`
+      `should call packages.run second for dependency ${pkgName}`
     );
     expect(packages.run.getCall(1).args).to.deep.equal(
       [callKwargDep],
