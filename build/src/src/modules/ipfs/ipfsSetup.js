@@ -35,11 +35,12 @@ function initIPFS() {
 
 function verifyIPFS(ipfs) {
   ipfs.id((err, identity) => {
-    if (err) {
-      logs.error(`IPFS error: ${err.message}`);
-    } else {
-      logs.info(`Connected to IPFS, id: ${(identity || {}).id}`);
-    }
+    if (err)
+      ipfs.version((err2, version) => {
+        if (err2) logs.error(`IPFS error: ${err2.message}`);
+        else logs.info(`Connected to IPFS ${JSON.stringify(version, null, 2)}`);
+      });
+    else logs.info(`Connected to IPFS ${(identity || {}).id}`);
   });
 }
 

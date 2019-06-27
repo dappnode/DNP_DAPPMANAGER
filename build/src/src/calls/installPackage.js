@@ -132,6 +132,7 @@ const installPackage = async ({
   );
   const dnpNames = pkgs.map(({ name }) => name).join(", ");
   logs.debug(`Processed manifests for: ${dnpNames}`);
+  logs.debug(JSON.stringify(pkgs, null, 2));
 
   // 4. Download requested packages in paralel
   await Promise.all(pkgs.map(pkg => packages.download({ pkg, id })));

@@ -1,6 +1,5 @@
 const { promisify } = require("util");
 const getPath = require("utils/getPath");
-const generate = require("utils/generate");
 const fs = require("fs");
 const validate = require("utils/validate");
 const restartPatch = require("modules/restartPatch");
@@ -9,6 +8,7 @@ const params = require("params");
 const docker = require("modules/docker");
 const downloadImage = require("modules/downloadImage");
 const semver = require("semver");
+const { manifestToCompose } = require("@dappnode/dnp-manifest");
 
 // Promisify fs methods
 const removeFile = promisify(fs.unlink);
@@ -85,11 +85,11 @@ async function load({ pkg, id }) {
   // Write manifest and docker-compose AFTER loading image
   await writeFile(
     validate.path(getPath.manifest(name, params, isCore)),
-    generate.manifest(manifest)
+    JSON.stringify(manifest, null, 2)
   );
   await writeFile(
     validate.path(getPath.dockerCompose(name, params, isCore)),
-    generate.dockerCompose(manifest, params)
+    manifestToCompose(manifest)
   );
 
   logUi({ id, name, message: "Cleaning files..." });

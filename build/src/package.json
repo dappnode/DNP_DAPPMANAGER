@@ -19,6 +19,7 @@
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
+    "@dappnode/dnp-manifest": "^0.0.9",
     "@parity/api": "^2.1.22",
     "async": "^2.6.1",
     "autobahn": "^18.3.2",
