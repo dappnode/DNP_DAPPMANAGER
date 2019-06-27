@@ -33,6 +33,14 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@dappnode/dnp-manifest@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@dappnode/dnp-manifest/-/dnp-manifest-0.0.8.tgz#88c0a6a1ad7d6ceaae0496501d2e2a71e965d144"
+  integrity sha512-p/N7pqp2y5iTpnp/K+bEtpl+5cNuqAGK/Th5eTKUNzOHRcJvDL81YKBOHpKd6ne8rxb3lGLMM1a2cfq5ArKoHg==
+  dependencies:
+    ajv "^6.10.0"
+    ajv-errors "^1.0.1"
+
 "@jimp/bmp@^0.5.4":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@jimp/bmp/-/bmp-0.5.4.tgz#b7b375aa774f26154912569864d5466e71333ef1"
@@ -465,7 +473,12 @@ aggregate-error@^1.0.0:
     clean-stack "^1.0.0"
     indent-string "^3.0.0"
 
-ajv@^6.5.5, ajv@^6.9.1:
+ajv-errors@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-1.0.1.tgz#f35986aceb91afadec4102fbd85014950cefa64d"
+  integrity sha512-DCRfO/4nQ+89p/RK43i8Ezd41EqdGIU4ld7nGF8OQ14oc/we5rEntLCUa7+jrn3nn83BosfwZA0wb4pon2o8iQ==
+
+ajv@^6.10.0, ajv@^6.5.5, ajv@^6.9.1:
   version "6.10.0"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.0.tgz#90d0d54439da587cd7e843bfb7045f50bd22bdf1"
   integrity sha512-nffhOpkymDECQyR0mnsUtoCE8RlX38G0rYP+wgLWFyZuUyuuojSSvi/+euOiQBIn63whYwYVIIH1TvE3tu4OEg==
