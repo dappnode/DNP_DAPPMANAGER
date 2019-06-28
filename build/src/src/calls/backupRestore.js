@@ -64,9 +64,14 @@ const backupRestore = async ({ id, dataUri, backup }) => {
       try {
         const fromPath = path.join(backupDir, name);
         // lstatSync throws if path does not exist, so must call existsSync first
-        if (!fs.existsSync(fromPath)) {
+        if (!fs.existsSync(fromPath))
           throw Error(`path ${fromPath} does not exist`);
-        } else if (fs.lstatSync(fromPath).isDirectory()) {
+
+        // Make sure the base dir exists on the container (will throw otherwise)
+        const toPathDir = path.parse(toPath).dir;
+        await shell(`docker exec ${containerName} mkdir -p ${toPathDir}`);
+
+        if (fs.lstatSync(fromPath).isDirectory()) {
           await shell(`docker cp ${fromPath}/. ${containerName}:${toPath}`);
         } else {
           await shell(`docker cp ${fromPath} ${containerName}:${toPath}`);

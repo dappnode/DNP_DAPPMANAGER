@@ -24,7 +24,10 @@ describe("Integration test for backup to and from: ", function() {
   // Paths on the container
   const containerRoot = "/";
   const onContainerDir = path.join(containerRoot, dir);
+  const onContainerSubDir = path.join(containerRoot, subDir);
   const onContainerFile = path.join(containerRoot, file);
+
+  const validateDir = path.join(testDir, "validateFiles");
 
   /**
    * /etc/nginx/nginx.conf - single file 646 Bytes
@@ -42,8 +45,10 @@ describe("Integration test for backup to and from: ", function() {
 
   const dataUri =
     "data:application/zip;base64,UEsDBAoAAAAAAIa1204AAAAAAAAAAAAAAAAIABwAdGVzdERpci9VVAkAA5sqFV2dKhVddXgLAAEE6AMAAAToAwAAUEsDBAoAAAAAAIa1204AAAAAAAAAAAAAAAARABwAdGVzdERpci9zdWItdGVzdC9VVAkAA5sqFV2dKhVddXgLAAEE6AMAAAToAwAAUEsDBAoAAAAAAIa1204WtQzjFQAAABUAAAAaABwAdGVzdERpci9zdWItdGVzdC9kYXRhLmNvbmZVVAkAA5sqFV2bKhVddXgLAAEE6AMAAAToAwAAQW1hemluZyB0ZXN0IGNvbnRlbnQKUEsDBAoAAAAAAIa1204WtQzjFQAAABUAAAAGABwAY29uZmlnVVQJAAObKhVdmyoVXXV4CwABBOgDAAAE6AMAAEFtYXppbmcgdGVzdCBjb250ZW50ClBLAQIeAwoAAAAAAIa1204AAAAAAAAAAAAAAAAIABgAAAAAAAAAEADtQQAAAAB0ZXN0RGlyL1VUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204AAAAAAAAAAAAAAAARABgAAAAAAAAAEADtQUIAAAB0ZXN0RGlyL3N1Yi10ZXN0L1VUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204WtQzjFQAAABUAAAAaABgAAAAAAAEAAACkgY0AAAB0ZXN0RGlyL3N1Yi10ZXN0L2RhdGEuY29uZlVUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204WtQzjFQAAABUAAAAGABgAAAAAAAEAAACkgfYAAABjb25maWdVVAUAA5sqFV11eAsAAQToAwAABOgDAABQSwUGAAAAAAQABABRAQAASwEAAAAA";
-
-  const negativeTestFolder = "TESTESTESTEST";
+  const dataUriPartial =
+    "data:application/zip;base64,UEsDBAoAAAAAAKyE3E4AAAAAAAAAAAAAAAAIABwAdGVzdERpci9VVAkAAyQmFl0lJhZddXgLAAEE6AMAAAToAwAAUEsDBAoAAAAAAKyE3E4AAAAAAAAAAAAAAAARABwAdGVzdERpci9zdWItdGVzdC9VVAkAAyQmFl0lJhZddXgLAAEE6AMAAAToAwAAUEsBAh4DCgAAAAAArITcTgAAAAAAAAAAAAAAAAgAGAAAAAAAAAAQAO1BAAAAAHRlc3REaXIvVVQFAAMkJhZddXgLAAEE6AMAAAToAwAAUEsBAh4DCgAAAAAArITcTgAAAAAAAAAAAAAAABEAGAAAAAAAAAAQAO1BQgAAAHRlc3REaXIvc3ViLXRlc3QvVVQFAAMkJhZddXgLAAEE6AMAAAToAwAAUEsFBgAAAAACAAIApQAAAI0AAAAAAA==";
+  const dataUriEmpty =
+    "data:application/zip;base64,UEsDBAoAAAAAAAGG3E4AAAAAAAAAAAAAAAAGABwAZW1wdHkvVVQJAAOiKBZdoigWXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAAGG3E4AAAAAAAAAAAAAAAAGABgAAAAAAAAAEADtQQAAAABlbXB0eS9VVAUAA6IoFl11eAsAAQToAwAABOgDAABQSwUGAAAAAAEAAQBMAAAAQAAAAAAA";
   /**
    * zip file contains metadata, such as file creation times
    * so the resulting base64 is not deterministic
@@ -53,27 +58,20 @@ describe("Integration test for backup to and from: ", function() {
     return await shell(`docker exec ${containerName} ${cmd}`);
   }
 
-  beforeEach("Up a test docker container", async () => {
-    this.timeout(60000);
+  beforeEach("Up a test docker container", async function() {
+    this.timeout(60 * 1000);
     await createTestDir();
-
+    await shell(`rm -rf ${validateDir}`);
     // Create container
     await shell(`docker rm -f ${containerName}`).catch(() => {});
     await shell(`docker run -d --name ${containerName} nginx:alpine`);
-
-    // Populate the container with shit data
-    await shell(`mkdir -p ${onServerSubDir}`);
-    await shell(`echo "${content}" > ${onServerFile}`);
-    await shell(`docker cp ${onServerDir} ${containerName}:test`);
   });
 
   it("Should get a backup for nginx", async () => {
-    // Test to make sure the container is recreated
-    await run(`mkdir ${negativeTestFolder}`);
-    expect(await run("ls -ltr")).to.include(
-      negativeTestFolder,
-      "negative test folder NOT found. This helps ensure that the container is recreated"
-    );
+    // Populate the container with shit data
+    await shell(`mkdir -p ${onServerSubDir}`);
+    await shell(`echo "${content}" > ${onServerFile}`);
+    await shell(`docker cp ${onServerDir} ${containerName}:${dir}`);
 
     // Actual call
     const res = await backupGet({ id, backup });
@@ -89,9 +87,8 @@ describe("Integration test for backup to and from: ", function() {
      *
      */
     await createTestDir();
-    const validateDir = path.join(testDir, "validateFiles");
     const validateDirComp = `${validateDir}.zip`;
-    dataUriToFile(dataUri, validateDirComp);
+    dataUriToFile(res.result, validateDirComp);
     await shell(`unzip ${validateDirComp} -d ${validateDir}`);
     // Check the file contents
     const backupFileContent = await shell(
@@ -112,14 +109,6 @@ describe("Integration test for backup to and from: ", function() {
   }).timeout(60 * 1000);
 
   it("Should restore a backup for nginx", async () => {
-    // Test to make sure the container is recreated
-    expect(await run("ls -ltr")).to.not.include(
-      negativeTestFolder,
-      "negative test folder FOUND (should not). This helps ensure that the container is recreated"
-    );
-    await run("ls -ltr");
-
-    // Actual call
     const res = await backupRestore({ id, dataUri, backup });
 
     expect(res).to.be.ok;
@@ -129,12 +118,112 @@ describe("Integration test for backup to and from: ", function() {
     /**
      * Validate that the files are correctly added
      */
-    expect(await run(`ls ${onContainerDir}`)).to.include(subDirName);
-    expect(await run(`cat ${onContainerFile}`)).to.include(content);
+    expect(await run(`ls ${onContainerDir}`)).to.equal(
+      subDirName,
+      `${onContainerDir} in container dir should only contain ${subDirName}`
+    );
+    expect(await run(`cat ${onContainerFile}`)).to.equal(
+      content,
+      `Wrong contents of in container file ${onContainerFile}`
+    );
   }).timeout(60 * 1000);
 
-  after("Clean test docker container", async () => {
-    this.timeout(60000);
+  /**
+   * Partial backup case
+   */
+
+  it("Should get a PARTIAL backup for nginx", async () => {
+    // Populate the container with shit data
+    await shell(`mkdir -p ${onServerSubDir}`);
+    await shell(`docker cp ${onServerDir} ${containerName}:${dir}`);
+
+    // Actual call
+    const res = await backupGet({ id, backup });
+
+    expect(res).to.be.ok;
+    expect(res.message).to.equal(
+      "Backup test-backup.dnp.dappnode.eth, items: testDir"
+    );
+    expect(res.result).to.be.a("string");
+    expect(res.result).to.include("data:application/zip;base64,");
+    /**
+     * [NOTE] validate the returned base64, assuming it's not deterministic
+     *
+     */
+    await createTestDir();
+    const validateDirComp = `${validateDir}.zip`;
+    dataUriToFile(res.result, validateDirComp);
+    await shell(`unzip ${validateDirComp} -d ${validateDir}`);
+
+    // Check the file contents
+    const backupDirLs = await shell(`ls ${validateDir}`);
+    const backupSubDirLs = await shell(
+      `ls ${path.join(validateDir, backupNameDir)}`
+    );
+
+    // Check the dir contents
+    expect(backupDirLs).to.equal(
+      backupNameDir,
+      `Backup sub dir file (name ${backupNameDir}) contents are incorrect`
+    );
+    expect(backupSubDirLs).to.equal(
+      subDirName,
+      `Backup sub dir file (name ${backupNameDir}) contents are incorrect`
+    );
+  }).timeout(60 * 1000);
+
+  it("Should restore a PARTIAL backup for nginx", async () => {
+    const res = await backupRestore({ id, dataUri: dataUriPartial, backup });
+
+    expect(res).to.be.ok;
+    expect(res.message).to.equal(
+      "Restored backup test-backup.dnp.dappnode.eth, items: testDir"
+    );
+    /**
+     * Validate that the files are correctly added
+     */
+    expect(await run(`ls ${onContainerDir}`)).to.equal(
+      subDirName,
+      `${onContainerDir} in container dir should only contain ${subDirName}`
+    );
+    expect(await run(`ls ${onContainerSubDir}`)).to.equal(
+      "",
+      `${onContainerSubDir} should not contain any file`
+    );
+  }).timeout(60 * 1000);
+
+  /**
+   * NO backup - should throw
+   */
+
+  it("Should THROW if no backup is possible for nginx", async () => {
+    let errorMessage = "---did not throw---";
+    try {
+      await backupGet({ id, backup });
+    } catch (e) {
+      errorMessage = e.message;
+    }
+    expect(errorMessage).to.include(
+      "Could not backup any item",
+      "Wrong error message"
+    );
+  }).timeout(60 * 1000);
+
+  it("Should restore a PARTIAL backup for nginx", async () => {
+    let errorMessage = "---did not throw---";
+    try {
+      await backupRestore({ id, dataUri: dataUriEmpty, backup });
+    } catch (e) {
+      errorMessage = e.message;
+    }
+    expect(errorMessage).to.include(
+      "Could not unbackup any item",
+      "Wrong error message"
+    );
+  }).timeout(60 * 1000);
+
+  after("Clean test docker container", async function() {
+    this.timeout(60 * 1000);
     await cleanTestDir();
     await shell(`docker rm -f ${containerName}`);
   });
