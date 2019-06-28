@@ -33,10 +33,10 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
-"@dappnode/dnp-manifest@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@dappnode/dnp-manifest/-/dnp-manifest-0.0.8.tgz#88c0a6a1ad7d6ceaae0496501d2e2a71e965d144"
-  integrity sha512-p/N7pqp2y5iTpnp/K+bEtpl+5cNuqAGK/Th5eTKUNzOHRcJvDL81YKBOHpKd6ne8rxb3lGLMM1a2cfq5ArKoHg==
+"@dappnode/dnp-manifest@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@dappnode/dnp-manifest/-/dnp-manifest-0.0.9.tgz#d5eaae9b08ee9ca519c17a93559fc7272a1069ac"
+  integrity sha512-U4ni9j+vDLGOu6dv2FobGdkfRILVmnUEUxvZ4SBMNc4vngakGb3iL4Uh2krgoxRLqKDGb2x5VpgZx+NRxoeacw==
   dependencies:
     ajv "^6.10.0"
     ajv-errors "^1.0.1"

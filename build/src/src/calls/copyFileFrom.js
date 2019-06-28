@@ -65,6 +65,12 @@ const copyFileFrom = async ({ id, fromPath }) => {
    * 1. Test if directory
    * 2. Compress (use stripTrailingSlash to clean path, just in case)
    * 3. Clean original files and rename toPath variable
+   *
+   * [TODO-IDEA]
+   * How to check the size and path characteristics with docker exec:
+   * - `docker exec ${container} test -f ${path}` returns if file or throws
+   * - `docker exec ${container} test -d ${path}` returns if directory or throws
+   * - `docker exec ${container} du -sb ${path}` returns bytes
    */
 
   if (fs.lstatSync(toPath).isDirectory()) {
