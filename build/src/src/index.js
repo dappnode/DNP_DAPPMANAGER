@@ -218,6 +218,7 @@ logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 const express = require("express");
 const fileUpload = require("express-fileupload");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
@@ -226,6 +227,7 @@ const port = 3000;
 
 // default options
 app.use(fileUpload());
+app.use(cors());
 
 app.get("/", async (req, res) => {
   return res.send("Welcome to the DAPPMANAGER HTTP API");
