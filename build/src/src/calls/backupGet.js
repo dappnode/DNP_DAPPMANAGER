@@ -2,11 +2,12 @@
 const params = require("params");
 const path = require("path");
 const logs = require("logs.js")(module);
+const db = require("db");
+const crypto = require("crypto");
 // Modules
 const dockerList = require("modules/dockerList");
 // Utils
 const shell = require("utils/shell");
-const fileToDataUri = require("utils/fileToDataUri");
 const validateBackupArray = require("utils/validateBackupArray");
 
 const maxSizeKb = 10e3;
@@ -98,30 +99,19 @@ const backupGet = async ({ id, backup }) => {
       );
     }
 
-    /**
-     * Converts a file to data URI.
-     * Path must have an extension for the mime type to be processed properly.
-     * If there is no extension, the MIME type will be:
-     * - application/octet-stream, which is defined as "arbitrary binary data"
-     * When the browser receives that MIME type it means:
-     * - "I don't know what the hell this is. Please save it as a file"
-     *
-     * [NOTE] does not support directories, it will throw an error:
-     *   Error: EISDIR: illegal operation on a directory, read
-     *
-     * @param {object} path file path, will read the file at this path
-     * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
-     */
-    const dataUri = await fileToDataUri(backupDirCompressed);
+    const fileId = crypto.randomBytes(32).toString("hex");
 
-    // Clean intermediate file
-    await shell(`rm -rf ${backupDirCompressed}`);
+    await db.set(fileId, backupDirCompressed);
+
+    // DEFER THIS ACTION
+    // // Clean intermediate file
+    // await shell(`rm -rf ${backupDirCompressed}`);
 
     return {
       message: `Backup ${id}, items: ${successfulBackups.join(", ")}`,
       logMessage: true,
       userAction: true,
-      result: dataUri
+      result: fileId
     };
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean

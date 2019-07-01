@@ -207,3 +207,34 @@ connection.onclose = (reason, details) => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+
+/**
+ * HTTP API
+ *
+ * [NOTE] This API is not secure
+ * - It is NOT protected by the IP range filter used in the WAMP
+ * - It can't use HTTPS for the limitations with internal IPs certificates
+ */
+
+const express = require("express");
+const app = express();
+const port = 3000;
+
+app.get("/", async (req, res) => {
+  return res.send("Welcome to the DAPPMANAGER HTTP API");
+});
+
+app.get("/download/:fileId", async (req, res, next) => {
+  logs.info(req);
+  const { fileId } = req.params;
+  const filePath = await db.get(fileId);
+
+  // If path does not exist, return error
+  if (!filePath) return next(Error(`No such fileId`));
+
+  // Remove the fileId from the DB FIRST to prevent reply attacks
+  await db.remove(fileId);
+  return res.download(filePath);
+});
+
+app.listen(port, () => logs.info(`HTTP API ${port}!`));

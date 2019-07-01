@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const shell = require("utils/shell");
 const path = require("path");
-const dataUriToFile = require("utils/dataUriToFile");
+const db = require("db");
 const { testDir, cleanTestDir, createTestDir } = require("./testUtils");
 
 // Calls
@@ -9,7 +9,7 @@ const backupGet = require("calls/backupGet");
 const backupRestore = require("calls/backupRestore");
 
 // MUST use function for this.timeout to work <====== function() ???
-describe("Integration test for backup to and from: ", function() {
+describe("Integration test for backup to and from:", function() {
   // Generic paths
   const dir = "test";
   const subDirName = "sub-test";
@@ -42,6 +42,9 @@ describe("Integration test for backup to and from: ", function() {
     { name: backupNameFile, path: onContainerFile },
     { name: backupNameDir, path: onContainerDir }
   ];
+
+  const filePath =
+    "DNCORE/.temp-transfer/test-backup.dnp.dappnode.eth_backup.zip";
 
   const dataUri =
     "data:application/zip;base64,UEsDBAoAAAAAAIa1204AAAAAAAAAAAAAAAAIABwAdGVzdERpci9VVAkAA5sqFV2dKhVddXgLAAEE6AMAAAToAwAAUEsDBAoAAAAAAIa1204AAAAAAAAAAAAAAAARABwAdGVzdERpci9zdWItdGVzdC9VVAkAA5sqFV2dKhVddXgLAAEE6AMAAAToAwAAUEsDBAoAAAAAAIa1204WtQzjFQAAABUAAAAaABwAdGVzdERpci9zdWItdGVzdC9kYXRhLmNvbmZVVAkAA5sqFV2bKhVddXgLAAEE6AMAAAToAwAAQW1hemluZyB0ZXN0IGNvbnRlbnQKUEsDBAoAAAAAAIa1204WtQzjFQAAABUAAAAGABwAY29uZmlnVVQJAAObKhVdmyoVXXV4CwABBOgDAAAE6AMAAEFtYXppbmcgdGVzdCBjb250ZW50ClBLAQIeAwoAAAAAAIa1204AAAAAAAAAAAAAAAAIABgAAAAAAAAAEADtQQAAAAB0ZXN0RGlyL1VUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204AAAAAAAAAAAAAAAARABgAAAAAAAAAEADtQUIAAAB0ZXN0RGlyL3N1Yi10ZXN0L1VUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204WtQzjFQAAABUAAAAaABgAAAAAAAEAAACkgY0AAAB0ZXN0RGlyL3N1Yi10ZXN0L2RhdGEuY29uZlVUBQADmyoVXXV4CwABBOgDAAAE6AMAAFBLAQIeAwoAAAAAAIa1204WtQzjFQAAABUAAAAGABgAAAAAAAEAAACkgfYAAABjb25maWdVVAUAA5sqFV11eAsAAQToAwAABOgDAABQSwUGAAAAAAQABABRAQAASwEAAAAA";
@@ -81,15 +84,15 @@ describe("Integration test for backup to and from: ", function() {
       "Backup test-backup.dnp.dappnode.eth, items: config, testDir"
     );
     expect(res.result).to.be.a("string");
-    expect(res.result).to.include("data:application/zip;base64,");
+    // res.result = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908"
+    expect(await db.get(res.result)).to.equal(filePath);
+
     /**
-     * [NOTE] validate the returned base64, assuming it's not deterministic
+     * [NOTE] validate the generated file, assuming it's not deterministic
      *
      */
     await createTestDir();
-    const validateDirComp = `${validateDir}.zip`;
-    dataUriToFile(res.result, validateDirComp);
-    await shell(`unzip ${validateDirComp} -d ${validateDir}`);
+    await shell(`unzip ${filePath} -d ${validateDir}`);
     // Check the file contents
     const backupFileContent = await shell(
       `cat ${path.join(validateDir, backupNameFile)}`
@@ -145,15 +148,16 @@ describe("Integration test for backup to and from: ", function() {
       "Backup test-backup.dnp.dappnode.eth, items: testDir"
     );
     expect(res.result).to.be.a("string");
-    expect(res.result).to.include("data:application/zip;base64,");
+    expect(res.result).to.be.a("string");
+    // res.result = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908"
+    expect(await db.get(res.result)).to.equal(filePath);
+
     /**
-     * [NOTE] validate the returned base64, assuming it's not deterministic
+     * [NOTE] validate the generated file, assuming it's not deterministic
      *
      */
     await createTestDir();
-    const validateDirComp = `${validateDir}.zip`;
-    dataUriToFile(res.result, validateDirComp);
-    await shell(`unzip ${validateDirComp} -d ${validateDir}`);
+    await shell(`unzip ${filePath} -d ${validateDir}`);
 
     // Check the file contents
     const backupDirLs = await shell(`ls ${validateDir}`);
@@ -209,7 +213,7 @@ describe("Integration test for backup to and from: ", function() {
     );
   }).timeout(60 * 1000);
 
-  it("Should restore a PARTIAL backup for nginx", async () => {
+  it("Should THROW if no restore backup is possible for nginx", async () => {
     let errorMessage = "---did not throw---";
     try {
       await backupRestore({ id, dataUri: dataUriEmpty, backup });

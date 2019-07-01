@@ -69,7 +69,9 @@ COPY build/entrypoint.sh .
 COPY build/dns_updater.sh /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
 
-# Copy the src the last as it's the more likely layer to change
+EXPOSE 3000
+
+# Copy the src last as it's the layer most likely to change
 COPY --from=build /usr/src/app /usr/src/app
 
 ENTRYPOINT /usr/src/app/entrypoint.sh
