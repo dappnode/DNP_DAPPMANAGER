@@ -5,6 +5,8 @@
  */
 
 module.exports = {
+  backupGet: require("./backupGet"),
+  backupRestore: require("./backupRestore"),
   changeIpfsTimeout: require("./changeIpfsTimeout"),
   cleanCache: require("./cleanCache"),
   copyFileFrom: require("./copyFileFrom"),

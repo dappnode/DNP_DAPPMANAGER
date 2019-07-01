@@ -3,6 +3,7 @@ const params = require("params");
 const path = require("path");
 const logs = require("logs.js")(module);
 const db = require("db");
+const fs = require("fs");
 const crypto = require("crypto");
 // Modules
 const dockerList = require("modules/dockerList");
@@ -103,9 +104,12 @@ const backupGet = async ({ id, backup }) => {
 
     await db.set(fileId, backupDirCompressed);
 
-    // DEFER THIS ACTION
-    // // Clean intermediate file
-    // await shell(`rm -rf ${backupDirCompressed}`);
+    // DEFER THIS ACTION: Clean intermediate file
+    setTimeout(() => {
+      fs.unlink(backupDirCompressed, errFs => {
+        logs.error(`Error deleting file: ${errFs.message}`);
+      });
+    }, 15 * 60 * 1000);
 
     return {
       message: `Backup ${id}, items: ${successfulBackups.join(", ")}`,
