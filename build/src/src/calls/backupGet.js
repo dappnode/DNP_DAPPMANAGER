@@ -22,7 +22,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   { name: "config", path: "/usr/.raiden/config" },
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
- * @returns {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
+ * @returns {string} fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 const backupGet = async ({ id, backup }) => {
   if (!id) throw Error("Argument id must be defined");
@@ -77,14 +77,17 @@ const backupGet = async ({ id, backup }) => {
         `Dir file transfers > ${maxSizeKb} KB are not allowed. Attempting ${dirSizeKb} KB`
       );
     }
-    // Use node.js util to get the file / dir name safely
-    const backupDirCompressed = `${backupDir}.zip`;
+
     /**
-     * To preserve the folder's relative structure while calling zip from a different dir
-     * Ref: https://unix.stackexchange.com/a/77616
-     * `(cd test/npm-test && zip -r - .) > npm-test.zip`
+     * Use the -C option to cd in the directory before doing the tar
+     * Provide the list of directories / files to include to keep the file structure clean
+     *
+     * successfulBackups = ["config", "keys", "name"]
+     * dirList = "config keys name"
      */
-    await shell(`(cd ${backupDir} && zip -r - .) > ${backupDirCompressed}`);
+    const backupDirComp = `${backupDir}.tar.xz`;
+    const dirListToComp = successfulBackups.join(" ");
+    await shell(`tar -czf ${backupDirComp} -C ${backupDir} ${dirListToComp}`);
     await shell(`rm -rf ${backupDir}`);
 
     /**
@@ -92,9 +95,9 @@ const backupGet = async ({ id, backup }) => {
      * $ du -s -k app/file.gz
      * 12 app/file.gz
      */
-    const fileSizeKb = await getFileOrDirSize(backupDirCompressed);
+    const fileSizeKb = await getFileOrDirSize(backupDirComp);
     if (fileSizeKb > 20e3) {
-      await shell(`rm -rf ${backupDirCompressed}`);
+      await shell(`rm -rf ${backupDirComp}`);
       throw Error(
         `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${fileSizeKb} KB`
       );
@@ -102,11 +105,11 @@ const backupGet = async ({ id, backup }) => {
 
     const fileId = crypto.randomBytes(32).toString("hex");
 
-    await db.set(fileId, backupDirCompressed);
+    await db.set(fileId, backupDirComp);
 
     // DEFER THIS ACTION: Clean intermediate file
     setTimeout(() => {
-      fs.unlink(backupDirCompressed, errFs => {
+      fs.unlink(backupDirComp, errFs => {
         logs.error(`Error deleting file: ${errFs.message}`);
       });
     }, 15 * 60 * 1000);

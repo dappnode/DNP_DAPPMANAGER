@@ -250,7 +250,7 @@ app.get("/download/:fileId", async (req, res) => {
   return res.download(filePath, errHttp => {
     if (!errHttp)
       fs.unlink(filePath, errFs => {
-        logs.error(`Error deleting file: ${errFs.message}`);
+        if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
       });
   });
 });
@@ -278,7 +278,7 @@ app.post("/upload", (req, res) => {
 
   setTimeout(() => {
     fs.unlink(filePath, errFs => {
-      logs.error(`Error deleting file: ${errFs.message}`);
+      if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
     });
   }, 15 * 60 * 1000);
 });
