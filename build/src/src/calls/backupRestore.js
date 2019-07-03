@@ -5,6 +5,8 @@ const db = require("db");
 const logs = require("logs.js")(module);
 // Modules
 const dockerList = require("modules/dockerList");
+// External call
+const restartPackage = require("./restartPackage");
 // Utils
 const shell = require("utils/shell");
 const validateBackupArray = require("utils/validateBackupArray");
@@ -91,6 +93,9 @@ const backupRestore = async ({ id, backup, fileId }) => {
     // Clean intermediate file
     await shell(`rm -rf ${backupDir}`);
     await shell(`rm -rf ${backupDirCompressed}`);
+
+    // Restart package so the file changes take effect
+    await restartPackage({ id });
 
     return {
       message: `Restored backup ${id}, items: ${successfulBackups.join(", ")}`,
