@@ -21,6 +21,9 @@ require("./watchers/natRenewal");
 // Print version data
 require("./utils/getVersionData");
 
+// Start HTTP API
+require("./httpApi");
+
 /*
  * Connection configuration
  * ************************
@@ -207,80 +210,3 @@ connection.onclose = (reason, details) => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
-
-/**
- * HTTP API
- *
- * [NOTE] This API is not secure
- * - It is NOT protected by the IP range filter used in the WAMP
- * - It can't use HTTPS for the limitations with internal IPs certificates
- */
-
-const express = require("express");
-const fileUpload = require("express-fileupload");
-const cors = require("cors");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
-const app = express();
-const port = 3000;
-
-// default options
-app.use(fileUpload());
-app.use(cors());
-
-app.get("/", async (req, res) => {
-  return res.send("Welcome to the DAPPMANAGER HTTP API");
-});
-
-app.get("/download/:fileId", async (req, res) => {
-  // Protect for a range of IPs
-  // req.ip = "::ffff:172.33.10.1";
-  const ip = req.ip;
-  if (!ip.includes("172.33.10.")) res.status(403).send(`Forbidden ip: ${ip}`);
-
-  const { fileId } = req.params;
-  const filePath = await db.get(fileId);
-
-  // If path does not exist, return error
-  if (!filePath) return res.status(404).send("File not found");
-
-  // Remove the fileId from the DB FIRST to prevent reply attacks
-  await db.remove(fileId);
-  return res.download(filePath, errHttp => {
-    if (!errHttp)
-      fs.unlink(filePath, errFs => {
-        if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
-      });
-  });
-});
-
-const tempTransferDir = params.TEMP_TRANSFER_DIR;
-
-app.post("/upload", (req, res) => {
-  // Protect for a range of IPs
-  // req.ip = "::ffff:172.33.10.1";
-  const ip = req.ip;
-  if (!ip.includes("172.33.10.")) res.status(403).send(`Forbidden ip: ${ip}`);
-
-  if (Object.keys(req.files).length == 0)
-    return res.status(400).send("No files were uploaded.");
-
-  const fileId = crypto.randomBytes(32).toString("hex");
-  const filePath = path.join(tempTransferDir, fileId);
-
-  // Use the mv() method to place the file somewhere on your server
-  // The name of the input field (i.e. "file") is used to retrieve the uploaded file
-  req.files.file.mv(filePath, err => {
-    if (err) res.status(500).send(err);
-    else res.send(fileId);
-  });
-
-  setTimeout(() => {
-    fs.unlink(filePath, errFs => {
-      if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
-    });
-  }, 15 * 60 * 1000);
-});
-
-app.listen(port, () => logs.info(`HTTP API ${port}!`));
