@@ -1,12 +1,14 @@
 const params = require("params");
 const path = require("path");
 const fs = require("fs");
+const db = require("db");
 const logs = require("logs.js")(module);
 // Modules
 const dockerList = require("modules/dockerList");
+// External call
+const restartPackage = require("./restartPackage");
 // Utils
 const shell = require("utils/shell");
-const dataUriToFile = require("utils/dataUriToFile");
 const validateBackupArray = require("utils/validateBackupArray");
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
@@ -21,9 +23,9 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
  */
-const backupRestore = async ({ id, dataUri, backup }) => {
+const backupRestore = async ({ id, backup, fileId }) => {
   if (!id) throw Error("Argument id must be defined");
-  if (!dataUri) throw Error("Argument dataUri must be defined");
+  if (!fileId) throw Error("Argument fileId must be defined");
   if (!backup) throw Error("Argument backup must be defined");
   if (!backup.length) throw Error("No backup items specified");
 
@@ -36,27 +38,29 @@ const backupRestore = async ({ id, dataUri, backup }) => {
   const containerName = dnp.packageName;
 
   // Intermediate step, the file is in local file system
-  await shell(`mkdir -p ${tempTransferDir}`); // Never throws
   const backupDir = path.join(tempTransferDir, `${dnp.name}_backup`);
-  const backupDirCompressed = `${backupDir}.zip`;
+  const backupDirCompressed = `${backupDir}.tar.xz`;
   await shell(`rm -rf ${backupDir}`); // Just to be sure it's clean
   await shell(`rm -rf ${backupDirCompressed}`); // Just to be sure it's clean
+  await shell(`mkdir -p ${backupDir}`); // Never throws
+
+  // Fetch the filePath and the file with fileId
+  const filePath = await db.get(fileId);
+  if (!filePath) throw Error(`No file found for id: ${fileId}`);
+  if (!fs.existsSync(filePath))
+    throw Error(`No file found at path: ${filePath}`);
+  await shell(`mv ${filePath} ${backupDirCompressed}`);
 
   try {
     /**
-     * Convert dataUri to local file
-     *
-     * In this conversion direction MIME types don't matter
-     * The extension is what decides the type and it's the user's
-     * responsability to specify it correctly on the UI. The code will
-     * not cause problems if the types are not setup corretly
+     * Untar to directory
+     * `tar -xf vpn.dnp.dappnode.eth_backup.tar.xz -C test/`
+     * Then,
+     * user@dn:~/home$ ls test/
+     * modules  secrets  src
      */
-    dataUriToFile(dataUri, backupDirCompressed);
-    /**
-     * Unzip to directory. The destination directory will be created by unzip
-     * `unzip transfers/raiden_backup.zip -d transfers`
-     */
-    await shell(`unzip ${backupDirCompressed} -d ${backupDir}`);
+    await shell(`tar -xf ${backupDirCompressed} -C ${backupDir}`);
+    await shell(`rm -rf ${backupDirCompressed}`);
 
     const successfulBackups = [];
     let lastError;
@@ -89,6 +93,9 @@ const backupRestore = async ({ id, dataUri, backup }) => {
     // Clean intermediate file
     await shell(`rm -rf ${backupDir}`);
     await shell(`rm -rf ${backupDirCompressed}`);
+
+    // Restart package so the file changes take effect
+    await restartPackage({ id });
 
     return {
       message: `Restored backup ${id}, items: ${successfulBackups.join(", ")}`,

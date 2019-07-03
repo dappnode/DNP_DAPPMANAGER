@@ -2,11 +2,13 @@
 const params = require("params");
 const path = require("path");
 const logs = require("logs.js")(module);
+const db = require("db");
+const fs = require("fs");
+const crypto = require("crypto");
 // Modules
 const dockerList = require("modules/dockerList");
 // Utils
 const shell = require("utils/shell");
-const fileToDataUri = require("utils/fileToDataUri");
 const validateBackupArray = require("utils/validateBackupArray");
 
 const maxSizeKb = 10e3;
@@ -20,7 +22,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   { name: "config", path: "/usr/.raiden/config" },
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
- * @returns {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
+ * @returns {string} fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 const backupGet = async ({ id, backup }) => {
   if (!id) throw Error("Argument id must be defined");
@@ -75,14 +77,17 @@ const backupGet = async ({ id, backup }) => {
         `Dir file transfers > ${maxSizeKb} KB are not allowed. Attempting ${dirSizeKb} KB`
       );
     }
-    // Use node.js util to get the file / dir name safely
-    const backupDirCompressed = `${backupDir}.zip`;
+
     /**
-     * To preserve the folder's relative structure while calling zip from a different dir
-     * Ref: https://unix.stackexchange.com/a/77616
-     * `(cd test/npm-test && zip -r - .) > npm-test.zip`
+     * Use the -C option to cd in the directory before doing the tar
+     * Provide the list of directories / files to include to keep the file structure clean
+     *
+     * successfulBackups = ["config", "keys", "name"]
+     * dirList = "config keys name"
      */
-    await shell(`(cd ${backupDir} && zip -r - .) > ${backupDirCompressed}`);
+    const backupDirComp = `${backupDir}.tar.xz`;
+    const dirListToComp = successfulBackups.join(" ");
+    await shell(`tar -czf ${backupDirComp} -C ${backupDir} ${dirListToComp}`);
     await shell(`rm -rf ${backupDir}`);
 
     /**
@@ -90,38 +95,30 @@ const backupGet = async ({ id, backup }) => {
      * $ du -s -k app/file.gz
      * 12 app/file.gz
      */
-    const fileSizeKb = await getFileOrDirSize(backupDirCompressed);
+    const fileSizeKb = await getFileOrDirSize(backupDirComp);
     if (fileSizeKb > 20e3) {
-      await shell(`rm -rf ${backupDirCompressed}`);
+      await shell(`rm -rf ${backupDirComp}`);
       throw Error(
         `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${fileSizeKb} KB`
       );
     }
 
-    /**
-     * Converts a file to data URI.
-     * Path must have an extension for the mime type to be processed properly.
-     * If there is no extension, the MIME type will be:
-     * - application/octet-stream, which is defined as "arbitrary binary data"
-     * When the browser receives that MIME type it means:
-     * - "I don't know what the hell this is. Please save it as a file"
-     *
-     * [NOTE] does not support directories, it will throw an error:
-     *   Error: EISDIR: illegal operation on a directory, read
-     *
-     * @param {object} path file path, will read the file at this path
-     * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
-     */
-    const dataUri = await fileToDataUri(backupDirCompressed);
+    const fileId = crypto.randomBytes(32).toString("hex");
 
-    // Clean intermediate file
-    await shell(`rm -rf ${backupDirCompressed}`);
+    await db.set(fileId, backupDirComp);
+
+    // DEFER THIS ACTION: Clean intermediate file
+    setTimeout(() => {
+      fs.unlink(backupDirComp, errFs => {
+        logs.error(`Error deleting file: ${errFs.message}`);
+      });
+    }, 15 * 60 * 1000);
 
     return {
       message: `Backup ${id}, items: ${successfulBackups.join(", ")}`,
       logMessage: true,
       userAction: true,
-      result: dataUri
+      result: fileId
     };
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
