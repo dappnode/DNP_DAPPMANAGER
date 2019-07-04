@@ -47,13 +47,13 @@ const fetchDirectory = async () => {
 
   // Extend package object contents
   dnpsCache = await Promise.all(
-    dnpsFromDirectory.map(async ({ name, status, directoryId }) => {
+    dnpsFromDirectory.map(async pkg => {
+      const name = pkg.name;
       // Now resolve the last version of the package
       const manifest = await getManifest(parse.packageReq(name));
       emitPkg({
+        ...pkg,
         name,
-        status,
-        directoryId,
         manifest
       });
 
@@ -84,9 +84,8 @@ const fetchDirectory = async () => {
 
       // Merge results and return
       return {
+        ...pkg,
         name,
-        status,
-        directoryId,
         // Appended
         manifest,
         avatar

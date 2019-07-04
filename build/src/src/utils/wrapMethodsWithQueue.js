@@ -14,9 +14,9 @@ const { promisify } = require("util");
  * }
  * @param {object} params, params for the async queue
  */
-function wrapMethodsWithQueue(methods, params) {
+function wrapMethodsWithQueue(methods, params = {}, options = {}) {
   // Parameters
-  const { times = 3, concurrency = 10, intervalBase = 225 } = params || {};
+  const { times = 3, concurrency = 10, intervalBase = 225 } = params;
 
   // create a queue object
   const q = async.queue(function(task, callback) {
@@ -47,11 +47,12 @@ function wrapMethodsWithQueue(methods, params) {
   const wrappedMethods = {};
   for (const [key, method] of Object.entries(methods)) {
     // Make sure the method is an async function
-    if (
-      typeof method !== "function" ||
-      method.constructor.name === "AsyncFunction"
-    )
-      throw Error(`Method ${key} must be a regular async function`);
+    if (!options.disableChecks)
+      if (
+        typeof method !== "function" ||
+        method.constructor.name === "AsyncFunction"
+      )
+        throw Error(`Method ${key} must be a regular async function`);
 
     // Wrap method with the queue via push task
     wrappedMethods[key] = (...args) =>
