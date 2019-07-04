@@ -21,6 +21,9 @@ require("./watchers/natRenewal");
 // Print version data
 require("./utils/getVersionData");
 
+// Start HTTP API
+require("./httpApi");
+
 /*
  * Connection configuration
  * ************************

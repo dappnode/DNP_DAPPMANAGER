@@ -16,6 +16,7 @@ async function cleanTestDir() {
   await shell(`rm -rf ${testDir}`);
 }
 async function createTestDir() {
+  await cleanTestDir();
   await shell(`mkdir -p ${testDir}`);
 }
 
