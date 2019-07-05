@@ -1,16 +1,13 @@
 const fs = require("fs");
-const db = require("db");
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
-const logs = require("logs.js")(module);
 // Modules
 const docker = require("modules/docker");
-const dockerList = require("modules/dockerList");
+// External call
+const restartPackageVolumes = require("./restartPackageVolumes");
 // Utils
-const parseManifestPorts = require("utils/parseManifestPorts");
 const getPath = require("utils/getPath");
 const shell = require("utils/shell");
-const { stringIncludes } = require("utils/strings");
 
 /**
  * Remove package data: docker down + disk files
@@ -29,46 +26,16 @@ const removePackage = async ({ id, deleteVolumes = false }) => {
   }
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    throw Error("The installer cannot be restarted");
+    throw Error("The installer cannot be removed");
   }
 
-  // CLOSE PORTS
-  // portsToClose: [ {number: 30303, type: 'UDP'}, ...]
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
-  if (!dnp) {
-    throw Error(
-      `No DNP was found for name ${id}, so its ports cannot be closed`
-    );
-  }
-  // Get manifest
-  let mappedPortsToClose = [];
-  try {
-    const manifestPath = getPath.manifest(id, params, dnp.isCore);
-    const manifestFileData = fs.readFileSync(manifestPath, "utf8");
-    const manifest = JSON.parse(manifestFileData);
-    mappedPortsToClose = parseManifestPorts(manifest);
-  } catch (e) {
-    logs.error(
-      `Error getting mappedPortsToClose from manifest of ${dnp.name}: ${
-        e.stack
-      }`
-    );
-  }
-  // Skip if there are no ports to open or if UPnP is not available
-  const upnpAvailable = await db.get("upnpAvailable");
-  // dnp.portsToClose = [ {number: 30303, type: 'UDP'}, ...] - will always be defined and an array
-  const portsToClose = [...mappedPortsToClose, ...dnp.portsToClose];
-  if (dnp.portsToClose.length && upnpAvailable) {
-    eventBus.emit(eventBusTag.call, {
-      callId: "managePorts",
-      kwargs: {
-        action: "close",
-        ports: portsToClose
-      }
-    });
-  }
+  /**
+   * [NOTE] Not necessary to close the ports since they will just
+   * not be renewed in the next interval
+   */
 
+  // Call restartPackageVolumes to safely delete dependant volumes
+  if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
   // Remove container (and) volumes
   await docker.compose.down(dockerComposePath, {
     volumes: Boolean(deleteVolumes)

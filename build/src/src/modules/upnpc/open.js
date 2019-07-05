@@ -3,20 +3,26 @@ const validateKwargs = require("./validateKwargs");
 const parseOpenOutput = require("./parseOpenOutput");
 
 /**
- * Closes port = deletes port mapping
+ * Opens port = adds port mapping
  * Actual command example:
- *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -r 500 UDP
+ * docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -a 192.168.178.31 9735 9735 TCP 7200
  *
  * @param {object} kwargs: {
- *   number: '3000',
- *   type: 'TCP',
+ *   portNumber: '3000',
+ *   protocol: 'TCP',
  * }
  * @returns {*}
  */
-async function open({ number, type }) {
-  validateKwargs({ number, type });
+
+// Timeout in seconds. Should be greater than the natRenewalInterval
+const natRenewalTimeout = 7200;
+
+async function open({ portNumber, protocol }, localIp) {
+  validateKwargs({ portNumber, protocol });
   try {
-    const res = await upnpcCommand(`-e DAppNode -r ${number} ${type}`);
+    const res = await upnpcCommand(
+      `-e DAppNode -a ${localIp} ${portNumber} ${portNumber} ${protocol} ${natRenewalTimeout}`
+    );
     return parseOpenOutput(res);
   } catch (e) {
     parseOpenOutput(e.message);

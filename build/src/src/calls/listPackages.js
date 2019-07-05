@@ -29,8 +29,8 @@ async function dockerSystemDf() {
  *   id: "923852...", {string}
  *   packageName: "DAppNodePackage-admin...", {string}
  *   version: "0.1.8", {string}
- *   isDNP: true, {bool}
- *   isCORE: false, {bool}
+ *   isDnp: true, {bool}
+ *   isCore: false, {bool}
  *   created: <data string>, {string}
  *   image: "admin.dnp.dappnode.eth-0.1.8", {string}
  *   name: "admin.dnp.dappnode.eth", {string}
@@ -52,7 +52,7 @@ async function dockerSystemDf() {
  *   origin: "/ipfs/Qmabcd...", {string}
  *   chain: "ethereum", {string}
  *   dependencies: { dependency.dnp.dappnode.eth: "0.1.8" }, {object}
- *   portsToClose: [ {number: 30303, type: 'UDP'}, ...], {array}
+ *   portsToClose: [ {portNumber: 30303, protocol: 'UDP'}, ...], {array}
  *
  *   // Appended here
  *   envs: { ENV_NAME: "ENV_VALUE" }, {object}

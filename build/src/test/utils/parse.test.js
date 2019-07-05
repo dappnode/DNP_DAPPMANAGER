@@ -71,7 +71,18 @@ describe("Util: parse", function() {
 
     it("should parse ports", () => {
       const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
-      ports.should.deep.equal(["4001", "4002"]);
+      ports.should.deep.equal([
+        {
+          container: "4001",
+          host: "4001",
+          type: "tcp"
+        },
+        {
+          container: "4002",
+          host: "4002",
+          type: "udp"
+        }
+      ]);
     });
 
     it("should parse ports when there are non", () => {

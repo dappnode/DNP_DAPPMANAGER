@@ -8,7 +8,6 @@ const logUserAction = require("./logUserAction");
 const { registerHandler } = require("./registerHandler");
 const params = require("./params");
 const db = require("./db");
-const upnpc = require("./modules/upnpc");
 const { stringIncludes } = require("utils/strings");
 
 // import calls
@@ -17,9 +16,13 @@ const calls = require("./calls");
 // Start watchers
 require("./watchers/chains");
 require("./watchers/diskUsage");
+require("./watchers/natRenewal");
 
 // Print version data
 require("./utils/getVersionData");
+
+// Start HTTP API
+require("./httpApi");
 
 /*
  * Connection configuration
@@ -207,28 +210,3 @@ connection.onclose = (reason, details) => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
-
-/**
- * Initials calls
- */
-
-/**
- * 1. Query UPnP to check if it's available
- */
-checkIfUpnpIsAvailable();
-async function checkIfUpnpIsAvailable() {
-  try {
-    const currentPortMappings = await upnpc.list();
-    logs.info("UPnP device available");
-    logs.info(
-      `currentPortMappings: ${JSON.stringify(currentPortMappings, null, 2)}`
-    );
-    await db.set("upnpAvailable", true);
-  } catch (e) {
-    if (stringIncludes((e || {}).message, "NOUPNP")) {
-      logs.info("UPnP device NOT available");
-    } else {
-      logs.error(`Error checking if UPnP device is available: ${e.stack}`);
-    }
-  }
-}

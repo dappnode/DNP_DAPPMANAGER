@@ -69,7 +69,14 @@ function containerName(dockerComposePath) {
 function dockerComposePorts(dockerComposePath) {
   const service = getUniqueDockerComposeService(dockerComposePath);
   const ports = service.ports || [];
-  return ports.map(p => p.split(":")[0]);
+  return ports.map(portString => {
+    const [portMapping, type = "tcp"] = portString.split("/");
+    const [host, container] = portMapping.split(":");
+    // HOST:CONTAINER/type, return [HOST, CONTAINER/type]
+    if (container) return { host, container, type };
+    // CONTAINER/type, return [null, CONTAINER/type]
+    else return { container: host, type };
+  });
 }
 
 function envFile(envFileData = "") {

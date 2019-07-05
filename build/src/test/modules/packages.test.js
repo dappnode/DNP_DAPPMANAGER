@@ -3,6 +3,7 @@ const chai = require("chai");
 const sinon = require("sinon");
 const getPath = require("utils/getPath");
 const params = require("params");
+const { manifestToCompose } = require("@dappnode/dnp-manifest");
 
 const expect = require("chai").expect;
 chai.use(require("sinon-chai"));
@@ -32,22 +33,6 @@ describe("Util: package install / download", () => {
   const downloadImageSpy = sinon.spy();
   const downloadImage = async (hash, path) => {
     downloadImageSpy(hash, path);
-  };
-
-  // generate .DockerCompose .Manifest
-  const generateManifestSpy = sinon.spy();
-  const generateDockerComposeSpy = sinon.spy();
-  const DockerCompose = "DockerCompose";
-  const Manifest = "Manifest";
-  const generate = {
-    manifest: dnpManifest => {
-      generateManifestSpy(dnpManifest);
-      return "Manifest";
-    },
-    dockerCompose: dnpManifest => {
-      generateDockerComposeSpy(dnpManifest);
-      return DockerCompose;
-    }
   };
 
   // docker .load .compose.up
@@ -87,83 +72,62 @@ describe("Util: package install / download", () => {
   const { download, load, run } = proxyquire("modules/packages", {
     "modules/downloadImage": downloadImage,
     "modules/docker": docker,
-    "utils/generate": generate,
     "utils/validate": validate,
     fs: fs,
     params: params
   });
 
-  describe(".download", () => {
-    download({
+  it("Should .download", async () => {
+    await download({
       pkg: {
         name: PACKAGE_NAME,
         manifest: dnpManifest
       }
     });
 
-    // downloadImageSpy - IMAGE_HASH, IMAGE_PATH
-    it("ipfs.download should be called with IMAGE_HASH, IMAGE_PATH", () => {
-      sinon.assert.calledWith(downloadImageSpy, IMAGE_HASH, IMAGE_PATH);
-    });
+    expect(downloadImageSpy.getCall(0).args).to.deep.equal(
+      [IMAGE_HASH, IMAGE_PATH],
+      "ipfs.download should be called with IMAGE_HASH, IMAGE_PATH"
+    );
   });
 
-  describe(".load", () => {
-    load({
+  it("Should .load", async () => {
+    await load({
       pkg: {
         name: PACKAGE_NAME,
         manifest: dnpManifest
       }
     });
 
-    // generateManifestSpy - dnpManifest
-    it("generate.Manifest should be called with dnpManifest", () => {
-      sinon.assert.calledWith(generateManifestSpy, dnpManifest);
-    });
-
-    // generateDockerComposeSpy - dnpManifest
-    it("generate.DockerCompose should be called with dnpManifest", () => {
-      expect(generateDockerComposeSpy.getCalls()[0].args).to.deep.equal([
-        dnpManifest
-      ]);
-    });
-
-    // fsWriteFileSpy - DockerCompose, DOCKERCOMPOSE_PATH
-    it("fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH", () => {
-      expect(fsWriteFileSpy.getCalls()[0].args).to.deep.equal([
-        MANIFEST_PATH,
-        Manifest
-      ]);
-    });
-
-    it("fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH", () => {
-      expect(fsWriteFileSpy.getCalls()[1].args).to.deep.equal([
-        DOCKERCOMPOSE_PATH,
-        DockerCompose
-      ]);
-    });
-
-    it("docker.load should be called with IMAGE_PATH", () => {
-      expect(dockerLoadSpy.getCalls()[0].args).to.deep.equal([IMAGE_PATH]);
-    });
-
-    it("fs.unlink promisified should be called with IMAGE_PATH", () => {
-      expect(fsUnlinkSpy.getCalls()[0].args).to.deep.equal([IMAGE_PATH]);
-    });
+    expect(fsWriteFileSpy.getCalls()[0].args).to.deep.equal(
+      [MANIFEST_PATH, JSON.stringify(dnpManifest, null, 2)],
+      "fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH"
+    );
+    expect(fsWriteFileSpy.getCalls()[1].args).to.deep.equal(
+      [DOCKERCOMPOSE_PATH, manifestToCompose(dnpManifest)],
+      "fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH"
+    );
+    expect(dockerLoadSpy.getCalls()[0].args).to.deep.equal(
+      [IMAGE_PATH],
+      "docker.load should be called with IMAGE_PATH"
+    );
+    expect(fsUnlinkSpy.getCalls()[0].args).to.deep.equal(
+      [IMAGE_PATH],
+      "fs.unlink promisified should be called with IMAGE_PATH"
+    );
   });
 
-  describe(".run", () => {
-    run({
+  it("Should .run", async () => {
+    await run({
       pkg: {
         name: PACKAGE_NAME,
         manifest: dnpManifest
       }
     });
 
-    // generateDockerComposeSpy - dnpManifest
-    it("docker.compose.up should be called with DOCKERCOMPOSE_PATH", () => {
-      expect(dockerComposeUpSpy.getCalls()[0].args).to.deep.equal([
-        DOCKERCOMPOSE_PATH
-      ]);
-    });
+    expect(dockerComposeUpSpy.getCalls()[0].args).to.deep.equal(
+      [DOCKERCOMPOSE_PATH],
+      "docker.compose.up should be called with DOCKERCOMPOSE_PATH"
+    );
   });
 });

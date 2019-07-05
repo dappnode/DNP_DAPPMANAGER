@@ -22,7 +22,7 @@ FROM node:10.15.3-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.20.1
 
-RUN apk add --no-cache curl bind-dev xz libltdl zip
+RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip
 
 RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
     ALPINE_GLIBC_PACKAGE_VERSION="2.28-r0" && \
@@ -69,7 +69,7 @@ COPY build/entrypoint.sh .
 COPY build/dns_updater.sh /etc/periodic/1min/dns_updater
 RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
 
-# Copy the src the last as it's the more likely layer to change
+# Copy the src last as it's the layer most likely to change
 COPY --from=build /usr/src/app /usr/src/app
 
 ENTRYPOINT /usr/src/app/entrypoint.sh
