@@ -24,6 +24,16 @@ require("./utils/getVersionData");
 // Start HTTP API
 require("./httpApi");
 
+// Initial calls to check this DAppNode's status
+const passwordIsSecure = require("./calls/passwordIsSecure");
+passwordIsSecure()
+  .then(({ result }) => {
+    logs.info("Host user password is " + (result ? "secure" : "INSECURE"));
+  })
+  .catch(e => {
+    logs.error(`Error checking if host user password is secure: ${e.message}`);
+  });
+
 /*
  * Connection configuration
  * ************************
