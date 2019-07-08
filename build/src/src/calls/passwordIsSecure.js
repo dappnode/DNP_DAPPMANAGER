@@ -1,7 +1,6 @@
-const db = require("db");
 const { isPasswordSecure } = require("modules/passwordManager");
 
-const IS_PASSWORD_SECURE = "is-password-secure";
+let isSecureCache = false;
 
 /**
  * Checks if the user `dappnode`'s password in the host machine
@@ -17,17 +16,11 @@ const IS_PASSWORD_SECURE = "is-password-secure";
  * @returns {bool} true = is secure / false = is not
  */
 const passwordIsSecure = async () => {
-  let isSecure;
-  isSecure = await db.get(IS_PASSWORD_SECURE);
-
-  if (!isSecure) {
-    isSecure = await isPasswordSecure();
-    await db.set(IS_PASSWORD_SECURE, isSecure);
-  }
+  if (!isSecureCache) isSecureCache = await isPasswordSecure();
 
   return {
     message: `Checked if password is secure`,
-    result: isSecure
+    result: isSecureCache
   };
 };
 

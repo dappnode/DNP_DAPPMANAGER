@@ -26,10 +26,20 @@ async function getDappmanagerImage() {
  */
 async function isPasswordSecure() {
   const image = await getDappmanagerImage();
-  const res = await shell(
-    `${baseCommand} ${image} sh -c "grep dappnode:.*${insecureSalt} /etc/shadow"`
-  );
-  return !res;
+  try {
+    const res = await shell(
+      `${baseCommand} ${image} sh -c "grep dappnode:.*${insecureSalt} /etc/shadow"`
+    );
+    return !res;
+  } catch (e) {
+    /**
+     * From the man grep page:
+     * The exit status is 0 if selected lines are found and 1 otherwise
+     * The exit status is 2 if an error occurred
+     */
+    if (e.code == 1) return true;
+    else throw e;
+  }
 }
 
 /**

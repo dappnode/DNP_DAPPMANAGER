@@ -5,7 +5,7 @@ const autobahn = require("autobahn");
 const { eventBus, eventBusTag } = require("./eventBus");
 const logs = require("./logs")(module);
 const logUserAction = require("./logUserAction");
-const { registerHandler, wrapErrors } = require("./registerHandler");
+const { registerHandler } = require("./registerHandler");
 const params = require("./params");
 const db = require("./db");
 const { stringIncludes } = require("utils/strings");
@@ -25,10 +25,14 @@ require("./utils/getVersionData");
 require("./httpApi");
 
 // Initial calls to check this DAppNode's status
-wrapErrors(calls.passwordIsSecure, "passwordIsSecure")().then(res => {
-  if (res.success)
-    logs.info("Host user password is " + (res.result ? "secure" : "INSECURE"));
-});
+const passwordIsSecure = require("./calls/passwordIsSecure");
+passwordIsSecure()
+  .then(({ result }) => {
+    logs.info("Host user password is " + (result ? "secure" : "INSECURE"));
+  })
+  .catch(e => {
+    logs.error(`Error checking if host user password is secure: ${e.message}`);
+  });
 
 /*
  * Connection configuration
