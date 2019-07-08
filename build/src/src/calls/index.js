@@ -32,6 +32,8 @@ module.exports = {
   resolveRequest: require("./resolveRequest"),
   restartPackage: require("./restartPackage"),
   restartPackageVolumes: require("./restartPackageVolumes"),
+  sshPasswordChange: require("./sshPasswordChange"),
+  sshPasswordIsSecure: require("./sshPasswordIsSecure"),
   togglePackage: require("./togglePackage"),
   updatePackageEnv: require("./updatePackageEnv")
 };
