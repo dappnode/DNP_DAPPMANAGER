@@ -1,4 +1,6 @@
 const { changeSshPassword } = require("modules/sshPassword");
+// External calls
+const sshPasswordIsSecure = require("./sshPasswordIsSecure");
 
 /**
  * Changes the SSH password of the host for the user `dappnode`
@@ -7,7 +9,12 @@ const { changeSshPassword } = require("modules/sshPassword");
  * @param {string} newPassword super-secure-password
  */
 const sshPasswordChange = async ({ newPassword }) => {
+  if (!newPassword) throw Error("Argument newPassword must be defined");
+
   await changeSshPassword(newPassword);
+
+  // Update the DB "is-ssh-password-secure" check
+  await sshPasswordIsSecure();
 
   return {
     message: `Changed SSH password`,

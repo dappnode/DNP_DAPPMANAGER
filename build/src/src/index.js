@@ -5,7 +5,7 @@ const autobahn = require("autobahn");
 const { eventBus, eventBusTag } = require("./eventBus");
 const logs = require("./logs")(module);
 const logUserAction = require("./logUserAction");
-const { registerHandler } = require("./registerHandler");
+const { registerHandler, wrapErrors } = require("./registerHandler");
 const params = require("./params");
 const db = require("./db");
 const { stringIncludes } = require("utils/strings");
@@ -23,6 +23,12 @@ require("./utils/getVersionData");
 
 // Start HTTP API
 require("./httpApi");
+
+// Initial calls to check this DAppNode's status
+wrapErrors(calls.sshPasswordIsSecure, "sshPasswordIsSecure")().then(res => {
+  if (res.success)
+    logs.info("SSH password is " + (res.result ? "secure" : "INSECURE"));
+});
 
 /*
  * Connection configuration
