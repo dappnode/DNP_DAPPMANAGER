@@ -25,9 +25,9 @@ require("./utils/getVersionData");
 require("./httpApi");
 
 // Initial calls to check this DAppNode's status
-wrapErrors(calls.sshPasswordIsSecure, "sshPasswordIsSecure")().then(res => {
+wrapErrors(calls.passwordIsSecure, "passwordIsSecure")().then(res => {
   if (res.success)
-    logs.info("SSH password is " + (res.result ? "secure" : "INSECURE"));
+    logs.info("Host user password is " + (res.result ? "secure" : "INSECURE"));
 });
 
 /*

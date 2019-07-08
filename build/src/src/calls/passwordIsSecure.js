@@ -1,10 +1,10 @@
 const db = require("db");
-const { isSshPasswordSecure } = require("modules/sshPassword");
+const { isPasswordSecure } = require("modules/passwordManager");
 
-const IS_SSH_PASSWORD_SECURE = "is-ssh-password-secure";
+const IS_PASSWORD_SECURE = "is-password-secure";
 
 /**
- * Checks if the SSH password of the host for the user `dappnode`
+ * Checks if the user `dappnode`'s password in the host machine
  * is NOT the insecure default set at installation time.
  * It does so by checking if the current salt is `insecur3`
  *
@@ -16,19 +16,19 @@ const IS_SSH_PASSWORD_SECURE = "is-ssh-password-secure";
  *
  * @returns {bool} true = is secure / false = is not
  */
-const sshPasswordIsSecure = async () => {
+const passwordIsSecure = async () => {
   let isSecure;
-  isSecure = await db.get(IS_SSH_PASSWORD_SECURE);
+  isSecure = await db.get(IS_PASSWORD_SECURE);
 
   if (!isSecure) {
-    isSecure = await isSshPasswordSecure();
-    await db.set(IS_SSH_PASSWORD_SECURE, isSecure);
+    isSecure = await isPasswordSecure();
+    await db.set(IS_PASSWORD_SECURE, isSecure);
   }
 
   return {
-    message: `Checked if SSH password is secure`,
+    message: `Checked if password is secure`,
     result: isSecure
   };
 };
 
-module.exports = sshPasswordIsSecure;
+module.exports = passwordIsSecure;

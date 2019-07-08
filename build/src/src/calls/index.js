@@ -27,13 +27,13 @@ module.exports = {
   notificationsGet: require("./notificationsGet"),
   notificationsRemove: require("./notificationsRemove"),
   notificationsTest: require("./notificationsTest"),
+  passwordChange: require("./passwordChange"),
+  passwordIsSecure: require("./passwordIsSecure"),
   removePackage: require("./removePackage"),
   requestChainData: require("./requestChainData"),
   resolveRequest: require("./resolveRequest"),
   restartPackage: require("./restartPackage"),
   restartPackageVolumes: require("./restartPackageVolumes"),
-  sshPasswordChange: require("./sshPasswordChange"),
-  sshPasswordIsSecure: require("./sshPasswordIsSecure"),
   togglePackage: require("./togglePackage"),
   updatePackageEnv: require("./updatePackageEnv")
 };
