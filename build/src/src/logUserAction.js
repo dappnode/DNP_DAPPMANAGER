@@ -62,6 +62,17 @@ const onlyUserAction = format(info => {
 });
 
 /**
+ * Private fields
+ */
+const privateFields = format(info => {
+  const _info = Object.assign({}, info);
+  if (_info.privateKwargs && _info.kwargs && typeof _info.kwargs === "object")
+    for (const key of Object.keys(_info.kwargs)) _info.kwargs[key] = "********";
+  delete _info.privateKwargs;
+  return _info;
+});
+
+/**
  * Limit the length of objects.
  * RPC calls like copyTo may content really big dataUrls as kwargs,
  * prevent them from cluttering the userActionLogs file
@@ -85,6 +96,7 @@ const logger = createLogger({
   ],
   format: format.combine(
     onlyUserAction(),
+    privateFields(),
     limitLength(),
     format.timestamp(),
     format.json()
