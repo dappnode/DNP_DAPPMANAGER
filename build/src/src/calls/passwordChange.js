@@ -19,7 +19,8 @@ const passwordChange = async ({ newPassword }) => {
   return {
     message: `Changed password`,
     logMessage: true,
-    userAction: true
+    userAction: true,
+    privateKwargs: true
   };
 };
 
