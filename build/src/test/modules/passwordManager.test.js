@@ -34,7 +34,7 @@ describe("Module > passwordManager", () => {
     const newPassword = "secret-password";
     await changePassword(newPassword);
     expect(lastCmd).to.equal(
-      `docker run --rm -v /etc:/etc --privileged --entrypoint="" dappmanager.dnp.dappnode.eth:0.2.0 sh -c "echo dappnode:${newPassword} | chpasswd"`
+      `docker run --rm -v /etc:/etc --privileged --entrypoint="" dappmanager.dnp.dappnode.eth:0.2.0 sh -c "echo 'dappnode:${newPassword}' | chpasswd"`
     );
   });
 
