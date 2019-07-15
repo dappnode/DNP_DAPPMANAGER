@@ -62,7 +62,7 @@ async function changePassword(newPassword) {
 
   const image = await getDappmanagerImage();
   const res = await shell(
-    `${baseCommand} ${image} sh -c "echo 'dappnode:${newPassword}' | chpasswd"`
+    `${baseCommand} -e PASS='${newPassword}' ${image} sh -c 'echo dappnode:$PASS | chpasswd'`
   );
 
   // Check the return for success? #### TODO
