@@ -52,8 +52,19 @@ async function changePassword(newPassword) {
   if (!newPassword) throw Error("newPassword must be defined");
   if (typeof newPassword !== "string")
     throw Error("newPassword must be a string");
+
+  /**
+   * Make sure the password is OK:
+   * - Is longer than 8 characters, for security
+   * - Does not contain the `'` character, which would break the command
+   * - Does not contain non-ascii characters which may cause trouble in the command
+   */
   if (newPassword.length < 8)
     throw Error("password length must be at least 8 characters");
+  if (!/^((?!['])[\x20-\x7F])*$/.test(newPassword))
+    throw Error(
+      `Password must contain only ASCII characters and not the ' character`
+    );
 
   if (await isPasswordSecure())
     throw Error(
