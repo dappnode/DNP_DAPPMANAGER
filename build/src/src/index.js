@@ -14,6 +14,7 @@ const { stringIncludes } = require("utils/strings");
 const calls = require("./calls");
 
 // Start watchers
+require("./watchers/autoUpdates");
 require("./watchers/chains");
 require("./watchers/diskUsage");
 require("./watchers/natRenewal");
