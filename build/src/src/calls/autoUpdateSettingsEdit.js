@@ -1,32 +1,27 @@
-const autoUpdateHelper = require("utils/autoUpdateHelper");
+const {
+  MY_PACKAGES, // "my-packages"
+  SYSTEM_PACKAGES, // "system-packages"
+  editDnpSetting,
+  editCoreSetting
+} = require("utils/autoUpdateHelper");
 
 /**
  * Edits the auto-update settings
  *
  * @param {string} id = "bitcoin.dnp.dappnode.eth"
- * @param {bool} generalSettings Edit the general settings
- * @param {bool} applyToAll Reset all DNP individual settings
- * @param {object} settings = { major: false, minor: false, patch: true }
+ * @param {bool} active Auto update is active for ID
  */
-const autoUpdateSettingsEdit = async ({
-  id,
-  generalSettings,
-  applyToAll,
-  settings
-}) => {
-  if (!id && !generalSettings)
+const autoUpdateSettingsEdit = async ({ id, active }) => {
+  if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
-  if (!settings) throw Error(`Argument settings must be defined`);
 
-  if (generalSettings) {
-    if (applyToAll) await autoUpdateHelper.resetDnpsSettings();
-    await autoUpdateHelper.editGeneralSettings(settings);
-  } else {
-    await autoUpdateHelper.editDnpSettings(id, settings);
-  }
+  if (id === MY_PACKAGES) await editDnpSetting(active);
+  else if (id === SYSTEM_PACKAGES) await editCoreSetting(active);
+  else throw Error(`id must be ${MY_PACKAGES} or ${SYSTEM_PACKAGES}: ${id}`);
 
+  const name = (id || "").replace("-", " ");
   return {
-    message: `Edited auto update settings for ${id}`,
+    message: `${active ? "Enabled" : "Disabled"} auto updates for ${name}`,
     logMessage: true,
     userAction: true
   };

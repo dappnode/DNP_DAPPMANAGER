@@ -1,11 +1,11 @@
 const db = require("db");
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
 
-const AUTO_UPDATE_SETTINGS = "auto-update-settings";
+// Groups of packages keys
 const MY_PACKAGES = "my-packages";
-const validSettings = ["off", "patch", "minor"];
-const validCoreSettings = ["off", "patch"];
-const coreName = "core.dnp.dappnode.eth";
+const SYSTEM_PACKAGES = "system-packages";
+// Db keys
+const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 
 /**
  * Checks the local DB for user settings, to decide if an update is allowed
@@ -14,23 +14,24 @@ const coreName = "core.dnp.dappnode.eth";
  * @param {string} from "0.2.0"
  * @param {string} to "0.2.1"
  */
-async function isUpdateAllowed(name, from, to) {
+async function isUpdateAllowed(id, from, to) {
   const autoUpdateSettings = await getSettings();
 
-  // Compute the update type
+  // Check if autoupdates are allowed for this id
+  if (!autoUpdateSettings[id]) return false;
+
+  // Compute the update type: "major", "minor", "patch"
   const updateType = computeSemverUpdateType(from, to);
   if (!updateType) return false;
 
-  // Check if the update type is allowed
-  if (name === coreName) {
-    // For the core / system packages, only patch is allowed
-    return updateType === "patch" && autoUpdateSettings[name] === "patch";
-  } else {
-    const setting = autoUpdateSettings[name] || autoUpdateSettings[MY_PACKAGES];
-    const allowedIndex = validSettings.indexOf(setting);
-    const requestedIndex = validSettings.indexOf(updateType);
-    return requestedIndex > 0 && allowedIndex >= requestedIndex;
-  }
+  // My packages are allowed to be updated for "minor" and "patch"
+  if (id === MY_PACKAGES)
+    return updateType === "minor" || updateType === "patch";
+
+  // System packages are only allowed to be updated for "patch"
+  if (id === SYSTEM_PACKAGES) return updateType === "patch";
+
+  throw Error(`Unknown id ${id}`);
 }
 
 /**
@@ -56,44 +57,59 @@ async function getSettings() {
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {object} settings = "patch"
  */
-async function editDnpSettings(name, setting) {
-  const autoUpdateSettings = await getSettings();
+async function editSettings(id, active) {
+  if (id !== MY_PACKAGES && id !== SYSTEM_PACKAGES)
+    throw Error(`id must be ${MY_PACKAGES} or ${SYSTEM_PACKAGES}: ${id}`);
 
-  if (name === coreName && !validCoreSettings.includes(setting))
-    throw Error(`Invalid core key in update settings: ${setting}`);
-  if (!validSettings.includes(setting))
-    throw Error(`Invalid key in update settings: ${setting}`);
+  const autoUpdateSettings = await getSettings();
 
   await db.set(AUTO_UPDATE_SETTINGS, {
     ...autoUpdateSettings,
-    [name]: setting
+    [id]: active
   });
 }
 
 /**
- * Edit auto update settings that apply to ALL DNPs
- * @param {object} settings = "any"
+ * Shortcuts to prevent naming errors
  */
-async function editGeneralSettings(setting) {
-  await editDnpSettings(MY_PACKAGES, setting);
+
+async function editDnpSetting(active) {
+  return await editSettings(MY_PACKAGES, active);
 }
 
-/**
- * Reset the auto update settings of no-core packages to no setting
- */
-async function resetDnpsSettings() {
-  const autoUpdateSettings = await getSettings();
-  const coreSetting = autoUpdateSettings[coreName];
-  await db.set(
-    AUTO_UPDATE_SETTINGS,
-    coreSetting ? { [coreName]: coreSetting } : {}
-  );
+async function editCoreSetting(active) {
+  return await editSettings(SYSTEM_PACKAGES, active);
+}
+
+async function isDnpUpdateAllowed(from, to) {
+  return await isUpdateAllowed(MY_PACKAGES, from, to);
+}
+
+async function isCoreUpdateAllowed(from, to) {
+  return await isUpdateAllowed(SYSTEM_PACKAGES, from, to);
+}
+
+async function isDnpUpdateEnabled() {
+  return (await getSettings())[MY_PACKAGES] || false;
+}
+
+async function isCoreUpdateEnabled() {
+  return (await getSettings())[SYSTEM_PACKAGES] || false;
 }
 
 module.exports = {
-  isUpdateAllowed,
-  editDnpSettings,
-  editGeneralSettings,
-  resetDnpsSettings,
-  getSettings
+  // DNPs / my-packages
+  editDnpSetting,
+  isDnpUpdateEnabled,
+  isDnpUpdateAllowed,
+  // Core / system-packages
+  editCoreSetting,
+  isCoreUpdateEnabled,
+  isCoreUpdateAllowed,
+  editSettings,
+  getSettings,
+  // String constants
+  MY_PACKAGES,
+  SYSTEM_PACKAGES,
+  AUTO_UPDATE_SETTINGS
 };
