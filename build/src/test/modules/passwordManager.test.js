@@ -58,4 +58,25 @@ describe("Module > passwordManager", () => {
       `The password can only be changed if it's the insecure default`
     );
   });
+
+  it("Should block changing the password if the input contains problematic characters", async () => {
+    const { changePassword } = proxyquire("modules/passwordManager", {
+      "utils/shell": async cmd => {
+        if (cmd === checkImageCmd) return image;
+        if (cmd == grepCommand) return passwordHash;
+        throw Error(`Unknown command ${cmd}`);
+      }
+    });
+
+    let errorMessage = "---did not throw---";
+    try {
+      await changePassword("password'ops");
+    } catch (e) {
+      errorMessage = e.message;
+    }
+
+    expect(errorMessage).to.equal(
+      `Password must contain only ASCII characters and not the ' character`
+    );
+  });
 });
