@@ -236,12 +236,38 @@ const getRepoVersions = async (packageReq, verReq) => {
   return versions;
 };
 
+/**
+ * Fetches the latest version of a DNP
+ * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
+ * @returns {string} latestVersion = "0.2.4"
+ */
+async function getLatestSemver(packageReq) {
+  if (!packageReq || typeof packageReq !== "object") {
+    throw Error("Wrong packageReq: " + packageReq);
+  }
+  if (!packageReq.name) {
+    throw Error("packageReq must contain a name property: " + packageReq);
+  }
+
+  const { name } = packageReq;
+  validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
+
+  const repo = await getRepoContract(name, web3);
+  if (!repo) {
+    throw Error(`Resolver could not find a match for ${name}`);
+  }
+
+  const res = await repo.methods.getLatest().call();
+  return res.semanticVersion.join(".");
+}
+
 module.exports = {
   repoExists,
   getRepoVersions,
   getRepoHash,
   getRepoContract,
   getLatestVersion,
+  getLatestSemver,
   getSemanticVersion,
   getLatestWithVersion
 };

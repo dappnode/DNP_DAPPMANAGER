@@ -5,6 +5,8 @@
  */
 
 module.exports = {
+  autoUpdateSettingsEdit: require("./autoUpdateSettingsEdit"),
+  autoUpdateSettingsGet: require("./autoUpdateSettingsGet"),
   backupGet: require("./backupGet"),
   backupRestore: require("./backupRestore"),
   changeIpfsTimeout: require("./changeIpfsTimeout"),
