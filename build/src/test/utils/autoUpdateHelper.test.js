@@ -12,6 +12,7 @@ const {
   // To keep a registry of performed updates
   updateRegistry,
   getRegistry,
+  removeRegistryEntry,
   // String constants
   AUTO_UPDATE_SETTINGS,
   AUTO_UPDATE_REGISTRY
@@ -60,18 +61,42 @@ describe("Util: autoUpdateHelper", () => {
     expect(await isCoreUpdateEnabled()).to.equal(false, "After disabling");
   });
 
-  it("Should add a registry and query it", async () => {
-    const version1 = "0.2.5";
-    const version2 = "0.2.6";
-    const timestamp = 1563373272397;
-    await updateRegistry({ name, version: version1, timestamp });
-    await updateRegistry({ name, version: version2, timestamp });
-    const registry = await getRegistry();
-    expect(registry).to.deep.equal({
-      [name]: [
-        { version: version1, timestamp },
-        { version: version2, timestamp }
-      ]
+  describe("Auto update registry", () => {
+    it("Should add a registry and query it", async () => {
+      const version1 = "0.2.5";
+      const version2 = "0.2.6";
+      const timestamp = 1563373272397;
+      await updateRegistry({ name, version: version1, timestamp });
+      await updateRegistry({ name, version: version2, timestamp });
+      const registry = await getRegistry();
+      expect(registry).to.deep.equal({
+        [name]: [
+          { version: version1, timestamp },
+          { version: version2, timestamp }
+        ]
+      });
+    });
+
+    it("Should remove an registry entry", async () => {
+      // removeRegistryEntry;
+
+      const version = "0.2.6";
+      const timestamp = 1563373272397;
+      const registryEntry = { name, version, timestamp };
+      await updateRegistry(registryEntry);
+
+      expect(await getRegistry()).to.deep.equal(
+        { [name]: [{ version, timestamp }] },
+        "Should have one entry"
+      );
+
+      // Remove entry
+      await removeRegistryEntry(registryEntry);
+
+      expect(await getRegistry()).to.deep.equal(
+        { [name]: [] },
+        "Entry should had been removed"
+      );
     });
   });
 
