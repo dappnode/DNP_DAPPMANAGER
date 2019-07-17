@@ -5,6 +5,7 @@
  */
 
 module.exports = {
+  autoUpdateRegistryGet: require("./autoUpdateRegistryGet"),
   autoUpdateSettingsEdit: require("./autoUpdateSettingsEdit"),
   autoUpdateSettingsGet: require("./autoUpdateSettingsGet"),
   backupGet: require("./backupGet"),

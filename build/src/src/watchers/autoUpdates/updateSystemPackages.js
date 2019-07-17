@@ -4,7 +4,10 @@ const parse = require("utils/parse");
 const apm = require("modules/apm");
 const logs = require("logs.js")(module);
 const dappGet = require("modules/dappGet");
+const { eventBus, eventBusTag } = require("eventBus");
+// Utils
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
+const { updateRegistry } = require("utils/autoUpdateHelper");
 // External calls
 const installPackage = require("calls/installPackage");
 
@@ -14,16 +17,25 @@ const coreDnpName = "core.dnp.dappnode.eth";
  * Only `patch` updates are allowed
  */
 
+let latestVersionCache;
+
 async function isCoreUpdateAllowed() {
   const dnpList = await dockerList.listContainers();
+
+  /**
+   * Cache the last version to avoid running additional tasks
+   */
+  const latestVersion = await apm.getLatestSemver(
+    parse.packageReq(coreDnpName)
+  );
+  if (!latestVersion || latestVersionCache === latestVersion) return false;
+  latestVersionCache = latestVersion;
+
   const coreDnp = dnpList.find(dnp => dnp.name === coreDnpName);
   if (coreDnp && semver.valid(coreDnp.version)) {
     /**
      * If core.dnp.dappnode.eth, use it to figure out the version
      */
-    const latestVersion = await apm.getLatestSemver(
-      parse.packageReq(coreDnpName)
-    );
     const updateType = computeSemverUpdateType(coreDnp.version, latestVersion);
     return updateType === "patch";
   } else {
@@ -59,6 +71,9 @@ async function updateSystemPackages() {
       options: { BYPASS_RESOLVER: true }
     });
     logs.info(`Successfully auto-updated system packages`);
+    await updateRegistry({ name: coreDnpName, version: latestVersionCache });
+    // Update the UI dynamically of the new successful auto-update
+    eventBus.emit(eventBusTag.emitUpdateRegistry);
   }
 }
 
