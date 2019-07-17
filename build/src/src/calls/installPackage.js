@@ -206,6 +206,9 @@ const installPackage = async ({
         `Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`
       );
     }
+
+    // Instruct the UI to clear isInstalling logs
+    logUi({ id, clear: true });
   }
 
   // Emit packages update

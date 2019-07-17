@@ -17,6 +17,7 @@ const eventBus = new MyEmitter();
 const eventBusTag = {
   emitDirectory: "EMIT_DIRECTORY",
   emitPackages: "EMIT_PACKAGES",
+  emitUpdateRegistry: "EMIT_UPDATE_REGISTRY",
   logUi: "EVENT_BUS_LOGUI",
   call: "INTERNAL_CALL",
   logUserAction: "EVENT_BUS_LOGUSERACTION",

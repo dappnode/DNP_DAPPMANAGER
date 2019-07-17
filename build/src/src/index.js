@@ -14,6 +14,7 @@ const { stringIncludes } = require("utils/strings");
 const calls = require("./calls");
 
 // Start watchers
+require("./watchers/autoUpdates");
 require("./watchers/chains");
 require("./watchers/diskUsage");
 require("./watchers/natRenewal");
@@ -152,6 +153,16 @@ connection.onopen = (session, details) => {
     publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
+  // Emits the registry of successful auto updates
+  eventBus.onSafe(
+    eventBusTag.emitUpdateRegistry,
+    async () => {
+      const registry = (await calls.autoUpdateRegistryGet()).result;
+      publish("autoUpdateRegistry.dappmanager.dnp.dappnode.eth", registry);
+    },
+    { isAsync: true }
+  );
+
   /**
    * Emit progress logs to the ADMIN UI
    * @param {object} logData = {
@@ -163,7 +174,7 @@ connection.onopen = (session, details) => {
   eventBus.onSafe(eventBusTag.logUi, logData => {
     publish("log.dappmanager.dnp.dappnode.eth", logData);
     // Also, log them internally. But skip download progress logs, too spam-y
-    if (!stringIncludes((logData || {}).message, "%")) {
+    if (!stringIncludes((logData || {}).message, "%") && !logData.clear) {
       logs.info(JSON.stringify(logData));
     }
   });
