@@ -8,20 +8,20 @@ const {
 /**
  * Edits the auto-update settings
  *
- * @param {string} id = "bitcoin.dnp.dappnode.eth"
- * @param {bool} active Auto update is active for ID
+ * @param {string} id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
+ * @param {bool} enabled Auto update is enabled for ID
  */
-const autoUpdateSettingsEdit = async ({ id, active }) => {
+const autoUpdateSettingsEdit = async ({ id, enabled }) => {
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 
-  if (id === MY_PACKAGES) await editDnpSetting(active);
-  else if (id === SYSTEM_PACKAGES) await editCoreSetting(active);
-  else throw Error(`id must be ${MY_PACKAGES} or ${SYSTEM_PACKAGES}: ${id}`);
+  if (id === MY_PACKAGES) await editDnpSetting(enabled);
+  else if (id === SYSTEM_PACKAGES) await editCoreSetting(enabled);
+  else await editDnpSetting(enabled, id);
 
-  const name = (id || "").replace("-", " ");
+  const name = ((id || "").split(".")[0] || "").replace("-", " ");
   return {
-    message: `${active ? "Enabled" : "Disabled"} auto updates for ${name}`,
+    message: `${enabled ? "Enabled" : "Disabled"} auto updates for ${name}`,
     logMessage: true,
     userAction: true
   };
