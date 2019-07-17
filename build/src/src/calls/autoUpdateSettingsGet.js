@@ -3,9 +3,16 @@ const autoUpdateHelper = require("utils/autoUpdateHelper");
 /**
  * Get current auto-update settings
  *
+ * - "system-packages" = if the update is enabled
+ * - "my-packages" = an object, means the default settings is update enabled
+ * - "my-packages"["bitcoin.dnp.dappnode.eth"] = true, means that the
+ *   update is NOT enabled
+ *
  * @returns {object} autoUpdateSettings = {
- *   "any": { major: false, minor: false, patch: true },
- *   "bitcoin.dnp.dappnode.eth": { major: false, minor: true, patch: true }
+ *   "system-packages": true
+ *   "my-packages": {
+ *     "bitcoin.dnp.dappnode.eth": true
+ *   }
  * }
  */
 const autoUpdateSettingsGet = async () => {
