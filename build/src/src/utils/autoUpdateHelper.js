@@ -125,6 +125,17 @@ async function updateRegistry({ name, version, timestamp }) {
   });
 }
 
+async function removeRegistryEntry({ name, version, timestamp }) {
+  const registry = await getRegistry();
+  if (!Array.isArray(registry[name])) return;
+  await db.set(AUTO_UPDATE_REGISTRY, {
+    ...registry,
+    [name]: registry[name].filter(
+      entry => entry.version !== version && entry.timestamp !== timestamp
+    )
+  });
+}
+
 /**
  * Returns a registry of successfully completed auto-updates
  *
@@ -155,6 +166,7 @@ module.exports = {
   // To keep a registry of performed updates
   updateRegistry,
   getRegistry,
+  removeRegistryEntry,
   // String constants
   MY_PACKAGES,
   SYSTEM_PACKAGES,

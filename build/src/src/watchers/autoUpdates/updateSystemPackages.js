@@ -7,7 +7,10 @@ const dappGet = require("modules/dappGet");
 const { eventBus, eventBusTag } = require("eventBus");
 // Utils
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
-const { updateRegistry } = require("utils/autoUpdateHelper");
+const {
+  updateRegistry,
+  removeRegistryEntry
+} = require("utils/autoUpdateHelper");
 // External calls
 const installPackage = require("calls/installPackage");
 
@@ -66,14 +69,31 @@ async function isCoreUpdateAllowed() {
 async function updateSystemPackages() {
   if (await isCoreUpdateAllowed()) {
     logs.info(`Auto-updating system packages...`);
-    await installPackage({
-      id: coreDnpName,
-      options: { BYPASS_RESOLVER: true }
-    });
-    logs.info(`Successfully auto-updated system packages`);
-    await updateRegistry({ name: coreDnpName, version: latestVersionCache });
-    // Update the UI dynamically of the new successful auto-update
-    eventBus.emit(eventBusTag.emitUpdateRegistry);
+
+    /**
+     * If the DAPPMANAGER is updated the updateRegistry will never be executed.
+     * Add it preventively, and then remove it if the update errors
+     */
+    const registryEntry = {
+      name: coreDnpName,
+      version: latestVersionCache,
+      timestamp: Date.now()
+    };
+    await updateRegistry(registryEntry);
+
+    try {
+      await installPackage({
+        id: coreDnpName,
+        options: { BYPASS_RESOLVER: true }
+      });
+      logs.info(`Successfully auto-updated system packages`);
+      // Update the UI dynamically of the new successful auto-update
+      eventBus.emit(eventBusTag.emitUpdateRegistry);
+    } catch (e) {
+      // Remove the log and throw
+      await removeRegistryEntry(registryEntry);
+      throw e;
+    }
   }
 }
 
