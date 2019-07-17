@@ -5,6 +5,7 @@ const MY_PACKAGES = "my-packages";
 const SYSTEM_PACKAGES = "system-packages";
 // Db keys
 const AUTO_UPDATE_SETTINGS = "auto-update-settings";
+const AUTO_UPDATE_REGISTRY = "auto-update-registry";
 
 /**
  * Get current auto-update settings
@@ -107,6 +108,42 @@ async function isCoreUpdateEnabled() {
   return (await getSettings())[SYSTEM_PACKAGES] || false;
 }
 
+/**
+ * Adds an entry to the auto-update registry
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} version "0.2.5"
+ */
+async function updateRegistry({ name, version, timestamp }) {
+  const registry = await getRegistry();
+  await db.set(AUTO_UPDATE_REGISTRY, {
+    ...registry,
+    [name]: [
+      ...(registry[name] || []),
+      { version, timestamp: timestamp || Date.now() }
+    ]
+  });
+}
+
+/**
+ * Returns a registry of successfully completed auto-updates
+ *
+ * @returns {object} registry = {
+ *   "system-packages": [
+ *     { version: "0.2.4", timestamp: 1563304834738 }
+ *     { version: "0.2.5", timestamp: 1563371560487 }
+ *   ]
+ *   "bitcoin.dnp.dappnode.eth": [
+ *     { version: "0.1.1", timestamp: 1563304834738 }
+ *     { version: "0.1.2", timestamp: 1563371560487 }
+ *   ]
+ * }
+ */
+async function getRegistry() {
+  const registry = await db.get(AUTO_UPDATE_REGISTRY);
+  return registry || {};
+}
+
 module.exports = {
   // DNPs / my-packages
   editDnpSetting,
@@ -115,8 +152,12 @@ module.exports = {
   editCoreSetting,
   isCoreUpdateEnabled,
   getSettings,
+  // To keep a registry of performed updates
+  updateRegistry,
+  getRegistry,
   // String constants
   MY_PACKAGES,
   SYSTEM_PACKAGES,
-  AUTO_UPDATE_SETTINGS
+  AUTO_UPDATE_SETTINGS,
+  AUTO_UPDATE_REGISTRY
 };

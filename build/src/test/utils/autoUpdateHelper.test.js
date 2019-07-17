@@ -9,15 +9,20 @@ const {
   editCoreSetting,
   isCoreUpdateEnabled,
   getSettings,
+  // To keep a registry of performed updates
+  updateRegistry,
+  getRegistry,
   // String constants
-  AUTO_UPDATE_SETTINGS
+  AUTO_UPDATE_SETTINGS,
+  AUTO_UPDATE_REGISTRY
 } = require("utils/autoUpdateHelper");
 
 const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", async () => {
-    await db.set(AUTO_UPDATE_SETTINGS, {});
+    await db.set(AUTO_UPDATE_SETTINGS, null);
+    await db.set(AUTO_UPDATE_REGISTRY, null);
     expect(await getSettings()).to.deep.equal(
       {},
       "autoUpdateSettings are not empty"
@@ -55,8 +60,24 @@ describe("Util: autoUpdateHelper", () => {
     expect(await isCoreUpdateEnabled()).to.equal(false, "After disabling");
   });
 
+  it("Should add a registry and query it", async () => {
+    const version1 = "0.2.5";
+    const version2 = "0.2.6";
+    const timestamp = 1563373272397;
+    await updateRegistry({ name, version: version1, timestamp });
+    await updateRegistry({ name, version: version2, timestamp });
+    const registry = await getRegistry();
+    expect(registry).to.deep.equal({
+      [name]: [
+        { version: version1, timestamp },
+        { version: version2, timestamp }
+      ]
+    });
+  });
+
   after("Should reset all setting", async () => {
-    await db.set(AUTO_UPDATE_SETTINGS, {});
+    await db.set(AUTO_UPDATE_SETTINGS, null);
+    await db.set(AUTO_UPDATE_REGISTRY, null);
     expect(await getSettings()).to.deep.equal(
       {},
       "autoUpdateSettings are not empty"

@@ -153,6 +153,16 @@ connection.onopen = (session, details) => {
     publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
+  // Emits the registry of successful auto updates
+  eventBus.onSafe(
+    eventBusTag.emitUpdateRegistry,
+    async () => {
+      const registry = (await calls.autoUpdateRegistryGet()).result;
+      publish("autoUpdateRegistry.dappmanager.dnp.dappnode.eth", registry);
+    },
+    { isAsync: true }
+  );
+
   /**
    * Emit progress logs to the ADMIN UI
    * @param {object} logData = {
