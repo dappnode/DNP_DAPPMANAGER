@@ -1,4 +1,5 @@
 const db = require("db");
+const params = require("params");
 
 // Groups of packages keys
 const MY_PACKAGES = "my-packages";
@@ -6,6 +7,8 @@ const SYSTEM_PACKAGES = "system-packages";
 // Db keys
 const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 const AUTO_UPDATE_REGISTRY = "auto-update-registry";
+
+const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
 
 /**
  * Get current auto-update settings
@@ -109,50 +112,93 @@ async function isCoreUpdateEnabled() {
 }
 
 /**
- * Adds an entry to the auto-update registry
+ * Flags a DNP version as successfully auto-updated
+ * The purpose of this information is just to provide feedback in the ADMIN UI
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} version "0.2.5"
+ * @param {number} timestamp Use ONLY to make tests deterministic
+ */
+async function flagSuccessfulUpdate(name, version, timestamp) {
+  await setRegistry(name, version, { updated: timestamp || Date.now() });
+}
+
+/**
+ * Unflag a successful update. Used only for core update, since if
+ * the DAPPMANAGER is updated the update can never be flagged as successful
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} version "0.2.5"
  */
-async function updateRegistry({ name, version, timestamp }) {
-  const registry = await getRegistry();
-  await db.set(AUTO_UPDATE_REGISTRY, {
-    ...registry,
-    [name]: [
-      ...(registry[name] || []),
-      { version, timestamp: timestamp || Date.now() }
-    ]
-  });
+async function unflagSuccessfulUpdate(name, version) {
+  await setRegistry(name, version, { updated: null });
 }
 
-async function removeRegistryEntry({ name, version, timestamp }) {
+/**
+ * Auto-updates must be performed 24h after "seeing" the new version
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} version "0.2.5"
+ * @param {number} timestamp Use ONLY to make tests deterministic
+ */
+async function isUpdateDelayCompleted(name, version, timestamp) {
   const registry = await getRegistry();
-  if (!Array.isArray(registry[name])) return;
-  await db.set(AUTO_UPDATE_REGISTRY, {
-    ...registry,
-    [name]: registry[name].filter(
-      entry => entry.version !== version && entry.timestamp !== timestamp
-    )
-  });
+  const { firstSeen } = ((registry || {})[name] || {})[version] || {};
+  if (firstSeen) {
+    if (Date.now() - firstSeen > updateDelay) {
+      // Flag the delay as completed and allow the update
+      await setRegistry(name, version, { completedDelay: true });
+      return true;
+    } else {
+      // Do not allow the update, the delay is not completed
+      return false;
+    }
+  } else {
+    // Start the delay object by recording the first seen time
+    await setRegistry(name, version, { firstSeen: timestamp || Date.now() });
+    return false;
+  }
 }
 
 /**
  * Returns a registry of successfully completed auto-updates
  *
  * @returns {object} registry = {
- *   "system-packages": [
- *     { version: "0.2.4", timestamp: 1563304834738 }
- *     { version: "0.2.5", timestamp: 1563371560487 }
- *   ]
- *   "bitcoin.dnp.dappnode.eth": [
- *     { version: "0.1.1", timestamp: 1563304834738 }
- *     { version: "0.1.2", timestamp: 1563371560487 }
- *   ]
+ *   "core.dnp.dappnode.eth": {
+ *     "0.2.4": { firstSeen: 1563218436285, updated: 1563304834738, completedDelay: true },
+ *     "0.2.5": { firstSeen: 1563371560487 }
+ *   },
+ *   "bitcoin.dnp.dappnode.eth": {
+ *     "0.1.1": { firstSeen: 1563218436285, updated: 1563304834738, completedDelay: true },
+ *     "0.1.2": { firstSeen: 1563371560487 }
+ *   }
  * }
  */
 async function getRegistry() {
   const registry = await db.get(AUTO_UPDATE_REGISTRY);
   return registry || {};
+}
+
+/**
+ * Set a DNP version entry in the registry by merging data
+ * Abstracts the lengthy object merging to simply the other functions
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} version "0.2.5"
+ * @param {object} data { param: "value" }
+ */
+async function setRegistry(name, version, data) {
+  const registry = await getRegistry();
+  await db.set(AUTO_UPDATE_REGISTRY, {
+    ...registry,
+    [name]: {
+      ...(registry[name] || {}),
+      [version]: {
+        ...((registry[name] || {})[version] || {}),
+        ...data
+      }
+    }
+  });
 }
 
 module.exports = {
@@ -164,9 +210,11 @@ module.exports = {
   isCoreUpdateEnabled,
   getSettings,
   // To keep a registry of performed updates
-  updateRegistry,
+  // + Enforce a delay before auto-updating
+  flagSuccessfulUpdate,
+  unflagSuccessfulUpdate,
+  isUpdateDelayCompleted,
   getRegistry,
-  removeRegistryEntry,
   // String constants
   MY_PACKAGES,
   SYSTEM_PACKAGES,

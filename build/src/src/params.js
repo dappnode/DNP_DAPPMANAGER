@@ -31,6 +31,10 @@ module.exports = {
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
 
+  // Auto-update parameters
+  AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
+  AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
+
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth",
   IPFS_TIMEOUT: 30 * 1000,

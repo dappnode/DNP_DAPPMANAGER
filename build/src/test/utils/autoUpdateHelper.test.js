@@ -10,9 +10,11 @@ const {
   isCoreUpdateEnabled,
   getSettings,
   // To keep a registry of performed updates
-  updateRegistry,
+  // + Enforce a delay before auto-updating
+  flagSuccessfulUpdate,
+  unflagSuccessfulUpdate,
+  isUpdateDelayCompleted,
   getRegistry,
-  removeRegistryEntry,
   // String constants
   AUTO_UPDATE_SETTINGS,
   AUTO_UPDATE_REGISTRY
@@ -62,18 +64,18 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   describe("Auto update registry", () => {
-    it("Should add a registry and query it", async () => {
+    it("Should flag a successful update in the registry and query it", async () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      await updateRegistry({ name, version: version1, timestamp });
-      await updateRegistry({ name, version: version2, timestamp });
+      await flagSuccessfulUpdate(name, version1, timestamp);
+      await flagSuccessfulUpdate(name, version2, timestamp);
       const registry = await getRegistry();
       expect(registry).to.deep.equal({
-        [name]: [
-          { version: version1, timestamp },
-          { version: version2, timestamp }
-        ]
+        [name]: {
+          [version1]: { updated: timestamp },
+          [version2]: { updated: timestamp }
+        }
       });
     });
 
@@ -82,20 +84,75 @@ describe("Util: autoUpdateHelper", () => {
 
       const version = "0.2.6";
       const timestamp = 1563373272397;
-      const registryEntry = { name, version, timestamp };
-      await updateRegistry(registryEntry);
+      await flagSuccessfulUpdate(name, version, timestamp);
 
       expect(await getRegistry()).to.deep.equal(
-        { [name]: [{ version, timestamp }] },
+        {
+          [name]: {
+            [version]: { updated: timestamp }
+          }
+        },
         "Should have one entry"
       );
 
       // Remove entry
-      await removeRegistryEntry(registryEntry);
+      await unflagSuccessfulUpdate(name, version);
 
       expect(await getRegistry()).to.deep.equal(
-        { [name]: [] },
+        {
+          [name]: {
+            [version]: { updated: null }
+          }
+        },
         "Entry should had been removed"
+      );
+    });
+  });
+
+  describe("Auto update delay", () => {
+    it("Should NOT allow the update if the delay is NOT completed", async () => {
+      const version = "0.2.6";
+      const timestamp = Date.now();
+      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+        false,
+        "Should not allow on first check"
+      );
+
+      expect(await getRegistry()).to.deep.equal(
+        {
+          [name]: {
+            [version]: { firstSeen: timestamp }
+          }
+        },
+        "Should have one entry with firstSeen set"
+      );
+
+      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+        false,
+        "Should not allow again because the delay is not completed (24h)"
+      );
+    });
+
+    it("Should allow the update if the delay is completed", async () => {
+      const version = "0.2.6";
+      const timestamp = Date.now() - (24 * 60 * 60 * 1000 + 1);
+      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+        false,
+        "Should not allow on first check"
+      );
+
+      expect(await getRegistry()).to.deep.equal(
+        {
+          [name]: {
+            [version]: { firstSeen: timestamp }
+          }
+        },
+        "Should have one entry with firstSeen set"
+      );
+
+      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+        true,
+        "Should allow again because the delay is completed (24h)"
       );
     });
   });

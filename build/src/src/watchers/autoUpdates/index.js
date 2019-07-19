@@ -1,4 +1,5 @@
 const logs = require("logs.js")(module);
+const params = require("params");
 // Utils
 const {
   isDnpUpdateEnabled,
@@ -8,7 +9,7 @@ const {
 const updateMyPackages = require("./updateMyPackages");
 const updateSystemPackages = require("./updateSystemPackages");
 
-const monitoringInterval = 5 * 60 * 1000; // (ms) (5 minutes)
+const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000; // (ms) (5 minutes)
 
 /**
  * Auto-update:
