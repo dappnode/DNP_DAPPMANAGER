@@ -33,7 +33,13 @@ module.exports = {
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
+
+  // Watchers
   AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
+  CHECK_CHAIN_WATCHER_INTERVAL: 60 * 1000, // 1 minute
+  EMIT_CHAIN_DATA_WATCHER_INTERVAL: 5 * 1000, // 5 seconds
+  CHECK_DISK_USAGE_WATCHER_INTERVAL: 60 * 1000, // 1 minute
+  NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000,
 
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth",
