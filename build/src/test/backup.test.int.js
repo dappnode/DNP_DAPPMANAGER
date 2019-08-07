@@ -24,8 +24,7 @@ describe("Integration test for backup to and from:", function() {
   const dockerComposePath =
     "dnp_repo/test-backup.dnp.dappnode.eth/docker-compose.yml";
 
-  const filePath =
-    "DNCORE/.temp-transfer/test-backup.dnp.dappnode.eth_backup.tar.xz";
+  const filePath = ".temp-transfer/test-backup.dnp.dappnode.eth_backup.tar.xz";
 
   /**
    * RESTORE => GET integral test

@@ -22,7 +22,8 @@ module.exports = {
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // lowdb requires an absolute path
   DB_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
-  TEMP_TRANSFER_DIR: path.join(DNCORE_DIR, ".temp-transfer"),
+  // Temp transfer dir must not be in a volume
+  TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",

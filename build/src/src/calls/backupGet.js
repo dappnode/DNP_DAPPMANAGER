@@ -1,4 +1,3 @@
-"use strict"; // 'datauri' requested to use 'use strict';
 const params = require("params");
 const path = require("path");
 const logs = require("logs.js")(module);
@@ -11,7 +10,6 @@ const dockerList = require("modules/dockerList");
 const shell = require("utils/shell");
 const validateBackupArray = require("utils/validateBackupArray");
 
-const maxSizeKb = 10e3;
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
@@ -66,19 +64,6 @@ const backupGet = async ({ id, backup }) => {
       throw Error(`Could not backup any item: ${lastError.stack}`);
 
     /**
-     * Limit max file size until a DAppNode <-> client transport method is adopted
-     * $ du -s -k app/file.gz
-     * 12 app/file.gz
-     */
-    const dirSizeKb = await getFileOrDirSize(backupDir);
-    if (dirSizeKb > 200e3) {
-      await shell(`rm -rf ${backupDir}`);
-      throw Error(
-        `Dir file transfers > ${maxSizeKb} KB are not allowed. Attempting ${dirSizeKb} KB`
-      );
-    }
-
-    /**
      * Use the -C option to cd in the directory before doing the tar
      * Provide the list of directories / files to include to keep the file structure clean
      *
@@ -89,19 +74,6 @@ const backupGet = async ({ id, backup }) => {
     const dirListToComp = successfulBackups.join(" ");
     await shell(`tar -czf ${backupDirComp} -C ${backupDir} ${dirListToComp}`);
     await shell(`rm -rf ${backupDir}`);
-
-    /**
-     * Limit max file size until a DAppNode <-> client transport method is adopted
-     * $ du -s -k app/file.gz
-     * 12 app/file.gz
-     */
-    const fileSizeKb = await getFileOrDirSize(backupDirComp);
-    if (fileSizeKb > 20e3) {
-      await shell(`rm -rf ${backupDirComp}`);
-      throw Error(
-        `File transfers > ${maxSizeKb} KB are not allowed. Attempting ${fileSizeKb} KB`
-      );
-    }
 
     const fileId = crypto.randomBytes(32).toString("hex");
 
@@ -126,23 +98,5 @@ const backupGet = async ({ id, backup }) => {
     throw e;
   }
 };
-
-// Utility
-
-/**
- * Limit max file size until a DAppNode <-> client transport method is adopted
- * $ du -s -k app/file.gz
- * 12 app/file.gz
- * @param {string} path "app/file.gz"
- * @returns {string} size in KB "12"
- */
-async function getFileOrDirSize(path) {
-  const output = await shell(`du -s -k ${path}`);
-  const sizeString = output
-    .trim()
-    .replace(/\t/g, " ")
-    .split(" ")[0];
-  return parseInt(sizeString || "0");
-}
 
 module.exports = backupGet;
