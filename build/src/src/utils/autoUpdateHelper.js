@@ -1,5 +1,6 @@
 const db = require("db");
 const params = require("params");
+const { eventBus, eventBusTag } = require("eventBus");
 
 // Groups of packages keys
 const MY_PACKAGES = "my-packages";
@@ -36,6 +37,35 @@ async function getSettings() {
 }
 
 /**
+ * Set the current
+ * Abstracts the lengthy object merging to simply the other functions
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} version "0.2.5"
+ * @param {object} data { param: "value" }
+ */
+async function setSettings(id, data) {
+  const autoUpdateSettings = await getSettings();
+  if (id) {
+    await db.set(AUTO_UPDATE_SETTINGS, {
+      ...autoUpdateSettings,
+      [id]: {
+        ...(autoUpdateSettings[id] || {}),
+        ...data
+      }
+    });
+  } else {
+    await db.set(AUTO_UPDATE_SETTINGS, {
+      ...autoUpdateSettings,
+      ...data
+    });
+  }
+
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.emit(eventBusTag.emitUpdateRegistry);
+}
+
+/**
  * Edit the settings of regular DNPs
  * - pass the `name` argument to edit a specific DNP
  * - set `name` to null to edit the general My packages setting
@@ -48,29 +78,17 @@ async function editDnpSetting(enabled, name) {
   if (name) {
     // Modify the specific DNP settings. The are stored INVERTED.
     // true = not enabled, false = enabled
-    await db.set(AUTO_UPDATE_SETTINGS, {
-      ...autoUpdateSettings,
-      [MY_PACKAGES]: {
-        ...(autoUpdateSettings[MY_PACKAGES] || {}),
-        [name]: !enabled
-      }
-    });
+    await setSettings(MY_PACKAGES, { [name]: !enabled });
   } else {
     if (enabled) {
       // Set the "my-packages" property to an empty object to be truthy
       // and turn on updates for all packages
       if (!autoUpdateSettings[MY_PACKAGES])
-        await db.set(AUTO_UPDATE_SETTINGS, {
-          ...autoUpdateSettings,
-          [MY_PACKAGES]: {}
-        });
+        await setSettings(null, { [MY_PACKAGES]: {} });
     } else {
       // Set the "my-packages" property to an null to turn OFF
       // updates for all packages and override the custom settings
-      await db.set(AUTO_UPDATE_SETTINGS, {
-        ...autoUpdateSettings,
-        [MY_PACKAGES]: null
-      });
+      await setSettings(null, { [MY_PACKAGES]: null });
     }
   }
 }
@@ -81,11 +99,7 @@ async function editDnpSetting(enabled, name) {
  * @param {bool} enabled
  */
 async function editCoreSetting(enabled) {
-  const autoUpdateSettings = await getSettings();
-  await db.set(AUTO_UPDATE_SETTINGS, {
-    ...autoUpdateSettings,
-    [SYSTEM_PACKAGES]: enabled
-  });
+  await setSettings(null, { [SYSTEM_PACKAGES]: enabled });
 }
 
 /**
@@ -199,6 +213,9 @@ async function setRegistry(name, version, data) {
       }
     }
   });
+
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.emit(eventBusTag.emitUpdateRegistry);
 }
 
 module.exports = {
