@@ -1,5 +1,8 @@
 const expect = require("chai").expect;
 const db = require("db");
+const params = require("params");
+
+const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
 
 const {
   // DNPs / my-packages
@@ -121,7 +124,10 @@ describe("Util: autoUpdateHelper", () => {
       expect(await getRegistry()).to.deep.equal(
         {
           [name]: {
-            [version]: { firstSeen: timestamp }
+            [version]: {
+              firstSeen: timestamp,
+              scheduledUpdate: timestamp + updateDelay
+            }
           }
         },
         "Should have one entry with firstSeen set"
@@ -144,7 +150,10 @@ describe("Util: autoUpdateHelper", () => {
       expect(await getRegistry()).to.deep.equal(
         {
           [name]: {
-            [version]: { firstSeen: timestamp }
+            [version]: {
+              firstSeen: timestamp,
+              scheduledUpdate: timestamp + updateDelay
+            }
           }
         },
         "Should have one entry with firstSeen set"

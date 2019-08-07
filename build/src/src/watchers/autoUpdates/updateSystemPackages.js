@@ -4,6 +4,7 @@ const parse = require("utils/parse");
 const apm = require("modules/apm");
 const logs = require("logs.js")(module);
 const dappGet = require("modules/dappGet");
+const { eventBus, eventBusTag } = require("eventBus");
 // Utils
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
 const {
@@ -78,7 +79,9 @@ async function updateSystemPackages() {
       id: coreDnpName,
       options: { BYPASS_RESOLVER: true }
     });
+
     logs.info(`Successfully auto-updated system packages`);
+    eventBus.emit(eventBusTag.emitPackages);
   } catch (e) {
     // Remove the log and throw
     await unflagSuccessfulUpdate(coreDnpName, latestVersion);

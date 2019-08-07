@@ -221,6 +221,12 @@ connection.onopen = (session, details) => {
     },
     { isAsync: true }
   );
+
+  /**
+   * Initial calls when WAMP is active
+   * - When the DAPPMANAGER starts, update the list of packages
+   */
+  eventBus.emit(eventBusTag.emitPackages);
 };
 
 connection.onclose = (reason, details) => {

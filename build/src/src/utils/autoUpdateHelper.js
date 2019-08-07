@@ -156,12 +156,16 @@ async function unflagSuccessfulUpdate(name, version) {
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
 async function isUpdateDelayCompleted(name, version, timestamp) {
+  if (!timestamp) timestamp = Date.now();
+
   const registry = await getRegistry();
-  const { firstSeen } = ((registry || {})[name] || {})[version] || {};
-  if (firstSeen) {
-    if (Date.now() - firstSeen > updateDelay) {
-      // Flag the delay as completed and allow the update
-      await setRegistry(name, version, { completedDelay: true });
+  const { scheduledUpdate, completedDelay } =
+    ((registry || {})[name] || {})[version] || {};
+  if (scheduledUpdate) {
+    if (Date.now() > scheduledUpdate) {
+      // Flag the delay as completed (if necessary) and allow the update
+      if (completedDelay)
+        await setRegistry(name, version, { completedDelay: true });
       return true;
     } else {
       // Do not allow the update, the delay is not completed
@@ -169,7 +173,11 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
     }
   } else {
     // Start the delay object by recording the first seen time
-    await setRegistry(name, version, { firstSeen: timestamp || Date.now() });
+
+    await setRegistry(name, version, {
+      firstSeen: timestamp,
+      scheduledUpdate: timestamp + updateDelay
+    });
     return false;
   }
 }
@@ -179,11 +187,17 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
  *
  * @returns {object} registry = {
  *   "core.dnp.dappnode.eth": {
- *     "0.2.4": { firstSeen: 1563218436285, updated: 1563304834738, completedDelay: true },
+ *     "0.2.4": { firstSeen: 1563218436285,
+ *                scheduledUpdate: 1563304834738,
+ *                updated: 1563304834738,
+ *                completedDelay: true },
  *     "0.2.5": { firstSeen: 1563371560487 }
  *   },
  *   "bitcoin.dnp.dappnode.eth": {
- *     "0.1.1": { firstSeen: 1563218436285, updated: 1563304834738, completedDelay: true },
+ *     "0.1.1": { firstSeen: 1563218436285,
+ *                scheduledUpdate: 1563304834738,
+ *                updated: 1563304834738,
+ *                completedDelay: true },
  *     "0.1.2": { firstSeen: 1563371560487 }
  *   }
  * }
