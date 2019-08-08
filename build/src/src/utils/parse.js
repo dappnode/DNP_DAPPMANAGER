@@ -79,6 +79,32 @@ function dockerComposePorts(dockerComposePath) {
   });
 }
 
+/**
+ * Edit the ports of an existing docker-compose.yml
+ * @param {string} dockerComposePath
+ * @param {array} dcPorts [
+ *   { host: 30444, container: 30303, protocol: "UDP" },
+ *   { host: 4000, container: 4000, protocol: "TCP" }
+ * ]
+ * @returns {object} dcObject, docker-compose.yml json object
+ */
+function editDockerComposePorts(dockerComposePath, dcPorts) {
+  // Stringify ports
+  const stringifiedPorts = dcPorts.map(({ host, container, type }) => {
+    const parsedType = (type || "").toLowerCase() === "udp" ? "/udp" : "";
+    return host
+      ? // HOST:CONTAINER/type, if HOST
+        [host, container].join(":") + parsedType
+      : // CONTAINER/type, if no HOST
+        container + parsedType;
+  });
+
+  const dc = readDockerCompose(dockerComposePath);
+  const packageName = Object.getOwnPropertyNames(dc.services)[0];
+  dc.services[packageName].ports = stringifiedPorts;
+  return dc;
+}
+
 function envFile(envFileData = "") {
   // Parses key1=value1 files, splited by new line
   //        key2=value2
@@ -173,6 +199,7 @@ module.exports = {
   serviceVolumes,
   containerName,
   dockerComposePorts,
+  editDockerComposePorts,
   envFile,
   stringifyEnvs,
   packageReq,
