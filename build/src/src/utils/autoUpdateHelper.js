@@ -1,6 +1,7 @@
 const db = require("db");
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
+const { pickBy } = require("lodash");
 
 // Groups of packages keys
 const MY_PACKAGES = "my-packages";
@@ -10,6 +11,8 @@ const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 const AUTO_UPDATE_REGISTRY = "auto-update-registry";
 
 const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
+const autoUpdateWatcherInterval = params.AUTO_UPDATE_WATCHER_INTERVAL;
+const coreDnpName = params.coreDnpName;
 
 /**
  * Get current auto-update settings
@@ -91,6 +94,8 @@ async function editDnpSetting(enabled, name) {
       await setSettings(null, { [MY_PACKAGES]: null });
     }
   }
+
+  if (!enabled) await clearPendingUpdates(name || MY_PACKAGES);
 }
 
 /**
@@ -183,6 +188,52 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
 }
 
 /**
+ * Clears the pending updates from the registry
+ * from a setting ID.
+ *
+ * @param {string} id "my-packages", "system-packages", "bitcoin.dnp.dappnode.eth"
+ */
+async function clearPendingUpdates(id) {
+  const registry = await getRegistry();
+
+  if (id === MY_PACKAGES) {
+    const dnpNames = Object.keys(registry).filter(name => name !== coreDnpName);
+    for (const dnpName of dnpNames) {
+      await clearPendingUpdatesOfDnp(dnpName);
+    }
+  } else if (id === SYSTEM_PACKAGES) {
+    await clearPendingUpdatesOfDnp(coreDnpName);
+  } else {
+    await clearPendingUpdatesOfDnp(id);
+  }
+
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.emit(eventBusTag.emitUpdateRegistry);
+}
+
+/**
+ * Clears the pending updates from the registry so:
+ * - The update delay time is reseted
+ * - The UI does no longer show the "Scheduled" info
+ *
+ * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
+ */
+async function clearPendingUpdatesOfDnp(name) {
+  const registry = await getRegistry();
+  await db.set(AUTO_UPDATE_REGISTRY, {
+    ...registry,
+    [name]: pickBy(registry[name] || {}, ({ scheduledUpdate, updated }) => {
+      // pending updates have not been executed, and the update time is within bounds
+      const isPending =
+        scheduledUpdate &&
+        !updated &&
+        scheduledUpdate + autoUpdateWatcherInterval > Date.now();
+      return !isPending;
+    })
+  });
+}
+
+/**
  * Returns a registry of successfully completed auto-updates
  *
  * @returns {object} registry = {
@@ -217,6 +268,7 @@ async function getRegistry() {
  */
 async function setRegistry(name, version, data) {
   const registry = await getRegistry();
+
   await db.set(AUTO_UPDATE_REGISTRY, {
     ...registry,
     [name]: {
@@ -245,6 +297,7 @@ module.exports = {
   flagSuccessfulUpdate,
   unflagSuccessfulUpdate,
   isUpdateDelayCompleted,
+  clearPendingUpdates,
   getRegistry,
   // String constants
   MY_PACKAGES,

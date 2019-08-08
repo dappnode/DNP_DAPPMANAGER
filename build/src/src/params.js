@@ -48,5 +48,8 @@ module.exports = {
   // Web3 parameters
   WEB3_HOST_WS: "ws://my.ethchain.dnp.dappnode.eth:8546",
   WEB3_HOST_HTTP: "http://my.ethchain.dnp.dappnode.eth:8545",
-  CHAIN_DATA_UNTIL: 0
+  CHAIN_DATA_UNTIL: 0,
+
+  // DAppNode specific names
+  coreDnpName: "core.dnp.dappnode.eth"
 };

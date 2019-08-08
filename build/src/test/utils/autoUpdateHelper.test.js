@@ -17,8 +17,10 @@ const {
   flagSuccessfulUpdate,
   unflagSuccessfulUpdate,
   isUpdateDelayCompleted,
+  clearPendingUpdates,
   getRegistry,
   // String constants
+  MY_PACKAGES,
   AUTO_UPDATE_SETTINGS,
   AUTO_UPDATE_REGISTRY
 } = require("utils/autoUpdateHelper");
@@ -141,7 +143,7 @@ describe("Util: autoUpdateHelper", () => {
 
     it("Should allow the update if the delay is completed", async () => {
       const version = "0.2.6";
-      const timestamp = Date.now() - (24 * 60 * 60 * 1000 + 1);
+      const timestamp = Date.now() - (updateDelay + 1);
       expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
@@ -164,9 +166,46 @@ describe("Util: autoUpdateHelper", () => {
         "Should allow again because the delay is completed (24h)"
       );
     });
+
+    it("Should clear pending updates", async () => {
+      const version = "0.2.6";
+      const timestamp = Date.now() - (updateDelay + 1);
+      const version2 = "0.2.5";
+      const timestamp2 = Date.now() - 2 * updateDelay;
+
+      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+        false,
+        "Should not allow on first check"
+      );
+      await isUpdateDelayCompleted(name, version2, timestamp2);
+      await flagSuccessfulUpdate(name, version2, timestamp2);
+
+      expect(Object.keys((await getRegistry())[name])).to.deep.equal(
+        [version, version2],
+        "Should have one entry"
+      );
+
+      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+        true,
+        "Should allow again because the delay is completed (24h)"
+      );
+
+      // Remove update entry. Test also that MY_PACKAGES removes this DNP
+      await clearPendingUpdates(MY_PACKAGES);
+
+      expect(Object.keys((await getRegistry())[name])).to.deep.equal(
+        [version2],
+        "Should have one entry removed the pending update entries"
+      );
+
+      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+        false,
+        "Should not be allowed since the version is now removed"
+      );
+    });
   });
 
-  after("Should reset all setting", async () => {
+  after("Should reset all settings", async () => {
     await db.set(AUTO_UPDATE_SETTINGS, null);
     await db.set(AUTO_UPDATE_REGISTRY, null);
     expect(await getSettings()).to.deep.equal(
