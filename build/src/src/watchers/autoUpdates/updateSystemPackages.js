@@ -1,5 +1,4 @@
 const dockerList = require("modules/dockerList");
-const semver = require("semver");
 const parse = require("utils/parse");
 const apm = require("modules/apm");
 const logs = require("logs.js")(module);
@@ -21,39 +20,31 @@ const coreDnpName = "core.dnp.dappnode.eth";
  * Only `patch` updates are allowed
  */
 
-async function isCoreUpdateAllowed(latestVersion) {
+async function isCoreUpdateAllowed() {
   const dnpList = await dockerList.listContainers();
 
-  const coreDnp = dnpList.find(dnp => dnp.name === coreDnpName);
-  if (coreDnp && semver.valid(coreDnp.version)) {
-    /**
-     * If core.dnp.dappnode.eth, use it to figure out the version
-     */
-    const updateType = computeSemverUpdateType(coreDnp.version, latestVersion);
-    return updateType === "patch";
-  } else {
-    /**
-     * Otherwise, resolve core.dnp.dappnode.eth to figure out if it should be installed
-     * With the list of deps to install, compute the higher updateType
-     * - Check that all core DNPs to be updated have exactly an updateType of "patch"
-     */
-    const { state } = await dappGet(parse.packageReq(coreDnpName), {
-      BYPASS_RESOLVER: true
-    });
+  /**
+   * Resolve core.dnp.dappnode.eth to figure out if it should be installed
+   * With the list of deps to install, compute the higher updateType
+   * - Check that all core DNPs to be updated have exactly an updateType of "patch"
+   */
+  const { state } = await dappGet(parse.packageReq(coreDnpName), {
+    BYPASS_RESOLVER: true
+  });
 
-    const deps = Object.assign({}, state);
-    delete deps[coreDnpName];
+  // If there is no DNP to be updated, don't allow the update
+  if (!Object.keys(state).length) return false;
 
-    const coreDnps = dnpList.filter(
-      dnp => dnp.isCore && semver.valid(dnp.version) && deps[dnp.name]
-    );
-
-    for (const { name, version } of coreDnps) {
-      const updateType = computeSemverUpdateType(version, deps[name]);
-      if (updateType !== "patch") return false;
-    }
-    return true;
+  // State includes `coreDnpName` and any other core DNP to be updated
+  for (const [name, newVersion] of Object.entries(state)) {
+    const dnp = dnpList.find(dnp => dnp.name === name) || {};
+    // If a required DNP is not installed or the update type is not patch, don't allow
+    const updateType = computeSemverUpdateType(dnp.version, newVersion);
+    if (updateType !== "patch") return false;
   }
+
+  // If all checks are okay, allow the update
+  return true;
 }
 
 async function updateSystemPackages() {

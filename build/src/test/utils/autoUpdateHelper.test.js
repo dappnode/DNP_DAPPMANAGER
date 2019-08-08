@@ -165,6 +165,11 @@ describe("Util: autoUpdateHelper", () => {
         true,
         "Should allow again because the delay is completed (24h)"
       );
+
+      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+        true,
+        "Should allow again, a second time after the delay is completed"
+      );
     });
 
     it("Should clear pending updates", async () => {
