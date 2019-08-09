@@ -1,8 +1,11 @@
 const upnpc = require("modules/upnpc");
 const logs = require("logs.js")(module);
+const { eventBus, eventBusTag } = require("eventBus");
 const db = require("db");
 const getPortsToOpen = require("./getPortsToOpen");
 const getLocalIp = require("utils/getLocalIp");
+// Utils
+const { runOnlyOneSequentially } = require("utils/asyncFlows");
 
 const natRenewalInterval = 60 * 60 * 1000;
 
@@ -96,9 +99,22 @@ async function natRenewal() {
   }
 }
 
-natRenewal();
+/**
+ * runOnlyOneSequentially makes sure that natRenewal is not run twice
+ * in parallel. Also, if multiple requests to run natRenewal, they will
+ * be ignored and run only once more after the previous natRenewal is
+ * completed.
+ */
+
+const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+
+throttledNatRenewal();
 setInterval(() => {
-  natRenewal();
+  throttledNatRenewal();
 }, natRenewalInterval);
 
-module.exports = natRenewal;
+eventBus.onSafe(eventBusTag.runNatRenewal, () => {
+  throttledNatRenewal();
+});
+
+module.exports = throttledNatRenewal;

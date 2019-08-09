@@ -257,6 +257,14 @@ async function listContainers() {
   return dnpListExtended;
 }
 
+async function getContainer(id) {
+  const dnpList = await listContainers();
+  return dnpList.find(
+    dnp => (dnp.name || "").includes(id) || (dnp.id || "").includes(id)
+  );
+}
+
 module.exports = {
-  listContainers
+  listContainers,
+  getContainer
 };

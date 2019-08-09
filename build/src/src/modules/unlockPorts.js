@@ -1,5 +1,10 @@
 const parse = require("utils/parse");
-const { stringIncludes } = require("utils/strings");
+const {
+  parsePortMappings,
+  stringifyPortMappings
+} = require("utils/dockerComposeParsers");
+
+const ephemeralPortRange = 32768;
 
 /**
  * Unlocks locked ephemeral ports of stopped container
@@ -7,9 +12,10 @@ const { stringIncludes } = require("utils/strings");
  * 2. For each portsToClose, remove its port bindings
  * 3. Write the docker-compose (no need to up the package)
  *
+ * Docker's ephemeral port range: 32768-60999
+ *
  * Used when trying to up a container and its ports collide
  * @param {string} dockerComposePath
- * @returns {array} portsToClose = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
 async function unlockPorts(dockerComposePath) {
   if (typeof dockerComposePath !== "string") {
@@ -25,46 +31,25 @@ async function unlockPorts(dockerComposePath) {
   // Create shortcut to the first service
   const service = dc.services[Object.getOwnPropertyNames(dc.services)[0]];
   if (!service) {
+    const dcString = JSON.stringify(dc, null, 2);
     throw Error(
-      `Broken docker-compose (${dockerComposePath}) found while solving a port conflict: \n${JSON.stringify(
-        dc,
-        null,
-        2
-      )}`
+      `Broken docker-compose (${dockerComposePath}), on unlockPorts: \n${dcString}`
     );
-  }
-  const portsToCloseString = (service.labels || {}).portsToClose;
-  const portsToClose = portsToCloseString ? JSON.parse(portsToCloseString) : [];
-  if (!portsToClose.length) {
-    // This package has no locked ephemeral ports, so there is no way to solve it
-    return [];
   }
 
   // 2. Reset the docker-compose to make them epheremal again
-  // portsToClose: '[{"portNumber":32768,"protocol":"UDP"},{"portNumber":32768,"protocol":"TCP"}]'
-  service.ports = service.ports.map(portString => {
-    if (!portString.includes(":")) return portString;
-    const [portHost, portContainer] = portString.split(":");
-    const [, portType = "tcp"] = portContainer.split("/");
-    const isPortLocked = portsToClose.find(
-      p =>
-        String(p.portNumber) === String(portHost) &&
-        stringIncludes((p || {}).protocol, portType)
-    );
-    return isPortLocked ? portString.split(":")[1] : portString;
-  });
-  // Clean labels
-  delete (service.labels || {}).portsToClose;
-  if (!Object.keys(service.labels).length) {
-    delete service.labels;
-  }
+  service.ports = stringifyPortMappings(
+    parsePortMappings(service.ports).map(portMapping => {
+      const { host, container, protocol } = portMapping;
+      return host && parseInt(host) >= ephemeralPortRange
+        ? { container, protocol }
+        : portMapping;
+    })
+  );
 
   // 3. Write the docker-compose (no need to up the package)
   dc.services[Object.getOwnPropertyNames(dc.services)[0]] = service;
   parse.writeDockerCompose(dockerComposePath, dc);
-
-  // Return portsToClose to be closed by UPnP if necessary
-  return portsToClose;
 }
 
 module.exports = unlockPorts;

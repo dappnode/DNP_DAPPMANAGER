@@ -1,6 +1,5 @@
 const { eventBus, eventBusTag } = require("eventBus");
 const logs = require("logs.js")(module);
-const db = require("db");
 // Modules
 const packages = require("modules/packages");
 const dappGet = require("modules/dappGet");
@@ -13,7 +12,6 @@ const merge = require("utils/merge");
 const isIpfsRequest = require("utils/isIpfsRequest");
 const isSyncing = require("utils/isSyncing");
 const envsHelper = require("utils/envsHelper");
-const parseManifestPorts = require("utils/parseManifestPorts");
 const { stringIncludes } = require("utils/strings");
 
 /**
@@ -178,35 +176,17 @@ const installPackage = async ({
     await packages.run({ pkg, id });
     logs.info(`Started (docker-compose up) DNP ${pkg.name}`);
 
-    // 7. Open ports
-    // 7A. Mapped ports: mappedPortsToOpen = [ {portNumber: '30303', protocol: 'TCP'}, ... ]
-    const mappedPortsToOpen = parseManifestPorts(pkg.manifest);
-
-    // 7B. P2P ports: modify docker-compose + open ports
+    // 7. Lock ephemeral ports: modify docker-compose + open ports
     // - lockPorts modifies the docker-compose and returns
     //   lockedPortsToOpen = [ {portNumber: '32769', protocol: 'UDP'}, ... ]
-    // - managePorts calls UPnP to open the ports
-    const lockedPortsToOpen = await lockPorts({ pkg });
-    if (lockedPortsToOpen.length)
-      logs.info(
-        `Locked ${lockedPortsToOpen.length} ports of DNP ${
-          pkg.name
-        }: ${JSON.stringify(lockedPortsToOpen)}`
-      );
-
-    // Skip if there are no ports to open or if UPnP is not available
-    const portsToOpen = [...mappedPortsToOpen, ...lockedPortsToOpen];
-    const upnpAvailable = await db.get("upnpAvailable");
-    if (portsToOpen.length && upnpAvailable) {
-      eventBus.emit(eventBusTag.call, {
-        callId: "managePorts",
-        kwargs: { action: "open", ports: portsToOpen }
-      });
-      logs.info(
-        `Emitted internal call to open ports: ${JSON.stringify(portsToOpen)}`
-      );
-    }
+    await lockPorts(pkg.name || pkg.manifest.name);
   }
+
+  // AFTER - 8. Trigger a natRenewal update to open ports if necessary
+  // Since a package installation is not a very frequent activity it is okay to be
+  // called on each install. Internal mechanisms protect the natRenewal function
+  // to be called too often.
+  eventBus.emit(eventBusTag.runNatRenewal);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);

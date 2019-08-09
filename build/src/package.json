@@ -6,6 +6,7 @@
   "scripts": {
     "start": "NODE_PATH=src node src/index.js",
     "dev": "NODE_ENV=development npm start",
+    "build": "node_modules/.bin/tsc && npm run lint",
     "file": "NODE_PATH=src node",
     "test": "NODE_PATH=src TEST=true mocha --exit \"./{,!(node_modules)/**}/*.test.js\" ",
     "test:file": "NODE_PATH=src TEST=true mocha --exit ",
@@ -52,6 +53,9 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.0",
+    "@types/node": "^12.7.1",
+    "@types/yamljs": "^0.2.30",
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
     "eslint": "^5.16.0",
@@ -63,7 +67,8 @@
     "prettier": "^1.16.4",
     "proxyquire": "^2.0.1",
     "sinon": "^5.0.10",
-    "sinon-chai": "^3.1.0"
+    "sinon-chai": "^3.1.0",
+    "typescript": "^3.5.3"
   },
   "husky": {
     "hooks": {

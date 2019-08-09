@@ -1,8 +1,8 @@
-const parse = require("utils/parse");
 const dockerList = require("modules/dockerList");
 const docker = require("modules/docker");
-const getPath = require("utils/getPath");
-const params = require("params");
+const { getComposeInstance } = require("utils/dockerComposeFile");
+const { stringIncludes } = require("utils/strings");
+const logs = require("logs.js")(module);
 
 /**
  * The goal of this module is to find out which port
@@ -73,107 +73,54 @@ const params = require("params");
  * @param {object} pkg {name, ver, manifest}
  * @returns {array} portsToOpen = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
-async function lockPorts({ pkg, dockerComposePath }) {
-  // Load the docker compose
-  if (pkg) {
-    // First, check if the package has ephemeral ports (to skip quicly if necessary)
-    const manifestPorts = ((pkg.manifest || {}).image || {}).ports || [];
-    if (!manifestPorts.filter(port => !(port || "").includes(":")).length) {
-      // No ephemeral ports on this package, returns no portsToOpen
-      return [];
-    }
-    dockerComposePath = getPath.dockerCompose(
-      pkg.name,
-      params,
-      pkg.manifest.isCore
-    );
-  } else if (dockerComposePath) {
-    //
-  } else {
-    throw Error(
-      "lockPorts first argument must be an object with either a pkg or a dockerComposePath"
-    );
-  }
+async function lockPorts(id) {
+  const compose = getComposeInstance(id);
+  const portMappings = compose.getPortMappings();
 
-  const dc = parse.readDockerCompose(dockerComposePath);
-  let name = Object.getOwnPropertyNames(dc.services)[0];
-  let dcPorts = dc.services[name].ports;
-  if (!Array.isArray(dcPorts)) {
-    throw Error(
-      `${name}'s docker-compose's image ports is not an array: ${dcPorts}`
-    );
-  }
-  if (!dcPorts.filter(port => !(port || "").includes(":")).length) {
-    throw Error(
-      `${name}'s docker-compose's image ports has no expected ephemeral ports`
-    );
-  }
+  const ephemeralPortMappings = portMappings.filter(({ host }) => !host);
+
+  // Check if the package has ephemeral ports (to skip quicly if necessary)
+  if (!ephemeralPortMappings.length) return;
 
   // Get the current state of the package to know which port was chosen by docker
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name && _dnp.name.includes(name));
-  if (!dnp) {
-    throw Error(
-      `No DNP was found for name ${name}, so its ports cannot be checked`
-    );
-  }
-  if (!dnp.ports.length) {
-    throw Error(`${name}'s container's ports array has length 0`);
-  }
-
-  // Track and return host ports in case they have to be openned
-  const portsToOpen = [];
+  const dnp = await dockerList.getContainer(id);
+  if (!dnp) throw Error(`No dnp found for ${id}`);
 
   // the dcPorts array are only ports that do not include ":",
   // port = "5000"
   // port = "5000/udp"
-  dcPorts = dcPorts.map(portString => {
-    if (portString.includes(":")) {
-      return portString;
-    }
-
-    let [portNumber, portType = "tcp"] = portString.split("/");
-    if (isNaN(portNumber)) {
-      throw Error(
-        `Port declared in ${name} docker-compose, must be num : ${portNumber}`
+  const newPortMappings = ephemeralPortMappings.map(
+    ({ container, protocol }) => {
+      // portNumber or p.PrivatePort may be of type integer
+      const currentPort = dnp.ports.find(
+        p =>
+          String(p.PrivatePort) === String(container) &&
+          stringIncludes(protocol, p.Type)
       );
+      if (!currentPort) {
+        throw Error(
+          `Port ${id} ${container}/${protocol} not in ${JSON.stringify(
+            dnp.ports
+          )}`
+        );
+      }
+
+      // Now convert "30303/udp" to "32769:30303/udp"
+      return { host: String(currentPort.PublicPort), container, protocol };
     }
-    const dnpListPort = dnp.ports.find(
-      p =>
-        // portNumber or p.PrivatePort may be of type integer
-        String(p.PrivatePort) === String(portNumber) && portType === p.Type
-    );
-    if (!dnpListPort) {
-      throw Error(
-        `Port ${portString} of ${name} not in ${JSON.stringify(dnp.ports)}`
-      );
-    }
+  );
 
-    // Store the host port in the ports to open array
-    portsToOpen.push({
-      portNumber: dnpListPort.PublicPort,
-      protocol: portType.toUpperCase()
-    });
-
-    // Now convert "30303/udp" to "32769:30303/udp"
-    return `${dnpListPort.PublicPort}:${portString}`;
-  });
-
-  // Set ports to docker-compose object
-  dc.services[name].ports = dcPorts;
-  // Add ports to close in the docker-compose labels
-  dc.services[name].labels = {
-    ...(dc.services[name].labels || {}),
-    portsToClose: JSON.stringify(portsToOpen)
-  };
-  // Write docker-compose
-  parse.writeDockerCompose(dockerComposePath, dc);
+  compose.mergePortMapping(newPortMappings);
 
   // In order to apply the labels to the current container, re-up it
-  await docker.compose.up(dockerComposePath);
+  await docker.compose.up(compose.dockerComposePath);
+
+  logs.info(
+    `Locked emphemeral ports of ${id}: ${JSON.stringify(newPortMappings)}`
+  );
 
   // Track and return host ports in case they have to be openned
-  return portsToOpen;
+  return newPortMappings;
 }
 
 module.exports = lockPorts;

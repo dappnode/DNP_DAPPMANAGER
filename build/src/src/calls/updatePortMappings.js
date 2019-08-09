@@ -1,12 +1,9 @@
-const params = require("params");
-// Modules
-const dockerList = require("modules/dockerList");
+const lockPorts = require("modules/lockPorts");
 // Utils
-const parse = require("utils/parse");
-const getPath = require("utils/getPath");
-const { stringIncludes } = require("utils/strings");
+const dockerComposeFile = require("utils/dockerComposeFile");
 // External call
 const restartPackage = require("./restartPackage");
+const { eventBus, eventBusTag } = require("eventBus");
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -23,41 +20,45 @@ const updatePortMappings = async ({ id, portMappings }) => {
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
 
-  /**
-   * 1. Fetch existing port mappings
-   * @param {array} dcPorts = [
-   *   { host: 30444, container: 30303, protocol: "UDP" }
-   * ]
-   */
-  const dnpList = await dockerList.listContainers();
-  const dnp = dnpList.find(_dnp => stringIncludes(_dnp.name, id));
-  if (!dnp) {
-    throw Error(`No DNP was found for name ${id}`);
-  }
-  const dockerComposePath = getPath.dockerCompose(dnp.name, params, dnp.isCore);
-  const dcPorts = parse.dockerComposePorts(dockerComposePath);
+  if (
+    id === "dappmanager.dnp.dappnode.eth" &&
+    portMappings.find(({ host }) => !host)
+  )
+    throw Error("Can't assign ephemeral ports to the DAPPAMANAGER");
 
   /**
-   * 2. Merge existing port mappings with new port mappings
+   * [NOTE]
+   * Assigning ephemeral ports to the DAPPMANAGER can be problematic
+   * because since it is reseted, the `lockPorts` function will never
+   * be executed.
+   * ### TODO: lockPorts will be executed on the DAPPMANAGER start
+   * and lock any remaining ephemeral ports of all DNPs
+   */
+
+  /**
+   * 1. Merge existing port mappings with new port mappings
    * - Has to compute mergedPortMappings
    * - [Ports to close]: Maybe not since the new natRenewal will automatically drop them
    * - [Ports to open]: Can the natRenewal be triggered for a specific DNP?
    * - [Locked ports]: The object in the container label has to be edited
    * #### TODO: Since now there is the natRenewal, is the portsToClose array necessary anymore?
+   * @param {array} dcPorts = [
+   *   { host: 30444, container: 30303, protocol: "UDP" }
+   * ]
    */
-  const mergedPortMappings = mergePortMappings(dcPorts, portMappings);
-
-  /**
-   * 3. Apply new merged port mappings
-   */
-  const dcObject = parse.editDockerComposePorts(
-    dockerComposePath,
-    mergedPortMappings
-  );
-  parse.writeDockerCompose(dockerComposePath, dcObject);
+  const compose = dockerComposeFile(id);
+  compose.mergePortMappings(portMappings);
 
   // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
   await restartPackage({ id });
+
+  /**
+   * 2. Lock ephemeral ports if any
+   */
+  await lockPorts(id);
+
+  // Trigger a natRenewal update to open ports if necessary
+  eventBus.emit(eventBusTag.runNatRenewal);
 
   return {
     message: `Updated ${id} port mappings`,
@@ -65,22 +66,5 @@ const updatePortMappings = async ({ id, portMappings }) => {
     userAction: true
   };
 };
-
-// Utils
-
-function mergePortMappings(portMappings1, portMappings2) {
-  return Object.values({
-    ...transformPortMappingToObject(portMappings1),
-    ...transformPortMappingToObject(portMappings2)
-  });
-}
-
-function transformPortMappingToObject(portMappings) {
-  portMappings.reduce((obj, portMapping) => {
-    if (!container) throw Error(`Invalid portMapping, key container is null`);
-    const { container, type = "tcp" } = portMapping;
-    return { ...obj, [`${container}/${type.toLowerCase()}`]: portMapping };
-  }, {});
-}
 
 module.exports = updatePortMappings;
