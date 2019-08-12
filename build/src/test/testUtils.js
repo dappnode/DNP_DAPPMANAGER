@@ -1,4 +1,5 @@
 const shell = require("utils/shell");
+const path = require("path");
 
 const testDir = "./test_files/";
 
@@ -20,9 +21,14 @@ async function createTestDir() {
   await shell(`mkdir -p ${testDir}`);
 }
 
+async function createDirP(filePath) {
+  await shell(`mkdir -p ${path.parse(filePath).dir}`);
+}
+
 module.exports = {
   testDir,
   cleanTestDir,
   createTestDir,
+  createDirP,
   ignoreErrors
 };

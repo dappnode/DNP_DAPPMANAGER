@@ -13,7 +13,7 @@ const params = require("params");
 /**
  * Utils to read or edit a docker-compose file
  */
-function getDockerComposePath(id) {
+function getDockerComposePath(id, newFile) {
   const composeCorePath = path_1.default.join(
     params.DNCORE_DIR,
     `docker-compose-${(id || "").split(".")[0]}.yml`
@@ -25,8 +25,10 @@ function getDockerComposePath(id) {
   );
   if (fs_1.default.existsSync(composeCorePath)) return composeCorePath;
   else if (fs_1.default.existsSync(dnpPath)) return dnpPath;
+  else if (newFile) return dnpPath;
   else throw Error(`No docker-compose found for ${id}`);
 }
+exports.getDockerComposePath = getDockerComposePath;
 function readComposeObj(dockerComposePath) {
   const dcString = fs_1.default.readFileSync(dockerComposePath, "utf-8");
   return yamljs_1.default.parse(dcString);

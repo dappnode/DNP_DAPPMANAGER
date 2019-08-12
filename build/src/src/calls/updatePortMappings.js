@@ -1,6 +1,6 @@
 const lockPorts = require("modules/lockPorts");
 // Utils
-const dockerComposeFile = require("utils/dockerComposeFile");
+const { getComposeInstance } = require("utils/dockerComposeFile");
 // External call
 const restartPackage = require("./restartPackage");
 const { eventBus, eventBusTag } = require("eventBus");
@@ -46,8 +46,8 @@ const updatePortMappings = async ({ id, portMappings }) => {
    *   { host: 30444, container: 30303, protocol: "UDP" }
    * ]
    */
-  const compose = dockerComposeFile(id);
-  compose.mergePortMappings(portMappings);
+  const compose = getComposeInstance(id);
+  compose.mergePortMapping(portMappings);
 
   // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
   await restartPackage({ id });

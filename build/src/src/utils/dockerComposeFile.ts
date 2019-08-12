@@ -23,7 +23,7 @@ interface ComposeObj {
  * Utils to read or edit a docker-compose file
  */
 
-function getDockerComposePath(id: string) {
+export function getDockerComposePath(id: string, newFile?: boolean) {
   const composeCorePath = path.join(
     params.DNCORE_DIR,
     `docker-compose-${(id || "").split(".")[0]}.yml`
@@ -32,6 +32,7 @@ function getDockerComposePath(id: string) {
 
   if (fs.existsSync(composeCorePath)) return composeCorePath;
   else if (fs.existsSync(dnpPath)) return dnpPath;
+  else if (newFile) return dnpPath;
   else throw Error(`No docker-compose found for ${id}`);
 }
 
