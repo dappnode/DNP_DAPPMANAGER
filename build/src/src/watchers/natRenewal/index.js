@@ -8,8 +8,12 @@ const natRenewalInterval = 60 * 60 * 1000;
 
 const portId = port => `${port.portNumber} ${port.protocol}`;
 
-let isFirstRun = true;
+let isFirstRunGlobal = true;
 async function natRenewal() {
+  // Signal it's no longer the first run
+  const isFirstRun = isFirstRunGlobal;
+  isFirstRunGlobal = false;
+
   try {
     // 1. Get the list of ports and check there is a UPnP device
     // portMappings = [ {protocol: 'UDP', exPort: '500', inPort: '500'} ]
@@ -68,8 +72,6 @@ async function natRenewal() {
         logs.error(`Error openning port ${portId(portToOpen)}: ${e.message}`);
       }
     }
-    // Signal it's no longer the first run
-    isFirstRun = false;
 
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
@@ -82,7 +84,7 @@ async function natRenewal() {
             p.exPort === String(portToOpen.portNumber) &&
             p.inPort === String(portToOpen.portNumber)
         );
-        if (currentPort) {
+        if (currentPort && isFirstRun) {
           logs.info(
             `Port ${portId(portToOpen)} verified. It is currently open`
           );
