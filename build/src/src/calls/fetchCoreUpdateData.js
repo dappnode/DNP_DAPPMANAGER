@@ -1,8 +1,9 @@
+const semver = require("semver");
 const dappGet = require("modules/dappGet");
 const getManifest = require("modules/getManifest");
 const dockerList = require("modules/dockerList");
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
-const semver = require("semver");
+const { getCoreVersionId } = require("utils/coreVersionId");
 
 const coreName = "core.dnp.dappnode.eth";
 
@@ -97,15 +98,10 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
       semver.satisfies(to, updateAlert.to || "*")
   );
 
-  /**
-   * Compute version id:
-   * admin@0.2.4,vpn@0.2.2,core@0.2.6
-   * - Sort alphabetically to ensure the version ID is deterministic
-   */
-  const versionId = packages
-    .map(({ name, to }) => [name.split(".")[0], to].join("@"))
-    .sort()
-    .join(",");
+  // versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"
+  const versionId = getCoreVersionId(
+    packages.map(({ name, to }) => ({ name, version: to }))
+  );
 
   return {
     available: Object.keys(coreDnpsToBeInstalled).length,

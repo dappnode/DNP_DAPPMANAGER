@@ -1,7 +1,15 @@
+const semver = require("semver");
+const { listContainers } = require("modules/dockerList");
+const { getCoreVersionId } = require("utils/coreVersionId");
 const autoUpdateHelper = require("utils/autoUpdateHelper");
 
+const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
+
 /**
- * Returns a registry of successfully completed auto-updates
+ * Returns a auto-update data:
+ * - settings: If auto-updates are enabled for a specific DNP or DNPs
+ * - registry: List of executed auto-updates
+ * - pending: Pending auto-update per DNP, can be already executed
  *
  * @returns {object} result = {
  *   settings: {
@@ -36,12 +44,63 @@ const autoUpdateHelper = require("utils/autoUpdateHelper");
  * }
  */
 async function autoUpdateDataGet() {
+  const settings = await autoUpdateHelper.getSettings();
+  const registry = await autoUpdateHelper.getRegistry();
+  const pending = await autoUpdateHelper.getRegistry();
+
+  const dnpList = await listContainers();
+
+  const dnpsToShow = [
+    {
+      name: SYSTEM_PACKAGES,
+      enabled: await autoUpdateHelper.isCoreUpdateEnabled(),
+      feedback: await autoUpdateHelper.getCoreFeedbackMessage({
+        currentVersionId: getCoreVersionId(
+          dnpList.filter(({ isCore }) => isCore)
+        )
+      })
+    },
+    {
+      name: MY_PACKAGES,
+      enabled: await autoUpdateHelper.isDnpUpdateEnabled(),
+      feedback: "-"
+    }
+  ];
+
+  if (await autoUpdateHelper.isDnpUpdateEnabled()) {
+    const singleDnpsToShow = dnpList.filter(
+      dnp =>
+        dnp.name &&
+        // Ignore core DNPs
+        dnp.isDnp &&
+        // Ignore wierd versions
+        semver.valid(dnp.version) &&
+        // MUST come from the APM
+        !dnp.origin
+    );
+
+    for (const dnp of singleDnpsToShow) {
+      const enabled = await autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
+      dnpsToShow.push({
+        name: dnp.name,
+        enabled,
+        feedback: enabled
+          ? await autoUpdateHelper.getDnpFeedbackMessage({
+              id: dnp.name,
+              currentVersion: dnp.version
+            })
+          : "-"
+      });
+    }
+  }
+
   return {
     message: `Got auto update data`,
     result: {
-      settings: await autoUpdateHelper.getSettings(),
-      registry: await autoUpdateHelper.getRegistry(),
-      pending: await autoUpdateHelper.getRegistry()
+      settings,
+      registry,
+      pending,
+      dnpsToShow
     }
   };
 }

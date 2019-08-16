@@ -2,6 +2,9 @@ const db = require("db");
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
 const { pick, omit } = require("lodash");
+const { parseStaticDate, parseDiffDates } = require("./dates");
+const { parseCoreVersionIdToStrings } = require("./coreVersionId");
+const { includesArray } = require("./arrays");
 
 // Groups of packages keys
 const MY_PACKAGES = "my-packages";
@@ -141,7 +144,7 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
 
   if (pendingUpdate && pendingUpdate.version === version) {
     const { scheduledUpdate, completedDelay } = pendingUpdate;
-    if (Date.now() > scheduledUpdate) {
+    if (timestamp > scheduledUpdate) {
       // Flag the delay as completed (if necessary) and allow the update
       if (!completedDelay) await setPending(name, { completedDelay: true });
       return true;
@@ -288,6 +291,110 @@ async function setPending(name, data) {
   eventBus.emit(eventBusTag.emitAutoUpdateData);
 }
 
+/**
+ * Get an auto-update feedback message
+ * - If there is a pending update
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
+ */
+async function getDnpFeedbackMessage({
+  id,
+  currentVersion,
+  registry,
+  pending
+}) {
+  if (!registry) registry = await getRegistry();
+  if (!pending) pending = await getPending();
+
+  const currentVersionRegistry = (registry[id] || {})[currentVersion] || {};
+  const { version: pendingVersion, scheduledUpdate } = pending[id] || {};
+
+  // If current version is auto-installed, it will show up in the registry
+  if (currentVersionRegistry.successful)
+    return `${parseStaticDate(currentVersionRegistry.updated)}`;
+
+  // If the pending version is the current BUT it is NOT in the registry,
+  // it must have been updated by the user
+  if (currentVersion && currentVersion === pendingVersion)
+    return `Manually updated`;
+
+  // Here, an update can be pending
+  if (scheduledUpdate)
+    if (Date.now() > scheduledUpdate) {
+      return "In queue";
+    } else {
+      return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
+    }
+
+  return "-";
+}
+
+/**
+ * Get an auto-update feedback message
+ * - If there is a pending update
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
+ */
+async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
+  if (!registry) registry = await getRegistry();
+  if (!pending) pending = await getPending();
+
+  const id = coreDnpName;
+  /**
+   * Let's figure out the version of the core
+   */
+
+  const { version: pendingVersion, scheduledUpdate } = pending[id] || {};
+  const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
+  const lastUpdatedVersionsAreInstalled =
+    lastUpdatedVersion.version &&
+    includesArray(
+      parseCoreVersionIdToStrings(lastUpdatedVersion.version),
+      parseCoreVersionIdToStrings(currentVersionId)
+    );
+  const pendingVersionsAreInstalled =
+    pendingVersion &&
+    includesArray(
+      parseCoreVersionIdToStrings(pendingVersion),
+      parseCoreVersionIdToStrings(currentVersionId)
+    );
+
+  // If current version is auto-installed, it will show up in the registry
+  if (lastUpdatedVersionsAreInstalled && pendingVersionsAreInstalled)
+    return `${parseStaticDate(lastUpdatedVersion.updated)}`;
+
+  // If the pending version is the current BUT it is NOT in the registry,
+  // it must have been updated by the user
+  if (!lastUpdatedVersionsAreInstalled && pendingVersionsAreInstalled)
+    return `Manually updated`;
+
+  // Here, an update can be pending
+  if (scheduledUpdate)
+    if (Date.now() > scheduledUpdate) {
+      return "In queue";
+    } else {
+      return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
+    }
+
+  return "-";
+}
+
+function getLastRegistryEntry(registryDnp = {}) {
+  return (
+    Object.entries(registryDnp)
+      .map(([version, { updated, successful }]) => ({
+        version,
+        updated,
+        successful
+      }))
+      .filter(({ successful }) => successful)
+      .sort((a, b) => a.updated - b.updated)
+      .slice(-1)[0] || {}
+  );
+}
+
 module.exports = {
   // DNPs / my-packages
   editDnpSetting,
@@ -304,6 +411,10 @@ module.exports = {
   getRegistry,
   // Pending updates
   getPending,
+  getDnpFeedbackMessage,
+  getCoreFeedbackMessage,
+  // Utils
+  getLastRegistryEntry,
   // String constants
   MY_PACKAGES,
   SYSTEM_PACKAGES,
