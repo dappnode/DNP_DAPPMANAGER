@@ -153,12 +153,12 @@ connection.onopen = (session, details) => {
     publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
-  // Emits the registry of successful auto updates
+  // Emits the auto update data (settings, registry, pending)
   eventBus.onSafe(
-    eventBusTag.emitUpdateRegistry,
+    eventBusTag.emitAutoUpdateData,
     async () => {
-      const registry = (await calls.autoUpdateRegistryGet()).result;
-      publish("autoUpdateRegistry.dappmanager.dnp.dappnode.eth", registry);
+      const autoUpdateData = (await calls.autoUpdateDataGet()).result;
+      publish("autoUpdateData.dappmanager.dnp.dappnode.eth", autoUpdateData);
     },
     { isAsync: true }
   );

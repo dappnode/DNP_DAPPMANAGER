@@ -14,58 +14,62 @@ const {
   getSettings,
   // To keep a registry of performed updates
   // + Enforce a delay before auto-updating
-  flagSuccessfulUpdate,
-  unflagSuccessfulUpdate,
+  flagCompletedUpdate,
   isUpdateDelayCompleted,
-  clearPendingUpdates,
   getRegistry,
+  // Pending updates
+  getPending,
   // String constants
-  MY_PACKAGES,
   AUTO_UPDATE_SETTINGS,
-  AUTO_UPDATE_REGISTRY
+  AUTO_UPDATE_REGISTRY,
+  AUTO_UPDATE_PENDING
 } = require("utils/autoUpdateHelper");
 
 const name = "bitcoin.dnp.dappnode.eth";
+const successful = true;
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", async () => {
     await db.set(AUTO_UPDATE_SETTINGS, null);
     await db.set(AUTO_UPDATE_REGISTRY, null);
+    await db.set(AUTO_UPDATE_PENDING, null);
     expect(await getSettings()).to.deep.equal(
       {},
       "autoUpdateSettings are not empty"
     );
   });
 
-  it("Should set active for my packages", async () => {
-    const check = name => isDnpUpdateEnabled(name);
+  describe("Auto update settings", () => {
+    it("Should set active for my packages", async () => {
+      const check = name => isDnpUpdateEnabled(name);
 
-    // Enable my-packages
-    expect(await check()).to.equal(false, "Before enabling");
-    await editDnpSetting(true);
-    expect(await check()).to.equal(true, "After enabling");
+      // Enable my-packages
+      expect(await check()).to.equal(false, "Before enabling");
+      await editDnpSetting(true);
+      expect(await check()).to.equal(true, "After enabling");
 
-    // Disable a single package
-    expect(await check(name)).to.equal(true, "Before disabling name");
-    await editDnpSetting(true, name);
-    expect(await check(name)).to.equal(true, "Before disablingx2 name");
-    await editDnpSetting(false, name);
-    expect(await check(name)).to.equal(false, "After disabling name");
-    await editDnpSetting(true, name);
-    expect(await check(name)).to.equal(true, "After enabling name");
+      // Disable a single package
+      expect(await check(name)).to.equal(true, "Before disabling name");
+      await editDnpSetting(true, name);
+      expect(await check(name)).to.equal(true, "Before disablingx2 name");
+      await editDnpSetting(false, name);
+      expect(await check(name)).to.equal(false, "After disabling name");
+      await editDnpSetting(true, name);
+      expect(await check(name)).to.equal(true, "After enabling name");
 
-    // Disable my-packages
-    await editDnpSetting(false);
-    expect(await check()).to.equal(false, "After disabling");
-    expect(await check(name)).to.equal(false, "After disabling name final");
-  });
+      // Disable my-packages
+      await editDnpSetting(false);
+      expect(await check()).to.equal(false, "After disabling");
+      expect(await check(name)).to.equal(false, "After disabling name final");
+    });
 
-  it("Should set active for system packages", async () => {
-    expect(await isCoreUpdateEnabled()).to.equal(false, "Before enabling");
-    await editCoreSetting(true);
-    expect(await isCoreUpdateEnabled()).to.equal(true, "After enabling");
-    await editCoreSetting(false);
-    expect(await isCoreUpdateEnabled()).to.equal(false, "After disabling");
+    it("Should set active for system packages", async () => {
+      expect(await isCoreUpdateEnabled()).to.equal(false, "Before enabling");
+      await editCoreSetting(true);
+      expect(await isCoreUpdateEnabled()).to.equal(true, "After enabling");
+      await editCoreSetting(false);
+      expect(await isCoreUpdateEnabled()).to.equal(false, "After disabling");
+    });
   });
 
   describe("Auto update registry", () => {
@@ -73,43 +77,44 @@ describe("Util: autoUpdateHelper", () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      await flagSuccessfulUpdate(name, version1, timestamp);
-      await flagSuccessfulUpdate(name, version2, timestamp);
+      await flagCompletedUpdate(name, version1, successful, timestamp);
+      await flagCompletedUpdate(name, version2, successful, timestamp);
       const registry = await getRegistry();
       expect(registry).to.deep.equal({
         [name]: {
-          [version1]: { updated: timestamp },
-          [version2]: { updated: timestamp }
+          [version1]: { updated: timestamp, successful: true },
+          [version2]: { updated: timestamp, successful: true }
         }
       });
     });
 
-    it("Should remove an registry entry", async () => {
+    it("Should flag an update as unsuccessful", async () => {
       // removeRegistryEntry;
 
       const version = "0.2.6";
       const timestamp = 1563373272397;
-      await flagSuccessfulUpdate(name, version, timestamp);
+      await flagCompletedUpdate(name, version, successful, timestamp);
 
       expect(await getRegistry()).to.deep.equal(
         {
           [name]: {
-            [version]: { updated: timestamp }
+            [version]: { updated: timestamp, successful: true }
           }
         },
         "Should have one entry"
       );
 
       // Remove entry
-      await unflagSuccessfulUpdate(name, version);
+      const timestampLatter = timestamp + 12736;
+      await flagCompletedUpdate(name, version, false, timestampLatter);
 
       expect(await getRegistry()).to.deep.equal(
         {
           [name]: {
-            [version]: { updated: null }
+            [version]: { updated: timestampLatter, successful: false }
           }
         },
-        "Entry should had been removed"
+        "Entry should be marked as unsuccessful"
       );
     });
   });
@@ -123,13 +128,13 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(await getRegistry()).to.deep.equal(
+      expect(await getPending()).to.deep.equal(
         {
           [name]: {
-            [version]: {
-              firstSeen: timestamp,
-              scheduledUpdate: timestamp + updateDelay
-            }
+            version,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
           }
         },
         "Should have one entry with firstSeen set"
@@ -149,13 +154,13 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(await getRegistry()).to.deep.equal(
+      expect(await getPending()).to.deep.equal(
         {
           [name]: {
-            [version]: {
-              firstSeen: timestamp,
-              scheduledUpdate: timestamp + updateDelay
-            }
+            version,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
           }
         },
         "Should have one entry with firstSeen set"
@@ -182,30 +187,34 @@ describe("Util: autoUpdateHelper", () => {
         false,
         "Should not allow on first check"
       );
-      await isUpdateDelayCompleted(name, version2, timestamp2);
-      await flagSuccessfulUpdate(name, version2, timestamp2);
 
-      expect(Object.keys((await getRegistry())[name])).to.deep.equal(
-        [version, version2],
-        "Should have one entry"
+      expect(await getPending()).to.deep.equal(
+        {
+          [name]: {
+            version,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Should have one entry with firstSeen set"
       );
 
-      expect(await isUpdateDelayCompleted(name, version)).to.equal(
-        true,
-        "Should allow again because the delay is completed (24h)"
-      );
-
-      // Remove update entry. Test also that MY_PACKAGES removes this DNP
-      await clearPendingUpdates(MY_PACKAGES);
-
-      expect(Object.keys((await getRegistry())[name])).to.deep.equal(
-        [version2],
-        "Should have one entry removed the pending update entries"
-      );
-
-      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+      expect(await isUpdateDelayCompleted(name, version2, timestamp2)).to.equal(
         false,
-        "Should not be allowed since the version is now removed"
+        "Should not allow on first check"
+      );
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [name]: {
+            version: version2,
+            firstSeen: timestamp2,
+            scheduledUpdate: timestamp2 + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Should have deleted the previous entry and changed for the second one"
       );
     });
   });
@@ -213,9 +222,6 @@ describe("Util: autoUpdateHelper", () => {
   after("Should reset all settings", async () => {
     await db.set(AUTO_UPDATE_SETTINGS, null);
     await db.set(AUTO_UPDATE_REGISTRY, null);
-    expect(await getSettings()).to.deep.equal(
-      {},
-      "autoUpdateSettings are not empty"
-    );
+    await db.set(AUTO_UPDATE_PENDING, null);
   });
 });

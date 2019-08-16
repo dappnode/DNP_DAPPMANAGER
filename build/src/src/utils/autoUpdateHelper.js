@@ -1,7 +1,7 @@
 const db = require("db");
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
-const { pickBy } = require("lodash");
+const { pick, omit } = require("lodash");
 
 // Groups of packages keys
 const MY_PACKAGES = "my-packages";
@@ -9,63 +9,43 @@ const SYSTEM_PACKAGES = "system-packages";
 // Db keys
 const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 const AUTO_UPDATE_REGISTRY = "auto-update-registry";
+const AUTO_UPDATE_PENDING = "auto-update-pending";
 
 const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
-const autoUpdateWatcherInterval = params.AUTO_UPDATE_WATCHER_INTERVAL;
 const coreDnpName = params.coreDnpName;
 
 /**
  * Get current auto-update settings
  *
- * - "system-packages" = if the update is enabled
- * - "my-packages" = an object, means the default settings is update enabled
- * - "my-packages"["bitcoin.dnp.dappnode.eth"] = true, means that the
- *   update is NOT enabled
- *
  * @returns {object} autoUpdateSettings = {
- *   "system-packages": true
- *   "my-packages": {
- *     "bitcoin.dnp.dappnode.eth": true
- *   }
+ *   "system-packages": { enabled: true }
+ *   "my-packages": { enabled: true }
+ *   "bitcoin.dnp.dappnode.eth": { enabled: false }
  * }
  */
 async function getSettings() {
   const autoUpdateSettings = await db.get(AUTO_UPDATE_SETTINGS);
-  if (autoUpdateSettings) {
-    return autoUpdateSettings;
-  } else {
-    await db.set(AUTO_UPDATE_SETTINGS, {});
-    return {};
-  }
+  if (!autoUpdateSettings) await db.set(AUTO_UPDATE_SETTINGS, {});
+  return autoUpdateSettings || {};
 }
 
 /**
  * Set the current
  * Abstracts the lengthy object merging to simply the other functions
  *
- * @param {string} name "bitcoin.dnp.dappnode.eth"
- * @param {string} version "0.2.5"
- * @param {object} data { param: "value" }
+ * @param {string} id "bitcoin.dnp.dappnode.eth"
+ * @param {boolean} enabled true
  */
-async function setSettings(id, data) {
+async function setSettings(id, enabled) {
   const autoUpdateSettings = await getSettings();
-  if (id) {
-    await db.set(AUTO_UPDATE_SETTINGS, {
-      ...autoUpdateSettings,
-      [id]: {
-        ...(autoUpdateSettings[id] || {}),
-        ...data
-      }
-    });
-  } else {
-    await db.set(AUTO_UPDATE_SETTINGS, {
-      ...autoUpdateSettings,
-      ...data
-    });
-  }
+
+  await db.set(AUTO_UPDATE_SETTINGS, {
+    ...autoUpdateSettings,
+    [id]: { enabled }
+  });
 
   // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitUpdateRegistry);
+  eventBus.emit(eventBusTag.emitAutoUpdateData);
 }
 
 /**
@@ -74,28 +54,24 @@ async function setSettings(id, data) {
  * - set `name` to null to edit the general My packages setting
  *
  * @param {bool} enabled
- * @param {string} name optional
+ * @param {string} name, if null modifies MY_PACKAGES settings
  */
-async function editDnpSetting(enabled, name) {
+async function editDnpSetting(enabled, name = MY_PACKAGES) {
   const autoUpdateSettings = await getSettings();
-  if (name) {
-    // Modify the specific DNP settings. The are stored INVERTED.
-    // true = not enabled, false = enabled
-    await setSettings(MY_PACKAGES, { [name]: !enabled });
-  } else {
-    if (enabled) {
-      // Set the "my-packages" property to an empty object to be truthy
-      // and turn on updates for all packages
-      if (!autoUpdateSettings[MY_PACKAGES])
-        await setSettings(null, { [MY_PACKAGES]: {} });
-    } else {
-      // Set the "my-packages" property to an null to turn OFF
-      // updates for all packages and override the custom settings
-      await setSettings(null, { [MY_PACKAGES]: null });
-    }
-  }
 
-  if (!enabled) await clearPendingUpdates(name || MY_PACKAGES);
+  // When disabling MY_PACKAGES, turn off all DNPs settings by
+  // Ignoring all entries but the system packages
+  if (name === MY_PACKAGES && !enabled)
+    await db.set(
+      AUTO_UPDATE_SETTINGS,
+      pick(autoUpdateSettings, SYSTEM_PACKAGES)
+    );
+
+  // When disabling any DNP, clear their pending updates
+  // Ignoring all entries but the system packages
+  if (!enabled) await clearPendingUpdates(name);
+
+  await setSettings(name, enabled);
 }
 
 /**
@@ -104,7 +80,7 @@ async function editDnpSetting(enabled, name) {
  * @param {bool} enabled
  */
 async function editCoreSetting(enabled) {
-  await setSettings(null, { [SYSTEM_PACKAGES]: enabled });
+  await setSettings(SYSTEM_PACKAGES, enabled);
 }
 
 /**
@@ -112,14 +88,14 @@ async function editCoreSetting(enabled) {
  * @param {string} name optional
  * @returns {bool} isEnabled
  */
-async function isDnpUpdateEnabled(name) {
+async function isDnpUpdateEnabled(name = MY_PACKAGES) {
   const settings = await getSettings();
-  const myPackages = settings[MY_PACKAGES];
-  if (name) {
-    return myPackages && !myPackages[name] ? true : false;
-  } else {
-    return myPackages ? true : false;
-  }
+
+  // If checking the general MY_PACKAGES setting,
+  // or a DNP that does not has a specific setting,
+  // use the general MY_PACKAGES setting
+  if (!settings[name]) name = MY_PACKAGES;
+  return (settings[name] || {}).enabled ? true : false;
 }
 
 /**
@@ -127,7 +103,7 @@ async function isDnpUpdateEnabled(name) {
  * @returns {bool} isEnabled
  */
 async function isCoreUpdateEnabled() {
-  return (await getSettings())[SYSTEM_PACKAGES] || false;
+  return await isDnpUpdateEnabled(SYSTEM_PACKAGES);
 }
 
 /**
@@ -138,23 +114,20 @@ async function isCoreUpdateEnabled() {
  * @param {string} version "0.2.5"
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
-async function flagSuccessfulUpdate(name, version, timestamp) {
-  await setRegistry(name, version, { updated: timestamp || Date.now() });
-}
-
-/**
- * Unflag a successful update. Used only for core update, since if
- * the DAPPMANAGER is updated the update can never be flagged as successful
- *
- * @param {string} name "bitcoin.dnp.dappnode.eth"
- * @param {string} version "0.2.5"
- */
-async function unflagSuccessfulUpdate(name, version) {
-  await setRegistry(name, version, { updated: null });
+async function flagCompletedUpdate(name, version, successful, timestamp) {
+  await setRegistry(name, version, {
+    updated: timestamp || Date.now(),
+    successful
+  });
 }
 
 /**
  * Auto-updates must be performed 24h after "seeing" the new version
+ * - There is a "pending" queue with only one possible slot
+ * - If the version is seen for the first time, it will be added
+ *   to the queue and delete the older queue item if any
+ * - If the version is the same as the one in the queue, the delay
+ *   will be checked and if it's completed the update is authorized
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} version "0.2.5"
@@ -163,14 +136,14 @@ async function unflagSuccessfulUpdate(name, version) {
 async function isUpdateDelayCompleted(name, version, timestamp) {
   if (!timestamp) timestamp = Date.now();
 
-  const registry = await getRegistry();
-  const { scheduledUpdate, completedDelay } =
-    ((registry || {})[name] || {})[version] || {};
-  if (scheduledUpdate) {
+  const pending = await getPending();
+  const pendingUpdate = pending[name];
+
+  if (pendingUpdate && pendingUpdate.version === version) {
+    const { scheduledUpdate, completedDelay } = pendingUpdate;
     if (Date.now() > scheduledUpdate) {
       // Flag the delay as completed (if necessary) and allow the update
-      if (completedDelay)
-        await setRegistry(name, version, { completedDelay: true });
+      if (!completedDelay) await setPending(name, { completedDelay: true });
       return true;
     } else {
       // Do not allow the update, the delay is not completed
@@ -178,10 +151,11 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
     }
   } else {
     // Start the delay object by recording the first seen time
-
-    await setRegistry(name, version, {
+    await setPending(name, {
+      version,
       firstSeen: timestamp,
-      scheduledUpdate: timestamp + updateDelay
+      scheduledUpdate: timestamp + updateDelay,
+      completedDelay: false
     });
     return false;
   }
@@ -194,10 +168,10 @@ async function isUpdateDelayCompleted(name, version, timestamp) {
  * @param {string} id "my-packages", "system-packages", "bitcoin.dnp.dappnode.eth"
  */
 async function clearPendingUpdates(id) {
-  const registry = await getRegistry();
+  const pending = await getPending();
 
   if (id === MY_PACKAGES) {
-    const dnpNames = Object.keys(registry).filter(name => name !== coreDnpName);
+    const dnpNames = Object.keys(pending).filter(name => name !== coreDnpName);
     for (const dnpName of dnpNames) {
       await clearPendingUpdatesOfDnp(dnpName);
     }
@@ -208,7 +182,7 @@ async function clearPendingUpdates(id) {
   }
 
   // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitUpdateRegistry);
+  eventBus.emit(eventBusTag.emitAutoUpdateData);
 }
 
 /**
@@ -219,18 +193,8 @@ async function clearPendingUpdates(id) {
  * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
  */
 async function clearPendingUpdatesOfDnp(name) {
-  const registry = await getRegistry();
-  await db.set(AUTO_UPDATE_REGISTRY, {
-    ...registry,
-    [name]: pickBy(registry[name] || {}, ({ scheduledUpdate, updated }) => {
-      // pending updates have not been executed, and the update time is within bounds
-      const isPending =
-        scheduledUpdate &&
-        !updated &&
-        scheduledUpdate + autoUpdateWatcherInterval > Date.now();
-      return !isPending;
-    })
-  });
+  const pending = await getPending();
+  await db.set(AUTO_UPDATE_PENDING, omit(pending, name));
 }
 
 /**
@@ -238,23 +202,18 @@ async function clearPendingUpdatesOfDnp(name) {
  *
  * @returns {object} registry = {
  *   "core.dnp.dappnode.eth": {
- *     "0.2.4": { firstSeen: 1563218436285,
- *                scheduledUpdate: 1563304834738,
- *                updated: 1563304834738,
- *                completedDelay: true },
- *     "0.2.5": { firstSeen: 1563371560487 }
+ *     "0.2.4": { updated: 1563304834738, successful: true },
+ *     "0.2.5": { updated: 1563304834738, successful: false }
  *   },
  *   "bitcoin.dnp.dappnode.eth": {
- *     "0.1.1": { firstSeen: 1563218436285,
- *                scheduledUpdate: 1563304834738,
- *                updated: 1563304834738,
- *                completedDelay: true },
- *     "0.1.2": { firstSeen: 1563371560487 }
+ *     "0.1.1": { updated: 1563304834738, successful: true },
+ *     "0.1.2": { updated: 1563304834738, successful: true }
  *   }
  * }
  */
 async function getRegistry() {
   const registry = await db.get(AUTO_UPDATE_REGISTRY);
+  if (!registry) await db.set(AUTO_UPDATE_REGISTRY, {});
   return registry || {};
 }
 
@@ -281,7 +240,52 @@ async function setRegistry(name, version, data) {
   });
 
   // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitUpdateRegistry);
+  eventBus.emit(eventBusTag.emitAutoUpdateData);
+}
+
+/**
+ * Returns a list of pending auto-updates, 1 per DNP max
+ *
+ * @returns {object} pending = {
+ *   "core.dnp.dappnode.eth": {
+ *     version: "0.2.4",
+ *     firstSeen: 1563218436285,
+ *     scheduledUpdate: 1563304834738,
+ *     completedDelay: true
+ *   },
+ *   "bitcoin.dnp.dappnode.eth": {
+ *     version: "0.1.2",
+ *     firstSeen: 1563218436285,
+ *     scheduledUpdate: 1563304834738,
+ *     completedDelay: false,
+ *   }
+ * }
+ */
+async function getPending() {
+  const pending = await db.get(AUTO_UPDATE_PENDING);
+  if (!pending) await db.set(AUTO_UPDATE_PENDING, {});
+  return pending || {};
+}
+
+/**
+ * Set a DNP version entry in the registry by merging data
+ * Abstracts the lengthy object merging to simply the other functions
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {object} data { version: "0.2.6", param: "value" }
+ */
+async function setPending(name, data) {
+  const pending = await getPending();
+  await db.set(AUTO_UPDATE_PENDING, {
+    ...pending,
+    [name]: {
+      ...(pending[name] || {}),
+      ...data
+    }
+  });
+
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.emit(eventBusTag.emitAutoUpdateData);
 }
 
 module.exports = {
@@ -294,14 +298,16 @@ module.exports = {
   getSettings,
   // To keep a registry of performed updates
   // + Enforce a delay before auto-updating
-  flagSuccessfulUpdate,
-  unflagSuccessfulUpdate,
+  flagCompletedUpdate,
   isUpdateDelayCompleted,
   clearPendingUpdates,
   getRegistry,
+  // Pending updates
+  getPending,
   // String constants
   MY_PACKAGES,
   SYSTEM_PACKAGES,
   AUTO_UPDATE_SETTINGS,
-  AUTO_UPDATE_REGISTRY
+  AUTO_UPDATE_REGISTRY,
+  AUTO_UPDATE_PENDING
 };

@@ -5,9 +5,8 @@
  */
 
 module.exports = {
-  autoUpdateRegistryGet: require("./autoUpdateRegistryGet"),
+  autoUpdateDataGet: require("./autoUpdateDataGet"),
   autoUpdateSettingsEdit: require("./autoUpdateSettingsEdit"),
-  autoUpdateSettingsGet: require("./autoUpdateSettingsGet"),
   backupGet: require("./backupGet"),
   backupRestore: require("./backupRestore"),
   changeIpfsTimeout: require("./changeIpfsTimeout"),
@@ -16,6 +15,7 @@ module.exports = {
   copyFileTo: require("./copyFileTo"),
   diagnose: require("./diagnose"),
   diskSpaceAvailable: require("./diskSpaceAvailable"),
+  fetchCoreUpdateData: require("./fetchCoreUpdateData"),
   fetchDirectory: require("./fetchDirectory"),
   fetchPackageVersions: require("./fetchPackageVersions"),
   fetchPackageData: require("./fetchPackageData"),

@@ -9,7 +9,7 @@ const computeSemverUpdateType = require("utils/computeSemverUpdateType");
 const {
   isDnpUpdateEnabled,
   isUpdateDelayCompleted,
-  flagSuccessfulUpdate
+  flagCompletedUpdate
 } = require("utils/autoUpdateHelper");
 // External calls
 const installPackage = require("calls/installPackage");
@@ -34,10 +34,11 @@ async function updateMyPackage(name, version) {
   if (!(await isUpdateDelayCompleted(name, latestVersion))) return;
 
   logs.info(`Auto-updating ${name} to ${latestVersion}...`);
+
   await installPackage({ id: name });
 
-  logs.info(`Successfully auto-updated ${name} to ${latestVersion}`);
-  await flagSuccessfulUpdate(name, latestVersion);
+  await flagCompletedUpdate(name, version, true);
+  logs.info(`Successfully auto-updated system packages`);
   eventBus.emit(eventBusTag.emitPackages);
 }
 
