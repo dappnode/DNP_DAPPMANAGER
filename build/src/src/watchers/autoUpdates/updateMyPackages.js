@@ -37,7 +37,7 @@ async function updateMyPackage(name, version) {
 
   await installPackage({ id: name });
 
-  await flagCompletedUpdate(name, version, true);
+  await flagCompletedUpdate(name, latestVersion, true);
   logs.info(`Successfully auto-updated system packages`);
   eventBus.emit(eventBusTag.emitPackages);
 }

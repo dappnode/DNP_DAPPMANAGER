@@ -83,6 +83,10 @@ async function editDnpSetting(enabled, name = MY_PACKAGES) {
  */
 async function editCoreSetting(enabled) {
   await setSettings(SYSTEM_PACKAGES, enabled);
+
+  // When disabling any DNP, clear their pending updates
+  // Ignoring all entries but the system packages
+  if (!enabled) await clearPendingUpdates(SYSTEM_PACKAGES);
 }
 
 /**

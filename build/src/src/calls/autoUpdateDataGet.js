@@ -69,16 +69,23 @@ async function autoUpdateDataGet() {
   ];
 
   if (await autoUpdateHelper.isDnpUpdateEnabled()) {
-    const singleDnpsToShow = dnpList.filter(
-      dnp =>
+    const singleDnpsToShow = [];
+    for (const dnp of dnpList) {
+      const storedDnp = singleDnpsToShow.find(_dnp => _dnp.name === dnp.name);
+      const storedVersion = (storedDnp || {}).version;
+      if (
         dnp.name &&
         // Ignore core DNPs
         dnp.isDnp &&
         // Ignore wierd versions
         semver.valid(dnp.version) &&
         // MUST come from the APM
-        !dnp.origin
-    );
+        !dnp.origin &&
+        // Ensure there are no duplicates
+        (!storedVersion || semver.gt(storedVersion, dnp.version))
+      )
+        singleDnpsToShow.push(dnp);
+    }
 
     for (const dnp of singleDnpsToShow) {
       const enabled = await autoUpdateHelper.isDnpUpdateEnabled(dnp.name);

@@ -107,7 +107,7 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
   return {
     message: "Got core update data",
     result: {
-      available: Object.keys(coreDnpsToBeInstalled).length,
+      available: Boolean(Object.keys(coreDnpsToBeInstalled).length),
       type,
       packages,
       changelog: coreManifest.changelog,
