@@ -2,7 +2,6 @@ const db = require("db");
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
 const { pick, omit } = require("lodash");
-const { parseStaticDate, parseDiffDates } = require("./dates");
 const { parseCoreVersionIdToStrings } = require("./coreVersionId");
 const { includesArray } = require("./arrays");
 
@@ -299,6 +298,12 @@ async function setPending(name, data) {
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
+ * @return {object} feedback = {
+ *   updated: 15363818244,
+ *   manuallyUpdated: true,
+ *   inQueue: true,
+ *   scheduled: 15363818244
+ * }
  */
 async function getDnpFeedbackMessage({
   id,
@@ -314,22 +319,22 @@ async function getDnpFeedbackMessage({
 
   // If current version is auto-installed, it will show up in the registry
   if (currentVersionRegistry.successful)
-    return `${parseStaticDate(currentVersionRegistry.updated)}`;
+    return { updated: currentVersionRegistry.updated };
 
   // If the pending version is the current BUT it is NOT in the registry,
   // it must have been updated by the user
   if (currentVersion && currentVersion === pendingVersion)
-    return `Manually updated`;
+    return { manuallyUpdated: true };
 
   // Here, an update can be pending
   if (scheduledUpdate)
     if (Date.now() > scheduledUpdate) {
-      return "In queue";
+      return { inQueue: true };
     } else {
-      return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
+      return { scheduled: scheduledUpdate };
     }
 
-  return "-";
+  return {};
 }
 
 /**
@@ -338,6 +343,12 @@ async function getDnpFeedbackMessage({
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
+ * @return {object} feedback = {
+ *   updated: 15363818244,
+ *   manuallyUpdated: true,
+ *   inQueue: true,
+ *   scheduled: 15363818244
+ * }
  */
 async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
   if (!registry) registry = await getRegistry();
@@ -366,20 +377,25 @@ async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
   if (scheduledUpdate) {
     // If the pending version is the current BUT it is NOT in the registry,
     // it must have been updated by the user
-    if (pendingVersionsAreInstalled) return `Manually updated`;
+    if (pendingVersionsAreInstalled) return { manuallyUpdated: true };
 
     // Here, an update can be pending
-    if (Date.now() > scheduledUpdate) return "In queue";
-    else return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
+    if (Date.now() > scheduledUpdate) return { inQueue: true };
+    else return { scheduled: scheduledUpdate };
   } else {
     // If current version is auto-installed, it will show up in the registry
     if (lastUpdatedVersionsAreInstalled)
-      return `${parseStaticDate(lastUpdatedVersion.updated)}`;
+      return { updated: lastUpdatedVersion.updated };
   }
 
-  return "-";
+  return {};
 }
 
+/**
+ * Returns the last successful registry entry sorted by updated timestamp
+ * @param {object} registryDnp
+ * @return {object}
+ */
 function getLastRegistryEntry(registryDnp = {}) {
   return (
     Object.entries(registryDnp)

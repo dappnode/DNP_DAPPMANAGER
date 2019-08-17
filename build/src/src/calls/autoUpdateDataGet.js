@@ -11,6 +11,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * - settings: If auto-updates are enabled for a specific DNP or DNPs
  * - registry: List of executed auto-updates
  * - pending: Pending auto-update per DNP, can be already executed
+ * - dnpsToShow: Parsed data to be shown in the UI
  *
  * @returns {object} result = {
  *   settings: {
@@ -18,50 +19,27 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  *     "my-packages": { enabled: true }
  *     "bitcoin.dnp.dappnode.eth": { enabled: false }
  *   },
- *   registry: {
- *     "core.dnp.dappnode.eth": {
- *       "0.2.4": { updated: 1563304834738, successful: true },
- *       "0.2.5": { updated: 1563304834738, successful: false }
- *     },
- *     "bitcoin.dnp.dappnode.eth": {
- *       "0.1.1": { updated: 1563304834738, successful: true },
- *       "0.1.2": { updated: 1563304834738, successful: true }
+ *   registry: { "core.dnp.dappnode.eth": {
+ *     "0.2.4": { updated: 1563304834738, successful: true },
+ *     "0.2.5": { updated: 1563304834738, successful: false }
+ *   }, ... },
+ *   pending: { "core.dnp.dappnode.eth": {
+ *     version: "0.2.4",
+ *     firstSeen: 1563218436285,
+ *     scheduledUpdate: 1563304834738,
+ *     completedDelay: true
+ *   }, ... },
+ *   dnpsToShow: [{
+ *     id: "system-packages",
+ *     displayName: "System packages",
+ *     enabled: true,
+ *     feedback: {
+ *       updated: 15363818244,
+ *       manuallyUpdated: true,
+ *       inQueue: true,
+ *       scheduled: 15363818244
  *     }
- *   },
- *   pending: {
- *     "core.dnp.dappnode.eth": {
- *       version: "0.2.4",
- *       firstSeen: 1563218436285,
- *       scheduledUpdate: 1563304834738,
- *       completedDelay: true
- *     },
- *     "bitcoin.dnp.dappnode.eth": {
- *       version: "0.1.2",
- *       firstSeen: 1563218436285,
- *       scheduledUpdate: 1563304834738,
- *       completedDelay: false,
- *     }
- *   },
- *   dnpsToShow: [
- *     {
- *       id: "system-packages",
- *       displayName: "System packages",
- *       enabled: true,
- *       feedback: "Today, 0 min ago"
- *     },
- *     {
- *       id: "my-packages",
- *       displayName: "My packages",
- *       enabled: true,
- *       feedback: "-"
- *     },
- *     {
- *       id: "bitcoin.dnp.dappnode.eth",
- *       displayName: "Bitcoin",
- *       enabled: true,
- *       feedback: "Scheduled, in 23 hours"
- *     }
- *   ]
+ *   }, ... ]
  * }
  */
 async function autoUpdateDataGet() {
@@ -86,7 +64,7 @@ async function autoUpdateDataGet() {
       id: MY_PACKAGES,
       displayName: "My packages",
       enabled: await autoUpdateHelper.isDnpUpdateEnabled(),
-      feedback: "-"
+      feedback: {}
     }
   ];
 
@@ -113,7 +91,7 @@ async function autoUpdateDataGet() {
               id: dnp.name,
               currentVersion: dnp.version
             })
-          : "-"
+          : {}
       });
     }
   }

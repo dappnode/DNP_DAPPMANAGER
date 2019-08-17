@@ -77,19 +77,19 @@ describe("Call function: autoUpdateDataGet", () => {
             id: "system-packages",
             displayName: "System packages",
             enabled: true,
-            feedback: "Today, 0 min ago"
+            feedback: { updated: timestamp }
           },
           {
             id: "my-packages",
             displayName: "My packages",
             enabled: true,
-            feedback: "-"
+            feedback: {}
           },
           {
             id: id,
             displayName: "Bitcoin",
             enabled: true,
-            feedback: "Scheduled, in 23 hours"
+            feedback: { scheduled: timestamp + params.AUTO_UPDATE_DELAY }
           }
         ]
       }

@@ -232,17 +232,18 @@ describe("Util: autoUpdateHelper", () => {
     const nextVersion = "0.2.7";
 
     it("1. Nothing happened yet", async () => {
-      const message = await getDnpFeedbackMessage({
+      const feedback = await getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
         pending: {}
       });
-      expect(message).to.equal("-", "Message should be empty");
+      expect(feedback).to.deep.equal({}, "Message should be empty");
     });
 
     it("2. DNP is seen", async () => {
-      const message = await getDnpFeedbackMessage({
+      const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
+      const feedback = await getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -250,16 +251,16 @@ describe("Util: autoUpdateHelper", () => {
           [id]: {
             version: nextVersion,
             firstSeen: Date.now(),
-            scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
+            scheduledUpdate: timestamp,
             completedDelay: false
           }
         }
       });
-      expect(message).to.equal("Scheduled, in 12 hours");
+      expect(feedback).to.deep.equal({ scheduled: timestamp });
     });
 
     it("3A. DNP is manually updated", async () => {
-      const message = await getDnpFeedbackMessage({
+      const feedback = await getDnpFeedbackMessage({
         id,
         currentVersion: nextVersion,
         registry: {},
@@ -272,11 +273,11 @@ describe("Util: autoUpdateHelper", () => {
           }
         }
       });
-      expect(message).to.equal("Manually updated");
+      expect(feedback).to.deep.equal({ manuallyUpdated: true });
     });
 
     it("3B. DNP is in queue", async () => {
-      const message = await getDnpFeedbackMessage({
+      const feedback = await getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -289,17 +290,18 @@ describe("Util: autoUpdateHelper", () => {
           }
         }
       });
-      expect(message).to.equal("In queue");
+      expect(feedback).to.deep.equal({ inQueue: true });
     });
 
     it("3B. DNP is successfully updated", async () => {
-      const message = await getDnpFeedbackMessage({
+      const timestamp = Date.now();
+      const feedback = await getDnpFeedbackMessage({
         id,
         currentVersion: nextVersion,
         registry: {
           [id]: {
             [nextVersion]: {
-              updated: Date.now(),
+              updated: timestamp,
               successful: true
             }
           }
@@ -313,7 +315,7 @@ describe("Util: autoUpdateHelper", () => {
           }
         }
       });
-      expect(message).to.equal("Today, 0 min ago");
+      expect(feedback).to.deep.equal({ updated: timestamp });
     });
   });
 
@@ -326,16 +328,17 @@ describe("Util: autoUpdateHelper", () => {
     const id = coreDnpName;
 
     it("1. Nothing happened yet", async () => {
-      const message = await getCoreFeedbackMessage({
+      const feedback = await getCoreFeedbackMessage({
         currentVersionId,
         registry: {},
         pending: {}
       });
-      expect(message).to.equal("-", "Message should be empty");
+      expect(feedback).to.deep.equal({}, "Message should be empty");
     });
 
     it("2. Core update is seen", async () => {
-      const message = await getCoreFeedbackMessage({
+      const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
+      const feedback = await getCoreFeedbackMessage({
         currentVersionId,
         registry: {},
         pending: {
@@ -345,16 +348,16 @@ describe("Util: autoUpdateHelper", () => {
               { name: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
-            scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
+            scheduledUpdate: timestamp,
             completedDelay: false
           }
         }
       });
-      expect(message).to.equal("Scheduled, in 12 hours");
+      expect(feedback).to.deep.equal({ scheduled: timestamp });
     });
 
     it("3A. Core is manually updated", async () => {
-      const message = await getCoreFeedbackMessage({
+      const feedback = await getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId([
           { name: "admin", version: "0.2.1" },
           { name: "vpn", version: "0.2.1" },
@@ -373,10 +376,11 @@ describe("Util: autoUpdateHelper", () => {
           }
         }
       });
-      expect(message).to.equal("Manually updated");
+      expect(feedback).to.deep.equal({ manuallyUpdated: true });
     });
 
     it("3B. Core is successfully updated", async () => {
+      const timestamp = Date.now();
       const nextVersion = getCoreVersionId([
         { name: "admin", version: "0.2.1" },
         { name: "core", version: "0.2.1" }
@@ -386,19 +390,19 @@ describe("Util: autoUpdateHelper", () => {
         { name: "vpn", version: "0.2.1" },
         { name: "core", version: "0.2.1" }
       ]);
-      const message = await getCoreFeedbackMessage({
+      const feedback = await getCoreFeedbackMessage({
         currentVersionId,
         registry: {
           [id]: {
-            [nextVersion]: { updated: Date.now(), successful: true }
+            [nextVersion]: { updated: timestamp, successful: true }
           }
         },
         pending: {}
       });
-      expect(message).to.equal("Today, 0 min ago");
+      expect(feedback).to.deep.equal({ updated: timestamp });
     });
 
-    it("X. Core full lifecycle", async () => {
+    it("1 -> 4. Core full lifecycle", async () => {
       const currentVersionIdBefore = getCoreVersionId([
         { name: "admin", version: "0.2.0" },
         { name: "vpn", version: "0.2.0" },
@@ -423,19 +427,24 @@ describe("Util: autoUpdateHelper", () => {
         await getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
-      ).to.equal("-", "1. Should be empty");
+      ).to.deep.equal({}, "1. Should be empty");
 
+      const timestampIsUpdated =
+        Date.now() - (24 * 60 * 60 * 1000 - microDelay);
       await isUpdateDelayCompleted(
         coreDnpName,
         nextVersionId,
-        Date.now() - (24 * 60 * 60 * 1000 - microDelay)
+        timestampIsUpdated
       );
 
       expect(
         await getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
-      ).to.equal("Scheduled, in 0 minutes", "2. Should be scheduled");
+      ).to.deep.equal(
+        { scheduled: timestampIsUpdated + updateDelay },
+        "2. Should be scheduled"
+      );
 
       await new Promise(r => setTimeout(r, 2 * microDelay));
 
@@ -443,33 +452,50 @@ describe("Util: autoUpdateHelper", () => {
         await getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
-      ).to.equal("In queue", "3. Should be in queue");
+      ).to.deep.equal({ inQueue: true }, "3. Should be in queue");
 
       expect(
         await getCoreFeedbackMessage({
           currentVersionId: currentVersionIdAfter
         })
-      ).to.equal("Manually updated", "3A. Should be manually updated");
+      ).to.deep.equal(
+        { manuallyUpdated: true },
+        "3A. Should be manually updated"
+      );
 
-      await flagCompletedUpdate(coreDnpName, nextVersionId, true);
-
-      expect(
-        await getCoreFeedbackMessage({
-          currentVersionId: currentVersionIdAfter
-        })
-      ).to.equal("Today, 0 min ago", "3B. Should be completed");
-
-      await isUpdateDelayCompleted(
+      const timestampIsCompleted = Date.now();
+      await flagCompletedUpdate(
         coreDnpName,
-        nextVersion2Id,
-        Date.now() - (24 * 60 * 60 * 1000 - microDelay)
+        nextVersionId,
+        true,
+        timestampIsCompleted
       );
 
       expect(
         await getCoreFeedbackMessage({
           currentVersionId: currentVersionIdAfter
         })
-      ).to.equal("Scheduled, in 0 minutes", "4. Start again");
+      ).to.deep.equal(
+        { updated: timestampIsCompleted },
+        "3B. Should be completed"
+      );
+
+      const timestampIsCompletedNext =
+        Date.now() - (24 * 60 * 60 * 1000 - microDelay);
+      await isUpdateDelayCompleted(
+        coreDnpName,
+        nextVersion2Id,
+        timestampIsCompletedNext
+      );
+
+      expect(
+        await getCoreFeedbackMessage({
+          currentVersionId: currentVersionIdAfter
+        })
+      ).to.deep.equal(
+        { scheduled: timestampIsCompletedNext + updateDelay },
+        "4. Start again"
+      );
     });
   });
 
