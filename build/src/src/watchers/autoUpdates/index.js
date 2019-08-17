@@ -1,9 +1,11 @@
 const logs = require("logs.js")(module);
 const params = require("params");
+const { eventBus, eventBusTag } = require("eventBus");
 // Utils
 const {
   isDnpUpdateEnabled,
-  isCoreUpdateEnabled
+  isCoreUpdateEnabled,
+  clearPendingUpdates
 } = require("utils/autoUpdateHelper");
 
 const updateMyPackages = require("./updateMyPackages");
@@ -42,5 +44,12 @@ async function autoUpdates() {
 }
 
 autoUpdates();
+
+eventBus.onSafe(eventBusTag.packageModified, ({ id, removed } = {}) => {
+  if (removed)
+    clearPendingUpdates(id).catch(e =>
+      logs.error(`Error clearPendingUpdates: ${e.stack}`)
+    );
+});
 
 module.exports = autoUpdates;

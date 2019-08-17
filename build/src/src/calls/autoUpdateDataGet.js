@@ -2,6 +2,7 @@ const semver = require("semver");
 const { listContainers } = require("modules/dockerList");
 const { getCoreVersionId } = require("utils/coreVersionId");
 const autoUpdateHelper = require("utils/autoUpdateHelper");
+const { shortNameCapitalized } = require("utils/format");
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 
@@ -40,19 +41,40 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  *       scheduledUpdate: 1563304834738,
  *       completedDelay: false,
  *     }
- *   }
+ *   },
+ *   dnpsToShow: [
+ *     {
+ *       id: "system-packages",
+ *       displayName: "System packages",
+ *       enabled: true,
+ *       feedback: "Today, 0 min ago"
+ *     },
+ *     {
+ *       id: "my-packages",
+ *       displayName: "My packages",
+ *       enabled: true,
+ *       feedback: "-"
+ *     },
+ *     {
+ *       id: "bitcoin.dnp.dappnode.eth",
+ *       displayName: "Bitcoin",
+ *       enabled: true,
+ *       feedback: "Scheduled, in 23 hours"
+ *     }
+ *   ]
  * }
  */
 async function autoUpdateDataGet() {
   const settings = await autoUpdateHelper.getSettings();
   const registry = await autoUpdateHelper.getRegistry();
-  const pending = await autoUpdateHelper.getRegistry();
+  const pending = await autoUpdateHelper.getPending();
 
   const dnpList = await listContainers();
 
   const dnpsToShow = [
     {
-      name: SYSTEM_PACKAGES,
+      id: SYSTEM_PACKAGES,
+      displayName: "System packages",
       enabled: await autoUpdateHelper.isCoreUpdateEnabled(),
       feedback: await autoUpdateHelper.getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId(
@@ -61,7 +83,8 @@ async function autoUpdateDataGet() {
       })
     },
     {
-      name: MY_PACKAGES,
+      id: MY_PACKAGES,
+      displayName: "My packages",
       enabled: await autoUpdateHelper.isDnpUpdateEnabled(),
       feedback: "-"
     }
@@ -82,7 +105,8 @@ async function autoUpdateDataGet() {
     for (const dnp of singleDnpsToShow) {
       const enabled = await autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
       dnpsToShow.push({
-        name: dnp.name,
+        id: dnp.name,
+        displayName: shortNameCapitalized(dnp.name),
         enabled,
         feedback: enabled
           ? await autoUpdateHelper.getDnpFeedbackMessage({

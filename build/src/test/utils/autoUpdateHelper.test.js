@@ -18,6 +18,7 @@ const {
   // + Enforce a delay before auto-updating
   flagCompletedUpdate,
   isUpdateDelayCompleted,
+  clearPendingUpdates,
   getRegistry,
   // Pending updates
   getPending,
@@ -392,14 +393,7 @@ describe("Util: autoUpdateHelper", () => {
             [nextVersion]: { updated: Date.now(), successful: true }
           }
         },
-        pending: {
-          [id]: {
-            version: nextVersion,
-            firstSeen: Date.now(),
-            scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
-            completedDelay: false
-          }
-        }
+        pending: {}
       });
       expect(message).to.equal("Today, 0 min ago");
     });
@@ -499,6 +493,12 @@ describe("Util: autoUpdateHelper", () => {
         const registryDnp = {};
         const lastEntry = {};
         expect(getLastRegistryEntry(registryDnp)).to.deep.equal(lastEntry);
+      });
+    });
+
+    describe("clearPendingUpdates", () => {
+      it("Should not throw for unknown keys", () => {
+        clearPendingUpdates("asdasd");
       });
     });
   });

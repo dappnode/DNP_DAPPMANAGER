@@ -122,6 +122,8 @@ async function flagCompletedUpdate(name, version, successful, timestamp) {
     updated: timestamp || Date.now(),
     successful
   });
+
+  if (successful) await clearPendingUpdatesOfDnp(name);
 }
 
 /**
@@ -361,22 +363,19 @@ async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
       parseCoreVersionIdToStrings(currentVersionId)
     );
 
-  // If current version is auto-installed, it will show up in the registry
-  if (lastUpdatedVersionsAreInstalled && pendingVersionsAreInstalled)
-    return `${parseStaticDate(lastUpdatedVersion.updated)}`;
+  if (scheduledUpdate) {
+    // If the pending version is the current BUT it is NOT in the registry,
+    // it must have been updated by the user
+    if (pendingVersionsAreInstalled) return `Manually updated`;
 
-  // If the pending version is the current BUT it is NOT in the registry,
-  // it must have been updated by the user
-  if (!lastUpdatedVersionsAreInstalled && pendingVersionsAreInstalled)
-    return `Manually updated`;
-
-  // Here, an update can be pending
-  if (scheduledUpdate)
-    if (Date.now() > scheduledUpdate) {
-      return "In queue";
-    } else {
-      return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
-    }
+    // Here, an update can be pending
+    if (Date.now() > scheduledUpdate) return "In queue";
+    else return `Scheduled, in ${parseDiffDates(scheduledUpdate)}`;
+  } else {
+    // If current version is auto-installed, it will show up in the registry
+    if (lastUpdatedVersionsAreInstalled)
+      return `${parseStaticDate(lastUpdatedVersion.updated)}`;
+  }
 
   return "-";
 }
