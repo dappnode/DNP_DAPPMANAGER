@@ -12,7 +12,9 @@ const installPackage = require("calls/installPackage");
 const coreDnpName = "core.dnp.dappnode.eth";
 
 async function updateSystemPackages() {
-  const { available, type, versionId } = await fetchCoreUpdateData();
+  const {
+    result: { available, type, versionId }
+  } = await fetchCoreUpdateData();
 
   // If there is not update available or the type is not patch, return early
   if (!available || type !== "patch") return;

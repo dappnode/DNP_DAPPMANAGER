@@ -8,6 +8,8 @@ const { getCoreVersionId } = require("utils/coreVersionId");
 const coreName = "core.dnp.dappnode.eth";
 
 /**
+ * Fetches the core update data, if available
+ *
  * @returns {object} result = {
  *   available: true {bool},
  *   type: "minor",
@@ -25,8 +27,9 @@ const coreName = "core.dnp.dappnode.eth";
  *       manifest: {}
  *     }
  *   ],
- *   changelog: "ajshdkas",
- *   updateAlerts: "asjdhkas",
+ *   changelog: "Changelog text",
+ *   updateAlerts: [{ message: "Specific update alert"}, ... ],
+ *   versionId: "admin@0.2.6,core@0.2.8"
  * }
  */
 async function fetchCoreUpdateData({ version = "*" } = {}) {
@@ -35,12 +38,10 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
    * With the list of deps to install, compute the higher updateType
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
-  const { state: coreDnpsToBeInstalled } = await dappGet(
-    { name: coreName, ver: version },
-    {
-      BYPASS_RESOLVER: true
-    }
-  );
+  const { state: coreDnpsToBeInstalled } = await dappGet({
+    name: coreName,
+    ver: version
+  });
 
   const dnpList = await dockerList.listContainers();
 
@@ -54,7 +55,7 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
       return {
         name: depName,
         from: dnp ? dnp.version : "",
-        to: depVersion,
+        to: depManifest.version,
         warningOnInstall: depManifest.warningOnInstall,
         manifest: depManifest
       };
@@ -104,12 +105,15 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
   );
 
   return {
-    available: Object.keys(coreDnpsToBeInstalled).length,
-    type,
-    packages,
-    changelog: coreManifest.changelog,
-    updateAlerts,
-    versionId
+    message: "Got core update data",
+    result: {
+      available: Object.keys(coreDnpsToBeInstalled).length,
+      type,
+      packages,
+      changelog: coreManifest.changelog,
+      updateAlerts,
+      versionId
+    }
   };
 }
 
