@@ -206,6 +206,21 @@ async function clearPendingUpdatesOfDnp(name) {
 }
 
 /**
+ * Clears the auto-update registry entries.
+ * Should be used when uninstalling a DNP, for clearing the UI
+ * and the install history of the DNP.
+ *
+ * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
+ */
+async function clearRegistry(name) {
+  const registry = await getRegistry();
+  await db.set(AUTO_UPDATE_REGISTRY, omit(registry, name));
+
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.emit(eventBusTag.emitAutoUpdateData);
+}
+
+/**
  * Returns a registry of successfully completed auto-updates
  *
  * @returns {object} registry = {
@@ -298,7 +313,6 @@ async function setPending(name, data) {
 
 /**
  * Get an auto-update feedback message
- * - If there is a pending update
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
@@ -321,14 +335,19 @@ async function getDnpFeedbackMessage({
   const currentVersionRegistry = (registry[id] || {})[currentVersion] || {};
   const { version: pendingVersion, scheduledUpdate } = pending[id] || {};
 
+  const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
+  const lastUpdatedVersionsAreInstalled =
+    lastUpdatedVersion.version && lastUpdatedVersion.version === currentVersion;
+  const pendingVersionsAreInstalled =
+    pendingVersion && pendingVersion === currentVersion;
+
   // If current version is auto-installed, it will show up in the registry
-  if (currentVersionRegistry.successful)
+  if (lastUpdatedVersionsAreInstalled)
     return { updated: currentVersionRegistry.updated };
 
   // If the pending version is the current BUT it is NOT in the registry,
   // it must have been updated by the user
-  if (currentVersion && currentVersion === pendingVersion)
-    return { manuallyUpdated: true };
+  if (pendingVersionsAreInstalled) return { manuallyUpdated: true };
 
   // Here, an update can be pending
   if (scheduledUpdate)
@@ -343,7 +362,8 @@ async function getDnpFeedbackMessage({
 
 /**
  * Get an auto-update feedback message
- * - If there is a pending update
+ * [NOTE] since core versionId may include multiple verisons,
+ * the logic is different than for a single version DNP
  *
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} currentVersion "0.2.6", must come from dockerList, dnp.version
@@ -427,6 +447,7 @@ module.exports = {
   flagCompletedUpdate,
   isUpdateDelayCompleted,
   clearPendingUpdates,
+  clearRegistry,
   getRegistry,
   // Pending updates
   getPending,

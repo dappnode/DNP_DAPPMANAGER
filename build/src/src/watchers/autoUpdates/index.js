@@ -5,7 +5,8 @@ const { eventBus, eventBusTag } = require("eventBus");
 const {
   isDnpUpdateEnabled,
   isCoreUpdateEnabled,
-  clearPendingUpdates
+  clearPendingUpdates,
+  clearRegistry
 } = require("utils/autoUpdateHelper");
 
 const updateMyPackages = require("./updateMyPackages");
@@ -50,6 +51,7 @@ eventBus.onSafe(eventBusTag.packageModified, ({ id, removed } = {}) => {
     clearPendingUpdates(id).catch(e =>
       logs.error(`Error clearPendingUpdates: ${e.stack}`)
     );
+  clearRegistry(id).catch(e => logs.error(`Error clearRegistry: ${e.stack}`));
 });
 
 module.exports = autoUpdates;

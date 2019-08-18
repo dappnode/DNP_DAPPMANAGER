@@ -317,6 +317,30 @@ describe("Util: autoUpdateHelper", () => {
       });
       expect(feedback).to.deep.equal({ updated: timestamp });
     });
+
+    it("Swarm logic bug for rollback versions", async () => {
+      const swarmId = "swarm.dnp.dappnode.eth";
+      const timestamp = Date.now() + 23.3 * 60 * 60 * 1000;
+      const feedback = await getDnpFeedbackMessage({
+        id: swarmId,
+        currentVersion: "0.2.1",
+        registry: {
+          [swarmId]: {
+            "0.2.1": { updated: 1566058824278, successful: true },
+            "0.2.2": { updated: 1566140083139, successful: true }
+          }
+        },
+        pending: {
+          [swarmId]: {
+            version: "0.2.2",
+            firstSeen: timestamp - 24 * 60 * 60 * 1000,
+            scheduledUpdate: timestamp,
+            completedDelay: false
+          }
+        }
+      });
+      expect(feedback).to.deep.equal({ scheduled: timestamp });
+    });
   });
 
   describe("Feedback text for COREs", () => {
