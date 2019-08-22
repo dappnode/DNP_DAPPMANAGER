@@ -21,11 +21,8 @@ const updatePortMappings = async ({ id, portMappings, options = {} }) => {
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
 
-  if (
-    id === "dappmanager.dnp.dappnode.eth" &&
-    portMappings.find(({ host }) => !host)
-  )
-    throw Error("Can't assign ephemeral ports to the DAPPAMANAGER");
+  if (id === "dappmanager.dnp.dappnode.eth")
+    throw Error("Can not edit DAPPAMANAGER ports");
 
   /**
    * [NOTE]
