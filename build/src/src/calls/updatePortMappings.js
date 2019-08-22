@@ -1,6 +1,7 @@
 const lockPorts = require("modules/lockPorts");
 // Utils
 const { getComposeInstance } = require("utils/dockerComposeFile");
+const { stringIncludes } = require("utils/strings");
 // External call
 const restartPackage = require("./restartPackage");
 const { eventBus, eventBusTag } = require("eventBus");
@@ -47,11 +48,34 @@ const updatePortMappings = async ({ id, portMappings, options = {} }) => {
    * ]
    */
   const compose = getComposeInstance(id);
+  const previousPortMappings = compose.getPortMappings();
   if (options.merge) compose.mergePortMapping(portMappings);
   else compose.setPortMappings(portMappings);
 
   // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
-  await restartPackage({ id });
+  try {
+    await restartPackage({ id });
+  } catch (e) {
+    if (stringIncludes(e.message, "port is already allocated")) {
+      compose.setPortMappings(previousPortMappings);
+      await restartPackage({ id });
+
+      // Try to get the port colliding from the error
+      const ipAndPort = (e.message.match(
+        /(?:Bind for)(.+)(?:failed: port is already allocated)/
+      ) || [])[1];
+      const collidingPortNumber = (ipAndPort || "").split(":")[1] || "";
+
+      // Throw error
+      throw Error(
+        `${
+          collidingPortNumber
+            ? `Port ${collidingPortNumber} is already mapped`
+            : "Port collision"
+        }. Reverted port mapping update`
+      );
+    }
+  }
 
   /**
    * 2. Lock ephemeral ports if any

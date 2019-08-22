@@ -44,6 +44,8 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
           // Trigger a natRenewal update to open ports if necessary
           eventBus.emit(eventBusTag.runNatRenewal);
         }
+      } else {
+        throw e;
       }
     } else {
       throw e;
