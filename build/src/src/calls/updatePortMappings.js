@@ -15,7 +15,7 @@ const { eventBus, eventBusTag } = require("eventBus");
  * ]
  * #### !!!!! NOTE take into account existing ephemeral ports
  */
-const updatePortMappings = async ({ id, portMappings }) => {
+const updatePortMappings = async ({ id, portMappings, options = {} }) => {
   if (!id) throw Error("kwarg id must be defined");
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
@@ -47,7 +47,8 @@ const updatePortMappings = async ({ id, portMappings }) => {
    * ]
    */
   const compose = getComposeInstance(id);
-  compose.mergePortMapping(portMappings);
+  if (options.merge) compose.mergePortMapping(portMappings);
+  else compose.setPortMappings(portMappings);
 
   // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
   await restartPackage({ id });

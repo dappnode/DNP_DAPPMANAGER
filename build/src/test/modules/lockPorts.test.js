@@ -26,10 +26,10 @@ describe("Module: lockPorts", function() {
       .map(port => {
         let [portNumber, portType = "tcp"] = port.split("/");
         return {
-          IP: "0.0.0.0",
-          PrivatePort: portNumber, // container port
-          PublicPort: ephemeralPort[portType]++, // host port
-          Type: portType
+          ip: "0.0.0.0",
+          container: portNumber,
+          host: ephemeralPort[portType]++,
+          protocol: portType
         };
       });
   }

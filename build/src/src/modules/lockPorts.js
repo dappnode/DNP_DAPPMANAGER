@@ -42,10 +42,10 @@ const logs = require("logs.js")(module);
  *       name: "ipfs.dnp.dappnode.eth",
  *       ports: [
  *         {
- *           "IP": "0.0.0.0"
- *           "PrivatePort": 5000, // container port
- *           "PublicPort": 32769, // host port
- *           "Type": "tcp"
+ *           "ip": "0.0.0.0"
+ *           "container": 5000,
+ *           "host": 32769,
+ *           "protocol": "TCP"
  *         },
  *         ...
  *       ],
@@ -91,11 +91,10 @@ async function lockPorts(id) {
   // port = "5000/udp"
   const newPortMappings = ephemeralPortMappings.map(
     ({ container, protocol }) => {
-      // portNumber or p.PrivatePort may be of type integer
       const currentPort = dnp.ports.find(
         p =>
-          String(p.PrivatePort) === String(container) &&
-          stringIncludes(protocol, p.Type)
+          String(p.container) === String(container) &&
+          stringIncludes(protocol, p.protocol)
       );
       if (!currentPort) {
         throw Error(
@@ -106,7 +105,7 @@ async function lockPorts(id) {
       }
 
       // Now convert "30303/udp" to "32769:30303/udp"
-      return { host: String(currentPort.PublicPort), container, protocol };
+      return { host: String(currentPort.host), container, protocol };
     }
   );
 

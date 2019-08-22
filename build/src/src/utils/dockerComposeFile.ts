@@ -77,9 +77,15 @@ export function getComposeInstance(idOrObject: string | ComposeObj) {
     write();
   }
 
+  function setPortMappings(newPortMappings: PortMapping[]) {
+    service.ports = stringifyPortMappings(newPortMappings);
+    write();
+  }
+
   return {
     getPortMappings,
     mergePortMapping,
+    setPortMappings,
     write,
     // Constant getter
     dockerComposePath
