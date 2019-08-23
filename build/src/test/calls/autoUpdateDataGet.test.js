@@ -40,7 +40,6 @@ describe("Call function: autoUpdateDataGet", () => {
     await flagCompletedUpdate(
       "core.dnp.dappnode.eth",
       "admin@0.2.1,core@0.2.1",
-      true,
       timestamp
     );
   });

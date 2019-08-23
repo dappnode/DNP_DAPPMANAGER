@@ -4,7 +4,8 @@ const fetchCoreUpdateData = require("calls/fetchCoreUpdateData");
 // Utils
 const {
   isUpdateDelayCompleted,
-  flagCompletedUpdate
+  flagCompletedUpdate,
+  flagErrorUpdate
 } = require("utils/autoUpdateHelper");
 // External calls
 const installPackage = require("calls/installPackage");
@@ -26,21 +27,20 @@ async function updateSystemPackages() {
   logs.info(`Auto-updating system packages...`);
 
   try {
-    /**
-     * If the DAPPMANAGER is updated the updateRegistry will never be executed.
-     * Add it preventively, and then remove it if the update errors
-     */
-    await flagCompletedUpdate(coreDnpName, versionId, true);
     await installPackage({
       id: coreDnpName,
       options: { BYPASS_RESOLVER: true }
     });
 
+    /**
+     * If the DAPPMANAGER is updated the updateRegistry will never be executed.
+     * Add it preventively, and then remove it if the update errors
+     */
+    await flagCompletedUpdate(coreDnpName, versionId);
     logs.info(`Successfully auto-updated system packages`);
     eventBus.emit(eventBusTag.emitPackages);
   } catch (e) {
-    // Remove the log and throw
-    await flagCompletedUpdate(coreDnpName, versionId, false);
+    await flagErrorUpdate(coreDnpName, e.message);
     throw e;
   }
 }

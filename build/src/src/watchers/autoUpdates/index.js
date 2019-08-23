@@ -1,12 +1,14 @@
 const logs = require("logs.js")(module);
 const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
+const fetchCoreUpdateData = require("calls/fetchCoreUpdateData");
 // Utils
 const {
   isDnpUpdateEnabled,
   isCoreUpdateEnabled,
   clearPendingUpdates,
-  clearRegistry
+  clearRegistry,
+  clearCompletedCoreUpdatesIfAny
 } = require("utils/autoUpdateHelper");
 
 const updateMyPackages = require("./updateMyPackages");
@@ -53,5 +55,22 @@ eventBus.onSafe(eventBusTag.packageModified, ({ id, removed } = {}) => {
     );
   clearRegistry(id).catch(e => logs.error(`Error clearRegistry: ${e.stack}`));
 });
+
+/**
+ * If the DAPPMANAGER is updated the pending state will never be updated to
+ * "completed". So on every DAPPMANAGER start it must checked if a successful
+ * update happen before restarting
+ */
+checkForCompletedCoreUpdates();
+async function checkForCompletedCoreUpdates() {
+  try {
+    const {
+      result: { versionId }
+    } = await fetchCoreUpdateData();
+    await clearCompletedCoreUpdatesIfAny(versionId);
+  } catch (e) {
+    logs.error(`Error on clearCompletedCoreUpdatesIfAny: ${e.stack}`);
+  }
+}
 
 module.exports = autoUpdates;

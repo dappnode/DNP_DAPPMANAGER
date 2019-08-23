@@ -120,13 +120,24 @@ async function isCoreUpdateEnabled() {
  * @param {string} version "0.2.5"
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
-async function flagCompletedUpdate(name, version, successful, timestamp) {
+async function flagCompletedUpdate(name, version, timestamp) {
   await setRegistry(name, version, {
     updated: timestamp || Date.now(),
-    successful
+    successful: true
   });
 
-  if (successful) await clearPendingUpdatesOfDnp(name);
+  await clearPendingUpdatesOfDnp(name);
+}
+
+/**
+ * Flags a pending auto-update as error-ed
+ * The purpose of this information is just to provide feedback in the ADMIN UI
+ *
+ * @param {string} name "bitcoin.dnp.dappnode.eth"
+ * @param {string} errorMessage "Mainnet is still syncing"
+ */
+async function flagErrorUpdate(name, errorMessage) {
+  await setPending(name, { errorMessage });
 }
 
 /**
@@ -218,6 +229,30 @@ async function clearRegistry(name) {
 
   // Update the UI dynamically of the new successful auto-update
   eventBus.emit(eventBusTag.emitAutoUpdateData);
+}
+
+/**
+ * If the DAPPMANAGER is updated the pending state will never be updated to
+ * "completed". So on every DAPPMANAGER start it must checked if a successful
+ * update happen before restarting
+ *
+ * @param {string} currentVersionId "admin@0.2.6,core@0.2.8"
+ * @param {number} timestamp Use ONLY to make tests deterministic
+ */
+async function clearCompletedCoreUpdatesIfAny(currentVersionId, timestamp) {
+  const pending = await getPending();
+
+  const { version: pendingVersionId } = pending[coreDnpName] || {};
+  const pendingVersionsAreInstalled =
+    pendingVersionId &&
+    includesArray(
+      parseCoreVersionIdToStrings(pendingVersionId),
+      parseCoreVersionIdToStrings(currentVersionId)
+    );
+
+  if (pendingVersionsAreInstalled) {
+    await flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
+  }
 }
 
 /**
@@ -333,7 +368,8 @@ async function getDnpFeedbackMessage({
   if (!pending) pending = await getPending();
 
   const currentVersionRegistry = (registry[id] || {})[currentVersion] || {};
-  const { version: pendingVersion, scheduledUpdate } = pending[id] || {};
+  const { version: pendingVersion, scheduledUpdate, errorMessage } =
+    pending[id] || {};
 
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
@@ -352,7 +388,7 @@ async function getDnpFeedbackMessage({
   // Here, an update can be pending
   if (scheduledUpdate)
     if (Date.now() > scheduledUpdate) {
-      return { inQueue: true };
+      return { inQueue: true, ...(errorMessage ? { errorMessage } : {}) };
     } else {
       return { scheduled: scheduledUpdate };
     }
@@ -383,7 +419,8 @@ async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
    * Let's figure out the version of the core
    */
 
-  const { version: pendingVersion, scheduledUpdate } = pending[id] || {};
+  const { version: pendingVersion, scheduledUpdate, errorMessage } =
+    pending[id] || {};
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
@@ -404,7 +441,8 @@ async function getCoreFeedbackMessage({ currentVersionId, registry, pending }) {
     if (pendingVersionsAreInstalled) return { manuallyUpdated: true };
 
     // Here, an update can be pending
-    if (Date.now() > scheduledUpdate) return { inQueue: true };
+    if (Date.now() > scheduledUpdate)
+      return { inQueue: true, ...(errorMessage ? { errorMessage } : {}) };
     else return { scheduled: scheduledUpdate };
   } else {
     // If current version is auto-installed, it will show up in the registry
@@ -445,9 +483,11 @@ module.exports = {
   // To keep a registry of performed updates
   // + Enforce a delay before auto-updating
   flagCompletedUpdate,
+  flagErrorUpdate,
   isUpdateDelayCompleted,
   clearPendingUpdates,
   clearRegistry,
+  clearCompletedCoreUpdatesIfAny,
   getRegistry,
   // Pending updates
   getPending,

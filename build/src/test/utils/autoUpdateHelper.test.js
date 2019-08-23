@@ -17,8 +17,10 @@ const {
   // To keep a registry of performed updates
   // + Enforce a delay before auto-updating
   flagCompletedUpdate,
+  flagErrorUpdate,
   isUpdateDelayCompleted,
   clearPendingUpdates,
+  clearCompletedCoreUpdatesIfAny,
   getRegistry,
   // Pending updates
   getPending,
@@ -33,7 +35,6 @@ const {
 } = require("utils/autoUpdateHelper");
 
 const name = "bitcoin.dnp.dappnode.eth";
-const successful = true;
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", async () => {
@@ -84,8 +85,8 @@ describe("Util: autoUpdateHelper", () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      await flagCompletedUpdate(name, version1, successful, timestamp);
-      await flagCompletedUpdate(name, version2, successful, timestamp);
+      await flagCompletedUpdate(name, version1, timestamp);
+      await flagCompletedUpdate(name, version2, timestamp);
       const registry = await getRegistry();
       expect(registry).to.deep.equal({
         [name]: {
@@ -93,36 +94,6 @@ describe("Util: autoUpdateHelper", () => {
           [version2]: { updated: timestamp, successful: true }
         }
       });
-    });
-
-    it("Should flag an update as unsuccessful", async () => {
-      // removeRegistryEntry;
-
-      const version = "0.2.6";
-      const timestamp = 1563373272397;
-      await flagCompletedUpdate(name, version, successful, timestamp);
-
-      expect(await getRegistry()).to.deep.equal(
-        {
-          [name]: {
-            [version]: { updated: timestamp, successful: true }
-          }
-        },
-        "Should have one entry"
-      );
-
-      // Remove entry
-      const timestampLatter = timestamp + 12736;
-      await flagCompletedUpdate(name, version, false, timestampLatter);
-
-      expect(await getRegistry()).to.deep.equal(
-        {
-          [name]: {
-            [version]: { updated: timestampLatter, successful: false }
-          }
-        },
-        "Entry should be marked as unsuccessful"
-      );
     });
   });
 
@@ -224,6 +195,43 @@ describe("Util: autoUpdateHelper", () => {
         "Should have deleted the previous entry and changed for the second one"
       );
     });
+
+    it("Should flag an update as unsuccessful", async () => {
+      // removeRegistryEntry;
+
+      const version = "0.2.6";
+      const timestamp = 1563373272397;
+      await isUpdateDelayCompleted(name, version, timestamp);
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [name]: {
+            version,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Should have a pending state"
+      );
+
+      // Simulation update Error
+      const errorMessage = "Mainnet is still thinking";
+      await flagErrorUpdate(name, errorMessage);
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [name]: {
+            version,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false,
+            errorMessage
+          }
+        },
+        "Pending should contain an error message"
+      );
+    });
   });
 
   describe("Feedback text for DNPs", () => {
@@ -318,6 +326,25 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ updated: timestamp });
     });
 
+    it("3C. DNP update failed", async () => {
+      const errorMessage = "Mainnet is still syncing";
+      const feedback = await getDnpFeedbackMessage({
+        id,
+        currentVersion,
+        registry: {},
+        pending: {
+          [id]: {
+            version: nextVersion,
+            firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
+            scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
+            completedDelay: false,
+            errorMessage
+          }
+        }
+      });
+      expect(feedback).to.deep.equal({ inQueue: true, errorMessage });
+    });
+
     it("Swarm logic bug for rollback versions", async () => {
       const swarmId = "swarm.dnp.dappnode.eth";
       const timestamp = Date.now() + 23.3 * 60 * 60 * 1000;
@@ -345,9 +372,9 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Feedback text for COREs", () => {
     const currentVersionId = getCoreVersionId([
-      { name: "admin", version: "0.2.6" },
-      { name: "vpn", version: "0.2.2" },
-      { name: "core", version: "0.2.8" }
+      { name: "admin", version: "0.2.0" },
+      { name: "vpn", version: "0.2.1" },
+      { name: "core", version: "0.2.0" }
     ]);
     const id = coreDnpName;
 
@@ -426,6 +453,27 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ updated: timestamp });
     });
 
+    it("3C. Core update failed", async () => {
+      const errorMessage = "Mainnet is still syncing";
+      const feedback = await getCoreFeedbackMessage({
+        currentVersionId,
+        registry: {},
+        pending: {
+          [id]: {
+            version: getCoreVersionId([
+              { name: "admin", version: "0.2.1" },
+              { name: "core", version: "0.2.1" }
+            ]),
+            firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
+            scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
+            completedDelay: false,
+            errorMessage
+          }
+        }
+      });
+      expect(feedback).to.deep.equal({ inQueue: true, errorMessage });
+    });
+
     it("1 -> 4. Core full lifecycle", async () => {
       const currentVersionIdBefore = getCoreVersionId([
         { name: "admin", version: "0.2.0" },
@@ -491,7 +539,6 @@ describe("Util: autoUpdateHelper", () => {
       await flagCompletedUpdate(
         coreDnpName,
         nextVersionId,
-        true,
         timestampIsCompleted
       );
 
@@ -519,6 +566,99 @@ describe("Util: autoUpdateHelper", () => {
       ).to.deep.equal(
         { scheduled: timestampIsCompletedNext + updateDelay },
         "4. Start again"
+      );
+    });
+  });
+
+  describe("DAPPMANAGER update patch measures", () => {
+    it("Should clear complete core updates if update was completed", async () => {
+      const id = coreDnpName;
+      const timestamp = Date.now();
+      const versionId = getCoreVersionId([
+        { name: "admin", version: "0.2.1" },
+        { name: "vpn", version: "0.2.1" },
+        { name: "core", version: "0.2.1" }
+      ]);
+      const nextVersionId = getCoreVersionId([
+        { name: "admin", version: "0.2.1" },
+        { name: "core", version: "0.2.1" }
+      ]);
+
+      await isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [id]: {
+            version: nextVersionId,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Core update should be pending"
+      );
+
+      await clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+
+      expect(await getPending()).to.deep.equal(
+        {},
+        "Pending version should be removed"
+      );
+
+      expect(await getRegistry()).to.deep.equal(
+        {
+          [id]: {
+            [nextVersionId]: { updated: timestamp, successful: true }
+          }
+        },
+        "A new registry entry should be added"
+      );
+    });
+
+    it("Should NOT clear complete core updates if update was NOT completed", async () => {
+      const id = coreDnpName;
+      const timestamp = Date.now();
+      const versionId = getCoreVersionId([
+        { name: "admin", version: "0.2.0" },
+        { name: "vpn", version: "0.2.1" },
+        { name: "core", version: "0.2.1" }
+      ]);
+      const nextVersionId = getCoreVersionId([
+        { name: "admin", version: "0.2.1" },
+        { name: "core", version: "0.2.1" }
+      ]);
+
+      await isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [id]: {
+            version: nextVersionId,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Core update should be pending"
+      );
+
+      await clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+
+      expect(await getPending()).to.deep.equal(
+        {
+          [id]: {
+            version: nextVersionId,
+            firstSeen: timestamp,
+            scheduledUpdate: timestamp + updateDelay,
+            completedDelay: false
+          }
+        },
+        "Pending version should still be there"
+      );
+
+      expect(await getRegistry()).to.deep.equal(
+        {},
+        "Registry should be empty, no new version added"
       );
     });
   });
