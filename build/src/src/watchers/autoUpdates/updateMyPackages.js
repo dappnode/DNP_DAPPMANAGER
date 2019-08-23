@@ -4,6 +4,7 @@ const parse = require("utils/parse");
 const apm = require("modules/apm");
 const logs = require("logs.js")(module);
 const { eventBus, eventBusTag } = require("eventBus");
+const params = require("params");
 // Utils
 const computeSemverUpdateType = require("utils/computeSemverUpdateType");
 const {
@@ -59,7 +60,7 @@ async function updateMyPackages() {
       // Ignore wierd versions
       semver.valid(dnp.version) &&
       // MUST come from the APM
-      !dnp.origin
+      (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS)
   );
 
   for (const { name, version } of dnps) {

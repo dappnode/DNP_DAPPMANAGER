@@ -1,4 +1,5 @@
 const semver = require("semver");
+const params = require("params");
 const { listContainers } = require("modules/dockerList");
 const { getCoreVersionId } = require("utils/coreVersionId");
 const autoUpdateHelper = require("utils/autoUpdateHelper");
@@ -80,7 +81,7 @@ async function autoUpdateDataGet() {
         // Ignore wierd versions
         semver.valid(dnp.version) &&
         // MUST come from the APM
-        !dnp.origin &&
+        (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS) &&
         // Ensure there are no duplicates
         (!storedVersion || semver.gt(storedVersion, dnp.version))
       )

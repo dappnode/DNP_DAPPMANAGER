@@ -2,6 +2,19 @@
 const winston = require("winston");
 const { createLogger, format, transports } = winston;
 
+const { LOG_LEVEL } = process.env;
+
+const logLevel =
+  LOG_LEVEL === "error"
+    ? "error"
+    : LOG_LEVEL === "warn"
+    ? "warn"
+    : LOG_LEVEL === "verbose"
+    ? "verbose"
+    : LOG_LEVEL === "debug"
+    ? "debug"
+    : "info";
+
 /*
  * Generic logger to the console and therefore the container logs
  */
@@ -56,7 +69,7 @@ function _getLabel(mod) {
 
 module.exports = function(mod) {
   const logger = createLogger({
-    level: process.env.LOG_LEVEL || "info",
+    level: logLevel,
     format: format.combine(
       format.splat(),
       format.timestamp({

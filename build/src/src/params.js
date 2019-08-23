@@ -1,5 +1,7 @@
 const path = require("path");
 
+const devMode = process.env.LOG_LEVEL === "DEV_MODE";
+
 /**
  * DAPPMANAGER Parameters. This parameters are modified on execution for testing
  */
@@ -11,7 +13,7 @@ const path = require("path");
 const DNCORE_DIR = "DNCORE"; // Bind volume
 const REPO_DIR = "dnp_repo"; // Named volume
 
-module.exports = {
+const params = {
   // Autobahn parameters
   autobahnUrl: "ws://my.wamp.dnp.dappnode.eth:8080/ws",
   autobahnRealm: "dappnode_admin",
@@ -33,6 +35,7 @@ module.exports = {
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
+  AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Watchers
   AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
@@ -53,3 +56,11 @@ module.exports = {
   // DAppNode specific names
   coreDnpName: "core.dnp.dappnode.eth"
 };
+
+if (devMode) {
+  params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
+  params.AUTO_UPDATE_WATCHER_INTERVAL = 1 * 1000; // 1 second
+  params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
+}
+
+module.exports = params;
