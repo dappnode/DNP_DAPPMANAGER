@@ -109,7 +109,8 @@ async function isDnpUpdateEnabled(name = MY_PACKAGES) {
  * @returns {bool} isEnabled
  */
 async function isCoreUpdateEnabled() {
-  return await isDnpUpdateEnabled(SYSTEM_PACKAGES);
+  const settings = await getSettings();
+  return (settings[SYSTEM_PACKAGES] || {}).enabled ? true : false;
 }
 
 /**
