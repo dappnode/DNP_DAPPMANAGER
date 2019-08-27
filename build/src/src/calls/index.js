@@ -38,5 +38,7 @@ module.exports = {
   restartPackage: require("./restartPackage"),
   restartPackageVolumes: require("./restartPackageVolumes"),
   togglePackage: require("./togglePackage"),
-  updatePackageEnv: require("./updatePackageEnv")
+  updatePackageEnv: require("./updatePackageEnv"),
+  rebootHost: require("./rebootHost"),
+  poweroffHost: require("./poweroffHost")
 };
