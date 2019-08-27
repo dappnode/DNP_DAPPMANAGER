@@ -34,8 +34,11 @@ describe("dockerList", function() {
         shortName: "otpweb",
         ports: [
           {
-            PrivatePort: 80,
-            Type: "tcp"
+            host: null,
+            container: 80,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [],
@@ -56,40 +59,38 @@ describe("dockerList", function() {
         shortName: "nginx-proxy",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 443,
-            PublicPort: 443,
-            Type: "tcp"
+            host: 443,
+            container: 443,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 80,
-            PublicPort: 80,
-            Type: "tcp"
+            host: 80,
+            container: 80,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
-          {
-            type: "bind",
-            path: "/root/certs",
-            dest: "/etc/nginx/certs"
-          },
+          { type: "bind", path: "/root/certs", dest: "/etc/nginx/certs" },
           {
             type: "volume",
-            name:
-              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
             path: "",
             dest: "/etc/nginx/dhparam",
+            name:
+              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
             users: ["nginx-proxy.dnp.dappnode.eth"],
             owner: "nginx-proxy.dnp.dappnode.eth",
             isOwner: true
           },
           {
             type: "volume",
-            name: "nginxproxydnpdappnodeeth_vhost.d",
             path:
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             dest: "/etc/nginx/vhost.d",
+            name: "nginxproxydnpdappnodeeth_vhost.d",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -104,9 +105,9 @@ describe("dockerList", function() {
           },
           {
             type: "volume",
-            name: "nginxproxydnpdappnodeeth_html",
             path: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             dest: "/usr/share/nginx/html",
+            name: "nginxproxydnpdappnodeeth_html",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -134,10 +135,10 @@ describe("dockerList", function() {
         volumes: [
           {
             type: "volume",
-            name: "dncore_ethchaindnpdappnodeeth_data",
             path:
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             dest: "/app/.ethchain",
+            name: "dncore_ethchaindnpdappnodeeth_data",
             users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
             owner: "ethchain.dnp.dappnode.eth",
             isOwner: false
@@ -181,23 +182,27 @@ describe("dockerList", function() {
         shortName: "admin",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 8090,
-            PublicPort: 8090,
-            Type: "tcp"
+            host: 8090,
+            container: 8090,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            PrivatePort: 80,
-            Type: "tcp"
+            host: null,
+            container: 80,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "dncore_vpndnpdappnodeeth_shared",
             path:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             dest: "/usr/www/openvpn/cred",
+            name: "dncore_vpndnpdappnodeeth_shared",
             users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: false
@@ -219,33 +224,26 @@ describe("dockerList", function() {
         shortName: "vpn",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 1194,
-            PublicPort: 1194,
-            Type: "udp"
+            host: 1194,
+            container: 1194,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "dncore_vpndnpdappnodeeth_config",
             path:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
             dest: "/etc/openvpn",
+            name: "dncore_vpndnpdappnodeeth_config",
             users: ["vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
           },
-          {
-            type: "bind",
-            path: "/etc/hostname",
-            dest: "/etc/vpnname"
-          },
-          {
-            type: "bind",
-            path: "/lib/modules",
-            dest: "/lib/modules"
-          },
+          { type: "bind", path: "/etc/hostname", dest: "/etc/vpnname" },
+          { type: "bind", path: "/lib/modules", dest: "/lib/modules" },
           {
             type: "bind",
             path: "/usr/src/dappnode/config",
@@ -253,9 +251,9 @@ describe("dockerList", function() {
           },
           {
             type: "volume",
-            name: "dncore_vpndnpdappnodeeth_data",
             path: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
             dest: "/usr/src/app/secrets",
+            name: "dncore_vpndnpdappnodeeth_data",
             users: ["vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
@@ -267,10 +265,10 @@ describe("dockerList", function() {
           },
           {
             type: "volume",
-            name: "dncore_vpndnpdappnodeeth_shared",
             path:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             dest: "/var/spool/openvpn",
+            name: "dncore_vpndnpdappnodeeth_shared",
             users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
@@ -299,10 +297,10 @@ describe("dockerList", function() {
           },
           {
             type: "volume",
-            name: "dncore_dappmanagerdnpdappnodeeth_data",
             path:
               "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
             dest: "/usr/src/app/dnp_repo",
+            name: "dncore_dappmanagerdnpdappnodeeth_data",
             users: ["dappmanager.dnp.dappnode.eth"],
             owner: "dappmanager.dnp.dappnode.eth",
             isOwner: true
@@ -329,17 +327,20 @@ describe("dockerList", function() {
         shortName: "bind",
         ports: [
           {
-            PrivatePort: 53,
-            Type: "udp"
+            host: null,
+            container: 53,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "dncore_binddnpdappnodeeth_data",
             path:
               "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
             dest: "/etc/bind",
+            name: "dncore_binddnpdappnodeeth_data",
             users: ["bind.dnp.dappnode.eth"],
             owner: "bind.dnp.dappnode.eth",
             isOwner: true
@@ -361,31 +362,34 @@ describe("dockerList", function() {
         shortName: "ethchain",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30303,
-            PublicPort: 30303,
-            Type: "tcp"
+            host: 30303,
+            container: 30303,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30303,
-            PublicPort: 30303,
-            Type: "udp"
+            host: 30303,
+            container: 30303,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30304,
-            PublicPort: 30304,
-            Type: "udp"
+            host: 30304,
+            container: 30304,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "dncore_ethchaindnpdappnodeeth_data",
             path:
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             dest: "/root/.local/share/io.parity.ethereum",
+            name: "dncore_ethchaindnpdappnodeeth_data",
             users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
             owner: "ethchain.dnp.dappnode.eth",
             isOwner: true
@@ -407,47 +411,58 @@ describe("dockerList", function() {
         shortName: "ipfs",
         ports: [
           {
-            PrivatePort: 5001,
-            Type: "tcp"
+            host: null,
+            container: 5001,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            PrivatePort: 8080,
-            Type: "tcp"
+            host: null,
+            container: 8080,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            PrivatePort: 8081,
-            Type: "tcp"
+            host: null,
+            container: 8081,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 4001,
-            PublicPort: 4001,
-            Type: "tcp"
+            host: 4001,
+            container: 4001,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 4002,
-            PublicPort: 4002,
-            Type: "udp"
+            host: 4002,
+            container: 4002,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "dncore_ipfsdnpdappnodeeth_data",
             path:
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
             dest: "/data/ipfs",
+            name: "dncore_ipfsdnpdappnodeeth_data",
             users: ["ipfs.dnp.dappnode.eth"],
             owner: "ipfs.dnp.dappnode.eth",
             isOwner: true
           },
           {
             type: "volume",
-            name: "dncore_ipfsdnpdappnodeeth_export",
             path:
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
             dest: "/export",
+            name: "dncore_ipfsdnpdappnodeeth_export",
             users: ["ipfs.dnp.dappnode.eth"],
             owner: "ipfs.dnp.dappnode.eth",
             isOwner: true
@@ -486,24 +501,26 @@ describe("dockerList", function() {
         shortName: "swarm",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30399,
-            PublicPort: 30399,
-            Type: "tcp"
+            host: 30399,
+            container: 30399,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30399,
-            PublicPort: 30399,
-            Type: "udp"
+            host: 30399,
+            container: 30399,
+            protocol: "UDP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "swarmdnpdappnodeeth_swarm",
             path: "/var/lib/docker/volumes/swarmdnpdappnodeeth_swarm/_data",
             dest: "/root/.ethereum",
+            name: "swarmdnpdappnodeeth_swarm",
             users: ["swarm.dnp.dappnode.eth"],
             owner: "swarm.dnp.dappnode.eth",
             isOwner: true
@@ -516,9 +533,7 @@ describe("dockerList", function() {
         id: "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
         packageName: "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
         version: "0.0.4",
-        dependencies: {
-          "nginx-proxy.dnp.dappnode.eth": "latest"
-        },
+        dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
         portsToClose: [],
         isDnp: true,
         isCore: false,
@@ -528,17 +543,13 @@ describe("dockerList", function() {
         shortName: "letsencrypt-nginx",
         ports: [],
         volumes: [
-          {
-            type: "bind",
-            path: "/root/certs",
-            dest: "/etc/nginx/certs"
-          },
+          { type: "bind", path: "/root/certs", dest: "/etc/nginx/certs" },
           {
             type: "volume",
-            name: "nginxproxydnpdappnodeeth_vhost.d",
             path:
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             dest: "/etc/nginx/vhost.d",
+            name: "nginxproxydnpdappnodeeth_vhost.d",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -548,9 +559,9 @@ describe("dockerList", function() {
           },
           {
             type: "volume",
-            name: "nginxproxydnpdappnodeeth_html",
             path: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             dest: "/usr/share/nginx/html",
+            name: "nginxproxydnpdappnodeeth_html",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -583,10 +594,10 @@ describe("dockerList", function() {
         volumes: [
           {
             type: "volume",
-            name: "ipfsreplicatordnpdappnodeeth_pin-data",
             path:
               "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
             dest: "/usr/src/app/data",
+            name: "ipfsreplicatordnpdappnodeeth_pin-data",
             users: ["ipfs-replicator.dnp.dappnode.eth"],
             owner: "ipfs-replicator.dnp.dappnode.eth",
             isOwner: true
@@ -601,18 +612,9 @@ describe("dockerList", function() {
         version: "0.2.2",
         chain: "ethereum",
         portsToClose: [
-          {
-            number: 32769,
-            type: "TCP"
-          },
-          {
-            number: 32771,
-            type: "UDP"
-          },
-          {
-            number: 32770,
-            type: "UDP"
-          }
+          { number: 32769, type: "TCP" },
+          { number: 32771, type: "UDP" },
+          { number: 32770, type: "UDP" }
         ],
         isDnp: true,
         isCore: false,
@@ -622,31 +624,34 @@ describe("dockerList", function() {
         shortName: "goerli-geth",
         ports: [
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30303,
-            PublicPort: 32769,
-            Type: "tcp"
+            host: 32769,
+            container: 30303,
+            protocol: "TCP",
+            ephemeral: true,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30303,
-            PublicPort: 32771,
-            Type: "udp"
+            host: 32771,
+            container: 30303,
+            protocol: "UDP",
+            ephemeral: true,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 30304,
-            PublicPort: 32770,
-            Type: "udp"
+            host: 32770,
+            container: 30304,
+            protocol: "UDP",
+            ephemeral: true,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "goerligethdnpdappnodeeth_goerli",
             path:
               "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
             dest: "/goerli",
+            name: "goerligethdnpdappnodeeth_goerli",
             users: ["goerli-geth.dnp.dappnode.eth"],
             owner: "goerli-geth.dnp.dappnode.eth",
             isOwner: true
@@ -659,9 +664,7 @@ describe("dockerList", function() {
         id: "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
         packageName: "DAppNodePackage-ln.dnp.dappnode.eth",
         version: "0.1.1",
-        dependencies: {
-          "bitcoin.dnp.dappnode.eth": "latest"
-        },
+        dependencies: { "bitcoin.dnp.dappnode.eth": "latest" },
         portsToClose: [],
         isDnp: true,
         isCore: false,
@@ -671,27 +674,34 @@ describe("dockerList", function() {
         shortName: "ln",
         ports: [
           {
-            PrivatePort: 80,
-            Type: "tcp"
+            host: null,
+            container: 80,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            IP: "0.0.0.0",
-            PrivatePort: 9735,
-            PublicPort: 9735,
-            Type: "tcp"
+            host: 9735,
+            container: 9735,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            PrivatePort: 10009,
-            Type: "tcp"
+            host: null,
+            container: 10009,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [
           {
             type: "volume",
-            name: "lndnpdappnodeeth_lndconfig_data",
             path:
               "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
             dest: "/root/.lnd",
+            name: "lndnpdappnodeeth_lndconfig_data",
             users: ["ln.dnp.dappnode.eth"],
             owner: "ln.dnp.dappnode.eth",
             isOwner: true
@@ -713,12 +723,18 @@ describe("dockerList", function() {
         shortName: "wamp",
         ports: [
           {
-            PrivatePort: 8000,
-            Type: "tcp"
+            host: null,
+            container: 8000,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           },
           {
-            PrivatePort: 8080,
-            Type: "tcp"
+            host: null,
+            container: 8080,
+            protocol: "TCP",
+            ephemeral: false,
+            ip: "0.0.0.0"
           }
         ],
         volumes: [],

@@ -22,7 +22,8 @@ const eventBusTag = {
   call: "INTERNAL_CALL",
   logUserAction: "EVENT_BUS_LOGUSERACTION",
   emitChainData: "EMIT_CHAIN_DATA",
-  pushNotification: "PUSH_NOTIFICATION"
+  pushNotification: "PUSH_NOTIFICATION",
+  runNatRenewal: "RUN_NAT_RENEWAL"
 };
 
 /**

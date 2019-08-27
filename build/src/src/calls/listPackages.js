@@ -8,6 +8,7 @@ const docker = require("modules/docker");
 const parseDockerSystemDf = require("utils/parseDockerSystemDf");
 const getPath = require("utils/getPath");
 const envsHelper = require("utils/envsHelper");
+const appendIsPortDeletable = require("utils/appendIsPortDeletable");
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
@@ -36,9 +37,9 @@ async function dockerSystemDf() {
  *   name: "admin.dnp.dappnode.eth", {string}
  *   shortName: "admin", {string}
  *   ports: [{
- *     PrivatePort: 2222, {number}
- *     PublicPort: 3333, {number}
- *     Type: "tcp" {string}
+ *     host: 2222, {number}
+ *     container: 3333, {number}
+ *     protocol: "TCP" {string}
  *   }, ... ], {array}
  *   volumes: [{
  *     type: "bind", {string}
@@ -89,6 +90,12 @@ const listPackages = async () => {
         const manifestFileData = fs.readFileSync(manifestPath, "utf8");
         try {
           dnp.manifest = JSON.parse(manifestFileData);
+
+          /**
+           * Add logic to know if a port is deletable
+           * = Not declared in the manifest
+           */
+          dnp.ports = appendIsPortDeletable(dnp.ports, dnp.manifest);
         } catch (e) {
           // Silence parsing errors
         }

@@ -57,8 +57,8 @@ describe("Call function: installPackage", function() {
   };
 
   // Simulate that only the dependency has p2p ports
-  const lockPorts = sinon.stub().callsFake(async ({ pkg }) => {
-    if (pkg.name === depName) return depPortsToOpen;
+  const lockPorts = sinon.stub().callsFake(async id => {
+    if (id === depName) return depPortsToOpen;
     else return [];
   });
 
@@ -163,17 +163,8 @@ describe("Call function: installPackage", function() {
     // eventBus should be called once to open ports, and then to emitPackages
     sinon.assert.callCount(eventBusPackage.eventBus.emit, 3);
     expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal(
-      [
-        eventBusTag.call,
-        {
-          callId: "managePorts",
-          kwargs: {
-            action: "open",
-            ports: depPortsToOpen
-          }
-        }
-      ],
-      `eventBus.emit first call must be to open the dependencies' ports`
+      [eventBusTag.runNatRenewal],
+      `eventBus.emit first call must be a NAT renewal call`
     );
   });
 

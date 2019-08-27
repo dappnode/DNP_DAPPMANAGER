@@ -44,21 +44,12 @@ services:
             - '32768:30303/udp'
             - '32768:30303'
             - '5001:5001'
-        labels:
-            portsToClose: '[{"portNumber":32768,"protocol":"UDP"},{"portNumber":32768,"protocol":"TCP"}]'
 `;
     fs.writeFileSync(dockerComposePath, dockerComposeString);
   });
 
-  it("should unlock ports and return portsToClose (NON core)", async () => {
-    const portsToClose = await unlockPorts(dockerComposePath);
-    expect(portsToClose).to.deep.equal([
-      { portNumber: 32768, protocol: "UDP" },
-      { portNumber: 32768, protocol: "TCP" }
-    ]);
-  });
-
   it("should have modified the docker-compose (NON core)", async () => {
+    await unlockPorts(dockerComposePath);
     const dc = fs.readFileSync(dockerComposePath, "utf8");
     expect(dc).to.equal(`version: '3.4'
 services:

@@ -32,6 +32,8 @@ module.exports = {
   notificationsTest: require("./notificationsTest"),
   passwordChange: require("./passwordChange"),
   passwordIsSecure: require("./passwordIsSecure"),
+  poweroffHost: require("./poweroffHost"),
+  rebootHost: require("./rebootHost"),
   removePackage: require("./removePackage"),
   requestChainData: require("./requestChainData"),
   resolveRequest: require("./resolveRequest"),
@@ -39,6 +41,5 @@ module.exports = {
   restartPackageVolumes: require("./restartPackageVolumes"),
   togglePackage: require("./togglePackage"),
   updatePackageEnv: require("./updatePackageEnv"),
-  rebootHost: require("./rebootHost"),
-  poweroffHost: require("./poweroffHost")
+  updatePortMappings: require("./updatePortMappings")
 };

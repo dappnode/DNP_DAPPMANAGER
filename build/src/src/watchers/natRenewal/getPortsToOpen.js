@@ -32,24 +32,21 @@ async function getPortsToOpen() {
      *   isCore: false, {bool}
      *   name: "admin.dnp.dappnode.eth", {string}
      *   ports: [{
-     *     PrivatePort: 2222, {number}
-     *     PublicPort: 3333, {number}
-     *     Type: "tcp" {string}
+     *     container: 2222, {number}
+     *     host: 3333, {number}
+     *     protocol: "tcp" {string}
      *   }, ... ], {array}
      *   running: true, {bool}
      *   portsToClose: [ {portNumber: 30303, protocol: 'UDP'}, ...], {array}
      * }, ... ]
-     *
-     * [NOTE]: PublicPort is the host's port
      */
     const dnpList = await dockerList.listContainers();
     for (const dnp of dnpList) {
       if (dnp.running) {
         // If DNP is running the port mapping is available in the dnpList
         for (const port of dnp.ports || []) {
-          // PublicPort is the host's port
-          if (port.PublicPort) {
-            addPort(port.Type, port.PublicPort);
+          if (port.host) {
+            addPort(port.protocol, port.host);
           }
         }
       } else {
@@ -64,7 +61,7 @@ async function getPortsToOpen() {
            * @param {array} dockerComposePorts = [{
            *   host: "32638",
            *   container: "30303",
-           *   type: "udp"
+           *   protocol: "udp"
            * }]
            */
           const dockerComposePorts = parse.dockerComposePorts(

@@ -188,7 +188,13 @@ async function listContainers() {
         image: c.Image,
         name: name,
         shortName: shortName(name),
-        ports: c.Ports,
+        ports: c.Ports.map(({ IP, PrivatePort, PublicPort, Type }) => ({
+          host: PublicPort || null,
+          container: PrivatePort || null,
+          protocol: Type === "udp" ? "UDP" : "TCP",
+          ephemeral: Boolean(PublicPort && PublicPort >= 32768),
+          ip: IP || "0.0.0.0"
+        })),
         volumes: c.Mounts.map(({ Type, Name, Source, Destination }) => ({
           type: Type,
           path: Source,
@@ -257,6 +263,14 @@ async function listContainers() {
   return dnpListExtended;
 }
 
+async function getContainer(id) {
+  const dnpList = await listContainers();
+  return dnpList.find(
+    dnp => (dnp.name || "").includes(id) || (dnp.id || "").includes(id)
+  );
+}
+
 module.exports = {
-  listContainers
+  listContainers,
+  getContainer
 };

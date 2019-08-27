@@ -16,34 +16,34 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           {
             isCore: true,
             name: "admin.dnp.dappnode.eth",
-            ports: [{ PublicPort: 8090, Type: "tcp" }],
+            ports: [{ host: 8090, protocol: "tcp" }],
             running: true
           },
           {
             isCore: true,
             name: "vpn.dnp.dappnode.eth",
-            ports: [{ PublicPort: 1194, Type: "udp" }],
+            ports: [{ host: 1194, protocol: "udp" }],
             running: true
           },
           {
             isCore: true,
             name: "vpn.dnp.dappnode.eth2",
-            ports: [{ PublicPort: 1194, Type: "udp" }],
+            ports: [{ host: 1194, protocol: "udp" }],
             running: true
           },
           {
             isCore: false,
             name: "goerli.dnp.dappnode.eth",
             ports: [
-              { PublicPort: 32769, Type: "tcp" },
-              { PublicPort: 32771, Type: "udp" },
-              { PublicPort: 32770, Type: "udp" }
+              { host: 32769, protocol: "tcp" },
+              { host: 32771, protocol: "udp" },
+              { host: 32770, protocol: "udp" }
             ],
             running: true,
             portsToClose: [
-              { portNumber: 32769, Type: "TCP" },
-              { portNumber: 32771, Type: "UDP" },
-              { portNumber: 32770, Type: "UDP" }
+              { portNumber: 32769, protocol: "TCP" },
+              { portNumber: 32771, protocol: "UDP" },
+              { portNumber: 32770, protocol: "UDP" }
             ]
           },
           {
@@ -107,7 +107,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           {
             isCore: true,
             name: "admin.dnp.dappnode.eth",
-            ports: [{ PublicPort: 8090, Type: "tcp" }],
+            ports: [{ host: 8090, protocol: "tcp" }],
             running: true
           },
           {

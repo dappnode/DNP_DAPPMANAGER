@@ -10,8 +10,13 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
-const DNCORE_DIR = "DNCORE"; // Bind volume
-const REPO_DIR = "dnp_repo"; // Named volume
+let DNCORE_DIR = "DNCORE"; // Bind volume
+let REPO_DIR = "dnp_repo"; // Named volume
+
+if (process.env.TEST) {
+  DNCORE_DIR = "test_files/";
+  REPO_DIR = "test_files/";
+}
 
 const params = {
   // Autobahn parameters
