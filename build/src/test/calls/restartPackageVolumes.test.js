@@ -19,9 +19,10 @@ describe("Call function: restartPackageVolumes", function() {
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
   const nginxId = "nginx-proxy.dnp.dappnode.eth";
   const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
+  const raidenTestnetId = "raiden-testnet.dnp.dappnode.eth";
 
   // docker-compose.yml will be generated for this DNP ids
-  const ids = [dnpNameCore, nginxId, letsencryptId];
+  const ids = [dnpNameCore, nginxId, letsencryptId, raidenTestnetId];
 
   const docker = {
     compose: {
@@ -98,6 +99,17 @@ describe("Call function: restartPackageVolumes", function() {
             users: ["nginx-proxy.dnp.dappnode.eth"],
             owner: "nginx-proxy.dnp.dappnode.eth",
             isOwner: true
+          }
+        ]
+      },
+      {
+        name: raidenTestnetId,
+        isCore: false,
+        volumes: [
+          {
+            name: "raidentestnetdnpdappnodeeth_data",
+            isOwner: true,
+            users: [raidenTestnetId]
           }
         ]
       }
@@ -178,6 +190,40 @@ describe("Call function: restartPackageVolumes", function() {
       );
     });
     sinon.assert.called(docker.safe.compose.up);
+  });
+
+  it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {
+    const res = await restartPackageVolumes({ id: raidenTestnetId });
+    expect(res).to.be.ok;
+    expect(res).to.have.property("message");
+
+    // Assert correct call order docker rm
+    sinon.assert.called(docker.compose.rm);
+    const dnpsInOrder = [raidenTestnetId];
+    dnpsInOrder.forEach((volName, i) => {
+      expect(docker.compose.rm.getCall(i).args[0]).to.include(
+        volName,
+        `Wrong dnpName on docker.compose.rm call #${i}`
+      );
+    });
+
+    // Assert correct call order for volumeRm
+    const volumesInOrder = ["raidentestnetdnpdappnodeeth_data"];
+    volumesInOrder.forEach((volName, i) => {
+      expect(docker.volume.rm.getCall(i).args[0]).to.equal(
+        volName,
+        `Wrong volume name on docker.volume.rm call #${i}`
+      );
+    });
+
+    // Assert correct call order docker up
+    sinon.assert.called(docker.safe.compose.up);
+    dnpsInOrder.forEach((volName, i) => {
+      expect(docker.safe.compose.up.getCall(i).args[0]).to.includes(
+        volName,
+        `Wrong dnpName on docker.safe.compose.up call #${i}`
+      );
+    });
   });
 
   it("Should NOT allow id = dappmanager.dnp.dappnode.eth", async () => {

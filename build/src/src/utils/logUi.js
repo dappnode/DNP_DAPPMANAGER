@@ -14,8 +14,11 @@ const { eventBus, eventBusTag } = require("eventBus");
  * @param {string} message, log message
  * message = "Downloading 75%"
  */
-function logUi({ id, name, message }) {
-  eventBus.emit(eventBusTag.logUi, { id, name, message });
+function logUi({ id, name, message, clear }) {
+  eventBus.emit(
+    eventBusTag.logUi,
+    clear ? { id, clear } : { id, name, message }
+  );
 }
 
 module.exports = logUi;

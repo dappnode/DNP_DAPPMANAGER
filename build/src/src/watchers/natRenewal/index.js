@@ -1,10 +1,12 @@
 const upnpc = require("modules/upnpc");
 const logs = require("logs.js")(module);
+const params = require("params");
 const db = require("db");
 const getPortsToOpen = require("./getPortsToOpen");
 const getLocalIp = require("utils/getLocalIp");
 
-const natRenewalInterval = 60 * 60 * 1000;
+const natRenewalInterval =
+  params.NAT_RENEWAL_WATCHER_INTERVAL || 60 * 60 * 1000;
 
 const portId = port => `${port.portNumber} ${port.protocol}`;
 
