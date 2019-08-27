@@ -110,42 +110,50 @@ describe("Call function: installPackage", function() {
     id: pkgName,
     pkg: { manifest: { ...depManifest }, name: depName, ver: depVer }
   };
+
+  function sortById(a, b) {
+    return a.pkg.name > b.pkg.name ? 1 : a.pkg.name < b.pkg.name ? -1 : 0;
+  }
+
   // Step 3: Format the request and filter out already updated packages
   // Step 4: Download requested packages
   it("should have called download", async () => {
     sinon.assert.callCount(packages.download, 2);
-    expect(packages.download.getCall(0).args).to.deep.equal(
-      [callKwargPkg],
-      `should call packages.download first for package ${pkgName}`
-    );
-    expect(packages.download.getCall(1).args).to.deep.equal(
-      [callKwargDep],
-      `should call packages.download second for dependency ${depName}`
+    expect(
+      [
+        packages.download.getCall(0).args[0],
+        packages.download.getCall(1).args[0]
+      ].sort(sortById)
+    ).deep.equal(
+      [callKwargPkg, callKwargDep],
+      `should call packages.download for ${pkgName} and ${depName}`
     );
   });
 
   it("should have called load", async () => {
     sinon.assert.callCount(packages.load, 2);
-    expect(packages.load.getCall(0).args).to.deep.equal(
-      [callKwargPkg],
-      `should call packages.load first for package ${pkgName}`
-    );
-    expect(packages.load.getCall(1).args).to.deep.equal(
-      [callKwargDep],
-      `should call packages.load second for dependency ${depName}`
+
+    expect(
+      [packages.load.getCall(0).args[0], packages.load.getCall(1).args[0]].sort(
+        sortById
+      )
+    ).deep.equal(
+      [callKwargPkg, callKwargDep],
+      `should call packages.load for ${pkgName} and ${depName}`
     );
   });
 
   // Step 5: Run requested packages
   it("should have called run", async () => {
     sinon.assert.callCount(packages.run, 2);
-    expect(packages.run.getCall(0).args).to.deep.equal(
-      [callKwargPkg],
-      `should call packages.run second for dependency ${pkgName}`
-    );
-    expect(packages.run.getCall(1).args).to.deep.equal(
-      [callKwargDep],
-      `should call packages.run second for dependency ${depName}`
+
+    expect(
+      [packages.run.getCall(0).args[0], packages.run.getCall(1).args[0]].sort(
+        sortById
+      )
+    ).deep.equal(
+      [callKwargPkg, callKwargDep],
+      `should call packages.run for ${pkgName} and ${depName}`
     );
   });
 

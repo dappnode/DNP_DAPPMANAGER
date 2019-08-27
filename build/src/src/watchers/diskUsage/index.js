@@ -1,6 +1,10 @@
 const shellExec = require("utils/shell");
 const logs = require("logs.js")(module);
+const params = require("params");
 const { eventBus, eventBusTag } = require("eventBus");
+
+const monitoringInterval =
+  params.CHECK_DISK_USAGE_WATCHER_INTERVAL || 60 * 1000; // (ms) (1 minute)
 
 /**
  * Commands
@@ -24,7 +28,6 @@ const thresholds = [
     containersDescription: "all non-core DNPs plus the Ethchain and IPFS"
   }
 ];
-const monitoringInterval = 60 * 1000; // (ms) (1 minute)
 
 const thresholdIsActive = {};
 
