@@ -9,6 +9,7 @@
     "hash": "",
     "size": "",
     "volumes": [
+      "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket",
       "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
       "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
       "/var/run/docker.sock:/var/run/docker.sock"
@@ -22,11 +23,7 @@
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
   ],
-  "keywords": [
-    "DAppNodeCore",
-    "Manager",
-    "Installer"
-  ],
+  "keywords": ["DAppNodeCore", "Manager", "Installer"],
   "links": {
     "ui": "http://my.dappnode/",
     "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
