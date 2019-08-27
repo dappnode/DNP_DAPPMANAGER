@@ -1,13 +1,13 @@
-import {
-  parsePortMappings,
-  stringifyPortMappings,
-  mergePortMappings,
-  PortMapping
-} from "./dockerComposeParsers";
 import fs from "fs";
 import path from "path";
 import yaml from "yamljs";
-const params = require("params");
+import {
+  parsePortMappings,
+  stringifyPortMappings,
+  mergePortMappings
+} from "./dockerComposeParsers";
+import { PortMapping } from "../types";
+import params from "../params";
 
 interface Service {
   ports: string[];
@@ -47,7 +47,7 @@ function writeComposeObj(dockerComposePath: string, composeObj: ComposeObj) {
 }
 
 export function getComposeInstance(idOrObject: string | ComposeObj) {
-  let dockerComposePath: string = "";
+  let dockerComposePath = "";
   let composeObj: ComposeObj;
   if (typeof idOrObject === "string") {
     dockerComposePath = getDockerComposePath(idOrObject);

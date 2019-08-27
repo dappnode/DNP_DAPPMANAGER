@@ -15,6 +15,6 @@ docker ps -a
 # Install git and mocha
 docker exec -it DAppNodeCore-dappmanager.dnp.dappnode.eth apk update
 docker exec -it DAppNodeCore-dappmanager.dnp.dappnode.eth apk add git python python-dev build-base
-docker exec -it DAppNodeCore-dappmanager.dnp.dappnode.eth yarn add mocha chai
+docker exec -it DAppNodeCore-dappmanager.dnp.dappnode.eth yarn add -D mocha chai ts-node typescript
 # Run integration tests
 docker exec -it DAppNodeCore-dappmanager.dnp.dappnode.eth yarn test:int

@@ -14,6 +14,8 @@ test_build/
 build/src/undefined/
 build/src/test_files/
 build/src/test_files/*
+build/src/.temp-transfer/
+build/src/.temp-transfer/*
 
 # Version data file
 .version.json

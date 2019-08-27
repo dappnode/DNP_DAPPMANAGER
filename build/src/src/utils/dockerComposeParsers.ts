@@ -1,14 +1,8 @@
+import { PortProtocol, PortMapping } from "../types";
+
 /**
  * Internal methods that purely modify JSON
  */
-
-type PortProtocol = "UDP" | "TCP";
-
-export interface PortMapping {
-  container: string;
-  host?: string;
-  protocol: PortProtocol;
-}
 
 /**
  * Parses a port string array from a docker-compose.yml
@@ -26,10 +20,12 @@ export function parsePortMappings(portsArray: string[]): PortMapping[] {
     // Make sure the protocol is correct
     const protocolParsed =
       protocolString.toLowerCase() === "udp" ? "UDP" : "TCP";
-    // Cast the protocolString to a PortProtocol type
-    const protocol: PortProtocol = protocolParsed as PortProtocol;
+    const [hostString, containerString] = portMapping.split(":");
 
-    let [host, container] = portMapping.split(":");
+    // Convert to appropiate types + Cast to a PortProtocol type
+    const host = parseInt(hostString);
+    const container = parseInt(containerString);
+    const protocol = protocolParsed as PortProtocol;
 
     // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
     if (container) return { host, container, protocol };
@@ -91,10 +87,7 @@ export function mergePortMappings(
   // Make the order deterministic, by port number and then TCP first
   return mergedPortMappings.sort(function(a: PortMapping, b: PortMapping) {
     function numGetter(portMapping: PortMapping) {
-      return (
-        parseInt(portMapping.container) +
-        (portMapping.protocol === "UDP" ? 0.5 : 0)
-      );
+      return portMapping.container + (portMapping.protocol === "UDP" ? 0.5 : 0);
     }
     return numGetter(a) - numGetter(b);
   });
