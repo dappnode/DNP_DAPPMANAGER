@@ -45,6 +45,13 @@ async function fetchCoreUpdateData({ version = "*" } = {}) {
 
   const dnpList = await dockerList.listContainers();
 
+  /**
+   * If the core.dnp.dappnode.eth is not installed,
+   * Ignore it to compute the update type
+   */
+  const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
+  if (!coreDnp) delete coreDnpsToBeInstalled[coreName];
+
   const packages = await Promise.all(
     Object.entries(coreDnpsToBeInstalled).map(async ([depName, depVersion]) => {
       const dnp = dnpList.find(_dnp => _dnp.name === depName);
