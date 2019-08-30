@@ -181,7 +181,7 @@ const installPackage = async ({
     //   lockedPortsToOpen = [ {portNumber: '32769', protocol: 'UDP'}, ... ]
     await lockPorts(pkg.name || pkg.manifest.name);
   }
-  
+
   // Instruct the UI to clear isInstalling logs
   logUi({ id, clear: true });
 
