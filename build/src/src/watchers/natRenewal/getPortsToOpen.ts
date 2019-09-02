@@ -20,11 +20,11 @@ export default async function getPortsToOpen() {
     const portsToOpen: {
       [portId: string]: PortInterface;
     } = {};
-    const addPort = (protocol: PortProtocol, host: number) => {
+    const addPortToOpen = (protocol: PortProtocol, host: number) => {
       const portNumber = host;
       portsToOpen[`${portNumber}-${protocol}`] = { protocol, portNumber };
     };
-    const getPorts = () => Object.values(portsToOpen);
+    const getPortsToOpen = () => Object.values(portsToOpen);
 
     /**
      * @param {array} dnpInstalled = [{
@@ -48,7 +48,7 @@ export default async function getPortsToOpen() {
         // If DNP is running the port mapping is available in the dnpList
         for (const port of dnp.ports || []) {
           if (port.host) {
-            addPort(port.protocol, port.host);
+            addPortToOpen(port.protocol, port.host);
           }
         }
       } else {
@@ -71,7 +71,7 @@ export default async function getPortsToOpen() {
           );
           for (const port of dockerComposePorts || []) {
             // Only consider ports that are mapped (not ephemeral ports)
-            if (port.host) addPort(port.protocol, port.host);
+            if (port.host) addPortToOpen(port.protocol, port.host);
           }
         } catch (e) {
           logs.error(
@@ -83,7 +83,7 @@ export default async function getPortsToOpen() {
       }
     }
 
-    return getPorts();
+    return getPortsToOpen();
   } catch (e) {
     logs.error(`Error on getPortsToOpen: ${e.stack}`);
     return defaultPortsToOpen;

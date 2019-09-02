@@ -85,10 +85,8 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = proxyquire(
       "../../../src/watchers/natRenewal/getPortsToOpen",
       {
-        "../../modules/listContainers": {
-          listContainers: () => {
-            throw Error("Demo Error for listContainers");
-          }
+        "../../modules/listContainers": async () => {
+          throw Error("Demo Error for listContainers");
         },
         "../../utils/parse": {
           dockerComposePorts: () => {}
