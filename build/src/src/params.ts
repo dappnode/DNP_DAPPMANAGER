@@ -50,12 +50,18 @@ const params = {
   NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000,
 
   // IPFS parameters
-  IPFS_HOST: process.env.IPFS_REDIRECT || "my.ipfs.dnp.dappnode.eth",
+  IPFS_HOST:
+    process.env.IPFS_HOST ||
+    process.env.IPFS_REDIRECT ||
+    "my.ipfs.dnp.dappnode.eth",
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters
-  WEB3_HOST_WS: "ws://my.ethchain.dnp.dappnode.eth:8546",
-  WEB3_HOST_HTTP: "http://my.ethchain.dnp.dappnode.eth:8545",
+  WEB3_HOST: process.env.WEB3_HOST || "ws://my.ethchain.dnp.dappnode.eth:8546",
+  WEB3_HOST_HTTP:
+    process.env.WEB3_HOST_HTTP ||
+    process.env.WEB3_HOST ||
+    "http://my.ethchain.dnp.dappnode.eth:8545",
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
@@ -66,6 +72,11 @@ if (devMode) {
   params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
   params.AUTO_UPDATE_WATCHER_INTERVAL = 1 * 1000; // 1 second
   params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
+}
+
+if (process.env.NODE_ENV === "development") {
+  params.autobahnUrl = "ws://localhost:8080/ws";
+  params.autobahnRealm = "realm1";
 }
 
 export default params;

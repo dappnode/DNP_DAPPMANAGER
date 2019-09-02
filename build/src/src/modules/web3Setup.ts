@@ -4,11 +4,7 @@ const logs = require("../logs")(module);
 
 // Prevent web3 from executing to testing. Can result in infinite non-ending tests
 
-const WEB3_HOST: any =
-  process.env.WEB3_HOST_WS ||
-  (process.env.NODE_ENV === "development"
-    ? "https://mainnet.infura.io/v3/bb15bacfcdbe45819caede241dcf8b0d"
-    : params.WEB3_HOST_WS);
+const WEB3_HOST: any = params.WEB3_HOST;
 
 if (WEB3_HOST === undefined || WEB3_HOST === null)
   throw Error("WEB3_HOST is needed to connect to ethchain but it's undefined");

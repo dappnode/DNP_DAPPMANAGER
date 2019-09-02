@@ -8,11 +8,7 @@ const logs = require("../../logs")(module);
  * Notice that this script takes advantatge of the singleton nature of nodejs imports.
  * The exported ipfs object will only be initialized once in the entire application.
  */
-
-// if (process.env.NODE_ENV === 'development') {
-//   params.IPFS = '127.0.0.1';
-// }
-const IPFS_HOST = process.env.IPFS_HOST || params.IPFS_HOST;
+const IPFS_HOST = params.IPFS_HOST;
 const ipfs = process.env.TEST
   ? {}
   : ipfsAPI(IPFS_HOST, "5001", {

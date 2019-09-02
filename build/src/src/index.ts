@@ -49,12 +49,6 @@ calls
  *   - publish progress logs and userAction logs
  * - it subscribe to userAction logs sent by the VPN to store them locally
  */
-
-if (process.env.NODE_ENV === "development") {
-  params.autobahnUrl = "ws://localhost:8080/ws";
-  params.autobahnRealm = "realm1";
-}
-
 const url = params.autobahnUrl;
 const realm = params.autobahnRealm;
 const connection = new autobahn.Connection({ url, realm });
@@ -139,6 +133,8 @@ connection.onopen = (session, details) => {
     // Also, log them internally. But skip download progress logs, too spam-y
     if (!(logData.message || "").includes("%") && !logData.clear) {
       logs.info(JSON.stringify(logData));
+    } else {
+      logs.debug(JSON.stringify(logData));
     }
   });
 
