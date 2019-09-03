@@ -17,7 +17,7 @@ async function getPortsToOpen() {
   try {
     // Aggreate ports with an object form to prevent duplicates
     const portsToOpen = {};
-    const addPort = (type, host) => {
+    const addPort = (type = "tcp", host) => {
       const protocol = type.toUpperCase();
       const portNumber = host;
       portsToOpen[portNumber + protocol] = { protocol, portNumber };
