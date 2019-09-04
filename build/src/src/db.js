@@ -49,8 +49,13 @@ function formatKey(key) {
   return key;
 }
 
+function clearDb() {
+  db.setState({});
+}
+
 module.exports = {
   set,
   get,
-  remove
+  remove,
+  clearDb
 };

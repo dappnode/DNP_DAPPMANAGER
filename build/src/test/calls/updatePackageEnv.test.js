@@ -14,7 +14,7 @@ describe("Call function: updatePackageEnv", function() {
   // This function gets the manifest of a package,
   // and then gets the avatar refered in the manifest if any
   // Finally returns this data objectified
-  const packageName = "myPackage.eth";
+  const id = "myPackage.eth";
   const testDirectory = "./test_files/";
 
   const params = {
@@ -24,16 +24,19 @@ describe("Call function: updatePackageEnv", function() {
     REPO_DIR: testDirectory
   };
 
-  const dockerComposePath = getPath.dockerComposeSmart(packageName, params);
-  const envFilePath = getPath.envFileSmart(packageName, params);
+  const dockerComposePath = getPath.dockerComposeSmart(id, params);
+  const envFilePath = getPath.envFileSmart(id, params);
 
   const dockerList = {
-    listContainers: sinon.stub().resolves([{ name: packageName }])
+    listContainers: sinon.stub().resolves([{ name: id }])
   };
+
+  const restartPackage = sinon.stub().resolves();
 
   const updatePackageEnv = proxyquire("calls/updatePackageEnv", {
     "modules/docker": docker,
     "modules/dockerList": dockerList,
+    "./restartPackage": restartPackage,
     params: params
   });
 
@@ -43,20 +46,21 @@ describe("Call function: updatePackageEnv", function() {
       fs.writeFileSync(dockerComposePath, "docker-compose");
     });
 
-    it("Should update the envs and reset the package", async () => {
+    beforeEach(() => {
       // Prepare mocks
-      sinon.restore();
-      sinon.replace(docker.compose, "down", sinon.fake());
-      sinon.replace(docker.compose, "up", sinon.fake());
+      restartPackage.resetHistory();
+    });
+
+    it("Should update the envs and reset the package", async () => {
       // Execute calls
       let res = await updatePackageEnv({
-        id: packageName,
+        id,
         envs: { key: "val" },
         restart: true
       });
       // Verify
-      // docker.compose should be used to reset the package
-      sinon.assert.calledWith(docker.compose.up, dockerComposePath);
+      // restartPackage should be used to reset the package
+      sinon.assert.calledWith(restartPackage, { id });
       // The envs should have been written
       let envString = fs.readFileSync(envFilePath, "utf8");
       expect(envString).to.include("key=val");
@@ -66,19 +70,15 @@ describe("Call function: updatePackageEnv", function() {
     });
 
     it("Should NOT reset the package", async () => {
-      // Prepare mocks
-      docker.compose.down.resetHistory();
-      docker.compose.up.resetHistory();
       // Execute calls
       let res = await updatePackageEnv({
-        id: packageName,
+        id,
         envs: { key: "val" },
         restart: false
       });
       // Verify
-      // docker.compose should NOT be used to reset the package
-      sinon.assert.notCalled(docker.compose.down);
-      sinon.assert.notCalled(docker.compose.up);
+      // restartPackage should NOT be used to reset the package
+      sinon.assert.notCalled(restartPackage);
       // And return correctly
       expect(res).to.be.ok;
       expect(res).to.have.property("message");

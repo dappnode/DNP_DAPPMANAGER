@@ -34,19 +34,18 @@ async function dockerComposeUpSafe(dockerComposePath, options) {
 
         // unlockPorts will modify the docker-compose to remove the port bidnings
         // in order to let docker to assign new ones
-        const portsToClose = await unlockPorts(dockerComposePath);
-        if (portsToClose.length) {
-          const kwargs = { action: "close", ports: portsToClose };
-          eventBus.emit(eventBusTag.call, { callId: "managePorts", kwargs });
-        }
+        // The natRenewal loop will close them by not renewing the mapping
+        await unlockPorts(dockerComposePath);
 
         // Up the package and lock the ports again
         await docker.compose.up(dockerComposePath);
-        const portsToOpen = await lockPorts({ dockerComposePath });
-        if (portsToOpen.length) {
-          const kwargs = { action: "open", ports: portsToOpen };
-          eventBus.emit(eventBusTag.call, { callId: "managePorts", kwargs });
+        const newPortMappings = await lockPorts({ dockerComposePath });
+        if (newPortMappings.length) {
+          // Trigger a natRenewal update to open ports if necessary
+          eventBus.emit(eventBusTag.runNatRenewal);
         }
+      } else {
+        throw e;
       }
     } else {
       throw e;

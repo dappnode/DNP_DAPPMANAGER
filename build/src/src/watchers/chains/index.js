@@ -4,6 +4,11 @@ const dockerList = require("modules/dockerList");
 const { shortNameCapitalized } = require("utils/strings");
 const params = require("params");
 
+const checkChainWatcherInterval =
+  params.CHECK_CHAIN_WATCHER_INTERVAL || 60 * 1000; // 1 minute
+const emitChainDataWatcherInterval =
+  params.EMIT_CHAIN_DATA_WATCHER_INTERVAL || 5 * 1000; // 5 seconds
+
 const drivers = {
   ethereum: require("./ethereum"),
   bitcoin: require("./bitcoin"),
@@ -138,7 +143,7 @@ checkChainWatchers();
 // during the DAppNode installation
 setTimeout(() => {
   checkChainWatchers();
-}, 60 * 1000);
+}, checkChainWatcherInterval);
 
 eventBus.on(eventBusTag.packageModified, () => {
   checkChainWatchers();
@@ -161,7 +166,7 @@ eventBus.on(eventBusTag.packageModified, () => {
 // to the current time + 5 minutes. During that time, emitChain data every 5 seconds
 setInterval(async () => {
   if (params.CHAIN_DATA_UNTIL > Date.now()) getAndEmitChainData();
-}, 5000);
+}, emitChainDataWatcherInterval);
 
 // Also get and emit chain data immediately after the UI has requested it
 eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);

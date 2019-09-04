@@ -13,7 +13,8 @@ describe("Call function: managePorts", function() {
   };
 
   const managePorts = proxyquire("calls/managePorts", {
-    "modules/upnpc": upnpc
+    "modules/upnpc": upnpc,
+    "utils/getLocalIp": async () => "0.0.0.0"
   });
 
   it("should open the requested ports", async () => {

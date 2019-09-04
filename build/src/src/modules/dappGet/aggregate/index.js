@@ -105,6 +105,12 @@ async function aggregate({ req, dnpList, fetch }) {
           delete dnps[dnpName].versions[version];
         }
       });
+      if (!Object.keys(dnps[dnpName].versions).length)
+        throw Error(
+          `Aggregated versions of request ${req.name}@${
+            req.ver
+          } did not satisfy its range`
+        );
     }
     // > Label isInstalled + Enfore conditions:
     //   - installed DNPs cannot be downgraded (don't apply this condition to the request)
@@ -121,22 +127,28 @@ async function aggregate({ req, dnpList, fetch }) {
           delete dnps[dnpName].versions[version];
         }
       });
+      if (!Object.keys(dnps[dnpName].versions).length)
+        throw Error(
+          `Aggregated versions of installed package ${dnpName} cause a downgrade from ${
+            dnp.version
+          }. Having a future development version could be the cause of this error.`
+        );
+    } else {
+      // Validate aggregated dnps
+      // - dnps must contain at least one version of the requested package
+      if (!Object.keys(dnps[dnpName].versions).length) {
+        logs.error(
+          `Faulty dnps object for ${req.name}@${req.ver}: ` +
+            JSON.stringify(dnps, null, 2)
+        );
+        throw Error(
+          `No version aggregated for ${dnpName} for request ${req.name} @ ${
+            req.ver
+          }`
+        );
+      }
     }
   });
-
-  // Validate aggregated dnps
-  // - dnps must contain at least one version of the requested package
-  if (!Object.keys((dnps[req.name] || {}).versions || {}).length) {
-    logs.error(
-      `Faulty dnps object for ${req.name}@${req.ver}: ` +
-        JSON.stringify(dnps, null, 2)
-    );
-    throw Error(
-      `Aggregated dnps must contain at least one version of the requested DNP ${
-        req.name
-      } @ ${req.ver}`
-    );
-  }
 
   return dnps;
 }

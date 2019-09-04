@@ -12,8 +12,11 @@ const DAppNodePackageStatus = ["Deleted", "Active", "Developing"];
  * @returns {array} An array of objects:
  *  [
  *    {
- *      name: packageName,  (string)
- *      status: 'Preparing' (string)
+ *      name: packageName,   {string}
+ *      status: 1            {number}
+ *      statusName: "Active" {string}
+ *      position: 2000,      {number}
+ *      directoryId: 3       {number}
  *    },
  *    ...
  *  ]

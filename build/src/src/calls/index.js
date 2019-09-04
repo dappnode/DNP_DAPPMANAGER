@@ -5,6 +5,8 @@
  */
 
 module.exports = {
+  autoUpdateDataGet: require("./autoUpdateDataGet"),
+  autoUpdateSettingsEdit: require("./autoUpdateSettingsEdit"),
   backupGet: require("./backupGet"),
   backupRestore: require("./backupRestore"),
   changeIpfsTimeout: require("./changeIpfsTimeout"),
@@ -13,6 +15,7 @@ module.exports = {
   copyFileTo: require("./copyFileTo"),
   diagnose: require("./diagnose"),
   diskSpaceAvailable: require("./diskSpaceAvailable"),
+  fetchCoreUpdateData: require("./fetchCoreUpdateData"),
   fetchDirectory: require("./fetchDirectory"),
   fetchPackageVersions: require("./fetchPackageVersions"),
   fetchPackageData: require("./fetchPackageData"),
@@ -29,11 +32,14 @@ module.exports = {
   notificationsTest: require("./notificationsTest"),
   passwordChange: require("./passwordChange"),
   passwordIsSecure: require("./passwordIsSecure"),
+  poweroffHost: require("./poweroffHost"),
+  rebootHost: require("./rebootHost"),
   removePackage: require("./removePackage"),
   requestChainData: require("./requestChainData"),
   resolveRequest: require("./resolveRequest"),
   restartPackage: require("./restartPackage"),
   restartPackageVolumes: require("./restartPackageVolumes"),
   togglePackage: require("./togglePackage"),
-  updatePackageEnv: require("./updatePackageEnv")
+  updatePackageEnv: require("./updatePackageEnv"),
+  updatePortMappings: require("./updatePortMappings")
 };
