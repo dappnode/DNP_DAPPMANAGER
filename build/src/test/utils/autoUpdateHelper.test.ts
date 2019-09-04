@@ -38,57 +38,54 @@ import {
 const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
-  beforeEach("Make sure the autosettings are restarted", async () => {
-    await db.set(AUTO_UPDATE_SETTINGS, null);
-    await db.set(AUTO_UPDATE_REGISTRY, null);
-    await db.set(AUTO_UPDATE_PENDING, null);
-    expect(await getSettings()).to.deep.equal(
-      {},
-      "autoUpdateSettings are not empty"
-    );
+  beforeEach("Make sure the autosettings are restarted", () => {
+    db.set(AUTO_UPDATE_SETTINGS, null);
+    db.set(AUTO_UPDATE_REGISTRY, null);
+    db.set(AUTO_UPDATE_PENDING, null);
+    expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });
 
   describe("Auto update settings", () => {
-    it("Should set active for my packages", async () => {
+    it("Should set active for my packages", () => {
       const check = () => isDnpUpdateEnabled(name);
 
       // Enable my-packages
-      expect(await check()).to.equal(false, "Before enabling");
-      await editDnpSetting(true);
-      expect(await check()).to.equal(true, "After enabling");
+      expect(check()).to.equal(false, "Before enabling");
+      editDnpSetting(true);
+      expect(check()).to.equal(true, "After enabling");
 
       // Disable a single package
-      expect(await check()).to.equal(true, "Before disabling name");
-      await editDnpSetting(true, name);
-      expect(await check()).to.equal(true, "Before disablingx2 name");
-      await editDnpSetting(false, name);
-      expect(await check()).to.equal(false, "After disabling name");
-      await editDnpSetting(true, name);
-      expect(await check()).to.equal(true, "After enabling name");
+      expect(check()).to.equal(true, "Before disabling name");
+      editDnpSetting(true, name);
+      expect(check()).to.equal(true, "Before disablingx2 name");
+      editDnpSetting(false, name);
+      expect(check()).to.equal(false, "After disabling name");
+      editDnpSetting(true, name);
+      expect(check()).to.equal(true, "After enabling name");
 
       // Disable my-packages
-      await editDnpSetting(false);
-      expect(await check()).to.equal(false, "After disabling");
-      expect(await check()).to.equal(false, "After disabling name final");
+      editDnpSetting(false);
+      expect(check()).to.equal(false, "After disabling");
+      expect(check()).to.equal(false, "After disabling name final");
     });
 
-    it("Should set active for system packages", async () => {
-      expect(await isCoreUpdateEnabled()).to.equal(false, "Before enabling");
-      await editCoreSetting(true);
-      expect(await isCoreUpdateEnabled()).to.equal(true, "After enabling");
-      await editCoreSetting(false);
-      expect(await isCoreUpdateEnabled()).to.equal(false, "After disabling");
+    it("Should set active for system packages", () => {
+      expect(isCoreUpdateEnabled()).to.equal(false, "Before enabling");
+      editCoreSetting(true);
+      expect(isCoreUpdateEnabled()).to.equal(true, "After enabling");
+      editCoreSetting(false);
+      expect(isCoreUpdateEnabled()).to.equal(false, "After disabling");
     });
   });
 
   describe("Auto update registry", () => {
-    it("Should flag a successful update in the registry and query it", async () => {
+    it("Should flag a successful update in the registry and query it", () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      await flagCompletedUpdate(name, version1, timestamp);
-      await flagCompletedUpdate(name, version2, timestamp);
-      const registry = await getRegistry();
+      flagCompletedUpdate(name, version1, timestamp);
+      flagCompletedUpdate(name, version2, timestamp);
+      const registry = getRegistry();
       expect(registry).to.deep.equal({
         [name]: {
           [version1]: { updated: timestamp, successful: true },
@@ -99,15 +96,15 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   describe("Auto update delay", () => {
-    it("Should NOT allow the update if the delay is NOT completed", async () => {
+    it("Should NOT allow the update if the delay is NOT completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now();
-      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version,
@@ -119,21 +116,21 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(name, version)).to.equal(
         false,
         "Should not allow again because the delay is not completed (24h)"
       );
     });
 
-    it("Should allow the update if the delay is completed", async () => {
+    it("Should allow the update if the delay is completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now() - (updateDelay + 1);
-      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version,
@@ -145,29 +142,29 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(name, version)).to.equal(
         true,
         "Should allow again because the delay is completed (24h)"
       );
 
-      expect(await isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(name, version)).to.equal(
         true,
         "Should allow again, a second time after the delay is completed"
       );
     });
 
-    it("Should clear pending updates", async () => {
+    it("Should clear pending updates", () => {
       const version = "0.2.6";
       const timestamp = Date.now() - (updateDelay + 1);
       const version2 = "0.2.5";
       const timestamp2 = Date.now() - 2 * updateDelay;
 
-      expect(await isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version,
@@ -179,12 +176,12 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(await isUpdateDelayCompleted(name, version2, timestamp2)).to.equal(
+      expect(isUpdateDelayCompleted(name, version2, timestamp2)).to.equal(
         false,
         "Should not allow on first check"
       );
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version: version2,
@@ -197,14 +194,14 @@ describe("Util: autoUpdateHelper", () => {
       );
     });
 
-    it("Should flag an update as unsuccessful", async () => {
+    it("Should flag an update as unsuccessful", () => {
       // removeRegistryEntry;
 
       const version = "0.2.6";
       const timestamp = 1563373272397;
-      await isUpdateDelayCompleted(name, version, timestamp);
+      isUpdateDelayCompleted(name, version, timestamp);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version,
@@ -218,9 +215,9 @@ describe("Util: autoUpdateHelper", () => {
 
       // Simulation update Error
       const errorMessage = "Mainnet is still thinking";
-      await flagErrorUpdate(name, errorMessage);
+      flagErrorUpdate(name, errorMessage);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [name]: {
             version,
@@ -240,8 +237,8 @@ describe("Util: autoUpdateHelper", () => {
     const currentVersion = "0.2.6";
     const nextVersion = "0.2.7";
 
-    it("1. Nothing happened yet", async () => {
-      const feedback = await getDnpFeedbackMessage({
+    it("1. Nothing happened yet", () => {
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -250,9 +247,9 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({}, "Message should be empty");
     });
 
-    it("2. DNP is seen", async () => {
+    it("2. DNP is seen", () => {
       const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
-      const feedback = await getDnpFeedbackMessage({
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -268,8 +265,8 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ scheduled: timestamp });
     });
 
-    it("3A. DNP is manually updated", async () => {
-      const feedback = await getDnpFeedbackMessage({
+    it("3A. DNP is manually updated", () => {
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion: nextVersion,
         registry: {},
@@ -285,8 +282,8 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ manuallyUpdated: true });
     });
 
-    it("3B. DNP is in queue", async () => {
-      const feedback = await getDnpFeedbackMessage({
+    it("3B. DNP is in queue", () => {
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -302,9 +299,9 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ inQueue: true });
     });
 
-    it("3B. DNP is successfully updated", async () => {
+    it("3B. DNP is successfully updated", () => {
       const timestamp = Date.now();
-      const feedback = await getDnpFeedbackMessage({
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion: nextVersion,
         registry: {
@@ -327,9 +324,9 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ updated: timestamp });
     });
 
-    it("3C. DNP update failed", async () => {
+    it("3C. DNP update failed", () => {
       const errorMessage = "Mainnet is still syncing";
-      const feedback = await getDnpFeedbackMessage({
+      const feedback = getDnpFeedbackMessage({
         id,
         currentVersion,
         registry: {},
@@ -346,10 +343,10 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ inQueue: true, errorMessage });
     });
 
-    it("Swarm logic bug for rollback versions", async () => {
+    it("Swarm logic bug for rollback versions", () => {
       const swarmId = "swarm.dnp.dappnode.eth";
       const timestamp = Date.now() + 23.3 * 60 * 60 * 1000;
-      const feedback = await getDnpFeedbackMessage({
+      const feedback = getDnpFeedbackMessage({
         id: swarmId,
         currentVersion: "0.2.1",
         registry: {
@@ -379,8 +376,8 @@ describe("Util: autoUpdateHelper", () => {
     ]);
     const id = coreDnpName;
 
-    it("1. Nothing happened yet", async () => {
-      const feedback = await getCoreFeedbackMessage({
+    it("1. Nothing happened yet", () => {
+      const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {},
         pending: {}
@@ -388,9 +385,9 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({}, "Message should be empty");
     });
 
-    it("2. Core update is seen", async () => {
+    it("2. Core update is seen", () => {
       const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
-      const feedback = await getCoreFeedbackMessage({
+      const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {},
         pending: {
@@ -408,8 +405,8 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ scheduled: timestamp });
     });
 
-    it("3A. Core is manually updated", async () => {
-      const feedback = await getCoreFeedbackMessage({
+    it("3A. Core is manually updated", () => {
+      const feedback = getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId([
           { name: "admin", version: "0.2.1" },
           { name: "vpn", version: "0.2.1" },
@@ -431,7 +428,7 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ manuallyUpdated: true });
     });
 
-    it("3B. Core is successfully updated", async () => {
+    it("3B. Core is successfully updated", () => {
       const timestamp = Date.now();
       const nextVersion = getCoreVersionId([
         { name: "admin", version: "0.2.1" },
@@ -442,7 +439,7 @@ describe("Util: autoUpdateHelper", () => {
         { name: "vpn", version: "0.2.1" },
         { name: "core", version: "0.2.1" }
       ]);
-      const feedback = await getCoreFeedbackMessage({
+      const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {
           [id]: {
@@ -454,9 +451,9 @@ describe("Util: autoUpdateHelper", () => {
       expect(feedback).to.deep.equal({ updated: timestamp });
     });
 
-    it("3C. Core update failed", async () => {
+    it("3C. Core update failed", () => {
       const errorMessage = "Mainnet is still syncing";
-      const feedback = await getCoreFeedbackMessage({
+      const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {},
         pending: {
@@ -497,21 +494,17 @@ describe("Util: autoUpdateHelper", () => {
       const microDelay = 5;
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
       ).to.deep.equal({}, "1. Should be empty");
 
       const timestampIsUpdated =
         Date.now() - (24 * 60 * 60 * 1000 - microDelay);
-      await isUpdateDelayCompleted(
-        coreDnpName,
-        nextVersionId,
-        timestampIsUpdated
-      );
+      isUpdateDelayCompleted(coreDnpName, nextVersionId, timestampIsUpdated);
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
       ).to.deep.equal(
@@ -522,13 +515,13 @@ describe("Util: autoUpdateHelper", () => {
       await new Promise(r => setTimeout(r, 2 * microDelay));
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdBefore
         })
       ).to.deep.equal({ inQueue: true }, "3. Should be in queue");
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdAfter
         })
       ).to.deep.equal(
@@ -537,14 +530,10 @@ describe("Util: autoUpdateHelper", () => {
       );
 
       const timestampIsCompleted = Date.now();
-      await flagCompletedUpdate(
-        coreDnpName,
-        nextVersionId,
-        timestampIsCompleted
-      );
+      flagCompletedUpdate(coreDnpName, nextVersionId, timestampIsCompleted);
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdAfter
         })
       ).to.deep.equal(
@@ -554,14 +543,14 @@ describe("Util: autoUpdateHelper", () => {
 
       const timestampIsCompletedNext =
         Date.now() - (24 * 60 * 60 * 1000 - microDelay);
-      await isUpdateDelayCompleted(
+      isUpdateDelayCompleted(
         coreDnpName,
         nextVersion2Id,
         timestampIsCompletedNext
       );
 
       expect(
-        await getCoreFeedbackMessage({
+        getCoreFeedbackMessage({
           currentVersionId: currentVersionIdAfter
         })
       ).to.deep.equal(
@@ -572,7 +561,7 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   describe("DAPPMANAGER update patch measures", () => {
-    it("Should clear complete core updates if update was completed", async () => {
+    it("Should clear complete core updates if update was completed", () => {
       const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
@@ -585,9 +574,9 @@ describe("Util: autoUpdateHelper", () => {
         { name: "core", version: "0.2.1" }
       ]);
 
-      await isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
+      isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [id]: {
             version: nextVersionId,
@@ -599,14 +588,14 @@ describe("Util: autoUpdateHelper", () => {
         "Core update should be pending"
       );
 
-      await clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+      clearCompletedCoreUpdatesIfAny(versionId, timestamp);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {},
         "Pending version should be removed"
       );
 
-      expect(await getRegistry()).to.deep.equal(
+      expect(getRegistry()).to.deep.equal(
         {
           [id]: {
             [nextVersionId]: { updated: timestamp, successful: true }
@@ -616,7 +605,7 @@ describe("Util: autoUpdateHelper", () => {
       );
     });
 
-    it("Should NOT clear complete core updates if update was NOT completed", async () => {
+    it("Should NOT clear complete core updates if update was NOT completed", () => {
       const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
@@ -629,9 +618,9 @@ describe("Util: autoUpdateHelper", () => {
         { name: "core", version: "0.2.1" }
       ]);
 
-      await isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
+      isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [id]: {
             version: nextVersionId,
@@ -643,9 +632,9 @@ describe("Util: autoUpdateHelper", () => {
         "Core update should be pending"
       );
 
-      await clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+      clearCompletedCoreUpdatesIfAny(versionId, timestamp);
 
-      expect(await getPending()).to.deep.equal(
+      expect(getPending()).to.deep.equal(
         {
           [id]: {
             version: nextVersionId,
@@ -657,7 +646,7 @@ describe("Util: autoUpdateHelper", () => {
         "Pending version should still be there"
       );
 
-      expect(await getRegistry()).to.deep.equal(
+      expect(getRegistry()).to.deep.equal(
         {},
         "Registry should be empty, no new version added"
       );
@@ -694,9 +683,9 @@ describe("Util: autoUpdateHelper", () => {
     });
   });
 
-  after("Should reset all settings", async () => {
-    await db.set(AUTO_UPDATE_SETTINGS, null);
-    await db.set(AUTO_UPDATE_REGISTRY, null);
-    await db.set(AUTO_UPDATE_PENDING, null);
+  after("Should reset all settings", () => {
+    db.set(AUTO_UPDATE_SETTINGS, null);
+    db.set(AUTO_UPDATE_REGISTRY, null);
+    db.set(AUTO_UPDATE_PENDING, null);
   });
 });

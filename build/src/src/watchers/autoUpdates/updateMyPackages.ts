@@ -22,7 +22,7 @@ const logs = require("../../logs")(module);
 
 async function updateMyPackage(name: string, version: string) {
   // Check if this specific dnp has auto-updates enabled
-  if (!(await isDnpUpdateEnabled(name))) return;
+  if (!isDnpUpdateEnabled(name)) return;
 
   const latestVersion = await apm.getLatestSemver(parse.packageReq(name));
 
@@ -33,18 +33,18 @@ async function updateMyPackage(name: string, version: string) {
 
   // Enforce a 24h delay before performing an auto-update
   // Also records the remaining time in the db for the UI
-  if (!(await isUpdateDelayCompleted(name, latestVersion))) return;
+  if (!isUpdateDelayCompleted(name, latestVersion)) return;
 
   logs.info(`Auto-updating ${name} to ${latestVersion}...`);
 
   try {
     await installPackage({ id: name });
 
-    await flagCompletedUpdate(name, latestVersion);
+    flagCompletedUpdate(name, latestVersion);
     logs.info(`Successfully auto-updated system packages`);
     eventBus.emit(eventBusTag.emitPackages);
   } catch (e) {
-    await flagErrorUpdate(name, e.message);
+    flagErrorUpdate(name, e.message);
     throw e;
   }
 }

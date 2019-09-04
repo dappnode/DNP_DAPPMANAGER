@@ -23,7 +23,7 @@ const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000;
  */
 async function autoUpdates() {
   try {
-    if (await isDnpUpdateEnabled()) {
+    if (isDnpUpdateEnabled()) {
       try {
         await updateMyPackages();
       } catch (e) {
@@ -31,7 +31,7 @@ async function autoUpdates() {
       }
     }
 
-    if (await isCoreUpdateEnabled()) {
+    if (isCoreUpdateEnabled()) {
       try {
         await updateSystemPackages();
       } catch (e) {
@@ -52,13 +52,8 @@ eventBusOnSafe(
   eventBusTag.packageModified,
   (data: { id: string; removed?: boolean }) => {
     const { id, removed } = data;
-    if (removed)
-      clearPendingUpdates(id).catch((e: Error) =>
-        logs.error(`Error clearPendingUpdates: ${e.stack}`)
-      );
-    clearRegistry(id).catch((e: Error) =>
-      logs.error(`Error clearRegistry: ${e.stack}`)
-    );
+    if (removed) clearPendingUpdates(id);
+    clearRegistry(id);
   }
 );
 
@@ -72,7 +67,7 @@ async function checkForCompletedCoreUpdates() {
     const {
       result: { versionId }
     } = await fetchCoreUpdateData();
-    await clearCompletedCoreUpdatesIfAny(versionId);
+    clearCompletedCoreUpdatesIfAny(versionId);
   } catch (e) {
     logs.error(`Error on clearCompletedCoreUpdatesIfAny: ${e.stack}`);
   }

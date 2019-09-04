@@ -4,8 +4,28 @@ import listContainers from "../modules/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
+import {
+  SettingsInterface,
+  RegistryInterface,
+  PendingInterface
+} from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
+
+interface AutoUpdateFeedbackInterface {
+  inQueue?: boolean;
+  manuallyUpdated?: boolean;
+  scheduled?: number;
+  updated?: number;
+  errorMessage?: string;
+}
+
+interface DnpsToShowInterface {
+  id: string;
+  displayName: string;
+  enabled: boolean;
+  feedback: AutoUpdateFeedbackInterface;
+}
 
 /**
  * Returns a auto-update data:
@@ -43,19 +63,27 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet() {
-  const settings = await autoUpdateHelper.getSettings();
-  const registry = await autoUpdateHelper.getRegistry();
-  const pending = await autoUpdateHelper.getPending();
+export default async function autoUpdateDataGet(): Promise<{
+  message: string;
+  result: {
+    settings: SettingsInterface;
+    registry: RegistryInterface;
+    pending: PendingInterface;
+    dnpsToShow: DnpsToShowInterface[];
+  };
+}> {
+  const settings = autoUpdateHelper.getSettings();
+  const registry = autoUpdateHelper.getRegistry();
+  const pending = autoUpdateHelper.getPending();
 
   const dnpList = await listContainers();
 
-  const dnpsToShow = [
+  const dnpsToShow: DnpsToShowInterface[] = [
     {
       id: SYSTEM_PACKAGES,
       displayName: "System packages",
-      enabled: await autoUpdateHelper.isCoreUpdateEnabled(),
-      feedback: await autoUpdateHelper.getCoreFeedbackMessage({
+      enabled: autoUpdateHelper.isCoreUpdateEnabled(),
+      feedback: autoUpdateHelper.getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId(
           dnpList.filter(({ isCore }) => isCore)
         )
@@ -64,12 +92,12 @@ export default async function autoUpdateDataGet() {
     {
       id: MY_PACKAGES,
       displayName: "My packages",
-      enabled: await autoUpdateHelper.isDnpUpdateEnabled(),
+      enabled: autoUpdateHelper.isDnpUpdateEnabled(),
       feedback: {}
     }
   ];
 
-  if (await autoUpdateHelper.isDnpUpdateEnabled()) {
+  if (autoUpdateHelper.isDnpUpdateEnabled()) {
     const singleDnpsToShow = [];
     for (const dnp of dnpList) {
       const storedDnp = singleDnpsToShow.find(_dnp => _dnp.name === dnp.name);
@@ -89,13 +117,13 @@ export default async function autoUpdateDataGet() {
     }
 
     for (const dnp of singleDnpsToShow) {
-      const enabled = await autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
+      const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
       dnpsToShow.push({
         id: dnp.name,
         displayName: shortNameCapitalized(dnp.name),
         enabled,
         feedback: enabled
-          ? await autoUpdateHelper.getDnpFeedbackMessage({
+          ? autoUpdateHelper.getDnpFeedbackMessage({
               id: dnp.name,
               currentVersion: dnp.version
             })

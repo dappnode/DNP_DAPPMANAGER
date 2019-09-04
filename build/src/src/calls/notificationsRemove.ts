@@ -10,7 +10,7 @@ export default async function notificationsRemove({ ids }: { ids: string[] }) {
   if (!ids) throw Error("kwarg ids must be defined");
 
   for (const id of ids) {
-    await db.remove(`notification.${id}`);
+    db.remove(`notification.${id}`);
   }
 
   return {

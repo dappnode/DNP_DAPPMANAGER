@@ -17,27 +17,24 @@ const db = low(adapter);
  * > If db.get is called and nothing is found return empty
  * > If db.write is called and the db file doesn't exist, create one
  *
- * await db.set(key, value)
+ * db.set(key, value)
  * > Write the value in the key
- * await db.get()
+ * db.get()
  * > Return the whole db
- * await db.get(key)
+ * db.get(key)
  * > Return the content of that key
  */
 
-export async function get(key?: string) {
-  if (key) {
-    return db.get(formatKey(key)).value();
-  } else {
-    return Object.assign({}, db.getState());
-  }
+export function get(key?: string) {
+  if (key) return db.get(formatKey(key)).value();
+  else return Object.assign({}, db.getState());
 }
 
-export async function set(key: string, value: any) {
+export function set(key: string, value: any) {
   return db.set(formatKey(key), value).write();
 }
 
-export async function remove(key: string) {
+export function remove(key: string) {
   return db.unset(formatKey(key)).write();
 }
 

@@ -133,11 +133,11 @@ async function resolveApmVersionAndCache({ name, ver }: RequestInterface) {
   const key = `${name}-${ver}`.split(".").join("-");
 
   // Check if the key is stored in cache. This key-value will never change
-  const hashCache = await db.get(key);
+  const hashCache: string = db.get(key);
   if (hashCache) return hashCache;
 
   const hash = await resolveApmVersion({ name, ver });
-  await db.set(key, hash);
+  db.set(key, hash);
   return hash;
 }
 

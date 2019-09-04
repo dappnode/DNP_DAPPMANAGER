@@ -22,7 +22,7 @@ export default async function updateSystemPackages() {
 
   // Enforce a 24h delay before performing an auto-update
   // Also records the remaining time in the db for the UI
-  if (!(await isUpdateDelayCompleted(coreDnpName, versionId))) return;
+  if (!isUpdateDelayCompleted(coreDnpName, versionId)) return;
 
   logs.info(`Auto-updating system packages...`);
 
@@ -36,11 +36,11 @@ export default async function updateSystemPackages() {
      * If the DAPPMANAGER is updated the updateRegistry will never be executed.
      * Add it preventively, and then remove it if the update errors
      */
-    await flagCompletedUpdate(coreDnpName, versionId);
+    flagCompletedUpdate(coreDnpName, versionId);
     logs.info(`Successfully auto-updated system packages`);
     eventBus.emit(eventBusTag.emitPackages);
   } catch (e) {
-    await flagErrorUpdate(coreDnpName, e.message);
+    flagErrorUpdate(coreDnpName, e.message);
     throw e;
   }
 }

@@ -37,9 +37,9 @@ const coreDnpName = params.coreDnpName;
  *   "bitcoin.dnp.dappnode.eth": { enabled: false }
  * }
  */
-export async function getSettings(): Promise<SettingsInterface> {
-  const autoUpdateSettings = await db.get(AUTO_UPDATE_SETTINGS);
-  if (!autoUpdateSettings) await db.set(AUTO_UPDATE_SETTINGS, {});
+export function getSettings(): SettingsInterface {
+  const autoUpdateSettings: SettingsInterface = db.get(AUTO_UPDATE_SETTINGS);
+  if (!autoUpdateSettings) db.set(AUTO_UPDATE_SETTINGS, {});
   return autoUpdateSettings || {};
 }
 
@@ -50,10 +50,10 @@ export async function getSettings(): Promise<SettingsInterface> {
  * @param {string} id "bitcoin.dnp.dappnode.eth"
  * @param {boolean} enabled true
  */
-async function setSettings(id: string, enabled: boolean) {
-  const autoUpdateSettings = await getSettings();
+function setSettings(id: string, enabled: boolean) {
+  const autoUpdateSettings = getSettings();
 
-  await db.set(AUTO_UPDATE_SETTINGS, {
+  db.set(AUTO_UPDATE_SETTINGS, {
     ...autoUpdateSettings,
     [id]: { enabled }
   });
@@ -70,22 +70,19 @@ async function setSettings(id: string, enabled: boolean) {
  * @param {bool} enabled
  * @param {string} name, if null modifies MY_PACKAGES settings
  */
-export async function editDnpSetting(enabled: boolean, name = MY_PACKAGES) {
-  const autoUpdateSettings = await getSettings();
+export function editDnpSetting(enabled: boolean, name = MY_PACKAGES) {
+  const autoUpdateSettings = getSettings();
 
   // When disabling MY_PACKAGES, turn off all DNPs settings by
   // Ignoring all entries but the system packages
   if (name === MY_PACKAGES && !enabled)
-    await db.set(
-      AUTO_UPDATE_SETTINGS,
-      pick(autoUpdateSettings, SYSTEM_PACKAGES)
-    );
+    db.set(AUTO_UPDATE_SETTINGS, pick(autoUpdateSettings, SYSTEM_PACKAGES));
 
   // When disabling any DNP, clear their pending updates
   // Ignoring all entries but the system packages
-  if (!enabled) await clearPendingUpdates(name);
+  if (!enabled) clearPendingUpdates(name);
 
-  await setSettings(name, enabled);
+  setSettings(name, enabled);
 }
 
 /**
@@ -93,12 +90,12 @@ export async function editDnpSetting(enabled: boolean, name = MY_PACKAGES) {
  *
  * @param {bool} enabled
  */
-export async function editCoreSetting(enabled: boolean) {
-  await setSettings(SYSTEM_PACKAGES, enabled);
+export function editCoreSetting(enabled: boolean) {
+  setSettings(SYSTEM_PACKAGES, enabled);
 
   // When disabling any DNP, clear their pending updates
   // Ignoring all entries but the system packages
-  if (!enabled) await clearPendingUpdates(SYSTEM_PACKAGES);
+  if (!enabled) clearPendingUpdates(SYSTEM_PACKAGES);
 }
 
 /**
@@ -106,8 +103,8 @@ export async function editCoreSetting(enabled: boolean) {
  * @param {string} name optional
  * @returns {bool} isEnabled
  */
-export async function isDnpUpdateEnabled(name = MY_PACKAGES) {
-  const settings = await getSettings();
+export function isDnpUpdateEnabled(name = MY_PACKAGES) {
+  const settings = getSettings();
 
   // If checking the general MY_PACKAGES setting,
   // or a DNP that does not has a specific setting,
@@ -120,8 +117,8 @@ export async function isDnpUpdateEnabled(name = MY_PACKAGES) {
  * Check if auto updates are enabled for system packages
  * @returns {bool} isEnabled
  */
-export async function isCoreUpdateEnabled() {
-  const settings = await getSettings();
+export function isCoreUpdateEnabled() {
+  const settings = getSettings();
   return (settings[SYSTEM_PACKAGES] || {}).enabled ? true : false;
 }
 
@@ -133,17 +130,17 @@ export async function isCoreUpdateEnabled() {
  * @param {string} version "0.2.5"
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
-export async function flagCompletedUpdate(
+export function flagCompletedUpdate(
   name: string,
   version: string,
   timestamp?: number
 ) {
-  await setRegistry(name, version, {
+  setRegistry(name, version, {
     updated: timestamp || Date.now(),
     successful: true
   });
 
-  await clearPendingUpdatesOfDnp(name);
+  clearPendingUpdatesOfDnp(name);
 }
 
 /**
@@ -153,8 +150,8 @@ export async function flagCompletedUpdate(
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} errorMessage "Mainnet is still syncing"
  */
-export async function flagErrorUpdate(name: string, errorMessage: string) {
-  await setPending(name, { errorMessage });
+export function flagErrorUpdate(name: string, errorMessage: string) {
+  setPending(name, { errorMessage });
 }
 
 /**
@@ -169,21 +166,21 @@ export async function flagErrorUpdate(name: string, errorMessage: string) {
  * @param {string} version "0.2.5"
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
-export async function isUpdateDelayCompleted(
+export function isUpdateDelayCompleted(
   name: string,
   version: string,
   timestamp?: number
 ) {
   if (!timestamp) timestamp = Date.now();
 
-  const pending = await getPending();
+  const pending = getPending();
   const pendingUpdate = pending[name];
 
   if (pendingUpdate && pendingUpdate.version === version) {
     const { scheduledUpdate, completedDelay } = pendingUpdate;
     if (scheduledUpdate && timestamp > scheduledUpdate) {
       // Flag the delay as completed (if necessary) and allow the update
-      if (!completedDelay) await setPending(name, { completedDelay: true });
+      if (!completedDelay) setPending(name, { completedDelay: true });
       return true;
     } else {
       // Do not allow the update, the delay is not completed
@@ -191,7 +188,7 @@ export async function isUpdateDelayCompleted(
     }
   } else {
     // Start the delay object by recording the first seen time
-    await setPending(name, {
+    setPending(name, {
       version,
       firstSeen: timestamp,
       scheduledUpdate: timestamp + updateDelay,
@@ -207,18 +204,18 @@ export async function isUpdateDelayCompleted(
  *
  * @param {string} id "my-packages", "system-packages", "bitcoin.dnp.dappnode.eth"
  */
-export async function clearPendingUpdates(id: string) {
-  const pending = await getPending();
+export function clearPendingUpdates(id: string) {
+  const pending = getPending();
 
   if (id === MY_PACKAGES) {
     const dnpNames = Object.keys(pending).filter(name => name !== coreDnpName);
     for (const dnpName of dnpNames) {
-      await clearPendingUpdatesOfDnp(dnpName);
+      clearPendingUpdatesOfDnp(dnpName);
     }
   } else if (id === SYSTEM_PACKAGES) {
-    await clearPendingUpdatesOfDnp(coreDnpName);
+    clearPendingUpdatesOfDnp(coreDnpName);
   } else {
-    await clearPendingUpdatesOfDnp(id);
+    clearPendingUpdatesOfDnp(id);
   }
 
   // Update the UI dynamically of the new successful auto-update
@@ -232,9 +229,9 @@ export async function clearPendingUpdates(id: string) {
  *
  * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
  */
-async function clearPendingUpdatesOfDnp(name: string) {
-  const pending = await getPending();
-  await db.set(AUTO_UPDATE_PENDING, omit(pending, name));
+function clearPendingUpdatesOfDnp(name: string) {
+  const pending = getPending();
+  db.set(AUTO_UPDATE_PENDING, omit(pending, name));
 }
 
 /**
@@ -244,9 +241,9 @@ async function clearPendingUpdatesOfDnp(name: string) {
  *
  * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
  */
-export async function clearRegistry(name: string) {
-  const registry = await getRegistry();
-  await db.set(AUTO_UPDATE_REGISTRY, omit(registry, name));
+export function clearRegistry(name: string) {
+  const registry = getRegistry();
+  db.set(AUTO_UPDATE_REGISTRY, omit(registry, name));
 
   // Update the UI dynamically of the new successful auto-update
   eventBus.emit(eventBusTag.emitAutoUpdateData);
@@ -260,11 +257,11 @@ export async function clearRegistry(name: string) {
  * @param {string} currentVersionId "admin@0.2.6,core@0.2.8"
  * @param {number} timestamp Use ONLY to make tests deterministic
  */
-export async function clearCompletedCoreUpdatesIfAny(
+export function clearCompletedCoreUpdatesIfAny(
   currentVersionId: string,
   timestamp?: number
 ) {
-  const pending = await getPending();
+  const pending = getPending();
 
   const { version: pendingVersionId } =
     pending[coreDnpName] || ({} as PendingEntryInterface);
@@ -276,7 +273,7 @@ export async function clearCompletedCoreUpdatesIfAny(
     );
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
-    await flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
+    flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
   }
 }
 
@@ -294,9 +291,9 @@ export async function clearCompletedCoreUpdatesIfAny(
  *   }
  * }
  */
-export async function getRegistry(): Promise<RegistryInterface> {
-  const registry = await db.get(AUTO_UPDATE_REGISTRY);
-  if (!registry) await db.set(AUTO_UPDATE_REGISTRY, {});
+export function getRegistry(): RegistryInterface {
+  const registry = db.get(AUTO_UPDATE_REGISTRY);
+  if (!registry) db.set(AUTO_UPDATE_REGISTRY, {});
   return registry || {};
 }
 
@@ -308,14 +305,14 @@ export async function getRegistry(): Promise<RegistryInterface> {
  * @param {string} version "0.2.5"
  * @param {object} data { param: "value" }
  */
-async function setRegistry(
+function setRegistry(
   name: string,
   version: string,
   data: RegistryEntryInterface
 ) {
-  const registry = await getRegistry();
+  const registry = getRegistry();
 
-  await db.set(AUTO_UPDATE_REGISTRY, {
+  db.set(AUTO_UPDATE_REGISTRY, {
     ...registry,
     [name]: {
       ...(registry[name] || {}),
@@ -348,9 +345,9 @@ async function setRegistry(
  *   }
  * }
  */
-export async function getPending(): Promise<PendingInterface> {
-  const pending = await db.get(AUTO_UPDATE_PENDING);
-  if (!pending) await db.set(AUTO_UPDATE_PENDING, {});
+export function getPending(): PendingInterface {
+  const pending = db.get(AUTO_UPDATE_PENDING);
+  if (!pending) db.set(AUTO_UPDATE_PENDING, {});
   return pending || {};
 }
 
@@ -361,9 +358,9 @@ export async function getPending(): Promise<PendingInterface> {
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {object} data { version: "0.2.6", param: "value" }
  */
-async function setPending(name: string, data: PendingEntryInterface) {
-  const pending = await getPending();
-  await db.set(AUTO_UPDATE_PENDING, {
+function setPending(name: string, data: PendingEntryInterface) {
+  const pending = getPending();
+  db.set(AUTO_UPDATE_PENDING, {
     ...pending,
     [name]: {
       ...(pending[name] || {}),
@@ -387,7 +384,7 @@ async function setPending(name: string, data: PendingEntryInterface) {
  *   scheduled: 15363818244
  * }
  */
-export async function getDnpFeedbackMessage({
+export function getDnpFeedbackMessage({
   id,
   currentVersion,
   registry,
@@ -398,8 +395,8 @@ export async function getDnpFeedbackMessage({
   registry?: RegistryInterface;
   pending?: PendingInterface;
 }) {
-  if (!registry) registry = await getRegistry();
-  if (!pending) pending = await getPending();
+  if (!registry) registry = getRegistry();
+  if (!pending) pending = getPending();
 
   const currentVersionRegistry = (registry[id] || {})[currentVersion] || {};
   const { version: pendingVersion, scheduledUpdate, errorMessage } =
@@ -444,7 +441,7 @@ export async function getDnpFeedbackMessage({
  *   scheduled: 15363818244
  * }
  */
-export async function getCoreFeedbackMessage({
+export function getCoreFeedbackMessage({
   currentVersionId,
   registry,
   pending
@@ -453,8 +450,8 @@ export async function getCoreFeedbackMessage({
   registry?: RegistryInterface;
   pending?: PendingInterface;
 }) {
-  if (!registry) registry = await getRegistry();
-  if (!pending) pending = await getPending();
+  if (!registry) registry = getRegistry();
+  if (!pending) pending = getPending();
 
   const id = coreDnpName;
   /**

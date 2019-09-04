@@ -1,4 +1,5 @@
 import * as db from "../db";
+import { PortInterface, PortMapping } from "../types";
 
 /**
  * Returns the current ports status
@@ -22,9 +23,9 @@ import * as db from "../db";
  * }
  */
 export default async function getPortsStatus() {
-  const upnpAvailable = await db.get("upnpAvailable");
-  const portsToOpen = await db.get("portsToOpen");
-  const currentPortMappings = await db.get("currentPortMappings");
+  const upnpAvailable: boolean = db.get("upnpAvailable");
+  const portsToOpen: PortInterface = db.get("portsToOpen");
+  const currentPortMappings: PortMapping[] = db.get("currentPortMappings");
 
   return {
     message: `Got port status`,

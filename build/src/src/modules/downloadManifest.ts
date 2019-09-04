@@ -23,7 +23,7 @@ export default async function downloadManifest(hash: string) {
    * The manifest is stored un-parsed. The validate function will
    * parse it and return a valid object if the validation succeeeds
    */
-  const manifestStringCache = await db.get(hash);
+  const manifestStringCache: string = db.get(hash);
   const cacheValidation = await validateManifest(manifestStringCache);
   if (cacheValidation.success) return cacheValidation.manifest;
 
@@ -42,7 +42,7 @@ export default async function downloadManifest(hash: string) {
     throw Error(
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
-  await db.set(hash, manifestString);
+  db.set(hash, manifestString);
   return validation.manifest;
 }
 

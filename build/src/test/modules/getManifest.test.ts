@@ -14,8 +14,8 @@ function getGetManifest(
   dbInstance: DbInstance
 ) {
   const db = {
-    get: async (key: string) => dbInstance[key],
-    set: async (key: string, val: any) => (dbInstance[key] = val)
+    get: (key: string) => dbInstance[key],
+    set: (key: string, val: any) => (dbInstance[key] = val)
   };
   const { default: getManifest } = proxyquire("../../src/modules/getManifest", {
     "../modules/downloadManifest": async () => manifest,

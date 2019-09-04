@@ -45,13 +45,13 @@ app.get("/download/:fileId", async (req, res) => {
     return res.status(403).send(`Forbidden ip: ${req.ip}`);
 
   const { fileId } = req.params;
-  const filePath = await db.get(fileId);
+  const filePath: string = db.get(fileId);
 
   // If path does not exist, return error
   if (!filePath) return res.status(404).send("File not found");
 
   // Remove the fileId from the DB FIRST to prevent reply attacks
-  await db.remove(fileId);
+  db.remove(fileId);
   return res.download(filePath, errHttp => {
     if (!errHttp)
       fs.unlink(filePath, errFs => {

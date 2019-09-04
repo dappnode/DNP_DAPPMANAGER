@@ -42,17 +42,20 @@ describe("Call function: removePackage", function() {
 
   // db to know UPnP state
   const db = {
-    get: async (key: string) => {
+    get: (key: string) => {
       if (key === "upnpAvailable") return true;
     }
   };
 
-  const { default: removePackage } = proxyquire("../../src/calls/removePackage", {
-    "../modules/docker": docker,
-    "../eventBus": eventBusPackage,
-    "../params": params,
-    "../db": db
-  });
+  const { default: removePackage } = proxyquire(
+    "../../src/calls/removePackage",
+    {
+      "../modules/docker": docker,
+      "../eventBus": eventBusPackage,
+      "../params": params,
+      "../db": db
+    }
+  );
 
   before(async () => {
     validate.path(dockerComposePath);

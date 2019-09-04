@@ -25,7 +25,7 @@ async function dockerComposeUpSafe(dockerComposePath: string, options?: any) {
     const unlockPorts = require("modules/unlockPorts");
 
     if (e.message.includes("port is already allocated")) {
-      const upnpAvailable = await db.get("upnpAvailable");
+      const upnpAvailable = db.get("upnpAvailable");
       if (upnpAvailable) {
         // Don't try to find which port caused the error.
         // In case of multiple collitions you would need to call this function recursively

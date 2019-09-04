@@ -68,22 +68,25 @@ describe("Call function: installPackage", function() {
 
   // db to know UPnP state
   const db = {
-    get: async (key: string) => {
+    get: (key: string) => {
       if (key === "upnpAvailable") return true;
     }
   };
 
-  const { default: installPackage } = proxyquire("../../src/calls/installPackage", {
-    "../modules/packages": packages,
-    "../modules/dappGet": dappGet,
-    "../modules/getManifest": getManifest,
-    "../modules/listContainers": listContainers,
-    "../modules/lockPorts": lockPorts,
-    "../eventBus": eventBusPackage,
-    "../utils/isSyncing": isSyncing,
-    "../params": params,
-    "../db": db
-  });
+  const { default: installPackage } = proxyquire(
+    "../../src/calls/installPackage",
+    {
+      "../modules/packages": packages,
+      "../modules/dappGet": dappGet,
+      "../modules/getManifest": getManifest,
+      "../modules/listContainers": listContainers,
+      "../modules/lockPorts": lockPorts,
+      "../eventBus": eventBusPackage,
+      "../utils/isSyncing": isSyncing,
+      "../params": params,
+      "../db": db
+    }
+  );
 
   // before(() => {
   //     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);

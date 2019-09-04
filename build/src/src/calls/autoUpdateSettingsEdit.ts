@@ -21,9 +21,9 @@ export default async function autoUpdateSettingsEdit({
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 
-  if (id === MY_PACKAGES) await editDnpSetting(enabled);
-  else if (id === SYSTEM_PACKAGES) await editCoreSetting(enabled);
-  else await editDnpSetting(enabled, id);
+  if (id === MY_PACKAGES) editDnpSetting(enabled);
+  else if (id === SYSTEM_PACKAGES) editCoreSetting(enabled);
+  else editDnpSetting(enabled, id);
 
   const name = ((id || "").split(".")[0] || "").replace("-", " ");
   return {

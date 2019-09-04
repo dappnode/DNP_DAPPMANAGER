@@ -18,26 +18,29 @@ describe("Call function: autoUpdateDataGet", () => {
   const nextVersion = "0.2.7";
   const timestamp = Date.now() - 1000;
 
-  const { default: autoUpdateDataGet } = proxyquire("../../src/calls/autoUpdateDataGet", {
-    "../modules/listContainers": async () => [
-      { name: id, isDnp: true, version: currentVersion },
-      { name: "admin", isCore: true, version: "0.2.1" },
-      { name: "core", isCore: true, version: "0.2.1" },
-      { name: "vpn", isCore: true, version: "0.2.0" }
-    ]
-  });
+  const { default: autoUpdateDataGet } = proxyquire(
+    "../../src/calls/autoUpdateDataGet",
+    {
+      "../modules/listContainers": async () => [
+        { name: id, isDnp: true, version: currentVersion },
+        { name: "admin", isCore: true, version: "0.2.1" },
+        { name: "core", isCore: true, version: "0.2.1" },
+        { name: "vpn", isCore: true, version: "0.2.0" }
+      ]
+    }
+  );
 
   before(async () => {
     await createTestDir();
-    await db.clearDb();
+    db.clearDb();
     // Prepare results
     // Enable a few DNPs
-    await editCoreSetting(true);
-    await editDnpSetting(true);
-    await editDnpSetting(true, id);
+    editCoreSetting(true);
+    editDnpSetting(true);
+    editDnpSetting(true, id);
     // Trigger some versions
-    await isUpdateDelayCompleted(id, nextVersion, timestamp);
-    await flagCompletedUpdate(
+    isUpdateDelayCompleted(id, nextVersion, timestamp);
+    flagCompletedUpdate(
       "core.dnp.dappnode.eth",
       "admin@0.2.1,core@0.2.1",
       timestamp

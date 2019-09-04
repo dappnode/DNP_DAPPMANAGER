@@ -22,7 +22,7 @@ export default async function downloadAvatar(hash: string) {
   /**
    * 1. Check if cache exist and validate it
    */
-  const avatarCache = await db.get(hash);
+  const avatarCache: string = db.get(hash);
   const cacheValidation = await validateAvatar(avatarCache);
   if (cacheValidation.success) return avatarCache;
 
@@ -50,7 +50,7 @@ export default async function downloadAvatar(hash: string) {
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
 
-  await db.set(hash, avatar);
+  db.set(hash, avatar);
   return avatar;
 }
 
