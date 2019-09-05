@@ -1,21 +1,9 @@
 import shell from "../utils/shell";
+import getDappmanagerImage from "../utils/getDappmanagerImage";
 
 const insecureSalt = "insecur3";
 
 const baseCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint=""`;
-
-// If the DAPPMANAGER image changes, this node app MUST be reseted
-let cacheDappmanagerImage: string;
-async function getDappmanagerImage() {
-  if (cacheDappmanagerImage) return cacheDappmanagerImage;
-  const res = await shell(
-    `docker ps --filter "name=dappmanager.dnp.dappnode.eth" --format "{{.Image}}"`
-  );
-  if (!res) throw Error("No image found for dappmanager.dnp.dappnode.eth");
-  const dappmanagerImage = res.trim();
-  cacheDappmanagerImage = dappmanagerImage;
-  return dappmanagerImage;
-}
 
 /**
  * Checks if the user `dappnode`'s password in the host machine
