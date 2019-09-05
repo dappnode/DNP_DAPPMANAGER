@@ -1,24 +1,19 @@
 import "mocha";
 import { expect } from "chai";
 import shell from "../../src/utils/shell";
+import path from "path";
+import { createTestDir, cleanTestDir, testDir } from "../testUtils";
 
 import verifyXz from "../../src/utils/verifyXz";
 
-const testDirectory = "./test_files/";
-const okFilePath = `${testDirectory}ok-file.txt.xz`;
+const okFilePath = path.join(testDir, "ok-file.txt.xz");
 const okFilePreCompress = okFilePath.replace(".xz", "");
-const corruptFilePath = `${testDirectory}corrupt-file.txt.xz`;
-const missingFilePath = `${testDirectory}missing-file.txt.xz`;
-
-async function cleanFiles() {
-  for (const path of [okFilePath, okFilePreCompress, corruptFilePath]) {
-    await shell(`rm -f ${path}`);
-  }
-}
+const corruptFilePath = path.join(testDir, "corrupt-file.txt.xz");
+const missingFilePath = path.join(testDir, "missing-file.txt.xz");
 
 describe("Util: verifyXz", function() {
   before(async () => {
-    await cleanFiles();
+    await createTestDir();
     await shell(`echo "some content" > ${okFilePreCompress}`);
     await shell(`xz ${okFilePreCompress}`);
     await shell(`echo "bad content" > ${corruptFilePath}`);
@@ -42,6 +37,6 @@ describe("Util: verifyXz", function() {
   });
 
   after(async () => {
-    await cleanFiles();
+    await cleanTestDir();
   });
 });

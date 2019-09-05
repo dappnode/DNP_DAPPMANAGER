@@ -121,9 +121,6 @@ const docker = {
   // --verbose , -v		Show detailed information on space usage
   systemDf: () => shell("docker system df --verbose"),
 
-  status: (containerNameOrId: string) =>
-    shell(`docker inspect --format='{{.State.Status}}' ${containerNameOrId}`),
-
   // File manager, copy command
   copyFileFrom: (id: string, fromPath: string, toPath: string) =>
     shell(`docker cp --follow-link ${id}:${fromPath} ${toPath}`),

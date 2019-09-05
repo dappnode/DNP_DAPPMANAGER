@@ -51,16 +51,17 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
             portsToClose: [{ portNumber: 30303, protocol: "UDP" }]
           }
         ],
-        "../../utils/parse": {
-          dockerComposePorts: (dockerComposePath: string) => {
-            if (dockerComposePath.includes(stoppedDnp))
-              return [
-                { host: 4001, container: 4001, protocol: "UDP" },
-                { host: 4001, container: 4001, protocol: "TCP" }
-              ];
-            else
-              throw Error(`Unknown dockerComposePath "${dockerComposePath}"`);
-          }
+        "../../utils/dockerComposeFile": {
+          getComposeInstance: (dnpName: string) => ({
+            getPortMappings: () => {
+              if (dnpName.includes(stoppedDnp))
+                return [
+                  { host: 4001, container: 4001, protocol: "UDP" },
+                  { host: 4001, container: 4001, protocol: "TCP" }
+                ];
+              else throw Error(`Unknown dnpName "${dnpName}"`);
+            }
+          })
         }
       }
     );

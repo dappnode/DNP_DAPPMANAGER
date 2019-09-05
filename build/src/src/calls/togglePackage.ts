@@ -1,5 +1,5 @@
+import listContainers from "../modules/listContainers";
 import * as getPath from "../utils/getPath";
-import * as parse from "../utils/parse";
 import params from "../params";
 import docker from "../modules/docker";
 import { eventBus, eventBusTag } from "../eventBus";
@@ -20,22 +20,13 @@ export default async function togglePackage({
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
-  // This parse utility already throws if no docker-compose found
-  const containerName = parse.containerName(dockerComposePath);
 
-  const packageState = await docker.status(containerName);
+  const dnpList = await listContainers({ byName: id });
+  const dnp = dnpList[0];
+  if (!dnp) throw Error(`No DNP was found for name ${id}`);
 
-  // docker-compose states my contain extra info, i.e. Exit (137), Up (healthy)
-  switch ((packageState || "").split(" ")[0].trim()) {
-    case "running":
-      await docker.compose.stop(dockerComposePath, { timeout });
-      break;
-    case "exited":
-      await docker.compose.start(dockerComposePath);
-      break;
-    default:
-      throw Error(`Unkown state: ${packageState} for package ${id}`);
-  }
+  if (dnp.running) await docker.compose.stop(dockerComposePath, { timeout });
+  else await docker.compose.start(dockerComposePath);
 
   // Emit packages update
   eventBus.emit(eventBusTag.emitPackages);

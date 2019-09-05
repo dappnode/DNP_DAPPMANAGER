@@ -1,4 +1,4 @@
-import * as parse from "../utils/parse";
+import { readComposeObj, writeComposeObj } from "../utils/dockerComposeFile";
 import {
   parsePortMappings,
   stringifyPortMappings
@@ -27,7 +27,7 @@ export default async function unlockPorts(dockerComposePath: string) {
   }
 
   // 1. Parse docker-compose to find portsToClose.
-  const dc = parse.readDockerCompose(dockerComposePath);
+  const dc = readComposeObj(dockerComposePath);
   // Create shortcut to the first service
   const service = dc.services[Object.getOwnPropertyNames(dc.services)[0]];
   if (!service) {
@@ -49,5 +49,5 @@ export default async function unlockPorts(dockerComposePath: string) {
 
   // 3. Write the docker-compose (no need to up the package)
   dc.services[Object.getOwnPropertyNames(dc.services)[0]] = service;
-  parse.writeDockerCompose(dockerComposePath, dc);
+  writeComposeObj(dockerComposePath, dc);
 }

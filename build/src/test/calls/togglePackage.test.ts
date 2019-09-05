@@ -4,6 +4,8 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
+import { PackageContainer } from "../../src/types";
+import { mockDnp } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Call function: togglePackage", function() {
@@ -26,15 +28,25 @@ services:
   const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, false);
 
   const docker = {
-    status: sinon.fake.resolves("running"),
     compose: {
       stop: sinon.fake.resolves(null)
     }
   };
 
+  const dnpList = [
+    {
+      ...mockDnp,
+      name: PACKAGE_NAME,
+      running: true
+    }
+  ];
+
   const { default: togglePackage } = proxyquire(
     "../../src/calls/togglePackage",
     {
+      "../modules/listContainers": async ({ byName }: { byName: string }) => {
+        return dnpList.filter(({ name }) => name === byName);
+      },
       "../modules/docker": docker,
       "../params": params
     }
@@ -47,20 +59,20 @@ services:
 
   it("should stop the package with correct arguments", async () => {
     const res = await togglePackage({ id: PACKAGE_NAME });
-    sinon.assert.called(docker.status);
     sinon.assert.called(docker.compose.stop);
     expect(res).to.be.ok;
     expect(res).to.have.property("message");
   });
 
   it("should throw an error with wrong package name", async () => {
+    const id = "anotherPackage.dnp.eth";
     let error = "--- togglePackage did not throw ---";
     try {
-      await togglePackage({ id: "anotherPackage.dnp.eth" });
+      await togglePackage({ id });
     } catch (e) {
       error = e.message;
     }
-    expect(error).to.include("docker-compose does not exist");
+    expect(error).to.include(`No DNP was found for name ${id}`);
   });
 
   after(() => {

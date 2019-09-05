@@ -1,11 +1,9 @@
 import listContainers from "../../modules/listContainers";
-import params from "../../params";
 // Utils
-import * as getPath from "../../utils/getPath";
-import * as parse from "../../utils/parse";
+import { getComposeInstance } from "../../utils/dockerComposeFile";
 // Default ports to open in case getPortsToOpen throws
 import defaultPortsToOpen from "./defaultPortsToOpen";
-import { PackagePort, PortProtocol, PortMapping } from "../../types";
+import { PackagePort, PortProtocol } from "../../types";
 import Logs from "../../logs";
 const logs = Logs(module);
 
@@ -55,22 +53,9 @@ export default async function getPortsToOpen() {
       } else {
         try {
           // If DNP is exited, the port mapping is only available in the docker-compose
-          const dockerComposePath = getPath.dockerCompose(
-            dnp.name,
-            params,
-            dnp.isCore
-          );
-          /**
-           * @param {array} dockerComposePorts = [{
-           *   host: "32638",
-           *   container: "30303",
-           *   protocol: "udp"
-           * }]
-           */
-          const dockerComposePorts: PortMapping[] = parse.dockerComposePorts(
-            dockerComposePath
-          );
-          for (const port of dockerComposePorts || []) {
+          const compose = getComposeInstance(dnp.name);
+          const dockerComposePortMappings = compose.getPortMappings();
+          for (const port of dockerComposePortMappings || []) {
             // Only consider ports that are mapped (not ephemeral ports)
             if (port.host) addPortToOpen(port.protocol, port.host);
           }

@@ -9,13 +9,32 @@ import {
 import { PortMapping } from "../types";
 import params from "../params";
 
-interface Service {
-  ports: string[];
-}
-
-interface ComposeObj {
+interface DockerComposePackage {
+  version: string;
   services: {
-    [dnpName: string]: Service;
+    [dnpName: string]: {
+      container_name: string; // "DAppNodePackage-bitcoin.dnp.dappnode.eth",
+      image: string; // "bitcoin.dnp.dappnode.eth:0.1.1";
+      volumes: string[]; // ["bitcoin_data:/root/.bitcoin"];
+      ports: string[]; // ["8333:8333"];
+      env_file: string[]; // ["bitcoin.dnp.dappnode.eth.env"];
+      networks: string[]; // ["dncore_network"];
+      dns: string; // "172.33.1.2";
+      logging: {
+        options: {
+          "max-size": string; // "10m";
+          "max-file": string; // "3";
+        };
+      };
+    };
+  };
+  volumes: {
+    [volumeName: string]: {};
+  };
+  networks: {
+    dncore_network: {
+      external: boolean;
+    };
   };
 }
 
@@ -36,19 +55,24 @@ export function getDockerComposePath(id: string, newFile?: boolean) {
   else throw Error(`No docker-compose found for ${id}`);
 }
 
-function readComposeObj(dockerComposePath: string) {
+export function readComposeObj(
+  dockerComposePath: string
+): DockerComposePackage {
   const dcString = fs.readFileSync(dockerComposePath, "utf-8");
   return yaml.parse(dcString);
 }
 
-function writeComposeObj(dockerComposePath: string, composeObj: ComposeObj) {
+export function writeComposeObj(
+  dockerComposePath: string,
+  composeObj: DockerComposePackage
+) {
   const composeString = yaml.stringify(composeObj, 8, 2);
   fs.writeFileSync(dockerComposePath, composeString, "utf-8");
 }
 
-export function getComposeInstance(idOrObject: string | ComposeObj) {
+export function getComposeInstance(idOrObject: string | DockerComposePackage) {
   let dockerComposePath = "";
-  let composeObj: ComposeObj;
+  let composeObj: DockerComposePackage;
   if (typeof idOrObject === "string") {
     dockerComposePath = getDockerComposePath(idOrObject);
     composeObj = readComposeObj(dockerComposePath);
@@ -59,7 +83,7 @@ export function getComposeInstance(idOrObject: string | ComposeObj) {
   }
 
   const dnpName = Object.getOwnPropertyNames(composeObj.services)[0];
-  const service: Service = composeObj.services[dnpName];
+  const service = composeObj.services[dnpName];
 
   function write() {
     composeObj.services[dnpName] = service;

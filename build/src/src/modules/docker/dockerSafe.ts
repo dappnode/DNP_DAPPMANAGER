@@ -1,5 +1,5 @@
 import docker from "./dockerCommands";
-import * as parse from "../../utils/parse";
+import { readComposeObj } from "../../utils/dockerComposeFile";
 import * as db from "../../db";
 import { eventBus, eventBusTag } from "../../eventBus";
 import lockPorts from "../lockPorts";
@@ -39,7 +39,7 @@ async function dockerComposeUpSafe(dockerComposePath: string, options?: any) {
       await unlockPorts(dockerComposePath);
 
       // #### PATCH to get id from dockerComposePath
-      const dc = parse.readDockerCompose(dockerComposePath);
+      const dc = readComposeObj(dockerComposePath);
       const id = Object.keys(dc.services)[0];
 
       // Up the package and lock the ports again
