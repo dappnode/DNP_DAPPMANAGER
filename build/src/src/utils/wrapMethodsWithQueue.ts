@@ -1,4 +1,4 @@
-const async = require("async");
+import async from "async";
 import { promisify } from "util";
 
 /**

@@ -1,5 +1,8 @@
+import fs from "fs";
 import Logs from "../logs";
 const logs = Logs(module);
+
+const versionDataJsonPath = "../../.version.json";
 
 /**
  * For debugging, print current version, branch and commit
@@ -9,8 +12,12 @@ const logs = Logs(module);
  */
 let versionData = {};
 try {
-  versionData = require("../../.version.json");
-  logs.info(`Version info: \n${JSON.stringify(versionData, null, 2)}`);
+  if (!fs.existsSync(versionDataJsonPath)) {
+    logs.warn(`Version info not found at path: ${versionDataJsonPath}`);
+  } else {
+    versionData = JSON.parse(fs.readFileSync(versionDataJsonPath, "utf8"));
+    logs.info(`Version info: \n${JSON.stringify(versionData, null, 2)}`);
+  }
 } catch (e) {
   logs.error(`Error printing current version ${e.message}`);
 }

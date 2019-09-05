@@ -1,5 +1,5 @@
 import shell from "./shell";
-const isIp = require("is-ip");
+import isIp from "is-ip";
 import Logs from "../logs";
 const logs = Logs(module);
 

@@ -1,4 +1,5 @@
-const Web3 = require("web3");
+// #### NOTE: Typedefinitions of web3.eth.isSyncing() are not correct, using require to ignore them
+const Web3 = require("web3"); // #### NOTE
 import { ChainData } from "../../types";
 
 const MIN_BLOCK_DIFF_SYNC = 60;

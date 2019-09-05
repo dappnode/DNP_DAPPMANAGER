@@ -1,5 +1,5 @@
 import resizeImg from "./resizeImg";
-const imageminPngquant = require("imagemin-pngquant");
+import imageminPngquant from "imagemin-pngquant";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -39,9 +39,9 @@ export default async function formatAndCompressAvatar(inputBuffer: Buffer) {
   let compressedImgBuffer;
   try {
     const resizedImgBuffer = await resizeImg(inputBuffer, outputResolution);
-    compressedImgBuffer = await imageminPngquant({
-      quality: "0-95"
-    })(resizedImgBuffer);
+    compressedImgBuffer = await imageminPngquant({ quality: [0, 0.95] })(
+      resizedImgBuffer
+    );
   } catch (e) {
     logs.warn(`Error compressing avatar: ${e.stack}`);
   }

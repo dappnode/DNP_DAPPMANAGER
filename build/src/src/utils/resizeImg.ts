@@ -1,4 +1,4 @@
-const Jimp = require("jimp");
+import Jimp from "jimp";
 
 export default function resizeImg(imageBuffer: Buffer, pixelWidth: number) {
   return Jimp.read(imageBuffer).then((image: any) =>

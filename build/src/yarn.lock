@@ -488,6 +488,21 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
+"@types/imagemin-pngquant@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/imagemin-pngquant/-/imagemin-pngquant-7.0.0.tgz#fd074409a369ebc2bf3e6ea77b268a460225b204"
+  integrity sha512-9m4EKVKNVy+nkX9Q/jZljGQ32vwYCn25lrbclhOKWrVAHD+MjuJzU/4NB0/loTyZSWyByMJ8sFSGjow66P7nJw==
+  dependencies:
+    "@types/imagemin" "*"
+    "@types/node" "*"
+
+"@types/imagemin@*":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@types/imagemin/-/imagemin-6.0.0.tgz#c7b72bb08657396884acfac735c204379b0fe0a4"
+  integrity sha512-07dAIxWudAi8dHBS7W5JJ1rj4XR+FBLooq1yXXZo2XTv9kbMHKeDjq1pd9ou4Ui6yBZzfezlNxfJM1++fbc5/A==
+  dependencies:
+    "@types/node" "*"
+
 "@types/joi@^14.3.3":
   version "14.3.3"
   resolved "https://registry.yarnpkg.com/@types/joi/-/joi-14.3.3.tgz#f251aa8150fc0b6a7ce9feab21802a28473de335"

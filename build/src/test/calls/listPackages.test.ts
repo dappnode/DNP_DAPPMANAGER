@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
+import * as validate from "../../src/utils/validate";
 import { stringifyEnvs } from "../../src/utils/parse";
-const shell = require("shelljs");
 
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -46,7 +46,7 @@ describe("Call function: listPackages", function() {
   before(() => {
     // Write mock data on the test folder
     const ENV_PATH = getPath.envFile(mockList[0].name, params, false);
-    shell.mkdir("-p", getParentDir(ENV_PATH));
+    validate.path(ENV_PATH);
     fs.writeFileSync(ENV_PATH, stringifyEnvs(envs));
   });
 
@@ -64,9 +64,3 @@ describe("Call function: listPackages", function() {
     });
   });
 });
-
-// Utils
-
-function getParentDir(fullPath: string) {
-  return fullPath.replace(/\/[^/]+$/, "");
-}

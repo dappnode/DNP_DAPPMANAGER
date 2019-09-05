@@ -1,4 +1,5 @@
-const shell = require("shelljs");
+import fs from "fs";
+import pathUtil from "path";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -12,25 +13,23 @@ const logs = Logs(module);
  *         parent directory recursively with mkdir -p
  */
 
-export function isEthDomain(domain: string) {
+export function isEthDomain(domain: string): void {
   if (domain.substr(domain.length - 4) != ".eth") {
     logs.error(`Error: reponame is not an .eth domain: ${domain}`);
     throw Error(`reponame is not an .eth domain: ${domain}`);
   }
 }
 
-export function path(path: string) {
+export function path(filePath: string): string {
   // shell.mkdir('-p', fullPath);
   // directory exists
-  const parentPath = path.replace(/\/[^/]+\/?$/, "");
-  if (!shell.test("-e", parentPath)) {
-    logs.warn(
-      `Parent path doesn't exist, creating it. pwd: ${shell.pwd()}, parent: ${parentPath}`
-    );
-    shell.mkdir("-p", parentPath);
+  const parentPath = pathUtil.parse(filePath).dir;
+  if (!fs.existsSync(parentPath)) {
+    logs.warn(`Parent path doesn't exist, creating it: ${parentPath}`);
+    fs.mkdirSync(parentPath, { recursive: true });
   }
 
   // returning so it can be used as
   // > await fs.writeFileSync(validate.path(path), data)
-  return path;
+  return filePath;
 }

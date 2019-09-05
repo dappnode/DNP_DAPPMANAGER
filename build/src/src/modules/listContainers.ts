@@ -98,7 +98,7 @@ async function listContainers(options?: {
     if (options.byName) filters.name = [options.byName];
     if (options.byId) filters.id = [options.byId];
   }
-  const containers: Container[] = await docker.listContainers({
+  const containers = await docker.listContainers({
     all: true,
     filters
   });
@@ -106,9 +106,9 @@ async function listContainers(options?: {
   /**
    * Format containers
    */
-  const dnpList = containers
-    .map(c => {
-      const packageName = (c.Names[0] || "").replace("/", "");
+  const dnpList: PackageContainer[] = containers
+    .map(container => {
+      const packageName = (container.Names[0] || "").replace("/", "");
       const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
       const isCore = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
@@ -118,7 +118,7 @@ async function listContainers(options?: {
         name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
       else name = packageName;
 
-      let version = (c.Image || "").split(":")[1] || "0.0.0";
+      let version = (container.Image || "").split(":")[1] || "0.0.0";
       // IPFS path
       if ((version || "").startsWith("ipfs-")) {
         version = version.replace("ipfs-", "/ipfs/");
@@ -131,52 +131,49 @@ async function listContainers(options?: {
       let origin = "";
       let chain = "";
       let dependencies: Dependencies = {};
-
-      if (c.Labels && typeof c.Labels === "object") {
-        if (c.Labels["dappnode.dnp.origin"])
-          // Critical for dappGet/aggregate on IPFS DNPs
-          origin = c.Labels["dappnode.dnp.origin"];
-
-        if (c.Labels["dappnode.dnp.chain"])
-          chain = c.Labels["dappnode.dnp.chain"];
-
-        if (c.Labels["dappnode.dnp.dependencies"])
+      const labels = container.Labels;
+      if (labels && typeof labels === "object") {
+        // Critical for dappGet/aggregate on IPFS DNPs
+        if (labels["dappnode.dnp.origin"])
+          origin = labels["dappnode.dnp.origin"];
+        if (labels["dappnode.dnp.chain"]) chain = labels["dappnode.dnp.chain"];
+        if (labels["dappnode.dnp.dependencies"])
           try {
-            dependencies = JSON.parse(c.Labels["dappnode.dnp.dependencies"]);
+            dependencies = JSON.parse(labels["dappnode.dnp.dependencies"]);
           } catch (e) {}
       }
 
-      const container: PackageContainer = {
-        id: c.Id,
+      const formatedContainer: PackageContainer = {
+        id: container.Id,
         packageName,
         version,
         isDnp,
         isCore,
-        created: c.Created,
-        image: c.Image,
+        created: container.Created,
+        image: container.Image,
         name: name,
         shortName: shortName(name),
-        ports: c.Ports.map(({ PrivatePort, PublicPort, Type }) => ({
+        ports: container.Ports.map(({ PrivatePort, PublicPort, Type }) => ({
           // "PublicPort" will be undefined if the port is not mapped
           ...(PublicPort ? { host: PublicPort } : {}),
           container: PrivatePort,
           protocol: Type === "udp" ? "UDP" : "TCP"
         })),
-        volumes: c.Mounts.map(({ Name, Source, Destination }) => ({
+        volumes: container.Mounts.map(({ Name, Source, Destination }) => ({
           path: Source,
           dest: Destination,
           // "Name" will be undefined if it's not a named volumed
           ...(Name ? { name: Name } : {})
         })),
-        state: c.State,
-        running: c.State === "running",
+        state: container.State as ContainerStatus,
+        running: container.State === "running",
         dependencies,
         // #### TODO: The ADMIN does not accept an empty chain or origin
         ...(origin ? { origin } : {}),
         ...(chain ? { chain } : {})
       };
 
-      return container;
+      return formatedContainer;
     })
     .filter(pkg => pkg.isDnp || pkg.isCore);
 
