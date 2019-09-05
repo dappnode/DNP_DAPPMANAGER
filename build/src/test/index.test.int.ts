@@ -61,8 +61,6 @@ describe("Full integration test with REAL docker: ", function() {
       await shellSafe(cmd);
     }
 
-    const cmds2 = ["docker pull chentex/random-logger", "docker save "];
-
     // Print out params
     logs.info("Test params");
     logs.info(JSON.stringify(params, null, 2));

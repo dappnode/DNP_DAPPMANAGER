@@ -1,8 +1,9 @@
 import fs from "fs";
 import params from "../params";
+import { eventBus, eventBusTag } from "../eventBus";
 // Modules
 import listContainers from "../modules/listContainers";
-import docker from "../modules/docker";
+import { dockerDf } from "../modules/dockerApi";
 // Utils
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import * as getPath from "../utils/getPath";
@@ -14,15 +15,7 @@ const logs = Logs(module);
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
 // Prevent running it twice
-let isRunning: boolean;
-let cacheResult: string;
-async function dockerSystemDf() {
-  if (isRunning && cacheResult) return cacheResult;
-  isRunning = true;
-  cacheResult = await docker.systemDf();
-  isRunning = false;
-  return cacheResult;
-}
+let isDockerSystemDfCallRunning = false;
 
 /**
  * Returns the list of current containers associated to packages
@@ -64,16 +57,6 @@ async function dockerSystemDf() {
 export default async function listPackages() {
   let dnpList = await listContainers();
 
-  // Append volume info
-  // This call can fail because of:
-  //   Error response from daemon: a disk usage operation is already running
-  try {
-    const dockerSystemDfData = await dockerSystemDf();
-    dnpList = parseDockerSystemDf({ data: dockerSystemDfData, dnpList });
-  } catch (e) {
-    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
-  }
-
   // Append envFile and manifest
   dnpList.map(dnp => {
     // Add env info, only if there are ENVs
@@ -106,6 +89,23 @@ export default async function listPackages() {
       logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
     }
   });
+
+  // ##### EMIT data before appending system data
+  eventBus.emit(eventBusTag.emitPackages, dnpList);
+
+  // Append volume info
+  // This call can fail because of:
+  //   Error response from daemon: a disk usage operation is already running
+  if (!isDockerSystemDfCallRunning)
+    try {
+      isDockerSystemDfCallRunning = true;
+      const dockerSystemDfData = await dockerDf();
+      dnpList = parseDockerSystemDf({ dockerSystemDfData, dnpList });
+    } catch (e) {
+      logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
+    } finally {
+      isDockerSystemDfCallRunning = false;
+    }
 
   return {
     message: `Listing ${dnpList.length} packages`,

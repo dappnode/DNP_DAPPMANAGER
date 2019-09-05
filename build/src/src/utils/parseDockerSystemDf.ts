@@ -1,47 +1,24 @@
 import { PackageContainer } from "../types";
-
-const Parser = require("table-parser");
+import { DockerApiSystemDfReturn } from "../modules/dockerApi";
+import prettyBytes from "pretty-bytes";
 
 export default function parseDockerSystemDf({
-  data,
+  dockerSystemDfData,
   dnpList
 }: {
-  data: string;
+  dockerSystemDfData: DockerApiSystemDfReturn;
   dnpList: PackageContainer[];
 }): PackageContainer[] {
-  if (!data) throw Error("on parseDockerSystemDf, data is not defined");
-
-  const volumeData = data.split("Local Volumes space usage:")[1] || "";
-  // return output;
-  const parsedData: {
-    VOLUME: string[];
-    NAME: string[];
-    LINKS: string[];
-    SIZE: string[];
-  }[] = Parser.parse(volumeData.trim());
-  // Correct output, turn arrays into strings
-  // parsedData = [
-  //   { VOLUME: [ 'dncore_dappmanagerdnpdappnodeeth_data', '1' ],
-  //   NAME: [ 'dncore_dappmanagerdnpdappnodeeth_data' ],
-  //   LINKS: [ '1' ],
-  //   SIZE: [ '1.319kB' ]
-  // }, ...]
-  // ==== into ====>
-  // {
-  //   'dncore_dappmanagerdnpdappnodeeth_data': {
-  //     links: '1',
-  //     size: '1.319kB'
-  //   }, ...
-  // }
   const correctedParsedDataObj: {
-    [volumeName: string]: { links: string; size: string };
+    [volumeName: string]: { links: number; size: string };
   } = {};
-  parsedData.forEach(volumeObj => {
-    const name = (volumeObj.VOLUME || [])[0];
-    const links = (volumeObj.LINKS || [])[0];
-    const size = (volumeObj.SIZE || [])[0];
+
+  for (const vol of dockerSystemDfData.Volumes) {
+    const name = vol.Name;
+    const links = vol.UsageData.RefCount;
+    const size = prettyBytes(vol.UsageData.Size);
     correctedParsedDataObj[name] = { links, size };
-  });
+  }
 
   dnpList = dnpList.map(dnp => {
     if (!dnp.volumes) {

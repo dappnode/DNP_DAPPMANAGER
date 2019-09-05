@@ -1,4 +1,4 @@
-import docker from "./dockerApi";
+import { dockerApi } from "./dockerApi";
 // dedicated modules
 import { shortName } from "../utils/strings";
 import params from "../params";
@@ -98,7 +98,7 @@ async function listContainers(options?: {
     if (options.byName) filters.name = [options.byName];
     if (options.byId) filters.id = [options.byId];
   }
-  const containers = await docker.listContainers({
+  const containers = await dockerApi.listContainers({
     all: true,
     filters
   });

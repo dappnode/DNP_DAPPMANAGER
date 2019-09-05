@@ -4,7 +4,6 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import { PackageContainer } from "../../src/types";
 import { mockDnp } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 

@@ -10,7 +10,9 @@ describe("dockerList", function() {
     "../../src/modules/listContainers",
     {
       "./dockerApi": {
-        listContainers: async () => dockerApiResponseContainers
+        dockerApi: {
+          listContainers: async () => dockerApiResponseContainers
+        }
       }
     }
   );

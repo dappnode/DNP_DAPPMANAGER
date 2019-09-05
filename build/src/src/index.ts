@@ -9,7 +9,8 @@ import {
   DirectoryDnp,
   ProgressLog,
   PackageNotification,
-  UserActionLog
+  UserActionLog,
+  PackageContainer
 } from "./types";
 import Logs from "./logs";
 const logs = Logs(module);
@@ -104,8 +105,8 @@ connection.onopen = (session, details) => {
   // Emits the list of packages
   eventBusOnSafe(
     eventBusTag.emitPackages,
-    async () => {
-      const dnpList = (await calls.listPackages()).result;
+    async (dnpList: PackageContainer[] | undefined) => {
+      if (!dnpList) dnpList = (await calls.listPackages()).result;
       publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
     },
     { isAsync: true }

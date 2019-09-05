@@ -1,6 +1,5 @@
 const Daemon = require("monero-rpc").Daemon;
 import { ChainData } from "../../types";
-import { promisify } from "util";
 
 // Monero's average block time is 2 minutes
 
