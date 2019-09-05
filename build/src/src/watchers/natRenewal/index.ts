@@ -91,10 +91,10 @@ async function natRenewal() {
             p.exPort === String(portToOpen.portNumber) &&
             p.inPort === String(portToOpen.portNumber)
         );
-        if (currentPort && isFirstRun) {
-          logs.info(
-            `Port ${portId(portToOpen)} verified. It is currently open`
-          );
+        const portIsOpen = Boolean(currentPort);
+        if (portIsOpen) {
+          if (isFirstRun)
+            logs.info(`Port ${portId(portToOpen)} verified. Currently open`);
         } else {
           logs.error(`Error, port ${portId(portToOpen)} is not currently open`);
         }
