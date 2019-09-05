@@ -2,7 +2,8 @@ import path from "path";
 import fs from "fs";
 import * as db from "../db";
 import params from "../params";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 // Modules
 import listContainers from "../modules/listContainers";
 // External call
@@ -10,7 +11,7 @@ import restartPackage from "./restartPackage";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { BackupInterface } from "../types";
+import { PackageBackup } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -30,7 +31,7 @@ export default async function backupRestore({
   fileId
 }: {
   id: string;
-  backup: BackupInterface[];
+  backup: PackageBackup[];
   fileId: string;
 }) {
   if (!id) throw Error("Argument id must be defined");

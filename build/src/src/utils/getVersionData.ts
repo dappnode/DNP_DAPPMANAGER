@@ -1,4 +1,5 @@
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * For debugging, print current version, branch and commit

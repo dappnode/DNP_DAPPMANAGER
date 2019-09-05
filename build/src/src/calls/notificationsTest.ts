@@ -1,5 +1,5 @@
 import { eventBus, eventBusTag } from "../eventBus";
-import { NotificationInterface, NotificationType } from "../types";
+import { PackageNotification, NotificationType } from "../types";
 
 /**
  * Adds a notification to be shown the UI.
@@ -16,7 +16,7 @@ import { NotificationInterface, NotificationType } from "../types";
 export default async function notificationsTest({
   notification
 }: {
-  notification: NotificationInterface;
+  notification: PackageNotification;
 }) {
   if (!notification) {
     const id = String(Math.random()).slice(2);

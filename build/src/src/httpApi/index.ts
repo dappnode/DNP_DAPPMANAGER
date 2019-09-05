@@ -7,7 +7,8 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import params from "../params";
 import * as db from "../db";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 const app = express();
 const port = 3000;

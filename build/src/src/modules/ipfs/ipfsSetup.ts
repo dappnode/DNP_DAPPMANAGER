@@ -1,6 +1,7 @@
 const ipfsAPI = require("ipfs-http-client");
 import params from "../../params";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /**
  * IPFS client setup.

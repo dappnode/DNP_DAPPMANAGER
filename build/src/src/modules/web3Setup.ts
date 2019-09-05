@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import params from "../params";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 // Prevent web3 from executing to testing. Can result in infinite non-ending tests
 

@@ -3,7 +3,8 @@ import { expect } from "chai";
 import fs from "fs";
 import { promisify } from "util";
 const proxyquire = require("proxyquire").noCallThru();
-const logs = require("../../src/logs")(module);
+import Logs from "../../src/logs";
+const logs = Logs(module);
 
 describe("Call function: fetchPackageData", function() {
   // This function gets the manifest of a package,

@@ -6,13 +6,14 @@ import getPortsToOpen from "./getPortsToOpen";
 import getLocalIp from "../../utils/getLocalIp";
 // Utils
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import { PortInterface } from "../../types";
-const logs = require("../../logs")(module);
+import { PackagePort } from "../../types";
+import Logs from "../../logs";
+const logs = Logs(module);
 
 const natRenewalInterval =
   params.NAT_RENEWAL_WATCHER_INTERVAL || 60 * 60 * 1000;
 
-const portId = (port: PortInterface) => `${port.portNumber} ${port.protocol}`;
+const portId = (port: PackagePort) => `${port.portNumber} ${port.protocol}`;
 
 let isFirstRunGlobal = true;
 async function natRenewal() {

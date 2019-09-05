@@ -6,7 +6,8 @@ import * as parse from "../utils/parse";
 import isSyncing from "../utils/isSyncing";
 import isIpfsHash from "../utils/isIpfsHash";
 import { DirectoryDnp } from "../types";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 let dnpsCache: DirectoryDnp[] = [];
 const avatarCache: { [avatarHash: string]: string } = {};

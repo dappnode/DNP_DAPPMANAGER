@@ -8,7 +8,7 @@ import * as validate from "../utils/validate";
 import * as getPath from "../utils/getPath";
 import logUi from "../utils/logUi";
 import params from "../params";
-import { InstallerPkgInterface } from "../types";
+import { InstallerPkg } from "../types";
 const { manifestToCompose } = require("@dappnode/dnp-manifest");
 
 // Promisify fs methods
@@ -23,13 +23,7 @@ const writeFile = promisify(fs.writeFile);
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function download({
-  pkg,
-  id
-}: {
-  pkg: InstallerPkgInterface;
-  id: string;
-}) {
+export async function download({ pkg, id }: { pkg: InstallerPkg; id: string }) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
@@ -77,13 +71,7 @@ export async function download({
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function load({
-  pkg,
-  id
-}: {
-  pkg: InstallerPkgInterface;
-  id: string;
-}) {
+export async function load({ pkg, id }: { pkg: InstallerPkg; id: string }) {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
@@ -125,13 +113,7 @@ export async function load({
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function run({
-  pkg,
-  id
-}: {
-  pkg: InstallerPkgInterface;
-  id: string;
-}) {
+export async function run({ pkg, id }: { pkg: InstallerPkg; id: string }) {
   const { name, manifest } = pkg;
   const { version } = manifest;
   const isCore = Boolean(pkg.isCore);

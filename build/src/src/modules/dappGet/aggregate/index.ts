@@ -4,9 +4,10 @@ import listContainers from "../../../modules/listContainers";
 import * as safeSemver from "../utils/safeSemver";
 import _aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
-import { ContainerInterface, RequestInterface } from "../../../types";
+import { PackageContainer, PackageRequest } from "../../../types";
 import { DnpsInterface, FetchFunction } from "../types";
-const logs = require("../../../logs")(module);
+import Logs from "../../../logs";
+const logs = Logs(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -57,8 +58,8 @@ export default async function aggregate({
   dnpList,
   fetch
 }: {
-  req: RequestInterface;
-  dnpList: ContainerInterface[];
+  req: PackageRequest;
+  dnpList: PackageContainer[];
   fetch: FetchFunction;
 }) {
   // Minimal dependency injection (fetch). Proxyquire does not support subdependencies

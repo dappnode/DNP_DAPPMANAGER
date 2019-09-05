@@ -1,6 +1,7 @@
 import resizeImg from "./resizeImg";
 const imageminPngquant = require("imagemin-pngquant");
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 const outputResolution = 200;
 

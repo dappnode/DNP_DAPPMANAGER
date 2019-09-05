@@ -2,13 +2,13 @@
  * Aggregate types
  */
 
-export interface DependenciesInterface {
+export interface Dependencies {
   [dependencyName: string]: string;
 }
 
 export interface DnpsRepo {
   [dnpName: string]: {
-    [version: string]: DependenciesInterface;
+    [version: string]: Dependencies;
   };
 }
 
@@ -19,7 +19,7 @@ export interface FetchFunction {
   }: {
     name: string;
     ver: string;
-  }) => Promise<DependenciesInterface>;
+  }) => Promise<Dependencies>;
   versions: ({
     name,
     versionRange

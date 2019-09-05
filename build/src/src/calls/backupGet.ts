@@ -1,7 +1,8 @@
 import fs from "fs";
 import crypto from "crypto";
 import path from "path";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 import * as db from "../db";
 import params from "../params";
 // Modules
@@ -9,7 +10,7 @@ import listContainers from "../modules/listContainers";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { BackupInterface } from "../types";
+import { PackageBackup } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -28,7 +29,7 @@ export default async function backupGet({
   backup
 }: {
   id: string;
-  backup: BackupInterface[];
+  backup: PackageBackup[];
 }) {
   if (!id) throw Error("Argument id must be defined");
   if (!backup) throw Error("Argument backup must be defined");

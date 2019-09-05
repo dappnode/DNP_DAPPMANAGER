@@ -1,5 +1,5 @@
 import dappGet from "../modules/dappGet";
-import { RequestInterface } from "../types";
+import { PackageRequest } from "../types";
 
 /**
  * Resolves a DNP request given the current repo state fetched
@@ -19,7 +19,7 @@ export default async function resolveRequest({
   req,
   options
 }: {
-  req: RequestInterface;
+  req: PackageRequest;
   options: {};
 }) {
   if (!req) throw Error("kwarg req must be defined");

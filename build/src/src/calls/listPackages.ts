@@ -8,7 +8,8 @@ import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import * as getPath from "../utils/getPath";
 import * as envsHelper from "../utils/envsHelper";
 import appendIsPortDeletable from "../utils/appendIsPortDeletable";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running

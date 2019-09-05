@@ -5,12 +5,12 @@ import { pick, omit } from "lodash";
 import { parseCoreVersionIdToStrings } from "./coreVersionId";
 import { includesArray } from "./arrays";
 import {
-  SettingsInterface,
-  RegistryEntryInterface,
-  RegistryDnpInterface,
+  AutoUpdateSettings,
+  AutoUpdateRegistryEntry,
+  AutoUpdateRegistryDnp,
   RegistryInterface,
-  PendingEntryInterface,
-  PendingInterface
+  AutoUpdatePendingEntry,
+  AutoUpdatePending
 } from "../types";
 
 // Groups of packages keys
@@ -37,8 +37,8 @@ const coreDnpName = params.coreDnpName;
  *   "bitcoin.dnp.dappnode.eth": { enabled: false }
  * }
  */
-export function getSettings(): SettingsInterface {
-  const autoUpdateSettings: SettingsInterface = db.get(AUTO_UPDATE_SETTINGS);
+export function getSettings(): AutoUpdateSettings {
+  const autoUpdateSettings: AutoUpdateSettings = db.get(AUTO_UPDATE_SETTINGS);
   if (!autoUpdateSettings) db.set(AUTO_UPDATE_SETTINGS, {});
   return autoUpdateSettings || {};
 }
@@ -264,7 +264,7 @@ export function clearCompletedCoreUpdatesIfAny(
   const pending = getPending();
 
   const { version: pendingVersionId } =
-    pending[coreDnpName] || ({} as PendingEntryInterface);
+    pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
   const pendingVersionsAreInstalled =
     pendingVersionId &&
     includesArray(
@@ -308,7 +308,7 @@ export function getRegistry(): RegistryInterface {
 function setRegistry(
   name: string,
   version: string,
-  data: RegistryEntryInterface
+  data: AutoUpdateRegistryEntry
 ) {
   const registry = getRegistry();
 
@@ -345,7 +345,7 @@ function setRegistry(
  *   }
  * }
  */
-export function getPending(): PendingInterface {
+export function getPending(): AutoUpdatePending {
   const pending = db.get(AUTO_UPDATE_PENDING);
   if (!pending) db.set(AUTO_UPDATE_PENDING, {});
   return pending || {};
@@ -358,7 +358,7 @@ export function getPending(): PendingInterface {
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {object} data { version: "0.2.6", param: "value" }
  */
-function setPending(name: string, data: PendingEntryInterface) {
+function setPending(name: string, data: AutoUpdatePendingEntry) {
   const pending = getPending();
   db.set(AUTO_UPDATE_PENDING, {
     ...pending,
@@ -393,14 +393,14 @@ export function getDnpFeedbackMessage({
   id: string;
   currentVersion: string;
   registry?: RegistryInterface;
-  pending?: PendingInterface;
+  pending?: AutoUpdatePending;
 }) {
   if (!registry) registry = getRegistry();
   if (!pending) pending = getPending();
 
   const currentVersionRegistry = (registry[id] || {})[currentVersion] || {};
   const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[id] || ({} as PendingEntryInterface);
+    pending[id] || ({} as AutoUpdatePendingEntry);
 
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
@@ -448,7 +448,7 @@ export function getCoreFeedbackMessage({
 }: {
   currentVersionId: string;
   registry?: RegistryInterface;
-  pending?: PendingInterface;
+  pending?: AutoUpdatePending;
 }) {
   if (!registry) registry = getRegistry();
   if (!pending) pending = getPending();
@@ -459,7 +459,7 @@ export function getCoreFeedbackMessage({
    */
 
   const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[id] || ({} as PendingEntryInterface);
+    pending[id] || ({} as AutoUpdatePendingEntry);
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
@@ -497,7 +497,7 @@ export function getCoreFeedbackMessage({
  * @param {object} registryDnp
  * @return {object}
  */
-export function getLastRegistryEntry(registryDnp: RegistryDnpInterface) {
+export function getLastRegistryEntry(registryDnp: AutoUpdateRegistryDnp) {
   return (
     Object.entries(registryDnp)
       .map(([version, { updated, successful }]) => ({

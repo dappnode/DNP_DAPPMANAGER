@@ -1,8 +1,8 @@
 import shell from "../src/utils/shell";
 import * as path from "path";
 import {
-  ContainerInterface,
-  ManifestInterface,
+  PackageContainer,
+  Manifest,
   VolumeInterface
 } from "../src/types";
 
@@ -40,7 +40,7 @@ export type CallbackFunction = (err: Error | null, res: any | null) => void;
  * Mock data
  */
 
-export const mockDnp: ContainerInterface = {
+export const mockDnp: PackageContainer = {
   id: "17628371823",
   packageName: "mock-dnp.dnp.dappnode.eth",
   version: "0.0.0",
@@ -54,12 +54,12 @@ export const mockDnp: ContainerInterface = {
   volumes: [],
   state: "running",
   running: true,
-  origin: null,
-  chain: null,
+  origin: "",
+  chain: "",
   dependencies: {}
 };
 
-export const mockManifest: ManifestInterface = {
+export const mockManifest: Manifest = {
   name: "mock-dnp.dnp.dappnode.eth",
   version: "0.0.0",
   type: "service",

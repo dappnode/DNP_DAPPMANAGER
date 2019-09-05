@@ -6,7 +6,8 @@ import * as getPath from "../src/utils/getPath";
 import * as calls from "../src/calls";
 import params from "../src/params";
 const getDataUri = require("datauri").promise;
-const logs = require("../src/logs")(module);
+import Logs from "../src/logs";
+const logs = Logs(module);
 
 // Utils
 async function getDnpFromListPackages(id: string) {
@@ -35,6 +36,7 @@ describe("Full integration test with REAL docker: ", function() {
 
   const idOtpweb = "otpweb.dnp.dappnode.eth";
   const idNginx = "nginx-proxy.dnp.dappnode.eth";
+  const idLetsencrypt = "letsencrypt-nginx.dnp.dappnode.eth";
 
   const shellSafe = (cmd: string) => shell(cmd).catch(() => {});
 
@@ -58,6 +60,8 @@ describe("Full integration test with REAL docker: ", function() {
     for (const cmd of cmds) {
       await shellSafe(cmd);
     }
+
+    const cmds2 = ["docker pull chentex/random-logger", "docker save "];
 
     // Print out params
     logs.info("Test params");
@@ -191,9 +195,19 @@ describe("Full integration test with REAL docker: ", function() {
   }).timeout(20 * 1000);
 
   it(`Should restart the package volumes of ${idNginx}`, async () => {
-    const res = await calls.restartPackageVolumes({ id: idNginx });
+    const res = await calls.restartPackageVolumes({
+      id: idNginx,
+      doNotRestart: true
+    });
     /**
-     * nginx-proxy.dnp.dappnode.eth has one named undeclared volume,
+     * [NOTE]: The letsencrypt-nginx.dnp.dappnode.eth manifest is wrong.
+     * The volumes of nginx-proxy are not correctly defined, so this test fails
+     * To solve this:
+     * - Run the restart with `doNotRestart: true`
+     * - Create the volumes manually
+     * - Up the packages
+     *
+     * [NOTE] nginx-proxy.dnp.dappnode.eth has one named undeclared volume,
      * so its name will be an unpredictable hash. Full message example:
      * "Restarted nginx-proxy.dnp.dappnode.eth volumes: nginxproxydnpdappnodeeth_html ad09c24035959430f416a259d419d5967ae09d65337ce65e9c9f361a5a3fa1d1 nginxproxydnpdappnodeeth_vhost.d"
      */
@@ -202,6 +216,15 @@ describe("Full integration test with REAL docker: ", function() {
     );
     expect(res.message).to.include("nginxproxydnpdappnodeeth_html");
     expect(res.message).to.include("nginxproxydnpdappnodeeth_vhost.d");
+
+    for (const vol of [
+      "nginxproxydnpdappnodeeth_html",
+      "nginxproxydnpdappnodeeth_vhost.d"
+    ])
+      await shell(`docker volume create --name=${vol}`);
+
+    for (const dnpName of [idNginx, idLetsencrypt])
+      await calls.restartPackage({ id: dnpName });
   }).timeout(20 * 1000);
 
   /**

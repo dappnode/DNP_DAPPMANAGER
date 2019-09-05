@@ -1,6 +1,7 @@
 import shell from "./shell";
 const isIp = require("is-ip");
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 export default async function getLocalIp(options?: { silent: boolean }) {
   const silent = options && options.silent;

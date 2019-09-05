@@ -5,8 +5,9 @@ import * as getPath from "../../utils/getPath";
 import * as parse from "../../utils/parse";
 // Default ports to open in case getPortsToOpen throws
 import defaultPortsToOpen from "./defaultPortsToOpen";
-import { PortInterface, PortProtocol } from "../../types";
-const logs = require("../../logs")(module);
+import { PackagePort, PortProtocol, PortMapping } from "../../types";
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /**
  * @returns {array} portsToOpen = [{
@@ -18,7 +19,7 @@ export default async function getPortsToOpen() {
   try {
     // Aggreate ports with an object form to prevent duplicates
     const portsToOpen: {
-      [portId: string]: PortInterface;
+      [portId: string]: PackagePort;
     } = {};
     const addPortToOpen = (protocol: PortProtocol, host: number) => {
       const portNumber = host;
@@ -66,7 +67,7 @@ export default async function getPortsToOpen() {
            *   protocol: "udp"
            * }]
            */
-          const dockerComposePorts = parse.dockerComposePorts(
+          const dockerComposePorts: PortMapping[] = parse.dockerComposePorts(
             dockerComposePath
           );
           for (const port of dockerComposePorts || []) {

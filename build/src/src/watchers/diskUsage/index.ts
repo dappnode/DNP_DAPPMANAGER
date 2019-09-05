@@ -1,7 +1,8 @@
 import shellExec from "../../utils/shell";
 import params from "../../params";
 import { eventBus, eventBusTag } from "../../eventBus";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 const monitoringInterval =
   params.CHECK_DISK_USAGE_WATCHER_INTERVAL || 60 * 1000; // (ms) (1 minute)

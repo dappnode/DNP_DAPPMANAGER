@@ -1,5 +1,6 @@
 import EventEmitter from "events";
-const logs = require("./logs")(module);
+import Logs from "./logs";
+const logs = Logs(module);
 
 /** HOW TO:
  * - ON:

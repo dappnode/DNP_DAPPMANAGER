@@ -1,8 +1,9 @@
 import isEnsDomain from "../utils/isEnsDomain";
 import { DirectoryDnp, DirectoryDnpStatus } from "../types";
 import * as directoryContract from "../contracts/directory";
-const web3 = require("./web3Setup");
-const logs = require("../logs")(module);
+import web3 from "./web3Setup";
+import Logs from "../logs";
+const logs = Logs(module);
 
 // Contract parameters
 const DAppNodePackageStatus: DirectoryDnpStatus[] = [

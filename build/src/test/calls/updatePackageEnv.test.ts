@@ -5,7 +5,6 @@ import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import paramsDefault from "../../src/params";
-const docker = require("../../src/modules/docker");
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Call function: updatePackageEnv", function() {
@@ -29,12 +28,14 @@ describe("Call function: updatePackageEnv", function() {
 
   const restartPackage = sinon.stub().resolves();
 
-  const { default: updatePackageEnv } = proxyquire("../../src/calls/updatePackageEnv", {
-    "../modules/docker": docker,
-    "../modules/listContainers": listContainers,
-    "./restartPackage": restartPackage,
-    "../params": params
-  });
+  const { default: updatePackageEnv } = proxyquire(
+    "../../src/calls/updatePackageEnv",
+    {
+      "../modules/listContainers": listContainers,
+      "./restartPackage": restartPackage,
+      "../params": params
+    }
+  );
 
   describe("Call function updatePackageEnv", function() {
     before(() => {

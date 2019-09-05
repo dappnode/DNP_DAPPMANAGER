@@ -2,12 +2,14 @@ import { eventBus, eventBusTag } from "../../eventBus";
 import listContainers from "../../modules/listContainers";
 import { shortNameCapitalized } from "../../utils/strings";
 import params from "../../params";
-import { ChainDataInterface } from "../../types";
+import { ChainData } from "../../types";
+import { supportedProviders, Chain } from "./supportedProviders";
 // Drivers
 import ethereum from "./ethereum";
 import bitcoin from "./bitcoin";
 import monero from "./monero";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 const checkChainWatcherInterval =
   params.CHECK_CHAIN_WATCHER_INTERVAL || 60 * 1000; // 1 minute
@@ -15,10 +17,7 @@ const emitChainDataWatcherInterval =
   params.EMIT_CHAIN_DATA_WATCHER_INTERVAL || 5 * 1000; // 5 seconds
 
 const drivers: {
-  [driverName: string]: (
-    name: string,
-    api: string
-  ) => Promise<ChainDataInterface>;
+  [driverName: string]: (name: string, api: string) => Promise<ChainData>;
 } = {
   ethereum,
   bitcoin,
@@ -28,64 +27,6 @@ const drivers: {
 // This module contains watchers to the different active chains
 // It will only emit chain information when at least one ADMIN UI is active
 // Every time there is a package install / remove, the watchers will be reseted
-
-interface Chain {
-  name: string;
-  module: string;
-  api: any;
-}
-
-const supportedProviders: { [dnpName: string]: Chain } = {
-  "ethchain.dnp.dappnode.eth": {
-    name: "Mainnet",
-    module: "ethereum",
-    api: "http://my.ethchain.dnp.dappnode.eth:8545"
-    //  api: 'ws://my.ethchain.dnp.dappnode.eth:8546',
-  },
-  "ropsten.dnp.dappnode.eth": {
-    name: "Ropsten",
-    module: "ethereum",
-    api: "http://my.ropsten.dnp.dappnode.eth:8545"
-    //  api: 'ws://my.ropsten.dnp.dappnode.eth:8546',
-  },
-  "rinkeby.dnp.dappnode.eth": {
-    name: "Rinkeby",
-    module: "ethereum",
-    api: "http://my.rinkeby.dnp.dappnode.eth:8545"
-    //  api: 'ws://my.rinkeby.dnp.dappnode.eth:8546',
-  },
-  "kovan.dnp.dappnode.eth": {
-    name: "Kovan",
-    module: "ethereum",
-    api: "http://my.kovan.dnp.dappnode.eth:8545"
-    //  api: 'ws://my.kovan.dnp.dappnode.eth:8546',
-  },
-  "goerli-geth.dnp.dappnode.eth": {
-    name: "Goerli-geth",
-    module: "ethereum",
-    api: "http://my.goerli-geth.dnp.dappnode.eth:8545"
-  },
-  "goerli-pantheon.dnp.dappnode.eth": {
-    name: "Goerli-pantheon",
-    module: "ethereum",
-    api: "http://my.goerli-pantheon.dnp.dappnode.eth:8545"
-  },
-  "goerli-parity.dnp.dappnode.eth": {
-    name: "Goerli-parity",
-    module: "ethereum",
-    api: "http://my.goerli-parity.dnp.dappnode.eth:8545"
-  },
-  "bitcoin.dnp.dappnode.eth": {
-    name: "Bitcoin",
-    module: "bitcoin",
-    api: "my.bitcoin.dnp.dappnode.eth"
-  },
-  "monero.dnp.dappnode.eth": {
-    name: "Monero",
-    module: "monero",
-    api: "http://my.monero.dnp.dappnode.eth:18081"
-  }
-};
 
 const getDriveApi: {
   [driverName: string]: (dnpName: string) => string;
@@ -112,7 +53,7 @@ async function addChain(dnpName: string, driverName?: string) {
   if (driverName && getDriveApi[driverName]) {
     activeChains[dnpName] = {
       name: shortNameCapitalized(dnpName),
-      module: driverName,
+      driverName,
       api: getDriveApi[driverName](dnpName)
     };
   } else {
@@ -176,7 +117,7 @@ eventBus.on(eventBusTag.packageModified, () => {
 
 interface ChainCacheInterface {
   active: boolean;
-  lastResult: ChainDataInterface;
+  lastResult: ChainData;
 }
 const cache: {
   [chainId: string]: ChainCacheInterface;
@@ -190,20 +131,31 @@ async function getAndEmitChainData() {
         return dnp && dnp.running;
       })
       .map(async dnpName => {
-        const chain = activeChains[dnpName];
-        const id = chain.api;
-        if (!cache[id]) cache[id] = {} as ChainCacheInterface;
+        const { name, api, driverName } = activeChains[dnpName];
+        if (!cache[api]) cache[api] = {} as ChainCacheInterface;
         // Return last result if previous call is still active
-        if (cache[id].active) return cache[id].lastResult;
+        if (cache[api].active) return cache[api].lastResult;
         // Otherwise raise active flag and perform the request
-        cache[id].active = true;
-        const result = await drivers[chain.module](chain.name, chain.api);
-        cache[id].active = false;
-        cache[id].lastResult = result;
+        cache[api].active = true;
+
+        // Chain .ts file call
+        const result: ChainData = await drivers[driverName](name, api).catch(
+          (e: Error) => {
+            logs.warn(`Error on chain ${name} watcher: ${e.stack}`);
+            return {
+              name,
+              syncing: false,
+              error: true,
+              message: e.message
+            };
+          }
+        );
+        cache[api].active = false;
+        cache[api].lastResult = result;
         return result;
       })
   );
-  eventBus.emit(eventBusTag.emitChainData, { chainData });
+  eventBus.emit(eventBusTag.emitChainData, chainData);
 }
 
 // When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL

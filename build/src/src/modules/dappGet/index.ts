@@ -1,12 +1,13 @@
 import listContainers from "../../modules/listContainers";
 // Internal
-import { RequestInterface } from "../../types";
+import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
 import * as fetch from "./fetch";
 import aggregate from "./aggregate";
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 interface StateInterface {
   [dnpName: string]: string;
@@ -54,7 +55,7 @@ interface StateInterface {
  * }
  */
 export default async function dappGet(
-  req: RequestInterface,
+  req: PackageRequest,
   options?: { BYPASS_RESOLVER?: boolean }
 ): Promise<{
   message: string;

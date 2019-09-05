@@ -8,7 +8,7 @@ export interface PortMapping {
   ip?: string;
 }
 
-export interface PortInterface {
+export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
 }
@@ -22,7 +22,7 @@ export interface VolumeInterface {
   isOwner?: boolean;
 }
 
-export interface DependenciesInterface {
+export interface Dependencies {
   [dependencyName: string]: string;
 }
 
@@ -34,7 +34,7 @@ export type ContainerStatus =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
-export interface ContainerInterface {
+export interface PackageContainer {
   id: string;
   packageName: string;
   version: string;
@@ -48,18 +48,18 @@ export interface ContainerInterface {
   volumes: VolumeInterface[];
   state: ContainerStatus;
   running: boolean;
-  origin: string | null;
-  chain: string | null;
-  dependencies: DependenciesInterface;
-  envs?: EnvsInterface;
-  manifest?: ManifestInterface;
+  origin?: string;
+  chain?: string;
+  dependencies: Dependencies;
+  envs?: PackageEnvs;
+  manifest?: Manifest;
 }
 
-export interface EnvsInterface {
+export interface PackageEnvs {
   [envName: string]: string;
 }
 
-export interface ManifestInterface {
+export interface Manifest {
   name: string;
   version: string;
   isCore?: boolean;
@@ -73,7 +73,7 @@ export interface ManifestInterface {
     volumes?: string[];
     ports?: string[];
   };
-  dependencies: DependenciesInterface;
+  dependencies: Dependencies;
   updateAlerts?: {
     from: string;
     to: string;
@@ -86,30 +86,32 @@ export interface ManifestInterface {
     onRemove: string;
   };
   changelog?: string;
+  // Aditional property written by DAPPMANAGER
+  origin?: string | null;
 }
 
-export interface PortInterface {
+export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
 }
 
-export interface RequestInterface {
+export interface PackageRequest {
   name: string;
   ver: string;
 }
 
-export interface ParamsInterface {
+export interface DappnodeParams {
   DNCORE_DIR: string;
   REPO_DIR: string;
 }
 
-export interface BackupInterface {
+export interface PackageBackup {
   name: string;
   path: string;
 }
 
 export type NotificationType = "danger" | "warning" | "success";
-export interface NotificationInterface {
+export interface PackageNotification {
   id: string; // "notification-id"
   type: NotificationType;
   title: string; // "Some notification"
@@ -127,11 +129,11 @@ export interface DirectoryDnp {
   directoryId: number;
   isFeatured: boolean;
   featuredIndex: number;
-  manifest?: ManifestInterface;
+  manifest?: Manifest;
   avatar?: string;
 }
 
-export interface ChainDataInterface {
+export interface ChainData {
   name: string; // Ethereum
   syncing: boolean; // if chain is syncing
   error: boolean; // If there was an error retrieving state
@@ -139,14 +141,14 @@ export interface ChainDataInterface {
   progress?: number; // 0.83027522935
 }
 
-export interface ProgressLogInterface {
+export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
   name: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
   message: string; // "Downloading 75%", log message
   clear?: boolean; // to trigger the UI to clear the all logs of this id
 }
 
-export interface UserActionLogInterface {
+export interface UserActionLog {
   level: "info" | "error";
   event: string; // "installPackage.dnp.dappnode.eth"
   message: string; // "Successfully install DNP", { string } Returned message from the call function*
@@ -163,26 +165,26 @@ export type CrossbarHandler = () => {
  * Installer types
  */
 
-export interface UserSetEnvsInterface {
-  [dnpName: string]: EnvsInterface;
+export interface UserSetPackageEnvs {
+  [dnpName: string]: PackageEnvs;
 }
 
-export interface UserSetVolsInterface {
+export interface UserSetPackageVols {
   [dnpName: string]: {
     [originalVolumeMapping: string]: string;
   };
 }
 
-export interface UserSetPortsInterface {
+export interface UserSetPackagePorts {
   [dnpName: string]: {
     [originalPortMapping: string]: string;
   };
 }
 
-export interface InstallerPkgInterface {
+export interface InstallerPkg {
   name: string;
   ver: string;
-  manifest: ManifestInterface;
+  manifest: Manifest;
   isCore: boolean;
 }
 
@@ -190,28 +192,39 @@ export interface InstallerPkgInterface {
  * Auto-update helper types
  */
 
-export interface SettingsInterface {
+export interface AutoUpdateSettings {
   [dnpNameOrGroupId: string]: { enabled: boolean };
 }
 
-export interface RegistryEntryInterface {
+export interface AutoUpdateRegistryEntry {
   updated?: number;
   successful?: boolean;
 }
-export interface RegistryDnpInterface {
-  [version: string]: RegistryEntryInterface;
+export interface AutoUpdateRegistryDnp {
+  [version: string]: AutoUpdateRegistryEntry;
 }
 export interface RegistryInterface {
-  [dnpName: string]: RegistryDnpInterface;
+  [dnpName: string]: AutoUpdateRegistryDnp;
 }
 
-export interface PendingEntryInterface {
+export interface AutoUpdatePendingEntry {
   version?: string;
   firstSeen?: number;
   scheduledUpdate?: number;
   completedDelay?: boolean;
   errorMessage?: string;
 }
-export interface PendingInterface {
-  [dnpName: string]: PendingEntryInterface;
+export interface AutoUpdatePending {
+  [dnpName: string]: AutoUpdatePendingEntry;
 }
+
+/**
+ * Releases types
+ */
+
+export type FetchLatestVersion = (
+  dnpName: string
+) => Promise<{
+  version: string;
+  contentUri: string;
+}>;

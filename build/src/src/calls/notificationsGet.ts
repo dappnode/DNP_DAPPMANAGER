@@ -1,5 +1,5 @@
 import * as db from "../db";
-import { NotificationInterface } from "../types";
+import { PackageNotification } from "../types";
 
 /**
  * Returns not viewed notifications.
@@ -19,7 +19,7 @@ export default async function notificationsGet() {
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }
    */
-  const notifications: { [notificationid: string]: NotificationInterface } =
+  const notifications: { [notificationid: string]: PackageNotification } =
     db.get(`notification`) || {};
   const notificationsArray = Object.values(notifications);
 

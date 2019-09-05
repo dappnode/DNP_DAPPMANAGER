@@ -1,6 +1,6 @@
 import upnpcCommand from "./upnpcCommand";
 import parseCloseOutput from "./parseCloseOutput";
-import { PortInterface } from "../../types";
+import { PackagePort } from "../../types";
 
 /**
  * Close port = deletes the map requested port to host
@@ -13,7 +13,7 @@ import { PortInterface } from "../../types";
  * }
  * @returns {*}
  */
-export default async function close(port: PortInterface) {
+export default async function close(port: PackagePort) {
   const { portNumber, protocol } = port;
 
   try {

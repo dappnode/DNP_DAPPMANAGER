@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import { eventBusTag } from "../../src/eventBus";
-import { InstallerPkgInterface } from "../../src/types";
+import { InstallerPkg } from "../../src/types";
 
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -126,7 +126,7 @@ describe("Call function: installPackage", function() {
   };
 
   interface SortablePkg {
-    pkg: InstallerPkgInterface;
+    pkg: InstallerPkg;
   }
   function sortById(a: SortablePkg, b: SortablePkg) {
     return a.pkg.name > b.pkg.name ? 1 : a.pkg.name < b.pkg.name ? -1 : 0;

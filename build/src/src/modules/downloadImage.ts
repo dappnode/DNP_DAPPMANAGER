@@ -3,7 +3,8 @@ import * as ipfs from "./ipfs";
 import verifyXz from "../utils/verifyXz";
 import * as validate from "../utils/validate";
 import { isAbsolute } from "path";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Handles the download of a DNP .xz image.

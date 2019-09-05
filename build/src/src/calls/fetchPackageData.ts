@@ -1,7 +1,8 @@
 import * as parse from "../utils/parse";
 import getManifest from "../modules/getManifest";
 import getAvatar from "../modules/getAvatar";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Fetches the manifest of the latest version and its avatar.

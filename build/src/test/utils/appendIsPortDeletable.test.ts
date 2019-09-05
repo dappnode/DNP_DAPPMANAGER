@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import { ManifestInterface, PortMapping } from "../../src/types";
+import { Manifest, PortMapping } from "../../src/types";
 import { mockManifest } from "../testUtils";
 
 import appendIsPortDeletable from "../../src/utils/appendIsPortDeletable";
 
 describe("Util: appendIsPortDeletable", () => {
   it("should flag deletable for a normal case (Swarm)", () => {
-    const manifest: ManifestInterface = {
+    const manifest: Manifest = {
       ...mockManifest,
       name: "swarm.dnp.dappnode.eth",
       image: {
@@ -70,7 +70,7 @@ describe("Util: appendIsPortDeletable", () => {
   });
 
   it("should flag deletable for a case without manifest ports (Ethforward)", () => {
-    const manifest: ManifestInterface = {
+    const manifest: Manifest = {
       ...mockManifest,
       name: "ethforward.dnp.dappnode.eth",
       image: {

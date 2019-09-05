@@ -71,7 +71,7 @@ describe("Module: lockPorts", function() {
 
   const { default: lockPorts } = proxyquire("../../src/modules/lockPorts", {
     "../modules/listContainers": listContainers,
-    "../modules/docker": docker
+    "../modules/docker/dockerCommands": docker
   });
 
   before(async () => {

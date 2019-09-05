@@ -1,6 +1,7 @@
 import logUserAction from "./logUserAction";
 import { Session } from "autobahn";
-const logs = require("./logs")(module);
+import Logs from "./logs";
+const logs = Logs(module);
 
 interface KwargsInterace {
   dontLogError?: boolean;

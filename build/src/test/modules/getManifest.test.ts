@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { ManifestInterface } from "../../src/types";
+import { Manifest } from "../../src/types";
 import { mockManifest } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -9,7 +9,7 @@ interface DbInstance {
 }
 
 function getGetManifest(
-  manifest: ManifestInterface,
+  manifest: Manifest,
   sampleHash: string,
   dbInstance: DbInstance
 ) {
@@ -30,7 +30,7 @@ function getGetManifest(
 const name = "test.dnp.dappnode.eth";
 const sampleHash = "/ipfs/QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD";
 
-const manifest: ManifestInterface = {
+const manifest: Manifest = {
   ...mockManifest,
   name,
   version: "0.1.8",

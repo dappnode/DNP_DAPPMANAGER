@@ -1,5 +1,6 @@
 import shell from "../../utils/shell";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /*
  * Wrapper for shell.js, adding a protection against missing env files.

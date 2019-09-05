@@ -1,7 +1,7 @@
 import isIpfsHash from "./isIpfsHash";
-import { RequestInterface } from "../types";
+import { PackageRequest } from "../types";
 
-export default function isIpfsRequest(req: RequestInterface) {
+export default function isIpfsRequest(req: PackageRequest) {
   if (req && typeof req === "object") {
     return (
       (req.name && isIpfsHash(req.name)) || (req.ver && isIpfsHash(req.ver))

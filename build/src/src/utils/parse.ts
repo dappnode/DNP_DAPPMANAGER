@@ -1,18 +1,48 @@
 import fs from "fs";
 import yaml from "yamljs";
 import * as validate from "./validate";
-import { ManifestInterface, EnvsInterface, PortMapping } from "../types";
+import { parsePortMappings } from "./dockerComposeParsers";
+import { Manifest, PackageEnvs, PortMapping } from "../types";
 
 /*
  * Reads and parses files. This util is used to abstract some logic
  * out of other files and ease testing.
  */
 
-export function parseDockerCompose(dcString: string) {
+interface DockerComposePackage {
+  version: string;
+  services: {
+    [dnpName: string]: {
+      container_name: string; // "DAppNodePackage-bitcoin.dnp.dappnode.eth",
+      image: string; // "bitcoin.dnp.dappnode.eth:0.1.1";
+      volumes: string[]; // ["bitcoin_data:/root/.bitcoin"];
+      ports: string[]; // ["8333:8333"];
+      env_file: string[]; // ["bitcoin.dnp.dappnode.eth.env"];
+      networks: string[]; // ["dncore_network"];
+      dns: string; // "172.33.1.2";
+      logging: {
+        options: {
+          "max-size": string; // "10m";
+          "max-file": string; // "3";
+        };
+      };
+    };
+  };
+  volumes: {
+    [volumeName: string]: {};
+  };
+  networks: {
+    dncore_network: {
+      external: boolean;
+    };
+  };
+}
+
+export function parseDockerCompose(dcString: string): DockerComposePackage {
   return yaml.parse(dcString);
 }
 
-export function stringifyDockerCompose(dcObject: string) {
+export function stringifyDockerCompose(dcObject: DockerComposePackage) {
   return yaml.stringify(dcObject, 9, 2);
 }
 
@@ -34,7 +64,7 @@ export function writeDockerCompose(dockerComposePath: string, dcObject: any) {
 // Select the first service in a docker-compose
 function getUniqueDockerComposeService(dockerComposePath: string) {
   const dc = readDockerCompose(dockerComposePath);
-  const packageName = Object.getOwnPropertyNames(dc.services)[0];
+  const packageName = Object.keys(dc.services)[0];
   return dc.services[packageName];
 }
 
@@ -43,7 +73,7 @@ export function serviceVolumes(dockerComposePath: string) {
   const dc = readDockerCompose(dockerComposePath);
   const service = getUniqueDockerComposeService(dockerComposePath);
 
-  const externalVolumes = Object.getOwnPropertyNames(dc.volumes || []);
+  const externalVolumes = Object.keys(dc.volumes || []);
 
   const packageVolumes: string[] = [];
   const volumes: string[] = service.volumes || [];
@@ -65,17 +95,9 @@ export function containerName(dockerComposePath: string) {
 }
 
 // Get an array of ports of a docker-compose service
-export function dockerComposePorts(dockerComposePath: string) {
+export function dockerComposePorts(dockerComposePath: string): PortMapping[] {
   const service = getUniqueDockerComposeService(dockerComposePath);
-  const ports = service.ports || [];
-  return ports.map((portString: string) => {
-    const [portMapping, type = "tcp"] = portString.split("/");
-    const [host, container] = portMapping.split(":");
-    // HOST:CONTAINER/type, return [HOST, CONTAINER/type]
-    if (container) return { host, container, type };
-    // CONTAINER/type, return [null, CONTAINER/type]
-    else return { container: host, type };
-  });
+  return parsePortMappings(service.ports || []);
 }
 
 /**
@@ -102,7 +124,7 @@ export function editDockerComposePorts(
   });
 
   const dc = readDockerCompose(dockerComposePath);
-  const packageName = Object.getOwnPropertyNames(dc.services)[0];
+  const packageName = Object.keys(dc.services)[0];
   dc.services[packageName].ports = stringifiedPorts;
   return dc;
 }
@@ -114,14 +136,14 @@ export function envFile(envFileData: string) {
     .trim()
     .split("\n")
     .filter(row => row.length > 0)
-    .reduce((obj: EnvsInterface, row: string) => {
+    .reduce((obj: PackageEnvs, row: string) => {
       const [key, value] = row.split(/=(.*)/);
       obj[key] = value;
       return obj;
     }, {});
 }
 
-export function stringifyEnvs(envs: EnvsInterface) {
+export function stringifyEnvs(envs: PackageEnvs) {
   if (typeof envs === typeof {}) {
     // great
   } else if (typeof envs === typeof "string") {
@@ -176,7 +198,7 @@ export function packageReq(reqString: string) {
 // }
 
 export const manifest = {
-  depObject: function(manifest: ManifestInterface) {
+  depObject: function(manifest: Manifest) {
     const depObject = manifest.dependencies || {};
     if (!depObject || typeof depObject != typeof {}) {
       throw Error(
@@ -188,9 +210,9 @@ export const manifest = {
     return depObject;
   },
 
-  imageName: (manifest: ManifestInterface) => manifest.image.path,
-  imageHash: (manifest: ManifestInterface) => manifest.image.hash,
-  imageSize: (manifest: ManifestInterface) => manifest.image.size,
-  type: (manifest: ManifestInterface) => manifest.type,
-  version: (manifest: ManifestInterface) => manifest.version
+  imageName: (manifest: Manifest) => manifest.image.path,
+  imageHash: (manifest: Manifest) => manifest.image.hash,
+  imageSize: (manifest: Manifest) => manifest.image.size,
+  type: (manifest: Manifest) => manifest.type,
+  version: (manifest: Manifest) => manifest.version
 };

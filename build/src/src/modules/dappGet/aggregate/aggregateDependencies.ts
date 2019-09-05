@@ -1,10 +1,11 @@
 import { hasVersion, setVersion } from "../utils/dnpUtils";
 import sanitizeVersions from "./sanitizeVersions";
 import sanitizeDependencies from "./sanitizeDependencies";
-import { DnpsInterface, DependenciesInterface, FetchFunction } from "../types";
-const logs = require("../../../logs")(module);
+import { DnpsInterface, Dependencies, FetchFunction } from "../types";
+import Logs from "../../../logs";
+const logs = Logs(module);
 
-const emptyDeps: DependenciesInterface = {};
+const emptyDeps: Dependencies = {};
 
 /**
  * The goal of this function is to recursively aggregate all dependencies

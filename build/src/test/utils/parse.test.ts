@@ -75,14 +75,14 @@ describe("Util: parse", function() {
       const ports = parse.dockerComposePorts(DOCKERCOMPOSE_PATH);
       ports.should.deep.equal([
         {
-          container: "4001",
-          host: "4001",
-          type: "tcp"
+          container: 4001,
+          host: 4001,
+          protocol: "TCP"
         },
         {
-          container: "4002",
-          host: "4002",
-          type: "udp"
+          container: 4002,
+          host: 4002,
+          protocol: "UDP"
         }
       ]);
     });

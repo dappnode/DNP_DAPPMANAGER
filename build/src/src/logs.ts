@@ -1,5 +1,5 @@
 "use strict";
-const winston = require("winston");
+import winston from "winston";
 const { createLogger, format, transports } = winston;
 
 const { LOG_LEVEL } = process.env;
@@ -28,16 +28,16 @@ const logLevel =
  */
 
 const scFormat = format.printf(info => {
-  let level = info.level.toUpperCase();
+  const level = info.level.toUpperCase();
   let message = info.message;
-  let filteredInfo = Object.assign({}, info, {
+  const filteredInfo = Object.assign({}, info, {
     level: undefined,
     message: undefined,
     splat: undefined,
     label: undefined,
     timestamp: undefined
   });
-  let append = JSON.stringify(filteredInfo, null, 4);
+  const append = JSON.stringify(filteredInfo, null, 4);
   if (append != "{}") {
     message = `${message} - ${append}`;
   }
@@ -55,19 +55,16 @@ const scFormat = format.printf(info => {
  *                      logger.
  * @returns {winston.format.label}
  */
-function _getLabel(mod) {
-  let label = mod;
-  if (mod == undefined) {
-    mod = module;
-  }
-  if (mod.id) {
-    label = mod.id.replace(".js", "");
-    label = label.replace(/^.*\/src\//, "");
-  }
+function _getLabel(mod: NodeModule) {
+  if (mod == undefined) mod = module;
+
+  const label = mod.id
+    ? (mod.id.replace(".js", "") || "").replace(/^.*\/src\//, "")
+    : "";
   return format.label({ label: label });
 }
 
-module.exports = function(mod) {
+export default function(mod: NodeModule) {
   const logger = createLogger({
     level: logLevel,
     format: format.combine(
@@ -89,4 +86,4 @@ module.exports = function(mod) {
     ]
   });
   return logger;
-};
+}

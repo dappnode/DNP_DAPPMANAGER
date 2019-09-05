@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-import { ChainDataInterface } from "../../types";
+import { ChainData } from "../../types";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 
@@ -32,54 +32,45 @@ function parseHexOrDecimal(hexOrDecimal: string) {
 export default async function ethereum(
   name: string,
   api: string
-): Promise<ChainDataInterface> {
-  try {
-    const web3 = new Web3(api);
-    const [syncing, blockNumber] = await Promise.all([
-      web3.eth.isSyncing(),
-      web3.eth.getBlockNumber()
-    ]);
-    if (
-      syncing &&
-      syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC
-    ) {
-      if (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0) {
-        return {
-          name,
-          syncing: true,
-          error: false,
-          message: `Syncing snapshot: ${parseSyncing(
-            syncing.warpChunksProcessed,
-            syncing.warpChunksAmount
-          )}`,
-          progress: syncing.warpChunksProcessed / syncing.warpChunksAmount
-        };
-      } else {
-        return {
-          name,
-          syncing: true,
-          error: false,
-          message: `Blocks synced: ${parseSyncing(
-            syncing.currentBlock,
-            syncing.highestBlock
-          )}`,
-          progress: syncing.currentBlock / syncing.highestBlock
-        };
-      }
+): Promise<ChainData> {
+  const web3 = new Web3(api);
+  const [syncing, blockNumber] = await Promise.all([
+    web3.eth.isSyncing(),
+    web3.eth.getBlockNumber()
+  ]);
+  if (
+    syncing &&
+    syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC
+  ) {
+    if (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0) {
+      return {
+        name,
+        syncing: true,
+        error: false,
+        message: `Syncing snapshot: ${parseSyncing(
+          syncing.warpChunksProcessed,
+          syncing.warpChunksAmount
+        )}`,
+        progress: syncing.warpChunksProcessed / syncing.warpChunksAmount
+      };
     } else {
       return {
         name,
-        syncing: false,
+        syncing: true,
         error: false,
-        message: "Synced #" + blockNumber
+        message: `Blocks synced: ${parseSyncing(
+          syncing.currentBlock,
+          syncing.highestBlock
+        )}`,
+        progress: syncing.currentBlock / syncing.highestBlock
       };
     }
-  } catch (e) {
+  } else {
     return {
       name,
       syncing: false,
-      error: true,
-      message: e.message
+      error: false,
+      message: "Synced #" + blockNumber
     };
   }
 }

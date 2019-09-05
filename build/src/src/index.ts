@@ -5,13 +5,14 @@ import { registerHandler } from "./registerHandler";
 import params from "./params";
 import * as db from "./db";
 import {
-  ChainDataInterface,
+  ChainData,
   DirectoryDnp,
-  ProgressLogInterface,
-  NotificationInterface,
-  UserActionLogInterface
+  ProgressLog,
+  PackageNotification,
+  UserActionLog
 } from "./types";
-const logs = require("./logs")(module);
+import Logs from "./logs";
+const logs = Logs(module);
 
 // import calls
 import * as calls from "./calls";
@@ -96,12 +97,9 @@ connection.onopen = (session, details) => {
     });
   }
 
-  eventBusOnSafe(
-    eventBusTag.emitChainData,
-    ({ chainData }: { chainData: ChainDataInterface }) => {
-      publish("chainData.dappmanager.dnp.dappnode.eth", chainData);
-    }
-  );
+  eventBusOnSafe(eventBusTag.emitChainData, (chainData: ChainData) => {
+    publish("chainData.dappmanager.dnp.dappnode.eth", chainData);
+  });
 
   // Emits the list of packages
   eventBusOnSafe(
@@ -128,7 +126,7 @@ connection.onopen = (session, details) => {
     { isAsync: true }
   );
 
-  eventBusOnSafe(eventBusTag.logUi, (logData: ProgressLogInterface) => {
+  eventBusOnSafe(eventBusTag.logUi, (logData: ProgressLog) => {
     publish("log.dappmanager.dnp.dappnode.eth", logData);
     // Also, log them internally. But skip download progress logs, too spam-y
     if (!(logData.message || "").includes("%") && !logData.clear) {
@@ -138,12 +136,9 @@ connection.onopen = (session, details) => {
     }
   });
 
-  eventBusOnSafe(
-    eventBusTag.logUserAction,
-    (userActionLog: UserActionLogInterface) => {
-      publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
-    }
-  );
+  eventBusOnSafe(eventBusTag.logUserAction, (userActionLog: UserActionLog) => {
+    publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
+  });
 
   /**
    * Receives userAction logs from the VPN nodejs app
@@ -155,7 +150,7 @@ connection.onopen = (session, details) => {
 
   eventBusOnSafe(
     eventBusTag.pushNotification,
-    async (notification: NotificationInterface) => {
+    async (notification: PackageNotification) => {
       db.set(`notification.${notification.id}`, notification);
       publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
     },

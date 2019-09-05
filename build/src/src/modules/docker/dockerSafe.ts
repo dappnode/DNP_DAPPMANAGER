@@ -1,6 +1,9 @@
 import docker from "./dockerCommands";
+import * as parse from "../../utils/parse";
 import * as db from "../../db";
 import { eventBus, eventBusTag } from "../../eventBus";
+import lockPorts from "../lockPorts";
+import unlockPorts from "../unlockPorts";
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -21,30 +24,30 @@ async function dockerComposeUpSafe(dockerComposePath: string, options?: any) {
      * docker will no be defined yet, then they must be imported dynamically
      * to ensure a proper import order
      */
-    const lockPorts = require("modules/lockPorts");
-    const unlockPorts = require("modules/unlockPorts");
 
-    if (e.message.includes("port is already allocated")) {
-      const upnpAvailable = db.get("upnpAvailable");
-      if (upnpAvailable) {
-        // Don't try to find which port caused the error.
-        // In case of multiple collitions you would need to call this function recursively
-        // Just reset all ephemeral ports
+    if (
+      e.message.includes("port is already allocated") &&
+      db.get("upnpAvailable")
+    ) {
+      // Don't try to find which port caused the error.
+      // In case of multiple collitions you would need to call this function recursively
+      // Just reset all ephemeral ports
 
-        // unlockPorts will modify the docker-compose to remove the port bidnings
-        // in order to let docker to assign new ones
-        // The natRenewal loop will close them by not renewing the mapping
-        await unlockPorts(dockerComposePath);
+      // unlockPorts will modify the docker-compose to remove the port bidnings
+      // in order to let docker to assign new ones
+      // The natRenewal loop will close them by not renewing the mapping
+      await unlockPorts(dockerComposePath);
 
-        // Up the package and lock the ports again
-        await docker.compose.up(dockerComposePath);
-        const newPortMappings = await lockPorts({ dockerComposePath });
-        if (newPortMappings.length) {
-          // Trigger a natRenewal update to open ports if necessary
-          eventBus.emit(eventBusTag.runNatRenewal);
-        }
-      } else {
-        throw e;
+      // #### PATCH to get id from dockerComposePath
+      const dc = parse.readDockerCompose(dockerComposePath);
+      const id = Object.keys(dc.services)[0];
+
+      // Up the package and lock the ports again
+      await docker.compose.up(dockerComposePath);
+      const newPortMappings = await lockPorts(id);
+      if (newPortMappings && newPortMappings.length) {
+        // Trigger a natRenewal update to open ports if necessary
+        eventBus.emit(eventBusTag.runNatRenewal);
       }
     } else {
       throw e;

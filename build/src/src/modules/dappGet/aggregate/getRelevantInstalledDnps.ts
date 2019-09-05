@@ -1,5 +1,5 @@
 import { intersection } from "lodash";
-import { ContainerInterface } from "../../../types";
+import { PackageContainer } from "../../../types";
 
 /**
  * @param {array} requestedDnps = [
@@ -25,12 +25,12 @@ export default function getRelevantInstalledDnps({
   installedDnps
 }: {
   requestedDnps: string[];
-  installedDnps: ContainerInterface[];
-}): ContainerInterface[] {
+  installedDnps: PackageContainer[];
+}): PackageContainer[] {
   // Prevent possible recursive loops
   const start = Date.now();
 
-  const state: { [dnpName: string]: ContainerInterface } = {};
+  const state: { [dnpName: string]: PackageContainer } = {};
   const intersectedDnps = intersection(
     requestedDnps,
     installedDnps.map(dnp => dnp.name)
@@ -43,7 +43,7 @@ export default function getRelevantInstalledDnps({
   // Return only packages that are not already included in the requestedDnps array
   return Object.values(state).filter(dnp => !requestedDnps.includes(dnp.name));
 
-  function addDependants(dnp: ContainerInterface) {
+  function addDependants(dnp: PackageContainer) {
     // Prevent possible recursive loops
     if (Date.now() - start > 2000) return;
 
@@ -55,15 +55,15 @@ export default function getRelevantInstalledDnps({
     });
   }
 
-  function addToState(dnp: ContainerInterface) {
+  function addToState(dnp: PackageContainer) {
     state[dnp.name] = dnp;
   }
-  function isInState(dnp: ContainerInterface) {
+  function isInState(dnp: PackageContainer) {
     return Boolean(state[dnp.name]);
   }
   function dependsOn(
-    dependantPkg: ContainerInterface,
-    dnp: ContainerInterface
+    dependantPkg: PackageContainer,
+    dnp: PackageContainer
   ) {
     return Boolean(dependantPkg.dependencies[dnp.name]);
   }

@@ -1,7 +1,8 @@
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
 import { timeoutError } from "../data";
-const logs = require("../../../logs")(module);
+import Logs from "../../../logs";
+const logs = Logs(module);
 
 /**
  * Returns a file addressed by a valid IPFS Path.

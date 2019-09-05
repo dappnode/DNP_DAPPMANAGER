@@ -1,11 +1,11 @@
-import { ManifestInterface } from "../types";
+import { Manifest } from "../types";
 
 /**
  * Parses ports
  * @param {object} manifest or portsArray = ['32323:30303/udp']
  * @returns {array} [ {portNumber: '32323', protocol: 'UDP'}, ... ]
  */
-export default function parseManifestPorts(manifest: ManifestInterface) {
+export default function parseManifestPorts(manifest: Manifest) {
   if (!manifest) return [];
   const portsArray = (manifest.image || {}).ports || [];
 

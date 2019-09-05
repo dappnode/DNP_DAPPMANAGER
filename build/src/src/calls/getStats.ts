@@ -1,6 +1,7 @@
 import os from "os";
 import shellExec from "../utils/shell";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 // Cache static values
 const numCores = os.cpus().length;

@@ -111,8 +111,10 @@ describe("Call function: restartPackageVolumes", function() {
       ]
     }
   ];
-  const listContainers = async ({ byName }: { byName: string }) =>
-    dnpList.filter(dnp => dnp.name === byName);
+  const listContainers = async (kwargs: { byName: string }) =>
+    kwargs && kwargs.byName
+      ? dnpList.filter(dnp => dnp.name === kwargs.byName)
+      : dnpList;
 
   const { default: restartPackageVolumes } = proxyquire(
     "../../src/calls/restartPackageVolumes",

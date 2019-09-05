@@ -6,7 +6,8 @@ import listContainers from "../modules/listContainers";
 import { eventBus, eventBusTag } from "../eventBus";
 // Utils
 import * as getPath from "../utils/getPath";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -22,8 +23,9 @@ export default async function restartPackageVolumes({
 }) {
   if (!id) throw Error("kwarg id must be defined");
 
-  const dnpList = await listContainers({ byName: id });
-  const dnp = dnpList[0];
+  // Don't query byId so the volume info is aggregated for all packages
+  const dnpList = await listContainers();
+  const dnp = dnpList.find(_dnp => _dnp.name === id);
   if (!dnp) throw Error(`Could not find an container with the name: ${id}`);
 
   /**
@@ -57,6 +59,8 @@ export default async function restartPackageVolumes({
      * id will always be the owner of the volumes, and other DNPs, the users.
      */
     .sort((dnpName: string) => (dnpName === id ? -1 : 1));
+
+  logs.debug(JSON.stringify({ volumeNames, dnpsToRemove }, null, 2));
 
   // Verify results
   const dockerComposePaths: { [dnpName: string]: string } = {};

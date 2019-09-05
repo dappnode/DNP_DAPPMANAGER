@@ -1,12 +1,13 @@
 import semver from "semver";
 import * as validate from "../utils/validate";
 import web3 from "./web3Setup";
-import { RequestInterface } from "../types";
+import { PackageRequest } from "../types";
 
 import * as ensContract from "../contracts/ens";
 import * as publicResolverContract from "../contracts/publicResolver";
 import * as repoContract from "../contracts/repository";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 function castWeb3Abi(abi: any): any[] {
   return abi.map((abiItem: any) => ({
@@ -84,7 +85,7 @@ export async function repoExists(reponame: string) {
   return resolverAddress !== "0x0000000000000000000000000000000000000000";
 }
 
-export const getRepoHash = async (packageReq: RequestInterface) => {
+export const getRepoHash = async (packageReq: PackageRequest) => {
   const name = packageReq.name;
   const version = packageReq.ver;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
@@ -110,7 +111,7 @@ export const getRepoHash = async (packageReq: RequestInterface) => {
  * @param {*} packageReq
  * @returns {*}
  */
-export async function getLatestWithVersion(packageReq: RequestInterface) {
+export async function getLatestWithVersion(packageReq: PackageRequest) {
   if (!packageReq || typeof packageReq !== "object") {
     throw Error("Wrong packageReq: " + packageReq);
   }
@@ -172,7 +173,7 @@ export async function getLatestWithVersion(packageReq: RequestInterface) {
  * @returns {*}
  */
 export async function getRepoVersions(
-  packageReq: RequestInterface,
+  packageReq: PackageRequest,
   verReq: string
 ) {
   if (!packageReq || typeof packageReq !== "object") {
@@ -242,7 +243,7 @@ export async function getRepoVersions(
  * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
  * @returns {string} latestVersion = "0.2.4"
  */
-export async function getLatestSemver(packageReq: RequestInterface) {
+export async function getLatestSemver(packageReq: PackageRequest) {
   if (!packageReq || typeof packageReq !== "object") {
     throw Error("Wrong packageReq: " + packageReq);
   }

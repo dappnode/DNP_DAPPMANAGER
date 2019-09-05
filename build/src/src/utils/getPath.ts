@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ParamsInterface } from "../types";
+import { DappnodeParams } from "../types";
 
 /*
  * Generates file paths given a set of parameters. This tool helps
@@ -23,7 +23,7 @@ import { ParamsInterface } from "../types";
 
 export function packageRepoDir(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -33,7 +33,7 @@ export function packageRepoDir(
 
 export function manifest(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -46,7 +46,7 @@ export function manifest(
 
 export function dockerCompose(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -54,7 +54,7 @@ export function dockerCompose(
   return getDockerComposePath(dnpName, params, isCore);
 }
 
-export function dockerComposeSmart(dnpName: string, params: ParamsInterface) {
+export function dockerComposeSmart(dnpName: string, params: DappnodeParams) {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   // First check for core docker-compose
@@ -66,7 +66,7 @@ export function dockerComposeSmart(dnpName: string, params: ParamsInterface) {
 
 export function envFile(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -76,7 +76,7 @@ export function envFile(
 
 export function envFileSmart(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -92,7 +92,7 @@ export function envFileSmart(
 export function image(
   dnpName: string,
   imageName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!dnpName) throw Error("dnpName must be defined");
@@ -105,7 +105,7 @@ export function image(
 
 function getDockerComposePath(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   return path.join(
@@ -116,7 +116,7 @@ function getDockerComposePath(
 
 function getEnvFilePath(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   return path.join(getRepoDirPath(dnpName, params, isCore), `${dnpName}.env`);
@@ -124,7 +124,7 @@ function getEnvFilePath(
 
 function getRepoDirPath(
   dnpName: string,
-  params: ParamsInterface,
+  params: DappnodeParams,
   isCore: boolean
 ) {
   if (!params.DNCORE_DIR) throw Error("params.DNCORE_DIR must be defined");

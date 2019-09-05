@@ -3,7 +3,7 @@ import { expect } from "chai";
 import shell from "../../src/utils/shell";
 import fs from "fs";
 import { mockManifest } from "../testUtils";
-import { ManifestInterface, UserSetEnvsInterface } from "../../src/types";
+import { Manifest, UserSetPackageEnvs } from "../../src/types";
 
 import * as envsHelper from "../../src/utils/envsHelper";
 
@@ -20,7 +20,7 @@ describe("Util: envsHelper", () => {
   });
 
   it("should merge envs and write them", () => {
-    const manifest: ManifestInterface = {
+    const manifest: Manifest = {
       ...mockManifest,
       name,
       isCore,
@@ -34,7 +34,7 @@ describe("Util: envsHelper", () => {
       }
     };
 
-    const userSetEnvs: UserSetEnvsInterface = {
+    const userSetEnvs: UserSetPackageEnvs = {
       [name]: {
         ENV_NAME3: "user-set"
       }

@@ -14,7 +14,8 @@ import {
 } from "../../utils/autoUpdateHelper";
 // External calls
 import installPackage from "../../calls/installPackage";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /**
  * Only `minor` and `patch` updates are allowed

@@ -1,8 +1,9 @@
-import docker from "./docker";
+import docker from "../modules/docker/dockerCommands";
 import { getComposeInstance } from "../utils/dockerComposeFile";
 import listContainers from "../modules/listContainers";
 import { PortMapping } from "../types";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * The goal of this module is to find out which port

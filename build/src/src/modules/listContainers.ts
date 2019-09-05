@@ -3,11 +3,10 @@ import docker from "./dockerApi";
 import { shortName } from "../utils/strings";
 import params from "../params";
 import {
-  ContainerInterface,
-  DependenciesInterface,
+  PackageContainer,
+  Dependencies,
   VolumeInterface,
-  ContainerStatus,
-  PortProtocol
+  ContainerStatus
 } from "../types";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
@@ -93,7 +92,7 @@ interface ListContainersFilters {
 async function listContainers(options?: {
   byName?: string;
   byId?: string;
-}): Promise<ContainerInterface[]> {
+}): Promise<PackageContainer[]> {
   const filters: ListContainersFilters = {};
   if (options) {
     if (options.byName) filters.name = [options.byName];
@@ -129,9 +128,9 @@ async function listContainers(options?: {
       //   dappnode.dnp.dependencies
       //   dappnode.dnp.origin
       //   dappnode.dnp.chain
-      let origin: string | null = null;
-      let chain: string | null = null;
-      let dependencies: DependenciesInterface = {};
+      let origin = "";
+      let chain = "";
+      let dependencies: Dependencies = {};
 
       if (c.Labels && typeof c.Labels === "object") {
         if (c.Labels["dappnode.dnp.origin"])
@@ -147,7 +146,7 @@ async function listContainers(options?: {
           } catch (e) {}
       }
 
-      const container: ContainerInterface = {
+      const container: PackageContainer = {
         id: c.Id,
         packageName,
         version,
@@ -171,9 +170,10 @@ async function listContainers(options?: {
         })),
         state: c.State,
         running: c.State === "running",
-        origin,
-        chain,
-        dependencies
+        dependencies,
+        // #### TODO: The ADMIN does not accept an empty chain or origin
+        ...(origin ? { origin } : {}),
+        ...(chain ? { chain } : {})
       };
 
       return container;
@@ -223,7 +223,7 @@ async function listContainers(options?: {
       if (!namedVolumesOwners[volName]) namedVolumesOwners[volName] = users[0];
     }
 
-    const dnpListExtended: ContainerInterface[] = dnpList.map(dnp => {
+    const dnpListExtended: PackageContainer[] = dnpList.map(dnp => {
       if (!dnp.volumes) return dnp;
       const volumes = dnp.volumes.map(vol => {
         let newVol: VolumeInterface;

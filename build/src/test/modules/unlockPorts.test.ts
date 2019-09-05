@@ -24,14 +24,7 @@ describe("Module: unlockPorts", function() {
 
   const dockerComposePath = getPath.dockerCompose(pkg.name, params, false);
 
-  const docker = {
-    compose: {
-      up: async () => {}
-    }
-  };
-
   const { default: unlockPorts } = proxyquire("../../src/modules/unlockPorts", {
-    "../modules/docker": docker,
     "../params": params
   });
 

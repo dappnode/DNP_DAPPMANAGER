@@ -12,12 +12,13 @@ import isIpfsRequest from "../utils/isIpfsRequest";
 import isSyncing from "../utils/isSyncing";
 import * as envsHelper from "../utils/envsHelper";
 import {
-  UserSetEnvsInterface,
-  UserSetPortsInterface,
-  UserSetVolsInterface,
-  InstallerPkgInterface
+  UserSetPackageEnvs,
+  UserSetPackagePorts,
+  UserSetPackageVols,
+  InstallerPkg
 } from "../types";
-const logs = require("../logs")(module);
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -62,9 +63,9 @@ export default async function installPackage({
   options
 }: {
   id: string;
-  userSetEnvs?: UserSetEnvsInterface;
-  userSetVols?: UserSetVolsInterface;
-  userSetPorts?: UserSetPortsInterface;
+  userSetEnvs?: UserSetPackageEnvs;
+  userSetVols?: UserSetPackageVols;
+  userSetPorts?: UserSetPackagePorts;
   options?: { BYPASS_CORE_RESTRICTION?: boolean; BYPASS_RESOLVER?: boolean };
 }) {
   if (!id) throw Error("kwarg id must be defined");
@@ -111,7 +112,7 @@ export default async function installPackage({
     logUi({ id, name, message: "Already updated" });
   });
 
-  const pkgs: InstallerPkgInterface[] = await Promise.all(
+  const pkgs: InstallerPkg[] = await Promise.all(
     Object.entries(state).map(async ([name, ver]) => {
       // 3.2 Fetch manifest
       let manifest = await getManifest({ name, ver });
@@ -155,7 +156,7 @@ export default async function installPackage({
   logs.info(`Successfully loaded DNPs ${dnpNames}`);
 
   // Patch, install the dappmanager the last always
-  const isDappmanager = (pkg: InstallerPkgInterface) =>
+  const isDappmanager = (pkg: InstallerPkg) =>
     (pkg.manifest || {}).name === "dappmanager.dnp.dappnode.eth";
 
   for (const pkg of pkgs.sort(pkg => (isDappmanager(pkg) ? 1 : -1))) {

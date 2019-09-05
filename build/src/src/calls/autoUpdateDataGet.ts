@@ -5,9 +5,9 @@ import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
 import {
-  SettingsInterface,
+  AutoUpdateSettings,
   RegistryInterface,
-  PendingInterface
+  AutoUpdatePending
 } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
@@ -66,9 +66,9 @@ interface DnpsToShowInterface {
 export default async function autoUpdateDataGet(): Promise<{
   message: string;
   result: {
-    settings: SettingsInterface;
+    settings: AutoUpdateSettings;
     registry: RegistryInterface;
-    pending: PendingInterface;
+    pending: AutoUpdatePending;
     dnpsToShow: DnpsToShowInterface[];
   };
 }> {

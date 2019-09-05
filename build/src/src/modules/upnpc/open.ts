@@ -1,6 +1,6 @@
 import upnpcCommand from "./upnpcCommand";
 import parseOpenOutput from "./parseOpenOutput";
-import { PortInterface } from "../../types";
+import { PackagePort } from "../../types";
 
 /**
  * Opens port = adds port mapping
@@ -17,7 +17,7 @@ import { PortInterface } from "../../types";
 // Timeout in seconds. Should be greater than the natRenewalInterval
 const natRenewalTimeout = 7200;
 
-export default async function open(port: PortInterface, localIp: string) {
+export default async function open(port: PackagePort, localIp: string) {
   const { portNumber, protocol } = port;
 
   try {

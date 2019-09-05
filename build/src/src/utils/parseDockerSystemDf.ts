@@ -1,4 +1,4 @@
-import { ContainerInterface } from "../types";
+import { PackageContainer } from "../types";
 
 const Parser = require("table-parser");
 
@@ -7,8 +7,8 @@ export default function parseDockerSystemDf({
   dnpList
 }: {
   data: string;
-  dnpList: ContainerInterface[];
-}): ContainerInterface[] {
+  dnpList: PackageContainer[];
+}): PackageContainer[] {
   if (!data) throw Error("on parseDockerSystemDf, data is not defined");
 
   const volumeData = data.split("Local Volumes space usage:")[1] || "";

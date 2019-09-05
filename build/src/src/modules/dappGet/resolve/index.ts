@@ -7,7 +7,8 @@ import {
 import { pickBy, mapValues } from "lodash";
 import generateErrorMessage from "./generateErrorMessage";
 import { DnpsInterface, ErrorsInterface } from "../types";
-const logs = require("../../../logs")(module);
+import Logs from "../../../logs";
+const logs = Logs(module);
 
 const timeoutMs = 10 * 1000; // ms
 

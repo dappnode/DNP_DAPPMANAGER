@@ -1,9 +1,10 @@
 import getManifest from "../../modules/getManifest";
 import listContainers from "../../modules/listContainers";
 // Internal
-import { RequestInterface } from "../../types";
+import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /**
  * The dappGet resolver may cause errors.
@@ -13,7 +14,7 @@ const logs = require("../../logs")(module);
  * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
  */
 
-export default async function dappGetBasic(req: RequestInterface) {
+export default async function dappGetBasic(req: PackageRequest) {
   const reqManifest = await getManifest(req);
   // reqManifest.dependencies = {
   //     'bind.dnp.dappnode.eth': '0.1.4',

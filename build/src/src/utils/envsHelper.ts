@@ -3,7 +3,7 @@ import params from "../params";
 import * as parse from "./parse";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
-import { EnvsInterface, ManifestInterface } from "../types";
+import { PackageEnvs, Manifest } from "../types";
 
 /**
  * Loads a `.env` file from disk and parses its envs
@@ -30,7 +30,7 @@ export function load(name: string, isCore: boolean) {
  *   ENV_NAME: 'value'
  * }
  */
-export function write(name: string, isCore: boolean, envs: EnvsInterface) {
+export function write(name: string, isCore: boolean, envs: PackageEnvs) {
   const envFilePath = getPath.envFileSmart(name, params, isCore);
   fs.writeFileSync(validate.path(envFilePath), parse.stringifyEnvs(envs));
 }
@@ -42,9 +42,9 @@ export function write(name: string, isCore: boolean, envs: EnvsInterface) {
  *   ENV_NAME: 'value'
  * }
  */
-export function getManifestEnvs(manifest: ManifestInterface) {
+export function getManifestEnvs(manifest: Manifest) {
   const envsArray = (manifest.image || {}).environment || [];
-  return envsArray.reduce((_envs: EnvsInterface, row) => {
+  return envsArray.reduce((_envs: PackageEnvs, row) => {
     const [key, value] = (row || "").trim().split(/=(.*)/);
     _envs[key] = value || "";
     return _envs;

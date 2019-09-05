@@ -3,7 +3,8 @@ import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
 import { promisify } from "util";
-const logs = require("../../src/logs")(module);
+import Logs from "../../src/logs";
+const logs = Logs(module);
 
 const proxyquire = require("proxyquire").noCallThru();
 

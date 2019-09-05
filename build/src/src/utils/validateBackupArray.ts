@@ -1,5 +1,5 @@
 import path from "path";
-import { BackupInterface } from "../types";
+import { PackageBackup } from "../types";
 
 /**
  * Verify conditions on the backup array
@@ -11,7 +11,7 @@ import { BackupInterface } from "../types";
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
  */
-export default function validateBackupArray(backup: BackupInterface[]) {
+export default function validateBackupArray(backup: PackageBackup[]) {
   const pathsObj: { [backupName: string]: boolean } = {};
   for (const { name, path: _path } of backup) {
     if (pathsObj[name])

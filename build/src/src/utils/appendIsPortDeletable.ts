@@ -1,9 +1,9 @@
 import { parsePortMappings } from "./dockerComposeParsers";
-import { PortMapping, ManifestInterface } from "../types";
+import { PortMapping, Manifest } from "../types";
 
 export default function appendIsPortDeletable(
   portMappings: PortMapping[],
-  manifest: ManifestInterface
+  manifest: Manifest
 ) {
   const parsedManifestPorts = parsePortMappings(manifest.image.ports || []);
 

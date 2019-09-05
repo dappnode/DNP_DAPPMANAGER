@@ -1,8 +1,8 @@
 import {
-  ManifestInterface,
-  UserSetVolsInterface,
-  UserSetPortsInterface,
-  EnvsInterface
+  Manifest,
+  UserSetPackageVols,
+  UserSetPackagePorts,
+  PackageEnvs
 } from "../types";
 
 /**
@@ -35,8 +35,8 @@ import {
  * @returns {object} edited or original manifest
  */
 function mergeManifestVols(
-  manifest: ManifestInterface,
-  userSetVols: UserSetVolsInterface
+  manifest: Manifest,
+  userSetVols: UserSetPackageVols
 ) {
   const name = (manifest || {}).name;
   const manifestVols = ((manifest || {}).image || {}).volumes; // is an array
@@ -85,8 +85,8 @@ function mergeManifestVols(
  * @returns {object} edited or original manifest
  */
 function mergeManifestPorts(
-  manifest: ManifestInterface,
-  userSetPorts: UserSetPortsInterface
+  manifest: Manifest,
+  userSetPorts: UserSetPackagePorts
 ) {
   const name = (manifest || {}).name;
   const manifestPorts = ((manifest || {}).image || {}).ports; // is an array
@@ -116,9 +116,9 @@ function mergeManifestPorts(
  * envObj = { ENV_NAME: "ENV_VALUE" }
  * @returns {object} envs = { ENV_NAME: "ENV_VALUE" }
  */
-function mergeEnvs(...envObjs: EnvsInterface[]) {
+function mergeEnvs(...envObjs: PackageEnvs[]) {
   const envNames = Object.keys(Object.assign({}, ...envObjs));
-  return envNames.reduce((envs: EnvsInterface, envName) => {
+  return envNames.reduce((envs: PackageEnvs, envName) => {
     envs[envName] = envObjs.reduce(
       (value, envObj) => envObj[envName] || value,
       ""

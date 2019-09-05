@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { ContainerInterface } from "../../src/types";
+import { PackageContainer } from "../../src/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 const dockerApiResponseContainers = require("./dockerApiSamples/containers.json");
@@ -18,7 +18,7 @@ describe("dockerList", function() {
   it("should parse an entire listContainers", async () => {
     const dnpList = await listContainers();
 
-    const expectedDnpList: ContainerInterface[] = [
+    const expectedDnpList: PackageContainer[] = [
       {
         id: "5407d28e2cca82b4e83351b2f55d07469703223e2296934f5034a8922e99d76d",
         packageName: "DAppNodePackage-otpweb.dnp.dappnode.eth",
@@ -38,8 +38,6 @@ describe("dockerList", function() {
         volumes: [],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
@@ -111,8 +109,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -139,8 +135,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -162,8 +156,6 @@ describe("dockerList", function() {
         ],
         state: "exited",
         running: false,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -200,8 +192,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -267,8 +257,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -303,8 +291,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -336,8 +322,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -380,8 +364,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -440,8 +422,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -458,8 +438,6 @@ describe("dockerList", function() {
         volumes: [],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -496,8 +474,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       },
       {
@@ -546,8 +522,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest"
         }
@@ -577,7 +551,6 @@ describe("dockerList", function() {
         state: "running",
         running: true,
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        chain: null,
         dependencies: {}
       },
       {
@@ -620,7 +593,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
         chain: "ethereum",
         dependencies: {}
       },
@@ -662,8 +634,6 @@ describe("dockerList", function() {
         ],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {
           "bitcoin.dnp.dappnode.eth": "latest"
         }
@@ -691,8 +661,6 @@ describe("dockerList", function() {
         volumes: [],
         state: "running",
         running: true,
-        origin: null,
-        chain: null,
         dependencies: {}
       }
     ];

@@ -1,7 +1,7 @@
-import { PortInterface } from "../../types";
+import { PackagePort } from "../../types";
 
 // Default ports to open in case getPortsToOpen throws
-const defaultPortsToOpen: PortInterface[] = [
+const defaultPortsToOpen: PackagePort[] = [
   // - OpenVPN: 1194 UDP
   { protocol: "UDP", portNumber: 1194 },
   // - SSH: 22 TCP (Ignore)

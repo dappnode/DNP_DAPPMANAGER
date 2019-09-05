@@ -9,7 +9,8 @@ import {
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper";
-const logs = require("../../logs")(module);
+import Logs from "../../logs";
+const logs = Logs(module);
 
 import updateMyPackages from "./updateMyPackages";
 import updateSystemPackages from "./updateSystemPackages";
@@ -50,10 +51,9 @@ autoUpdates();
 
 eventBusOnSafe(
   eventBusTag.packageModified,
-  (data: { id: string; removed?: boolean }) => {
-    const { id, removed } = data;
-    if (removed) clearPendingUpdates(id);
-    clearRegistry(id);
+  (data?: { id: string; removed?: boolean }) => {
+    if (data && data.removed) clearPendingUpdates(data.id);
+    if (data) clearRegistry(data.id);
   }
 );
 

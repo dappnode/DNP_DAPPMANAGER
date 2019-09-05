@@ -1,5 +1,5 @@
 import getManifest from "../../../modules/getManifest";
-import { DependenciesInterface } from "../../../types";
+import { Dependencies } from "../../../types";
 
 /**
  * Fetches the dependencies of a given DNP name and version
@@ -17,8 +17,8 @@ export default async function fetchDependencies({
 }: {
   name: string;
   ver: string;
-}) {
+}): Promise<Dependencies> {
   const manifest = await getManifest({ name, ver });
-  const dependencies: DependenciesInterface = manifest.dependencies || {};
+  const dependencies: Dependencies = manifest.dependencies || {};
   return dependencies;
 }

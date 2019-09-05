@@ -5,7 +5,7 @@ import isIpfsHash from "../utils/isIpfsHash";
 import isEnsDomain from "../utils/isEnsDomain";
 import isSemverRange from "../utils/isSemverRange";
 import isSemver from "../utils/isSemver";
-import { RequestInterface, ManifestInterface } from "../types";
+import { PackageRequest, Manifest } from "../types";
 import Joi from "joi";
 
 // Used by
@@ -28,7 +28,7 @@ import Joi from "joi";
 export default async function getManifest({
   name,
   ver
-}: RequestInterface): Promise<ManifestInterface> {
+}: PackageRequest): Promise<Manifest> {
   if (ver === "latest") ver = "*";
   // Assert kwargs
   if (!name) throw Error(`getManifest kwargs must contain property "name"`);
@@ -77,7 +77,7 @@ export default async function getManifest({
  * @param {string} ver
  * @returns {object} = { hash, origin }
  */
-async function fetchManifestHash({ name, ver }: RequestInterface) {
+async function fetchManifestHash({ name, ver }: PackageRequest) {
   /**
    * 0. Normal case, name = eth domain & ver = semverVersion
    * Go fetch to the APM
@@ -125,7 +125,7 @@ async function fetchManifestHash({ name, ver }: RequestInterface) {
  * @param {string} ver
  * @returns {string} manifestHash
  */
-async function resolveApmVersionAndCache({ name, ver }: RequestInterface) {
+async function resolveApmVersionAndCache({ name, ver }: PackageRequest) {
   /**
    * Construct a key for the db. The semver CANNOT be 0.1.0 as that would mean {0: {1: {0: {}}}
    * id = goerli-pantheon-dnp-dappnode-eth-0-1-0
@@ -148,11 +148,11 @@ async function resolveApmVersionAndCache({ name, ver }: RequestInterface) {
  * @param {string} ver
  * @returns {string} manifestHash
  */
-async function resolveApmVersion({ name, ver }: RequestInterface) {
+async function resolveApmVersion({ name, ver }: PackageRequest) {
   return await apm.getRepoHash({ name, ver });
 }
 
-function validateManifest(manifest: ManifestInterface) {
+function validateManifest(manifest: Manifest) {
   // Minimal (very relaxed) manifest check
   const manifestSchema = Joi.object({
     name: Joi.string().required(),

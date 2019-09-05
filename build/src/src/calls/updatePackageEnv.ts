@@ -5,7 +5,7 @@ import * as parse from "../utils/parse";
 import * as envsHelper from "../utils/envsHelper";
 // External call
 import restartPackage from "./restartPackage";
-import { EnvsInterface } from "../types";
+import { PackageEnvs } from "../types";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -23,7 +23,7 @@ export default async function updatePackageEnv({
   restart
 }: {
   id: string;
-  envs: EnvsInterface;
+  envs: PackageEnvs;
   restart: boolean;
 }) {
   if (!id) throw Error("kwarg id must be defined");
