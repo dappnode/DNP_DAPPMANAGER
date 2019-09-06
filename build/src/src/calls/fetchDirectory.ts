@@ -1,5 +1,5 @@
 import getDirectory from "../modules/getDirectory";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import getManifest from "../modules/getManifest";
 import getAvatar from "../modules/getAvatar";
 import * as parse from "../utils/parse";
@@ -41,7 +41,7 @@ export default async function fetchDirectory(): Promise<
 
   // Emit the cached DNPs right away
   if (Array.isArray(dnpsCache) && dnpsCache.length) {
-    eventBus.emit(eventBusTag.emitDirectory, dnpsCache);
+    eventBus.directory.emit(dnpsCache);
   }
 
   /**
@@ -120,7 +120,7 @@ export default async function fetchDirectory(): Promise<
 function emitPkg(dnp: DirectoryDnp): void {
   const dnpCache = dnpsCache.find(({ name }) => name === dnp.name);
   if (!dnpCache || isCacheInvalid(dnpCache, dnp))
-    eventBus.emit(eventBusTag.emitDirectory, [dnp]);
+    eventBus.directory.emit([dnp]);
 }
 
 function isCacheInvalid(dnpCache: DirectoryDnp, dnpNew: DirectoryDnp): boolean {

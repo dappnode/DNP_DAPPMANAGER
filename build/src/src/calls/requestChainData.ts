@@ -1,5 +1,5 @@
 import params from "../params";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import { RpcHandlerReturn } from "../types";
 
 /**
@@ -11,7 +11,7 @@ export default async function requestChainData(): Promise<RpcHandlerReturn> {
 
   // Trigger a chainData fetch immediately so
   // it is shown as quick as possible in the front-end
-  eventBus.emit(eventBusTag.requestedChainData);
+  eventBus.requestChainData.emit();
 
   // Do NOT log a message or a user action as this method is call too often
   return {

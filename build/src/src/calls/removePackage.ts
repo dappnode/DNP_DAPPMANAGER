@@ -1,6 +1,6 @@
 import fs from "fs";
 import params from "../params";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 // Modules
 import docker from "../modules/docker";
 // External call
@@ -51,8 +51,8 @@ export default async function removePackage({
   await shell(`rm -r ${packageRepoDir}`);
 
   // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
-  eventBus.emit(eventBusTag.packageModified, { id, removed: true });
+  eventBus.requestPackages.emit();
+  eventBus.packageModified.emit({ id, removed: true });
 
   return {
     message: `Removed package: ${id}`,

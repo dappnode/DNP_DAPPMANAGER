@@ -1,5 +1,5 @@
 import autobahn from "autobahn";
-import { eventBus, eventBusTag, eventBusOnSafe } from "./eventBus";
+import * as eventBus from "./eventBus";
 import logUserAction from "./logUserAction";
 import { registerHandler } from "./registerHandler";
 import params from "./params";
@@ -102,46 +102,39 @@ connection.onopen = (session, details): void => {
     });
   }
 
-  eventBusOnSafe(eventBusTag.emitChainData, (chainData: ChainData) => {
+  eventBus.chainData.on((chainData: ChainData[]) => {
     publish("chainData.dappmanager.dnp.dappnode.eth", chainData);
   });
 
   // Emits the list of packages
-  eventBusOnSafe(
-    eventBusTag.emitPackages,
-    async (dnpList: PackageContainer[] | undefined) => {
-      if (!dnpList) dnpList = (await calls.listPackages()).result;
-      publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
-    },
-    { isAsync: true }
-  );
+  eventBus.packages.on((dnpList: PackageContainer[]) => {
+    publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
+  });
+  eventBus.requestPackages.on(async () => {
+    const dnpList = (await calls.listPackages()).result;
+    publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
+  });
 
   // Emits the directory
-  eventBusOnSafe(eventBusTag.emitDirectory, (pkgs: DirectoryDnp[]) => {
+  eventBus.directory.on((pkgs: DirectoryDnp[]) => {
     publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
   });
 
   // Emits the auto update data (settings, registry, pending)
-  eventBusOnSafe(
-    eventBusTag.emitAutoUpdateData,
-    async () => {
-      const autoUpdateData = (await calls.autoUpdateDataGet()).result;
-      publish("autoUpdateData.dappmanager.dnp.dappnode.eth", autoUpdateData);
-    },
-    { isAsync: true }
-  );
-
-  eventBusOnSafe(eventBusTag.logUi, (logData: ProgressLog) => {
-    publish("log.dappmanager.dnp.dappnode.eth", logData);
-    // Also, log them internally. But skip download progress logs, too spam-y
-    if (!(logData.message || "").includes("%") && !logData.clear) {
-      logs.info(JSON.stringify(logData));
-    } else {
-      logs.debug(JSON.stringify(logData));
-    }
+  eventBus.requestAutoUpdateData.on(async () => {
+    const autoUpdateData = (await calls.autoUpdateDataGet()).result;
+    publish("autoUpdateData.dappmanager.dnp.dappnode.eth", autoUpdateData);
   });
 
-  eventBusOnSafe(eventBusTag.logUserAction, (userActionLog: UserActionLog) => {
+  eventBus.logUi.on((logData: ProgressLog) => {
+    publish("log.dappmanager.dnp.dappnode.eth", logData);
+    // Also, log them internally. But skip download progress logs, too spam-y
+    if (!(logData.message || "").includes("%") && !logData.clear)
+      logs.info(JSON.stringify(logData));
+    else logs.debug(JSON.stringify(logData));
+  });
+
+  eventBus.logUserAction.on((userActionLog: UserActionLog) => {
     publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
   });
 
@@ -153,20 +146,17 @@ connection.onopen = (session, details): void => {
     logUserAction.log(userActionLog);
   });
 
-  eventBusOnSafe(
-    eventBusTag.pushNotification,
-    async (notification: PackageNotification) => {
-      db.setNotification(notification.id, notification);
-      publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
-    },
-    { isAsync: true }
-  );
+  eventBus.notification.on((notification: PackageNotification) => {
+    db.setNotification(notification.id, notification);
+    publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
+  });
 
   /**
    * Initial calls when WAMP is active
    * - When the DAPPMANAGER starts, update the list of packages
    */
-  eventBus.emit(eventBusTag.emitPackages);
+  eventBus.requestAutoUpdateData.emit();
+  eventBus.requestPackages.emit();
 };
 
 connection.onclose = (reason, details): boolean => {

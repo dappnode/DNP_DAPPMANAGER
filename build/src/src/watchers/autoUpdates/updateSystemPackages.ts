@@ -1,4 +1,4 @@
-import { eventBus, eventBusTag } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
 // Utils
 import {
@@ -39,7 +39,7 @@ export default async function updateSystemPackages(): Promise<void> {
      */
     flagCompletedUpdate(coreDnpName, versionId);
     logs.info(`Successfully auto-updated system packages`);
-    eventBus.emit(eventBusTag.emitPackages);
+    eventBus.requestPackages.emit();
   } catch (e) {
     flagErrorUpdate(coreDnpName, e.message);
     throw e;

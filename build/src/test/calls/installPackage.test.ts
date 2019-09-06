@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { eventBusTag } from "../../src/eventBus";
 import { InstallerPkg, PackageContainer } from "../../src/types";
 
 const proxyquire = require("proxyquire").noCallThru();
@@ -48,11 +47,10 @@ describe("Call function: installPackage", function() {
     else throw Error(`[SINON STUB] Manifest of ${pkg.name} not available`);
   });
 
-  const eventBusPackage = {
-    eventBus: {
-      emit: sinon.stub()
-    },
-    eventBusTag
+  const eventBus = {
+    runNatRenewal: { emit: sinon.stub() },
+    requestPackages: { emit: sinon.stub() },
+    packageModified: { emit: sinon.stub() }
   };
 
   const listContainers = async (): Promise<PackageContainer[]> => [];
@@ -82,7 +80,7 @@ describe("Call function: installPackage", function() {
       "../modules/getManifest": getManifest,
       "../modules/listContainers": listContainers,
       "../modules/lockPorts": lockPorts,
-      "../eventBus": eventBusPackage,
+      "../eventBus": eventBus,
       "../utils/isSyncing": isSyncing,
       "../params": params,
       "../db": db
@@ -176,31 +174,19 @@ describe("Call function: installPackage", function() {
   });
 
   // Step 6: P2P ports: modify docker-compose + open ports
-  it("should emit an internal call to the eventBus", async () => {
+  it("should call lockPorts", async () => {
     sinon.assert.callCount(lockPorts, 2);
-    // eventBus should be called once to open ports, and then to emitPackages
-    sinon.assert.callCount(eventBusPackage.eventBus.emit, 3);
-    expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal(
-      [eventBusTag.runNatRenewal],
-      `eventBus.emit first call must be a NAT renewal call`
-    );
+    expect(lockPorts.firstCall.lastArg).to.equal(pkgName, "Wrong 1st call");
+    expect(lockPorts.secondCall.lastArg).to.equal(depName, "Wrong 2nd call");
   });
 
   // Step FINAL:
   it("should request to emit packages to refresh the UI", async () => {
-    expect(eventBusPackage.eventBus.emit.getCall(1).args).to.deep.equal(
-      [eventBusTag.emitPackages],
-      `eventBus.emit second call must be to request emit packages`
-    );
+    sinon.assert.calledOnce(eventBus.runNatRenewal.emit);
+    sinon.assert.calledOnce(eventBus.requestPackages.emit);
+    sinon.assert.calledOnce(eventBus.packageModified.emit);
+    expect(eventBus.packageModified.emit.lastCall.lastArg).to.deep.equal({
+      id: pkgName
+    });
   });
-
-  // it('should throw an error with wrong package name', async () => {
-  //     let error = '--- removePackage did not throw ---';
-  //     try {
-  //         await removePackage({id: PACKAGE_NAME});
-  //     } catch (e) {
-  //         error = e.message;
-  //     }
-  //     expect(error).to.include('No docker-compose found');
-  // });
 });

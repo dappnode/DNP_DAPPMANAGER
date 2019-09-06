@@ -4,7 +4,6 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import { eventBusTag } from "../../src/eventBus";
 import shell from "../../src/utils/shell";
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -33,11 +32,9 @@ describe("Call function: removePackage", function() {
     }
   };
 
-  const eventBusPackage = {
-    eventBus: {
-      emit: sinon.stub()
-    },
-    eventBusTag
+  const eventBus = {
+    requestPackages: { emit: sinon.stub() },
+    packageModified: { emit: sinon.stub() }
   };
 
   // db to know UPnP state
@@ -52,7 +49,7 @@ describe("Call function: removePackage", function() {
     "../../src/calls/removePackage",
     {
       "../modules/docker": docker,
-      "../eventBus": eventBusPackage,
+      "../eventBus": eventBus,
       "../params": params,
       "../db": db
     }
@@ -71,17 +68,19 @@ describe("Call function: removePackage", function() {
 
   it("should have called docker-compose down", async () => {
     sinon.assert.callCount(docker.compose.down, 1);
-    expect(docker.compose.down.getCall(0).args).to.deep.equal(
+    expect(docker.compose.down.firstCall.args).to.deep.equal(
       [dockerComposePath, { volumes: false }],
       `should call docker.compose.down for the package ${id}`
     );
   });
 
   it("should request to emit packages to refresh the UI", async () => {
-    expect(eventBusPackage.eventBus.emit.getCall(0).args).to.deep.equal(
-      [eventBusTag.emitPackages],
-      `eventBus.emit first call must be to request emit packages`
-    );
+    sinon.assert.calledOnce(eventBus.requestPackages.emit);
+    sinon.assert.calledOnce(eventBus.packageModified.emit);
+    expect(eventBus.packageModified.emit.firstCall.lastArg).to.deep.equal({
+      id,
+      removed: true
+    });
   });
 
   it("should throw an error with wrong package name", async () => {

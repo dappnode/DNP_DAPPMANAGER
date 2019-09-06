@@ -1,4 +1,5 @@
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
+import { ProgressLog } from "../types";
 
 /**
  * Some remote procedure calls (RPC) need a continuous update.
@@ -14,19 +15,9 @@ import { eventBus, eventBusTag } from "../eventBus";
  * @param {string} message, log message
  * message = "Downloading 75%"
  */
-export default function logUi({
-  id,
-  name,
-  message,
-  clear
-}: {
-  id: string;
-  name?: string;
-  message?: string;
-  clear?: boolean;
-}): void {
-  eventBus.emit(
-    eventBusTag.logUi,
-    clear ? { id, clear } : { id, name, message }
-  );
+export default function logUi({ id, name, message, clear }: ProgressLog): void {
+  const progressLog: ProgressLog = clear
+    ? { id, clear }
+    : { id, name, message };
+  eventBus.logUi.emit(progressLog);
 }

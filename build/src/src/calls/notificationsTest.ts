@@ -1,4 +1,4 @@
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import {
   PackageNotification,
   NotificationType,
@@ -31,7 +31,8 @@ export default async function notificationsTest({
       body: randomSentence(20)
     };
   }
-  eventBus.emit(eventBusTag.pushNotification, notification);
+
+  eventBus.notification.emit(notification);
 
   return {
     message: `Added notification ${JSON.stringify(notification)}`,

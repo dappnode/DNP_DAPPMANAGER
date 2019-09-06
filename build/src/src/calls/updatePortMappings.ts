@@ -4,7 +4,7 @@ import { getComposeInstance } from "../utils/dockerComposeFile";
 import { PortMapping, RpcHandlerReturn } from "../types";
 // External call
 import restartPackage from "./restartPackage";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -88,7 +88,7 @@ export default async function updatePortMappings({
   await lockPorts(id);
 
   // Trigger a natRenewal update to open ports if necessary
-  eventBus.emit(eventBusTag.runNatRenewal);
+  eventBus.runNatRenewal.emit();
 
   return {
     message: `Updated ${id} port mappings`,

@@ -3,7 +3,7 @@ import { uniq } from "lodash";
 import params from "../params";
 import docker from "../modules/docker";
 import listContainers from "../modules/listContainers";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 // Utils
 import * as getPath from "../utils/getPath";
 import Logs from "../logs";
@@ -107,7 +107,7 @@ export default async function restartPackageVolumes({
   if (err) throw err;
 
   // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
+  eventBus.requestPackages.emit();
 
   return {
     message: `Restarted ${id} volumes: ${volumeNames.join(" ")}`,

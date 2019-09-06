@@ -1,4 +1,4 @@
-import { eventBus, eventBusTag } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import listContainers from "../../modules/listContainers";
 import { shortNameCapitalized } from "../../utils/strings";
 import params from "../../params";
@@ -104,7 +104,7 @@ setTimeout(() => {
   checkChainWatchers();
 }, checkChainWatcherInterval);
 
-eventBus.on(eventBusTag.packageModified, () => {
+eventBus.packageModified.on(() => {
   checkChainWatchers();
 });
 
@@ -155,7 +155,7 @@ async function getAndEmitChainData(): Promise<void> {
         return result;
       })
   );
-  eventBus.emit(eventBusTag.emitChainData, chainData);
+  eventBus.chainData.emit(chainData);
 }
 
 // When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL
@@ -165,7 +165,9 @@ setInterval(async () => {
 }, emitChainDataWatcherInterval);
 
 // Also get and emit chain data immediately after the UI has requested it
-eventBus.on(eventBusTag.requestedChainData, getAndEmitChainData);
+eventBus.requestChainData.on(() => {
+  getAndEmitChainData();
+});
 
 // Don't start new requests if the previous one is still active.
 // If it is still active return the last result.

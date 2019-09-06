@@ -1,5 +1,5 @@
 import params from "../../params";
-import { eventBusTag, eventBusOnSafe } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
 // Utils
 import {
@@ -49,13 +49,10 @@ async function autoUpdates(): Promise<void> {
 
 autoUpdates();
 
-eventBusOnSafe(
-  eventBusTag.packageModified,
-  (data?: { id: string; removed?: boolean }) => {
-    if (data && data.removed) clearPendingUpdates(data.id);
-    if (data) clearRegistry(data.id);
-  }
-);
+eventBus.packageModified.on(data => {
+  if (data && data.removed) clearPendingUpdates(data.id);
+  if (data && data.id) clearRegistry(data.id);
+});
 
 /**
  * If the DAPPMANAGER is updated the pending state will never be updated to

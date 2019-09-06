@@ -2,7 +2,7 @@ import semver from "semver";
 import listContainers from "../../modules/listContainers";
 import * as parse from "../../utils/parse";
 import * as apm from "../../modules/apm";
-import { eventBus, eventBusTag } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import params from "../../params";
 // Utils
 import computeSemverUpdateType from "../../utils/computeSemverUpdateType";
@@ -43,7 +43,7 @@ async function updateMyPackage(name: string, version: string): Promise<void> {
 
     flagCompletedUpdate(name, latestVersion);
     logs.info(`Successfully auto-updated system packages`);
-    eventBus.emit(eventBusTag.emitPackages);
+    eventBus.requestPackages.emit();
   } catch (e) {
     flagErrorUpdate(name, e.message);
     throw e;

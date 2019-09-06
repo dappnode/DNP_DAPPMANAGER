@@ -1,5 +1,5 @@
 import * as upnpc from "../../modules/upnpc";
-import { eventBusTag, eventBusOnSafe } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";
 import getPortsToOpen from "./getPortsToOpen";
@@ -120,7 +120,7 @@ setInterval(() => {
   throttledNatRenewal();
 }, natRenewalInterval);
 
-eventBusOnSafe(eventBusTag.runNatRenewal, () => {
+eventBus.runNatRenewal.on(() => {
   throttledNatRenewal();
 });
 

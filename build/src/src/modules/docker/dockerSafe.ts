@@ -1,7 +1,7 @@
 import docker from "./dockerCommands";
 import { readComposeObj } from "../../utils/dockerComposeFile";
 import * as db from "../../db";
-import { eventBus, eventBusTag } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import lockPorts from "../lockPorts";
 import unlockPorts from "../unlockPorts";
 import { DockerOptionsInterface } from "../../types";
@@ -51,7 +51,7 @@ async function dockerComposeUpSafe(
       const newPortMappings = await lockPorts(id);
       if (newPortMappings && newPortMappings.length) {
         // Trigger a natRenewal update to open ports if necessary
-        eventBus.emit(eventBusTag.runNatRenewal);
+        eventBus.runNatRenewal.emit();
       }
     } else {
       throw e;

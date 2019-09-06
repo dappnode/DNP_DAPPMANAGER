@@ -1,6 +1,6 @@
 import * as db from "../db";
 import params from "../params";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import { pick, omit } from "lodash";
 import { parseCoreVersionIdToStrings } from "./coreVersionId";
 import { includesArray } from "./arrays";
@@ -24,6 +24,11 @@ const coreDnpName = params.coreDnpName;
 /**
  * Define types
  */
+
+function autoUpdateDataHasChanged(): void {
+  // Update the UI dynamically of the new successful auto-update
+  eventBus.requestAutoUpdateData.emit();
+}
 
 /**
  * Get current auto-update settings
@@ -55,8 +60,7 @@ function setSettings(id: string, enabled: boolean): void {
     [id]: { enabled }
   });
 
-  // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitAutoUpdateData);
+  autoUpdateDataHasChanged();
 }
 
 /**
@@ -215,8 +219,7 @@ export function clearPendingUpdates(id: string): void {
     clearPendingUpdatesOfDnp(id);
   }
 
-  // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitAutoUpdateData);
+  autoUpdateDataHasChanged();
 }
 
 /**
@@ -242,8 +245,7 @@ export function clearRegistry(name: string): void {
   const registry = getRegistry();
   db.setAutoUpdateRegistry(omit(registry, name));
 
-  // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitAutoUpdateData);
+  autoUpdateDataHasChanged();
 }
 
 /**
@@ -320,8 +322,7 @@ function setRegistry(
     }
   });
 
-  // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitAutoUpdateData);
+  autoUpdateDataHasChanged();
 }
 
 /**
@@ -365,8 +366,7 @@ function setPending(name: string, data: AutoUpdatePendingEntry): void {
     }
   });
 
-  // Update the UI dynamically of the new successful auto-update
-  eventBus.emit(eventBusTag.emitAutoUpdateData);
+  autoUpdateDataHasChanged();
 }
 
 /**

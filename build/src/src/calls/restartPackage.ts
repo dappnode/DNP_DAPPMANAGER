@@ -3,7 +3,7 @@ import * as getPath from "../utils/getPath";
 import restartPatch from "../modules/restartPatch";
 import params from "../params";
 import docker from "../modules/docker";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import { RpcHandlerReturn } from "../types";
 
 /**
@@ -31,7 +31,7 @@ export default async function restartPackage({
     await docker.safe.compose.up(dockerComposePath);
 
     // Emit packages update
-    eventBus.emit(eventBusTag.emitPackages);
+    eventBus.requestPackages.emit();
   }
 
   return {

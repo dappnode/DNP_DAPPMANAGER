@@ -1,6 +1,6 @@
 import fs from "fs";
 import params from "../params";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 // Modules
 import listContainers from "../modules/listContainers";
 import { dockerDf } from "../modules/dockerApi";
@@ -96,7 +96,7 @@ export default async function listPackages(): Promise<RpcListPackagesReturn> {
   });
 
   // ##### EMIT data before appending system data
-  eventBus.emit(eventBusTag.emitPackages, dnpList);
+  eventBus.packages.emit(dnpList);
 
   // Append volume info
   // This call can fail because of:

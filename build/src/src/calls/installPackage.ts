@@ -1,4 +1,4 @@
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 // Modules
 import * as packages from "../modules/packages";
 import dappGet from "../modules/dappGet";
@@ -201,11 +201,11 @@ export default async function installPackage({
   // Since a package installation is not a very frequent activity it is okay to be
   // called on each install. Internal mechanisms protect the natRenewal function
   // to be called too often.
-  eventBus.emit(eventBusTag.runNatRenewal);
+  eventBus.runNatRenewal.emit();
 
   // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
-  eventBus.emit(eventBusTag.packageModified);
+  eventBus.requestPackages.emit();
+  eventBus.packageModified.emit({ id });
 
   return {
     message: `Installed ${req.req}`,

@@ -2,7 +2,7 @@ import listContainers from "../modules/listContainers";
 import * as getPath from "../utils/getPath";
 import params from "../params";
 import docker from "../modules/docker";
-import { eventBus, eventBusTag } from "../eventBus";
+import * as eventBus from "../eventBus";
 import { RpcHandlerReturn } from "../types";
 
 /**
@@ -30,7 +30,7 @@ export default async function togglePackage({
   else await docker.compose.start(dockerComposePath);
 
   // Emit packages update
-  eventBus.emit(eventBusTag.emitPackages);
+  eventBus.requestPackages.emit();
 
   return {
     message: `Successfully toggled package: ${id}`,

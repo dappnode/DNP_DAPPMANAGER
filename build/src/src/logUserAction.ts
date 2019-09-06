@@ -1,8 +1,9 @@
 import winston from "winston";
 import Transport from "winston-transport";
-import { eventBus, eventBusTag } from "./eventBus";
+import * as eventBus from "./eventBus";
 import limitObjValuesSize from "./utils/limitObjValuesSize";
 import params from "./params";
+import { UserActionLog } from "./types";
 
 const { createLogger, format, transports } = winston;
 
@@ -41,9 +42,9 @@ class EmitToAdmin extends Transport {
    *   @property {object} message - e.message
    *   @property {object} stack - e.stack
    */
-  log(info: { level: string }, callback: () => void): void {
+  log(info: UserActionLog, callback: () => void): void {
     setImmediate(() => {
-      eventBus.emit(eventBusTag.logUserAction, info);
+      eventBus.logUserAction.emit(info);
     });
     callback();
   }

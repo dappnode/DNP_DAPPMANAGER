@@ -146,8 +146,8 @@ export interface ChainData {
 
 export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
-  name: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
-  message: string; // "Downloading 75%", log message
+  name?: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
+  message?: string; // "Downloading 75%", log message
   clear?: boolean; // to trigger the UI to clear the all logs of this id
 }
 

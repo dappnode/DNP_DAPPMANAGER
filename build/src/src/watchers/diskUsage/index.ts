@@ -1,6 +1,6 @@
 import shellExec from "../../utils/shell";
 import params from "../../params";
-import { eventBus, eventBusTag } from "../../eventBus";
+import * as eventBus from "../../eventBus";
 import Logs from "../../logs";
 const logs = Logs(module);
 
@@ -108,7 +108,7 @@ async function monitorDiskUsage(): Promise<void> {
           } (${formatedNames}) after the disk space reached a ${threshold.id}`
         );
 
-        eventBus.emit(eventBusTag.pushNotification, {
+        eventBus.notification.emit({
           id: "diskSpaceRanOut-stoppedPackages",
           type: "danger",
           title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
@@ -121,7 +121,7 @@ async function monitorDiskUsage(): Promise<void> {
         thresholdIsActive[threshold.id] = true;
 
         // Emit packages update
-        eventBus.emit(eventBusTag.emitPackages);
+        eventBus.requestPackages.emit();
       } else if (diskAvailableBytes > 1.2 * threshold.kb) {
         // If there is again enough free space, allow packages to be stopped
         // if disk space runs out agains
