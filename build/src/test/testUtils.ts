@@ -5,8 +5,8 @@ import { DockerApiSystemDfReturn } from "../src/modules/dockerApi";
 
 export const testDir = "./test_files/";
 
-export function ignoreErrors<Argument, Return>(fn: (arg: Argument) => Return) {
-  return async function(arg: Argument): Promise<Return | undefined> {
+export function ignoreErrors<A, R>(fn: (arg: A) => R) {
+  return async function(arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {

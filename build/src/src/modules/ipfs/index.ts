@@ -1,10 +1,12 @@
 import * as ipfsParams from "./ipfsParams";
-import wrapMethodsWithQueue from "../../utils/wrapMethodsWithQueue";
+import { runWithRetry } from "../../utils/asyncFlows";
 import isIpfsHash from "../../utils/isIpfsHash";
-import { timeoutError } from "./data";
+import { timeoutError, IpfsArgument } from "./data";
 
 // Methods
-import * as methods from "./methods";
+import catRaw from "./methods/cat";
+import catStreamToFsRaw from "./methods/catStreamToFs";
+import objectSizeRaw from "./methods/objectSize";
 
 // Params
 const params = {
@@ -13,12 +15,17 @@ const params = {
   intervalBase: ipfsParams.intervalBase || 225
 };
 
-/**
- * First, wrap methods with a concurrency and retry async queue.
- * This wrap ensures that many concurrent calls will not overload the
- * node, increasing the chances of failure.
- */
-const wrappedMethods = wrapMethodsWithQueue(methods, params);
+async function isAvailable(hash: string): Promise<void> {
+  if (!isIpfsHash(hash)) throw Error(`Invalid IPFS hash: ${hash}`);
+  // Reformat the hash, some methods do not tolerate the /ipfs/ prefix
+  hash = hash.split("ipfs/")[1] || hash;
+
+  await objectSizeRaw(hash).catch(e => {
+    if (e.message === timeoutError)
+      throw Error(`Ipfs hash not available: ${hash}`);
+    else throw Error(`Ipfs hash ${hash} not available error: ${e.message}`);
+  });
+}
 
 /**
  * Second, wrap the wrapped methods with a check to verify if the
@@ -26,30 +33,18 @@ const wrappedMethods = wrapMethodsWithQueue(methods, params);
  * is itself wrapped in a retry async flow.
  */
 
-function wrapMethodWithIsAvailable(method: (...args: any[]) => any) {
-  return async function(hash: string, ...args: any[]): Promise<any> {
-    await isAvailable(hash);
-    return await method(hash, ...args);
+function wrapMethodWithIsAvailableAndRetry<A extends IpfsArgument, R>(
+  method: (kwargs: A) => Promise<R>
+): (kwargs: A) => Promise<R> {
+  const isAvailableRetry = runWithRetry(isAvailable, params);
+  const methodRetry = runWithRetry(method, params);
+  return async function(kwargs: A): Promise<R> {
+    await isAvailableRetry(kwargs.hash);
+    return await methodRetry(kwargs);
   };
 }
 
-async function isAvailable(hash: string): Promise<void> {
-  if (!hash || typeof hash !== "string")
-    throw Error(`arg hash must be a string: ${hash}`);
-  if (!isIpfsHash(hash)) throw Error(`Invalid IPFS hash: ${hash}`);
-  // Reformat the hash, some methods do not tolerate the /ipfs/ prefix
-  hash = hash.split("ipfs/")[1] || hash;
-
-  try {
-    await wrappedMethods.objectSize(hash);
-  } catch (e) {
-    if (e.message === timeoutError)
-      throw Error(`Ipfs hash not available: ${hash}`);
-    else throw Error(`Ipfs hash ${hash} not available error: ${e.message}`);
-  }
-}
-
-export const cat = wrapMethodWithIsAvailable(wrappedMethods.cat);
-export const catStreamToFs = wrapMethodWithIsAvailable(
-  wrappedMethods.catStreamToFs
+export const cat = wrapMethodWithIsAvailableAndRetry(catRaw);
+export const catStreamToFs = wrapMethodWithIsAvailableAndRetry(
+  catStreamToFsRaw
 );

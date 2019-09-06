@@ -1,8 +1,12 @@
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
-import { timeoutError } from "../data";
+import { timeoutError, IpfsArgument } from "../data";
 import Logs from "../../../logs";
 const logs = Logs(module);
+
+interface CatArgument extends IpfsArgument {
+  maxLength?: number;
+}
 
 /**
  * Returns a file addressed by a valid IPFS Path.
@@ -12,10 +16,7 @@ const logs = Logs(module);
  *   if reached, it will throw an error
  * @returns {buffer} hash contents as a buffer
  */
-export default function cat(
-  hash: string,
-  { maxLength, asBuffer }: { maxLength?: number; asBuffer?: boolean }
-): Promise<Buffer | string> {
+export default function cat({ hash, maxLength }: CatArgument): Promise<Buffer> {
   return new Promise(
     (resolve, reject): void => {
       // Timeout cancel mechanism
@@ -26,7 +27,7 @@ export default function cat(
       const options: { length?: number } = {};
       if (maxLength) options.length = maxLength;
 
-      ipfs.cat(hash, options, (err: Error, data: string) => {
+      ipfs.cat(hash, options, (err: Error, data: Buffer) => {
         clearTimeout(timeoutToCancel);
         if (err) return reject(err);
 
@@ -38,8 +39,7 @@ export default function cat(
           if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
         });
 
-        if (asBuffer) resolve(data);
-        else resolve(data.toString());
+        resolve(data);
       });
     }
   );

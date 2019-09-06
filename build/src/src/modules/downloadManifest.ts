@@ -2,7 +2,7 @@ import * as ipfs from "./ipfs";
 import * as db from "../db";
 import { Manifest } from "../types";
 
-const maxLenght = 100e3; // Limit manifest size to ~100KB
+const maxLength = 100e3; // Limit manifest size to ~100KB
 
 /**
  * Handles the download of a JSON DNP manifest.
@@ -34,7 +34,8 @@ export default async function downloadManifest(
    * 2. Cat stream to file system
    * - Make sure the path is correct and the parent folder exist or is created
    */
-  const manifestString = await ipfs.cat(hash, { maxLenght });
+  const manifestBuffer = await ipfs.cat({ hash, maxLength });
+  const manifestString = manifestBuffer.toString();
 
   /**
    * 3. Validate downloaded image

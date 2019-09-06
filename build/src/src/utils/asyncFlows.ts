@@ -1,4 +1,6 @@
 import async from "async";
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Makes sure the target async function is running only once at every instant.
@@ -19,21 +21,29 @@ import async from "async";
  *
  * @param fn Target function
  */
-export function runOnlyOneSequentially<Argument, Return>(
-  fn: (arg?: Argument) => Promise<Return>
-): (arg?: Argument) => void {
+export function runOnlyOneSequentially<A, R>(
+  fn: (arg?: A) => Promise<R>
+): (arg?: A) => void {
   // create a cargo object with an infinite payload
   const cargo = async.cargo(function(
-    tasks: { arg: Argument }[],
+    tasks: { arg: A }[],
     callback: () => void
   ) {
-    fn(tasks[0].arg).then(() => {
-      callback();
-    });
+    fn(tasks[0].arg)
+      .then(() => {
+        callback();
+      })
+      .catch(e => {
+        logs.error(
+          `WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks. Error: ${
+            e.stack
+          }`
+        );
+      });
   },
   1e9);
 
-  return function(arg?: Argument): void {
+  return function(arg?: A): void {
     cargo.push({ arg });
   };
 }
@@ -53,17 +63,17 @@ export function runOnlyOneSequentially<Argument, Return>(
  *
  * @param fn Target function (Callback style)
  */
-export function runOnlyOneReturnToAll<Return>(
-  fn: () => Promise<Return>
-): () => Promise<Return> {
+export function runOnlyOneReturnToAll<R>(
+  fn: () => Promise<R>
+): () => Promise<R> {
   // This variables act as a class constructor
   let isRunning = false;
   let waitingPromises: {
-    resolve: (res: Return) => void;
+    resolve: (res: R) => void;
     reject: (err: Error) => void;
   }[] = [];
 
-  return function throttledFunction(): Promise<Return> {
+  return function throttledFunction(): Promise<R> {
     return new Promise(
       (resolve, reject): void => {
         waitingPromises.push({ resolve, reject });
@@ -85,6 +95,32 @@ export function runOnlyOneReturnToAll<Return>(
               waitingPromises = [];
             });
         }
+      }
+    );
+  };
+}
+
+export function runWithRetry<A, R>(
+  apiMethod: (arg: A) => Promise<R>,
+  params?: { times?: number; base?: number }
+): (arg: A) => Promise<R> {
+  const times = params && params.times ? params.times : 3;
+  const base = params && params.base ? params.base : 225;
+
+  return function retryFunction(arg: A): Promise<R> {
+    return new Promise(
+      (resolve, reject): void => {
+        async.retry(
+          {
+            times,
+            interval: (retryCount): number => base * Math.pow(2, retryCount)
+          },
+          async.asyncify(async () => apiMethod(arg)),
+          (err: Error | null | undefined, result: R): void => {
+            if (err) reject(err);
+            else resolve(result);
+          }
+        );
       }
     );
   };

@@ -70,10 +70,10 @@ function getDiskPercent(): string {
  * @param {function} fn async getter
  * @param {string} name for the message
  */
-async function wrapErrors<Return>(
-  fn: () => Promise<Return>,
+async function wrapErrors<R>(
+  fn: () => Promise<R>,
   name: string
-): Promise<Return | undefined> {
+): Promise<R | undefined> {
   try {
     return await fn();
   } catch (e) {

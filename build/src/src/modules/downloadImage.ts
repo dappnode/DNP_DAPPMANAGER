@@ -45,7 +45,7 @@ export default async function downloadImage(
    * 2. Cat stream to file system
    * - Make sure the path is correct and the parent folder exist or is created
    */
-  await ipfs.catStreamToFs(hash, path, options);
+  await ipfs.catStreamToFs({ hash, path, ...options });
 
   /**
    * 3. Validate downloaded image

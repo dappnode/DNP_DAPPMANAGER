@@ -47,7 +47,7 @@ describe("ipfs > methods > catStreamToFs", () => {
 
   it("Should download a file", async () => {
     const onChunk = sinon.stub();
-    const res = await catStreamToFs(hashOk, path, { onChunk });
+    const res = await catStreamToFs({ hash: hashOk, path, onChunk });
     expect(res).to.be.undefined;
     expect(fs.readFileSync(path, "utf8")).to.equal(fileContents);
     // Check onChunk

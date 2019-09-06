@@ -1,14 +1,20 @@
-import wrapMethodsWithQueue from "../utils/wrapMethodsWithQueue";
+import { runWithRetry } from "../utils/asyncFlows";
 // Modules
 import listContainers from "../modules/listContainers";
 import docker from "../modules/docker";
 import { RpcHandlerReturn } from "../types";
 
 // Retry logs call 3 times, in case it happen during a container reboot
-const dockerWithRetry = wrapMethodsWithQueue(
-  { log: docker.log },
-  { times: 3 },
-  { disableChecks: true }
+const dockerLogsRetry = runWithRetry(
+  ({
+    containerNameOrId,
+    ...options
+  }: {
+    containerNameOrId: string;
+    timestamps?: boolean;
+    tail?: number;
+  }) => docker.log(containerNameOrId, options),
+  { times: 3 }
 );
 
 /**
@@ -26,7 +32,7 @@ export default async function logPackage({
   options
 }: {
   id: string;
-  options?: { OPTION1: boolean };
+  options?: { timestamp: boolean; tail: number };
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
@@ -35,7 +41,10 @@ export default async function logPackage({
   if (!dnp) throw Error(`No DNP found for id ${id}`);
   const containerName = dnp.packageName;
 
-  const logs = await dockerWithRetry.log(containerName, options || {});
+  const logs = await dockerLogsRetry({
+    containerNameOrId: containerName,
+    ...(options || {})
+  });
 
   return {
     message: `Got logs of ${id}`,

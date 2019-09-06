@@ -2,11 +2,16 @@ import fs from "fs";
 import { isAbsolute } from "path";
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
-import { timeoutError } from "../data";
+import { timeoutError, IpfsArgument } from "../data";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
 const timeoutMs = params.IPFS_TIMEOUT || 2000;
+
+interface CatStreamToFsArgument extends IpfsArgument {
+  path: string;
+  onChunk?: (chunk: Buffer) => void;
+}
 
 /**
  * Streams an IPFS object to the local fs.
@@ -19,17 +24,15 @@ const timeoutMs = params.IPFS_TIMEOUT || 2000;
  * - onChunk: {function} Gets called on every received chuck
  *   function(chunk) {}
  */
-export default function catStreamToFs(
-  hash: string,
-  path: string,
-  options: { onChunk: (chunk: Buffer) => void }
-): Promise<string> {
+export default function catStreamToFs({
+  hash,
+  path,
+  onChunk
+}: CatStreamToFsArgument): Promise<string> {
   return new Promise(
     (resolve, reject): void => {
       if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
         reject(Error(`Invalid path: "${path}"`));
-      if (options && typeof options !== "object")
-        reject(Error("options must be an object"));
 
       // Timeout cancel mechanism
       const timeoutToCancel = setTimeout(() => {
@@ -43,7 +46,7 @@ export default function catStreamToFs(
 
       const onData = (chunk: Buffer): void => {
         clearTimeout(timeoutToCancel);
-        if (options.onChunk) options.onChunk(chunk);
+        if (onChunk) onChunk(chunk);
       };
 
       const onFinish = (data: string): void => {

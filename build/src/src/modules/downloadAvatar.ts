@@ -33,11 +33,12 @@ export default async function downloadAvatar(hash: string): Promise<string> {
    */
   let avatarBuffer;
   try {
-    avatarBuffer = await ipfs.cat(hash, { asBuffer: true });
+    avatarBuffer = await ipfs.cat({ hash });
   } catch (e) {
     e.message = `Can't download avatar: ${e.message}`;
     throw e;
   }
+
   const avatar = await formatAndCompressAvatar(avatarBuffer);
 
   /**

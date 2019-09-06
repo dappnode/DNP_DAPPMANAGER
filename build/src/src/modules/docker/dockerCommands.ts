@@ -116,13 +116,13 @@ const docker = {
   // --timestamps , -t  Show timestamps
   log: (
     containerNameOrId: string,
-    options: { timestamps: boolean; tail: number }
+    options: { timestamps?: boolean; tail?: number }
   ): Promise<string> => {
     // Parse options
     let optionsString = "";
     // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
     if (options && options.timestamps) optionsString += " --timestamps";
-    if (options && !isNaN(options.tail))
+    if (options && options.tail && !isNaN(options.tail))
       optionsString += ` --tail ${options.tail}`;
     return shell(`docker logs ${containerNameOrId} ${optionsString} 2>&1`);
   },
