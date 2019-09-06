@@ -26,9 +26,9 @@ export default async function downloadManifest(
    * The manifest is stored un-parsed. The validate function will
    * parse it and return a valid object if the validation succeeeds
    */
-  const manifestStringCache: string = db.get(hash);
-  const cacheValidation = validateManifest(manifestStringCache);
-  if (cacheValidation.success) return JSON.parse(manifestStringCache);
+  const manifestStringCache = db.getIpfsCache(hash);
+  if (manifestStringCache && validateManifest(manifestStringCache).success)
+    return JSON.parse(manifestStringCache);
 
   /**
    * 2. Cat stream to file system
@@ -46,7 +46,7 @@ export default async function downloadManifest(
     throw Error(
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
-  db.set(hash, manifestString);
+  db.setIpfsCache(hash, manifestString);
   return JSON.parse(manifestString);
 }
 

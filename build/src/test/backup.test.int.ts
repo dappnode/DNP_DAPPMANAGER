@@ -86,7 +86,7 @@ volumes:
     await shell(`rm -rf ${path.join(testDir, "test")}`);
 
     // Store the fileId in the DB to simulate an HTTP upload
-    db.set(fileId, backupFileComp);
+    db.setFileTransferPath(fileId, backupFileComp);
     // Create a fake docker-compose.yml for the restart call
 
     /**
@@ -110,7 +110,7 @@ volumes:
     );
     expect(resGet.result).to.be.a("string");
     // res.result = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908"
-    expect(db.get(resGet.result)).to.equal(filePath);
+    expect(db.getFileTransferPath(resGet.result)).to.equal(filePath);
 
     /**
      * [NOTE] validate the generated file, assuming it's not deterministic

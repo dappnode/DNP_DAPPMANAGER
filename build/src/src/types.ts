@@ -210,7 +210,7 @@ export interface AutoUpdateRegistryEntry {
 export interface AutoUpdateRegistryDnp {
   [version: string]: AutoUpdateRegistryEntry;
 }
-export interface RegistryInterface {
+export interface AutoUpdateRegistry {
   [dnpName: string]: AutoUpdateRegistryDnp;
 }
 

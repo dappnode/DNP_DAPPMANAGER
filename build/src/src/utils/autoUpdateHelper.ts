@@ -8,7 +8,7 @@ import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
   AutoUpdateRegistryDnp,
-  RegistryInterface,
+  AutoUpdateRegistry,
   AutoUpdatePendingEntry,
   AutoUpdatePending,
   AutoUpdateFeedback
@@ -17,10 +17,6 @@ import {
 // Groups of packages keys
 export const MY_PACKAGES = "my-packages";
 export const SYSTEM_PACKAGES = "system-packages";
-// Db keys
-export const AUTO_UPDATE_SETTINGS = "auto-update-settings";
-export const AUTO_UPDATE_REGISTRY = "auto-update-registry";
-export const AUTO_UPDATE_PENDING = "auto-update-pending";
 
 const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
 const coreDnpName = params.coreDnpName;
@@ -39,8 +35,8 @@ const coreDnpName = params.coreDnpName;
  * }
  */
 export function getSettings(): AutoUpdateSettings {
-  const autoUpdateSettings: AutoUpdateSettings = db.get(AUTO_UPDATE_SETTINGS);
-  if (!autoUpdateSettings) db.set(AUTO_UPDATE_SETTINGS, {});
+  const autoUpdateSettings: AutoUpdateSettings = db.getAutoUpdateSettings();
+  if (!autoUpdateSettings) db.setAutoUpdateSettings({});
   return autoUpdateSettings || {};
 }
 
@@ -54,7 +50,7 @@ export function getSettings(): AutoUpdateSettings {
 function setSettings(id: string, enabled: boolean): void {
   const autoUpdateSettings = getSettings();
 
-  db.set(AUTO_UPDATE_SETTINGS, {
+  db.setAutoUpdateSettings({
     ...autoUpdateSettings,
     [id]: { enabled }
   });
@@ -77,7 +73,7 @@ export function editDnpSetting(enabled: boolean, name = MY_PACKAGES): void {
   // When disabling MY_PACKAGES, turn off all DNPs settings by
   // Ignoring all entries but the system packages
   if (name === MY_PACKAGES && !enabled)
-    db.set(AUTO_UPDATE_SETTINGS, pick(autoUpdateSettings, SYSTEM_PACKAGES));
+    db.setAutoUpdateSettings(pick(autoUpdateSettings, SYSTEM_PACKAGES));
 
   // When disabling any DNP, clear their pending updates
   // Ignoring all entries but the system packages
@@ -232,7 +228,7 @@ export function clearPendingUpdates(id: string): void {
  */
 function clearPendingUpdatesOfDnp(name: string): void {
   const pending = getPending();
-  db.set(AUTO_UPDATE_PENDING, omit(pending, name));
+  db.setAutoUpdatePending(omit(pending, name));
 }
 
 /**
@@ -244,7 +240,7 @@ function clearPendingUpdatesOfDnp(name: string): void {
  */
 export function clearRegistry(name: string): void {
   const registry = getRegistry();
-  db.set(AUTO_UPDATE_REGISTRY, omit(registry, name));
+  db.setAutoUpdateRegistry(omit(registry, name));
 
   // Update the UI dynamically of the new successful auto-update
   eventBus.emit(eventBusTag.emitAutoUpdateData);
@@ -292,9 +288,9 @@ export function clearCompletedCoreUpdatesIfAny(
  *   }
  * }
  */
-export function getRegistry(): RegistryInterface {
-  const registry = db.get(AUTO_UPDATE_REGISTRY);
-  if (!registry) db.set(AUTO_UPDATE_REGISTRY, {});
+export function getRegistry(): AutoUpdateRegistry {
+  const registry = db.getAutoUpdateRegistry();
+  if (!registry) db.setAutoUpdateRegistry({});
   return registry || {};
 }
 
@@ -313,7 +309,7 @@ function setRegistry(
 ): void {
   const registry = getRegistry();
 
-  db.set(AUTO_UPDATE_REGISTRY, {
+  db.setAutoUpdateRegistry({
     ...registry,
     [name]: {
       ...(registry[name] || {}),
@@ -347,8 +343,8 @@ function setRegistry(
  * }
  */
 export function getPending(): AutoUpdatePending {
-  const pending = db.get(AUTO_UPDATE_PENDING);
-  if (!pending) db.set(AUTO_UPDATE_PENDING, {});
+  const pending = db.getAutoUpdatePending();
+  if (!pending) db.setAutoUpdatePending({});
   return pending || {};
 }
 
@@ -361,7 +357,7 @@ export function getPending(): AutoUpdatePending {
  */
 function setPending(name: string, data: AutoUpdatePendingEntry): void {
   const pending = getPending();
-  db.set(AUTO_UPDATE_PENDING, {
+  db.setAutoUpdatePending({
     ...pending,
     [name]: {
       ...(pending[name] || {}),
@@ -393,7 +389,7 @@ export function getDnpFeedbackMessage({
 }: {
   id: string;
   currentVersion: string;
-  registry?: RegistryInterface;
+  registry?: AutoUpdateRegistry;
   pending?: AutoUpdatePending;
 }): AutoUpdateFeedback {
   if (!registry) registry = getRegistry();
@@ -448,7 +444,7 @@ export function getCoreFeedbackMessage({
   pending
 }: {
   currentVersionId: string;
-  registry?: RegistryInterface;
+  registry?: AutoUpdateRegistry;
   pending?: AutoUpdatePending;
 }): AutoUpdateFeedback {
   if (!registry) registry = getRegistry();

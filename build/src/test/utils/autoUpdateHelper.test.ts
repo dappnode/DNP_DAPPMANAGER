@@ -28,20 +28,16 @@ import {
   getDnpFeedbackMessage,
   getCoreFeedbackMessage,
   // Utils
-  getLastRegistryEntry,
-  // String constants
-  AUTO_UPDATE_SETTINGS,
-  AUTO_UPDATE_REGISTRY,
-  AUTO_UPDATE_PENDING
+  getLastRegistryEntry
 } from "../../src/utils/autoUpdateHelper";
 
 const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", () => {
-    db.set(AUTO_UPDATE_SETTINGS, null);
-    db.set(AUTO_UPDATE_REGISTRY, null);
-    db.set(AUTO_UPDATE_PENDING, null);
+    db.setAutoUpdateSettings({});
+    db.setAutoUpdateRegistry({});
+    db.setAutoUpdatePending({});
     expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });
 
@@ -688,8 +684,8 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   after("Should reset all settings", () => {
-    db.set(AUTO_UPDATE_SETTINGS, null);
-    db.set(AUTO_UPDATE_REGISTRY, null);
-    db.set(AUTO_UPDATE_PENDING, null);
+    db.setAutoUpdateSettings({});
+    db.setAutoUpdateRegistry({});
+    db.setAutoUpdatePending({});
   });
 });

@@ -89,7 +89,7 @@ export default async function backupGet({
 
     const fileId = crypto.randomBytes(32).toString("hex");
 
-    db.set(fileId, backupDirComp);
+    db.setFileTransferPath(fileId, backupDirComp);
 
     // DEFER THIS ACTION: Clean intermediate file
     setTimeout(() => {

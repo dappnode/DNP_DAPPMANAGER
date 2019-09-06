@@ -132,18 +132,12 @@ async function resolveApmVersionAndCache({
   name,
   ver
 }: PackageRequest): Promise<string> {
-  /**
-   * Construct a key for the db. The semver CANNOT be 0.1.0 as that would mean {0: {1: {0: {}}}
-   * id = goerli-pantheon-dnp-dappnode-eth-0-1-0
-   */
-  const key = `${name}-${ver}`.split(".").join("-");
-
   // Check if the key is stored in cache. This key-value will never change
-  const hashCache: string = db.get(key);
+  const hashCache = db.getApmCache(name, ver);
   if (hashCache) return hashCache;
 
   const hash = await resolveApmVersion({ name, ver });
-  db.set(key, hash);
+  db.setApmCache(name, ver, hash);
   return hash;
 }
 

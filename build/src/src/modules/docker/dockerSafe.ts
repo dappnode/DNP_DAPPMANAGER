@@ -31,7 +31,7 @@ async function dockerComposeUpSafe(
 
     if (
       e.message.includes("port is already allocated") &&
-      db.get("upnpAvailable")
+      db.getUpnpAvailable()
     ) {
       // Don't try to find which port caused the error.
       // In case of multiple collitions you would need to call this function recursively

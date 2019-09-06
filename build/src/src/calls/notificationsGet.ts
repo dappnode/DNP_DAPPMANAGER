@@ -26,7 +26,7 @@ export default async function notificationsGet(): Promise<
    * The key `notification` returns an object { "id1": <notification obj>, ... }
    */
   const notifications: { [notificationid: string]: PackageNotification } =
-    db.get(`notification`) || {};
+    db.getNotifications() || {};
   const notificationsArray = Object.values(notifications);
 
   return {

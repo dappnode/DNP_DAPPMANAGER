@@ -49,7 +49,7 @@ export default function catStreamToFs({
 
       let totalData = 0;
       let previousProgress = -1;
-      const round = (n: number) =>
+      const round = (n: number): number =>
         resolution * Math.round((100 * n) / resolution);
 
       const onData = (chunk: Buffer): void => {

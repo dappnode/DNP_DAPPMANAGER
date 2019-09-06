@@ -46,7 +46,7 @@ app.get("/download/:fileId", async (req, res) => {
     return res.status(403).send(`Forbidden ip: ${req.ip}`);
 
   const { fileId } = req.params;
-  const filePath: string = db.get(fileId);
+  const filePath = db.getFileTransferPath(fileId);
 
   // If path does not exist, return error
   if (!filePath) return res.status(404).send("File not found");
@@ -86,7 +86,7 @@ app.post("/upload", (req, res) => {
   file.mv(filePath, err => {
     if (err) return res.status(500).send(err);
 
-    db.set(fileId, filePath);
+    db.setFileTransferPath(fileId, filePath);
     res.send(fileId);
     // Delete the file after 15 minutes
     setTimeout(() => {

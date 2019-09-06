@@ -6,7 +6,7 @@ import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
 import {
   AutoUpdateSettings,
-  RegistryInterface,
+  AutoUpdateRegistry,
   AutoUpdatePending,
   AutoUpdateFeedback,
   RpcHandlerReturn
@@ -24,7 +24,7 @@ interface DnpsToShowInterface {
 interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
   result: {
     settings: AutoUpdateSettings;
-    registry: RegistryInterface;
+    registry: AutoUpdateRegistry;
     pending: AutoUpdatePending;
     dnpsToShow: DnpsToShowInterface[];
   };

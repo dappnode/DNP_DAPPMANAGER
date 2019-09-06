@@ -156,7 +156,7 @@ connection.onopen = (session, details): void => {
   eventBusOnSafe(
     eventBusTag.pushNotification,
     async (notification: PackageNotification) => {
-      db.set(`notification.${notification.id}`, notification);
+      db.setNotification(notification.id, notification);
       publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
     },
     { isAsync: true }

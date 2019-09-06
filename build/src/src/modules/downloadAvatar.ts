@@ -22,9 +22,8 @@ export default async function downloadAvatar(hash: string): Promise<string> {
   /**
    * 1. Check if cache exist and validate it
    */
-  const avatarCache: string = db.get(hash);
-  const cacheValidation = validateAvatar(avatarCache);
-  if (cacheValidation.success) return avatarCache;
+  const avatarCache = db.getIpfsCache(hash);
+  if (avatarCache && validateAvatar(avatarCache).success) return avatarCache;
 
   /**
    * 2. Cat stream to file system
@@ -51,7 +50,7 @@ export default async function downloadAvatar(hash: string): Promise<string> {
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
 
-  db.set(hash, avatar);
+  db.setIpfsCache(hash, avatar);
   return avatar;
 }
 
