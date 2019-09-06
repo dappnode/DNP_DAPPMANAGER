@@ -7,10 +7,12 @@ import Logs from "../../../logs";
 const logs = Logs(module);
 
 const timeoutMs = params.IPFS_TIMEOUT || 2000;
+const resolution = 2;
 
 interface CatStreamToFsArgument extends IpfsArgument {
   path: string;
-  onChunk?: (chunk: Buffer) => void;
+  fileSize: number;
+  progress: (n: number) => void;
 }
 
 /**
@@ -27,7 +29,8 @@ interface CatStreamToFsArgument extends IpfsArgument {
 export default function catStreamToFs({
   hash,
   path,
-  onChunk
+  fileSize,
+  progress
 }: CatStreamToFsArgument): Promise<string> {
   return new Promise(
     (resolve, reject): void => {
@@ -44,9 +47,21 @@ export default function catStreamToFs({
         reject(Error(streamId + ": " + err));
       };
 
+      let totalData = 0;
+      let previousProgress = -1;
+      const round = (n: number) =>
+        resolution * Math.round((100 * n) / resolution);
+
       const onData = (chunk: Buffer): void => {
         clearTimeout(timeoutToCancel);
-        if (onChunk) onChunk(chunk);
+        totalData += chunk.length;
+        if (progress && fileSize) {
+          const currentProgress = round(totalData / fileSize);
+          if (currentProgress !== previousProgress) {
+            progress(currentProgress);
+            previousProgress = currentProgress;
+          }
+        }
       };
 
       const onFinish = (data: string): void => {

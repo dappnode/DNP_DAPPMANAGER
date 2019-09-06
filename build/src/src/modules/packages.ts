@@ -44,22 +44,15 @@ export async function download({
     getPath.image(name, imageName, params, isCore)
   );
 
-  // Keep track of the bytes downloaded. Log UI every 2%
-  const onChunk = onChunkFactory(imageSize, 2, function(
-    percent: number,
-    bytes: number
-  ) {
-    const message =
-      percent > 100
-        ? `Downloading (${bytes} / ${imageSize} expected bytes) 100%`
-        : `Downloading ${percent}%`;
-    logUi({ id, name, message });
-  });
-
   // Wrap in try / catch to format the error
   try {
     logUi({ id, name, message: "Starting download..." });
-    await downloadImage(imageHash, imagePath, { onChunk });
+    // Keep track of the bytes downloaded. Log UI every 2%
+    await downloadImage(imageHash, imagePath, imageSize, progress => {
+      let message = `Downloading ${progress}%`;
+      if (progress > 100) message += ` (expected ${imageSize} bytes)`;
+      logUi({ id, name, message });
+    });
   } catch (e) {
     e.message = `Can't download ${name} image: ${e.message}`;
     throw e;
@@ -163,31 +156,4 @@ export async function run({
 
   // Final log
   logUi({ id, name, message: "package started" });
-}
-
-// Utilities
-
-/**
- * Utility to abstract the chunk progress tracking
- * @param {number} totalAmount Total amount to compute the ratio against
- * @param {number} resolution callback is called every ${resolution} %
- * @param {function} callback function(percent, currentAmount) {}
- */
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-function onChunkFactory(
-  totalAmount: number,
-  resolution: number,
-  callback: (percent: number, currentAmount: number) => void
-) {
-  let currentAmount = 0;
-  let prevPercent = 0;
-  return function(chunk: Buffer): void {
-    currentAmount += chunk.length;
-    const ratio = currentAmount / totalAmount;
-    const percent = resolution * Math.ceil((100 * ratio) / resolution);
-    if (percent > prevPercent) {
-      prevPercent = percent;
-      callback(percent, currentAmount);
-    }
-  };
 }

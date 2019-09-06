@@ -23,7 +23,8 @@ const logs = Logs(module);
 export default async function downloadImage(
   hash: string,
   path: string,
-  options?: {}
+  fileSize: number,
+  progress: (n: number) => void
 ): Promise<void> {
   if (!hash || typeof hash !== "string")
     throw Error(`arg hash must be a string: ${hash}`);
@@ -45,7 +46,7 @@ export default async function downloadImage(
    * 2. Cat stream to file system
    * - Make sure the path is correct and the parent folder exist or is created
    */
-  await ipfs.catStreamToFs({ hash, path, ...options });
+  await ipfs.catStreamToFs({ hash, path, fileSize, progress });
 
   /**
    * 3. Validate downloaded image

@@ -46,15 +46,20 @@ describe("ipfs > methods > catStreamToFs", () => {
   });
 
   it("Should download a file", async () => {
-    const onChunk = sinon.stub();
-    const res = await catStreamToFs({ hash: hashOk, path, onChunk });
+    const onProgress = sinon.stub();
+    const res = await catStreamToFs({
+      hash: hashOk,
+      path,
+      fileSize: 1304,
+      progress: (n: number): void => {
+        onProgress(n);
+      }
+    });
     expect(res).to.be.undefined;
     expect(fs.readFileSync(path, "utf8")).to.equal(fileContents);
-    // Check onChunk
-    sinon.assert.called(onChunk);
-    const chunk = onChunk.firstCall.lastArg;
-    expect(chunk instanceof Buffer);
-    expect(String(chunk)).to.equal(fileContents);
+    // Check onProgress, since the file is so short, only the first 0% is logged
+    sinon.assert.called(onProgress);
+    expect(onProgress.firstCall.args).to.deep.equal([0]);
   });
 
   after("Clean test directory", cleanTestDir);
