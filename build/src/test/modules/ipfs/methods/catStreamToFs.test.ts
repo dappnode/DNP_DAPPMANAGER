@@ -5,25 +5,20 @@ import fs from "fs";
 
 const proxyquire = require("proxyquire").noCallThru();
 
-import {
-  testDir,
-  createTestDir,
-  cleanTestDir,
-  CallbackFunction
-} from "../../../testUtils";
+import { testDir, createTestDir, cleanTestDir } from "../../../testUtils";
 
 // With proxyrequire you stub before requiring
 
 const pathSource = testDir + "/hello-world_source.txt";
 const hashOk = "QmeV1kwh3333bsnT6YRfdCRrSgUPngKmAhhTa4RrqYOKOK";
 const ipfs = {
-  catReadableStream: (hash: string) => {
+  catReadableStream: (hash: string): fs.ReadStream => {
     if (hash === hashOk) return fs.createReadStream(pathSource);
     else throw Error("Unknown hash");
   },
   pin: {
-    add: (_: any, callback: CallbackFunction) => {
-      callback(null, "great success");
+    add: (data: string, callback: (err: null, res: string) => void): void => {
+      callback(null, `great success: ${data}`);
     }
   }
 };

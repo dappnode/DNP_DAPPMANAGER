@@ -1,7 +1,8 @@
 import { hasVersion, setVersion } from "../utils/dnpUtils";
 import sanitizeVersions from "./sanitizeVersions";
 import sanitizeDependencies from "./sanitizeDependencies";
-import { DnpsInterface, Dependencies, FetchFunction } from "../types";
+import { Dependencies } from "../../../types";
+import { DnpsInterface, FetchFunction } from "../types";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
@@ -36,7 +37,7 @@ export default async function aggregateDependencies({
   dnps: DnpsInterface;
   recursiveCount?: number;
   fetch: FetchFunction;
-}) {
+}): Promise<void> {
   // Control infinite loops
   if (!recursiveCount) recursiveCount = 1;
   else if (recursiveCount++ > 1000) return;

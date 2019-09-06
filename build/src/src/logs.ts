@@ -1,5 +1,6 @@
 "use strict";
 import winston from "winston";
+
 const { createLogger, format, transports } = winston;
 
 const { LOG_LEVEL } = process.env;
@@ -55,6 +56,8 @@ const scFormat = format.printf(info => {
  *                      logger.
  * @returns {winston.format.label}
  */
+// Let winston return it's own format
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function _getLabel(mod: NodeModule) {
   if (mod == undefined) mod = module;
 
@@ -64,7 +67,7 @@ function _getLabel(mod: NodeModule) {
   return format.label({ label: label });
 }
 
-export default function(mod: NodeModule) {
+export default function(mod: NodeModule): winston.Logger {
   const logger = createLogger({
     level: logLevel,
     format: format.combine(

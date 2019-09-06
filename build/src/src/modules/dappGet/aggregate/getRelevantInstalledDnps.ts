@@ -43,7 +43,7 @@ export default function getRelevantInstalledDnps({
   // Return only packages that are not already included in the requestedDnps array
   return Object.values(state).filter(dnp => !requestedDnps.includes(dnp.name));
 
-  function addDependants(dnp: PackageContainer) {
+  function addDependants(dnp: PackageContainer): void {
     // Prevent possible recursive loops
     if (Date.now() - start > 2000) return;
 
@@ -55,16 +55,16 @@ export default function getRelevantInstalledDnps({
     });
   }
 
-  function addToState(dnp: PackageContainer) {
+  function addToState(dnp: PackageContainer): void {
     state[dnp.name] = dnp;
   }
-  function isInState(dnp: PackageContainer) {
+  function isInState(dnp: PackageContainer): boolean {
     return Boolean(state[dnp.name]);
   }
   function dependsOn(
     dependantPkg: PackageContainer,
     dnp: PackageContainer
-  ) {
+  ): boolean {
     return Boolean(dependantPkg.dependencies[dnp.name]);
   }
 }

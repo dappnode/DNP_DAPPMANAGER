@@ -1,4 +1,13 @@
 import shellExec from "../utils/shell";
+import { RpcHandlerReturn } from "../types";
+
+interface RpcDiagnoseReturn extends RpcHandlerReturn {
+  result: {
+    name: string;
+    result?: string;
+    error?: string;
+  }[];
+}
 
 /**
  * Returns a list of checks done as a diagnose
@@ -12,7 +21,7 @@ import shellExec from "../utils/shell";
  *   } // either "result" or "error" prop will exist
  * }
  */
-export default async function diagnose() {
+export default async function diagnose(): Promise<RpcDiagnoseReturn> {
   // Get docker version
   const dockerVersion = {
     name: "docker version",
@@ -41,7 +50,12 @@ export default async function diagnose() {
  * - On error:
  *   { error: 'sh: docker: not found' }
  */
-function shellExecFormated(cmd: string) {
+function shellExecFormated(
+  cmd: string
+): Promise<{
+  result?: string;
+  error?: string;
+}> {
   return shellExec(cmd)
     .then((data: string) => ({ result: (data || "").trim() }))
     .catch((e: Error) => ({ error: e.message }));

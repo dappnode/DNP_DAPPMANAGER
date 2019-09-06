@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import { eventBusTag } from "../../src/eventBus";
-import { InstallerPkg } from "../../src/types";
+import { InstallerPkg, PackageContainer } from "../../src/types";
 
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -55,7 +55,7 @@ describe("Call function: installPackage", function() {
     eventBusTag
   };
 
-  const listContainers = async () => {};
+  const listContainers = async (): Promise<PackageContainer[]> => [];
 
   // Simulate that only the dependency has p2p ports
   const lockPorts = sinon.stub().callsFake(async id => {
@@ -64,12 +64,13 @@ describe("Call function: installPackage", function() {
   });
 
   // Simulated the chain is already synced
-  const isSyncing = async () => false;
+  const isSyncing = async (): Promise<boolean> => false;
 
   // db to know UPnP state
   const db = {
-    get: (key: string) => {
+    get: (key: string): boolean => {
       if (key === "upnpAvailable") return true;
+      else throw Error("Unexpected key in mock db");
     }
   };
 
@@ -128,7 +129,7 @@ describe("Call function: installPackage", function() {
   interface SortablePkg {
     pkg: InstallerPkg;
   }
-  function sortById(a: SortablePkg, b: SortablePkg) {
+  function sortById(a: SortablePkg, b: SortablePkg): number {
     return a.pkg.name > b.pkg.name ? 1 : a.pkg.name < b.pkg.name ? -1 : 0;
   }
 

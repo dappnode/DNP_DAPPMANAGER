@@ -24,6 +24,8 @@ const { createLogger, format, transports } = winston;
 
 // Custom transport to broadcast new logs to the admin directly
 class EmitToAdmin extends Transport {
+  // I don't know the typing of this contructor opts, and it's pointless to type
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   constructor(opts?: any) {
     super(opts);
   }
@@ -39,7 +41,7 @@ class EmitToAdmin extends Transport {
    *   @property {object} message - e.message
    *   @property {object} stack - e.stack
    */
-  log(info: any, callback: any) {
+  log(info: { level: string }, callback: () => void): void {
     setImmediate(() => {
       eventBus.emit(eventBusTag.logUserAction, info);
     });

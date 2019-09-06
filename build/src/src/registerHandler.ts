@@ -1,12 +1,10 @@
 import logUserAction from "./logUserAction";
 import { Session } from "autobahn";
+import { RpcHandlerReturn } from "./types";
 import Logs from "./logs";
 const logs = Logs(module);
 
-interface KwargsInterace {
-  dontLogError?: boolean;
-  [kwargName: string]: any;
-}
+type KwargsInterace = any;
 
 /*
  * RPC register wrapper
@@ -15,9 +13,15 @@ interface KwargsInterace {
  * and logging of errors and actions.
  */
 
-export const wrapErrors = (handler: (...args: any[]) => any, event: string) =>
+export const wrapErrors = (
+  handler: (kwargs: KwargsInterace) => Promise<RpcHandlerReturn>,
+  event: string
+) =>
   // function(args, kwargs, details)
-  async function(_: any, kwargs: KwargsInterace) {
+  async function wrappedHandler(
+    _0: any[] | undefined,
+    kwargs: KwargsInterace
+  ): Promise<string> {
     if (!kwargs) kwargs = {} as KwargsInterace;
     logs.debug(`In-call to ${event}`);
     // 0. args: an array with call arguments
@@ -93,9 +97,9 @@ export const wrapErrors = (handler: (...args: any[]) => any, event: string) =>
 export const registerHandler = (
   session: Session,
   event: string,
-  handler: (...args: any[]) => any
-) => {
-  return session.register(event, wrapErrors(handler, event)).then(
+  handler: (kwargs: KwargsInterace) => Promise<RpcHandlerReturn>
+): void => {
+  session.register(event, wrapErrors(handler, event)).then(
     () => {
       logs.info(`Registered event: ${event}`);
     },
@@ -105,6 +109,7 @@ export const registerHandler = (
   );
 };
 
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function error2obj(e: Error) {
   return { message: e.message, stack: e.stack, userAction: true };
 }

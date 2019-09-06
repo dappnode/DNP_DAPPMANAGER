@@ -1,6 +1,7 @@
 import { changePassword } from "../modules/passwordManager";
 // External calls
 import passwordIsSecure from "./passwordIsSecure";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Changes the user `dappnode`'s password in the host machine
@@ -12,7 +13,7 @@ export default async function passwordChange({
   newPassword
 }: {
   newPassword: string;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);

@@ -8,7 +8,7 @@
  */
 export function getCoreVersionId(
   coreDnps: { name: string; version: string }[]
-) {
+): string {
   return coreDnps
     .filter(({ name, version }) => name && version)
     .map(({ name, version }) => [name.split(".")[0], version].join("@"))

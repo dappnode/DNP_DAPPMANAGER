@@ -75,7 +75,7 @@ export function getPermutationsTable(
  */
 export function getTotalPermutations(
   permutationsTable: PermutationsTableInterface
-) {
+): number {
   return Object.values(permutationsTable).reduce(
     (num, dnp) => num * dnp.versions.length,
     1
@@ -101,7 +101,7 @@ export function getTotalPermutations(
 export function getPermutation(
   permutationsTable: PermutationsTableInterface,
   i: number
-) {
+): PermutationInterface {
   const permutation: PermutationInterface = {};
   for (const dnp of permutationsTable) {
     permutation[dnp.name] = dnp.versions[Math.floor(i / dnp.m) % dnp.n];

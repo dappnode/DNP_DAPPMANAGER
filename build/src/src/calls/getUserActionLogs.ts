@@ -1,6 +1,7 @@
 import fs from "fs";
 import { promisify } from "util";
 import params from "../params";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Returns the user action logs. This logs are stored in a different
@@ -25,7 +26,10 @@ import params from "../params";
  * }
  */
 
-export default async function getUserActionLogs({ fromLog = 0, numLogs = 50 }) {
+export default async function getUserActionLogs({
+  fromLog = 0,
+  numLogs = 50
+}): Promise<RpcHandlerReturn> {
   const { userActionLogsFilename } = params;
 
   if (!fs.existsSync(userActionLogsFilename)) {

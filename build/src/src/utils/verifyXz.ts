@@ -10,7 +10,12 @@ import shell from "./shell";
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-export default function verifyXz(xzFilePath: string) {
+export default function verifyXz(
+  xzFilePath: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> {
   return shell(`xz -t ${xzFilePath}`)
     .then(() => ({
       success: true,

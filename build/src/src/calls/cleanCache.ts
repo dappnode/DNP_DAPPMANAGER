@@ -2,6 +2,7 @@ import params from "../params";
 import restartPatch from "../modules/restartPatch";
 // Utils
 import shell from "../utils/shell";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Cleans the cache files of the DAPPMANAGER:
@@ -9,7 +10,7 @@ import shell from "../utils/shell";
  * - user action logs
  * - temp transfer folder
  */
-export default async function cleanCache() {
+export default async function cleanCache(): Promise<RpcHandlerReturn> {
   const pathsToDelete = [
     params.DB_PATH,
     params.userActionLogsFilename,

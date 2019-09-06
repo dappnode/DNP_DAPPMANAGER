@@ -13,8 +13,10 @@ import isIpfsHash from "../../../utils/isIpfsHash";
  * @param {function} sortFunction can be semver.rcompare for example
  * @returns {function} wrapped sort function
  */
-function safeSort(sortFunction: (a: string, b: string) => number) {
-  return (v1: string, v2: string) => {
+function safeSort(
+  sortFunction: (a: string, b: string) => number
+): (a: string, b: string) => number {
+  return (v1: string, v2: string): number => {
     // 1. Put IPFS versions the first
     if (isIpfsHash(v1)) return -1;
     if (isIpfsHash(v2)) return 1;
@@ -29,7 +31,7 @@ function safeSort(sortFunction: (a: string, b: string) => number) {
 export const rcompare = safeSort(semver.rcompare);
 export const compare = safeSort(semver.compare);
 
-export function satisfies(ver: string, range: string) {
+export function satisfies(ver: string, range: string): boolean {
   // satisfies(ver, range)
   // 1. an IPFS ver satisfies any range
   // 2. an IPFS range only allows that exact ver

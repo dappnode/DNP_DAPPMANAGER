@@ -1,5 +1,6 @@
 import * as ipfs from "./ipfs";
 import * as db from "../db";
+import { Manifest } from "../types";
 
 const maxLenght = 100e3; // Limit manifest size to ~100KB
 
@@ -14,7 +15,9 @@ const maxLenght = 100e3; // Limit manifest size to ~100KB
  *
  * @param {string} hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
  */
-export default async function downloadManifest(hash: string) {
+export default async function downloadManifest(
+  hash: string
+): Promise<Manifest> {
   if (!hash || typeof hash !== "string")
     throw Error(`arg hash must be a string: ${hash}`);
 
@@ -24,8 +27,8 @@ export default async function downloadManifest(hash: string) {
    * parse it and return a valid object if the validation succeeeds
    */
   const manifestStringCache: string = db.get(hash);
-  const cacheValidation = await validateManifest(manifestStringCache);
-  if (cacheValidation.success) return cacheValidation.manifest;
+  const cacheValidation = validateManifest(manifestStringCache);
+  if (cacheValidation.success) return JSON.parse(manifestStringCache);
 
   /**
    * 2. Cat stream to file system
@@ -37,13 +40,13 @@ export default async function downloadManifest(hash: string) {
    * 3. Validate downloaded image
    * Store the un-parsed manifest in the cache
    */
-  const validation = await validateManifest(manifestString);
+  const validation = validateManifest(manifestString);
   if (!validation.success)
     throw Error(
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
   db.set(hash, manifestString);
-  return validation.manifest;
+  return JSON.parse(manifestString);
 }
 
 /**
@@ -60,7 +63,9 @@ export default async function downloadManifest(hash: string) {
  *   message: "File size is 0 bytes" {string}
  * }
  */
-async function validateManifest(manifestString: string) {
+function validateManifest(
+  manifestString: string
+): { success: boolean; message: string } {
   if (!manifestString)
     return {
       success: false,
@@ -68,10 +73,10 @@ async function validateManifest(manifestString: string) {
     };
 
   try {
-    const manifest = JSON.parse(manifestString);
+    JSON.parse(manifestString);
     return {
       success: true,
-      manifest
+      message: ""
     };
   } catch (e) {
     return { success: false, message: "Invalid JSON" };

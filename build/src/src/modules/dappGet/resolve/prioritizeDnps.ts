@@ -1,4 +1,8 @@
-import { DnpsInterface } from "../types";
+import { DnpsInterface, DnpInterface } from "../types";
+
+interface PrioritizeDnpReturn extends DnpInterface {
+  name: string;
+}
 
 /**
  * Converts the dnps object into an array
@@ -41,7 +45,9 @@ import { DnpsInterface } from "../types";
  *   {name: 'A', isRequest: true, versions: []},
  * ]
  */
-export default function prioritizeDnps(dnps: DnpsInterface) {
+export default function prioritizeDnps(
+  dnps: DnpsInterface
+): PrioritizeDnpReturn[] {
   // Convert the dnps object into an array of objects appending the name
   return (
     Object.keys(dnps)

@@ -1,5 +1,6 @@
 import upnpcCommand from "./upnpcCommand";
 import parseListOutput from "./parseListOutput";
+import { UpnpPortMapping } from "./types";
 
 /**
  * Lists current port mapping for DAppNode
@@ -13,7 +14,7 @@ import parseListOutput from "./parseListOutput";
  *   {protocol: 'TCP', exPort: '30303', inPort: '30303'},
  * ]
  */
-export default async function list() {
+export default async function list(): Promise<UpnpPortMapping[]> {
   try {
     const res = await upnpcCommand(`-l`);
     return parseListOutput(res);

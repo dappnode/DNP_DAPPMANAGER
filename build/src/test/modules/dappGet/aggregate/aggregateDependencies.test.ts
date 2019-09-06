@@ -4,6 +4,14 @@ import semver from "semver";
 import sinon from "sinon";
 
 import aggregateDependencies from "../../../../src/modules/dappGet/aggregate/aggregateDependencies";
+import { Dependencies } from "../../../../src/types";
+
+interface MockDnpDependencies {
+  [dnpName: string]: Dependencies;
+}
+interface MockVersions {
+  [dnpName: string]: string[];
+}
 
 /**
  * Purpose of the test. Make sure it is able recursively fetch a DNP's dependencies
@@ -25,7 +33,9 @@ import aggregateDependencies from "../../../../src/modules/dappGet/aggregate/agg
  *   - 'dnpC.dnp.dappnode.eth' => 'dnpA.dnp.dappnode.eth'
  */
 
-const fetchVersions = (versions: any) =>
+// Don't need to redefine sinon complex type
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+const fetchVersions = (versions: MockVersions) =>
   sinon
     .stub()
     .callsFake(
@@ -43,7 +53,9 @@ const fetchVersions = (versions: any) =>
       }
     );
 
-const fetchDependencies = (dependencies: any) =>
+// Don't need to redefine sinon complex type
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+const fetchDependencies = (dependencies: MockDnpDependencies) =>
   sinon.stub().callsFake(async ({ name }: { name: string }) => {
     if (!dependencies[name])
       throw Error(`No dependencies found for dnp: ${name}`);
@@ -52,15 +64,13 @@ const fetchDependencies = (dependencies: any) =>
 
 describe("dappGet/aggregate/aggregateDependencies", () => {
   it("should fetch the correct dependencies", async () => {
-    const versions = {
+    const versions: MockVersions = {
       "kovan.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0", "0.2.1"],
       "dependency.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0"]
     };
 
-    const dependencies = {
-      "kovan.dnp.dappnode.eth": {
-        "dependency.dnp.dappnode.eth": "^0.1.1"
-      },
+    const dependencies: MockDnpDependencies = {
+      "kovan.dnp.dappnode.eth": { "dependency.dnp.dappnode.eth": "^0.1.1" },
       "dependency.dnp.dappnode.eth": {}
     };
 
@@ -90,13 +100,13 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
   });
 
   it("should not crash with circular dependencies", async () => {
-    const versions = {
+    const versions: MockVersions = {
       "dnpA.dnp.dappnode.eth": ["0.1.0"],
       "dnpB.dnp.dappnode.eth": ["0.1.0"],
       "dnpC.dnp.dappnode.eth": ["0.1.0"]
     };
 
-    const dependencies = {
+    const dependencies: MockDnpDependencies = {
       "dnpA.dnp.dappnode.eth": { "dnpB.dnp.dappnode.eth": "^0.1.0" },
       "dnpB.dnp.dappnode.eth": { "dnpC.dnp.dappnode.eth": "^0.1.0" },
       "dnpC.dnp.dappnode.eth": { "dnpA.dnp.dappnode.eth": "^0.1.0" }

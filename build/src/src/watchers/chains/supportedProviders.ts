@@ -1,6 +1,6 @@
 export interface Chain {
   name: string;
-  api: any;
+  api: string;
   driverName: string;
 }
 

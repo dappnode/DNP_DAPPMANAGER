@@ -1,5 +1,9 @@
 import { eventBus, eventBusTag } from "../eventBus";
-import { PackageNotification, NotificationType } from "../types";
+import {
+  PackageNotification,
+  NotificationType,
+  RpcHandlerReturn
+} from "../types";
 
 /**
  * Adds a notification to be shown the UI.
@@ -17,7 +21,7 @@ export default async function notificationsTest({
   notification
 }: {
   notification: PackageNotification;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!notification) {
     const id = String(Math.random()).slice(2);
     notification = {

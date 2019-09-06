@@ -41,7 +41,7 @@ export function eventBusOnSafe(
   eventName: string,
   listener: (...args: any[]) => void,
   options?: { isAsync: boolean }
-) {
+): void {
   if (options && options.isAsync) {
     eventBus.on(eventName, async (...args: any[]) => {
       try {

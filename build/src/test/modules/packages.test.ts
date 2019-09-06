@@ -3,7 +3,6 @@ import chai from "chai";
 import sinon from "sinon";
 import * as getPath from "../../src/utils/getPath";
 import params from "../../src/params";
-import { CallbackFunction } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 const { manifestToCompose } = require("@dappnode/dnp-manifest");
 const expect = chai.expect;
@@ -32,7 +31,7 @@ describe("Util: package install / download", () => {
 
   // ipfs .download, .isfileHashValid
   const downloadImageSpy = sinon.spy();
-  const downloadImage = async (hash: string, path: string) => {
+  const downloadImage = async (hash: string, path: string): Promise<void> => {
     downloadImageSpy(hash, path);
   };
 
@@ -44,12 +43,12 @@ describe("Util: package install / download", () => {
     compose: {
       up: dockerComposeUpSpy
     },
-    images: async () => {}
+    images: async (): Promise<void> => {}
   };
 
   // validate .path --> blindly accept all paths
   const validate = {
-    path: (path: string) => path
+    path: (path: string): string => path
   };
 
   // fs .writeFileSync, .existsSync, .unlinkSync
@@ -60,16 +59,19 @@ describe("Util: package install / download", () => {
     writeFile: async (
       data: string,
       path: string,
-      callback: CallbackFunction
-    ) => {
+      callback: (err: null, res: string) => void
+    ): Promise<void> => {
       fsWriteFileSpy(data, path);
       callback(null, "great success");
     },
-    existsSync: async (path: string) => {
+    existsSync: async (path: string): Promise<boolean> => {
       fsExistsSyncSpy(path);
       return true;
     },
-    unlink: (path: string, callback: CallbackFunction) => {
+    unlink: (
+      path: string,
+      callback: (err: null, res: string) => void
+    ): void => {
       fsUnlinkSpy(path);
       callback(null, "great success");
     }

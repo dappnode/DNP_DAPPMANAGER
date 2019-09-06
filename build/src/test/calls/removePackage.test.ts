@@ -42,8 +42,9 @@ describe("Call function: removePackage", function() {
 
   // db to know UPnP state
   const db = {
-    get: (key: string) => {
+    get: (key: string): boolean => {
       if (key === "upnpAvailable") return true;
+      else return false;
     }
   };
 

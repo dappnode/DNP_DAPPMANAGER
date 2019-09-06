@@ -37,7 +37,7 @@ import {
 function mergeManifestVols(
   manifest: Manifest,
   userSetVols: UserSetPackageVols
-) {
+): Manifest {
   const name = (manifest || {}).name;
   const manifestVols = ((manifest || {}).image || {}).volumes; // is an array
   // No volumes for this specific manifest
@@ -87,7 +87,7 @@ function mergeManifestVols(
 function mergeManifestPorts(
   manifest: Manifest,
   userSetPorts: UserSetPackagePorts
-) {
+): Manifest {
   const name = (manifest || {}).name;
   const manifestPorts = ((manifest || {}).image || {}).ports; // is an array
   // No ports for this specific manifest
@@ -116,7 +116,7 @@ function mergeManifestPorts(
  * envObj = { ENV_NAME: "ENV_VALUE" }
  * @returns {object} envs = { ENV_NAME: "ENV_VALUE" }
  */
-function mergeEnvs(...envObjs: PackageEnvs[]) {
+function mergeEnvs(...envObjs: PackageEnvs[]): PackageEnvs {
   const envNames = Object.keys(Object.assign({}, ...envObjs));
   return envNames.reduce((envs: PackageEnvs, envName) => {
     envs[envName] = envObjs.reduce(

@@ -12,7 +12,7 @@ const logs = Logs(module);
 export default async function shellWrap(
   cmd: string,
   options?: { timeout?: number }
-) {
+): Promise<string> {
   try {
     return await shell(cmd, options);
   } catch (e) {

@@ -1,5 +1,7 @@
 import "mocha";
 import { expect } from "chai";
+import { PackageContainer } from "../../src/types";
+import { mockDnp } from "../testUtils";
 
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -14,13 +16,15 @@ describe("Call function: logPackage", function() {
   const id = "test.dnp.dappnode.eth";
   const containerName = `DAppNodePackage-${id}`;
   const docker = {
-    log: async () => {
+    log: async (): Promise<string> => {
       hasLogged = true;
       return logsString;
     }
   };
 
-  const listContainers = async () => [{ name: id, packageName: containerName }];
+  const listContainers = async (): Promise<PackageContainer[]> => [
+    { ...mockDnp, name: id, packageName: containerName }
+  ];
 
   const { default: logPackage } = proxyquire("../../src/calls/logPackage", {
     "../modules/docker": docker,

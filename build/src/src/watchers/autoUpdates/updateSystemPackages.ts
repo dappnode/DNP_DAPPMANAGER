@@ -13,10 +13,10 @@ const logs = Logs(module);
 
 const coreDnpName = "core.dnp.dappnode.eth";
 
-export default async function updateSystemPackages() {
+export default async function updateSystemPackages(): Promise<void> {
   const {
     result: { available, type, versionId }
-  } = await fetchCoreUpdateData();
+  } = await fetchCoreUpdateData({});
 
   // If there is not update available or the type is not patch, return early
   if (!available || type !== "patch") return;

@@ -7,6 +7,11 @@ import listContainers from "../modules/listContainers";
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";
 import params from "../params";
+import { RpcHandlerReturn } from "../types";
+
+interface RpcCopyFileToReturn extends RpcHandlerReturn {
+  result: string;
+}
 
 const maxSizeKb = 10e3;
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
@@ -31,7 +36,7 @@ export default async function copyFileFrom({
 }: {
   id: string;
   fromPath: string;
-}) {
+}): Promise<RpcCopyFileToReturn> {
   if (!id) throw Error("Argument id must be defined");
   if (!fromPath) throw Error("Argument fromPath must be defined");
 
@@ -152,7 +157,7 @@ export default async function copyFileFrom({
  * @param {string} path "app/file.gz"
  * @returns {string} size in KB "12"
  */
-async function getFileOrDirSize(path: string) {
+async function getFileOrDirSize(path: string): Promise<number> {
   const output = await shell(`du -s -k ${path}`);
   const sizeString = output
     .trim()

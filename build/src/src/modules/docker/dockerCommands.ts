@@ -1,3 +1,4 @@
+import { DockerOptionsInterface } from "../../types";
 import shell from "./shell";
 
 /* eslint-disable no-useless-escape */
@@ -17,7 +18,7 @@ const docker = {
     // --build                    Build images before starting containers.
     // --exit-code-from SERVICE   Return the exit code of the selected service
     //                            container. Implies --abort-on-container-exit.
-    up: (dcPath: string, options?: OptionsInterface) =>
+    up: (dcPath: string, options?: DockerOptionsInterface): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} up -d`, options || {})),
 
     // Usage: down [options]
@@ -28,29 +29,35 @@ const docker = {
     //     -v, --volumes           Remove named volumes declared in the `volumes`
     //     --remove-orphans        Remove containers for services not defined in the Compose file
     //     -t, --timeout TIMEOUT   Specify a shutdown timeout in seconds. (default: 10)
-    down: (dcPath: string, options?: OptionsInterface) =>
+    down: (dcPath: string, options?: DockerOptionsInterface): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} down`, options || {})),
 
     // Usage: start [SERVICE...]
-    start: (dcPath: string, options?: OptionsInterface) =>
+    start: (
+      dcPath: string,
+      options?: DockerOptionsInterface
+    ): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} start`, options || {})),
 
     // Usage: stop [options] [SERVICE...]
     // Options:
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-    stop: (dcPath: string, options?: OptionsInterface) =>
+    stop: (dcPath: string, options?: DockerOptionsInterface): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} stop`, options || {})),
 
     // Usage: restart [options] [SERVICE...]
     // Options:
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
-    rm: (dcPath: string, options?: OptionsInterface) =>
+    rm: (dcPath: string, options?: DockerOptionsInterface): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} rm -sf`, options || {})),
 
     // Usage: restart [options] [SERVICE...]
     // Options:
     // -t, --timeout TIMEOUT      Specify a shutdown timeout in seconds. (default: 10)
-    restart: (dcPath: string, options?: OptionsInterface) =>
+    restart: (
+      dcPath: string,
+      options?: DockerOptionsInterface
+    ): Promise<string> =>
       shell(withOptions(`docker-compose -f ${dcPath} restart`, options || {})),
 
     // Usage: logs [options] [SERVICE...]
@@ -60,7 +67,7 @@ const docker = {
     // -t, --timestamps    Show timestamps
     // --tail="all"        Number of lines to show from the end of the logs
     //                     for each container.
-    logs: (dcPath: string, options?: OptionsInterface) =>
+    logs: (dcPath: string, options?: DockerOptionsInterface): Promise<string> =>
       shell(
         withOptions(`docker-compose -f ${dcPath} logs`, options || {}) + " 2>&1"
       ),
@@ -68,23 +75,26 @@ const docker = {
     // Usage: ps [options] [SERVICE...]
     // Options:
     // -q    Only display IDs
-    ps: (dcPath: string) => shell(`docker-compose -f ${dcPath} ps`)
+    ps: (dcPath: string): Promise<string> =>
+      shell(`docker-compose -f ${dcPath} ps`)
   },
 
   volume: {
     // docker volume rm [OPTIONS] VOLUME [VOLUME...]
     // --force , -f  Force the removal of one or more volumes
-    rm: (volumeName: string) => shell(`docker volume rm -f ${volumeName}`)
+    rm: (volumeName: string): Promise<string> =>
+      shell(`docker volume rm -f ${volumeName}`)
   },
 
   // SPECIAL OPERATION
   // Searches for semver
-  images: () => shell(`docker images --format "{{.Repository}}:{{.Tag}}"`),
+  images: (): Promise<string> =>
+    shell(`docker images --format "{{.Repository}}:{{.Tag}}"`),
 
-  rmi: (imgsToDelete: string[]) =>
+  rmi: (imgsToDelete: string[]): Promise<string> =>
     shell(`docker rmi ${imgsToDelete.join(" ")}`),
 
-  rmOldSemverImages: (packageName: string) =>
+  rmOldSemverImages: (packageName: string): Promise<string> =>
     shell(
       `docker rmi $(docker images --format "{{.Repository}}:{{.Tag}}" | grep "${packageName}:[0-9]\+.[0-9]\+.[0-9]\+")`
     ),
@@ -93,11 +103,12 @@ const docker = {
   // Usage: docker load [OPTIONS]
   // --input , -i		Read from tar archive file, instead of STDIN
   // --quiet , -q		Suppress the load output
-  load: (imagePath: string) => shell(`docker load -i ${imagePath}`),
+  load: (imagePath: string): Promise<string> =>
+    shell(`docker load -i ${imagePath}`),
 
   // NOT A DOCKER-COMPOSE
   // Usage: docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
-  tag: (sourceImage: string, targetImage: string) =>
+  tag: (sourceImage: string, targetImage: string): Promise<string> =>
     shell(`docker tag ${sourceImage} ${targetImage}`),
 
   // NOT A DOCKER-COMPOSE
@@ -106,7 +117,7 @@ const docker = {
   log: (
     containerNameOrId: string,
     options: { timestamps: boolean; tail: number }
-  ) => {
+  ): Promise<string> => {
     // Parse options
     let optionsString = "";
     // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
@@ -119,17 +130,21 @@ const docker = {
   // NOT A DOCKER-COMPOSE
   // Usage: docker system df [OPTIONS]
   // --verbose , -v		Show detailed information on space usage
-  systemDf: () => shell("docker system df --verbose"),
+  systemDf: (): Promise<string> => shell("docker system df --verbose"),
 
   // File manager, copy command
-  copyFileFrom: (id: string, fromPath: string, toPath: string) =>
+  copyFileFrom: (
+    id: string,
+    fromPath: string,
+    toPath: string
+  ): Promise<string> =>
     shell(`docker cp --follow-link ${id}:${fromPath} ${toPath}`),
 
-  copyFileTo: (id: string, fromPath: string, toPath: string) =>
+  copyFileTo: (id: string, fromPath: string, toPath: string): Promise<string> =>
     shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`),
 
   // Metadata getters
-  getContainerWorkingDir: (id: string) =>
+  getContainerWorkingDir: (id: string): Promise<string> =>
     shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`)
 };
 
@@ -138,16 +153,8 @@ const docker = {
  * @param {string} command
  * @param {object} options
  */
-function withOptions(command: string, options: OptionsInterface) {
+function withOptions(command: string, options: DockerOptionsInterface): string {
   return [command, parseOptions(options)].filter(x => x).join(" ");
-}
-
-interface OptionsInterface {
-  timeout?: number;
-  timestamps?: boolean;
-  volumes?: boolean;
-  v?: boolean;
-  core?: string;
 }
 
 function parseOptions({
@@ -156,7 +163,7 @@ function parseOptions({
   volumes,
   v,
   core
-}: OptionsInterface) {
+}: DockerOptionsInterface): string {
   const options = [];
 
   // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).

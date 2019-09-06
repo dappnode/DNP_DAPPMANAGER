@@ -44,7 +44,7 @@ import parseGeneralErrors from "./parseGeneralErrors";
  * @param {string} terminalOutput A sample can be found above
  * @returns {*}
  */
-export default function parseCloseOutput(terminalOutput: string) {
+export default function parseCloseOutput(terminalOutput: string): boolean {
   parseGeneralErrors(terminalOutput);
 
   // Get the last line of the output
@@ -61,5 +61,7 @@ export default function parseCloseOutput(terminalOutput: string) {
   const okRegex = RegExp(/returned.+0/);
   if (okRegex.test(lastLine)) {
     return true;
+  } else {
+    return false;
   }
 }

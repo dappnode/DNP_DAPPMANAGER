@@ -4,14 +4,21 @@ import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import { stringifyEnvs } from "../../src/utils/parse";
-
+import { PackageContainer, RpcHandlerReturn } from "../../src/types";
+import { DockerApiSystemDfReturn } from "../../src/modules/dockerApi";
+import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
+
+interface RpcListPackagesReturn extends RpcHandlerReturn {
+  result: PackageContainer[];
+}
 
 describe("Call function: listPackages", function() {
   let hasListed = false;
   const envs = { VAR1: "VALUE1" };
   const mockList = [
     {
+      ...mockDnp,
       name: "test.dnp.dappnode.eth"
     }
   ];
@@ -19,16 +26,14 @@ describe("Call function: listPackages", function() {
   const expectedResult = [Object.assign({ envs }, mockList[0])];
 
   // Mock docker calls
-  const listContainers = async () => {
+  const listContainers = async (): Promise<PackageContainer[]> => {
     hasListed = true;
     return mockList;
   };
 
-  const docker = {
-    systemDf: async () => {
-      return [];
-    }
-  };
+  async function dockerDf(): Promise<DockerApiSystemDfReturn> {
+    return mockDockerSystemDfDataSample;
+  }
 
   // Mock params
   const params = {
@@ -39,7 +44,7 @@ describe("Call function: listPackages", function() {
   // initialize call
   const { default: listPackages } = proxyquire("../../src/calls/listPackages", {
     "../modules/listContainers": listContainers,
-    "../modules/docker": docker,
+    "../modules/dockerApi": { dockerDf },
     "../params": params
   });
 
@@ -50,7 +55,7 @@ describe("Call function: listPackages", function() {
     fs.writeFileSync(ENV_PATH, stringifyEnvs(envs));
   });
 
-  let res: any;
+  let res: RpcListPackagesReturn;
   it("should list packages with correct arguments", async () => {
     res = await listPackages();
     expect(hasListed).to.be.true;

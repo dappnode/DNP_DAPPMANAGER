@@ -70,7 +70,9 @@ export function mergePortMappings(
 ): PortMapping[] {
   // Give each port mapping a deterministic key so mappings targeting
   // the same container port number and protocol get overwritten
-  function transformPortMappingToObject(portMappings: PortMapping[]) {
+  function transformPortMappingToObject(
+    portMappings: PortMapping[]
+  ): { [portMappingsId: string]: PortMapping } {
     return portMappings.reduce((obj, portMapping) => {
       const { container, protocol } = portMapping;
       if (!container) throw Error(`Invalid portMapping, key container is null`);
@@ -85,10 +87,11 @@ export function mergePortMappings(
   });
 
   // Make the order deterministic, by port number and then TCP first
-  return mergedPortMappings.sort(function(a: PortMapping, b: PortMapping) {
-    function numGetter(portMapping: PortMapping) {
-      return portMapping.container + (portMapping.protocol === "UDP" ? 0.5 : 0);
+  return mergedPortMappings.sort(
+    (a: PortMapping, b: PortMapping): number => {
+      const numGetter = (portMapping: PortMapping): number =>
+        portMapping.container + (portMapping.protocol === "UDP" ? 0.5 : 0);
+      return numGetter(a) - numGetter(b);
     }
-    return numGetter(a) - numGetter(b);
-  });
+  );
 }

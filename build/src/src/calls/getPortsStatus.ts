@@ -1,5 +1,13 @@
 import * as db from "../db";
-import { PackagePort, PortMapping } from "../types";
+import { PackagePort, PortMapping, RpcHandlerReturn } from "../types";
+
+interface RpcGetPortsStatusReturn extends RpcHandlerReturn {
+  result: {
+    upnpAvailable: boolean;
+    portsToOpen: PackagePort[];
+    currentPortMappings: PortMapping[];
+  };
+}
 
 /**
  * Returns the current ports status
@@ -22,9 +30,11 @@ import { PackagePort, PortMapping } from "../types";
  *   ]
  * }
  */
-export default async function getPortsStatus() {
+export default async function getPortsStatus(): Promise<
+  RpcGetPortsStatusReturn
+> {
   const upnpAvailable: boolean = db.get("upnpAvailable");
-  const portsToOpen: PackagePort = db.get("portsToOpen");
+  const portsToOpen: PackagePort[] = db.get("portsToOpen");
   const currentPortMappings: PortMapping[] = db.get("currentPortMappings");
 
   return {

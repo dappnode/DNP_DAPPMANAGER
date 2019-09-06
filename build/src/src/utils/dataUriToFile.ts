@@ -7,7 +7,7 @@ const dataUriToBuffer = require("data-uri-to-buffer");
  * @param {string} dataUri = data:application/zip;base64,UEsDBBQAAAg...
  * @param {string} pathTo = DNCORE/tempfile
  */
-export default function dataUriToFile(dataUri: string, pathTo: string) {
+export default function dataUriToFile(dataUri: string, pathTo: string): void {
   const decodedBuffer = dataUriToBuffer(dataUri);
   fs.writeFileSync(pathTo, decodedBuffer);
 }

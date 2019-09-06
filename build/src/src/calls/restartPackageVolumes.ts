@@ -7,6 +7,7 @@ import { eventBus, eventBusTag } from "../eventBus";
 // Utils
 import * as getPath from "../utils/getPath";
 import Logs from "../logs";
+import { RpcHandlerReturn } from "../types";
 const logs = Logs(module);
 
 /**
@@ -20,7 +21,7 @@ export default async function restartPackageVolumes({
 }: {
   id: string;
   doNotRestart?: boolean;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   // Don't query byId so the volume info is aggregated for all packages

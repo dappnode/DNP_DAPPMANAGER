@@ -41,7 +41,7 @@ const thresholdIsActive: {
  *
  * @returns {*}
  */
-async function monitorDiskUsage() {
+async function monitorDiskUsage(): Promise<void> {
   try {
     const diskAvailable = await shellExec(`df -k / | awk 'NR>1 { print $4}'`);
     if (!diskAvailable || typeof diskAvailable !== "string")

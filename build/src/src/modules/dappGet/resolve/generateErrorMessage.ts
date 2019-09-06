@@ -15,7 +15,7 @@ export default function generateErrorMessage({
   caseId: number;
   totalCases: number;
   errors: ErrorsInterface;
-}) {
+}): string {
   const errorMsgs = [];
   // Timeout message
   if (hasTimedOut) errorMsgs.push(`Resolver timed out (${timeoutMs} ms).`);
@@ -53,7 +53,7 @@ export default function generateErrorMessage({
   return errorMsgs.join(" ");
 }
 
-function stripVersion(s: string) {
+function stripVersion(s: string): string {
   if (!s || typeof s !== "string") return s;
   return s.split("@")[0];
 }

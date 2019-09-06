@@ -11,7 +11,9 @@ describe("dockerList", function() {
     {
       "./dockerApi": {
         dockerApi: {
-          listContainers: async () => dockerApiResponseContainers
+          // I can't access to the original type of dockerode, and it's pointless to type
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+          listContainers: async (): Promise<any> => dockerApiResponseContainers
         }
       }
     }

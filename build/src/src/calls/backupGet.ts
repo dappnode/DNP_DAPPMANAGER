@@ -10,7 +10,11 @@ import listContainers from "../modules/listContainers";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup } from "../types";
+import { PackageBackup, RpcHandlerReturn } from "../types";
+
+interface RpcBackupGetReturn extends RpcHandlerReturn {
+  result: string;
+}
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -30,7 +34,7 @@ export default async function backupGet({
 }: {
   id: string;
   backup: PackageBackup[];
-}) {
+}): Promise<RpcBackupGetReturn> {
   if (!id) throw Error("Argument id must be defined");
   if (!backup) throw Error("Argument backup must be defined");
   if (!backup.length) throw Error("No backup items specified");

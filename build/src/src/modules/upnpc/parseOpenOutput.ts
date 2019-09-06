@@ -31,7 +31,7 @@ import parseGeneralErrors from "./parseGeneralErrors";
  * @param {string} terminalOutput A sample can be found above
  * @returns {*}
  */
-export default function parseOpenOutput(terminalOutput: string) {
+export default function parseOpenOutput(terminalOutput: string): boolean {
   parseGeneralErrors(terminalOutput);
 
   // Get the last line of the output
@@ -42,5 +42,7 @@ export default function parseOpenOutput(terminalOutput: string) {
   const okRegex = RegExp(/is.redirected/);
   if (okRegex.test(lastLine)) {
     return true;
+  } else {
+    return false;
   }
 }

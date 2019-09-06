@@ -54,13 +54,15 @@ export default async function monero(
   name: string,
   api: string
 ): Promise<ChainData> {
-  const info: MoneroRpcGetInfoResult = await new Promise((resolve, reject) => {
-    const daemon = new Daemon(api);
-    daemon.getInfo((err: Error, res: MoneroRpcGetInfoResult) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
-  });
+  const info: MoneroRpcGetInfoResult = await new Promise(
+    (resolve, reject): void => {
+      const daemon = new Daemon(api);
+      daemon.getInfo((err: Error, res: MoneroRpcGetInfoResult) => {
+        if (err) reject(err);
+        else resolve(res);
+      });
+    }
+  );
 
   const highestBlock = info.target_height;
   const currentBlock = info.height;

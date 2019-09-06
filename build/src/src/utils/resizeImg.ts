@@ -1,7 +1,10 @@
 import Jimp from "jimp";
 
-export default function resizeImg(imageBuffer: Buffer, pixelWidth: number) {
-  return Jimp.read(imageBuffer).then((image: any) =>
+export default function resizeImg(
+  imageBuffer: Buffer,
+  pixelWidth: number
+): Promise<Buffer> {
+  return Jimp.read(imageBuffer).then(image =>
     image
       .contain(
         pixelWidth,

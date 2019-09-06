@@ -1,7 +1,7 @@
 import lockPorts from "../modules/lockPorts";
 // Utils
 import { getComposeInstance } from "../utils/dockerComposeFile";
-import { PortMapping } from "../types";
+import { PortMapping, RpcHandlerReturn } from "../types";
 // External call
 import restartPackage from "./restartPackage";
 import { eventBus, eventBusTag } from "../eventBus";
@@ -24,7 +24,7 @@ export default async function updatePortMappings({
   id: string;
   portMappings: PortMapping[];
   options?: { merge: boolean };
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");

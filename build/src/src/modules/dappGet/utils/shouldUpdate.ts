@@ -6,7 +6,7 @@ import semver from "semver";
  * @param {String} v2 newVersion
  * @return {Bool}
  */
-export default function shouldUpdate(v1: string, v2: string) {
+export default function shouldUpdate(v1: string, v2: string): boolean {
   // Deal with a double IPFS hash case
   if (v1 && v2 && v1 === v2) return false;
   v1 = semver.valid(v1) || "999.9.9";

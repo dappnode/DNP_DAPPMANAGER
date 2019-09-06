@@ -4,6 +4,7 @@ import * as db from "../../db";
 import { eventBus, eventBusTag } from "../../eventBus";
 import lockPorts from "../lockPorts";
 import unlockPorts from "../unlockPorts";
+import { DockerOptionsInterface } from "../../types";
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -15,9 +16,12 @@ import unlockPorts from "../unlockPorts";
 // ERROR: for dnp2  Cannot start service dnp2: driver failed programming external connectivity on endpoint dc_dnp2_1 (cee2e0d559f12a9434100ff9368b4535380b0e2637ab854475a63c032315b22e): Bind for 0.0.0.0:3000 failed: port is already allocated
 // ERROR: Encountered errors while bringing up the project.
 
-async function dockerComposeUpSafe(dockerComposePath: string, options?: any) {
+async function dockerComposeUpSafe(
+  dockerComposePath: string,
+  options?: DockerOptionsInterface
+): Promise<void> {
   try {
-    return await docker.compose.up(dockerComposePath, options);
+    await docker.compose.up(dockerComposePath, options);
   } catch (e) {
     /**
      * These port two modules use docker. If they are imported above,

@@ -13,7 +13,7 @@ import { PackageEnvs, Manifest } from "../types";
  *   ENV_NAME: 'value'
  * }
  */
-export function load(name: string, isCore: boolean) {
+export function load(name: string, isCore: boolean): PackageEnvs {
   const envFilePath = getPath.envFile(name, params, isCore);
   if (!fs.existsSync(envFilePath)) {
     return {};
@@ -30,7 +30,7 @@ export function load(name: string, isCore: boolean) {
  *   ENV_NAME: 'value'
  * }
  */
-export function write(name: string, isCore: boolean, envs: PackageEnvs) {
+export function write(name: string, isCore: boolean, envs: PackageEnvs): void {
   const envFilePath = getPath.envFileSmart(name, params, isCore);
   fs.writeFileSync(validate.path(envFilePath), parse.stringifyEnvs(envs));
 }
@@ -42,7 +42,7 @@ export function write(name: string, isCore: boolean, envs: PackageEnvs) {
  *   ENV_NAME: 'value'
  * }
  */
-export function getManifestEnvs(manifest: Manifest) {
+export function getManifestEnvs(manifest: Manifest): PackageEnvs {
   const envsArray = (manifest.image || {}).environment || [];
   return envsArray.reduce((_envs: PackageEnvs, row) => {
     const [key, value] = (row || "").trim().split(/=(.*)/);

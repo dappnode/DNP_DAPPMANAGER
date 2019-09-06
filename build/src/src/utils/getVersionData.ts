@@ -1,4 +1,5 @@
 import fs from "fs";
+import { PackageVersionData } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -10,7 +11,7 @@ const versionDataJsonPath = "../../.version.json";
  *   "branch": "master",
  *   "commit": "ab991e1482b44065ee4d6f38741bd89aeaeb3cec" }
  */
-let versionData = {};
+let versionData: PackageVersionData = {};
 try {
   if (!fs.existsSync(versionDataJsonPath)) {
     logs.warn(`Version info not found at path: ${versionDataJsonPath}`);

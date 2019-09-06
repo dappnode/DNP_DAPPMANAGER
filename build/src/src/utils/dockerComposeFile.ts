@@ -42,7 +42,7 @@ interface DockerComposePackage {
  * Utils to read or edit a docker-compose file
  */
 
-export function getDockerComposePath(id: string, newFile?: boolean) {
+export function getDockerComposePath(id: string, newFile?: boolean): string {
   const composeCorePath = path.join(
     params.DNCORE_DIR,
     `docker-compose-${(id || "").split(".")[0]}.yml`
@@ -65,11 +65,12 @@ export function readComposeObj(
 export function writeComposeObj(
   dockerComposePath: string,
   composeObj: DockerComposePackage
-) {
+): void {
   const composeString = yaml.stringify(composeObj, 8, 2);
   fs.writeFileSync(dockerComposePath, composeString, "utf-8");
 }
 
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function getComposeInstance(idOrObject: string | DockerComposePackage) {
   let dockerComposePath = "";
   let composeObj: DockerComposePackage;
@@ -85,23 +86,23 @@ export function getComposeInstance(idOrObject: string | DockerComposePackage) {
   const dnpName = Object.getOwnPropertyNames(composeObj.services)[0];
   const service = composeObj.services[dnpName];
 
-  function write() {
+  function write(): void {
     composeObj.services[dnpName] = service;
     writeComposeObj(dockerComposePath, composeObj);
   }
 
-  function getPortMappings() {
+  function getPortMappings(): PortMapping[] {
     return parsePortMappings(service.ports || []);
   }
 
-  function mergePortMapping(newPortMappings: PortMapping[]) {
+  function mergePortMapping(newPortMappings: PortMapping[]): void {
     service.ports = stringifyPortMappings(
       mergePortMappings(getPortMappings(), newPortMappings)
     );
     write();
   }
 
-  function setPortMappings(newPortMappings: PortMapping[]) {
+  function setPortMappings(newPortMappings: PortMapping[]): void {
     service.ports = stringifyPortMappings(newPortMappings);
     write();
   }

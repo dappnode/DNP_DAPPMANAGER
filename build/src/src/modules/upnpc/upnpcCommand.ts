@@ -1,7 +1,7 @@
 import shell from "../../utils/shell";
 import parseGeneralErrors from "./parseGeneralErrors";
 
-export default async function upnpcCommand(cmd: string) {
+export default async function upnpcCommand(cmd: string): Promise<string> {
   try {
     const image = await shell(
       `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`

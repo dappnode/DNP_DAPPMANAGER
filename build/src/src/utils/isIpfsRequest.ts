@@ -1,9 +1,9 @@
 import isIpfsHash from "./isIpfsHash";
 import { PackageRequest } from "../types";
 
-export default function isIpfsRequest(req: PackageRequest) {
+export default function isIpfsRequest(req: PackageRequest): boolean {
   if (req && typeof req === "object") {
-    return (
+    return Boolean(
       (req.name && isIpfsHash(req.name)) || (req.ver && isIpfsHash(req.ver))
     );
   } else if (req && typeof req === "string") {

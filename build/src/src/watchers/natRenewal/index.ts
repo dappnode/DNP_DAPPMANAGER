@@ -13,10 +13,11 @@ const logs = Logs(module);
 const natRenewalInterval =
   params.NAT_RENEWAL_WATCHER_INTERVAL || 60 * 60 * 1000;
 
-const portId = (port: PackagePort) => `${port.portNumber} ${port.protocol}`;
+const portId = (port: PackagePort): string =>
+  `${port.portNumber} ${port.protocol}`;
 
 let isFirstRunGlobal = true;
-async function natRenewal() {
+async function natRenewal(): Promise<void> {
   // Signal it's no longer the first run
   const isFirstRun = isFirstRunGlobal;
   isFirstRunGlobal = false;

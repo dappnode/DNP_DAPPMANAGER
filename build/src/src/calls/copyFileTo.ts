@@ -6,6 +6,7 @@ import listContainers from "../modules/listContainers";
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";
 import params from "../params";
+import { RpcHandlerReturn } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -36,7 +37,7 @@ export default async function copyFileTo({
   dataUri: string;
   filename: string;
   toPath: string;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("Argument id must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");

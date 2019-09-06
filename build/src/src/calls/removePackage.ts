@@ -8,6 +8,7 @@ import restartPackageVolumes from "./restartPackageVolumes";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Remove package data: docker down + disk files
@@ -21,7 +22,7 @@ export default async function removePackage({
 }: {
   id: string;
   deleteVolumes: boolean;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const packageRepoDir = getPath.packageRepoDir(id, params, false);

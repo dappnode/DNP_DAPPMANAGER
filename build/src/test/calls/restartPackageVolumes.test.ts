@@ -4,6 +4,8 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
+import { PackageContainer } from "../../src/types";
+import { mockDnp, mockVolume } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Call function: restartPackageVolumes", function() {
@@ -40,34 +42,45 @@ describe("Call function: restartPackageVolumes", function() {
 
   const dnpList = [
     {
+      ...mockDnp,
       name: dnpNameCore,
       isCore: true,
       volumes: [
-        { name: "vol1", isOwner: true, users: [dnpNameCore] },
-        { name: "vol2", isOwner: true, users: [dnpNameCore] }
+        { ...mockVolume, name: "vol1", isOwner: true, users: [dnpNameCore] },
+        { ...mockVolume, name: "vol2", isOwner: true, users: [dnpNameCore] }
       ]
     },
     {
+      ...mockDnp,
       name: dappmanagerId,
       isCore: true,
       volumes: [
-        { name: "dappmanager_vol", isOwner: true, users: [dappmanagerId] }
+        {
+          ...mockVolume,
+          name: "dappmanager_vol",
+          isOwner: true,
+          users: [dappmanagerId]
+        }
       ]
     },
     {
+      ...mockDnp,
       name: noVolsDnpName,
       volumes: []
     },
     {
+      ...mockDnp,
       name: nginxId,
       volumes: [
         {
+          ...mockVolume,
           type: "bind",
           path: "/root/certs",
           dest: "/etc/nginx/certs"
         },
 
         {
+          ...mockVolume,
           name: "nginxproxydnpdappnodeeth_vhost.d",
           users: [
             "letsencrypt-nginx.dnp.dappnode.eth",
@@ -77,11 +90,13 @@ describe("Call function: restartPackageVolumes", function() {
           isOwner: true
         },
         {
+          ...mockVolume,
           type: "bind",
           path: "/var/run/docker.sock",
           dest: "/tmp/docker.sock"
         },
         {
+          ...mockVolume,
           name: "nginxproxydnpdappnodeeth_html",
           users: [
             "letsencrypt-nginx.dnp.dappnode.eth",
@@ -91,6 +106,7 @@ describe("Call function: restartPackageVolumes", function() {
           isOwner: true
         },
         {
+          ...mockVolume,
           name:
             "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
           users: ["nginx-proxy.dnp.dappnode.eth"],
@@ -100,10 +116,12 @@ describe("Call function: restartPackageVolumes", function() {
       ]
     },
     {
+      ...mockDnp,
       name: raidenTestnetId,
       isCore: false,
       volumes: [
         {
+          ...mockVolume,
           name: "raidentestnetdnpdappnodeeth_data",
           isOwner: true,
           users: [raidenTestnetId]
@@ -111,7 +129,9 @@ describe("Call function: restartPackageVolumes", function() {
       ]
     }
   ];
-  const listContainers = async (kwargs: { byName: string }) =>
+  const listContainers = async (kwargs: {
+    byName: string;
+  }): Promise<PackageContainer[]> =>
     kwargs && kwargs.byName
       ? dnpList.filter(dnp => dnp.name === kwargs.byName)
       : dnpList;

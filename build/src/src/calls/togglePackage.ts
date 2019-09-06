@@ -3,6 +3,7 @@ import * as getPath from "../utils/getPath";
 import params from "../params";
 import docker from "../modules/docker";
 import { eventBus, eventBusTag } from "../eventBus";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Stops or starts after fetching its status
@@ -16,7 +17,7 @@ export default async function togglePackage({
 }: {
   id: string;
   timeout?: number;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);

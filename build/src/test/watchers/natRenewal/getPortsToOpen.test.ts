@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import defaultPortsToOpen from "../../../src/watchers/natRenewal/defaultPortsToOpen";
+import { PortMapping } from "../../../src/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Watchers > natRenewal > getPortsToOpen", () => {
@@ -52,8 +53,10 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           }
         ],
         "../../utils/dockerComposeFile": {
-          getComposeInstance: (dnpName: string) => ({
-            getPortMappings: () => {
+          getComposeInstance: (
+            dnpName: string
+          ): { getPortMappings: () => PortMapping[] } => ({
+            getPortMappings: (): PortMapping[] => {
               if (dnpName.includes(stoppedDnp))
                 return [
                   { host: 4001, container: 4001, protocol: "UDP" },
@@ -90,7 +93,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           throw Error("Demo Error for listContainers");
         },
         "../../utils/parse": {
-          dockerComposePorts: () => {}
+          dockerComposePorts: (): void => {}
         }
       }
     );
@@ -118,7 +121,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           }
         ],
         "../../utils/parse": {
-          dockerComposePorts: (dockerComposePath: string) => {
+          dockerComposePorts: (dockerComposePath: string): void => {
             if (
               dockerComposePath === `dnp_repo/${throwsDnp}/docker-compose.yml`
             )

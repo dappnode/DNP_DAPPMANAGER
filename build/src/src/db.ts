@@ -25,27 +25,27 @@ const db = low(adapter);
  * > Return the content of that key
  */
 
-export function get(key?: string) {
+export function get(key?: string): any {
   if (key) return db.get(formatKey(key)).value();
   else return Object.assign({}, db.getState());
 }
 
-export function set(key: string, value: any) {
+export function set(key: string, value: any): void {
   return db.set(formatKey(key), value).write();
 }
 
-export function remove(key: string) {
-  return db.unset(formatKey(key)).write();
+export function remove(key: string): void {
+  db.unset(formatKey(key)).write();
 }
 
 // Format keys to make sure they are consistent
-function formatKey(key: string) {
+function formatKey(key: string): string {
   // Check if key exist before calling String.prototype
   if (!key) return key;
   if (key.includes("ipfs/")) return key.split("ipfs/")[1];
   return key;
 }
 
-export function clearDb() {
+export function clearDb(): void {
   db.setState({});
 }

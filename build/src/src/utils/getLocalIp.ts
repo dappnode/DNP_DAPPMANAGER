@@ -3,7 +3,9 @@ import isIp from "is-ip";
 import Logs from "../logs";
 const logs = Logs(module);
 
-export default async function getLocalIp(options?: { silent: boolean }) {
+export default async function getLocalIp(options?: {
+  silent: boolean;
+}): Promise<string | undefined> {
   const silent = options && options.silent;
 
   try {
@@ -14,7 +16,7 @@ export default async function getLocalIp(options?: { silent: boolean }) {
       `docker run --rm --net=host --entrypoint=/sbin/ip ${image} route get 1`
     );
     const internalIp = ((output || "").match(/src\s((\d+\.?){4})/) || [])[1];
-    return isIp(internalIp) ? internalIp : null;
+    return isIp(internalIp) ? internalIp : undefined;
   } catch (e) {
     if (!silent) logs.error(`Error getting internal IP: ${e.message}`);
   }

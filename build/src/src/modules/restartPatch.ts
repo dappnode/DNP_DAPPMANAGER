@@ -17,7 +17,7 @@ import params from "../params";
  * shows up in the ADMIN UI's package list
  */
 
-export default async function restartPatch(IMAGE_NAME = "") {
+export default async function restartPatch(IMAGE_NAME = ""): Promise<void> {
   if (!IMAGE_NAME.includes(":")) {
     const dnpList = await listContainers();
     const container = dnpList.find(c => (c.name || "").includes(IMAGE_NAME));

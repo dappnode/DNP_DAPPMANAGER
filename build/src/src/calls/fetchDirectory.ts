@@ -5,9 +5,13 @@ import getAvatar from "../modules/getAvatar";
 import * as parse from "../utils/parse";
 import isSyncing from "../utils/isSyncing";
 import isIpfsHash from "../utils/isIpfsHash";
-import { DirectoryDnp } from "../types";
+import { DirectoryDnp, RpcHandlerReturn } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
+
+interface RpcFetchDirectoryReturn extends RpcHandlerReturn {
+  result: DirectoryDnp[];
+}
 
 let dnpsCache: DirectoryDnp[] = [];
 const avatarCache: { [avatarHash: string]: string } = {};
@@ -24,7 +28,9 @@ const avatarCache: { [avatarHash: string]: string } = {};
  *   avatar: <base64 image>, {string}
  * }, ... ]
  */
-export default async function fetchDirectory() {
+export default async function fetchDirectory(): Promise<
+  RpcFetchDirectoryReturn
+> {
   if (Boolean(await isSyncing())) {
     return {
       message: `Mainnet is still syncing`,
@@ -111,7 +117,7 @@ export default async function fetchDirectory() {
  * - Emit the dnp only if the cache has changed. Prevent too much UI re-renders
  * @param {object} dnp
  */
-function emitPkg(dnp: DirectoryDnp) {
+function emitPkg(dnp: DirectoryDnp): void {
   const dnpCache = dnpsCache.find(({ name }) => name === dnp.name);
   if (!dnpCache || isCacheInvalid(dnpCache, dnp))
     eventBus.emit(eventBusTag.emitDirectory, [dnp]);

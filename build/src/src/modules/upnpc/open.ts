@@ -17,7 +17,10 @@ import { PackagePort } from "../../types";
 // Timeout in seconds. Should be greater than the natRenewalInterval
 const natRenewalTimeout = 7200;
 
-export default async function open(port: PackagePort, localIp: string) {
+export default async function open(
+  port: PackagePort,
+  localIp: string
+): Promise<boolean> {
   const { portNumber, protocol } = port;
 
   try {

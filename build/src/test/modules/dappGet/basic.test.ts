@@ -1,7 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest, PackageContainer } from "../../../src/types";
+import { Manifest, PackageContainer, PackageRequest } from "../../../src/types";
 import { mockManifest, mockDnp } from "../../testUtils";
+import { ResultInterface } from "../../../src/modules/dappGet/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 /* eslint-disable max-len */
@@ -14,7 +15,7 @@ const proxyquire = require("proxyquire").noCallThru();
 function getDappBasic(
   containerList: PackageContainer[],
   manifest: Manifest
-) {
+): (req: PackageRequest) => Promise<ResultInterface> {
   const { default: dappGet } = proxyquire(
     "../../../src/modules/dappGet/basic",
     {

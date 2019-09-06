@@ -23,45 +23,47 @@ export default function catStreamToFs(
   hash: string,
   path: string,
   options: { onChunk: (chunk: Buffer) => void }
-) {
-  return new Promise((resolve, reject) => {
-    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
-      reject(Error(`Invalid path: "${path}"`));
-    if (options && typeof options !== "object")
-      reject(Error("options must be an object"));
+): Promise<string> {
+  return new Promise(
+    (resolve, reject): void => {
+      if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
+        reject(Error(`Invalid path: "${path}"`));
+      if (options && typeof options !== "object")
+        reject(Error("options must be an object"));
 
-    // Timeout cancel mechanism
-    const timeoutToCancel = setTimeout(() => {
-      reject(Error(timeoutError));
-    }, timeoutMs);
+      // Timeout cancel mechanism
+      const timeoutToCancel = setTimeout(() => {
+        reject(Error(timeoutError));
+      }, timeoutMs);
 
-    const onError = (streamId: string) => (err: Error) => {
-      clearTimeout(timeoutToCancel);
-      reject(Error(streamId + ": " + err));
-    };
+      const onError = (streamId: string) => (err: Error): void => {
+        clearTimeout(timeoutToCancel);
+        reject(Error(streamId + ": " + err));
+      };
 
-    const onData = (chunk: Buffer) => {
-      clearTimeout(timeoutToCancel);
-      if (options.onChunk) options.onChunk(chunk);
-    };
+      const onData = (chunk: Buffer): void => {
+        clearTimeout(timeoutToCancel);
+        if (options.onChunk) options.onChunk(chunk);
+      };
 
-    const onFinish = (data: string) => {
-      clearTimeout(timeoutToCancel);
-      // Pin files after a successful download
-      ipfs.pin.add(hash, (err: Error) => {
-        if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
-      });
-      resolve(data);
-    };
+      const onFinish = (data: string): void => {
+        clearTimeout(timeoutToCancel);
+        // Pin files after a successful download
+        ipfs.pin.add(hash, (err: Error) => {
+          if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
+        });
+        resolve(data);
+      };
 
-    const readStream = ipfs
-      .catReadableStream(hash)
-      .on("data", onData)
-      .on("error", onError("ReadableStream"));
-    const writeStream = fs
-      .createWriteStream(path)
-      .on("finish", onFinish)
-      .on("error", onError("WriteStream"));
-    readStream.pipe(writeStream);
-  });
+      const readStream = ipfs
+        .catReadableStream(hash)
+        .on("data", onData)
+        .on("error", onError("ReadableStream"));
+      const writeStream = fs
+        .createWriteStream(path)
+        .on("finish", onFinish)
+        .on("error", onError("WriteStream"));
+      readStream.pipe(writeStream);
+    }
+  );
 }

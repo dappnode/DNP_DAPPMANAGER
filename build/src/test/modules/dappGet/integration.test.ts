@@ -5,15 +5,17 @@ import * as safeSemver from "../../../src/modules/dappGet/utils/safeSemver";
 import fs from "fs";
 import path from "path";
 import { FetchFunction } from "../../../src/modules/dappGet/types";
+import { PackageContainer } from "../../../src/types";
+import { mockDnp } from "../../testUtils";
 
 /* eslint-disable no-console */
 
 const log = false;
-function logBig(...args: any) {
+function logBig(...args: string[]): void {
   const b = "=".repeat(20);
   if (log)
     console.log(
-      `\n${b}\n${args.map((s: any) => String(s)).join(`\n${b}\n`)}\n${b}'\n`
+      `\n${b}\n${args.map((s: string) => String(s)).join(`\n${b}\n`)}\n${b}'\n`
     );
 }
 
@@ -36,7 +38,7 @@ describe("dappGet integration test", () => {
         // Prepare dependencies
 
         // Autogenerate a listContainers reponse from the _case object
-        const listContainers = async () =>
+        const listContainers = async (): Promise<PackageContainer[]> =>
           Object.keys(_case.dnps)
             .filter(dnpName => _case.dnps[dnpName].installed)
             .map(dnpName => {
@@ -50,6 +52,7 @@ describe("dappGet integration test", () => {
                 );
               }
               return {
+                ...mockDnp,
                 name: dnpName,
                 version: _case.dnps[dnpName].installed,
                 origin: dnp.origin,

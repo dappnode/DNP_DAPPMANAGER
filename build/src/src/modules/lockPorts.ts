@@ -74,14 +74,14 @@ const logs = Logs(module);
  * @param {object} pkg {name, ver, manifest}
  * @returns {array} portsToOpen = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
-export default async function lockPorts(id: string) {
+export default async function lockPorts(id: string): Promise<PortMapping[]> {
   const compose = getComposeInstance(id);
   const portMappings = compose.getPortMappings();
 
   const ephemeralPortMappings = portMappings.filter(({ host }) => !host);
 
   // Check if the package has ephemeral ports (to skip quicly if necessary)
-  if (!ephemeralPortMappings.length) return;
+  if (!ephemeralPortMappings.length) return [];
 
   // Get the current state of the package to know which port was chosen by docker
   const dnps = await listContainers({ byName: id });

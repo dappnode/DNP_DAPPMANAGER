@@ -1,6 +1,6 @@
 const { isIPFS } = require("ipfs-http-client");
 
-function isMultihash(hash: string) {
+function isMultihash(hash: string): boolean {
   return isIPFS.cid(hash);
 }
 
@@ -14,7 +14,7 @@ function isMultihash(hash: string) {
  * @param {string} hash
  * @returns {bool}
  */
-export default function isIpfsHash(hash: string) {
+export default function isIpfsHash(hash: string): boolean {
   if (!hash || typeof hash !== "string") return false;
   // Correct hash prefix
   if (hash.includes("ipfs/")) {

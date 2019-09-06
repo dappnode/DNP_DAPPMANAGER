@@ -55,13 +55,17 @@ const url = params.autobahnUrl;
 const realm = params.autobahnRealm;
 const connection = new autobahn.Connection({ url, realm });
 
-connection.onopen = (session, details) => {
+connection.onopen = (session, details): void => {
   logs.info(`Connected to DAppNode's WAMP
   url:     ${url}
   realm:   ${realm}
   session: ${(details || {}).authid}`);
 
-  registerHandler(session, "ping.dappmanager.dnp.dappnode.eth", (x: any) => x);
+  registerHandler(
+    session,
+    "ping.dappmanager.dnp.dappnode.eth",
+    async (x: string) => ({ message: "ping", result: x })
+  );
   for (const [callId, callHandler] of Object.entries(calls)) {
     registerHandler(
       session,
@@ -83,11 +87,11 @@ connection.onopen = (session, details) => {
    * - Subscriber:
    *     subscribe("event.name", function(arg1, arg2) {})
    */
-  function publish(event: string, ...args: any[]) {
+  function publish(event: string, ...args: any[]): void {
     // session.publish(topic, args, kwargs, options)
     session.publish(event, args);
   }
-  function subscribe(event: string, cb: (...args: any[]) => void) {
+  function subscribe(event: string, cb: (...args: any[]) => void): void {
     // session.subscribe(topic, function(args, kwargs, details) )
     session.subscribe(event, args => {
       try {
@@ -165,7 +169,7 @@ connection.onopen = (session, details) => {
   eventBus.emit(eventBusTag.emitPackages);
 };
 
-connection.onclose = (reason, details) => {
+connection.onclose = (reason, details): boolean => {
   logs.warn(
     `WAMP connection closed: ${reason} ${(details || {}).message || ""}`
   );

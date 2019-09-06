@@ -77,7 +77,10 @@ export default async function getManifest({
  * @param {string} ver
  * @returns {object} = { hash, origin }
  */
-async function fetchManifestHash({ name, ver }: PackageRequest) {
+async function fetchManifestHash({
+  name,
+  ver
+}: PackageRequest): Promise<string> {
   /**
    * 0. Normal case, name = eth domain & ver = semverVersion
    * Go fetch to the APM
@@ -125,7 +128,10 @@ async function fetchManifestHash({ name, ver }: PackageRequest) {
  * @param {string} ver
  * @returns {string} manifestHash
  */
-async function resolveApmVersionAndCache({ name, ver }: PackageRequest) {
+async function resolveApmVersionAndCache({
+  name,
+  ver
+}: PackageRequest): Promise<string> {
   /**
    * Construct a key for the db. The semver CANNOT be 0.1.0 as that would mean {0: {1: {0: {}}}
    * id = goerli-pantheon-dnp-dappnode-eth-0-1-0
@@ -148,11 +154,14 @@ async function resolveApmVersionAndCache({ name, ver }: PackageRequest) {
  * @param {string} ver
  * @returns {string} manifestHash
  */
-async function resolveApmVersion({ name, ver }: PackageRequest) {
+async function resolveApmVersion({
+  name,
+  ver
+}: PackageRequest): Promise<string> {
   return await apm.getRepoHash({ name, ver });
 }
 
-function validateManifest(manifest: Manifest) {
+function validateManifest(manifest: Manifest): void {
   // Minimal (very relaxed) manifest check
   const manifestSchema = Joi.object({
     name: Joi.string().required(),

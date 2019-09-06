@@ -7,11 +7,8 @@ import aggregate from "./aggregate";
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
+import { ResultInterface, DnpsInterface, StateInterface } from "./types";
 const logs = Logs(module);
-
-interface StateInterface {
-  [dnpName: string]: string;
-}
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -57,11 +54,7 @@ interface StateInterface {
 export default async function dappGet(
   req: PackageRequest,
   options?: { BYPASS_RESOLVER?: boolean }
-): Promise<{
-  message: string;
-  state: StateInterface;
-  alreadyUpdated: StateInterface;
-}> {
+): Promise<ResultInterface> {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
    * It will not use the fetch or resolver module and only
@@ -72,7 +65,7 @@ export default async function dappGet(
   const dnpList = await listContainers();
 
   // Aggregate
-  let dnps;
+  let dnps: DnpsInterface;
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
     dnps = await aggregate({ req, dnpList, fetch });

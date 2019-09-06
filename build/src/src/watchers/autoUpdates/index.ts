@@ -22,7 +22,7 @@ const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000;
  * All code is sequential, to not perform more than one update at once.
  * One of the update might be the core and crash the other updates.
  */
-async function autoUpdates() {
+async function autoUpdates(): Promise<void> {
   try {
     if (isDnpUpdateEnabled()) {
       try {
@@ -62,11 +62,11 @@ eventBusOnSafe(
  * "completed". So on every DAPPMANAGER start it must checked if a successful
  * update happen before restarting
  */
-async function checkForCompletedCoreUpdates() {
+async function checkForCompletedCoreUpdates(): Promise<void> {
   try {
     const {
       result: { versionId }
-    } = await fetchCoreUpdateData();
+    } = await fetchCoreUpdateData({});
     clearCompletedCoreUpdatesIfAny(versionId);
   } catch (e) {
     logs.error(`Error on clearCompletedCoreUpdatesIfAny: ${e.stack}`);

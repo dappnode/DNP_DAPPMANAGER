@@ -9,61 +9,45 @@ import * as repoContract from "../contracts/repository";
 import Logs from "../logs";
 const logs = Logs(module);
 
-function castWeb3Abi(abi: any): any[] {
-  return abi.map((abiItem: any) => ({
-    ...abiItem,
-    type: abiItem.type
-  }));
-}
-
-function namehash(name: string, web3: any) {
+function namehash(name: string): string {
   let node =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
   if (name != "") {
     const labels = name.split(".");
     for (let i = labels.length - 1; i >= 0; i--) {
-      node = web3.utils.sha3(node + web3.utils.sha3(labels[i]).slice(2), {
-        encoding: "hex"
-      });
+      node = web3.utils.sha3(node + web3.utils.sha3(labels[i]).slice(2));
     }
   }
   return node.toString();
 }
 
 // Declare utility methods
-export async function getRepoContract(reponame: string) {
-  const ens = new web3.eth.Contract(
-    castWeb3Abi(ensContract.abi),
-    ensContract.address
-  );
-  const resolverAddress = await ens.methods
-    .resolver(namehash(reponame, web3))
-    .call();
+export async function getRepoAddress(reponame: string): Promise<string> {
+  const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
+  const resolverAddress = await ens.methods.resolver(namehash(reponame)).call();
 
   if (resolverAddress == "0x0000000000000000000000000000000000000000") {
-    return;
+    return "";
   }
 
   const resolver = new web3.eth.Contract(
-    castWeb3Abi(publicResolverContract.abi),
+    publicResolverContract.abi,
     resolverAddress
   );
-  const repoAddr = await resolver.methods.addr(namehash(reponame, web3)).call();
-  return new web3.eth.Contract(castWeb3Abi(repoContract.abi), repoAddr);
+  return await resolver.methods.addr(namehash(reponame)).call();
 }
 
-export async function getLatestVersion(repo: any) {
-  return await repo.methods
-    .getLatest()
-    .call()
-    .then((res: any) => web3.utils.hexToAscii(res.contentURI));
-}
-
-export async function getSemanticVersion(repo: any, version: string[]) {
+export async function getSemanticVersion(
+  repoAddr: string,
+  version: string[]
+): Promise<string> {
+  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
   return await repo.methods
     .getBySemanticVersion(version)
     .call()
-    .then((res: any) => web3.utils.hexToAscii(res.contentURI))
+    .then((res: { contentURI: string }) =>
+      web3.utils.hexToAscii(res.contentURI)
+    )
     .catch((err: Error) => {
       if (err.message == "Couldn't decode uint16 from ABI: 0x")
         return "NOT_VALID_VERSION";
@@ -74,24 +58,21 @@ export async function getSemanticVersion(repo: any, version: string[]) {
 // Declare methods
 
 // Util to check if a repo exists for a given name
-export async function repoExists(reponame: string) {
-  const ens = new web3.eth.Contract(
-    castWeb3Abi(ensContract.abi),
-    ensContract.address
-  );
-  const resolverAddress = await ens.methods
-    .resolver(namehash(reponame, web3))
-    .call();
+export async function repoExists(reponame: string): Promise<boolean> {
+  const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
+  const resolverAddress = await ens.methods.resolver(namehash(reponame)).call();
   return resolverAddress !== "0x0000000000000000000000000000000000000000";
 }
 
-export const getRepoHash = async (packageReq: PackageRequest) => {
+export const getRepoHash = async (
+  packageReq: PackageRequest
+): Promise<string> => {
   const name = packageReq.name;
   const version = packageReq.ver;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name);
-  if (!repo) {
+  const repoAddr = await getRepoAddress(name);
+  if (!repoAddr) {
     throw Error(`Resolver could not find a match for ${name}`);
   }
 
@@ -99,9 +80,15 @@ export const getRepoHash = async (packageReq: PackageRequest) => {
   if (cleanVersion) {
     // Getting the specific version provided
     const versionArray = cleanVersion.split(".");
-    return getSemanticVersion(repo, versionArray);
+    return getSemanticVersion(repoAddr, versionArray);
   } else {
-    return getLatestVersion(repo);
+    const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
+    return await repo.methods
+      .getLatest()
+      .call()
+      .then((res: { contentURI: string }) =>
+        web3.utils.hexToAscii(res.contentURI)
+      );
   }
 };
 
@@ -111,7 +98,9 @@ export const getRepoHash = async (packageReq: PackageRequest) => {
  * @param {*} packageReq
  * @returns {*}
  */
-export async function getLatestWithVersion(packageReq: PackageRequest) {
+export async function getLatestWithVersion(
+  packageReq: PackageRequest
+): Promise<{ [version: string]: string }> {
   if (!packageReq || typeof packageReq !== "object") {
     throw Error("Wrong packageReq: " + packageReq);
   }
@@ -122,13 +111,14 @@ export async function getLatestWithVersion(packageReq: PackageRequest) {
   const { name } = packageReq;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name);
+  const repoAddr = await getRepoAddress(name);
+  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
   if (!repo) {
     throw Error(`Resolver could not find a match for ${name}`);
   }
 
   const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
-  const versions: any = {};
+  const versions: { [version: string]: string } = {};
   // versionIndexes = [1, 2, 3, 4, 5, ...]
 
   /**
@@ -149,7 +139,7 @@ export async function getLatestWithVersion(packageReq: PackageRequest) {
     // semanticVersion = [1, 0, 8]. It is joined to form a regular semver string
     // Append version result to the versions object
     versions[semanticVersion.join(".")] = await getSemanticVersion(
-      repo,
+      repoAddr,
       semanticVersion
     );
   } catch (e) {
@@ -175,7 +165,7 @@ export async function getLatestWithVersion(packageReq: PackageRequest) {
 export async function getRepoVersions(
   packageReq: PackageRequest,
   verReq: string
-) {
+): Promise<{ [version: string]: string }> {
   if (!packageReq || typeof packageReq !== "object") {
     throw Error("Wrong packageReq: " + packageReq);
   }
@@ -190,13 +180,12 @@ export async function getRepoVersions(
   const { name } = packageReq;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name);
-  if (!repo) {
-    throw Error(`Resolver could not find a match for ${name}`);
-  }
+  const repoAddr = await getRepoAddress(name);
+  if (!repoAddr) throw Error(`Resolver could not find a match for ${name}`);
+  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
 
   const versionCount = parseFloat(await repo.methods.getVersionsCount().call());
-  const versions: any = {};
+  const versions: { [version: string]: string } = {};
   // versionIndexes = [1, 2, 3, 4, 5, ...]
   const versionIndexes = [...Array(versionCount).keys()].map(i => i + 1);
 
@@ -220,7 +209,7 @@ export async function getRepoVersions(
         const ver = verArray.join(".");
         // Append version result to the versions object
         if (semver.satisfies(ver, verReq)) {
-          versions[ver] = await getSemanticVersion(repo, verArray);
+          versions[ver] = await getSemanticVersion(repoAddr, verArray);
         }
       } catch (e) {
         // If you request an inexistent ID to the contract, web3 will throw
@@ -243,7 +232,9 @@ export async function getRepoVersions(
  * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
  * @returns {string} latestVersion = "0.2.4"
  */
-export async function getLatestSemver(packageReq: PackageRequest) {
+export async function getLatestSemver(
+  packageReq: PackageRequest
+): Promise<string> {
   if (!packageReq || typeof packageReq !== "object") {
     throw Error("Wrong packageReq: " + packageReq);
   }
@@ -254,10 +245,9 @@ export async function getLatestSemver(packageReq: PackageRequest) {
   const { name } = packageReq;
   validate.isEthDomain(name); // Validate the provided name, it only accepts .eth domains
 
-  const repo = await getRepoContract(name);
-  if (!repo) {
-    throw Error(`Resolver could not find a match for ${name}`);
-  }
+  const repoAddr = await getRepoAddress(name);
+  if (!repoAddr) throw Error(`Resolver could not find a match for ${name}`);
+  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
 
   const res = await repo.methods.getLatest().call();
   return res.semanticVersion.join(".");

@@ -4,8 +4,8 @@ import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import params from "../../src/params";
-import { createTestDir, cleanTestDir } from "../testUtils";
-import { PortMapping } from "../../src/types";
+import { createTestDir, cleanTestDir, mockDnp } from "../testUtils";
+import { PortMapping, PackageContainer } from "../../src/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Module: lockPorts", function() {
@@ -38,10 +38,15 @@ describe("Module: lockPorts", function() {
       });
   }
 
-  const listContainers = async ({ byName }: { byName: string }) => {
+  const listContainers = async ({
+    byName
+  }: {
+    byName: string;
+  }): Promise<PackageContainer[]> => {
     if (byName === normalDnpName)
       return [
         {
+          ...mockDnp,
           name: normalDnpName,
           ports: getListContainerPorts(normalDnpPorts)
         }
@@ -49,6 +54,7 @@ describe("Module: lockPorts", function() {
     if (byName === coreDnpName)
       return [
         {
+          ...mockDnp,
           name: coreDnpName,
           isCore: true,
           ports: getListContainerPorts(coreDnpPorts)
@@ -57,15 +63,17 @@ describe("Module: lockPorts", function() {
     if (byName === noPortsDnpName)
       return [
         {
+          ...mockDnp,
           name: noPortsDnpName,
           ports: getListContainerPorts(noPortsPorts)
         }
       ];
+    return [];
   };
 
   const docker = {
     compose: {
-      up: async () => {}
+      up: async (): Promise<void> => {}
     }
   };
 
@@ -163,7 +171,7 @@ services:
 
   it("should skip the process early on a package without ephemeral ports", async () => {
     const earlyReturn = await lockPorts(noPortsDnpName);
-    expect(earlyReturn).to.equal(undefined);
+    expect(earlyReturn).to.deep.equal([] as PortMapping[]);
   });
 
   after(async () => {

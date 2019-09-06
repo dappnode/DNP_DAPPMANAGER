@@ -35,7 +35,9 @@ const outputResolution = 200;
  *                                   outputResolution x outputResolution px
  * @returns {string} base64 representation of the image
  */
-export default async function formatAndCompressAvatar(inputBuffer: Buffer) {
+export default async function formatAndCompressAvatar(
+  inputBuffer: Buffer
+): Promise<string> {
   let compressedImgBuffer;
   try {
     const resizedImgBuffer = await resizeImg(inputBuffer, outputResolution);

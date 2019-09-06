@@ -23,7 +23,6 @@ export interface DockerApiSystemDfReturn {
     ImageID: string; // "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749";
     Command: string; // "top";
     Created: number; // 1472592424;
-    Ports: any[];
     SizeRootFs: number; // 1092588;
     Labels: { [labelName: string]: string };
     State: string; // "exited";
@@ -49,7 +48,6 @@ export interface DockerApiSystemDfReturn {
         };
       };
     };
-    Mounts: any[];
   }[];
   Volumes: {
     Name: string; // "my-volume";

@@ -2,7 +2,7 @@ import semver from "semver";
 import listContainers from "../../../modules/listContainers";
 // Internal
 import * as safeSemver from "../utils/safeSemver";
-import _aggregateDependencies from "./aggregateDependencies";
+import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { PackageContainer, PackageRequest } from "../../../types";
 import { DnpsInterface, FetchFunction } from "../types";
@@ -61,16 +61,19 @@ export default async function aggregate({
   req: PackageRequest;
   dnpList: PackageContainer[];
   fetch: FetchFunction;
-}) {
+}): Promise<DnpsInterface> {
   // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-  const aggregateDependencies = (kwargs: any) =>
-    _aggregateDependencies({ ...kwargs, fetch });
   const dnps: DnpsInterface = {};
 
   // WARNING: req is a user external input, must verify
   if (req.ver === "latest") req.ver = "*";
 
-  await aggregateDependencies({ name: req.name, versionRange: req.ver, dnps });
+  await aggregateDependencies({
+    name: req.name,
+    versionRange: req.ver,
+    dnps,
+    fetch // #### Injected dependency
+  });
 
   // Get the list of relevant installed dnps
   if (!dnpList) dnpList = await listContainers();
@@ -91,7 +94,8 @@ export default async function aggregate({
         await aggregateDependencies({
           name: dnp.name,
           versionRange: dnp.origin || `>=${dnp.version}`,
-          dnps
+          dnps,
+          fetch // #### Injected dependency
         });
       } catch (e) {
         logs.warn(

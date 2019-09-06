@@ -15,30 +15,32 @@ const logs = Logs(module);
 export default function cat(
   hash: string,
   { maxLength, asBuffer }: { maxLength?: number; asBuffer?: boolean }
-) {
-  return new Promise((resolve, reject) => {
-    // Timeout cancel mechanism
-    const timeoutToCancel = setTimeout(() => {
-      reject(Error(timeoutError));
-    }, params.IPFS_TIMEOUT);
+): Promise<Buffer | string> {
+  return new Promise(
+    (resolve, reject): void => {
+      // Timeout cancel mechanism
+      const timeoutToCancel = setTimeout(() => {
+        reject(Error(timeoutError));
+      }, params.IPFS_TIMEOUT);
 
-    const options: { length?: number } = {};
-    if (maxLength) options.length = maxLength;
+      const options: { length?: number } = {};
+      if (maxLength) options.length = maxLength;
 
-    ipfs.cat(hash, options, (err: Error, data: string) => {
-      clearTimeout(timeoutToCancel);
-      if (err) return reject(err);
+      ipfs.cat(hash, options, (err: Error, data: string) => {
+        clearTimeout(timeoutToCancel);
+        if (err) return reject(err);
 
-      if (data.length === maxLength)
-        reject(Error(`Maximum size exceeded (${maxLength} bytes)`));
+        if (data.length === maxLength)
+          reject(Error(`Maximum size exceeded (${maxLength} bytes)`));
 
-      // Pin files after a successful download
-      ipfs.pin.add(hash, (err: Error) => {
-        if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
+        // Pin files after a successful download
+        ipfs.pin.add(hash, (err: Error) => {
+          if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
+        });
+
+        if (asBuffer) resolve(data);
+        else resolve(data.toString());
       });
-
-      if (asBuffer) resolve(data);
-      else resolve(data.toString());
-    });
-  });
+    }
+  );
 }

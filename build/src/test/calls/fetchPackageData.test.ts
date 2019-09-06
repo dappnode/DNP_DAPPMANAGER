@@ -14,11 +14,12 @@ describe("Call function: fetchPackageData", function() {
   const avatarHash = "FakeFileAvatarHash";
   const testDirectory = "./test_files/";
 
-  const getManifest = async () => ({
+  const getManifest = async (): Promise<{ avatar: string }> => ({
     avatar: avatarHash
   });
 
-  const getAvatar = async () => "data:image/png;base64,avatarb23ib32";
+  const getAvatar = async (): Promise<string> =>
+    "data:image/png;base64,avatarb23ib32";
 
   const { default: fetchPackageData } = proxyquire(
     "../../src/calls/fetchPackageData",

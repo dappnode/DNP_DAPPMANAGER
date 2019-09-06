@@ -5,13 +5,13 @@ import { ChainData } from "../../types";
 const MIN_BLOCK_DIFF_SYNC = 60;
 
 // Utils
-function parseSyncing(current: string, total: string) {
+function parseSyncing(current: string, total: string): string {
   return `${parseHexOrDecimal(current)} / ${parseHexOrDecimal(total)}`;
 }
 
 // Current versions of parseInt are able to recognize hex numbers
 // and automatically use a radix parameter of 16.
-function parseHexOrDecimal(hexOrDecimal: string) {
+function parseHexOrDecimal(hexOrDecimal: string): number {
   return parseInt(hexOrDecimal);
 }
 

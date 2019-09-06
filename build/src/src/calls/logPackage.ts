@@ -2,6 +2,7 @@ import wrapMethodsWithQueue from "../utils/wrapMethodsWithQueue";
 // Modules
 import listContainers from "../modules/listContainers";
 import docker from "../modules/docker";
+import { RpcHandlerReturn } from "../types";
 
 // Retry logs call 3 times, in case it happen during a container reboot
 const dockerWithRetry = wrapMethodsWithQueue(
@@ -26,7 +27,7 @@ export default async function logPackage({
 }: {
   id: string;
   options?: { OPTION1: boolean };
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await listContainers();

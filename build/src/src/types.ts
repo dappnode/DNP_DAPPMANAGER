@@ -59,6 +59,12 @@ export interface PackageEnvs {
   [envName: string]: string;
 }
 
+export interface ManifestUpdateAlert {
+  from: string;
+  to: string;
+  message: string;
+}
+
 export interface Manifest {
   name: string;
   version: string;
@@ -74,11 +80,7 @@ export interface Manifest {
     ports?: string[];
   };
   dependencies: Dependencies;
-  updateAlerts?: {
-    from: string;
-    to: string;
-    message: string;
-  }[];
+  updateAlerts?: ManifestUpdateAlert[];
   warnings?: {
     onInstall: string;
     onUpdate: string;
@@ -98,6 +100,7 @@ export interface PackagePort {
 export interface PackageRequest {
   name: string;
   ver: string;
+  req?: string;
 }
 
 export interface DappnodeParams {
@@ -157,10 +160,6 @@ export interface UserActionLog {
   stack?: string; // If error: e.stack { string }
 }
 
-export type CrossbarHandler = () => {
-  result?: any;
-};
-
 /**
  * Installer types
  */
@@ -186,6 +185,14 @@ export interface InstallerPkg {
   ver: string;
   manifest: Manifest;
   isCore: boolean;
+}
+
+export interface DockerOptionsInterface {
+  timeout?: number;
+  timestamps?: boolean;
+  volumes?: boolean;
+  v?: boolean;
+  core?: string;
 }
 
 /**
@@ -218,6 +225,14 @@ export interface AutoUpdatePending {
   [dnpName: string]: AutoUpdatePendingEntry;
 }
 
+export interface AutoUpdateFeedback {
+  inQueue?: boolean;
+  manuallyUpdated?: boolean;
+  scheduled?: number;
+  updated?: number;
+  errorMessage?: string;
+}
+
 /**
  * Releases types
  */
@@ -228,3 +243,21 @@ export type FetchLatestVersion = (
   version: string;
   contentUri: string;
 }>;
+
+export interface PackageVersionData {
+  version?: string;
+  branch?: string;
+  commit?: string;
+}
+
+/**
+ * RPC methods
+ */
+
+export interface RpcHandlerReturn {
+  message: string;
+  result?: any;
+  logMessage?: boolean;
+  userAction?: boolean;
+  privateKwargs?: boolean;
+}

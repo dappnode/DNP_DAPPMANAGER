@@ -5,7 +5,7 @@ import * as parse from "../utils/parse";
 import * as envsHelper from "../utils/envsHelper";
 // External call
 import restartPackage from "./restartPackage";
-import { PackageEnvs } from "../types";
+import { PackageEnvs, RpcHandlerReturn } from "../types";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -25,7 +25,7 @@ export default async function updatePackageEnv({
   id: string;
   envs: PackageEnvs;
   restart: boolean;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
   if (!envs) throw Error("kwarg envs must be defined");
 

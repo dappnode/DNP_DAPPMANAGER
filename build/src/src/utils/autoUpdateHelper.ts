@@ -10,7 +10,8 @@ import {
   AutoUpdateRegistryDnp,
   RegistryInterface,
   AutoUpdatePendingEntry,
-  AutoUpdatePending
+  AutoUpdatePending,
+  AutoUpdateFeedback
 } from "../types";
 
 // Groups of packages keys
@@ -50,7 +51,7 @@ export function getSettings(): AutoUpdateSettings {
  * @param {string} id "bitcoin.dnp.dappnode.eth"
  * @param {boolean} enabled true
  */
-function setSettings(id: string, enabled: boolean) {
+function setSettings(id: string, enabled: boolean): void {
   const autoUpdateSettings = getSettings();
 
   db.set(AUTO_UPDATE_SETTINGS, {
@@ -70,7 +71,7 @@ function setSettings(id: string, enabled: boolean) {
  * @param {bool} enabled
  * @param {string} name, if null modifies MY_PACKAGES settings
  */
-export function editDnpSetting(enabled: boolean, name = MY_PACKAGES) {
+export function editDnpSetting(enabled: boolean, name = MY_PACKAGES): void {
   const autoUpdateSettings = getSettings();
 
   // When disabling MY_PACKAGES, turn off all DNPs settings by
@@ -90,7 +91,7 @@ export function editDnpSetting(enabled: boolean, name = MY_PACKAGES) {
  *
  * @param {bool} enabled
  */
-export function editCoreSetting(enabled: boolean) {
+export function editCoreSetting(enabled: boolean): void {
   setSettings(SYSTEM_PACKAGES, enabled);
 
   // When disabling any DNP, clear their pending updates
@@ -103,7 +104,7 @@ export function editCoreSetting(enabled: boolean) {
  * @param {string} name optional
  * @returns {bool} isEnabled
  */
-export function isDnpUpdateEnabled(name = MY_PACKAGES) {
+export function isDnpUpdateEnabled(name = MY_PACKAGES): boolean {
   const settings = getSettings();
 
   // If checking the general MY_PACKAGES setting,
@@ -117,7 +118,7 @@ export function isDnpUpdateEnabled(name = MY_PACKAGES) {
  * Check if auto updates are enabled for system packages
  * @returns {bool} isEnabled
  */
-export function isCoreUpdateEnabled() {
+export function isCoreUpdateEnabled(): boolean {
   const settings = getSettings();
   return (settings[SYSTEM_PACKAGES] || {}).enabled ? true : false;
 }
@@ -134,7 +135,7 @@ export function flagCompletedUpdate(
   name: string,
   version: string,
   timestamp?: number
-) {
+): void {
   setRegistry(name, version, {
     updated: timestamp || Date.now(),
     successful: true
@@ -150,7 +151,7 @@ export function flagCompletedUpdate(
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {string} errorMessage "Mainnet is still syncing"
  */
-export function flagErrorUpdate(name: string, errorMessage: string) {
+export function flagErrorUpdate(name: string, errorMessage: string): void {
   setPending(name, { errorMessage });
 }
 
@@ -170,7 +171,7 @@ export function isUpdateDelayCompleted(
   name: string,
   version: string,
   timestamp?: number
-) {
+): boolean {
   if (!timestamp) timestamp = Date.now();
 
   const pending = getPending();
@@ -204,7 +205,7 @@ export function isUpdateDelayCompleted(
  *
  * @param {string} id "my-packages", "system-packages", "bitcoin.dnp.dappnode.eth"
  */
-export function clearPendingUpdates(id: string) {
+export function clearPendingUpdates(id: string): void {
   const pending = getPending();
 
   if (id === MY_PACKAGES) {
@@ -229,7 +230,7 @@ export function clearPendingUpdates(id: string) {
  *
  * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
  */
-function clearPendingUpdatesOfDnp(name: string) {
+function clearPendingUpdatesOfDnp(name: string): void {
   const pending = getPending();
   db.set(AUTO_UPDATE_PENDING, omit(pending, name));
 }
@@ -241,7 +242,7 @@ function clearPendingUpdatesOfDnp(name: string) {
  *
  * @param {string} name "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"
  */
-export function clearRegistry(name: string) {
+export function clearRegistry(name: string): void {
   const registry = getRegistry();
   db.set(AUTO_UPDATE_REGISTRY, omit(registry, name));
 
@@ -260,7 +261,7 @@ export function clearRegistry(name: string) {
 export function clearCompletedCoreUpdatesIfAny(
   currentVersionId: string,
   timestamp?: number
-) {
+): void {
   const pending = getPending();
 
   const { version: pendingVersionId } =
@@ -309,7 +310,7 @@ function setRegistry(
   name: string,
   version: string,
   data: AutoUpdateRegistryEntry
-) {
+): void {
   const registry = getRegistry();
 
   db.set(AUTO_UPDATE_REGISTRY, {
@@ -358,7 +359,7 @@ export function getPending(): AutoUpdatePending {
  * @param {string} name "bitcoin.dnp.dappnode.eth"
  * @param {object} data { version: "0.2.6", param: "value" }
  */
-function setPending(name: string, data: AutoUpdatePendingEntry) {
+function setPending(name: string, data: AutoUpdatePendingEntry): void {
   const pending = getPending();
   db.set(AUTO_UPDATE_PENDING, {
     ...pending,
@@ -394,7 +395,7 @@ export function getDnpFeedbackMessage({
   currentVersion: string;
   registry?: RegistryInterface;
   pending?: AutoUpdatePending;
-}) {
+}): AutoUpdateFeedback {
   if (!registry) registry = getRegistry();
   if (!pending) pending = getPending();
 
@@ -449,7 +450,7 @@ export function getCoreFeedbackMessage({
   currentVersionId: string;
   registry?: RegistryInterface;
   pending?: AutoUpdatePending;
-}) {
+}): AutoUpdateFeedback {
   if (!registry) registry = getRegistry();
   if (!pending) pending = getPending();
 
@@ -497,7 +498,13 @@ export function getCoreFeedbackMessage({
  * @param {object} registryDnp
  * @return {object}
  */
-export function getLastRegistryEntry(registryDnp: AutoUpdateRegistryDnp) {
+export function getLastRegistryEntry(
+  registryDnp: AutoUpdateRegistryDnp
+): {
+  version: string;
+  updated?: number;
+  successful?: boolean;
+} {
   return (
     Object.entries(registryDnp)
       .map(([version, { updated, successful }]) => ({

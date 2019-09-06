@@ -1,10 +1,8 @@
+import { Dependencies } from "../../types";
+
 /**
  * Aggregate types
  */
-
-export interface Dependencies {
-  [dependencyName: string]: string;
-}
 
 export interface DnpsRepo {
   [dnpName: string]: {
@@ -66,10 +64,20 @@ export interface PermutationInterface {
   [dnpName: string]: VersionInternalResolver;
 }
 
-export interface StateInterface {
+export interface StateInternalInterface {
   [dnpName: string]: VersionInternalResolver;
+}
+
+export interface StateInterface {
+  [dnpName: string]: string;
 }
 
 export interface ErrorsInterface {
   [errorKey: string]: number;
+}
+
+export interface ResultInterface {
+  message: string;
+  state: StateInterface;
+  alreadyUpdated: StateInterface;
 }

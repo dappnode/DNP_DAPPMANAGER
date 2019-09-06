@@ -13,7 +13,6 @@ import cleanCache from "./cleanCache";
 import copyFileFrom from "./copyFileFrom";
 import copyFileTo from "./copyFileTo";
 import diagnose from "./diagnose";
-import diskSpaceAvailable from "./diskSpaceAvailable";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
 import fetchPackageData from "./fetchPackageData";
@@ -51,7 +50,6 @@ export {
   copyFileFrom,
   copyFileTo,
   diagnose,
-  diskSpaceAvailable,
   fetchCoreUpdateData,
   fetchDirectory,
   fetchPackageData,

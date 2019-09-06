@@ -1,4 +1,5 @@
 import installPackage from "./installPackage";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Installs a package in safe mode, by setting options.BYPASS_RESOLVER = true
@@ -14,7 +15,7 @@ export default async function installPackageSafe({
 }: {
   id: string;
   options?: { BYPASS_RESOLVER?: boolean };
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   options.BYPASS_RESOLVER = true;

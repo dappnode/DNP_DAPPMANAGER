@@ -8,7 +8,7 @@ describe("Util: restartPatch", () => {
   let dockerComposeUpArg: string;
   const docker = {
     compose: {
-      up: async (arg: string) => {
+      up: async (arg: string): Promise<void> => {
         dockerComposeUpArg = arg;
       }
     }

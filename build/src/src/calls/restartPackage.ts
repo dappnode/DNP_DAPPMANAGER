@@ -4,13 +4,18 @@ import restartPatch from "../modules/restartPatch";
 import params from "../params";
 import docker from "../modules/docker";
 import { eventBus, eventBusTag } from "../eventBus";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Calls docker rm and docker up on a package
  *
  * @param {string} id DNP .eth name
  */
-export default async function restartPackage({ id }: { id: string }) {
+export default async function restartPackage({
+  id
+}: {
+  id: string;
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);

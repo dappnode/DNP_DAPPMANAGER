@@ -1,6 +1,6 @@
 // WARNING: versions is an external uncontrolled input, verify
 
-export default function sanitizeVersions(versions: string[]) {
+export default function sanitizeVersions(versions: string[]): string[] {
   if (!versions) {
     throw Error("SANITIZE-ERROR: Versions is not defined");
   }

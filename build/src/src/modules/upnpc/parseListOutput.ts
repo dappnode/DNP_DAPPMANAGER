@@ -1,4 +1,6 @@
 import parseGeneralErrors from "./parseGeneralErrors";
+import { PortProtocol } from "../../types";
+import { UpnpPortMapping } from "./types";
 
 // SUCCESSFUL
 
@@ -49,7 +51,9 @@ import parseGeneralErrors from "./parseGeneralErrors";
  *   { protocol: "TCP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
  * ]
  */
-export default function parseListOutput(terminalOutput: string) {
+export default function parseListOutput(
+  terminalOutput: string
+): UpnpPortMapping[] {
   parseGeneralErrors(terminalOutput);
 
   // 1. Cut to the start of the table
@@ -70,7 +74,12 @@ export default function parseListOutput(terminalOutput: string) {
         const [, protocol, mapping] = line.trim().split(/\s+/);
         const exPort = mapping.split("->")[0];
         const [ip, inPort] = (mapping.split("->")[1] || "").split(":");
-        return { protocol, exPort, inPort, ip };
+        return {
+          protocol: (protocol === "UDP" ? "UDP" : "TCP") as PortProtocol,
+          exPort,
+          inPort,
+          ip
+        };
       })
       // Make sure each result is correct, otherwise remove it
       .filter(

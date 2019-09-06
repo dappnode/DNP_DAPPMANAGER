@@ -14,7 +14,7 @@ const getDataUri = require("datauri").promise;
  * @param {object} path file path, will read the file at this path
  * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
  */
-export default async function fileToDataUri(path: string) {
+export default async function fileToDataUri(path: string): Promise<string> {
   let dataUri = await getDataUri(path);
 
   /**

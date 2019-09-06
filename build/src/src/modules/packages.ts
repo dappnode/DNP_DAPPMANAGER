@@ -23,7 +23,13 @@ const writeFile = promisify(fs.writeFile);
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function download({ pkg, id }: { pkg: InstallerPkg; id: string }) {
+export async function download({
+  pkg,
+  id
+}: {
+  pkg: InstallerPkg;
+  id: string;
+}): Promise<void> {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
@@ -71,7 +77,13 @@ export async function download({ pkg, id }: { pkg: InstallerPkg; id: string }) {
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function load({ pkg, id }: { pkg: InstallerPkg; id: string }) {
+export async function load({
+  pkg,
+  id
+}: {
+  pkg: InstallerPkg;
+  id: string;
+}): Promise<void> {
   // call IPFS, store the file in the repo's folder
   // load the image to docker
   const { manifest } = pkg;
@@ -113,7 +125,13 @@ export async function load({ pkg, id }: { pkg: InstallerPkg; id: string }) {
  * - id: task id to allow progress updates
  * @returns {*}
  */
-export async function run({ pkg, id }: { pkg: InstallerPkg; id: string }) {
+export async function run({
+  pkg,
+  id
+}: {
+  pkg: InstallerPkg;
+  id: string;
+}): Promise<void> {
   const { name, manifest } = pkg;
   const { version } = manifest;
   const isCore = Boolean(pkg.isCore);
@@ -155,6 +173,7 @@ export async function run({ pkg, id }: { pkg: InstallerPkg; id: string }) {
  * @param {number} resolution callback is called every ${resolution} %
  * @param {function} callback function(percent, currentAmount) {}
  */
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function onChunkFactory(
   totalAmount: number,
   resolution: number,
@@ -162,7 +181,7 @@ function onChunkFactory(
 ) {
   let currentAmount = 0;
   let prevPercent = 0;
-  return function(chunk: any) {
+  return function(chunk: Buffer): void {
     currentAmount += chunk.length;
     const ratio = currentAmount / totalAmount;
     const percent = resolution * Math.ceil((100 * ratio) / resolution);

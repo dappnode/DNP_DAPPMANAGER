@@ -7,24 +7,27 @@ import { shortNameCapitalized } from "../utils/format";
 import {
   AutoUpdateSettings,
   RegistryInterface,
-  AutoUpdatePending
+  AutoUpdatePending,
+  AutoUpdateFeedback,
+  RpcHandlerReturn
 } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
-
-interface AutoUpdateFeedbackInterface {
-  inQueue?: boolean;
-  manuallyUpdated?: boolean;
-  scheduled?: number;
-  updated?: number;
-  errorMessage?: string;
-}
 
 interface DnpsToShowInterface {
   id: string;
   displayName: string;
   enabled: boolean;
-  feedback: AutoUpdateFeedbackInterface;
+  feedback: AutoUpdateFeedback;
+}
+
+interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
+  result: {
+    settings: AutoUpdateSettings;
+    registry: RegistryInterface;
+    pending: AutoUpdatePending;
+    dnpsToShow: DnpsToShowInterface[];
+  };
 }
 
 /**
@@ -63,15 +66,9 @@ interface DnpsToShowInterface {
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet(): Promise<{
-  message: string;
-  result: {
-    settings: AutoUpdateSettings;
-    registry: RegistryInterface;
-    pending: AutoUpdatePending;
-    dnpsToShow: DnpsToShowInterface[];
-  };
-}> {
+export default async function autoUpdateDataGet(): Promise<
+  RpcAutoUpdateDataGetReturn
+> {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();

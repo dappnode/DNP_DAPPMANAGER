@@ -4,8 +4,27 @@ import getManifest from "../modules/getManifest";
 import listContainers from "../modules/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
+import { Manifest, ManifestUpdateAlert, RpcHandlerReturn } from "../types";
+
+interface RpcFetchCoreUpdateDataReturn extends RpcHandlerReturn {
+  result: {
+    available: boolean;
+    type: string | null;
+    packages: {
+      name: string;
+      from: string;
+      to: string;
+      warningOnInstall: string;
+      manifest: Manifest;
+    }[];
+    changelog: string;
+    updateAlerts: ManifestUpdateAlert[];
+    versionId: string;
+  };
+}
 
 const coreName = "core.dnp.dappnode.eth";
+const defaultVersion = "*";
 
 /**
  * Fetches the core update data, if available
@@ -32,7 +51,11 @@ const coreName = "core.dnp.dappnode.eth";
  *   versionId: "admin@0.2.6,core@0.2.8"
  * }
  */
-export default async function fetchCoreUpdateData({ version = "*" } = {}) {
+export default async function fetchCoreUpdateData({
+  version
+}: {
+  version?: string;
+}): Promise<RpcFetchCoreUpdateDataReturn> {
   /**
    * Resolve core.dnp.dappnode.eth to figure out if it should be installed
    * With the list of deps to install, compute the higher updateType
@@ -40,7 +63,7 @@ export default async function fetchCoreUpdateData({ version = "*" } = {}) {
    */
   const { state: coreDnpsToBeInstalled } = await dappGet({
     name: coreName,
-    ver: version
+    ver: version || defaultVersion
   });
 
   const dnpList = await listContainers();
@@ -89,7 +112,7 @@ export default async function fetchCoreUpdateData({ version = "*" } = {}) {
 
   const coreManifest = await getManifest({
     name: coreName,
-    ver: version
+    ver: version || defaultVersion
   });
 
   /**
@@ -119,7 +142,7 @@ export default async function fetchCoreUpdateData({ version = "*" } = {}) {
       available: Boolean(Object.keys(coreDnpsToBeInstalled).length),
       type,
       packages,
-      changelog: coreManifest.changelog,
+      changelog: coreManifest.changelog || "",
       updateAlerts,
       versionId
     }

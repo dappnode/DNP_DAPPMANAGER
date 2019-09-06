@@ -27,13 +27,13 @@ const wrappedMethods = wrapMethodsWithQueue(methods, params);
  */
 
 function wrapMethodWithIsAvailable(method: (...args: any[]) => any) {
-  return async function(hash: string, ...args: any[]) {
+  return async function(hash: string, ...args: any[]): Promise<any> {
     await isAvailable(hash);
     return await method(hash, ...args);
   };
 }
 
-async function isAvailable(hash: string) {
+async function isAvailable(hash: string): Promise<void> {
   if (!hash || typeof hash !== "string")
     throw Error(`arg hash must be a string: ${hash}`);
   if (!isIpfsHash(hash)) throw Error(`Invalid IPFS hash: ${hash}`);

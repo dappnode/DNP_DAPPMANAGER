@@ -10,7 +10,7 @@ import isIpfsHash from "./isIpfsHash";
  * This wrapper guards against this extra cases.
  */
 
-export function isHigher(v1: string, v2: string) {
+export function isHigher(v1: string, v2: string): boolean {
   const ipfs = "999.9.10";
   const latest = "999.9.9";
   // if v1 and v2 are ipfs hashes, prioritize above latest
@@ -23,7 +23,7 @@ export function isHigher(v1: string, v2: string) {
   return semver.gt(v1, v2);
 }
 
-export function highestVersion(v1: string, v2: string) {
+export function highestVersion(v1: string, v2: string): string {
   // If no version is passed return the other
   if (!v1 && v2) return v2;
   if (!v2 && v1) return v1;

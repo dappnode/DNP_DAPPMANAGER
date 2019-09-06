@@ -24,7 +24,7 @@ export default function logUi({
   name?: string;
   message?: string;
   clear?: boolean;
-}) {
+}): void {
   eventBus.emit(
     eventBusTag.logUi,
     clear ? { id, clear } : { id, name, message }

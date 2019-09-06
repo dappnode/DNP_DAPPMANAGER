@@ -2,7 +2,15 @@ import * as parse from "../utils/parse";
 import getManifest from "../modules/getManifest";
 import getAvatar from "../modules/getAvatar";
 import Logs from "../logs";
+import { Manifest, RpcHandlerReturn } from "../types";
 const logs = Logs(module);
+
+interface RpcFetchPackageDataReturn extends RpcHandlerReturn {
+  result: {
+    manifest: Manifest;
+    avatar: string | undefined;
+  };
+}
 
 /**
  * Fetches the manifest of the latest version and its avatar.
@@ -14,7 +22,11 @@ const logs = Logs(module);
  *   manifest: <manifest object> {object}
  * }
  */
-export default async function fetchPackageData({ id }: { id: string }) {
+export default async function fetchPackageData({
+  id
+}: {
+  id: string;
+}): Promise<RpcFetchPackageDataReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const manifest = await getManifest(parse.packageReq(id));

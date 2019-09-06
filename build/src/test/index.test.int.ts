@@ -7,17 +7,20 @@ import * as calls from "../src/calls";
 import params from "../src/params";
 const getDataUri = require("datauri").promise;
 import Logs from "../src/logs";
+import { PackageContainer, ContainerStatus } from "../src/types";
 const logs = Logs(module);
 
 // Utils
-async function getDnpFromListPackages(id: string) {
+async function getDnpFromListPackages(
+  id: string
+): Promise<PackageContainer | undefined> {
   const res = await calls.listPackages();
   if (!Array.isArray(res.result))
     throw Error("listPackages must return an array");
   return res.result.find(e => e.name.includes(id));
 }
 
-async function getDnpState(id: string) {
+async function getDnpState(id: string): Promise<ContainerStatus | "down"> {
   const dnp = await getDnpFromListPackages(id);
   return dnp ? dnp.state : "down";
 }
@@ -38,7 +41,8 @@ describe("Full integration test with REAL docker: ", function() {
   const idNginx = "nginx-proxy.dnp.dappnode.eth";
   const idLetsencrypt = "letsencrypt-nginx.dnp.dappnode.eth";
 
-  const shellSafe = (cmd: string) => shell(cmd).catch(() => {});
+  const shellSafe = (cmd: string): Promise<string | void> =>
+    shell(cmd).catch(() => {});
 
   // add .skip to skip test
 

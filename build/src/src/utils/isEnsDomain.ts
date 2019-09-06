@@ -1,6 +1,6 @@
 const supportedDomains = ["eth"];
 
-export default function isEnsDomain(ensDomain: string) {
+export default function isEnsDomain(ensDomain: string): boolean {
   if (!ensDomain || typeof ensDomain !== "string") return false;
   if (ensDomain.includes("/")) return false;
   if (!ensDomain.includes(".")) return false;

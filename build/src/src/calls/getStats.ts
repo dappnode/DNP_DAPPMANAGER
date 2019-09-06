@@ -1,7 +1,16 @@
 import os from "os";
 import shellExec from "../utils/shell";
 import Logs from "../logs";
+import { RpcHandlerReturn } from "../types";
 const logs = Logs(module);
+
+interface RpcGetStatsReturn extends RpcHandlerReturn {
+  result: {
+    cpu: string | undefined;
+    memory: string | undefined;
+    disk: string | undefined;
+  };
+}
 
 // Cache static values
 const numCores = os.cpus().length;
@@ -15,7 +24,7 @@ const numCores = os.cpus().length;
  *   disk: "57%", {string}
  * }
  */
-export default async function getStats() {
+export default async function getStats(): Promise<RpcGetStatsReturn> {
   const cpuUsedPercent = await wrapErrors(async () => {
     return getDiskPercent();
   }, "cpuUsedPercent");
@@ -50,7 +59,7 @@ export default async function getStats() {
  * This util takes only the 1min and limits it to 100%
  * @returns {string} cpu usage percent "36%"
  */
-function getDiskPercent() {
+function getDiskPercent(): string {
   let cpuFraction = os.loadavg()[0] / numCores;
   if (cpuFraction > 1) cpuFraction = 1;
   return Math.round(cpuFraction * 100) + "%";
@@ -61,7 +70,10 @@ function getDiskPercent() {
  * @param {function} fn async getter
  * @param {string} name for the message
  */
-async function wrapErrors(fn: () => Promise<string>, name: string) {
+async function wrapErrors<Return>(
+  fn: () => Promise<Return>,
+  name: string
+): Promise<Return | undefined> {
   try {
     return await fn();
   } catch (e) {

@@ -24,24 +24,28 @@ interface EthSyncingInterface {
  * @returns {bool} Returns true if it's syncing and the blockDiff
  * is big enough. Returns false otherwise
  */
-const isSyncingThrottled = runOnlyOneReturnToAll(callback => {
-  eth.sendAsync(
-    { method: "eth_syncing" },
-    (err: Error, res: EthSyncingInterface) => {
-      if (err) {
-        if (err.message.includes("Invalid JSON RPC response from provider")) {
-          return callback(Error(`Can't connect to ${WEB3_HOST_HTTP}`), null);
-        } else {
-          return callback(err, null);
+function isSyncing(): Promise<boolean> {
+  return new Promise(
+    (resolve, reject): void => {
+      eth.sendAsync(
+        { method: "eth_syncing" },
+        (err: Error, res: EthSyncingInterface) => {
+          if (err) {
+            if (err.message.includes("Invalid JSON RPC response from provider"))
+              reject(Error(`Can't connect to ${WEB3_HOST_HTTP}`));
+            else reject(err);
+          } else {
+            if (!res) resolve(false);
+            const currentBlock = parseInt(res.currentBlock, 16);
+            const highestBlock = parseInt(res.highestBlock, 16);
+            resolve(Math.abs(currentBlock - highestBlock) > blockDiff);
+          }
         }
-      }
-      if (!res) return callback(null, false);
-      const currentBlock = parseInt(res.currentBlock, 16);
-      const highestBlock = parseInt(res.highestBlock, 16);
-      const isSyncing = Math.abs(currentBlock - highestBlock) > blockDiff;
-      callback(null, isSyncing);
+      );
     }
   );
-});
+}
+
+const isSyncingThrottled = runOnlyOneReturnToAll(isSyncing);
 
 export default isSyncingThrottled;

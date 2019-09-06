@@ -17,7 +17,9 @@ const ephemeralPortRange = 32768;
  * Used when trying to up a container and its ports collide
  * @param {string} dockerComposePath
  */
-export default async function unlockPorts(dockerComposePath: string) {
+export default async function unlockPorts(
+  dockerComposePath: string
+): Promise<void> {
   if (typeof dockerComposePath !== "string") {
     throw Error(
       `First argument (dockerComposePath) of unlockPorts must be String: ${JSON.stringify(

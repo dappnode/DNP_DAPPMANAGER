@@ -22,7 +22,35 @@ const proxyquire = require("proxyquire").noCallThru();
  * > Also, should not crash due to a dependency loop
  */
 
-const dnpList = getDnpList();
+const dnpList = [
+  {
+    dependencies: {
+      "nginx-proxy.dnp.dappnode.eth": "latest",
+      "letsencrypt-nginx.dnp.dappnode.eth": "latest"
+    },
+    name: "web.dnp.dappnode.eth",
+    version: "0.0.0",
+    origin: undefined
+  },
+  {
+    dependencies: undefined,
+    name: "vpn.dnp.dappnode.eth",
+    version: "0.1.16",
+    origin: undefined
+  },
+  {
+    dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
+    name: "nginx-proxy.dnp.dappnode.eth",
+    version: "0.0.3",
+    origin: undefined
+  },
+  {
+    dependencies: { "web.dnp.dappnode.eth": "latest" },
+    name: "letsencrypt-nginx.dnp.dappnode.eth",
+    version: "0.0.4",
+    origin: "/ipfs/Qm1234"
+  }
+];
 const listContainers = sinon.stub().callsFake(async () => {
   return dnpList;
 });
@@ -150,35 +178,3 @@ describe("dappGet/aggregate", () => {
     });
   });
 });
-
-function getDnpList() {
-  return [
-    {
-      dependencies: {
-        "nginx-proxy.dnp.dappnode.eth": "latest",
-        "letsencrypt-nginx.dnp.dappnode.eth": "latest"
-      },
-      name: "web.dnp.dappnode.eth",
-      version: "0.0.0",
-      origin: undefined
-    },
-    {
-      dependencies: undefined,
-      name: "vpn.dnp.dappnode.eth",
-      version: "0.1.16",
-      origin: undefined
-    },
-    {
-      dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-      name: "nginx-proxy.dnp.dappnode.eth",
-      version: "0.0.3",
-      origin: undefined
-    },
-    {
-      dependencies: { "web.dnp.dappnode.eth": "latest" },
-      name: "letsencrypt-nginx.dnp.dappnode.eth",
-      version: "0.0.4",
-      origin: "/ipfs/Qm1234"
-    }
-  ];
-}

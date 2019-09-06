@@ -1,7 +1,4 @@
 import async from "async";
-import { promisify } from "util";
-
-type Callback = (err: Error | null, res: any) => void;
 
 /**
  * Makes sure the target async function is running only once at every instant.
@@ -22,20 +19,22 @@ type Callback = (err: Error | null, res: any) => void;
  *
  * @param fn Target function
  */
-export function runOnlyOneSequentially(fn: (...args: any[]) => Promise<any>) {
+export function runOnlyOneSequentially<Argument, Return>(
+  fn: (arg?: Argument) => Promise<Return>
+): (arg?: Argument) => void {
   // create a cargo object with an infinite payload
   const cargo = async.cargo(function(
-    tasks: { args: any[] }[],
+    tasks: { arg: Argument }[],
     callback: () => void
   ) {
-    fn(...tasks[0].args).then(() => {
+    fn(tasks[0].arg).then(() => {
       callback();
     });
   },
   1e9);
 
-  return function(...args: any[]) {
-    cargo.push({ args });
+  return function(arg?: Argument): void {
+    cargo.push({ arg });
   };
 }
 
@@ -54,41 +53,41 @@ export function runOnlyOneSequentially(fn: (...args: any[]) => Promise<any>) {
  *
  * @param fn Target function (Callback style)
  */
-export function runOnlyOneReturnToAll(fn: (callback: Callback) => void) {
+export function runOnlyOneReturnToAll<Return>(
+  fn: () => Promise<Return>
+): () => Promise<Return> {
   // This variables act as a class constructor
   let isRunning = false;
-  let waitingCallbacks: Callback[] = [];
+  let waitingPromises: {
+    resolve: (res: Return) => void;
+    reject: (err: Error) => void;
+  }[] = [];
 
-  function throttledCallback(callback: Callback) {
-    waitingCallbacks.push(callback);
-    if (!isRunning) {
-      isRunning = true;
-      fn((err, res) => {
-        waitingCallbacks.forEach(callback => callback(err, res));
-        isRunning = false;
-        waitingCallbacks = [];
-      });
-    }
-  }
-
-  return promisify(throttledCallback);
-}
-
-/**
- * Same as runOnlyOneReturnToAll but for async target functions
- *
- * @param fn Target function (Async style)
- */
-export function runOnlyOneReturnToAllAsync(fn: () => Promise<any>) {
-  function fnCallbackStyle(callback: Callback) {
-    fn().then(
-      // Convert an async fn to a callback style fn
-      res => callback(null, res),
-      err => callback(err, null)
+  return function throttledFunction(): Promise<Return> {
+    return new Promise(
+      (resolve, reject): void => {
+        waitingPromises.push({ resolve, reject });
+        if (!isRunning) {
+          isRunning = true;
+          fn()
+            .then(
+              res =>
+                waitingPromises.forEach(waitingPromise => {
+                  waitingPromise.resolve(res);
+                }),
+              (err: Error) =>
+                waitingPromises.forEach(waitingPromise => {
+                  waitingPromise.reject(err);
+                })
+            )
+            .then(() => {
+              isRunning = false;
+              waitingPromises = [];
+            });
+        }
+      }
     );
-  }
-
-  return runOnlyOneReturnToAll(fnCallbackStyle);
+  };
 }
 
 /**
@@ -96,6 +95,10 @@ export function runOnlyOneReturnToAllAsync(fn: () => Promise<any>) {
  *
  * @param ms Pause time (ms)
  */
-export function pause(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function pause(ms: number): Promise<void> {
+  return new Promise(
+    (resolve): void => {
+      setTimeout(resolve, ms);
+    }
+  );
 }

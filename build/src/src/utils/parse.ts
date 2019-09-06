@@ -1,6 +1,6 @@
-import { PackageEnvs } from "../types";
+import { PackageEnvs, PackageRequest } from "../types";
 
-export function envFile(envFileData: string) {
+export function envFile(envFileData: string): PackageEnvs {
   // Parses key1=value1 files, splited by new line
   //        key2=value2
   return (envFileData || "")
@@ -14,7 +14,7 @@ export function envFile(envFileData: string) {
     }, {});
 }
 
-export function stringifyEnvs(envs: PackageEnvs) {
+export function stringifyEnvs(envs: PackageEnvs): string {
   if (typeof envs === typeof {}) {
     // great
   } else if (typeof envs === typeof "string") {
@@ -35,7 +35,7 @@ export function stringifyEnvs(envs: PackageEnvs) {
   );
 }
 
-export function packageReq(reqString: string) {
+export function packageReq(reqString: string): PackageRequest {
   if (!reqString) throw Error("PARSE ERROR: packageReq is undefined");
 
   if (typeof reqString != "string") {

@@ -20,7 +20,7 @@ export default async function fetchVersions({
 }: {
   name: string;
   versionRange: string;
-}) {
+}): Promise<string[]> {
   if (semver.validRange(versionRange)) {
     if (versionRange === "*") {
       // ##### TODO: Case 0. Force "*" to strictly fetch the last version only

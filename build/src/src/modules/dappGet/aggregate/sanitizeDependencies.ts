@@ -2,7 +2,9 @@ import { Dependencies } from "../../../types";
 
 // WARNING: manifest's dependencies is an external uncontrolled input, verify
 
-export default function sanitizeDependencies(dependencies: Dependencies) {
+export default function sanitizeDependencies(
+  dependencies: Dependencies
+): Dependencies {
   if (!dependencies) {
     throw Error("SANITIZE-ERROR: Dependencies is not defined");
   }

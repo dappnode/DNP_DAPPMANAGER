@@ -1,5 +1,13 @@
 import dappGet from "../modules/dappGet";
-import { PackageRequest } from "../types";
+import { PackageRequest, RpcHandlerReturn } from "../types";
+import { StateInterface } from "../modules/dappGet/types";
+
+interface RpcResolveRequestReturn extends RpcHandlerReturn {
+  result: {
+    state: StateInterface;
+    alreadyUpdated: StateInterface;
+  };
+}
 
 /**
  * Resolves a DNP request given the current repo state fetched
@@ -21,7 +29,7 @@ export default async function resolveRequest({
 }: {
   req: PackageRequest;
   options: {};
-}) {
+}): Promise<RpcResolveRequestReturn> {
   if (!req) throw Error("kwarg req must be defined");
 
   /**

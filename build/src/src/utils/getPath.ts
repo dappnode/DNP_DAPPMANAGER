@@ -25,7 +25,7 @@ export function packageRepoDir(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   return getRepoDirPath(dnpName, params, isCore);
@@ -35,7 +35,7 @@ export function manifest(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   return path.join(
@@ -48,13 +48,16 @@ export function dockerCompose(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   return getDockerComposePath(dnpName, params, isCore);
 }
 
-export function dockerComposeSmart(dnpName: string, params: DappnodeParams) {
+export function dockerComposeSmart(
+  dnpName: string,
+  params: DappnodeParams
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   // First check for core docker-compose
@@ -68,7 +71,7 @@ export function envFile(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   return getEnvFilePath(dnpName, params, isCore);
@@ -78,7 +81,7 @@ export function envFileSmart(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!params) throw Error("params must be defined");
   if (isCore) return getEnvFilePath(dnpName, params, true);
@@ -94,7 +97,7 @@ export function image(
   imageName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!dnpName) throw Error("dnpName must be defined");
   if (!imageName) throw Error("imageName must be defined");
   if (!params) throw Error("params must be defined");
@@ -107,7 +110,7 @@ function getDockerComposePath(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   return path.join(
     getRepoDirPath(dnpName, params, isCore),
     getDockerComposeName(dnpName, isCore)
@@ -118,7 +121,7 @@ function getEnvFilePath(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   return path.join(getRepoDirPath(dnpName, params, isCore), `${dnpName}.env`);
 }
 
@@ -126,14 +129,14 @@ function getRepoDirPath(
   dnpName: string,
   params: DappnodeParams,
   isCore: boolean
-) {
+): string {
   if (!params.DNCORE_DIR) throw Error("params.DNCORE_DIR must be defined");
   if (!params.REPO_DIR) throw Error("params.REPO_DIR must be defined");
   if (isCore) return params.DNCORE_DIR;
   return path.join(params.REPO_DIR, dnpName);
 }
 
-function getDockerComposeName(dnpName: string, isCore: boolean) {
+function getDockerComposeName(dnpName: string, isCore: boolean): string {
   if (isCore) {
     verifyDnpName(dnpName);
     const dnpShortName = (dnpName || "").split(".")[0];
@@ -143,7 +146,7 @@ function getDockerComposeName(dnpName: string, isCore: boolean) {
   }
 }
 
-function getManifestName(dnpName: string, isCore: boolean) {
+function getManifestName(dnpName: string, isCore: boolean): string {
   if (isCore) {
     verifyDnpName(dnpName);
     const dnpShortName = (dnpName || "").split(".")[0];
@@ -155,7 +158,7 @@ function getManifestName(dnpName: string, isCore: boolean) {
 
 // Utils
 
-function verifyDnpName(dnpName: string) {
+function verifyDnpName(dnpName: string): void {
   if (!dnpName) throw Error("dnpName must be defined");
   if (typeof dnpName !== "string")
     throw Error(

@@ -47,7 +47,7 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Auto update settings", () => {
     it("Should set active for my packages", () => {
-      const check = () => isDnpUpdateEnabled(name);
+      const check = (): boolean => isDnpUpdateEnabled(name);
 
       // Enable my-packages
       expect(check()).to.equal(false, "Before enabling");
@@ -512,7 +512,11 @@ describe("Util: autoUpdateHelper", () => {
         "2. Should be scheduled"
       );
 
-      await new Promise(r => setTimeout(r, 2 * microDelay));
+      await new Promise(
+        (r): void => {
+          setTimeout(r, 2 * microDelay);
+        }
+      );
 
       expect(
         getCoreFeedbackMessage({

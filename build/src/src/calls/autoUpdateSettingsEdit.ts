@@ -4,6 +4,7 @@ import {
   editDnpSetting,
   editCoreSetting
 } from "../utils/autoUpdateHelper";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Edits the auto-update settings
@@ -17,7 +18,7 @@ export default async function autoUpdateSettingsEdit({
 }: {
   id: string;
   enabled: boolean;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 

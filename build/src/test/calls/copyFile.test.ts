@@ -3,6 +3,8 @@ import { expect } from "chai";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
 import path from "path";
+import { PackageContainer } from "../../src/types";
+import { mockDnp } from "../testUtils";
 
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -17,18 +19,26 @@ const modifiedParams = {
   DNCORE_DIR: testDir
 };
 const containerSimulatedFolder = `${testDir}/container-volume`;
-const dockerPath = (_path: string) => containerSimulatedFolder + _path;
+const dockerPath = (_path: string): string => containerSimulatedFolder + _path;
 const id = "kovan.dnp.dappnode.eth";
 const containerName = "DAppNodePackage-kovan.dnp.dappnode.eth";
 
 const docker = {
-  copyFileFrom: async (id: string, fromPath: string, toPath: string) => {
+  copyFileFrom: async (
+    id: string,
+    fromPath: string,
+    toPath: string
+  ): Promise<void> => {
     if (id !== containerName)
       throw Error(`Fake docker: Container not found: ${id}`);
     await shell(`mkdir -p ${path.dirname(dockerPath(fromPath))}`);
     await shell(`cp ${dockerPath(fromPath)} ${toPath}`);
   },
-  copyFileTo: async (id: string, fromPath: string, toPath: string) => {
+  copyFileTo: async (
+    id: string,
+    fromPath: string,
+    toPath: string
+  ): Promise<void> => {
     if (id !== containerName)
       throw Error(`Fake docker: Container not found: ${id}`);
     await shell(`mkdir -p ${path.dirname(dockerPath(toPath))}`);
@@ -36,7 +46,9 @@ const docker = {
   }
 };
 
-const listContainers = async () => [{ name: id, packageName: containerName }];
+const listContainers = async (): Promise<PackageContainer[]> => [
+  { ...mockDnp, name: id, packageName: containerName }
+];
 
 const { default: copyFileTo } = proxyquire("../../src/calls/copyFileTo", {
   "../params": modifiedParams,

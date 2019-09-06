@@ -1,6 +1,8 @@
 import async from "async";
 import { promisify } from "util";
 
+type WrapMethods = { [methodName: string]: (...args: any[]) => any };
+
 /**
  * Wrap function pushes an ipfsTasks.download task to the queue.
  * This task HAS to be an async func, which no paramaters will be passed to
@@ -23,7 +25,7 @@ export default function wrapMethodsWithQueue(
   methods: { [methodName: string]: (...args: any[]) => any },
   params?: { times?: number; concurrency?: number; intervalBase?: number },
   options?: { disableChecks?: boolean }
-) {
+): WrapMethods {
   // Parameters
   const { times = 3, concurrency = 10, intervalBase = 225 } = params || {};
 
@@ -56,7 +58,7 @@ export default function wrapMethodsWithQueue(
    */
   const pushTaskAsync = promisify(q.push);
 
-  const wrappedMethods: { [methodName: string]: (...args: any[]) => any } = {};
+  const wrappedMethods: WrapMethods = {};
   for (const [key, method] of Object.entries(methods)) {
     // Make sure the method is an async function
     if (
@@ -67,7 +69,7 @@ export default function wrapMethodsWithQueue(
       throw Error(`Method ${key} must be a regular async function`);
 
     // Wrap method with the queue via push task
-    wrappedMethods[key] = (...args) =>
+    wrappedMethods[key] = (...args): Promise<any> =>
       pushTaskAsync(async () => await method(...args));
   }
   return wrappedMethods;

@@ -17,8 +17,8 @@ describe("Calls > getStats", function() {
   }
 
   const os = {
-    cpus: () => [{ cpu: "info" }],
-    loadavg: () => [0.5]
+    cpus: (): { cpu: string }[] => [{ cpu: "info" }],
+    loadavg: (): number[] => [0.5]
   };
 
   const { default: getStats } = proxyquire("../../src/calls/getStats", {

@@ -3,6 +3,14 @@ import params from "../../params";
 import Logs from "../../logs";
 const logs = Logs(module);
 
+interface IpfsHttpApiVersionReturn {
+  Commit: string;
+  Golang: string;
+  Repo: string;
+  System: string;
+  Version: string;
+}
+
 /**
  * IPFS client setup.
  *
@@ -26,7 +34,7 @@ if (!process.env.TEST) {
   logs.info(`Attempting IPFS connection to : ${IPFS_HOST}`);
   ipfs.id((err: Error, identity: { id: string }) => {
     if (err)
-      ipfs.version((err2: Error, version: any) => {
+      ipfs.version((err2: Error, version: IpfsHttpApiVersionReturn) => {
         if (err2) logs.error(`IPFS error: ${err2.message}`);
         else logs.info(`Connected to IPFS ${JSON.stringify(version, null, 2)}`);
       });

@@ -18,7 +18,10 @@ const exec = util.promisify(child.exec);
  */
 const defaultTimeout = 15 * 60 * 1000; // ms
 
-export default function shell(cmd: string, options?: { timeout?: number }) {
+export default function shell(
+  cmd: string,
+  options?: { timeout?: number }
+): Promise<string> {
   const timeout = options && options.timeout ? options.timeout : defaultTimeout;
   return exec(cmd, { timeout })
     .then(res => (res.stdout || "").trim())

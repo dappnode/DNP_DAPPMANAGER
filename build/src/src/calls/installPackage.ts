@@ -15,7 +15,8 @@ import {
   UserSetPackageEnvs,
   UserSetPackagePorts,
   UserSetPackageVols,
-  InstallerPkg
+  InstallerPkg,
+  RpcHandlerReturn
 } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -67,7 +68,7 @@ export default async function installPackage({
   userSetVols?: UserSetPackageVols;
   userSetPorts?: UserSetPackagePorts;
   options?: { BYPASS_CORE_RESTRICTION?: boolean; BYPASS_RESOLVER?: boolean };
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
   const BYPASS_CORE_RESTRICTION = options && options.BYPASS_CORE_RESTRICTION;
@@ -156,7 +157,7 @@ export default async function installPackage({
   logs.info(`Successfully loaded DNPs ${dnpNames}`);
 
   // Patch, install the dappmanager the last always
-  const isDappmanager = (pkg: InstallerPkg) =>
+  const isDappmanager = (pkg: InstallerPkg): boolean =>
     (pkg.manifest || {}).name === "dappmanager.dnp.dappnode.eth";
 
   for (const pkg of pkgs.sort(pkg => (isDappmanager(pkg) ? 1 : -1))) {

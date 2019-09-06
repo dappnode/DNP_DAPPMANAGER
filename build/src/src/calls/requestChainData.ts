@@ -1,11 +1,12 @@
 import params from "../params";
 import { eventBus, eventBusTag } from "../eventBus";
+import { RpcHandlerReturn } from "../types";
 
 /**
  * Requests chain data. Also instructs the DAPPMANAGER
  * to keep sending data for a period of time (5 minutes)
  */
-export default async function requestChainData() {
+export default async function requestChainData(): Promise<RpcHandlerReturn> {
   params.CHAIN_DATA_UNTIL = Date.now() + 5 * 60 * 1000;
 
   // Trigger a chainData fetch immediately so

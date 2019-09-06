@@ -49,7 +49,7 @@ const activeChains: { [chainName: string]: Chain } = {};
  * fetch data from those only
  */
 
-async function addChain(dnpName: string, driverName?: string) {
+function addChain(dnpName: string, driverName?: string): void {
   if (driverName && getDriveApi[driverName]) {
     activeChains[dnpName] = {
       name: shortNameCapitalized(dnpName),
@@ -61,11 +61,11 @@ async function addChain(dnpName: string, driverName?: string) {
   }
 }
 
-async function removeChain(dnpName: string) {
+function removeChain(dnpName: string): void {
   delete activeChains[dnpName];
 }
 
-async function checkChainWatchers() {
+async function checkChainWatchers(): Promise<void> {
   try {
     const dnpList = await listContainers();
     // Remove chains
@@ -122,7 +122,7 @@ interface ChainCacheInterface {
 const cache: {
   [chainId: string]: ChainCacheInterface;
 } = {};
-async function getAndEmitChainData() {
+async function getAndEmitChainData(): Promise<void> {
   const dnpList = await listContainers();
   const chainData = await Promise.all(
     Object.keys(activeChains)

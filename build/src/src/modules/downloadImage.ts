@@ -24,7 +24,7 @@ export default async function downloadImage(
   hash: string,
   path: string,
   options?: {}
-) {
+): Promise<void> {
   if (!hash || typeof hash !== "string")
     throw Error(`arg hash must be a string: ${hash}`);
 
@@ -73,7 +73,9 @@ export default async function downloadImage(
  *   message: "File size is 0 bytes" {string}
  * }
  */
-async function validateImage(path: string) {
+async function validateImage(
+  path: string
+): Promise<{ success: boolean; message: string }> {
   // Verify that the file exists
   if (!fs.existsSync(path))
     return { success: false, message: "File not found" };
@@ -88,5 +90,5 @@ async function validateImage(path: string) {
   }
 
   // If all okay, return success
-  return { success: true };
+  return { success: true, message: "" };
 }

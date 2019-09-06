@@ -13,7 +13,7 @@ import { PackagePort } from "../../types";
  * }
  * @returns {*}
  */
-export default async function close(port: PackagePort) {
+export default async function close(port: PackagePort): Promise<boolean> {
   const { portNumber, protocol } = port;
 
   try {

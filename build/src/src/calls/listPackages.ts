@@ -10,12 +10,17 @@ import * as getPath from "../utils/getPath";
 import * as envsHelper from "../utils/envsHelper";
 import appendIsPortDeletable from "../utils/appendIsPortDeletable";
 import Logs from "../logs";
+import { PackageContainer, RpcHandlerReturn } from "../types";
 const logs = Logs(module);
 
 // This call can fail because of:
 //   Error response from daemon: a disk usage operation is already running
 // Prevent running it twice
 let isDockerSystemDfCallRunning = false;
+
+interface RpcListPackagesReturn extends RpcHandlerReturn {
+  result: PackageContainer[];
+}
 
 /**
  * Returns the list of current containers associated to packages
@@ -54,7 +59,7 @@ let isDockerSystemDfCallRunning = false;
  *   manifest: <manifest object> {object}
  * }, ... ]
  */
-export default async function listPackages() {
+export default async function listPackages(): Promise<RpcListPackagesReturn> {
   let dnpList = await listContainers();
 
   // Append envFile and manifest

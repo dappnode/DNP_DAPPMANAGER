@@ -13,17 +13,17 @@ const logs = Logs(module);
  *   portNumber: 30303
  * }]
  */
-export default async function getPortsToOpen() {
+export default async function getPortsToOpen(): Promise<PackagePort[]> {
   try {
     // Aggreate ports with an object form to prevent duplicates
     const portsToOpen: {
       [portId: string]: PackagePort;
     } = {};
-    const addPortToOpen = (protocol: PortProtocol, host: number) => {
+    const addPortToOpen = (protocol: PortProtocol, host: number): void => {
       const portNumber = host;
       portsToOpen[`${portNumber}-${protocol}`] = { protocol, portNumber };
     };
-    const getPortsToOpen = () => Object.values(portsToOpen);
+    const getPortsToOpen = (): PackagePort[] => Object.values(portsToOpen);
 
     /**
      * @param {array} dnpInstalled = [{

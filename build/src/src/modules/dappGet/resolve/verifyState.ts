@@ -1,6 +1,6 @@
 import * as safeSemver from "../utils/safeSemver";
 import { hasVersion, getDependencies, toReq } from "../utils/dnpUtils";
-import { StateInterface, DnpsInterface } from "../types";
+import { StateInternalInterface, DnpsInterface } from "../types";
 
 /**
  * Checks if a specific combination of DNP versions is valid
@@ -22,7 +22,7 @@ import { StateInterface, DnpsInterface } from "../types";
  * - msg: metadata of which pkg and dep invalidated the state
  */
 export default function verifyState(
-  state: StateInterface,
+  state: StateInternalInterface,
   dnps: DnpsInterface
 ): {
   valid: boolean;

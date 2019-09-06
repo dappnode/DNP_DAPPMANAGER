@@ -1,5 +1,9 @@
 import * as db from "../db";
-import { PackageNotification } from "../types";
+import { PackageNotification, RpcHandlerReturn } from "../types";
+
+interface RpcNotificationsGetResult extends RpcHandlerReturn {
+  result: PackageNotification[];
+}
 
 /**
  * Returns not viewed notifications.
@@ -14,7 +18,9 @@ import { PackageNotification } from "../types";
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export default async function notificationsGet() {
+export default async function notificationsGet(): Promise<
+  RpcNotificationsGetResult
+> {
   /**
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }

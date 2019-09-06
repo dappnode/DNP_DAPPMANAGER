@@ -21,7 +21,7 @@ const logs = Logs(module);
  * Only `minor` and `patch` updates are allowed
  */
 
-async function updateMyPackage(name: string, version: string) {
+async function updateMyPackage(name: string, version: string): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
   if (!isDnpUpdateEnabled(name)) return;
 
@@ -50,7 +50,7 @@ async function updateMyPackage(name: string, version: string) {
   }
 }
 
-export default async function updateMyPackages() {
+export default async function updateMyPackages(): Promise<void> {
   const dnpList = await listContainers();
 
   const dnps = dnpList.filter(

@@ -1,10 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest } from "../../src/types";
+import { Manifest, PackageRequest } from "../../src/types";
 import { mockManifest } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 
 interface DbInstance {
+  // By definition the db cannot know what's in an arbitrary key
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any;
 }
 
@@ -12,15 +14,19 @@ function getGetManifest(
   manifest: Manifest,
   sampleHash: string,
   dbInstance: DbInstance
-) {
+): (req: PackageRequest) => Promise<Manifest> {
   const db = {
-    get: (key: string) => dbInstance[key],
-    set: (key: string, val: any) => (dbInstance[key] = val)
+    // By definition the db cannot know what's in an arbitrary key
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    get: (key: string): any => dbInstance[key],
+    // By definition the db cannot know what's in an arbitrary key
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    set: (key: string, val: any): void => (dbInstance[key] = val)
   };
   const { default: getManifest } = proxyquire("../../src/modules/getManifest", {
-    "../modules/downloadManifest": async () => manifest,
+    "../modules/downloadManifest": async (): Promise<Manifest> => manifest,
     "../modules/apm": {
-      getRepoHash: async () => sampleHash
+      getRepoHash: async (): Promise<string> => sampleHash
     },
     "../db": db
   });
@@ -42,7 +48,7 @@ const manifest: Manifest = {
 };
 
 describe("Get manifest", function() {
-  const dbInstance: { [key: string]: any } = {};
+  const dbInstance: DbInstance = {};
 
   // Encapsulated proxyrequire
   const getManifest = getGetManifest(manifest, sampleHash, dbInstance);
@@ -68,7 +74,7 @@ describe("Get manifest", function() {
 });
 
 describe("Get manifest, test cache", function() {
-  const dbInstance: { [key: string]: any } = {};
+  const dbInstance: DbInstance = {};
 
   // Encapsulated proxyrequire
   const getManifest = getGetManifest(manifest, sampleHash, dbInstance);

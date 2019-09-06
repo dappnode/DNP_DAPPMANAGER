@@ -4,6 +4,7 @@ import listContainers from "../../modules/listContainers";
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
+import { ResultInterface } from "./types";
 const logs = Logs(module);
 
 /**
@@ -14,7 +15,9 @@ const logs = Logs(module);
  * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
  */
 
-export default async function dappGetBasic(req: PackageRequest) {
+export default async function dappGetBasic(
+  req: PackageRequest
+): Promise<ResultInterface> {
   const reqManifest = await getManifest(req);
   // reqManifest.dependencies = {
   //     'bind.dnp.dappnode.eth': '0.1.4',

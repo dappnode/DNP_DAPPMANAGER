@@ -11,7 +11,7 @@ import restartPackage from "./restartPackage";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup } from "../types";
+import { PackageBackup, RpcHandlerReturn } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -33,7 +33,7 @@ export default async function backupRestore({
   id: string;
   backup: PackageBackup[];
   fileId: string;
-}) {
+}): Promise<RpcHandlerReturn> {
   if (!id) throw Error("Argument id must be defined");
   if (!fileId) throw Error("Argument fileId must be defined");
   if (!backup) throw Error("Argument backup must be defined");
