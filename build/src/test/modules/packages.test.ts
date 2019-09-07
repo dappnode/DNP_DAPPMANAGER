@@ -78,8 +78,8 @@ describe("Util: package install / download", () => {
   };
 
   const { download, load, run } = proxyquire("../../src/modules/packages", {
-    "../modules/downloadImage": downloadImage,
-    "../modules/docker": docker,
+    "./release/getImage": downloadImage,
+    "./docker": docker,
     "../utils/validate": validate,
     "../params": params,
     fs: fs

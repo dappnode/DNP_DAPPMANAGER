@@ -21,7 +21,7 @@ describe("Call function: autoUpdateDataGet", () => {
   const { default: autoUpdateDataGet } = proxyquire(
     "../../src/calls/autoUpdateDataGet",
     {
-      "../modules/listContainers": async () => [
+      "../modules/docker/listContainers": async () => [
         { name: id, isDnp: true, version: currentVersion },
         { name: "admin", isCore: true, version: "0.2.1" },
         { name: "core", isCore: true, version: "0.2.1" },

@@ -1,6 +1,6 @@
 import semver from "semver";
 import params from "../params";
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";

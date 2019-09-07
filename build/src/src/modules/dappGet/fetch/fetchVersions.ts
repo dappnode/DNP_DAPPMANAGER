@@ -1,5 +1,5 @@
 import semver from "semver";
-import * as apm from "../../apm";
+import { getLatestVersion, getAllVersions } from "../../release/getVersions";
 
 /**
  * Fetches the available versions given a request.
@@ -27,18 +27,15 @@ export default async function fetchVersions({
       // If "*" is interpreted as any version, many old manifests are not well
       // hosted and delay the resolution too much because all old versions have
       // to timeout in order to proceed
-      const versionObj = await apm.getLatestWithVersion({ name, ver: "*" });
-      return Object.keys(versionObj);
+      const { version: latestVersion } = await getLatestVersion(name);
+      return [latestVersion];
     } else if (semver.valid(versionRange)) {
       // Case 1. Valid semver version (not range): Return that version
       return [versionRange];
     } else {
       // Case 1. Valid semver range: Fetch the valid versions from APM
-      const versionsObj = await apm.getRepoVersions(
-        { name, ver: "*" },
-        versionRange
-      );
-      return Object.keys(versionsObj);
+      const requestedVersions = await getAllVersions(name, { versionRange });
+      return requestedVersions.map(({ version }) => version);
     }
   }
 

@@ -1,9 +1,9 @@
 import { promisify } from "util";
 import fs from "fs";
 import semver from "semver";
-import restartPatch from "./restartPatch";
+import restartPatch from "./docker/restartPatch";
 import docker from "./docker";
-import downloadImage from "./downloadImage";
+import getImage from "./release/getImage";
 import * as validate from "../utils/validate";
 import * as getPath from "../utils/getPath";
 import logUi from "../utils/logUi";
@@ -48,7 +48,7 @@ export async function download({
   try {
     logUi({ id, name, message: "Starting download..." });
     // Keep track of the bytes downloaded. Log UI every 2%
-    await downloadImage(imageHash, imagePath, imageSize, progress => {
+    await getImage(imageHash, imagePath, imageSize, (progress: number) => {
       let message = `Downloading ${progress}%`;
       if (progress > 100) message += ` (expected ${imageSize} bytes)`;
       logUi({ id, name, message });

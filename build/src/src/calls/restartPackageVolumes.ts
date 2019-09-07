@@ -2,7 +2,7 @@ import fs from "fs";
 import { uniq } from "lodash";
 import params from "../params";
 import docker from "../modules/docker";
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 import * as eventBus from "../eventBus";
 // Utils
 import * as getPath from "../utils/getPath";

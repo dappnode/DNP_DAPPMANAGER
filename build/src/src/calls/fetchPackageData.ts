@@ -1,6 +1,6 @@
 import * as parse from "../utils/parse";
-import getManifest from "../modules/getManifest";
-import getAvatar from "../modules/getAvatar";
+import getManifest from "../modules/release/getManifest";
+import getAvatar from "../modules/release/getAvatar";
 import Logs from "../logs";
 import { Manifest, RpcHandlerReturn } from "../types";
 const logs = Logs(module);

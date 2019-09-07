@@ -41,10 +41,9 @@ describe("Call function: fetchDirectory", function() {
       const { default: fetchDirectory } = proxyquire(
         "../../src/calls/fetchDirectory",
         {
-          "../modules/getDirectory": getDirectory,
-          "../modules/listContainers": async () => ["pkgA"],
-          "../modules/getManifest": getManifest,
-          "../modules/getAvatar": getAvatar,
+          "../modules/release/getDirectory": getDirectory,
+          "../modules/release/getManifest": getManifest,
+          "../modules/release/getAvatar": getAvatar,
           "../utils/isSyncing": async () => false
         }
       );

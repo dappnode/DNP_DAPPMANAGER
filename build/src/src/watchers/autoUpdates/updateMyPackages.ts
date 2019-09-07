@@ -1,7 +1,6 @@
 import semver from "semver";
-import listContainers from "../../modules/listContainers";
-import * as parse from "../../utils/parse";
-import * as apm from "../../modules/apm";
+import listContainers from "../../modules/docker/listContainers";
+import { getLatestVersion } from "../../modules/release/getVersions";
 import * as eventBus from "../../eventBus";
 import params from "../../params";
 // Utils
@@ -25,7 +24,7 @@ async function updateMyPackage(name: string, version: string): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
   if (!isDnpUpdateEnabled(name)) return;
 
-  const latestVersion = await apm.getLatestSemver(parse.packageReq(name));
+  const { version: latestVersion } = await getLatestVersion(name);
 
   // Compute if the update type is "patch"/"minor" = is allowed
   // If release is not allowed, abort

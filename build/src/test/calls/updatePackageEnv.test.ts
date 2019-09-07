@@ -31,7 +31,7 @@ describe("Call function: updatePackageEnv", function() {
   const { default: updatePackageEnv } = proxyquire(
     "../../src/calls/updatePackageEnv",
     {
-      "../modules/listContainers": listContainers,
+      "../modules/docker/listContainers": listContainers,
       "./restartPackage": restartPackage,
       "../params": params
     }

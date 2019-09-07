@@ -1,7 +1,7 @@
 import path from "path";
 // Modules
 import docker from "../modules/docker";
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";

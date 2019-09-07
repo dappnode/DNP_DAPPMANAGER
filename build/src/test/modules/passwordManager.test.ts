@@ -2,37 +2,44 @@ import "mocha";
 import { expect } from "chai";
 const proxyquire = require("proxyquire").noCallThru();
 
+// proxyquire abstraction so relative paths only have to be changed once
+function getPasswordManager(
+  shellMock: (cmd: string) => Promise<string>,
+  image: string
+): {
+  isPasswordSecure: () => Promise<boolean>;
+  changePassword: (newPassword: string) => Promise<void>;
+} {
+  const passwordManager = proxyquire("../../src/modules/passwordManager", {
+    "../utils/shell": shellMock,
+    "../utils/getDappmanagerImage": async () => image
+  });
+  return passwordManager;
+}
+
 describe("Module > passwordManager", () => {
   const image = "dappmanager.dnp.dappnode.eth:0.2.0";
   const grepCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint="" dappmanager.dnp.dappnode.eth:0.2.0 sh -c "grep dappnode:.*insecur3 /etc/shadow"`;
   const passwordHash = `dappnode:$6$insecur3$rnEv9Amdjn3ctXxPYOlzj/cwvLT43GjWzkPECIHNqd8Vvza5bMG8QqMwEIBKYqnj609D.4ngi4qlmt29dLE.71:18004:0:99999:7:::`;
 
   it("Should check if the password is secure", async () => {
-    const { isPasswordSecure } = proxyquire(
-      "../../src/modules/passwordManager",
-      {
-        "../utils/shell": async (cmd: string) => {
-          if (cmd == grepCommand) return passwordHash;
-          throw Error(`Unknown command ${cmd}`);
-        },
-        "../utils/getDappmanagerImage": async () => image
-      }
-    );
+    const { isPasswordSecure } = getPasswordManager(async (cmd: string) => {
+      if (cmd == grepCommand) return passwordHash;
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
+
     const isSecure = await isPasswordSecure();
     expect(isSecure).to.equal(false);
   });
 
   it("Should change the password", async () => {
     let lastCmd;
-    const { changePassword } = proxyquire("../../src/modules/passwordManager", {
-      "../utils/shell": async (cmd: string) => {
-        lastCmd = cmd;
-        if (cmd == grepCommand) return passwordHash;
-        if (cmd.includes("chpasswd")) return "";
-        throw Error(`Unknown command ${cmd}`);
-      },
-      "../utils/getDappmanagerImage": async () => image
-    });
+    const { changePassword } = getPasswordManager(async (cmd: string) => {
+      lastCmd = cmd;
+      if (cmd == grepCommand) return passwordHash;
+      if (cmd.includes("chpasswd")) return "";
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     const newPassword = "secret-password";
     await changePassword(newPassword);
@@ -42,13 +49,10 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password when it's secure", async () => {
-    const { changePassword } = proxyquire("../../src/modules/passwordManager", {
-      "../utils/shell": async (cmd: string) => {
-        if (cmd == grepCommand) return "";
-        throw Error(`Unknown command ${cmd}`);
-      },
-      "../utils/getDappmanagerImage": async () => image
-    });
+    const { changePassword } = getPasswordManager(async (cmd: string) => {
+      if (cmd == grepCommand) return "";
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     let errorMessage = "---did not throw---";
     try {
@@ -63,13 +67,10 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password if the input contains problematic characters", async () => {
-    const { changePassword } = proxyquire("../../src/modules/passwordManager", {
-      "../utils/shell": async (cmd: string) => {
-        if (cmd == grepCommand) return passwordHash;
-        throw Error(`Unknown command ${cmd}`);
-      },
-      "../utils/getDappmanagerImage": async () => image
-    });
+    const { changePassword } = getPasswordManager(async (cmd: string) => {
+      if (cmd == grepCommand) return passwordHash;
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     let errorMessage = "---did not throw---";
     try {

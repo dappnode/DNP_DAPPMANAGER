@@ -1,9 +1,9 @@
 import fs from "fs";
-import * as getPath from "../utils/getPath";
-import * as validate from "../utils/validate";
-import listContainers from "../modules/listContainers";
-import docker from "../modules/docker";
-import params from "../params";
+import * as getPath from "../../utils/getPath";
+import * as validate from "../../utils/validate";
+import listContainers from "./listContainers";
+import docker from "./dockerCommands";
+import params from "../../params";
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it

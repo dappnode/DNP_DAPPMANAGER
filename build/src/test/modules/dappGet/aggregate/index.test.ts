@@ -96,7 +96,7 @@ const { default: aggregate } = proxyquire(
   {
     "./getRelevantInstalledDnps": getRelevantInstalledDnps,
     "./aggregateDependencies": aggregateDependencies,
-    "../../../modules/listContainers": listContainers
+    "../../../modules/docker/listContainers": listContainers
   }
 );
 

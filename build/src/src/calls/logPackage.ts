@@ -1,6 +1,6 @@
 import { runWithRetry } from "../utils/asyncFlows";
 // Modules
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 import docker from "../modules/docker";
 import { RpcHandlerReturn } from "../types";
 

@@ -43,7 +43,7 @@ services:
   const { default: togglePackage } = proxyquire(
     "../../src/calls/togglePackage",
     {
-      "../modules/listContainers": async ({ byName }: { byName: string }) => {
+      "../modules/docker/listContainers": async ({ byName }: { byName: string }) => {
         return dnpList.filter(({ name }) => name === byName);
       },
       "../modules/docker": docker,

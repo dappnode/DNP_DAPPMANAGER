@@ -1,4 +1,4 @@
-import listContainers from "../../modules/listContainers";
+import listContainers from "../../modules/docker/listContainers";
 // Utils
 import { getComposeInstance } from "../../utils/dockerComposeFile";
 // Default ports to open in case getPortsToOpen throws

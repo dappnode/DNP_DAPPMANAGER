@@ -1,4 +1,4 @@
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 import * as getPath from "../utils/getPath";
 import params from "../params";
 import docker from "../modules/docker";

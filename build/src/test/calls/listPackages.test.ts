@@ -5,7 +5,7 @@ import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import { stringifyEnvs } from "../../src/utils/parse";
 import { PackageContainer, RpcHandlerReturn } from "../../src/types";
-import { DockerApiSystemDfReturn } from "../../src/modules/dockerApi";
+import { DockerApiSystemDfReturn } from "../../src/modules/docker/dockerApi";
 import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
 const proxyquire = require("proxyquire").noCallThru();
 
@@ -43,8 +43,8 @@ describe("Call function: listPackages", function() {
 
   // initialize call
   const { default: listPackages } = proxyquire("../../src/calls/listPackages", {
-    "../modules/listContainers": listContainers,
-    "../modules/dockerApi": { dockerDf },
+    "../modules/docker/listContainers": listContainers,
+    "../modules/docker/dockerApi": { dockerDf },
     "../params": params
   });
 

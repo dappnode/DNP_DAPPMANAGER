@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
+import { ApmVersion } from "../../../../src/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 /**
@@ -12,17 +13,27 @@ const proxyquire = require("proxyquire").noCallThru();
  * > Should call return that single version given an invalid semver version
  */
 
-const apmVersionRange = ["0.1.0", "0.1.1", "0.1.2"];
-const apm = {
-  getRepoVersions: sinon.stub().callsFake(async () => {
-    return { "0.1.0": "", "0.1.1": "", "0.1.2": "" };
-  })
-};
+const contentUri = "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt";
+const expectedApmVersionsReturn = ["0.1.2", "0.1.1", "0.1.0"];
+const getLatestVersion = sinon.stub().callsFake(
+  async (): Promise<ApmVersion> => {
+    return { version: "0.1.2", contentUri };
+  }
+);
+const getAllVersions = sinon.stub().callsFake(
+  async (): Promise<ApmVersion[]> => {
+    return [
+      { version: "0.1.2", contentUri },
+      { version: "0.1.1", contentUri },
+      { version: "0.1.0", contentUri }
+    ];
+  }
+);
 
 const { default: fetchVersions } = proxyquire(
   "../../../../src/modules/dappGet/fetch/fetchVersions",
   {
-    "../../apm": apm
+    "../../release/getVersions": { getLatestVersion, getAllVersions }
   }
 );
 
@@ -32,8 +43,8 @@ describe("dappGet/fetch/fetchVersions", () => {
       name: "kovan.dnp.dappnode.eth",
       versionRange: "^0.1.0"
     });
-    sinon.assert.callCount(apm.getRepoVersions, 1);
-    expect(versions).to.deep.equal(apmVersionRange);
+    sinon.assert.callCount(getAllVersions, 1);
+    expect(versions).to.deep.equal(expectedApmVersionsReturn);
   });
 
   it("Should call return that version with a valid semver version", async () => {

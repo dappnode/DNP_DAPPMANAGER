@@ -53,12 +53,12 @@ const listContainers = async (): Promise<PackageContainer[]> => [
 const { default: copyFileTo } = proxyquire("../../src/calls/copyFileTo", {
   "../params": modifiedParams,
   "../modules/docker": docker,
-  "../modules/listContainers": listContainers
+  "../modules/docker/listContainers": listContainers
 });
 const { default: copyFileFrom } = proxyquire("../../src/calls/copyFileFrom", {
   "../params": modifiedParams,
   "../modules/docker": docker,
-  "../modules/listContainers": listContainers
+  "../modules/docker/listContainers": listContainers
 });
 
 const dataUri =

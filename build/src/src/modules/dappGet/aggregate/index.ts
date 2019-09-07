@@ -1,5 +1,5 @@
 import semver from "semver";
-import listContainers from "../../../modules/listContainers";
+import listContainers from "../../docker/listContainers";
 // Internal
 import * as safeSemver from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";

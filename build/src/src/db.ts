@@ -7,7 +7,8 @@ import {
   AutoUpdateSettings,
   AutoUpdatePending,
   AutoUpdateRegistry,
-  PackagePort
+  PackagePort,
+  ApmVersion
 } from "./types";
 import { UpnpPortMapping } from "./modules/upnpc/types";
 import semver from "semver";
@@ -79,11 +80,15 @@ export function getIpfsCache(hash: string): string | null {
 // apmCacheKey = goerli-pantheon-dnp-dappnode-eth-0-1-0
 const getApmCacheKey = (name: string, ver: string): string =>
   `${name}-${ver}`.split(".").join("-");
-export function setApmCache(name: string, ver: string, hash: string): void {
+export function setApmCache(
+  name: string,
+  ver: string,
+  apmVersion: ApmVersion
+): void {
   // Only store if the key is valid
-  if (name && semver.valid(ver)) set(getApmCacheKey(name, ver), hash);
+  if (name && semver.valid(ver)) set(getApmCacheKey(name, ver), apmVersion);
 }
-export function getApmCache(name: string, ver: string): string | null {
+export function getApmCache(name: string, ver: string): ApmVersion | null {
   return get(getApmCacheKey(name, ver));
 }
 

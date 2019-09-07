@@ -1,7 +1,7 @@
 import shell from "../src/utils/shell";
 import * as path from "path";
 import { PackageContainer, Manifest, VolumeInterface } from "../src/types";
-import { DockerApiSystemDfReturn } from "../src/modules/dockerApi";
+import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
 export const testDir = "./test_files/";
 

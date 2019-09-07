@@ -11,7 +11,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = proxyquire(
       "../../../src/watchers/natRenewal/getPortsToOpen",
       {
-        "../../modules/listContainers": async () => [
+        "../../modules/docker/listContainers": async () => [
           {
             isCore: true,
             name: "admin.dnp.dappnode.eth",
@@ -89,7 +89,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = proxyquire(
       "../../../src/watchers/natRenewal/getPortsToOpen",
       {
-        "../../modules/listContainers": async () => {
+        "../../modules/docker/listContainers": async () => {
           throw Error("Demo Error for listContainers");
         },
         "../../utils/parse": {
@@ -108,7 +108,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = proxyquire(
       "../../../src/watchers/natRenewal/getPortsToOpen",
       {
-        "../../modules/listContainers": async () => [
+        "../../modules/docker/listContainers": async () => [
           {
             isCore: true,
             name: "admin.dnp.dappnode.eth",

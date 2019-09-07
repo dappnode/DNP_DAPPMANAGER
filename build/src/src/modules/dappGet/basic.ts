@@ -1,5 +1,5 @@
-import getManifest from "../../modules/getManifest";
-import listContainers from "../../modules/listContainers";
+import getManifest from "../release/getManifest";
+import listContainers from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";

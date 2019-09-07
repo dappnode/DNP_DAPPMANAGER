@@ -1,6 +1,6 @@
 import docker from "../modules/docker/dockerCommands";
 import { getComposeInstance } from "../utils/dockerComposeFile";
-import listContainers from "../modules/listContainers";
+import listContainers from "./docker/listContainers";
 import { PortMapping } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);

@@ -103,14 +103,14 @@ describe("dappGet integration test", () => {
           "../../../src/modules/dappGet",
           {
             "./fetch": fetch,
-            "../../modules/listContainers": listContainers
+            "../../modules/docker/listContainers": listContainers
           }
         );
 
         const { default: aggregate } = proxyquire(
           "../../../src/modules/dappGet/aggregate",
           {
-            "../../../modules/listContainers": listContainers
+            "../../../modules/docker/listContainers": listContainers
           }
         );
 

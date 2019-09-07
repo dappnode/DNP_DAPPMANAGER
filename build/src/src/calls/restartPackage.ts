@@ -1,6 +1,6 @@
 import fs from "fs";
 import * as getPath from "../utils/getPath";
-import restartPatch from "../modules/restartPatch";
+import restartPatch from "../modules/docker/restartPatch";
 import params from "../params";
 import docker from "../modules/docker";
 import * as eventBus from "../eventBus";

@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 // Modules
 import docker from "../modules/docker";
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";

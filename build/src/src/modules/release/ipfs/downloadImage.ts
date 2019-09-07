@@ -1,10 +1,7 @@
-import fs from "fs";
-import * as ipfs from "./ipfs";
-import verifyXz from "../utils/verifyXz";
-import * as validate from "../utils/validate";
+import * as ipfs from "../../ipfs";
+import * as validate from "../../../utils/validate";
 import { isAbsolute } from "path";
-import Logs from "../logs";
-const logs = Logs(module);
+import { validateImage } from "../validate";
 
 /**
  * Handles the download of a DNP .xz image.
@@ -58,38 +55,4 @@ export default async function downloadImage(
         validation.message
       }`
     );
-}
-
-/**
- * Validates a .xz DNP image. It will test
- *
- * 1. The file at path exists
- * 2. The file at path has a size > 0 bytes
- * 3. Test against `xz -t` validation, ensuring it's ok
- *
- * @param {string} path
- * @returns {object} A result object, so it doesn't have to be handled with try / catch
- * {
- *   success: true, {bool}
- *   message: "File size is 0 bytes" {string}
- * }
- */
-async function validateImage(
-  path: string
-): Promise<{ success: boolean; message: string }> {
-  // Verify that the file exists
-  if (!fs.existsSync(path))
-    return { success: false, message: "File not found" };
-
-  if (fs.statSync(path).size == 0)
-    return { success: false, message: "File size is 0 bytes" };
-
-  const { success, message } = await verifyXz(path);
-  if (!success) {
-    logs.warn(`Image at ${path} failed .xz verification: ${message}`);
-    return { success: false, message: `Invalid .xz: ${message}` };
-  }
-
-  // If all okay, return success
-  return { success: true, message: "" };
 }

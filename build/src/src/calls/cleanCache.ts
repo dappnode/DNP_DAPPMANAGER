@@ -1,5 +1,5 @@
 import params from "../params";
-import restartPatch from "../modules/restartPatch";
+import restartPatch from "../modules/docker/restartPatch";
 // Utils
 import shell from "../utils/shell";
 import { RpcHandlerReturn } from "../types";

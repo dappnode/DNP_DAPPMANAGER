@@ -28,7 +28,7 @@ describe("Call function: logPackage", function() {
 
   const { default: logPackage } = proxyquire("../../src/calls/logPackage", {
     "../modules/docker": docker,
-    "../modules/listContainers": listContainers,
+    "../modules/docker/listContainers": listContainers,
     "../params": params
   });
 

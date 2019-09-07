@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import * as getPath from "../../src/utils/getPath";
+import * as getPath from "../../../src/utils/getPath";
 const proxyquire = require("proxyquire").noCallThru();
 
 describe("Util: restartPatch", () => {
@@ -25,10 +25,10 @@ describe("Util: restartPatch", () => {
   );
 
   const { default: restartPatch } = proxyquire(
-    "../../src/modules/restartPatch",
+    "../../../src/modules/docker/restartPatch",
     {
-      "../modules/docker": docker,
-      "../params": params
+      "./dockerCommands": docker,
+      "../../params": params
     }
   );
 

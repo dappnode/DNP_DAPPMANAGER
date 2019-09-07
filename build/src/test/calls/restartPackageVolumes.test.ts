@@ -140,7 +140,7 @@ describe("Call function: restartPackageVolumes", function() {
     "../../src/calls/restartPackageVolumes",
     {
       "../modules/docker": docker,
-      "../modules/listContainers": listContainers,
+      "../modules/docker/listContainers": listContainers,
       "../params": params
     }
   );

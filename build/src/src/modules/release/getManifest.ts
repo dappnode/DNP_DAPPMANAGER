@@ -1,12 +1,11 @@
-import downloadManifest from "./downloadManifest";
-import * as apm from "./apm";
-import * as db from "../db";
-import isIpfsHash from "../utils/isIpfsHash";
-import isEnsDomain from "../utils/isEnsDomain";
-import isSemverRange from "../utils/isSemverRange";
-import isSemver from "../utils/isSemver";
-import { PackageRequest, Manifest } from "../types";
-import Joi from "joi";
+import downloadManifest from "./ipfs/downloadManifest";
+import { getVersion } from "./getVersions";
+import * as db from "../../db";
+import isIpfsHash from "../../utils/isIpfsHash";
+import isEnsDomain from "../../utils/isEnsDomain";
+import isSemverRange from "../../utils/isSemverRange";
+import isSemver from "../../utils/isSemver";
+import { PackageRequest, Manifest } from "../../types";
 
 // Used by
 // calls / fetchDirectory;
@@ -39,16 +38,10 @@ export default async function getManifest({
 
   // 2. Download the manifest
   // wrap in try / catch to format error
-  let manifest;
-  try {
-    manifest = await downloadManifest(hash);
-  } catch (e) {
-    e.message = `Can't download ${name} manifest: ${e.message}`;
-    throw e;
-  }
+  const manifest = await downloadManifest(hash).catch(e => {
+    throw Error(`Can't download ${name} manifest: ${e.message}`);
+  });
 
-  // Verify the manifest
-  validateManifest(manifest);
   // Verify that the request was correct: hash mismatch
   // Except if the id is = "/ipfs/Qm...", there is no provided name
   if (isIpfsHash(name)) {
@@ -81,64 +74,25 @@ async function fetchManifestHash({
   name,
   ver
 }: PackageRequest): Promise<string> {
-  /**
-   * 0. Normal case, name = eth domain & ver = semverVersion
-   * Go fetch to the APM
-   */
-  if (isEnsDomain(name) && isSemver(ver)) {
-    return await resolveApmVersionAndCache({ name, ver });
-  }
-
-  /**
-   * 1. Normal case, name = eth domain & ver = semverRange
-   * [DO-NOT-CACHE] as the version is dynamic
-   * Go fetch to the APM
-   */
-  if (isEnsDomain(name) && isSemverRange(ver)) {
+  // Normal case, name = eth domain & ver = semverVersion
+  if (isEnsDomain(name) && isSemver(ver))
     return await resolveApmVersion({ name, ver });
-  }
 
-  /**
-   * 2. IPFS normal case, name = eth domain & ver = IPFS hash
-   */
-  if (isEnsDomain(name) && isIpfsHash(ver)) {
-    return ver;
-  }
+  // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
+  if (isEnsDomain(name) && isSemverRange(ver))
+    return await resolveApmVersion({ name, ver });
 
-  /**
-   * 3. When requesting IPFS hashes for the first time, their name is unknown
-   *    name = IPFS hash, ver = null
-   */
-  if (isIpfsHash(name)) {
-    return name;
-  }
+  // IPFS normal case, name = eth domain & ver = IPFS hash
+  if (isEnsDomain(name) && isIpfsHash(ver)) return ver;
 
-  /**
-   * 3. All other cases are invalid
-   */
+  // When requesting IPFS hashes for the first time, their name is unknown
+  // name = IPFS hash, ver = null
+  if (isIpfsHash(name)) return name;
+
+  // All other cases are invalid
   if (isEnsDomain(name))
     throw Error(`Invalid version, must be a semver or IPFS hash: ${ver}`);
   else throw Error(`Invalid DNP name, must be a ENS domain: ${name}`);
-}
-
-/**
- * Fetches the manifest hash and handles cache
- *
- * @param {string} name
- * @param {string} ver
- * @returns {string} manifestHash
- */
-async function resolveApmVersionAndCache({
-  name,
-  ver
-}: PackageRequest): Promise<string> {
-  // Check if the key is stored in cache. This key-value will never change
-  const hashCache = db.getApmCache(name, ver);
-  if (hashCache) return hashCache;
-
-  const hash = await resolveApmVersion({ name, ver });
-  db.setApmCache(name, ver, hash);
-  return hash;
 }
 
 /**
@@ -152,21 +106,6 @@ async function resolveApmVersion({
   name,
   ver
 }: PackageRequest): Promise<string> {
-  return await apm.getRepoHash({ name, ver });
-}
-
-function validateManifest(manifest: Manifest): void {
-  // Minimal (very relaxed) manifest check
-  const manifestSchema = Joi.object({
-    name: Joi.string().required(),
-    version: Joi.string().required(),
-    image: Joi.object({
-      hash: Joi.string().required()
-    })
-      .pattern(/./, Joi.any())
-      .required()
-  }).pattern(/./, Joi.any());
-
-  // Throws error if invalid
-  Joi.assert(manifest, manifestSchema, "Manifest");
+  const res = await getVersion(name, ver);
+  return res.contentUri;
 }

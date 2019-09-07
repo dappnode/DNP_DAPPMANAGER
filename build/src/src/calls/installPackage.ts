@@ -2,7 +2,7 @@ import * as eventBus from "../eventBus";
 // Modules
 import * as packages from "../modules/packages";
 import dappGet from "../modules/dappGet";
-import getManifest from "../modules/getManifest";
+import getManifest from "../modules/release/getManifest";
 import lockPorts from "../modules/lockPorts";
 // Utils
 import logUi from "../utils/logUi";

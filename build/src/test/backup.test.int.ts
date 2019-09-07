@@ -27,6 +27,10 @@ describe("Integration test for backup to and from:", function() {
 
   const filePath = ".temp-transfer/test-backup.dnp.dappnode.eth_backup.tar.xz";
 
+  before(async () => {
+    db.clearDb();
+  });
+
   /**
    * RESTORE => GET integral test
    * - Generate a fake backup file locally

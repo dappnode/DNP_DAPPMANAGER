@@ -77,8 +77,8 @@ describe("Call function: installPackage", function() {
     {
       "../modules/packages": packages,
       "../modules/dappGet": dappGet,
-      "../modules/getManifest": getManifest,
-      "../modules/listContainers": listContainers,
+      "../modules/release/getManifest": getManifest,
+      "../modules/docker/listContainers": listContainers,
       "../modules/lockPorts": lockPorts,
       "../eventBus": eventBus,
       "../utils/isSyncing": isSyncing,

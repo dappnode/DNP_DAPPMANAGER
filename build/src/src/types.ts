@@ -237,12 +237,10 @@ export interface AutoUpdateFeedback {
  * Releases types
  */
 
-export type FetchLatestVersion = (
-  dnpName: string
-) => Promise<{
+export interface ApmVersion {
   version: string;
   contentUri: string;
-}>;
+}
 
 export interface PackageVersionData {
   version?: string;

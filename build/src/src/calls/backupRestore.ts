@@ -5,7 +5,7 @@ import params from "../params";
 import Logs from "../logs";
 const logs = Logs(module);
 // Modules
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 // External call
 import restartPackage from "./restartPackage";
 // Utils

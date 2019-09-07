@@ -1,7 +1,7 @@
-import * as ipfs from "./ipfs";
-import * as db from "../db";
-import formatAndCompressAvatar from "../utils/formatAndCompressAvatar";
-import Joi from "joi";
+import * as ipfs from "../../ipfs";
+import * as db from "../../../db";
+import formatAndCompressAvatar from "../../../utils/formatAndCompressAvatar";
+import { validateAvatar } from "../validate";
 
 /**
  * Handles the download of a JSON DNP manifest.
@@ -52,38 +52,4 @@ export default async function downloadAvatar(hash: string): Promise<string> {
 
   db.setIpfsCache(hash, avatar);
   return avatar;
-}
-
-/**
- * Validates a PNG avatar
- *
- * 1. The file at path exists
- *
- * @param {string} avatar, base64 encoded dataUrl
- * @returns {object} A result object, so it doesn't have to be handled with try / catch
- * {
- *   success: true, {bool}
- *   message: "File size is 0 bytes" {string}
- * }
- */
-function validateAvatar(avatar: string): { success: boolean; message: string } {
-  if (!avatar)
-    return {
-      success: false,
-      message: "Empty string"
-    };
-
-  /**
-   * avatar must be 'data:image/png;base64,VE9PTUFOWVNFQ1JFVFM='
-   * on error: result = { error: <Error obj> }
-   */
-  const result = Joi.validate(avatar, Joi.string().dataUri());
-  if (result.error)
-    return {
-      success: false,
-      message: (result.error.message || "").replace("value", "avatar")
-    };
-
-  // If all okay, return success
-  return { success: true, message: "" };
 }

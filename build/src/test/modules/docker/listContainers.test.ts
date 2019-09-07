@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import { PackageContainer } from "../../src/types";
+import { PackageContainer } from "../../../src/types";
 const proxyquire = require("proxyquire").noCallThru();
 
 const dockerApiResponseContainers = require("./dockerApiSamples/containers.json");
 
-describe("dockerList", function() {
+describe("listContainers", function() {
   const { default: listContainers } = proxyquire(
-    "../../src/modules/listContainers",
+    "../../../src/modules/docker/listContainers",
     {
       "./dockerApi": {
         dockerApi: {

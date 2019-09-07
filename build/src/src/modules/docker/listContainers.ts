@@ -1,70 +1,16 @@
 import { dockerApi } from "./dockerApi";
 // dedicated modules
-import { shortName } from "../utils/strings";
-import params from "../params";
+import { shortName } from "../../utils/strings";
+import params from "../../params";
 import {
   PackageContainer,
   Dependencies,
   VolumeInterface,
   ContainerStatus
-} from "../types";
+} from "../../types";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
-
-interface Container {
-  Id: string; // "8dfafdbc3a40";
-  Names: string[]; // ["/boring_feynman"];
-  Image: string; // "ubuntu:latest";
-  ImageID: string; // "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82";
-  Command: string; // "echo 1";
-  Created: number; // 1367854155;
-  State: ContainerStatus; // "Exited";
-  Status: string; // "Exit 0";
-  Ports: [
-    {
-      PrivatePort: number; // 2222;
-      PublicPort?: number; // 3333;
-      Type: "tcp" | "udp";
-    }
-  ];
-  Labels: {
-    "dappnode.dnp.origin"?: string; // ipfs/QmYAITSYG...
-    "dappnode.dnp.chain"?: "bitcoin" | "ethereum" | "monero";
-    "dappnode.dnp.dependencies"?: string; // '{"dnpName": "version"}'
-  };
-  SizeRw: number; // 12288;
-  SizeRootFs: number; // 0;
-  HostConfig: {
-    NetworkMode: "default";
-  };
-  NetworkSettings: {
-    Networks: {
-      bridge: {
-        NetworkID: string; // "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812";
-        EndpointID: string; // "2cdc4edb1ded3631c81f57966563e5c8525b81121bb3706a9a9a3ae102711f3f";
-        Gateway: string; // "172.17.0.1";
-        IPAddress: string; // "172.17.0.2";
-        IPPrefixLen: number; // 16;
-        IPv6Gateway: string; // "";
-        GlobalIPv6Address: string; // "";
-        GlobalIPv6PrefixLen: number; // 0;
-        MacAddress: string; // "02:42:ac:11:00:02";
-      };
-    };
-  };
-  Mounts: [
-    {
-      Name: string; // "fac362...80535";
-      Source: string; // "/data";
-      Destination: string; // "/data";
-      Driver: string; // "local";
-      Mode: string; // "ro,Z";
-      RW: boolean;
-      Propagation: string; // "";
-    }
-  ];
-}
 
 interface ListContainersFilters {
   ancestor?: string; // "(<image-name>[:<tag>], <image id>, or <image@digest>)";

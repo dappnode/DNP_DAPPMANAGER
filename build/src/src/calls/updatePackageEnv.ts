@@ -1,5 +1,5 @@
-import downloadManifest from "../modules/downloadManifest";
-import listContainers from "../modules/listContainers";
+import downloadManifest from "../modules/release/ipfs/downloadManifest";
+import listContainers from "../modules/docker/listContainers";
 // Utils
 import * as parse from "../utils/parse";
 import * as envsHelper from "../utils/envsHelper";

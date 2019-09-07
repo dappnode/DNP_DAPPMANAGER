@@ -1,5 +1,5 @@
 import * as eventBus from "../../eventBus";
-import listContainers from "../../modules/listContainers";
+import listContainers from "../../modules/docker/listContainers";
 import { shortNameCapitalized } from "../../utils/strings";
 import params from "../../params";
 import { ChainData } from "../../types";

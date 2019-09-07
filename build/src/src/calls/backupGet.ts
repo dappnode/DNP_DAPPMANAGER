@@ -6,7 +6,7 @@ const logs = Logs(module);
 import * as db from "../db";
 import params from "../params";
 // Modules
-import listContainers from "../modules/listContainers";
+import listContainers from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";

@@ -1,4 +1,4 @@
-import listContainers from "../../modules/listContainers";
+import listContainers from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";

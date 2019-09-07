@@ -19,8 +19,8 @@ function getDappBasic(
   const { default: dappGet } = proxyquire(
     "../../../src/modules/dappGet/basic",
     {
-      "../../modules/getManifest": async () => manifest,
-      "../../modules/listContainers": async () => containerList
+      "../../modules/release/getManifest": async () => manifest,
+      "../../modules/docker/listContainers": async () => containerList
     }
   );
   return dappGet;

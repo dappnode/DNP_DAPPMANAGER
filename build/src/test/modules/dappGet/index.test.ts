@@ -54,7 +54,7 @@ const resolve = sinon.stub().callsFake(() => {
 const { default: dappGet } = proxyquire("../../../src/modules/dappGet", {
   "./aggregate": aggregate,
   "./resolve": resolve,
-  "../../modules/listContainers": listContainers
+  "../../modules/docker/listContainers": listContainers
 });
 
 describe("dappGet", () => {

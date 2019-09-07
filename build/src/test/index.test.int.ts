@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import * as fs from "fs";
+import * as db from "../src/db";
 import shell from "../src/utils/shell";
 import * as getPath from "../src/utils/getPath";
 import * as calls from "../src/calls";
@@ -64,6 +65,9 @@ describe("Full integration test with REAL docker: ", function() {
     for (const cmd of cmds) {
       await shellSafe(cmd);
     }
+
+    // Clean DB
+    db.clearDb();
 
     // Print out params
     logs.info("Test params");

@@ -1,6 +1,6 @@
-import * as ipfs from "./ipfs";
-import * as db from "../db";
-import { Manifest } from "../types";
+import * as ipfs from "../../ipfs";
+import * as db from "../../../db";
+import { Manifest } from "../../../types";
 
 const maxLength = 100e3; // Limit manifest size to ~100KB
 

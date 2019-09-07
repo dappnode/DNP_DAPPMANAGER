@@ -1,5 +1,5 @@
 import { PackageContainer } from "../types";
-import { DockerApiSystemDfReturn } from "../modules/dockerApi";
+import { DockerApiSystemDfReturn } from "../modules/docker/dockerApi";
 import prettyBytes from "pretty-bytes";
 
 export default function parseDockerSystemDf({

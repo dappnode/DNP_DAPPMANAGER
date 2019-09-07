@@ -1,7 +1,7 @@
-import getDirectory from "../modules/getDirectory";
+import getDirectory from "../modules/release/getDirectory";
 import * as eventBus from "../eventBus";
-import getManifest from "../modules/getManifest";
-import getAvatar from "../modules/getAvatar";
+import getManifest from "../modules/release/getManifest";
+import getAvatar from "../modules/release/getAvatar";
 import * as parse from "../utils/parse";
 import isSyncing from "../utils/isSyncing";
 import isIpfsHash from "../utils/isIpfsHash";

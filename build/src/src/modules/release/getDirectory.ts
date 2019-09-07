@@ -1,8 +1,8 @@
-import isEnsDomain from "../utils/isEnsDomain";
-import { DirectoryDnp, DirectoryDnpStatus } from "../types";
-import * as directoryContract from "../contracts/directory";
-import web3 from "./web3Setup";
-import Logs from "../logs";
+import isEnsDomain from "../../utils/isEnsDomain";
+import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
+import * as directoryContract from "../../contracts/directory";
+import web3 from "../web3Setup";
+import Logs from "../../logs";
 const logs = Logs(module);
 
 // Contract parameters

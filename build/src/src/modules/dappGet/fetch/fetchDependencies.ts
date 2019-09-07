@@ -1,4 +1,4 @@
-import getManifest from "../../../modules/getManifest";
+import getManifest from "../../release/getManifest";
 import { Dependencies } from "../../../types";
 
 /**

@@ -1,20 +1,27 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest, PackageRequest } from "../../src/types";
+import { Manifest, PackageRequest, ApmVersion } from "../../src/types";
 import { mockManifest } from "../testUtils";
 import * as db from "../../src/db";
 const proxyquire = require("proxyquire").noCallThru();
 
+// proxyquire abstraction so relative paths only have to be changed once
 function getGetManifest(
   manifest: Manifest,
   sampleHash: string
 ): (req: PackageRequest) => Promise<Manifest> {
-  const { default: getManifest } = proxyquire("../../src/modules/getManifest", {
-    "../modules/downloadManifest": async (): Promise<Manifest> => manifest,
-    "../modules/apm": {
-      getRepoHash: async (): Promise<string> => sampleHash
+  const { default: getManifest } = proxyquire(
+    "../../src/modules/release/getManifest",
+    {
+      "./ipfs/downloadManifest": async (): Promise<Manifest> => manifest,
+      "./getVersions": {
+        getVersion: async (): Promise<ApmVersion> => ({
+          version: "0.2.4",
+          contentUri: sampleHash
+        })
+      }
     }
-  });
+  );
   return getManifest;
 }
 
@@ -37,7 +44,7 @@ describe("Get manifest", function() {
     db.clearDb();
   });
 
-  it("should return a parsed manifest and cache it", async () => {
+  it("should return a parsed manifest NOT cache it", async () => {
     // Encapsulated proxyrequire
     const getManifest = getGetManifest(manifest, sampleHash);
 
@@ -53,10 +60,7 @@ describe("Get manifest", function() {
       ...manifest
     });
 
-    expect(db.getEntireDb()).to.deep.equal({
-      "test-dnp-dappnode-eth-0-2-1":
-        "/ipfs/QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
-    });
+    expect(db.getEntireDb()).to.deep.equal({});
   });
 
   it("Should call getManifest and not store anything in the db", async () => {
