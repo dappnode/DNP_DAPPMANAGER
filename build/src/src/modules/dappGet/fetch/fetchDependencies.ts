@@ -11,13 +11,10 @@ import { Dependencies } from "../../../types";
  * @returns {object} dependencies:
  *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
  */
-export default async function fetchDependencies({
-  name,
-  ver
-}: {
-  name: string;
-  ver: string;
-}): Promise<Dependencies> {
+export default async function fetchDependencies(
+  name: string,
+  ver: string
+): Promise<Dependencies> {
   const manifest = await getManifest({ name, ver });
   const dependencies: Dependencies = manifest.dependencies || {};
   return dependencies;

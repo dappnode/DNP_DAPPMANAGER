@@ -1,5 +1,5 @@
 import semver from "semver";
-import listContainers from "../../modules/docker/listContainers";
+import { listContainers } from "../../modules/docker/listContainers";
 import { getLatestVersion } from "../../modules/release/getVersions";
 import * as eventBus from "../../eventBus";
 import params from "../../params";

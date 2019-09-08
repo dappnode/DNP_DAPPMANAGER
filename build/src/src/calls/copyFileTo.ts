@@ -1,7 +1,10 @@
 import path from "path";
 // Modules
-import docker from "../modules/docker";
-import listContainers from "../modules/docker/listContainers";
+import {
+  dockerCopyFileTo,
+  dockerGetContainerWorkingDir
+} from "../modules/docker/dockerCommands";
+import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";
@@ -47,16 +50,14 @@ export default async function copyFileTo({
     throw Error(`filename must not be a path: ${filename}`);
 
   // Get container name
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(p => p.name === id);
-  if (!dnp) throw Error(`No DNP found for id ${id}`);
+  const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect
   if (!toPath || !path.isAbsolute(toPath)) {
     // workingDir = "/usr/src/app" (Must clean the double quotes)
-    let workingDir = await docker.getContainerWorkingDir(containerName);
+    let workingDir = await dockerGetContainerWorkingDir(containerName);
     workingDir = (workingDir || "/").replace(/['"]+/g, "");
     toPath = path.join(workingDir, toPath);
   }
@@ -77,7 +78,7 @@ export default async function copyFileTo({
   dataUriToFile(dataUri, fromPath);
 
   // Copy file from local file system to container
-  await docker.copyFileTo(containerName, fromPath, toPath);
+  await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
   await shell(`rm -rf ${fromPath}`);

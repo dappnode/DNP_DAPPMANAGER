@@ -6,7 +6,7 @@ import {
 } from "./permutations";
 import { pickBy, mapValues } from "lodash";
 import generateErrorMessage from "./generateErrorMessage";
-import { DnpsInterface, ErrorsInterface } from "../types";
+import { DappGetDnps, DappGetErrors } from "../types";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
@@ -62,9 +62,9 @@ const timeoutMs = 10 * 1000; // ms
  * }
  */
 export default function resolver(
-  dnps: DnpsInterface
+  dnps: DappGetDnps
 ): { success: boolean; message: string; state: { [dnpName: string]: string } } {
-  const errors: ErrorsInterface = {};
+  const errors: DappGetErrors = {};
 
   const permutationsTable = getPermutationsTable(dnps);
   const totalCases = getTotalPermutations(permutationsTable);

@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import semver from "semver";
-import sinon from "sinon";
 
 import aggregateDependencies from "../../../../src/modules/dappGet/aggregate/aggregateDependencies";
 import { Dependencies } from "../../../../src/types";
@@ -33,51 +32,41 @@ interface MockVersions {
  *   - 'dnpC.dnp.dappnode.eth' => 'dnpA.dnp.dappnode.eth'
  */
 
-// Don't need to redefine sinon complex type
+// No need to re-define a nested module object type
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const fetchVersions = (versions: MockVersions) =>
-  sinon
-    .stub()
-    .callsFake(
-      async ({
-        name,
-        versionRange
-      }: {
-        name: string;
-        versionRange: string;
-      }) => {
-        if (!versions[name]) throw Error(`No versions found for dnp: ${name}`);
-        return versions[name].filter((version: string) =>
-          semver.satisfies(version, versionRange)
-        );
-      }
-    );
-
-// Don't need to redefine sinon complex type
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const fetchDependencies = (dependencies: MockDnpDependencies) =>
-  sinon.stub().callsFake(async ({ name }: { name: string }) => {
-    if (!dependencies[name])
-      throw Error(`No dependencies found for dnp: ${name}`);
-    return dependencies[name];
-  });
+function mockFetch(dependencies: MockDnpDependencies, versions: MockVersions) {
+  return {
+    dependencies: async (
+      name: string,
+      version: string
+    ): Promise<Dependencies> => {
+      version;
+      if (!dependencies[name])
+        throw Error(`No dependencies found for dnp: ${name}`);
+      return dependencies[name];
+    },
+    versions: async (name: string, versionRange: string): Promise<string[]> => {
+      if (!versions[name]) throw Error(`No versions found for dnp: ${name}`);
+      return versions[name].filter((version: string) =>
+        semver.satisfies(version, versionRange)
+      );
+    }
+  };
+}
 
 describe("dappGet/aggregate/aggregateDependencies", () => {
   it("should fetch the correct dependencies", async () => {
-    const versions: MockVersions = {
-      "kovan.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0", "0.2.1"],
-      "dependency.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0"]
-    };
-
     const dependencies: MockDnpDependencies = {
       "kovan.dnp.dappnode.eth": { "dependency.dnp.dappnode.eth": "^0.1.1" },
       "dependency.dnp.dappnode.eth": {}
     };
 
-    const fetch = {
-      dependencies: fetchDependencies(dependencies),
-      versions: fetchVersions(versions)
+    const versions: MockVersions = {
+      "kovan.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0", "0.2.1"],
+      "dependency.dnp.dappnode.eth": ["0.1.0", "0.1.1", "0.1.2", "0.2.0"]
     };
+
+    const fetch = mockFetch(dependencies, versions);
 
     const name = "kovan.dnp.dappnode.eth";
     const versionRange = "0.1.0";
@@ -100,22 +89,19 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
   });
 
   it("should not crash with circular dependencies", async () => {
-    const versions: MockVersions = {
-      "dnpA.dnp.dappnode.eth": ["0.1.0"],
-      "dnpB.dnp.dappnode.eth": ["0.1.0"],
-      "dnpC.dnp.dappnode.eth": ["0.1.0"]
-    };
-
     const dependencies: MockDnpDependencies = {
       "dnpA.dnp.dappnode.eth": { "dnpB.dnp.dappnode.eth": "^0.1.0" },
       "dnpB.dnp.dappnode.eth": { "dnpC.dnp.dappnode.eth": "^0.1.0" },
       "dnpC.dnp.dappnode.eth": { "dnpA.dnp.dappnode.eth": "^0.1.0" }
     };
 
-    const fetch = {
-      dependencies: fetchDependencies(dependencies),
-      versions: fetchVersions(versions)
+    const versions: MockVersions = {
+      "dnpA.dnp.dappnode.eth": ["0.1.0"],
+      "dnpB.dnp.dappnode.eth": ["0.1.0"],
+      "dnpC.dnp.dappnode.eth": ["0.1.0"]
     };
+
+    const fetch = mockFetch(dependencies, versions);
 
     const name = "dnpA.dnp.dappnode.eth";
     const versionRange = "0.1.0";

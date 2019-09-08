@@ -1,6 +1,6 @@
 import * as safeSemver from "../utils/safeSemver";
 import { hasVersion, getDependencies, toReq } from "../utils/dnpUtils";
-import { StateInternalInterface, DnpsInterface } from "../types";
+import { StateInternalInterface, DappGetDnps } from "../types";
 
 /**
  * Checks if a specific combination of DNP versions is valid
@@ -23,7 +23,7 @@ import { StateInternalInterface, DnpsInterface } from "../types";
  */
 export default function verifyState(
   state: StateInternalInterface,
-  dnps: DnpsInterface
+  dnps: DappGetDnps
 ): {
   valid: boolean;
   reason?: {

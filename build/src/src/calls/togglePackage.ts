@@ -1,7 +1,10 @@
-import listContainers from "../modules/docker/listContainers";
+import { listContainer } from "../modules/docker/listContainers";
 import * as getPath from "../utils/getPath";
 import params from "../params";
-import docker from "../modules/docker";
+import {
+  dockerComposeStart,
+  dockerComposeStop
+} from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 import { RpcHandlerReturn } from "../types";
 
@@ -22,12 +25,10 @@ export default async function togglePackage({
 
   const dockerComposePath = getPath.dockerComposeSmart(id, params);
 
-  const dnpList = await listContainers({ byName: id });
-  const dnp = dnpList[0];
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnp = await listContainer(id);
 
-  if (dnp.running) await docker.compose.stop(dockerComposePath, { timeout });
-  else await docker.compose.start(dockerComposePath);
+  if (dnp.running) await dockerComposeStop(dockerComposePath, { timeout });
+  else await dockerComposeStart(dockerComposePath);
 
   // Emit packages update
   eventBus.requestPackages.emit();

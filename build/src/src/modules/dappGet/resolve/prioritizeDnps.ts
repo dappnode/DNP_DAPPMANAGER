@@ -1,6 +1,6 @@
-import { DnpsInterface, DnpInterface } from "../types";
+import { DappGetDnps, DappGetDnp } from "../types";
 
-interface PrioritizeDnpReturn extends DnpInterface {
+interface PrioritizeDnpReturn extends DappGetDnp {
   name: string;
 }
 
@@ -46,7 +46,7 @@ interface PrioritizeDnpReturn extends DnpInterface {
  * ]
  */
 export default function prioritizeDnps(
-  dnps: DnpsInterface
+  dnps: DappGetDnps
 ): PrioritizeDnpReturn[] {
   // Convert the dnps object into an array of objects appending the name
   return (

@@ -1,12 +1,14 @@
 import "mocha";
-import chai from "chai";
+import chai, { expect } from "chai";
 import sinon from "sinon";
+import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import params from "../../src/params";
-const proxyquire = require("proxyquire").noCallThru();
-const { manifestToCompose } = require("@dappnode/dnp-manifest");
-const expect = chai.expect;
+import rewiremock from "rewiremock";
+import { mockManifest, cleanTestDir, createTestDir } from "../testUtils";
 chai.use(require("sinon-chai"));
+// Imports for typings
+import * as packagesType from "../../src/modules/packages";
 
 describe("Util: package install / download", () => {
   // ///// Make mocks for dependencies
@@ -15,127 +17,109 @@ describe("Util: package install / download", () => {
   params.REPO_DIR = "test_files/";
 
   // getManifest
-  const PACKAGE_NAME = "myPackage";
-  const IMAGE_HASH = "imageHash";
-  const IMAGE_NAME = "imageName";
-  const MANIFEST_PATH = getPath.manifest(PACKAGE_NAME, params, false);
-  const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params, false);
-  const IMAGE_PATH = getPath.image(PACKAGE_NAME, IMAGE_NAME, params, false);
+  const dnpName = "myPackage";
+  const id = dnpName;
+  const isCore = false;
+  const imageName = "imageName";
+  const imageHash = "imageHash";
+  const imageSize = 1111;
+  const dockerComposePath = getPath.dockerCompose(dnpName, params, isCore);
+  const imagePath = getPath.image(dnpName, imageName, params, isCore);
   const dnpManifest = {
-    name: PACKAGE_NAME,
+    ...mockManifest,
+    name: dnpName,
     image: {
-      path: IMAGE_NAME,
-      hash: IMAGE_HASH
+      ...mockManifest.image,
+      path: imageName,
+      hash: imageHash,
+      size: imageSize
     }
   };
 
-  // ipfs .download, .isfileHashValid
-  const downloadImageSpy = sinon.spy();
-  const downloadImage = async (hash: string, path: string): Promise<void> => {
-    downloadImageSpy(hash, path);
-  };
+  const downloadImage = sinon.stub();
 
-  // docker .load .compose.up
-  const dockerLoadSpy = sinon.spy();
-  const dockerComposeUpSpy = sinon.spy();
-  const docker = {
-    load: dockerLoadSpy,
-    compose: {
-      up: dockerComposeUpSpy
-    },
-    images: async (): Promise<void> => {}
-  };
+  const dockerLoad = sinon.stub();
+  const dockerImages = sinon.stub();
+  const dockerRmi = sinon.stub();
+  const dockerComposeUpSafe = sinon.stub();
 
-  // validate .path --> blindly accept all paths
-  const validate = {
-    path: (path: string): string => path
-  };
+  let packages: typeof packagesType;
 
-  // fs .writeFileSync, .existsSync, .unlinkSync
-  const fsWriteFileSpy = sinon.spy();
-  const fsExistsSyncSpy = sinon.spy();
-  const fsUnlinkSpy = sinon.spy();
-  const fs = {
-    writeFile: async (
-      data: string,
-      path: string,
-      callback: (err: null, res: string) => void
-    ): Promise<void> => {
-      fsWriteFileSpy(data, path);
-      callback(null, "great success");
-    },
-    existsSync: async (path: string): Promise<boolean> => {
-      fsExistsSyncSpy(path);
-      return true;
-    },
-    unlink: (
-      path: string,
-      callback: (err: null, res: string) => void
-    ): void => {
-      fsUnlinkSpy(path);
-      callback(null, "great success");
-    }
-  };
+  before("Mock", async () => {
+    packages = await rewiremock.around(
+      () => import("../../src/modules/packages"),
+      mock => {
+        mock(() => import("../../src/modules/release/getImage"))
+          .withDefault(downloadImage)
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/dockerCommands"))
+          .with({ dockerLoad, dockerImages, dockerRmi })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/dockerSafe"))
+          .with({ dockerComposeUpSafe })
+          .toBeUsed();
+      }
+    );
+  });
 
-  const { download, load, run } = proxyquire("../../src/modules/packages", {
-    "./release/getImage": downloadImage,
-    "./docker": docker,
-    "../utils/validate": validate,
-    "../params": params,
-    fs: fs
+  before(async () => {
+    await createTestDir();
+    fs.mkdirSync(getPath.packageRepoDir(dnpName, params, isCore));
+    fs.writeFileSync(imagePath, "MOCK-CONTENT");
   });
 
   it("Should .download", async () => {
-    await download({
+    await packages.download({
       pkg: {
-        name: PACKAGE_NAME,
-        manifest: dnpManifest
-      }
+        name: dnpName,
+        manifest: dnpManifest,
+        ver: "0.1.0",
+        isCore: false
+      },
+      id
     });
 
-    expect(downloadImageSpy.getCall(0).args).to.deep.equal(
-      [IMAGE_HASH, IMAGE_PATH],
-      "ipfs.download should be called with IMAGE_HASH, IMAGE_PATH"
+    expect(downloadImage.firstCall.args.slice(0, 3)).to.deep.equal(
+      [imageHash, imagePath, imageSize],
+      "ipfs.download should be called with imageHash, imagePath"
     );
   });
 
   it("Should .load", async () => {
-    await load({
+    await packages.load({
       pkg: {
-        name: PACKAGE_NAME,
-        manifest: dnpManifest
-      }
+        name: dnpName,
+        manifest: dnpManifest,
+        ver: "0.1.0",
+        isCore: false
+      },
+      id
     });
 
-    expect(fsWriteFileSpy.getCalls()[0].args).to.deep.equal(
-      [MANIFEST_PATH, JSON.stringify(dnpManifest, null, 2)],
-      "fs.writeFileSync should be called FIRST with DockerCompose, MANIFEST_PATH"
-    );
-    expect(fsWriteFileSpy.getCalls()[1].args).to.deep.equal(
-      [DOCKERCOMPOSE_PATH, manifestToCompose(dnpManifest)],
-      "fs.writeFileSync should be called SECOND with DockerCompose, DOCKERCOMPOSE_PATH"
-    );
-    expect(dockerLoadSpy.getCalls()[0].args).to.deep.equal(
-      [IMAGE_PATH],
-      "docker.load should be called with IMAGE_PATH"
-    );
-    expect(fsUnlinkSpy.getCalls()[0].args).to.deep.equal(
-      [IMAGE_PATH],
-      "fs.unlink promisified should be called with IMAGE_PATH"
+    expect(dockerLoad.firstCall.args).to.deep.equal(
+      [imagePath],
+      "docker.load should be called with imagePath"
     );
   });
 
   it("Should .run", async () => {
-    await run({
+    await packages.run({
       pkg: {
-        name: PACKAGE_NAME,
-        manifest: dnpManifest
-      }
+        name: dnpName,
+        manifest: dnpManifest,
+        ver: "0.1.0",
+        isCore: false
+      },
+      id
     });
 
-    expect(dockerComposeUpSpy.getCalls()[0].args).to.deep.equal(
-      [DOCKERCOMPOSE_PATH],
-      "docker.compose.up should be called with DOCKERCOMPOSE_PATH"
+    expect(dockerComposeUpSafe.firstCall.args).to.deep.equal(
+      [dockerComposePath],
+      "docker.compose.up should be called with dockerComposePath"
     );
+  });
+
+  after(async () => {
+    await cleanTestDir();
   });
 });

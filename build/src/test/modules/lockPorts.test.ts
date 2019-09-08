@@ -6,9 +6,11 @@ import * as validate from "../../src/utils/validate";
 import params from "../../src/params";
 import { createTestDir, cleanTestDir, mockDnp } from "../testUtils";
 import { PortMapping, PackageContainer } from "../../src/types";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+// Import dependencies for typing
+import lockPorts from "../../src/modules/lockPorts";
 
-describe("Module: lockPorts", function() {
+describe("Module: lockPorts", () => {
   const normalDnpName = "kovan.dnp.dappnode.eth";
   const normalDnpPorts = ["30303", "30303/udp"];
 
@@ -38,48 +40,49 @@ describe("Module: lockPorts", function() {
       });
   }
 
-  const listContainers = async ({
-    byName
-  }: {
-    byName: string;
-  }): Promise<PackageContainer[]> => {
+  async function listContainer(byName: string): Promise<PackageContainer> {
     if (byName === normalDnpName)
-      return [
-        {
-          ...mockDnp,
-          name: normalDnpName,
-          ports: getListContainerPorts(normalDnpPorts)
-        }
-      ];
+      return {
+        ...mockDnp,
+        name: normalDnpName,
+        ports: getListContainerPorts(normalDnpPorts)
+      };
     if (byName === coreDnpName)
-      return [
-        {
-          ...mockDnp,
-          name: coreDnpName,
-          isCore: true,
-          ports: getListContainerPorts(coreDnpPorts)
-        }
-      ];
+      return {
+        ...mockDnp,
+        name: coreDnpName,
+        isCore: true,
+        ports: getListContainerPorts(coreDnpPorts)
+      };
     if (byName === noPortsDnpName)
-      return [
-        {
-          ...mockDnp,
-          name: noPortsDnpName,
-          ports: getListContainerPorts(noPortsPorts)
-        }
-      ];
-    return [];
-  };
+      return {
+        ...mockDnp,
+        name: noPortsDnpName,
+        ports: getListContainerPorts(noPortsPorts)
+      };
+    throw Error(`MOCK ERROR - unknown DNP for ${byName}`);
+  }
 
-  const docker = {
-    compose: {
-      up: async (): Promise<void> => {}
-    }
-  };
+  async function dockerComposeUp(dcPath: string): Promise<string> {
+    dcPath;
+    return "success";
+  }
 
-  const { default: lockPorts } = proxyquire("../../src/modules/lockPorts", {
-    "../modules/docker/listContainers": listContainers,
-    "../modules/docker/dockerCommands": docker
+  let lockPortsMock: typeof lockPorts;
+
+  beforeEach("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../src/modules/lockPorts"),
+      mock => {
+        mock(() => import("../../src/modules/docker/listContainers"))
+          .with({ listContainer })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/dockerCommands"))
+          .with({ dockerComposeUp })
+          .toBeUsed();
+      }
+    );
+    lockPortsMock = mock.default;
   });
 
   before(async () => {
@@ -124,53 +127,61 @@ services:
   });
 
   it("should lock ports and return portsToOpen (NON core)", async () => {
-    const portsToOpen = await lockPorts(normalDnpName);
+    const portsToOpen = await lockPortsMock(normalDnpName);
     const expectedPortsToOpen: PortMapping[] = [
       { host: 32768, container: 30303, protocol: "UDP" },
       { host: 32768, container: 30303, protocol: "TCP" }
     ];
-    expect(portsToOpen).to.deep.equal(expectedPortsToOpen);
-  });
+    expect(portsToOpen).to.deep.equal(
+      expectedPortsToOpen,
+      "Wrong returned ports"
+    );
 
-  it("should have modified the docker-compose (NON core)", async () => {
     const dc = fs.readFileSync(
       getPath.dockerCompose(normalDnpName, params, false),
       "utf8"
     );
-    expect(dc).to.equal(`version: '3.4'
+    expect(dc).to.equal(
+      `version: '3.4'
 services:
   ${normalDnpName}:
     ports:
       - '32768:30303'
       - '32768:30303/udp'
-`);
+`,
+      "Wrong modified docker-compose"
+    );
   });
 
   it("should lock ports and return portsToOpen (core)", async () => {
-    const portsToOpen = await lockPorts(coreDnpName);
+    const portsToOpen = await lockPortsMock(coreDnpName);
     const expectedPortsToOpen: PortMapping[] = [
       { host: 32769, container: 30303, protocol: "UDP" },
       { host: 32769, container: 30303, protocol: "TCP" }
     ];
-    expect(portsToOpen).to.deep.equal(expectedPortsToOpen);
-  });
+    expect(portsToOpen).to.deep.equal(
+      expectedPortsToOpen,
+      "Wrong returned ports"
+    );
 
-  it("should have modified the docker-compose (core)", async () => {
     const dc = fs.readFileSync(
       getPath.dockerCompose(coreDnpName, params, true),
       "utf8"
     );
-    expect(dc).to.equal(`version: '3.4'
+    expect(dc).to.equal(
+      `version: '3.4'
 services:
   ${coreDnpName}:
     ports:
       - '32769:30303'
       - '32769:30303/udp'
-`);
+`,
+      "Wrong modified docker-compose"
+    );
   });
 
   it("should skip the process early on a package without ephemeral ports", async () => {
-    const earlyReturn = await lockPorts(noPortsDnpName);
+    const earlyReturn = await lockPortsMock(noPortsDnpName);
     expect(earlyReturn).to.deep.equal([] as PortMapping[]);
   });
 

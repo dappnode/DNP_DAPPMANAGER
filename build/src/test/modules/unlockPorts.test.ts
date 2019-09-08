@@ -3,7 +3,8 @@ import { expect } from "chai";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-const proxyquire = require("proxyquire").noCallThru();
+
+import unlockPorts from "../../src/modules/unlockPorts";
 
 describe("Module: unlockPorts", function() {
   const params = {
@@ -23,10 +24,6 @@ describe("Module: unlockPorts", function() {
   };
 
   const dockerComposePath = getPath.dockerCompose(pkg.name, params, false);
-
-  const { default: unlockPorts } = proxyquire("../../src/modules/unlockPorts", {
-    "../params": params
-  });
 
   before(() => {
     validate.path(dockerComposePath);

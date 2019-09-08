@@ -1,12 +1,15 @@
 import "mocha";
 import { expect } from "chai";
-const proxyquire = require("proxyquire").noCallThru();
 import * as safeSemver from "../../../src/modules/dappGet/utils/safeSemver";
 import fs from "fs";
 import path from "path";
-import { FetchFunction } from "../../../src/modules/dappGet/types";
+import { DappGetFetchFunction } from "../../../src/modules/dappGet/types";
 import { PackageContainer } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
+import rewiremock from "rewiremock";
+// Imports for types
+import dappGetType from "../../../src/modules/dappGet";
+import aggregateType from "../../../src/modules/dappGet/aggregate";
 
 /* eslint-disable no-console */
 
@@ -37,52 +40,43 @@ describe("dappGet integration test", () => {
       describe(`Case: ${_case.name}`, () => {
         // Prepare dependencies
 
-        // Autogenerate a listContainers reponse from the _case object
-        const listContainers = async (): Promise<PackageContainer[]> =>
-          Object.keys(_case.dnps)
-            .filter(dnpName => _case.dnps[dnpName].installed)
-            .map(dnpName => {
-              const dnp =
-                _case.dnps[dnpName].versions[_case.dnps[dnpName].installed];
-              if (!dnp) {
-                throw Error(
-                  `The installed version must be defined: ${dnpName} @ ${
-                    _case.dnps[dnpName].installed
-                  }`
-                );
-              }
-              return {
-                ...mockDnp,
-                name: dnpName,
-                version: _case.dnps[dnpName].installed,
-                origin: dnp.origin,
-                dependencies: dnp.dependencies || {}
-              };
-            });
+        const dnpList: PackageContainer[] = Object.keys(_case.dnps)
+          .filter(dnpName => _case.dnps[dnpName].installed)
+          .map(dnpName => {
+            const dnp =
+              _case.dnps[dnpName].versions[_case.dnps[dnpName].installed];
+            if (!dnp) {
+              throw Error(
+                `The installed version must be defined: ${dnpName} @ ${
+                  _case.dnps[dnpName].installed
+                }`
+              );
+            }
+            return {
+              ...mockDnp,
+              name: dnpName,
+              version: _case.dnps[dnpName].installed,
+              origin: dnp.origin,
+              dependencies: dnp.dependencies || {}
+            };
+          });
 
-        const fetch: FetchFunction = {
-          dependencies: async ({
-            name,
-            ver
-          }: {
-            name: string;
-            ver: string;
-          }) => {
+        // Autogenerate a listContainers reponse from the _case object
+        async function listContainers(): Promise<PackageContainer[]> {
+          return dnpList;
+        }
+
+        const fetch: DappGetFetchFunction = {
+          dependencies: async (name: string, version: string) => {
             if (!_case.dnps[name])
               throw Error(`dnp ${name} is not in the case definition`);
-            if (!_case.dnps[name].versions[ver])
+            if (!_case.dnps[name].versions[version])
               throw Error(
-                `Version ${name} @ ${ver} is not in the case definition`
+                `Version ${name} @ ${version} is not in the case definition`
               );
-            return _case.dnps[name].versions[ver].dependencies;
+            return _case.dnps[name].versions[version].dependencies;
           },
-          versions: async ({
-            name,
-            versionRange
-          }: {
-            name: string;
-            versionRange: string;
-          }) => {
+          versions: async (name: string, versionRange: string) => {
             if (!_case.dnps[name])
               throw Error(`dnp ${name} is not in the case definition`);
             const allVersions = Object.keys(_case.dnps[name].versions);
@@ -99,23 +93,35 @@ describe("dappGet integration test", () => {
           }
         };
 
-        const { default: dappGet } = proxyquire(
-          "../../../src/modules/dappGet",
-          {
-            "./fetch": fetch,
-            "../../modules/docker/listContainers": listContainers
-          }
-        );
+        let dappGet: typeof dappGetType;
+        let aggregate: typeof aggregateType;
 
-        const { default: aggregate } = proxyquire(
-          "../../../src/modules/dappGet/aggregate",
-          {
-            "../../../modules/docker/listContainers": listContainers
-          }
-        );
+        before("Mock", async () => {
+          const dappGetImport = await rewiremock.around(
+            () => import("../../../src/modules/dappGet"),
+            mock => {
+              mock(() => import("../../../src/modules/dappGet/fetch"))
+                .with(fetch)
+                .toBeUsed();
+              mock(() => import("../../../src/modules/docker/listContainers"))
+                .with({ listContainers })
+                .toBeUsed();
+            }
+          );
+          const aggregateImport = await rewiremock.around(
+            () => import("../../../src/modules/dappGet/aggregate"),
+            mock => {
+              mock(() => import("../../../src/modules/docker/listContainers"))
+                .with({ listContainers })
+                .toBeUsed();
+            }
+          );
+          dappGet = dappGetImport.default;
+          aggregate = aggregateImport.default;
+        });
 
         it("Agreggate dnps for the integration test", async () => {
-          const dnps = await aggregate({ req: _case.req, fetch });
+          const dnps = await aggregate({ req: _case.req, dnpList, fetch });
           logBig("  Aggregated DNPs", JSON.stringify(dnps, null, 2));
           expect(Boolean(Object.keys(dnps).length)).to.equal(
             true,

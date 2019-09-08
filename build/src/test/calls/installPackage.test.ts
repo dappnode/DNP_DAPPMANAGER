@@ -1,32 +1,38 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { InstallerPkg, PackageContainer } from "../../src/types";
-
-const proxyquire = require("proxyquire").noCallThru();
+import {
+  InstallerPkg,
+  ProgressLog,
+  PackageRequest,
+  PortMapping,
+  Manifest
+} from "../../src/types";
+import rewiremock from "rewiremock";
+// Imports for typings
+import installPackageType from "../../src/calls/installPackage";
+import { DappGetResult } from "../../src/modules/dappGet/types";
+import { mockManifest } from "../testUtils";
 
 describe("Call function: installPackage", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   const pkgName = "dapp.dnp.dappnode.eth";
   const pkgVer = "0.1.1";
-  const pkgManifest = {
+  const pkgManifest: Manifest = {
+    ...mockManifest,
     name: pkgName,
     type: "service"
   };
 
   const depName = "kovan.dnp.dappnode.eth";
   const depVer = "0.1.1";
-  const depManifest = {
+  const depManifest: Manifest = {
+    ...mockManifest,
     name: depName,
     type: "library"
   };
-  const depPortsToOpen = [
-    { portNumber: 32769, protocol: "UDP" },
-    { portNumber: 32769, protocol: "TCP" }
+  const depPortsToOpen: PortMapping[] = [
+    { host: 32769, container: 32769, protocol: "UDP" },
+    { host: 32769, container: 32769, protocol: "TCP" }
   ];
 
   // Stub packages module. Resolve always returning nothing
@@ -36,56 +42,74 @@ describe("Call function: installPackage", function() {
     run: sinon.fake.resolves(null)
   };
 
-  const dappGet = sinon.fake.resolves({
-    message: "Found compatible state",
-    state: { [pkgName]: pkgVer, [depName]: depVer }
-  });
+  const dappGetSpy = sinon.spy();
+  async function dappGet(req: PackageRequest): Promise<DappGetResult> {
+    dappGetSpy(req);
+    return {
+      message: "Found compatible state",
+      state: { [pkgName]: pkgVer, [depName]: depVer },
+      alreadyUpdated: {}
+    };
+  }
 
-  const getManifest = sinon.stub().callsFake(async function(pkg) {
+  async function getManifest(pkg: PackageRequest): Promise<Manifest> {
     if (pkg.name === pkgName) return pkgManifest;
     else if (pkg.name === depName) return depManifest;
     else throw Error(`[SINON STUB] Manifest of ${pkg.name} not available`);
-  });
+  }
 
   const eventBus = {
-    runNatRenewal: { emit: sinon.stub() },
-    requestPackages: { emit: sinon.stub() },
-    packageModified: { emit: sinon.stub() }
+    runNatRenewal: { emit: sinon.stub(), on: sinon.stub() },
+    requestPackages: { emit: sinon.stub(), on: sinon.stub() },
+    packageModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  const listContainers = async (): Promise<PackageContainer[]> => [];
-
   // Simulate that only the dependency has p2p ports
-  const lockPorts = sinon.stub().callsFake(async id => {
+  const lockPortsSpy = sinon.spy();
+  async function lockPorts(id: string): Promise<PortMapping[]> {
+    lockPortsSpy(id);
     if (id === depName) return depPortsToOpen;
     else return [];
-  });
+  }
+
+  function logUi(progressLog: ProgressLog): void {
+    progressLog;
+  }
 
   // Simulated the chain is already synced
   const isSyncing = async (): Promise<boolean> => false;
 
-  // db to know UPnP state
-  const db = {
-    get: (key: string): boolean => {
-      if (key === "upnpAvailable") return true;
-      else throw Error("Unexpected key in mock db");
-    }
-  };
+  let installPackage: typeof installPackageType;
 
-  const { default: installPackage } = proxyquire(
-    "../../src/calls/installPackage",
-    {
-      "../modules/packages": packages,
-      "../modules/dappGet": dappGet,
-      "../modules/release/getManifest": getManifest,
-      "../modules/docker/listContainers": listContainers,
-      "../modules/lockPorts": lockPorts,
-      "../eventBus": eventBus,
-      "../utils/isSyncing": isSyncing,
-      "../params": params,
-      "../db": db
-    }
-  );
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../src/calls/installPackage"),
+      mock => {
+        mock(() => import("../../src/modules/packages"))
+          .with(packages)
+          .toBeUsed();
+        mock(() => import("../../src/modules/dappGet"))
+          .withDefault(dappGet)
+          .toBeUsed();
+        mock(() => import("../../src/modules/lockPorts"))
+          .withDefault(lockPorts)
+          .toBeUsed();
+        mock(() => import("../../src/modules/release/getManifest"))
+          .withDefault(getManifest)
+          .toBeUsed();
+        mock(() => import("../../src/utils/isSyncing"))
+          .withDefault(isSyncing)
+          .toBeUsed();
+        mock(() => import("../../src/utils/logUi"))
+          .withDefault(logUi)
+          .toBeUsed();
+        mock(() => import("../../src/eventBus"))
+          .with(eventBus)
+          .toBeUsed();
+      }
+    );
+    installPackage = mock.default;
+  });
 
   // before(() => {
   //     const DOCKERCOMPOSE_PATH = getPath.dockerCompose(PACKAGE_NAME, params);
@@ -102,7 +126,11 @@ describe("Call function: installPackage", function() {
   // Step 1: Parse request
   // Step 2: Resolve the request
   it("should have called dappGet with correct arguments", async () => {
-    sinon.assert.calledWith(dappGet, { name: pkgName, req: pkgName, ver: "*" });
+    sinon.assert.calledWith(dappGetSpy, {
+      name: pkgName,
+      req: pkgName,
+      ver: "*"
+    });
   });
 
   const callKwargPkg = {
@@ -175,9 +203,9 @@ describe("Call function: installPackage", function() {
 
   // Step 6: P2P ports: modify docker-compose + open ports
   it("should call lockPorts", async () => {
-    sinon.assert.callCount(lockPorts, 2);
-    expect(lockPorts.firstCall.lastArg).to.equal(pkgName, "Wrong 1st call");
-    expect(lockPorts.secondCall.lastArg).to.equal(depName, "Wrong 2nd call");
+    sinon.assert.callCount(lockPortsSpy, 2);
+    expect(lockPortsSpy.firstCall.lastArg).to.equal(pkgName, "Wrong 1st call");
+    expect(lockPortsSpy.secondCall.lastArg).to.equal(depName, "Wrong 2nd call");
   });
 
   // Step FINAL:

@@ -1,8 +1,11 @@
 import path from "path";
 import fs from "fs";
 // Modules
-import docker from "../modules/docker";
-import listContainers from "../modules/docker/listContainers";
+import {
+  dockerCopyFileFrom,
+  dockerGetContainerWorkingDir
+} from "../modules/docker/dockerCommands";
+import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";
@@ -41,16 +44,14 @@ export default async function copyFileFrom({
   if (!fromPath) throw Error("Argument fromPath must be defined");
 
   // Get container name
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(p => p.name === id);
-  if (!dnp) throw Error(`No DNP found for id ${id}`);
+  const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect
   if (!path.isAbsolute(fromPath)) {
     // workingDir = "/usr/src/app"
-    let workingDir = await docker.getContainerWorkingDir(containerName);
+    let workingDir = await dockerGetContainerWorkingDir(containerName);
     workingDir = (workingDir || "/").replace(/['"]+/g, "");
     fromPath = path.join(workingDir, fromPath);
   }
@@ -68,10 +69,10 @@ export default async function copyFileFrom({
   let toPath = path.join(tempTransferDir, base);
 
   // Copy file from container to local file system
-  await docker.copyFileFrom(containerName, fromPath, toPath);
+  await dockerCopyFileFrom(containerName, fromPath, toPath);
 
   /**
-   * Allow directories by automatically compressing them to .tar.gz files
+   * Allow directories by autdockerCopyFileFromomatically compressing them to .tar.gz files
    * 1. Test if directory
    * 2. Compress (use stripTrailingSlash to clean path, just in case)
    * 3. Clean original files and rename toPath variable

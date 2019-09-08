@@ -1,72 +1,75 @@
 import "mocha";
 import { expect } from "chai";
-import sinon from "sinon";
-import fs from "fs";
-import { promisify } from "util";
-import Logs from "../../src/logs";
-const logs = Logs(module);
-
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+import { mockManifest, mockDirectoryDnp } from "../testUtils";
+// Imports for typings
+import fetchDirectoryType from "../../src/calls/fetchDirectory";
+import { Manifest, DirectoryDnp } from "../../src/types";
 
 describe("Call function: fetchDirectory", function() {
   // This function gets the manifest of a package,
   // and then gets the avatar refered in the manifest if any
   // Finally returns this data objectified
-  const packageName = "myPackage.eth";
-  const avatarHash = "FakeFileAvatarHash";
-  const testDirectory = "./test_files/";
-  const manifest = { name: "pkgA" };
-  const avatar = "base64-avatar-mockmockmockmock";
+  const avatarHash = "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt";
+  const avatarContent = "base64-avatar-mockmockmockmock";
+  const manifest = { ...mockManifest, avatar: avatarHash };
 
   describe("Call function fetchDirectory", function() {
-    before(async () => {
-      await promisify(fs.mkdir)(testDirectory).catch(logs.error);
-      await promisify(fs.writeFile)(testDirectory + avatarHash, "data").catch(
-        logs.error
+    let fetchDirectory: typeof fetchDirectoryType;
+
+    before("Mock", async () => {
+      async function getDirectory(): Promise<DirectoryDnp[]> {
+        return [mockDirectoryDnp];
+      }
+
+      async function getManifest(): Promise<Manifest> {
+        return manifest;
+      }
+
+      async function getAvatar(hash: string): Promise<string> {
+        if (hash === avatarHash) return avatarContent;
+        throw Error(`Unknown avatar hash ${hash}`);
+      }
+
+      async function isSyncing(): Promise<boolean> {
+        return false;
+      }
+
+      const mock = await rewiremock.around(
+        () => import("../../src/calls/fetchDirectory"),
+        mock => {
+          mock(() => import("../../src/modules/release/getDirectory"))
+            .withDefault(getDirectory)
+            .toBeUsed();
+          mock(() => import("../../src/modules/release/getManifest"))
+            .withDefault(getManifest)
+            .toBeUsed();
+          mock(() => import("../../src/modules/release/getAvatar"))
+            .withDefault(getAvatar)
+            .toBeUsed();
+          mock(() => import("../../src/utils/isSyncing"))
+            .withDefault(isSyncing)
+            .toBeUsed();
+        }
       );
+      fetchDirectory = mock.default;
     });
 
     it("should return success message and the directory data", async () => {
-      const getDirectory = sinon.stub();
-      getDirectory.resolves([
-        { name: "pkgA", status: "preparing", directoryId: 1 }
-      ]);
-
-      const getManifest = sinon.stub();
-      getManifest.resolves(manifest);
-
-      const getAvatar = sinon.stub();
-      getAvatar.resolves(avatar);
-
-      const { default: fetchDirectory } = proxyquire(
-        "../../src/calls/fetchDirectory",
+      const expectedDirectoryReturn: DirectoryDnp[] = [
         {
-          "../modules/release/getDirectory": getDirectory,
-          "../modules/release/getManifest": getManifest,
-          "../modules/release/getAvatar": getAvatar,
-          "../utils/isSyncing": async () => false
+          ...mockDirectoryDnp,
+          manifest,
+          avatar: avatarContent
         }
-      );
+      ];
 
-      const res = await fetchDirectory({ id: packageName });
+      const res = await fetchDirectory();
       expect(res).to.be.ok;
       expect(res).to.have.property("message");
       expect(res).to.have.property("result");
       expect(res.result).to.be.an("array");
-      expect(res.result).to.deep.equal([
-        {
-          avatar: undefined,
-          manifest: manifest,
-          name: "pkgA",
-          status: "preparing",
-          directoryId: 1
-        }
-      ]);
-    });
-
-    after(async () => {
-      await promisify(fs.unlink)(testDirectory + avatarHash).catch(logs.error);
-      await promisify(fs.rmdir)(testDirectory).catch(logs.error);
+      expect(res.result).to.deep.equal(expectedDirectoryReturn);
     });
   });
 });

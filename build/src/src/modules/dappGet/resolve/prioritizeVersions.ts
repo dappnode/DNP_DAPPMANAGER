@@ -1,6 +1,6 @@
 import * as safeSemver from "../utils/safeSemver";
 import { getVersionsFromDnp } from "../utils/dnpUtils";
-import { DnpInterface } from "../types";
+import { DappGetDnp } from "../types";
 
 /**
  * Prioritizes the versions array according to this rules
@@ -16,9 +16,7 @@ import { DnpInterface } from "../types";
  * }
  * @returns {array} versions: ['0.1.2', '0.1.0']
  */
-export default function prioritizeVersions(
-  dnp: DnpInterface
-): (string | null)[] {
+export default function prioritizeVersions(dnp: DappGetDnp): (string | null)[] {
   const versions = Object.keys(getVersionsFromDnp(dnp));
   // Order the versions to prioritize which successful case will be picked first
   // 1. Requested package, newest first

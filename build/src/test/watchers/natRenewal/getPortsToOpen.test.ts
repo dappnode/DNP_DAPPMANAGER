@@ -1,75 +1,86 @@
 import "mocha";
 import { expect } from "chai";
 import defaultPortsToOpen from "../../../src/watchers/natRenewal/defaultPortsToOpen";
-import { PortMapping } from "../../../src/types";
-const proxyquire = require("proxyquire").noCallThru();
+import { PortMapping, PackageContainer } from "../../../src/types";
+import rewiremock from "rewiremock";
+// imports for typings
+import { mockDnp } from "../../testUtils";
 
 describe("Watchers > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
     const stoppedDnp = "stopped.dnp.dappnode.eth";
-
-    const { default: getPortsToOpen } = proxyquire(
-      "../../../src/watchers/natRenewal/getPortsToOpen",
+    const dnpList: PackageContainer[] = [
       {
-        "../../modules/docker/listContainers": async () => [
-          {
-            isCore: true,
-            name: "admin.dnp.dappnode.eth",
-            ports: [{ host: 8090, protocol: "TCP" }],
-            running: true
-          },
-          {
-            isCore: true,
-            name: "vpn.dnp.dappnode.eth",
-            ports: [{ host: 1194, protocol: "UDP" }],
-            running: true
-          },
-          {
-            isCore: true,
-            name: "vpn.dnp.dappnode.eth2",
-            ports: [{ host: 1194, protocol: "UDP" }],
-            running: true
-          },
-          {
-            isCore: false,
-            name: "goerli.dnp.dappnode.eth",
-            ports: [
-              { host: 32769, protocol: "TCP" },
-              { host: 32771, protocol: "UDP" },
-              { host: 32770, protocol: "UDP" }
-            ],
-            running: true,
-            portsToClose: [
-              { portNumber: 32769, protocol: "TCP" },
-              { portNumber: 32771, protocol: "UDP" },
-              { portNumber: 32770, protocol: "UDP" }
-            ]
-          },
-          {
-            isCore: false,
-            name: stoppedDnp,
-            running: false,
-            portsToClose: [{ portNumber: 30303, protocol: "UDP" }]
-          }
+        ...mockDnp,
+        isCore: true,
+        name: "admin.dnp.dappnode.eth",
+        ports: [{ container: 80, host: 8090, protocol: "TCP" }],
+        running: true
+      },
+      {
+        ...mockDnp,
+        isCore: true,
+        name: "vpn.dnp.dappnode.eth",
+        ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
+        running: true
+      },
+      {
+        ...mockDnp,
+        isCore: true,
+        name: "vpn.dnp.dappnode.eth2",
+        ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
+        running: true
+      },
+      {
+        ...mockDnp,
+        isCore: false,
+        name: "goerli.dnp.dappnode.eth",
+        ports: [
+          { container: 30303, host: 32769, protocol: "TCP" },
+          { container: 30303, host: 32771, protocol: "UDP" },
+          { container: 30304, host: 32770, protocol: "UDP" }
         ],
-        "../../utils/dockerComposeFile": {
-          getComposeInstance: (
-            dnpName: string
-          ): { getPortMappings: () => PortMapping[] } => ({
-            getPortMappings: (): PortMapping[] => {
-              if (dnpName.includes(stoppedDnp))
-                return [
-                  { host: 4001, container: 4001, protocol: "UDP" },
-                  { host: 4001, container: 4001, protocol: "TCP" }
-                ];
-              else throw Error(`Unknown dnpName "${dnpName}"`);
-            }
-          })
+        running: true
+      },
+      {
+        ...mockDnp,
+        isCore: false,
+        name: stoppedDnp,
+        running: false
+      }
+    ];
+
+    async function listContainers(): Promise<PackageContainer[]> {
+      return dnpList;
+    }
+
+    function getComposeInstance(dnpName: any): any {
+      return {
+        getPortMappings: (): PortMapping[] => {
+          if (dnpName.includes(stoppedDnp))
+            return [
+              { host: 4001, container: 4001, protocol: "UDP" },
+              { host: 4001, container: 4001, protocol: "TCP" }
+            ];
+          else throw Error(`Unknown dnpName "${dnpName}"`);
         }
+      };
+    }
+
+    const { default: getPortsToOpen } = await rewiremock.around(
+      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      mock => {
+        mock(() => import("../../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
+        mock(() => import("../../../src/utils/dockerComposeFile"))
+          .with({ getComposeInstance })
+          .toBeUsed();
       }
     );
 
     const portsToOpen = await getPortsToOpen();
+
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
       { protocol: "TCP", portNumber: 8090 },
@@ -86,15 +97,19 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
   });
 
   it("Return default ports if portsToOpen throws", async () => {
-    const { default: getPortsToOpen } = proxyquire(
-      "../../../src/watchers/natRenewal/getPortsToOpen",
-      {
-        "../../modules/docker/listContainers": async () => {
-          throw Error("Demo Error for listContainers");
-        },
-        "../../utils/parse": {
-          dockerComposePorts: (): void => {}
-        }
+    async function listContainers(): Promise<PackageContainer[]> {
+      throw Error("Demo Error for listContainers");
+    }
+
+    const { default: getPortsToOpen } = await rewiremock.around(
+      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      mock => {
+        mock(() => import("../../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
+        // mock(() => import("../../../src/utils/dockerComposeFile"))
+        //   .with({ getComposeInstance })
+        //   .toBeUsed();
       }
     );
 
@@ -105,31 +120,40 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
   it("Ignore a DNP if it throws fetching it's docker-compose", async () => {
     const throwsDnp = "throws.dnp.dappnode.eth";
 
-    const { default: getPortsToOpen } = proxyquire(
-      "../../../src/watchers/natRenewal/getPortsToOpen",
-      {
-        "../../modules/docker/listContainers": async () => [
-          {
-            isCore: true,
-            name: "admin.dnp.dappnode.eth",
-            ports: [{ host: 8090, protocol: "TCP" }],
-            running: true
-          },
-          {
-            name: throwsDnp,
-            running: false
-          }
-        ],
-        "../../utils/parse": {
-          dockerComposePorts: (dockerComposePath: string): void => {
-            if (
-              dockerComposePath === `dnp_repo/${throwsDnp}/docker-compose.yml`
-            )
-              throw Error(`Demo Error for ${throwsDnp}`);
-            else
-              throw Error(`Unknown dockerComposePath "${dockerComposePath}"`);
-          }
+    async function listContainers(): Promise<PackageContainer[]> {
+      return [
+        {
+          ...mockDnp,
+          isCore: true,
+          name: "admin.dnp.dappnode.eth",
+          ports: [{ container: 80, host: 8090, protocol: "TCP" }],
+          running: true
+        },
+        {
+          ...mockDnp,
+          name: throwsDnp,
+          running: false
         }
+      ];
+    }
+
+    // "../../utils/parse": {
+    //   dockerComposePorts: (dockerComposePath: string): void => {
+    //     if (
+    //       dockerComposePath === `dnp_repo/${throwsDnp}/docker-compose.yml`
+    //     )
+    //       throw Error(`Demo Error for ${throwsDnp}`);
+    //     else
+    //       throw Error(`Unknown dockerComposePath "${dockerComposePath}"`);
+    //   }
+    // }
+
+    const { default: getPortsToOpen } = await rewiremock.around(
+      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      mock => {
+        mock(() => import("../../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
       }
     );
 

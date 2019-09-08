@@ -1,5 +1,5 @@
 import downloadManifest from "../modules/release/ipfs/downloadManifest";
-import listContainers from "../modules/docker/listContainers";
+import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import * as parse from "../utils/parse";
 import * as envsHelper from "../utils/envsHelper";
@@ -41,9 +41,7 @@ export default async function updatePackageEnv({
     }
   }
 
-  const dnpList = await listContainers({ byName: id });
-  const dnp = dnpList[0];
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnp = await listContainer(id);
 
   // Write envs
   const previousEnvs = envsHelper.load(id, dnp.isCore);

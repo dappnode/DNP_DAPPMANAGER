@@ -1,6 +1,12 @@
 import shell from "../src/utils/shell";
 import * as path from "path";
-import { PackageContainer, Manifest, VolumeInterface } from "../src/types";
+import {
+  PackageContainer,
+  Manifest,
+  VolumeInterface,
+  DirectoryDnp,
+  PortMapping
+} from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
 export const testDir = "./test_files/";
@@ -66,6 +72,11 @@ export const mockManifest: Manifest = {
 export const mockVolume: VolumeInterface = {
   path: "mock/mock/mock",
   dest: "mock/mock/mock"
+};
+
+export const mockPort: PortMapping = {
+  container: 1111,
+  protocol: "TCP"
 };
 
 export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
@@ -139,4 +150,14 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
       }
     }
   ]
+};
+
+export const mockDirectoryDnp: DirectoryDnp = {
+  name: "mock.dnp.mock.eth",
+  status: 1,
+  statusName: "Active",
+  position: 1000,
+  directoryId: 2,
+  isFeatured: true,
+  featuredIndex: 0
 };

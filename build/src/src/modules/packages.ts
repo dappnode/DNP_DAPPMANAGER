@@ -1,8 +1,8 @@
-import { promisify } from "util";
 import fs from "fs";
 import semver from "semver";
 import restartPatch from "./docker/restartPatch";
-import docker from "./docker";
+import { dockerLoad, dockerImages, dockerRmi } from "./docker/dockerCommands";
+import { dockerComposeUpSafe } from "./docker/dockerSafe";
 import getImage from "./release/getImage";
 import * as validate from "../utils/validate";
 import * as getPath from "../utils/getPath";
@@ -10,10 +10,6 @@ import logUi from "../utils/logUi";
 import params from "../params";
 import { InstallerPkg } from "../types";
 const { manifestToCompose } = require("@dappnode/dnp-manifest");
-
-// Promisify fs methods
-const removeFile = promisify(fs.unlink);
-const writeFile = promisify(fs.writeFile);
 
 /**
  * Handles the download of a package.
@@ -91,20 +87,20 @@ export async function load({
   );
 
   logUi({ id, name, message: "Loading image..." });
-  await docker.load(imagePath);
+  await dockerLoad(imagePath);
 
   // Write manifest and docker-compose AFTER loading image
-  await writeFile(
+  fs.writeFileSync(
     validate.path(getPath.manifest(name, params, isCore)),
     JSON.stringify(manifest, null, 2)
   );
-  await writeFile(
+  fs.writeFileSync(
     validate.path(getPath.dockerCompose(name, params, isCore)),
     manifestToCompose(manifest)
   );
 
   logUi({ id, name, message: "Cleaning files..." });
-  await removeFile(imagePath);
+  fs.unlinkSync(imagePath);
 
   // Final log
   logUi({ id, name, message: "Package Loaded" });
@@ -135,7 +131,7 @@ export async function run({
   if (name == "dappmanager.dnp.dappnode.eth") {
     await restartPatch(name + ":" + version);
   } else {
-    await docker.compose.up(dockerComposePath);
+    await dockerComposeUpSafe(dockerComposePath);
   }
 
   // Clean old images. This command can throw errors.
@@ -143,8 +139,8 @@ export async function run({
   // Untagged: package.dnp.dappnode.eth:0.1.6
   logUi({ id, name, message: "cleaning old images" });
   try {
-    const currentImgs = await docker.images();
-    await docker.rmi(
+    const currentImgs = await dockerImages();
+    await dockerRmi(
       (currentImgs || "").split(/\r|\n/).filter((p: string) => {
         const [pName, pVer] = p.split(":");
         return pName === name && semver.valid(pVer) && pVer !== version;

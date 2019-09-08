@@ -1,10 +1,10 @@
 import getManifest from "../release/getManifest";
-import listContainers from "../docker/listContainers";
+import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
-import { ResultInterface } from "./types";
+import { DappGetResult } from "./types";
 const logs = Logs(module);
 
 /**
@@ -17,7 +17,7 @@ const logs = Logs(module);
 
 export default async function dappGetBasic(
   req: PackageRequest
-): Promise<ResultInterface> {
+): Promise<DappGetResult> {
   const reqManifest = await getManifest(req);
   // reqManifest.dependencies = {
   //     'bind.dnp.dappnode.eth': '0.1.4',

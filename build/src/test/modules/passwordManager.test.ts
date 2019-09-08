@@ -1,20 +1,23 @@
 import "mocha";
 import { expect } from "chai";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
 
-// proxyquire abstraction so relative paths only have to be changed once
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function getPasswordManager(
   shellMock: (cmd: string) => Promise<string>,
   image: string
-): {
-  isPasswordSecure: () => Promise<boolean>;
-  changePassword: (newPassword: string) => Promise<void>;
-} {
-  const passwordManager = proxyquire("../../src/modules/passwordManager", {
-    "../utils/shell": shellMock,
-    "../utils/getDappmanagerImage": async () => image
-  });
-  return passwordManager;
+) {
+  return rewiremock.around(
+    () => import("../../src/modules/passwordManager"),
+    mock => {
+      mock(() => import("../../src/utils/shell"))
+        .withDefault(shellMock)
+        .toBeUsed();
+      mock(() => import("../../src/utils/getDappmanagerImage"))
+        .withDefault(async () => image)
+        .toBeUsed();
+    }
+  );
 }
 
 describe("Module > passwordManager", () => {
@@ -23,10 +26,13 @@ describe("Module > passwordManager", () => {
   const passwordHash = `dappnode:$6$insecur3$rnEv9Amdjn3ctXxPYOlzj/cwvLT43GjWzkPECIHNqd8Vvza5bMG8QqMwEIBKYqnj609D.4ngi4qlmt29dLE.71:18004:0:99999:7:::`;
 
   it("Should check if the password is secure", async () => {
-    const { isPasswordSecure } = getPasswordManager(async (cmd: string) => {
-      if (cmd == grepCommand) return passwordHash;
-      throw Error(`Unknown command ${cmd}`);
-    }, image);
+    const { isPasswordSecure } = await getPasswordManager(
+      async (cmd: string) => {
+        if (cmd == grepCommand) return passwordHash;
+        throw Error(`Unknown command ${cmd}`);
+      },
+      image
+    );
 
     const isSecure = await isPasswordSecure();
     expect(isSecure).to.equal(false);
@@ -34,7 +40,7 @@ describe("Module > passwordManager", () => {
 
   it("Should change the password", async () => {
     let lastCmd;
-    const { changePassword } = getPasswordManager(async (cmd: string) => {
+    const { changePassword } = await getPasswordManager(async (cmd: string) => {
       lastCmd = cmd;
       if (cmd == grepCommand) return passwordHash;
       if (cmd.includes("chpasswd")) return "";
@@ -49,7 +55,7 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password when it's secure", async () => {
-    const { changePassword } = getPasswordManager(async (cmd: string) => {
+    const { changePassword } = await getPasswordManager(async (cmd: string) => {
       if (cmd == grepCommand) return "";
       throw Error(`Unknown command ${cmd}`);
     }, image);
@@ -67,7 +73,7 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password if the input contains problematic characters", async () => {
-    const { changePassword } = getPasswordManager(async (cmd: string) => {
+    const { changePassword } = await getPasswordManager(async (cmd: string) => {
       if (cmd == grepCommand) return passwordHash;
       throw Error(`Unknown command ${cmd}`);
     }, image);

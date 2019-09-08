@@ -2,7 +2,7 @@ import fs from "fs";
 import params from "../params";
 import * as eventBus from "../eventBus";
 // Modules
-import listContainers from "../modules/docker/listContainers";
+import { listContainers } from "../modules/docker/listContainers";
 import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";

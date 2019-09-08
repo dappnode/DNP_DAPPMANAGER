@@ -2,7 +2,8 @@ import fs from "fs";
 import * as getPath from "../utils/getPath";
 import restartPatch from "../modules/docker/restartPatch";
 import params from "../params";
-import docker from "../modules/docker";
+import { dockerComposeRm } from "../modules/docker/dockerCommands";
+import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import * as eventBus from "../eventBus";
 import { RpcHandlerReturn } from "../types";
 
@@ -27,8 +28,8 @@ export default async function restartPackage({
     await restartPatch(id);
   } else {
     // Combining rm && up doesn't prevent the installer from crashing
-    await docker.compose.rm(dockerComposePath);
-    await docker.safe.compose.up(dockerComposePath);
+    await dockerComposeRm(dockerComposePath);
+    await dockerComposeUpSafe(dockerComposePath);
 
     // Emit packages update
     eventBus.requestPackages.emit();

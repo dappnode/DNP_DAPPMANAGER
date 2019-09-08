@@ -1,7 +1,7 @@
 import { runWithRetry } from "../utils/asyncFlows";
 // Modules
-import listContainers from "../modules/docker/listContainers";
-import docker from "../modules/docker";
+import { listContainer } from "../modules/docker/listContainers";
+import { dockerLogs } from "../modules/docker/dockerCommands";
 import { RpcHandlerReturn } from "../types";
 
 // Retry logs call 3 times, in case it happen during a container reboot
@@ -13,7 +13,7 @@ const dockerLogsRetry = runWithRetry(
     containerNameOrId: string;
     timestamps?: boolean;
     tail?: number;
-  }) => docker.log(containerNameOrId, options),
+  }) => dockerLogs(containerNameOrId, options),
   { times: 3 }
 );
 
@@ -36,9 +36,7 @@ export default async function logPackage({
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(p => p.name === id);
-  if (!dnp) throw Error(`No DNP found for id ${id}`);
+  const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
   const logs = await dockerLogsRetry({

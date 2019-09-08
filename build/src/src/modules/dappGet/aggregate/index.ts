@@ -1,11 +1,10 @@
 import semver from "semver";
-import listContainers from "../../docker/listContainers";
 // Internal
 import * as safeSemver from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { PackageContainer, PackageRequest } from "../../../types";
-import { DnpsInterface, FetchFunction } from "../types";
+import { DappGetDnps, DappGetFetchFunction } from "../types";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
@@ -60,10 +59,10 @@ export default async function aggregate({
 }: {
   req: PackageRequest;
   dnpList: PackageContainer[];
-  fetch: FetchFunction;
-}): Promise<DnpsInterface> {
+  fetch: DappGetFetchFunction;
+}): Promise<DappGetDnps> {
   // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-  const dnps: DnpsInterface = {};
+  const dnps: DappGetDnps = {};
 
   // WARNING: req is a user external input, must verify
   if (req.ver === "latest") req.ver = "*";
@@ -75,8 +74,6 @@ export default async function aggregate({
     fetch // #### Injected dependency
   });
 
-  // Get the list of relevant installed dnps
-  if (!dnpList) dnpList = await listContainers();
   const relevantInstalledDnps = getRelevantInstalledDnps({
     // requestedDnps = ["A", "B", "C"]
     requestedDnps: Object.keys(dnps),

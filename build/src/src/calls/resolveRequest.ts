@@ -1,11 +1,11 @@
 import dappGet from "../modules/dappGet";
 import { PackageRequest, RpcHandlerReturn } from "../types";
-import { StateInterface } from "../modules/dappGet/types";
+import { DappGetState } from "../modules/dappGet/types";
 
 interface RpcResolveRequestReturn extends RpcHandlerReturn {
   result: {
-    state: StateInterface;
-    alreadyUpdated: StateInterface;
+    state: DappGetState;
+    alreadyUpdated: DappGetState;
   };
 }
 

@@ -1,8 +1,8 @@
 import fs from "fs";
 import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
-import listContainers from "./listContainers";
-import docker from "./dockerCommands";
+import { listContainer } from "./listContainers";
+import { dockerComposeUp } from "./dockerCommands";
 import params from "../../params";
 
 /**
@@ -17,16 +17,10 @@ import params from "../../params";
  * shows up in the ADMIN UI's package list
  */
 
-export default async function restartPatch(IMAGE_NAME = ""): Promise<void> {
-  if (!IMAGE_NAME.includes(":")) {
-    const dnpList = await listContainers();
-    const container = dnpList.find(c => (c.name || "").includes(IMAGE_NAME));
-    if (container) {
-      const version = container.version;
-      IMAGE_NAME += ":" + version;
-    } else {
-      throw Error(`No image found for ${IMAGE_NAME}`);
-    }
+export default async function restartPatch(imageName = ""): Promise<void> {
+  if (!imageName.includes(":")) {
+    const dnp = await listContainer(imageName);
+    imageName = dnp.image;
   }
 
   const DOCKERCOMPOSE_RESTART_PATH = getPath.dockerCompose(
@@ -40,7 +34,7 @@ export default async function restartPatch(IMAGE_NAME = ""): Promise<void> {
 
 services:
     restart.dnp.dappnode.eth:
-        image: ${IMAGE_NAME}
+        image: ${imageName}
         container_name: DAppNodeTool-restart.dnp.dappnode.eth
         volumes:
             - '${PATH_LOCAL}:${PATH_REMOTE}'
@@ -51,5 +45,5 @@ services:
 
   validate.path(DOCKERCOMPOSE_RESTART_PATH);
   await fs.writeFileSync(DOCKERCOMPOSE_RESTART_PATH, DOCKERCOMPOSE_DATA);
-  await docker.compose.up(DOCKERCOMPOSE_RESTART_PATH);
+  await dockerComposeUp(DOCKERCOMPOSE_RESTART_PATH);
 }

@@ -1,13 +1,17 @@
 import fs from "fs";
 import { uniq } from "lodash";
 import params from "../params";
-import docker from "../modules/docker";
-import listContainers from "../modules/docker/listContainers";
+import {
+  dockerComposeRm,
+  dockerVolumeRm
+} from "../modules/docker/dockerCommands";
+import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
+import { listContainerExtendedInfo } from "../modules/docker/listContainers";
 import * as eventBus from "../eventBus";
 // Utils
 import * as getPath from "../utils/getPath";
-import Logs from "../logs";
 import { RpcHandlerReturn } from "../types";
+import Logs from "../logs";
 const logs = Logs(module);
 
 /**
@@ -24,10 +28,8 @@ export default async function restartPackageVolumes({
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  // Don't query byId so the volume info is aggregated for all packages
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name === id);
-  if (!dnp) throw Error(`Could not find an container with the name: ${id}`);
+  // Needs the extended info that includes the volume ownership data
+  const dnp = await listContainerExtendedInfo(id);
 
   /**
    * @param {object} namedOwnedVolumes = {
@@ -85,10 +87,10 @@ export default async function restartPackageVolumes({
   let err;
   try {
     for (const dnpName of dnpsToRemove) {
-      await docker.compose.rm(dockerComposePaths[dnpName]);
+      await dockerComposeRm(dockerComposePaths[dnpName]);
     }
     for (const volName of volumeNames) {
-      if (volName) await docker.volume.rm(volName);
+      if (volName) await dockerVolumeRm(volName);
     }
   } catch (e) {
     err = e;
@@ -99,7 +101,7 @@ export default async function restartPackageVolumes({
     logs.warn(`On restartPackageVolumes, doNotRestart = true`);
   } else {
     for (const dnpName of dnpsToRemove) {
-      await docker.safe.compose.up(dockerComposePaths[dnpName]);
+      await dockerComposeUpSafe(dockerComposePaths[dnpName]);
     }
   }
 

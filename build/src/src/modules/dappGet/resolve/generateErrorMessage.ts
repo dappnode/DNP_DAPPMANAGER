@@ -1,4 +1,4 @@
-import { ErrorsInterface } from "../types";
+import { DappGetErrors } from "../types";
 
 /**
  * Formats an error message
@@ -14,7 +14,7 @@ export default function generateErrorMessage({
   timeoutMs: number;
   caseId: number;
   totalCases: number;
-  errors: ErrorsInterface;
+  errors: DappGetErrors;
 }): string {
   const errorMsgs = [];
   // Timeout message

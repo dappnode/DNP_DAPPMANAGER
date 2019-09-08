@@ -1,7 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+// Import for types
+import dappGetType from "../../../src/modules/dappGet";
+import { PackageContainer } from "../../../src/types";
+import { mockDnp } from "../../testUtils";
+import { DappGetDnps } from "../../../src/modules/dappGet/types";
 
 /* eslint-disable max-len */
 
@@ -9,55 +14,76 @@ const proxyquire = require("proxyquire").noCallThru();
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-const listContainers = sinon.stub().callsFake(async () => {
-  return [
-    {
-      dependencies: {
-        "nginx-proxy.dnp.dappnode.eth": "latest",
-        "letsencrypt-nginx.dnp.dappnode.eth": "latest"
-      },
-      name: "web.dnp.dappnode.eth",
-      version: "0.1.0",
-      origin: undefined
-    },
-    {
-      dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-      name: "nginx-proxy.dnp.dappnode.eth",
-      version: "0.0.3",
-      origin: undefined
-    },
-    {
-      dependencies: { "web.dnp.dappnode.eth": "latest" },
-      name: "letsencrypt-nginx.dnp.dappnode.eth",
-      version: "0.0.4",
-      origin: "/ipfs/Qm1234"
-    }
-  ];
-});
-
-const aggregate = sinon.stub().callsFake(async () => {
-  return {};
-});
-
-const resolve = sinon.stub().callsFake(() => {
-  return {
-    success: true,
-    message: "Found compatible state",
-    state: {
-      "nginx-proxy.dnp.dappnode.eth": "0.0.4",
-      "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
-      "web.dnp.dappnode.eth": "0.1.0"
-    }
-  };
-});
-
-const { default: dappGet } = proxyquire("../../../src/modules/dappGet", {
-  "./aggregate": aggregate,
-  "./resolve": resolve,
-  "../../modules/docker/listContainers": listContainers
-});
-
 describe("dappGet", () => {
+  const listContainersSpy = sinon.spy();
+
+  let dappGet: typeof dappGetType;
+
+  before("Mock", async () => {
+    async function listContainers(): Promise<PackageContainer[]> {
+      listContainersSpy();
+      return [
+        {
+          ...mockDnp,
+          dependencies: {
+            "nginx-proxy.dnp.dappnode.eth": "latest",
+            "letsencrypt-nginx.dnp.dappnode.eth": "latest"
+          },
+          name: "web.dnp.dappnode.eth",
+          version: "0.1.0",
+          origin: undefined
+        },
+        {
+          ...mockDnp,
+          dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
+          name: "nginx-proxy.dnp.dappnode.eth",
+          version: "0.0.3",
+          origin: undefined
+        },
+        {
+          ...mockDnp,
+          dependencies: { "web.dnp.dappnode.eth": "latest" },
+          name: "letsencrypt-nginx.dnp.dappnode.eth",
+          version: "0.0.4",
+          origin: "/ipfs/Qm1234"
+        }
+      ];
+    }
+
+    async function aggregate(): Promise<DappGetDnps> {
+      return {};
+    }
+
+    // IDE and rewiremock can figure out the type on their own
+    /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+    function resolve() {
+      return {
+        success: true,
+        message: "Found compatible state",
+        state: {
+          "nginx-proxy.dnp.dappnode.eth": "0.0.4",
+          "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
+          "web.dnp.dappnode.eth": "0.1.0"
+        }
+      };
+    }
+
+    const mock = await rewiremock.around(
+      () => import("../../../src/modules/dappGet"),
+      mock => {
+        mock(() => import("../../../src/modules/dappGet/aggregate"))
+          .withDefault(aggregate)
+          .toBeUsed();
+        mock(() => import("../../../src/modules/dappGet/resolve"))
+          .withDefault(resolve)
+          .toBeUsed();
+        mock(() => import("../../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
+      }
+    );
+    dappGet = mock.default;
+  });
   it("Should add packages to the alreadyUpdated object", async () => {
     const { state, alreadyUpdated } = await dappGet({
       name: "nginx-proxy.dnp.dappnode.eth",
@@ -74,6 +100,6 @@ describe("dappGet", () => {
   });
 
   it("Should call list containers once", () => {
-    sinon.assert.calledOnce(listContainers);
+    sinon.assert.calledOnce(listContainersSpy);
   });
 });

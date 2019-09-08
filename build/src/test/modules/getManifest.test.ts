@@ -1,28 +1,40 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest, PackageRequest, ApmVersion } from "../../src/types";
+import { Manifest, ApmVersion } from "../../src/types";
 import { mockManifest } from "../testUtils";
 import * as db from "../../src/db";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
 
-// proxyquire abstraction so relative paths only have to be changed once
-function getGetManifest(
-  manifest: Manifest,
-  sampleHash: string
-): (req: PackageRequest) => Promise<Manifest> {
-  const { default: getManifest } = proxyquire(
-    "../../src/modules/release/getManifest",
-    {
-      "./ipfs/downloadManifest": async (): Promise<Manifest> => manifest,
-      "./getVersions": {
-        getVersion: async (): Promise<ApmVersion> => ({
-          version: "0.2.4",
-          contentUri: sampleHash
-        })
-      }
+/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+async function mockGetManifest(manifest: Manifest, sampleHash: string) {
+  async function downloadManifestMock(): Promise<Manifest> {
+    return manifest;
+  }
+
+  async function getVersion(
+    dnpName: string,
+    version: string
+  ): Promise<ApmVersion> {
+    dnpName;
+    version;
+    return {
+      version: "0.2.4",
+      contentUri: sampleHash
+    };
+  }
+
+  const mock = await rewiremock.around(
+    () => import("../../src/modules/release/getManifest"),
+    mock => {
+      mock(() => import("../../src/modules/release/ipfs/downloadManifest"))
+        .withDefault(downloadManifestMock)
+        .toBeUsed();
+      mock(() => import("../../src/modules/release/getVersions"))
+        .with({ getVersion })
+        .toBeUsed();
     }
   );
-  return getManifest;
+  return mock.default;
 }
 
 const name = "test.dnp.dappnode.eth";
@@ -46,14 +58,9 @@ describe("Get manifest", function() {
 
   it("should return a parsed manifest NOT cache it", async () => {
     // Encapsulated proxyrequire
-    const getManifest = getGetManifest(manifest, sampleHash);
+    const getManifest = await mockGetManifest(manifest, sampleHash);
 
-    const packageReq = {
-      name: name,
-      ver: "0.2.1"
-    };
-
-    const res = await getManifest(packageReq);
+    const res = await getManifest({ name, ver: "0.2.1" });
 
     expect(res).to.deep.equal({
       origin: null,
@@ -65,14 +72,9 @@ describe("Get manifest", function() {
 
   it("Should call getManifest and not store anything in the db", async () => {
     // Encapsulated proxyrequire
-    const getManifest = getGetManifest(manifest, sampleHash);
+    const getManifest = await mockGetManifest(manifest, sampleHash);
 
-    const packageReq = {
-      name: name,
-      ver: "latest"
-    };
-
-    await getManifest(packageReq);
+    await getManifest({ name, ver: "latest" });
     expect(db.getEntireDb()).to.deep.equal({});
   });
 });

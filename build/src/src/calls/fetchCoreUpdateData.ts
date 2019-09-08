@@ -1,7 +1,7 @@
 import semver from "semver";
 import dappGet from "../modules/dappGet";
 import getManifest from "../modules/release/getManifest";
-import listContainers from "../modules/docker/listContainers";
+import { listContainers } from "../modules/docker/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import { Manifest, ManifestUpdateAlert, RpcHandlerReturn } from "../types";

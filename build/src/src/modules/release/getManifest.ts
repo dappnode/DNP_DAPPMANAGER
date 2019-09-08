@@ -1,6 +1,5 @@
 import downloadManifest from "./ipfs/downloadManifest";
 import { getVersion } from "./getVersions";
-import * as db from "../../db";
 import isIpfsHash from "../../utils/isIpfsHash";
 import isEnsDomain from "../../utils/isEnsDomain";
 import isSemverRange from "../../utils/isSemverRange";

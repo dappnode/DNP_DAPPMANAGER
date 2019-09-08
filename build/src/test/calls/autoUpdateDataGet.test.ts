@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { createTestDir, cleanTestDir } from "../testUtils";
+import { createTestDir, cleanTestDir, mockDnp } from "../testUtils";
 import {
   editDnpSetting,
   editCoreSetting,
@@ -9,8 +9,9 @@ import {
 } from "../../src/utils/autoUpdateHelper";
 import * as db from "../../src/db";
 import params from "../../src/params";
-
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+import autoUpdateDataGetType from "../../src/calls/autoUpdateDataGet";
+import { PackageContainer } from "../../src/types";
 
 describe("Call function: autoUpdateDataGet", () => {
   const id = "bitcoin.dnp.dappnode.eth";
@@ -18,17 +19,51 @@ describe("Call function: autoUpdateDataGet", () => {
   const nextVersion = "0.2.7";
   const timestamp = Date.now() - 1000;
 
-  const { default: autoUpdateDataGet } = proxyquire(
-    "../../src/calls/autoUpdateDataGet",
-    {
-      "../modules/docker/listContainers": async () => [
-        { name: id, isDnp: true, version: currentVersion },
-        { name: "admin", isCore: true, version: "0.2.1" },
-        { name: "core", isCore: true, version: "0.2.1" },
-        { name: "vpn", isCore: true, version: "0.2.0" }
-      ]
-    }
-  );
+  async function listContainers(): Promise<PackageContainer[]> {
+    return [
+      {
+        ...mockDnp,
+        name: id,
+        isDnp: true,
+        version: currentVersion
+      },
+      {
+        ...mockDnp,
+        name: "admin",
+        isDnp: false,
+        isCore: true,
+        version: "0.2.1"
+      },
+      {
+        ...mockDnp,
+        name: "core",
+        isDnp: false,
+        isCore: true,
+        version: "0.2.1"
+      },
+      {
+        ...mockDnp,
+        name: "vpn",
+        isDnp: false,
+        isCore: true,
+        version: "0.2.0"
+      }
+    ];
+  }
+
+  let autoUpdateDataGet: typeof autoUpdateDataGetType;
+
+  beforeEach("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../src/calls/autoUpdateDataGet"),
+      mock => {
+        mock(() => import("../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
+      }
+    );
+    autoUpdateDataGet = mock.default;
+  });
 
   before(async () => {
     await createTestDir();

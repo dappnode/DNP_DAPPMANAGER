@@ -4,27 +4,9 @@ import { Dependencies } from "../../types";
  * Aggregate types
  */
 
-export interface DnpsRepo {
-  [dnpName: string]: {
-    [version: string]: Dependencies;
-  };
-}
-
-export interface FetchFunction {
-  dependencies: ({
-    name,
-    ver
-  }: {
-    name: string;
-    ver: string;
-  }) => Promise<Dependencies>;
-  versions: ({
-    name,
-    versionRange
-  }: {
-    name: string;
-    versionRange: string;
-  }) => Promise<string[]>;
+export interface DappGetFetchFunction {
+  dependencies: (name: string, ver: string) => Promise<Dependencies>;
+  versions: (name: string, versionRange: string) => Promise<string[]>;
 }
 
 /**
@@ -35,7 +17,7 @@ export interface PkgsObj {
   [dnpName: string]: string[];
 }
 
-export interface DnpInterface {
+export interface DappGetDnp {
   versions: {
     [version: string]: {
       [dependencyName: string]: string;
@@ -45,8 +27,8 @@ export interface DnpInterface {
   isInstalled?: boolean;
 }
 
-export interface DnpsInterface {
-  [dnpName: string]: DnpInterface;
+export interface DappGetDnps {
+  [dnpName: string]: DappGetDnp;
 }
 
 type VersionInternalResolver = string | null;
@@ -68,16 +50,16 @@ export interface StateInternalInterface {
   [dnpName: string]: VersionInternalResolver;
 }
 
-export interface StateInterface {
+export interface DappGetState {
   [dnpName: string]: string;
 }
 
-export interface ErrorsInterface {
+export interface DappGetErrors {
   [errorKey: string]: number;
 }
 
-export interface ResultInterface {
+export interface DappGetResult {
   message: string;
-  state: StateInterface;
-  alreadyUpdated: StateInterface;
+  state: DappGetState;
+  alreadyUpdated: DappGetState;
 }

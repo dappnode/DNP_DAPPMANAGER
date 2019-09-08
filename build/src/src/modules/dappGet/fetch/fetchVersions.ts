@@ -14,13 +14,10 @@ import { getLatestVersion, getAllVersions } from "../../release/getVersions";
  * }
  * @returns {Set} set of versions
  */
-export default async function fetchVersions({
-  name,
-  versionRange
-}: {
-  name: string;
-  versionRange: string;
-}): Promise<string[]> {
+export default async function fetchVersions(
+  name: string,
+  versionRange: string
+): Promise<string[]> {
   if (semver.validRange(versionRange)) {
     if (versionRange === "*") {
       // ##### TODO: Case 0. Force "*" to strictly fetch the last version only

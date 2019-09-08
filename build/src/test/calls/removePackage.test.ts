@@ -5,7 +5,9 @@ import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import shell from "../../src/utils/shell";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+// Imports for typings
+import removePackageType from "../../src/calls/removePackage";
 
 describe("Call function: removePackage", function() {
   const testDir = "test_files/";
@@ -26,34 +28,29 @@ describe("Call function: removePackage", function() {
 
   const idWrong = "missing.dnp.dappnode.eth";
 
-  const docker = {
-    compose: {
-      down: sinon.stub().resolves()
-    }
-  };
+  const dockerComposeDown = sinon.stub().resolves();
 
   const eventBus = {
-    requestPackages: { emit: sinon.stub() },
-    packageModified: { emit: sinon.stub() }
+    requestPackages: { emit: sinon.stub(), on: sinon.stub() },
+    packageModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  // db to know UPnP state
-  const db = {
-    get: (key: string): boolean => {
-      if (key === "upnpAvailable") return true;
-      else return false;
-    }
-  };
+  let removePackage: typeof removePackageType;
 
-  const { default: removePackage } = proxyquire(
-    "../../src/calls/removePackage",
-    {
-      "../modules/docker": docker,
-      "../eventBus": eventBus,
-      "../params": params,
-      "../db": db
-    }
-  );
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../src/calls/removePackage"),
+      mock => {
+        mock(() => import("../../src/modules/docker/dockerCommands"))
+          .with({ dockerComposeDown })
+          .toBeUsed();
+        mock(() => import("../../src/eventBus"))
+          .with(eventBus)
+          .toBeUsed();
+      }
+    );
+    removePackage = mock.default;
+  });
 
   before(async () => {
     validate.path(dockerComposePath);
@@ -67,9 +64,9 @@ describe("Call function: removePackage", function() {
   });
 
   it("should have called docker-compose down", async () => {
-    sinon.assert.callCount(docker.compose.down, 1);
-    expect(docker.compose.down.firstCall.args).to.deep.equal(
-      [dockerComposePath, { volumes: false }],
+    sinon.assert.callCount(dockerComposeDown, 1);
+    expect(dockerComposeDown.firstCall.args).to.deep.equal(
+      [dockerComposePath, false],
       `should call docker.compose.down for the package ${id}`
     );
   });

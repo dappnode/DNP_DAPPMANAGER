@@ -1,7 +1,7 @@
 import prioritizeVersions from "./prioritizeVersions";
 import prioritizeDnps from "./prioritizeDnps";
 import {
-  DnpsInterface,
+  DappGetDnps,
   PermutationsTableInterface,
   PermutationInterface
 } from "../types";
@@ -33,7 +33,7 @@ import {
  * ]
  */
 export function getPermutationsTable(
-  dnps: DnpsInterface
+  dnps: DappGetDnps
 ): PermutationsTableInterface {
   let m = 1;
   // This sort is extremely important. It prioritizes the first successful version

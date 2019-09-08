@@ -1,7 +1,15 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-const proxyquire = require("proxyquire").noCallThru();
+import rewiremock from "rewiremock";
+// Import for types
+import aggregateType from "../../../../src/modules/dappGet/aggregate/index";
+import { PackageContainer, Dependencies } from "../../../../src/types";
+import { mockDnp } from "../../../testUtils";
+import {
+  DappGetFetchFunction,
+  DappGetDnps
+} from "../../../../src/modules/dappGet/types";
 
 /**
  * Purpose of the test. Make sure aggregate fetches all necessary DNPs and info
@@ -22,10 +30,14 @@ const proxyquire = require("proxyquire").noCallThru();
  * > Also, should not crash due to a dependency loop
  */
 
-const dnpList = [
+const nginxId = "nginx-proxy.dnp.dappnode.eth";
+const depId = "dependency.dnp.dappnode.eth";
+
+const dnpList: PackageContainer[] = [
   {
+    ...mockDnp,
     dependencies: {
-      "nginx-proxy.dnp.dappnode.eth": "latest",
+      [nginxId]: "latest",
       "letsencrypt-nginx.dnp.dappnode.eth": "latest"
     },
     name: "web.dnp.dappnode.eth",
@@ -33,39 +45,49 @@ const dnpList = [
     origin: undefined
   },
   {
-    dependencies: undefined,
+    ...mockDnp,
+    dependencies: {},
     name: "vpn.dnp.dappnode.eth",
     version: "0.1.16",
     origin: undefined
   },
   {
-    dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-    name: "nginx-proxy.dnp.dappnode.eth",
+    ...mockDnp,
+    dependencies: { [nginxId]: "latest" },
+    name: nginxId,
     version: "0.0.3",
     origin: undefined
   },
   {
+    ...mockDnp,
     dependencies: { "web.dnp.dappnode.eth": "latest" },
     name: "letsencrypt-nginx.dnp.dappnode.eth",
     version: "0.0.4",
     origin: "/ipfs/Qm1234"
   }
 ];
-const listContainers = sinon.stub().callsFake(async () => {
-  return dnpList;
-});
 
-const aggregateDependencies = sinon.stub().callsFake(async ({ name, dnps }) => {
-  if (name === "nginx-proxy.dnp.dappnode.eth") {
-    dnps["nginx-proxy.dnp.dappnode.eth"] = {
+const aggregateDependenciesSpy = sinon.spy();
+async function aggregateDependencies({
+  name,
+  versionRange,
+  dnps
+}: {
+  name: string;
+  versionRange: string;
+  dnps: DappGetDnps;
+}): Promise<void> {
+  aggregateDependenciesSpy({ name, versionRange, dnps });
+  if (name === nginxId) {
+    dnps[nginxId] = {
       versions: {
-        ...((dnps["nginx-proxy.dnp.dappnode.eth"] || {}).versions || {}),
-        "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" }
+        ...(dnps[nginxId] ? dnps[nginxId].versions || {} : {}),
+        "0.1.0": { [depId]: "^0.1.1" }
       }
     };
-    dnps["dependency.dnp.dappnode.eth"] = {
+    dnps[depId] = {
       versions: {
-        ...((dnps["dependency.dnp.dappnode.eth"] || {}).versions || {}),
+        ...(dnps[depId] ? dnps[depId].versions || {} : {}),
         "0.1.1": {},
         "0.1.2": {}
       }
@@ -76,81 +98,107 @@ const aggregateDependencies = sinon.stub().callsFake(async ({ name, dnps }) => {
   if (dnp) {
     dnps[dnp.name] = {
       versions: {
-        ...((dnps[dnp.name] || {}).versions || {}),
+        ...(dnps[dnp.name] ? dnps[dnp.name].versions || {} : {}),
         [dnp.version]: dnp.dependencies
       }
     };
   }
-});
+}
 
-const getRelevantInstalledDnps = sinon.stub().callsFake(() => {
+function getRelevantInstalledDnps(): PackageContainer[] {
   const relevantInstalledDnpNames = [
     "web.dnp.dappnode.eth",
     "letsencrypt-nginx.dnp.dappnode.eth"
   ];
   return dnpList.filter(dnp => relevantInstalledDnpNames.includes(dnp.name));
-});
+}
 
-const { default: aggregate } = proxyquire(
-  "../../../../src/modules/dappGet/aggregate/index",
-  {
-    "./getRelevantInstalledDnps": getRelevantInstalledDnps,
-    "./aggregateDependencies": aggregateDependencies,
-    "../../../modules/docker/listContainers": listContainers
+const emptyFetch: DappGetFetchFunction = {
+  dependencies: async (name: string, ver: string): Promise<Dependencies> => {
+    name;
+    ver;
+    return {};
+  },
+  versions: async (name: string, versionRange: string): Promise<string[]> => {
+    name;
+    versionRange;
+    return [];
   }
-);
+};
 
 describe("dappGet/aggregate", () => {
+  let aggregate: typeof aggregateType;
+
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../../../src/modules/dappGet/aggregate/index"),
+      mock => {
+        mock(() =>
+          import(
+            "../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps"
+          )
+        )
+          .withDefault(getRelevantInstalledDnps)
+          .toBeUsed();
+        mock(() =>
+          import(
+            "../../../../src/modules/dappGet/aggregate/aggregateDependencies"
+          )
+        )
+          .withDefault(aggregateDependencies)
+          .toBeUsed();
+      }
+    );
+    aggregate = mock.default;
+  });
+
   it("Should label the packages correctly", async () => {
     const req = {
-      name: "nginx-proxy.dnp.dappnode.eth",
+      name: nginxId,
       ver: "^0.1.0"
     };
-    const dnps = await aggregate({ req });
+    const dnps = await aggregate({ req, dnpList, fetch: emptyFetch });
 
-    expect(dnps).to.deep.equal({
-      "dependency.dnp.dappnode.eth": {
-        versions: {
-          "0.1.1": {},
-          "0.1.2": {}
-        }
-      },
-      "letsencrypt-nginx.dnp.dappnode.eth": {
-        isInstalled: true,
-        versions: {
-          "0.0.4": {
-            "web.dnp.dappnode.eth": "latest"
+    expect(dnps).to.deep.equal(
+      {
+        [depId]: {
+          versions: {
+            "0.1.1": {},
+            "0.1.2": {}
+          }
+        },
+        "letsencrypt-nginx.dnp.dappnode.eth": {
+          isInstalled: true,
+          versions: {
+            "0.0.4": {
+              "web.dnp.dappnode.eth": "latest"
+            }
+          }
+        },
+        [nginxId]: {
+          isRequest: true,
+          versions: {
+            "0.1.0": {
+              [depId]: "^0.1.1"
+            }
+          }
+        },
+        "web.dnp.dappnode.eth": {
+          isInstalled: true,
+          versions: {
+            "0.0.0": {
+              "letsencrypt-nginx.dnp.dappnode.eth": "latest",
+              [nginxId]: "latest"
+            }
           }
         }
       },
-      "nginx-proxy.dnp.dappnode.eth": {
-        isRequest: true,
-        versions: {
-          "0.1.0": {
-            "dependency.dnp.dappnode.eth": "^0.1.1"
-          }
-        }
-      },
-      "web.dnp.dappnode.eth": {
-        isInstalled: true,
-        versions: {
-          "0.0.0": {
-            "letsencrypt-nginx.dnp.dappnode.eth": "latest",
-            "nginx-proxy.dnp.dappnode.eth": "latest"
-          }
-        }
-      }
-    });
-  });
+      "Should label the packages correctly"
+    );
 
-  it("Should call list containers once", () => {
-    sinon.assert.calledOnce(listContainers);
-  });
-
-  it("Should call aggregateDependencies in the correct order, for each package and version range", () => {
     const dnpAggregateDependenciesCalls = [
       // For user request, the version range is the one set by the user
-      { name: "nginx-proxy.dnp.dappnode.eth", versionRange: "^0.1.0" },
+      { name: nginxId, versionRange: "^0.1.0" },
       // For state packages, the version range is greater or equal than the current
       { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" },
       // For state packages, if there is a specified origin, only fetch that
@@ -160,20 +208,17 @@ describe("dappGet/aggregate", () => {
       }
     ];
     sinon.assert.callCount(
-      aggregateDependencies,
+      aggregateDependenciesSpy,
       dnpAggregateDependenciesCalls.length
     );
-    dnpAggregateDependenciesCalls.forEach((dnp, i) => {
-      const { name, versionRange } = aggregateDependencies.getCall(i).args[0];
-      expect(name).to.equal(
-        dnp.name,
-        `aggregateDependencies call ${i} should be for dnp name: "${dnp.name}"`
-      );
-      expect(versionRange).to.equal(
-        dnp.versionRange,
-        `aggregateDependencies call ${i} should be for dnp ${
-          dnp.name
-        } versionRange: "${dnp.versionRange}"`
+
+    dnpAggregateDependenciesCalls.forEach((callArgs, i) => {
+      const { name, versionRange } = aggregateDependenciesSpy.getCall(
+        i
+      ).lastArg;
+      expect({ name, versionRange }).to.deep.equal(
+        callArgs,
+        `Wrong arguments for call ${i} to aggregateDependencies`
       );
     });
   });

@@ -6,7 +6,7 @@ const logs = Logs(module);
 import * as db from "../db";
 import params from "../params";
 // Modules
-import listContainers from "../modules/docker/listContainers";
+import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
@@ -42,9 +42,7 @@ export default async function backupGet({
   validateBackupArray(backup);
 
   // Get container name
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(p => p.name === id);
-  if (!dnp) throw Error(`No DNP found for id ${id}`);
+  const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
   // Intermediate step, the file is in local file system

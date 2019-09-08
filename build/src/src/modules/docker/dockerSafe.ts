@@ -1,10 +1,9 @@
-import docker from "./dockerCommands";
+import { dockerComposeUp } from "./dockerCommands";
 import { readComposeObj } from "../../utils/dockerComposeFile";
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import lockPorts from "../lockPorts";
 import unlockPorts from "../unlockPorts";
-import { DockerOptionsInterface } from "../../types";
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -16,12 +15,11 @@ import { DockerOptionsInterface } from "../../types";
 // ERROR: for dnp2  Cannot start service dnp2: driver failed programming external connectivity on endpoint dc_dnp2_1 (cee2e0d559f12a9434100ff9368b4535380b0e2637ab854475a63c032315b22e): Bind for 0.0.0.0:3000 failed: port is already allocated
 // ERROR: Encountered errors while bringing up the project.
 
-async function dockerComposeUpSafe(
-  dockerComposePath: string,
-  options?: DockerOptionsInterface
+export async function dockerComposeUpSafe(
+  dockerComposePath: string
 ): Promise<void> {
   try {
-    await docker.compose.up(dockerComposePath, options);
+    await dockerComposeUp(dockerComposePath);
   } catch (e) {
     /**
      * These port two modules use docker. If they are imported above,
@@ -47,7 +45,7 @@ async function dockerComposeUpSafe(
       const id = Object.keys(dc.services)[0];
 
       // Up the package and lock the ports again
-      await docker.compose.up(dockerComposePath);
+      await dockerComposeUp(dockerComposePath);
       const newPortMappings = await lockPorts(id);
       if (newPortMappings && newPortMappings.length) {
         // Trigger a natRenewal update to open ports if necessary
@@ -58,11 +56,3 @@ async function dockerComposeUpSafe(
     }
   }
 }
-
-const dockerSafe = {
-  compose: {
-    up: dockerComposeUpSafe
-  }
-};
-
-export default dockerSafe;

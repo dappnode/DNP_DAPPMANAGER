@@ -1,23 +1,31 @@
 import "mocha";
 import { expect } from "chai";
 import { PackageContainer } from "../../../src/types";
-const proxyquire = require("proxyquire").noCallThru();
+import Docker from "dockerode";
+import rewiremock from "rewiremock";
+// Imports for typing
+import { listContainers as listContainersType } from "../../../src/modules/docker/listContainers";
 
-const dockerApiResponseContainers = require("./dockerApiSamples/containers.json");
+import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
 
 describe("listContainers", function() {
-  const { default: listContainers } = proxyquire(
-    "../../../src/modules/docker/listContainers",
-    {
-      "./dockerApi": {
-        dockerApi: {
-          // I can't access to the original type of dockerode, and it's pointless to type
-          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-          listContainers: async (): Promise<any> => dockerApiResponseContainers
-        }
+  async function dockerList(): Promise<Docker.ContainerInfo[]> {
+    return dockerApiResponseContainers;
+  }
+
+  let listContainers: typeof listContainersType;
+
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../../src/modules/docker/listContainers"),
+      mock => {
+        mock(() => import("../../../src/modules/docker/dockerApi"))
+          .with({ dockerList })
+          .toBeUsed();
       }
-    }
-  );
+    );
+    listContainers = mock.listContainers;
+  });
 
   it("should parse an entire listContainers", async () => {
     const dnpList = await listContainers();

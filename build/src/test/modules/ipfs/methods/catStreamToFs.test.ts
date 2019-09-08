@@ -2,10 +2,10 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
-
-const proxyquire = require("proxyquire").noCallThru();
-
 import { testDir, createTestDir, cleanTestDir } from "../../../testUtils";
+import rewiremock from "rewiremock";
+// Import for type
+import catStreamToFsType from "../../../../src/modules/ipfs/methods/catStreamToFs";
 
 // With proxyrequire you stub before requiring
 
@@ -23,19 +23,24 @@ const ipfs = {
   }
 };
 
-const { default: catStreamToFs } = proxyquire(
-  "../../../../src/modules/ipfs/methods/catStreamToFs",
-  {
-    "../ipfsSetup": ipfs,
-    "../../../params": {
-      // ##### Change this as a flag in params.ts
-      CACHE_DIR: "test_files/"
-    }
-  }
-);
-
 describe("ipfs > methods > catStreamToFs", () => {
-  before("Create test directory", createTestDir);
+  before("Create test directory", async () => {
+    await createTestDir();
+  });
+
+  let catStreamToFs: typeof catStreamToFsType;
+
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../../../src/modules/ipfs/methods/catStreamToFs"),
+      mock => {
+        mock(() => import("../../../../src/modules/ipfs/ipfsSetup"))
+          .withDefault(ipfs)
+          .toBeUsed();
+      }
+    );
+    catStreamToFs = mock.default;
+  });
 
   // const ipfs = ipfsAPI('my.ipfs.dnp.dappnode.eth', '5001', {protocol: 'http'});
   const path = testDir + "hello-world.txt";
@@ -62,5 +67,7 @@ describe("ipfs > methods > catStreamToFs", () => {
     expect(onProgress.firstCall.args).to.deep.equal([0]);
   });
 
-  after("Clean test directory", cleanTestDir);
+  after("Clean test directory", async () => {
+    await cleanTestDir();
+  });
 });

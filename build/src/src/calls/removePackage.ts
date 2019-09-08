@@ -2,7 +2,7 @@ import fs from "fs";
 import params from "../params";
 import * as eventBus from "../eventBus";
 // Modules
-import docker from "../modules/docker";
+import { dockerComposeDown } from "../modules/docker/dockerCommands";
 // External call
 import restartPackageVolumes from "./restartPackageVolumes";
 // Utils
@@ -21,7 +21,7 @@ export default async function removePackage({
   deleteVolumes = false
 }: {
   id: string;
-  deleteVolumes: boolean;
+  deleteVolumes?: boolean;
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
@@ -44,9 +44,7 @@ export default async function removePackage({
   // Call restartPackageVolumes to safely delete dependant volumes
   if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
   // Remove container (and) volumes
-  await docker.compose.down(dockerComposePath, {
-    volumes: Boolean(deleteVolumes)
-  });
+  await dockerComposeDown(dockerComposePath, deleteVolumes);
   // Remove DNP folder and files
   await shell(`rm -r ${packageRepoDir}`);
 

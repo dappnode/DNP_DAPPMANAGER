@@ -2,7 +2,7 @@ import { hasVersion, setVersion } from "../utils/dnpUtils";
 import sanitizeVersions from "./sanitizeVersions";
 import sanitizeDependencies from "./sanitizeDependencies";
 import { Dependencies } from "../../../types";
-import { DnpsInterface, FetchFunction } from "../types";
+import { DappGetDnps, DappGetFetchFunction } from "../types";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
@@ -34,9 +34,9 @@ export default async function aggregateDependencies({
 }: {
   name: string;
   versionRange: string;
-  dnps: DnpsInterface;
+  dnps: DappGetDnps;
   recursiveCount?: number;
-  fetch: FetchFunction;
+  fetch: DappGetFetchFunction;
 }): Promise<void> {
   // Control infinite loops
   if (!recursiveCount) recursiveCount = 1;
@@ -48,7 +48,7 @@ export default async function aggregateDependencies({
   // 1. Fetch versions of "name" that match this request
   //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
   const versions = await fetch
-    .versions({ name, versionRange })
+    .versions(name, versionRange)
     .then(sanitizeVersions);
 
   await Promise.all(
@@ -59,7 +59,7 @@ export default async function aggregateDependencies({
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
       const dependencies = await fetch
-        .dependencies({ name, ver: version })
+        .dependencies(name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
           logs.warn(

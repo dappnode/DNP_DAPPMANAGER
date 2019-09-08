@@ -1,4 +1,4 @@
-import listContainers from "../docker/listContainers";
+import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
@@ -7,7 +7,7 @@ import aggregate from "./aggregate";
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
-import { ResultInterface, DnpsInterface, StateInterface } from "./types";
+import { DappGetResult, DappGetDnps, DappGetState } from "./types";
 const logs = Logs(module);
 
 /**
@@ -54,7 +54,7 @@ const logs = Logs(module);
 export default async function dappGet(
   req: PackageRequest,
   options?: { BYPASS_RESOLVER?: boolean }
-): Promise<ResultInterface> {
+): Promise<DappGetResult> {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
    * It will not use the fetch or resolver module and only
@@ -65,7 +65,7 @@ export default async function dappGet(
   const dnpList = await listContainers();
 
   // Aggregate
-  let dnps: DnpsInterface;
+  let dnps: DappGetDnps;
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
     dnps = await aggregate({ req, dnpList, fetch });
@@ -94,7 +94,7 @@ export default async function dappGet(
   if (!success) throw Error(`Could not find compatible state. ${message}`);
 
   // Otherwise, format the output
-  const alreadyUpdated: StateInterface = {};
+  const alreadyUpdated: DappGetState = {};
   dnpList.forEach(dnp => {
     const currentVersion = dnp.version;
     const newVersion = state[dnp.name];

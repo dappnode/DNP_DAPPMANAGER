@@ -1,8 +1,8 @@
-import { DnpsInterface, DnpInterface } from "../types";
+import { DappGetDnps, DappGetDnp } from "../types";
 import { Dependencies } from "../../../types";
 
 export function getVersion(
-  dnps: DnpsInterface,
+  dnps: DappGetDnps,
   name: string,
   version: string
 ): {
@@ -12,7 +12,7 @@ export function getVersion(
 }
 
 export function hasVersion(
-  dnps: DnpsInterface,
+  dnps: DappGetDnps,
   name: string,
   version: string
 ): boolean {
@@ -20,7 +20,7 @@ export function hasVersion(
 }
 
 export function getDependencies(
-  dnps: DnpsInterface,
+  dnps: DappGetDnps,
   name: string,
   version: string
 ): Dependencies {
@@ -28,7 +28,7 @@ export function getDependencies(
 }
 
 export function setVersion(
-  dnps: DnpsInterface,
+  dnps: DappGetDnps,
   name: string,
   version: string,
   value: Dependencies
@@ -38,7 +38,7 @@ export function setVersion(
 }
 
 export function getVersionsFromDnp(
-  dnp: DnpInterface
+  dnp: DappGetDnp
 ): {
   [version: string]: {
     [dependencyName: string]: string;

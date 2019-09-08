@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import shell from "../../src/utils/shell";
-import paramsDefault from "../../src/params";
+import params from "../../src/params";
 
-const proxyquire = require("proxyquire").noCallThru();
+import getUserActionLogs from "../../src/calls/getUserActionLogs";
+import { cleanTestDir, createTestDir } from "../testUtils";
 
-const testDir = "./test_files/";
-const userActionLogsFilename = testDir + "userActionLogs.log";
+const userActionLogsFilename = params.userActionLogsFilename;
 const log1 = "log_1";
 const log2 = "log_2";
 const log3 = "log_3";
@@ -17,15 +16,8 @@ const log4 = "log_4";
 const userActionLogs = [log1, log2, log3, log4].join("\n");
 
 describe("Call function: getUserActionLogs", function() {
-  const { default: getUserActionLogs } = proxyquire("../../src/calls/getUserActionLogs", {
-    "../params": {
-      ...paramsDefault,
-      userActionLogsFilename
-    }
-  });
-
   before(async () => {
-    await shell(`mkdir -p ${testDir}`);
+    await createTestDir();
     fs.writeFileSync(userActionLogsFilename, userActionLogs);
   });
 
@@ -57,6 +49,6 @@ describe("Call function: getUserActionLogs", function() {
   });
 
   after(async () => {
-    await shell(`rm -rf ${testDir}`);
+    await cleanTestDir();
   });
 });
