@@ -41,9 +41,10 @@ export default async function formatAndCompressAvatar(
   let compressedImgBuffer;
   try {
     const resizedImgBuffer = await resizeImg(inputBuffer, outputResolution);
-    compressedImgBuffer = await imageminPngquant({ quality: [0, 0.95] })(
-      resizedImgBuffer
-    );
+    const OPTION_TO_BYPASS_MISSTYPED_MODULE: any = { quality: "0-95" }; // :(
+    compressedImgBuffer = await imageminPngquant(
+      OPTION_TO_BYPASS_MISSTYPED_MODULE
+    )(resizedImgBuffer);
   } catch (e) {
     logs.warn(`Error compressing avatar: ${e.stack}`);
   }

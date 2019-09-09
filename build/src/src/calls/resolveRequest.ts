@@ -28,7 +28,7 @@ export default async function resolveRequest({
   options
 }: {
   req: PackageRequest;
-  options: {};
+  options?: { BYPASS_RESOLVER?: boolean };
 }): Promise<RpcResolveRequestReturn> {
   if (!req) throw Error("kwarg req must be defined");
 

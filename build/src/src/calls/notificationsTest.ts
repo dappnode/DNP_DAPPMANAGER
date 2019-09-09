@@ -1,4 +1,5 @@
 import * as eventBus from "../eventBus";
+import * as db from "../db";
 import {
   PackageNotification,
   NotificationType,
@@ -20,17 +21,18 @@ import {
 export default async function notificationsTest({
   notification
 }: {
-  notification: PackageNotification;
+  notification?: PackageNotification;
 }): Promise<RpcHandlerReturn> {
   if (!notification) {
-    const id = String(Math.random()).slice(2);
     notification = {
-      id,
+      id: String(Math.random()).slice(2),
       type: randomType() as NotificationType,
       title: randomSentence(3),
       body: randomSentence(20)
     };
   }
+
+  db.setNotification(notification.id, notification);
 
   eventBus.notification.emit(notification);
 

@@ -68,6 +68,8 @@ export default function resolver(
 
   const permutationsTable = getPermutationsTable(dnps);
   const totalCases = getTotalPermutations(permutationsTable);
+  logs.debug(`dappGet found ${totalCases} possible cases`);
+  logs.debug(JSON.stringify(permutationsTable, null, 2));
 
   if (!totalCases) throw Error("Aggregation error, total cases must be > 0");
 
@@ -79,10 +81,10 @@ export default function resolver(
     // Creates a states from all the possible permutations
     // { A: '2.0.0', B: '1.0.0', C: '2.0.0' }
     const state = getPermutation(permutationsTable, caseId);
-    logs.debug(`CASE-ID ${caseId}: ${JSON.stringify(state)}`);
     // Check if this combination of versions is valid
     const result = verifyState(state, dnps);
     if (result.valid) {
+      logs.debug(`case ${caseId} valid: ${JSON.stringify(state)}`);
       return {
         success: true,
         message: `Found compatible state at case ${caseId + 1}/${totalCases}`,
