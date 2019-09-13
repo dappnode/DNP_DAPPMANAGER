@@ -1,4 +1,4 @@
-import getManifest from "../../release/getManifest";
+import getDependencies from "../../release/getDependencies";
 import { Dependencies } from "../../../types";
 
 /**
@@ -13,9 +13,7 @@ import { Dependencies } from "../../../types";
  */
 export default async function fetchDependencies(
   name: string,
-  ver: string
+  version: string
 ): Promise<Dependencies> {
-  const manifest = await getManifest({ name, ver });
-  const dependencies: Dependencies = manifest.dependencies || {};
-  return dependencies;
+  return await getDependencies(name, version);
 }

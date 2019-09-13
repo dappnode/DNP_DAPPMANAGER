@@ -7,11 +7,6 @@ import * as validate from "../../src/utils/validate";
 import unlockPorts from "../../src/modules/unlockPorts";
 
 describe("Module: unlockPorts", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   const pkg = {
     name: "kovan.dnp.dappnode.eth",
     ver: "0.1.0",
@@ -23,7 +18,7 @@ describe("Module: unlockPorts", function() {
     }
   };
 
-  const dockerComposePath = getPath.dockerCompose(pkg.name, params, false);
+  const dockerComposePath = getPath.dockerCompose(pkg.name, false);
 
   before(() => {
     validate.path(dockerComposePath);

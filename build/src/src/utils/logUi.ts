@@ -15,9 +15,10 @@ import { ProgressLog } from "../types";
  * @param {string} message, log message
  * message = "Downloading 75%"
  */
-export default function logUi({ id, name, message, clear }: ProgressLog): void {
-  const progressLog: ProgressLog = clear
-    ? { id, clear }
-    : { id, name, message };
+export function logUi(progressLog: ProgressLog): void {
   eventBus.logUi.emit(progressLog);
+}
+
+export function logUiClear({ id }: { id: string }): void {
+  eventBus.logUi.emit({ id, name: "", message: "", clear: true });
 }

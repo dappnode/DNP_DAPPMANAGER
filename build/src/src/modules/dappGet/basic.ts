@@ -1,4 +1,4 @@
-import getManifest from "../release/getManifest";
+import getDependencies from "../release/getDependencies";
 import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
@@ -8,26 +8,21 @@ import { DappGetResult } from "./types";
 const logs = Logs(module);
 
 /**
- * The dappGet resolver may cause errors.
+ * Simple version of `dappGet`, since its resolver may cause errors.
  * Updating the core will never require dependency resolution,
  * therefore for a system update the dappGet resolver will be emitted
  *
- * If BYPASS_RESOLVER == true, just fetch the first level dependencies of the request
+ * If `BYPASS_RESOLVER == true`, fetch first level dependencies only
  */
-
 export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
-  const reqManifest = await getManifest(req);
-  // reqManifest.dependencies = {
-  //     'bind.dnp.dappnode.eth': '0.1.4',
-  //     'admin.dnp.dappnode.eth': '/ipfs/Qm...',
-  // }
+  const dependencies = await getDependencies(req.name, req.ver);
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install
   const state = {
-    ...((reqManifest || {}).dependencies || {}),
+    ...dependencies,
     [req.name]: req.ver
   };
 

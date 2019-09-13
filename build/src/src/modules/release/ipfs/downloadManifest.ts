@@ -1,6 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import { Manifest } from "../../../types";
+import { validateManifestBasic } from "../validate";
 
 const maxLength = 100e3; // Limit manifest size to ~100KB
 
@@ -26,60 +27,30 @@ export default async function downloadManifest(
    * The manifest is stored un-parsed. The validate function will
    * parse it and return a valid object if the validation succeeeds
    */
-  const manifestStringCache = db.getIpfsCache(hash);
-  if (manifestStringCache && validateManifest(manifestStringCache).success)
-    return JSON.parse(manifestStringCache);
+  const manifestCache = db.getManifestCache(hash);
+  if (manifestCache && validateManifestBasic(manifestCache).success)
+    return manifestCache;
 
   /**
    * 2. Cat stream to file system
    * - Make sure the path is correct and the parent folder exist or is created
    */
-  const manifestBuffer = await ipfs.cat({ hash, maxLength });
-  const manifestString = manifestBuffer.toString();
+  const manifestString = await ipfs.catString({ hash, maxLength });
+  let manifest: Manifest;
+  try {
+    manifest = JSON.parse(manifestString);
+  } catch (e) {
+    throw Error(`Error parsing manifest string: ${e.message}`);
+  }
 
   /**
-   * 3. Validate downloaded image
+   * 3. Validate downloaded manifest
    * Store the un-parsed manifest in the cache
    */
-  const validation = validateManifest(manifestString);
+  const validation = validateManifestBasic(manifest);
   if (!validation.success)
-    throw Error(
-      `Downloaded image from ${hash} failed validation: ${validation.message}`
-    );
-  db.setIpfsCache(hash, manifestString);
-  return JSON.parse(manifestString);
-}
+    throw Error(`Invalid manifest from ${hash}: ${validation.message}`);
 
-/**
- * Validates a .xz DNP image. It will test
- *
- * 1. The file at path exists
- * 2. The file at path has a size > 0 bytes
- * 3. Test against `xz -t` validation, ensuring it's ok
- *
- * @param {string} path
- * @returns {object} A result object, so it doesn't have to be handled with try / catch
- * {
- *   success: true, {bool}
- *   message: "File size is 0 bytes" {string}
- * }
- */
-function validateManifest(
-  manifestString: string
-): { success: boolean; message: string } {
-  if (!manifestString)
-    return {
-      success: false,
-      message: "Empty string"
-    };
-
-  try {
-    JSON.parse(manifestString);
-    return {
-      success: true,
-      message: ""
-    };
-  } catch (e) {
-    return { success: false, message: "Invalid JSON" };
-  }
+  db.setManifestCache(hash, manifest);
+  return manifest;
 }

@@ -54,17 +54,13 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
       return dnpList;
     }
 
-    function getComposeInstance(dnpName: any): any {
-      return {
-        getPortMappings: (): PortMapping[] => {
-          if (dnpName.includes(stoppedDnp))
-            return [
-              { host: 4001, container: 4001, protocol: "UDP" },
-              { host: 4001, container: 4001, protocol: "TCP" }
-            ];
-          else throw Error(`Unknown dnpName "${dnpName}"`);
-        }
-      };
+    function getPortMappings(dnpName: string): PortMapping[] {
+      if (dnpName.includes(stoppedDnp))
+        return [
+          { host: 4001, container: 4001, protocol: "UDP" },
+          { host: 4001, container: 4001, protocol: "TCP" }
+        ];
+      else throw Error(`Unknown dnpName "${dnpName}"`);
     }
 
     const { default: getPortsToOpen } = await rewiremock.around(
@@ -74,7 +70,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
           .with({ listContainers })
           .toBeUsed();
         mock(() => import("../../../src/utils/dockerComposeFile"))
-          .with({ getComposeInstance })
+          .with({ getPortMappings })
           .toBeUsed();
       }
     );

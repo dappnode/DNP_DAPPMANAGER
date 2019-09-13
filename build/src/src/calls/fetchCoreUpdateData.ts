@@ -1,6 +1,6 @@
 import semver from "semver";
 import dappGet from "../modules/dappGet";
-import getManifest from "../modules/release/getManifest";
+import getRelease from "../modules/release/getRelease";
 import { listContainers } from "../modules/docker/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
@@ -78,17 +78,15 @@ export default async function fetchCoreUpdateData({
   const packages = await Promise.all(
     Object.entries(coreDnpsToBeInstalled).map(async ([depName, depVersion]) => {
       const dnp = dnpList.find(_dnp => _dnp.name === depName);
-      const depManifest = await getManifest({
-        name: depName,
-        ver: depVersion
-      });
+      const { metadata: depManifest } = await getRelease(depName, depVersion);
       return {
         name: depName,
         from: dnp ? dnp.version : "",
         to: depManifest.version,
-        warningOnInstall: depManifest.warnings
-          ? depManifest.warnings.onInstall
-          : "",
+        warningOnInstall:
+          depManifest.warnings && depManifest.warnings.onInstall
+            ? depManifest.warnings.onInstall
+            : "",
         manifest: depManifest
       };
     })
@@ -110,10 +108,10 @@ export default async function fetchCoreUpdateData({
     ? "patch"
     : null;
 
-  const coreManifest = await getManifest({
-    name: coreName,
-    ver: version || defaultVersion
-  });
+  const { metadata: coreManifest } = await getRelease(
+    coreName,
+    version || defaultVersion
+  );
 
   /**
    * Compute updateAlerts

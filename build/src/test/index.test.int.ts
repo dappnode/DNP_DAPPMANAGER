@@ -219,7 +219,7 @@ describe("Full integration test with REAL docker: ", () => {
     const idLetsencrypt = "letsencrypt-nginx.dnp.dappnode.eth";
 
     before(async () => {
-      this.timeout(60000);
+      this.timeout(60 * 1000);
       // runs before all tests in this block
       const cmds = [
         "docker volume create --name=nginxproxydnpdappnodeeth_vhost.d",

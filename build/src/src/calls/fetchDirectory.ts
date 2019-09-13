@@ -1,8 +1,7 @@
 import getDirectory from "../modules/release/getDirectory";
 import * as eventBus from "../eventBus";
-import getManifest from "../modules/release/getManifest";
+import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
-import * as parse from "../utils/parse";
 import isSyncing from "../utils/isSyncing";
 import isIpfsHash from "../utils/isIpfsHash";
 import { DirectoryDnp, RpcHandlerReturn } from "../types";
@@ -58,18 +57,13 @@ export default async function fetchDirectory(): Promise<
     dnpsFromDirectory.map(async pkg => {
       const name = pkg.name;
       // Now resolve the last version of the package
-      const manifest = await getManifest(parse.packageReq(name));
-      emitPkg({
-        ...pkg,
-        name,
-        manifest
-      });
+      const { metadata: manifest, avatarFile } = await getRelease(name);
+      emitPkg({ ...pkg, name, manifest });
 
-      // Fetch the package image
-      const avatarHash = manifest.avatar;
-
+      // Fetch the package avatar
       let avatar;
-      if (isIpfsHash(avatarHash)) {
+      if (avatarFile && isIpfsHash(avatarFile.hash)) {
+        const avatarHash = avatarFile.hash;
         try {
           // Retrieve cached avatar or fetch it
           if (avatarCache[avatarHash]) {

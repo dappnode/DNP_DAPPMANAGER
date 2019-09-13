@@ -8,7 +8,9 @@ import {
   AutoUpdatePending,
   AutoUpdateRegistry,
   PackagePort,
-  ApmVersion
+  ApmVersion,
+  Manifest,
+  Compose
 } from "./types";
 import { UpnpPortMapping } from "./modules/upnpc/types";
 import semver from "semver";
@@ -65,6 +67,22 @@ export const AUTO_UPDATE_PENDING = "auto-update-pending";
 
 // IPFS Cache
 /////////////
+
+const getManifestCacheKey = (hash: string): string => `manifest-${hash}`;
+export function setManifestCache(hash: string, manifest: Manifest): void {
+  set(getManifestCacheKey(hash), manifest);
+}
+export function getManifestCache(hash: string): Manifest | null {
+  return get(getManifestCacheKey(hash));
+}
+
+const getComposeCacheKey = (hash: string): string => `compose-${hash}`;
+export function setComposeCache(hash: string, compose: Compose): void {
+  set(getComposeCacheKey(hash), compose);
+}
+export function getComposeCache(hash: string): Compose | null {
+  return get(getComposeCacheKey(hash));
+}
 
 export function setIpfsCache(hash: string, content: string): void {
   set(hash, content);

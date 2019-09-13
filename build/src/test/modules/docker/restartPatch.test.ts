@@ -1,22 +1,19 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import params from "../../../src/params";
 import fs from "fs";
 import * as getPath from "../../../src/utils/getPath";
 import rewiremock from "rewiremock";
 // Import for type
-import restartPatchType from "../../../src/modules/docker/restartPatch";
+import restartPatchType, {
+  restartId
+} from "../../../src/modules/docker/restartPatch";
 
 describe("Util: restartPatch", () => {
   const dockerComposeUp = sinon.stub();
 
   const imageName = "dappmanager.tar.xz:0.0.9";
-  const dockerComposeRestartPath = getPath.dockerCompose(
-    "restart.dnp.dappnode.eth",
-    params,
-    true
-  );
+  const dockerComposeRestartPath = getPath.dockerCompose(restartId, true);
 
   let restartPatch: typeof restartPatchType;
 
@@ -44,9 +41,9 @@ describe("Util: restartPatch", () => {
     const expectedDc = `version: '3.4'
 
 services:
-    restart.dnp.dappnode.eth:
+    ${restartId}:
         image: dappmanager.tar.xz:0.0.9
-        container_name: DAppNodeTool-restart.dnp.dappnode.eth
+        container_name: DAppNodeTool-${restartId}
         volumes:
             - '/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml:/usr/src/app/DNCORE/docker-compose-dappmanager.yml'
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'

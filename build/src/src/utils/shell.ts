@@ -61,9 +61,6 @@ cat: aa.txt: No such file or directory
   stdout: '',
   stderr: 'cat: aa.txt: No such file or directory\n' }
 
- * console.log(err) will return all the info above
- * console.log(`${err}`) will return the same as err.message
- *
  * Conclusion
  * ==========
  *

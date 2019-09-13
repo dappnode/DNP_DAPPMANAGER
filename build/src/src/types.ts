@@ -1,11 +1,15 @@
 export type PortProtocol = "UDP" | "TCP";
 
-export interface PortMapping {
+interface BasicPortMapping {
   host?: number;
   container: number;
   protocol: PortProtocol;
+}
+
+export interface PortMapping extends BasicPortMapping {
   ephemeral?: boolean;
   ip?: string;
+  deletable?: boolean;
 }
 
 export interface PackagePort {
@@ -13,10 +17,13 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
-export interface VolumeInterface {
-  path: string;
-  dest: string;
+interface BasicVolumeMapping {
+  host: string; // path
+  container: string; // dest
   name?: string;
+}
+
+export interface VolumeMapping extends BasicVolumeMapping {
   users?: string[];
   owner?: string;
   isOwner?: boolean;
@@ -44,15 +51,18 @@ export interface PackageContainer {
   image: string;
   name: string;
   shortName: string;
-  ports: PortMapping[];
-  volumes: VolumeInterface[];
   state: ContainerStatus;
   running: boolean;
   origin?: string;
   chain?: string;
   dependencies: Dependencies;
-  envs?: PackageEnvs;
   manifest?: Manifest;
+  envs?: PackageEnvs;
+  ports: PortMapping[];
+  volumes: VolumeMapping[];
+  defaultEnvironment: PackageEnvs;
+  defaultPorts: PortMapping[];
+  defaultVolumes: VolumeMapping[];
 }
 
 export interface PackageEnvs {
@@ -65,31 +75,92 @@ export interface ManifestUpdateAlert {
   message: string;
 }
 
-export interface Manifest {
+interface ManifestImage {
+  hash: string;
+  size: number;
+  path: string;
+  volumes?: string[];
+  external_vol?: string[];
+  ports?: string[];
+  environment?: string[];
+  restart?: string;
+  privileged?: boolean;
+  cap_add?: string[];
+  cap_drop?: string[];
+  devices?: string[];
+  subnet?: string;
+  ipv4_address?: string;
+  network_mode?: string;
+  command?: string;
+  labels?: string[];
+}
+export interface Manifest extends PackageReleaseMetadata {
   name: string;
   version: string;
-  isCore?: boolean;
-  type: string;
-  avatar: string;
-  image: {
-    hash: string;
-    path: string;
-    size: number;
-    environment?: string[];
-    volumes?: string[];
-    ports?: string[];
+  avatar?: string;
+}
+
+export interface ManifestWithImage extends Manifest {
+  image: ManifestImage;
+}
+
+export interface ComposeVolumes {
+  // volumeName: "dncore_ethchaindnpdappnodeeth_data"
+  [volumeName: string]: {
+    external?: {
+      name: string; // "dncore_ethchaindnpdappnodeeth_data"
+    };
   };
-  dependencies: Dependencies;
-  updateAlerts?: ManifestUpdateAlert[];
-  warnings?: {
-    onInstall: string;
-    onUpdate: string;
-    onReset: string;
-    onRemove: string;
+}
+
+export interface ComposeService {
+  build?:
+    | {
+        context: string; // ".";
+        dockerfile: string; // "./build/Dockerfile";
+      }
+    | string;
+  container_name?: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  image?: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
+  ports?: string[];
+  environment?: string[];
+  labels?: { [labelName: string]: string };
+  // env_file: string; IGNORED, Use environment
+  // ipv4_address: "172.33.1.7";
+  networks?: string[] | { network: { ipv4_address: string } };
+  dns?: string; // "172.33.1.2";
+  restart?: string; // "always";
+  privileged?: boolean;
+  cap_add?: string[];
+  cap_drop?: string[];
+  devices?: string[];
+  network_mode?: string;
+  command?: string;
+  logging?: {
+    options: {
+      "max-size": string; // "10m",
+      "max-file": string; // "3"
+    };
   };
-  changelog?: string;
-  // Aditional property written by DAPPMANAGER
-  origin?: string | null;
+}
+
+export type ComposeUnsafe = Compose;
+
+export interface Compose {
+  version: string; // "3.4"
+  networks?: {
+    [networkName: string]: {
+      external?: boolean;
+      driver?: string; // "bridge";
+      ipam?: { config: { subnet: string }[] }; // { subnet: "172.33.0.0/16" }
+    };
+  };
+  volumes?: ComposeVolumes; // { dappmanagerdnpdappnodeeth_data: {} };
+  // dnpName: "dappmanager.dnp.dappnode.eth"
+  services: {
+    [dnpName: string]: ComposeService;
+  };
 }
 
 export interface PackagePort {
@@ -146,8 +217,8 @@ export interface ChainData {
 
 export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
-  name?: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
-  message?: string; // "Downloading 75%", log message
+  name: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
+  message: string; // "Downloading 75%", log message
   clear?: boolean; // to trigger the UI to clear the all logs of this id
 }
 
@@ -168,23 +239,18 @@ export interface UserSetPackageEnvs {
   [dnpName: string]: PackageEnvs;
 }
 
+export interface UserSetPackageVolsSingle {
+  [originalVolumeMapping: string]: string;
+}
 export interface UserSetPackageVols {
-  [dnpName: string]: {
-    [originalVolumeMapping: string]: string;
-  };
+  [dnpName: string]: UserSetPackageVolsSingle;
 }
 
+export interface UserSetPackagePortsSingle {
+  [originalPortMapping: string]: string;
+}
 export interface UserSetPackagePorts {
-  [dnpName: string]: {
-    [originalPortMapping: string]: string;
-  };
-}
-
-export interface InstallerPkg {
-  name: string;
-  ver: string;
-  manifest: Manifest;
-  isCore: boolean;
+  [dnpName: string]: UserSetPackagePortsSingle;
 }
 
 export interface DockerOptionsInterface {
@@ -246,6 +312,101 @@ export interface PackageVersionData {
   version?: string;
   branch?: string;
   commit?: string;
+}
+
+type DistributedFileSource = "ipfs" | "swarm";
+export interface DistributedFile {
+  hash: string;
+  source: DistributedFileSource;
+  size: number;
+}
+
+export interface PackageRelease {
+  name: string;
+  version: string;
+  // File info for downloads
+  manifestFile: DistributedFile;
+  imageFile: DistributedFile;
+  avatarFile: DistributedFile | null;
+  // Data for release processing
+  metadata: PackageReleaseMetadata;
+  compose: Compose;
+  // Aditional
+  origin: string | null;
+  isCore: boolean;
+}
+
+export interface InstallerPkg extends PackageRelease {
+  imagePath: string;
+}
+
+export interface PackageReleaseMetadata {
+  name: string;
+  version: string;
+  upstreamVersion?: string;
+  shortDescription?: string;
+  description?: string;
+  type?: string;
+  chain?: string;
+  dependencies?: Dependencies;
+  requirements?: {
+    minimumDappnodeVersion: string;
+  };
+  backup?: PackageBackup[];
+  changelog?: string;
+  warnings?: {
+    onInstall?: string;
+    onUpdate?: string;
+    onReset?: string;
+    onRemove?: string;
+  };
+  updateAlerts?: ManifestUpdateAlert[];
+  disclaimer?: {
+    message: string;
+  };
+  style?: {
+    featuredBackground?: string;
+    featuredColor?: string;
+    featuredAvatarFilter?: string;
+  };
+  author?: string;
+  contributors?: string[];
+  categories?: string[];
+  keywords?: string[];
+  links?: {
+    homepage?: string;
+    ui?: string;
+    api?: string;
+    gateway?: string;
+  };
+  repository?: {
+    type?: string;
+    url?: string;
+    directory?: string;
+  };
+  bugs?: {
+    url: string;
+  };
+  license?: string;
+}
+
+export interface PackageReleaseImageData {
+  // Mergable properties (editable)
+  volumes?: string[];
+  ports?: string[];
+  environment?: string[];
+  // Non-mergable properties
+  external_vol?: string[];
+  restart?: string;
+  privileged?: boolean;
+  cap_add?: string[];
+  cap_drop?: string[];
+  devices?: string[];
+  subnet?: string;
+  ipv4_address?: string;
+  network_mode?: string;
+  command?: string;
+  labels?: string[];
 }
 
 /**

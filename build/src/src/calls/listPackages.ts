@@ -1,16 +1,12 @@
-import fs from "fs";
-import params from "../params";
 import * as eventBus from "../eventBus";
 // Modules
 import { listContainers } from "../modules/docker/listContainers";
 import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
-import * as getPath from "../utils/getPath";
-import * as envsHelper from "../utils/envsHelper";
-import appendIsPortDeletable from "../utils/appendIsPortDeletable";
 import Logs from "../logs";
 import { PackageContainer, RpcHandlerReturn } from "../types";
+import { readConfigFiles } from "../utils/configFiles";
 const logs = Logs(module);
 
 // This call can fail because of:
@@ -64,34 +60,12 @@ export default async function listPackages(): Promise<RpcListPackagesReturn> {
 
   // Append envFile and manifest
   dnpList.map(dnp => {
-    // Add env info, only if there are ENVs
     try {
-      const envs = envsHelper.load(dnp.name, dnp.isCore);
-      if (Object.keys(envs).length) dnp.envs = envs;
+      const { manifest, compose } = readConfigFiles(dnp.name, dnp.isCore);
+      dnp.manifest = manifest;
+      dnp.envs = compose.envs;
     } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} envs: ${e.stack}`);
-    }
-
-    // Add manifest
-    try {
-      const manifestPath = getPath.manifest(dnp.name, params, dnp.isCore);
-      if (fs.existsSync(manifestPath)) {
-        const manifestFileData = fs.readFileSync(manifestPath, "utf8");
-        try {
-          dnp.manifest = JSON.parse(manifestFileData);
-
-          /**
-           * Add logic to know if a port is deletable
-           * = Not declared in the manifest
-           */
-          if (dnp.manifest)
-            dnp.ports = appendIsPortDeletable(dnp.ports, dnp.manifest);
-        } catch (e) {
-          // Silence parsing errors
-        }
-      }
-    } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} manifest: ${e.message}`);
+      logs.warn(`Error appending ${(dnp || {}).name} files: ${e.message}`);
     }
   });
 

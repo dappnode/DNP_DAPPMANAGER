@@ -1,5 +1,4 @@
-import * as parse from "../utils/parse";
-import getManifest from "../modules/release/getManifest";
+import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import Logs from "../logs";
 import { Manifest, RpcHandlerReturn } from "../types";
@@ -8,7 +7,7 @@ const logs = Logs(module);
 interface RpcFetchPackageDataReturn extends RpcHandlerReturn {
   result: {
     manifest: Manifest;
-    avatar: string | undefined;
+    avatar: string | null;
   };
 }
 
@@ -29,12 +28,13 @@ export default async function fetchPackageData({
 }): Promise<RpcFetchPackageDataReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const manifest = await getManifest(parse.packageReq(id));
+  const release = await getRelease(id);
 
   // Fetch the package image
-  const avatarHash = manifest.avatar;
-  let avatar;
-  if (avatarHash) {
+
+  let avatar: string | null = null;
+  if (release.avatarFile) {
+    const avatarHash = release.avatarFile.hash;
     try {
       avatar = await getAvatar(avatarHash);
     } catch (e) {
@@ -48,8 +48,8 @@ export default async function fetchPackageData({
   return {
     message: `Got data of ${id}`,
     result: {
-      manifest,
-      avatar
+      manifest: release.metadata,
+      avatar: avatar
     }
   };
 }

@@ -1,9 +1,8 @@
 import fs from "fs";
-import params from "../params";
-import * as parse from "./parse";
+import { parseEnvironment, stringifyEnvironment } from "./dockerComposeParsers";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
-import { PackageEnvs, Manifest } from "../types";
+import { PackageEnvs, ManifestWithImage } from "../types";
 
 /**
  * Loads a `.env` file from disk and parses its envs
@@ -14,12 +13,17 @@ import { PackageEnvs, Manifest } from "../types";
  * }
  */
 export function load(name: string, isCore: boolean): PackageEnvs {
-  const envFilePath = getPath.envFile(name, params, isCore);
+  const envFilePath = getPath.envFile(name, isCore);
   if (!fs.existsSync(envFilePath)) {
     return {};
   }
   const envFileData = fs.readFileSync(envFilePath, "utf8");
-  return parse.envFile(envFileData);
+  return parseEnvironment(
+    envFileData
+      .trim()
+      .split("\n")
+      .filter(row => row.trim())
+  );
 }
 
 /**
@@ -31,8 +35,16 @@ export function load(name: string, isCore: boolean): PackageEnvs {
  * }
  */
 export function write(name: string, isCore: boolean, envs: PackageEnvs): void {
-  const envFilePath = getPath.envFileSmart(name, params, isCore);
-  fs.writeFileSync(validate.path(envFilePath), parse.stringifyEnvs(envs));
+  writeStringified(name, isCore, stringifyEnvironment(envs));
+}
+
+export function writeStringified(
+  name: string,
+  isCore: boolean,
+  environment: string[]
+): void {
+  const envFilePath = getPath.envFileSmart(name, isCore);
+  fs.writeFileSync(validate.path(envFilePath), environment.join("\n"));
 }
 
 /**
@@ -42,11 +54,7 @@ export function write(name: string, isCore: boolean, envs: PackageEnvs): void {
  *   ENV_NAME: 'value'
  * }
  */
-export function getManifestEnvs(manifest: Manifest): PackageEnvs {
+export function getManifestEnvs(manifest: ManifestWithImage): PackageEnvs {
   const envsArray = (manifest.image || {}).environment || [];
-  return envsArray.reduce((_envs: PackageEnvs, row) => {
-    const [key, value] = (row || "").trim().split(/=(.*)/);
-    _envs[key] = value || "";
-    return _envs;
-  }, {});
+  return parseEnvironment(envsArray);
 }

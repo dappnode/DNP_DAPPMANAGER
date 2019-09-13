@@ -26,14 +26,6 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
-"@dappnode/dnp-manifest@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@dappnode/dnp-manifest/-/dnp-manifest-0.0.9.tgz#d5eaae9b08ee9ca519c17a93559fc7272a1069ac"
-  integrity sha512-U4ni9j+vDLGOu6dv2FobGdkfRILVmnUEUxvZ4SBMNc4vngakGb3iL4Uh2krgoxRLqKDGb2x5VpgZx+NRxoeacw==
-  dependencies:
-    ajv "^6.10.0"
-    ajv-errors "^1.0.1"
-
 "@jimp/bmp@^0.5.4":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@jimp/bmp/-/bmp-0.5.4.tgz#b7b375aa774f26154912569864d5466e71333ef1"
@@ -697,11 +689,6 @@ aes-js@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-3.0.0.tgz#e21df10ad6c2053295bcbb8dab40b09dbea87e4d"
   integrity sha1-4h3xCtbCBTKVvLuNq0Cwnb6ofk0=
-
-ajv-errors@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-1.0.1.tgz#f35986aceb91afadec4102fbd85014950cefa64d"
-  integrity sha512-DCRfO/4nQ+89p/RK43i8Ezd41EqdGIU4ld7nGF8OQ14oc/we5rEntLCUa7+jrn3nn83BosfwZA0wb4pon2o8iQ==
 
 ajv@^6.10.0, ajv@^6.5.5, ajv@^6.9.1:
   version "6.10.0"

@@ -1,8 +1,48 @@
-import { PortProtocol, PortMapping } from "../types";
+import {
+  PortProtocol,
+  PortMapping,
+  PackageEnvs,
+  Compose,
+  VolumeMapping
+} from "../types";
 
 /**
  * Internal methods that purely modify JSON
  */
+
+/**
+ * Returns the first name of a compose. It will match the DNP name ENS domain
+ */
+export function parseServiceName(compose: Compose): string {
+  return Object.keys(compose.services)[0];
+}
+
+/**
+ * Parses an envs array from a manifest or docker-compose.yml
+ * @param envsArray:
+ * ["NAME=VALUE",  "NOVAL",   "COMPLEX=D=D=D  = 2"]
+ * @returns envs =
+ * { NAME: "VALUE", NOVAL: "", COMPLEX: "D=D=D  = 2" }
+ */
+export function parseEnvironment(envsArray: string[]): PackageEnvs {
+  return envsArray.reduce((envs: PackageEnvs, row) => {
+    const [key, value] = (row || "").trim().split(/=(.*)/);
+    return { ...envs, [key]: value || "" };
+  }, {});
+}
+
+/**
+ * Reverse of parseEnvironment, stringifies envs object to envsArray
+ * @param envs =
+ * { NAME: "VALUE", NOVAL: "", COMPLEX: "D=D=D  = 2" }
+ * @returns envsArray =
+ * ["NAME=VALUE",  "NOVAL",   "COMPLEX=D=D=D  = 2"]
+ */
+export function stringifyEnvironment(envs: PackageEnvs): string[] {
+  return Object.entries(envs).map(([name, value]) =>
+    value ? [name, value].join("=") : name
+  );
+}
 
 /**
  * Parses a port string array from a docker-compose.yml
@@ -94,4 +134,20 @@ export function mergePortMappings(
       return numGetter(a) - numGetter(b);
     }
   );
+}
+
+/**
+ * Parses an array of volumes from the service section
+ * @param volumesArray
+ */
+export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
+  return volumesArray.map(volString => {
+    const [host, container] = volString.split(":");
+    const isNamed = !host.startsWith("/") && !host.startsWith("~");
+    return {
+      host,
+      container,
+      name: isNamed ? host : undefined
+    };
+  });
 }

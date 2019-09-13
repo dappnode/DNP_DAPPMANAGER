@@ -1,16 +1,24 @@
+import path from "path";
+import fs from "fs";
+import params from "../params";
 import * as eventBus from "../eventBus";
 // Modules
-import * as packages from "../modules/packages";
 import dappGet from "../modules/dappGet";
-import getManifest from "../modules/release/getManifest";
+import getRelease from "../modules/release/getRelease";
+import getImage from "../modules/release/getImage";
 import lockPorts from "../modules/lockPorts";
+import {
+  dockerLoad,
+  dockerCleanOldImages
+} from "../modules/docker/dockerCommands";
+import { dockerComposeUpSafeByName } from "../modules/docker/dockerSafe";
+import restartPatch from "../modules/docker/restartPatch";
 // Utils
-import logUi from "../utils/logUi";
+import { logUi, logUiClear } from "../utils/logUi";
 import * as parse from "../utils/parse";
-import * as merge from "../utils/merge";
+import { writeConfigFiles } from "../utils/configFiles";
 import isIpfsRequest from "../utils/isIpfsRequest";
 import isSyncing from "../utils/isSyncing";
-import * as envsHelper from "../utils/envsHelper";
 import {
   UserSetPackageEnvs,
   UserSetPackagePorts,
@@ -20,6 +28,8 @@ import {
 } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
+
+const imageDir = params.TEMP_TRANSFER_DIR;
 
 /**
  * Installs a package. It resolves dependencies, downloads
@@ -109,35 +119,32 @@ export default async function installPackage({
   );
 
   // 3. Format the request and filter out already updated packages
-  Object.keys(alreadyUpdated || {}).forEach(name => {
+  Object.keys(alreadyUpdated || {}).forEach(function(name) {
     logUi({ id, name, message: "Already updated" });
   });
 
   const pkgs: InstallerPkg[] = await Promise.all(
-    Object.entries(state).map(async ([name, ver]) => {
+    Object.entries(state).map(async ([name, version]) => {
       // 3.2 Fetch manifest
-      let manifest = await getManifest({ name, ver });
-      if (!manifest) throw Error(`Missing manifest for ${name}`);
+      const release = await getRelease(name, version);
 
       // 3.3 Verify dncore condition
       // Prevent default values. Someone can try to spoof "isCore" in the manifest
       // The origin must be the registry controlled by the DAppNode team, and it must NOT come from ipfs, thus APM
       if (
-        manifest.type == "dncore" &&
+        release.isCore &&
         !BYPASS_CORE_RESTRICTION &&
         (!(name || "").endsWith(".dnp.dappnode.eth") ||
-          (ver || "").startsWith("/ipfs/"))
+          (version || "").startsWith("/ipfs/"))
       )
         throw Error(
           `Unverified core package ${name}, only allowed origin is .dnp.dappnode.eth APM registy`
         );
 
-      // 3.4 Merge user set vols and ports
-      if (userSetVols) manifest = merge.manifest.vols(manifest, userSetVols);
-      if (userSetPorts) manifest = merge.manifest.ports(manifest, userSetPorts);
-
-      // Return pkg object
-      return { name, ver, manifest, isCore: manifest.type == "dncore" };
+      return {
+        ...release,
+        imagePath: path.join(imageDir, `${name}_${version}.tar.xz`)
+      };
     })
   );
   const dnpNames = pkgs.map(({ name }) => name).join(", ");
@@ -145,57 +152,67 @@ export default async function installPackage({
   logs.debug(JSON.stringify(pkgs, null, 2));
 
   // 4. Download requested packages in paralel
-  await Promise.all(pkgs.map(pkg => packages.download({ pkg, id })));
-  logs.info(`Successfully downloaded DNPs ${dnpNames}`);
+  await Promise.all(
+    pkgs.map(async function({ name, imageFile: { hash, size }, imagePath }) {
+      logUi({ id, name, message: "Starting download..." });
+      await getImage(hash, imagePath, size, (progress: number) => {
+        let message = `Downloading ${progress}%`;
+        if (progress > 100) message += ` (expected ${size} bytes)`;
+        logUi({ id, name, message });
+      }).catch((e: Error) => {
+        e.message = `Can't download ${name} image: ${e.message}`;
+        throw e; // Use this format to keep the stack trace
+      });
+
+      logUi({ id, name, message: "Package downloaded" });
+    })
+  );
 
   // 5. Load requested packages in paralel
   //    Do this in a separate stage. If the download fails, the files will not be persisted
   //    If a dependency fails, some future version of another DNP could be loaded
   //    creating wierd bugs of unstable versions
   //    ###### NOTE: this a temporary solution until a proper rollback is implemented
-  await Promise.all(pkgs.map(pkg => packages.load({ pkg, id })));
-  logs.info(`Successfully loaded DNPs ${dnpNames}`);
+  await Promise.all(
+    pkgs.map(async function({ name, imagePath }) {
+      logUi({ id, name, message: "Loading image..." });
+      await dockerLoad(imagePath);
+      logUi({ id, name, message: "Cleaning files..." });
+      fs.unlinkSync(imagePath);
+      logUi({ id, name, message: "Package Loaded" });
+    })
+  );
 
   // Patch, install the dappmanager the last always
-  const isDappmanager = (pkg: InstallerPkg): boolean =>
-    (pkg.manifest || {}).name === "dappmanager.dnp.dappnode.eth";
+  const pkgsInSafeOrder = pkgs.sort(pkg =>
+    pkg.name === "dappmanager.dnp.dappnode.eth" ? 1 : -1
+  );
 
-  for (const pkg of pkgs.sort(pkg => (isDappmanager(pkg) ? 1 : -1))) {
-    // 5. Set ENVs. Set userSetEnvs + the manifest defaults (if not previously set)
-    const name = pkg.manifest.name;
-    const defaultEnvs = envsHelper.getManifestEnvs(pkg.manifest) || {};
-    const previousEnvs = envsHelper.load(name, pkg.isCore) || {};
-    const _userSetEnvs =
-      userSetEnvs && userSetEnvs[pkg.manifest.name]
-        ? userSetEnvs[pkg.manifest.name]
-        : {};
-    /**
-     * Merge ENVs by priority
-     * 1. userSet on installation
-     * 2. previously set (already installed DNPs)
-     * 3. default values from the manifest
-     * Empty values will NOT be replaced on updates.
-     */
-    const envs = { ...defaultEnvs, ...previousEnvs, ..._userSetEnvs };
-    envsHelper.write(name, pkg.isCore, envs);
-    logs.info(
-      `Wrote envs for DNP ${name} ${
-        pkg.isCore ? "(Core)" : ""
-      }:\n ${JSON.stringify(envs, null, 2)}`
-    );
+  for (const pkg of pkgsInSafeOrder) {
+    // 5. Write configuration files. Metadata, compose, compose-default
+    writeConfigFiles({ ...pkg, userSetVols, userSetPorts, userSetEnvs });
 
-    // 6. Run requested packages
-    await packages.run({ pkg, id });
-    logs.info(`Started (docker-compose up) DNP ${pkg.name}`);
+    // 6. Run packages
+    const { name, version, isCore } = pkg;
+    logUi({ id, name, message: "starting package... " });
+    // patch to prevent installer from crashing
+    if (name == "dappmanager.dnp.dappnode.eth")
+      await restartPatch(name + ":" + version);
+    else await dockerComposeUpSafeByName(name, isCore);
+
+    logUi({ id, name, message: "cleaning old images" });
+    await dockerCleanOldImages(name, version).catch(() => {});
+
+    logUi({ id, name, message: "package started" });
 
     // 7. Lock ephemeral ports: modify docker-compose + open ports
     // - lockPorts modifies the docker-compose and returns
     //   lockedPortsToOpen = [ {portNumber: '32769', protocol: 'UDP'}, ... ]
-    await lockPorts(pkg.name || pkg.manifest.name);
+    await lockPorts(name);
   }
 
   // Instruct the UI to clear isInstalling logs
-  logUi({ id, clear: true });
+  logUiClear({ id });
 
   // AFTER - 8. Trigger a natRenewal update to open ports if necessary
   // Since a package installation is not a very frequent activity it is okay to be

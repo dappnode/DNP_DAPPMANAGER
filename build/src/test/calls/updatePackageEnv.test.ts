@@ -2,7 +2,6 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
-import params from "../../src/params";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import rewiremock from "rewiremock";
@@ -17,8 +16,8 @@ describe("Call function: updatePackageEnv", function() {
   // Finally returns this data objectified
   const id = "myPackage.eth";
 
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
-  const envFilePath = getPath.envFileSmart(id, params, false);
+  const dockerComposePath = getPath.dockerComposeSmart(id);
+  const envFilePath = getPath.envFileSmart(id, false);
 
   async function listContainer(id: string): Promise<PackageContainer> {
     return { ...mockDnp, name: id };

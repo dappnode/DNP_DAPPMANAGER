@@ -3,9 +3,12 @@ import * as path from "path";
 import {
   PackageContainer,
   Manifest,
-  VolumeInterface,
+  VolumeMapping,
   DirectoryDnp,
-  PortMapping
+  PortMapping,
+  PackageRelease,
+  Compose,
+  ManifestWithImage
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
@@ -37,9 +40,14 @@ export async function createDirP(filePath: string): Promise<void> {
  * Mock data
  */
 
+const mockDnpName = "mock-dnp.dnp.dappnode.eth";
+const mockDnpVersion = "0.0.0";
+export const mockSize = 1111111;
+export const mockHash = "/ipfs/QmWkAVYJhpwqApRfK4SZ6e2Xt2Daamc8uBpM1oMLmQ6fw4";
+
 export const mockDnp: PackageContainer = {
   id: "17628371823",
-  packageName: "mock-dnp.dnp.dappnode.eth",
+  packageName: mockDnpName,
   version: "0.0.0",
   isDnp: true,
   isCore: false,
@@ -47,31 +55,41 @@ export const mockDnp: PackageContainer = {
   image: "mock-image",
   name: "mock-name",
   shortName: "mock-shortname",
-  ports: [],
-  volumes: [],
   state: "running",
   running: true,
   origin: "",
   chain: "",
-  dependencies: {}
+  dependencies: {},
+  envs: {},
+  ports: [],
+  volumes: [],
+  defaultEnvironment: {},
+  defaultPorts: [],
+  defaultVolumes: []
 };
 
 export const mockManifest: Manifest = {
-  name: "mock-dnp.dnp.dappnode.eth",
+  name: mockDnpName,
   version: "0.0.0",
+  description: "Mock description",
   type: "service",
-  avatar: "/ipfs/QmMOCKMOCKMOCKMOCK",
-  image: {
-    hash: "/ipfs/QmMOCKMOCKMOCKMOCK",
-    path: "mock/mock/mock.mock",
-    size: 111111111
-  },
-  dependencies: {}
+  avatar: mockHash,
+  dependencies: {},
+  license: "Mock-license"
 };
 
-export const mockVolume: VolumeInterface = {
-  path: "mock/mock/mock",
-  dest: "mock/mock/mock"
+export const mockManifestWithImage: ManifestWithImage = {
+  ...mockManifest,
+  image: {
+    hash: mockHash,
+    path: "mock/mock/mock.mock",
+    size: mockSize
+  }
+};
+
+export const mockVolume: VolumeMapping = {
+  host: "mock/mock/mock",
+  container: "mock/mock/mock"
 };
 
 export const mockPort: PortMapping = {
@@ -153,11 +171,34 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
 };
 
 export const mockDirectoryDnp: DirectoryDnp = {
-  name: "mock.dnp.mock.eth",
+  name: mockDnpName,
   status: 1,
   statusName: "Active",
   position: 1000,
   directoryId: 2,
   isFeatured: true,
   featuredIndex: 0
+};
+
+export const mockCompose: Compose = {
+  version: "3.4",
+  services: {
+    [mockDnpName]: {
+      image: `${mockDnpName}:${mockDnpVersion}`,
+      /* eslint-disable-next-line @typescript-eslint/camelcase */
+      container_name: `DAppNodePackage-${mockDnpName}`
+    }
+  }
+};
+
+export const mockRelease: PackageRelease = {
+  name: mockDnpName,
+  version: mockDnpVersion,
+  manifestFile: { hash: mockHash, size: mockSize, source: "ipfs" },
+  imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
+  avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
+  metadata: { name: mockDnpName, version: mockDnpVersion },
+  compose: mockCompose,
+  origin: null,
+  isCore: false
 };

@@ -1,7 +1,6 @@
 import fs from "fs";
 import * as getPath from "../utils/getPath";
 import restartPatch from "../modules/docker/restartPatch";
-import params from "../params";
 import { dockerComposeRm } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import * as eventBus from "../eventBus";
@@ -19,7 +18,7 @@ export default async function restartPackage({
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
+  const dockerComposePath = getPath.dockerComposeSmart(id);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error(`No docker-compose found: ${dockerComposePath}`);
   }

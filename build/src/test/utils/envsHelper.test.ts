@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import shell from "../../src/utils/shell";
 import fs from "fs";
-import { mockManifest } from "../testUtils";
-import { Manifest, UserSetPackageEnvs } from "../../src/types";
+import { mockManifestWithImage } from "../testUtils";
+import { UserSetPackageEnvs, ManifestWithImage } from "../../src/types";
 
 import * as envsHelper from "../../src/utils/envsHelper";
 
@@ -20,12 +20,11 @@ describe("Util: envsHelper", () => {
   });
 
   it("should merge envs and write them", () => {
-    const manifest: Manifest = {
-      ...mockManifest,
+    const manifest: ManifestWithImage = {
+      ...mockManifestWithImage,
       name,
-      isCore,
       image: {
-        ...mockManifest.image,
+        ...mockManifestWithImage.image,
         environment: [
           "ENV_NAME1=manifest_value",
           "ENV_NAME2=manifest_value",

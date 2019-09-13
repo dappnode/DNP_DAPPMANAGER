@@ -1,3 +1,4 @@
+import semver from "semver";
 import { DockerOptionsInterface } from "../../types";
 import shell from "./shell";
 
@@ -46,6 +47,24 @@ export function dockerImages(): Promise<string> {
 
 export function dockerRmi(imgsToDelete: string[]): Promise<string> {
   return shell(`docker rmi ${imgsToDelete.join(" ")}`);
+}
+
+/**
+ * Clean old semver tagged images for DNP `name` expect tag `version`.
+ * If the images were removed successfuly the dappmanger will print logs:
+ * Untagged: package.dnp.dappnode.eth:0.1.6
+ */
+export async function dockerCleanOldImages(
+  name: string,
+  version: string
+): Promise<void> {
+  const currentImgs = await dockerImages();
+  await dockerRmi(
+    (currentImgs || "").split(/\r|\n/).filter((p: string) => {
+      const [pName, pVer] = p.split(":");
+      return pName === name && semver.valid(pVer) && pVer !== version;
+    })
+  );
 }
 
 export function dockerLogs(
