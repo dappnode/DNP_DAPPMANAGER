@@ -1,6 +1,6 @@
 import * as ipfsParams from "./ipfsParams";
 import { runWithRetry } from "../../utils/asyncFlows";
-import isIpfsHash from "../../utils/isIpfsHash";
+import { isIpfsHash } from "../../utils/validate";
 import { timeoutError, IpfsArgument } from "./data";
 
 // Methods

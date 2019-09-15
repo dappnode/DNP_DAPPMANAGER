@@ -2,8 +2,7 @@ import * as db from "../db";
 import params from "../params";
 import * as eventBus from "../eventBus";
 import { pick, omit } from "lodash";
-import { parseCoreVersionIdToStrings } from "./coreVersionId";
-import { includesArray } from "./arrays";
+import { areCoreVersionIdsIncluded } from "./coreVersionId";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
@@ -266,10 +265,7 @@ export function clearCompletedCoreUpdatesIfAny(
     pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
   const pendingVersionsAreInstalled =
     pendingVersionId &&
-    includesArray(
-      parseCoreVersionIdToStrings(pendingVersionId),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(pendingVersionId, currentVersionId);
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
     flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
@@ -460,16 +456,10 @@ export function getCoreFeedbackMessage({
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
-    includesArray(
-      parseCoreVersionIdToStrings(lastUpdatedVersion.version),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(lastUpdatedVersion.version, currentVersionId);
   const pendingVersionsAreInstalled =
     pendingVersion &&
-    includesArray(
-      parseCoreVersionIdToStrings(pendingVersion),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(pendingVersion, currentVersionId);
 
   if (scheduledUpdate) {
     // If the pending version is the current BUT it is NOT in the registry,

@@ -17,7 +17,7 @@ import restartPatch from "../modules/docker/restartPatch";
 import { logUi, logUiClear } from "../utils/logUi";
 import * as parse from "../utils/parse";
 import { writeConfigFiles } from "../utils/configFiles";
-import isIpfsRequest from "../utils/isIpfsRequest";
+import { isIpfsRequest } from "../utils/validate";
 import isSyncing from "../utils/isSyncing";
 import {
   UserSetPackageEnvs,

@@ -3,7 +3,7 @@ import * as eventBus from "../eventBus";
 import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import isSyncing from "../utils/isSyncing";
-import isIpfsHash from "../utils/isIpfsHash";
+import { isIpfsHash } from "../utils/validate";
 import { DirectoryDnp, RpcHandlerReturn } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);

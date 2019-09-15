@@ -1,6 +1,6 @@
 import resolveReleaseName from "./resolveReleaseName";
 import downloadRelease from "./ipfs/downloadRelease";
-import isEnsDomain from "../../utils/isEnsDomain";
+import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";
 import { parseMetadataFromManifest, sanitizeCompose } from "./parsers";
 

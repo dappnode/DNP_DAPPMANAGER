@@ -1,5 +1,5 @@
 import semver from "semver";
-import isIpfsHash from "../../../utils/isIpfsHash";
+import { isIpfsHash } from "../../../utils/validate";
 
 /**
  * semver comparision functions semver.compare and semver.rcompare

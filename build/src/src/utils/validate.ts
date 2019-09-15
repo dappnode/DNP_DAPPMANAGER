@@ -1,23 +1,71 @@
 import fs from "fs";
 import pathUtil from "path";
+import semver from "semver";
+import { PackageRequest } from "../types";
+const { isIPFS } = require("ipfs-http-client");
 import Logs from "../logs";
 const logs = Logs(module);
 
-/*
- * Multipurpose util, it will check for a condition and correct it or throw an error.
- * It valides:
- * - packageReq: Standard object in multiple RPCs
- * - ethDomain: Ensures *.eth
- * - IPFShash
- * - path: Extensively used. It verifies that a path exists, otherwise creates its
- *         parent directory recursively with mkdir -p
- */
+const supportedDomains = ["eth"];
 
-export function isEthDomain(domain: string): void {
-  if (domain.substr(domain.length - 4) != ".eth") {
-    logs.error(`Error: reponame is not an .eth domain: ${domain}`);
-    throw Error(`reponame is not an .eth domain: ${domain}`);
+export function isEnsDomain(ensDomain: string): boolean {
+  if (!ensDomain || typeof ensDomain !== "string") return false;
+  if (ensDomain.includes("/")) return false;
+  if (!ensDomain.includes(".")) return false;
+  // "kovan.dnp.dappnode.eth" => "eth"
+  const domain = ensDomain.split(".").slice(-1)[0] || "";
+  if (!supportedDomains.includes(domain)) return false;
+  // If any negative condition was matched:
+  return true;
+}
+
+/**
+ * Checks if the given string is a valid IPFS CID or path
+ *
+ * isIPFS.cid('QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o') // true (CIDv0)
+ * isIPFS.cid('zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7') // true (CIDv1)
+ * isIPFS.cid('noop') // false
+ *
+ * @param {string} hash
+ * @returns {bool}
+ */
+export function isIpfsHash(hash: string): boolean {
+  if (!hash || typeof hash !== "string") return false;
+  // Correct hash prefix
+  if (hash.includes("ipfs/")) {
+    hash = hash.split("ipfs/")[1];
   }
+  hash.replace("/", "");
+  // Make sure hash if valid
+  return isIPFS.cid(hash);
+}
+
+export function isIpfsRequest(req: PackageRequest): boolean {
+  if (req && typeof req === "object") {
+    return Boolean(
+      (req.name && isIpfsHash(req.name)) || (req.ver && isIpfsHash(req.ver))
+    );
+  } else if (req && typeof req === "string") {
+    return isIpfsHash(req);
+  } else {
+    return false;
+  }
+}
+
+/**
+ * Must accept regular semvers and "*"
+ * @param {string} version
+ */
+export function isSemver(version: string): boolean {
+  return Boolean(semver.valid(version));
+}
+
+/**
+ * Must accept regular semvers and "*"
+ * @param {string} version
+ */
+export function isSemverRange(version: string): boolean {
+  return Boolean(semver.validRange(version));
 }
 
 export function path(filePath: string): string {
