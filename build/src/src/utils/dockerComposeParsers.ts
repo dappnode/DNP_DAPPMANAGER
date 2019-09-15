@@ -1,3 +1,4 @@
+import { uniqBy, concat } from "lodash";
 import {
   PortProtocol,
   PortMapping,
@@ -101,12 +102,13 @@ export function stringifyPortMappings(portMappings: PortMapping[]): string[] {
 }
 
 /**
- * Merges two port mapping arrays ensuring container ports are unique.
- * If there are duplicate mappings for the same container port number and protocol,
+ * Merges ensuring container ports are unique.
+ * If there are duplicate mappings for the same
+ * container port number and protocol,
  * the latter mapping will overwrite the others.
  *
- * @param portMappings1 PortMapping array with LESS priority
- * @param portMappings2 PortMapping array with MORE priority
+ * @param portMappings1 PortMapping array with MORE priority
+ * @param portMappings2 PortMapping array with LESS priority
  * @returns merged PortMapping array
  */
 export function mergePortMappings(
@@ -115,29 +117,22 @@ export function mergePortMappings(
 ): PortMapping[] {
   // Give each port mapping a deterministic key so mappings targeting
   // the same container port number and protocol get overwritten
-  function transformPortMappingToObject(
-    portMappings: PortMapping[]
-  ): { [portMappingsId: string]: PortMapping } {
-    return portMappings.reduce((obj, portMapping) => {
-      const { container, protocol } = portMapping;
-      if (!container) throw Error(`Invalid portMapping, key container is null`);
-      // Construct a unique key per container port number and protocol
-      return { ...obj, [`${container}/${protocol || "TCP"}`]: portMapping };
-    }, {});
-  }
+  return uniqBy(
+    concat(portMappings1, portMappings2),
+    ({ container, protocol }: PortMapping) =>
+      `${container}/${protocol || "TCP"}`
+  );
+}
 
-  const mergedPortMappings: PortMapping[] = Object.values({
-    ...transformPortMappingToObject(portMappings1),
-    ...transformPortMappingToObject(portMappings2)
-  });
-
-  // Make the order deterministic, by port number and then TCP first
-  return mergedPortMappings.sort(
-    (a: PortMapping, b: PortMapping): number => {
-      const numGetter = (portMapping: PortMapping): number =>
-        portMapping.container + (portMapping.protocol === "UDP" ? 0.5 : 0);
-      return numGetter(a) - numGetter(b);
-    }
+export function mergePortArrays(
+  portArray1: string[],
+  portArray2: string[]
+): string[] {
+  return stringifyPortMappings(
+    mergePortMappings(
+      parsePortMappings(portArray1),
+      parsePortMappings(portArray2)
+    )
   );
 }
 
@@ -147,7 +142,7 @@ export function mergePortMappings(
  */
 export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
   return volumesArray.map(volString => {
-    const [host, container] = volString.split(":");
+    const [host, container] = volString.split(/:(.*)/);
     const isNamed = !host.startsWith("/") && !host.startsWith("~");
     return {
       host,
@@ -155,4 +150,43 @@ export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
       name: isNamed ? host : undefined
     };
   });
+}
+
+export function stringifyVolumeMappings(
+  volumeMappings: VolumeMapping[]
+): string[] {
+  return volumeMappings.map(({ host, container }) =>
+    [host, container].join(":")
+  );
+}
+
+/**
+ * Merges ensuring container paths are unique.
+ * If there are duplicate mappings for the same container path,
+ * the latter mapping will overwrite the others.
+ *
+ * @param volumeMappings1 VolumeMapping array with MORE priority
+ * @param volumeMappings2 VolumeMapping array with LESS priority
+ * @returns merged VolumeMapping array
+ */
+export function mergeVolumeMappings(
+  volumeMappings1: VolumeMapping[],
+  volumeMappings2: VolumeMapping[]
+): VolumeMapping[] {
+  return uniqBy(
+    concat(volumeMappings1, volumeMappings2),
+    ({ container }: VolumeMapping) => container
+  );
+}
+
+export function mergeVolumeArrays(
+  volumeArray1: string[],
+  volumeArray2: string[]
+): string[] {
+  return stringifyVolumeMappings(
+    mergeVolumeMappings(
+      parseVolumeMappings(volumeArray1),
+      parseVolumeMappings(volumeArray2)
+    )
+  );
 }

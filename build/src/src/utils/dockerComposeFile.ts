@@ -99,8 +99,8 @@ export const mergePortMapping = getComposeServiceEditor(
     return {
       ports: composeParser.stringifyPortMappings(
         composeParser.mergePortMappings(
-          composeParser.parsePortMappings(service.ports || []),
-          newPortMappings
+          newPortMappings,
+          composeParser.parsePortMappings(service.ports || [])
         )
       )
     };

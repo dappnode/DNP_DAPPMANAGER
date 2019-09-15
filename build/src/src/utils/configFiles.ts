@@ -2,7 +2,6 @@ import fs from "fs";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
 import { writeComposeObj, readComposeObj } from "./dockerComposeFile";
-import * as envsHelper from "./envsHelper";
 import {
   writeDefaultsToLabels,
   writeMetadataToLabels
@@ -11,7 +10,9 @@ import {
   parseEnvironment,
   stringifyEnvironment,
   parseServiceName,
-  parseService
+  parseService,
+  mergeVolumeArrays,
+  mergePortArrays
 } from "./dockerComposeParsers";
 import params from "../params";
 import {
@@ -22,8 +23,7 @@ import {
   UserSetPackageEnvs,
   UserSetPackageVolsSingle,
   UserSetPackagePortsSingle,
-  PackageEnvs,
-  ComposeService
+  PackageEnvs
 } from "../types";
 
 /**
@@ -38,12 +38,16 @@ export function mergeUserSetToCompose(
     userSetDnpVols = {},
     userSetDnpPorts = {},
     userSetDnpEnvs = {},
-    previousEnvs = {}
+    previousEnvs = [],
+    previousPorts = [],
+    previousVolumes = []
   }: {
     userSetDnpVols: UserSetPackageVolsSingle;
     userSetDnpPorts: UserSetPackagePortsSingle;
     userSetDnpEnvs: PackageEnvs;
-    previousEnvs: PackageEnvs;
+    previousEnvs: string[];
+    previousPorts: string[];
+    previousVolumes: string[];
   }
 ): Compose {
   const serviceName = parseServiceName(compose);
@@ -51,6 +55,16 @@ export function mergeUserSetToCompose(
   const defaultEnvironment = service.environment || [];
   const defaultVolumes = service.volumes || [];
   const defaultPorts = service.ports || [];
+
+  let PROBLEM_WITH_PREVIOUS_VOLUMES;
+  /**
+   * A user installs bitcoin DNP and changes the bind mount of the
+   * chain data to a different HD.
+   * Then, the bitcoin DNP developer changes the bind mount of the
+   * chain data.
+   * How does the DAppNode know that the previous path has to be
+   * renamed and which re-write corresponds to which mapping?
+   */
 
   return {
     ...compose,
@@ -66,11 +80,15 @@ export function mergeUserSetToCompose(
          */
         environment: stringifyEnvironment({
           ...parseEnvironment(defaultEnvironment),
-          ...previousEnvs,
+          ...parseEnvironment(previousEnvs),
           ...userSetDnpEnvs
         }),
-        volumes: defaultVolumes.map(vol => userSetDnpVols[vol] || vol),
-        ports: defaultPorts.map(port => userSetDnpPorts[port] || port),
+        volumes: mergeVolumeArrays(previousVolumes, defaultVolumes).map(
+          vol => userSetDnpVols[vol] || vol
+        ),
+        ports: mergePortArrays(previousPorts, defaultPorts).map(
+          port => userSetDnpPorts[port] || port
+        ),
 
         /**
          * Add the default values as labels
@@ -95,7 +113,7 @@ export function mergeUserSetToCompose(
  * - common dns
  * - DAppNode internal network
  */
-export function addDefaultDataToCompose(
+export function addGeneralDataToCompose(
   compose: Compose,
   {
     metadata,
@@ -181,21 +199,24 @@ export function writeConfigFiles({
   fs.writeFileSync(manifestPath, JSON.stringify(metadata, null, 2));
 
   // Write compose with user set data, and previous
+  const composePath = validate.path(getPath.dockerCompose(name, isCore));
+  const previousService = fs.existsSync(composePath)
+    ? parseService(readComposeObj(composePath))
+    : {};
   const composeWithUserSettings = mergeUserSetToCompose(compose, {
     userSetDnpEnvs: (userSetEnvs || {})[name] || {},
     userSetDnpPorts: (userSetPorts || {})[name] || {},
     userSetDnpVols: (userSetVols || {})[name] || {},
-    previousEnvs: envsHelper.load(name, isCore)
+    previousEnvs: previousService.environment || [],
+    previousPorts: previousService.ports || [],
+    previousVolumes: previousService.volumes || []
   });
-  let CHANGE_OLD_ENVS_SOURCE__NOW_COME_FROM_OLD_COMPOSE;
-  let READ_OLD_PORT_MAPPINGS_FROM_COMPOSE;
 
-  const composeWithUserSettingsAndData = addDefaultDataToCompose(
+  const composeWithUserSettingsAndData = addGeneralDataToCompose(
     composeWithUserSettings,
     { metadata, isCore, origin: origin || "" }
   );
 
-  const composePath = validate.path(getPath.dockerCompose(name, isCore));
   writeComposeObj(composePath, composeWithUserSettingsAndData);
 }
 
