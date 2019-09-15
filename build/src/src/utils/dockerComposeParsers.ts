@@ -3,7 +3,8 @@ import {
   PortMapping,
   PackageEnvs,
   Compose,
-  VolumeMapping
+  VolumeMapping,
+  ComposeService
 } from "../types";
 
 /**
@@ -15,6 +16,10 @@ import {
  */
 export function parseServiceName(compose: Compose): string {
   return Object.keys(compose.services)[0];
+}
+
+export function parseService(compose: Compose): ComposeService {
+  return compose.services[parseServiceName(compose)];
 }
 
 /**

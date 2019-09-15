@@ -10,7 +10,8 @@ import {
 import {
   parseEnvironment,
   stringifyEnvironment,
-  parseServiceName
+  parseServiceName,
+  parseService
 } from "./dockerComposeParsers";
 import params from "../params";
 import {
@@ -21,7 +22,8 @@ import {
   UserSetPackageEnvs,
   UserSetPackageVolsSingle,
   UserSetPackagePortsSingle,
-  PackageEnvs
+  PackageEnvs,
+  ComposeService
 } from "../types";
 
 /**
@@ -200,12 +202,14 @@ export function writeConfigFiles({
 export function readConfigFiles(
   name: string,
   isCore: boolean
-): { manifest: Manifest; compose: Compose } {
+): { manifest: Manifest; compose: Compose; environment: PackageEnvs } {
   const manifestPath = validate.path(getPath.manifest(name, isCore));
   const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
   const composePath = validate.path(getPath.dockerCompose(name, isCore));
   const compose = readComposeObj(composePath);
+  const service = parseService(compose);
+  const environment = parseEnvironment(service.environment || []);
 
-  return { manifest, compose };
+  return { manifest, compose, environment };
 }

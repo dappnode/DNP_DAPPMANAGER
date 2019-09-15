@@ -145,8 +145,8 @@ services:
 services:
   ${normalDnpName}:
     ports:
-      - '32768:30303'
       - '32768:30303/udp'
+      - '32768:30303'
 `,
       "Wrong modified docker-compose"
     );
@@ -172,8 +172,8 @@ services:
 services:
   ${coreDnpName}:
     ports:
-      - '32769:30303'
       - '32769:30303/udp'
+      - '32769:30303'
 `,
       "Wrong modified docker-compose"
     );

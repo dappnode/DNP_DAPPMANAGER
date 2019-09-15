@@ -257,12 +257,13 @@ describe("Full integration test with REAL docker: ", () => {
     }).timeout(5 * 60 * 1000);
 
     // EXTRA, verify that the envs were set correctly
-    it("should had to update DNP ENVs during the installation", () => {
-      const envRes = fs.readFileSync(
-        getPath.envFile(idOtpweb, params, false),
-        "utf8"
-      );
-      expect(envRes).to.include("VIRTUAL_HOST=\nLETSENCRYPT_HOST=");
+    it("should had to update DNP ENVs during the installation", async () => {
+      const dnp = await getDnpFromListPackages(idOtpweb);
+      if (!dnp) throw Error(`DNP ${idOtpweb} not found`);
+      expect(dnp.envs).to.deep.equal({
+        VIRTUAL_HOST: "",
+        LETSENCRYPT_HOST: ""
+      });
     }).timeout(10 * 1000);
 
     // - > logPackage
@@ -293,15 +294,17 @@ describe("Full integration test with REAL docker: ", () => {
       const envValue = String(Date.now());
       const res = await calls.updatePackageEnv({
         id: idOtpweb,
-        envs: { time: envValue },
-        restart: true
+        envs: { time: envValue }
       });
       expect(res).to.have.property("message");
-      const envRes = fs.readFileSync(
-        getPath.envFile(idOtpweb, params, false),
-        "utf8"
-      );
-      expect(envRes).to.include(`time=${envValue}`);
+
+      const dnp = await getDnpFromListPackages(idOtpweb);
+      if (!dnp) throw Error(`DNP ${idOtpweb} not found`);
+      expect(dnp.envs).to.deep.equal({
+        VIRTUAL_HOST: "",
+        LETSENCRYPT_HOST: "",
+        time: envValue
+      });
     }).timeout(120 * 1000);
 
     /**

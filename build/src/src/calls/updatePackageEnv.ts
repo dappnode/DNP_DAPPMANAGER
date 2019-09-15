@@ -10,27 +10,23 @@ import { PackageEnvs, RpcHandlerReturn } from "../types";
  * envs = {
  *   ENV_NAME: ENV_VALUE
  * }
- * @param {bool} restart flag to restart the DNP
  */
 export default async function updatePackageEnv({
   id,
-  envs,
-  restart
+  envs
 }: {
   id: string;
   envs: PackageEnvs;
-  restart: boolean;
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
   if (!envs) throw Error("kwarg envs must be defined");
 
   mergeEnvs(id, envs);
 
-  // External call to calls/restartPackage to prevent code duplication
-  if (restart) await restartPackage({ id });
+  await restartPackage({ id });
 
   return {
-    message: `Updated envs of ${id} ${restart ? "and restarted" : ""} `,
+    message: `Updated ENVs of ${id}`,
     logMessage: true,
     userAction: true
   };
