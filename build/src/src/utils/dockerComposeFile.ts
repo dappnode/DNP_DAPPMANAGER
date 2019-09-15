@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import yaml from "yamljs";
 import * as composeParser from "./dockerComposeParsers";
+import { omit, omitBy, isEmpty, isObject } from "lodash";
 import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
 import params from "../params";
 
@@ -58,10 +59,7 @@ function getComposeServiceEditor<T>(
     writeComposeObj(composePath, {
       ...compose,
       services: {
-        [serviceName]: {
-          ...service,
-          ...serviceEditor(service, newData)
-        }
+        [serviceName]: serviceEditor(service, newData)
       }
     });
   };
@@ -86,6 +84,19 @@ function getComposeServiceGetter<T>(
 export const mergeEnvs = getComposeServiceEditor(
   (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
     return {
+      ...service,
+      environment: composeParser.stringifyEnvironment({
+        ...composeParser.parseEnvironment(service.environment || []),
+        ...newEnvs
+      })
+    };
+  }
+);
+
+export const mergeEnvsAndOmitEnvFile = getComposeServiceEditor(
+  (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
+    return {
+      ...omit(service, "env_file"),
       environment: composeParser.stringifyEnvironment({
         ...composeParser.parseEnvironment(service.environment || []),
         ...newEnvs
@@ -97,6 +108,7 @@ export const mergeEnvs = getComposeServiceEditor(
 export const mergePortMapping = getComposeServiceEditor(
   (service: ComposeService, newPortMappings: PortMapping[]): ComposeService => {
     return {
+      ...service,
       ports: composeParser.stringifyPortMappings(
         composeParser.mergePortMappings(
           newPortMappings,
@@ -114,8 +126,8 @@ export const getPortMappings = getComposeServiceGetter(
 
 export const setPortMapping = getComposeServiceEditor(
   (service: ComposeService, newPortMappings: PortMapping[]): ComposeService => {
-    service;
     return {
+      ...service,
       ports: composeParser.stringifyPortMappings(newPortMappings)
     };
   }

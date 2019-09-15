@@ -123,14 +123,16 @@ export function getFileTransferPath(fileId: string): string | null {
 // Notification DB
 //////////////////
 
+const NOTIFICATION = "notification";
+
 export function setNotification(
   id: string,
   notification: PackageNotification
 ): void {
-  set(`notification.${id}`, notification);
+  set(`${NOTIFICATION}.${id}`, notification);
 }
 export function getNotifications(): { [id: string]: PackageNotification } {
-  return get("notification") || {};
+  return get(NOTIFICATION) || {};
 }
 
 // AutoUpdate methods
@@ -166,23 +168,39 @@ export function getAutoUpdateRegistry(): AutoUpdateRegistry {
 // UPnP, and ports info
 ///////////////////////
 
+const UPNP_AVAILABLE = "upnpAvailable";
+const UPNP_PORT_MAPPINGS = "upnpPortMappings";
+const PORTS_TO_OPEN = "portsToOpen";
+
 export function setUpnpAvailable(upnpAvailable: boolean): void {
-  set("upnpAvailable", upnpAvailable);
+  set(UPNP_AVAILABLE, upnpAvailable);
 }
 export function getUpnpAvailable(): boolean {
-  return get("upnpAvailable") || false;
+  return get(UPNP_AVAILABLE) || false;
 }
 
 export function setUpnpPortMappings(upnpPortMappings: UpnpPortMapping[]): void {
-  set("upnpPortMappings", upnpPortMappings);
+  set(UPNP_PORT_MAPPINGS, upnpPortMappings);
 }
 export function getUpnpPortMappings(): UpnpPortMapping[] {
-  return get("upnpPortMappings") || [];
+  return get(UPNP_PORT_MAPPINGS) || [];
 }
 
 export function setPortsToOpen(portsToOpen: PackagePort[]): void {
-  set("portsToOpen", portsToOpen);
+  set(PORTS_TO_OPEN, portsToOpen);
 }
 export function getPortsToOpen(): PackagePort[] {
-  return get("portsToOpen") || [];
+  return get(PORTS_TO_OPEN) || [];
+}
+
+// Additional system info
+/////////////////////////
+
+const ARE_ENV_FILES_MIGRATED = "areEnvFilesMigrated";
+
+export function setAreEnvFilesMigrated(areEnvFilesMigrated: boolean): void {
+  set(ARE_ENV_FILES_MIGRATED, areEnvFilesMigrated);
+}
+export function getAreEnvFilesMigrated(): boolean {
+  return get(ARE_ENV_FILES_MIGRATED);
 }

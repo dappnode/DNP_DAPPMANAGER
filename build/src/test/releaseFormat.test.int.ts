@@ -192,7 +192,11 @@ const releaseTests: {
 
 describe("Release format tests", () => {
   before("Create DAppNode docker network", async () => {
-    await shell(`docker network create ${params.DNP_NETWORK_EXTERNAL_NAME}`);
+    const dncoreNetwork = params.DNP_NETWORK_EXTERNAL_NAME;
+    const networkExists = await shell(
+      `docker network ls --filter name=${dncoreNetwork} -q`
+    );
+    if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
   });
 
   for (const releaseTest of releaseTests) {

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "NODE_ENV=development npm start",
+    "dev": "NODE_ENV=development npm run start",
     "build": "node_modules/.bin/tsc && npm run lint",
     "watch-ts": "./node_modules/.bin/tsc -w",
     "file": "node",
@@ -16,7 +16,8 @@
     "test:all": "npm run test && npm run test:int",
     "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "lint": "./node_modules/.bin/eslint . --ext .ts --fix",
-    "pre-commit": "npm run build && npm run test"
+    "pre-commit": "npm run build && npm run test",
+    "clean": "rm -rf DNCORE/ .temp-transfer/ cache/ dist/"
   },
   "author": "dappLion",
   "license": "ISC",
