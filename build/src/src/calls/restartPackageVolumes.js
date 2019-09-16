@@ -14,7 +14,7 @@ const { uniqueValues } = require("utils/arrays");
  *
  * @param {string} id DNP .eth name
  */
-async function restartPackageVolumes({ id, doNotRestart }) {
+async function restartPackageVolumes({ id, doNotRestart, volumeId }) {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await dockerList.listContainers();
@@ -37,11 +37,17 @@ async function restartPackageVolumes({ id, doNotRestart }) {
    * }
    */
   const namedOwnedVolumes = (dnp.volumes || []).filter(
-    vol => vol.name && vol.isOwner
+    vol => vol.name && vol.isOwner && (!volumeId || volumeId === vol.name)
   );
   // If there are no volumes don't do anything
   if (!namedOwnedVolumes.length)
-    return { message: `${id} has no named volumes` };
+    if (volumeId) throw Error(`Volume ${volumeId} of ${id} not found`);
+    else
+      return {
+        message: `${id} has no named volumes`,
+        logMessage: true,
+        userAction: true
+      };
 
   // Destructure result and append the current requested DNP (id)
   const volumeNames = namedOwnedVolumes.map(vol => vol.name);
