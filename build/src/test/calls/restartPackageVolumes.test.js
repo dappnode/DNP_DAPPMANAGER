@@ -192,6 +192,27 @@ describe("Call function: restartPackageVolumes", function() {
     sinon.assert.called(docker.safe.compose.up);
   });
 
+  it(`Should remove only one of the package volumes of ${dnpNameCore} (core)`, async () => {
+    const res = await restartPackageVolumes({
+      id: dnpNameCore,
+      volumeId: "vol1"
+    });
+    expect(res).to.be.ok;
+    expect(res).to.have.property("message");
+
+    // sinon.assert.called(docker.compose.rm);
+    sinon.assert.callCount(docker.compose.rm, 1);
+    // Assert correct call order for volumeRm
+    const volumesInOrder = ["vol1"];
+    volumesInOrder.forEach((volName, i) => {
+      expect(docker.volume.rm.getCall(i).args[0]).to.equal(
+        volName,
+        `Wrong volume name on docker.volume.rm call #${i}`
+      );
+    });
+    sinon.assert.called(docker.safe.compose.up);
+  });
+
   it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {
     const res = await restartPackageVolumes({ id: raidenTestnetId });
     expect(res).to.be.ok;
