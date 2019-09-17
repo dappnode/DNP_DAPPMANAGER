@@ -3,7 +3,8 @@ import { PackageVersionData } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
 
-const versionDataJsonPath = "../../.version.json";
+const VERSION_DATA_FILE = "/usr/src/app/.version.json";
+const versionDataJsonPath = VERSION_DATA_FILE;
 
 /**
  * For debugging, print current version, branch and commit
