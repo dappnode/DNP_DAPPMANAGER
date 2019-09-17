@@ -229,16 +229,16 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.have.property("message");
 
     // sinon.assert.called(docker.compose.rm);
-    sinon.assert.callCount(docker.compose.rm, 1);
+    sinon.assert.callCount(dockerComposeRm, 1);
     // Assert correct call order for volumeRm
     const volumesInOrder = ["vol1"];
     volumesInOrder.forEach((volName, i) => {
-      expect(docker.volume.rm.getCall(i).args[0]).to.equal(
+      expect(dockerVolumeRm.getCall(i).args[0]).to.equal(
         volName,
         `Wrong volume name on docker.volume.rm call #${i}`
       );
     });
-    sinon.assert.called(docker.safe.compose.up);
+    sinon.assert.called(dockerComposeUpSafe);
   });
 
   it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {

@@ -21,10 +21,12 @@ const logs = Logs(module);
  */
 export default async function restartPackageVolumes({
   id,
-  doNotRestart
+  doNotRestart,
+  volumeId
 }: {
   id: string;
   doNotRestart?: boolean;
+  volumeId?: string;
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
@@ -45,11 +47,17 @@ export default async function restartPackageVolumes({
    * }
    */
   const namedOwnedVolumes = (dnp.volumes || []).filter(
-    vol => vol.name && vol.isOwner
+    vol => vol.name && vol.isOwner && (!volumeId || volumeId === vol.name)
   );
   // If there are no volumes don't do anything
   if (!namedOwnedVolumes.length)
-    return { message: `${id} has no named volumes` };
+    if (volumeId) throw Error(`Volume ${volumeId} of ${id} not found`);
+    else
+      return {
+        message: `${id} has no named volumes`,
+        logMessage: true,
+        userAction: true
+      };
 
   // Destructure result and append the current requested DNP (id)
   const volumeNames = namedOwnedVolumes.map(vol => vol.name);
