@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "yamljs";
+import yaml from "js-yaml";
 import * as composeParser from "./dockerComposeParsers";
 import { omit, omitBy, isEmpty, isObject } from "lodash";
 import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
@@ -23,16 +23,36 @@ export function getDockerComposePath(id: string, newFile?: boolean): string {
   else throw Error(`No docker-compose found for ${id}`);
 }
 
+export function parseComposeObj(composeString: string): Compose {
+  try {
+    return yaml.safeLoad(composeString);
+  } catch (e) {
+    throw Error(`Error parseing compose yaml: ${e.message}`);
+  }
+}
+
 export function readComposeObj(dockerComposePath: string): Compose {
   const dcString = fs.readFileSync(dockerComposePath, "utf-8");
-  return yaml.parse(dcString);
+  return parseComposeObj(dcString);
 }
 
 export function writeComposeObj(
   dockerComposePath: string,
-  composeObj: Compose
+  compose: Compose
 ): void {
-  const composeString = yaml.stringify(composeObj, 8, 2);
+  // Clean empty arrays and objects
+  const serviceName = composeParser.parseServiceName(compose);
+  const cleanCompose = {
+    ...compose,
+    services: {
+      [serviceName]: omitBy(
+        compose.services[serviceName],
+        el => isObject(el) && isEmpty(el)
+      )
+    }
+  };
+
+  const composeString = yaml.safeDump(cleanCompose);
   fs.writeFileSync(dockerComposePath, composeString, "utf-8");
 }
 

@@ -12,17 +12,17 @@ import parseResult from "./parseResult";
  * @returns {string} latestVersion = "0.2.4"
  */
 export default async function fetchLatestVersion(
-  dnpName: string,
+  name: string,
   version: string
 ): Promise<ApmVersion> {
   const semverObj = semver.parse(version);
   if (!semverObj) throw Error(`Invalid semver ${version}`);
 
   // Load cache if available
-  const cachedResult = db.getApmCache(dnpName, version);
+  const cachedResult = db.apmCache.get({ name, version });
   if (cachedResult) return cachedResult;
 
-  const repoAddr = await fetchRepoAddress(dnpName);
+  const repoAddr = await fetchRepoAddress(name);
   const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
 
   const apmVersion = await repo.methods
@@ -32,7 +32,7 @@ export default async function fetchLatestVersion(
 
   // Validate and store cache
   if (apmVersion.version === version)
-    db.setApmCache(dnpName, version, apmVersion);
+    db.apmCache.set({ name, version }, apmVersion);
 
   return apmVersion;
 }

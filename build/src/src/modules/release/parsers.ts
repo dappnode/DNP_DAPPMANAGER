@@ -18,12 +18,9 @@ const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
 
 export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
-  const { name, version, image } = manifest;
+  const { name, image } = manifest;
   const serviceName = name;
-
-  // Assume not allowed core condition is already verified
-  const isCore = manifest.type === "dncore";
-  const namePrefix = isCore ? containerCoreNamePrefix : containerNamePrefix;
+  const isCore = getIsCore(manifest);
 
   const volumes: ComposeVolumes = {};
   if (manifest.image.volumes)
@@ -48,8 +45,6 @@ export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
     version: "3.4",
     services: {
       [serviceName]: {
-        container_name: `${namePrefix}${name}`,
-        image: `${name}:${version}`,
         ...pick(image, [
           "ports",
           "environment",
@@ -74,8 +69,10 @@ export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
           : {})
       }
     },
+
     // Volumes
     ...(isEmpty(volumes) ? {} : { volumes }),
+
     // Networks
     ...(isCore && image.subnet
       ? {
@@ -96,18 +93,21 @@ export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
 export function parseMetadataFromManifest(
   manifest: Manifest
 ): PackageReleaseMetadata {
-  // ##### Is this necessary? Correct manifest: type missing
-  if (!manifest.type) manifest.type = "service";
-
-  return omit(manifest as ManifestWithImage, ["avatar", "image"]);
+  return {
+    ...omit(manifest as ManifestWithImage, ["avatar", "image"]),
+    // ##### Is this necessary? Correct manifest: type missing
+    type: manifest.type || "service"
+  };
 }
 
 export function sanitizeCompose(
   composeUnsafe: ComposeUnsafe,
-  isCore: boolean
+  manifest: Manifest
 ): Compose {
   const serviceName = Object.keys(composeUnsafe.services)[0];
   const service = composeUnsafe.services[serviceName];
+  const { name, version } = manifest;
+  const isCore = getIsCore(manifest);
 
   /* eslint-disable @typescript-eslint/camelcase */
   const serviceFiltered = pick(service, [
@@ -133,11 +133,37 @@ export function sanitizeCompose(
   // From networks
   if (!isCore) delete composeUnsafe.networks;
 
-  /* eslint-enable @typescript-eslint/camelcase */
   return {
     ...pick(composeUnsafe, ["version", "networks", "volumes"]),
     services: {
-      [serviceName]: serviceFiltered
+      [name]: {
+        ...serviceFiltered,
+        container_name: getContainerName(name, isCore),
+        image: getImage(name, version),
+        restart: service.restart || "always",
+        logging: {
+          options: {
+            "max-size": "10m",
+            "max-file": "3"
+          }
+        }
+      }
     }
   };
+  /* eslint-enable @typescript-eslint/camelcase */
+}
+
+// Minor utils
+
+export function getIsCore(manifest: Manifest): boolean {
+  return manifest.type === "dncore";
+}
+
+function getContainerName(name: string, isCore: boolean): string {
+  // Note: the prefixes already end with the character "-"
+  return `${isCore ? containerCoreNamePrefix : containerNamePrefix}${name}`;
+}
+
+function getImage(name: string, version: string): string {
+  return `${name}:${version}`;
 }

@@ -113,13 +113,7 @@ export interface ComposeVolumes {
   };
 }
 
-export interface ComposeService {
-  build?:
-    | {
-        context: string; // ".";
-        dockerfile: string; // "./build/Dockerfile";
-      }
-    | string;
+interface ComposeServiceBase {
   container_name?: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   image?: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
@@ -137,7 +131,24 @@ export interface ComposeService {
   devices?: string[];
   network_mode?: string;
   command?: string;
-  logging?: {
+}
+
+export interface ComposeServiceUnsafe extends ComposeServiceBase {
+  build?:
+    | {
+        context: string; // ".";
+        dockerfile: string; // "./build/Dockerfile";
+      }
+    | string;
+  container_name?: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  image?: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+}
+
+export interface ComposeService extends ComposeServiceBase {
+  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+  env_file?: string[];
+  logging: {
     options: {
       "max-size": string; // "10m",
       "max-file": string; // "3"
@@ -145,9 +156,7 @@ export interface ComposeService {
   };
 }
 
-export type ComposeUnsafe = Compose;
-
-export interface Compose {
+interface ComposeBase {
   version: string; // "3.4"
   networks?: {
     [networkName: string]: {
@@ -157,6 +166,16 @@ export interface Compose {
     };
   };
   volumes?: ComposeVolumes; // { dappmanagerdnpdappnodeeth_data: {} };
+}
+
+export interface ComposeUnsafe extends ComposeBase {
+  // dnpName: "dappmanager.dnp.dappnode.eth"
+  services: {
+    [dnpName: string]: ComposeServiceUnsafe;
+  };
+}
+
+export interface Compose extends ComposeBase {
   // dnpName: "dappmanager.dnp.dappnode.eth"
   services: {
     [dnpName: string]: ComposeService;

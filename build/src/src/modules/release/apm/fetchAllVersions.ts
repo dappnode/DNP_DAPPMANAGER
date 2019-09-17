@@ -15,13 +15,13 @@ const logs = Logs(module);
  * @returns {*}
  */
 export default async function fetchAllVersions(
-  repoName: string,
+  name: string,
   verReq: string
 ): Promise<ApmVersion[]> {
   // If verReq is not provided or invalid, default to all versions
   if (!verReq || semver.validRange(verReq)) verReq = "*";
 
-  const repoAddr = await fetchRepoAddress(repoName);
+  const repoAddr = await fetchRepoAddress(name);
   const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
 
   const versionCount = parseFloat(await repo.methods.getVersionsCount().call());

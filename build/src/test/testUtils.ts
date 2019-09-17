@@ -8,7 +8,8 @@ import {
   PortMapping,
   PackageRelease,
   Compose,
-  ManifestWithImage
+  ManifestWithImage,
+  ComposeService
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
@@ -180,14 +181,22 @@ export const mockDirectoryDnp: DirectoryDnp = {
   featuredIndex: 0
 };
 
+export const mockComposeService: ComposeService = {
+  image: `${mockDnpName}:${mockDnpVersion}`,
+  /* eslint-disable-next-line @typescript-eslint/camelcase */
+  container_name: `DAppNodePackage-${mockDnpName}`,
+  logging: {
+    options: {
+      "max-size": "10m",
+      "max-file": "3"
+    }
+  }
+};
+
 export const mockCompose: Compose = {
   version: "3.4",
   services: {
-    [mockDnpName]: {
-      image: `${mockDnpName}:${mockDnpVersion}`,
-      /* eslint-disable-next-line @typescript-eslint/camelcase */
-      container_name: `DAppNodePackage-${mockDnpName}`
-    }
+    [mockDnpName]: mockComposeService
   }
 };
 

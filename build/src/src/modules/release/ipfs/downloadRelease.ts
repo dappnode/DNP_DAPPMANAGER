@@ -8,6 +8,7 @@ import {
   ComposeUnsafe
 } from "../../../types";
 import { validateManifestWithImageData } from "../validate";
+import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose } from "../parsers";
 
 /**
@@ -28,7 +29,8 @@ export default async function downloadRelease(
   composeUnsafe: ComposeUnsafe;
   manifest: Manifest;
 }> {
-  //
+  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
+
   try {
     const manifest: Manifest = await downloadManifest(hash);
     const manifestWithImage: ManifestWithImage = manifest as ManifestWithImage;

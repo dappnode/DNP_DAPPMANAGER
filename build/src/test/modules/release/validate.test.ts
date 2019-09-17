@@ -6,7 +6,7 @@ import {
   validateAvatar,
   validateImage,
   validateManifestBasic,
-  validateCompose
+  validateComposeOrUnsafe
 } from "../../../src/modules/release/validate";
 import {
   testDir,
@@ -134,18 +134,18 @@ describe("Release > validate", () => {
 
   describe("validateCompose", () => {
     it("Should validate a valid compose", () => {
-      expect(validateCompose(mockCompose)).to.deep.equal(successReturn);
+      expect(validateComposeOrUnsafe(mockCompose)).to.deep.equal(successReturn);
     });
 
     it("Should reject an empty compose", () => {
-      expect(validateCompose({} as Compose)).to.deep.include(
+      expect(validateComposeOrUnsafe({} as Compose)).to.deep.include(
         errorReturnNoMessage
       );
     });
 
     it("Should validate a compose with unknown extra props", () => {
       expect(
-        validateCompose({ ...mockCompose, extraProp: true } as Compose)
+        validateComposeOrUnsafe({ ...mockCompose, extraProp: true } as Compose)
       ).to.deep.include(successReturn);
     });
   });

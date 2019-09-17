@@ -10,9 +10,9 @@ import parseResult from "./parseResult";
  * @returns {string} latestVersion = "0.2.4"
  */
 export default async function fetchLatestVersion(
-  dnpName: string
+  name: string
 ): Promise<ApmVersion> {
-  const repoAddr = await fetchRepoAddress(dnpName);
+  const repoAddr = await fetchRepoAddress(name);
   const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
 
   const res = await repo.methods.getLatest().call();

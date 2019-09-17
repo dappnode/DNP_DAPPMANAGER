@@ -55,8 +55,8 @@ jobs:
 
     # Test that it builds correctly
     ###############################
-    - stage: build-test
-      name: build-test
+    - stage: test
+      name: Docker build test
       services:
         - docker
       script:

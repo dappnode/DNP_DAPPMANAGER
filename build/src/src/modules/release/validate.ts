@@ -1,7 +1,7 @@
 import Joi from "joi";
 import fs from "fs";
 import verifyXz from "../../utils/verifyXz";
-import { Manifest, Compose } from "../../types";
+import { Manifest, Compose, ComposeUnsafe } from "../../types";
 
 export interface ValidateReturn {
   success: boolean;
@@ -114,7 +114,9 @@ export function validateManifestWithImageData(
   };
 }
 
-export function validateCompose(compose: Compose): ValidateReturn {
+export function validateComposeOrUnsafe(
+  compose: Compose | ComposeUnsafe
+): ValidateReturn {
   const result = Joi.validate(
     compose,
     Joi.object({

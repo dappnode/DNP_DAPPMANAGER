@@ -27,7 +27,8 @@ import {
   UserSetPackageEnvs,
   UserSetPackageVolsSingle,
   UserSetPackagePortsSingle,
-  PackageEnvs
+  PackageEnvs,
+  ComposeService
 } from "../types";
 
 /**
@@ -206,7 +207,7 @@ export function writeConfigFiles({
   const composePath = validate.path(getPath.dockerCompose(name, isCore));
   const previousService = fs.existsSync(composePath)
     ? parseService(readComposeObj(composePath))
-    : {};
+    : ({} as ComposeService);
   const composeWithUserSettings = mergeUserSetToCompose(compose, {
     userSetDnpEnvs: (userSetEnvs || {})[name] || {},
     userSetDnpPorts: (userSetPorts || {})[name] || {},

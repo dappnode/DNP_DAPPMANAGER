@@ -27,11 +27,11 @@ export default async function listPackages(): Promise<RpcListPackagesReturn> {
   // Append envFile and manifest
   dnpList.map(dnp => {
     try {
-      const { manifest, environment } = readConfigFiles(dnp.name, dnp.isCore);
+      const { manifest, environment } = readConfigFiles(dnp);
       dnp.manifest = manifest;
       dnp.envs = environment;
     } catch (e) {
-      logs.warn(`Error appending ${(dnp || {}).name} files: ${e.message}`);
+      logs.warn(`Error appending ${dnp.name} files: ${e.stack || e.message}`);
     }
   });
 

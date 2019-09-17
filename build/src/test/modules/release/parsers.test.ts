@@ -5,8 +5,17 @@ import {
   parseMetadataFromManifest,
   sanitizeCompose
 } from "../../../src/modules/release/parsers";
-import { mockManifestWithImage, mockCompose } from "../../testUtils";
-import { ManifestWithImage, Manifest, Compose } from "../../../src/types";
+import {
+  mockManifestWithImage,
+  mockCompose,
+  mockManifest
+} from "../../testUtils";
+import {
+  ManifestWithImage,
+  Manifest,
+  Compose,
+  ComposeUnsafe
+} from "../../../src/types";
 
 /* eslint-disable @typescript-eslint/camelcase */
 describe("Release > parsers", () => {
@@ -29,12 +38,10 @@ describe("Release > parsers", () => {
         }
       };
 
-      const expectedCompose: Compose = {
+      const expectedCompose: ComposeUnsafe = {
         ...mockCompose,
         services: {
           [name]: {
-            image: "mock-dnp.dappnode.eth:0.0.0",
-            container_name: "DAppNodePackage-mock-dnp.dappnode.eth",
             ports,
             volumes
           }
@@ -53,15 +60,14 @@ describe("Release > parsers", () => {
         image: emptyImage
       };
 
-      expect(manifestToCompose(manifest)).to.deep.equal({
+      const expectedCompose: ComposeUnsafe = {
         version: "3.4",
         services: {
-          [name]: {
-            image: "mock-dnp.dappnode.eth:0.0.0",
-            container_name: "DAppNodePackage-mock-dnp.dappnode.eth"
-          }
+          [name]: {}
         }
-      });
+      };
+
+      expect(manifestToCompose(manifest)).to.deep.equal(expectedCompose);
     });
   });
 
@@ -92,6 +98,7 @@ describe("Release > parsers", () => {
         services: {
           [serviceName]: {
             ...mockCompose.services[serviceName],
+            restart: "always",
             ports,
             volumes
           }
@@ -118,9 +125,9 @@ describe("Release > parsers", () => {
         }
       };
 
-      expect(sanitizeCompose(composeWithExtraProps, false)).to.deep.equal(
-        okCompose
-      );
+      expect(
+        sanitizeCompose(composeWithExtraProps, mockManifest)
+      ).to.deep.equal(okCompose);
     });
   });
 });

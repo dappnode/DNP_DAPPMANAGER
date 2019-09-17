@@ -2,7 +2,11 @@ import resolveReleaseName from "./resolveReleaseName";
 import downloadRelease from "./ipfs/downloadRelease";
 import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";
-import { parseMetadataFromManifest, sanitizeCompose } from "./parsers";
+import {
+  parseMetadataFromManifest,
+  sanitizeCompose,
+  getIsCore
+} from "./parsers";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -40,17 +44,15 @@ export default async function getRelease(
   if (isEnsDomain(name) && name !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
 
-  const isCore = manifest.type === "dncore";
-
   return {
     name,
     version: manifest.version,
     origin,
-    isCore,
+    isCore: getIsCore(manifest),
     manifestFile,
     imageFile,
     avatarFile,
     metadata: parseMetadataFromManifest(manifest),
-    compose: sanitizeCompose(composeUnsafe, isCore)
+    compose: sanitizeCompose(composeUnsafe, manifest)
   };
 }

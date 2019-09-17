@@ -2,6 +2,7 @@ import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import { Manifest } from "../../../types";
 import { validateManifestBasic } from "../validate";
+import { isIpfsHash } from "../../../utils/validate";
 
 const maxLength = 100e3; // Limit manifest size to ~100KB
 
@@ -19,15 +20,14 @@ const maxLength = 100e3; // Limit manifest size to ~100KB
 export default async function downloadManifest(
   hash: string
 ): Promise<Manifest> {
-  if (!hash || typeof hash !== "string")
-    throw Error(`arg hash must be a string: ${hash}`);
+  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   /**
    * 1. Check if cache exist and validate it
    * The manifest is stored un-parsed. The validate function will
    * parse it and return a valid object if the validation succeeeds
    */
-  const manifestCache = db.getManifestCache(hash);
+  const manifestCache = db.manifestCache.get(hash);
   if (manifestCache && validateManifestBasic(manifestCache).success)
     return manifestCache;
 
@@ -51,6 +51,6 @@ export default async function downloadManifest(
   if (!validation.success)
     throw Error(`Invalid manifest from ${hash}: ${validation.message}`);
 
-  db.setManifestCache(hash, manifest);
+  db.manifestCache.set(hash, manifest);
   return manifest;
 }

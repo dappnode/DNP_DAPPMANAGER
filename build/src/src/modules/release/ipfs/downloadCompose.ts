@@ -1,8 +1,9 @@
 import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import { ComposeUnsafe } from "../../../types";
-import { validateCompose } from "../validate";
-import yaml from "yamljs";
+import { validateComposeOrUnsafe } from "../validate";
+import { parseComposeObj } from "../../../utils/dockerComposeFile";
+import { isIpfsHash } from "../../../utils/validate";
 
 const maxLength = 100e3; // Limit manifest size to ~100KB
 
@@ -20,16 +21,15 @@ const maxLength = 100e3; // Limit manifest size to ~100KB
 export default async function downloadCompose(
   hash: string
 ): Promise<ComposeUnsafe> {
-  if (!hash || typeof hash !== "string")
-    throw Error(`arg hash must be a string: ${hash}`);
+  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   /**
    * 1. Check if cache exist and validate it
    * The manifest is stored un-parsed. The validate function will
    * parse it and return a valid object if the validation succeeeds
    */
-  const composeCache = db.getComposeCache(hash);
-  if (composeCache && validateCompose(composeCache).success)
+  const composeCache = db.composeCache.get(hash);
+  if (composeCache && validateComposeOrUnsafe(composeCache).success)
     return composeCache;
 
   /**
@@ -39,7 +39,7 @@ export default async function downloadCompose(
   const composeString = await ipfs.catString({ hash, maxLength });
   let composeUnsafe: ComposeUnsafe;
   try {
-    composeUnsafe = yaml.parse(composeString);
+    composeUnsafe = parseComposeObj(composeString);
   } catch (e) {
     throw Error(`Error parsing compose string: ${e.message}`);
   }
@@ -48,12 +48,12 @@ export default async function downloadCompose(
    * 3. Validate downloaded compose
    * Store the un-parsed manifest in the cache
    */
-  const validation = validateCompose(composeUnsafe);
+  const validation = validateComposeOrUnsafe(composeUnsafe);
   if (!validation.success)
     throw Error(
       `Downloaded compose from ${hash} failed validation: ${validation.message}`
     );
 
-  db.setComposeCache(hash, composeUnsafe);
+  db.composeCache.set(hash, composeUnsafe);
   return composeUnsafe;
 }

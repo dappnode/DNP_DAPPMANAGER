@@ -32,7 +32,7 @@ export default async function notificationsTest({
     };
   }
 
-  db.setNotification(notification.id, notification);
+  db.notification.set(notification.id, notification);
 
   eventBus.notification.emit(notification);
 

@@ -148,7 +148,7 @@ connection.onopen = (session, details): void => {
   });
 
   eventBus.notification.on((notification: PackageNotification) => {
-    db.setNotification(notification.id, notification);
+    db.notification.set(notification.id, notification);
     publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
   });
 
@@ -178,7 +178,7 @@ logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 async function runLegacyOps(): Promise<void> {
   try {
-    if (!db.getAreEnvFilesMigrated()) {
+    if (!db.areEnvFilesMigrated.get()) {
       const { result: dnpList } = await calls.listPackages();
       for (const dnp of dnpList) {
         const hasConverted = convertLegacyEnvFiles(dnp);
@@ -186,10 +186,10 @@ async function runLegacyOps(): Promise<void> {
           logs.info(`Converted ${dnp.name} .env file to compose environment`);
       }
       logs.info(`Finished converting legacy .env files without errors`);
-      db.setAreEnvFilesMigrated(true);
+      db.areEnvFilesMigrated.set(true);
     }
   } catch (e) {
-    logs.error(`Error converting legacy .env files: ${e.stack}`);
+    logs.error(`Error converting legacy .env files: ${e.stack || e.message}`);
   }
 }
 
