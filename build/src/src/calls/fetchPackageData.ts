@@ -1,12 +1,14 @@
+import { pick } from "lodash";
 import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import Logs from "../logs";
-import { Manifest, RpcHandlerReturn } from "../types";
+import { RpcHandlerReturn, ManifestWithImage, PackageRelease } from "../types";
+import { parseService } from "../utils/dockerComposeParsers";
 const logs = Logs(module);
 
 interface RpcFetchPackageDataReturn extends RpcHandlerReturn {
   result: {
-    manifest: Manifest;
+    manifest: ManifestWithImage;
     avatar: string | null;
   };
 }
@@ -45,11 +47,30 @@ export default async function fetchPackageData({
     }
   }
 
+  const legacyManifest = getLegacyManifestFromRelease(release);
+
   return {
     message: `Got data of ${id}`,
     result: {
-      manifest: release.metadata,
+      manifest: legacyManifest,
       avatar: avatar
+    }
+  };
+}
+
+export function getLegacyManifestFromRelease({
+  compose,
+  imageFile,
+  metadata
+}: PackageRelease): ManifestWithImage {
+  const service = parseService(compose);
+  return {
+    ...metadata,
+    image: {
+      hash: imageFile.hash,
+      size: imageFile.size,
+      path: "legacy-path",
+      ...pick(service, ["ports", "volumes", "environment"])
     }
   };
 }

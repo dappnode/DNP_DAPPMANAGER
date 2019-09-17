@@ -6,6 +6,7 @@ import isSyncing from "../utils/isSyncing";
 import { isIpfsHash } from "../utils/validate";
 import { DirectoryDnp, RpcHandlerReturn } from "../types";
 import Logs from "../logs";
+import { getLegacyManifestFromRelease } from "./fetchPackageData";
 const logs = Logs(module);
 
 interface RpcFetchDirectoryReturn extends RpcHandlerReturn {
@@ -57,10 +58,12 @@ export default async function fetchDirectory(): Promise<
     dnpsFromDirectory.map(async pkg => {
       const name = pkg.name;
       // Now resolve the last version of the package
-      const { metadata: manifest, avatarFile } = await getRelease(name);
-      emitPkg({ ...pkg, name, manifest });
+      const release = await getRelease(name);
+      const legacyManifest = getLegacyManifestFromRelease(release);
+      emitPkg({ ...pkg, name, manifest: legacyManifest });
 
       // Fetch the package avatar
+      const avatarFile = release.avatarFile;
       let avatar;
       if (avatarFile && isIpfsHash(avatarFile.hash)) {
         const avatarHash = avatarFile.hash;
@@ -86,7 +89,7 @@ export default async function fetchDirectory(): Promise<
         ...pkg,
         name,
         // Appended
-        manifest,
+        manifest: legacyManifest,
         avatar
       };
     })

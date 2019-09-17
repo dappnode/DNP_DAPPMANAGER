@@ -1,7 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock";
-import { mockManifest, mockDirectoryDnp, mockRelease } from "../testUtils";
+import {
+  mockManifest,
+  mockDirectoryDnp,
+  mockRelease,
+  mockHash,
+  mockSize
+} from "../testUtils";
 // Imports for typings
 import fetchDirectoryType from "../../src/calls/fetchDirectory";
 import { DirectoryDnp, PackageRelease } from "../../src/types";
@@ -56,10 +62,17 @@ describe("Call function: fetchDirectory", function() {
     });
 
     it("should return success message and the directory data", async () => {
-      const expectedDirectoryReturn: DirectoryDnp[] = [
+      const expectedDirectoryReturn = [
         {
           ...mockDirectoryDnp,
-          manifest,
+          manifest: {
+            ...manifest,
+            image: {
+              hash: mockHash,
+              size: mockSize,
+              path: "legacy-path"
+            }
+          },
           avatar: avatarContent
         }
       ];
