@@ -393,6 +393,9 @@ export interface PackageReleaseMetadata {
   requirements?: {
     minimumDappnodeVersion: string;
   };
+  globalEnvs?: {
+    all?: boolean;
+  };
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {
