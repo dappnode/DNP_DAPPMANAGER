@@ -6,6 +6,7 @@ import params from "./params";
 import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
 import initializeDb from "./initializeDb";
+import * as globalEnvsFile from "./utils/globalEnvsFile";
 import {
   ChainData,
   DirectoryDnp,
@@ -35,6 +36,10 @@ import "./httpApi";
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
+
+// Create the global env file
+globalEnvsFile.createFile();
+globalEnvsFile.setEnvs({ DAPPNODE_GLOBAL_ENVS_ACTIVE: "true" });
 
 // Initial calls to check this DAppNode's status
 calls
@@ -143,7 +148,7 @@ connection.onopen = (session, details): void => {
   eventBus.logUserAction.on((userActionLog: UserActionLog) => {
     publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
   });
-  
+
   /**
    * Receives userAction logs from the VPN nodejs app
    * See above for more details on userActionLog
