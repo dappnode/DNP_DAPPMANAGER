@@ -3,6 +3,7 @@ build/src/tmp_dnp_repo/
 build/src/dnp_repo/
 build/src/DNCORE/
 build/src/cache/
+build/src/dist/
 build/src/dappmanagerdb.json
 test_build/
 .DS_Store
@@ -24,3 +25,4 @@ node_modules/\.yarn-integrity
 
 # Typescript build artifacts
 build/src/dist/
+build/src/.temp-transfer/

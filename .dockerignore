@@ -11,9 +11,14 @@ build/src/dappmanagerdb.json
 
 # Test artifacts
 test_build/
+test_build/*
+test_build/.git/
+test_build/.git/*
 build/src/undefined/
 build/src/test_files/
 build/src/test_files/*
+build/src/.temp-transfer/
+build/src/.temp-transfer/*
 
 # Version data file
 .version.json

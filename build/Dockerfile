@@ -33,11 +33,6 @@ RUN yarn add typescript
 COPY build/src .
 RUN yarn build
 
-# Typescript files
-# While there is mixed content, .ts files get compiled in the same location
-# to .js files, so the .ts should be ignored (deleted)
-RUN rm src/**/*.ts
-
 
 # Layer 3: Final layer
 #####################################
@@ -95,6 +90,6 @@ RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts 
 # Copy the src last as it's the layer most likely to change
 COPY --from=build-deps /usr/src/app /usr/src/app
 COPY build/src/test /usr/src/app/test
-COPY --from=build-src /usr/src/app/src /usr/src/app/src
+COPY --from=build-src /usr/src/app/dist /usr/src/app/src
 
 ENTRYPOINT /usr/src/app/entrypoint.sh
