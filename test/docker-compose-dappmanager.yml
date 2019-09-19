@@ -17,7 +17,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     dns: 172.33.1.2
     environment:
-      - WEB3_HOST_WS=https://mainnet.infura.io/metamask
+      - WEB3_HOST=https://mainnet.infura.io/metamask
       - IPFS_HOST=ipfs.infura.io
       - IPFS_PROTOCOL=https
     networks:

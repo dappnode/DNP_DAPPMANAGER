@@ -1,0 +1,62 @@
+import "mocha";
+import { expect } from "chai";
+import fs from "fs";
+import params from "../../src/params";
+import * as getPath from "../../src/utils/getPath";
+import * as validate from "../../src/utils/validate";
+import { stringifyEnvs } from "../../src/utils/parse";
+import { PackageContainer } from "../../src/types";
+import { DockerApiSystemDfReturn } from "../../src/modules/docker/dockerApi";
+import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
+import rewiremock from "rewiremock";
+// Imports for typings
+import listPackagesType from "../../src/calls/listPackages";
+
+describe("Call function: listPackages", function() {
+  let hasListed = false;
+  const envs = { VAR1: "VALUE1" };
+  const dnp = { ...mockDnp, name: "test.dnp.dappnode.eth" };
+  const mockList = [dnp];
+  // Result should extend the package list with the env variables
+  const expectedResult: PackageContainer[] = [Object.assign({ envs }, dnp)];
+
+  // Mock docker calls
+  const listContainers = async (): Promise<PackageContainer[]> => {
+    hasListed = true;
+    return mockList;
+  };
+
+  async function dockerDf(): Promise<DockerApiSystemDfReturn> {
+    return mockDockerSystemDfDataSample;
+  }
+
+  let listPackages: typeof listPackagesType;
+
+  before("Mock", async () => {
+    const mock = await rewiremock.around(
+      () => import("../../src/calls/listPackages"),
+      mock => {
+        mock(() => import("../../src/modules/docker/listContainers"))
+          .with({ listContainers })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/dockerApi"))
+          .with({ dockerDf })
+          .toBeUsed();
+      }
+    );
+    listPackages = mock.default;
+  });
+
+  before(() => {
+    // Write mock data on the test folder
+    const ENV_PATH = getPath.envFile(mockList[0].name, params, false);
+    validate.path(ENV_PATH);
+    fs.writeFileSync(ENV_PATH, stringifyEnvs(envs));
+  });
+
+  it("should list packages with correct arguments", async () => {
+    const res = await listPackages();
+    expect(hasListed).to.be.true;
+    expect(res.result).to.deep.equal(expectedResult);
+  });
+});
