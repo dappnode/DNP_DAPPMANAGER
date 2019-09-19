@@ -16,6 +16,7 @@ import {
 // Define docker compose parameters
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
+const globalEnvsFile = params.GLOBAL_ENVS_FILE;
 
 export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
   const { name, image } = manifest;
@@ -133,6 +134,9 @@ export function sanitizeCompose(
   // From networks
   if (!isCore) delete composeUnsafe.networks;
 
+  const env_file = [];
+  if ((manifest.globalEnvs || {}).all) env_file.push(globalEnvsFile);
+
   return {
     ...pick(composeUnsafe, ["version", "networks", "volumes"]),
     services: {
@@ -141,6 +145,7 @@ export function sanitizeCompose(
         container_name: getContainerName(name, isCore),
         image: getImage(name, version),
         restart: service.restart || "always",
+        ...(env_file.length ? { env_file } : {}),
         logging: {
           options: {
             "max-size": "10m",
