@@ -1,5 +1,6 @@
 import "mocha";
 import { expect } from "chai";
+import { omit } from "lodash";
 import * as db from "../src/db";
 import * as calls from "../src/calls";
 import { Manifest } from "../src/types";
@@ -53,6 +54,9 @@ describe("Fetch external release data", () => {
 
   it("Should fetch BIND's package data", async () => {
     const { result } = await calls.fetchPackageData({ id: bindId });
+    // ###### TEMP FIX FOR ADMIN COMPATIBILITY
+    let TEMP_FIX_FOR_ADMIN_COMPATIBILITY;
+    delete result.manifest.image;
     expect(result.manifest).to.deep.equal(
       bindManifest,
       "Inconsistent manifest for BIND"
