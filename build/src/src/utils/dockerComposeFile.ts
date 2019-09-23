@@ -105,10 +105,12 @@ export const mergeEnvs = getComposeServiceEditor(
   (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
     return {
       ...service,
-      environment: composeParser.stringifyEnvironment({
-        ...composeParser.parseEnvironment(service.environment || []),
-        ...newEnvs
-      })
+      environment: composeParser.stringifyEnvironment(
+        composeParser.mergeEnvs(
+          newEnvs,
+          composeParser.parseEnvironment(service.environment || [])
+        )
+      )
     };
   }
 );
@@ -117,10 +119,12 @@ export const mergeEnvsAndOmitEnvFile = getComposeServiceEditor(
   (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
     return {
       ...omit(service, "env_file"),
-      environment: composeParser.stringifyEnvironment({
-        ...composeParser.parseEnvironment(service.environment || []),
-        ...newEnvs
-      })
+      environment: composeParser.stringifyEnvironment(
+        composeParser.mergeEnvs(
+          newEnvs,
+          composeParser.parseEnvironment(service.environment || [])
+        )
+      )
     };
   }
 );
