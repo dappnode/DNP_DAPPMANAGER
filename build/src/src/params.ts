@@ -66,7 +66,16 @@ const params = {
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
-  coreDnpName: "core.dnp.dappnode.eth"
+  coreDnpName: "core.dnp.dappnode.eth",
+
+  // DYNDNS parameters
+  DYNDNS_HOST: "https://ns.dappnode.io",
+  DYNDNS_DOMAIN: "dyndns.dappnode.io",
+  DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
+
+  // System file paths
+  HOSTNAME_PATH: "/etc/dappnodename",
+  STATIC_IP_PATH: "/usr/src/app/config/static_ip"
 };
 
 if (devMode) {
