@@ -1,7 +1,8 @@
 import EthCrypto from "eth-crypto";
-import * as db from "../db";
-const logs = require("../logs.js")(module);
-import { IdentityInterface } from "../types";
+import params from "../../params";
+import * as db from "../../db";
+import Logs from "../../logs";
+const logs = Logs(module);
 
 const corruptedPrivateKeyMessage = `
 
@@ -13,6 +14,9 @@ const corruptedPrivateKeyMessage = `
 
 
 `;
+
+// this domain must be stripped of http(s):// tag
+const dyndnsDomain = params.DYNDNS_DOMAIN;
 
 /**
  * EthCrypto reference
@@ -36,29 +40,23 @@ const corruptedPrivateKeyMessage = `
    const signature = EthCrypto.sign(privateKey, messageHash);
  */
 
-// dyndnsHost has to be stripped of http(s):// tag
-// process.env.DYNDNS_DOMAIN should include said tag
-function getDyndnsHost() {
-  const { DYNDNS_DOMAIN } = process.env;
-  return DYNDNS_DOMAIN && DYNDNS_DOMAIN.includes("://")
-    ? DYNDNS_DOMAIN.split("://")[1]
-    : DYNDNS_DOMAIN;
-}
-
-function isPrivateKeyValid(privateKey: string) {
+function isPrivateKeyValid(privateKey: string): boolean {
   try {
     EthCrypto.publicKeyByPrivateKey(privateKey);
     return true;
   } catch (e) {
     logs.warn(
-      `Private key verification failed. EthCrypto.publicKeyByPrivateKey returned error: ${e.stack}`
+      `Private key verification failed. EthCrypto.publicKeyByPrivateKey returned error: ${
+        e.stack
+      }`
     );
     return false;
   }
 }
 
-export default async function generateKeys() {
-  const currentPrivateKey = await db.get("privateKey");
+export default async function generateKeys(): Promise<void> {
+  const currentPrivateKey = db.dyndnsIdentity.get().privateKey;
+  // Check for corrupted privateKey case
   if (currentPrivateKey) {
     if (isPrivateKeyValid(currentPrivateKey)) {
       logs.info(`Skipping keys generation, found identity in db`);
@@ -67,14 +65,18 @@ export default async function generateKeys() {
       logs.warn(corruptedPrivateKeyMessage);
     }
   }
-  const identity: IdentityInterface = EthCrypto.createIdentity();
-  await db.set("address", identity.address);
-  await db.set("privateKey", identity.privateKey);
-  await db.set("publicKey", identity.publicKey);
+
+  const identity = EthCrypto.createIdentity();
+  db.dyndnsIdentity.set({
+    address: identity.address,
+    privateKey: identity.privateKey,
+    publicKey: identity.publicKey
+  });
+
   const subdomain = identity.address
     .toLowerCase()
     .substr(2)
     .substring(0, 16);
-  const domain: string = [subdomain, getDyndnsHost()].join(".");
-  await db.set("domain", domain);
+  const domain = [subdomain, dyndnsDomain].join(".");
+  db.domain.set(domain);
 }
