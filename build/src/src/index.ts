@@ -5,7 +5,7 @@ import { registerHandler } from "./registerHandler";
 import params from "./params";
 import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
-import initializeVpnStuff from "./init";
+import initializeDb from "./init";
 import {
   ChainData,
   DirectoryDnp,
@@ -25,6 +25,7 @@ import "./watchers/autoUpdates";
 import "./watchers/chains";
 import "./watchers/diskUsage";
 import "./watchers/natRenewal";
+import "./watchers/dyndns";
 
 // Print version data
 import "./utils/getVersionData";
@@ -32,8 +33,7 @@ import "./utils/getVersionData";
 // Start HTTP API
 import "./httpApi";
 
-// initializeVpnStuff
-initializeVpnStuff();
+initializeDb();
 
 // Initial calls to check this DAppNode's status
 calls

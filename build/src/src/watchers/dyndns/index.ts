@@ -91,3 +91,5 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
 setInterval(() => {
   checkIpAndUpdateIfNecessary();
 }, dyndnsInterval);
+
+export default checkIpAndUpdateIfNecessary;
