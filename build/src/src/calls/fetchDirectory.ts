@@ -1,12 +1,12 @@
 import getDirectory from "../modules/release/getDirectory";
 import * as eventBus from "../eventBus";
-import getManifest from "../modules/release/getManifest";
+import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
-import * as parse from "../utils/parse";
 import isSyncing from "../utils/isSyncing";
-import isIpfsHash from "../utils/isIpfsHash";
+import { isIpfsHash } from "../utils/validate";
 import { DirectoryDnp, RpcHandlerReturn } from "../types";
 import Logs from "../logs";
+import { getLegacyManifestFromRelease } from "./fetchPackageData";
 const logs = Logs(module);
 
 interface RpcFetchDirectoryReturn extends RpcHandlerReturn {
@@ -58,18 +58,15 @@ export default async function fetchDirectory(): Promise<
     dnpsFromDirectory.map(async pkg => {
       const name = pkg.name;
       // Now resolve the last version of the package
-      const manifest = await getManifest(parse.packageReq(name));
-      emitPkg({
-        ...pkg,
-        name,
-        manifest
-      });
+      const release = await getRelease(name);
+      const legacyManifest = getLegacyManifestFromRelease(release);
+      emitPkg({ ...pkg, name, manifest: legacyManifest });
 
-      // Fetch the package image
-      const avatarHash = manifest.avatar;
-
+      // Fetch the package avatar
+      const avatarFile = release.avatarFile;
       let avatar;
-      if (isIpfsHash(avatarHash)) {
+      if (avatarFile && isIpfsHash(avatarFile.hash)) {
+        const avatarHash = avatarFile.hash;
         try {
           // Retrieve cached avatar or fetch it
           if (avatarCache[avatarHash]) {
@@ -92,7 +89,7 @@ export default async function fetchDirectory(): Promise<
         ...pkg,
         name,
         // Appended
-        manifest,
+        manifest: legacyManifest,
         avatar
       };
     })

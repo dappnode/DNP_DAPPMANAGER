@@ -1,16 +1,15 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import params from "../../src/params";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import { stringifyEnvs } from "../../src/utils/parse";
 import { PackageContainer } from "../../src/types";
 import { DockerApiSystemDfReturn } from "../../src/modules/docker/dockerApi";
 import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import listPackagesType from "../../src/calls/listPackages";
+import { stringifyEnvironment } from "../../src/utils/dockerComposeParsers";
 
 describe("Call function: listPackages", function() {
   let hasListed = false;
@@ -49,9 +48,9 @@ describe("Call function: listPackages", function() {
 
   before(() => {
     // Write mock data on the test folder
-    const ENV_PATH = getPath.envFile(mockList[0].name, params, false);
+    const ENV_PATH = getPath.envFile(mockList[0].name, false);
     validate.path(ENV_PATH);
-    fs.writeFileSync(ENV_PATH, stringifyEnvs(envs));
+    fs.writeFileSync(ENV_PATH, stringifyEnvironment(envs).join("\n"));
   });
 
   it("should list packages with correct arguments", async () => {

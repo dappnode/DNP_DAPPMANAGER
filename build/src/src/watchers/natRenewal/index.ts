@@ -27,7 +27,7 @@ async function natRenewal(): Promise<void> {
     // portMappings = [ {protocol: 'UDP', exPort: '500', inPort: '500'} ]
     try {
       const portMappings = await upnpc.list();
-      db.setUpnpAvailable(true);
+      db.upnpAvailable.set(true);
       if (isFirstRun) {
         logs.info("UPnP device available");
         logs.info(
@@ -36,7 +36,7 @@ async function natRenewal(): Promise<void> {
       }
     } catch (e) {
       if (e.message.includes("NOUPNP")) {
-        db.setUpnpAvailable(false);
+        db.upnpAvailable.set(false);
         if (isFirstRun) logs.warn("No UPnP device available");
         return;
       } else {
@@ -46,7 +46,7 @@ async function natRenewal(): Promise<void> {
 
     // Fetch portsToOpen and store them in the DB
     const portsToOpen = await getPortsToOpen();
-    db.setPortsToOpen(portsToOpen);
+    db.portsToOpen.set(portsToOpen);
     if (isFirstRun)
       logs.info(
         `NAT renewal portsToOpen: ${JSON.stringify(portsToOpen, null, 2)}`
@@ -84,7 +84,7 @@ async function natRenewal(): Promise<void> {
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
       const upnpPortMappings = await upnpc.list();
-      db.setUpnpPortMappings(upnpPortMappings);
+      db.upnpPortMappings.set(upnpPortMappings);
       for (const portToOpen of portsToOpen) {
         const currentPort = upnpPortMappings.find(
           p =>

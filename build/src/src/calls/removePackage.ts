@@ -1,5 +1,4 @@
 import fs from "fs";
-import params from "../params";
 import * as eventBus from "../eventBus";
 // Modules
 import { dockerComposeDown } from "../modules/docker/dockerCommands";
@@ -25,9 +24,8 @@ export default async function removePackage({
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const packageRepoDir = getPath.packageRepoDir(id, params, false);
-
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
+  const packageRepoDir = getPath.packageRepoDir(id, false);
+  const dockerComposePath = getPath.dockerComposeSmart(id);
   if (!fs.existsSync(dockerComposePath)) {
     throw Error(`No docker-compose found: ${dockerComposePath}`);
   }

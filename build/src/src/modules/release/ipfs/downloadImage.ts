@@ -2,6 +2,7 @@ import * as ipfs from "../../ipfs";
 import * as validate from "../../../utils/validate";
 import { isAbsolute } from "path";
 import { validateImage } from "../validate";
+import { isIpfsHash } from "../../../utils/validate";
 
 /**
  * Handles the download of a DNP .xz image.
@@ -23,8 +24,7 @@ export default async function downloadImage(
   fileSize: number,
   progress: (n: number) => void
 ): Promise<void> {
-  if (!hash || typeof hash !== "string")
-    throw Error(`arg hash must be a string: ${hash}`);
+  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   /**
    * 0. Validate parameters

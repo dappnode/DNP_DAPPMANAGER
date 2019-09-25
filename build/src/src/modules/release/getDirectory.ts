@@ -1,4 +1,4 @@
-import isEnsDomain from "../../utils/isEnsDomain";
+import { isEnsDomain } from "../../utils/validate";
 import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
 import * as directoryContract from "../../contracts/directory";
 import web3 from "../web3Setup";

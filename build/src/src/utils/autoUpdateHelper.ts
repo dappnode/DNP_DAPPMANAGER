@@ -2,8 +2,7 @@ import * as db from "../db";
 import params from "../params";
 import * as eventBus from "../eventBus";
 import { pick, omit } from "lodash";
-import { parseCoreVersionIdToStrings } from "./coreVersionId";
-import { includesArray } from "./arrays";
+import { areCoreVersionIdsIncluded } from "./coreVersionId";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
@@ -40,9 +39,7 @@ function autoUpdateDataHasChanged(): void {
  * }
  */
 export function getSettings(): AutoUpdateSettings {
-  const autoUpdateSettings: AutoUpdateSettings = db.getAutoUpdateSettings();
-  if (!autoUpdateSettings) db.setAutoUpdateSettings({});
-  return autoUpdateSettings || {};
+  return db.autoUpdateSettings.get();
 }
 
 /**
@@ -55,7 +52,7 @@ export function getSettings(): AutoUpdateSettings {
 function setSettings(id: string, enabled: boolean): void {
   const autoUpdateSettings = getSettings();
 
-  db.setAutoUpdateSettings({
+  db.autoUpdateSettings.set({
     ...autoUpdateSettings,
     [id]: { enabled }
   });
@@ -77,7 +74,7 @@ export function editDnpSetting(enabled: boolean, name = MY_PACKAGES): void {
   // When disabling MY_PACKAGES, turn off all DNPs settings by
   // Ignoring all entries but the system packages
   if (name === MY_PACKAGES && !enabled)
-    db.setAutoUpdateSettings(pick(autoUpdateSettings, SYSTEM_PACKAGES));
+    db.autoUpdateSettings.set(pick(autoUpdateSettings, SYSTEM_PACKAGES));
 
   // When disabling any DNP, clear their pending updates
   // Ignoring all entries but the system packages
@@ -231,7 +228,7 @@ export function clearPendingUpdates(id: string): void {
  */
 function clearPendingUpdatesOfDnp(name: string): void {
   const pending = getPending();
-  db.setAutoUpdatePending(omit(pending, name));
+  db.autoUpdatePending.set(omit(pending, name));
 }
 
 /**
@@ -243,7 +240,7 @@ function clearPendingUpdatesOfDnp(name: string): void {
  */
 export function clearRegistry(name: string): void {
   const registry = getRegistry();
-  db.setAutoUpdateRegistry(omit(registry, name));
+  db.autoUpdateRegistry.set(omit(registry, name));
 
   autoUpdateDataHasChanged();
 }
@@ -266,10 +263,7 @@ export function clearCompletedCoreUpdatesIfAny(
     pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
   const pendingVersionsAreInstalled =
     pendingVersionId &&
-    includesArray(
-      parseCoreVersionIdToStrings(pendingVersionId),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(pendingVersionId, currentVersionId);
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
     flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
@@ -291,9 +285,7 @@ export function clearCompletedCoreUpdatesIfAny(
  * }
  */
 export function getRegistry(): AutoUpdateRegistry {
-  const registry = db.getAutoUpdateRegistry();
-  if (!registry) db.setAutoUpdateRegistry({});
-  return registry || {};
+  return db.autoUpdateRegistry.get();
 }
 
 /**
@@ -311,7 +303,7 @@ function setRegistry(
 ): void {
   const registry = getRegistry();
 
-  db.setAutoUpdateRegistry({
+  db.autoUpdateRegistry.set({
     ...registry,
     [name]: {
       ...(registry[name] || {}),
@@ -344,9 +336,7 @@ function setRegistry(
  * }
  */
 export function getPending(): AutoUpdatePending {
-  const pending = db.getAutoUpdatePending();
-  if (!pending) db.setAutoUpdatePending({});
-  return pending || {};
+  return db.autoUpdatePending.get();
 }
 
 /**
@@ -358,7 +348,7 @@ export function getPending(): AutoUpdatePending {
  */
 function setPending(name: string, data: AutoUpdatePendingEntry): void {
   const pending = getPending();
-  db.setAutoUpdatePending({
+  db.autoUpdatePending.set({
     ...pending,
     [name]: {
       ...(pending[name] || {}),
@@ -460,16 +450,10 @@ export function getCoreFeedbackMessage({
   const lastUpdatedVersion = getLastRegistryEntry(registry[id] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
-    includesArray(
-      parseCoreVersionIdToStrings(lastUpdatedVersion.version),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(lastUpdatedVersion.version, currentVersionId);
   const pendingVersionsAreInstalled =
     pendingVersion &&
-    includesArray(
-      parseCoreVersionIdToStrings(pendingVersion),
-      parseCoreVersionIdToStrings(currentVersionId)
-    );
+    areCoreVersionIdsIncluded(pendingVersion, currentVersionId);
 
   if (scheduledUpdate) {
     // If the pending version is the current BUT it is NOT in the registry,

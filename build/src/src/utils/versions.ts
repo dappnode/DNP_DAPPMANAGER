@@ -1,5 +1,5 @@
 import semver from "semver";
-import isIpfsHash from "./isIpfsHash";
+import { isIpfsHash } from "./validate";
 
 /*
  * Wrapper for the semver library. In the DAPPMANAGER versions can be:

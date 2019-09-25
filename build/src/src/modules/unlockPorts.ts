@@ -1,8 +1,4 @@
-import { readComposeObj, writeComposeObj } from "../utils/dockerComposeFile";
-import {
-  parsePortMappings,
-  stringifyPortMappings
-} from "../utils/dockerComposeParsers";
+import { getPortMappings, setPortMapping } from "../utils/dockerComposeFile";
 
 const ephemeralPortRange = 32768;
 
@@ -29,27 +25,14 @@ export default async function unlockPorts(
   }
 
   // 1. Parse docker-compose to find portsToClose.
-  const dc = readComposeObj(dockerComposePath);
-  // Create shortcut to the first service
-  const service = dc.services[Object.getOwnPropertyNames(dc.services)[0]];
-  if (!service) {
-    const dcString = JSON.stringify(dc, null, 2);
-    throw Error(
-      `Broken docker-compose (${dockerComposePath}), on unlockPorts: \n${dcString}`
-    );
-  }
+  const portMappings = getPortMappings(dockerComposePath, { isPath: true });
+  const newPortMappings = portMappings.map(portMapping => {
+    const { host, container, protocol } = portMapping;
+    return host && host >= ephemeralPortRange
+      ? { container, protocol }
+      : portMapping;
+  });
 
   // 2. Reset the docker-compose to make them epheremal again
-  service.ports = stringifyPortMappings(
-    parsePortMappings(service.ports).map(portMapping => {
-      const { host, container, protocol } = portMapping;
-      return host && host >= ephemeralPortRange
-        ? { container, protocol }
-        : portMapping;
-    })
-  );
-
-  // 3. Write the docker-compose (no need to up the package)
-  dc.services[Object.getOwnPropertyNames(dc.services)[0]] = service;
-  writeComposeObj(dockerComposePath, dc);
+  setPortMapping(dockerComposePath, newPortMappings, { isPath: true });
 }

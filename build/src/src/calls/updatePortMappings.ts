@@ -1,6 +1,10 @@
 import lockPorts from "../modules/lockPorts";
 // Utils
-import { getComposeInstance } from "../utils/dockerComposeFile";
+import {
+  mergePortMapping,
+  getPortMappings,
+  setPortMapping
+} from "../utils/dockerComposeFile";
 import { PortMapping, RpcHandlerReturn } from "../types";
 // External call
 import restartPackage from "./restartPackage";
@@ -52,17 +56,16 @@ export default async function updatePortMappings({
    *   { host: 30444, container: 30303, protocol: "UDP" }
    * ]
    */
-  const compose = getComposeInstance(id);
-  const previousPortMappings = compose.getPortMappings();
-  if (options && options.merge) compose.mergePortMapping(portMappings);
-  else compose.setPortMappings(portMappings);
+  const previousPortMappings = getPortMappings(id);
+  if (options && options.merge) mergePortMapping(id, portMappings);
+  else setPortMapping(id, portMappings);
 
   // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
   try {
     await restartPackage({ id });
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
-      compose.setPortMappings(previousPortMappings);
+      setPortMapping(id, previousPortMappings);
       await restartPackage({ id });
 
       // Try to get the port colliding from the error

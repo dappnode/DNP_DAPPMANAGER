@@ -38,7 +38,7 @@ RUN yarn build
 #####################################
 FROM node:10.15.3-alpine
 
-ENV DOCKER_COMPOSE_VERSION 1.20.1
+ENV DOCKER_COMPOSE_VERSION 1.24.1
 
 RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus
 
@@ -91,5 +91,8 @@ RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts 
 COPY --from=build-deps /usr/src/app /usr/src/app
 COPY build/src/test /usr/src/app/test
 COPY --from=build-src /usr/src/app/dist /usr/src/app/src
+
+ENV COMPOSE_HTTP_TIMEOUT=300 DOCKER_CLIENT_TIMEOUT=300 DOCKER_HOST=unix:///var/run/docker.sock
+RUN echo "127.0.0.1 localunixsocket"
 
 ENTRYPOINT /usr/src/app/entrypoint.sh

@@ -1,9 +1,9 @@
 import Joi from "joi";
 import fs from "fs";
 import verifyXz from "../../utils/verifyXz";
-import { Manifest } from "../../types";
+import { Manifest, Compose, ComposeUnsafe } from "../../types";
 
-interface ValidateReturn {
+export interface ValidateReturn {
   success: boolean;
   message: string;
 }
@@ -77,40 +77,77 @@ export async function validateImage(path: string): Promise<ValidateReturn> {
  *   message: "File size is 0 bytes" {string}
  * }
  */
-export function validateManifest(
-  manifestString: string
-): { success: boolean; message: string } {
-  if (!manifestString)
-    return {
-      success: false,
-      message: "Empty string"
-    };
+export function validateManifestBasic(manifest: Manifest): ValidateReturn {
+  const result = Joi.validate(
+    manifest,
+    Joi.object({
+      name: Joi.string().required(),
+      version: Joi.string().required()
+    }).pattern(/./, Joi.any())
+  );
 
-  try {
-    const manifest: Manifest = JSON.parse(manifestString);
-    const result = Joi.validate(
-      manifest,
-      Joi.object({
-        name: Joi.string().required(),
-        version: Joi.string().required(),
-        image: Joi.object({
-          hash: Joi.string().required()
-        })
-          .pattern(/./, Joi.any())
-          .required()
-      }).pattern(/./, Joi.any())
-    );
-    if (result.error)
-      return {
-        success: false,
-        message: result.error.message
-      };
-    else
-      return {
-        success: true,
-        message: ""
-      };
-  } catch (e) {
-    return { success: false, message: "Invalid JSON" };
-  }
+  return {
+    success: !result.error,
+    message: result.error ? result.error.message : ""
+  };
+}
+
+export function validateManifestWithImageData(
+  manifest: Manifest
+): ValidateReturn {
+  const result = Joi.validate(
+    manifest,
+    Joi.object({
+      name: Joi.string().required(),
+      version: Joi.string().required(),
+      image: Joi.object({
+        hash: Joi.string().required()
+      })
+        .pattern(/./, Joi.any())
+        .required()
+    }).pattern(/./, Joi.any())
+  );
+
+  return {
+    success: !result.error,
+    message: result.error ? result.error.message : ""
+  };
+}
+
+export function validateComposeOrUnsafe(
+  compose: Compose | ComposeUnsafe
+): ValidateReturn {
+  const result = Joi.validate(
+    compose,
+    Joi.object({
+      version: Joi.string().required(),
+      networks: Joi.object({
+        network: Joi.object({
+          driver: Joi.string()
+        }).pattern(/./, Joi.any())
+      }),
+      volumes: Joi.object().pattern(/./, Joi.any()),
+      services: Joi.object()
+        .pattern(
+          /./,
+          Joi.object({
+            image: Joi.string().required(),
+            /* eslint-disable-next-line @typescript-eslint/camelcase */
+            container_name: Joi.string(),
+            restart: Joi.string(),
+            environment: Joi.array().items(Joi.string()),
+            volumes: Joi.array().items(Joi.string()),
+            ports: Joi.array().items(Joi.string()),
+            labels: Joi.object().pattern(/./, Joi.string()),
+            dns: Joi.string()
+          }).pattern(/./, Joi.any())
+        )
+        .required()
+    }).pattern(/./, Joi.any())
+  );
+
+  return {
+    success: !result.error,
+    message: result.error ? result.error.message : ""
+  };
 }

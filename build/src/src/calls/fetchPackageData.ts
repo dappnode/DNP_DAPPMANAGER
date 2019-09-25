@@ -1,14 +1,15 @@
-import * as parse from "../utils/parse";
-import getManifest from "../modules/release/getManifest";
+import { pick } from "lodash";
+import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import Logs from "../logs";
-import { Manifest, RpcHandlerReturn } from "../types";
+import { RpcHandlerReturn, ManifestWithImage, PackageRelease } from "../types";
+import { parseService } from "../utils/dockerComposeParsers";
 const logs = Logs(module);
 
 interface RpcFetchPackageDataReturn extends RpcHandlerReturn {
   result: {
-    manifest: Manifest;
-    avatar: string | undefined;
+    manifest: ManifestWithImage;
+    avatar: string | null;
   };
 }
 
@@ -29,12 +30,13 @@ export default async function fetchPackageData({
 }): Promise<RpcFetchPackageDataReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const manifest = await getManifest(parse.packageReq(id));
+  const release = await getRelease(id);
 
   // Fetch the package image
-  const avatarHash = manifest.avatar;
-  let avatar;
-  if (avatarHash) {
+
+  let avatar: string | null = null;
+  if (release.avatarFile) {
+    const avatarHash = release.avatarFile.hash;
     try {
       avatar = await getAvatar(avatarHash);
     } catch (e) {
@@ -45,11 +47,30 @@ export default async function fetchPackageData({
     }
   }
 
+  const legacyManifest = getLegacyManifestFromRelease(release);
+
   return {
     message: `Got data of ${id}`,
     result: {
-      manifest,
-      avatar
+      manifest: legacyManifest,
+      avatar: avatar
+    }
+  };
+}
+
+export function getLegacyManifestFromRelease({
+  compose,
+  imageFile,
+  metadata
+}: PackageRelease): ManifestWithImage {
+  const service = parseService(compose);
+  return {
+    ...metadata,
+    image: {
+      hash: imageFile.hash,
+      size: imageFile.size,
+      path: "legacy-path",
+      ...pick(service, ["ports", "volumes", "environment"])
     }
   };
 }

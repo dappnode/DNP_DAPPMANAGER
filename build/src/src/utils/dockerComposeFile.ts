@@ -1,42 +1,10 @@
 import fs from "fs";
 import path from "path";
-import yaml from "yamljs";
-import {
-  parsePortMappings,
-  stringifyPortMappings,
-  mergePortMappings
-} from "./dockerComposeParsers";
-import { PortMapping } from "../types";
+import yaml from "js-yaml";
+import * as composeParser from "./dockerComposeParsers";
+import { omit, omitBy, isEmpty, isObject } from "lodash";
+import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
 import params from "../params";
-
-interface DockerComposePackage {
-  version: string;
-  services: {
-    [dnpName: string]: {
-      container_name: string; // "DAppNodePackage-bitcoin.dnp.dappnode.eth",
-      image: string; // "bitcoin.dnp.dappnode.eth:0.1.1";
-      volumes: string[]; // ["bitcoin_data:/root/.bitcoin"];
-      ports: string[]; // ["8333:8333"];
-      env_file: string[]; // ["bitcoin.dnp.dappnode.eth.env"];
-      networks: string[]; // ["dncore_network"];
-      dns: string; // "172.33.1.2";
-      logging: {
-        options: {
-          "max-size": string; // "10m";
-          "max-file": string; // "3";
-        };
-      };
-    };
-  };
-  volumes: {
-    [volumeName: string]: {};
-  };
-  networks: {
-    dncore_network: {
-      external: boolean;
-    };
-  };
-}
 
 /**
  * Utils to read or edit a docker-compose file
@@ -55,64 +23,136 @@ export function getDockerComposePath(id: string, newFile?: boolean): string {
   else throw Error(`No docker-compose found for ${id}`);
 }
 
-export function readComposeObj(
-  dockerComposePath: string
-): DockerComposePackage {
+export function parseComposeObj(composeString: string): Compose {
+  try {
+    return yaml.safeLoad(composeString);
+  } catch (e) {
+    throw Error(`Error parseing compose yaml: ${e.message}`);
+  }
+}
+
+export function readComposeObj(dockerComposePath: string): Compose {
   const dcString = fs.readFileSync(dockerComposePath, "utf-8");
-  return yaml.parse(dcString);
+  return parseComposeObj(dcString);
 }
 
 export function writeComposeObj(
   dockerComposePath: string,
-  composeObj: DockerComposePackage
+  compose: Compose
 ): void {
-  const composeString = yaml.stringify(composeObj, 8, 2);
+  // Clean empty arrays and objects
+  const serviceName = composeParser.parseServiceName(compose);
+  const cleanCompose = {
+    ...compose,
+    services: {
+      [serviceName]: omitBy(
+        compose.services[serviceName],
+        el => isObject(el) && isEmpty(el)
+      )
+    }
+  };
+
+  const composeString = yaml.safeDump(cleanCompose);
   fs.writeFileSync(dockerComposePath, composeString, "utf-8");
 }
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-export function getComposeInstance(idOrObject: string | DockerComposePackage) {
-  let dockerComposePath = "";
-  let composeObj: DockerComposePackage;
-  if (typeof idOrObject === "string") {
-    dockerComposePath = getDockerComposePath(idOrObject);
-    composeObj = readComposeObj(dockerComposePath);
-  } else if (typeof idOrObject === "object") {
-    composeObj = idOrObject;
-  } else {
-    throw Error(`Invalid type for idOrObject: ${typeof idOrObject}`);
-  }
+/**
+ * Generic / factory functions for compose service items
+ * - editor
+ * - getter
+ * - setter
+ */
 
-  const dnpName = Object.getOwnPropertyNames(composeObj.services)[0];
-  const service = composeObj.services[dnpName];
-
-  function write(): void {
-    composeObj.services[dnpName] = service;
-    writeComposeObj(dockerComposePath, composeObj);
-  }
-
-  function getPortMappings(): PortMapping[] {
-    return parsePortMappings(service.ports || []);
-  }
-
-  function mergePortMapping(newPortMappings: PortMapping[]): void {
-    service.ports = stringifyPortMappings(
-      mergePortMappings(getPortMappings(), newPortMappings)
-    );
-    write();
-  }
-
-  function setPortMappings(newPortMappings: PortMapping[]): void {
-    service.ports = stringifyPortMappings(newPortMappings);
-    write();
-  }
-
-  return {
-    getPortMappings,
-    mergePortMapping,
-    setPortMappings,
-    write,
-    // Constant getter
-    dockerComposePath
+function getComposeServiceEditor<T>(
+  serviceEditor: (service: ComposeService, newData: T) => ComposeService
+) {
+  return function composeServiceEditor(
+    id: string,
+    newData: T,
+    options?: { isPath: boolean }
+  ): void {
+    const composePath =
+      options && options.isPath ? id : getDockerComposePath(id);
+    const compose = readComposeObj(composePath);
+    const serviceName = composeParser.parseServiceName(compose);
+    const service = compose.services[serviceName];
+    writeComposeObj(composePath, {
+      ...compose,
+      services: {
+        [serviceName]: serviceEditor(service, newData)
+      }
+    });
   };
 }
+
+function getComposeServiceGetter<T>(
+  serviceGetter: (service: ComposeService) => T
+) {
+  return function composeServiceEditor(
+    id: string,
+    options?: { isPath: boolean }
+  ): T {
+    const composePath =
+      options && options.isPath ? id : getDockerComposePath(id);
+    const compose = readComposeObj(composePath);
+    const serviceName = composeParser.parseServiceName(compose);
+    const service = compose.services[serviceName];
+    return serviceGetter(service);
+  };
+}
+
+export const mergeEnvs = getComposeServiceEditor(
+  (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
+    return {
+      ...service,
+      environment: composeParser.stringifyEnvironment(
+        composeParser.mergeEnvs(
+          newEnvs,
+          composeParser.parseEnvironment(service.environment || [])
+        )
+      )
+    };
+  }
+);
+
+export const mergeEnvsAndOmitEnvFile = getComposeServiceEditor(
+  (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
+    return {
+      ...omit(service, "env_file"),
+      environment: composeParser.stringifyEnvironment(
+        composeParser.mergeEnvs(
+          newEnvs,
+          composeParser.parseEnvironment(service.environment || [])
+        )
+      )
+    };
+  }
+);
+
+export const mergePortMapping = getComposeServiceEditor(
+  (service: ComposeService, newPortMappings: PortMapping[]): ComposeService => {
+    return {
+      ...service,
+      ports: composeParser.stringifyPortMappings(
+        composeParser.mergePortMappings(
+          newPortMappings,
+          composeParser.parsePortMappings(service.ports || [])
+        )
+      )
+    };
+  }
+);
+
+export const getPortMappings = getComposeServiceGetter(
+  (service: ComposeService) =>
+    composeParser.parsePortMappings(service.ports || [])
+);
+
+export const setPortMapping = getComposeServiceEditor(
+  (service: ComposeService, newPortMappings: PortMapping[]): ComposeService => {
+    return {
+      ...service,
+      ports: composeParser.stringifyPortMappings(newPortMappings)
+    };
+  }
+);

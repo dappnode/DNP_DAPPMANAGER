@@ -11,13 +11,9 @@ import removePackageType from "../../src/calls/removePackage";
 
 describe("Call function: removePackage", function() {
   const testDir = "test_files/";
-  const params = {
-    REPO_DIR: testDir,
-    DNCORE_DIR: "DNCORE"
-  };
 
   const id = "test.dnp.dappnode.eth";
-  const dockerComposePath = getPath.dockerCompose(id, params, false);
+  const dockerComposePath = getPath.dockerCompose(id, false);
   const dockerComposeTemplate = `
   version: '3.4'
       services:

@@ -1,3 +1,5 @@
+import { difference } from "lodash";
+
 /**
  * Compute version id:
  * admin@0.2.4,vpn@0.2.2,core@0.2.6
@@ -28,6 +30,25 @@ export function parseCoreVersionId(
     });
 }
 
+/**
+ * Checks if `a2` includes all elements of `a1`
+ * @param {array} a1
+ * @param {array} a2
+ */
+export function includesArray<T>(subset: T[], superset: T[]): boolean {
+  return difference(subset, superset).length === 0;
+}
+
 export function parseCoreVersionIdToStrings(versionId: string): string[] {
   return (versionId || "").split(",");
+}
+
+export function areCoreVersionIdsIncluded(
+  coreVersionIdSubset: string,
+  coreVersionIdSuperset: string
+): boolean {
+  return includesArray(
+    parseCoreVersionIdToStrings(coreVersionIdSubset),
+    parseCoreVersionIdToStrings(coreVersionIdSuperset)
+  );
 }

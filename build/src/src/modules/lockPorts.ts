@@ -1,5 +1,9 @@
 import { dockerComposeUp } from "./docker/dockerCommands";
-import { getComposeInstance } from "../utils/dockerComposeFile";
+import {
+  getPortMappings,
+  setPortMapping,
+  getDockerComposePath
+} from "../utils/dockerComposeFile";
 import { listContainer } from "./docker/listContainers";
 import { PortMapping } from "../types";
 import Logs from "../logs";
@@ -75,8 +79,7 @@ const logs = Logs(module);
  * @returns {array} portsToOpen = [ {portNumber: 32769, protocol: 'UDP'}, ... ]
  */
 export default async function lockPorts(id: string): Promise<PortMapping[]> {
-  const compose = getComposeInstance(id);
-  const portMappings = compose.getPortMappings();
+  const portMappings = getPortMappings(id);
 
   const ephemeralPortMappings = portMappings.filter(({ host }) => !host);
 
@@ -108,10 +111,11 @@ export default async function lockPorts(id: string): Promise<PortMapping[]> {
     }
   );
 
-  compose.mergePortMapping(newPortMappings);
+  setPortMapping(id, newPortMappings);
 
   // In order to apply the labels to the current container, re-up it
-  await dockerComposeUp(compose.dockerComposePath);
+  const dockerComposePath = getDockerComposePath(id);
+  await dockerComposeUp(dockerComposePath);
 
   logs.info(
     `Locked emphemeral ports of ${id}: ${JSON.stringify(newPortMappings)}`

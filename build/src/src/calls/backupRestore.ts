@@ -53,7 +53,7 @@ export default async function backupRestore({
   await shell(`mkdir -p ${backupDir}`); // Never throws
 
   // Fetch the filePath and the file with fileId
-  const filePath = db.getFileTransferPath(fileId);
+  const filePath = db.fileTransferPath.get(fileId);
   if (!filePath) throw Error(`No file found for id: ${fileId}`);
   if (!fs.existsSync(filePath))
     throw Error(`No file found at path: ${filePath}`);

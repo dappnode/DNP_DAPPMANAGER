@@ -34,9 +34,9 @@ interface RpcGetPortsStatusReturn extends RpcHandlerReturn {
 export default async function getPortsStatus(): Promise<
   RpcGetPortsStatusReturn
 > {
-  const upnpAvailable: boolean = db.getUpnpAvailable();
-  const portsToOpen: PackagePort[] = db.getPortsToOpen();
-  const upnpPortMappings: UpnpPortMapping[] = db.getUpnpPortMappings();
+  const upnpAvailable: boolean = db.upnpAvailable.get();
+  const portsToOpen: PackagePort[] = db.portsToOpen.get();
+  const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get();
 
   return {
     message: `Got port status`,

@@ -1,6 +1,5 @@
 import fs from "fs";
 import { uniq } from "lodash";
-import params from "../params";
 import {
   dockerComposeRm,
   dockerVolumeRm
@@ -85,7 +84,7 @@ export default async function restartPackageVolumes({
     if (dnpName.includes("dappmanager.dnp.dappnode.eth")) {
       throw Error("The dappmanager cannot be restarted");
     }
-    const dockerComposePath = getPath.dockerComposeSmart(dnpName, params);
+    const dockerComposePath = getPath.dockerComposeSmart(dnpName);
     if (!fs.existsSync(dockerComposePath)) {
       throw Error(`No docker-compose found: ${dockerComposePath}`);
     }

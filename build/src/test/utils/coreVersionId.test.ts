@@ -3,7 +3,9 @@ import { expect } from "chai";
 
 import {
   getCoreVersionId,
-  parseCoreVersionId
+  parseCoreVersionId,
+  includesArray,
+  areCoreVersionIdsIncluded
 } from "../../src/utils/coreVersionId";
 
 describe("Util: coreVersionId", () => {
@@ -40,6 +42,39 @@ describe("Util: coreVersionId", () => {
       ];
       const versionId = "";
       expect(getCoreVersionId(coreDnps)).to.equal(versionId);
+    });
+  });
+
+  describe("includesArray", () => {
+    it("Array 2 should include array 1 strings", () => {
+      const arr1 = ["admin@0.2.4", "core@0.2.4"];
+      const arr2 = ["admin@0.2.4", "core@0.2.4", "vpn@0.2.2"];
+      expect(includesArray(arr1, arr2)).to.equal(true);
+    });
+  });
+
+  describe("areCoreVersionIdsIncluded", () => {
+    const coreVersionSubset: { name: string; version: string }[] = [
+      { name: "admin.dnp.dappnode.eth", version: "0.2.6" },
+      { name: "core.dnp.dappnode.eth", version: "0.2.8" }
+    ];
+    const coreVersionSuperset: { name: string; version: string }[] = [
+      ...coreVersionSubset,
+      { name: "vpn.dnp.dappnode.eth", version: "0.2.2" }
+    ];
+    const coreVersionIdSubset = getCoreVersionId(coreVersionSubset);
+    const coreVersionIdSuperset = getCoreVersionId(coreVersionSuperset);
+
+    it("Should return true for including core version ids", () => {
+      expect(
+        areCoreVersionIdsIncluded(coreVersionIdSubset, coreVersionIdSuperset)
+      ).to.be.true;
+    });
+
+    it("Should return false for NOT including core version ids", () => {
+      expect(
+        areCoreVersionIdsIncluded(coreVersionIdSuperset, coreVersionIdSubset)
+      ).to.be.false;
     });
   });
 });

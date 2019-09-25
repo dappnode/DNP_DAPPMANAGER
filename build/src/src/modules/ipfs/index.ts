@@ -1,11 +1,13 @@
 import * as ipfsParams from "./ipfsParams";
 import { runWithRetry } from "../../utils/asyncFlows";
-import isIpfsHash from "../../utils/isIpfsHash";
+import { isIpfsHash } from "../../utils/validate";
 import { timeoutError, IpfsArgument } from "./data";
 
 // Methods
 import catRaw from "./methods/cat";
+import catStringRaw from "./methods/catString";
 import catStreamToFsRaw from "./methods/catStreamToFs";
+import lsRaw from "./methods/ls";
 import objectSizeRaw from "./methods/objectSize";
 
 // Params
@@ -45,6 +47,8 @@ function wrapMethodWithIsAvailableAndRetry<A extends IpfsArgument, R>(
 }
 
 export const cat = wrapMethodWithIsAvailableAndRetry(catRaw);
+export const catString = wrapMethodWithIsAvailableAndRetry(catStringRaw);
 export const catStreamToFs = wrapMethodWithIsAvailableAndRetry(
   catStreamToFsRaw
 );
+export const ls = wrapMethodWithIsAvailableAndRetry(lsRaw);

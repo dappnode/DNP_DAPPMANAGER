@@ -4,6 +4,7 @@ import logUserAction from "./logUserAction";
 import { registerHandler } from "./registerHandler";
 import params from "./params";
 import * as db from "./db";
+import { convertLegacyEnvFiles } from "./utils/configFiles";
 import {
   ChainData,
   DirectoryDnp,
@@ -147,7 +148,7 @@ connection.onopen = (session, details): void => {
   });
 
   eventBus.notification.on((notification: PackageNotification) => {
-    db.setNotification(notification.id, notification);
+    db.notification.set(notification.id, notification);
     publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
   });
 
@@ -168,3 +169,28 @@ connection.onclose = (reason, details): boolean => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+
+/**
+ * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
+ * This function will read the contents of .env files and add them in the
+ * compose itself in the `environment` field in array format
+ */
+
+async function runLegacyOps(): Promise<void> {
+  try {
+    if (!db.areEnvFilesMigrated.get()) {
+      const { result: dnpList } = await calls.listPackages();
+      for (const dnp of dnpList) {
+        const hasConverted = convertLegacyEnvFiles(dnp);
+        if (hasConverted)
+          logs.info(`Converted ${dnp.name} .env file to compose environment`);
+      }
+      logs.info(`Finished converting legacy .env files without errors`);
+      db.areEnvFilesMigrated.set(true);
+    }
+  } catch (e) {
+    logs.error(`Error converting legacy .env files: ${e.stack || e.message}`);
+  }
+}
+
+runLegacyOps();

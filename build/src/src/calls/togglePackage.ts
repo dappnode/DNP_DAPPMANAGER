@@ -1,6 +1,5 @@
 import { listContainer } from "../modules/docker/listContainers";
 import * as getPath from "../utils/getPath";
-import params from "../params";
 import {
   dockerComposeStart,
   dockerComposeStop
@@ -23,7 +22,7 @@ export default async function togglePackage({
 }): Promise<RpcHandlerReturn> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const dockerComposePath = getPath.dockerComposeSmart(id, params);
+  const dockerComposePath = getPath.dockerComposeSmart(id);
 
   const dnp = await listContainer(id);
 

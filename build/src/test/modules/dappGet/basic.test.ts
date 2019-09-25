@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest, PackageContainer } from "../../../src/types";
-import { mockManifest, mockDnp } from "../../testUtils";
+import { PackageContainer, Dependencies } from "../../../src/types";
+import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";
 
 /* eslint-disable max-len */
@@ -13,9 +13,12 @@ import rewiremock from "rewiremock";
 
 // IDE and rewiremock can figure out the type on their own
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-async function getDappBasic(dnpList: PackageContainer[], manifest: Manifest) {
-  async function getManifest(): Promise<Manifest> {
-    return manifest;
+async function getDappBasic(
+  dnpList: PackageContainer[],
+  dependencies: Dependencies
+) {
+  async function getDependencies(): Promise<Dependencies> {
+    return dependencies;
   }
 
   async function listContainers(): Promise<PackageContainer[]> {
@@ -25,8 +28,8 @@ async function getDappBasic(dnpList: PackageContainer[], manifest: Manifest) {
   const mock = await rewiremock.around(
     () => import("../../../src/modules/dappGet/basic"),
     mock => {
-      mock(() => import("../../../src/modules/release/getManifest"))
-        .withDefault(getManifest)
+      mock(() => import("../../../src/modules/release/getDependencies"))
+        .withDefault(getDependencies)
         .toBeUsed();
       mock(() => import("../../../src/modules/docker/listContainers"))
         .with({ listContainers })
@@ -46,20 +49,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "ethforward.dnp.dappnode.eth", version: "0.1.0" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.1.15",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.1.4",
-          "ipfs.dnp.dappnode.eth": "0.1.3",
-          "ethchain.dnp.dappnode.eth": "0.1.4",
-          "ethforward.dnp.dappnode.eth": "0.1.1",
-          "vpn.dnp.dappnode.eth": "0.1.11",
-          "wamp.dnp.dappnode.eth": "0.1.0",
-          "admin.dnp.dappnode.eth": "0.1.6",
-          "dappmanager.dnp.dappnode.eth": "0.1.10"
-        }
+        "bind.dnp.dappnode.eth": "0.1.4",
+        "ipfs.dnp.dappnode.eth": "0.1.3",
+        "ethchain.dnp.dappnode.eth": "0.1.4",
+        "ethforward.dnp.dappnode.eth": "0.1.1",
+        "vpn.dnp.dappnode.eth": "0.1.11",
+        "wamp.dnp.dappnode.eth": "0.1.0",
+        "admin.dnp.dappnode.eth": "0.1.6",
+        "dappmanager.dnp.dappnode.eth": "0.1.10"
       }
     );
 
@@ -105,20 +102,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "dappmanager.dnp.dappnode.eth", version: "0.2.0" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.2.0",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.2.0",
-          "ipfs.dnp.dappnode.eth": "0.2.0",
-          "ethchain.dnp.dappnode.eth": "0.2.0",
-          "ethforward.dnp.dappnode.eth": "0.2.0",
-          "vpn.dnp.dappnode.eth": "0.2.0",
-          "wamp.dnp.dappnode.eth": "0.2.0",
-          "admin.dnp.dappnode.eth": "0.2.0",
-          "dappmanager.dnp.dappnode.eth": "0.2.0"
-        }
+        "bind.dnp.dappnode.eth": "0.2.0",
+        "ipfs.dnp.dappnode.eth": "0.2.0",
+        "ethchain.dnp.dappnode.eth": "0.2.0",
+        "ethforward.dnp.dappnode.eth": "0.2.0",
+        "vpn.dnp.dappnode.eth": "0.2.0",
+        "wamp.dnp.dappnode.eth": "0.2.0",
+        "admin.dnp.dappnode.eth": "0.2.0",
+        "dappmanager.dnp.dappnode.eth": "0.2.0"
       }
     );
 
@@ -156,20 +147,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "dappmanager.dnp.dappnode.eth", version: "0.2.0" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.2.0",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.2.0",
-          "ipfs.dnp.dappnode.eth": "0.2.0",
-          "ethchain.dnp.dappnode.eth": "0.2.0",
-          "ethforward.dnp.dappnode.eth": "0.2.0",
-          "vpn.dnp.dappnode.eth": "0.2.0",
-          "wamp.dnp.dappnode.eth": "0.2.0",
-          "admin.dnp.dappnode.eth": "0.2.0",
-          "dappmanager.dnp.dappnode.eth": "0.2.0"
-        }
+        "bind.dnp.dappnode.eth": "0.2.0",
+        "ipfs.dnp.dappnode.eth": "0.2.0",
+        "ethchain.dnp.dappnode.eth": "0.2.0",
+        "ethforward.dnp.dappnode.eth": "0.2.0",
+        "vpn.dnp.dappnode.eth": "0.2.0",
+        "wamp.dnp.dappnode.eth": "0.2.0",
+        "admin.dnp.dappnode.eth": "0.2.0",
+        "dappmanager.dnp.dappnode.eth": "0.2.0"
       }
     );
 
@@ -207,20 +192,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "dappmanager.dnp.dappnode.eth", version: "0.2.0" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.2.0-alpha",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.2.0-alpha",
-          "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
-          "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
-          "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
-          "vpn.dnp.dappnode.eth": "0.2.0-alpha",
-          "wamp.dnp.dappnode.eth": "0.2.0-alpha",
-          "admin.dnp.dappnode.eth": "0.2.0-alpha",
-          "dappmanager.dnp.dappnode.eth": "0.2.0-alpha"
-        }
+        "bind.dnp.dappnode.eth": "0.2.0-alpha",
+        "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
+        "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
+        "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
+        "vpn.dnp.dappnode.eth": "0.2.0-alpha",
+        "wamp.dnp.dappnode.eth": "0.2.0-alpha",
+        "admin.dnp.dappnode.eth": "0.2.0-alpha",
+        "dappmanager.dnp.dappnode.eth": "0.2.0-alpha"
       }
     );
 
@@ -258,20 +237,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "dappmanager.dnp.dappnode.eth", version: "0.1.20" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.2.0-alpha",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.2.0-alpha",
-          "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
-          "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
-          "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
-          "vpn.dnp.dappnode.eth": "0.2.0-alpha",
-          "wamp.dnp.dappnode.eth": "0.2.0-alpha",
-          "admin.dnp.dappnode.eth": "0.2.0-alpha",
-          "dappmanager.dnp.dappnode.eth": "0.2.0-alpha"
-        }
+        "bind.dnp.dappnode.eth": "0.2.0-alpha",
+        "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
+        "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
+        "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
+        "vpn.dnp.dappnode.eth": "0.2.0-alpha",
+        "wamp.dnp.dappnode.eth": "0.2.0-alpha",
+        "admin.dnp.dappnode.eth": "0.2.0-alpha",
+        "dappmanager.dnp.dappnode.eth": "0.2.0-alpha"
       }
     );
 
@@ -308,20 +281,14 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "dappmanager.dnp.dappnode.eth", version: "0.1.20" }
       ],
       {
-        ...mockManifest,
-        name: "core.dnp.dappnode.eth",
-        version: "0.2.0",
-        type: "dncore",
-        dependencies: {
-          "bind.dnp.dappnode.eth": "0.2.0",
-          "ipfs.dnp.dappnode.eth": "0.2.0",
-          "ethchain.dnp.dappnode.eth": "0.2.0",
-          "ethforward.dnp.dappnode.eth": "0.2.0",
-          "vpn.dnp.dappnode.eth": "0.2.0",
-          "wamp.dnp.dappnode.eth": "0.2.0",
-          "admin.dnp.dappnode.eth": "0.2.0",
-          "dappmanager.dnp.dappnode.eth": "0.2.0"
-        }
+        "bind.dnp.dappnode.eth": "0.2.0",
+        "ipfs.dnp.dappnode.eth": "0.2.0",
+        "ethchain.dnp.dappnode.eth": "0.2.0",
+        "ethforward.dnp.dappnode.eth": "0.2.0",
+        "vpn.dnp.dappnode.eth": "0.2.0",
+        "wamp.dnp.dappnode.eth": "0.2.0",
+        "admin.dnp.dappnode.eth": "0.2.0",
+        "dappmanager.dnp.dappnode.eth": "0.2.0"
       }
     );
 

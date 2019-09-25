@@ -7,6 +7,8 @@ import { DappGetFetchFunction } from "../../../src/modules/dappGet/types";
 import { PackageContainer } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";
+import Logs from "../../../src/logs";
+const logs = Logs(module);
 // Imports for types
 import dappGetType from "../../../src/modules/dappGet";
 import aggregateType from "../../../src/modules/dappGet/aggregate";
@@ -17,7 +19,7 @@ const log = false;
 function logBig(...args: string[]): void {
   const b = "=".repeat(20);
   if (log)
-    console.log(
+    logs.info(
       `\n${b}\n${args.map((s: string) => String(s)).join(`\n${b}\n`)}\n${b}'\n`
     );
 }

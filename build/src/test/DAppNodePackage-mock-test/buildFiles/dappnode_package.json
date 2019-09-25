@@ -1,0 +1,16 @@
+{
+  "name": "mock-test.public.dappnode.eth",
+  "version": "0.0.1",
+  "description": "mock-test description",
+  "avatar": "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
+  "type": "service",
+  "image": {
+    "path": "mock-test.public.dappnode.eth_0.0.1.tar.xz",
+    "hash": "",
+    "size": 0,
+    "restart": "always",
+    "environment": ["NAME=Normal_Name"]
+  },
+  "author": "lion",
+  "license": "GLP-3.0"
+}
