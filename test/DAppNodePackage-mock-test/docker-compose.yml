@@ -1,5 +1,0 @@
-version: '3.4'
-services:
-  mock-test.public.dappnode.eth:
-    image: 'mock-test.public.dappnode.eth:0.0.1'
-    build: ./build

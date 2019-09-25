@@ -3,7 +3,8 @@ import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
 import { listContainer } from "./listContainers";
 import { dockerComposeUp } from "./dockerCommands";
-import params from "../../params";
+
+export const restartId = "restart.dnp.dappnode.eth";
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it
@@ -23,19 +24,15 @@ export default async function restartPatch(imageName = ""): Promise<void> {
     imageName = dnp.image;
   }
 
-  const DOCKERCOMPOSE_RESTART_PATH = getPath.dockerCompose(
-    "restart.dnp.dappnode.eth",
-    params,
-    true
-  );
+  const DOCKERCOMPOSE_RESTART_PATH = getPath.dockerCompose(restartId, true);
   const PATH_LOCAL = "/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml";
   const PATH_REMOTE = "/usr/src/app/DNCORE/docker-compose-dappmanager.yml";
   const DOCKERCOMPOSE_DATA = `version: '3.4'
 
 services:
-    restart.dnp.dappnode.eth:
+    ${restartId}:
         image: ${imageName}
-        container_name: DAppNodeTool-restart.dnp.dappnode.eth
+        container_name: DAppNodeTool-${restartId}
         volumes:
             - '${PATH_LOCAL}:${PATH_REMOTE}'
             - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'

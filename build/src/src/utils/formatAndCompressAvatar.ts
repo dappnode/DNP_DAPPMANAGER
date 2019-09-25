@@ -41,6 +41,7 @@ export default async function formatAndCompressAvatar(
   let compressedImgBuffer;
   try {
     const resizedImgBuffer = await resizeImg(inputBuffer, outputResolution);
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const OPTION_TO_BYPASS_MISSTYPED_MODULE: any = { quality: "0-95" }; // :(
     compressedImgBuffer = await imageminPngquant(
       OPTION_TO_BYPASS_MISSTYPED_MODULE

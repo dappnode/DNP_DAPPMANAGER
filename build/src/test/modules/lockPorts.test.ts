@@ -3,7 +3,6 @@ import { expect } from "chai";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import params from "../../src/params";
 import { createTestDir, cleanTestDir, mockDnp } from "../testUtils";
 import { PortMapping, PackageContainer } from "../../src/types";
 import rewiremock from "rewiremock";
@@ -120,7 +119,7 @@ services:
         isCore: false
       }
     ]) {
-      const composePath = getPath.dockerCompose(name, params, isCore);
+      const composePath = getPath.dockerCompose(name, isCore);
       validate.path(composePath);
       fs.writeFileSync(composePath, composeString);
     }
@@ -138,7 +137,7 @@ services:
     );
 
     const dc = fs.readFileSync(
-      getPath.dockerCompose(normalDnpName, params, false),
+      getPath.dockerCompose(normalDnpName, false),
       "utf8"
     );
     expect(dc).to.equal(
@@ -146,8 +145,8 @@ services:
 services:
   ${normalDnpName}:
     ports:
-      - '32768:30303'
       - '32768:30303/udp'
+      - '32768:30303'
 `,
       "Wrong modified docker-compose"
     );
@@ -165,7 +164,7 @@ services:
     );
 
     const dc = fs.readFileSync(
-      getPath.dockerCompose(coreDnpName, params, true),
+      getPath.dockerCompose(coreDnpName, true),
       "utf8"
     );
     expect(dc).to.equal(
@@ -173,8 +172,8 @@ services:
 services:
   ${coreDnpName}:
     ports:
-      - '32769:30303'
       - '32769:30303/udp'
+      - '32769:30303'
 `,
       "Wrong modified docker-compose"
     );

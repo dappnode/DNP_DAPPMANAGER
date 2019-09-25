@@ -1,10 +1,16 @@
 import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock";
-import { mockManifest, mockDirectoryDnp } from "../testUtils";
+import {
+  mockManifest,
+  mockDirectoryDnp,
+  mockRelease,
+  mockHash,
+  mockSize
+} from "../testUtils";
 // Imports for typings
 import fetchDirectoryType from "../../src/calls/fetchDirectory";
-import { Manifest, DirectoryDnp } from "../../src/types";
+import { DirectoryDnp, PackageRelease } from "../../src/types";
 
 describe("Call function: fetchDirectory", function() {
   // This function gets the manifest of a package,
@@ -22,13 +28,13 @@ describe("Call function: fetchDirectory", function() {
         return [mockDirectoryDnp];
       }
 
-      async function getManifest(): Promise<Manifest> {
-        return manifest;
+      async function getRelease(): Promise<PackageRelease> {
+        return { ...mockRelease, metadata: manifest };
       }
 
       async function getAvatar(hash: string): Promise<string> {
-        if (hash === avatarHash) return avatarContent;
-        throw Error(`Unknown avatar hash ${hash}`);
+        hash;
+        return avatarContent;
       }
 
       async function isSyncing(): Promise<boolean> {
@@ -41,8 +47,8 @@ describe("Call function: fetchDirectory", function() {
           mock(() => import("../../src/modules/release/getDirectory"))
             .withDefault(getDirectory)
             .toBeUsed();
-          mock(() => import("../../src/modules/release/getManifest"))
-            .withDefault(getManifest)
+          mock(() => import("../../src/modules/release/getRelease"))
+            .withDefault(getRelease)
             .toBeUsed();
           mock(() => import("../../src/modules/release/getAvatar"))
             .withDefault(getAvatar)
@@ -56,10 +62,17 @@ describe("Call function: fetchDirectory", function() {
     });
 
     it("should return success message and the directory data", async () => {
-      const expectedDirectoryReturn: DirectoryDnp[] = [
+      const expectedDirectoryReturn = [
         {
           ...mockDirectoryDnp,
-          manifest,
+          manifest: {
+            ...manifest,
+            image: {
+              hash: mockHash,
+              size: mockSize,
+              path: "legacy-path"
+            }
+          },
           avatar: avatarContent
         }
       ];

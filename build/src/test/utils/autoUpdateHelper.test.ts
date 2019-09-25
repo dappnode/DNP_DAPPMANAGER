@@ -35,9 +35,7 @@ const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", () => {
-    db.setAutoUpdateSettings({});
-    db.setAutoUpdateRegistry({});
-    db.setAutoUpdatePending({});
+    db.clearDb();
     expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });
 
@@ -684,8 +682,6 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   after("Should reset all settings", () => {
-    db.setAutoUpdateSettings({});
-    db.setAutoUpdateRegistry({});
-    db.setAutoUpdatePending({});
+    db.clearDb();
   });
 });

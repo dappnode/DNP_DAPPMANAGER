@@ -1,5 +1,5 @@
 import web3 from "../../web3Setup";
-import * as validate from "../../../utils/validate";
+import { isEnsDomain } from "../../../utils/validate";
 import * as ensContract from "../../../contracts/ens";
 import * as publicResolverContract from "../../../contracts/publicResolver";
 
@@ -18,7 +18,8 @@ function namehash(name: string): string {
 export default async function fetchRepoAddress(
   repoName: string
 ): Promise<string> {
-  validate.isEthDomain(repoName); // Validate the provided name, it only accepts .eth domains
+  // Validate the provided name, it only accepts .eth domains
+  if (!isEnsDomain(repoName)) throw Error(`repoName must be an ENS domain`);
 
   const ens = new web3.eth.Contract(ensContract.abi, ensContract.address);
   const resolverAddress = await ens.methods.resolver(namehash(repoName)).call();

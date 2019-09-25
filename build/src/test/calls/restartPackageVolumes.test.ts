@@ -11,11 +11,6 @@ import rewiremock from "rewiremock";
 import restartPackageVolumesType from "../../src/calls/restartPackageVolumes";
 
 describe("Call function: restartPackageVolumes", function() {
-  const params = {
-    DNCORE_DIR: "DNCORE",
-    REPO_DIR: "test_files/"
-  };
-
   const dnpNameCore = "testCore.dnp.dappnode.eth";
   const dappmanagerId = "dappmanager.dnp.dappnode.eth";
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
@@ -152,7 +147,7 @@ describe("Call function: restartPackageVolumes", function() {
 
   before(() => {
     for (const id of ids) {
-      const dockerComposePath = getPath.dockerCompose(id, params, false);
+      const dockerComposePath = getPath.dockerCompose(id, false);
       validate.path(dockerComposePath);
       fs.writeFileSync(dockerComposePath, "docker-compose");
     }
@@ -297,7 +292,7 @@ describe("Call function: restartPackageVolumes", function() {
 
   after(() => {
     for (const id of ids) {
-      const dockerComposePath = getPath.dockerCompose(id, params, false);
+      const dockerComposePath = getPath.dockerCompose(id, false);
       fs.unlinkSync(dockerComposePath);
     }
   });

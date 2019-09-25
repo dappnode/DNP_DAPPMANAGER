@@ -14,7 +14,8 @@ import { DappGetDnps } from "../../../src/modules/dappGet/types";
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-describe("dappGet", () => {
+describe("dappGet", function() {
+  this.timeout(5 * 1000); // For some reason the before step can last > 2s
   const listContainersSpy = sinon.spy();
 
   let dappGet: typeof dappGetType;
@@ -84,6 +85,7 @@ describe("dappGet", () => {
     );
     dappGet = mock.default;
   });
+
   it("Should add packages to the alreadyUpdated object", async () => {
     const { state, alreadyUpdated } = await dappGet({
       name: "nginx-proxy.dnp.dappnode.eth",

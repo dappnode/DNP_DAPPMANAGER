@@ -2,6 +2,7 @@ import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import formatAndCompressAvatar from "../../../utils/formatAndCompressAvatar";
 import { validateAvatar } from "../validate";
+import { isIpfsHash } from "../../../utils/validate";
 
 /**
  * Handles the download of a JSON DNP manifest.
@@ -16,13 +17,12 @@ import { validateAvatar } from "../validate";
  */
 
 export default async function downloadAvatar(hash: string): Promise<string> {
-  if (!hash || typeof hash !== "string")
-    throw Error(`arg hash must be a string: ${hash}`);
+  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   /**
    * 1. Check if cache exist and validate it
    */
-  const avatarCache = db.getIpfsCache(hash);
+  const avatarCache = db.ipfsCache.get(hash);
   if (avatarCache && validateAvatar(avatarCache).success) return avatarCache;
 
   /**
@@ -50,6 +50,6 @@ export default async function downloadAvatar(hash: string): Promise<string> {
       `Downloaded image from ${hash} failed validation: ${validation.message}`
     );
 
-  db.setIpfsCache(hash, avatar);
+  db.ipfsCache.set(hash, avatar);
   return avatar;
 }

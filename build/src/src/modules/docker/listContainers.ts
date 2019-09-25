@@ -5,10 +5,19 @@ import { shortName } from "../../utils/strings";
 import params from "../../params";
 import {
   PackageContainer,
-  Dependencies,
-  VolumeInterface,
-  ContainerStatus
+  VolumeMapping,
+  ContainerStatus,
+  PortProtocol
 } from "../../types";
+import {
+  readDefaultsFromLabels,
+  readMetadataFromLabels
+} from "../../utils/containerLabelsDb";
+import {
+  parseEnvironment,
+  parsePortMappings,
+  parseVolumeMappings
+} from "../../utils/dockerComposeParsers";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -73,7 +82,7 @@ export async function listContainers(): Promise<PackageContainer[]> {
   const dnpListExtended: PackageContainer[] = dnpList.map(dnp => {
     if (!dnp.volumes) return dnp;
     const volumes = dnp.volumes.map(vol => {
-      let newVol: VolumeInterface;
+      let newVol: VolumeMapping;
       if (vol.name)
         newVol = {
           ...vol,
@@ -120,11 +129,11 @@ export async function listContainerExtendedInfo(
 function parseContainerInfo(container: ContainerInfo): PackageContainer {
   const packageName = (container.Names[0] || "").replace("/", "");
   const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
-  const isCore = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
+  const isCoreByName = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   let name;
   if (isDnp) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
-  else if (isCore)
+  else if (isCoreByName)
     name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";
   else name = packageName;
 
@@ -138,26 +147,25 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
   //   dappnode.dnp.dependencies
   //   dappnode.dnp.origin
   //   dappnode.dnp.chain
-  let origin = "";
-  let chain = "";
-  let dependencies: Dependencies = {};
   const labels = container.Labels;
-  if (labels && typeof labels === "object") {
-    // Critical for dappGet/aggregate on IPFS DNPs
-    if (labels["dappnode.dnp.origin"]) origin = labels["dappnode.dnp.origin"];
-    if (labels["dappnode.dnp.chain"]) chain = labels["dappnode.dnp.chain"];
-    if (labels["dappnode.dnp.dependencies"])
-      try {
-        dependencies = JSON.parse(labels["dappnode.dnp.dependencies"]);
-      } catch (e) {}
-  }
+  const {
+    defaultEnvironment,
+    defaultPorts,
+    defaultVolumes
+  } = readDefaultsFromLabels(labels);
+  const defaultEnvironmentParsed = parseEnvironment(defaultEnvironment);
+  const defaultPortsParsed = parsePortMappings(defaultPorts);
+  const defaultVolumesParsed = parseVolumeMappings(defaultVolumes);
+  const { dependencies, chain, origin, isCore } = readMetadataFromLabels(
+    labels
+  );
 
   return {
     id: container.Id,
     packageName,
     version,
     isDnp,
-    isCore,
+    isCore: isCore || isCoreByName,
     created: container.Created,
     image: container.Image,
     name: name,
@@ -166,19 +174,30 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
       // "PublicPort" will be undefined / null / 0 if the port is not mapped
       ...(PublicPort ? { host: PublicPort } : {}),
       container: PrivatePort,
-      protocol: Type === "udp" ? "UDP" : "TCP"
+      protocol: (Type === "udp" ? "UDP" : "TCP") as PortProtocol
+    })).map(port => ({
+      ...port,
+      deletable: !defaultPortsParsed.find(
+        defaultPort =>
+          defaultPort.container == port.container &&
+          defaultPort.protocol == port.protocol
+      )
     })),
     volumes: container.Mounts.map(({ Name, Source, Destination }) => ({
-      path: Source,
-      dest: Destination,
+      host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+      container: Destination, // "/etc/nginx/vhost.d"
       // "Name" will be undefined if it's not a named volumed
-      ...(Name ? { name: Name } : {})
+      ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d",
     })),
     state: container.State as ContainerStatus,
     running: container.State === "running",
     dependencies,
     // #### TODO: The ADMIN does not accept an empty chain or origin
     ...(origin ? { origin } : {}),
-    ...(chain ? { chain } : {})
+    ...(chain ? { chain } : {}),
+    // Default values to avoid having to read the manifest
+    defaultEnvironment: defaultEnvironmentParsed,
+    defaultPorts: defaultPortsParsed,
+    defaultVolumes: defaultVolumesParsed
   };
 }
