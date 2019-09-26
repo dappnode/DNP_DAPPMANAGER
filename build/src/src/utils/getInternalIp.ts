@@ -7,7 +7,7 @@ export default async function getInternalIp(): Promise<string> {
       `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`
     );
     const output = await shell(
-      `docker run --rm --net=host ${image} ip route get 1`
+      `docker run --rm --net=host --entrypoint=/sbin/ip ${image} route get 1`
     );
     // A unicode escape sequence is basically atomic. You cannot really build one dynamically
     // Template literals basically perform string concatenation, so your code is equivalent to
