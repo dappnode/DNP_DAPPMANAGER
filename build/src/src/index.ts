@@ -32,6 +32,7 @@ import "./utils/getVersionData";
 
 // Start HTTP API
 import "./httpApi";
+import checkIpAndUpdateIfNecessary from "./watchers/dyndns";
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
@@ -199,3 +200,6 @@ async function runLegacyOps(): Promise<void> {
 }
 
 runLegacyOps();
+
+// Refresh DynDNS
+checkIpAndUpdateIfNecessary();
