@@ -16,6 +16,7 @@ import diagnose from "./diagnose";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
 import fetchPackageData from "./fetchPackageData";
+import getParams from "./getParams";
 import getStats from "./getStats";
 import getUserActionLogs from "./getUserActionLogs";
 import getVersionData from "./getVersionData";
@@ -36,6 +37,7 @@ import requestChainData from "./requestChainData";
 import resolveRequest from "./resolveRequest";
 import restartPackage from "./restartPackage";
 import restartPackageVolumes from "./restartPackageVolumes";
+import setStaticIp from "./setStaticIp";
 import togglePackage from "./togglePackage";
 import updatePackageEnv from "./updatePackageEnv";
 import updatePortMappings from "./updatePortMappings";
@@ -53,6 +55,7 @@ export {
   fetchCoreUpdateData,
   fetchDirectory,
   fetchPackageData,
+  getParams,
   getStats,
   getUserActionLogs,
   getVersionData,
@@ -73,6 +76,7 @@ export {
   resolveRequest,
   restartPackage,
   restartPackageVolumes,
+  setStaticIp,
   togglePackage,
   updatePackageEnv,
   updatePortMappings
