@@ -39,6 +39,10 @@ const dyndnsHost = params.DYNDNS_HOST;
  */
 export default async function updateIp(): Promise<string | void> {
   const privateKey = db.dyndnsIdentity.get().privateKey;
+  if (!privateKey) {
+    logs.warn("dyndns: Private key not initialized");
+    return;
+  }
 
   const timestamp = Math.floor(Date.now() / 1000);
   const messageHash = EthCrypto.hash.keccak256(timestamp.toString());
@@ -52,7 +56,6 @@ export default async function updateIp(): Promise<string | void> {
     `sig=${signature}`
   ];
   const url = `${dyndnsHost}/?${parameters.join("&")}`;
-
   try {
     const res = await fetch(url);
 
