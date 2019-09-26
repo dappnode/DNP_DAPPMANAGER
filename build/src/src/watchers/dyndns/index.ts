@@ -1,3 +1,4 @@
+import * as eventBus from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";
 import updateIp from "../../modules/dyndns/updateIp";
@@ -91,3 +92,7 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
 setInterval(() => {
   checkIpAndUpdateIfNecessary();
 }, dyndnsInterval);
+
+eventBus.initializedDb.on(checkIpAndUpdateIfNecessary);
+
+export default checkIpAndUpdateIfNecessary;
