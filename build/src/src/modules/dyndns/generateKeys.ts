@@ -54,7 +54,7 @@ function isPrivateKeyValid(privateKey: string): boolean {
   }
 }
 
-export default async function generateKeys(): Promise<void> {
+export default function generateKeys(): void {
   const currentPrivateKey = db.dyndnsIdentity.get().privateKey;
   // Check for corrupted privateKey case
   if (currentPrivateKey) {

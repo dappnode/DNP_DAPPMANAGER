@@ -1,6 +1,7 @@
 import * as db from "./db";
 import Logs from "./logs";
 const logs = Logs(module);
+import * as eventBus from "./eventBus";
 
 // Modules
 import * as dyndns from "./modules/dyndns";
@@ -18,7 +19,12 @@ const getInternalIpSafe = returnNullIfError(getInternalIp);
 const getExternalUpnpIpSafe = returnNullIfError(getExternalUpnpIp);
 const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
 
-export default async function initializeApp(): Promise<void> {
+/**
+ * - Generate local keypair for dyndns
+ * - Get network status variables
+ * - Trigger a dyndns loop
+ */
+export default async function initializeDb(): Promise<void> {
   // 1. Directly connected to the internet: Public IP is the interface IP
   // 2. Behind a router: Needs to get the public IP, open ports and get the internal IP
   // 2A. UPnP available: Get public IP without a centralize service. Can open ports
@@ -85,7 +91,6 @@ export default async function initializeApp(): Promise<void> {
   db.upnpAvailable.set(upnpAvailable);
   // FIXME: Change naming of noNatLoopback to remove negation.
   db.noNatLoopback.set(noNatLoopback);
-  // FIXME: Add logic to detect double NAT (External UPnP IP != Public IP)
   db.doubleNat.set(doubleNat);
   db.alertToOpenPorts.set(alertUserToOpenPorts);
   db.internalIp.set(internalIp);
@@ -93,7 +98,9 @@ export default async function initializeApp(): Promise<void> {
   // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
-  await dyndns.generateKeys();
+  dyndns.generateKeys();
+
+  eventBus.initializedDb.emit();
 }
 
 // Utils
