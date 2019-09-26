@@ -200,6 +200,3 @@ async function runLegacyOps(): Promise<void> {
 }
 
 runLegacyOps();
-
-// Refresh DynDNS
-checkIpAndUpdateIfNecessary();
