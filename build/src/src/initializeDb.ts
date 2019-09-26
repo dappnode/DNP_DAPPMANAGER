@@ -16,7 +16,7 @@ import { pause } from "./utils/asyncFlows";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
-const getExternalUpnpIpSafe = returnNullIfError(getExternalUpnpIp);
+const getExternalUpnpIpSafe = returnNullIfError(getExternalUpnpIp, true);
 const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
 
 /**
@@ -106,13 +106,15 @@ export default async function initializeDb(): Promise<void> {
 // Utils
 
 function returnNullIfError(
-  fn: () => Promise<string>
+  fn: () => Promise<string>,
+  silent?: boolean
 ): () => Promise<string | null> {
   return async function(): Promise<string | null> {
     try {
       return await fn();
     } catch (e) {
-      logs.error(e.stack || e.message);
+      if (silent) logs.warn(e.message);
+      else logs.error(e.stack || e.message);
       return null;
     }
   };
