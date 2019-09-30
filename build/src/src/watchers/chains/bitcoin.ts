@@ -3,7 +3,13 @@ import shell from "../../utils/shell";
 import params from "../../params";
 import { ChainData } from "../../types";
 
-const MIN_BLOCK_DIFF_SYNC = 3;
+const getMinBlockDiffSync = (api: string) =>
+  // minTimeDiff = 30 min
+  api.includes("bitcoin")
+    ? 30 / 10
+    : // ZCash, Litecoin, etc
+      30 / 2.5;
+
 const apiPrefix = "my.";
 
 // After revising 'bitcoin-core' source code,
@@ -61,7 +67,7 @@ export default async function bitcoin(
   const secondsDiff = Math.floor(Date.now() / 1000) - block.time;
   const blockDiffAprox = Math.floor(secondsDiff / (60 * 10));
 
-  if (blockDiffAprox > MIN_BLOCK_DIFF_SYNC)
+  if (blockDiffAprox > getMinBlockDiffSync(api))
     return {
       name,
       syncing: true,
