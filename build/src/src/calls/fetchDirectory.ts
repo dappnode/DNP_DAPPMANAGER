@@ -54,46 +54,54 @@ export default async function fetchDirectory(): Promise<
   const dnpsFromDirectory = await getDirectory();
 
   // Extend package object contents
-  dnpsCache = await Promise.all(
+  const dnpsCacheTemp: (DirectoryDnp | undefined)[] = await Promise.all(
     dnpsFromDirectory.map(async pkg => {
-      const name = pkg.name;
-      // Now resolve the last version of the package
-      const release = await getRelease(name);
-      const legacyManifest = getLegacyManifestFromRelease(release);
-      emitPkg({ ...pkg, name, manifest: legacyManifest });
+      try {
+        const name = pkg.name;
+        // Now resolve the last version of the package
+        const release = await getRelease(name);
+        const legacyManifest = getLegacyManifestFromRelease(release);
+        emitPkg({ ...pkg, name, manifest: legacyManifest });
 
-      // Fetch the package avatar
-      const avatarFile = release.avatarFile;
-      let avatar;
-      if (avatarFile && isIpfsHash(avatarFile.hash)) {
-        const avatarHash = avatarFile.hash;
-        try {
-          // Retrieve cached avatar or fetch it
-          if (avatarCache[avatarHash]) {
-            avatar = avatarCache[avatarHash];
-          } else {
-            avatar = await getAvatar(avatarHash);
-            avatarCache[avatarHash] = avatar;
+        // Fetch the package avatar
+        const avatarFile = release.avatarFile;
+        let avatar;
+        if (avatarFile && isIpfsHash(avatarFile.hash)) {
+          const avatarHash = avatarFile.hash;
+          try {
+            // Retrieve cached avatar or fetch it
+            if (avatarCache[avatarHash]) {
+              avatar = avatarCache[avatarHash];
+            } else {
+              avatar = await getAvatar(avatarHash);
+              avatarCache[avatarHash] = avatar;
+            }
+            emitPkg({ ...pkg, name, avatar });
+          } catch (e) {
+            // If the avatar can not be fetched don't stop the function
+            logs.error(
+              `Error fetching avatar of ${name} at ${avatarHash}: ${e.message}`
+            );
           }
-          emitPkg({ ...pkg, name, avatar });
-        } catch (e) {
-          // If the avatar can not be fetched don't stop the function
-          logs.error(
-            `Error fetching avatar of ${name} at ${avatarHash}: ${e.message}`
-          );
         }
-      }
 
-      // Merge results and return
-      return {
-        ...pkg,
-        name,
-        // Appended
-        manifest: legacyManifest,
-        avatar
-      };
+        // Merge results and return
+        return {
+          ...pkg,
+          name,
+          // Appended
+          manifest: legacyManifest,
+          avatar
+        };
+      } catch (e) {
+        logs.error(`Error fetching ${name} release: ${e.message}`);
+      }
     })
   );
+
+  // Make sure the order is correct
+  dnpsCache = [];
+  for (const dnp of dnpsCacheTemp) if (dnp) dnpsCache.push(dnp);
 
   const payloadSize = Math.floor(
     Buffer.byteLength(JSON.stringify(dnpsCache), "utf8") / 1000
