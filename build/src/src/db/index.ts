@@ -1,7 +1,8 @@
 import {
   autoUpdatePending,
   autoUpdateRegistry,
-  autoUpdateSettings
+  autoUpdateSettings,
+  AUTO_UPDATE_SETTINGS
 } from "./autoUpdateSettings";
 import { composeCache, apmCache, ipfsCache, manifestCache } from "./cache";
 import { fileTransferPath } from "./fileTransferPath";
@@ -21,8 +22,26 @@ import {
   internalIp
 } from "./network";
 // Aditional low levels methods
-import { clearDb as clearMainDb } from "./dbMain";
-import { clearDb as clearCacheDb } from "./dbCache";
+import { lowLevel as lowLevelMainDb } from "./dbMain";
+import { lowLevel as lowLevelCacheDb } from "./dbCache";
+
+/**
+ * Migrate keys to the new DB
+ * - AUTO_UPDATE_SETTINGS
+ * - ARE_ENV_FILES_MIGRATED (is ommited)
+ */
+const dbKeysToMigrate = [AUTO_UPDATE_SETTINGS];
+function migrateToNewMainDb() {
+  for (const key of dbKeysToMigrate) {
+    lowLevelMainDb.set(key, lowLevelCacheDb.get(key));
+    lowLevelCacheDb.del(key);
+  }
+}
+
+/**
+ * Alias
+ */
+const clearCache = lowLevelCacheDb.clearDb;
 
 export {
   autoUpdatePending,
@@ -51,6 +70,9 @@ export {
   alertToOpenPorts,
   internalIp,
   // Aditional low levels methods
-  clearMainDb,
-  clearCacheDb
+  lowLevelMainDb,
+  lowLevelCacheDb,
+  // General methods
+  clearCache,
+  migrateToNewMainDb
 };

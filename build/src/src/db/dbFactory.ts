@@ -31,7 +31,7 @@ export default function dbFactory(dbPath: string) {
     return db.set(formatKey(key), value).write();
   }
 
-  function remove(key: string): void {
+  function del(key: string): void {
     db.unset(formatKey(key)).write();
   }
 
@@ -66,7 +66,7 @@ export default function dbFactory(dbPath: string) {
         if (validate(keyArg, newValue)) set(keyGetter(keyArg), newValue);
       },
       remove: (keyArg: K): void => {
-        remove(keyGetter(keyArg));
+        del(keyGetter(keyArg));
       }
     };
   }
@@ -80,6 +80,7 @@ export default function dbFactory(dbPath: string) {
   return {
     staticKey,
     dynamicKeyValidate,
-    clearDb
+    clearDb,
+    lowLevel: { get, set, del, clearDb }
   };
 }

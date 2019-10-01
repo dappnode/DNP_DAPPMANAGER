@@ -143,7 +143,7 @@ connection.onopen = (session, details): void => {
   eventBus.logUserAction.on((userActionLog: UserActionLog) => {
     publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
   });
-
+  
   /**
    * Receives userAction logs from the VPN nodejs app
    * See above for more details on userActionLog
@@ -178,10 +178,20 @@ logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
  * This function will read the contents of .env files and add them in the
- * compose itself in the `environment` field in array format
+ * compose itself in the `environment` field in array format.
+ *
+ * [LEGACY] The DB is split into two where the old db becomes a cache only
+ * and the new one is for permanent required data. Some key-values will be
+ * moved from the old db to the cache db.
  */
 
 async function runLegacyOps(): Promise<void> {
+  try {
+    db.migrateToNewMainDb();
+  } catch (e) {
+    logs.error(`Error migrating to new main DB: ${e.stack || e.message}`);
+  }
+
   try {
     if (!db.areEnvFilesMigrated.get()) {
       const { result: dnpList } = await calls.listPackages();
