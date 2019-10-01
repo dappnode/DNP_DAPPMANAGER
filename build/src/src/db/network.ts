@@ -1,4 +1,4 @@
-import { staticKey } from "./lowLevelDb";
+import { staticKey } from "./dbMain";
 
 const NO_NAT_LOOPBACK = "no-nat-loopback";
 const DOUBLE_NAT = "double-nat";

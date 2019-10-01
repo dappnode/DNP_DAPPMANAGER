@@ -1,5 +1,7 @@
 import shell from "../src/utils/shell";
 import * as path from "path";
+import * as dbMain from "../src/db/dbMain";
+import * as dbCache from "../src/db/dbCache";
 import {
   PackageContainer,
   Manifest,
@@ -15,6 +17,11 @@ import {
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
 export const testDir = "./test_files/";
+
+export function clearDbs(): void {
+  dbMain.clearDb();
+  dbCache.clearDb();
+}
 
 export function ignoreErrors<A, R>(fn: (arg: A) => R) {
   return async function(arg: A): Promise<R | undefined> {

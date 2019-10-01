@@ -1,4 +1,4 @@
-import { staticKey } from "./lowLevelDb";
+import { staticKey } from "./dbMain";
 
 const ARE_ENV_FILES_MIGRATED = "are-env-files-migrated";
 const IMPORTED_INSTALLATION_STATIC_IP = "imported-installation-staticIp";

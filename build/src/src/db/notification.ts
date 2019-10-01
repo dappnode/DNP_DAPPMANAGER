@@ -1,5 +1,6 @@
-import { dynamicKeyValidate, staticKey, joinWithDot } from "./lowLevelDb";
+import { dynamicKeyValidate, staticKey } from "./dbCache";
 import { PackageNotification } from "../types";
+import { joinWithDot } from "./dbUtils";
 
 const NOTIFICATION = "notification";
 

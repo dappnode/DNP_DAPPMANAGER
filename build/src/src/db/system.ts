@@ -1,4 +1,4 @@
-import { staticKey } from "./lowLevelDb";
+import { staticKey } from "./dbMain";
 
 const SERVER_NAME = "server-name";
 

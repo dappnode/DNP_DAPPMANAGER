@@ -21,7 +21,8 @@ import {
   internalIp
 } from "./network";
 // Aditional low levels methods
-import { clearDb } from "./lowLevelDb";
+import { clearDb as clearMainDb } from "./dbMain";
+import { clearDb as clearCacheDb } from "./dbCache";
 
 export {
   autoUpdatePending,
@@ -50,5 +51,6 @@ export {
   alertToOpenPorts,
   internalIp,
   // Aditional low levels methods
-  clearDb
+  clearMainDb,
+  clearCacheDb
 };
