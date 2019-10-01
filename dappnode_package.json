@@ -1,8 +1,8 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
-  "avatar": "/ipfs/QmdT2GX9ybaoE25HBk7is8CDnfn2KaFTpZVkLdfkAQs1PN",
+  "avatar": "/ipfs/QmfTpBLzoSdrG88ETRnDus27DTDRUrTXyyVmhXDuMNYVaN",
   "type": "dncore",
   "image": {
     "path": "",
