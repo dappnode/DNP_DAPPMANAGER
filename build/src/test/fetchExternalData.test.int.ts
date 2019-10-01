@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import { omit } from "lodash";
-import * as db from "../src/db";
 import * as calls from "../src/calls";
 import { Manifest } from "../src/types";
+import { clearDbs } from "./testUtils";
 
 describe("Fetch external release data", () => {
   before(async () => {
-    db.clearDb();
+    clearDbs();
   });
 
   const bindId = "bind.dnp.dappnode.eth";

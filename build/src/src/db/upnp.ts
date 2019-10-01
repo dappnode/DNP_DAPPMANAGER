@@ -1,4 +1,4 @@
-import { staticKey } from "./lowLevelDb";
+import { staticKey } from "./dbMain";
 import { UpnpPortMapping } from "../modules/upnpc/types";
 import { PackagePort } from "../types";
 

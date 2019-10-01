@@ -1,4 +1,4 @@
-import { staticKey } from "./lowLevelDb";
+import { staticKey } from "./dbMain";
 import { IdentityInterface } from "../types";
 
 const PUBLIC_IP = "public-ip";

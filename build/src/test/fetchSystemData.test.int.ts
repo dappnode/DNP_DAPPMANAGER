@@ -1,15 +1,15 @@
 import "mocha";
 import { expect } from "chai";
-import * as db from "../src/db";
 import * as calls from "../src/calls";
 import Logs from "../src/logs";
 import { AutoUpdateSettings } from "../src/types";
 import { MY_PACKAGES, SYSTEM_PACKAGES } from "../src/utils/autoUpdateHelper";
+import { clearDbs } from "./testUtils";
 const logs = Logs(module);
 
 describe("Auto update data", () => {
   before(async () => {
-    db.clearDb();
+    clearDbs();
   });
 
   const enabled = true;
@@ -33,7 +33,7 @@ describe("Auto update data", () => {
 
 describe("Get system data", () => {
   before(async () => {
-    db.clearDb();
+    clearDbs();
   });
 
   it("Should do and return a diagnose", async () => {
@@ -73,7 +73,7 @@ describe("Get system data", () => {
 
 describe("Notifications", async () => {
   before("Should post a test notification", async () => {
-    db.clearDb();
+    clearDbs();
     await calls.notificationsTest({});
   });
 
