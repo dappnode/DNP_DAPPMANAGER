@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import * as db from "../src/db";
 import shell from "../src/utils/shell";
 import * as calls from "../src/calls";
 import params from "../src/params";
 const getDataUri = require("datauri").promise;
 import Logs from "../src/logs";
 import { PackageContainer, ContainerStatus, PortMapping } from "../src/types";
+import { clearDbs } from "./testUtils";
 const logs = Logs(module);
 
 // Utils
@@ -68,7 +68,7 @@ describe("DNP lifecycle", function() {
     }
 
     // Clean DB
-    db.clearDb();
+    clearDbs();
 
     // Print out params
     logs.info("Test params");

@@ -28,7 +28,8 @@ const params = {
   DNCORE_DIR,
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // lowdb requires an absolute path
-  DB_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
+  DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
 
@@ -66,7 +67,18 @@ const params = {
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
-  coreDnpName: "core.dnp.dappnode.eth"
+  coreDnpName: "core.dnp.dappnode.eth",
+  vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+
+  // DYNDNS parameters
+  DYNDNS_HOST: "https://ns.dappnode.io",
+  DYNDNS_DOMAIN: "dyndns.dappnode.io",
+  DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
+
+  // System file paths
+  HOSTNAME_PATH: "/etc/dappnodename",
+  STATIC_IP_PATH: "/usr/src/app/config/static_ip",
+  VPNDB_PATH: "/usr/src/app/secrets/vpndb.json"
 };
 
 if (devMode) {
