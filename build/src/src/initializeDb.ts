@@ -117,7 +117,7 @@ export default async function initializeDb(): Promise<void> {
       logs.warn("VPN identity not imported.");
     }
 
-  const serverName = await getServerName();
+  const serverName = getServerName();
   db.publicIp.set(publicIp || "");
   db.serverName.set(serverName);
   db.upnpAvailable.set(upnpAvailable);
