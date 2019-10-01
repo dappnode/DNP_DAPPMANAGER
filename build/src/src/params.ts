@@ -67,6 +67,7 @@ const params = {
 
   // DAppNode specific names
   coreDnpName: "core.dnp.dappnode.eth",
+  vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",
@@ -75,7 +76,8 @@ const params = {
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
-  STATIC_IP_PATH: "/usr/src/app/config/static_ip"
+  STATIC_IP_PATH: "/usr/src/app/config/static_ip",
+  VPNDB_PATH: "/usr/src/app/secrets/vpndb.json"
 };
 
 if (devMode) {

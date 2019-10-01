@@ -11,8 +11,14 @@ import getInternalIp from "./utils/getInternalIp";
 import getStaticIp from "./utils/getStaticIp";
 import getExternalUpnpIp from "./modules/upnpc/getExternalIp";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls";
+import params from "./params";
 import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
+import shell from "./utils/shell";
+import { IdentityInterface } from "./types";
+
+const vpnDataVolume = params.vpnDataVolume;
+const dyndnsDomain = params.DYNDNS_DOMAIN;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -85,20 +91,48 @@ export default async function initializeDb(): Promise<void> {
     ? Boolean(internalIp !== publicIp && !upnpAvailable)
     : false;
 
+  if (!db.isVpnDbMigrated.get())
+    try {
+      const image = await shell(
+        `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`
+      );
+      const output = await shell(
+        `docker run --rm -v  ${vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
+      );
+      const vpndb: IdentityInterface = JSON.parse(output);
+      db.dyndnsIdentity.set({
+        address: vpndb.address,
+        privateKey: vpndb.privateKey,
+        publicKey: vpndb.publicKey
+      });
+      const subdomain = vpndb.address
+        .toLowerCase()
+        .substr(2)
+        .substring(0, 16);
+      const domain = [subdomain, dyndnsDomain].join(".");
+      db.domain.set(domain);
+      db.isVpnDbMigrated.set(true);
+
+      logs.info("VPN identity imported.");
+    } catch (e) {
+      logs.warn("VPN identity not imported.");
+    }
+
   const serverName = await getServerName();
   db.publicIp.set(publicIp || "");
   db.serverName.set(serverName);
   db.upnpAvailable.set(upnpAvailable);
-  // FIXME: Change naming of noNatLoopback to remove negation.
   db.noNatLoopback.set(noNatLoopback);
   db.doubleNat.set(doubleNat);
   db.alertToOpenPorts.set(alertUserToOpenPorts);
   db.internalIp.set(internalIp);
 
-  // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
-  // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
-  // - Updates the domain: db.domain.set(domain);
-  dyndns.generateKeys();
+  if (!db.isVpnDbMigrated.get()) {
+    // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
+    // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
+    // - Updates the domain: db.domain.set(domain);
+    dyndns.generateKeys();
+  }
 
   eventBus.initializedDb.emit();
 }
