@@ -9,7 +9,8 @@ import { notification, notifications } from "./notification";
 import { upnpAvailable, upnpPortMappings, portsToOpen } from "./upnp";
 import {
   areEnvFilesMigrated,
-  importedInstallationStaticIp
+  importedInstallationStaticIp,
+  isVpnDbMigrated
 } from "./systemFlags";
 import { publicIp, domain, dyndnsIdentity, staticIp } from "./dyndns";
 import { serverName } from "./system";
@@ -42,6 +43,7 @@ export {
   dyndnsIdentity,
   staticIp,
   importedInstallationStaticIp,
+  isVpnDbMigrated,
   serverName,
   noNatLoopback,
   doubleNat,
