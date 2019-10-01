@@ -1,6 +1,7 @@
-import { dynamicKeyValidate, joinWithDot, stripDots } from "./lowLevelDb";
+import { dynamicKeyValidate } from "./dbCache";
 import { Manifest, ApmVersion, ComposeUnsafe } from "../types";
 import semver from "semver";
+import { joinWithDot, stripDots } from "./dbUtils";
 
 const CACHE = "cache";
 const CACHE_MANIFEST = `${CACHE}.manifest`;

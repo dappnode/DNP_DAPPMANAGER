@@ -439,3 +439,18 @@ export interface RpcHandlerReturn {
   userAction?: boolean;
   privateKwargs?: boolean;
 }
+
+/**
+ * HTTP Response
+ */
+
+export interface HttpResponseInterface {
+  data: any;
+  statusCode: number;
+}
+
+export interface IdentityInterface {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+}

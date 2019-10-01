@@ -5,6 +5,7 @@ import { registerHandler } from "./registerHandler";
 import params from "./params";
 import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
+import initializeDb from "./initializeDb";
 import {
   ChainData,
   DirectoryDnp,
@@ -24,12 +25,16 @@ import "./watchers/autoUpdates";
 import "./watchers/chains";
 import "./watchers/diskUsage";
 import "./watchers/natRenewal";
+import "./watchers/dyndns";
 
 // Print version data
 import "./utils/getVersionData";
 
 // Start HTTP API
 import "./httpApi";
+
+// Generate keypair, network stats, and run dyndns loop
+initializeDb();
 
 // Initial calls to check this DAppNode's status
 calls
@@ -138,7 +143,7 @@ connection.onopen = (session, details): void => {
   eventBus.logUserAction.on((userActionLog: UserActionLog) => {
     publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
   });
-
+  
   /**
    * Receives userAction logs from the VPN nodejs app
    * See above for more details on userActionLog
@@ -173,10 +178,20 @@ logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
  * This function will read the contents of .env files and add them in the
- * compose itself in the `environment` field in array format
+ * compose itself in the `environment` field in array format.
+ *
+ * [LEGACY] The DB is split into two where the old db becomes a cache only
+ * and the new one is for permanent required data. Some key-values will be
+ * moved from the old db to the cache db.
  */
 
 async function runLegacyOps(): Promise<void> {
+  try {
+    db.migrateToNewMainDb();
+  } catch (e) {
+    logs.error(`Error migrating to new main DB: ${e.stack || e.message}`);
+  }
+
   try {
     if (!db.areEnvFilesMigrated.get()) {
       const { result: dnpList } = await calls.listPackages();
