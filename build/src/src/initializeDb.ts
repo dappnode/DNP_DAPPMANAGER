@@ -6,6 +6,7 @@ import * as eventBus from "./eventBus";
 // Modules
 import * as dyndns from "./modules/dyndns";
 // Utils
+import getDappmanagerImage from "./utils/getDappmanagerImage";
 import getServerName from "./utils/getServerName";
 import getInternalIp from "./utils/getInternalIp";
 import getStaticIp from "./utils/getStaticIp";
@@ -93,9 +94,7 @@ export default async function initializeDb(): Promise<void> {
 
   if (!db.isVpnDbMigrated.get())
     try {
-      const image = await shell(
-        `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`
-      );
+      const image = await getDappmanagerImage();
       const output = await shell(
         `docker run --rm -v  ${vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
       );
