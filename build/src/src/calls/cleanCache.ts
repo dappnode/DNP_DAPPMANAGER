@@ -1,5 +1,5 @@
 import params from "../params";
-import * as dbCache from "../db/dbCache";
+import { clearCache } from "../db";
 import restartPatch from "../modules/docker/restartPatch";
 // Utils
 import shell from "../utils/shell";
@@ -21,7 +21,7 @@ export default async function cleanCache(): Promise<RpcHandlerReturn> {
   }
 
   // Clear cache DBs in friendly manner
-  dbCache.clearDb();
+  clearCache();
 
   // Restart DAPPMANAGER to prevent app breaks after deleting the db
   await restartPatch("dappmanager.dnp.dappnode.eth");
