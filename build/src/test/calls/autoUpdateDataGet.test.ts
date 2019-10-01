@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import { createTestDir, cleanTestDir, mockDnp } from "../testUtils";
+import { createTestDir, cleanTestDir, mockDnp, clearDbs } from "../testUtils";
 import {
   editDnpSetting,
   editCoreSetting,
   isUpdateDelayCompleted,
   flagCompletedUpdate
 } from "../../src/utils/autoUpdateHelper";
-import * as db from "../../src/db";
 import params from "../../src/params";
 import rewiremock from "rewiremock";
 import autoUpdateDataGetType from "../../src/calls/autoUpdateDataGet";
@@ -67,7 +66,7 @@ describe("Call function: autoUpdateDataGet", () => {
 
   before(async () => {
     await createTestDir();
-    db.clearDb();
+    clearDbs();
     // Prepare results
     // Enable a few DNPs
     editCoreSetting(true);

@@ -1,4 +1,5 @@
-import { staticKey } from "./lowLevelDb";
+import * as dbMain from "./dbMain";
+import * as dbCache from "./dbCache";
 import {
   AutoUpdateSettings,
   AutoUpdatePending,
@@ -11,17 +12,17 @@ const AUTO_UPDATE_PENDING = "auto-update-pending";
 
 // auto-update-settings
 
-export const autoUpdateSettings = staticKey<AutoUpdateSettings>(
+export const autoUpdateSettings = dbMain.staticKey<AutoUpdateSettings>(
   AUTO_UPDATE_SETTINGS,
   {}
 );
 
-export const autoUpdatePending = staticKey<AutoUpdatePending>(
+export const autoUpdatePending = dbCache.staticKey<AutoUpdatePending>(
   AUTO_UPDATE_REGISTRY,
   {}
 );
 
-export const autoUpdateRegistry = staticKey<AutoUpdateRegistry>(
+export const autoUpdateRegistry = dbCache.staticKey<AutoUpdateRegistry>(
   AUTO_UPDATE_PENDING,
   {}
 );

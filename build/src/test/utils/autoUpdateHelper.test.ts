@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-import * as db from "../../src/db";
 import params from "../../src/params";
 import { getCoreVersionId } from "../../src/utils/coreVersionId";
 
@@ -30,12 +29,13 @@ import {
   // Utils
   getLastRegistryEntry
 } from "../../src/utils/autoUpdateHelper";
+import { clearDbs } from "../testUtils";
 
 const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   beforeEach("Make sure the autosettings are restarted", () => {
-    db.clearDb();
+    clearDbs();
     expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });
 
@@ -682,6 +682,6 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   after("Should reset all settings", () => {
-    db.clearDb();
+    clearDbs();
   });
 });

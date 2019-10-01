@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as db from "../src/db";
 import shell from "../src/utils/shell";
-import { testDir, cleanTestDir, createTestDir } from "./testUtils";
+import { testDir, cleanTestDir, createTestDir, clearDbs } from "./testUtils";
 
 // Calls
 import backupGet from "../src/calls/backupGet";
@@ -28,7 +28,7 @@ describe("Integration test for backup to and from:", function() {
   const filePath = ".temp-transfer/test-backup.dnp.dappnode.eth_backup.tar.xz";
 
   before(async () => {
-    db.clearDb();
+    clearDbs();
   });
 
   /**

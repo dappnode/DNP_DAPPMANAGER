@@ -29,6 +29,7 @@ const params = {
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // lowdb requires an absolute path
   DB_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdbcache.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
 
