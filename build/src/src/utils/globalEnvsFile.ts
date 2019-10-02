@@ -1,14 +1,29 @@
 import params from "../params";
+import path from "path";
 import fs from "fs";
 import { parseEnvironment, stringifyEnvironment } from "./dockerComposeParsers";
+import { getDockerComposePath } from "./dockerComposeFile";
 
-const globalEnvsFile = params.GLOBAL_ENVS_FILE;
+const globalEnvsFile = params.GLOBAL_ENVS_PATH_NODE;
 export const envsPath = globalEnvsFile; // For testing
 
 const NEWLINES_MATCH = /\n|\r|\r\n/;
 
 interface Envs {
   [name: string]: string;
+}
+
+export function getRelativePathFromComposePath(
+  composePath: string,
+  _globalEnvsFile = globalEnvsFile // For testing
+): string {
+  const composeDir = path.parse(composePath).dir;
+  return path.relative(composeDir, _globalEnvsFile);
+}
+
+export function getRelativePath(dnpName: string): string {
+  const composePath = getDockerComposePath(dnpName);
+  return getRelativePathFromComposePath(composePath);
 }
 
 export function setEnvs(newEnvs: Envs): void {

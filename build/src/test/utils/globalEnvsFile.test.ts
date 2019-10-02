@@ -3,8 +3,8 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 import { testDir, createTestDir, cleanTestDir } from "../testUtils";
-
 import * as globalEnvsFile from "../../src/utils/globalEnvsFile";
+import params from "../../src/params";
 
 describe("Util > globalEnvsFile", function() {
   beforeEach(async () => {
@@ -57,6 +57,40 @@ describe("Util > globalEnvsFile", function() {
       THIS_IS: "",
       VERY_BROKEN: ""
     });
+  });
+
+  it("Should get the relative path of the env file of a core DNP", () => {
+    const id = "vpn.dnp.dappnode.eth";
+    fs.writeFileSync(
+      path.join(params.DNCORE_DIR, "docker-compose-vpn.yml"),
+      "compose"
+    );
+    expect(globalEnvsFile.getRelativePath(id)).to.equal(
+      "dnp.dappnode.global.env"
+    );
+  });
+
+  it("Should parse paths correctly", () => {
+    const globalEnvPathReal =
+      "/usr/src/dappnode/DNCORE/dnp.dappnode.global.env";
+    const coreComposePath = "/usr/src/dappnode/DNCORE/docker-compose-vpn.yml";
+    const dnpComposePath =
+      "/usr/src/dappnode/dnp_repo/bitcoin.dnp.dappnode.eth/docker-compose-bitcoin.yml";
+    expect(
+      globalEnvsFile.getRelativePathFromComposePath(
+        coreComposePath,
+        globalEnvPathReal
+      )
+    ).to.equal("dnp.dappnode.global.env", "Wrong core relative path");
+    expect(
+      globalEnvsFile.getRelativePathFromComposePath(
+        dnpComposePath,
+        globalEnvPathReal
+      )
+    ).to.equal(
+      "../../DNCORE/dnp.dappnode.global.env",
+      "Wrong dnp relative path"
+    );
   });
 
   after(async () => {

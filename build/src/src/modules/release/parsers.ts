@@ -17,7 +17,10 @@ import {
 // Define docker compose parameters
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
-const globalEnvsFile = params.GLOBAL_ENVS_FILE;
+
+function getGlobalEnvsFilePath(isCore: boolean): string {
+  return isCore ? params.GLOBAL_ENVS_PATH_CORE : params.GLOBAL_ENVS_PATH_DNP;
+}
 
 /**
  * Legacy function to convert a manifest into a compose
@@ -160,7 +163,8 @@ export function sanitizeCompose(
   if (!isCore) delete composeUnsafe.networks;
 
   const env_file = [];
-  if ((manifest.globalEnvs || {}).all) env_file.push(globalEnvsFile);
+  if ((manifest.globalEnvs || {}).all)
+    env_file.push(getGlobalEnvsFilePath(isCore));
 
   return {
     ...pick(composeUnsafe, ["version", "networks", "volumes"]),
