@@ -1,10 +1,11 @@
 import params from "../params";
 import fs from "fs";
+import { parseEnvironment, stringifyEnvironment } from "./dockerComposeParsers";
 
 const globalEnvsFile = params.GLOBAL_ENVS_FILE;
+export const envsPath = globalEnvsFile; // For testing
 
 const NEWLINES_MATCH = /\n|\r|\r\n/;
-const NAME_VALUE_SPLIT = /=(.*)/;
 
 interface Envs {
   [name: string]: string;
@@ -30,18 +31,10 @@ export function readEnvFile(envPath: string): Envs {
   if (!fs.existsSync(envPath)) writeEnvFile(envPath, {});
 
   const envData = fs.readFileSync(envPath, "utf8").trim();
-  return envData.split(NEWLINES_MATCH).reduce(
-    (envs, line) => {
-      const [name, value] = line.trim().split(NAME_VALUE_SPLIT);
-      return { ...envs, [name]: value || "" };
-    },
-    {} as Envs
-  );
+  return parseEnvironment(envData.split(NEWLINES_MATCH));
 }
 
 export function writeEnvFile(envPath: string, envs: Envs): void {
-  const envData = Object.entries(envs)
-    .map(([name, value]) => [name, value || ""].join("="))
-    .join("\n");
+  const envData = stringifyEnvironment(envs).join("\n");
   fs.writeFileSync(envPath, envData);
 }

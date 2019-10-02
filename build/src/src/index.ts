@@ -39,7 +39,7 @@ initializeDb();
 
 // Create the global env file
 globalEnvsFile.createFile();
-globalEnvsFile.setEnvs({ DAPPNODE_GLOBAL_ENVS_ACTIVE: "true" });
+globalEnvsFile.setEnvs({ [params.GLOBAL_ENVS.ACTIVE]: "true" });
 
 // Initial calls to check this DAppNode's status
 calls
