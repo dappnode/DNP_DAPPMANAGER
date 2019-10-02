@@ -134,20 +134,21 @@ export default async function initializeDb(): Promise<void> {
   }
 
   globalEnvsFile.setEnvs({
-    [params.GLOBAL_ENVS.HOSTNAME]: db.serverName.get(),
     [params.GLOBAL_ENVS.INTERNAL_IP]: db.internalIp.get(),
     [params.GLOBAL_ENVS.STATIC_IP]: db.staticIp.get(),
+    [params.GLOBAL_ENVS.HOSTNAME]: db.staticIp.get() || db.domain.get(),
     [params.GLOBAL_ENVS.UPNP_AVAILABLE]: boolToString(db.upnpAvailable.get()),
     [params.GLOBAL_ENVS.NO_NAT_LOOPBACK]: boolToString(!db.noNatLoopback.get()),
     [params.GLOBAL_ENVS.DOMAIN]: db.domain.get(),
     [params.GLOBAL_ENVS.PUBKEY]: db.dyndnsIdentity.get().publicKey,
-    [params.GLOBAL_ENVS.PUBLIC_IP]: db.publicIp.get()
+    [params.GLOBAL_ENVS.PUBLIC_IP]: db.publicIp.get(),
+    [params.GLOBAL_ENVS.SERVER_NAME]: db.serverName.get()
   });
 
   if (!db.hasRestartedVpnToInjectEnvs.get())
     try {
       const vpnName = "vpn.dnp.dappnode.eth";
-      mergeEnvFile(vpnName, params.GLOBAL_ENVS_FILE);
+      mergeEnvFile(vpnName, params.GLOBAL_ENVS_PATH_CORE);
       await restartPackage({ id: vpnName });
       db.hasRestartedVpnToInjectEnvs.set(true);
     } catch (e) {

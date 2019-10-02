@@ -12,6 +12,7 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  */
 let DNCORE_DIR = "DNCORE"; // Bind volume
 let REPO_DIR = "dnp_repo"; // Named volume
+const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 
 if (process.env.TEST) {
   DNCORE_DIR = "test_files/";
@@ -32,8 +33,10 @@ const params = {
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
-  // Must be an absolute path because DNP docker-compose are in different paths
-  GLOBAL_ENVS_FILE: path.resolve(DNCORE_DIR, "dnp.dappnode.global.env"),
+  // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
+  GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
+  GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
+  GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -85,14 +88,15 @@ const params = {
   // Global ENVs names
   GLOBAL_ENVS: {
     ACTIVE: "_DAPPNODE_GLOBAL_ENVS_ACTIVE",
+    DOMAIN: "_DAPPNODE_GLOBAL_DOMAIN", // "" || "6b3d49d4965584c2.dyndns.dappnode.io"
+    STATIC_IP: "_DAPPNODE_GLOBAL_STATIC_IP", // "" || "138.68.106.96"
     HOSTNAME: "_DAPPNODE_GLOBAL_HOSTNAME", // "6b3d49d4965584c2.dyndns.dappnode.io" || "138.68.106.96"
     INTERNAL_IP: "_DAPPNODE_GLOBAL_INTERNAL_IP", // "192.168.0.1"
-    STATIC_IP: "_DAPPNODE_GLOBAL_STATIC_IP", // "" || "138.68.106.96"
     UPNP_AVAILABLE: "_DAPPNODE_GLOBAL_UPNP_AVAILABLE", // "true" || "false"
     NO_NAT_LOOPBACK: "_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", // "true" || "false"
-    DOMAIN: "_DAPPNODE_GLOBAL_DOMAIN", // "" || "6b3d49d4965584c2.dyndns.dappnode.io"
     PUBKEY: "_DAPPNODE_GLOBAL_PUBKEY", // "0x6B3D49d4965584C28Fbf14B82b1012664a73b9Ab"
-    PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP" // "138.68.106.96"
+    PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
+    SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
   }
 };
 
