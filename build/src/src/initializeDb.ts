@@ -15,6 +15,7 @@ import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
 import Logs from "./logs";
 import { restartPackage } from "./calls";
+import { mergeEnvFile } from "./utils/dockerComposeFile";
 const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
@@ -145,7 +146,9 @@ export default async function initializeDb(): Promise<void> {
 
   if (!db.hasRestartedVpnToInjectEnvs.get())
     try {
-      await restartPackage({ id: "vpn.dnp.dappnode.eth" });
+      const vpnName = "vpn.dnp.dappnode.eth";
+      mergeEnvFile(vpnName, params.GLOBAL_ENVS_FILE);
+      await restartPackage({ id: vpnName });
       db.hasRestartedVpnToInjectEnvs.set(true);
     } catch (e) {
       logs.error(`Error reseting the VPN: ${e.stack}`);

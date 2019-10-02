@@ -1,9 +1,36 @@
 import fs from "fs";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
-import { readComposeObj, mergeEnvsAndOmitEnvFile } from "./dockerComposeFile";
-import { parseEnvironment, parseService } from "./dockerComposeParsers";
-import { Compose, Manifest, PackageEnvs } from "../types";
+import {
+  writeComposeObj,
+  readComposeObj,
+  mergeEnvsAndOmitDnpEnvFile
+} from "./dockerComposeFile";
+import {
+  writeDefaultsToLabels,
+  writeMetadataToLabels
+} from "./containerLabelsDb";
+import {
+  parseEnvironment,
+  stringifyEnvironment,
+  parseServiceName,
+  parseService,
+  mergeVolumeArrays,
+  mergePortArrays,
+  mergeUserSetVolumes
+} from "./dockerComposeParsers";
+import params from "../params";
+import {
+  Compose,
+  Manifest,
+  UserSetPackageVols,
+  UserSetPackagePorts,
+  UserSetPackageEnvs,
+  UserSetPackageVolsSingle,
+  UserSetPackagePortsSingle,
+  PackageEnvs,
+  ComposeService
+} from "../types";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
@@ -53,7 +80,7 @@ export function convertLegacyEnvFiles({
   if (fs.existsSync(envFilePath)) {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
     const envsArray = envFileData.trim().split("\n");
-    mergeEnvsAndOmitEnvFile(name, parseEnvironment(envsArray));
+    mergeEnvsAndOmitDnpEnvFile(name, parseEnvironment(envsArray));
     fs.unlinkSync(envFilePath);
     return true;
   }

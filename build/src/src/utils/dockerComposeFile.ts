@@ -2,14 +2,8 @@ import fs from "fs";
 import path from "path";
 import yaml from "js-yaml";
 import * as composeParser from "./dockerComposeParsers";
-import { omit, omitBy, isEmpty, isObject } from "lodash";
-import {
-  PortMapping,
-  Compose,
-  PackageEnvs,
-  ComposeService,
-  UserSet
-} from "../types";
+import { uniq, concat, pull, omitBy, isEmpty, isObject } from "lodash";
+import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
 import params from "../params";
 
 /**
@@ -46,7 +40,12 @@ export function writeComposeObj(
   dockerComposePath: string,
   compose: Compose
 ): void {
-  // Clean empty arrays and objects
+  /**
+   * Critical step to prevent writing faulty docker-compose.yml files
+   * that can kill docker-compose calls.
+   * - Removes service first levels keys that are objects or arrays and
+   *   are empty (environment, env_files, ports, volumes)
+   */
   const serviceName = composeParser.parseServiceName(compose);
   const cleanCompose = {
     ...compose,
@@ -70,7 +69,11 @@ export function writeComposeObj(
  */
 
 function getComposeServiceEditor<T>(
-  serviceEditor: (service: ComposeService, newData: T) => ComposeService
+  serviceEditor: (
+    service: ComposeService,
+    newData: T,
+    serviceName: string
+  ) => ComposeService
 ) {
   return function composeServiceEditor(
     id: string,
@@ -85,7 +88,7 @@ function getComposeServiceEditor<T>(
     writeComposeObj(composePath, {
       ...compose,
       services: {
-        [serviceName]: serviceEditor(service, newData)
+        [serviceName]: serviceEditor(service, newData, serviceName)
       }
     });
   };
@@ -121,10 +124,16 @@ export const mergeEnvs = getComposeServiceEditor(
   }
 );
 
-export const mergeEnvsAndOmitEnvFile = getComposeServiceEditor(
-  (service: ComposeService, newEnvs: PackageEnvs): ComposeService => {
+/* eslint-disable @typescript-eslint/camelcase */
+export const mergeEnvsAndOmitDnpEnvFile = getComposeServiceEditor(
+  (
+    service: ComposeService,
+    newEnvs: PackageEnvs,
+    serviceName: string
+  ): ComposeService => {
     return {
-      ...omit(service, "env_file"),
+      ...service,
+      env_file: pull(service.env_file || [], `${serviceName}.env`),
       environment: composeParser.stringifyEnvironment(
         composeParser.mergeEnvs(
           newEnvs,
@@ -134,6 +143,16 @@ export const mergeEnvsAndOmitEnvFile = getComposeServiceEditor(
     };
   }
 );
+
+export const mergeEnvFile = getComposeServiceEditor(
+  (service: ComposeService, newEnvFile: string): ComposeService => {
+    return {
+      ...service,
+      env_file: uniq(concat(service.env_file || [], newEnvFile))
+    };
+  }
+);
+/* eslint-enable @typescript-eslint/camelcase */
 
 export const mergePortMapping = getComposeServiceEditor(
   (service: ComposeService, newPortMappings: PortMapping[]): ComposeService => {
