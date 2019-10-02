@@ -1,11 +1,6 @@
 import * as db from "./db";
-import Logs from "./logs";
-const logs = Logs(module);
 import * as eventBus from "./eventBus";
-
-// Modules
 import * as dyndns from "./modules/dyndns";
-// Utils
 import getDappmanagerImage from "./utils/getDappmanagerImage";
 import getServerName from "./utils/getServerName";
 import getInternalIp from "./utils/getInternalIp";
@@ -16,7 +11,11 @@ import params from "./params";
 import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
 import shell from "./utils/shell";
+import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
+import Logs from "./logs";
+import { restartPackage } from "./calls";
+const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
 const dyndnsDomain = params.DYNDNS_DOMAIN;
@@ -133,6 +132,25 @@ export default async function initializeDb(): Promise<void> {
     dyndns.generateKeys();
   }
 
+  globalEnvsFile.setEnvs({
+    [params.GLOBAL_ENVS.HOSTNAME]: db.serverName.get(),
+    [params.GLOBAL_ENVS.INTERNAL_IP]: db.internalIp.get(),
+    [params.GLOBAL_ENVS.STATIC_IP]: db.staticIp.get(),
+    [params.GLOBAL_ENVS.UPNP_AVAILABLE]: boolToString(db.upnpAvailable.get()),
+    [params.GLOBAL_ENVS.NO_NAT_LOOPBACK]: boolToString(!db.noNatLoopback.get()),
+    [params.GLOBAL_ENVS.DOMAIN]: db.domain.get(),
+    [params.GLOBAL_ENVS.PUBKEY]: db.dyndnsIdentity.get().publicKey,
+    [params.GLOBAL_ENVS.PUBLIC_IP]: db.publicIp.get()
+  });
+
+  if (!db.hasRestartedVpnToInjectEnvs.get())
+    try {
+      await restartPackage({ id: "vpn.dnp.dappnode.eth" });
+      db.hasRestartedVpnToInjectEnvs.set(true);
+    } catch (e) {
+      logs.error(`Error reseting the VPN: ${e.stack}`);
+    }
+
   eventBus.initializedDb.emit();
 }
 
@@ -151,4 +169,8 @@ function returnNullIfError(
       return null;
     }
   };
+}
+
+function boolToString(bool: boolean): string {
+  return bool ? "true" : "false";
 }
