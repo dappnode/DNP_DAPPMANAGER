@@ -32,7 +32,8 @@ const params = {
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
-  GLOBAL_ENVS_FILE: path.join(DNCORE_DIR, "dnp.dappnode.global.env"),
+  // Must be an absolute path because DNP docker-compose are in different paths
+  GLOBAL_ENVS_FILE: path.resolve(DNCORE_DIR, "dnp.dappnode.global.env"),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
