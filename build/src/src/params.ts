@@ -79,7 +79,19 @@ const params = {
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
   STATIC_IP_PATH: "/usr/src/app/config/static_ip",
-  VPNDB_PATH: "/usr/src/app/secrets/vpndb.json"
+  VPNDB_PATH: "/usr/src/app/secrets/vpndb.json",
+
+  // Global ENVs names
+  GLOBAL_ENVS: {
+    HOSTNAME: "_DAPPNODE_GLOBAL_HOSTNAME", // "6b3d49d4965584c2.dyndns.dappnode.io" || "138.68.106.96"
+    INTERNAL_IP: "_DAPPNODE_GLOBAL_INTERNAL_IP", // "192.168.0.1"
+    STATIC_IP: "_DAPPNODE_GLOBAL_STATIC_IP", // "" || "138.68.106.96"
+    UPNP_AVAILABLE: "_DAPPNODE_GLOBAL_UPNP_AVAILABLE", // "true" || "false"
+    NO_NAT_LOOPBACK: "_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", // "true" || "false"
+    DOMAIN: "_DAPPNODE_GLOBAL_DOMAIN", // "" || "6b3d49d4965584c2.dyndns.dappnode.io"
+    PUBKEY: "_DAPPNODE_GLOBAL_PUBKEY", // "0x6B3D49d4965584C28Fbf14B82b1012664a73b9Ab"
+    PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP" // "138.68.106.96"
+  }
 };
 
 if (devMode) {
