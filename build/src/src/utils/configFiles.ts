@@ -16,7 +16,8 @@ import {
   parseServiceName,
   parseService,
   mergeVolumeArrays,
-  mergePortArrays
+  mergePortArrays,
+  mergeUserSetVolumes
 } from "./dockerComposeParsers";
 import params from "../params";
 import {
@@ -88,8 +89,10 @@ export function mergeUserSetToCompose(
           ...parseEnvironment(previousEnvs),
           ...userSetDnpEnvs
         }),
-        volumes: mergeVolumeArrays(previousVolumes, defaultVolumes).map(
-          vol => userSetDnpVols[vol] || vol
+        // Volumes are normalized on the mergeVolumeArrays
+        volumes: mergeUserSetVolumes(
+          mergeVolumeArrays(previousVolumes, defaultVolumes),
+          userSetDnpVols
         ),
         ports: mergePortArrays(previousPorts, defaultPorts).map(
           port => userSetDnpPorts[port] || port
