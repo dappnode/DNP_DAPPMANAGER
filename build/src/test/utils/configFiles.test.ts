@@ -43,8 +43,8 @@ describe("Util > configFiles", () => {
         "30304:30304": "30304"
       };
       const userSetDnpVols = {
-        "kovan:/root/.local/share/io.parity.ethereum/":
-          "different_path:/root/.local/share/io.parity.ethereum/"
+        "kovan:/root/.local/share/io.parity.ethereum//":
+          "different_path:/root/.local/share/io.parity.ethereum//"
       };
 
       const serviceName = parseServiceName(mockCompose);
@@ -68,7 +68,7 @@ describe("Util > configFiles", () => {
             environment: ["ENV1=USER_SET_VAL1", "ENV2=PREVIOUS_SET_VAL2"],
             ports: ["31313:30303", "31313:30303/udp", "30304", "3000:8080"],
             volumes: [
-              "different_path:/root/.local/share/io.parity.ethereum/",
+              "different_path:/root/.local/share/io.parity.ethereum",
               "/dev1:/root/.sync"
             ],
             labels: writeDefaultsToLabels({

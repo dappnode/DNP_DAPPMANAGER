@@ -1,11 +1,13 @@
-import { uniqBy, concat, pickBy } from "lodash";
+import path from "path";
+import { uniqBy, concat, pickBy, fromPairs, toPairs } from "lodash";
 import {
   PortProtocol,
   PortMapping,
   PackageEnvs,
   Compose,
   VolumeMapping,
-  ComposeService
+  ComposeService,
+  UserSetPackageVolsSingle
 } from "../types";
 
 /**
@@ -162,6 +164,18 @@ export function mergePortArrays(
 }
 
 /**
+ * Normalizes volume paths, removes trailing slash
+ * - "/"                => "/"
+ * - "/root/.ethereum/" => "/root/.ethereum"
+ * - "data"             => "data"
+ */
+export function normalizeVolumePath(volumePath: string) {
+  // Remove trailing slash
+  if (volumePath === "/") return volumePath;
+  return path.normalize(volumePath.replace(/\/+$/, ""));
+}
+
+/**
  * Parses an array of volumes from the service section
  * @param volumesArray
  */
@@ -170,8 +184,8 @@ export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
     const [host, container] = volString.split(/:(.*)/);
     const isNamed = !host.startsWith("/") && !host.startsWith("~");
     return {
-      host,
-      container,
+      host: normalizeVolumePath(host),
+      container: normalizeVolumePath(container),
       name: isNamed ? host : undefined
     };
   });
@@ -214,4 +228,16 @@ export function mergeVolumeArrays(
       parseVolumeMappings(volumeArray2)
     )
   );
+}
+
+export function mergeUserSetVolumes(
+  currentVolumes: string[],
+  userSetVolumes: UserSetPackageVolsSingle
+) {
+  // Normalize userSetVolumes so they catch the current ones
+  const userSetDnpVolsNormalized: UserSetPackageVolsSingle = fromPairs(
+    toPairs(userSetVolumes).map(pair => pair.map(normalizeVolumePath))
+  );
+
+  return currentVolumes.map(vol => userSetDnpVolsNormalized[vol] || vol);
 }

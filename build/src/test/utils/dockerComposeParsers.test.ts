@@ -12,7 +12,8 @@ import {
   parseVolumeMappings,
   stringifyVolumeMappings,
   mergeVolumeMappings,
-  mergeVolumeArrays
+  mergeVolumeArrays,
+  normalizeVolumePath
 } from "../../src/utils/dockerComposeParsers";
 
 describe("Util: dockerComposeParsers", () => {
@@ -164,6 +165,31 @@ describe("Util: dockerComposeParsers", () => {
       expect(mergedPortMappings).to.deep.equal([
         "/dev1/custom-path/bitcoin-data:/root/.bitcoin"
       ]);
+    });
+
+    it("De-duplicate identical paths", () => {
+      const volumeArray1 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum/"];
+      const volumeArray2 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum"];
+
+      const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
+
+      expect(mergedPortMappings).to.deep.equal([
+        "ethchaindnpdappnodeeth_geth:/root/.ethereum"
+      ]);
+    });
+
+    describe("Path normalization", () => {
+      const paths = [
+        { path: "/", res: "/" },
+        { path: "/root/.ethereum/", res: "/root/.ethereum" },
+        { path: "/hello///", res: "/hello" },
+        { path: "ethchain_geth", res: "ethchain_geth" },
+        { path: "data", res: "data" }
+      ];
+      for (const { path, res } of paths)
+        it(`Should normalize ${path}`, () => {
+          expect(normalizeVolumePath(path)).to.equal(res);
+        });
     });
   });
 });
