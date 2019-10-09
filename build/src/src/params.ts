@@ -37,6 +37,7 @@ const params = {
   GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
+  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -97,7 +98,11 @@ const params = {
     PUBKEY: "_DAPPNODE_GLOBAL_PUBKEY", // "0x6B3D49d4965584C28Fbf14B82b1012664a73b9Ab"
     PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
     SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
-  }
+  },
+
+  // A hardcoded key is used to prevent an attacker using specific values
+  ADMIN_NACL_PUBLIC_KEY: "5jLtRyKR3S947PYW7ge5MwjWSaPXalHK2REhPTzBjkQ=",
+  ADMIN_NACL_SECRET_KEY: "IbB5BuqXnzCObxMpGll1u9vOAInv0va83MxmCk76eAQ="
 };
 
 if (devMode) {
