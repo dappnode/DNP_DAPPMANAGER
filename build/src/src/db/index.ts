@@ -22,6 +22,7 @@ import {
   alertToOpenPorts,
   internalIp
 } from "./network";
+import { naclSecretKey, naclPublicKey, identityAddress } from "./secrets";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";
 import { lowLevel as lowLevelCacheDb } from "./dbCache";
@@ -71,6 +72,9 @@ export {
   doubleNat,
   alertToOpenPorts,
   internalIp,
+  naclSecretKey,
+  naclPublicKey,
+  identityAddress,
   // Aditional low levels methods
   lowLevelMainDb,
   lowLevelCacheDb,
