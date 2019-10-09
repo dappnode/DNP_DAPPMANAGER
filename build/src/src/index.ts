@@ -7,6 +7,7 @@ import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
 import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
+import { generateKeyPair } from "./utils/publickeyEncryption";
 import {
   ChainData,
   DirectoryDnp,
@@ -40,6 +41,13 @@ initializeDb();
 // Create the global env file
 globalEnvsFile.createFile();
 globalEnvsFile.setEnvs({ [params.GLOBAL_ENVS.ACTIVE]: "true" });
+
+// Create local keys for NACL public encryption
+if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
+  const { publicKey, secretKey } = generateKeyPair();
+  db.naclPublicKey.set(publicKey);
+  db.naclSecretKey.set(secretKey);
+}
 
 // Initial calls to check this DAppNode's status
 calls

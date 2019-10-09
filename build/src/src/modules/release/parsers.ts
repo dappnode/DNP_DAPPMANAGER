@@ -141,6 +141,8 @@ export function sanitizeCompose(
   if ((manifest.globalEnvs || {}).all)
     env_file.push(getGlobalEnvsFilePath(isCore));
 
+  let THERE_IS_DUPLICATION_IN_SETTING_LOGGING_OPTIONS;
+
   return {
     ...pick(composeUnsafe, ["version", "networks", "volumes"]),
     services: {
