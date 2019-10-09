@@ -100,9 +100,9 @@ const params = {
     SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
   },
 
-  // A hardcoded key is used to prevent an attacker using specific values
-  ADMIN_NACL_PUBLIC_KEY: "5jLtRyKR3S947PYW7ge5MwjWSaPXalHK2REhPTzBjkQ=",
-  ADMIN_NACL_SECRET_KEY: "IbB5BuqXnzCObxMpGll1u9vOAInv0va83MxmCk76eAQ="
+  // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
+  ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
+  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ="
 };
 
 if (devMode) {
