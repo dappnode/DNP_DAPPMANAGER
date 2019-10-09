@@ -19,7 +19,6 @@ import { mergeEnvFile } from "./utils/dockerComposeFile";
 const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
-const dyndnsDomain = params.DYNDNS_DOMAIN;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -32,6 +31,13 @@ const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
  * - Trigger a dyndns loop
  */
 export default async function initializeDb(): Promise<void> {
+  /**
+   * Migrate data from the VPN db
+   * - dyndns identity (including the domain)
+   * - staticIp (if set)
+   */
+  await migrateVpnDb();
+
   // 1. Directly connected to the internet: Public IP is the interface IP
   // 2. Behind a router: Needs to get the public IP, open ports and get the internal IP
   // 2A. UPnP available: Get public IP without a centralize service. Can open ports
@@ -92,31 +98,6 @@ export default async function initializeDb(): Promise<void> {
     ? Boolean(internalIp !== publicIp && !upnpAvailable)
     : false;
 
-  if (!db.isVpnDbMigrated.get())
-    try {
-      const image = await getDappmanagerImage();
-      const output = await shell(
-        `docker run --rm -v  ${vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
-      );
-      const vpndb: IdentityInterface = JSON.parse(output);
-      db.dyndnsIdentity.set({
-        address: vpndb.address,
-        privateKey: vpndb.privateKey,
-        publicKey: vpndb.publicKey
-      });
-      const subdomain = vpndb.address
-        .toLowerCase()
-        .substr(2)
-        .substring(0, 16);
-      const domain = [subdomain, dyndnsDomain].join(".");
-      db.domain.set(domain);
-      db.isVpnDbMigrated.set(true);
-
-      logs.info("VPN identity imported.");
-    } catch (e) {
-      logs.warn("VPN identity not imported.");
-    }
-
   const serverName = getServerName();
   db.publicIp.set(publicIp || "");
   db.serverName.set(serverName);
@@ -126,12 +107,10 @@ export default async function initializeDb(): Promise<void> {
   db.alertToOpenPorts.set(alertUserToOpenPorts);
   db.internalIp.set(internalIp);
 
-  if (!db.isVpnDbMigrated.get()) {
-    // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
-    // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
-    // - Updates the domain: db.domain.set(domain);
-    dyndns.generateKeys();
-  }
+  // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
+  // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
+  // - Updates the domain: db.domain.set(domain);
+  dyndns.generateKeys(); // Auto-checks if keys are already generated
 
   globalEnvsFile.setEnvs({
     [params.GLOBAL_ENVS.INTERNAL_IP]: db.internalIp.get(),
@@ -156,6 +135,53 @@ export default async function initializeDb(): Promise<void> {
     }
 
   eventBus.initializedDb.emit();
+}
+
+/**
+ * Migrate data from the VPN db
+ * - dyndns identity (including the domain)
+ * - staticIp (if set)
+ */
+async function migrateVpnDb() {
+  try {
+    if (db.isVpnDbMigrated.get()) return;
+
+    interface VpnDb extends IdentityInterface {
+      domain: string;
+      staticIp: string | null;
+      "imported-installation-staticIp": boolean;
+    }
+    const image = await getDappmanagerImage();
+    const output = await shell(
+      `docker run --rm -v  ${vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
+    );
+    if (!output) throw Error(`VPN DB is empty`);
+    const vpndb: VpnDb = JSON.parse(output);
+
+    // Only set the params from the VPN if
+    // - they are NOT set in the DAPPMANAGER
+    // - they ARE set in the VPN
+    if (vpndb.privateKey && !db.dyndnsIdentity.get().privateKey) {
+      db.dyndnsIdentity.set({
+        address: vpndb.address,
+        privateKey: vpndb.privateKey,
+        publicKey: vpndb.publicKey
+      });
+      db.domain.set(vpndb.domain);
+    }
+    if (vpndb.staticIp && !db.staticIp.get())
+      db.staticIp.set(vpndb.staticIp || "");
+    if (vpndb["imported-installation-staticIp"])
+      db.importedInstallationStaticIp.set(
+        Boolean(vpndb["imported-installation-staticIp"])
+      );
+
+    db.isVpnDbMigrated.set(true);
+
+    logs.info("VPN DB imported successfully imported");
+  } catch (e) {
+    logs.warn(`Error importing VPN DB: ${e.stack}`);
+  }
 }
 
 // Utils
