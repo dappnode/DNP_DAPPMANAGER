@@ -371,6 +371,9 @@ export interface PackageReleaseMetadata {
   requirements?: {
     minimumDappnodeVersion: string;
   };
+  globalEnvs?: {
+    all?: boolean;
+  };
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {
@@ -438,4 +441,19 @@ export interface RpcHandlerReturn {
   logMessage?: boolean;
   userAction?: boolean;
   privateKwargs?: boolean;
+}
+
+/**
+ * HTTP Response
+ */
+
+export interface HttpResponseInterface {
+  data: any;
+  statusCode: number;
+}
+
+export interface IdentityInterface {
+  address: string;
+  privateKey: string;
+  publicKey: string;
 }

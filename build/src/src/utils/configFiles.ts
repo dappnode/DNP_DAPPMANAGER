@@ -4,7 +4,7 @@ import * as validate from "./validate";
 import {
   writeComposeObj,
   readComposeObj,
-  mergeEnvsAndOmitEnvFile
+  mergeEnvsAndOmitDnpEnvFile
 } from "./dockerComposeFile";
 import {
   writeDefaultsToLabels,
@@ -276,7 +276,7 @@ export function convertLegacyEnvFiles({
   if (fs.existsSync(envFilePath)) {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
     const envsArray = envFileData.trim().split("\n");
-    mergeEnvsAndOmitEnvFile(name, parseEnvironment(envsArray));
+    mergeEnvsAndOmitDnpEnvFile(name, parseEnvironment(envsArray));
     fs.unlinkSync(envFilePath);
     return true;
   }

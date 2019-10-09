@@ -133,10 +133,17 @@ describe("Util > configFiles", () => {
       const envFilePath = getPath.envFile(name, isCore);
       const composePath = getPath.dockerCompose(name, isCore);
       const envsString = "NAME=VALUE";
+      /* eslint-disable @typescript-eslint/camelcase */
       const composeString = yaml.safeDump({
         version: "3.4",
-        services: { [name]: { image: `${name}:0.2.0` } }
+        services: {
+          [name]: {
+            image: `${name}:0.2.0`,
+            env_file: [name + ".env"]
+          }
+        }
       });
+      /* eslint-enable @typescript-eslint/camelcase */
       validate.path(envFilePath);
       fs.writeFileSync(envFilePath, envsString);
       fs.writeFileSync(composePath, composeString);

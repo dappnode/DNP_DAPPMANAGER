@@ -12,6 +12,7 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  */
 let DNCORE_DIR = "DNCORE"; // Bind volume
 let REPO_DIR = "dnp_repo"; // Named volume
+const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 
 if (process.env.TEST) {
   DNCORE_DIR = "test_files/";
@@ -28,9 +29,14 @@ const params = {
   DNCORE_DIR,
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // lowdb requires an absolute path
-  DB_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
+  DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
+  // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
+  GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
+  GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
+  GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -66,7 +72,32 @@ const params = {
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
-  coreDnpName: "core.dnp.dappnode.eth"
+  coreDnpName: "core.dnp.dappnode.eth",
+  vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+
+  // DYNDNS parameters
+  DYNDNS_HOST: "https://ns.dappnode.io",
+  DYNDNS_DOMAIN: "dyndns.dappnode.io",
+  DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
+
+  // System file paths
+  HOSTNAME_PATH: "/etc/dappnodename",
+  STATIC_IP_PATH: "/usr/src/app/config/static_ip",
+  VPNDB_PATH: "/usr/src/app/secrets/vpndb.json",
+
+  // Global ENVs names
+  GLOBAL_ENVS: {
+    ACTIVE: "_DAPPNODE_GLOBAL_ENVS_ACTIVE",
+    DOMAIN: "_DAPPNODE_GLOBAL_DOMAIN", // "" || "6b3d49d4965584c2.dyndns.dappnode.io"
+    STATIC_IP: "_DAPPNODE_GLOBAL_STATIC_IP", // "" || "138.68.106.96"
+    HOSTNAME: "_DAPPNODE_GLOBAL_HOSTNAME", // "6b3d49d4965584c2.dyndns.dappnode.io" || "138.68.106.96"
+    INTERNAL_IP: "_DAPPNODE_GLOBAL_INTERNAL_IP", // "192.168.0.1"
+    UPNP_AVAILABLE: "_DAPPNODE_GLOBAL_UPNP_AVAILABLE", // "true" || "false"
+    NO_NAT_LOOPBACK: "_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", // "true" || "false"
+    PUBKEY: "_DAPPNODE_GLOBAL_PUBKEY", // "0x6B3D49d4965584C28Fbf14B82b1012664a73b9Ab"
+    PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
+    SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
+  }
 };
 
 if (devMode) {

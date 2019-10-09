@@ -17,6 +17,10 @@ import {
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
 
+function getGlobalEnvsFilePath(isCore: boolean): string {
+  return isCore ? params.GLOBAL_ENVS_PATH_CORE : params.GLOBAL_ENVS_PATH_DNP;
+}
+
 export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
   const { name, image } = manifest;
   const serviceName = name;
@@ -133,6 +137,10 @@ export function sanitizeCompose(
   // From networks
   if (!isCore) delete composeUnsafe.networks;
 
+  const env_file = [];
+  if ((manifest.globalEnvs || {}).all)
+    env_file.push(getGlobalEnvsFilePath(isCore));
+
   return {
     ...pick(composeUnsafe, ["version", "networks", "volumes"]),
     services: {
@@ -141,6 +149,7 @@ export function sanitizeCompose(
         container_name: getContainerName(name, isCore),
         image: getImage(name, version),
         restart: service.restart || "always",
+        ...(env_file.length ? { env_file } : {}),
         logging: {
           options: {
             "max-size": "10m",
