@@ -3,7 +3,13 @@ import path from "path";
 import yaml from "js-yaml";
 import * as composeParser from "./dockerComposeParsers";
 import { uniq, concat, pull, omitBy, isEmpty, isObject } from "lodash";
-import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
+import {
+  PortMapping,
+  Compose,
+  PackageEnvs,
+  ComposeService,
+  UserSet
+} from "../types";
 import params from "../params";
 
 /**

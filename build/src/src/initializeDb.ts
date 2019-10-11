@@ -142,7 +142,7 @@ export default async function initializeDb(): Promise<void> {
  * - dyndns identity (including the domain)
  * - staticIp (if set)
  */
-async function migrateVpnDb() {
+async function migrateVpnDb(): Promise<void> {
   try {
     if (db.isVpnDbMigrated.get()) return;
 

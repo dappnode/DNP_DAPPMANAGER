@@ -3,7 +3,7 @@ import shell from "../../utils/shell";
 import params from "../../params";
 import { ChainData } from "../../types";
 
-const getMinBlockDiffSync = (api: string) =>
+const getMinBlockDiffSync = (api: string): number =>
   // minTimeDiff = 30 min
   api.includes("bitcoin")
     ? 30 / 10

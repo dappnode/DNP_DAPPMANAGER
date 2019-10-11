@@ -2,35 +2,11 @@ import fs from "fs";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
 import {
-  writeComposeObj,
   readComposeObj,
   mergeEnvsAndOmitDnpEnvFile
 } from "./dockerComposeFile";
-import {
-  writeDefaultsToLabels,
-  writeMetadataToLabels
-} from "./containerLabelsDb";
-import {
-  parseEnvironment,
-  stringifyEnvironment,
-  parseServiceName,
-  parseService,
-  mergeVolumeArrays,
-  mergePortArrays,
-  mergeUserSetVolumes
-} from "./dockerComposeParsers";
-import params from "../params";
-import {
-  Compose,
-  Manifest,
-  UserSetPackageVols,
-  UserSetPackagePorts,
-  UserSetPackageEnvs,
-  UserSetPackageVolsSingle,
-  UserSetPackagePortsSingle,
-  PackageEnvs,
-  ComposeService
-} from "../types";
+import { parseEnvironment, parseService } from "./dockerComposeParsers";
+import { Compose, Manifest, PackageEnvs } from "../types";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
