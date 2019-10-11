@@ -169,7 +169,7 @@ export function mergePortArrays(
  * - "/root/.ethereum/" => "/root/.ethereum"
  * - "data"             => "data"
  */
-export function normalizeVolumePath(volumePath: string) {
+export function normalizeVolumePath(volumePath: string): string {
   // Remove trailing slash
   if (volumePath === "/") return volumePath;
   return path.normalize(volumePath.replace(/\/+$/, ""));
@@ -233,7 +233,7 @@ export function mergeVolumeArrays(
 export function mergeUserSetVolumes(
   currentVolumes: string[],
   userSetVolumes: UserSetPackageVolsSingle
-) {
+): string[] {
   // Normalize userSetVolumes so they catch the current ones
   const userSetDnpVolsNormalized: UserSetPackageVolsSingle = fromPairs(
     toPairs(userSetVolumes).map(pair => pair.map(normalizeVolumePath))

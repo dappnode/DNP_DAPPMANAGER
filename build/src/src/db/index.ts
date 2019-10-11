@@ -33,7 +33,7 @@ import { lowLevel as lowLevelCacheDb } from "./dbCache";
  * - ARE_ENV_FILES_MIGRATED (is ommited)
  */
 const dbKeysToMigrate = [AUTO_UPDATE_SETTINGS];
-function migrateToNewMainDb() {
+function migrateToNewMainDb(): void {
   for (const key of dbKeysToMigrate) {
     lowLevelMainDb.set(key, lowLevelCacheDb.get(key));
     lowLevelCacheDb.del(key);

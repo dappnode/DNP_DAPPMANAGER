@@ -6,8 +6,6 @@ import {
   decodeBase64
 } from "tweetnacl-util";
 
-const newNonce = () => randomBytes(box.nonceLength);
-
 export function generateKeyPair(): {
   publicKey: string;
   secretKey: string;
@@ -24,7 +22,7 @@ export function encrypt(
   mySecretKey: string,
   theirPublicKey: string
 ): string {
-  const nonce = newNonce();
+  const nonce = randomBytes(box.nonceLength);
   const messageUint8 = decodeUTF8(plainMessage);
   const encrypted = box(
     messageUint8,
