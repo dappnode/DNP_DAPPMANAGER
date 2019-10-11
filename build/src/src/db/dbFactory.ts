@@ -2,6 +2,8 @@ import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import * as validate from "../utils/validate";
 import { formatKey } from "./dbUtils";
+import Logs from "../logs";
+const logs = Logs(module);
 
 export interface Db {
   get(key: string): any | null;
@@ -14,6 +16,7 @@ export interface Db {
 export default function dbFactory(dbPath: string) {
   // Define dbPath and make sure it exists (mkdir -p)
   validate.path(dbPath);
+  logs.info(`New DB instance at ${dbPath}`);
 
   // Initialize db
   const adapter = new FileSync(dbPath);
