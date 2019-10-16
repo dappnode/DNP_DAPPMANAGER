@@ -24,7 +24,6 @@ describe("Call function: removePackage", function() {
               container_name: DNP_DAPPMANAGER_TEST_CONTAINER
   `.trim();
 
-  const idWrong = "missing.dnp.dappnode.eth";
   const dnp: PackageContainer = {
     ...mockDnp,
     isCore: false,

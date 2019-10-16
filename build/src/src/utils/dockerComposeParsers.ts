@@ -251,7 +251,7 @@ export function mergeVolumeArrays(
 export function mergeUserSetVolumes(
   currentVolumes: string[],
   userSetVolumes: UserSetPackageVolsSingle
-) {
+): string[] {
   // Normalize userSetVolumes so they catch the current ones
   const userSetDnpVolsNormalized: UserSetPackageVolsSingle = fromPairs(
     toPairs(userSetVolumes).map(pair => pair.map(normalizeVolumePath))

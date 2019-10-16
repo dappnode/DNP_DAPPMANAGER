@@ -6,7 +6,7 @@ import * as calls from "../src/calls";
 import params from "../src/params";
 const getDataUri = require("datauri").promise;
 import Logs from "../src/logs";
-import { PackageContainer, ContainerStatus, PortMapping } from "../src/types";
+import { PortMapping } from "../src/types";
 import { getDnpFromListPackages, getDnpState } from "./testPackageUtils";
 const logs = Logs(module);
 

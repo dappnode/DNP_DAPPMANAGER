@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-import { omit } from "lodash";
 import * as db from "../src/db";
 import * as calls from "../src/calls";
 import { Manifest } from "../src/types";

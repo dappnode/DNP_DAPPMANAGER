@@ -23,7 +23,9 @@ import {
   normalizeVolumePath,
   parseUserSet,
   applyUserSet,
-  convertUserSetLegacy
+  convertUserSetLegacy,
+  parseServiceName,
+  parseService
 } from "../../src/utils/dockerComposeParsers";
 import { mockCompose, mockDnpName, mockComposeService } from "../testUtils";
 
@@ -335,6 +337,88 @@ describe("Util: dockerComposeParsers", () => {
         userSetPorts
       });
       expect(userSet).to.deep.equal(expectedUserSet);
+    });
+  });
+
+  describe("Merge userSet to the compose (applyUserSet, convertUserSetLegacy)", () => {
+    it("should merge the userSetDnpObjects", () => {
+      const serviceName = parseServiceName(mockCompose);
+
+      const compose: Compose = {
+        ...mockCompose,
+        services: {
+          [serviceName]: {
+            ...mockCompose.services[serviceName],
+            environment: ["ENV1=DEFAULTVAL1", "ENV2=DEFAULTVAL2"],
+            ports: ["30303", "30303/udp", "30304:30304", "8080:8080"],
+            volumes: [
+              "kovan:/root/.local/share/io.parity.ethereum/",
+              "sync-data:/root/.sync"
+            ]
+          }
+        }
+      };
+
+      // Data introduced by the user at the moment of installing
+      // [NOTE]: the user should be seeing a merge of [default + previous]
+      const userSetDnpEnvs = {
+        ENV1: "USER_SET_VAL1",
+        ENV_OLD: "PREVIOUS_SET_VAL2"
+      };
+      const userSetDnpPorts = {
+        "30303": "31313:30303",
+        "30303/udp": "31313:30303/udp",
+        "30304:30304": "30304"
+      };
+      const userSetDnpVols = {
+        "kovan:/root/.local/share/io.parity.ethereum//":
+          "different_path:/root/.local/share/io.parity.ethereum//",
+        "old_version_volume:/original/path":
+          "another_different_path:/original/path"
+      };
+
+      const userSet = convertUserSetLegacy({
+        userSetEnvs: { [serviceName]: userSetDnpEnvs },
+        userSetVols: { [serviceName]: userSetDnpVols },
+        userSetPorts: { [serviceName]: userSetDnpPorts }
+      });
+
+      expect(userSet).to.deep.equal(
+        {
+          "mock-dnp.dnp.dappnode.eth": {
+            environment: {
+              ENV1: "USER_SET_VAL1",
+              ENV_OLD: "PREVIOUS_SET_VAL2"
+            },
+            namedVolumeMappings: {
+              "/original/path": "another_different_path",
+              "/root/.local/share/io.parity.ethereum": "different_path"
+            },
+            portMappings: {
+              "30303/TCP": "31313",
+              "30303/UDP": "31313",
+              "30304/TCP": ""
+            }
+          }
+        },
+        "Wrong userSet conversion"
+      );
+
+      const returnCompose = applyUserSet(compose, userSet[serviceName]);
+
+      expect(
+        pick(parseService(returnCompose), ["environment", "ports", "volumes"])
+      ).to.deep.equal(
+        {
+          environment: ["ENV1=USER_SET_VAL1", "ENV2=DEFAULTVAL2"],
+          ports: ["31313:30303", "31313:30303/udp", "30304", "8080:8080"],
+          volumes: [
+            "different_path:/root/.local/share/io.parity.ethereum",
+            "sync-data:/root/.sync"
+          ]
+        },
+        "Wrong applyUserSet result"
+      );
     });
   });
 });

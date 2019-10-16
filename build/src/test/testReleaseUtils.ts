@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { isEqual } from "lodash";
-import { testDir, createTestDir } from "./testUtils";
+import { testDir } from "./testUtils";
 import shell from "../src/utils/shell";
 import params from "../src/params";
 import {

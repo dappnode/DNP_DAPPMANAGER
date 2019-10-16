@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { InstallPackageData } from "../../../src/types";
 import { mockPackageData } from "../../testUtils";
 
-import { orderInstallPackages } from "../../../src/modules/installer/getInstructions";
+import orderInstallPackages from "../../../src/modules/installer/orderInstallPackages";
 
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {

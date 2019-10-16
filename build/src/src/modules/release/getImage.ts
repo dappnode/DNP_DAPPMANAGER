@@ -24,7 +24,7 @@ export async function verifyDockerImage({
   imagePath: string;
   name: string;
   version: string;
-}) {
+}): Promise<void> {
   const images = await dockerImageManifest(imagePath);
   if (images.length !== 1)
     throw Error("image tarball must contain strictly one image");

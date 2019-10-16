@@ -7,15 +7,21 @@ import lockPorts from "../modules/lockPorts";
 import {
   dockerLoad,
   dockerCleanOldImages,
-  dockerComposeUp,
   dockerComposeDown
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import restartPatch from "../modules/docker/restartPatch";
+import getRelease from "../modules/release/getRelease";
+import orderInstallPackages from "../modules/installer/orderInstallPackages";
+import getInstallerPackageData from "../modules/installer/getInstallerPackageData";
+import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
 // Utils
+import { writeManifest } from "../utils/manifestFile";
+import { convertUserSetLegacy } from "../utils/dockerComposeParsers";
 import { logUi, logUiClear } from "../utils/logUi";
 import * as parse from "../utils/parse";
 import { isIpfsRequest } from "../utils/validate";
+import * as validate from "../utils/validate";
 import isSyncing from "../utils/isSyncing";
 import {
   RpcHandlerReturn,
@@ -26,12 +32,6 @@ import {
   UserSet
 } from "../types";
 import Logs from "../logs";
-import {
-  orderInstallPackages,
-  preInstallPackage
-} from "../modules/installer/getInstructions";
-import { writeManifest } from "../utils/manifestFile";
-import { convertUserSetLegacy } from "../utils/dockerComposeParsers";
 const logs = Logs(module);
 
 /**
@@ -134,14 +134,23 @@ export default async function installPackage({
    */
   const packagesData: InstallPackageData[] = orderInstallPackages(
     await Promise.all(
-      Object.entries(state).map(([name, version]) =>
-        preInstallPackage(
-          name,
-          version,
-          userSetByDnp[name],
-          BYPASS_CORE_RESTRICTION
-        )
-      )
+      Object.entries(state).map(async ([name, version]) => {
+        const release = await getRelease(name, version);
+
+        // .origin is only false when the origin is the AragonAPM
+        if (release.warnings.unverifiedCore && !BYPASS_CORE_RESTRICTION)
+          throw Error(`Core package ${name} is from an unverified origin`);
+
+        const userSet = userSetByDnp[name] || {};
+        const packageData = getInstallerPackageData(release, userSet);
+        const { composeNextPath, compose } = packageData;
+
+        // Create the repoDir if necessary
+        validate.path(composeNextPath);
+        await writeAndValidateCompose(composeNextPath, compose);
+
+        return packageData;
+      })
     ),
     req.name
   );
@@ -155,7 +164,7 @@ export default async function installPackage({
       const { name, version, isCore, imageFile, imagePath } = pkg;
       logUi({ id, name, message: "Starting download..." });
 
-      function onProgress(progress: number) {
+      function onProgress(progress: number): void {
         let message = `Downloading ${progress}%`;
         if (progress > 100) message += ` (expected ${imageFile.size} bytes)`;
         logUi({ id, name, message });

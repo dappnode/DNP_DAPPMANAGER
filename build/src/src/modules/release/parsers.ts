@@ -11,7 +11,6 @@ import {
   ComposeVolumes,
   ComposeUnsafe,
   Compose,
-  PackageRelease,
   ReleaseWarnings
 } from "../../types";
 

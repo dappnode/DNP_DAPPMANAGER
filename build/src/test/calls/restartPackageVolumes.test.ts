@@ -15,7 +15,7 @@ describe("Call function: restartPackageVolumes", function() {
   const dappmanagerId = "dappmanager.dnp.dappnode.eth";
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
   const nginxId = "nginx-proxy.dnp.dappnode.eth";
-  const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
+  // const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
   const raidenTestnetId = "raiden-testnet.dnp.dappnode.eth";
 
   // docker-compose.yml will be generated for this DNP ids

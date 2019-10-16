@@ -5,7 +5,6 @@ import lockPorts from "../lockPorts";
 import unlockPorts from "../unlockPorts";
 // Utils
 import { readComposeObj } from "../../utils/dockerComposeFile";
-import * as getPath from "../../utils/getPath";
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
