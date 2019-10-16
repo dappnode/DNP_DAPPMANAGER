@@ -207,6 +207,7 @@ export default async function installPackage({
       logUi({ id, name, message: "Package started" });
     }
   } catch (e) {
+    logs.error(`Rolling back installation of ${id}: ${e.stack}`);
     /**
      * Rollback
      * - Stop all new packages with the new compose
@@ -216,12 +217,10 @@ export default async function installPackage({
       name,
       imagePath,
       composePath,
-      composeNextPath,
-      manifestPath
+      composeNextPath
     } of packagesData) {
       try {
         logUi({ id, name, message: "Aborting and rolling back..." });
-        [imagePath, composeNextPath, manifestPath].forEach(safeUnlink);
 
         try {
           if (fs.existsSync(composeNextPath))
@@ -229,6 +228,9 @@ export default async function installPackage({
         } catch (eDown) {
           logs.error(`Error on rollback dc down ${name}: ${eDown.stack}`);
         }
+
+        safeUnlink(imagePath);
+        safeUnlink(composeNextPath);
 
         // Deal with packages that were NOT installed before this install
         if (fs.existsSync(composePath)) await dockerComposeUpSafe(composePath);

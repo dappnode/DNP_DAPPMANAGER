@@ -7,22 +7,10 @@ import params from "../src/params";
 const getDataUri = require("datauri").promise;
 import Logs from "../src/logs";
 import { PackageContainer, ContainerStatus, PortMapping } from "../src/types";
+import { getDnpFromListPackages, getDnpState } from "./testPackageUtils";
 const logs = Logs(module);
 
 // Utils
-async function getDnpFromListPackages(
-  id: string
-): Promise<PackageContainer | undefined> {
-  const res = await calls.listPackages();
-  if (!Array.isArray(res.result))
-    throw Error("listPackages must return an array");
-  return res.result.find(e => e.name.includes(id));
-}
-
-async function getDnpState(id: string): Promise<ContainerStatus | "down"> {
-  const dnp = await getDnpFromListPackages(id);
-  return dnp ? dnp.state : "down";
-}
 
 const shellSafe = (cmd: string): Promise<string | void> =>
   shell(cmd).catch(() => {});

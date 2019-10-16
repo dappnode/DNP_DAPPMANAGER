@@ -13,6 +13,7 @@ import {
   releaseDnpName,
   releaseVersion
 } from "./testReleaseUtils";
+import { getDnpFromListPackages } from "./testPackageUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -88,6 +89,59 @@ describe("Resilience features, when things go wrong", function() {
         deleteVolumes: true,
         timeout: 0
       });
+    }).timeout(60 * 1000);
+  });
+
+  describe("Failing installation due to bad compose", () => {
+    let brokenReleaseHash: string;
+    before("Install the good release", async () => {
+      await calls.installPackage({
+        id: [releaseDnpName, releaseHash].join("@")
+      });
+    });
+
+    before("Upload the bad release", async () => {
+      brokenReleaseHash = await prepareManifestTypeRelease({
+        ...mockManifestWithImage,
+        name: releaseDnpName,
+        version: releaseVersion,
+        image: {
+          ...mockManifestWithImage.image,
+          // Intentional error to make the installation fail
+          ports: ["0:0"]
+        }
+      });
+    });
+
+    it("Should do a rollback due to a broken compose", async () => {
+      const dnpBefore = await getDnpFromListPackages(releaseDnpName);
+
+      let errorMessage = "--did not throw--";
+      try {
+        await calls.installPackage({
+          id: [releaseDnpName, brokenReleaseHash].join("@")
+        });
+      } catch (e) {
+        errorMessage = e.message;
+      }
+      expect(errorMessage).to.include(
+        `Cannot start service ${releaseDnpName}`,
+        "Wrong error message"
+      );
+
+      const dnpAfter = await getDnpFromListPackages(releaseDnpName);
+
+      if (!dnpBefore) throw Error("dnpBefore not found");
+      if (!dnpAfter) throw Error("dnpAfter not found");
+
+      expect(dnpBefore.origin).to.equal(
+        releaseHash,
+        "Origin must be the good release hash"
+      );
+      expect(dnpBefore.origin).to.equal(
+        dnpAfter.origin,
+        "Rollback should leave the before version running"
+      );
     }).timeout(60 * 1000);
   });
 

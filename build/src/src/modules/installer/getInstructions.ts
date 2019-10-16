@@ -3,7 +3,10 @@ import { merge, sortBy } from "lodash";
 import { getUserSet, writeComposeObj } from "../../utils/dockerComposeFile";
 import * as validate from "../../utils/validate";
 import * as getPath from "../../utils/getPath";
-import { applyUserSet } from "../../utils/dockerComposeParsers";
+import {
+  applyUserSet,
+  addGeneralDataToCompose
+} from "../../utils/dockerComposeParsers";
 import getRelease from "../release/getRelease";
 import { dockerComposeConfig } from "../docker/dockerCommands";
 
@@ -63,7 +66,7 @@ function getInstallerPackageData(
   release: PackageRelease,
   userSet: UserSet
 ): InstallPackageData {
-  const { name, version, isCore, compose } = release;
+  const { name, version, isCore, compose, metadata, origin } = release;
   /**
    * Compute paths
    */
@@ -73,13 +76,9 @@ function getInstallerPackageData(
   const imagePath = getPath.image(name, version, isCore);
 
   /**
-   * Apply user set
+   * Gather extra data
    */
   const previousUserSet = getPreviousUserSet(name, isCore);
-  const composeWithUserSet = applyUserSet(
-    compose,
-    merge(previousUserSet, userSet)
-  );
 
   return {
     ...release,
@@ -89,7 +88,10 @@ function getInstallerPackageData(
     manifestPath,
     imagePath,
     // Data to write
-    compose: composeWithUserSet
+    compose: addGeneralDataToCompose(
+      applyUserSet(compose, merge(previousUserSet, userSet)),
+      { metadata, origin, isCore }
+    )
   };
 }
 

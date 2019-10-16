@@ -275,7 +275,7 @@ export function addGeneralDataToCompose(
     isCore
   }: {
     metadata: Manifest;
-    origin: string;
+    origin: string | null;
     isCore: boolean;
   }
 ): Compose {
@@ -299,7 +299,7 @@ export function addGeneralDataToCompose(
           ...service.labels,
           ...writeMetadataToLabels({
             dependencies: metadata.dependencies || {},
-            chain: metadata.chain || "",
+            chain: metadata.chain,
             origin,
             isCore
           })
