@@ -254,6 +254,16 @@ export interface UserActionLog {
  * Installer types
  */
 
+export interface UserSet {
+  environment?: { [envName: string]: string };
+  portMappings?: { [containerPortAndProtocol: string]: string };
+  namedVolumeMappings?: { [namedVolumeContainerPath: string]: string };
+}
+
+export interface UserSetByDnp {
+  [dnpName: string]: UserSet;
+}
+
 export interface UserSetPackageEnvs {
   [dnpName: string]: PackageEnvs;
 }
@@ -340,6 +350,10 @@ export interface DistributedFile {
   size: number;
 }
 
+export interface ReleaseWarnings {
+  unverifiedCore?: boolean;
+}
+
 export interface PackageRelease {
   name: string;
   version: string;
@@ -351,12 +365,19 @@ export interface PackageRelease {
   metadata: PackageReleaseMetadata;
   compose: Compose;
   // Aditional
+  warnings: ReleaseWarnings;
   origin: string | null;
   isCore: boolean;
 }
 
-export interface InstallerPkg extends PackageRelease {
+export interface InstallPackageData extends PackageRelease {
+  // Paths
   imagePath: string;
+  composePath: string;
+  composeNextPath: string;
+  manifestPath: string;
+  // Data to write
+  compose: Compose;
 }
 
 export interface PackageReleaseMetadata {
@@ -368,6 +389,7 @@ export interface PackageReleaseMetadata {
   type?: string;
   chain?: string;
   dependencies?: Dependencies;
+  runOrder?: string[];
   requirements?: {
     minimumDappnodeVersion: string;
   };

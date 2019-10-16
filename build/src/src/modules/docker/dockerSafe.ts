@@ -58,11 +58,3 @@ export async function dockerComposeUpSafe(
     }
   }
 }
-
-export function dockerComposeUpSafeByName(
-  name: string,
-  isCore: boolean
-): Promise<void> {
-  const dockerComposePath = getPath.dockerCompose(name, isCore);
-  return dockerComposeUpSafe(dockerComposePath);
-}

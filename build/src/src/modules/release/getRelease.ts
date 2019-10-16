@@ -5,7 +5,8 @@ import { PackageRelease } from "../../types";
 import {
   parseMetadataFromManifest,
   sanitizeCompose,
-  getIsCore
+  getIsCore,
+  getReleaseWarnings
 } from "./parsers";
 
 /**
@@ -44,7 +45,7 @@ export default async function getRelease(
   if (isEnsDomain(name) && name !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
 
-  return {
+  const release = {
     name,
     version: manifest.version,
     origin,
@@ -55,4 +56,9 @@ export default async function getRelease(
     metadata: parseMetadataFromManifest(manifest),
     compose: sanitizeCompose(composeUnsafe, manifest)
   };
+
+  return {
+    ...release,
+    warnings: getReleaseWarnings(release)
+  }
 }

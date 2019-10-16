@@ -10,27 +10,28 @@ export function dockerComposeUp(dcPath: string): Promise<string> {
 
 export function dockerComposeDown(
   dcPath: string,
-  volumes = false
+  options?: { volumes?: boolean; timeout?: number }
 ): Promise<string> {
-  return shell(withOptions(`docker-compose -f ${dcPath} down`, { volumes }));
+  return shell(withOptions(`docker-compose -f ${dcPath} down`, options || {}));
 }
 
 export function dockerComposeRm(dcPath: string): Promise<string> {
   return shell(`docker-compose -f ${dcPath} rm -sf`);
 }
 
-export function dockerComposeStart(
-  dcPath: string,
-  options?: DockerOptionsInterface
-): Promise<string> {
-  return shell(withOptions(`docker-compose -f ${dcPath} start`, options || {}));
+export function dockerComposeStart(dcPath: string): Promise<string> {
+  return shell(withOptions(`docker-compose -f ${dcPath} start`, {}));
 }
 
 export function dockerComposeStop(
   dcPath: string,
-  options?: DockerOptionsInterface
+  options?: { timeout?: number }
 ): Promise<string> {
   return shell(withOptions(`docker-compose -f ${dcPath} stop`, options || {}));
+}
+
+export function dockerComposeConfig(dcPath: string): Promise<string> {
+  return shell(`docker-compose -f ${dcPath} config`);
 }
 
 export function dockerVolumeRm(volumeName: string): Promise<string> {
@@ -39,6 +40,17 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
 
 export function dockerLoad(imagePath: string): Promise<string> {
   return shell(`docker load -i ${imagePath}`);
+}
+
+interface ImageManifest {
+  Config: string; // "f949e7d76d63befffc8eec2cbf8a6f509780f96fb3bacbdc24068d594a77f043.json"
+  Layers: string[]; // ["14ec119e6215a169a53a8c9cdfb56ca873e10f2e5ea0a37692bfa71601f18ec7/layer.tar"]
+  RepoTags: string[]; // ["package.dnp.dappnode.eth:0.2.0"];
+}
+export function dockerImageManifest(
+  imagePath: string
+): Promise<ImageManifest[]> {
+  return shell(`tar -xOf ${imagePath} manifest.json`).then(JSON.parse);
 }
 
 export function dockerImages(): Promise<string> {
@@ -59,12 +71,11 @@ export async function dockerCleanOldImages(
   version: string
 ): Promise<void> {
   const currentImgs = await dockerImages();
-  await dockerRmi(
-    (currentImgs || "").split(/\r|\n/).filter((p: string) => {
-      const [pName, pVer] = p.split(":");
-      return pName === name && semver.valid(pVer) && pVer !== version;
-    })
-  );
+  const oldImages = (currentImgs || "").split(/\r|\n/).filter((p: string) => {
+    const [pName, pVer] = p.split(":");
+    return pName === name && semver.valid(pVer) && pVer !== version;
+  });
+  if (oldImages.length > 0) await dockerRmi(oldImages);
 }
 
 export function dockerLogs(

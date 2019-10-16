@@ -3,7 +3,13 @@ import path from "path";
 import yaml from "js-yaml";
 import * as composeParser from "./dockerComposeParsers";
 import { omit, omitBy, isEmpty, isObject } from "lodash";
-import { PortMapping, Compose, PackageEnvs, ComposeService } from "../types";
+import {
+  PortMapping,
+  Compose,
+  PackageEnvs,
+  ComposeService,
+  UserSet
+} from "../types";
 import params from "../params";
 
 /**
@@ -156,3 +162,13 @@ export const setPortMapping = getComposeServiceEditor(
     };
   }
 );
+
+/**
+ * Read user variables
+ */
+
+export function getUserSet(composePath: string): UserSet {
+  if (!fs.existsSync(composePath)) return {};
+  const compose = readComposeObj(composePath);
+  return composeParser.parseUserSetFromCompose(compose);
+}

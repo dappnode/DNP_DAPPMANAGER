@@ -1,4 +1,5 @@
 import fs from "fs";
+import { omit } from "lodash";
 import path from "path";
 import params from "../params";
 
@@ -32,6 +33,17 @@ export function manifest(dnpName: string, isCore: boolean): string {
   );
 }
 
+export function image(
+  dnpName: string,
+  version: string,
+  isCore: boolean
+): string {
+  return path.join(
+    getRepoDirPath(dnpName, isCore),
+    `${dnpName}_${version}.tar.xz`
+  );
+}
+
 export function dockerCompose(dnpName: string, isCore: boolean): string {
   return getDockerComposePath(dnpName, isCore);
 }
@@ -55,15 +67,6 @@ export function envFileSmart(dnpName: string, isCore: boolean): string {
   if (fs.existsSync(ENV_FILE_PATH)) return ENV_FILE_PATH;
   // Then check for dnp docker-compose
   return getEnvFilePath(dnpName, false);
-}
-
-export function image(
-  dnpName: string,
-  imageName: string,
-  isCore: boolean
-): string {
-  if (!imageName) throw Error("imageName must be defined");
-  return path.join(getRepoDirPath(dnpName, isCore), imageName);
 }
 
 // Helper functions
@@ -113,4 +116,14 @@ function verifyDnpName(dnpName: string): void {
         dnpName
       )}`
     );
+}
+
+export function nextPath(anyPath: string): string {
+  const pathObj = path.parse(anyPath);
+  // From NodeJS docs
+  // `name` + `ext` will be used if `base` is not specified.
+  return path.format({
+    ...omit(pathObj, "base"),
+    ext: `.next${pathObj.ext}`
+  });
 }

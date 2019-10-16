@@ -59,6 +59,7 @@ describe("DNP lifecycle", function() {
       "rm -rf dnp_repo/nginx-proxy.dnp.dappnode.eth/",
       "rm -rf dnp_repo/letsencrypt-nginx.dnp.dappnode.eth/",
       `docker rm -f ${[
+        "DAppNodePackage-otpweb.dnp.dappnode.eth",
         "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
         "DAppNodePackage-nginx-proxy.dnp.dappnode.eth"
       ].join(" ")}`

@@ -1,6 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import { PortProtocol, VolumeMapping } from "../../src/types";
+import { pick } from "lodash";
+import {
+  PortProtocol,
+  VolumeMapping,
+  Compose,
+  UserSet,
+  UserSetByDnp
+} from "../../src/types";
 
 import {
   parsePortMappings,
@@ -13,8 +20,12 @@ import {
   stringifyVolumeMappings,
   mergeVolumeMappings,
   mergeVolumeArrays,
-  normalizeVolumePath
+  normalizeVolumePath,
+  parseUserSet,
+  applyUserSet,
+  convertUserSetLegacy
 } from "../../src/utils/dockerComposeParsers";
+import { mockCompose, mockDnpName, mockComposeService } from "../testUtils";
 
 describe("Util: dockerComposeParsers", () => {
   describe("environment: parse, stringify", () => {
@@ -190,6 +201,140 @@ describe("Util: dockerComposeParsers", () => {
         it(`Should normalize ${path}`, () => {
           expect(normalizeVolumePath(path)).to.equal(res);
         });
+    });
+  });
+
+  describe("parseUserSet", () => {
+    it("Should parse the user set variable", () => {
+      const userSet = parseUserSet({
+        environment: ["ORIGINAL=0", "USERSET=1"],
+        ports: ["4001:4001", "9090:9090", "32764:6000"],
+        volumes: ["data:/usr/data", "/dev1/custom-path:/usr/data2"]
+      });
+
+      const expectedUserSet: UserSet = {
+        environment: {
+          ORIGINAL: "0",
+          USERSET: "1"
+        },
+        namedVolumeMappings: {
+          "/usr/data": "data",
+          "/usr/data2": "/dev1/custom-path"
+        },
+        portMappings: {
+          "4001/TCP": "4001",
+          "6000/TCP": "32764",
+          "9090/TCP": "9090"
+        }
+      };
+
+      expect(userSet).to.deep.equal(expectedUserSet);
+    });
+  });
+
+  describe("applyUserSet", () => {
+    it("Should apply some user settings", () => {
+      const environment = ["ORIGINAL=VALUE", "USERSET=VALUE"];
+      const ports = ["4001:4001", "9090:9090/udp", "32764:6000"];
+      const volumes = ["data:/usr/data", "/dev1/custom-path:/usr/data2"];
+
+      const compose: Compose = {
+        ...mockCompose,
+        services: {
+          [mockDnpName]: {
+            ...mockComposeService,
+            environment,
+            ports,
+            volumes
+          }
+        }
+      };
+
+      const userSet: UserSet = {
+        environment: {
+          USERSET: "NEW_VALUE"
+        },
+        namedVolumeMappings: {
+          "/usr/data": "/dev0/user-set-path"
+        },
+        portMappings: {
+          "4001/TCP": "4111",
+          "9090/UDP": ""
+        }
+      };
+
+      const expectedServiceParts = {
+        environment: ["ORIGINAL=VALUE", "USERSET=NEW_VALUE"],
+        ports: ["4111:4001", "9090/udp", "32764:6000"],
+        volumes: [
+          "/dev0/user-set-path:/usr/data",
+          "/dev1/custom-path:/usr/data2"
+        ]
+      };
+      const composeReturn = applyUserSet(compose, userSet);
+      const serviceParts = pick(composeReturn.services[mockDnpName], [
+        "environment",
+        "ports",
+        "volumes"
+      ]);
+
+      expect(serviceParts).to.deep.equal(expectedServiceParts);
+    });
+  });
+
+  describe("convertUserSetLegacy", () => {
+    it("Should convert legacy userSet* types to userSet", () => {
+      const dnpName = "kovan.dnp.dappnode.eth";
+      const dnpName2 = "dependency.dnp.dappnode.eth";
+      const userSetEnvs = {
+        [dnpName]: {
+          ENV_NAME: "CUSTOM_VALUE"
+        }
+      };
+      const userSetVols = {
+        [dnpName]: {
+          "kovan:/root/.local/share/io.parity.ethereum/":
+            "/dev1/custom-path:/root/.local/share/io.parity.ethereum/"
+        }
+      };
+      const userSetPorts = {
+        [dnpName]: {
+          "30303": "31313:30303",
+          "30303/udp": "31313:30303/udp"
+        },
+        [dnpName2]: {
+          "4001:4001": "4001"
+        }
+      };
+
+      const expectedUserSet: UserSetByDnp = {
+        [dnpName]: {
+          environment: {
+            ENV_NAME: "CUSTOM_VALUE"
+          },
+          namedVolumeMappings: {
+            "/root/.local/share/io.parity.ethereum": "/dev1/custom-path"
+          },
+          portMappings: {
+            "30303/TCP": "31313",
+            "30303/UDP": "31313"
+          }
+        },
+        [dnpName2]: {
+          environment: {},
+          namedVolumeMappings: {},
+          portMappings: {
+            "4001/TCP": ""
+          }
+        }
+      };
+
+      const userSet = convertUserSetLegacy({
+        userSetEnvs,
+        userSetVols,
+        userSetPorts
+      });
+      expect(userSet).to.deep.equal(expectedUserSet);
     });
   });
 });

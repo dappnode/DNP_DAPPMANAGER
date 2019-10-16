@@ -62,7 +62,7 @@ describe("Call function: removePackage", function() {
   it("should have called docker-compose down", async () => {
     sinon.assert.callCount(dockerComposeDown, 1);
     expect(dockerComposeDown.firstCall.args).to.deep.equal(
-      [dockerComposePath, false],
+      [dockerComposePath, { volumes: false }],
       `should call docker.compose.down for the package ${id}`
     );
   });

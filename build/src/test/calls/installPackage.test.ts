@@ -2,7 +2,6 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import {
-  InstallerPkg,
   ProgressLog,
   PackageRequest,
   PortMapping,
@@ -170,23 +169,14 @@ describe.skip("Call function: installPackage", function() {
     }
   };
 
-  interface SortablePkg {
-    pkg: InstallerPkg;
-  }
-  function sortById(a: SortablePkg, b: SortablePkg): number {
-    return a.pkg.name > b.pkg.name ? 1 : a.pkg.name < b.pkg.name ? -1 : 0;
-  }
-
   // Step 3: Format the request and filter out already updated packages
   // Step 4: Download requested packages
   it("should have called download", async () => {
     sinon.assert.callCount(packages.download, 2);
-    expect(
-      [
-        packages.download.getCall(0).args[0],
-        packages.download.getCall(1).args[0]
-      ].sort(sortById)
-    ).deep.equal(
+    expect([
+      packages.download.getCall(0).args[0],
+      packages.download.getCall(1).args[0]
+    ]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.download for ${pkgName} and ${depName}`
     );
@@ -195,11 +185,10 @@ describe.skip("Call function: installPackage", function() {
   it("should have called load", async () => {
     sinon.assert.callCount(packages.load, 2);
 
-    expect(
-      [packages.load.getCall(0).args[0], packages.load.getCall(1).args[0]].sort(
-        sortById
-      )
-    ).deep.equal(
+    expect([
+      packages.load.getCall(0).args[0],
+      packages.load.getCall(1).args[0]
+    ]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.load for ${pkgName} and ${depName}`
     );
@@ -209,11 +198,10 @@ describe.skip("Call function: installPackage", function() {
   it("should have called run", async () => {
     sinon.assert.callCount(packages.run, 2);
 
-    expect(
-      [packages.run.getCall(0).args[0], packages.run.getCall(1).args[0]].sort(
-        sortById
-      )
-    ).deep.equal(
+    expect([
+      packages.run.getCall(0).args[0],
+      packages.run.getCall(1).args[0]
+    ]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.run for ${pkgName} and ${depName}`
     );

@@ -42,7 +42,7 @@ export default async function removePackage({
   // Call restartPackageVolumes to safely delete dependant volumes
   if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
   // Remove container (and) volumes
-  await dockerComposeDown(dockerComposePath, deleteVolumes);
+  await dockerComposeDown(dockerComposePath, { volumes: deleteVolumes });
   // Remove DNP folder and files
   await shell(`rm -r ${packageRepoDir}`);
 
