@@ -88,23 +88,18 @@ function getRepoDirPath(dnpName: string, isCore: boolean): string {
 }
 
 function getDockerComposeName(dnpName: string, isCore: boolean): string {
-  if (isCore) {
-    verifyDnpName(dnpName);
-    const dnpShortName = (dnpName || "").split(".")[0];
-    return `docker-compose-${dnpShortName}.yml`;
-  } else {
-    return "docker-compose.yml";
-  }
+  if (isCore) return `docker-compose-${getShortName(dnpName)}.yml`;
+  else return "docker-compose.yml";
 }
 
 function getManifestName(dnpName: string, isCore: boolean): string {
-  if (isCore) {
-    verifyDnpName(dnpName);
-    const dnpShortName = (dnpName || "").split(".")[0];
-    return `dappnode_package-${dnpShortName}.json`;
-  } else {
-    return "dappnode_package.json";
-  }
+  if (isCore) return `dappnode_package-${getShortName(dnpName)}.json`;
+  else return "dappnode_package.json";
+}
+
+function getShortName(dnpName: string): string {
+  verifyDnpName(dnpName);
+  return ((dnpName || "").split(".")[0] || "").toLowerCase();
 }
 
 // Utils

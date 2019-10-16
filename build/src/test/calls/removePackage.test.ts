@@ -8,6 +8,8 @@ import shell from "../../src/utils/shell";
 import rewiremock from "rewiremock";
 // Imports for typings
 import removePackageType from "../../src/calls/removePackage";
+import { PackageContainer } from "../../src/types";
+import { mockDnp } from "../testUtils";
 
 describe("Call function: removePackage", function() {
   const testDir = "test_files/";
@@ -23,8 +25,16 @@ describe("Call function: removePackage", function() {
   `.trim();
 
   const idWrong = "missing.dnp.dappnode.eth";
+  const dnp: PackageContainer = {
+    ...mockDnp,
+    isCore: false,
+    packageName: `DAppNodePackage-${id}`,
+    name: id
+  };
 
   const dockerComposeDown = sinon.stub().resolves();
+  const dockerRm = sinon.stub().resolves();
+  const listContainer = sinon.stub().resolves(dnp);
 
   const eventBus = {
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
@@ -38,10 +48,13 @@ describe("Call function: removePackage", function() {
       () => import("../../src/calls/removePackage"),
       mock => {
         mock(() => import("../../src/modules/docker/dockerCommands"))
-          .with({ dockerComposeDown })
+          .with({ dockerComposeDown, dockerRm })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
           .with(eventBus)
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/listContainers"))
+          .with({ listContainer })
           .toBeUsed();
       }
     );
@@ -62,7 +75,7 @@ describe("Call function: removePackage", function() {
   it("should have called docker-compose down", async () => {
     sinon.assert.callCount(dockerComposeDown, 1);
     expect(dockerComposeDown.firstCall.args).to.deep.equal(
-      [dockerComposePath, { volumes: false }],
+      [dockerComposePath, { volumes: false, timeout: 10 }],
       `should call docker.compose.down for the package ${id}`
     );
   });
@@ -74,16 +87,6 @@ describe("Call function: removePackage", function() {
       id,
       removed: true
     });
-  });
-
-  it("should throw an error with wrong package name", async () => {
-    let error = "--- removePackage did not throw ---";
-    try {
-      await removePackage({ id: idWrong });
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.include("No docker-compose found");
   });
 
   after(async () => {

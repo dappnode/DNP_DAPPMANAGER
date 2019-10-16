@@ -38,6 +38,14 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return shell(`docker volume rm -f ${volumeName}`);
 }
 
+export function dockerRm(
+  containerNameOrId: string,
+  options?: { volumes?: boolean }
+): Promise<string> {
+  const flags = (options || {}).volumes ? "--volumes" : "";
+  return shell(`docker rm -f ${flags} ${containerNameOrId}`);
+}
+
 export function dockerLoad(imagePath: string): Promise<string> {
   return shell(`docker load -i ${imagePath}`);
 }
