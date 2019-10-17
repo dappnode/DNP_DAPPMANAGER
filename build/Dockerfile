@@ -29,7 +29,7 @@ WORKDIR /usr/src/app
 # Add source
 COPY build/src/package.json ./
 COPY build/src/yarn.lock ./
-RUN yarn add typescript
+RUN yarn add -D typescript
 COPY build/src .
 RUN yarn build
 
