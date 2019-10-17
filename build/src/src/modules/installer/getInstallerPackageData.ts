@@ -6,6 +6,8 @@ import {
   applyUserSet,
   addGeneralDataToCompose
 } from "../../utils/dockerComposeParsers";
+import Logs from "../../logs";
+const logs = Logs(module);
 
 /**
  * Receives a release and returns all the information and instructions
@@ -49,5 +51,12 @@ export default function getInstallerPackageData(
 function getPreviousUserSet(name: string, isCore: boolean): UserSet {
   // What if it's not previous there?
   const composePath = getPath.dockerCompose(name, isCore);
-  return getUserSet(composePath);
+
+  // If the compose is invalid, just return empty ENVs
+  try {
+    return getUserSet(composePath);
+  } catch (e) {
+    logs.error(`Error getting user set envs: ${e.stack}`);
+    return {};
+  }
 }
