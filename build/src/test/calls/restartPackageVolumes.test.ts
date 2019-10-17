@@ -15,13 +15,11 @@ describe("Call function: restartPackageVolumes", function() {
   const dappmanagerId = "dappmanager.dnp.dappnode.eth";
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
   const nginxId = "nginx-proxy.dnp.dappnode.eth";
-  const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
+  // const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
   const raidenTestnetId = "raiden-testnet.dnp.dappnode.eth";
 
   // docker-compose.yml will be generated for this DNP ids
-  const ids = [dnpNameCore, nginxId, letsencryptId, raidenTestnetId];
-
-  const dockerComposeRm = sinon.stub();
+  const dockerRm = sinon.stub();
   const dockerVolumeRm = sinon.stub();
   const dockerComposeUpSafe = sinon.stub();
 
@@ -115,14 +113,15 @@ describe("Call function: restartPackageVolumes", function() {
         }
       ]
     }
-  ];
+  ].map(dnp => ({
+    ...dnp,
+    packageName: dnp.isCore
+      ? `DAppNodePackage-${dnp.name}`
+      : `DAppNodeCore-${dnp.name}`
+  }));
 
-  async function listContainerExtendedInfo(
-    id: string
-  ): Promise<PackageContainer> {
-    const dnp = dnpList.find(dnp => dnp.name === id);
-    if (!dnp) throw Error(`MOCK ERROR - no dnp ${id}`);
-    else return dnp;
+  async function listContainers(): Promise<PackageContainer[]> {
+    return dnpList;
   }
 
   let restartPackageVolumes: typeof restartPackageVolumesType;
@@ -132,13 +131,13 @@ describe("Call function: restartPackageVolumes", function() {
       () => import("../../src/calls/restartPackageVolumes"),
       mock => {
         mock(() => import("../../src/modules/docker/dockerCommands"))
-          .with({ dockerComposeRm, dockerVolumeRm })
+          .with({ dockerRm, dockerVolumeRm })
           .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerSafe"))
           .with({ dockerComposeUpSafe })
           .toBeUsed();
         mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainerExtendedInfo })
+          .with({ listContainers })
           .toBeUsed();
       }
     );
@@ -146,15 +145,15 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   before(() => {
-    for (const id of ids) {
-      const dockerComposePath = getPath.dockerCompose(id, false);
+    for (const { name, isCore } of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(name, isCore);
       validate.path(dockerComposePath);
       fs.writeFileSync(dockerComposePath, "docker-compose");
     }
   });
 
   beforeEach(() => {
-    dockerComposeRm.resetHistory();
+    dockerRm.resetHistory();
     dockerComposeUpSafe.resetHistory();
     dockerVolumeRm.resetHistory();
   });
@@ -165,12 +164,12 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.have.property("message");
 
     // Assert correct call order docker rm
-    sinon.assert.called(dockerComposeRm);
-    const dnpsInOrder = [nginxId, letsencryptId];
+    sinon.assert.called(dockerRm);
+    const dnpsInOrder = [nginxId];
     dnpsInOrder.forEach((volName, i) => {
-      expect(dockerComposeRm.getCall(i).args[0]).to.include(
+      expect(dockerRm.getCall(i).args[0]).to.include(
         volName,
-        `Wrong dnpName on dockerComposeRm call #${i}`
+        `Wrong dnpName on dockerRm call #${i}`
       );
     });
 
@@ -202,8 +201,8 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.be.ok;
     expect(res).to.have.property("message");
 
-    // sinon.assert.called(dockerComposeRm);
-    sinon.assert.called(dockerComposeRm);
+    // sinon.assert.called(dockerRm);
+    sinon.assert.called(dockerRm);
     // Assert correct call order for volumeRm
     const volumesInOrder = ["vol1", "vol2"];
     volumesInOrder.forEach((volName, i) => {
@@ -224,7 +223,7 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.have.property("message");
 
     // sinon.assert.called(docker.compose.rm);
-    sinon.assert.callCount(dockerComposeRm, 1);
+    sinon.assert.callCount(dockerRm, 1);
     // Assert correct call order for volumeRm
     const volumesInOrder = ["vol1"];
     volumesInOrder.forEach((volName, i) => {
@@ -242,12 +241,12 @@ describe("Call function: restartPackageVolumes", function() {
     expect(res).to.have.property("message");
 
     // Assert correct call order docker rm
-    sinon.assert.called(dockerComposeRm);
+    sinon.assert.called(dockerRm);
     const dnpsInOrder = [raidenTestnetId];
     dnpsInOrder.forEach((volName, i) => {
-      expect(dockerComposeRm.getCall(i).args[0]).to.include(
+      expect(dockerRm.getCall(i).args[0]).to.include(
         volName,
-        `Wrong dnpName on dockerComposeRm call #${i}`
+        `Wrong dnpName on dockerRm call #${i}`
       );
     });
 
@@ -282,7 +281,7 @@ describe("Call function: restartPackageVolumes", function() {
 
   it("Should early return if the DNP has no volumes", async () => {
     const res = await restartPackageVolumes({ id: noVolsDnpName });
-    // sinon.assert.called(dockerComposeRm);
+    // sinon.assert.called(dockerRm);
     expect(res).to.be.ok;
     expect(res).to.have.property("message");
     expect(res.message).to.equal(
@@ -291,8 +290,8 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   after(() => {
-    for (const id of ids) {
-      const dockerComposePath = getPath.dockerCompose(id, false);
+    for (const { name, isCore } of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(name, isCore);
       fs.unlinkSync(dockerComposePath);
     }
   });

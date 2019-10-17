@@ -1,5 +1,5 @@
 import "mocha";
-import chai from "chai";
+import chai, { expect } from "chai";
 import path from "path";
 
 chai.should();
@@ -9,36 +9,48 @@ import * as getPath from "../../src/utils/getPath";
 const testDir = "test_files/";
 
 describe("Util: get paths", function() {
-  const packageName = "some_package";
-  const imageName = "some_image.tar.xz";
+  const name = "some_package";
+  const version = "0.2.0";
 
   it("return PACKAGE_REPO_DIR path", () => {
-    getPath
-      .packageRepoDir(packageName, false)
-      .should.equal(testDir + packageName);
+    expect(getPath.packageRepoDir(name, false)).to.equal(testDir + name);
   });
 
   it("return MANIFEST path", () => {
-    getPath
-      .manifest(packageName, false)
-      .should.equal(path.join(testDir, packageName, "dappnode_package.json"));
+    expect(getPath.manifest(name, false)).to.equal(
+      path.join(testDir, "some_package/dappnode_package.json")
+    );
   });
 
   it("return DOCKERCOMPOSE path", () => {
-    getPath
-      .dockerCompose(packageName, false)
-      .should.equal(path.join(testDir, packageName, "docker-compose.yml"));
+    expect(getPath.dockerCompose(name, false)).to.equal(
+      path.join(testDir, "some_package/docker-compose.yml")
+    );
   });
 
   it("return ENV_FILE path", () => {
-    getPath
-      .envFile(packageName, false)
-      .should.equal(path.join(testDir, packageName, `${packageName}.env`));
+    expect(getPath.envFile(name, false)).to.equal(
+      path.join(testDir, "some_package/some_package.env")
+    );
   });
 
   it("return IMAGE path", () => {
-    getPath
-      .image(packageName, imageName, false)
-      .should.equal(path.join(testDir, packageName, imageName));
+    expect(getPath.image(name, version, false)).to.equal(
+      path.join(testDir, "some_package/some_package_0.2.0.tar.xz")
+    );
+  });
+
+  describe("next path", () => {
+    const nextPaths = {
+      "docker-compose.yml": "docker-compose.next.yml",
+      "DNCORE/docker-compose.yml": "DNCORE/docker-compose.next.yml",
+      "/dnp_repo/my.dnp.dappnode.eth/docker-compose.yml":
+        "/dnp_repo/my.dnp.dappnode.eth/docker-compose.next.yml",
+      "dappnode_package.json": "dappnode_package.next.json"
+    };
+    for (const [from, next] of Object.entries(nextPaths))
+      it(`Should return next path of ${from}`, () => {
+        expect(getPath.nextPath(from)).to.equal(next);
+      });
   });
 });

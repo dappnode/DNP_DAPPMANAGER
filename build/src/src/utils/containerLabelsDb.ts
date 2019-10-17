@@ -75,14 +75,14 @@ export function writeMetadataToLabels({
   isCore
 }: {
   dependencies: Dependencies;
-  chain: string;
-  origin: string;
+  chain: string | undefined;
+  origin: string | null;
   isCore: boolean;
 }): ContainerLabels {
   return {
     [dependenciesId]: setJson(dependencies),
-    [chainId]: chain,
-    [originId]: origin,
+    [chainId]: chain || "",
+    [originId]: origin || "",
     [isCoreId]: isCore ? "true" : "false"
   };
 }
@@ -92,13 +92,13 @@ export function readMetadataFromLabels(
 ): {
   dependencies: Dependencies;
   chain: string;
-  origin: string;
+  origin: string | null;
   isCore: boolean;
 } {
   return {
     dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
     chain: labels[chainId] || "",
-    origin: labels[originId] || "",
+    origin: labels[originId] || null,
     isCore: labels[isCoreId] === "true" ? true : false
   };
 }

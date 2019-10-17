@@ -1,4 +1,5 @@
 import fs from "fs";
+import { omit } from "lodash";
 import path from "path";
 import params from "../params";
 
@@ -32,6 +33,17 @@ export function manifest(dnpName: string, isCore: boolean): string {
   );
 }
 
+export function image(
+  dnpName: string,
+  version: string,
+  isCore: boolean
+): string {
+  return path.join(
+    getRepoDirPath(dnpName, isCore),
+    `${dnpName}_${version}.tar.xz`
+  );
+}
+
 export function dockerCompose(dnpName: string, isCore: boolean): string {
   return getDockerComposePath(dnpName, isCore);
 }
@@ -57,15 +69,6 @@ export function envFileSmart(dnpName: string, isCore: boolean): string {
   return getEnvFilePath(dnpName, false);
 }
 
-export function image(
-  dnpName: string,
-  imageName: string,
-  isCore: boolean
-): string {
-  if (!imageName) throw Error("imageName must be defined");
-  return path.join(getRepoDirPath(dnpName, isCore), imageName);
-}
-
 // Helper functions
 
 function getDockerComposePath(dnpName: string, isCore: boolean): string {
@@ -85,23 +88,18 @@ function getRepoDirPath(dnpName: string, isCore: boolean): string {
 }
 
 function getDockerComposeName(dnpName: string, isCore: boolean): string {
-  if (isCore) {
-    verifyDnpName(dnpName);
-    const dnpShortName = (dnpName || "").split(".")[0];
-    return `docker-compose-${dnpShortName}.yml`;
-  } else {
-    return "docker-compose.yml";
-  }
+  if (isCore) return `docker-compose-${getShortName(dnpName)}.yml`;
+  else return "docker-compose.yml";
 }
 
 function getManifestName(dnpName: string, isCore: boolean): string {
-  if (isCore) {
-    verifyDnpName(dnpName);
-    const dnpShortName = (dnpName || "").split(".")[0];
-    return `dappnode_package-${dnpShortName}.json`;
-  } else {
-    return "dappnode_package.json";
-  }
+  if (isCore) return `dappnode_package-${getShortName(dnpName)}.json`;
+  else return "dappnode_package.json";
+}
+
+function getShortName(dnpName: string): string {
+  verifyDnpName(dnpName);
+  return ((dnpName || "").split(".")[0] || "").toLowerCase();
 }
 
 // Utils
@@ -113,4 +111,14 @@ function verifyDnpName(dnpName: string): void {
         dnpName
       )}`
     );
+}
+
+export function nextPath(anyPath: string): string {
+  const pathObj = path.parse(anyPath);
+  // From NodeJS docs
+  // `name` + `ext` will be used if `base` is not specified.
+  return path.format({
+    ...omit(pathObj, "base"),
+    ext: `.next${pathObj.ext}`
+  });
 }

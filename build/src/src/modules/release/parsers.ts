@@ -10,13 +10,21 @@ import {
   ManifestWithImage,
   ComposeVolumes,
   ComposeUnsafe,
-  Compose
+  Compose,
+  ReleaseWarnings
 } from "../../types";
 
 // Define docker compose parameters
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
 
+/**
+ * Legacy function to convert a manifest into a compose
+ * - It should exclusively accept the properties of a compose that are pre-screened
+ * - It should let the docker-compose sanitation to the another function
+ *
+ * @param manifest
+ */
 export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
   const { name, image } = manifest;
   const serviceName = name;
@@ -90,6 +98,13 @@ export function manifestToCompose(manifest: ManifestWithImage): ComposeUnsafe {
   /* eslint-enable @typescript-eslint/camelcase */
 }
 
+/**
+ * Sanitize metadata from the manifest.
+ * Since metadata is not used for critical purposes, it can just
+ * be copied over
+ *
+ * @param manifest
+ */
 export function parseMetadataFromManifest(
   manifest: Manifest
 ): PackageReleaseMetadata {
@@ -100,6 +115,16 @@ export function parseMetadataFromManifest(
   };
 }
 
+/**
+ * Strict sanitation of a docker-compose to prevent
+ * - Use of uncontroled features
+ * - Use of unsupported docker-compose syntax
+ * [NOTE] Allow but dangerous usage is tolerated by this function
+ * but will generate a warning in another function.
+ *
+ * @param composeUnsafe
+ * @param manifest
+ */
 export function sanitizeCompose(
   composeUnsafe: ComposeUnsafe,
   manifest: Manifest
@@ -151,6 +176,29 @@ export function sanitizeCompose(
     }
   };
   /* eslint-enable @typescript-eslint/camelcase */
+}
+
+/**
+ * Generates an object of warnings so other components can
+ * decide to throw an error or just show a warning in the UI
+ *
+ * @param release So it has access to all its assets
+ */
+export function getReleaseWarnings({
+  name,
+  isCore,
+  origin
+}: {
+  name: string;
+  isCore: boolean;
+  origin: string | null;
+}): ReleaseWarnings {
+  const releaseWarnings: ReleaseWarnings = {};
+
+  if (isCore && origin && name.endsWith(".dnp.dappnode.eth"))
+    releaseWarnings.unverifiedCore = true;
+
+  return releaseWarnings;
 }
 
 // Minor utils

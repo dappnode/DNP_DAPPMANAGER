@@ -9,7 +9,8 @@ import {
   PackageRelease,
   Compose,
   ManifestWithImage,
-  ComposeService
+  ComposeService,
+  InstallPackageData
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
@@ -41,8 +42,8 @@ export async function createDirP(filePath: string): Promise<void> {
  * Mock data
  */
 
-const mockDnpName = "mock-dnp.dnp.dappnode.eth";
-const mockDnpVersion = "0.0.0";
+export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
+export const mockDnpVersion = "0.0.0";
 export const mockSize = 1111111;
 export const mockHash = "/ipfs/QmWkAVYJhpwqApRfK4SZ6e2Xt2Daamc8uBpM1oMLmQ6fw4";
 
@@ -208,6 +209,15 @@ export const mockRelease: PackageRelease = {
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   metadata: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
+  warnings: {},
   origin: null,
   isCore: false
+};
+
+export const mockPackageData: InstallPackageData = {
+  ...mockRelease,
+  imagePath: "mock/path/image",
+  composePath: "mock/path/compose",
+  composeNextPath: "mock/path/compose.next",
+  manifestPath: "mock/path/manifest"
 };

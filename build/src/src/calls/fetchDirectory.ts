@@ -56,8 +56,8 @@ export default async function fetchDirectory(): Promise<
   // Extend package object contents
   const dnpsCacheTemp: (DirectoryDnp | undefined)[] = await Promise.all(
     dnpsFromDirectory.map(async pkg => {
+      const name = pkg.name;
       try {
-        const name = pkg.name;
         // Now resolve the last version of the package
         const release = await getRelease(name);
         const legacyManifest = getLegacyManifestFromRelease(release);

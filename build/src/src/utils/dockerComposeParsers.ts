@@ -1,5 +1,5 @@
 import path from "path";
-import { uniqBy, concat, pickBy, fromPairs, toPairs } from "lodash";
+import { uniqBy, concat, pickBy, fromPairs, toPairs, mapValues } from "lodash";
 import {
   PortProtocol,
   PortMapping,
@@ -7,8 +7,19 @@ import {
   Compose,
   VolumeMapping,
   ComposeService,
-  UserSetPackageVolsSingle
+  UserSetPackageVolsSingle,
+  Manifest,
+  UserSet,
+  UserSetPackageEnvs,
+  UserSetPackageVols,
+  UserSetPackagePorts,
+  UserSetByDnp
 } from "../types";
+import params from "../params";
+import {
+  writeMetadataToLabels,
+  writeDefaultsToLabels
+} from "./containerLabelsDb";
 
 /**
  * Internal methods that purely modify JSON
@@ -169,26 +180,33 @@ export function mergePortArrays(
  * - "/root/.ethereum/" => "/root/.ethereum"
  * - "data"             => "data"
  */
-export function normalizeVolumePath(volumePath: string) {
+export function normalizeVolumePath(volumePath: string): string {
   // Remove trailing slash
+  if (!volumePath) return "";
   if (volumePath === "/") return volumePath;
   return path.normalize(volumePath.replace(/\/+$/, ""));
 }
 
 /**
  * Parses an array of volumes from the service section
+ * - Ignores broken volume mappings, where there is no container path
+ *   "/host/path:", "/host/path"
  * @param volumesArray
  */
 export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
-  return volumesArray.map(volString => {
-    const [host, container] = volString.split(/:(.*)/);
-    const isNamed = !host.startsWith("/") && !host.startsWith("~");
-    return {
-      host: normalizeVolumePath(host),
-      container: normalizeVolumePath(container),
-      name: isNamed ? host : undefined
-    };
-  });
+  return volumesArray
+    .map(volString => {
+      const [host, container] = volString
+        .split(/:(.*)/)
+        .map(normalizeVolumePath);
+      const isNamed = !host.startsWith("/") && !host.startsWith("~");
+      return {
+        host,
+        container,
+        name: isNamed ? host : undefined
+      };
+    })
+    .filter(({ container }) => container);
 }
 
 export function stringifyVolumeMappings(
@@ -233,11 +251,254 @@ export function mergeVolumeArrays(
 export function mergeUserSetVolumes(
   currentVolumes: string[],
   userSetVolumes: UserSetPackageVolsSingle
-) {
+): string[] {
   // Normalize userSetVolumes so they catch the current ones
   const userSetDnpVolsNormalized: UserSetPackageVolsSingle = fromPairs(
     toPairs(userSetVolumes).map(pair => pair.map(normalizeVolumePath))
   );
 
   return currentVolumes.map(vol => userSetDnpVolsNormalized[vol] || vol);
+}
+
+/**
+ * Returns a new compose object with default data appended to it
+ * - logging data to prevent huge logs
+ * - custom labels to store: dependencies, chain, origin, isCore
+ * - common dns
+ * - DAppNode internal network
+ */
+export function addGeneralDataToCompose(
+  compose: Compose,
+  {
+    metadata,
+    origin,
+    isCore
+  }: {
+    metadata: Manifest;
+    origin: string | null;
+    isCore: boolean;
+  }
+): Compose {
+  const serviceName = parseServiceName(compose);
+  const service = compose.services[serviceName];
+
+  return {
+    ...compose,
+    services: {
+      [serviceName]: {
+        ...service,
+        // Add logging options to prevent huge log files
+        logging: {
+          options: {
+            "max-size": "10m",
+            "max-file": "3"
+          }
+        },
+        // Add custom labels
+        labels: {
+          ...service.labels,
+          ...writeMetadataToLabels({
+            dependencies: metadata.dependencies || {},
+            chain: metadata.chain,
+            origin,
+            isCore
+          })
+        },
+        // Add common DNS
+        dns: params.DNS_SERVICE,
+        // Add network settings
+        ...(!isCore ? { networks: [params.DNP_NETWORK_EXTERNAL_NAME] } : {})
+      }
+    },
+    networks: !isCore
+      ? {
+          [params.DNP_NETWORK_EXTERNAL_NAME]: {
+            external: true
+          }
+        }
+      : compose.networks || {}
+  };
+}
+
+function getPortMappingId(portMapping: PortMapping): string {
+  return `${portMapping.container}/${portMapping.protocol}`;
+}
+
+/**
+ * Returns the user settings applied to this compose
+ * This function works in coordination with other parsers to
+ * correctly store and differentiate which settings are from the
+ * user and which are not
+ */
+export function parseUserSet(fromCompose: {
+  environment: string[];
+  ports: string[];
+  volumes: string[];
+}): UserSet {
+  // Store original envs and do a diff
+  const envs = parseEnvironment(fromCompose.environment);
+  // Take into account ephemeral ports which are auto-generated
+  const ports = parsePortMappings(fromCompose.ports);
+  const volumeMappings = parseVolumeMappings(fromCompose.volumes);
+
+  return {
+    environment: envs,
+    portMappings: ports.reduce(
+      (obj: { [containerPortAndProtocol: string]: string }, port) => {
+        return {
+          ...obj,
+          [getPortMappingId(port)]: String(port.host || "")
+        };
+      },
+      {}
+    ),
+    namedVolumeMappings: volumeMappings.reduce(
+      (obj: { [namedVolumeContainerPath: string]: string }, vol) => {
+        return {
+          ...obj,
+          [vol.container]: vol.name || vol.host
+        };
+      },
+      {}
+    )
+  };
+}
+
+/**
+ * Returns the user settings applied to this compose
+ * This function works in coordination with other parsers to
+ * correctly store and differentiate which settings are from the
+ * user and which are not
+ */
+export function parseUserSetFromCompose(compose: Compose): UserSet {
+  const service = parseService(compose);
+  return parseUserSet({
+    environment: service.environment || [],
+    ports: service.ports || [],
+    volumes: service.volumes || []
+  });
+}
+
+export function applyUserSet(compose: Compose, userSet: UserSet): Compose {
+  const serviceName = parseServiceName(compose);
+  const service = compose.services[serviceName];
+
+  // Load envs, ports, and volumes
+  const envs = parseEnvironment(service.environment || []);
+  const ports = parsePortMappings(service.ports || []);
+  const volumeMappings = parseVolumeMappings(service.volumes || []);
+
+  // Default values
+  const defaultEnvironment = service.environment || [];
+  const defaultVolumes = service.volumes || [];
+  const defaultPorts = service.ports || [];
+
+  // User set
+  const userSetEnvironment = userSet.environment || {};
+  const userSetPortMappings = userSet.portMappings || {};
+  const userSetVolumeMappings = userSet.namedVolumeMappings || {};
+
+  return {
+    ...compose,
+    services: {
+      [serviceName]: {
+        ...service,
+        // Apply user set envs replacing by ENV name
+        environment: stringifyEnvironment(
+          mapValues(
+            envs,
+            (envValue, envName) => userSetEnvironment[envName] || envValue
+          )
+        ),
+        ports: stringifyPortMappings(
+          ports.map(port => {
+            const portId = getPortMappingId(port);
+            if (portId in userSetPortMappings) {
+              const userSetHost = userSetPortMappings[portId];
+              return {
+                ...port,
+                host: userSetHost ? parseInt(userSetHost) : undefined
+              };
+            } else return port;
+          })
+        ),
+        volumes: stringifyVolumeMappings(
+          volumeMappings.map(vol => {
+            const userSetHost = userSetVolumeMappings[vol.container];
+            if (vol.name && userSetHost)
+              return {
+                ...vol,
+                host: userSetHost
+              };
+            else return vol;
+          })
+        ),
+        /**
+         * Add the default values as labels
+         */
+        labels: {
+          ...service.labels,
+          ...writeDefaultsToLabels({
+            defaultEnvironment,
+            defaultVolumes,
+            defaultPorts
+          })
+        }
+      }
+    }
+  };
+}
+
+/**
+ * Convert legacy userSet*** to userSet
+ *
+ * @param {object} userSetEnvs
+ * userSetEnvs= {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "ENV_NAME": "VALUE1"
+ * }, ... }
+ * @param {object} userSetVols user set volumes
+ * userSetVols = {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
+ * }, ... }
+ * @param {object} userSetPorts user set ports
+ * userSetPorts = {
+ *   "kovan.dnp.dappnode.eth": {
+ *     "30303": "31313:30303",
+ *     "30303/udp": "31313:30303/udp"
+ * }, ... }
+ *
+ * @param {object} userSet {
+ *   environment: { "NAME": "NEW_VALUE" }
+ *   namedVolumeMappings: { "/usr/container": "/dev0/user-set-path" }
+ *   portMappings: { "4001/TCP": "4111", "9090/UDP": "" }
+ * }
+ */
+export function convertUserSetLegacy({
+  userSetEnvs,
+  userSetVols,
+  userSetPorts
+}: {
+  userSetEnvs?: UserSetPackageEnvs;
+  userSetVols?: UserSetPackageVols;
+  userSetPorts?: UserSetPackagePorts;
+}): UserSetByDnp {
+  const dnpNames = Object.keys({
+    ...(userSetEnvs || {}),
+    ...(userSetVols || {}),
+    ...(userSetPorts || {})
+  });
+
+  const userSetByDnp: UserSetByDnp = {};
+
+  for (const name of dnpNames) {
+    userSetByDnp[name] = parseUserSet({
+      environment: stringifyEnvironment((userSetEnvs || {})[name] || {}),
+      ports: Object.values((userSetPorts || {})[name] || {}),
+      volumes: Object.values((userSetVols || {})[name] || {})
+    });
+  }
+
+  return userSetByDnp;
 }
