@@ -46,23 +46,24 @@ export default async function removePackage({
 
   // Call restartPackageVolumes to safely delete dependant volumes
   if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
-
-  /**
-   * If there is no docker-compose, do a docker rm directly
-   * Otherwise, try to do a docker-compose down and if it fails,
-   * log to console and do docker-rm
-   */
-  if (fs.existsSync(composePath))
-    try {
-      await dockerComposeDown(composePath, {
-        volumes: deleteVolumes,
-        timeout
-      });
-    } catch (e) {
-      logs.error(`Error on dockerComposeDown of ${id}: ${e.message}`);
-      await dockerRm(containerName, { volumes: deleteVolumes });
-    }
-  else await dockerRm(containerName, { volumes: deleteVolumes });
+  else {
+    /**
+     * If there is no docker-compose, do a docker rm directly
+     * Otherwise, try to do a docker-compose down and if it fails,
+     * log to console and do docker-rm
+     */
+    if (fs.existsSync(composePath))
+      try {
+        await dockerComposeDown(composePath, {
+          volumes: deleteVolumes,
+          timeout
+        });
+      } catch (e) {
+        logs.error(`Error on dockerComposeDown of ${id}: ${e.message}`);
+        await dockerRm(containerName, { volumes: deleteVolumes });
+      }
+    else await dockerRm(containerName, { volumes: deleteVolumes });
+  }
 
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
