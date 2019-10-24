@@ -180,7 +180,11 @@ async function migrateVpnDb(): Promise<void> {
 
     logs.info("VPN DB imported successfully imported");
   } catch (e) {
-    logs.warn(`Error importing VPN DB: ${e.stack}`);
+    if (e.message && e.message.includes("No such file or directory")) {
+      logs.warn(`VNP DB not imported, vpndb.json missing.`);
+    } else {
+      logs.error(`Error importing VPN DB: ${e.stack}`);
+    }
   }
 }
 
