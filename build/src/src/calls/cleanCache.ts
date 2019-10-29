@@ -1,5 +1,5 @@
 import params from "../params";
-import restartPatch from "../modules/docker/restartPatch";
+import { clearCache } from "../db";
 // Utils
 import shell from "../utils/shell";
 import { RpcHandlerReturn } from "../types";
@@ -12,15 +12,15 @@ import { RpcHandlerReturn } from "../types";
  */
 export default async function cleanCache(): Promise<RpcHandlerReturn> {
   const pathsToDelete = [
-    params.DB_PATH,
     params.userActionLogsFilename,
     params.TEMP_TRANSFER_DIR
   ];
   for (const path of pathsToDelete) {
     await shell(`rm -rf ${path}`);
   }
-  // Restart DAPPMANAGER to prevent app breaks after deleting the db
-  await restartPatch("dappmanager.dnp.dappnode.eth");
+
+  // Clear cache DBs in friendly manner
+  clearCache();
 
   return {
     message: `Cleaned cache`,

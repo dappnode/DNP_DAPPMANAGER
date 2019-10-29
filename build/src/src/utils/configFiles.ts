@@ -1,7 +1,10 @@
 import fs from "fs";
 import * as getPath from "./getPath";
 import * as validate from "./validate";
-import { readComposeObj, mergeEnvsAndOmitEnvFile } from "./dockerComposeFile";
+import {
+  readComposeObj,
+  mergeEnvsAndOmitDnpEnvFile
+} from "./dockerComposeFile";
 import { parseEnvironment, parseService } from "./dockerComposeParsers";
 import { Compose, Manifest, PackageEnvs } from "../types";
 
@@ -53,7 +56,7 @@ export function convertLegacyEnvFiles({
   if (fs.existsSync(envFilePath)) {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
     const envsArray = envFileData.trim().split("\n");
-    mergeEnvsAndOmitEnvFile(name, parseEnvironment(envsArray));
+    mergeEnvsAndOmitDnpEnvFile(name, parseEnvironment(envsArray));
     fs.unlinkSync(envFilePath);
     return true;
   }

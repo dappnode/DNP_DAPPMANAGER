@@ -16,6 +16,7 @@ import diagnose from "./diagnose";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
 import fetchPackageData from "./fetchPackageData";
+import getParams from "./getParams";
 import getStats from "./getStats";
 import getUserActionLogs from "./getUserActionLogs";
 import getVersionData from "./getVersionData";
@@ -24,6 +25,7 @@ import installPackageSafe from "./installPackageSafe";
 import listPackages from "./listPackages";
 import logPackage from "./logPackage";
 import managePorts from "./managePorts";
+import naclEncryptionGetPublicKey from "./naclEncryptionGetPublicKey";
 import notificationsGet from "./notificationsGet";
 import notificationsRemove from "./notificationsRemove";
 import notificationsTest from "./notificationsTest";
@@ -36,6 +38,9 @@ import requestChainData from "./requestChainData";
 import resolveRequest from "./resolveRequest";
 import restartPackage from "./restartPackage";
 import restartPackageVolumes from "./restartPackageVolumes";
+import seedPhraseGetPublicKey from "./seedPhraseGetPublicKey";
+import seedPhraseSet from "./seedPhraseSet";
+import setStaticIp from "./setStaticIp";
 import togglePackage from "./togglePackage";
 import updatePackageEnv from "./updatePackageEnv";
 import updatePortMappings from "./updatePortMappings";
@@ -53,6 +58,7 @@ export {
   fetchCoreUpdateData,
   fetchDirectory,
   fetchPackageData,
+  getParams,
   getStats,
   getUserActionLogs,
   getVersionData,
@@ -61,6 +67,7 @@ export {
   listPackages,
   logPackage,
   managePorts,
+  naclEncryptionGetPublicKey,
   notificationsGet,
   notificationsRemove,
   notificationsTest,
@@ -73,6 +80,9 @@ export {
   resolveRequest,
   restartPackage,
   restartPackageVolumes,
+  seedPhraseGetPublicKey,
+  seedPhraseSet,
+  setStaticIp,
   togglePackage,
   updatePackageEnv,
   updatePortMappings
