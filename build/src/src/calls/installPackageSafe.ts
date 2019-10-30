@@ -15,7 +15,7 @@ export default async function installPackageSafe({
 }: {
   id: string;
   options?: { BYPASS_RESOLVER?: boolean };
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   options.BYPASS_RESOLVER = true;

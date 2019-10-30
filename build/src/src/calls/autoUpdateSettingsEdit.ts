@@ -18,7 +18,7 @@ export default async function autoUpdateSettingsEdit({
 }: {
   id: string;
   enabled: boolean;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 

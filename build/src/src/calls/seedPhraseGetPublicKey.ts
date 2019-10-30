@@ -1,9 +1,7 @@
 import * as db from "../db";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 
-interface RpcGetIdentityPublicKey extends RpcHandlerReturn {
-  result: string;
-}
+type ReturnData = string;
 
 /**
  * Returns the public key of the seedPhrase currently stored if any.
@@ -11,8 +9,8 @@ interface RpcGetIdentityPublicKey extends RpcHandlerReturn {
  *
  * @returns {string} publicKey
  */
-export default async function seedPhraseGetPublicKey(): Promise<
-  RpcGetIdentityPublicKey
+export default async function seedPhraseGetPublicKey(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   const identityAddress = db.identityAddress.get();
 

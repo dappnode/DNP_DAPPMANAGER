@@ -26,7 +26,7 @@ export default async function removePackage({
   id: string;
   deleteVolumes?: boolean;
   timeout?: number;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   const { name, isCore, packageName: containerName } = await listContainer(id);

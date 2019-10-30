@@ -1,13 +1,11 @@
 import shellExec from "../utils/shell";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 
-interface RpcDiagnoseReturn extends RpcHandlerReturn {
-  result: {
-    name: string;
-    result?: string;
-    error?: string;
-  }[];
-}
+type ReturnData = {
+  name: string;
+  result?: string;
+  error?: string;
+}[];
 
 /**
  * Returns a list of checks done as a diagnose
@@ -21,7 +19,9 @@ interface RpcDiagnoseReturn extends RpcHandlerReturn {
  *   } // either "result" or "error" prop will exist
  * }
  */
-export default async function diagnose(): Promise<RpcDiagnoseReturn> {
+export default async function diagnose(): RpcHandlerReturnWithResult<
+  ReturnData
+> {
   // Get docker version
   const dockerVersion = {
     name: "docker version",

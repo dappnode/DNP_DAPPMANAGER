@@ -13,7 +13,7 @@ export default async function passwordChange({
   newPassword
 }: {
   newPassword: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);

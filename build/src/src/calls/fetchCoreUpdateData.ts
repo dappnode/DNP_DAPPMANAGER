@@ -4,23 +4,25 @@ import getRelease from "../modules/release/getRelease";
 import { listContainers } from "../modules/docker/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
-import { Manifest, ManifestUpdateAlert, RpcHandlerReturn } from "../types";
+import {
+  Manifest,
+  ManifestUpdateAlert,
+  RpcHandlerReturnWithResult
+} from "../types";
 
-interface RpcFetchCoreUpdateDataReturn extends RpcHandlerReturn {
-  result: {
-    available: boolean;
-    type: string | null;
-    packages: {
-      name: string;
-      from: string;
-      to: string;
-      warningOnInstall: string;
-      manifest: Manifest;
-    }[];
-    changelog: string;
-    updateAlerts: ManifestUpdateAlert[];
-    versionId: string;
-  };
+interface ReturnData {
+  available: boolean;
+  type: string | null;
+  packages: {
+    name: string;
+    from: string;
+    to: string;
+    warningOnInstall: string;
+    manifest: Manifest;
+  }[];
+  changelog: string;
+  updateAlerts: ManifestUpdateAlert[];
+  versionId: string;
 }
 
 const coreName = "core.dnp.dappnode.eth";
@@ -55,7 +57,7 @@ export default async function fetchCoreUpdateData({
   version
 }: {
   version?: string;
-}): Promise<RpcFetchCoreUpdateDataReturn> {
+}): RpcHandlerReturnWithResult<ReturnData> {
   /**
    * Resolve core.dnp.dappnode.eth to figure out if it should be installed
    * With the list of deps to install, compute the higher updateType

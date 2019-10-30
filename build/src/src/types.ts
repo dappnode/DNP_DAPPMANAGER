@@ -458,15 +458,30 @@ export interface PackageReleaseImageData {
 
 /**
  * RPC methods
+ * - Generic inteface with metadata types
+ * - `WithResult` to type the return value
+ * - `Generic` for higher order functions
+ * [NOTE]: All are wrapped in a promise before exporting
  */
 
-export interface RpcHandlerReturn {
+interface RpcHandlerReturnInterface {
   message: string;
-  result?: any;
   logMessage?: boolean;
   userAction?: boolean;
   privateKwargs?: boolean;
 }
+interface RpcHandlerReturnWithResultInterface<R>
+  extends RpcHandlerReturnInterface {
+  result: R;
+}
+interface RpcHandlerReturnGenericInterface extends RpcHandlerReturnInterface {
+  result?: any;
+}
+export type RpcHandlerReturn = Promise<RpcHandlerReturnInterface>;
+export type RpcHandlerReturnWithResult<R> = Promise<
+  RpcHandlerReturnWithResultInterface<R>
+>;
+export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
 
 /**
  * HTTP Response

@@ -84,7 +84,7 @@ export default async function installPackage({
   userSetVols?: UserSetPackageVols;
   userSetPorts?: UserSetPackagePorts;
   options?: { BYPASS_CORE_RESTRICTION?: boolean; BYPASS_RESOLVER?: boolean };
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   const BYPASS_CORE_RESTRICTION = Boolean(

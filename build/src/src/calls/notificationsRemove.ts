@@ -11,7 +11,7 @@ export default async function notificationsRemove({
   ids
 }: {
   ids: string[];
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!ids) throw Error("kwarg ids must be defined");
 
   for (const id of ids) db.notification.remove(id);

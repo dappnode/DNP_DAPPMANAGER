@@ -2,15 +2,17 @@ import { pick } from "lodash";
 import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import Logs from "../logs";
-import { RpcHandlerReturn, ManifestWithImage, PackageRelease } from "../types";
+import {
+  ManifestWithImage,
+  PackageRelease,
+  RpcHandlerReturnWithResult
+} from "../types";
 import { parseService } from "../utils/dockerComposeParsers";
 const logs = Logs(module);
 
-interface RpcFetchPackageDataReturn extends RpcHandlerReturn {
-  result: {
-    manifest: ManifestWithImage;
-    avatar: string | null;
-  };
+interface ReturnData {
+  manifest: ManifestWithImage;
+  avatar: string | null;
 }
 
 /**
@@ -27,7 +29,7 @@ export default async function fetchPackageData({
   id
 }: {
   id: string;
-}): Promise<RpcFetchPackageDataReturn> {
+}): RpcHandlerReturnWithResult<ReturnData> {
   if (!id) throw Error("kwarg id must be defined");
 
   const release = await getRelease(id);

@@ -10,7 +10,7 @@ import { RpcHandlerReturn } from "../types";
  * - user action logs
  * - temp transfer folder
  */
-export default async function cleanCache(): Promise<RpcHandlerReturn> {
+export default async function cleanCache(): RpcHandlerReturn {
   const pathsToDelete = [
     params.userActionLogsFilename,
     params.TEMP_TRANSFER_DIR

@@ -9,7 +9,7 @@ import {
   AutoUpdateRegistry,
   AutoUpdatePending,
   AutoUpdateFeedback,
-  RpcHandlerReturn
+  RpcHandlerReturnWithResult
 } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
@@ -21,13 +21,11 @@ interface DnpsToShowInterface {
   feedback: AutoUpdateFeedback;
 }
 
-interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
-  result: {
-    settings: AutoUpdateSettings;
-    registry: AutoUpdateRegistry;
-    pending: AutoUpdatePending;
-    dnpsToShow: DnpsToShowInterface[];
-  };
+interface ReturnData {
+  settings: AutoUpdateSettings;
+  registry: AutoUpdateRegistry;
+  pending: AutoUpdatePending;
+  dnpsToShow: DnpsToShowInterface[];
 }
 
 /**
@@ -66,8 +64,8 @@ interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet(): Promise<
-  RpcAutoUpdateDataGetReturn
+export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();

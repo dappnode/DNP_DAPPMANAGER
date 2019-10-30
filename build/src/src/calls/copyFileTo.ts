@@ -40,7 +40,7 @@ export default async function copyFileTo({
   dataUri: string;
   filename: string;
   toPath: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("Argument id must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");

@@ -4,14 +4,12 @@ import getRelease from "../modules/release/getRelease";
 import getAvatar from "../modules/release/getAvatar";
 import isSyncing from "../utils/isSyncing";
 import { isIpfsHash } from "../utils/validate";
-import { DirectoryDnp, RpcHandlerReturn } from "../types";
+import { DirectoryDnp, RpcHandlerReturnWithResult } from "../types";
 import Logs from "../logs";
 import { getLegacyManifestFromRelease } from "./fetchPackageData";
 const logs = Logs(module);
 
-interface RpcFetchDirectoryReturn extends RpcHandlerReturn {
-  result: DirectoryDnp[];
-}
+type ReturnData = DirectoryDnp[];
 
 let dnpsCache: DirectoryDnp[] = [];
 const avatarCache: { [avatarHash: string]: string } = {};
@@ -28,8 +26,8 @@ const avatarCache: { [avatarHash: string]: string } = {};
  *   avatar: <base64 image>, {string}
  * }, ... ]
  */
-export default async function fetchDirectory(): Promise<
-  RpcFetchDirectoryReturn
+export default async function fetchDirectory(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   if (Boolean(await isSyncing())) {
     return {

@@ -23,7 +23,7 @@ export default async function restartPackageVolumes({
   id: string;
   doNotRestart?: boolean;
   volumeId?: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   // Needs the extended info that includes the volume ownership data
