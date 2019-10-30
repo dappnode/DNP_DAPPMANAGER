@@ -95,20 +95,25 @@ export default async function dappGet(
 
   // Otherwise, format the output
   const alreadyUpdated: DappGetState = {};
-  dnpList.forEach(dnp => {
-    const currentVersion = dnp.version;
-    const newVersion = state[dnp.name];
-    if (newVersion && !shouldUpdate(currentVersion, newVersion)) {
+  const currentVersion: DappGetState = {};
+  for (const dnp of dnpList) {
+    const prevVersion = dnp.version;
+    const nextVersion = state[dnp.name];
+    if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
       // DNP is already updated.
       // Remove from the success object and add it to the alreadyUpdatedd
       alreadyUpdated[dnp.name] = state[dnp.name];
       delete state[dnp.name];
     }
-  });
+    if (nextVersion && currentVersion) {
+      currentVersion[dnp.name] = prevVersion;
+    }
+  }
 
   return {
     message,
     state,
-    alreadyUpdated
+    alreadyUpdated,
+    currentVersion
   };
 }
