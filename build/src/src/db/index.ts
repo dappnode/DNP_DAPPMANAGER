@@ -11,8 +11,7 @@ import { upnpAvailable, upnpPortMappings, portsToOpen } from "./upnp";
 import {
   areEnvFilesMigrated,
   importedInstallationStaticIp,
-  isVpnDbMigrated,
-  hasRestartedVpnToInjectEnvs
+  isVpnDbMigrated
 } from "./systemFlags";
 import { publicIp, domain, dyndnsIdentity, staticIp } from "./dyndns";
 import { serverName } from "./system";
@@ -66,7 +65,6 @@ export {
   staticIp,
   importedInstallationStaticIp,
   isVpnDbMigrated,
-  hasRestartedVpnToInjectEnvs,
   serverName,
   noNatLoopback,
   doubleNat,
