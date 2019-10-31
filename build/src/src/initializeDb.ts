@@ -19,6 +19,8 @@ import { mergeEnvFile } from "./utils/dockerComposeFile";
 const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
+const vpnName = "vpn.dnp.dappnode.eth";
+const vpnContainerName = "DAppNodeCore-vpn.dnp.dappnode.eth";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -124,15 +126,27 @@ export default async function initializeDb(): Promise<void> {
     [params.GLOBAL_ENVS.SERVER_NAME]: db.serverName.get()
   });
 
-  if (!db.hasRestartedVpnToInjectEnvs.get())
+  let shouldResetTheVpn = true;
+  try {
+    // [_DAPPNODE_GLOBAL_ENVS_ACTIVE=true _DAPPNODE_GLOBAL_INTERNAL_IP=1.2.3.4 ...]
+    const envsString = await shell(
+      `docker inspect ${vpnContainerName} --format "{{.Config.Env}}"`
+    );
+    if (envsString && envsString.includes(params.GLOBAL_ENVS.ACTIVE))
+      shouldResetTheVpn = false;
+  } catch (e) {
+    logs.error(`Error checking if should reset the VPN: ${e.stack}`);
+  }
+
+  if (shouldResetTheVpn)
     try {
-      const vpnName = "vpn.dnp.dappnode.eth";
       mergeEnvFile(vpnName, params.GLOBAL_ENVS_PATH_CORE);
       await restartPackage({ id: vpnName });
-      db.hasRestartedVpnToInjectEnvs.set(true);
+      logs.info("Added global ENVs and restarted the VPN");
     } catch (e) {
       logs.error(`Error reseting the VPN: ${e.stack}`);
     }
+  else logs.info("Globals ENVs are already set in the VPN environment");
 
   eventBus.initializedDb.emit();
 }
