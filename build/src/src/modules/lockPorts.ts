@@ -1,7 +1,7 @@
 import { dockerComposeUp } from "./docker/dockerCommands";
 import {
   getPortMappings,
-  setPortMapping,
+  mergePortMapping,
   getDockerComposePath
 } from "../utils/dockerComposeFile";
 import { listContainer } from "./docker/listContainers";
@@ -111,7 +111,7 @@ export default async function lockPorts(id: string): Promise<PortMapping[]> {
     }
   );
 
-  setPortMapping(id, newPortMappings);
+  mergePortMapping(id, newPortMappings);
 
   // In order to apply the labels to the current container, re-up it
   const dockerComposePath = getDockerComposePath(id);

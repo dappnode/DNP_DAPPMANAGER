@@ -1,9 +1,9 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../src/calls";
-import { createTestDir } from "./testUtils";
-import params from "../src/params";
-import shell from "../src/utils/shell";
+import * as calls from "../../src/calls";
+import { createTestDir } from "../testUtils";
+import params from "../../src/params";
+import shell from "../../src/utils/shell";
 import {
   prepareDirectoryTypeReleaseWithDockerCompose,
   prepareDirectoryTypeReleaseNoDockerCompose,
@@ -12,7 +12,7 @@ import {
   verifyFiles,
   releaseDnpName,
   releaseVersion
-} from "./testReleaseUtils";
+} from "../testReleaseUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -97,7 +97,8 @@ describe("Release format tests", () => {
         if (!releaseHash) throw Error("Previous test failed");
 
         await calls.installPackage({
-          id: [releaseDnpName, releaseHash].join("@")
+          name: releaseDnpName,
+          version: releaseHash
           // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
         });
 

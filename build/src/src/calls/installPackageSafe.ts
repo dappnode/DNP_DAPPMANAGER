@@ -1,4 +1,5 @@
 import installPackage from "./installPackage";
+import * as parse from "../utils/parse";
 import { RpcHandlerReturn } from "../types";
 
 /**
@@ -17,7 +18,15 @@ export default async function installPackageSafe({
   options?: { BYPASS_RESOLVER?: boolean };
 }): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
+  const { name, ver: version } = parse.packageReq(id);
 
-  options.BYPASS_RESOLVER = true;
-  return await installPackage({ id, options });
+  return await installPackage({
+    name,
+    version,
+    userSettings: {},
+    options: {
+      ...options,
+      BYPASS_RESOLVER: true
+    }
+  });
 }

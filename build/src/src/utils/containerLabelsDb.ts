@@ -60,11 +60,14 @@ export function readDefaultsFromLabels(
   defaultEnvironment: string[];
   defaultPorts: string[];
   defaultVolumes: string[];
+  hasDefaults: boolean;
 } {
   return {
     defaultEnvironment: safeGetArray(labels[defaultEnvironmentId]),
     defaultPorts: safeGetArray(labels[defaultPortsId]),
-    defaultVolumes: safeGetArray(labels[defaultVolumesId])
+    defaultVolumes: safeGetArray(labels[defaultVolumesId]),
+    // Sanity flag
+    hasDefaults: defaultVolumesId in labels
   };
 }
 

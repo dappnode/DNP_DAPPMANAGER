@@ -1,6 +1,6 @@
-import { PackageRelease, UserSet, InstallPackageData } from "../../types";
-import { merge } from "lodash";
-import { getUserSet } from "../../utils/dockerComposeFile";
+import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
+import merge from "deepmerge";
+import { getUserSettings } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import {
   applyUserSet,
@@ -17,7 +17,7 @@ const logs = Logs(module);
  */
 export default function getInstallerPackageData(
   release: PackageRelease,
-  userSet: UserSet
+  userSettings: UserSettings
 ): InstallPackageData {
   const { name, version, isCore, compose, metadata, origin } = release;
   /**
@@ -31,7 +31,7 @@ export default function getInstallerPackageData(
   /**
    * Gather extra data
    */
-  const previousUserSet = getPreviousUserSet(name, isCore);
+  const previousUserSettings = getPreviousUserSettings(name, isCore);
 
   return {
     ...release,
@@ -42,19 +42,22 @@ export default function getInstallerPackageData(
     imagePath,
     // Data to write
     compose: addGeneralDataToCompose(
-      applyUserSet(compose, merge(previousUserSet, userSet)),
+      applyUserSet(compose, merge(previousUserSettings, userSettings)),
       { metadata, origin, isCore }
-    )
+    ),
+    // User settings to be applied by the installer
+    fileUploads: userSettings.fileUploads
   };
 }
 
-function getPreviousUserSet(name: string, isCore: boolean): UserSet {
-  // What if it's not previous there?
-  const composePath = getPath.dockerCompose(name, isCore);
-
-  // If the compose is invalid, just return empty ENVs
+/**
+ * If composePath does not exist, returns empty object {}
+ * If the compose is invalid, just return empty ENVs
+ */
+function getPreviousUserSettings(name: string, isCore: boolean): UserSettings {
   try {
-    return getUserSet(composePath);
+    const composePath = getPath.dockerCompose(name, isCore);
+    return getUserSettings(composePath);
   } catch (e) {
     logs.error(`Error getting user set envs: ${e.stack}`);
     return {};

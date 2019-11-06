@@ -60,5 +60,5 @@ export default async function getRelease(
   return {
     ...release,
     warnings: getReleaseWarnings(release)
-  }
+  };
 }

@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import * as eventBus from "../eventBus";
 // Modules
 import dappGet from "../modules/dappGet";
@@ -17,91 +18,44 @@ import getInstallerPackageData from "../modules/installer/getInstallerPackageDat
 import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
 // Utils
 import { writeManifest } from "../utils/manifestFile";
-import { convertUserSetLegacy } from "../utils/dockerComposeParsers";
 import { logUi, logUiClear } from "../utils/logUi";
-import * as parse from "../utils/parse";
 import { isIpfsRequest } from "../utils/validate";
 import * as validate from "../utils/validate";
 import isSyncing from "../utils/isSyncing";
-import {
-  RpcHandlerReturn,
-  UserSetPackageEnvs,
-  UserSetPackageVols,
-  UserSetPackagePorts,
-  InstallPackageData,
-  UserSet
-} from "../types";
+import { RpcHandlerReturn, InstallPackageData, PackageRequest } from "../types";
+import { RequestData } from "../route-types/installPackage";
 import Logs from "../logs";
+import copyFileTo from "./copyFileTo";
+import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 const logs = Logs(module);
 
 /**
- * Installs a package. It resolves dependencies, downloads
- * manifests and images, loads the images to docker, and calls
- * docker up on each package.
- * It has extra functionality for special cases
- * - allowCore: If a manifest requests a package to be core
- *   it will only be granted if
- *   1. Its manifest comes from APM and .dnp.dappnode.eth
- *   2. It comes from IPFS and the BYPASS_CORE_RESTRICTION env is true
- * - Special versions: It needs to deal with two cases
- *   1. ver = 'latest'
- *   2. ver = '/ipfs/QmZ87fb2...'
+ * Installs a DAppNode Package.
+ * Resolves dependencies, downloads release assets, loads the images to docker,
+ * sets userSettings and starts the docker container for each package.
  *
- * The logId is the requested id. It is used for the UI to track
- * the progress of the installation in real time and prevent double installs
+ * The logId is the requested id. It is used for the UI to track the progress
+ * of the installation in real time and prevent double installs
  *
- * @param {string} id DNP .eth name
- * @param {object} userSetEnvs
- * userSetEnvs= {
- *   "kovan.dnp.dappnode.eth": {
- *     "ENV_NAME": "VALUE1"
- * }, ... }
- * @param {object} userSetVols user set volumes
- * userSetVols = {
- *   "kovan.dnp.dappnode.eth": {
- *     "kovan:/root/.local/share/io.parity.ethereum/": "different_name"
- * }, ... }
- * @param {object} userSetPorts user set ports
- * userSetPorts = {
- *   "kovan.dnp.dappnode.eth": {
- *     "30303": "31313:30303",
- *     "30303/udp": "31313:30303/udp"
- * }, ... }
- * @param {object} options install options
- * - BYPASS_RESOLVER {bool}: Skips dappGet and just fetches first level dependencies
- * - BYPASS_CORE_RESTRICTION {bool}: Allows dncore DNPs from unverified sources (IPFS)
- * options = { BYPASS_RESOLVER: true, BYPASS_CORE_RESTRICTION: true }
+ * Options
+ * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
+ * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
 export default async function installPackage({
-  id,
-  userSetEnvs,
-  userSetVols,
-  userSetPorts,
+  name: reqName,
+  version: reqVersion,
+  userSettings: userSettingsAllDnps = {},
   options
-}: {
-  id: string;
-  userSetEnvs?: UserSetPackageEnvs;
-  userSetVols?: UserSetPackageVols;
-  userSetPorts?: UserSetPackagePorts;
-  options?: { BYPASS_CORE_RESTRICTION?: boolean; BYPASS_RESOLVER?: boolean };
-}): RpcHandlerReturn {
-  if (!id) throw Error("kwarg id must be defined");
-
+}: RequestData): RpcHandlerReturn {
   const BYPASS_CORE_RESTRICTION = Boolean(
     options && options.BYPASS_CORE_RESTRICTION
   );
 
-  // Legacy
-  const userSetByDnp: { [dnpName: string]: UserSet } = convertUserSetLegacy({
-    userSetEnvs,
-    userSetVols,
-    userSetPorts
-  });
-
   // 1. Parse the id into a request
-  // id = 'otpweb.dnp.dappnode.eth@0.1.4'
-  // req = { name: 'otpweb.dnp.dappnode.eth', ver: '0.1.4' }
-  const req = parse.packageReq(id);
+  reqName = sanitizeRequestName(reqName);
+  reqVersion = sanitizeRequestVersion(reqVersion);
+  const req: PackageRequest = { name: reqName, ver: reqVersion };
+  const id = reqName;
 
   // If the request is not from IPFS, check if the chain is syncing
   if (!isIpfsRequest(req) && (await isSyncing()))
@@ -118,10 +72,14 @@ export default async function installPackage({
    * Forwards the options to dappGet:
    * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
    */
-  logUi({ id, name: req.name, message: "Resolving dependencies..." });
+  logUi({ id, name: reqName, message: "Resolving dependencies..." });
   const { state, alreadyUpdated } = await dappGet(req, options);
   logs.info(
-    `Resolved request ${id} ver ${req.ver}: ${JSON.stringify(state, null, 2)}`
+    `Resolved request ${reqName} @ ${reqVersion}: ${JSON.stringify(
+      state,
+      null,
+      2
+    )}`
   );
 
   // 3. Format the request and filter out already updated packages
@@ -141,9 +99,12 @@ export default async function installPackage({
         if (release.warnings.unverifiedCore && !BYPASS_CORE_RESTRICTION)
           throw Error(`Core package ${name} is from an unverified origin`);
 
-        const userSet = userSetByDnp[name] || {};
-        const packageData = getInstallerPackageData(release, userSet);
+        const userSettings = userSettingsAllDnps[name] || {};
+        const packageData = getInstallerPackageData(release, userSettings);
         const { composeNextPath, compose } = packageData;
+
+        logs.debug(`Package data: ${JSON.stringify(packageData, null, 2)}`);
+        logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
 
         // Create the repoDir if necessary
         validate.path(composeNextPath);
@@ -152,9 +113,8 @@ export default async function installPackage({
         return packageData;
       })
     ),
-    req.name
+    reqName
   );
-  logs.debug(`Packages data: ${JSON.stringify(packagesData, null, 2)}`);
 
   /**
    * [Download] The image of each package to the file system in paralel
@@ -205,13 +165,37 @@ export default async function installPackage({
      * [Run] Up each package in serie. The order is extremely important
      * and is guaranteed by `orderInstallPackages`
      */
-    for (const { name, version, composeNextPath } of packagesData) {
-      logUi({ id, name, message: "Starting package... " });
-
+    for (const {
+      name,
+      version,
+      composeNextPath,
+      fileUploads
+    } of packagesData) {
       // patch to prevent installer from crashing
-      if (name == "dappmanager.dnp.dappnode.eth")
+      if (name == "dappmanager.dnp.dappnode.eth") {
+        logUi({ id, name, message: "Reseting DAppNode... " });
         await restartPatch(name + ":" + version);
-      else await dockerComposeUpSafe(composeNextPath);
+      } else {
+        // Copy fileUploads if any to the container before upping
+        if (fileUploads) {
+          logUi({ id, name, message: "Copying file uploads..." });
+          logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
+
+          await dockerComposeUpSafe(composeNextPath, { noStart: true });
+          for (const [containerPath, dataUri] of Object.entries(fileUploads)) {
+            const { dir, base } = path.parse(containerPath);
+            await copyFileTo({
+              id: name,
+              dataUri,
+              filename: base,
+              toPath: dir
+            });
+          }
+        }
+
+        logUi({ id, name, message: "Starting package... " });
+        await dockerComposeUpSafe(composeNextPath);
+      }
 
       logUi({ id, name, message: "Package started" });
     }
@@ -289,7 +273,9 @@ export default async function installPackage({
    * lockPorts modifies the docker-compose and returns
    */
   for (const { name } of packagesData) {
+    logUi({ id, name, message: "Locking ports..." });
     await lockPorts(name);
+    logUi({ id, name, message: "Locked ports" });
   }
 
   // Instruct the UI to clear isInstalling logs

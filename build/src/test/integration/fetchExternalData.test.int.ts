@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../src/calls";
-import { Manifest } from "../src/types";
-import { clearDbs } from "./testUtils";
+import * as calls from "../../src/calls";
+import { Manifest } from "../../src/types";
+import { clearDbs } from "../testUtils";
 
 describe("Fetch external release data", () => {
   before(async () => {

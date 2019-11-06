@@ -1,10 +1,10 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../src/calls";
-import Logs from "../src/logs";
-import { AutoUpdateSettings } from "../src/types";
-import { MY_PACKAGES, SYSTEM_PACKAGES } from "../src/utils/autoUpdateHelper";
-import { clearDbs } from "./testUtils";
+import * as calls from "../../src/calls";
+import Logs from "../../src/logs";
+import { AutoUpdateSettings } from "../../src/types";
+import { MY_PACKAGES, SYSTEM_PACKAGES } from "../../src/utils/autoUpdateHelper";
+import { clearDbs } from "../testUtils";
 const logs = Logs(module);
 
 describe("Auto update data", () => {

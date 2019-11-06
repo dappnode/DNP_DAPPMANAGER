@@ -3,9 +3,16 @@ import { DockerOptionsInterface } from "../../types";
 import shell from "./shell";
 
 /* eslint-disable no-useless-escape */
+export interface DockerComposeUpOptions {
+  noStart?: boolean;
+}
 
-export function dockerComposeUp(dcPath: string): Promise<string> {
-  return shell(`docker-compose -f ${dcPath} up -d`);
+export function dockerComposeUp(
+  dcPath: string,
+  options?: DockerComposeUpOptions
+): Promise<string> {
+  const flags = options && options.noStart ? "--no-start" : "-d";
+  return shell(`docker-compose -f ${dcPath} up ${flags}`);
 }
 
 export function dockerComposeDown(

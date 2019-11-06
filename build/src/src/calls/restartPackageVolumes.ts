@@ -109,6 +109,10 @@ export default async function restartPackageVolumes({
   }
   // Restart docker to apply changes
   // Offer a doNotRestart option for the removePackage call
+  // NOTE: if a package is dependant on id's volume it cannot be up-ed
+  // again since a volume it requires will not be there
+  // NOTE: The UI already alerts the user that multiple packages will
+  // be uninstalled at once
   if (doNotRestart) {
     logs.warn(`On restartPackageVolumes, doNotRestart = true`);
   } else {

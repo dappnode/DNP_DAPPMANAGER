@@ -20,7 +20,10 @@ const logs = Logs(module);
  * Only `minor` and `patch` updates are allowed
  */
 
-async function updateMyPackage(name: string, version: string): Promise<void> {
+async function updateMyPackage(
+  name: string,
+  currentVersion: string
+): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
   if (!isDnpUpdateEnabled(name)) return;
 
@@ -28,7 +31,7 @@ async function updateMyPackage(name: string, version: string): Promise<void> {
 
   // Compute if the update type is "patch"/"minor" = is allowed
   // If release is not allowed, abort
-  const updateType = computeSemverUpdateType(version, latestVersion);
+  const updateType = computeSemverUpdateType(currentVersion, latestVersion);
   if (updateType !== "minor" && updateType !== "patch") return;
 
   // Enforce a 24h delay before performing an auto-update
@@ -38,7 +41,7 @@ async function updateMyPackage(name: string, version: string): Promise<void> {
   logs.info(`Auto-updating ${name} to ${latestVersion}...`);
 
   try {
-    await installPackage({ id: name });
+    await installPackage({ name, version: latestVersion });
 
     flagCompletedUpdate(name, latestVersion);
     logs.info(`Successfully auto-updated system packages`);
@@ -63,9 +66,9 @@ export default async function updateMyPackages(): Promise<void> {
       (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS)
   );
 
-  for (const { name, version } of dnps) {
+  for (const { name, version: currentVersion } of dnps) {
     try {
-      await updateMyPackage(name, version);
+      await updateMyPackage(name, currentVersion);
     } catch (e) {
       logs.error(`Error auto-updating ${name}: ${e.stack}`);
     }

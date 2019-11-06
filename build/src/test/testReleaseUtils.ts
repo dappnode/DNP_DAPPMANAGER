@@ -34,6 +34,8 @@ const manifestFileNoHashes = "dappnode_package-no-hashes.json";
 const manifestFileNoImage = "dappnode_package-no-image.json";
 const composeFile = "docker-compose-mock-test.yml";
 const imageFile = "mock-test.public.dappnode.eth_0.0.1.tar.xz";
+const imagePath = path.join(buildFilesDir, imageFile);
+const imageTag = "mock-test.public.dappnode.eth:0.0.1";
 
 export function verifyFiles(): void {
   if (!fs.existsSync(buildFilesDir))
@@ -136,11 +138,10 @@ export async function prepareDirectoryTypeReleaseNoDockerCompose(): Promise<
 export async function prepareManifestTypeRelease(
   manifest?: ManifestWithImage
 ): Promise<string> {
-  const uploadedFiles = await ipfsAddFromFs(
-    path.join(buildFilesDir, imageFile)
-  );
-  const imageHash = uploadedFiles[0].hash;
-  const imageSize = uploadedFiles[0].size;
+  const imageUpload =
+    manifest && manifest.name !== releaseDnpName
+      ? await uploadNewImageToIpfs(manifest)
+      : await uploadImageToIpfs(imagePath);
 
   if (!manifest)
     manifest = JSON.parse(
@@ -148,8 +149,8 @@ export async function prepareManifestTypeRelease(
     );
   if (!manifest) throw Error("No manifest");
   if (!manifest.image) throw Error("No image in manifest");
-  manifest.image.hash = imageHash;
-  manifest.image.size = imageSize;
+  manifest.image.hash = imageUpload.hash;
+  manifest.image.size = imageUpload.size;
 
   const releaseHashManifest = await ipfsAddManifest(manifest);
 
@@ -161,4 +162,35 @@ export async function prepareManifestTypeRelease(
     throw Error("Wrong uploaded manifest");
 
   return releaseHashManifest;
+}
+
+/**
+ * Uploads an image correctly tagged with a different name and version
+ * @param name "different.dnp.dappnode.eth"
+ * @param version "0.2.0"
+ */
+async function uploadNewImageToIpfs({
+  name,
+  version
+}: {
+  name: string;
+  version: string;
+}) {
+  const newImagePath = path.resolve(testDir, `${name}_${version}.tar.xz`);
+  const newImageTag = `${name}:${version}`;
+  // Load image if not in docker already
+  if (!(await shell(`docker images -q ${imageTag}`)))
+    await shell(`docker load < ${imagePath}`);
+
+  await shell(`docker tag ${imageTag} ${newImageTag}`);
+  await shell(`docker save ${newImageTag} | xz > ${newImagePath}`);
+  return await uploadImageToIpfs(newImagePath);
+}
+
+async function uploadImageToIpfs(_imagePath: string) {
+  const uploadedFiles = await ipfsAddFromFs(_imagePath);
+  return {
+    hash: uploadedFiles[0].hash,
+    size: uploadedFiles[0].size
+  };
 }

@@ -147,10 +147,6 @@ connection.onopen = (session, details): void => {
 
   eventBus.logUi.on((logData: ProgressLog) => {
     publish("log.dappmanager.dnp.dappnode.eth", logData);
-    // Also, log them internally. But skip download progress logs, too spam-y
-    if (!(logData.message || "").includes("%") && !logData.clear)
-      logs.info(JSON.stringify(logData));
-    else logs.debug(JSON.stringify(logData));
   });
 
   eventBus.logUserAction.on((userActionLog: UserActionLog) => {

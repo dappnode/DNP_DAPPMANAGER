@@ -1,19 +1,19 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import * as getPath from "../src/utils/getPath";
-import * as calls from "../src/calls";
-import { createTestDir, mockManifestWithImage } from "./testUtils";
-import params from "../src/params";
-import shell from "../src/utils/shell";
+import * as getPath from "../../src/utils/getPath";
+import * as calls from "../../src/calls";
+import { createTestDir, mockManifestWithImage } from "../testUtils";
+import params from "../../src/params";
+import shell from "../../src/utils/shell";
 import {
   prepareManifestTypeRelease,
   cleanInstallationArtifacts,
   verifyFiles,
   releaseDnpName,
   releaseVersion
-} from "./testReleaseUtils";
-import { getDnpFromListPackages } from "./testPackageUtils";
+} from "../testReleaseUtils";
+import { getDnpFromListPackages } from "../testPackageUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -58,7 +58,8 @@ describe("Resilience features, when things go wrong", function() {
   describe("Remove a package without compose", () => {
     before("Install the release", async () => {
       await calls.installPackage({
-        id: [releaseDnpName, releaseHash].join("@")
+        name: releaseDnpName,
+        version: releaseHash
       });
     });
 
@@ -76,7 +77,8 @@ describe("Resilience features, when things go wrong", function() {
   describe("Remove a package with a broken compose", () => {
     before("Install the release", async () => {
       await calls.installPackage({
-        id: [releaseDnpName, releaseHash].join("@")
+        name: releaseDnpName,
+        version: releaseHash
       });
     });
 
@@ -96,7 +98,8 @@ describe("Resilience features, when things go wrong", function() {
     let brokenReleaseHash: string;
     before("Install the good release", async () => {
       await calls.installPackage({
-        id: [releaseDnpName, releaseHash].join("@")
+        name: releaseDnpName,
+        version: releaseHash
       });
     });
 
@@ -119,7 +122,8 @@ describe("Resilience features, when things go wrong", function() {
       let errorMessage = "--did not throw--";
       try {
         await calls.installPackage({
-          id: [releaseDnpName, brokenReleaseHash].join("@")
+          name: releaseDnpName,
+          version: brokenReleaseHash
         });
       } catch (e) {
         errorMessage = e.message;

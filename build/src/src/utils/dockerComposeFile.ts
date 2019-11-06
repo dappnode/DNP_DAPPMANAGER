@@ -8,9 +8,10 @@ import {
   Compose,
   PackageEnvs,
   ComposeService,
-  UserSet
+  UserSettings
 } from "../types";
 import params from "../params";
+import { verifyCompose } from "./dockerComposeSanitizer";
 
 /**
  * Utils to read or edit a docker-compose file
@@ -46,6 +47,9 @@ export function writeComposeObj(
   dockerComposePath: string,
   compose: Compose
 ): void {
+  // Last check to verify compose rules
+  verifyCompose(compose);
+
   /**
    * Critical step to prevent writing faulty docker-compose.yml files
    * that can kill docker-compose calls.
@@ -192,7 +196,7 @@ export const setPortMapping = getComposeServiceEditor(
  * Read user variables
  */
 
-export function getUserSet(composePath: string): UserSet {
+export function getUserSettings(composePath: string): UserSettings {
   if (!fs.existsSync(composePath)) return {};
   const compose = readComposeObj(composePath);
   return composeParser.parseUserSetFromCompose(compose);
