@@ -2,18 +2,12 @@ import fs from "fs";
 import { isAbsolute } from "path";
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
-import { timeoutError, IpfsArgument } from "../data";
+import { timeoutError } from "../data";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
 const timeoutMs = params.IPFS_TIMEOUT || 2000;
 const resolution = 2;
-
-interface CatStreamToFsArgument extends IpfsArgument {
-  path: string;
-  fileSize: number;
-  progress: (n: number) => void;
-}
 
 /**
  * Streams an IPFS object to the local fs.
@@ -31,7 +25,12 @@ export default function catStreamToFs({
   path,
   fileSize,
   progress
-}: CatStreamToFsArgument): Promise<string> {
+}: {
+  hash: string;
+  path: string;
+  fileSize?: number;
+  progress?: (n: number) => void;
+}): Promise<string> {
   return new Promise(
     (resolve, reject): void => {
       if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))

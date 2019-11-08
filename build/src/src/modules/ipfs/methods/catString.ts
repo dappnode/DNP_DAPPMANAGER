@@ -1,9 +1,4 @@
 import ipfsCat from "./cat";
-import { IpfsArgument } from "../data";
-
-interface CatArgument extends IpfsArgument {
-  maxLength?: number;
-}
 
 /**
  * Returns a file addressed by a valid IPFS Path.
@@ -16,6 +11,9 @@ interface CatArgument extends IpfsArgument {
 export default function catString({
   hash,
   maxLength
-}: CatArgument): Promise<string> {
+}: {
+  hash: string;
+  maxLength?: number;
+}): Promise<string> {
   return ipfsCat({ hash, maxLength }).then(file => file.toString());
 }
