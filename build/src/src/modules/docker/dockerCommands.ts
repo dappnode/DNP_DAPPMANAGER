@@ -12,7 +12,8 @@ export function dockerComposeUp(
   options?: DockerComposeUpOptions
 ): Promise<string> {
   const flags = options && options.noStart ? "--no-start" : "-d";
-  return shell(`docker-compose -f ${dcPath} up ${flags}`);
+  // Adding <&- to prevent interactive mode
+  return shell(`docker-compose -f ${dcPath} up ${flags} <&-`);
 }
 
 export function dockerComposeDown(
