@@ -11,7 +11,7 @@ export default async function resolveReleaseName(
   version = "*"
 ): Promise<{
   hash: string;
-  origin: string | null;
+  origin?: string;
 }> {
   // Correct version
   if (version === "latest") version = "*";
@@ -19,15 +19,13 @@ export default async function resolveReleaseName(
   // Normal case, name = eth domain & ver = semverVersion
   if (isEnsDomain(name) && isSemver(version))
     return {
-      hash: await resolveApmVersion(name, version),
-      origin: null
+      hash: await resolveApmVersion(name, version)
     };
 
   // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
   if (isEnsDomain(name) && isSemverRange(version))
     return {
-      hash: await resolveApmVersion(name, version),
-      origin: null
+      hash: await resolveApmVersion(name, version)
     };
 
   // IPFS normal case, name = eth domain & ver = IPFS hash

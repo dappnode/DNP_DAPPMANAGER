@@ -200,7 +200,7 @@ export function getReleaseWarnings({
 }: {
   name: string;
   isCore: boolean;
-  origin: string | null;
+  origin?: string;
 }): ReleaseWarnings {
   const releaseWarnings: ReleaseWarnings = {};
 

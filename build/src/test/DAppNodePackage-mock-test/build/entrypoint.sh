@@ -3,7 +3,7 @@
 FILE=/usr/config.json
 
 echo " "
-echo "Hello, ${VARIABLE:-no-name}"
+echo "Hello, ${NAME:-no-name}"
 echo " "
 
 if test -f "$FILE"; then
@@ -15,4 +15,4 @@ fi
 
 echo " "
 
-sleep 100000
+exec nc -l -p 8888

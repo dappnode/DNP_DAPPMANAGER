@@ -81,15 +81,16 @@ export interface UserSettingsAllDnps {
 }
 
 export interface CompatibleDnps {
-  [dnpName: string]: { from: string | null; to: string };
+  [dnpName: string]: { from?: string; to: string };
   // "bitcoin.dnp.dappnode.eth": { from: "0.2.5"; to: "0.2.6" };
   // "ln.dnp.dappnode.eth": { from: null; to: "0.2.2" };
 }
 
 export interface RequestedDnp {
   name: string; // "bitcoin.dnp.dappnode.eth"
-  version: string; // "0.2.5", "/ipfs/Qm"
-  origin: string | null; // "/ipfs/Qm"
+  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
+  semVersion: string; // Always a semver: "0.2.3"
+  origin?: string; // "/ipfs/Qm"
   avatar: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
   metadata: PackageReleaseMetadata;
   // Setup wizard
@@ -454,7 +455,7 @@ export interface PackageVersionData {
   commit?: string;
 }
 
-type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
@@ -467,17 +468,18 @@ export interface ReleaseWarnings {
 
 export interface PackageRelease {
   name: string;
-  version: string;
+  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
+  semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
   manifestFile: DistributedFile;
   imageFile: DistributedFile;
-  avatarFile: DistributedFile | null;
+  avatarFile?: DistributedFile;
   // Data for release processing
   metadata: PackageReleaseMetadata;
   compose: Compose;
   // Aditional
   warnings: ReleaseWarnings;
-  origin: string | null;
+  origin?: string;
   isCore: boolean;
 }
 

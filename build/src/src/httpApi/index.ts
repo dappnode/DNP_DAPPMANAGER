@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { isArray } from "util";
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
@@ -82,7 +81,9 @@ app.post("/upload", (req, res) => {
 
   // Use the mv() method to place the file somewhere on your server
   // The name of the input field (i.e. "file") is used to retrieve the uploaded file
-  const file = isArray(req.files.file) ? req.files.file[0] : req.files.file;
+  const file = Array.isArray(req.files.file)
+    ? req.files.file[0]
+    : req.files.file;
   file.mv(filePath, err => {
     if (err) return res.status(500).send(err);
 

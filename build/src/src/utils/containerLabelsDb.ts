@@ -78,8 +78,8 @@ export function writeMetadataToLabels({
   isCore
 }: {
   dependencies: Dependencies;
-  chain: string | undefined;
-  origin: string | null;
+  chain?: string;
+  origin?: string;
   isCore: boolean;
 }): ContainerLabels {
   return {
@@ -95,13 +95,13 @@ export function readMetadataFromLabels(
 ): {
   dependencies: Dependencies;
   chain: string;
-  origin: string | null;
+  origin?: string;
   isCore: boolean;
 } {
   return {
     dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
     chain: labels[chainId] || "",
-    origin: labels[originId] || null,
+    origin: labels[originId] || undefined,
     isCore: labels[isCoreId] === "true" ? true : false
   };
 }

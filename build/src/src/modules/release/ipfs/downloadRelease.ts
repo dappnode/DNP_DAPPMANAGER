@@ -5,11 +5,14 @@ import {
   Manifest,
   DistributedFile,
   ManifestWithImage,
-  ComposeUnsafe
+  ComposeUnsafe,
+  DistributedFileSource
 } from "../../../types";
 import { validateManifestWithImageData } from "../validate";
 import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose } from "../parsers";
+
+const source = "ipfs" as DistributedFileSource;
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -25,7 +28,7 @@ export default async function downloadRelease(
 ): Promise<{
   manifestFile: DistributedFile;
   imageFile: DistributedFile;
-  avatarFile: DistributedFile | null;
+  avatarFile?: DistributedFile;
   composeUnsafe: ComposeUnsafe;
   manifest: Manifest;
 }> {
@@ -45,9 +48,9 @@ export default async function downloadRelease(
 
     const { image, avatar } = manifestWithImage;
     return {
-      manifestFile: { hash: hash, source: "ipfs", size: 0 },
-      imageFile: { hash: image.hash, source: "ipfs", size: image.size },
-      avatarFile: avatar ? { hash: avatar, source: "ipfs", size: 0 } : null,
+      manifestFile: { hash: hash, source, size: 0 },
+      imageFile: { hash: image.hash, source, size: image.size },
+      avatarFile: avatar ? { hash: avatar, source, size: 0 } : undefined,
       manifest,
       composeUnsafe: manifestToCompose(manifestWithImage)
     };
@@ -86,7 +89,7 @@ export default async function downloadRelease(
       return {
         manifestFile: getFileFromEntry(manifestEntry),
         imageFile: getFileFromEntry(imageEntry),
-        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : null,
+        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : undefined,
         manifest,
         composeUnsafe
       };
@@ -103,5 +106,5 @@ function getFileFromEntry({
   hash: string;
   size: number;
 }): DistributedFile {
-  return { hash, size, source: "ipfs" };
+  return { hash, size, source };
 }

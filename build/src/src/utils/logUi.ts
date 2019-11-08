@@ -21,8 +21,7 @@ export function logUi(progressLog: ProgressLog): void {
   const { id, name, message } = progressLog;
   // Log them internally. But skip download progress logs, too spam-y
   const logDebug = `Progress log: ${id} - ${name}: ${message}`;
-  if (logDebug.includes("%")) logs.debug(logDebug);
-  else logs.info(logDebug);
+  if (!logDebug.includes("%")) logs.info(logDebug);
 
   eventBus.logUi.emit(progressLog);
 }

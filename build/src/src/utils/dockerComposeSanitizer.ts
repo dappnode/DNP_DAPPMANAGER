@@ -1,11 +1,11 @@
 import { Compose } from "../types";
 import { parseService, parseServiceName } from "./dockerComposeParsers";
 
-function assertNoSubstitution(s: string) {
+function assertNoSubstitution(s: string): void {
   if (s && s.includes("${")) throw Error(`variable substitution not allowed`);
 }
 
-function verifyServiceVolumes(volumes: string[]) {
+function verifyServiceVolumes(volumes: string[]): void {
   if (!Array.isArray(volumes)) throw Error("service.volumes must be an array");
 
   for (const vol of volumes) {
@@ -22,7 +22,7 @@ function verifyServiceVolumes(volumes: string[]) {
   }
 }
 
-export function verifyCompose(compose: Compose) {
+export function verifyCompose(compose: Compose): void {
   const service = parseService(compose);
   const serviceName = parseServiceName(compose);
   try {

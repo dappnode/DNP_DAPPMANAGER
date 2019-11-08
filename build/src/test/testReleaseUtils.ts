@@ -4,6 +4,7 @@ import { isEqual } from "lodash";
 import { testDir } from "./testUtils";
 import shell from "../src/utils/shell";
 import params from "../src/params";
+import * as validate from "../src/utils/validate";
 import {
   ipfsAddDirFromFs,
   ipfsAddManifest,
@@ -164,6 +165,11 @@ export async function prepareManifestTypeRelease(
   return releaseHashManifest;
 }
 
+interface IpfsUploadReturn {
+  hash: string;
+  size: number;
+}
+
 /**
  * Uploads an image correctly tagged with a different name and version
  * @param name "different.dnp.dappnode.eth"
@@ -175,19 +181,22 @@ async function uploadNewImageToIpfs({
 }: {
   name: string;
   version: string;
-}) {
+}): Promise<IpfsUploadReturn> {
   const newImagePath = path.resolve(testDir, `${name}_${version}.tar.xz`);
   const newImageTag = `${name}:${version}`;
   // Load image if not in docker already
   if (!(await shell(`docker images -q ${imageTag}`)))
     await shell(`docker load < ${imagePath}`);
 
+  validate.path(newImagePath);
   await shell(`docker tag ${imageTag} ${newImageTag}`);
   await shell(`docker save ${newImageTag} | xz > ${newImagePath}`);
   return await uploadImageToIpfs(newImagePath);
 }
 
-async function uploadImageToIpfs(_imagePath: string) {
+async function uploadImageToIpfs(
+  _imagePath: string
+): Promise<IpfsUploadReturn> {
   const uploadedFiles = await ipfsAddFromFs(_imagePath);
   return {
     hash: uploadedFiles[0].hash,

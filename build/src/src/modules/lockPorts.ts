@@ -115,6 +115,7 @@ export default async function lockPorts(id: string): Promise<PortMapping[]> {
 
   // In order to apply the labels to the current container, re-up it
   const dockerComposePath = getDockerComposePath(id);
+  logs.debug(`Lock ports: up-ing ${dockerComposePath}`);
   await dockerComposeUp(dockerComposePath);
 
   logs.info(

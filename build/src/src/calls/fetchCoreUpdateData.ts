@@ -12,7 +12,7 @@ import {
 
 interface ReturnData {
   available: boolean;
-  type: string | null;
+  type?: string;
   packages: {
     name: string;
     from: string;
@@ -108,7 +108,7 @@ export default async function fetchCoreUpdateData({
     ? "minor"
     : updateTypes.includes("patch")
     ? "patch"
-    : null;
+    : undefined;
 
   const { metadata: coreManifest } = await getRelease(
     coreName,

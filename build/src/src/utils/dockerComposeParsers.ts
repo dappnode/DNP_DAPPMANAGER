@@ -242,7 +242,7 @@ export function addGeneralDataToCompose(
     isCore
   }: {
     metadata: Manifest;
-    origin: string | null;
+    origin?: string;
     isCore: boolean;
   }
 ): Compose {
@@ -302,8 +302,8 @@ export function parseUserSetFromCompose(compose: Compose): UserSettings {
   const service = parseService(compose);
 
   const {
-    defaultEnvironment,
-    defaultPorts,
+    // defaultEnvironment,
+    // defaultPorts,
     defaultVolumes,
     hasDefaults
   } = readDefaultsFromLabels(service.labels || {});

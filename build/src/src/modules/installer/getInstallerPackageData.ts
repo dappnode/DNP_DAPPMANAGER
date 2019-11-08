@@ -1,13 +1,11 @@
 import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
 import merge from "deepmerge";
-import { getUserSettings } from "../../utils/dockerComposeFile";
+import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import {
   applyUserSet,
   addGeneralDataToCompose
 } from "../../utils/dockerComposeParsers";
-import Logs from "../../logs";
-const logs = Logs(module);
 
 /**
  * Receives a release and returns all the information and instructions
@@ -19,19 +17,17 @@ export default function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings
 ): InstallPackageData {
-  const { name, version, isCore, compose, metadata, origin } = release;
+  const { name, semVersion, isCore, compose, metadata, origin } = release;
   /**
    * Compute paths
    */
   const composePath = getPath.dockerCompose(name, isCore);
   const composeNextPath = getPath.nextPath(composePath);
   const manifestPath = getPath.manifest(name, isCore);
-  const imagePath = getPath.image(name, version, isCore);
+  const imagePath = getPath.image(name, semVersion, isCore);
 
-  /**
-   * Gather extra data
-   */
-  const previousUserSettings = getPreviousUserSettings(name, isCore);
+  // If composePath does not exist, or is invalid: returns {}
+  const previousUserSettings = getUserSettingsSafe(name, isCore);
 
   return {
     ...release,
@@ -48,18 +44,4 @@ export default function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings.fileUploads
   };
-}
-
-/**
- * If composePath does not exist, returns empty object {}
- * If the compose is invalid, just return empty ENVs
- */
-function getPreviousUserSettings(name: string, isCore: boolean): UserSettings {
-  try {
-    const composePath = getPath.dockerCompose(name, isCore);
-    return getUserSettings(composePath);
-  } catch (e) {
-    logs.error(`Error getting user set envs: ${e.stack}`);
-    return {};
-  }
 }

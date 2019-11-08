@@ -63,13 +63,19 @@ describe("DNP lifecycle", function() {
   };
   const toEnvironment = (envs: {
     [id: string]: { key: string; value: string };
-  }) => Object.values(envs).map(({ key, value }) => `${key}=${value}`);
+  }): string[] =>
+    Object.values(envs).map(({ key, value }) => `${key}=${value}`);
 
   interface PortMappingWithNew extends PortMapping {
     newHost: number | string;
   }
+  interface PortMappingForTest extends PortMappingWithNew {
+    portId: string;
+  }
 
-  const addPortId = (obj: { [id: string]: PortMappingWithNew }) =>
+  const addPortId = (obj: {
+    [id: string]: PortMappingWithNew;
+  }): { [id: string]: PortMappingForTest } =>
     mapValues(obj, p => ({ ...p, portId: `${p.container}/${p.protocol}` }));
   const portsMain = addPortId({
     // Unchanged
@@ -142,7 +148,7 @@ describe("DNP lifecycle", function() {
     }
   };
 
-  const toDaraUrl = (s: string) =>
+  const toDaraUrl = (s: string): string =>
     `data:application/json;base64,${Buffer.from(s).toString("base64")}`;
 
   const demoFilePath = "/usr/config.json";
@@ -180,11 +186,10 @@ describe("DNP lifecycle", function() {
 
   let mainDnpReleaseHash: string;
 
-  async function cleanTestArtifacts() {
+  async function cleanTestArtifacts(): Promise<void> {
     const cmds = [
       // SUPER important to clean dnp_repo folder to avoid caches
       `rm -rf ${params.REPO_DIR}`,
-      `rm -rf ${params.DNCORE_DIR}`,
 
       // Clean previous stuff
       `docker rm -f ${[

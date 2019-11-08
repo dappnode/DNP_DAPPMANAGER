@@ -81,13 +81,10 @@ describe("Release format tests", () => {
       it("Get the release", async () => {
         if (!releaseHash) throw Error("Previous test failed");
 
-        const { result } = await calls.fetchPackageData({ id: releaseHash });
+        const { result } = await calls.fetchDnpRequest({ id: releaseHash });
 
-        expect(result.manifest.name).to.equal(
-          releaseDnpName,
-          "Wrong manifest name"
-        );
-        expect(result.manifest.version).to.equal(
+        expect(result.name).to.equal(releaseDnpName, "Wrong manifest name");
+        expect(result.semVersion).to.equal(
           releaseVersion,
           "Wrong manifest version"
         );
@@ -104,8 +101,8 @@ describe("Release format tests", () => {
 
         // Verify it is running correctly
         const { result } = await calls.logPackage({ id: releaseDnpName });
-        expect(result).to.equal(
-          `Hello, ${releaseTest.envValue} !`,
+        expect(result).to.include(
+          `Hello, ${releaseTest.envValue}`,
           `Wrong log from ${releaseDnpName} after installation`
         );
       }).timeout(60 * 1000);

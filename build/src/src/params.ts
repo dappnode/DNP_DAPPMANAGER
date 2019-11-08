@@ -28,6 +28,8 @@ const params = {
   REPO_DIR,
   DNCORE_DIR,
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
+  // Static files serve
+  avatarStaticDir: path.join(REPO_DIR, "avatars"),
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
@@ -38,6 +40,10 @@ const params = {
   GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
+
+  // HTTP API parameters
+  apiUrl: "http://dappmanager.dappnode",
+  ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -112,8 +118,9 @@ if (devMode) {
 }
 
 if (process.env.NODE_ENV === "development") {
-  params.autobahnUrl = "ws://localhost:8080/ws";
-  params.autobahnRealm = "realm1";
+  params.apiUrl = "http://localhost:3000";
+  // params.autobahnUrl = "ws://localhost:8080/ws";
+  // params.autobahnRealm = "realm1";
 }
 
 export default params;

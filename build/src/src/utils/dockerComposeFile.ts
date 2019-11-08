@@ -11,11 +11,16 @@ import {
   UserSettings
 } from "../types";
 import params from "../params";
+import * as getPath from "./getPath";
 import { verifyCompose } from "./dockerComposeSanitizer";
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Utils to read or edit a docker-compose file
  */
+
+let DUPLICATED_CODE_WITH_GET_PATH;
 
 export function getDockerComposePath(id: string, newFile?: boolean): string {
   const composeCorePath = path.join(
@@ -196,8 +201,24 @@ export const setPortMapping = getComposeServiceEditor(
  * Read user variables
  */
 
-export function getUserSettings(composePath: string): UserSettings {
+export function getUserSettings(name: string, isCore: boolean): UserSettings {
+  const composePath = getPath.dockerCompose(name, isCore);
   if (!fs.existsSync(composePath)) return {};
   const compose = readComposeObj(composePath);
   return composeParser.parseUserSetFromCompose(compose);
+}
+
+/**
+ * If composePath does not exist, or is invalid: returns {}
+ */
+export function getUserSettingsSafe(
+  name: string,
+  isCore: boolean
+): UserSettings {
+  try {
+    return getUserSettings(name, isCore);
+  } catch (e) {
+    logs.error(`Error getting userSettings ${name}: ${e.stack}`);
+    return {};
+  }
 }

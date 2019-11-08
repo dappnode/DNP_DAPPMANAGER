@@ -46,8 +46,9 @@ export default async function getRelease(
     throw Error("DNP's name doesn't match the manifest's name");
 
   const release = {
-    name,
-    version: manifest.version,
+    name: manifest.name,
+    reqVersion: origin || manifest.version,
+    semVersion: manifest.version,
     origin,
     isCore: getIsCore(manifest),
     manifestFile,
