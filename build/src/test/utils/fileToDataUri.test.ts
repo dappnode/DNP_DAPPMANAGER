@@ -27,27 +27,15 @@ describe("Util: fileToDataUri", () => {
   it("should convert a JSON file to a valid dataUri", async () => {
     const fileData = JSON.stringify(
       {
-        name: "test",
-        version: "1.0.0",
-        description: "",
-        main: "index.js",
-        scripts: { test: 'echo "Error: no test specified" && exit 1' },
-        keywords: [],
-        author: "",
-        license: "ISC",
-        dependencies: {
-          ethers: "^4.0.23",
-          "lz-string": "^1.4.4",
-          "qrcode-terminal": "^0.12.0",
-          web3: "^1.0.0-beta.37"
-        }
+        name: "Adam",
+        age: 23
       },
       null,
       2
     );
     const path = `${testDir}/filedemo.json`;
     const dataUri =
-      "data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==";
+      "data:application/json;base64,ewogICJuYW1lIjogIkFkYW0iLAogICJhZ2UiOiAyMwp9Cg==";
     fs.writeFileSync(path, fileData);
     const _dataUri = await fileToDataUri(path);
 
