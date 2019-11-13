@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DOMAIN=$1
-INTERAL_IP=$2
+INTERNAL_IP=$2
 
 ## Remove all zones in case they exists
 rndc showzone ${DOMAIN} in dappmanager >/dev/null 2>&1 && rndc delzone ${DOMAIN} in dappmanager;
@@ -16,7 +16,7 @@ server 172.33.1.2
 debug yes
 zone ${DOMAIN}.
 update delete ${DOMAIN}. A
-update add ${DOMAIN}. 60 A $INTERAL_IP
+update add ${DOMAIN}. 60 A $INTERNAL_IP
 show
 send
 EOF
