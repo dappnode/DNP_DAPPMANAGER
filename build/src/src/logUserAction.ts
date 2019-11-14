@@ -1,7 +1,12 @@
 import winston from "winston";
 import Transport from "winston-transport";
 import * as eventBus from "./eventBus";
-import limitObjValuesSize from "./utils/limitObjValuesSize";
+import { pipe } from "./utils/functions";
+import {
+  trimBase64Values,
+  hideSensitiveValues,
+  limitObjValuesSize
+} from "./utils/objects";
 import params from "./params";
 import { UserActionLog } from "./types";
 
@@ -65,26 +70,22 @@ const onlyUserAction = format(info => {
 });
 
 /**
- * Private fields
+ * Transform the info object
+ * 1. Any key in kwargs or the result that the name implies that contains
+ *    sensitive data will be replace by ********
+ * 2. When sending user settings the kwargs can potentially contain long
+ *    base64 file contents. Trim them off
+ * 3. Limit the length of objects.
+ *    RPC calls like copyTo may content really big dataUrls as kwargs,
+ *    prevent them from cluttering the userActionLogs file
  */
-const privateFields = format(info => {
-  const _info = Object.assign({}, info);
-  if (_info.privateKwargs && _info.kwargs && typeof _info.kwargs === "object")
-    for (const key of Object.keys(_info.kwargs)) _info.kwargs[key] = "********";
-  delete _info.privateKwargs;
-  return _info;
-});
-
-/**
- * Limit the length of objects.
- * RPC calls like copyTo may content really big dataUrls as kwargs,
- * prevent them from cluttering the userActionLogs file
- */
-const maxLen = 500;
-const limitLength = format(info => {
-  if (info.kwargs) info.kwargs = limitObjValuesSize(info.kwargs, maxLen);
-  if (info.result) info.result = limitObjValuesSize(info.result, maxLen);
-  return info;
+const formatLogObjectFunction = pipe(
+  hideSensitiveValues,
+  trimBase64Values,
+  obj => limitObjValuesSize(obj, 500)
+);
+const formatLogObject = format(info => {
+  return formatLogObjectFunction(info);
 });
 
 // Actual logger
@@ -99,8 +100,7 @@ const logger = createLogger({
   ],
   format: format.combine(
     onlyUserAction(),
-    privateFields(),
-    limitLength(),
+    formatLogObject(),
     format.timestamp(),
     format.json()
   )

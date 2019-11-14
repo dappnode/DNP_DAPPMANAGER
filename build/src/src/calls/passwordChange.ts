@@ -24,7 +24,6 @@ export default async function passwordChange({
   return {
     message: `Changed password`,
     logMessage: true,
-    userAction: true,
-    privateKwargs: true
+    userAction: true
   };
 }

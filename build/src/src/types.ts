@@ -598,7 +598,6 @@ interface RpcHandlerReturnInterface {
   message: string;
   logMessage?: boolean;
   userAction?: boolean;
-  privateKwargs?: boolean;
 }
 interface RpcHandlerReturnWithResultInterface<R>
   extends RpcHandlerReturnInterface {
