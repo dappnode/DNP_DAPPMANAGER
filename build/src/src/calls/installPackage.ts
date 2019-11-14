@@ -28,9 +28,9 @@ import Logs from "../logs";
 import copyFileTo from "./copyFileTo";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import {
-  flagPackageIsNotInstalling,
   packageIsInstalling,
-  flagPackageIsInstalling
+  flagPackagesAreNotInstalling,
+  flagPackagesAreInstalling
 } from "../utils/packageIsInstalling";
 const logs = Logs(module);
 
@@ -96,7 +96,7 @@ export default async function installPackage({
 
   try {
     // Flag the packages as installing
-    Object.keys(state).forEach(flagPackageIsInstalling);
+    flagPackagesAreInstalling(state);
 
     // 3. Format the request and filter out already updated packages
     for (const name in alreadyUpdated)
@@ -308,6 +308,9 @@ export default async function installPackage({
     eventBus.requestPackages.emit();
     eventBus.packageModified.emit({ id });
 
+    // Flag packages as no longer installing
+    flagPackagesAreNotInstalling(state);
+
     return {
       message: `Installed ${id}`,
       logMessage: true,
@@ -316,7 +319,7 @@ export default async function installPackage({
   } catch (e) {
     // CRITICAL STEP: Flag the packages as NOT installing
     // Otherwise packages will not be able to be installed
-    Object.keys(state).forEach(flagPackageIsNotInstalling);
+    flagPackagesAreNotInstalling(state);
 
     // Clear possible logs between dep resolution and package running
     logUiClear({ id });
