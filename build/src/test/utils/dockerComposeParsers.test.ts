@@ -211,11 +211,11 @@ describe("Util: dockerComposeParsers", () => {
             ...mockComposeService,
             environment: ["ORIGINAL=0", "USERSET=1"],
             ports: ["4001:4001", "9090:9090", "32764:6000"],
-            volumes: ["/dev1/custom-path:/usr/data", "more_data:/usr/data2"],
+            volumes: ["/dev1/custom-path:/usr/data", "moredata:/usr/data2"],
             labels: {
               "dappnode.dnp.default.environment": "[]",
               "dappnode.dnp.default.ports": "[]",
-              "dappnode.dnp.default.volumes": `["${bitcoinDataVolumeName}:/usr/data", "more_data:/usr/data2"]`
+              "dappnode.dnp.default.volumes": `["${bitcoinDataVolumeName}:/usr/data", "moredata:/usr/data2"]`
             }
           }
         }
@@ -229,7 +229,8 @@ describe("Util: dockerComposeParsers", () => {
           USERSET: "1"
         },
         namedVolumePaths: {
-          [bitcoinDataVolumeName]: "/dev1/custom-path"
+          [bitcoinDataVolumeName]: "/dev1/custom-path",
+          moredata: ""
         },
         portMappings: {
           "4001/TCP": "4001",
@@ -248,10 +249,7 @@ describe("Util: dockerComposeParsers", () => {
         services: {
           [bitcoinName]: {
             ...mockComposeService,
-            volumes: [
-              "/dev1/custom-path:/root/.bitcoin",
-              "more_data:/usr/data2"
-            ]
+            volumes: ["/dev1/custom-path:/root/.bitcoin", "moredata:/usr/data2"]
           }
         }
       };
@@ -262,7 +260,8 @@ describe("Util: dockerComposeParsers", () => {
         environment: {},
         portMappings: {},
         namedVolumePaths: {
-          [bitcoinDataVolumeName]: "/dev1/custom-path"
+          [bitcoinDataVolumeName]: "/dev1/custom-path",
+          moredata: ""
         }
       };
 

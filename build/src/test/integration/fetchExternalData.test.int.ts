@@ -1,8 +1,10 @@
 import "mocha";
 import { expect } from "chai";
+import path from "path";
 import * as calls from "../../src/calls";
 import { ManifestWithImage, Compose, RequestedDnp } from "../../src/types";
 import {
+  testDir,
   clearDbs,
   createTestDir,
   mockComposeService,
@@ -15,6 +17,7 @@ import * as validate from "../../src/utils/validate";
 import params from "../../src/params";
 import { writeComposeObj } from "../../src/utils/dockerComposeFile";
 import { dockerComposeUp } from "../../src/modules/docker/dockerCommands";
+import { writeDefaultsToLabels } from "../../src/utils/containerLabelsDb";
 
 const mockImage = "mock-test.public.dappnode.eth:0.0.1";
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
@@ -31,6 +34,7 @@ describe("Fetch external release data", () => {
     const idMain = "main.dnp.dappnode.eth";
     const idDep = "dependency.dnp.dappnode.eth";
     const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
+    const customVolumePath = path.resolve(testDir, "dev1");
 
     const mainDnpManifest: ManifestWithImage = {
       name: idMain,
@@ -41,7 +45,7 @@ describe("Fetch external release data", () => {
         size: 0,
         path: "",
         environment: ["ENV_DEFAULT=ORIGINAL"],
-        volumes: ["data:/usr"],
+        volumes: ["data:/usr", "data2:/usr2"],
         /* eslint-disable-next-line @typescript-eslint/camelcase */
         external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
         ports: ["1111:1111"]
@@ -79,7 +83,13 @@ describe("Fetch external release data", () => {
           /* eslint-disable-next-line @typescript-eslint/camelcase */
           container_name: containerNameMain,
           image: mockImage,
-          environment: ["PREVIOUS_SET=PREV_VAL"]
+          environment: ["PREVIOUS_SET=PREV_VAL"],
+          volumes: [`${customVolumePath}:/usr`],
+          labels: writeDefaultsToLabels({
+            defaultEnvironment: [],
+            defaultPorts: [],
+            defaultVolumes: ["data:/usr"]
+          })
         }
       }
     };
@@ -154,12 +164,28 @@ describe("Fetch external release data", () => {
         settings: {
           [idMain]: {
             environment: {
+              ENV_DEFAULT: "ORIGINAL",
               PREVIOUS_SET: "PREV_VAL"
             },
-            portMappings: {},
-            namedVolumePaths: {}
+            portMappings: {
+              "1111/TCP": "1111"
+            },
+            namedVolumePaths: {
+              data: customVolumePath,
+              data2: ""
+            }
           },
-          [idDep]: {}
+          [idDep]: {
+            environment: {
+              DEP_ENV: "DEP_ORIGINAL"
+            },
+            portMappings: {
+              "2222/TCP": "2222"
+            },
+            namedVolumePaths: {
+              data: ""
+            }
+          }
         },
         request: {
           compatible: {

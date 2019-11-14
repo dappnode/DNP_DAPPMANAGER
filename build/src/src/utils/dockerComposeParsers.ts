@@ -325,7 +325,7 @@ export function parseUserSetFromCompose(compose: Compose): UserSettings {
   );
   // volumes = ["/dev0/user-set-path:/usr/data"]
   // defaultVolumes = ["bitcoin_data:/usr/data"]
-  const namedVolumePaths = parsedDefaultVolumes.reduce(
+  const namedVolumePathsFromDefaults = parsedDefaultVolumes.reduce(
     (obj: typeof userSettingsType.namedVolumePaths, defaultVol) => {
       if (defaultVol.name) {
         const currentVols = volumes.filter(
@@ -342,6 +342,21 @@ export function parseUserSetFromCompose(compose: Compose): UserSettings {
     },
     {}
   );
+  // If there is a named volume, it must be added in user settings so it
+  // can be modified by the user in the UI. If it's value is "", it will be ignored
+  const namedVolumePathsUnset = volumes.reduce(
+    (obj: typeof userSettingsType.namedVolumePaths, vol) => {
+      // Ignore binds and external volumes
+      if (!vol.name || ((compose.volumes || {})[vol.name] || {}).external)
+        return obj;
+      else return { ...obj, [vol.name]: "" };
+    },
+    {}
+  );
+  const namedVolumePaths = {
+    ...namedVolumePathsUnset,
+    ...namedVolumePathsFromDefaults
+  };
 
   return {
     environment,
