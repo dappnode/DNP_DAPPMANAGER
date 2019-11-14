@@ -1,4 +1,5 @@
 import { DirectoryItem } from "../types";
+import { directoryDnpsSchema, directoryDnpsSample } from "../schemas";
 
 export const route = "fetchDirectory.dappmanager.dnp.dappnode.eth";
 
@@ -7,50 +8,8 @@ export type RequestData = {};
 
 export type ReturnData = DirectoryItem[];
 
-export const returnDataSchema = {
-  type: "array",
-  title: "directory",
-  items: {
-    type: "object",
-    properties: {
-      name: { type: "string" },
-      description: { type: "string" },
-      avatarUrl: { type: "string" },
-      isInstalled: { type: "boolean" },
-      isUpdated: { type: "boolean" },
-      whitelisted: { type: "boolean" },
-      isFeatured: { type: "boolean" },
-      featuredStyle: { type: "object" },
-      categories: { type: "array", items: { type: "string" } }
-    },
-    required: [
-      "name",
-      "description",
-      "isInstalled",
-      "isUpdated",
-      "whitelisted",
-      "isFeatured",
-      "categories"
-    ]
-  }
-};
+export const returnDataSchema = directoryDnpsSchema;
 
 // Samples for testing
 
-export const returnDataSample: ReturnData = [
-  {
-    name: "name",
-    description: "desc",
-    avatarUrl: "http://",
-    isInstalled: true,
-    isUpdated: false,
-    whitelisted: true,
-    isFeatured: true,
-    featuredStyle: {
-      featuredBackground: "#fff",
-      featuredColor: "#fff",
-      featuredAvatarFilter: "invert(1)"
-    },
-    categories: ["Developer Tools"]
-  }
-];
+export const returnDataSample: ReturnData = directoryDnpsSample;

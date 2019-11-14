@@ -2,7 +2,11 @@ import Ajv, { ErrorObject } from "ajv";
 
 const ajv = new Ajv({ allErrors: true });
 
-export function getValidator<T>(schema: any, dataVar?: string): (data: T) => T {
+export function getValidator<T>(
+  schema: any,
+  dataVar: string,
+  errorHanlder: (errorMessage: string) => void
+): (data: T) => T {
   const name = dataVar || schema.title || "data";
   /**
    * Special validator where it checks each item individually.
@@ -29,8 +33,7 @@ export function getValidator<T>(schema: any, dataVar?: string): (data: T) => T {
         if (!isValid) {
           const { errors } = validateItem;
           const errorText = formatErrors(errors, itemName);
-          if (errorCache !== errorText)
-            console.error(errorCache, { item, errors });
+          if (errorCache !== errorText) errorHanlder(errorCache);
           errorCache = errorText;
         }
         return isValid;
@@ -46,7 +49,6 @@ export function getValidator<T>(schema: any, dataVar?: string): (data: T) => T {
       if (!validate(data)) {
         const { errors } = validate;
         const prettyErrors = formatErrors(errors, name);
-        console.error(prettyErrors, { data, errors });
         throw Error(prettyErrors);
       }
       return data;

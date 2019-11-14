@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "NODE_ENV=development ts-node src/index",
+    "dev:local": "ts-node -r dotenv/config src/index",
     "build": "node_modules/.bin/tsc && npm run lint",
     "watch-ts": "./node_modules/.bin/tsc -w",
     "file": "node",

@@ -167,6 +167,7 @@ export interface VolumeMapping extends BasicVolumeMapping {
   users?: string[];
   owner?: string;
   isOwner?: boolean;
+  size?: number;
 }
 
 export interface Dependencies {
@@ -439,6 +440,20 @@ export interface AutoUpdateFeedback {
   scheduled?: number;
   updated?: number;
   errorMessage?: string;
+}
+
+export interface AutoUpdateDataDnpView {
+  id: string;
+  displayName: string;
+  enabled: boolean;
+  feedback: AutoUpdateFeedback;
+}
+
+export interface AutoUpdateDataView {
+  settings: AutoUpdateSettings;
+  registry: AutoUpdateRegistry;
+  pending: AutoUpdatePending;
+  dnpsToShow: AutoUpdateDataDnpView[];
 }
 
 /**
