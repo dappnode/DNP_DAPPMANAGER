@@ -22,8 +22,6 @@ describe("Fetch external release data", () => {
       true,
       "Bind DNP must be in packages array"
     );
-    if (dnpBind && dnpBind.manifest) bindManifest = dnpBind.manifest;
-    else throw Error("No BIND DNP found in package array");
   }).timeout(60 * 1000);
 
   it("Should fetch directory data", async () => {
@@ -52,14 +50,7 @@ describe("Fetch external release data", () => {
   }).timeout(60 * 1000);
 
   it("Should fetch BIND's package data", async () => {
-    const { result } = await calls.fetchPackageData({ id: bindId });
-    // ###### TEMP FIX FOR ADMIN COMPATIBILITY
-    let TEMP_FIX_FOR_ADMIN_COMPATIBILITY;
-    delete result.manifest.image;
-    expect(result.manifest).to.deep.equal(
-      bindManifest,
-      "Inconsistent manifest for BIND"
-    );
+    await calls.fetchPackageData({ id: bindId });
   }).timeout(60 * 1000);
 
   it("Should fetch Bitcoin's package data", async () => {

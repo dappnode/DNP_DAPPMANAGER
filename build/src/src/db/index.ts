@@ -8,11 +8,7 @@ import { composeCache, apmCache, ipfsCache, manifestCache } from "./cache";
 import { fileTransferPath } from "./fileTransferPath";
 import { notification, notifications } from "./notification";
 import { upnpAvailable, upnpPortMappings, portsToOpen } from "./upnp";
-import {
-  areEnvFilesMigrated,
-  importedInstallationStaticIp,
-  isVpnDbMigrated
-} from "./systemFlags";
+import { importedInstallationStaticIp, isVpnDbMigrated } from "./systemFlags";
 import { publicIp, domain, dyndnsIdentity, staticIp } from "./dyndns";
 import { serverName } from "./system";
 import {
@@ -58,7 +54,6 @@ export {
   upnpAvailable,
   upnpPortMappings,
   portsToOpen,
-  areEnvFilesMigrated,
   publicIp,
   domain,
   dyndnsIdentity,
