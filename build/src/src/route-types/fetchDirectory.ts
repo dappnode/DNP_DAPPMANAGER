@@ -15,7 +15,7 @@ export const returnDataSchema = {
     properties: {
       name: { type: "string" },
       description: { type: "string" },
-      avatar: { type: "string" },
+      avatarUrl: { type: "string" },
       isInstalled: { type: "boolean" },
       isUpdated: { type: "boolean" },
       whitelisted: { type: "boolean" },
@@ -26,7 +26,6 @@ export const returnDataSchema = {
     required: [
       "name",
       "description",
-      "avatar",
       "isInstalled",
       "isUpdated",
       "whitelisted",
@@ -42,7 +41,7 @@ export const returnDataSample: ReturnData = [
   {
     name: "name",
     description: "desc",
-    avatar: "http://",
+    avatarUrl: "http://",
     isInstalled: true,
     isUpdated: false,
     whitelisted: true,

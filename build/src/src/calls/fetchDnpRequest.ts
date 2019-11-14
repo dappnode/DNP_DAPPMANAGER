@@ -13,13 +13,13 @@ import getRelease from "../modules/release/getRelease";
 import dappGet from "../modules/dappGet";
 import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
-import resolveAvatarFileToUrl from "../httpApi/resolveAvatarFileToUrl";
 import semver from "semver";
 import { listContainers } from "../modules/docker/listContainers";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
 import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
+import { fileToGatewayUrl } from "../utils/distributedFile";
 
 export default async function fetchDnpRequest({
   id
@@ -69,7 +69,7 @@ export default async function fetchDnpRequest({
   const requiresCoreUpdate = getRequiresCoreUpdate(mainRelease, dnpList);
 
   // Fetch and store avatar
-  const avatarUrl = resolveAvatarFileToUrl(mainRelease.avatarFile);
+  const avatarUrl = fileToGatewayUrl(mainRelease.avatarFile);
 
   return {
     message: `Fetched request data of ${id}`,
@@ -78,7 +78,7 @@ export default async function fetchDnpRequest({
       semVersion: mainRelease.semVersion,
       reqVersion: mainRelease.reqVersion,
       origin: mainRelease.origin, // "/ipfs/Qm"
-      avatar: avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
+      avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
       // Prevent sending duplicated data
       metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiSchema"]),
       // Setup wizard

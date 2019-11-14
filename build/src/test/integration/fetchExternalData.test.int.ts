@@ -134,8 +134,8 @@ describe("Fetch external release data", () => {
         reqVersion: mainDnpReleaseHash,
         semVersion: "0.1.0",
         origin: mainDnpReleaseHash,
-        avatar:
-          "http://dappmanager.dappnode/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
+        avatarUrl:
+          "http://ipfs.dappnode:8080/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
         metadata: {
           name: idMain,
           version: "0.1.0",

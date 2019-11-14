@@ -24,7 +24,7 @@ import { SetupSchema, SetupUiSchema } from "./types-own";
 export interface DirectoryItem {
   name: string;
   description: string; // = metadata.shortDescription || metadata.description
-  avatar: string; // Must be URL to a resource in a DAPPMANAGER API
+  avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
   isInstalled: boolean; // Show "UPDATE"
   isUpdated: boolean; // Show "UPDATED"
   whitelisted: boolean;
@@ -91,7 +91,7 @@ export interface RequestedDnp {
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
-  avatar: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
+  avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
   metadata: PackageReleaseMetadata;
   // Setup wizard
   setupSchema?: SetupSchemaAllDnps;
@@ -193,9 +193,6 @@ export interface PackageContainer {
   shortName: string;
   state: ContainerStatus;
   running: boolean;
-  origin?: string;
-  chain?: string;
-  dependencies: Dependencies;
   manifest?: Manifest;
   envs?: PackageEnvs;
   ports: PortMapping[];
@@ -203,6 +200,10 @@ export interface PackageContainer {
   defaultEnvironment: PackageEnvs;
   defaultPorts: PortMapping[];
   defaultVolumes: VolumeMapping[];
+  dependencies: Dependencies;
+  avatarUrl: string;
+  origin?: string;
+  chain?: string;
 }
 
 export interface PackageEnvs {

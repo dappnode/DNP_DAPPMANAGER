@@ -18,6 +18,7 @@ import {
   parsePortMappings,
   parseVolumeMappings
 } from "../../utils/dockerComposeParsers";
+import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -153,12 +154,17 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     defaultPorts,
     defaultVolumes
   } = readDefaultsFromLabels(labels);
+  const {
+    dependencies,
+    avatar,
+    chain,
+    origin,
+    isCore
+  } = readMetadataFromLabels(labels);
   const defaultEnvironmentParsed = parseEnvironment(defaultEnvironment);
   const defaultPortsParsed = parsePortMappings(defaultPorts);
   const defaultVolumesParsed = parseVolumeMappings(defaultVolumes);
-  const { dependencies, chain, origin, isCore } = readMetadataFromLabels(
-    labels
-  );
+  const avatarUrl = multiaddressToGatewayUrl(avatar);
 
   return {
     id: container.Id,
@@ -195,9 +201,9 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     state: container.State as ContainerStatus,
     running: container.State === "running",
     dependencies,
-    // #### TODO: The ADMIN does not accept an empty chain or origin
-    ...(origin ? { origin } : {}),
-    ...(chain ? { chain } : {}),
+    avatarUrl,
+    origin,
+    chain,
     // Default values to avoid having to read the manifest
     defaultEnvironment: defaultEnvironmentParsed,
     defaultPorts: defaultPortsParsed,

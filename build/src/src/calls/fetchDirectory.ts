@@ -4,10 +4,10 @@ import getRelease from "../modules/release/getRelease";
 import isSyncing from "../utils/isSyncing";
 import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";
-import resolveAvatarFileToUrl from "../httpApi/resolveAvatarFileToUrl";
 import { listContainers } from "../modules/docker/listContainers";
 import { notUndefined } from "../utils/typingHelpers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
+import { fileToGatewayUrl } from "../utils/distributedFile";
 const logs = Logs(module);
 
 /**
@@ -39,7 +39,7 @@ export default async function fetchDirectory(): RpcHandlerReturnWithResult<
         return {
           name,
           description: getShortDescription(metadata),
-          avatar: resolveAvatarFileToUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, dnpList),
           isUpdated: getIsUpdated(release, dnpList),
           whitelisted: true,

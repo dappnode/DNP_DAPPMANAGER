@@ -6,6 +6,7 @@ import {
   applyUserSet,
   addGeneralDataToCompose
 } from "../../utils/dockerComposeParsers";
+import { fileToMultiaddress } from "../../utils/distributedFile";
 
 /**
  * Receives a release and returns all the information and instructions
@@ -29,6 +30,9 @@ export default function getInstallerPackageData(
   // If composePath does not exist, or is invalid: returns {}
   const previousUserSettings = getUserSettingsSafe(name, isCore);
 
+  // Aditional metadata
+  const avatar = fileToMultiaddress(release.avatarFile);
+
   return {
     ...release,
     // Paths
@@ -39,7 +43,7 @@ export default function getInstallerPackageData(
     // Data to write
     compose: addGeneralDataToCompose(
       applyUserSet(compose, merge(previousUserSettings, userSettings)),
-      { metadata, origin, isCore }
+      { metadata, avatar, origin, isCore }
     ),
     // User settings to be applied by the installer
     fileUploads: userSettings.fileUploads

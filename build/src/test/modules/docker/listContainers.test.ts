@@ -58,7 +58,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "8a382e9a3b8ac449388470d06b98486b4fc965980fc5b72fd1c1cc77ae070484",
@@ -141,7 +144,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "951426e3fa2cbfd49a5198840764383af3961c2b29ba33a6b5f3dd45b953db9f",
@@ -172,7 +178,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
@@ -198,7 +207,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
@@ -241,7 +253,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
@@ -324,7 +339,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
@@ -367,7 +385,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
@@ -404,7 +425,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "e1766fd7a9d8110398b66c7b0f68fe625ee856f49526b987a54537028448476b",
@@ -454,7 +478,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
@@ -524,7 +551,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
@@ -543,7 +573,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
@@ -586,7 +619,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
@@ -647,7 +683,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "c944a1549ba675b7229b55370cfd2f54dca1f86050fbef7df4ba453398f93c24",
@@ -676,10 +715,12 @@ describe("listContainers", function() {
         state: "running",
         running: true,
         dependencies: {},
-        origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "ffc3f4ed380ad42b7f847228862ad4de4ab471229bb5e1ed0aef46d4561309d2",
@@ -727,10 +768,12 @@ describe("listContainers", function() {
         state: "running",
         running: true,
         dependencies: {},
-        chain: "ethereum",
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "ethereum",
+        avatarUrl: ""
       },
       {
         id: "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
@@ -780,7 +823,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
@@ -810,7 +856,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       }
     ];
 
