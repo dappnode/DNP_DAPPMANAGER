@@ -206,18 +206,15 @@ async function runLegacyOps(): Promise<void> {
   }
 
   try {
-    if (!db.areEnvFilesMigrated.get()) {
-      const { result: dnpList } = await calls.listPackages();
-      for (const dnp of dnpList) {
-        const hasConverted = convertLegacyEnvFiles(dnp);
-        if (hasConverted)
-          logs.info(`Converted ${dnp.name} .env file to compose environment`);
-      }
-      logs.info(`Finished converting legacy .env files without errors`);
-      db.areEnvFilesMigrated.set(true);
+    const { result: dnpList } = await calls.listPackages();
+    for (const dnp of dnpList) {
+      const hasConverted = convertLegacyEnvFiles(dnp);
+      if (hasConverted)
+        logs.info(`Converted ${dnp.name} .env file to compose environment`);
     }
+    logs.info(`Finished converting legacy DNP .env files if any`);
   } catch (e) {
-    logs.error(`Error converting legacy .env files: ${e.stack || e.message}`);
+    logs.error(`Error converting DNP .env files: ${e.stack || e.message}`);
   }
 }
 
