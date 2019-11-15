@@ -8,7 +8,7 @@ import {
   ComposeUnsafe,
   DistributedFileSource
 } from "../../../types";
-import { validateManifestWithImageData } from "../validate";
+import { validateManifestWithImageData } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose } from "../parsers";
 

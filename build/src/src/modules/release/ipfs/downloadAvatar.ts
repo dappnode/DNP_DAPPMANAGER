@@ -1,7 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import formatAndCompressAvatar from "../../../utils/formatAndCompressAvatar";
-import { validateAvatar } from "../validate";
+import { validateAvatar } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 
 /**

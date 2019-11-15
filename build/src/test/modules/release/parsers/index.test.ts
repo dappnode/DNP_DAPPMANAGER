@@ -4,18 +4,18 @@ import {
   manifestToCompose,
   parseMetadataFromManifest,
   sanitizeCompose
-} from "../../../src/modules/release/parsers";
+} from "../../../../src/modules/release/parsers";
 import {
   mockManifestWithImage,
   mockCompose,
   mockManifest
-} from "../../testUtils";
+} from "../../../testUtils";
 import {
   ManifestWithImage,
   Manifest,
   Compose,
   ComposeUnsafe
-} from "../../../src/types";
+} from "../../../../src/types";
 
 /* eslint-disable @typescript-eslint/camelcase */
 describe("Release > parsers", () => {

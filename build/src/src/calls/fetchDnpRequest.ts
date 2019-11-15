@@ -20,6 +20,7 @@ import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
 import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
+import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
 
 export default async function fetchDnpRequest({
   id
@@ -67,6 +68,7 @@ export default async function fetchDnpRequest({
   const isInstalled = getIsInstalled(mainRelease, dnpList);
   const isUpdated = getIsUpdated(mainRelease, dnpList);
   const requiresCoreUpdate = getRequiresCoreUpdate(mainRelease, dnpList);
+  const specialPermissions = getReleaseSpecialPermissions(mainRelease);
 
   // Fetch and store avatar
   const avatarUrl = fileToGatewayUrl(mainRelease.avatarFile);
@@ -79,8 +81,6 @@ export default async function fetchDnpRequest({
       reqVersion: mainRelease.reqVersion,
       origin: mainRelease.origin, // "/ipfs/Qm"
       avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
-      // Prevent sending duplicated data
-      metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiSchema"]),
       // Setup wizard
       setupSchema,
       setupUiSchema,
@@ -88,6 +88,9 @@ export default async function fetchDnpRequest({
       imageSize: mainRelease.imageFile.size,
       isUpdated,
       isInstalled,
+      // Prevent sending duplicated data
+      metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiSchema"]),
+      specialPermissions, // Decoupled metadata
       // Settings must include the previous user settings
       settings,
       request: {

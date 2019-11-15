@@ -1,7 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as validate from "../../../utils/validate";
 import { isAbsolute } from "path";
-import { validateImage } from "../validate";
+import { validateImage } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 
 /**

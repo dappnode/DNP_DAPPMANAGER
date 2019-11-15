@@ -147,6 +147,13 @@ describe("Fetch external release data", () => {
           },
           type: "service"
         },
+        specialPermissions: [
+          {
+            details:
+              "Allows the DAppNode Package to read and write to the volume dependencydnpdappnodeeth_data",
+            name: "Access to DAppNode Package volume"
+          }
+        ],
         setupSchema: {
           [idMain]: {
             type: "object",

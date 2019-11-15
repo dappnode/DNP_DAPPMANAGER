@@ -7,15 +7,15 @@ import {
   validateImage,
   validateManifestBasic,
   validateComposeOrUnsafe
-} from "../../../src/modules/release/validate";
+} from "../../../../src/modules/release/parsers/validate";
 import {
   testDir,
   createTestDir,
   cleanTestDir,
   mockManifest,
   mockCompose
-} from "../../testUtils";
-import { Manifest, Compose } from "../../../src/types";
+} from "../../../testUtils";
+import { Manifest, Compose } from "../../../../src/types";
 
 const successReturn = {
   success: true,

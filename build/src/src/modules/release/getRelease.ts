@@ -1,4 +1,4 @@
-import resolveReleaseName from "./resolveReleaseName";
+import resolveReleaseName from "./parsers/resolveReleaseName";
 import downloadRelease from "./ipfs/downloadRelease";
 import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";

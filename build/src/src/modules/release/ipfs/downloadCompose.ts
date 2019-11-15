@@ -1,7 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import { ComposeUnsafe } from "../../../types";
-import { validateComposeOrUnsafe } from "../validate";
+import { validateComposeOrUnsafe } from "../parsers/validate";
 import { parseComposeObj } from "../../../utils/dockerComposeFile";
 import { isIpfsHash } from "../../../utils/validate";
 

@@ -2,8 +2,8 @@ import { omit, pick, isEmpty } from "lodash";
 import {
   parseVolumeMappings,
   parseEnvironment
-} from "../../utils/dockerComposeParsers";
-import params from "../../params";
+} from "../../../utils/dockerComposeParsers";
+import params from "../../../params";
 import {
   Manifest,
   PackageReleaseMetadata,
@@ -12,7 +12,7 @@ import {
   ComposeUnsafe,
   Compose,
   ReleaseWarnings
-} from "../../types";
+} from "../../../types";
 
 // Define docker compose parameters
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;

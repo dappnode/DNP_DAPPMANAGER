@@ -1,7 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as db from "../../../db";
 import { Manifest } from "../../../types";
-import { validateManifestBasic } from "../validate";
+import { validateManifestBasic } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 
 const maxLength = 100e3; // Limit manifest size to ~100KB

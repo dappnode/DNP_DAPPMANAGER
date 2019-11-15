@@ -1,7 +1,7 @@
 import Joi from "joi";
 import fs from "fs";
-import verifyXz from "../../utils/verifyXz";
-import { Manifest, Compose, ComposeUnsafe } from "../../types";
+import verifyXz from "../../../utils/verifyXz";
+import { Manifest, Compose, ComposeUnsafe } from "../../../types";
 
 export interface ValidateReturn {
   success: boolean;

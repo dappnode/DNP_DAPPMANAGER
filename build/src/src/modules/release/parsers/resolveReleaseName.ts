@@ -1,10 +1,10 @@
-import { getVersion } from "./getVersions";
+import { getVersion } from "../getVersions";
 import {
   isIpfsHash,
   isEnsDomain,
   isSemver,
   isSemverRange
-} from "../../utils/validate";
+} from "../../../utils/validate";
 
 export default async function resolveReleaseName(
   name: string,

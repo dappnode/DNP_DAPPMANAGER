@@ -92,16 +92,18 @@ export interface RequestedDnp {
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
   avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
-  metadata: PackageReleaseMetadata;
   // Setup wizard
   setupSchema?: SetupSchemaAllDnps;
   setupUiSchema?: SetupUiSchemaAllDnps;
+  settings: UserSettingsAllDnps; // MUST include the previous user settings
   // Additional data
   imageSize: number;
   isUpdated: boolean;
   isInstalled: boolean;
-  // Settings must include the previous user settings
-  settings: UserSettingsAllDnps;
+  // Decoupled metadata
+  metadata: PackageReleaseMetadata;
+  specialPermissions: SpecialPermission[];
+  // Request status and dependencies
   request: {
     compatible: {
       requiresCoreUpdate: boolean;
@@ -477,6 +479,11 @@ export interface DistributedFile {
 
 export interface ReleaseWarnings {
   unverifiedCore?: boolean;
+}
+
+export interface SpecialPermission {
+  name: string; // "Short description",
+  details: string; // "Long description of the capabilitites"
 }
 
 export interface PackageRelease {
