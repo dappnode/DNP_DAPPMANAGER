@@ -45,7 +45,7 @@ export default async function fetchDirectory(): RpcHandlerReturnWithResult<
           whitelisted: true,
           isFeatured,
           featuredStyle: metadata.style,
-          categories: metadata.categories || []
+          categories: metadata.categories || getFallBackCategories(name) || []
         } as DirectoryItem;
       } catch (e) {
         logs.error(`Error fetching ${name} release: ${e.message}`);
@@ -73,4 +73,31 @@ function getShortDescription(metadata: {
     metadata.shortDescription || metadata.description || "No description";
   // Don't send big descriptions, the UI crops them anyway
   return desc.slice(0, 80);
+}
+
+const fallbackCategories: { [dnpName: string]: string[] } = {
+  "kovan.dnp.dappnode.eth": ["Developer tools"],
+  "artis-sigma1.public.dappnode.eth": ["Blockchain"],
+  "monero.dnp.dappnode.eth": ["Blockchain"],
+  "vipnode.dnp.dappnode.eth": ["Economic incentive"],
+  "ropsten.dnp.dappnode.eth": ["Developer tools"],
+  "rinkeby.dnp.dappnode.eth": ["Developer tools"],
+  "lightning-network.dnp.dappnode.eth": [
+    "Payment channels",
+    "Economic incentive"
+  ],
+  "swarm.dnp.dappnode.eth": ["Storage", "Communications"],
+  "goerli-geth.dnp.dappnode.eth": ["Developer tools"],
+  "bitcoin.dnp.dappnode.eth": ["Blockchain"],
+  "raiden-testnet.dnp.dappnode.eth": ["Developer tools"],
+  "raiden.dnp.dappnode.eth": ["Payment channels"]
+};
+
+/**
+ * For known packages that are not yet updated, used this for nicer UX
+ * until all of them are updated
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
+ */
+function getFallBackCategories(dnpName: string): string[] {
+  return fallbackCategories[dnpName];
 }
