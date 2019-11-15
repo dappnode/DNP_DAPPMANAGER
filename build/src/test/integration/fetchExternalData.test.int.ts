@@ -10,7 +10,7 @@ import {
   mockComposeService,
   mockCompose
 } from "../testUtils";
-import { prepareManifestTypeRelease } from "../testReleaseUtils";
+import { uploadManifestRelease } from "../testReleaseUtils";
 import shell from "../../src/utils/shell";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
@@ -95,20 +95,23 @@ describe("Fetch external release data", () => {
     };
 
     let mainDnpReleaseHash: string;
+    let mainDnpImageSize: number;
     let dependencyReleaseHash: string;
 
     before("Create releases", async () => {
       await createTestDir();
 
-      dependencyReleaseHash = await prepareManifestTypeRelease(
-        dependencyManifest
-      );
-      mainDnpReleaseHash = await prepareManifestTypeRelease({
+      const depUpload = await uploadManifestRelease(dependencyManifest);
+      const mainUpload = await uploadManifestRelease({
         ...mainDnpManifest,
         dependencies: {
-          [idDep]: dependencyReleaseHash
+          [idDep]: depUpload.hash
         }
       });
+
+      dependencyReleaseHash = depUpload.hash;
+      mainDnpReleaseHash = mainUpload.hash;
+      mainDnpImageSize = mainUpload.imageSize;
     });
 
     async function cleanArtifacts(): Promise<void> {
@@ -158,7 +161,7 @@ describe("Fetch external release data", () => {
           [idMain]: { payoutAddress: { "ui:help": "Special help text" } },
           [idDep]: { dependencyVar: { "ui:help": "Special help text" } }
         },
-        imageSize: 636510,
+        imageSize: mainDnpImageSize,
         isUpdated: false,
         isInstalled: true,
         settings: {

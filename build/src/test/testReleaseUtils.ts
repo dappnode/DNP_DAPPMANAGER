@@ -136,9 +136,9 @@ export async function prepareDirectoryTypeReleaseNoDockerCompose(): Promise<
  *
  * @returns {string} releaseHash
  */
-export async function prepareManifestTypeRelease(
+export async function uploadManifestRelease(
   manifest?: ManifestWithImage
-): Promise<string> {
+): Promise<{ hash: string; imageSize: number }> {
   const imageUpload =
     manifest && manifest.name !== releaseDnpName
       ? await uploadNewImageToIpfs(manifest)
@@ -162,7 +162,17 @@ export async function prepareManifestTypeRelease(
   if (!isEqual(manifestUploaded, manifest))
     throw Error("Wrong uploaded manifest");
 
-  return releaseHashManifest;
+  return { hash: releaseHashManifest, imageSize: imageUpload.size };
+}
+
+/**
+ * Alias of above, but just returns the manifest release hash
+ */
+export async function prepareManifestTypeRelease(
+  manifest?: ManifestWithImage
+): Promise<string> {
+  const upload = await uploadManifestRelease(manifest);
+  return upload.hash;
 }
 
 interface IpfsUploadReturn {

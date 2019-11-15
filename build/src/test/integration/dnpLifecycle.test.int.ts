@@ -16,7 +16,7 @@ import {
   PortProtocol
 } from "../../src/types";
 import { clearDbs, testDir } from "../testUtils";
-import { prepareManifestTypeRelease } from "../testReleaseUtils";
+import { uploadManifestRelease } from "../testReleaseUtils";
 import { stringifyPortMappings } from "../../src/utils/dockerComposeParsers";
 const logs = Logs(module);
 
@@ -218,15 +218,14 @@ describe("DNP lifecycle", function() {
 
   before(`Preparing releases for ${idMain} and ${idDep}`, async () => {
     // Prepare a package release with dependencies
-    const dependencyReleaseHash = await prepareManifestTypeRelease(
-      dependencyManifest
-    );
-    mainDnpReleaseHash = await prepareManifestTypeRelease({
+    const dependencyUpload = await uploadManifestRelease(dependencyManifest);
+    const mainDnpUpload = await uploadManifestRelease({
       ...mainDnpManifest,
       dependencies: {
-        [idDep]: dependencyReleaseHash
+        [idDep]: dependencyUpload.hash
       }
     });
+    mainDnpReleaseHash = mainDnpUpload.hash;
   });
 
   before("Should resolve a request", async () => {
