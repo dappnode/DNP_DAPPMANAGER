@@ -158,9 +158,6 @@ interface BasicVolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
-  // #### Temp properties for admin compatibility
-  path?: string;
-  type?: string;
 }
 
 export interface VolumeMapping extends BasicVolumeMapping {

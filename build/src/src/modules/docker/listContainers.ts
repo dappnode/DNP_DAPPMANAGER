@@ -189,14 +189,11 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
           defaultPort.protocol == port.protocol
       )
     })),
-    volumes: container.Mounts.map(({ Name, Source, Destination, Type }) => ({
+    volumes: container.Mounts.map(({ Name, Source, Destination }) => ({
       host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
       container: Destination, // "/etc/nginx/vhost.d"
       // "Name" will be undefined if it's not a named volumed
-      ...(Name ? { name: Name } : {}), // "nginxproxydnpdappnodeeth_vhost.d",
-      // ##### TEMP properties for admin compatibility
-      path: Destination,
-      type: Type
+      ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
     })),
     state: container.State as ContainerStatus,
     running: container.State === "running",
