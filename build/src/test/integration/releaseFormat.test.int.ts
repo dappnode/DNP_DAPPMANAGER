@@ -5,8 +5,7 @@ import { createTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
 import {
-  prepareDirectoryTypeReleaseWithDockerCompose,
-  prepareDirectoryTypeReleaseNoDockerCompose,
+  prepareDirectoryTypeRelease,
   prepareManifestTypeRelease,
   cleanInstallationArtifacts,
   verifyFiles,
@@ -18,14 +17,12 @@ import {
  * Generate mock releases in the different formats,
  * and try to retrieve and run them
  * - IPFS directory with docker-compose
- * - IPFS directory generate docker-compose from manifest
  * - IPFS manifest, generate docker-compose from manifest
  */
 
 /**
  * Aggregate the three type of tests
- * - Directory-type, WITH docker-compose
- * - Directory-type, NO docker-compose
+ * - Directory-type (with docker-compose)
  * - Manifest-type
  *
  * [NOTE] There are different default `NAME` env values
@@ -38,14 +35,9 @@ const releaseTests: {
   envValue: string;
 }[] = [
   {
-    name: "Directory-type, WITH docker-compose",
-    prepareRelease: prepareDirectoryTypeReleaseWithDockerCompose,
+    name: "Directory-type",
+    prepareRelease: prepareDirectoryTypeRelease,
     envValue: "From_Compose"
-  },
-  {
-    name: "Directory-type, NO docker-compose",
-    prepareRelease: prepareDirectoryTypeReleaseNoDockerCompose,
-    envValue: "No_Hashes"
   },
   {
     name: "Manifest-type",

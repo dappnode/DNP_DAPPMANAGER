@@ -1,8 +1,15 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
+import { omit } from "lodash";
 import * as calls from "../../src/calls";
-import { ManifestWithImage, Compose, RequestedDnp } from "../../src/types";
+import {
+  ManifestWithImage,
+  Compose,
+  RequestedDnp,
+  Manifest
+} from "../../src/types";
+import { SetupSchema, SetupUiJson } from "../../src/types-own";
 import {
   testDir,
   clearDbs,
@@ -10,7 +17,10 @@ import {
   mockComposeService,
   mockCompose
 } from "../testUtils";
-import { uploadManifestRelease } from "../testReleaseUtils";
+import {
+  uploadManifestRelease,
+  uploadDirectoryRelease
+} from "../testReleaseUtils";
 import shell from "../../src/utils/shell";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
@@ -30,7 +40,7 @@ describe("Fetch external release data", () => {
   const bindId = "bind.dnp.dappnode.eth";
   const bitcoinId = "bitcoin.dnp.dappnode.eth";
 
-  describe("fetchDnpRequest", () => {
+  describe("fetchDnpRequest with dependencies (manifest release)", () => {
     const idMain = "main.dnp.dappnode.eth";
     const idDep = "dependency.dnp.dappnode.eth";
     const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
@@ -54,7 +64,7 @@ describe("Fetch external release data", () => {
         type: "object",
         properties: { payoutAddress: { type: "string" } }
       },
-      setupUiSchema: { payoutAddress: { "ui:help": "Special help text" } }
+      setupUiJson: { payoutAddress: { "ui:help": "Special help text" } }
     };
 
     const dependencyManifest: ManifestWithImage = {
@@ -72,7 +82,7 @@ describe("Fetch external release data", () => {
         type: "object",
         properties: { dependencyVar: { type: "string" } }
       },
-      setupUiSchema: { dependencyVar: { "ui:help": "Special help text" } }
+      setupUiJson: { dependencyVar: { "ui:help": "Special help text" } }
     };
 
     const composeMain: Compose = {
@@ -164,7 +174,7 @@ describe("Fetch external release data", () => {
             properties: { dependencyVar: { type: "string" } }
           }
         },
-        setupUiSchema: {
+        setupUiJson: {
           [idMain]: { payoutAddress: { "ui:help": "Special help text" } },
           [idDep]: { dependencyVar: { "ui:help": "Special help text" } }
         },
@@ -216,6 +226,136 @@ describe("Fetch external release data", () => {
       };
 
       expect(res.result).to.deep.equal(expectRequestDnp);
+    });
+
+    after("Clean artifcats", async () => {
+      await cleanArtifacts();
+    });
+  });
+
+  describe("fetchDnpRequest with misc files (directory release)", () => {
+    const idMain = "main.dnp.dappnode.eth";
+    const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
+
+    const mainDnpManifest: Manifest = {
+      name: idMain,
+      version: "0.1.0",
+      avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt"
+    };
+
+    const composeMain: Compose = {
+      ...mockCompose,
+      services: {
+        [idMain]: {
+          ...mockComposeService,
+          /* eslint-disable-next-line @typescript-eslint/camelcase */
+          container_name: containerNameMain,
+          image: mockImage
+        }
+      }
+    };
+
+    const setupWizard: SetupSchema = {
+      type: "object",
+      properties: {
+        mockVar: { type: "string" }
+      }
+    };
+
+    const setupWizardUi: SetupUiJson = {
+      mockVar: { "ui:help": "Special help text" }
+    };
+
+    const disclaimer = "Warning!\n\nThis is really dangerous";
+
+    let mainDnpReleaseHash: string;
+
+    before("Create releases", async () => {
+      await createTestDir();
+
+      mainDnpReleaseHash = await uploadDirectoryRelease({
+        manifest: mainDnpManifest,
+        compose: composeMain,
+        setupWizard,
+        setupWizardUi,
+        disclaimer
+      });
+    });
+
+    async function cleanArtifacts(): Promise<void> {
+      await shell(`docker rm -f ${containerNameMain}`).catch(() => {});
+    }
+
+    before("Up mock docker packages", async () => {
+      await cleanArtifacts();
+
+      const composePathMain = getPath.dockerCompose(idMain, false);
+      validate.path(composePathMain);
+      writeComposeObj(composePathMain, composeMain);
+      await dockerComposeUp(composePathMain);
+    });
+
+    it("Fetch package data", async () => {
+      const res = await calls.fetchDnpRequest({
+        id: mainDnpReleaseHash
+      });
+
+      const expectRequestDnp: RequestedDnp = {
+        name: idMain,
+        reqVersion: mainDnpReleaseHash,
+        semVersion: "0.1.0",
+        origin: mainDnpReleaseHash,
+        avatarUrl:
+          "http://ipfs.dappnode:8080/ipfs/QmYZkQjhSoqyq9mTaK3FiT3MDcrFDvEwQvzMGWW6f1nHGm",
+        metadata: {
+          name: idMain,
+          version: "0.1.0",
+          type: "service",
+          disclaimer: {
+            message: disclaimer
+          }
+        },
+        specialPermissions: [],
+
+        // Data added via files, to be tested
+        setupSchema: {
+          [idMain]: setupWizard
+        },
+        setupUiJson: {
+          [idMain]: setupWizardUi
+        },
+
+        isUpdated: false,
+        isInstalled: true,
+        settings: {
+          [idMain]: {
+            environment: {},
+            portMappings: {},
+            namedVolumePaths: {}
+          }
+        },
+        request: {
+          compatible: {
+            requiresCoreUpdate: false,
+            resolving: false,
+            isCompatible: true,
+            error: "",
+            dnps: {
+              [idMain]: { from: "0.0.1", to: mainDnpReleaseHash }
+            }
+          },
+          available: {
+            isAvailable: true,
+            message: ""
+          }
+        },
+        // Mock, ommited below
+        imageSize: 0
+      };
+
+      expect(omit(res.result, ["imageSize"])).to.deep.equal(
+        omit(expectRequestDnp, ["imageSize"])
+      );
     });
 
     after("Clean artifcats", async () => {

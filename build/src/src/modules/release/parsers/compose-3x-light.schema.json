@@ -1,0 +1,159 @@
+{
+  "title": "compose",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": { "type": "string" },
+
+    "services": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9._-]+$": {
+          "type": "object",
+
+          "properties": {
+            "image": { "type": "string" },
+            "cap_add": { "$ref": "#/definitions/list_of_strings" },
+            "cap_drop": { "$ref": "#/definitions/list_of_strings" },
+            "devices": { "$ref": "#/definitions/list_of_strings" },
+            "environment": { "$ref": "#/definitions/list_or_dict" },
+            "labels": { "$ref": "#/definitions/list_or_dict" },
+            "mac_address": { "type": "string" },
+            "network_mode": { "type": "string" },
+            "ports": {
+              "type": "array",
+              "items": {
+                "oneOf": [{ "type": "number" }, { "type": "string" }]
+              },
+              "uniqueItems": true
+            },
+            "privileged": { "type": "boolean" },
+            "restart": { "type": "string" },
+            "volumes": { "$ref": "#/definitions/list_of_strings" },
+            "networks": {
+              "oneOf": [
+                { "$ref": "#/definitions/list_of_strings" },
+                {
+                  "type": "object",
+                  "patternProperties": {
+                    "^[a-zA-Z0-9._-]+$": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "aliases": {
+                              "$ref": "#/definitions/list_of_strings"
+                            },
+                            "ipv4_address": { "type": "string" },
+                            "ipv6_address": { "type": "string" }
+                          }
+                        },
+                        { "type": "null" }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "networks": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9._-]+$": {
+          "type": ["object", "null"],
+          "properties": {
+            "driver": { "type": "string" },
+            "driver_opts": {
+              "type": "object",
+              "patternProperties": {
+                "^.+$": { "type": ["string", "number"] }
+              }
+            },
+            "ipam": {
+              "type": "object",
+              "properties": {
+                "driver": { "type": "string" },
+                "config": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "subnet": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "external": {
+              "type": ["boolean", "object"],
+              "properties": {
+                "name": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "internal": { "type": "boolean" }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "volumes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9._-]+$": {
+          "type": ["object", "null"],
+          "properties": {
+            "name": { "type": "string" },
+            "driver": { "type": "string" },
+            "driver_opts": {
+              "type": "object",
+              "patternProperties": {
+                "^.+$": { "type": ["string", "number"] }
+              }
+            },
+            "external": {
+              "type": ["boolean", "object"],
+              "properties": {
+                "name": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "definitions": {
+    "list_of_strings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+
+    "list_or_dict": {
+      "oneOf": [
+        {
+          "type": "object",
+          "patternProperties": {
+            ".+": {
+              "type": ["string", "number", "null"]
+            }
+          },
+          "additionalProperties": false
+        },
+        { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      ]
+    }
+  }
+}

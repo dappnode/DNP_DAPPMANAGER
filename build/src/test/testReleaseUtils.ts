@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs";
+import yaml from "js-yaml";
 import { isEqual } from "lodash";
 import { testDir } from "./testUtils";
 import shell from "../src/utils/shell";
@@ -11,7 +12,8 @@ import {
   ipfsAddFromFs
 } from "./testIpfsUtils";
 import * as ipfs from "../src/modules/ipfs";
-import { ManifestWithImage } from "../src/types";
+import { ManifestWithImage, Manifest, Compose } from "../src/types";
+import { SetupSchema, SetupUiJson } from "../src/types-own";
 
 /**
  * Generate mock releases in the different formats,
@@ -24,14 +26,10 @@ import { ManifestWithImage } from "../src/types";
 export const releaseDnpName = "mock-test.public.dappnode.eth";
 export const releaseVersion = "0.0.1";
 
-const buildFilesDir = path.resolve(
-  "./test/",
-  "DAppNodePackage-mock-test",
-  "buildFiles"
-);
+const mockDnpDir = path.resolve("./test/", "DAppNodePackage-mock-test");
+const buildFilesDir = path.resolve(mockDnpDir, "buildFiles");
 
 const manifestFileOld = "dappnode_package.json";
-const manifestFileNoHashes = "dappnode_package-no-hashes.json";
 const manifestFileNoImage = "dappnode_package-no-image.json";
 const composeFile = "docker-compose-mock-test.yml";
 const imageFile = "mock-test.public.dappnode.eth_0.0.1.tar.xz";
@@ -43,7 +41,7 @@ export function verifyFiles(): void {
     throw Error(`build files dir not found at ${buildFilesDir}`);
   for (const file of [
     manifestFileOld,
-    manifestFileNoHashes,
+    manifestFileNoImage,
     composeFile,
     imageFile
   ]) {
@@ -61,7 +59,7 @@ export async function cleanInstallationArtifacts(): Promise<void> {
 }
 
 /**
- * Release type: `Directory-type, WITH docker-compose`
+ * Release type: `Directory-type`
  * This function is a miniature version of the DAppNode SDK
  * 1. Creates a new directory with the structure:
  *  /dappnode_package-no-hashes.json
@@ -70,58 +68,48 @@ export async function cleanInstallationArtifacts(): Promise<void> {
  *
  * @returns {string} releaseHash
  */
-export async function prepareDirectoryTypeReleaseWithDockerCompose(): Promise<
-  string
-> {
-  const releaseDir = path.join(testDir, "release-directory-docker-compose");
-  const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
+export async function uploadDirectoryRelease({
+  manifest,
+  compose,
+  setupWizard,
+  setupWizardUi,
+  disclaimer
+}: {
+  manifest: Manifest;
+  compose: Compose;
+  setupWizard?: SetupSchema;
+  setupWizardUi?: SetupUiJson;
+  disclaimer?: string;
+}): Promise<string> {
+  const releaseDir = path.join(testDir, "release-directory");
+  await shell(`rm -rf ${releaseDir}`); // Clean dir before populating
 
   fs.mkdirSync(releaseDir, { recursive: true });
-  for (const file of filesToUpload)
-    fs.copyFileSync(
-      path.join(buildFilesDir, file),
-      path.join(releaseDir, file)
-    );
+
+  function writeAsset(fileName: string, data: string): void {
+    fs.writeFileSync(path.join(releaseDir, fileName), data);
+  }
+  function writeJson<T>(fileName: string, jsonData: T): void {
+    writeAsset(fileName, JSON.stringify(jsonData, null, 2));
+  }
+
+  writeJson("dappnode_package.json", manifest); // Manifest
+  writeAsset("docker-compose.yml", yaml.safeDump(compose)); // Compose
+  // const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
+  await saveNewImageToDisk(manifest, releaseDir); // Image
+  await shell(`cp ${mockDnpDir}/*.png ${releaseDir}`); // Avatar
+
+  // Misc
+  if (setupWizard) writeJson("setup.schema.json", setupWizard);
+  if (setupWizardUi) writeJson("setup-ui.json", setupWizardUi);
+  if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
   const rootHash = await ipfsAddDirFromFs(releaseDir);
 
   // Verify the uploaded files
-  const files = await ipfs.ls({ hash: rootHash });
-  if (!isEqual(files.map(f => f.name), filesToUpload))
-    throw Error("Uploaded files do not match");
-
-  return rootHash;
-}
-
-/**
- * Release type: `Directory-type, NO docker-compose`
- * This function is a miniature version of the DAppNode SDK
- * 1. Creates a new directory with the structure:
- *  /dappnode_package-no-hashes.json
- *  /mock-test.public.dappnode.eth_0.0.1.tar.xz
- * 2. Uploads the entire folder and checks its contents
- *
- * @returns {string} releaseHash
- */
-export async function prepareDirectoryTypeReleaseNoDockerCompose(): Promise<
-  string
-> {
-  const releaseDir = path.join(testDir, "release-directory-no-compose");
-  const filesToUpload = [manifestFileNoHashes, imageFile];
-
-  fs.mkdirSync(releaseDir, { recursive: true });
-  for (const file of filesToUpload)
-    fs.copyFileSync(
-      path.join(buildFilesDir, file),
-      path.join(releaseDir, file)
-    );
-
-  const rootHash = await ipfsAddDirFromFs(releaseDir);
-
-  // Verify the uploaded files
-  const files = await ipfs.ls({ hash: rootHash });
-  if (!isEqual(files.map(f => f.name), filesToUpload))
-    throw Error("Uploaded files do not match");
+  // const files = await ipfs.ls({ hash: rootHash });
+  // if (!isEqual(files.map(f => f.name), filesToUpload))
+  //   throw Error("Uploaded files do not match");
 
   return rootHash;
 }
@@ -166,6 +154,37 @@ export async function uploadManifestRelease(
 }
 
 /**
+ * Release type: `Directory-type`
+ * This function is a miniature version of the DAppNode SDK
+ * 1. Creates a new directory with the structure:
+ *  /dappnode_package-no-hashes.json
+ *  /mock-test.public.dappnode.eth_0.0.1.tar.xz
+ * 2. Uploads the entire folder and checks its contents
+ *
+ * @returns {string} releaseHash
+ */
+export async function prepareDirectoryTypeRelease(): Promise<string> {
+  const releaseDir = path.join(testDir, "release-directory");
+  const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
+
+  fs.mkdirSync(releaseDir, { recursive: true });
+  for (const file of filesToUpload)
+    fs.copyFileSync(
+      path.join(buildFilesDir, file),
+      path.join(releaseDir, file)
+    );
+
+  const rootHash = await ipfsAddDirFromFs(releaseDir);
+
+  // Verify the uploaded files
+  const files = await ipfs.ls({ hash: rootHash });
+  if (!isEqual(files.map(f => f.name), filesToUpload))
+    throw Error("Uploaded files do not match");
+
+  return rootHash;
+}
+
+/**
  * Alias of above, but just returns the manifest release hash
  */
 export async function prepareManifestTypeRelease(
@@ -181,6 +200,34 @@ interface IpfsUploadReturn {
 }
 
 /**
+ * Saves an image correctly tagged with a different name and version
+ * @param name "different.dnp.dappnode.eth"
+ * @param version "0.2.0"
+ * @return newImagePath
+ */
+async function saveNewImageToDisk(
+  {
+    name,
+    version
+  }: {
+    name: string;
+    version: string;
+  },
+  dirToSaveTo: string = testDir
+): Promise<string> {
+  const newImagePath = path.resolve(dirToSaveTo, `${name}_${version}.tar.xz`);
+  const newImageTag = `${name}:${version}`;
+  // Load image if not in docker already
+  if (!(await shell(`docker images -q ${imageTag}`)))
+    await shell(`docker load < ${imagePath}`);
+
+  validate.path(newImagePath);
+  await shell(`docker tag ${imageTag} ${newImageTag}`);
+  await shell(`docker save ${newImageTag} | xz > ${newImagePath}`);
+  return newImagePath;
+}
+
+/**
  * Uploads an image correctly tagged with a different name and version
  * @param name "different.dnp.dappnode.eth"
  * @param version "0.2.0"
@@ -192,15 +239,7 @@ async function uploadNewImageToIpfs({
   name: string;
   version: string;
 }): Promise<IpfsUploadReturn> {
-  const newImagePath = path.resolve(testDir, `${name}_${version}.tar.xz`);
-  const newImageTag = `${name}:${version}`;
-  // Load image if not in docker already
-  if (!(await shell(`docker images -q ${imageTag}`)))
-    await shell(`docker load < ${imagePath}`);
-
-  validate.path(newImagePath);
-  await shell(`docker tag ${imageTag} ${newImageTag}`);
-  await shell(`docker save ${newImageTag} | xz > ${newImagePath}`);
+  const newImagePath = await saveNewImageToDisk({ name, version });
   return await uploadImageToIpfs(newImagePath);
 }
 

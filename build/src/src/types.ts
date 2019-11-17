@@ -1,4 +1,6 @@
-import { SetupSchema, SetupUiSchema } from "./types-own";
+import { SetupSchema, SetupUiJson } from "./types-own";
+
+// Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
 /**
  * ==============
@@ -52,8 +54,8 @@ export interface SetupSchemaAllDnpsFormated {
   properties: { [dnpName: string]: SetupSchema };
 }
 
-export interface SetupUiSchemaAllDnps {
-  [dnpName: string]: SetupUiSchema;
+export interface SetupUiJsonAllDnps {
+  [dnpName: string]: SetupUiJson;
 }
 
 export type UserSettingTarget =
@@ -80,6 +82,10 @@ export interface UserSettingsAllDnps {
   [dnpName: string]: UserSettings;
 }
 
+export interface DisclaimerAllDnps {
+  [dnpName: string]: string;
+}
+
 export interface CompatibleDnps {
   [dnpName: string]: { from?: string; to: string };
   // "bitcoin.dnp.dappnode.eth": { from: "0.2.5"; to: "0.2.6" };
@@ -92,9 +98,9 @@ export interface RequestedDnp {
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
   avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
-  // Setup wizard
+  // Setup
   setupSchema?: SetupSchemaAllDnps;
-  setupUiSchema?: SetupUiSchemaAllDnps;
+  setupUiJson?: SetupUiJsonAllDnps;
   settings: UserSettingsAllDnps; // MUST include the previous user settings
   // Additional data
   imageSize: number;
@@ -549,7 +555,7 @@ export interface PackageReleaseMetadata {
     featuredAvatarFilter?: string;
   };
   setupSchema?: SetupSchema;
-  setupUiSchema?: SetupUiSchema;
+  setupUiJson?: SetupUiJson;
   author?: string;
   contributors?: string[];
   categories?: string[];

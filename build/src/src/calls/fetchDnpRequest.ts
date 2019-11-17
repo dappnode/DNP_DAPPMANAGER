@@ -1,7 +1,7 @@
 import { RequestData, ReturnData } from "../route-types/fetchDnpRequest";
 import {
   SetupSchemaAllDnps,
-  SetupUiSchemaAllDnps,
+  SetupUiJsonAllDnps,
   UserSettingsAllDnps,
   CompatibleDnps,
   PackageRelease,
@@ -28,13 +28,13 @@ export default async function fetchDnpRequest({
   const mainRelease = await getRelease(id);
 
   const setupSchema: SetupSchemaAllDnps = {};
-  const setupUiSchema: SetupUiSchemaAllDnps = {};
+  const setupUiJson: SetupUiJsonAllDnps = {};
   const settings: UserSettingsAllDnps = {};
 
   function addReleaseToSettings(_release: PackageRelease): void {
     const { name, metadata, compose, isCore } = _release;
     if (metadata.setupSchema) setupSchema[name] = metadata.setupSchema;
-    if (metadata.setupUiSchema) setupUiSchema[name] = metadata.setupUiSchema;
+    if (metadata.setupUiJson) setupUiJson[name] = metadata.setupUiJson;
     settings[name] = deepmerge(
       parseUserSetFromCompose(compose), // current user settings overwritte compose
       // If composePath does not exist, or is invalid: returns {}
@@ -81,15 +81,15 @@ export default async function fetchDnpRequest({
       reqVersion: mainRelease.reqVersion,
       origin: mainRelease.origin, // "/ipfs/Qm"
       avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
-      // Setup wizard
+      // Setup
       setupSchema,
-      setupUiSchema,
+      setupUiJson,
       // Additional data
       imageSize: mainRelease.imageFile.size,
       isUpdated,
       isInstalled,
       // Prevent sending duplicated data
-      metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiSchema"]),
+      metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiJson"]),
       specialPermissions, // Decoupled metadata
       // Settings must include the previous user settings
       settings,

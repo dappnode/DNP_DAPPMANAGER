@@ -39,7 +39,7 @@ export function parseComposeObj(composeString: string): Compose {
   try {
     return yaml.safeLoad(composeString);
   } catch (e) {
-    throw Error(`Error parseing compose yaml: ${e.message}`);
+    throw Error(`Error parsing compose yaml: ${e.message}`);
   }
 }
 
