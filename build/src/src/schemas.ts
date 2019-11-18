@@ -199,7 +199,8 @@ export const userActionLogsSchema = {
     event: { type: "string" },
     message: { type: "string" }
   },
-  required: ["level", "event", "message"]
+  // VPN still sends logs without message (legacy compatibility)
+  required: ["level", "event"]
 };
 
 export const userActionLogsSample: UserActionLog = {

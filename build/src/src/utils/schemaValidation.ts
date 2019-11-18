@@ -5,7 +5,7 @@ const ajv = new Ajv({ allErrors: true });
 export function getValidator<T>(
   schema: any,
   dataVar: string,
-  errorHanlder: (errorMessage: string) => void
+  debugErrorHanlder: (errorMessage: string) => void
 ): (data: T) => T {
   const name = dataVar || schema.title || "data";
   /**
@@ -33,7 +33,7 @@ export function getValidator<T>(
         if (!isValid) {
           const { errors } = validateItem;
           const errorText = formatErrors(errors, itemName);
-          if (errorCache !== errorText) errorHanlder(errorCache);
+          if (errorCache !== errorText) debugErrorHanlder(errorCache);
           errorCache = errorText;
         }
         return isValid;
@@ -49,6 +49,7 @@ export function getValidator<T>(
       if (!validate(data)) {
         const { errors } = validate;
         const prettyErrors = formatErrors(errors, name);
+        debugErrorHanlder(JSON.stringify({ data, errors }, null, 2));
         throw Error(prettyErrors);
       }
       return data;

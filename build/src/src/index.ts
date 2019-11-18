@@ -93,9 +93,7 @@ connection.onopen = (session, details): void => {
    * via the `eventBusOnSafe` method
    */
 
-  const wampSubscriptions = registerSubscriptions(session, errorMessage =>
-    logs.error(errorMessage)
-  );
+  const wampSubscriptions = registerSubscriptions(session, logs);
 
   // Pipe local events to WAMP
   eventBus.chainData.on(wampSubscriptions.chainData.emit);

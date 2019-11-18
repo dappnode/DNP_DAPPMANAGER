@@ -7,10 +7,10 @@ interface AnyObject {
 function applyRecursivelyToStrings(
   stringModifier: (value: string, key: string) => string
 ) {
-  return function trimBase64Values(obj: any): any {
+  return function objectModifier(obj: any): any {
     return mapValues(obj, (value, key) => {
       if (typeof value === "string") return stringModifier(value, key);
-      else if (isObject(value)) return trimBase64Values(value);
+      else if (isObject(value)) return objectModifier(value);
       else return value;
     });
   };

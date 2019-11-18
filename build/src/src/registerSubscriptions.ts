@@ -1,7 +1,5 @@
 import autobahn from "autobahn";
 import { getValidator } from "./utils/schemaValidation";
-import Logs from "./logs";
-const logs = Logs(module);
 // Subscriptions
 import * as autoUpdateData from "./route-types/subscriptionAutoUpdateData";
 import * as chainData from "./route-types/subscriptionChainData";
@@ -14,7 +12,10 @@ import * as userActionToDappm from "./route-types/subscriptionVpnLegacy";
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function registerSubscriptions(
   session: autobahn.Session,
-  errorHandler: (errorMessage: string) => void
+  errorLogger: {
+    error: (errorMessage: string) => void;
+    debug: (errorMessage: string) => void;
+  }
 ) {
   function publish<T>(event: string, arg: T): void {
     // session.publish(topic, args, kwargs, options)
@@ -23,11 +24,11 @@ export function registerSubscriptions(
 
   function subscribe<T>(event: string, listener: (arg: T) => void): void {
     // session.subscribe(topic, function(args, kwargs, details) )
-    session.subscribe(event, (_0, { data }) => {
+    session.subscribe(event, ([dataFromArgs], { dataFromKwargs }) => {
       try {
-        listener(data);
+        listener(dataFromArgs || dataFromKwargs);
       } catch (e) {
-        errorHandler(`Error on WAMP ${event}: ${e.stack}`);
+        errorLogger.error(`Error on WAMP ${event}: ${e.stack}`);
       }
     });
   }
@@ -41,7 +42,7 @@ export function registerSubscriptions(
     returnDataSchema?: object;
   }) {
     const validateData = dataSchema
-      ? getValidator<T>(dataSchema, "data", msg => logs.error(msg))
+      ? getValidator<T>(dataSchema, "data", errorLogger.debug)
       : null;
 
     return {
@@ -54,7 +55,7 @@ export function registerSubscriptions(
         try {
           publish(route, validateData ? validateData(data) : data);
         } catch (e) {
-          logs.error(`Error on WAMP emit ${route}: ${e.stack}`);
+          errorLogger.error(`Error on WAMP emit ${route}: ${e.stack}`);
         }
       }
     };

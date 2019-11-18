@@ -85,7 +85,9 @@ const formatLogObjectFunction = pipe(
   obj => limitObjValuesSize(obj, 500)
 );
 const formatLogObject = format(info => {
-  return formatLogObjectFunction(info);
+  // MUST do a spread in order to include `[Symbol(level)]: 'error'` property,
+  // otherwise winston will ignore the log
+  return { ...info, ...formatLogObjectFunction(info) };
 });
 
 // Actual logger
