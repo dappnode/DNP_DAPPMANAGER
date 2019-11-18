@@ -410,10 +410,17 @@ export function applyUserSet(
   const nextVolumes = stringifyVolumeMappings(
     volumeMappings.map(vol => {
       const userSetHost = userSetNamedVolumePaths[vol.name || ""];
-      // If there is a setting, change the volume to bind by removing vol.name
-      return vol.name && userSetHost
-        ? { ...omit(vol, "name"), host: userSetHost }
-        : vol;
+      if (vol.name && userSetHost) {
+        // Make sure only a bind volume is created
+        if (!path.isAbsolute(userSetHost))
+          throw Error(
+            `user set volume path for ${serviceName} must be an absolute path: ${userSetHost}`
+          );
+        // If there is a setting, change the volume to bind by removing vol.name
+        return { ...omit(vol, "name"), host: userSetHost };
+      } else {
+        return vol;
+      }
     })
   );
 
