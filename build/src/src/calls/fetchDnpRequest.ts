@@ -2,6 +2,7 @@ import { RequestData, ReturnData } from "../route-types/fetchDnpRequest";
 import {
   SetupSchemaAllDnps,
   SetupUiJsonAllDnps,
+  SetupTargetAllDnps,
   UserSettingsAllDnps,
   CompatibleDnps,
   PackageRelease,
@@ -28,12 +29,14 @@ export default async function fetchDnpRequest({
   const mainRelease = await getRelease(id);
 
   const setupSchema: SetupSchemaAllDnps = {};
+  const setupTarget: SetupTargetAllDnps = {};
   const setupUiJson: SetupUiJsonAllDnps = {};
   const settings: UserSettingsAllDnps = {};
 
   function addReleaseToSettings(_release: PackageRelease): void {
     const { name, metadata, compose, isCore } = _release;
     if (metadata.setupSchema) setupSchema[name] = metadata.setupSchema;
+    if (metadata.setupTarget) setupTarget[name] = metadata.setupTarget;
     if (metadata.setupUiJson) setupUiJson[name] = metadata.setupUiJson;
     settings[name] = deepmerge(
       parseUserSetFromCompose(compose), // current user settings overwritte compose
@@ -83,13 +86,18 @@ export default async function fetchDnpRequest({
       avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
       // Setup
       setupSchema,
+      setupTarget,
       setupUiJson,
       // Additional data
       imageSize: mainRelease.imageFile.size,
       isUpdated,
       isInstalled,
       // Prevent sending duplicated data
-      metadata: omit(mainRelease.metadata, ["setupSchema", "setupUiJson"]),
+      metadata: omit(mainRelease.metadata, [
+        "setupSchema",
+        "setupTarget",
+        "setupUiJson"
+      ]),
       specialPermissions, // Decoupled metadata
       // Settings must include the previous user settings
       settings,

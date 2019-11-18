@@ -7,7 +7,8 @@ import {
   ManifestWithImage,
   Compose,
   RequestedDnp,
-  Manifest
+  Manifest,
+  SetupTarget
 } from "../../src/types";
 import { SetupSchema, SetupUiJson } from "../../src/types-own";
 import {
@@ -64,6 +65,9 @@ describe("Fetch external release data", () => {
         type: "object",
         properties: { payoutAddress: { type: "string" } }
       },
+      setupTarget: {
+        payoutAddress: { type: "environment", name: "PAYOUT_ADDRESS" }
+      },
       setupUiJson: { payoutAddress: { "ui:help": "Special help text" } }
     };
 
@@ -81,6 +85,9 @@ describe("Fetch external release data", () => {
       setupSchema: {
         type: "object",
         properties: { dependencyVar: { type: "string" } }
+      },
+      setupTarget: {
+        dependencyVar: { type: "environment", name: "DEP_VAR" }
       },
       setupUiJson: { dependencyVar: { "ui:help": "Special help text" } }
     };
@@ -164,6 +171,7 @@ describe("Fetch external release data", () => {
             name: "Access to DAppNode Package volume"
           }
         ],
+
         setupSchema: {
           [idMain]: {
             type: "object",
@@ -174,10 +182,19 @@ describe("Fetch external release data", () => {
             properties: { dependencyVar: { type: "string" } }
           }
         },
+        setupTarget: {
+          [idMain]: {
+            payoutAddress: { type: "environment", name: "PAYOUT_ADDRESS" }
+          },
+          [idDep]: {
+            dependencyVar: { type: "environment", name: "DEP_VAR" }
+          }
+        },
         setupUiJson: {
           [idMain]: { payoutAddress: { "ui:help": "Special help text" } },
           [idDep]: { dependencyVar: { "ui:help": "Special help text" } }
         },
+
         imageSize: mainDnpImageSize,
         isUpdated: false,
         isInstalled: true,
@@ -255,14 +272,18 @@ describe("Fetch external release data", () => {
       }
     };
 
-    const setupWizard: SetupSchema = {
+    const setupSchema: SetupSchema = {
       type: "object",
       properties: {
         mockVar: { type: "string" }
       }
     };
 
-    const setupWizardUi: SetupUiJson = {
+    const setupTarget: SetupTarget = {
+      mockVar: { type: "environment", name: "MOCK_VAR" }
+    };
+
+    const setupUiJson: SetupUiJson = {
       mockVar: { "ui:help": "Special help text" }
     };
 
@@ -276,8 +297,9 @@ describe("Fetch external release data", () => {
       mainDnpReleaseHash = await uploadDirectoryRelease({
         manifest: mainDnpManifest,
         compose: composeMain,
-        setupWizard,
-        setupWizardUi,
+        setupSchema,
+        setupTarget,
+        setupUiJson,
         disclaimer
       });
     });
@@ -318,12 +340,9 @@ describe("Fetch external release data", () => {
         specialPermissions: [],
 
         // Data added via files, to be tested
-        setupSchema: {
-          [idMain]: setupWizard
-        },
-        setupUiJson: {
-          [idMain]: setupWizardUi
-        },
+        setupSchema: { [idMain]: setupSchema },
+        setupTarget: { [idMain]: setupTarget },
+        setupUiJson: { [idMain]: setupUiJson },
 
         isUpdated: false,
         isInstalled: true,

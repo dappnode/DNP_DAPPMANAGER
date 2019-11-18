@@ -45,24 +45,27 @@ export interface RequestStatus {
   success?: boolean;
 }
 
-export interface SetupSchemaAllDnps {
-  [dnpName: string]: SetupSchema;
-}
-
-export interface SetupSchemaAllDnpsFormated {
-  type: "object";
-  properties: { [dnpName: string]: SetupSchema };
-}
-
-export interface SetupUiJsonAllDnps {
-  [dnpName: string]: SetupUiJson;
-}
-
 export type UserSettingTarget =
   | { type: "environment"; name: string }
   | { type: "portMapping"; containerPort: string }
   | { type: "namedVolumePath"; volumeName: string }
   | { type: "fileUpload"; path: string };
+
+export interface SetupTarget {
+  [propId: string]: UserSettingTarget;
+}
+
+export interface SetupSchemaAllDnps {
+  [dnpName: string]: SetupSchema;
+}
+
+export interface SetupTargetAllDnps {
+  [dnpName: string]: SetupTarget;
+}
+
+export interface SetupUiJsonAllDnps {
+  [dnpName: string]: SetupUiJson;
+}
 
 // Settings must include the previous user settings
 
@@ -100,6 +103,7 @@ export interface RequestedDnp {
   avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
   // Setup
   setupSchema?: SetupSchemaAllDnps;
+  setupTarget?: SetupTargetAllDnps;
   setupUiJson?: SetupUiJsonAllDnps;
   settings: UserSettingsAllDnps; // MUST include the previous user settings
   // Additional data
@@ -556,6 +560,7 @@ export interface PackageReleaseMetadata {
   };
   setupSchema?: SetupSchema;
   setupUiJson?: SetupUiJson;
+  setupTarget?: SetupTarget;
   author?: string;
   contributors?: string[];
   categories?: string[];

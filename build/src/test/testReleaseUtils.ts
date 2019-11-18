@@ -12,7 +12,12 @@ import {
   ipfsAddFromFs
 } from "./testIpfsUtils";
 import * as ipfs from "../src/modules/ipfs";
-import { ManifestWithImage, Manifest, Compose } from "../src/types";
+import {
+  ManifestWithImage,
+  Manifest,
+  Compose,
+  SetupTarget
+} from "../src/types";
 import { SetupSchema, SetupUiJson } from "../src/types-own";
 
 /**
@@ -71,14 +76,16 @@ export async function cleanInstallationArtifacts(): Promise<void> {
 export async function uploadDirectoryRelease({
   manifest,
   compose,
-  setupWizard,
-  setupWizardUi,
+  setupSchema,
+  setupTarget,
+  setupUiJson,
   disclaimer
 }: {
   manifest: Manifest;
   compose: Compose;
-  setupWizard?: SetupSchema;
-  setupWizardUi?: SetupUiJson;
+  setupSchema?: SetupSchema;
+  setupTarget?: SetupTarget;
+  setupUiJson?: SetupUiJson;
   disclaimer?: string;
 }): Promise<string> {
   const releaseDir = path.join(testDir, "release-directory");
@@ -100,8 +107,9 @@ export async function uploadDirectoryRelease({
   await shell(`cp ${mockDnpDir}/*.png ${releaseDir}`); // Avatar
 
   // Misc
-  if (setupWizard) writeJson("setup.schema.json", setupWizard);
-  if (setupWizardUi) writeJson("setup-ui.json", setupWizardUi);
+  if (setupSchema) writeJson("setup.schema.json", setupSchema);
+  if (setupTarget) writeJson("setup-target.json", setupTarget);
+  if (setupUiJson) writeJson("setup-ui.json", setupUiJson);
   if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
   const rootHash = await ipfsAddDirFromFs(releaseDir);

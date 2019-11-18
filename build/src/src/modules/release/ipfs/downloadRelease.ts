@@ -13,6 +13,7 @@ import {
   downloadManifest,
   downloadCompose,
   downloadSetupSchema,
+  downloadSetupTarget,
   downloadSetupUiJson,
   downloadDisclaimer
 } from "./downloadAssets";
@@ -24,8 +25,9 @@ const releaseFilesRegex = {
   image: /\.tar\.xz$/,
   compose: /compose.*\.yml$/,
   avatar: /avatar.*\.png$/,
-  setupWizard: /setup\..*\.json$/,
-  setupWizardUi: /setup-ui\..*json$/,
+  setupSchema: /setup\..*\.json$/,
+  setupTarget: /setup-target\..*json$/,
+  setupUiJson: /setup-ui\..*json$/,
   disclaimer: /disclaimer\.md$/i
 };
 
@@ -75,8 +77,9 @@ export default async function downloadRelease(
       const imageEntry = files.find(releaseFileIs.image);
       const composeEntry = files.find(releaseFileIs.compose);
       const avatarEntry = files.find(releaseFileIs.avatar);
-      const setupSchemaEntry = files.find(releaseFileIs.setupWizard);
-      const setupUiJsonEntry = files.find(releaseFileIs.setupWizardUi);
+      const setupSchemaEntry = files.find(releaseFileIs.setupSchema);
+      const setupTargetEntry = files.find(releaseFileIs.setupTarget);
+      const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
       const disclaimerEntry = files.find(releaseFileIs.disclaimer);
 
       if (!manifestEntry) throw Error("Release must contain a manifest");
@@ -87,17 +90,20 @@ export default async function downloadRelease(
         manifest,
         composeUnsafe,
         setupSchema,
+        setupTarget,
         setupUiJson,
         disclaimer
       ] = await Promise.all([
         downloadManifest(manifestEntry.hash),
         downloadCompose(composeEntry.hash),
         setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
+        setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
         setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
         disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash)
       ]);
 
       if (setupSchema) manifest.setupSchema = setupSchema;
+      if (setupTarget) manifest.setupTarget = setupTarget;
       if (setupUiJson) manifest.setupUiJson = setupUiJson;
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
 
