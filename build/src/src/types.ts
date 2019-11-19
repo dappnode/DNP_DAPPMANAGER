@@ -466,6 +466,26 @@ export interface AutoUpdateDataView {
 }
 
 /**
+ * For fetch core update data
+ */
+
+export interface DependencyListItem {
+  name: string;
+  from?: string;
+  to: string;
+  warningOnInstall?: string;
+}
+
+export interface CoreUpdateData {
+  available: boolean;
+  type?: string;
+  packages: DependencyListItem[];
+  changelog: string;
+  updateAlerts: ManifestUpdateAlert[];
+  versionId: string;
+}
+
+/**
  * Releases types
  */
 

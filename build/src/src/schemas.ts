@@ -5,8 +5,29 @@ import {
   ChainData,
   ProgressLog,
   PackageNotification,
-  UserActionLog
+  UserActionLog,
+  CoreUpdateData
 } from "./types";
+
+/**
+ * GENERIC TYPES
+ *
+ * Manifest
+ */
+
+export const manifestSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string" },
+    version: { type: "string" }
+  },
+  required: ["name", "version"]
+};
+
+export const manifestSample = {
+  name: "name",
+  version: "0.2.0"
+};
 
 /**
  * Auto update data
@@ -103,6 +124,54 @@ export const directoryDnpSample: DirectoryItem = {
 };
 
 export const directoryDnpsSample: DirectoryItem[] = [directoryDnpSample];
+
+/**
+ * For fetch core update data
+ */
+
+export const coreUpdateDataSchema = {
+  title: "coreUpdateData",
+  type: "object",
+  properties: {
+    available: { type: "boolean" },
+    type: { type: "string" },
+    packages: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          from: { type: "string" },
+          to: { type: "string" },
+          warningOnInstall: { type: "string" }
+        },
+        required: ["name", "to"]
+      }
+    },
+    changelog: { type: "string" },
+    updateAlerts: { type: "array" },
+    versionId: { type: "string" }
+  },
+  required: ["available"]
+};
+
+// Samples for testing
+
+export const coreUpdateDataSample: CoreUpdateData = {
+  available: true,
+  type: "patch",
+  packages: [
+    {
+      name: "admin.dnp.dappnode.eth",
+      from: "0.2.0",
+      to: "0.2.1",
+      warningOnInstall: "Warning!"
+    }
+  ],
+  changelog: "Admin changelog",
+  updateAlerts: [],
+  versionId: "admin@0.2.1"
+};
 
 /**
  * Installed DNPs. Use in UI at /packages, /packages/:id,
