@@ -201,6 +201,7 @@ export interface PackageContainer {
   image: string;
   name: string;
   shortName: string;
+  ip?: string; // IP of the DNP in the dappnode network
   state: ContainerStatus;
   running: boolean;
   manifest?: Manifest;

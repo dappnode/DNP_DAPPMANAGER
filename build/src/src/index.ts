@@ -22,6 +22,7 @@ import "./watchers/chains";
 import "./watchers/diskUsage";
 import "./watchers/natRenewal";
 import "./watchers/dyndns";
+import "./watchers/nsupdate";
 
 // Print version data
 import "./utils/getVersionData";
