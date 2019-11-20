@@ -5,7 +5,7 @@ import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import Logs from "../logs";
-import { PackageContainer, RpcHandlerReturn } from "../types";
+import { PackageContainer, RpcHandlerReturnWithResult } from "../types";
 import { readConfigFiles } from "../utils/configFiles";
 const logs = Logs(module);
 
@@ -14,14 +14,14 @@ const logs = Logs(module);
 // Prevent running it twice
 let isDockerSystemDfCallRunning = false;
 
-interface RpcListPackagesReturn extends RpcHandlerReturn {
-  result: PackageContainer[];
-}
+type ReturnData = PackageContainer[];
 
 /**
  * Returns the list of current containers associated to packages
  */
-export default async function listPackages(): Promise<RpcListPackagesReturn> {
+export default async function listPackages(): RpcHandlerReturnWithResult<
+  ReturnData
+> {
   let dnpList = await listContainers();
 
   // Append envFile and manifest

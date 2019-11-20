@@ -18,7 +18,7 @@ export default async function seedPhraseSet({
   seedPhraseEncrypted
 }: {
   seedPhraseEncrypted: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (typeof seedPhraseEncrypted !== "string")
     throw Error("kwarg seedPhraseEncrypted must be a string");
 

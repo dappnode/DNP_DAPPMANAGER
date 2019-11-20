@@ -29,7 +29,7 @@ export default async function updateSystemPackages(): Promise<void> {
 
   try {
     await installPackage({
-      id: coreDnpName,
+      name: coreDnpName,
       options: { BYPASS_RESOLVER: true }
     });
 

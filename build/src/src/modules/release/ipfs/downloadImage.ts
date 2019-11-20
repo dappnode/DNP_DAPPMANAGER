@@ -1,7 +1,7 @@
 import * as ipfs from "../../ipfs";
 import * as validate from "../../../utils/validate";
 import { isAbsolute } from "path";
-import { validateImage } from "../validate";
+import { validateImage } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 
 /**
@@ -36,8 +36,8 @@ export default async function downloadImage(
   /**
    * 1. Check if cache exist and validate it
    */
-  const cacheValidation = await validateImage(path);
-  if (cacheValidation.success) return;
+  const imageIsOk = await validateImage(path).then(() => true, () => false);
+  if (imageIsOk) return;
 
   /**
    * 2. Cat stream to file system
@@ -48,11 +48,9 @@ export default async function downloadImage(
   /**
    * 3. Validate downloaded image
    */
-  const validation = await validateImage(path);
-  if (!validation.success)
+  await validateImage(path).catch(e => {
     throw Error(
-      `Downloaded image from ${hash} to ${path} failed validation: ${
-        validation.message
-      }`
+      `Downloaded image from ${hash} to ${path} failed validation: ${e.message}`
     );
+  });
 }

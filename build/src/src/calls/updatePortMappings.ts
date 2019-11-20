@@ -28,7 +28,7 @@ export default async function updatePortMappings({
   id: string;
   portMappings: PortMapping[];
   options?: { merge: boolean };
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");

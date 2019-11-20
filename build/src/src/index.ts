@@ -2,20 +2,14 @@ import autobahn from "autobahn";
 import * as eventBus from "./eventBus";
 import logUserAction from "./logUserAction";
 import { registerHandler } from "./registerHandler";
+import { registerSubscriptions } from "./registerSubscriptions";
 import params from "./params";
 import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
 import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
-import {
-  ChainData,
-  DirectoryDnp,
-  ProgressLog,
-  PackageNotification,
-  UserActionLog,
-  PackageContainer
-} from "./types";
+import { PackageNotification } from "./types";
 import Logs from "./logs";
 const logs = Logs(module);
 
@@ -99,80 +93,41 @@ connection.onopen = (session, details): void => {
    * via the `eventBusOnSafe` method
    */
 
-  /**
-   * Utilities to encode arguments to publish with the Crossbar format (args, kwargs)
-   * - Publisher:
-   *     publish("event.name", arg1, arg2)
-   * - Subscriber:
-   *     subscribe("event.name", function(arg1, arg2) {})
-   */
-  function publish(event: string, ...args: any[]): void {
-    // session.publish(topic, args, kwargs, options)
-    session.publish(event, args);
-  }
-  function subscribe(event: string, cb: (...args: any[]) => void): void {
-    // session.subscribe(topic, function(args, kwargs, details) )
-    session.subscribe(event, args => {
-      try {
-        cb(...args);
-      } catch (e) {
-        logs.error(`Error on WAMP ${event}: ${e.stack}`);
-      }
-    });
-  }
+  const wampSubscriptions = registerSubscriptions(session, logs);
 
-  eventBus.chainData.on((chainData: ChainData[]) => {
-    publish("chainData.dappmanager.dnp.dappnode.eth", chainData);
-  });
+  // Pipe local events to WAMP
+  eventBus.chainData.on(wampSubscriptions.chainData.emit);
+  eventBus.logUi.on(wampSubscriptions.progressLog.emit);
+  eventBus.logUserAction.on(wampSubscriptions.userActionLog.emit);
+  eventBus.packages.on(wampSubscriptions.packages.emit);
 
-  // Emits the list of packages
-  eventBus.packages.on((dnpList: PackageContainer[]) => {
-    publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
-  });
+  // Emit the list of packages
   eventBus.requestPackages.on(async () => {
     const dnpList = (await calls.listPackages()).result;
-    publish("packages.dappmanager.dnp.dappnode.eth", dnpList);
-  });
-
-  // Emits the directory
-  eventBus.directory.on((pkgs: DirectoryDnp[]) => {
-    publish("directory.dappmanager.dnp.dappnode.eth", pkgs);
+    wampSubscriptions.packages.emit(dnpList);
   });
 
   // Emits the auto update data (settings, registry, pending)
   eventBus.requestAutoUpdateData.on(async () => {
     const autoUpdateData = (await calls.autoUpdateDataGet()).result;
-    publish("autoUpdateData.dappmanager.dnp.dappnode.eth", autoUpdateData);
+    wampSubscriptions.autoUpdateData.emit(autoUpdateData);
   });
 
-  eventBus.logUi.on((logData: ProgressLog) => {
-    publish("log.dappmanager.dnp.dappnode.eth", logData);
-    // Also, log them internally. But skip download progress logs, too spam-y
-    if (!(logData.message || "").includes("%") && !logData.clear)
-      logs.info(JSON.stringify(logData));
-    else logs.debug(JSON.stringify(logData));
-  });
-
-  eventBus.logUserAction.on((userActionLog: UserActionLog) => {
-    publish("logUserAction.dappmanager.dnp.dappnode.eth", userActionLog);
-  });
-
-  /**
-   * Receives userAction logs from the VPN nodejs app
-   * See above for more details on userActionLog
-   */
-  subscribe("logUserActionToDappmanager", userActionLog => {
+  // Receives userAction logs from the VPN nodejs app
+  wampSubscriptions.logUserActionToDappmanager.on(userActionLog => {
     logUserAction.log(userActionLog);
   });
 
+  // Store notification in DB and push it to the UI
   eventBus.notification.on((notification: PackageNotification) => {
     db.notification.set(notification.id, notification);
-    publish("pushNotification.dappmanager.dnp.dappnode.eth", notification);
+    wampSubscriptions.pushNotification.emit(notification);
   });
 
   /**
    * Initial calls when WAMP is active
-   * - When the DAPPMANAGER starts, update the list of packages
+   * - When the DAPPMANAGER starts, update the list of packages.
+   *   The DAPPMANAGER may restart without the UI being restarted
    */
   eventBus.requestAutoUpdateData.emit();
   eventBus.requestPackages.emit();

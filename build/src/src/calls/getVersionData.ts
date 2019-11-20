@@ -1,9 +1,7 @@
 import versionData from "../utils/getVersionData";
-import { PackageVersionData, RpcHandlerReturn } from "../types";
+import { PackageVersionData, RpcHandlerReturnWithResult } from "../types";
 
-interface RpcGetVersionData extends RpcHandlerReturn {
-  result: PackageVersionData;
-}
+type ReturnData = PackageVersionData;
 
 /**
  * Returns the version data of this specific build
@@ -14,7 +12,9 @@ interface RpcGetVersionData extends RpcHandlerReturn {
  *   commit: "ab991e1482b44065ee4d6f38741bd89aeaeb3cec"
  * }
  */
-export default async function getVersionData(): Promise<RpcGetVersionData> {
+export default async function getVersionData(): RpcHandlerReturnWithResult<
+  ReturnData
+> {
   return {
     message: "Got version data",
     result: versionData

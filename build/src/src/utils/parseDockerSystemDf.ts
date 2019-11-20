@@ -1,6 +1,5 @@
 import { PackageContainer } from "../types";
 import { DockerApiSystemDfReturn } from "../modules/docker/dockerApi";
-import prettyBytes from "pretty-bytes";
 
 export default function parseDockerSystemDf({
   dockerSystemDfData,
@@ -10,13 +9,13 @@ export default function parseDockerSystemDf({
   dnpList: PackageContainer[];
 }): PackageContainer[] {
   const correctedParsedDataObj: {
-    [volumeName: string]: { links: number; size: string };
+    [volumeName: string]: { links: number; size: number };
   } = {};
 
   for (const vol of dockerSystemDfData.Volumes) {
     const name = vol.Name;
     const links = vol.UsageData.RefCount;
-    const size = prettyBytes(vol.UsageData.Size);
+    const size = vol.UsageData.Size;
     correctedParsedDataObj[name] = { links, size };
   }
 

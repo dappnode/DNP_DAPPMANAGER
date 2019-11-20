@@ -9,7 +9,7 @@ export default async function changeIpfsTimeout({
   timeout
 }: {
   timeout?: number;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!timeout) throw Error("kwarg timeout must be defined");
 
   params.IPFS_TIMEOUT = timeout;

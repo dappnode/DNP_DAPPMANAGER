@@ -19,7 +19,7 @@ export default async function togglePackage({
 }: {
   id: string;
   timeout?: number;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id);

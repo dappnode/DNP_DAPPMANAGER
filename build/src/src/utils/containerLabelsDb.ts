@@ -15,6 +15,7 @@ const defaultEnvironmentId = prefix + "default.environment";
 const defaultPortsId = prefix + "default.ports";
 const defaultVolumesId = prefix + "default.volumes";
 const dependenciesId = prefix + "dependencies";
+const avatarId = prefix + "avatar";
 const originId = prefix + "origin";
 const chainId = prefix + "chain";
 const isCoreId = prefix + "isCore";
@@ -60,27 +61,33 @@ export function readDefaultsFromLabels(
   defaultEnvironment: string[];
   defaultPorts: string[];
   defaultVolumes: string[];
+  hasDefaults: boolean;
 } {
   return {
     defaultEnvironment: safeGetArray(labels[defaultEnvironmentId]),
     defaultPorts: safeGetArray(labels[defaultPortsId]),
-    defaultVolumes: safeGetArray(labels[defaultVolumesId])
+    defaultVolumes: safeGetArray(labels[defaultVolumesId]),
+    // Sanity flag
+    hasDefaults: defaultVolumesId in labels
   };
 }
 
 export function writeMetadataToLabels({
   dependencies,
+  avatar,
   chain,
   origin,
   isCore
 }: {
   dependencies: Dependencies;
-  chain: string | undefined;
-  origin: string | null;
+  avatar: string;
+  chain?: string;
+  origin?: string;
   isCore: boolean;
 }): ContainerLabels {
   return {
     [dependenciesId]: setJson(dependencies),
+    [avatarId]: avatar || "",
     [chainId]: chain || "",
     [originId]: origin || "",
     [isCoreId]: isCore ? "true" : "false"
@@ -91,14 +98,16 @@ export function readMetadataFromLabels(
   labels: ContainerLabels
 ): {
   dependencies: Dependencies;
+  avatar: string;
   chain: string;
-  origin: string | null;
+  origin?: string;
   isCore: boolean;
 } {
   return {
     dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
+    avatar: labels[avatarId] || "",
     chain: labels[chainId] || "",
-    origin: labels[originId] || null,
+    origin: labels[originId] || undefined,
     isCore: labels[isCoreId] === "true" ? true : false
   };
 }

@@ -62,7 +62,8 @@ describe.skip("Call function: installPackage", function() {
     return {
       message: "Found compatible state",
       state: { [pkgName]: pkgVer, [depName]: depVer },
-      alreadyUpdated: {}
+      alreadyUpdated: {},
+      currentVersion: {}
     };
   }
 
@@ -129,7 +130,7 @@ describe.skip("Call function: installPackage", function() {
   // });
 
   it("should install the package with correct arguments", async () => {
-    const res = await installPackage({ id: pkgName });
+    const res = await installPackage({ name: pkgName });
     expect(res).to.be.an("object");
     expect(res).to.have.property("message");
   });

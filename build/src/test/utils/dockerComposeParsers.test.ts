@@ -5,8 +5,7 @@ import {
   PortProtocol,
   VolumeMapping,
   Compose,
-  UserSet,
-  UserSetByDnp
+  UserSettings
 } from "../../src/types";
 
 import {
@@ -18,16 +17,13 @@ import {
   mergePortArrays,
   parseVolumeMappings,
   stringifyVolumeMappings,
-  mergeVolumeMappings,
-  mergeVolumeArrays,
   normalizeVolumePath,
-  parseUserSet,
-  applyUserSet,
-  convertUserSetLegacy,
-  parseServiceName,
-  parseService
+  parseUserSetFromCompose,
+  applyUserSet
 } from "../../src/utils/dockerComposeParsers";
 import { mockCompose, mockDnpName, mockComposeService } from "../testUtils";
+
+const bitcoinDataVolumeName = "bitcoin_data";
 
 describe("Util: dockerComposeParsers", () => {
   describe("environment: parse, stringify", () => {
@@ -148,48 +144,48 @@ describe("Util: dockerComposeParsers", () => {
       );
     });
 
-    it("should merge volume mappings", () => {
-      const volumeMappings1: VolumeMapping[] = [
-        { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" }
-      ];
+    // it("should merge volume mappings", () => {
+    //   const volumeMappings1: VolumeMapping[] = [
+    //     { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" }
+    //   ];
 
-      const volumeMappings2: VolumeMapping[] = [
-        { host: "bitcoin_data", container: "/root/.bitcoin" },
-        { host: "/etc/another-path", container: "/etc/some-path" }
-      ];
+    //   const volumeMappings2: VolumeMapping[] = [
+    //     { host: "bitcoin_data", container: "/root/.bitcoin" },
+    //     { host: "/etc/another-path", container: "/etc/some-path" }
+    //   ];
 
-      const mergedVolumeMappings = mergeVolumeMappings(
-        volumeMappings1,
-        volumeMappings2
-      );
+    //   const mergedVolumeMappings = mergeVolumeMappings(
+    //     volumeMappings1,
+    //     volumeMappings2
+    //   );
 
-      expect(mergedVolumeMappings).to.deep.equal([
-        { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" },
-        { host: "/etc/another-path", container: "/etc/some-path" }
-      ]);
-    });
+    //   expect(mergedVolumeMappings).to.deep.equal([
+    //     { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" },
+    //     { host: "/etc/another-path", container: "/etc/some-path" }
+    //   ]);
+    // });
 
-    it("should parse, merge and stringify two volume arrays", () => {
-      const volumeArray1 = ["/dev1/custom-path/bitcoin-data:/root/.bitcoin"];
-      const volumeArray2 = ["bitcoin_data:/root/.bitcoin"];
+    // it("should parse, merge and stringify two volume arrays", () => {
+    //   const volumeArray1 = ["/dev1/custom-path/bitcoin-data:/root/.bitcoin"];
+    //   const volumeArray2 = ["bitcoin_data:/root/.bitcoin"];
 
-      const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
+    //   const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
 
-      expect(mergedPortMappings).to.deep.equal([
-        "/dev1/custom-path/bitcoin-data:/root/.bitcoin"
-      ]);
-    });
+    //   expect(mergedPortMappings).to.deep.equal([
+    //     "/dev1/custom-path/bitcoin-data:/root/.bitcoin"
+    //   ]);
+    // });
 
-    it("De-duplicate identical paths", () => {
-      const volumeArray1 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum/"];
-      const volumeArray2 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum"];
+    // it("De-duplicate identical paths", () => {
+    //   const volumeArray1 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum/"];
+    //   const volumeArray2 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum"];
 
-      const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
+    //   const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
 
-      expect(mergedPortMappings).to.deep.equal([
-        "ethchaindnpdappnodeeth_geth:/root/.ethereum"
-      ]);
-    });
+    //   expect(mergedPortMappings).to.deep.equal([
+    //     "ethchaindnpdappnodeeth_geth:/root/.ethereum"
+    //   ]);
+    // });
 
     describe("Path normalization", () => {
       const paths = [
@@ -208,20 +204,33 @@ describe("Util: dockerComposeParsers", () => {
 
   describe("parseUserSet", () => {
     it("Should parse the user set variable", () => {
-      const userSet = parseUserSet({
-        environment: ["ORIGINAL=0", "USERSET=1"],
-        ports: ["4001:4001", "9090:9090", "32764:6000"],
-        volumes: ["data:/usr/data", "/dev1/custom-path:/usr/data2"]
-      });
+      const compose: Compose = {
+        ...mockCompose,
+        services: {
+          [mockDnpName]: {
+            ...mockComposeService,
+            environment: ["ORIGINAL=0", "USERSET=1"],
+            ports: ["4001:4001", "9090:9090", "32764:6000"],
+            volumes: ["/dev1/custom-path:/usr/data", "moredata:/usr/data2"],
+            labels: {
+              "dappnode.dnp.default.environment": "[]",
+              "dappnode.dnp.default.ports": "[]",
+              "dappnode.dnp.default.volumes": `["${bitcoinDataVolumeName}:/usr/data", "moredata:/usr/data2"]`
+            }
+          }
+        }
+      };
 
-      const expectedUserSet: UserSet = {
+      const userSettings = parseUserSetFromCompose(compose);
+
+      const expectedUserSet: UserSettings = {
         environment: {
           ORIGINAL: "0",
           USERSET: "1"
         },
-        namedVolumeMappings: {
-          "/usr/data": "data",
-          "/usr/data2": "/dev1/custom-path"
+        namedVolumePaths: {
+          [bitcoinDataVolumeName]: "/dev1/custom-path",
+          moredata: ""
         },
         portMappings: {
           "4001/TCP": "4001",
@@ -230,7 +239,33 @@ describe("Util: dockerComposeParsers", () => {
         }
       };
 
-      expect(userSet).to.deep.equal(expectedUserSet);
+      expect(userSettings).to.deep.equal(expectedUserSet);
+    });
+
+    it("Should parse a legacy bitcoin DNP without default.volumes", () => {
+      const bitcoinName = "bitcoin.dnp.dappnode.eth";
+      const compose: Compose = {
+        ...mockCompose,
+        services: {
+          [bitcoinName]: {
+            ...mockComposeService,
+            volumes: ["/dev1/custom-path:/root/.bitcoin", "moredata:/usr/data2"]
+          }
+        }
+      };
+
+      const userSettings = parseUserSetFromCompose(compose);
+
+      const expectedUserSet: UserSettings = {
+        environment: {},
+        portMappings: {},
+        namedVolumePaths: {
+          [bitcoinDataVolumeName]: "/dev1/custom-path",
+          moredata: ""
+        }
+      };
+
+      expect(userSettings).to.deep.equal(expectedUserSet);
     });
   });
 
@@ -238,7 +273,10 @@ describe("Util: dockerComposeParsers", () => {
     it("Should apply some user settings", () => {
       const environment = ["ORIGINAL=VALUE", "USERSET=VALUE"];
       const ports = ["4001:4001", "9090:9090/udp", "32764:6000"];
-      const volumes = ["data:/usr/data", "/dev1/custom-path:/usr/data2"];
+      const volumes = [
+        `${bitcoinDataVolumeName}:/usr/data`,
+        "/dev1/custom-path:/usr/data2"
+      ];
 
       const compose: Compose = {
         ...mockCompose,
@@ -252,12 +290,12 @@ describe("Util: dockerComposeParsers", () => {
         }
       };
 
-      const userSet: UserSet = {
+      const userSet: UserSettings = {
         environment: {
           USERSET: "NEW_VALUE"
         },
-        namedVolumeMappings: {
-          "/usr/data": "/dev0/user-set-path"
+        namedVolumePaths: {
+          [bitcoinDataVolumeName]: "/dev0/user-set-path"
         },
         portMappings: {
           "4001/TCP": "4111",
@@ -282,143 +320,169 @@ describe("Util: dockerComposeParsers", () => {
 
       expect(serviceParts).to.deep.equal(expectedServiceParts);
     });
-  });
 
-  describe("convertUserSetLegacy", () => {
-    it("Should convert legacy userSet* types to userSet", () => {
-      const dnpName = "kovan.dnp.dappnode.eth";
-      const dnpName2 = "dependency.dnp.dappnode.eth";
-      const userSetEnvs = {
-        [dnpName]: {
-          ENV_NAME: "CUSTOM_VALUE"
-        }
-      };
-      const userSetVols = {
-        [dnpName]: {
-          "kovan:/root/.local/share/io.parity.ethereum/":
-            "/dev1/custom-path:/root/.local/share/io.parity.ethereum/"
-        }
-      };
-      const userSetPorts = {
-        [dnpName]: {
-          "30303": "31313:30303",
-          "30303/udp": "31313:30303/udp"
-        },
-        [dnpName2]: {
-          "4001:4001": "4001"
-        }
-      };
-
-      const expectedUserSet: UserSetByDnp = {
-        [dnpName]: {
-          environment: {
-            ENV_NAME: "CUSTOM_VALUE"
-          },
-          namedVolumeMappings: {
-            "/root/.local/share/io.parity.ethereum": "/dev1/custom-path"
-          },
-          portMappings: {
-            "30303/TCP": "31313",
-            "30303/UDP": "31313"
-          }
-        },
-        [dnpName2]: {
-          environment: {},
-          namedVolumeMappings: {},
-          portMappings: {
-            "4001/TCP": ""
-          }
-        }
-      };
-
-      const userSet = convertUserSetLegacy({
-        userSetEnvs,
-        userSetVols,
-        userSetPorts
-      });
-      expect(userSet).to.deep.equal(expectedUserSet);
-    });
-  });
-
-  describe("Merge userSet to the compose (applyUserSet, convertUserSetLegacy)", () => {
-    it("should merge the userSetDnpObjects", () => {
-      const serviceName = parseServiceName(mockCompose);
-
+    it("Should apply a setting to make a host port ephemeral", () => {
       const compose: Compose = {
         ...mockCompose,
         services: {
-          [serviceName]: {
-            ...mockCompose.services[serviceName],
-            environment: ["ENV1=DEFAULTVAL1", "ENV2=DEFAULTVAL2"],
-            ports: ["30303", "30303/udp", "30304:30304", "8080:8080"],
-            volumes: [
-              "kovan:/root/.local/share/io.parity.ethereum/",
-              "sync-data:/root/.sync"
-            ]
+          [mockDnpName]: {
+            ...mockComposeService,
+            ports: ["3333/udp", "4444:4444/udp"]
           }
         }
       };
 
-      // Data introduced by the user at the moment of installing
-      // [NOTE]: the user should be seeing a merge of [default + previous]
-      const userSetDnpEnvs = {
-        ENV1: "USER_SET_VAL1",
-        ENV_OLD: "PREVIOUS_SET_VAL2"
-      };
-      const userSetDnpPorts = {
-        "30303": "31313:30303",
-        "30303/udp": "31313:30303/udp",
-        "30304:30304": "30304"
-      };
-      const userSetDnpVols = {
-        "kovan:/root/.local/share/io.parity.ethereum//":
-          "different_path:/root/.local/share/io.parity.ethereum//",
-        "old_version_volume:/original/path":
-          "another_different_path:/original/path"
+      const userSet: UserSettings = {
+        portMappings: { "3333/UDP": "3330", "4444/UDP": "" }
       };
 
-      const userSet = convertUserSetLegacy({
-        userSetEnvs: { [serviceName]: userSetDnpEnvs },
-        userSetVols: { [serviceName]: userSetDnpVols },
-        userSetPorts: { [serviceName]: userSetDnpPorts }
-      });
+      const expectedServiceParts = {
+        ports: ["3330:3333/udp", "4444/udp"]
+      };
+      const composeReturn = applyUserSet(compose, userSet);
+      const serviceParts = pick(composeReturn.services[mockDnpName], ["ports"]);
 
-      expect(userSet).to.deep.equal(
-        {
-          "mock-dnp.dnp.dappnode.eth": {
-            environment: {
-              ENV1: "USER_SET_VAL1",
-              ENV_OLD: "PREVIOUS_SET_VAL2"
-            },
-            namedVolumeMappings: {
-              "/original/path": "another_different_path",
-              "/root/.local/share/io.parity.ethereum": "different_path"
-            },
-            portMappings: {
-              "30303/TCP": "31313",
-              "30303/UDP": "31313",
-              "30304/TCP": ""
-            }
-          }
-        },
-        "Wrong userSet conversion"
-      );
-
-      const returnCompose = applyUserSet(compose, userSet[serviceName]);
-
-      expect(
-        pick(parseService(returnCompose), ["environment", "ports", "volumes"])
-      ).to.deep.equal(
-        {
-          environment: ["ENV1=USER_SET_VAL1", "ENV2=DEFAULTVAL2"],
-          ports: ["31313:30303", "31313:30303/udp", "30304", "8080:8080"],
-          volumes: [
-            "different_path:/root/.local/share/io.parity.ethereum",
-            "sync-data:/root/.sync"
-          ]
-        },
-        "Wrong applyUserSet result"
-      );
+      expect(serviceParts).to.deep.equal(expectedServiceParts);
     });
   });
+
+  // describe("convertUserSetLegacy", () => {
+  //   it("Should convert legacy userSet* types to userSet", () => {
+  //     const dnpName = "kovan.dnp.dappnode.eth";
+  //     const dnpName2 = "dependency.dnp.dappnode.eth";
+  //     const userSetEnvs = {
+  //       [dnpName]: {
+  //         ENV_NAME: "CUSTOM_VALUE"
+  //       }
+  //     };
+  //     const userSetVols = {
+  //       [dnpName]: {
+  //         "kovan:/root/.local/share/io.parity.ethereum/":
+  //           "/dev1/custom-path:/root/.local/share/io.parity.ethereum/"
+  //       }
+  //     };
+  //     const userSetPorts = {
+  //       [dnpName]: {
+  //         "30303": "31313:30303",
+  //         "30303/udp": "31313:30303/udp"
+  //       },
+  //       [dnpName2]: {
+  //         "4001:4001": "4001"
+  //       }
+  //     };
+
+  //     const expectedUserSet: UserSettingsAllDnps = {
+  //       [dnpName]: {
+  //         environment: {
+  //           ENV_NAME: "CUSTOM_VALUE"
+  //         },
+  //         namedVolumePaths: {
+  //           "/root/.local/share/io.parity.ethereum": "/dev1/custom-path"
+  //         },
+  //         portMappings: {
+  //           "30303/TCP": "31313",
+  //           "30303/UDP": "31313"
+  //         }
+  //       },
+  //       [dnpName2]: {
+  //         environment: {},
+  //         namedVolumePaths: {},
+  //         portMappings: {
+  //           "4001/TCP": ""
+  //         }
+  //       }
+  //     };
+
+  //     const userSet = mapValues()
+
+  //     convertUserSetLegacy({
+  //       userSetEnvs,
+  //       userSetVols,
+  //       userSetPorts
+  //     });
+  //     expect(userSet).to.deep.equal(expectedUserSet);
+  //   });
+  // });
+
+  // describe("Merge userSet to the compose (applyUserSet, convertUserSetLegacy)", () => {
+  //   it("should merge the userSetDnpObjects", () => {
+  //     const serviceName = parseServiceName(mockCompose);
+
+  //     const compose: Compose = {
+  //       ...mockCompose,
+  //       services: {
+  //         [serviceName]: {
+  //           ...mockCompose.services[serviceName],
+  //           environment: ["ENV1=DEFAULTVAL1", "ENV2=DEFAULTVAL2"],
+  //           ports: ["30303", "30303/udp", "30304:30304", "8080:8080"],
+  //           volumes: [
+  //             "kovan:/root/.local/share/io.parity.ethereum/",
+  //             "sync-data:/root/.sync"
+  //           ]
+  //         }
+  //       }
+  //     };
+
+  //     // Data introduced by the user at the moment of installing
+  //     // [NOTE]: the user should be seeing a merge of [default + previous]
+  //     const userSetDnpEnvs = {
+  //       ENV1: "USER_SET_VAL1",
+  //       ENV_OLD: "PREVIOUS_SET_VAL2"
+  //     };
+  //     const userSetDnpPorts = {
+  //       "30303": "31313:30303",
+  //       "30303/udp": "31313:30303/udp",
+  //       "30304:30304": "30304"
+  //     };
+  //     const userSetDnpVols = {
+  //       "kovan:/root/.local/share/io.parity.ethereum//":
+  //         "different_path:/root/.local/share/io.parity.ethereum//",
+  //       "old_version_volume:/original/path":
+  //         "another_different_path:/original/path"
+  //     };
+
+  //     const userSet = convertUserSetLegacy({
+  //       userSetEnvs: { [serviceName]: userSetDnpEnvs },
+  //       userSetVols: { [serviceName]: userSetDnpVols },
+  //       userSetPorts: { [serviceName]: userSetDnpPorts }
+  //     });
+
+  //     expect(userSet).to.deep.equal(
+  //       {
+  //         "mock-dnp.dnp.dappnode.eth": {
+  //           environment: {
+  //             ENV1: "USER_SET_VAL1",
+  //             ENV_OLD: "PREVIOUS_SET_VAL2"
+  //           },
+  //           namedVolumeMappings: {
+  //             "/original/path": "another_different_path",
+  //             "/root/.local/share/io.parity.ethereum": "different_path"
+  //           },
+  //           portMappings: {
+  //             "30303/TCP": "31313",
+  //             "30303/UDP": "31313",
+  //             "30304/TCP": ""
+  //           }
+  //         }
+  //       },
+  //       "Wrong userSet conversion"
+  //     );
+
+  //     const returnCompose = applyUserSet(compose, userSet[serviceName]);
+
+  //     expect(
+  //       pick(parseService(returnCompose), ["environment", "ports", "volumes"])
+  //     ).to.deep.equal(
+  //       {
+  //         environment: ["ENV1=USER_SET_VAL1", "ENV2=DEFAULTVAL2"],
+  //         ports: ["31313:30303", "31313:30303/udp", "30304", "8080:8080"],
+  //         volumes: [
+  //           "different_path:/root/.local/share/io.parity.ethereum",
+  //           "sync-data:/root/.sync"
+  //         ]
+  //       },
+  //       "Wrong applyUserSet result"
+  //     );
+  //   });
+  // });
 });

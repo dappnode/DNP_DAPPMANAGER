@@ -10,11 +10,9 @@ import { listContainer } from "../modules/docker/listContainers";
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";
 import params from "../params";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 
-interface RpcCopyFileToReturn extends RpcHandlerReturn {
-  result: string;
-}
+type ReturnData = string;
 
 const maxSizeKb = 10e3;
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
@@ -39,7 +37,7 @@ export default async function copyFileFrom({
 }: {
   id: string;
   fromPath: string;
-}): Promise<RpcCopyFileToReturn> {
+}): RpcHandlerReturnWithResult<ReturnData> {
   if (!id) throw Error("Argument id must be defined");
   if (!fromPath) throw Error("Argument fromPath must be defined");
 

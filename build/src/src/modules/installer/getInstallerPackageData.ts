@@ -1,13 +1,12 @@
-import { PackageRelease, UserSet, InstallPackageData } from "../../types";
-import { merge } from "lodash";
-import { getUserSet } from "../../utils/dockerComposeFile";
+import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
+import merge from "deepmerge";
+import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import {
   applyUserSet,
   addGeneralDataToCompose
 } from "../../utils/dockerComposeParsers";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { fileToMultiaddress } from "../../utils/distributedFile";
 
 /**
  * Receives a release and returns all the information and instructions
@@ -17,21 +16,22 @@ const logs = Logs(module);
  */
 export default function getInstallerPackageData(
   release: PackageRelease,
-  userSet: UserSet
+  userSettings: UserSettings
 ): InstallPackageData {
-  const { name, version, isCore, compose, metadata, origin } = release;
+  const { name, semVersion, isCore, compose, metadata, origin } = release;
   /**
    * Compute paths
    */
   const composePath = getPath.dockerCompose(name, isCore);
   const composeNextPath = getPath.nextPath(composePath);
   const manifestPath = getPath.manifest(name, isCore);
-  const imagePath = getPath.image(name, version, isCore);
+  const imagePath = getPath.image(name, semVersion, isCore);
 
-  /**
-   * Gather extra data
-   */
-  const previousUserSet = getPreviousUserSet(name, isCore);
+  // If composePath does not exist, or is invalid: returns {}
+  const previousUserSettings = getUserSettingsSafe(name, isCore);
+
+  // Aditional metadata
+  const avatar = fileToMultiaddress(release.avatarFile);
 
   return {
     ...release,
@@ -42,21 +42,10 @@ export default function getInstallerPackageData(
     imagePath,
     // Data to write
     compose: addGeneralDataToCompose(
-      applyUserSet(compose, merge(previousUserSet, userSet)),
-      { metadata, origin, isCore }
-    )
+      applyUserSet(compose, merge(previousUserSettings, userSettings)),
+      { metadata, avatar, origin, isCore }
+    ),
+    // User settings to be applied by the installer
+    fileUploads: userSettings.fileUploads
   };
-}
-
-function getPreviousUserSet(name: string, isCore: boolean): UserSet {
-  // What if it's not previous there?
-  const composePath = getPath.dockerCompose(name, isCore);
-
-  // If the compose is invalid, just return empty ENVs
-  try {
-    return getUserSet(composePath);
-  } catch (e) {
-    logs.error(`Error getting user set envs: ${e.stack}`);
-    return {};
-  }
 }

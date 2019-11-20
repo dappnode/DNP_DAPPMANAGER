@@ -1,15 +1,13 @@
 import os from "os";
 import shellExec from "../utils/shell";
 import Logs from "../logs";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 const logs = Logs(module);
 
-interface RpcGetStatsReturn extends RpcHandlerReturn {
-  result: {
-    cpu: string | undefined;
-    memory: string | undefined;
-    disk: string | undefined;
-  };
+interface ReturnData {
+  cpu: string | undefined;
+  memory: string | undefined;
+  disk: string | undefined;
 }
 
 // Cache static values
@@ -24,7 +22,9 @@ const numCores = os.cpus().length;
  *   disk: "57%", {string}
  * }
  */
-export default async function getStats(): Promise<RpcGetStatsReturn> {
+export default async function getStats(): RpcHandlerReturnWithResult<
+  ReturnData
+> {
   const cpuUsedPercent = await wrapErrors(async () => {
     return getDiskPercent();
   }, "cpuUsedPercent");

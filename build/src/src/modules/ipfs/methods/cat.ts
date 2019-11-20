@@ -1,12 +1,8 @@
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
-import { timeoutError, IpfsArgument } from "../data";
+import { timeoutError } from "../data";
 import Logs from "../../../logs";
 const logs = Logs(module);
-
-interface CatArgument extends IpfsArgument {
-  maxLength?: number;
-}
 
 /**
  * Returns a file addressed by a valid IPFS Path.
@@ -16,7 +12,13 @@ interface CatArgument extends IpfsArgument {
  *   if reached, it will throw an error
  * @returns {buffer} hash contents as a buffer
  */
-export default function cat({ hash, maxLength }: CatArgument): Promise<Buffer> {
+export default function cat({
+  hash,
+  maxLength
+}: {
+  hash: string;
+  maxLength?: number;
+}): Promise<Buffer> {
   return new Promise(
     (resolve, reject): void => {
       // Timeout cancel mechanism

@@ -11,7 +11,6 @@ import parseDockerSystemDf from "../../src/utils/parseDockerSystemDf";
 describe("Util: parseDockerSystemDf", function() {
   it("should extend the dnpList", () => {
     const volumeName = mockDockerSystemDfDataSample.Volumes[0].Name;
-    const volumeSizePretty = "1.11 GB";
     const volumeLinks =
       mockDockerSystemDfDataSample.Volumes[0].UsageData.RefCount;
 
@@ -55,7 +54,7 @@ describe("Util: parseDockerSystemDf", function() {
             name: volumeName,
             path: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
             links: volumeLinks,
-            size: volumeSizePretty
+            size: 1111111111
           }
         ]
       }

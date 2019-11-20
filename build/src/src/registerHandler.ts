@@ -1,10 +1,8 @@
 import logUserAction from "./logUserAction";
 import { Session } from "autobahn";
-import { RpcHandlerReturn } from "./types";
+import { RpcHandlerReturnGeneric } from "./types";
 import Logs from "./logs";
 const logs = Logs(module);
-
-type KwargsInterace = any;
 
 /*
  * RPC register wrapper
@@ -13,16 +11,18 @@ type KwargsInterace = any;
  * and logging of errors and actions.
  */
 
-export const wrapErrors = (
-  handler: (kwargs: KwargsInterace) => Promise<RpcHandlerReturn>,
+export const wrapErrors = <K>(
+  handler: (kwargs: K) => RpcHandlerReturnGeneric,
   event: string
 ) =>
   // function(args, kwargs, details)
   async function wrappedHandler(
+    // crossbar's session.register requires _0: `any[] | undefined`
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     _0: any[] | undefined,
-    kwargs: KwargsInterace
+    kwargs: K
   ): Promise<string> {
-    if (!kwargs) kwargs = {} as KwargsInterace;
+    if (!kwargs) kwargs = {} as K;
     logs.debug(`In-call to ${event}`);
     // 0. args: an array with call arguments
     // 1. kwargs: an object with call arguments
@@ -72,11 +72,6 @@ export const wrapErrors = (
          */
         logs.warn(`Could not connect to ethchain node, on ${event}: ${msg}`);
         logUserAction.log({ level: "error", event, ...error2obj(e), kwargs });
-      } else if (kwargs.dontLogError) {
-        /**
-         * 3. Special feature so the UI can suppress noisy errors on recurring calls
-         *    This is necessary for the fetchPackageData while the user is typing a name
-         */
       } else {
         /**
          * 0. Else
@@ -97,7 +92,7 @@ export const wrapErrors = (
 export const registerHandler = (
   session: Session,
   event: string,
-  handler: (kwargs: KwargsInterace) => Promise<RpcHandlerReturn>
+  handler: (kwargs: any) => RpcHandlerReturnGeneric
 ): void => {
   session.register(event, wrapErrors(handler, event)).then(
     () => {

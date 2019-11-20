@@ -1,3 +1,152 @@
+import { SetupSchema, SetupUiJson } from "./types-own";
+
+// Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
+
+/**
+ * ==============
+ * ==============
+ * ADMIN
+ * ==============
+ * ==============
+ */
+
+/**
+ * [NOTE] Items MUST be ordered by the directory order
+ * - featured #0
+ * - featured #1
+ * - whitelisted #0
+ * - whitelisted #1
+ * - whitelisted #2
+ * - other #0
+ * - other #1
+ *
+ * [NOTE] Search result will never show up in the directory listing,
+ * they will appear in a future dropdown under the searchbar
+ */
+export interface DirectoryItem {
+  name: string;
+  description: string; // = metadata.shortDescription || metadata.description
+  avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
+  isInstalled: boolean; // Show "UPDATE"
+  isUpdated: boolean; // Show "UPDATED"
+  whitelisted: boolean;
+  isFeatured: boolean;
+  featuredStyle?: {
+    featuredBackground?: string;
+    featuredColor?: string;
+    featuredAvatarFilter?: string;
+  };
+  categories: string[];
+}
+
+export interface RequestStatus {
+  loading?: boolean;
+  error?: string;
+  success?: boolean;
+}
+
+export type UserSettingTarget =
+  | { type: "environment"; name: string }
+  | { type: "portMapping"; containerPort: string }
+  | { type: "namedVolumePath"; volumeName: string }
+  | { type: "fileUpload"; path: string };
+
+export interface SetupTarget {
+  [propId: string]: UserSettingTarget;
+}
+
+export interface SetupSchemaAllDnps {
+  [dnpName: string]: SetupSchema;
+}
+
+export interface SetupTargetAllDnps {
+  [dnpName: string]: SetupTarget;
+}
+
+export interface SetupUiJsonAllDnps {
+  [dnpName: string]: SetupUiJson;
+}
+
+// Settings must include the previous user settings
+
+export interface UserSettings {
+  environment?: { [envName: string]: string }; // Env value
+  portMappings?: { [containerPortAndType: string]: string }; // Host port
+  namedVolumePaths?: { [volumeName: string]: string }; // Host absolute path
+  fileUploads?: { [containerPath: string]: string }; // dataURL
+}
+// "bitcoin.dnp.dappnode.eth": {
+//   environment: { MODE: "VALUE_SET_BEFORE" }
+//   portMappings: { "8443": "8443"; "8443/udp": "8443" },
+//   namedVolumePaths: { data: "" }
+//   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
+// };
+export interface UserSettingsAllDnps {
+  [dnpName: string]: UserSettings;
+}
+
+export interface DisclaimerAllDnps {
+  [dnpName: string]: string;
+}
+
+export interface CompatibleDnps {
+  [dnpName: string]: { from?: string; to: string };
+  // "bitcoin.dnp.dappnode.eth": { from: "0.2.5"; to: "0.2.6" };
+  // "ln.dnp.dappnode.eth": { from: null; to: "0.2.2" };
+}
+
+export interface RequestedDnp {
+  name: string; // "bitcoin.dnp.dappnode.eth"
+  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
+  semVersion: string; // Always a semver: "0.2.3"
+  origin?: string; // "/ipfs/Qm"
+  avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
+  // Setup
+  setupSchema?: SetupSchemaAllDnps;
+  setupTarget?: SetupTargetAllDnps;
+  setupUiJson?: SetupUiJsonAllDnps;
+  settings: UserSettingsAllDnps; // MUST include the previous user settings
+  // Additional data
+  imageSize: number;
+  isUpdated: boolean;
+  isInstalled: boolean;
+  // Decoupled metadata
+  metadata: PackageReleaseMetadata;
+  specialPermissions: SpecialPermission[];
+  // Request status and dependencies
+  request: {
+    compatible: {
+      requiresCoreUpdate: boolean;
+      resolving: boolean;
+      isCompatible: boolean; // false;
+      error: string; // "LN requires incompatible dependency";
+      dnps: CompatibleDnps;
+    };
+    available: {
+      isAvailable: boolean; // false;
+      message: string; // "LN image not available";
+    };
+  };
+}
+
+// Installing types
+
+export interface ProgressLogs {
+  [dnpName: string]: string;
+}
+
+export interface ProgressLogsByDnp {
+  [dnpName: string]: ProgressLogs;
+}
+
+/**
+ * ==============
+ * ==============
+ * DAPPMANAGER
+ * ==============
+ * ==============
+ */
+
 export type PortProtocol = "UDP" | "TCP";
 
 interface BasicPortMapping {
@@ -21,15 +170,13 @@ interface BasicVolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
-  // #### Temp properties for admin compatibility
-  path?: string;
-  type?: string;
 }
 
 export interface VolumeMapping extends BasicVolumeMapping {
   users?: string[];
   owner?: string;
   isOwner?: boolean;
+  size?: number;
 }
 
 export interface Dependencies {
@@ -56,9 +203,6 @@ export interface PackageContainer {
   shortName: string;
   state: ContainerStatus;
   running: boolean;
-  origin?: string;
-  chain?: string;
-  dependencies: Dependencies;
   manifest?: Manifest;
   envs?: PackageEnvs;
   ports: PortMapping[];
@@ -66,6 +210,10 @@ export interface PackageContainer {
   defaultEnvironment: PackageEnvs;
   defaultPorts: PortMapping[];
   defaultVolumes: VolumeMapping[];
+  dependencies: Dependencies;
+  avatarUrl: string;
+  origin?: string;
+  chain?: string;
 }
 
 export interface PackageEnvs {
@@ -254,36 +402,8 @@ export interface UserActionLog {
 }
 
 /**
- * Installer types
+ * Docker
  */
-
-export interface UserSet {
-  environment?: { [envName: string]: string };
-  portMappings?: { [containerPortAndProtocol: string]: string };
-  namedVolumeMappings?: { [namedVolumeContainerPath: string]: string };
-}
-
-export interface UserSetByDnp {
-  [dnpName: string]: UserSet;
-}
-
-export interface UserSetPackageEnvs {
-  [dnpName: string]: PackageEnvs;
-}
-
-export interface UserSetPackageVolsSingle {
-  [originalVolumeMapping: string]: string;
-}
-export interface UserSetPackageVols {
-  [dnpName: string]: UserSetPackageVolsSingle;
-}
-
-export interface UserSetPackagePortsSingle {
-  [originalPortMapping: string]: string;
-}
-export interface UserSetPackagePorts {
-  [dnpName: string]: UserSetPackagePortsSingle;
-}
 
 export interface DockerOptionsInterface {
   timeout?: number;
@@ -331,6 +451,40 @@ export interface AutoUpdateFeedback {
   errorMessage?: string;
 }
 
+export interface AutoUpdateDataDnpView {
+  id: string;
+  displayName: string;
+  enabled: boolean;
+  feedback: AutoUpdateFeedback;
+}
+
+export interface AutoUpdateDataView {
+  settings: AutoUpdateSettings;
+  registry: AutoUpdateRegistry;
+  pending: AutoUpdatePending;
+  dnpsToShow: AutoUpdateDataDnpView[];
+}
+
+/**
+ * For fetch core update data
+ */
+
+export interface DependencyListItem {
+  name: string;
+  from?: string;
+  to: string;
+  warningOnInstall?: string;
+}
+
+export interface CoreUpdateData {
+  available: boolean;
+  type?: string;
+  packages: DependencyListItem[];
+  changelog: string;
+  updateAlerts: ManifestUpdateAlert[];
+  versionId: string;
+}
+
 /**
  * Releases types
  */
@@ -346,7 +500,7 @@ export interface PackageVersionData {
   commit?: string;
 }
 
-type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
@@ -357,19 +511,25 @@ export interface ReleaseWarnings {
   unverifiedCore?: boolean;
 }
 
+export interface SpecialPermission {
+  name: string; // "Short description",
+  details: string; // "Long description of the capabilitites"
+}
+
 export interface PackageRelease {
   name: string;
-  version: string;
+  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
+  semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
   manifestFile: DistributedFile;
   imageFile: DistributedFile;
-  avatarFile: DistributedFile | null;
+  avatarFile?: DistributedFile;
   // Data for release processing
   metadata: PackageReleaseMetadata;
   compose: Compose;
   // Aditional
   warnings: ReleaseWarnings;
-  origin: string | null;
+  origin?: string;
   isCore: boolean;
 }
 
@@ -381,6 +541,8 @@ export interface InstallPackageData extends PackageRelease {
   manifestPath: string;
   // Data to write
   compose: Compose;
+  // User settings to be applied after running
+  fileUploads?: { [containerPath: string]: string };
 }
 
 export interface PackageReleaseMetadata {
@@ -416,6 +578,9 @@ export interface PackageReleaseMetadata {
     featuredColor?: string;
     featuredAvatarFilter?: string;
   };
+  setupSchema?: SetupSchema;
+  setupUiJson?: SetupUiJson;
+  setupTarget?: SetupTarget;
   author?: string;
   contributors?: string[];
   categories?: string[];
@@ -458,15 +623,29 @@ export interface PackageReleaseImageData {
 
 /**
  * RPC methods
+ * - Generic inteface with metadata types
+ * - `WithResult` to type the return value
+ * - `Generic` for higher order functions
+ * [NOTE]: All are wrapped in a promise before exporting
  */
 
-export interface RpcHandlerReturn {
+interface RpcHandlerReturnInterface {
   message: string;
-  result?: any;
   logMessage?: boolean;
   userAction?: boolean;
-  privateKwargs?: boolean;
 }
+interface RpcHandlerReturnWithResultInterface<R>
+  extends RpcHandlerReturnInterface {
+  result: R;
+}
+interface RpcHandlerReturnGenericInterface extends RpcHandlerReturnInterface {
+  result?: any;
+}
+export type RpcHandlerReturn = Promise<RpcHandlerReturnInterface>;
+export type RpcHandlerReturnWithResult<R> = Promise<
+  RpcHandlerReturnWithResultInterface<R>
+>;
+export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
 
 /**
  * HTTP Response

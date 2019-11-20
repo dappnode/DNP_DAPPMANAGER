@@ -65,15 +65,16 @@ export const mockDnp: PackageContainer = {
   shortName: "mock-shortname",
   state: "running",
   running: true,
-  origin: "",
-  chain: "",
-  dependencies: {},
   envs: {},
   ports: [],
   volumes: [],
   defaultEnvironment: {},
   defaultPorts: [],
-  defaultVolumes: []
+  defaultVolumes: [],
+  dependencies: {},
+  origin: "",
+  chain: "",
+  avatarUrl: ""
 };
 
 export const mockManifest: Manifest = {
@@ -209,14 +210,14 @@ export const mockCompose: Compose = {
 
 export const mockRelease: PackageRelease = {
   name: mockDnpName,
-  version: mockDnpVersion,
+  reqVersion: mockDnpVersion,
+  semVersion: mockDnpVersion,
   manifestFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   metadata: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
-  origin: null,
   isCore: false
 };
 

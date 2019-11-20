@@ -1,5 +1,3 @@
-import downloadManifest from "./downloadManifest";
-import downloadCompose from "./downloadCompose";
 import * as ipfs from "../../ipfs";
 import {
   Manifest,
@@ -7,9 +5,36 @@ import {
   ManifestWithImage,
   ComposeUnsafe
 } from "../../../types";
-import { validateManifestWithImageData } from "../validate";
+import { mapValues } from "lodash";
+import { validateManifestWithImage } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose } from "../parsers";
+import {
+  downloadManifest,
+  downloadCompose,
+  downloadSetupSchema,
+  downloadSetupTarget,
+  downloadSetupUiJson,
+  downloadDisclaimer
+} from "./downloadAssets";
+
+const source: "ipfs" = "ipfs";
+
+const releaseFilesRegex = {
+  manifest: /dappnode_package.*\.json$/,
+  image: /\.tar\.xz$/,
+  compose: /compose.*\.yml$/,
+  avatar: /avatar.*\.png$/,
+  setupSchema: /setup\..*\.json$/,
+  setupTarget: /setup-target\..*json$/,
+  setupUiJson: /setup-ui\..*json$/,
+  disclaimer: /disclaimer\.md$/i
+};
+
+const releaseFileIs = mapValues(
+  releaseFilesRegex,
+  fileRegex => ({ name }: { name: string }): boolean => fileRegex.test(name)
+);
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -17,7 +42,7 @@ import { manifestToCompose } from "../parsers";
  * or inspect the package metadata
  * - The download of image and avatar should be handled externally with other "pure"
  *   functions, without this method becoming a factory
- * - The download methods should be communicated of enought information to
+ * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
 export default async function downloadRelease(
@@ -25,68 +50,67 @@ export default async function downloadRelease(
 ): Promise<{
   manifestFile: DistributedFile;
   imageFile: DistributedFile;
-  avatarFile: DistributedFile | null;
+  avatarFile?: DistributedFile;
   composeUnsafe: ComposeUnsafe;
   manifest: Manifest;
 }> {
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   try {
-    const manifest: Manifest = await downloadManifest(hash);
-    const manifestWithImage: ManifestWithImage = manifest as ManifestWithImage;
-
-    /**
-     * Release type-manifest
-     * - Expect the manifest to contain image data and hashes
-     */
-    const validation = validateManifestWithImageData(manifestWithImage);
-    if (!validation.success)
-      throw Error(`Invalid ${hash} image ${hash}: ${validation.message}`);
-
+    const manifest = await downloadManifest(hash);
+    // Make sure manifest.image.hash exists. Otherwise, will throw
+    const manifestWithImage = validateManifestWithImage(
+      manifest as ManifestWithImage
+    );
     const { image, avatar } = manifestWithImage;
     return {
-      manifestFile: { hash: hash, source: "ipfs", size: 0 },
-      imageFile: { hash: image.hash, source: "ipfs", size: image.size },
-      avatarFile: avatar ? { hash: avatar, source: "ipfs", size: 0 } : null,
+      manifestFile: getFileFromHash(hash),
+      imageFile: getFileFromHash(image.hash, image.size),
+      avatarFile: avatar ? getFileFromHash(avatar) : undefined,
       manifest,
       composeUnsafe: manifestToCompose(manifestWithImage)
     };
   } catch (e) {
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
-      const avatarEntry = files.find(file => file.name.endsWith(".png"));
-      const manifestEntry = files.find(file => file.name.endsWith(".json"));
-      const imageEntry = files.find(file => file.name.endsWith(".tar.xz"));
-      const composeEntry = files.find(file => file.name.endsWith(".yml"));
+      const manifestEntry = files.find(releaseFileIs.manifest);
+      const imageEntry = files.find(releaseFileIs.image);
+      const composeEntry = files.find(releaseFileIs.compose);
+      const avatarEntry = files.find(releaseFileIs.avatar);
+      const setupSchemaEntry = files.find(releaseFileIs.setupSchema);
+      const setupTargetEntry = files.find(releaseFileIs.setupTarget);
+      const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
+      const disclaimerEntry = files.find(releaseFileIs.disclaimer);
 
       if (!manifestEntry) throw Error("Release must contain a manifest");
       if (!imageEntry) throw Error("Release must contain an image");
+      if (!composeEntry) throw Error("Release must contain a docker compose");
 
-      const manifest: Manifest = await downloadManifest(manifestEntry.hash);
-      const manifestWithImage: ManifestWithImage = manifest as ManifestWithImage;
+      const [
+        manifest,
+        composeUnsafe,
+        setupSchema,
+        setupTarget,
+        setupUiJson,
+        disclaimer
+      ] = await Promise.all([
+        downloadManifest(manifestEntry.hash),
+        downloadCompose(composeEntry.hash),
+        setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
+        setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
+        setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
+        disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash)
+      ]);
 
-      /**
-       * Release type-directory
-       * - Expect the manifest to contain only metadata
-       * - The validation is done in the `downloadManifest` function
-       */
-
-      let composeUnsafe: ComposeUnsafe;
-      if (composeEntry) {
-        composeUnsafe = await downloadCompose(composeEntry.hash);
-      } else if (manifestWithImage.image) {
-        // This type casting is OK since the image field is certain to exist
-        composeUnsafe = manifestToCompose(manifestWithImage);
-      } else {
-        throw Error(
-          `Release should provide either a docker-compose or a manifest.image field`
-        );
-      }
+      if (setupSchema) manifest.setupSchema = setupSchema;
+      if (setupTarget) manifest.setupTarget = setupTarget;
+      if (setupUiJson) manifest.setupUiJson = setupUiJson;
+      if (disclaimer) manifest.disclaimer = { message: disclaimer };
 
       return {
         manifestFile: getFileFromEntry(manifestEntry),
         imageFile: getFileFromEntry(imageEntry),
-        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : null,
+        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : undefined,
         manifest,
         composeUnsafe
       };
@@ -96,6 +120,12 @@ export default async function downloadRelease(
   }
 }
 
+// Helpers
+
+function getFileFromHash(hash: string, size?: number): DistributedFile {
+  return { hash, size: size || 0, source };
+}
+
 function getFileFromEntry({
   hash,
   size
@@ -103,5 +133,7 @@ function getFileFromEntry({
   hash: string;
   size: number;
 }): DistributedFile {
-  return { hash, size, source: "ipfs" };
+  return { hash, size, source };
 }
+
+// File finder helpers
