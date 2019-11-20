@@ -5,6 +5,7 @@ import { listContainer } from "./listContainers";
 import { dockerComposeUp } from "./dockerCommands";
 
 export const restartId = "restart.dnp.dappnode.eth";
+const dappmanagerName = "dappmanager.dnp.dappnode.eth";
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it
@@ -20,7 +21,7 @@ export const restartId = "restart.dnp.dappnode.eth";
 
 export default async function restartPatch(imageName = ""): Promise<void> {
   if (!imageName.includes(":")) {
-    const dnp = await listContainer(imageName);
+    const dnp = await listContainer(dappmanagerName);
     imageName = dnp.image;
   }
 

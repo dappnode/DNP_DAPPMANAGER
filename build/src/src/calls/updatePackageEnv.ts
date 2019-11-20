@@ -17,7 +17,7 @@ export default async function updatePackageEnv({
 }: {
   id: string;
   envs: PackageEnvs;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
   if (!envs) throw Error("kwarg envs must be defined");
 

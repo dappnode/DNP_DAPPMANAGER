@@ -4,58 +4,18 @@ import getRelease from "../modules/release/getRelease";
 import { listContainers } from "../modules/docker/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
-import { Manifest, ManifestUpdateAlert, RpcHandlerReturn } from "../types";
-
-interface RpcFetchCoreUpdateDataReturn extends RpcHandlerReturn {
-  result: {
-    available: boolean;
-    type: string | null;
-    packages: {
-      name: string;
-      from: string;
-      to: string;
-      warningOnInstall: string;
-      manifest: Manifest;
-    }[];
-    changelog: string;
-    updateAlerts: ManifestUpdateAlert[];
-    versionId: string;
-  };
-}
+import { RpcHandlerReturnWithResult } from "../types";
+import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 
 const coreName = "core.dnp.dappnode.eth";
 const defaultVersion = "*";
 
 /**
  * Fetches the core update data, if available
- *
- * @returns {object} result = {
- *   available: true {bool},
- *   type: "minor",
- *   packages: [
- *     {
- *       name: "core.dnp.dappnode.eth",
- *       from: "0.2.5",
- *       to: "0.2.6",
- *       manifest: {}
- *     },
- *     {
- *       name: "admin.dnp.dappnode.eth",
- *       from: "0.2.2",
- *       to: "0.2.3",
- *       manifest: {}
- *     }
- *   ],
- *   changelog: "Changelog text",
- *   updateAlerts: [{ message: "Specific update alert"}, ... ],
- *   versionId: "admin@0.2.6,core@0.2.8"
- * }
  */
 export default async function fetchCoreUpdateData({
   version
-}: {
-  version?: string;
-}): Promise<RpcFetchCoreUpdateDataReturn> {
+}: RequestData): RpcHandlerReturnWithResult<ReturnData> {
   /**
    * Resolve core.dnp.dappnode.eth to figure out if it should be installed
    * With the list of deps to install, compute the higher updateType
@@ -81,13 +41,12 @@ export default async function fetchCoreUpdateData({
       const { metadata: depManifest } = await getRelease(depName, depVersion);
       return {
         name: depName,
-        from: dnp ? dnp.version : "",
+        from: dnp ? dnp.version : undefined,
         to: depManifest.version,
         warningOnInstall:
           depManifest.warnings && depManifest.warnings.onInstall
             ? depManifest.warnings.onInstall
-            : "",
-        manifest: depManifest
+            : undefined
       };
     })
   );
@@ -106,7 +65,7 @@ export default async function fetchCoreUpdateData({
     ? "minor"
     : updateTypes.includes("patch")
     ? "patch"
-    : null;
+    : undefined;
 
   const { metadata: coreManifest } = await getRelease(
     coreName,

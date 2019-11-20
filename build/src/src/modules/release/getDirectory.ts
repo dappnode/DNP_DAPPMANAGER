@@ -3,6 +3,7 @@ import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
 import * as directoryContract from "../../contracts/directory";
 import web3 from "../web3Setup";
 import Logs from "../../logs";
+import { notUndefined } from "../../utils/typingHelpers";
 const logs = Logs(module);
 
 // Contract parameters
@@ -14,18 +15,7 @@ const DAppNodePackageStatus: DirectoryDnpStatus[] = [
 
 /**
  * Fetches all package names in the custom dappnode directory.
- *
- * @returns {array} An array of objects:
- *  [
- *    {
- *      name: packageName,   {string}
- *      status: 1            {number}
- *      statusName: "Active" {string}
- *      position: 2000,      {number}
- *      directoryId: 3       {number}
- *    },
- *    ...
- *  ]
+ * [NOTE]: Already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
  */
 export default async function getDirectory(): Promise<DirectoryDnp[]> {
   const directory = new web3.eth.Contract(
@@ -47,7 +37,7 @@ export default async function getDirectory(): Promise<DirectoryDnp[]> {
    * 4. Remove duplicate indexes
    * 5. Base64 to decimal index
    */
-  const featuredIndexes = featuredBytes
+  const featuredIndexes: number[] = featuredBytes
     .replace("0x", "")
     .match(/.{1,2}/g)
     .filter((value: string) => value !== "00")
@@ -62,8 +52,7 @@ export default async function getDirectory(): Promise<DirectoryDnp[]> {
     directoryIds.push(i);
   }
 
-  const packages: DirectoryDnp[] = [];
-  await Promise.all(
+  const packages = await Promise.all(
     directoryIds.map(async i => {
       try {
         const {
@@ -76,10 +65,11 @@ export default async function getDirectory(): Promise<DirectoryDnp[]> {
         const position = parseInt(positionBn);
 
         // Make sure the DNP is not Deprecated or Deleted
+
         if (!isEnsDomain(name) || status === 0) return;
 
         const featuredIndex = featuredIndexes.indexOf(i);
-        const pkg: DirectoryDnp = {
+        return {
           name,
           status,
           statusName: DAppNodePackageStatus[status],
@@ -87,14 +77,29 @@ export default async function getDirectory(): Promise<DirectoryDnp[]> {
           directoryId: i,
           isFeatured: featuredIndex > -1,
           featuredIndex: featuredIndex
-        };
-
-        packages.push(pkg);
+        } as DirectoryDnp;
       } catch (e) {
         logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
       }
     })
   );
 
-  return packages;
+  return sortDirectoryItems(packages.filter(notUndefined));
+}
+
+/**
+ * Sorts a directory with the following order
+ * - featured #0
+ * - featured #1
+ * - normal #0
+ * - normal #1
+ * - normal #2
+ */
+export function sortDirectoryItems(dnps: DirectoryDnp[]): DirectoryDnp[] {
+  const featured = dnps.filter(dnp => dnp.isFeatured);
+  const notFeatured = dnps.filter(dnp => !dnp.isFeatured);
+  return [
+    ...featured.sort((a, b) => a.featuredIndex - b.featuredIndex),
+    ...notFeatured.sort((a, b) => b.position - a.position)
+  ];
 }

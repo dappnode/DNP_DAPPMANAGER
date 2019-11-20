@@ -2,7 +2,6 @@ import EventEmitter from "events";
 import Logs from "./logs";
 import {
   ChainData,
-  DirectoryDnp,
   PackageContainer,
   ProgressLog,
   UserActionLog,
@@ -94,7 +93,6 @@ type PackageModifiedType = { id: string; removed?: boolean };
 export const packageModified = busFactory<PackageModifiedType>(
   "PACKAGE_MODIFIED"
 );
-export const directory = busFactory<DirectoryDnp[]>("DIRECTORY");
 export const packages = busFactory<PackageContainer[]>("PACKAGES");
 export const logUi = busFactory<ProgressLog>("LOGUI");
 export const logUserAction = busFactory<UserActionLog>("LOG_USER_ACTION");

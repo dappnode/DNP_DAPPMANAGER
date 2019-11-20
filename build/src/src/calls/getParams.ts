@@ -1,17 +1,15 @@
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 import * as db from "../db";
 
-interface RpcGetParamsReturn extends RpcHandlerReturn {
-  result: {
-    ip: string; // "85.84.83.82",
-    name: string; // "My-DAppNode",
-    staticIp: string; // "85.84.83.82" | null,
-    domain: string; // "1234acbd.dyndns.io",
-    upnpAvailable: boolean;
-    noNatLoopback: boolean;
-    alertToOpenPorts: boolean;
-    internalIp: string; // "192.168.0.1",
-  };
+interface ReturnData {
+  ip: string; // "85.84.83.82",
+  name: string; // "My-DAppNode",
+  staticIp: string; // "85.84.83.82" | null,
+  domain: string; // "1234acbd.dyndns.io",
+  upnpAvailable: boolean;
+  noNatLoopback: boolean;
+  alertToOpenPorts: boolean;
+  internalIp: string; // "192.168.0.1",
 }
 
 /**
@@ -28,7 +26,9 @@ interface RpcGetParamsReturn extends RpcHandlerReturn {
  *   internalIp: 192.168.0.1,
  * }
  */
-export default async function getParams(): Promise<RpcGetParamsReturn> {
+export default async function getParams(): RpcHandlerReturnWithResult<
+  ReturnData
+> {
   return {
     message: "Got params",
     result: {

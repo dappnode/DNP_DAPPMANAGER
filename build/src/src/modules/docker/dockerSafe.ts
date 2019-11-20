@@ -1,4 +1,4 @@
-import { dockerComposeUp } from "./dockerCommands";
+import { dockerComposeUp, DockerComposeUpOptions } from "./dockerCommands";
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import lockPorts from "../lockPorts";
@@ -17,10 +17,11 @@ import { readComposeObj } from "../../utils/dockerComposeFile";
 // ERROR: Encountered errors while bringing up the project.
 
 export async function dockerComposeUpSafe(
-  dockerComposePath: string
+  dockerComposePath: string,
+  options?: DockerComposeUpOptions
 ): Promise<void> {
   try {
-    await dockerComposeUp(dockerComposePath);
+    await dockerComposeUp(dockerComposePath, options);
   } catch (e) {
     /**
      * These port two modules use docker. If they are imported above,
@@ -46,7 +47,7 @@ export async function dockerComposeUpSafe(
       const id = Object.keys(dc.services)[0];
 
       // Up the package and lock the ports again
-      await dockerComposeUp(dockerComposePath);
+      await dockerComposeUp(dockerComposePath, options);
       const newPortMappings = await lockPorts(id);
       if (newPortMappings && newPortMappings.length) {
         // Trigger a natRenewal update to open ports if necessary

@@ -22,7 +22,7 @@ export default async function notificationsTest({
   notification
 }: {
   notification?: PackageNotification;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!notification) {
     notification = {
       id: String(Math.random()).slice(2),

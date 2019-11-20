@@ -1,6 +1,6 @@
 import ipfs from "../ipfsSetup";
 import params from "../../../params";
-import { timeoutError, IpfsArgument } from "../data";
+import { timeoutError } from "../data";
 import Logs from "../../../logs";
 const logs = Logs(module);
 
@@ -23,7 +23,9 @@ interface IpfsLsFileResult {
  */
 export default function cat({
   hash
-}: IpfsArgument): Promise<IpfsLsFileResult[]> {
+}: {
+  hash: string;
+}): Promise<IpfsLsFileResult[]> {
   return new Promise(
     (resolve, reject): void => {
       // Timeout cancel mechanism

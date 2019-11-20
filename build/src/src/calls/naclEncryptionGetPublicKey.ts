@@ -1,10 +1,7 @@
-
 import * as db from "../db";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 
-interface RpcGetNaclPublicKey extends RpcHandlerReturn {
-  result: string;
-}
+type ReturnData = string;
 
 /**
  * Returns the public key of nacl's asymmetric encryption,
@@ -13,8 +10,8 @@ interface RpcGetNaclPublicKey extends RpcHandlerReturn {
  *
  * @param {string} publicKey
  */
-export default async function naclEncryptionGetPublicKey(): Promise<
-  RpcGetNaclPublicKey
+export default async function naclEncryptionGetPublicKey(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   const dappmanagerNaclPublicKey = db.naclPublicKey.get();
 

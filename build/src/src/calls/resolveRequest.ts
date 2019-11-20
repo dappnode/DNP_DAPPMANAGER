@@ -1,12 +1,10 @@
 import dappGet from "../modules/dappGet";
-import { PackageRequest, RpcHandlerReturn } from "../types";
+import { PackageRequest, RpcHandlerReturnWithResult } from "../types";
 import { DappGetState } from "../modules/dappGet/types";
 
-interface RpcResolveRequestReturn extends RpcHandlerReturn {
-  result: {
-    state: DappGetState;
-    alreadyUpdated: DappGetState;
-  };
+interface ReturnData {
+  state: DappGetState;
+  alreadyUpdated: DappGetState;
 }
 
 /**
@@ -29,7 +27,7 @@ export default async function resolveRequest({
 }: {
   req: PackageRequest;
   options?: { BYPASS_RESOLVER?: boolean };
-}): Promise<RpcResolveRequestReturn> {
+}): RpcHandlerReturnWithResult<ReturnData> {
   if (!req) throw Error("kwarg req must be defined");
 
   /**

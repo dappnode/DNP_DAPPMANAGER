@@ -58,7 +58,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "8a382e9a3b8ac449388470d06b98486b4fc965980fc5b72fd1c1cc77ae070484",
@@ -87,17 +90,13 @@ describe("listContainers", function() {
         volumes: [
           {
             host: "/root/certs",
-            container: "/etc/nginx/certs",
-            path: "/etc/nginx/certs",
-            type: "bind"
+            container: "/etc/nginx/certs"
           },
           {
             host: "",
             container: "/etc/nginx/dhparam",
             name:
               "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
-            path: "/etc/nginx/dhparam",
-            type: "volume",
             users: ["nginx-proxy.dnp.dappnode.eth"],
             owner: "nginx-proxy.dnp.dappnode.eth",
             isOwner: true
@@ -107,8 +106,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
             name: "nginxproxydnpdappnodeeth_vhost.d",
-            path: "/etc/nginx/vhost.d",
-            type: "volume",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -118,16 +115,12 @@ describe("listContainers", function() {
           },
           {
             host: "/var/run/docker.sock",
-            container: "/tmp/docker.sock",
-            path: "/tmp/docker.sock",
-            type: "bind"
+            container: "/tmp/docker.sock"
           },
           {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
             name: "nginxproxydnpdappnodeeth_html",
-            path: "/usr/share/nginx/html",
-            type: "volume",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -141,7 +134,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "951426e3fa2cbfd49a5198840764383af3961c2b29ba33a6b5f3dd45b953db9f",
@@ -160,8 +156,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/app/.ethchain",
             name: "dncore_ethchaindnpdappnodeeth_data",
-            path: "/app/.ethchain",
-            type: "volume",
             users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
             owner: "ethchain.dnp.dappnode.eth",
             isOwner: false
@@ -172,7 +166,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
@@ -188,9 +185,7 @@ describe("listContainers", function() {
         volumes: [
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock",
-            path: "/var/run/docker.sock",
-            type: "bind"
+            container: "/var/run/docker.sock"
           }
         ],
         state: "exited",
@@ -198,7 +193,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
@@ -229,8 +227,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/usr/www/openvpn/cred",
             name: "dncore_vpndnpdappnodeeth_shared",
-            path: "/usr/www/openvpn/cred",
-            type: "volume",
             users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: false
@@ -241,7 +237,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
@@ -267,53 +266,39 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
             container: "/etc/openvpn",
             name: "dncore_vpndnpdappnodeeth_config",
-            path: "/etc/openvpn",
-            type: "volume",
             users: ["vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
           },
           {
             host: "/etc/hostname",
-            container: "/etc/vpnname",
-            path: "/etc/vpnname",
-            type: "bind"
+            container: "/etc/vpnname"
           },
           {
             host: "/lib/modules",
-            container: "/lib/modules",
-            path: "/lib/modules",
-            type: "bind"
+            container: "/lib/modules"
           },
           {
             host: "/usr/src/dappnode/config",
-            container: "/usr/src/app/config",
-            path: "/usr/src/app/config",
-            type: "bind"
+            container: "/usr/src/app/config"
           },
           {
             host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
             container: "/usr/src/app/secrets",
             name: "dncore_vpndnpdappnodeeth_data",
-            path: "/usr/src/app/secrets",
-            type: "volume",
             users: ["vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock",
-            path: "/var/run/docker.sock",
-            type: "bind"
+            container: "/var/run/docker.sock"
           },
           {
             host:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/var/spool/openvpn",
             name: "dncore_vpndnpdappnodeeth_shared",
-            path: "/var/spool/openvpn",
-            type: "volume",
             users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
             owner: "vpn.dnp.dappnode.eth",
             isOwner: true
@@ -324,7 +309,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
@@ -340,26 +328,20 @@ describe("listContainers", function() {
         volumes: [
           {
             host: "/usr/src/dappnode/DNCORE",
-            container: "/usr/src/app/DNCORE",
-            path: "/usr/src/app/DNCORE",
-            type: "bind"
+            container: "/usr/src/app/DNCORE"
           },
           {
             host:
               "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
             container: "/usr/src/app/dnp_repo",
             name: "dncore_dappmanagerdnpdappnodeeth_data",
-            path: "/usr/src/app/dnp_repo",
-            type: "volume",
             users: ["dappmanager.dnp.dappnode.eth"],
             owner: "dappmanager.dnp.dappnode.eth",
             isOwner: true
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock",
-            path: "/var/run/docker.sock",
-            type: "bind"
+            container: "/var/run/docker.sock"
           }
         ],
         state: "running",
@@ -367,7 +349,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
@@ -392,8 +377,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
             container: "/etc/bind",
             name: "dncore_binddnpdappnodeeth_data",
-            path: "/etc/bind",
-            type: "volume",
             users: ["bind.dnp.dappnode.eth"],
             owner: "bind.dnp.dappnode.eth",
             isOwner: true
@@ -404,7 +387,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "e1766fd7a9d8110398b66c7b0f68fe625ee856f49526b987a54537028448476b",
@@ -442,8 +428,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/root/.local/share/io.parity.ethereum",
             name: "dncore_ethchaindnpdappnodeeth_data",
-            path: "/root/.local/share/io.parity.ethereum",
-            type: "volume",
             users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
             owner: "ethchain.dnp.dappnode.eth",
             isOwner: true
@@ -454,7 +438,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
@@ -501,8 +488,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
             container: "/data/ipfs",
             name: "dncore_ipfsdnpdappnodeeth_data",
-            path: "/data/ipfs",
-            type: "volume",
             users: ["ipfs.dnp.dappnode.eth"],
             owner: "ipfs.dnp.dappnode.eth",
             isOwner: true
@@ -512,8 +497,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
             container: "/export",
             name: "dncore_ipfsdnpdappnodeeth_export",
-            path: "/export",
-            type: "volume",
             users: ["ipfs.dnp.dappnode.eth"],
             owner: "ipfs.dnp.dappnode.eth",
             isOwner: true
@@ -524,7 +507,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
@@ -543,7 +529,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
@@ -574,8 +563,6 @@ describe("listContainers", function() {
             host: "/var/lib/docker/volumes/swarmdnpdappnodeeth_swarm/_data",
             container: "/root/.ethereum",
             name: "swarmdnpdappnodeeth_swarm",
-            path: "/root/.ethereum",
-            type: "volume",
             users: ["swarm.dnp.dappnode.eth"],
             owner: "swarm.dnp.dappnode.eth",
             isOwner: true
@@ -586,7 +573,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
@@ -602,17 +592,13 @@ describe("listContainers", function() {
         volumes: [
           {
             host: "/root/certs",
-            container: "/etc/nginx/certs",
-            path: "/etc/nginx/certs",
-            type: "bind"
+            container: "/etc/nginx/certs"
           },
           {
             host:
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
             name: "nginxproxydnpdappnodeeth_vhost.d",
-            path: "/etc/nginx/vhost.d",
-            type: "volume",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -624,8 +610,6 @@ describe("listContainers", function() {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
             name: "nginxproxydnpdappnodeeth_html",
-            path: "/usr/share/nginx/html",
-            type: "volume",
             users: [
               "nginx-proxy.dnp.dappnode.eth",
               "letsencrypt-nginx.dnp.dappnode.eth"
@@ -635,9 +619,7 @@ describe("listContainers", function() {
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock",
-            path: "/var/run/docker.sock",
-            type: "bind"
+            container: "/var/run/docker.sock"
           }
         ],
         state: "running",
@@ -647,7 +629,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "c944a1549ba675b7229b55370cfd2f54dca1f86050fbef7df4ba453398f93c24",
@@ -666,8 +651,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
             container: "/usr/src/app/data",
             name: "ipfsreplicatordnpdappnodeeth_pin-data",
-            path: "/usr/src/app/data",
-            type: "volume",
             users: ["ipfs-replicator.dnp.dappnode.eth"],
             owner: "ipfs-replicator.dnp.dappnode.eth",
             isOwner: true
@@ -676,10 +659,12 @@ describe("listContainers", function() {
         state: "running",
         running: true,
         dependencies: {},
-        origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "ffc3f4ed380ad42b7f847228862ad4de4ab471229bb5e1ed0aef46d4561309d2",
@@ -717,8 +702,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
             container: "/goerli",
             name: "goerligethdnpdappnodeeth_goerli",
-            path: "/goerli",
-            type: "volume",
             users: ["goerli-geth.dnp.dappnode.eth"],
             owner: "goerli-geth.dnp.dappnode.eth",
             isOwner: true
@@ -727,10 +710,12 @@ describe("listContainers", function() {
         state: "running",
         running: true,
         dependencies: {},
-        chain: "ethereum",
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "ethereum",
+        avatarUrl: ""
       },
       {
         id: "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
@@ -766,8 +751,6 @@ describe("listContainers", function() {
               "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
             container: "/root/.lnd",
             name: "lndnpdappnodeeth_lndconfig_data",
-            path: "/root/.lnd",
-            type: "volume",
             users: ["ln.dnp.dappnode.eth"],
             owner: "ln.dnp.dappnode.eth",
             isOwner: true
@@ -780,7 +763,10 @@ describe("listContainers", function() {
         },
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       },
       {
         id: "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
@@ -810,7 +796,10 @@ describe("listContainers", function() {
         dependencies: {},
         defaultEnvironment: {},
         defaultPorts: [],
-        defaultVolumes: []
+        defaultVolumes: [],
+        origin: undefined,
+        chain: "",
+        avatarUrl: ""
       }
     ];
 

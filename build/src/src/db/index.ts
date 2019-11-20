@@ -17,6 +17,7 @@ import {
   alertToOpenPorts,
   internalIp
 } from "./network";
+import { packageIsInstalling } from "./isInstalling";
 import { naclSecretKey, naclPublicKey, identityAddress } from "./secrets";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";
@@ -68,6 +69,7 @@ export {
   naclSecretKey,
   naclPublicKey,
   identityAddress,
+  packageIsInstalling,
   // Aditional low levels methods
   lowLevelMainDb,
   lowLevelCacheDb,

@@ -13,7 +13,7 @@ export default async function setStaticIp({
   staticIp
 }: {
   staticIp: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   const oldStaticIp = db.staticIp.get();
   db.staticIp.set(staticIp);
 

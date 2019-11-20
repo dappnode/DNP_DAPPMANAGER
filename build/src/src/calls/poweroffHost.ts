@@ -7,7 +7,7 @@ const baseCommand = `docker run --rm -v /run/dbus/system_bus_socket:/run/dbus/sy
 /**
  * Shuts down the host machine via the DBus socket
  */
-export default async function poweroffHost(): Promise<RpcHandlerReturn> {
+export default async function poweroffHost(): RpcHandlerReturn {
   const image = await getDappmanagerImage();
   await shell(
     `${baseCommand} ${image} sh -c "dbus-send --system --print-reply \

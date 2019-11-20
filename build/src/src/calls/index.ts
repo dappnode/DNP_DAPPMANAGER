@@ -15,7 +15,7 @@ import copyFileTo from "./copyFileTo";
 import diagnose from "./diagnose";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
-import fetchPackageData from "./fetchPackageData";
+import fetchDnpRequest from "./fetchDnpRequest";
 import getParams from "./getParams";
 import getStats from "./getStats";
 import getUserActionLogs from "./getUserActionLogs";
@@ -57,7 +57,7 @@ export {
   diagnose,
   fetchCoreUpdateData,
   fetchDirectory,
-  fetchPackageData,
+  fetchDnpRequest,
   getParams,
   getStats,
   getUserActionLogs,

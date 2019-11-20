@@ -51,7 +51,7 @@ export interface StateInternalInterface {
 }
 
 export interface DappGetState {
-  [dnpName: string]: string;
+  [dnpName: string]: string; // version
 }
 
 export interface DappGetErrors {
@@ -62,4 +62,5 @@ export interface DappGetResult {
   message: string;
   state: DappGetState;
   alreadyUpdated: DappGetState;
+  currentVersion: DappGetState;
 }

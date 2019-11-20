@@ -29,6 +29,8 @@ export async function verifyDockerImage({
   if (images.length !== 1)
     throw Error("image tarball must contain strictly one image");
   const imageTag = images[0].RepoTags[0];
-  if (imageTag !== `${name}:${version}`)
+  const expectedTag = `${name}:${version}`;
+  if (imageTag !== expectedTag) {
     throw Error(`Wrong image tag ${imageTag}`);
+  }
 }

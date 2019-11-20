@@ -15,7 +15,7 @@ export default async function restartPackage({
   id
 }: {
   id: string;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id);

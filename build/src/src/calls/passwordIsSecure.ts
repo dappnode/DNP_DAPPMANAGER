@@ -1,11 +1,9 @@
 import { isPasswordSecure } from "../modules/passwordManager";
-import { RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
+
+type ReturnData = boolean;
 
 let isSecureCache = false;
-
-interface RpcPasswordIsSecureReturn extends RpcHandlerReturn {
-  result: boolean;
-}
 
 /**
  * Checks if the user `dappnode`'s password in the host machine
@@ -20,8 +18,8 @@ interface RpcPasswordIsSecureReturn extends RpcHandlerReturn {
  *
  * @returns {bool} true = is secure / false = is not
  */
-export default async function passwordIsSecure(): Promise<
-  RpcPasswordIsSecureReturn
+export default async function passwordIsSecure(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   if (!isSecureCache) isSecureCache = await isPasswordSecure();
 

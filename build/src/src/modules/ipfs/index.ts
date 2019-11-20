@@ -1,7 +1,7 @@
 import * as ipfsParams from "./ipfsParams";
 import { runWithRetry } from "../../utils/asyncFlows";
 import { isIpfsHash } from "../../utils/validate";
-import { timeoutError, IpfsArgument } from "./data";
+import { timeoutError } from "./data";
 
 // Methods
 import catRaw from "./methods/cat";
@@ -35,7 +35,7 @@ async function isAvailable(hash: string): Promise<void> {
  * is itself wrapped in a retry async flow.
  */
 
-function wrapMethodWithIsAvailableAndRetry<A extends IpfsArgument, R>(
+function wrapMethodWithIsAvailableAndRetry<A extends { hash: string }, R>(
   method: (kwargs: A) => Promise<R>
 ): (kwargs: A) => Promise<R> {
   const isAvailableRetry = runWithRetry(isAvailable, params);

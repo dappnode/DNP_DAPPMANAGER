@@ -1,5 +1,7 @@
 import * as eventBus from "../eventBus";
 import { ProgressLog } from "../types";
+import Logs from "../logs";
+const logs = Logs(module);
 
 /**
  * Some remote procedure calls (RPC) need a continuous update.
@@ -16,6 +18,11 @@ import { ProgressLog } from "../types";
  * message = "Downloading 75%"
  */
 export function logUi(progressLog: ProgressLog): void {
+  const { id, name, message } = progressLog;
+  // Log them internally. But skip download progress logs, too spam-y
+  const logDebug = `Progress log: ${id} - ${name}: ${message}`;
+  if (!logDebug.includes("%")) logs.info(logDebug);
+
   eventBus.logUi.emit(progressLog);
 }
 

@@ -26,7 +26,7 @@ export default async function removePackage({
   id: string;
   deleteVolumes?: boolean;
   timeout?: number;
-}): Promise<RpcHandlerReturn> {
+}): RpcHandlerReturn {
   if (!id) throw Error("kwarg id must be defined");
 
   const { name, isCore, packageName: containerName } = await listContainer(id);
@@ -45,8 +45,9 @@ export default async function removePackage({
    */
 
   // Call restartPackageVolumes to safely delete dependant volumes
-  if (deleteVolumes) await restartPackageVolumes({ id, doNotRestart: true });
-  else {
+  if (deleteVolumes) {
+    await restartPackageVolumes({ id, doNotRestart: true });
+  } else {
     /**
      * If there is no docker-compose, do a docker rm directly
      * Otherwise, try to do a docker-compose down and if it fails,

@@ -1,35 +1,20 @@
+import { ReturnData } from "../route-types/fetchDirectory";
 import getDirectory from "../modules/release/getDirectory";
-import * as eventBus from "../eventBus";
 import getRelease from "../modules/release/getRelease";
-import getAvatar from "../modules/release/getAvatar";
 import isSyncing from "../utils/isSyncing";
-import { isIpfsHash } from "../utils/validate";
-import { DirectoryDnp, RpcHandlerReturn } from "../types";
+import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";
-import { getLegacyManifestFromRelease } from "./fetchPackageData";
+import { listContainers } from "../modules/docker/listContainers";
+import { notUndefined } from "../utils/typingHelpers";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
+import { fileToGatewayUrl } from "../utils/distributedFile";
 const logs = Logs(module);
-
-interface RpcFetchDirectoryReturn extends RpcHandlerReturn {
-  result: DirectoryDnp[];
-}
-
-let dnpsCache: DirectoryDnp[] = [];
-const avatarCache: { [avatarHash: string]: string } = {};
 
 /**
  * Fetches all package names in the custom dappnode directory.
- * This feature helps the UI to load the directory data faster.
- *
- * @returns {array} A formated success message.
- * result: packages = [{
- *   name: "bitcoin.dnp.dappnode.eth", {string}
- *   status: "preparing", {string}
- *   manifest: <manifest object>, {object}
- *   avatar: <base64 image>, {string}
- * }, ... ]
  */
-export default async function fetchDirectory(): Promise<
-  RpcFetchDirectoryReturn
+export default async function fetchDirectory(): RpcHandlerReturnWithResult<
+  ReturnData
 > {
   if (Boolean(await isSyncing())) {
     return {
@@ -39,110 +24,80 @@ export default async function fetchDirectory(): Promise<
     };
   }
 
-  // Emit the cached DNPs right away
-  if (Array.isArray(dnpsCache) && dnpsCache.length) {
-    eventBus.directory.emit(dnpsCache);
-  }
+  const dnpList = await listContainers();
 
-  /**
-   * List of available packages in the directory
-   * @param {array} dnpsFromDirectory = [{
-   *   name: "bitcoin.dnp.dappnode.eth", {string}
-   *   status: "preparing", {string}
-   * }, ... ]
-   */
-  const dnpsFromDirectory = await getDirectory();
+  // const directoryItemsUnordered: DirectoryItem[] = [];
 
-  // Extend package object contents
-  const dnpsCacheTemp: (DirectoryDnp | undefined)[] = await Promise.all(
-    dnpsFromDirectory.map(async pkg => {
-      const name = pkg.name;
+  const directoryDnps = (await Promise.all(
+    // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
+    (await getDirectory()).map(async ({ name, isFeatured }) => {
       try {
         // Now resolve the last version of the package
         const release = await getRelease(name);
-        const legacyManifest = getLegacyManifestFromRelease(release);
-        emitPkg({ ...pkg, name, manifest: legacyManifest });
+        const { metadata, avatarFile } = release;
 
-        // Fetch the package avatar
-        const avatarFile = release.avatarFile;
-        let avatar;
-        if (avatarFile && isIpfsHash(avatarFile.hash)) {
-          const avatarHash = avatarFile.hash;
-          try {
-            // Retrieve cached avatar or fetch it
-            if (avatarCache[avatarHash]) {
-              avatar = avatarCache[avatarHash];
-            } else {
-              avatar = await getAvatar(avatarHash);
-              avatarCache[avatarHash] = avatar;
-            }
-            emitPkg({ ...pkg, name, avatar });
-          } catch (e) {
-            // If the avatar can not be fetched don't stop the function
-            logs.error(
-              `Error fetching avatar of ${name} at ${avatarHash}: ${e.message}`
-            );
-          }
-        }
-
-        // Merge results and return
         return {
-          ...pkg,
           name,
-          // Appended
-          manifest: legacyManifest,
-          avatar
-        };
+          description: getShortDescription(metadata),
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          isInstalled: getIsInstalled(release, dnpList),
+          isUpdated: getIsUpdated(release, dnpList),
+          whitelisted: true,
+          isFeatured,
+          featuredStyle: metadata.style,
+          categories: metadata.categories || getFallBackCategories(name) || []
+        } as DirectoryItem;
       } catch (e) {
         logs.error(`Error fetching ${name} release: ${e.message}`);
       }
     })
-  );
+  )).filter(notUndefined);
 
-  // Make sure the order is correct
-  dnpsCache = [];
-  for (const dnp of dnpsCacheTemp) if (dnp) dnpsCache.push(dnp);
-
-  const payloadSize = Math.floor(
-    Buffer.byteLength(JSON.stringify(dnpsCache), "utf8") / 1000
-  );
   return {
-    message: `Listed directory: ${dnpsCache.length} DNPs, ${payloadSize} KB`,
-    result: dnpsCache,
+    message: `Listed directory of ${directoryDnps.length} DNPs`,
+    result: directoryDnps,
     logMessage: true
   };
 }
 
-// Utils / Cache managment
+// Helpers
 
 /**
- * Emits a DNP object to the UI for a progressive update response.
- * The first argument of `emitDirectory` must be an array of DNP objects
- *
- * - Emit the dnp only if the cache has changed. Prevent too much UI re-renders
- * @param {object} dnp
+ * Get a short description and trim it
  */
-function emitPkg(dnp: DirectoryDnp): void {
-  const dnpCache = dnpsCache.find(({ name }) => name === dnp.name);
-  if (!dnpCache || isCacheInvalid(dnpCache, dnp))
-    eventBus.directory.emit([dnp]);
+function getShortDescription(metadata: {
+  description?: string;
+  shortDescription?: string;
+}): string {
+  const desc =
+    metadata.shortDescription || metadata.description || "No description";
+  // Don't send big descriptions, the UI crops them anyway
+  return desc.slice(0, 80);
 }
 
-function isCacheInvalid(dnpCache: DirectoryDnp, dnpNew: DirectoryDnp): boolean {
-  const manifestNew = dnpNew ? dnpNew.manifest : null;
-  const versionNew = manifestNew ? manifestNew.version : null;
-  const versionCache =
-    dnpCache && dnpCache.manifest ? dnpCache.manifest.version : null;
-  const avatarNew = dnpNew ? dnpNew.avatar : null;
-  const avatarCache = dnpCache ? dnpCache.avatar : null;
-  /**
-   * Only two elements can change, the manifest and the avatar
-   * - Since these DNPs are fetched from an APM, there will never be two
-   *   different manifest for the same version
-   * - The avatar is a raw string, so it can be compared with a simple equality
-   */
-  if (manifestNew && !versionNew) return true;
-  if (manifestNew && versionNew !== versionCache) return true;
-  if (avatarNew && avatarNew !== avatarCache) return true;
-  return false;
+const fallbackCategories: { [dnpName: string]: string[] } = {
+  "kovan.dnp.dappnode.eth": ["Developer tools"],
+  "artis-sigma1.public.dappnode.eth": ["Blockchain"],
+  "monero.dnp.dappnode.eth": ["Blockchain"],
+  "vipnode.dnp.dappnode.eth": ["Economic incentive"],
+  "ropsten.dnp.dappnode.eth": ["Developer tools"],
+  "rinkeby.dnp.dappnode.eth": ["Developer tools"],
+  "lightning-network.dnp.dappnode.eth": [
+    "Payment channels",
+    "Economic incentive"
+  ],
+  "swarm.dnp.dappnode.eth": ["Storage", "Communications"],
+  "goerli-geth.dnp.dappnode.eth": ["Developer tools"],
+  "bitcoin.dnp.dappnode.eth": ["Blockchain"],
+  "raiden-testnet.dnp.dappnode.eth": ["Developer tools"],
+  "raiden.dnp.dappnode.eth": ["Payment channels"]
+};
+
+/**
+ * For known packages that are not yet updated, used this for nicer UX
+ * until all of them are updated
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
+ */
+function getFallBackCategories(dnpName: string): string[] {
+  return fallbackCategories[dnpName];
 }

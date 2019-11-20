@@ -5,30 +5,12 @@ import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
 import {
-  AutoUpdateSettings,
-  AutoUpdateRegistry,
-  AutoUpdatePending,
-  AutoUpdateFeedback,
-  RpcHandlerReturn
+  RpcHandlerReturnWithResult,
+  AutoUpdateDataView,
+  AutoUpdateDataDnpView
 } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
-
-interface DnpsToShowInterface {
-  id: string;
-  displayName: string;
-  enabled: boolean;
-  feedback: AutoUpdateFeedback;
-}
-
-interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
-  result: {
-    settings: AutoUpdateSettings;
-    registry: AutoUpdateRegistry;
-    pending: AutoUpdatePending;
-    dnpsToShow: DnpsToShowInterface[];
-  };
-}
 
 /**
  * Returns a auto-update data:
@@ -66,8 +48,8 @@ interface RpcAutoUpdateDataGetReturn extends RpcHandlerReturn {
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet(): Promise<
-  RpcAutoUpdateDataGetReturn
+export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
+  AutoUpdateDataView
 > {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
@@ -75,7 +57,7 @@ export default async function autoUpdateDataGet(): Promise<
 
   const dnpList = await listContainers();
 
-  const dnpsToShow: DnpsToShowInterface[] = [
+  const dnpsToShow: AutoUpdateDataDnpView[] = [
     {
       id: SYSTEM_PACKAGES,
       displayName: "System packages",

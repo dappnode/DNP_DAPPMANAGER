@@ -1,4 +1,4 @@
-import resolveReleaseName from "./resolveReleaseName";
+import resolveReleaseName from "./parsers/resolveReleaseName";
 import downloadRelease from "./ipfs/downloadRelease";
 import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";
@@ -46,8 +46,9 @@ export default async function getRelease(
     throw Error("DNP's name doesn't match the manifest's name");
 
   const release = {
-    name,
-    version: manifest.version,
+    name: manifest.name,
+    reqVersion: origin || manifest.version,
+    semVersion: manifest.version,
     origin,
     isCore: getIsCore(manifest),
     manifestFile,
@@ -60,5 +61,5 @@ export default async function getRelease(
   return {
     ...release,
     warnings: getReleaseWarnings(release)
-  }
+  };
 }
