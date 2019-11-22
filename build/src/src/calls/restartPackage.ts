@@ -32,6 +32,7 @@ export default async function restartPackage({
 
     // Emit packages update
     eventBus.requestPackages.emit();
+    eventBus.packagesModified.emit({ ids: [id] });
   }
 
   return {

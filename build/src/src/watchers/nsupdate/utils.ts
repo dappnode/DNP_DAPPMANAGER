@@ -36,14 +36,17 @@ interface DnpToUpdate {
  * show
  * send
  */
-function getNsupdateTxt(domains: DomainIp[], zone: string): string {
+function getNsupdateTxt(
+  domains: DomainIp[],
+  zone: string,
+  removeOnly: boolean
+): string {
   const nsupdateInstructions = domains
-    .map(({ domain, ip }) =>
-      `
-update delete ${domain} A
-update add ${domain} ${TTL} A ${ip}
-`.trim()
-    )
+    .map(({ domain, ip }) => {
+      const rm = `update delete ${domain} A`;
+      const add = `update add ${domain} ${TTL} A ${ip}`;
+      return removeOnly ? rm : [rm, add].join("\n");
+    })
     .join("\n");
 
   return `
@@ -94,20 +97,38 @@ export function getDotDappnodeDomain(name: string): string {
 /**
  * Returns an array of nsupdate.txt files ready for nsupdate
  * If no update must happen, it returns an empty array
+ *
+ * @param dnpList Abstract this call for testability
+ * @param ids Only updates this DNP names
+ * @param removeOnly Only remove the record
  */
-export function getNsupdateTxts(dnpList: PackageContainer[]): string[] {
+export function getNsupdateTxts({
+  dnpList,
+  ids,
+  removeOnly = false
+}: {
+  dnpList: PackageContainer[];
+  ids?: string[];
+  removeOnly?: boolean;
+}): string[] {
   const dnpsToUpdate: DnpToUpdate[] = [];
-  for (const dnp of dnpList) {
-    if (dnp.isDnp && !dnp.isCore && dnp.ip)
+  // `dnp.ip` = Necessary to satisfy the typscript compiler
+  for (const dnp of dnpList)
+    if (
+      dnp.ip &&
+      dnp.isDnp &&
+      !dnp.isCore &&
+      (!ids || !ids.length || ids.includes(dnp.name))
+    )
       dnpsToUpdate.push({ name: dnp.name, ip: dnp.ip });
-  }
 
   if (!dnpsToUpdate.length) return [];
 
   return Object.entries(zones).map(([zone, getDomain]) =>
     getNsupdateTxt(
       dnpsToUpdate.map(({ name, ip }) => ({ domain: getDomain(name), ip })),
-      zone
+      zone,
+      removeOnly
     )
   );
 }

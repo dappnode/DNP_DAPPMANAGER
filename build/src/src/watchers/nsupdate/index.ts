@@ -3,17 +3,22 @@ import params from "../../params";
 import execNsupdate from "./execNsupdate";
 import { listContainers } from "../../modules/docker/listContainers";
 // Utils
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import { getNsupdateTxts } from "./utils";
 import Logs from "../../logs";
 const logs = Logs(module);
 
 const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
 
-async function runNsupdate() {
+async function runNsupdate({
+  ids,
+  removeOnly
+}: {
+  ids?: string[];
+  removeOnly?: boolean;
+}) {
   try {
     const dnpList = await listContainers();
-    const nsupdateTxts = getNsupdateTxts(dnpList);
+    const nsupdateTxts = getNsupdateTxts({ dnpList, ids, removeOnly });
     for (const nsupdateTxt of nsupdateTxts) {
       await execNsupdate(nsupdateTxt);
     }
@@ -22,26 +27,18 @@ async function runNsupdate() {
   }
 }
 
-/**
- * runOnlyOneSequentially makes sure that nsupdate is not run twice
- * in parallel. Also, if multiple requests to run nsupdate, they will
- * be ignored and run only once more after the previous nsupdate is
- * completed.
- */
-
-const throttledNsupdate = runOnlyOneSequentially(runNsupdate);
-
 // First call
-throttledNsupdate();
+runNsupdate({});
 
 // Every interval
 setInterval(() => {
-  throttledNsupdate();
+  runNsupdate({});
 }, nsupdateInterval);
 
 // React immediatelly to new installs
-eventBus.packageModified.on(() => {
-  throttledNsupdate();
+eventBus.packagesModified.on(({ ids, removed }) => {
+  if (removed) runNsupdate({ ids, removeOnly: true });
+  else runNsupdate({ ids });
 });
 
-export default throttledNsupdate;
+export {};

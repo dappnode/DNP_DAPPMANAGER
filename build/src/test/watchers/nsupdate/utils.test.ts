@@ -40,20 +40,23 @@ describe("watcher > nsupdate", () => {
   });
 
   describe("getNsupdateTxts", () => {
+    const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
+    const moneroDnpName = "monero.dnp.dappnode.eth";
+    const dnpList = [
+      {
+        ...mockDnp,
+        name: bitcoinDnpName,
+        ip: "172.33.0.2"
+      },
+      {
+        ...mockDnp,
+        name: moneroDnpName,
+        ip: "172.33.0.3"
+      }
+    ];
+
     it("Should get nsupdate.txt contents for a normal case", () => {
-      const dnpList = [
-        {
-          ...mockDnp,
-          name: "bitcoin.dnp.dappnode.eth",
-          ip: "172.33.0.2"
-        },
-        {
-          ...mockDnp,
-          name: "monero.dnp.dappnode.eth",
-          ip: "172.33.0.3"
-        }
-      ];
-      const nsupdateTxts = getNsupdateTxts(dnpList);
+      const nsupdateTxts = getNsupdateTxts({ dnpList });
       expect(nsupdateTxts).to.deep.equal([
         `
 server 172.33.1.2
@@ -74,6 +77,83 @@ update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete monero.dappnode A
 update add monero.dappnode 60 A 172.33.0.3
+show
+send
+`.trim()
+      ]);
+    });
+
+    it("Should get nsupdate.txt contents for remove only", () => {
+      const nsupdateTxts = getNsupdateTxts({ dnpList, removeOnly: true });
+      expect(nsupdateTxts).to.deep.equal([
+        `
+server 172.33.1.2
+debug yes
+zone eth.
+update delete my.bitcoin.dnp.dappnode.eth A
+update delete my.monero.dnp.dappnode.eth A
+show
+send
+`.trim(),
+        `
+server 172.33.1.2
+debug yes
+zone dappnode.
+update delete bitcoin.dappnode A
+update delete monero.dappnode A
+show
+send
+`.trim()
+      ]);
+    });
+
+    it("Should get nsupdate.txt contents for installing bitcoin", () => {
+      const nsupdateTxts = getNsupdateTxts({
+        dnpList,
+        ids: [bitcoinDnpName]
+      });
+      expect(nsupdateTxts).to.deep.equal([
+        `
+server 172.33.1.2
+debug yes
+zone eth.
+update delete my.bitcoin.dnp.dappnode.eth A
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
+show
+send
+`.trim(),
+        `
+server 172.33.1.2
+debug yes
+zone dappnode.
+update delete bitcoin.dappnode A
+update add bitcoin.dappnode 60 A 172.33.0.2
+show
+send
+`.trim()
+      ]);
+    });
+
+    it("Should get nsupdate.txt contents for a removing bitcoin", () => {
+      const nsupdateTxts = getNsupdateTxts({
+        dnpList,
+        ids: [bitcoinDnpName],
+        removeOnly: true
+      });
+      expect(nsupdateTxts).to.deep.equal([
+        `
+server 172.33.1.2
+debug yes
+zone eth.
+update delete my.bitcoin.dnp.dappnode.eth A
+show
+send
+`.trim(),
+        `
+server 172.33.1.2
+debug yes
+zone dappnode.
+update delete bitcoin.dappnode A
 show
 send
 `.trim()

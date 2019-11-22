@@ -9,7 +9,7 @@ import rewiremock from "rewiremock";
 // Imports for typings
 import removePackageType from "../../src/calls/removePackage";
 import { PackageContainer } from "../../src/types";
-import { mockDnp } from "../testUtils";
+import { mockDnp, cleanTestDir } from "../testUtils";
 
 describe("Call function: removePackage", function() {
   const testDir = "test_files/";
@@ -37,7 +37,7 @@ describe("Call function: removePackage", function() {
 
   const eventBus = {
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
-    packageModified: { emit: sinon.stub(), on: sinon.stub() }
+    packagesModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
   let removePackage: typeof removePackageType;
@@ -81,18 +81,14 @@ describe("Call function: removePackage", function() {
 
   it("should request to emit packages to refresh the UI", async () => {
     sinon.assert.calledOnce(eventBus.requestPackages.emit);
-    sinon.assert.calledOnce(eventBus.packageModified.emit);
-    expect(eventBus.packageModified.emit.firstCall.lastArg).to.deep.equal({
-      id,
+    sinon.assert.calledOnce(eventBus.packagesModified.emit);
+    expect(eventBus.packagesModified.emit.firstCall.lastArg).to.deep.equal({
+      ids: [id],
       removed: true
     });
   });
 
   after(async () => {
-    try {
-      await shell(`rm -rf ${testDir}`);
-    } catch (e) {
-      //
-    }
+    await cleanTestDir();
   });
 });

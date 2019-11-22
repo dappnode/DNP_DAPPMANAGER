@@ -17,13 +17,56 @@ const logs = Logs(module);
  */
 export default async function restartPackageVolumes({
   id,
+  volumeId
+}: {
+  id: string;
+  volumeId?: string;
+}): RpcHandlerReturn {
+  const { removedVols, removedDnps } = await restartPackageVolumesTask({
+    id,
+    volumeId
+  });
+
+  // If there are no volumes don't do anything
+  if (!removedVols.length)
+    return {
+      message: `${id} has no named volumes`,
+      logMessage: true,
+      userAction: true
+    };
+
+  // Emit packages update
+  eventBus.requestPackages.emit();
+  eventBus.packagesModified.emit({ ids: removedDnps });
+
+  return {
+    message: `Restarted ${id} volumes: ${removedVols.join(" ")}`,
+    logMessage: true,
+    userAction: true
+  };
+}
+
+/**
+ * Abstract the task itself to be used by `removePackage`
+ */
+
+/**
+ * Removes a package volumes. The re-ups the package
+ *
+ * @param {string} id DNP .eth name
+ */
+export async function restartPackageVolumesTask({
+  id,
   doNotRestart,
   volumeId
 }: {
   id: string;
   doNotRestart?: boolean;
   volumeId?: string;
-}): RpcHandlerReturn {
+}): Promise<{
+  removedDnps: string[];
+  removedVols: string[];
+}> {
   if (!id) throw Error("kwarg id must be defined");
 
   // Needs the extended info that includes the volume ownership data
@@ -51,15 +94,11 @@ export default async function restartPackageVolumes({
   // If there are no volumes don't do anything
   if (!namedOwnedVolumes.length)
     if (volumeId) throw Error(`Volume ${volumeId} of ${id} not found`);
-    else
-      return {
-        message: `${id} has no named volumes`,
-        logMessage: true,
-        userAction: true
-      };
+    else return { removedDnps: [], removedVols: [] };
 
   // Destructure result and append the current requested DNP (id)
-  const volumeNames = namedOwnedVolumes.map(vol => vol.name);
+  const volumeNames: string[] = []; // To satisfy typescript compiler
+  for (const vol of namedOwnedVolumes) if (vol.name) volumeNames.push(vol.name);
   const dnpsToRemove = namedOwnedVolumes
     .reduce((dnps: string[], vol) => uniq([...dnps, ...(vol.users || [])]), [])
     /**
@@ -124,12 +163,8 @@ export default async function restartPackageVolumes({
   // In case of error: FIRST up the dnp, THEN throw the error
   if (err) throw err;
 
-  // Emit packages update
-  eventBus.requestPackages.emit();
-
   return {
-    message: `Restarted ${id} volumes: ${volumeNames.join(" ")}`,
-    logMessage: true,
-    userAction: true
+    removedDnps: dnpsToRemove,
+    removedVols: volumeNames
   };
 }
