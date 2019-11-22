@@ -25,9 +25,6 @@ export default function execNsupdate(nsupdateTxt: string): Promise<string> {
     if (!child.stdin)
       return reject(Error("Process has no stdin stream available"));
 
-    if (child.stdout) child.stdout.pipe(process.stdout);
-    if (child.stderr) child.stderr.pipe(process.stderr);
-
     child.stdin.write(nsupdateTxt);
     child.stdin.end(); // this call seems necessary, at least with plain node.js executable
   });

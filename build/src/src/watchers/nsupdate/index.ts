@@ -8,6 +8,7 @@ import Logs from "../../logs";
 const logs = Logs(module);
 
 const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
+let firstRun = true;
 
 async function runNsupdate({
   ids,
@@ -21,6 +22,13 @@ async function runNsupdate({
     const nsupdateTxts = getNsupdateTxts({ dnpList, ids, removeOnly });
     for (const nsupdateTxt of nsupdateTxts) {
       await execNsupdate(nsupdateTxt);
+    }
+    if (ids) {
+      if (removeOnly) logs.info(`nsupdate delete for ${ids.join(", ")}`);
+      else logs.info(`nsupdate add for ${ids.join(", ")}`);
+    } else if (firstRun) {
+      logs.info(`Successful initial nsupdate call for all DNPs`);
+      firstRun = false;
     }
   } catch (e) {
     logs.error(`Error on nsupdate interval: ${e.stack}`);
