@@ -104,7 +104,7 @@ setTimeout(() => {
   checkChainWatchers();
 }, checkChainWatcherInterval);
 
-eventBus.packageModified.on(() => {
+eventBus.packagesModified.on(() => {
   checkChainWatchers();
 });
 

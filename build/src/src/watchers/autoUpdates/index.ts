@@ -49,9 +49,9 @@ async function autoUpdates(): Promise<void> {
 
 autoUpdates();
 
-eventBus.packageModified.on(data => {
-  if (data && data.removed) clearPendingUpdates(data.id);
-  if (data && data.id) clearRegistry(data.id);
+eventBus.packagesModified.on(({ ids, removed }) => {
+  if (removed) ids.forEach(clearPendingUpdates);
+  ids.forEach(clearRegistry);
 });
 
 /**

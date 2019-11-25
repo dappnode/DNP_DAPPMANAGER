@@ -22,6 +22,7 @@ import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
+const networkName = params.DNP_NETWORK_EXTERNAL_NAME;
 
 /**
  * Returns the list of containers
@@ -144,6 +145,13 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     version = version.replace("ipfs-", "/ipfs/");
   }
 
+  const ip =
+    container.NetworkSettings &&
+    container.NetworkSettings.Networks &&
+    container.NetworkSettings.Networks[networkName]
+      ? container.NetworkSettings.Networks[networkName].IPAddress
+      : undefined;
+
   // Process dappnode.dnp tags
   //   dappnode.dnp.dependencies
   //   dappnode.dnp.origin
@@ -176,6 +184,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     image: container.Image,
     name: name,
     shortName: shortName(name),
+    ip,
     ports: container.Ports.map(({ PrivatePort, PublicPort, Type }) => ({
       // "PublicPort" will be undefined / null / 0 if the port is not mapped
       ...(PublicPort ? { host: PublicPort } : {}),

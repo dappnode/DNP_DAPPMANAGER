@@ -306,7 +306,9 @@ export default async function installPackage({
 
     // Emit packages update
     eventBus.requestPackages.emit();
-    eventBus.packageModified.emit({ id });
+    eventBus.packagesModified.emit({
+      ids: packagesData.map(({ name }) => name)
+    });
 
     // Flag packages as no longer installing
     flagPackagesAreNotInstalling(state);
