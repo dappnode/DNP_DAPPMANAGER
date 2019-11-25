@@ -118,10 +118,14 @@ export default async function initializeDb(): Promise<void> {
   // on Wifi connections, only if the internal IP !== public IP
   // MUST be run after key generation `dyndns.generateKeys()`
   // > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
-  const domain = db.domain.get();
-  if (internalIp !== publicIp && internalIp && domain) {
-    await shell(`update_local_dyndns ${domain} ${internalIp}`);
-    logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
+  try {
+    const domain = db.domain.get();
+    if (internalIp !== publicIp && internalIp && domain) {
+      await shell(`update_local_dyndns ${domain} ${internalIp}`);
+      logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
+    }
+  } catch (e) {
+    logs.error(`Error on update local dyndns: ${e.stack}`)
   }
 
   // Set global ENVs from the DB values in this syntax for consistency
