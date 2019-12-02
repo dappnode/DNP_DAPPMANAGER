@@ -1,11 +1,14 @@
+import { ReturnData } from "../route-types/listPackages";
 import * as eventBus from "../eventBus";
+import * as db from "../db";
 // Modules
 import { listContainers } from "../modules/docker/listContainers";
 import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
+import { omit } from "lodash";
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import Logs from "../logs";
-import { PackageContainer, RpcHandlerReturnWithResult } from "../types";
+import { RpcHandlerReturnWithResult } from "../types";
 import { readConfigFiles } from "../utils/configFiles";
 const logs = Logs(module);
 
@@ -13,8 +16,6 @@ const logs = Logs(module);
 //   Error response from daemon: a disk usage operation is already running
 // Prevent running it twice
 let isDockerSystemDfCallRunning = false;
-
-type ReturnData = PackageContainer[];
 
 /**
  * Returns the list of current containers associated to packages
@@ -28,8 +29,12 @@ export default async function listPackages(): RpcHandlerReturnWithResult<
   dnpList.map(dnp => {
     try {
       const { manifest, environment } = readConfigFiles(dnp);
-      dnp.manifest = manifest;
+      dnp.manifest = omit(manifest, ["gettingStarted"]);
       dnp.envs = environment;
+      dnp.gettingStarted = manifest.gettingStarted;
+      dnp.gettingStartedShow = Boolean(
+        db.packageGettingStartedShow.get(dnp.name)
+      );
     } catch (e) {
       logs.warn(`Error appending ${dnp.name} files: ${e.stack || e.message}`);
     }

@@ -1,27 +1,20 @@
-import {
-  autoUpdatePending,
-  autoUpdateRegistry,
-  autoUpdateSettings,
-  AUTO_UPDATE_SETTINGS
-} from "./autoUpdateSettings";
-import { composeCache, apmCache, ipfsCache, manifestCache } from "./cache";
-import { fileTransferPath } from "./fileTransferPath";
-import { notification, notifications } from "./notification";
-import { upnpAvailable, upnpPortMappings, portsToOpen } from "./upnp";
-import { importedInstallationStaticIp, isVpnDbMigrated } from "./systemFlags";
-import { publicIp, domain, dyndnsIdentity, staticIp } from "./dyndns";
-import { serverName } from "./system";
-import {
-  noNatLoopback,
-  doubleNat,
-  alertToOpenPorts,
-  internalIp
-} from "./network";
-import { packageIsInstalling } from "./isInstalling";
-import { naclSecretKey, naclPublicKey, identityAddress } from "./secrets";
+export * from "./autoUpdateSettings";
+export * from "./cache";
+export * from "./dyndns";
+export * from "./fileTransferPath";
+export * from "./isInstalling";
+export * from "./network";
+export * from "./notification";
+export * from "./package";
+export * from "./secrets";
+export * from "./system";
+export * from "./systemFlags";
+export * from "./upnp";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";
 import { lowLevel as lowLevelCacheDb } from "./dbCache";
+// For migrate
+import { AUTO_UPDATE_SETTINGS } from "./autoUpdateSettings";
 
 /**
  * Migrate keys to the new DB
@@ -42,34 +35,6 @@ function migrateToNewMainDb(): void {
 const clearCache = lowLevelCacheDb.clearDb;
 
 export {
-  autoUpdatePending,
-  autoUpdateRegistry,
-  autoUpdateSettings,
-  composeCache,
-  apmCache,
-  ipfsCache,
-  manifestCache,
-  fileTransferPath,
-  notification,
-  notifications,
-  upnpAvailable,
-  upnpPortMappings,
-  portsToOpen,
-  publicIp,
-  domain,
-  dyndnsIdentity,
-  staticIp,
-  importedInstallationStaticIp,
-  isVpnDbMigrated,
-  serverName,
-  noNatLoopback,
-  doubleNat,
-  alertToOpenPorts,
-  internalIp,
-  naclSecretKey,
-  naclPublicKey,
-  identityAddress,
-  packageIsInstalling,
   // Aditional low levels methods
   lowLevelMainDb,
   lowLevelCacheDb,
