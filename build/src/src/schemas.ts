@@ -85,6 +85,7 @@ export const directoryDnpsSchema = {
   items: {
     type: "object",
     properties: {
+      status: { type: "string" },
       name: { type: "string" },
       description: { type: "string" },
       avatarUrl: { type: "string" },
@@ -95,19 +96,12 @@ export const directoryDnpsSchema = {
       featuredStyle: { type: "object" },
       categories: { type: "array", items: { type: "string" } }
     },
-    required: [
-      "name",
-      "description",
-      "isInstalled",
-      "isUpdated",
-      "whitelisted",
-      "isFeatured",
-      "categories"
-    ]
+    required: ["status", "name"]
   }
 };
 
 export const directoryDnpSample: DirectoryItem = {
+  status: "ok",
   name: "name",
   description: "desc",
   avatarUrl: "http://",

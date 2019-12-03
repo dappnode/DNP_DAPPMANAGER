@@ -23,14 +23,18 @@ import { SetupSchema, SetupUiJson } from "./types-own";
  * [NOTE] Search result will never show up in the directory listing,
  * they will appear in a future dropdown under the searchbar
  */
-export interface DirectoryItem {
+// Information immediatelly available in the directory smart contract
+interface DirectoryItemBasic {
   name: string;
+  whitelisted: boolean;
+  isFeatured: boolean;
+}
+export interface DirectoryItemOk extends DirectoryItemBasic {
+  status: "ok";
   description: string; // = metadata.shortDescription || metadata.description
   avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
   isInstalled: boolean; // Show "UPDATE"
   isUpdated: boolean; // Show "UPDATED"
-  whitelisted: boolean;
-  isFeatured: boolean;
   featuredStyle?: {
     featuredBackground?: string;
     featuredColor?: string;
@@ -38,6 +42,18 @@ export interface DirectoryItem {
   };
   categories: string[];
 }
+export interface DirectoryItemLoading extends DirectoryItemBasic {
+  status: "loading";
+  message?: string;
+}
+export interface DirectoryItemError extends DirectoryItemBasic {
+  status: "error";
+  message: string;
+}
+export type DirectoryItem =
+  | DirectoryItemOk
+  | DirectoryItemLoading
+  | DirectoryItemError;
 
 export interface RequestStatus {
   loading?: boolean;
