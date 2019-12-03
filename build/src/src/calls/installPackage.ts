@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as eventBus from "../eventBus";
+import * as db from "../db";
 // Modules
 import dappGet from "../modules/dappGet";
 import getImage, { verifyDockerImage } from "../modules/release/getImage";
@@ -283,6 +284,7 @@ export default async function installPackage({
       logUi({ id, name, message: "Writing files..." });
 
       writeManifest(manifestPath, metadata);
+      db.addPackageInstalledMetadata(name);
     }
 
     /**

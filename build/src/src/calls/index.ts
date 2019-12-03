@@ -29,6 +29,7 @@ import naclEncryptionGetPublicKey from "./naclEncryptionGetPublicKey";
 import notificationsGet from "./notificationsGet";
 import notificationsRemove from "./notificationsRemove";
 import notificationsTest from "./notificationsTest";
+import packageGettingStartedToggle from "./packageGettingStartedToggle";
 import passwordChange from "./passwordChange";
 import passwordIsSecure from "./passwordIsSecure";
 import poweroffHost from "./poweroffHost";
@@ -71,6 +72,7 @@ export {
   notificationsGet,
   notificationsRemove,
   notificationsTest,
+  packageGettingStartedToggle,
   passwordChange,
   passwordIsSecure,
   poweroffHost,

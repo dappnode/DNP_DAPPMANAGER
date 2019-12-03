@@ -41,7 +41,13 @@ export const downloadSetupUiJson = downloadAssetFactory<SetupUiJson>({
 export const downloadDisclaimer = downloadAssetFactory<string>({
   parse: content => content,
   validate: disclaimer => disclaimer,
-  maxLength: 100e3 // Limit size to ~10KB
+  maxLength: 10e3 // Limit size to ~10KB
+});
+
+export const downloadGetStarted = downloadAssetFactory<string>({
+  parse: content => content,
+  validate: gettingStarted => gettingStarted,
+  maxLength: 10e3 // Limit size to ~10KB
 });
 
 /**

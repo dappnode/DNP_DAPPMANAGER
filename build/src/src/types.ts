@@ -215,6 +215,9 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: string;
+  // ### TODO: Move to a different type "InstalledDnpDetail"
+  gettingStarted?: string;
+  gettingStartedShow?: boolean;
 }
 
 export interface PackageEnvs {
@@ -574,6 +577,7 @@ export interface PackageReleaseMetadata {
   disclaimer?: {
     message: string;
   };
+  gettingStarted?: string;
   style?: {
     featuredBackground?: string;
     featuredColor?: string;
