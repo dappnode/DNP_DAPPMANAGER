@@ -4,7 +4,6 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import shell from "../../src/utils/shell";
 import rewiremock from "rewiremock";
 // Imports for typings
 import removePackageType from "../../src/calls/removePackage";
@@ -12,8 +11,6 @@ import { PackageContainer } from "../../src/types";
 import { mockDnp, cleanTestDir } from "../testUtils";
 
 describe("Call function: removePackage", function() {
-  const testDir = "test_files/";
-
   const id = "test.dnp.dappnode.eth";
   const dockerComposePath = getPath.dockerCompose(id, false);
   const dockerComposeTemplate = `

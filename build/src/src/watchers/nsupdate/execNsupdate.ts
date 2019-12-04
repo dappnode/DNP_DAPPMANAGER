@@ -16,16 +16,18 @@ import { exec } from "child_process";
  * send
  */
 export default function execNsupdate(nsupdateTxt: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const child = exec("nsupdate -v", (error, stdout, stderr) => {
-      if (error) reject(error);
-      else resolve(stdout || stderr);
-    });
+  return new Promise(
+    (resolve, reject): void => {
+      const child = exec("nsupdate -v", (error, stdout, stderr) => {
+        if (error) reject(error);
+        else resolve(stdout || stderr);
+      });
 
-    if (!child.stdin)
-      return reject(Error("Process has no stdin stream available"));
+      if (!child.stdin)
+        return reject(Error("Process has no stdin stream available"));
 
-    child.stdin.write(nsupdateTxt);
-    child.stdin.end(); // this call seems necessary, at least with plain node.js executable
-  });
+      child.stdin.write(nsupdateTxt);
+      child.stdin.end(); // this call seems necessary, at least with plain node.js executable
+    }
+  );
 }

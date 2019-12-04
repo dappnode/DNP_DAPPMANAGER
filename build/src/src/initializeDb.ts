@@ -215,9 +215,9 @@ async function migrateVpnDb(): Promise<void> {
  * MUST be run after key generation `dyndns.generateKeys()`
  * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
  */
-async function updateLocalDyndns() {
+async function updateLocalDyndns(): Promise<void> {
   try {
-    async function updateLocalDyndnsCall() {
+    async function updateLocalDyndnsCall(): Promise<void> {
       const domain = db.domain.get();
       const publicIp = db.publicIp.get();
       const internalIp = db.internalIp.get();

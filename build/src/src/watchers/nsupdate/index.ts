@@ -16,7 +16,7 @@ async function runNsupdate({
 }: {
   ids?: string[];
   removeOnly?: boolean;
-}) {
+}): Promise<void> {
   try {
     const dnpList = await listContainers();
     const nsupdateTxts = getNsupdateTxts({ dnpList, ids, removeOnly });
