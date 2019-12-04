@@ -9,7 +9,7 @@ import getExternalUpnpIp from "./modules/upnpc/getExternalIp";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls";
 import params from "./params";
 import ping from "./utils/ping";
-import { pause } from "./utils/asyncFlows";
+import { pause, runWithRetry } from "./utils/asyncFlows";
 import shell from "./utils/shell";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
@@ -117,12 +117,8 @@ export default async function initializeDb(): Promise<void> {
   // Set the domain of this DAppNode to point to the internal IP for better UX
   // on Wifi connections, only if the internal IP !== public IP
   // MUST be run after key generation `dyndns.generateKeys()`
-  // > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
-  const domain = db.domain.get();
-  if (internalIp !== publicIp && internalIp && domain) {
-    await shell(`update_local_dyndns ${domain} ${internalIp}`);
-    logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
-  }
+  // NOTE: Runs as a forked process with retry and a try / catch block
+  updateLocalDyndns();
 
   // Set global ENVs from the DB values in this syntax for consistency
   globalEnvsFile.setEnvs({
@@ -210,6 +206,35 @@ async function migrateVpnDb(): Promise<void> {
     } else {
       logs.error(`Error importing VPN DB: ${e.stack}`);
     }
+  }
+}
+
+/**
+ * Set the domain of this DAppNode to point to the internal IP for better UX
+ * on Wifi connections, only if the internal IP !== public IP
+ * MUST be run after key generation `dyndns.generateKeys()`
+ * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
+ */
+async function updateLocalDyndns(): Promise<void> {
+  try {
+    async function updateLocalDyndnsCall(): Promise<void> {
+      const domain = db.domain.get();
+      const publicIp = db.publicIp.get();
+      const internalIp = db.internalIp.get();
+      if (internalIp !== publicIp && internalIp && domain) {
+        try {
+          await shell(`update_local_dyndns ${domain} ${internalIp}`);
+          logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
+        } catch (e) {
+          // Log the error in each attempt for transparency / debugging
+          logs.warn(`Error on updateLocalDyndns attempt: ${e.message}`);
+          throw e;
+        }
+      }
+    }
+    await runWithRetry(updateLocalDyndnsCall, { times: 5, base: 1000 })(null);
+  } catch (e) {
+    logs.error(`Error on update local dyndns: ${e.stack}`);
   }
 }
 

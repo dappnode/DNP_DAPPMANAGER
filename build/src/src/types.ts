@@ -23,14 +23,18 @@ import { SetupSchema, SetupUiJson } from "./types-own";
  * [NOTE] Search result will never show up in the directory listing,
  * they will appear in a future dropdown under the searchbar
  */
-export interface DirectoryItem {
+// Information immediatelly available in the directory smart contract
+interface DirectoryItemBasic {
   name: string;
+  whitelisted: boolean;
+  isFeatured: boolean;
+}
+export interface DirectoryItemOk extends DirectoryItemBasic {
+  status: "ok";
   description: string; // = metadata.shortDescription || metadata.description
   avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
   isInstalled: boolean; // Show "UPDATE"
   isUpdated: boolean; // Show "UPDATED"
-  whitelisted: boolean;
-  isFeatured: boolean;
   featuredStyle?: {
     featuredBackground?: string;
     featuredColor?: string;
@@ -38,6 +42,18 @@ export interface DirectoryItem {
   };
   categories: string[];
 }
+export interface DirectoryItemLoading extends DirectoryItemBasic {
+  status: "loading";
+  message?: string;
+}
+export interface DirectoryItemError extends DirectoryItemBasic {
+  status: "error";
+  message: string;
+}
+export type DirectoryItem =
+  | DirectoryItemOk
+  | DirectoryItemLoading
+  | DirectoryItemError;
 
 export interface RequestStatus {
   loading?: boolean;
@@ -201,6 +217,7 @@ export interface PackageContainer {
   image: string;
   name: string;
   shortName: string;
+  ip?: string; // IP of the DNP in the dappnode network
   state: ContainerStatus;
   running: boolean;
   manifest?: Manifest;
@@ -214,6 +231,9 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: string;
+  // ### TODO: Move to a different type "InstalledDnpDetail"
+  gettingStarted?: string;
+  gettingStartedShow?: boolean;
 }
 
 export interface PackageEnvs {
@@ -573,6 +593,7 @@ export interface PackageReleaseMetadata {
   disclaimer?: {
     message: string;
   };
+  gettingStarted?: string;
   style?: {
     featuredBackground?: string;
     featuredColor?: string;

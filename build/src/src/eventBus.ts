@@ -5,7 +5,8 @@ import {
   PackageContainer,
   ProgressLog,
   UserActionLog,
-  PackageNotification
+  PackageNotification,
+  DirectoryItem
 } from "./types";
 const logs = Logs(module);
 
@@ -89,10 +90,11 @@ const busFactory = <T>(event: string) => ({
 //   call: "INTERNAL_CALL",
 
 export const chainData = busFactory<ChainData[]>("CHAIN_DATAS");
-type PackageModifiedType = { id: string; removed?: boolean };
-export const packageModified = busFactory<PackageModifiedType>(
+type PackageModifiedType = { ids: string[]; removed?: boolean };
+export const packagesModified = busFactory<PackageModifiedType>(
   "PACKAGE_MODIFIED"
 );
+export const directory = busFactory<DirectoryItem[]>("DIRECTORY");
 export const packages = busFactory<PackageContainer[]>("PACKAGES");
 export const logUi = busFactory<ProgressLog>("LOGUI");
 export const logUserAction = busFactory<UserActionLog>("LOG_USER_ACTION");

@@ -84,10 +84,6 @@ WORKDIR /usr/src/app
 COPY --from=build-deps /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-deps /usr/bin/docker /usr/bin/docker
 
-COPY build/entrypoint.sh .
-COPY build/dns_updater.sh /etc/periodic/1min/dns_updater
-RUN crontab -l | { cat; echo "*       *       *       *       *       run-parts   /etc/periodic/1min"; } | crontab -
-
 # Copy the src last as it's the layer most likely to change
 COPY --from=build-deps /usr/src/app /usr/src/app
 COPY --from=build-src /usr/src/app/dist /usr/src/app/src
@@ -98,4 +94,4 @@ COPY build/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 ENV COMPOSE_HTTP_TIMEOUT=300 DOCKER_CLIENT_TIMEOUT=300 DOCKER_HOST=unix:///var/run/docker.sock
 RUN echo "127.0.0.1 localunixsocket"
 
-ENTRYPOINT /usr/src/app/entrypoint.sh
+CMD [ "node", "src/index" ]

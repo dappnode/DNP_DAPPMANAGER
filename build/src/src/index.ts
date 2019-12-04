@@ -22,6 +22,7 @@ import "./watchers/chains";
 import "./watchers/diskUsage";
 import "./watchers/natRenewal";
 import "./watchers/dyndns";
+import "./watchers/nsupdate";
 
 // Print version data
 import "./utils/getVersionData";
@@ -100,6 +101,7 @@ connection.onopen = (session, details): void => {
   eventBus.logUi.on(wampSubscriptions.progressLog.emit);
   eventBus.logUserAction.on(wampSubscriptions.userActionLog.emit);
   eventBus.packages.on(wampSubscriptions.packages.emit);
+  eventBus.directory.on(wampSubscriptions.directory.emit);
 
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {

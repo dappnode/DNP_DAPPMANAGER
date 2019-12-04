@@ -1,3 +1,4 @@
+import * as eventBus from "../eventBus";
 import { ReturnData } from "../route-types/fetchDirectory";
 import getDirectory from "../modules/release/getDirectory";
 import getRelease from "../modules/release/getRelease";
@@ -5,10 +6,12 @@ import isSyncing from "../utils/isSyncing";
 import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";
 import { listContainers } from "../modules/docker/listContainers";
-import { notUndefined } from "../utils/typingHelpers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
+import { throttle } from "lodash";
 const logs = Logs(module);
+
+const loadThrottle = 500; // 0.5 seconds
 
 /**
  * Fetches all package names in the custom dappnode directory.
@@ -24,34 +27,54 @@ export default async function fetchDirectory(): RpcHandlerReturnWithResult<
     };
   }
 
+  // Prevent sending way to many updates in case the fetching process is fast
+  const emitDirectoryUpdate = throttle(eventBus.directory.emit, loadThrottle);
+
   const dnpList = await listContainers();
 
-  // const directoryItemsUnordered: DirectoryItem[] = [];
+  // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
+  const directory = await getDirectory();
+  const directoryDnps: DirectoryItem[] = directory.map(
+    ({ name, isFeatured }) => ({
+      status: "loading",
+      name,
+      whitelisted: true,
+      isFeatured
+    })
+  );
+  emitDirectoryUpdate(directoryDnps);
 
-  const directoryDnps = (await Promise.all(
-    // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
-    (await getDirectory()).map(async ({ name, isFeatured }) => {
+  await Promise.all(
+    directory.map(async ({ name, isFeatured }, idx) => {
+      const whitelisted = true;
+      const directoryItemBasic = { name, whitelisted, isFeatured };
       try {
         // Now resolve the last version of the package
         const release = await getRelease(name);
         const { metadata, avatarFile } = release;
 
-        return {
-          name,
+        directoryDnps[idx] = {
+          ...directoryItemBasic,
+          status: "ok",
           description: getShortDescription(metadata),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, dnpList),
           isUpdated: getIsUpdated(release, dnpList),
-          whitelisted: true,
-          isFeatured,
           featuredStyle: metadata.style,
           categories: metadata.categories || getFallBackCategories(name) || []
-        } as DirectoryItem;
+        };
       } catch (e) {
         logs.error(`Error fetching ${name} release: ${e.message}`);
+        directoryDnps[idx] = {
+          ...directoryItemBasic,
+          status: "error",
+          message: e.message
+        };
+      } finally {
+        emitDirectoryUpdate(directoryDnps);
       }
     })
-  )).filter(notUndefined);
+  );
 
   return {
     message: `Listed directory of ${directoryDnps.length} DNPs`,

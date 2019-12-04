@@ -15,7 +15,8 @@ import {
   downloadSetupSchema,
   downloadSetupTarget,
   downloadSetupUiJson,
-  downloadDisclaimer
+  downloadDisclaimer,
+  downloadGetStarted
 } from "./downloadAssets";
 
 const source: "ipfs" = "ipfs";
@@ -28,7 +29,8 @@ const releaseFilesRegex = {
   setupSchema: /setup\..*\.json$/,
   setupTarget: /setup-target\..*json$/,
   setupUiJson: /setup-ui\..*json$/,
-  disclaimer: /disclaimer\.md$/i
+  disclaimer: /disclaimer\.md$/i,
+  gettingStarted: /getting.*started\.md$/i
 };
 
 const releaseFileIs = mapValues(
@@ -81,6 +83,7 @@ export default async function downloadRelease(
       const setupTargetEntry = files.find(releaseFileIs.setupTarget);
       const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
       const disclaimerEntry = files.find(releaseFileIs.disclaimer);
+      const getStartedEntry = files.find(releaseFileIs.gettingStarted);
 
       if (!manifestEntry) throw Error("Release must contain a manifest");
       if (!imageEntry) throw Error("Release must contain an image");
@@ -92,20 +95,23 @@ export default async function downloadRelease(
         setupSchema,
         setupTarget,
         setupUiJson,
-        disclaimer
+        disclaimer,
+        gettingStarted
       ] = await Promise.all([
         downloadManifest(manifestEntry.hash),
         downloadCompose(composeEntry.hash),
         setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
         setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
         setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
-        disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash)
+        disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash),
+        getStartedEntry && downloadGetStarted(getStartedEntry.hash)
       ]);
 
       if (setupSchema) manifest.setupSchema = setupSchema;
       if (setupTarget) manifest.setupTarget = setupTarget;
       if (setupUiJson) manifest.setupUiJson = setupUiJson;
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
+      if (gettingStarted) manifest.gettingStarted = gettingStarted;
 
       return {
         manifestFile: getFileFromEntry(manifestEntry),

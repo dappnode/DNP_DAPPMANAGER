@@ -54,6 +54,10 @@ export default function dbFactory(dbPath: string) {
     };
   }
 
+  /**
+   * @param keyGetter Must return a unique string key
+   * @param validate Must return a boolean (valid or not) given an item
+   */
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   function dynamicKeyValidate<T, K>(
     keyGetter: (keyArg: K) => string,
