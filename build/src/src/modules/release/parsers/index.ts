@@ -1,4 +1,4 @@
-import { omit, pick, isEmpty } from "lodash";
+import { mapValues, omit, pick, isEmpty } from "lodash";
 import {
   parseVolumeMappings,
   parseEnvironment
@@ -166,8 +166,8 @@ export function sanitizeCompose(
   if ((manifest.globalEnvs || {}).all)
     env_file.push(getGlobalEnvsFilePath(isCore));
 
-  return {
-    ...pick(composeUnsafe, ["version", "networks", "volumes"]),
+  const compose: Compose = {
+    ...pick(composeUnsafe, ["version", "networks"]),
     services: {
       [name]: {
         ...serviceFiltered,
@@ -184,6 +184,17 @@ export function sanitizeCompose(
       }
     }
   };
+
+  // If there are volume declarations, only keep safe properties
+  if (!isEmpty(composeUnsafe.volumes)) {
+    compose.volumes = mapValues(composeUnsafe.volumes, vol =>
+      pick(vol, ["externals"])
+    );
+  }
+
+  // #### TODO, sanitize network
+
+  return compose;
   /* eslint-enable @typescript-eslint/camelcase */
 }
 
