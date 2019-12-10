@@ -188,7 +188,7 @@ export function sanitizeCompose(
   // If there are volume declarations, only keep safe properties
   if (!isEmpty(composeUnsafe.volumes)) {
     compose.volumes = mapValues(composeUnsafe.volumes, vol =>
-      pick(vol, ["externals"])
+      pick(vol, ["external"])
     );
   }
 

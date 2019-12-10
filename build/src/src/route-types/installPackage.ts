@@ -14,15 +14,27 @@ export interface RequestData {
 
 export type ReturnData = void;
 
+const objOfStringsSchema = {
+  type: "object",
+  patternProperties: { "^.*$": { type: "string" } }
+};
 export const requestDataSchema = {
   type: "object",
   required: ["name"],
   properties: {
     name: { type: "string" },
     version: { type: "string" },
-    userSetEnvs: { type: "object" },
-    userSetVols: { type: "object" },
-    userSetPorts: { type: "object" },
+    userSettings: {
+      type: "object",
+      patternProperties: {
+        "^.*$": {
+          environment: objOfStringsSchema,
+          portMappings: objOfStringsSchema,
+          namedVolumeMountpoints: objOfStringsSchema,
+          fileUploads: objOfStringsSchema
+        }
+      }
+    },
     options: {
       type: "object",
       properties: {
@@ -36,13 +48,13 @@ export const requestDataSchema = {
 // Samples for testing
 
 export const requestDataSample: RequestData = {
-  name: "name",
+  name: "dnp.name.eth",
   version: "0.0.0",
   userSettings: {
-    name: {
+    "dnp.name.eth": {
       environment: { ENV: "VALUE" },
       portMappings: { "8888/TCP": "" },
-      namedVolumePaths: { data: "/dev1" },
+      namedVolumeMountpoints: { data: "/dev1" },
       fileUploads: { "/file": "data:text/plain;base64,SGVs" }
     }
   },

@@ -17,7 +17,10 @@ import {
 } from "../../src/types";
 import { clearDbs, testDir } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
-import { stringifyPortMappings } from "../../src/utils/dockerComposeParsers";
+import {
+  stringifyPortMappings,
+  legacyTag
+} from "../../src/utils/dockerComposeParsers";
 const logs = Logs(module);
 
 // Utils
@@ -175,8 +178,9 @@ describe("DNP lifecycle", function() {
         [portsDep.three.portId]: String(portsDep.three.newHost),
         [portsDep.four.portId]: String(portsDep.four.newHost)
       },
-      namedVolumePaths: {
-        [depVolumes.changeme.name]: depVolumes.changeme.newHost
+      namedVolumeMountpoints: {
+        // ##### DEPRECATED
+        [depVolumes.changeme.name]: legacyTag + depVolumes.changeme.newHost
       },
       fileUploads: {
         [demoFilePath]: fileDataUrlDep
