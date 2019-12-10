@@ -29,6 +29,7 @@ import params from "../../src/params";
 import { writeComposeObj } from "../../src/utils/dockerComposeFile";
 import { dockerComposeUp } from "../../src/modules/docker/dockerCommands";
 import { writeDefaultsToLabels } from "../../src/utils/containerLabelsDb";
+import { legacyTag } from "../../src/utils/dockerComposeParsers";
 
 const mockImage = "mock-test.public.dappnode.eth:0.0.1";
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
@@ -46,7 +47,10 @@ describe("Fetch external release data", () => {
     const idDep = "dependency.dnp.dappnode.eth";
     const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
     const customVolumePath = path.resolve(testDir, "dev1");
+    const mountpoint = path.resolve(testDir, "dev0");
+    const customMountpoint = `${mountpoint}/dappnode-volumes/main.dnp.dappnode.eth/data0`;
 
+    // Manifest fetched from IPFS
     const mainDnpManifest: ManifestWithImage = {
       name: idMain,
       version: "0.1.0",
@@ -56,7 +60,7 @@ describe("Fetch external release data", () => {
         size: 0,
         path: "",
         environment: ["ENV_DEFAULT=ORIGINAL"],
-        volumes: ["data:/usr", "data2:/usr2"],
+        volumes: ["data0/usr0", "data1:/usr1", "data2:/usr2"],
         /* eslint-disable-next-line @typescript-eslint/camelcase */
         external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
         ports: ["1111:1111"]
@@ -71,6 +75,7 @@ describe("Fetch external release data", () => {
       setupUiJson: { payoutAddress: { "ui:help": "Special help text" } }
     };
 
+    // Manifest fetched from IPFS
     const dependencyManifest: ManifestWithImage = {
       name: idDep,
       version: "0.1.0",
@@ -92,6 +97,7 @@ describe("Fetch external release data", () => {
       setupUiJson: { dependencyVar: { "ui:help": "Special help text" } }
     };
 
+    // Compose fetched from disk, from previously installed version
     const composeMain: Compose = {
       ...mockCompose,
       services: {
@@ -101,15 +107,35 @@ describe("Fetch external release data", () => {
           container_name: containerNameMain,
           image: mockImage,
           environment: ["PREVIOUS_SET=PREV_VAL"],
-          volumes: [`${customVolumePath}:/usr`],
+          volumes: ["data0:/usr0", `${customVolumePath}:/usr1`],
           labels: writeDefaultsToLabels({
             defaultEnvironment: [],
             defaultPorts: [],
-            defaultVolumes: ["data:/usr"]
+            defaultVolumes: ["data0:/usr0", "data1:/usr1"]
           })
         }
+      },
+      volumes: {
+        data0: {
+          /* eslint-disable-next-line @typescript-eslint/camelcase */
+          driver_opts: {
+            device: customMountpoint,
+            o: "bind",
+            type: "none"
+          }
+        },
+        data1: {}
       }
     };
+
+    async function cleanArtifacts(): Promise<void> {
+      for (const cmd of [
+        `docker rm -f ${containerNameMain}`,
+        `docker volume rm -f $(docker volume ls --filter name=maindnpdappnodeeth_ -q)`,
+        `docker volume rm -f $(docker volume ls --filter name=dependencydnpdappnodeeth_ -q)`
+      ])
+        await shell(cmd).catch(() => {});
+    }
 
     let mainDnpReleaseHash: string;
     let mainDnpImageSize: number;
@@ -131,16 +157,15 @@ describe("Fetch external release data", () => {
       mainDnpImageSize = mainUpload.imageSize;
     });
 
-    async function cleanArtifacts(): Promise<void> {
-      await shell(`docker rm -f ${containerNameMain}`).catch(() => {});
-    }
-
     before("Up mock docker packages", async () => {
       await cleanArtifacts();
 
       const composePathMain = getPath.dockerCompose(idMain, false);
       validate.path(composePathMain);
       writeComposeObj(composePathMain, composeMain);
+      // Create the custom mountpoint for the bind volume
+      // validate.path creates the parent folder, so a placeholder file is added
+      validate.path(path.join(customMountpoint, "placeholder.file"));
       await dockerComposeUp(composePathMain);
     });
 
@@ -207,9 +232,11 @@ describe("Fetch external release data", () => {
             portMappings: {
               "1111/TCP": "1111"
             },
-            namedVolumePaths: {
-              data: customVolumePath,
-              data2: ""
+            namedVolumeMountpoints: {
+              data0: mountpoint,
+              data2: "",
+              // ##### DEPRECATED
+              data1: legacyTag + customVolumePath
             }
           },
           [idDep]: {
@@ -219,7 +246,7 @@ describe("Fetch external release data", () => {
             portMappings: {
               "2222/TCP": "2222"
             },
-            namedVolumePaths: {
+            namedVolumeMountpoints: {
               data: ""
             }
           }
@@ -289,6 +316,10 @@ describe("Fetch external release data", () => {
 
     const disclaimer = "Warning!\n\nThis is really dangerous";
 
+    async function cleanArtifacts(): Promise<void> {
+      await shell(`docker rm -f ${containerNameMain}`).catch(() => {});
+    }
+
     let mainDnpReleaseHash: string;
 
     before("Create releases", async () => {
@@ -303,10 +334,6 @@ describe("Fetch external release data", () => {
         disclaimer
       });
     });
-
-    async function cleanArtifacts(): Promise<void> {
-      await shell(`docker rm -f ${containerNameMain}`).catch(() => {});
-    }
 
     before("Up mock docker packages", async () => {
       await cleanArtifacts();
@@ -350,7 +377,7 @@ describe("Fetch external release data", () => {
           [idMain]: {
             environment: {},
             portMappings: {},
-            namedVolumePaths: {}
+            namedVolumeMountpoints: {}
           }
         },
         request: {

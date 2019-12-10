@@ -27,7 +27,8 @@ import {
   readDefaultsFromLabels
 } from "./containerLabelsDb";
 
-const mountpointDevicePrefix = "dappnode-volume";
+export const mountpointDevicePrefix = "dappnode-volumes";
+export const legacyTag = "legacy:";
 
 let userSettingsType: UserSettings;
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
@@ -305,6 +306,10 @@ function getPortMappingId(portMapping: PortMapping): string {
  */
 export function parseUserSetFromCompose(compose: Compose): UserSettings {
   const service = parseService(compose);
+  const serviceName = parseServiceName(compose);
+  const { defaultVolumes, hasDefaults } = readDefaultsFromLabels(
+    service.labels || {}
+  );
 
   // Store original envs and do a diff
   const environment = parseEnvironment(service.environment || []);
@@ -314,63 +319,47 @@ export function parseUserSetFromCompose(compose: Compose): UserSettings {
   for (const port of parsePortMappings(service.ports || []))
     portMappings[getPortMappingId(port)] = String(port.host || "");
 
-  // Check if there are any named volume mappings stored in the metadata tags
+  // Fetch mountpoints
+  // also, non-assigned mountpoints must be added in user settings so it
+  // can be modified by the user in the UI. If it's value is "", it will be ignored
+  // [NOTE]: Ignores volume declarations that are not used in the service
   const volumes = parseVolumeMappings(service.volumes || []);
+  const namedVolumeMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
+  if (compose.volumes)
+    for (const [volumeName, volObj] of Object.entries(compose.volumes))
+      if (volumes.find(vol => vol.host === volumeName) && !volObj.external)
+        if (volObj.driver_opts && volObj.driver_opts.device) {
+          const devicePath = volObj.driver_opts.device;
+          const mountpoint = parseDevicePathMountpoint(devicePath);
+          if (mountpoint) namedVolumeMountpoints[volumeName] = mountpoint;
+        } else {
+          namedVolumeMountpoints[volumeName] = "";
+        }
+
+  // ##### <DEPRECATED> Kept for legacy compatibility
+  // Check if there are any named volume mappings stored in the metadata tags
   // To be backwards compatible, a few key DNP named volume mappings are hardcoded
   // legacyDefaultVolumes will only apply for legacy DNPs without defaults in labels
   const parsedDefaultVolumes = parseVolumeMappings(
     hasDefaults ? defaultVolumes : legacyDefaultVolumes[serviceName] || []
   );
-  // volumes = ["/dev0/user-set-path:/usr/data"]
-  // defaultVolumes = ["bitcoin_data:/usr/data"]
-  const namedVolumePathsFromDefaults = parsedDefaultVolumes.reduce(
-    (obj: typeof userSettingsType.namedVolumePaths, defaultVol) => {
-      if (defaultVol.name) {
-        const currentVols = volumes.filter(
-          v => v.container === defaultVol.container
-        );
-        // Only consider this setting if there is exactly ONE mapping for the container path
-        if (currentVols.length === 1) {
-          const currentVol = currentVols[0];
-          if (currentVol.name !== defaultVol.name)
-            return { ...obj, [defaultVol.name]: currentVol.host };
-        }
-      }
-      return obj;
-    },
-    {}
-  );
-  // If there is a named volume, it must be added in user settings so it
-  // can be modified by the user in the UI. If it's value is "", it will be ignored
-  const namedVolumePathsUnset = volumes.reduce(
-    (obj: typeof userSettingsType.namedVolumePaths, vol) => {
-      // Ignore binds and external volumes
-      if (!vol.name || ((compose.volumes || {})[vol.name] || {}).external)
-        return obj;
-      else return { ...obj, [vol.name]: "" };
-    },
-    {}
-  );
-  const namedVolumePaths = {
-    ...namedVolumePathsUnset,
-    ...namedVolumePathsFromDefaults
-  };
-
-  // Fetch mountpoints
-  const namedVolumeMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
-  if (compose.volumes)
-    for (const [volumeName, volObj] of Object.entries(compose.volumes))
-      if (volObj.driver_opts && volObj.driver_opts.device) {
-        const devicePath = volObj.driver_opts.device;
-        const mountpoint = parseDevicePathMountpoint(devicePath);
-        if (mountpoint) namedVolumeMountpoints[volumeName] = mountpoint;
-      }
+  // defaultVolumes = ["bitcoin_data:/usr/data"], volumes = ["/dev0/user-set-path:/usr/data"]
+  for (const defaultVol of parsedDefaultVolumes) {
+    if (defaultVol.name) {
+      // Only consider this setting if there is exactly ONE mapping for the container path
+      const [currentVol, otherVol] = volumes.filter(
+        v => v.container === defaultVol.container
+      );
+      if (!otherVol && currentVol.name !== defaultVol.name)
+        namedVolumeMountpoints[defaultVol.name] = legacyTag + currentVol.host;
+    }
+  }
+  // ##### </DEPRECATED>
 
   return {
     environment,
     portMappings,
-    namedVolumeMountpoints,
-    namedVolumePaths
+    namedVolumeMountpoints
   };
 }
 
@@ -394,8 +383,14 @@ export function applyUserSet(
   // User set
   const userSetEnvironment = userSettings.environment || {};
   const userSetPortMappings = userSettings.portMappings || {};
-  const userSetNamedVolumePaths = userSettings.namedVolumePaths || {};
-  const userSetMountpoints = userSettings.namedVolumeMountpoints || {};
+  const userSetMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
+  const userSetNamedVolumePaths: typeof userSettingsType.namedVolumeMountpoints = {};
+  for (const [volumeName, mountpoint] of Object.entries(
+    userSettings.namedVolumeMountpoints || {}
+  ))
+    if (mountpoint.startsWith(legacyTag))
+      userSetNamedVolumePaths[volumeName] = mountpoint.split(legacyTag)[1];
+    else userSetMountpoints[volumeName] = mountpoint;
 
   // New values
   const nextEnvironment = stringifyEnvironment(
@@ -440,6 +435,7 @@ export function applyUserSet(
   for (const [volumeName, mountpoint] of Object.entries(userSetMountpoints))
     if (volumes && volumes[volumeName] && !volumes[volumeName].external)
       nextComposeVolumes[volumeName] = {
+        /* eslint-disable-next-line @typescript-eslint/camelcase */
         driver_opts: {
           type: "none",
           device: getDevicePath({ mountpoint, dnpName, volumeName }),
@@ -473,7 +469,9 @@ export function applyUserSet(
       }
     },
     // Only add volumes property if necessary, keep the compose clean
-    ...(isEmpty(volumes) ? {} : { volumes: { ...volumes, nextComposeVolumes } })
+    ...(isEmpty(volumes)
+      ? {}
+      : { volumes: { ...volumes, ...nextComposeVolumes } })
   };
 }
 
@@ -493,15 +491,15 @@ export function getDevicePath({
   mountpoint: string;
   dnpName: string;
   volumeName: string;
-}) {
+}): string {
   if (!path.isAbsolute(mountpoint))
     throw Error(
       `mountpoint path for '${dnpName} - ${volumeName}' must be an absolute path: ${mountpoint}`
     );
 
-  const stripCharacters = (s: string) =>
+  const stripCharacters = (s: string): string =>
     s
-      .replace(/[`~!@#$%^&*()_|+=?;:'",<>\{\}\[\]\\\/]/gi, "")
+      .replace(/[`~!@#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "")
       .replace(/\.+/, ".");
 
   return path.join(
