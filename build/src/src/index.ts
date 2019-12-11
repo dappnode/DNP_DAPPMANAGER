@@ -30,6 +30,9 @@ import "./utils/getVersionData";
 // Start HTTP API
 import "./httpApi";
 
+// Copy host scripts
+import { copyHostScripts } from "./modules/hostScripts";
+
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
 
@@ -176,3 +179,15 @@ async function runLegacyOps(): Promise<void> {
 }
 
 runLegacyOps();
+
+/**
+ * Run initial opts
+ * - Copy host scripts
+ */
+
+try {
+  copyHostScripts();
+  logs.info(`Copied host scripts`);
+} catch (e) {
+  logs.error(`Error copying host scripts: ${e.stack}`);
+}

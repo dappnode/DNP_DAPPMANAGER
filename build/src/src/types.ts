@@ -648,6 +648,16 @@ export interface PackageReleaseImageData {
   labels?: string[];
 }
 
+// An array of mountpoints MUST include one with the host (mountpoint = "")
+export interface MountpointData {
+  mountpoint: string; // "/media/usb0", mountpoint = "" means host (default)
+  use: string; // "87%"
+  total: string; // "500G"
+  free: string; // "141G"
+  vendor: string; // "ATA", "SanDisk"
+  model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
+}
+
 /**
  * RPC methods
  * - Generic inteface with metadata types
