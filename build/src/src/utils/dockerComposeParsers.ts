@@ -27,8 +27,8 @@ import {
   readDefaultsFromLabels
 } from "./containerLabelsDb";
 
-export const mountpointDevicePrefix = "dappnode-volumes";
-export const legacyTag = "legacy:";
+export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
+export const legacyTag = params.MOUNTPOINT_DEVICE_LEGACY_TAG;
 
 let userSettingsType: UserSettings;
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
