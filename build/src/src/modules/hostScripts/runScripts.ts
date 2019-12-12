@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import shell from "../../utils/shell";
+import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import { MountpointData } from "../../types";
 
@@ -41,7 +41,5 @@ async function runScript(scriptName: string, args = ""): Promise<string> {
     throw Error(`Host script ${scriptName} not found`);
 
   const scriptPathFromHost = path.resolve(hostScriptsDirFromHost, scriptName);
-  return await shell(
-    `docker run --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i /bin/bash ${scriptPathFromHost} ${args}`
-  );
+  return await shellHost(`/bin/bash ${scriptPathFromHost} ${args}`);
 }

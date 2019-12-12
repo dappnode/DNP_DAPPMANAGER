@@ -11,27 +11,39 @@ const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
  * - Add new scripts
  * - Update scripts by comparing sha256 hashes
  * - Remove scripts that are not here
+ * @return For info and logging
  */
-export function copyHostScripts(): void {
+export function copyHostScripts(): {
+  removed: string[];
+  copied: string[];
+} {
   // Make sure the target scripts dir exists
   fs.mkdirSync(hostScriptsDir, { recursive: true });
 
   // Fetch list of scripts to diff them
   const newScripts = fs.readdirSync(hostScriptsDirSource);
   const oldScripts = fs.readdirSync(hostScriptsDir);
+  const removed: string[] = [];
+  const copied: string[] = [];
 
   // Compute files to remove
-  for (const nameOld of oldScripts)
-    if (!newScripts.includes(nameOld))
-      fs.unlinkSync(path.join(hostScriptsDir, nameOld));
+  for (const name of oldScripts)
+    if (!newScripts.includes(name)) {
+      fs.unlinkSync(path.join(hostScriptsDir, name));
+      removed.push(name);
+    }
 
   // Compute files to add
   for (const name of newScripts) {
-    const pathNew = path.join(__dirname, name);
+    const pathNew = path.join(hostScriptsDirSource, name);
     const pathOld = path.join(hostScriptsDir, name);
-    if (sha256File(pathNew) !== sha256File(pathOld))
+    if (sha256File(pathNew) !== sha256File(pathOld)) {
       fs.copyFileSync(pathNew, pathOld);
+      copied.push(name);
+    }
   }
+
+  return { removed, copied };
 }
 
 /**

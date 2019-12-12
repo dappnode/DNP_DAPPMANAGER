@@ -121,12 +121,16 @@ export default async function installPackage({
 
           validate.path(composeNextPath); // Create the repoDir if necessary
           await writeAndValidateCompose(composeNextPath, compose);
-          createCustomVolumeDevicePaths(compose); // Create custom volume device path if any
 
           return packageData;
         })
       ),
       reqName
+    );
+    // Bulk packages processing
+    // Create custom volume device path if any
+    await createCustomVolumeDevicePaths(
+      packagesData.map(({ compose }) => compose)
     );
 
     /**

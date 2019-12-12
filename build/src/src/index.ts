@@ -186,8 +186,11 @@ runLegacyOps();
  */
 
 try {
-  copyHostScripts();
-  logs.info(`Copied host scripts`);
+  const { copied, removed } = copyHostScripts();
+  let message = "Successfully run copyHostScripts.";
+  if (copied.length) message += ` Copied ${copied.join(", ")}.`;
+  if (removed.length) message += ` Removed ${removed.join(", ")}.`;
+  logs.info(message);
 } catch (e) {
   logs.error(`Error copying host scripts: ${e.stack}`);
 }
