@@ -98,3 +98,8 @@ export interface DockerApiSystemDfReturn {
 export function dockerDf(): Promise<DockerApiSystemDfReturn> {
   return dockerApi.df();
 }
+
+export function dockerVolumeInspect(volumeName: string) {
+  const volume = dockerApi.getVolume(volumeName);
+  return volume.inspect();
+}
