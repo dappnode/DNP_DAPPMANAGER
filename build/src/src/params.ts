@@ -114,6 +114,10 @@ const params = {
     SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
   },
 
+  // nsenter line to run commands on host
+  NSENTER_COMMAND:
+    "docker run --rm --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i",
+
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
   ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ="
