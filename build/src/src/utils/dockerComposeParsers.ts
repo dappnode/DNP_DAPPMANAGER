@@ -433,7 +433,12 @@ export function applyUserSet(
   const dnpName = serviceName;
   const volumes = compose.volumes;
   for (const [volumeName, mountpoint] of Object.entries(userSetMountpoints))
-    if (volumes && volumes[volumeName] && !volumes[volumeName].external)
+    if (
+      mountpoint &&
+      volumes &&
+      volumes[volumeName] &&
+      !volumes[volumeName].external
+    )
       nextComposeVolumes[volumeName] = {
         /* eslint-disable-next-line @typescript-eslint/camelcase */
         driver_opts: {

@@ -27,8 +27,60 @@ import {
 } from "../../src/utils/dockerComposeParsers";
 import { mockCompose, mockDnpName, mockComposeService } from "../testUtils";
 
+/* eslint-disable @typescript-eslint/camelcase */
+
 const bitcoinVolumeName = "bitcoin_data";
 const bitcoinVolumeNameNew = "bitcoin_new_data";
+
+const polkadotNewCompose = {
+  version: "3.4",
+  services: {
+    "polkadot-kusama.public.dappnode.eth": {
+      image: "polkadot-kusama.public.dappnode.eth:0.0.2",
+      volumes: ["polkadot:/polkadot"],
+      ports: ["30333:30333"],
+      environment: [
+        "NODE_NAME=DAppNodeNodler",
+        "VALIDATOR_ENABLE=no",
+        "TELEMETRY_ENABLE=no",
+        "EXTRA_OPTS=--out-peers 10 --in-peers 10"
+      ],
+      restart: "always",
+      container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
+      logging: {
+        options: {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      dns: "172.33.1.2",
+      networks: ["dncore_network"]
+    }
+  },
+  volumes: {
+    polkadot: {}
+  },
+  networks: {
+    dncore_network: {
+      external: true
+    }
+  }
+};
+
+const polkadotCurrentCompose = {
+  ...polkadotNewCompose,
+  services: {
+    "polkadot-kusama.public.dappnode.eth": {
+      ...polkadotNewCompose.services["polkadot-kusama.public.dappnode.eth"],
+      labels: {
+        "dappnode.dnp.default.environment":
+          '["NODE_NAME=DAppNodeNodler","VALIDATOR_ENABLE=no","TELEMETRY_ENABLE=no","EXTRA_OPTS=--out-peers 10 --in-peers 10"]',
+        "dappnode.dnp.default.ports": '["30333:30333"]',
+        "dappnode.dnp.default.volumes": '["polkadot:/polkadot"]'
+      }
+    }
+  }
+};
 
 describe("Util: dockerComposeParsers", () => {
   describe("environment: parse, stringify", () => {
@@ -165,7 +217,7 @@ describe("Util: dockerComposeParsers", () => {
   });
 
   describe("parseUserSet", () => {
-    it("Should parse the user set variable", () => {
+    it("Should parse a normal case", () => {
       const compose: Compose = {
         ...mockCompose,
         services: {
@@ -189,7 +241,6 @@ describe("Util: dockerComposeParsers", () => {
           bitcoinVolumeName: {},
           moredata: {},
           [bitcoinVolumeNameNew]: {
-            /* eslint-disable-next-line @typescript-eslint/camelcase */
             driver_opts: {
               device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
               o: "bind",
@@ -248,6 +299,27 @@ describe("Util: dockerComposeParsers", () => {
           [bitcoinVolumeName]: legacyTag + "/dev1/custom-path"
         },
         portMappings: {}
+      };
+
+      expect(userSettings).to.deep.equal(expectedUserSet);
+    });
+
+    it("Should parse correctly for an update with a named volume (bug)", () => {
+      const userSettings = parseUserSetFromCompose(polkadotCurrentCompose);
+
+      const expectedUserSet: UserSettings = {
+        environment: {
+          EXTRA_OPTS: "--out-peers 10 --in-peers 10",
+          NODE_NAME: "DAppNodeNodler",
+          TELEMETRY_ENABLE: "no",
+          VALIDATOR_ENABLE: "no"
+        },
+        namedVolumeMountpoints: {
+          polkadot: ""
+        },
+        portMappings: {
+          "30333/TCP": "30333"
+        }
       };
 
       expect(userSettings).to.deep.equal(expectedUserSet);
@@ -318,7 +390,6 @@ describe("Util: dockerComposeParsers", () => {
         volumes: {
           ...compose.volumes,
           [bitcoinVolumeNameNew]: {
-            /* eslint-disable-next-line @typescript-eslint/camelcase */
             driver_opts: {
               device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
               o: "bind",
@@ -353,6 +424,12 @@ describe("Util: dockerComposeParsers", () => {
 
       expect(serviceParts).to.deep.equal(expectedServiceParts);
     });
+
+    it("Should return the same compose if re-applying it's own user settings", () => {
+      const userSettings = parseUserSetFromCompose(polkadotCurrentCompose);
+      const composeReturn = applyUserSet(polkadotNewCompose, userSettings);
+      expect(composeReturn).to.deep.equal(polkadotCurrentCompose);
+    });
   });
 
   describe("device path", () => {
@@ -381,3 +458,5 @@ describe("Util: dockerComposeParsers", () => {
     });
   });
 });
+
+/* eslint-enable @typescript-eslint/camelcase */
