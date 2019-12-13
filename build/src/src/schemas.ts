@@ -7,7 +7,8 @@ import {
   PackageNotification,
   UserActionLog,
   CoreUpdateData,
-  MountpointData
+  MountpointData,
+  PackageDetailData
 } from "./types";
 
 /**
@@ -209,6 +210,20 @@ export const installedDnpSample: PackageContainer = {
 };
 
 export const installedDnpsSample: PackageContainer[] = [installedDnpSample];
+
+export const packageDetailDataSchema = {
+  type: "object",
+  properties: {
+    volumeSizes: { type: "object" }
+  },
+  required: ["volumeSizes"]
+};
+
+export const packageDetailDataSample: PackageDetailData = {
+  volumeSizes: {
+    data: "6371825123" // volumeName: sizeInBytes
+  }
+};
 
 /**
  * Notifications

@@ -359,7 +359,9 @@ describe("Util: dockerComposeParsers", () => {
     const pathParts = {
       mountpoint: "/dev1/data",
       dnpName: "bitcoin.dnp.dappnode.eth",
-      volumeName: "data"
+      volumeName: "data",
+      volumePath: "bitcoin.dnp.dappnode.eth/data",
+      mountpointPath: "/dev1/data/dappnode-volumes"
     };
     const devicePath =
       "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data";
