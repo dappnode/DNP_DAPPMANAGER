@@ -240,6 +240,12 @@ export interface PackageEnvs {
   [envName: string]: string;
 }
 
+export interface PackageDetailData {
+  volumeSizes: {
+    [volumeName: string]: string; // bitcoin_data: "823203"
+  };
+}
+
 export interface ManifestUpdateAlert {
   from: string;
   to: string;

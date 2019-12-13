@@ -516,7 +516,9 @@ export function getDevicePath({
  * @return path parts = {
  *   mountpoint: "/dev1/data",
  *   dnpName: "bitcoin.dnp.dappnode.eth",
- *   volumeName: "data"
+ *   volumeName: "data",
+ *   volumePath: "bitcoin.dnp.dappnode.eth/data",
+ *   mountpointPath: "/dev1/data/dappnode-volumes"
  * }
  */
 export function parseDevicePath(
@@ -526,6 +528,8 @@ export function parseDevicePath(
       mountpoint: string;
       dnpName: string;
       volumeName: string;
+      volumePath: string;
+      mountpointPath: string;
     }
   | undefined {
   const [mountpoint, dnpNameAndVolumeName] = devicePath.split(
@@ -537,7 +541,9 @@ export function parseDevicePath(
   return {
     mountpoint: path.normalize(mountpoint),
     dnpName,
-    volumeName
+    volumeName,
+    volumePath: dnpNameAndVolumeName,
+    mountpointPath: path.join(mountpoint, mountpointDevicePrefix)
   };
 }
 

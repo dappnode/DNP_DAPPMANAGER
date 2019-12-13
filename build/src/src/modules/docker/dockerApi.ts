@@ -99,7 +99,9 @@ export function dockerDf(): Promise<DockerApiSystemDfReturn> {
   return dockerApi.df();
 }
 
-export function dockerVolumeInspect(volumeName: string) {
+export function dockerVolumeInspect(
+  volumeName: string
+): Promise<Docker.VolumeInspectInfo> {
   const volume = dockerApi.getVolume(volumeName);
   return volume.inspect();
 }
