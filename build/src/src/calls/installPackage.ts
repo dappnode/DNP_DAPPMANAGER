@@ -38,6 +38,7 @@ import { stringify } from "../utils/objects";
 import params from "../params";
 const logs = Logs(module);
 
+const dappmanagerId = "dappmanager.dnp.dappnode.eth";
 const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 /**
@@ -187,11 +188,11 @@ export default async function installPackage({
        */
       for (const { name, composeNextPath, fileUploads } of packagesData) {
         // patch to prevent installer from crashing
-        if (name == "dappmanager.dnp.dappnode.eth") {
+        if (name == dappmanagerId) {
           logUi({ id, name, message: "Reseting DAppNode... " });
           await restartPatch();
         } else {
-          // Copy fileUploads if any to the container before upping
+          // Copy fileUploads if any to the container before up-ing
           if (fileUploads) {
             logUi({ id, name, message: "Copying file uploads..." });
             logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
@@ -234,18 +235,11 @@ export default async function installPackage({
         try {
           logUi({ id, name, message: "Aborting and rolling back..." });
 
-          try {
-            if (fs.existsSync(composeNextPath))
-              await dockerComposeDown(composeNextPath);
-          } catch (eDown) {
-            logs.error(`Error on rollback dc down ${name}: ${eDown.stack}`);
-          }
-
           safeUnlink(imagePath);
           safeUnlink(composeNextPath);
 
           // Deal with packages that were NOT installed before this install
-          if (fs.existsSync(composePath))
+          if (fs.existsSync(composePath) && name !== dappmanagerId)
             await dockerComposeUpSafe(composePath);
         } catch (ePkg) {
           logs.error(`Error rolling back ${name}: ${ePkg.stack}`);
