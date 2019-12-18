@@ -58,6 +58,7 @@ const params = {
   // Docker volume parameters
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
   MOUNTPOINT_DEVICE_LEGACY_TAG: "legacy:",
+  USER_SETTING_DISABLE_TAG: "disable:",
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day

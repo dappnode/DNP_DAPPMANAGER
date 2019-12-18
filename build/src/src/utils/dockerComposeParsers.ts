@@ -29,6 +29,9 @@ import {
 
 export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 export const legacyTag = params.MOUNTPOINT_DEVICE_LEGACY_TAG;
+const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
+const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
+const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 let userSettingsType: UserSettings;
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
@@ -48,6 +51,11 @@ export function parseServiceName(compose: Compose): string {
 
 export function parseService(compose: Compose): ComposeService {
   return compose.services[parseServiceName(compose)];
+}
+
+export function getContainerName(name: string, isCore: boolean): string {
+  // Note: the prefixes already end with the character "-"
+  return `${isCore ? containerCoreNamePrefix : containerNamePrefix}${name}`;
 }
 
 /**
@@ -435,7 +443,12 @@ export function applyUserSet(
   const volumes = compose.volumes;
 
   // Apply general mountpoint to all volumes
-  if (allNamedVolumeMountpoint && volumes)
+  if (
+    allNamedVolumeMountpoint &&
+    volumes &&
+    // #### TEMP: Tag set in fetchDnpRequest
+    allNamedVolumeMountpoint !== userSettingDisableTag
+  )
     for (const [volumeName, volumeObj] of Object.entries(volumes))
       if (!volumeObj.external)
         nextComposeVolumes[volumeName] = {

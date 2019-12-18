@@ -227,7 +227,7 @@ export function getIsCore(manifest: Manifest): boolean {
   return manifest.type === "dncore";
 }
 
-function getContainerName(name: string, isCore: boolean): string {
+export function getContainerName(name: string, isCore: boolean): string {
   // Note: the prefixes already end with the character "-"
   return `${isCore ? containerCoreNamePrefix : containerNamePrefix}${name}`;
 }

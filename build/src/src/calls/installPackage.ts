@@ -35,7 +35,10 @@ import {
   flagPackagesAreInstalling
 } from "../utils/packageIsInstalling";
 import { stringify } from "../utils/objects";
+import params from "../params";
 const logs = Logs(module);
+
+const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 /**
  * Installs a DAppNode Package.
@@ -197,6 +200,9 @@ export default async function installPackage({
             for (const [containerPath, dataUri] of Object.entries(
               fileUploads
             )) {
+              // #### TEMP: Tag set in fetchDnpRequest
+              if (dataUri === userSettingDisableTag) continue;
+
               const { dir, base } = path.parse(containerPath);
               await copyFileTo({
                 id: name,
