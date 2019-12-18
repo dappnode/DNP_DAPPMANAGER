@@ -12,7 +12,7 @@ import {
 } from "../../src/types";
 import { SetupSchema, SetupUiJson } from "../../src/types-own";
 import {
-  testDir,
+  testMountpoints,
   clearDbs,
   createTestDir,
   mockComposeService,
@@ -46,8 +46,8 @@ describe("Fetch external release data", () => {
     const idMain = "main.dnp.dappnode.eth";
     const idDep = "dependency.dnp.dappnode.eth";
     const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
-    const customVolumePath = path.resolve(testDir, "dev1");
-    const mountpoint = path.resolve(testDir, "dev0");
+    const customVolumePath = path.resolve(testMountpoints, "dev1");
+    const mountpoint = path.resolve(testMountpoints, "dev0");
     const customMountpoint = `${mountpoint}/dappnode-volumes/main.dnp.dappnode.eth/data0`;
 
     // Manifest fetched from IPFS
@@ -164,8 +164,7 @@ describe("Fetch external release data", () => {
       validate.path(composePathMain);
       writeComposeObj(composePathMain, composeMain);
       // Create the custom mountpoint for the bind volume
-      // validate.path creates the parent folder, so a placeholder file is added
-      validate.path(path.join(customMountpoint, "placeholder.file"));
+      await shell(`mkdir -p ${customMountpoint}`);
       await dockerComposeUp(composePathMain);
     });
 

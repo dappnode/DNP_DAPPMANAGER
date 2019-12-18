@@ -15,7 +15,7 @@ import {
   ManifestWithImage,
   PortProtocol
 } from "../../src/types";
-import { clearDbs, testDir } from "../testUtils";
+import { clearDbs, testMountpoints } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
 import {
   stringifyPortMappings,
@@ -99,7 +99,7 @@ describe("DNP lifecycle", function() {
   const volumesMain = {
     changeme: {
       name: "changeme-main",
-      newHost: path.resolve(testDir, "testMountpoint"),
+      newHost: path.resolve(testMountpoints, "testMountpoint"),
       container: "/temp"
     }
   };
@@ -122,7 +122,7 @@ describe("DNP lifecycle", function() {
   const volumesDep = {
     changeme: {
       name: "changeme-dep",
-      newHost: path.resolve(testDir, "testBind"),
+      newHost: path.resolve(testMountpoints, "testBind"),
       container: "/temp"
     }
   };

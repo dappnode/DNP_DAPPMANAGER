@@ -430,6 +430,85 @@ describe("Util: dockerComposeParsers", () => {
       const composeReturn = applyUserSet(polkadotNewCompose, userSettings);
       expect(composeReturn).to.deep.equal(polkadotCurrentCompose);
     });
+
+    it("Should apply allNamedVolumeMountpoint setting, and persist an update", () => {
+      const mountpoint = "/dev1/data";
+
+      const originalCompose: Compose = {
+        ...mockCompose,
+        services: {
+          [mockDnpName]: {
+            ...mockComposeService,
+            volumes: ["data:/usr/data", "identity:/usr/id"]
+          }
+        },
+        volumes: {
+          data: {},
+          identity: {}
+        }
+      };
+
+      const userSet: UserSettings = {
+        allNamedVolumeMountpoint: mountpoint
+      };
+
+      const expectedComposeAfterFirstInstall: Compose = {
+        ...originalCompose,
+        services: {
+          [mockDnpName]: {
+            ...originalCompose.services[mockDnpName],
+            volumes: ["data:/usr/data", "identity:/usr/id"],
+            labels: {
+              "dappnode.dnp.default.environment": "[]",
+              "dappnode.dnp.default.ports": "[]",
+              "dappnode.dnp.default.volumes":
+                '["data:/usr/data","identity:/usr/id"]'
+            }
+          }
+        },
+        volumes: {
+          data: {
+            driver_opts: {
+              device:
+                "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/data",
+              o: "bind",
+              type: "none"
+            }
+          },
+          identity: {
+            driver_opts: {
+              device:
+                "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/identity",
+              o: "bind",
+              type: "none"
+            }
+          }
+        }
+      };
+
+      const expectedUserSettingsOnUpdate: UserSettings = {
+        environment: {},
+        namedVolumeMountpoints: {
+          data: mountpoint,
+          identity: mountpoint
+        },
+        portMappings: {}
+      };
+
+      expect(applyUserSet(originalCompose, userSet)).to.deep.equal(
+        expectedComposeAfterFirstInstall,
+        "allNamedVolumeMountpoint setting should be applied in first install"
+      );
+
+      const userSettingsOnUpdate = parseUserSetFromCompose(
+        expectedComposeAfterFirstInstall
+      );
+      expect(userSettingsOnUpdate).to.deep.equal(expectedUserSettingsOnUpdate);
+      expect(applyUserSet(originalCompose, userSettingsOnUpdate)).to.deep.equal(
+        expectedComposeAfterFirstInstall,
+        "After a future update the user settings from allNamedVolumeMountpoint should persist"
+      );
+    });
   });
 
   describe("device path", () => {

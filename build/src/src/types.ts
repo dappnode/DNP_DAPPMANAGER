@@ -65,6 +65,7 @@ export type UserSettingTarget =
   | { type: "environment"; name: string }
   | { type: "portMapping"; containerPort: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
+  | { type: "allNamedVolumesMountpoint" }
   | { type: "fileUpload"; path: string };
 
 export interface SetupTarget {
@@ -89,6 +90,7 @@ export interface UserSettings {
   environment?: { [envName: string]: string }; // Env value
   portMappings?: { [containerPortAndType: string]: string }; // Host port
   namedVolumeMountpoints?: { [volumeName: string]: string }; // Host absolute path to mountpoint
+  allNamedVolumeMountpoint?: string; // mountpoint
   fileUploads?: { [containerPath: string]: string }; // dataURL
 }
 // "bitcoin.dnp.dappnode.eth": {

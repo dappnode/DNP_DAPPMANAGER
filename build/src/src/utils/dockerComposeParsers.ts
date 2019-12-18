@@ -383,6 +383,7 @@ export function applyUserSet(
   // User set
   const userSetEnvironment = userSettings.environment || {};
   const userSetPortMappings = userSettings.portMappings || {};
+  const allNamedVolumeMountpoint = userSettings.allNamedVolumeMountpoint;
   const userSetMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
   const userSetNamedVolumePaths: typeof userSettingsType.namedVolumeMountpoints = {};
   for (const [volumeName, mountpoint] of Object.entries(
@@ -428,10 +429,29 @@ export function applyUserSet(
     })
   );
 
-  // User set mountpoints for named volumes
+  // Volume section edits
   const nextComposeVolumes: ComposeVolumes = {};
   const dnpName = serviceName;
   const volumes = compose.volumes;
+
+  // Apply general mountpoint to all volumes
+  if (allNamedVolumeMountpoint && volumes)
+    for (const [volumeName, volumeObj] of Object.entries(volumes))
+      if (!volumeObj.external)
+        nextComposeVolumes[volumeName] = {
+          /* eslint-disable-next-line @typescript-eslint/camelcase */
+          driver_opts: {
+            type: "none",
+            device: getDevicePath({
+              mountpoint: allNamedVolumeMountpoint,
+              dnpName,
+              volumeName
+            }),
+            o: "bind"
+          }
+        };
+
+  // User set mountpoints for named volumes
   for (const [volumeName, mountpoint] of Object.entries(userSetMountpoints))
     if (
       mountpoint &&

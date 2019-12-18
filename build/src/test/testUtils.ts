@@ -16,6 +16,7 @@ import {
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
 export const testDir = "./test_files/";
+export const testMountpoints = "./test_mountpoints";
 
 export function clearDbs(): void {
   lowLevelCacheDb.clearDb();

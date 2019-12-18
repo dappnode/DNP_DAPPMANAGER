@@ -17,6 +17,8 @@ test_build/.git/*
 build/src/undefined/
 build/src/test_files/
 build/src/test_files/*
+build/src/test_mountpoints/
+build/src/test_mountpoints/*
 build/src/.temp-transfer/
 build/src/.temp-transfer/*
 
