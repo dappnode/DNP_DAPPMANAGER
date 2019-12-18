@@ -41,8 +41,8 @@ const params = {
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
   // Host script paths
-  HOST_SCRIPTS_DIR_FROM_HOST: "/usr/src/dappnode/DNCORE/scripts",
-  HOST_SCRIPTS_DIR: "DNCORE/scripts",
+  HOST_SCRIPTS_DIR_FROM_HOST: "/usr/src/dappnode/DNCORE/scripts/host",
+  HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
 
   // HTTP API parameters
