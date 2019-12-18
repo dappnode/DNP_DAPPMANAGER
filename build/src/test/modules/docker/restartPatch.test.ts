@@ -9,7 +9,7 @@ import restartPatchType, {
   restartId
 } from "../../../src/modules/docker/restartPatch";
 
-describe("Util: restartPatch", () => {
+describe.skip("Util: restartPatch", () => {
   const dockerComposeUp = sinon.stub();
 
   const imageName = "dappmanager.tar.xz:0.0.9";

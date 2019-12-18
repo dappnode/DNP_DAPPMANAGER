@@ -8,8 +8,7 @@ import getImage, { verifyDockerImage } from "../modules/release/getImage";
 import lockPorts from "../modules/lockPorts";
 import {
   dockerLoad,
-  dockerCleanOldImages,
-  dockerComposeDown
+  dockerCleanOldImages
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import restartPatch from "../modules/docker/restartPatch";

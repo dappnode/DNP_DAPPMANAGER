@@ -101,11 +101,19 @@ export async function listContainers(): Promise<PackageContainer[]> {
   return dnpListExtended;
 }
 
-export async function listContainer(byName: string): Promise<PackageContainer> {
+export async function listContainerNoThrow(
+  byName: string
+): Promise<PackageContainer | null> {
   const containers = await dockerList({ filters: { name: [byName] } });
   const container = containers[0];
-  if (!container) throw Error(`No DNP was found for name ${byName}`);
+  if (!container) return null;
   return parseContainerInfo(container);
+}
+
+export async function listContainer(byName: string): Promise<PackageContainer> {
+  const container = await listContainerNoThrow(byName);
+  if (!container) throw Error(`No DNP was found for name ${byName}`);
+  return container;
 }
 
 export async function listContainerExtendedInfo(
