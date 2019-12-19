@@ -12,7 +12,6 @@ import restartPatchType, {
 describe.skip("Util: restartPatch", () => {
   const dockerComposeUp = sinon.stub();
 
-  const imageName = "dappmanager.tar.xz:0.0.9";
   const dockerComposeRestartPath = getPath.dockerCompose(restartId, true);
 
   let restartPatch: typeof restartPatchType;
@@ -30,7 +29,7 @@ describe.skip("Util: restartPatch", () => {
   });
 
   it("Should call docker.compose.up with the correct arguments", async () => {
-    await restartPatch(imageName);
+    await restartPatch();
     sinon.assert.calledOnce(dockerComposeUp);
     sinon.assert.calledWithExactly(dockerComposeUp, dockerComposeRestartPath);
   });

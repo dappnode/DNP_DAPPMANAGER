@@ -23,15 +23,13 @@ const restartContainerName = `DAppNodeTool-${restartId}`;
  * shows up in the ADMIN UI's package list
  */
 
-export default async function restartPatch(imageName = ""): Promise<void> {
-  if (!imageName.includes(":")) {
-    const dnp = await listContainer(dappmanagerName);
-    imageName = dnp.image;
-  }
+export default async function restartDappmanagerPatch(): Promise<void> {
+  const dnp = await listContainer(dappmanagerName);
+  const imageName = dnp.image;
 
   const composeRestartPath = getPath.dockerCompose(restartId, true);
-  const pathLocal = "/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml";
   const pathRemote = "/usr/src/app/DNCORE/docker-compose-dappmanager.yml";
+  const pathLocal = getPath.dockerCompose(dappmanagerName, true);
 
   /**
    * [NOTE1]: The entrypoint property in the docker-compose overwrites
@@ -68,7 +66,7 @@ services:
       - '${pathLocal}:${pathRemote}'
       - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
       - '/var/run/docker.sock:/var/run/docker.sock'
-    entrypoint: docker-compose -f ${pathRemote} up -d --force-recreate
+    entrypoint: docker-compose -f ${pathRemote} up -d --force-recreate <&-
     network_mode: none
 `;
 

@@ -24,7 +24,7 @@ export default async function restartPackage({
   }
 
   if (id.includes("dappmanager.dnp.dappnode.eth")) {
-    await restartPatch(id);
+    await restartPatch();
   } else {
     // Combining rm && up doesn't prevent the installer from crashing
     await dockerComposeRm(dockerComposePath);
