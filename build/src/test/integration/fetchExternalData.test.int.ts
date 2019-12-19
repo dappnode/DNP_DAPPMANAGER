@@ -12,7 +12,7 @@ import {
 } from "../../src/types";
 import { SetupSchema, SetupUiJson } from "../../src/types-own";
 import {
-  testMountpoints,
+  getTestMountpoint,
   clearDbs,
   createTestDir,
   mockComposeService,
@@ -34,6 +34,12 @@ import { legacyTag } from "../../src/utils/dockerComposeParsers";
 const mockImage = "mock-test.public.dappnode.eth:0.0.1";
 const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
 
+// This mountpoints have files inside created by docker with the root
+// user group, so they can't be cleaned by other tests.
+// #### TODO: While a better solution is found, each test will use a separate dir
+const testMountpointfetchMain = getTestMountpoint("fetch-main");
+const testMountpointfetchMountpoint = getTestMountpoint("fetch-mountpoint");
+
 describe("Fetch external release data", () => {
   before(async () => {
     clearDbs();
@@ -46,8 +52,8 @@ describe("Fetch external release data", () => {
     const idMain = "main.dnp.dappnode.eth";
     const idDep = "dependency.dnp.dappnode.eth";
     const containerNameMain = `${containerCoreNamePrefix}${idMain}`;
-    const customVolumePath = path.resolve(testMountpoints, "dev1");
-    const mountpoint = path.resolve(testMountpoints, "dev0");
+    const customVolumePath = path.resolve(testMountpointfetchMain, "dev1");
+    const mountpoint = path.resolve(testMountpointfetchMountpoint, "dev0");
     const customMountpoint = `${mountpoint}/dappnode-volumes/main.dnp.dappnode.eth/data0`;
 
     // Manifest fetched from IPFS

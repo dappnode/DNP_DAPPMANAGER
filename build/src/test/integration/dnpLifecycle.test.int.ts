@@ -15,13 +15,19 @@ import {
   ManifestWithImage,
   PortProtocol
 } from "../../src/types";
-import { clearDbs, testMountpoints } from "../testUtils";
+import { clearDbs, getTestMountpoint } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
 import {
   stringifyPortMappings,
   legacyTag
 } from "../../src/utils/dockerComposeParsers";
 const logs = Logs(module);
+
+// This mountpoints have files inside created by docker with the root
+// user group, so they can't be cleaned by other tests.
+// #### TODO: While a better solution is found, each test will use a separate dir
+const testMountpointDnpLifeCycleMain = getTestMountpoint("dnplifecycle-main");
+const testMountpointDnpLifeCycleDep = getTestMountpoint("dnplifecycle-dep");
 
 // Utils
 
@@ -99,7 +105,7 @@ describe("DNP lifecycle", function() {
   const volumesMain = {
     changeme: {
       name: "changeme-main",
-      newHost: path.resolve(testMountpoints, "testMountpoint"),
+      newHost: path.resolve(testMountpointDnpLifeCycleMain, "testMountpoint"),
       container: "/temp"
     }
   };
@@ -122,7 +128,7 @@ describe("DNP lifecycle", function() {
   const volumesDep = {
     changeme: {
       name: "changeme-dep",
-      newHost: path.resolve(testMountpoints, "testBind"),
+      newHost: path.resolve(testMountpointDnpLifeCycleDep, "testBind"),
       container: "/temp"
     }
   };
