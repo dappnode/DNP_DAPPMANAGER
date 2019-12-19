@@ -18,7 +18,7 @@ for line in $(df -hlPT | grep ^/); do
     # Detect devices mounted with usbmount, and grab a deterministic mount point
     usbmount_symlink=""
     if [ -d /run/usbmount ]; then
-      usbmount_symlink=$(ls -1d /run/usbmount/* | xargs -I {} -i sh -c 'echo $(readlink -f "{}"):{}' | grep ${mountpoint} | cut -d":" -f2)
+      usbmount_symlink=$(ls -1d /run/usbmount/* 2>/dev/null | xargs -I {} -i sh -c 'echo $(readlink -f "{}"):{}' | grep ${mountpoint} 2>/dev/null | cut -d":" -f2)
       if [ -n "${usbmount_symlink}" ]; then
         mountpoint="${usbmount_symlink}"
       fi
