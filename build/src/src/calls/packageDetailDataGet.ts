@@ -1,10 +1,11 @@
 import { ReturnData } from "../route-types/packageDetailDataGet";
-import { isEmpty } from "lodash";
+import { isEmpty, mapValues } from "lodash";
 import { RequestData } from "../route-types/packageGettingStartedToggle";
 import { RpcHandlerReturnWithResult } from "../types";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import getHostVolumeSizes from "../modules/docker/getHostVolumeSizes";
+import { parseDevicePath } from "../utils/dockerComposeParsers";
 
 /**
  * Toggles the visibility of a getting started block
@@ -37,10 +38,19 @@ export default async function packageDetailDataGet({
     ? {}
     : await getHostVolumeSizes(volDevicePaths);
 
+  const volumes = mapValues(volDevicePaths, (devicePath, volName) => {
+    const pathParts = parseDevicePath(devicePath);
+    return {
+      size: volumeSizes[volName],
+      devicePath,
+      mountpoint: pathParts ? pathParts.mountpoint : undefined
+    };
+  });
+
   return {
     message: `Got volume sizes of ${id}`,
     result: {
-      volumeSizes
+      volumes
     }
   };
 }

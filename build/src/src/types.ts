@@ -243,8 +243,13 @@ export interface PackageEnvs {
 }
 
 export interface PackageDetailData {
-  volumeSizes: {
-    [volumeName: string]: string; // bitcoin_data: "823203"
+  volumes: {
+    // volumeName = bitcoin_data
+    [volumeName: string]: {
+      size: string; // "823203"
+      devicePath: string; // "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
+      mountpoint?: string; // "/dev1/data"
+    };
   };
 }
 

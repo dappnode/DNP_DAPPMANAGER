@@ -214,14 +214,18 @@ export const installedDnpsSample: PackageContainer[] = [installedDnpSample];
 export const packageDetailDataSchema = {
   type: "object",
   properties: {
-    volumeSizes: { type: "object" }
+    volumes: { type: "object" }
   },
-  required: ["volumeSizes"]
+  required: ["volumes"]
 };
 
 export const packageDetailDataSample: PackageDetailData = {
-  volumeSizes: {
-    data: "6371825123" // volumeName: sizeInBytes
+  volumes: {
+    data: {
+      size: "6371825123", // volumeName: sizeInBytes
+      devicePath: "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data",
+      mountpoint: "/dev1/data"
+    }
   }
 };
 
