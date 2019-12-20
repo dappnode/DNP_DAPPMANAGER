@@ -25,10 +25,12 @@ import installPackageSafe from "./installPackageSafe";
 import listPackages from "./listPackages";
 import logPackage from "./logPackage";
 import managePorts from "./managePorts";
+import mountpointsGet from "./mountpointsGet";
 import naclEncryptionGetPublicKey from "./naclEncryptionGetPublicKey";
 import notificationsGet from "./notificationsGet";
 import notificationsRemove from "./notificationsRemove";
 import notificationsTest from "./notificationsTest";
+import packageDetailDataGet from "./packageDetailDataGet";
 import packageGettingStartedToggle from "./packageGettingStartedToggle";
 import passwordChange from "./passwordChange";
 import passwordIsSecure from "./passwordIsSecure";
@@ -68,10 +70,12 @@ export {
   listPackages,
   logPackage,
   managePorts,
+  mountpointsGet,
   naclEncryptionGetPublicKey,
   notificationsGet,
   notificationsRemove,
   notificationsTest,
+  packageDetailDataGet,
   packageGettingStartedToggle,
   passwordChange,
   passwordIsSecure,

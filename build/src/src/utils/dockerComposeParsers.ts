@@ -17,7 +17,8 @@ import {
   VolumeMapping,
   ComposeService,
   Manifest,
-  UserSettings
+  UserSettings,
+  ComposeVolumes
 } from "../types";
 import params from "../params";
 import {
@@ -25,6 +26,12 @@ import {
   writeDefaultsToLabels,
   readDefaultsFromLabels
 } from "./containerLabelsDb";
+
+export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
+export const legacyTag = params.MOUNTPOINT_DEVICE_LEGACY_TAG;
+const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
+const containerCoreNamePrefix = params.CONTAINER_CORE_NAME_PREFIX;
+const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 let userSettingsType: UserSettings;
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
@@ -44,6 +51,11 @@ export function parseServiceName(compose: Compose): string {
 
 export function parseService(compose: Compose): ComposeService {
   return compose.services[parseServiceName(compose)];
+}
+
+export function getContainerName(name: string, isCore: boolean): string {
+  // Note: the prefixes already end with the character "-"
+  return `${isCore ? containerCoreNamePrefix : containerNamePrefix}${name}`;
 }
 
 /**
@@ -301,15 +313,11 @@ function getPortMappingId(portMapping: PortMapping): string {
  * user and which are not
  */
 export function parseUserSetFromCompose(compose: Compose): UserSettings {
-  const serviceName = parseServiceName(compose);
   const service = parseService(compose);
-
-  const {
-    // defaultEnvironment,
-    // defaultPorts,
-    defaultVolumes,
-    hasDefaults
-  } = readDefaultsFromLabels(service.labels || {});
+  const serviceName = parseServiceName(compose);
+  const { defaultVolumes, hasDefaults } = readDefaultsFromLabels(
+    service.labels || {}
+  );
 
   // Store original envs and do a diff
   const environment = parseEnvironment(service.environment || []);
@@ -319,52 +327,47 @@ export function parseUserSetFromCompose(compose: Compose): UserSettings {
   for (const port of parsePortMappings(service.ports || []))
     portMappings[getPortMappingId(port)] = String(port.host || "");
 
-  // Check if there are any named volume mappings stored in the metadata tags
+  // Fetch mountpoints
+  // also, non-assigned mountpoints must be added in user settings so it
+  // can be modified by the user in the UI. If it's value is "", it will be ignored
+  // [NOTE]: Ignores volume declarations that are not used in the service
   const volumes = parseVolumeMappings(service.volumes || []);
+  const namedVolumeMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
+  if (compose.volumes)
+    for (const [volumeName, volObj] of Object.entries(compose.volumes))
+      if (volumes.find(vol => vol.host === volumeName) && !volObj.external)
+        if (volObj.driver_opts && volObj.driver_opts.device) {
+          const devicePath = volObj.driver_opts.device;
+          const mountpoint = parseDevicePathMountpoint(devicePath);
+          if (mountpoint) namedVolumeMountpoints[volumeName] = mountpoint;
+        } else {
+          namedVolumeMountpoints[volumeName] = "";
+        }
+
+  // ##### <DEPRECATED> Kept for legacy compatibility
+  // Check if there are any named volume mappings stored in the metadata tags
   // To be backwards compatible, a few key DNP named volume mappings are hardcoded
   // legacyDefaultVolumes will only apply for legacy DNPs without defaults in labels
   const parsedDefaultVolumes = parseVolumeMappings(
     hasDefaults ? defaultVolumes : legacyDefaultVolumes[serviceName] || []
   );
-  // volumes = ["/dev0/user-set-path:/usr/data"]
-  // defaultVolumes = ["bitcoin_data:/usr/data"]
-  const namedVolumePathsFromDefaults = parsedDefaultVolumes.reduce(
-    (obj: typeof userSettingsType.namedVolumePaths, defaultVol) => {
-      if (defaultVol.name) {
-        const currentVols = volumes.filter(
-          v => v.container === defaultVol.container
-        );
-        // Only consider this setting if there is exactly ONE mapping for the container path
-        if (currentVols.length === 1) {
-          const currentVol = currentVols[0];
-          if (currentVol.name !== defaultVol.name)
-            return { ...obj, [defaultVol.name]: currentVol.host };
-        }
-      }
-      return obj;
-    },
-    {}
-  );
-  // If there is a named volume, it must be added in user settings so it
-  // can be modified by the user in the UI. If it's value is "", it will be ignored
-  const namedVolumePathsUnset = volumes.reduce(
-    (obj: typeof userSettingsType.namedVolumePaths, vol) => {
-      // Ignore binds and external volumes
-      if (!vol.name || ((compose.volumes || {})[vol.name] || {}).external)
-        return obj;
-      else return { ...obj, [vol.name]: "" };
-    },
-    {}
-  );
-  const namedVolumePaths = {
-    ...namedVolumePathsUnset,
-    ...namedVolumePathsFromDefaults
-  };
+  // defaultVolumes = ["bitcoin_data:/usr/data"], volumes = ["/dev0/user-set-path:/usr/data"]
+  for (const defaultVol of parsedDefaultVolumes) {
+    if (defaultVol.name) {
+      // Only consider this setting if there is exactly ONE mapping for the container path
+      const [currentVol, otherVol] = volumes.filter(
+        v => v.container === defaultVol.container
+      );
+      if (!otherVol && currentVol.name !== defaultVol.name)
+        namedVolumeMountpoints[defaultVol.name] = legacyTag + currentVol.host;
+    }
+  }
+  // ##### </DEPRECATED>
 
   return {
     environment,
     portMappings,
-    namedVolumePaths
+    namedVolumeMountpoints
   };
 }
 
@@ -388,7 +391,15 @@ export function applyUserSet(
   // User set
   const userSetEnvironment = userSettings.environment || {};
   const userSetPortMappings = userSettings.portMappings || {};
-  const userSetNamedVolumePaths = userSettings.namedVolumePaths || {};
+  const allNamedVolumeMountpoint = userSettings.allNamedVolumeMountpoint;
+  const userSetMountpoints: typeof userSettingsType.namedVolumeMountpoints = {};
+  const userSetNamedVolumePaths: typeof userSettingsType.namedVolumeMountpoints = {};
+  for (const [volumeName, mountpoint] of Object.entries(
+    userSettings.namedVolumeMountpoints || {}
+  ))
+    if (mountpoint.startsWith(legacyTag))
+      userSetNamedVolumePaths[volumeName] = mountpoint.split(legacyTag)[1];
+    else userSetMountpoints[volumeName] = mountpoint;
 
   // New values
   const nextEnvironment = stringifyEnvironment(
@@ -397,6 +408,7 @@ export function applyUserSet(
       (envValue, envName) => userSetEnvironment[envName] || envValue
     )
   );
+
   const nextPorts = stringifyPortMappings(
     portMappings.map(portMapping => {
       const portId = getPortMappingId(portMapping);
@@ -407,7 +419,8 @@ export function applyUserSet(
         : portMapping;
     })
   );
-  const nextVolumes = stringifyVolumeMappings(
+
+  const nextServiceVolumes = stringifyVolumeMappings(
     volumeMappings.map(vol => {
       const userSetHost = userSetNamedVolumePaths[vol.name || ""];
       if (vol.name && userSetHost) {
@@ -424,6 +437,50 @@ export function applyUserSet(
     })
   );
 
+  // Volume section edits
+  const nextComposeVolumes: ComposeVolumes = {};
+  const dnpName = serviceName;
+  const volumes = compose.volumes;
+
+  // Apply general mountpoint to all volumes
+  if (
+    allNamedVolumeMountpoint &&
+    volumes &&
+    // #### TEMP: Tag set in fetchDnpRequest
+    allNamedVolumeMountpoint !== userSettingDisableTag
+  )
+    for (const [volumeName, volumeObj] of Object.entries(volumes))
+      if (!volumeObj.external)
+        nextComposeVolumes[volumeName] = {
+          /* eslint-disable-next-line @typescript-eslint/camelcase */
+          driver_opts: {
+            type: "none",
+            device: getDevicePath({
+              mountpoint: allNamedVolumeMountpoint,
+              dnpName,
+              volumeName
+            }),
+            o: "bind"
+          }
+        };
+
+  // User set mountpoints for named volumes
+  for (const [volumeName, mountpoint] of Object.entries(userSetMountpoints))
+    if (
+      mountpoint &&
+      volumes &&
+      volumes[volumeName] &&
+      !volumes[volumeName].external
+    )
+      nextComposeVolumes[volumeName] = {
+        /* eslint-disable-next-line @typescript-eslint/camelcase */
+        driver_opts: {
+          type: "none",
+          device: getDevicePath({ mountpoint, dnpName, volumeName }),
+          o: "bind"
+        }
+      };
+
   return {
     ...compose,
     services: {
@@ -434,13 +491,11 @@ export function applyUserSet(
           {
             environment: nextEnvironment,
             ports: nextPorts,
-            volumes: nextVolumes
+            volumes: nextServiceVolumes
           },
           el => isObject(el) && isEmpty(el)
         ),
-        /**
-         * Add the default values as labels
-         */
+        // Add the default values as labels
         labels: {
           ...service.labels,
           ...writeDefaultsToLabels({
@@ -450,6 +505,89 @@ export function applyUserSet(
           })
         }
       }
-    }
+    },
+    // Only add volumes property if necessary, keep the compose clean
+    ...(isEmpty(volumes)
+      ? {}
+      : { volumes: { ...volumes, ...nextComposeVolumes } })
   };
+}
+
+/**
+ * Gets a device path and sanitizes the parts
+ * - For dnpName and volumeName only tolerates
+ *   alphanumeric characters and "-", "."
+ * - The mountpoint must be an absolute path
+ *
+ * @return devicePath = "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
+ */
+export function getDevicePath({
+  mountpoint,
+  dnpName,
+  volumeName
+}: {
+  mountpoint: string;
+  dnpName: string;
+  volumeName: string;
+}): string {
+  if (!path.isAbsolute(mountpoint))
+    throw Error(
+      `mountpoint path for '${dnpName} - ${volumeName}' must be an absolute path: ${mountpoint}`
+    );
+
+  const stripCharacters = (s: string): string =>
+    s
+      .replace(/[`~!@#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "")
+      .replace(/\.+/, ".");
+
+  return path.join(
+    mountpoint,
+    mountpointDevicePrefix,
+    stripCharacters(dnpName),
+    stripCharacters(volumeName)
+  );
+}
+
+/**
+ * Reverses the result of `getDevicePath`
+ * @param devicePath "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
+ * @return path parts = {
+ *   mountpoint: "/dev1/data",
+ *   dnpName: "bitcoin.dnp.dappnode.eth",
+ *   volumeName: "data",
+ *   volumePath: "bitcoin.dnp.dappnode.eth/data",
+ *   mountpointPath: "/dev1/data/dappnode-volumes"
+ * }
+ */
+export function parseDevicePath(
+  devicePath: string
+):
+  | {
+      mountpoint: string;
+      dnpName: string;
+      volumeName: string;
+      volumePath: string;
+      mountpointPath: string;
+    }
+  | undefined {
+  const [mountpoint, dnpNameAndVolumeName] = devicePath.split(
+    "/" + mountpointDevicePrefix + "/"
+  );
+  if (!dnpNameAndVolumeName) return;
+  const [dnpName, volumeName] = dnpNameAndVolumeName.split("/");
+  if (!volumeName) return;
+  return {
+    mountpoint: path.normalize(mountpoint),
+    dnpName,
+    volumeName,
+    volumePath: dnpNameAndVolumeName,
+    mountpointPath: path.join(mountpoint, mountpointDevicePrefix)
+  };
+}
+
+export function parseDevicePathMountpoint(
+  devicePath: string
+): string | undefined {
+  const pathParts = parseDevicePath(devicePath);
+  return pathParts ? pathParts.mountpoint : undefined;
 }

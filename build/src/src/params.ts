@@ -40,6 +40,10 @@ const params = {
   GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
+  // Host script paths
+  HOST_SCRIPTS_DIR_FROM_HOST: "/usr/src/dappnode/DNCORE/scripts/host",
+  HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
+  HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
 
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
@@ -51,6 +55,10 @@ const params = {
   DNP_NETWORK_INTERNAL_NAME: "network",
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
+  // Docker volume parameters
+  MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
+  MOUNTPOINT_DEVICE_LEGACY_TAG: "legacy:",
+  USER_SETTING_DISABLE_TAG: "disable:",
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
@@ -106,6 +114,10 @@ const params = {
     PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
     SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
   },
+
+  // nsenter line to run commands on host
+  NSENTER_COMMAND:
+    "docker run --rm --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i",
 
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",

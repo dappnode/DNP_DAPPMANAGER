@@ -64,7 +64,8 @@ export interface RequestStatus {
 export type UserSettingTarget =
   | { type: "environment"; name: string }
   | { type: "portMapping"; containerPort: string }
-  | { type: "namedVolumePath"; volumeName: string }
+  | { type: "namedVolumeMountpoint"; volumeName: string }
+  | { type: "allNamedVolumesMountpoint" }
   | { type: "fileUpload"; path: string };
 
 export interface SetupTarget {
@@ -88,13 +89,14 @@ export interface SetupUiJsonAllDnps {
 export interface UserSettings {
   environment?: { [envName: string]: string }; // Env value
   portMappings?: { [containerPortAndType: string]: string }; // Host port
-  namedVolumePaths?: { [volumeName: string]: string }; // Host absolute path
+  namedVolumeMountpoints?: { [volumeName: string]: string }; // Host absolute path to mountpoint
+  allNamedVolumeMountpoint?: string; // mountpoint
   fileUploads?: { [containerPath: string]: string }; // dataURL
 }
 // "bitcoin.dnp.dappnode.eth": {
 //   environment: { MODE: "VALUE_SET_BEFORE" }
 //   portMappings: { "8443": "8443"; "8443/udp": "8443" },
-//   namedVolumePaths: { data: "" }
+//   namedVolumeMountpoints: { data: "" }
 //   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
 // };
 export interface UserSettingsAllDnps {
@@ -240,6 +242,17 @@ export interface PackageEnvs {
   [envName: string]: string;
 }
 
+export interface PackageDetailData {
+  volumes: {
+    // volumeName = bitcoin_data
+    [volumeName: string]: {
+      size: string; // "823203"
+      devicePath: string; // "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
+      mountpoint?: string; // "/dev1/data"
+    };
+  };
+}
+
 export interface ManifestUpdateAlert {
   from: string;
   to: string;
@@ -278,9 +291,15 @@ export interface ManifestWithImage extends Manifest {
 export interface ComposeVolumes {
   // volumeName: "dncore_ethchaindnpdappnodeeth_data"
   [volumeName: string]: {
-    external?: {
-      name: string; // "dncore_ethchaindnpdappnodeeth_data"
-    };
+    // Allowed to user
+    external?: boolean | { name: string }; // name: "dncore_ethchaindnpdappnodeeth_data"
+    // NOT allowed to user, only used by DAppNode internally (if any)
+    name?: string; // Volumes can only be declared locally or be external
+    driver?: string; // Dangerous
+    driver_opts?:
+      | { type: "none"; device: string; o: "bind" }
+      | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
+    labels?: { [labelName: string]: string }; // User should not use this feature
   };
 }
 
@@ -640,6 +659,16 @@ export interface PackageReleaseImageData {
   network_mode?: string;
   command?: string;
   labels?: string[];
+}
+
+// An array of mountpoints MUST include one with the host (mountpoint = "")
+export interface MountpointData {
+  mountpoint: string; // "/media/usb0", mountpoint = "" means host (default)
+  use: string; // "87%"
+  total: string; // "500G"
+  free: string; // "141G"
+  vendor: string; // "ATA", "SanDisk"
+  model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
 /**

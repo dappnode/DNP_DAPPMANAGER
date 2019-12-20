@@ -16,12 +16,18 @@ import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
 import semver from "semver";
 import { listContainers } from "../modules/docker/listContainers";
+import { dockerInfoArchive } from "../modules/docker/dockerApi";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
-import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
+import {
+  parseUserSetFromCompose,
+  getContainerName
+} from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
+
+const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 export default async function fetchDnpRequest({
   id
@@ -33,19 +39,47 @@ export default async function fetchDnpRequest({
   const setupUiJson: SetupUiJsonAllDnps = {};
   const settings: UserSettingsAllDnps = {};
 
-  function addReleaseToSettings(_release: PackageRelease): void {
+  const dnpList = await listContainers();
+
+  async function addReleaseToSettings(_release: PackageRelease): Promise<void> {
     const { name, metadata, compose, isCore } = _release;
     if (metadata.setupSchema) setupSchema[name] = metadata.setupSchema;
     if (metadata.setupTarget) setupTarget[name] = metadata.setupTarget;
     if (metadata.setupUiJson) setupUiJson[name] = metadata.setupUiJson;
-    settings[name] = deepmerge(
-      parseUserSetFromCompose(compose), // current user settings overwritte compose
-      // If composePath does not exist, or is invalid: returns {}
+
+    const isInstalled = getIsInstalled(mainRelease, dnpList);
+    const containerName = getContainerName(name, isCore);
+
+    // current user settings overwritte compose
+    // If composePath does not exist, or is invalid: getUserSettingsSafe returns {}
+    const userSettings = deepmerge(
+      parseUserSetFromCompose(compose),
       getUserSettingsSafe(name, isCore)
     );
+
+    if (metadata.setupTarget)
+      for (const target of Object.values(metadata.setupTarget)) {
+        // If the package is already installed, disable allNamedVolumesMountpoint if any
+        if (target.type === "allNamedVolumesMountpoint" && isInstalled)
+          userSettings.allNamedVolumeMountpoint = userSettingDisableTag;
+        // If the path of file upload exists, mark it as disabled in the UI
+        if (target.type === "fileUpload") {
+          try {
+            const info = await dockerInfoArchive(containerName, target.path);
+            if (!userSettings.fileUploads) userSettings.fileUploads = {};
+            if (info.size)
+              userSettings.fileUploads[target.path] = userSettingDisableTag;
+          } catch (e) {
+            // Ignore all errors: 404 Container not found,
+            // 404 path not found, Base64 parsing, JSON parsing, etc.
+          }
+        }
+      }
+
+    settings[name] = userSettings;
   }
 
-  addReleaseToSettings(mainRelease);
+  await addReleaseToSettings(mainRelease);
 
   // Fetch dependencies
   let compatibleError = "";
@@ -61,13 +95,13 @@ export default async function fetchDnpRequest({
     // Add dependencies' metadata
     for (const [depName, depVersion] of Object.entries(state))
       if (depName !== name)
-        addReleaseToSettings(await getRelease(depName, depVersion));
+        await addReleaseToSettings(await getRelease(depName, depVersion));
   } catch (e) {
     compatibleError = e.message;
   }
 
   // Compute version metadata
-  const dnpList = await listContainers();
+
   const isInstalled = getIsInstalled(mainRelease, dnpList);
   const isUpdated = getIsUpdated(mainRelease, dnpList);
   const requiresCoreUpdate = getRequiresCoreUpdate(mainRelease, dnpList);

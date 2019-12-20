@@ -85,6 +85,7 @@ COPY --from=build-deps /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-deps /usr/bin/docker /usr/bin/docker
 
 # Copy the src last as it's the layer most likely to change
+COPY build/src/hostScripts /usr/src/app/hostScripts
 COPY --from=build-deps /usr/src/app /usr/src/app
 COPY --from=build-src /usr/src/app/dist /usr/src/app/src
 

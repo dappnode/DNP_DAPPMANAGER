@@ -8,8 +8,7 @@ import getImage, { verifyDockerImage } from "../modules/release/getImage";
 import lockPorts from "../modules/lockPorts";
 import {
   dockerLoad,
-  dockerCleanOldImages,
-  dockerComposeDown
+  dockerCleanOldImages
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import restartPatch from "../modules/docker/restartPatch";
@@ -17,6 +16,7 @@ import getRelease from "../modules/release/getRelease";
 import orderInstallPackages from "../modules/installer/orderInstallPackages";
 import getInstallerPackageData from "../modules/installer/getInstallerPackageData";
 import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
+import createCustomVolumeDevicePaths from "../modules/installer/createCustomVolumeDevicePaths";
 // Utils
 import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
@@ -33,7 +33,12 @@ import {
   flagPackagesAreNotInstalling,
   flagPackagesAreInstalling
 } from "../utils/packageIsInstalling";
+import { stringify } from "../utils/objects";
+import params from "../params";
 const logs = Logs(module);
+
+const dappmanagerId = "dappmanager.dnp.dappnode.eth";
+const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 /**
  * Installs a DAppNode Package.
@@ -80,13 +85,7 @@ export default async function installPackage({
    */
   logUi({ id, name: reqName, message: "Resolving dependencies..." });
   const { state, alreadyUpdated } = await dappGet(req, options);
-  logs.info(
-    `Resolved request ${reqName} @ ${reqVersion}: ${JSON.stringify(
-      state,
-      null,
-      2
-    )}`
-  );
+  logs.info(`Resolved request ${reqName} @ ${reqVersion}: ${stringify(state)}`);
 
   // Make sure that all packages are not being installed
   for (const dnpName of Object.keys(state))
@@ -123,14 +122,18 @@ export default async function installPackage({
           logs.debug(`Package data: ${JSON.stringify(packageData, null, 2)}`);
           logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
 
-          // Create the repoDir if necessary
-          validate.path(composeNextPath);
+          validate.path(composeNextPath); // Create the repoDir if necessary
           await writeAndValidateCompose(composeNextPath, compose);
 
           return packageData;
         })
       ),
       reqName
+    );
+    // Bulk packages processing
+    // Create custom volume device path if any
+    await createCustomVolumeDevicePaths(
+      packagesData.map(({ compose }) => compose)
     );
 
     /**
@@ -184,11 +187,11 @@ export default async function installPackage({
        */
       for (const { name, composeNextPath, fileUploads } of packagesData) {
         // patch to prevent installer from crashing
-        if (name == "dappmanager.dnp.dappnode.eth") {
+        if (name == dappmanagerId) {
           logUi({ id, name, message: "Reseting DAppNode... " });
           await restartPatch();
         } else {
-          // Copy fileUploads if any to the container before upping
+          // Copy fileUploads if any to the container before up-ing
           if (fileUploads) {
             logUi({ id, name, message: "Copying file uploads..." });
             logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
@@ -197,6 +200,9 @@ export default async function installPackage({
             for (const [containerPath, dataUri] of Object.entries(
               fileUploads
             )) {
+              // #### TEMP: Tag set in fetchDnpRequest
+              if (dataUri === userSettingDisableTag) continue;
+
               const { dir, base } = path.parse(containerPath);
               await copyFileTo({
                 id: name,
@@ -214,12 +220,11 @@ export default async function installPackage({
         logUi({ id, name, message: "Package started" });
       }
     } catch (e) {
-      logs.error(`Rolling back installation of ${id}: ${e.stack}`);
       /**
-       * Rollback
-       * - Stop all new packages with the new compose
-       * - Up the old packages with the previous compose
+       * [Rollback] Stop all new packages with the new compose
+       * Up the old packages with the previous compose
        */
+      logs.error(`Rolling back installation of ${id}: ${e.stack}`);
       for (const {
         name,
         imagePath,
@@ -229,18 +234,11 @@ export default async function installPackage({
         try {
           logUi({ id, name, message: "Aborting and rolling back..." });
 
-          try {
-            if (fs.existsSync(composeNextPath))
-              await dockerComposeDown(composeNextPath);
-          } catch (eDown) {
-            logs.error(`Error on rollback dc down ${name}: ${eDown.stack}`);
-          }
-
           safeUnlink(imagePath);
           safeUnlink(composeNextPath);
 
           // Deal with packages that were NOT installed before this install
-          if (fs.existsSync(composePath))
+          if (fs.existsSync(composePath) && name !== dappmanagerId)
             await dockerComposeUpSafe(composePath);
         } catch (ePkg) {
           logs.error(`Error rolling back ${name}: ${ePkg.stack}`);
@@ -300,10 +298,12 @@ export default async function installPackage({
     // Instruct the UI to clear isInstalling logs
     logUiClear({ id });
 
-    // AFTER - 8. Trigger a natRenewal update to open ports if necessary
-    // Since a package installation is not a very frequent activity it is okay to be
-    // called on each install. Internal mechanisms protect the natRenewal function
-    // to be called too often.
+    /**
+     * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
+     * Since a package installation is not a very frequent activity it is okay to be
+     * called on each install. Internal mechanisms protect the natRenewal function
+     * to be called too often.
+     */
     eventBus.runNatRenewal.emit();
 
     // Emit packages update

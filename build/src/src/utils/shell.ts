@@ -1,7 +1,10 @@
 import util from "util";
 import * as child from "child_process";
+import params from "../params";
 
 const exec = util.promisify(child.exec);
+
+const nsenterCommand = params.NSENTER_COMMAND;
 
 /**
  * If this method is invoked as its util.promisify()ed version,
@@ -18,6 +21,9 @@ const exec = util.promisify(child.exec);
  */
 const defaultTimeout = 15 * 60 * 1000; // ms
 
+/**
+ * Run arbitrary commands in a shell in the DAPPMANAGER container
+ */
 export default async function shell(
   cmd: string,
   options?: { timeout?: number; maxBuffer?: number }
@@ -32,6 +38,20 @@ export default async function shell(
       }
       throw err;
     });
+}
+
+/**
+ * Run arbitrary commands in a shell in the host
+ * [ALERT]: To use flags, you MUST add "--" before the first flag
+ * `mkdir -p /some/dir` will fail, because the flag -p will be interpreted as
+ * part of the `docker run ... nsenter` command
+ * `mkdir -- -p /some/dir` will succeed
+ */
+export function shellHost(
+  cmd: string,
+  options?: { timeout?: number }
+): Promise<string> {
+  return shell(`${nsenterCommand} ${cmd}`, options);
 }
 
 /**

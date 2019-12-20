@@ -22,6 +22,14 @@ describe("Call function: restartPackageVolumes", function() {
   const dockerRm = sinon.stub();
   const dockerVolumeRm = sinon.stub();
   const dockerComposeUpSafe = sinon.stub();
+  const dockerVolumeInspect = sinon.stub().resolves({
+    Driver: "local",
+    Labels: {},
+    Mountpoint: "/var/lib/docker/volumes/dappnodeeth_data/_data",
+    Name: "dappnodeeth_data",
+    Options: null,
+    Scope: "local"
+  });
 
   // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
 
@@ -135,6 +143,9 @@ describe("Call function: restartPackageVolumes", function() {
           .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerSafe"))
           .with({ dockerComposeUpSafe })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/dockerApi"))
+          .with({ dockerVolumeInspect })
           .toBeUsed();
         mock(() => import("../../src/modules/docker/listContainers"))
           .with({ listContainers })

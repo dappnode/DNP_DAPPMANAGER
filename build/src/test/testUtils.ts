@@ -1,5 +1,6 @@
 import shell from "../src/utils/shell";
 import * as path from "path";
+import fs from "fs";
 import { lowLevelCacheDb, lowLevelMainDb } from "../src/db";
 import {
   PackageContainer,
@@ -16,6 +17,12 @@ import {
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 
 export const testDir = "./test_files/";
+const testMountpoint = "./test_mountpoints";
+export const getTestMountpoint = (id: string): string => {
+  const mountpointPath = path.join(testMountpoint, id);
+  fs.mkdirSync(mountpointPath, { recursive: true });
+  return mountpointPath;
+};
 
 export function clearDbs(): void {
   lowLevelCacheDb.clearDb();

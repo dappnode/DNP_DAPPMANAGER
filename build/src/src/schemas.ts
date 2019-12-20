@@ -6,7 +6,9 @@ import {
   ProgressLog,
   PackageNotification,
   UserActionLog,
-  CoreUpdateData
+  CoreUpdateData,
+  MountpointData,
+  PackageDetailData
 } from "./types";
 
 /**
@@ -209,6 +211,24 @@ export const installedDnpSample: PackageContainer = {
 
 export const installedDnpsSample: PackageContainer[] = [installedDnpSample];
 
+export const packageDetailDataSchema = {
+  type: "object",
+  properties: {
+    volumes: { type: "object" }
+  },
+  required: ["volumes"]
+};
+
+export const packageDetailDataSample: PackageDetailData = {
+  volumes: {
+    data: {
+      size: "6371825123", // volumeName: sizeInBytes
+      devicePath: "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data",
+      mountpoint: "/dev1/data"
+    }
+  }
+};
+
 /**
  * Notifications
  */
@@ -230,6 +250,38 @@ export const packageNotificationSample: PackageNotification = {
   title: "Danger!",
   body: "This happened"
 };
+
+/**
+ * Mountpoints
+ */
+
+export const mountpointsDataSchema = {
+  type: "array",
+  title: "mountpointsData",
+  items: {
+    type: "object",
+    properties: {
+      mountpoint: { type: "string" },
+      use: { type: "string" },
+      total: { type: "string" },
+      free: { type: "string" },
+      vendor: { type: "string" },
+      model: { type: "string" }
+    },
+    required: ["mountpoint"]
+  }
+};
+
+export const mountpointsDataSample: MountpointData[] = [
+  {
+    mountpoint: "/media/usb0",
+    use: "87%",
+    total: "500G",
+    free: "141G",
+    vendor: "ATA",
+    model: "CT500MX500SSD4"
+  }
+];
 
 /**
  * Progress logs. Use in UI /installer/:id to provide feedback during installation
