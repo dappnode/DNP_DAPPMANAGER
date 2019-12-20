@@ -18,12 +18,13 @@ const exec = util.promisify(child.exec);
  */
 const defaultTimeout = 15 * 60 * 1000; // ms
 
-export default function shell(
+export default async function shell(
   cmd: string,
-  options?: { timeout?: number }
+  options?: { timeout?: number; maxBuffer?: number }
 ): Promise<string> {
   const timeout = options && options.timeout ? options.timeout : defaultTimeout;
-  return exec(cmd, { timeout })
+  const maxBuffer = options && options.maxBuffer;
+  return exec(cmd, { timeout, maxBuffer })
     .then(res => (res.stdout || "").trim())
     .catch(err => {
       if (err.signal === "SIGTERM") {

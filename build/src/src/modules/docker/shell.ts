@@ -11,7 +11,7 @@ const logs = Logs(module);
 
 export default async function shellWrap(
   cmd: string,
-  options?: { timeout?: number }
+  options?: { timeout?: number; maxBuffer?: number }
 ): Promise<string> {
   try {
     return await shell(cmd, options);

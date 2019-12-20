@@ -104,7 +104,9 @@ export function dockerLogs(
   if (options && options.timestamps) optionsString += " --timestamps";
   if (options && options.tail && !isNaN(options.tail))
     optionsString += ` --tail ${options.tail}`;
-  return shell(`docker logs ${containerNameOrId} ${optionsString} 2>&1`);
+  return shell(`docker logs ${containerNameOrId} ${optionsString} 2>&1`, {
+    maxBuffer: 1024 * 1024 * 10 // 10 MB
+  });
 }
 
 // File manager, copy command
