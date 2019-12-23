@@ -56,7 +56,10 @@ export function registerSubscriptions(
         try {
           publish(route, validateData ? validateData(data) : data);
         } catch (e) {
-          errorLogger.error(`Error on WAMP emit ${route}: ${e.stack}`);
+          // autobahn returns a wierd error
+          const errorMessage =
+            typeof e === "object" ? (e.stack ? e.stack : JSON.stringify(e)) : e;
+          errorLogger.error(`Error on WAMP emit ${route}: ${errorMessage}`);
         }
       }
     };
