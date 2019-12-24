@@ -524,9 +524,12 @@ describe("DNP lifecycle", function() {
       const dnpMainPrev = await getDnpFromListPackages(idMain);
       const res = await calls.restartPackageVolumes({ id: idDep });
       const dnpMainNext = await getDnpFromListPackages(idMain);
-      expect(res.message).to.equal(
-        `Restarted ${idDep} volumes: dependencydnpdappnodeeth_data`
-      );
+
+      // #### NOTE: order of the message is not guaranteed, check it by parts
+      // Possible message: `Restarted ${idDep} volumes: dependencydnpdappnodeeth_data`
+      for (const messagePart of [idDep, "dependencydnpdappnodeeth_data"])
+        expect(res.message).to.include(messagePart, "Wrong result message");
+
       // To know if main was restarted check that the container is different
       if (!dnpMainPrev) throw Error(`DNP ${idMain} (prev) not found`);
       if (!dnpMainNext) throw Error(`DNP ${idMain} (next) not found`);
@@ -541,9 +544,14 @@ describe("DNP lifecycle", function() {
       // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
       // removed but it's data will not. Only the reference in /var/lib/docker
       // is deleted
-      expect(res.message).to.equal(
-        `Restarted ${idMain} volumes: maindnpdappnodeeth_changeme-main maindnpdappnodeeth_data`
-      );
+      // #### NOTE: order of the message is not guaranteed, check it by parts
+      // Possible message: `Restarted ${idMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
+      for (const messagePart of [
+        idMain,
+        "maindnpdappnodeeth_changeme-main",
+        "maindnpdappnodeeth_data"
+      ])
+        expect(res.message).to.include(messagePart, "Wrong result message");
     });
   });
 
