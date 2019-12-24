@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
 import { listContainer, listContainerNoThrow } from "./listContainers";
@@ -29,7 +30,9 @@ export default async function restartDappmanagerPatch(): Promise<void> {
 
   const composeRestartPath = getPath.dockerCompose(restartId, true);
   const pathRemote = "/usr/src/app/DNCORE/docker-compose-dappmanager.yml";
-  const pathLocal = getPath.dockerCompose(dappmanagerName, true);
+  // NOTE: pathLocal MUST be an ABSOLUTE path or docker-compose will consider it
+  // a named volume and error
+  const pathLocal = path.resolve(getPath.dockerCompose(dappmanagerName, true));
 
   /**
    * [NOTE1]: The entrypoint property in the docker-compose overwrites
@@ -57,6 +60,8 @@ export default async function restartDappmanagerPatch(): Promise<void> {
     }
   }
 
+  // NOTE: pathLocal MUST be an ABSOLUTE path or docker-compose will consider it
+  // a named volume and error
   const composeData = `version: '3.4'
 services:
   ${restartId}:
