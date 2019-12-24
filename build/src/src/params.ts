@@ -13,6 +13,7 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 let DNCORE_DIR = "DNCORE"; // Bind volume
 let REPO_DIR = "dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
+const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
   DNCORE_DIR = "test_files/";
@@ -27,6 +28,7 @@ const params = {
   // File paths
   REPO_DIR,
   DNCORE_DIR,
+  HOST_HOME,
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // Static files serve
   avatarStaticDir: path.join(REPO_DIR, "avatars"),
@@ -41,7 +43,7 @@ const params = {
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
   // Host script paths
-  HOST_SCRIPTS_DIR_FROM_HOST: "/usr/src/dappnode/DNCORE/scripts/host",
+  HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
 

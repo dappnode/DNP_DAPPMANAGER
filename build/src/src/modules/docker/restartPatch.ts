@@ -5,6 +5,7 @@ import * as validate from "../../utils/validate";
 import { listContainer, listContainerNoThrow } from "./listContainers";
 import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
+import params from "../../params";
 import Logs from "../../logs";
 const logs = Logs(module);
 
@@ -29,10 +30,11 @@ export default async function restartDappmanagerPatch(): Promise<void> {
   const imageName = dnp.image;
 
   const composeRestartPath = getPath.dockerCompose(restartId, true);
-  const pathRemote = "/usr/src/app/DNCORE/docker-compose-dappmanager.yml";
+  const composePathFromDncore = getPath.dockerCompose(dappmanagerName, true);
+  const pathRemote = path.resolve(composePathFromDncore);
   // NOTE: pathLocal MUST be an ABSOLUTE path or docker-compose will consider it
   // a named volume and error
-  const pathLocal = path.resolve(getPath.dockerCompose(dappmanagerName, true));
+  const pathLocal = path.join(params.HOST_HOME, composePathFromDncore);
 
   /**
    * [NOTE1]: The entrypoint property in the docker-compose overwrites
@@ -71,7 +73,7 @@ services:
       - '${pathLocal}:${pathRemote}'
       - '/usr/local/bin/docker-compose:/usr/local/bin/docker-compose'
       - '/var/run/docker.sock:/var/run/docker.sock'
-    entrypoint: docker-compose -f ${pathRemote} up -d --force-recreate <&-
+    entrypoint: docker-compose -f ${pathRemote} up -d --force-recreate
     network_mode: none
 `;
 
