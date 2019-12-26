@@ -1,10 +1,9 @@
 import { ReturnData } from "../route-types/packageDetailDataGet";
-import { isEmpty, mapValues } from "lodash";
+import { mapValues } from "lodash";
 import { RequestData } from "../route-types/packageGettingStartedToggle";
 import { RpcHandlerReturnWithResult } from "../types";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
-import getHostVolumeSizes from "../modules/docker/getHostVolumeSizes";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
 
 /**
@@ -34,14 +33,17 @@ export default async function packageDetailDataGet({
   }
 
   // Only call this very expensive function if necessary
-  const volumeSizes = isEmpty(volDevicePaths)
-    ? {}
-    : await getHostVolumeSizes(volDevicePaths);
+  // TODO: This feature is deactivated until UX is sorted out
+  //       calling du on massive dirs is too resource consuming
+  //       and can take +30min on Storj data
+  // const volumeSizes = isEmpty(volDevicePaths)
+  //   ? {}
+  //   : await getHostVolumeSizes(volDevicePaths);
 
-  const volumes = mapValues(volDevicePaths, (devicePath, volName) => {
+  const volumes = mapValues(volDevicePaths, (devicePath /* volName */) => {
     const pathParts = parseDevicePath(devicePath);
     return {
-      size: volumeSizes[volName],
+      size: undefined, // volumeSizes[volName]
       devicePath,
       mountpoint: pathParts ? pathParts.mountpoint : undefined
     };
