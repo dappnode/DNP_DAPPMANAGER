@@ -63,17 +63,20 @@ export default async function fetchDnpRequest({
         if (target.type === "allNamedVolumesMountpoint" && isInstalled)
           userSettings.allNamedVolumeMountpoint = userSettingDisableTag;
         // If the path of file upload exists, mark it as disabled in the UI
-        if (target.type === "fileUpload") {
-          try {
-            const info = await dockerInfoArchive(containerName, target.path);
-            if (!userSettings.fileUploads) userSettings.fileUploads = {};
-            if (info.size)
-              userSettings.fileUploads[target.path] = userSettingDisableTag;
-          } catch (e) {
-            // Ignore all errors: 404 Container not found,
-            // 404 path not found, Base64 parsing, JSON parsing, etc.
-          }
-        }
+
+        // TODO: Deactivated since it collides with `react-jsonschema-form` validation for data urls
+        //       Setting this prop to something random like "disabled:" will block a DNP update
+        // if (target.type === "fileUpload") {
+        //   try {
+        //     const info = await dockerInfoArchive(containerName, target.path);
+        //     if (!userSettings.fileUploads) userSettings.fileUploads = {};
+        //     if (info.size)
+        //       userSettings.fileUploads[target.path] = userSettingDisableTag;
+        //   } catch (e) {
+        //     // Ignore all errors: 404 Container not found,
+        //     // 404 path not found, Base64 parsing, JSON parsing, etc.
+        //   }
+        // }
       }
 
     settings[name] = userSettings;
