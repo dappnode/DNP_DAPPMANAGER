@@ -14,18 +14,19 @@ export * from "./upnp";
 import { lowLevel as lowLevelMainDb } from "./dbMain";
 import { lowLevel as lowLevelCacheDb } from "./dbCache";
 // For migrate
-import { AUTO_UPDATE_SETTINGS } from "./autoUpdateSettings";
+import { AUTO_UPDATE_SETTINGS, autoUpdateSettings } from "./autoUpdateSettings";
+import { isEmpty } from "lodash";
 
 /**
  * Migrate keys to the new DB
- * - AUTO_UPDATE_SETTINGS
- * - ARE_ENV_FILES_MIGRATED (is ommited)
  */
-const dbKeysToMigrate = [AUTO_UPDATE_SETTINGS];
 function migrateToNewMainDb(): void {
-  for (const key of dbKeysToMigrate) {
-    lowLevelMainDb.set(key, lowLevelCacheDb.get(key));
-    lowLevelCacheDb.del(key);
+  // AUTO_UPDATE_SETTINGS
+  // Migrate ONLY if there are settings in the old DB
+  const autoUpdateSettingsValue = lowLevelCacheDb.get(AUTO_UPDATE_SETTINGS);
+  if (autoUpdateSettingsValue && !isEmpty(autoUpdateSettingsValue)) {
+    autoUpdateSettings.set(autoUpdateSettingsValue);
+    lowLevelCacheDb.del(AUTO_UPDATE_SETTINGS);
   }
 }
 

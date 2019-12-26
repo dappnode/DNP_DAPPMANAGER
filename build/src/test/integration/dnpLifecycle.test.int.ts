@@ -15,10 +15,19 @@ import {
   ManifestWithImage,
   PortProtocol
 } from "../../src/types";
-import { clearDbs, testDir } from "../testUtils";
+import { clearDbs, getTestMountpoint } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
-import { stringifyPortMappings } from "../../src/utils/dockerComposeParsers";
+import {
+  stringifyPortMappings,
+  legacyTag
+} from "../../src/utils/dockerComposeParsers";
 const logs = Logs(module);
+
+// This mountpoints have files inside created by docker with the root
+// user group, so they can't be cleaned by other tests.
+// #### TODO: While a better solution is found, each test will use a separate dir
+const testMountpointDnpLifeCycleMain = getTestMountpoint("dnplifecycle-main");
+const testMountpointDnpLifeCycleDep = getTestMountpoint("dnplifecycle-dep");
 
 // Utils
 
@@ -93,6 +102,13 @@ describe("DNP lifecycle", function() {
       newHost: 2220
     }
   });
+  const volumesMain = {
+    changeme: {
+      name: "changeme-main",
+      newHost: path.resolve(testMountpointDnpLifeCycleMain, "testMountpoint"),
+      container: "/temp"
+    }
+  };
   const portsDep = addPortId({
     // Change from ephemeral to a defined host port
     three: {
@@ -109,10 +125,10 @@ describe("DNP lifecycle", function() {
       newHost: ""
     }
   });
-  const depVolumes = {
+  const volumesDep = {
     changeme: {
-      name: "changeme",
-      newHost: path.resolve(__dirname, testDir, "testBind"),
+      name: "changeme-dep",
+      newHost: path.resolve(testMountpointDnpLifeCycleDep, "testBind"),
       container: "/temp"
     }
   };
@@ -125,7 +141,10 @@ describe("DNP lifecycle", function() {
       size: 0,
       path: "",
       environment: toEnvironment(envsMain),
-      volumes: ["data:/usr"],
+      volumes: [
+        "data:/usr",
+        `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
+      ],
       /* eslint-disable-next-line @typescript-eslint/camelcase */
       external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
       ports: stringifyPortMappings(Object.values(portsMain))
@@ -142,7 +161,7 @@ describe("DNP lifecycle", function() {
       environment: toEnvironment(envsDep),
       volumes: [
         "data:/usr",
-        `${depVolumes.changeme.name}:${depVolumes.changeme.container}`
+        `${volumesDep.changeme.name}:${volumesDep.changeme.container}`
       ],
       ports: stringifyPortMappings(Object.values(portsDep))
     }
@@ -163,6 +182,9 @@ describe("DNP lifecycle", function() {
       portMappings: {
         [portsMain.two.portId]: String(portsMain.two.newHost)
       },
+      namedVolumeMountpoints: {
+        [volumesMain.changeme.name]: volumesMain.changeme.newHost
+      },
       fileUploads: {
         [demoFilePath]: fileDataUrlMain
       }
@@ -175,8 +197,9 @@ describe("DNP lifecycle", function() {
         [portsDep.three.portId]: String(portsDep.three.newHost),
         [portsDep.four.portId]: String(portsDep.four.newHost)
       },
-      namedVolumePaths: {
-        [depVolumes.changeme.name]: depVolumes.changeme.newHost
+      namedVolumeMountpoints: {
+        // ##### DEPRECATED
+        [volumesDep.changeme.name]: legacyTag + volumesDep.changeme.newHost
       },
       fileUploads: {
         [demoFilePath]: fileDataUrlDep
@@ -190,12 +213,14 @@ describe("DNP lifecycle", function() {
     const cmds = [
       // SUPER important to clean dnp_repo folder to avoid caches
       `rm -rf ${params.REPO_DIR}`,
-
       // Clean previous stuff
       `docker rm -f ${[
         `DAppNodePackage-${idMain}`,
         `DAppNodePackage-${idDep}`
-      ].join(" ")}`
+      ].join(" ")}`,
+      // Clean volumes
+      `docker volume rm -f $(docker volume ls --filter name=maindnpdappnodeeth_ -q)`,
+      `docker volume rm -f $(docker volume ls --filter name=dependencydnpdappnodeeth_ -q)`
     ];
     for (const cmd of cmds) {
       await shellSafe(cmd);
@@ -289,6 +314,22 @@ describe("DNP lifecycle", function() {
       });
     });
 
+    it(`${idMain} name volume paths`, () => {
+      const changemeVolume = dnpMain.volumes.find(
+        ({ container }) => container === volumesMain.changeme.container
+      );
+
+      if (!changemeVolume) throw Error(`Volume changeme not found`);
+      // Using this particular type of bind, the volume path in docker inspect
+      // is the default var lib docker
+      const dockerDefaultPath = path.join(
+        "/var/lib/docker/volumes",
+        `${idMain.replace(/\./g, "")}_${volumesMain.changeme.name}`,
+        "_data"
+      );
+      expect(changemeVolume.host).to.equal(dockerDefaultPath);
+    });
+
     it(`${idMain} fileuploads`, async () => {
       const res = await calls.copyFileFrom({
         id: idMain,
@@ -325,10 +366,10 @@ describe("DNP lifecycle", function() {
 
     it(`${idDep} name volume paths`, () => {
       const changemeVolume = dnpDep.volumes.find(
-        ({ container }) => container === depVolumes.changeme.container
+        ({ container }) => container === volumesDep.changeme.container
       );
       if (!changemeVolume) throw Error(`Volume changeme not found`);
-      expect(changemeVolume.host).to.equal(depVolumes.changeme.newHost);
+      expect(changemeVolume.host).to.equal(volumesDep.changeme.newHost);
     });
 
     it(`${idDep} fileuploads`, async () => {
@@ -483,9 +524,12 @@ describe("DNP lifecycle", function() {
       const dnpMainPrev = await getDnpFromListPackages(idMain);
       const res = await calls.restartPackageVolumes({ id: idDep });
       const dnpMainNext = await getDnpFromListPackages(idMain);
-      expect(res.message).to.equal(
-        `Restarted ${idDep} volumes: dependencydnpdappnodeeth_data`
-      );
+
+      // #### NOTE: order of the message is not guaranteed, check it by parts
+      // Possible message: `Restarted ${idDep} volumes: dependencydnpdappnodeeth_data`
+      for (const messagePart of [idDep, "dependencydnpdappnodeeth_data"])
+        expect(res.message).to.include(messagePart, "Wrong result message");
+
       // To know if main was restarted check that the container is different
       if (!dnpMainPrev) throw Error(`DNP ${idMain} (prev) not found`);
       if (!dnpMainNext) throw Error(`DNP ${idMain} (next) not found`);
@@ -497,9 +541,17 @@ describe("DNP lifecycle", function() {
 
     it(`Should restart the package volumes of ${idMain}`, async () => {
       const res = await calls.restartPackageVolumes({ id: idMain });
-      expect(res.message).to.equal(
-        `Restarted ${idMain} volumes: maindnpdappnodeeth_data`
-      );
+      // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
+      // removed but it's data will not. Only the reference in /var/lib/docker
+      // is deleted
+      // #### NOTE: order of the message is not guaranteed, check it by parts
+      // Possible message: `Restarted ${idMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
+      for (const messagePart of [
+        idMain,
+        "maindnpdappnodeeth_changeme-main",
+        "maindnpdappnodeeth_data"
+      ])
+        expect(res.message).to.include(messagePart, "Wrong result message");
     });
   });
 

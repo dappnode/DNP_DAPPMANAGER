@@ -19,11 +19,68 @@ import {
   stringifyVolumeMappings,
   normalizeVolumePath,
   parseUserSetFromCompose,
-  applyUserSet
+  applyUserSet,
+  getDevicePath,
+  parseDevicePath,
+  parseDevicePathMountpoint,
+  legacyTag
 } from "../../src/utils/dockerComposeParsers";
 import { mockCompose, mockDnpName, mockComposeService } from "../testUtils";
 
-const bitcoinDataVolumeName = "bitcoin_data";
+/* eslint-disable @typescript-eslint/camelcase */
+
+const bitcoinVolumeName = "bitcoin_data";
+const bitcoinVolumeNameNew = "bitcoin_new_data";
+
+const polkadotNewCompose = {
+  version: "3.4",
+  services: {
+    "polkadot-kusama.public.dappnode.eth": {
+      image: "polkadot-kusama.public.dappnode.eth:0.0.2",
+      volumes: ["polkadot:/polkadot"],
+      ports: ["30333:30333"],
+      environment: [
+        "NODE_NAME=DAppNodeNodler",
+        "VALIDATOR_ENABLE=no",
+        "TELEMETRY_ENABLE=no",
+        "EXTRA_OPTS=--out-peers 10 --in-peers 10"
+      ],
+      restart: "always",
+      container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
+      logging: {
+        options: {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      dns: "172.33.1.2",
+      networks: ["dncore_network"]
+    }
+  },
+  volumes: {
+    polkadot: {}
+  },
+  networks: {
+    dncore_network: {
+      external: true
+    }
+  }
+};
+
+const polkadotCurrentCompose = {
+  ...polkadotNewCompose,
+  services: {
+    "polkadot-kusama.public.dappnode.eth": {
+      ...polkadotNewCompose.services["polkadot-kusama.public.dappnode.eth"],
+      labels: {
+        "dappnode.dnp.default.environment":
+          '["NODE_NAME=DAppNodeNodler","VALIDATOR_ENABLE=no","TELEMETRY_ENABLE=no","EXTRA_OPTS=--out-peers 10 --in-peers 10"]',
+        "dappnode.dnp.default.ports": '["30333:30333"]',
+        "dappnode.dnp.default.volumes": '["polkadot:/polkadot"]'
+      }
+    }
+  }
+};
 
 describe("Util: dockerComposeParsers", () => {
   describe("environment: parse, stringify", () => {
@@ -144,49 +201,6 @@ describe("Util: dockerComposeParsers", () => {
       );
     });
 
-    // it("should merge volume mappings", () => {
-    //   const volumeMappings1: VolumeMapping[] = [
-    //     { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" }
-    //   ];
-
-    //   const volumeMappings2: VolumeMapping[] = [
-    //     { host: "bitcoin_data", container: "/root/.bitcoin" },
-    //     { host: "/etc/another-path", container: "/etc/some-path" }
-    //   ];
-
-    //   const mergedVolumeMappings = mergeVolumeMappings(
-    //     volumeMappings1,
-    //     volumeMappings2
-    //   );
-
-    //   expect(mergedVolumeMappings).to.deep.equal([
-    //     { host: "/dev1/custom-path/bitcoin-data", container: "/root/.bitcoin" },
-    //     { host: "/etc/another-path", container: "/etc/some-path" }
-    //   ]);
-    // });
-
-    // it("should parse, merge and stringify two volume arrays", () => {
-    //   const volumeArray1 = ["/dev1/custom-path/bitcoin-data:/root/.bitcoin"];
-    //   const volumeArray2 = ["bitcoin_data:/root/.bitcoin"];
-
-    //   const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
-
-    //   expect(mergedPortMappings).to.deep.equal([
-    //     "/dev1/custom-path/bitcoin-data:/root/.bitcoin"
-    //   ]);
-    // });
-
-    // it("De-duplicate identical paths", () => {
-    //   const volumeArray1 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum/"];
-    //   const volumeArray2 = ["ethchaindnpdappnodeeth_geth:/root/.ethereum"];
-
-    //   const mergedPortMappings = mergeVolumeArrays(volumeArray1, volumeArray2);
-
-    //   expect(mergedPortMappings).to.deep.equal([
-    //     "ethchaindnpdappnodeeth_geth:/root/.ethereum"
-    //   ]);
-    // });
-
     describe("Path normalization", () => {
       const paths = [
         { path: "/", res: "/" },
@@ -203,7 +217,7 @@ describe("Util: dockerComposeParsers", () => {
   });
 
   describe("parseUserSet", () => {
-    it("Should parse the user set variable", () => {
+    it("Should parse a normal case", () => {
       const compose: Compose = {
         ...mockCompose,
         services: {
@@ -211,11 +225,26 @@ describe("Util: dockerComposeParsers", () => {
             ...mockComposeService,
             environment: ["ORIGINAL=0", "USERSET=1"],
             ports: ["4001:4001", "9090:9090", "32764:6000"],
-            volumes: ["/dev1/custom-path:/usr/data", "moredata:/usr/data2"],
+            volumes: [
+              "/dev1/custom-path:/usr/data0",
+              "moredata:/usr/data1",
+              `${bitcoinVolumeNameNew}:/usr/data2`
+            ],
             labels: {
               "dappnode.dnp.default.environment": "[]",
               "dappnode.dnp.default.ports": "[]",
-              "dappnode.dnp.default.volumes": `["${bitcoinDataVolumeName}:/usr/data", "moredata:/usr/data2"]`
+              "dappnode.dnp.default.volumes": `["${bitcoinVolumeName}:/usr/data0", "moredata:/usr/data1", "${bitcoinVolumeNameNew}:/usr/data2"]`
+            }
+          }
+        },
+        volumes: {
+          bitcoinVolumeName: {},
+          moredata: {},
+          [bitcoinVolumeNameNew]: {
+            driver_opts: {
+              device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
+              o: "bind",
+              type: "none"
             }
           }
         }
@@ -228,9 +257,11 @@ describe("Util: dockerComposeParsers", () => {
           ORIGINAL: "0",
           USERSET: "1"
         },
-        namedVolumePaths: {
-          [bitcoinDataVolumeName]: "/dev1/custom-path",
-          moredata: ""
+        namedVolumeMountpoints: {
+          [bitcoinVolumeNameNew]: "/dev0/data",
+          moredata: "",
+          // ##### DEPRECATED
+          [bitcoinVolumeName]: legacyTag + "/dev1/custom-path"
         },
         portMappings: {
           "4001/TCP": "4001",
@@ -251,6 +282,10 @@ describe("Util: dockerComposeParsers", () => {
             ...mockComposeService,
             volumes: ["/dev1/custom-path:/root/.bitcoin", "moredata:/usr/data2"]
           }
+        },
+        volumes: {
+          [bitcoinVolumeName]: {},
+          moredata: {}
         }
       };
 
@@ -258,10 +293,32 @@ describe("Util: dockerComposeParsers", () => {
 
       const expectedUserSet: UserSettings = {
         environment: {},
-        portMappings: {},
-        namedVolumePaths: {
-          [bitcoinDataVolumeName]: "/dev1/custom-path",
-          moredata: ""
+        namedVolumeMountpoints: {
+          moredata: "",
+          // ##### DEPRECATED
+          [bitcoinVolumeName]: legacyTag + "/dev1/custom-path"
+        },
+        portMappings: {}
+      };
+
+      expect(userSettings).to.deep.equal(expectedUserSet);
+    });
+
+    it("Should parse correctly for an update with a named volume (bug)", () => {
+      const userSettings = parseUserSetFromCompose(polkadotCurrentCompose);
+
+      const expectedUserSet: UserSettings = {
+        environment: {
+          EXTRA_OPTS: "--out-peers 10 --in-peers 10",
+          NODE_NAME: "DAppNodeNodler",
+          TELEMETRY_ENABLE: "no",
+          VALIDATOR_ENABLE: "no"
+        },
+        namedVolumeMountpoints: {
+          polkadot: ""
+        },
+        portMappings: {
+          "30333/TCP": "30333"
         }
       };
 
@@ -274,8 +331,9 @@ describe("Util: dockerComposeParsers", () => {
       const environment = ["ORIGINAL=VALUE", "USERSET=VALUE"];
       const ports = ["4001:4001", "9090:9090/udp", "32764:6000"];
       const volumes = [
-        `${bitcoinDataVolumeName}:/usr/data`,
-        "/dev1/custom-path:/usr/data2"
+        `${bitcoinVolumeNameNew}:/usr/data0`,
+        "/dev1/custom-path:/usr/data1",
+        `${bitcoinVolumeName}:/usr/data2`
       ];
 
       const compose: Compose = {
@@ -287,6 +345,10 @@ describe("Util: dockerComposeParsers", () => {
             ports,
             volumes
           }
+        },
+        volumes: {
+          [bitcoinVolumeNameNew]: {},
+          [bitcoinVolumeName]: {}
         }
       };
 
@@ -294,8 +356,10 @@ describe("Util: dockerComposeParsers", () => {
         environment: {
           USERSET: "NEW_VALUE"
         },
-        namedVolumePaths: {
-          [bitcoinDataVolumeName]: "/dev0/user-set-path"
+        namedVolumeMountpoints: {
+          [bitcoinVolumeNameNew]: "/dev0/data",
+          // ##### DEPRECATED
+          [bitcoinVolumeName]: legacyTag + "/dev2/user-set-path"
         },
         portMappings: {
           "4001/TCP": "4111",
@@ -303,22 +367,38 @@ describe("Util: dockerComposeParsers", () => {
         }
       };
 
-      const expectedServiceParts = {
-        environment: ["ORIGINAL=VALUE", "USERSET=NEW_VALUE"],
-        ports: ["4111:4001", "9090/udp", "32764:6000"],
-        volumes: [
-          "/dev0/user-set-path:/usr/data",
-          "/dev1/custom-path:/usr/data2"
-        ]
-      };
       const composeReturn = applyUserSet(compose, userSet);
-      const serviceParts = pick(composeReturn.services[mockDnpName], [
-        "environment",
-        "ports",
-        "volumes"
-      ]);
-
-      expect(serviceParts).to.deep.equal(expectedServiceParts);
+      const expectedCompose: Compose = {
+        ...compose,
+        services: {
+          [mockDnpName]: {
+            ...mockComposeService,
+            environment: ["ORIGINAL=VALUE", "USERSET=NEW_VALUE"],
+            ports: ["4111:4001", "9090/udp", "32764:6000"],
+            volumes: [
+              `${bitcoinVolumeNameNew}:/usr/data0`,
+              "/dev1/custom-path:/usr/data1",
+              "/dev2/user-set-path:/usr/data2"
+            ],
+            labels: {
+              "dappnode.dnp.default.environment": JSON.stringify(environment),
+              "dappnode.dnp.default.ports": JSON.stringify(ports),
+              "dappnode.dnp.default.volumes": JSON.stringify(volumes)
+            }
+          }
+        },
+        volumes: {
+          ...compose.volumes,
+          [bitcoinVolumeNameNew]: {
+            driver_opts: {
+              device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
+              o: "bind",
+              type: "none"
+            }
+          }
+        }
+      };
+      expect(composeReturn).to.deep.equal(expectedCompose);
     });
 
     it("Should apply a setting to make a host port ephemeral", () => {
@@ -344,145 +424,118 @@ describe("Util: dockerComposeParsers", () => {
 
       expect(serviceParts).to.deep.equal(expectedServiceParts);
     });
+
+    it("Should return the same compose if re-applying it's own user settings", () => {
+      const userSettings = parseUserSetFromCompose(polkadotCurrentCompose);
+      const composeReturn = applyUserSet(polkadotNewCompose, userSettings);
+      expect(composeReturn).to.deep.equal(polkadotCurrentCompose);
+    });
+
+    it("Should apply allNamedVolumeMountpoint setting, and persist an update", () => {
+      const mountpoint = "/dev1/data";
+
+      const originalCompose: Compose = {
+        ...mockCompose,
+        services: {
+          [mockDnpName]: {
+            ...mockComposeService,
+            volumes: ["data:/usr/data", "identity:/usr/id"]
+          }
+        },
+        volumes: {
+          data: {},
+          identity: {}
+        }
+      };
+
+      const userSet: UserSettings = {
+        allNamedVolumeMountpoint: mountpoint
+      };
+
+      const expectedComposeAfterFirstInstall: Compose = {
+        ...originalCompose,
+        services: {
+          [mockDnpName]: {
+            ...originalCompose.services[mockDnpName],
+            volumes: ["data:/usr/data", "identity:/usr/id"],
+            labels: {
+              "dappnode.dnp.default.environment": "[]",
+              "dappnode.dnp.default.ports": "[]",
+              "dappnode.dnp.default.volumes":
+                '["data:/usr/data","identity:/usr/id"]'
+            }
+          }
+        },
+        volumes: {
+          data: {
+            driver_opts: {
+              device:
+                "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/data",
+              o: "bind",
+              type: "none"
+            }
+          },
+          identity: {
+            driver_opts: {
+              device:
+                "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/identity",
+              o: "bind",
+              type: "none"
+            }
+          }
+        }
+      };
+
+      const expectedUserSettingsOnUpdate: UserSettings = {
+        environment: {},
+        namedVolumeMountpoints: {
+          data: mountpoint,
+          identity: mountpoint
+        },
+        portMappings: {}
+      };
+
+      expect(applyUserSet(originalCompose, userSet)).to.deep.equal(
+        expectedComposeAfterFirstInstall,
+        "allNamedVolumeMountpoint setting should be applied in first install"
+      );
+
+      const userSettingsOnUpdate = parseUserSetFromCompose(
+        expectedComposeAfterFirstInstall
+      );
+      expect(userSettingsOnUpdate).to.deep.equal(expectedUserSettingsOnUpdate);
+      expect(applyUserSet(originalCompose, userSettingsOnUpdate)).to.deep.equal(
+        expectedComposeAfterFirstInstall,
+        "After a future update the user settings from allNamedVolumeMountpoint should persist"
+      );
+    });
   });
 
-  // describe("convertUserSetLegacy", () => {
-  //   it("Should convert legacy userSet* types to userSet", () => {
-  //     const dnpName = "kovan.dnp.dappnode.eth";
-  //     const dnpName2 = "dependency.dnp.dappnode.eth";
-  //     const userSetEnvs = {
-  //       [dnpName]: {
-  //         ENV_NAME: "CUSTOM_VALUE"
-  //       }
-  //     };
-  //     const userSetVols = {
-  //       [dnpName]: {
-  //         "kovan:/root/.local/share/io.parity.ethereum/":
-  //           "/dev1/custom-path:/root/.local/share/io.parity.ethereum/"
-  //       }
-  //     };
-  //     const userSetPorts = {
-  //       [dnpName]: {
-  //         "30303": "31313:30303",
-  //         "30303/udp": "31313:30303/udp"
-  //       },
-  //       [dnpName2]: {
-  //         "4001:4001": "4001"
-  //       }
-  //     };
+  describe("device path", () => {
+    const pathParts = {
+      mountpoint: "/dev1/data",
+      dnpName: "bitcoin.dnp.dappnode.eth",
+      volumeName: "data",
+      volumePath: "bitcoin.dnp.dappnode.eth/data",
+      mountpointPath: "/dev1/data/dappnode-volumes"
+    };
+    const devicePath =
+      "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data";
 
-  //     const expectedUserSet: UserSettingsAllDnps = {
-  //       [dnpName]: {
-  //         environment: {
-  //           ENV_NAME: "CUSTOM_VALUE"
-  //         },
-  //         namedVolumePaths: {
-  //           "/root/.local/share/io.parity.ethereum": "/dev1/custom-path"
-  //         },
-  //         portMappings: {
-  //           "30303/TCP": "31313",
-  //           "30303/UDP": "31313"
-  //         }
-  //       },
-  //       [dnpName2]: {
-  //         environment: {},
-  //         namedVolumePaths: {},
-  //         portMappings: {
-  //           "4001/TCP": ""
-  //         }
-  //       }
-  //     };
+    it("Should get a device path", () => {
+      expect(getDevicePath(pathParts)).to.equal(devicePath);
+    });
 
-  //     const userSet = mapValues()
+    it("Should parse a device path", () => {
+      expect(parseDevicePath(devicePath)).to.deep.equal(pathParts);
+    });
 
-  //     convertUserSetLegacy({
-  //       userSetEnvs,
-  //       userSetVols,
-  //       userSetPorts
-  //     });
-  //     expect(userSet).to.deep.equal(expectedUserSet);
-  //   });
-  // });
-
-  // describe("Merge userSet to the compose (applyUserSet, convertUserSetLegacy)", () => {
-  //   it("should merge the userSetDnpObjects", () => {
-  //     const serviceName = parseServiceName(mockCompose);
-
-  //     const compose: Compose = {
-  //       ...mockCompose,
-  //       services: {
-  //         [serviceName]: {
-  //           ...mockCompose.services[serviceName],
-  //           environment: ["ENV1=DEFAULTVAL1", "ENV2=DEFAULTVAL2"],
-  //           ports: ["30303", "30303/udp", "30304:30304", "8080:8080"],
-  //           volumes: [
-  //             "kovan:/root/.local/share/io.parity.ethereum/",
-  //             "sync-data:/root/.sync"
-  //           ]
-  //         }
-  //       }
-  //     };
-
-  //     // Data introduced by the user at the moment of installing
-  //     // [NOTE]: the user should be seeing a merge of [default + previous]
-  //     const userSetDnpEnvs = {
-  //       ENV1: "USER_SET_VAL1",
-  //       ENV_OLD: "PREVIOUS_SET_VAL2"
-  //     };
-  //     const userSetDnpPorts = {
-  //       "30303": "31313:30303",
-  //       "30303/udp": "31313:30303/udp",
-  //       "30304:30304": "30304"
-  //     };
-  //     const userSetDnpVols = {
-  //       "kovan:/root/.local/share/io.parity.ethereum//":
-  //         "different_path:/root/.local/share/io.parity.ethereum//",
-  //       "old_version_volume:/original/path":
-  //         "another_different_path:/original/path"
-  //     };
-
-  //     const userSet = convertUserSetLegacy({
-  //       userSetEnvs: { [serviceName]: userSetDnpEnvs },
-  //       userSetVols: { [serviceName]: userSetDnpVols },
-  //       userSetPorts: { [serviceName]: userSetDnpPorts }
-  //     });
-
-  //     expect(userSet).to.deep.equal(
-  //       {
-  //         "mock-dnp.dnp.dappnode.eth": {
-  //           environment: {
-  //             ENV1: "USER_SET_VAL1",
-  //             ENV_OLD: "PREVIOUS_SET_VAL2"
-  //           },
-  //           namedVolumeMappings: {
-  //             "/original/path": "another_different_path",
-  //             "/root/.local/share/io.parity.ethereum": "different_path"
-  //           },
-  //           portMappings: {
-  //             "30303/TCP": "31313",
-  //             "30303/UDP": "31313",
-  //             "30304/TCP": ""
-  //           }
-  //         }
-  //       },
-  //       "Wrong userSet conversion"
-  //     );
-
-  //     const returnCompose = applyUserSet(compose, userSet[serviceName]);
-
-  //     expect(
-  //       pick(parseService(returnCompose), ["environment", "ports", "volumes"])
-  //     ).to.deep.equal(
-  //       {
-  //         environment: ["ENV1=USER_SET_VAL1", "ENV2=DEFAULTVAL2"],
-  //         ports: ["31313:30303", "31313:30303/udp", "30304", "8080:8080"],
-  //         volumes: [
-  //           "different_path:/root/.local/share/io.parity.ethereum",
-  //           "sync-data:/root/.sync"
-  //         ]
-  //       },
-  //       "Wrong applyUserSet result"
-  //     );
-  //   });
-  // });
+    it("Should parse a device path mountpoint", () => {
+      expect(parseDevicePathMountpoint(devicePath)).to.equal(
+        pathParts.mountpoint
+      );
+    });
+  });
 });
+
+/* eslint-enable @typescript-eslint/camelcase */

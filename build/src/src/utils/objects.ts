@@ -46,3 +46,10 @@ export function limitObjValuesSize(
     }
   });
 }
+
+/**
+ * Alias for JSON.stringify(obj, null, 2)
+ */
+export function stringify(obj: any): string {
+  return JSON.stringify(obj, null, 2);
+}

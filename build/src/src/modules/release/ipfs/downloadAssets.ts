@@ -70,7 +70,7 @@ function downloadAssetFactory<T>({
     const data: T = parse(content);
     return validate(data);
   }
-  return memoize(downloadAsset, { async: true });
+  return memoize(downloadAsset, { promise: true });
 }
 
 /**
