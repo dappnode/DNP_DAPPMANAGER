@@ -14,6 +14,7 @@ export interface DockerApiListContainerOptions {
     health?: string; // "(starting|healthy|unhealthy|none)";
     // MUST be an array of: [byId]
     id?: string[]; // "<ID> a container's ID";
+    ip?: string[]; // "<IP> a container's IP'"
     isolation?: string; // "(default|process|hyperv) (Windows daemon only)";
     "is-task"?: string; //"(true|false)";
     label?: string; // "key or label='key=value' of a container label";

@@ -5,6 +5,9 @@ import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import params from "../params";
+import { listContainers } from "../modules/docker/listContainers";
+import signWithPrivateKey from "../utils/sign";
+
 import * as db from "../db";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -96,6 +99,25 @@ app.post("/upload", (req, res) => {
       });
     }, 15 * 60 * 1000);
   });
+});
+
+app.get("/sign", async (req, res) => {
+  const data = req.query.data;
+  try {
+    if (typeof data === undefined) throw Error("missing");
+    if (typeof data !== "string") throw Error("must be a string");
+    if (!data) throw Error("must not be empty");
+  } catch (e) {
+    return res.status(400).send(`Arg data ${e.message}`);
+  }
+
+  // Find IPv4 adresses only, this is a IPv6 to IPv4 prefix
+  const ipv4 = req.ip.replace("::ffff:", "");
+  const dnps = await listContainers();
+  const dnp = dnps.find(_dnp => _dnp.ip === ipv4);
+  if (!dnp) return res.status(405).send(`No DNP found for ip ${ipv4}`);
+
+  return res.status(200).send(signWithPrivateKey(dnp.name + ":" + data));
 });
 
 app.listen(port, () => logs.info(`HTTP API ${port}!`));

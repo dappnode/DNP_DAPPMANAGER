@@ -41,11 +41,14 @@ const params = {
   GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
   GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
-  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
+
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+
+  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".identity.private.key"),
+  SIGNATURE_PREFIX: "\x1dDappnode Signed Message:\n",
 
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
