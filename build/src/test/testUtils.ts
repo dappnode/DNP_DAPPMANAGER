@@ -167,11 +167,13 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
             MacAddress: "02:42:ac:12:00:02"
           }
         }
-      }
+      },
+      Mounts: []
     }
   ],
   Volumes: [
     {
+      CreatedAt: "2019-12-19T16:24:21+01:00",
       Name: "mock_mockdnpeth_data",
       Driver: "local",
       Mountpoint: "/var/lib/docker/volumes/my-volume/_data",
