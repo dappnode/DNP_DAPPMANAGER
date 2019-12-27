@@ -110,6 +110,8 @@ connection.onopen = (session, details): void => {
   eventBus.requestPackages.on(async () => {
     const dnpList = (await calls.listPackages()).result;
     wampSubscriptions.packages.emit(dnpList);
+    const volumes = (await calls.volumesGet()).result;
+    wampSubscriptions.volumes.emit(volumes);
   });
 
   // Emits the auto update data (settings, registry, pending)
