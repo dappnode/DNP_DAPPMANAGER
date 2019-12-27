@@ -8,7 +8,8 @@ import {
   UserActionLog,
   CoreUpdateData,
   MountpointData,
-  PackageDetailData
+  PackageDetailData,
+  VolumeData
 } from "./types";
 
 /**
@@ -280,6 +281,40 @@ export const mountpointsDataSample: MountpointData[] = [
     free: "141G",
     vendor: "ATA",
     model: "CT500MX500SSD4"
+  }
+];
+
+/**
+ * Dangling volumes
+ */
+
+export const volumeDataSchema = {
+  type: "array",
+  title: "volumeData",
+  items: {
+    type: "object",
+    properties: {
+      mountpoint: { type: "string" },
+      use: { type: "string" },
+      total: { type: "string" },
+      free: { type: "string" },
+      vendor: { type: "string" },
+      model: { type: "string" }
+    },
+    required: ["name"]
+  }
+};
+
+export const volumeDataSample: VolumeData[] = [
+  {
+    name: "gethdnpdappnodeeth_data",
+    shortName: "data",
+    owner: "gethdnpdappnodeeth",
+    createdAt: 1569346006000,
+    mountpoint: "/dev1/data/",
+    size: 161254123,
+    refCount: 0,
+    isDangling: true
   }
 ];
 

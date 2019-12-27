@@ -671,6 +671,17 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
+export interface VolumeData {
+  name: string; // "gethdnpdappnodeeth_data", Actual name to call delete on
+  shortName?: string; // "data",
+  owner?: string; // gethdnpdappnodeeth
+  createdAt: number; // 1569346006000,
+  mountpoint: string; // ""
+  size?: number; // 161254123,
+  refCount: number; // 2
+  isDangling: boolean; // if no container is using it
+}
+
 /**
  * RPC methods
  * - Generic inteface with metadata types

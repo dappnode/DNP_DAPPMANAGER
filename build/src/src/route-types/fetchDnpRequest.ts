@@ -26,3 +26,32 @@ export const returnDataSchema = {
 export const requestDataSample: RequestData = {
   id: "name"
 };
+
+export const returnDataSample: ReturnData = {
+  name: "",
+  reqVersion: "",
+  semVersion: "",
+  avatarUrl: "",
+  settings: {},
+  imageSize: 0,
+  isUpdated: false,
+  isInstalled: false,
+  metadata: {
+    name: "",
+    version: ""
+  },
+  specialPermissions: [],
+  request: {
+    compatible: {
+      requiresCoreUpdate: false,
+      resolving: false,
+      isCompatible: false,
+      error: "",
+      dnps: {}
+    },
+    available: {
+      isAvailable: true,
+      message: ""
+    }
+  }
+};
