@@ -305,7 +305,7 @@ export const volumeDataSchema = {
   }
 };
 
-export const volumeDataSample: VolumeData[] = [
+export const volumesDataSample: VolumeData[] = [
   {
     name: "gethdnpdappnodeeth_data",
     shortName: "data",
