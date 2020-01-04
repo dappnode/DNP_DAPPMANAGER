@@ -664,9 +664,10 @@ export interface PackageReleaseImageData {
 // An array of mountpoints MUST include one with the host (mountpoint = "")
 export interface MountpointData {
   mountpoint: string; // "/media/usb0", mountpoint = "" means host (default)
-  use: string; // "87%"
-  total: string; // "500G"
-  free: string; // "141G"
+  use: string; // "89%"
+  used: number; // 198642520
+  total: number; // 235782040
+  free: number; // 25092776
   vendor: string; // "ATA", "SanDisk"
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
@@ -676,11 +677,14 @@ export interface VolumeData {
   shortName?: string; // "data",
   owner?: string; // gethdnpdappnodeeth
   createdAt: number; // 1569346006000,
-  mountpoint: string; // ""
+  mountpoint: string; // "",
   size?: number; // 161254123,
+  fileSystem?: MountpointData;
   refCount: number; // 2
   isDangling: boolean; // if no container is using it
 }
+
+
 
 /**
  * RPC methods
