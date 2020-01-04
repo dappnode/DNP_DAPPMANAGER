@@ -264,8 +264,9 @@ export const mountpointsDataSchema = {
     properties: {
       mountpoint: { type: "string" },
       use: { type: "string" },
-      total: { type: "string" },
-      free: { type: "string" },
+      used: { type: "number" },
+      total: { type: "number" },
+      free: { type: "number" },
       vendor: { type: "string" },
       model: { type: "string" }
     },
@@ -276,9 +277,10 @@ export const mountpointsDataSchema = {
 export const mountpointsDataSample: MountpointData[] = [
   {
     mountpoint: "/media/usb0",
-    use: "87%",
-    total: "500G",
-    free: "141G",
+    use: "89%",
+    used: 198642520,
+    total: 235782040,
+    free: 25092776,
     vendor: "ATA",
     model: "CT500MX500SSD4"
   }

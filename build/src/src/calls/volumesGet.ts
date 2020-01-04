@@ -2,8 +2,7 @@ import { ReturnData } from "../route-types/volumesGet";
 import { RpcHandlerReturnWithResult, VolumeData } from "../types";
 import { dockerDf } from "../modules/docker/dockerApi";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
-import getHostVolumeSizes from "../modules/docker/getHostVolumeSizes";
-import { mapValues } from "lodash";
+import { detectMountpoints } from "../modules/hostScripts";
 
 /**
  * Returns not viewed notifications.
@@ -32,10 +31,14 @@ export default async function volumesGet(): RpcHandlerReturnWithResult<
   }
 
   // This expensive function won't be called on empty volDevicePaths
-  const hostVolumeSizes = mapValues(
-    await getHostVolumeSizes(volDevicePaths),
-    volSize => parseInt(volSize)
-  );
+  const mountpoints = await detectMountpoints();
+
+  // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
+  //       calling du on massive dirs can take +30min (i.e. Storj data));
+  // const hostVolumeSizes = mapValues(
+  //   await getHostVolumeSizes(volDevicePaths),
+  //   volSize => parseInt(volSize)
+  // );
 
   // Append sizes after to optimize the number of calls to dockerDf and host
   const formatedVolumes: VolumeData[] = volumes.map(vol => {
@@ -54,7 +57,10 @@ export default async function volumesGet(): RpcHandlerReturnWithResult<
       owner: owner,
       createdAt: new Date(vol.CreatedAt).getTime(),
       mountpoint: pathParts ? pathParts.mountpoint : "",
-      size: hostVolumeSizes[vol.Name] || vol.UsageData.Size,
+      size: vol.UsageData.Size,
+      fileSystem: pathParts
+        ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
+        : undefined,
       refCount: vol.UsageData.RefCount,
       isDangling: vol.UsageData.RefCount === 0
     };
