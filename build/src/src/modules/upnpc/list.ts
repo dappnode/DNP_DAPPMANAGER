@@ -1,5 +1,6 @@
 import upnpcCommand from "./upnpcCommand";
 import parseListOutput from "./parseListOutput";
+import parseGeneralErrors from "./parseGeneralErrors";
 import { UpnpPortMapping } from "./types";
 
 /**
@@ -19,7 +20,7 @@ export default async function list(): Promise<UpnpPortMapping[]> {
     const res = await upnpcCommand(`-l`);
     return parseListOutput(res);
   } catch (e) {
-    parseListOutput(e.message);
+    parseGeneralErrors(e.message);
     throw e;
   }
 }
