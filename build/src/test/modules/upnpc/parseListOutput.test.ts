@@ -31,13 +31,6 @@ ExternalIPAddress = 85.84.83.82
 GetGenericPortMappingEntry() returned 713 (SpecifiedArrayIndexInvalid)
 `;
 
-  const terminalOutputErrorNoDevice = `upnpc : miniupnpc library test client, version 2.0.
-(c) 2005-2017 Thomas Bernard.
-Go to http://miniupnp.free.fr/ or https://miniupnp.tuxfamily.org/
-for more information.
-No IGD UPnP Device found on the network !
-`;
-
   it("On success, it should return the current port mappings", async () => {
     const ports = parseListOutput(terminalOutputSuccess);
     expect(ports).to.deep.equal([
@@ -49,15 +42,5 @@ No IGD UPnP Device found on the network !
       { protocol: "TCP", exPort: "4001", inPort: "4001", ip: "192.168.1.42" },
       { protocol: "UDP", exPort: "4002", inPort: "4002", ip: "192.168.1.42" }
     ]);
-  });
-
-  it("On error, it should return error", () => {
-    let error;
-    try {
-      parseListOutput(terminalOutputErrorNoDevice);
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.equal("NOUPNP: No UPnP device available");
   });
 });

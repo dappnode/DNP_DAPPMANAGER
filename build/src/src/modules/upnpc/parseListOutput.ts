@@ -54,8 +54,6 @@ import { UpnpPortMapping } from "./types";
 export default function parseListOutput(
   terminalOutput: string
 ): UpnpPortMapping[] {
-  parseGeneralErrors(terminalOutput);
-
   // 1. Cut to the start of the table
   const validLineRegex = RegExp(
     /\d+\s+(UDP|TCP)\s+\d+->(\d+\.){3}\d+:\d+\s+.DAppNode/
