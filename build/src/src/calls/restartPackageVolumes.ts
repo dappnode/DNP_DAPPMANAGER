@@ -1,3 +1,4 @@
+import { RequestData } from "../route-types/restartPackageVolumes";
 import fs from "fs";
 import { uniq } from "lodash";
 import { dockerRm } from "../modules/docker/dockerCommands";
@@ -17,15 +18,12 @@ export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 /**
  * Removes a package volumes. The re-ups the package
  *
- * @param {string} id DNP .eth name
+ * @param id DNP .eth name
  */
 export default async function restartPackageVolumes({
   id,
   volumeId
-}: {
-  id: string;
-  volumeId?: string;
-}): RpcHandlerReturn {
+}: RequestData): RpcHandlerReturn {
   const { removedVols, removedDnps } = await restartPackageVolumesTask({
     id,
     volumeId

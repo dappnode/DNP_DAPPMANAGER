@@ -1,8 +1,10 @@
 import { ReturnData } from "../route-types/volumesGet";
 import { RpcHandlerReturnWithResult, VolumeData } from "../types";
 import { dockerDf } from "../modules/docker/dockerApi";
-import { parseDevicePath } from "../utils/dockerComposeParsers";
+import { listContainers } from "../modules/docker/listContainers";
 import { detectMountpoints } from "../modules/hostScripts";
+import { parseDevicePath } from "../utils/dockerComposeParsers";
+
 
 /**
  * Returns not viewed notifications.
@@ -20,18 +22,12 @@ import { detectMountpoints } from "../modules/hostScripts";
 export default async function volumesGet(): RpcHandlerReturnWithResult<
   ReturnData
 > {
-  const { Volumes: volumes /* Containers */ } = await dockerDf();
-
-  // Track each type of volume to only call the expensive size
-  // fetching functions if necessary
-  const volDevicePaths: { [volName: string]: string } = {};
-  for (const vol of volumes) {
-    if (vol.Options && vol.Options.device)
-      volDevicePaths[vol.Name] = vol.Options.device;
-  }
+  const { Volumes } = await dockerDf();
+  const dnpList = await listContainers();
 
   // This expensive function won't be called on empty volDevicePaths
-  const mountpoints = await detectMountpoints();
+  const callDetectMountpoints = Volumes.some(vol => (vol.Options || {}).device);
+  const mountpoints = callDetectMountpoints ? await detectMountpoints() : [];
 
   // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
   //       calling du on massive dirs can take +30min (i.e. Storj data));
@@ -41,20 +37,23 @@ export default async function volumesGet(): RpcHandlerReturnWithResult<
   // );
 
   // Append sizes after to optimize the number of calls to dockerDf and host
-  const formatedVolumes: VolumeData[] = volumes.map(vol => {
+  const formatedVolumes: VolumeData[] = Volumes.map(vol => {
     const pathParts = vol.Options
       ? parseDevicePath(vol.Options.device)
       : undefined;
 
     const { shortName, owner } = parseVolumeLabels(vol.Labels || {});
-    // const containerOwner = Containers.find(c =>
-    //   c.Mounts.find(v => v.Name === vol.Name)
-    // );
+    const containerOwner = dnpList.find(dnp =>
+      dnp.volumes.find(v => v.name === vol.Name && v.isOwner)
+    );
 
-    return {
+    const volumeData: VolumeData = {
+      // Real volume and owner name to call delete on
       name: vol.Name,
-      shortName: shortName,
-      owner: owner,
+      owner: containerOwner ? containerOwner.name : undefined,
+      // Guessed volume and owner name for display
+      nameDisplay: shortName,
+      ownerDisplay: owner,
       createdAt: new Date(vol.CreatedAt).getTime(),
       mountpoint: pathParts ? pathParts.mountpoint : "",
       size: vol.UsageData.Size,
@@ -64,6 +63,7 @@ export default async function volumesGet(): RpcHandlerReturnWithResult<
       refCount: vol.UsageData.RefCount,
       isDangling: vol.UsageData.RefCount === 0
     };
+    return volumeData;
   });
 
   return {

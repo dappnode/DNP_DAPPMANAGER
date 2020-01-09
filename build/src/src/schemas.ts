@@ -310,8 +310,9 @@ export const volumeDataSchema = {
 export const volumesDataSample: VolumeData[] = [
   {
     name: "gethdnpdappnodeeth_data",
-    shortName: "data",
-    owner: "gethdnpdappnodeeth",
+    owner: "geth.dnp.dappnode.eth",
+    nameDisplay: "data",
+    ownerDisplay: "gethdnpdappnodeeth",
     createdAt: 1569346006000,
     mountpoint: "/dev1/data/",
     size: 161254123,

@@ -7,6 +7,7 @@ import * as mountpointsGet from "./mountpointsGet";
 import * as packageDetailDataGet from "./packageDetailDataGet";
 import * as packageGettingStartedToggle from "./packageGettingStartedToggle";
 import * as passwordChange from "./passwordChange";
+import * as restartPackageVolumes from "./restartPackageVolumes";
 import * as volumeRemove from "./volumeRemove";
 import * as volumesGet from "./volumesGet";
 
@@ -20,6 +21,7 @@ export {
   packageDetailDataGet,
   packageGettingStartedToggle,
   passwordChange,
+  restartPackageVolumes,
   volumeRemove,
   volumesGet
 };

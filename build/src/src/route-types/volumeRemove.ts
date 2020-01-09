@@ -1,6 +1,5 @@
 export const route = "volumeRemove.dappmanager.dnp.dappnode.eth";
 
-// No request arguments
 export interface RequestData {
   name: string;
 }

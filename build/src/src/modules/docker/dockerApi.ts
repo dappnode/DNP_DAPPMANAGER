@@ -187,7 +187,9 @@ interface DockerVolumeListItem {
   Scope: string; // "local";
 }
 
-export async function dockerVolumesList(options?: DockerApiListVolumesOptions) {
+export async function dockerVolumesList(
+  options?: DockerApiListVolumesOptions
+): Promise<DockerVolumeListItem[]> {
   const { Volumes } = await dockerApi.listVolumes({ filters: options });
   // Return is not correctly typed, casting to actual tested values
   return Volumes as DockerVolumeListItem[];
