@@ -296,12 +296,10 @@ export const volumeDataSchema = {
   items: {
     type: "object",
     properties: {
-      mountpoint: { type: "string" },
-      use: { type: "string" },
-      total: { type: "string" },
-      free: { type: "string" },
-      vendor: { type: "string" },
-      model: { type: "string" }
+      name: { type: "string" },
+      owner: { type: "string" },
+      nameDisplay: { type: "string" },
+      ownerDisplay: { type: "string" }
     },
     required: ["name"]
   }
@@ -317,7 +315,7 @@ export const volumesDataSample: VolumeData[] = [
     mountpoint: "/dev1/data/",
     size: 161254123,
     refCount: 0,
-    isDangling: true
+    isOrphan: true
   }
 ];
 

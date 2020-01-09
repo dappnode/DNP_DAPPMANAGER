@@ -679,10 +679,10 @@ export interface VolumeData {
   ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
   createdAt: number; // 1569346006000,
   mountpoint: string; // "",
-  size?: number; // 161254123,
   fileSystem?: MountpointData;
-  refCount: number; // 2
-  isDangling: boolean; // if no container is using it
+  size?: number; // 161254123,
+  refCount?: number; // 2
+  isOrphan: boolean; // if no container is using it
 }
 
 /**
