@@ -12,4 +12,6 @@ export const returnDataSchema = mountpointsDataSchema;
 
 // Samples for testing
 
+export const requestDataSample: RequestData = {};
+
 export const returnDataSample: ReturnData = mountpointsDataSample;

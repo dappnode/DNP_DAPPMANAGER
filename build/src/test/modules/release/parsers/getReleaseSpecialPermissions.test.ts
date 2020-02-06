@@ -32,6 +32,7 @@ describe("Release > parsers", () => {
         services: {
           [serviceName]: {
             ...service,
+            privileged: true,
             networks: {
               network: {
                 ipv4_address: "172.33.10.4"

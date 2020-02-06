@@ -42,7 +42,7 @@ export function getReleaseSpecialPermissions({
       });
   }
 
-  if (isCore || privileged || (cap_add || []).includes("ALL"))
+  if (privileged || (cap_add || []).includes("ALL"))
     specialPermissions.push({
       name: "Privileged access to the system host",
       details:

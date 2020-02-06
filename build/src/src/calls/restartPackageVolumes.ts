@@ -1,14 +1,14 @@
+import { RequestData } from "../route-types/restartPackageVolumes";
 import fs from "fs";
 import { uniq } from "lodash";
-import { dockerVolumeRm, dockerRm } from "../modules/docker/dockerCommands";
+import { dockerRm } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
-import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainers } from "../modules/docker/listContainers";
+import { removeNamedVolume } from "./volumeRemove";
 import * as eventBus from "../eventBus";
 import params from "../params";
 // Utils
 import * as getPath from "../utils/getPath";
-import { shellHost } from "../utils/shell";
 import { RpcHandlerReturn } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -18,15 +18,12 @@ export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 /**
  * Removes a package volumes. The re-ups the package
  *
- * @param {string} id DNP .eth name
+ * @param id DNP .eth name
  */
 export default async function restartPackageVolumes({
   id,
   volumeId
-}: {
-  id: string;
-  volumeId?: string;
-}): RpcHandlerReturn {
+}: RequestData): RpcHandlerReturn {
   const { removedVols, removedDnps } = await restartPackageVolumesTask({
     id,
     volumeId
@@ -148,42 +145,7 @@ export async function restartPackageVolumesTask({
 
     // `if` necessary for the compiler
     for (const volName of volumeNames)
-      if (volName) {
-        /**
-         * Check if the volume is a different device / mountpoint as a bind
-         * If so, remove the volume data in the device path
-         * volInfo = { ..., "Driver": "local",
-         *   "Mountpoint": "/var/lib/docker/volumes/bitcoindnpdappnodeeth_bitcoin_data/_data",
-         *   "Name": "bitcoindnpdappnodeeth_bitcoin_data",
-         *   "Options": { "o": "bind", "type": "none",
-         *     "device": "/mnt/volume_ams3_01/dappnode-volumes/bitcoin.dnp.dappnode.eth/bitcoin_data" },
-         *   "Scope": "local" }
-         */
-        const volInfo = await dockerVolumeInspect(volName);
-        if (
-          volInfo.Options &&
-          volInfo.Options.device &&
-          volInfo.Driver === "local" &&
-          volInfo.Options.o === "bind"
-        ) {
-          const devicePath = volInfo.Options.device;
-          // WARNING: Make sure the device path is correct because
-          // it could cause mayhem if empty or if it has a wrong value
-          if (!devicePath) throw Error(`devicePath is empty`);
-          if (!devicePath.includes(mountpointDevicePrefix))
-            throw Error(
-              `devicePath must contain the volume tag '${mountpointDevicePrefix}': ${devicePath}`
-            );
-          if (devicePath.length < 10)
-            throw Error(`devicePath is too short: ${devicePath}`);
-
-          // Using the `bash -c '$CMD' notation because otherwise the
-          // '*' is expanded in the parent nsenter cmd, not in `rm -rf`
-          await shellHost(`/bin/bash -- -c 'rm -rf ${devicePath}/*'`);
-          logs.info(`Removed volume with custom device: ${devicePath}`);
-        }
-        await dockerVolumeRm(volName);
-      }
+      if (volName) await removeNamedVolume(volName);
   } catch (e) {
     err = e;
   }

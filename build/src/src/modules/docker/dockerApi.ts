@@ -1,4 +1,5 @@
 import Docker from "dockerode";
+import memoize from "memoizee";
 
 const dockerApi = new Docker({ socketPath: "/var/run/docker.sock" });
 
@@ -80,14 +81,25 @@ export interface DockerApiSystemDfReturn {
         };
       };
     };
+    Mounts: {
+      Type: string; // "volume";
+      Name: string; // "test_data";
+      Source: string; // "/var/lib/docker/volumes/test_data/_data";
+      Destination: string; // "/usr/src";
+      Driver: string; // "local";
+      Mode: string; // "rw";
+      RW: boolean; // true;
+      Propagation: string; // "";
+    }[];
   }[];
   Volumes: {
+    CreatedAt: string; // "2019-12-19T16:24:21+01:00"
     Name: string; // "my-volume";
     Driver: string; // "local";
     Mountpoint: string; // "/var/lib/docker/volumes/my-volume/_data";
-    Labels: null;
+    Labels: null | { [labelName: string]: string };
     Scope: string; // "local";
-    Options: null;
+    Options: null | { device: string; o: string; type: string };
     UsageData: {
       Size: number; // 10920104;
       RefCount: number; // 2;
@@ -95,8 +107,19 @@ export interface DockerApiSystemDfReturn {
   }[];
 }
 
-export function dockerDf(): Promise<DockerApiSystemDfReturn> {
-  return dockerApi.df();
+// Result is cached for 15s + it only ran once at a time (like runOnlyOneReturnToAll)
+const dockerApiDfMemo = memoize(() => dockerApi.df(), {
+  promise: true,
+  maxAge: 5000
+});
+
+/**
+ * Calls docker system df -v
+ * NOTE: Result is cached for 15s + it only ran once at a time,
+ * resolving multiple calls with the value (like runOnlyOneReturnToAll)
+ */
+export async function dockerDf(): Promise<DockerApiSystemDfReturn> {
+  return await dockerApiDfMemo();
 }
 
 export function dockerVolumeInspect(
@@ -143,4 +166,31 @@ export async function dockerInfoArchive(
     "ascii"
   );
   return JSON.parse(pathStatString);
+}
+
+interface DockerApiListVolumesOptions {
+  dangling?: boolean; // When set to true (or 1), returns all volumes that are not in use by a container. When set to false (or 0), only volumes that are in use by one or more containers are returned.
+  driver?: string[]; // <volume-driver-name> Matches volumes based on their driver.
+  label?: string[]; // "key or label='key=value' of a container label";
+  // MUST be an array of: [byName]
+  name?: string[]; // "<name> a container's name";
+}
+
+interface DockerVolumeListItem {
+  CreatedAt: string; // "2019-12-10T11:54:22+01:00";
+  Driver: string; // "local";
+  Labels: { [labelKey: string]: string }; // { "com.docker.compose.version": "1.22.0" };
+  Mountpoint: string; // "/var/lib/docker/volumes/nginx.dnp.dappnode.eth-data/_data";
+  Name: string; // "nginx.dnp.dappnode.eth-data";
+  Options: null | { device: string; o: string; type: string };
+  // { device: "/demo/Code/dappnode/test/compose-test/data", o: "bind", type: "none" },
+  Scope: string; // "local";
+}
+
+export async function dockerVolumesList(
+  options?: DockerApiListVolumesOptions
+): Promise<DockerVolumeListItem[]> {
+  const { Volumes } = await dockerApi.listVolumes({ filters: options });
+  // Return is not correctly typed, casting to actual tested values
+  return Volumes as DockerVolumeListItem[];
 }

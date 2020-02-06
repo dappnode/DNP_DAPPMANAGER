@@ -47,6 +47,8 @@ import setStaticIp from "./setStaticIp";
 import togglePackage from "./togglePackage";
 import updatePackageEnv from "./updatePackageEnv";
 import updatePortMappings from "./updatePortMappings";
+import volumeRemove from "./volumeRemove";
+import volumesGet from "./volumesGet";
 
 export {
   autoUpdateDataGet,
@@ -91,5 +93,7 @@ export {
   setStaticIp,
   togglePackage,
   updatePackageEnv,
-  updatePortMappings
+  updatePortMappings,
+  volumeRemove,
+  volumesGet
 };
