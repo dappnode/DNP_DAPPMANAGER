@@ -12,4 +12,6 @@ export const returnDataSchema = installedDnpsSchema;
 
 // Samples for testing
 
+export const requestDataSample: RequestData = {};
+
 export const returnDataSample: ReturnData = installedDnpsSample;

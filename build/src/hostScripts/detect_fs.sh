@@ -5,11 +5,13 @@
 
 IFS=$'\n'
 echo -n "["
-for line in $(df -hlPT | grep ^/); do
+for line in $(df -lPTB1 | grep ^/); do
   if [[ ! $line =~ \/$ ]] && [[ ! $line == *"/boot"* ]]; then
     mountpoint=$(echo "$line" | awk '{ print $7 }')
     use=$(echo "$line" | awk '{ print $6 }')
     free=$(echo "$line" | awk '{ print $5 }')
+    used=$(echo "$line" | awk '{ print $4 }')
+    total=$(echo "$line" | awk '{ print $3 }')
     partition=$(echo "$line" | awk '{ print $1 }' | xargs basename)
     device="$(readlink -f "/sys/class/block/$partition/.." | xargs basename || true)"
     model="$(lsblk -no MODEL /dev/$device 2>/dev/null | sed -e 's/[[:space:]]*$//' || true)"
@@ -26,7 +28,7 @@ for line in $(df -hlPT | grep ^/); do
 
     # print in JSON format
     [[ "$NEXT" != "true" ]] || echo -n ","
-    echo -n "{\"mountpoint\": \"$mountpoint\", \"use\": \"$use\", \"free\": \"$free\", \"vendor\": \"$vendor\", \"model\": \"$model\"}"
+    echo -n "{\"mountpoint\": \"$mountpoint\", \"use\": \"$use\", \"free\": \"$free\", \"used\": \"$used\", \"total\": \"$total\", \"vendor\": \"$vendor\", \"model\": \"$model\"}"
     NEXT=true
   fi
 done

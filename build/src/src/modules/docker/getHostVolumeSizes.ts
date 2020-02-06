@@ -1,3 +1,4 @@
+import { isEmpty } from "lodash";
 import { shellHost } from "../../utils/shell";
 import { parseDevicePath } from "../../utils/dockerComposeParsers";
 import { parseDuOutput } from "../../utils/unix";
@@ -22,6 +23,9 @@ interface VolSizes {
 export default async function getHostVolumeSizes(
   volDevicePaths: VolDevicePaths
 ): Promise<VolSizes> {
+  // if there are no volDevicePaths, return early
+  if (isEmpty(volDevicePaths)) return {};
+
   // Aggregate the devicePaths by mountpoint to minimize the # of calls
   // to script shell hosts
   const mountpoints: {

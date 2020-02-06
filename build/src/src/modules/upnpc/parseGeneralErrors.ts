@@ -7,8 +7,10 @@
 // No IGD UPnP Device found on the network !
 
 export default function parseGeneralErrors(terminalOutput: string): string {
-  const upnpAvailable = RegExp(/Found valid IGD/, "i").test(terminalOutput);
-  if (!upnpAvailable) throw Error("NOUPNP: No UPnP device available");
+  const noUpnpAvailable =
+    RegExp(/No IGD UPnP Device found/, "i").test(terminalOutput) ||
+    RegExp(/No valid UPNP Internet Gateway Device/, "i").test(terminalOutput);
+  if (noUpnpAvailable) throw Error("NOUPNP: No UPnP device available");
 
   return terminalOutput;
 }

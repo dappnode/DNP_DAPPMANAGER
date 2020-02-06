@@ -16,7 +16,6 @@ import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
 import semver from "semver";
 import { listContainers } from "../modules/docker/listContainers";
-import { dockerInfoArchive } from "../modules/docker/dockerApi";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
@@ -48,7 +47,6 @@ export default async function fetchDnpRequest({
     if (metadata.setupUiJson) setupUiJson[name] = metadata.setupUiJson;
 
     const isInstalled = getIsInstalled(mainRelease, dnpList);
-    const containerName = getContainerName(name, isCore);
 
     // current user settings overwritte compose
     // If composePath does not exist, or is invalid: getUserSettingsSafe returns {}

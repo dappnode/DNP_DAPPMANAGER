@@ -12,11 +12,6 @@ import { RpcHandlerReturnWithResult } from "../types";
 import { readConfigFiles } from "../utils/configFiles";
 const logs = Logs(module);
 
-// This call can fail because of:
-//   Error response from daemon: a disk usage operation is already running
-// Prevent running it twice
-let isDockerSystemDfCallRunning = false;
-
 /**
  * Returns the list of current containers associated to packages
  */
@@ -46,16 +41,12 @@ export default async function listPackages(): RpcHandlerReturnWithResult<
   // Append volume info
   // This call can fail because of:
   //   Error response from daemon: a disk usage operation is already running
-  if (!isDockerSystemDfCallRunning)
-    try {
-      isDockerSystemDfCallRunning = true;
-      const dockerSystemDfData = await dockerDf();
-      dnpList = parseDockerSystemDf({ dockerSystemDfData, dnpList });
-    } catch (e) {
-      logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
-    } finally {
-      isDockerSystemDfCallRunning = false;
-    }
+  try {
+    const dockerSystemDfData = await dockerDf();
+    dnpList = parseDockerSystemDf({ dockerSystemDfData, dnpList });
+  } catch (e) {
+    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
+  }
 
   return {
     message: `Listing ${dnpList.length} packages`,

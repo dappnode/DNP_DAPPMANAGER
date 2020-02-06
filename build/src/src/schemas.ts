@@ -8,7 +8,8 @@ import {
   UserActionLog,
   CoreUpdateData,
   MountpointData,
-  PackageDetailData
+  PackageDetailData,
+  VolumeData
 } from "./types";
 
 /**
@@ -263,8 +264,9 @@ export const mountpointsDataSchema = {
     properties: {
       mountpoint: { type: "string" },
       use: { type: "string" },
-      total: { type: "string" },
-      free: { type: "string" },
+      used: { type: "number" },
+      total: { type: "number" },
+      free: { type: "number" },
       vendor: { type: "string" },
       model: { type: "string" }
     },
@@ -275,11 +277,45 @@ export const mountpointsDataSchema = {
 export const mountpointsDataSample: MountpointData[] = [
   {
     mountpoint: "/media/usb0",
-    use: "87%",
-    total: "500G",
-    free: "141G",
+    use: "89%",
+    used: 198642520,
+    total: 235782040,
+    free: 25092776,
     vendor: "ATA",
     model: "CT500MX500SSD4"
+  }
+];
+
+/**
+ * Dangling volumes
+ */
+
+export const volumeDataSchema = {
+  type: "array",
+  title: "volumeData",
+  items: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      owner: { type: "string" },
+      nameDisplay: { type: "string" },
+      ownerDisplay: { type: "string" }
+    },
+    required: ["name"]
+  }
+};
+
+export const volumesDataSample: VolumeData[] = [
+  {
+    name: "gethdnpdappnodeeth_data",
+    owner: "geth.dnp.dappnode.eth",
+    nameDisplay: "data",
+    ownerDisplay: "gethdnpdappnodeeth",
+    createdAt: 1569346006000,
+    mountpoint: "/dev1/data/",
+    size: 161254123,
+    refCount: 0,
+    isOrphan: true
   }
 ];
 
