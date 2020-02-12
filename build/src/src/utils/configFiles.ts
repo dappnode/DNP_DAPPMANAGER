@@ -26,11 +26,15 @@ export function readConfigFiles({
 }: {
   name: string;
   isCore: boolean;
-}): { manifest: Manifest; compose: Compose; environment: PackageEnvs } {
+}): {
+  manifest: Manifest | undefined;
+  compose: Compose;
+  environment: PackageEnvs;
+} {
   const manifestPath = validate.path(getPath.manifest(name, isCore));
-  const manifest: Manifest = parseManifest(
-    fs.readFileSync(manifestPath, "utf8")
-  );
+  const manifest: Manifest | undefined = fs.existsSync(manifestPath)
+    ? parseManifest(fs.readFileSync(manifestPath, "utf8"))
+    : undefined;
 
   const composePath = validate.path(getPath.dockerCompose(name, isCore));
   const compose = readComposeObj(composePath);

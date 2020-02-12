@@ -24,9 +24,11 @@ export default async function listPackages(): RpcHandlerReturnWithResult<
   dnpList.map(dnp => {
     try {
       const { manifest, environment } = readConfigFiles(dnp);
-      dnp.manifest = omit(manifest, ["gettingStarted"]);
+      if (manifest) {
+        dnp.manifest = omit(manifest, ["gettingStarted"]);
+        dnp.gettingStarted = manifest.gettingStarted;
+      }
       dnp.envs = environment;
-      dnp.gettingStarted = manifest.gettingStarted;
       dnp.gettingStartedShow = Boolean(
         db.packageGettingStartedShow.get(dnp.name)
       );
