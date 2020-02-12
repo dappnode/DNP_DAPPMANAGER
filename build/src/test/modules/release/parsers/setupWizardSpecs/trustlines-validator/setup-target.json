@@ -1,0 +1,14 @@
+{
+  "keystore": {
+    "type": "fileUpload",
+    "path": "/config/custom/keys/tlbc/account.json"
+  },
+  "keystoreAddress": {
+    "type": "environment",
+    "name": "ADDRESS"
+  },
+  "keystorePassword": {
+    "type": "environment",
+    "name": "PASSWORD"
+  }
+}

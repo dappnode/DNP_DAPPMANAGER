@@ -1,0 +1,25 @@
+{
+  "auth_token": {
+    "type": "environment",
+    "name": "AUTH_TOKEN"
+  },
+  "wallet": {
+    "type": "environment",
+    "name": "WALLET"
+  },
+  "bandwidth": {
+    "type": "environment",
+    "name": "BANDWIDTH"
+  },
+  "storage": {
+    "type": "environment",
+    "name": "STORAGE"
+  },
+  "email": {
+    "type": "environment",
+    "name": "EMAIL"
+  },
+  "storjDataMountpoint": {
+    "type": "allNamedVolumesMountpoint"
+  }
+}

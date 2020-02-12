@@ -16,8 +16,10 @@ import {
   downloadSetupTarget,
   downloadSetupUiJson,
   downloadDisclaimer,
-  downloadGetStarted
+  downloadGetStarted,
+  downloadSetupWizard
 } from "./downloadAssets";
+import { setupWizard1To2 } from "../parsers/setupWizardParsers";
 
 const source: "ipfs" = "ipfs";
 
@@ -26,6 +28,7 @@ const releaseFilesRegex = {
   image: /\.tar\.xz$/,
   compose: /compose.*\.yml$/,
   avatar: /avatar.*\.png$/,
+  setupWizard: /setup-wizard\..*json$/,
   setupSchema: /setup\..*\.json$/,
   setupTarget: /setup-target\..*json$/,
   setupUiJson: /setup-ui\..*json$/,
@@ -79,6 +82,7 @@ export default async function downloadRelease(
       const imageEntry = files.find(releaseFileIs.image);
       const composeEntry = files.find(releaseFileIs.compose);
       const avatarEntry = files.find(releaseFileIs.avatar);
+      const setupWizardEntry = files.find(releaseFileIs.setupWizard);
       const setupSchemaEntry = files.find(releaseFileIs.setupSchema);
       const setupTargetEntry = files.find(releaseFileIs.setupTarget);
       const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
@@ -92,6 +96,7 @@ export default async function downloadRelease(
       const [
         manifest,
         composeUnsafe,
+        setupWizard,
         setupSchema,
         setupTarget,
         setupUiJson,
@@ -100,6 +105,7 @@ export default async function downloadRelease(
       ] = await Promise.all([
         downloadManifest(manifestEntry.hash),
         downloadCompose(composeEntry.hash),
+        setupWizardEntry && downloadSetupWizard(setupWizardEntry.hash),
         setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
         setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
         setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
@@ -107,9 +113,13 @@ export default async function downloadRelease(
         getStartedEntry && downloadGetStarted(getStartedEntry.hash)
       ]);
 
-      if (setupSchema) manifest.setupSchema = setupSchema;
-      if (setupTarget) manifest.setupTarget = setupTarget;
-      if (setupUiJson) manifest.setupUiJson = setupUiJson;
+      if (setupWizard) manifest.setupWizard = setupWizard;
+      else if (setupSchema && setupTarget)
+        manifest.setupWizard = setupWizard1To2(
+          setupSchema,
+          setupTarget,
+          setupUiJson || {}
+        );
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
 

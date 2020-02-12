@@ -16,9 +16,8 @@ import {
   ManifestWithImage,
   Manifest,
   Compose,
-  SetupTarget
+  SetupWizard
 } from "../src/types";
-import { SetupSchema, SetupUiJson } from "../src/types-own";
 
 /**
  * Generate mock releases in the different formats,
@@ -76,16 +75,12 @@ export async function cleanInstallationArtifacts(): Promise<void> {
 export async function uploadDirectoryRelease({
   manifest,
   compose,
-  setupSchema,
-  setupTarget,
-  setupUiJson,
+  setupWizard,
   disclaimer
 }: {
   manifest: Manifest;
   compose: Compose;
-  setupSchema?: SetupSchema;
-  setupTarget?: SetupTarget;
-  setupUiJson?: SetupUiJson;
+  setupWizard?: SetupWizard;
   disclaimer?: string;
 }): Promise<string> {
   const releaseDir = path.join(testDir, "release-directory");
@@ -107,9 +102,7 @@ export async function uploadDirectoryRelease({
   await shell(`cp ${mockDnpDir}/*.png ${releaseDir}`); // Avatar
 
   // Misc
-  if (setupSchema) writeJson("setup.schema.json", setupSchema);
-  if (setupTarget) writeJson("setup-target.json", setupTarget);
-  if (setupUiJson) writeJson("setup-ui.json", setupUiJson);
+  if (setupWizard) writeJson("setup-wizard.json", setupWizard);
   if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
   const rootHash = await ipfsAddDirFromFs(releaseDir);
