@@ -1,14 +1,13 @@
 import { RequestData, ReturnData } from "../route-types/fetchDnpRequest";
 import {
-  SetupSchemaAllDnps,
-  SetupUiJsonAllDnps,
-  SetupTargetAllDnps,
   UserSettingsAllDnps,
   CompatibleDnps,
   PackageRelease,
   RpcHandlerReturnWithResult,
   PackageReleaseMetadata,
-  PackageContainer
+  PackageContainer,
+  SetupWizardAllDnps,
+  SetupWizardField
 } from "../types";
 import getRelease from "../modules/release/getRelease";
 import dappGet from "../modules/dappGet";
@@ -25,26 +24,20 @@ import {
 } from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
-
-const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
+import { dockerInfoArchive } from "../modules/docker/dockerApi";
 
 export default async function fetchDnpRequest({
   id
 }: RequestData): RpcHandlerReturnWithResult<ReturnData> {
   const mainRelease = await getRelease(id);
 
-  const setupSchema: SetupSchemaAllDnps = {};
-  const setupTarget: SetupTargetAllDnps = {};
-  const setupUiJson: SetupUiJsonAllDnps = {};
+  const setupWizard: SetupWizardAllDnps = {};
   const settings: UserSettingsAllDnps = {};
 
   const dnpList = await listContainers();
 
   async function addReleaseToSettings(_release: PackageRelease): Promise<void> {
     const { name, metadata, compose, isCore } = _release;
-    if (metadata.setupSchema) setupSchema[name] = metadata.setupSchema;
-    if (metadata.setupTarget) setupTarget[name] = metadata.setupTarget;
-    if (metadata.setupUiJson) setupUiJson[name] = metadata.setupUiJson;
 
     const isInstalled = getIsInstalled(mainRelease, dnpList);
 
@@ -55,27 +48,42 @@ export default async function fetchDnpRequest({
       getUserSettingsSafe(name, isCore)
     );
 
-    if (metadata.setupTarget)
-      for (const target of Object.values(metadata.setupTarget)) {
-        // If the package is already installed, disable allNamedVolumesMountpoint if any
-        if (target.type === "allNamedVolumesMountpoint" && isInstalled)
-          userSettings.allNamedVolumeMountpoint = userSettingDisableTag;
-        // If the path of file upload exists, mark it as disabled in the UI
-
-        // TODO: Deactivated since it collides with `react-jsonschema-form` validation for data urls
-        //       Setting this prop to something random like "disabled:" will block a DNP update
-        // if (target.type === "fileUpload") {
-        //   try {
-        //     const info = await dockerInfoArchive(containerName, target.path);
-        //     if (!userSettings.fileUploads) userSettings.fileUploads = {};
-        //     if (info.size)
-        //       userSettings.fileUploads[target.path] = userSettingDisableTag;
-        //   } catch (e) {
-        //     // Ignore all errors: 404 Container not found,
-        //     // 404 path not found, Base64 parsing, JSON parsing, etc.
-        //   }
-        // }
+    if (metadata.setupWizard) {
+      const activeSetupWizardFields: SetupWizardField[] = [];
+      for (const field of metadata.setupWizard.fields) {
+        async function shouldAddSetupWizardField(): Promise<boolean> {
+          if (field.target) {
+            switch (field.target.type) {
+              case "allNamedVolumesMountpoint":
+              case "namedVolumeMountpoint":
+                // If the package is installed, ignore (all)namedVolumesMountpoint
+                return !isInstalled;
+              case "fileUpload":
+                // If the path of file upload exists, ignore fileUpload
+                try {
+                  const info = await dockerInfoArchive(
+                    getContainerName(name, isCore),
+                    field.target.path
+                  );
+                  return !info.size;
+                } catch (e) {
+                  // Ignore all errors: 404 Container not found,
+                  // 404 path not found, Base64 parsing, JSON parsing, etc.
+                }
+            }
+          }
+          return true;
+        }
+        // Declaring and calling this function to use returns
+        // which make code more readable and less duplicated
+        if (await shouldAddSetupWizardField())
+          activeSetupWizardFields.push(field);
       }
+      setupWizard[name] = {
+        ...metadata.setupWizard,
+        fields: activeSetupWizardFields
+      };
+    }
 
     settings[name] = userSettings;
   }
@@ -120,19 +128,13 @@ export default async function fetchDnpRequest({
       origin: mainRelease.origin, // "/ipfs/Qm"
       avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
       // Setup
-      setupSchema,
-      setupTarget,
-      setupUiJson,
+      setupWizard,
       // Additional data
       imageSize: mainRelease.imageFile.size,
       isUpdated,
       isInstalled,
       // Prevent sending duplicated data
-      metadata: omit(mainRelease.metadata, [
-        "setupSchema",
-        "setupTarget",
-        "setupUiJson"
-      ]),
+      metadata: omit(mainRelease.metadata, ["setupWizard"]),
       specialPermissions, // Decoupled metadata
       // Settings must include the previous user settings
       settings,

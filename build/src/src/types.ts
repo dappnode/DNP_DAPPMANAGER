@@ -61,12 +61,35 @@ export interface RequestStatus {
   success?: boolean;
 }
 
+export interface SetupWizard {
+  fields: SetupWizardField[];
+}
+
+export interface SetupWizardField {
+  id: string;
+  target?: UserSettingTarget; // Allow form questions
+  // UI
+  title: string;
+  description: string;
+  secret?: boolean;
+  // Validation options
+  pattern?: string;
+  patternErrorMessage?: string;
+  enum?: string[];
+  required?: boolean;
+  if?: SetupSchema;
+}
+
 export type UserSettingTarget =
   | { type: "environment"; name: string }
   | { type: "portMapping"; containerPort: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
   | { type: "allNamedVolumesMountpoint" }
   | { type: "fileUpload"; path: string };
+
+export interface SetupWizardAllDnps {
+  [dnpName: string]: SetupWizard;
+}
 
 export interface SetupTarget {
   [propId: string]: UserSettingTarget;
@@ -120,9 +143,7 @@ export interface RequestedDnp {
   origin?: string; // "/ipfs/Qm"
   avatarUrl: string; // "http://dappmanager.dappnode/avatar/Qm7763518d4";
   // Setup
-  setupSchema?: SetupSchemaAllDnps;
-  setupTarget?: SetupTargetAllDnps;
-  setupUiJson?: SetupUiJsonAllDnps;
+  setupWizard?: SetupWizardAllDnps;
   settings: UserSettingsAllDnps; // MUST include the previous user settings
   // Additional data
   imageSize: number;
@@ -236,6 +257,8 @@ export interface PackageContainer {
   // ### TODO: Move to a different type "InstalledDnpDetail"
   gettingStarted?: string;
   gettingStartedShow?: boolean;
+  setupWizard?: SetupWizardField[];
+  userSettings?: UserSettings;
 }
 
 export interface PackageEnvs {
@@ -618,9 +641,7 @@ export interface PackageReleaseMetadata {
     featuredColor?: string;
     featuredAvatarFilter?: string;
   };
-  setupSchema?: SetupSchema;
-  setupUiJson?: SetupUiJson;
-  setupTarget?: SetupTarget;
+  setupWizard?: SetupWizard;
   author?: string;
   contributors?: string[];
   categories?: string[];

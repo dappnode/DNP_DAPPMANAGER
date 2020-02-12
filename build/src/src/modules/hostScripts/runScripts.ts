@@ -74,6 +74,7 @@ export const detectMountpoints = memoize(
  */
 async function runScript(scriptName: string, args = ""): Promise<string> {
   const scriptPath = path.resolve(hostScriptsDir, scriptName);
+  console.trace(`HELLO!`);
   if (!fs.existsSync(scriptPath))
     throw Error(`Host script ${scriptName} not found`);
 

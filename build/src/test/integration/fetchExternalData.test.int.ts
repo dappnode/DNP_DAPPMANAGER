@@ -8,9 +8,8 @@ import {
   Compose,
   RequestedDnp,
   Manifest,
-  SetupTarget
+  SetupWizard
 } from "../../src/types";
-import { SetupSchema, SetupUiJson } from "../../src/types-own";
 import {
   getTestMountpoint,
   clearDbs,
@@ -71,14 +70,16 @@ describe("Fetch external release data", () => {
         external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
         ports: ["1111:1111"]
       },
-      setupSchema: {
-        type: "object",
-        properties: { payoutAddress: { type: "string" } }
-      },
-      setupTarget: {
-        payoutAddress: { type: "environment", name: "PAYOUT_ADDRESS" }
-      },
-      setupUiJson: { payoutAddress: { "ui:help": "Special help text" } }
+      setupWizard: {
+        fields: [
+          {
+            id: "payoutAddress",
+            target: { type: "environment", name: "PAYOUT_ADDRESS" },
+            title: "Payout address",
+            description: "Payout address description"
+          }
+        ]
+      }
     };
 
     // Manifest fetched from IPFS
@@ -93,14 +94,16 @@ describe("Fetch external release data", () => {
         volumes: ["data:/usr"],
         ports: ["2222:2222"]
       },
-      setupSchema: {
-        type: "object",
-        properties: { dependencyVar: { type: "string" } }
-      },
-      setupTarget: {
-        dependencyVar: { type: "environment", name: "DEP_VAR" }
-      },
-      setupUiJson: { dependencyVar: { "ui:help": "Special help text" } }
+      setupWizard: {
+        fields: [
+          {
+            id: "dependencyVar",
+            target: { type: "environment", name: "DEP_VAR" },
+            title: "Dependency var",
+            description: "Dependency var description"
+          }
+        ]
+      }
     };
 
     // Compose fetched from disk, from previously installed version
@@ -202,27 +205,27 @@ describe("Fetch external release data", () => {
           }
         ],
 
-        setupSchema: {
+        setupWizard: {
           [idMain]: {
-            type: "object",
-            properties: { payoutAddress: { type: "string" } }
+            fields: [
+              {
+                id: "payoutAddress",
+                target: { type: "environment", name: "PAYOUT_ADDRESS" },
+                title: "Payout address",
+                description: "Payout address description"
+              }
+            ]
           },
           [idDep]: {
-            type: "object",
-            properties: { dependencyVar: { type: "string" } }
+            fields: [
+              {
+                id: "dependencyVar",
+                target: { type: "environment", name: "DEP_VAR" },
+                title: "Dependency var",
+                description: "Dependency var description"
+              }
+            ]
           }
-        },
-        setupTarget: {
-          [idMain]: {
-            payoutAddress: { type: "environment", name: "PAYOUT_ADDRESS" }
-          },
-          [idDep]: {
-            dependencyVar: { type: "environment", name: "DEP_VAR" }
-          }
-        },
-        setupUiJson: {
-          [idMain]: { payoutAddress: { "ui:help": "Special help text" } },
-          [idDep]: { dependencyVar: { "ui:help": "Special help text" } }
         },
 
         imageSize: mainDnpImageSize,
@@ -304,19 +307,15 @@ describe("Fetch external release data", () => {
       }
     };
 
-    const setupSchema: SetupSchema = {
-      type: "object",
-      properties: {
-        mockVar: { type: "string" }
-      }
-    };
-
-    const setupTarget: SetupTarget = {
-      mockVar: { type: "environment", name: "MOCK_VAR" }
-    };
-
-    const setupUiJson: SetupUiJson = {
-      mockVar: { "ui:help": "Special help text" }
+    const setupWizard: SetupWizard = {
+      fields: [
+        {
+          id: "mockVar",
+          target: { type: "environment", name: "MOCK_VAR" },
+          title: "Mock var",
+          description: "Mock var description"
+        }
+      ]
     };
 
     const disclaimer = "Warning!\n\nThis is really dangerous";
@@ -333,9 +332,7 @@ describe("Fetch external release data", () => {
       mainDnpReleaseHash = await uploadDirectoryRelease({
         manifest: mainDnpManifest,
         compose: composeMain,
-        setupSchema,
-        setupTarget,
-        setupUiJson,
+        setupWizard,
         disclaimer
       });
     });
@@ -372,9 +369,7 @@ describe("Fetch external release data", () => {
         specialPermissions: [],
 
         // Data added via files, to be tested
-        setupSchema: { [idMain]: setupSchema },
-        setupTarget: { [idMain]: setupTarget },
-        setupUiJson: { [idMain]: setupUiJson },
+        setupWizard: { [idMain]: setupWizard },
 
         isUpdated: false,
         isInstalled: true,

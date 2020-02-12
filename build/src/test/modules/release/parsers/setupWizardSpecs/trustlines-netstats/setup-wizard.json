@@ -1,0 +1,59 @@
+[
+  {
+    "id": "netstats_enable",
+    "target": {
+      "type": "environment",
+      "name": "NETSTATS_ENABLE"
+    },
+    "title": "Enable netstats",
+    "description": "Have you already received your credentials and do you want to set up the netstats client now?",
+    "enum": ["no", "yes"],
+    "required": true
+  },
+  {
+    "id": "username",
+    "target": {
+      "type": "environment",
+      "name": "WS_USER"
+    },
+    "title": "Username",
+    "description": "The user provided by the trustline foundation to connect to netstats",
+    "if": { "netstats_enable": { "enum": ["yes"] } },
+    "required": true
+  },
+  {
+    "id": "password",
+    "target": {
+      "type": "environment",
+      "name": "WS_PASSWORD"
+    },
+    "title": "Password",
+    "description": "The password provided by the trustline foundation to connect to netstats",
+    "if": { "netstats_enable": { "enum": ["yes"] } },
+    "required": true,
+    "secret": true
+  },
+  {
+    "id": "instance_name",
+    "target": {
+      "type": "environment",
+      "name": "INSTANCE_NAME"
+    },
+    "title": "Instance name",
+    "description": "The name you want to use in netstats",
+    "if": { "netstats_enable": { "enum": ["yes"] } },
+    "required": true
+  },
+  {
+    "id": "validator_status",
+    "target": {
+      "type": "environment",
+      "name": "SHOW_VALIDATOR_STATUS"
+    },
+    "title": "Publicly Displayed",
+    "description": "Do you want to be publicly displayed as a validator?",
+    "enum": ["no", "yes"],
+    "if": { "netstats_enable": { "enum": ["yes"] } },
+    "required": true
+  }
+]
