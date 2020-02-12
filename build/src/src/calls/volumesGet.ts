@@ -5,8 +5,6 @@ import { listContainers } from "../modules/docker/listContainers";
 import { detectMountpoints } from "../modules/hostScripts";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
 
-volumesGet().then(console.log);
-
 /**
  * Returns not viewed notifications.
  * Use an array as the keys are not known in advance and the array form
