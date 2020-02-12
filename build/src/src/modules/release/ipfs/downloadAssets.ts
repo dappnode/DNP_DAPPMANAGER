@@ -1,6 +1,11 @@
 import * as ipfs from "../../ipfs";
 import memoize from "memoizee";
-import { Manifest, ComposeUnsafe, SetupTarget } from "../../../types";
+import {
+  Manifest,
+  ComposeUnsafe,
+  SetupTarget,
+  SetupWizard
+} from "../../../types";
 import { SetupSchema, SetupUiJson } from "../../../types-own";
 import {
   validateManifestBasic,
@@ -18,6 +23,12 @@ export const downloadCompose = downloadAssetFactory<ComposeUnsafe>({
   parse: parseComposeObj,
   validate: validateComposeOrUnsafe,
   maxLength: 10e3 // Limit size to ~10KB
+});
+
+export const downloadSetupWizard = downloadAssetFactory<SetupWizard>({
+  parse: jsonParse,
+  validate: setupWizard => setupWizard,
+  maxLength: 100e3 // Limit size to ~100KB
 });
 
 export const downloadSetupSchema = downloadAssetFactory<SetupSchema>({

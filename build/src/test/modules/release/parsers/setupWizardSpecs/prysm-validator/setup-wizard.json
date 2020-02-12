@@ -1,0 +1,49 @@
+[
+  {
+    "id": "validator_account",
+    "title": "Validator account",
+    "description": "Do you want to use a new (or the current) validator keypair or do you want to import an already registered validator account?\n\n* **New/current**: An account will be created only if there is no account in the system\n\n* **Import**: You can import a validator account that you have already registered as a validator",
+    "enum": ["new/current", "import"],
+    "required": true
+  },
+  {
+    "id": "password",
+    "target": {
+      "type": "environment",
+      "name": "PASSWORD"
+    },
+    "title": "Password",
+    "description": "The password to unlock all validator accounts",
+    "required": true,
+    "secret": true,
+    "if": {
+      "validator_account": { "enum": ["new/current", "import"] }
+    }
+  },
+  {
+    "id": "validatorprivatekey",
+    "target": {
+      "type": "fileUpload",
+      "path": "/data/validatorprivatekey"
+    },
+    "title": "Validator Private Key",
+    "description": "Your Keystore/JSON file containing the Validator Private Key that you want to use for this node",
+    "required": true,
+    "if": {
+      "validator_account": { "enum": ["import"] }
+    }
+  },
+  {
+    "id": "shardwithdrawalkey",
+    "target": {
+      "type": "fileUpload",
+      "path": "/data/shardwithdrawalkey"
+    },
+    "title": "Shard Withdrawal Key",
+    "description": "Your Keystore/JSON file containing the Shard Withdrawal Key that you want to use for this node",
+    "required": true,
+    "if": {
+      "validator_account": { "enum": ["import"] }
+    }
+  }
+]
