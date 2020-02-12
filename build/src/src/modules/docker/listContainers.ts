@@ -200,11 +200,13 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
       protocol: (Type === "udp" ? "UDP" : "TCP") as PortProtocol
     })).map(port => ({
       ...port,
-      deletable: !defaultPortsParsed.find(
-        defaultPort =>
-          defaultPort.container == port.container &&
-          defaultPort.protocol == port.protocol
-      )
+      deletable:
+        defaultPortsParsed.length > 0 &&
+        !defaultPortsParsed.find(
+          defaultPort =>
+            defaultPort.container == port.container &&
+            defaultPort.protocol == port.protocol
+        )
     })),
     volumes: container.Mounts.map(({ Name, Source, Destination }) => ({
       host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",

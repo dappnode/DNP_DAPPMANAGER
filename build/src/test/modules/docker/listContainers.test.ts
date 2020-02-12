@@ -48,7 +48,7 @@ describe("listContainers", function() {
           {
             container: 80,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [],
@@ -81,13 +81,13 @@ describe("listContainers", function() {
             host: 443,
             container: 443,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 80,
             container: 80,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -219,12 +219,12 @@ describe("listContainers", function() {
             host: 8090,
             container: 8090,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             container: 80,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -264,7 +264,7 @@ describe("listContainers", function() {
             host: 1194,
             container: 1194,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -377,7 +377,7 @@ describe("listContainers", function() {
           {
             container: 53,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -408,7 +408,7 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334707,
         image: "ethchain.dnp.dappnode.eth:0.2.1",
-        origin: undefined,
+        origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         name: "ethchain.dnp.dappnode.eth",
         shortName: "ethchain",
         ip: "172.33.1.6",
@@ -417,19 +417,19 @@ describe("listContainers", function() {
             host: 30303,
             container: 30303,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 30303,
             container: 30303,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           },
           {
             host: 30304,
             container: 30304,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -446,11 +446,48 @@ describe("listContainers", function() {
         state: "running",
         running: true,
         dependencies: {},
-        avatarUrl: "",
-        chain: "",
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        avatarUrl:
+          "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+        chain: "ethereum",
+        defaultEnvironment: {
+          DEFAULT_CLIENT: "PARITY",
+          EXTRA_OPTS: "--warp-barrier 8540000",
+          EXTRA_OPTS_GETH: ""
+        },
+        defaultPorts: [
+          {
+            container: 30303,
+            host: 30303,
+            protocol: "TCP"
+          },
+          {
+            container: 30303,
+            host: 30303,
+            protocol: "UDP"
+          },
+          {
+            container: 30304,
+            host: 30304,
+            protocol: "UDP"
+          }
+        ],
+        defaultVolumes: [
+          {
+            container: "/root/.local/share/io.parity.ethereum",
+            host: "ethchaindnpdappnodeeth_data",
+            name: "ethchaindnpdappnodeeth_data"
+          },
+          {
+            container: "/root/.ethereum",
+            host: "ethchaindnpdappnodeeth_geth",
+            name: "ethchaindnpdappnodeeth_geth"
+          },
+          {
+            container: "/root/identity",
+            host: "ethchaindnpdappnodeeth_identity",
+            name: "ethchaindnpdappnodeeth_identity"
+          }
+        ]
       },
       {
         id: "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
@@ -468,29 +505,29 @@ describe("listContainers", function() {
           {
             container: 5001,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             container: 8080,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             container: 8081,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 4001,
             container: 4001,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 4002,
             container: 4002,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -562,13 +599,13 @@ describe("listContainers", function() {
             host: 30399,
             container: 30399,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 30399,
             container: 30399,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -697,19 +734,19 @@ describe("listContainers", function() {
             host: 32769,
             container: 30303,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 32771,
             container: 30303,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           },
           {
             host: 32770,
             container: 30304,
             protocol: "UDP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -748,18 +785,18 @@ describe("listContainers", function() {
           {
             container: 80,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             host: 9735,
             container: 9735,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             container: 10009,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [
@@ -800,12 +837,12 @@ describe("listContainers", function() {
           {
             container: 8000,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           },
           {
             container: 8080,
             protocol: "TCP",
-            deletable: true
+            deletable: false
           }
         ],
         volumes: [],

@@ -603,7 +603,15 @@ export const dockerApiResponseContainers: Docker.ContainerInfo[] = [
             "com.docker.compose.oneoff": "False",
             "com.docker.compose.project": "dncore",
             "com.docker.compose.service": "ethchain.dnp.dappnode.eth",
-            "com.docker.compose.version": "1.22.0"
+            "com.docker.compose.version": "1.22.0",
+            "dappnode.dnp.default.environment": '["EXTRA_OPTS=--warp-barrier 8540000","EXTRA_OPTS_GETH=","DEFAULT_CLIENT=PARITY"]',
+            "dappnode.dnp.default.ports": '["30303:30303","30303:30303/udp","30304:30304/udp"]',
+            "dappnode.dnp.default.volumes": '["ethchaindnpdappnodeeth_data:/root/.local/share/io.parity.ethereum","ethchaindnpdappnodeeth_geth:/root/.ethereum/","ethchaindnpdappnodeeth_identity:/root/identity/"]',
+            "dappnode.dnp.dependencies": '{}',
+            "dappnode.dnp.avatar": "/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+            "dappnode.dnp.chain": "ethereum",
+            "dappnode.dnp.origin": "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
+            "dappnode.dnp.isCore": 'true'
         },
         "Mounts": [
             {
