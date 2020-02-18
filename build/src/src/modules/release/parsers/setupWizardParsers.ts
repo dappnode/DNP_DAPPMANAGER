@@ -1,4 +1,4 @@
-import { SetupWizardField, SetupTarget } from "../../../types";
+import { SetupWizardField, SetupTarget, SetupWizard } from "../../../types";
 import { SetupSchema, SetupUiJson } from "../../../types-own";
 import { pick, omit, uniq, isEmpty } from "lodash";
 import deepmerge from "deepmerge";
@@ -27,7 +27,7 @@ export function setupWizard1To2(
   setupSchema: SetupSchema,
   setupTarget: SetupTarget,
   setupUiJson: SetupUiJson
-): SetupWizardField[] {
+): SetupWizard {
   const setupWizardObj: { [propId: string]: SetupWizardField } = {};
 
   function addPropertiesBlock(
@@ -106,14 +106,17 @@ export function setupWizard1To2(
 
   // Sorts the fields in the order of "ui:order"
   const uiOrder = setupUiJson["ui:order"] as string[];
-  return [
-    ...uiOrder
-      .filter(propId => setupWizardObj[propId])
-      .map(propId => setupWizardObj[propId]),
-    ...Object.values(setupWizardObj).filter(
-      field => !uiOrder.includes(field.id)
-    )
-  ];
+  return {
+    version: "2",
+    fields: [
+      ...uiOrder
+        .filter(propId => setupWizardObj[propId])
+        .map(propId => setupWizardObj[propId]),
+      ...Object.values(setupWizardObj).filter(
+        field => !uiOrder.includes(field.id)
+      )
+    ]
+  };
 }
 
 /**
