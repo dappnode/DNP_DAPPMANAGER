@@ -74,8 +74,7 @@ export default async function fetchDnpRequest({
           }
           return true;
         }
-        // Declaring and calling this function to use returns
-        // which make code more readable and less duplicated
+        // Declare and call this function to use a switch / return patten
         if (await shouldAddSetupWizardField())
           activeSetupWizardFields.push(field);
       }

@@ -71,6 +71,7 @@ describe("Fetch external release data", () => {
         ports: ["1111:1111"]
       },
       setupWizard: {
+        version: "2",
         fields: [
           {
             id: "payoutAddress",
@@ -95,6 +96,7 @@ describe("Fetch external release data", () => {
         ports: ["2222:2222"]
       },
       setupWizard: {
+        version: "2",
         fields: [
           {
             id: "dependencyVar",
@@ -207,6 +209,7 @@ describe("Fetch external release data", () => {
 
         setupWizard: {
           [idMain]: {
+            version: "2",
             fields: [
               {
                 id: "payoutAddress",
@@ -217,6 +220,7 @@ describe("Fetch external release data", () => {
             ]
           },
           [idDep]: {
+            version: "2",
             fields: [
               {
                 id: "dependencyVar",
@@ -308,6 +312,7 @@ describe("Fetch external release data", () => {
     };
 
     const setupWizard: SetupWizard = {
+      version: "2",
       fields: [
         {
           id: "mockVar",

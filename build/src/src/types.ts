@@ -62,6 +62,7 @@ export interface RequestStatus {
 }
 
 export interface SetupWizard {
+  version: "2";
   fields: SetupWizardField[];
 }
 
@@ -77,7 +78,7 @@ export interface SetupWizardField {
   patternErrorMessage?: string;
   enum?: string[];
   required?: boolean;
-  if?: SetupSchema;
+  if?: SetupSchema | { [id: string]: SetupSchema };
 }
 
 export type UserSettingTarget =
@@ -243,7 +244,6 @@ export interface PackageContainer {
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerStatus;
   running: boolean;
-  manifest?: Manifest;
   envs?: PackageEnvs;
   ports: PortMapping[];
   volumes: VolumeMapping[];
@@ -254,11 +254,11 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: string;
-  // ### TODO: Move to a different type "InstalledDnpDetail"
+  // ### TODO: Move to PackageDetails, note it will require significant
+  // changes to the ADMIN UI in parts the code is not yet typed
+  manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
-  setupWizard?: SetupWizardField[];
-  userSettings?: UserSettings;
 }
 
 export interface PackageEnvs {
@@ -266,7 +266,7 @@ export interface PackageEnvs {
 }
 
 export interface PackageDetailData {
-  volumes: {
+  volumes?: {
     // volumeName = bitcoin_data
     [volumeName: string]: {
       size?: string; // "823203"
@@ -274,6 +274,8 @@ export interface PackageDetailData {
       mountpoint?: string; // "/dev1/data"
     };
   };
+  setupWizard?: SetupWizard;
+  userSettings?: UserSettings;
 }
 
 export interface ManifestUpdateAlert {
@@ -635,6 +637,7 @@ export interface PackageReleaseMetadata {
   disclaimer?: {
     message: string;
   };
+
   gettingStarted?: string;
   style?: {
     featuredBackground?: string;
@@ -642,6 +645,11 @@ export interface PackageReleaseMetadata {
     featuredAvatarFilter?: string;
   };
   setupWizard?: SetupWizard;
+  // Legacy setupWizardv1
+  setupSchema?: SetupSchema;
+  setupTarget?: SetupTarget;
+  setupUiJson?: SetupUiJson;
+
   author?: string;
   contributors?: string[];
   categories?: string[];

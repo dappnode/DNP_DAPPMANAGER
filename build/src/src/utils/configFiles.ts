@@ -20,6 +20,39 @@ function parseManifest(manifestString: string): Manifest {
   }
 }
 
+export function readEnvironment({
+  name,
+  isCore
+}: {
+  name: string;
+  isCore: boolean;
+}): PackageEnvs {
+  const composePath = validate.path(getPath.dockerCompose(name, isCore));
+  if (fs.existsSync(composePath)) {
+    const compose = readComposeObj(composePath);
+    const service = parseService(compose);
+    return parseEnvironment(service.environment || []);
+  } else {
+    // ### TODO: Call docker inspect and retrieve the envs from there
+    return {};
+  }
+}
+
+export function readManifest({
+  name,
+  isCore
+}: {
+  name: string;
+  isCore: boolean;
+}): Manifest | null {
+  const manifestPath = validate.path(getPath.manifest(name, isCore));
+  if (fs.existsSync(manifestPath)) {
+    return parseManifest(fs.readFileSync(manifestPath, "utf8"));
+  } else {
+    return null;
+  }
+}
+
 export function readConfigFiles({
   name,
   isCore

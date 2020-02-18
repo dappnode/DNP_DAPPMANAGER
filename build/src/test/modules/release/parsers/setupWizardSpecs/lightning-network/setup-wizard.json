@@ -1,22 +1,25 @@
-[
-  {
-    "id": "rtl_password",
-    "target": {
-      "type": "environment",
-      "name": "RTL_PASSWORD"
+{
+  "version": "2",
+  "fields": [
+    {
+      "id": "rtl_password",
+      "target": {
+        "type": "environment",
+        "name": "RTL_PASSWORD"
+      },
+      "title": "Password",
+      "description": "Your password for Ride The Lightning Web UI",
+      "required": true,
+      "secret": true
     },
-    "title": "Password",
-    "description": "Your password for Ride The Lightning Web UI",
-    "required": true,
-    "secret": true
-  },
-  {
-    "id": "alias",
-    "target": {
-      "type": "environment",
-      "name": "ALIAS"
-    },
-    "title": "Alias",
-    "description": "Alias name for your node (will be public)"
-  }
-]
+    {
+      "id": "alias",
+      "target": {
+        "type": "environment",
+        "name": "ALIAS"
+      },
+      "title": "Alias",
+      "description": "Alias name for your node (will be public)"
+    }
+  ]
+}

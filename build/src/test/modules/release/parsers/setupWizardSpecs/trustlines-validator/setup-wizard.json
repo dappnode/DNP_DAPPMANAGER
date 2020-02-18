@@ -1,32 +1,35 @@
-[
-  {
-    "id": "keystore",
-    "target": {
-      "type": "fileUpload",
-      "path": "/config/custom/keys/tlbc/account.json"
+{
+  "version": "2",
+  "fields": [
+    {
+      "id": "keystore",
+      "target": {
+        "type": "fileUpload",
+        "path": "/config/custom/keys/tlbc/account.json"
+      },
+      "title": "Keystore",
+      "description": "Your Keystore/JSON file containing the private key that you want to use for this node"
     },
-    "title": "Keystore",
-    "description": "Your Keystore/JSON file containing the private key that you want to use for this node"
-  },
-  {
-    "id": "keystoreAddress",
-    "target": {
-      "type": "environment",
-      "name": "ADDRESS"
+    {
+      "id": "keystoreAddress",
+      "target": {
+        "type": "environment",
+        "name": "ADDRESS"
+      },
+      "title": "Public Address",
+      "description": "Public address from the keystore.\nFor validators, you will use this address to seal blocks so it must be an authorized validator address, you can check the valid addresses in [this list](https://github.com/trustlines-protocol/blockchain/blob/1c664ff7d28998b7070c9edb3b325062a5365aad/chain/tlbc/tlbc-spec.json#L11)",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "patternErrorMessage": "Must be a valid address (0x1fd16a...)"
     },
-    "title": "Public Address",
-    "description": "Public address from the keystore.\nFor validators, you will use this address to seal blocks so it must be an authorized validator address, you can check the valid addresses in [this list](https://github.com/trustlines-protocol/blockchain/blob/1c664ff7d28998b7070c9edb3b325062a5365aad/chain/tlbc/tlbc-spec.json#L11)",
-    "pattern": "^0x[a-fA-F0-9]{40}$",
-    "patternErrorMessage": "Must be a valid address (0x1fd16a...)"
-  },
-  {
-    "id": "keystorePassword",
-    "target": {
-      "type": "environment",
-      "name": "PASSWORD"
-    },
-    "title": "Password",
-    "description": "Password to unlock the uploaded keystore",
-    "secret": true
-  }
-]
+    {
+      "id": "keystorePassword",
+      "target": {
+        "type": "environment",
+        "name": "PASSWORD"
+      },
+      "title": "Password",
+      "description": "Password to unlock the uploaded keystore",
+      "secret": true
+    }
+  ]
+}

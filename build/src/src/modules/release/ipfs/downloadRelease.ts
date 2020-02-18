@@ -19,7 +19,6 @@ import {
   downloadGetStarted,
   downloadSetupWizard
 } from "./downloadAssets";
-import { setupWizard1To2 } from "../parsers/setupWizardParsers";
 
 const source: "ipfs" = "ipfs";
 
@@ -113,13 +112,11 @@ export default async function downloadRelease(
         getStartedEntry && downloadGetStarted(getStartedEntry.hash)
       ]);
 
+      // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
       if (setupWizard) manifest.setupWizard = setupWizard;
-      else if (setupSchema && setupTarget)
-        manifest.setupWizard = setupWizard1To2(
-          setupSchema,
-          setupTarget,
-          setupUiJson || {}
-        );
+      if (setupSchema) manifest.setupSchema = setupSchema;
+      if (setupTarget) manifest.setupTarget = setupTarget;
+      if (setupUiJson) manifest.setupUiJson = setupUiJson;
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
 
