@@ -11,7 +11,7 @@ import parseResult from "./parseResult";
  * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
  * @returns {string} latestVersion = "0.2.4"
  */
-export default async function fetchLatestVersion(
+export default async function fetchVersion(
   name: string,
   version: string
 ): Promise<ApmVersion> {
