@@ -7,6 +7,7 @@ import cors from "cors";
 import params from "../params";
 import * as db from "../db";
 import Logs from "../logs";
+import { listContainers } from "../modules/docker/listContainers";
 const logs = Logs(module);
 
 const app = express();
@@ -21,6 +22,7 @@ const port = 3000;
 
 const adminIpPrefix = "172.33.10.";
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
+const maxDnpDataSize = 1e6; // 1 MB
 
 // default options. ALL CORS + limit fileSize and file count
 app.use(
@@ -32,6 +34,29 @@ app.use(cors());
 
 app.get("/", async (req, res) => {
   return res.send("Welcome to the DAPPMANAGER HTTP API");
+});
+
+app.get("/dnp-data/:paramId", async (req, res) => {
+  const { paramId } = req.params;
+  const data = req.query.data;
+  try {
+    if (typeof data === undefined) throw Error("missing");
+    if (typeof data !== "string") throw Error("must be a string");
+    if (Buffer.byteLength(data, "utf8") > maxDnpDataSize)
+      throw Error(`longer than max ${maxDnpDataSize} bytes`);
+  } catch (e) {
+    return res.status(400).send(`Arg data ${e.message}`);
+  }
+
+  // Find IPv4 adresses only, this is a IPv6 to IPv4 prefix
+  const ipv4 = req.ip.replace("::ffff:", "");
+  const dnps = await listContainers();
+  const dnp = dnps.find(_dnp => _dnp.ip === ipv4);
+  if (!dnp) return res.status(405).send(`No DNP found for ip ${ipv4}`);
+
+  db.packageData.set({ dnpName: dnp.name, paramId }, data);
+
+  return res.status(200).send();
 });
 
 /**

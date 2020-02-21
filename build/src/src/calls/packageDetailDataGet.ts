@@ -5,6 +5,7 @@ import { RpcHandlerReturnWithResult } from "../types";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
+import * as db from "../db";
 
 /**
  * Toggles the visibility of a getting started block
@@ -48,6 +49,8 @@ export default async function packageDetailDataGet({
       mountpoint: pathParts ? pathParts.mountpoint : undefined
     };
   });
+
+  const packageData = db.packageDataAll.get(id) || {};
 
   return {
     message: `Got volume sizes of ${id}`,
