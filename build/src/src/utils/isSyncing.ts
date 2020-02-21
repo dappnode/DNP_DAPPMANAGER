@@ -5,8 +5,8 @@ import { runOnlyOneReturnToAll } from "./asyncFlows";
 
 const blockDiff = 50;
 
-const WEB3_HOST_HTTP = params.WEB3_HOST_HTTP;
-const eth = new EthRPC(new HttpProvider(WEB3_HOST_HTTP));
+const WEB3_HOST = params.WEB3_HOST;
+const eth = new EthRPC(new HttpProvider(WEB3_HOST));
 
 interface EthSyncingInterface {
   startingBlock: string;
@@ -32,7 +32,7 @@ function isSyncing(): Promise<boolean> {
         (err: Error, res: EthSyncingInterface) => {
           if (err) {
             if (err.message.includes("Invalid JSON RPC response from provider"))
-              reject(Error(`Can't connect to ${WEB3_HOST_HTTP}`));
+              reject(Error(`Can't connect to ${WEB3_HOST}`));
             else reject(err);
           } else {
             if (!res) resolve(false);

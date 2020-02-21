@@ -9,19 +9,11 @@ const logs = Logs(module);
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const WEB3_HOST: any = params.WEB3_HOST;
 
-if (WEB3_HOST === undefined || WEB3_HOST === null)
-  throw Error("WEB3_HOST is needed to connect to ethchain but it's undefined");
+if (!process.env.TEST) {
+  if (!WEB3_HOST) throw Error("No WEB3_HOST provided");
+  logs.info(`Web3 connection to: ${WEB3_HOST}`);
+}
 
 const web3 = process.env.TEST ? ({} as Web3) : new Web3(WEB3_HOST);
-
-if (!process.env.TEST) {
-  logs.info(`Web3 connection to: ${WEB3_HOST}`);
-  setInterval(() => {
-    web3.eth.net.isListening().catch((e: Error) => {
-      logs.error(`Web3 connection error to ${WEB3_HOST}: ${e.message}`);
-      web3.setProvider(WEB3_HOST);
-    });
-  }, 10000);
-}
 
 export default web3;

@@ -1,4 +1,4 @@
-import web3 from "../../web3Setup";
+import Web3 from "web3";
 import { ApmVersion } from "../../../types";
 
 interface ApmRepoVersionReturn {
@@ -10,6 +10,6 @@ interface ApmRepoVersionReturn {
 export default function parseResult(res: ApmRepoVersionReturn): ApmVersion {
   return {
     version: res.semanticVersion.join("."),
-    contentUri: web3.utils.hexToAscii(res.contentURI)
+    contentUri: Web3.utils.hexToAscii(res.contentURI)
   };
 }
