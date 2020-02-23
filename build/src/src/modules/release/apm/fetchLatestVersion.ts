@@ -1,20 +1,18 @@
-import web3 from "../../web3Setup";
+import { getEthersProvider } from "../../ethProvider";
+import { ethers } from "ethers";
 import { ApmVersion } from "../../../types";
 import * as repoContract from "../../../contracts/repository";
-import fetchRepoAddress from "./fetchRepoAddress";
-import parseResult from "./parseResult";
+import { parseApmVersionReturn } from "./apmUtils";
 
 /**
- * Fetches the latest version of a DNP
- * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
- * @returns {string} latestVersion = "0.2.4"
+ * Fetch the latest version of an APM repo
+ * @param name "bitcoin.dnp.dappnode.eth"
  */
 export default async function fetchLatestVersion(
   name: string
 ): Promise<ApmVersion> {
-  const repoAddr = await fetchRepoAddress(name);
-  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
+  const provider = getEthersProvider();
+  const repo = new ethers.Contract(name, repoContract.abi, provider);
 
-  const res = await repo.methods.getLatest().call();
-  return parseResult(res);
+  return await repo.getLatest().then(parseApmVersionReturn);
 }

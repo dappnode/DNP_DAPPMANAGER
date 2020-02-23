@@ -1,7 +1,8 @@
 import { isEnsDomain } from "../../utils/validate";
+import { ethers } from "ethers";
 import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
 import * as directoryContract from "../../contracts/directory";
-import web3 from "../web3Setup";
+import { getEthersProvider } from "../ethProvider";
 import Logs from "../../logs";
 import { notUndefined } from "../../utils/typingHelpers";
 const logs = Logs(module);
@@ -18,17 +19,20 @@ const DAppNodePackageStatus: DirectoryDnpStatus[] = [
  * [NOTE]: Already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
  */
 export default async function getDirectory(): Promise<DirectoryDnp[]> {
-  const directory = new web3.eth.Contract(
+  const provider = getEthersProvider();
+  const directory = new ethers.Contract(
+    directoryContract.address,
     directoryContract.abi,
-    directoryContract.address
+    provider
   );
-  const numberOfDAppNodePackages = parseInt(
-    await directory.methods.numberOfDAppNodePackages().call()
-  );
+
+  const numberOfDAppNodePackages = await directory
+    .numberOfDAppNodePackages()
+    .then(parseInt);
 
   // Get featured packages list
   // 0x0b00000000000000000000000000000000000000000000000000000000000000
-  const featuredBytes = await directory.methods.featured().call();
+  const featuredBytes = await directory.featured();
   // ["0b", "00", ...]
   /**
    * 1. Strip hex prefix
@@ -59,7 +63,7 @@ export default async function getDirectory(): Promise<DirectoryDnp[]> {
           name,
           status: statusBn,
           position: positionBn
-        } = await directory.methods.getPackage(i).call();
+        } = await directory.getPackage(i);
 
         const status = parseInt(statusBn);
         const position = parseInt(positionBn);

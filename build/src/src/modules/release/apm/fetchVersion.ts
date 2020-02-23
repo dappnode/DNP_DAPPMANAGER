@@ -1,34 +1,29 @@
-import semver from "semver";
+import { getEthersProvider } from "../../ethProvider";
+import { ethers } from "ethers";
 import * as db from "../../../db";
-import web3 from "../../web3Setup";
 import { ApmVersion } from "../../../types";
 import * as repoContract from "../../../contracts/repository";
-import fetchRepoAddress from "./fetchRepoAddress";
-import parseResult from "./parseResult";
+import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils";
 
 /**
- * Fetches the latest version of a DNP
- * @param {object} packageReq { name: "bitcoin.dnp.dappnode.eth" }
- * @returns {string} latestVersion = "0.2.4"
+ * Fetch a specific version of an APM repo
+ * @param name "bitcoin.dnp.dappnode.eth"
+ * @param version "0.2.4"
  */
 export default async function fetchVersion(
   name: string,
   version: string
 ): Promise<ApmVersion> {
-  const semverObj = semver.parse(version);
-  if (!semverObj) throw Error(`Invalid semver ${version}`);
-
   // Load cache if available
   const cachedResult = db.apmCache.get({ name, version });
   if (cachedResult) return cachedResult;
 
-  const repoAddr = await fetchRepoAddress(name);
-  const repo = new web3.eth.Contract(repoContract.abi, repoAddr);
+  const provider = getEthersProvider();
+  const repo = new ethers.Contract(name, repoContract.abi, provider);
 
-  const apmVersion = await repo.methods
-    .getBySemanticVersion([semverObj.major, semverObj.minor, semverObj.patch])
-    .call()
-    .then(parseResult);
+  const apmVersion = await repo
+    .getBySemanticVersion(toApmVersionArray(version))
+    .then(parseApmVersionReturn);
 
   // Validate and store cache
   if (apmVersion.version === version)
