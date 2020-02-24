@@ -686,6 +686,21 @@ export interface VolumeData {
 }
 
 /**
+ * Eth provider / client types
+ * Manage the Ethereum multi-client setup
+ */
+
+export type EthClientTarget = "rpc" | "light-client" | "fullnode";
+export type EthClientStatus =
+  | "selected"
+  | "installing"
+  | "installed"
+  | "syncing"
+  | "active"
+  | "error-installing"
+  | "error-syncing";
+
+/**
  * RPC methods
  * - Generic inteface with metadata types
  * - `WithResult` to type the return value

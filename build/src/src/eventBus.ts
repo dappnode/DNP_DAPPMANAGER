@@ -108,3 +108,6 @@ export const requestAutoUpdateData = busFactoryNoArgAsync(
 export const requestPackages = busFactoryNoArgAsync("REQUEST_PACKAGES");
 export const runNatRenewal = busFactoryNoArg("RUN_NAT_RENEWAL");
 export const initializedDb = busFactoryNoArg("INITIALIZED_DB");
+export const runEthProviderWatcher = busFactoryNoArg(
+  "RUN_ETH_PROVIDER_WATCHER"
+);
