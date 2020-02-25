@@ -3,7 +3,11 @@ import * as eventBus from "../../eventBus";
 import { installPackage, removePackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { EthClientTarget } from "../../types";
-import { getClientData, getEthProviderUrl } from "./clientParams";
+import {
+  getClientData,
+  getEthProviderUrl,
+  genericUserSettings
+} from "./clientParams";
 import { isSyncing } from "../../utils/isSyncing";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
@@ -30,11 +34,11 @@ export async function changeClient(
   const prevTarget = getTarget();
   if (prevTarget === nextTarget) throw Error("Same target");
 
-  // Always that the client is switching set ethProvider to "rpc"
-  setEthProvider("rpc");
+  // Always that the client is switching set ethProvider to "remote"
+  setEthProvider("remote");
 
   // If the previous client is a client package, uninstall it
-  if (prevTarget !== "rpc") {
+  if (prevTarget !== "remote") {
     const { name } = getClientData(prevTarget);
     removePackage({ id: name, deleteVolumes }).catch(e => {
       logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
@@ -59,10 +63,10 @@ export async function changeClient(
  * It makes it easier to know what will happen next given a status
  * It also retries each step automatically without added logic
  */
-async function runEthMultiClientWatcher(): Promise<void> {
+export async function runEthMultiClientWatcher(): Promise<void> {
   const target = getTarget();
 
-  if (target === "rpc") {
+  if (target === "remote") {
     // Do nothing
     return;
   }
@@ -83,7 +87,10 @@ async function runEthMultiClientWatcher(): Promise<void> {
         // Expected state, run / retry installation
         try {
           setStatus("installing");
-          await installPackage({ name });
+          await installPackage({
+            name,
+            userSettings: { [name]: { ...genericUserSettings } }
+          });
           setStatus("installed");
         } catch (e) {
           setStatus("error-installing", e);
@@ -142,23 +149,26 @@ async function runEthMultiClientWatcher(): Promise<void> {
 }
 
 /**
- * Run this watcher:
+ * Eth multi-client watcher. Handles ETH client switching logic
+ * Must run:
  * - every interval
  * - after changing the client
  * - after completing a run if the status has changed
  */
-eventBus.runEthProviderWatcher.on(
-  runOnlyOneSequentially(async () => {
-    try {
-      const prevStatus = getStatus();
-      await runEthMultiClientWatcher();
-      const nextStatus = getStatus();
-      if (prevStatus !== nextStatus)
-        setTimeout(eventBus.runEthProviderWatcher.emit, 1000);
-    } catch (e) {
-      logs.error(`Error on eth provider watcher: ${e.stack}`);
-    }
-  })
-);
+export default function runWatcher(): void {
+  eventBus.runEthProviderWatcher.on(
+    runOnlyOneSequentially(async () => {
+      try {
+        const prevStatus = getStatus();
+        await runEthMultiClientWatcher();
+        const nextStatus = getStatus();
+        if (prevStatus !== nextStatus)
+          setTimeout(eventBus.runEthProviderWatcher.emit, 1000);
+      } catch (e) {
+        logs.error(`Error on eth provider watcher: ${e.stack}`);
+      }
+    })
+  );
 
-setInterval(eventBus.runEthProviderWatcher.emit, 1 * 60 * 1000);
+  setInterval(eventBus.runEthProviderWatcher.emit, 1 * 60 * 1000);
+}

@@ -389,6 +389,7 @@ export function applyUserSet(
   const volumeMappings = parseVolumeMappings(prevVolumes);
 
   // User set
+  const domainAlias = userSettings.domainAlias;
   const userSetEnvironment = userSettings.environment || {};
   const userSetPortMappings = userSettings.portMappings || {};
   const allNamedVolumeMountpoint = userSettings.allNamedVolumeMountpoint;
@@ -502,7 +503,8 @@ export function applyUserSet(
             defaultEnvironment: prevEnvironment,
             defaultPorts: prevPorts,
             defaultVolumes: prevVolumes
-          })
+          }),
+          ...writeMetadataToLabels({ domainAlias })
         }
       }
     },

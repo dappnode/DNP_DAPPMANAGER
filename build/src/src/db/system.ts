@@ -20,7 +20,7 @@ export const ethProvider = staticKey<string>(ETH_PROVIDER, "");
 
 export const ethClientTarget = staticKey<EthClientTarget>(
   ETH_CLIENT_TARGET,
-  "rpc"
+  "remote"
 );
 export const ethClientStatus = staticKey<EthClientStatus>(
   ETH_CLIENT_STATUS,

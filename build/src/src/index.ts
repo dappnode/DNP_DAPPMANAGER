@@ -10,19 +10,11 @@ import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { PackageNotification } from "./types";
+import { copyHostScripts } from "./modules/hostScripts";
+import * as calls from "./calls";
+import runWatchers from "./watchers";
 import Logs from "./logs";
 const logs = Logs(module);
-
-// import calls
-import * as calls from "./calls";
-
-// Start watchers
-import "./watchers/autoUpdates";
-import "./watchers/chains";
-import "./watchers/diskUsage";
-import "./watchers/natRenewal";
-import "./watchers/dyndns";
-import "./watchers/nsupdate";
 
 // Print version data
 import "./utils/getVersionData";
@@ -30,8 +22,8 @@ import "./utils/getVersionData";
 // Start HTTP API
 import "./httpApi";
 
-// Copy host scripts
-import { copyHostScripts } from "./modules/hostScripts";
+// Start watchers
+runWatchers();
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();

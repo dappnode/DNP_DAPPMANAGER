@@ -175,7 +175,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatar,
     chain,
     origin,
-    isCore
+    isCore,
+    domainAlias
   } = readMetadataFromLabels(labels);
   const defaultEnvironmentParsed = parseEnvironment(defaultEnvironment);
   const defaultPortsParsed = parsePortMappings(defaultPorts);
@@ -220,6 +221,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatarUrl,
     origin,
     chain,
+    ...(domainAlias ? { domainAlias } : {}),
     // Default values to avoid having to read the manifest
     defaultEnvironment: defaultEnvironmentParsed,
     defaultPorts: defaultPortsParsed,
