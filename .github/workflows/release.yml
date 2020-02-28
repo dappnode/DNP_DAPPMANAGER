@@ -25,7 +25,7 @@ jobs:
       - name: yarn test
         run: yarn test
         working-directory: ${{ env.working-directory }}  
-  test:
+  it-test:
     runs-on: ubuntu-16.04
     env:
       working-directory: ./build/src
