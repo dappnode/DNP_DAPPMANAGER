@@ -138,11 +138,12 @@ export async function runEthMultiClientWatcher(): Promise<void> {
     case "installing":
     case "error-installing":
       // Client is already installed but the status was not updated
+      // This may happen if the client was already installed by the user
+      // or after a migration before having this functionality
       setStatus("installed");
       return;
 
     default:
-      // "selected", "installing", "error-installing"
       // Should never reach this point, all status covered
       return;
   }
