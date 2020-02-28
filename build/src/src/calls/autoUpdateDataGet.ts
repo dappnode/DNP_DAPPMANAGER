@@ -1,14 +1,11 @@
+import { ReturnData } from "../route-types/autoUpdateDataGet";
 import semver from "semver";
 import params from "../params";
 import { listContainers } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
-import {
-  RpcHandlerReturnWithResult,
-  AutoUpdateDataView,
-  AutoUpdateDataDnpView
-} from "../types";
+import { RpcHandlerReturnWithResult, AutoUpdateDataDnpView } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 
@@ -19,7 +16,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * - pending: Pending auto-update per DNP, can be already executed
  * - dnpsToShow: Parsed data to be shown in the UI
  *
- * @returns {object} result = {
+ * @returns result = {
  *   settings: {
  *     "system-packages": { enabled: true }
  *     "my-packages": { enabled: true }
@@ -49,7 +46,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * }
  */
 export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
-  AutoUpdateDataView
+  ReturnData
 > {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();

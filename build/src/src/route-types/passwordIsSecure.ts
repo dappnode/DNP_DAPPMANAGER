@@ -14,7 +14,7 @@ export const route = "passwordIsSecure.dappmanager.dnp.dappnode.eth";
  * @returns {bool} true = is secure / false = is not
  */
 
-export interface RequestData {}
+export type RequestData = {};
 
 export type ReturnData = boolean;
 

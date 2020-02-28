@@ -10,7 +10,9 @@ import {
   MountpointData,
   PackageDetailData,
   VolumeData,
-  SystemInfo
+  SystemInfo,
+  HostStats,
+  Diagnose
 } from "./types";
 
 /**
@@ -169,6 +171,49 @@ export const coreUpdateDataSample: CoreUpdateData = {
   changelog: "Admin changelog",
   updateAlerts: [],
   versionId: "admin@0.2.1"
+};
+
+/**
+ * Summary of diagnose checks performed by the DAppNode host
+ */
+export const diagnoseSchema = {
+  type: "array",
+  title: "diagnose",
+  items: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      result: { type: "string" },
+      error: { type: "string" }
+    },
+    required: ["name"]
+  }
+};
+
+export const diagnoseSample: Diagnose = [
+  {
+    name: "docker version",
+    result: "Docker version 18.06.1-ce, build e68fc7a",
+    error: "sh: docker: not found"
+  }
+];
+
+/**
+ * Host machine stats, cpu, memory, disk, etc
+ */
+export const hostStatsSchema = {
+  type: "object",
+  properties: {
+    cpu: { type: "string" },
+    memory: { type: "string" },
+    disk: { type: "string" }
+  }
+};
+
+export const hostStatsSample: HostStats = {
+  cpu: "35%",
+  memory: "46%",
+  disk: "57%"
 };
 
 /**
@@ -388,6 +433,13 @@ export const systemInfoSchema = {
 };
 
 export const systemInfoSample: SystemInfo = {
+  // Git version data
+  versionData: {
+    branch: "master",
+    commit: "153123",
+    version: "0.2.0"
+  },
+  // Network params
   ip: "85.84.83.82",
   name: "My-DAppNode",
   staticIp: "85.84.83.82",
@@ -396,7 +448,11 @@ export const systemInfoSample: SystemInfo = {
   noNatLoopback: true,
   alertToOpenPorts: true,
   internalIp: "192.168.0.1",
+  // Other
   dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
   identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+  ethClientTarget: "geth-fast",
+  ethClientStatus: "installing",
+  ethClientStatusError: "Error fetching manifest from ...",
   ethProvider: "http://lightnode.dappnode:8545"
 };

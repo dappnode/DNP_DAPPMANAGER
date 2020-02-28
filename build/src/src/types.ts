@@ -734,6 +734,25 @@ export interface SystemInfo {
 }
 
 /**
+ * Host machine stats, cpu, memory, disk, etc
+ */
+export interface HostStats {
+  cpu?: string; // "35%""
+  memory?: string; // "46%"
+  disk?: string; // "57%"
+}
+
+/**
+ * Summary of diagnose checks performed by the DAppNode host
+ */
+export interface DiagnoseItem {
+  name: string;
+  result?: string;
+  error?: string;
+}
+export type Diagnose = DiagnoseItem[];
+
+/**
  * RPC methods
  * - Generic inteface with metadata types
  * - `WithResult` to type the return value
