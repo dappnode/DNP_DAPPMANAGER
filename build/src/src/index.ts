@@ -100,16 +100,22 @@ connection.onopen = (session, details): void => {
 
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {
-    const dnpList = (await calls.listPackages()).result;
+    const { result: dnpList } = await calls.listPackages();
     wampSubscriptions.packages.emit(dnpList);
-    const volumes = (await calls.volumesGet()).result;
+    const { result: volumes } = await calls.volumesGet();
     wampSubscriptions.volumes.emit(volumes);
   });
 
   // Emits the auto update data (settings, registry, pending)
   eventBus.requestAutoUpdateData.on(async () => {
-    const autoUpdateData = (await calls.autoUpdateDataGet()).result;
+    const { result: autoUpdateData } = await calls.autoUpdateDataGet();
     wampSubscriptions.autoUpdateData.emit(autoUpdateData);
+  });
+
+  // Emits all system info
+  eventBus.requestSystemInfo.on(async () => {
+    const { result: systemInfo } = await calls.systemInfoGet();
+    wampSubscriptions.systemInfo.emit(systemInfo);
   });
 
   // Receives userAction logs from the VPN nodejs app
@@ -118,7 +124,7 @@ connection.onopen = (session, details): void => {
   });
 
   // Store notification in DB and push it to the UI
-  eventBus.notification.on((notification: PackageNotification) => {
+  eventBus.notification.on(notification => {
     db.notification.set(notification.id, notification);
     wampSubscriptions.pushNotification.emit(notification);
   });

@@ -707,6 +707,33 @@ export type EthClientStatus =
   | "error-syncing";
 
 /**
+ * Aggregated DAppNode system info
+ */
+export interface SystemInfo {
+  // Git version data
+  versionData: PackageVersionData;
+  // Network params
+  ip: string; // "85.84.83.82",
+  name: string; // "My-DAppNode",
+  staticIp: string; // "85.84.83.82" | null,
+  domain: string; // "1234acbd.dyndns.io",
+  upnpAvailable: boolean;
+  noNatLoopback: boolean;
+  alertToOpenPorts: boolean;
+  internalIp: string; // "192.168.0.1",
+  // Public key of nacl's asymmetric encryption, used by the ADMIN UI
+  // to send sensitive data in a slightly more protected way
+  dappmanagerNaclPublicKey: string;
+  // From seedPhrase: If it's not stored yet, it's an empty string
+  identityAddress: string;
+  // Eth multi-client configuration and status
+  ethClientTarget: EthClientTarget;
+  ethClientStatus: EthClientStatus;
+  ethClientStatusError?: string;
+  ethProvider: string;
+}
+
+/**
  * RPC methods
  * - Generic inteface with metadata types
  * - `WithResult` to type the return value

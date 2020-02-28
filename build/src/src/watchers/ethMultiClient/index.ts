@@ -27,7 +27,7 @@ const setEthProvider = (target: EthClientTarget): void =>
  * @param nextTarget Ethereum client to change to
  * @param deleteVolumes If changing from a package client, delete its data
  */
-export async function changeClient(
+export async function changeEthMultiClient(
   nextTarget: EthClientTarget,
   deleteVolumes?: boolean
 ): Promise<void> {
@@ -49,6 +49,7 @@ export async function changeClient(
   setTarget(nextTarget);
   setStatus("selected");
   eventBus.runEthProviderWatcher.emit();
+  eventBus.requestSystemInfo.emit();
 }
 
 /**
@@ -163,8 +164,12 @@ export default function runWatcher(): void {
         const prevStatus = getStatus();
         await runEthMultiClientWatcher();
         const nextStatus = getStatus();
-        if (prevStatus !== nextStatus)
+        if (prevStatus !== nextStatus) {
+          // Next run MUST be defered to next event loop for prevStatus to refresh
           setTimeout(eventBus.runEthProviderWatcher.emit, 1000);
+          // Update UI with new status
+          eventBus.requestSystemInfo.emit();
+        }
       } catch (e) {
         logs.error(`Error on eth provider watcher: ${e.stack}`);
       }

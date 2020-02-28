@@ -1,7 +1,6 @@
+import { ReturnData } from "../route-types/passwordIsSecure";
 import { isPasswordSecure } from "../modules/passwordManager";
 import { RpcHandlerReturnWithResult } from "../types";
-
-type ReturnData = boolean;
 
 let isSecureCache = false;
 

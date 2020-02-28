@@ -1,3 +1,4 @@
+import { RequestData } from "../route-types/passwordChange";
 import { changePassword } from "../modules/passwordManager";
 // External calls
 import passwordIsSecure from "./passwordIsSecure";
@@ -11,9 +12,7 @@ import { RpcHandlerReturn } from "../types";
  */
 export default async function passwordChange({
   newPassword
-}: {
-  newPassword: string;
-}): RpcHandlerReturn {
+}: RequestData): RpcHandlerReturn {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);

@@ -9,7 +9,8 @@ import {
   CoreUpdateData,
   MountpointData,
   PackageDetailData,
-  VolumeData
+  VolumeData,
+  SystemInfo
 } from "./types";
 
 /**
@@ -361,4 +362,41 @@ export const userActionLogsSample: UserActionLog = {
   kwargs: { do: "this" },
   result: { data: "content" },
   stack: "Danger\n  at a.ts:152:25"
+};
+
+/**
+ * System info
+ */
+
+export const systemInfoSchema = {
+  type: "object",
+  properties: {
+    ip: { type: "string" },
+    name: { type: "string" },
+    staticIp: { type: "string" },
+    domain: { type: "string" },
+    upnpAvailable: { type: "boolean" },
+    noNatLoopback: { type: "boolean" },
+    alertToOpenPorts: { type: "boolean" },
+    internalIp: { type: "string" },
+    dappmanagerNaclPublicKey: { type: "string" },
+    identityAddress: { type: "string" },
+    ethProvider: { type: "string" }
+  },
+  // VPN still sends logs without message (legacy compatibility)
+  required: []
+};
+
+export const systemInfoSample: SystemInfo = {
+  ip: "85.84.83.82",
+  name: "My-DAppNode",
+  staticIp: "85.84.83.82",
+  domain: "1234acbd.dyndns.io",
+  upnpAvailable: true,
+  noNatLoopback: true,
+  alertToOpenPorts: true,
+  internalIp: "192.168.0.1",
+  dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
+  identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+  ethProvider: "http://lightnode.dappnode:8545"
 };

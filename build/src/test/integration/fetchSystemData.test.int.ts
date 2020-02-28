@@ -58,8 +58,8 @@ describe("Get system data", () => {
     expect(result.disk).to.include("%");
   }).timeout(10 * 1000);
 
-  it("Should get DAPPMANAGER version data", async () => {
-    const { result } = await calls.getVersionData();
+  it("Should get DAPPMANAGER system info", async () => {
+    const { result } = await calls.systemInfoGet();
     expect(result).to.be.ok;
     // Can't check return because is only exists on full build :(
   }).timeout(10 * 1000);
