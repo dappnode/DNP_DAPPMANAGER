@@ -1,0 +1,15 @@
+name: Build test
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-test:
+     runs-on: ubuntu-16.04
+     name: Build test
+     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Docker-Compose Build
+        run: docker-compose build
