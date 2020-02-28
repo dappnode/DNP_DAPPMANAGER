@@ -2,23 +2,7 @@
   "name": "dappmanager.dnp.dappnode.eth",
   "version": "0.2.24",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
-  "avatar": "/ipfs/QmfTpBLzoSdrG88ETRnDus27DTDRUrTXyyVmhXDuMNYVaN",
   "type": "dncore",
-  "image": {
-    "path": "",
-    "hash": "",
-    "size": "",
-    "volumes": [
-      "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket",
-      "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/",
-      "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
-      "/var/run/docker.sock:/var/run/docker.sock",
-      "/etc/hostname:/etc/dappnodename:ro"
-    ],
-    "restart": "always",
-    "subnet": "172.33.0.0/16",
-    "ipv4_address": "172.33.1.7"
-  },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "contributors": [
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
