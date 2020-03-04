@@ -1,19 +1,30 @@
-import { EthClientTarget, UserSettings } from "../../types";
+import { EthClientTarget } from "../../types";
 
-export const nodeAlias = "fullnode";
-export const nodeRpcUrl = `http://${nodeAlias}.dappnode:8545`;
 export const publicRpcUrl = "https://mainnet.dappnode.io:8545";
-export const genericUserSettings: UserSettings = {
-  domainAlias: [nodeAlias]
-};
 
+/**
+ * Returns the url of the JSON RPC for each Ethereum client tag
+ * @param target Ethereum client type
+ */
 export function getEthProviderUrl(target: EthClientTarget): string {
   switch (target) {
     case "remote":
       return publicRpcUrl;
 
+    case "geth-light":
+      return "http://geth-light.dappnode:8545";
+
+    case "geth-fast":
+      return "http://geth.dappnode:8545";
+
+    case "geth-full":
+      return "http://geth.dappnode:8545";
+
+    case "parity":
+      return "http://parity.dappnode:8545";
+
     default:
-      return nodeRpcUrl;
+      throw Error(`Unknown client target: ${target}`);
   }
 }
 

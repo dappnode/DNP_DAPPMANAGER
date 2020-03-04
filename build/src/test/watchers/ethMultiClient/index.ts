@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import {
-  nodeRpcUrl,
-  publicRpcUrl
+  publicRpcUrl,
+  getEthProviderUrl
 } from "../../../src/watchers/ethMultiClient/clientParams";
 import {
   PackageContainer,
@@ -23,6 +23,7 @@ interface State {
 describe("Watchers > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     const newTarget: EthClientTarget = "geth-full";
+    const newProviderUrl = getEthProviderUrl(newTarget);
     const newTargetDnpName = "geth.dnp.dappnode.eth";
 
     /**
@@ -139,7 +140,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       name: newTargetDnpName,
       running: true
     });
-    isSyncingState[nodeRpcUrl] = true;
+    isSyncingState[newProviderUrl] = true;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
@@ -151,13 +152,13 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     );
 
     // Simulate the package finishes syncing
-    isSyncingState[nodeRpcUrl] = false;
+    isSyncingState[newProviderUrl] = false;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
         status: "active",
-        ethProvider: nodeRpcUrl
+        ethProvider: newProviderUrl
       } as State,
       "When completing sync, package should be activated"
     );

@@ -3,11 +3,7 @@ import * as eventBus from "../../eventBus";
 import { installPackage, removePackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { EthClientTarget } from "../../types";
-import {
-  getClientData,
-  getEthProviderUrl,
-  genericUserSettings
-} from "./clientParams";
+import { getClientData, getEthProviderUrl } from "./clientParams";
 import { isSyncing } from "../../utils/isSyncing";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
@@ -88,10 +84,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
         // Expected state, run / retry installation
         try {
           setStatus("installing");
-          await installPackage({
-            name,
-            userSettings: { [name]: { ...genericUserSettings } }
-          });
+          await installPackage({ name });
           setStatus("installed");
         } catch (e) {
           setStatus("error-installing", e);
