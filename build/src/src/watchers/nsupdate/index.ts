@@ -1,4 +1,5 @@
 import * as eventBus from "../../eventBus";
+import * as db from "../../db";
 import params from "../../params";
 import execNsupdate from "./execNsupdate";
 import { listContainers } from "../../modules/docker/listContainers";
@@ -19,10 +20,23 @@ async function runNsupdate({
 }): Promise<void> {
   try {
     const dnpList = await listContainers();
-    const nsupdateTxts = getNsupdateTxts({ dnpList, ids, removeOnly });
+
+    // Load domain alias from db
+    const domainAliases = {
+      fullnode: db.fullnodeDomainTarget.get()
+    };
+
+    const nsupdateTxts = getNsupdateTxts({
+      dnpList,
+      domainAliases,
+      ids,
+      removeOnly
+    });
+
     for (const nsupdateTxt of nsupdateTxts) {
       await execNsupdate(nsupdateTxt);
     }
+
     if (ids) {
       if (removeOnly) logs.info(`nsupdate delete for ${ids.join(", ")}`);
       else logs.info(`nsupdate add for ${ids.join(", ")}`);

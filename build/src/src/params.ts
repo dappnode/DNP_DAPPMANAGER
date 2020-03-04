@@ -120,7 +120,13 @@ const params = {
 
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
-  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ="
+  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
+
+  // Fullnode names
+  ALLOWED_FULLNODE_DNP_NAMES: [
+    "geth.dnp.dappnode.eth",
+    "parity.dnp.dappnode.eth"
+  ]
 };
 
 if (devMode) {

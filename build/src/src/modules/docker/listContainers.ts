@@ -23,6 +23,7 @@ import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 const networkName = params.DNP_NETWORK_EXTERNAL_NAME;
+const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
 
 /**
  * Returns the list of containers
@@ -222,6 +223,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     origin,
     chain,
     ...(domainAlias ? { domainAlias } : {}),
+    canBeFullnode: allowedFullnodeDnpNames.includes(name),
     // Default values to avoid having to read the manifest
     defaultEnvironment: defaultEnvironmentParsed,
     defaultPorts: defaultPortsParsed,

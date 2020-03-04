@@ -454,5 +454,7 @@ export const systemInfoSample: SystemInfo = {
   ethClientTarget: "geth-fast",
   ethClientStatus: "installing",
   ethClientStatusError: "Error fetching manifest from ...",
-  ethProvider: "http://lightnode.dappnode:8545"
+  ethProvider: "http://lightnode.dappnode:8545",
+  // Domain map
+  fullnodeDomainTarget: "lightnode.dnp.dappnode.eth"
 };

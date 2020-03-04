@@ -40,6 +40,39 @@ describe("watcher > nsupdate", () => {
     }
   });
 
+  /**
+   * Util to reduce verbosity when asserting nsupdate texts
+   * @param nsupdateTxts
+   * @param expectedNsupdateTxts
+   */
+  function assertNsUpdateTxts(
+    nsupdateTxts: string[],
+    expectedNsupdateTxts: { eth: string; dappnode: string }
+  ): void {
+    expect(nsupdateTxts[0]).to.equal(
+      `
+server 172.33.1.2
+debug yes
+zone eth.
+${expectedNsupdateTxts.eth.trim()}
+show
+send
+    `.trim(),
+      "Wrong eth zone"
+    );
+    expect(nsupdateTxts[1]).to.equal(
+      `
+server 172.33.1.2
+debug yes
+zone dappnode.
+${expectedNsupdateTxts.dappnode.trim()}
+show
+send
+    `.trim(),
+      "Wrong dappnode zone"
+    );
+  }
+
   describe("getNsupdateTxts", () => {
     const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
     const gethDnpName = "geth.dnp.dappnode.eth";
@@ -53,117 +86,80 @@ describe("watcher > nsupdate", () => {
         ...mockDnp,
         name: gethDnpName,
         ip: "172.33.0.3",
-        domainAlias: ["fullnode"],
         chain: "ethereum"
       }
     ];
+    const domainAliases = {
+      fullnode: gethDnpName
+    };
 
     it("Should get nsupdate.txt contents for a normal case", () => {
-      const nsupdateTxts = getNsupdateTxts({ dnpList });
-      expect(nsupdateTxts).to.deep.equal([
-        `
-server 172.33.1.2
-debug yes
-zone eth.
+      const nsupdateTxts = getNsupdateTxts({ dnpList, domainAliases });
+      assertNsUpdateTxts(nsupdateTxts, {
+        eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
 update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
 update delete my.geth.dnp.dappnode.eth A
-update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3
-show
-send
-`.trim(),
-        `
-server 172.33.1.2
-debug yes
-zone dappnode.
+update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3`,
+        dappnode: `
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete geth.dappnode A
 update add geth.dappnode 60 A 172.33.0.3
 update delete fullnode.dappnode A
-update add fullnode.dappnode 60 A 172.33.0.3
-show
-send
-`.trim()
-      ]);
+update add fullnode.dappnode 60 A 172.33.0.3`
+      });
     });
 
     it("Should get nsupdate.txt contents for remove only", () => {
-      const nsupdateTxts = getNsupdateTxts({ dnpList, removeOnly: true });
-      expect(nsupdateTxts).to.deep.equal([
-        `
-server 172.33.1.2
-debug yes
-zone eth.
+      const nsupdateTxts = getNsupdateTxts({
+        dnpList,
+        domainAliases,
+        removeOnly: true
+      });
+
+      assertNsUpdateTxts(nsupdateTxts, {
+        eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update delete my.geth.dnp.dappnode.eth A
-show
-send
-`.trim(),
-        `
-server 172.33.1.2
-debug yes
-zone dappnode.
+update delete my.geth.dnp.dappnode.eth A`,
+        dappnode: `
 update delete bitcoin.dappnode A
 update delete geth.dappnode A
-update delete fullnode.dappnode A
-show
-send
-`.trim()
-      ]);
+update delete fullnode.dappnode A`
+      });
     });
 
     it("Should get nsupdate.txt contents for installing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
         dnpList,
+        domainAliases,
         ids: [bitcoinDnpName]
       });
-      expect(nsupdateTxts).to.deep.equal([
-        `
-server 172.33.1.2
-debug yes
-zone eth.
+
+      assertNsUpdateTxts(nsupdateTxts, {
+        eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
-show
-send
-`.trim(),
-        `
-server 172.33.1.2
-debug yes
-zone dappnode.
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2`,
+        dappnode: `
 update delete bitcoin.dappnode A
-update add bitcoin.dappnode 60 A 172.33.0.2
-show
-send
-`.trim()
-      ]);
+update add bitcoin.dappnode 60 A 172.33.0.2`
+      });
     });
 
     it("Should get nsupdate.txt contents for a removing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
         dnpList,
+        domainAliases,
         ids: [bitcoinDnpName],
         removeOnly: true
       });
-      expect(nsupdateTxts).to.deep.equal([
-        `
-server 172.33.1.2
-debug yes
-zone eth.
-update delete my.bitcoin.dnp.dappnode.eth A
-show
-send
-`.trim(),
-        `
-server 172.33.1.2
-debug yes
-zone dappnode.
-update delete bitcoin.dappnode A
-show
-send
-`.trim()
-      ]);
+
+      assertNsUpdateTxts(nsupdateTxts, {
+        eth: `
+update delete my.bitcoin.dnp.dappnode.eth A`,
+        dappnode: `
+update delete bitcoin.dappnode A`
+      });
     });
   });
 });

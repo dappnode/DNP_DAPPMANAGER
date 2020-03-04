@@ -13,6 +13,10 @@ interface PackageContainerWithIp extends PackageContainer {
   ip: string;
 }
 
+interface AliasMap {
+  [domainAlias: string]: string; // dnpName
+}
+
 /**
  * Rules for allowing or forbidding alias requested by the packages
  * @param alias "fullnode"
@@ -116,10 +120,12 @@ export function getDotDappnodeDomain(name: string): string {
  */
 export function getNsupdateTxts({
   dnpList,
+  domainAliases,
   ids,
   removeOnly = false
 }: {
   dnpList: PackageContainer[];
+  domainAliases: AliasMap;
   ids?: string[];
   removeOnly?: boolean;
 }): string[] {
@@ -151,6 +157,12 @@ export function getNsupdateTxts({
       for (const alias of dnp.domainAlias)
         if (isAliasAllowed(alias, dnp))
           dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+
+  // Add .dappnode domain alias from db (such as fullnode.dappnode)
+  for (const [alias, dnpName] of Object.entries(domainAliases)) {
+    const dnp = dnpsToUpdate.find(dnp => dnpName && dnp.name === dnpName);
+    if (dnp) dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+  }
 
   return (
     [{ zone: ethZone, domains: eth }, { zone: dappnodeZone, domains: dappnode }]

@@ -235,6 +235,7 @@ export interface PackageContainer {
   origin?: string;
   chain?: string;
   domainAlias?: string[];
+  canBeFullnode?: boolean;
   // ### TODO: Move to a different type "InstalledDnpDetail"
   gettingStarted?: string;
   gettingStartedShow?: boolean;
@@ -731,6 +732,8 @@ export interface SystemInfo {
   ethClientStatus: EthClientStatus;
   ethClientStatusError?: string;
   ethProvider: string;
+  // Domain maps
+  fullnodeDomainTarget: string;
 }
 
 /**

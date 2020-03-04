@@ -16,6 +16,8 @@ const getStatus = db.ethClientStatus.get;
 const getTarget = db.ethClientTarget.get;
 const setEthProvider = (target: EthClientTarget): void =>
   db.ethProvider.set(getEthProviderUrl(target));
+const setFullnodeDomainTarget = (dnpName: string): void =>
+  db.fullnodeDomainTarget.set(dnpName);
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -86,6 +88,9 @@ export async function runEthMultiClientWatcher(): Promise<void> {
           setStatus("installing");
           await installPackage({ name });
           setStatus("installed");
+          // Map fullnode.dappnode to the new installed package
+          setFullnodeDomainTarget(name);
+          eventBus.packagesModified.emit({ ids: [name] });
         } catch (e) {
           setStatus("error-installing", e);
         }
