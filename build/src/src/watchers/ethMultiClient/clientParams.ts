@@ -1,30 +1,4 @@
 import { EthClientTarget, UserSettings } from "../../types";
-import params from "../../params";
-
-export const publicRpcUrl = params.REMOTE_MAINNET_RPC_URL;
-
-/**
- * Returns the url of the JSON RPC for each Ethereum client tag
- * @param target Ethereum client type
- */
-export function getEthProviderUrl(target: EthClientTarget): string {
-  switch (target) {
-    case "remote":
-      return publicRpcUrl;
-
-    case "geth-light":
-      return "http://geth-light.dappnode:8545";
-
-    case "geth-fast":
-      return "http://geth.dappnode:8545";
-
-    case "parity":
-      return "http://parity.dappnode:8545";
-
-    default:
-      throw Error(`Unknown client target: ${target}`);
-  }
-}
 
 /**
  * Returns package data for each Ethereum client tag
@@ -32,14 +6,15 @@ export function getEthProviderUrl(target: EthClientTarget): string {
  */
 export function getClientData(
   target: EthClientTarget
-): { name: string; userSettings?: UserSettings } {
+): { name: string; url: string; userSettings?: UserSettings } {
   switch (target) {
     case "remote":
-      throw Error(`Client RPC does not require an install`);
+      throw Error(`No client data for remote target`);
 
     case "geth-light":
       return {
         name: "geth.dnp.dappnode.eth",
+        url: "http://geth.dappnode:8545",
         userSettings: {
           environment: {
             EXTRA_OPTS: "--rpcapi eth,net,web3,txpool --syncmode light"
@@ -48,10 +23,16 @@ export function getClientData(
       };
 
     case "geth-fast":
-      return { name: "geth.dnp.dappnode.eth" };
+      return {
+        name: "geth.dnp.dappnode.eth",
+        url: "http://geth.dappnode:8545"
+      };
 
     case "parity":
-      return { name: "parity.dnp.dappnode.eth" };
+      return {
+        name: "parity.dnp.dappnode.eth",
+        url: "http://parity.dappnode:8545"
+      };
 
     default:
       throw Error(`Unsupported client target: ${target}`);

@@ -1,23 +1,48 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
+import params from "../../params";
 import { installPackage, removePackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { EthClientTarget } from "../../types";
-import { getClientData, getEthProviderUrl } from "./clientParams";
+import { EthClientTarget, EthClientStatus } from "../../types";
+import { getClientData } from "./clientParams";
 import { isSyncing } from "../../utils/isSyncing";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
 const logs = Logs(module);
 
 // Create alias to make the main functions more flexible and readable
-const setStatus = db.setEthClientStatusAndError;
+
+const getTarget = db.ethClientTarget.get;
 const setTarget = db.ethClientTarget.set;
 const getStatus = db.ethClientStatus.get;
-const getTarget = db.ethClientTarget.get;
-const setEthProvider = (target: EthClientTarget): void =>
-  db.ethProvider.set(getEthProviderUrl(target));
-const setFullnodeDomainTarget = (dnpName: string): void =>
+
+const setStatus = (status: EthClientStatus, e?: Error): void => {
+  db.setEthClientStatusAndError(status, e);
+  eventBus.requestSystemInfo.emit(); // Update UI with new status
+};
+
+const setFullnodeDomainTarget = (dnpName: string): void => {
   db.fullnodeDomainTarget.set(dnpName);
+  eventBus.packagesModified.emit({ ids: [dnpName] }); // Run nsupdate
+};
+
+/**
+ * Returns the url of the JSON RPC an Eth multi-client status and target
+ * If the package target is not active it returns the remote URL
+ * This causes that during client changes the URL will always point to remote
+ *
+ * Note: Keep this logic here since it is coupled with the meaning and
+ * implementation of ethClientTarget and ethClientStatus
+ * @return ethProvier http://geth.dappnode:8545
+ */
+export function getEthProviderUrl(): string {
+  const target = getTarget();
+  const status = getStatus();
+
+  if (!target || target === "remote" || status !== "active")
+    return params.REMOTE_MAINNET_RPC_URL;
+  else return getClientData(target).url;
+}
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -32,9 +57,6 @@ export async function changeEthMultiClient(
   const prevTarget = getTarget();
   if (prevTarget === nextTarget) throw Error("Same target");
 
-  // Always that the client is switching set ethProvider to "remote"
-  setEthProvider("remote");
-
   // If the previous client is a client package, uninstall it
   if (prevTarget !== "remote") {
     const { name } = getClientData(prevTarget);
@@ -46,8 +68,7 @@ export async function changeEthMultiClient(
   // Setting the status to selected will trigger an install
   setTarget(nextTarget);
   setStatus("selected");
-  eventBus.runEthProviderWatcher.emit();
-  eventBus.requestSystemInfo.emit();
+  eventBus.runEthMultiClientWatcher.emit();
 }
 
 /**
@@ -71,7 +92,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
   }
 
   const status = getStatus();
-  const { name, userSettings } = getClientData(target);
+  const { name, url, userSettings } = getClientData(target);
   const dnp = await listContainerNoThrow(name);
 
   // Client is not installed
@@ -91,9 +112,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
             userSettings: { [name]: userSettings || {} }
           });
           setStatus("installed");
-          // Map fullnode.dappnode to the new installed package
-          setFullnodeDomainTarget(name);
-          eventBus.packagesModified.emit({ ids: [name] });
+          setFullnodeDomainTarget(name); // Map fullnode.dappnode to package
         } catch (e) {
           setStatus("error-installing", e);
         }
@@ -125,12 +144,8 @@ export async function runEthMultiClientWatcher(): Promise<void> {
     case "error-syncing":
       // Check if client is already synced
       try {
-        if (await isSyncing(getEthProviderUrl(target))) {
-          setStatus("syncing");
-        } else {
-          setEthProvider(target);
-          setStatus("active");
-        }
+        if (await isSyncing(url)) setStatus("syncing");
+        else setStatus("active");
       } catch (e) {
         setStatus("error-syncing", e);
       }
@@ -159,23 +174,20 @@ export async function runEthMultiClientWatcher(): Promise<void> {
  * - after completing a run if the status has changed
  */
 export default function runWatcher(): void {
-  eventBus.runEthProviderWatcher.on(
+  eventBus.runEthMultiClientWatcher.on(
     runOnlyOneSequentially(async () => {
       try {
         const prevStatus = getStatus();
         await runEthMultiClientWatcher();
         const nextStatus = getStatus();
-        if (prevStatus !== nextStatus) {
+        if (prevStatus !== nextStatus)
           // Next run MUST be defered to next event loop for prevStatus to refresh
-          setTimeout(eventBus.runEthProviderWatcher.emit, 1000);
-          // Update UI with new status
-          eventBus.requestSystemInfo.emit();
-        }
+          setTimeout(eventBus.runEthMultiClientWatcher.emit, 1000);
       } catch (e) {
         logs.error(`Error on eth provider watcher: ${e.stack}`);
       }
     })
   );
 
-  setInterval(eventBus.runEthProviderWatcher.emit, 1 * 60 * 1000);
+  setInterval(eventBus.runEthMultiClientWatcher.emit, 1 * 60 * 1000);
 }

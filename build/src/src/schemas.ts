@@ -426,7 +426,11 @@ export const systemInfoSchema = {
     internalIp: { type: "string" },
     dappmanagerNaclPublicKey: { type: "string" },
     identityAddress: { type: "string" },
-    ethProvider: { type: "string" }
+    ethClientTarget: { type: "string" },
+    ethClientStatus: { type: "string" },
+    ethClientStatusError: { type: "string" },
+    ethProvider: { type: "string" },
+    fullnodeDomainTarget: { type: "string" }
   },
   // VPN still sends logs without message (legacy compatibility)
   required: []
@@ -454,7 +458,7 @@ export const systemInfoSample: SystemInfo = {
   ethClientTarget: "geth-fast",
   ethClientStatus: "installing",
   ethClientStatusError: "Error fetching manifest from ...",
-  ethProvider: "http://lightnode.dappnode:8545",
+  ethProvider: "http://geth.dappnode:8545",
   // Domain map
-  fullnodeDomainTarget: "lightnode.dnp.dappnode.eth"
+  fullnodeDomainTarget: "geth.dnp.dappnode.eth"
 };

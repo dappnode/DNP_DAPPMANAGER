@@ -1,10 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import {
-  publicRpcUrl,
-  getEthProviderUrl
-} from "../../../src/watchers/ethMultiClient/clientParams";
-import {
   PackageContainer,
   EthClientTarget,
   EthClientStatus
@@ -12,18 +8,18 @@ import {
 import rewiremock from "rewiremock";
 // imports for typings
 import { mockDnp } from "../../testUtils";
+import { getClientData } from "../../../src/watchers/ethMultiClient/clientParams";
 
 interface State {
   target: EthClientTarget;
   status: EthClientStatus;
   statusError?: string;
-  ethProvider: string;
 }
 
 describe("Watchers > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     const newTarget: EthClientTarget = "geth-fast";
-    const newProviderUrl = getEthProviderUrl(newTarget);
+    const newTargetUrl = getClientData(newTarget).url;
     const newTargetDnpName = "geth.dnp.dappnode.eth";
 
     /**
@@ -31,8 +27,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
      */
     const state: State = {
       target: "remote",
-      status: "selected",
-      ethProvider: publicRpcUrl
+      status: "selected"
     };
 
     /**
@@ -66,16 +61,16 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
         if (e) state.statusError = e.message;
         else delete state.statusError;
       },
-      ethProvider: {
-        get: () => state.ethProvider,
-        set: (ethProvider: string) => {
-          state.ethProvider = ethProvider;
-        }
+      fullnodeDomainTarget: {
+        get: (): string => "",
+        set: (_: string) => {}
       }
     };
     /* eslint-enable @typescript-eslint/explicit-function-return-type */
 
     async function isSyncing(url: string): Promise<boolean> {
+      if (typeof isSyncingState[url] !== "boolean")
+        throw Error(`Is syncing fake call failed for unknown url: ${url}`);
       return isSyncingState[url];
     }
 
@@ -116,8 +111,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     expect(state).to.deep.equal(
       {
         target: "remote",
-        status: "selected",
-        ethProvider: publicRpcUrl
+        status: "selected"
       } as State,
       "State should be equal to initial"
     );
@@ -128,8 +122,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: "installed",
-        ethProvider: publicRpcUrl
+        status: "installed"
       } as State,
       "After the user selects a new target it should start installing"
     );
@@ -140,25 +133,23 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       name: newTargetDnpName,
       running: true
     });
-    isSyncingState[newProviderUrl] = true;
+    isSyncingState[newTargetUrl] = true;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: "syncing",
-        ethProvider: publicRpcUrl
+        status: "syncing"
       } as State,
       "After installation, the package is syncing"
     );
 
     // Simulate the package finishes syncing
-    isSyncingState[newProviderUrl] = false;
+    isSyncingState[newTargetUrl] = false;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: "active",
-        ethProvider: newProviderUrl
+        status: "active"
       } as State,
       "When completing sync, package should be activated"
     );
