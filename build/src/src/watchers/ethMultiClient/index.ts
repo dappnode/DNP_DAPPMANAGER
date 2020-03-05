@@ -1,13 +1,14 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import params from "../../params";
+import { ethers } from "ethers";
 import { installPackage, removePackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { EthClientTarget, EthClientStatus } from "../../types";
 import { getClientData } from "./clientParams";
-import { isSyncing } from "../../utils/isSyncing";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
+import getDirectory from "../../modules/release/getDirectory";
 const logs = Logs(module);
 
 // Create alias to make the main functions more flexible and readable
@@ -42,6 +43,28 @@ export function getEthProviderUrl(): string {
   if (!target || target === "remote" || status !== "active")
     return params.REMOTE_MAINNET_RPC_URL;
   else return getClientData(target).url;
+}
+
+/**
+ * Make sure the client is syncing
+ * - Check that eth_syncing returns false (WARNING: may return false positive)
+ * - Make sure content can be queried
+ * - Make sure DAppNode smart contracts can be accessed
+ * @param url
+ */
+export async function isClientSyncing(url: string): Promise<boolean> {
+  const provider = new ethers.providers.JsonRpcProvider(url);
+  const isSyncing = await provider.send("eth_syncing", []);
+  if (isSyncing) return true;
+
+  // Do extra checks to make sure the client is actually synced
+  const currentBlock = await provider.getBlockNumber();
+  if (!currentBlock) return true;
+
+  const directory = await getDirectory();
+  if (!directory || directory.length === 0) return true;
+
+  return false;
 }
 
 /**
@@ -144,7 +167,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
     case "error-syncing":
       // Check if client is already synced
       try {
-        if (await isSyncing(url)) setStatus("syncing");
+        if (await isClientSyncing(url)) setStatus("syncing");
         else setStatus("active");
       } catch (e) {
         setStatus("error-syncing", e);
