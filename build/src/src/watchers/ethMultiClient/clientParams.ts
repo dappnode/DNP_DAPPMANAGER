@@ -1,6 +1,7 @@
 import { EthClientTarget } from "../../types";
+import params from "../../params";
 
-export const publicRpcUrl = "https://mainnet.dappnode.io:8545";
+export const publicRpcUrl = params.REMOTE_MAINNET_RPC_URL;
 
 /**
  * Returns the url of the JSON RPC for each Ethereum client tag

@@ -95,6 +95,10 @@ const params = {
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
+  // DAppNode remote fullnode service
+  REMOTE_MAINNET_RPC_URL:
+    process.env.REMOTE_MAINNET_RPC_URL || "https://mainnet.dappnode.io:8545",
+
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
   STATIC_IP_PATH: "/usr/src/app/config/static_ip",
