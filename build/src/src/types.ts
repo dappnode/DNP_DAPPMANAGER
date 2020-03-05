@@ -698,6 +698,13 @@ export type EthClientTarget =
   | "geth-fast"
   | "geth-full"
   | "parity";
+export const ethClientTargets: EthClientTarget[] = [
+  "remote",
+  "geth-light",
+  "geth-fast",
+  "geth-full",
+  "parity"
+];
 export type EthClientStatus =
   | "selected"
   | "installing"

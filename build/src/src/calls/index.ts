@@ -13,6 +13,7 @@ import cleanCache from "./cleanCache";
 import copyFileFrom from "./copyFileFrom";
 import copyFileTo from "./copyFileTo";
 import diagnose from "./diagnose";
+import domainAliasSet from "./domainAliasSet";
 import ethClientTargetSet from "./ethClientTargetSet";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
@@ -58,6 +59,7 @@ export {
   copyFileFrom,
   copyFileTo,
   diagnose,
+  domainAliasSet,
   ethClientTargetSet,
   fetchCoreUpdateData,
   fetchDirectory,

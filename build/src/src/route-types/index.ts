@@ -1,5 +1,6 @@
 import * as autoUpdateDataGet from "./autoUpdateDataGet";
 import * as diagnose from "./diagnose";
+import * as domainAliasSet from "./domainAliasSet";
 import * as ethClientTargetSet from "./ethClientTargetSet";
 import * as fetchCoreUpdateData from "./fetchCoreUpdateData";
 import * as fetchDirectory from "./fetchDirectory";
@@ -20,6 +21,7 @@ import * as volumesGet from "./volumesGet";
 export {
   autoUpdateDataGet,
   diagnose,
+  domainAliasSet,
   ethClientTargetSet,
   fetchCoreUpdateData,
   fetchDirectory,
