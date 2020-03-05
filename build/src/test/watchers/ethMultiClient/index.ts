@@ -22,7 +22,7 @@ interface State {
 
 describe("Watchers > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    const newTarget: EthClientTarget = "geth-full";
+    const newTarget: EthClientTarget = "geth-fast";
     const newProviderUrl = getEthProviderUrl(newTarget);
     const newTargetDnpName = "geth.dnp.dappnode.eth";
 

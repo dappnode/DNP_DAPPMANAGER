@@ -71,7 +71,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
   }
 
   const status = getStatus();
-  const { name } = getClientData(target);
+  const { name, userSettings } = getClientData(target);
   const dnp = await listContainerNoThrow(name);
 
   // Client is not installed
@@ -86,7 +86,10 @@ export async function runEthMultiClientWatcher(): Promise<void> {
         // Expected state, run / retry installation
         try {
           setStatus("installing");
-          await installPackage({ name });
+          await installPackage({
+            name,
+            userSettings: { [name]: userSettings || {} }
+          });
           setStatus("installed");
           // Map fullnode.dappnode to the new installed package
           setFullnodeDomainTarget(name);
