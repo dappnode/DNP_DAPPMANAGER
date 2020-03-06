@@ -22,7 +22,7 @@ export function getClientData(
         }
       };
 
-    case "geth-fast":
+    case "geth":
       return {
         name: "geth.dnp.dappnode.eth",
         url: "http://geth.dappnode:8545"

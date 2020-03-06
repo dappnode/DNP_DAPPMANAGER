@@ -692,11 +692,11 @@ export interface VolumeData {
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
  */
-export type EthClientTarget = "remote" | "geth-light" | "geth-fast" | "parity";
+export type EthClientTarget = "remote" | "geth-light" | "geth" | "parity";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
   "geth-light",
-  "geth-fast",
+  "geth",
   "parity"
 ];
 export type EthClientStatus =

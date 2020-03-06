@@ -25,6 +25,6 @@ export const requestDataSchema = {
 // Samples for testing
 
 export const requestDataSample: RequestData = {
-  target: "geth-fast",
+  target: "geth-light",
   deleteVolumes: true
 };

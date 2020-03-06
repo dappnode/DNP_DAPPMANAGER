@@ -18,9 +18,8 @@ interface State {
 
 describe("Watchers > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    const newTarget: EthClientTarget = "geth-fast";
-    const newTargetUrl = getClientData(newTarget).url;
-    const newTargetDnpName = "geth.dnp.dappnode.eth";
+    const newTarget: EthClientTarget = "geth";
+    const newTargetData = getClientData(newTarget);
 
     /**
      * Mutetable state used by the mock DB
@@ -130,10 +129,10 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     // Simulate the package starts running after being installed
     dnpList.push({
       ...mockDnp,
-      name: newTargetDnpName,
+      name: newTargetData.name,
       running: true
     });
-    isSyncingState[newTargetUrl] = true;
+    isSyncingState[newTargetData.url] = true;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
@@ -144,7 +143,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     );
 
     // Simulate the package finishes syncing
-    isSyncingState[newTargetUrl] = false;
+    isSyncingState[newTargetData.url] = false;
     await runEthMultiClientWatcher();
     expect(state).to.deep.equal(
       {
