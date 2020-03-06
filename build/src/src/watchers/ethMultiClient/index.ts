@@ -82,10 +82,14 @@ export async function changeEthMultiClient(
 
   // If the previous client is a client package, uninstall it
   if (prevTarget !== "remote") {
-    const { name } = getClientData(prevTarget);
-    removePackage({ id: name, deleteVolumes }).catch(e => {
+    try {
+      const { name } = getClientData(prevTarget);
+      await removePackage({ id: name, deleteVolumes });
+      // Must await uninstall because geth -> light, light -> geth
+      // will create conflicts otherwise
+    } catch (e) {
       logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
-    });
+    }
   }
 
   // Setting the status to selected will trigger an install
