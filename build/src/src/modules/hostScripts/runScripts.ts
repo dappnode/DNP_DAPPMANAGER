@@ -10,9 +10,8 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 
 /**
  * Script runners
- * - detect_fs.sh
- * - migrate_ethchain.sh
  */
+type ScriptName = "detect_fs.sh" | "migrate_volume.sh";
 
 /**
  * Detects mountpoints in the host
@@ -70,18 +69,22 @@ export const detectMountpoints = memoize(
 );
 
 /**
- * Moves the volumes of the DNP_ETHCHAIN package to the new format
- * of non-core package
+ * Dangerously move a docker volume in the host docker root dir
+ * @param fromVolumeName "dncore_ethchaindnpdappnodeeth_geth"
+ * @param toVolumeName "gethdnpdappnodeeth_data"
  */
-export async function migrateEthchainVolumes(): Promise<void> {
-  await runScript("migrate_ethchain.sh");
+export async function migrateVolume(
+  fromVolumeName: string,
+  toVolumeName: string
+): Promise<void> {
+  await runScript("migrate_volume.sh", `${fromVolumeName} ${toVolumeName}`);
 }
 
 /**
  * Run a script for the hostScripts folder
  * @param scriptName "detect_fs.sh"
  */
-async function runScript(scriptName: string, args = ""): Promise<string> {
+async function runScript(scriptName: ScriptName, args = ""): Promise<string> {
   const scriptPath = path.resolve(hostScriptsDir, scriptName);
   if (!fs.existsSync(scriptPath))
     throw Error(`Host script ${scriptName} not found`);
