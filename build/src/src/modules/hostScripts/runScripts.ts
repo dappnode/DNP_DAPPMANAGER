@@ -11,6 +11,7 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 /**
  * Script runners
  * - detect_fs.sh
+ * - migrate_ethchain.sh
  */
 
 /**
@@ -67,6 +68,14 @@ export const detectMountpoints = memoize(
   },
   { promise: true, maxAge: 5000 }
 );
+
+/**
+ * Moves the volumes of the DNP_ETHCHAIN package to the new format
+ * of non-core package
+ */
+export async function migrateEthchainVolumes(): Promise<void> {
+  await runScript("migrate_ethchain.sh");
+}
 
 /**
  * Run a script for the hostScripts folder

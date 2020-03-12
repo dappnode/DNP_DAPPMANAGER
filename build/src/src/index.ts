@@ -9,10 +9,10 @@ import { convertLegacyEnvFiles } from "./utils/configFiles";
 import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
-import { PackageNotification } from "./types";
 import { copyHostScripts } from "./modules/hostScripts";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
+import migrateEthchain from "./watchers/ethMultiClient/migrateEthchain";
 import Logs from "./logs";
 const logs = Logs(module);
 
@@ -176,6 +176,10 @@ async function runLegacyOps(): Promise<void> {
   } catch (e) {
     logs.error(`Error converting DNP .env files: ${e.stack || e.message}`);
   }
+
+  migrateEthchain()
+    .then(() => logs.info(`Migrated ETHCHAIN`))
+    .catch(e => logs.error(`Error migrating ETHCHAIN: ${e.stack}`));
 }
 
 runLegacyOps();

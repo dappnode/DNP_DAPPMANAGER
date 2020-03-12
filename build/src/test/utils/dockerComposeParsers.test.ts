@@ -324,6 +324,77 @@ describe("Util: dockerComposeParsers", () => {
 
       expect(userSettings).to.deep.equal(expectedUserSet);
     });
+
+    it("Should parse a DNP_ETHCHAIN compose userSettings", () => {
+      const compose: Compose = {
+        version: "3.4",
+        networks: {
+          network: {
+            driver: "bridge",
+            ipam: { config: [{ subnet: "172.33.0.0/16" }] }
+          }
+        },
+        volumes: {
+          ethchaindnpdappnodeeth_data: {},
+          ethchaindnpdappnodeeth_geth: {},
+          ethchaindnpdappnodeeth_identity: {},
+          ethchaindnpdappnodeeth_ipc: {}
+        },
+        services: {
+          "ethchain.dnp.dappnode.eth": {
+            image: "ethchain.dnp.dappnode.eth:0.2.20",
+            container_name: "DAppNodeCore-ethchain.dnp.dappnode.eth",
+            restart: "always",
+            volumes: [
+              "ethchaindnpdappnodeeth_data:/root/.local/share/io.parity.ethereum",
+              "ethchaindnpdappnodeeth_geth:/root/.ethereum",
+              "ethchaindnpdappnodeeth_identity:/root/identity",
+              "ethchaindnpdappnodeeth_ipc:/root/.ethereum/ipc"
+            ],
+            environment: [
+              "EXTRA_OPTS=--warp-barrier 9530000",
+              "EXTRA_OPTS_GETH",
+              "DEFAULT_CLIENT=PARITY"
+            ],
+            ports: ["35353:30303", "35353:30303/udp", "35354:30304/udp"],
+            dns: "172.33.1.2",
+            networks: {
+              network: {
+                ipv4_address: "172.33.1.6"
+              }
+            },
+            logging: {
+              options: {
+                "max-size": "10m",
+                "max-file": "3"
+              }
+            }
+          }
+        }
+      };
+
+      const expectedUserSet: UserSettings = {
+        environment: {
+          EXTRA_OPTS: "--warp-barrier 9530000",
+          EXTRA_OPTS_GETH: "",
+          DEFAULT_CLIENT: "PARITY"
+        },
+        portMappings: {
+          "30303/TCP": "35353",
+          "30303/UDP": "35353",
+          "30304/UDP": "35354"
+        },
+        namedVolumeMountpoints: {
+          ethchaindnpdappnodeeth_data: "",
+          ethchaindnpdappnodeeth_geth: "",
+          ethchaindnpdappnodeeth_identity: "",
+          ethchaindnpdappnodeeth_ipc: ""
+        }
+      };
+
+      const userSettings = parseUserSetFromCompose(compose);
+      expect(userSettings).to.deep.equal(expectedUserSet);
+    });
   });
 
   describe("applyUserSet", () => {

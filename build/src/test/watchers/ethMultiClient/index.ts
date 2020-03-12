@@ -62,7 +62,9 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       },
       fullnodeDomainTarget: {
         get: (): string => "",
-        set: (_: string) => {}
+        set: (dnpName: string) => {
+          dnpName;
+        }
       }
     };
     /* eslint-enable @typescript-eslint/explicit-function-return-type */

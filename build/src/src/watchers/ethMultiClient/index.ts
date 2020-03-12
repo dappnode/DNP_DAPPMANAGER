@@ -4,11 +4,12 @@ import params from "../../params";
 import { ethers } from "ethers";
 import { installPackage, removePackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { EthClientTarget, EthClientStatus } from "../../types";
+import { EthClientTarget, EthClientStatus, UserSettings } from "../../types";
 import { getClientData } from "./clientParams";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
 import getDirectory from "../../modules/release/getDirectory";
+import merge from "deepmerge";
 const logs = Logs(module);
 
 // Create alias to make the main functions more flexible and readable
@@ -75,10 +76,14 @@ export async function isClientSyncing(url: string): Promise<boolean> {
  */
 export async function changeEthMultiClient(
   nextTarget: EthClientTarget,
-  deleteVolumes?: boolean
+  deleteVolumes?: boolean,
+  userSettings?: UserSettings
 ): Promise<void> {
   const prevTarget = getTarget();
   if (prevTarget === nextTarget) throw Error("Same target");
+
+  // Set user settings of next target if any
+  if (userSettings) db.ethClientUserSettings.set(nextTarget, userSettings);
 
   // If the previous client is a client package, uninstall it
   if (prevTarget !== "remote") {
@@ -136,7 +141,13 @@ export async function runEthMultiClientWatcher(): Promise<void> {
           setStatus("installing");
           await installPackage({
             name,
-            userSettings: { [name]: userSettings || {} }
+            userSettings: {
+              [name]: merge(
+                // Merge the default user settings with any customization from the user
+                userSettings || {},
+                db.ethClientUserSettings.get(target) || {}
+              )
+            }
           });
           setStatus("installed");
           setFullnodeDomainTarget(name); // Map fullnode.dappnode to package

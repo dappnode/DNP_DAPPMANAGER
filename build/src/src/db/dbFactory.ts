@@ -64,10 +64,9 @@ export default function dbFactory(dbPath: string) {
     validate: (keyArg: K, value?: T) => boolean
   ) {
     return {
-      get: (keyArg: K): T | null => {
+      get: (keyArg: K): T | undefined => {
         const value = get(keyGetter(keyArg));
         if (validate(keyArg, value)) return value;
-        else return null;
       },
       set: (keyArg: K, newValue: T): void => {
         if (validate(keyArg, newValue)) set(keyGetter(keyArg), newValue);

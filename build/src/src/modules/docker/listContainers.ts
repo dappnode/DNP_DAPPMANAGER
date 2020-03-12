@@ -106,9 +106,7 @@ export async function listContainerNoThrow(
   byName: string
 ): Promise<PackageContainer | null> {
   const containers = await dockerList({ filters: { name: [byName] } });
-  const container = containers[0];
-  if (!container) return null;
-  return parseContainerInfo(container);
+  return containers[0] ? parseContainerInfo(containers[0]) : null;
 }
 
 export async function listContainer(byName: string): Promise<PackageContainer> {
