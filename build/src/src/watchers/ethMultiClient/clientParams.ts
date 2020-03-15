@@ -28,10 +28,10 @@ export function getClientData(
         url: "http://geth.dappnode:8545"
       };
 
-    case "parity":
+    case "open-ethereum":
       return {
-        name: "parity.dnp.dappnode.eth",
-        url: "http://parity.dappnode:8545"
+        name: "open-ethereum.dnp.dappnode.eth",
+        url: "http://open-ethereum.dappnode:8545"
       };
 
     default:

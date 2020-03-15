@@ -124,7 +124,7 @@ export default async function migrateEthchain(): Promise<void> {
 
   // Install new package. fullnode.dappnode is assigned after install
   if (ethchain) {
-    const target = isNextOpenEthereum ? "parity" : "geth";
+    const target = isNextOpenEthereum ? "open-ethereum" : "geth";
     const EXTRA_OPTS = isNextOpenEthereum
       ? envs.EXTRA_OPTS
       : envs.EXTRA_OPTS_GETH;
