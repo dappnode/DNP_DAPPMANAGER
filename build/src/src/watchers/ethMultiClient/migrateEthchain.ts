@@ -28,7 +28,7 @@ export default async function migrateEthchain(): Promise<void> {
   if (ethchain)
     try {
       await dockerRm(ethchain.id);
-      logs.info("Removed package");
+      logs.info("Removed ETHCHAIN package");
 
       // Clean manifest and docker-compose
       for (const filepath of [
@@ -37,16 +37,16 @@ export default async function migrateEthchain(): Promise<void> {
       ])
         if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
     } catch (e) {
-      logs.error(`Error removing package: ${e.stack}`);
+      logs.error(`Error removing ETHCHAIN package: ${e.stack}`);
     }
 
   // Non-blocking step of migrating old volumes with a host script
   if (volumes.some(vol => vol.Name.startsWith(ethchainVolumePrefix)))
     try {
       await migrateEthchainVolumes();
-      logs.info("Migrated volumes");
+      logs.info("Migrated ETHCHAIN volumes");
     } catch (e) {
-      logs.error(`Error migrating volumes: ${e.stack}`);
+      logs.error(`Error migrating ETHCHAIN volumes: ${e.stack}`);
     }
 
   // Install new package. fullnode.dappnode is assigned after install
