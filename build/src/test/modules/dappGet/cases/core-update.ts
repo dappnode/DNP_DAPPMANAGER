@@ -24,7 +24,7 @@ module.exports = {
         "0.1.0": { dependencies: {} }
       }
     },
-    "vnp.dnp.dappnode.eth": {
+    "vpn.dnp.dappnode.eth": {
       installed: "0.1.1",
       versions: {
         "0.1.1": { dependencies: {} },
@@ -43,14 +43,14 @@ module.exports = {
       versions: {
         "0.1.1": {
           dependencies: {
-            "vnp.dnp.dappnode.eth": "0.1.1",
+            "vpn.dnp.dappnode.eth": "0.1.1",
             "dappmanager.dnp.dappnode.eth": "0.1.0",
             "ethforward.dnp.dappnode.eth": "0.1.1"
           }
         },
         "0.1.0": {
           dependencies: {
-            "vnp.dnp.dappnode.eth": "0.1.0",
+            "vpn.dnp.dappnode.eth": "0.1.0",
             "dappmanager.dnp.dappnode.eth": "0.1.0",
             "ethforward.dnp.dappnode.eth": "0.1.0"
           }
