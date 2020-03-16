@@ -82,8 +82,7 @@ const params = {
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters
-  WEB3_HOST:
-    process.env.WEB3_HOST || "http://my.ethchain.dnp.dappnode.eth:8545",
+  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names

@@ -17,8 +17,8 @@ function parseHexOrDecimal(hexOrDecimal: string): number {
 
 /**
  * Returns a chain data object for an [ethereum] API
- * @param {string} name = "Mainnet"
- * @param {string} api = "http://my.ethchain.dnp.dappnode.eth:8545"
+ * @param {string} name = "Geth"
+ * @param {string} api = "http://geth.dappnode:8545"
  * @returns {object}
  * - On success: {
  *   syncing: true, {bool}

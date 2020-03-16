@@ -27,7 +27,7 @@ export function getReleaseSpecialPermissions({
     : [];
 
   for (const externalVol of externalVols) {
-    // externalVol = "dncore_ethchaindnpdappnodeeth_data:/app/.ethchain:ro"
+    // externalVol = "gethdnpdappnodeeth_data:/app/.ethchain:ro"
     const host = externalVol.split(":")[0];
     const parts = host.split("_");
     if (parts[0] === "dncore")

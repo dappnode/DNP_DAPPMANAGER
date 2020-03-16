@@ -5,12 +5,6 @@ export interface Chain {
 }
 
 export const supportedProviders: { [dnpName: string]: Chain } = {
-  "ethchain.dnp.dappnode.eth": {
-    name: "Mainnet",
-    driverName: "ethereum",
-    api: "http://my.ethchain.dnp.dappnode.eth:8545"
-    //  api: 'ws://my.ethchain.dnp.dappnode.eth:8546',
-  },
   "ropsten.dnp.dappnode.eth": {
     name: "Ropsten",
     driverName: "ethereum",
@@ -38,11 +32,6 @@ export const supportedProviders: { [dnpName: string]: Chain } = {
     name: "Goerli-pantheon",
     driverName: "ethereum",
     api: "http://my.goerli-pantheon.dnp.dappnode.eth:8545"
-  },
-  "goerli-parity.dnp.dappnode.eth": {
-    name: "Goerli-parity",
-    driverName: "ethereum",
-    api: "http://my.goerli-parity.dnp.dappnode.eth:8545"
   },
   "bitcoin.dnp.dappnode.eth": {
     name: "Bitcoin",

@@ -51,7 +51,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.1.4",
         "ipfs.dnp.dappnode.eth": "0.1.3",
-        "ethchain.dnp.dappnode.eth": "0.1.4",
         "ethforward.dnp.dappnode.eth": "0.1.1",
         "vpn.dnp.dappnode.eth": "0.1.11",
         "wamp.dnp.dappnode.eth": "0.1.0",
@@ -70,7 +69,6 @@ describe("dappGetBasic", () => {
       // Deps
       "bind.dnp.dappnode.eth": "0.1.4",
       "ipfs.dnp.dappnode.eth": "0.1.3",
-      "ethchain.dnp.dappnode.eth": "0.1.4",
       "ethforward.dnp.dappnode.eth": "0.1.1",
       "vpn.dnp.dappnode.eth": "0.1.11",
       "wamp.dnp.dappnode.eth": "0.1.0"
@@ -88,11 +86,6 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "ipfs.dnp.dappnode.eth", version: "0.2.0-alpha" },
         {
           ...mockDnp,
-          name: "ethchain.dnp.dappnode.eth",
-          version: "0.2.0-alpha"
-        },
-        {
-          ...mockDnp,
           name: "ethforward.dnp.dappnode.eth",
           version: "0.2.0-alpha"
         },
@@ -104,7 +97,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.2.0",
         "ipfs.dnp.dappnode.eth": "0.2.0",
-        "ethchain.dnp.dappnode.eth": "0.2.0",
         "ethforward.dnp.dappnode.eth": "0.2.0",
         "vpn.dnp.dappnode.eth": "0.2.0",
         "wamp.dnp.dappnode.eth": "0.2.0",
@@ -123,7 +115,6 @@ describe("dappGetBasic", () => {
       // Deps
       "bind.dnp.dappnode.eth": "0.2.0",
       "ipfs.dnp.dappnode.eth": "0.2.0",
-      "ethchain.dnp.dappnode.eth": "0.2.0",
       "ethforward.dnp.dappnode.eth": "0.2.0",
       "vpn.dnp.dappnode.eth": "0.2.0",
       "wamp.dnp.dappnode.eth": "0.2.0",
@@ -139,7 +130,6 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "core.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "bind.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "ipfs.dnp.dappnode.eth", version: "0.2.0" },
-        { ...mockDnp, name: "ethchain.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "ethforward.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "vpn.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "wamp.dnp.dappnode.eth", version: "0.2.0" },
@@ -149,7 +139,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.2.0",
         "ipfs.dnp.dappnode.eth": "0.2.0",
-        "ethchain.dnp.dappnode.eth": "0.2.0",
         "ethforward.dnp.dappnode.eth": "0.2.0",
         "vpn.dnp.dappnode.eth": "0.2.0",
         "wamp.dnp.dappnode.eth": "0.2.0",
@@ -169,7 +158,6 @@ describe("dappGetBasic", () => {
       // Ignored deps
       // 'bind.dnp.dappnode.eth': '0.2.0',
       // 'ipfs.dnp.dappnode.eth': '0.2.0',
-      // 'ethchain.dnp.dappnode.eth': '0.2.0',
       // 'ethforward.dnp.dappnode.eth': '0.2.0',
       // 'vpn.dnp.dappnode.eth': '0.2.0',
       // 'wamp.dnp.dappnode.eth': '0.2.0',
@@ -184,7 +172,6 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "core.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "bind.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "ipfs.dnp.dappnode.eth", version: "0.2.0" },
-        { ...mockDnp, name: "ethchain.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "ethforward.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "vpn.dnp.dappnode.eth", version: "0.2.0" },
         { ...mockDnp, name: "wamp.dnp.dappnode.eth", version: "0.2.0" },
@@ -194,7 +181,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.2.0-alpha",
         "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
-        "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
         "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
         "vpn.dnp.dappnode.eth": "0.2.0-alpha",
         "wamp.dnp.dappnode.eth": "0.2.0-alpha",
@@ -214,7 +200,6 @@ describe("dappGetBasic", () => {
       // Ignored deps
       // 'bind.dnp.dappnode.eth': '0.2.0',
       // 'ipfs.dnp.dappnode.eth': '0.2.0',
-      // 'ethchain.dnp.dappnode.eth': '0.2.0',
       // 'ethforward.dnp.dappnode.eth': '0.2.0',
       // 'vpn.dnp.dappnode.eth': '0.2.0',
       // 'wamp.dnp.dappnode.eth': '0.2.0',
@@ -229,7 +214,6 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "core.dnp.dappnode.eth", version: "0.1.11" },
         { ...mockDnp, name: "bind.dnp.dappnode.eth", version: "0.1.9" },
         { ...mockDnp, name: "ipfs.dnp.dappnode.eth", version: "0.1.6" },
-        { ...mockDnp, name: "ethchain.dnp.dappnode.eth", version: "0.1.7" },
         { ...mockDnp, name: "ethforward.dnp.dappnode.eth", version: "0.1.2" },
         { ...mockDnp, name: "vpn.dnp.dappnode.eth", version: "0.1.12" },
         { ...mockDnp, name: "wamp.dnp.dappnode.eth", version: "0.1.1" },
@@ -239,7 +223,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.2.0-alpha",
         "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
-        "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
         "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
         "vpn.dnp.dappnode.eth": "0.2.0-alpha",
         "wamp.dnp.dappnode.eth": "0.2.0-alpha",
@@ -258,7 +241,6 @@ describe("dappGetBasic", () => {
       // Deps
       "bind.dnp.dappnode.eth": "0.2.0-alpha",
       "ipfs.dnp.dappnode.eth": "0.2.0-alpha",
-      "ethchain.dnp.dappnode.eth": "0.2.0-alpha",
       "ethforward.dnp.dappnode.eth": "0.2.0-alpha",
       "vpn.dnp.dappnode.eth": "0.2.0-alpha",
       "wamp.dnp.dappnode.eth": "0.2.0-alpha",
@@ -273,7 +255,6 @@ describe("dappGetBasic", () => {
         { ...mockDnp, name: "core.dnp.dappnode.eth", version: "0.1.11" },
         { ...mockDnp, name: "bind.dnp.dappnode.eth", version: "0.1.9" },
         { ...mockDnp, name: "ipfs.dnp.dappnode.eth", version: "0.1.6" },
-        { ...mockDnp, name: "ethchain.dnp.dappnode.eth", version: "0.1.7" },
         { ...mockDnp, name: "ethforward.dnp.dappnode.eth", version: "0.1.2" },
         { ...mockDnp, name: "vpn.dnp.dappnode.eth", version: "0.1.12" },
         { ...mockDnp, name: "wamp.dnp.dappnode.eth", version: "0.1.1" },
@@ -283,7 +264,6 @@ describe("dappGetBasic", () => {
       {
         "bind.dnp.dappnode.eth": "0.2.0",
         "ipfs.dnp.dappnode.eth": "0.2.0",
-        "ethchain.dnp.dappnode.eth": "0.2.0",
         "ethforward.dnp.dappnode.eth": "0.2.0",
         "vpn.dnp.dappnode.eth": "0.2.0",
         "wamp.dnp.dappnode.eth": "0.2.0",
@@ -302,7 +282,6 @@ describe("dappGetBasic", () => {
       // Deps
       "bind.dnp.dappnode.eth": "0.2.0",
       "ipfs.dnp.dappnode.eth": "0.2.0",
-      "ethchain.dnp.dappnode.eth": "0.2.0",
       "ethforward.dnp.dappnode.eth": "0.2.0",
       "vpn.dnp.dappnode.eth": "0.2.0",
       "wamp.dnp.dappnode.eth": "0.2.0",

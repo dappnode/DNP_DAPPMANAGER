@@ -292,10 +292,10 @@ export interface ManifestWithImage extends Manifest {
 }
 
 export interface ComposeVolumes {
-  // volumeName: "dncore_ethchaindnpdappnodeeth_data"
+  // volumeName: "dncore_ipfsdnpdappnodeeth_data"
   [volumeName: string]: {
     // Allowed to user
-    external?: boolean | { name: string }; // name: "dncore_ethchaindnpdappnodeeth_data"
+    external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
     // NOT allowed to user, only used by DAppNode internally (if any)
     name?: string; // Volumes can only be declared locally or be external
     driver?: string; // Dangerous

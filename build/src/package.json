@@ -23,7 +23,6 @@
   "author": "dappLion",
   "license": "ISC",
   "dependencies": {
-    "@parity/api": "^2.1.22",
     "@types/memoizee": "^0.4.3",
     "ajv": "^6.10.2",
     "async": "^2.6.1",

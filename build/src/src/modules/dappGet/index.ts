@@ -32,7 +32,6 @@ const logs = Logs(module);
  *   message: 'Found compatible state at case 1/256',
  *   state: {
  *     'ipfs.dnp.dappnode.eth': '0.1.3',
- *     'ethchain.dnp.dappnode.eth': '0.1.4',
  *     'ethforward.dnp.dappnode.eth': '0.1.1',
  *     'vpn.dnp.dappnode.eth': '0.1.11',
  *     'wamp.dnp.dappnode.eth': '0.1.0',
