@@ -460,5 +460,7 @@ export const systemInfoSample: SystemInfo = {
   ethClientStatusError: "Error fetching manifest from ...",
   ethProvider: "http://geth.dappnode:8545",
   // Domain map
-  fullnodeDomainTarget: "geth.dnp.dappnode.eth"
+  fullnodeDomainTarget: "geth.dnp.dappnode.eth",
+  // UI
+  showWelcome: true
 };

@@ -6,6 +6,7 @@ import { changeEthMultiClient } from ".";
 import { migrateVolume } from "../../modules/hostScripts";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
+import * as db from "../../db";
 import Logs from "../../logs";
 import shell from "../../utils/shell";
 const logs = Logs(module);
@@ -44,24 +45,7 @@ export default async function migrateEthchain(): Promise<void> {
   } = (ethchain || {}).envs || userSettings.environment || {};
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
 
-  // Non-blocking step of uninstalling the DNP_ETHCHAIN
-  if (ethchain)
-    try {
-      await dockerRm(ethchain.id);
-      logs.info("Removed ETHCHAIN package");
-
-      // Clean manifest and docker-compose
-      for (const filepath of [
-        getPath.dockerCompose(ethchainDnpName, true),
-        getPath.manifest(ethchainDnpName, true)
-      ])
-        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-    } catch (e) {
-      logs.error(`Error removing ETHCHAIN package: ${e.stack}`);
-    }
-
-  // Non-blocking step of migrating old volumes with a host script
-  const migrations = [
+  const volumeMigrations = [
     {
       id: "OpenEthereum data volume",
       from: ethchainVolumes.data,
@@ -87,7 +71,27 @@ export default async function migrateEthchain(): Promise<void> {
         !volumes.find(vol => vol.Name === to)
     );
 
-  for (const { id, from, to } of migrations) {
+  // De-activate UI welcome flow if this is an update
+  if (ethchain || volumeMigrations.length > 0) db.uiWelcomeDone.set(true);
+
+  // Non-blocking step of uninstalling the DNP_ETHCHAIN
+  if (ethchain)
+    try {
+      await dockerRm(ethchain.id);
+      logs.info("Removed ETHCHAIN package");
+
+      // Clean manifest and docker-compose
+      for (const filepath of [
+        getPath.dockerCompose(ethchainDnpName, true),
+        getPath.manifest(ethchainDnpName, true)
+      ])
+        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+    } catch (e) {
+      logs.error(`Error removing ETHCHAIN package: ${e.stack}`);
+    }
+
+  // Non-blocking step of migrating old volumes with a host script
+  for (const { id, from, to } of volumeMigrations) {
     try {
       // Remove all packages that are using the volume to safely move it
       const idsToRemove = await shell(`docker ps -aq --filter volume=${from}`);
@@ -100,11 +104,11 @@ export default async function migrateEthchain(): Promise<void> {
     }
   }
   // Optimization to only run `docker system df -v` once, can run for +15s
-  if (migrations.length > 0)
+  if (volumeMigrations.length > 0)
     try {
       // Make sure the volume was migrated successfully before removing it
       const { Volumes } = await dockerDf({ noCache: true });
-      for (const { id, from } of migrations) {
+      for (const { id, from } of volumeMigrations) {
         const fromVol = Volumes.find(vol => vol.Name === from);
         if (!fromVol)
           logs.warning(`Did not delete ETHCHAIN ${id} ${from}, not found`);

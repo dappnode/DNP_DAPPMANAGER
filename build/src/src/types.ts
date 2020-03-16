@@ -739,6 +739,8 @@ export interface SystemInfo {
   ethProvider: string;
   // Domain maps
   fullnodeDomainTarget: string;
+  // UI stats
+  showWelcome: boolean;
 }
 
 /**

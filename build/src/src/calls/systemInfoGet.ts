@@ -38,7 +38,9 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       ethClientStatusError: db.ethClientStatusError.get(),
       ethProvider: getEthProviderUrl(),
       // Domain map
-      fullnodeDomainTarget: db.fullnodeDomainTarget.get()
+      fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
+      // UI stats
+      showWelcome: !db.uiWelcomeDone.get()
     }
   };
 }
