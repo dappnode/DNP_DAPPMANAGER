@@ -91,9 +91,6 @@ describe.skip("Call function: installPackage", function() {
     progressLog;
   }
 
-  // Simulated the chain is already synced
-  const isSyncing = async (): Promise<boolean> => false;
-
   let installPackage: typeof installPackageType;
 
   before("Mock", async () => {
@@ -108,9 +105,6 @@ describe.skip("Call function: installPackage", function() {
           .toBeUsed();
         mock(() => import("../../src/modules/release/getRelease"))
           .withDefault(getRelease)
-          .toBeUsed();
-        mock(() => import("../../src/utils/isSyncing"))
-          .withDefault(isSyncing)
           .toBeUsed();
         mock(() => import("../../src/utils/logUi"))
           .with({ logUi })

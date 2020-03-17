@@ -2,7 +2,6 @@ import * as eventBus from "../eventBus";
 import { ReturnData } from "../route-types/fetchDirectory";
 import getDirectory from "../modules/release/getDirectory";
 import getRelease from "../modules/release/getRelease";
-import isSyncing from "../utils/isSyncing";
 import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";
 import { listContainers } from "../modules/docker/listContainers";
@@ -19,14 +18,6 @@ const loadThrottle = 500; // 0.5 seconds
 export default async function fetchDirectory(): RpcHandlerReturnWithResult<
   ReturnData
 > {
-  if (Boolean(await isSyncing())) {
-    return {
-      message: `Mainnet is still syncing`,
-      result: [],
-      logMessage: true
-    };
-  }
-
   // Prevent sending way to many updates in case the fetching process is fast
   const emitDirectoryUpdate = throttle(eventBus.directory.emit, loadThrottle);
 

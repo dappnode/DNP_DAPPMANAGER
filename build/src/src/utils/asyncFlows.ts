@@ -59,7 +59,6 @@ export function runOnlyOneSequentially<A, R>(
  * [NOTE]: The target function should NEVER be called with different arguments
  * since the arguments of non-first callers will be ignored.
  * [ONLY] use this function to query a state that changes with a low frequency.
- * For example: to check if a blockchain node is syncing: `utils/isSyncing.ts`
  *
  * @param fn Target function (Callback style)
  */

@@ -1,8 +1,22 @@
 // #### NOTE: Typedefinitions of web3.eth.isSyncing() are not correct, using require to ignore them
-const Web3 = require("web3"); // #### NOTE
+import { ethers } from "ethers";
 import { ChainData } from "../../types";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
+
+type EthSyncingReturn =
+  | false
+  | {
+      currentBlock: string; // "0x0";
+      highestBlock: string; // "0x8a61c8";
+      startingBlock: string; // "0x0";
+      // Geth sync
+      knownStates?: string; // "0x1266";
+      pulledStates?: string; // "0x115";
+      // Open Ethereum sync
+      warpChunksAmount?: string; // "0x1266";
+      warpChunksProcessed?: string; // "0x115";
+    };
 
 // Utils
 function parseSyncing(current: string, total: string): string {
@@ -34,38 +48,67 @@ export default async function ethereum(
   name: string,
   api: string
 ): Promise<ChainData> {
-  const web3 = new Web3(api);
+  const provider = new ethers.providers.JsonRpcProvider(api);
   const [syncing, blockNumber] = await Promise.all([
-    web3.eth.isSyncing(),
-    web3.eth.getBlockNumber()
+    provider.send("eth_syncing", []) as Promise<EthSyncingReturn>,
+    provider.getBlockNumber()
   ]);
-  if (
-    syncing &&
-    syncing.highestBlock - syncing.currentBlock > MIN_BLOCK_DIFF_SYNC
-  ) {
-    if (syncing.warpChunksAmount > 0 && syncing.warpChunksProcessed > 0) {
+
+  if (syncing) {
+    const currentBlock = parseHexOrDecimal(syncing.currentBlock);
+    const highestBlock = parseHexOrDecimal(syncing.highestBlock);
+
+    // Syncing but very close
+    if (highestBlock - currentBlock > MIN_BLOCK_DIFF_SYNC)
       return {
         name,
-        syncing: true,
+        syncing: false,
         error: false,
-        message: `Syncing snapshot: ${parseSyncing(
-          syncing.warpChunksProcessed,
-          syncing.warpChunksAmount
-        )}`,
-        progress: syncing.warpChunksProcessed / syncing.warpChunksAmount
+        message: "Synced #" + blockNumber
       };
-    } else {
+
+    // Geth sync with states
+    if (
+      typeof syncing.knownStates !== "undefined" &&
+      typeof syncing.pulledStates !== "undefined"
+    ) {
+      const currentState = parseHexOrDecimal(syncing.knownStates);
+      const highestState = parseHexOrDecimal(syncing.pulledStates);
+
       return {
         name,
         syncing: true,
         error: false,
-        message: `Blocks synced: ${parseSyncing(
-          syncing.currentBlock,
-          syncing.highestBlock
-        )}`,
-        progress: syncing.currentBlock / syncing.highestBlock
+        message: `Blocks synced: ${currentState} / ${highestState}`,
+        progress: currentState / highestState
       };
     }
+
+    // Open Ethereum sync
+    if (
+      typeof syncing.warpChunksAmount !== "undefined" &&
+      typeof syncing.warpChunksProcessed !== "undefined"
+    ) {
+      const currentChunk = parseHexOrDecimal(syncing.warpChunksProcessed);
+      const highestChunk = parseHexOrDecimal(syncing.warpChunksAmount);
+
+      return {
+        name,
+        syncing: true,
+        error: false,
+        message: `Syncing snapshot: ${currentChunk} ${highestChunk}`,
+        progress: currentChunk / highestChunk
+      };
+    }
+
+    // Return normal only blocks sync info
+    return {
+      name,
+      syncing: true,
+      error: false,
+      message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
+      progress: currentBlock / highestBlock
+    };
   } else {
     return {
       name,

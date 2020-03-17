@@ -22,7 +22,6 @@ import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
 import { isIpfsRequest } from "../utils/validate";
 import * as validate from "../utils/validate";
-import isSyncing from "../utils/isSyncing";
 import { RpcHandlerReturn, InstallPackageData, PackageRequest } from "../types";
 import { RequestData } from "../route-types/installPackage";
 import Logs from "../logs";
@@ -65,10 +64,6 @@ export default async function installPackage({
   reqVersion = sanitizeRequestVersion(reqVersion);
   const req: PackageRequest = { name: reqName, ver: reqVersion };
   const id = reqName;
-
-  // If the request is not from IPFS, check if the chain is syncing
-  if (!isIpfsRequest(req) && (await isSyncing()))
-    throw Error("Mainnet is syncing");
 
   /**
    * [Resolve] the request

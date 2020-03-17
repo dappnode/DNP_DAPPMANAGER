@@ -69,12 +69,6 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     };
     /* eslint-enable @typescript-eslint/explicit-function-return-type */
 
-    async function isSyncing(url: string): Promise<boolean> {
-      if (typeof isSyncingState[url] !== "boolean")
-        throw Error(`Is syncing fake call failed for unknown url: ${url}`);
-      return isSyncingState[url];
-    }
-
     async function listContainerNoThrow(
       name: string
     ): Promise<PackageContainer | null> {
@@ -90,9 +84,6 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       mock => {
         mock(() => import("../../../src/db"))
           .with(db)
-          .toBeUsed();
-        mock(() => import("../../../src/utils/isSyncing"))
-          .with({ isSyncing })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
           .with({ listContainerNoThrow })
