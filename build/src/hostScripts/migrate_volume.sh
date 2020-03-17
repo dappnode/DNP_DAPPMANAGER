@@ -4,6 +4,9 @@
 # It's original purpose is to migrate ETHCHAIN volumes to multi-client model.
 #
 
+# Exit on error
+set -e
+
 FROM_VOLUME_NAME=$1
 TO_VOLUME_NAME=$2
 
