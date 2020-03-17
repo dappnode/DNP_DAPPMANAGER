@@ -17,7 +17,7 @@ export function getClientData(
         url: "http://geth.dappnode:8545",
         userSettings: {
           environment: {
-            EXTRA_OPTS: "--rpcapi eth,net,web3,txpool --syncmode light"
+            SYNCMODE: "light"
           }
         }
       };
