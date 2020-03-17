@@ -1,8 +1,10 @@
 // #### NOTE: Typedefinitions of web3.eth.isSyncing() are not correct, using require to ignore them
 import { ethers } from "ethers";
 import { ChainData } from "../../types";
+import { whyDoesGethTakesSoMuchToSync } from "../../externalLinks";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
+const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
 
 type EthSyncingReturn =
   | false
@@ -17,11 +19,6 @@ type EthSyncingReturn =
       warpChunksAmount?: string; // "0x1266";
       warpChunksProcessed?: string; // "0x115";
     };
-
-// Utils
-function parseSyncing(current: string, total: string): string {
-  return `${parseHexOrDecimal(current)} / ${parseHexOrDecimal(total)}`;
-}
 
 // Current versions of parseInt are able to recognize hex numbers
 // and automatically use a radix parameter of 16.
@@ -79,7 +76,12 @@ export default async function ethereum(
         name,
         syncing: true,
         error: false,
-        message: `Blocks synced: ${currentState} / ${highestState}`,
+        // Render multiline status in the UI
+        message: [
+          `Blocks synced: ${currentBlock} / ${highestBlock}`,
+          `States synced: ${currentState} / ${highestState}`,
+          `[What does this mean?](${gethSyncHelpUrl})`
+        ].join("\n\n"),
         progress: currentState / highestState
       };
     }
