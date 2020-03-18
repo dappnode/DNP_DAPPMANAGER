@@ -96,7 +96,7 @@ const params = {
 
   // DAppNode remote fullnode service
   REMOTE_MAINNET_RPC_URL:
-    process.env.REMOTE_MAINNET_RPC_URL || "https://mainnet.dappnode.io:8545",
+    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
