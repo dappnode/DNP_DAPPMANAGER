@@ -11,6 +11,8 @@ test_build/
 .nyc_output
 build_*
 uploader
+# This project uses yarn
+build/src/package-lock.json
 
 # Test artifacts
 test_build/
