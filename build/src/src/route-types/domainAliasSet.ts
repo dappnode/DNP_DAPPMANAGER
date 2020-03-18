@@ -24,5 +24,5 @@ export const requestDataSchema = {
 
 export const requestDataSample: RequestData = {
   alias: "fullnode",
-  dnpName: "open-ethereum.dnp.dappnode.eth"
+  dnpName: "openethereum.dnp.dappnode.eth"
 };

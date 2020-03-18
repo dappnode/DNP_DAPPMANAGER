@@ -124,7 +124,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
   }
 
   const status = getStatus();
-  const { name, url, userSettings } = getClientData(target);
+  const { name, version, url, userSettings } = getClientData(target);
   const dnp = await listContainerNoThrow(name);
 
   // Client is not installed
@@ -141,6 +141,7 @@ export async function runEthMultiClientWatcher(): Promise<void> {
           setStatus("installing");
           await installPackage({
             name,
+            version,
             userSettings: {
               [name]: merge(
                 // Merge the default user settings with any customization from the user

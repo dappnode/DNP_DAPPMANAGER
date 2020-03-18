@@ -692,16 +692,12 @@ export interface VolumeData {
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
  */
-export type EthClientTarget =
-  | "remote"
-  | "geth-light"
-  | "geth"
-  | "open-ethereum";
+export type EthClientTarget = "remote" | "geth-light" | "geth" | "openethereum";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
   "geth-light",
   "geth",
-  "open-ethereum"
+  "openethereum"
 ];
 export type EthClientStatus =
   | "selected"

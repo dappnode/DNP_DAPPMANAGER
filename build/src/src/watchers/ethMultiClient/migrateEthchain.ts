@@ -15,16 +15,13 @@ const ethchainDnpName = "ethchain.dnp.dappnode.eth";
 
 const ethchainVolumes = {
   data: "dncore_ethchaindnpdappnodeeth_data",
-  geth: "dncore_ethchaindnpdappnodeeth_geth",
-  identity: "dncore_ethchaindnpdappnodeeth_identity"
+  geth: "dncore_ethchaindnpdappnodeeth_geth"
 };
 const openEthereumVolumes = {
-  data: "openethereumdnpdappnodeeth_data",
-  identity: "openethereumdnpdappnodeeth_identity"
+  data: "openethereumdnpdappnodeeth_data"
 };
 const gethVolumes = {
-  data: "gethdnpdappnodeeth_data",
-  identity: "gethdnpdappnodeeth_identity"
+  data: "gethdnpdappnodeeth_data"
 };
 
 /**
@@ -58,14 +55,7 @@ export default async function migrateEthchain(): Promise<void> {
     {
       id: "Geth data volume",
       from: ethchainVolumes.geth,
-      to: openEthereumVolumes.data
-    },
-    {
-      id: "Identity volume",
-      from: ethchainVolumes.identity,
-      to: isNextOpenEthereum
-        ? gethVolumes.identity
-        : openEthereumVolumes.identity
+      to: gethVolumes.data
     }
   ]
     // Only migrate volumes that exists and their target does not
@@ -132,7 +122,7 @@ export default async function migrateEthchain(): Promise<void> {
 
   // Install new package. fullnode.dappnode is assigned after install
   if (ethchain) {
-    const target = isNextOpenEthereum ? "open-ethereum" : "geth";
+    const target = isNextOpenEthereum ? "openethereum" : "geth";
     const EXTRA_OPTS = isNextOpenEthereum
       ? envs.EXTRA_OPTS
       : envs.EXTRA_OPTS_GETH;

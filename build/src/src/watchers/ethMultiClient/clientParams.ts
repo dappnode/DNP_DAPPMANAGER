@@ -6,7 +6,12 @@ import { EthClientTarget, UserSettings } from "../../types";
  */
 export function getClientData(
   target: EthClientTarget
-): { name: string; url: string; userSettings?: UserSettings } {
+): {
+  name: string;
+  url: string;
+  version?: string;
+  userSettings?: UserSettings;
+} {
   switch (target) {
     case "remote":
       throw Error(`No client data for remote target`);
@@ -28,10 +33,12 @@ export function getClientData(
         url: "http://geth.dappnode:8545"
       };
 
-    case "open-ethereum":
+    case "openethereum":
       return {
-        name: "open-ethereum.dnp.dappnode.eth",
-        url: "http://open-ethereum.dappnode:8545"
+        name: "openethereum.dnp.dappnode.eth",
+        // #### TODO: Temp version for development / testing
+        version: "QmbHRZTW9ubWUGp41wbCVnVXaUoUmyM9Tv689EvLbRTQCK",
+        url: "http://openethereum.dappnode:8545"
       };
 
     default:
