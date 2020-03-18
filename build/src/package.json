@@ -18,7 +18,8 @@
     "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "lint": "./node_modules/.bin/eslint . --ext .ts --fix",
     "pre-commit": "npm run build && npm run test",
-    "clean": "rm -rf DNCORE/ dnp_repo/ .temp-transfer/ cache/ dist/"
+    "clean": "rm -rf DNCORE/ dnp_repo/ .temp-transfer/ cache/ dist/",
+    "prepare": "node_modules/.bin/patch-package"
   },
   "author": "dappLion",
   "license": "ISC",
@@ -83,6 +84,7 @@
     "husky": "^2.3.0",
     "mocha": "^6.2.2",
     "nyc": "^11.8.0",
+    "patch-package": "^6.2.1",
     "prettier": "^1.16.4",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
