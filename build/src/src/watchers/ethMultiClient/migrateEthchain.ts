@@ -111,9 +111,9 @@ export default async function migrateEthchain(): Promise<void> {
       for (const { id, from } of volumeMigrations) {
         const fromVol = Volumes.find(vol => vol.Name === from);
         if (!fromVol)
-          logs.warning(`Did not delete ETHCHAIN ${id} ${from}, not found`);
+          logs.warn(`Did not delete ETHCHAIN ${id} ${from}, not found`);
         else if (fromVol.UsageData.Size > 0)
-          logs.warning(`Did not delete ETHCHAIN ${id} ${from}, not empty`);
+          logs.warn(`Did not delete ETHCHAIN ${id} ${from}, not empty`);
         else
           try {
             await shell(`docker volume rm -f ${from}`);
@@ -132,6 +132,7 @@ export default async function migrateEthchain(): Promise<void> {
     const EXTRA_OPTS = isNextOpenEthereum
       ? envs.EXTRA_OPTS
       : envs.EXTRA_OPTS_GETH;
+    logs.info(`Installing eth multi-client ${target}: ${JSON.stringify(envs)}`);
 
     await changeEthMultiClient(target, false, {
       portMappings: userSettings.portMappings,
