@@ -42,7 +42,11 @@ export default async function migrateEthchain(): Promise<void> {
     EXTRA_OPTS?: string; // --warp-barrier 9530000
     EXTRA_OPTS_GETH?: string; // --syncmode light
     DEFAULT_CLIENT?: string; // PARITY
-  } = (ethchain || {}).envs || userSettings.environment || {};
+  } = {
+    // Consider envs from both the running container and its compose
+    ...((ethchain || {}).envs || {}),
+    ...(userSettings.environment || {})
+  };
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
 
   const volumeMigrations = [
