@@ -29,9 +29,8 @@ fi
 FROM_PATH=${DOCKER_ROOT_DIR}/volumes/${FROM_VOLUME_NAME}
 TO_PATH=${DOCKER_ROOT_DIR}/volumes/${TO_VOLUME_NAME}
 
-if [[ -d TO_PATH ]]
-then
-  echo "TO_PATH already exists"
+if [[ -d "${TO_PATH}" ]]; then
+  echo "Error: ${TO_PATH} already exists."
   exit 1
 fi
 
