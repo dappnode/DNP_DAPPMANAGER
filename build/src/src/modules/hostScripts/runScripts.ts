@@ -71,7 +71,7 @@ export const detectMountpoints = memoize(
 /**
  * Dangerously move a docker volume in the host docker root dir
  * @param fromVolumeName "dncore_ethchaindnpdappnodeeth_geth"
- * @param toVolumeName "gethdnpdappnodeeth_data"
+ * @param toVolumeName "gethdnpdappnodeeth_geth"
  */
 export async function migrateVolume(
   fromVolumeName: string,
