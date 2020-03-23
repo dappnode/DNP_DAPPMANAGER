@@ -21,7 +21,7 @@ const openEthereumVolumes = {
   data: "openethereumdnpdappnodeeth_data"
 };
 const gethVolumes = {
-  data: "gethdnpdappnodeeth_data"
+  data: "gethdnpdappnodeeth_geth"
 };
 
 /**

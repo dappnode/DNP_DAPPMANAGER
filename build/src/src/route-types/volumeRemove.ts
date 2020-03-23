@@ -19,5 +19,5 @@ export const returnDataSchema = {};
 // Samples for testing
 
 export const requestDataSample: RequestData = {
-  name: "gethdnpdappnodeeth_data"
+  name: "gethdnpdappnodeeth_geth"
 };

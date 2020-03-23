@@ -676,7 +676,7 @@ export interface MountpointData {
 }
 
 export interface VolumeData {
-  name: string; // "gethdnpdappnodeeth_data", Actual name to call delete on
+  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
   nameDisplay?: string; // "data", Guessed short name for display
   ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
