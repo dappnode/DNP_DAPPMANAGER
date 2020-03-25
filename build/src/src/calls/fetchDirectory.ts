@@ -1,6 +1,6 @@
 import * as eventBus from "../eventBus";
 import { ReturnData } from "../route-types/fetchDirectory";
-import getDirectory from "../modules/release/getDirectory";
+import { getDirectory } from "../modules/directory";
 import getRelease from "../modules/release/getRelease";
 import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";

@@ -8,7 +8,6 @@ import { EthClientTarget, EthClientStatus, UserSettings } from "../../types";
 import { getClientData } from "./clientParams";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import Logs from "../../logs";
-import getDirectory from "../../modules/release/getDirectory";
 import merge from "deepmerge";
 const logs = Logs(module);
 
@@ -62,8 +61,7 @@ export async function isClientSyncing(url: string): Promise<boolean> {
   const currentBlock = await provider.getBlockNumber();
   if (!currentBlock) return true;
 
-  const directory = await getDirectory();
-  if (!directory || directory.length === 0) return true;
+  // ### TODO: Fetch some specific APM data
 
   return false;
 }

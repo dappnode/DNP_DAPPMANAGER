@@ -2,7 +2,6 @@ import { isEnsDomain } from "../../utils/validate";
 import { ethers } from "ethers";
 import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
 import * as directoryContract from "../../contracts/directory";
-import { getEthersProvider } from "../ethProvider";
 import Logs from "../../logs";
 import { notUndefined } from "../../utils/typingHelpers";
 const logs = Logs(module);
@@ -18,8 +17,9 @@ const DAppNodePackageStatus: DirectoryDnpStatus[] = [
  * Fetches all package names in the custom dappnode directory.
  * [NOTE]: Already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
  */
-export default async function getDirectory(): Promise<DirectoryDnp[]> {
-  const provider = getEthersProvider();
+export async function getDirectory(
+  provider: ethers.providers.Provider
+): Promise<DirectoryDnp[]> {
   const directory = new ethers.Contract(
     directoryContract.address,
     directoryContract.abi,
