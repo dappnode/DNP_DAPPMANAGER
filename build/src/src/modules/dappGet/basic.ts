@@ -1,4 +1,5 @@
-import getDependencies from "../release/getDependencies";
+import { ethers } from "ethers";
+import { fetchDependenciesSetup } from "./fetch";
 import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
@@ -15,9 +16,11 @@ const logs = Logs(module);
  * If `BYPASS_RESOLVER == true`, fetch first level dependencies only
  */
 export default async function dappGetBasic(
-  req: PackageRequest
+  req: PackageRequest,
+  provider: ethers.providers.Provider
 ): Promise<DappGetResult> {
-  const dependencies = await getDependencies(req.name, req.ver);
+  const fetchDependencies = fetchDependenciesSetup(provider);
+  const dependencies = await fetchDependencies(req.name, req.ver);
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install
