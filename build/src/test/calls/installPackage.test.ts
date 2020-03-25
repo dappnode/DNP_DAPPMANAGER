@@ -67,7 +67,11 @@ describe.skip("Call function: installPackage", function() {
     };
   }
 
-  async function getRelease(name: string): Promise<PackageRelease> {
+  async function getRelease(
+    provider: any,
+    name: string
+  ): Promise<PackageRelease> {
+    provider;
     if (name === pkgName) return pkgPkg;
     else if (name === depName) return depPkg;
     else throw Error(`TEST-MOCK-ERROR Manifest of ${name} not available`);
@@ -104,7 +108,7 @@ describe.skip("Call function: installPackage", function() {
           .withDefault(lockPorts)
           .toBeUsed();
         mock(() => import("../../src/modules/release/getRelease"))
-          .withDefault(getRelease)
+          .with({ getRelease })
           .toBeUsed();
         mock(() => import("../../src/utils/logUi"))
           .with({ logUi })

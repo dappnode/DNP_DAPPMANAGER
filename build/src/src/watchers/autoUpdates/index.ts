@@ -1,6 +1,7 @@
 import params from "../../params";
 import * as eventBus from "../../eventBus";
 import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
+import { getEthersProvider } from "../../modules/ethClient";
 // Utils
 import {
   isDnpUpdateEnabled,

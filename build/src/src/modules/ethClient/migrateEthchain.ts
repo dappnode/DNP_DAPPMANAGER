@@ -1,14 +1,14 @@
 import fs from "fs";
+import { changeEthMultiClient } from "./changeEthMultiClient";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { dockerVolumesList, dockerDf } from "../../modules/docker/dockerApi";
 import { dockerRm } from "../../modules/docker/dockerCommands";
-import { changeEthMultiClient } from ".";
 import { migrateVolume } from "../../modules/hostScripts";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import * as db from "../../db";
-import Logs from "../../logs";
 import shell from "../../utils/shell";
+import Logs from "../../logs";
 const logs = Logs(module);
 
 const ethchainDnpName = "ethchain.dnp.dappnode.eth";
@@ -30,7 +30,7 @@ const gethVolumes = {
  * 2. Move volumes in the host
  * 3. Install new package with existing settings
  */
-export default async function migrateEthchain(): Promise<void> {
+export async function migrateEthchain(): Promise<void> {
   const ethchain = await listContainerNoThrow(ethchainDnpName);
   const volumes = await dockerVolumesList();
   // If ethchain compose does not exist, returns {}

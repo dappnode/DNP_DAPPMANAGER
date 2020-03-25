@@ -4,11 +4,6 @@ import { Dependencies } from "../../types";
  * Aggregate types
  */
 
-export interface DappGetFetchFunction {
-  dependencies: (name: string, ver: string) => Promise<Dependencies>;
-  versions: (name: string, versionRange: string) => Promise<string[]>;
-}
-
 /**
  * Resolver types
  */

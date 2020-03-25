@@ -1,15 +1,17 @@
 import { listContainers } from "../docker/listContainers";
 // Internal
-import { ethers } from "ethers";
 import { PackageRequest } from "../../types";
-import { fetchDependenciesSetup, fetchVersionsSetup } from "./fetch";
 import dappGetBasic from "./basic";
-import aggregate from "./aggregate";
+import aggregate, { DappGetFetcher } from "./aggregate";
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types";
 const logs = Logs(module);
+
+export interface DappgetOptions {
+  BYPASS_RESOLVER?: boolean;
+}
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -53,16 +55,14 @@ const logs = Logs(module);
  */
 export default async function dappGet(
   req: PackageRequest,
-  provider: ethers.providers.Provider,
-  options?: { BYPASS_RESOLVER?: boolean }
+  options?: DappgetOptions
 ): Promise<DappGetResult> {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
    * It will not use the fetch or resolver module and only
    * fetch the first level dependencies of the request
    */
-  if (options && options.BYPASS_RESOLVER)
-    return await dappGetBasic(req, provider);
+  if (options && options.BYPASS_RESOLVER) return await dappGetBasic(req);
 
   const dnpList = await listContainers();
 
@@ -73,10 +73,7 @@ export default async function dappGet(
     dnps = await aggregate({
       req,
       dnpList,
-      fetch: {
-        dependencies: fetchDependenciesSetup(provider),
-        versions: fetchVersionsSetup(provider)
-      }
+      dappGetFetcher: new DappGetFetcher()
     });
   } catch (e) {
     logs.error(`dappGet/aggregate error: ${e.stack}`);

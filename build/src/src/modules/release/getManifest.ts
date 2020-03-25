@@ -2,7 +2,7 @@ import ipfsCatString from "../ipfs/methods/catString";
 import { validateManifestBasic } from "./parsers/validate";
 import { Manifest } from "../../types";
 
-export async function fetchManifestOnly(contentUri: string): Promise<Manifest> {
+export async function getManifest(contentUri: string): Promise<Manifest> {
   return ipfsCatString({ hash: contentUri })
     .catch((e: Error) => {
       if (e.message.includes("is a directory"))

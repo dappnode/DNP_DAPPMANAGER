@@ -3,7 +3,6 @@ import { expect } from "chai";
 import * as safeSemver from "../../../src/modules/dappGet/utils/safeSemver";
 import fs from "fs";
 import path from "path";
-import { DappGetFetchFunction } from "../../../src/modules/dappGet/types";
 import { PackageContainer } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";

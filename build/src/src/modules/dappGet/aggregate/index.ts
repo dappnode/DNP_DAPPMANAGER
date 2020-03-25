@@ -4,9 +4,12 @@ import * as safeSemver from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { PackageContainer, PackageRequest } from "../../../types";
-import { DappGetDnps, DappGetFetchFunction } from "../types";
+import { DappGetDnps } from "../types";
 import Logs from "../../../logs";
+import { DappGetFetcher } from "./DappGetFetcher";
 const logs = Logs(module);
+
+export { DappGetFetcher };
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -55,11 +58,11 @@ const logs = Logs(module);
 export default async function aggregate({
   req,
   dnpList,
-  fetch
+  dappGetFetcher
 }: {
   req: PackageRequest;
   dnpList: PackageContainer[];
-  fetch: DappGetFetchFunction;
+  dappGetFetcher: DappGetFetcher;
 }): Promise<DappGetDnps> {
   // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
   const dnps: DappGetDnps = {};
@@ -71,7 +74,7 @@ export default async function aggregate({
     name: req.name,
     versionRange: req.ver,
     dnps,
-    fetch // #### Injected dependency
+    dappGetFetcher // #### Injected dependency
   });
 
   const relevantInstalledDnps = getRelevantInstalledDnps({
@@ -92,7 +95,7 @@ export default async function aggregate({
           name: dnp.name,
           versionRange: dnp.origin || `>=${dnp.version}`,
           dnps,
-          fetch // #### Injected dependency
+          dappGetFetcher // #### Injected dependency
         });
       } catch (e) {
         logs.warn(

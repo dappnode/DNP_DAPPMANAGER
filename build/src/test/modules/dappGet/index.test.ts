@@ -87,10 +87,14 @@ describe("dappGet", function() {
   });
 
   it("Should add packages to the alreadyUpdated object", async () => {
-    const { state, alreadyUpdated } = await dappGet({
-      name: "nginx-proxy.dnp.dappnode.eth",
-      ver: "^0.1.0"
-    });
+    const provider: any = {};
+    const { state, alreadyUpdated } = await dappGet(
+      {
+        name: "nginx-proxy.dnp.dappnode.eth",
+        ver: "^0.1.0"
+      },
+      provider
+    );
 
     expect(state).to.deep.equal({
       "nginx-proxy.dnp.dappnode.eth": "0.0.4"

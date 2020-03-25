@@ -1,13 +1,14 @@
 import * as eventBus from "../eventBus";
 import { ReturnData } from "../route-types/fetchDirectory";
 import { getDirectory } from "../modules/directory";
-import getRelease from "../modules/release/getRelease";
 import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
 import Logs from "../logs";
 import { listContainers } from "../modules/docker/listContainers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";
+import { getEthersProvider } from "../modules/ethClient";
+import { ReleaseFetcher } from "../modules/release";
 const logs = Logs(module);
 
 const loadThrottle = 500; // 0.5 seconds
@@ -18,13 +19,16 @@ const loadThrottle = 500; // 0.5 seconds
 export default async function fetchDirectory(): RpcHandlerReturnWithResult<
   ReturnData
 > {
+  const provider = await getEthersProvider();
+  const releaseFetcher = new ReleaseFetcher();
+
   // Prevent sending way to many updates in case the fetching process is fast
   const emitDirectoryUpdate = throttle(eventBus.directory.emit, loadThrottle);
 
   const dnpList = await listContainers();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
-  const directory = await getDirectory();
+  const directory = await getDirectory(provider);
   const directoryDnps: DirectoryItem[] = directory.map(
     ({ name, isFeatured }) => ({
       status: "loading",
@@ -41,7 +45,7 @@ export default async function fetchDirectory(): RpcHandlerReturnWithResult<
       const directoryItemBasic = { name, whitelisted, isFeatured };
       try {
         // Now resolve the last version of the package
-        const release = await getRelease(name);
+        const release = await releaseFetcher.getRelease(name);
         const { metadata, avatarFile } = release;
 
         directoryDnps[idx] = {

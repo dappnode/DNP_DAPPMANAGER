@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-import * as apm from "../apm";
+import { Apm } from "../apm";
 import {
   isIpfsHash,
   isEnsDomain,
@@ -8,7 +7,7 @@ import {
 } from "../../utils/validate";
 
 export default async function resolveReleaseName(
-  provider: ethers.providers.Provider,
+  apm: Apm,
   name: string,
   version = "*"
 ): Promise<{
@@ -26,7 +25,7 @@ export default async function resolveReleaseName(
     name: string,
     version: string
   ): Promise<string> {
-    const res = await apm.fetchVersion(provider, name, version);
+    const res = await apm.fetchVersion(name, version);
     return res.contentUri;
   }
 

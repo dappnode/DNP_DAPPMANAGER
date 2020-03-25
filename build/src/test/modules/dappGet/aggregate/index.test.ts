@@ -6,10 +6,7 @@ import rewiremock from "rewiremock";
 import aggregateType from "../../../../src/modules/dappGet/aggregate/index";
 import { PackageContainer, Dependencies } from "../../../../src/types";
 import { mockDnp } from "../../../testUtils";
-import {
-  DappGetFetchFunction,
-  DappGetDnps
-} from "../../../../src/modules/dappGet/types";
+import { DappGetDnps } from "../../../../src/modules/dappGet/types";
 
 /**
  * Purpose of the test. Make sure aggregate fetches all necessary DNPs and info

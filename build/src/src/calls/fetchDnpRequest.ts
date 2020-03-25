@@ -10,8 +10,6 @@ import {
   PackageReleaseMetadata,
   PackageContainer
 } from "../types";
-import getRelease from "../modules/release/getRelease";
-import dappGet from "../modules/dappGet";
 import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
 import semver from "semver";
@@ -19,19 +17,19 @@ import { listContainers } from "../modules/docker/listContainers";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
-import {
-  parseUserSetFromCompose,
-  getContainerName
-} from "../utils/dockerComposeParsers";
+import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
+import { ReleaseFetcher } from "../modules/release";
 
 const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 export default async function fetchDnpRequest({
   id
 }: RequestData): RpcHandlerReturnWithResult<ReturnData> {
-  const mainRelease = await getRelease(id);
+  const releaseFetcher = new ReleaseFetcher();
+
+  const mainRelease = await releaseFetcher.getRelease(id);
 
   const setupSchema: SetupSchemaAllDnps = {};
   const setupTarget: SetupTargetAllDnps = {};
@@ -87,16 +85,22 @@ export default async function fetchDnpRequest({
   let compatibleDnps: CompatibleDnps = {};
   try {
     const { name, reqVersion } = mainRelease;
-    const { state, currentVersion } = await dappGet({ name, ver: reqVersion });
+    const {
+      state,
+      currentVersion,
+      releases
+    } = await releaseFetcher.getReleasesResolved({
+      name,
+      ver: reqVersion
+    });
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
       from: currentVersion[dnpName],
       to: nextVersion
     }));
 
     // Add dependencies' metadata
-    for (const [depName, depVersion] of Object.entries(state))
-      if (depName !== name)
-        await addReleaseToSettings(await getRelease(depName, depVersion));
+    for (const [depName, release] of Object.entries(releases))
+      if (depName !== name) await addReleaseToSettings(release);
   } catch (e) {
     compatibleError = e.message;
   }
