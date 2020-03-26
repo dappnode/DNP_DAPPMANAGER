@@ -6,10 +6,6 @@ const repoAbi = [
   "event NewVersion(uint256 versionId, uint16[3] semanticVersion)"
 ];
 
-interface ApmVersionMetadataObj {
-  [version: string]: ApmVersionMetadata;
-}
-
 /**
  * Fetches the new repos logs from a registry
  *
@@ -20,7 +16,7 @@ export async function fetchApmVersionsMetadata(
   provider: ethers.providers.Provider,
   addressOrEnsName: string,
   fromBlock?: number
-): Promise<ApmVersionMetadataObj> {
+): Promise<ApmVersionMetadata[]> {
   // Change this method if the web3 library is not ethjs
   // await ensureAncientBlocks();
 
@@ -33,26 +29,22 @@ export async function fetchApmVersionsMetadata(
     topics: [repo.events.NewVersion.topic]
   });
 
-  const versionsMetadata: ApmVersionMetadataObj = {};
-  await Promise.all(
-    result.map(async event => {
-      // Parse tx data
-      const txHash = event.transactionHash;
-      const blockNumber = event.blockNumber;
-      const timestamp = await getTimestamp(blockNumber, provider);
-
-      // Parse values
-      const parsedLog = repo.parseLog(event);
-      if (!parsedLog || !parsedLog.values)
-        throw Error(`Error parsing NewRepo event`);
-      // const versionId = parsedLog.values.versionId.toNumber();
-      const version = parsedLog.values.semanticVersion.join(".");
-      versionsMetadata[version] = {
-        txHash,
-        blockNumber,
-        timestamp
-      };
-    })
+  return await Promise.all(
+    result.map(
+      async (event): Promise<ApmVersionMetadata> => {
+        // Parse values
+        const parsedLog = repo.parseLog(event);
+        if (!parsedLog || !parsedLog.values)
+          throw Error(`Error parsing NewRepo event`);
+        // const versionId = parsedLog.values.versionId.toNumber();
+        return {
+          version: parsedLog.values.semanticVersion.join("."),
+          // Parse tx data
+          txHash: event.transactionHash,
+          blockNumber: event.blockNumber,
+          timestamp: await getTimestamp(event.blockNumber, provider)
+        };
+      }
+    )
   );
-  return versionsMetadata;
 }

@@ -3,10 +3,6 @@ import { ApmVersionState } from "./types";
 import * as repoContract from "../../contracts/repository";
 import { parseApmVersionReturn, linspace } from "./apmUtils";
 
-interface ApmVersionStateObj {
-  [version: string]: ApmVersionState;
-}
-
 /**
  * Fetch all versions of an APM repo
  * If provided version request range, only returns satisfying versions
@@ -16,7 +12,7 @@ export async function fetchApmVersionsState(
   provider: ethers.providers.Provider,
   name: string,
   lastVersionId = 0
-): Promise<ApmVersionStateObj> {
+): Promise<ApmVersionState[]> {
   const repo = new ethers.Contract(name, repoContract.abi, provider);
 
   const versionCount: number = await repo.getVersionsCount().then(parseFloat);
@@ -37,16 +33,17 @@ export async function fetchApmVersionsState(
   // Guard against bugs that can cause // negative values
   if (isNaN(lastVersionId) || lastVersionId < 0) lastVersionId = 0;
   const versionIndexes = linspace(lastVersionId + 1, versionCount);
-  const versionsState: ApmVersionStateObj = {};
-  await Promise.all(
-    versionIndexes.map(async i => {
-      const res = await repo.getByVersionId(i);
-      const version = parseApmVersionReturn(res);
-      versionsState[version.version] = {
-        ...version,
-        versionId: i
-      };
-    })
+  return await Promise.all(
+    versionIndexes.map(
+      async (i): Promise<ApmVersionState> => {
+        const versionData = await repo
+          .getByVersionId(i)
+          .then(parseApmVersionReturn);
+        return {
+          ...versionData,
+          versionId: i
+        };
+      }
+    )
   );
-  return versionsState;
 }

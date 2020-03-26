@@ -11,7 +11,7 @@ export type ProviderGetter = () => Promise<ethers.providers.Provider>;
 export class EthersProvider {
   provider: ethers.providers.Provider | undefined = undefined;
 
-  async getProvider() {
+  async getProvider(): Promise<ethers.providers.Provider> {
     if (!this.provider) this.provider = await getEthersProvider();
     return this.provider;
   }

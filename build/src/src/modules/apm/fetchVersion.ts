@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { ApmRepoVersionReturn } from "./types";
+import { ApmRepoVersionReturn, ApmVersionRaw } from "./types";
 import * as repoContract from "../../contracts/repository";
 import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils";
 
@@ -12,7 +12,7 @@ export async function fetchVersion(
   provider: ethers.providers.Provider,
   name: string,
   version?: string
-): Promise<{ version: string; contentUri: string }> {
+): Promise<ApmVersionRaw> {
   const repo = new ethers.Contract(name, repoContract.abi, provider);
 
   const res: ApmRepoVersionReturn = version

@@ -1,5 +1,3 @@
-import { Dependencies } from "../../types";
-
 /**
  * Aggregate types
  */
