@@ -1,3 +1,5 @@
+import { DappgetTestCase } from "../testHelpers";
+
 /**
  * Case: Don't install a package if not necessary
  *
@@ -9,7 +11,7 @@
  * as the first possible version of each newly install package
  */
 
-module.exports = {
+const caseData: DappgetTestCase = {
   name: "dont install DNP if not necessary",
   req: {
     name: "dnp-a.eth",
@@ -36,15 +38,17 @@ module.exports = {
   dnps: {
     "dnp-a.eth": {
       versions: {
-        "0.1.0": { dependencies: {} },
-        "0.1.1": { dependencies: { "dnp-c.eth": "0.1.0" } },
-        "0.1.2": { dependencies: {} }
+        "0.1.0": {},
+        "0.1.1": { "dnp-c.eth": "0.1.0" },
+        "0.1.2": {}
       }
     },
     "dnp-c.eth": {
       versions: {
-        "0.1.0": { dependencies: {} }
+        "0.1.0": {}
       }
     }
   }
 };
+
+export default caseData;

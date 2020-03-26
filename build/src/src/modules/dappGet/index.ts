@@ -2,7 +2,9 @@ import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
-import aggregate, { DappGetFetcher } from "./aggregate";
+import aggregate from "./aggregate";
+import { DappGetFetcher } from "./fetch";
+
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
@@ -55,7 +57,9 @@ export interface DappgetOptions {
  */
 export default async function dappGet(
   req: PackageRequest,
-  options?: DappgetOptions
+  options?: DappgetOptions,
+  // For testing
+  dappGetFetcher?: DappGetFetcher
 ): Promise<DappGetResult> {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
@@ -73,7 +77,7 @@ export default async function dappGet(
     dnps = await aggregate({
       req,
       dnpList,
-      dappGetFetcher: new DappGetFetcher()
+      dappGetFetcher: dappGetFetcher || new DappGetFetcher()
     });
   } catch (e) {
     logs.error(`dappGet/aggregate error: ${e.stack}`);

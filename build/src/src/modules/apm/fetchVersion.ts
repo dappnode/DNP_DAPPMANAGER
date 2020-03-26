@@ -17,6 +17,6 @@ export async function fetchVersion(
 
   const res: ApmRepoVersionReturn = version
     ? await repo.getBySemanticVersion(toApmVersionArray(version))
-    : repo.getLatest();
+    : await repo.getLatest();
   return parseApmVersionReturn(res);
 }

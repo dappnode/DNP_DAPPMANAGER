@@ -4,7 +4,7 @@ import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
 import { DappGetResult, DappGetState } from "./types";
-import { DappGetFetcher } from "./aggregate";
+import { DappGetFetcher } from "./fetch";
 const logs = Logs(module);
 
 /**

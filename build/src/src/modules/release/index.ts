@@ -5,7 +5,7 @@ import { PackageRelease, PackageRequest, Manifest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
 import { Apm } from "../apm";
 
-type PackageReleases = { [name: string]: PackageRelease };
+export type PackageReleases = { [name: string]: PackageRelease };
 
 export class ReleaseFetcher extends Apm {
   /**

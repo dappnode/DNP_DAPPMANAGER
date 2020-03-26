@@ -4,7 +4,7 @@ import sanitizeDependencies from "./sanitizeDependencies";
 import { Dependencies } from "../../../types";
 import { DappGetDnps } from "../types";
 import Logs from "../../../logs";
-import { DappGetFetcher } from "./DappGetFetcher";
+import { DappGetFetcher } from "../fetch";
 const logs = Logs(module);
 
 const emptyDeps: Dependencies = {};

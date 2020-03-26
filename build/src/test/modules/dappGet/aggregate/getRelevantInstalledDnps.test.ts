@@ -19,6 +19,31 @@ import getRelevantInstalledDnps from "../../../../src/modules/dappGet/aggregate/
  */
 
 describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
+  it("Should pick a dependant dnp", () => {
+    const relevantPkg = {
+      ...mockDnp,
+      version: "0.1.0",
+      name: "dnp-b.eth",
+      dependencies: { "dnp-c.eth": "0.1.0" }
+    };
+    const dnpList = [
+      relevantPkg,
+      {
+        ...mockDnp,
+        id: "17628371823",
+        version: "0.1.0",
+        name: "dnp-c.eth"
+      }
+    ];
+
+    const relevantInstalledDnps = getRelevantInstalledDnps({
+      requestedDnps: ["dnp-a.eth", "dnp-c.eth"],
+      installedDnps: dnpList
+    });
+
+    expect(relevantInstalledDnps).to.deep.equal([relevantPkg]);
+  });
+
   it("should get the relevant installed dnps from a defined example case", async () => {
     const dnpList = [
       {

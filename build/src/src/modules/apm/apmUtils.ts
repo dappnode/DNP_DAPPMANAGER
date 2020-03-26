@@ -11,6 +11,8 @@ export function parseApmVersionReturn(
   version: string;
   contentUri: string;
 } {
+  if (!Array.isArray(res.semanticVersion))
+    throw Error(`property 'semanticVersion' must be an array`);
   return {
     version: res.semanticVersion.join("."),
     // Second argument = true: ignore UTF8 parsing errors

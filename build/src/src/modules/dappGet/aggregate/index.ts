@@ -6,10 +6,8 @@ import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { PackageContainer, PackageRequest } from "../../../types";
 import { DappGetDnps } from "../types";
 import Logs from "../../../logs";
-import { DappGetFetcher } from "./DappGetFetcher";
+import { DappGetFetcher } from "../fetch/DappGetFetcher";
 const logs = Logs(module);
-
-export { DappGetFetcher };
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
