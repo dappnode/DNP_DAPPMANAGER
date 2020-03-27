@@ -38,7 +38,6 @@ import poweroffHost from "./poweroffHost";
 import rebootHost from "./rebootHost";
 import removePackage from "./removePackage";
 import requestChainData from "./requestChainData";
-import resolveRequest from "./resolveRequest";
 import restartPackage from "./restartPackage";
 import restartPackageVolumes from "./restartPackageVolumes";
 import seedPhraseSet from "./seedPhraseSet";
@@ -86,7 +85,6 @@ export {
   rebootHost,
   removePackage,
   requestChainData,
-  resolveRequest,
   restartPackage,
   restartPackageVolumes,
   seedPhraseSet,

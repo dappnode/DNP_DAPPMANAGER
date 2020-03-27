@@ -1,18 +1,34 @@
-import { getVersion } from "../getVersions";
+import { Apm } from "../apm";
 import {
   isIpfsHash,
   isEnsDomain,
   isSemver,
   isSemverRange
-} from "../../../utils/validate";
+} from "../../utils/validate";
 
 export default async function resolveReleaseName(
+  apm: Apm,
   name: string,
   version = "*"
 ): Promise<{
   hash: string;
   origin?: string;
 }> {
+  /**
+   * Fetches the manifest hash
+   *
+   * @param {string} name
+   * @param {string} ver
+   * @returns {string} manifestHash
+   */
+  async function resolveApmVersion(
+    name: string,
+    version: string
+  ): Promise<string> {
+    const res = await apm.fetchVersion(name, version);
+    return res.contentUri;
+  }
+
   // Correct version
   if (version === "latest") version = "*";
 
@@ -47,19 +63,4 @@ export default async function resolveReleaseName(
   if (isEnsDomain(name))
     throw Error(`Invalid version, must be a semver or a hash: ${version}`);
   else throw Error(`Invalid DNP name, must be a ENS domain: ${name}`);
-}
-
-/**
- * Fetches the manifest hash
- *
- * @param {string} name
- * @param {string} ver
- * @returns {string} manifestHash
- */
-async function resolveApmVersion(
-  name: string,
-  version: string
-): Promise<string> {
-  const res = await getVersion(name, version);
-  return res.contentUri;
 }

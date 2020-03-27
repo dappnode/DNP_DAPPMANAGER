@@ -10,9 +10,9 @@ import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
+import { migrateEthchain } from "./modules/ethClient";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
-import migrateEthchain from "./watchers/ethMultiClient/migrateEthchain";
 import Logs from "./logs";
 const logs = Logs(module);
 

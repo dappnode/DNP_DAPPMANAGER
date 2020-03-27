@@ -1,4 +1,3 @@
-import resolveReleaseName from "./parsers/resolveReleaseName";
 import downloadRelease from "./ipfs/downloadRelease";
 import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";
@@ -21,13 +20,16 @@ import {
  * @param name
  * @param version
  */
-export default async function getRelease(
-  name: string,
-  version?: string
-): Promise<PackageRelease> {
-  // 1. Get the release hash
-  const { hash, origin } = await resolveReleaseName(name, version);
-
+export async function getReleaseFromIpfs({
+  hash,
+  name,
+  origin
+}: {
+  hash: string;
+  name?: string;
+  origin?: string;
+}): Promise<PackageRelease> {
+  const id = name || hash;
   // 2. Download the release data
   const {
     manifestFile,
@@ -36,13 +38,13 @@ export default async function getRelease(
     manifest,
     composeUnsafe
   } = await downloadRelease(hash).catch(e => {
-    e.message = `Can't download ${name} release: ${e.message}`;
+    e.message = `Can't download ${id} release: ${e.message}`;
     throw e; // Use this format to keep the stack trace
   });
 
   // Verify that the request was correct: hash mismatch
   // Except if the id is = "/ipfs/Qm...", there is no provided name
-  if (isEnsDomain(name) && name !== manifest.name)
+  if (name && isEnsDomain(name) && name !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
 
   const release = {

@@ -5,14 +5,14 @@ import {
   ProgressLog,
   PackageRequest,
   PortMapping,
-  Manifest,
-  PackageRelease
+  Manifest
 } from "../../src/types";
 import rewiremock from "rewiremock";
 // Imports for typings
 import installPackageType from "../../src/calls/installPackage";
-import { DappGetResult } from "../../src/modules/dappGet/types";
+import { DappGetState } from "../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../testUtils";
+import { ReleaseFetcher, PackageReleases } from "../../src/modules/release";
 
 describe.skip("Call function: installPackage", function() {
   // Pkg data
@@ -57,20 +57,29 @@ describe.skip("Call function: installPackage", function() {
   };
 
   const dappGetSpy = sinon.spy();
-  async function dappGet(req: PackageRequest): Promise<DappGetResult> {
-    dappGetSpy(req);
-    return {
-      message: "Found compatible state",
-      state: { [pkgName]: pkgVer, [depName]: depVer },
-      alreadyUpdated: {},
-      currentVersion: {}
-    };
-  }
 
-  async function getRelease(name: string): Promise<PackageRelease> {
-    if (name === pkgName) return pkgPkg;
-    else if (name === depName) return depPkg;
-    else throw Error(`TEST-MOCK-ERROR Manifest of ${name} not available`);
+  class ReleaseFetcherMock extends ReleaseFetcher {
+    async getReleasesResolved(
+      req: PackageRequest
+    ): Promise<{
+      releases: PackageReleases;
+      message: string;
+      state: DappGetState;
+      alreadyUpdated: DappGetState;
+      currentVersion: DappGetState;
+    }> {
+      dappGetSpy(req);
+      return {
+        message: "Found compatible state",
+        state: { [pkgName]: pkgVer, [depName]: depVer },
+        alreadyUpdated: {},
+        currentVersion: {},
+        releases: {
+          [pkgName]: pkgPkg,
+          [depName]: depPkg
+        }
+      };
+    }
   }
 
   const eventBus = {
@@ -97,14 +106,11 @@ describe.skip("Call function: installPackage", function() {
     const mock = await rewiremock.around(
       () => import("../../src/calls/installPackage"),
       mock => {
-        mock(() => import("../../src/modules/dappGet"))
-          .withDefault(dappGet)
-          .toBeUsed();
         mock(() => import("../../src/modules/lockPorts"))
           .withDefault(lockPorts)
           .toBeUsed();
-        mock(() => import("../../src/modules/release/getRelease"))
-          .withDefault(getRelease)
+        mock(() => import("../../src/modules/release"))
+          .with({ ReleaseFetcher: ReleaseFetcherMock })
           .toBeUsed();
         mock(() => import("../../src/utils/logUi"))
           .with({ logUi })

@@ -3,7 +3,6 @@ import { RpcHandlerReturnWithResult } from "../types";
 import * as db from "../db";
 import versionData from "../utils/getVersionData";
 import logPackage from "./logPackage";
-import { getEthProviderUrl } from "../watchers/ethMultiClient";
 
 const wifiName = "wifi.dnp.dappnode.eth";
 
@@ -37,7 +36,7 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       ethClientStatus: db.ethClientStatus.get(),
       ethClientFallbackOn: db.ethClientFallbackOn.get(),
       ethClientStatusError: db.ethClientStatusError.get(),
-      ethProvider: getEthProviderUrl(),
+      ethProvider: db.ethProviderUrl.get(),
       // Domain map
       fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
       // UI stats

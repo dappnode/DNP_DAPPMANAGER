@@ -2,8 +2,9 @@ import { hasVersion, setVersion } from "../utils/dnpUtils";
 import sanitizeVersions from "./sanitizeVersions";
 import sanitizeDependencies from "./sanitizeDependencies";
 import { Dependencies } from "../../../types";
-import { DappGetDnps, DappGetFetchFunction } from "../types";
+import { DappGetDnps } from "../types";
 import Logs from "../../../logs";
+import { DappGetFetcher } from "../fetch";
 const logs = Logs(module);
 
 const emptyDeps: Dependencies = {};
@@ -30,24 +31,25 @@ export default async function aggregateDependencies({
   versionRange,
   dnps,
   recursiveCount,
-  fetch
+  dappGetFetcher
 }: {
   name: string;
   versionRange: string;
   dnps: DappGetDnps;
   recursiveCount?: number;
-  fetch: DappGetFetchFunction;
+  dappGetFetcher: DappGetFetcher;
 }): Promise<void> {
   // Control infinite loops
   if (!recursiveCount) recursiveCount = 1;
   else if (recursiveCount++ > 1000) return;
 
   // Check injected dependency
-  if (!fetch) throw Error('injected dependency "fetch" is not defined');
+  if (!dappGetFetcher)
+    throw Error('injected dependency "fetch" is not defined');
 
   // 1. Fetch versions of "name" that match this request
   //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
-  const versions = await fetch
+  const versions = await dappGetFetcher
     .versions(name, versionRange)
     .then(sanitizeVersions);
 
@@ -58,7 +60,7 @@ export default async function aggregateDependencies({
       else setVersion(dnps, name, version, {});
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-      const dependencies = await fetch
+      const dependencies = await dappGetFetcher
         .dependencies(name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
@@ -79,7 +81,7 @@ export default async function aggregateDependencies({
             versionRange: dependencies[dependencyName],
             dnps,
             recursiveCount,
-            fetch
+            dappGetFetcher
           });
         })
       );

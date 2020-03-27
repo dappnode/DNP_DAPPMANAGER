@@ -1,50 +1,19 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
-import params from "../../params";
 import { ethers } from "ethers";
-import { installPackage, removePackage } from "../../calls";
+import { installPackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { EthClientTarget, EthClientStatus, UserSettings } from "../../types";
-import { getClientData } from "./clientParams";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import Logs from "../../logs";
-import getDirectory from "../../modules/release/getDirectory";
 import merge from "deepmerge";
+import { getClientData } from "../../modules/ethClient/clientParams";
+import {
+  getTarget,
+  getStatus,
+  setStatus,
+  setFullnodeDomainTarget
+} from "../../modules/ethClient/utils";
+import Logs from "../../logs";
 const logs = Logs(module);
-
-// Create alias to make the main functions more flexible and readable
-
-const getTarget = db.ethClientTarget.get;
-const setTarget = db.ethClientTarget.set;
-const getStatus = db.ethClientStatus.get;
-
-const setStatus = (status: EthClientStatus, e?: Error): void => {
-  db.setEthClientStatusAndError(status, e);
-  eventBus.requestSystemInfo.emit(); // Update UI with new status
-};
-
-const setFullnodeDomainTarget = (dnpName: string): void => {
-  db.fullnodeDomainTarget.set(dnpName);
-  eventBus.packagesModified.emit({ ids: [dnpName] }); // Run nsupdate
-};
-
-/**
- * Returns the url of the JSON RPC an Eth multi-client status and target
- * If the package target is not active it returns the remote URL
- * This causes that during client changes the URL will always point to remote
- *
- * Note: Keep this logic here since it is coupled with the meaning and
- * implementation of ethClientTarget and ethClientStatus
- * @return ethProvier http://geth.dappnode:8545
- */
-export function getEthProviderUrl(): string {
-  const target = getTarget();
-  const status = getStatus();
-
-  if (!target || target === "remote" || status !== "active")
-    return params.REMOTE_MAINNET_RPC_URL;
-  else return getClientData(target).url;
-}
 
 /**
  * Make sure the client is syncing
@@ -62,45 +31,9 @@ export async function isClientSyncing(url: string): Promise<boolean> {
   const currentBlock = await provider.getBlockNumber();
   if (!currentBlock) return true;
 
-  const directory = await getDirectory();
-  if (!directory || directory.length === 0) return true;
+  // ### TODO: Fetch some specific APM data
 
   return false;
-}
-
-/**
- * Changes the ethereum client used to fetch package data
- * Callable by the client
- * @param nextTarget Ethereum client to change to
- * @param deleteVolumes If changing from a package client, delete its data
- */
-export async function changeEthMultiClient(
-  nextTarget: EthClientTarget,
-  deleteVolumes?: boolean,
-  userSettings?: UserSettings
-): Promise<void> {
-  const prevTarget = getTarget();
-  if (prevTarget === nextTarget) throw Error("Same target");
-
-  // Set user settings of next target if any
-  if (userSettings) db.ethClientUserSettings.set(nextTarget, userSettings);
-
-  // If the previous client is a client package, uninstall it
-  if (prevTarget !== "remote") {
-    try {
-      const { name } = getClientData(prevTarget);
-      await removePackage({ id: name, deleteVolumes });
-      // Must await uninstall because geth -> light, light -> geth
-      // will create conflicts otherwise
-    } catch (e) {
-      logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
-    }
-  }
-
-  // Setting the status to selected will trigger an install
-  setTarget(nextTarget);
-  setStatus("selected");
-  eventBus.runEthMultiClientWatcher.emit();
 }
 
 /**

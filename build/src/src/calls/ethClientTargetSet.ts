@@ -1,6 +1,6 @@
 import { RequestData } from "../route-types/ethClientTargetSet";
 import { RpcHandlerReturn, ethClientTargets } from "../types";
-import { changeEthMultiClient } from "../watchers/ethMultiClient";
+import { changeEthMultiClient } from "../modules/ethClient";
 
 /**
  * Changes the ethereum client used to fetch package data

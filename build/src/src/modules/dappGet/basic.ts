@@ -1,10 +1,10 @@
-import getDependencies from "../release/getDependencies";
 import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
 import { DappGetResult, DappGetState } from "./types";
+import { DappGetFetcher } from "./fetch";
 const logs = Logs(module);
 
 /**
@@ -17,7 +17,8 @@ const logs = Logs(module);
 export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
-  const dependencies = await getDependencies(req.name, req.ver);
+  const dappGetFetcher = new DappGetFetcher();
+  const dependencies = await dappGetFetcher.dependencies(req.name, req.ver);
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install

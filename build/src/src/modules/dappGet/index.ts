@@ -2,13 +2,18 @@ import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
-import * as fetch from "./fetch";
 import aggregate from "./aggregate";
+import { DappGetFetcher } from "./fetch";
+
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
 import Logs from "../../logs";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types";
 const logs = Logs(module);
+
+export interface DappgetOptions {
+  BYPASS_RESOLVER?: boolean;
+}
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -52,7 +57,9 @@ const logs = Logs(module);
  */
 export default async function dappGet(
   req: PackageRequest,
-  options?: { BYPASS_RESOLVER?: boolean }
+  options?: DappgetOptions,
+  // For testing
+  dappGetFetcher?: DappGetFetcher
 ): Promise<DappGetResult> {
   /**
    * If BYPASS_RESOLVER=true, use the dappGet basic.
@@ -67,7 +74,11 @@ export default async function dappGet(
   let dnps: DappGetDnps;
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
-    dnps = await aggregate({ req, dnpList, fetch });
+    dnps = await aggregate({
+      req,
+      dnpList,
+      dappGetFetcher: dappGetFetcher || new DappGetFetcher()
+    });
   } catch (e) {
     logs.error(`dappGet/aggregate error: ${e.stack}`);
     e.message = `dappGet could not resolve request ${req.name}@${

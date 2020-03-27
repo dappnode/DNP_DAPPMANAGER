@@ -1,3 +1,5 @@
+import { DappgetTestCase } from "../testHelpers";
+
 /**
  * Case: Deal with circular dependencies.
  *
@@ -16,7 +18,7 @@
  * has been already fetched, it will not be fetched again
  */
 
-module.exports = {
+const caseData: DappgetTestCase = {
   name: "circular dependencies",
   req: {
     name: "dnp-a.eth",
@@ -30,24 +32,20 @@ module.exports = {
   dnps: {
     "dnp-a.eth": {
       versions: {
-        "0.1.0": {
-          dependencies: { "dnp-b.eth": "0.1.0" }
-        }
+        "0.1.0": { "dnp-b.eth": "0.1.0" }
       }
     },
     "dnp-b.eth": {
       versions: {
-        "0.1.0": {
-          dependencies: { "dnp-c.eth": "0.1.0" }
-        }
+        "0.1.0": { "dnp-c.eth": "0.1.0" }
       }
     },
     "dnp-c.eth": {
       versions: {
-        "0.1.0": {
-          dependencies: { "dnp-a.eth": "0.1.0" }
-        }
+        "0.1.0": { "dnp-a.eth": "0.1.0" }
       }
     }
   }
 };
+
+export default caseData;

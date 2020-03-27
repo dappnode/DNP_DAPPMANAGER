@@ -1,8 +1,8 @@
 import semver from "semver";
 import { listContainers } from "../../modules/docker/listContainers";
-import { getLatestVersion } from "../../modules/release/getVersions";
 import * as eventBus from "../../eventBus";
 import params from "../../params";
+import { ReleaseFetcher } from "../../modules/release";
 // Utils
 import computeSemverUpdateType from "../../utils/computeSemverUpdateType";
 import {
@@ -16,18 +16,43 @@ import installPackage from "../../calls/installPackage";
 import Logs from "../../logs";
 const logs = Logs(module);
 
+export default async function updateMyPackages(): Promise<void> {
+  const releaseFetcher = new ReleaseFetcher();
+  const dnpList = await listContainers();
+
+  const dnps = dnpList.filter(
+    dnp =>
+      dnp.name &&
+      // Ignore core DNPs
+      dnp.isDnp &&
+      // Ignore wierd versions
+      semver.valid(dnp.version) &&
+      // MUST come from the APM
+      (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS)
+  );
+
+  for (const { name, version: currentVersion } of dnps) {
+    try {
+      await updateMyPackage(releaseFetcher, name, currentVersion);
+    } catch (e) {
+      logs.error(`Error auto-updating ${name}: ${e.stack}`);
+    }
+  }
+}
+
 /**
  * Only `minor` and `patch` updates are allowed
  */
 
 async function updateMyPackage(
+  releaseFetcher: ReleaseFetcher,
   name: string,
   currentVersion: string
 ): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
   if (!isDnpUpdateEnabled(name)) return;
 
-  const { version: latestVersion } = await getLatestVersion(name);
+  const { version: latestVersion } = await releaseFetcher.fetchVersion(name);
 
   // Compute if the update type is "patch"/"minor" = is allowed
   // If release is not allowed, abort
@@ -49,28 +74,5 @@ async function updateMyPackage(
   } catch (e) {
     flagErrorUpdate(name, e.message);
     throw e;
-  }
-}
-
-export default async function updateMyPackages(): Promise<void> {
-  const dnpList = await listContainers();
-
-  const dnps = dnpList.filter(
-    dnp =>
-      dnp.name &&
-      // Ignore core DNPs
-      dnp.isDnp &&
-      // Ignore wierd versions
-      semver.valid(dnp.version) &&
-      // MUST come from the APM
-      (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS)
-  );
-
-  for (const { name, version: currentVersion } of dnps) {
-    try {
-      await updateMyPackage(name, currentVersion);
-    } catch (e) {
-      logs.error(`Error auto-updating ${name}: ${e.stack}`);
-    }
   }
 }
