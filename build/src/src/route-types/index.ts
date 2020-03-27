@@ -1,4 +1,5 @@
 import * as autoUpdateDataGet from "./autoUpdateDataGet";
+import * as autoUpdateSettingsEdit from "./autoUpdateSettingsEdit";
 import * as diagnose from "./diagnose";
 import * as domainAliasSet from "./domainAliasSet";
 import * as ethClientFallbackSet from "./ethClientFallbackSet";
@@ -22,6 +23,7 @@ import * as volumesGet from "./volumesGet";
 
 export {
   autoUpdateDataGet,
+  autoUpdateSettingsEdit,
   diagnose,
   domainAliasSet,
   ethClientFallbackSet,
