@@ -457,6 +457,7 @@ export const systemInfoSample: SystemInfo = {
   identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
   ethClientTarget: "geth-light",
   ethClientStatus: "installing",
+  ethClientFallbackOn: true,
   ethClientStatusError: "Error fetching manifest from ...",
   ethProvider: "http://geth.dappnode:8545",
   // Domain map

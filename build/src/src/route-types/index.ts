@@ -1,6 +1,7 @@
 import * as autoUpdateDataGet from "./autoUpdateDataGet";
 import * as diagnose from "./diagnose";
 import * as domainAliasSet from "./domainAliasSet";
+import * as ethClientFallbackSet from "./ethClientFallbackSet";
 import * as ethClientTargetSet from "./ethClientTargetSet";
 import * as fetchCoreUpdateData from "./fetchCoreUpdateData";
 import * as fetchDirectory from "./fetchDirectory";
@@ -23,6 +24,7 @@ export {
   autoUpdateDataGet,
   diagnose,
   domainAliasSet,
+  ethClientFallbackSet,
   ethClientTargetSet,
   fetchCoreUpdateData,
   fetchDirectory,

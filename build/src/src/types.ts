@@ -733,6 +733,7 @@ export interface SystemInfo {
   ethClientStatus: EthClientStatus;
   ethClientStatusError?: string;
   ethProvider: string;
+  ethClientFallbackOn: boolean;
   // Domain maps
   fullnodeDomainTarget: string;
   // UI stats

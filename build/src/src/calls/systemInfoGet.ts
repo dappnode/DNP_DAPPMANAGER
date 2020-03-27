@@ -35,6 +35,7 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       // Eth provider configured URL, if empty will default to WEB3_HOST
       ethClientTarget: db.ethClientTarget.get(),
       ethClientStatus: db.ethClientStatus.get(),
+      ethClientFallbackOn: db.ethClientFallbackOn.get(),
       ethClientStatusError: db.ethClientStatusError.get(),
       ethProvider: getEthProviderUrl(),
       // Domain map

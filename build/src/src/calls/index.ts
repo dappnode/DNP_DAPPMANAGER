@@ -14,6 +14,7 @@ import copyFileFrom from "./copyFileFrom";
 import copyFileTo from "./copyFileTo";
 import diagnose from "./diagnose";
 import domainAliasSet from "./domainAliasSet";
+import ethClientFallbackSet from "./ethClientFallbackSet";
 import ethClientTargetSet from "./ethClientTargetSet";
 import fetchCoreUpdateData from "./fetchCoreUpdateData";
 import fetchDirectory from "./fetchDirectory";
@@ -61,6 +62,7 @@ export {
   copyFileTo,
   diagnose,
   domainAliasSet,
+  ethClientFallbackSet,
   ethClientTargetSet,
   fetchCoreUpdateData,
   fetchDirectory,

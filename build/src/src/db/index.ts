@@ -1,6 +1,7 @@
 export * from "./autoUpdateSettings";
 export * from "./cache";
 export * from "./dyndns";
+export * from "./ethClient";
 export * from "./fileTransferPath";
 export * from "./isInstalling";
 export * from "./network";
