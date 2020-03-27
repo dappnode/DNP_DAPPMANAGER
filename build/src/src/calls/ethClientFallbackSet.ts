@@ -6,9 +6,9 @@ import { RpcHandlerReturn } from "../types";
  * Sets if a fallback should be used
  */
 export default async function ethClientFallbackSet({
-  fallbackOn
+  fallback
 }: RequestData): RpcHandlerReturn {
-  db.ethClientFallbackOn.set(fallbackOn);
+  db.ethClientFallback.set(fallback);
 
   return {
     message: "set ethClientFallbackSet"

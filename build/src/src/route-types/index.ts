@@ -16,7 +16,7 @@ import * as passwordChange from "./passwordChange";
 import * as passwordIsSecure from "./passwordIsSecure";
 import * as restartPackageVolumes from "./restartPackageVolumes";
 import * as systemInfoGet from "./systemInfoGet";
-import * as uiWelcomeDone from "./uiWelcomeDone";
+import * as uiWelcomeStatusSet from "./uiWelcomeStatusSet";
 import * as volumeRemove from "./volumeRemove";
 import * as volumesGet from "./volumesGet";
 
@@ -39,7 +39,7 @@ export {
   passwordIsSecure,
   restartPackageVolumes,
   systemInfoGet,
-  uiWelcomeDone,
+  uiWelcomeStatusSet,
   volumeRemove,
   volumesGet
 };

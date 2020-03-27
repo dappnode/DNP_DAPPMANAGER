@@ -4,7 +4,7 @@ import params from "../../params";
 import { getClientData } from "./clientParams";
 import { EthClientTarget } from "../../types";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { getTarget, getStatus, getFallbackOn } from "./utils";
+import { getTarget, getStatus, getFallback } from "./utils";
 
 export type ProviderGetter = () => Promise<ethers.providers.Provider>;
 
@@ -39,7 +39,7 @@ export async function getEthersProvider(): Promise<
 async function getEthProviderUrl(): Promise<string> {
   const target = getTarget();
   const status = getStatus();
-  const fallbackOn = getFallbackOn();
+  const fallback = getFallback();
 
   if (!target || target === "remote") {
     // Remote is selected, just return remote
@@ -55,7 +55,7 @@ async function getEthProviderUrl(): Promise<string> {
         throw Error(`is ${status}`);
       }
     } catch (e) {
-      if (fallbackOn) {
+      if (fallback === "on") {
         // Fallback on, ignore error and return remote
         return params.REMOTE_MAINNET_RPC_URL;
       } else {

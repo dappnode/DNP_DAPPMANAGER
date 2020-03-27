@@ -44,7 +44,7 @@ import seedPhraseSet from "./seedPhraseSet";
 import setStaticIp from "./setStaticIp";
 import systemInfoGet from "./systemInfoGet";
 import togglePackage from "./togglePackage";
-import uiWelcomeDone from "./uiWelcomeDone";
+import uiWelcomeStatusSet from "./uiWelcomeStatusSet";
 import updatePackageEnv from "./updatePackageEnv";
 import updatePortMappings from "./updatePortMappings";
 import volumeRemove from "./volumeRemove";
@@ -91,7 +91,7 @@ export {
   setStaticIp,
   systemInfoGet,
   togglePackage,
-  uiWelcomeDone,
+  uiWelcomeStatusSet,
   updatePackageEnv,
   updatePortMappings,
   volumeRemove,

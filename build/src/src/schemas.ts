@@ -428,9 +428,11 @@ export const systemInfoSchema = {
     identityAddress: { type: "string" },
     ethClientTarget: { type: "string" },
     ethClientStatus: { type: "string" },
+    ethClientFallback: { type: "string" },
     ethClientStatusError: { type: "string" },
     ethProvider: { type: "string" },
-    fullnodeDomainTarget: { type: "string" }
+    fullnodeDomainTarget: { type: "string" },
+    uiWelcomeStatus: { type: "string" }
   },
   // VPN still sends logs without message (legacy compatibility)
   required: []
@@ -457,11 +459,11 @@ export const systemInfoSample: SystemInfo = {
   identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
   ethClientTarget: "geth-light",
   ethClientStatus: "installing",
-  ethClientFallbackOn: true,
+  ethClientFallback: "on",
   ethClientStatusError: "Error fetching manifest from ...",
   ethProvider: "http://geth.dappnode:8545",
   // Domain map
   fullnodeDomainTarget: "geth.dnp.dappnode.eth",
   // UI
-  showWelcome: true
+  uiWelcomeStatus: "doing"
 };

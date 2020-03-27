@@ -7,7 +7,7 @@ import { EthClientStatus } from "../../types";
 export const getTarget = db.ethClientTarget.get;
 export const setTarget = db.ethClientTarget.set;
 export const getStatus = db.ethClientStatus.get;
-export const getFallbackOn = db.ethClientFallbackOn.get;
+export const getFallback = db.ethClientFallback.get;
 
 export const setStatus = (status: EthClientStatus, e?: Error): void => {
   db.setEthClientStatusAndError(status, e);

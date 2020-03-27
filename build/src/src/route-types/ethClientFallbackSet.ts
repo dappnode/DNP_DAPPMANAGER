@@ -1,3 +1,5 @@
+import { EthClientFallback } from "../types";
+
 export const route = "ethClientFallbackSet.dappmanager.dnp.dappnode.eth";
 
 /**
@@ -5,21 +7,21 @@ export const route = "ethClientFallbackSet.dappmanager.dnp.dappnode.eth";
  */
 
 export interface RequestData {
-  fallbackOn: boolean;
+  fallback: EthClientFallback;
 }
 
 export type ReturnData = void;
 
 export const requestDataSchema = {
   type: "object",
-  required: ["fallbackOn"],
+  required: ["fallback"],
   properties: {
-    fallbackOn: { type: "boolean" }
+    fallback: { type: "string" }
   }
 };
 
 // Samples for testing
 
 export const requestDataSample: RequestData = {
-  fallbackOn: true
+  fallback: "off"
 };

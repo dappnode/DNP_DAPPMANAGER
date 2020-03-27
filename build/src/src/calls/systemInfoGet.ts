@@ -34,13 +34,13 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       // Eth provider configured URL, if empty will default to WEB3_HOST
       ethClientTarget: db.ethClientTarget.get(),
       ethClientStatus: db.ethClientStatus.get(),
-      ethClientFallbackOn: db.ethClientFallbackOn.get(),
+      ethClientFallback: db.ethClientFallback.get(),
       ethClientStatusError: db.ethClientStatusError.get(),
       ethProvider: db.ethProviderUrl.get(),
       // Domain map
       fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
       // UI stats
-      showWelcome: !db.uiWelcomeDone.get()
+      uiWelcomeStatus: db.uiWelcomeStatus.get()
     }
   };
 }

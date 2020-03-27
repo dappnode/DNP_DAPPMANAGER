@@ -66,7 +66,10 @@ export async function migrateEthchain(): Promise<void> {
     );
 
   // De-activate UI welcome flow if this is an update
-  if (ethchain || volumeMigrations.length > 0) db.uiWelcomeDone.set(true);
+  if (ethchain || volumeMigrations.length > 0) {
+    db.ethClientFallback.set("on");
+    db.uiWelcomeStatus.set("done");
+  }
 
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
   if (ethchain)
