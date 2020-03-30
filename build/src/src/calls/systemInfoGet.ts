@@ -1,8 +1,9 @@
 import { ReturnData } from "../route-types/systemInfoGet";
-import { RpcHandlerReturnWithResult } from "../types";
+import { RpcHandlerReturnWithResult, NewFeatureId } from "../types";
 import * as db from "../db";
 import versionData from "../utils/getVersionData";
 import logPackage from "./logPackage";
+import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 
 const wifiName = "wifi.dnp.dappnode.eth";
 
@@ -40,9 +41,49 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       // Domain map
       fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
       // UI stats
-      uiWelcomeStatus: db.uiWelcomeStatus.get()
+      newFeatureIds: getNewFeatureIds(),
+      isFirstTimeRunning: db.isFirstTimeRunning.get()
     }
   };
+}
+
+/**
+ * Compute which features to show
+ * - repository: Show only if nothing is selected
+ * - auto-updates: Show only if disabled
+ * - change-host-password: Show only if insecure
+ */
+function getNewFeatureIds(): NewFeatureId[] {
+  const newFeatureIds: NewFeatureId[] = [];
+
+  if (db.ethClientTarget.get()) {
+    // If the user does not has the fallback on and has not seen the full
+    // repository view, show a specific one just asking for the fallback
+    if (
+      db.ethClientFallback.get() === "off" &&
+      db.newFeatureStatus.get("repository") !== "seen"
+    )
+      newFeatureIds.push("repository-fallback");
+  } else {
+    // repository: Show only if nothing is selected
+    newFeatureIds.push("repository");
+  }
+
+  // auto-updates: Show only if all are disabled
+  if (
+    !autoUpdateHelper.isDnpUpdateEnabled() &&
+    !autoUpdateHelper.isCoreUpdateEnabled()
+  )
+    newFeatureIds.push("auto-updates");
+
+  // change-host-password: Show only if insecure
+  if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
+
+  // Filter out features that the user has already seen or set
+  return newFeatureIds.filter(featureId => {
+    const status = db.newFeatureStatus.get(featureId);
+    return status !== "seen";
+  });
 }
 
 /**

@@ -25,7 +25,7 @@ export async function changeEthMultiClient(
   if (userSettings) db.ethClientUserSettings.set(nextTarget, userSettings);
 
   // If the previous client is a client package, uninstall it
-  if (prevTarget !== "remote") {
+  if (prevTarget && prevTarget !== "remote") {
     try {
       const { name } = getClientData(prevTarget);
       await removePackage({ id: name, deleteVolumes });

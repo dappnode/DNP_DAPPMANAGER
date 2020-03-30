@@ -65,12 +65,6 @@ export async function migrateEthchain(): Promise<void> {
         !volumes.find(vol => vol.Name === to)
     );
 
-  // De-activate UI welcome flow if this is an update
-  if (ethchain || volumeMigrations.length > 0) {
-    db.ethClientFallback.set("on");
-    db.uiWelcomeStatus.set("done");
-  }
-
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
   if (ethchain)
     try {
@@ -135,5 +129,10 @@ export async function migrateEthchain(): Promise<void> {
       portMappings: userSettings.portMappings,
       environment: EXTRA_OPTS ? { EXTRA_OPTS } : undefined
     });
+  }
+
+  // Automatically activate fallback?
+  if (ethchain || volumeMigrations.length > 0) {
+    db.ethClientFallback.set("on");
   }
 }

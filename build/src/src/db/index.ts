@@ -10,6 +10,7 @@ export * from "./package";
 export * from "./secrets";
 export * from "./system";
 export * from "./systemFlags";
+export * from "./ui";
 export * from "./upnp";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";

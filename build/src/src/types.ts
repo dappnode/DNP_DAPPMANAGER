@@ -714,11 +714,6 @@ export type EthClientStatus =
 export type EthClientFallback = "on" | "off";
 
 /**
- * UI Welcome flow status. Persists the info of which page the UI should show
- */
-export type UiWelcomeStatus = "pending" | "doing" | "done";
-
-/**
  * Aggregated DAppNode system info
  */
 export interface SystemInfo {
@@ -739,7 +734,7 @@ export interface SystemInfo {
   // From seedPhrase: If it's not stored yet, it's an empty string
   identityAddress: string;
   // Eth multi-client configuration and status
-  ethClientTarget: EthClientTarget;
+  ethClientTarget: EthClientTarget | null;
   ethClientStatus: EthClientStatus;
   ethClientStatusError?: string;
   ethClientFallback: EthClientFallback;
@@ -747,7 +742,8 @@ export interface SystemInfo {
   // Domain maps
   fullnodeDomainTarget: string;
   // UI stats
-  uiWelcomeStatus: UiWelcomeStatus;
+  newFeatureIds: NewFeatureId[];
+  isFirstTimeRunning: boolean;
 }
 
 /**
@@ -794,6 +790,21 @@ export type RpcHandlerReturnWithResult<R> = Promise<
   RpcHandlerReturnWithResultInterface<R>
 >;
 export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
+
+/**
+ * Welcome wizard / setup flow
+ * Available routes / views in the UI
+ */
+export type NewFeatureId =
+  | "repository"
+  | "repository-fallback"
+  | "auto-updates"
+  | "change-host-password";
+
+/**
+ * UI Welcome flow status. Persists the info of which page the UI should show
+ */
+export type NewFeatureStatus = "pending" | "seen" | "skipped";
 
 /**
  * HTTP Response

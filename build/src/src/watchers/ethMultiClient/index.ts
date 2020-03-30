@@ -51,7 +51,7 @@ export async function isClientSyncing(url: string): Promise<boolean> {
 export async function runEthMultiClientWatcher(): Promise<void> {
   const target = getTarget();
 
-  if (target === "remote") {
+  if (!target || target === "remote") {
     // Do nothing
     return;
   }

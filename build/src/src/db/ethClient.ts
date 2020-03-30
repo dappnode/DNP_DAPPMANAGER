@@ -14,10 +14,16 @@ const ETH_CLIENT_STATUS_ERROR = "eth-client-status-error";
 const ETH_CLIENT_USER_SETTINGS = "eth-client-user-settings";
 const ETH_PROVIDER_URL = "eth-provider-url";
 
-export const ethClientTarget = staticKey<EthClientTarget>(
+// Re-export to consider the first value (when it's not set)
+// but do not allow to set null again. Using to express intentionality
+const _ethClientTarget = staticKey<EthClientTarget | null>(
   ETH_CLIENT_TARGET,
-  "remote"
+  null
 );
+export const ethClientTarget = {
+  get: _ethClientTarget.get,
+  set: (newValue: EthClientTarget) => _ethClientTarget.set(newValue)
+};
 export const ethClientStatus = staticKey<EthClientStatus>(
   ETH_CLIENT_STATUS,
   "selected"

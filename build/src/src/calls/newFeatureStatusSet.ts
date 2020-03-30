@@ -1,4 +1,4 @@
-import { RequestData } from "../route-types/uiWelcomeStatusSet";
+import { RequestData } from "../route-types/newFeatureStatusSet";
 import { RpcHandlerReturn } from "../types";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
@@ -6,10 +6,11 @@ import * as eventBus from "../eventBus";
 /**
  * Flag the UI welcome flow as completed
  */
-export default async function uiWelcomeStatusSet({
-  uiWelcomeStatus
+export default async function newFeatureStatusSet({
+  featureId,
+  status
 }: RequestData): RpcHandlerReturn {
-  db.uiWelcomeStatus.set(uiWelcomeStatus);
+  db.newFeatureStatus.set(featureId, status);
 
   // Notify the UI of the uiWelcomeStatus change
   eventBus.requestSystemInfo.emit();

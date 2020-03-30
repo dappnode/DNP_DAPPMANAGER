@@ -41,7 +41,10 @@ async function getEthProviderUrl(): Promise<string> {
   const status = getStatus();
   const fallback = getFallback();
 
-  if (!target || target === "remote") {
+  if (!target) {
+    // Initial case where the user has not selected any client yet
+    throw Error(`No ethereum client selected yet`);
+  } else if (target === "remote") {
     // Remote is selected, just return remote
     return params.REMOTE_MAINNET_RPC_URL;
   } else {
