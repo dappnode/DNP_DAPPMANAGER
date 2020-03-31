@@ -129,7 +129,13 @@ const params = {
   ALLOWED_FULLNODE_DNP_NAMES: [
     "geth.dnp.dappnode.eth",
     "parity.dnp.dappnode.eth"
-  ]
+  ],
+
+  // ETHFORWARD / HTTP proxy params
+  ETHFORWARD_HTTP_PROXY_PORT: 80,
+  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
+  ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
+  ETHFORWARD_PIN_ON_VISIT: true
 };
 
 if (devMode) {

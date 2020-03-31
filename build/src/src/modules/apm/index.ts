@@ -1,10 +1,18 @@
-import { EthersProvider } from "../ethClient";
+import { ethers } from "ethers";
+import { getEthersProvider } from "../ethClient";
 import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata";
 import { fetchApmVersionsState } from "./fetchApmVersionsState";
 import { fetchVersion } from "./fetchVersion";
 import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types";
 
-export class Apm extends EthersProvider {
+export class Apm {
+  provider: ethers.providers.Provider | undefined = undefined;
+
+  async getProvider(): Promise<ethers.providers.Provider> {
+    if (!this.provider) this.provider = await getEthersProvider();
+    return this.provider;
+  }
+
   /**
    * Fetch a specific version of an APM repo
    * If version is falsy, gets the latest version

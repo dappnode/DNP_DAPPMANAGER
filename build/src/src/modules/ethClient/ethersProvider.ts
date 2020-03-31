@@ -8,14 +8,7 @@ import { getTarget, getStatus, getFallback } from "./utils";
 
 export type ProviderGetter = () => Promise<ethers.providers.Provider>;
 
-export class EthersProvider {
-  provider: ethers.providers.Provider | undefined = undefined;
-
-  async getProvider(): Promise<ethers.providers.Provider> {
-    if (!this.provider) this.provider = await getEthersProvider();
-    return this.provider;
-  }
-}
+export class EthProviderError extends Error {}
 
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target
@@ -36,14 +29,14 @@ export async function getEthersProvider(): Promise<
  * If the package target is not active it returns the remote URLs
  * @return ethProvier http://geth.dappnode:8545
  */
-async function getEthProviderUrl(): Promise<string> {
+export async function getEthProviderUrl(): Promise<string> {
   const target = getTarget();
   const status = getStatus();
   const fallback = getFallback();
 
   if (!target) {
     // Initial case where the user has not selected any client yet
-    throw Error(`No ethereum client selected yet`);
+    throw new EthProviderError(`No ethereum client selected yet`);
   } else if (target === "remote") {
     // Remote is selected, just return remote
     return params.REMOTE_MAINNET_RPC_URL;
@@ -55,7 +48,7 @@ async function getEthProviderUrl(): Promise<string> {
         return getClientData(target).url;
       } else {
         // Client not active, no need to check
-        throw Error(`is ${status}`);
+        throw new EthProviderError(`is ${status}`);
       }
     } catch (e) {
       if (fallback === "on") {
@@ -63,7 +56,7 @@ async function getEthProviderUrl(): Promise<string> {
         return params.REMOTE_MAINNET_RPC_URL;
       } else {
         // Fallback off, throw nice error
-        throw Error(`Ethereum client not available: ${e.message}`);
+        throw new EthProviderError(`Node not available: ${e.message}`);
       }
     }
   }

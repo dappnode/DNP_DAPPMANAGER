@@ -13,6 +13,7 @@ import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
+import startEthForward from "./ethForward";
 import Logs from "./logs";
 const logs = Logs(module);
 
@@ -21,6 +22,9 @@ import "./utils/getVersionData";
 
 // Start HTTP API
 import "./httpApi";
+
+// Start eth forward http proxy
+startEthForward();
 
 // Start watchers
 runWatchers();
