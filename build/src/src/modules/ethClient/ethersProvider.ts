@@ -2,9 +2,8 @@ import { ethers } from "ethers";
 import * as db from "../../db";
 import params from "../../params";
 import { getClientData } from "./clientParams";
-import { EthClientTarget } from "../../types";
-import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { getTarget, getStatus, getFallback } from "./utils";
+import { getClientStatus } from "./clientStatus";
+import { EthClientStatusError } from "../../types";
 
 export type ProviderGetter = () => Promise<ethers.providers.Provider>;
 
@@ -30,72 +29,71 @@ export async function getEthersProvider(): Promise<
  * @return ethProvier http://geth.dappnode:8545
  */
 export async function getEthProviderUrl(): Promise<string> {
-  const target = getTarget();
-  const status = getStatus();
-  const fallback = getFallback();
+  const target = db.ethClientTarget.get();
+  const fallback = db.ethClientFallback.get();
 
-  if (!target) {
-    // Initial case where the user has not selected any client yet
-    throw new EthProviderError(`No ethereum client selected yet`);
-  } else if (target === "remote") {
-    // Remote is selected, just return remote
-    return params.REMOTE_MAINNET_RPC_URL;
+  // Initial case where the user has not selected any client yet
+  if (!target) throw new EthProviderError(`No ethereum client selected yet`);
+
+  // Remote is selected, just return remote
+  if (target === "remote") return params.REMOTE_MAINNET_RPC_URL;
+
+  const status = await getClientStatus(target);
+  db.ethClientStatus.set(target, status);
+
+  if (status.ok) {
+    // Package test succeeded return its url
+    return getClientData(target).url;
   } else {
-    try {
-      if (status === "active") {
-        // Client is active, test and return
-        await assertTargetIsAvailable(target);
-        return getClientData(target).url;
-      } else {
-        // Client not active, no need to check
-        throw new EthProviderError(`is ${status}`);
-      }
-    } catch (e) {
-      if (fallback === "on") {
-        // Fallback on, ignore error and return remote
-        return params.REMOTE_MAINNET_RPC_URL;
-      } else {
-        // Fallback off, throw nice error
-        throw new EthProviderError(`Node not available: ${e.message}`);
-      }
+    if (fallback === "on") {
+      // Fallback on, ignore error and return remote
+      return params.REMOTE_MAINNET_RPC_URL;
+    } else {
+      // Fallback off, throw nice error
+      const message = parseClientStatusError(status);
+      throw new EthProviderError(`Node not available: ${message}`);
     }
   }
 }
 
-// Call to dappmanager.dnp.dappnode.eth, getByVersionId(35)
-// Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
-const testTxData = {
-  to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-  data:
-    "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
-};
-const result =
-  "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";
-
 /**
- * Returns void if a given ethers provider is okay to fetch APM state
- * Otherwise returns an error with the guessed caused of problems
- * @param provider
+ * Parse client status errors to a single string line
+ *
+ * Note: MUST NOT have undefined as a valid return type so typescript
+ *       enforces that all possible states are covered
  */
-async function assertTargetIsAvailable(target: EthClientTarget): Promise<void> {
-  const { url, name } = getClientData(target);
-  const provider = new ethers.providers.JsonRpcProvider(url);
-  try {
-    const res = await provider.send("eth_call", [testTxData, "latest"]);
-    if (res !== result) {
-      const syncing = await provider.send("eth_syncing", []);
-      if (syncing) {
-        throw Error(`is syncing`);
-      } else {
-        throw Error(`test state called failed`);
-      }
-    }
-  } catch (e) {
-    if (e.message.includes("ECONNREFUSED")) {
-      const dnp = await listContainerNoThrow(name);
-      if (!dnp) throw Error(`not installed`);
-      if (!dnp.running) throw Error(`not running`);
-    }
-    throw e;
+export function parseClientStatusError(
+  statusError: EthClientStatusError
+): string {
+  switch (statusError.code) {
+    case "UNKNOWN_ERROR":
+      return `Unknown error: ${statusError.error.message}`;
+
+    case "STATE_NOT_SYNCED":
+      return "State is not synced";
+
+    case "STATE_CALL_ERROR":
+      return `State call error: ${statusError.error.message}`;
+
+    case "IS_SYNCING":
+      return "Is syncing";
+
+    case "NOT_AVAILABLE":
+      return `Not available: ${statusError.error.message}`;
+
+    case "NOT_RUNNING":
+      return "Not running";
+
+    case "NOT_INSTALLED":
+      return "Not installed";
+
+    case "INSTALLING":
+      return "Is installing";
+
+    case "INSTALLING_ERROR":
+      return `Install error: ${statusError.error.message}`;
+
+    case "UNINSTALLED":
+      return `Package is uninstalled`;
   }
 }

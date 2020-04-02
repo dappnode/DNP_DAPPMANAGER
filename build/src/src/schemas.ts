@@ -426,15 +426,13 @@ export const systemInfoSchema = {
     internalIp: { type: "string" },
     dappmanagerNaclPublicKey: { type: "string" },
     identityAddress: { type: "string" },
-    ethClientTarget: { type: "string" },
-    ethClientStatus: { type: "string" },
+    ethClientTarget: { type: ["string", "null"] },
     ethClientFallback: { type: "string" },
-    ethClientStatusError: { type: "string" },
+    ethClientStatus: { type: ["object", "null"] },
     ethProvider: { type: "string" },
     fullnodeDomainTarget: { type: "string" },
     uiWelcomeStatus: { type: "string" }
   },
-  // VPN still sends logs without message (legacy compatibility)
   required: []
 };
 
@@ -458,9 +456,12 @@ export const systemInfoSample: SystemInfo = {
   dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
   identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
   ethClientTarget: "geth-light",
-  ethClientStatus: "installing",
+  ethClientStatus: {
+    ok: false,
+    code: "STATE_CALL_ERROR",
+    error: { message: "Some Error", stack: "Some Error\nline 56 file.ts" }
+  },
   ethClientFallback: "on",
-  ethClientStatusError: "Error fetching manifest from ...",
   ethProvider: "http://geth.dappnode:8545",
   // Domain map
   fullnodeDomainTarget: "geth.dnp.dappnode.eth",

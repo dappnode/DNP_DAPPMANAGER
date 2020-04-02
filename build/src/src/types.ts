@@ -699,19 +699,49 @@ export const ethClientTargets: EthClientTarget[] = [
   "geth",
   "openethereum"
 ];
-export type EthClientStatus =
-  | "selected"
-  | "installing"
-  | "installed"
-  | "syncing"
-  | "active"
-  | "error-installing"
-  | "error-syncing";
 
 /**
  * If the DAPPMANAGER should use a eth remote node in cases of error syncing
  */
 export type EthClientFallback = "on" | "off";
+
+export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
+
+export type EthClientStatusOk =
+  // All okay, client is functional
+  { ok: true; url: string; name: string };
+
+export type EthClientStatusError =
+  // Unexpected error
+  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
+  // State is not correct, node is not synced but eth_syncing did not picked it up
+  | { ok: false; code: "STATE_NOT_SYNCED" }
+  // APM state call failed, syncing call succeeded and is not working
+  // = Likely an error related to fetching state content
+  | { ok: false; code: "STATE_CALL_ERROR"; error: ErrorSerialized }
+  // State call failed and eth_syncing returned true
+  | { ok: false; code: "IS_SYNCING" }
+  // syncing call failed, but the client is running
+  // ???, a connection error?
+  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
+  // NOT Expected: Package's container is not running
+  | { ok: false; code: "NOT_RUNNING" }
+  // Package's container does not exist in docker ps -a, and there's no clear reason why
+  | { ok: false; code: "NOT_INSTALLED" }
+  // Expected: Package is installing or pending to be installed
+  | { ok: false; code: "INSTALLING" }
+  // Expected: Package is installing but an error happened
+  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
+  // NOT Expected: Package should be installed but it is not
+  | { ok: false; code: "UNINSTALLED" };
+
+/**
+ * Serialized errors so the can be persisted in the db, a JSON to disk
+ */
+export interface ErrorSerialized {
+  message: string;
+  stack?: string;
+}
 
 /**
  * Aggregated DAppNode system info
@@ -733,11 +763,14 @@ export interface SystemInfo {
   dappmanagerNaclPublicKey: string;
   // From seedPhrase: If it's not stored yet, it's an empty string
   identityAddress: string;
-  // Eth multi-client configuration and status
+  // Eth multi-client configuration
   ethClientTarget: EthClientTarget | null;
-  ethClientStatus: EthClientStatus;
-  ethClientStatusError?: string;
   ethClientFallback: EthClientFallback;
+  // Eth multi-client status (cached, may be a small delay with real status)
+  // - EthClientStatus = status of the current target
+  // - undefined = status of current target has not been defined yet
+  // - null = current target is remote and has no status
+  ethClientStatus: EthClientStatus | undefined | null;
   ethProvider: string;
   // Domain maps
   fullnodeDomainTarget: string;

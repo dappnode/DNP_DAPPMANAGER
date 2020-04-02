@@ -4,7 +4,6 @@ import { removePackage } from "../../calls";
 import { EthClientTarget, UserSettings } from "../../types";
 import { getClientData } from "./clientParams";
 import Logs from "../../logs";
-import { getTarget, setTarget, setStatus } from "./utils";
 const logs = Logs(module);
 
 /**
@@ -18,7 +17,7 @@ export async function changeEthMultiClient(
   deleteVolumes?: boolean,
   userSettings?: UserSettings
 ): Promise<void> {
-  const prevTarget = getTarget();
+  const prevTarget = db.ethClientTarget.get();
   if (prevTarget === nextTarget) throw Error("Same target");
 
   // Set user settings of next target if any
@@ -28,16 +27,19 @@ export async function changeEthMultiClient(
   if (prevTarget && prevTarget !== "remote") {
     try {
       const { name } = getClientData(prevTarget);
+      db.ethClientInstallStatus.set(prevTarget, { status: "UNINSTALLED" });
       await removePackage({ id: name, deleteVolumes });
       // Must await uninstall because geth -> light, light -> geth
-      // will create conflicts otherwise
+      // will create conflicts since it's the same DNP
     } catch (e) {
       logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
     }
   }
 
   // Setting the status to selected will trigger an install
-  setTarget(nextTarget);
-  setStatus("selected");
-  eventBus.runEthMultiClientWatcher.emit();
+  db.ethClientTarget.set(nextTarget);
+  if (nextTarget !== "remote") {
+    db.ethClientInstallStatus.set(nextTarget, { status: "TO_INSTALL" });
+    eventBus.runEthClientInstaller.emit();
+  }
 }

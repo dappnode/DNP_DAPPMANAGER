@@ -13,6 +13,8 @@ const wifiName = "wifi.dnp.dappnode.eth";
 export default async function systemInfoGet(): RpcHandlerReturnWithResult<
   ReturnData
 > {
+  const ethClientTarget = db.ethClientTarget.get();
+
   return {
     message: "Got system info",
     result: {
@@ -33,10 +35,11 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       // From seedPhrase: If it's not stored yet, it's an empty string
       identityAddress: db.identityAddress.get(),
       // Eth provider configured URL, if empty will default to WEB3_HOST
-      ethClientTarget: db.ethClientTarget.get(),
-      ethClientStatus: db.ethClientStatus.get(),
+      ethClientTarget,
+      ethClientStatus: ethClientTarget
+        ? db.ethClientStatus.get(ethClientTarget)
+        : null,
       ethClientFallback: db.ethClientFallback.get(),
-      ethClientStatusError: db.ethClientStatusError.get(),
       ethProvider: db.ethProviderUrl.get(),
       // Domain map
       fullnodeDomainTarget: db.fullnodeDomainTarget.get(),

@@ -1,40 +1,21 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
-import { ethers } from "ethers";
 import { installPackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
 import { getClientData } from "../../modules/ethClient/clientParams";
 import {
-  getTarget,
-  getStatus,
-  setStatus,
-  setFullnodeDomainTarget
-} from "../../modules/ethClient/utils";
+  EthClientInstallStatus,
+  serializeError
+} from "../../modules/ethClient/types";
+import { packageIsInstalling } from "../../utils/packageIsInstalling";
 import Logs from "../../logs";
+import { EthClientTarget } from "../../types";
 const logs = Logs(module);
 
-/**
- * Make sure the client is syncing
- * - Check that eth_syncing returns false (WARNING: may return false positive)
- * - Make sure content can be queried
- * - Make sure DAppNode smart contracts can be accessed
- * @param url
- */
-export async function isClientSyncing(url: string): Promise<boolean> {
-  const provider = new ethers.providers.JsonRpcProvider(url);
-  const isSyncing = await provider.send("eth_syncing", []);
-  if (isSyncing) return true;
-
-  // Do extra checks to make sure the client is actually synced
-  const currentBlock = await provider.getBlockNumber();
-  if (!currentBlock) return true;
-
-  // ### TODO: Fetch some specific APM data
-
-  return false;
-}
+// Enforces that the default value of status is correct
+type InstallStatus = EthClientInstallStatus["status"];
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -48,30 +29,44 @@ export async function isClientSyncing(url: string): Promise<boolean> {
  * It makes it easier to know what will happen next given a status
  * It also retries each step automatically without added logic
  */
-export async function runEthMultiClientWatcher(): Promise<void> {
-  const target = getTarget();
+export async function runEthClientInstaller(
+  target: EthClientTarget
+): Promise<EthClientInstallStatus | null> {
+  // Re-check just in case, on run the installer for local target clients
+  if (target === "remote") return null;
 
-  if (!target || target === "remote") {
-    // Do nothing
-    return;
-  }
-
-  const status = getStatus();
-  const { name, version, url, userSettings } = getClientData(target);
+  const { name, version, userSettings } = getClientData(target);
   const dnp = await listContainerNoThrow(name);
 
-  // Client is not installed
-  if (!dnp) {
-    switch (status) {
-      case "installing":
-        // OK client still installing
-        return;
+  const installStatus = db.ethClientInstallStatus.get(target);
+  const status: InstallStatus = installStatus
+    ? installStatus.status
+    : "TO_INSTALL";
 
-      case "selected":
-      case "error-installing":
-        // Expected state, run / retry installation
+  if (dnp) {
+    // OK: Client is already installed
+    return { status: "INSTALLED" };
+  } else {
+    // Client is not installed
+
+    switch (status) {
+      case "INSTALLING":
+        // This status has to be verified
+        // otherwise it can stay in installing state forever if the dappmanager
+        // resets during an installation of the client
+        if (packageIsInstalling(name)) {
+          // OK: client still installing
+          return null;
+        } else {
+          // Trigger another install
+          return { status: "TO_INSTALL" };
+        }
+
+      case "TO_INSTALL":
+      case "INSTALLING_ERROR":
+        // OK: Expected state, run / retry installation
         try {
-          setStatus("installing");
+          db.ethClientInstallStatus.set(target, { status: "INSTALLING" });
           await installPackage({
             name,
             version,
@@ -83,58 +78,26 @@ export async function runEthMultiClientWatcher(): Promise<void> {
               )
             }
           });
-          setStatus("installed");
-          setFullnodeDomainTarget(name); // Map fullnode.dappnode to package
+
+          // Map fullnode.dappnode to package
+          db.fullnodeDomainTarget.set(name);
+          // Run nsupdate
+          eventBus.packagesModified.emit({ ids: [name] });
+
+          return { status: "INSTALLED" };
         } catch (e) {
-          setStatus("error-installing", e);
+          return { status: "INSTALLING_ERROR", error: serializeError(e) };
         }
-        return;
 
-      default:
-        // NOT-OK Client should be installed
+      case "INSTALLED":
+        // NOT-OK: Client should be installed
         // Something or someone removed the client, re-install?
-        return;
+        return null;
+
+      case "UNINSTALLED":
+        // OK: Client should be un-installed and is uninstalled
+        return null;
     }
-  }
-
-  // Client is installed but not running
-  if (!dnp.running) {
-    // Package can be stopped because the user stopped it or
-    // because the DAppNode is too full and auto-stop kicked in
-    // For now, do nothing
-    return;
-  }
-
-  // Client installed and running
-  switch (status) {
-    case "active":
-      // OK client is synced and active
-      return;
-
-    case "installed":
-    case "syncing":
-    case "error-syncing":
-      // Check if client is already synced
-      try {
-        if (await isClientSyncing(url)) setStatus("syncing");
-        else setStatus("active");
-      } catch (e) {
-        setStatus("error-syncing", e);
-      }
-      return;
-
-    case "selected":
-    case "installing":
-    case "error-installing":
-      // Client is already installed but the status was not updated
-      // This may happen if the client was already installed by the user
-      // or after a migration before having this functionality
-      setStatus("installed");
-      return;
-
-    default:
-      // Should never reach this point, all status covered
-      return;
   }
 }
 
@@ -146,20 +109,26 @@ export async function runEthMultiClientWatcher(): Promise<void> {
  * - after completing a run if the status has changed
  */
 export default function runWatcher(): void {
-  eventBus.runEthMultiClientWatcher.on(
+  // Subscribe with a throttle to run only one time at once
+  eventBus.runEthClientInstaller.on(
     runOnlyOneSequentially(async () => {
       try {
-        const prevStatus = getStatus();
-        await runEthMultiClientWatcher();
-        const nextStatus = getStatus();
-        if (prevStatus !== nextStatus)
-          // Next run MUST be defered to next event loop for prevStatus to refresh
-          setTimeout(eventBus.runEthMultiClientWatcher.emit, 1000);
+        const target = db.ethClientTarget.get();
+        if (target && target !== "remote") {
+          const prevStatus = db.ethClientInstallStatus.get(target);
+          const nextStatus = await runEthClientInstaller(target);
+          if (nextStatus) {
+            db.ethClientInstallStatus.set(target, nextStatus);
+            if (!prevStatus || prevStatus.status !== nextStatus.status)
+              // Next run MUST be defered to next event loop for prevStatus to refresh
+              setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+          }
+        }
       } catch (e) {
-        logs.error(`Error on eth provider watcher: ${e.stack}`);
+        logs.error(`Error on eth client installer watcher: ${e.stack}`);
       }
     })
   );
 
-  setInterval(eventBus.runEthMultiClientWatcher.emit, 1 * 60 * 1000);
+  setInterval(eventBus.runEthClientInstaller.emit, 1 * 60 * 1000);
 }

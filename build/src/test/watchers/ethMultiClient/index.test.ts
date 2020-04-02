@@ -1,19 +1,20 @@
 import "mocha";
 import { expect } from "chai";
+import sinon from "sinon";
+import rewiremock from "rewiremock";
+// imports for typings
 import {
   PackageContainer,
   EthClientTarget,
-  EthClientStatus
+  UserSettings
 } from "../../../src/types";
-import rewiremock from "rewiremock";
-// imports for typings
 import { mockDnp } from "../../testUtils";
-import { getClientData } from "../../../src/watchers/ethMultiClient/clientParams";
+import { getClientData } from "../../../src/modules/ethClient/clientParams";
+import { EthClientInstallStatus } from "../../../src/modules/ethClient/types";
 
 interface State {
   target: EthClientTarget;
-  status: EthClientStatus;
-  statusError?: string;
+  status: { [target: string]: EthClientInstallStatus };
 }
 
 describe("Watchers > ethMultiClient > runWatcher", () => {
@@ -26,13 +27,8 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
      */
     const state: State = {
       target: "remote",
-      status: "selected"
+      status: {}
     };
-
-    /**
-     * Mutable state used by isSyncing
-     */
-    const isSyncingState: { [url: string]: boolean } = {};
 
     /**
      * Mutable state used by listContainerNoThrow
@@ -49,21 +45,32 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
           state.target = target;
         }
       },
-      ethClientStatus: {
-        get: () => state.status,
-        set: (status: EthClientStatus) => {
-          state.status = status;
+      ethClientInstallStatus: {
+        get: (keyArg: EthClientTarget) => state.status[keyArg],
+        set: (keyArg: EthClientTarget, status: EthClientInstallStatus) => {
+          state.status[keyArg] = status;
+        },
+        remove: (keyArg: EthClientTarget) => {
+          keyArg;
         }
-      },
-      setEthClientStatusAndError: (status: EthClientStatus, e?: Error) => {
-        state.status = status;
-        if (e) state.statusError = e.message;
-        else delete state.statusError;
       },
       fullnodeDomainTarget: {
         get: (): string => "",
         set: (dnpName: string) => {
           dnpName;
+        }
+      },
+      ethClientUserSettings: {
+        get: (keyArg: EthClientTarget): UserSettings => {
+          keyArg;
+          return {};
+        },
+        set: (keyArg: EthClientTarget, userSettings: UserSettings) => {
+          keyArg;
+          userSettings;
+        },
+        remove: (keyArg: EthClientTarget) => {
+          keyArg;
         }
       }
     };
@@ -75,11 +82,12 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       return dnpList.find(dnp => dnp.name === name) || null;
     }
 
-    async function installPackage(): Promise<{ message: string }> {
-      return { message: "" };
-    }
+    const installPackage = sinon.mock().resolves({ message: "" });
+    // async function installPackage(): Promise<{ message: string }> {
+    //   return { message: "" };
+    // }
 
-    const { runEthMultiClientWatcher } = await rewiremock.around(
+    const { runEthClientInstaller } = await rewiremock.around(
       () => import("../../../src/watchers/ethMultiClient"),
       mock => {
         mock(() => import("../../../src/db"))
@@ -94,30 +102,42 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       }
     );
 
+    /**
+     * Recreate the behaviour of the multi-client watcher
+     */
+    async function runClientInstallerWatcher() {
+      const target = state.target;
+      if (target && target !== "remote") {
+        const nextStatus = await runEthClientInstaller(state.target);
+        if (nextStatus) state.status[target] = nextStatus;
+      }
+    }
+
     // ////////////////////////////////
     // Simulate a client change process
     // ////////////////////////////////
 
     // State should be equal to initial
-    await runEthMultiClientWatcher();
+    await runClientInstallerWatcher();
     expect(state).to.deep.equal(
       {
         target: "remote",
-        status: "selected"
+        status: {}
       } as State,
       "State should be equal to initial"
     );
 
     // Simulate user selecting a new target
     state.target = newTarget;
-    await runEthMultiClientWatcher();
+    await runClientInstallerWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: "installed"
+        status: { [newTarget]: { status: "INSTALLED" } }
       } as State,
       "After the user selects a new target it should start installing"
     );
+    sinon.assert.calledOnce(installPackage);
 
     // Simulate the package starts running after being installed
     dnpList.push({
@@ -125,25 +145,13 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       name: newTargetData.name,
       running: true
     });
-    isSyncingState[newTargetData.url] = true;
-    await runEthMultiClientWatcher();
+    await runClientInstallerWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: "syncing"
+        status: { [newTarget]: { status: "INSTALLED" } }
       } as State,
-      "After installation, the package is syncing"
-    );
-
-    // Simulate the package finishes syncing
-    isSyncingState[newTargetData.url] = false;
-    await runEthMultiClientWatcher();
-    expect(state).to.deep.equal(
-      {
-        target: newTarget,
-        status: "active"
-      } as State,
-      "When completing sync, package should be activated"
+      "After installation, the loop does nothing"
     );
   });
 });
