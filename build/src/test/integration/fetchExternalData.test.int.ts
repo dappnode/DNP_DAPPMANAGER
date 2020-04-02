@@ -41,8 +41,11 @@ const testMountpointfetchMain = getTestMountpoint("fetch-main");
 const testMountpointfetchMountpoint = getTestMountpoint("fetch-mountpoint");
 
 describe("Fetch external release data", () => {
-  before(async () => {
+  before("Clear DBs and set remote", async () => {
     clearDbs();
+    // Activate remote and fallback to fetch test data without a local node
+    await calls.ethClientFallbackSet({ fallback: "on" });
+    await calls.ethClientTargetSet({ target: "remote" });
   });
 
   const bindId = "bind.dnp.dappnode.eth";
