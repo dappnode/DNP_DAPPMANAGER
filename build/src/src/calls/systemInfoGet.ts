@@ -73,11 +73,8 @@ function getNewFeatureIds(): NewFeatureId[] {
   }
 
   // auto-updates: Show only if all are disabled
-  if (
-    !autoUpdateHelper.isDnpUpdateEnabled() &&
-    !autoUpdateHelper.isCoreUpdateEnabled()
-  )
-    newFeatureIds.push("auto-updates");
+  if (!autoUpdateHelper.isCoreUpdateEnabled())
+    newFeatureIds.push("system-auto-updates");
 
   // change-host-password: Show only if insecure
   if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");

@@ -25,6 +25,6 @@ export const requestDataSchema = {
 // Samples for testing
 
 export const requestDataSample: RequestData = {
-  featureId: "auto-updates",
+  featureId: "repository",
   status: "seen"
 };

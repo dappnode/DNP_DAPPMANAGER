@@ -831,7 +831,7 @@ export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
 export type NewFeatureId =
   | "repository"
   | "repository-fallback"
-  | "auto-updates"
+  | "system-auto-updates"
   | "change-host-password";
 
 /**

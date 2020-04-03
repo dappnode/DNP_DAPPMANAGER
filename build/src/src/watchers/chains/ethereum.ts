@@ -33,7 +33,7 @@ function parseHexOrDecimal(hexOrDecimal: string | number): number {
 function safeProgress(progress: number): number | undefined {
   if (typeof progress !== "number" || isNaN(progress) || !isFinite(progress))
     return undefined;
-  else progress;
+  else return progress;
 }
 
 /**
