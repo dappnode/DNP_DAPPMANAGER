@@ -105,8 +105,7 @@ export function parseEthereumState(
           `Blocks synced: ${currentBlock} / ${highestBlock}`,
           `States synced: ${currentState} / ${highestState}`,
           `[What does this mean?](${gethSyncHelpUrl})`
-        ].join("\n\n"),
-        progress: safeProgress(currentState / highestState)
+        ].join("\n\n")
       };
     }
 
