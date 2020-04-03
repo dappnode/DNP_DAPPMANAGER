@@ -137,3 +137,35 @@ export function pause(ms: number): Promise<void> {
     }
   );
 }
+
+/**
+ * Like setInterval but you can pass a list ms values
+ *
+ * **Example**
+ * ```js
+ * setIntervalDynamic(callback, [1000, 2000, 3000])
+ * ```
+ * - First interval will take 1000 ms
+ * - Second interval will take 2000 ms
+ * - Third and all subsequent will take 3000 ms
+ *
+ * @param fn callback
+ * @param msArray [1000, 2000, 3000]
+ */
+export function setIntervalDynamic(
+  fn: (...args: any[]) => void,
+  msArray: number[]
+): void {
+  const msFinal = msArray[msArray.length - 1];
+  if (typeof msFinal !== "number")
+    throw Error(`msArray must have at least one element`);
+
+  function run() {
+    setTimeout(() => {
+      fn();
+      run();
+    }, msArray.shift() || msFinal);
+  }
+
+  run();
+}
