@@ -5,6 +5,11 @@ export interface Chain {
 }
 
 export const supportedProviders: { [dnpName: string]: Chain } = {
+  "openethereum.dnp.dappnode.eth": {
+    name: "OpenEthereum",
+    driverName: "ethereum",
+    api: "http://my.openethereum.dnp.dappnode.eth:8545"
+  },
   "ropsten.dnp.dappnode.eth": {
     name: "Ropsten",
     driverName: "ethereum",
