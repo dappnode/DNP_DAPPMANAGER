@@ -4,9 +4,11 @@ import crypto from "crypto";
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
+import * as calls from "../calls";
 import params from "../params";
 import * as db from "../db";
 import Logs from "../logs";
+import { logContainer } from "../modules/docker/dockerApi";
 const logs = Logs(module);
 
 const app = express();
@@ -32,6 +34,22 @@ app.use(cors());
 
 app.get("/", async (req, res) => {
   return res.send("Welcome to the DAPPMANAGER HTTP API");
+});
+
+app.get("/container-logs/:id", async (req, res) => {
+  // Protect for a range of IPs, req.ip = "::ffff:172.33.10.1";
+  if (!req.ip.includes(adminIpPrefix))
+    return res.status(403).send(`Forbidden ip: ${req.ip}`);
+
+  const { id } = req.params;
+  const { result } = await calls.logPackage({ id });
+
+  const filename = `logs-dappnode-package-${id}.txt`;
+  const mimetype = "text/plain";
+  res.setHeader("Content-disposition", "attachment; filename=" + filename);
+  res.setHeader("Content-type", mimetype);
+
+  res.status(200).send(result);
 });
 
 /**
