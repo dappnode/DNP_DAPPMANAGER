@@ -44,8 +44,7 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
       // Domain map
       fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
       // UI stats
-      newFeatureIds: getNewFeatureIds(),
-      isFirstTimeRunning: db.isFirstTimeRunning.get()
+      newFeatureIds: getNewFeatureIds()
     }
   };
 }

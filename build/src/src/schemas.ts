@@ -466,6 +466,5 @@ export const systemInfoSample: SystemInfo = {
   // Domain map
   fullnodeDomainTarget: "geth.dnp.dappnode.eth",
   // UI
-  newFeatureIds: ["repository"],
-  isFirstTimeRunning: true
+  newFeatureIds: ["repository"]
 };

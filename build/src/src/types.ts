@@ -776,7 +776,6 @@ export interface SystemInfo {
   fullnodeDomainTarget: string;
   // UI stats
   newFeatureIds: NewFeatureId[];
-  isFirstTimeRunning: boolean;
 }
 
 /**
