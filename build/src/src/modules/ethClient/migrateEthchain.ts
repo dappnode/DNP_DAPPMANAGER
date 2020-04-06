@@ -130,9 +130,4 @@ export async function migrateEthchain(): Promise<void> {
       environment: EXTRA_OPTS ? { EXTRA_OPTS } : undefined
     });
   }
-
-  // Automatically activate fallback?
-  if (ethchain || volumeMigrations.length > 0) {
-    db.ethClientFallback.set("on");
-  }
 }
