@@ -3,6 +3,7 @@ import { expect } from "chai";
 
 import { parseEthereumState } from "../../../src/watchers/chains/drivers/ethereum";
 import { ChainDataResult } from "../../../src/watchers/chains/types";
+import { parseEthersSyncing } from "../../../src/watchers/chains/utils";
 
 describe("Watchers > chains > ethereum", () => {
   describe("parseEthereumState", () => {
@@ -25,7 +26,10 @@ describe("Watchers > chains > ethereum", () => {
         progress: 0.9707641196013289
       };
 
-      const chainData = parseEthereumState(syncing, blockNumber);
+      const chainData = parseEthereumState(
+        parseEthersSyncing(syncing),
+        blockNumber
+      );
 
       expect(chainData).to.deep.equal(expecteChainData);
     });
@@ -48,7 +52,10 @@ describe("Watchers > chains > ethereum", () => {
         progress: 0.9930280130689418
       };
 
-      const chainData = parseEthereumState(syncing, blockNumber);
+      const chainData = parseEthereumState(
+        parseEthersSyncing(syncing),
+        blockNumber
+      );
 
       expect(chainData).to.deep.equal(expecteChainData);
     });

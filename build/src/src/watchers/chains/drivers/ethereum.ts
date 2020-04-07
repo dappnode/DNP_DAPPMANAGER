@@ -1,39 +1,10 @@
 import { ethers } from "ethers";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import { ChainDataResult } from "../types";
+import { EthSyncing, parseEthersSyncing, safeProgress } from "../utils";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
-
-type EthSyncingReturn =
-  | false
-  | {
-      currentBlock: string; // "0x0";
-      highestBlock: string; // "0x8a61c8";
-      startingBlock: string; // "0x0";
-      // Geth sync
-      knownStates?: string | null; // "0x1266";
-      pulledStates?: string | null; // "0x115";
-      // Open Ethereum sync
-      warpChunksAmount?: string | null; // "0x1266";
-      warpChunksProcessed?: string | null; // "0x115";
-    };
-
-// Current versions of parseInt are able to recognize hex numbers
-// and automatically use a radix parameter of 16.
-function parseHexOrDecimal(hexOrDecimal: string | number): number {
-  return parseInt(String(hexOrDecimal));
-}
-
-/**
- * Make sure progress is a valid number, otherwise API typechecking will error since
- * a NaN value may be converted to null
- */
-function safeProgress(progress: number): number | undefined {
-  if (typeof progress !== "number" || isNaN(progress) || !isFinite(progress))
-    return undefined;
-  else return progress;
-}
 
 /**
  * Returns a chain data object for an [ethereum] API
@@ -52,7 +23,7 @@ function safeProgress(progress: number): number | undefined {
 export default async function ethereum(api: string): Promise<ChainDataResult> {
   const provider = new ethers.providers.JsonRpcProvider(api);
   const [syncing, blockNumber] = await Promise.all([
-    provider.send("eth_syncing", []) as Promise<EthSyncingReturn>,
+    provider.send("eth_syncing", []).then(parseEthersSyncing),
     provider.getBlockNumber()
   ]);
 
@@ -64,15 +35,24 @@ export default async function ethereum(api: string): Promise<ChainDataResult> {
  * Isolated in a pure function for testability
  */
 export function parseEthereumState(
-  syncing: EthSyncingReturn,
+  syncing: EthSyncing,
   blockNumber: number
 ): ChainDataResult {
   if (syncing) {
-    const currentBlock = parseHexOrDecimal(syncing.currentBlock);
-    const highestBlock = parseHexOrDecimal(syncing.highestBlock);
-
+    const {
+      // Generic syncing response
+      currentBlock,
+      highestBlock,
+      // Geth variables
+      pulledStates,
+      knownStates,
+      // Open Ethereum variables
+      warpChunksProcessed,
+      warpChunksAmount
+    } = syncing;
     // Syncing but very close
-    if (highestBlock - currentBlock < MIN_BLOCK_DIFF_SYNC)
+    const currentBlockDiff = highestBlock - currentBlock;
+    if (currentBlockDiff < MIN_BLOCK_DIFF_SYNC)
       return {
         syncing: false,
         error: false,
@@ -80,22 +60,14 @@ export function parseEthereumState(
       };
 
     // Geth sync with states
-    if (
-      (typeof syncing.knownStates === "string" ||
-        typeof syncing.knownStates === "number") &&
-      (typeof syncing.pulledStates === "string" ||
-        typeof syncing.pulledStates === "number")
-    ) {
-      const currentState = parseHexOrDecimal(syncing.knownStates);
-      const highestState = parseHexOrDecimal(syncing.pulledStates);
-
+    if (typeof pulledStates === "number" && typeof knownStates === "number") {
       return {
         syncing: true,
         error: false,
         // Render multiline status in the UI
         message: [
           `Blocks synced: ${currentBlock} / ${highestBlock}`,
-          `States synced: ${currentState} / ${highestState}`
+          `States synced: ${pulledStates} / ${knownStates}`
         ].join("\n\n"),
         help: gethSyncHelpUrl
       };
@@ -103,19 +75,14 @@ export function parseEthereumState(
 
     // Open Ethereum sync
     if (
-      (typeof syncing.warpChunksAmount === "string" ||
-        typeof syncing.warpChunksAmount === "number") &&
-      (typeof syncing.warpChunksProcessed === "string" ||
-        typeof syncing.warpChunksProcessed === "number")
+      typeof warpChunksProcessed === "number" &&
+      typeof warpChunksAmount === "number"
     ) {
-      const currentChunk = parseHexOrDecimal(syncing.warpChunksProcessed);
-      const highestChunk = parseHexOrDecimal(syncing.warpChunksAmount);
-
       return {
         syncing: true,
         error: false,
-        message: `Syncing snapshot: ${currentChunk} / ${highestChunk}`,
-        progress: safeProgress(currentChunk / highestChunk)
+        message: `Syncing snapshot: ${warpChunksProcessed} / ${warpChunksAmount}`,
+        progress: safeProgress(warpChunksProcessed / warpChunksAmount)
       };
     }
 

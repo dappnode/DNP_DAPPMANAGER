@@ -4,8 +4,16 @@ import { getClientData } from "./clientParams";
 import { EthClientTarget, EthClientStatus } from "../../types";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { serializeError } from "./types";
+import { parseEthersSyncing } from "../../watchers/chains/utils";
 
-class StateNotSyncedError extends Error {}
+/**
+ * Minimum block difference to consider a local ethereum mainnet node synced
+ * if  highestBlock = 1000005
+ * and currentBlock = 1000000
+ * and minDiff = 50
+ * The node will be considered synced
+ */
+const MIN_ETH_BLOCK_DIFF_SYNC = 60;
 
 /**
  * Goal:
@@ -38,69 +46,64 @@ export async function getClientStatus(
   try {
     try {
       // Provider API works? Do a single test call to check state
-      if (await isApmStateCorrect(url)) {
-        // All okay!
-        return { ok: true, url, name };
+      if (await isSyncing(url)) {
+        return { ok: false, code: "IS_SYNCING" };
       } else {
-        // Throw a known error to run an eth_syncing call to make sure the node is syncing
-        throw new StateNotSyncedError();
-      }
-    } catch (eFromTestCall) {
-      try {
-        if (await isSyncing(url)) {
-          return { ok: false, code: "IS_SYNCING" };
-        } else {
-          if (eFromTestCall instanceof StateNotSyncedError) {
+        try {
+          if (await isApmStateCorrect(url)) {
+            // All okay!
+            return { ok: true, url, name };
+          } else {
             // State is not correct, node is not synced but eth_syncing did not picked it up
             return { ok: false, code: "STATE_NOT_SYNCED" };
-          } else {
-            // APM state call failed, syncing call succeeded and is not working
-            // = Likely an error related to fetching state content
-            return {
-              ok: false,
-              code: "STATE_CALL_ERROR",
-              error: serializeError(eFromTestCall)
-            };
           }
+        } catch (eFromTestCall) {
+          // APM state call failed, syncing call succeeded and is not working
+          // = Likely an error related to fetching state content
+          return {
+            ok: false,
+            code: "STATE_CALL_ERROR",
+            error: serializeError(eFromTestCall)
+          };
         }
-      } catch (eFromSyncing) {
-        // syncing call failed, the node is not available, find out why
-        const dnp = await listContainerNoThrow(name);
-        if (dnp) {
-          // DNP is installed
-          if (dnp.running) {
-            // syncing call failed, but the client is running
-            // ???, a connection error?
-            return {
-              ok: false,
-              code: "NOT_AVAILABLE",
-              error: serializeError(eFromSyncing)
-            };
-          } else {
-            return { ok: false, code: "NOT_RUNNING" };
+      }
+    } catch (eFromSyncing) {
+      // syncing call failed, the node is not available, find out why
+      const dnp = await listContainerNoThrow(name);
+      if (dnp) {
+        // DNP is installed
+        if (dnp.running) {
+          // syncing call failed, but the client is running
+          // ???, a connection error?
+          return {
+            ok: false,
+            code: "NOT_AVAILABLE",
+            error: serializeError(eFromSyncing)
+          };
+        } else {
+          return { ok: false, code: "NOT_RUNNING" };
+        }
+      } else {
+        // DNP is not installed, figure out why
+        const installStatus = db.ethClientInstallStatus.get(target);
+        if (installStatus) {
+          switch (installStatus.status) {
+            case "TO_INSTALL":
+            case "INSTALLING":
+              return { ok: false, code: "INSTALLING" };
+            case "INSTALLING_ERROR":
+              return {
+                ok: false,
+                code: "INSTALLING_ERROR",
+                error: installStatus.error
+              };
+            case "INSTALLED":
+              return { ok: false, code: "UNINSTALLED" };
+            case "UNINSTALLED":
+              return { ok: false, code: "NOT_INSTALLED" };
           }
         } else {
-          // DNP is not installed, figure out why
-          const installStatus = db.ethClientInstallStatus.get(target);
-          if (installStatus) {
-            switch (installStatus.status) {
-              case "TO_INSTALL":
-              case "INSTALLING":
-                return { ok: false, code: "INSTALLING" };
-              case "INSTALLING_ERROR":
-                return {
-                  ok: false,
-                  code: "INSTALLING_ERROR",
-                  error: installStatus.error
-                };
-              case "INSTALLED":
-                return { ok: false, code: "UNINSTALLED" };
-              case "UNINSTALLED":
-                return { ok: false, code: "NOT_INSTALLED" };
-            }
-          } else {
-            return { ok: false, code: "NOT_INSTALLED" };
-          }
+          return { ok: false, code: "NOT_INSTALLED" };
         }
       }
     }
@@ -115,15 +118,17 @@ export async function getClientStatus(
  */
 async function isSyncing(url: string): Promise<boolean> {
   const provider = new ethers.providers.JsonRpcProvider(url);
-  const syncing = await provider.send("eth_syncing", []);
-  if (syncing) return true;
+  const syncing = await provider
+    .send("eth_syncing", [])
+    .then(parseEthersSyncing);
 
-  // ### Todo: Make sure check below is necessary
-  // Just when starting the client might think it's synced to block #0
-  // const currentBlock = await provider.getBlockNumber();
-  // if (currentBlock === 0) return true;
+  if (!syncing) return false;
 
-  return false;
+  // The bigger the far from synced
+  const currentBlockDiff = syncing.highestBlock - syncing.currentBlock;
+  // If block diff is small, consider it already synced
+  if (currentBlockDiff < MIN_ETH_BLOCK_DIFF_SYNC) return false;
+  else return true;
 }
 
 /**
