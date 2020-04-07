@@ -61,19 +61,21 @@ export const chainsDataSchema = {
   items: {
     type: "object",
     properties: {
+      dnpName: { type: "string" },
       name: { type: "string" },
       syncing: { type: "boolean" },
       error: { type: "boolean" },
       message: { type: "string" },
       progress: { type: "number" }
     },
-    required: ["name", "message"]
+    required: ["dnpName", "message"]
   }
 };
 
 export const chainsDataSample: ChainData[] = [
   {
-    name: "chain",
+    dnpName: "geth.dnp.dappnode.eth",
+    name: "Geth (light client)",
     syncing: true,
     error: false,
     message: "Block 4/8",

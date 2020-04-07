@@ -1,5 +1,5 @@
 const Daemon = require("monero-rpc").Daemon;
-import { ChainData } from "../../types";
+import { ChainDataResult } from "../types";
 
 // Monero's average block time is 2 minutes
 
@@ -37,9 +37,8 @@ interface MoneroRpcGetInfoResult {
 
 /**
  * Returns a chain data object for an [monero] API
- * @param {string} name = "Monero"
- * @param {string} api = "http://my.monero.dnp.dappnode.eth:18081"
- * @returns {object}
+ * @param api = "http://my.monero.dnp.dappnode.eth:18081"
+ * @returns
  * - On success: {
  *   syncing: true, {bool}
  *   message: "Blocks synced: 543000 / 654000", {string}
@@ -50,10 +49,7 @@ interface MoneroRpcGetInfoResult {
  *   error: true {bool},
  * }
  */
-export default async function monero(
-  name: string,
-  api: string
-): Promise<ChainData> {
+export default async function monero(api: string): Promise<ChainDataResult> {
   const info: MoneroRpcGetInfoResult = await new Promise(
     (resolve, reject): void => {
       const daemon = new Daemon(api);
@@ -68,7 +64,6 @@ export default async function monero(
   const currentBlock = info.height;
   if (highestBlock - currentBlock > MIN_BLOCK_DIFF_SYNC) {
     return {
-      name,
       syncing: true,
       error: false,
       message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
@@ -76,7 +71,6 @@ export default async function monero(
     };
   } else {
     return {
-      name,
       syncing: false,
       error: false,
       message: `Synced #${currentBlock}`

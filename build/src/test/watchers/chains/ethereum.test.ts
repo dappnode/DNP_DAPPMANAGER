@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 
-import { parseEthereumState } from "../../../src/watchers/chains/ethereum";
-import { ChainData } from "../../../src/types";
+import { parseEthereumState } from "../../../src/watchers/chains/drivers/ethereum";
+import { ChainDataResult } from "../../../src/watchers/chains/types";
 
 describe("Watchers > chains > ethereum", () => {
   describe("parseEthereumState", () => {
@@ -18,7 +18,7 @@ describe("Watchers > chains > ethereum", () => {
       };
       const blockNumber = 0;
 
-      const expecteChainData: Omit<ChainData, "name"> = {
+      const expecteChainData: ChainDataResult = {
         syncing: true,
         error: false,
         message: "Syncing snapshot: 4383 / 4515",
@@ -41,7 +41,7 @@ describe("Watchers > chains > ethereum", () => {
 
       const blockNumber = 0;
 
-      const expecteChainData: Omit<ChainData, "name"> = {
+      const expecteChainData: ChainDataResult = {
         syncing: true,
         error: false,
         message: "Blocks synced: 9730183 / 9798498",

@@ -1,7 +1,7 @@
 const Client = require("bitcoin-core");
-import shell from "../../utils/shell";
-import params from "../../params";
-import { ChainData } from "../../types";
+import shell from "../../../utils/shell";
+import params from "../../../params";
+import { ChainDataResult } from "../types";
 
 const getMinBlockDiffSync = (api: string): number =>
   // minTimeDiff = 30 min
@@ -25,9 +25,8 @@ const cache: {
 
 /**
  * Returns a chain data object for a [bitcoin] API
- * @param {string} name = "Bitcoin"
- * @param {string} api = "my.bitcoin.dnp.dappnode.eth"
- * @returns {object}
+ * @param api = "my.bitcoin.dnp.dappnode.eth"
+ * @returns
  * - On success: {
  *   syncing: true, {bool}
  *   message: "Blocks synced: 543000 / 654000", {string}
@@ -38,10 +37,7 @@ const cache: {
  *   error: true {bool},
  * }
  */
-export default async function bitcoin(
-  name: string,
-  api: string
-): Promise<ChainData> {
+export default async function bitcoin(api: string): Promise<ChainDataResult> {
   // To initialize the bitcoin client, the RPC user and password are necessary
   // They are stored in the package envs
   const containerName = getContainerNameFromApi(api);
@@ -69,7 +65,6 @@ export default async function bitcoin(
 
   if (blockDiffAprox > getMinBlockDiffSync(api))
     return {
-      name,
       syncing: true,
       error: false,
       message: `Blocks synced: ${blockIndex} / ${blockDiffAprox + blockIndex}`,
@@ -77,7 +72,6 @@ export default async function bitcoin(
     };
   else
     return {
-      name,
       syncing: false,
       error: false,
       message: `Synced #${blockIndex}`

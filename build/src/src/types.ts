@@ -210,6 +210,8 @@ export type ContainerStatus =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
+export type ChainDriver = "bitcoin" | "ethereum" | "monero";
+
 export interface PackageContainer {
   id: string;
   packageName: string;
@@ -233,7 +235,7 @@ export interface PackageContainer {
   dependencies: Dependencies;
   avatarUrl: string;
   origin?: string;
-  chain?: string;
+  chain?: ChainDriver;
   domainAlias?: string[];
   canBeFullnode?: boolean;
   // ### TODO: Move to a different type "InstalledDnpDetail"
@@ -420,10 +422,12 @@ export interface DirectoryDnp {
 }
 
 export interface ChainData {
-  name: string; // Ethereum
+  dnpName: string; // "geth.dnp.dappnode.eth"
+  name?: string; // Optional pretty name: "Geth (light client)"
   syncing: boolean; // if chain is syncing
   error: boolean; // If there was an error retrieving state
   message: string; // "Blocks synced: 543000 / 654000"
+  help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
 }
 

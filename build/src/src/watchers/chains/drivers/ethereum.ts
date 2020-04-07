@@ -1,7 +1,6 @@
-// #### NOTE: Typedefinitions of web3.eth.isSyncing() are not correct, using require to ignore them
 import { ethers } from "ethers";
-import { ChainData } from "../../types";
-import { whyDoesGethTakesSoMuchToSync } from "../../externalLinks";
+import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
+import { ChainDataResult } from "../types";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
@@ -38,7 +37,6 @@ function safeProgress(progress: number): number | undefined {
 
 /**
  * Returns a chain data object for an [ethereum] API
- * @param name = "Geth"
  * @param api = "http://geth.dappnode:8545"
  * @returns
  * - On success: {
@@ -51,20 +49,14 @@ function safeProgress(progress: number): number | undefined {
  *   error: true {bool},
  * }
  */
-export default async function ethereum(
-  name: string,
-  api: string
-): Promise<ChainData> {
+export default async function ethereum(api: string): Promise<ChainDataResult> {
   const provider = new ethers.providers.JsonRpcProvider(api);
   const [syncing, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []) as Promise<EthSyncingReturn>,
     provider.getBlockNumber()
   ]);
 
-  return {
-    name,
-    ...parseEthereumState(syncing, blockNumber)
-  };
+  return parseEthereumState(syncing, blockNumber);
 }
 
 /**
@@ -74,7 +66,7 @@ export default async function ethereum(
 export function parseEthereumState(
   syncing: EthSyncingReturn,
   blockNumber: number
-): Omit<ChainData, "name"> {
+): ChainDataResult {
   if (syncing) {
     const currentBlock = parseHexOrDecimal(syncing.currentBlock);
     const highestBlock = parseHexOrDecimal(syncing.highestBlock);
@@ -103,9 +95,9 @@ export function parseEthereumState(
         // Render multiline status in the UI
         message: [
           `Blocks synced: ${currentBlock} / ${highestBlock}`,
-          `States synced: ${currentState} / ${highestState}`,
-          `[What does this mean?](${gethSyncHelpUrl})`
-        ].join("\n\n")
+          `States synced: ${currentState} / ${highestState}`
+        ].join("\n\n"),
+        help: gethSyncHelpUrl
       };
     }
 
@@ -135,10 +127,20 @@ export function parseEthereumState(
       progress: safeProgress(currentBlock / highestBlock)
     };
   } else {
-    return {
-      syncing: false,
-      error: false,
-      message: "Synced #" + blockNumber
-    };
+    if (!blockNumber || blockNumber === 0) {
+      // Some nodes on start may think they are synced at block 0 before discovering blocks
+      return {
+        syncing: true,
+        error: false,
+        message: `Syncing...`,
+        progress: 0
+      };
+    } else {
+      return {
+        syncing: false,
+        error: false,
+        message: "Synced #" + blockNumber
+      };
+    }
   }
 }

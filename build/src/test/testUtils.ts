@@ -80,7 +80,6 @@ export const mockDnp: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  chain: "",
   avatarUrl: ""
 };
 

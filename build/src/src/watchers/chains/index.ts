@@ -1,14 +1,12 @@
 import * as eventBus from "../../eventBus";
 import { listContainers } from "../../modules/docker/listContainers";
-import { shortNameCapitalized } from "../../utils/strings";
 import params from "../../params";
 import { ChainData } from "../../types";
-import { supportedProviders, Chain } from "./supportedProviders";
+import { knownChains } from "./knownChains";
 // Drivers
-import ethereum from "./ethereum";
-import bitcoin from "./bitcoin";
-import monero from "./monero";
+import runDriver, { getDriverApi } from "./drivers";
 import Logs from "../../logs";
+import { Chain } from "./types";
 const logs = Logs(module);
 
 const checkChainWatcherInterval =
@@ -16,28 +14,9 @@ const checkChainWatcherInterval =
 const emitChainDataWatcherInterval =
   params.EMIT_CHAIN_DATA_WATCHER_INTERVAL || 5 * 1000; // 5 seconds
 
-const drivers: {
-  [driverName: string]: (name: string, api: string) => Promise<ChainData>;
-} = {
-  ethereum,
-  bitcoin,
-  monero
-};
-
 // This module contains watchers to the different active chains
 // It will only emit chain information when at least one ADMIN UI is active
 // Every time there is a package install / remove, the watchers will be reseted
-
-const getDriveApi: {
-  [driverName: string]: (dnpName: string) => string;
-} = {
-  // 'http://my.ropsten.dnp.dappnode.eth:8545'
-  ethereum: (dnpName: string) => `http://my.${dnpName}:8545`,
-  // 'my.bitcoin.dnp.dappnode.eth'
-  bitcoin: (dnpName: string) => `my.${dnpName}`,
-  // 'http://my.monero.dnp.dappnode.eth:18081'
-  monero: (dnpName: string) => `http://my.${dnpName}:18081`
-};
 
 const activeChains: { [chainName: string]: Chain } = {};
 
@@ -49,47 +28,33 @@ const activeChains: { [chainName: string]: Chain } = {};
  * fetch data from those only
  */
 
-function addChain(dnpName: string, driverName?: string): void {
-  if (driverName && getDriveApi[driverName]) {
-    activeChains[dnpName] = {
-      name: shortNameCapitalized(dnpName),
-      driverName,
-      api: getDriveApi[driverName](dnpName)
-    };
-  } else {
-    activeChains[dnpName] = supportedProviders[dnpName];
-  }
-}
-
-function removeChain(dnpName: string): void {
-  delete activeChains[dnpName];
-}
-
 async function checkChainWatchers(): Promise<void> {
   try {
     const dnpList = await listContainers();
+
     // Remove chains
     for (const dnpName of Object.keys(activeChains)) {
       // If a chain is being watched but is not in the current dnpList
       if (!dnpList.find(dnp => dnp.name === dnpName)) {
-        removeChain(dnpName);
+        delete activeChains[dnpName];
       }
     }
+
     // Add new chains
     for (const dnp of dnpList) {
-      // If this dnp is a supported chain, and not currently watched
-      if (dnp.chain && !activeChains[dnp.name]) {
-        if (drivers[dnp.chain]) {
-          addChain(dnp.name, dnp.chain);
+      if (!activeChains[dnp.name]) {
+        if (dnp.chain) {
+          const apiUrl = getDriverApi(dnp.chain, dnp.name);
+          if (apiUrl)
+            activeChains[dnp.name] = {
+              dnpName: dnp.name,
+              driverName: dnp.chain,
+              api: apiUrl
+            };
         } else {
-          logs.warn(
-            `DNP ${dnp.name} is requesting an unsupported chain driver: ${
-              dnp.chain
-            }`
-          );
+          const knownChain = knownChains[dnp.name];
+          if (knownChain) activeChains[dnp.name] = knownChain;
         }
-      } else if (supportedProviders[dnp.name] && !activeChains[dnp.name]) {
-        addChain(dnp.name);
       }
     }
   } catch (e) {
@@ -115,47 +80,51 @@ eventBus.packagesModified.on(() => {
  * and emits the data to the UI
  */
 
-interface ChainCacheInterface {
-  active: boolean;
-  lastResult: ChainData;
-}
-const cache: {
-  [chainId: string]: ChainCacheInterface;
-} = {};
 async function getAndEmitChainData(): Promise<void> {
   const dnpList = await listContainers();
-  const chainData = await Promise.all(
-    Object.keys(activeChains)
-      .filter(dnpName => {
-        const dnp = dnpList.find(_dnp => _dnp.name === dnpName);
-        return dnp && dnp.running;
-      })
-      .map(async dnpName => {
-        const { name, api, driverName } = activeChains[dnpName];
-        if (!cache[api]) cache[api] = {} as ChainCacheInterface;
-        // Return last result if previous call is still active
-        if (cache[api].active) return cache[api].lastResult;
-        // Otherwise raise active flag and perform the request
-        cache[api].active = true;
 
-        // Chain .ts file call
-        const result: ChainData = await drivers[driverName](name, api).catch(
-          (e: Error) => {
-            logs.warn(`Error on chain ${name} watcher: ${e.stack}`);
-            return {
-              name,
-              syncing: false,
-              error: true,
-              message: e.message
-            };
-          }
-        );
-        cache[api].active = false;
-        cache[api].lastResult = result;
-        return result;
-      })
+  const chainsToCall: Chain[] = [];
+  for (const [dnpName, chain] of Object.entries(activeChains)) {
+    const dnp = dnpList.find(_dnp => _dnp.name === dnpName);
+    if (dnp && dnp.running) chainsToCall.push(chain);
+  }
+
+  const chainData = await Promise.all(
+    chainsToCall.map(
+      async (chain): Promise<ChainData> => {
+        const { dnpName } = chain;
+        try {
+          const chainDataResult = await runDriver(chain);
+          return {
+            dnpName,
+            ...chainDataResult
+          };
+        } catch (e) {
+          logs.warn(`Error on chain ${chain.dnpName} watcher: ${e.stack}`);
+          return {
+            dnpName,
+            syncing: false,
+            error: true,
+            message: parseChainErrors(e)
+          };
+        }
+      }
+    )
   );
   eventBus.chainData.emit(chainData);
+}
+
+/**
+ * Reword expected chain errors
+ */
+function parseChainErrors(error: Error): string {
+  if (error.message.includes("ECONNREFUSED"))
+    return `DAppNode Package stopped or unreachable (connection refused)`;
+
+  if (error.message.includes("Invalid JSON RPC response"))
+    return `DAppNode Package stopped or unreachable (invalid response)`;
+
+  return error.message;
 }
 
 // When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL

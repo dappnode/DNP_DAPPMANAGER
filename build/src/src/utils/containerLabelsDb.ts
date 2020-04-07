@@ -1,4 +1,4 @@
-import { Dependencies } from "../types";
+import { Dependencies, ChainDriver } from "../types";
 
 interface ContainerLabels {
   [labelId: string]: string;
@@ -103,7 +103,7 @@ export function readMetadataFromLabels(
 ): {
   dependencies: Dependencies;
   avatar: string;
-  chain: string;
+  chain: ChainDriver;
   origin?: string;
   isCore: boolean;
   domainAlias?: string[];
@@ -111,7 +111,7 @@ export function readMetadataFromLabels(
   return {
     dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
     avatar: labels[avatarId] || "",
-    chain: labels[chainId] || "",
+    chain: (labels[chainId] as ChainDriver) || undefined,
     origin: labels[originId] || undefined,
     isCore: labels[isCoreId] === "true" ? true : false,
     domainAlias: labels[domainAliasId]

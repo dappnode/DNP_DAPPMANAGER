@@ -1,4 +1,5 @@
 import async from "async";
+import memoize from "memoizee";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -62,43 +63,21 @@ export function runOnlyOneSequentially<A, R>(
  *
  * @param fn Target function (Callback style)
  */
-export function runOnlyOneReturnToAll<R>(
-  fn: () => Promise<R>
-): () => Promise<R> {
-  // This variables act as a class constructor
-  let isRunning = false;
-  let waitingPromises: {
-    resolve: (res: R) => void;
-    reject: (err: Error) => void;
-  }[] = [];
-
-  return function throttledFunction(): Promise<R> {
-    return new Promise(
-      (resolve, reject): void => {
-        waitingPromises.push({ resolve, reject });
-        if (!isRunning) {
-          isRunning = true;
-          fn()
-            .then(
-              res =>
-                waitingPromises.forEach(waitingPromise => {
-                  waitingPromise.resolve(res);
-                }),
-              (err: Error) =>
-                waitingPromises.forEach(waitingPromise => {
-                  waitingPromise.reject(err);
-                })
-            )
-            .then(() => {
-              isRunning = false;
-              waitingPromises = [];
-            });
-        }
-      }
-    );
-  };
+export function runOnlyOneReturnToAll<F extends Function>(f: F): F {
+  return memoize(f, {
+    // Wait for Promises to resolve. Do not cache rejections
+    promise: true,
+    // Return the computed cached result to only waiting calls while the
+    // result if being computed. Right as it is resolved, compute it again
+    maxAge: 1
+  });
 }
 
+/**
+ * Retry execution n times until success or n errors
+ * @param apiMethod
+ * @param params
+ */
 export function runWithRetry<A, R>(
   apiMethod: (arg: A) => Promise<R>,
   params?: { times?: number; base?: number }

@@ -60,7 +60,7 @@ describe("listContainers", function() {
         },
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -138,7 +138,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -172,7 +172,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -201,7 +201,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -247,7 +247,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -321,7 +321,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -363,7 +363,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -403,7 +403,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -564,7 +564,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -588,7 +588,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -634,7 +634,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -692,7 +692,7 @@ describe("listContainers", function() {
         },
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -726,7 +726,7 @@ describe("listContainers", function() {
         avatarUrl: "",
         canBeFullnode: false,
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -832,7 +832,7 @@ describe("listContainers", function() {
         },
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -867,7 +867,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false,
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
