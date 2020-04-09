@@ -12,6 +12,10 @@ import {
 import { packageIsInstalling } from "../../utils/packageIsInstalling";
 import Logs from "../../logs";
 import { EthClientTarget } from "../../types";
+import {
+  EthProviderError,
+  getLocalFallbackContentHash
+} from "../../modules/ethClient";
 const logs = Logs(module);
 
 // Enforces that the default value of status is correct
@@ -65,9 +69,11 @@ export async function runEthClientInstaller(
       case "TO_INSTALL":
       case "INSTALLING_ERROR":
         // OK: Expected state, run / retry installation
+
         try {
           db.ethClientInstallStatus.set(target, { status: "INSTALLING" });
-          await installPackage({
+
+          const installOptions = {
             name,
             version,
             userSettings: {
@@ -77,7 +83,24 @@ export async function runEthClientInstaller(
                 db.ethClientUserSettings.get(target) || {}
               )
             }
-          });
+          };
+
+          try {
+            await installPackage(installOptions);
+          } catch (e) {
+            // When installing DAppNode for the first time, if the user selects a
+            // non-remote target and disabled fallback, there must be a way to
+            // install the client package without access to an Eth node. This try / catch
+            // covers this case by re-trying the installation with a locally available
+            // IPFS content hash for all target packages
+            if (e instanceof EthProviderError) {
+              const contentHash = getLocalFallbackContentHash(name);
+              if (!contentHash) throw Error(`No local version for ${name}`);
+              await installPackage({ ...installOptions, version: contentHash });
+            } else {
+              throw e;
+            }
+          }
 
           // Map fullnode.dappnode to package
           db.fullnodeDomainTarget.set(name);
