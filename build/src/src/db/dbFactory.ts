@@ -5,13 +5,6 @@ import { formatKey } from "./dbUtils";
 import Logs from "../logs";
 const logs = Logs(module);
 
-export interface Db {
-  get(key: string): any | null;
-  set(key: string, value: any): void;
-  remove(key: string): void;
-  clearDb(): void;
-}
-
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export default function dbFactory(dbPath: string) {
   // Define dbPath and make sure it exists (mkdir -p)

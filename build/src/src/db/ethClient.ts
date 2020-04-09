@@ -26,7 +26,7 @@ const _ethClientTarget = interceptOnSet(
 );
 export const ethClientTarget = {
   get: _ethClientTarget.get,
-  set: (newValue: EthClientTarget) => _ethClientTarget.set(newValue)
+  set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue)
 };
 
 export const ethClientFallback = interceptOnSet(
@@ -88,7 +88,9 @@ function interceptOnSet<F extends Function, T extends { set: F }>(
 ): T {
   return {
     ...dbSetter,
-    set: function(...args: any[]) {
+    // Arguments are not used, so their type is not relevant
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    set: function(...args: any[]): void {
       dbSetter.set(...args);
       eventBus.requestSystemInfo.emit();
     }

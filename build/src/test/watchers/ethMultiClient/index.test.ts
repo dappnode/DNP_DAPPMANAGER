@@ -105,7 +105,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     /**
      * Recreate the behaviour of the multi-client watcher
      */
-    async function runClientInstallerWatcher() {
+    async function runClientInstallerWatcher(): Promise<void> {
       const target = state.target;
       if (target && target !== "remote") {
         const nextStatus = await runEthClientInstaller(state.target);

@@ -42,8 +42,8 @@ export default memoize(runDriver, {
   // result if being computed. Right as it is resolved, compute it again
   maxAge: 100,
   // Stringify chain object
-  normalizer: (...args: any[]) => {
-    const chain: Chain = args[0];
+  normalizer: (args: [Chain]) => {
+    const chain = args[0];
     return chain.driverName + chain.api;
   }
 });

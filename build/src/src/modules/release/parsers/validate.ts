@@ -8,7 +8,10 @@ import manifestWithImageSchema from "./manifest-with-image.schema.json";
 
 const ajv = new Ajv({ allErrors: true });
 
-function getValidator<T>(schema: any, dataName?: string): (data: T) => T {
+function getValidator<T>(
+  schema: { title: string },
+  dataName?: string
+): (data: T) => T {
   const name = dataName || schema.title || "data";
   const validate = ajv.compile(schema);
   return (data: T): T => {

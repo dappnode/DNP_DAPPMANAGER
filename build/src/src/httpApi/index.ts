@@ -8,7 +8,6 @@ import * as calls from "../calls";
 import params from "../params";
 import * as db from "../db";
 import Logs from "../logs";
-import { logContainer } from "../modules/docker/dockerApi";
 const logs = Logs(module);
 
 const app = express();

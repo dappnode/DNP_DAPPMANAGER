@@ -1,4 +1,4 @@
-import { mapValues, pickBy } from "lodash";
+import { mapValues } from "lodash";
 
 /**
  * Ethereum driver utils
@@ -53,14 +53,16 @@ export function parseEthersSyncing(syncing: EthSyncingReturn): EthSyncing {
       case "number":
         return parseInt(String(hexValue));
       default:
-        return null;
+        return undefined;
     }
   });
 
-  return pickBy(
-    parsedSyncing,
-    parseValue => typeof parseValue === "number"
-  ) as any;
+  return {
+    ...parsedSyncing,
+    // To satisfy the compiler as it does not fully understand the switch above
+    currentBlock: parsedSyncing.currentBlock || 0,
+    highestBlock: parsedSyncing.highestBlock || 0
+  };
 }
 
 /**

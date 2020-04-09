@@ -6,7 +6,6 @@ import { dockerRm } from "../../modules/docker/dockerCommands";
 import { migrateVolume } from "../../modules/hostScripts";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
-import * as db from "../../db";
 import shell from "../../utils/shell";
 import Logs from "../../logs";
 const logs = Logs(module);

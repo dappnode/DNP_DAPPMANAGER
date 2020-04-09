@@ -132,14 +132,14 @@ export function pause(ms: number): Promise<void> {
  * @param msArray [1000, 2000, 3000]
  */
 export function setIntervalDynamic(
-  fn: (...args: any[]) => void,
+  fn: () => void | Promise<void>,
   msArray: number[]
 ): void {
   const msFinal = msArray[msArray.length - 1];
   if (typeof msFinal !== "number")
     throw Error(`msArray must have at least one element`);
 
-  function run() {
+  function run(): void {
     setTimeout(() => {
       fn();
       run();

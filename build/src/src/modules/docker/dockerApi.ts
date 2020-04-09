@@ -225,6 +225,7 @@ export async function logContainer(
   const container = dockerApi.getContainer(containerNameOrId);
   const res = await container.logs({ stdout: true, stderr: true, ...options });
   // Return is incorrectly typed as NodeJS.ReadableStream, but it's string
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const data: string = res as any;
   return data;
 }
