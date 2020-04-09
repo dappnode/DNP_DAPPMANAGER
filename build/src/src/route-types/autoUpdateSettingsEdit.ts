@@ -8,7 +8,7 @@ export type RequestData = {
 
 export type ReturnData = void;
 
-export const returnDataSchema = {
+export const requestDataSchema = {
   type: "object",
   properties: {
     id: { type: "string" },
