@@ -1,7 +1,6 @@
 import semver from "semver";
 import { listContainers } from "../../modules/docker/listContainers";
 import * as eventBus from "../../eventBus";
-import params from "../../params";
 import { ReleaseFetcher } from "../../modules/release";
 // Utils
 import computeSemverUpdateType from "../../utils/computeSemverUpdateType";
@@ -20,22 +19,19 @@ export default async function updateMyPackages(): Promise<void> {
   const releaseFetcher = new ReleaseFetcher();
   const dnpList = await listContainers();
 
-  const dnps = dnpList.filter(
-    dnp =>
-      dnp.name &&
+  for (const { name, isDnp, version: currentVersion } of dnpList) {
+    if (
+      name &&
       // Ignore core DNPs
-      dnp.isDnp &&
+      isDnp &&
       // Ignore wierd versions
-      semver.valid(dnp.version) &&
-      // MUST come from the APM
-      (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS)
-  );
-
-  for (const { name, version: currentVersion } of dnps) {
-    try {
-      await updateMyPackage(releaseFetcher, name, currentVersion);
-    } catch (e) {
-      logs.error(`Error auto-updating ${name}: ${e.stack}`);
+      semver.valid(currentVersion)
+    ) {
+      try {
+        await updateMyPackage(releaseFetcher, name, currentVersion);
+      } catch (e) {
+        logs.error(`Error auto-updating ${name}: ${e.stack}`);
+      }
     }
   }
 }
@@ -51,6 +47,11 @@ async function updateMyPackage(
 ): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
   if (!isDnpUpdateEnabled(name)) return;
+
+  // MUST exist an APM repo with the package name
+  // Check here instead of the if statement to be inside the try / catch
+  const repoExists = await releaseFetcher.repoExists(name);
+  if (!repoExists) return;
 
   const { version: latestVersion } = await releaseFetcher.fetchVersion(name);
 

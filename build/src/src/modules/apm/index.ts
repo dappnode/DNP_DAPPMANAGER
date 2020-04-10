@@ -3,6 +3,7 @@ import { getEthersProvider } from "../ethClient";
 import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata";
 import { fetchApmVersionsState } from "./fetchApmVersionsState";
 import { fetchVersion } from "./fetchVersion";
+import { repoExists } from "./repoExists";
 import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types";
 
 export class Apm {
@@ -44,5 +45,13 @@ export class Apm {
     fromBlock?: number
   ): Promise<ApmVersionMetadata[]> {
     return fetchApmVersionsMetadata(await this.getProvider(), name, fromBlock);
+  }
+
+  /**
+   * Returns true if an APM repo exists for a package name
+   * @param name "bitcoin.dnp.dappnode.eth"
+   */
+  async repoExists(name: string): Promise<boolean> {
+    return repoExists(await this.getProvider(), name);
   }
 }
