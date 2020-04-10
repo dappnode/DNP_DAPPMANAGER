@@ -37,11 +37,11 @@ const docker = import 'modules/docker'
 ```
 
 ```javascript
-const DOCKERCOMPOSE_PATH = 'DNCORE/docker-compose-admin.yml'
+const DOCKERCOMPOSE_PATH = "DNCORE/docker-compose-admin.yml";
 const options = {
-    timeout: 0
-}
-await docker.compose.down(DOCKERCOMPOSE_PATH, options)
+  timeout: 0
+};
+await docker.compose.down(DOCKERCOMPOSE_PATH, options);
 ```
 
 ## Implementation

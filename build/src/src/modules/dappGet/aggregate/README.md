@@ -5,7 +5,7 @@ Aggregates all relevant packages and their info given a specific request. The re
 ## Usage
 
 ```javascript
-const dnps = await aggregate(req)
+const dnps = await aggregate(req);
 ```
 
 ### Arguments
