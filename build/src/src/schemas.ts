@@ -12,7 +12,8 @@ import {
   VolumeData,
   SystemInfo,
   HostStats,
-  Diagnose
+  Diagnose,
+  PackageVersionData
 } from "./types";
 
 /**
@@ -415,9 +416,26 @@ export const userActionLogsSample: UserActionLog = {
  * System info
  */
 
+export const packageVersionDataSchema = {
+  type: "object",
+  properties: {
+    branch: { type: "string" },
+    commit: { type: "string" },
+    version: { type: "string" }
+  },
+  required: []
+};
+
+export const packageVersionDataSample: PackageVersionData = {
+  branch: "master",
+  commit: "153123",
+  version: "0.2.0"
+};
+
 export const systemInfoSchema = {
   type: "object",
   properties: {
+    versionData: packageVersionDataSchema,
     ip: { type: "string" },
     name: { type: "string" },
     staticIp: { type: "string" },
@@ -440,11 +458,7 @@ export const systemInfoSchema = {
 
 export const systemInfoSample: SystemInfo = {
   // Git version data
-  versionData: {
-    branch: "master",
-    commit: "153123",
-    version: "0.2.0"
-  },
+  versionData: packageVersionDataSample,
   // Network params
   ip: "85.84.83.82",
   name: "My-DAppNode",

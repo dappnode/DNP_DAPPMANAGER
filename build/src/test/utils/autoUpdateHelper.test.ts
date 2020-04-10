@@ -485,7 +485,7 @@ describe("Util: autoUpdateHelper", () => {
         { name: "admin", version: "0.2.2" },
         { name: "core", version: "0.2.2" }
       ]);
-      const microDelay = 5;
+      const microDelay = 20;
 
       expect(
         getCoreFeedbackMessage({
