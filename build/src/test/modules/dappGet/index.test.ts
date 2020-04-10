@@ -7,6 +7,7 @@ import dappGetType from "../../../src/modules/dappGet";
 import { PackageContainer } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import { DappGetDnps } from "../../../src/modules/dappGet/types";
+import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
 
 /* eslint-disable max-len */
 
@@ -87,10 +88,16 @@ describe("dappGet", function() {
   });
 
   it("Should add packages to the alreadyUpdated object", async () => {
-    const { state, alreadyUpdated } = await dappGet({
-      name: "nginx-proxy.dnp.dappnode.eth",
-      ver: "^0.1.0"
-    });
+    const dappGetOptions = {};
+    const dappGetFetcher = new DappGetFetcher();
+    const { state, alreadyUpdated } = await dappGet(
+      {
+        name: "nginx-proxy.dnp.dappnode.eth",
+        ver: "^0.1.0"
+      },
+      dappGetOptions,
+      dappGetFetcher
+    );
 
     expect(state).to.deep.equal({
       "nginx-proxy.dnp.dappnode.eth": "0.0.4"

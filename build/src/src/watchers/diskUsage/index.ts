@@ -12,7 +12,7 @@ const monitoringInterval =
  * docker ps --filter "name=DAppNodePackage" --format "{{.Names}}"
  * docker stop $(docker ps --filter "name=DAppNodePackage" -q)
  *
- * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ethchain.dnp.dappnode.eth" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth" -q)
+ * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth" -q)
  */
 
 const thresholds = [
@@ -25,7 +25,7 @@ const thresholds = [
   {
     id: "critical level of 1 GB",
     kb: 1 * 1e6, // ~ 1 GB
-    filterCommand: `--filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ethchain.dnp.dappnode.eth" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth"`,
+    filterCommand: `--filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth"`,
     containersDescription: "all non-core DNPs plus the Ethchain and IPFS"
   }
 ];

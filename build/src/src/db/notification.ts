@@ -9,12 +9,7 @@ const notificationKeyGetter = (id: string): string =>
 const notificationValidate = (
   id: string,
   notification?: PackageNotification
-): boolean => {
-  return (
-    typeof id === "string" &&
-    (!notification || typeof notification === "object")
-  );
-};
+): boolean => typeof id === "string" && typeof notification === "object";
 
 export const notification = dynamicKeyValidate<PackageNotification, string>(
   notificationKeyGetter,

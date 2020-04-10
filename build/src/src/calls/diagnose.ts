@@ -1,28 +1,14 @@
+import { ReturnData } from "../route-types/diagnose";
 import shellExec from "../utils/shell";
 import { RpcHandlerReturnWithResult } from "../types";
 
-type ReturnData = {
-  name: string;
-  result?: string;
-  error?: string;
-}[];
-
 /**
  * Returns a list of checks done as a diagnose
- *
- * @returns {object} diagnoses object, by diagnose id
- * diagnoses = {
- *   "dockerVersion": {
- *     name: "docker version",
- *     result: "Docker version 18.06.1-ce, build e68fc7a"
- *     error: "sh: docker: not found"
- *   } // either "result" or "error" prop will exist
- * }
  */
 export default async function diagnose(): RpcHandlerReturnWithResult<
   ReturnData
 > {
-  // Get docker version
+  // Get docker version: "Docker version 18.06.1-ce, build e68fc7a"
   const dockerVersion = {
     name: "docker version",
     ...(await shellExecFormated(`docker -v`))

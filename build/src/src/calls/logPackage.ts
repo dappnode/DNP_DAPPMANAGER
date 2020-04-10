@@ -1,23 +1,8 @@
-import { runWithRetry } from "../utils/asyncFlows";
-// Modules
 import { listContainer } from "../modules/docker/listContainers";
-import { dockerLogs } from "../modules/docker/dockerCommands";
 import { RpcHandlerReturnWithResult } from "../types";
+import { logContainer } from "../modules/docker/dockerApi";
 
 type ReturnData = string;
-
-// Retry logs call 3 times, in case it happen during a container reboot
-const dockerLogsRetry = runWithRetry(
-  ({
-    containerNameOrId,
-    ...options
-  }: {
-    containerNameOrId: string;
-    timestamps?: boolean;
-    tail?: number;
-  }) => dockerLogs(containerNameOrId, options),
-  { times: 3 }
-);
 
 /**
  * Returns the logs of the docker container of a package
@@ -41,10 +26,7 @@ export default async function logPackage({
   const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
-  const logs = await dockerLogsRetry({
-    containerNameOrId: containerName,
-    ...(options || {})
-  });
+  const logs = await logContainer(containerName, options);
 
   return {
     message: `Got logs of ${id}`,

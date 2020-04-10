@@ -94,21 +94,6 @@ export async function dockerCleanOldImages(
   if (oldImages.length > 0) await dockerRmi(oldImages);
 }
 
-export function dockerLogs(
-  containerNameOrId: string,
-  options: { timestamps?: boolean; tail?: number }
-): Promise<string> {
-  // Parse options
-  let optionsString = "";
-  // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  if (options && options.timestamps) optionsString += " --timestamps";
-  if (options && options.tail && !isNaN(options.tail))
-    optionsString += ` --tail ${options.tail}`;
-  return shell(`docker logs ${containerNameOrId} ${optionsString} 2>&1`, {
-    maxBuffer: 1024 * 1024 * 10 // 10 MB
-  });
-}
-
 // File manager, copy command
 
 export function dockerCopyFileTo(

@@ -106,5 +106,9 @@ export const requestAutoUpdateData = busFactoryNoArgAsync(
   "REQUEST_AUTO_UPDATE_DATA"
 );
 export const requestPackages = busFactoryNoArgAsync("REQUEST_PACKAGES");
+export const requestSystemInfo = busFactoryNoArgAsync("REQUEST_SYSTEM_INFO");
 export const runNatRenewal = busFactoryNoArg("RUN_NAT_RENEWAL");
 export const initializedDb = busFactoryNoArg("INITIALIZED_DB");
+export const runEthClientInstaller = busFactoryNoArg(
+  "RUN_ETH_MULTI_CLIENT_WATCHER"
+);

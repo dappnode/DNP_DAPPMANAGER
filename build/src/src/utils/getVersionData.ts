@@ -11,6 +11,8 @@ const versionDataJsonPath = VERSION_DATA_FILE;
  * { "version": "0.1.21",
  *   "branch": "master",
  *   "commit": "ab991e1482b44065ee4d6f38741bd89aeaeb3cec" }
+ *
+ * Data is read from disk only once at start-up
  */
 let versionData: PackageVersionData = {};
 try {

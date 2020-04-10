@@ -118,8 +118,11 @@ const dockerApiDfMemo = memoize(() => dockerApi.df(), {
  * NOTE: Result is cached for 15s + it only ran once at a time,
  * resolving multiple calls with the value (like runOnlyOneReturnToAll)
  */
-export async function dockerDf(): Promise<DockerApiSystemDfReturn> {
-  return await dockerApiDfMemo();
+export async function dockerDf(options?: {
+  noCache: boolean;
+}): Promise<DockerApiSystemDfReturn> {
+  if (options && options.noCache) return await dockerApi.df();
+  else return await dockerApiDfMemo();
 }
 
 export function dockerVolumeInspect(
@@ -193,4 +196,36 @@ export async function dockerVolumesList(
   const { Volumes } = await dockerApi.listVolumes({ filters: options });
   // Return is not correctly typed, casting to actual tested values
   return Volumes as DockerVolumeListItem[];
+}
+
+interface LogOptions {
+  // Return logs from stdout
+  stdout?: boolean;
+  // Return logs from stderr
+  stderr?: boolean;
+  // Add timestamps to every log line
+  timestamps?: boolean;
+  // Only return this number of log lines from the end of the logs.
+  // Specify as an integer or all to output all log lines. Default "all"
+  tail?: number;
+  // Only return logs since this time, as a UNIX timestamp. Default 0
+  since?: number;
+  // Only return logs before this time, as a UNIX timestamp. Default 0
+  until?: number;
+}
+
+/**
+ * Returns container's logs as a string with escape codes
+ * @param containerNameOrId
+ */
+export async function logContainer(
+  containerNameOrId: string,
+  options?: LogOptions
+): Promise<string> {
+  const container = dockerApi.getContainer(containerNameOrId);
+  const res = await container.logs({ stdout: true, stderr: true, ...options });
+  // Return is incorrectly typed as NodeJS.ReadableStream, but it's string
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const data: string = res as any;
+  return data;
 }

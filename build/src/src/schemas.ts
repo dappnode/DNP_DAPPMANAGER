@@ -9,7 +9,10 @@ import {
   CoreUpdateData,
   MountpointData,
   PackageDetailData,
-  VolumeData
+  VolumeData,
+  SystemInfo,
+  HostStats,
+  Diagnose
 } from "./types";
 
 /**
@@ -58,19 +61,21 @@ export const chainsDataSchema = {
   items: {
     type: "object",
     properties: {
+      dnpName: { type: "string" },
       name: { type: "string" },
       syncing: { type: "boolean" },
       error: { type: "boolean" },
       message: { type: "string" },
       progress: { type: "number" }
     },
-    required: ["name", "message"]
+    required: ["dnpName", "message"]
   }
 };
 
 export const chainsDataSample: ChainData[] = [
   {
-    name: "chain",
+    dnpName: "geth.dnp.dappnode.eth",
+    name: "Geth (light client)",
     syncing: true,
     error: false,
     message: "Block 4/8",
@@ -168,6 +173,49 @@ export const coreUpdateDataSample: CoreUpdateData = {
   changelog: "Admin changelog",
   updateAlerts: [],
   versionId: "admin@0.2.1"
+};
+
+/**
+ * Summary of diagnose checks performed by the DAppNode host
+ */
+export const diagnoseSchema = {
+  type: "array",
+  title: "diagnose",
+  items: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      result: { type: "string" },
+      error: { type: "string" }
+    },
+    required: ["name"]
+  }
+};
+
+export const diagnoseSample: Diagnose = [
+  {
+    name: "docker version",
+    result: "Docker version 18.06.1-ce, build e68fc7a",
+    error: "sh: docker: not found"
+  }
+];
+
+/**
+ * Host machine stats, cpu, memory, disk, etc
+ */
+export const hostStatsSchema = {
+  type: "object",
+  properties: {
+    cpu: { type: "string" },
+    memory: { type: "string" },
+    disk: { type: "string" }
+  }
+};
+
+export const hostStatsSample: HostStats = {
+  cpu: "35%",
+  memory: "46%",
+  disk: "57%"
 };
 
 /**
@@ -361,4 +409,64 @@ export const userActionLogsSample: UserActionLog = {
   kwargs: { do: "this" },
   result: { data: "content" },
   stack: "Danger\n  at a.ts:152:25"
+};
+
+/**
+ * System info
+ */
+
+export const systemInfoSchema = {
+  type: "object",
+  properties: {
+    ip: { type: "string" },
+    name: { type: "string" },
+    staticIp: { type: "string" },
+    domain: { type: "string" },
+    upnpAvailable: { type: "boolean" },
+    noNatLoopback: { type: "boolean" },
+    alertToOpenPorts: { type: "boolean" },
+    internalIp: { type: "string" },
+    dappmanagerNaclPublicKey: { type: "string" },
+    identityAddress: { type: "string" },
+    ethClientTarget: { type: ["string", "null"] },
+    ethClientFallback: { type: "string" },
+    ethClientStatus: { type: ["object", "null"] },
+    ethProvider: { type: "string" },
+    fullnodeDomainTarget: { type: "string" },
+    uiWelcomeStatus: { type: "string" }
+  },
+  required: []
+};
+
+export const systemInfoSample: SystemInfo = {
+  // Git version data
+  versionData: {
+    branch: "master",
+    commit: "153123",
+    version: "0.2.0"
+  },
+  // Network params
+  ip: "85.84.83.82",
+  name: "My-DAppNode",
+  staticIp: "85.84.83.82",
+  domain: "1234acbd.dyndns.io",
+  upnpAvailable: true,
+  noNatLoopback: true,
+  alertToOpenPorts: true,
+  internalIp: "192.168.0.1",
+  // Other
+  dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
+  identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+  ethClientTarget: "geth-light",
+  ethClientStatus: {
+    ok: false,
+    code: "STATE_CALL_ERROR",
+    error: { message: "Some Error", stack: "Some Error\nline 56 file.ts" }
+  },
+  ethClientFallback: "on",
+  ethProvider: "http://geth.dappnode:8545",
+  // Domain map
+  fullnodeDomainTarget: "geth.dnp.dappnode.eth",
+  // UI
+  newFeatureIds: ["repository"]
 };

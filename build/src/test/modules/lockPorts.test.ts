@@ -13,7 +13,7 @@ describe("Module: lockPorts", () => {
   const normalDnpName = "kovan.dnp.dappnode.eth";
   const normalDnpPorts = ["30303", "30303/udp"];
 
-  const coreDnpName = "ethchain.dnp.dappnode.eth";
+  const coreDnpName = "geth.dnp.dappnode.eth";
   const coreDnpPorts = ["30303", "30303/udp"];
 
   const noPortsDnpName = "ipfs.dnp.dappnode.eth";

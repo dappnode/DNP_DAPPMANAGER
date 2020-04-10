@@ -4,7 +4,7 @@ import { expect } from "chai";
 import {
   parseCredentialsFromEnvs,
   getContainerNameFromApi
-} from "../../../src/watchers/chains/bitcoin";
+} from "../../../src/watchers/chains/drivers/bitcoin";
 
 describe("Watchers > chains > bitcoin", () => {
   describe("parseCredentialsFromEnvs", () => {

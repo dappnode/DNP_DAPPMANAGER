@@ -1,6 +1,7 @@
 import { storePrivateKeyFromSeed } from "../utils/seedPhrase";
 import { decrypt } from "../utils/publickeyEncryption";
 import * as db from "../db";
+import * as eventBus from "../eventBus";
 import params from "../params";
 import { RpcHandlerReturn } from "../types";
 
@@ -29,7 +30,11 @@ export default async function seedPhraseSet({
     adminPublicKey
   );
 
+  // Also sets identityAddress
   storePrivateKeyFromSeed(seedPhrase);
+
+  // Notify the UI of the identityAddress and seedPhrase change
+  eventBus.requestSystemInfo.emit();
 
   return {
     message: `Updated seed phrase`,

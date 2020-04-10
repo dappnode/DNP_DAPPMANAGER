@@ -23,6 +23,7 @@ import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 const networkName = params.DNP_NETWORK_EXTERNAL_NAME;
+const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
 
 /**
  * Returns the list of containers
@@ -105,9 +106,7 @@ export async function listContainerNoThrow(
   byName: string
 ): Promise<PackageContainer | null> {
   const containers = await dockerList({ filters: { name: [byName] } });
-  const container = containers[0];
-  if (!container) return null;
-  return parseContainerInfo(container);
+  return containers[0] ? parseContainerInfo(containers[0]) : null;
 }
 
 export async function listContainer(byName: string): Promise<PackageContainer> {
@@ -175,7 +174,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatar,
     chain,
     origin,
-    isCore
+    isCore,
+    domainAlias
   } = readMetadataFromLabels(labels);
   const defaultEnvironmentParsed = parseEnvironment(defaultEnvironment);
   const defaultPortsParsed = parsePortMappings(defaultPorts);
@@ -220,6 +220,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatarUrl,
     origin,
     chain,
+    ...(domainAlias ? { domainAlias } : {}),
+    canBeFullnode: allowedFullnodeDnpNames.includes(name),
     // Default values to avoid having to read the manifest
     defaultEnvironment: defaultEnvironmentParsed,
     defaultPorts: defaultPortsParsed,

@@ -92,6 +92,7 @@ export interface UserSettings {
   namedVolumeMountpoints?: { [volumeName: string]: string }; // Host absolute path to mountpoint
   allNamedVolumeMountpoint?: string; // mountpoint
   fileUploads?: { [containerPath: string]: string }; // dataURL
+  domainAlias?: string[]; // ["fullnode", "my-custom-name"]
 }
 // "bitcoin.dnp.dappnode.eth": {
 //   environment: { MODE: "VALUE_SET_BEFORE" }
@@ -209,6 +210,8 @@ export type ContainerStatus =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
+export type ChainDriver = "bitcoin" | "ethereum" | "monero";
+
 export interface PackageContainer {
   id: string;
   packageName: string;
@@ -232,7 +235,9 @@ export interface PackageContainer {
   dependencies: Dependencies;
   avatarUrl: string;
   origin?: string;
-  chain?: string;
+  chain?: ChainDriver;
+  domainAlias?: string[];
+  canBeFullnode?: boolean;
   // ### TODO: Move to a different type "InstalledDnpDetail"
   gettingStarted?: string;
   gettingStartedShow?: boolean;
@@ -289,10 +294,10 @@ export interface ManifestWithImage extends Manifest {
 }
 
 export interface ComposeVolumes {
-  // volumeName: "dncore_ethchaindnpdappnodeeth_data"
+  // volumeName: "dncore_ipfsdnpdappnodeeth_data"
   [volumeName: string]: {
     // Allowed to user
-    external?: boolean | { name: string }; // name: "dncore_ethchaindnpdappnodeeth_data"
+    external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
     // NOT allowed to user, only used by DAppNode internally (if any)
     name?: string; // Volumes can only be declared locally or be external
     driver?: string; // Dangerous
@@ -417,10 +422,12 @@ export interface DirectoryDnp {
 }
 
 export interface ChainData {
-  name: string; // Ethereum
+  dnpName: string; // "geth.dnp.dappnode.eth"
+  name?: string; // Optional pretty name: "Geth (light client)"
   syncing: boolean; // if chain is syncing
   error: boolean; // If there was an error retrieving state
   message: string; // "Blocks synced: 543000 / 654000"
+  help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
 }
 
@@ -673,7 +680,7 @@ export interface MountpointData {
 }
 
 export interface VolumeData {
-  name: string; // "gethdnpdappnodeeth_data", Actual name to call delete on
+  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
   nameDisplay?: string; // "data", Guessed short name for display
   ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
@@ -684,6 +691,115 @@ export interface VolumeData {
   refCount?: number; // 2
   isOrphan: boolean; // if no container is using it
 }
+
+/**
+ * Eth provider / client types
+ * Manage the Ethereum multi-client setup
+ */
+export type EthClientTarget = "remote" | "geth-light" | "geth" | "openethereum";
+export const ethClientTargets: EthClientTarget[] = [
+  "remote",
+  "geth-light",
+  "geth",
+  "openethereum"
+];
+
+/**
+ * If the DAPPMANAGER should use a eth remote node in cases of error syncing
+ */
+export type EthClientFallback = "on" | "off";
+
+export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
+
+export type EthClientStatusOk =
+  // All okay, client is functional
+  { ok: true; url: string; name: string };
+
+export type EthClientStatusError =
+  // Unexpected error
+  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
+  // State is not correct, node is not synced but eth_syncing did not picked it up
+  | { ok: false; code: "STATE_NOT_SYNCED" }
+  // APM state call failed, syncing call succeeded and is not working
+  // = Likely an error related to fetching state content
+  | { ok: false; code: "STATE_CALL_ERROR"; error: ErrorSerialized }
+  // State call failed and eth_syncing returned true
+  | { ok: false; code: "IS_SYNCING" }
+  // syncing call failed, but the client is running
+  // ???, a connection error?
+  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
+  // NOT Expected: Package's container is not running
+  | { ok: false; code: "NOT_RUNNING" }
+  // Package's container does not exist in docker ps -a, and there's no clear reason why
+  | { ok: false; code: "NOT_INSTALLED" }
+  // Expected: Package is installing or pending to be installed
+  | { ok: false; code: "INSTALLING" }
+  // Expected: Package is installing but an error happened
+  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
+  // NOT Expected: Package should be installed but it is not
+  | { ok: false; code: "UNINSTALLED" };
+
+/**
+ * Serialized errors so the can be persisted in the db, a JSON to disk
+ */
+export interface ErrorSerialized {
+  message: string;
+  stack?: string;
+}
+
+/**
+ * Aggregated DAppNode system info
+ */
+export interface SystemInfo {
+  // Git version data
+  versionData: PackageVersionData;
+  // Network params
+  ip: string; // "85.84.83.82",
+  name: string; // "My-DAppNode",
+  staticIp: string; // "85.84.83.82" | null,
+  domain: string; // "1234acbd.dyndns.io",
+  upnpAvailable: boolean;
+  noNatLoopback: boolean;
+  alertToOpenPorts: boolean;
+  internalIp: string; // "192.168.0.1",
+  // Public key of nacl's asymmetric encryption, used by the ADMIN UI
+  // to send sensitive data in a slightly more protected way
+  dappmanagerNaclPublicKey: string;
+  // From seedPhrase: If it's not stored yet, it's an empty string
+  identityAddress: string;
+  // Eth multi-client configuration
+  ethClientTarget: EthClientTarget | null;
+  ethClientFallback: EthClientFallback;
+  // Eth multi-client status (cached, may be a small delay with real status)
+  // - EthClientStatus = status of the current target
+  // - undefined = status of current target has not been defined yet
+  // - null = current target is remote and has no status
+  ethClientStatus: EthClientStatus | undefined | null;
+  ethProvider: string;
+  // Domain maps
+  fullnodeDomainTarget: string;
+  // UI stats
+  newFeatureIds: NewFeatureId[];
+}
+
+/**
+ * Host machine stats, cpu, memory, disk, etc
+ */
+export interface HostStats {
+  cpu?: string; // "35%""
+  memory?: string; // "46%"
+  disk?: string; // "57%"
+}
+
+/**
+ * Summary of diagnose checks performed by the DAppNode host
+ */
+export interface DiagnoseItem {
+  name: string;
+  result?: string;
+  error?: string;
+}
+export type Diagnose = DiagnoseItem[];
 
 /**
  * RPC methods
@@ -710,6 +826,21 @@ export type RpcHandlerReturnWithResult<R> = Promise<
   RpcHandlerReturnWithResultInterface<R>
 >;
 export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
+
+/**
+ * Welcome wizard / setup flow
+ * Available routes / views in the UI
+ */
+export type NewFeatureId =
+  | "repository"
+  | "repository-fallback"
+  | "system-auto-updates"
+  | "change-host-password";
+
+/**
+ * UI Welcome flow status. Persists the info of which page the UI should show
+ */
+export type NewFeatureStatus = "pending" | "seen" | "skipped";
 
 /**
  * HTTP Response

@@ -43,7 +43,6 @@ const timeoutMs = 10 * 1000; // ms
  *   state: {
  *     'bind.dnp.dappnode.eth': '0.1.4',
  *     'ipfs.dnp.dappnode.eth': '0.1.3',
- *     'ethchain.dnp.dappnode.eth': '0.1.4',
  *     'ethforward.dnp.dappnode.eth': '0.1.1',
  *     'vpn.dnp.dappnode.eth': '0.1.11',
  *     'wamp.dnp.dappnode.eth': '0.1.0',

@@ -46,6 +46,8 @@ const params = {
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+  // Local fallback versions, to be able to install and eth client without connecting to remote
+  FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
 
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
@@ -82,11 +84,7 @@ const params = {
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters
-  WEB3_HOST: process.env.WEB3_HOST || "ws://my.ethchain.dnp.dappnode.eth:8546",
-  WEB3_HOST_HTTP:
-    process.env.WEB3_HOST_HTTP ||
-    process.env.WEB3_HOST ||
-    "http://my.ethchain.dnp.dappnode.eth:8545",
+  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
@@ -97,6 +95,10 @@ const params = {
   DYNDNS_HOST: "https://ns.dappnode.io",
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
+
+  // DAppNode remote fullnode service
+  REMOTE_MAINNET_RPC_URL:
+    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
@@ -123,7 +125,19 @@ const params = {
 
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
-  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ="
+  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
+
+  // Fullnode names
+  ALLOWED_FULLNODE_DNP_NAMES: [
+    "geth.dnp.dappnode.eth",
+    "parity.dnp.dappnode.eth"
+  ],
+
+  // ETHFORWARD / HTTP proxy params
+  ETHFORWARD_HTTP_PROXY_PORT: 80,
+  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
+  ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
+  ETHFORWARD_PIN_ON_VISIT: true
 };
 
 if (devMode) {

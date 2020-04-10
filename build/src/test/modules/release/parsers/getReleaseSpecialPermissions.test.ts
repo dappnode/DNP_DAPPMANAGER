@@ -18,9 +18,9 @@ describe("Release > parsers", () => {
       const compose: Compose = {
         ...mockCompose,
         volumes: {
-          dncore_ethchaindnpdappnodeeth_data: {
+          dncore_ipfsdnpdappnodeeth_data: {
             external: {
-              name: "dncore_ethchaindnpdappnodeeth_data"
+              name: "dncore_ipfsdnpdappnodeeth_data"
             }
           },
           bitcoindnpdappnodeeth_data: {

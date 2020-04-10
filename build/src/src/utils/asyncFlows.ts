@@ -1,4 +1,5 @@
 import async from "async";
+import memoize from "memoizee";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -59,47 +60,24 @@ export function runOnlyOneSequentially<A, R>(
  * [NOTE]: The target function should NEVER be called with different arguments
  * since the arguments of non-first callers will be ignored.
  * [ONLY] use this function to query a state that changes with a low frequency.
- * For example: to check if a blockchain node is syncing: `utils/isSyncing.ts`
  *
  * @param fn Target function (Callback style)
  */
-export function runOnlyOneReturnToAll<R>(
-  fn: () => Promise<R>
-): () => Promise<R> {
-  // This variables act as a class constructor
-  let isRunning = false;
-  let waitingPromises: {
-    resolve: (res: R) => void;
-    reject: (err: Error) => void;
-  }[] = [];
-
-  return function throttledFunction(): Promise<R> {
-    return new Promise(
-      (resolve, reject): void => {
-        waitingPromises.push({ resolve, reject });
-        if (!isRunning) {
-          isRunning = true;
-          fn()
-            .then(
-              res =>
-                waitingPromises.forEach(waitingPromise => {
-                  waitingPromise.resolve(res);
-                }),
-              (err: Error) =>
-                waitingPromises.forEach(waitingPromise => {
-                  waitingPromise.reject(err);
-                })
-            )
-            .then(() => {
-              isRunning = false;
-              waitingPromises = [];
-            });
-        }
-      }
-    );
-  };
+export function runOnlyOneReturnToAll<F extends Function>(f: F): F {
+  return memoize(f, {
+    // Wait for Promises to resolve. Do not cache rejections
+    promise: true,
+    // Return the computed cached result to only waiting calls while the
+    // result if being computed. Right as it is resolved, compute it again
+    maxAge: 1
+  });
 }
 
+/**
+ * Retry execution n times until success or n errors
+ * @param apiMethod
+ * @param params
+ */
 export function runWithRetry<A, R>(
   apiMethod: (arg: A) => Promise<R>,
   params?: { times?: number; base?: number }
@@ -137,4 +115,36 @@ export function pause(ms: number): Promise<void> {
       setTimeout(resolve, ms);
     }
   );
+}
+
+/**
+ * Like setInterval but you can pass a list ms values
+ *
+ * **Example**
+ * ```js
+ * setIntervalDynamic(callback, [1000, 2000, 3000])
+ * ```
+ * - First interval will take 1000 ms
+ * - Second interval will take 2000 ms
+ * - Third and all subsequent will take 3000 ms
+ *
+ * @param fn callback
+ * @param msArray [1000, 2000, 3000]
+ */
+export function setIntervalDynamic(
+  fn: () => void | Promise<void>,
+  msArray: number[]
+): void {
+  const msFinal = msArray[msArray.length - 1];
+  if (typeof msFinal !== "number")
+    throw Error(`msArray must have at least one element`);
+
+  function run(): void {
+    setTimeout(() => {
+      fn();
+      run();
+    }, msArray.shift() || msFinal);
+  }
+
+  run();
 }

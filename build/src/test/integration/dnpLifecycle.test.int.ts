@@ -254,10 +254,15 @@ describe("DNP lifecycle", function() {
   });
 
   before("Should resolve a request", async () => {
-    const { result } = await calls.resolveRequest({
-      req: { name: idMain, ver: mainDnpReleaseHash }
+    const { result } = await calls.fetchDnpRequest({
+      id: mainDnpReleaseHash
     });
-    expect(result.state).to.have.property(idMain);
+    expect(result.name, "Wrong result name").to.equal(idMain);
+    expect(result.request.compatible, "Result is not compatible").to.be.ok;
+    expect(
+      result.request.compatible.dnps,
+      "Resolved state should include this dnp"
+    ).to.have.property(idMain);
   });
 
   before("Should install DNP", async () => {

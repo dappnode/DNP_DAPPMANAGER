@@ -59,7 +59,8 @@ describe("listContainers", function() {
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -136,7 +137,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -169,7 +171,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -197,7 +200,8 @@ describe("listContainers", function() {
         running: false,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -242,7 +246,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -315,7 +320,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -356,7 +362,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -395,7 +402,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -448,6 +456,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl:
           "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+        canBeFullnode: false,
         chain: "ethereum",
         defaultEnvironment: {
           DEFAULT_CLIENT: "PARITY",
@@ -554,7 +563,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -577,7 +587,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -622,7 +633,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -679,7 +691,8 @@ describe("listContainers", function() {
           "nginx-proxy.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -711,8 +724,9 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
+        canBeFullnode: false,
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        chain: "",
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -764,6 +778,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
+        canBeFullnode: false,
         chain: "ethereum",
         defaultEnvironment: {},
         defaultPorts: [],
@@ -816,7 +831,8 @@ describe("listContainers", function() {
           "bitcoin.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
@@ -850,7 +866,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        chain: "",
+        canBeFullnode: false,
+        chain: undefined,
         defaultEnvironment: {},
         defaultPorts: [],
         defaultVolumes: []
