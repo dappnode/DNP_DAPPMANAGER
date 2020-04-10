@@ -1,16 +1,31 @@
-import { staticKey } from "./dbMain";
+import * as dbMain from "./dbMain";
+import * as dbCache from "./dbCache";
+import { PackageVersionData } from "../types";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";
 const PASSWORD_IS_SECURE = "password-is-secure";
+const VERSION_DATA = "version-data";
 
-export const serverName = staticKey<string>(SERVER_NAME, "");
+export const serverName = dbMain.staticKey<string>(SERVER_NAME, "");
 
 // Domains
 
-export const fullnodeDomainTarget = staticKey<string>(
+export const fullnodeDomainTarget = dbMain.staticKey<string>(
   FULLNODE_DOMAIN_TARGET,
   ""
 );
 
-export const passwordIsSecure = staticKey<boolean>(PASSWORD_IS_SECURE, false);
+// Host password check
+
+export const passwordIsSecure = dbMain.staticKey<boolean>(
+  PASSWORD_IS_SECURE,
+  false
+);
+
+// Cache version information to detect updates
+
+export const versionData = dbCache.staticKey<PackageVersionData>(
+  VERSION_DATA,
+  {}
+);

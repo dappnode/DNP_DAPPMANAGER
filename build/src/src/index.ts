@@ -11,14 +11,15 @@ import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
+import {
+  getVersionData,
+  isNewDappmanagerVersion
+} from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
 import startEthForward from "./ethForward";
 import Logs from "./logs";
 const logs = Logs(module);
-
-// Print version data
-import "./utils/getVersionData";
 
 // Start HTTP API
 import "./httpApi";
@@ -140,6 +141,10 @@ connection.onopen = (session, details): void => {
    */
   eventBus.requestAutoUpdateData.emit();
   eventBus.requestPackages.emit();
+
+  // If DAPPMANAGER's version has changed reload the client
+  if (isNewDappmanagerVersion())
+    wampSubscriptions.reloadClient.emit({ reason: "New version" });
 };
 
 connection.onclose = (reason, details): boolean => {
@@ -151,6 +156,11 @@ connection.onclose = (reason, details): boolean => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+
+// Read and print version data
+const versionData = getVersionData();
+if (versionData.ok) logs.info("Version info", versionData.data);
+else logs.error(`Error getting version data: ${versionData.message}`);
 
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files

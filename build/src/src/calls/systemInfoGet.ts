@@ -1,7 +1,7 @@
 import { ReturnData } from "../route-types/systemInfoGet";
 import { RpcHandlerReturnWithResult, NewFeatureId } from "../types";
 import * as db from "../db";
-import versionData from "../utils/getVersionData";
+import { getVersionData } from "../utils/getVersionData";
 import logPackage from "./logPackage";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 
@@ -19,7 +19,7 @@ export default async function systemInfoGet(): RpcHandlerReturnWithResult<
     message: "Got system info",
     result: {
       // Git version data
-      versionData,
+      versionData: getVersionData().data,
       // Network params
       ip: db.publicIp.get(),
       name: db.serverName.get(),
