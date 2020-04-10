@@ -1,0 +1,6 @@
+# Ignore image assets
+*.png
+
+# Ignore test assets
+*.tar.xz
+*.sh

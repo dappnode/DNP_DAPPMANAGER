@@ -17,6 +17,7 @@
     "test:all": "npm run test && npm run test:int",
     "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
     "lint": "./node_modules/.bin/eslint . --ext .ts --fix",
+    "prettier": "prettier --write 'src/**/*.*' 'test/**/*.*'",
     "pre-commit": "npm run build && npm run test",
     "clean": "rm -rf DNCORE/ dnp_repo/ .temp-transfer/ cache/ dist/",
     "prepare": "node_modules/.bin/patch-package"
