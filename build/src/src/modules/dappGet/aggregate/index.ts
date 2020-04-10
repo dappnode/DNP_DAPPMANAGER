@@ -7,6 +7,7 @@ import { PackageContainer, PackageRequest } from "../../../types";
 import { DappGetDnps } from "../types";
 import Logs from "../../../logs";
 import { DappGetFetcher } from "../fetch/DappGetFetcher";
+import { setVersion } from "../utils/dnpUtils";
 const logs = Logs(module);
 
 /**
@@ -86,18 +87,25 @@ export default async function aggregate({
   });
   // Add relevant installed dnps and their dependencies to the dnps object
   await Promise.all(
-    relevantInstalledDnps.map(async dnp => {
+    relevantInstalledDnps.map(async ({ name, version, origin, ...dnp }) => {
       try {
-        // Fetch exact version if doesn't came from ENS. Otherwise fetch all newer versions
-        await aggregateDependencies({
-          name: dnp.name,
-          versionRange: dnp.origin || `>=${dnp.version}`,
-          dnps,
-          dappGetFetcher // #### Injected dependency
-        });
+        if (origin) {
+          // If package does not have an APM repo assume one single version
+          // Use the cached dependencies stored in its container labels
+          // Note: The IPFS hash MUST NOT be passed as a version or the package
+          // will not be able to be updated
+          setVersion(dnps, name, version, dnp.dependencies);
+        } else {
+          await aggregateDependencies({
+            name,
+            versionRange: `>=${version}`,
+            dnps,
+            dappGetFetcher // #### Injected dependency
+          });
+        }
       } catch (e) {
         logs.warn(
-          `Error fetching installed dnp ${dnp.name}: ${e.stack || e.message}`
+          `Error fetching installed dnp ${name}: ${e.stack || e.message}`
         );
       }
     })

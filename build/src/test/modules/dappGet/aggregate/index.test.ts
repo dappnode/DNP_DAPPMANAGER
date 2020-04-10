@@ -192,12 +192,12 @@ describe("dappGet/aggregate", () => {
       // For user request, the version range is the one set by the user
       { name: nginxId, versionRange: "^0.1.0" },
       // For state packages, the version range is greater or equal than the current
-      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" },
-      // For state packages, if there is a specified origin, only fetch that
-      {
-        name: "letsencrypt-nginx.dnp.dappnode.eth",
-        versionRange: "/ipfs/Qm1234"
-      }
+      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" }
+      // For state packages, if there is a specified origin, use cached local dependencies
+      // {
+      //   name: "letsencrypt-nginx.dnp.dappnode.eth",
+      //   versionRange: "/ipfs/Qm1234"
+      // }
     ];
     sinon.assert.callCount(
       aggregateDependenciesSpy,
