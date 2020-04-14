@@ -1,4 +1,5 @@
 import path from "path";
+import { EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -155,3 +156,24 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export default params;
+
+/**
+ * Link between an ethClientTarget keyword and its pacakge information
+ * Declared above to use stronger typings
+ */
+export const ethClientData: {
+  [P in EthClientTargetPackage]: {
+    name: string;
+    url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
+    version?: string;
+    userSettings?: UserSettings; // Custom installation for geth light client
+  }
+} = {
+  "geth-light": {
+    name: "geth.dnp.dappnode.eth",
+    userSettings: { environment: { SYNCMODE: "light" } }
+  },
+  geth: { name: "geth.dnp.dappnode.eth" },
+  openethereum: { name: "openethereum.dnp.dappnode.eth" },
+  nethermind: { name: "nethermind.public.dappnode.eth" }
+};

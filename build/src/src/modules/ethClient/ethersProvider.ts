@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
 import params from "../../params";
-import { getClientData } from "./clientParams";
 import { getClientStatus } from "./clientStatus";
 import { EthClientStatusError } from "../../types";
 
@@ -43,7 +42,7 @@ export async function getEthProviderUrl(): Promise<string> {
 
   if (status.ok) {
     // Package test succeeded return its url
-    return getClientData(target).url;
+    return status.url;
   } else {
     if (fallback === "on") {
       // Fallback on, ignore error and return remote
