@@ -1,10 +1,10 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
+import { ethClientData } from "../../params";
 import { installPackage } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
-import { getClientData } from "../../modules/ethClient/clientParams";
 import {
   EthClientInstallStatus,
   serializeError
@@ -39,7 +39,9 @@ export async function runEthClientInstaller(
   // Re-check just in case, on run the installer for local target clients
   if (target === "remote") return null;
 
-  const { name, version, userSettings } = getClientData(target);
+  const clientData = ethClientData[target];
+  if (!clientData) throw Error(`No client data for target: ${target}`);
+  const { name, version, userSettings } = clientData;
   const dnp = await listContainerNoThrow(name);
 
   const installStatus = db.ethClientInstallStatus.get(target);

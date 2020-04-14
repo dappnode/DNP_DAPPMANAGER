@@ -9,8 +9,8 @@ import {
   UserSettings
 } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
-import { getClientData } from "../../../src/modules/ethClient/clientParams";
 import { EthClientInstallStatus } from "../../../src/modules/ethClient/types";
+import { ethClientData } from "../../../src/params";
 
 interface State {
   target: EthClientTarget;
@@ -20,7 +20,7 @@ interface State {
 describe("Watchers > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     const newTarget: EthClientTarget = "geth";
-    const newTargetData = getClientData(newTarget);
+    const newTargetData = ethClientData[newTarget];
 
     /**
      * Mutetable state used by the mock DB

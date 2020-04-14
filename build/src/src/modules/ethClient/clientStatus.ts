@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
-import { getClientData } from "./clientParams";
-import { EthClientTarget, EthClientStatus } from "../../types";
+import { ethClientData } from "../../params";
+import { EthClientStatus, EthClientTargetPackage } from "../../types";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { serializeError } from "./types";
 import { parseEthersSyncing } from "../../watchers/chains/utils";
+import { getEthClientApiUrl } from "./apiUrl";
 
 /**
  * Minimum block difference to consider a local ethereum mainnet node synced
@@ -40,10 +41,13 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
  *       enforces that all possible states are covered
  */
 export async function getClientStatus(
-  target: EthClientTarget
+  target: EthClientTargetPackage
 ): Promise<EthClientStatus> {
-  const { url, name } = getClientData(target);
   try {
+    const clientData = ethClientData[target];
+    if (!clientData) throw Error(`Unsupported target '${target}'`);
+    const name = clientData.name;
+    const url = clientData.url || getEthClientApiUrl(name);
     try {
       // Provider API works? Do a single test call to check state
       if (await isSyncing(url)) {

@@ -1,8 +1,8 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
+import { ethClientData } from "../../params";
 import { removePackage } from "../../calls";
 import { EthClientTarget, UserSettings } from "../../types";
-import { getClientData } from "./clientParams";
 import Logs from "../../logs";
 const logs = Logs(module);
 
@@ -26,11 +26,13 @@ export async function changeEthMultiClient(
   // If the previous client is a client package, uninstall it
   if (prevTarget && prevTarget !== "remote") {
     try {
-      const { name } = getClientData(prevTarget);
-      db.ethClientInstallStatus.set(prevTarget, { status: "UNINSTALLED" });
-      await removePackage({ id: name, deleteVolumes });
-      // Must await uninstall because geth -> light, light -> geth
-      // will create conflicts since it's the same DNP
+      const clientData = ethClientData[prevTarget];
+      if (clientData) {
+        db.ethClientInstallStatus.set(prevTarget, { status: "UNINSTALLED" });
+        await removePackage({ id: clientData.name, deleteVolumes });
+        // Must await uninstall because geth -> light, light -> geth
+        // will create conflicts since it's the same DNP
+      }
     } catch (e) {
       logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
     }
