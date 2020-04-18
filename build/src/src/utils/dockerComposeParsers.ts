@@ -268,13 +268,6 @@ export function addGeneralDataToCompose(
     services: {
       [serviceName]: {
         ...service,
-        // Add logging options to prevent huge log files
-        logging: {
-          options: {
-            "max-size": "10m",
-            "max-file": "3"
-          }
-        },
         // Add custom labels
         labels: {
           ...service.labels,

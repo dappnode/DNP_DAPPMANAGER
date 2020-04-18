@@ -92,6 +92,10 @@ describe("Release > parsers", () => {
 
   describe("sanitizeCompose", () => {
     it("Should parse metadata from a manifest", () => {
+      const customLogging = {
+        driver: "syslog"
+      };
+
       const serviceName = Object.keys(mockCompose.services)[0];
       const okCompose: Compose = {
         ...mockCompose,
@@ -100,7 +104,8 @@ describe("Release > parsers", () => {
             ...mockCompose.services[serviceName],
             restart: "always",
             ports,
-            volumes
+            volumes,
+            logging: customLogging
           }
         }
       };
@@ -112,12 +117,7 @@ describe("Release > parsers", () => {
             ...mockCompose.services[serviceName],
             ports,
             volumes,
-            logging: {
-              options: {
-                "max-size": "dangerous-property",
-                "max-file": "dangerous-property"
-              }
-            }
+            logging: customLogging
           }
         },
         networks: {

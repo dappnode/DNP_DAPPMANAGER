@@ -326,6 +326,13 @@ interface ComposeServiceBase {
   devices?: string[];
   network_mode?: string;
   command?: string;
+  // Logging
+  logging?: {
+    driver?: string;
+    options?: {
+      [optName: string]: string | number | null;
+    };
+  };
 }
 
 export interface ComposeServiceUnsafe extends ComposeServiceBase {
@@ -343,12 +350,6 @@ export interface ComposeService extends ComposeServiceBase {
   container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
   env_file?: string[];
-  logging: {
-    options: {
-      "max-size": string; // "10m",
-      "max-file": string; // "3"
-    };
-  };
 }
 
 interface ComposeBase {
