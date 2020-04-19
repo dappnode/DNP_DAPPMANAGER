@@ -1,5 +1,6 @@
 import Docker from "dockerode";
 import memoize from "memoizee";
+import { stripDockerApiLogsHeader } from "./utils";
 
 const dockerApi = new Docker({ socketPath: "/var/run/docker.sock" });
 
@@ -226,6 +227,8 @@ export async function logContainer(
   const res = await container.logs({ stdout: true, stderr: true, ...options });
   // Return is incorrectly typed as NodeJS.ReadableStream, but it's string
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const data: string = res as any;
-  return data;
+  const data: string = (res as any) || "";
+
+  // Remove prepended bytes added to each line by the docker API
+  return stripDockerApiLogsHeader(data);
 }
