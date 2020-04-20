@@ -11,6 +11,7 @@ import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
+import { migrateEthForward } from "./ethForward/migrateEthForward";
 import {
   getVersionData,
   isNewDappmanagerVersion
@@ -191,9 +192,13 @@ async function runLegacyOps(): Promise<void> {
     logs.error(`Error converting DNP .env files: ${e.stack || e.message}`);
   }
 
-  migrateEthchain()
-    .then(() => logs.info(`Migrated ETHCHAIN`))
-    .catch(e => logs.error(`Error migrating ETHCHAIN: ${e.stack}`));
+  migrateEthchain().catch(e =>
+    logs.error(`Error migrating ETHCHAIN: ${e.stack}`)
+  );
+
+  migrateEthForward().catch(e =>
+    logs.error(`Error migrating ETHFORWARD: ${e.stack}`)
+  );
 }
 
 runLegacyOps();
