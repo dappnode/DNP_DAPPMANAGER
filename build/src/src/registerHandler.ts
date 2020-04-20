@@ -2,6 +2,7 @@ import logUserAction from "./logUserAction";
 import { Session } from "autobahn";
 import { RpcHandlerReturnGeneric } from "./types";
 import Logs from "./logs";
+import { EthProviderError } from "./modules/ethClient";
 const logs = Logs(module);
 
 /*
@@ -64,13 +65,16 @@ export const wrapErrors = <K>(
          * - Print a warning only
          */
         logs.warn(`Chain is still syncing, on ${event}: ${msg}`);
-      } else if (msg.includes("connection not open")) {
+      } else if (
+        msg.includes("connection not open") ||
+        e instanceof EthProviderError
+      ) {
         /**
          * 2. When attempting an JSON RPC but the connection with the node is closed
          * - Emit a userActionLog
          * - Print a warning only
          */
-        logs.warn(`Could not connect to ethchain node, on ${event}: ${msg}`);
+        logs.warn(`Eth provider error on ${event}: ${msg}`);
         logUserAction.log({ level: "error", event, ...error2obj(e), kwargs });
       } else {
         /**
