@@ -1,3 +1,4 @@
+import params from "../params";
 import { RpcHandlerReturnWithResult, CoreUpdateData } from "../types";
 import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../modules/release";
@@ -6,7 +7,7 @@ import semver from "semver";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
 
-const coreName = "core.dnp.dappnode.eth";
+const coreName = params.coreDnpName;
 const defaultVersion = "*";
 
 /**

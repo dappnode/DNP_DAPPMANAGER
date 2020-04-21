@@ -1,4 +1,5 @@
 import semver from "semver";
+import params from "../../../params";
 // Internal
 import * as safeSemver from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
@@ -82,7 +83,7 @@ export default async function aggregate({
     // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
     // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
     installedDnps: dnpList.filter(
-      dnp => semver.valid(dnp.version) && dnp.name !== "core.dnp.dappnode.eth"
+      dnp => semver.valid(dnp.version) && dnp.name !== params.coreDnpName
     )
   });
   // Add relevant installed dnps and their dependencies to the dnps object

@@ -123,7 +123,7 @@ export async function restartPackageVolumesTask({
    * - No DNP can be the "dappmanager.dnp.dappnode.eth"
    */
   for (const dnpName of dnpsToRemove) {
-    if (dnpName.includes("dappmanager.dnp.dappnode.eth"))
+    if (dnpName.includes(params.dappmanagerDnpName))
       throw Error("The dappmanager cannot be restarted");
 
     const dnpToRemove = dnpListExtended.find(_dnp => _dnp.name === dnpName);

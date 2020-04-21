@@ -92,6 +92,10 @@ const params = {
 
   // DAppNode specific names
   coreDnpName: "core.dnp.dappnode.eth",
+  dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
+  restartDnpName: "restart.dnp.dappnode.eth",
+  vpnDnpName: "vpn.dnp.dappnode.eth",
+  wifiDnpName: "wifi.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
 
   // DYNDNS parameters

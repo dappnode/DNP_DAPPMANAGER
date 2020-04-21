@@ -9,6 +9,7 @@ import { PortMapping, RpcHandlerReturn } from "../types";
 // External call
 import restartPackage from "./restartPackage";
 import * as eventBus from "../eventBus";
+import params from "../params";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -33,7 +34,7 @@ export default async function updatePortMappings({
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
 
-  if (id === "dappmanager.dnp.dappnode.eth")
+  if (id === params.dappmanagerDnpName)
     throw Error("Can not edit DAPPAMANAGER ports");
 
   /**
