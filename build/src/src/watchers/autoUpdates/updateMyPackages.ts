@@ -15,8 +15,9 @@ import installPackage from "../../calls/installPackage";
 import Logs from "../../logs";
 const logs = Logs(module);
 
-export default async function updateMyPackages(): Promise<void> {
-  const releaseFetcher = new ReleaseFetcher();
+export default async function updateMyPackages(
+  releaseFetcher: ReleaseFetcher
+): Promise<void> {
   const dnpList = await listContainers();
 
   for (const { name, isDnp, version: currentVersion } of dnpList) {

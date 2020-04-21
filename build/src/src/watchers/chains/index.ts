@@ -100,7 +100,7 @@ async function getAndEmitChainData(): Promise<void> {
             ...chainDataResult
           };
         } catch (e) {
-          logs.warn(`Error on chain ${chain.dnpName} watcher: ${e.stack}`);
+          logs.debug(`Error on chain ${dnpName} watcher: ${e.stack}`);
           return {
             dnpName,
             syncing: false,

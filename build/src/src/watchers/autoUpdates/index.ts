@@ -1,6 +1,8 @@
 import params from "../../params";
 import * as eventBus from "../../eventBus";
 import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
+import { ReleaseFetcher } from "../../modules/release";
+import { EthProviderError } from "../../modules/ethClient";
 // Utils
 import {
   isDnpUpdateEnabled,
@@ -24,9 +26,20 @@ const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000;
  */
 async function autoUpdates(): Promise<void> {
   try {
+    const releaseFetcher = new ReleaseFetcher();
+    // Make sure the eth client provider is available before checking each package
+    // Do it once and return for expected errors to reduce cluttering
+    if (isDnpUpdateEnabled() || isCoreUpdateEnabled())
+      try {
+        await releaseFetcher.getProvider();
+      } catch (e) {
+        if (e instanceof EthProviderError) return;
+        logs.warn(`Error getting eth provider: ${e.stack}`);
+      }
+
     if (isDnpUpdateEnabled()) {
       try {
-        await updateMyPackages();
+        await updateMyPackages(releaseFetcher);
       } catch (e) {
         logs.error(`Error on updateMyPackages: ${e.stack}`);
       }
