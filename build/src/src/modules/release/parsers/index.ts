@@ -177,6 +177,7 @@ export function sanitizeCompose(
         ...(env_file.length ? { env_file } : {}),
         // Add logging options to prevent huge log files
         logging: service.logging || {
+          driver: "json-file",
           options: {
             "max-size": "10m",
             "max-file": "3"
