@@ -97,6 +97,7 @@ const params = {
   vpnDnpName: "vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+  restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",

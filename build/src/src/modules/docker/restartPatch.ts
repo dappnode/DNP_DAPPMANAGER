@@ -11,7 +11,7 @@ const logs = Logs(module);
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
-const restartContainerName = `DAppNodeTool-${restartId}`;
+const restartContainerName = params.restartContainerName;
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it

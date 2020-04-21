@@ -12,6 +12,7 @@ import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
+import { postCoreUpdate } from "./modules/installer/postCoreUpdate";
 import {
   getVersionData,
   isNewDappmanagerVersion
@@ -206,14 +207,11 @@ runLegacyOps();
 /**
  * Run initial opts
  * - Copy host scripts
+ * -
  */
 
-try {
-  const { copied, removed } = copyHostScripts();
-  let message = "Successfully run copyHostScripts.";
-  if (copied.length) message += ` Copied ${copied.join(", ")}.`;
-  if (removed.length) message += ` Removed ${removed.join(", ")}.`;
-  logs.info(message);
-} catch (e) {
-  logs.error(`Error copying host scripts: ${e.stack}`);
-}
+copyHostScripts().catch(e =>
+  logs.error(`Error copying host scripts: ${e.stack}`)
+);
+
+postCoreUpdate().catch(e => logs.error(`Error on postCoreUpdate: ${e.stack}`));
