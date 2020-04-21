@@ -1,4 +1,5 @@
 import fs from "fs";
+import params from "../params";
 import * as getPath from "../utils/getPath";
 import restartPatch from "../modules/docker/restartPatch";
 import { dockerComposeRm } from "../modules/docker/dockerCommands";
@@ -23,7 +24,7 @@ export default async function restartPackage({
     throw Error(`No docker-compose found: ${dockerComposePath}`);
   }
 
-  if (id.includes("dappmanager.dnp.dappnode.eth")) {
+  if (id.includes(params.dappmanagerDnpName)) {
     await restartPatch();
   } else {
     // Combining rm && up doesn't prevent the installer from crashing

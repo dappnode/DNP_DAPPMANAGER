@@ -1,4 +1,5 @@
 import * as eventBus from "../../eventBus";
+import params from "../../params";
 import {
   isUpdateDelayCompleted,
   flagCompletedUpdate,
@@ -9,7 +10,7 @@ import Logs from "../../logs";
 import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 const logs = Logs(module);
 
-const coreDnpName = "core.dnp.dappnode.eth";
+const coreDnpName = params.coreDnpName;
 
 export default async function updateSystemPackages(): Promise<void> {
   const { available, type, versionId } = await getCoreUpdateData();

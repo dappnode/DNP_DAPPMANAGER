@@ -1,11 +1,12 @@
 import { ReturnData } from "../route-types/systemInfoGet";
 import { RpcHandlerReturnWithResult, NewFeatureId } from "../types";
+import params from "../params";
 import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
 import logPackage from "./logPackage";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 
-const wifiName = "wifi.dnp.dappnode.eth";
+const wifiName = params.wifiDnpName;
 
 /**
  * Returns the current DAppNode system info

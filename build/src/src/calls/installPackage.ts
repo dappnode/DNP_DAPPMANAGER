@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import params from "../params";
 import * as eventBus from "../eventBus";
 import * as db from "../db";
 // Modules
@@ -33,7 +34,7 @@ import { stringify } from "../utils/objects";
 import { ReleaseFetcher } from "../modules/release";
 const logs = Logs(module);
 
-const dappmanagerId = "dappmanager.dnp.dappnode.eth";
+const dappmanagerId = params.dappmanagerDnpName;
 
 /**
  * Installs a DAppNode Package.

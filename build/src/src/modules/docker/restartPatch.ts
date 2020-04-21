@@ -9,8 +9,8 @@ import params from "../../params";
 import Logs from "../../logs";
 const logs = Logs(module);
 
-export const restartId = "restart.dnp.dappnode.eth";
-const dappmanagerName = "dappmanager.dnp.dappnode.eth";
+const restartId = params.restartDnpName;
+const dappmanagerName = params.dappmanagerDnpName;
 const restartContainerName = `DAppNodeTool-${restartId}`;
 
 /**

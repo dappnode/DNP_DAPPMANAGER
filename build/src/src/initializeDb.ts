@@ -19,8 +19,8 @@ import { mergeEnvFile } from "./utils/dockerComposeFile";
 const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
-const vpnName = "vpn.dnp.dappnode.eth";
-const vpnContainerName = "DAppNodeCore-vpn.dnp.dappnode.eth";
+const vpnName = params.vpnDnpName;
+const vpnContainerName = `DAppNodeCore-${vpnName}`;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
