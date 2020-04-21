@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import params from "../../params";
+import Logs from "../../logs";
+const logs = Logs(module);
 
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
@@ -13,10 +15,7 @@ const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
  * - Remove scripts that are not here
  * @return For info and logging
  */
-export function copyHostScripts(): {
-  removed: string[];
-  copied: string[];
-} {
+export async function copyHostScripts(): Promise<void> {
   // Make sure the target scripts dir exists
   fs.mkdirSync(hostScriptsDir, { recursive: true });
 
@@ -43,7 +42,10 @@ export function copyHostScripts(): {
     }
   }
 
-  return { removed, copied };
+  let message = "Successfully run copyHostScripts.";
+  if (copied.length) message += ` Copied ${copied.join(", ")}.`;
+  if (removed.length) message += ` Removed ${removed.join(", ")}.`;
+  logs.info(message);
 }
 
 /**
