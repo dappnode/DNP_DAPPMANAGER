@@ -47,12 +47,6 @@ const polkadotNewCompose = {
       ],
       restart: "always",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
-      logging: {
-        options: {
-          "max-size": "10m",
-          "max-file": "3"
-        }
-      },
       dns: "172.33.1.2",
       networks: ["dncore_network"]
     }
@@ -361,12 +355,6 @@ describe("Util: dockerComposeParsers", () => {
             networks: {
               network: {
                 ipv4_address: "172.33.1.6"
-              }
-            },
-            logging: {
-              options: {
-                "max-size": "10m",
-                "max-file": "3"
               }
             }
           }

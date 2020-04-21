@@ -16,13 +16,7 @@ describe("Module > installer > createCustomVolumeDevicePaths", () => {
         "raiden.dnp.dappnode.eth": {
           volumes: ["data:/root/.raiden"],
           container_name: "DAppNodePackage-raiden.dnp.dappnode.eth",
-          image: "raiden.dnp.dappnode.eth:0.0.2",
-          logging: {
-            options: {
-              "max-size": "10m",
-              "max-file": "3"
-            }
-          }
+          image: "raiden.dnp.dappnode.eth:0.0.2"
         }
       },
       volumes: {
