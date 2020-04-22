@@ -25,3 +25,5 @@ services:
     networks:
       network:
         ipv4_address: 172.33.1.7
+    logging:
+      driver: journald
