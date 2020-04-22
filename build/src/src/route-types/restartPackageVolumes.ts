@@ -22,5 +22,5 @@ export const returnDataSchema = {};
 
 export const requestDataSample: RequestData = {
   id: "geth.dnp.dappnode.eth",
-  volumeId: "gethdnpdappnodeeth_data"
+  volumeId: "gethdnpdappnodeeth_geth"
 };

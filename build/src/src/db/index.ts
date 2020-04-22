@@ -1,6 +1,7 @@
 export * from "./autoUpdateSettings";
 export * from "./cache";
 export * from "./dyndns";
+export * from "./ethClient";
 export * from "./fileTransferPath";
 export * from "./isInstalling";
 export * from "./network";
@@ -9,6 +10,7 @@ export * from "./package";
 export * from "./secrets";
 export * from "./system";
 export * from "./systemFlags";
+export * from "./ui";
 export * from "./upnp";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";

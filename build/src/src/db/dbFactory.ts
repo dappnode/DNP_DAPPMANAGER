@@ -5,13 +5,6 @@ import { formatKey } from "./dbUtils";
 import Logs from "../logs";
 const logs = Logs(module);
 
-export interface Db {
-  get(key: string): any | null;
-  set(key: string, value: any): void;
-  remove(key: string): void;
-  clearDb(): void;
-}
-
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export default function dbFactory(dbPath: string) {
   // Define dbPath and make sure it exists (mkdir -p)
@@ -64,10 +57,9 @@ export default function dbFactory(dbPath: string) {
     validate: (keyArg: K, value?: T) => boolean
   ) {
     return {
-      get: (keyArg: K): T | null => {
+      get: (keyArg: K): T | undefined => {
         const value = get(keyGetter(keyArg));
         if (validate(keyArg, value)) return value;
-        else return null;
       },
       set: (keyArg: K, newValue: T): void => {
         if (validate(keyArg, newValue)) set(keyGetter(keyArg), newValue);

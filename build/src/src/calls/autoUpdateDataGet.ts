@@ -1,13 +1,13 @@
+import { ReturnData } from "../route-types/autoUpdateDataGet";
 import semver from "semver";
-import params from "../params";
 import { listContainers } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
 import {
   RpcHandlerReturnWithResult,
-  AutoUpdateDataView,
-  AutoUpdateDataDnpView
+  AutoUpdateDataDnpView,
+  PackageContainer
 } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
@@ -19,7 +19,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * - pending: Pending auto-update per DNP, can be already executed
  * - dnpsToShow: Parsed data to be shown in the UI
  *
- * @returns {object} result = {
+ * @returns result = {
  *   settings: {
  *     "system-packages": { enabled: true }
  *     "my-packages": { enabled: true }
@@ -49,7 +49,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * }
  */
 export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
-  AutoUpdateDataView
+  ReturnData
 > {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
@@ -77,7 +77,7 @@ export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
   ];
 
   if (autoUpdateHelper.isDnpUpdateEnabled()) {
-    const singleDnpsToShow = [];
+    const singleDnpsToShow: PackageContainer[] = [];
     for (const dnp of dnpList) {
       const storedDnp = singleDnpsToShow.find(_dnp => _dnp.name === dnp.name);
       const storedVersion = storedDnp ? storedDnp.version : "";
@@ -87,8 +87,6 @@ export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
         dnp.isDnp &&
         // Ignore wierd versions
         semver.valid(dnp.version) &&
-        // MUST come from the APM
-        (!dnp.origin || params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS) &&
         // Ensure there are no duplicates
         (!storedVersion || semver.gt(storedVersion, dnp.version))
       )

@@ -80,7 +80,6 @@ export const mockDnp: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  chain: "",
   avatarUrl: ""
 };
 
@@ -201,13 +200,7 @@ export const mockDirectoryDnp: DirectoryDnp = {
 export const mockComposeService: ComposeService = {
   image: `${mockDnpName}:${mockDnpVersion}`,
   /* eslint-disable-next-line @typescript-eslint/camelcase */
-  container_name: `DAppNodePackage-${mockDnpName}`,
-  logging: {
-    options: {
-      "max-size": "10m",
-      "max-file": "3"
-    }
-  }
+  container_name: `DAppNodePackage-${mockDnpName}`
 };
 
 export const mockCompose: Compose = {

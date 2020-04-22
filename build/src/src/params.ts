@@ -1,4 +1,5 @@
 import path from "path";
+import { EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -46,6 +47,10 @@ const params = {
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+  // Local fallback versions, to be able to install and eth client without connecting to remote
+  FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
+  // Version data file, created in the docker image build process
+  VERSION_DATA_FILE_PATH: "/usr/src/app/.version.json",
 
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
@@ -82,21 +87,26 @@ const params = {
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters
-  WEB3_HOST: process.env.WEB3_HOST || "ws://my.ethchain.dnp.dappnode.eth:8546",
-  WEB3_HOST_HTTP:
-    process.env.WEB3_HOST_HTTP ||
-    process.env.WEB3_HOST ||
-    "http://my.ethchain.dnp.dappnode.eth:8545",
+  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
   coreDnpName: "core.dnp.dappnode.eth",
+  dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
+  restartDnpName: "restart.dnp.dappnode.eth",
+  vpnDnpName: "vpn.dnp.dappnode.eth",
+  wifiDnpName: "wifi.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+  restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
+
+  // DAppNode remote fullnode service
+  REMOTE_MAINNET_RPC_URL:
+    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
@@ -123,7 +133,19 @@ const params = {
 
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
-  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ="
+  ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
+
+  // Fullnode names
+  ALLOWED_FULLNODE_DNP_NAMES: [
+    "geth.dnp.dappnode.eth",
+    "parity.dnp.dappnode.eth"
+  ],
+
+  // ETHFORWARD / HTTP proxy params
+  ETHFORWARD_HTTP_PROXY_PORT: 80,
+  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
+  ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
+  ETHFORWARD_PIN_ON_VISIT: true
 };
 
 if (devMode) {
@@ -139,3 +161,24 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export default params;
+
+/**
+ * Link between an ethClientTarget keyword and its pacakge information
+ * Declared above to use stronger typings
+ */
+export const ethClientData: {
+  [P in EthClientTargetPackage]: {
+    name: string;
+    url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
+    version?: string;
+    userSettings?: UserSettings; // Custom installation for geth light client
+  }
+} = {
+  "geth-light": {
+    name: "geth.dnp.dappnode.eth",
+    userSettings: { environment: { SYNCMODE: "light" } }
+  },
+  geth: { name: "geth.dnp.dappnode.eth" },
+  openethereum: { name: "openethereum.dnp.dappnode.eth" },
+  nethermind: { name: "nethermind.public.dappnode.eth" }
+};

@@ -1,4 +1,4 @@
-import { Dependencies } from "../types";
+import { Dependencies, ChainDriver } from "../types";
 
 interface ContainerLabels {
   [labelId: string]: string;
@@ -19,6 +19,7 @@ const avatarId = prefix + "avatar";
 const originId = prefix + "origin";
 const chainId = prefix + "chain";
 const isCoreId = prefix + "isCore";
+const domainAliasId = prefix + "alias.domain";
 
 function setJson(data: object | string[]): string {
   return JSON.stringify(data);
@@ -77,21 +78,24 @@ export function writeMetadataToLabels({
   avatar,
   chain,
   origin,
-  isCore
+  isCore,
+  domainAlias
 }: {
-  dependencies: Dependencies;
-  avatar: string;
+  dependencies?: Dependencies;
+  avatar?: string;
   chain?: string;
   origin?: string;
-  isCore: boolean;
+  isCore?: boolean;
+  domainAlias?: string[];
 }): ContainerLabels {
-  return {
-    [dependenciesId]: setJson(dependencies),
-    [avatarId]: avatar || "",
-    [chainId]: chain || "",
-    [originId]: origin || "",
-    [isCoreId]: isCore ? "true" : "false"
-  };
+  const labels: ContainerLabels = {};
+  if (dependencies) labels[dependenciesId] = setJson(dependencies);
+  if (avatar) labels[avatarId] = avatar;
+  if (typeof isCore === "boolean") labels[isCoreId] = isCore ? "true" : "false";
+  if (chain) labels[chainId] = chain;
+  if (origin) labels[originId] = origin;
+  if (domainAlias) labels[domainAliasId] = setJson(domainAlias);
+  return labels;
 }
 
 export function readMetadataFromLabels(
@@ -99,15 +103,19 @@ export function readMetadataFromLabels(
 ): {
   dependencies: Dependencies;
   avatar: string;
-  chain: string;
+  chain: ChainDriver;
   origin?: string;
   isCore: boolean;
+  domainAlias?: string[];
 } {
   return {
     dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
     avatar: labels[avatarId] || "",
-    chain: labels[chainId] || "",
+    chain: (labels[chainId] as ChainDriver) || undefined,
     origin: labels[originId] || undefined,
-    isCore: labels[isCoreId] === "true" ? true : false
+    isCore: labels[isCoreId] === "true" ? true : false,
+    domainAlias: labels[domainAliasId]
+      ? ((safeGetJson(labels[domainAliasId]) || undefined) as string[])
+      : undefined
   };
 }

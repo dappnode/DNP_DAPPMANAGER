@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
+import params from "../params";
 import * as eventBus from "../eventBus";
 import * as db from "../db";
 // Modules
-import dappGet from "../modules/dappGet";
 import getImage, { verifyDockerImage } from "../modules/release/getImage";
 import lockPorts from "../modules/lockPorts";
 import {
@@ -12,7 +12,6 @@ import {
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import restartPatch from "../modules/docker/restartPatch";
-import getRelease from "../modules/release/getRelease";
 import orderInstallPackages from "../modules/installer/orderInstallPackages";
 import getInstallerPackageData from "../modules/installer/getInstallerPackageData";
 import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
@@ -20,9 +19,7 @@ import createCustomVolumeDevicePaths from "../modules/installer/createCustomVolu
 // Utils
 import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
-import { isIpfsRequest } from "../utils/validate";
 import * as validate from "../utils/validate";
-import isSyncing from "../utils/isSyncing";
 import { RpcHandlerReturn, InstallPackageData, PackageRequest } from "../types";
 import { RequestData } from "../route-types/installPackage";
 import Logs from "../logs";
@@ -34,9 +31,10 @@ import {
   flagPackagesAreInstalling
 } from "../utils/packageIsInstalling";
 import { stringify } from "../utils/objects";
+import { ReleaseFetcher } from "../modules/release";
 const logs = Logs(module);
 
-const dappmanagerId = "dappmanager.dnp.dappnode.eth";
+const dappmanagerId = params.dappmanagerDnpName;
 
 /**
  * Installs a DAppNode Package.
@@ -66,10 +64,6 @@ export default async function installPackage({
   const req: PackageRequest = { name: reqName, ver: reqVersion };
   const id = reqName;
 
-  // If the request is not from IPFS, check if the chain is syncing
-  if (!isIpfsRequest(req) && (await isSyncing()))
-    throw Error("Mainnet is syncing");
-
   /**
    * [Resolve] the request
    * @param {object} state = {
@@ -82,7 +76,12 @@ export default async function installPackage({
    * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
    */
   logUi({ id, name: reqName, message: "Resolving dependencies..." });
-  const { state, alreadyUpdated } = await dappGet(req, options);
+  const releaseFetcher = new ReleaseFetcher();
+  const {
+    state,
+    alreadyUpdated,
+    releases
+  } = await releaseFetcher.getReleasesResolved(req, options);
   logs.info(`Resolved request ${reqName} @ ${reqVersion}: ${stringify(state)}`);
 
   // Make sure that all packages are not being installed
@@ -106,9 +105,7 @@ export default async function installPackage({
      */
     const packagesData: InstallPackageData[] = orderInstallPackages(
       await Promise.all(
-        Object.entries(state).map(async ([name, version]) => {
-          const release = await getRelease(name, version);
-
+        Object.entries(releases).map(async ([name, release]) => {
           // .origin is only false when the origin is the AragonAPM
           if (release.warnings.unverifiedCore && !BYPASS_CORE_RESTRICTION)
             throw Error(`Core package ${name} is from an unverified origin`);

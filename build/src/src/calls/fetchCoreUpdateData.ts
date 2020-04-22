@@ -1,13 +1,13 @@
-import semver from "semver";
-import dappGet from "../modules/dappGet";
-import getRelease from "../modules/release/getRelease";
+import params from "../params";
+import { RpcHandlerReturnWithResult, CoreUpdateData } from "../types";
+import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
+import { ReleaseFetcher } from "../modules/release";
 import { listContainers } from "../modules/docker/listContainers";
+import semver from "semver";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
-import { RpcHandlerReturnWithResult } from "../types";
-import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 
-const coreName = "core.dnp.dappnode.eth";
+const coreName = params.coreDnpName;
 const defaultVersion = "*";
 
 /**
@@ -16,14 +16,29 @@ const defaultVersion = "*";
 export default async function fetchCoreUpdateData({
   version
 }: RequestData): RpcHandlerReturnWithResult<ReturnData> {
+  return {
+    message: "Got core update data",
+    result: await getCoreUpdateData(version)
+  };
+}
+
+/**
+ * Fetches the core update data, if available
+ */
+export async function getCoreUpdateData(
+  coreVersion: string = defaultVersion
+): Promise<CoreUpdateData> {
   /**
    * Resolve core.dnp.dappnode.eth to figure out if it should be installed
    * With the list of deps to install, compute the higher updateType
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
-  const { state: coreDnpsToBeInstalled } = await dappGet({
+  const releaseFetcher = new ReleaseFetcher();
+  const {
+    releases: coreDnpsToBeInstalled
+  } = await releaseFetcher.getReleasesResolved({
     name: coreName,
-    ver: version || defaultVersion
+    ver: coreVersion
   });
 
   const dnpList = await listContainers();
@@ -33,12 +48,13 @@ export default async function fetchCoreUpdateData({
    * Ignore it to compute the update type
    */
   const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
+  const coreRelease = coreDnpsToBeInstalled[coreName];
   if (!coreDnp) delete coreDnpsToBeInstalled[coreName];
 
-  const packages = await Promise.all(
-    Object.entries(coreDnpsToBeInstalled).map(async ([depName, depVersion]) => {
+  const packages = Object.entries(coreDnpsToBeInstalled).map(
+    ([depName, release]) => {
       const dnp = dnpList.find(_dnp => _dnp.name === depName);
-      const { metadata: depManifest } = await getRelease(depName, depVersion);
+      const { metadata: depManifest } = release;
       return {
         name: depName,
         from: dnp ? dnp.version : undefined,
@@ -48,7 +64,7 @@ export default async function fetchCoreUpdateData({
             ? depManifest.warnings.onInstall
             : undefined
       };
-    })
+    }
   );
 
   /**
@@ -67,14 +83,10 @@ export default async function fetchCoreUpdateData({
     ? "patch"
     : undefined;
 
-  const { metadata: coreManifest } = await getRelease(
-    coreName,
-    version || defaultVersion
-  );
-
   /**
    * Compute updateAlerts
    */
+  const { metadata: coreManifest } = coreRelease;
   const dnpCore = dnpList.find(dnp => dnp.name === coreName);
   const from = dnpCore ? dnpCore.version : "";
   const to = coreManifest.version;
@@ -94,14 +106,11 @@ export default async function fetchCoreUpdateData({
   );
 
   return {
-    message: "Got core update data",
-    result: {
-      available: Boolean(Object.keys(coreDnpsToBeInstalled).length),
-      type,
-      packages,
-      changelog: coreManifest.changelog || "",
-      updateAlerts,
-      versionId
-    }
+    available: Boolean(Object.keys(coreDnpsToBeInstalled).length),
+    type,
+    packages,
+    changelog: coreManifest.changelog || "",
+    updateAlerts,
+    versionId
   };
 }

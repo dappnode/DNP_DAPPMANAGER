@@ -7,6 +7,8 @@ import * as directory from "./route-types/subscriptionDirectory";
 import * as packages from "./route-types/subscriptionPackages";
 import * as progressLog from "./route-types/subscriptionProgressLog";
 import * as pushNotification from "./route-types/subscriptionPushNotification";
+import * as reloadClient from "./route-types/subscriptionReloadClient";
+import * as systemInfo from "./route-types/subscriptionSystemInfo";
 import * as userActionLog from "./route-types/subscriptionUserActionLog";
 import * as userActionToDappm from "./route-types/subscriptionVpnLegacy";
 import * as volumes from "./route-types/subscriptionVolumes";
@@ -42,6 +44,7 @@ export function registerSubscriptions(
   }: {
     route: string;
     returnDataSchema?: object;
+    returnDataSample: T;
   }) {
     const validateData = dataSchema
       ? getValidator<T>(dataSchema, "data", errorLogger.debug)
@@ -67,19 +70,17 @@ export function registerSubscriptions(
   }
 
   return {
-    autoUpdateData: wampBusFactory<autoUpdateData.ReturnData>(autoUpdateData),
-    chainData: wampBusFactory<chainData.ReturnData>(chainData),
-    directory: wampBusFactory<directory.ReturnData>(directory),
-    packages: wampBusFactory<packages.ReturnData>(packages),
-    progressLog: wampBusFactory<progressLog.ReturnData>(progressLog),
-    pushNotification: wampBusFactory<pushNotification.ReturnData>(
-      pushNotification
-    ),
-    userActionLog: wampBusFactory<userActionLog.ReturnData>(userActionLog),
-    volumes: wampBusFactory<volumes.ReturnData>(volumes),
+    autoUpdateData: wampBusFactory(autoUpdateData),
+    chainData: wampBusFactory(chainData),
+    directory: wampBusFactory(directory),
+    packages: wampBusFactory(packages),
+    progressLog: wampBusFactory(progressLog),
+    pushNotification: wampBusFactory(pushNotification),
+    reloadClient: wampBusFactory(reloadClient),
+    systemInfo: wampBusFactory(systemInfo),
+    userActionLog: wampBusFactory(userActionLog),
+    volumes: wampBusFactory(volumes),
     // Legacy
-    logUserActionToDappmanager: wampBusFactory<userActionToDappm.ReturnData>(
-      userActionToDappm
-    )
+    logUserActionToDappmanager: wampBusFactory(userActionToDappm)
   };
 }

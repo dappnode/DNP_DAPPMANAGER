@@ -1,4 +1,6 @@
-module.exports = {
+import { DappgetTestCase } from "../testHelpers";
+
+const caseData: DappgetTestCase = {
   name: "core update",
   req: {
     name: "ethforward.dnp.dappnode.eth",
@@ -19,43 +21,41 @@ module.exports = {
     "ethforward.dnp.dappnode.eth": {
       installed: "0.1.1",
       versions: {
-        "0.1.2": { dependencies: {} },
-        "0.1.1": { dependencies: {} },
-        "0.1.0": { dependencies: {} }
+        "0.1.2": {},
+        "0.1.1": {},
+        "0.1.0": {}
       }
     },
-    "vnp.dnp.dappnode.eth": {
+    "vpn.dnp.dappnode.eth": {
       installed: "0.1.1",
       versions: {
-        "0.1.1": { dependencies: {} },
-        "0.1.0": { dependencies: {} }
+        "0.1.1": {},
+        "0.1.0": {}
       }
     },
     "dappmanager.dnp.dappnode.eth": {
       installed: "0.1.0",
       versions: {
-        "0.1.1": { dependencies: {} },
-        "0.1.0": { dependencies: {} }
+        "0.1.1": {},
+        "0.1.0": {}
       }
     },
     "core.dnp.dappnode.eth": {
       installed: "0.1.1",
       versions: {
         "0.1.1": {
-          dependencies: {
-            "vnp.dnp.dappnode.eth": "0.1.1",
-            "dappmanager.dnp.dappnode.eth": "0.1.0",
-            "ethforward.dnp.dappnode.eth": "0.1.1"
-          }
+          "vpn.dnp.dappnode.eth": "0.1.1",
+          "dappmanager.dnp.dappnode.eth": "0.1.0",
+          "ethforward.dnp.dappnode.eth": "0.1.1"
         },
         "0.1.0": {
-          dependencies: {
-            "vnp.dnp.dappnode.eth": "0.1.0",
-            "dappmanager.dnp.dappnode.eth": "0.1.0",
-            "ethforward.dnp.dappnode.eth": "0.1.0"
-          }
+          "vpn.dnp.dappnode.eth": "0.1.0",
+          "dappmanager.dnp.dappnode.eth": "0.1.0",
+          "ethforward.dnp.dappnode.eth": "0.1.0"
         }
       }
     }
   }
 };
+
+export default caseData;

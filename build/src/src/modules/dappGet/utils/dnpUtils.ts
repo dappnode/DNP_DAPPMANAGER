@@ -31,10 +31,10 @@ export function setVersion(
   dnps: DappGetDnps,
   name: string,
   version: string,
-  value: Dependencies
+  dependencies: Dependencies
 ): void {
   if (!dnps[name]) dnps[name] = { versions: {} };
-  dnps[name].versions[version] = value;
+  dnps[name].versions[version] = dependencies;
 }
 
 export function getVersionsFromDnp(

@@ -38,8 +38,14 @@ const scFormat = format.printf(info => {
     label: undefined,
     timestamp: undefined
   });
-  const append = JSON.stringify(filteredInfo, null, 4);
-  if (append != "{}") {
+  let append: string;
+  try {
+    append = JSON.stringify(filteredInfo, null, 4);
+  } catch (e) {
+    append = `\n Logs error - can't stringify data: ${e.message}`;
+  }
+
+  if (append && append != "{}") {
     message = `${message} - ${append}`;
   }
   const variables = [];
@@ -67,6 +73,19 @@ function _getLabel(mod: NodeModule) {
   return format.label({ label: label });
 }
 
+/**
+ * Parses data appended to the message
+ * ```javascript
+ * logs.info("Hello!", { asd: 1 });
+ * ```
+ * Prints
+ * ```raw
+ * INFO [.] [] : Hello! - {
+ *   "asd": 1
+ * }
+ * ```
+ * @param mod
+ */
 export default function(mod: NodeModule): winston.Logger {
   const logger = createLogger({
     level: logLevel,

@@ -1,5 +1,6 @@
 import fs from "fs";
 import * as eventBus from "../eventBus";
+import params from "../params";
 // Modules
 import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
 // External call
@@ -31,7 +32,7 @@ export default async function removePackage({
 
   const { name, isCore, packageName: containerName } = await listContainer(id);
 
-  if (isCore || id === "dappmanager.dnp.dappnode.eth") {
+  if (isCore || id === params.dappmanagerDnpName) {
     throw Error("Core packages cannot be cannot be removed");
   }
 

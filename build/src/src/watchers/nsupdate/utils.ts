@@ -1,19 +1,35 @@
 import { PackageContainer } from "../../types";
+import { isEmpty } from "lodash";
 
 const TTL = 60;
+const ethZone = "eth.";
+const dappnodeZone = "dappnode.";
 
-const zones = {
-  "eth.": getMyDotEthdomain,
-  "dappnode.": getDotDappnodeDomain
-};
+interface DomainMap {
+  [domain: string]: string; // ip
+}
 
-interface DomainIp {
-  domain: string;
+interface PackageContainerWithIp extends PackageContainer {
   ip: string;
 }
-interface DnpToUpdate {
-  name: string;
-  ip: string;
+
+interface AliasMap {
+  [domainAlias: string]: string; // dnpName
+}
+
+/**
+ * Rules for allowing or forbidding alias requested by the packages
+ * @param alias "fullnode"
+ * @param dnp Package object
+ */
+function isAliasAllowed(alias: string, dnp: PackageContainerWithIp): boolean {
+  // For now only allow known aliases
+  switch (alias) {
+    case "fullnode":
+      // Only allow "fullnode" if the package declares itself as an ethereum node
+      return dnp.chain === "ethereum";
+  }
+  return false;
 }
 
 /**
@@ -37,12 +53,12 @@ interface DnpToUpdate {
  * send
  */
 function getNsupdateTxt(
-  domains: DomainIp[],
+  domains: DomainMap,
   zone: string,
   removeOnly: boolean
 ): string {
-  const nsupdateInstructions = domains
-    .map(({ domain, ip }) => {
+  const nsupdateInstructions = Object.entries(domains)
+    .map(([domain, ip]) => {
       const rm = `update delete ${domain} A`;
       const add = `update add ${domain} ${TTL} A ${ip}`;
       return removeOnly ? rm : [rm, add].join("\n");
@@ -104,14 +120,16 @@ export function getDotDappnodeDomain(name: string): string {
  */
 export function getNsupdateTxts({
   dnpList,
+  domainAliases,
   ids,
   removeOnly = false
 }: {
   dnpList: PackageContainer[];
+  domainAliases: AliasMap;
   ids?: string[];
   removeOnly?: boolean;
 }): string[] {
-  const dnpsToUpdate: DnpToUpdate[] = [];
+  const dnpsToUpdate: PackageContainerWithIp[] = [];
   // `dnp.ip` = Necessary to satisfy the typscript compiler
   for (const dnp of dnpList)
     if (
@@ -120,15 +138,37 @@ export function getNsupdateTxts({
       !dnp.isCore &&
       (!ids || !ids.length || ids.includes(dnp.name))
     )
-      dnpsToUpdate.push({ name: dnp.name, ip: dnp.ip });
+      dnpsToUpdate.push({ ...dnp, ip: dnp.ip });
 
   if (!dnpsToUpdate.length) return [];
 
-  return Object.entries(zones).map(([zone, getDomain]) =>
-    getNsupdateTxt(
-      dnpsToUpdate.map(({ name, ip }) => ({ domain: getDomain(name), ip })),
-      zone,
-      removeOnly
-    )
+  const eth: DomainMap = {};
+  const dappnode: DomainMap = {};
+
+  // Add domains from installed package names
+  for (const { name, ip } of dnpsToUpdate) {
+    eth[getMyDotEthdomain(name)] = ip;
+    dappnode[getDotDappnodeDomain(name)] = ip;
+  }
+
+  // Add dappnode domain alias from installed packages
+  for (const dnp of dnpsToUpdate)
+    if (dnp.domainAlias)
+      for (const alias of dnp.domainAlias)
+        if (isAliasAllowed(alias, dnp))
+          dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+
+  // Add .dappnode domain alias from db (such as fullnode.dappnode)
+  for (const [alias, dnpName] of Object.entries(domainAliases)) {
+    const dnp = dnpsToUpdate.find(dnp => dnpName && dnp.name === dnpName);
+    if (dnp) dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+  }
+
+  return (
+    [{ zone: ethZone, domains: eth }, { zone: dappnodeZone, domains: dappnode }]
+      // Only process zones that have domains / entries
+      .filter(({ domains }) => !isEmpty(domains))
+      // Convert domain maps to nsupdate txts
+      .map(({ zone, domains }) => getNsupdateTxt(domains, zone, removeOnly))
   );
 }

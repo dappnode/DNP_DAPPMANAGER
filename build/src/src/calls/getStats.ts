@@ -1,26 +1,15 @@
+import { ReturnData } from "../route-types/getStats";
 import os from "os";
 import shellExec from "../utils/shell";
 import Logs from "../logs";
 import { RpcHandlerReturnWithResult } from "../types";
 const logs = Logs(module);
 
-interface ReturnData {
-  cpu: string | undefined;
-  memory: string | undefined;
-  disk: string | undefined;
-}
-
 // Cache static values
 const numCores = os.cpus().length;
 
 /**
- * Returns the current disk space available of a requested path
- *
- * @returns {object} status = {
- *   cpu: "35%", {string}
- *   memory: "46%", {string}
- *   disk: "57%", {string}
- * }
+ * Returns relevant host machine stats such as disk space, memory, cpu, etc
  */
 export default async function getStats(): RpcHandlerReturnWithResult<
   ReturnData

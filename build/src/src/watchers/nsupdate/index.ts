@@ -1,7 +1,9 @@
 import * as eventBus from "../../eventBus";
+import * as db from "../../db";
 import params from "../../params";
 import execNsupdate from "./execNsupdate";
 import { listContainers } from "../../modules/docker/listContainers";
+import { setIntervalDynamic } from "../../utils/asyncFlows";
 // Utils
 import { getNsupdateTxts } from "./utils";
 import Logs from "../../logs";
@@ -19,10 +21,23 @@ async function runNsupdate({
 }): Promise<void> {
   try {
     const dnpList = await listContainers();
-    const nsupdateTxts = getNsupdateTxts({ dnpList, ids, removeOnly });
+
+    // Load domain alias from db
+    const domainAliases = {
+      fullnode: db.fullnodeDomainTarget.get()
+    };
+
+    const nsupdateTxts = getNsupdateTxts({
+      dnpList,
+      domainAliases,
+      ids,
+      removeOnly
+    });
+
     for (const nsupdateTxt of nsupdateTxts) {
       await execNsupdate(nsupdateTxt);
     }
+
     if (ids) {
       if (removeOnly) logs.info(`nsupdate delete for ${ids.join(", ")}`);
       else logs.info(`nsupdate add for ${ids.join(", ")}`);
@@ -39,9 +54,21 @@ async function runNsupdate({
 runNsupdate({});
 
 // Every interval
-setInterval(() => {
+setIntervalDynamic(() => {
   runNsupdate({});
-}, nsupdateInterval);
+}, [
+  // There may be a race condition between the DAPPMANAGER and the BIND
+  // On an update, if the DAPPMANAGER restarts first and then the BIND,
+  // there might be a potential window of `nsupdateInterval` hasn't applied
+  // the dynamic nsupdates provided by the DAPPMANAGER
+  // Since doing an nsupdate is cheap this increase in refresh frequency
+  // after a restart wants to prevents a potential issue by the race condition
+  1 * 60 * 1000, //        1  min
+  5 * 60 * 1000, //        5  min
+  nsupdateInterval / 4, // 15 min
+  nsupdateInterval / 2, // 30 min
+  nsupdateInterval //      60 min
+]);
 
 // React immediatelly to new installs
 eventBus.packagesModified.on(({ ids, removed }) => {

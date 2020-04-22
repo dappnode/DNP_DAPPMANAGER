@@ -1,6 +1,6 @@
-# Layer 1: Build the dependencies
+# Layer 0: Common base so it's cached 
 #####################################
-FROM node:10.15.3-alpine as build-deps
+FROM node:10.15.3-alpine as build-base
 
 RUN apk add --no-cache git python build-base bind-tools docker bash jq
 
@@ -9,7 +9,19 @@ WORKDIR /usr/src/app
 # Install app dependencies to use docker's layer cache
 COPY build/src/package.json ./
 COPY build/src/yarn.lock ./
-RUN yarn install --production
+RUN yarn install --production --link-duplicates
+# --link-duplicates: hardlinks for repeated modules. 193964 => 175592
+
+
+
+# Layer 1: Build the dependencies
+#####################################
+FROM build-base as build-deps
+
+# Apply patch-package
+COPY build/src/patches patches
+RUN yarn add -D patch-package --production --frozen-lockfile --skip-integrity-check
+RUN yarn prepare
 
 # Get this DNP version and git hash. Results in /usr/src/app/.version.json
 COPY .git .git
@@ -20,16 +32,9 @@ RUN ./getVersionData.sh
 
 # Layer 2: Build the source .ts files
 #####################################
-FROM node:10.15.3-alpine as build-src
+FROM build-base as build-src
 
-RUN apk add --no-cache git python build-base bind-tools docker bash jq
-
-WORKDIR /usr/src/app
-
-# Add source
-COPY build/src/package.json ./
-COPY build/src/yarn.lock ./
-RUN yarn add -D typescript
+RUN yarn install --frozen-lockfile
 COPY build/src .
 RUN yarn build
 

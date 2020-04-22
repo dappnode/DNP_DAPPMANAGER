@@ -10,8 +10,8 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 
 /**
  * Script runners
- * - detect_fs.sh
  */
+type ScriptName = "detect_fs.sh" | "migrate_volume.sh";
 
 /**
  * Detects mountpoints in the host
@@ -69,10 +69,29 @@ export const detectMountpoints = memoize(
 );
 
 /**
+ * Dangerously move a docker volume in the host docker root dir
+ * @param fromVolumeName "dncore_ethchaindnpdappnodeeth_geth"
+ * @param toVolumeName "gethdnpdappnodeeth_geth"
+ */
+export async function migrateVolume(
+  fromVolumeName: string,
+  toVolumeName: string
+): Promise<void> {
+  for (const [id, name] of Object.entries({ fromVolumeName, toVolumeName })) {
+    // Make sure a wrong path is not created, and prevent "../../" paths
+    if (!name) throw new Error(`${id} must not be empty`);
+    if (/(\.){2,}/.test(name)) throw Error(`${id} must not contain '..'`);
+    if (/\//.test(name)) throw Error(`${id} must not be a path`);
+  }
+
+  await runScript("migrate_volume.sh", `${fromVolumeName} ${toVolumeName}`);
+}
+
+/**
  * Run a script for the hostScripts folder
  * @param scriptName "detect_fs.sh"
  */
-async function runScript(scriptName: string, args = ""): Promise<string> {
+async function runScript(scriptName: ScriptName, args = ""): Promise<string> {
   const scriptPath = path.resolve(hostScriptsDir, scriptName);
   if (!fs.existsSync(scriptPath))
     throw Error(`Host script ${scriptName} not found`);

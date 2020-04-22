@@ -268,13 +268,6 @@ export function addGeneralDataToCompose(
     services: {
       [serviceName]: {
         ...service,
-        // Add logging options to prevent huge log files
-        logging: {
-          options: {
-            "max-size": "10m",
-            "max-file": "3"
-          }
-        },
         // Add custom labels
         labels: {
           ...service.labels,
@@ -389,6 +382,7 @@ export function applyUserSet(
   const volumeMappings = parseVolumeMappings(prevVolumes);
 
   // User set
+  const domainAlias = userSettings.domainAlias;
   const userSetEnvironment = userSettings.environment || {};
   const userSetPortMappings = userSettings.portMappings || {};
   const allNamedVolumeMountpoint = userSettings.allNamedVolumeMountpoint;
@@ -502,7 +496,8 @@ export function applyUserSet(
             defaultEnvironment: prevEnvironment,
             defaultPorts: prevPorts,
             defaultVolumes: prevVolumes
-          })
+          }),
+          ...writeMetadataToLabels({ domainAlias })
         }
       }
     },

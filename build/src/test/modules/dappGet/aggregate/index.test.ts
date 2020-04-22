@@ -2,14 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock";
+import { DappGetFetcherMock } from "../testHelpers";
+
 // Import for types
 import aggregateType from "../../../../src/modules/dappGet/aggregate/index";
-import { PackageContainer, Dependencies } from "../../../../src/types";
+import { PackageContainer } from "../../../../src/types";
 import { mockDnp } from "../../../testUtils";
-import {
-  DappGetFetchFunction,
-  DappGetDnps
-} from "../../../../src/modules/dappGet/types";
+import { DappGetDnps } from "../../../../src/modules/dappGet/types";
 
 /**
  * Purpose of the test. Make sure aggregate fetches all necessary DNPs and info
@@ -113,18 +112,7 @@ function getRelevantInstalledDnps(): PackageContainer[] {
   return dnpList.filter(dnp => relevantInstalledDnpNames.includes(dnp.name));
 }
 
-const emptyFetch: DappGetFetchFunction = {
-  dependencies: async (name: string, ver: string): Promise<Dependencies> => {
-    name;
-    ver;
-    return {};
-  },
-  versions: async (name: string, versionRange: string): Promise<string[]> => {
-    name;
-    versionRange;
-    return [];
-  }
-};
+const dappGetFetcherEmpty = new DappGetFetcherMock({});
 
 describe("dappGet/aggregate", () => {
   let aggregate: typeof aggregateType;
@@ -157,7 +145,11 @@ describe("dappGet/aggregate", () => {
       name: nginxId,
       ver: "^0.1.0"
     };
-    const dnps = await aggregate({ req, dnpList, fetch: emptyFetch });
+    const dnps = await aggregate({
+      req,
+      dnpList,
+      dappGetFetcher: dappGetFetcherEmpty
+    });
 
     expect(dnps).to.deep.equal(
       {
@@ -200,12 +192,12 @@ describe("dappGet/aggregate", () => {
       // For user request, the version range is the one set by the user
       { name: nginxId, versionRange: "^0.1.0" },
       // For state packages, the version range is greater or equal than the current
-      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" },
-      // For state packages, if there is a specified origin, only fetch that
-      {
-        name: "letsencrypt-nginx.dnp.dappnode.eth",
-        versionRange: "/ipfs/Qm1234"
-      }
+      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" }
+      // For state packages, if there is a specified origin, use cached local dependencies
+      // {
+      //   name: "letsencrypt-nginx.dnp.dappnode.eth",
+      //   versionRange: "/ipfs/Qm1234"
+      // }
     ];
     sinon.assert.callCount(
       aggregateDependenciesSpy,

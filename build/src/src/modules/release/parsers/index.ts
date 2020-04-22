@@ -175,7 +175,9 @@ export function sanitizeCompose(
         image: getImage(name, version),
         restart: service.restart || "always",
         ...(env_file.length ? { env_file } : {}),
-        logging: {
+        // Add logging options to prevent huge log files
+        logging: service.logging || {
+          driver: "json-file",
           options: {
             "max-size": "10m",
             "max-file": "3"

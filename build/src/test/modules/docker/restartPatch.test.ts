@@ -2,16 +2,16 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
+import params from "../../../src/params";
 import * as getPath from "../../../src/utils/getPath";
 import rewiremock from "rewiremock";
 // Import for type
-import restartPatchType, {
-  restartId
-} from "../../../src/modules/docker/restartPatch";
+import restartPatchType from "../../../src/modules/docker/restartPatch";
 
 describe.skip("Util: restartPatch", () => {
   const dockerComposeUp = sinon.stub();
 
+  const restartId = params.restartDnpName;
   const dockerComposeRestartPath = getPath.dockerCompose(restartId, true);
 
   let restartPatch: typeof restartPatchType;

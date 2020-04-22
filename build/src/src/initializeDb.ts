@@ -19,8 +19,8 @@ import { mergeEnvFile } from "./utils/dockerComposeFile";
 const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
-const vpnName = "vpn.dnp.dappnode.eth";
-const vpnContainerName = "DAppNodeCore-vpn.dnp.dappnode.eth";
+const vpnName = params.vpnDnpName;
+const vpnContainerName = `DAppNodeCore-${vpnName}`;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -202,7 +202,7 @@ async function migrateVpnDb(): Promise<void> {
     logs.info("VPN DB imported successfully imported");
   } catch (e) {
     if (e.message && e.message.includes("No such file or directory")) {
-      logs.warn(`VNP DB not imported, vpndb.json missing.`);
+      logs.warn(`VPN DB not imported, vpndb.json missing.`);
     } else {
       logs.error(`Error importing VPN DB: ${e.stack}`);
     }

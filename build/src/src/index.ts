@@ -9,29 +9,28 @@ import { convertLegacyEnvFiles } from "./utils/configFiles";
 import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
-import { PackageNotification } from "./types";
+import { copyHostScripts } from "./modules/hostScripts";
+import { migrateEthchain } from "./modules/ethClient";
+import { migrateEthForward } from "./ethForward/migrateEthForward";
+import { postCoreUpdate } from "./modules/installer/postCoreUpdate";
+import {
+  getVersionData,
+  isNewDappmanagerVersion
+} from "./utils/getVersionData";
+import * as calls from "./calls";
+import runWatchers from "./watchers";
+import startEthForward from "./ethForward";
 import Logs from "./logs";
 const logs = Logs(module);
-
-// import calls
-import * as calls from "./calls";
-
-// Start watchers
-import "./watchers/autoUpdates";
-import "./watchers/chains";
-import "./watchers/diskUsage";
-import "./watchers/natRenewal";
-import "./watchers/dyndns";
-import "./watchers/nsupdate";
-
-// Print version data
-import "./utils/getVersionData";
 
 // Start HTTP API
 import "./httpApi";
 
-// Copy host scripts
-import { copyHostScripts } from "./modules/hostScripts";
+// Start eth forward http proxy
+startEthForward();
+
+// Start watchers
+runWatchers();
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
@@ -108,16 +107,22 @@ connection.onopen = (session, details): void => {
 
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {
-    const dnpList = (await calls.listPackages()).result;
+    const { result: dnpList } = await calls.listPackages();
     wampSubscriptions.packages.emit(dnpList);
-    const volumes = (await calls.volumesGet()).result;
+    const { result: volumes } = await calls.volumesGet();
     wampSubscriptions.volumes.emit(volumes);
   });
 
   // Emits the auto update data (settings, registry, pending)
   eventBus.requestAutoUpdateData.on(async () => {
-    const autoUpdateData = (await calls.autoUpdateDataGet()).result;
+    const { result: autoUpdateData } = await calls.autoUpdateDataGet();
     wampSubscriptions.autoUpdateData.emit(autoUpdateData);
+  });
+
+  // Emits all system info
+  eventBus.requestSystemInfo.on(async () => {
+    const { result: systemInfo } = await calls.systemInfoGet();
+    wampSubscriptions.systemInfo.emit(systemInfo);
   });
 
   // Receives userAction logs from the VPN nodejs app
@@ -126,7 +131,7 @@ connection.onopen = (session, details): void => {
   });
 
   // Store notification in DB and push it to the UI
-  eventBus.notification.on((notification: PackageNotification) => {
+  eventBus.notification.on(notification => {
     db.notification.set(notification.id, notification);
     wampSubscriptions.pushNotification.emit(notification);
   });
@@ -138,6 +143,10 @@ connection.onopen = (session, details): void => {
    */
   eventBus.requestAutoUpdateData.emit();
   eventBus.requestPackages.emit();
+
+  // If DAPPMANAGER's version has changed reload the client
+  if (isNewDappmanagerVersion())
+    wampSubscriptions.reloadClient.emit({ reason: "New version" });
 };
 
 connection.onclose = (reason, details): boolean => {
@@ -149,6 +158,11 @@ connection.onclose = (reason, details): boolean => {
 
 connection.open();
 logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+
+// Read and print version data
+const versionData = getVersionData();
+if (versionData.ok) logs.info("Version info", versionData.data);
+else logs.error(`Error getting version data: ${versionData.message}`);
 
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
@@ -178,6 +192,14 @@ async function runLegacyOps(): Promise<void> {
   } catch (e) {
     logs.error(`Error converting DNP .env files: ${e.stack || e.message}`);
   }
+
+  migrateEthchain().catch(e =>
+    logs.error(`Error migrating ETHCHAIN: ${e.stack}`)
+  );
+
+  migrateEthForward().catch(e =>
+    logs.error(`Error migrating ETHFORWARD: ${e.stack}`)
+  );
 }
 
 runLegacyOps();
@@ -185,14 +207,11 @@ runLegacyOps();
 /**
  * Run initial opts
  * - Copy host scripts
+ * -
  */
 
-try {
-  const { copied, removed } = copyHostScripts();
-  let message = "Successfully run copyHostScripts.";
-  if (copied.length) message += ` Copied ${copied.join(", ")}.`;
-  if (removed.length) message += ` Removed ${removed.join(", ")}.`;
-  logs.info(message);
-} catch (e) {
-  logs.error(`Error copying host scripts: ${e.stack}`);
-}
+copyHostScripts().catch(e =>
+  logs.error(`Error copying host scripts: ${e.stack}`)
+);
+
+postCoreUpdate().catch(e => logs.error(`Error on postCoreUpdate: ${e.stack}`));

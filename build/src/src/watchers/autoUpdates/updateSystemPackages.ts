@@ -1,22 +1,19 @@
 import * as eventBus from "../../eventBus";
-import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
-// Utils
+import params from "../../params";
 import {
   isUpdateDelayCompleted,
   flagCompletedUpdate,
   flagErrorUpdate
 } from "../../utils/autoUpdateHelper";
-// External calls
 import installPackage from "../../calls/installPackage";
 import Logs from "../../logs";
+import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 const logs = Logs(module);
 
-const coreDnpName = "core.dnp.dappnode.eth";
+const coreDnpName = params.coreDnpName;
 
 export default async function updateSystemPackages(): Promise<void> {
-  const {
-    result: { available, type, versionId }
-  } = await fetchCoreUpdateData({});
+  const { available, type, versionId } = await getCoreUpdateData();
 
   // If there is not update available or the type is not patch, return early
   if (!available || type !== "patch") return;
