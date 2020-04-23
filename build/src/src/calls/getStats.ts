@@ -1,9 +1,8 @@
 import { ReturnData } from "../route-types/getStats";
 import os from "os";
 import shellExec from "../utils/shell";
-import Logs from "../logs";
 import osu from "node-os-utils";
-import { RpcHandlerReturnWithResult } from "../types";
+import Logs from "../logs";
 const logs = Logs(module);
 
 // Cache static values
@@ -12,9 +11,7 @@ const numCores = os.cpus().length;
 /**
  * Returns relevant host machine stats such as disk space, memory, cpu, etc
  */
-export default async function getStats(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function getStats(): Promise<ReturnData> {
   const cpuUsedPercent = await wrapErrors(async () => {
     const cpuPercentage = await osu.cpu.usage(5000); // 10.38
     return Math.round(cpuPercentage) + "%";
@@ -32,12 +29,9 @@ export default async function getStats(): RpcHandlerReturnWithResult<
   }, "diskUsedPercent");
 
   return {
-    message: `Checked stats of this DAppNode server`,
-    result: {
-      cpu: cpuUsedPercent,
-      memory: memUsedPercent,
-      disk: diskUsedPercent
-    }
+    cpu: cpuUsedPercent,
+    memory: memUsedPercent,
+    disk: diskUsedPercent
   };
 }
 

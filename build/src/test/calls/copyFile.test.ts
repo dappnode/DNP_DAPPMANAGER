@@ -92,24 +92,19 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   });
 
   it("should copy a file to a container", async () => {
-    const res = await copyFileTo({
+    await copyFileTo({
       id,
       dataUri,
       filename,
       toPath: containerPath
     });
-    // Check response message
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
   });
 
   it("should copy a file from a container", async () => {
-    const res = await copyFileFrom({ id, fromPath: containerPath });
+    const result = await copyFileFrom({ id, fromPath: containerPath });
     // Check response message
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res).to.have.property("result");
-    expect(res.result).to.equal(dataUri);
+    expect(result).to.be.ok;
+    expect(result).to.equal(dataUri);
   });
 
   after(async () => {

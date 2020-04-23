@@ -1,5 +1,5 @@
 import * as db from "../db";
-import { PackagePort, RpcHandlerReturnWithResult } from "../types";
+import { PackagePort } from "../types";
 import { UpnpPortMapping } from "../modules/upnpc/types";
 
 interface ReturnData {
@@ -29,19 +29,14 @@ interface ReturnData {
  *   ]
  * }
  */
-export default async function getPortsStatus(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function getPortsStatus(): Promise<ReturnData> {
   const upnpAvailable: boolean = db.upnpAvailable.get();
   const portsToOpen: PackagePort[] = db.portsToOpen.get();
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get();
 
   return {
-    message: `Got port status`,
-    result: {
-      upnpAvailable,
-      portsToOpen,
-      upnpPortMappings
-    }
+    upnpAvailable,
+    portsToOpen,
+    upnpPortMappings
   };
 }

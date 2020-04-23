@@ -54,8 +54,8 @@ describe("Call function: listPackages", function() {
   });
 
   it("should list packages with correct arguments", async () => {
-    const res = await listPackages();
+    const dnpList = await listPackages();
     expect(hasListed).to.be.true;
-    expect(res.result).to.deep.equal(expectedResult);
+    expect(dnpList).to.deep.equal(expectedResult);
   });
 });

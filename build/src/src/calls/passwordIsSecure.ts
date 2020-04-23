@@ -1,7 +1,6 @@
 import { ReturnData } from "../route-types/passwordIsSecure";
 import { isPasswordSecure } from "../modules/passwordManager";
 import * as db from "../db";
-import { RpcHandlerReturnWithResult } from "../types";
 
 /**
  * Checks if the user `dappnode`'s password in the host machine
@@ -16,20 +15,12 @@ import { RpcHandlerReturnWithResult } from "../types";
  *
  * @returns {bool} true = is secure / false = is not
  */
-export default async function passwordIsSecure(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function passwordIsSecure(): Promise<ReturnData> {
   if (db.passwordIsSecure.get()) {
-    return {
-      message: `Password is already secure`,
-      result: true
-    };
+    return true;
   } else {
     const isSecure = await isPasswordSecure();
     if (isSecure) db.passwordIsSecure.set(isSecure);
-    return {
-      message: `Checked if password is secure`,
-      result: isSecure
-    };
+    return isSecure;
   }
 }

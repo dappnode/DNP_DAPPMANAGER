@@ -1,5 +1,4 @@
 import { RequestData } from "../route-types/domainAliasSet";
-import { RpcHandlerReturn } from "../types";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
 
@@ -9,7 +8,7 @@ import * as eventBus from "../eventBus";
 export default async function domainAliasSet({
   alias,
   dnpName
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   switch (alias) {
     case "fullnode":
       db.fullnodeDomainTarget.set(dnpName);
@@ -20,10 +19,4 @@ export default async function domainAliasSet({
 
   // Trigger an nsupdate run
   eventBus.packagesModified.emit({ ids: [dnpName] });
-
-  return {
-    message: `Set domain alias ${alias} to ${dnpName}`,
-    logMessage: true,
-    userAction: true
-  };
 }

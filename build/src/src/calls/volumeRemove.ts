@@ -3,7 +3,6 @@ import { dockerVolumeRm } from "../modules/docker/dockerCommands";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { shellHost } from "../utils/shell";
 import * as eventBus from "../eventBus";
-import { RpcHandlerReturn } from "../types";
 import params from "../params";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -17,19 +16,13 @@ const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
  */
 export default async function volumeRemove({
   name
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   if (!name) throw Error("kwarg name must be defined");
 
   await removeNamedVolume(name);
 
   // Emit packages update
   eventBus.requestPackages.emit();
-
-  return {
-    message: `Successfully removed volume: ${name}`,
-    logMessage: true,
-    userAction: true
-  };
 }
 
 /**

@@ -170,9 +170,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${nginxId}`, async () => {
-    const res = await restartPackageVolumes({ id: nginxId });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
+    await restartPackageVolumes({ id: nginxId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -208,9 +206,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${dnpNameCore} (core)`, async () => {
-    const res = await restartPackageVolumes({ id: dnpNameCore });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
+    await restartPackageVolumes({ id: dnpNameCore });
 
     // sinon.assert.called(dockerRm);
     sinon.assert.called(dockerRm);
@@ -226,12 +222,10 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove only one of the package volumes of ${dnpNameCore} (core)`, async () => {
-    const res = await restartPackageVolumes({
+    await restartPackageVolumes({
       id: dnpNameCore,
       volumeId: "vol1"
     });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
 
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.callCount(dockerRm, 1);
@@ -247,9 +241,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {
-    const res = await restartPackageVolumes({ id: raidenTestnetId });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
+    await restartPackageVolumes({ id: raidenTestnetId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -291,13 +283,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it("Should early return if the DNP has no volumes", async () => {
-    const res = await restartPackageVolumes({ id: noVolsDnpName });
-    // sinon.assert.called(dockerRm);
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res.message).to.equal(
-      "no-vols.dnp.dappnode.eth has no named volumes"
-    );
+    await restartPackageVolumes({ id: noVolsDnpName });
   });
 
   after(() => {

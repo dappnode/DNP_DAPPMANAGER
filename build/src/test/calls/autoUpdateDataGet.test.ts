@@ -85,50 +85,47 @@ describe("Call function: autoUpdateDataGet", () => {
     const res = await autoUpdateDataGet();
 
     expect(res).to.deep.equal({
-      message: "Got auto update data",
-      result: {
-        settings: {
-          "bitcoin.dnp.dappnode.eth": { enabled: true },
-          "my-packages": { enabled: true },
-          "system-packages": { enabled: true }
-        },
-        registry: {
-          "core.dnp.dappnode.eth": {
-            "admin@0.2.1,core@0.2.1": {
-              successful: true,
-              updated: timestamp
-            }
+      settings: {
+        "bitcoin.dnp.dappnode.eth": { enabled: true },
+        "my-packages": { enabled: true },
+        "system-packages": { enabled: true }
+      },
+      registry: {
+        "core.dnp.dappnode.eth": {
+          "admin@0.2.1,core@0.2.1": {
+            successful: true,
+            updated: timestamp
           }
+        }
+      },
+      pending: {
+        "bitcoin.dnp.dappnode.eth": {
+          completedDelay: false,
+          firstSeen: timestamp,
+          scheduledUpdate: timestamp + params.AUTO_UPDATE_DELAY,
+          version: nextVersion
+        }
+      },
+      dnpsToShow: [
+        {
+          id: "system-packages",
+          displayName: "System packages",
+          enabled: true,
+          feedback: { updated: timestamp }
         },
-        pending: {
-          "bitcoin.dnp.dappnode.eth": {
-            completedDelay: false,
-            firstSeen: timestamp,
-            scheduledUpdate: timestamp + params.AUTO_UPDATE_DELAY,
-            version: nextVersion
-          }
+        {
+          id: "my-packages",
+          displayName: "My packages",
+          enabled: true,
+          feedback: {}
         },
-        dnpsToShow: [
-          {
-            id: "system-packages",
-            displayName: "System packages",
-            enabled: true,
-            feedback: { updated: timestamp }
-          },
-          {
-            id: "my-packages",
-            displayName: "My packages",
-            enabled: true,
-            feedback: {}
-          },
-          {
-            id: id,
-            displayName: "Bitcoin",
-            enabled: true,
-            feedback: { scheduled: timestamp + params.AUTO_UPDATE_DELAY }
-          }
-        ]
-      }
+        {
+          id: id,
+          displayName: "Bitcoin",
+          enabled: true,
+          feedback: { scheduled: timestamp + params.AUTO_UPDATE_DELAY }
+        }
+      ]
     });
   });
 

@@ -1,6 +1,6 @@
 import params from "../params";
 import { omit, isEmpty } from "lodash";
-import { RpcHandlerReturnWithResult, CoreUpdateData } from "../types";
+import { CoreUpdateData } from "../types";
 import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../modules/release";
 import { listContainers } from "../modules/docker/listContainers";
@@ -16,11 +16,8 @@ const defaultVersion = "*";
  */
 export default async function fetchCoreUpdateData({
   version
-}: RequestData): RpcHandlerReturnWithResult<ReturnData> {
-  return {
-    message: "Got core update data",
-    result: await getCoreUpdateData(version)
-  };
+}: RequestData): Promise<ReturnData> {
+  return await getCoreUpdateData(version);
 }
 
 /**

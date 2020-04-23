@@ -8,7 +8,6 @@ import { restartPackageVolumesTask } from "./restartPackageVolumes";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
-import { RpcHandlerReturn } from "../types";
 import { listContainer } from "../modules/docker/listContainers";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -27,7 +26,7 @@ export default async function removePackage({
   id: string;
   deleteVolumes?: boolean;
   timeout?: number;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
 
   const { name, isCore, packageName: containerName } = await listContainer(id);
@@ -80,10 +79,4 @@ export default async function removePackage({
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ ids: removedIds, removed: true });
-
-  return {
-    message: `Removed package: ${id}`,
-    logMessage: true,
-    userAction: true
-  };
 }

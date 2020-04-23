@@ -10,7 +10,6 @@ import { listContainer } from "../modules/docker/listContainers";
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";
 import params from "../params";
-import { RpcHandlerReturnWithResult } from "../types";
 
 type ReturnData = string;
 
@@ -37,7 +36,7 @@ export default async function copyFileFrom({
 }: {
   id: string;
   fromPath: string;
-}): RpcHandlerReturnWithResult<ReturnData> {
+}): Promise<ReturnData> {
   if (!id) throw Error("Argument id must be defined");
   if (!fromPath) throw Error("Argument fromPath must be defined");
 
@@ -139,12 +138,7 @@ export default async function copyFileFrom({
   // Clean intermediate file
   await shell(`rm -rf ${toPath}`);
 
-  return {
-    message: `Copied file from ${id} ${fromPath}`,
-    logMessage: true,
-    userAction: true,
-    result: dataUri
-  };
+  return dataUri;
 }
 
 // Utility

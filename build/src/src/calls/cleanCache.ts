@@ -2,7 +2,6 @@ import params from "../params";
 import { clearCache } from "../db";
 // Utils
 import shell from "../utils/shell";
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Cleans the cache files of the DAPPMANAGER:
@@ -10,7 +9,7 @@ import { RpcHandlerReturn } from "../types";
  * - user action logs
  * - temp transfer folder
  */
-export default async function cleanCache(): RpcHandlerReturn {
+export default async function cleanCache(): Promise<void> {
   const pathsToDelete = [
     params.userActionLogsFilename,
     params.TEMP_TRANSFER_DIR
@@ -21,10 +20,4 @@ export default async function cleanCache(): RpcHandlerReturn {
 
   // Clear cache DBs in friendly manner
   clearCache();
-
-  return {
-    message: `Cleaned cache`,
-    logMessage: true,
-    userAction: true
-  };
 }

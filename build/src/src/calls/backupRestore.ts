@@ -11,7 +11,7 @@ import restartPackage from "./restartPackage";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup, RpcHandlerReturn } from "../types";
+import { PackageBackup } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -33,7 +33,7 @@ export default async function backupRestore({
   id: string;
   backup: PackageBackup[];
   fileId: string;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!id) throw Error("Argument id must be defined");
   if (!fileId) throw Error("Argument fileId must be defined");
   if (!backup) throw Error("Argument backup must be defined");
@@ -104,12 +104,6 @@ export default async function backupRestore({
 
     // Restart package so the file changes take effect
     await restartPackage({ id });
-
-    return {
-      message: `Restored backup ${id}, items: ${successfulBackups.join(", ")}`,
-      logMessage: true,
-      userAction: true
-    };
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
     await shell(`rm -rf ${tempTransferDir}`);
