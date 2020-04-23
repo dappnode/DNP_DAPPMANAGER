@@ -4,7 +4,7 @@ import params from "../params";
  * Used to test different IPFS timeout parameters live from the ADMIN UI.
  * @param {(string|number)} timeout new IPFS timeout in ms
  */
-export default async function changeIpfsTimeout({
+export async function changeIpfsTimeout({
   timeout
 }: {
   timeout?: number;

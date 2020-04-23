@@ -10,7 +10,7 @@ const numCores = os.cpus().length;
 /**
  * Returns relevant host machine stats such as disk space, memory, cpu, etc
  */
-export default async function getStats(): Promise<ReturnData> {
+export async function getStats(): Promise<ReturnData> {
   const cpuUsedPercent = await wrapErrors(async () => {
     return getDiskPercent();
   }, "cpuUsedPercent");

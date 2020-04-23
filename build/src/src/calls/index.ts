@@ -1,99 +1,42 @@
-/**
- * Each call on this list will be automatically registered to WAMP
- * The key of the object property will be the call name as
- *     <key>.dappmanager.dnp.dappnode.eth
- */
-
-import autoUpdateDataGet from "./autoUpdateDataGet";
-import autoUpdateSettingsEdit from "./autoUpdateSettingsEdit";
-import backupGet from "./backupGet";
-import backupRestore from "./backupRestore";
-import changeIpfsTimeout from "./changeIpfsTimeout";
-import cleanCache from "./cleanCache";
-import copyFileFrom from "./copyFileFrom";
-import copyFileTo from "./copyFileTo";
-import diagnose from "./diagnose";
-import domainAliasSet from "./domainAliasSet";
-import ethClientFallbackSet from "./ethClientFallbackSet";
-import ethClientTargetSet from "./ethClientTargetSet";
-import fetchCoreUpdateData from "./fetchCoreUpdateData";
-import fetchDirectory from "./fetchDirectory";
-import fetchDnpRequest from "./fetchDnpRequest";
-import getStats from "./getStats";
-import getUserActionLogs from "./getUserActionLogs";
-import installPackage from "./installPackage";
-import installPackageSafe from "./installPackageSafe";
-import listPackages from "./listPackages";
-import logPackage from "./logPackage";
-import managePorts from "./managePorts";
-import mountpointsGet from "./mountpointsGet";
-import notificationsGet from "./notificationsGet";
-import notificationsRemove from "./notificationsRemove";
-import notificationsTest from "./notificationsTest";
-import packageDetailDataGet from "./packageDetailDataGet";
-import packageGettingStartedToggle from "./packageGettingStartedToggle";
-import passwordChange from "./passwordChange";
-import passwordIsSecure from "./passwordIsSecure";
-import poweroffHost from "./poweroffHost";
-import rebootHost from "./rebootHost";
-import removePackage from "./removePackage";
-import requestChainData from "./requestChainData";
-import restartPackage from "./restartPackage";
-import restartPackageVolumes from "./restartPackageVolumes";
-import seedPhraseSet from "./seedPhraseSet";
-import setStaticIp from "./setStaticIp";
-import systemInfoGet from "./systemInfoGet";
-import togglePackage from "./togglePackage";
-import newFeatureStatusSet from "./newFeatureStatusSet";
-import updatePackageEnv from "./updatePackageEnv";
-import updatePortMappings from "./updatePortMappings";
-import volumeRemove from "./volumeRemove";
-import volumesGet from "./volumesGet";
-
-export {
-  autoUpdateDataGet,
-  autoUpdateSettingsEdit,
-  backupGet,
-  backupRestore,
-  changeIpfsTimeout,
-  cleanCache,
-  copyFileFrom,
-  copyFileTo,
-  diagnose,
-  domainAliasSet,
-  ethClientFallbackSet,
-  ethClientTargetSet,
-  fetchCoreUpdateData,
-  fetchDirectory,
-  fetchDnpRequest,
-  getStats,
-  getUserActionLogs,
-  installPackage,
-  installPackageSafe,
-  listPackages,
-  logPackage,
-  managePorts,
-  mountpointsGet,
-  notificationsGet,
-  notificationsRemove,
-  notificationsTest,
-  packageDetailDataGet,
-  packageGettingStartedToggle,
-  passwordChange,
-  passwordIsSecure,
-  poweroffHost,
-  rebootHost,
-  removePackage,
-  requestChainData,
-  restartPackage,
-  restartPackageVolumes,
-  seedPhraseSet,
-  setStaticIp,
-  systemInfoGet,
-  togglePackage,
-  newFeatureStatusSet,
-  updatePackageEnv,
-  updatePortMappings,
-  volumeRemove,
-  volumesGet
-};
+export { autoUpdateDataGet } from "./autoUpdateDataGet";
+export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit";
+export { backupGet } from "./backupGet";
+export { backupRestore } from "./backupRestore";
+export { changeIpfsTimeout } from "./changeIpfsTimeout";
+export { cleanCache } from "./cleanCache";
+export { copyFileFrom } from "./copyFileFrom";
+export { copyFileTo } from "./copyFileTo";
+export { diagnose } from "./diagnose";
+export { domainAliasSet } from "./domainAliasSet";
+export { ethClientTargetSet } from "./ethClientTargetSet";
+export { ethClientFallbackSet } from "./ethClientFallbackSet";
+export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
+export { fetchDirectory } from "./fetchDirectory";
+export { fetchDnpRequest } from "./fetchDnpRequest";
+export { getStats } from "./getStats";
+export { getUserActionLogs } from "./getUserActionLogs";
+export { installPackage } from "./installPackage";
+export { listPackages } from "./listPackages";
+export { logPackage } from "./logPackage";
+export { mountpointsGet } from "./mountpointsGet";
+export { notificationsGet } from "./notificationsGet";
+export { notificationsRemove } from "./notificationsRemove";
+export { notificationsTest } from "./notificationsTest";
+export { packageDetailDataGet } from "./packageDetailDataGet";
+export { packageGettingStartedToggle } from "./packageGettingStartedToggle";
+export { passwordChange } from "./passwordChange";
+export { passwordIsSecure } from "./passwordIsSecure";
+export { poweroffHost } from "./poweroffHost";
+export { rebootHost } from "./rebootHost";
+export { removePackage } from "./removePackage";
+export { requestChainData } from "./requestChainData";
+export { restartPackage } from "./restartPackage";
+export { restartPackageVolumes } from "./restartPackageVolumes";
+export { seedPhraseSet } from "./seedPhraseSet";
+export { setStaticIp } from "./setStaticIp";
+export { systemInfoGet } from "./systemInfoGet";
+export { togglePackage } from "./togglePackage";
+export { updatePackageEnv } from "./updatePackageEnv";
+export { updatePortMappings } from "./updatePortMappings";
+export { volumeRemove } from "./volumeRemove";
+export { volumesGet } from "./volumesGet";

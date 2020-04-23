@@ -16,7 +16,7 @@ const loadThrottle = 500; // 0.5 seconds
 /**
  * Fetches all package names in the custom dappnode directory.
  */
-export default async function fetchDirectory(): Promise<ReturnData> {
+export async function fetchDirectory(): Promise<ReturnData> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 

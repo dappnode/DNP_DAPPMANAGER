@@ -6,7 +6,7 @@ import * as eventBus from "../eventBus";
  * Toggles the visibility of a getting started block
  * @param show Should be shown on hidden
  */
-export default async function packageGettingStartedToggle({
+export async function packageGettingStartedToggle({
   id,
   show
 }: RequestData): Promise<void> {

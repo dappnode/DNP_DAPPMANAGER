@@ -7,7 +7,7 @@ const logs = Logs(module);
 // Modules
 import { listContainer } from "../modules/docker/listContainers";
 // External call
-import restartPackage from "./restartPackage";
+import { restartPackage } from "./restartPackage";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
@@ -25,7 +25,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
  */
-export default async function backupRestore({
+export async function backupRestore({
   id,
   backup,
   fileId

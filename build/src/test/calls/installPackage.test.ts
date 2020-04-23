@@ -9,7 +9,7 @@ import {
 } from "../../src/types";
 import rewiremock from "rewiremock";
 // Imports for typings
-import installPackageType from "../../src/calls/installPackage";
+import { installPackage as installPackageType } from "../../src/calls/installPackage";
 import { DappGetState } from "../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../testUtils";
 import { ReleaseFetcher, PackageReleases } from "../../src/modules/release";
@@ -120,7 +120,7 @@ describe.skip("Call function: installPackage", function() {
           .toBeUsed();
       }
     );
-    installPackage = mock.default;
+    installPackage = mock.installPackage;
   });
 
   // before(() => {

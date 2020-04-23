@@ -7,8 +7,8 @@ import shell from "../../src/utils/shell";
 import { testDir, cleanTestDir, createTestDir, clearDbs } from "../testUtils";
 
 // Calls
-import backupGet from "../../src/calls/backupGet";
-import backupRestore from "../../src/calls/backupRestore";
+import { backupGet } from "../../src/calls/backupGet";
+import { backupRestore } from "../../src/calls/backupRestore";
 
 // MUST use function for this.timeout to work <====== function() ???
 describe("Integration test for backup to and from:", function() {

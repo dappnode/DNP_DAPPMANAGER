@@ -12,7 +12,7 @@ import * as eventBus from "../eventBus";
  * @param {string} id DNP .eth name
  * @param {number} timeout seconds to stop the package
  */
-export default async function togglePackage({
+export async function togglePackage({
   id,
   timeout = 10
 }: {

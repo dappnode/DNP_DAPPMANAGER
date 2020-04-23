@@ -11,11 +11,7 @@ import * as eventBus from "../eventBus";
  *
  * @param {string} id DNP .eth name
  */
-export default async function restartPackage({
-  id
-}: {
-  id: string;
-}): Promise<void> {
+export async function restartPackage({ id }: { id: string }): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id);

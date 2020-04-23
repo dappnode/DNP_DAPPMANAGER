@@ -18,7 +18,7 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export default async function volumesGet(): Promise<ReturnData> {
+export async function volumesGet(): Promise<ReturnData> {
   const volumes = await dockerVolumesList();
   const { Volumes: volumesDf } = await dockerDf();
   const dnpList = await listContainers();

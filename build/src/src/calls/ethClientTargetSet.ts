@@ -5,7 +5,7 @@ import { changeEthMultiClient } from "../modules/ethClient";
 /**
  * Changes the ethereum client used to fetch package data
  */
-export default async function ethClientTargetSet({
+export async function ethClientTargetSet({
   target,
   deleteVolumes
 }: RequestData): Promise<void> {

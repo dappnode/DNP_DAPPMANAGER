@@ -1,6 +1,6 @@
 import params from "../../params";
 import * as eventBus from "../../eventBus";
-import fetchCoreUpdateData from "../../calls/fetchCoreUpdateData";
+import { fetchCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../../modules/release";
 import { EthProviderError } from "../../modules/ethClient";
 // Utils

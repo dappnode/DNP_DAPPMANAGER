@@ -5,7 +5,7 @@ import * as eventBus from "../eventBus";
 /**
  * Set a domain alias to a DAppNode package by name
  */
-export default async function domainAliasSet({
+export async function domainAliasSet({
   alias,
   dnpName
 }: RequestData): Promise<void> {

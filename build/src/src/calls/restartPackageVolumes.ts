@@ -19,7 +19,7 @@ export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
  *
  * @param id DNP .eth name
  */
-export default async function restartPackageVolumes({
+export async function restartPackageVolumes({
   id,
   volumeId
 }: RequestData): Promise<void> {

@@ -26,7 +26,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  * ]
  * @returns {string} fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
-export default async function backupGet({
+export async function backupGet({
   id,
   backup
 }: {

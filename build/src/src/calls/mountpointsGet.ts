@@ -6,7 +6,7 @@ import { detectMountpoints } from "../modules/hostScripts";
  * Returns the list of current mountpoints in the host,
  * by running a pre-written script in the host
  */
-export default async function mountpointsGet(): Promise<ReturnData> {
+export async function mountpointsGet(): Promise<ReturnData> {
   const mountpoints = await detectMountpoints();
   const hostMountpoint: MountpointData = {
     mountpoint: "",

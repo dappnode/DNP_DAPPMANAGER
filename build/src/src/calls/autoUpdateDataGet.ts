@@ -44,7 +44,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet(): Promise<ReturnData> {
+export async function autoUpdateDataGet(): Promise<ReturnData> {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();

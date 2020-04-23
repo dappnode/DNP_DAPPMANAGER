@@ -3,7 +3,7 @@ import { expect } from "chai";
 import fs from "fs";
 import params from "../../src/params";
 
-import getUserActionLogs from "../../src/calls/getUserActionLogs";
+import { getUserActionLogs } from "../../src/calls/getUserActionLogs";
 import { cleanTestDir, createTestDir } from "../testUtils";
 
 const userActionLogsFilename = params.userActionLogsFilename;

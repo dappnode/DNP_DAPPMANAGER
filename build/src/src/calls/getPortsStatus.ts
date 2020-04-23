@@ -29,7 +29,7 @@ interface ReturnData {
  *   ]
  * }
  */
-export default async function getPortsStatus(): Promise<ReturnData> {
+export async function getPortsStatus(): Promise<ReturnData> {
   const upnpAvailable: boolean = db.upnpAvailable.get();
   const portsToOpen: PackagePort[] = db.portsToOpen.get();
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get();

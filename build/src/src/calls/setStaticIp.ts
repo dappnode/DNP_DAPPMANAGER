@@ -10,7 +10,7 @@ const logs = Logs(module);
  * - To enable: "85.84.83.82"
  * - To disable: null
  */
-export default async function setStaticIp({
+export async function setStaticIp({
   staticIp
 }: {
   staticIp: string;

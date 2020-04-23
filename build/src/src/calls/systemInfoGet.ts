@@ -3,7 +3,7 @@ import { NewFeatureId } from "../types";
 import params from "../params";
 import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
-import logPackage from "./logPackage";
+import { logPackage } from "./logPackage";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 
 const wifiName = params.wifiDnpName;
@@ -11,7 +11,7 @@ const wifiName = params.wifiDnpName;
 /**
  * Returns the current DAppNode system info
  */
-export default async function systemInfoGet(): Promise<ReturnData> {
+export async function systemInfoGet(): Promise<ReturnData> {
   const ethClientTarget = db.ethClientTarget.get();
 
   return {
