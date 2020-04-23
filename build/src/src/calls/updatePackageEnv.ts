@@ -1,5 +1,5 @@
 import { mergeEnvs } from "../utils/dockerComposeFile";
-import restartPackage from "./restartPackage";
+import { restartPackage } from "./restartPackage";
 import { PackageEnvs } from "../types";
 
 /**
@@ -11,7 +11,7 @@ import { PackageEnvs } from "../types";
  *   ENV_NAME: ENV_VALUE
  * }
  */
-export default async function updatePackageEnv({
+export async function updatePackageEnv({
   id,
   envs
 }: {

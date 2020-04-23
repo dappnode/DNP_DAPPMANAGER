@@ -7,7 +7,7 @@ import {
 } from "../utils/dockerComposeFile";
 import { PortMapping } from "../types";
 // External call
-import restartPackage from "./restartPackage";
+import { restartPackage } from "./restartPackage";
 import * as eventBus from "../eventBus";
 import params from "../params";
 
@@ -21,7 +21,7 @@ import params from "../params";
  * ]
  * #### !!!!! NOTE take into account existing ephemeral ports
  */
-export default async function updatePortMappings({
+export async function updatePortMappings({
   id,
   portMappings,
   options

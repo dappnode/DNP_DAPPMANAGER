@@ -5,7 +5,7 @@ import * as eventBus from "../eventBus";
 /**
  * Flag the UI welcome flow as completed
  */
-export default async function newFeatureStatusSet({
+export async function newFeatureStatusSet({
   featureId,
   status
 }: RequestData): Promise<void> {

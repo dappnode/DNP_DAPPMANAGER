@@ -30,7 +30,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   Same for relative paths to directories.
  * @returns {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
  */
-export default async function copyFileFrom({
+export async function copyFileFrom({
   id,
   fromPath
 }: {

@@ -18,7 +18,7 @@ const logs = Logs(module);
  * @param {string} id DNP .eth name
  * @param {bool} deleteVolumes flag to also clear permanent package data
  */
-export default async function removePackage({
+export async function removePackage({
   id,
   deleteVolumes = false,
   timeout = 10

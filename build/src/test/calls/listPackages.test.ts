@@ -8,7 +8,7 @@ import { DockerApiSystemDfReturn } from "../../src/modules/docker/dockerApi";
 import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
-import listPackagesType from "../../src/calls/listPackages";
+import { listPackages as listPackagesType } from "../../src/calls/listPackages";
 import { stringifyEnvironment } from "../../src/utils/dockerComposeParsers";
 
 describe("Call function: listPackages", function() {
@@ -43,7 +43,7 @@ describe("Call function: listPackages", function() {
           .toBeUsed();
       }
     );
-    listPackages = mock.default;
+    listPackages = mock.listPackages;
   });
 
   before(() => {

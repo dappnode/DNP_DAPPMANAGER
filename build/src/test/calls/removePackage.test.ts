@@ -6,7 +6,7 @@ import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import rewiremock from "rewiremock";
 // Imports for typings
-import removePackageType from "../../src/calls/removePackage";
+import { removePackage as removePackageType } from "../../src/calls/removePackage";
 import { PackageContainer } from "../../src/types";
 import { mockDnp, cleanTestDir } from "../testUtils";
 
@@ -54,7 +54,7 @@ describe("Call function: removePackage", function() {
           .toBeUsed();
       }
     );
-    removePackage = mock.default;
+    removePackage = mock.removePackage;
   });
 
   before(async () => {

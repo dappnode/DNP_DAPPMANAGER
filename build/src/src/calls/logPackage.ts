@@ -13,7 +13,7 @@ type ReturnData = string;
  * options = { timestamp: true, tail: 200 }
  * @returns {string} logs: <string with escape codes>
  */
-export default async function logPackage({
+export async function logPackage({
   id,
   options
 }: {

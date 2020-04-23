@@ -14,7 +14,7 @@ const defaultVersion = "*";
 /**
  * Fetches the core update data, if available
  */
-export default async function fetchCoreUpdateData({
+export async function fetchCoreUpdateData({
   version
 }: RequestData): Promise<ReturnData> {
   return await getCoreUpdateData(version);

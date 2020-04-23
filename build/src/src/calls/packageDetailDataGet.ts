@@ -1,6 +1,6 @@
 import { ReturnData } from "../route-types/packageDetailDataGet";
 import { mapValues } from "lodash";
-import { RequestData } from "../route-types/packageGettingStartedToggle";
+import { RequestData } from "../route-types/packageDetailDataGet";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
@@ -9,7 +9,7 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  * Toggles the visibility of a getting started block
  * @param show Should be shown on hidden
  */
-export default async function packageDetailDataGet({
+export async function packageDetailDataGet({
   id
 }: RequestData): Promise<ReturnData> {
   if (!id) throw Error("kwarg id must be defined");

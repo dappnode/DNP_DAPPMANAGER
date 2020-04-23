@@ -6,7 +6,7 @@ import * as db from "../db";
  * @param {array} ids Array of ids to be marked as read
  * ids = [ "notification-id1", "notification-id2" ]
  */
-export default async function notificationsRemove({
+export async function notificationsRemove({
   ids
 }: {
   ids: string[];
