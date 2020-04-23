@@ -25,6 +25,7 @@ const logs = Logs(module);
 
 // Start HTTP API
 import "./httpApi";
+import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
 
 // Start eth forward http proxy
 startEthForward();
@@ -199,6 +200,10 @@ async function runLegacyOps(): Promise<void> {
 
   migrateEthForward().catch(e =>
     logs.error(`Error migrating ETHFORWARD: ${e.stack}`)
+  );
+
+  removeLegacyBindVolume().catch(e =>
+    logs.error(`Error removing legacy BIND volume: ${e.stack}`)
   );
 }
 
