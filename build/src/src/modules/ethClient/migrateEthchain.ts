@@ -1,4 +1,5 @@
 import fs from "fs";
+import * as db from "../../db";
 import { changeEthMultiClient } from "./changeEthMultiClient";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { dockerVolumesList, dockerDf } from "../../modules/docker/dockerApi";
@@ -8,6 +9,7 @@ import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import shell from "../../utils/shell";
 import Logs from "../../logs";
+import { EthClientTargetPackage } from "../../types";
 const logs = Logs(module);
 
 const ethchainDnpName = "ethchain.dnp.dappnode.eth";
@@ -46,6 +48,14 @@ export async function migrateEthchain(): Promise<void> {
     ...(userSettings.environment || {})
   };
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
+  let target: EthClientTargetPackage = isNextOpenEthereum
+    ? "openethereum"
+    : "geth";
+  let EXTRA_OPTS =
+    (isNextOpenEthereum ? envs.EXTRA_OPTS : envs.EXTRA_OPTS_GETH) || "";
+  // Store settings in the cache. It is possible that the migration is stopped
+  // because the DAPPMANAGER resets and then the eth client will not be installed
+  db.ethClientMigrationTempSettings.set({ target, EXTRA_OPTS });
 
   const volumesToMigrate = [
     {
@@ -142,16 +152,23 @@ export async function migrateEthchain(): Promise<void> {
   }
 
   // Install new package. fullnode.dappnode is assigned after install
-  if (ethchain) {
-    const target = isNextOpenEthereum ? "openethereum" : "geth";
-    const EXTRA_OPTS = isNextOpenEthereum
-      ? envs.EXTRA_OPTS
-      : envs.EXTRA_OPTS_GETH;
-    logs.info(`Installing eth multi-client ${target}: ${JSON.stringify(envs)}`);
+  const migrationTempSettings = db.ethClientMigrationTempSettings.get();
+  if (ethchain || migrationTempSettings) {
+    logs.info(
+      `Installing eth multi-client ${target}: with EXTRA_OPTS ${EXTRA_OPTS}`
+    );
+
+    if (migrationTempSettings) {
+      target = migrationTempSettings.target || target;
+      EXTRA_OPTS = migrationTempSettings.EXTRA_OPTS || EXTRA_OPTS;
+    }
 
     await changeEthMultiClient(target, false, {
       portMappings: userSettings.portMappings,
       environment: EXTRA_OPTS ? { EXTRA_OPTS } : undefined
     });
+
+    // Once the client has been successfully changed, delete temp migration settings
+    db.ethClientMigrationTempSettings.set(null);
   }
 }

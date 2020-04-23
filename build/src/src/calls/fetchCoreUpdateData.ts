@@ -49,6 +49,10 @@ export async function getCoreUpdateData(
    */
   const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
   const coreRelease = coreDnpsToBeInstalled[coreName];
+  if (!coreRelease)
+    throw Error(
+      `No coreRelease found: ${Object.keys(coreDnpsToBeInstalled).join(", ")}`
+    );
   if (!coreDnp) delete coreDnpsToBeInstalled[coreName];
 
   const packages = Object.entries(coreDnpsToBeInstalled).map(

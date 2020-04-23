@@ -18,13 +18,12 @@ export async function changeEthMultiClient(
   userSettings?: UserSettings
 ): Promise<void> {
   const prevTarget = db.ethClientTarget.get();
-  if (prevTarget === nextTarget) throw Error("Same target");
 
   // Set user settings of next target if any
   if (userSettings) db.ethClientUserSettings.set(nextTarget, userSettings);
 
   // If the previous client is a client package, uninstall it
-  if (prevTarget && prevTarget !== "remote") {
+  if (prevTarget !== nextTarget && prevTarget && prevTarget !== "remote") {
     try {
       const clientData = ethClientData[prevTarget];
       if (clientData) {
@@ -40,7 +39,7 @@ export async function changeEthMultiClient(
 
   // Setting the status to selected will trigger an install
   db.ethClientTarget.set(nextTarget);
-  if (nextTarget !== "remote") {
+  if (prevTarget !== nextTarget && nextTarget !== "remote") {
     db.ethClientInstallStatus.set(nextTarget, { status: "TO_INSTALL" });
     eventBus.runEthClientInstaller.emit();
   }

@@ -106,7 +106,12 @@ export async function listContainerNoThrow(
   byName: string
 ): Promise<PackageContainer | null> {
   const containers = await dockerList({ filters: { name: [byName] } });
-  return containers[0] ? parseContainerInfo(containers[0]) : null;
+  if (!containers[0]) return null;
+  const container = parseContainerInfo(containers[0]);
+  // When querying "geth.dnp.dappnode.eth", if user has "goerli-geth.dnp.dappnode.eth"
+  // The latter can be returned as the original container.
+  if (container.name !== byName) return null;
+  else return container;
 }
 
 export async function listContainer(byName: string): Promise<PackageContainer> {
@@ -140,7 +145,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
   const isDnp = packageName.includes(CONTAINER_NAME_PREFIX);
   const isCoreByName = packageName.includes(CONTAINER_CORE_NAME_PREFIX);
 
-  let name;
+  let name = "";
   if (isDnp) name = packageName.split(CONTAINER_NAME_PREFIX)[1] || "";
   else if (isCoreByName)
     name = packageName.split(CONTAINER_CORE_NAME_PREFIX)[1] || "";

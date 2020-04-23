@@ -4,7 +4,8 @@ import {
   EthClientTarget,
   UserSettings,
   EthClientFallback,
-  EthClientStatus
+  EthClientStatus,
+  EthClientTargetPackage
 } from "../types";
 import { joinWithDot, stripDots } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
@@ -18,6 +19,8 @@ const ETH_CLIENT_USER_SETTINGS = "eth-client-user-settings";
 const ETH_CLIENT_INSTALL_STATUS = "eth-client-install-status";
 const ETH_CLIENT_STATUS = "eth-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
+// Cached temp status
+const ETH_CLIENT_MIGRATION_TEMP_SETTINGS = "eth-client-migration-temp-status";
 
 // Re-export to consider the first value (when it's not set)
 // but do not allow to set null again. Using to express intentionality
@@ -96,3 +99,13 @@ function interceptOnSet<F extends Function, T extends { set: F }>(
     }
   };
 }
+
+/**
+ * Temporal cache settings that must survive a reset
+ * Store settings in the cache. It is possible that the migration is stopped
+ * because the DAPPMANAGER resets and then the eth client will not be installed
+ */
+export const ethClientMigrationTempSettings = dbCache.staticKey<{
+  target: EthClientTargetPackage;
+  EXTRA_OPTS: string;
+} | null>(ETH_CLIENT_MIGRATION_TEMP_SETTINGS, null);
