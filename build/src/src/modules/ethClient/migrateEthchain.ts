@@ -2,7 +2,7 @@ import fs from "fs";
 import { changeEthMultiClient } from "./changeEthMultiClient";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { dockerVolumesList, dockerDf } from "../../modules/docker/dockerApi";
-import { dockerRm } from "../../modules/docker/dockerCommands";
+import { dockerRm, dockerVolumeRm } from "../../modules/docker/dockerCommands";
 import { migrateVolume } from "../../modules/hostScripts";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
@@ -14,7 +14,9 @@ const ethchainDnpName = "ethchain.dnp.dappnode.eth";
 
 const ethchainVolumes = {
   data: "dncore_ethchaindnpdappnodeeth_data",
-  geth: "dncore_ethchaindnpdappnodeeth_geth"
+  geth: "dncore_ethchaindnpdappnodeeth_geth",
+  identity: "dncore_ethchaindnpdappnodeeth_identity",
+  ipc: "dncore_ethchaindnpdappnodeeth_ipc"
 };
 const openEthereumVolumes = {
   data: "openethereumdnpdappnodeeth_data"
@@ -45,7 +47,7 @@ export async function migrateEthchain(): Promise<void> {
   };
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
 
-  const volumeMigrations = [
+  const volumesToMigrate = [
     {
       id: "OpenEthereum data volume",
       from: ethchainVolumes.data,
@@ -64,6 +66,17 @@ export async function migrateEthchain(): Promise<void> {
         !volumes.find(vol => vol.Name === to)
     );
 
+  const volumesToRemove = [
+    {
+      id: "legacy identity volume",
+      name: ethchainVolumes.identity
+    },
+    {
+      id: "legacy IPC volume",
+      name: ethchainVolumes.ipc
+    }
+  ].filter(({ name }) => volumes.find(vol => vol.Name === name));
+
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
   if (ethchain)
     try {
@@ -81,7 +94,7 @@ export async function migrateEthchain(): Promise<void> {
     }
 
   // Non-blocking step of migrating old volumes with a host script
-  for (const { id, from, to } of volumeMigrations) {
+  for (const { id, from, to } of volumesToMigrate) {
     try {
       // Remove all packages that are using the volume to safely move it
       const idsToRemove = await shell(`docker ps -aq --filter volume=${from}`);
@@ -94,11 +107,11 @@ export async function migrateEthchain(): Promise<void> {
     }
   }
   // Optimization to only run `docker system df -v` once, can run for +15s
-  if (volumeMigrations.length > 0)
+  if (volumesToMigrate.length > 0)
     try {
       // Make sure the volume was migrated successfully before removing it
       const { Volumes } = await dockerDf({ noCache: true });
-      for (const { id, from } of volumeMigrations) {
+      for (const { id, from } of volumesToMigrate) {
         const fromVol = Volumes.find(vol => vol.Name === from);
         if (!fromVol)
           logs.warn(`Did not delete ETHCHAIN ${id} ${from}, not found`);
@@ -115,6 +128,18 @@ export async function migrateEthchain(): Promise<void> {
     } catch (e) {
       logs.error(`Error deleting ETHCHAIN volumes: ${e.stack}`);
     }
+
+  for (const { id, name } of volumesToRemove) {
+    try {
+      // Remove all packages that are using the volume to safely move it
+      const idsToRemove = await shell(`docker ps -aq --filter volume=${name}`);
+      if (idsToRemove) throw Error(`Volume is used by ${idsToRemove}`);
+      await dockerVolumeRm(name);
+      logs.info(`Removed ETHCHAIN ${id}`);
+    } catch (e) {
+      logs.error(`Error removing ETHCHAIN ${id}: ${e.stack}`);
+    }
+  }
 
   // Install new package. fullnode.dappnode is assigned after install
   if (ethchain) {
