@@ -5,7 +5,6 @@ import {
   dockerComposeStop
 } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Stops or starts after fetching its status
@@ -19,7 +18,7 @@ export default async function togglePackage({
 }: {
   id: string;
   timeout?: number;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dockerComposePath = getPath.dockerComposeSmart(id);
@@ -31,10 +30,4 @@ export default async function togglePackage({
 
   // Emit packages update
   eventBus.requestPackages.emit();
-
-  return {
-    message: `Successfully toggled package: ${id}`,
-    logMessage: true,
-    userAction: true
-  };
 }

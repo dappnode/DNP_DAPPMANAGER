@@ -22,30 +22,24 @@ describe("Call function: getUserActionLogs", function() {
   });
 
   it("should return the latest two logs", async () => {
-    const res = await getUserActionLogs({
+    const result = await getUserActionLogs({
       fromLog: 0,
       numLogs: 2
     });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res.result).to.equal([log4, log3].join("\n"));
+    expect(result).to.equal([log4, log3].join("\n"));
   });
 
   it("should return the next two logs", async () => {
-    const res = await getUserActionLogs({
+    const result = await getUserActionLogs({
       fromLog: 2,
       numLogs: 2
     });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res.result).to.equal([log2, log1].join("\n"));
+    expect(result).to.equal([log2, log1].join("\n"));
   });
 
   it("should return all logs, with the default values 0, 50", async () => {
-    const res = await getUserActionLogs({});
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res.result).to.equal([log4, log3, log2, log1].join("\n"));
+    const result = await getUserActionLogs({});
+    expect(result).to.equal([log4, log3, log2, log1].join("\n"));
   });
 
   after(async () => {

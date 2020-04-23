@@ -1,5 +1,4 @@
 import * as db from "../db";
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Marks notifications as view by deleting them from the db
@@ -11,12 +10,8 @@ export default async function notificationsRemove({
   ids
 }: {
   ids: string[];
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!ids) throw Error("kwarg ids must be defined");
 
   for (const id of ids) db.notification.remove(id);
-
-  return {
-    message: `Removed notifications: ${ids.join(", ")}`
-  };
 }

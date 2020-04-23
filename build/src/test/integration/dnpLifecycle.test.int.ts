@@ -254,7 +254,7 @@ describe("DNP lifecycle", function() {
   });
 
   before("Should resolve a request", async () => {
-    const { result } = await calls.fetchDnpRequest({
+    const result = await calls.fetchDnpRequest({
       id: mainDnpReleaseHash
     });
     expect(result.name, "Wrong result name").to.equal(idMain);
@@ -336,11 +336,11 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${idMain} fileuploads`, async () => {
-      const res = await calls.copyFileFrom({
+      const result = await calls.copyFileFrom({
         id: idMain,
         fromPath: demoFilePath
       });
-      expect(res.result).to.equal(fileDataUrlMain);
+      expect(result).to.equal(fileDataUrlMain);
     });
 
     it(`${idDep} environment`, () => {
@@ -378,11 +378,11 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${idDep} fileuploads`, async () => {
-      const res = await calls.copyFileFrom({
+      const result = await calls.copyFileFrom({
         id: idDep,
         fromPath: demoFilePath
       });
-      expect(res.result).to.equal(fileDataUrlDep);
+      expect(result).to.equal(fileDataUrlDep);
     });
   });
 
@@ -394,15 +394,13 @@ describe("DNP lifecycle", function() {
     });
 
     it(`Should call logPackage for ${idMain}`, async () => {
-      const res = await calls.logPackage({ id: idMain });
-      expect(res).to.have.property("message");
-      expect(res.result).to.be.a("string");
+      const result = await calls.logPackage({ id: idMain });
+      expect(result).to.be.a("string");
     });
 
     it(`Should call logPackage for ${idDep}`, async () => {
-      const res = await calls.logPackage({ id: idDep });
-      expect(res).to.have.property("message");
-      expect(res.result).to.be.a("string");
+      const result = await calls.logPackage({ id: idDep });
+      expect(result).to.be.a("string");
     });
   });
 
@@ -418,11 +416,10 @@ describe("DNP lifecycle", function() {
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
-      const res = await calls.updatePackageEnv({
+      await calls.updatePackageEnv({
         id: idMain,
         envs: { time: envValue }
       });
-      expect(res).to.have.property("message");
 
       const dnpNext = await getDnpFromListPackages(idMain);
       if (!dnpNext) throw Error(`DNP ${idMain} not found`);
@@ -527,13 +524,8 @@ describe("DNP lifecycle", function() {
     // Main depends on the volume of dep, so main should be shutdown
     it(`Should restart the package volumes of ${idDep}`, async () => {
       const dnpMainPrev = await getDnpFromListPackages(idMain);
-      const res = await calls.restartPackageVolumes({ id: idDep });
+      await calls.restartPackageVolumes({ id: idDep });
       const dnpMainNext = await getDnpFromListPackages(idMain);
-
-      // #### NOTE: order of the message is not guaranteed, check it by parts
-      // Possible message: `Restarted ${idDep} volumes: dependencydnpdappnodeeth_data`
-      for (const messagePart of [idDep, "dependencydnpdappnodeeth_data"])
-        expect(res.message).to.include(messagePart, "Wrong result message");
 
       // To know if main was restarted check that the container is different
       if (!dnpMainPrev) throw Error(`DNP ${idMain} (prev) not found`);
@@ -545,18 +537,18 @@ describe("DNP lifecycle", function() {
     });
 
     it(`Should restart the package volumes of ${idMain}`, async () => {
-      const res = await calls.restartPackageVolumes({ id: idMain });
+      await calls.restartPackageVolumes({ id: idMain });
       // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
       // removed but it's data will not. Only the reference in /var/lib/docker
       // is deleted
       // #### NOTE: order of the message is not guaranteed, check it by parts
       // Possible message: `Restarted ${idMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
-      for (const messagePart of [
-        idMain,
-        "maindnpdappnodeeth_changeme-main",
-        "maindnpdappnodeeth_data"
-      ])
-        expect(res.message).to.include(messagePart, "Wrong result message");
+      // for (const messagePart of [
+      //   idMain,
+      //   "maindnpdappnodeeth_changeme-main",
+      //   "maindnpdappnodeeth_data"
+      // ])
+      //   expect(res.message).to.include(messagePart, "Wrong result message");
     });
   });
 

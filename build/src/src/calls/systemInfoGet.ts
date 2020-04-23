@@ -1,5 +1,5 @@
 import { ReturnData } from "../route-types/systemInfoGet";
-import { RpcHandlerReturnWithResult, NewFeatureId } from "../types";
+import { NewFeatureId } from "../types";
 import params from "../params";
 import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
@@ -11,42 +11,37 @@ const wifiName = params.wifiDnpName;
 /**
  * Returns the current DAppNode system info
  */
-export default async function systemInfoGet(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function systemInfoGet(): Promise<ReturnData> {
   const ethClientTarget = db.ethClientTarget.get();
 
   return {
-    message: "Got system info",
-    result: {
-      // Git version data
-      versionData: getVersionData().data,
-      // Network params
-      ip: db.publicIp.get(),
-      name: db.serverName.get(),
-      staticIp: db.staticIp.get(),
-      domain: db.domain.get(),
-      upnpAvailable: db.upnpAvailable.get(),
-      noNatLoopback: db.noNatLoopback.get(),
-      alertToOpenPorts: db.alertToOpenPorts.get(),
-      internalIp: db.internalIp.get(),
-      // Public key of nacl's asymmetric encryption, used by the ADMIN UI
-      // to send sensitive data in a slightly more protected way
-      dappmanagerNaclPublicKey: db.naclPublicKey.get(),
-      // From seedPhrase: If it's not stored yet, it's an empty string
-      identityAddress: db.identityAddress.get(),
-      // Eth provider configured URL, if empty will default to WEB3_HOST
-      ethClientTarget,
-      ethClientStatus: ethClientTarget
-        ? db.ethClientStatus.get(ethClientTarget)
-        : null,
-      ethClientFallback: db.ethClientFallback.get(),
-      ethProvider: db.ethProviderUrl.get(),
-      // Domain map
-      fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
-      // UI stats
-      newFeatureIds: getNewFeatureIds()
-    }
+    // Git version data
+    versionData: getVersionData().data,
+    // Network params
+    ip: db.publicIp.get(),
+    name: db.serverName.get(),
+    staticIp: db.staticIp.get(),
+    domain: db.domain.get(),
+    upnpAvailable: db.upnpAvailable.get(),
+    noNatLoopback: db.noNatLoopback.get(),
+    alertToOpenPorts: db.alertToOpenPorts.get(),
+    internalIp: db.internalIp.get(),
+    // Public key of nacl's asymmetric encryption, used by the ADMIN UI
+    // to send sensitive data in a slightly more protected way
+    dappmanagerNaclPublicKey: db.naclPublicKey.get(),
+    // From seedPhrase: If it's not stored yet, it's an empty string
+    identityAddress: db.identityAddress.get(),
+    // Eth provider configured URL, if empty will default to WEB3_HOST
+    ethClientTarget,
+    ethClientStatus: ethClientTarget
+      ? db.ethClientStatus.get(ethClientTarget)
+      : null,
+    ethClientFallback: db.ethClientFallback.get(),
+    ethProvider: db.ethProviderUrl.get(),
+    // Domain map
+    fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
+    // UI stats
+    newFeatureIds: getNewFeatureIds()
   };
 }
 
@@ -92,7 +87,7 @@ function getNewFeatureIds(): NewFeatureId[] {
  */
 async function getIsWifiActive(): Promise<boolean> {
   try {
-    const { result: logs } = await logPackage({
+    const logs = await logPackage({
       id: wifiName,
       options: { timestamp: false, tail: 20 }
     });

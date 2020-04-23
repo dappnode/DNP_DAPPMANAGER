@@ -3,7 +3,6 @@ import { decrypt } from "../utils/publickeyEncryption";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
 import params from "../params";
-import { RpcHandlerReturn } from "../types";
 
 const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
 
@@ -19,7 +18,7 @@ export default async function seedPhraseSet({
   seedPhraseEncrypted
 }: {
   seedPhraseEncrypted: string;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (typeof seedPhraseEncrypted !== "string")
     throw Error("kwarg seedPhraseEncrypted must be a string");
 
@@ -35,10 +34,4 @@ export default async function seedPhraseSet({
 
   // Notify the UI of the identityAddress and seedPhrase change
   eventBus.requestSystemInfo.emit();
-
-  return {
-    message: `Updated seed phrase`,
-    logMessage: true,
-    userAction: true
-  };
 }

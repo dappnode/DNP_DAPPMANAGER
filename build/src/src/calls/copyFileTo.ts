@@ -9,7 +9,6 @@ import { listContainer } from "../modules/docker/listContainers";
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";
 import params from "../params";
-import { RpcHandlerReturn } from "../types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -40,7 +39,7 @@ export default async function copyFileTo({
   dataUri: string;
   filename: string;
   toPath: string;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!id) throw Error("Argument id must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");
@@ -82,10 +81,4 @@ export default async function copyFileTo({
 
   // Clean intermediate file
   await shell(`rm -rf ${fromPath}`);
-
-  return {
-    message: `Copied file ${filename} to ${id} ${toPath}`,
-    logMessage: true,
-    userAction: true
-  };
 }

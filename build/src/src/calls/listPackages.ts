@@ -8,16 +8,13 @@ import { dockerDf } from "../modules/docker/dockerApi";
 import { omit } from "lodash";
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import Logs from "../logs";
-import { RpcHandlerReturnWithResult } from "../types";
 import { readConfigFiles } from "../utils/configFiles";
 const logs = Logs(module);
 
 /**
  * Returns the list of current containers associated to packages
  */
-export default async function listPackages(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function listPackages(): Promise<ReturnData> {
   let dnpList = await listContainers();
 
   // Append envFile and manifest
@@ -50,8 +47,5 @@ export default async function listPackages(): RpcHandlerReturnWithResult<
     logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
   }
 
-  return {
-    message: `Listing ${dnpList.length} packages`,
-    result: dnpList
-  };
+  return dnpList;
 }

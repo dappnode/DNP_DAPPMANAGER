@@ -1,5 +1,5 @@
 import { ReturnData } from "../route-types/volumesGet";
-import { RpcHandlerReturnWithResult, VolumeData } from "../types";
+import { VolumeData } from "../types";
 import { dockerDf, dockerVolumesList } from "../modules/docker/dockerApi";
 import { listContainers } from "../modules/docker/listContainers";
 import { detectMountpoints } from "../modules/hostScripts";
@@ -18,9 +18,7 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export default async function volumesGet(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function volumesGet(): Promise<ReturnData> {
   const volumes = await dockerVolumesList();
   const { Volumes: volumesDf } = await dockerDf();
   const dnpList = await listContainers();
@@ -76,10 +74,7 @@ export default async function volumesGet(): RpcHandlerReturnWithResult<
     return volumeData;
   });
 
-  return {
-    message: `Got ${formatedVolumes.length} volumes`,
-    result: formatedVolumes
-  };
+  return formatedVolumes;
 }
 
 /**

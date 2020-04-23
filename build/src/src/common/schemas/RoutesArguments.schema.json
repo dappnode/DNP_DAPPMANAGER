@@ -1,0 +1,1532 @@
+{
+  "type": "object",
+  "properties": {
+    "autoUpdateSettingsEdit": {
+      "description": "Edits the auto-update settings",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "enabled",
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "backupGet": {
+      "description": "Generates a backup of a package and sends it to the client for download.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "backup": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PackageBackup"
+              }
+            }
+          },
+          "required": [
+            "backup",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "backup": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/PackageBackup"
+                }
+              }
+            },
+            "required": [
+              "backup",
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "backupRestore": {
+      "description": "Restores a backup of a package from the dataUri provided by the user",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "backup": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PackageBackup"
+              }
+            },
+            "fileId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "backup",
+            "fileId",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "backup": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/PackageBackup"
+                }
+              },
+              "fileId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "backup",
+              "fileId",
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "changeIpfsTimeout": {
+      "description": "Used to test different IPFS timeout parameters live from the ADMIN UI.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "timeout": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "timeout"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "timeout": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "timeout"
+            ]
+          }
+        ]
+      }
+    },
+    "copyFileFrom": {
+      "description": "Copy file from a DNP and downloaded on the client",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "fromPath": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "fromPath",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "fromPath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "fromPath",
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "copyFileTo": {
+      "description": "Copy file to a DNP:",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "dataUri": {
+              "type": "string"
+            },
+            "filename": {
+              "type": "string"
+            },
+            "toPath": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dataUri",
+            "filename",
+            "id",
+            "toPath"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "dataUri": {
+                "type": "string"
+              },
+              "filename": {
+                "type": "string"
+              },
+              "toPath": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "dataUri",
+              "filename",
+              "id",
+              "toPath"
+            ]
+          }
+        ]
+      }
+    },
+    "deviceAdd": {
+      "description": "Creates a new device with the provided id.\nGenerates certificates and keys needed for OpenVPN.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "deviceCredentialsGet": {
+      "description": "Creates a new OpenVPN credentials file, encrypted.\nThe filename is the (16 chars short) result of hashing the generated salt in the db,\nconcatenated with the device id.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "deviceRemove": {
+      "description": "Removes the device with the provided id, if exists.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "deviceReset": {
+      "description": "Resets the device credentials with the provided id, if exists.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "deviceAdminToggle": {
+      "description": "Gives/removes admin rights to the provided device id.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "domainAliasSet": {
+      "description": "Set a domain alias to a DAppNode package by name",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "alias": {
+              "type": "string"
+            },
+            "dnpName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "alias",
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "alias": {
+                "type": "string"
+              },
+              "dnpName": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "alias",
+              "dnpName"
+            ]
+          }
+        ]
+      }
+    },
+    "ethClientFallbackSet": {
+      "description": "Sets if a fallback should be used",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "fallback": {
+              "$ref": "#/definitions/EthClientFallback"
+            }
+          },
+          "required": [
+            "fallback"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "fallback": {
+                "$ref": "#/definitions/EthClientFallback"
+              }
+            },
+            "required": [
+              "fallback"
+            ]
+          }
+        ]
+      }
+    },
+    "ethClientTargetSet": {
+      "description": "Changes the ethereum client used to fetch package data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "$ref": "#/definitions/EthClientTarget"
+            },
+            "deleteVolumes": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "target"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "target": {
+                "$ref": "#/definitions/EthClientTarget"
+              },
+              "deleteVolumes": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "target"
+            ]
+          }
+        ]
+      }
+    },
+    "fetchCoreUpdateData": {
+      "description": "Return formated core update data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "fetchDnpRequest": {
+      "description": "Fetch extended info about a new DNP",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "getUserActionLogs": {
+      "description": "Returns the user action logs. This logs are stored in a different\nfile and format, and are meant to ease user support\nThe list is ordered from newest to oldest\n- Newest log has index = 0\n- If the param fromLog is out of bounds, the result will be an empty array: []",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "fromLog": {
+              "type": "number"
+            },
+            "numLogs": {
+              "type": "number"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "fromLog": {
+                "type": "number"
+              },
+              "numLogs": {
+                "type": "number"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "installPackage": {
+      "description": "Installs a DAppNode Package.\nResolves dependencies, downloads release assets, loads the images to docker,\nsets userSettings and starts the docker container for each package.\n\nThe logId is the requested id. It is used for the UI to track the progress\nof the installation in real time and prevent double installs\n\nOptions\n- BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies\n- BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "userSettings": {
+              "$ref": "#/definitions/UserSettingsAllDnps"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "BYPASS_RESOLVER": {
+                  "type": "boolean"
+                },
+                "BYPASS_CORE_RESTRICTION": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              },
+              "userSettings": {
+                "$ref": "#/definitions/UserSettingsAllDnps"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "BYPASS_RESOLVER": {
+                    "type": "boolean"
+                  },
+                  "BYPASS_CORE_RESTRICTION": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      }
+    },
+    "logPackage": {
+      "description": "Returns the logs of the docker container of a package",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "timestamps": {
+                  "type": "boolean"
+                },
+                "tail": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "timestamps": {
+                    "type": "boolean"
+                  },
+                  "tail": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "newFeatureStatusSet": {
+      "description": "Flag the UI welcome flow as completed",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "featureId": {
+              "$ref": "#/definitions/NewFeatureId"
+            },
+            "status": {
+              "$ref": "#/definitions/NewFeatureStatus"
+            }
+          },
+          "required": [
+            "featureId",
+            "status"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "featureId": {
+                "$ref": "#/definitions/NewFeatureId"
+              },
+              "status": {
+                "$ref": "#/definitions/NewFeatureStatus"
+              }
+            },
+            "required": [
+              "featureId",
+              "status"
+            ]
+          }
+        ]
+      }
+    },
+    "notificationsRemove": {
+      "description": "Marks notifications as view by deleting them from the db",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "ids"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "ids"
+            ]
+          }
+        ]
+      }
+    },
+    "notificationsTest": {
+      "description": "Adds a notification to be shown the UI.\nSet the notification param to null for a random notification",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "notification": {
+              "$ref": "#/definitions/PackageNotification"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "notification": {
+                "$ref": "#/definitions/PackageNotification"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "packageDetailDataGet": {
+      "description": "Get package detail information",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "packageGettingStartedToggle": {
+      "description": "Toggles the visibility of a getting started block",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "show": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "show"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "show": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "show"
+            ]
+          }
+        ]
+      }
+    },
+    "passwordChange": {
+      "description": "Changes the user `dappnode`'s password in the host machine\nOnly allows it if the current password has the salt `insecur3`",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "newPassword"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "newPassword": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "newPassword"
+            ]
+          }
+        ]
+      }
+    },
+    "removePackage": {
+      "description": "Remove a package and its data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "deleteVolumes": {
+              "type": "boolean"
+            },
+            "timeout": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "deleteVolumes": {
+                "type": "boolean"
+              },
+              "timeout": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "restartPackage": {
+      "description": "Calls docker rm and docker up on a package",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "restartPackageVolumes": {
+      "description": "Removes a package volumes. The re-ups the package",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "volumeId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "volumeId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "seedPhraseSet": {
+      "description": "Receives an encrypted message containing the seed phrase of\n12 word mnemonic ethereum account. The extra layer of encryption\nslightly increases the security of the exchange while the WAMP\nmodule works over HTTP.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "seedPhraseEncrypted": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "seedPhraseEncrypted"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "seedPhraseEncrypted": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "seedPhraseEncrypted"
+            ]
+          }
+        ]
+      }
+    },
+    "setStaticIp": {
+      "description": "Sets the static IP",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "staticIp": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "staticIp"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "staticIp": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "staticIp"
+            ]
+          }
+        ]
+      }
+    },
+    "togglePackage": {
+      "description": "Stops or starts after fetching its status",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "timeout": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "timeout": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "updatePackageEnv": {
+      "description": "Updates the .env file of a package. If requested, also re-ups it",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "envs": {
+              "$ref": "#/definitions/PackageEnvs"
+            }
+          },
+          "required": [
+            "envs",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "envs": {
+                "$ref": "#/definitions/PackageEnvs"
+              }
+            },
+            "required": [
+              "envs",
+              "id"
+            ]
+          }
+        ]
+      }
+    },
+    "updatePortMappings": {
+      "description": "Updates a package port mappings",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "portMappings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PortMapping"
+              }
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "merge": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "merge"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "portMappings"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "portMappings": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/PortMapping"
+                }
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "merge": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "merge"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "portMappings"
+            ]
+          }
+        ]
+      }
+    },
+    "volumeRemove": {
+      "description": "Removes a docker volume by name",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "additionalItems": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PackageBackup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "path"
+      ]
+    },
+    "EthClientFallback": {
+      "description": "If the DAPPMANAGER should use a eth remote node in cases of error syncing",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "type": "string"
+    },
+    "EthClientTarget": {
+      "enum": [
+        "geth",
+        "geth-light",
+        "nethermind",
+        "openethereum",
+        "remote"
+      ],
+      "type": "string"
+    },
+    "UserSettingsAllDnps": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UserSettings"
+      }
+    },
+    "UserSettings": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "portMappings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "namedVolumeMountpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "allNamedVolumeMountpoint": {
+          "type": "string"
+        },
+        "fileUploads": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "domainAlias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "NewFeatureId": {
+      "description": "Welcome wizard / setup flow\nAvailable routes / views in the UI",
+      "enum": [
+        "change-host-password",
+        "repository",
+        "repository-fallback",
+        "system-auto-updates"
+      ],
+      "type": "string"
+    },
+    "NewFeatureStatus": {
+      "description": "UI Welcome flow status. Persists the info of which page the UI should show",
+      "enum": [
+        "pending",
+        "seen",
+        "skipped"
+      ],
+      "type": "string"
+    },
+    "PackageNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/NotificationType"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "id",
+        "title",
+        "type"
+      ]
+    },
+    "NotificationType": {
+      "enum": [
+        "danger",
+        "success",
+        "warning"
+      ],
+      "type": "string"
+    },
+    "PackageEnvs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "PortMapping": {
+      "type": "object",
+      "properties": {
+        "ephemeral": {
+          "type": "boolean"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "deletable": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "number"
+        },
+        "container": {
+          "type": "number"
+        },
+        "protocol": {
+          "$ref": "#/definitions/PortProtocol"
+        }
+      },
+      "required": [
+        "container",
+        "protocol"
+      ]
+    },
+    "PortProtocol": {
+      "description": "==============\n==============\nDAPPMANAGER\n==============\n==============",
+      "enum": [
+        "TCP",
+        "UDP"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

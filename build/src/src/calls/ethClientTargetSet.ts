@@ -1,5 +1,5 @@
 import { RequestData } from "../route-types/ethClientTargetSet";
-import { RpcHandlerReturn, ethClientTargets } from "../types";
+import { ethClientTargets } from "../types";
 import { changeEthMultiClient } from "../modules/ethClient";
 
 /**
@@ -8,16 +8,10 @@ import { changeEthMultiClient } from "../modules/ethClient";
 export default async function ethClientTargetSet({
   target,
   deleteVolumes
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
   if (!ethClientTargets.includes(target))
     throw Error(`Unknown client target: ${target}`);
 
   await changeEthMultiClient(target, deleteVolumes);
-
-  return {
-    message: `Changed Eth client`,
-    logMessage: true,
-    userAction: true
-  };
 }

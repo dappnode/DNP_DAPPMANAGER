@@ -74,9 +74,7 @@ eventBus.packagesModified.on(({ ids, removed }) => {
  */
 async function checkForCompletedCoreUpdates(): Promise<void> {
   try {
-    const {
-      result: { versionId }
-    } = await fetchCoreUpdateData({});
+    const { versionId } = await fetchCoreUpdateData({});
     clearCompletedCoreUpdatesIfAny(versionId);
   } catch (e) {
     logs.error(`Error on clearCompletedCoreUpdatesIfAny: ${e.stack}`);

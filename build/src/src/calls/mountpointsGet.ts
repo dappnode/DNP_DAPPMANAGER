@@ -1,14 +1,12 @@
 import { ReturnData } from "../route-types/mountpointsGet";
-import { RpcHandlerReturnWithResult, MountpointData } from "../types";
+import { MountpointData } from "../types";
 import { detectMountpoints } from "../modules/hostScripts";
 
 /**
  * Returns the list of current mountpoints in the host,
  * by running a pre-written script in the host
  */
-export default async function mountpointsGet(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function mountpointsGet(): Promise<ReturnData> {
   const mountpoints = await detectMountpoints();
   const hostMountpoint: MountpointData = {
     mountpoint: "",
@@ -20,8 +18,5 @@ export default async function mountpointsGet(): RpcHandlerReturnWithResult<
     model: ""
   };
 
-  return {
-    message: `fetched ${mountpoints.length} mountpoints`,
-    result: [hostMountpoint, ...mountpoints]
-  };
+  return [hostMountpoint, ...mountpoints];
 }

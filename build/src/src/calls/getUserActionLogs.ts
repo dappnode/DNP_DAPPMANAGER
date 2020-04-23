@@ -1,7 +1,6 @@
 import fs from "fs";
 import { promisify } from "util";
 import params from "../params";
-import { RpcHandlerReturnWithResult } from "../types";
 
 type ReturnData = string;
 
@@ -31,14 +30,11 @@ type ReturnData = string;
 export default async function getUserActionLogs({
   fromLog = 0,
   numLogs = 50
-}): RpcHandlerReturnWithResult<ReturnData> {
+}): Promise<ReturnData> {
   const { userActionLogsFilename } = params;
 
   if (!fs.existsSync(userActionLogsFilename)) {
-    return {
-      message: "userActionLogs are empty, returning an empty string",
-      result: ""
-    };
+    return "";
   }
 
   const userActionLogs = await promisify(fs.readFile)(userActionLogsFilename, {
@@ -57,8 +53,5 @@ export default async function getUserActionLogs({
     .slice(fromLog, fromLog + numLogs)
     .join("\n");
 
-  return {
-    message: "Got userActionLogs",
-    result: userActionLogsSelected
-  };
+  return userActionLogsSelected;
 }

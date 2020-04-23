@@ -20,7 +20,7 @@ import createCustomVolumeDevicePaths from "../modules/installer/createCustomVolu
 import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
 import * as validate from "../utils/validate";
-import { RpcHandlerReturn, InstallPackageData, PackageRequest } from "../types";
+import { InstallPackageData, PackageRequest } from "../types";
 import { RequestData } from "../route-types/installPackage";
 import Logs from "../logs";
 import copyFileTo from "./copyFileTo";
@@ -53,7 +53,7 @@ export default async function installPackage({
   version: reqVersion,
   userSettings: userSettingsAllDnps = {},
   options
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   const BYPASS_CORE_RESTRICTION = Boolean(
     options && options.BYPASS_CORE_RESTRICTION
   );
@@ -306,12 +306,6 @@ export default async function installPackage({
 
     // Flag packages as no longer installing
     flagPackagesAreNotInstalling(state);
-
-    return {
-      message: `Installed ${id}`,
-      logMessage: true,
-      userAction: true
-    };
   } catch (e) {
     // CRITICAL STEP: Flag the packages as NOT installing
     // Otherwise packages will not be able to be installed

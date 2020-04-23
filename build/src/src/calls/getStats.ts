@@ -2,7 +2,6 @@ import { ReturnData } from "../route-types/getStats";
 import os from "os";
 import shellExec from "../utils/shell";
 import Logs from "../logs";
-import { RpcHandlerReturnWithResult } from "../types";
 const logs = Logs(module);
 
 // Cache static values
@@ -11,9 +10,7 @@ const numCores = os.cpus().length;
 /**
  * Returns relevant host machine stats such as disk space, memory, cpu, etc
  */
-export default async function getStats(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function getStats(): Promise<ReturnData> {
   const cpuUsedPercent = await wrapErrors(async () => {
     return getDiskPercent();
   }, "cpuUsedPercent");
@@ -30,12 +27,9 @@ export default async function getStats(): RpcHandlerReturnWithResult<
   }, "diskUsedPercent");
 
   return {
-    message: `Checked stats of this DAppNode server`,
-    result: {
-      cpu: cpuUsedPercent,
-      memory: memUsedPercent,
-      disk: diskUsedPercent
-    }
+    cpu: cpuUsedPercent,
+    memory: memUsedPercent,
+    disk: diskUsedPercent
   };
 }
 

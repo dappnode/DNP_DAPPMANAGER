@@ -1,5 +1,5 @@
 import * as db from "../db";
-import { PackageNotification, RpcHandlerReturnWithResult } from "../types";
+import { PackageNotification } from "../types";
 
 type ReturnData = PackageNotification[];
 
@@ -16,9 +16,7 @@ type ReturnData = PackageNotification[];
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export default async function notificationsGet(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function notificationsGet(): Promise<ReturnData> {
   /**
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }
@@ -26,10 +24,5 @@ export default async function notificationsGet(): RpcHandlerReturnWithResult<
   const notifications: {
     [notificationid: string]: PackageNotification;
   } = db.notifications.get();
-  const notificationsArray = Object.values(notifications);
-
-  return {
-    message: `Got ${notificationsArray.length} notifications`,
-    result: notificationsArray
-  };
+  return Object.values(notifications);
 }

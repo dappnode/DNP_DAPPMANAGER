@@ -5,7 +5,7 @@ import {
   getPortMappings,
   setPortMapping
 } from "../utils/dockerComposeFile";
-import { PortMapping, RpcHandlerReturn } from "../types";
+import { PortMapping } from "../types";
 // External call
 import restartPackage from "./restartPackage";
 import * as eventBus from "../eventBus";
@@ -29,7 +29,7 @@ export default async function updatePortMappings({
   id: string;
   portMappings: PortMapping[];
   options?: { merge: boolean };
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
@@ -93,10 +93,4 @@ export default async function updatePortMappings({
 
   // Trigger a natRenewal update to open ports if necessary
   eventBus.runNatRenewal.emit();
-
-  return {
-    message: `Updated ${id} port mappings`,
-    logMessage: true,
-    userAction: true
-  };
 }
