@@ -16,7 +16,7 @@ type ReturnData = PackageNotification[];
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export default async function notificationsGet(): Promise<ReturnData> {
+export async function notificationsGet(): Promise<ReturnData> {
   /**
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }

@@ -8,7 +8,7 @@ import { PackageContainer } from "../../src/types";
 import { mockDnp, mockVolume } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
-import restartPackageVolumesType from "../../src/calls/restartPackageVolumes";
+import { restartPackageVolumes as restartPackageVolumesType } from "../../src/calls/restartPackageVolumes";
 
 describe("Call function: restartPackageVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
@@ -152,7 +152,7 @@ describe("Call function: restartPackageVolumes", function() {
           .toBeUsed();
       }
     );
-    restartPackageVolumes = mock.default;
+    restartPackageVolumes = mock.restartPackageVolumes;
   });
 
   before(() => {

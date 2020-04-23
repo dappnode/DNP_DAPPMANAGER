@@ -14,7 +14,7 @@ import { PackageNotification, NotificationType } from "../types";
  *   body: "Some text about notification" {string}
  * }
  */
-export default async function notificationsTest({
+export async function notificationsTest({
   notification
 }: {
   notification?: PackageNotification;

@@ -14,7 +14,7 @@ const logs = Logs(module);
 /**
  * Returns the list of current containers associated to packages
  */
-export default async function listPackages(): Promise<ReturnData> {
+export async function listPackages(): Promise<ReturnData> {
   let dnpList = await listContainers();
 
   // Append envFile and manifest

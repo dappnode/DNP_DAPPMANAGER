@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock";
-import getStatsType from "../../src/calls/getStats";
+import { getStats as getStatsType } from "../../src/calls/getStats";
 import { CpuInfo } from "os";
 
 const testedCmdResponses: { [cmd: string]: string } = {
@@ -49,7 +49,7 @@ describe("Calls > getStats", function() {
           .toBeUsed();
       }
     );
-    getStats = mock.default;
+    getStats = mock.getStats;
   });
 
   it("should return the expected result", async () => {

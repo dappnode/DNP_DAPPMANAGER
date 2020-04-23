@@ -6,8 +6,8 @@ import { PackageContainer } from "../../src/types";
 import { mockDnp, testDir } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
-import copyFileFromType from "../../src/calls/copyFileFrom";
-import copyFileToType from "../../src/calls/copyFileTo";
+import { copyFileFrom as copyFileFromType } from "../../src/calls/copyFileFrom";
+import { copyFileTo as copyFileToType } from "../../src/calls/copyFileTo";
 
 describe("Call function: copyFileTo and copyFileFrom", () => {
   /**
@@ -78,8 +78,8 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
           .toBeUsed();
       }
     );
-    copyFileTo = copyFileToImport.default;
-    copyFileFrom = copyFileFromImport.default;
+    copyFileTo = copyFileToImport.copyFileTo;
+    copyFileFrom = copyFileFromImport.copyFileFrom;
   });
 
   const dataUri =

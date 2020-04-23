@@ -23,7 +23,7 @@ import * as validate from "../utils/validate";
 import { InstallPackageData, PackageRequest } from "../types";
 import { RequestData } from "../route-types/installPackage";
 import Logs from "../logs";
-import copyFileTo from "./copyFileTo";
+import { copyFileTo } from "./copyFileTo";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import {
   packageIsInstalling,
@@ -48,7 +48,7 @@ const dappmanagerId = params.dappmanagerDnpName;
  * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
  * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
-export default async function installPackage({
+export async function installPackage({
   name: reqName,
   version: reqVersion,
   userSettings: userSettingsAllDnps = {},

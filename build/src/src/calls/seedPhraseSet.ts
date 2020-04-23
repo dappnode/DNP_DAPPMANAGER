@@ -14,7 +14,7 @@ const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
  *
  * @param {string} seedPhraseEncrypted tweetnacl base64 box with nonce
  */
-export default async function seedPhraseSet({
+export async function seedPhraseSet({
   seedPhraseEncrypted
 }: {
   seedPhraseEncrypted: string;
