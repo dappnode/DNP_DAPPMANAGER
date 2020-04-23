@@ -12,7 +12,7 @@ import {
  * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
  * @param enabled Auto update is enabled for ID
  */
-export default async function autoUpdateSettingsEdit({
+export async function autoUpdateSettingsEdit({
   id,
   enabled
 }: RequestData): Promise<void> {

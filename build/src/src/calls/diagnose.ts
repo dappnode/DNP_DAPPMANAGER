@@ -4,7 +4,7 @@ import shellExec from "../utils/shell";
 /**
  * Returns a list of checks done as a diagnose
  */
-export default async function diagnose(): Promise<ReturnData> {
+export async function diagnose(): Promise<ReturnData> {
   // Get docker version: "Docker version 18.06.1-ce, build e68fc7a"
   const dockerVersion = {
     name: "docker version",

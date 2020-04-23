@@ -14,9 +14,7 @@ const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
  *
  * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
  */
-export default async function volumeRemove({
-  name
-}: RequestData): Promise<void> {
+export async function volumeRemove({ name }: RequestData): Promise<void> {
   if (!name) throw Error("kwarg name must be defined");
 
   await removeNamedVolume(name);

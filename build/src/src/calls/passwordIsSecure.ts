@@ -15,7 +15,7 @@ import * as db from "../db";
  *
  * @returns {bool} true = is secure / false = is not
  */
-export default async function passwordIsSecure(): Promise<ReturnData> {
+export async function passwordIsSecure(): Promise<ReturnData> {
   if (db.passwordIsSecure.get()) {
     return true;
   } else {

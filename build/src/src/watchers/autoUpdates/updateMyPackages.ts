@@ -11,7 +11,7 @@ import {
   flagErrorUpdate
 } from "../../utils/autoUpdateHelper";
 // External calls
-import installPackage from "../../calls/installPackage";
+import { installPackage } from "../../calls/installPackage";
 import Logs from "../../logs";
 const logs = Logs(module);
 

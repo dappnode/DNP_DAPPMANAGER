@@ -9,7 +9,7 @@ import shell from "../utils/shell";
  * - user action logs
  * - temp transfer folder
  */
-export default async function cleanCache(): Promise<void> {
+export async function cleanCache(): Promise<void> {
   const pathsToDelete = [
     params.userActionLogsFilename,
     params.TEMP_TRANSFER_DIR

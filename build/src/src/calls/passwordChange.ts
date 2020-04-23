@@ -1,7 +1,7 @@
 import { RequestData } from "../route-types/passwordChange";
 import { changePassword } from "../modules/passwordManager";
 // External calls
-import passwordIsSecure from "./passwordIsSecure";
+import { passwordIsSecure } from "./passwordIsSecure";
 
 /**
  * Changes the user `dappnode`'s password in the host machine
@@ -9,7 +9,7 @@ import passwordIsSecure from "./passwordIsSecure";
  *
  * @param {string} newPassword super-secure-password
  */
-export default async function passwordChange({
+export async function passwordChange({
   newPassword
 }: RequestData): Promise<void> {
   if (!newPassword) throw Error("Argument newPassword must be defined");

@@ -27,7 +27,7 @@ type ReturnData = string;
  * }
  */
 
-export default async function getUserActionLogs({
+export async function getUserActionLogs({
   fromLog = 0,
   numLogs = 50
 }): Promise<ReturnData> {

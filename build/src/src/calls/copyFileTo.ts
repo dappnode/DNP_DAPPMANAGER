@@ -29,7 +29,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   Same for relative paths to directories.
  * - If empty, defaults to $WORKDIR
  */
-export default async function copyFileTo({
+export async function copyFileTo({
   id,
   dataUri,
   filename,

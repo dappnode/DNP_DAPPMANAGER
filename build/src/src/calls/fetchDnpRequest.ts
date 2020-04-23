@@ -23,7 +23,7 @@ import { ReleaseFetcher } from "../modules/release";
 
 const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
-export default async function fetchDnpRequest({
+export async function fetchDnpRequest({
   id
 }: RequestData): Promise<ReturnData> {
   const releaseFetcher = new ReleaseFetcher();

@@ -9,7 +9,7 @@ import {
 } from "../../src/utils/autoUpdateHelper";
 import params from "../../src/params";
 import rewiremock from "rewiremock";
-import autoUpdateDataGetType from "../../src/calls/autoUpdateDataGet";
+import { autoUpdateDataGet as autoUpdateDataGetType } from "../../src/calls/autoUpdateDataGet";
 import { PackageContainer } from "../../src/types";
 
 describe("Call function: autoUpdateDataGet", () => {
@@ -61,7 +61,7 @@ describe("Call function: autoUpdateDataGet", () => {
           .toBeUsed();
       }
     );
-    autoUpdateDataGet = mock.default;
+    autoUpdateDataGet = mock.autoUpdateDataGet;
   });
 
   before(async () => {
