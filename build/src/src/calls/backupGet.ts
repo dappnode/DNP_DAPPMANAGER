@@ -10,7 +10,7 @@ import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup, RpcHandlerReturnWithResult } from "../types";
+import { PackageBackup } from "../types";
 
 type ReturnData = string;
 
@@ -32,7 +32,7 @@ export default async function backupGet({
 }: {
   id: string;
   backup: PackageBackup[];
-}): RpcHandlerReturnWithResult<ReturnData> {
+}): Promise<ReturnData> {
   if (!id) throw Error("Argument id must be defined");
   if (!backup) throw Error("Argument backup must be defined");
   if (!backup.length) throw Error("No backup items specified");
@@ -94,12 +94,7 @@ export default async function backupGet({
       });
     }, 15 * 60 * 1000);
 
-    return {
-      message: `Backup ${id}, items: ${successfulBackups.join(", ")}`,
-      logMessage: true,
-      userAction: true,
-      result: fileId
-    };
+    return fileId;
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
     await shell(`rm -rf ${tempTransferDir}`);

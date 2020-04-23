@@ -63,9 +63,7 @@ describe("Call function: removePackage", function() {
   });
 
   it("should stop the package with correct arguments", async () => {
-    const res = await removePackage({ id });
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
+    await removePackage({ id });
   });
 
   it("should have called docker-compose down", async () => {

@@ -5,7 +5,6 @@ import {
   editDnpSetting,
   editCoreSetting
 } from "../utils/autoUpdateHelper";
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Edits the auto-update settings
@@ -16,18 +15,11 @@ import { RpcHandlerReturn } from "../types";
 export default async function autoUpdateSettingsEdit({
   id,
   enabled
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 
   if (id === MY_PACKAGES) editDnpSetting(enabled);
   else if (id === SYSTEM_PACKAGES) editCoreSetting(enabled);
   else editDnpSetting(enabled, id);
-
-  const name = ((id || "").split(".")[0] || "").replace("-", " ");
-  return {
-    message: `${enabled ? "Enabled" : "Disabled"} auto updates for ${name}`,
-    logMessage: true,
-    userAction: true
-  };
 }

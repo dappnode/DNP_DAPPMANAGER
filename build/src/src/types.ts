@@ -810,32 +810,6 @@ export interface DiagnoseItem {
 export type Diagnose = DiagnoseItem[];
 
 /**
- * RPC methods
- * - Generic inteface with metadata types
- * - `WithResult` to type the return value
- * - `Generic` for higher order functions
- * [NOTE]: All are wrapped in a promise before exporting
- */
-
-interface RpcHandlerReturnInterface {
-  message: string;
-  logMessage?: boolean;
-  userAction?: boolean;
-}
-interface RpcHandlerReturnWithResultInterface<R>
-  extends RpcHandlerReturnInterface {
-  result: R;
-}
-interface RpcHandlerReturnGenericInterface extends RpcHandlerReturnInterface {
-  result?: any;
-}
-export type RpcHandlerReturn = Promise<RpcHandlerReturnInterface>;
-export type RpcHandlerReturnWithResult<R> = Promise<
-  RpcHandlerReturnWithResultInterface<R>
->;
-export type RpcHandlerReturnGeneric = Promise<RpcHandlerReturnGenericInterface>;
-
-/**
  * Welcome wizard / setup flow
  * Available routes / views in the UI
  */

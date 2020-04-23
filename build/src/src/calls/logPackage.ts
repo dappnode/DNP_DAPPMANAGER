@@ -1,5 +1,4 @@
 import { listContainer } from "../modules/docker/listContainers";
-import { RpcHandlerReturnWithResult } from "../types";
 import { logContainer } from "../modules/docker/dockerApi";
 
 type ReturnData = string;
@@ -20,16 +19,11 @@ export default async function logPackage({
 }: {
   id: string;
   options?: { timestamp: boolean; tail: number };
-}): RpcHandlerReturnWithResult<ReturnData> {
+}): Promise<ReturnData> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp = await listContainer(id);
   const containerName = dnp.packageName;
 
-  const logs = await logContainer(containerName, options);
-
-  return {
-    message: `Got logs of ${id}`,
-    result: logs
-  };
+  return await logContainer(containerName, options);
 }

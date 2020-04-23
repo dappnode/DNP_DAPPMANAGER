@@ -1,10 +1,6 @@
 import * as eventBus from "../eventBus";
 import * as db from "../db";
-import {
-  PackageNotification,
-  NotificationType,
-  RpcHandlerReturn
-} from "../types";
+import { PackageNotification, NotificationType } from "../types";
 
 /**
  * Adds a notification to be shown the UI.
@@ -22,7 +18,7 @@ export default async function notificationsTest({
   notification
 }: {
   notification?: PackageNotification;
-}): RpcHandlerReturn {
+}): Promise<void> {
   if (!notification) {
     notification = {
       id: String(Math.random()).slice(2),
@@ -35,12 +31,6 @@ export default async function notificationsTest({
   db.notification.set(notification.id, notification);
 
   eventBus.notification.emit(notification);
-
-  return {
-    message: `Added notification ${JSON.stringify(notification)}`,
-    logMessage: true,
-    userAction: true
-  };
 }
 
 // Utils

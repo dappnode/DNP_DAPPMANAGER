@@ -178,7 +178,7 @@ describe("Fetch external release data", () => {
     });
 
     it("Fetch regular package data", async () => {
-      const res = await calls.fetchDnpRequest({
+      const result = await calls.fetchDnpRequest({
         id: mainDnpReleaseHash
       });
 
@@ -277,7 +277,7 @@ describe("Fetch external release data", () => {
         }
       };
 
-      expect(res.result).to.deep.equal(expectRequestDnp);
+      expect(result).to.deep.equal(expectRequestDnp);
     });
 
     after("Clean artifcats", async () => {
@@ -353,7 +353,7 @@ describe("Fetch external release data", () => {
     });
 
     it("Fetch package data", async () => {
-      const res = await calls.fetchDnpRequest({
+      const result = await calls.fetchDnpRequest({
         id: mainDnpReleaseHash
       });
 
@@ -407,7 +407,7 @@ describe("Fetch external release data", () => {
         imageSize: 0
       };
 
-      expect(omit(res.result, ["imageSize"])).to.deep.equal(
+      expect(omit(result, ["imageSize"])).to.deep.equal(
         omit(expectRequestDnp, ["imageSize"])
       );
     });
@@ -419,7 +419,7 @@ describe("Fetch external release data", () => {
 
   describe("fetchCoreUpdateData", () => {
     it("Should fetch core update data", async () => {
-      const { result } = await calls.fetchCoreUpdateData({});
+      const result = await calls.fetchCoreUpdateData({});
       expect(result.available, "Core update should be available").to.be.true;
       const dnpBind = result.packages.find(({ name }) => name === bindId);
       expect(dnpBind, "Bind DNP must be in packages array").to.be.ok;
@@ -428,7 +428,7 @@ describe("Fetch external release data", () => {
 
   describe("fetchDirectory", () => {
     it("Should fetch directory data", async () => {
-      const { result: directoryDnps } = await calls.fetchDirectory();
+      const directoryDnps = await calls.fetchDirectory();
       expect(directoryDnps).to.have.length.greaterThan(
         0,
         "There should be packages in the directory return"

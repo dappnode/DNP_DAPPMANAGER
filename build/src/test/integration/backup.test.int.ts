@@ -96,25 +96,23 @@ volumes:
     /**
      * Do restore
      */
-    const resRestore = await backupRestore({ id, fileId, backup });
-    expect(resRestore).to.be.ok;
-    expect(resRestore.message).to.equal(
-      "Restored backup test-backup.dnp.dappnode.eth, items: config, test",
-      "Wrong response message for backupRestore"
-    );
+    await backupRestore({ id, fileId, backup });
+    // expect(resRestore.message).to.equal(
+    //   "Restored backup test-backup.dnp.dappnode.eth, items: config, test",
+    //   "Wrong response message for backupRestore"
+    // );
 
     /**
      * Do get
      */
-    const resGet = await backupGet({ id, backup });
-    expect(resGet).to.be.ok;
-    expect(resGet.message).to.equal(
-      "Backup test-backup.dnp.dappnode.eth, items: config, test",
-      "Wrong response message for backupGet"
-    );
-    expect(resGet.result).to.be.a("string");
-    // res.result = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908"
-    expect(db.fileTransferPath.get(resGet.result)).to.equal(filePath);
+    const resultGet = await backupGet({ id, backup });
+    // expect(resGet.message).to.equal(
+    //   "Backup test-backup.dnp.dappnode.eth, items: config, test",
+    //   "Wrong response message for backupGet"
+    // );
+    expect(resultGet).to.be.a("string");
+    // resultGet = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908"
+    expect(db.fileTransferPath.get(resultGet)).to.equal(filePath);
 
     /**
      * [NOTE] validate the generated file, assuming it's not deterministic

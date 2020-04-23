@@ -9,7 +9,6 @@ import * as eventBus from "../eventBus";
 import params from "../params";
 // Utils
 import * as getPath from "../utils/getPath";
-import { RpcHandlerReturn } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -23,29 +22,18 @@ export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 export default async function restartPackageVolumes({
   id,
   volumeId
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   const { removedVols, removedDnps } = await restartPackageVolumesTask({
     id,
     volumeId
   });
 
   // If there are no volumes don't do anything
-  if (!removedVols.length)
-    return {
-      message: `${id} has no named volumes`,
-      logMessage: true,
-      userAction: true
-    };
+  if (!removedVols.length) return;
 
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ ids: removedDnps });
-
-  return {
-    message: `Restarted ${id} volumes: ${removedVols.join(" ")}`,
-    logMessage: true,
-    userAction: true
-  };
 }
 
 /**

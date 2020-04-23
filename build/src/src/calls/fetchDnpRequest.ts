@@ -6,7 +6,6 @@ import {
   UserSettingsAllDnps,
   CompatibleDnps,
   PackageRelease,
-  RpcHandlerReturnWithResult,
   PackageReleaseMetadata,
   PackageContainer
 } from "../types";
@@ -26,7 +25,7 @@ const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 export default async function fetchDnpRequest({
   id
-}: RequestData): RpcHandlerReturnWithResult<ReturnData> {
+}: RequestData): Promise<ReturnData> {
   const releaseFetcher = new ReleaseFetcher();
 
   const mainRelease = await releaseFetcher.getRelease(id);
@@ -116,42 +115,39 @@ export default async function fetchDnpRequest({
   const avatarUrl = fileToGatewayUrl(mainRelease.avatarFile);
 
   return {
-    message: `Fetched request data of ${id}`,
-    result: {
-      name: mainRelease.name, // "bitcoin.dnp.dappnode.eth"
-      semVersion: mainRelease.semVersion,
-      reqVersion: mainRelease.reqVersion,
-      origin: mainRelease.origin, // "/ipfs/Qm"
-      avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
-      // Setup
-      setupSchema,
-      setupTarget,
-      setupUiJson,
-      // Additional data
-      imageSize: mainRelease.imageFile.size,
-      isUpdated,
-      isInstalled,
-      // Prevent sending duplicated data
-      metadata: omit(mainRelease.metadata, [
-        "setupSchema",
-        "setupTarget",
-        "setupUiJson"
-      ]),
-      specialPermissions, // Decoupled metadata
-      // Settings must include the previous user settings
-      settings,
-      request: {
-        compatible: {
-          requiresCoreUpdate,
-          resolving: false,
-          isCompatible: !compatibleError,
-          error: compatibleError,
-          dnps: compatibleDnps
-        },
-        available: {
-          isAvailable: true,
-          message: "" // "LN image not available";
-        }
+    name: mainRelease.name, // "bitcoin.dnp.dappnode.eth"
+    semVersion: mainRelease.semVersion,
+    reqVersion: mainRelease.reqVersion,
+    origin: mainRelease.origin, // "/ipfs/Qm"
+    avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
+    // Setup
+    setupSchema,
+    setupTarget,
+    setupUiJson,
+    // Additional data
+    imageSize: mainRelease.imageFile.size,
+    isUpdated,
+    isInstalled,
+    // Prevent sending duplicated data
+    metadata: omit(mainRelease.metadata, [
+      "setupSchema",
+      "setupTarget",
+      "setupUiJson"
+    ]),
+    specialPermissions, // Decoupled metadata
+    // Settings must include the previous user settings
+    settings,
+    request: {
+      compatible: {
+        requiresCoreUpdate,
+        resolving: false,
+        isCompatible: !compatibleError,
+        error: compatibleError,
+        dnps: compatibleDnps
+      },
+      available: {
+        isAvailable: true,
+        message: "" // "LN image not available";
       }
     }
   };

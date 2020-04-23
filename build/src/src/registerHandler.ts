@@ -1,9 +1,10 @@
 import logUserAction from "./logUserAction";
 import { Session } from "autobahn";
-import { RpcHandlerReturnGeneric } from "./types";
 import Logs from "./logs";
 import { EthProviderError } from "./modules/ethClient";
 const logs = Logs(module);
+
+type Handler = (kwargs: any) => Promise<any>;
 
 /*
  * RPC register wrapper
@@ -12,10 +13,7 @@ const logs = Logs(module);
  * and logging of errors and actions.
  */
 
-export const wrapErrors = <K>(
-  handler: (kwargs: K) => RpcHandlerReturnGeneric,
-  event: string
-) =>
+export const wrapErrors = <K>(handler: Handler, event: string) =>
   // function(args, kwargs, details)
   async function wrappedHandler(
     // crossbar's session.register requires _0: `any[] | undefined`
@@ -29,11 +27,12 @@ export const wrapErrors = <K>(
     // 1. kwargs: an object with call arguments
     // 2. details: an object which provides call metadata
     try {
-      const res = await handler(kwargs);
-      /**
-       * res = { message, result }
-       */
-
+      const result = await handler(kwargs);
+      const res = {
+        message: event,
+        result,
+        logMessage: false
+      };
       // Log internally
       logUserAction.log({ level: "info", event, ...res, kwargs });
       const eventShort = event.replace(".dappmanager.dnp.dappnode.eth", "");
@@ -93,10 +92,10 @@ export const wrapErrors = <K>(
     }
   };
 
-export const registerHandler = (
+export const registerHandler = <K>(
   session: Session,
   event: string,
-  handler: (kwargs: any) => RpcHandlerReturnGeneric
+  handler: Handler
 ): void => {
   session.register(event, wrapErrors(handler, event)).then(
     () => {
