@@ -51,8 +51,8 @@ if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
 // Initial calls to check this DAppNode's status
 calls
   .passwordIsSecure()
-  .then(({ result }) => {
-    logs.info("Host user password is " + (result ? "secure" : "INSECURE"));
+  .then(isSecure => {
+    logs.info("Host user password is " + (isSecure ? "secure" : "INSECURE"));
   })
   .catch(e => {
     logs.error(`Error checking if host user password is secure: ${e.message}`);
@@ -109,22 +109,18 @@ connection.onopen = (session, details): void => {
 
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {
-    const { result: dnpList } = await calls.listPackages();
-    wampSubscriptions.packages.emit(dnpList);
-    const { result: volumes } = await calls.volumesGet();
-    wampSubscriptions.volumes.emit(volumes);
+    wampSubscriptions.packages.emit(await calls.listPackages());
+    wampSubscriptions.volumes.emit(await calls.volumesGet());
   });
 
   // Emits the auto update data (settings, registry, pending)
   eventBus.requestAutoUpdateData.on(async () => {
-    const { result: autoUpdateData } = await calls.autoUpdateDataGet();
-    wampSubscriptions.autoUpdateData.emit(autoUpdateData);
+    wampSubscriptions.autoUpdateData.emit(await calls.autoUpdateDataGet());
   });
 
   // Emits all system info
   eventBus.requestSystemInfo.on(async () => {
-    const { result: systemInfo } = await calls.systemInfoGet();
-    wampSubscriptions.systemInfo.emit(systemInfo);
+    wampSubscriptions.systemInfo.emit(await calls.systemInfoGet());
   });
 
   // Receives userAction logs from the VPN nodejs app
@@ -184,7 +180,7 @@ async function runLegacyOps(): Promise<void> {
   }
 
   try {
-    const { result: dnpList } = await calls.listPackages();
+    const dnpList = await calls.listPackages();
     for (const dnp of dnpList) {
       const hasConverted = convertLegacyEnvFiles(dnp);
       if (hasConverted)

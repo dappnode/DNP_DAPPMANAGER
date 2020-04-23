@@ -1,4 +1,3 @@
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Open or closes requested ports
@@ -10,6 +9,6 @@ import { RpcHandlerReturn } from "../types";
  * @param {array} ports: array of port objects
  * ports = [ { portNumber: 30303, protocol: TCP }, ... ]
  */
-export default async function managePorts(): RpcHandlerReturn {
+export default async function managePorts(): Promise<void> {
   throw Error("deprecated");
 }

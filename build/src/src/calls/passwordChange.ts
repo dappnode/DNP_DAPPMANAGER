@@ -2,7 +2,6 @@ import { RequestData } from "../route-types/passwordChange";
 import { changePassword } from "../modules/passwordManager";
 // External calls
 import passwordIsSecure from "./passwordIsSecure";
-import { RpcHandlerReturn } from "../types";
 
 /**
  * Changes the user `dappnode`'s password in the host machine
@@ -12,17 +11,11 @@ import { RpcHandlerReturn } from "../types";
  */
 export default async function passwordChange({
   newPassword
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);
 
   // Update the DB "is-password-secure" check
   await passwordIsSecure();
-
-  return {
-    message: `Changed password`,
-    logMessage: true,
-    userAction: true
-  };
 }

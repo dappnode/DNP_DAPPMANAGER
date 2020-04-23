@@ -4,11 +4,7 @@ import { listContainers } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
-import {
-  RpcHandlerReturnWithResult,
-  AutoUpdateDataDnpView,
-  PackageContainer
-} from "../types";
+import { AutoUpdateDataDnpView, PackageContainer } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 
@@ -48,9 +44,7 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  *   }, ... ]
  * }
  */
-export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function autoUpdateDataGet(): Promise<ReturnData> {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();
@@ -110,12 +104,9 @@ export default async function autoUpdateDataGet(): RpcHandlerReturnWithResult<
   }
 
   return {
-    message: `Got auto update data`,
-    result: {
-      settings,
-      registry,
-      pending,
-      dnpsToShow
-    }
+    settings,
+    registry,
+    pending,
+    dnpsToShow
   };
 }

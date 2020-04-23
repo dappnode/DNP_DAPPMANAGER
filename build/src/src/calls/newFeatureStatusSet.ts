@@ -1,5 +1,4 @@
 import { RequestData } from "../route-types/newFeatureStatusSet";
-import { RpcHandlerReturn } from "../types";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
 
@@ -9,13 +8,9 @@ import * as eventBus from "../eventBus";
 export default async function newFeatureStatusSet({
   featureId,
   status
-}: RequestData): RpcHandlerReturn {
+}: RequestData): Promise<void> {
   db.newFeatureStatus.set(featureId, status);
 
   // Notify the UI of the uiWelcomeStatus change
   eventBus.requestSystemInfo.emit();
-
-  return {
-    message: "Changed uiWelcomeStatus"
-  };
 }

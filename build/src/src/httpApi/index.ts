@@ -37,14 +37,14 @@ export default function startHttpApi(port: number = httpApiPort) {
 
   app.get("/container-logs/:id", isAuthorized, async (req, res) => {
     const { id } = req.params;
-    const { result } = await calls.logPackage({ id });
+    const logs = await calls.logPackage({ id });
 
     const filename = `logs-dappnode-package-${id}.txt`;
     const mimetype = "text/plain";
     res.setHeader("Content-disposition", "attachment; filename=" + filename);
     res.setHeader("Content-type", mimetype);
 
-    res.status(200).send(result);
+    res.status(200).send(logs);
   });
 
   /**

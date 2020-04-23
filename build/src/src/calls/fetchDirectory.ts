@@ -1,7 +1,7 @@
 import * as eventBus from "../eventBus";
 import { ReturnData } from "../route-types/fetchDirectory";
 import { getDirectory } from "../modules/directory";
-import { RpcHandlerReturnWithResult, DirectoryItem } from "../types";
+import { DirectoryItem } from "../types";
 import Logs from "../logs";
 import { listContainers } from "../modules/docker/listContainers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
@@ -16,9 +16,7 @@ const loadThrottle = 500; // 0.5 seconds
 /**
  * Fetches all package names in the custom dappnode directory.
  */
-export default async function fetchDirectory(): RpcHandlerReturnWithResult<
-  ReturnData
-> {
+export default async function fetchDirectory(): Promise<ReturnData> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 
@@ -71,11 +69,7 @@ export default async function fetchDirectory(): RpcHandlerReturnWithResult<
     })
   );
 
-  return {
-    message: `Listed directory of ${directoryDnps.length} DNPs`,
-    result: directoryDnps,
-    logMessage: true
-  };
+  return directoryDnps;
 }
 
 // Helpers

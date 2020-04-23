@@ -24,9 +24,7 @@ describe("Auto update data", () => {
       [MY_PACKAGES]: { enabled },
       [SYSTEM_PACKAGES]: { enabled }
     };
-    const {
-      result: { settings }
-    } = await calls.autoUpdateDataGet();
+    const { settings } = await calls.autoUpdateDataGet();
     expect(settings).to.deep.equal(expectedSettings);
   });
 });
@@ -37,8 +35,7 @@ describe("Get system data", () => {
   });
 
   it("Should do and return a diagnose", async () => {
-    const { result } = await calls.diagnose();
-    expect(result).to.be.ok;
+    const result = await calls.diagnose();
     // Only verify the version calls (docker, docker-compose)
     // that they actually returned a proper version
     for (const diagnose of result.filter(d => d.name.includes("version"))) {
@@ -50,8 +47,7 @@ describe("Get system data", () => {
   }).timeout(10 * 1000);
 
   it("Should get host machine stats", async () => {
-    const { result } = await calls.getStats();
-    expect(result).to.be.ok;
+    const result = await calls.getStats();
     // Can't check actual returns since they vary
     expect(result.cpu).to.include("%");
     expect(result.memory).to.include("%");
@@ -59,13 +55,12 @@ describe("Get system data", () => {
   }).timeout(10 * 1000);
 
   it("Should get DAPPMANAGER system info", async () => {
-    const { result } = await calls.systemInfoGet();
-    expect(result).to.be.ok;
+    await calls.systemInfoGet();
     // Can't check return because is only exists on full build :(
   }).timeout(10 * 1000);
 
   it("Should getUserActionLogs", async () => {
-    const { result } = await calls.getUserActionLogs({});
+    const result = await calls.getUserActionLogs({});
     // User logs should be empty since nothing happened that was registered
     expect(result).to.be.a("string");
   });
@@ -80,7 +75,7 @@ describe("Notifications", async () => {
   let id: string;
 
   it("Should retrieve notifications", async () => {
-    const { result } = await calls.notificationsGet();
+    const result = await calls.notificationsGet();
     expect(result).to.have.length.greaterThan(
       0,
       "There should be one notification"
@@ -90,8 +85,8 @@ describe("Notifications", async () => {
 
   it("Should remove a notification", async () => {
     if (!id) throw Error("Previous test failed");
-    const {} = await calls.notificationsRemove({ ids: [id] });
-    const { result } = await calls.notificationsGet();
+    await calls.notificationsRemove({ ids: [id] });
+    const result = await calls.notificationsGet();
     const deletedNotification = result.find(n => n.id === id);
     if (deletedNotification) {
       logs.info(JSON.stringify(result, null, 2));

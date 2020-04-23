@@ -53,10 +53,8 @@ describe("Calls > getStats", function() {
   });
 
   it("should return the expected result", async () => {
-    const res = await getStats();
-    expect(res).to.be.ok;
-    expect(res).to.have.property("message");
-    expect(res.result).to.deep.equal({
+    const stats = await getStats();
+    expect(stats).to.deep.equal({
       cpu: "50%",
       disk: "39%",
       memory: "15%"

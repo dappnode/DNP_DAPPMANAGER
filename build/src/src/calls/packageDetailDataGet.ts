@@ -1,7 +1,6 @@
 import { ReturnData } from "../route-types/packageDetailDataGet";
 import { mapValues } from "lodash";
 import { RequestData } from "../route-types/packageGettingStartedToggle";
-import { RpcHandlerReturnWithResult } from "../types";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
@@ -12,7 +11,7 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  */
 export default async function packageDetailDataGet({
   id
-}: RequestData): RpcHandlerReturnWithResult<ReturnData> {
+}: RequestData): Promise<ReturnData> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp = await listContainer(id);
@@ -50,9 +49,6 @@ export default async function packageDetailDataGet({
   });
 
   return {
-    message: `Got volume sizes of ${id}`,
-    result: {
-      volumes
-    }
+    volumes
   };
 }
