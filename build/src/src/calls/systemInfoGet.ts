@@ -1,17 +1,16 @@
-import { ReturnData } from "../route-types/systemInfoGet";
-import { NewFeatureId } from "../types";
 import params from "../params";
 import * as db from "../db";
-import { getVersionData } from "../utils/getVersionData";
 import { logPackage } from "./logPackage";
+import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
+import { NewFeatureId, SystemInfo } from "../types";
 
 const wifiName = params.wifiDnpName;
 
 /**
  * Returns the current DAppNode system info
  */
-export async function systemInfoGet(): Promise<ReturnData> {
+export async function systemInfoGet(): Promise<SystemInfo> {
   const ethClientTarget = db.ethClientTarget.get();
 
   return {

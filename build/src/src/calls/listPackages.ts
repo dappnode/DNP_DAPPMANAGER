@@ -1,4 +1,3 @@
-import { ReturnData } from "../route-types/listPackages";
 import * as eventBus from "../eventBus";
 import * as db from "../db";
 // Modules
@@ -7,14 +6,15 @@ import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
 import { omit } from "lodash";
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
-import Logs from "../logs";
 import { readConfigFiles } from "../utils/configFiles";
+import { PackageContainer } from "../types";
+import Logs from "../logs";
 const logs = Logs(module);
 
 /**
  * Returns the list of current containers associated to packages
  */
-export async function listPackages(): Promise<ReturnData> {
+export async function listPackages(): Promise<PackageContainer[]> {
   let dnpList = await listContainers();
 
   // Append envFile and manifest

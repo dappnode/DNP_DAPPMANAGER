@@ -54,7 +54,9 @@ export async function callRoute<R>(
   args: Args
 ): Promise<R> {
   try {
-    const res = await session.call<RpcResult<R>>(getEvent(route), args);
+    const res: RpcResult<R> = await session
+      .call<RpcResult<R>>(getEvent(route), args)
+      .then(res => (typeof res === "string" ? JSON.parse(res) : res));
     // Handle route implementation errors
     if (res.success) return res.result;
     else throw Error(res.message);

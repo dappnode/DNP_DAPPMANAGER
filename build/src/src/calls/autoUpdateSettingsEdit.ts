@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/autoUpdateSettingsEdit";
 import {
   MY_PACKAGES, // "my-packages"
   SYSTEM_PACKAGES, // "system-packages"
@@ -15,7 +14,10 @@ import {
 export async function autoUpdateSettingsEdit({
   id,
   enabled
-}: RequestData): Promise<void> {
+}: {
+  id: string;
+  enabled: boolean;
+}): Promise<void> {
   if (!id)
     throw Error(`Argument id is required or generalSettings must be true`);
 

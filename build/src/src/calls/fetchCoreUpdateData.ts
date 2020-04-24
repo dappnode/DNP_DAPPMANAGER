@@ -1,7 +1,6 @@
 import params from "../params";
 import { omit, isEmpty } from "lodash";
 import { CoreUpdateData } from "../types";
-import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../modules/release";
 import { listContainers } from "../modules/docker/listContainers";
 import semver from "semver";
@@ -16,7 +15,9 @@ const defaultVersion = "*";
  */
 export async function fetchCoreUpdateData({
   version
-}: RequestData): Promise<ReturnData> {
+}: {
+  version?: string;
+}): Promise<CoreUpdateData> {
   return await getCoreUpdateData(version);
 }
 

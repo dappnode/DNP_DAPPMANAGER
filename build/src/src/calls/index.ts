@@ -19,6 +19,7 @@ export { installPackage } from "./installPackage";
 export { listPackages } from "./listPackages";
 export { logPackage } from "./logPackage";
 export { mountpointsGet } from "./mountpointsGet";
+export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";
 export { notificationsRemove } from "./notificationsRemove";
 export { notificationsTest } from "./notificationsTest";

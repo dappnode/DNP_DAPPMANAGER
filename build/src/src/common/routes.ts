@@ -15,7 +15,10 @@ import {
   PortMapping,
   PackageEnvs,
   PackageNotification,
-  PackageBackup
+  PackageBackup,
+  EthClientFallback,
+  NewFeatureId,
+  NewFeatureStatus
 } from "./types";
 
 export interface Routes {
@@ -115,6 +118,13 @@ export interface Routes {
    * Set a domain alias to a DAppNode package by name
    */
   domainAliasSet: (kwargs: { alias: string; dnpName: string }) => Promise<void>;
+
+  /**
+   * Sets if a fallback should be used
+   */
+  ethClientFallbackSet: (kwargs: {
+    fallback: EthClientFallback;
+  }) => Promise<void>;
 
   /**
    * Changes the ethereum client used to fetch package data
@@ -217,6 +227,14 @@ export interface Routes {
    * by running a pre-written script in the host
    */
   mountpointsGet: () => Promise<MountpointData[]>;
+
+  /**
+   * Flag the UI welcome flow as completed
+   */
+  newFeatureStatusSet: (kwargs: {
+    featureId: NewFeatureId;
+    status: NewFeatureStatus;
+  }) => Promise<void>;
 
   /**
    * Returns not viewed notifications.
@@ -392,6 +410,7 @@ export const routesData: RoutesData = {
   copyFileTo: { log: true },
   diagnose: {},
   domainAliasSet: { log: true },
+  ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
@@ -402,6 +421,7 @@ export const routesData: RoutesData = {
   listPackages: {},
   logPackage: {},
   mountpointsGet: {},
+  newFeatureStatusSet: {},
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
@@ -428,7 +448,9 @@ export const routesData: RoutesData = {
 // DO NOT REMOVE
 // Enforces that each route is a function that returns a promise
 export type RoutesArguments = { [K in keyof Routes]: Parameters<Routes[K]> };
-export type RoutesReturn = { [K in keyof Routes]: ResolvedType<Routes[K]> };
+export type RoutesReturn = {
+  [K in keyof Routes]: ReplaceVoidByNull<ResolvedType<Routes[K]>>
+};
 
 /**
  * Returns the return resolved type of a function type
@@ -440,3 +462,5 @@ export type ResolvedType<T extends (...args: any) => Promise<any>> = T extends (
   ? R
   : never;
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+export type ReplaceVoidByNull<T> = T extends void ? null : T;

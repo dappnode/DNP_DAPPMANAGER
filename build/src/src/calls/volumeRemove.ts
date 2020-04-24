@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/volumeRemove";
 import { dockerVolumeRm } from "../modules/docker/dockerCommands";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { shellHost } from "../utils/shell";
@@ -14,7 +13,7 @@ const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
  *
  * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
  */
-export async function volumeRemove({ name }: RequestData): Promise<void> {
+export async function volumeRemove({ name }: { name: string }): Promise<void> {
   if (!name) throw Error("kwarg name must be defined");
 
   await removeNamedVolume(name);
