@@ -1,6 +1,6 @@
-import { ReturnData } from "../route-types/getStats";
 import os from "os";
 import shellExec from "../utils/shell";
+import { HostStats } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -10,7 +10,7 @@ const numCores = os.cpus().length;
 /**
  * Returns relevant host machine stats such as disk space, memory, cpu, etc
  */
-export async function getStats(): Promise<ReturnData> {
+export async function getStats(): Promise<HostStats> {
   const cpuUsedPercent = await wrapErrors(async () => {
     return getDiskPercent();
   }, "cpuUsedPercent");

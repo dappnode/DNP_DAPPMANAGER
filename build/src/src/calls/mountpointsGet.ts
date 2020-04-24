@@ -1,12 +1,11 @@
-import { ReturnData } from "../route-types/mountpointsGet";
-import { MountpointData } from "../types";
 import { detectMountpoints } from "../modules/hostScripts";
+import { MountpointData } from "../types";
 
 /**
  * Returns the list of current mountpoints in the host,
  * by running a pre-written script in the host
  */
-export async function mountpointsGet(): Promise<ReturnData> {
+export async function mountpointsGet(): Promise<MountpointData[]> {
   const mountpoints = await detectMountpoints();
   const hostMountpoint: MountpointData = {
     mountpoint: "",

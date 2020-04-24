@@ -1,5 +1,6 @@
 import * as db from "../db";
 import * as dyndns from "../modules/dyndns";
+import * as eventBus from "../eventBus";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -28,6 +29,18 @@ export async function setStaticIp({
   } else {
     logs.info(`Updated static IP: ${staticIp}`);
   }
+
+  eventBus.notification.emit({
+    id: "staticIpUpdated",
+    type: "warning",
+    title: "Update connection profiles",
+    body:
+      "Your static IP was changed, please download and install your VPN connection profile again. Instruct your users to do so also."
+  });
+
+  // Dynamic update with the new staticIp
+  eventBus.requestSystemInfo.emit();
+  eventBus.requestDevices.emit();
 }
 
 module.exports = setStaticIp;

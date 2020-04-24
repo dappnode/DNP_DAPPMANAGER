@@ -1,10 +1,10 @@
-import { ReturnData } from "../route-types/diagnose";
 import shellExec from "../utils/shell";
+import { Diagnose } from "../types";
 
 /**
  * Returns a list of checks done as a diagnose
  */
-export async function diagnose(): Promise<ReturnData> {
+export async function diagnose(): Promise<Diagnose> {
   // Get docker version: "Docker version 18.06.1-ce, build e68fc7a"
   const dockerVersion = {
     name: "docker version",

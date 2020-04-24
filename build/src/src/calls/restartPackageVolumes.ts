@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/restartPackageVolumes";
 import fs from "fs";
 import { uniq } from "lodash";
 import { dockerRm } from "../modules/docker/dockerCommands";
@@ -16,13 +15,17 @@ export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 
 /**
  * Removes a package volumes. The re-ups the package
- *
- * @param id DNP .eth name
  */
 export async function restartPackageVolumes({
   id,
   volumeId
-}: RequestData): Promise<void> {
+}: {
+  id: string;
+  /**
+   * volumeId = "gethdnpdappnodeeth_geth"
+   */
+  volumeId?: string;
+}): Promise<void> {
   const { removedVols, removedDnps } = await restartPackageVolumesTask({
     id,
     volumeId

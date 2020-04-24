@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/packageGettingStartedToggle";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
 
@@ -9,7 +8,10 @@ import * as eventBus from "../eventBus";
 export async function packageGettingStartedToggle({
   id,
   show
-}: RequestData): Promise<void> {
+}: {
+  id: string;
+  show: boolean;
+}): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
 
   db.packageGettingStartedShow.set(id, show);
