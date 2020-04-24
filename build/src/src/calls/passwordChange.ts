@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/passwordChange";
 import { changePassword } from "../modules/passwordManager";
 // External calls
 import { passwordIsSecure } from "./passwordIsSecure";
@@ -11,7 +10,9 @@ import { passwordIsSecure } from "./passwordIsSecure";
  */
 export async function passwordChange({
   newPassword
-}: RequestData): Promise<void> {
+}: {
+  newPassword: string;
+}): Promise<void> {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);

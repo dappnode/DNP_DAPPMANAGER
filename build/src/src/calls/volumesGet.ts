@@ -1,9 +1,8 @@
-import { ReturnData } from "../route-types/volumesGet";
-import { VolumeData } from "../types";
 import { dockerDf, dockerVolumesList } from "../modules/docker/dockerApi";
 import { listContainers } from "../modules/docker/listContainers";
 import { detectMountpoints } from "../modules/hostScripts";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
+import { VolumeData } from "../types";
 
 /**
  * Returns not viewed notifications.
@@ -18,7 +17,7 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export async function volumesGet(): Promise<ReturnData> {
+export async function volumesGet(): Promise<VolumeData[]> {
   const volumes = await dockerVolumesList();
   const { Volumes: volumesDf } = await dockerDf();
   const dnpList = await listContainers();

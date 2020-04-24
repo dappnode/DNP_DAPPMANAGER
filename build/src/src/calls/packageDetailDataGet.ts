@@ -1,9 +1,8 @@
-import { ReturnData } from "../route-types/packageDetailDataGet";
 import { mapValues } from "lodash";
-import { RequestData } from "../route-types/packageDetailDataGet";
 import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
+import { PackageDetailData } from "../types";
 
 /**
  * Toggles the visibility of a getting started block
@@ -11,7 +10,9 @@ import { parseDevicePath } from "../utils/dockerComposeParsers";
  */
 export async function packageDetailDataGet({
   id
-}: RequestData): Promise<ReturnData> {
+}: {
+  id: string;
+}): Promise<PackageDetailData> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp = await listContainer(id);

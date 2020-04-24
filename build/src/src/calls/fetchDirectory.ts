@@ -1,5 +1,4 @@
 import * as eventBus from "../eventBus";
-import { ReturnData } from "../route-types/fetchDirectory";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
 import Logs from "../logs";
@@ -16,7 +15,7 @@ const loadThrottle = 500; // 0.5 seconds
 /**
  * Fetches all package names in the custom dappnode directory.
  */
-export async function fetchDirectory(): Promise<ReturnData> {
+export async function fetchDirectory(): Promise<DirectoryItem[]> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 
