@@ -1,6 +1,6 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "type": "dncore",
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
