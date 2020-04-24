@@ -1,8 +1,3 @@
-import autobahn from "autobahn";
-import * as eventBus from "./eventBus";
-import logUserAction from "./logUserAction";
-import { registerHandler } from "./registerHandler";
-import { registerSubscriptions } from "./registerSubscriptions";
 import params from "./params";
 import * as db from "./db";
 import { convertLegacyEnvFiles } from "./utils/configFiles";
@@ -14,19 +9,20 @@ import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
 import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
 import { postCoreUpdate } from "./modules/installer/postCoreUpdate";
-import {
-  getVersionData,
-  isNewDappmanagerVersion
-} from "./utils/getVersionData";
+import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
 import startEthForward from "./ethForward";
 import startHttpApi from "./httpApi";
+import { startAutobahn } from "./api";
 import Logs from "./logs";
 const logs = Logs(module);
 
 // Start HTTP API
 startHttpApi();
+
+// Start WAMP Transport
+startAutobahn({ url: params.autobahnUrl, realm: params.autobahnRealm });
 
 // Start eth forward http proxy
 startEthForward();
@@ -57,105 +53,6 @@ calls
   .catch(e => {
     logs.error(`Error checking if host user password is secure: ${e.message}`);
   });
-
-/*
- * Connection configuration
- * ************************
- * Autobahn.js connects to the WAMP, whos url in defined in params.js
- * On connection open:
- * - all handlers are registered
- * - the native event bus is linked to the session to:
- *   - allow internal calls
- *   - publish progress logs and userAction logs
- * - it subscribe to userAction logs sent by the VPN to store them locally
- */
-const url = params.autobahnUrl;
-const realm = params.autobahnRealm;
-const connection = new autobahn.Connection({ url, realm });
-
-connection.onopen = (session, details): void => {
-  logs.info(`Connected to DAppNode's WAMP
-  url:     ${url}
-  realm:   ${realm}
-  session: ${(details || {}).authid}`);
-
-  registerHandler(
-    session,
-    "ping.dappmanager.dnp.dappnode.eth",
-    async (x: string) => ({ message: "ping", result: x })
-  );
-  for (const [callId, callHandler] of Object.entries(calls)) {
-    registerHandler(
-      session,
-      callId + ".dappmanager.dnp.dappnode.eth",
-      callHandler
-    );
-  }
-
-  /**
-   * All the session uses below can throw errors if the session closes.
-   * so each single callback is wrapped in a try/catch block,
-   * via the `eventBusOnSafe` method
-   */
-
-  const wampSubscriptions = registerSubscriptions(session, logs);
-
-  // Pipe local events to WAMP
-  eventBus.chainData.on(wampSubscriptions.chainData.emit);
-  eventBus.logUi.on(wampSubscriptions.progressLog.emit);
-  eventBus.logUserAction.on(wampSubscriptions.userActionLog.emit);
-  eventBus.packages.on(wampSubscriptions.packages.emit);
-  eventBus.directory.on(wampSubscriptions.directory.emit);
-
-  // Emit the list of packages
-  eventBus.requestPackages.on(async () => {
-    wampSubscriptions.packages.emit(await calls.listPackages());
-    wampSubscriptions.volumes.emit(await calls.volumesGet());
-  });
-
-  // Emits the auto update data (settings, registry, pending)
-  eventBus.requestAutoUpdateData.on(async () => {
-    wampSubscriptions.autoUpdateData.emit(await calls.autoUpdateDataGet());
-  });
-
-  // Emits all system info
-  eventBus.requestSystemInfo.on(async () => {
-    wampSubscriptions.systemInfo.emit(await calls.systemInfoGet());
-  });
-
-  // Receives userAction logs from the VPN nodejs app
-  wampSubscriptions.logUserActionToDappmanager.on(userActionLog => {
-    logUserAction.log(userActionLog);
-  });
-
-  // Store notification in DB and push it to the UI
-  eventBus.notification.on(notification => {
-    db.notification.set(notification.id, notification);
-    wampSubscriptions.pushNotification.emit(notification);
-  });
-
-  /**
-   * Initial calls when WAMP is active
-   * - When the DAPPMANAGER starts, update the list of packages.
-   *   The DAPPMANAGER may restart without the UI being restarted
-   */
-  eventBus.requestAutoUpdateData.emit();
-  eventBus.requestPackages.emit();
-
-  // If DAPPMANAGER's version has changed reload the client
-  if (isNewDappmanagerVersion())
-    wampSubscriptions.reloadClient.emit({ reason: "New version" });
-};
-
-connection.onclose = (reason, details): boolean => {
-  logs.warn(
-    `WAMP connection closed: ${reason} ${(details || {}).message || ""}`
-  );
-  return false;
-};
-
-connection.open();
-logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
 
 // Read and print version data
 const versionData = getVersionData();
