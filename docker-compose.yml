@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: ./build/Dockerfile
-    image: 'dappmanager.dnp.dappnode.eth:0.2.28'
+    image: 'dappmanager.dnp.dappnode.eth:0.2.29'
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     volumes:
