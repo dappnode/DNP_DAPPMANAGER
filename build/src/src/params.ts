@@ -62,6 +62,7 @@ const params = {
   DNP_NETWORK_INTERNAL_NAME: "network",
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
+  CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",
   // Docker volume parameters
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
   MOUNTPOINT_DEVICE_LEGACY_TAG: "legacy:",

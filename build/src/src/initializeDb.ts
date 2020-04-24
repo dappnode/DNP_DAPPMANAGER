@@ -20,7 +20,7 @@ const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
 const vpnName = params.vpnDnpName;
-const vpnContainerName = `DAppNodeCore-${vpnName}`;
+const vpnContainerName = `${params.CONTAINER_CORE_NAME_PREFIX}${vpnName}`;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);

@@ -106,12 +106,18 @@ export async function listContainerNoThrow(
   byName: string
 ): Promise<PackageContainer | null> {
   const containers = await dockerList({ filters: { name: [byName] } });
-  if (!containers[0]) return null;
-  const container = parseContainerInfo(containers[0]);
   // When querying "geth.dnp.dappnode.eth", if user has "goerli-geth.dnp.dappnode.eth"
   // The latter can be returned as the original container.
-  if (container.name !== byName) return null;
-  else return container;
+  // Return an exact match for
+  // - containerName "DAppNodePackage-geth.dnp.dappnode.eth"
+  // - name: "geth.dnp.dappnode.eth"
+  const matches = containers
+    .map(parseContainerInfo)
+    .filter(
+      container => container.packageName === byName || container.name === byName
+    );
+  if (matches.length > 1) throw Error(`Multiple matches found for ${byName}`);
+  return matches[0] || null;
 }
 
 export async function listContainer(byName: string): Promise<PackageContainer> {
