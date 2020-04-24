@@ -55,7 +55,7 @@ export async function migrateEthchain(): Promise<void> {
     (isNextOpenEthereum ? envs.EXTRA_OPTS : envs.EXTRA_OPTS_GETH) || "";
   // Store settings in the cache. It is possible that the migration is stopped
   // because the DAPPMANAGER resets and then the eth client will not be installed
-  db.ethClientMigrationTempSettings.set({ target, EXTRA_OPTS });
+  if (ethchain) db.ethClientMigrationTempSettings.set({ target, EXTRA_OPTS });
 
   const volumesToMigrate = [
     {
