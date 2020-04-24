@@ -20,9 +20,6 @@ import createCustomVolumeDevicePaths from "../modules/installer/createCustomVolu
 import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
 import * as validate from "../utils/validate";
-import { InstallPackageData, PackageRequest } from "../types";
-import { RequestData } from "../route-types/installPackage";
-import Logs from "../logs";
 import { copyFileTo } from "./copyFileTo";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import {
@@ -32,6 +29,12 @@ import {
 } from "../utils/packageIsInstalling";
 import { stringify } from "../utils/objects";
 import { ReleaseFetcher } from "../modules/release";
+import {
+  UserSettingsAllDnps,
+  InstallPackageData,
+  PackageRequest
+} from "../types";
+import Logs from "../logs";
 const logs = Logs(module);
 
 const dappmanagerId = params.dappmanagerDnpName;
@@ -53,7 +56,15 @@ export async function installPackage({
   version: reqVersion,
   userSettings: userSettingsAllDnps = {},
   options
-}: RequestData): Promise<void> {
+}: {
+  name: string;
+  version?: string;
+  userSettings?: UserSettingsAllDnps;
+  options?: {
+    BYPASS_RESOLVER?: boolean;
+    BYPASS_CORE_RESTRICTION?: boolean;
+  };
+}): Promise<void> {
   const BYPASS_CORE_RESTRICTION = Boolean(
     options && options.BYPASS_CORE_RESTRICTION
   );

@@ -1,6 +1,6 @@
-import { RequestData } from "../route-types/newFeatureStatusSet";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
+import { NewFeatureId, NewFeatureStatus } from "../types";
 
 /**
  * Flag the UI welcome flow as completed
@@ -8,7 +8,10 @@ import * as eventBus from "../eventBus";
 export async function newFeatureStatusSet({
   featureId,
   status
-}: RequestData): Promise<void> {
+}: {
+  featureId: NewFeatureId;
+  status: NewFeatureStatus;
+}): Promise<void> {
   db.newFeatureStatus.set(featureId, status);
 
   // Notify the UI of the uiWelcomeStatus change

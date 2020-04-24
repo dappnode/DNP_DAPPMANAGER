@@ -1,8 +1,6 @@
 import { listContainer } from "../modules/docker/listContainers";
 import { logContainer } from "../modules/docker/dockerApi";
 
-type ReturnData = string;
-
 /**
  * Returns the logs of the docker container of a package
  *
@@ -19,7 +17,7 @@ export async function logPackage({
 }: {
   id: string;
   options?: { timestamp: boolean; tail: number };
-}): Promise<ReturnData> {
+}): Promise<string> {
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp = await listContainer(id);

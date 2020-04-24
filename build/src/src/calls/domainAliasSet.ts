@@ -1,4 +1,3 @@
-import { RequestData } from "../route-types/domainAliasSet";
 import * as db from "../db";
 import * as eventBus from "../eventBus";
 
@@ -8,7 +7,10 @@ import * as eventBus from "../eventBus";
 export async function domainAliasSet({
   alias,
   dnpName
-}: RequestData): Promise<void> {
+}: {
+  alias: string;
+  dnpName: string;
+}): Promise<void> {
   switch (alias) {
     case "fullnode":
       db.fullnodeDomainTarget.set(dnpName);

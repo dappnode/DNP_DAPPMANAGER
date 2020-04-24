@@ -1,4 +1,3 @@
-import { ReturnData } from "../route-types/passwordIsSecure";
 import { isPasswordSecure } from "../modules/passwordManager";
 import * as db from "../db";
 
@@ -15,7 +14,7 @@ import * as db from "../db";
  *
  * @returns {bool} true = is secure / false = is not
  */
-export async function passwordIsSecure(): Promise<ReturnData> {
+export async function passwordIsSecure(): Promise<boolean> {
   if (db.passwordIsSecure.get()) {
     return true;
   } else {

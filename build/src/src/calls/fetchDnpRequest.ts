@@ -1,14 +1,3 @@
-import { RequestData, ReturnData } from "../route-types/fetchDnpRequest";
-import {
-  SetupSchemaAllDnps,
-  SetupUiJsonAllDnps,
-  SetupTargetAllDnps,
-  UserSettingsAllDnps,
-  CompatibleDnps,
-  PackageRelease,
-  PackageReleaseMetadata,
-  PackageContainer
-} from "../types";
 import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
 import semver from "semver";
@@ -20,12 +9,25 @@ import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
 import { ReleaseFetcher } from "../modules/release";
+import {
+  RequestedDnp,
+  SetupSchemaAllDnps,
+  SetupUiJsonAllDnps,
+  SetupTargetAllDnps,
+  UserSettingsAllDnps,
+  CompatibleDnps,
+  PackageRelease,
+  PackageReleaseMetadata,
+  PackageContainer
+} from "../types";
 
 const userSettingDisableTag = params.USER_SETTING_DISABLE_TAG;
 
 export async function fetchDnpRequest({
   id
-}: RequestData): Promise<ReturnData> {
+}: {
+  id: string;
+}): Promise<RequestedDnp> {
   const releaseFetcher = new ReleaseFetcher();
 
   const mainRelease = await releaseFetcher.getRelease(id);

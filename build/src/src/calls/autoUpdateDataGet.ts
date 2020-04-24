@@ -1,10 +1,10 @@
-import { ReturnData } from "../route-types/autoUpdateDataGet";
 import semver from "semver";
 import { listContainers } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
 import { AutoUpdateDataDnpView, PackageContainer } from "../types";
+import { AutoUpdateDataView } from "../common/types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 
@@ -14,37 +14,8 @@ const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
  * - registry: List of executed auto-updates
  * - pending: Pending auto-update per DNP, can be already executed
  * - dnpsToShow: Parsed data to be shown in the UI
- *
- * @returns result = {
- *   settings: {
- *     "system-packages": { enabled: true }
- *     "my-packages": { enabled: true }
- *     "bitcoin.dnp.dappnode.eth": { enabled: false }
- *   },
- *   registry: { "core.dnp.dappnode.eth": {
- *     "0.2.4": { updated: 1563304834738, successful: true },
- *     "0.2.5": { updated: 1563304834738, successful: false }
- *   }, ... },
- *   pending: { "core.dnp.dappnode.eth": {
- *     version: "0.2.4",
- *     firstSeen: 1563218436285,
- *     scheduledUpdate: 1563304834738,
- *     completedDelay: true
- *   }, ... },
- *   dnpsToShow: [{
- *     id: "system-packages",
- *     displayName: "System packages",
- *     enabled: true,
- *     feedback: {
- *       updated: 15363818244,
- *       manuallyUpdated: true,
- *       inQueue: true,
- *       scheduled: 15363818244
- *     }
- *   }, ... ]
- * }
  */
-export async function autoUpdateDataGet(): Promise<ReturnData> {
+export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   const settings = autoUpdateHelper.getSettings();
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();

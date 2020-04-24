@@ -464,6 +464,16 @@ export interface DockerOptionsInterface {
  * Auto-update helper types
  */
 
+/**
+ * Sample:
+ * ```
+ * settings = {
+ *   "system-packages": { enabled: true }
+ *   "my-packages": { enabled: true }
+ *   "bitcoin.dnp.dappnode.eth": { enabled: false }
+ * }
+ * ```
+ */
 export interface AutoUpdateSettings {
   [dnpNameOrGroupId: string]: { enabled: boolean };
 }
@@ -475,6 +485,18 @@ export interface AutoUpdateRegistryEntry {
 export interface AutoUpdateRegistryDnp {
   [version: string]: AutoUpdateRegistryEntry;
 }
+
+/**
+ * Sample:
+ * ```
+ * registry = {
+ *   "core.dnp.dappnode.eth": {
+ *     "0.2.4": { updated: 1563304834738, successful: true },
+ *     "0.2.5": { updated: 1563304834738, successful: false }
+ *   }, ...
+ * }
+ * ```
+ */
 export interface AutoUpdateRegistry {
   [dnpName: string]: AutoUpdateRegistryDnp;
 }
@@ -486,6 +508,20 @@ export interface AutoUpdatePendingEntry {
   completedDelay?: boolean;
   errorMessage?: string;
 }
+
+/**
+ * Sample:
+ * ```
+ * pending = {
+ *   "core.dnp.dappnode.eth": {
+ *     version: "0.2.4",
+ *     firstSeen: 1563218436285,
+ *     scheduledUpdate: 1563304834738,
+ *     completedDelay: true
+ *   },
+ * ... },
+ * ```
+ */
 export interface AutoUpdatePending {
   [dnpName: string]: AutoUpdatePendingEntry;
 }
@@ -498,6 +534,22 @@ export interface AutoUpdateFeedback {
   errorMessage?: string;
 }
 
+/**
+ * Sample:
+ * ```
+ * dnpsToShow = [{
+ *   id: "system-packages",
+ *   displayName: "System packages",
+ *   enabled: true,
+ *   feedback: {
+ *     updated: 15363818244,
+ *     manuallyUpdated: true,
+ *     inQueue: true,
+ *     scheduled: 15363818244
+ *   }
+ * }, ... ]
+ * ```
+ */
 export interface AutoUpdateDataDnpView {
   id: string;
   displayName: string;
@@ -505,6 +557,13 @@ export interface AutoUpdateDataDnpView {
   feedback: AutoUpdateFeedback;
 }
 
+/**
+ * Full auto-update data:
+ * - settings: If auto-updates are enabled for a specific DNP or DNPs
+ * - registry: List of executed auto-updates
+ * - pending: Pending auto-update per DNP, can be already executed
+ * - dnpsToShow: Parsed data to be shown in the UI
+ */
 export interface AutoUpdateDataView {
   settings: AutoUpdateSettings;
   registry: AutoUpdateRegistry;
