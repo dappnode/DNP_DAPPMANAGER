@@ -1,18 +1,19 @@
-import path from "path";
 import http from "http";
 import httpProxy from "http-proxy";
 import params from "../params";
+import { EthProviderError } from "../modules/ethClient";
+import { urlJoin } from "../utils/url";
 import { ResolveDomainWithCache } from "./resolveDomain";
+import { pinIpfsHash } from "./utils";
+import * as views from "./views";
 import {
   NodeNotAvailable,
   ProxyError,
   EnsResolverError,
-  NotFoundError
+  NotFoundError,
+  Content
 } from "./types";
-import { pinIpfsHash } from "./utils";
-import * as views from "./views";
 import Logs from "../logs";
-import { EthProviderError } from "../modules/ethClient";
 const logs = Logs(module);
 
 // Define params
@@ -21,6 +22,19 @@ const ipfsRedirect = params.ETHFORWARD_IPFS_REDIRECT; // "http://ipfs.dappnode:8
 const swarmRedirect = params.ETHFORWARD_SWARM_REDIRECT; // "http://swarm.dappnode";
 const pinContentOnVisit = params.ETHFORWARD_PIN_ON_VISIT;
 const port = params.ETHFORWARD_HTTP_PROXY_PORT;
+
+/**
+ * Convert a decentralized content into a fetchable URL
+ * @param content
+ */
+function getTargetUrl(content: Content): string {
+  switch (content.location) {
+    case "ipfs":
+      return urlJoin(ipfsRedirect, content.hash);
+    case "swarm":
+      return urlJoin(swarmRedirect, content.hash);
+  }
+}
 
 /**
  * Start eth forward http proxy
@@ -41,37 +55,28 @@ export default function startEthForward(): void {
       if (!domain) throw new TypeError(`req host is not defined`);
 
       const content = await resolveDomain(domain);
-      logs.debug(`Resolved ${domain} to ${JSON.stringify(content)}`);
+      const target = getTargetUrl(content);
+      logs.debug(`Proxying ${domain} to ${target}`, content);
 
-      // Alias to isolate proxying logic from the location switch
-      async function proxyTo(target: string): Promise<http.IncomingMessage> {
-        // Note: Must use the promise constructor otherwise proxy.web breaks
-        // due to no proper binding of its underlying 'this'
-        //   Cannot read property 'length' of undefined
-        //   src/node_modules/http-proxy/lib/http-proxy/index.js:72:31
-        return new Promise<http.IncomingMessage>((resolve, reject) => {
-          proxy.web(req, res, { target }, (e: Error | undefined, proxyRes) => {
-            if (!e) return resolve(proxyRes);
-            // Indicates that the host is unreachable.
-            // Usually happens when the node is not running
-            if (e.message.includes("EHOSTUNREACH"))
-              reject(new NodeNotAvailable(e.message, content.location));
-            else reject(new ProxyError(e.message, target));
-          });
+      // Note: Must use the promise constructor otherwise proxy.web breaks
+      // due to no proper binding of its underlying 'this'
+      //   Cannot read property 'length' of undefined
+      //   src/node_modules/http-proxy/lib/http-proxy/index.js:72:31
+      await new Promise<http.IncomingMessage>((resolve, reject) => {
+        proxy.web(req, res, { target }, (e: Error | undefined, proxyRes) => {
+          if (!e) return resolve(proxyRes);
+          // Indicates that the host is unreachable.
+          // Usually happens when the node is not running
+          if (e.message.includes("EHOSTUNREACH"))
+            reject(new NodeNotAvailable(e.message, content.location));
+          else reject(new ProxyError(e.message, target));
         });
-      }
+      });
 
-      switch (content.location) {
-        case "ipfs":
-          await proxyTo(path.join(ipfsRedirect, content.hash));
-          if (pinContentOnVisit)
-            pinIpfsHash(content.hash).catch(e =>
-              logs.debug(`Error pinning ${content.hash}: ${e.message}`)
-            );
-
-        case "swarm":
-          await proxyTo(path.join(swarmRedirect, content.hash));
-      }
+      if (content.location === "ipfs" && pinContentOnVisit)
+        pinIpfsHash(content.hash).catch(e =>
+          logs.debug(`Error pinning ${content.hash}: ${e.message}`)
+        );
     } catch (e) {
       /**
        * Returns the response error HTML. Use function format to make sure
