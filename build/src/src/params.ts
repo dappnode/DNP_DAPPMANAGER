@@ -55,6 +55,7 @@ const params = {
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
   ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
+  HTTP_API_PORT: 3000,
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
