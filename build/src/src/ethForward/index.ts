@@ -56,7 +56,7 @@ export default function startEthForward(): void {
             // Usually happens when the node is not running
             if (e.message.includes("EHOSTUNREACH"))
               reject(new NodeNotAvailable(e.message, content.location));
-            else reject(new ProxyError(e.stack || e.message, target));
+            else reject(new ProxyError(e.message, target));
           });
         });
       }
