@@ -73,31 +73,34 @@ export default function startEthForward(): void {
           await proxyTo(path.join(swarmRedirect, content.hash));
       }
     } catch (e) {
-      function send(html: string): void {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(html);
-        res.end();
+      /**
+       * Returns the response error HTML. Use function format to make sure
+       * a single HTML is returned to the res stream
+       */
+      function errorToResponseHtml(e: Error, domain?: string): string {
+        logs.debug(`ETHFORWARD Error: ${e.message}`);
+
+        // Not found views
+        if (e instanceof EnsResolverError || e instanceof NotFoundError)
+          return views.notFound(e);
+
+        // Node not available views
+        if (e instanceof EthProviderError) return views.noEth(e);
+        if (e instanceof NodeNotAvailable)
+          if (e.location === "swarm") return views.noSwarm(e);
+          else if (e.location === "ipfs") return views.noIpfs(e);
+
+        // Proxy errors
+        if (e instanceof ProxyError) return views.unknownError(e);
+
+        // Unknown errors, log to error
+        logs.error(`ETHFORWARD Unknown error resolving ${domain}: ${e.stack}`);
+        return views.unknownError(e);
       }
 
-      logs.debug(`ETHFORWARD Error: ${e.message}`);
-
-      // Not found views
-      if (e instanceof EnsResolverError || e instanceof NotFoundError)
-        return send(views.notFound(e));
-
-      // Node not available views
-      if (e instanceof EthProviderError) return send(views.noEth(e));
-      if (e instanceof NodeNotAvailable)
-        if (e.location === "swarm") return send(views.noSwarm(e));
-        else if (e.location === "ipfs") return send(views.noIpfs(e));
-
-      // Unknown errors, log to error
-      logs.error(`ETHFORWARD Unknown error resolving ${domain}: ${e.stack}`);
-
-      // Proxy errors
-      if (e instanceof ProxyError) send(views.unknownError(e));
-
-      return send(views.unknownError(e));
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(errorToResponseHtml(e, domain));
+      res.end();
     }
   }
 
