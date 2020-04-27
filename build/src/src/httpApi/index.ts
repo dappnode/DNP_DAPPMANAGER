@@ -7,6 +7,7 @@ import cors from "cors";
 import * as calls from "../calls";
 import params from "../params";
 import * as db from "../db";
+import { isAuthorized } from "./auth";
 import Logs from "../logs";
 const logs = Logs(module);
 
@@ -20,7 +21,6 @@ const port = 3000;
  * - It can't use HTTPS for the limitations with internal IPs certificates
  */
 
-const adminIpPrefix = "172.33.10.";
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 // default options. ALL CORS + limit fileSize and file count
@@ -35,11 +35,7 @@ app.get("/", async (req, res) => {
   return res.send("Welcome to the DAPPMANAGER HTTP API");
 });
 
-app.get("/container-logs/:id", async (req, res) => {
-  // Protect for a range of IPs, req.ip = "::ffff:172.33.10.1";
-  if (!req.ip.includes(adminIpPrefix))
-    return res.status(403).send(`Forbidden ip: ${req.ip}`);
-
+app.get("/container-logs/:id", isAuthorized, async (req, res) => {
   const { id } = req.params;
   const { result } = await calls.logPackage({ id });
 
@@ -56,11 +52,7 @@ app.get("/container-logs/:id", async (req, res) => {
  * File must be previously available at the specified fileId
  * - Only available to admin users
  */
-app.get("/download/:fileId", async (req, res) => {
-  // Protect for a range of IPs, req.ip = "::ffff:172.33.10.1";
-  if (!req.ip.includes(adminIpPrefix))
-    return res.status(403).send(`Forbidden ip: ${req.ip}`);
-
+app.get("/download/:fileId", isAuthorized, async (req, res) => {
   const { fileId } = req.params;
   const filePath = db.fileTransferPath.get(fileId);
 
@@ -83,11 +75,7 @@ app.get("/download/:fileId", async (req, res) => {
  * A fileId will be provided afterwards to be used in another useful call
  * - Only available to admin users
  */
-app.post("/upload", (req, res) => {
-  // Protect for a range of IPs, req.ip = "::ffff:172.33.10.1";
-  if (!req.ip.includes(adminIpPrefix))
-    return res.status(403).send(`Forbidden ip: ${req.ip}`);
-
+app.post("/upload", isAuthorized, (req, res) => {
   if (!req.files || typeof req.files !== "object")
     return res.status(400).send("Argument files missing");
   if (Object.keys(req.files).length == 0)
