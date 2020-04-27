@@ -12,6 +12,7 @@ import Logs from "../logs";
 const logs = Logs(module);
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
+const httpApiPort = params.HTTP_API_PORT;
 
 /**
  * HTTP API
@@ -19,7 +20,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  * [NOTE] This API is not secure
  * - It can't use HTTPS for the limitations with internal IPs certificates
  */
-export default function startHttpApi(port = 3000) {
+export default function startHttpApi(port: number = httpApiPort) {
   const app = express();
 
   // default options. ALL CORS + limit fileSize and file count
