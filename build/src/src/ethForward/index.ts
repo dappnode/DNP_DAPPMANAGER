@@ -1,6 +1,5 @@
 import path from "path";
 import http from "http";
-import util from "util";
 import httpProxy from "http-proxy";
 import params from "../params";
 import { ResolveDomainWithCache } from "./resolveDomain";
@@ -29,7 +28,6 @@ const port = params.ETHFORWARD_HTTP_PROXY_PORT;
 export default function startEthForward(): void {
   // Create a proxy
   const proxy = httpProxy.createProxyServer({});
-  const proxyWeb = util.promisify(proxy.web);
 
   // Create a domain resolver with cache
   const resolveDomain = ResolveDomainWithCache();
@@ -46,12 +44,22 @@ export default function startEthForward(): void {
       logs.debug(`Resolved ${domain} to ${JSON.stringify(content)}`);
 
       // Alias to isolate proxying logic from the location switch
-      const proxyTo = (target: string): Promise<http.IncomingMessage> =>
-        proxyWeb(req, res, { target }).catch(e => {
-          if (e.message.includes("EHOSTUNREACH"))
-            throw new NodeNotAvailable(e.message, content.location);
-          throw new ProxyError(e.message, target);
+      async function proxyTo(target: string): Promise<http.IncomingMessage> {
+        // Note: Must use the promise constructor otherwise proxy.web breaks
+        // due to no proper binding of its underlying 'this'
+        //   Cannot read property 'length' of undefined
+        //   src/node_modules/http-proxy/lib/http-proxy/index.js:72:31
+        return new Promise<http.IncomingMessage>((resolve, reject) => {
+          proxy.web(req, res, { target }, (e: Error | undefined, proxyRes) => {
+            if (!e) return resolve(proxyRes);
+            // Indicates that the host is unreachable.
+            // Usually happens when the node is not running
+            if (e.message.includes("EHOSTUNREACH"))
+              reject(new NodeNotAvailable(e.message, content.location));
+            else reject(new ProxyError(e.stack || e.message, target));
+          });
         });
+      }
 
       switch (content.location) {
         case "ipfs":
