@@ -7,6 +7,7 @@
     "start": "node dist/index.js",
     "dev": "NODE_ENV=development ts-node src/index",
     "dev:local": "ts-node -r dotenv/config src/index",
+    "prebuild": "node_modules/.bin/ts-node src/common/validation/generateSchemas",
     "build": "node_modules/.bin/tsc && npm run lint",
     "watch-ts": "./node_modules/.bin/tsc -w",
     "file": "node",
@@ -98,7 +99,8 @@
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
     "ts-node": "^8.3.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.8.0",
+    "typescript-json-schema": "^0.42.0"
   },
   "husky": {
     "hooks": {

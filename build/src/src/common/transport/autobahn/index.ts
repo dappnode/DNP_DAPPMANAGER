@@ -14,6 +14,28 @@ type WampDomain = typeof dappmanagerDomain | typeof vpnDomain;
 // For RPC transport uses a simple status object
 // For subscription only emits on success
 
+export async function registerRoutes<Routes>(
+  session: Session,
+  routes: Routes,
+  options?: {
+    loggerMiddleware?: LoggerMiddleware;
+    domain?: WampDomain;
+    validateArgs?: (route: string, args: Args) => void;
+  }
+): Promise<({ ok: boolean; message: string })[]> {
+  return await Promise.all(
+    Object.entries(routes).map(([route, handler]) =>
+      registerRoute(session, route, handler, options).then(
+        () => ({ ok: true, message: `Registered event: ${route}` }),
+        e => ({
+          ok: false,
+          message: `Error registering event ${route}: ${(e || {}).error}`
+        })
+      )
+    )
+  );
+}
+
 /**
  * Register a RPC route to the crossbar server
  * @param session
@@ -25,14 +47,21 @@ export async function registerRoute<R>(
   session: Session,
   route: string,
   handler: (...args: Args) => Promise<R>,
-  middleware: LoggerMiddleware,
-  domain: WampDomain = dappmanagerDomain
+  options?: {
+    loggerMiddleware?: LoggerMiddleware;
+    domain?: WampDomain;
+    validateArgs?: (route: string, args: Args) => void;
+  }
 ): Promise<IRegistration> {
-  const { onCall, onSuccess, onError } = middleware || {};
-  async function endpoint(args?: Args): Promise<RpcResult<R>> {
+  const { loggerMiddleware, domain = dappmanagerDomain, validateArgs } =
+    options || {};
+  const { onCall, onSuccess, onError } = loggerMiddleware || {};
+
+  async function endpoint(args: Args = []): Promise<RpcResult<R>> {
     try {
       if (onCall) onCall(route, args);
-      const result = await handler(...(args || []));
+      if (validateArgs) validateArgs(route, args);
+      const result = await handler(...args);
       if (onSuccess) onSuccess(route, result, args);
       return { success: true, result };
     } catch (e) {
@@ -114,16 +143,22 @@ export function parseWampError(
 export function subscriptionsFactory<Subscriptions>(
   session: Session,
   subscriptionsData: { [K in keyof Subscriptions]: {} },
-  middleware: LoggerMiddleware,
-  domain: WampDomain = dappmanagerDomain
+  options?: {
+    loggerMiddleware?: LoggerMiddleware;
+    domain?: WampDomain;
+    validateArgs?: (route: string, args: Args) => void;
+  }
 ): {
   [K in keyof Subscriptions]: {
     emit: (...args: Args) => void;
     on: (handler: (...args: Args) => void) => void;
   }
 } {
-  const { onError } = middleware || {};
-  return mapValues(subscriptionsData, (data, route) => {
+  const { loggerMiddleware, domain = dappmanagerDomain, validateArgs } =
+    options || {};
+  const { onError } = loggerMiddleware || {};
+
+  return mapValues(subscriptionsData, (_0, route) => {
     const event = route + domain;
     return {
       emit: async (...args: Args): Promise<void> => {
@@ -139,8 +174,9 @@ export function subscriptionsFactory<Subscriptions>(
       },
       on: (handler: (...args: Args) => void | Promise<void>): void => {
         async function endpoint(args?: Args): Promise<void> {
+          // Use try / catch and await to be safe for async and sync methods
           try {
-            // Use try / catch and await to be safe for async and sync methods
+            if (validateArgs) validateArgs(route, args || []);
             await handler(...(args || []));
           } catch (e) {
             if (onError) onError(`on - ${route}`, e, args);
