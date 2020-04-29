@@ -8,10 +8,14 @@ import { Subscriptions, subscriptionsData } from "../common/subscriptions";
 // Transport autobahn
 import {
   registerRoute,
-  subscriptionsFactory
+  subscriptionsFactory,
+  parseWampError
 } from "../common/transport/autobahn";
 import Logs from "../logs";
+import { RpcResult } from "../common/transport/types";
 const logs = Logs(module);
+
+let _session: autobahn.Session;
 
 /*
  * Connection configuration
@@ -37,6 +41,8 @@ export async function startAutobahn({
   url:     ${url}
   realm:   ${realm}
   session: ${(details || {}).authid}`);
+
+    _session = session;
 
     // Construct loggers
     const routesLogger = routesLoggerFactory(routesData);
@@ -74,4 +80,32 @@ export async function startAutobahn({
 
   connection.open();
   logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+}
+
+/**
+ * Call a VPN WAMP endpoint (LEGACY format)
+ * @param route "addDevice"
+ * @param args { id: "admin" }
+ * ```js
+ * vpnWampCall("addDevice", { id })
+ * ```
+ */
+export async function vpnWampCall<R>(
+  route: string,
+  kwargs: { [key: string]: any } = {}
+): Promise<R> {
+  if (!_session) throw Error(`Session not started`);
+  if (!_session.isOpen) throw Error(`Session not open`);
+
+  try {
+    const res: RpcResult<R> = await _session
+      .call<RpcResult<R>>(route + ".vpn.dnp.dappnode.eth", [], kwargs)
+      .then(res => (typeof res === "string" ? JSON.parse(res) : res));
+    // Handle route implementation errors
+    if (res.success) return res.result;
+    else throw Error(res.message);
+  } catch (e) {
+    const err: Error = parseWampError(e);
+    throw err;
+  }
 }

@@ -16,6 +16,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
   return {
     // Git version data
     versionData: getVersionData().data,
+    versionDataVpn: db.versionDataVpn.get(),
     // Network params
     ip: db.publicIp.get(),
     name: db.serverName.get(),
@@ -88,7 +89,7 @@ async function getIsWifiActive(): Promise<boolean> {
   try {
     const logs = await logPackage({
       id: wifiName,
-      options: { timestamp: false, tail: 20 }
+      options: { timestamps: false, tail: 20 }
     });
     const firstLogLine = (logs || "").trim().split("\n")[0];
     return !firstLogLine || !firstLogLine.includes("No interface found");

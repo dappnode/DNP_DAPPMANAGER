@@ -3,8 +3,9 @@ import { mapValues } from "lodash";
 import { Args, RpcResult, LoggerMiddleware } from "../types";
 
 // Keep the same event signature for backwards compatibility
-const rpcDomain = ".dappmanager.dnp.dappnode.eth";
-const getEvent = (route: string): string => route + rpcDomain;
+const dappmanagerDomain = ".dappmanager.dnp.dappnode.eth";
+const vpnDomain = ".vpn.dnp.dappnode.eth";
+type WampDomain = typeof dappmanagerDomain | typeof vpnDomain;
 
 // Crossbar autobahn client
 // Uses RPC for actions and retrieve info and subscriptions
@@ -24,7 +25,8 @@ export async function registerRoute<R>(
   session: Session,
   route: string,
   handler: (...args: Args) => Promise<R>,
-  middleware: LoggerMiddleware
+  middleware: LoggerMiddleware,
+  domain: WampDomain = dappmanagerDomain
 ): Promise<IRegistration> {
   const { onCall, onSuccess, onError } = middleware || {};
   async function endpoint(args?: Args): Promise<RpcResult<R>> {
@@ -39,7 +41,7 @@ export async function registerRoute<R>(
     }
   }
 
-  return await session.register(getEvent(route), endpoint);
+  return await session.register(route + domain, endpoint);
 }
 
 /**
@@ -51,31 +53,45 @@ export async function registerRoute<R>(
 export async function callRoute<R>(
   session: Session,
   route: string,
-  args: Args
+  args: Args,
+  domain: WampDomain = dappmanagerDomain
 ): Promise<R> {
   try {
     const res: RpcResult<R> = await session
-      .call<RpcResult<R>>(getEvent(route), args)
+      .call<RpcResult<R>>(route + domain, args)
       .then(res => (typeof res === "string" ? JSON.parse(res) : res));
     // Handle route implementation errors
     if (res.success) return res.result;
     else throw Error(res.message);
   } catch (e) {
-    // Handle transport error
-    // Note: Autobahn errors are not structured normally.
-    // e = { error: 'wamp.error.runtime_error', args: [ {} ], kwargs: {} }
-    // e = { error: 'wamp.error.no_such_procedure', args: [ 'no callee registered for procedure <route-test.dappmanager.dnp.dappnode.eth>' ], kwargs: {} }
-    if (e instanceof Error) throw e;
-    if (e.message) throw Error(e.message);
-    if (e.error) {
-      throw Error(
-        [e.error, ...(Array.isArray(e.args) ? e.args : [])]
-          .filter((arg: any) => typeof arg === "string")
-          .join(" - ")
-      );
-    }
-    throw Error(`Unknown autobahn transport error: ${JSON.stringify(e)}`);
+    const err: Error = parseWampError(e);
+    throw err;
   }
+}
+
+/**
+ * Handle transport error
+ * Note: Autobahn errors are not structured normally.
+ * e = { error: 'wamp.error.runtime_error', args: [ {} ], kwargs: {} }
+ * e = { error: 'wamp.error.no_such_procedure', args: [ 'no callee registered for procedure <route-test.dappmanager.dnp.dappnode.eth>' ], kwargs: {} }
+ * @param e
+ */
+export function parseWampError(
+  e: Error | { message?: string; error?: Error; args?: any[] }
+): Error {
+  // Handle transport error
+  // Note: Autobahn errors are not structured normally.
+  // e = { error: 'wamp.error.runtime_error', args: [ {} ], kwargs: {} }
+  // e = { error: 'wamp.error.no_such_procedure', args: [ 'no callee registered for procedure <route-test.dappmanager.dnp.dappnode.eth>' ], kwargs: {} }
+  if (e instanceof Error) return e;
+  if (e.message) return Error(e.message);
+  if (e.error)
+    return Error(
+      [e.error, ...(Array.isArray(e.args) ? e.args : [])]
+        .filter((arg: any) => typeof arg === "string")
+        .join(" - ")
+    );
+  return Error(`Unknown autobahn transport error: ${JSON.stringify(e)}`);
 }
 
 /**
@@ -98,7 +114,8 @@ export async function callRoute<R>(
 export function subscriptionsFactory<Subscriptions>(
   session: Session,
   subscriptionsData: { [K in keyof Subscriptions]: {} },
-  middleware: LoggerMiddleware
+  middleware: LoggerMiddleware,
+  domain: WampDomain = dappmanagerDomain
 ): {
   [K in keyof Subscriptions]: {
     emit: (...args: Args) => void;
@@ -107,7 +124,7 @@ export function subscriptionsFactory<Subscriptions>(
 } {
   const { onError } = middleware || {};
   return mapValues(subscriptionsData, (data, route) => {
-    const event = getEvent(route);
+    const event = route + domain;
     return {
       emit: async (...args: Args): Promise<void> => {
         try {

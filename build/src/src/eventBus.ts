@@ -105,6 +105,7 @@ export const requestChainData = busFactoryNoArg("REQUEST_CHAIN_DATA");
 export const requestAutoUpdateData = busFactoryNoArgAsync(
   "REQUEST_AUTO_UPDATE_DATA"
 );
+export const requestDevices = busFactoryNoArgAsync("REQUEST_DEVICES");
 export const requestPackages = busFactoryNoArgAsync("REQUEST_PACKAGES");
 export const requestSystemInfo = busFactoryNoArgAsync("REQUEST_SYSTEM_INFO");
 export const runNatRenewal = busFactoryNoArg("RUN_NAT_RENEWAL");

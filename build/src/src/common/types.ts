@@ -1,5 +1,19 @@
 import { SetupSchema, SetupUiJson } from "../types-own";
 
+// Device types
+
+export interface VpnDeviceCredentials {
+  filename: string;
+  key: string;
+  url: string;
+}
+
+export interface VpnDevice {
+  id: string;
+  admin: boolean;
+  ip: string;
+}
+
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
 /**
@@ -819,6 +833,7 @@ export interface ErrorSerialized {
 export interface SystemInfo {
   // Git version data
   versionData: PackageVersionData;
+  versionDataVpn: PackageVersionData;
   // Network params
   ip: string; // "85.84.83.82",
   name: string; // "My-DAppNode",
