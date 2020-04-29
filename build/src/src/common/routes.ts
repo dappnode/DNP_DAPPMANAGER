@@ -434,37 +434,31 @@ export interface Routes {
   volumesGet: () => Promise<VolumeData[]>;
 }
 
-export interface RouteData {
-  log?: boolean;
-}
-
-export type RoutesData = { [P in keyof Routes]: RouteData };
-
-export const routesData: RoutesData = {
+export const routesData: { [P in keyof Routes]: {} } = {
   autoUpdateDataGet: {},
-  autoUpdateSettingsEdit: { log: true },
+  autoUpdateSettingsEdit: {},
   backupGet: {},
-  backupRestore: { log: true },
-  changeIpfsTimeout: { log: true },
+  backupRestore: {},
+  changeIpfsTimeout: {},
   cleanCache: {},
-  copyFileFrom: { log: true },
-  copyFileTo: { log: true },
-  deviceAdd: { log: true },
-  deviceAdminToggle: { log: true },
+  copyFileFrom: {},
+  copyFileTo: {},
+  deviceAdd: {},
+  deviceAdminToggle: {},
   deviceCredentialsGet: {},
-  deviceRemove: { log: true },
-  deviceReset: { log: true },
+  deviceRemove: {},
+  deviceReset: {},
   devicesList: {},
   diagnose: {},
-  domainAliasSet: { log: true },
-  ethClientFallbackSet: { log: true },
-  ethClientTargetSet: { log: true },
+  domainAliasSet: {},
+  ethClientFallbackSet: {},
+  ethClientTargetSet: {},
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
   getStats: {},
   getUserActionLogs: {},
-  installPackage: { log: true },
+  installPackage: {},
   listPackages: {},
   logPackage: {},
   mountpointsGet: {},
@@ -474,28 +468,30 @@ export const routesData: RoutesData = {
   notificationsTest: {},
   packageDetailDataGet: {},
   packageGettingStartedToggle: {},
-  passwordChange: { log: true },
+  passwordChange: {},
   passwordIsSecure: {},
-  poweroffHost: { log: true },
-  rebootHost: { log: true },
-  removePackage: { log: true },
+  poweroffHost: {},
+  rebootHost: {},
+  removePackage: {},
   requestChainData: {},
-  restartPackage: { log: true },
-  restartPackageVolumes: { log: true },
-  seedPhraseSet: { log: true },
-  setStaticIp: { log: true },
+  restartPackage: {},
+  restartPackageVolumes: {},
+  seedPhraseSet: {},
+  setStaticIp: {},
   systemInfoGet: {},
-  togglePackage: { log: true },
-  updatePackageEnv: { log: true },
-  updatePortMappings: { log: true },
-  volumeRemove: { log: true },
+  togglePackage: {},
+  updatePackageEnv: {},
+  updatePortMappings: {},
+  volumeRemove: {},
   volumesGet: {}
 };
 
 // DO NOT REMOVE
 // Enforces that each route is a function that returns a promise
 export type RoutesArguments = { [K in keyof Routes]: Parameters<Routes[K]> };
-export type RoutesReturn = { [K in keyof Routes]: ResolvedType<Routes[K]> };
+export type RoutesReturn = {
+  [K in keyof Routes]: ReplaceVoidWithNull<ResolvedType<Routes[K]>>
+};
 
 /**
  * Returns the return resolved type of a function type
@@ -507,3 +503,5 @@ export type ResolvedType<T extends (...args: any) => Promise<any>> = T extends (
   ? R
   : never;
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+export type ReplaceVoidWithNull<T> = T extends void ? null : T;

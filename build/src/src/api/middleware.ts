@@ -1,21 +1,46 @@
 import logUserAction from "../logUserAction";
-import { RouteData } from "../common/routes";
+import { Routes } from "../common/routes";
 import { EthProviderError } from "../modules/ethClient";
 import { LoggerMiddleware, Args, Result } from "../common/transport/types";
-import { SubscriptionData } from "../common/subscriptions";
 import Logs from "../logs";
 const logs = Logs(module);
 
-export function routesLoggerFactory(routesData: {
-  [route: string]: RouteData;
-}): LoggerMiddleware {
+const routesToLog: (keyof Routes)[] = [
+  "autoUpdateSettingsEdit",
+  "backupRestore",
+  "changeIpfsTimeout",
+  "copyFileFrom",
+  "copyFileTo",
+  "deviceAdd",
+  "deviceAdminToggle",
+  "deviceRemove",
+  "deviceReset",
+  "domainAliasSet",
+  "ethClientFallbackSet",
+  "ethClientTargetSet",
+  "installPackage",
+  "passwordChange",
+  "poweroffHost",
+  "rebootHost",
+  "removePackage",
+  "restartPackage",
+  "restartPackageVolumes",
+  "seedPhraseSet",
+  "setStaticIp",
+  "togglePackage",
+  "updatePackageEnv",
+  "updatePortMappings",
+  "volumeRemove"
+];
+
+export function routesLoggerFactory(): LoggerMiddleware {
   return {
     onCall: (route: string, args?: Args): void => {
-      logs.debug(`RPC call ${route} data`, { args });
+      logs.debug(`RPC call ${route} data`, args);
     },
 
     onSuccess: (route: string, result: Result, args?: Args): void => {
-      if ((routesData[route] || {}).log) {
+      if (routesToLog.includes(route as keyof Routes)) {
         logUserAction.log({
           level: "info",
           event: route,
@@ -51,11 +76,7 @@ export function routesLoggerFactory(routesData: {
   };
 }
 
-export function subscriptionsLoggerFactory(subscriptionsData: {
-  [route: string]: SubscriptionData;
-}): LoggerMiddleware {
-  // To be used to customize behaviour
-  subscriptionsData;
+export function subscriptionsLoggerFactory(): LoggerMiddleware {
   return {
     onError: (route: string, error: Error, args?: Args): void => {
       logs.error(`Subscription error ${route}: ${error.stack}`);

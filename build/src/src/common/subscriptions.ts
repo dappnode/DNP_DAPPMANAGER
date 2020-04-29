@@ -113,11 +113,7 @@ export type Subscriptions = {
   }
 };
 
-export type SubscriptionData = {};
-
-export const subscriptionsData: {
-  [P in keyof Subscriptions]: SubscriptionData
-} = {
+export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   autoUpdateData: {},
   chainData: {},
   devices: {},
