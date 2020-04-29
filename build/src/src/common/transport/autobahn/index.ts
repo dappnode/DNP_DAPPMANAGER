@@ -1,5 +1,5 @@
 import { Session, IRegistration } from "autobahn";
-import { mapValues } from "lodash";
+import { mapValues, isEmpty } from "lodash";
 import { Args, RpcResult, LoggerMiddleware } from "../types";
 
 // Keep the same event signature for backwards compatibility
@@ -57,8 +57,14 @@ export async function registerRoute<R>(
     options || {};
   const { onCall, onSuccess, onError } = loggerMiddleware || {};
 
-  async function endpoint(args: Args = []): Promise<RpcResult<R>> {
+  async function endpoint(
+    args: Args = [],
+    kwargs?: any
+  ): Promise<RpcResult<R>> {
     try {
+      // Be backwards compatible with previous kwargs semantics
+      if ((args || []).length === 0 && !isEmpty(kwargs)) args = [kwargs];
+
       if (onCall) onCall(route, args);
       if (validateArgs) validateArgs(route, args);
       const result = await handler(...args);
