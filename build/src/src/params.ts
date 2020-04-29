@@ -85,7 +85,7 @@ const params = {
   IPFS_HOST:
     process.env.IPFS_HOST ||
     process.env.IPFS_REDIRECT ||
-    "my.ipfs.dnp.dappnode.eth",
+    "http://ipfs.dappnode:5001",
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters

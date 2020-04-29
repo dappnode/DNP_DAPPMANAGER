@@ -1,26 +1,24 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import ipfs from "../ipfsSetup";
-import params from "../../../params";
-import { timeoutError } from "../data";
-import Logs from "../../../logs";
-const logs = Logs(module);
+import ipfs, { timeoutMs, TimeoutErrorKy } from "../ipfsSetup";
+import { pinAddNoThrow } from "./pinAdd";
+const toStream = require("it-to-stream");
 
-const timeoutMs = params.IPFS_TIMEOUT || 2000;
 const resolution = 2;
+const timeoutMaxDownloadTime = 5 * 60 * 1000;
 
 /**
  * Streams an IPFS object to the local fs.
  * If the stream does not start within the specified timeout,
  * it will throw and error. This utility does not verify the file
  *
- * @param {string} hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- * @param {string} path "/usr/src/path-to-file/file.ext"
- * @param {object} options Available options:
+ * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+ * @param path "/usr/src/path-to-file/file.ext"
+ * @param options Available options:
  * - onChunk: {function} Gets called on every received chuck
  *   function(chunk) {}
  */
-export default function catStreamToFs({
+export default async function catStreamToFs({
   hash,
   path,
   fileSize,
@@ -38,7 +36,7 @@ export default function catStreamToFs({
 
       // Timeout cancel mechanism
       const timeoutToCancel = setTimeout(() => {
-        reject(Error(timeoutError));
+        reject(TimeoutErrorKy);
       }, timeoutMs);
 
       const onError = (streamId: string) => (err: Error): void => {
@@ -66,14 +64,17 @@ export default function catStreamToFs({
       const onFinish = (data: string): void => {
         clearTimeout(timeoutToCancel);
         // Pin files after a successful download
-        ipfs.pin.add(hash, (err: Error) => {
-          if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
-        });
+        pinAddNoThrow({ hash });
         resolve(data);
       };
 
-      const readStream = ipfs
-        .catReadableStream(hash)
+      // IPFS native timeout will interrupt a working but slow stream
+      // Use a max higher timeout that the one to check availability
+      const readable = toStream.readable(
+        ipfs.cat(hash, { timeout: timeoutMaxDownloadTime })
+      );
+
+      const readStream = readable
         .on("data", onData)
         .on("error", onError("ReadableStream"));
       const writeStream = fs
