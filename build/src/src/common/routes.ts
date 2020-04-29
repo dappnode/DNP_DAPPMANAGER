@@ -18,7 +18,9 @@ import {
   PackageBackup,
   EthClientFallback,
   NewFeatureId,
-  NewFeatureStatus
+  NewFeatureStatus,
+  VpnDeviceCredentials,
+  VpnDevice
 } from "./types";
 
 export interface Routes {
@@ -108,6 +110,46 @@ export interface Routes {
     filename: string;
     toPath: string;
   }) => Promise<void>;
+
+  /**
+   * Creates a new device with the provided id.
+   * Generates certificates and keys needed for OpenVPN.
+   * @param id Device id name
+   */
+  deviceAdd: (kwargs: { id: string }) => Promise<void>;
+
+  /**
+   * Creates a new OpenVPN credentials file, encrypted.
+   * The filename is the (16 chars short) result of hashing the generated salt in the db,
+   * concatenated with the device id.
+   * @param id Device id name
+   */
+  deviceCredentialsGet: (kwargs: {
+    id: string;
+  }) => Promise<VpnDeviceCredentials>;
+
+  /**
+   * Removes the device with the provided id, if exists.
+   * @param id Device id name
+   */
+  deviceRemove: (kwargs: { id: string }) => Promise<void>;
+
+  /**
+   * Resets the device credentials with the provided id, if exists.
+   * @param id Device id name
+   */
+  deviceReset: (kwargs: { id: string }) => Promise<void>;
+
+  /**
+   * Gives/removes admin rights to the provided device id.
+   * @param id Device id name
+   */
+  deviceAdminToggle: (kwargs: { id: string }) => Promise<void>;
+
+  /**
+   * Returns a list of the existing devices, with the admin property
+   */
+  devicesList: () => Promise<VpnDevice[]>;
 
   /**
    * Run system diagnose to inform the user
@@ -212,14 +254,13 @@ export interface Routes {
    * Returns the logs of the docker container of a package
    * @param id DNP .eth name
    * @param options log options
-   * - timestamp {bool} Show timestamps: true
-   * - tail {number} Number of lines to return from bottom: 200
-   * options = { timestamp: true, tail: 200 }
+   * - timestamps: Show timestamps
+   * - tail: Number of lines to return from bottom: 200
    * @returns String with escape codes
    */
   logPackage: (kwargs: {
     id: string;
-    options?: { timestamp: boolean; tail: number };
+    options?: { timestamps?: boolean; tail?: number };
   }) => Promise<string>;
 
   /**
@@ -408,6 +449,12 @@ export const routesData: RoutesData = {
   cleanCache: {},
   copyFileFrom: { log: true },
   copyFileTo: { log: true },
+  deviceAdd: { log: true },
+  deviceAdminToggle: { log: true },
+  deviceCredentialsGet: {},
+  deviceRemove: { log: true },
+  deviceReset: { log: true },
+  devicesList: {},
   diagnose: {},
   domainAliasSet: { log: true },
   ethClientFallbackSet: { log: true },
@@ -448,9 +495,7 @@ export const routesData: RoutesData = {
 // DO NOT REMOVE
 // Enforces that each route is a function that returns a promise
 export type RoutesArguments = { [K in keyof Routes]: Parameters<Routes[K]> };
-export type RoutesReturn = {
-  [K in keyof Routes]: ReplaceVoidByNull<ResolvedType<Routes[K]>>
-};
+export type RoutesReturn = { [K in keyof Routes]: ResolvedType<Routes[K]> };
 
 /**
  * Returns the return resolved type of a function type
@@ -462,5 +507,3 @@ export type ResolvedType<T extends (...args: any) => Promise<any>> = T extends (
   ? R
   : never;
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-export type ReplaceVoidByNull<T> = T extends void ? null : T;
