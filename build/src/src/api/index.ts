@@ -3,16 +3,20 @@ import * as calls from "../calls";
 import { mapSubscriptionsToEventBus } from "./subscriptions";
 import { routesLoggerFactory, subscriptionsLoggerFactory } from "./middleware";
 // Types
-import { Routes, routesData } from "../common/routes";
+import { Routes } from "../common/routes";
 import { Subscriptions, subscriptionsData } from "../common/subscriptions";
+import { RpcResult } from "../common/transport/types";
 // Transport autobahn
 import {
-  registerRoute,
   subscriptionsFactory,
-  parseWampError
+  parseWampError,
+  registerRoutes
 } from "../common/transport/autobahn";
+import {
+  validateRoutesArgsFactory,
+  validateSubscriptionsArgsFactory
+} from "../common/validation";
 import Logs from "../logs";
-import { RpcResult } from "../common/transport/types";
 const logs = Logs(module);
 
 let _session: autobahn.Session;
@@ -44,19 +48,16 @@ export async function startAutobahn({
 
     _session = session;
 
-    // Construct loggers
-    const routesLogger = routesLoggerFactory(routesData);
-    const subscriptionsLogger = subscriptionsLoggerFactory(subscriptionsData);
-
     // Type assertion of calls <> Routes happen here
-    const routes: Routes = calls;
-
-    for (const [route, handler] of Object.entries(routes)) {
-      registerRoute(session, route, handler, routesLogger).then(
-        () => logs.info(`Registered event: ${route}`),
-        e => logs.error(`Error registering event ${route}: ${(e || {}).error}`)
-      );
-    }
+    registerRoutes<Routes>(session, calls, {
+      loggerMiddleware: routesLoggerFactory(),
+      validateArgs: validateRoutesArgsFactory()
+    }).then(registrationResults => {
+      for (const { ok, message } of registrationResults) {
+        if (ok) logs.info(message);
+        else logs.info(message);
+      }
+    });
 
     /**
      * All the session uses below can throw errors if the session closes.
@@ -67,7 +68,10 @@ export async function startAutobahn({
     const subscriptions = subscriptionsFactory<Subscriptions>(
       session,
       subscriptionsData,
-      subscriptionsLogger
+      {
+        loggerMiddleware: subscriptionsLoggerFactory(),
+        validateArgs: validateSubscriptionsArgsFactory()
+      }
     );
 
     mapSubscriptionsToEventBus(subscriptions);

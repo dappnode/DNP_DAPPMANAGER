@@ -22,6 +22,9 @@ build/src/test_files/*
 build/src/test_mountpoints_*/
 build/src/test_mountpoints_*/*
 
+# Built schemas
+build/src/src/common/schemas
+
 # Version data file
 .version.json
 
