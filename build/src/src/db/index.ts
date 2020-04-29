@@ -12,6 +12,7 @@ export * from "./system";
 export * from "./systemFlags";
 export * from "./ui";
 export * from "./upnp";
+export * from "./vpn";
 // Aditional low levels methods
 import { lowLevel as lowLevelMainDb } from "./dbMain";
 import { lowLevel as lowLevelCacheDb } from "./dbCache";
