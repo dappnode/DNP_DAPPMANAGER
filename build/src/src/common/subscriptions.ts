@@ -7,7 +7,8 @@ import {
   PackageNotification,
   SystemInfo,
   UserActionLog,
-  VolumeData
+  VolumeData,
+  VpnDevice
 } from "./types";
 
 export interface SubscriptionsTypes {
@@ -22,6 +23,12 @@ export interface SubscriptionsTypes {
    * @param chainData
    */
   chainData: (chainData: ChainData[]) => void;
+
+  /**
+   * All VPN devices
+   * @param devices
+   */
+  devices: (devices: VpnDevice[]) => void;
 
   /**
    * Directory updates
@@ -113,6 +120,7 @@ export const subscriptionsData: {
 } = {
   autoUpdateData: {},
   chainData: {},
+  devices: {},
   directory: {},
   packages: {},
   progressLog: {},

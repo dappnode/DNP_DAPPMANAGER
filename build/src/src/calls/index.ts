@@ -1,3 +1,5 @@
+export * from "./device";
+
 export { autoUpdateDataGet } from "./autoUpdateDataGet";
 export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit";
 export { backupGet } from "./backupGet";

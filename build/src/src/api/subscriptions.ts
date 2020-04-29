@@ -13,6 +13,11 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
   eventBus.packages.on(subscriptions.packages.emit);
   eventBus.directory.on(subscriptions.directory.emit);
 
+  // Emit the list of devices
+  eventBus.requestDevices.on(async () => {
+    subscriptions.devices.emit(await calls.devicesList());
+  });
+
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {
     subscriptions.packages.emit(await calls.listPackages());
