@@ -24,7 +24,7 @@ jobs:
           node-version: "10.x"
       - run: yarn install
         working-directory: ${{ env.working-directory }}
-      - run: yarn lint
+      - run: yarn build
         working-directory: ${{ env.working-directory }}
       - run: yarn test
         working-directory: ${{ env.working-directory }}
@@ -42,6 +42,8 @@ jobs:
         with:
           node-version: "10.x"
       - run: yarn install
+        working-directory: ${{ env.working-directory }}
+      - run: yarn generate
         working-directory: ${{ env.working-directory }}
       - run: yarn test:int
         working-directory: ${{ env.working-directory }}
