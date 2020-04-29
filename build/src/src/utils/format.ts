@@ -34,3 +34,27 @@ export function shortNameCapitalized(name: string): string {
 
   return _name.charAt(0).toUpperCase() + _name.slice(1);
 }
+
+/**
+ * Return a globally unique domain friendly short name
+ *
+ * NOTE: There will be collisions for packages with names:
+ * 1. "goerli-geth.public.dappnode.eth"
+ * 2. "goerli/geth.public.dappnode.eth"
+ * Since both results will be "goerli-geth-public"
+ *
+ * @param name "goerli-geth.public.dappnode.eth"
+ * @returns "goerli-geth-public"
+ */
+export function shortNameDomain(name: string): string {
+  return (
+    name
+      .replace(".dappnode", "")
+      .replace(".eth", "")
+      .replace(".dnp", "")
+      // Remove all special characters except for "-"
+      .replace(/[^a-zA-Z\-]/g, "-")
+      // Remove consecutive "-" characters
+      .replace(/(\-)\-+/g, "$1")
+  );
+}

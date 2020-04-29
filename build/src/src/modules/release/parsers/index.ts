@@ -1,7 +1,9 @@
 import { mapValues, omit, pick, isEmpty } from "lodash";
 import {
   parseVolumeMappings,
-  parseEnvironment
+  parseEnvironment,
+  mergeEnvs,
+  stringifyEnvironment
 } from "../../../utils/dockerComposeParsers";
 import params from "../../../params";
 import {
@@ -13,6 +15,7 @@ import {
   Compose,
   ReleaseWarnings
 } from "../../../types";
+import { shortNameDomain } from "../../../utils/format";
 
 // Define docker compose parameters
 const containerNamePrefix = params.CONTAINER_NAME_PREFIX;
@@ -131,7 +134,8 @@ export function parseMetadataFromManifest(
  */
 export function sanitizeCompose(
   composeUnsafe: ComposeUnsafe,
-  manifest: Manifest
+  manifest: Manifest,
+  config: { domain: string }
 ): Compose {
   const serviceName = Object.keys(composeUnsafe.services)[0];
   const service = composeUnsafe.services[serviceName];
@@ -165,6 +169,17 @@ export function sanitizeCompose(
   const env_file = [];
   if ((manifest.globalEnvs || {}).all)
     env_file.push(getGlobalEnvsFilePath(isCore));
+
+  // Add SSL environment variables
+  if (manifest.ssl) {
+    const dnpSubDomain = `${shortNameDomain(name)}.${config.domain}`;
+    serviceFiltered.environment = stringifyEnvironment(
+      mergeEnvs(parseEnvironment(serviceFiltered.environment || []), {
+        VIRTUAL_HOST: dnpSubDomain,
+        LETSENCRYPT_HOST: dnpSubDomain
+      })
+    );
+  }
 
   const compose: Compose = {
     ...pick(composeUnsafe, ["version", "networks"]),

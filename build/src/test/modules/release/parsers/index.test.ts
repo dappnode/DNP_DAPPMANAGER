@@ -126,7 +126,9 @@ describe("Release > parsers", () => {
       };
 
       expect(
-        sanitizeCompose(composeWithExtraProps, mockManifest)
+        sanitizeCompose(composeWithExtraProps, mockManifest, {
+          domain: "012345678.dyndns.dappnode.io"
+        })
       ).to.deep.equal(okCompose);
     });
   });
