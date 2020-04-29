@@ -1,8 +1,5 @@
-import ipfs from "../ipfsSetup";
-import params from "../../../params";
-import { timeoutError } from "../data";
-import Logs from "../../../logs";
-const logs = Logs(module);
+import ipfs, { timeoutMs } from "../ipfsSetup";
+import { pinAddNoThrow } from "./pinAdd";
 
 interface IpfsLsFileResult {
   name: string; // 'avatar.png',
@@ -15,35 +12,41 @@ interface IpfsLsFileResult {
 
 /**
  * Returns a file addressed by a valid IPFS Path.
- * @param {string} hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
- * @param {object} options Available options:
+ * @param hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
+ * @param options Available options:
  * - maxLength: specifies a length to read from the stream.
  *   if reached, it will throw an error
- * @returns {buffer} hash contents as a buffer
+ * @returns hash contents as a buffer
  */
-export default function cat({
+export default async function ls({
   hash
 }: {
   hash: string;
 }): Promise<IpfsLsFileResult[]> {
-  return new Promise(
-    (resolve, reject): void => {
-      // Timeout cancel mechanism
-      const timeoutToCancel = setTimeout(() => {
-        reject(Error(timeoutError));
-      }, params.IPFS_TIMEOUT);
+  const files = [];
+  for await (const file of ipfs.ls(hash, { timeout: timeoutMs })) {
+    files.push(file);
+  }
 
-      ipfs.ls(hash, { sort: true }, (err: Error, data: IpfsLsFileResult[]) => {
-        clearTimeout(timeoutToCancel);
-        if (err) return reject(err);
+  // Pin files after a successful download
+  pinAddNoThrow({ hash });
 
-        // Pin files after a successful download
-        ipfs.pin.add(hash, (err: Error) => {
-          if (err) logs.error(`Error pinning hash ${hash}: ${err.stack}`);
-        });
-
-        resolve(data);
-      });
-    }
-  );
+  // {
+  //   depth: 1,
+  //   name: 'alice.txt',
+  //   path: 'QmVvjDy7yF7hdnqE8Hrf4MHo5ABDtb5AbX6hWbD3Y42bXP/alice.txt',
+  //   size: 11696,
+  //   cid: CID('QmZyUEQVuRK3XV7L9Dk26pg6RVSgaYkiSTEdnT2kZZdwoi'),
+  //   type: 'file',
+  //   mode: Number,
+  //   mtime: { secs: Number, nsecs: Number }
+  // }
+  return files.map(file => ({
+    name: file.name,
+    path: file.path,
+    size: file.size,
+    hash: file.cid.toString(),
+    type: file.type,
+    depth: file.depth
+  }));
 }

@@ -15,19 +15,35 @@ type IpfsAddResult = {
 }[];
 
 /**
+ * Wrapper to abstract converting the return values of ipfs.add
+ * @param content
+ */
+async function ipfsAdd(content: any): Promise<IpfsAddResult> {
+  const files = [];
+  for await (const file of ipfsRaw.add(content)) {
+    files.push(file);
+  }
+  return files.map(file => ({
+    path: file.path,
+    hash: file.cid.toString(),
+    size: file.size
+  }));
+}
+
+/**
  * Uploads a directory / file from the local filesystem
  * This should be part of the `DAppNodeSDK`
  */
-export function ipfsAddFromFs(
+export async function ipfsAddFromFs(
   path: string,
   options?: { recursive: boolean }
 ): Promise<IpfsAddResult> {
   if (!fs.existsSync(path))
     throw Error(`ipfs.addFromFs error: no file found at: ${path}`);
-  return ipfsRaw.addFromFs(path, options);
+  return await ipfsAdd(Ipfs.globSource(path, options));
 }
 
-export function ipfsAddDirFromFs(path: string): Promise<string> {
+export async function ipfsAddDirFromFs(path: string): Promise<string> {
   return ipfsAddFromFs(path, { recursive: true }).then(findRootHash);
 }
 
@@ -37,7 +53,7 @@ export function ipfsAddDirFromFs(path: string): Promise<string> {
  */
 export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Ipfs.Buffer.from(JSON.stringify(manifest, null, 2));
-  const results: IpfsAddResult = await ipfsRaw.add(content);
+  const results = await ipfsAdd(content);
   return results[0].hash;
 }
 

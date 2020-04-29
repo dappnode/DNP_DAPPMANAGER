@@ -1,7 +1,18 @@
-const ipfsAPI = require("ipfs-http-client");
+const ipfsClient = require("ipfs-http-client");
 import params from "../../params";
 import Logs from "../../logs";
 const logs = Logs(module);
+
+export const timeoutMs = 30 * 1000;
+/**
+ * From https://github.com/sindresorhus/ky/blob/2f37c3f999efb36db9108893b8b3d4b3a7f5ec45/index.js#L127-L132
+ */
+export const TimeoutErrorKy = class TimeoutError extends Error {
+  constructor() {
+    super("Request timed out");
+    this.name = "TimeoutError";
+  }
+};
 
 interface IpfsHttpApiVersionReturn {
   Commit: string;
@@ -20,9 +31,7 @@ interface IpfsHttpApiVersionReturn {
 const IPFS_HOST = params.IPFS_HOST;
 const ipfs = process.env.TEST
   ? {}
-  : ipfsAPI(IPFS_HOST, "5001", {
-      protocol: process.env.IPFS_PROTOCOL || "http"
-    });
+  : ipfsClient(IPFS_HOST, { timeout: timeoutMs });
 
 /**
  * Prevents web3 from executing to unit-testing.

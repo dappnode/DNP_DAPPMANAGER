@@ -2,9 +2,9 @@ import http from "http";
 import httpProxy from "http-proxy";
 import params from "../params";
 import { EthProviderError } from "../modules/ethClient";
+import { pinAddNoThrow } from "../modules/ipfs/methods/pinAdd";
 import { urlJoin } from "../utils/url";
 import { ResolveDomainWithCache } from "./resolveDomain";
-import { pinIpfsHash } from "./utils";
 import * as views from "./views";
 import {
   NodeNotAvailable,
@@ -74,9 +74,7 @@ export default function startEthForward(): void {
       });
 
       if (content.location === "ipfs" && pinContentOnVisit)
-        pinIpfsHash(content.hash).catch(e =>
-          logs.debug(`Error pinning ${content.hash}: ${e.message}`)
-        );
+        pinAddNoThrow({ hash: content.hash });
     } catch (e) {
       /**
        * Returns the response error HTML. Use function format to make sure
