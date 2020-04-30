@@ -55,6 +55,7 @@ const params = {
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
   ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
+  HTTP_API_PORT: 3000,
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -84,7 +85,7 @@ const params = {
   IPFS_HOST:
     process.env.IPFS_HOST ||
     process.env.IPFS_REDIRECT ||
-    "my.ipfs.dnp.dappnode.eth",
+    "http://ipfs.dappnode:5001",
   IPFS_TIMEOUT: 30 * 1000,
 
   // Web3 parameters

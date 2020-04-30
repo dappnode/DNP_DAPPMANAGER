@@ -608,6 +608,7 @@ export interface PackageReleaseMetadata {
   globalEnvs?: {
     all?: boolean;
   };
+  ssl?: true;
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {

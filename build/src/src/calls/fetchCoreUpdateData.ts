@@ -1,4 +1,5 @@
 import params from "../params";
+import { omit, isEmpty } from "lodash";
 import { RpcHandlerReturnWithResult, CoreUpdateData } from "../types";
 import { RequestData, ReturnData } from "../route-types/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../modules/release";
@@ -34,12 +35,21 @@ export async function getCoreUpdateData(
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
   const releaseFetcher = new ReleaseFetcher();
-  const {
-    releases: coreDnpsToBeInstalled
-  } = await releaseFetcher.getReleasesResolved({
+  const { releases } = await releaseFetcher.getReleasesResolved({
     name: coreName,
     ver: coreVersion
   });
+
+  if (isEmpty(releases)) {
+    return {
+      available: false,
+      type: undefined,
+      packages: [],
+      changelog: "",
+      updateAlerts: [],
+      versionId: ""
+    };
+  }
 
   const dnpList = await listContainers();
 
@@ -48,12 +58,7 @@ export async function getCoreUpdateData(
    * Ignore it to compute the update type
    */
   const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
-  const coreRelease = coreDnpsToBeInstalled[coreName];
-  if (!coreRelease)
-    throw Error(
-      `No coreRelease found: ${Object.keys(coreDnpsToBeInstalled).join(", ")}`
-    );
-  if (!coreDnp) delete coreDnpsToBeInstalled[coreName];
+  const coreDnpsToBeInstalled = !coreDnp ? omit(releases, coreName) : releases;
 
   const packages = Object.entries(coreDnpsToBeInstalled).map(
     ([depName, release]) => {
@@ -90,6 +95,9 @@ export async function getCoreUpdateData(
   /**
    * Compute updateAlerts
    */
+  const coreRelease =
+    releases[coreName] ||
+    (await releaseFetcher.getRelease(coreName, coreVersion));
   const { metadata: coreManifest } = coreRelease;
   const dnpCore = dnpList.find(dnp => dnp.name === coreName);
   const from = dnpCore ? dnpCore.version : "";

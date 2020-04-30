@@ -1,3 +1,4 @@
+import * as db from "../../db";
 import downloadRelease from "./ipfs/downloadRelease";
 import { isEnsDomain } from "../../utils/validate";
 import { PackageRelease } from "../../types";
@@ -57,7 +58,9 @@ export async function getReleaseFromIpfs({
     imageFile,
     avatarFile,
     metadata: parseMetadataFromManifest(manifest),
-    compose: sanitizeCompose(composeUnsafe, manifest)
+    compose: sanitizeCompose(composeUnsafe, manifest, {
+      domain: db.domain.get()
+    })
   };
 
   return {

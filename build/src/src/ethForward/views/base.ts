@@ -35,7 +35,7 @@ export function base(title: string, body: string, e?: Error): string {
   h1 { color: #555; font-size: 2em; font-weight: 400; }
   p { max-width: 400px; }
   a { color: #4db6a7; text-decoration: none; }
-  details { opacity: 0.75; }
+  details { opacity: 0.75; white-space: pre; text-align: left; }
 </style>
 </head>
 
@@ -48,7 +48,7 @@ export function base(title: string, body: string, e?: Error): string {
     e
       ? `
   <details>
-    <summary>${e.message}</summary>
+    <summary>${(e.message || "").split("\n")[0]}</summary>
     ${e.stack}
   </details>
   `

@@ -12,6 +12,7 @@ import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
+import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
 import { postCoreUpdate } from "./modules/installer/postCoreUpdate";
 import {
   getVersionData,
@@ -20,12 +21,12 @@ import {
 import * as calls from "./calls";
 import runWatchers from "./watchers";
 import startEthForward from "./ethForward";
+import startHttpApi from "./httpApi";
 import Logs from "./logs";
 const logs = Logs(module);
 
 // Start HTTP API
-import "./httpApi";
-import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
+startHttpApi();
 
 // Start eth forward http proxy
 startEthForward();

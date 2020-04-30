@@ -1,19 +1,19 @@
-import path from "path";
 import http from "http";
-import util from "util";
 import httpProxy from "http-proxy";
 import params from "../params";
+import { EthProviderError } from "../modules/ethClient";
+import { pinAddNoThrow } from "../modules/ipfs/methods/pinAdd";
+import { urlJoin } from "../utils/url";
 import { ResolveDomainWithCache } from "./resolveDomain";
+import * as views from "./views";
 import {
   NodeNotAvailable,
   ProxyError,
   EnsResolverError,
-  NotFoundError
+  NotFoundError,
+  Content
 } from "./types";
-import { pinIpfsHash } from "./utils";
-import * as views from "./views";
 import Logs from "../logs";
-import { EthProviderError } from "../modules/ethClient";
 const logs = Logs(module);
 
 // Define params
@@ -24,12 +24,24 @@ const pinContentOnVisit = params.ETHFORWARD_PIN_ON_VISIT;
 const port = params.ETHFORWARD_HTTP_PROXY_PORT;
 
 /**
+ * Convert a decentralized content into a fetchable URL
+ * @param content
+ */
+function getTargetUrl(content: Content): string {
+  switch (content.location) {
+    case "ipfs":
+      return urlJoin(ipfsRedirect, content.hash);
+    case "swarm":
+      return urlJoin(swarmRedirect, content.hash);
+  }
+}
+
+/**
  * Start eth forward http proxy
  */
 export default function startEthForward(): void {
   // Create a proxy
   const proxy = httpProxy.createProxyServer({});
-  const proxyWeb = util.promisify(proxy.web);
 
   // Create a domain resolver with cache
   const resolveDomain = ResolveDomainWithCache();
@@ -43,53 +55,55 @@ export default function startEthForward(): void {
       if (!domain) throw new TypeError(`req host is not defined`);
 
       const content = await resolveDomain(domain);
-      logs.debug(`Resolved ${domain} to ${JSON.stringify(content)}`);
+      const target = getTargetUrl(content);
+      logs.debug(`Proxying ${domain} to ${target}`, content);
 
-      // Alias to isolate proxying logic from the location switch
-      const proxyTo = (target: string): Promise<http.IncomingMessage> =>
-        proxyWeb(req, res, { target }).catch(e => {
+      // Note: Must use the promise constructor otherwise proxy.web breaks
+      // due to no proper binding of its underlying 'this'
+      //   Cannot read property 'length' of undefined
+      //   src/node_modules/http-proxy/lib/http-proxy/index.js:72:31
+      await new Promise<http.IncomingMessage>((resolve, reject) => {
+        proxy.web(req, res, { target }, (e: Error | undefined, proxyRes) => {
+          if (!e) return resolve(proxyRes);
+          // Indicates that the host is unreachable.
+          // Usually happens when the node is not running
           if (e.message.includes("EHOSTUNREACH"))
-            throw new NodeNotAvailable(e.message, content.location);
-          throw new ProxyError(e.message, target);
+            reject(new NodeNotAvailable(e.message, content.location));
+          else reject(new ProxyError(e.message, target));
         });
+      });
 
-      switch (content.location) {
-        case "ipfs":
-          await proxyTo(path.join(ipfsRedirect, content.hash));
-          if (pinContentOnVisit)
-            pinIpfsHash(content.hash).catch(e =>
-              logs.debug(`Error pinning ${content.hash}: ${e.message}`)
-            );
-
-        case "swarm":
-          await proxyTo(path.join(swarmRedirect, content.hash));
-      }
+      if (content.location === "ipfs" && pinContentOnVisit)
+        pinAddNoThrow({ hash: content.hash });
     } catch (e) {
-      function send(html: string): void {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(html);
-        res.end();
+      /**
+       * Returns the response error HTML. Use function format to make sure
+       * a single HTML is returned to the res stream
+       */
+      function errorToResponseHtml(e: Error, domain?: string): string {
+        logs.debug(`ETHFORWARD Error: ${e.message}`);
+
+        // Not found views
+        if (e instanceof EnsResolverError || e instanceof NotFoundError)
+          return views.notFound(e);
+
+        // Node not available views
+        if (e instanceof EthProviderError) return views.noEth(e);
+        if (e instanceof NodeNotAvailable)
+          if (e.location === "swarm") return views.noSwarm(e);
+          else if (e.location === "ipfs") return views.noIpfs(e);
+
+        // Proxy errors
+        if (e instanceof ProxyError) return views.unknownError(e);
+
+        // Unknown errors, log to error
+        logs.error(`ETHFORWARD Unknown error resolving ${domain}: ${e.stack}`);
+        return views.unknownError(e);
       }
 
-      logs.debug(`ETHFORWARD Error: ${e.message}`);
-
-      // Not found views
-      if (e instanceof EnsResolverError || e instanceof NotFoundError)
-        return send(views.notFound(e));
-
-      // Node not available views
-      if (e instanceof EthProviderError) return send(views.noEth(e));
-      if (e instanceof NodeNotAvailable)
-        if (e.location === "swarm") return send(views.noSwarm(e));
-        else if (e.location === "ipfs") return send(views.noIpfs(e));
-
-      // Unknown errors, log to error
-      logs.error(`ETHFORWARD Unknown error resolving ${domain}: ${e.stack}`);
-
-      // Proxy errors
-      if (e instanceof ProxyError) send(views.unknownError(e));
-
-      return send(views.unknownError(e));
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(errorToResponseHtml(e, domain));
+      res.end();
     }
   }
 

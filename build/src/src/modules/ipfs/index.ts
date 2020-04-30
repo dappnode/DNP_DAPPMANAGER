@@ -1,7 +1,6 @@
 import * as ipfsParams from "./ipfsParams";
 import { runWithRetry } from "../../utils/asyncFlows";
 import { isIpfsHash } from "../../utils/validate";
-import { timeoutError } from "./data";
 
 // Methods
 import catRaw from "./methods/cat";
@@ -23,7 +22,8 @@ async function isAvailable(hash: string): Promise<void> {
   hash = hash.split("ipfs/")[1] || hash;
 
   await objectSizeRaw(hash).catch(e => {
-    if (e.message === timeoutError)
+    // ky specific timeout errors https://github.com/sindresorhus/ky/blob/2f37c3f999efb36db9108893b8b3d4b3a7f5ec45/index.js#L127-L132
+    if (e.name === "TimeoutError" || e.message.includes("timed out"))
       throw Error(`Ipfs hash not available: ${hash}`);
     else throw Error(`Ipfs hash ${hash} not available error: ${e.message}`);
   });
