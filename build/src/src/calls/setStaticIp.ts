@@ -42,5 +42,3 @@ export async function setStaticIp({
   eventBus.requestSystemInfo.emit();
   eventBus.requestDevices.emit();
 }
-
-module.exports = setStaticIp;

@@ -56,6 +56,8 @@ export async function registerRoute<R>(
   const { loggerMiddleware, domain = dappmanagerDomain, validateArgs } =
     options || {};
   const { onCall, onSuccess, onError } = loggerMiddleware || {};
+  if (!route) throw Error(`route must not be empty`);
+  if (!handler) throw Error(`handler is not defined`);
 
   async function endpoint(
     args: Args = [],
