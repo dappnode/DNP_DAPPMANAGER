@@ -28,7 +28,7 @@ export async function notificationsTest({
     };
   }
 
-  db.notification.set(notification.id, notification);
+  db.notificationPush(notification.id, notification);
 
   eventBus.notification.emit(notification);
 }

@@ -41,7 +41,7 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
 
   // Store notification in DB and push it to the UI
   eventBus.notification.on(notification => {
-    db.notification.set(notification.id, notification);
+    db.notificationPush(notification.id, notification);
     subscriptions.pushNotification.emit(notification);
   });
 

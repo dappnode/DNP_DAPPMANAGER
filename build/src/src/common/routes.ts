@@ -20,7 +20,8 @@ import {
   NewFeatureId,
   NewFeatureStatus,
   VpnDeviceCredentials,
-  VpnDevice
+  VpnDevice,
+  PackageNotificationDb
 } from "./types";
 
 export interface Routes {
@@ -282,7 +283,7 @@ export interface Routes {
    * Use an array as the keys are not known in advance and the array form
    * is okay for RPC transport, as uniqueness is guaranteed
    */
-  notificationsGet: () => Promise<PackageNotification[]>;
+  notificationsGet: () => Promise<PackageNotificationDb[]>;
 
   /**
    * Marks notifications as view by deleting them from the db
