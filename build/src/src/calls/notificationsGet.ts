@@ -1,14 +1,12 @@
 import * as db from "../db";
-import { PackageNotification } from "../types";
-
-type ReturnData = PackageNotification[];
+import { PackageNotificationDb } from "../types";
 
 /**
  * Returns not viewed notifications.
  * Use an array as the keys are not known in advance and the array form
  * is okay for RPC transport, as uniqueness is guaranteed
  *
- * @returns {object} notifications object, by notification id
+ * @returns notifications object, by notification id
  * notifications = [{
  *   id: "diskSpaceRanOut-stoppedPackages",
  *   type: "danger",
@@ -16,13 +14,11 @@ type ReturnData = PackageNotification[];
  *   body: "Available disk space is less than a safe ...",
  * }, ... ]
  */
-export async function notificationsGet(): Promise<ReturnData> {
+export async function notificationsGet(): Promise<PackageNotificationDb[]> {
   /**
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }
    */
-  const notifications: {
-    [notificationid: string]: PackageNotification;
-  } = db.notifications.get();
+  const notifications = db.notifications.get();
   return Object.values(notifications);
 }

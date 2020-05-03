@@ -420,6 +420,10 @@ export interface PackageNotification {
   title: string; // "Some notification"
   body: string; // "Some text about notification"
 }
+export interface PackageNotificationDb extends PackageNotification {
+  timestamp: number;
+  viewed: boolean;
+}
 
 export type UpdateType = "major" | "minor" | "patch" | null;
 
@@ -455,6 +459,7 @@ export interface ProgressLog {
 
 export interface UserActionLog {
   level: "info" | "error";
+  timestamp: string;
   event: string; // "installPackage.dnp.dappnode.eth"
   message: string; // "Successfully install DNP", { string } Returned message from the call function*
   kwargs: any; // { id: "dnpName" }, { object } RPC key - word arguments
