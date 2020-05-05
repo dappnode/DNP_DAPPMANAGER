@@ -93,6 +93,7 @@ const params = {
   CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
+  bindDnpName: "bind.dnp.dappnode.eth",
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
   restartDnpName: "restart.dnp.dappnode.eth",
