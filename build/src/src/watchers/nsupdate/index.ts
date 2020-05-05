@@ -70,9 +70,11 @@ setIntervalDynamic(() => {
   nsupdateInterval //      60 min
 ]);
 
-// React immediatelly to new installs
 eventBus.packagesModified.on(({ ids, removed }) => {
-  if (removed) runNsupdate({ ids, removeOnly: true });
+  // When the BIND is re-created, run nsupdate on all domains
+  if (ids.includes(params.bindDnpName)) runNsupdate({});
+  // React immediatelly to new installs
+  else if (removed) runNsupdate({ ids, removeOnly: true });
   else runNsupdate({ ids });
 });
 
