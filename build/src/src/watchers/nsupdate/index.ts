@@ -3,12 +3,13 @@ import * as db from "../../db";
 import params from "../../params";
 import execNsupdate from "./execNsupdate";
 import { listContainers } from "../../modules/docker/listContainers";
-import { setIntervalDynamic } from "../../utils/asyncFlows";
+import { setIntervalDynamic, runWithRetry } from "../../utils/asyncFlows";
 // Utils
 import { getNsupdateTxts } from "./utils";
 import Logs from "../../logs";
 const logs = Logs(module);
 
+const execNsupdateRetry = runWithRetry(execNsupdate, { base: 1000 });
 const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
 let firstRun = true;
 
@@ -35,7 +36,7 @@ async function runNsupdate({
     });
 
     for (const nsupdateTxt of nsupdateTxts) {
-      await execNsupdate(nsupdateTxt);
+      await execNsupdateRetry(nsupdateTxt);
     }
 
     if (ids) {
@@ -70,9 +71,11 @@ setIntervalDynamic(() => {
   nsupdateInterval //      60 min
 ]);
 
-// React immediatelly to new installs
 eventBus.packagesModified.on(({ ids, removed }) => {
-  if (removed) runNsupdate({ ids, removeOnly: true });
+  // When the BIND is re-created, run nsupdate on all domains. Wait 5s to be active
+  if (ids.includes(params.bindDnpName)) setTimeout(() => runNsupdate({}), 5000);
+  // React immediatelly to new installs
+  else if (removed) runNsupdate({ ids, removeOnly: true });
   else runNsupdate({ ids });
 });
 
