@@ -19,15 +19,16 @@ export async function removeLegacyBindVolume(): Promise<void> {
   const volumeExists = (name: string): boolean =>
     volumes.some(vol => vol.Name === name);
 
-  for (const volName of [oldBindVol, newBindVol]) {
-    if (volumeExists(volName)) {
-      const users = await shell(`docker ps -aq --filter volume=${oldBindVol}`);
-      if (users)
-        throw Error(`legacy BIND volume ${volName} has users: ${users}`);
+  for (const volName of [oldBindVol, newBindVol])
+    if (volumeExists(volName))
+      try {
+        const users = await shell(`docker ps -aq --filter volume=${volName}`);
+        if (users) throw Error(`legacy volume ${volName} has users: ${users}`);
 
-      // Delete only if has no users
-      await dockerVolumeRm(oldBindVol);
-      logs.info(`Removed legacy BIND volume ${oldBindVol}`);
-    }
-  }
+        // Delete only if has no users
+        await dockerVolumeRm(volName);
+        logs.info(`Removed legacy volume ${volName}`);
+      } catch (e) {
+        logs.error(`Error removing legacy volume ${volName}: ${e.stack}`);
+      }
 }
