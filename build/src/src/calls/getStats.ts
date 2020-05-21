@@ -2,6 +2,7 @@ import { ReturnData } from "../route-types/getStats";
 import os from "os";
 import shellExec from "../utils/shell";
 import Logs from "../logs";
+import osu from "node-os-utils";
 import { RpcHandlerReturnWithResult } from "../types";
 const logs = Logs(module);
 
@@ -15,7 +16,8 @@ export default async function getStats(): RpcHandlerReturnWithResult<
   ReturnData
 > {
   const cpuUsedPercent = await wrapErrors(async () => {
-    return getDiskPercent();
+    const cpuPercentage = await osu.cpu.usage(5000); // 10.38
+    return Math.round(cpuPercentage) + "%";
   }, "cpuUsedPercent");
 
   const memUsedPercent = await wrapErrors(async () => {
@@ -48,7 +50,7 @@ export default async function getStats(): RpcHandlerReturnWithResult<
  * This util takes only the 1min and limits it to 100%
  * @returns {string} cpu usage percent "36%"
  */
-function getDiskPercent(): string {
+function getCpuLoad(): string {
   let cpuFraction = os.loadavg()[0] / numCores;
   if (cpuFraction > 1) cpuFraction = 1;
   return Math.round(cpuFraction * 100) + "%";
