@@ -62,5 +62,13 @@
       "remote": "Thu, 30 Apr 2020 16:55:29 GMT"
     },
     "link": "http://my.dappnode/#/sdk/publish/r=dappmanager.dnp.dappnode.eth&v=0.2.29&h=%2Fipfs%2FQmc1VT7khMjsCghRKJzULyucVrhLMhZyrLmSDNG2TJSRV4"
+  },
+  "0.2.31": {
+    "hash": "/ipfs/QmZzAVE5EV2oXB7eWMDrbj2hun3ZX3yw8PqJtJcxyQPbem",
+    "type": "directory",
+    "uploadedTo": {
+      "remote": "Thu, 21 May 2020 17:47:34 GMT"
+    },
+    "link": "http://my.dappnode/#/sdk/publish/r=dappmanager.dnp.dappnode.eth&v=0.2.31&h=%2Fipfs%2FQmZzAVE5EV2oXB7eWMDrbj2hun3ZX3yw8PqJtJcxyQPbem"
   }
 }
