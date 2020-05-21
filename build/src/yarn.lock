@@ -220,6 +220,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/node-os-utils@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@types/node-os-utils/-/node-os-utils-1.2.0.tgz#d03286eca0642f861cbee506bc1f4dd868a15826"
+  integrity sha512-sstDo2s8gQR/Qh2Bd6yNQ5xJv+D4ttyB9ZVjB3mBm3VkGl2RoqjV7fiw9mIHLbshHSRm2m8uf0XrIRQNWB/z6A==
+
 "@types/node@*":
   version "11.13.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.13.0.tgz#b0df8d6ef9b5001b2be3a94d909ce3c29a80f9e1"
@@ -5107,6 +5112,11 @@ node-libs-browser@^2.1.0:
     url "^0.11.0"
     util "^0.11.0"
     vm-browserify "^1.0.1"
+
+node-os-utils@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/node-os-utils/-/node-os-utils-1.2.2.tgz#57acb6a26a79314a0156804b3f347608db406571"
+  integrity sha512-QepEuY8kw+kRPdpciSSB2AFLM76RNRiSxtlXG5AisIQ8ow9tuSZ/QiS8cFro1iA843ZjSvaoM8DGa8R9loDlWA==
 
 nofilter@^1.0.1:
   version "1.0.2"
