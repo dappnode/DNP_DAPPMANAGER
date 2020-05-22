@@ -1,4 +1,5 @@
 import * as ipfs from "../../ipfs";
+import yaml from "js-yaml";
 import memoize from "memoizee";
 import {
   Manifest,
@@ -26,7 +27,7 @@ export const downloadCompose = downloadAssetFactory<ComposeUnsafe>({
 });
 
 export const downloadSetupWizard = downloadAssetFactory<SetupWizard>({
-  parse: jsonParse,
+  parse: yaml.safeLoad,
   validate: setupWizard => setupWizard,
   maxLength: 100e3 // Limit size to ~100KB
 });
