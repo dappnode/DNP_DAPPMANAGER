@@ -181,8 +181,18 @@ export function sanitizeCompose(
     "labels"
   ]);
 
-  // From networks
-  if (!isCore) delete composeUnsafe.networks;
+  // Make sure ENVs are in array format
+  if (
+    typeof serviceFiltered.environment === "object" &&
+    !Array.isArray(serviceFiltered.environment)
+  )
+    serviceFiltered.environment = stringifyEnvironment(
+      serviceFiltered.environment
+    );
+
+  if (!isCore)
+    // From networks
+    delete composeUnsafe.networks;
 
   const env_file = [];
   if ((manifest.globalEnvs || {}).all)

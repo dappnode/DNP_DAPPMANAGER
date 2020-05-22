@@ -69,6 +69,10 @@ export function getContainerName(name: string, isCore: boolean): string {
  * { NAME: "VALUE", NOVAL: "", COMPLEX: "D=D=D  = 2" }
  */
 export function parseEnvironment(envsArray: string[]): PackageEnvs {
+  // Make sure ENVs are in array format
+  if (typeof envsArray === "object" && !Array.isArray(envsArray))
+    return envsArray;
+
   return envsArray
     .filter(row => (row || "").trim())
     .reduce((envs: PackageEnvs, row) => {
