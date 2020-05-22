@@ -2,18 +2,12 @@ import * as db from "../db";
 
 const isInstallingTimeout = 5 * 60 * 1000; // 5 min (ms)
 
-interface DnpsObject<T> {
-  [dnpName: string]: T;
+export function flagPackagesAreInstalling(dnpNames: string[]): void {
+  for (const dnpName of dnpNames) flagPackageIsInstalling(dnpName);
 }
 
-export function flagPackagesAreInstalling<T>(dnpsObject: DnpsObject<T>): void {
-  Object.keys(dnpsObject).forEach(flagPackageIsInstalling);
-}
-
-export function flagPackagesAreNotInstalling<T>(
-  dnpsObject: DnpsObject<T>
-): void {
-  Object.keys(dnpsObject).forEach(flagPackageIsNotInstalling);
+export function flagPackagesAreNotInstalling(dnpNames: string[]): void {
+  for (const dnpName of dnpNames) flagPackageIsNotInstalling(dnpName);
 }
 
 export function flagPackageIsInstalling(dnpName: string): void {

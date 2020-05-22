@@ -684,10 +684,11 @@ export interface PackageRelease {
 }
 
 export interface InstallPackageData extends PackageRelease {
+  isUpdate: boolean;
   // Paths
   imagePath: string;
   composePath: string;
-  composeNextPath: string;
+  composeBackupPath: string;
   manifestPath: string;
   // Data to write
   compose: Compose;

@@ -5,17 +5,19 @@ import * as eventBus from "../eventBus";
 import * as db from "../db";
 // Modules
 import getImage, { verifyDockerImage } from "../modules/release/getImage";
-import lockPorts from "../modules/lockPorts";
 import {
   dockerLoad,
-  dockerCleanOldImages
+  dockerCleanOldImages,
+  dockerComposeRm
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import restartPatch from "../modules/docker/restartPatch";
 import orderInstallPackages from "../modules/installer/orderInstallPackages";
-import getInstallerPackageData from "../modules/installer/getInstallerPackageData";
+import getInstallerPackageData, {
+  getInstallerPackagesData
+} from "../modules/installer/getInstallerPackageData";
 import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
-import createCustomVolumeDevicePaths from "../modules/installer/createCustomVolumeDevicePaths";
+import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths";
 // Utils
 import { writeManifest } from "../utils/manifestFile";
 import { logUi, logUiClear } from "../utils/logUi";
@@ -38,6 +40,7 @@ import Logs from "../logs";
 const logs = Logs(module);
 
 const dappmanagerId = params.dappmanagerDnpName;
+type Log = (name: string, message: string) => void;
 
 /**
  * Installs a DAppNode Package.
@@ -54,289 +57,296 @@ const dappmanagerId = params.dappmanagerDnpName;
 export async function installPackage({
   name: reqName,
   version: reqVersion,
-  userSettings: userSettingsAllDnps = {},
-  options
+  userSettings = {},
+  options = {}
 }: {
   name: string;
   version?: string;
   userSettings?: UserSettingsAllDnps;
   options?: {
+    /**
+     * Forwarded option to dappGet
+     * If true, uses the dappGetBasic, which only fetches first level deps
+     */
     BYPASS_RESOLVER?: boolean;
     BYPASS_CORE_RESTRICTION?: boolean;
   };
 }): Promise<void> {
-  const BYPASS_CORE_RESTRICTION = Boolean(
-    options && options.BYPASS_CORE_RESTRICTION
-  );
-
   // 1. Parse the id into a request
-  reqName = sanitizeRequestName(reqName);
-  reqVersion = sanitizeRequestVersion(reqVersion);
-  const req: PackageRequest = { name: reqName, ver: reqVersion };
-  const id = reqName;
+  const req: PackageRequest = {
+    name: sanitizeRequestName(reqName),
+    ver: sanitizeRequestVersion(reqVersion)
+  };
+  const id = req.name;
+  const log: Log = (name, message) => logUi({ id, name, message });
 
-  /**
-   * [Resolve] the request
-   * @param {object} state = {
-   * 'admin.dnp.dappnode.eth': '0.1.5'
-   * }
-   * @param {object} alreadyUpdated = {
-   * 'bind.dnp.dappnode.eth': '0.1.4'
-   * }
-   * Forwards the options to dappGet:
-   * - BYPASS_RESOLVER: if true, uses the dappGetBasic, which only fetches first level deps
-   */
-  logUi({ id, name: reqName, message: "Resolving dependencies..." });
+  log(id, "Resolving dependencies...");
   const releaseFetcher = new ReleaseFetcher();
   const {
     state,
-    alreadyUpdated,
+    currentVersion,
     releases
   } = await releaseFetcher.getReleasesResolved(req, options);
-  logs.info(`Resolved request ${reqName} @ ${reqVersion}: ${stringify(state)}`);
+  logs.info(`Resolved request ${req.name} @ ${req.ver}: ${stringify(state)}`);
 
-  // Make sure that all packages are not being installed
-  for (const dnpName of Object.keys(state))
+  // Throw any errors found in the release
+  for (const release of releases) {
+    if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
+      throw Error(`Core package ${release.name} is from an unverified origin`);
+  }
+
+  // Gather all data necessary for the install. Isolated in a pure function to ease testing
+  const packagesData = getInstallerPackagesData({
+    releases,
+    userSettings,
+    currentVersion,
+    reqName
+  });
+  logs.debug(`Packages data: ${JSON.stringify(packagesData, null, 2)}`);
+  logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
+
+  // Make sure that no package is already being installed
+  const dnpNames = packagesData.map(({ name }) => name);
+  for (const dnpName of dnpNames)
     if (packageIsInstalling(dnpName)) {
       logUiClear({ id }); // Clear "resolving..." logs
       throw Error(`${dnpName} is installing`);
     }
 
   try {
-    // Flag the packages as installing
-    flagPackagesAreInstalling(state);
+    flagPackagesAreInstalling(dnpNames);
 
-    // 3. Format the request and filter out already updated packages
-    for (const name in alreadyUpdated)
-      logUi({ id, name, message: "Already updated" });
+    await downloadImages(packagesData, log);
+    await loadImages(packagesData, log);
 
-    /**
-     * [Data] gather all data for the following steps.
-     * This is an isolated function to ease testing
-     */
-    const packagesData: InstallPackageData[] = orderInstallPackages(
-      await Promise.all(
-        Object.entries(releases).map(async ([name, release]) => {
-          // .origin is only false when the origin is the AragonAPM
-          if (release.warnings.unverifiedCore && !BYPASS_CORE_RESTRICTION)
-            throw Error(`Core package ${name} is from an unverified origin`);
-
-          const userSettings = userSettingsAllDnps[name] || {};
-          const packageData = getInstallerPackageData(release, userSettings);
-          const { composeNextPath, compose } = packageData;
-
-          logs.debug(`Package data: ${JSON.stringify(packageData, null, 2)}`);
-          logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
-
-          validate.path(composeNextPath); // Create the repoDir if necessary
-          await writeAndValidateCompose(composeNextPath, compose);
-
-          return packageData;
-        })
-      ),
-      reqName
-    );
-    // Bulk packages processing
-    // Create custom volume device path if any
-    await createCustomVolumeDevicePaths(
-      packagesData.map(({ compose }) => compose)
-    );
-
-    /**
-     * [Download] The image of each package to the file system in paralel
-     */
-    await Promise.all(
-      packagesData.map(async function(pkg) {
-        const { name, semVersion, isCore, imageFile, imagePath } = pkg;
-        logUi({ id, name, message: "Starting download..." });
-
-        function onProgress(progress: number): void {
-          let message = `Downloading ${progress}%`;
-          if (progress > 100) message += ` (expected ${imageFile.size} bytes)`;
-          logUi({ id, name, message });
-        }
-        await getImage(imageFile, imagePath, onProgress).catch((e: Error) => {
-          e.message = `Can't download ${name} image: ${e.message}`;
-          throw e; // Use this format to keep the stack trace
-        });
-
-        // Do not throw for core packages
-        try {
-          await verifyDockerImage({ imagePath, name, version: semVersion });
-        } catch (e) {
-          const errorMessage = `Error verifying image: ${e.message}`;
-          if (isCore) logs.error(errorMessage);
-          else throw Error(errorMessage);
-        }
-
-        logUi({ id, name, message: "Package downloaded" });
-      })
-    );
-
-    /**
-     * [Load] Docker image from .tar.xz. Do this after all downloads after uping
-     * any package to prevent inconsistencies. If a dependency fails, some
-     * future version of another DNP could be loaded creating wierd bugs of unstable versions
-     */
-    await Promise.all(
-      packagesData.map(async function({ name, imagePath }) {
-        logUi({ id, name, message: "Loading image..." });
-        await dockerLoad(imagePath);
-        logUi({ id, name, message: "Package Loaded" });
-      })
-    );
+    await createVolumeDevicePaths(packagesData.map(({ compose }) => compose));
 
     try {
-      /**
-       * [Run] Up each package in serie. The order is extremely important
-       * and is guaranteed by `orderInstallPackages`
-       */
-      for (const { name, composeNextPath, fileUploads } of packagesData) {
-        // patch to prevent installer from crashing
-        if (name == dappmanagerId) {
-          logUi({ id, name, message: "Reseting DAppNode... " });
-          await restartPatch();
-        } else {
-          // Copy fileUploads if any to the container before up-ing
-          if (fileUploads) {
-            logUi({ id, name, message: "Copying file uploads..." });
-            logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
-
-            await dockerComposeUpSafe(composeNextPath, { noStart: true });
-            for (const [containerPath, dataUri] of Object.entries(
-              fileUploads
-            )) {
-              const { dir, base } = path.parse(containerPath);
-              await copyFileTo({
-                id: name,
-                dataUri,
-                filename: base,
-                toPath: dir
-              });
-            }
-          }
-
-          logUi({ id, name, message: "Starting package... " });
-          await dockerComposeUpSafe(composeNextPath);
-        }
-
-        logUi({ id, name, message: "Package started" });
-      }
+      await runPackages(packagesData, log);
     } catch (e) {
-      /**
-       * [Rollback] Stop all new packages with the new compose
-       * Up the old packages with the previous compose
-       */
-      logs.error(`Rolling back installation of ${id}: ${e.stack}`);
-      for (const {
-        name,
-        imagePath,
-        composePath,
-        composeNextPath
-      } of packagesData) {
-        try {
-          logUi({ id, name, message: "Aborting and rolling back..." });
-
-          safeUnlink(imagePath);
-          safeUnlink(composeNextPath);
-
-          // Deal with packages that were NOT installed before this install
-          if (fs.existsSync(composePath) && name !== dappmanagerId)
-            await dockerComposeUpSafe(composePath);
-        } catch (ePkg) {
-          logs.error(`Error rolling back ${name}: ${ePkg.stack}`);
-        }
-      }
-
-      // Instruct the UI to clear isInstalling logs
-      logUiClear({ id });
-
-      // Emit packages update
-      eventBus.requestPackages.emit();
-
+      await rollbackPackages(packagesData, log);
       throw e;
     }
+
+    await postInstallClean(packagesData, log);
+    onFinish(id, packagesData);
+  } catch (e) {
+    onFinish(id, packagesData);
+    throw e;
+  }
+}
+
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ * Experiment to clean up logic, and make it more modular
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+async function onFinish(id: string, packagesData: InstallPackageData[]) {
+  const ids = packagesData.map(({ name }) => name);
+
+  /**
+   * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
+   * Since a package installation is not a very frequent activity it is okay to be
+   * called on each install. Internal mechanisms protect the natRenewal function
+   * to be called too often.
+   */
+  eventBus.runNatRenewal.emit();
+
+  // Emit packages update
+  eventBus.requestPackages.emit();
+  eventBus.packagesModified.emit({ ids });
+
+  // Flag the packages as NOT installing.
+  // Must be called also on Error, otherwise packages can't be re-installed
+  flagPackagesAreNotInstalling(ids);
+
+  // Instruct the UI to clear isInstalling logs
+  logUiClear({ id });
+}
+
+async function postInstallClean(packagesData: InstallPackageData[], log: Log) {
+  for (const pkg of packagesData) {
+    const { name, semVersion, imagePath } = pkg;
+    const { composePath, composeBackupPath } = pkg;
+
+    /**
+     * [Files] Add remaining files
+     * [Clean] old files and images
+     */
+    const { manifestPath, metadata } = pkg;
+    log(name, "Writing files...");
+
+    writeManifest(manifestPath, metadata);
+    db.addPackageInstalledMetadata(name);
 
     /**
      * [Clean] old files and images
      * IMPORTANT! Do this step AFTER the try/catch otherwise the rollback
      * will not work, as the compose.next.yml is the same as compose.yml
      */
-    for (const pkg of packagesData) {
-      const { name, semVersion, imagePath } = pkg;
-      const { composePath, composeNextPath } = pkg;
+    log(name, "Cleaning files...");
+    fs.unlinkSync(imagePath);
+    fs.unlinkSync(composeBackupPath);
 
-      logUi({ id, name, message: "Cleaning files..." });
-      fs.unlinkSync(imagePath);
-      fs.renameSync(composeNextPath, composePath);
-
-      logUi({ id, name, message: "cleaning old images" });
-      await dockerCleanOldImages(name, semVersion).catch(e =>
-        logs.warn(`Error cleaning images: ${e.message}`)
-      );
-    }
-
-    /**
-     * [Files] Add remaining files
-     * [Clean] old files and images
-     */
-    for (const pkg of packagesData) {
-      const { name, manifestPath, metadata } = pkg;
-      logUi({ id, name, message: "Writing files..." });
-
-      writeManifest(manifestPath, metadata);
-      db.addPackageInstalledMetadata(name);
-    }
-
-    /**
-     * [Lock] Call lock ephemeral ports: modify docker-compose + open ports
-     * lockPorts modifies the docker-compose and returns
-     */
-    for (const { name } of packagesData) {
-      logUi({ id, name, message: "Locking ports..." });
-      await lockPorts(name);
-      logUi({ id, name, message: "Locked ports" });
-    }
-
-    // Instruct the UI to clear isInstalling logs
-    logUiClear({ id });
-
-    /**
-     * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
-     * Since a package installation is not a very frequent activity it is okay to be
-     * called on each install. Internal mechanisms protect the natRenewal function
-     * to be called too often.
-     */
-    eventBus.runNatRenewal.emit();
-
-    // Emit packages update
-    eventBus.requestPackages.emit();
-    eventBus.packagesModified.emit({
-      ids: packagesData.map(({ name }) => name)
-    });
-
-    // Flag packages as no longer installing
-    flagPackagesAreNotInstalling(state);
-  } catch (e) {
-    // CRITICAL STEP: Flag the packages as NOT installing
-    // Otherwise packages will not be able to be installed
-    flagPackagesAreNotInstalling(state);
-
-    // Clear possible logs between dep resolution and package running
-    logUiClear({ id });
-
-    throw e;
+    log(name, "Cleaning previous images...");
+    await dockerCleanOldImages(name, semVersion).catch(e =>
+      logs.warn(`Error cleaning images: ${e.message}`)
+    );
   }
 }
 
-// Utils
+/**
+ * Download the .tar.xz docker image of each package in paralel
+ * After each download verify that the image is ok and contains
+ * only the expected image layers
+ */
+async function downloadImages(packagesData: InstallPackageData[], log: Log) {
+  await Promise.all(
+    packagesData.map(async function(pkg) {
+      const { name, semVersion, isCore, imageFile, imagePath } = pkg;
+      log(name, "Starting download...");
 
-function safeUnlink(filePath: string): void {
-  try {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch (e) {
-    logs.error(
-      `Error on installer rollback safeUnlink of ${filePath}: ${e.stack}`
-    );
+      function onProgress(progress: number): void {
+        let message = `Downloading ${progress}%`;
+        if (progress > 100) message += ` (expected ${imageFile.size} bytes)`;
+        log(name, message);
+      }
+
+      try {
+        await getImage(imageFile, imagePath, onProgress);
+      } catch (e) {
+        e.message = `Can't download ${name} image: ${e.message}`;
+        throw e; // Use this format to keep the stack trace
+      }
+
+      // Do not throw for core packages
+      log(name, "Verifying download...");
+      try {
+        await verifyDockerImage({ imagePath, name, version: semVersion });
+      } catch (e) {
+        const errorMessage = `Error verifying image: ${e.message}`;
+        if (isCore) logs.error(errorMessage);
+        else throw Error(errorMessage);
+      }
+
+      log(name, "Package downloaded");
+    })
+  );
+}
+
+/**
+ * Load the docker image .tar.xz. file of each package
+ * Do this AFTER all downloads but BEFORE starting any package to prevent inconsistencies.
+ * If a dependency fails, some future version of another DNP could be loaded
+ * creating wierd bugs with unstable versions
+ */
+async function loadImages(packagesData: InstallPackageData[], log: Log) {
+  await Promise.all(
+    packagesData.map(async function({ name, imagePath }) {
+      log(name, "Loading image...");
+      await dockerLoad(imagePath);
+      log(name, "Package Loaded");
+    })
+  );
+}
+
+/**
+ * Create and run each package container in series
+ * The order is extremely important and should be guaranteed by `orderInstallPackages`
+ */
+async function runPackages(packagesData: InstallPackageData[], log: Log) {
+  for (const { composePath, compose, composeBackupPath } of packagesData) {
+    // Create the repoDir if necessary
+    validate.path(composePath);
+
+    // Backup compose to be able to do a rollback
+    // If the compose does not exist, continue
+    if (fs.existsSync(composeBackupPath))
+      fs.copyFileSync(composePath, composeBackupPath);
+
+    await writeAndValidateCompose(composePath, compose);
   }
+
+  for (const { name, composePath, fileUploads } of packagesData) {
+    // patch to prevent installer from crashing
+    if (name == dappmanagerId) {
+      log(name, "Reseting DAppNode... ");
+      await restartPatch();
+    } else {
+      // Copy fileUploads if any to the container before up-ing
+      if (fileUploads) {
+        log(name, "Copying file uploads...");
+        logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
+
+        await dockerComposeUpSafe(composePath, { noStart: true });
+        for (const [containerPath, dataUri] of Object.entries(fileUploads)) {
+          const { dir: toPath, base: filename } = path.parse(containerPath);
+          await copyFileTo({ id: name, dataUri, filename, toPath });
+        }
+      }
+
+      log(name, "Starting package... ");
+      await dockerComposeUpSafe(composePath);
+    }
+
+    log(name, "Package started");
+  }
+}
+
+/**
+ * [Rollback] Stop all new packages with the new compose
+ * Up the old packages with the previous compose
+ */
+async function rollbackPackages(packagesData: InstallPackageData[], log: Log) {
+  // Restore all backup composes. Do it first to make sure the next version compose is not
+  // used unintentionally if the installed package is restored
+  for (const { name, composePath, composeBackupPath, isUpdate } of packagesData)
+    try {
+      fs.copyFileSync(composeBackupPath, composePath);
+    } catch (e) {
+      if (e.code !== "ENOENT" || isUpdate)
+        logs.error(`Rollback error restoring ${name} compose: ${e.stack}`);
+    }
+
+  // Delete image files
+  for (const { name, imagePath } of packagesData)
+    try {
+      fs.unlinkSync(imagePath);
+    } catch (e) {
+      logs.error(`Rollback error removing ${name} image: ${e.stack}`);
+    }
+
+  // Restore backup versions
+  for (const { name, composePath, isUpdate } of packagesData)
+    try {
+      log(name, "Aborting and rolling back...");
+
+      // Deal with packages that were NOT installed before this install
+      if (name === dappmanagerId) {
+        // await whatToDoWithDappmanager();
+        // Do nothing by now
+      } else if (isUpdate) {
+        await dockerComposeUpSafe(composePath);
+      } else {
+        await dockerComposeRm(composePath);
+      }
+
+      log(name, "Aborted and rolled back...");
+    } catch (e) {
+      logs.error(`Rollback error rolling starting ${name}: ${e.stack}`);
+    }
 }

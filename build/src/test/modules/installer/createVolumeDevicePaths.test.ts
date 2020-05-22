@@ -2,9 +2,9 @@ import "mocha";
 import { expect } from "chai";
 import { Compose } from "../../../src/types";
 
-import { getCustomVolumeDevicePaths } from "../../../src/modules/installer/createCustomVolumeDevicePaths";
+import { getVolumeDevicePaths } from "../../../src/modules/installer/createVolumeDevicePaths";
 
-describe("Module > installer > createCustomVolumeDevicePaths", () => {
+describe("Module > installer > createVolumeDevicePaths", () => {
   it("Should parse the list of volume paths to create from compose", () => {
     const devicePath =
       "/mnt/volume_ams3_01/dappnode-volumes/raiden.dnp.dappnode.eth/data";
@@ -36,8 +36,6 @@ describe("Module > installer > createCustomVolumeDevicePaths", () => {
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
-    expect(getCustomVolumeDevicePaths([sampleCompose])).to.deep.equal([
-      devicePath
-    ]);
+    expect(getVolumeDevicePaths([sampleCompose])).to.deep.equal([devicePath]);
   });
 });

@@ -5,14 +5,15 @@ import {
   ProgressLog,
   PackageRequest,
   PortMapping,
-  Manifest
+  Manifest,
+  PackageRelease
 } from "../../src/types";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { installPackage as installPackageType } from "../../src/calls/installPackage";
 import { DappGetState } from "../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../testUtils";
-import { ReleaseFetcher, PackageReleases } from "../../src/modules/release";
+import { ReleaseFetcher } from "../../src/modules/release";
 
 describe.skip("Call function: installPackage", function() {
   // Pkg data
@@ -62,7 +63,7 @@ describe.skip("Call function: installPackage", function() {
     async getReleasesResolved(
       req: PackageRequest
     ): Promise<{
-      releases: PackageReleases;
+      releases: PackageRelease[];
       message: string;
       state: DappGetState;
       alreadyUpdated: DappGetState;
@@ -74,10 +75,7 @@ describe.skip("Call function: installPackage", function() {
         state: { [pkgName]: pkgVer, [depName]: depVer },
         alreadyUpdated: {},
         currentVersion: {},
-        releases: {
-          [pkgName]: pkgPkg,
-          [depName]: depPkg
-        }
+        releases: [pkgPkg, depPkg]
       };
     }
   }

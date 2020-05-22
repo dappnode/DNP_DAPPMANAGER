@@ -5,8 +5,6 @@ import { PackageRelease, PackageRequest, Manifest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
 import { Apm } from "../apm";
 
-export type PackageReleases = { [name: string]: PackageRelease };
-
 export class ReleaseFetcher extends Apm {
   /**
    * Resolves name + version to an IPFS hash
@@ -29,14 +27,12 @@ export class ReleaseFetcher extends Apm {
    */
   async getReleases(packages: {
     [name: string]: string;
-  }): Promise<PackageReleases> {
-    const releases: PackageReleases = {};
-    await Promise.all(
-      Object.entries(packages).map(async ([name, version]) => {
-        releases[name] = await this.getRelease(name, version);
-      })
+  }): Promise<PackageRelease[]> {
+    return await Promise.all(
+      Object.entries(packages).map(([name, version]) =>
+        this.getRelease(name, version)
+      )
     );
-    return releases;
   }
 
   /**
