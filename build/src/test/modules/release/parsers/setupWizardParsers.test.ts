@@ -2,11 +2,20 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
+import yaml from "js-yaml";
+
 import { setupWizard1To2 } from "../../../../src/modules/release/parsers/setupWizardParsers";
 import { SetupSchema, SetupUiJson } from "../../../../src/types-own";
 import { SetupTarget, SetupWizardField } from "../../../../src/types";
 
 const setupWizardSpecs = "./setupWizardSpecs";
+
+const paths = {
+  setupTarget: "setup-target.json",
+  setupUi: "setup-ui.json",
+  setupSchema: "setup.schema.json",
+  setupWizard: "setup-wizard.yml"
+};
 
 /* eslint-disable @typescript-eslint/camelcase */
 describe("Release > parsers > setupWizard", () => {
@@ -21,19 +30,18 @@ describe("Release > parsers > setupWizard", () => {
             dirName,
             fileName
           );
-          if (!fs.existsSync(filePath))
-            throw Error(`File ${filePath} does not exist`);
-          return JSON.parse(fs.readFileSync(filePath, "utf8"));
+          return yaml.safeLoad(fs.readFileSync(filePath, "utf8"));
         }
 
-        const setupTarget = loadFile<SetupTarget>("setup-target.json");
-        const setupUiJson = loadFile<SetupUiJson>("setup-ui.json");
-        const setupSchema = loadFile<SetupSchema>("setup.schema.json");
+        const setupTarget = loadFile<SetupTarget>(paths.setupTarget);
+        const setupUiJson = loadFile<SetupUiJson>(paths.setupUi);
+        const setupSchema = loadFile<SetupSchema>(paths.setupSchema);
         let noSetupWizard = false;
         let setupWizard: SetupWizardField[] = [];
         try {
-          setupWizard = loadFile<SetupWizardField[]>("setup-wizard.json");
+          setupWizard = loadFile<SetupWizardField[]>(paths.setupWizard);
         } catch (e) {
+          if (e.code !== "ENOENT") throw e;
           noSetupWizard = true;
         }
 
@@ -46,13 +54,8 @@ describe("Release > parsers > setupWizard", () => {
         if (noSetupWizard) {
           console.log(JSON.stringify(computedSetupWizard, null, 2));
           fs.writeFileSync(
-            path.join(
-              __dirname,
-              setupWizardSpecs,
-              dirName,
-              "setup-wizard.json"
-            ),
-            JSON.stringify(computedSetupWizard, null, 2)
+            path.join(__dirname, setupWizardSpecs, dirName, paths.setupWizard),
+            yaml.safeDump(computedSetupWizard)
           );
         } else {
           expect(computedSetupWizard).to.deep.equal(setupWizard);
