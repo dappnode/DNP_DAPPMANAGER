@@ -965,5 +965,4 @@ export interface HttpResponseInterface {
 export interface IdentityInterface {
   address: string;
   privateKey: string;
-  publicKey: string;
 }

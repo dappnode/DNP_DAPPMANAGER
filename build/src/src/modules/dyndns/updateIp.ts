@@ -1,32 +1,10 @@
-import EthCrypto from "eth-crypto";
+import { ethers } from "ethers";
 import params from "../../params";
 import fetch from "node-fetch";
 import * as db from "../../db";
 import { logs } from "../../logs";
 
 const dyndnsHost = params.DYNDNS_HOST;
-
-/**
- * EthCrypto reference
- *
- * - Create private key
- * const identity = EthCrypto.createIdentity();
- * {
-      address: '0x3f243FdacE01Cfd9719f7359c94BA11361f32471',
-      privateKey: '0x107be9...',
-      publicKey: 'bf1cc315...'
-  }
- *
- * - From private key to public key
- * const publicKey = EthCrypto.publicKeyByPrivateKey('0x107be9...);
- * - Publick key to address
- * const address = EthCrypto.publicKey.toAddress('bf1cc315...);
- *
- * - Sign message
- * const message = 'foobar';
-   const messageHash = EthCrypto.hash.keccak256(message);
-   const signature = EthCrypto.sign(privateKey, messageHash);
- */
 
 /**
  * Gets the keys from the local file or creates new ones and stores them.
@@ -44,13 +22,18 @@ export default async function updateIp(): Promise<string | void> {
   }
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const messageHash = EthCrypto.hash.keccak256(timestamp.toString());
-  const signature = EthCrypto.sign(privateKey, messageHash);
-  const publicKey = EthCrypto.publicKeyByPrivateKey(privateKey);
-  const address = EthCrypto.publicKey.toAddress(publicKey);
 
+  // Using ethers as a raw signer (without '\x19Ethereum Signed Message:\n' prefix) to mimic previous EthCrypto signature
+  const wallet = new ethers.Wallet(privateKey);
+  const signingKey = new ethers.utils.SigningKey(privateKey);
+  const signDigest = signingKey.signDigest.bind(signingKey);
+  const hash = ethers.utils.solidityKeccak256(
+    ["string"],
+    [timestamp.toString()]
+  );
+  const signature = ethers.utils.joinSignature(signDigest(hash));
   const parameters = [
-    `address=${address}`,
+    `address=${wallet.address}`,
     `timestamp=${timestamp}`,
     `sig=${signature}`
   ];

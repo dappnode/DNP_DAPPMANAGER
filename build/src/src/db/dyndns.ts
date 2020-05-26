@@ -12,8 +12,7 @@ export const domain = staticKey<string>(DOMAIN, "");
 
 export const dyndnsIdentity = staticKey<IdentityInterface>(DYNDNS_IDENTITY, {
   address: "",
-  privateKey: "",
-  publicKey: ""
+  privateKey: ""
 });
 
 export const staticIp = staticKey<string>(STATIC_IP, "");
