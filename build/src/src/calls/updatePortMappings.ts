@@ -1,5 +1,3 @@
-import lockPorts from "../modules/lockPorts";
-// Utils
 import {
   mergePortMapping,
   getPortMappings,
@@ -36,15 +34,6 @@ export async function updatePortMappings({
 
   if (id === params.dappmanagerDnpName)
     throw Error("Can not edit DAPPAMANAGER ports");
-
-  /**
-   * [NOTE]
-   * Assigning ephemeral ports to the DAPPMANAGER can be problematic
-   * because since it is reseted, the `lockPorts` function will never
-   * be executed.
-   * ### TODO: lockPorts will be executed on the DAPPMANAGER start
-   * and lock any remaining ephemeral ports of all DNPs
-   */
 
   /**
    * 1. Merge existing port mappings with new port mappings
@@ -85,11 +74,6 @@ export async function updatePortMappings({
       );
     }
   }
-
-  /**
-   * 2. Lock ephemeral ports if any
-   */
-  await lockPorts(id);
 
   // Trigger a natRenewal update to open ports if necessary
   eventBus.runNatRenewal.emit();

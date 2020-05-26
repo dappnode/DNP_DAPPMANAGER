@@ -86,14 +86,6 @@ describe.skip("Call function: installPackage", function() {
     packageModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  // Simulate that only the dependency has p2p ports
-  const lockPortsSpy = sinon.spy();
-  async function lockPorts(id: string): Promise<PortMapping[]> {
-    lockPortsSpy(id);
-    if (id === depName) return depPortsToOpen;
-    else return [];
-  }
-
   function logUi(progressLog: ProgressLog): void {
     progressLog;
   }
@@ -104,9 +96,6 @@ describe.skip("Call function: installPackage", function() {
     const mock = await rewiremock.around(
       () => import("../../src/calls/installPackage"),
       mock => {
-        mock(() => import("../../src/modules/lockPorts"))
-          .withDefault(lockPorts)
-          .toBeUsed();
         mock(() => import("../../src/modules/release"))
           .with({ ReleaseFetcher: ReleaseFetcherMock })
           .toBeUsed();
@@ -204,13 +193,6 @@ describe.skip("Call function: installPackage", function() {
       [callKwargPkg, callKwargDep],
       `should call packages.run for ${pkgName} and ${depName}`
     );
-  });
-
-  // Step 6: P2P ports: modify docker-compose + open ports
-  it("should call lockPorts", async () => {
-    sinon.assert.callCount(lockPortsSpy, 2);
-    expect(lockPortsSpy.firstCall.lastArg).to.equal(pkgName, "Wrong 1st call");
-    expect(lockPortsSpy.secondCall.lastArg).to.equal(depName, "Wrong 2nd call");
   });
 
   // Step FINAL:

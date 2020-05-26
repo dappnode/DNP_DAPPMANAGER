@@ -1,10 +1,4 @@
 import { dockerComposeUp, DockerComposeUpOptions } from "./dockerCommands";
-import * as db from "../../db";
-import * as eventBus from "../../eventBus";
-import lockPorts from "../lockPorts";
-import unlockPorts from "../unlockPorts";
-// Utils
-import { readComposeObj } from "../../utils/dockerComposeFile";
 
 // Ports error example error
 // root@lionDAppnode:/usr/src/dappnode/DNCORE/dc# docker-compose -f docker-compose2.yml up -d
@@ -20,41 +14,5 @@ export async function dockerComposeUpSafe(
   dockerComposePath: string,
   options?: DockerComposeUpOptions
 ): Promise<void> {
-  try {
-    await dockerComposeUp(dockerComposePath, options);
-  } catch (e) {
-    /**
-     * These port two modules use docker. If they are imported above,
-     * docker will no be defined yet, then they must be imported dynamically
-     * to ensure a proper import order
-     */
-
-    if (
-      e.message.includes("port is already allocated") &&
-      db.upnpAvailable.get()
-    ) {
-      // Don't try to find which port caused the error.
-      // In case of multiple collitions you would need to call this function recursively
-      // Just reset all ephemeral ports
-
-      // unlockPorts will modify the docker-compose to remove the port bidnings
-      // in order to let docker to assign new ones
-      // The natRenewal loop will close them by not renewing the mapping
-      await unlockPorts(dockerComposePath);
-
-      // #### PATCH to get id from dockerComposePath
-      const dc = readComposeObj(dockerComposePath);
-      const id = Object.keys(dc.services)[0];
-
-      // Up the package and lock the ports again
-      await dockerComposeUp(dockerComposePath, options);
-      const newPortMappings = await lockPorts(id);
-      if (newPortMappings && newPortMappings.length) {
-        // Trigger a natRenewal update to open ports if necessary
-        eventBus.runNatRenewal.emit();
-      }
-    } else {
-      throw e;
-    }
-  }
+  await dockerComposeUp(dockerComposePath, options);
 }
