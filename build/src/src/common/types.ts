@@ -365,6 +365,7 @@ interface ComposeServiceBase {
   devices?: string[];
   network_mode?: string;
   command?: string;
+  entrypoint?: string;
   // Logging
   logging?: {
     driver?: string;
@@ -705,7 +706,12 @@ export interface PackageReleaseMetadata {
   type?: string;
   chain?: string;
   dependencies?: Dependencies;
+
+  // Safety properties to solve problematic updates
   runOrder?: string[];
+  restartCommand?: string;
+  restartLaunchCommand?: string;
+
   requirements?: {
     minimumDappnodeVersion: string;
   };

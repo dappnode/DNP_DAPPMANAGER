@@ -11,7 +11,7 @@ import {
   dockerComposeRm
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
-import restartPatch from "../modules/docker/restartPatch";
+import { restartDappmanagerPatch } from "../modules/docker/restartPatch";
 import orderInstallPackages from "../modules/installer/orderInstallPackages";
 import getInstallerPackageData, {
   getInstallerPackagesData
@@ -281,11 +281,16 @@ async function runPackages(packagesData: InstallPackageData[], log: Log) {
     await writeAndValidateCompose(composePath, compose);
   }
 
-  for (const { name, composePath, fileUploads } of packagesData) {
+  for (const { name, composePath, fileUploads, ...pkg } of packagesData) {
     // patch to prevent installer from crashing
     if (name == dappmanagerId) {
       log(name, "Reseting DAppNode... ");
-      await restartPatch();
+      await restartDappmanagerPatch({
+        composePath,
+        composeBackupPath: pkg.composeBackupPath,
+        restartCommand: pkg.metadata.restartCommand,
+        restartLaunchCommand: pkg.metadata.restartLaunchCommand
+      });
     } else {
       // Copy fileUploads if any to the container before up-ing
       if (fileUploads) {

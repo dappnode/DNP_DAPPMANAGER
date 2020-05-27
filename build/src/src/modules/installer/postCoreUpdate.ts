@@ -3,7 +3,7 @@ import semver from "semver";
 import params from "../../params";
 import * as db from "../../db";
 import { listContainerNoThrow } from "../docker/listContainers";
-import restartDappmanagerPatch from "../docker/restartPatch";
+import { restartDappmanagerPatch } from "../docker/restartPatch";
 import { pause } from "../../utils/asyncFlows";
 import * as getPath from "../../utils/getPath";
 import { readComposeObj } from "../../utils/dockerComposeFile";
@@ -55,7 +55,7 @@ export async function postCoreUpdate(): Promise<void> {
       `Restarting DAPPMANAGER in post core update step: \n  Applying update ${currentVersion} => ${composeVersion}`
     );
     db.lastPostCoreUpdateRestart.set(Date.now());
-    await restartDappmanagerPatch();
+    await restartDappmanagerPatch({ composePath });
   }
 }
 
