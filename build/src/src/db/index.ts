@@ -1,5 +1,6 @@
 export * from "./autoUpdateSettings";
 export * from "./cache";
+export * from "./coreUpdate";
 export * from "./dyndns";
 export * from "./ethClient";
 export * from "./fileTransferPath";

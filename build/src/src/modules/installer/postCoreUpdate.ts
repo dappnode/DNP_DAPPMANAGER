@@ -3,12 +3,18 @@ import semver from "semver";
 import params from "../../params";
 import * as db from "../../db";
 import { listContainerNoThrow } from "../docker/listContainers";
+import { containerInspect, logContainer } from "../docker/dockerApi";
 import { restartDappmanagerPatch } from "../docker/restartPatch";
 import { pause } from "../../utils/asyncFlows";
 import * as getPath from "../../utils/getPath";
 import { readComposeObj } from "../../utils/dockerComposeFile";
 import { parseService } from "../../utils/dockerComposeParsers";
+import Dockerode from "dockerode";
 import Logs from "../../logs";
+import { dockerRm } from "../docker/dockerCommands";
+import { rollbackPackages, postInstallClean } from "../../calls/installPackage";
+import { InstallPackageData } from "../../common/types";
+import { getLogUi } from "../../utils/logUi";
 const logs = Logs(module);
 
 const maxRestartContainerWait = 60 * 1000;
@@ -20,76 +26,80 @@ const waitBetweenRestarts = 5 * 60 * 1000;
  * - Up DAPPMANAGER if it's version is equal to the compose
  */
 export async function postCoreUpdate(): Promise<void> {
-  await Promise.all([
-    // Await for restart patch to finish,
-    waitForRestartPatchToFinish(),
-    // and, wait at least 5 seconds
-    pause(5 * 1000)
-  ]);
+  try {
+    await waitForRestartPatchToFinish();
+    const restart = await containerInspect(params.restartContainerName);
+    await logRestartPatchStatus(restart);
 
-  // Move .next.yml files to .yml
-  const composePath = getPath.dockerCompose(params.dappmanagerDnpName, true);
-  mvIfExists(getPath.nextPath(composePath), composePath);
-
-  // Up DAPPMANAGER if it's version is equal to the compose
-  const composeVersion = readComposeVersion(composePath);
-  const dappmanager = await listContainerNoThrow(params.dappmanagerDnpName);
-  const currentVersion = (dappmanager || {}).version || "";
-  if (
-    semver.valid(currentVersion) &&
-    semver.valid(composeVersion) &&
-    semver.lt(currentVersion, composeVersion)
-  ) {
-    // Add additional wait if there are two restarts to quickly
-    // and a least 5 minutes between restarts
-    const lastRestart = db.lastPostCoreUpdateRestart.get();
-    const waitTime = waitBetweenRestarts + lastRestart - Date.now();
-    if (waitTime > 0) {
-      logs.warn(
-        `Two consecutive DAPPMANAGER restarts in post core update step: \n  Waiting ${waitTime} ms to restart`
-      );
-      await pause(waitTime);
+    const log = getLogUi(params.coreDnpName);
+    const packagesData = db.coreUpdatePackagesData.get();
+    if (!packagesData) {
+      // Assuming the dappmanager has been reseted, not updated
+      logs.info(`No core update packages data found`);
+    } else if (restart.State.ExitCode > 0) {
+      // Error during update, needs to rollback
+      rollbackPackages(packagesData, log);
+    } else {
+      // All okay, finish installation
+      postInstallClean(packagesData, log);
     }
 
-    logs.info(
-      `Restarting DAPPMANAGER in post core update step: \n  Applying update ${currentVersion} => ${composeVersion}`
-    );
-    db.lastPostCoreUpdateRestart.set(Date.now());
-    await restartDappmanagerPatch({ composePath });
+    // Remove the pending core update packages data
+    db.coreUpdatePackagesData.set(null);
+    // Remove restart patch container
+    await dockerRm(params.restartContainerName);
+  } catch (e) {
+    if (e.message.includes("No such container")) {
+      // Restart container does no exist, the dappmanager has not been restarted
+      // by the restartPatch, do nothing
+      return;
+    } else {
+      throw e;
+    }
   }
 }
 
-/**
- * Util to parse semver from a DNP compose
- * @param composePath "/usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml"
- */
-function readComposeVersion(composePath: string): string {
-  const compose = readComposeObj(composePath);
-  const { image } = parseService(compose) || {};
-  return (image || "").split(":")[1] || "";
+export function isCoreUpdate(packagesData: InstallPackageData[]): boolean {
+  return packagesData.some(({ name }) => name === params.dappmanagerDnpName);
 }
 
 /**
- * Util to move a file only if exists
- * @param from
- * @param to
+ * Report on the status of the restart container
+ * Non-essential, so wrap in try catch to not prevent a rollback
+ * @param restart
  */
-function mvIfExists(from: string, to: string): void {
+async function logRestartPatchStatus(restart: Dockerode.ContainerInspectInfo) {
   try {
-    fs.renameSync(from, to);
+    const finishTime = new Date(restart.State.FinishedAt);
+    const finishSecAgo = (Date.now() - finishTime.getTime()) / 1000;
+    const restartLogs = await logContainer(params.restartContainerName);
+    const restartLogsIndented = restartLogs
+      .split("\n")
+      .map(line => "\t" + line)
+      .join("\n");
+    logs.info(`Restart patch status:
+  Finished: ${finishTime.toISOString()}, ${finishSecAgo} seconds ago
+  ExitCode: ${restart.State.ExitCode}
+  Error: ${restart.State.Error}
+  Logs: 
+${restartLogsIndented}
+`);
   } catch (e) {
-    if (e.code !== "ENOENT") throw e;
+    logs.error(`Error reporting restart patch status: ${e.stack}`);
   }
 }
 
 /**
  * Await for the restart patch container to be removed or exited
  */
-async function waitForRestartPatchToFinish(): Promise<void> {
+async function waitForRestartPatchToFinish(): Promise<
+  Dockerode.ContainerInspectInfo
+> {
   const start = Date.now();
   while (Date.now() - start < maxRestartContainerWait) {
-    const restart = await listContainerNoThrow(params.restartContainerName);
-    if (!restart || !restart.running) return;
+    const restart = await containerInspect(params.restartContainerName);
+    if (!restart.State.Running) return restart;
     await pause(2 * 1000);
   }
+  throw Error(`Wait for restart patch to finish timeout`);
 }

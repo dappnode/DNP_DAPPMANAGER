@@ -684,6 +684,18 @@ export interface PackageRelease {
   isCore: boolean;
 }
 
+export type InstallPackageDataPaths = Pick<
+  InstallPackageData,
+  | "name"
+  | "semVersion"
+  | "composePath"
+  | "composeBackupPath"
+  | "manifestPath"
+  | "manifestBackupPath"
+  | "imagePath"
+  | "isUpdate"
+>;
+
 export interface InstallPackageData extends PackageRelease {
   isUpdate: boolean;
   // Paths
@@ -691,6 +703,7 @@ export interface InstallPackageData extends PackageRelease {
   composePath: string;
   composeBackupPath: string;
   manifestPath: string;
+  manifestBackupPath: string;
   // Data to write
   compose: Compose;
   // User settings to be applied after running

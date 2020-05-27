@@ -12,15 +12,12 @@ import {
 } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import { restartDappmanagerPatch } from "../modules/docker/restartPatch";
-import orderInstallPackages from "../modules/installer/orderInstallPackages";
-import getInstallerPackageData, {
-  getInstallerPackagesData
-} from "../modules/installer/getInstallerPackageData";
+import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData";
 import writeAndValidateCompose from "../modules/installer/writeAndValidateCompose";
 import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths";
 // Utils
 import { writeManifest } from "../utils/manifestFile";
-import { logUi, logUiClear } from "../utils/logUi";
+import { Log, getLogUi, logUiClear } from "../utils/logUi";
 import * as validate from "../utils/validate";
 import { copyFileTo } from "./copyFileTo";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
@@ -34,13 +31,14 @@ import { ReleaseFetcher } from "../modules/release";
 import {
   UserSettingsAllDnps,
   InstallPackageData,
+  InstallPackageDataPaths,
   PackageRequest
 } from "../types";
 import Logs from "../logs";
+import { isCoreUpdate } from "../modules/installer/postCoreUpdate";
 const logs = Logs(module);
 
 const dappmanagerId = params.dappmanagerDnpName;
-type Log = (name: string, message: string) => void;
 
 /**
  * Installs a DAppNode Package.
@@ -78,7 +76,7 @@ export async function installPackage({
     ver: sanitizeRequestVersion(reqVersion)
   };
   const id = req.name;
-  const log: Log = (name, message) => logUi({ id, name, message });
+  const log = getLogUi(id);
 
   log(id, "Resolving dependencies...");
   const releaseFetcher = new ReleaseFetcher();
@@ -120,6 +118,7 @@ export async function installPackage({
     await loadImages(packagesData, log);
 
     await createVolumeDevicePaths(packagesData.map(({ compose }) => compose));
+    await writeAndValidateFiles(packagesData, log);
 
     try {
       await runPackages(packagesData, log);
@@ -178,37 +177,6 @@ async function onFinish(id: string, packagesData: InstallPackageData[]) {
   logUiClear({ id });
 }
 
-async function postInstallClean(packagesData: InstallPackageData[], log: Log) {
-  for (const pkg of packagesData) {
-    const { name, semVersion, imagePath } = pkg;
-    const { composePath, composeBackupPath } = pkg;
-
-    /**
-     * [Files] Add remaining files
-     * [Clean] old files and images
-     */
-    const { manifestPath, metadata } = pkg;
-    log(name, "Writing files...");
-
-    writeManifest(manifestPath, metadata);
-    db.addPackageInstalledMetadata(name);
-
-    /**
-     * [Clean] old files and images
-     * IMPORTANT! Do this step AFTER the try/catch otherwise the rollback
-     * will not work, as the compose.next.yml is the same as compose.yml
-     */
-    log(name, "Cleaning files...");
-    fs.unlinkSync(imagePath);
-    fs.unlinkSync(composeBackupPath);
-
-    log(name, "Cleaning previous images...");
-    await dockerCleanOldImages(name, semVersion).catch(e =>
-      logs.warn(`Error cleaning images: ${e.message}`)
-    );
-  }
-}
-
 /**
  * Download the .tar.xz docker image of each package in paralel
  * After each download verify that the image is ok and contains
@@ -265,32 +233,58 @@ async function loadImages(packagesData: InstallPackageData[], log: Log) {
 }
 
 /**
+ * Write and validate the new compose files
+ * Backup the previous compose if exists to .backup.yml
+ * @param packagesData
+ */
+async function writeAndValidateFiles(
+  packagesData: InstallPackageData[],
+  log: Log
+) {
+  for (const {
+    name,
+    compose,
+    composePath,
+    composeBackupPath,
+    metadata,
+    manifestPath,
+    manifestBackupPath
+  } of packagesData) {
+    log(name, "Writing files...");
+
+    // Create the repoDir if necessary
+    validate.path(composePath);
+
+    // Backup compose to be able to do a rollback. Only if compose exists
+    if (fs.existsSync(composePath))
+      fs.copyFileSync(composePath, composeBackupPath);
+    await writeAndValidateCompose(composePath, compose);
+
+    // Backup manifest to be able to do a rollback. Only if manifest exists
+    if (fs.existsSync(manifestPath))
+      fs.copyFileSync(manifestPath, manifestBackupPath);
+    writeManifest(manifestPath, metadata);
+  }
+}
+
+/**
  * Create and run each package container in series
  * The order is extremely important and should be guaranteed by `orderInstallPackages`
  */
 async function runPackages(packagesData: InstallPackageData[], log: Log) {
-  for (const { composePath, compose, composeBackupPath } of packagesData) {
-    // Create the repoDir if necessary
-    validate.path(composePath);
-
-    // Backup compose to be able to do a rollback
-    // If the compose does not exist, continue
-    if (fs.existsSync(composeBackupPath))
-      fs.copyFileSync(composePath, composeBackupPath);
-
-    await writeAndValidateCompose(composePath, compose);
-  }
-
   for (const { name, composePath, fileUploads, ...pkg } of packagesData) {
     // patch to prevent installer from crashing
     if (name == dappmanagerId) {
       log(name, "Reseting DAppNode... ");
+      db.coreUpdatePackagesData.set(packagesData);
       await restartDappmanagerPatch({
         composePath,
         composeBackupPath: pkg.composeBackupPath,
         restartCommand: pkg.metadata.restartCommand,
         restartLaunchCommand: pkg.metadata.restartLaunchCommand
       });
+      // This line should never be reached, because restartDappmanagerPatch() should
+      // either throw, or never resolve because the main process is killed by docker
     } else {
       // Copy fileUploads if any to the container before up-ing
       if (fileUploads) {
@@ -315,17 +309,37 @@ async function runPackages(packagesData: InstallPackageData[], log: Log) {
 /**
  * [Rollback] Stop all new packages with the new compose
  * Up the old packages with the previous compose
+ * @param packagesData
+ * @param log
  */
-async function rollbackPackages(packagesData: InstallPackageData[], log: Log) {
+export async function rollbackPackages(
+  packagesData: InstallPackageDataPaths[],
+  log: Log
+) {
+  // Remove the pending core update packages data if any
+  if (packagesData.some(({ name }) => name === dappmanagerId))
+    db.coreUpdatePackagesData.set(null);
+
   // Restore all backup composes. Do it first to make sure the next version compose is not
   // used unintentionally if the installed package is restored
-  for (const { name, composePath, composeBackupPath, isUpdate } of packagesData)
-    try {
-      fs.copyFileSync(composeBackupPath, composePath);
-    } catch (e) {
-      if (e.code !== "ENOENT" || isUpdate)
-        logs.error(`Rollback error restoring ${name} compose: ${e.stack}`);
-    }
+  for (const {
+    name,
+    composePath,
+    composeBackupPath,
+    manifestPath,
+    manifestBackupPath,
+    isUpdate
+  } of packagesData)
+    for (const { from, to } of [
+      { from: composeBackupPath, to: composePath },
+      { from: manifestBackupPath, to: manifestPath }
+    ])
+      try {
+        fs.copyFileSync(from, to);
+      } catch (e) {
+        if (e.code !== "ENOENT" || isUpdate)
+          logs.error(`Rollback error restoring ${name} ${from}: ${e.stack}`);
+      }
 
   // Delete image files
   for (const { name, imagePath } of packagesData)
@@ -340,13 +354,15 @@ async function rollbackPackages(packagesData: InstallPackageData[], log: Log) {
     try {
       log(name, "Aborting and rolling back...");
 
-      // Deal with packages that were NOT installed before this install
       if (name === dappmanagerId) {
-        // await whatToDoWithDappmanager();
-        // Do nothing by now
+        // The DAPPMANAGER cannot be rolled back here. If the restartPatch has already
+        // stopped the original container this line will never be reached. If the
+        // restartPatch failed before stopping the original container there's no need
+        // to roll back, since the current container has the original version.
       } else if (isUpdate) {
         await dockerComposeUpSafe(composePath);
       } else {
+        // Remove new containers that were NOT installed before this install call
         await dockerComposeRm(composePath);
       }
 
@@ -354,4 +370,40 @@ async function rollbackPackages(packagesData: InstallPackageData[], log: Log) {
     } catch (e) {
       logs.error(`Rollback error rolling starting ${name}: ${e.stack}`);
     }
+}
+
+/**
+ * [Post install clean] After a successful install, clean backup files
+ * and clean old docker images
+ * @param packagesData
+ * @param log
+ */
+export async function postInstallClean(
+  packagesData: InstallPackageDataPaths[],
+  log: Log
+) {
+  for (const {
+    name,
+    semVersion,
+    imagePath,
+    manifestBackupPath,
+    composeBackupPath
+  } of packagesData) {
+    db.addPackageInstalledMetadata(name);
+
+    // [Clean] old files and images
+    // IMPORTANT! Do this step AFTER the try/catch otherwise the rollback
+    // will not work, as the compose.next.yml is the same as compose.yml
+    log(name, "Cleaning files...");
+    fs.unlinkSync(imagePath);
+    fs.unlinkSync(composeBackupPath);
+    fs.unlinkSync(manifestBackupPath);
+
+    log(name, "Cleaning previous images...");
+    try {
+      await dockerCleanOldImages(name, semVersion);
+    } catch (e) {
+      logs.warn(`Error cleaning images: ${e.message}`);
+    }
+  }
 }

@@ -10,7 +10,10 @@ import { testDir, cleanTestDir, createTestDir } from "../testUtils";
 import { Compose } from "../../src/types";
 import { writeComposeObj } from "../../src/utils/dockerComposeFile";
 import { listContainer } from "../../src/modules/docker/listContainers";
-import { dockerList } from "../../src/modules/docker/dockerApi";
+import {
+  dockerList,
+  containerInspect
+} from "../../src/modules/docker/dockerApi";
 
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,
@@ -19,10 +22,6 @@ import { dockerList } from "../../src/modules/docker/dockerApi";
  */
 
 const dindComposeImage = "danielguerra/dind-compose";
-const dindVolumes = [
-  "/var/run/docker.sock:/var/run/docker.sock",
-  "/etc/hostname:/etc/dappnodename:ro"
-];
 
 const mainContainerName = "DAppNodeTest-main-service";
 const restartContainerName = "DAppNodeTest-restart-service";
@@ -32,7 +31,7 @@ const labelVersion = "test.dappnode.version";
 
 const testDirContainer = path.resolve("/", testDir);
 const volumes = [
-  ...dindVolumes,
+  "/var/run/docker.sock:/var/run/docker.sock",
   `${path.resolve(testDir)}:${testDirContainer}`
 ];
 const prevComposeName = `docker-compose-previous.yml`;
@@ -176,6 +175,26 @@ exit $UPEXIT
       versionNext,
       "Final container should have the next version"
     );
+
+    const restartInspect = await containerInspect(restartContainerName);
+
+    console.log(restartInspect.State);
+    const restartFinished = new Date(restartInspect.State.FinishedAt);
+    const timeDiff = Date.now() - restartFinished.getTime();
+    console.log({ timeDiff });
+    // "State": {
+    //     "Status": "exited",
+    //     "Running": false,
+    //     "Paused": false,
+    //     "Restarting": false,
+    //     "OOMKilled": false,
+    //     "Dead": false,
+    //     "Pid": 0,
+    //     "ExitCode": 0,
+    //     "Error": "",
+    //     "StartedAt": "2020-05-27T11:14:34.563563403Z",
+    //     "FinishedAt": "2020-05-27T11:14:36.168578642Z"
+    // }
   });
 
   it("Should fail starting up a container and up the backup", async () => {
@@ -242,6 +261,20 @@ exit $UPEXIT
       versionPrev,
       "Final container should have the previous version"
     );
+
+    // "State": {
+    //     "Status": "exited",
+    //     "Running": false,
+    //     "Paused": false,
+    //     "Restarting": false,
+    //     "OOMKilled": false,
+    //     "Dead": false,
+    //     "Pid": 0,
+    //     "ExitCode": 1,
+    //     "Error": "",
+    //     "StartedAt": "2020-05-27T11:18:44.099077912Z",
+    //     "FinishedAt": "2020-05-27T11:18:46.867974054Z"
+    // }
   });
 
   it("Should exit on the original process because the next compose is corrupt", async () => {

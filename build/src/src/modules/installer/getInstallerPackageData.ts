@@ -49,6 +49,7 @@ export default function getInstallerPackageData(
   const composePath = getPath.dockerCompose(name, isCore);
   const composeBackupPath = getPath.backupPath(composePath);
   const manifestPath = getPath.manifest(name, isCore);
+  const manifestBackupPath = getPath.backupPath(manifestPath);
   const imagePath = getPath.image(name, semVersion, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
@@ -64,6 +65,7 @@ export default function getInstallerPackageData(
     composePath,
     composeBackupPath,
     manifestPath,
+    manifestBackupPath,
     imagePath,
     // Data to write
     compose: addGeneralDataToCompose(

@@ -229,5 +229,6 @@ export const mockPackageData: InstallPackageData = {
   imagePath: "mock/path/image",
   composePath: "mock/path/compose",
   composeBackupPath: "mock/path/compose.backup.yml",
-  manifestPath: "mock/path/manifest"
+  manifestPath: "mock/path/manifest.json",
+  manifestBackupPath: "mock/path/manifest.backup.json"
 };
