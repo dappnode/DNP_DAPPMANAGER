@@ -4,7 +4,6 @@ export * from "./coreUpdate";
 export * from "./dyndns";
 export * from "./ethClient";
 export * from "./fileTransferPath";
-export * from "./isInstalling";
 export * from "./network";
 export * from "./notification";
 export * from "./package";

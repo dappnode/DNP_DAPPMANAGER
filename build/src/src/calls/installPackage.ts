@@ -1,43 +1,29 @@
-import fs from "fs";
-import params from "../params";
 import * as eventBus from "../eventBus";
-import * as db from "../db";
-// Modules
-import getImage, { verifyDockerImage } from "../modules/release/getImage";
-import {
-  dockerLoad,
-  dockerCleanOldImages
-} from "../modules/docker/dockerCommands";
 import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData";
 import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths";
 // Utils
-import { Log, getLogUi, logUiClear } from "../utils/logUi";
+import { getLogUi, logUiClear } from "../utils/logUi";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
-import {
-  packageIsInstalling,
-  flagPackagesAreNotInstalling,
-  flagPackagesAreInstalling
-} from "../utils/packageIsInstalling";
 import { stringify } from "../utils/objects";
 import { ReleaseFetcher } from "../modules/release";
 import {
   UserSettingsAllDnps,
   InstallPackageData,
-  InstallPackageDataPaths,
   PackageRequest
 } from "../types";
-import Logs from "../logs";
 import {
   downloadImages,
   loadImages,
+  flagPackagesAreNotInstalling,
+  flagPackagesAreInstalling,
+  packageIsInstalling,
   runPackages,
   rollbackPackages,
   writeAndValidateFiles,
   postInstallClean
 } from "../modules/installer";
+import Logs from "../logs";
 const logs = Logs(module);
-
-const dappmanagerId = params.dappmanagerDnpName;
 
 /**
  * Installs a DAppNode Package.
@@ -77,69 +63,73 @@ export async function installPackage({
   const id = req.name;
   const log = getLogUi(id);
 
-  log(id, "Resolving dependencies...");
-  const releaseFetcher = new ReleaseFetcher();
-  const {
-    state,
-    currentVersion,
-    releases
-  } = await releaseFetcher.getReleasesResolved(req, options);
-  logs.info(`Resolved request ${req.name} @ ${req.ver}: ${stringify(state)}`);
+  try {
+    log(id, "Resolving dependencies...");
+    const releaseFetcher = new ReleaseFetcher();
+    const {
+      state,
+      currentVersion,
+      releases
+    } = await releaseFetcher.getReleasesResolved(req, options);
+    logs.info(`Resolved request ${req.name} @ ${req.ver}: ${stringify(state)}`);
 
-  // Throw any errors found in the release
-  for (const release of releases) {
-    if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
-      throw Error(`Core package ${release.name} is from an unverified origin`);
-  }
-
-  // Gather all data necessary for the install. Isolated in a pure function to ease testing
-  const packagesData = getInstallerPackagesData({
-    releases,
-    userSettings,
-    currentVersion,
-    reqName
-  });
-  logs.debug(`Packages data: ${JSON.stringify(packagesData, null, 2)}`);
-  logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
-
-  // Make sure that no package is already being installed
-  const dnpNames = packagesData.map(({ name }) => name);
-  for (const dnpName of dnpNames)
-    if (packageIsInstalling(dnpName)) {
-      logUiClear({ id }); // Clear "resolving..." logs
-      throw Error(`${dnpName} is installing`);
+    // Throw any errors found in the release
+    for (const release of releases) {
+      if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
+        throw Error(
+          `Core package ${release.name} is from an unverified origin`
+        );
     }
 
-  try {
-    flagPackagesAreInstalling(dnpNames);
+    // Gather all data necessary for the install. Isolated in a pure function to ease testing
+    const packagesData = getInstallerPackagesData({
+      releases,
+      userSettings,
+      currentVersion,
+      reqName
+    });
+    logs.debug(`Packages data: ${JSON.stringify(packagesData, null, 2)}`);
+    logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
 
-    await downloadImages(packagesData, log);
-    await loadImages(packagesData, log);
-
-    await createVolumeDevicePaths(packagesData.map(({ compose }) => compose));
-    await writeAndValidateFiles(packagesData, log);
+    // Make sure that no package is already being installed
+    const dnpNames = packagesData.map(({ name }) => name);
+    for (const dnpName of dnpNames)
+      if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 
     try {
-      await runPackages(packagesData, log);
+      flagPackagesAreInstalling(dnpNames);
+
+      await downloadImages(packagesData, log);
+      await loadImages(packagesData, log);
+
+      await createVolumeDevicePaths(packagesData.map(({ compose }) => compose));
+      await writeAndValidateFiles(packagesData, log);
+
+      try {
+        await runPackages(packagesData, log);
+      } catch (e) {
+        await rollbackPackages(packagesData, log);
+        throw e;
+      }
+
+      await postInstallClean(packagesData, log);
+      onFinish(dnpNames);
+      logUiClear({ id });
     } catch (e) {
-      await rollbackPackages(packagesData, log);
+      onFinish(dnpNames);
       throw e;
     }
-
-    await postInstallClean(packagesData, log);
-    onFinish(id, packagesData);
   } catch (e) {
-    onFinish(id, packagesData);
+    logUiClear({ id }); // Clear "resolving..." logs
     throw e;
   }
 }
 
 /**
- * Common tasks to perform after a successful or failed installation
- * @param id
+ * Bundle event emits that must be called on a successful and failed install
  * @param packagesData
  */
-async function onFinish(id: string, packagesData: InstallPackageData[]) {
+async function onFinish(dnpNames: string[]) {
   /**
    * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
    * Since a package installation is not a very frequent activity it is okay to be
@@ -149,14 +139,10 @@ async function onFinish(id: string, packagesData: InstallPackageData[]) {
   eventBus.runNatRenewal.emit();
 
   // Emit packages update
-  const ids = packagesData.map(({ name }) => name);
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids });
+  eventBus.packagesModified.emit({ ids: dnpNames });
 
   // Flag the packages as NOT installing.
   // Must be called also on Error, otherwise packages can't be re-installed
-  flagPackagesAreNotInstalling(ids);
-
-  // Instruct the UI to clear isInstalling logs
-  logUiClear({ id });
+  flagPackagesAreNotInstalling(dnpNames);
 }
