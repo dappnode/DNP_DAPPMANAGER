@@ -3,7 +3,7 @@ import path from "path";
 import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
 import * as db from "../../db";
-import { listContainer, listContainerNoThrow } from "./listContainers";
+import { listContainer, listContainerNoThrow } from "../docker/listContainers";
 import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
 import params from "../../params";
@@ -12,17 +12,17 @@ import { Compose, InstallPackageData } from "../../common/types";
 import { writeComposeObj, readComposeObj } from "../../utils/dockerComposeFile";
 import { parseService } from "../../utils/dockerComposeParsers";
 import Dockerode from "dockerode";
-import { containerInspect, logContainer } from "./dockerApi";
-import { dockerRm } from "./dockerCommands";
-import { rollbackPackages, postInstallClean } from "../../calls/installPackage";
+import { containerInspect, logContainer } from "../docker/dockerApi";
+import { dockerRm } from "../docker/dockerCommands";
 import { getLogUi } from "../../utils/logUi";
+import { rollbackPackages } from "./rollbackPackages";
+import { postInstallClean } from "./postInstallClean";
 const logs = Logs(module);
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
 const restartContainerName = params.restartContainerName;
 const restartScriptPath = path.join(params.DNCORE_DIR, "restart-dappnode.sh");
-const maxRestartContainerWait = 60 * 1000;
 
 /* eslint-disable @typescript-eslint/camelcase */
 
@@ -55,28 +55,19 @@ export async function restartDappmanagerPatch({
   const composeRestartPath = getPath.dockerCompose(restartId, true);
   if (!composeBackupPath) composeBackupPath = getPath.backupPath(composePath);
 
-  // [NOTE1]: The entrypoint property in the docker-compose overwrites
-  // both the CMD [ ] and ENTRYPOINT [ ] directive in the Dockerfile
-  //
-  // [NOTE2]: Using `network_mode: none` to prevent creating a useless
-  // network that may conflict with future restart containers (it has happen in Dec 2019)
-  //
-  // [NOTE3]: Must make sure that there is no restart container running previously
+  // Must make sure that there is no restart container running previously
   // If it's still running it will wait for a few seconds before killing it. If it working
   // properly, before the timeout expires the restart patch should kill the DAPPMANAGER;
   // but if something went wrong it will unlock the situation by killing a frozen restart container
   // If it's exited it will be removed beforehand
-
-  // Returns null if container is not found, then do nothing
-  const restartContainer = await listContainerNoThrow(restartContainerName);
-  if (restartContainer) {
-    if (restartContainer.running) await pause(15 * 1000);
-    try {
-      await shell(`docker rm -f ${restartContainerName}`);
-    } catch (e) {
-      // Since removing restart is non-essential, don't block a core update, just log
-      logs.error(`Error removing ${restartContainerName}: ${e.stack}`);
-    }
+  try {
+    await waitForRestartPatchToFinish({ timeout: 60 * 1000 });
+    // Returns null if container is not found, then do nothing
+    const restart = await listContainerNoThrow(restartContainerName);
+    if (restart && restart.running) await dockerRm(params.restartContainerName);
+  } catch (e) {
+    // Since removing restart is non-essential, don't block a core update, just log
+    logs.error(`Error removing ${restartContainerName}: ${e.stack}`);
   }
 
   /**
@@ -116,8 +107,12 @@ exit $UPEXIT
       [restartId]: {
         image: dappmanagerService.image || imageName,
         container_name: restartContainerName,
+        // Using `network_mode: none` to prevent creating a useless
+        // network that may conflict with future restart containers (it has happen in Dec 2019)
         network_mode: "none",
         volumes: params.restartDnpVolumes,
+        // The entrypoint property in the docker-compose overwrites
+        // both the CMD [ ] and ENTRYPOINT [ ] directive in the Dockerfile
         entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`
       }
     }
@@ -126,17 +121,16 @@ exit $UPEXIT
   validate.path(composeRestartPath);
   writeComposeObj(composeRestartPath, composeRestart);
 
-  // [NOTE1]: Attach to the restart container so it is a child process of the this command
-  // If the restart container cannot recreate the DAPPMANAGER the error will be caught
-  // This shell command should only resolve with an error. Otherwise, on success the container
-  // will be removed and this process killed.
-  //
-  // [NOTE2]: Allow to customize the restart extra opts with a parameter that comes from
-  // the new DAPPMANAGER / CORE manifest, as an extra safety measure
-
   try {
     if (packagesData) db.coreUpdatePackagesData.set(packagesData);
 
+    // [NOTE1]: Attach to the restart container so it is a child process of the this command
+    // If the restart container cannot recreate the DAPPMANAGER the error will be caught
+    // This shell command should only resolve with an error. Otherwise, on success the container
+    // will be removed and this process killed.
+    //
+    // [NOTE2]: Allow to customize the restart launch command with a parameter that comes from
+    // the new DAPPMANAGER / CORE manifest, as an extra safety measure
     await shell(
       restartLaunchCommand ||
         `docker-compose -f ${composeRestartPath} up --force-recreate <&-`
@@ -156,7 +150,7 @@ exit $UPEXIT
  */
 export async function postRestartPatch(): Promise<void> {
   try {
-    await waitForRestartPatchToFinish();
+    await waitForRestartPatchToFinish({ timeout: 60 * 1000 });
     const restart = await containerInspect(params.restartContainerName);
     try {
       await logRestartPatchStatus(restart);
@@ -217,16 +211,17 @@ ${restartLogsIndented}
 /**
  * Await for the restart patch container to be removed or exited
  */
-async function waitForRestartPatchToFinish(): Promise<
-  Dockerode.ContainerInspectInfo
-> {
+async function waitForRestartPatchToFinish({
+  timeout
+}: {
+  timeout: number;
+}): Promise<void> {
   const start = Date.now();
-  while (Date.now() - start < maxRestartContainerWait) {
+  while (Date.now() - start < timeout) {
     const restart = await containerInspect(restartContainerName);
-    if (!restart.State.Running) return restart;
+    if (!restart.State.Running) return;
     await pause(2 * 1000);
   }
-  throw Error(`Wait for restart patch to finish timeout`);
 }
 
 /* eslint-enable @typescript-eslint/camelcase */
