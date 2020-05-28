@@ -24,7 +24,7 @@ const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000;
  * All code is sequential, to not perform more than one update at once.
  * One of the update might be the core and crash the other updates.
  */
-async function autoUpdates(): Promise<void> {
+async function checkAutoUpdates(): Promise<void> {
   try {
     const releaseFetcher = new ReleaseFetcher();
     // Make sure the eth client provider is available before checking each package
@@ -57,15 +57,8 @@ async function autoUpdates(): Promise<void> {
   }
 
   // Trigger the interval loop with setTimeouts to prevent double execution
-  setTimeout(autoUpdates, monitoringInterval);
+  setTimeout(checkAutoUpdates, monitoringInterval);
 }
-
-autoUpdates();
-
-eventBus.packagesModified.on(({ ids, removed }) => {
-  if (removed) ids.forEach(clearPendingUpdates);
-  ids.forEach(clearRegistry);
-});
 
 /**
  * If the DAPPMANAGER is updated the pending state will never be updated to
@@ -81,6 +74,17 @@ async function checkForCompletedCoreUpdates(): Promise<void> {
   }
 }
 
-checkForCompletedCoreUpdates();
+/**
+ * Auto updates watcher.
+ * If there are new package versions available installs them
+ */
+export default function runWatcher(): void {
+  checkForCompletedCoreUpdates();
 
-export default autoUpdates;
+  checkAutoUpdates();
+
+  eventBus.packagesModified.on(({ ids, removed }) => {
+    if (removed) ids.forEach(clearPendingUpdates);
+    ids.forEach(clearRegistry);
+  });
+}

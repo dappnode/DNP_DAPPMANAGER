@@ -62,17 +62,6 @@ async function checkChainWatchers(): Promise<void> {
   }
 }
 
-checkChainWatchers();
-// Call checkChainWatchers() again in case there was a race condition
-// during the DAppNode installation
-setTimeout(() => {
-  checkChainWatchers();
-}, checkChainWatcherInterval);
-
-eventBus.packagesModified.on(() => {
-  checkChainWatchers();
-});
-
 /**
  * GET CHAIN DATA
  * ==============
@@ -127,20 +116,30 @@ function parseChainErrors(error: Error): string {
   return error.message;
 }
 
-// When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL
-// to the current time + 5 minutes. During that time, emitChain data every 5 seconds
-setInterval(async () => {
-  if (params.CHAIN_DATA_UNTIL > Date.now()) getAndEmitChainData();
-}, emitChainDataWatcherInterval);
+/**
+ * Chains watcher.
+ * Checks which chains are installed and queries their status (syncing + block height)
+ */
+export default function runWatcher() {
+  checkChainWatchers();
+  // Call checkChainWatchers() again in case there was a race condition
+  // during the DAppNode installation
+  setTimeout(() => {
+    checkChainWatchers();
+  }, checkChainWatcherInterval);
 
-// Also get and emit chain data immediately after the UI has requested it
-eventBus.requestChainData.on(() => {
-  getAndEmitChainData();
-});
+  eventBus.packagesModified.on(() => {
+    checkChainWatchers();
+  });
 
-// Don't start new requests if the previous one is still active.
-// If it is still active return the last result.
-// The current ADMIN UI requires a full array of chain data
+  // When an ADMIN UI is connected it will set params.CHAIN_DATA_UNTIL
+  // to the current time + 5 minutes. During that time, emitChain data every 5 seconds
+  setInterval(async () => {
+    if (params.CHAIN_DATA_UNTIL > Date.now()) getAndEmitChainData();
+  }, emitChainDataWatcherInterval);
 
-// To force this file to be a es6 module and scope variables properly
-export {};
+  // Also get and emit chain data immediately after the UI has requested it
+  eventBus.requestChainData.on(() => {
+    getAndEmitChainData();
+  });
+}

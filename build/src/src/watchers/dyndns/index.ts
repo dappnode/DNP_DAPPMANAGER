@@ -89,10 +89,13 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
   }
 }
 
-setInterval(() => {
-  checkIpAndUpdateIfNecessary();
-}, dyndnsInterval);
+/**
+ * Dyndns watcher.
+ */
+export default function runWatcher(): void {
+  setInterval(() => {
+    checkIpAndUpdateIfNecessary();
+  }, dyndnsInterval);
 
-eventBus.initializedDb.on(checkIpAndUpdateIfNecessary);
-
-export default checkIpAndUpdateIfNecessary;
+  eventBus.initializedDb.on(checkIpAndUpdateIfNecessary);
+}

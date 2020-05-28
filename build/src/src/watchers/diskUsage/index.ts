@@ -134,8 +134,12 @@ async function monitorDiskUsage(): Promise<void> {
   }
 }
 
-setInterval(() => {
-  monitorDiskUsage();
-}, monitoringInterval);
-
-export default monitorDiskUsage;
+/**
+ * Disk usage watcher.
+ * Prevents disk usage from getting full by stopping non-essential packages
+ */
+export default function runWatcher(): void {
+  setInterval(() => {
+    monitorDiskUsage();
+  }, monitoringInterval);
+}
