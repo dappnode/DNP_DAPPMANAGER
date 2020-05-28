@@ -115,13 +115,17 @@ async function natRenewal(): Promise<void> {
 
 const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
 
-throttledNatRenewal();
-setInterval(() => {
+/**
+ * NAT renewal watcher.
+ * Makes sure all necessary ports are mapped using UPNP
+ */
+export default function runWatcher(): void {
   throttledNatRenewal();
-}, natRenewalInterval);
+  setInterval(() => {
+    throttledNatRenewal();
+  }, natRenewalInterval);
 
-eventBus.runNatRenewal.on(() => {
-  throttledNatRenewal();
-});
-
-export default throttledNatRenewal;
+  eventBus.runNatRenewal.on(() => {
+    throttledNatRenewal();
+  });
+}

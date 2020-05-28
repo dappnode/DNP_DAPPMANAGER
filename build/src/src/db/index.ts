@@ -23,7 +23,7 @@ import { isEmpty } from "lodash";
 /**
  * Migrate keys to the new DB
  */
-function migrateToNewMainDb(): void {
+export function migrateToNewMainDb(): void {
   // AUTO_UPDATE_SETTINGS
   // Migrate ONLY if there are settings in the old DB
   const autoUpdateSettingsValue = lowLevelCacheDb.get(AUTO_UPDATE_SETTINGS);
@@ -34,15 +34,9 @@ function migrateToNewMainDb(): void {
 }
 
 /**
- * Alias
+ * Alias, General methods
  */
-const clearCache = lowLevelCacheDb.clearDb;
+export const clearCache = lowLevelCacheDb.clearDb;
 
-export {
-  // Aditional low levels methods
-  lowLevelMainDb,
-  lowLevelCacheDb,
-  // General methods
-  clearCache,
-  migrateToNewMainDb
-};
+// Aditional low levels methods
+export { lowLevelMainDb, lowLevelCacheDb };
