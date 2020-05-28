@@ -12,7 +12,7 @@ const logs = Logs(module);
 export async function downloadImages(
   packagesData: InstallPackageData[],
   log: Log
-) {
+): Promise<void> {
   await Promise.all(
     packagesData.map(async function(pkg) {
       const { name, semVersion, isCore, imageFile, imagePath } = pkg;

@@ -8,7 +8,7 @@ import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
 import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
-import { postCoreUpdate } from "./modules/installer/postCoreUpdate";
+import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
@@ -113,4 +113,6 @@ copyHostScripts().catch(e =>
   logs.error(`Error copying host scripts: ${e.stack}`)
 );
 
-postCoreUpdate().catch(e => logs.error(`Error on postCoreUpdate: ${e.stack}`));
+postRestartPatch().catch(e =>
+  logs.error(`Error on postRestartPatch: ${e.stack}`)
+);

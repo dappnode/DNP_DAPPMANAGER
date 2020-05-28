@@ -6,11 +6,7 @@ import { getLogUi, logUiClear } from "../utils/logUi";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import { stringify } from "../utils/objects";
 import { ReleaseFetcher } from "../modules/release";
-import {
-  UserSettingsAllDnps,
-  InstallPackageData,
-  PackageRequest
-} from "../types";
+import { UserSettingsAllDnps, PackageRequest } from "../types";
 import {
   downloadImages,
   loadImages,
@@ -102,7 +98,7 @@ export async function installPackage({
       await downloadImages(packagesData, log);
       await loadImages(packagesData, log);
 
-      await createVolumeDevicePaths(packagesData.map(({ compose }) => compose));
+      await createVolumeDevicePaths(packagesData);
       await writeAndValidateFiles(packagesData, log);
 
       try {

@@ -1,7 +1,7 @@
 import fs from "fs";
 import params from "../params";
 import * as getPath from "../utils/getPath";
-import { restartDappmanagerPatch } from "../modules/docker/restartPatch";
+import { restartDappmanagerPatch } from "../modules/installer/restartPatch";
 import { dockerComposeRm } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import * as eventBus from "../eventBus";

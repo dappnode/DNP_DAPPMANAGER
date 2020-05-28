@@ -16,7 +16,7 @@ import { dockerComposeConfig } from "../docker/dockerCommands";
 export async function writeAndValidateFiles(
   packagesData: InstallPackageData[],
   log: Log
-) {
+): Promise<void> {
   for (const {
     name,
     compose,
@@ -32,14 +32,25 @@ export async function writeAndValidateFiles(
     validate.path(composePath);
 
     // Backup compose to be able to do a rollback. Only if compose exists
-    if (fs.existsSync(composePath))
-      fs.copyFileSync(composePath, composeBackupPath);
+    copyIfExists(composePath, composeBackupPath);
     writeComposeObj(composePath, compose);
     await dockerComposeConfig(composePath);
 
     // Backup manifest to be able to do a rollback. Only if manifest exists
-    if (fs.existsSync(manifestPath))
-      fs.copyFileSync(manifestPath, manifestBackupPath);
+    copyIfExists(manifestPath, manifestBackupPath);
     writeManifest(manifestPath, metadata);
+  }
+}
+
+/**
+ * Util: Copy file and ignore if src does not exist
+ * @param src
+ * @param dest
+ */
+function copyIfExists(src: string, dest: string): void {
+  try {
+    fs.copyFileSync(src, dest);
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
   }
 }

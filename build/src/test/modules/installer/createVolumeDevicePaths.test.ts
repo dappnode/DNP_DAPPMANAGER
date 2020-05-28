@@ -10,7 +10,7 @@ describe("Module > installer > createVolumeDevicePaths", () => {
       "/mnt/volume_ams3_01/dappnode-volumes/raiden.dnp.dappnode.eth/data";
 
     /* eslint-disable @typescript-eslint/camelcase */
-    const sampleCompose: Compose = {
+    const compose: Compose = {
       version: "3.4",
       services: {
         "raiden.dnp.dappnode.eth": {
@@ -36,6 +36,6 @@ describe("Module > installer > createVolumeDevicePaths", () => {
     };
     /* eslint-enable @typescript-eslint/camelcase */
 
-    expect(getVolumeDevicePaths([sampleCompose])).to.deep.equal([devicePath]);
+    expect(getVolumeDevicePaths([{ compose }])).to.deep.equal([devicePath]);
   });
 });

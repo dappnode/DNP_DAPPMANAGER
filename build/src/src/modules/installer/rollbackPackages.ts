@@ -1,15 +1,11 @@
 import fs from "fs";
 import params from "../../params";
-// Modules
 import { dockerComposeRm } from "../docker/dockerCommands";
 import { dockerComposeUpSafe } from "../docker/dockerSafe";
-// Utils
 import { Log } from "../../utils/logUi";
 import { InstallPackageDataPaths } from "../../types";
 import Logs from "../../logs";
 const logs = Logs(module);
-
-const dappmanagerId = params.dappmanagerDnpName;
 
 /**
  * [Rollback] Stop all new packages with the new compose
@@ -20,7 +16,7 @@ const dappmanagerId = params.dappmanagerDnpName;
 export async function rollbackPackages(
   packagesData: InstallPackageDataPaths[],
   log: Log
-) {
+): Promise<void> {
   // Restore all backup composes. Do it first to make sure the next version compose is not
   // used unintentionally if the installed package is restored
   for (const {
@@ -36,7 +32,9 @@ export async function rollbackPackages(
       { from: manifestBackupPath, to: manifestPath }
     ])
       try {
+        // Don't use rename as it fails if paths are in different file systems (docker volume / docker container)
         fs.copyFileSync(from, to);
+        fs.unlinkSync(from);
       } catch (e) {
         if (e.code !== "ENOENT" || isUpdate)
           logs.error(`Rollback error restoring ${name} ${from}: ${e.stack}`);
@@ -55,7 +53,7 @@ export async function rollbackPackages(
     try {
       log(name, "Aborting and rolling back...");
 
-      if (name === dappmanagerId) {
+      if (name === params.dappmanagerDnpName) {
         // The DAPPMANAGER cannot be rolled back here. If the restartPatch has already
         // stopped the original container this line will never be reached. If the
         // restartPatch failed before stopping the original container there's no need

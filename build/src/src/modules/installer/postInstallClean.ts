@@ -15,7 +15,7 @@ const logs = Logs(module);
 export async function postInstallClean(
   packagesData: InstallPackageDataPaths[],
   log: Log
-) {
+): Promise<void> {
   for (const {
     name,
     semVersion,
@@ -29,9 +29,9 @@ export async function postInstallClean(
     // IMPORTANT! Do this step AFTER the try/catch otherwise the rollback
     // will not work, as the compose.next.yml is the same as compose.yml
     log(name, "Cleaning files...");
-    fs.unlinkSync(imagePath);
-    fs.unlinkSync(composeBackupPath);
-    fs.unlinkSync(manifestBackupPath);
+    unlinkIfExists(imagePath);
+    unlinkIfExists(composeBackupPath);
+    unlinkIfExists(manifestBackupPath);
 
     log(name, "Cleaning previous images...");
     try {
@@ -39,5 +39,17 @@ export async function postInstallClean(
     } catch (e) {
       logs.warn(`Error cleaning images: ${e.message}`);
     }
+  }
+}
+
+/**
+ * Util: Remove file but ignore errors if it does not exist
+ * @param path
+ */
+function unlinkIfExists(path: string): void {
+  try {
+    fs.unlinkSync(path);
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
   }
 }

@@ -8,7 +8,10 @@ import { dockerLoad } from "../docker/dockerCommands";
  * If a dependency fails, some future version of another DNP could be loaded
  * creating wierd bugs with unstable versions
  */
-export async function loadImages(packagesData: InstallPackageData[], log: Log) {
+export async function loadImages(
+  packagesData: InstallPackageData[],
+  log: Log
+): Promise<void> {
   await Promise.all(
     packagesData.map(async function({ name, imagePath }) {
       log(name, "Loading image...");

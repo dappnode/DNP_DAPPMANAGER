@@ -29,12 +29,16 @@ import {
   // Utils
   getLastRegistryEntry
 } from "../../src/utils/autoUpdateHelper";
-import { clearDbs } from "../testUtils";
+import { clearDbs, createTestDir } from "../testUtils";
 
 const name = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
-  beforeEach("Make sure the autosettings are restarted", () => {
+  before(async () => {
+    await createTestDir();
+  });
+
+  beforeEach("Make sure the autosettings are restarted", async () => {
     clearDbs();
     expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });

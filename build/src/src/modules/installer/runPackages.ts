@@ -1,6 +1,5 @@
 import path from "path";
 import params from "../../params";
-import * as db from "../../db";
 import { dockerComposeUpSafe } from "../docker/dockerSafe";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
@@ -9,8 +8,6 @@ import { InstallPackageData } from "../../types";
 import Logs from "../../logs";
 const logs = Logs(module);
 
-const dappmanagerId = params.dappmanagerDnpName;
-
 /**
  * Create and run each package container in series
  * The order is extremely important and should be guaranteed by `orderInstallPackages`
@@ -18,12 +15,11 @@ const dappmanagerId = params.dappmanagerDnpName;
 export async function runPackages(
   packagesData: InstallPackageData[],
   log: Log
-) {
+): Promise<void> {
   for (const { name, composePath, fileUploads, ...pkg } of packagesData) {
     // patch to prevent installer from crashing
-    if (name == dappmanagerId) {
+    if (name == params.dappmanagerDnpName) {
       log(name, "Reseting DAppNode... ");
-      db.coreUpdatePackagesData.set(packagesData);
       await restartDappmanagerPatch({
         composePath,
         composeBackupPath: pkg.composeBackupPath,

@@ -1,4 +1,3 @@
-import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
 import merge from "deepmerge";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
@@ -9,6 +8,7 @@ import {
 import { fileToMultiaddress } from "../../utils/distributedFile";
 import orderInstallPackages from "./orderInstallPackages";
 import { UserSettingsAllDnps } from "../../common/types";
+import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
 
 export function getInstallerPackagesData({
   releases,

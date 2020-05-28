@@ -63,7 +63,7 @@ describe("Test a container restarting itself", function() {
   });
 
   beforeEach(`Pull dindComposeImage ${dindComposeImage}`, async () => {
-    await shell(`docker pull ${dindComposeImage}`);
+    await runUntilExited(`docker pull ${dindComposeImage}`, "pull");
   });
 
   beforeEach(`Clean containers`, async () => {
@@ -86,11 +86,13 @@ docker-compose -f ${inContainer(nextComposeName)} up -d -t 0
 UPEXIT=$?
 if [ $UPEXIT -ne 0 ]
 then
-    echo "${mainContainerName} up failed, starting backup"
+    echo "${mainContainerName} up failed with exit $UPEXIT, starting backup"
     if [ "$(docker ps -aq -f status=running -f name=${mainContainerName})" ]
     then
+        echo "${mainContainerName} is still running"
         docker-compose -f ${inContainer(prevComposeName)} up -d -t 0
     else
+        echo "${mainContainerName} is not running, using --force-recreate"
         docker-compose -f ${inContainer(
           prevComposeName
         )} up -d -t 0 --force-recreate

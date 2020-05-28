@@ -3,7 +3,6 @@ import path from "path";
 import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
 import * as db from "../../db";
-import { listContainer, listContainerNoThrow } from "../docker/listContainers";
 import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
 import params from "../../params";
@@ -23,6 +22,7 @@ const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
 const restartContainerName = params.restartContainerName;
 const restartScriptPath = path.join(params.DNCORE_DIR, "restart-dappnode.sh");
+const timeoutWaitForRestart = 60 * 1000;
 
 /* eslint-disable @typescript-eslint/camelcase */
 
@@ -49,9 +49,6 @@ export async function restartDappmanagerPatch({
   restartLaunchCommand?: string;
   packagesData?: InstallPackageData[];
 }): Promise<void> {
-  const dnp = await listContainer(dappmanagerName);
-  const imageName = dnp.image;
-
   const composeRestartPath = getPath.dockerCompose(restartId, true);
   if (!composeBackupPath) composeBackupPath = getPath.backupPath(composePath);
 
@@ -61,10 +58,13 @@ export async function restartDappmanagerPatch({
   // but if something went wrong it will unlock the situation by killing a frozen restart container
   // If it's exited it will be removed beforehand
   try {
-    await waitForRestartPatchToFinish({ timeout: 60 * 1000 });
-    // Returns null if container is not found, then do nothing
-    const restart = await listContainerNoThrow(restartContainerName);
-    if (restart && restart.running) await dockerRm(params.restartContainerName);
+    const restart = await waitForRestartPatchToFinish();
+    // Restart is defined if the container exists even if exited
+    // Remove it to make sure that the exit signal after running the restart patch is for this run
+    if (restart) {
+      await logRestartPatchStatus(restart);
+      await dockerRm(restart.Id);
+    }
   } catch (e) {
     // Since removing restart is non-essential, don't block a core update, just log
     logs.error(`Error removing ${restartContainerName}: ${e.stack}`);
@@ -80,18 +80,21 @@ export async function restartDappmanagerPatch({
    * - If the first docker-compose up fails at the start stage, and the original container
    *   is left renamed to `${shortId}_${name}`. To correct the name, the container is
    *   force recreated.
+   * [NOTE]: This script MUST exit with code > 0 for postRestartPatch() to know when to rollback
    */
   const restartScript = `
 docker-compose -f ${composePath} up -d --force-recreate
 UPEXIT=$?
 if [ $UPEXIT -ne 0 ]
 then
-    echo "${dappmanagerName} up failed, starting backup"
+    echo "${dappmanagerName} up failed with exit $UPEXIT, starting backup"
     if [ "$(docker ps -aq -f status=running -f name=${dappmanagerName})" ]
     then
-        docker-compose -f ${composeBackupPath} up -d -t 0
+        echo "${dappmanagerName} is still running"
+        docker-compose -f ${composeBackupPath} up -d
     else
-        docker-compose -f ${composeBackupPath} up -d -t 0 --force-recreate
+        echo "${dappmanagerName} is not running, using --force-recreate"
+        docker-compose -f ${composeBackupPath} up -d --force-recreate
     fi
 fi
 exit $UPEXIT
@@ -105,7 +108,7 @@ exit $UPEXIT
     version: "3.4",
     services: {
       [restartId]: {
-        image: dappmanagerService.image || imageName,
+        image: dappmanagerService.image,
         container_name: restartContainerName,
         // Using `network_mode: none` to prevent creating a useless
         // network that may conflict with future restart containers (it has happen in Dec 2019)
@@ -144,19 +147,15 @@ exit $UPEXIT
 }
 
 /**
- * Completes a core update migration by making sure all steps are completed
- * - Move .next.yml files to .yml
- * - Up DAPPMANAGER if it's version is equal to the compose
+ * Completes a core update / restart if necessary
+ * The restart container MUST exit with code > 0 if there was an error
+ * Its exit code is the indicator to trigger a rollback in this function
  */
 export async function postRestartPatch(): Promise<void> {
-  try {
-    await waitForRestartPatchToFinish({ timeout: 60 * 1000 });
-    const restart = await containerInspect(params.restartContainerName);
-    try {
-      await logRestartPatchStatus(restart);
-    } catch (e) {
-      logs.error(`Error reporting restart patch status: ${e.stack}`);
-    }
+  const restart = await waitForRestartPatchToFinish();
+
+  if (restart) {
+    await logRestartPatchStatus(restart);
 
     const packagesData = db.coreUpdatePackagesData.get();
     const log = getLogUi(params.coreDnpName);
@@ -175,14 +174,8 @@ export async function postRestartPatch(): Promise<void> {
     db.coreUpdatePackagesData.set(null);
     // Remove restart patch container
     await dockerRm(params.restartContainerName);
-  } catch (e) {
-    if (e.message.includes("No such container")) {
-      // Restart container does no exist, the dappmanager has not been restarted
-      // by the restartPatch, do nothing
-      return;
-    } else {
-      throw e;
-    }
+  } else {
+    logs.info(`No restart patch found, assuming a manual restart`);
   }
 }
 
@@ -191,36 +184,51 @@ export async function postRestartPatch(): Promise<void> {
  * Non-essential, so wrap in try catch to not prevent a rollback
  * @param restart
  */
-async function logRestartPatchStatus(restart: Dockerode.ContainerInspectInfo) {
-  const finishTime = new Date(restart.State.FinishedAt);
-  const finishSecAgo = (Date.now() - finishTime.getTime()) / 1000;
-  const restartLogs = await logContainer(restartContainerName);
-  const restartLogsIndented = restartLogs
-    .split("\n")
-    .map(line => "\t" + line)
-    .join("\n");
-  logs.info(`Restart patch status:
+async function logRestartPatchStatus(
+  restart: Dockerode.ContainerInspectInfo
+): Promise<void> {
+  try {
+    if (!restart) {
+      logs.info(`No restart patch found, assuming a manual restart`);
+      return;
+    }
+
+    const finishTime = new Date(restart.State.FinishedAt);
+    const finishSecAgo = (Date.now() - finishTime.getTime()) / 1000;
+    const restartLogs = await logContainer(restartContainerName);
+    const restartLogsIndented = restartLogs
+      .split("\n")
+      .map(line => "\t" + line)
+      .join("\n");
+    logs.info(`Restart patch status:
   Finished: ${finishTime.toISOString()}, ${finishSecAgo} seconds ago
-  ExitCode: ${restart.State.ExitCode}
-  Error: ${restart.State.Error}
+  ExitCode: ${restart.State.ExitCode} ${restart.State.Error}
   Logs: 
 ${restartLogsIndented}
 `);
+  } catch (e) {
+    logs.error(`Error reporting restart patch status: ${e.stack}`);
+  }
 }
 
 /**
  * Await for the restart patch container to be removed or exited
  */
-async function waitForRestartPatchToFinish({
-  timeout
-}: {
-  timeout: number;
-}): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeout) {
-    const restart = await containerInspect(restartContainerName);
-    if (!restart.State.Running) return;
-    await pause(2 * 1000);
+async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspectInfo | null> {
+  try {
+    let restart = await containerInspect(restartContainerName);
+    const start = Date.now();
+    while (
+      Date.now() - start < timeoutWaitForRestart &&
+      restart.State.Running
+    ) {
+      restart = await containerInspect(restartContainerName);
+      await pause(1000);
+    }
+    return restart;
+  } catch (e) {
+    if (e.statusCode === 404 || e.reason === "no such container") return null;
+    else throw e;
   }
 }
 
