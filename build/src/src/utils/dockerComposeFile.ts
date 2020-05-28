@@ -72,7 +72,7 @@ export function writeComposeObj(
     }
   };
 
-  const composeString = yaml.safeDump(cleanCompose);
+  const composeString = yaml.safeDump(cleanCompose, { indent: 2 });
   fs.writeFileSync(dockerComposePath, composeString, "utf-8");
 }
 

@@ -108,8 +108,8 @@ export async function fetchDnpRequest({
     }));
 
     // Add dependencies' metadata
-    for (const [depName, release] of Object.entries(releases))
-      if (depName !== name) await addReleaseToSettings(release);
+    for (const release of releases)
+      if (release.name !== name) await addReleaseToSettings(release);
   } catch (e) {
     compatibleError = e.message;
   }

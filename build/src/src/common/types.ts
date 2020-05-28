@@ -365,6 +365,7 @@ interface ComposeServiceBase {
   devices?: string[];
   network_mode?: string;
   command?: string;
+  entrypoint?: string;
   // Logging
   logging?: {
     driver?: string;
@@ -683,12 +684,26 @@ export interface PackageRelease {
   isCore: boolean;
 }
 
+export type InstallPackageDataPaths = Pick<
+  InstallPackageData,
+  | "name"
+  | "semVersion"
+  | "composePath"
+  | "composeBackupPath"
+  | "manifestPath"
+  | "manifestBackupPath"
+  | "imagePath"
+  | "isUpdate"
+>;
+
 export interface InstallPackageData extends PackageRelease {
+  isUpdate: boolean;
   // Paths
   imagePath: string;
   composePath: string;
-  composeNextPath: string;
+  composeBackupPath: string;
   manifestPath: string;
+  manifestBackupPath: string;
   // Data to write
   compose: Compose;
   // User settings to be applied after running
@@ -704,7 +719,12 @@ export interface PackageReleaseMetadata {
   type?: string;
   chain?: string;
   dependencies?: Dependencies;
+
+  // Safety properties to solve problematic updates
   runOrder?: string[];
+  restartCommand?: string;
+  restartLaunchCommand?: string;
+
   requirements?: {
     minimumDappnodeVersion: string;
   };

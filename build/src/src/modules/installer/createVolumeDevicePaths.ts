@@ -10,10 +10,10 @@ const logs = Logs(module);
  * If the full path declared in the compose in not already created
  * docker will throw an error
  */
-export default async function createCustomVolumeDevicePaths(
-  composeArray: Compose[]
+export default async function createVolumeDevicePaths(
+  composeArray: { compose: Compose }[]
 ): Promise<void> {
-  const volumePaths = getCustomVolumeDevicePaths(composeArray);
+  const volumePaths = getVolumeDevicePaths(composeArray);
 
   if (!volumePaths.length) return;
 
@@ -37,9 +37,11 @@ export default async function createCustomVolumeDevicePaths(
  * Gets an array of devicePaths used in a Compose
  * [NOTE]: This pure function is abstracted for testability
  */
-export function getCustomVolumeDevicePaths(composeArray: Compose[]): string[] {
+export function getVolumeDevicePaths(
+  composeArray: { compose: Compose }[]
+): string[] {
   const volumePaths: string[] = [];
-  for (const compose of composeArray)
+  for (const { compose } of composeArray)
     for (const volObj of Object.values(compose.volumes || []))
       if (
         typeof volObj === "object" &&

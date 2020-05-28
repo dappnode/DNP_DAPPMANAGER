@@ -38,7 +38,7 @@ export async function getCoreUpdateData(
     ver: coreVersion
   });
 
-  if (isEmpty(releases)) {
+  if (releases.length === 0) {
     return {
       available: false,
       type: undefined,
@@ -56,23 +56,23 @@ export async function getCoreUpdateData(
    * Ignore it to compute the update type
    */
   const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
-  const coreDnpsToBeInstalled = !coreDnp ? omit(releases, coreName) : releases;
-
-  const packages = Object.entries(coreDnpsToBeInstalled).map(
-    ([depName, release]) => {
-      const dnp = dnpList.find(_dnp => _dnp.name === depName);
-      const { metadata: depManifest } = release;
-      return {
-        name: depName,
-        from: dnp ? dnp.version : undefined,
-        to: depManifest.version,
-        warningOnInstall:
-          depManifest.warnings && depManifest.warnings.onInstall
-            ? depManifest.warnings.onInstall
-            : undefined
-      };
-    }
+  const coreDnpsToBeInstalled = releases.filter(
+    ({ name }) => coreDnp || name !== coreName
   );
+
+  const packages = coreDnpsToBeInstalled.map(release => {
+    const dnp = dnpList.find(_dnp => _dnp.name === release.name);
+    const { metadata: depManifest } = release;
+    return {
+      name: release.name,
+      from: dnp ? dnp.version : undefined,
+      to: depManifest.version,
+      warningOnInstall:
+        depManifest.warnings && depManifest.warnings.onInstall
+          ? depManifest.warnings.onInstall
+          : undefined
+    };
+  });
 
   /**
    * If there's no from version, it should be the max jump from "0.0.0",
@@ -94,7 +94,7 @@ export async function getCoreUpdateData(
    * Compute updateAlerts
    */
   const coreRelease =
-    releases[coreName] ||
+    releases.find(({ name }) => name === coreName) ||
     (await releaseFetcher.getRelease(coreName, coreVersion));
   const { metadata: coreManifest } = coreRelease;
   const dnpCore = dnpList.find(dnp => dnp.name === coreName);
@@ -116,7 +116,7 @@ export async function getCoreUpdateData(
   );
 
   return {
-    available: Boolean(Object.keys(coreDnpsToBeInstalled).length),
+    available: coreDnpsToBeInstalled.length > 0,
     type,
     packages,
     changelog: coreManifest.changelog || "",

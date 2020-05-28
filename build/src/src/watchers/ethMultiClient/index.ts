@@ -9,7 +9,6 @@ import {
   EthClientInstallStatus,
   serializeError
 } from "../../modules/ethClient/types";
-import { packageIsInstalling } from "../../utils/packageIsInstalling";
 import Logs from "../../logs";
 import { EthClientTarget } from "../../types";
 import {
@@ -57,16 +56,9 @@ export async function runEthClientInstaller(
 
     switch (status) {
       case "INSTALLING":
-        // This status has to be verified
-        // otherwise it can stay in installing state forever if the dappmanager
-        // resets during an installation of the client
-        if (packageIsInstalling(name)) {
-          // OK: client still installing
-          return null;
-        } else {
-          // Trigger another install
-          return { status: "TO_INSTALL" };
-        }
+        // NOTE: This status has to be verified on DAPPMANAGER startup. Otherwise it can
+        // stay in installing state forever if the dappmanager resets during the installation
+        return null;
 
       case "TO_INSTALL":
       case "INSTALLING_ERROR":
@@ -127,6 +119,21 @@ export async function runEthClientInstaller(
 }
 
 /**
+ * Reset status if == INSTALLING, it has to be verified
+ * Otherwise it can stay in installing state forever if the dappmanager
+ * resets during an installation of the client
+ */
+function verifyInitialStatusIsNotInstalling() {
+  const target = db.ethClientTarget.get();
+  if (target) {
+    const status = db.ethClientInstallStatus.get(target);
+    if (status && status.status === "INSTALLING") {
+      db.ethClientInstallStatus.set(target, { status: "TO_INSTALL" });
+    }
+  }
+}
+
+/**
  * Eth multi-client watcher. Handles ETH client switching logic
  * Must run:
  * - every interval
@@ -134,6 +141,8 @@ export async function runEthClientInstaller(
  * - after completing a run if the status has changed
  */
 export default function runWatcher(): void {
+  verifyInitialStatusIsNotInstalling();
+
   // Subscribe with a throttle to run only one time at once
   eventBus.runEthClientInstaller.on(
     runOnlyOneSequentially(async () => {

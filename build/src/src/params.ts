@@ -101,6 +101,10 @@ const params = {
   wifiDnpName: "wifi.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
+  restartDnpVolumes: [
+    "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
+    "/var/run/docker.sock:/var/run/docker.sock"
+  ],
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",

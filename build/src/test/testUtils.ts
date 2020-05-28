@@ -225,8 +225,10 @@ export const mockRelease: PackageRelease = {
 
 export const mockPackageData: InstallPackageData = {
   ...mockRelease,
+  isUpdate: true,
   imagePath: "mock/path/image",
   composePath: "mock/path/compose",
-  composeNextPath: "mock/path/compose.next",
-  manifestPath: "mock/path/manifest"
+  composeBackupPath: "mock/path/compose.backup.yml",
+  manifestPath: "mock/path/manifest.json",
+  manifestBackupPath: "mock/path/manifest.backup.json"
 };

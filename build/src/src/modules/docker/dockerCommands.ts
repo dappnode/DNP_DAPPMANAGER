@@ -1,6 +1,7 @@
 import semver from "semver";
 import { DockerOptionsInterface } from "../../types";
 import shell from "./shell";
+import { imagesList, imageRemove } from "./dockerApi";
 
 /* eslint-disable no-useless-escape */
 export interface DockerComposeUpOptions {
@@ -86,12 +87,21 @@ export async function dockerCleanOldImages(
   name: string,
   version: string
 ): Promise<void> {
-  const currentImgs = await dockerImages();
-  const oldImages = (currentImgs || "").split(/\r|\n/).filter((p: string) => {
-    const [pName, pVer] = p.split(":");
-    return pName === name && semver.valid(pVer) && pVer !== version;
-  });
-  if (oldImages.length > 0) await dockerRmi(oldImages);
+  const repoImages = await imagesList({ filters: { reference: [name] } });
+  const imagesToDelete = repoImages.filter(image =>
+    image.RepoTags.every(tag => {
+      const [imageName, imageVersion] = tag.split(":");
+      return (
+        imageName === name &&
+        semver.valid(imageVersion) &&
+        semver.valid(version) &&
+        semver.lt(imageVersion, version)
+      );
+    })
+  );
+  for (const image of imagesToDelete) {
+    await imageRemove(image.Id);
+  }
 }
 
 // File manager, copy command

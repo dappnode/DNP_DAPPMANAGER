@@ -40,17 +40,17 @@ describe("Util: get paths", function() {
     );
   });
 
-  describe("next path", () => {
+  describe("backup path", () => {
     const nextPaths = {
-      "docker-compose.yml": "docker-compose.next.yml",
-      "DNCORE/docker-compose.yml": "DNCORE/docker-compose.next.yml",
+      "docker-compose.yml": "docker-compose.backup.yml",
+      "DNCORE/docker-compose.yml": "DNCORE/docker-compose.backup.yml",
       "/dnp_repo/my.dnp.dappnode.eth/docker-compose.yml":
-        "/dnp_repo/my.dnp.dappnode.eth/docker-compose.next.yml",
-      "dappnode_package.json": "dappnode_package.next.json"
+        "/dnp_repo/my.dnp.dappnode.eth/docker-compose.backup.yml",
+      "dappnode_package.json": "dappnode_package.backup.json"
     };
     for (const [from, next] of Object.entries(nextPaths))
       it(`Should return next path of ${from}`, () => {
-        expect(getPath.nextPath(from)).to.equal(next);
+        expect(getPath.backupPath(from)).to.equal(next);
       });
   });
 });

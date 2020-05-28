@@ -3,6 +3,8 @@ import { ProgressLog } from "../types";
 import Logs from "../logs";
 const logs = Logs(module);
 
+export type Log = (name: string, message: string) => void;
+
 /**
  * Some remote procedure calls (RPC) need a continuous update.
  * This function call be called at any point of the app and it
@@ -29,3 +31,12 @@ export function logUi(progressLog: ProgressLog): void {
 export function logUiClear({ id }: { id: string }): void {
   eventBus.logUi.emit({ id, name: "", message: "", clear: true });
 }
+
+/**
+ * Curried version of logUi to simplify code
+ * @param {string} id, overall log id (to bundle multiple logs)
+ */
+export const getLogUi = (id: string): Log => (
+  name: string,
+  message: string
+): void => logUi({ id, name, message });
