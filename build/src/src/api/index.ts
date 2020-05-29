@@ -11,7 +11,7 @@ import {
   subscriptionsFactory,
   parseWampError,
   registerRoutes
-} from "../common/transport/autobahn";
+} from "./legacy-autobahn";
 import {
   validateRoutesArgsFactory,
   validateSubscriptionsArgsFactory

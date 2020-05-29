@@ -1,5 +1,9 @@
 import express from "express";
 
+const allowAllIps = process.env.ALLOW_ALL_IPS;
+
+if (allowAllIps) console.log(`WARNING! ALLOWING ALL IPFS`);
+
 // Authorize by IP
 
 const authorizedIpPrefixes = [
@@ -18,7 +22,7 @@ export function isAuthorized(
 ) {
   const isIpAllowed = authorizedIpPrefixes.some(ip => req.ip.includes(ip));
 
-  if (isIpAllowed) {
+  if (isIpAllowed || allowAllIps) {
     next();
   } else {
     res.status(403).send(`Requires admin permission. Forbidden ip: ${req.ip}`);
