@@ -1,5 +1,7 @@
 import { mapValues, isObject } from "lodash";
 
+const secretKeyRegex = /(password|passphrase|secret|private)/i;
+
 // Generic object, requires use of any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericObject = { [key: string]: any };
@@ -24,14 +26,7 @@ export const trimBase64Values = applyRecursivelyToStrings(
 );
 
 export const hideSensitiveValues = applyRecursivelyToStrings((value, key) => {
-  const keyLowercase = key.toLowerCase();
-  if (
-    keyLowercase.includes("password") ||
-    keyLowercase.includes("secret") ||
-    keyLowercase.includes("private")
-  )
-    return "**********";
-  return value;
+  return secretKeyRegex.test(key) ? "**********" : value;
 });
 
 export function limitObjValuesSize<T extends GenericObject>(

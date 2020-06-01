@@ -58,18 +58,6 @@ class EmitToAdmin extends Transport {
 // Utilities to format
 
 /**
- * Format function to filter out unrelevant log properties
- * Note: format((info, opts) => ... )
- */
-const onlyUserAction = format(info => {
-  if (!info.userAction) return false;
-  const _info = Object.assign({}, info);
-  delete _info.userAction; // ES6 immutable object delete looks worse
-  delete _info.logMessage;
-  return _info;
-});
-
-/**
  * Transform the info object
  * 1. Any key in kwargs or the result that the name implies that contains
  *    sensitive data will be replace by ********
@@ -100,12 +88,7 @@ const logger = createLogger({
     }),
     new EmitToAdmin()
   ],
-  format: format.combine(
-    onlyUserAction(),
-    formatLogObject(),
-    format.timestamp(),
-    format.json()
-  )
+  format: format.combine(formatLogObject(), format.timestamp(), format.json())
 });
 
 export default logger;
