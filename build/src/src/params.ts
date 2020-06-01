@@ -57,6 +57,9 @@ const params = {
   ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
   HTTP_API_PORT: 3000,
 
+  // VPN API
+  vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
   DNP_NETWORK_EXTERNAL_NAME: "dncore_network",

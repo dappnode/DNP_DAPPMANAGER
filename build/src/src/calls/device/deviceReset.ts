@@ -1,4 +1,4 @@
-import { vpnWampCall } from "../../api";
+import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 
 /**
@@ -6,7 +6,7 @@ import * as eventBus from "../../eventBus";
  * @param id Device id name
  */
 export async function deviceReset({ id }: { id: string }): Promise<void> {
-  await vpnWampCall<void>("resetDevice", { id });
+  await vpnRpcCall<void>("resetDevice", { id });
 
   eventBus.requestDevices.emit();
 }

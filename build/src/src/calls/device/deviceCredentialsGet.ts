@@ -1,4 +1,4 @@
-import { vpnWampCall } from "../../api";
+import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
 import { VpnDeviceCredentials } from "../../types";
 
 /**
@@ -12,7 +12,7 @@ export async function deviceCredentialsGet({
 }: {
   id: string;
 }): Promise<VpnDeviceCredentials> {
-  return await vpnWampCall<VpnDeviceCredentials>("getDeviceCredentials", {
+  return await vpnRpcCall<VpnDeviceCredentials>("getDeviceCredentials", {
     id
   });
 }
