@@ -12,10 +12,9 @@ import {
   PortMapping,
   UserSettingsAllDnps,
   PackageContainer,
-  ManifestWithImage,
-  PortProtocol
+  ManifestWithImage
 } from "../../src/types";
-import { clearDbs, getTestMountpoint } from "../testUtils";
+import { clearDbs, getTestMountpoint, portProtocols } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
 import {
   stringifyPortMappings,
@@ -91,14 +90,14 @@ describe("DNP lifecycle", function() {
     one: {
       host: 1111,
       container: 1111,
-      protocol: "UDP" as PortProtocol,
+      protocol: portProtocols.UDP,
       newHost: 1111
     },
     // Change from a host port to a different
     two: {
       host: 2222,
       container: 2222,
-      protocol: "TCP" as PortProtocol,
+      protocol: portProtocols.TCP,
       newHost: 2220
     }
   });
@@ -114,14 +113,14 @@ describe("DNP lifecycle", function() {
     three: {
       host: undefined,
       container: 3333,
-      protocol: "UDP" as PortProtocol,
+      protocol: portProtocols.UDP,
       newHost: 3330
     },
     // Change from a defined host port to ephemeral
     four: {
       host: 4444,
       container: 4444,
-      protocol: "TCP" as PortProtocol,
+      protocol: portProtocols.TCP,
       newHost: ""
     }
   });

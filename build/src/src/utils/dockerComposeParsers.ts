@@ -135,7 +135,7 @@ export function parsePortMappings(portsArray: string[]): PortMapping[] {
     // Convert to appropiate types + Cast to a PortProtocol type
     const host = parseInt(hostString);
     const container = parseInt(containerString);
-    const protocol = protocolParsed as PortProtocol;
+    const protocol = protocolParsed;
 
     // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
     if (container) return { host, container, protocol };

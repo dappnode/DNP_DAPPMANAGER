@@ -1,8 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import { createTestDir, cleanTestDir, createDirP } from "../testUtils";
-import { PortProtocol } from "../../src/types";
+import {
+  createTestDir,
+  cleanTestDir,
+  createDirP,
+  portProtocols
+} from "../testUtils";
 
 import {
   mergePortMapping,
@@ -20,12 +24,12 @@ describe("Util: dockerComposeFile", () => {
     it("should merge a ports array into a docker-compose", async () => {
       const portMappings = [
         // Add a new port
-        { host: 4004, container: 4001, protocol: "TCP" as PortProtocol },
+        { host: 4004, container: 4001, protocol: portProtocols.TCP },
         // Modify the mapping of two port protocols
-        { host: 30673, container: 30303, protocol: "TCP" as PortProtocol },
-        { host: 30673, container: 30303, protocol: "UDP" as PortProtocol },
+        { host: 30673, container: 30303, protocol: portProtocols.TCP },
+        { host: 30673, container: 30303, protocol: portProtocols.UDP },
         // Make one mapped port ephemeral
-        { container: 16001, protocol: "TCP" as PortProtocol }
+        { container: 16001, protocol: portProtocols.TCP }
       ];
 
       await createTestDir();

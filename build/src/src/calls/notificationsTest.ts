@@ -22,7 +22,7 @@ export async function notificationsTest({
   if (!notification) {
     notification = {
       id: String(Math.random()).slice(2),
-      type: randomType() as NotificationType,
+      type: randomType(),
       title: randomSentence(3),
       body: randomSentence(20)
     };
