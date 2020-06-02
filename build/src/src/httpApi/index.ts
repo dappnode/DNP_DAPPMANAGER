@@ -6,11 +6,12 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import socketio from "socket.io";
 import params from "../params";
-import { isAuthorized } from "./auth";
+import { isAdmin } from "./auth";
 import { wrapHandler } from "./utils";
 import { download } from "./routes/download";
 import { upload } from "./routes/upload";
 import { containerLogs } from "./routes/containerLogs";
+import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
 import { getRpcHandler } from "../common/transport/jsonRpc";
 import * as methods from "../calls";
 import { subscriptionsFactory } from "../common/transport/socketIo";
@@ -77,14 +78,15 @@ export default function startHttpApi(port: number = httpApiPort) {
   app.get("/", (req, res) => res.send("DAPPMANAGER HTTP API"));
 
   // Methods that do not fit into RPC
-  app.get("/container-logs/:id", isAuthorized, wrapHandler(containerLogs));
-  app.get("/download/:fileId", isAuthorized, wrapHandler(download));
-  app.post("/upload", isAuthorized, wrapHandler(upload));
+  app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));
+  app.get("/download/:fileId", isAdmin, wrapHandler(download));
+  app.get("/user-action-logs", isAdmin, wrapHandler(downloadUserActionLogs));
+  app.post("/upload", isAdmin, wrapHandler(upload));
 
   // Rest of RPC methods
   app.post(
     "/rpc",
-    isAuthorized,
+    isAdmin,
     wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
   );
 
