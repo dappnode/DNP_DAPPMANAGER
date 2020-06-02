@@ -1,6 +1,6 @@
 import { Session, IRegistration } from "autobahn";
 import { mapValues, isEmpty } from "lodash";
-import { Args, RpcResult, LoggerMiddleware } from "../types";
+import { Args, RpcResult, LoggerMiddleware } from "../common/transport/types";
 
 // Keep the same event signature for backwards compatibility
 const dappmanagerDomain = ".dappmanager.dnp.dappnode.eth";

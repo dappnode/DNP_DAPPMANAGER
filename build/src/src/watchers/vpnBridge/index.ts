@@ -1,4 +1,4 @@
-import { vpnWampCall } from "../../api";
+import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
@@ -15,7 +15,7 @@ const logs = Logs(module);
 async function getVersionDataVpn(): Promise<void> {
   try {
     const versionDataVpn = await runWithRetry(
-      () => vpnWampCall<PackageVersionData>("getVersionData"),
+      () => vpnRpcCall<PackageVersionData>("getVersionData"),
       { times: 3, base: 1000 }
     )(null);
     db.versionDataVpn.set(versionDataVpn);
