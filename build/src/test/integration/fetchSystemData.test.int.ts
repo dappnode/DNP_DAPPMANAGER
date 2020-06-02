@@ -62,7 +62,7 @@ describe("Get system data", () => {
   it("Should getUserActionLogs", async () => {
     const result = await calls.getUserActionLogs({});
     // User logs should be empty since nothing happened that was registered
-    expect(result).to.be.a("string");
+    expect(result).to.be.a("array");
   });
 });
 

@@ -8,6 +8,7 @@ import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
 import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
+import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
@@ -98,6 +99,10 @@ async function runLegacyOps(): Promise<void> {
 
   removeLegacyBindVolume().catch(e =>
     logs.error(`Error removing legacy BIND volume: ${e.stack}`)
+  );
+
+  migrateUserActionLogs().catch(e =>
+    logs.error(`Error migrating userActionLogs: ${e.stack}`)
   );
 }
 

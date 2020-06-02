@@ -1,57 +1,46 @@
-import fs from "fs";
-import { promisify } from "util";
-import params from "../params";
-
-type ReturnData = string;
+import * as logUserAction from "../logUserAction";
+import { UserActionLog } from "../common";
 
 /**
  * Returns the user action logs. This logs are stored in a different
  * file and format, and are meant to ease user support
- * The list is ordered from newest to oldest
- * - Newest log has index = 0
- * - If the param fromLog is out of bounds, the result will be an empty array: []
- *
- * @param {number} fromLog, default value = 0
- * @param {number} numLogs, default value = 50
- * @returns {string} logs, stringified userActionLog JSON objects appended on new lines
- * To parse, by newline and then parse each line individually.
- * userActionLog = {
- *   level: "info" | "error", {string}
- *   event: "installPackage.dnp.dappnode.eth", {string}
- *   message: "Successfully install DNP", {string} Returned message from the call function
- *   result: { data: "contents" }, {*} Returned result from the call function
- *   kwargs: { id: "dnpName" }, {object} RPC key-word arguments
- *   // Only if error
- *   message: e.message, {string}
- *   stack.e.stack {string}
- * }
+ * The list is ordered from newest to oldest. Newest log has index = 0
+ * @param first for pagination
+ * @param after for pagination
  */
-
 export async function getUserActionLogs({
-  fromLog = 0,
-  numLogs = 50
-}): Promise<ReturnData> {
-  const { userActionLogsFilename } = params;
+  first = 50,
+  after = 0
+}): Promise<UserActionLog[]> {
+  return collapseEqualLogs(logUserAction.get().slice(after, after + first));
+}
 
-  if (!fs.existsSync(userActionLogsFilename)) {
-    return "";
+/**
+ * Collpase equal logs using the `count` property
+ * Prevents showing a long list of the same error when this happens repeatedly
+ * @param _userActionLogs
+ */
+function collapseEqualLogs(_userActionLogs: UserActionLog[]): UserActionLog[] {
+  // Do a shallow to copy to not mutate the original
+  const userActionLogs: UserActionLog[] = [..._userActionLogs];
+
+  for (let i = 0; i < userActionLogs.length; i++) {
+    const log = userActionLogs[i];
+    const logNext = userActionLogs[i + 1];
+    if (log && logNext) {
+      if (
+        log.level === logNext.level &&
+        log.event === logNext.event &&
+        log.message === logNext.message &&
+        log.stack === logNext.stack
+      ) {
+        userActionLogs[i] = { ...log, count: (log.count || 1) + 1 };
+        userActionLogs.splice(i + 1, 1);
+        // Go one step back to keep aggregating on the same index
+        i--;
+      }
+    }
   }
 
-  const userActionLogs = await promisify(fs.readFile)(userActionLogsFilename, {
-    encoding: "utf8"
-  });
-
-  /**
-   * The userActionLogs file can grow a lot. Only a part of it will be returned
-   * The client can specify which part of the file wants
-   * - reverse the array so the 0 index corresponds to the latest log
-   * - do not parse the logs to save resources
-   */
-  const userActionLogsSelected = (userActionLogs || "")
-    .split(/\r?\n/)
-    .reverse()
-    .slice(fromLog, fromLog + numLogs)
-    .join("\n");
-
-  return userActionLogsSelected;
+  return userActionLogs;
 }

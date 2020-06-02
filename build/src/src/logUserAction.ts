@@ -1,16 +1,24 @@
-import winston from "winston";
-import Transport from "winston-transport";
+import fs from "fs";
+import { orderBy } from "lodash";
 import * as eventBus from "./eventBus";
-import { pipe } from "./utils/functions";
-import {
-  trimBase64Values,
-  hideSensitiveValues,
-  limitObjValuesSize
-} from "./utils/objects";
 import params from "./params";
 import { UserActionLog } from "./types";
+import low from "lowdb";
+import FileSync from "lowdb/adapters/FileSync";
+import { logSafeObjects } from "./utils/logs";
+import Logs from "./logs";
+const logs = Logs(module);
 
-const { createLogger, format, transports } = winston;
+/**
+ * Max number of logs to prevent the log file from growing too big
+ * An averagae single log weights 1-0.5KB in file as JSON
+ */
+const maxNumOfLogs = 2000;
+const dbPath = params.USER_ACTION_LOGS_DB_PATH;
+const adapter = new FileSync<UserActionLog[]>(dbPath, { defaultValue: [] });
+const db = low(adapter);
+
+type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
 
 /*
  * To facilitate debugging, actions involving user interaction are stored in a file
@@ -19,76 +27,77 @@ const { createLogger, format, transports } = winston;
  * Specific RPCs will have a ```userAction``` flag to indicate that the result
  * should be logged by this module.
  */
+function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
+  const userActionLog: UserActionLog = {
+    level,
+    timestamp: Date.now(),
+    message: log.message,
+    ...(log.args ? { args: logSafeObjects(log.args) } : {}),
+    ...(log.result ? { result: logSafeObjects(log.result) } : {}),
+    ...log
+  };
 
-/*
- * > LEVELS:
- * ---------------------
- * logs.info("Something")
- * logs.warn("Something")
- * logs.error("Something")
- */
+  // Emit the log to the UI
+  eventBus.logUserAction.emit(userActionLog);
 
-// Custom transport to broadcast new logs to the admin directly
-class EmitToAdmin extends Transport {
-  // I don't know the typing of this contructor opts, and it's pointless to type
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  constructor(opts?: any) {
-    super(opts);
-  }
-
-  /**
-   * @param {object} info = userActionLog
-   *   @property {string} level - "info" | "error".
-   *   @property {string} event - Crossbar RPC event, "installPackage.dnp.dappnode.eth".
-   *   @property {string} message - Returned message from the call function, "Successfully install DNP"
-   *   @property {*} result - Returned result from the call function
-   *   @property {object} kwargs - RPC key-word arguments, { id: "dnpName" }
-   *   // Only if error
-   *   @property {object} message - e.message
-   *   @property {object} stack - e.stack
-   */
-  log(info: UserActionLog, callback: () => void): void {
-    setImmediate(() => {
-      eventBus.logUserAction.emit(info);
-    });
-    callback();
-  }
+  // Store the log in disk
+  db.setState([userActionLog, ...get()].slice(0, maxNumOfLogs));
 }
 
-// Utilities to format
+export function info(log: UserActionLogPartial): void {
+  push(log, "info");
+}
+
+export function error(log: UserActionLogPartial): void {
+  push(log, "error");
+}
 
 /**
- * Transform the info object
- * 1. Any key in kwargs or the result that the name implies that contains
- *    sensitive data will be replace by ********
- * 2. When sending user settings the kwargs can potentially contain long
- *    base64 file contents. Trim them off
- * 3. Limit the length of objects.
- *    RPC calls like copyTo may content really big dataUrls as kwargs,
- *    prevent them from cluttering the userActionLogs file
+ * Returns user actions logs, ordered from newest to oldest
  */
-const formatLogObjectFunction = pipe(
-  hideSensitiveValues,
-  trimBase64Values,
-  obj => limitObjValuesSize(obj, 500)
-);
-const formatLogObject = format(info => {
-  // MUST do a spread in order to include `[Symbol(level)]: 'error'` property,
-  // otherwise winston will ignore the log
-  return { ...info, ...formatLogObjectFunction(info) };
-});
+export function get(): UserActionLog[] {
+  return db.getState() || [];
+}
 
-// Actual logger
+/**
+ * Migrate winston .log JSON file to a lowdb
+ * Prevents having to manually parse the .log file which was happening on every
+ * ADMIN UI visit
+ */
+export async function migrateUserActionLogs() {
+  const userActionLogLegacyFile = params.userActionLogsFilename;
+  try {
+    const fileData = fs.readFileSync(userActionLogLegacyFile, "utf8");
 
-const logger = createLogger({
-  transports: [
-    new transports.File({
-      filename: params.userActionLogsFilename,
-      level: "info"
-    }),
-    new EmitToAdmin()
-  ],
-  format: format.combine(formatLogObject(), format.timestamp(), format.json())
-});
+    const userActionLogs: UserActionLog[] = [];
+    for (const row of fileData.trim().split(/\r?\n/)) {
+      try {
+        const winstonLog = JSON.parse(row);
+        userActionLogs.push({
+          ...winstonLog,
+          timestamp: new Date(winstonLog.timestamp).getTime()
+        });
+      } catch (e) {
+        logs.debug(`Error parsing user action log row: ${e.message}\n${row}`);
+      }
+    }
 
-export default logger;
+    const prevUserActionLogs = get();
+    db.setState(
+      orderBy(
+        [...prevUserActionLogs, ...userActionLogs],
+        log => log.timestamp,
+        "desc"
+      )
+    );
+    fs.unlinkSync(userActionLogLegacyFile);
+
+    logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
+  } catch (e) {
+    if (e.code === "ENOENT") {
+      logs.debug(`userActionLogs file not found, already migrated`);
+    } else {
+      logs.error(`Error migrating userActionLogs: ${e.stack}`);
+    }
+  }
+}

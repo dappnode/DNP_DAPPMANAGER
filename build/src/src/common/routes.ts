@@ -21,7 +21,8 @@ import {
   NewFeatureStatus,
   VpnDeviceCredentials,
   VpnDevice,
-  PackageNotificationDb
+  PackageNotificationDb,
+  UserActionLog
 } from "./types";
 
 export interface Routes {
@@ -200,29 +201,14 @@ export interface Routes {
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
-   * The list is ordered from newest to oldest
-   * - Newest log has index = 0
-   * - If the param fromLog is out of bounds, the result will be an empty array: []
-   *
-   * @param fromLog, default value = 0
-   * @param numLogs, default value = 50
-   * @returns logs, stringified userActionLog JSON objects appended on new lines
-   * To parse, by newline and then parse each line individually.
-   * userActionLog = {
-   *   level: "info" | "error", {string}
-   *   event: "installPackage.dnp.dappnode.eth", {string}
-   *   message: "Successfully install DNP", {string} Returned message from the call function
-   *   result: { data: "contents" }, {*} Returned result from the call function
-   *   kwargs: { id: "dnpName" }, {object} RPC key-word arguments
-   *   // Only if error
-   *   message: e.message, {string}
-   *   stack.e.stack {string}
-   * }
+   * The list is ordered from newest to oldest. Newest log has index = 0
+   * @param first for pagination
+   * @param after for pagination
    */
   getUserActionLogs: (kwargs: {
-    fromLog?: number;
-    numLogs?: number;
-  }) => Promise<string>;
+    first?: number;
+    after?: number;
+  }) => Promise<UserActionLog[]>;
 
   /**
    * Installs a DAppNode Package.
