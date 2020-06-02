@@ -1,6 +1,6 @@
-import logUserAction from "../logUserAction";
 import { Routes } from "../common/routes";
 import { EthProviderError } from "../modules/ethClient";
+import * as logUserAction from "../logUserAction";
 import { LoggerMiddleware, Args, Result } from "../common/transport/types";
 import Logs from "../logs";
 const logs = Logs(module);
@@ -39,10 +39,9 @@ export function routesLoggerFactory(): LoggerMiddleware {
       logs.debug(`RPC call ${route} data`, args);
     },
 
-    onSuccess: (route: string, result: Result, args?: Args): void => {
+    onSuccess: (route: string, result: Result, args: Args = []): void => {
       if (routesToLog.includes(route as keyof Routes)) {
-        logUserAction.log({
-          level: "info",
+        logUserAction.info({
           event: route,
           message: `${route} success`,
           result,
@@ -54,7 +53,7 @@ export function routesLoggerFactory(): LoggerMiddleware {
       }
     },
 
-    onError: (route: string, error: Error, args?: Args): void => {
+    onError: (route: string, error: Error, args: Args = []): void => {
       const msg = error.message;
       if (error instanceof EthProviderError) {
         logs.warn(`Eth provider error, on ${route}: ${msg}`);
@@ -64,8 +63,7 @@ export function routesLoggerFactory(): LoggerMiddleware {
         if (isNodeConnectionError(msg))
           logs.warn(`Error connecting to ethchain node, on ${route}: ${msg}`);
         else logs.error(`RPC error ${route}: ${error.stack}`);
-        logUserAction.log({
-          level: "error",
+        logUserAction.error({
           event: route,
           message: error.message,
           stack: error.stack,

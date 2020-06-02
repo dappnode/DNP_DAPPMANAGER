@@ -15,7 +15,7 @@ const authorizedIpPrefixes = [
   "172.33.1.10"
 ];
 
-export function isAuthorized(
+export function isAdmin(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction

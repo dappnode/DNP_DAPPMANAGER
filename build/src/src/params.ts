@@ -30,6 +30,8 @@ const params = {
   REPO_DIR,
   DNCORE_DIR,
   HOST_HOME,
+  USER_ACTION_LOGS_DB_PATH: path.join(DNCORE_DIR, "userActionLogs.json"),
+  // Legacy userActionLogs wiston .log file, migrated to USER_ACTION_LOGS_DB_PATH
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // Static files serve
   avatarStaticDir: path.join(REPO_DIR, "avatars"),

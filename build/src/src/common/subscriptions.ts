@@ -78,14 +78,6 @@ export interface SubscriptionsTypes {
    * @param volumes
    */
   volumes: (volumes: VolumeData[]) => void;
-
-  /**
-   * VPN emits this event for user action logs
-   *
-   * /////////////////////////////////////////////////////////
-   * **TO BE DEPRECATED**: deprecate when migrate WAMP to REST
-   */
-  logUserActionToDappmanager: (userActionLog: UserActionLog) => void;
 }
 
 export type Subscriptions = {
@@ -124,9 +116,7 @@ export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   reloadClient: {},
   systemInfo: {},
   userActionLog: {},
-  volumes: {},
-  // LEGACY
-  logUserActionToDappmanager: {}
+  volumes: {}
 };
 
 // DO NOT REMOVE

@@ -1,5 +1,4 @@
 import * as eventBus from "../eventBus";
-import logUserAction from "../logUserAction";
 import { Subscriptions } from "../common/subscriptions";
 import * as db from "../db";
 import { isNewDappmanagerVersion } from "../utils/getVersionData";
@@ -32,11 +31,6 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
   // Emits all system info
   eventBus.requestSystemInfo.on(async () => {
     subscriptions.systemInfo.emit(await calls.systemInfoGet());
-  });
-
-  // Receives userAction logs from the VPN nodejs app
-  subscriptions.logUserActionToDappmanager.on(userActionLog => {
-    logUserAction.log(userActionLog);
   });
 
   // Store notification in DB and push it to the UI

@@ -485,12 +485,14 @@ export interface ProgressLog {
 
 export interface UserActionLog {
   level: "info" | "error";
-  timestamp: string;
+  timestamp: number; // 1591095463341
   event: string; // "installPackage.dnp.dappnode.eth"
   message: string; // "Successfully install DNP", { string } Returned message from the call function*
-  kwargs: any; // { id: "dnpName" }, { object } RPC key - word arguments
+  args: any[]; // { id: "dnpName" }, { object }
   result?: any; // If success: { data: "contents" }, {*} Returned result from the call function
   stack?: string; // If error: e.stack { string }
+  // Additional properties to compress repeated logs (mainly errors)
+  count?: number;
 }
 
 /**
