@@ -41,7 +41,7 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
   eventBus.logUserAction.emit(userActionLog);
 
   // Store the log in disk
-  db.setState([userActionLog, ...get()].slice(0, maxNumOfLogs));
+  set([userActionLog, ...get()]);
 }
 
 export function info(log: UserActionLogPartial): void {
@@ -57,6 +57,14 @@ export function error(log: UserActionLogPartial): void {
  */
 export function get(): UserActionLog[] {
   return db.getState() || [];
+}
+
+/**
+ * Overwrites to the db a new array of logs
+ * @param userActionLogs
+ */
+function set(userActionLogs: UserActionLog[]): void {
+  db.setState(userActionLogs.slice(0, maxNumOfLogs)).write();
 }
 
 /**
@@ -82,14 +90,7 @@ export async function migrateUserActionLogs() {
       }
     }
 
-    const prevUserActionLogs = get();
-    db.setState(
-      orderBy(
-        [...prevUserActionLogs, ...userActionLogs],
-        log => log.timestamp,
-        "desc"
-      )
-    );
+    set(orderBy([...get(), ...userActionLogs], log => log.timestamp, "desc"));
     fs.unlinkSync(userActionLogLegacyFile);
 
     logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
