@@ -76,7 +76,7 @@ export function setupWizard1To2(
   }
 
   // Add the main block of properties
-  addPropertiesBlock(setupSchema.properties as any, setupSchema.required || []);
+  addPropertiesBlock(setupSchema.properties, setupSchema.required || []);
 
   // Add the dependencies with a conditional schema block
   // if dependencies[propId].oneOf structure is used
@@ -85,7 +85,7 @@ export function setupWizard1To2(
     Object.keys(setupSchema.dependencies).length === 1
   ) {
     const dependantProperty = Object.keys(setupSchema.dependencies)[0];
-    const oneOf = (setupSchema.dependencies[dependantProperty] as any).oneOf;
+    const oneOf = setupSchema.dependencies[dependantProperty].oneOf;
     if (Array.isArray(oneOf))
       for (const oneOfItem of oneOf) {
         const properitesNoDependant = omit(oneOfItem.properties, [
@@ -105,7 +105,7 @@ export function setupWizard1To2(
   }
 
   // Sorts the fields in the order of "ui:order"
-  const uiOrder = setupUiJson["ui:order"] as string[];
+  const uiOrder = setupUiJson["ui:order"] || [];
   return {
     version: "2",
     fields: [

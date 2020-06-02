@@ -57,35 +57,37 @@ export async function getDirectory(
   }
 
   const packages = await Promise.all(
-    directoryIds.map(async i => {
-      try {
-        const {
-          name,
-          status: statusBn,
-          position: positionBn
-        } = await directory.getPackage(i);
+    directoryIds.map(
+      async (i): Promise<DirectoryDnp | undefined> => {
+        try {
+          const {
+            name,
+            status: statusBn,
+            position: positionBn
+          } = await directory.getPackage(i);
 
-        const status = parseInt(statusBn);
-        const position = parseInt(positionBn);
+          const status = parseInt(statusBn);
+          const position = parseInt(positionBn);
 
-        // Make sure the DNP is not Deprecated or Deleted
+          // Make sure the DNP is not Deprecated or Deleted
 
-        if (!isEnsDomain(name) || status === 0) return;
+          if (!isEnsDomain(name) || status === 0) return;
 
-        const featuredIndex = featuredIndexes.indexOf(i);
-        return {
-          name,
-          status,
-          statusName: DAppNodePackageStatus[status],
-          position,
-          directoryId: i,
-          isFeatured: featuredIndex > -1,
-          featuredIndex: featuredIndex
-        } as DirectoryDnp;
-      } catch (e) {
-        logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
+          const featuredIndex = featuredIndexes.indexOf(i);
+          return {
+            name,
+            status,
+            statusName: DAppNodePackageStatus[status],
+            position,
+            directoryId: i,
+            isFeatured: featuredIndex > -1,
+            featuredIndex: featuredIndex
+          };
+        } catch (e) {
+          logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
+        }
       }
-    })
+    )
   );
 
   return sortDirectoryItems(packages.filter(notUndefined));
