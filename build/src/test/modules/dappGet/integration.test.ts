@@ -6,7 +6,7 @@ import { PackageContainer } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers";
-import { mapValues } from "lodash";
+import { mapValues, isEmpty } from "lodash";
 import { logs } from "../../../src/logs";
 
 // Imports for types
@@ -96,14 +96,11 @@ describe("dappGet integration test", () => {
           dappGetFetcher
         });
         logBig("  Aggregated DNPs", JSON.stringify(dnps, null, 2));
-        expect(Boolean(Object.keys(dnps).length)).to.equal(
-          true,
-          "Make sure the aggregation is not empty"
-        );
-        expect(Boolean(dnps[caseData.req.name])).to.equal(
-          true,
-          "Make sure the aggregation includes the requested package"
-        );
+        expectNotEmpty(dnps);
+        expect(
+          dnps,
+          "Make sure the aggregation object includes the requested package"
+        ).to.have.property(caseData.req.name);
         if (caseData.expectedAggregate) {
           expect(dnps).to.deep.equal(caseData.expectedAggregate);
         }
@@ -114,18 +111,6 @@ describe("dappGet integration test", () => {
         const { state, alreadyUpdated } = result;
         logBig("  DNPs result", JSON.stringify(result, null, 2));
 
-        expect(Boolean(Object.keys(state).length)).to.equal(
-          true,
-          `Make sure the success object is not empty: ${JSON.stringify(
-            result,
-            null,
-            2
-          )}`
-        );
-        expect(Boolean(state[caseData.req.name])).to.equal(
-          true,
-          "Make sure the success object includes the requested package"
-        );
         expect(state).to.deep.equal(caseData.expectedState);
 
         if (caseData.alreadyUpdated) {
@@ -135,3 +120,8 @@ describe("dappGet integration test", () => {
     });
   }
 });
+
+function expectNotEmpty(obj: any) {
+  expect(isEmpty(obj), "Obj must not be empty: " + JSON.stringify(obj, null, 2))
+    .to.be.false;
+}
