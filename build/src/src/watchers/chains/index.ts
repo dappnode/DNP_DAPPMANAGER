@@ -18,6 +18,7 @@ const emitChainDataWatcherInterval =
 // Every time there is a package install / remove, the watchers will be reseted
 
 const activeChains: { [chainName: string]: Chain } = {};
+const loggedError: { [chainName: string]: string | null } = {};
 
 /**
  * CHAIN MANAGMENT
@@ -83,12 +84,16 @@ async function getAndEmitChainData(): Promise<void> {
         const { dnpName } = chain;
         try {
           const chainDataResult = await runDriver(chain);
+          loggedError[chain.api] = null; // Reset last seen error
           return {
             dnpName,
             ...chainDataResult
           };
         } catch (e) {
-          logs.debug(`Error on chain ${dnpName} watcher`, e);
+          // Only log chain errors the first time they are seen
+          if (loggedError[chain.api] !== e.message)
+            logs.debug(`Error on chain ${dnpName} watcher`, e);
+          loggedError[chain.api] = e.message;
           return {
             dnpName,
             syncing: false,
