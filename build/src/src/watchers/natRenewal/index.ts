@@ -59,9 +59,6 @@ async function natRenewal(): Promise<void> {
           await upnpc.close(portToOpen);
         } catch (e) {
           // Errors while closing a port before openning do not matter.
-          logs.warn(
-            `Not closing any existing mapping of port: ${portId(portToOpen)}`
-          );
           logs.debug(`Error closing port ${portId(portToOpen)}`, e);
         }
       }
@@ -89,9 +86,9 @@ async function natRenewal(): Promise<void> {
         const portIsOpen = Boolean(currentPort);
         if (portIsOpen) {
           if (isFirstRun)
-            logs.info(`Port ${portId(portToOpen)} verified. Currently open`);
+            logs.info(`Port ${portId(portToOpen)} successfully opened`);
         } else {
-          logs.error(`Error, port ${portId(portToOpen)} is not currently open`);
+          logs.error(`Port ${portId(portToOpen)} is not open`);
         }
       }
     }
