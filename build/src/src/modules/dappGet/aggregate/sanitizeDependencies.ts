@@ -1,5 +1,5 @@
 import { Dependencies } from "../../../types";
-
+import { mapValues } from "lodash";
 // WARNING: manifest's dependencies is an external uncontrolled input, verify
 
 export default function sanitizeDependencies(
@@ -15,10 +15,8 @@ export default function sanitizeDependencies(
       )}`
     );
   }
-  Object.keys(dependencies).forEach(name => {
-    if (dependencies[name] === "latest") {
-      dependencies[name] = "*";
-    }
-  });
-  return dependencies;
+
+  return mapValues(dependencies, version =>
+    version === "latest" ? "*" : version
+  );
 }

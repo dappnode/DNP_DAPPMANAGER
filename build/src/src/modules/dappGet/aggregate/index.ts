@@ -110,18 +110,18 @@ export default async function aggregate({
   );
 
   // Label dnps. They are used to order versions
-  Object.keys(dnps).forEach(dnpName => {
+  for (const dnpName in dnps) {
     const dnp = dnpList.find(dnp => dnp.name === dnpName);
 
     // > Label isRequest + Enfore conditions:
     //   - requested DNP versions must match the provided versionRange
     if (dnpName === req.name) {
       dnps[dnpName].isRequest = true;
-      Object.keys(dnps[dnpName].versions).forEach(version => {
+      for (const version in dnps[dnpName].versions) {
         if (!safeSemver.satisfies(version, req.ver)) {
           delete dnps[dnpName].versions[version];
         }
-      });
+      }
       if (!Object.keys(dnps[dnpName].versions).length)
         throw Error(
           `Aggregated versions of request ${req.name}@${
@@ -134,7 +134,7 @@ export default async function aggregate({
     else if (dnp) {
       const dnpVersion = dnp.version;
       dnps[dnpName].isInstalled = true;
-      Object.keys(dnps[dnpName].versions).forEach(version => {
+      for (const version in dnps[dnpName].versions) {
         if (
           // Exclusively apply this condition to semver versions.
           semver.valid(version) &&
@@ -143,7 +143,7 @@ export default async function aggregate({
           semver.lt(version, dnpVersion)
         )
           delete dnps[dnpName].versions[version];
-      });
+      }
       if (!Object.keys(dnps[dnpName].versions).length)
         throw Error(
           `Aggregated versions of installed package ${dnpName} cause a downgrade from ${dnpVersion}. Having a future development version could be the cause of this error.`
@@ -157,7 +157,7 @@ export default async function aggregate({
         throw Error(`No version aggregated for ${dnpName}, request ${reqId}`);
       }
     }
-  });
+  }
 
   return dnps;
 }

@@ -83,7 +83,9 @@ export default function runWatcher(): void {
   checkAutoUpdates();
 
   eventBus.packagesModified.on(({ ids, removed }) => {
-    if (removed) ids.forEach(clearPendingUpdates);
-    ids.forEach(clearRegistry);
+    for (const id of ids) {
+      if (removed) clearPendingUpdates(id);
+      clearRegistry(id);
+    }
   });
 }
