@@ -96,4 +96,17 @@ describe("Util: logs", () => {
       shortProp: "1"
     });
   });
+
+  it("should keep an array of objects as an array", () => {
+    const obj = {
+      a: 1,
+      PRIVATE_WORD: "normal"
+    };
+    expect(logSafeObjects([obj])).to.deep.equal([
+      {
+        a: 1,
+        PRIVATE_WORD: "**********"
+      }
+    ]);
+  });
 });
