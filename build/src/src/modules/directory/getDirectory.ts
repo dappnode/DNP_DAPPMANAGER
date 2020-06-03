@@ -2,9 +2,8 @@ import { isEnsDomain } from "../../utils/validate";
 import { ethers } from "ethers";
 import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
 import * as directoryContract from "../../contracts/directory";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { notUndefined } from "../../utils/typingHelpers";
-const logs = Logs(module);
 
 // Contract parameters
 const DAppNodePackageStatus: DirectoryDnpStatus[] = [
@@ -84,7 +83,7 @@ export async function getDirectory(
             featuredIndex: featuredIndex
           };
         } catch (e) {
-          logs.error(`Error retrieving DNP #${i} from directory: ${e.stack}`);
+          logs.error(`Error retrieving DNP #${i} from directory`, e);
         }
       }
     )

@@ -9,13 +9,12 @@ import {
   EthClientInstallStatus,
   serializeError
 } from "../../modules/ethClient/types";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { EthClientTarget } from "../../types";
 import {
   EthProviderError,
   getLocalFallbackContentHash
 } from "../../modules/ethClient";
-const logs = Logs(module);
 
 // Enforces that the default value of status is correct
 type InstallStatus = EthClientInstallStatus["status"];
@@ -159,7 +158,7 @@ export default function runWatcher(): void {
           }
         }
       } catch (e) {
-        logs.error(`Error on eth client installer watcher: ${e.stack}`);
+        logs.error("Error on eth client installer watcher", e);
       }
     })
   );

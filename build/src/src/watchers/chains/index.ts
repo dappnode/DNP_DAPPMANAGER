@@ -5,9 +5,8 @@ import { ChainData } from "../../types";
 import { knownChains } from "./knownChains";
 // Drivers
 import runDriver, { getDriverApi } from "./drivers";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { Chain } from "./types";
-const logs = Logs(module);
 
 const checkChainWatcherInterval =
   params.CHECK_CHAIN_WATCHER_INTERVAL || 60 * 1000; // 1 minute
@@ -58,7 +57,7 @@ async function checkChainWatchers(): Promise<void> {
       }
     }
   } catch (e) {
-    logs.error(`Error checking chain watchers: ${e.stack}`);
+    logs.error(`Error checking chain watchers`, e);
   }
 }
 
@@ -89,7 +88,7 @@ async function getAndEmitChainData(): Promise<void> {
             ...chainDataResult
           };
         } catch (e) {
-          logs.debug(`Error on chain ${dnpName} watcher: ${e.stack}`);
+          logs.debug(`Error on chain ${dnpName} watcher`, e);
           return {
             dnpName,
             syncing: false,

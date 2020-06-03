@@ -13,8 +13,7 @@ import {
   NotFoundError,
   Content
 } from "./types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 // Define params
 
@@ -97,7 +96,7 @@ export default function startEthForward(): void {
         if (e instanceof ProxyError) return views.unknownError(e);
 
         // Unknown errors, log to error
-        logs.error(`ETHFORWARD Unknown error resolving ${domain}: ${e.stack}`);
+        logs.error(`ETHFORWARD Unknown error resolving ${domain}`, e);
         return views.unknownError(e);
       }
 
@@ -114,8 +113,7 @@ export default function startEthForward(): void {
 
   // Generic callback for errors
   proxy.on("error", e => {
-    console.log(e);
-    logs.error(`ETHFORWARD proxy error: ${e.message}`);
+    logs.error(`ETHFORWARD proxy error`, e);
   });
 
   // Create an HTTP server and register its handler

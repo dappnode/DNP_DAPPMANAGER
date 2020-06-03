@@ -1,7 +1,6 @@
 import * as eventBus from "../eventBus";
 import { ProgressLog } from "../types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 export type Log = (name: string, message: string) => void;
 
@@ -22,8 +21,8 @@ export type Log = (name: string, message: string) => void;
 export function logUi(progressLog: ProgressLog): void {
   const { id, name, message } = progressLog;
   // Log them internally. But skip download progress logs, too spam-y
-  const logDebug = `Progress log: ${id} - ${name}: ${message}`;
-  if (!logDebug.includes("%")) logs.info(logDebug);
+  if (message && !message.includes("%"))
+    logs.info("Progress log", name, message);
 
   eventBus.logUi.emit(progressLog);
 }

@@ -1,14 +1,13 @@
 import * as eventBus from "../eventBus";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
-import Logs from "../logs";
+import { logs } from "../logs";
 import { listContainers } from "../modules/docker/listContainers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
-const logs = Logs(module);
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -56,7 +55,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           categories: metadata.categories || getFallBackCategories(name) || []
         };
       } catch (e) {
-        logs.error(`Error fetching ${name} release: ${e.message}`);
+        logs.error(`Error fetching ${name} release`, e);
         directoryDnps[idx] = {
           ...directoryItemBasic,
           status: "error",

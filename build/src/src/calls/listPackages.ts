@@ -8,8 +8,7 @@ import { omit } from "lodash";
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
 import { readConfigFiles } from "../utils/configFiles";
 import { PackageContainer } from "../types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Returns the list of current containers associated to packages
@@ -30,7 +29,7 @@ export async function listPackages(): Promise<PackageContainer[]> {
         db.packageGettingStartedShow.get(dnp.name)
       );
     } catch (e) {
-      logs.warn(`Error appending ${dnp.name} files: ${e.stack || e.message}`);
+      logs.warn(`Error appending ${dnp.name} files`, e);
     }
   });
 
@@ -44,7 +43,7 @@ export async function listPackages(): Promise<PackageContainer[]> {
     const dockerSystemDfData = await dockerDf();
     dnpList = parseDockerSystemDf({ dockerSystemDfData, dnpList });
   } catch (e) {
-    logs.error(`Error on listPackages, appending volume info: ${e.stack}`);
+    logs.error("Error on listPackages, appending volume info", e);
   }
 
   return dnpList;

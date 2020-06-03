@@ -3,8 +3,7 @@ import * as db from "../../db";
 import { InstallPackageDataPaths } from "../../common/types";
 import { Log } from "../../utils/logUi";
 import { dockerCleanOldImages } from "../docker/dockerCommands";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * [Post install clean] After a successful install, clean backup files
@@ -37,7 +36,7 @@ export async function postInstallClean(
     try {
       await dockerCleanOldImages(name, semVersion);
     } catch (e) {
-      logs.warn(`Error cleaning images: ${e.message}`);
+      logs.warn("Error cleaning images", e);
     }
   }
 }

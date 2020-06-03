@@ -4,8 +4,7 @@ import * as db from "../../db";
 import updateIp from "../../modules/dyndns/updateIp";
 import lookup from "../../utils/lookup";
 import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const dyndnsInterval = params.DYNDNS_INTERVAL || 30 * 60 * 1000; // 30 minutes
 
@@ -49,7 +48,7 @@ async function shouldUpdate(): Promise<boolean> {
     return false;
   } catch (e) {
     // in case of error, should update
-    logs.warn(`Error on shouldUpdate: ${e.stack}`);
+    logs.warn("Error on shouldUpdate", e);
     return true;
   }
 }
@@ -85,7 +84,7 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
     const ipShouldBeUpdated = Boolean(await shouldUpdate());
     if (ipShouldBeUpdated) await updateIp();
   } catch (e) {
-    logs.error(`Error on dyndns interval: ${e.stack || e.message}`);
+    logs.error("Error on dyndns interval", e);
   }
 }
 

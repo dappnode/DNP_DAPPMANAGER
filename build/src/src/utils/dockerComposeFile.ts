@@ -13,8 +13,7 @@ import {
 import params from "../params";
 import * as getPath from "./getPath";
 import { verifyCompose } from "./dockerComposeSanitizer";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Utils to read or edit a docker-compose file
@@ -218,7 +217,7 @@ export function getUserSettingsSafe(
   try {
     return getUserSettings(name, isCore);
   } catch (e) {
-    logs.error(`Error getting userSettings ${name}: ${e.stack}`);
+    logs.error(`Error getting userSettings ${name}`, e);
     return {};
   }
 }

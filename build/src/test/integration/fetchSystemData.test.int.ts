@@ -1,11 +1,10 @@
 import "mocha";
 import { expect } from "chai";
 import * as calls from "../../src/calls";
-import Logs from "../../src/logs";
+import { logs } from "../../src/logs";
 import { AutoUpdateSettings } from "../../src/types";
 import { MY_PACKAGES, SYSTEM_PACKAGES } from "../../src/utils/autoUpdateHelper";
 import { clearDbs } from "../testUtils";
-const logs = Logs(module);
 
 describe("Auto update data", () => {
   before(async () => {
@@ -89,7 +88,7 @@ describe("Notifications", async () => {
     const result = await calls.notificationsGet();
     const deletedNotification = result.find(n => n.id === id);
     if (deletedNotification) {
-      logs.info(JSON.stringify(result, null, 2));
+      logs.info("deletedNotification", result);
       throw Error(`Notification id ${id} was not deleted`);
     }
   });

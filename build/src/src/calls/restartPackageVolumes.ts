@@ -8,8 +8,7 @@ import * as eventBus from "../eventBus";
 import params from "../params";
 // Utils
 import * as getPath from "../utils/getPath";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 
@@ -102,7 +101,7 @@ export async function restartPackageVolumesTask({
      */
     .sort((dnpName: string) => (dnpName === id ? -1 : 1));
 
-  logs.debug(JSON.stringify({ volumeNames, dnpsToRemove }, null, 2));
+  logs.debug({ volumeNames, dnpsToRemove });
 
   // Verify results
   const composePaths: { [dnpName: string]: string } = {};

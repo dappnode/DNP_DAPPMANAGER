@@ -2,8 +2,7 @@ import { Routes } from "../common/routes";
 import { EthProviderError } from "../modules/ethClient";
 import * as logUserAction from "../logUserAction";
 import { LoggerMiddleware, Args, Result } from "../common/transport/types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 const routesToLog: (keyof Routes)[] = [
   "autoUpdateSettingsEdit",
@@ -35,7 +34,7 @@ const routesToLog: (keyof Routes)[] = [
 
 export function routesLoggerFactory(): LoggerMiddleware {
   return {
-    onCall: (route: string, args?: Args): void => {
+    onCall: (route: string, args: Args = []): void => {
       logs.debug(`RPC call ${route} data`, args);
     },
 
@@ -47,9 +46,9 @@ export function routesLoggerFactory(): LoggerMiddleware {
           result,
           args
         });
-        logs.info(`RPC success ${route}`);
+        logs.info("RPC success", route);
       } else {
-        logs.debug(`RPC success ${route}`);
+        logs.debug("RPC success", route);
       }
     },
 
@@ -62,7 +61,7 @@ export function routesLoggerFactory(): LoggerMiddleware {
       } else {
         if (isNodeConnectionError(msg))
           logs.warn(`Error connecting to ethchain node, on ${route}: ${msg}`);
-        else logs.error(`RPC error ${route}: ${error.stack}`);
+        else logs.error("RPC error", route, error);
         logUserAction.error({
           event: route,
           message: error.message,
@@ -76,9 +75,9 @@ export function routesLoggerFactory(): LoggerMiddleware {
 
 export function subscriptionsLoggerFactory(): LoggerMiddleware {
   return {
-    onError: (route: string, error: Error, args?: Args): void => {
-      logs.error(`Subscription error ${route}: ${error.stack}`);
-      logs.debug(`Subscription error ${route} data`, { args });
+    onError: (route: string, error: Error, args: Args = []): void => {
+      logs.error("Subscription error", route, error);
+      logs.debug("Subscription error", route, args);
     }
   };
 }

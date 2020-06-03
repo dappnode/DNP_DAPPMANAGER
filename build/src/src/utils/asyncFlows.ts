@@ -1,7 +1,6 @@
 import async from "async";
 import memoize from "memoizee";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Makes sure the target async function is running only once at every instant.
@@ -36,9 +35,8 @@ export function runOnlyOneSequentially<A, R>(
       })
       .catch(e => {
         logs.error(
-          `WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks. Error: ${
-            e.stack
-          }`
+          `WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks`,
+          e
         );
       });
   },
@@ -63,7 +61,9 @@ export function runOnlyOneSequentially<A, R>(
  *
  * @param fn Target function (Callback style)
  */
-export function runOnlyOneReturnToAll<F extends Function>(f: F): F {
+export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
+  f: F
+): F {
   return memoize(f, {
     // Wait for Promises to resolve. Do not cache rejections
     promise: true,

@@ -6,7 +6,7 @@ import * as db from "../../db";
 import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
 import params from "../../params";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { Compose, InstallPackageData } from "../../common/types";
 import { writeComposeObj, readComposeObj } from "../../utils/dockerComposeFile";
 import { parseService } from "../../utils/dockerComposeParsers";
@@ -16,7 +16,6 @@ import { dockerRm } from "../docker/dockerCommands";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";
 import { postInstallClean } from "./postInstallClean";
-const logs = Logs(module);
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
@@ -67,7 +66,7 @@ export async function restartDappmanagerPatch({
     }
   } catch (e) {
     // Since removing restart is non-essential, don't block a core update, just log
-    logs.error(`Error removing ${restartContainerName}: ${e.stack}`);
+    logs.error(`Error removing ${restartContainerName}`, e);
   }
 
   /**
@@ -207,7 +206,7 @@ async function logRestartPatchStatus(
 ${restartLogsIndented}
 `);
   } catch (e) {
-    logs.error(`Error reporting restart patch status: ${e.stack}`);
+    logs.error("Error reporting restart patch status", e);
   }
 }
 

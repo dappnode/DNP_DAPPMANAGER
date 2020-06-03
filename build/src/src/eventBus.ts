@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import Logs from "./logs";
+import { logs } from "./logs";
 import {
   ChainData,
   PackageContainer,
@@ -8,7 +8,6 @@ import {
   PackageNotification,
   DirectoryItem
 } from "./types";
-const logs = Logs(module);
 
 /** HOW TO:
  * - ON:
@@ -25,10 +24,6 @@ const eventBus = new MyEmitter();
 
 /**
  * Offer a default mechanism to run listeners within a try/catch block
- *
- * [NOTE] Error parsing `e.stack || e.message || e` is necessary because
- * there has been instances where the error captured didn't had the stack
- * property
  */
 
 function eventBusOnSafe<T>(
@@ -39,7 +34,7 @@ function eventBusOnSafe<T>(
     try {
       listener(arg);
     } catch (e) {
-      logs.error(`Error on event '${eventName}': ${e.stack || e.message || e}`);
+      logs.error("Error on event", eventName, e);
     }
   });
 }
@@ -52,7 +47,7 @@ function eventBusOnSafeAsync<T>(
     try {
       await listener(arg);
     } catch (e) {
-      logs.error(`Error on event '${eventName}': ${e.stack || e.message || e}`);
+      logs.error("Error on event", eventName, e);
     }
   });
 }

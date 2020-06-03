@@ -1,9 +1,8 @@
 import path from "path";
 import { Compose } from "../../types";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { uniq } from "lodash";
 import { shellHost } from "../../utils/shell";
-const logs = Logs(module);
 
 /**
  * Create custom volume device path if any

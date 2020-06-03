@@ -1,8 +1,7 @@
 import EthCrypto from "eth-crypto";
 import params from "../../params";
 import * as db from "../../db";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const corruptedPrivateKeyMessage = `
 
@@ -46,9 +45,8 @@ function isPrivateKeyValid(privateKey: string): boolean {
     return true;
   } catch (e) {
     logs.warn(
-      `Private key verification failed. EthCrypto.publicKeyByPrivateKey returned error: ${
-        e.stack
-      }`
+      `Private key verification failed. EthCrypto.publicKeyByPrivateKey returned error`,
+      e
     );
     return false;
   }

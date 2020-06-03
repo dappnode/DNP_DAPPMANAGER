@@ -2,8 +2,7 @@ import EthCrypto from "eth-crypto";
 import params from "../../params";
 import fetch from "node-fetch";
 import * as db from "../../db";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const dyndnsHost = params.DYNDNS_HOST;
 
@@ -88,6 +87,6 @@ export default async function updateIp(): Promise<string | void> {
     db.domain.set(bodyData.domain);
     return bodyData.domain;
   } catch (e) {
-    logs.error(`Dyndns error: ${e.stack || e.message}`);
+    logs.error("Dyndns error", e);
   }
 }

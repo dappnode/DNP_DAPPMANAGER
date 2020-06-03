@@ -6,10 +6,9 @@ import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { PackageContainer, PackageRequest } from "../../../types";
 import { DappGetDnps } from "../types";
-import Logs from "../../../logs";
+import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch/DappGetFetcher";
 import { setVersion } from "../utils/dnpUtils";
-const logs = Logs(module);
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -105,9 +104,7 @@ export default async function aggregate({
           });
         }
       } catch (e) {
-        logs.warn(
-          `Error fetching installed dnp ${name}: ${e.stack || e.message}`
-        );
+        logs.warn(`Error fetching installed dnp ${name}`, e);
       }
     })
   );
@@ -155,14 +152,9 @@ export default async function aggregate({
       // Validate aggregated dnps
       // - dnps must contain at least one version of the requested package
       if (!Object.keys(dnps[dnpName].versions).length) {
-        logs.error(
-          `Faulty dnps object for ${req.name}@${req.ver}: ` +
-            JSON.stringify(dnps, null, 2)
-        );
         const reqId = `${req.name} @ ${req.ver}`;
-        throw Error(
-          `No version aggregated for ${dnpName} for request ${reqId}`
-        );
+        logs.error("Faulty dnps object", reqId, dnps);
+        throw Error(`No version aggregated for ${dnpName}, request ${reqId}`);
       }
     }
   });

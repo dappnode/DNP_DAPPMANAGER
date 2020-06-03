@@ -1,7 +1,6 @@
 import shell from "./shell";
 import isIp from "is-ip";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 export default async function getLocalIp(options?: {
   silent: boolean;

@@ -2,8 +2,7 @@ import fs from "fs";
 import { listContainerNoThrow } from "../modules/docker/listContainers";
 import { dockerRm } from "../modules/docker/dockerCommands";
 import * as getPath from "../utils/getPath";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 const ethforwardName = "ethforward.dnp.dappnode.eth";
 

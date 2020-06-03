@@ -1,8 +1,8 @@
 import fs from "fs";
 import crypto from "crypto";
 import path from "path";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
+
 import * as db from "../db";
 import params from "../params";
 // Modules
@@ -50,7 +50,7 @@ export async function backupGet({
   // Copy file from container to local file system
   try {
     const successfulBackups = [];
-    let lastError;
+    let lastError: Error | null = null;
     for (const { name, path: fromPath } of backup) {
       try {
         const toPath = path.join(backupDir, name);
@@ -58,18 +58,16 @@ export async function backupGet({
         successfulBackups.push(name);
       } catch (e) {
         if (e.message.includes("No such container:path"))
-          lastError = Error(`path ${fromPath} does not exist`);
-        else lastError = e;
-        logs.error(
-          `Error backing up ${id} - ${name} from ${fromPath}: ${
-            lastError.stack
-          }`
-        );
+          e = Error(`path ${fromPath} does not exist`);
+        logs.error(`Error backing up ${id}`, { name, fromPath }, e);
+        lastError = e;
       }
     }
 
-    if (!successfulBackups.length)
-      throw Error(`Could not backup any item: ${lastError.stack}`);
+    if (!successfulBackups.length && lastError) {
+      lastError.message = `Could not backup any item: ${lastError.message}`;
+      throw lastError;
+    }
 
     /**
      * Use the -C option to cd in the directory before doing the tar

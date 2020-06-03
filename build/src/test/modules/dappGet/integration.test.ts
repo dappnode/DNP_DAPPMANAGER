@@ -7,8 +7,8 @@ import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers";
 import { mapValues } from "lodash";
-import Logs from "../../../src/logs";
-const logs = Logs(module);
+import { logs } from "../../../src/logs";
+
 // Imports for types
 import dappGetType from "../../../src/modules/dappGet";
 import aggregateType from "../../../src/modules/dappGet/aggregate";

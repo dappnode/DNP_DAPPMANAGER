@@ -2,8 +2,7 @@ import os from "os";
 import shellExec from "../utils/shell";
 import osu from "node-os-utils";
 import { HostStats } from "../types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 // Cache static values
 const numCores = os.cpus().length;
@@ -62,6 +61,6 @@ async function wrapErrors<R>(
   try {
     return await fn();
   } catch (e) {
-    logs.warn(`Error fetching ${name}: ${e.stack}`);
+    logs.warn(`Error fetching ${name}`, e);
   }
 }

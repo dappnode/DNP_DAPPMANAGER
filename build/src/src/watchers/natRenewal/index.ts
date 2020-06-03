@@ -7,8 +7,7 @@ import getLocalIp from "../../utils/getLocalIp";
 // Utils
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import { PackagePort } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const natRenewalInterval =
   params.NAT_RENEWAL_WATCHER_INTERVAL || 60 * 60 * 1000;
@@ -30,9 +29,7 @@ async function natRenewal(): Promise<void> {
       db.upnpAvailable.set(true);
       if (isFirstRun) {
         logs.info("UPnP device available");
-        logs.info(
-          `Current UPNP port mappings: ${JSON.stringify(portMappings, null, 2)}`
-        );
+        logs.info("Current UPNP port mappings", portMappings);
       }
     } catch (e) {
       if (e.message.includes("NOUPNP")) {
@@ -47,10 +44,7 @@ async function natRenewal(): Promise<void> {
     // Fetch portsToOpen and store them in the DB
     const portsToOpen = await getPortsToOpen();
     db.portsToOpen.set(portsToOpen);
-    if (isFirstRun)
-      logs.info(
-        `NAT renewal portsToOpen: ${JSON.stringify(portsToOpen, null, 2)}`
-      );
+    if (isFirstRun) logs.info("NAT renewal portsToOpen", portsToOpen);
 
     // Fetch the localIp only once for all the portsToOpen
     const localIp = await getLocalIp();
@@ -68,7 +62,7 @@ async function natRenewal(): Promise<void> {
           logs.warn(
             `Not closing any existing mapping of port: ${portId(portToOpen)}`
           );
-          logs.debug(`Error closing port ${portId(portToOpen)}: ${e.stack}`);
+          logs.debug(`Error closing port ${portId(portToOpen)}`, e);
         }
       }
 
@@ -102,7 +96,7 @@ async function natRenewal(): Promise<void> {
       }
     }
   } catch (e) {
-    logs.error(`Error on NAT renewal interval: ${e.stack}`);
+    logs.error("Error on NAT renewal interval", e);
   }
 }
 

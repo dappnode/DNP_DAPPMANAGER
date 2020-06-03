@@ -16,8 +16,7 @@ import {
   validateRoutesArgsFactory,
   validateSubscriptionsArgsFactory
 } from "../common/validation";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 let _session: autobahn.Session;
 
@@ -41,10 +40,11 @@ export async function startAutobahn({
 }): Promise<void> {
   const connection = new autobahn.Connection({ url, realm });
   connection.onopen = (session, details): void => {
-    logs.info(`Connected to DAppNode's WAMP
-  url:     ${url}
-  realm:   ${realm}
-  session: ${(details || {}).authid}`);
+    logs.info("Connected to DAppNode's WAMP", {
+      url,
+      realm,
+      id: (details || {}).authid
+    });
 
     _session = session;
 
@@ -55,7 +55,7 @@ export async function startAutobahn({
     }).then(registrationResults => {
       for (const { ok, message } of registrationResults) {
         if (ok) logs.info(message);
-        else logs.info(message);
+        else logs.error(message);
       }
     });
 
@@ -83,7 +83,7 @@ export async function startAutobahn({
   };
 
   connection.open();
-  logs.info(`Attempting WAMP connection to ${url}, realm: ${realm}`);
+  logs.info("Attempting WAMP connection", { url, realm });
 }
 
 /**

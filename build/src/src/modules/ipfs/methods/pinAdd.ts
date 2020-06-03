@@ -1,6 +1,5 @@
 import ipfs, { timeoutMs } from "../ipfsSetup";
-import Logs from "../../../logs";
-const logs = Logs(module);
+import { logs } from "../../../logs";
 
 /**
  * [ { hash: 'QmNqDvqAyy3pN3PvymB6chM7S1FgYyive8LosVKUuaDdfd' } ]
@@ -25,6 +24,6 @@ export async function pinAdd({
  */
 export async function pinAddNoThrow({ hash }: { hash: string }): Promise<void> {
   await pinAdd({ hash }).catch((e: Error) =>
-    logs.error(`Error pinning hash ${hash}: ${e.stack}`)
+    logs.error(`Error pinning hash ${hash}`, e)
   );
 }

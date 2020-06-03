@@ -6,9 +6,8 @@ import {
   flagErrorUpdate
 } from "../../utils/autoUpdateHelper";
 import { installPackage } from "../../calls/installPackage";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
-const logs = Logs(module);
 
 const coreDnpName = params.coreDnpName;
 

@@ -6,8 +6,7 @@ import { UserActionLog } from "./types";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import { logSafeObjects } from "./utils/logs";
-import Logs from "./logs";
-const logs = Logs(module);
+import { logs } from "./logs";
 
 /**
  * Max number of logs to prevent the log file from growing too big
@@ -96,9 +95,9 @@ export async function migrateUserActionLogs() {
     logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
   } catch (e) {
     if (e.code === "ENOENT") {
-      logs.debug(`userActionLogs file not found, already migrated`);
+      logs.debug("userActionLogs file not found, already migrated");
     } else {
-      logs.error(`Error migrating userActionLogs: ${e.stack}`);
+      logs.error("Error migrating userActionLogs", e);
     }
   }
 }

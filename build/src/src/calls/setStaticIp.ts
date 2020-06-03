@@ -1,8 +1,7 @@
 import * as db from "../db";
 import * as dyndns from "../modules/dyndns";
 import * as eventBus from "../eventBus";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Sets the static IP

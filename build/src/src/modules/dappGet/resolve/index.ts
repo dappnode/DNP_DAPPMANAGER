@@ -7,8 +7,7 @@ import {
 import { pickBy, mapValues } from "lodash";
 import generateErrorMessage from "./generateErrorMessage";
 import { DappGetDnps, DappGetErrors } from "../types";
-import Logs from "../../../logs";
-const logs = Logs(module);
+import { logs } from "../../../logs";
 
 const timeoutMs = 10 * 1000; // ms
 
@@ -68,7 +67,7 @@ export default function resolver(
   const permutationsTable = getPermutationsTable(dnps);
   const totalCases = getTotalPermutations(permutationsTable);
   logs.debug(`dappGet found ${totalCases} possible cases`);
-  logs.debug(JSON.stringify(permutationsTable, null, 2));
+  logs.debug(permutationsTable);
 
   if (!totalCases) throw Error("Aggregation error, total cases must be > 0");
 
@@ -83,7 +82,7 @@ export default function resolver(
     // Check if this combination of versions is valid
     const result = verifyState(state, dnps);
     if (result.valid) {
-      logs.debug(`case ${caseId} valid: ${JSON.stringify(state)}`);
+      logs.debug(`case ${caseId} valid`, state);
       return {
         success: true,
         message: `Found compatible state at case ${caseId + 1}/${totalCases}`,

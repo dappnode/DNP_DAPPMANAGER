@@ -7,9 +7,8 @@ import { DappGetFetcher } from "./fetch";
 
 import resolve from "./resolve";
 import shouldUpdate from "./utils/shouldUpdate";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types";
-const logs = Logs(module);
 
 export interface DappgetOptions {
   BYPASS_RESOLVER?: boolean;
@@ -80,7 +79,7 @@ export default async function dappGet(
       dappGetFetcher: dappGetFetcher || new DappGetFetcher()
     });
   } catch (e) {
-    logs.error(`dappGet/aggregate error: ${e.stack}`);
+    logs.error("dappGet/aggregate error", e);
     e.message = `dappGet could not resolve request ${req.name}@${
       req.ver
     }, error on aggregate stage: ${e.message}`;
@@ -92,7 +91,7 @@ export default async function dappGet(
   try {
     result = resolve(dnps);
   } catch (e) {
-    logs.error(`dappGet/resolve error: ${e.stack}`);
+    logs.error("dappGet/resolve error", e);
     e.message = `dappGet could not resolve request ${req.name}@${
       req.ver
     }, error on resolve stage: ${e.message}`;

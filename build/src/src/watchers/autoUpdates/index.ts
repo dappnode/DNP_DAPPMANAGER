@@ -11,8 +11,7 @@ import {
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 import updateMyPackages from "./updateMyPackages";
 import updateSystemPackages from "./updateSystemPackages";
@@ -34,14 +33,14 @@ async function checkAutoUpdates(): Promise<void> {
         await releaseFetcher.getProvider();
       } catch (e) {
         if (e instanceof EthProviderError) return;
-        logs.warn(`Error getting eth provider: ${e.stack}`);
+        logs.warn("Error getting eth provider", e);
       }
 
     if (isDnpUpdateEnabled()) {
       try {
         await updateMyPackages(releaseFetcher);
       } catch (e) {
-        logs.error(`Error on updateMyPackages: ${e.stack}`);
+        logs.error("Error on updateMyPackages", e);
       }
     }
 
@@ -49,11 +48,11 @@ async function checkAutoUpdates(): Promise<void> {
       try {
         await updateSystemPackages();
       } catch (e) {
-        logs.error(`Error on updateSystemPackages: ${e.stack}`);
+        logs.error("Error on updateSystemPackages", e);
       }
     }
   } catch (e) {
-    logs.error(`Error on autoUpdates interval: ${e.stack}`);
+    logs.error("Error on autoUpdates interval", e);
   }
 
   // Trigger the interval loop with setTimeouts to prevent double execution
@@ -70,7 +69,7 @@ async function checkForCompletedCoreUpdates(): Promise<void> {
     const { versionId } = await fetchCoreUpdateData({});
     clearCompletedCoreUpdatesIfAny(versionId);
   } catch (e) {
-    logs.error(`Error on clearCompletedCoreUpdatesIfAny: ${e.stack}`);
+    logs.error("Error on clearCompletedCoreUpdatesIfAny", e);
   }
 }
 

@@ -4,8 +4,7 @@ import { getPortMappings } from "../../utils/dockerComposeFile";
 // Default ports to open in case getPortsToOpen throws
 import defaultPortsToOpen from "./defaultPortsToOpen";
 import { PackagePort, PortProtocol } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * @returns {array} portsToOpen = [{
@@ -43,6 +42,7 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
      */
     const dnpList = await listContainers();
     for (const dnp of dnpList) {
+      const id = dnp.name;
       if (dnp.running) {
         // If DNP is running the port mapping is available in the dnpList
         for (const port of dnp.ports || []) {
@@ -53,24 +53,20 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
       } else {
         try {
           // If DNP is exited, the port mapping is only available in the docker-compose
-          const dockerComposePortMappings = getPortMappings(dnp.name);
+          const dockerComposePortMappings = getPortMappings(id);
           for (const port of dockerComposePortMappings || []) {
             // Only consider ports that are mapped (not ephemeral ports)
             if (port.host) addPortToOpen(port.protocol, port.host);
           }
         } catch (e) {
-          logs.error(
-            `Error getting ports of "${
-              (dnp || {}).name
-            }" from docker-compose: ${e.stack}`
-          );
+          logs.error(`Error getting ports of ${id} from docker-compose`, e);
         }
       }
     }
 
     return getPortsToOpen();
   } catch (e) {
-    logs.error(`Error on getPortsToOpen: ${e.stack}`);
+    logs.error("Error on getPortsToOpen", e);
     return defaultPortsToOpen;
   }
 }

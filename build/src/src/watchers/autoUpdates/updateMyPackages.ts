@@ -12,8 +12,7 @@ import {
 } from "../../utils/autoUpdateHelper";
 // External calls
 import { installPackage } from "../../calls/installPackage";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 export default async function updateMyPackages(
   releaseFetcher: ReleaseFetcher
@@ -31,7 +30,7 @@ export default async function updateMyPackages(
       try {
         await updateMyPackage(releaseFetcher, name, currentVersion);
       } catch (e) {
-        logs.error(`Error auto-updating ${name}: ${e.stack}`);
+        logs.error(`Error auto-updating ${name}`, e);
       }
     }
   }

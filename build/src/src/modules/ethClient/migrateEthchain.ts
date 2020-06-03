@@ -8,9 +8,8 @@ import { migrateVolume } from "../../modules/hostScripts";
 import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
 import * as getPath from "../../utils/getPath";
 import shell from "../../utils/shell";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { EthClientTargetPackage } from "../../types";
-const logs = Logs(module);
 
 const ethchainDnpName = "ethchain.dnp.dappnode.eth";
 
@@ -100,7 +99,7 @@ export async function migrateEthchain(): Promise<void> {
       ])
         if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
     } catch (e) {
-      logs.error(`Error removing ETHCHAIN package: ${e.stack}`);
+      logs.error("Error removing ETHCHAIN package", e);
     }
 
   // Non-blocking step of migrating old volumes with a host script
@@ -111,9 +110,9 @@ export async function migrateEthchain(): Promise<void> {
       if (idsToRemove) await shell(`docker rm -f ${idsToRemove}`);
       // mv the docker var lib folder in the host context
       await migrateVolume(from, to);
-      logs.info(`Migrated ETHCHAIN ${id} from ${from} to ${to}`);
+      logs.info(`Migrated ETHCHAIN ${id}`, { from, to });
     } catch (e) {
-      logs.error(`Error migrating ETHCHAIN ${id}: ${e.stack}`);
+      logs.error(`Error migrating ETHCHAIN ${id}`, e);
     }
   }
   // Optimization to only run `docker system df -v` once, can run for +15s
@@ -132,11 +131,11 @@ export async function migrateEthchain(): Promise<void> {
             await shell(`docker volume rm -f ${from}`);
             logs.info(`Deleted ETHCHAIN ${id} ${from}`);
           } catch (e) {
-            logs.error(`Error deleting ETHCHAIN ${id} ${from}: ${e.stack}`);
+            logs.error(`Error deleting ETHCHAIN ${id} ${from}`, e);
           }
       }
     } catch (e) {
-      logs.error(`Error deleting ETHCHAIN volumes: ${e.stack}`);
+      logs.error(`Error deleting ETHCHAIN volumes`, e);
     }
 
   for (const { id, name } of volumesToRemove) {
@@ -147,16 +146,14 @@ export async function migrateEthchain(): Promise<void> {
       await dockerVolumeRm(name);
       logs.info(`Removed ETHCHAIN ${id}`);
     } catch (e) {
-      logs.error(`Error removing ETHCHAIN ${id}: ${e.stack}`);
+      logs.error(`Error removing ETHCHAIN ${id}`, e);
     }
   }
 
   // Install new package. fullnode.dappnode is assigned after install
   const migrationTempSettings = db.ethClientMigrationTempSettings.get();
   if (ethchain || migrationTempSettings) {
-    logs.info(
-      `Installing eth multi-client ${target}: with EXTRA_OPTS ${EXTRA_OPTS}`
-    );
+    logs.info(`Installing eth multi-client ${target}`, { EXTRA_OPTS });
 
     if (migrationTempSettings) {
       target = migrationTempSettings.target || target;
