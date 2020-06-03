@@ -22,8 +22,7 @@ import {
   subscriptionsLoggerFactory,
   routesLoggerFactory
 } from "../api/middleware";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 const httpApiPort = params.HTTP_API_PORT;
 const whitelist = [
@@ -90,5 +89,5 @@ export default function startHttpApi(port: number = httpApiPort) {
     wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
   );
 
-  server.listen(port, () => logs.info(`HTTP API ${port}!`));
+  server.listen(port, () => logs.info(`HTTP API ${port}`));
 }

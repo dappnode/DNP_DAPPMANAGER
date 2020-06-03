@@ -13,10 +13,9 @@ import { pause, runWithRetry } from "./utils/asyncFlows";
 import shell from "./utils/shell";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
-import Logs from "./logs";
+import { logs } from "./logs";
 import { restartPackage } from "./calls";
 import { mergeEnvFile } from "./utils/dockerComposeFile";
-const logs = Logs(module);
 
 const vpnDataVolume = params.vpnDataVolume;
 const vpnName = params.vpnDnpName;
@@ -142,7 +141,7 @@ export default async function initializeDb(): Promise<void> {
     if (envsString && envsString.includes(params.GLOBAL_ENVS.ACTIVE))
       shouldResetTheVpn = false;
   } catch (e) {
-    logs.error(`Error checking if should reset the VPN: ${e.stack}`);
+    logs.error("Error checking if should reset the VPN", e);
   }
 
   if (shouldResetTheVpn)
@@ -151,7 +150,7 @@ export default async function initializeDb(): Promise<void> {
       await restartPackage({ id: vpnName });
       logs.info("Added global ENVs and restarted the VPN");
     } catch (e) {
-      logs.error(`Error reseting the VPN: ${e.stack}`);
+      logs.error("Error reseting the VPN", e);
     }
   else logs.info("Globals ENVs are already set in the VPN environment");
 
@@ -204,7 +203,7 @@ async function migrateVpnDb(): Promise<void> {
     if (e.message && e.message.includes("No such file or directory")) {
       logs.warn(`VPN DB not imported, vpndb.json missing.`);
     } else {
-      logs.error(`Error importing VPN DB: ${e.stack}`);
+      logs.error("Error importing VPN DB", e);
     }
   }
 }
@@ -234,7 +233,7 @@ async function updateLocalDyndns(): Promise<void> {
     }
     await runWithRetry(updateLocalDyndnsCall, { times: 5, base: 1000 })(null);
   } catch (e) {
-    logs.error(`Error on update local dyndns: ${e.stack}`);
+    logs.error("Error on update local dyndns", e);
   }
 }
 
@@ -249,7 +248,7 @@ function returnNullIfError(
       return await fn();
     } catch (e) {
       if (silent) logs.warn(e.message);
-      else logs.error(e.stack || e.message);
+      else logs.error(e);
       return null;
     }
   };

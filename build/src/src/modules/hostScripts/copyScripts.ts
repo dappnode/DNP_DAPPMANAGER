@@ -2,8 +2,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import params from "../../params";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;

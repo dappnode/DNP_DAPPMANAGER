@@ -4,8 +4,7 @@ import * as db from "../../db";
 import params from "../../params";
 import { runWithRetry } from "../../utils/asyncFlows";
 import { PackageVersionData } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * Creates a new device with the provided id.

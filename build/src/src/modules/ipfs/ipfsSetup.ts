@@ -1,7 +1,6 @@
 const ipfsClient = require("ipfs-http-client");
 import params from "../../params";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 export const timeoutMs = 30 * 1000;
 /**
@@ -40,14 +39,14 @@ const ipfs = process.env.TEST
  * verify on the background, don't stop execution
  */
 if (!process.env.TEST) {
-  logs.info(`Attempting IPFS connection to : ${IPFS_HOST}`);
+  logs.info(`Attempting IPFS connection to: ${IPFS_HOST}`);
   ipfs.id((err: Error, identity: { id: string }) => {
     if (err)
       ipfs.version((err2: Error, version: IpfsHttpApiVersionReturn) => {
-        if (err2) logs.error(`IPFS error: ${err2.message}`);
-        else logs.info(`Connected to IPFS ${JSON.stringify(version, null, 2)}`);
+        if (err2) logs.error("Error checking IPFS connection", err2);
+        else logs.info("Connected to IPFS", version);
       });
-    else logs.info(`Connected to IPFS ${(identity || {}).id}`);
+    else logs.info("Connected to IPFS", (identity || {}).id);
   });
 }
 

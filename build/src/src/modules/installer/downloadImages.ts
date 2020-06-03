@@ -1,8 +1,7 @@
 import { InstallPackageData } from "../../common/types";
 import { Log } from "../../utils/logUi";
 import getImage, { verifyDockerImage } from "../release/getImage";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * Download the .tar.xz docker image of each package in paralel

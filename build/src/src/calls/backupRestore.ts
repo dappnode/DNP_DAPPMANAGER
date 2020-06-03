@@ -2,8 +2,8 @@ import path from "path";
 import fs from "fs";
 import * as db from "../db";
 import params from "../params";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
+
 // Modules
 import { listContainer } from "../modules/docker/listContainers";
 // External call
@@ -71,7 +71,7 @@ export async function backupRestore({
     await shell(`rm -rf ${backupDirCompressed}`);
 
     const successfulBackups = [];
-    let lastError;
+    let lastError: Error | null = null;
     for (const { name, path: toPath } of backup) {
       try {
         const fromPath = path.join(backupDir, name);
@@ -91,12 +91,14 @@ export async function backupRestore({
         successfulBackups.push(name);
       } catch (e) {
         lastError = e;
-        logs.error(`Backup error ${id} - ${name} from ${toPath}: ${e.stack}`);
+        logs.error(`Backup error ${id}`, { name, toPath }, e);
       }
     }
 
-    if (!successfulBackups.length)
-      throw Error(`Could not unbackup any item: ${lastError.stack}`);
+    if (!successfulBackups.length && lastError) {
+      lastError.message = `Could not unbackup any item: ${lastError.message}`;
+      throw lastError;
+    }
 
     // Clean intermediate file
     await shell(`rm -rf ${backupDir}`);

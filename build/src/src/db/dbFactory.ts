@@ -2,8 +2,7 @@ import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import * as validate from "../utils/validate";
 import { formatKey } from "./dbUtils";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export default function dbFactory(dbPath: string) {

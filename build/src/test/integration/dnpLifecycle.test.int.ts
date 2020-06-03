@@ -5,8 +5,7 @@ import { mapValues } from "lodash";
 import shell from "../../src/utils/shell";
 import * as calls from "../../src/calls";
 import params from "../../src/params";
-const getDataUri = require("datauri").promise;
-import Logs from "../../src/logs";
+import { logs } from "../../src/logs";
 import { getDnpFromListPackages, getDnpState } from "../testPackageUtils";
 import {
   PortMapping,
@@ -20,7 +19,7 @@ import {
   stringifyPortMappings,
   legacyTag
 } from "../../src/utils/dockerComposeParsers";
-const logs = Logs(module);
+const getDataUri = require("datauri").promise;
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -236,8 +235,7 @@ describe("DNP lifecycle", function() {
     clearDbs();
 
     // Print out params
-    logs.info("Test params");
-    logs.info(JSON.stringify(params, null, 2));
+    logs.info("Test params", params);
   });
 
   before(`Preparing releases for ${idMain} and ${idDep}`, async () => {
@@ -285,7 +283,7 @@ describe("DNP lifecycle", function() {
       dnpMain = _dnpMain;
       dnpDep = _dnpDep;
       // Print status as a sanity check for test debugging
-      logs.debug(JSON.stringify({ dnpMain, dnpDep }, null, 2));
+      logs.debug({ dnpMain, dnpDep });
     });
 
     it(`${idMain} environment`, () => {

@@ -4,7 +4,6 @@ import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePath
 // Utils
 import { getLogUi, logUiClear } from "../utils/logUi";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
-import { stringify } from "../utils/objects";
 import { ReleaseFetcher } from "../modules/release";
 import { UserSettingsAllDnps, PackageRequest } from "../types";
 import {
@@ -18,8 +17,7 @@ import {
   writeAndValidateFiles,
   postInstallClean
 } from "../modules/installer";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Installs a DAppNode Package.
@@ -67,7 +65,7 @@ export async function installPackage({
       currentVersion,
       releases
     } = await releaseFetcher.getReleasesResolved(req, options);
-    logs.info(`Resolved request ${req.name} @ ${req.ver}: ${stringify(state)}`);
+    logs.info("Resolved request", req, state);
 
     // Throw any errors found in the release
     for (const release of releases) {
@@ -84,8 +82,8 @@ export async function installPackage({
       currentVersion,
       reqName
     });
-    logs.debug(`Packages data: ${JSON.stringify(packagesData, null, 2)}`);
-    logs.debug(`User settings: ${JSON.stringify(userSettings, null, 2)}`);
+    logs.debug("Packages data", packagesData);
+    logs.debug("User settings", userSettings);
 
     // Make sure that no package is already being installed
     const dnpNames = packagesData.map(({ name }) => name);

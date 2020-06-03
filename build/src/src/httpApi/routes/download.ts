@@ -1,8 +1,7 @@
 import express from "express";
 import fs from "fs";
 import * as db from "../../db";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * Endpoint to download files.

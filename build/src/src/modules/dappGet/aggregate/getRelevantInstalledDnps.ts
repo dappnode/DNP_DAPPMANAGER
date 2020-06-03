@@ -36,10 +36,10 @@ export default function getRelevantInstalledDnps({
     installedDnps.map(dnp => dnp.name)
   );
   const installedDnpsWithDeps = installedDnps.filter(dnp => dnp.dependencies);
-  intersectedDnps.forEach(dnpName => {
+  for (const dnpName of intersectedDnps) {
     const dnp = installedDnps.find(dnp => dnp.name === dnpName);
     if (dnp) addDependants(dnp);
-  });
+  }
   // Return only packages that are not already included in the requestedDnps array
   return Object.values(state).filter(dnp => !requestedDnps.includes(dnp.name));
 
@@ -48,11 +48,11 @@ export default function getRelevantInstalledDnps({
     if (Date.now() - start > 2000) return;
 
     addToState(dnp);
-    installedDnpsWithDeps.forEach(dependantPkg => {
+    for (const dependantPkg of installedDnpsWithDeps) {
       if (dependsOn(dependantPkg, dnp) && !isInState(dependantPkg)) {
         addDependants(dependantPkg);
       }
-    });
+    }
   }
 
   function addToState(dnp: PackageContainer): void {

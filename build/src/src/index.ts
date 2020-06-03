@@ -16,8 +16,7 @@ import runWatchers from "./watchers";
 import startEthForward from "./ethForward";
 import startHttpApi from "./httpApi";
 import { startAutobahn } from "./api";
-import Logs from "./logs";
-const logs = Logs(module);
+import { logs } from "./logs";
 
 // Start HTTP API
 startHttpApi();
@@ -48,12 +47,10 @@ if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
 // Initial calls to check this DAppNode's status
 calls
   .passwordIsSecure()
-  .then(isSecure => {
-    logs.info("Host user password is " + (isSecure ? "secure" : "INSECURE"));
-  })
-  .catch(e => {
-    logs.error(`Error checking if host user password is secure: ${e.message}`);
-  });
+  .then(isSecure =>
+    logs.info("Host password is", isSecure ? "secure" : "INSECURE")
+  )
+  .catch(e => logs.error("Error checking if host user password is secure", e));
 
 // Read and print version data
 const versionData = getVersionData();
@@ -74,7 +71,7 @@ async function runLegacyOps(): Promise<void> {
   try {
     db.migrateToNewMainDb();
   } catch (e) {
-    logs.error(`Error migrating to new main DB: ${e.stack || e.message}`);
+    logs.error("Error migrating to new main DB", e);
   }
 
   try {
@@ -84,25 +81,21 @@ async function runLegacyOps(): Promise<void> {
       if (hasConverted)
         logs.info(`Converted ${dnp.name} .env file to compose environment`);
     }
-    logs.info(`Finished converting legacy DNP .env files if any`);
+    logs.info("Finished converting legacy DNP .env files if any");
   } catch (e) {
-    logs.error(`Error converting DNP .env files: ${e.stack || e.message}`);
+    logs.error("Error converting DNP .env files", e);
   }
 
-  migrateEthchain().catch(e =>
-    logs.error(`Error migrating ETHCHAIN: ${e.stack}`)
-  );
+  migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
 
-  migrateEthForward().catch(e =>
-    logs.error(`Error migrating ETHFORWARD: ${e.stack}`)
-  );
+  migrateEthForward().catch(e => logs.error("Error migrating ETHFORWARD", e));
 
   removeLegacyBindVolume().catch(e =>
-    logs.error(`Error removing legacy BIND volume: ${e.stack}`)
+    logs.error("Error removing legacy BIND volume", e)
   );
 
   migrateUserActionLogs().catch(e =>
-    logs.error(`Error migrating userActionLogs: ${e.stack}`)
+    logs.error("Error migrating userActionLogs", e)
   );
 }
 
@@ -114,10 +107,6 @@ runLegacyOps();
  * -
  */
 
-copyHostScripts().catch(e =>
-  logs.error(`Error copying host scripts: ${e.stack}`)
-);
+copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
 
-postRestartPatch().catch(e =>
-  logs.error(`Error on postRestartPatch: ${e.stack}`)
-);
+postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));

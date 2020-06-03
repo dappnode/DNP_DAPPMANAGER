@@ -4,8 +4,7 @@ import { listContainer } from "../modules/docker/listContainers";
 import { parseDevicePath } from "../utils/dockerComposeParsers";
 import { readManifest, readEnvironment } from "../utils/configFiles";
 import { PackageDetailData } from "../types";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Toggles the visibility of a getting started block
@@ -58,7 +57,7 @@ export async function packageDetailDataGet({
       };
     });
   } catch (e) {
-    logs.warn(`Error getting volume details for ${dnp.name}: ${e.stack}`);
+    logs.warn(`Error getting volume details for ${dnp.name}`, e);
   }
 
   // Setup wizard
@@ -74,7 +73,7 @@ export async function packageDetailDataGet({
       };
     }
   } catch (e) {
-    logs.warn(`Error getting manifest for ${dnp.name}: ${e.stack}`);
+    logs.warn(`Error getting manifest for ${dnp.name}`, e);
   }
 
   // User settings
@@ -84,7 +83,7 @@ export async function packageDetailDataGet({
       environment: environment
     };
   } catch (e) {
-    logs.warn(`Error getting user settings for ${dnp.name}: ${e.stack}`);
+    logs.warn(`Error getting user settings for ${dnp.name}`, e);
   }
 
   return packageDetail;

@@ -3,8 +3,7 @@ import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { shellHost } from "../utils/shell";
 import * as eventBus from "../eventBus";
 import params from "../params";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
 

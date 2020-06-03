@@ -3,9 +3,8 @@ import sanitizeVersions from "./sanitizeVersions";
 import sanitizeDependencies from "./sanitizeDependencies";
 import { Dependencies } from "../../../types";
 import { DappGetDnps } from "../types";
-import Logs from "../../../logs";
+import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch";
-const logs = Logs(module);
 
 const emptyDeps: Dependencies = {};
 
@@ -65,9 +64,8 @@ export default async function aggregateDependencies({
         .then(sanitizeDependencies)
         .catch((e: Error) => {
           logs.warn(
-            `Error fetching ${name}@${version} dependencies (assuming it has none). Error stack: ${
-              e.stack
-            }`
+            `Error fetching ${name}@${version} dependencies (assuming it has none)`,
+            e
           );
           return emptyDeps;
         });

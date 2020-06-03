@@ -1,111 +1,115 @@
-"use strict";
-import winston from "winston";
+import path from "path";
+import stackTrace from "stack-trace";
+// "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
+import "source-map-support/register";
+import { logSafeObjects } from "./utils/logs";
 
-const { createLogger, format, transports } = winston;
+const rootDir = __dirname;
+const logDebug = /debug/i.test(process.env.LOG_LEVEL || "");
 
-const { LOG_LEVEL } = process.env;
+// Not adding color codes since it makes it harder to read as plain text
+const tags = {
+  debug: "DEBUG",
+  info: "INFO",
+  warn: "WARN",
+  error: "ERROR"
+};
 
-const logLevel =
-  LOG_LEVEL === "error"
-    ? "error"
-    : LOG_LEVEL === "warn"
-    ? "warn"
-    : LOG_LEVEL === "verbose"
-    ? "verbose"
-    : LOG_LEVEL === "debug"
-    ? "debug"
-    : "info";
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable no-console */
+export const logs = {
+  /**
+   * Allows to log any type of data. Strings will be shown first.
+   * ```js
+   * logs.debug("some process", ["arg", "arg"], id);
+   * ```
+   */
+  debug: formatLogger(tags.debug, logDebug ? console.debug : () => {}),
+  /**
+   * Allows to log any type of data. Strings will be shown first.
+   * ```js
+   * logs.info(req.body, "first", [1, 2, 3], "second");
+   * ```
+   */
+  info: formatLogger(tags.info, console.log),
+  /**
+   * Allows to log any type of data. Strings will be shown first.
+   * Use `ErrorNoStack` to hide the stack
+   * ```js
+   * logs.warn("error fetching", new ErrorNoStack("DAMNN"));
+   * ```
+   */
+  warn: formatLogger(tags.warn, console.warn),
+  /**
+   * Allows to log any type of data. Strings will be shown first.
+   * Use `ErrorNoStack` to hide the stack
+   * ```js
+   * logs.error("error fetching", new Error("DAMNN"));
+   * ```
+   */
+  error: formatLogger(tags.error, console.error)
+};
+/* eslint-enable @typescript-eslint/no-empty-function */
+/* eslint-enable no-console */
 
-/*
- * Generic logger to the console and therefore the container logs
- */
+export class ErrorNoStack extends Error {}
 
-/*
- * > LEVELS:
- * ---------------------
- * logs.info("Something")
- * logs.warn("Something")
- * logs.error("Something")
- */
-
-const scFormat = format.printf(info => {
-  const level = info.level.toUpperCase();
-  let message = info.message;
-  const filteredInfo = Object.assign({}, info, {
-    level: undefined,
-    message: undefined,
-    splat: undefined,
-    label: undefined,
-    timestamp: undefined
-  });
-  let append: string;
-  try {
-    append = JSON.stringify(filteredInfo, null, 4);
-  } catch (e) {
-    append = `\n Logs error - can't stringify data: ${e.message}`;
-  }
-
-  if (append && append != "{}") {
-    message = `${message} - ${append}`;
-  }
-  const variables = [];
-  if (info.admin) variables.push("ADMIN");
-
-  // return `${info.timestamp} ${level} [${info.label}] : ${message}`;
-  return `${level} [${info.label}] [${variables.join("&")}] : ${message}`;
-});
-
-/**
- * Get a label to desribe the module we're logging for.
- *
- * @param {object}  mod The module we're logging for or a description of the
- *                      logger.
- * @returns {winston.format.label}
- */
-// Let winston return it's own format
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-function _getLabel(mod: NodeModule) {
-  if (mod == undefined) mod = module;
-
-  const label = mod.id
-    ? (mod.id.replace(".js", "") || "").replace(/^.*\/src\//, "")
-    : "";
-  return format.label({ label: label });
+function formatLogger(tag: string, logger: (...args: any[]) => void) {
+  return function log(
+    ...items: (string | Error | { [key: string]: any })[]
+  ): void {
+    try {
+      const caller = getLocation(Error(), 1) || "??";
+      const data = items
+        // String first
+        .sort(function compare(a, b) {
+          const aIsString = typeof a === "string";
+          const bIsString = typeof b === "string";
+          if (aIsString && !bIsString) return -1;
+          if (!aIsString && bIsString) return 1;
+          return 0;
+        })
+        // Error last
+        .sort(function compare(a, b) {
+          const aIsError = a instanceof Error;
+          const bIsError = b instanceof Error;
+          if (aIsError && !bIsError) return 1;
+          if (!aIsError && bIsError) return -1;
+          return 0;
+        })
+        .map(item => {
+          if (item instanceof ErrorNoStack) return item.message;
+          if (item instanceof Error) return item;
+          if (typeof item === "string") return item;
+          if (typeof item === "object") return logSafeObjects(item);
+          return item;
+        });
+      logger(tag, `[${caller}]`, ...data);
+    } catch (e) {
+      /* eslint-disable-next-line no-console */
+      console.error("ERROR LOGGING ITEMS", e);
+      logger(items);
+    }
+  };
 }
 
 /**
- * Parses data appended to the message
- * ```javascript
- * logs.info("Hello!", { asd: 1 });
- * ```
- * Prints
- * ```raw
- * INFO [.] [] : Hello! - {
- *   "asd": 1
- * }
- * ```
- * @param mod
+ * Grab the Nth path of the call stack
+ * Works well for transpiled, minified or regular code
+ * REQUIRES import "source-map-support/register";
  */
-export default function(mod: NodeModule): winston.Logger {
-  const logger = createLogger({
-    level: logLevel,
-    format: format.combine(
-      format.splat(),
-      format.timestamp({
-        format: "DD-MM-YYYY HH:mm:ss"
-      }),
-      _getLabel(mod),
-      scFormat
-    ),
-    transports: [
-      new transports.Console({
-        // format: format.combine(
-        //   format.timestamp(),
-        //   format.colorize(),
-        //   format.simple()
-        // ),
-      })
-    ]
-  });
-  return logger;
+export function getLocation(error: Error, stackCount: number): string | null {
+  const parsed = stackTrace.parse(error);
+  const firstOutsideRow = parsed[stackCount];
+  if (!firstOutsideRow) return null;
+
+  const fileName = firstOutsideRow.getFileName();
+  const lineNumber = firstOutsideRow.getLineNumber();
+  let relativePath = path.relative(rootDir, fileName);
+
+  // Don't show unnecessary file info
+  if (relativePath.endsWith(".ts")) relativePath = relativePath.slice(0, -3);
+  if (relativePath.endsWith("/index")) relativePath = relativePath.slice(0, -6);
+
+  return `${relativePath}:${lineNumber}`;
 }

@@ -5,8 +5,7 @@ import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * Create and run each package container in series
@@ -33,7 +32,7 @@ export async function runPackages(
       // Copy fileUploads if any to the container before up-ing
       if (fileUploads) {
         log(name, "Copying file uploads...");
-        logs.debug(`${name} fileUploads: ${JSON.stringify(fileUploads)}`);
+        logs.debug(`${name} fileUploads`, fileUploads);
 
         await dockerComposeUpSafe(composePath, { noStart: true });
         for (const [containerPath, dataUri] of Object.entries(fileUploads)) {

@@ -28,10 +28,3 @@ export function applyRecursivelyToStringValues(
     }
   };
 }
-
-/**
- * Alias for JSON.stringify(obj, null, 2)
- */
-export function stringify(obj: GenericObject): string {
-  return JSON.stringify(obj, null, 2);
-}

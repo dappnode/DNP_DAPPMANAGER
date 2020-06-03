@@ -4,8 +4,7 @@ import { dockerComposeRm } from "../docker/dockerCommands";
 import { dockerComposeUpSafe } from "../docker/dockerSafe";
 import { Log } from "../../utils/logUi";
 import { InstallPackageDataPaths } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * [Rollback] Stop all new packages with the new compose
@@ -37,7 +36,7 @@ export async function rollbackPackages(
         fs.unlinkSync(from);
       } catch (e) {
         if (e.code !== "ENOENT" || isUpdate)
-          logs.error(`Rollback error restoring ${name} ${from}: ${e.stack}`);
+          logs.error(`Rollback error restoring ${name} ${from}`, e);
       }
 
   // Delete image files
@@ -45,7 +44,7 @@ export async function rollbackPackages(
     try {
       fs.unlinkSync(imagePath);
     } catch (e) {
-      logs.error(`Rollback error removing ${name} image: ${e.stack}`);
+      logs.error(`Rollback error removing ${name} image`, e);
     }
 
   // Restore backup versions
@@ -67,6 +66,6 @@ export async function rollbackPackages(
 
       log(name, "Aborted and rolled back...");
     } catch (e) {
-      logs.error(`Rollback error rolling starting ${name}: ${e.stack}`);
+      logs.error(`Rollback error rolling starting ${name}`, e);
     }
 }

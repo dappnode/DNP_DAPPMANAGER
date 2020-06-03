@@ -5,9 +5,8 @@ import { ChainData } from "../../types";
 import { knownChains } from "./knownChains";
 // Drivers
 import runDriver, { getDriverApi } from "./drivers";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { Chain } from "./types";
-const logs = Logs(module);
 
 const checkChainWatcherInterval =
   params.CHECK_CHAIN_WATCHER_INTERVAL || 60 * 1000; // 1 minute
@@ -19,6 +18,7 @@ const emitChainDataWatcherInterval =
 // Every time there is a package install / remove, the watchers will be reseted
 
 const activeChains: { [chainName: string]: Chain } = {};
+const loggedError: { [chainName: string]: string | null } = {};
 
 /**
  * CHAIN MANAGMENT
@@ -58,7 +58,7 @@ async function checkChainWatchers(): Promise<void> {
       }
     }
   } catch (e) {
-    logs.error(`Error checking chain watchers: ${e.stack}`);
+    logs.error(`Error checking chain watchers`, e);
   }
 }
 
@@ -84,12 +84,16 @@ async function getAndEmitChainData(): Promise<void> {
         const { dnpName } = chain;
         try {
           const chainDataResult = await runDriver(chain);
+          loggedError[chain.api] = null; // Reset last seen error
           return {
             dnpName,
             ...chainDataResult
           };
         } catch (e) {
-          logs.debug(`Error on chain ${dnpName} watcher: ${e.stack}`);
+          // Only log chain errors the first time they are seen
+          if (loggedError[chain.api] !== e.message)
+            logs.debug(`Error on chain ${dnpName} watcher`, e);
+          loggedError[chain.api] = e.message;
           return {
             dnpName,
             syncing: false,

@@ -3,8 +3,7 @@ import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
 import { removePackage } from "../../calls";
 import { EthClientTarget, UserSettings } from "../../types";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -33,7 +32,7 @@ export async function changeEthMultiClient(
         // will create conflicts since it's the same DNP
       }
     } catch (e) {
-      logs.error(`Error removing previous ETH multi-client: ${e.stack}`);
+      logs.error("Error removing previous ETH multi-client", e);
     }
   }
 

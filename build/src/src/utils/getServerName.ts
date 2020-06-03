@@ -1,7 +1,6 @@
 import fs from "fs";
 import params from "../params";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 const hostnamePath = params.HOSTNAME_PATH;
 const defaultName = "DAppNode_server";

@@ -1,9 +1,8 @@
 import fs from "fs";
 import * as db from "../db";
 import params from "../params";
-import Logs from "../logs";
+import { logs } from "../logs";
 import isIp from "is-ip";
-const logs = Logs(module);
 
 const staticIpPath = params.STATIC_IP_PATH;
 

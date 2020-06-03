@@ -1,8 +1,7 @@
 import shellExec from "../../utils/shell";
 import params from "../../params";
 import * as eventBus from "../../eventBus";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const monitoringInterval =
   params.CHECK_DISK_USAGE_WATCHER_INTERVAL || 60 * 1000; // (ms) (1 minute)
@@ -88,9 +87,7 @@ async function monitorDiskUsage(): Promise<void> {
           if (e.message.includes("requires at least 1 argument")) {
             logs.warn(`No containers stopped by the "${cmd}" command`);
           } else {
-            logs.error(
-              `Error stopping containers on disk usage watcher: ${e.stack}`
-            );
+            logs.error("Error stopping containers on disk usage watcher", e);
           }
         }
 
@@ -130,7 +127,7 @@ async function monitorDiskUsage(): Promise<void> {
       }
     }
   } catch (e) {
-    logs.error(`Error monitoring disk usage: ${e.stack}`);
+    logs.error(`Error monitoring disk usage`, e);
   }
 }
 

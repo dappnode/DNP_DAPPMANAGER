@@ -9,8 +9,7 @@ import { restartPackageVolumesTask } from "./restartPackageVolumes";
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listContainer } from "../modules/docker/listContainers";
-import Logs from "../logs";
-const logs = Logs(module);
+import { logs } from "../logs";
 
 /**
  * Remove package data: docker down + disk files
@@ -67,7 +66,7 @@ export async function removePackage({
           timeout
         });
       } catch (e) {
-        logs.error(`Error on dockerComposeDown of ${id}: ${e.message}`);
+        logs.error(`Error on dockerComposeDown of ${id}`, e);
         await dockerRm(containerName, { volumes: deleteVolumes });
       }
     else await dockerRm(containerName, { volumes: deleteVolumes });

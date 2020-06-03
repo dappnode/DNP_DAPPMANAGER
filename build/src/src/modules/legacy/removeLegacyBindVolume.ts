@@ -1,8 +1,7 @@
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import shell from "../../utils/shell";
 import { dockerVolumesList } from "../docker/dockerApi";
 import { dockerVolumeRm } from "../docker/dockerCommands";
-const logs = Logs(module);
 
 const oldBindVol = "dncore_binddnpdappnodeeth_data";
 const newBindVol = "dncore_binddnpdappnodeeth_bind";
@@ -29,6 +28,6 @@ export async function removeLegacyBindVolume(): Promise<void> {
         await dockerVolumeRm(volName);
         logs.info(`Removed legacy volume ${volName}`);
       } catch (e) {
-        logs.error(`Error removing legacy volume ${volName}: ${e.stack}`);
+        logs.error(`Error removing legacy volume ${volName}`, e);
       }
 }

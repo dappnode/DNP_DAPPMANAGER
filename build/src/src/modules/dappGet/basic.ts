@@ -2,10 +2,9 @@ import { listContainers } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
-import Logs from "../../logs";
+import { logs } from "../../logs";
 import { DappGetResult, DappGetState } from "./types";
 import { DappGetFetcher } from "./fetch";
-const logs = Logs(module);
 
 /**
  * Simple version of `dappGet`, since its resolver may cause errors.
@@ -47,7 +46,7 @@ export default async function dappGetBasic(
       }
     }
   } catch (e) {
-    logs.error(`Error listing current containers: ${e.stack}`);
+    logs.error("Error listing current containers", e);
   }
 
   return {

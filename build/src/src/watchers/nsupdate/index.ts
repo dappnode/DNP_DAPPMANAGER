@@ -6,8 +6,7 @@ import { listContainers } from "../../modules/docker/listContainers";
 import { setIntervalDynamic, runWithRetry } from "../../utils/asyncFlows";
 // Utils
 import { getNsupdateTxts } from "./utils";
-import Logs from "../../logs";
-const logs = Logs(module);
+import { logs } from "../../logs";
 
 const execNsupdateRetry = runWithRetry(execNsupdate, { base: 1000 });
 const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
@@ -40,14 +39,14 @@ async function runNsupdate({
     }
 
     if (ids) {
-      if (removeOnly) logs.info(`nsupdate delete for ${ids.join(", ")}`);
-      else logs.info(`nsupdate add for ${ids.join(", ")}`);
+      if (removeOnly) logs.info("nsupdate delete", ids);
+      else logs.info("nsupdate add", ids);
     } else if (firstRun) {
       logs.info(`Successful initial nsupdate call for all DNPs`);
       firstRun = false;
     }
   } catch (e) {
-    logs.error(`Error on nsupdate interval: ${e.stack}`);
+    logs.error("Error on nsupdate interval", e);
   }
 }
 
