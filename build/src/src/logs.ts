@@ -7,11 +7,12 @@ import { logSafeObjects } from "./utils/logs";
 const rootDir = __dirname;
 const logDebug = /debug/i.test(process.env.LOG_LEVEL || "");
 
+// Not adding color codes since it makes it harder to read as plain text
 const tags = {
-  debug: "\x1b[35mdebug\x1b[0m", // magenta
-  info: "\x1b[32minfo \x1b[0m", // green
-  warn: "\x1b[33mwarn \x1b[0m", // yellow
-  error: "\x1b[31merror\x1b[0m" // red
+  debug: "DEBUG",
+  info: "INFO",
+  warn: "WARN",
+  error: "ERROR"
 };
 
 /* eslint-disable @typescript-eslint/no-empty-function */
