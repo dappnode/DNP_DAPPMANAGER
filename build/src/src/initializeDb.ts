@@ -108,7 +108,7 @@ export default async function initializeDb(): Promise<void> {
   db.alertToOpenPorts.set(alertUserToOpenPorts);
   db.internalIp.set(internalIp);
 
-  // Create VPN's address + publicKey + privateKey if it doesn't exist yet (with static ip or not)
+  // Create VPN's address + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
   dyndns.generateKeys(); // Auto-checks if keys are already generated
@@ -128,6 +128,7 @@ export default async function initializeDb(): Promise<void> {
     [params.GLOBAL_ENVS.NO_NAT_LOOPBACK]: boolToString(db.noNatLoopback.get()),
     [params.GLOBAL_ENVS.DOMAIN]: db.domain.get(),
     [params.GLOBAL_ENVS.PUBKEY]: db.dyndnsIdentity.get().publicKey,
+    [params.GLOBAL_ENVS.ADDRESS]: db.dyndnsIdentity.get().address,
     [params.GLOBAL_ENVS.PUBLIC_IP]: db.publicIp.get(),
     [params.GLOBAL_ENVS.SERVER_NAME]: db.serverName.get()
   });
