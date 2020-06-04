@@ -1,0 +1,191 @@
+.installer-header {
+  --avatar-size: 5rem;
+
+  .details-header {
+    display: flex;
+
+    .left {
+      flex: none;
+    }
+
+    .right {
+      flex: auto;
+    }
+
+    .right-top {
+      flex: auto;
+      justify-content: space-between;
+      display: flex;
+      @media screen and (max-width: 40rem) {
+        display: block;
+      }
+
+      > * {
+        margin-bottom: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .info {
+        flex: auto;
+        justify-content: space-between;
+        margin-right: 1rem;
+        min-height: var(--avatar-size);
+      }
+
+      .name-container {
+        height: 1.5rem;
+        display: flex;
+
+        .name {
+          font-size: 1.5rem;
+          line-height: 1.5rem;
+          height: 1.5rem;
+          overflow: hidden;
+        }
+
+        .verified-badge {
+          flex: none;
+          color: var(--dappnode-color);
+          height: 1.1rem;
+          margin-left: 0.25rem;
+          align-self: center;
+        }
+      }
+
+      .by > *:not(:last-child) {
+        margin-right: 8px;
+      }
+
+      .status-badges {
+        & > *:not(:last-child) {
+          margin-right: 8px;
+        }
+      }
+
+      .actions {
+        justify-content: flex-end;
+        margin-bottom: 0.4rem;
+        .install {
+          flex: none;
+        }
+      }
+    }
+
+    .right-bottom {
+      --ok-color: #dcf4f2;
+      --not-ok-color: #fae1e3;
+      --neutral-color: #e6e6e6;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0px, max-content));
+      @media screen and (max-width: 30rem) {
+        grid-template-columns: minmax(0px, max-content);
+      }
+      .status-badge {
+        background-color: var(--neutral-color);
+
+        border-radius: 41px;
+        padding: 1px 9px 1px 5px;
+        transition: color ease 150ms;
+        color: #4d4d4d;
+        font-size: 0.86rem;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        margin-top: 5px; // For the small view
+        margin-right: 5px; // For the wide view
+        > span {
+          overflow: hidden;
+        }
+        &.ok {
+          background-color: var(--ok-color);
+        }
+        &.not-ok {
+          background-color: var(--not-ok-color);
+        }
+        // Hoverable
+        cursor: pointer;
+        &:hover {
+          color: black;
+        }
+      }
+    }
+
+    .avatar {
+      display: flex;
+      justify-content: center;
+      width: var(--avatar-size);
+      height: var(--avatar-size);
+      margin-right: var(--default-spacing);
+      img {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  .more-options {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    svg {
+      font-size: 1.5rem;
+    }
+    transition: color ease 150ms;
+    &:hover {
+      color: black;
+    }
+    align-self: flex-end;
+    @media screen and (max-width: 40rem) {
+      justify-content: flex-start;
+      margin-left: calc(var(--avatar-size) + var(--default-spacing));
+      svg {
+        order: 2;
+      }
+    }
+  }
+
+  .details-body {
+    margin-top: var(--default-spacing);
+    .subtle-header {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  & > *:not(.installer-details) {
+    justify-self: end;
+  }
+
+  .expandable-info {
+    .subtle-header {
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      > svg {
+        font-size: 19px;
+        cursor: pointer;
+        transition: color ease 150ms;
+        &:hover {
+          color: black;
+        }
+      }
+    }
+
+    > * {
+      border-top: var(--border-style);
+      padding-top: var(--default-spacing);
+      margin-top: var(--default-spacing);
+    }
+    > *:last-child {
+      border-bottom: var(--border-style);
+      padding-bottom: var(--default-spacing);
+      margin-bottom: var(--default-spacing);
+    }
+  }
+}

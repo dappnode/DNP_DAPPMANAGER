@@ -1,0 +1,32 @@
+.atention-grab {
+  color: black !important;
+  animation: pulse-opacity 1s infinite ease-in-out;
+  --color-from: #c4c4c4;
+  --color-to: black;
+  --opacity-from: 0.1;
+  --opacity-to: 1;
+}
+/* pulse color */
+@keyframes pulse-color {
+  0% {
+    color: var(--color-from);
+  }
+  50% {
+    color: var(--color-to);
+  }
+  100% {
+    color: var(--color-from);
+  }
+}
+
+@keyframes pulse-opacity {
+  0% {
+    opacity: var(--opacity-from);
+  }
+  50% {
+    opacity: var(--opacity-to);
+  }
+  100% {
+    opacity: var(--opacity-from);
+  }
+}

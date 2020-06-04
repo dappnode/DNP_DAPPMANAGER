@@ -1,0 +1,10 @@
+.security-issue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--default-spacing);
+
+  .section-subtitle {
+    margin: 0;
+  }
+}

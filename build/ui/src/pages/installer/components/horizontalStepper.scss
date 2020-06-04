@@ -1,0 +1,91 @@
+.horizontal-stepper {
+  width: 100%;
+  align-items: flex-start;
+  display: flex;
+  padding: 3px 0;
+
+  .steps-step {
+    flex: 1;
+    position: relative;
+    padding-left: 8px;
+    padding-right: 8px;
+
+    --gray-color: #9e9e9e;
+    border-color: var(--gray-color);
+    color: var(--gray-color);
+
+    .connector {
+      top: 14px;
+      left: calc(-50% + 25px);
+      right: calc(50% + 25px);
+      position: absolute;
+      flex: 1 1 auto;
+      > span {
+        border-top-style: solid;
+        border-top-width: 2px;
+        display: block;
+        border-color: #bdbdbd;
+      }
+    }
+
+    &:first-child {
+      .connector {
+        display: none;
+      }
+    }
+
+    .step-label {
+      flex-direction: column;
+      display: flex;
+      align-items: center;
+      .icon-container {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: center;
+        align-items: center;
+        // Helps with really small screens when the connetor overlaps
+        z-index: 1;
+      }
+      .text-container {
+        width: 100%;
+        margin-top: 12px;
+        text-align: center;
+      }
+      .circle {
+        --step-circle-size: 35px;
+        text-align: center;
+        width: var(--step-circle-size);
+        height: var(--step-circle-size);
+        font-size: 14px;
+        border-radius: 50%;
+        line-height: 1.41;
+        overflow: hidden;
+        // box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
+        //   0 2px 10px 0 rgba(0, 0, 0, 0.12);
+        // Helps with really small screens when the connetor overlaps
+        background-color: var(--color-background);
+        transition: color ease 150ms;
+        border: 2px solid var(--gray-color);
+      }
+      .text {
+        text-align: center;
+      }
+    }
+    &.completed {
+      .step-label > .circle,
+      .connector > span {
+        background-color: var(--dappnode-strong-main-color);
+        border-color: var(--dappnode-strong-main-color);
+        color: white;
+      }
+    }
+
+    &.active {
+      color: black;
+      .step-label > .circle,
+      .connector > span {
+        border-color: var(--dappnode-color);
+      }
+    }
+  }
+}

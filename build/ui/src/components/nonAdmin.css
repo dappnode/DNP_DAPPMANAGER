@@ -1,0 +1,31 @@
+.standalone-container > div,
+.standalone-container > img {
+  margin: 0.7rem;
+}
+
+.standalone-container > .toplogo {
+  opacity: 0.4;
+}
+
+.standalone-container > .separator {
+  width: 25rem;
+  border-top: var(--border-style);
+}
+
+.standalone-container > .logo {
+  width: 15em;
+  filter: grayscale(100%);
+}
+
+.standalone-container > .title {
+  font-size: 3em;
+}
+
+.standalone-container > .text {
+  max-width: 35em;
+}
+
+/* For the links in NoConnection */
+.standalone-container a {
+  color: gray;
+}

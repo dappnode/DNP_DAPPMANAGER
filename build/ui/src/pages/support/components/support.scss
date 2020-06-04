@@ -1,0 +1,54 @@
+.github-issue-body {
+  /* Box styling */
+  border: solid 1px #d3d3d396;
+  border-radius: 5px;
+  padding: 16px 8px;
+  margin: 0px 0px 0px;
+  background-color: #f5f5f552;
+  opacity: 0.6;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  /* Text styling */
+  display: block;
+  /* Box sizing */
+  overflow: auto;
+  max-height: 500px;
+}
+
+.github-issue-header {
+  /* Box styling */
+  border: solid 1px #d3d3d396;
+  border-radius: 5px;
+  padding: 8px;
+  margin: 10px 0px 0px;
+  background-color: #f5f5f51a;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  opacity: 0.8;
+  overflow: hidden;
+  /* Text styling */
+  display: block;
+  /* Box sizing */
+  max-height: 500px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .location,
+  .loader {
+    display: flex;
+    align-items: center;
+  }
+
+  .arrow {
+    font-size: 130%;
+    margin: 0px 10px;
+    opacity: 0.4;
+  }
+
+  .logo {
+    display: flex;
+    font-size: 30px;
+  }
+}

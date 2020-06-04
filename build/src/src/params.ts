@@ -52,7 +52,9 @@ const params = {
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
-  VERSION_DATA_FILE_PATH: "/usr/src/app/.version.json",
+  GIT_DATA_PATH: process.env.GIT_DATA_PATH || ".git-data.json",
+  // UI static files
+  UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
   // HTTP API parameters
   apiUrl: "http://dappmanager.dappnode",
