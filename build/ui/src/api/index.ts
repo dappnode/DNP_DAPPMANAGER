@@ -25,6 +25,7 @@ import { apiUrl, apiUrls } from "params";
 
 const apiRpcUrl = apiUrls.rpc;
 const socketIoUrl = apiUrl;
+console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
 
 /**
  * Bridges events from the API websockets client to any consumer in the App

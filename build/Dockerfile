@@ -58,7 +58,7 @@ COPY build/ui/package.json build/ui/yarn.lock ./
 RUN yarn --production
 COPY build/ui .
 RUN yarn generate
-ENV REACT_APP_API_URL http://my.dappmanager.dnp.dappnode.eth:3000/
+ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
 

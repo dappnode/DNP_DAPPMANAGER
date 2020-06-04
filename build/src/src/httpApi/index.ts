@@ -5,6 +5,7 @@ import compression from "compression";
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import socketio from "socket.io";
+import path from "path";
 import params from "../params";
 import { isAdmin } from "./auth";
 import { wrapHandler } from "./utils";
@@ -25,6 +26,7 @@ import {
 import { logs } from "../logs";
 
 const httpApiPort = params.HTTP_API_PORT;
+const uiFilesPath = params.UI_FILES_PATH;
 const whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -62,19 +64,13 @@ export default function startHttpApi(port: number = httpApiPort) {
   const rpcHandler = getRpcHandler(methods, loggerMiddleware);
 
   // default options. ALL CORS + limit fileSize and file count
-  app.use(
-    fileUpload({
-      limits: { fileSize: 500 * 1024 * 1024, files: 10 }
-    })
-  );
+  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: whitelist }));
   app.use(compression());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-
-  // Ping / hello endpoint
-  app.get("/", (req, res) => res.send("DAPPMANAGER HTTP API"));
+  app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
 
   // Methods that do not fit into RPC
   app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));
@@ -87,6 +83,11 @@ export default function startHttpApi(port: number = httpApiPort) {
     "/rpc",
     isAdmin,
     wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
+  );
+
+  // Serve UI. React-router, index.html at all routes
+  app.get("*", (_0, res) =>
+    res.sendFile(path.resolve(uiFilesPath, "index.html"))
   );
 
   server.listen(port, () => logs.info(`HTTP API ${port}`));
