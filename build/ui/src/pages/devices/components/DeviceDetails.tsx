@@ -12,7 +12,7 @@ import Input from "components/Input";
 import QrCode from "components/QrCode";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
-import Error from "components/Error";
+import ErrorView from "components/ErrorView";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
 import { GoClippy } from "react-icons/go";
@@ -106,10 +106,10 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
 
       {credentials ? (
         <DeviceDetailsLoaded admin={false} id={id} url={credentials.url} />
-      ) : isValidating ? (
-        <Loading msg="Loading device credentials..." />
       ) : error ? (
-        <Error msg={`Error loading device credentials: ${error}`} />
+        <ErrorView error={error} />
+      ) : isValidating ? (
+        <Loading steps={["Loading device credentials"]} />
       ) : null}
     </>
   );

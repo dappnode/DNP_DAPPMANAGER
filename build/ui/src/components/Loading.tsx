@@ -1,15 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import logoAnimated from "img/dappNodeAnimation.gif";
+import "./loading.scss";
 
-const Loading = ({ size = 200, msg }: { size?: number; msg: string }) => (
-  <React.Fragment>
-    <div className="row justify-content-center mb-5 mt-5">
-      <h4 style={{ opacity: 0.6 }}>{msg}</h4>
-    </div>
-    <div className="row justify-content-center">
-      <img width={size} height={size} src={logoAnimated} alt="loading..." />
-    </div>
-  </React.Fragment>
-);
+export default function Loading({
+  size = 200,
+  steps
+}: {
+  size?: number;
+  steps: string[];
+}) {
+  const [index, setIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setIndex(i => i + 1), 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-export default Loading;
+  return (
+    <div className="loading-view">
+      <img src={logoAnimated} alt="Loading icon" />
+      <p className="steps">{steps[index] || steps[steps.length - 1]}...</p>
+    </div>
+  );
+}

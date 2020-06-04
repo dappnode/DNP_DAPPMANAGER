@@ -13,7 +13,7 @@ import Title from "components/Title";
 import Card from "components/Card";
 import Switch from "components/Switch";
 import Loading from "components/Loading";
-import ErrorView from "components/Error";
+import ErrorView from "components/ErrorView";
 import { ButtonLight } from "components/Button";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
@@ -134,10 +134,10 @@ export default function DevicesHome() {
               </React.Fragment>
             ))}
         </Card>
-      ) : devicesReq.isValidating ? (
-        <Loading msg={"Loading devices..."} />
       ) : devicesReq.error ? (
-        <ErrorView msg={`Error loading devices: ${devicesReq.error}`} />
+        <ErrorView error={devicesReq.error} />
+      ) : devicesReq.isValidating ? (
+        <Loading steps={["Loading devices"]} />
       ) : null}
     </>
   );

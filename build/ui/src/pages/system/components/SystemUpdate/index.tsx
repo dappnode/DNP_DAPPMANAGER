@@ -13,7 +13,7 @@ import StatusIcon from "components/StatusIcon";
 import SystemUpdateDetails from "./SystemUpdateDetails";
 import Loading from "components/Loading";
 import SubTitle from "components/SubTitle";
-import ErrorView from "components/Error";
+import ErrorView from "components/ErrorView";
 import { ProgressLogsView } from "pages/installer/components/InstallCardComponents/ProgressLogsView";
 
 export default function SystemUpdate() {
@@ -32,9 +32,9 @@ export default function SystemUpdate() {
       {coreUpdateAvailable ? (
         <SystemUpdateDetails />
       ) : loading ? (
-        <Loading msg="Checking core version..." />
+        <Loading steps={["Checking core version", "Loading version details"]} />
       ) : error ? (
-        <ErrorView msg={`Error checking core version: ${error}`}></ErrorView>
+        <ErrorView error={`Error checking core version: ${error}`}></ErrorView>
       ) : success ? (
         <Card spacing>
           <StatusIcon success message="System up to date" />

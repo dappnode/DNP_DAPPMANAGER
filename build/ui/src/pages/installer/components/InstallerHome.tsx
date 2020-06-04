@@ -18,7 +18,7 @@ import Title from "components/Title";
 import Input from "components/Input";
 import Button, { ButtonLight } from "components/Button";
 import Loading from "components/Loading";
-import Error from "components/Error";
+import ErrorView from "components/ErrorView";
 import Alert from "react-bootstrap/Alert";
 // Selectors
 import {
@@ -162,13 +162,11 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
           </div>
         )
       ) : requestStatus.error ? (
-        <Error
-          msg={`Error loading DAppNode Packages: ${requestStatus.error}`}
-        />
+        <ErrorView error={requestStatus.error} />
       ) : requestStatus.loading ? (
-        <Loading msg="Loading DAppNode Packages..." />
+        <Loading steps={["Loading DAppNode Packages"]} />
       ) : requestStatus.success ? (
-        <Error msg={"Directory loaded but found no packages"} />
+        <ErrorView error={"Directory loaded but found no packages"} />
       ) : null}
     </>
   );

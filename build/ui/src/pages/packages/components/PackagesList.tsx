@@ -7,7 +7,7 @@ import NoPackagesYet from "./NoPackagesYet";
 import StateBadge from "./PackageViews/StateBadge";
 import Card from "components/Card";
 import Loading from "components/Loading";
-import Error from "components/Error";
+import ErrorView from "components/ErrorView";
 // Selectors
 import { getDnpInstalledStatus } from "services/dnpInstalled/selectors";
 // Icons
@@ -28,10 +28,12 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
 
   if (!dnps.length) {
     if (loading)
-      return <Loading msg="Loading installed DAppNode Packages..." />;
+      return <Loading steps={["Loading installed DAppNode Packages"]} />;
     if (error)
       return (
-        <Error msg={`Error loading installed DAppNode Packages: ${error}`} />
+        <ErrorView
+          error={`Error loading installed DAppNode Packages: ${error}`}
+        />
       );
   }
 

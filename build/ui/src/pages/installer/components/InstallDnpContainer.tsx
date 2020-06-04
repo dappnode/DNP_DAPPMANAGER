@@ -10,7 +10,7 @@ import InstallDnpView from "./InstallDnpView";
 import { shortNameCapitalized } from "utils/format";
 import Title from "components/Title";
 import Loading from "components/Loading";
-import Error from "components/Error";
+import ErrorView from "components/ErrorView";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
 const InstallDnpContainer: React.FC<RouteComponentProps<{ id: string }>> = ({
@@ -37,10 +37,10 @@ const InstallDnpContainer: React.FC<RouteComponentProps<{ id: string }>> = ({
 
       {dnp ? (
         <InstallDnpView dnp={dnp} progressLogs={progressLogs} />
-      ) : isValidating ? (
-        <Loading msg={"Loading DAppNode Package data..."} />
       ) : error ? (
-        <Error msg={error} />
+        <ErrorView error={error} />
+      ) : isValidating ? (
+        <Loading steps={["Loading DAppNode Package data"]} />
       ) : null}
     </>
   );

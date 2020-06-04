@@ -4,7 +4,7 @@ import { UserActionLog } from "types";
 import { apiUrls } from "params";
 // Components
 import CardList from "components/CardList";
-import ErrorView from "components/Error";
+import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 import Button from "components/Button";
 // Utils
@@ -60,9 +60,11 @@ export default function Activity() {
           ))}
         </CardList>
       ) : userActionLogs.error ? (
-        <ErrorView msg={userActionLogs.error.message}></ErrorView>
+        <ErrorView error={userActionLogs.error} />
       ) : userActionLogs.isValidating ? (
-        <Loading msg="Loading user action logs" />
+        <Loading
+          steps={["Loading user action logs", "Parsing user action logs"]}
+        />
       ) : null}
 
       {userActionLogs.data && userActionLogs.data.length === count && (

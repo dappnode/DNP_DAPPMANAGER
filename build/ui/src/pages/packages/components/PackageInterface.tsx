@@ -19,7 +19,7 @@ import * as s from "../selectors";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
-import Error from "components/Error";
+import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
 import { shortNameCapitalized } from "utils/format";
@@ -45,13 +45,13 @@ export const PackageInterface: React.FC<
       <>
         <Title title={title} subtitle={id} />
         {loading ? (
-          <Loading msg="Loading your DAppNode Packages..." />
+          <Loading steps={["Loading your DAppNode Packages"]} />
         ) : error ? (
-          <Error msg={`Error loading your DAppNode Packages: ${error}`} />
+          <ErrorView error={`Error loading your DAppNode Packages: ${error}`} />
         ) : areThereDnps ? (
           <NoDnpInstalled id={id} />
         ) : (
-          <Error msg={`Unknown error, package not found`} />
+          <ErrorView error="Unknown error, package not found" />
         )}
       </>
     );

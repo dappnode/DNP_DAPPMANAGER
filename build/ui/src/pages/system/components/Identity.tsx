@@ -70,7 +70,7 @@ export default function Identity() {
     <>
       {/* Hack until a less verbose version of caching api calls is implemented */}
       {identityAddress === null ? (
-        <Loading msg="Checking identity..." />
+        <Loading steps={["Checking identity"]} />
       ) : identityAddress && !editorActive ? (
         <Card spacing>
           <StatusIcon

@@ -70,6 +70,6 @@ export default function App() {
   } else if (error) {
     return <NoConnection />;
   } else {
-    return <Loading msg={`Opening connection...`} />;
+    return <Loading steps={["Opening connection"]} />;
   }
 }
