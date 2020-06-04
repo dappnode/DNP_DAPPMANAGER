@@ -19,6 +19,7 @@ import { subscriptionsFactory } from "../common/transport/socketIo";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
 import { Subscriptions, subscriptionsData } from "../common/subscriptions";
 import { validateSubscriptionsArgsFactory } from "../common/validation";
+import { getEthForwardHandler, isDwebRequest } from "../ethForward";
 import {
   subscriptionsLoggerFactory,
   routesLoggerFactory
@@ -38,8 +39,10 @@ const whitelist = [
  *
  * [NOTE] This API is not secure
  * - It can't use HTTPS for the limitations with internal IPs certificates
+ *
+ * [NOTE] To enable express debugging set ENV DEBUG=express:*
  */
-export default function startHttpApi(port: number = httpApiPort) {
+export default function startHttpApi(port: number | string = httpApiPort) {
   const app = express();
   const server = new http.Server(app);
   const io = socketio(server);
@@ -59,10 +62,15 @@ export default function startHttpApi(port: number = httpApiPort) {
   );
   mapSubscriptionsToEventBus(subscriptions);
 
-  // RPC
   const loggerMiddleware = routesLoggerFactory();
   const rpcHandler = getRpcHandler(methods, loggerMiddleware);
+  const ethForwardHandler = getEthForwardHandler();
 
+  // Intercept decentralized website requests first
+  app.use((req, res, next) => {
+    if (isDwebRequest(req)) ethForwardHandler(req, res);
+    else next();
+  });
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
@@ -86,7 +94,7 @@ export default function startHttpApi(port: number = httpApiPort) {
   );
 
   // Serve UI. React-router, index.html at all routes
-  app.get("*", (_0, res) =>
+  app.get("*", (req, res) =>
     res.sendFile(path.resolve(uiFilesPath, "index.html"))
   );
 

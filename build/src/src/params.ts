@@ -57,9 +57,8 @@ const params = {
   UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
   // HTTP API parameters
-  apiUrl: "http://dappmanager.dappnode",
   ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
-  HTTP_API_PORT: 3000,
+  HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
 
   // VPN API
   vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
@@ -157,7 +156,6 @@ const params = {
   ],
 
   // ETHFORWARD / HTTP proxy params
-  ETHFORWARD_HTTP_PROXY_PORT: process.env.ETHFORWARD_HTTP_PROXY_PORT || 80,
   ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
   ETHFORWARD_PIN_ON_VISIT: true
@@ -167,12 +165,6 @@ if (devMode) {
   params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
   params.AUTO_UPDATE_WATCHER_INTERVAL = 1 * 1000; // 1 second
   params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
-}
-
-if (process.env.NODE_ENV === "development") {
-  params.apiUrl = "http://localhost:3000";
-  // params.autobahnUrl = "ws://localhost:8080/ws";
-  // params.autobahnRealm = "realm1";
 }
 
 export default params;
