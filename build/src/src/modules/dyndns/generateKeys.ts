@@ -22,10 +22,7 @@ function isPrivateKeyValid(privateKey: string): boolean {
     new ethers.Wallet(privateKey);
     return true;
   } catch (e) {
-    logs.warn(
-      `Private key verification failed. ethers.Wallet returned error`,
-      e
-    );
+    logs.warn(`Private key verification failed ethers.Wallet error`, e);
     return false;
   }
 }
@@ -45,7 +42,8 @@ export default function generateKeys(): void {
   const identity = ethers.Wallet.createRandom();
   db.dyndnsIdentity.set({
     address: identity.address,
-    privateKey: identity.privateKey
+    privateKey: identity.privateKey,
+    publicKey: ethers.utils.computePublicKey(identity.privateKey)
   });
 
   const subdomain = identity.address
