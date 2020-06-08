@@ -7,7 +7,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface DappnodeStatusState {
   systemInfo: SystemInfo | null;
   wifiStatus: { running: boolean } | null;
-  passwordIsInsecure: boolean;
+  /**
+   * Will trigger alerts when it's a boolean and false, x === false
+   * Must be null at start
+   */
+  passwordIsSecure: boolean | null;
   autoUpdateData: AutoUpdateDataView | null;
   volumes: VolumeData[];
 }
@@ -15,7 +19,7 @@ interface DappnodeStatusState {
 const initialState: DappnodeStatusState = {
   systemInfo: null,
   wifiStatus: null,
-  passwordIsInsecure: false,
+  passwordIsSecure: null,
   autoUpdateData: null,
   volumes: []
 };

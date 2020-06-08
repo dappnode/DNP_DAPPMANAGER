@@ -11,7 +11,7 @@ export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateAutoUpdateData = dappnodeStatus.actions.autoUpdateData;
 export const updateVolumes = dappnodeStatus.actions.volumes;
 const updateWifiStatus = dappnodeStatus.actions.wifiStatus;
-const updatePasswordIsInsecure = dappnodeStatus.actions.passwordIsInsecure;
+const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 
 // Fetch
 
@@ -20,9 +20,9 @@ export const fetchAutoUpdateData = (): AppThunk => async dispatch =>
     dispatch(updateAutoUpdateData(await api.autoUpdateDataGet()));
   }, "autoUpdateData");
 
-export const fetchPasswordIsInsecure = (): AppThunk => async dispatch =>
+export const fetchPasswordIsSecure = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
-    dispatch(updatePasswordIsInsecure(await api.passwordIsSecure()));
+    dispatch(updatePasswordIsSecure(await api.passwordIsSecure()));
   }, "passwordIsSecure");
 
 export const fetchVolumes = (): AppThunk => async dispatch =>

@@ -4,7 +4,7 @@ import { fetchCoreUpdateData } from "services/coreUpdate/actions";
 import {
   fetchSystemInfo,
   fetchVolumes,
-  fetchPasswordIsInsecure,
+  fetchPasswordIsSecure,
   fetchWifiStatus
 } from "services/dappnodeStatus/actions";
 
@@ -13,6 +13,6 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchCoreUpdateData());
   store.dispatch<any>(fetchSystemInfo());
   store.dispatch<any>(fetchVolumes());
-  store.dispatch<any>(fetchPasswordIsInsecure());
+  store.dispatch<any>(fetchPasswordIsSecure());
   store.dispatch<any>(fetchWifiStatus());
 }

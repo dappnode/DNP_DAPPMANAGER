@@ -9,7 +9,7 @@ import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
 // External
 import {
-  getPasswordIsInsecure,
+  getPasswordIsSecure,
   getIsWifiRunning
 } from "services/dappnodeStatus/selectors";
 // Style
@@ -26,7 +26,7 @@ interface SecurityIssue {
 }
 
 export default function SystemSecurity() {
-  const passwordIsInsecure = useSelector(getPasswordIsInsecure);
+  const passwordIsSecure = useSelector(getPasswordIsSecure);
   const areWifiCredentialsDefault = useSelector(getAreWifiCredentialsDefault);
   const isWifiRunning = useSelector(getIsWifiRunning);
 
@@ -35,7 +35,7 @@ export default function SystemSecurity() {
       name: "Change host user password",
       severity: "critical",
       component: ChangeHostUserPassword,
-      isActive: passwordIsInsecure,
+      isActive: passwordIsSecure === false,
       okMessage: "Host user password changed"
     },
     {

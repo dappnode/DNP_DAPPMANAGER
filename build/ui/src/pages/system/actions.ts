@@ -3,7 +3,7 @@ import { api } from "api";
 import { shortNameCapitalized, prettyVolumeName } from "utils/format";
 import { getEthClientPrettyName } from "components/EthMultiClient";
 // External actions
-import { fetchPasswordIsInsecure } from "services/dappnodeStatus/actions";
+import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
 import { getDnpInstalledById } from "services/dnpInstalled/selectors";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
@@ -58,7 +58,7 @@ export const passwordChangeInBackground = (
 ): AppThunk => async dispatch => {
   await api.passwordChange({ newPassword }).catch(console.error);
 
-  dispatch(fetchPasswordIsInsecure());
+  dispatch(fetchPasswordIsSecure());
 };
 
 export const passwordChange = (
@@ -80,7 +80,7 @@ export const passwordChange = (
     onSuccess: `Changed host user password`
   });
 
-  dispatch(fetchPasswordIsInsecure());
+  dispatch(fetchPasswordIsSecure());
 };
 
 export const volumeRemove = (name: string): AppThunk => async dispatch => {

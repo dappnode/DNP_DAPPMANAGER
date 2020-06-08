@@ -11,7 +11,7 @@ import {
 import { getAreWifiCredentialsDefault } from "services/dnpInstalled/selectors";
 import {
   getIsWifiRunning,
-  getPasswordIsInsecure,
+  getPasswordIsSecure,
   getIsCoreAutoUpdateActive
 } from "services/dappnodeStatus/selectors";
 import {
@@ -33,7 +33,7 @@ export default function NotificationsView() {
   const isCoreAutoUpdateActive = useSelector(getIsCoreAutoUpdateActive);
   const areWifiCredentialsDefault = useSelector(getAreWifiCredentialsDefault);
   const isWifiRunning = useSelector(getIsWifiRunning);
-  const passwordIsInsecure = useSelector(getPasswordIsInsecure);
+  const passwordIsSecure = useSelector(getPasswordIsSecure);
 
   const notifications = [
     /**
@@ -74,7 +74,7 @@ export default function NotificationsView() {
       linkPath: systemRootPath + "/" + systemSubPaths.security,
       body:
         "**Change the host 'dappnode' user password**, it's an insecure default.",
-      active: passwordIsInsecure
+      active: passwordIsSecure === false
     }
   ];
 

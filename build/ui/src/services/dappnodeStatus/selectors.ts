@@ -8,8 +8,8 @@ import { getEthClientPrettyStatusError } from "components/EthMultiClient";
 // Sub-local properties
 const getSystemInfo = (state: RootState) => state.dappnodeStatus.systemInfo;
 export const getDappnodeParams = (state: RootState) => getSystemInfo(state);
-export const getPasswordIsInsecure = (state: RootState) =>
-  state.dappnodeStatus.passwordIsInsecure;
+export const getPasswordIsSecure = (state: RootState) =>
+  state.dappnodeStatus.passwordIsSecure;
 export const getAutoUpdateData = (state: RootState) =>
   state.dappnodeStatus.autoUpdateData;
 export const getIdentityAddress = (state: RootState) =>
