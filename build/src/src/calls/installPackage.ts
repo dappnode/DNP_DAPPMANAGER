@@ -1,4 +1,3 @@
-import * as eventBus from "../eventBus";
 import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData";
 import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths";
 // Utils
@@ -9,13 +8,13 @@ import { UserSettingsAllDnps, PackageRequest } from "../types";
 import {
   downloadImages,
   loadImages,
-  flagPackagesAreNotInstalling,
   flagPackagesAreInstalling,
   packageIsInstalling,
   runPackages,
   rollbackPackages,
   writeAndValidateFiles,
-  postInstallClean
+  postInstallClean,
+  afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
 
@@ -107,36 +106,14 @@ export async function installPackage({
       }
 
       await postInstallClean(packagesData, log);
-      onFinish(dnpNames);
+      afterInstall(dnpNames);
       logUiClear({ id });
     } catch (e) {
-      onFinish(dnpNames);
+      afterInstall(dnpNames);
       throw e;
     }
   } catch (e) {
     logUiClear({ id }); // Clear "resolving..." logs
     throw e;
   }
-}
-
-/**
- * Bundle event emits that must be called on a successful and failed install
- * @param packagesData
- */
-async function onFinish(dnpNames: string[]) {
-  /**
-   * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
-   * Since a package installation is not a very frequent activity it is okay to be
-   * called on each install. Internal mechanisms protect the natRenewal function
-   * to be called too often.
-   */
-  eventBus.runNatRenewal.emit();
-
-  // Emit packages update
-  eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: dnpNames });
-
-  // Flag the packages as NOT installing.
-  // Must be called also on Error, otherwise packages can't be re-installed
-  flagPackagesAreNotInstalling(dnpNames);
 }
