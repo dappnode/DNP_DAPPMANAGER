@@ -78,11 +78,13 @@ function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
  * @param body
  */
 export async function parseRpcResponse<R>(body: RpcResponse): Promise<R> {
-  if (body.error)
-    if (body.error.data)
-      throw Error(body.error.message + "\n" + body.error.data);
-    else throw Error(body.error.message);
-  else return body.result;
+  if (body.error) {
+    const error = new JsonRpcError(body.error.message, body.error.code);
+    if (body.error.data) {
+      error.stack = body.error.data + "\n" + error.stack || "";
+    }
+    throw error;
+  } else return body.result;
 }
 
 function formatErrors(

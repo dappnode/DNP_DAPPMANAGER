@@ -8,7 +8,7 @@ import { fetchPasswordIsInsecure } from "services/dappnodeStatus/actions";
 import { getDnpInstalledById } from "services/dnpInstalled/selectors";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { EthClientTarget } from "types";
-import { withToast } from "components/toast/Toast";
+import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
 
 // Redux Thunk actions
@@ -44,17 +44,13 @@ export const changeEthClientTarget = (
         )
       : false;
 
-  try {
-    await withToast(
-      () => api.ethClientTargetSet({ target: nextTarget, deleteVolumes }),
-      {
-        message: "Changing Eth client...",
-        onSuccess: `Changed Eth client`
-      }
-    );
-  } catch (e) {
-    console.error(e);
-  }
+  await withToastNoThrow(
+    () => api.ethClientTargetSet({ target: nextTarget, deleteVolumes }),
+    {
+      message: "Changing Eth client...",
+      onSuccess: `Changed Eth client`
+    }
+  );
 };
 
 export const passwordChangeInBackground = (
@@ -79,7 +75,7 @@ export const passwordChange = (
     })
   );
 
-  await withToast(() => api.passwordChange({ newPassword }), {
+  await withToastNoThrow(() => api.passwordChange({ newPassword }), {
     message: `Changing host user password...`,
     onSuccess: `Changed host user password`
   });
@@ -99,7 +95,7 @@ export const volumeRemove = (name: string): AppThunk => async dispatch => {
     })
   );
 
-  await withToast(() => api.volumeRemove({ name }), {
+  await withToastNoThrow(() => api.volumeRemove({ name }), {
     message: `Removing volume...`,
     onSuccess: `Removed volume`
   });
@@ -148,7 +144,7 @@ export const packageVolumeRemove = (
     })
   );
 
-  await withToast(
+  await withToastNoThrow(
     () => api.restartPackageVolumes({ id: dnpName, volumeId: volName }),
     {
       message: `Removing ${prettyVolRef}...`,
