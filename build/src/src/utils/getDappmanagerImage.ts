@@ -1,15 +1,24 @@
-import shell from "./shell";
+import { dockerList } from "../modules/docker/dockerApi";
+import params from "../params";
+import memoize from "memoizee";
 
-// If the DAPPMANAGER image changes, this node app MUST be reseted
-let cacheDappmanagerImage = "";
+const dmName = params.dappmanagerDnpName;
 
-export default async function getDappmanagerImage(): Promise<string> {
-  if (cacheDappmanagerImage) return cacheDappmanagerImage;
-  const res = await shell(
-    `docker ps --filter "name=dappmanager.dnp.dappnode.eth" --format "{{.Image}}"`
-  );
-  if (!res) throw Error("No image found for dappmanager.dnp.dappnode.eth");
-  const dappmanagerImage = res.trim();
-  cacheDappmanagerImage = dappmanagerImage;
-  return dappmanagerImage;
+const getDappmanagerImageMemoized = memoize(
+  async (): Promise<string> => {
+    const containers = await dockerList({ filters: { name: [dmName] } });
+    const dappmanager = containers[0];
+
+    if (!dappmanager) throw Error(`No image found for ${dmName}`);
+    else return dappmanager.Image;
+  },
+  { promise: true }
+);
+
+/**
+ * Returns the image of the current dappmanager instance running
+ * It's memoized since the image will not change until this app is reseted
+ */
+export default async function getDappmanagerImage() {
+  return getDappmanagerImageMemoized();
 }
