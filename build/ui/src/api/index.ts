@@ -25,6 +25,7 @@ import { apiUrl, apiUrls } from "params";
 
 const apiRpcUrl = apiUrls.rpc;
 const socketIoUrl = apiUrl;
+/* eslint-disable-next-line no-console */
 console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
 
 /**
@@ -144,6 +145,7 @@ export function start() {
 
     // Delay announcing session is open until everything is setup
     store.dispatch(connectionOpen());
+    /* eslint-disable-next-line no-console */
     console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
   });
 

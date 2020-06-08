@@ -16,7 +16,7 @@ import {
 } from "services/dappnodeStatus/selectors";
 import { changeEthClientTarget } from "pages/system/actions";
 import Alert from "react-bootstrap/Alert";
-import { withToast } from "components/toast/Toast";
+import { withToastNoThrow } from "components/toast/Toast";
 
 export default function Repository() {
   const ethClientTarget = useSelector(getEthClientTarget);
@@ -37,14 +37,10 @@ export default function Repository() {
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
-    try {
-      await withToast(
-        () => api.ethClientFallbackSet({ fallback: newFallback }),
-        { onError: true }
-      );
-    } catch (e) {
-      console.log("Error on ethClientFallbackSet", e);
-    }
+    await withToastNoThrow(
+      () => api.ethClientFallbackSet({ fallback: newFallback }),
+      { onError: true }
+    );
   }
 
   /**

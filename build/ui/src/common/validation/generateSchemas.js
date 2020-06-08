@@ -21,6 +21,7 @@ for (const typeName of typesToSchema) {
 // Compile types to schemas
 const program = TJS.programFromConfig("tsconfig.json");
 for (const typeName of typesToSchema) {
+  /* eslint-disable-next-line no-console */
   console.log(`Generating .schema.json of ${typeName}`);
   const schema = TJS.generateSchema(program, typeName, {
     required: true

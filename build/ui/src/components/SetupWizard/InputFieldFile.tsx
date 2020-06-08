@@ -77,7 +77,7 @@ export default function InputFieldFile({
       const dataURL = await fileToDataURL(files);
       onValueChange(dataURL);
     } catch (e) {
-      console.log(`Error processing file: ${e.stack}`);
+      console.error(`Error processing file: ${e.stack}`);
     } finally {
       setProcessing(false);
     }
