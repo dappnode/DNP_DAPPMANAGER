@@ -82,6 +82,7 @@ export async function migrateUserActionLogs() {
         const winstonLog = JSON.parse(row);
         userActionLogs.push({
           ...winstonLog,
+          args: winstonLog.args || [winstonLog.kwargs],
           timestamp: new Date(winstonLog.timestamp).getTime()
         });
       } catch (e) {
