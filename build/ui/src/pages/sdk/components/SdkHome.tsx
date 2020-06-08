@@ -6,7 +6,7 @@ import Title from "components/Title";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import { ButtonLight } from "components/Button";
-import "./sdk.scss"
+import "./sdk.scss";
 
 const SDK_GUIDE_LINK =
   "https://github.com/dappnode/DAppNodeSDK/wiki/DAppNode-SDK-tutorial";
@@ -77,4 +77,3 @@ export default function SdkHome() {
     </>
   );
 }
-

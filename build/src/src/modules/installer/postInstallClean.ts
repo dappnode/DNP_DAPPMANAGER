@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import * as db from "../../db";
 import { InstallPackageDataPaths } from "../../common/types";
 import { Log } from "../../utils/logUi";
@@ -28,9 +29,10 @@ export async function postInstallClean(
     // IMPORTANT! Do this step AFTER the try/catch otherwise the rollback
     // will not work, as the compose.next.yml is the same as compose.yml
     log(name, "Cleaning files...");
-    unlinkIfExists(imagePath);
     unlinkIfExists(composeBackupPath);
     unlinkIfExists(manifestBackupPath);
+    unlinkIfExists(imagePath);
+    unlinkFilesWithExt(path.parse(imagePath).dir, ".tar.xz"); // Previous images
 
     log(name, "Cleaning previous images...");
     try {
@@ -51,4 +53,14 @@ function unlinkIfExists(path: string): void {
   } catch (e) {
     if (e.code !== "ENOENT") throw e;
   }
+}
+
+/**
+ * Util: Remove all files in directory with extension `ext`
+ * @param dir "/repo/dir"
+ * @param ext ".tar.xz"
+ */
+function unlinkFilesWithExt(dir: string, ext: string): void {
+  for (const file of fs.readdirSync(dir))
+    if (file.endsWith(ext)) unlinkIfExists(path.join(dir, file));
 }

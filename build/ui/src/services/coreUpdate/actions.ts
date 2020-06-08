@@ -57,7 +57,7 @@ export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
     dispatch(updateCoreRequestStatus({ success: true }));
     dispatch(updateCoreUpdateData(coreUpdateData));
 
-    /* Log out current state */
+    /* eslint-disable-next-line no-console */
     console.log(
       `DAppNode ${coreName} (${coreUpdateData.versionId})`,
       coreUpdateData

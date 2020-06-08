@@ -1,3 +1,4 @@
+export * from "./afterInstall";
 export * from "./downloadImages";
 export * from "./loadImages";
 export * from "./packageIsInstalling";

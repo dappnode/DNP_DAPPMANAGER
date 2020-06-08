@@ -16,6 +16,8 @@ import { dockerRm } from "../docker/dockerCommands";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";
 import { postInstallClean } from "./postInstallClean";
+import { afterInstall } from "./afterInstall";
+import { flagPackagesAreInstalling } from "./packageIsInstalling";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
@@ -163,7 +165,10 @@ export async function postRestartPatch(): Promise<void> {
       logs.info(`No core update packages data found`);
     } else if (restart.State.ExitCode > 0) {
       // Error during update, needs to rollback
+      const dnpNames = packagesData.map(({ name }) => name);
+      flagPackagesAreInstalling(dnpNames);
       rollbackPackages(packagesData, log);
+      afterInstall(dnpNames);
     } else {
       // All okay, finish installation
       postInstallClean(packagesData, log);
@@ -171,6 +176,7 @@ export async function postRestartPatch(): Promise<void> {
 
     // Remove the pending core update packages data
     db.coreUpdatePackagesData.set(null);
+
     // Remove restart patch container
     await dockerRm(params.restartContainerName);
   } else {

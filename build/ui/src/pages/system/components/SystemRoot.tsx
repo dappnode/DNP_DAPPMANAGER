@@ -19,9 +19,7 @@ import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Title from "components/Title";
 
-const SystemRoot: React.FunctionComponent<RouteComponentProps> = ({
-  match
-}) => {
+const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
    * Construct all subroutes to iterate them both in:
    * - Link (to)

@@ -9,7 +9,7 @@ interface ButtonProps {
   type?: ButtonType;
 }
 
-const Button: React.FunctionComponent<
+const Button: React.FC<
   ButtonProps & React.HTMLAttributes<HTMLButtonElement>
 > = ({ variant, children, pill, className, disabled, ...props }) => (
   <button
@@ -23,7 +23,7 @@ const Button: React.FunctionComponent<
   </button>
 );
 
-export const ButtonLight: React.FunctionComponent<
+export const ButtonLight: React.FC<
   ButtonProps & React.HTMLAttributes<HTMLButtonElement>
 > = props => (
   <Button variant={"outline-secondary"} {...props}>

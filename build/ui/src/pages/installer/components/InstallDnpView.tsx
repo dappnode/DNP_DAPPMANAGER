@@ -45,9 +45,7 @@ interface InstallDnpViewProps {
 //   "dappnode-user-set-form-data-" + dnp.origin ||
 //   (dnp.manifest || {}).name + (dnp.manifest || {}).version;
 
-const InstallDnpView: React.FunctionComponent<
-  InstallDnpViewProps & RouteComponentProps
-> = ({
+const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   dnp,
   progressLogs,
   // Extra
@@ -101,7 +99,6 @@ const InstallDnpView: React.FunctionComponent<
 
     // Do the process here to control when the installation finishes,
     // and do some nice transition to the package
-    console.log("Installing DNP", kwargs);
     try {
       setIsInstalling(true);
       await withToast(
@@ -186,7 +183,6 @@ const InstallDnpView: React.FunctionComponent<
           setupWizard={setupWizard || {}}
           userSettings={userSettings}
           onSubmit={(newUserSettings: UserSettingsAllDnps) => {
-            console.log("Set new userSettings", newUserSettings);
             setUserSettings(newUserSettings);
             goNext({ newUserSettings });
           }}

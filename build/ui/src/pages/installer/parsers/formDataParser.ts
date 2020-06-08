@@ -177,7 +177,7 @@ export function filterActiveSetupWizard(
         try {
           return ajv.validate(correctJsonSchema(field.if), formData[dnpName]);
         } catch (e) {
-          console.log(`Validation error ${dnpName} ${field.id}`, e);
+          console.error(`Validation error ${dnpName} ${field.id}`, e);
           return false;
         }
       } else {

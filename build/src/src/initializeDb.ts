@@ -9,7 +9,8 @@ import getExternalUpnpIp from "./modules/upnpc/getExternalIp";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls";
 import params from "./params";
 import ping from "./utils/ping";
-import { pause, runWithRetry } from "./utils/asyncFlows";
+import { pause } from "./utils/asyncFlows";
+import retry from "async-retry";
 import shell from "./utils/shell";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
@@ -217,7 +218,7 @@ async function migrateVpnDb(): Promise<void> {
  */
 async function updateLocalDyndns(): Promise<void> {
   try {
-    async function updateLocalDyndnsCall(): Promise<void> {
+    await retry(async function updateLocalDyndnsCall(): Promise<void> {
       const domain = db.domain.get();
       const publicIp = db.publicIp.get();
       const internalIp = db.internalIp.get();
@@ -231,8 +232,7 @@ async function updateLocalDyndns(): Promise<void> {
           throw e;
         }
       }
-    }
-    await runWithRetry(updateLocalDyndnsCall, { times: 5, base: 1000 })(null);
+    });
   } catch (e) {
     logs.error("Error on update local dyndns", e);
   }

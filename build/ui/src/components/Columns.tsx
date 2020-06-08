@@ -4,7 +4,7 @@ import "./columns.scss";
 /**
  * Display childrens as two columns
  */
-const Columns: React.FunctionComponent<{ className?: string }> = ({
+const Columns: React.FC<{ className?: string }> = ({
   children,
   className,
   ...props

@@ -2,7 +2,7 @@ import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
-import { runWithRetry } from "../../utils/asyncFlows";
+import retry from "async-retry";
 import { PackageVersionData } from "../../types";
 import { logs } from "../../logs";
 
@@ -13,10 +13,10 @@ import { logs } from "../../logs";
  */
 async function getVersionDataVpn(): Promise<void> {
   try {
-    const versionDataVpn = await runWithRetry(
+    const versionDataVpn = await retry(
       () => vpnRpcCall<PackageVersionData>("getVersionData"),
-      { times: 3, base: 1000 }
-    )(null);
+      { retries: 3 }
+    );
     db.versionDataVpn.set(versionDataVpn);
   } catch (e) {
     logs.error(`Error fetching VPN data`);

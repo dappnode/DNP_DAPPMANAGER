@@ -1,6 +1,6 @@
 import semver from "semver";
 import { DockerOptionsInterface } from "../../types";
-import shell from "./shell";
+import shell from "../../utils/shell";
 import { imagesList, imageRemove } from "./dockerApi";
 
 /* eslint-disable no-useless-escape */

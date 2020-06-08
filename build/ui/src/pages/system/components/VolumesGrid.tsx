@@ -29,10 +29,7 @@ const minSize = 10 * 1024 * 1024;
 export default function VolumesGrid() {
   const volumes = useSelector(getVolumes);
   const dispatch = useDispatch();
-
   const [showAll, setShowAll] = useState(false);
-
-  console.log({ volumes });
 
   const getSize = (v: VolumeData) => v.size || (v.fileSystem || {}).used || 0;
   const volumesFiltered = [...volumes]

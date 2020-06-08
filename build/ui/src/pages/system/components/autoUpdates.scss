@@ -38,10 +38,12 @@
   .name {
     display: flex;
   }
-  .name span {
+  .name .arrow {
     margin-right: 0.5rem;
     font-weight: 800;
     color: var(--border-color);
+    opacity: 1;
+    cursor: auto;
   }
 
   .last-update {

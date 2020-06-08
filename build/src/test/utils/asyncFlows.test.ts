@@ -3,7 +3,6 @@ import { expect } from "chai";
 import {
   runOnlyOneSequentially,
   runOnlyOneReturnToAll,
-  runWithRetry,
   pause
 } from "../../src/utils/asyncFlows";
 
@@ -234,58 +233,6 @@ Error 15: 0.616938341865086
         "mock error async 2",
         "mock error async 3"
       ]);
-    });
-  });
-
-  describe("runWithRetry", () => {
-    const errorMessage = "Mock error";
-    const arg = "Mock argument";
-    const times = 3;
-    const base = 1;
-
-    it("Should fail 2 times and then return success", async () => {
-      let count = 0;
-      const retryable = runWithRetry(
-        async function(name: string): Promise<string> {
-          if (count++ < times - 1) throw Error(errorMessage);
-          else return name;
-        },
-        { times, base }
-      );
-
-      const res = await retryable(arg);
-      expect(res).to.equal(arg);
-      expect(count).to.equal(times);
-    });
-
-    it("Should fail 3 times and then throw", async () => {
-      let count = 0;
-      const retryable = runWithRetry(
-        async function(name: string): Promise<string> {
-          if (count++ < times + 1) throw Error(errorMessage);
-          else return name;
-        },
-        { times, base }
-      );
-
-      const res = await retryable(arg).catch(e => e.message);
-      expect(res).to.equal(errorMessage);
-      expect(count).to.equal(times);
-    });
-
-    it("Should succeed on first try", async () => {
-      let count = 0;
-      const retryable = runWithRetry(
-        async function(name: string): Promise<string> {
-          count++;
-          return name;
-        },
-        { times, base }
-      );
-
-      const res = await retryable(arg);
-      expect(res).to.equal(arg);
-      expect(count).to.equal(1);
     });
   });
 });

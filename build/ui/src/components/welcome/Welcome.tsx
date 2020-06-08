@@ -34,7 +34,7 @@ interface RouteProps {
  */
 function getRouteIdComponent(
   routeId: NewFeatureId
-): React.FunctionComponent<RouteProps> | undefined {
+): React.FC<RouteProps> | undefined {
   switch (routeId) {
     case "system-auto-updates":
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
@@ -65,7 +65,7 @@ export default function Welcome() {
   // Do in two steps to avoid adding routes that don't have a view implemented
   const routes: {
     featureId: NewFeatureId;
-    render: React.FunctionComponent<RouteProps>;
+    render: React.FC<RouteProps>;
   }[] = [];
   for (const featureId of intFeatureIds) {
     const render = getRouteIdComponent(featureId);

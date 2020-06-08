@@ -11,7 +11,7 @@ interface SwitchProps {
   highlightOnHover?: boolean;
 }
 
-const Switch: React.FunctionComponent<SwitchProps> = ({
+const Switch: React.FC<SwitchProps> = ({
   checked,
   onToggle,
   label = "",
