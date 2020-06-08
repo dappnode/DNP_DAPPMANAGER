@@ -17,7 +17,6 @@ export const notificationsSlice = createSlice({
     ) => ({
       ...state,
       [action.payload.id]: {
-        id: String(Math.random()).slice(2),
         timestamp: Date.now(),
         viewed: false,
         ...action.payload

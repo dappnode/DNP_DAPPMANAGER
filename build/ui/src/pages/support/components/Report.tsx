@@ -9,6 +9,7 @@ import { issueBaseUrl } from "params";
 import { PackageVersionData } from "common/types";
 import Ok from "components/Ok";
 import { FaGithub } from "react-icons/fa";
+import { MdChevronRight } from "react-icons/md";
 
 export default function Report() {
   const dnpsReq = useApi.listPackages();
@@ -59,9 +60,9 @@ export default function Report() {
           <span className="logo">
             <FaGithub />
           </span>
-          <span className="arrow">></span>
+          <MdChevronRight className="arrow" />
           <span>New issue</span>
-          <span className="arrow">></span>
+          <MdChevronRight className="arrow" />
           <span>Body</span>
         </span>
 

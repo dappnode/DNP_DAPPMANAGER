@@ -39,7 +39,7 @@
     "react-markdown": "^4.0.8",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.0.0",
-    "react-scripts": "^3.0.0",
+    "react-scripts": "^3.4.1",
     "react-switch": "^5.0.1",
     "react-toastify": "^4.1.0",
     "redux": "^4.0.0",
@@ -54,7 +54,7 @@
     "tether": "^1.4.4",
     "tweetnacl": "^1.0.1",
     "tweetnacl-util": "^0.15.0",
-    "typescript": "^3.7.0",
+    "typescript": "^3.7.2",
     "typescript-json-schema": "^0.42.0"
   },
   "scripts": {
@@ -68,7 +68,7 @@
     "coverage": "react-scripts test --env=jsdom --coverage",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "analyze": "npx source-map-explorer build/static/js/main.*",
-    "lint": "./node_modules/.bin/eslint . --ext js --fix",
+    "lint": "./node_modules/.bin/eslint --ext ts,tsx,js,jsx --fix src",
     "prettier": "prettier --write 'src/**/*.*'",
     "pre-commit": "yarn lint && CI=true yarn test",
     "mock": "REACT_APP_API_URL=http://localhost:5000 yarn start",
@@ -80,7 +80,6 @@
     "cors": "^2.8.5",
     "coveralls": "^3.0.2",
     "eslint-config-prettier": "^4.1.0",
-    "eslint-config-react-app": "^3.0.6",
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.17.1",
     "husky": "^1.3.1",
@@ -88,12 +87,18 @@
     "prettier": "^1.16.4",
     "why-did-you-update": "0.1.1"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "jest": {
     "watchPathIgnorePatterns": [
       "/node_modules"

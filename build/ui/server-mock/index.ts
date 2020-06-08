@@ -23,6 +23,7 @@ app.use(bodyParser.json());
 
 // Ping / hello endpoint
 app.get("/", (req, res) => res.send("Mock server"));
+app.get("/ping", (req, res) => res.send(req.body));
 
 // Rest of RPC methods
 app.post("/rpc", (req, res) => {

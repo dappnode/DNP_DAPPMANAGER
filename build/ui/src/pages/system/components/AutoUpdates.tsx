@@ -11,6 +11,7 @@ import { withToast } from "components/toast/Toast";
 import { shortNameCapitalized } from "utils/format";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
 import { coreName, autoUpdateIds } from "params";
+import { MdChevronRight } from "react-icons/md";
 // External
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { getAutoUpdateData } from "services/dappnodeStatus/selectors";
@@ -187,7 +188,9 @@ function AutoUpdateItem({
       </span>
 
       <span className="name">
-        {isSinglePackage && <span>> </span>}
+        {isSinglePackage && (
+            <MdChevronRight className="arrow"/>
+        )}
         {displayName}
       </span>
 
