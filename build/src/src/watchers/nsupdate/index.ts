@@ -1,14 +1,14 @@
+import retry from "async-retry";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import execNsupdate from "./execNsupdate";
 import { listContainers } from "../../modules/docker/listContainers";
-import { setIntervalDynamic, runWithRetry } from "../../utils/asyncFlows";
+import { setIntervalDynamic } from "../../utils/asyncFlows";
 // Utils
 import { getNsupdateTxts } from "./utils";
 import { logs } from "../../logs";
 
-const execNsupdateRetry = runWithRetry(execNsupdate, { base: 1000 });
 const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
 let firstRun = true;
 
@@ -34,9 +34,8 @@ async function runNsupdate({
       removeOnly
     });
 
-    for (const nsupdateTxt of nsupdateTxts) {
-      await execNsupdateRetry(nsupdateTxt);
-    }
+    for (const nsupdateTxt of nsupdateTxts)
+      await retry(() => execNsupdate(nsupdateTxt));
 
     if (ids) {
       if (removeOnly) logs.info("nsupdate delete", ids);

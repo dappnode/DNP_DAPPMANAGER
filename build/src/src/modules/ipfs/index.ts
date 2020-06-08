@@ -1,5 +1,5 @@
 import * as ipfsParams from "./ipfsParams";
-import { runWithRetry } from "../../utils/asyncFlows";
+import retry from "async-retry";
 import { isIpfsHash } from "../../utils/validate";
 
 // Methods
@@ -10,10 +10,9 @@ import lsRaw from "./methods/ls";
 import objectSizeRaw from "./methods/objectSize";
 
 // Params
-const params = {
-  times: ipfsParams.times || 3,
-  concurrency: ipfsParams.concurrency || 10,
-  intervalBase: ipfsParams.intervalBase || 225
+const params: retry.Options = {
+  retries: ipfsParams.times || 3,
+  minTimeout: ipfsParams.intervalBase || 225
 };
 
 async function isAvailable(hash: string): Promise<void> {
@@ -38,11 +37,9 @@ async function isAvailable(hash: string): Promise<void> {
 function wrapMethodWithIsAvailableAndRetry<A extends { hash: string }, R>(
   method: (kwargs: A) => Promise<R>
 ): (kwargs: A) => Promise<R> {
-  const isAvailableRetry = runWithRetry(isAvailable, params);
-  const methodRetry = runWithRetry(method, params);
   return async function(kwargs: A): Promise<R> {
-    await isAvailableRetry(kwargs.hash);
-    return await methodRetry(kwargs);
+    await retry(() => isAvailable(kwargs.hash), params);
+    return await retry(() => method(kwargs), params);
   };
 }
 

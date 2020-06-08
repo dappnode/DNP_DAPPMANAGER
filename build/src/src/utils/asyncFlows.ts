@@ -74,37 +74,6 @@ export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
 }
 
 /**
- * Retry execution n times until success or n errors
- * @param apiMethod
- * @param params
- */
-export function runWithRetry<A, R>(
-  apiMethod: (arg: A) => Promise<R>,
-  params?: { times?: number; base?: number }
-): (arg: A) => Promise<R> {
-  const times = params && params.times ? params.times : 3;
-  const base = params && params.base ? params.base : 225;
-
-  return function retryFunction(arg: A): Promise<R> {
-    return new Promise(
-      (resolve, reject): void => {
-        async.retry(
-          {
-            times,
-            interval: (retryCount): number => base * Math.pow(2, retryCount)
-          },
-          async.asyncify(async () => apiMethod(arg)),
-          (err: Error | null | undefined, result: R): void => {
-            if (err) reject(err);
-            else resolve(result);
-          }
-        );
-      }
-    );
-  };
-}
-
-/**
  * Waits `ms` miliseconds
  *
  * @param ms Pause time (ms)
