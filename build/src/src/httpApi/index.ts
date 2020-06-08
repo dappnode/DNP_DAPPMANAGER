@@ -7,7 +7,7 @@ import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
 import params from "../params";
-import { isAdmin } from "./auth";
+import { isAdmin, isAdminIp } from "./auth";
 import { wrapHandler } from "./utils";
 import { download } from "./routes/download";
 import { upload } from "./routes/upload";
@@ -47,6 +47,12 @@ export default function startHttpApi(port: number | string = httpApiPort) {
   const server = new http.Server(app);
   const io = socketio(server);
 
+  io.use((socket, next) => {
+    const ip = socket.handshake.address;
+    if (isAdminIp(ip)) next();
+    else next(new Error(`Requires admin permission. Forbidden ip: ${ip}`));
+  });
+
   io.on("connection", function(socket) {
     console.log(`Socket connected`, socket.id);
   });
@@ -79,6 +85,9 @@ export default function startHttpApi(port: number | string = httpApiPort) {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
+
+  // Ping - health check
+  app.get("/ping", isAdmin, wrapHandler(req => req.body));
 
   // Methods that do not fit into RPC
   app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));

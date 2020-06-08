@@ -2,9 +2,9 @@ import { urlJoin } from "utils/url";
 
 // JSON RPC API
 export const apiUrl =
-  process.env.REACT_APP_API_URL ||
-  "http://my.dappmanager.dnp.dappnode.eth:3000/";
+  process.env.REACT_APP_API_URL || "http://my.dappmanager.dnp.dappnode.eth/";
 export const apiUrls = {
+  ping: urlJoin(apiUrl, "ping"),
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),

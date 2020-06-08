@@ -149,7 +149,7 @@ export function start() {
 
   function handleConnectionError(err: Error | string): void {
     const errorMessage = err instanceof Error ? err.message : err;
-    fetch(apiUrl).then(res => {
+    fetch(apiUrls.ping).then(res => {
       if (res.ok) {
         // Warn that subscriptions are disabled
         store.dispatch(connectionOpen());
@@ -157,7 +157,7 @@ export function start() {
         store.dispatch(
           connectionClose({
             error: errorMessage,
-            isNotAdmin: false
+            isNotAdmin: res.status === 403
           })
         );
       }
@@ -168,6 +168,9 @@ export function start() {
 
   // Handles server errors
   socket.io.on("connect_error", handleConnectionError);
+
+  // Handles middleware / authentication errors
+  socket.on("error", handleConnectionError);
 
   // Handles individual socket errors
   socket.on("disconnect", handleConnectionError);
