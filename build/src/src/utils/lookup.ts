@@ -1,6 +1,4 @@
-import { promisify } from "util";
-const dns = require("dns");
-const lookupAsync = promisify(dns.lookup);
+import dns from "dns";
 
 /**
  * Does a dns.lookup to resolve a hostname
@@ -20,7 +18,7 @@ export default async function lookup(
   ignoreErrors?: boolean
 ): Promise<string | null> {
   try {
-    const { address } = await lookupAsync(hostname);
+    const { address } = await dns.promises.lookup(hostname);
     return address;
   } catch (e) {
     if (ignoreErrors) return null;
