@@ -13,7 +13,6 @@ import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
-import startEthForward from "./ethForward";
 import startHttpApi from "./httpApi";
 import { startAutobahn } from "./api";
 import { logs } from "./logs";
@@ -23,9 +22,6 @@ startHttpApi();
 
 // Start WAMP Transport
 startAutobahn({ url: params.autobahnUrl, realm: params.autobahnRealm });
-
-// Start eth forward http proxy
-startEthForward();
 
 // Start watchers
 runWatchers();

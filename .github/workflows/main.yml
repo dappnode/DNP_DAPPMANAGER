@@ -15,7 +15,7 @@ jobs:
     env:
       working-directory: ./build/src
       CI: true
-    name: Unit Tests
+    name: Unit tests
     steps:
       - uses: actions/checkout@v2
       - name: Setup node
@@ -46,6 +46,25 @@ jobs:
       - run: yarn generate
         working-directory: ${{ env.working-directory }}
       - run: yarn test:int
+        working-directory: ${{ env.working-directory }}
+
+  ui-unit-test:
+    runs-on: ubuntu-16.04
+    env:
+      working-directory: ./build/ui
+      CI: true
+    name: UI unit tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: yarn install
+        working-directory: ${{ env.working-directory }}
+      - run: yarn build
+        working-directory: ${{ env.working-directory }}
+      - run: yarn test
         working-directory: ${{ env.working-directory }}
 
   build-test:

@@ -1,0 +1,17 @@
+.columns {
+  display: flex;
+  @media screen and (max-width: 40rem) {
+    display: block;
+    > *:not(:last-child) {
+      margin-bottom: var(--default-spacing);
+    }
+  }
+  @media screen and (min-width: 40rem) {
+    > *:not(:last-child) {
+      margin-right: var(--default-spacing);
+    }
+  }
+  > * {
+    flex: auto;
+  }
+}

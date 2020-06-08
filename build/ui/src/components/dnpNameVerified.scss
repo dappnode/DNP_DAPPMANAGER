@@ -1,0 +1,30 @@
+.dnp-name-verified {
+  display: grid;
+  grid-template-columns: auto auto;
+
+  --dnp-name-verified-font-size: 1.1rem;
+  --dnp-name-verified-height: 1.5rem;
+  &.big {
+    --dnp-name-verified-font-size: 2.2rem;
+    --dnp-name-verified-height: 2.5rem;
+  }
+
+  font-size: var(--dnp-name-verified-font-size);
+  grid-gap: 0 calc(var(--dnp-name-verified-font-size) / 4);
+
+  .name {
+    font-weight: 600;
+    // Limit the number of text lines to N
+    line-height: var(--dnp-name-verified-height); // X
+    max-height: var(--dnp-name-verified-height); // X*N
+    // Ellipsis
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .verified-badge {
+    font-size: 85%;
+    // align-self: end;  // #### Not sure this is necessary
+    color: var(--dappnode-color);
+  }
+}

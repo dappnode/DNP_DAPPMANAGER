@@ -20,7 +20,6 @@ import { logs } from "../logs";
 const ipfsRedirect = params.ETHFORWARD_IPFS_REDIRECT; // "http://ipfs.dappnode:8080"
 const swarmRedirect = params.ETHFORWARD_SWARM_REDIRECT; // "http://swarm.dappnode";
 const pinContentOnVisit = params.ETHFORWARD_PIN_ON_VISIT;
-const port = params.ETHFORWARD_HTTP_PROXY_PORT;
 
 /**
  * Convert a decentralized content into a fetchable URL
@@ -36,16 +35,39 @@ function getTargetUrl(content: Content): string {
 }
 
 /**
+ * Check if a request is for a decentralized website, based on their host
+ * - decentral.eth => true
+ * - my.dappmanager.dnp.dappnode.eth => false
+ * - my.dappnode => false
+ */
+export function isDwebRequest(req: http.IncomingMessage): boolean {
+  const domain = req.headers.host;
+  return (
+    typeof domain === "string" &&
+    domain.endsWith(".eth") &&
+    !domain.endsWith("dnp.dappnode.eth")
+  );
+}
+
+/**
  * Start eth forward http proxy
  */
-export default function startEthForward(): void {
-  // Create a proxy
+export function getEthForwardHandler(): (
+  req: http.IncomingMessage,
+  res: http.ServerResponse
+) => Promise<void> {
+  logs.info(`IPFS redirect set to: ${ipfsRedirect}`);
+  logs.info(`SWARM redirect set to: ${swarmRedirect}`);
+
   const proxy = httpProxy.createProxyServer({});
+  proxy.on("error", e => {
+    logs.error(`ETHFORWARD proxy error`, e);
+  });
 
   // Create a domain resolver with cache
   const resolveDomain = ResolveDomainWithCache();
 
-  async function proxyHttpServerHandler(
+  return async function ethForwardProxyHttpHandler(
     req: http.IncomingMessage,
     res: http.ServerResponse
   ): Promise<void> {
@@ -104,18 +126,5 @@ export default function startEthForward(): void {
       res.write(errorToResponseHtml(e, domain));
       res.end();
     }
-  }
-
-  // Log status
-  logs.info(`IPFS redirect set to: ${ipfsRedirect}`);
-  logs.info(`SWARM redirect set to: ${swarmRedirect}`);
-  logs.info(`Http server listening at port: ${port}`);
-
-  // Generic callback for errors
-  proxy.on("error", e => {
-    logs.error(`ETHFORWARD proxy error`, e);
-  });
-
-  // Create an HTTP server and register its handler
-  http.createServer(proxyHttpServerHandler).listen(port);
+  };
 }

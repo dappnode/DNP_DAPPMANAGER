@@ -5,8 +5,6 @@ import { PackageVersionData } from "../types";
 import params from "../params";
 import * as db from "../db";
 
-const versionDataJsonPath = params.VERSION_DATA_FILE_PATH;
-
 /**
  * For debugging, print current version, branch and commit
  * { "version": "0.1.21",
@@ -23,7 +21,7 @@ export const getVersionData = memoize(function(): {
 } {
   try {
     const data: PackageVersionData = JSON.parse(
-      fs.readFileSync(versionDataJsonPath, "utf8")
+      fs.readFileSync(params.GIT_DATA_PATH, "utf8")
     );
 
     const previousData = db.versionData.get();

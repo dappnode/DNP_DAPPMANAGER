@@ -1,0 +1,211 @@
+.list-grid.dnps {
+  /*
+  Col 1, Fit to the link buttons / switch always
+  Col 2: Shrink the text to an extend, otherwise fill all available space
+  Col 3, 4: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+  grid-template-columns:
+    minmax(1.65rem, min-content)
+    2rem
+    minmax(5rem, auto)
+    minmax(calc(var(--icon-size) / 2), min-content)
+    minmax(calc(var(--icon-size) / 2), min-content);
+
+  &.core {
+    grid-template-columns:
+      2rem
+      minmax(1.65rem, min-content)
+      minmax(5rem, auto)
+      minmax(calc(var(--icon-size) / 2), min-content)
+      minmax(calc(var(--icon-size) / 2), min-content);
+  }
+
+  @media screen and (max-width: 40rem) {
+    grid-template-columns:
+      1.65rem
+      2rem
+      minmax(5rem, auto)
+      minmax(calc(var(--icon-size) / 2), min-content);
+
+    .restart {
+      display: none;
+    }
+
+    .stateBadge {
+      height: 1.65rem;
+      border-radius: 1.65rem;
+      .content {
+        display: none;
+      }
+    }
+
+    &.core {
+      grid-template-columns:
+        2rem
+        minmax(1rem, min-content)
+        minmax(5rem, auto)
+        minmax(calc(var(--icon-size) / 2), min-content)
+        minmax(calc(var(--icon-size) / 2), min-content);
+    }
+  }
+
+  .avatar {
+    width: 100%;
+    border-radius: 4px;
+  }
+}
+/* Customize name inside NavLink */
+.list-grid.dnps a:hover {
+  color: var(--dappnode-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+/* Width must be 100% for proper hidding on small screens */
+.list-grid.dnps .stateBadge {
+  width: 100%;
+  overflow: hidden;
+  overflow-wrap: normal;
+}
+.list-grid.dnps .name {
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  overflow-wrap: normal;
+}
+
+.pkg-row-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.stateBadge {
+  border-radius: 6px;
+  padding: 1px 5px;
+  color: white;
+  font-size: 90%;
+  text-transform: uppercase;
+}
+
+/* Modify the buttons next to tables */
+
+.tableAction-button {
+  min-width: 75px;
+}
+
+/* PackagesViews / Logs */
+
+.log-controls .input-group,
+.log-controls label {
+  margin-bottom: 1rem !important;
+}
+
+/* PackagesViews / Controls */
+
+.control-item {
+  display: grid;
+  grid-template-columns: auto 100px;
+  align-items: start;
+  grid-gap: var(--default-spacing);
+}
+
+/* Button file selectors */
+
+.backup {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+  > span:not(:last-child) {
+    margin-right: var(--default-spacing);
+  }
+}
+
+.button-file-input {
+  position: relative;
+
+  > input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+  }
+}
+
+.backup,
+.file-manager {
+  .subtle-header {
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Internal packages navigation
+// ============================
+// On big screens
+// - vertical right sided navbar
+// - Display section title
+// Otherwise
+// - horizontal top navbar
+
+// ####### For now hide the header and DO NOT do it responsive
+// ####### the fit to screen breaks. The terminal grows beyond
+// ####### the screen size
+
+.packages-body {
+  display: flex;
+}
+
+.packages-content {
+  flex: auto;
+  .section-subtitle:only-child,
+  .section-subtitle:first-child:nth-last-child(2) {
+    display: none;
+  }
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+}
+
+.horizontal-navbar {
+  display: block;
+  text-align: center;
+  margin-bottom: 0.5rem !important;
+  .item-container {
+    background-color: transparent;
+    border: none;
+    margin-bottom: 1rem;
+    padding-bottom: 0.3rem;
+    padding-left: 0;
+    font-size: 1.2rem;
+    &:not(:last-child) {
+      padding-right: 1rem;
+      margin-right: 1rem;
+      border-right: var(--border-style);
+    }
+    &:hover {
+      color: inherit;
+    }
+
+    // Remove the border (outline) on click
+    &:focus {
+      outline: none;
+    }
+  }
+  .item {
+    color: #7b7d7f;
+    border: none;
+    padding-bottom: 0.3rem;
+    cursor: pointer;
+    &.active {
+      color: #212529;
+      border-bottom: 5px solid var(--dappnode-strong-main-color);
+    }
+  }
+}

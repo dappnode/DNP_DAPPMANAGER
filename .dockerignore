@@ -24,3 +24,13 @@ build/src/.temp-transfer/*
 
 # Version data file
 .version.json
+
+# UI
+build/ui/node_modules
+build/ui/npm-debug.log
+
+# Mock server is only for developing
+build/ui/server-mock
+
+# Version builds
+build_*/

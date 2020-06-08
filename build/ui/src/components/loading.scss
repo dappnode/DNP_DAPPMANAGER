@@ -1,0 +1,15 @@
+.loading-view {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  img {
+    width: 100px;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    opacity: 0.6;
+  }
+}

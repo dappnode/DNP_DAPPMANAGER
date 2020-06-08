@@ -1,0 +1,259 @@
+:root {
+  --sidebar-breakpoint: 40rem;
+  --sidenav-width: 12.5rem;
+  --transition-time: 0.25s;
+  --topbar-height: 3.5rem;
+  --container-padding: 1.5rem;
+  --color-white: white;
+  --color-border: #e5e5e5;
+  --color-background: #f7f9f9;
+  --border-size: 0.08rem;
+  --border-style: var(--border-size) solid var(--color-border);
+  --default-spacing: 1.25rem;
+}
+/* MUST ONLY defined z-index properties here 
+   Variable definitions are ordered from front to back
+*/
+:root {
+  /* Toastify toasts have z-index: 9999 */
+  --z-index-confirm-dialog: 5000;
+  --z-index-welcome-dialog: 4000;
+  --z-index-sidebar: 2000;
+  --z-index-topbar: 1000;
+}
+
+/* 
+  TEXT STYLES 
+*/
+body {
+  font-family: overpass, sans-serif !important;
+}
+
+/* Reset margins and underlying sizes. 
+   The height 100% is necessary so child elements have a reference to be full width
+*/
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/*****
+  BODY
+  ****
+  Body is the main app container. 
+  It will always have a fix height of the entire screen
+  and only the main content area is scrollable 
+*/
+.body {
+  /* ### Todo: Substract the topbar height to prevent showing scrollbar when not necessary */
+  /* min-height: calc(100vh - var(--topbar-height)); */
+  background-color: var(--color-background);
+}
+html,
+body {
+  background-color: var(--color-background);
+}
+
+/********
+  SIDEBAR
+  ******* 
+  The sidebar divided in two areas to match the header 
+  The responsiveness is controlled by making the width = 0 
+*/
+#sidebar {
+  /* Basic sizing */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--sidenav-width);
+  transition: width var(--transition-time);
+  /* When the screen height is really small, show scrolling
+     When the sidenav collapses, hide its content
+   */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* While the sidenav is collapsing, make sure the content stays straight */
+  white-space: nowrap;
+  /* Colors */
+  background-color: var(--color-white);
+  border-right: var(--border-style);
+  box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
+  /* place sidebar on top of the header and content */
+  z-index: var(--z-index-sidebar);
+}
+
+.sidebar-logo {
+  width: calc(0.7 * var(--sidenav-width));
+}
+/* SIDEBAR > NAV */
+#sidebar > .nav {
+  padding: 0.8rem 0;
+  flex: none;
+}
+.sidenav-item {
+  display: grid;
+  grid-template-columns: 1rem 2rem auto;
+  grid-gap: 0.6rem;
+  place-items: center start;
+  transition: all 0.5s;
+  width: 100%;
+}
+.sidenav-item:not(.top) {
+  height: 2.5rem;
+}
+.sidenav-item .icon,
+.sidenav-item svg {
+  grid-column: 2/3;
+  opacity: 0.3;
+}
+.sidenav-item .header,
+.sidenav-item .subheader {
+  grid-column: 2/4;
+}
+/* Make this section dissapear small heights */
+#sidebar > .funded-by {
+  width: 100%;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+/* SIDEBAR > TOP */
+.sidenav-item.top {
+  height: var(--topbar-height);
+  border-bottom: var(--border-style);
+  /* Prevent the item from shrinking */
+  flex-shrink: 0;
+}
+
+/* Styles below apply when screen width big */
+@media (min-width: 40rem) {
+  .sidenav-toggler {
+    display: none;
+  }
+}
+
+/*******
+  TOPBAR
+  ******
+  The topbar will always be visible and fixed on the top of the screen
+*/
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--topbar-height);
+  /* Postion left and right divs on each side + security gap margin */
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 1em;
+  /* Colors */
+  background-color: var(--color-white);
+  border-bottom: var(--border-style);
+  padding: 0 var(--container-padding);
+  /* place topbar between the sidebar (2) and the main (0) */
+  z-index: var(--z-index-topbar);
+}
+#topbar .right,
+#topbar .left {
+  display: flex;
+  align-items: center;
+}
+
+/* Align right to the right so the position does not change when the left div is not there */
+#topbar .right {
+  --icon-size: 1.5rem;
+  flex: auto;
+  display: grid;
+  /* Create as much columns as necessary aligned center vertically and justified to the right */
+  grid-template-columns:
+    minmax(var(--icon-size), min-content)
+    min-content
+    minmax(var(--icon-size), min-content)
+    minmax(var(--icon-size), min-content);
+
+  grid-auto-flow: column;
+  place-content: center end;
+  /* Auto-space the items only in-between, hard to achieve with flex */
+  grid-gap: 1rem;
+}
+
+/*****
+  MAIN
+  ****
+  Holds the app content. Content should be responsive on the x axis
+  Overflow on the y axis is expected and will be scrollable
+*/
+#main {
+  position: relative;
+  margin-top: var(--topbar-height);
+  margin-left: var(--sidenav-width);
+  background-color: var(--color-background);
+  padding: var(--container-padding);
+}
+
+#main > div {
+  margin-bottom: var(--default-spacing);
+}
+
+/********************
+  RESPONSIVENESS
+  **************
+  Safari has been reported to cause issues with a grid-area 
+  responsive layout. When react re-painted the DOM, some
+  node's scroll position was reseted.
+*/
+#main,
+#topbar {
+  transition: margin-left var(--transition-time);
+}
+@media only screen and (max-width: 40rem) {
+  #sidebar.collapsed {
+    width: 0;
+    border-right-width: 0;
+  }
+  #main,
+  #topbar {
+    margin-left: 0;
+  }
+}
+
+/********************
+  Generic section
+  *******************
+ */
+
+.section-spacing > * {
+  margin-bottom: var(--default-spacing);
+}
+
+/********************
+  SPECIAL STAND-ALONE
+  *******************
+  Used in:
+  - NonAdmin
+  - NoConnection
+ */
+.standalone-container {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  padding: 5em;
+  padding: 5em 1em;
+  text-align: center;
+  background-color: var(--color-background);
+  min-height: 100vh;
+}
+
+/*************
+  Additional
+  ************
+*/
+.button-group > *:not(:last-child) {
+  margin-right: var(--default-spacing);
+}

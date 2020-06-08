@@ -1,0 +1,93 @@
+.auto-update-row {
+  display: flex;
+  justify-content: space-between;
+  select {
+    max-width: 8rem;
+  }
+}
+
+.auto-updates-explanation {
+  margin-bottom: var(--default-spacing);
+}
+
+.list-grid.auto-updates {
+  /*
+  Col 1: Shrink the text to an extend, otherwise fill all available space
+  Col 2, 3: Fit to the link buttons / switch always
+  Col 4, 5: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+  grid-template-columns:
+    minmax(1.65rem, min-content)
+    minmax(4rem, max-content)
+    minmax(4rem, auto)
+    min-content;
+
+  .header {
+    color: #8c8c8c;
+  }
+
+  .stateBadge {
+    width: 2.5rem;
+    overflow: hidden;
+    overflow-wrap: normal;
+  }
+
+  .name {
+    display: flex;
+  }
+  .name span {
+    margin-right: 0.5rem;
+    font-weight: 800;
+    color: var(--border-color);
+  }
+
+  .last-update {
+    justify-self: right;
+    color: #8c8c8c;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    .error {
+      color: #ce4545;
+      font-size: 80%;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .extra-info {
+    grid-column: 1 / -1;
+    color: #ce4545;
+    font-size: 90%;
+  }
+
+  @media screen and (max-width: 40rem) {
+    .stateBadge,
+    .last-update {
+      display: none;
+    }
+    grid-template-columns:
+      minmax(4rem, auto)
+      minmax(min-content, max-content);
+
+    .extra-info {
+      display: none;
+    }
+  }
+}
+
+.show-detailed-options {
+  margin-top: var(--default-spacing);
+  label {
+    transition: opacity ease 0.1s;
+    color: #8c8c8c;
+  }
+  &:hover label {
+    opacity: 1;
+  }
+}

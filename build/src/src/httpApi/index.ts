@@ -5,8 +5,9 @@ import compression from "compression";
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import socketio from "socket.io";
+import path from "path";
 import params from "../params";
-import { isAdmin } from "./auth";
+import { isAdmin, isAdminIp } from "./auth";
 import { wrapHandler } from "./utils";
 import { download } from "./routes/download";
 import { upload } from "./routes/upload";
@@ -18,6 +19,7 @@ import { subscriptionsFactory } from "../common/transport/socketIo";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
 import { Subscriptions, subscriptionsData } from "../common/subscriptions";
 import { validateSubscriptionsArgsFactory } from "../common/validation";
+import { getEthForwardHandler, isDwebRequest } from "../ethForward";
 import {
   subscriptionsLoggerFactory,
   routesLoggerFactory
@@ -25,6 +27,7 @@ import {
 import { logs } from "../logs";
 
 const httpApiPort = params.HTTP_API_PORT;
+const uiFilesPath = params.UI_FILES_PATH;
 const whitelist = [
   "http://localhost:3000",
   "http://localhost:3001",
@@ -36,11 +39,19 @@ const whitelist = [
  *
  * [NOTE] This API is not secure
  * - It can't use HTTPS for the limitations with internal IPs certificates
+ *
+ * [NOTE] To enable express debugging set ENV DEBUG=express:*
  */
-export default function startHttpApi(port: number = httpApiPort) {
+export default function startHttpApi(port: number | string = httpApiPort) {
   const app = express();
   const server = new http.Server(app);
   const io = socketio(server);
+
+  io.use((socket, next) => {
+    const ip = socket.handshake.address;
+    if (isAdminIp(ip)) next();
+    else next(new Error(`Requires admin permission. Forbidden ip: ${ip}`));
+  });
 
   io.on("connection", function(socket) {
     console.log(`Socket connected`, socket.id);
@@ -57,24 +68,26 @@ export default function startHttpApi(port: number = httpApiPort) {
   );
   mapSubscriptionsToEventBus(subscriptions);
 
-  // RPC
   const loggerMiddleware = routesLoggerFactory();
   const rpcHandler = getRpcHandler(methods, loggerMiddleware);
+  const ethForwardHandler = getEthForwardHandler();
 
+  // Intercept decentralized website requests first
+  app.use((req, res, next) => {
+    if (isDwebRequest(req)) ethForwardHandler(req, res);
+    else next();
+  });
   // default options. ALL CORS + limit fileSize and file count
-  app.use(
-    fileUpload({
-      limits: { fileSize: 500 * 1024 * 1024, files: 10 }
-    })
-  );
+  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: whitelist }));
   app.use(compression());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
 
-  // Ping / hello endpoint
-  app.get("/", (req, res) => res.send("DAPPMANAGER HTTP API"));
+  // Ping - health check
+  app.get("/ping", isAdmin, wrapHandler(req => req.body));
 
   // Methods that do not fit into RPC
   app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));
@@ -87,6 +100,11 @@ export default function startHttpApi(port: number = httpApiPort) {
     "/rpc",
     isAdmin,
     wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
+  );
+
+  // Serve UI. React-router, index.html at all routes
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(uiFilesPath, "index.html"))
   );
 
   server.listen(port, () => logs.info(`HTTP API ${port}`));

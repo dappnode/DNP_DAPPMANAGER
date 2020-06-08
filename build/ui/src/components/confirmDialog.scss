@@ -1,0 +1,60 @@
+/* Confirm dialog overlay */
+.confirm-dialog-root {
+  z-index: var(--z-index-confirm-dialog);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  -ms-align-items: center;
+  align-items: center;
+
+  & > .dialog {
+    padding: var(--default-spacing);
+    padding-bottom: 0;
+    border-radius: 0.5rem;
+    border: var(--border-style);
+    background: white;
+    box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+    color: #666;
+    /* Sizing */
+    max-height: 30rem;
+    width: 27rem;
+    overflow-y: auto;
+
+    /* 30 * 90% = 27 (the width specified above) */
+    @media (max-width: 30rem) {
+      width: 90vw;
+    }
+
+    > .buttons {
+      margin-top: var(--default-spacing);
+
+      > button {
+        margin-bottom: var(--default-spacing);
+        white-space: pre-wrap;
+        &:not(:last-child) {
+          margin-right: var(--default-spacing);
+        }
+      }
+    }
+
+    .list {
+      margin-top: 0.7rem;
+    }
+
+    .list-item {
+      padding: 0.7rem 0;
+      border-bottom: var(--border-style);
+      &:first-child {
+        border-top: var(--border-style);
+      }
+      > .text {
+        opacity: 0.8;
+      }
+    }
+  }
+}

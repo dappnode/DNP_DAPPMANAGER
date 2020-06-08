@@ -1,0 +1,78 @@
+.setup-wizard {
+  .dnp-name {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    line-height: inherit;
+    color: inherit;
+    white-space: normal;
+  }
+
+  // Hide title if there is only one DNP section
+  .dnp-section:only-child .dnp-name {
+    display: none;
+  }
+
+  .dnp-section:not(:last-child),
+  .field:not(:last-child) {
+    padding-bottom: var(--default-spacing);
+    margin-bottom: var(--default-spacing);
+    border-bottom: var(--border-style);
+  }
+  .table-xn:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+
+  .field {
+    .title {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .description {
+      margin-bottom: 0.75rem;
+    }
+
+    // Control file inputs
+    .custom-file-label {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .error {
+      margin-top: 0.5rem;
+      color: var(--danger-color);
+    }
+  }
+
+  .bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: calc(-1 * var(--default-spacing));
+
+    button {
+      margin-top: var(--default-spacing);
+    }
+
+    div > button:not(:last-child) {
+      margin-right: var(--default-spacing);
+    }
+
+    .subtle-header {
+      margin-top: var(--default-spacing);
+      cursor: pointer;
+      transition: color ease 150ms;
+      &:hover {
+        color: black;
+      }
+    }
+  }
+}
+
+.input-field-secret-toggle {
+  display: flex !important;
+  font-size: 20px !important;
+  border-color: #ced4da !important;
+  svg {
+    opacity: 0.7;
+  }
+}

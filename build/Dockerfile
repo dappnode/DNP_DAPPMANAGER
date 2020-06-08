@@ -1,10 +1,10 @@
-# Layer 0: Common base so it's cached 
+# Common base so it's cached 
 #####################################
 FROM node:10.15.3-alpine as build-base
 
-RUN apk add --no-cache git python build-base bind-tools docker bash jq
-
 WORKDIR /usr/src/app
+
+RUN apk add --no-cache python build-base bind-tools docker bash
 
 # Install app dependencies to use docker's layer cache
 COPY build/src/package.json ./
@@ -12,7 +12,7 @@ COPY build/src/yarn.lock ./
 RUN yarn install --production --link-duplicates
 # --link-duplicates: hardlinks for repeated modules. 193964 => 175592
 
-# Layer 1: Build the dependencies
+# Build server dependencies
 #####################################
 FROM build-base as build-deps
 
@@ -21,14 +21,9 @@ COPY build/src/patches patches
 RUN yarn add -D patch-package --production --frozen-lockfile --skip-integrity-check
 RUN yarn prepare
 
-# Get this DNP version and git hash. Results in /usr/src/app/.version.json
-COPY .git .git
-COPY dappnode_package.json .
-COPY build/src/getVersionData.sh .
-RUN ./getVersionData.sh
 
 
-# Layer 2: Build the source .ts files
+# Build server source .ts files
 #####################################
 FROM build-base as build-src
 
@@ -37,7 +32,39 @@ COPY build/src .
 RUN yarn build
 
 
-# Layer 3: Final layer
+
+# Compute git data
+#####################################
+FROM node:10.15.3-alpine as git-data
+
+WORKDIR /usr/src/app
+
+RUN apk add --no-cache git
+COPY .git .git
+COPY dappnode_package.json .
+COPY build/getGitData.js .
+RUN node getGitData /usr/src/app/.git-data.json
+
+
+
+# UI build
+#####################################
+FROM node:10.15.3-alpine as build-ui
+
+WORKDIR /usr/src/app
+
+# Copy and install deps first to cache
+COPY build/ui/package.json build/ui/yarn.lock ./
+RUN yarn --production
+COPY build/ui .
+RUN yarn generate
+ENV REACT_APP_API_URL /
+RUN yarn build
+# Results in build/*
+
+
+
+# Final layer
 #####################################
 FROM node:10.15.3-alpine
 
@@ -48,9 +75,13 @@ RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind
 RUN curl -L https://github.com/dappnode/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-$(uname -m) > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
 
-# Copy files and do things that can change
-
 WORKDIR /usr/src/app
+
+ENV COMPOSE_HTTP_TIMEOUT=300 \
+  DOCKER_CLIENT_TIMEOUT=300 \
+  DOCKER_HOST=unix:///var/run/docker.sock \
+  UI_FILES_PATH=dist \
+  GIT_DATA_PATH=.git-data.json
 
 COPY --from=build-deps /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-deps /usr/bin/docker /usr/bin/docker
@@ -59,11 +90,10 @@ COPY --from=build-deps /usr/bin/docker /usr/bin/docker
 COPY build/src/hostScripts /usr/src/app/hostScripts
 COPY --from=build-deps /usr/src/app /usr/src/app
 COPY --from=build-src /usr/src/app/dist /usr/src/app/src
+COPY --from=build-ui /usr/src/app/build $UI_FILES_PATH
+COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 COPY build/rndc.conf /etc/bind/
 COPY build/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
-ENV COMPOSE_HTTP_TIMEOUT=300 DOCKER_CLIENT_TIMEOUT=300 DOCKER_HOST=unix:///var/run/docker.sock
-RUN echo "127.0.0.1 localunixsocket"
 
 CMD [ "node", "src/index" ]
