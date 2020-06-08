@@ -19,7 +19,7 @@ export const store = configureStore({
   // ### Todo: Fix type bug: 'state !== state', because state can be undefined
   reducer: rootReducer as Reducer,
   middleware: [thunk],
-  devTools: { actionsBlacklist: ["UPDATE_CHAIN_DATA"] }
+  devTools: { actionsBlacklist: ["chainData/update"] }
 });
 
 declare global {

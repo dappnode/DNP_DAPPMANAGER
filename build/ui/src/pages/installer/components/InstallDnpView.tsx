@@ -114,7 +114,6 @@ const InstallDnpView: React.FunctionComponent<
       );
       // Re-direct user to package page if installation is successful
       if (componentIsMounted.current) {
-        setIsInstalling(false);
         setShowSuccess(true);
         setTimeout(() => {
           if (componentIsMounted.current) {
@@ -127,6 +126,7 @@ const InstallDnpView: React.FunctionComponent<
       console.error(e);
     } finally {
       dispatch(clearIsInstallingLog({ id: name }));
+      if (componentIsMounted.current) setIsInstalling(false);
     }
   };
   // Prevent a burst of install calls
@@ -277,7 +277,7 @@ const InstallDnpView: React.FunctionComponent<
           <StatusIcon success={true} message="Successfully installed!" />
         </Card>
       ) : isInstalling ? (
-        <ProgressLogsView progressLogs={{ [name]: "..." }} />
+        <ProgressLogsView progressLogs={{ [name]: "Sending request..." }} />
       ) : null}
 
       {requiresCoreUpdate && (
