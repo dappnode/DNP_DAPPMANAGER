@@ -14,9 +14,7 @@ interface CardProps {
 /**
  * [NOTE] style is injected to the card-body div via ...props
  */
-const Card: React.FunctionComponent<
-  CardProps & React.HTMLAttributes<HTMLDivElement>
-> = ({
+const Card: React.FC<CardProps & React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   className = "",
   shadow,

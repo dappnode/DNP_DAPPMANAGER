@@ -15,7 +15,7 @@ type FadeStatus = "null" | "opacity-0" | "opacity-1";
  * Does a simple fade in/out animation. This component can appear abruptly
  * so the animation is important to soften it's flashy behaviour
  */
-const WelcomeModalContainer: React.FunctionComponent<{
+const WelcomeModalContainer: React.FC<{
   show: boolean;
 }> = ({ show, children }) => {
   const [status, setStatus] = useState<FadeStatus>("null");

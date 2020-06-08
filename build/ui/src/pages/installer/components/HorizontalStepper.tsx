@@ -7,7 +7,7 @@ interface HorizontalStepperProps {
   currentIndex: number;
 }
 
-const HorizontalStepper: React.FunctionComponent<HorizontalStepperProps> = ({
+const HorizontalStepper: React.FC<HorizontalStepperProps> = ({
   routes,
   currentIndex
 }) => (

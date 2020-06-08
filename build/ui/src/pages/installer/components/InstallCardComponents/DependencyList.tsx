@@ -37,9 +37,7 @@ interface DependencyListProps {
   deps: DependencyListItem[];
 }
 
-const DependencyList: React.FunctionComponent<DependencyListProps> = ({
-  deps
-}) => {
+const DependencyList: React.FC<DependencyListProps> = ({ deps }) => {
   if (!Array.isArray(deps)) {
     console.error("deps must be an array");
     return null;

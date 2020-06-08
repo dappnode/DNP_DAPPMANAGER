@@ -14,7 +14,7 @@ interface DependenciesProps {
   dnps: CompatibleDnps;
 }
 
-const Dependencies: React.FunctionComponent<DependenciesProps> = ({
+const Dependencies: React.FC<DependenciesProps> = ({
   noCard,
   resolving,
   error,

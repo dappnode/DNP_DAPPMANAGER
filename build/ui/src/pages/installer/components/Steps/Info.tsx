@@ -27,7 +27,7 @@ interface OkBadgeProps {
   msg: string;
 }
 
-const OkBadge: React.FunctionComponent<
+const OkBadge: React.FC<
   OkBadgeProps & React.HTMLAttributes<HTMLDivElement>
 > = ({ ok, loading, msg, ...props }) => {
   const status = ok ? "ok" : loading ? "" : "not-ok";
@@ -52,7 +52,7 @@ interface InstallerStepInfoProps {
   }[];
 }
 
-const InstallerStepInfo: React.FunctionComponent<InstallerStepInfoProps> = ({
+const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
   dnp,
   onInstall,
   disableInstallation,

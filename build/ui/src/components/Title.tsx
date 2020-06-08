@@ -5,11 +5,7 @@ interface TitleProps {
   subtitle?: string;
 }
 
-const Title: React.FunctionComponent<TitleProps> = ({
-  title,
-  subtitle,
-  children
-}) => {
+const Title: React.FC<TitleProps> = ({ title, subtitle, children }) => {
   if (children) return <div className="section-title">{children}</div>;
   if (subtitle)
     return (

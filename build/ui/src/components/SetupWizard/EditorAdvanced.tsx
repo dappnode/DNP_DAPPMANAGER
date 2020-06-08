@@ -13,7 +13,7 @@ interface EditableTableProps {
   setValue: (valueId: string, value: string) => void;
 }
 
-const EditableTable: React.FunctionComponent<EditableTableProps> = ({
+const EditableTable: React.FC<EditableTableProps> = ({
   headers,
   placeholder,
   values,

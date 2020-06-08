@@ -11,7 +11,7 @@ interface DisclaimerProps {
   goBack: () => void;
 }
 
-const Disclaimer: React.FunctionComponent<DisclaimerProps> = ({
+const Disclaimer: React.FC<DisclaimerProps> = ({
   disclaimers,
   onAccept,
   goBack

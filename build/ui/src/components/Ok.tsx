@@ -23,9 +23,12 @@ interface OkProps {
   msg: string;
 }
 
-const Ok: React.FunctionComponent<
-  OkProps & React.HTMLAttributes<HTMLDivElement>
-> = ({ msg, ok, loading, ...props }) => {
+const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
+  msg,
+  ok,
+  loading,
+  ...props
+}) => {
   return (
     <OkContainer {...props}>
       <IconContainer>

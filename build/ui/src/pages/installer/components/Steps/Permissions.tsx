@@ -12,7 +12,7 @@ interface PermissionsProps {
   goBack: () => void;
 }
 
-const Permissions: React.FunctionComponent<PermissionsProps> = ({
+const Permissions: React.FC<PermissionsProps> = ({
   permissions,
   onAccept,
   goBack

@@ -13,9 +13,7 @@ interface InputProps {
   type?: string;
 }
 
-const Input: React.FunctionComponent<
-  InputProps & React.HTMLAttributes<HTMLInputElement>
-> = ({
+const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
   value,
   onValueChange,
   onEnterPress,

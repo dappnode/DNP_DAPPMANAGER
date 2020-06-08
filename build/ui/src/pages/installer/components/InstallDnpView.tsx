@@ -45,9 +45,7 @@ interface InstallDnpViewProps {
 //   "dappnode-user-set-form-data-" + dnp.origin ||
 //   (dnp.manifest || {}).name + (dnp.manifest || {}).version;
 
-const InstallDnpView: React.FunctionComponent<
-  InstallDnpViewProps & RouteComponentProps
-> = ({
+const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   dnp,
   progressLogs,
   // Extra
