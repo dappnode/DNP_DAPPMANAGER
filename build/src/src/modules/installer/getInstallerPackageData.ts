@@ -42,7 +42,15 @@ export default function getInstallerPackageData(
   userSettings: UserSettings,
   currentVersion: string | undefined
 ): InstallPackageData {
-  const { name, semVersion, isCore, compose, metadata, origin } = release;
+  const {
+    name,
+    semVersion,
+    isCore,
+    compose,
+    metadata,
+    origin,
+    imageFile
+  } = release;
   /**
    * Compute paths
    */
@@ -50,7 +58,11 @@ export default function getInstallerPackageData(
   const composeBackupPath = getPath.backupPath(composePath);
   const manifestPath = getPath.manifest(name, isCore);
   const manifestBackupPath = getPath.backupPath(manifestPath);
-  const imagePath = getPath.image(name, semVersion, isCore);
+  // Prepend the hash to the version to make image files unique
+  // Necessary for the image download cache to re-download different
+  // images for the same semantic version
+  const versionWithHash = `${semVersion}-${imageFile.hash}`;
+  const imagePath = getPath.image(name, versionWithHash, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
   const previousUserSettings = getUserSettingsSafe(name, isCore);
