@@ -1,35 +1,34 @@
-# Common base so it's cached 
+# Common base so it's cached
 #####################################
-FROM node:10.15.3-alpine as build-base
+FROM node:10.15.3-alpine as build-monorepo
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN apk add --no-cache python build-base bind-tools docker bash
+RUN apk add --no-cache python build-base bash
 
-# Install app dependencies to use docker's layer cache
-COPY build/src/package.json ./
-COPY build/src/yarn.lock ./
-RUN yarn install --production --link-duplicates
-# --link-duplicates: hardlinks for repeated modules. 193964 => 175592
+# Copy and install deps first to cache
+COPY package.json yarn.lock lerna.json ./
+COPY patches patches/
+RUN yarn
+COPY packages/admin-ui/package.json \ 
+  packages/admin-ui/yarn.lock \ 
+  packages/admin-ui/
+COPY packages/dappmanager/package.json \ 
+  packages/dappmanager/yarn.lock \
+  packages/dappmanager/
+RUN yarn bootstrap
 
-# Build server dependencies
-#####################################
-FROM build-base as build-deps
-
-# Apply patch-package
-COPY build/src/patches patches
-RUN yarn add -D patch-package --production --frozen-lockfile --skip-integrity-check
-RUN yarn prepare
-
-
-
-# Build server source .ts files
-#####################################
-FROM build-base as build-src
-
-RUN yarn install --frozen-lockfile
-COPY build/src .
+# Build UI
+WORKDIR /app/packages/admin-ui/
+COPY packages/admin-ui/ .
+ENV REACT_APP_API_URL /
 RUN yarn build
+# Results in build/*
+
+WORKDIR /app/packages/dappmanager/
+COPY packages/dappmanager/ .
+RUN yarn build
+# Results in build/index.js
 
 
 
@@ -47,20 +46,11 @@ RUN node getGitData /usr/src/app/.git-data.json
 
 
 
-# UI build
+# Build binaries
 #####################################
-FROM node:10.15.3-alpine as build-ui
+FROM node:10.15.3-alpine as build-binaries
 
-WORKDIR /usr/src/app
-
-# Copy and install deps first to cache
-COPY build/ui/package.json build/ui/yarn.lock ./
-RUN yarn --production
-COPY build/ui .
-RUN yarn generate
-ENV REACT_APP_API_URL /
-RUN yarn build
-# Results in build/*
+RUN apk add --no-cache bind-tools docker
 
 
 
@@ -83,17 +73,16 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=dist \
   GIT_DATA_PATH=.git-data.json
 
-COPY --from=build-deps /usr/bin/nsupdate /usr/bin/nsupdate
-COPY --from=build-deps /usr/bin/docker /usr/bin/docker
+COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/nsupdate
+COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 
 # Copy the src last as it's the layer most likely to change
-COPY build/src/hostScripts /usr/src/app/hostScripts
-COPY --from=build-deps /usr/src/app /usr/src/app
-COPY --from=build-src /usr/src/app/dist /usr/src/app/src
-COPY --from=build-ui /usr/src/app/build $UI_FILES_PATH
+COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
+COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
+COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 COPY build/rndc.conf /etc/bind/
 COPY build/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
-CMD [ "node", "src/index" ]
+CMD [ "node", "index" ]

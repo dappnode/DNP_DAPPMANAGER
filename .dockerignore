@@ -1,36 +1,43 @@
 # Prevent Dockerfile modifications to trigger layer recomputation
 build/Dockerfile
 
+# Dependencies
+node_modules/
+
 # Accelerate COPY build/src . command
-build/src/node_modules/
-build/src/tmp_dnp_repo/
-build/src/dnp_repo/
-build/src/DNCORE/
-build/src/cache/
-build/src/dappmanagerdb.json
+packages/*/node_modules/
+packages/*/tmp_dnp_repo/
+packages/*/dnp_repo/
+packages/*/DNCORE/
+packages/*/cache/
+packages/*/dappmanagerdb.json
 
 # Test artifacts
 test_build/
 test_build/*
 test_build/.git/
 test_build/.git/*
-build/src/undefined/
-build/src/test_files/
-build/src/test_files/*
-build/src/test_mountpoints_*/
-build/src/test_mountpoints_*/*
-build/src/.temp-transfer/
-build/src/.temp-transfer/*
+packages/*/undefined/
+packages/*/test_files/
+packages/*/test_files/*
+packages/*/test_mountpoints_*/
+packages/*/test_mountpoints_*/*
+packages/*/.temp-transfer/
+packages/*/.temp-transfer/*
+
+# Test files
+packages/admin-ui/src/__tests__
+packages/dappmanager/test
 
 # Version data file
 .version.json
 
 # UI
-build/ui/node_modules
-build/ui/npm-debug.log
+packages/*/node_modules
+packages/*/npm-debug.log
 
 # Mock server is only for developing
-build/ui/server-mock
+packages/*/server-mock
 
 # Version builds
 build_*/

@@ -1,0 +1,21 @@
+{
+  "name": "@dappnode/dappmanager",
+  "version": "1.0.0",
+  "private": true,
+  "repository": "git@github.com:dappnode/DNP_DAPPMANAGER.git",
+  "license": "GPL-3.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna clean --yes && lerna bootstrap",
+    "postbootstrap": "patch-package",
+    "generate": "lerna run generate --stream",
+    "build": "lerna run build --stream",
+    "test": "lerna run test --stream",
+    "test:int": "lerna run test:int --stream"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
+}
