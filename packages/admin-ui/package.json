@@ -69,7 +69,7 @@
     "coverage": "react-scripts test --env=jsdom --coverage",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls",
     "analyze": "npx source-map-explorer build/static/js/main.*",
-    "lint": "./node_modules/.bin/eslint --ext ts,tsx,js,jsx --fix src",
+    "lint": "eslint --ext ts,tsx,js,jsx --fix src",
     "prettier": "prettier --write 'src/**/*.*'",
     "pre-commit": "yarn lint && CI=true yarn test",
     "mock": "REACT_APP_API_URL=http://localhost:5000 yarn start",
@@ -83,7 +83,6 @@
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.17.1",
-    "husky": "^1.3.1",
     "nodemon": "^2.0.4",
     "prettier": "^1.16.4",
     "why-did-you-update": "0.1.1"
@@ -104,10 +103,5 @@
     "watchPathIgnorePatterns": [
       "/node_modules"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run pre-commit"
-    }
   }
 }
