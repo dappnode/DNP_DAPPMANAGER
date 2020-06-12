@@ -1,0 +1,22 @@
+diff --git a/node_modules/ipfs-utils/src/http.js b/node_modules/ipfs-utils/src/http.js
+index 2ee9a20..bfac14a 100644
+--- a/node_modules/ipfs-utils/src/http.js
++++ b/node_modules/ipfs-utils/src/http.js
+@@ -1,16 +1,13 @@
+ /* eslint-disable no-undef */
+ 'use strict'
+ 
+-const fetch = require('node-fetch')
++const { Request, Headers, default: fetch } = require('node-fetch')
+ const merge = require('merge-options').bind({ ignoreUndefined: true })
+ const { URL, URLSearchParams } = require('iso-url')
+ const TextDecoder = require('./text-encoder')
+ const AbortController = require('abort-controller')
+ const anySignal = require('any-signal')
+ 
+-const Request = fetch.Request
+-const Headers = fetch.Headers
+-
+ class TimeoutError extends Error {
+   constructor () {
+     super('Request timed out')
