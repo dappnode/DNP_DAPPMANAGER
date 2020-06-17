@@ -13,8 +13,8 @@ import {
 } from "lodash";
 import * as getPath from "../../utils/getPath";
 import {
-  Compose as ComposeObj,
-  ComposeService as ComposeServiceObj,
+  Compose,
+  ComposeService,
   PortMapping,
   PackageEnvs,
   ContainerLabels
@@ -40,7 +40,7 @@ export class ComposeServiceEditor {
   }
 
   private edit(
-    serviceEditor: (service: ComposeServiceObj) => Partial<ComposeServiceObj>
+    serviceEditor: (service: ComposeService) => Partial<ComposeService>
   ): void {
     const service = this.parent.compose.services[this.serviceName];
     this.parent.compose.services[this.serviceName] = {
@@ -49,7 +49,7 @@ export class ComposeServiceEditor {
     };
   }
 
-  get(): ComposeServiceObj {
+  get(): ComposeService {
     return this.parent.compose.services[this.serviceName];
   }
 
@@ -110,13 +110,13 @@ export class ComposeServiceEditor {
 }
 
 export class ComposeEditor {
-  compose: ComposeObj;
+  compose: Compose;
 
-  constructor(compose: ComposeObj) {
+  constructor(compose: Compose) {
     this.compose = compose;
   }
 
-  static readFrom(composePath: string): ComposeObj {
+  static readFrom(composePath: string): Compose {
     const yamlString = fs.readFileSync(composePath, "utf8");
     return parseComposeYaml(yamlString);
   }
@@ -132,7 +132,7 @@ export class ComposeEditor {
     );
   }
 
-  output(): ComposeObj {
+  output(): Compose {
     // Last check to verify compose rules
     verifyCompose(this.compose);
 
@@ -210,7 +210,7 @@ export class ComposeFileEditor extends ComposeEditor {
 /**
  * Util with a nice error message in case or parsing error
  */
-function parseComposeYaml(yamlString: string): ComposeObj {
+function parseComposeYaml(yamlString: string): Compose {
   try {
     return yaml.safeLoad(yamlString);
   } catch (e) {

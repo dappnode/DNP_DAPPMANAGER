@@ -1,4 +1,5 @@
 import { Compose as ComposeObj } from "../../types";
+import { applyRecursivelyToStringValues } from "../../utils/objects";
 
 export function verifyCompose(compose: ComposeObj): void {
   for (const serviceName in compose.services) {
@@ -10,6 +11,9 @@ export function verifyCompose(compose: ComposeObj): void {
       throw e;
     }
   }
+
+  // Make sure there is no variable substitution in the compose
+  assertNoSubstitution(compose);
 }
 
 function verifyServiceVolumes(volumes: string[]): void {
@@ -19,7 +23,6 @@ function verifyServiceVolumes(volumes: string[]): void {
     try {
       if (typeof vol !== "string")
         throw Error("service.volumes items must be strings, use short syntax");
-      assertNoSubstitution(vol);
       const [host, container] = vol.split(/:(.*)/);
       if (!host) throw Error("volume host not defined");
       if (!container) throw Error("container path not defined");
@@ -29,6 +32,14 @@ function verifyServiceVolumes(volumes: string[]): void {
   }
 }
 
-function assertNoSubstitution(s: string): void {
-  if (s && s.includes("${")) throw Error(`variable substitution not allowed`);
-}
+/**
+ * Throws if variable substitution is found at any depth of the compose object
+ * ```yaml
+ * volumes: ${NOT_ALLOWED}
+ * ```
+ */
+const assertNoSubstitution = applyRecursivelyToStringValues((value, key) => {
+  if (value.includes("${"))
+    throw Error(`variable substitution not allowed: '${key}': '${value}'`);
+  return value;
+});
