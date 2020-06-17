@@ -7,15 +7,14 @@ import StatusIcon from "components/StatusIcon";
 import SeverityBadge, { SeverityLevel } from "./SeverityBadge";
 import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
+import Ok from "components/Ok";
 // External
 import {
   getPasswordIsSecure,
-  getIsWifiRunning
+  getWifiStatus
 } from "services/dappnodeStatus/selectors";
 // Style
 import "./security.scss";
-import { getAreWifiCredentialsDefault } from "services/dnpInstalled/selectors";
-import Ok from "components/Ok";
 
 interface SecurityIssue {
   name: string;
@@ -27,8 +26,7 @@ interface SecurityIssue {
 
 export default function SystemSecurity() {
   const passwordIsSecure = useSelector(getPasswordIsSecure);
-  const areWifiCredentialsDefault = useSelector(getAreWifiCredentialsDefault);
-  const isWifiRunning = useSelector(getIsWifiRunning);
+  const wifiStatus = useSelector(getWifiStatus);
 
   const securityIssues: SecurityIssue[] = [
     {
@@ -42,10 +40,10 @@ export default function SystemSecurity() {
       name: "Change WIFI default password",
       severity: "critical",
       component: ChangeWifiPassword,
-      isActive: areWifiCredentialsDefault && Boolean(isWifiRunning),
-      okMessage: isWifiRunning
+      isActive: Boolean(wifiStatus?.isDefault && wifiStatus?.running),
+      okMessage: wifiStatus?.running
         ? "WIFI credentials changed"
-        : "WIFI is not required"
+        : "WIFI is disabled"
     }
   ];
 

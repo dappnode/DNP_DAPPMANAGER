@@ -8,9 +8,8 @@ import {
   getIsCoreUpdateTypePatch,
   getUpdatingCore
 } from "services/coreUpdate/selectors";
-import { getAreWifiCredentialsDefault } from "services/dnpInstalled/selectors";
 import {
-  getIsWifiRunning,
+  getWifiStatus,
   getPasswordIsSecure,
   getIsCoreAutoUpdateActive
 } from "services/dappnodeStatus/selectors";
@@ -31,8 +30,7 @@ export default function NotificationsView() {
   const updatingCore = useSelector(getUpdatingCore);
   const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
   const isCoreAutoUpdateActive = useSelector(getIsCoreAutoUpdateActive);
-  const areWifiCredentialsDefault = useSelector(getAreWifiCredentialsDefault);
-  const isWifiRunning = useSelector(getIsWifiRunning);
+  const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
 
   const notifications = [
@@ -62,7 +60,7 @@ export default function NotificationsView() {
       linkPath: systemRootPath + "/" + systemSubPaths.security,
       body:
         "**Change the DAppNode WIFI credentials**, they are insecure default values.",
-      active: areWifiCredentialsDefault && isWifiRunning
+      active: wifiStatus?.isDefault && wifiStatus?.running
     },
     /**
      * [HOST-USER-PASSWORD]

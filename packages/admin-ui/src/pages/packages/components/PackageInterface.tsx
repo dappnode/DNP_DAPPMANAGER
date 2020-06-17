@@ -26,9 +26,9 @@ import { shortNameCapitalized } from "utils/format";
 // Selectors
 import { getDnpInstalledStatus } from "services/dnpInstalled/selectors";
 
-export const PackageInterface: React.FC<
-  RouteComponentProps<{ id: string }>
-> = ({ match }) => {
+export const PackageInterface: React.FC<RouteComponentProps<{
+  id: string;
+}>> = ({ match }) => {
   const id = decodeURIComponent(match.params.id || "");
 
   // Fetching status
@@ -82,7 +82,10 @@ export const PackageInterface: React.FC<
       name: "Config",
       subPath: "config",
       render: () => <Config dnp={dnp} dnpDetail={dnpDetail} />,
-      available: !isEmpty(dnp.envs) || !isEmpty((dnpDetail || {}).setupWizard)
+      available:
+        dnpDetail &&
+        dnpDetail.userSettings &&
+        !isEmpty(dnpDetail.userSettings.environment)
     },
     {
       name: "Ports",

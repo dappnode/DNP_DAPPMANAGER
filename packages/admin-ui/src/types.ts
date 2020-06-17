@@ -6,6 +6,12 @@ export interface DiagnoseObj {
   [diagnoseId: string]: DiagnoseItem;
 }
 
+export interface WifiStatus {
+  running: boolean;
+  ssid: string;
+  isDefault: boolean;
+}
+
 // Window extension
 
 declare global {

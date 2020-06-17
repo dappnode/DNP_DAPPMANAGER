@@ -1,12 +1,12 @@
 import { mapValues } from "lodash";
-import { SystemInfo, VolumeData, AutoUpdateDataView } from "types";
+import { SystemInfo, VolumeData, AutoUpdateDataView, WifiStatus } from "types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Service > dappnodeStatus
 
 interface DappnodeStatusState {
   systemInfo: SystemInfo | null;
-  wifiStatus: { running: boolean } | null;
+  wifiStatus: WifiStatus | null;
   /**
    * Will trigger alerts when it's a boolean and false, x === false
    * Must be null at start

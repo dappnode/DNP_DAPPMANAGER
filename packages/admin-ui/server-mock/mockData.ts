@@ -3,11 +3,16 @@ import {
   PackageContainer,
   RequestedDnp,
   DirectoryItem,
-  SpecialPermission,
   SetupWizard,
   ChainData,
-  PackageDetailData
+  PackageDetailData,
+  SpecialPermissionAllDnps,
+  PackageEnvs
 } from "../src/common/types";
+
+export interface PackageMockState extends PackageContainer {
+  envs?: PackageEnvs;
+}
 
 function getDescription(manifest: {
   shortDescription?: string;
@@ -504,13 +509,15 @@ const trustlinesMetadata = {
   license: "GPL-3.0"
 };
 
-const trustlinesSpecialPermissions: SpecialPermission[] = [
-  {
-    name: "Fake permissions of host access",
-    details:
-      "Fake permissions that does not mean anything\n\n - **markdown** _test_"
-  }
-];
+const trustlinesSpecialPermissions: SpecialPermissionAllDnps = {
+  [trustlinesMetadata.name]: [
+    {
+      name: "Fake permissions of host access",
+      details:
+        "Fake permissions that does not mean anything\n\n - **markdown** _test_"
+    }
+  ]
+};
 
 const trustlinesSetup = {
   environment: { ROLE: "observer", ADDRESS: "", PASSWORD: "" },
@@ -600,7 +607,7 @@ const sampleRequestState: RequestedDnp = {
   reqVersion: "0.0.0",
   avatarUrl: "",
   metadata: { name: "demo-name", version: "0.0.0", description: "demo" },
-  specialPermissions: [],
+  specialPermissions: {},
   imageSize: 10000000,
   isUpdated: false,
   isInstalled: true,
@@ -673,7 +680,6 @@ export const dnpRequests: { [dnpName: string]: RequestedDnp } = {
       [lightningNetworkMetadata.name]: lightningNetworkSetupWizard,
       [bitcoinMetadata.name]: bitcoinSetupWizard
     },
-
     request: {
       compatible: {
         requiresCoreUpdate: false,
@@ -953,7 +959,7 @@ export const chainData: ChainData[] = [
   }
 ];
 
-export const dnpInstalled: PackageContainer[] = [
+export const dnpInstalled: PackageMockState[] = [
   {
     ...samplePackageContainer,
     name: "admin.dnp.dappnode.eth",

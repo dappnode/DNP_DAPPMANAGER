@@ -68,8 +68,8 @@ export const getStaticIp = (state: RootState) =>
 export const getUpnpAvailable = (state: RootState) =>
   (getSystemInfo(state) || {}).upnpAvailable;
 
-export const getIsWifiRunning = (state: RootState) =>
-  (state.dappnodeStatus.wifiStatus || {}).running;
+export const getWifiStatus = (state: RootState) =>
+  state.dappnodeStatus.wifiStatus;
 
 export const getIsCoreAutoUpdateActive = createSelector(
   getAutoUpdateData,

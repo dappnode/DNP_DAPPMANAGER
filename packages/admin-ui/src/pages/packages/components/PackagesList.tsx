@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as s from "../selectors";
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { restartPackage } from "../actions";
+import { fetchDnpInstalled } from "services/dnpInstalled/actions";
 // Components
 import NoPackagesYet from "./NoPackagesYet";
 import StateBadge from "./PackageViews/StateBadge";
@@ -19,12 +21,15 @@ import { rootPath as packagesRootPath } from "pages/packages";
 // Images
 import defaultAvatar from "img/defaultAvatar.png";
 import dappnodeIcon from "img/dappnode-logo-only.png";
-import { restartPackage } from "../actions";
 
 export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
   const dispatch = useDispatch();
   const dnps = useSelector(s.getFilteredPackages);
   const { loading, error } = useSelector(getDnpInstalledStatus);
+
+  useEffect(() => {
+    dispatch(fetchDnpInstalled());
+  }, [dispatch]);
 
   if (!dnps.length) {
     if (loading)

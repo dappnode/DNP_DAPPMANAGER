@@ -11,16 +11,17 @@ import {
   directory,
   dnpRequests,
   dnpInstalled,
-  packagesDetailData
+  packagesDetailData,
+  PackageMockState
 } from "../mockData";
 
-const packages = new Map<string, PackageContainer>(
+const packages = new Map<string, PackageMockState>(
   dnpInstalled.map(pkg => [pkg.name, pkg])
 );
 
 function update(
   id: string,
-  fn: (pkg: PackageContainer) => Partial<PackageContainer>
+  fn: (pkg: PackageMockState) => Partial<PackageMockState>
 ) {
   const pkg = packages.get(id);
   if (!pkg) throw Error(`No id ${id}`);
@@ -114,7 +115,6 @@ export async function installPackage({
     ip: "172.10.0.1",
     state: "running",
     running: true,
-    envs: {},
     ports: [],
     volumes: [],
     defaultEnvironment: {},
@@ -150,7 +150,7 @@ export async function removePackage({
  * Calls docker rm and docker up on a package
  */
 export async function restartPackage({ id }: { id: string }): Promise<void> {
-  id;
+  throw Error(`Not implemented: ${id}`);
 }
 
 /**
@@ -162,7 +162,7 @@ export async function restartPackageVolumes({
   id: string;
   volumeId?: string;
 }): Promise<void> {
-  id;
+  throw Error(`Not implemented: ${id}`);
 }
 
 /**
