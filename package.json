@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "bootstrap": "lerna clean --yes && lerna bootstrap",
-    "postbootstrap": "patch-package",
+    "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
     "build": "lerna run build --stream",
     "test": "lerna run test --stream",
