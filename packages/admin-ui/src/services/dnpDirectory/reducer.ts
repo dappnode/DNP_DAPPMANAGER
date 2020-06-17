@@ -18,14 +18,16 @@ export const reducer = createReducer<{
       const directoryByName = keyBy(state.directory, dnp => dnp.name);
       return {
         ...state,
-        directory: action.payload.map(dnp => {
-          const currentDnp = directoryByName[dnp.name];
-          return dnp.status === "loading" &&
-            currentDnp &&
-            currentDnp.status === "ok"
-            ? currentDnp
-            : dnp;
-        })
+        directory: action.payload.map(
+          (dnp): DirectoryItem => {
+            const currentDnp = directoryByName[dnp.name];
+            return dnp.status === "loading" &&
+              currentDnp &&
+              currentDnp.status === "ok"
+              ? currentDnp
+              : dnp;
+          }
+        )
       };
     });
 

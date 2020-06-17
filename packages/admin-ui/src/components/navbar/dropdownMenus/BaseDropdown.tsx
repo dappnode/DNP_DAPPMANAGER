@@ -33,7 +33,7 @@ function areMessagesUnread(messages: BaseDropdownMessage[]) {
 
 type MessageType = "danger" | "warning" | "success";
 
-interface BaseDropdownMessage {
+export interface BaseDropdownMessage {
   type?: MessageType;
   title?: string | JSX.Element;
   body?: string;

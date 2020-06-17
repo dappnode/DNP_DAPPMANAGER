@@ -12,7 +12,8 @@ import {
   PortMapping,
   Compose,
   UserSettings,
-  UserSettingsAllDnps
+  UserSettingsAllDnps,
+  VolumeMappingDocker
 } from "../../types";
 import { cleanCompose } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";
@@ -120,14 +121,16 @@ export function applyUserSettings(
       );
 
       const nextPorts = stringifyPortMappings(
-        portMappings.map(portMapping => {
-          const portId = getPortMappingId(portMapping);
-          const userSetHost = parseInt(userSetPortMappings[portId]);
-          // Use `in` operator to tolerate empty hosts (= ephemeral port)
-          return portId in userSetPortMappings
-            ? { ...portMapping, host: userSetHost || undefined }
-            : portMapping;
-        })
+        portMappings.map(
+          (portMapping): PortMapping => {
+            const portId = getPortMappingId(portMapping);
+            const userSetHost = parseInt(userSetPortMappings[portId]);
+            // Use `in` operator to tolerate empty hosts (= ephemeral port)
+            return portId in userSetPortMappings
+              ? { ...portMapping, host: userSetHost || undefined }
+              : portMapping;
+          }
+        )
       );
 
       // Volume section edits
@@ -151,13 +154,15 @@ export function applyUserSettings(
 
       // ##### <DEPRECATED> Kept for legacy compatibility
       const nextServiceVolumes = stringifyVolumeMappings(
-        volumeMappings.map(vol => {
-          const hostUserSet =
-            vol.name && (userSettings.legacyBindVolumes || {})[vol.name];
-          if (hostUserSet && path.isAbsolute(hostUserSet))
-            return { host: hostUserSet, container: vol.container };
-          else return vol;
-        })
+        volumeMappings.map(
+          (vol): VolumeMappingDocker => {
+            const hostUserSet =
+              vol.name && (userSettings.legacyBindVolumes || {})[vol.name];
+            if (hostUserSet && path.isAbsolute(hostUserSet))
+              return { host: hostUserSet, container: vol.container };
+            else return vol;
+          }
+        )
       );
       // ##### </DEPRECATED>
 

@@ -34,44 +34,46 @@ export async function volumesGet(): Promise<VolumeData[]> {
   // );
 
   // Append sizes after to optimize the number of calls to dockerDf and host
-  const formatedVolumes: VolumeData[] = volumes.map(vol => {
-    const pathParts = vol.Options
-      ? parseDevicePath(vol.Options.device)
-      : undefined;
+  const formatedVolumes = volumes.map(
+    (vol): VolumeData => {
+      const pathParts = vol.Options
+        ? parseDevicePath(vol.Options.device)
+        : undefined;
 
-    const { shortName, owner } = parseVolumeLabels(vol.Labels || {});
-    // Get the exact name of the volume owner if any
-    const containerOwner = dnpList.find(dnp =>
-      dnp.volumes.find(v => v.name === vol.Name && v.isOwner)
-    );
-    // For custom bind volumes find if they are used
-    const isUsed = dnpList.some(dnp =>
-      dnp.volumes.find(v => v.name === vol.Name)
-    );
-    // Get the size of the volume via docker system df -v
-    const volDfData = volumesDf.find(v => v.Name === vol.Name);
-    const size = volDfData ? volDfData.UsageData.Size : undefined;
-    const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
-    const isOrphan = !refCount && !isUsed;
+      const { shortName, owner } = parseVolumeLabels(vol.Labels || {});
+      // Get the exact name of the volume owner if any
+      const containerOwner = dnpList.find(dnp =>
+        dnp.volumes.find(v => v.name === vol.Name && v.isOwner)
+      );
+      // For custom bind volumes find if they are used
+      const isUsed = dnpList.some(dnp =>
+        dnp.volumes.find(v => v.name === vol.Name)
+      );
+      // Get the size of the volume via docker system df -v
+      const volDfData = volumesDf.find(v => v.Name === vol.Name);
+      const size = volDfData ? volDfData.UsageData.Size : undefined;
+      const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
+      const isOrphan = !refCount && !isUsed;
 
-    const volumeData: VolumeData = {
-      // Real volume and owner name to call delete on
-      name: vol.Name,
-      owner: containerOwner ? containerOwner.name : undefined,
-      // Guessed volume and owner name for display
-      nameDisplay: shortName,
-      ownerDisplay: owner,
-      createdAt: new Date(vol.CreatedAt).getTime(),
-      mountpoint: pathParts ? pathParts.mountpoint : "",
-      fileSystem: pathParts
-        ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
-        : undefined,
-      size,
-      refCount,
-      isOrphan
-    };
-    return volumeData;
-  });
+      const volumeData: VolumeData = {
+        // Real volume and owner name to call delete on
+        name: vol.Name,
+        owner: containerOwner ? containerOwner.name : undefined,
+        // Guessed volume and owner name for display
+        nameDisplay: shortName,
+        ownerDisplay: owner,
+        createdAt: new Date(vol.CreatedAt).getTime(),
+        mountpoint: pathParts ? pathParts.mountpoint : "",
+        fileSystem: pathParts
+          ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
+          : undefined,
+        size,
+        refCount,
+        isOrphan
+      };
+      return volumeData;
+    }
+  );
 
   return formatedVolumes;
 }

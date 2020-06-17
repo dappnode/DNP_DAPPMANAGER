@@ -51,9 +51,7 @@ export default function Ports({ dnp }: { dnp: PackageContainer }) {
 
   function editPort(i: number, data: Partial<PortMapping>) {
     setPorts(ps =>
-      ps.map((p, _i) => {
-        return i === _i ? { ...p, ...data } : p;
-      })
+      ps.map((p, _i): PortMapping => (i === _i ? { ...p, ...data } : p))
     );
   }
 

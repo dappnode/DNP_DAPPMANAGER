@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import BaseDropdown from "./BaseDropdown";
+import BaseDropdown, { BaseDropdownMessage } from "./BaseDropdown";
 import makeBlockie from "ethereum-blockies-base64";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { stringSplit, stringIncludes } from "utils/strings";
@@ -54,9 +54,11 @@ export default function DappnodeIdentity() {
       name="DAppNode Identity"
       messages={Object.entries(dappnodeIdentity)
         .filter(([_, value]) => value)
-        .map(([key, value]) => {
-          return { title: parseIdentityKeyValue(key, value) };
-        })}
+        .map(
+          ([key, value]): BaseDropdownMessage => ({
+            title: parseIdentityKeyValue(key, value)
+          })
+        )}
       Icon={Icon}
       className={"dappnodeidentity"}
       placeholder="No identity available, click the report icon"

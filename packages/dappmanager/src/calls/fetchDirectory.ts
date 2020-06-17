@@ -25,8 +25,8 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
   const directory = await getDirectory(provider);
-  const directoryDnps: DirectoryItem[] = directory.map(
-    ({ name, isFeatured }) => ({
+  const directoryDnps = directory.map(
+    ({ name, isFeatured }): DirectoryItem => ({
       status: "loading",
       name,
       whitelisted: true,
@@ -36,35 +36,37 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   emitDirectoryUpdate(directoryDnps);
 
   await Promise.all(
-    directory.map(async ({ name, isFeatured }, idx) => {
-      const whitelisted = true;
-      const directoryItemBasic = { name, whitelisted, isFeatured };
-      try {
-        // Now resolve the last version of the package
-        const release = await releaseFetcher.getRelease(name);
-        const { metadata, avatarFile } = release;
+    directory.map(
+      async ({ name, isFeatured }, idx): Promise<void> => {
+        const whitelisted = true;
+        const directoryItemBasic = { name, whitelisted, isFeatured };
+        try {
+          // Now resolve the last version of the package
+          const release = await releaseFetcher.getRelease(name);
+          const { metadata, avatarFile } = release;
 
-        directoryDnps[idx] = {
-          ...directoryItemBasic,
-          status: "ok",
-          description: getShortDescription(metadata),
-          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-          isInstalled: getIsInstalled(release, dnpList),
-          isUpdated: getIsUpdated(release, dnpList),
-          featuredStyle: metadata.style,
-          categories: metadata.categories || getFallBackCategories(name) || []
-        };
-      } catch (e) {
-        logs.error(`Error fetching ${name} release`, e);
-        directoryDnps[idx] = {
-          ...directoryItemBasic,
-          status: "error",
-          message: e.message
-        };
-      } finally {
-        emitDirectoryUpdate(directoryDnps);
+          directoryDnps[idx] = {
+            ...directoryItemBasic,
+            status: "ok",
+            description: getShortDescription(metadata),
+            avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+            isInstalled: getIsInstalled(release, dnpList),
+            isUpdated: getIsUpdated(release, dnpList),
+            featuredStyle: metadata.style,
+            categories: metadata.categories || getFallBackCategories(name) || []
+          };
+        } catch (e) {
+          logs.error(`Error fetching ${name} release`, e);
+          directoryDnps[idx] = {
+            ...directoryItemBasic,
+            status: "error",
+            message: e.message
+          };
+        } finally {
+          emitDirectoryUpdate(directoryDnps);
+        }
       }
-    })
+    )
   );
 
   return directoryDnps;

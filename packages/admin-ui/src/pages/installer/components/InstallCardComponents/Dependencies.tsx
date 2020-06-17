@@ -5,7 +5,7 @@ import SubTitle from "components/SubTitle";
 import Ok from "components/Ok";
 import DependencyList from "./DependencyList";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { CompatibleDnps } from "types";
+import { CompatibleDnps, DependencyListItem } from "types";
 
 interface DependenciesProps {
   noCard?: boolean;
@@ -31,9 +31,9 @@ const Dependencies: React.FC<DependenciesProps> = ({
       <Ok ok={true} msg={`DAppNode Package is compatible`} />
       <div style={{ marginTop: 12, marginLeft: 28 }}>
         <DependencyList
-          deps={Object.entries(dnps).map(([name, { from, to }]) => {
-            return { from, to, name };
-          })}
+          deps={Object.entries(dnps).map(
+            ([name, { from, to }]): DependencyListItem => ({ from, to, name })
+          )}
         />
       </div>
     </>

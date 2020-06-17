@@ -11,24 +11,26 @@ import { PortMapping } from "../../types";
  *
  */
 export function parsePortMappings(portsArray: string[]): PortMapping[] {
-  return portsArray.map(portString => {
-    const [portMapping, protocolString = ""] = portString.split("/");
+  return portsArray.map(
+    (portString): PortMapping => {
+      const [portMapping, protocolString = ""] = portString.split("/");
 
-    // Make sure the protocol is correct
-    const protocolParsed =
-      protocolString.toLowerCase() === "udp" ? "UDP" : "TCP";
-    const [hostString, containerString] = portMapping.split(":");
+      // Make sure the protocol is correct
+      const protocolParsed =
+        protocolString.toLowerCase() === "udp" ? "UDP" : "TCP";
+      const [hostString, containerString] = portMapping.split(":");
 
-    // Convert to appropiate types + Cast to a PortProtocol type
-    const host = parseInt(hostString);
-    const container = parseInt(containerString);
-    const protocol = protocolParsed;
+      // Convert to appropiate types + Cast to a PortProtocol type
+      const host = parseInt(hostString);
+      const container = parseInt(containerString);
+      const protocol = protocolParsed;
 
-    // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
-    if (container) return { host, container, protocol };
-    // CONTAINER/protocol, return [null, CONTAINER/protocol]
-    else return { container: host, protocol };
-  });
+      // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
+      if (container) return { host, container, protocol };
+      // CONTAINER/protocol, return [null, CONTAINER/protocol]
+      else return { container: host, protocol };
+    }
+  );
 }
 
 /**

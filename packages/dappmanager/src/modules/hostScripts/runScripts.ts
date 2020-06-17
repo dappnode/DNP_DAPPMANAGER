@@ -52,15 +52,17 @@ export const detectMountpoints = memoize(
         `detect_fs script must return an array but returned: ${rawMountpointsJson}`
       );
 
-    const mountpoints: MountpointData[] = mountpointsDaraRaw.map(dataRaw => ({
-      mountpoint: dataRaw.mountpoint,
-      use: dataRaw.use,
-      used: parseInt(dataRaw.used),
-      total: parseInt(dataRaw.total),
-      free: parseInt(dataRaw.free),
-      vendor: dataRaw.vendor,
-      model: dataRaw.model
-    }));
+    const mountpoints = mountpointsDaraRaw.map(
+      (dataRaw): MountpointData => ({
+        mountpoint: dataRaw.mountpoint,
+        use: dataRaw.use,
+        used: parseInt(dataRaw.used),
+        total: parseInt(dataRaw.total),
+        free: parseInt(dataRaw.free),
+        vendor: dataRaw.vendor,
+        model: dataRaw.model
+      })
+    );
 
     // Validate result
     return mountpoints;

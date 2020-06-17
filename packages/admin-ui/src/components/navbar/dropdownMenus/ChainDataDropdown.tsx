@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useApi } from "api";
 import { useSelector } from "react-redux";
-import BaseDropdown from "./BaseDropdown";
+import BaseDropdown, { BaseDropdownMessage } from "./BaseDropdown";
 import { getChainData } from "services/chainData/selectors";
 import { shortNameCapitalized } from "utils/format";
 // Icons
@@ -26,7 +26,15 @@ export default function ChainDataDropdown() {
     <BaseDropdown
       name="Chain status"
       messages={chainData.map(
-        ({ dnpName, name, message, help, error, syncing, progress }) => ({
+        ({
+          dnpName,
+          name,
+          message,
+          help,
+          error,
+          syncing,
+          progress
+        }): BaseDropdownMessage => ({
           title: name || shortNameCapitalized(dnpName),
           body: message,
           help: help,

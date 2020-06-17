@@ -18,20 +18,21 @@ export const coreUpdatePackagesData = {
   get: _coreUpdatePackagesData.get,
   set: (
     packagesData: (InstallPackageData | InstallPackageDataPaths)[] | null
-  ) =>
+  ): void =>
     _coreUpdatePackagesData.set(
       packagesData
-        ? packagesData.map(packageData =>
-            pick(packageData, [
-              "name",
-              "semVersion",
-              "composePath",
-              "composeBackupPath",
-              "manifestPath",
-              "manifestBackupPath",
-              "imagePath",
-              "isUpdate"
-            ])
+        ? packagesData.map(
+            (packageData): InstallPackageDataPaths =>
+              pick(packageData, [
+                "name",
+                "semVersion",
+                "composePath",
+                "composeBackupPath",
+                "manifestPath",
+                "manifestBackupPath",
+                "imagePath",
+                "isUpdate"
+              ])
           )
         : packagesData
     )
