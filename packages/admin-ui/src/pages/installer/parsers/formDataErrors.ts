@@ -1,9 +1,5 @@
 import { UserSettingsAllDnps, SetupWizardAllDnps } from "types";
 import { SetupWizardFormDataReturn } from "../types";
-import {
-  MOUNTPOINT_DEVICE_LEGACY_TAG,
-  USER_SETTING_DISABLE_TAG
-} from "../../../params";
 
 type SetupWizardErrorType = "empty" | "pattern" | "enum";
 export interface SetupWizardError {
@@ -30,14 +26,7 @@ export function getUserSettingsDataErrors(
       for (const [volName, volPath] of Object.entries(
         data.namedVolumeMountpoints
       )) {
-        if (
-          volPath &&
-          !(
-            isAbsolute(volPath) ||
-            volPath.startsWith(MOUNTPOINT_DEVICE_LEGACY_TAG) ||
-            volPath.startsWith(USER_SETTING_DISABLE_TAG)
-          )
-        )
+        if (volPath && !isAbsolute(volPath))
           errors.push(
             `Mountpoint path for '${dnpName}' '${volName}' must be an absolute path`
           );

@@ -34,10 +34,6 @@ export const adminNaclSecretKey =
 export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
-// TEMP TAGS
-export const MOUNTPOINT_DEVICE_LEGACY_TAG = "legacy:";
-export const USER_SETTING_DISABLE_TAG = "disable:";
-
 // WEB3
 export const fullnodeHttpJsonRpc = "http://fullnode.dappnode:8545";
 

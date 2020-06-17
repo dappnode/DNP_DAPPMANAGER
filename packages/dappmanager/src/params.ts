@@ -68,8 +68,6 @@ const params = {
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",
   // Docker volume parameters
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
-  MOUNTPOINT_DEVICE_LEGACY_TAG: "legacy:",
-  USER_SETTING_DISABLE_TAG: "disable:",
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
@@ -175,7 +173,7 @@ export const ethClientData: {
     url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
     version?: string;
     userSettings?: UserSettings; // Custom installation for geth light client
-  }
+  };
 } = {
   "geth-light": {
     name: "geth.dnp.dappnode.eth",

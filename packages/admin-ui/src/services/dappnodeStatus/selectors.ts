@@ -65,9 +65,6 @@ export const getDappnodeIdentityClean = (state: RootState) => {
 export const getStaticIp = (state: RootState) =>
   (getSystemInfo(state) || {}).staticIp || "";
 
-export const getUpnpAvailable = (state: RootState) =>
-  (getSystemInfo(state) || {}).upnpAvailable;
-
 export const getWifiStatus = (state: RootState) =>
   state.dappnodeStatus.wifiStatus;
 
