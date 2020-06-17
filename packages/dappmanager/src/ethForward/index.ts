@@ -79,6 +79,10 @@ export function getEthForwardHandler(): (
       const target = getTargetUrl(content);
       logs.debug(`Proxying ${domain} to ${target}`, content);
 
+      // Must change the host from something not *.eth, to prevent the IPFS node
+      // from trying to resolve the domain with DNSLink and causing an error
+      req.headers.host = "dappmanager.dappnode";
+
       // Note: Must use the promise constructor otherwise proxy.web breaks
       // due to no proper binding of its underlying 'this'
       //   Cannot read property 'length' of undefined
