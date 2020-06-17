@@ -1,5 +1,5 @@
 import ipfsCatString from "../ipfs/methods/catString";
-import { validateManifestBasic } from "./parsers/validate";
+import { validateManifestBasic } from "../manifest";
 import { Manifest } from "../../types";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {

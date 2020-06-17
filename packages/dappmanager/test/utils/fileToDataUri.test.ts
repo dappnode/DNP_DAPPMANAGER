@@ -3,12 +3,13 @@ import { expect } from "chai";
 import fs from "fs";
 import fileToDataUri from "../../src/utils/fileToDataUri";
 import shell from "../../src/utils/shell";
+import { cleanTestDir, createTestDir } from "../testUtils";
 
 const testDir = "test_files";
 
 describe("Util: fileToDataUri", () => {
   before(async () => {
-    await shell(`mkdir -p ${testDir}`);
+    await createTestDir();
   });
 
   it("should convert a PNG to a valid dataUri", async () => {
@@ -78,6 +79,6 @@ describe("Util: fileToDataUri", () => {
   });
 
   after(async () => {
-    await shell(`rm -rf ${testDir}`);
+    await cleanTestDir();
   });
 });

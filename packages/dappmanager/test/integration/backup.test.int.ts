@@ -4,7 +4,13 @@ import * as fs from "fs";
 import * as path from "path";
 import * as db from "../../src/db";
 import shell from "../../src/utils/shell";
-import { testDir, cleanTestDir, createTestDir, clearDbs } from "../testUtils";
+import {
+  testDir,
+  cleanTestDir,
+  createTestDir,
+  clearDbs,
+  shellSafe
+} from "../testUtils";
 
 // Calls
 import { backupGet } from "../../src/calls/backupGet";
@@ -48,9 +54,7 @@ describe("Integration test for backup to and from:", function() {
     this.timeout(60 * 1000);
     await createTestDir();
     // Create container
-    await shell(`docker-compose -f ${dockerComposePath} down -v -t 0`).catch(
-      () => {}
-    );
+    await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
 
     await shell(`mkdir -p ${path.parse(dockerComposePath).dir}`);
     fs.writeFileSync(

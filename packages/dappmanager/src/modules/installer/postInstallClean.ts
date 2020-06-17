@@ -5,6 +5,7 @@ import { InstallPackageDataPaths } from "../../types";
 import { Log } from "../../utils/logUi";
 import { dockerCleanOldImages } from "../docker/dockerCommands";
 import { logs } from "../../logs";
+import { isNotFoundError } from "../../utils/node";
 
 /**
  * [Post install clean] After a successful install, clean backup files
@@ -51,7 +52,7 @@ function unlinkIfExists(path: string): void {
   try {
     fs.unlinkSync(path);
   } catch (e) {
-    if (e.code !== "ENOENT") throw e;
+    if (!isNotFoundError(e)) throw e;
   }
 }
 

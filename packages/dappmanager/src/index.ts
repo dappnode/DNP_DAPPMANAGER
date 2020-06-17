@@ -1,6 +1,6 @@
 import params from "./params";
 import * as db from "./db";
-import { convertLegacyEnvFiles } from "./utils/configFiles";
+
 import initializeDb from "./initializeDb";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
@@ -8,6 +8,7 @@ import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
 import { migrateEthForward } from "./ethForward/migrateEthForward";
 import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
+import { migrateLegacyEnvFiles } from "./modules/legacy/migrateLegacyEnvFiles";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
@@ -66,17 +67,7 @@ async function runLegacyOps(): Promise<void> {
     logs.error("Error migrating to new main DB", e);
   }
 
-  try {
-    const dnpList = await calls.listPackages();
-    for (const dnp of dnpList) {
-      const hasConverted = convertLegacyEnvFiles(dnp);
-      if (hasConverted)
-        logs.info(`Converted ${dnp.name} .env file to compose environment`);
-    }
-    logs.info("Finished converting legacy DNP .env files if any");
-  } catch (e) {
-    logs.error("Error converting DNP .env files", e);
-  }
+  migrateLegacyEnvFiles().catch(e => logs.error("Error migrate env_files", e));
 
   migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
 

@@ -40,7 +40,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1560420780,
         image: "otpweb.dnp.dappnode.eth:0.0.3",
-        origin: undefined,
         name: "otpweb.dnp.dappnode.eth",
         shortName: "otpweb",
         ip: "172.33.0.9",
@@ -59,11 +58,7 @@ describe("listContainers", function() {
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "8a382e9a3b8ac449388470d06b98486b4fc965980fc5b72fd1c1cc77ae070484",
@@ -73,7 +68,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1560420777,
         image: "nginx-proxy.dnp.dappnode.eth:0.0.3",
-        origin: undefined,
         name: "nginx-proxy.dnp.dappnode.eth",
         shortName: "nginx-proxy",
         ip: "172.33.0.6",
@@ -137,11 +131,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "951426e3fa2cbfd49a5198840764383af3961c2b29ba33a6b5f3dd45b953db9f",
@@ -151,7 +141,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1560369616,
         image: "vipnode.dnp.dappnode.eth:0.0.2",
-        origin: undefined,
         name: "vipnode.dnp.dappnode.eth",
         shortName: "vipnode",
         ip: "172.33.0.5",
@@ -171,11 +160,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
@@ -185,7 +170,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560354278,
         image: "wifi.dnp.dappnode.eth:0.2.0",
-        origin: undefined,
         name: "wifi.dnp.dappnode.eth",
         shortName: "wifi",
         ip: "",
@@ -200,11 +184,7 @@ describe("listContainers", function() {
         running: false,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
@@ -214,7 +194,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560335154,
         image: "admin.dnp.dappnode.eth:0.2.3",
-        origin: undefined,
         name: "admin.dnp.dappnode.eth",
         shortName: "admin",
         ip: "172.33.1.9",
@@ -246,11 +225,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
@@ -260,7 +235,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334861,
         image: "vpn.dnp.dappnode.eth:0.2.0",
-        origin: undefined,
         name: "vpn.dnp.dappnode.eth",
         shortName: "vpn",
         ip: "172.33.1.4",
@@ -320,11 +294,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
@@ -334,7 +304,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334707,
         image: "dappmanager.dnp.dappnode.eth:0.2.3",
-        origin: undefined,
         name: "dappmanager.dnp.dappnode.eth",
         shortName: "dappmanager",
         ip: "172.33.1.7",
@@ -362,11 +331,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
@@ -376,7 +341,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334707,
         image: "bind.dnp.dappnode.eth:0.2.0",
-        origin: undefined,
         name: "bind.dnp.dappnode.eth",
         shortName: "bind",
         ip: "172.33.1.2",
@@ -402,11 +366,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "e1766fd7a9d8110398b66c7b0f68fe625ee856f49526b987a54537028448476b",
@@ -416,7 +376,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334707,
         image: "ethchain.dnp.dappnode.eth:0.2.1",
-        origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         name: "ethchain.dnp.dappnode.eth",
         shortName: "ethchain",
         ip: "172.33.1.6",
@@ -456,44 +415,45 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl:
           "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
-        canBeFullnode: false,
+        origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         chain: "ethereum",
+        canBeFullnode: false,
         defaultEnvironment: {
-          DEFAULT_CLIENT: "PARITY",
           EXTRA_OPTS: "--warp-barrier 8540000",
-          EXTRA_OPTS_GETH: ""
+          EXTRA_OPTS_GETH: "",
+          DEFAULT_CLIENT: "PARITY"
         },
         defaultPorts: [
           {
-            container: 30303,
             host: 30303,
+            container: 30303,
             protocol: "TCP"
           },
           {
-            container: 30303,
             host: 30303,
+            container: 30303,
             protocol: "UDP"
           },
           {
-            container: 30304,
             host: 30304,
+            container: 30304,
             protocol: "UDP"
           }
         ],
         defaultVolumes: [
           {
-            container: "/root/.local/share/io.parity.ethereum",
             host: "ethchaindnpdappnodeeth_data",
+            container: "/root/.local/share/io.parity.ethereum",
             name: "ethchaindnpdappnodeeth_data"
           },
           {
-            container: "/root/.ethereum",
             host: "ethchaindnpdappnodeeth_geth",
+            container: "/root/.ethereum",
             name: "ethchaindnpdappnodeeth_geth"
           },
           {
-            container: "/root/identity",
             host: "ethchaindnpdappnodeeth_identity",
+            container: "/root/identity",
             name: "ethchaindnpdappnodeeth_identity"
           }
         ]
@@ -506,7 +466,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334697,
         image: "ipfs.dnp.dappnode.eth:0.2.2",
-        origin: undefined,
         name: "ipfs.dnp.dappnode.eth",
         shortName: "ipfs",
         ip: "172.33.1.5",
@@ -563,11 +522,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
@@ -577,7 +532,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1560334412,
         image: "ethforward.dnp.dappnode.eth:0.2.1",
-        origin: undefined,
         name: "ethforward.dnp.dappnode.eth",
         shortName: "ethforward",
         ip: "172.33.1.3",
@@ -587,11 +541,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
@@ -601,7 +551,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1558708223,
         image: "swarm.dnp.dappnode.eth:0.1.0",
-        origin: undefined,
         name: "swarm.dnp.dappnode.eth",
         shortName: "swarm",
         ip: "172.33.0.7",
@@ -633,11 +582,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
@@ -647,7 +592,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1558377639,
         image: "letsencrypt-nginx.dnp.dappnode.eth:0.0.4",
-        origin: undefined,
         name: "letsencrypt-nginx.dnp.dappnode.eth",
         shortName: "letsencrypt-nginx",
         ip: "172.33.0.8",
@@ -691,11 +635,7 @@ describe("listContainers", function() {
           "nginx-proxy.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "c944a1549ba675b7229b55370cfd2f54dca1f86050fbef7df4ba453398f93c24",
@@ -724,12 +664,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "ffc3f4ed380ad42b7f847228862ad4de4ab471229bb5e1ed0aef46d4561309d2",
@@ -739,7 +675,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1558258483,
         image: "goerli-geth.dnp.dappnode.eth:0.2.2",
-        origin: undefined,
         name: "goerli-geth.dnp.dappnode.eth",
         shortName: "goerli-geth",
         ip: "172.33.0.3",
@@ -778,11 +713,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
         chain: "ethereum",
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
@@ -792,7 +724,6 @@ describe("listContainers", function() {
         isCore: false,
         created: 1558258481,
         image: "ln.dnp.dappnode.eth:0.1.1",
-        origin: undefined,
         name: "ln.dnp.dappnode.eth",
         shortName: "ln",
         ip: "172.33.0.2",
@@ -831,11 +762,7 @@ describe("listContainers", function() {
           "bitcoin.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         id: "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
@@ -845,7 +772,6 @@ describe("listContainers", function() {
         isCore: true,
         created: 1557330387,
         image: "wamp.dnp.dappnode.eth:0.2.0",
-        origin: undefined,
         name: "wamp.dnp.dappnode.eth",
         shortName: "wamp",
         ip: "172.33.1.8",
@@ -866,14 +792,12 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false,
-        chain: undefined,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       }
     ];
 
-    expect(dnpList).to.deep.equal(expectedDnpList);
+    // Remove all values that are undefined
+    const dnpListClean = JSON.parse(JSON.stringify(dnpList));
+    expect(dnpListClean).to.deep.equal(expectedDnpList);
   });
 });

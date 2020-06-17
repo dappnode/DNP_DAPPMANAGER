@@ -1,13 +1,9 @@
-import {
-  mergePortMapping,
-  getPortMappings,
-  setPortMapping
-} from "../utils/dockerComposeFile";
-import { PortMapping } from "../types";
-// External call
 import { restartPackage } from "./restartPackage";
 import * as eventBus from "../eventBus";
 import params from "../params";
+import { listContainer } from "../modules/docker/listContainers";
+import { ComposeFileEditor } from "../modules/compose/editor";
+import { PortMapping } from "../types";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -17,7 +13,6 @@ import params from "../params";
  *   { host: 30444, container: 30303, protocol: "UDP" },
  *   { host: 4000, container: 4000, protocol: "TCP" }
  * ]
- * #### !!!!! NOTE take into account existing ephemeral ports
  */
 export async function updatePortMappings({
   id,
@@ -32,30 +27,27 @@ export async function updatePortMappings({
   if (!Array.isArray(portMappings))
     throw Error("kwarg portMappings must be an array");
 
-  if (id === params.dappmanagerDnpName)
+  const dnp = await listContainer(id);
+
+  if (dnp.name === params.dappmanagerDnpName)
     throw Error("Can not edit DAPPAMANAGER ports");
 
-  /**
-   * 1. Merge existing port mappings with new port mappings
-   * - Has to compute mergedPortMappings
-   * - [Ports to close]: Maybe not since the new natRenewal will automatically drop them
-   * - [Ports to open]: Can the natRenewal be triggered for a specific DNP?
-   * - [Locked ports]: The object in the container label has to be edited
-   * #### TODO: Since now there is the natRenewal, is the portsToClose array necessary anymore?
-   * @param {array} dcPorts = [
-   *   { host: 30444, container: 30303, protocol: "UDP" }
-   * ]
-   */
-  const previousPortMappings = getPortMappings(id);
-  if (options && options.merge) mergePortMapping(id, portMappings);
-  else setPortMapping(id, portMappings);
+  const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+  const service = compose.service();
+  const previousPortMappings = service.getPortMappings();
+  if (options && options.merge) service.mergePortMapping(portMappings);
+  else service.setPortMapping(portMappings);
+  compose.write();
 
-  // restartPackage triggers a eventBus.emit(eventBusTag.emitPackages);
   try {
+    // restartPackage triggers > eventBus emitPackages
     await restartPackage({ id });
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
-      setPortMapping(id, previousPortMappings);
+      // Rollback port mappings are re-up
+      service.setPortMapping(previousPortMappings);
+      compose.write();
+
       await restartPackage({ id });
 
       // Try to get the port colliding from the error

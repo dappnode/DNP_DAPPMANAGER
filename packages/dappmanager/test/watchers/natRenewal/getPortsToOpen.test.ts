@@ -1,10 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import defaultPortsToOpen from "../../../src/watchers/natRenewal/defaultPortsToOpen";
-import { PortMapping, PackageContainer } from "../../../src/types";
+import { PackageContainer } from "../../../src/types";
 import rewiremock from "rewiremock";
 // imports for typings
 import { mockDnp } from "../../testUtils";
+import { ComposeEditor } from "../../../src/modules/compose/editor";
 
 describe("Watchers > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
@@ -54,23 +55,27 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
       return dnpList;
     }
 
-    function getPortMappings(dnpName: string): PortMapping[] {
-      if (dnpName.includes(stoppedDnp))
-        return [
-          { host: 4001, container: 4001, protocol: "UDP" },
-          { host: 4001, container: 4001, protocol: "TCP" }
-        ];
-      else throw Error(`Unknown dnpName "${dnpName}"`);
-    }
+    // Write the compose of the stopped container
+    const compose = new ComposeEditor({
+      version: "3.4",
+      services: {
+        [stoppedDnp]: {
+          container_name: stoppedDnp,
+          image: stoppedDnp
+        }
+      }
+    });
+    compose.service().setPortMapping([
+      { host: 4001, container: 4001, protocol: "UDP" },
+      { host: 4001, container: 4001, protocol: "TCP" }
+    ]);
+    compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
     const { default: getPortsToOpen } = await rewiremock.around(
       () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
       mock => {
         mock(() => import("../../../src/modules/docker/listContainers"))
           .with({ listContainers })
-          .toBeUsed();
-        mock(() => import("../../../src/utils/dockerComposeFile"))
-          .with({ getPortMappings })
           .toBeUsed();
       }
     );

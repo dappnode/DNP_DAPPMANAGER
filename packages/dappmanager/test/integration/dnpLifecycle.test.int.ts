@@ -1,8 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
-import { mapValues } from "lodash";
-import shell from "../../src/utils/shell";
+import { mapValues, pick } from "lodash";
 import * as calls from "../../src/calls";
 import params from "../../src/params";
 import { logs } from "../../src/logs";
@@ -11,26 +10,31 @@ import {
   PortMapping,
   UserSettingsAllDnps,
   PackageContainer,
-  ManifestWithImage
+  ManifestWithImage,
+  PackageEnvs
 } from "../../src/types";
-import { clearDbs, getTestMountpoint, portProtocols } from "../testUtils";
+import {
+  clearDbs,
+  getTestMountpoint,
+  portProtocols,
+  shellSafe,
+  cleanRepos,
+  cleanContainers
+} from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
+import fileToDataUri from "../../src/utils/fileToDataUri";
 import {
   stringifyPortMappings,
-  legacyTag
-} from "../../src/utils/dockerComposeParsers";
-import fileToDataUri from "../../src/utils/fileToDataUri";
+  parseEnvironment
+} from "../../src/modules/compose";
+import { containerInspect } from "../../src/modules/docker/dockerApi";
+import { listContainer } from "../../src/modules/docker/listContainers";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
 // #### TODO: While a better solution is found, each test will use a separate dir
 const testMountpointDnpLifeCycleMain = getTestMountpoint("dnplifecycle-main");
 const testMountpointDnpLifeCycleDep = getTestMountpoint("dnplifecycle-dep");
-
-// Utils
-
-const shellSafe = (cmd: string): Promise<string | void> =>
-  shell(cmd).catch(console.debug);
 
 /**
  * PASSWORD MANAGMENT
@@ -52,6 +56,7 @@ describe("DNP lifecycle", function() {
 
   const idMain = "main.dnp.dappnode.eth";
   const idDep = "dependency.dnp.dappnode.eth";
+  const ids = [idMain, idDep];
   const envsMain = {
     ENV_TO_CHANGE: {
       key: "ENV_TO_CHANGE",
@@ -143,7 +148,6 @@ describe("DNP lifecycle", function() {
         "data:/usr",
         `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
       ],
-      /* eslint-disable-next-line @typescript-eslint/camelcase */
       external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
       ports: stringifyPortMappings(Object.values(portsMain))
     }
@@ -195,9 +199,8 @@ describe("DNP lifecycle", function() {
         [portsDep.three.portId]: String(portsDep.three.newHost),
         [portsDep.four.portId]: String(portsDep.four.newHost)
       },
-      namedVolumeMountpoints: {
-        // ##### DEPRECATED
-        [volumesDep.changeme.name]: legacyTag + volumesDep.changeme.newHost
+      legacyBindVolumes: {
+        [volumesDep.changeme.name]: volumesDep.changeme.newHost
       },
       fileUploads: {
         [demoFilePath]: fileDataUrlDep
@@ -207,27 +210,7 @@ describe("DNP lifecycle", function() {
 
   let mainDnpReleaseHash: string;
 
-  async function cleanTestArtifacts(): Promise<void> {
-    const cmds = [
-      // SUPER important to clean dnp_repo folder to avoid caches
-      `rm -rf ${params.REPO_DIR}`,
-      // Clean previous stuff
-      `docker rm -f ${[
-        `DAppNodePackage-${idMain}`,
-        `DAppNodePackage-${idDep}`
-      ].join(" ")}`,
-      // Clean volumes
-      `docker volume rm -f $(docker volume ls --filter name=maindnpdappnodeeth_ -q)`,
-      `docker volume rm -f $(docker volume ls --filter name=dependencydnpdappnodeeth_ -q)`
-    ];
-    for (const cmd of cmds) {
-      await shellSafe(cmd);
-    }
-  }
-
-  before(`Clean environment`, async () => {
-    await cleanTestArtifacts();
-
+  before("Clean environment", async () => {
     // Create necessary network
     await shellSafe("docker network create dncore_network");
 
@@ -236,6 +219,16 @@ describe("DNP lifecycle", function() {
 
     // Print out params
     logs.info("Test params", params);
+
+    // SUPER important to clean dnp_repo folder to avoid caches
+    await cleanRepos();
+    await cleanContainers(...ids);
+  });
+
+  after("Clean environment", async () => {
+    // SUPER important to clean dnp_repo folder to avoid caches
+    await cleanRepos();
+    await cleanContainers(...ids);
   });
 
   before(`Preparing releases for ${idMain} and ${idDep}`, async () => {
@@ -286,8 +279,8 @@ describe("DNP lifecycle", function() {
       logs.debug({ dnpMain, dnpDep });
     });
 
-    it(`${idMain} environment`, () => {
-      expect(dnpMain.envs).to.deep.equal({
+    it(`${idMain} environment`, async () => {
+      await assertEnvironment(idMain, {
         [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
         [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
       });
@@ -340,8 +333,8 @@ describe("DNP lifecycle", function() {
       expect(result).to.equal(fileDataUrlMain);
     });
 
-    it(`${idDep} environment`, () => {
-      expect(dnpDep.envs).to.deep.equal({
+    it(`${idDep} environment`, async () => {
+      await assertEnvironment(idDep, {
         [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
         [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
       });
@@ -408,8 +401,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should update DNP envs and reset", async () => {
-      const dnpPrev = await getDnpFromListPackages(idMain);
-      if (!dnpPrev) throw Error(`DNP ${idMain} not found`);
+      const dnpPrevEnvs = await getContainerEnvironment(idMain);
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
@@ -418,10 +410,11 @@ describe("DNP lifecycle", function() {
         envs: { time: envValue }
       });
 
-      const dnpNext = await getDnpFromListPackages(idMain);
-      if (!dnpNext) throw Error(`DNP ${idMain} not found`);
-      expect(dnpNext.envs).to.deep.equal({
-        ...dnpPrev.envs,
+      const dnpNextEnvs = await getContainerEnvironment(idMain);
+      expect(
+        pick(dnpNextEnvs, ["time", ...Object.keys(dnpPrevEnvs)])
+      ).to.deep.equal({
+        ...dnpPrevEnvs,
         time: envValue
       });
     });
@@ -569,8 +562,26 @@ describe("DNP lifecycle", function() {
       expect(stateMain).to.equal("down");
     });
   });
-
-  after(async () => {
-    await cleanTestArtifacts();
-  });
 });
+
+/**
+ * Environment variables in a container
+ * Note: Likely to include additional ENVs from the ones defined in the compose
+ * @param containerNameOrId
+ */
+async function getContainerEnvironment(id: string): Promise<PackageEnvs> {
+  const container = await listContainer(id);
+  const containerData = await containerInspect(container.id);
+  return parseEnvironment(containerData.Config.Env);
+}
+
+async function assertEnvironment(
+  dnpName: string,
+  expectedEnvs: PackageEnvs
+): Promise<void> {
+  const dnpDepEnvs = await getContainerEnvironment(dnpName);
+  expect(pick(dnpDepEnvs, Object.keys(expectedEnvs))).to.deep.equal(
+    expectedEnvs,
+    `Wrong environment: ${JSON.stringify(expectedEnvs)}`
+  );
+}

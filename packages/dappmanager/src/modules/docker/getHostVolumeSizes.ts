@@ -1,7 +1,7 @@
 import { isEmpty } from "lodash";
 import { shellHost } from "../../utils/shell";
-import { parseDevicePath } from "../../utils/dockerComposeParsers";
 import { parseDuOutput } from "../../utils/unix";
+import { parseDevicePath } from "../compose";
 
 interface VolDevicePaths {
   [volumeName: string]: string;

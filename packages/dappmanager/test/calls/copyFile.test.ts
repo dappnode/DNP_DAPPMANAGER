@@ -3,7 +3,7 @@ import { expect } from "chai";
 import shell from "../../src/utils/shell";
 import path from "path";
 import { PackageContainer } from "../../src/types";
-import { mockDnp, testDir } from "../testUtils";
+import { mockDnp, testDir, cleanTestDir, createTestDir } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { copyFileFrom as copyFileFromType } from "../../src/calls/copyFileFrom";
@@ -88,7 +88,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   const containerPath = "/usr/src/config.json";
 
   before(async () => {
-    await shell(`mkdir -p ${testDir}`);
+    await createTestDir();
   });
 
   it("should copy a file to a container", async () => {
@@ -108,6 +108,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   });
 
   after(async () => {
-    await shell(`rm -rf ${testDir}`);
+    await cleanTestDir();
   });
 });

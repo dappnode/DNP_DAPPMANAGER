@@ -1,14 +1,6 @@
-import * as ipfs from "../../ipfs";
-import {
-  Manifest,
-  DistributedFile,
-  ManifestWithImage,
-  ComposeUnsafe
-} from "../../../types";
 import { mapValues } from "lodash";
-import { validateManifestWithImage } from "../parsers/validate";
+import * as ipfs from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
-import { manifestToCompose } from "../parsers";
 import {
   downloadManifest,
   downloadCompose,
@@ -19,6 +11,13 @@ import {
   downloadGetStarted,
   downloadSetupWizard
 } from "./downloadAssets";
+import { manifestToCompose, validateManifestWithImage } from "../../manifest";
+import {
+  Manifest,
+  DistributedFile,
+  ManifestWithImage,
+  Compose
+} from "../../../types";
 
 const source: "ipfs" = "ipfs";
 
@@ -49,13 +48,13 @@ const releaseFileIs = mapValues(
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-export default async function downloadRelease(
+export async function downloadReleaseIpfs(
   hash: string
 ): Promise<{
   manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
-  composeUnsafe: ComposeUnsafe;
+  composeUnsafe: Compose;
   manifest: Manifest;
 }> {
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);

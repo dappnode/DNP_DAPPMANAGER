@@ -1,14 +1,14 @@
-import { getUserSettingsSafe } from "../utils/dockerComposeFile";
 import { mapValues, omit } from "lodash";
 import semver from "semver";
 import { listContainers } from "../modules/docker/listContainers";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
-import { parseUserSetFromCompose } from "../utils/dockerComposeParsers";
 import { fileToGatewayUrl } from "../utils/distributedFile";
-import { getReleaseSpecialPermissions } from "../modules/release/parsers/getReleaseSpecialPermissions";
 import { ReleaseFetcher } from "../modules/release";
+import { dockerInfoArchive } from "../modules/docker/dockerApi";
+import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor";
+import { parseSpecialPermissions } from "../modules/compose/specialPermissions";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
@@ -17,10 +17,9 @@ import {
   PackageReleaseMetadata,
   PackageContainer,
   SetupWizardAllDnps,
-  SetupWizardField
+  SetupWizardField,
+  SpecialPermissionAllDnps
 } from "../types";
-import { getContainerName } from "../utils/dockerComposeParsers";
-import { dockerInfoArchive } from "../modules/docker/dockerApi";
 
 export async function fetchDnpRequest({
   id
@@ -31,22 +30,24 @@ export async function fetchDnpRequest({
 
   const mainRelease = await releaseFetcher.getRelease(id);
 
-  const setupWizard: SetupWizardAllDnps = {};
   const settings: UserSettingsAllDnps = {};
+  const specialPermissions: SpecialPermissionAllDnps = {};
+  const setupWizard: SetupWizardAllDnps = {};
 
   const dnpList = await listContainers();
 
-  async function addReleaseToSettings(_release: PackageRelease): Promise<void> {
-    const { name, metadata, compose, isCore } = _release;
+  async function addReleaseToSettings(release: PackageRelease): Promise<void> {
+    const { name, metadata, compose, isCore } = release;
 
-    const isInstalled = getIsInstalled(mainRelease, dnpList);
+    const container = dnpList.find(_dnp => _dnp.name === name);
+    const isInstalled = Boolean(container);
 
-    // current user settings overwritte compose
-    // If composePath does not exist, or is invalid: getUserSettingsSafe returns {}
-    const userSettings = deepmerge(
-      parseUserSetFromCompose(compose),
-      getUserSettingsSafe(name, isCore)
-    );
+    const defaultUserSet = new ComposeEditor(compose).getUserSettings();
+    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
+    const userSettings = deepmerge(defaultUserSet, prevUserSet);
+    settings[name] = userSettings[name];
+
+    specialPermissions[name] = parseSpecialPermissions(compose, isCore);
 
     if (metadata.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
@@ -59,17 +60,18 @@ export async function fetchDnpRequest({
                 // If the package is installed, ignore (all)namedVolumesMountpoint
                 return !isInstalled;
               case "fileUpload":
-                // If the path of file upload exists, ignore fileUpload
-                try {
-                  const info = await dockerInfoArchive(
-                    getContainerName(name, isCore),
-                    field.target.path
-                  );
-                  return !info.size;
-                } catch (e) {
-                  // Ignore all errors: 404 Container not found,
-                  // 404 path not found, Base64 parsing, JSON parsing, etc.
-                }
+                // If the container nad path of file upload exists, ignore fileUpload
+                if (container)
+                  try {
+                    const fileInfo = await dockerInfoArchive(
+                      container.id,
+                      field.target.path
+                    );
+                    return !fileInfo.size;
+                  } catch (e) {
+                    // Ignore all errors: 404 Container not found,
+                    // 404 path not found, Base64 parsing, JSON parsing, etc.
+                  }
             }
           }
           return true;
@@ -83,8 +85,6 @@ export async function fetchDnpRequest({
         fields: activeSetupWizardFields
       };
     }
-
-    settings[name] = userSettings;
   }
 
   await addReleaseToSettings(mainRelease);
@@ -114,28 +114,18 @@ export async function fetchDnpRequest({
     compatibleError = e.message;
   }
 
-  // Compute version metadata
-
-  const isInstalled = getIsInstalled(mainRelease, dnpList);
-  const isUpdated = getIsUpdated(mainRelease, dnpList);
-  const requiresCoreUpdate = getRequiresCoreUpdate(mainRelease, dnpList);
-  const specialPermissions = getReleaseSpecialPermissions(mainRelease);
-
-  // Fetch and store avatar
-  const avatarUrl = fileToGatewayUrl(mainRelease.avatarFile);
-
   return {
     name: mainRelease.name, // "bitcoin.dnp.dappnode.eth"
     semVersion: mainRelease.semVersion,
     reqVersion: mainRelease.reqVersion,
     origin: mainRelease.origin, // "/ipfs/Qm"
-    avatarUrl, // "http://dappmanager.dappnode/avatar/Qm7763518d4";
+    avatarUrl: fileToGatewayUrl(mainRelease.avatarFile),
     // Setup
     setupWizard,
     // Additional data
     imageSize: mainRelease.imageFile.size,
-    isUpdated,
-    isInstalled,
+    isUpdated: getIsUpdated(mainRelease, dnpList),
+    isInstalled: getIsInstalled(mainRelease, dnpList),
     // Prevent sending duplicated data
     metadata: omit(mainRelease.metadata, ["setupWizard"]),
     specialPermissions, // Decoupled metadata
@@ -143,7 +133,8 @@ export async function fetchDnpRequest({
     settings,
     request: {
       compatible: {
-        requiresCoreUpdate,
+        // Compute version metadata
+        requiresCoreUpdate: getRequiresCoreUpdate(mainRelease, dnpList),
         resolving: false,
         isCompatible: !compatibleError,
         error: compatibleError,

@@ -1,14 +1,9 @@
-import merge from "deepmerge";
-import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
+import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath";
-import {
-  applyUserSet,
-  addGeneralDataToCompose
-} from "../../utils/dockerComposeParsers";
-import { fileToMultiaddress } from "../../utils/distributedFile";
 import orderInstallPackages from "./orderInstallPackages";
 import { UserSettingsAllDnps } from "../../types";
-import { PackageRelease, UserSettings, InstallPackageData } from "../../types";
+import { PackageRelease, InstallPackageData } from "../../types";
+import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
 
 export function getInstallerPackagesData({
   releases,
@@ -22,11 +17,7 @@ export function getInstallerPackagesData({
   reqName: string;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
-    getInstallerPackageData(
-      release,
-      userSettings[release.name] || {},
-      currentVersion[release.name]
-    )
+    getInstallerPackageData(release, userSettings, currentVersion[release.name])
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
 }
@@ -39,21 +30,12 @@ export function getInstallerPackagesData({
  */
 export default function getInstallerPackageData(
   release: PackageRelease,
-  userSettings: UserSettings,
+  userSettings: UserSettingsAllDnps,
   currentVersion: string | undefined
 ): InstallPackageData {
-  const {
-    name,
-    semVersion,
-    isCore,
-    compose,
-    metadata,
-    origin,
-    imageFile
-  } = release;
-  /**
-   * Compute paths
-   */
+  const { name, semVersion, isCore, imageFile } = release;
+
+  // Compute paths
   const composePath = getPath.dockerCompose(name, isCore);
   const composeBackupPath = getPath.backupPath(composePath);
   const manifestPath = getPath.manifest(name, isCore);
@@ -65,10 +47,11 @@ export default function getInstallerPackageData(
   const imagePath = getPath.image(name, versionWithHash, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
-  const previousUserSettings = getUserSettingsSafe(name, isCore);
+  const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
 
-  // Aditional metadata
-  const avatar = fileToMultiaddress(release.avatarFile);
+  // Append to compose
+  const compose = new ComposeEditor(release.compose);
+  compose.applyUserSettings(deepmerge(prevUserSet, userSettings));
 
   return {
     ...release,
@@ -80,11 +63,8 @@ export default function getInstallerPackageData(
     manifestBackupPath,
     imagePath,
     // Data to write
-    compose: addGeneralDataToCompose(
-      applyUserSet(compose, merge(previousUserSettings, userSettings)),
-      { metadata, avatar, origin, isCore }
-    ),
+    compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: userSettings.fileUploads
+    fileUploads: (userSettings[name] || {}).fileUploads
   };
 }

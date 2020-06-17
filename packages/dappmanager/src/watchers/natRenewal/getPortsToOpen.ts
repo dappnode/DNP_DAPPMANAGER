@@ -1,10 +1,9 @@
 import { listContainers } from "../../modules/docker/listContainers";
-// Utils
-import { getPortMappings } from "../../utils/dockerComposeFile";
 // Default ports to open in case getPortsToOpen throws
 import defaultPortsToOpen from "./defaultPortsToOpen";
 import { PackagePort, PortProtocol } from "../../types";
 import { logs } from "../../logs";
+import { ComposeFileEditor } from "../../modules/compose/editor";
 
 /**
  * @returns {array} portsToOpen = [{
@@ -53,11 +52,11 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
       } else {
         try {
           // If DNP is exited, the port mapping is only available in the docker-compose
-          const dockerComposePortMappings = getPortMappings(id);
-          for (const port of dockerComposePortMappings || []) {
-            // Only consider ports that are mapped (not ephemeral ports)
+          const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+          const portMappings = compose.service().getPortMappings();
+          // Only consider ports that are mapped (not ephemeral ports)
+          for (const port of portMappings)
             if (port.host) addPortToOpen(port.protocol, port.host);
-          }
         } catch (e) {
           logs.error(`Error getting ports of ${id} from docker-compose`, e);
         }

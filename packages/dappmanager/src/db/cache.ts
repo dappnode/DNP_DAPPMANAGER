@@ -1,5 +1,5 @@
 import { dynamicKeyValidate } from "./dbCache";
-import { Manifest, ApmVersion, ComposeUnsafe } from "../types";
+import { Manifest, ApmVersion, Compose } from "../types";
 import semver from "semver";
 import { joinWithDot, stripDots } from "./dbUtils";
 
@@ -48,14 +48,11 @@ export const apmCache = dynamicKeyValidate<ApmVersion, ApmKeyArg>(
 
 const composeCacheKeyGetter = (hash: string): string =>
   joinWithDot(CACHE_COMPOSE, hash);
-const composeCacheValidate = (
-  hash: string,
-  compose?: ComposeUnsafe
-): boolean => {
+const composeCacheValidate = (hash: string, compose?: Compose): boolean => {
   return typeof hash === "string" && (!compose || typeof compose === "object");
 };
 
-export const composeCache = dynamicKeyValidate<ComposeUnsafe, string>(
+export const composeCache = dynamicKeyValidate<Compose, string>(
   composeCacheKeyGetter,
   composeCacheValidate
 );

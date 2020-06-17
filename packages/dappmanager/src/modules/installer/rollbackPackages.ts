@@ -5,6 +5,7 @@ import { dockerComposeUpSafe } from "../docker/dockerSafe";
 import { Log } from "../../utils/logUi";
 import { InstallPackageDataPaths } from "../../types";
 import { logs } from "../../logs";
+import { isNotFoundError } from "../../utils/node";
 
 /**
  * [Rollback] Stop all new packages with the new compose
@@ -35,7 +36,7 @@ export async function rollbackPackages(
         fs.copyFileSync(from, to);
         fs.unlinkSync(from);
       } catch (e) {
-        if (e.code !== "ENOENT" || isUpdate)
+        if (!isNotFoundError(e) || isUpdate)
           logs.error(`Rollback error restoring ${name} ${from}`, e);
       }
 

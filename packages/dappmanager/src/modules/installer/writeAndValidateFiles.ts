@@ -1,10 +1,11 @@
 import fs from "fs";
-import { writeManifest } from "../../utils/manifestFile";
 import { Log } from "../../utils/logUi";
 import * as validate from "../../utils/validate";
 import { InstallPackageData } from "../../types";
-import { writeComposeObj } from "../../utils/dockerComposeFile";
 import { dockerComposeConfig } from "../docker/dockerCommands";
+import { ComposeEditor } from "../compose/editor";
+import { writeManifest } from "../manifest/manifestFile";
+import { isNotFoundError } from "../../utils/node";
 
 /**
  * Write the new compose and test it with config
@@ -17,15 +18,15 @@ export async function writeAndValidateFiles(
   packagesData: InstallPackageData[],
   log: Log
 ): Promise<void> {
-  for (const {
-    name,
-    compose,
-    composePath,
-    composeBackupPath,
-    metadata,
-    manifestPath,
-    manifestBackupPath
-  } of packagesData) {
+  for (const packageData of packagesData) {
+    const {
+      name,
+      composePath,
+      composeBackupPath,
+      metadata,
+      manifestPath,
+      manifestBackupPath
+    } = packageData;
     log(name, "Writing files...");
 
     // Create the repoDir if necessary
@@ -33,7 +34,10 @@ export async function writeAndValidateFiles(
 
     // Backup compose to be able to do a rollback. Only if compose exists
     copyIfExists(composePath, composeBackupPath);
-    writeComposeObj(composePath, compose);
+
+    // Write and validate new compose
+    const compose = new ComposeEditor(packageData.compose);
+    compose.writeTo(composePath);
     await dockerComposeConfig(composePath);
 
     // Backup manifest to be able to do a rollback. Only if manifest exists
@@ -51,6 +55,6 @@ function copyIfExists(src: string, dest: string): void {
   try {
     fs.copyFileSync(src, dest);
   } catch (e) {
-    if (e.code !== "ENOENT") throw e;
+    if (!isNotFoundError(e)) throw e;
   }
 }

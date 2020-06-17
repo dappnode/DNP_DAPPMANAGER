@@ -16,7 +16,7 @@ import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
 import { restartPackage } from "./calls";
-import { mergeEnvFile } from "./utils/dockerComposeFile";
+import { ComposeFileEditor } from "./modules/compose/editor";
 
 const vpnDataVolume = params.vpnDataVolume;
 const vpnName = params.vpnDnpName;
@@ -148,7 +148,9 @@ export default async function initializeDb(): Promise<void> {
 
   if (shouldResetTheVpn)
     try {
-      mergeEnvFile(vpnName, params.GLOBAL_ENVS_PATH_CORE);
+      const vpnCompose = new ComposeFileEditor(vpnName, true);
+      vpnCompose.service().addEnvFile(params.GLOBAL_ENVS_PATH_CORE);
+      vpnCompose.write();
       await restartPackage({ id: vpnName });
       logs.info("Added global ENVs and restarted the VPN");
     } catch (e) {

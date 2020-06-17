@@ -2,9 +2,8 @@ import path from "path";
 import fs from "fs";
 import yaml from "js-yaml";
 import { isEqual } from "lodash";
-import { testDir } from "./testUtils";
+import { testDir, cleanRepos } from "./testUtils";
 import shell from "../src/utils/shell";
-import params from "../src/params";
 import * as validate from "../src/utils/validate";
 import {
   ipfsAddDirFromFs,
@@ -55,7 +54,7 @@ export function verifyFiles(): void {
 }
 
 export async function cleanInstallationArtifacts(): Promise<void> {
-  await shell(`rm -rf ${params.REPO_DIR}`);
+  await cleanRepos();
   const containersToKill = await shell(
     `docker ps -f name=${releaseDnpName} -a -q`
   );
@@ -179,7 +178,12 @@ export async function prepareDirectoryTypeRelease(): Promise<string> {
 
   // Verify the uploaded files
   const files = await ipfs.ls({ hash: rootHash });
-  if (!isEqual(files.map(f => f.name), filesToUpload))
+  if (
+    !isEqual(
+      files.map(f => f.name),
+      filesToUpload
+    )
+  )
     throw Error("Uploaded files do not match");
 
   return rootHash;

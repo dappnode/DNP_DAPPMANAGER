@@ -1,6 +1,7 @@
-import { mergeEnvs } from "../utils/dockerComposeFile";
 import { restartPackage } from "./restartPackage";
 import { PackageEnvs } from "../types";
+import { listContainer } from "../modules/docker/listContainers";
+import { ComposeFileEditor } from "../modules/compose/editor";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -21,7 +22,10 @@ export async function updatePackageEnv({
   if (!id) throw Error("kwarg id must be defined");
   if (!envs) throw Error("kwarg envs must be defined");
 
-  mergeEnvs(id, envs);
+  const dnp = await listContainer(id);
+  const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+  compose.service().mergeEnvs(envs);
+  compose.write();
 
   await restartPackage({ id });
 }
