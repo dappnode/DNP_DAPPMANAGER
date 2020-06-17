@@ -2,7 +2,6 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import {
-  ProgressLog,
   PackageRequest,
   PortMapping,
   Manifest,
@@ -86,10 +85,6 @@ describe.skip("Call function: installPackage", function() {
     packageModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  function logUi(progressLog: ProgressLog): void {
-    progressLog;
-  }
-
   let installPackage: typeof installPackageType;
 
   before("Mock", async () => {
@@ -98,9 +93,6 @@ describe.skip("Call function: installPackage", function() {
       mock => {
         mock(() => import("../../src/modules/release"))
           .with({ ReleaseFetcher: ReleaseFetcherMock })
-          .toBeUsed();
-        mock(() => import("../../src/utils/logUi"))
-          .with({ logUi })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
           .with(eventBus)

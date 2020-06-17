@@ -30,7 +30,7 @@ import { UserSettingsAllDnps } from "../../common";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 
-export class ComposeServiceEditor {
+class ComposeServiceEditor {
   parent: ComposeEditor;
   serviceName: string;
 

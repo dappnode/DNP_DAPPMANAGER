@@ -1,7 +1,7 @@
 import { DappGetDnps, DappGetDnp } from "../types";
 import { Dependencies } from "../../../types";
 
-export function getVersion(
+function getVersion(
   dnps: DappGetDnps,
   name: string,
   version: string

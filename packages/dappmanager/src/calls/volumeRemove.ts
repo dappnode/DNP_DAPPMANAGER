@@ -5,8 +5,6 @@ import * as eventBus from "../eventBus";
 import params from "../params";
 import { logs } from "../logs";
 
-const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
-
 /**
  * Removes a docker volume by name
  *
@@ -43,9 +41,9 @@ export async function removeNamedVolume(volName: string): Promise<void> {
     // WARNING: Make sure the device path is correct because
     // it could cause mayhem if empty or if it has a wrong value
     if (!devicePath) throw Error(`devicePath is empty`);
-    if (!devicePath.includes(mountpointDevicePrefix))
+    if (!devicePath.includes(params.MOUNTPOINT_DEVICE_PREFIX))
       throw Error(
-        `devicePath must contain the volume tag '${mountpointDevicePrefix}': ${devicePath}`
+        `devicePath must contain the volume tag '${params.MOUNTPOINT_DEVICE_PREFIX}': ${devicePath}`
       );
     if (devicePath.length < 10)
       throw Error(`devicePath is too short: ${devicePath}`);

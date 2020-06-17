@@ -4,8 +4,6 @@ import params from "../../params";
 import { getClientStatus } from "./clientStatus";
 import { EthClientStatusError } from "../../types";
 
-export type ProviderGetter = () => Promise<ethers.providers.Provider>;
-
 export class EthProviderError extends Error {}
 
 /**
@@ -61,9 +59,7 @@ export async function getEthProviderUrl(): Promise<string> {
  * Note: MUST NOT have undefined as a valid return type so typescript
  *       enforces that all possible states are covered
  */
-export function parseClientStatusError(
-  statusError: EthClientStatusError
-): string {
+function parseClientStatusError(statusError: EthClientStatusError): string {
   switch (statusError.code) {
     case "UNKNOWN_ERROR":
       return `Unknown error: ${statusError.error.message}`;

@@ -30,7 +30,7 @@ export function clearDbs(): void {
   lowLevelMainDb.clearDb();
 }
 
-export function ignoreErrors<A, R>(fn: (arg: A) => R) {
+function ignoreErrors<A, R>(fn: (arg: A) => R) {
   return async function(arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
@@ -48,10 +48,6 @@ export async function cleanTestDir(): Promise<void> {
 export async function createTestDir(): Promise<void> {
   await cleanTestDir();
   await shell(`mkdir -p ${testDir}`);
-}
-
-export async function createDirP(filePath: string): Promise<void> {
-  await shell(`mkdir -p ${path.parse(filePath).dir}`);
 }
 
 export async function cleanRepos(): Promise<void> {
@@ -130,11 +126,6 @@ export const mockVolume: VolumeMapping = {
   container: "mock/mock/mock"
 };
 
-export const mockPort: PortMapping = {
-  container: 1111,
-  protocol: "TCP"
-};
-
 export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
   LayersSize: 101010101,
   Images: [
@@ -210,25 +201,13 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
   ]
 };
 
-export const mockDirectoryDnp: DirectoryDnp = {
-  name: mockDnpName,
-  status: 1,
-  statusName: "Active",
-  position: 1000,
-  directoryId: 2,
-  isFeatured: true,
-  featuredIndex: 0
-};
-
-export const mockComposeService: ComposeService = {
-  image: `${mockDnpName}:${mockDnpVersion}`,
-  container_name: `DAppNodePackage-${mockDnpName}`
-};
-
 export const mockCompose: Compose = {
   version: "3.4",
   services: {
-    [mockDnpName]: mockComposeService
+    [mockDnpName]: {
+      image: `${mockDnpName}:${mockDnpVersion}`,
+      container_name: `DAppNodePackage-${mockDnpName}`
+    }
   }
 };
 

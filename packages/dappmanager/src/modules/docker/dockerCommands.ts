@@ -70,14 +70,6 @@ export function dockerImageManifest(
   return shell(`tar -xOf ${imagePath} manifest.json`).then(JSON.parse);
 }
 
-export function dockerImages(): Promise<string> {
-  return shell(`docker images --format "{{.Repository}}:{{.Tag}}"`);
-}
-
-export function dockerRmi(imgsToDelete: string[]): Promise<string> {
-  return shell(`docker rmi ${imgsToDelete.join(" ")}`);
-}
-
 /**
  * Clean old semver tagged images for DNP `name` expect tag `version`.
  * If the images were removed successfuly the dappmanger will print logs:

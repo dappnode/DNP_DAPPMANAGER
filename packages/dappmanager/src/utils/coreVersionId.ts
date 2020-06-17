@@ -39,7 +39,7 @@ export function includesArray<T>(subset: T[], superset: T[]): boolean {
   return difference(subset, superset).length === 0;
 }
 
-export function parseCoreVersionIdToStrings(versionId: string): string[] {
+function parseCoreVersionIdToStrings(versionId: string): string[] {
   return (versionId || "").split(",");
 }
 

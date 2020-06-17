@@ -21,8 +21,6 @@ export interface ApmVersionRaw {
   contentUri: string;
 }
 
-export interface ApmVersion extends ApmVersionState, ApmVersionMetadata {}
-
 export interface ApmRepoVersionReturn {
   semanticVersion: number[]; // uint16[3]
   contractAddress: string; // address

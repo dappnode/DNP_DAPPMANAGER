@@ -20,7 +20,7 @@ interface VolSizes {
  *   bitcoin_data: "823203"
  * }
  */
-export default async function getHostVolumeSizes(
+export async function getHostVolumeSizes(
   volDevicePaths: VolDevicePaths
 ): Promise<VolSizes> {
   // if there are no volDevicePaths, return early

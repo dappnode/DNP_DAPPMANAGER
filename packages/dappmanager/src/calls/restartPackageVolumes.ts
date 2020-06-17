@@ -10,8 +10,6 @@ import params from "../params";
 import * as getPath from "../utils/getPath";
 import { logs } from "../logs";
 
-export const mountpointDevicePrefix = params.MOUNTPOINT_DEVICE_PREFIX;
-
 /**
  * Removes a package volumes. The re-ups the package
  */

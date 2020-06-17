@@ -13,7 +13,7 @@ describe("getHostVolumeSizes", () => {
           .toBeUsed();
       }
     );
-    return mock.default;
+    return mock.getHostVolumeSizes;
   }
 
   it("Get the volume size of one volume", async () => {

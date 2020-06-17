@@ -6,10 +6,6 @@
  * Resolver types
  */
 
-export interface PkgsObj {
-  [dnpName: string]: string[];
-}
-
 export interface DappGetDnp {
   versions: {
     [version: string]: {
@@ -28,7 +24,7 @@ type VersionInternalResolver = string | null;
 
 interface PermutationTableInterface {
   name: string;
-  versions: (VersionInternalResolver)[];
+  versions: VersionInternalResolver[];
   n: number;
   m: number;
 }

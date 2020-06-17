@@ -1,6 +1,6 @@
 import { dockerList } from "./dockerApi";
 import { ContainerInfo } from "dockerode";
-import { shortName } from "../../utils/strings";
+import { shortName } from "../../utils/format";
 import params from "../../params";
 import {
   PackageContainer,
@@ -117,15 +117,6 @@ export async function listContainer(byName: string): Promise<PackageContainer> {
   const container = await listContainerNoThrow(byName);
   if (!container) throw Error(`No DNP was found for name ${byName}`);
   return container;
-}
-
-export async function listContainerExtendedInfo(
-  byName: string
-): Promise<PackageContainer> {
-  const dnpListExtended = await listContainers();
-  const dnp = dnpListExtended.find(_dnp => _dnp.name === byName);
-  if (!dnp) throw Error(`No DNP was found for name ${byName}`);
-  return dnp;
 }
 
 // export async function listContainerByContainerId(

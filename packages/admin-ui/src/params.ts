@@ -12,10 +12,6 @@ export const apiUrls = {
   userActionLogs: urlJoin(apiUrl, "user-action-logs")
 };
 
-// WAMP
-export const wampUrl = "ws://my.wamp.dnp.dappnode.eth:8080/ws";
-export const wampRealm = "dappnode_admin";
-
 // WIFI
 export const wifiDefaultSSID = "DAppNodeWIFI";
 export const wifiDefaultWPA_PASSPHRASE = "dappnode";
@@ -33,9 +29,6 @@ export const adminNaclSecretKey =
   "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=";
 export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
-
-// WEB3
-export const fullnodeHttpJsonRpc = "http://fullnode.dappnode:8545";
 
 // URLs / Links
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";

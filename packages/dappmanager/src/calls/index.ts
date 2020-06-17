@@ -16,6 +16,7 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
 export { fetchDirectory } from "./fetchDirectory";
 export { fetchDnpRequest } from "./fetchDnpRequest";
 export { getStats } from "./getStats";
+export { getPortsStatus } from "./getPortsStatus";
 export { getUserActionLogs } from "./getUserActionLogs";
 export { installPackage } from "./installPackage";
 export { listPackages } from "./listPackages";

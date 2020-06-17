@@ -18,8 +18,8 @@ export type Log = (name: string, message: string) => void;
  * @param {string} message, log message
  * message = "Downloading 75%"
  */
-export function logUi(progressLog: ProgressLog): void {
-  const { id, name, message } = progressLog;
+function logUi(progressLog: ProgressLog): void {
+  const { name, message } = progressLog;
   // Log them internally. But skip download progress logs, too spam-y
   if (message && !message.includes("%"))
     logs.info("Progress log", name, message);

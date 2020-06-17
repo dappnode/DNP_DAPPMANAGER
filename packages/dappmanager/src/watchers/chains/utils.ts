@@ -1,16 +1,6 @@
 import { mapValues } from "lodash";
 
-/**
- * Ethereum driver utils
- */
-
-// Current versions of parseInt are able to recognize hex numbers
-// and automatically use a radix parameter of 16.
-export function parseHexOrDecimal(hexOrDecimal: string | number): number {
-  return parseInt(String(hexOrDecimal));
-}
-
-export type EthSyncingReturn =
+type EthSyncingReturn =
   | false
   | {
       currentBlock: string; // "0x0";

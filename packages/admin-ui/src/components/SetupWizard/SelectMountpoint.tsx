@@ -11,7 +11,6 @@ import { MountpointData } from "types";
 import newTabProps from "utils/newTabProps";
 import "./selectMountpoint.scss";
 
-export const selectMountpointId = "selectMountpoint";
 const troubleshootUrl =
   "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
 

@@ -28,7 +28,7 @@ export function getInstallerPackagesData({
  * This step is isolated to be a pure function and ease its testing
  * [PURE] Function
  */
-export default function getInstallerPackageData(
+function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettingsAllDnps,
   currentVersion: string | undefined
