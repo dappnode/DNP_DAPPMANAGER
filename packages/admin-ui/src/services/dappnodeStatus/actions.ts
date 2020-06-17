@@ -1,7 +1,12 @@
 import { api } from "api";
 import { dappnodeStatus } from "./reducer";
 import { AppThunk } from "store";
-import { wifiName } from "params";
+import {
+  wifiName,
+  wifiEnvWPA_PASSPHRASE,
+  wifiEnvSSID,
+  wifiDefaultWPA_PASSPHRASE
+} from "params";
 
 // Service > dappnodeStatus
 
@@ -35,12 +40,22 @@ export const fetchSystemInfo = (): AppThunk => async dispatch =>
     dispatch(setSystemInfo(await api.systemInfoGet()));
   }, "systemInfoGet");
 
+/**
+ * Check if the wifi DNP has the same credentials as the default ones
+ * @returns credentials are the same as the default ones
+ */
 export const fetchWifiStatus = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
+    const wifiDnp = await api.packageDetailDataGet({ id: wifiName });
+    const environment = wifiDnp.userSettings?.environment || {};
+    const ssid = environment[wifiEnvSSID];
+    const pass = environment[wifiEnvWPA_PASSPHRASE];
+    const isDefault = pass === wifiDefaultWPA_PASSPHRASE;
+
     const logs = await api.logPackage({ id: wifiName });
     const firstLogLine = logs.trim().split("\n")[0];
     const running = !firstLogLine.includes("No interface found");
-    dispatch(updateWifiStatus({ running }));
+    dispatch(updateWifiStatus({ running, ssid, isDefault }));
   }, "wifiStatus");
 
 /**

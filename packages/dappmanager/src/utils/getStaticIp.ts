@@ -3,6 +3,7 @@ import * as db from "../db";
 import params from "../params";
 import { logs } from "../logs";
 import isIp from "is-ip";
+import { isNotFoundError } from "./node";
 
 const staticIpPath = params.STATIC_IP_PATH;
 
@@ -16,7 +17,7 @@ function getInstallationStaticIp(): string {
     if (!isIp(ip)) return "";
     else return ip;
   } catch (e) {
-    if (e.code === "ENOENT") {
+    if (isNotFoundError(e)) {
       logs.warn(`staticIp not found at ${staticIpPath}: ${e.message}`);
     } else {
       logs.error(`Error reading staticIp at ${staticIpPath}: ${e.message}`);

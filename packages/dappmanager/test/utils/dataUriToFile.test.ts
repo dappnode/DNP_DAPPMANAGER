@@ -4,12 +4,13 @@ import shell from "../../src/utils/shell";
 import fs from "fs";
 
 import dataUriToFile from "../../src/utils/dataUriToFile";
+import { cleanTestDir, createTestDir } from "../testUtils";
 
 const testDir = "test_files";
 
 describe("Util: dataUriToFile", () => {
   before(async () => {
-    await shell(`mkdir -p ${testDir}`);
+    await createTestDir();
   });
 
   it("should convert a PNG dataUri to a valid image", () => {
@@ -43,6 +44,6 @@ describe("Util: dataUriToFile", () => {
   });
 
   after(async () => {
-    await shell(`rm -rf ${testDir}`);
+    await cleanTestDir();
   });
 });

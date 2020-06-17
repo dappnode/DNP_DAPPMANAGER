@@ -1,0 +1,41 @@
+import { omit } from "lodash";
+import { setupWizard1To2 } from "../setupWizard/setupWizard1To2";
+import {
+  Manifest,
+  PackageReleaseMetadata,
+  ManifestWithImage
+} from "../../types";
+
+/**
+ * Sanitize metadata from the manifest.
+ * Since metadata is not used for critical purposes, it can just
+ * be copied over
+ *
+ * @param manifest
+ */
+export function parseMetadataFromManifest(
+  manifest: Manifest
+): PackageReleaseMetadata {
+  const setupWizard = manifest.setupWizard
+    ? manifest.setupWizard
+    : manifest.setupSchema && manifest.setupTarget
+    ? setupWizard1To2(
+        manifest.setupSchema,
+        manifest.setupTarget,
+        manifest.setupUiJson || {}
+      )
+    : undefined;
+
+  return {
+    ...omit(manifest as ManifestWithImage, [
+      "avatar",
+      "image",
+      "setupSchema",
+      "setupTarget",
+      "setupUiJson"
+    ]),
+    ...(setupWizard ? { setupWizard } : {}),
+    // ##### Is this necessary? Correct manifest: type missing
+    type: manifest.type || "service"
+  };
+}

@@ -62,6 +62,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const { name, reqVersion, settings, metadata, setupWizard } = dnp;
   const isCore = metadata.type === "dncore";
   const permissions = dnp.specialPermissions;
+  const hasPermissions = Object.values(permissions).some(p => p.length > 0);
   const requiresCoreUpdate = dnp.request.compatible.requiresCoreUpdate;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
@@ -201,7 +202,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           goBack={goBack}
         />
       ),
-      available: permissions.length > 0
+      available: hasPermissions
     },
     {
       name: "Disclaimer",

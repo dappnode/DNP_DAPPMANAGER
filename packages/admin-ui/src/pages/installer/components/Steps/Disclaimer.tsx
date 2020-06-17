@@ -4,6 +4,8 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Card from "components/Card";
 import Button from "components/Button";
 import StatusIcon from "components/StatusIcon";
+import { shortNameCapitalized } from "utils/format";
+import "./permissions.scss";
 
 interface DisclaimerProps {
   disclaimers: { name: string; message: string }[];
@@ -26,9 +28,9 @@ const Disclaimer: React.FC<DisclaimerProps> = ({
     <Card spacing divider>
       {disclaimers.map(disclaimer => (
         <div key={disclaimer.name}>
-          <p>
-            <strong>{disclaimer.name} disclaimer</strong>
-          </p>
+          <div className="card-section-header">
+            {shortNameCapitalized(disclaimer.name)} disclaimer
+          </div>
           <div>
             <RenderMarkdown source={disclaimer.message} />
           </div>

@@ -1,8 +1,6 @@
 import params from "../params";
-import path from "path";
 import fs from "fs";
-import { parseEnvironment, stringifyEnvironment } from "./dockerComposeParsers";
-import { getDockerComposePath } from "./dockerComposeFile";
+import { parseEnvironment, stringifyEnvironment } from "../modules/compose";
 
 const globalEnvsFile = params.GLOBAL_ENVS_PATH_NODE;
 export const envsPath = globalEnvsFile; // For testing
@@ -13,17 +11,8 @@ interface Envs {
   [name: string]: string;
 }
 
-export function getRelativePathFromComposePath(
-  composePath: string,
-  _globalEnvsFile = globalEnvsFile // For testing
-): string {
-  const composeDir = path.parse(composePath).dir;
-  return path.relative(composeDir, _globalEnvsFile);
-}
-
-export function getRelativePath(dnpName: string): string {
-  const composePath = getDockerComposePath(dnpName);
-  return getRelativePathFromComposePath(composePath);
+export function getGlobalEnvsFilePath(isCore: boolean): string {
+  return isCore ? params.GLOBAL_ENVS_PATH_CORE : params.GLOBAL_ENVS_PATH_DNP;
 }
 
 export function setEnvs(newEnvs: Envs): void {

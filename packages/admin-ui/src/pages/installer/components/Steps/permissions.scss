@@ -1,0 +1,14 @@
+.card-section-header {
+  font-size: 1.25rem;
+  text-overflow: ellipsis;
+  color: var(--light-text-color);
+  border-bottom: var(--border-style);
+  margin-bottom: var(--default-spacing);
+  padding-bottom: calc(var(--default-spacing) / 2);
+}
+
+.special-permission {
+  .details {
+    color: var(--light-text-color);
+  }
+}

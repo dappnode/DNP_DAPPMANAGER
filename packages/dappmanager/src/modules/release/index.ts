@@ -1,5 +1,5 @@
 import resolveReleaseName from "./resolveReleaseName";
-import { getReleaseFromIpfs } from "./getRelease";
+import { getRelease } from "./getRelease";
 import { getManifest } from "./getManifest";
 import { PackageRelease, PackageRequest, Manifest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
@@ -19,7 +19,7 @@ export class ReleaseFetcher extends Apm {
    */
   async getRelease(name: string, version?: string): Promise<PackageRelease> {
     const { hash, origin } = await this.resolveReleaseName(name, version);
-    return await getReleaseFromIpfs({ hash, name, origin });
+    return await getRelease({ hash, name, origin });
   }
 
   /**

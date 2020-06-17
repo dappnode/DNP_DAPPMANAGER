@@ -7,6 +7,7 @@ import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import { logSafeObjects } from "./utils/logs";
 import { logs } from "./logs";
+import { isNotFoundError } from "./utils/node";
 
 /**
  * Max number of logs to prevent the log file from growing too big
@@ -94,7 +95,7 @@ export async function migrateUserActionLogs(): Promise<void> {
 
     logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
   } catch (e) {
-    if (e.code === "ENOENT") {
+    if (isNotFoundError(e)) {
       logs.debug("userActionLogs file not found, already migrated");
     } else {
       logs.error("Error migrating userActionLogs", e);

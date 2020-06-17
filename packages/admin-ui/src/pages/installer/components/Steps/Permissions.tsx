@@ -4,10 +4,12 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Card from "components/Card";
 import Button from "components/Button";
 import StatusIcon from "components/StatusIcon";
-import { SpecialPermission } from "types";
+import { SpecialPermissionAllDnps } from "types";
+import { shortNameCapitalized } from "utils/format";
+import "./permissions.scss";
 
 interface PermissionsProps {
-  permissions: SpecialPermission[];
+  permissions: SpecialPermissionAllDnps;
   onAccept: () => void;
   goBack: () => void;
 }
@@ -23,25 +25,35 @@ const Permissions: React.FC<PermissionsProps> = ({
    *   details: "Long description of the capabilitites"
    * }, ... ]
    */
-
-  // "Requires no special permissions"
   return (
     <Card className="permissions-list" spacing divider>
-      {permissions.map(({ name, details }) => (
-        <div key={name}>
-          <strong>{name}</strong>
-          <div style={{ opacity: 0.6 }}>
-            <RenderMarkdown source={details} />
+      {Object.entries(permissions).map(([dnpName, permissionsDnp]) => (
+        <div key={dnpName}>
+          <div className="card-section-header">
+            {shortNameCapitalized(dnpName)} special permissions
+          </div>
+
+          <div className="special-permission">
+            {permissionsDnp.map(({ name, details }) => (
+              <div key={name}>
+                <strong>{name}</strong>
+                <div className="details">
+                  <RenderMarkdown source={details} />
+                </div>
+              </div>
+            ))}
+
+            {permissionsDnp.length === 0 && (
+              <StatusIcon success message={"Requires no special permissions"} />
+            )}
           </div>
         </div>
       ))}
-      {permissions.length === 0 && (
-        <StatusIcon success message={"Requires no special permissions"} />
-      )}
+
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
         <Button variant="dappnode" onClick={onAccept}>
-          {permissions.length === 0 ? "Next" : "Accept"}
+          Accept
         </Button>
       </div>
     </Card>

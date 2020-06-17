@@ -1,18 +1,10 @@
 import * as ipfs from "../../ipfs";
 import yaml from "js-yaml";
 import memoize from "memoizee";
-import {
-  Manifest,
-  ComposeUnsafe,
-  SetupTarget,
-  SetupWizard
-} from "../../../types";
+import { Manifest, Compose, SetupTarget, SetupWizard } from "../../../types";
 import { SetupSchema, SetupUiJson } from "../../../types";
-import {
-  validateManifestBasic,
-  validateComposeOrUnsafe
-} from "../parsers/validate";
-import { parseComposeObj } from "../../../utils/dockerComposeFile";
+import { validateManifestBasic } from "../../manifest";
+import { validateCompose } from "../../compose";
 
 export const downloadManifest = downloadAssetFactory<Manifest>({
   parse: jsonParse,
@@ -20,9 +12,9 @@ export const downloadManifest = downloadAssetFactory<Manifest>({
   maxLength: 100e3 // Limit size to ~100KB
 });
 
-export const downloadCompose = downloadAssetFactory<ComposeUnsafe>({
-  parse: parseComposeObj,
-  validate: validateComposeOrUnsafe,
+export const downloadCompose = downloadAssetFactory<Compose>({
+  parse: yaml.safeLoad,
+  validate: validateCompose,
   maxLength: 10e3 // Limit size to ~10KB
 });
 

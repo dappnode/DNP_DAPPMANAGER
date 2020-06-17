@@ -7,13 +7,12 @@ import path from "path";
 import shell from "../../src/utils/shell";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../testUtils";
-import { Compose } from "../../src/types";
-import { writeComposeObj } from "../../src/utils/dockerComposeFile";
 import { listContainer } from "../../src/modules/docker/listContainers";
 import {
   dockerList,
   containerInspect
 } from "../../src/modules/docker/dockerApi";
+import { ComposeEditor } from "../../src/modules/compose/editor";
 
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,
@@ -42,7 +41,6 @@ const restartEntrypoint = "restart-entrypoint.sh";
 const inHost = (_path: string) => path.join(testDir, _path);
 const inContainer = (_path: string) => path.join(testDirContainer, _path);
 
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 describe("Test a container restarting itself", function() {
@@ -58,12 +56,15 @@ describe("Test a container restarting itself", function() {
     }
   }
 
-  beforeEach("Prepare test dir", async () => {
-    await createTestDir();
+  before(`Pull dindComposeImage ${dindComposeImage}`, async () => {
+    // Do not stream output. The download progress is really noisy
+    console.log(`Pulling image ${dindComposeImage} to test...`);
+    await shell(`docker pull ${dindComposeImage}`);
+    console.log("Pulled image");
   });
 
-  beforeEach(`Pull dindComposeImage ${dindComposeImage}`, async () => {
-    await runUntilExited(`docker pull ${dindComposeImage}`, "pull");
+  beforeEach("Prepare test dir", async () => {
+    await createTestDir();
   });
 
   beforeEach(`Clean containers`, async () => {
@@ -248,9 +249,7 @@ exit $UPEXIT
     assert.notStrictEqual(
       next.Id,
       prev.id,
-      `${mainContainerName} prev and next containers should have the same ID ${
-        prev.id
-      }`
+      `${mainContainerName} prev and next containers should have the same ID ${prev.id}`
     );
     assert.strictEqual(
       next.State,
@@ -318,9 +317,7 @@ exit $UPEXIT
     assert.strictEqual(
       next.id,
       prev.id,
-      `${mainContainerName} prev and next containers should have the same ID ${
-        prev.id
-      }`
+      `${mainContainerName} prev and next containers should have the same ID ${prev.id}`
     );
     assert.strictEqual(
       next.state,
@@ -361,7 +358,7 @@ function writeCompose({
   name: string;
   ports?: string[];
 }) {
-  const compose: Compose = {
+  const compose = new ComposeEditor({
     version: "3.4",
     services: {
       [container_name]: {
@@ -375,8 +372,8 @@ function writeCompose({
         }
       }
     }
-  };
-  writeComposeObj(inHost(name), compose);
+  });
+  compose.writeTo(inHost(name));
 }
 
 /**

@@ -1,11 +1,11 @@
 import fs from "fs";
 import * as db from "../../db";
 import { changeEthMultiClient } from "./changeEthMultiClient";
-import { listContainerNoThrow } from "../../modules/docker/listContainers";
-import { dockerVolumesList, dockerDf } from "../../modules/docker/dockerApi";
-import { dockerRm, dockerVolumeRm } from "../../modules/docker/dockerCommands";
-import { migrateVolume } from "../../modules/hostScripts";
-import { getUserSettingsSafe } from "../../utils/dockerComposeFile";
+import { listContainerNoThrow } from "../docker/listContainers";
+import { dockerVolumesList, dockerDf } from "../docker/dockerApi";
+import { dockerRm, dockerVolumeRm } from "../docker/dockerCommands";
+import { ComposeFileEditor } from "../compose/editor";
+import { migrateVolume } from "../hostScripts";
 import * as getPath from "../../utils/getPath";
 import shell from "../../utils/shell";
 import { logs } from "../../logs";
@@ -26,6 +26,12 @@ const gethVolumes = {
   data: "gethdnpdappnodeeth_geth"
 };
 
+interface EthchainEnvs {
+  EXTRA_OPTS?: string; // --warp-barrier 9530000
+  EXTRA_OPTS_GETH?: string; // --syncmode light
+  DEFAULT_CLIENT?: string; // PARITY
+}
+
 /**
  * Migrate old core package DNP_ETHCHAIN to the new format
  * 1. Get ETHCHAIN config and which client. Then delete configs
@@ -33,19 +39,17 @@ const gethVolumes = {
  * 3. Install new package with existing settings
  */
 export async function migrateEthchain(): Promise<void> {
-  const ethchain = await listContainerNoThrow(ethchainDnpName);
-  const volumes = await dockerVolumesList();
+  // Get ETHCHAIN's current status
+  const ethchainContainer = await listContainerNoThrow(ethchainDnpName);
   // If ethchain compose does not exist, returns {}
-  const userSettings = getUserSettingsSafe(ethchainDnpName, true);
-  const envs: {
-    EXTRA_OPTS?: string; // --warp-barrier 9530000
-    EXTRA_OPTS_GETH?: string; // --syncmode light
-    DEFAULT_CLIENT?: string; // PARITY
-  } = {
-    // Consider envs from both the running container and its compose
-    ...((ethchain || {}).envs || {}),
-    ...(userSettings.environment || {})
-  };
+  const userSettingsCompose = ComposeFileEditor.getUserSettingsIfExist(
+    ethchainDnpName,
+    true
+  );
+  const userSettings = userSettingsCompose[ethchainDnpName] || {};
+  const envs: EthchainEnvs = userSettings.environment || {};
+
+  const volumes = await dockerVolumesList();
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
   let target: EthClientTargetPackage = isNextOpenEthereum
     ? "openethereum"
@@ -54,7 +58,8 @@ export async function migrateEthchain(): Promise<void> {
     (isNextOpenEthereum ? envs.EXTRA_OPTS : envs.EXTRA_OPTS_GETH) || "";
   // Store settings in the cache. It is possible that the migration is stopped
   // because the DAPPMANAGER resets and then the eth client will not be installed
-  if (ethchain) db.ethClientMigrationTempSettings.set({ target, EXTRA_OPTS });
+  if (ethchainContainer)
+    db.ethClientMigrationTempSettings.set({ target, EXTRA_OPTS });
 
   const volumesToMigrate = [
     {
@@ -87,9 +92,9 @@ export async function migrateEthchain(): Promise<void> {
   ].filter(({ name }) => volumes.find(vol => vol.Name === name));
 
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
-  if (ethchain)
+  if (ethchainContainer)
     try {
-      await dockerRm(ethchain.id);
+      await dockerRm(ethchainContainer.id);
       logs.info("Removed ETHCHAIN package");
 
       // Clean manifest and docker-compose
@@ -152,7 +157,7 @@ export async function migrateEthchain(): Promise<void> {
 
   // Install new package. fullnode.dappnode is assigned after install
   const migrationTempSettings = db.ethClientMigrationTempSettings.get();
-  if (ethchain || migrationTempSettings) {
+  if (ethchainContainer || migrationTempSettings) {
     logs.info(`Installing eth multi-client ${target}`, { EXTRA_OPTS });
 
     if (migrationTempSettings) {

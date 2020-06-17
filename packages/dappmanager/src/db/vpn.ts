@@ -1,5 +1,5 @@
 import { staticKey } from "./dbCache";
-import { PackageVersionData } from "../common";
+import { PackageVersionData } from "../types";
 
 const VERSION_DATA_VPN = "version-data-vpn";
 

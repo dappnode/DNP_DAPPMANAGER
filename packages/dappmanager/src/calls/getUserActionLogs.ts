@@ -1,5 +1,5 @@
 import * as logUserAction from "../logUserAction";
-import { UserActionLog } from "../common";
+import { UserActionLog } from "../types";
 
 /**
  * Returns the user action logs. This logs are stored in a different

@@ -19,6 +19,7 @@ packages/*/test_files/
 packages/*/test_files/*
 packages/*/test_mountpoints_*/
 packages/*/test_mountpoints_*/*
+.temp-transfer
 
 # Built schemas
 packages/*/src/common/schemas

@@ -1,12 +1,10 @@
 import * as eventBus from "../eventBus";
-import * as db from "../db";
+
 // Modules
 import { listContainers } from "../modules/docker/listContainers";
 import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
-import { omit } from "lodash";
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
-import { readConfigFiles } from "../utils/configFiles";
 import { PackageContainer } from "../types";
 import { logs } from "../logs";
 
@@ -15,23 +13,6 @@ import { logs } from "../logs";
  */
 export async function listPackages(): Promise<PackageContainer[]> {
   let dnpList = await listContainers();
-
-  // Append envFile and manifest
-  dnpList.map(dnp => {
-    try {
-      const { manifest, environment } = readConfigFiles(dnp);
-      if (manifest) {
-        dnp.manifest = omit(manifest, ["gettingStarted"]);
-        dnp.gettingStarted = manifest.gettingStarted;
-      }
-      dnp.envs = environment;
-      dnp.gettingStartedShow = Boolean(
-        db.packageGettingStartedShow.get(dnp.name)
-      );
-    } catch (e) {
-      logs.warn(`Error appending ${dnp.name} files`, e);
-    }
-  });
 
   // ##### EMIT data before appending system data
   eventBus.packages.emit(dnpList);

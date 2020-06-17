@@ -15,6 +15,7 @@ import {
   InstallPackageData
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
+import params from "../src/params";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";
@@ -39,6 +40,8 @@ export function ignoreErrors<A, R>(fn: (arg: A) => R) {
   };
 }
 
+export const shellSafe = ignoreErrors(shell);
+
 export async function cleanTestDir(): Promise<void> {
   await shell(`rm -rf ${testDir}`);
 }
@@ -49,6 +52,22 @@ export async function createTestDir(): Promise<void> {
 
 export async function createDirP(filePath: string): Promise<void> {
   await shell(`mkdir -p ${path.parse(filePath).dir}`);
+}
+
+export async function cleanRepos(): Promise<void> {
+  await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
+}
+
+export async function cleanContainers(...ids: string[]): Promise<void> {
+  for (const id of ids) {
+    // Clean containers
+    await shellSafe(`docker rm -f $(docker ps -aq --filter name=${id})`);
+    // Clean associated volumes
+    const volumePrefix = id;
+    await shellSafe(
+      `docker volume rm -f $(docker volume ls --filter name=${volumePrefix} -q)`
+    );
+  }
 }
 
 /**
@@ -77,7 +96,6 @@ export const mockDnp: PackageContainer = {
   shortName: "mock-shortname",
   state: "running",
   running: true,
-  envs: {},
   ports: [],
   volumes: [],
   defaultEnvironment: {},
@@ -204,7 +222,6 @@ export const mockDirectoryDnp: DirectoryDnp = {
 
 export const mockComposeService: ComposeService = {
   image: `${mockDnpName}:${mockDnpVersion}`,
-  /* eslint-disable-next-line @typescript-eslint/camelcase */
   container_name: `DAppNodePackage-${mockDnpName}`
 };
 

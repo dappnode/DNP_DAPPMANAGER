@@ -20,6 +20,6 @@
     // ##### typescript does not understand hoisting
     "@typescript-eslint/no-use-before-define": "off",
     // ### This project uses docker-compose which has many variables not in camelCase
-    "@typescript-eslint/camelcase": "warn"
+    "@typescript-eslint/camelcase": "off"
   }
 }

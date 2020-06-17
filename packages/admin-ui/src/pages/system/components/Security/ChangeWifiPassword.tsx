@@ -2,20 +2,20 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { api } from "api";
 import { wifiName, wifiEnvSSID, wifiEnvWPA_PASSPHRASE } from "params";
+import { getWifiStatus } from "services/dappnodeStatus/selectors";
 // Components
 import Card from "components/Card";
 import Input from "components/Input";
 import Button from "components/Button";
 import Switch from "components/Switch";
+import { withToastNoThrow } from "components/toast/Toast";
 // Style
 import "./changeHostUserPassword.scss";
-import { getWifiCredentials } from "services/dnpInstalled/selectors";
-import { withToastNoThrow } from "components/toast/Toast";
 
 export default function ChangeWifiPassword() {
-  const wifiCredentials = useSelector(getWifiCredentials);
+  const wifiStatus = useSelector(getWifiStatus);
+  const prevSsid = wifiStatus?.ssid || "";
 
-  const prevSsid = (wifiCredentials || {}).ssid || "";
   const [ssid, setSsid] = useState(prevSsid);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

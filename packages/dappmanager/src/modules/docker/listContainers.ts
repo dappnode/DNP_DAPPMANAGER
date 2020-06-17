@@ -1,24 +1,23 @@
 import { dockerList } from "./dockerApi";
 import { ContainerInfo } from "dockerode";
-// dedicated modules
 import { shortName } from "../../utils/strings";
 import params from "../../params";
 import {
   PackageContainer,
   VolumeMapping,
   ContainerStatus,
-  PortProtocol
+  PortProtocol,
+  PortMapping
 } from "../../types";
-import {
-  readDefaultsFromLabels,
-  readMetadataFromLabels
-} from "../../utils/containerLabelsDb";
 import {
   parseEnvironment,
   parsePortMappings,
-  parseVolumeMappings
-} from "../../utils/dockerComposeParsers";
+  parseVolumeMappings,
+  readDefaultsFromLabels,
+  readMetadataFromLabels
+} from "../compose";
 import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
+import { uniq, concat } from "lodash";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -57,47 +56,41 @@ export async function listContainers(): Promise<PackageContainer[]> {
    *   "nginxproxydnpdappnodeeth_html": "nginx-proxy.dnp.dappnode.eth"
    * }
    */
-  const namedVolumesUsers: {
-    [dnpName: string]: string[];
-  } = {};
-  for (const dnp of dnpList) {
-    for (const vol of dnp.volumes || []) {
-      if (!vol.name) continue;
-      if (!namedVolumesUsers[vol.name])
-        namedVolumesUsers[vol.name] = [dnp.name];
-      else if (!namedVolumesUsers[vol.name].includes(dnp.name))
-        namedVolumesUsers[vol.name].push(dnp.name);
-    }
-  }
-  const namedVolumesOwners: {
-    [dnpName: string]: string;
-  } = {};
+  const namedVolumesUsers: { [dnpName: string]: string[] } = {};
+  const namedVolumesOwners: { [dnpName: string]: string } = {};
+  for (const dnp of dnpList)
+    for (const vol of dnp.volumes || [])
+      if (dnp.name && vol.name)
+        namedVolumesUsers[vol.name] = uniq(
+          concat(namedVolumesUsers[vol.name] || [], dnp.name)
+        );
   for (const [volName, users] of Object.entries(namedVolumesUsers)) {
-    for (const dnpName of users) {
-      // "nginx-proxy.dnp.dappnode.eth" => "nginxproxydnpdappnodeeth"
+    for (const dnpName of users)
       if (volName.includes(dnpName.replace(/[^0-9a-z]/gi, "")))
+        // "nginx-proxy.dnp.dappnode.eth" => "nginxproxydnpdappnodeeth"
         namedVolumesOwners[volName] = dnpName;
-    }
+
     // Fallback, assign ownership to the first user
     if (!namedVolumesOwners[volName]) namedVolumesOwners[volName] = users[0];
   }
 
-  const dnpListExtended: PackageContainer[] = dnpList.map(dnp => {
-    if (!dnp.volumes) return dnp;
-    const volumes = dnp.volumes.map(vol => {
-      let newVol: VolumeMapping;
-      if (vol.name)
-        newVol = {
-          ...vol,
-          users: namedVolumesUsers[vol.name],
-          owner: namedVolumesOwners[vol.name],
-          isOwner: namedVolumesOwners[vol.name] === dnp.name
-        };
-      else newVol = vol;
-      return newVol;
-    });
-    return { ...dnp, volumes };
-  });
+  const dnpListExtended = dnpList.map(
+    (dnp): PackageContainer => {
+      if (!dnp.volumes) return dnp;
+      const volumes = dnp.volumes.map(
+        (vol): VolumeMapping => {
+          let newVol: VolumeMapping;
+          if (vol.name) {
+            const users = namedVolumesUsers[vol.name];
+            const owner = namedVolumesOwners[vol.name];
+            newVol = { ...vol, users, owner, isOwner: owner === dnp.name };
+          } else newVol = vol;
+          return newVol;
+        }
+      );
+      return { ...dnp, volumes };
+    }
+  );
 
   return dnpListExtended;
 }
@@ -175,22 +168,23 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
   //   dappnode.dnp.origin
   //   dappnode.dnp.chain
   const labels = container.Labels;
-  const {
-    defaultEnvironment,
-    defaultPorts,
-    defaultVolumes
-  } = readDefaultsFromLabels(labels);
+  const defaults = readDefaultsFromLabels(labels);
   const {
     dependencies,
     avatar,
     chain,
     origin,
-    isCore,
-    domainAlias
+    isCore
   } = readMetadataFromLabels(labels);
-  const defaultEnvironmentParsed = parseEnvironment(defaultEnvironment);
-  const defaultPortsParsed = parsePortMappings(defaultPorts);
-  const defaultVolumesParsed = parseVolumeMappings(defaultVolumes);
+  const defaultEnvironment = defaults.environment
+    ? parseEnvironment(defaults.environment)
+    : undefined;
+  const defaultPorts = defaults.ports
+    ? parsePortMappings(defaults.ports)
+    : undefined;
+  const defaultVolumes = defaults.volumes
+    ? parseVolumeMappings(defaults.volumes)
+    : undefined;
   const avatarUrl = multiaddressToGatewayUrl(avatar);
 
   return {
@@ -209,33 +203,38 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
       ...(PublicPort ? { host: PublicPort } : {}),
       container: PrivatePort,
       protocol: (Type === "udp" ? "UDP" : "TCP") as PortProtocol
-    })).map(port => ({
-      ...port,
-      deletable:
-        defaultPortsParsed.length > 0 &&
-        !defaultPortsParsed.find(
-          defaultPort =>
-            defaultPort.container == port.container &&
-            defaultPort.protocol == port.protocol
+    })).map(
+      (port): PortMapping => ({
+        ...port,
+        deletable: Boolean(
+          defaultPorts &&
+            defaultPorts.length > 0 &&
+            !defaultPorts.find(
+              defaultPort =>
+                defaultPort.container == port.container &&
+                defaultPort.protocol == port.protocol
+            )
         )
-    })),
-    volumes: container.Mounts.map(({ Name, Source, Destination }) => ({
-      host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
-      container: Destination, // "/etc/nginx/vhost.d"
-      // "Name" will be undefined if it's not a named volumed
-      ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
-    })),
+      })
+    ),
+    volumes: container.Mounts.map(
+      ({ Name, Source, Destination }): VolumeMapping => ({
+        host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+        container: Destination, // "/etc/nginx/vhost.d"
+        // "Name" will be undefined if it's not a named volumed
+        ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
+      })
+    ),
     state: container.State as ContainerStatus,
     running: container.State === "running",
     dependencies,
     avatarUrl,
     origin,
     chain,
-    ...(domainAlias ? { domainAlias } : {}),
     canBeFullnode: allowedFullnodeDnpNames.includes(name),
     // Default values to avoid having to read the manifest
-    defaultEnvironment: defaultEnvironmentParsed,
-    defaultPorts: defaultPortsParsed,
-    defaultVolumes: defaultVolumesParsed
+    defaultEnvironment,
+    defaultPorts,
+    defaultVolumes
   };
 }

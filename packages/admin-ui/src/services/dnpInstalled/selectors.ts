@@ -1,12 +1,5 @@
 import { RootState } from "rootReducer";
-import {
-  wifiName,
-  ipfsName,
-  wifiDefaultSSID,
-  wifiDefaultWPA_PASSPHRASE,
-  wifiEnvWPA_PASSPHRASE,
-  wifiEnvSSID
-} from "params";
+import { ipfsName } from "params";
 import { PackageContainer } from "types";
 
 // Service > dnpInstalled
@@ -15,31 +8,6 @@ export const getDnpInstalled = (state: RootState): PackageContainer[] =>
   state.dnpInstalled.dnpInstalled;
 export const getDnpInstalledStatus = (state: RootState) =>
   state.dnpInstalled.requestStatus;
-
-export const getWifiCredentials = (
-  state: RootState
-): { ssid: string; pass: string } | null => {
-  const dnps = getDnpInstalled(state);
-  const wifiDnp = dnps.find(dnp => dnp.name === wifiName);
-  if (!wifiDnp || !wifiDnp.envs) return null;
-  return {
-    ssid: wifiDnp.envs[wifiEnvSSID],
-    pass: wifiDnp.envs[wifiEnvWPA_PASSPHRASE]
-  };
-};
-
-/**
- * Check if the wifi DNP has the same credentials as the default ones
- * @returns credentials are the same as the default ones
- */
-export const getAreWifiCredentialsDefault = (state: RootState): boolean => {
-  const wifiCredentials = getWifiCredentials(state);
-  if (!wifiCredentials) return false;
-  return (
-    wifiCredentials.pass === wifiDefaultWPA_PASSPHRASE &&
-    wifiCredentials.ssid === wifiDefaultSSID
-  );
-};
 
 /**
  * Returns object ready to check if a port is used or not

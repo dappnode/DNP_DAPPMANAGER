@@ -1,13 +1,16 @@
 import * as db from "../../db";
-import downloadRelease from "./ipfs/downloadRelease";
-import { isEnsDomain } from "../../utils/validate";
+import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
+import { isEnsDomain, isIpfsHash } from "../../utils/validate";
 import { PackageRelease } from "../../types";
-import {
-  parseMetadataFromManifest,
-  sanitizeCompose,
-  getIsCore,
-  getReleaseWarnings
-} from "./parsers";
+import { getIsCore } from "../manifest/getIsCore";
+import { parseMetadataFromManifest } from "../manifest";
+import { DistributedFile, Compose, Manifest } from "../../common";
+import { parseUnsafeCompose } from "../compose/unsafeCompose";
+import { ComposeEditor } from "../compose/editor";
+import { shortNameDomain } from "../../utils/format";
+import { writeMetadataToLabels } from "../compose";
+import { fileToMultiaddress } from "../../utils/distributedFile";
+import { getGlobalEnvsFilePath } from "../../utils/globalEnvsFile";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -21,50 +24,102 @@ import {
  * @param name
  * @param version
  */
-export async function getReleaseFromIpfs({
+export async function getRelease({
   hash,
-  name,
+  name: reqName,
   origin
 }: {
   hash: string;
   name?: string;
   origin?: string;
 }): Promise<PackageRelease> {
-  const id = name || hash;
-  // 2. Download the release data
   const {
     manifestFile,
     imageFile,
     avatarFile,
     manifest,
     composeUnsafe
-  } = await downloadRelease(hash).catch(e => {
-    e.message = `Can't download ${id} release: ${e.message}`;
-    throw e; // Use this format to keep the stack trace
-  });
+  } = await downloadRelease(hash, reqName || hash);
 
-  // Verify that the request was correct: hash mismatch
-  // Except if the id is = "/ipfs/Qm...", there is no provided name
-  if (name && isEnsDomain(name) && name !== manifest.name)
+  if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
 
-  const release = {
-    name: manifest.name,
+  const name = manifest.name;
+  const isCore = getIsCore(manifest);
+
+  const metadata = parseMetadataFromManifest(manifest);
+  const compose = new ComposeEditor(
+    parseUnsafeCompose(composeUnsafe, manifest)
+  );
+
+  // Add SSL environment variables
+  if (manifest.ssl) {
+    const dnpSubDomain = `${shortNameDomain(name)}.${db.domain.get()}`;
+    compose.service().mergeEnvs({
+      VIRTUAL_HOST: dnpSubDomain,
+      LETSENCRYPT_HOST: dnpSubDomain
+    });
+  }
+
+  // Add global env_file on request
+  if ((manifest.globalEnvs || {}).all)
+    compose.service().addEnvFile(getGlobalEnvsFilePath(isCore));
+
+  compose.service().mergeLabels(
+    writeMetadataToLabels({
+      dependencies: metadata.dependencies || {},
+      avatar: fileToMultiaddress(avatarFile),
+      chain: metadata.chain,
+      origin,
+      isCore
+    })
+  );
+
+  return {
+    name,
     reqVersion: origin || manifest.version,
     semVersion: manifest.version,
     origin,
-    isCore: getIsCore(manifest),
+    isCore,
     manifestFile,
     imageFile,
     avatarFile,
-    metadata: parseMetadataFromManifest(manifest),
-    compose: sanitizeCompose(composeUnsafe, manifest, {
-      domain: db.domain.get()
-    })
+    metadata,
+    compose: compose.output(),
+    // Generates an object of warnings so other components can
+    // decide to throw an error or just show a warning in the UI
+    warnings: {
+      unverifiedCore:
+        isCore && Boolean(origin) && name.endsWith(".dnp.dappnode.eth"),
+      requestNameMismatch:
+        isEnsDomain(reqName || "") && reqName !== manifest.name
+    }
   };
+}
 
-  return {
-    ...release,
-    warnings: getReleaseWarnings(release)
-  };
+/**
+ * Switch to download release from each sources
+ * @param hash `"/ipfs/Qm..."`
+ * @param id For debugging `"package.dnp.dappnode.eth"`
+ */
+async function downloadRelease(
+  hash: string,
+  id: string
+): Promise<{
+  manifestFile: DistributedFile;
+  imageFile: DistributedFile;
+  avatarFile?: DistributedFile;
+  composeUnsafe: Compose;
+  manifest: Manifest;
+}> {
+  if (isIpfsHash(hash)) {
+    try {
+      return await downloadReleaseIpfs(hash);
+    } catch (e) {
+      e.message = `Error downloading ${id} release from IPFS: ${e.message}`;
+      throw e; // Use this format to keep the stack trace
+    }
+  } else {
+    throw Error(`Unknown hash type: ${hash}`);
+  }
 }

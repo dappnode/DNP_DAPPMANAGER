@@ -1,7 +1,4 @@
 import * as ipfs from "../../ipfs";
-import * as validate from "../../../utils/validate";
-import { isAbsolute } from "path";
-import { validateImage } from "../parsers/validate";
 import { isIpfsHash } from "../../../utils/validate";
 
 /**
@@ -26,31 +23,7 @@ export default async function downloadImage(
 ): Promise<void> {
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
-  /**
-   * 0. Validate parameters
-   */
-  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
-    throw Error(`Invalid path: "${path}"`);
-  validate.path(path);
-
-  /**
-   * 1. Check if cache exist and validate it
-   */
-  const imageIsOk = await validateImage(path).then(() => true, () => false);
-  if (imageIsOk) return;
-
-  /**
-   * 2. Cat stream to file system
-   * - Make sure the path is correct and the parent folder exist or is created
-   */
+  // Cat stream to file system
+  // Make sure the path is correct and the parent folder exist or is created
   await ipfs.catStreamToFs({ hash, path, fileSize, progress });
-
-  /**
-   * 3. Validate downloaded image
-   */
-  await validateImage(path).catch(e => {
-    throw Error(
-      `Downloaded image from ${hash} to ${path} failed validation: ${e.message}`
-    );
-  });
 }

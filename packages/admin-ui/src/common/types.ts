@@ -152,6 +152,16 @@ export interface SetupUiJson {
 
 // Settings must include the previous user settings
 
+/**
+ * ```js
+ * "bitcoin.dnp.dappnode.eth": {
+ *   environment: { MODE: "VALUE_SET_BEFORE" }
+ *   portMappings: { "8443": "8443"; "8443/udp": "8443" },
+ *   namedVolumeMountpoints: { data: "" }
+ *   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
+ * };
+ * ```
+ */
 export interface UserSettings {
   environment?: { [envName: string]: string }; // Env value
   portMappings?: { [containerPortAndType: string]: string }; // Host port
@@ -159,13 +169,10 @@ export interface UserSettings {
   allNamedVolumeMountpoint?: string; // mountpoint
   fileUploads?: { [containerPath: string]: string }; // dataURL
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
+  // ### DEPRECATED Kept for legacy compatibility
+  legacyBindVolumes?: { [volumeName: string]: string }; // Host vol name to host bind absolute path
 }
-// "bitcoin.dnp.dappnode.eth": {
-//   environment: { MODE: "VALUE_SET_BEFORE" }
-//   portMappings: { "8443": "8443"; "8443/udp": "8443" },
-//   namedVolumeMountpoints: { data: "" }
-//   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
-// };
+
 export interface UserSettingsAllDnps {
   [dnpName: string]: UserSettings;
 }
@@ -195,7 +202,7 @@ export interface RequestedDnp {
   isInstalled: boolean;
   // Decoupled metadata
   metadata: PackageReleaseMetadata;
-  specialPermissions: SpecialPermission[];
+  specialPermissions: SpecialPermissionAllDnps;
   // Request status and dependencies
   request: {
     compatible: {
@@ -249,13 +256,13 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
-interface BasicVolumeMapping {
+export interface VolumeMappingDocker {
   host: string; // path
   container: string; // dest
   name?: string;
 }
 
-export interface VolumeMapping extends BasicVolumeMapping {
+export interface VolumeMapping extends VolumeMappingDocker {
   users?: string[];
   owner?: string;
   isOwner?: boolean;
@@ -289,12 +296,11 @@ export interface PackageContainer {
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerStatus;
   running: boolean;
-  envs?: PackageEnvs;
   ports: PortMapping[];
   volumes: VolumeMapping[];
-  defaultEnvironment: PackageEnvs;
-  defaultPorts: PortMapping[];
-  defaultVolumes: VolumeMapping[];
+  defaultEnvironment?: PackageEnvs;
+  defaultPorts?: PortMapping[];
+  defaultVolumes?: VolumeMapping[];
   dependencies: Dependencies;
   avatarUrl: string;
   origin?: string;
@@ -306,6 +312,8 @@ export interface PackageContainer {
   manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
+  // Note: environment is only accessible doing a container inspect or reading the compose
+  // envs?: PackageEnvs;
 }
 
 export interface PackageEnvs {
@@ -375,16 +383,16 @@ export interface ComposeVolumes {
   };
 }
 
-interface ComposeServiceBase {
-  container_name?: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  image?: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+export interface ComposeService {
+  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   ports?: string[];
-  environment?: string[];
+  environment?: PackageEnvs;
   labels?: { [labelName: string]: string };
-  // env_file: string; IGNORED, Use environment
+  env_file?: string[];
   // ipv4_address: "172.33.1.7";
-  networks?: string[] | { network: { ipv4_address: string } };
+  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
   dns?: string; // "172.33.1.2";
   restart?: string; // "always";
   privileged?: boolean;
@@ -403,25 +411,12 @@ interface ComposeServiceBase {
   };
 }
 
-export interface ComposeServiceUnsafe extends ComposeServiceBase {
-  build?:
-    | {
-        context: string; // ".";
-        dockerfile: string; // "./build/Dockerfile";
-      }
-    | string;
-  container_name?: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  image?: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-}
-
-export interface ComposeService extends ComposeServiceBase {
-  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  env_file?: string[];
-}
-
-interface ComposeBase {
+export interface Compose {
   version: string; // "3.4"
+  // dnpName: "dappmanager.dnp.dappnode.eth"
+  services: {
+    [dnpName: string]: ComposeService;
+  };
   networks?: {
     [networkName: string]: {
       external?: boolean;
@@ -430,20 +425,6 @@ interface ComposeBase {
     };
   };
   volumes?: ComposeVolumes; // { dappmanagerdnpdappnodeeth_data: {} };
-}
-
-export interface ComposeUnsafe extends ComposeBase {
-  // dnpName: "dappmanager.dnp.dappnode.eth"
-  services: {
-    [dnpName: string]: ComposeServiceUnsafe;
-  };
-}
-
-export interface Compose extends ComposeBase {
-  // dnpName: "dappmanager.dnp.dappnode.eth"
-  services: {
-    [dnpName: string]: ComposeService;
-  };
 }
 
 export interface PackagePort {
@@ -689,12 +670,24 @@ export interface DistributedFile {
 }
 
 export interface ReleaseWarnings {
+  /**
+   * If a core package does not come from the DAppNode Package APM registry
+   */
   unverifiedCore?: boolean;
+  /**
+   * If the requested name does not match the manifest name
+   */
+  requestNameMismatch?: boolean;
 }
 
 export interface SpecialPermission {
   name: string; // "Short description",
   details: string; // "Long description of the capabilitites"
+  serviceName?: string; // Extra data
+}
+
+export interface SpecialPermissionAllDnps {
+  [dnpName: string]: SpecialPermission[];
 }
 
 export interface PackageRelease {

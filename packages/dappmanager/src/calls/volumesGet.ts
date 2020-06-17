@@ -1,7 +1,7 @@
 import { dockerDf, dockerVolumesList } from "../modules/docker/dockerApi";
 import { listContainers } from "../modules/docker/listContainers";
 import { detectMountpoints } from "../modules/hostScripts";
-import { parseDevicePath } from "../utils/dockerComposeParsers";
+import { parseDevicePath } from "../modules/compose";
 import { VolumeData } from "../types";
 
 /**

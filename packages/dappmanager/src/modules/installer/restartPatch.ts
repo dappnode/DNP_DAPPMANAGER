@@ -7,9 +7,7 @@ import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
 import params from "../../params";
 import { logs } from "../../logs";
-import { Compose, InstallPackageData } from "../../types";
-import { writeComposeObj, readComposeObj } from "../../utils/dockerComposeFile";
-import { parseService } from "../../utils/dockerComposeParsers";
+import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
 import { containerInspect, logContainer } from "../docker/dockerApi";
 import { dockerRm } from "../docker/dockerCommands";
@@ -18,14 +16,13 @@ import { rollbackPackages } from "./rollbackPackages";
 import { postInstallClean } from "./postInstallClean";
 import { afterInstall } from "./afterInstall";
 import { flagPackagesAreInstalling } from "./packageIsInstalling";
+import { ComposeEditor } from "../compose/editor";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
 const restartContainerName = params.restartContainerName;
 const restartScriptPath = path.join(params.DNCORE_DIR, "restart-dappnode.sh");
 const timeoutWaitForRestart = 60 * 1000;
-
-/* eslint-disable @typescript-eslint/camelcase */
 
 /**
  * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it
@@ -103,13 +100,14 @@ exit $UPEXIT
 
   fs.writeFileSync(restartScriptPath, restartScript);
 
-  const dappmanagerCompose = readComposeObj(composePath);
-  const dappmanagerService = parseService(dappmanagerCompose);
-  const composeRestart: Compose = {
+  const dappmCompose = new ComposeEditor(ComposeEditor.readFrom(composePath));
+  const dappmanagerNewImage = dappmCompose.service().get().image;
+
+  const composeRestart = new ComposeEditor({
     version: "3.4",
     services: {
       [restartId]: {
-        image: dappmanagerService.image,
+        image: dappmanagerNewImage,
         container_name: restartContainerName,
         // Using `network_mode: none` to prevent creating a useless
         // network that may conflict with future restart containers (it has happen in Dec 2019)
@@ -120,10 +118,10 @@ exit $UPEXIT
         entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`
       }
     }
-  };
+  });
 
   validate.path(composeRestartPath);
-  writeComposeObj(composeRestartPath, composeRestart);
+  composeRestart.writeTo(composeRestartPath);
 
   try {
     if (packagesData) db.coreUpdatePackagesData.set(packagesData);
@@ -236,5 +234,3 @@ async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspect
     else throw e;
   }
 }
-
-/* eslint-enable @typescript-eslint/camelcase */

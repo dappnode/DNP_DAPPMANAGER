@@ -1,5 +1,6 @@
 import fs from "fs";
 import params from "../../params";
+import { isNotFoundError } from "../../utils/node";
 
 /**
  * contentHashes = {
@@ -30,7 +31,7 @@ export function loadContentHashes(filepath: string): ContentHashes | undefined {
     const packagesContentHashData = fs.readFileSync(filepath, "utf8");
     return parseContentHashFile(packagesContentHashData);
   } catch (e) {
-    if (e.code !== "ENOENT") throw e;
+    if (!isNotFoundError(e)) throw e;
   }
 }
 
