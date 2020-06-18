@@ -115,7 +115,7 @@ export async function listContainerNoThrow(
 
 export async function listContainer(byName: string): Promise<PackageContainer> {
   const container = await listContainerNoThrow(byName);
-  if (!container) throw Error(`No DNP was found for name ${byName}`);
+  if (!container) throw Error(`${byName} package not found`);
   return container;
 }
 

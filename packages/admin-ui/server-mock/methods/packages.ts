@@ -139,7 +139,7 @@ export async function packageGet({
   id: string;
 }): Promise<InstalledPackageDetailData> {
   const pkg = packages.get(id);
-  if (!pkg) throw Error(`No detail data for ${id}`);
+  if (!pkg) throw Error(`${id} package not found`);
   return pkg;
 }
 

@@ -6,8 +6,6 @@ import { PackageContainer } from "types";
 
 export const getDnpInstalled = (state: RootState): PackageContainer[] =>
   state.dnpInstalled.dnpInstalled;
-export const getDnpInstalledStatus = (state: RootState) =>
-  state.dnpInstalled.requestStatus;
 
 /**
  * Returns object ready to check if a port is used or not

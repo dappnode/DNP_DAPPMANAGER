@@ -22,31 +22,27 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
 import { shortNameCapitalized } from "utils/format";
-// Selectors
-import { getDnpInstalledStatus } from "services/dnpInstalled/selectors";
+
 
 export const PackageInterface: React.FC<RouteComponentProps<{
   id: string;
 }>> = ({ match }) => {
   const id = decodeURIComponent(match.params.id || "");
 
-  // Fetching status
-  const { loading, error } = useSelector(getDnpInstalledStatus);
-  const areThereDnps = useSelector(s.areThereDnps);
-  // Dnp data
-  const dnp = useSelector((state: any) => s.getDnpById(state, id));
-  const { data: dnpDetail } = useApi.packageGet({ id });
-
+  const dnpRequest = useApi.packageGet({ id });
+  const dnp = dnpRequest.data;
   if (!dnp) {
     return (
       <>
         <Title title={title} subtitle={id} />
-        {loading ? (
+        {dnpRequest.isValidating ? (
           <Loading steps={["Loading your DAppNode Packages"]} />
-        ) : error ? (
-          <ErrorView error={`Error loading your DAppNode Packages: ${error}`} />
-        ) : areThereDnps ? (
-          <NoDnpInstalled id={id} />
+        ) : dnpRequest.error ? (
+          dnpRequest.error.message.includes("package not found") ? (
+            <NoDnpInstalled id={id} />
+          ) : (
+            <ErrorView error={dnpRequest.error} />
+          )
         ) : (
           <ErrorView error="Unknown error, package not found" />
         )}
@@ -57,15 +53,18 @@ export const PackageInterface: React.FC<RouteComponentProps<{
   const DnpSpecific = dnpSpecific[dnp.name];
 
   const dnpName = dnp.name;
-  const { isCore, state, volumes, ports } = dnp;
   const {
+    isCore,
+    state,
+    volumes,
+    ports,
     userSettings,
     setupWizard,
     manifest,
     gettingStarted,
     gettingStartedShow,
     volumesSize: volumesDetail
-  } = dnpDetail || {};
+  } = dnp;
   const { backup = [] } = manifest || {};
 
   /**
