@@ -1,11 +1,8 @@
-import { mapValues } from "lodash";
-import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { readManifestIfExists } from "../modules/manifest";
 import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
-import { parseDevicePath } from "../modules/compose";
 import { ComposeFileEditor } from "../modules/compose/editor";
 
 /**
@@ -20,43 +17,6 @@ export async function packageGet({
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp: InstalledPackageDetailData = await listContainer(id);
-
-  // Detailed volume info
-  try {
-    const volDevicePaths: { [volumeName: string]: string } = {};
-
-    for (const vol of dnp.volumes) {
-      if (vol.name) {
-        const volInfo = await dockerVolumeInspect(vol.name);
-        if (
-          volInfo.Options &&
-          volInfo.Options.device &&
-          volInfo.Driver === "local" &&
-          volInfo.Options.o === "bind"
-        )
-          volDevicePaths[vol.name] = volInfo.Options.device;
-      }
-    }
-
-    // Only call this very expensive function if necessary
-    // TODO: This feature is deactivated until UX is sorted out
-    //       calling du on massive dirs is too resource consuming
-    //       and can take +30min on Storj data
-    // const volumeSizes = isEmpty(volDevicePaths)
-    //   ? {}
-    //   : await getHostVolumeSizes(volDevicePaths);
-
-    dnp.volumesSize = mapValues(volDevicePaths, (devicePath /* volName */) => {
-      const pathParts = parseDevicePath(devicePath);
-      return {
-        size: undefined, // volumeSizes[volName]
-        devicePath,
-        mountpoint: pathParts ? pathParts.mountpoint : undefined
-      };
-    });
-  } catch (e) {
-    logs.warn(`Error getting volume details for ${dnp.name}`, e);
-  }
 
   try {
     const manifest = readManifestIfExists(dnp);

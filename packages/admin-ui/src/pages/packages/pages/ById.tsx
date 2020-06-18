@@ -59,8 +59,7 @@ export const PackageById: React.FC<RouteComponentProps<{
     setupWizard,
     manifest,
     gettingStarted,
-    gettingStartedShow,
-    volumesSize: volumesDetail
+    gettingStartedShow
   } = dnp;
   const { backup = [] } = manifest || {};
 
@@ -74,10 +73,7 @@ export const PackageById: React.FC<RouteComponentProps<{
       name: "Info",
       subPath: "info",
       render: () => (
-        <Info
-          dnp={dnp}
-          {...{ manifest, gettingStarted, gettingStartedShow, volumesDetail }}
-        />
+        <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />
       ),
       available: true
     },

@@ -162,7 +162,14 @@ Content in the first column | Content in the second column
         protocol: "UDP"
       }
     ],
-    volumes: [],
+    volumes: [
+      {
+        name: "lightning-networkpublicdappnodeeth_data",
+        owner: "lightning-network.public.dappnode.eth",
+        host: "data",
+        container: "./data/ethereum"
+      }
+    ],
     userSettings: {
       environment: {
         ENV_NAME: "ENV_VALUE"

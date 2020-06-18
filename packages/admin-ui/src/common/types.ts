@@ -314,15 +314,6 @@ export interface PackageContainer {
 export interface InstalledPackageData extends PackageContainer {}
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
-  // ### Have this in a separate endpoint?
-  volumesSize?: {
-    // volumeName = bitcoin_data
-    [volumeName: string]: {
-      size?: string; // "823203"
-      devicePath: string; // "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
-      mountpoint?: string; // "/dev1/data"
-    };
-  };
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;
   gettingStarted?: string;
@@ -838,7 +829,7 @@ export interface VolumeData {
   nameDisplay?: string; // "data", Guessed short name for display
   ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
   createdAt: number; // 1569346006000,
-  mountpoint: string; // "",
+  mountpoint: string; // "/dev1/data",
   fileSystem?: MountpointData;
   size?: number; // 161254123,
   refCount?: number; // 2

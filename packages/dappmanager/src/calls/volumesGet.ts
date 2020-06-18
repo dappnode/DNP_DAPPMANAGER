@@ -13,8 +13,8 @@ export async function volumesGet(): Promise<VolumeData[]> {
   const dnpList = await listContainers();
 
   // This expensive function won't be called on empty volDevicePaths
-  const callDetectMountpoints = volumes.some(vol => (vol.Options || {}).device);
-  const mountpoints = callDetectMountpoints ? await detectMountpoints() : [];
+  const shouldDetectMountpoints = volumes.some(vol => vol.Options?.device);
+  const mountpoints = shouldDetectMountpoints ? await detectMountpoints() : [];
 
   // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
   //       calling du on massive dirs can take +30min (i.e. Storj data));
