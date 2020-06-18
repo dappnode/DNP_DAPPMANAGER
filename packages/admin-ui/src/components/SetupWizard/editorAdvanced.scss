@@ -1,0 +1,15 @@
+table.editor-advanced-table,
+.editor-advanced-table table {
+  width: 100%;
+
+  // Also in the last table to provide extra spacing
+  margin-bottom: var(--default-spacing);
+
+  tr:not(:last-child) td,
+  thead td {
+    padding-bottom: var(--default-spacing);
+  }
+  td:not(:last-child) {
+    padding-right: var(--default-spacing);
+  }
+}
