@@ -42,6 +42,7 @@ export default function Config({
       userSettings={localUserSettings}
       onSubmit={onSubmit}
       submitTag="Update"
+      disableIfEqual={true}
     />
   );
 }
