@@ -1,6 +1,4 @@
 import { RootState } from "rootReducer";
-import { autoUpdateIds } from "params";
-import { createSelector } from "reselect";
 import { getEthClientPrettyStatusError } from "components/EthMultiClient";
 
 // Service > dappnodeStatus
@@ -10,8 +8,6 @@ const getSystemInfo = (state: RootState) => state.dappnodeStatus.systemInfo;
 export const getDappnodeParams = (state: RootState) => getSystemInfo(state);
 export const getPasswordIsSecure = (state: RootState) =>
   state.dappnodeStatus.passwordIsSecure;
-export const getAutoUpdateData = (state: RootState) =>
-  state.dappnodeStatus.autoUpdateData;
 export const getIdentityAddress = (state: RootState) =>
   (getSystemInfo(state) || {}).identityAddress;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
@@ -67,12 +63,3 @@ export const getStaticIp = (state: RootState) =>
 
 export const getWifiStatus = (state: RootState) =>
   state.dappnodeStatus.wifiStatus;
-
-export const getIsCoreAutoUpdateActive = createSelector(
-  getAutoUpdateData,
-  autoUpdateData =>
-    (
-      ((autoUpdateData || {}).settings || {})[autoUpdateIds.SYSTEM_PACKAGES] ||
-      {}
-    ).enabled
-);

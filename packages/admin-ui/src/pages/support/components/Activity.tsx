@@ -30,6 +30,12 @@ export default function Activity() {
   const userActionLogs = useApi.getUserActionLogs({ first: count });
   useSubscription.userActionLog(userActionLogs.revalidate);
 
+  // Store logs in internal cache so the screen is not blank on loadMore
+  const [dataCache, setDataCache] = useState<UserActionLog[]>();
+  useEffect(() => {
+    if (userActionLogs.data) setDataCache(userActionLogs.data);
+  }, [userActionLogs.data]);
+
   function loadMore() {
     setCount(n => n + 50);
   }
@@ -53,9 +59,9 @@ export default function Activity() {
       </div>
 
       {/* Activity list */}
-      {userActionLogs.data ? (
+      {dataCache ? (
         <CardList>
-          {userActionLogs.data.map((log, i) => (
+          {dataCache.map((log, i) => (
             <ActivityItem key={i} log={log} />
           ))}
         </CardList>

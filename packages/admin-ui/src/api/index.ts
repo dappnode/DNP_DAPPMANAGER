@@ -28,6 +28,21 @@ const socketIoUrl = apiUrl;
 /* eslint-disable-next-line no-console */
 console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
 
+const routeSubscription: Partial<
+  {
+    [K in keyof Routes]: keyof Subscriptions;
+  }
+> = {
+  autoUpdateDataGet: "autoUpdateData",
+  devicesList: "devices",
+  getUserActionLogs: "userActionLog",
+  notificationsGet: "pushNotification",
+  packageGet: "packages",
+  packagesGet: "packages",
+  systemInfoGet: "systemInfo",
+  volumesGet: "volumes"
+};
+
 /**
  * Bridges events from the API websockets client to any consumer in the App
  * All WAMP events will be emitted in this PubSub instance
@@ -78,13 +93,35 @@ export const useApi: {
   [K in keyof Routes]: (
     ...args: Parameters<Routes[K]>
   ) => responseInterface<ResolvedType<Routes[K]>, Error>;
-} = mapValues(api, (handler, route) => {
+} = mapValues(routesData, (data, route) => {
   return function(...args: any[]) {
     const argsKey = args.length > 0 ? JSON.stringify(args) : "";
-    const fetcher: (...args: any[]) => Promise<any> = handler;
-    return useSWR([route, argsKey], () => fetcher(...args));
+    const fetcher = (...args: any[]) => callRoute<any>(route, args);
+    const swr = useSWR([route, argsKey], () => fetcher(...args));
+
+    // Attach optional subscriptions
+    const subscriptionRoute = routeSubscription[route as keyof Routes];
+    if (subscriptionRoute) useSubscribe(subscriptionRoute, swr.revalidate);
+
+    return swr;
   };
 });
+
+/**
+ * Bridges a single event from the API websockets client to any consumer in the App
+ * **Note**: this callback MUST be memoized
+ */
+export function useSubscribe(
+  route: keyof Subscriptions,
+  callback: (data: any) => void
+): void {
+  useEffect(() => {
+    apiEventBridge.on(route, callback);
+    return () => {
+      apiEventBridge.off(route, callback);
+    };
+  }, [route, callback]);
+}
 
 /**
  * Bridges events from the API websockets client to any consumer in the App
@@ -111,12 +148,7 @@ export const useSubscription: {
   ) => void;
 } = mapValues(subscriptionsData, (data, route) => {
   return function(callback: (...args: any) => void) {
-    useEffect(() => {
-      apiEventBridge.on(route, callback);
-      return () => {
-        apiEventBridge.off(route, callback);
-      };
-    }, [callback]);
+    useSubscribe(route as keyof Subscriptions, callback);
   };
 });
 

@@ -13,17 +13,11 @@ import {
 // Update
 
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
-export const updateAutoUpdateData = dappnodeStatus.actions.autoUpdateData;
 export const updateVolumes = dappnodeStatus.actions.volumes;
 const updateWifiStatus = dappnodeStatus.actions.wifiStatus;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 
 // Fetch
-
-export const fetchAutoUpdateData = (): AppThunk => async dispatch =>
-  withTryCatch(async () => {
-    dispatch(updateAutoUpdateData(await api.autoUpdateDataGet()));
-  }, "autoUpdateData");
 
 export const fetchPasswordIsSecure = (): AppThunk => async dispatch =>
   withTryCatch(async () => {

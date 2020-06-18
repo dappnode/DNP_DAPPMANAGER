@@ -1,20 +1,18 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
-import Info from "./PackageViews/Info";
-import { dnpSpecificList, dnpSpecific } from "./PackageViews/DnpSpecific";
-import Logs from "./PackageViews/Logs";
-import Config from "./PackageViews/Config";
-import Ports from "./PackageViews/Ports";
-import { FileManager } from "./PackageViews/FileManager";
-import Backup from "./PackageViews/Backup";
-import { Controls } from "./PackageViews/Controls";
-import NoDnpInstalled from "./NoDnpInstalled";
-import * as s from "../selectors";
+import Info from "../components/Info";
+import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
+import Logs from "../components/Logs";
+import Config from "../components/Config";
+import Ports from "../components/Ports";
+import { FileManager } from "../components/FileManager";
+import Backup from "../components/Backup";
+import { Controls } from "../components/Controls";
+import NoDnpInstalled from "../components/NoDnpInstalled";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
@@ -22,31 +20,26 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
 import { shortNameCapitalized } from "utils/format";
-// Selectors
-import { getDnpInstalledStatus } from "services/dnpInstalled/selectors";
 
-export const PackageInterface: React.FC<RouteComponentProps<{
+export const PackageById: React.FC<RouteComponentProps<{
   id: string;
 }>> = ({ match }) => {
   const id = decodeURIComponent(match.params.id || "");
 
-  // Fetching status
-  const { loading, error } = useSelector(getDnpInstalledStatus);
-  const areThereDnps = useSelector(s.areThereDnps);
-  // Dnp data
-  const dnp = useSelector((state: any) => s.getDnpById(state, id));
-  const { data: dnpDetail } = useApi.packageGet({ id });
-
+  const dnpRequest = useApi.packageGet({ id });
+  const dnp = dnpRequest.data;
   if (!dnp) {
     return (
       <>
         <Title title={title} subtitle={id} />
-        {loading ? (
+        {dnpRequest.isValidating ? (
           <Loading steps={["Loading your DAppNode Packages"]} />
-        ) : error ? (
-          <ErrorView error={`Error loading your DAppNode Packages: ${error}`} />
-        ) : areThereDnps ? (
-          <NoDnpInstalled id={id} />
+        ) : dnpRequest.error ? (
+          dnpRequest.error.message.includes("package not found") ? (
+            <NoDnpInstalled id={id} />
+          ) : (
+            <ErrorView error={dnpRequest.error} />
+          )
         ) : (
           <ErrorView error="Unknown error, package not found" />
         )}
@@ -57,15 +50,18 @@ export const PackageInterface: React.FC<RouteComponentProps<{
   const DnpSpecific = dnpSpecific[dnp.name];
 
   const dnpName = dnp.name;
-  const { isCore, state, volumes, ports } = dnp;
   const {
+    isCore,
+    state,
+    volumes,
+    ports,
     userSettings,
     setupWizard,
     manifest,
     gettingStarted,
     gettingStartedShow,
     volumesSize: volumesDetail
-  } = dnpDetail || {};
+  } = dnp;
   const { backup = [] } = manifest || {};
 
   /**

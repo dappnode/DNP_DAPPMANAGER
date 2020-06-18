@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { packageSetEnvironment } from "../../actions";
+import { packageSetEnvironment } from "../actions";
 // Components
 import { SetupWizard } from "components/SetupWizard";
 // Utils

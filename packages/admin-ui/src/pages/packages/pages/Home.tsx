@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { title, rootPath, systemPackagesSubPath } from "../data";
 // Components
-import { PackagesList } from "./PackagesList";
+import { PackagesList } from "../components/PackagesList";
 import Title from "components/Title";
 
 export function PackagesHome({ showCoreDnps }: { showCoreDnps: boolean }) {
