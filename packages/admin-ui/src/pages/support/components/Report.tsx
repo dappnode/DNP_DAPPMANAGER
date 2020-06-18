@@ -12,7 +12,7 @@ import { FaGithub } from "react-icons/fa";
 import { MdChevronRight } from "react-icons/md";
 
 export default function Report() {
-  const dnpsReq = useApi.listPackages();
+  const dnpsReq = useApi.packagesGet();
   const systemInfoReq = useApi.systemInfoGet();
   const diagnoseReq = useApi.diagnose();
   const hostStatsReq = useApi.getStats();

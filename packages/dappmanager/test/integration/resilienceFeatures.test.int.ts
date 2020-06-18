@@ -57,7 +57,7 @@ describe("Resilience features, when things go wrong", function() {
 
   describe("Remove a package without compose", () => {
     before("Install the release", async () => {
-      await calls.installPackage({
+      await calls.packageInstall({
         name: releaseDnpName,
         version: releaseHash
       });
@@ -66,7 +66,7 @@ describe("Resilience features, when things go wrong", function() {
     it("Remove the compose and then remove the package", async () => {
       const composePath = getPath.dockerCompose(releaseDnpName, false);
       fs.unlinkSync(composePath);
-      await calls.removePackage({
+      await calls.packageRemove({
         id: releaseDnpName,
         deleteVolumes: true,
         timeout: 0
@@ -76,7 +76,7 @@ describe("Resilience features, when things go wrong", function() {
 
   describe("Remove a package with a broken compose", () => {
     before("Install the release", async () => {
-      await calls.installPackage({
+      await calls.packageInstall({
         name: releaseDnpName,
         version: releaseHash
       });
@@ -86,7 +86,7 @@ describe("Resilience features, when things go wrong", function() {
       const composePath = getPath.dockerCompose(releaseDnpName, false);
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
-      await calls.removePackage({
+      await calls.packageRemove({
         id: releaseDnpName,
         deleteVolumes: true,
         timeout: 0
@@ -97,7 +97,7 @@ describe("Resilience features, when things go wrong", function() {
   describe("Failing installation due to bad compose", () => {
     let brokenReleaseHash: string;
     before("Install the good release", async () => {
-      await calls.installPackage({
+      await calls.packageInstall({
         name: releaseDnpName,
         version: releaseHash
       });
@@ -121,7 +121,7 @@ describe("Resilience features, when things go wrong", function() {
 
       let errorMessage = "--did not throw--";
       try {
-        await calls.installPackage({
+        await calls.packageInstall({
           name: releaseDnpName,
           version: brokenReleaseHash
         });

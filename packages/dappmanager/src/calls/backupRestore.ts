@@ -7,7 +7,7 @@ import { logs } from "../logs";
 // Modules
 import { listContainer } from "../modules/docker/listContainers";
 // External call
-import { restartPackage } from "./restartPackage";
+import { packageRestart } from "./packageRestart";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
@@ -105,7 +105,7 @@ export async function backupRestore({
     await shell(`rm -rf ${backupDirCompressed}`);
 
     // Restart package so the file changes take effect
-    await restartPackage({ id });
+    await packageRestart({ id });
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
     await shell(`rm -rf ${tempTransferDir}`);

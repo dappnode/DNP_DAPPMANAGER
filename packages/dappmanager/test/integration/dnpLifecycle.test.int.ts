@@ -256,7 +256,7 @@ describe("DNP lifecycle", function() {
   });
 
   before("Should install DNP", async () => {
-    await calls.installPackage({
+    await calls.packageInstall({
       name: idMain,
       version: mainDnpReleaseHash,
       userSettings
@@ -384,12 +384,12 @@ describe("DNP lifecycle", function() {
     });
 
     it(`Should call logPackage for ${idMain}`, async () => {
-      const result = await calls.logPackage({ id: idMain });
+      const result = await calls.packageLog({ id: idMain });
       expect(result).to.be.a("string");
     });
 
     it(`Should call logPackage for ${idDep}`, async () => {
-      const result = await calls.logPackage({ id: idDep });
+      const result = await calls.packageLog({ id: idDep });
       expect(result).to.be.a("string");
     });
   });
@@ -405,7 +405,7 @@ describe("DNP lifecycle", function() {
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
-      await calls.updatePackageEnv({
+      await calls.packageSetEnvironment({
         id: idMain,
         envs: { time: envValue }
       });
@@ -425,7 +425,7 @@ describe("DNP lifecycle", function() {
       const portMappings: PortMapping[] = [
         { host: portNumber, container: portNumber, protocol }
       ];
-      await calls.updatePortMappings({
+      await calls.packageSetPortMappings({
         id: idMain,
         portMappings
       });
@@ -457,7 +457,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should stop the DNP", async () => {
-      await calls.togglePackage({ id: idMain, timeout: 0 });
+      await calls.packageStartStop({ id: idMain, timeout: 0 });
     });
 
     it(`DNP should be running`, async () => {
@@ -466,7 +466,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should start the DNP", async () => {
-      await calls.togglePackage({ id: idMain, timeout: 0 });
+      await calls.packageStartStop({ id: idMain, timeout: 0 });
     });
 
     it(`DNP should be running`, async () => {
@@ -475,7 +475,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should restart the DNP", async () => {
-      await calls.restartPackage({ id: idMain });
+      await calls.packageRestart({ id: idMain });
     });
 
     it(`DNP should be running`, async () => {
@@ -514,7 +514,7 @@ describe("DNP lifecycle", function() {
     // Main depends on the volume of dep, so main should be shutdown
     it(`Should restart the package volumes of ${idDep}`, async () => {
       const dnpMainPrev = await getDnpFromListPackages(idMain);
-      await calls.restartPackageVolumes({ id: idDep });
+      await calls.packageRestartVolumes({ id: idDep });
       const dnpMainNext = await getDnpFromListPackages(idMain);
 
       // To know if main was restarted check that the container is different
@@ -527,7 +527,7 @@ describe("DNP lifecycle", function() {
     });
 
     it(`Should restart the package volumes of ${idMain}`, async () => {
-      await calls.restartPackageVolumes({ id: idMain });
+      await calls.packageRestartVolumes({ id: idMain });
       // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
       // removed but it's data will not. Only the reference in /var/lib/docker
       // is deleted
@@ -550,7 +550,7 @@ describe("DNP lifecycle", function() {
 
   describe("Uninstall the DNP", () => {
     before(`Should remove DNP ${idDep}`, async () => {
-      await calls.removePackage({ id: idDep, deleteVolumes: true });
+      await calls.packageRemove({ id: idDep, deleteVolumes: true });
     });
 
     // Since main depends on a volume of main, it will removed at the same time

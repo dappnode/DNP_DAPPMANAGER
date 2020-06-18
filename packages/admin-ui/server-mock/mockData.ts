@@ -5,12 +5,12 @@ import {
   DirectoryItem,
   SetupWizard,
   ChainData,
-  PackageDetailData,
   SpecialPermissionAllDnps,
-  PackageEnvs
+  PackageEnvs,
+  InstalledPackageDetailData
 } from "../src/common/types";
 
-export interface PackageMockState extends PackageContainer {
+export interface PackageMockState extends InstalledPackageDetailData {
   envs?: PackageEnvs;
 }
 
@@ -1056,16 +1056,11 @@ export const dnpInstalled: PackageMockState[] = [
     ...samplePackageContainer,
     name: raidenMetadata.name,
     isCore: false,
-    avatarUrl: raidenAvatar
-  }
-];
-
-export const packagesDetailData: { [id: string]: PackageDetailData } = {
-  [raidenMetadata.name]: {
+    avatarUrl: raidenAvatar,
     setupWizard: raidenSetupWizard,
     userSettings: raidenTestnetSetup
   }
-};
+];
 
 /**
  * ==========

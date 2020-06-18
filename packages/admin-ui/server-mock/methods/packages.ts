@@ -1,17 +1,17 @@
 import {
   PackageEnvs,
-  PackageContainer,
   UserSettingsAllDnps,
-  PackageDetailData,
   CoreUpdateData,
   DirectoryItem,
-  RequestedDnp
+  RequestedDnp,
+  PortMapping,
+  InstalledPackageData,
+  InstalledPackageDetailData
 } from "../../src/common";
 import {
   directory,
   dnpRequests,
   dnpInstalled,
-  packagesDetailData,
   PackageMockState
 } from "../mockData";
 
@@ -90,7 +90,7 @@ export async function fetchDnpRequest({
  * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
  * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
-export async function installPackage({
+export async function packageInstall({
   name,
   version
 }: {
@@ -132,69 +132,23 @@ export async function installPackage({
 }
 
 /**
- * Remove a package and its data
- * @param id DNP .eth name
- * @param deleteVolumes flag to also clear permanent package data
+ * Get package detail information
  */
-export async function removePackage({
+export async function packageGet({
   id
 }: {
   id: string;
-  deleteVolumes?: boolean;
-  timeout?: number;
-}): Promise<void> {
-  packages.delete(id);
+}): Promise<InstalledPackageDetailData> {
+  const pkg = packages.get(id);
+  if (!pkg) throw Error(`No detail data for ${id}`);
+  return pkg;
 }
 
 /**
- * Calls docker rm and docker up on a package
+ * Returns the list of current containers associated to packages
  */
-export async function restartPackage({ id }: { id: string }): Promise<void> {
-  throw Error(`Not implemented: ${id}`);
-}
-
-/**
- * Removes a package volumes. The re-ups the package
- */
-export async function restartPackageVolumes({
-  id
-}: {
-  id: string;
-  volumeId?: string;
-}): Promise<void> {
-  throw Error(`Not implemented: ${id}`);
-}
-
-/**
- * Stops or starts after fetching its status
- * @param id DNP .eth name
- * @param timeout seconds to stop the package
- */
-export async function togglePackage({
-  id
-}: {
-  id: string;
-  options?: { timeout?: number };
-}): Promise<void> {
-  update(id, pkg => ({
-    running: !pkg.running,
-    state: pkg.running ? "exited" : "running"
-  }));
-}
-
-/**
- * Updates the .env file of a package. If requested, also re-ups it
- * @param id DNP .eth name
- * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
- */
-export async function updatePackageEnv({
-  id,
-  envs
-}: {
-  id: string;
-  envs: PackageEnvs;
-}): Promise<void> {
-  update(id, () => ({ envs }));
+export async function packagesGet(): Promise<InstalledPackageData[]> {
+  return Array.from(packages.values());
 }
 
 /**
@@ -212,26 +166,6 @@ export async function packageGettingStartedToggle({
 }
 
 /**
- * Returns the list of current containers associated to packages
- */
-export async function listPackages(): Promise<PackageContainer[]> {
-  return Array.from(packages.values());
-}
-
-/**
- * Get package detail information
- */
-export async function packageDetailDataGet({
-  id
-}: {
-  id: string;
-}): Promise<PackageDetailData> {
-  const packageDetailData = packagesDetailData[id];
-  if (!packageDetailData) throw Error(`No detail data for ${id}`);
-  return packageDetailData;
-}
-
-/**
  * Returns the logs of the docker container of a package
  * @param id DNP .eth name
  * @param options log options
@@ -239,11 +173,93 @@ export async function packageDetailDataGet({
  * - tail: Number of lines to return from bottom: 200
  * @returns String with escape codes
  */
-export async function logPackage({
+export async function packageLog({
   id
 }: {
   id: string;
   options?: { timestamps?: boolean; tail?: number };
 }): Promise<string> {
   return `INFO: ${id} logs`;
+}
+
+/**
+ * Remove a package and its data
+ * @param id DNP .eth name
+ * @param deleteVolumes flag to also clear permanent package data
+ */
+export async function packageRemove({
+  id
+}: {
+  id: string;
+  deleteVolumes?: boolean;
+  timeout?: number;
+}): Promise<void> {
+  packages.delete(id);
+}
+
+/**
+ * Calls docker rm and docker up on a package
+ */
+export async function packageRestart({ id }: { id: string }): Promise<void> {
+  throw Error(`Not implemented: ${id}`);
+}
+
+/**
+ * Removes a package volumes. The re-ups the package
+ */
+export async function packageRestartVolumes({
+  id
+}: {
+  id: string;
+  volumeId?: string;
+}): Promise<void> {
+  throw Error(`Not implemented: ${id}`);
+}
+
+/**
+ * Updates the .env file of a package. If requested, also re-ups it
+ * @param id DNP .eth name
+ * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
+ */
+export async function packageSetEnvironment({
+  id,
+  envs
+}: {
+  id: string;
+  envs: PackageEnvs;
+}): Promise<void> {
+  update(id, () => ({ envs }));
+}
+
+/**
+ * Updates the .env file of a package. If requested, also re-ups it
+ * @param id DNP .eth name
+ * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
+ */
+export async function packageSetPortMappings({
+  id,
+  portMappings
+}: {
+  id: string;
+  portMappings: PortMapping[];
+  options?: { merge: boolean };
+}): Promise<void> {
+  update(id, () => ({ ports: portMappings }));
+}
+
+/**
+ * Stops or starts after fetching its status
+ * @param id DNP .eth name
+ * @param timeout seconds to stop the package
+ */
+export async function packageStartStop({
+  id
+}: {
+  id: string;
+  options?: { timeout?: number };
+}): Promise<void> {
+  update(id, pkg => ({
+    running: !pkg.running,
+    state: pkg.running ? "exited" : "running"
+  }));
 }

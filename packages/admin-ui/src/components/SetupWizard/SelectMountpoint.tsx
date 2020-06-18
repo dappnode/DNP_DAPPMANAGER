@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useSWR, { mutate } from "swr";
-import { api } from "api";
+import { useApi } from "api";
 import Dropdown from "react-bootstrap/Dropdown";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Button from "components/Button";
@@ -91,16 +90,10 @@ export default function SelectMountpoint({
     prevPath?: string;
   };
 }) {
-  const mountpointsGetKey = "mountpointsGet";
-  const { data: mountpointsApi, error, isValidating } = useSWR(
-    [mountpointsGetKey],
-    () => api.mountpointsGet()
-  );
-
   const [showHelp, setShowHelp] = useState(false);
-
-  const mountpointsLoaded = Boolean(mountpointsApi);
-  const mountpoints: MountpointData[] = mountpointsApi || [
+  const mountpointsRequest = useApi.mountpointsGet();
+  const isValidating = mountpointsRequest.isValidating;
+  const mountpoints = mountpointsRequest.data || [
     {
       mountpoint: "",
       vendor: "Host",
@@ -174,7 +167,7 @@ export default function SelectMountpoint({
               </Dropdown.Item>
             ))}
 
-            {isValidating && !mountpointsLoaded && (
+            {isValidating && !mountpointsRequest.data && (
               <Dropdown.Item>Loading...</Dropdown.Item>
             )}
 
@@ -191,7 +184,7 @@ export default function SelectMountpoint({
         {!alreadySet && (
           <Button
             // Manually trigger re-fetching of SWR
-            onClick={() => mutate(mountpointsGetKey)}
+            onClick={() => mountpointsRequest.revalidate()}
             disabled={isValidating}
             className={"refresh " + joinCssClass({ loading: isValidating })}
           >
@@ -208,9 +201,9 @@ export default function SelectMountpoint({
         </div>
       )}
 
-      {error && (
+      {mountpointsRequest.error && (
         <div className="change-mountpoint-error">
-          Error detecting mountpoints: {error}
+          Error detecting mountpoints: {mountpointsRequest.error}
         </div>
       )}
     </>

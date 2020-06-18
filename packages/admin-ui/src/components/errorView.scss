@@ -31,4 +31,11 @@
   .error {
     color: var(--danger-color);
   }
+
+  .only-summary {
+    margin-bottom: 1rem;
+    opacity: 0.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
 }

@@ -11,30 +11,34 @@ import Links from "./Links";
 import Vols from "./Vols";
 import StateBadge from "../StateBadge";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer, PackageDetailData } from "types";
+import { PackageContainer, Manifest, InstalledPackageDetailData } from "types";
 import "./info.scss";
 
 const ipfsGateway = "http://ipfs.dappnode:8080";
 
 function Info({
   dnp,
-  dnpDetail
+  manifest,
+  gettingStarted,
+  gettingStartedShow,
+  volumesDetail
 }: {
   dnp: PackageContainer;
-  dnpDetail?: PackageDetailData;
+  manifest?: Manifest;
+  gettingStarted?: string;
+  gettingStartedShow?: boolean;
+  volumesDetail: InstalledPackageDetailData["volumesSize"];
 }) {
   const [gettingStartedShowLocal, setGettingStartedIsShown] = useState(false);
   const [allowUndo, setAllowUndo] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { manifest, state, origin } = dnp;
-  const { description, version, upstreamVersion } = manifest || {};
-  const gettingStarted = dnp.gettingStarted || description;
-  const gettingStartedShowRemote = dnp.gettingStartedShow;
+  const { state, origin } = dnp;
+  const { version, upstreamVersion, links } = manifest || {};
 
   useEffect(() => {
-    setGettingStartedIsShown(Boolean(gettingStartedShowRemote));
-  }, [gettingStartedShowRemote, setGettingStartedIsShown]);
+    setGettingStartedIsShown(Boolean(gettingStarted));
+  }, [gettingStarted]);
 
   async function toggleGettingStarted(show: boolean) {
     if (loading) return;
@@ -55,7 +59,7 @@ function Info({
 
   return (
     <>
-      {!gettingStarted ? null : gettingStartedShowLocal ? (
+      {gettingStartedShowLocal && gettingStarted ? (
         <>
           <SubTitle
             className={`getting-started-header ${loading ? "loading" : ""}`}
@@ -63,15 +67,13 @@ function Info({
             <div>Getting started</div>
             <div>
               {/* Allow the user to "re-pin" the getting started */}
-              {!gettingStartedShowRemote && (
-                <GoPin onClick={showGettingStarted} />
-              )}
+              {!gettingStartedShow && <GoPin onClick={showGettingStarted} />}
               <MdClose onClick={hideGettingStarted} />
             </div>
           </SubTitle>
           <Card className="getting-started-content">
             <RenderMarkdown source={gettingStarted} />
-            {gettingStartedShowRemote && (
+            {gettingStartedShow && (
               <div className="subtle-header" onClick={hideGettingStarted}>
                 Dismiss
               </div>
@@ -120,11 +122,16 @@ function Info({
         )}
 
         <div>
-          <Vols dnp={dnp} volumesDetail={(dnpDetail || {}).volumes || {}} />
+          <Vols
+            dnpName={dnp.name}
+            volumes={dnp.volumes}
+            volumesDetail={volumesDetail}
+          />
         </div>
 
         <div>
-          <Links dnp={dnp} />
+          {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
+          <Links links={links || ((manifest as any) || {}).homepage || {}} />
         </div>
       </Card>
     </>

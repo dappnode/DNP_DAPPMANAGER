@@ -1,6 +1,6 @@
 import params from "../params";
 import * as db from "../db";
-import { logPackage } from "./logPackage";
+import { packageLog } from "./packageLog";
 import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { NewFeatureId, SystemInfo } from "../types";
@@ -87,7 +87,7 @@ function getNewFeatureIds(): NewFeatureId[] {
  */
 async function getIsWifiActive(): Promise<boolean> {
   try {
-    const logs = await logPackage({
+    const logs = await packageLog({
       id: wifiName,
       options: { timestamps: false, tail: 20 }
     });

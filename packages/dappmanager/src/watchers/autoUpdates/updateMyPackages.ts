@@ -11,7 +11,7 @@ import {
   flagErrorUpdate
 } from "../../utils/autoUpdateHelper";
 // External calls
-import { installPackage } from "../../calls/installPackage";
+import { packageInstall } from "../../calls";
 import { logs } from "../../logs";
 
 export default async function updateMyPackages(
@@ -67,7 +67,7 @@ async function updateMyPackage(
   logs.info(`Auto-updating ${name} to ${latestVersion}...`);
 
   try {
-    await installPackage({ name, version: latestVersion });
+    await packageInstall({ name, version: latestVersion });
 
     flagCompletedUpdate(name, latestVersion);
     logs.info(`Successfully auto-updated system packages`);

@@ -1,4 +1,4 @@
-import { restartPackage } from "./restartPackage";
+import { packageRestart } from "./packageRestart";
 import { PackageEnvs } from "../types";
 import { listContainer } from "../modules/docker/listContainers";
 import { ComposeFileEditor } from "../modules/compose/editor";
@@ -12,7 +12,7 @@ import { ComposeFileEditor } from "../modules/compose/editor";
  *   ENV_NAME: ENV_VALUE
  * }
  */
-export async function updatePackageEnv({
+export async function packageSetEnvironment({
   id,
   envs
 }: {
@@ -27,5 +27,5 @@ export async function updatePackageEnv({
   compose.service().mergeEnvs(envs);
   compose.write();
 
-  await restartPackage({ id });
+  await packageRestart({ id });
 }

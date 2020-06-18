@@ -1,7 +1,7 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
-import { installPackage } from "../../calls";
+import { packageInstall } from "../../calls";
 import { listContainerNoThrow } from "../../modules/docker/listContainers";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
@@ -79,7 +79,7 @@ export async function runEthClientInstaller(
           };
 
           try {
-            await installPackage(installOptions);
+            await packageInstall(installOptions);
           } catch (e) {
             // When installing DAppNode for the first time, if the user selects a
             // non-remote target and disabled fallback, there must be a way to
@@ -89,7 +89,7 @@ export async function runEthClientInstaller(
             if (e instanceof EthProviderError) {
               const contentHash = getLocalFallbackContentHash(name);
               if (!contentHash) throw Error(`No local version for ${name}`);
-              await installPackage({ ...installOptions, version: contentHash });
+              await packageInstall({ ...installOptions, version: contentHash });
             } else {
               throw e;
             }

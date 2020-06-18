@@ -44,7 +44,7 @@ export default function Logs({ id }: { id: string }) {
     async function logDnp() {
       try {
         const options = { timestamps, tail: lines };
-        const logs = await api.logPackage({ id, options });
+        const logs = await api.packageLog({ id, options });
         if (typeof logs !== "string") throw Error("Logs must be a string");
 
         // Prevent updating the state of an unmounted component

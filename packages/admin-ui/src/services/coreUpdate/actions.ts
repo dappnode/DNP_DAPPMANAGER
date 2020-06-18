@@ -85,7 +85,7 @@ export const updateCore = (): AppThunk => async (dispatch, getState) => {
 
     await withToast(
       () =>
-        api.installPackage({
+        api.packageInstall({
           name: coreName,
           version,
           options: { BYPASS_CORE_RESTRICTION: true, BYPASS_RESOLVER: true }

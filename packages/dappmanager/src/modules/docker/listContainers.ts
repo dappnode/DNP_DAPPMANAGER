@@ -5,7 +5,7 @@ import params from "../../params";
 import {
   PackageContainer,
   VolumeMapping,
-  ContainerStatus,
+  ContainerState,
   PortProtocol,
   PortMapping
 } from "../../types";
@@ -218,7 +218,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
         ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
       })
     ),
-    state: container.State as ContainerStatus,
+    state: container.State as ContainerState,
     running: container.State === "running",
     dependencies,
     avatarUrl,

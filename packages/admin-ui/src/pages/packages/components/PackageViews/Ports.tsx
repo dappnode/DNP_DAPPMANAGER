@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { api } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
+import { PortMapping } from "types";
 // Components
 import Card from "components/Card";
 import TableInputs from "components/TableInputs";
@@ -13,25 +14,35 @@ import { MdAdd } from "react-icons/md";
 import { getHostPortMappings } from "services/dnpInstalled/selectors";
 // Style
 import "./ports.scss";
-import { PackageContainer, PortMapping } from "common/types";
 
 const maxPortNumber = 32768 - 1;
 
-export default function Ports({ dnp }: { dnp: PackageContainer }) {
+export default function Ports({
+  id,
+  ports: portsFromDnp
+}: {
+  id: string;
+  ports: PortMapping[];
+}) {
   const hostPortMapping = useSelector(getHostPortMappings);
-
-  const portsFromDnp = useMemo(() => getPortsFromDnp(dnp), [dnp]);
   const [ports, setPorts] = useState<PortMapping[]>(portsFromDnp);
   const [updating, setUpdating] = useState(false);
   useEffect(() => {
-    setPorts(portsFromDnp);
+    // Shallow copy since sort mutates the original array
+    setPorts(
+      [...(portsFromDnp || [])]
+        .filter(({ host }) => host)
+        .sort((a, b) => a.container - b.container)
+        .sort((a, b) =>
+          a.deletable && !b.deletable ? 1 : !a.deletable && b.deletable ? -1 : 0
+        )
+    );
   }, [portsFromDnp]);
 
   async function onUpdateEnvsSubmit() {
-    const id = dnp.name;
     setUpdating(true);
     await withToastNoThrow(
-      () => api.updatePortMappings({ id, portMappings: ports }),
+      () => api.packageSetPortMappings({ id, portMappings: ports }),
       {
         message: `Updating ${shortNameCapitalized(id)} port mappings...`,
         onSuccess: `Updated ${shortNameCapitalized(id)} port mappings`
@@ -90,7 +101,7 @@ export default function Ports({ dnp }: { dnp: PackageContainer }) {
   function getConflictingPort() {
     for (const { host, protocol } of ports) {
       const owner = hostPortMapping[`${host}/${protocol}`];
-      if (owner && owner !== dnp.name) return { host, protocol, owner };
+      if (owner && owner !== id) return { host, protocol, owner };
     }
   }
 
@@ -224,19 +235,6 @@ export default function Ports({ dnp }: { dnp: PackageContainer }) {
       </div>
     </Card>
   );
-}
-
-/**
- * Util to parse ports from container
- * @param dnp
- */
-function getPortsFromDnp(dnp: PackageContainer) {
-  return [...(dnp.ports || [])]
-    .filter(({ host }) => host)
-    .sort((a, b) => a.container - b.container)
-    .sort((a, b) =>
-      a.deletable && !b.deletable ? 1 : !a.deletable && b.deletable ? -1 : 0
-    );
 }
 
 /**

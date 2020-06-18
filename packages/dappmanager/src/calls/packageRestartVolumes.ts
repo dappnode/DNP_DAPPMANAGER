@@ -13,7 +13,7 @@ import { logs } from "../logs";
 /**
  * Removes a package volumes. The re-ups the package
  */
-export async function restartPackageVolumes({
+export async function packageRestartVolumes({
   id,
   volumeId
 }: {

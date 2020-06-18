@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import * as s from "../selectors";
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { restartPackage } from "../actions";
+import { packageRestart } from "../actions";
 import { fetchDnpInstalled } from "services/dnpInstalled/actions";
 // Components
 import NoPackagesYet from "./NoPackagesYet";
@@ -72,7 +72,7 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
             <MdRefresh
               className="restart"
               style={{ fontSize: "1.05rem" }}
-              onClick={() => dispatch(restartPackage(name))}
+              onClick={() => dispatch(packageRestart(name))}
             />
             <hr />
           </React.Fragment>

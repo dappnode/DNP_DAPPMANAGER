@@ -2,8 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
-import useSWR from "swr";
-import { api } from "api";
+import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
 import Info from "./PackageViews/Info";
@@ -36,9 +35,7 @@ export const PackageInterface: React.FC<RouteComponentProps<{
   const areThereDnps = useSelector(s.areThereDnps);
   // Dnp data
   const dnp = useSelector((state: any) => s.getDnpById(state, id));
-  const { data: dnpDetail } = useSWR([id, "packageDetailDataGet"], id =>
-    api.packageDetailDataGet({ id })
-  );
+  const { data: dnpDetail } = useApi.packageGet({ id });
 
   if (!dnp) {
     return (
@@ -58,7 +55,18 @@ export const PackageInterface: React.FC<RouteComponentProps<{
   }
 
   const DnpSpecific = dnpSpecific[dnp.name];
-  const backup = (dnp.manifest || {}).backup || [];
+
+  const dnpName = dnp.name;
+  const { isCore, state, volumes, ports } = dnp;
+  const {
+    userSettings,
+    setupWizard,
+    manifest,
+    gettingStarted,
+    gettingStartedShow,
+    volumesSize: volumesDetail
+  } = dnpDetail || {};
+  const { backup = [] } = manifest || {};
 
   /**
    * Construct all subroutes to iterate them both in:
@@ -69,66 +77,68 @@ export const PackageInterface: React.FC<RouteComponentProps<{
     {
       name: "Info",
       subPath: "info",
-      render: () => <Info dnp={dnp} dnpDetail={dnpDetail} />,
+      render: () => (
+        <Info
+          dnp={dnp}
+          {...{ manifest, gettingStarted, gettingStartedShow, volumesDetail }}
+        />
+      ),
       available: true
     },
     {
       name: "Controls",
       subPath: "controls",
-      render: () => <Controls dnp={dnp} />,
+      render: () => <Controls id={dnpName} {...{ isCore, state, volumes }} />,
       available: true
     },
     {
       name: "Config",
       subPath: "config",
-      render: () => <Config dnp={dnp} dnpDetail={dnpDetail} />,
-      available:
-        dnpDetail &&
-        dnpDetail.userSettings &&
-        !isEmpty(dnpDetail.userSettings.environment)
+      render: () => <Config id={dnpName} {...{ userSettings, setupWizard }} />,
+      available: userSettings && !isEmpty(userSettings.environment)
     },
     {
       name: "Ports",
       subPath: "ports",
-      render: () => <Ports dnp={dnp} />,
-      available: dnp.name !== "dappmanager.dnp.dappnode.eth"
+      render: () => <Ports id={dnpName} {...{ ports }} />,
+      available: dnpName !== "dappmanager.dnp.dappnode.eth"
     },
     {
       name: "Logs",
       subPath: "logs",
-      render: () => <Logs id={dnp.name} />,
+      render: () => <Logs id={dnpName} />,
       available: true
     },
     {
       name: "Backup",
       subPath: "backup",
-      render: () => <Backup id={dnp.name} backup={backup} />,
+      render: () => <Backup id={dnpName} {...{ backup }} />,
       available: backup.length > 0
     },
     {
       name: "File Manager",
       subPath: "file-manager",
-      render: () => <FileManager id={dnp.name} />,
+      render: () => <FileManager id={dnpName} />,
       available: true
     },
     // DnpSpecific is a variable dynamic per DNP component
     {
-      name: dnpSpecificList[dnp.name],
+      name: dnpSpecificList[dnpName],
       // Convert name to subPath:
       // "Connect with peers" => "connect-with-peers"
       subPath: encodeURIComponent(
-        (dnpSpecificList[dnp.name] || "")
+        (dnpSpecificList[dnpName] || "")
           .toLowerCase()
           .replace(new RegExp(" ", "g"), "-")
       ),
       render: () => <DnpSpecific dnp={dnp} />,
-      available: DnpSpecific && dnpSpecificList[dnp.name]
+      available: DnpSpecific && dnpSpecificList[dnpName]
     }
   ].filter(route => route.available);
 
   return (
     <>
-      <Title title={title} subtitle={shortNameCapitalized(dnp.name || id)} />
+      <Title title={title} subtitle={shortNameCapitalized(dnpName || id)} />
 
       <div className="horizontal-navbar">
         {availableRoutes.map(route => (

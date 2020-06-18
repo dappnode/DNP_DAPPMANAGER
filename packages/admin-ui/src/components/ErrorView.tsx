@@ -8,10 +8,14 @@ export default function ErrorView({ error }: { error: Error | string }) {
   return (
     <div className="error-view">
       <img src={errorImg} alt="Error icon" />
-      <details>
-        <summary>{message.split("\n")[0]}</summary>
-        <pre>{detail}</pre>
-      </details>
+      {detail ? (
+        <details>
+          <summary>{message.split("\n")[0]}</summary>
+          <pre>{detail}</pre>
+        </details>
+      ) : (
+        <span className="only-summary">{message}</span>
+      )}
     </div>
   );
 }

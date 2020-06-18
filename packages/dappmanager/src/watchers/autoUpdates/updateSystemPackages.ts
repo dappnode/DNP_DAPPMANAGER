@@ -5,7 +5,7 @@ import {
   flagCompletedUpdate,
   flagErrorUpdate
 } from "../../utils/autoUpdateHelper";
-import { installPackage } from "../../calls/installPackage";
+import { packageInstall } from "../../calls";
 import { logs } from "../../logs";
 import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 
@@ -24,7 +24,7 @@ export default async function updateSystemPackages(): Promise<void> {
   logs.info(`Auto-updating system packages...`);
 
   try {
-    await installPackage({
+    await packageInstall({
       name: coreDnpName,
       options: { BYPASS_RESOLVER: true }
     });

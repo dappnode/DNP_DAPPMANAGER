@@ -15,7 +15,7 @@ import shell from "./utils/shell";
 import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
-import { restartPackage } from "./calls";
+import { packageRestart } from "./calls";
 import { ComposeFileEditor } from "./modules/compose/editor";
 
 const vpnDataVolume = params.vpnDataVolume;
@@ -151,7 +151,7 @@ export default async function initializeDb(): Promise<void> {
       const vpnCompose = new ComposeFileEditor(vpnName, true);
       vpnCompose.service().addEnvFile(params.GLOBAL_ENVS_PATH_CORE);
       vpnCompose.write();
-      await restartPackage({ id: vpnName });
+      await packageRestart({ id: vpnName });
       logs.info("Added global ENVs and restarted the VPN");
     } catch (e) {
       logs.error("Error reseting the VPN", e);

@@ -145,7 +145,7 @@ export const packageVolumeRemove = (
   );
 
   await withToastNoThrow(
-    () => api.restartPackageVolumes({ id: dnpName, volumeId: volName }),
+    () => api.packageRestartVolumes({ id: dnpName, volumeId: volName }),
     {
       message: `Removing ${prettyVolRef}...`,
       onSuccess: `Removed ${prettyVolRef}`
