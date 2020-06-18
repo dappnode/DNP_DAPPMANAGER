@@ -1,9 +1,10 @@
 import React from "react";
 import { orderBy, isEmpty } from "lodash";
 // Components
-import TableInputs from "components/TableInputs";
+import Input from "components/Input";
 import { UserSettingsAllDnps } from "types";
 import { shortNameCapitalized } from "utils/format";
+import "./editorAdvanced.scss";
 
 interface EditableTableProps {
   headers: string[];
@@ -26,19 +27,34 @@ const EditableTable: React.FC<EditableTableProps> = ({
     ["id"]
   );
   return (
-    <TableInputs
-      headers={headers}
-      content={valuesArray.map(({ id, value = "" }) => [
-        { disabled: true, value: id },
-        {
-          placeholder,
-          value,
-          onValueChange: (newValue: string) => setValue(id, newValue),
-          disabled: (disabledValues || {})[id]
-        }
-      ])}
-      rowsTemplate=""
-    />
+    <table className="editor-advanced-table">
+      <thead>
+        <tr>
+          {headers.map(header => (
+            <td key={header} className="subtle-header">
+              {header}
+            </td>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {valuesArray.map(({ id, value = "" }) => (
+          <tr key={id}>
+            <td>
+              <Input lock={true} value={id} onValueChange={() => {}} />
+            </td>
+            <td>
+              <Input
+                placeholder={placeholder}
+                value={value}
+                onValueChange={(newValue: string) => setValue(id, newValue)}
+                lock={(disabledValues || {})[id]}
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
