@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { api } from "api";
+import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
 import { PortMapping } from "types";
 // Components
@@ -10,10 +9,9 @@ import Button from "components/Button";
 // Utils
 import { shortNameCapitalized } from "utils/format";
 import { MdAdd } from "react-icons/md";
-// Selectors
-import { getHostPortMappings } from "services/dnpInstalled/selectors";
 // Style
 import "./ports.scss";
+import { PackageContainer } from "common";
 
 const maxPortNumber = 32768 - 1;
 
@@ -24,7 +22,6 @@ export default function Ports({
   id: string;
   ports: PortMapping[];
 }) {
-  const hostPortMapping = useSelector(getHostPortMappings);
   const [ports, setPorts] = useState<PortMapping[]>(portsFromDnp);
   const [updating, setUpdating] = useState(false);
   useEffect(() => {
@@ -38,6 +35,10 @@ export default function Ports({
         )
     );
   }, [portsFromDnp]);
+
+  // Fetch current list of packages to check which ports are already used
+  const dnpInstalled = useApi.packagesGet();
+  const hostPortMapping = getHostPortMappings(dnpInstalled.data || []);
 
   async function onUpdateEnvsSubmit() {
     setUpdating(true);
@@ -247,4 +248,20 @@ function portsToId(portMappings: PortMapping[]): string {
       [host, container, protocol].join("")
     )
     .join("");
+}
+
+/**
+ * Util: Returns object ready to check if a port is used or not
+ * @return
+ * ```
+ * hostPortMappings = { "8080/TCP": "bitcoin.dnp.dappnode.eth" }
+ * ```
+ */
+function getHostPortMappings(dnps: PackageContainer[]) {
+  const hostPortMappings: { [portId: string]: string } = {};
+  for (const dnp of dnps)
+    for (const port of dnp.ports || [])
+      if (port.host)
+        hostPortMappings[`${port.host}/${port.protocol}`] = dnp.name;
+  return hostPortMappings;
 }

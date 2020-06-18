@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-import * as s from "../selectors";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useApi } from "api";
 import { packageRestart } from "../actions";
-import { fetchDnpInstalled } from "services/dnpInstalled/actions";
 // Components
 import NoPackagesYet from "./NoPackagesYet";
-import StateBadge from "./PackageViews/StateBadge";
+import StateBadge from "./StateBadge";
 import Card from "components/Card";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
@@ -19,12 +18,11 @@ import { rootPath as packagesRootPath } from "pages/packages";
 // Images
 import defaultAvatar from "img/defaultAvatar.png";
 import dappnodeIcon from "img/dappnode-logo-only.png";
-import { useApi } from "api";
+import "./packages.scss";
 
 export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
   const dnpsRequest = useApi.packagesGet();
   const dispatch = useDispatch();
-
 
   if (dnpsRequest.data) {
     const filteredDnps = dnpsRequest.data.filter(
@@ -63,11 +61,12 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
             </React.Fragment>
           )
         )}
-      </Card>)
+      </Card>
+    );
   } else {
     if (dnpsRequest.error) return <ErrorView error={dnpsRequest.error} />;
     if (dnpsRequest.isValidating)
       return <Loading steps={["Loading installed DAppNode Packages"]} />;
-    return <ErrorView error="Unknown error" />
+    return <ErrorView error="Unknown error" />;
   }
 };

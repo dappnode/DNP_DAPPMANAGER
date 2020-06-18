@@ -7,19 +7,6 @@ import { PackageContainer } from "types";
 export const getDnpInstalled = (state: RootState): PackageContainer[] =>
   state.dnpInstalled.dnpInstalled;
 
-/**
- * Returns object ready to check if a port is used or not
- */
-export const getHostPortMappings = (state: RootState) => {
-  const dnps = getDnpInstalled(state);
-  const hostPortMappings: { [portId: string]: string } = {};
-  for (const dnp of dnps)
-    for (const port of dnp.ports || [])
-      if (port.host)
-        hostPortMappings[`${port.host}/${port.protocol}`] = dnp.name;
-  return hostPortMappings;
-};
-
 interface VolumeStats {
   name: string;
   size: number;

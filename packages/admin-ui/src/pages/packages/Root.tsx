@@ -1,11 +1,11 @@
 import React from "react";
 import { Switch, Route, RouteComponentProps } from "react-router-dom";
-import { systemPackagesSubPath } from "../data";
+import { systemPackagesSubPath } from "./data";
 // Components
-import { PackagesHome } from "./PackagesHome";
-import { PackageInterface } from "./PackageInterface";
-// Styles
-import "./packages.scss";
+import { PackagesHome } from "./pages/Home";
+import { PackageById } from "./pages/ById";
+// Style
+import "./components/packages.scss";
 
 export const PackagesRoot: React.FC<RouteComponentProps> = ({ match }) => (
   <Switch>
@@ -14,6 +14,6 @@ export const PackagesRoot: React.FC<RouteComponentProps> = ({ match }) => (
       path={match.path + systemPackagesSubPath}
       render={props => <PackagesHome {...props} showCoreDnps={true} />}
     />
-    <Route path={match.path + "/:id"} component={PackageInterface} />
+    <Route path={match.path + "/:id"} component={PackageById} />
   </Switch>
 );

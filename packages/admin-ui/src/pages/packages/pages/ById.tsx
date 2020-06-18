@@ -1,20 +1,18 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
-import Info from "./PackageViews/Info";
-import { dnpSpecificList, dnpSpecific } from "./PackageViews/DnpSpecific";
-import Logs from "./PackageViews/Logs";
-import Config from "./PackageViews/Config";
-import Ports from "./PackageViews/Ports";
-import { FileManager } from "./PackageViews/FileManager";
-import Backup from "./PackageViews/Backup";
-import { Controls } from "./PackageViews/Controls";
-import NoDnpInstalled from "./NoDnpInstalled";
-import * as s from "../selectors";
+import Info from "../components/Info";
+import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
+import Logs from "../components/Logs";
+import Config from "../components/Config";
+import Ports from "../components/Ports";
+import { FileManager } from "../components/FileManager";
+import Backup from "../components/Backup";
+import { Controls } from "../components/Controls";
+import NoDnpInstalled from "../components/NoDnpInstalled";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
@@ -23,8 +21,7 @@ import Title from "components/Title";
 // Utils
 import { shortNameCapitalized } from "utils/format";
 
-
-export const PackageInterface: React.FC<RouteComponentProps<{
+export const PackageById: React.FC<RouteComponentProps<{
   id: string;
 }>> = ({ match }) => {
   const id = decodeURIComponent(match.params.id || "");
