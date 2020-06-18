@@ -17,12 +17,15 @@ import { continueIfCalleDisconnected } from "api/utils";
 
 export const packageSetEnvironment = (
   id: string,
-  envs: PackageEnvs
-): AppThunk => () =>
+  envs: PackageEnvs,
+  envNames?: string[]
+): AppThunk => () => {
+  const envList = (envNames || Object.keys(envs)).join(", ");
   withToastNoThrow(() => api.packageSetEnvironment({ id, envs }), {
-    message: `Updating ${id} envs: ${Object.keys(envs).join(", ")}...`,
-    onSuccess: `Updated ${id} envs`
+    message: `Updating ${sn(id)} ${envList}...`,
+    onSuccess: `Updated ${sn(id)} ${envList}`
   });
+};
 
 // Used in package interface / controls
 

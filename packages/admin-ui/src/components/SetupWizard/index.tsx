@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import deepmerge from "deepmerge";
+import { isEqual } from "lodash";
 // Components
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
@@ -24,13 +25,15 @@ export function SetupWizard({
   userSettings: initialUserSettings,
   onSubmit,
   goBack,
-  submitTag
+  submitTag,
+  disableIfEqual
 }: {
   setupWizard: SetupWizardAllDnps;
   userSettings: UserSettingsAllDnps;
   onSubmit: (newUserSettings: UserSettingsAllDnps) => void;
   goBack?: () => void;
   submitTag?: string;
+  disableIfEqual?: boolean;
 }) {
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const [showAdvanced, setShowAdvanced] = useState(isWizardEmpty);
@@ -116,7 +119,13 @@ export function SetupWizard({
       <div className="bottom-buttons">
         <div>
           {goBack && <Button onClick={goBack}>Cancel</Button>}
-          <Button onClick={handleSubmit} variant="dappnode">
+          <Button
+            onClick={handleSubmit}
+            variant="dappnode"
+            disabled={
+              disableIfEqual && isEqual(initialUserSettings, userSettings)
+            }
+          >
             {submitTag || "Submit"}
           </Button>
         </div>

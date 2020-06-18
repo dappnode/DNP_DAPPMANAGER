@@ -9,6 +9,7 @@ import {
   UserSettingsAllDnps,
   UserSettings
 } from "types";
+import { difference } from "utils/lodashExtended";
 
 export default function Config({
   id,
@@ -27,13 +28,25 @@ export default function Config({
   useEffect(() => {
     if (userSettings) setLocalUserSettings({ [id]: userSettings });
   }, [userSettings, id]);
+
   function onSubmit(newUserSettings: UserSettingsAllDnps) {
     // Persist them here so the new settings don't dissapear on submission
     setLocalUserSettings(newUserSettings);
 
+    const prevEnvs = userSettings?.environment || {};
     const newEnvs = newUserSettings[id].environment;
     if (!newEnvs) return console.error(`SetupWizard returned no ENVs`);
-    dispatch(packageSetEnvironment(id, newEnvs));
+    const diffEnvs = difference(prevEnvs, newEnvs);
+
+    // Try to get a more friendly name for each ENV
+    const niceNames = Object.keys(diffEnvs).map(name => {
+      for (const field of setupWizard?.fields || [])
+        if (field.target?.type === "environment" && field.target.name === name)
+          return field.title || name;
+      return name;
+    });
+
+    dispatch(packageSetEnvironment(id, diffEnvs, niceNames));
   }
 
   return (
@@ -42,6 +55,7 @@ export default function Config({
       userSettings={localUserSettings}
       onSubmit={onSubmit}
       submitTag="Update"
+      disableIfEqual={true}
     />
   );
 }
