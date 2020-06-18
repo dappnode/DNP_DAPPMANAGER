@@ -11,10 +11,10 @@ import {
   PackageNotificationDb,
   PackageNotification,
   SystemInfo,
-  PortMapping,
   VolumeData
 } from "../../src/common";
 import { coreName } from "../mockData";
+import { pause } from "../utils";
 
 /**
  * Returns formated auto-update data
@@ -405,23 +405,14 @@ export async function systemInfoGet(): Promise<SystemInfo> {
   };
 }
 
-/**
- * Updates a package port mappings
- */
-export async function updatePortMappings(kwargs: {
-  id: string;
-  portMappings: PortMapping[];
-  options?: { merge: boolean };
-}): Promise<void> {
-  //
-}
+
 
 /**
  * Removes a docker volume by name
  * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
  */
 export async function volumeRemove(kwargs: { name: string }): Promise<void> {
-  //
+  await pause(1000)
 }
 
 /**
