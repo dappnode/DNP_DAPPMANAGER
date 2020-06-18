@@ -85,14 +85,14 @@ describe("Release format tests", () => {
       it("Install the release", async () => {
         if (!releaseHash) throw Error("Previous test failed");
 
-        await calls.installPackage({
+        await calls.packageInstall({
           name: releaseDnpName,
           version: releaseHash
           // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
         });
 
         // Verify it is running correctly
-        const result = await calls.logPackage({ id: releaseDnpName });
+        const result = await calls.packageLog({ id: releaseDnpName });
         expect(result).to.include(
           `Hello, ${releaseTest.envValue}`,
           `Wrong log from ${releaseDnpName} after installation`

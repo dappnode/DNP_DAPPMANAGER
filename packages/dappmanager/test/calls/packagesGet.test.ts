@@ -5,9 +5,9 @@ import { DockerApiSystemDfReturn } from "../../src/modules/docker/dockerApi";
 import { mockDnp, mockDockerSystemDfDataSample } from "../testUtils";
 import rewiremock from "rewiremock";
 
-import { listPackages as listPackagesType } from "../../src/calls/listPackages";
+import { packagesGet as packagesGetType } from "../../src/calls/packagesGet";
 
-describe("Call function: listPackages", function() {
+describe("Call function: packagesGet", function() {
   let hasListed = false;
   const dnp = { ...mockDnp, name: "test.dnp.dappnode.eth" };
   const mockList = [dnp];
@@ -23,11 +23,11 @@ describe("Call function: listPackages", function() {
     return mockDockerSystemDfDataSample;
   }
 
-  let listPackages: typeof listPackagesType;
+  let packagesGet: typeof packagesGetType;
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../src/calls/listPackages"),
+      () => import("../../src/calls/packagesGet"),
       mock => {
         mock(() => import("../../src/modules/docker/listContainers"))
           .with({ listContainers })
@@ -37,11 +37,11 @@ describe("Call function: listPackages", function() {
           .toBeUsed();
       }
     );
-    listPackages = mock.listPackages;
+    packagesGet = mock.packagesGet;
   });
 
   it("should list packages with correct arguments", async () => {
-    const dnpList = await listPackages();
+    const dnpList = await packagesGet();
     expect(hasListed).to.be.true;
     expect(dnpList).to.deep.equal(expectedResult);
   });

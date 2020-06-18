@@ -7,9 +7,7 @@ import {
   RequestedDnp,
   HostStats,
   UserSettingsAllDnps,
-  PackageContainer,
   MountpointData,
-  PackageDetailData,
   SystemInfo,
   VolumeData,
   PortMapping,
@@ -22,7 +20,9 @@ import {
   VpnDeviceCredentials,
   VpnDevice,
   PackageNotificationDb,
-  UserActionLog
+  UserActionLog,
+  InstalledPackageData,
+  InstalledPackageDetailData
 } from "./types";
 
 export interface Routes {
@@ -211,46 +211,6 @@ export interface Routes {
   }) => Promise<UserActionLog[]>;
 
   /**
-   * Installs a DAppNode Package.
-   * Resolves dependencies, downloads release assets, loads the images to docker,
-   * sets userSettings and starts the docker container for each package.
-   *
-   * The logId is the requested id. It is used for the UI to track the progress
-   * of the installation in real time and prevent double installs
-   *
-   * Options
-   * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
-   * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
-   */
-  installPackage: (kwargs: {
-    name: string;
-    version?: string;
-    userSettings?: UserSettingsAllDnps;
-    options?: {
-      BYPASS_RESOLVER?: boolean;
-      BYPASS_CORE_RESTRICTION?: boolean;
-    };
-  }) => Promise<void>;
-
-  /**
-   * Returns the list of current containers associated to packages
-   */
-  listPackages: () => Promise<PackageContainer[]>;
-
-  /**
-   * Returns the logs of the docker container of a package
-   * @param id DNP .eth name
-   * @param options log options
-   * - timestamps: Show timestamps
-   * - tail: Number of lines to return from bottom: 200
-   * @returns String with escape codes
-   */
-  logPackage: (kwargs: {
-    id: string;
-    options?: { timestamps?: boolean; tail?: number };
-  }) => Promise<string>;
-
-  /**
    * Returns the list of current mountpoints in the host,
    * by running a pre-written script in the host
    */
@@ -286,9 +246,36 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Installs a DAppNode Package.
+   * Resolves dependencies, downloads release assets, loads the images to docker,
+   * sets userSettings and starts the docker container for each package.
+   *
+   * The logId is the requested id. It is used for the UI to track the progress
+   * of the installation in real time and prevent double installs
+   *
+   * Options
+   * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
+   * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
+   */
+  packageInstall: (kwargs: {
+    name: string;
+    version?: string;
+    userSettings?: UserSettingsAllDnps;
+    options?: {
+      BYPASS_RESOLVER?: boolean;
+      BYPASS_CORE_RESTRICTION?: boolean;
+    };
+  }) => Promise<void>;
+
+  /**
    * Get package detail information
    */
-  packageDetailDataGet: (kwargs: { id: string }) => Promise<PackageDetailData>;
+  packageGet: (kwargs: { id: string }) => Promise<InstalledPackageDetailData>;
+
+  /**
+   * Returns the list of current containers associated to packages
+   */
+  packagesGet: () => Promise<InstalledPackageData[]>;
 
   /**
    * Toggles the visibility of a getting started block
@@ -297,6 +284,72 @@ export interface Routes {
   packageGettingStartedToggle: (kwargs: {
     id: string;
     show: boolean;
+  }) => Promise<void>;
+
+  /**
+   * Returns the logs of the docker container of a package
+   * @param id DNP .eth name
+   * @param options log options
+   * - timestamps: Show timestamps
+   * - tail: Number of lines to return from bottom: 200
+   * @returns String with escape codes
+   */
+  packageLog: (kwargs: {
+    id: string;
+    options?: { timestamps?: boolean; tail?: number };
+  }) => Promise<string>;
+
+  /**
+   * Remove a package and its data
+   * @param id DNP .eth name
+   * @param deleteVolumes flag to also clear permanent package data
+   */
+  packageRemove: (kwarg: {
+    id: string;
+    deleteVolumes?: boolean;
+    timeout?: number;
+  }) => Promise<void>;
+
+  /**
+   * Calls docker rm and docker up on a package
+   */
+  packageRestart: (kwargs: { id: string }) => Promise<void>;
+
+  /**
+   * Removes a package volumes. The re-ups the package
+   */
+  packageRestartVolumes: (kwargs: {
+    id: string;
+    volumeId?: string;
+  }) => Promise<void>;
+
+  /**
+   * Updates the .env file of a package. If requested, also re-ups it
+   * @param id DNP .eth name
+   * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
+   */
+  packageSetEnvironment: (kwargs: {
+    id: string;
+    envs: PackageEnvs;
+  }) => Promise<void>;
+
+  /**
+   * Updates a package port mappings
+   */
+  packageSetPortMappings: (kwargs: {
+    id: string;
+    portMappings: PortMapping[];
+    options?: { merge: boolean };
+  }) => Promise<void>;
+
+  /**
+   * Stops or starts after fetching its status
+   * @param id DNP .eth name
+   * @param timeout seconds to stop the package
+   */
+  packageStartStop: (kwargs: {
+    id: string;
+    options?: { timeout?: number };
   }) => Promise<void>;
 
   /**
@@ -331,34 +384,10 @@ export interface Routes {
   rebootHost: () => Promise<void>;
 
   /**
-   * Remove a package and its data
-   * @param id DNP .eth name
-   * @param deleteVolumes flag to also clear permanent package data
-   */
-  removePackage: (kwarg: {
-    id: string;
-    deleteVolumes?: boolean;
-    timeout?: number;
-  }) => Promise<void>;
-
-  /**
    * Requests chain data. Also instructs the DAPPMANAGER
    * to keep sending data for a period of time (5 minutes)
    */
   requestChainData: () => Promise<void>;
-
-  /**
-   * Calls docker rm and docker up on a package
-   */
-  restartPackage: (kwargs: { id: string }) => Promise<void>;
-
-  /**
-   * Removes a package volumes. The re-ups the package
-   */
-  restartPackageVolumes: (kwargs: {
-    id: string;
-    volumeId?: string;
-  }) => Promise<void>;
 
   /**
    * Receives an encrypted message containing the seed phrase of
@@ -379,35 +408,6 @@ export interface Routes {
    * Returns the current DAppNode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
-
-  /**
-   * Stops or starts after fetching its status
-   * @param id DNP .eth name
-   * @param timeout seconds to stop the package
-   */
-  togglePackage: (kwargs: {
-    id: string;
-    options?: { timeout?: number };
-  }) => Promise<void>;
-
-  /**
-   * Updates the .env file of a package. If requested, also re-ups it
-   * @param id DNP .eth name
-   * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
-   */
-  updatePackageEnv: (kwargs: {
-    id: string;
-    envs: PackageEnvs;
-  }) => Promise<void>;
-
-  /**
-   * Updates a package port mappings
-   */
-  updatePortMappings: (kwargs: {
-    id: string;
-    portMappings: PortMapping[];
-    options?: { merge: boolean };
-  }) => Promise<void>;
 
   /**
    * Removes a docker volume by name
@@ -445,30 +445,30 @@ export const routesData: { [P in keyof Routes]: {} } = {
   fetchDnpRequest: {},
   getStats: {},
   getUserActionLogs: {},
-  installPackage: {},
-  listPackages: {},
-  logPackage: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
-  packageDetailDataGet: {},
+  packageInstall: {},
+  packageGet: {},
+  packagesGet: {},
   packageGettingStartedToggle: {},
+  packageLog: {},
+  packageRemove: {},
+  packageRestart: {},
+  packageRestartVolumes: {},
+  packageSetEnvironment: {},
+  packageSetPortMappings: {},
+  packageStartStop: {},
   passwordChange: {},
   passwordIsSecure: {},
   poweroffHost: {},
   rebootHost: {},
-  removePackage: {},
   requestChainData: {},
-  restartPackage: {},
-  restartPackageVolumes: {},
   seedPhraseSet: {},
   setStaticIp: {},
   systemInfoGet: {},
-  togglePackage: {},
-  updatePackageEnv: {},
-  updatePortMappings: {},
   volumeRemove: {},
   volumesGet: {}
 };
@@ -477,7 +477,7 @@ export const routesData: { [P in keyof Routes]: {} } = {
 // Enforces that each route is a function that returns a promise
 export type RoutesArguments = { [K in keyof Routes]: Parameters<Routes[K]> };
 export type RoutesReturn = {
-  [K in keyof Routes]: ReplaceVoidWithNull<ResolvedType<Routes[K]>>
+  [K in keyof Routes]: ReplaceVoidWithNull<ResolvedType<Routes[K]>>;
 };
 
 /**

@@ -273,7 +273,7 @@ export interface Dependencies {
   [dependencyName: string]: string;
 }
 
-export type ContainerStatus =
+export type ContainerState =
   | "created" // created A container that has been created(e.g.with docker create) but not started
   | "restarting" // restarting A container that is in the process of being restarted
   | "running" // running A currently running container
@@ -294,7 +294,7 @@ export interface PackageContainer {
   name: string;
   shortName: string;
   ip?: string; // IP of the DNP in the dappnode network
-  state: ContainerStatus;
+  state: ContainerState;
   running: boolean;
   ports: PortMapping[];
   volumes: VolumeMapping[];
@@ -307,21 +307,15 @@ export interface PackageContainer {
   chain?: ChainDriver;
   domainAlias?: string[];
   canBeFullnode?: boolean;
-  // ### TODO: Move to PackageDetails, note it will require significant
-  // changes to the ADMIN UI in parts the code is not yet typed
-  manifest?: Manifest;
-  gettingStarted?: string;
-  gettingStartedShow?: boolean;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
 
-export interface PackageEnvs {
-  [envName: string]: string;
-}
+export interface InstalledPackageData extends PackageContainer {}
 
-export interface PackageDetailData {
-  volumes?: {
+export interface InstalledPackageDetailData extends InstalledPackageData {
+  // ### Have this in a separate endpoint?
+  volumesSize?: {
     // volumeName = bitcoin_data
     [volumeName: string]: {
       size?: string; // "823203"
@@ -331,6 +325,13 @@ export interface PackageDetailData {
   };
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;
+  gettingStarted?: string;
+  gettingStartedShow?: boolean;
+  manifest?: Manifest;
+}
+
+export interface PackageEnvs {
+  [envName: string]: string;
 }
 
 export interface ManifestUpdateAlert {
@@ -495,7 +496,7 @@ export interface ProgressLog {
 export interface UserActionLog {
   level: "info" | "error";
   timestamp: number; // 1591095463341
-  event: string; // "installPackage.dnp.dappnode.eth"
+  event: string; // "packageInstall.dnp.dappnode.eth"
   message: string; // "Successfully install DNP", { string } Returned message from the call function*
   args: any[]; // { id: "dnpName" }, { object }
   result?: any; // If success: { data: "contents" }, {*} Returned result from the call function
@@ -788,6 +789,7 @@ export interface PackageReleaseMetadata {
     ui?: string;
     api?: string;
     gateway?: string;
+    [linkName: string]: string | undefined;
   };
   repository?: {
     type?: string;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, RouteComponentProps } from "react-router-dom";
-import useSWR from "swr";
-import { api } from "api";
+import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
 import { rootPath, title } from "../data";
@@ -95,17 +94,14 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
   match
 }) => {
   const id = match.params.id;
-  const { data: credentials, error, isValidating } = useSWR(
-    [id, "deviceCredentialsGet"],
-    id => api.deviceCredentialsGet({ id })
-  );
+  const { data, error, isValidating } = useApi.deviceCredentialsGet({ id });
 
   return (
     <>
       <Title title={title} subtitle={id} />
 
-      {credentials ? (
-        <DeviceDetailsLoaded admin={false} id={id} url={credentials.url} />
+      {data ? (
+        <DeviceDetailsLoaded admin={false} id={id} url={data.url} />
       ) : error ? (
         <ErrorView error={error} />
       ) : isValidating ? (

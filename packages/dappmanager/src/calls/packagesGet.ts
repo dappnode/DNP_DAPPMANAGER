@@ -5,13 +5,13 @@ import { listContainers } from "../modules/docker/listContainers";
 import { dockerDf } from "../modules/docker/dockerApi";
 // Utils
 import parseDockerSystemDf from "../utils/parseDockerSystemDf";
-import { PackageContainer } from "../types";
+import { InstalledPackageData } from "../types";
 import { logs } from "../logs";
 
 /**
  * Returns the list of current containers associated to packages
  */
-export async function listPackages(): Promise<PackageContainer[]> {
+export async function packagesGet(): Promise<InstalledPackageData[]> {
   let dnpList = await listContainers();
 
   // ##### EMIT data before appending system data

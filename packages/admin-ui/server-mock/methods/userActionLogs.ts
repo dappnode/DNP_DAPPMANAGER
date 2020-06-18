@@ -4,7 +4,7 @@ const userActionLogs: UserActionLog[] = [];
 
 for (let i = 0; i < 200; i++) {
   userActionLogs.push({
-    event: "installPackage.dappmanager.dnp.dappnode.eth",
+    event: "packageInstall.dappmanager.dnp.dappnode.eth",
     args: [
       {
         id: "rinkeby.dnp.dappnode.eth",

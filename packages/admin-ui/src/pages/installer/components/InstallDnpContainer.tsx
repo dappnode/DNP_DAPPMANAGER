@@ -1,6 +1,5 @@
 import React from "react";
-import useSWR from "swr";
-import { api } from "api";
+import { useApi } from "api";
 import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { title } from "../data";
@@ -18,10 +17,7 @@ const InstallDnpContainer: React.FC<RouteComponentProps<{ id: string }>> = ({
 }) => {
   const id = decodeURIComponent(match.params.id);
 
-  const { data: dnp, error, isValidating } = useSWR(
-    [id, "fetchDnpRequest"],
-    id => api.fetchDnpRequest({ id })
-  );
+  const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id });
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // Get progressLogs

@@ -3,7 +3,7 @@ import { dockerVolumeInspect } from "../modules/docker/dockerApi";
 import { listContainer } from "../modules/docker/listContainers";
 import { readManifestIfExists } from "../modules/manifest";
 import * as db from "../db";
-import { PackageDetailData } from "../types";
+import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
 import { parseDevicePath } from "../modules/compose";
 import { ComposeFileEditor } from "../modules/compose/editor";
@@ -12,16 +12,14 @@ import { ComposeFileEditor } from "../modules/compose/editor";
  * Toggles the visibility of a getting started block
  * @param show Should be shown on hidden
  */
-export async function packageDetailDataGet({
+export async function packageGet({
   id
 }: {
   id: string;
-}): Promise<PackageDetailData> {
+}): Promise<InstalledPackageDetailData> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const packageDetail: PackageDetailData = {};
-
-  const dnp = await listContainer(id);
+  const dnp: InstalledPackageDetailData = await listContainer(id);
 
   // Detailed volume info
   try {
@@ -48,9 +46,7 @@ export async function packageDetailDataGet({
     //   ? {}
     //   : await getHostVolumeSizes(volDevicePaths);
 
-    packageDetail.volumes = mapValues(volDevicePaths, (
-      devicePath /* volName */
-    ) => {
+    dnp.volumesSize = mapValues(volDevicePaths, (devicePath /* volName */) => {
       const pathParts = parseDevicePath(devicePath);
       return {
         size: undefined, // volumeSizes[volName]
@@ -66,7 +62,7 @@ export async function packageDetailDataGet({
     const manifest = readManifestIfExists(dnp);
     if (manifest && manifest.setupWizard) {
       // Setup wizard, only include the environment fields
-      packageDetail.setupWizard = {
+      dnp.setupWizard = {
         ...manifest.setupWizard,
         fields: manifest.setupWizard.fields.filter(
           field => field.target && field.target.type === "environment"
@@ -89,12 +85,12 @@ export async function packageDetailDataGet({
     // ENVs that are not declared in the compose will show up (i.e. PATH)
     // So it's easier and cleaner to just parse the docker-compose.yml
     const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
-    packageDetail.userSettings = {
+    dnp.userSettings = {
       environment: compose.service().getEnvs()
     };
   } catch (e) {
     logs.warn(`Error getting user settings for ${dnp.name}`, e);
   }
 
-  return packageDetail;
+  return dnp;
 }

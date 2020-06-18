@@ -1,4 +1,4 @@
-import { restartPackage } from "./restartPackage";
+import { packageRestart } from "./packageRestart";
 import * as eventBus from "../eventBus";
 import params from "../params";
 import { listContainer } from "../modules/docker/listContainers";
@@ -14,7 +14,7 @@ import { PortMapping } from "../types";
  *   { host: 4000, container: 4000, protocol: "TCP" }
  * ]
  */
-export async function updatePortMappings({
+export async function packageSetPortMappings({
   id,
   portMappings,
   options
@@ -40,15 +40,15 @@ export async function updatePortMappings({
   compose.write();
 
   try {
-    // restartPackage triggers > eventBus emitPackages
-    await restartPackage({ id });
+    // packageRestart triggers > eventBus emitPackages
+    await packageRestart({ id });
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
       service.setPortMapping(previousPortMappings);
       compose.write();
 
-      await restartPackage({ id });
+      await packageRestart({ id });
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(

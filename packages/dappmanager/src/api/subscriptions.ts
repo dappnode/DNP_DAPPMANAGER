@@ -19,7 +19,7 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
 
   // Emit the list of packages
   eventBus.requestPackages.on(async () => {
-    subscriptions.packages.emit(await calls.listPackages());
+    subscriptions.packages.emit(await calls.packagesGet());
     subscriptions.volumes.emit(await calls.volumesGet());
   });
 

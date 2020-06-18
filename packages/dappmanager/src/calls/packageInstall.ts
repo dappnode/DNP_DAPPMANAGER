@@ -30,7 +30,7 @@ import { logs } from "../logs";
  * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
  * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
-export async function installPackage({
+export async function packageInstall({
   name: reqName,
   version: reqVersion,
   userSettings = {},

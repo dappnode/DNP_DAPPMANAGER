@@ -4,7 +4,7 @@ import params from "../params";
 // Modules
 import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
 // External call
-import { restartPackageVolumesTask } from "./restartPackageVolumes";
+import { restartPackageVolumesTask } from "./packageRestartVolumes";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
@@ -17,7 +17,7 @@ import { logs } from "../logs";
  * @param {string} id DNP .eth name
  * @param {bool} deleteVolumes flag to also clear permanent package data
  */
-export async function removePackage({
+export async function packageRemove({
   id,
   deleteVolumes = false,
   timeout = 10

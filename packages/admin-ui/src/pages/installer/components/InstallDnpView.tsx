@@ -41,9 +41,6 @@ interface InstallDnpViewProps {
  * [WARNING!] Do NOT store the userSetFormData as it may contain large files,
  * or do it with caution. The size of userSetFormData stringified is not found
  */
-// const getUniqueId = dnp =>
-//   "dappnode-user-set-form-data-" + dnp.origin ||
-//   (dnp.manifest || {}).name + (dnp.manifest || {}).version;
 
 const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   dnp,
@@ -104,7 +101,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
       setIsInstalling(true);
       await withToast(
         // If call errors with "callee disconnected", resolve with success
-        continueIfCalleDisconnected(() => api.installPackage(kwargs), name),
+        continueIfCalleDisconnected(() => api.packageInstall(kwargs), name),
         {
           message: `Installing ${shortNameCapitalized(name)}...`,
           onSuccess: `Installed ${shortNameCapitalized(name)}`

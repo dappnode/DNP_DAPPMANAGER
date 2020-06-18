@@ -1,20 +1,15 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import {
-  PackageRequest,
-  PortMapping,
-  Manifest,
-  PackageRelease
-} from "../../src/types";
+import { PackageRequest, Manifest, PackageRelease } from "../../src/types";
 import rewiremock from "rewiremock";
 // Imports for typings
-import { installPackage as installPackageType } from "../../src/calls/installPackage";
+import { packageInstall as packageInstallType } from "../../src/calls/packageInstall";
 import { DappGetState } from "../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../testUtils";
 import { ReleaseFetcher } from "../../src/modules/release";
 
-describe.skip("Call function: installPackage", function() {
+describe.skip("Call function: packageInstall", function() {
   // Pkg data
   const pkgName = "dapp.dnp.dappnode.eth";
   const pkgVer = "0.1.1";
@@ -38,10 +33,6 @@ describe.skip("Call function: installPackage", function() {
     name: depName,
     type: "library"
   };
-  const depPortsToOpen: PortMapping[] = [
-    { host: 32769, container: 32769, protocol: "UDP" },
-    { host: 32769, container: 32769, protocol: "TCP" }
-  ];
   const depPkg = {
     ...mockRelease,
     manifest: depManifest,
@@ -85,11 +76,11 @@ describe.skip("Call function: installPackage", function() {
     packageModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  let installPackage: typeof installPackageType;
+  let packageInstall: typeof packageInstallType;
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../src/calls/installPackage"),
+      () => import("../../src/calls/packageInstall"),
       mock => {
         mock(() => import("../../src/modules/release"))
           .with({ ReleaseFetcher: ReleaseFetcherMock })
@@ -99,7 +90,7 @@ describe.skip("Call function: installPackage", function() {
           .toBeUsed();
       }
     );
-    installPackage = mock.installPackage;
+    packageInstall = mock.packageInstall;
   });
 
   // before(() => {
@@ -109,7 +100,7 @@ describe.skip("Call function: installPackage", function() {
   // });
 
   it("should install the package with correct arguments", async () => {
-    const res = await installPackage({ name: pkgName });
+    const res = await packageInstall({ name: pkgName });
     expect(res).to.be.an("object");
     expect(res).to.have.property("message");
   });

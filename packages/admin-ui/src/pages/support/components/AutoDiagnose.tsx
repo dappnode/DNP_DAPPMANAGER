@@ -15,7 +15,7 @@ export default function AutoDiagnose() {
   const connectionStatus = useSelector(getConnectionStatus);
   const systemInfo = useApi.systemInfoGet();
   const hostStats = useApi.getStats();
-  const dnpInstalled = useApi.listPackages();
+  const dnpInstalled = useApi.packagesGet();
   const ipfsConnection = useSWR(["ipfsConnection"], checkIpfsConnection);
 
   const isOpen = connectionStatus.isOpen;

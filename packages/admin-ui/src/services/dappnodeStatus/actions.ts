@@ -46,13 +46,13 @@ export const fetchSystemInfo = (): AppThunk => async dispatch =>
  */
 export const fetchWifiStatus = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
-    const wifiDnp = await api.packageDetailDataGet({ id: wifiName });
+    const wifiDnp = await api.packageGet({ id: wifiName });
     const environment = wifiDnp.userSettings?.environment || {};
     const ssid = environment[wifiEnvSSID];
     const pass = environment[wifiEnvWPA_PASSPHRASE];
     const isDefault = pass === wifiDefaultWPA_PASSPHRASE;
 
-    const logs = await api.logPackage({ id: wifiName });
+    const logs = await api.packageLog({ id: wifiName });
     const firstLogLine = logs.trim().split("\n")[0];
     const running = !firstLogLine.includes("No interface found");
     dispatch(updateWifiStatus({ running, ssid, isDefault }));

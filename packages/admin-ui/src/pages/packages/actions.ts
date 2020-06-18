@@ -15,24 +15,24 @@ import { continueIfCalleDisconnected } from "api/utils";
 
 // Used in package interface / envs
 
-export const updatePackageEnv = (
+export const packageSetEnvironment = (
   id: string,
   envs: PackageEnvs
 ): AppThunk => () =>
-  withToastNoThrow(() => api.updatePackageEnv({ id, envs }), {
+  withToastNoThrow(() => api.packageSetEnvironment({ id, envs }), {
     message: `Updating ${id} envs: ${Object.keys(envs).join(", ")}...`,
     onSuccess: `Updated ${id} envs`
   });
 
 // Used in package interface / controls
 
-export const togglePackage = (id: string): AppThunk => () =>
-  withToastNoThrow(() => api.togglePackage({ id }), {
+export const packageStartStop = (id: string): AppThunk => () =>
+  withToastNoThrow(() => api.packageStartStop({ id }), {
     message: `Toggling ${sn(id)}...`,
     onSuccess: `Toggled ${sn(id)}`
   });
 
-export const restartPackage = (id: string): AppThunk => async (_, getState) => {
+export const packageRestart = (id: string): AppThunk => async (_, getState) => {
   // If the DNP is not gracefully stopped, ask for confirmation to reset
   const dnp = getDnpInstalledById(getState(), id);
   if (!dnp || dnp.running || dnp.state !== "exited")
@@ -47,7 +47,7 @@ export const restartPackage = (id: string): AppThunk => async (_, getState) => {
 
   await withToastNoThrow(
     // If call errors with "callee disconnected", resolve with success
-    continueIfCalleDisconnected(() => api.restartPackage({ id }), id),
+    continueIfCalleDisconnected(() => api.packageRestart({ id }), id),
     {
       message: `Restarting ${sn(id)}...`,
       onSuccess: `Restarted ${sn(id)}`
@@ -55,7 +55,7 @@ export const restartPackage = (id: string): AppThunk => async (_, getState) => {
   );
 };
 
-export const restartPackageVolumes = (id: string): AppThunk => async (
+export const packageRestartVolumes = (id: string): AppThunk => async (
   _,
   getState
 ) => {
@@ -92,13 +92,13 @@ export const restartPackageVolumes = (id: string): AppThunk => async (
     );
   }
 
-  await withToastNoThrow(() => api.restartPackageVolumes({ id }), {
+  await withToastNoThrow(() => api.packageRestartVolumes({ id }), {
     message: `Removing volumes of ${sn(id)}...`,
     onSuccess: `Removed volumes of ${sn(id)}`
   });
 };
 
-export const removePackage = (id: string): AppThunk => async (_, getState) => {
+export const packageRemove = (id: string): AppThunk => async (_, getState) => {
   const dnp = getDnpInstalledById(getState(), id);
   if (!dnp) throw Error(`DNP not found dnpList: ${id}`);
 
@@ -157,7 +157,7 @@ export const removePackage = (id: string): AppThunk => async (_, getState) => {
       })
     );
 
-  await withToastNoThrow(() => api.removePackage({ id, deleteVolumes }), {
+  await withToastNoThrow(() => api.packageRemove({ id, deleteVolumes }), {
     message: `Removing ${sn(id)} ${deleteVolumes ? " and volumes" : ""}...`,
     onSuccess: `Removed ${sn(id)}`
   });

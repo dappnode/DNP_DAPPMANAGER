@@ -1,53 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import * as action from "../../actions";
+import { packageSetEnvironment } from "../../actions";
 // Components
 import { SetupWizard } from "components/SetupWizard";
 // Utils
 import {
-  PackageContainer,
+  SetupWizard as SetupWizardType,
   UserSettingsAllDnps,
-  PackageDetailData
-} from "common/types";
+  UserSettings
+} from "types";
 
 export default function Config({
-  dnp,
-  dnpDetail
+  id,
+  setupWizard,
+  userSettings
 }: {
-  dnp?: PackageContainer;
-  dnpDetail?: PackageDetailData;
+  id: string;
+  setupWizard?: SetupWizardType;
+  userSettings?: UserSettings;
 }) {
-  const [userSettings, setUserSettings] = useState<UserSettingsAllDnps>({});
+  const [localUserSettings, setLocalUserSettings] = useState<
+    UserSettingsAllDnps
+  >({});
   const dispatch = useDispatch();
 
-  const name = dnp ? dnp.name : "dnp";
-  const setupWizardDnp = (dnpDetail || {}).setupWizard;
-  const setupWizard = setupWizardDnp ? { [name]: setupWizardDnp } : {};
-
   useEffect(() => {
-    const userSettingsDnp = (dnpDetail || {}).userSettings;
-    if (userSettingsDnp) setUserSettings({ [name]: userSettingsDnp });
-  }, [dnpDetail, name]);
-
+    if (userSettings) setLocalUserSettings({ [id]: userSettings });
+  }, [userSettings, id]);
   function onSubmit(newUserSettings: UserSettingsAllDnps) {
     // Persist them here so the new settings don't dissapear on submission
-    setUserSettings(newUserSettings);
+    setLocalUserSettings(newUserSettings);
 
-    if (!dnp || !dnp.name)
-      return console.error(
-        `Can't update ENVs because dnp.name not defined`,
-        dnp
-      );
-
-    const newEnvs = newUserSettings[name].environment;
+    const newEnvs = newUserSettings[id].environment;
     if (!newEnvs) return console.error(`SetupWizard returned no ENVs`);
-    dispatch(action.updatePackageEnv(dnp.name, newEnvs));
+    dispatch(packageSetEnvironment(id, newEnvs));
   }
 
   return (
     <SetupWizard
-      setupWizard={setupWizard}
-      userSettings={userSettings}
+      setupWizard={setupWizard ? { [id]: setupWizard } : {}}
+      userSettings={localUserSettings}
       onSubmit={onSubmit}
       submitTag="Update"
     />

@@ -4,7 +4,7 @@ import { logContainer } from "../modules/docker/dockerApi";
 /**
  * Returns the logs of the docker container of a package
  */
-export async function logPackage({
+export async function packageLog({
   id,
   options
 }: {

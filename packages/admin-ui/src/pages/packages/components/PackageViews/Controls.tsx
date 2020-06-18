@@ -5,14 +5,13 @@ import { useDispatch } from "react-redux";
 import CardList from "components/CardList";
 import Button from "components/Button";
 // Utils
-import { toLowercase } from "utils/strings";
 import { wifiName, ipfsName } from "params";
-import { PackageContainer } from "common/types";
+import { VolumeMapping, ContainerState } from "types";
 import {
-  togglePackage,
-  restartPackageVolumes,
-  removePackage,
-  restartPackage
+  packageStartStop,
+  packageRestartVolumes,
+  packageRemove,
+  packageRestart
 } from "pages/packages/actions";
 
 function getRootPath(dnpName: string) {
@@ -29,11 +28,20 @@ function getRootPath(dnpName: string) {
     : "/packages";
 }
 
-export function Controls({ dnp }: { dnp: PackageContainer }) {
+export function Controls({
+  id,
+  isCore,
+  state,
+  volumes
+}: {
+  id: string;
+  isCore: boolean;
+  state: ContainerState;
+  volumes: VolumeMapping[];
+}) {
   const dispatch = useDispatch();
-  const state = toLowercase(dnp.state); // toLowercase always returns a string
 
-  const namedVols = (dnp.volumes || []).filter(vol => vol.name);
+  const namedVols = (volumes || []).filter(vol => vol.name);
   const namedOwnedVols = namedVols.filter(vol => vol.isOwner);
   const namedExternalVols = namedVols
     .filter(vol => !vol.isOwner && vol.owner)
@@ -48,7 +56,7 @@ export function Controls({ dnp }: { dnp: PackageContainer }) {
       name:
         state === "running" ? "Stop" : state === "exited" ? "Start" : "Toggle",
       text: "Toggle the state of the package from running to paused",
-      action: () => dispatch(togglePackage(dnp.name)),
+      action: () => dispatch(packageStartStop(id)),
       availableForCore: false,
       whitelist: [wifiName, ipfsName],
       type: "secondary"
@@ -57,7 +65,7 @@ export function Controls({ dnp }: { dnp: PackageContainer }) {
       name: "Restart",
       text:
         "Restarting a package will interrupt the service during 1-10s but preserve its data",
-      action: () => dispatch(restartPackage(dnp.name)),
+      action: () => dispatch(packageRestart(id)),
       availableForCore: true,
       type: "secondary"
     },
@@ -76,7 +84,7 @@ export function Controls({ dnp }: { dnp: PackageContainer }) {
           ))}
         </div>
       ),
-      action: () => dispatch(restartPackageVolumes(dnp.name)),
+      action: () => dispatch(packageRestartVolumes(id)),
       availableForCore: true,
       disabled: !namedOwnedVols.length,
       type: "danger"
@@ -84,7 +92,7 @@ export function Controls({ dnp }: { dnp: PackageContainer }) {
     {
       name: "Remove ",
       text: "Deletes a package permanently.",
-      action: () => dispatch(removePackage(dnp.name)),
+      action: () => dispatch(packageRemove(id)),
       availableForCore: false,
       type: "danger"
     }
@@ -97,8 +105,8 @@ export function Controls({ dnp }: { dnp: PackageContainer }) {
         .filter(
           action =>
             action.availableForCore ||
-            !dnp.isCore ||
-            (action.whitelist || []).includes(dnp.name)
+            !isCore ||
+            (action.whitelist || []).includes(id)
         )
         .map(({ name, text, type, action, disabled }) => (
           <div key={name} className="control-item">

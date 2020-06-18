@@ -4,20 +4,15 @@ import {
   Diagnose,
   EthClientFallback,
   EthClientTarget,
-  CoreUpdateData,
-  DirectoryItem,
   HostStats,
-  RequestedDnp,
   MountpointData,
   NewFeatureId,
   NewFeatureStatus,
   PackageNotificationDb,
   PackageNotification,
-  PackageDetailData,
   SystemInfo,
   PortMapping,
-  VolumeData,
-  UserActionLog
+  VolumeData
 } from "../../src/common";
 import { coreName } from "../mockData";
 

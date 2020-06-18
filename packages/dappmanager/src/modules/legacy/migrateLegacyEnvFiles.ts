@@ -1,7 +1,7 @@
 import fs from "fs";
 import { parseEnvironment } from "../compose";
 import { ComposeFileEditor } from "../compose/editor";
-import { listPackages } from "../../calls";
+import { packagesGet } from "../../calls";
 import * as getPath from "../../utils/getPath";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";
@@ -13,7 +13,7 @@ import { isNotFoundError } from "../../utils/node";
  */
 export async function migrateLegacyEnvFiles(): Promise<void> {
   try {
-    const dnpList = await listPackages();
+    const dnpList = await packagesGet();
     for (const { name, isCore } of dnpList) migrateLegacyEnvFile(name, isCore);
     logs.info("Finished migrating legacy DNP .env files if any");
   } catch (e) {

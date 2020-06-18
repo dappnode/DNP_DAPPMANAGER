@@ -82,8 +82,8 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       return dnpList.find(dnp => dnp.name === name) || null;
     }
 
-    const installPackage = sinon.mock().resolves({ message: "" });
-    // async function installPackage(): Promise<{ message: string }> {
+    const packageInstall = sinon.mock().resolves({ message: "" });
+    // async function packageInstall(): Promise<{ message: string }> {
     //   return { message: "" };
     // }
 
@@ -97,7 +97,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
           .with({ listContainerNoThrow })
           .toBeUsed();
         mock(() => import("../../../src/calls"))
-          .with({ installPackage })
+          .with({ packageInstall })
           .toBeUsed();
       }
     );
@@ -137,7 +137,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
       } as State,
       "After the user selects a new target it should start installing"
     );
-    sinon.assert.calledOnce(installPackage);
+    sinon.assert.calledOnce(packageInstall);
 
     // Simulate the package starts running after being installed
     dnpList.push({

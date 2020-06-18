@@ -7,7 +7,7 @@ import * as calls from "../../calls";
  */
 export const containerLogs: express.Handler = async (req, res) => {
   const { id } = req.params;
-  const logs = await calls.logPackage({ id });
+  const logs = await calls.packageLog({ id });
 
   const filename = `logs-dappnode-package-${id}.txt`;
   const mimetype = "text/plain";

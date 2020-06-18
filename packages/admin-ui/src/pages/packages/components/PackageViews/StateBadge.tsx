@@ -1,7 +1,7 @@
 import React from "react";
-import { ContainerStatus } from "types";
+import { ContainerState } from "types";
 
-export default function StateBadge({ state }: { state: ContainerStatus }) {
+export default function StateBadge({ state }: { state: ContainerState }) {
   const styleColor =
     state === "running"
       ? "success"

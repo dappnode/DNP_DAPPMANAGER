@@ -12,7 +12,7 @@ const updateStatus = dnpInstalledSlice.actions.updateStatus;
 export const fetchDnpInstalled = (): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
-    dispatch(setDnpInstalled(await api.listPackages()));
+    dispatch(setDnpInstalled(await api.packagesGet()));
     dispatch(updateStatus({ loading: false, success: true }));
   } catch (e) {
     dispatch(updateStatus({ loading: false, error: e.message }));

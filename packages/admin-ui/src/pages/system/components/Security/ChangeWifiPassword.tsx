@@ -56,7 +56,7 @@ export default function ChangeWifiPassword() {
       [wifiEnvSSID]: ssid,
       [wifiEnvWPA_PASSPHRASE]: password
     };
-    withToastNoThrow(() => api.updatePackageEnv({ id: wifiName, envs }), {
+    withToastNoThrow(() => api.packageSetEnvironment({ id: wifiName, envs }), {
       message: "Changing WIFI credentials...",
       onSuccess: "Changed WIFI credentials"
     });

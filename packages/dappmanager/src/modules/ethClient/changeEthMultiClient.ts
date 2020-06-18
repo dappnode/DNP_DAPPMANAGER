@@ -1,7 +1,7 @@
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
-import { removePackage } from "../../calls";
+import { packageRemove } from "../../calls";
 import { EthClientTarget, UserSettings } from "../../types";
 import { logs } from "../../logs";
 
@@ -27,7 +27,7 @@ export async function changeEthMultiClient(
       const clientData = ethClientData[prevTarget];
       if (clientData) {
         db.ethClientInstallStatus.set(prevTarget, { status: "UNINSTALLED" });
-        await removePackage({ id: clientData.name, deleteVolumes });
+        await packageRemove({ id: clientData.name, deleteVolumes });
         // Must await uninstall because geth -> light, light -> geth
         // will create conflicts since it's the same DNP
       }

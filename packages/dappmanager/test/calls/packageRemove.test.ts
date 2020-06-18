@@ -6,11 +6,11 @@ import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
 import rewiremock from "rewiremock";
 // Imports for typings
-import { removePackage as removePackageType } from "../../src/calls/removePackage";
+import { packageRemove as packageRemoveType } from "../../src/calls/packageRemove";
 import { PackageContainer } from "../../src/types";
 import { mockDnp, cleanTestDir } from "../testUtils";
 
-describe("Call function: removePackage", function() {
+describe("Call function: packageRemove", function() {
   const id = "test.dnp.dappnode.eth";
   const dockerComposePath = getPath.dockerCompose(id, false);
   const dockerComposeTemplate = `
@@ -37,11 +37,11 @@ describe("Call function: removePackage", function() {
     packagesModified: { emit: sinon.stub(), on: sinon.stub() }
   };
 
-  let removePackage: typeof removePackageType;
+  let packageRemove: typeof packageRemoveType;
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../src/calls/removePackage"),
+      () => import("../../src/calls/packageRemove"),
       mock => {
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerComposeDown, dockerRm })
@@ -54,7 +54,7 @@ describe("Call function: removePackage", function() {
           .toBeUsed();
       }
     );
-    removePackage = mock.removePackage;
+    packageRemove = mock.packageRemove;
   });
 
   before(async () => {
@@ -63,7 +63,7 @@ describe("Call function: removePackage", function() {
   });
 
   it("should stop the package with correct arguments", async () => {
-    await removePackage({ id });
+    await packageRemove({ id });
   });
 
   it("should have called docker-compose down", async () => {

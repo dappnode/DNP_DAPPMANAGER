@@ -8,9 +8,9 @@ import { PackageContainer } from "../../src/types";
 import { mockDnp, mockVolume } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
-import { restartPackageVolumes as restartPackageVolumesType } from "../../src/calls/restartPackageVolumes";
+import { packageRestartVolumes as packageRestartVolumesType } from "../../src/calls/packageRestartVolumes";
 
-describe("Call function: restartPackageVolumes", function() {
+describe("Call function: packageRestartVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
   const dappmanagerId = "dappmanager.dnp.dappnode.eth";
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
@@ -132,11 +132,11 @@ describe("Call function: restartPackageVolumes", function() {
     return dnpList;
   }
 
-  let restartPackageVolumes: typeof restartPackageVolumesType;
+  let packageRestartVolumes: typeof packageRestartVolumesType;
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../src/calls/restartPackageVolumes"),
+      () => import("../../src/calls/packageRestartVolumes"),
       mock => {
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerRm, dockerVolumeRm })
@@ -152,7 +152,7 @@ describe("Call function: restartPackageVolumes", function() {
           .toBeUsed();
       }
     );
-    restartPackageVolumes = mock.restartPackageVolumes;
+    packageRestartVolumes = mock.packageRestartVolumes;
   });
 
   before(() => {
@@ -170,7 +170,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${nginxId}`, async () => {
-    await restartPackageVolumes({ id: nginxId });
+    await packageRestartVolumes({ id: nginxId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -206,7 +206,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${dnpNameCore} (core)`, async () => {
-    await restartPackageVolumes({ id: dnpNameCore });
+    await packageRestartVolumes({ id: dnpNameCore });
 
     // sinon.assert.called(dockerRm);
     sinon.assert.called(dockerRm);
@@ -222,7 +222,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove only one of the package volumes of ${dnpNameCore} (core)`, async () => {
-    await restartPackageVolumes({
+    await packageRestartVolumes({
       id: dnpNameCore,
       volumeId: "vol1"
     });
@@ -241,7 +241,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {
-    await restartPackageVolumes({ id: raidenTestnetId });
+    await packageRestartVolumes({ id: raidenTestnetId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -275,7 +275,7 @@ describe("Call function: restartPackageVolumes", function() {
   it("Should NOT allow id = dappmanager.dnp.dappnode.eth", async () => {
     let err = "did not throw";
     try {
-      await restartPackageVolumes({ id: "dappmanager.dnp.dappnode.eth" });
+      await packageRestartVolumes({ id: "dappmanager.dnp.dappnode.eth" });
     } catch (e) {
       err = e.message;
     }
@@ -283,7 +283,7 @@ describe("Call function: restartPackageVolumes", function() {
   });
 
   it("Should early return if the DNP has no volumes", async () => {
-    await restartPackageVolumes({ id: noVolsDnpName });
+    await packageRestartVolumes({ id: noVolsDnpName });
   });
 
   after(() => {
