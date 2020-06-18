@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
-import { PortMapping } from "types";
+import { PortMapping, PackageContainer } from "types";
 // Components
 import Card from "components/Card";
-import TableInputs from "components/TableInputs";
 import Button from "components/Button";
+import Input from "components/Input";
+import Select from "components/Select";
 // Utils
 import { shortNameCapitalized } from "utils/format";
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./ports.scss";
-import { PackageContainer } from "common";
 
 const maxPortNumber = 32768 - 1;
 
@@ -120,8 +120,6 @@ export default function Ports({
   const duplicatedHostPort = getDuplicatedHostPort();
   const conflictingPort = getConflictingPort();
   const portOverTheMax = getPortOverTheMax();
-
-  const thereAreNewPorts = ports.some(({ deletable }) => deletable);
   const arePortsTheSame = portsToId(portsFromDnp) === portsToId(ports);
 
   // Aggregate error messages as an array of strings
@@ -161,59 +159,83 @@ export default function Ports({
       updating
   );
 
+  // "auto auto minmax(min-content, max-content) min-content"
   return (
     <Card spacing className="ports-editor">
-      <TableInputs
-        headers={[
-          "Host port",
-          "Package port number",
-          "Protocol",
-          ...(thereAreNewPorts ? [""] : [])
-        ]}
-        numOfRows={3}
-        rowsTemplate={
-          thereAreNewPorts
-            ? "auto auto minmax(min-content, max-content) min-content"
-            : "auto auto minmax(min-content, max-content)"
-        }
-        content={[
-          ...ports.map(({ host, container, protocol, deletable }, i) => [
-            {
-              placeholder: "Ephemeral port if unspecified",
-              value: host || "",
-              onValueChange: (value: string) =>
-                editPort(i, { host: parseInt(value) || undefined })
-            },
+      <table>
+        <thead>
+          <tr>
+            <td className="subtle-header">Host port</td>
+            <td className="subtle-header">Package port number</td>
+            <td className="subtle-header">Protocol</td>
+          </tr>
+        </thead>
+        <tbody>
+          {ports.map(({ host, container, protocol, deletable }, i) => (
+            <tr key={i}>
+              <td>
+                <Input
+                  placeholder="Ephemeral port if unspecified"
+                  value={host || ""}
+                  onValueChange={(value: string) =>
+                    editPort(i, { host: parseInt(value) || undefined })
+                  }
+                />
+              </td>
+              <td>
+                {deletable ? (
+                  <Input
+                    placeholder="enter container port..."
+                    value={container}
+                    onValueChange={(value: string) =>
+                      editPort(i, { container: parseInt(value) || undefined })
+                    }
+                  />
+                ) : (
+                  <Input
+                    lock={true}
+                    value={container}
+                    onValueChange={() => {}}
+                  />
+                )}
+              </td>
+              <td>
+                {deletable ? (
+                  <Select
+                    options={["TCP", "UDP"]}
+                    value={protocol}
+                    onValueChange={(value: string) =>
+                      editPort(i, { protocol: value === "UDP" ? "UDP" : "TCP" })
+                    }
+                  />
+                ) : (
+                  <Input
+                    lock={true}
+                    value={protocol}
+                    onValueChange={() => {}}
+                  />
+                )}
+              </td>
 
-            deletable
-              ? {
-                  placeholder: "enter container port...",
-                  value: container,
-                  onValueChange: (value: string) =>
-                    editPort(i, { container: parseInt(value) || undefined })
-                }
-              : { lock: true, value: container },
-
-            deletable
-              ? {
-                  select: true,
-                  options: ["TCP", "UDP"],
-                  value: protocol,
-                  onValueChange: (value: string) =>
-                    editPort(i, { protocol: value === "UDP" ? "UDP" : "TCP" })
-                }
-              : { lock: true, value: protocol },
-
-            ...(thereAreNewPorts
-              ? [
-                  deletable
-                    ? { deleteButton: true, onClick: () => removePort(i) }
-                    : { empty: true }
-                ]
-              : [])
-          ])
-        ]}
-      />
+              {deletable && (
+                <td className="delete">
+                  <Button
+                    onClick={() => removePort(i)}
+                    style={{
+                      display: "flex",
+                      fontSize: "1.5rem",
+                      padding: ".375rem",
+                      borderColor: "#ced4da"
+                    }}
+                  >
+                    <MdClose />
+                  </Button>
+                </td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       {errors.map(error => (
         <div className="error" key={error}>
