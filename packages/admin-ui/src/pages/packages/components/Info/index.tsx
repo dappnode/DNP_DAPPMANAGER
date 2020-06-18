@@ -11,7 +11,7 @@ import Links from "./Links";
 import Vols from "./Vols";
 import StateBadge from "../StateBadge";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer, Manifest, InstalledPackageDetailData } from "types";
+import { PackageContainer, Manifest } from "types";
 import "./info.scss";
 
 const ipfsGateway = "http://ipfs.dappnode:8080";
@@ -20,14 +20,12 @@ function Info({
   dnp,
   manifest,
   gettingStarted,
-  gettingStartedShow,
-  volumesDetail
+  gettingStartedShow
 }: {
   dnp: PackageContainer;
   manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
-  volumesDetail: InstalledPackageDetailData["volumesSize"];
 }) {
   const [gettingStartedShowLocal, setGettingStartedIsShown] = useState(false);
   const [allowUndo, setAllowUndo] = useState(false);
@@ -122,11 +120,7 @@ function Info({
         )}
 
         <div>
-          <Vols
-            dnpName={dnp.name}
-            volumes={dnp.volumes}
-            volumesDetail={volumesDetail}
-          />
+          <Vols dnpName={dnp.name} volumes={dnp.volumes} />
         </div>
 
         <div>

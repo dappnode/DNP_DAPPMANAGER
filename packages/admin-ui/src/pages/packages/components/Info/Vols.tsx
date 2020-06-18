@@ -1,17 +1,19 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import { getVolumes } from "services/dappnodeStatus/selectors";
 import DataList from "./DataList";
 import { prettyVolumeName, prettyBytes } from "utils/format";
-import { VolumeMapping, InstalledPackageDetailData } from "types";
+import { VolumeMapping } from "types";
 
 export default function Vols({
   dnpName,
-  volumes,
-  volumesDetail
+  volumes
 }: {
   dnpName: string;
   volumes: VolumeMapping[];
-  volumesDetail: InstalledPackageDetailData["volumesSize"];
 }) {
+  const volumesData = useSelector(getVolumes);
+
   return (
     <DataList
       title={"Volumes"}
@@ -24,9 +26,9 @@ export default function Vols({
         // - dncore_vpndnpdappnodeeth_data: 866B
         // - /etc/hostname: - (bind)
         .map(({ name, container, size, host }) => {
-          const volumeDetail = (volumesDetail || {})[name || ""];
-          const mountpointSize = volumeDetail ? volumeDetail.size : undefined;
-          const mountpoint = volumeDetail ? volumeDetail.mountpoint : undefined;
+          const volumeDetail = volumesData.find(v => v.name === name);
+          const mountpointSize = volumeDetail?.size;
+          const mountpoint = volumeDetail?.mountpoint;
           const prettyVol = prettyVolumeName(name || "", dnpName);
           const prettyVolString = [prettyVol.owner, prettyVol.name]
             .filter(s => s)
@@ -34,7 +36,7 @@ export default function Vols({
           return {
             name: name ? prettyVolString : container || "Unknown",
             size: mountpointSize
-              ? prettyBytes(parseInt(mountpointSize))
+              ? prettyBytes(mountpointSize)
               : typeof size === "number" && !isNaN(size)
               ? prettyBytes(size)
               : !name
