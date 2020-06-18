@@ -8,6 +8,7 @@ import {
   InstalledPackageData,
   InstalledPackageDetailData
 } from "../../src/common";
+import * as eventBus from "../eventBus";
 import { dnpInstalled, directory, dnpRequests } from "../data";
 import { pause } from "../utils";
 
@@ -24,6 +25,7 @@ function update(
   const pkg = packages.get(id);
   if (!pkg) throw Error(`No id ${id}`);
   packages.set(id, { ...pkg, ...fn(pkg) });
+  eventBus.requestPackages.emit();
 }
 
 /**

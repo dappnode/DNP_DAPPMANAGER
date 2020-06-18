@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
 import {
@@ -10,8 +11,7 @@ import {
 } from "services/coreUpdate/selectors";
 import {
   getWifiStatus,
-  getPasswordIsSecure,
-  getIsCoreAutoUpdateActive
+  getPasswordIsSecure
 } from "services/dappnodeStatus/selectors";
 import {
   rootPath as systemRootPath,
@@ -21,6 +21,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
+import { autoUpdateIds } from "params";
 
 /**
  * Aggregate notification and display logic
@@ -29,9 +30,16 @@ export default function NotificationsView() {
   const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);
   const updatingCore = useSelector(getUpdatingCore);
   const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
-  const isCoreAutoUpdateActive = useSelector(getIsCoreAutoUpdateActive);
   const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
+
+  // Check is auto updates are enabled for the core
+  const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
+  const isCoreAutoUpdateActive = (
+    (autoUpdateSettingsReq.data?.settings || {})[
+      autoUpdateIds.SYSTEM_PACKAGES
+    ] || {}
+  ).enabled;
 
   const notifications = [
     /**

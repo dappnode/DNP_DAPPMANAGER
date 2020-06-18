@@ -7,19 +7,11 @@ import {
   clearIsInstallingLog,
   updateIsInstallingLog
 } from "services/isInstallingLogs/actions";
-import {
-  updateAutoUpdateData,
-  updateVolumes,
-  setSystemInfo
-} from "services/dappnodeStatus/actions";
+import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
 import { setDnpDirectory } from "services/dnpDirectory/actions";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
-  subscriptions.autoUpdateData.on(autoUpdateData => {
-    store.dispatch(updateAutoUpdateData(autoUpdateData));
-  });
-
   subscriptions.chainData.on(chainsData => {
     store.dispatch(updateChainData(chainsData));
   });

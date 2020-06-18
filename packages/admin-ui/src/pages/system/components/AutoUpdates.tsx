@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { api } from "api";
+import { api, useApi } from "api";
 // Components
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
 import Switch from "components/Switch";
+import Loading from "components/Loading";
+import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized } from "utils/format";
@@ -14,9 +16,7 @@ import { coreName, autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
 // External
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
-import { getAutoUpdateData } from "services/dappnodeStatus/selectors";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
-import { fetchAutoUpdateData } from "services/dappnodeStatus/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { rootPath as installerRootPath } from "pages/installer";
 import {
@@ -34,27 +34,9 @@ const getIsSinglePackage = (id: string) =>
  * Main auto-udpates view
  */
 export default function AutoUpdates() {
-  const autoUpdateData = useSelector(getAutoUpdateData);
+  const autoUpdateData = useApi.autoUpdateDataGet();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
   const ethClientWarning = useSelector(getEthClientWarning);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchAutoUpdateData());
-  }, [dispatch]);
-
-  const { dnpsToShow = [] } = autoUpdateData || {};
-  const someAutoUpdateIsEnabled =
-    dnpsToShow.length > 0 && dnpsToShow.some(dnp => dnp.enabled);
-
-  // Force a re-render every 15 seconds for the timeFrom to show up correctly
-  const [, setClock] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => setClock(n => n + 1), 15 * 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   async function setUpdateSettings(
     id: string,
@@ -73,58 +55,70 @@ export default function AutoUpdates() {
     }
   }
 
-  return (
-    <Card>
-      <div className="auto-updates-explanation">
-        Enable auto-updates for DAppNode to install automatically the latest
-        versions. For major breaking updates, your approval will always be
-        required.
-      </div>
+  if (autoUpdateData.data) {
+    const { dnpsToShow = [] } = autoUpdateData.data || {};
+    const someAutoUpdateIsEnabled =
+      dnpsToShow.length > 0 && dnpsToShow.some(dnp => dnp.enabled);
 
-      {ethClientWarning && someAutoUpdateIsEnabled && (
-        <Alert variant="warning">
-          Auto-updates will not work temporarily. Eth client not available:{" "}
-          {ethClientWarning}
-          <br />
-          Enable the{" "}
-          <NavLink to={activateFallbackPath}>
-            repository source fallback
-          </NavLink>{" "}
-          to have auto-updates meanwhile
-        </Alert>
-      )}
+    return (
+      <Card>
+        <div className="auto-updates-explanation">
+          Enable auto-updates for DAppNode to install automatically the latest
+          versions. For major breaking updates, your approval will always be
+          required.
+        </div>
 
-      <div className="list-grid auto-updates">
-        {/* Table header */}
-        <span className="stateBadge" />
-        <span className="name" />
-        <span className="last-update header">Last auto-update</span>
-        <span className="header">Enabled</span>
+        {ethClientWarning && someAutoUpdateIsEnabled && (
+          <Alert variant="warning">
+            Auto-updates will not work temporarily. Eth client not available:{" "}
+            {ethClientWarning}
+            <br />
+            Enable the{" "}
+            <NavLink to={activateFallbackPath}>
+              repository source fallback
+            </NavLink>{" "}
+            to have auto-updates meanwhile
+          </Alert>
+        )}
 
-        <hr />
-        {/* Items of the table */}
-        {dnpsToShow.map(({ id, displayName, enabled, feedback }) => (
-          <AutoUpdateItem
-            key={id}
-            {...{
-              id,
-              displayName,
-              enabled,
-              feedback,
-              isInstalling: Boolean(
-                (progressLogsByDnp || {})[
-                  id === SYSTEM_PACKAGES ? coreName : id
-                ]
-              ),
-              isSinglePackage: getIsSinglePackage(id),
-              // Actions
-              setUpdateSettings
-            }}
-          />
-        ))}
-      </div>
-    </Card>
-  );
+        <div className="list-grid auto-updates">
+          {/* Table header */}
+          <span className="stateBadge" />
+          <span className="name" />
+          <span className="last-update header">Last auto-update</span>
+          <span className="header">Enabled</span>
+
+          <hr />
+          {/* Items of the table */}
+          {dnpsToShow.map(({ id, displayName, enabled, feedback }) => (
+            <AutoUpdateItem
+              key={id}
+              {...{
+                id,
+                displayName,
+                enabled,
+                feedback,
+                isInstalling: Boolean(
+                  (progressLogsByDnp || {})[
+                    id === SYSTEM_PACKAGES ? coreName : id
+                  ]
+                ),
+                isSinglePackage: getIsSinglePackage(id),
+                // Actions
+                setUpdateSettings
+              }}
+            />
+          ))}
+        </div>
+      </Card>
+    );
+  } else if (autoUpdateData.error) {
+    return <ErrorView error={autoUpdateData.error} />;
+  } else if (autoUpdateData.isValidating) {
+    return <Loading steps={["Loading auto-update data"]} />;
+  } else {
+    return <ErrorView error="Unknown error" />;
+  }
 }
 
 /**
@@ -149,6 +143,14 @@ function AutoUpdateItem({
   setUpdateSettings: (id: string, enable: boolean) => void;
 }) {
   const [collapsed, setCollapsed] = useState(true);
+  // Force a re-render every 15 seconds for the timeFrom to show up correctly
+  const [, setClock] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setClock(n => n + 1), 15 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const { updated, manuallyUpdated, inQueue, scheduled } = feedback;
   const errorMessage = feedback.errorMessage;
@@ -188,9 +190,7 @@ function AutoUpdateItem({
       </span>
 
       <span className="name">
-        {isSinglePackage && (
-            <MdChevronRight className="arrow"/>
-        )}
+        {isSinglePackage && <MdChevronRight className="arrow" />}
         {displayName}
       </span>
 
