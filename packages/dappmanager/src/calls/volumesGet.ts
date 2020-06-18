@@ -5,17 +5,7 @@ import { parseDevicePath } from "../modules/compose";
 import { VolumeData } from "../types";
 
 /**
- * Returns not viewed notifications.
- * Use an array as the keys are not known in advance and the array form
- * is okay for RPC transport, as uniqueness is guaranteed
- *
- * @returns {object} notifications object, by notification id
- * notifications = [{
- *   id: "diskSpaceRanOut-stoppedPackages",
- *   type: "danger",
- *   title: "Disk space ran out, stopped packages",
- *   body: "Available disk space is less than a safe ...",
- * }, ... ]
+ * Returns volume data
  */
 export async function volumesGet(): Promise<VolumeData[]> {
   const volumes = await dockerVolumesList();

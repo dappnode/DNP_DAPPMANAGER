@@ -8,20 +8,18 @@ import {
   InstalledPackageData,
   InstalledPackageDetailData
 } from "../../src/common";
-import {
-  directory,
-  dnpRequests,
-  dnpInstalled,
-  PackageMockState
-} from "../mockData";
+import { dnpInstalled, directory, dnpRequests } from "../data";
+import { pause } from "../utils";
 
-const packages = new Map<string, PackageMockState>(
+const pkgRestartMs = 2000;
+
+const packages = new Map<string, InstalledPackageDetailData>(
   dnpInstalled.map(pkg => [pkg.name, pkg])
 );
 
 function update(
   id: string,
-  fn: (pkg: PackageMockState) => Partial<PackageMockState>
+  fn: (pkg: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
 ) {
   const pkg = packages.get(id);
   if (!pkg) throw Error(`No id ${id}`);
@@ -102,6 +100,7 @@ export async function packageInstall({
     BYPASS_CORE_RESTRICTION?: boolean;
   };
 }): Promise<void> {
+  await pause(pkgRestartMs);
   packages.set(name, {
     id: name,
     packageName: name,
@@ -194,6 +193,7 @@ export async function packageRemove({
   deleteVolumes?: boolean;
   timeout?: number;
 }): Promise<void> {
+  await pause(pkgRestartMs);
   packages.delete(id);
 }
 
@@ -201,7 +201,11 @@ export async function packageRemove({
  * Calls docker rm and docker up on a package
  */
 export async function packageRestart({ id }: { id: string }): Promise<void> {
-  throw Error(`Not implemented: ${id}`);
+  await pause(pkgRestartMs);
+  update(id, () => ({ state: "exited" }));
+
+  await pause(pkgRestartMs);
+  update(id, () => ({ state: "running" }));
 }
 
 /**
@@ -228,7 +232,13 @@ export async function packageSetEnvironment({
   id: string;
   envs: PackageEnvs;
 }): Promise<void> {
-  update(id, () => ({ envs }));
+  await pause(pkgRestartMs);
+  update(id, dnp => ({
+    userSettings: {
+      ...dnp.userSettings,
+      environment: { ...(dnp.userSettings?.environment || {}), ...envs }
+    }
+  }));
 }
 
 /**
@@ -244,6 +254,7 @@ export async function packageSetPortMappings({
   portMappings: PortMapping[];
   options?: { merge: boolean };
 }): Promise<void> {
+  await pause(pkgRestartMs);
   update(id, () => ({ ports: portMappings }));
 }
 
@@ -258,6 +269,7 @@ export async function packageStartStop({
   id: string;
   options?: { timeout?: number };
 }): Promise<void> {
+  await pause(pkgRestartMs);
   update(id, pkg => ({
     running: !pkg.running,
     state: pkg.running ? "exited" : "running"
