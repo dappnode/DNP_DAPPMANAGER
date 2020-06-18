@@ -1,0 +1,24 @@
+{
+  "name": "dappmanager.dnp.dappnode.eth",
+  "version": "0.2.33",
+  "description": "Dappnode package responsible for providing the DappNode Package Manager",
+  "type": "dncore",
+  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+  "contributors": [
+    "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
+    "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
+  ],
+  "keywords": ["DAppNodeCore", "Manager", "Installer"],
+  "links": {
+    "ui": "http://my.dappnode/",
+    "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dappnode/DNP_DAPPMANAGER"
+  },
+  "bugs": {
+    "url": "https://github.com/dappnode/DNP_DAPPMANAGER/issues"
+  },
+  "license": "GPL-3.0"
+}

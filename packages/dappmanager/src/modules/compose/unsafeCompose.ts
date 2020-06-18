@@ -1,4 +1,4 @@
-import { mapValues, pick, omit } from "lodash";
+import { mapValues, pick, omit, toPairs, sortBy, fromPairs } from "lodash";
 import params from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
@@ -12,14 +12,9 @@ interface ValidationAlert {
 }
 
 const serviceSafeKeys: (keyof ComposeService)[] = [
-  // Required properties
-  "container_name",
-  "image",
-  // Mergable properties (editable)
   "volumes",
   "ports",
   "environment",
-  // Non-mergable properties
   "restart",
   "privileged",
   "cap_add",
@@ -46,7 +41,7 @@ export const getImage = (name: string, version: string): string =>
  * - Use of uncontroled features
  * - Use of unsupported docker-compose syntax
  * [NOTE] Allow but dangerous usage is tolerated by this function
- * but will generate a warning in another function.
+ * but will generate a warning in unsafeComposeAlerts.
  */
 export function parseUnsafeCompose(
   composeUnsafe: Compose,
@@ -58,29 +53,31 @@ export function parseUnsafeCompose(
   return cleanCompose({
     version: composeUnsafe.version || "3.4",
 
-    services: mapValues(composeUnsafe.services, serviceUnsafe => ({
-      // Overridable defaults
-      restart: "always",
-      logging: {
-        driver: "json-file",
-        options: {
-          "max-size": "10m",
-          "max-file": "3"
-        }
-      },
+    services: mapValues(composeUnsafe.services, serviceUnsafe =>
+      sortServiceKeys({
+        // Overridable defaults
+        restart: "always",
+        logging: {
+          driver: "json-file",
+          options: {
+            "max-size": "10m",
+            "max-file": "3"
+          }
+        },
 
-      // Whitelisted optional keys
-      ...pick(serviceUnsafe, serviceSafeKeys),
+        // Whitelisted optional keys
+        ...pick(serviceUnsafe, serviceSafeKeys),
 
-      // Mandatory values
-      container_name: getContainerName(name, isCore),
-      image: getImage(name, version),
-      environment: parseEnvironment(serviceUnsafe.environment || {}),
-      dns: params.DNS_SERVICE, // Common DAppNode ENS
-      networks: isCore
-        ? serviceUnsafe.networks || [params.DNP_NETWORK_EXTERNAL_NAME]
-        : [params.DNP_NETWORK_EXTERNAL_NAME]
-    })),
+        // Mandatory values
+        container_name: getContainerName(name, isCore),
+        image: getImage(name, version),
+        environment: parseEnvironment(serviceUnsafe.environment || {}),
+        dns: params.DNS_SERVICE, // Common DAppNode ENS
+        networks: isCore
+          ? serviceUnsafe.networks || [params.DNP_NETWORK_EXTERNAL_NAME]
+          : [params.DNP_NETWORK_EXTERNAL_NAME]
+      })
+    ),
 
     volumes: mapValues(composeUnsafe.volumes || {}, vol =>
       pick(vol, volumeSafeKeys)
@@ -97,6 +94,14 @@ export function parseUnsafeCompose(
           [params.DNP_NETWORK_EXTERNAL_NAME]: { external: true }
         }
   });
+}
+
+/**
+ * Sort service keys alphabetically, for better readibility
+ * @param service
+ */
+function sortServiceKeys(service: ComposeService): ComposeService {
+  return fromPairs(sortBy(toPairs(service), "0")) as ComposeService;
 }
 
 /**

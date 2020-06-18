@@ -13,7 +13,7 @@ import {
 import { setupWizard1To2 } from "../../../src/modules/setupWizard/setupWizard1To2";
 import { isNotFoundError } from "../../../src/utils/node";
 
-const setupWizardSpecs = "../setupWizardSpecs";
+const specsDir = path.join(__dirname, "../setupWizardSpecs");
 
 const paths = {
   setupTarget: "setup-target.json",
@@ -22,18 +22,13 @@ const paths = {
   setupWizard: "setup-wizard.yml"
 };
 
-describe("Release > parsers > setupWizard", () => {
+describe("Setup wizard", () => {
   describe("setupWizard1To2", () => {
-    const files = fs.readdirSync(path.join(__dirname, setupWizardSpecs));
+    const files = fs.readdirSync(specsDir);
     for (const dirName of files) {
       it(`${dirName}`, () => {
         function loadFile<T>(fileName: string): T {
-          const filePath = path.join(
-            __dirname,
-            setupWizardSpecs,
-            dirName,
-            fileName
-          );
+          const filePath = path.join(specsDir, dirName, fileName);
           return yaml.safeLoad(fs.readFileSync(filePath, "utf8"));
         }
 
@@ -58,7 +53,7 @@ describe("Release > parsers > setupWizard", () => {
         if (noSetupWizard) {
           console.log(JSON.stringify(computedSetupWizard, null, 2));
           fs.writeFileSync(
-            path.join(__dirname, setupWizardSpecs, dirName, paths.setupWizard),
+            path.join(specsDir, dirName, paths.setupWizard),
             yaml.safeDump(computedSetupWizard)
           );
         } else {
