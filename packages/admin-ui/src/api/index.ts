@@ -97,13 +97,13 @@ export const useApi: {
   return function(...args: any[]) {
     const argsKey = args.length > 0 ? JSON.stringify(args) : "";
     const fetcher = (...args: any[]) => callRoute<any>(route, args);
-    const swr = useSWR([route, argsKey], () => fetcher(...args));
+    const res = useSWR([route, argsKey], () => fetcher(...args));
 
     // Attach optional subscriptions
     const subscriptionRoute = routeSubscription[route as keyof Routes];
-    if (subscriptionRoute) useSubscribe(subscriptionRoute, swr.revalidate);
+    if (subscriptionRoute) useSubscribe(subscriptionRoute, res.revalidate);
 
-    return swr;
+    return res;
   };
 });
 
