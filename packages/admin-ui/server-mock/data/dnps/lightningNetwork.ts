@@ -165,7 +165,6 @@ Content in the first column | Content in the second column
     volumes: [
       {
         name: "lightning-networkpublicdappnodeeth_data",
-        owner: "lightning-network.public.dappnode.eth",
         host: "data",
         container: "./data/ethereum"
       }

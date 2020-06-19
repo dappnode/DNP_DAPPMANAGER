@@ -9,7 +9,7 @@ import {
 } from "services/dnpInstalled/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { PackageEnvs } from "types";
-import { PackageContainer, VolumeData } from "common/types";
+import { PackageContainer, VolumeData } from "types";
 import { AppThunk } from "store";
 import { continueIfCalleDisconnected } from "api/utils";
 import { getVolumes } from "services/dappnodeStatus/selectors";

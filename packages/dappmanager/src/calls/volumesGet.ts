@@ -1,6 +1,5 @@
 import { dockerDf, dockerVolumesList } from "../modules/docker/dockerApi";
 import { listContainers } from "../modules/docker/listContainers";
-import { detectMountpoints } from "../modules/hostScripts";
 import { parseDevicePath } from "../modules/compose";
 import { VolumeData } from "../types";
 
@@ -24,8 +23,6 @@ export async function volumesGet(): Promise<VolumeData[]> {
   const dnpList = await listContainers();
 
   // This expensive function won't be called on empty volDevicePaths
-  const shouldDetectMountpoints = volumes.some(vol => vol.Options?.device);
-  const mountpoints = shouldDetectMountpoints ? await detectMountpoints() : [];
 
   // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
   //       calling du on massive dirs can take +30min (i.e. Storj data));
@@ -74,9 +71,6 @@ export async function volumesGet(): Promise<VolumeData[]> {
         internalName,
         createdAt: new Date(vol.CreatedAt).getTime(),
         mountpoint: pathParts ? pathParts.mountpoint : "",
-        fileSystem: pathParts
-          ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
-          : undefined,
         size,
         refCount,
         isOrphan

@@ -28,10 +28,10 @@ export const mountpoints = [
   },
   {
     mountpoint: "/media/usb0",
-    use: "1%",
-    used: 992e9,
-    total: 1000e9,
-    free: 6.2e9,
+    use: "89%",
+    used: 198642520,
+    total: 235782040,
+    free: 25092776,
     vendor: "SanDisk",
     model: "Ultra_USB_3.0"
   },

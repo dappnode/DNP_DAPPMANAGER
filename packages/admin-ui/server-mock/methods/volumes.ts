@@ -2,12 +2,12 @@ import { VolumeData } from "../../src/types";
 import { pause } from "../utils";
 import * as eventBus from "../eventBus";
 
-let volumes = [
+let volumes: VolumeData[] = [
   {
     name: "gethdnpdappnodeeth_data",
     owner: undefined,
-    nameDisplay: "data",
-    ownerDisplay: "gethdnpdappnodeeth",
+    users: ["geth.dnp.dappnode.eth"],
+    internalName: "data",
     createdAt: 1569346006000,
     mountpoint: "",
     size: 161254123,
@@ -17,28 +17,19 @@ let volumes = [
   {
     name: "lightning-networkpublicdappnodeeth_data",
     owner: "lightning-network.public.dappnode.eth",
-    nameDisplay: "data",
-    ownerDisplay: "lightning-networkpublicdappnodeeth",
+    users: ["lightning-network.public.dappnode.eth"],
+    internalName: "data",
     createdAt: 1569146006000,
     mountpoint: "/media/usb0",
     size: 0,
-    fileSystem: {
-      mountpoint: "/media/usb0",
-      use: "89%",
-      used: 198642520,
-      total: 235782040,
-      free: 25092776,
-      vendor: "SanDisk",
-      model: "Ultra_USB_3.0"
-    },
     refCount: 2,
     isOrphan: false
   },
   {
     name: "d19f0771fe2e5b813cf0d138a77eddc33ae3fd6afc1cc6daf0fba42ed73e36ae",
     owner: undefined,
-    nameDisplay: "",
-    ownerDisplay: "",
+    users: [],
+    internalName: "",
     createdAt: 1569306006000,
     mountpoint: "",
     size: 24,
@@ -48,6 +39,7 @@ let volumes = [
   {
     name: "paritydnpdappnodeeth_data",
     owner: "parity.dnp.dappnode.eth",
+    users: ["parity.dnp.dappnode.eth"],
     size: 71570000000,
     createdAt: 1569146006000,
     mountpoint: "",
@@ -56,6 +48,7 @@ let volumes = [
   {
     name: "paritydnpdappnodeeth_geth",
     owner: "parity.dnp.dappnode.eth",
+    users: ["parity.dnp.dappnode.eth"],
     size: 94620000000,
     createdAt: 1569146006000,
     mountpoint: "",

@@ -102,7 +102,7 @@ export type Subscriptions = {
      * ```
      */
     on: (handler: SubscriptionsTypes[K]) => void;
-  }
+  };
 };
 
 export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
@@ -122,5 +122,5 @@ export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
 // DO NOT REMOVE
 // Enforces that each route is a function that returns nothing
 export type SubscriptionsArguments = {
-  [K in keyof SubscriptionsTypes]: Parameters<SubscriptionsTypes[K]>
+  [K in keyof SubscriptionsTypes]: Parameters<SubscriptionsTypes[K]>;
 };

@@ -823,7 +823,6 @@ export interface VolumeData {
   internalName?: string; // "data", Volume name as referenced inside the compose
   createdAt: number; // 1569346006000,
   mountpoint: string; // "/dev1/data",
-  fileSystem?: MountpointData;
   size?: number; // 161254123,
   refCount?: number; // 2
   isOrphan: boolean; // if no container is using it

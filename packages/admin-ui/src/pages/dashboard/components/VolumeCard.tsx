@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "components/Card";
 import { prettyBytes } from "utils/format";
-import { VolumeData } from "common";
+import { VolumeData } from "types";
 
 export default function VolumeCard({ volumeData }: { volumeData: VolumeData }) {
   return (
