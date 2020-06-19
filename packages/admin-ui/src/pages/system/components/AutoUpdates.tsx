@@ -6,8 +6,6 @@ import { api, useApi } from "api";
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
 import Switch from "components/Switch";
-import Loading from "components/Loading";
-import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized } from "utils/format";
@@ -25,6 +23,7 @@ import {
 } from "pages/system/data";
 // Styles
 import "./autoUpdates.scss";
+import { renderResponse } from "components/SwrRender";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateIds;
 const getIsSinglePackage = (id: string) =>
@@ -34,7 +33,7 @@ const getIsSinglePackage = (id: string) =>
  * Main auto-udpates view
  */
 export default function AutoUpdates() {
-  const autoUpdateData = useApi.autoUpdateDataGet();
+  const autoUpdateDataReq = useApi.autoUpdateDataGet();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
   const ethClientWarning = useSelector(getEthClientWarning);
 
@@ -55,70 +54,68 @@ export default function AutoUpdates() {
     }
   }
 
-  if (autoUpdateData.data) {
-    const { dnpsToShow = [] } = autoUpdateData.data || {};
-    const someAutoUpdateIsEnabled =
-      dnpsToShow.length > 0 && dnpsToShow.some(dnp => dnp.enabled);
+  return renderResponse(
+    autoUpdateDataReq,
+    ["Loading auto-update data"],
+    autoUpdateData => {
+      const { dnpsToShow = [] } = autoUpdateData || {};
+      const someAutoUpdateIsEnabled =
+        dnpsToShow.length > 0 && dnpsToShow.some(dnp => dnp.enabled);
 
-    return (
-      <Card>
-        <div className="auto-updates-explanation">
-          Enable auto-updates for DAppNode to install automatically the latest
-          versions. For major breaking updates, your approval will always be
-          required.
-        </div>
+      return (
+        <Card>
+          <div className="auto-updates-explanation">
+            Enable auto-updates for DAppNode to install automatically the latest
+            versions. For major breaking updates, your approval will always be
+            required.
+          </div>
 
-        {ethClientWarning && someAutoUpdateIsEnabled && (
-          <Alert variant="warning">
-            Auto-updates will not work temporarily. Eth client not available:{" "}
-            {ethClientWarning}
-            <br />
-            Enable the{" "}
-            <NavLink to={activateFallbackPath}>
-              repository source fallback
-            </NavLink>{" "}
-            to have auto-updates meanwhile
-          </Alert>
-        )}
+          {ethClientWarning && someAutoUpdateIsEnabled && (
+            <Alert variant="warning">
+              Auto-updates will not work temporarily. Eth client not available:{" "}
+              {ethClientWarning}
+              <br />
+              Enable the{" "}
+              <NavLink to={activateFallbackPath}>
+                repository source fallback
+              </NavLink>{" "}
+              to have auto-updates meanwhile
+            </Alert>
+          )}
 
-        <div className="list-grid auto-updates">
-          {/* Table header */}
-          <span className="stateBadge" />
-          <span className="name" />
-          <span className="last-update header">Last auto-update</span>
-          <span className="header">Enabled</span>
+          <div className="list-grid auto-updates">
+            {/* Table header */}
+            <span className="stateBadge" />
+            <span className="name" />
+            <span className="last-update header">Last auto-update</span>
+            <span className="header">Enabled</span>
 
-          <hr />
-          {/* Items of the table */}
-          {dnpsToShow.map(({ id, displayName, enabled, feedback }) => (
-            <AutoUpdateItem
-              key={id}
-              {...{
-                id,
-                displayName,
-                enabled,
-                feedback,
-                isInstalling: Boolean(
-                  (progressLogsByDnp || {})[
-                    id === SYSTEM_PACKAGES ? coreName : id
-                  ]
-                ),
-                isSinglePackage: getIsSinglePackage(id),
-                // Actions
-                setUpdateSettings
-              }}
-            />
-          ))}
-        </div>
-      </Card>
-    );
-  } else if (autoUpdateData.error) {
-    return <ErrorView error={autoUpdateData.error} />;
-  } else if (autoUpdateData.isValidating) {
-    return <Loading steps={["Loading auto-update data"]} />;
-  } else {
-    return <ErrorView error="Unknown error" />;
-  }
+            <hr />
+            {/* Items of the table */}
+            {dnpsToShow.map(({ id, displayName, enabled, feedback }) => (
+              <AutoUpdateItem
+                key={id}
+                {...{
+                  id,
+                  displayName,
+                  enabled,
+                  feedback,
+                  isInstalling: Boolean(
+                    (progressLogsByDnp || {})[
+                      id === SYSTEM_PACKAGES ? coreName : id
+                    ]
+                  ),
+                  isSinglePackage: getIsSinglePackage(id),
+                  // Actions
+                  setUpdateSettings
+                }}
+              />
+            ))}
+          </div>
+        </Card>
+      );
+    }
+  );
 }
 
 /**

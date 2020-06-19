@@ -33,16 +33,14 @@ export const PackageById: React.FC<RouteComponentProps<{
       <>
         <Title title={title} subtitle={id} />
         {dnpRequest.isValidating ? (
-          <Loading steps={["Loading your DAppNode Packages"]} />
+          <Loading steps={[`Loading ${shortNameCapitalized(id)}`]} />
         ) : dnpRequest.error ? (
           dnpRequest.error.message.includes("package not found") ? (
             <NoDnpInstalled id={id} />
           ) : (
             <ErrorView error={dnpRequest.error} />
           )
-        ) : (
-          <ErrorView error="Unknown error, package not found" />
-        )}
+        ) : null}
       </>
     );
   }

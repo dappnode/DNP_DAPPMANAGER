@@ -12,9 +12,8 @@ import Button from "components/Button";
 import Title from "components/Title";
 import Card from "components/Card";
 import Switch from "components/Switch";
-import Loading from "components/Loading";
-import ErrorView from "components/ErrorView";
 import { ButtonLight } from "components/Button";
+import { renderResponse } from "components/SwrRender";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { superAdminId } from "params";
@@ -104,14 +103,14 @@ export default function DevicesHome() {
         <div className="color-danger">{error}</div>
       ))}
 
-      {devicesReq.data ? (
+      {renderResponse(devicesReq, ["Loading devices"], data => (
         <Card className="list-grid devices">
           <header>Name</header>
           <header className="center">Credentials</header>
           <header>Admin</header>
           <header>Reset</header>
           <header>Remove</header>
-          {[...devicesReq.data]
+          {[...data]
             // Sort super admin device as first
             .sort(d1 => (d1.id === superAdminId ? -1 : 0))
             .map(({ id, admin }) => (
@@ -134,11 +133,7 @@ export default function DevicesHome() {
               </React.Fragment>
             ))}
         </Card>
-      ) : devicesReq.error ? (
-        <ErrorView error={devicesReq.error} />
-      ) : devicesReq.isValidating ? (
-        <Loading steps={["Loading devices"]} />
-      ) : null}
+      ))}
     </>
   );
 }
