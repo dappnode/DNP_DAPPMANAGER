@@ -9,9 +9,10 @@ import {
 } from "services/dnpInstalled/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { PackageEnvs } from "types";
-import { PackageContainer } from "common/types";
+import { PackageContainer, VolumeData } from "common/types";
 import { AppThunk } from "store";
 import { continueIfCalleDisconnected } from "api/utils";
+import { getVolumes } from "services/dappnodeStatus/selectors";
 
 // Used in package interface / envs
 
@@ -64,6 +65,7 @@ export const packageRestartVolumes = (id: string): AppThunk => async (
 ) => {
   // Make sure there are no colliding volumes with this DNP
   const dnp = getDnpInstalledById(getState(), id);
+  const volumesData = getVolumes(getState());
 
   if (dnp) {
     const warningsList: { title: string; body: string }[] = [];
@@ -73,7 +75,7 @@ export const packageRestartVolumes = (id: string): AppThunk => async (
      * DNPs are users, they will be removed by the DAPPMANAGER.
      * Alert the user about this fact
      */
-    const dnpsToRemove = getDnpsToRemove(dnp);
+    const dnpsToRemove = getDnpsToRemove(dnp, volumesData);
     if (dnpsToRemove.length)
       warningsList.push({
         title: "Warning! DAppNode Packages to be removed",
@@ -103,6 +105,7 @@ export const packageRestartVolumes = (id: string): AppThunk => async (
 
 export const packageRemove = (id: string): AppThunk => async (_, getState) => {
   const dnp = getDnpInstalledById(getState(), id);
+  const volumesData = getVolumes(getState());
   if (!dnp) throw Error(`DNP not found dnpList: ${id}`);
 
   // Dialog to confirm remove + USER INPUT for delete volumes
@@ -111,7 +114,7 @@ export const packageRemove = (id: string): AppThunk => async (_, getState) => {
       const title = `Removing ${sn(id)}`;
       let text = `This action cannot be undone.`;
       const buttons = [{ label: "Remove", onClick: () => resolve(false) }];
-      if (areThereVolumesToRemove(dnp)) {
+      if (areThereVolumesToRemove(dnp, volumesData)) {
         // Only show the remove data related text if necessary
         text += ` If you do NOT want to keep ${id}'s data, remove it permanently clicking the "Remove and delete data" option.`;
         // Only display the "Remove and delete data" button if necessary
@@ -126,7 +129,7 @@ export const packageRemove = (id: string): AppThunk => async (_, getState) => {
 
   const warningsList: { title: string; body: string }[] = [];
   // Don't show the same DNP in both dnpsToRemove and dependantsOf
-  const dnpsToRemove = getDnpsToRemove(dnp);
+  const dnpsToRemove = getDnpsToRemove(dnp, volumesData);
   const dependantsOf = getDependantsOfId(getState(), id).filter(
     name => !dnpsToRemove.includes(name)
   );
@@ -179,12 +182,18 @@ export const packageRemove = (id: string): AppThunk => async (_, getState) => {
  * @param dnp DNP is installed object
  * @returns list of DNPs to remove
  */
-function getDnpsToRemove(dnp: PackageContainer): string[] {
+function getDnpsToRemove(
+  dnp: PackageContainer,
+  volumesData: VolumeData[]
+): string[] {
   const dnpsToRemove = new Set<string>();
-  for (const vol of dnp.volumes || [])
-    if (vol.name && vol.isOwner && vol.users && vol.users.length > 1)
-      for (const dnpName of vol.users)
-        if (dnpName !== dnp.name) dnpsToRemove.add(dnpName);
+  for (const vol of dnp.volumes || []) {
+    const volumeData = volumesData.find(v => v.name === vol.name);
+    if (volumeData && volumeData.owner === dnp.name && volumeData.users) {
+      for (const user of volumeData.users)
+        if (user !== dnp.name) dnpsToRemove.add(user);
+    }
+  }
   return Array.from(dnpsToRemove);
 }
 
@@ -193,6 +202,15 @@ function getDnpsToRemove(dnp: PackageContainer): string[] {
  * @param dnp DNP is installed object
  * @returns
  */
-function areThereVolumesToRemove(dnp: PackageContainer): boolean {
-  return dnp.volumes && dnp.volumes.some(vol => vol.isOwner);
+function areThereVolumesToRemove(
+  dnp: PackageContainer,
+  volumesData: VolumeData[]
+): boolean {
+  return (
+    dnp.volumes &&
+    dnp.volumes.some(vol => {
+      const volumeData = volumesData.find(v => v.name === vol.name);
+      return volumeData && volumeData.owner === dnp.name;
+    })
+  );
 }

@@ -1,5 +1,5 @@
 import path from "path";
-import { VolumeMappingDocker } from "../../types";
+import { VolumeMapping } from "../../types";
 
 /**
  * Normalizes volume paths, removes trailing slash
@@ -20,12 +20,10 @@ export function normalizeVolumePath(volumePath: string): string {
  *   "/host/path:", "/host/path"
  * @param volumesArray
  */
-export function parseVolumeMappings(
-  volumesArray: string[]
-): VolumeMappingDocker[] {
+export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
   return volumesArray
     .map(
-      (volString): VolumeMappingDocker => {
+      (volString): VolumeMapping => {
         const [host, container] = volString
           .split(/:(.*)/)
           .map(normalizeVolumePath);
@@ -41,7 +39,7 @@ export function parseVolumeMappings(
 }
 
 export function stringifyVolumeMappings(
-  volumeMappings: VolumeMappingDocker[]
+  volumeMappings: VolumeMapping[]
 ): string[] {
   return volumeMappings.map(({ name, host, container }) =>
     [name || host, container].join(":")

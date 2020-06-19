@@ -4,7 +4,7 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as validate from "../../src/utils/validate";
-import { PackageContainer } from "../../src/types";
+import { PackageContainer, VolumeData } from "../../src/types";
 import { mockDnp, mockVolume } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
@@ -18,29 +18,24 @@ describe("Call function: packageRestartVolumes", function() {
   // const letsencryptId = "letsencrypt-nginx.dnp.dappnode.eth";
   const raidenTestnetId = "raiden-testnet.dnp.dappnode.eth";
 
+  // Vol names
+  const dappmanagerVolName = "dncore_dappmanagerdnpdappnodeeth_data";
+
   // docker-compose.yml will be generated for this DNP ids
   const dockerRm = sinon.stub();
-  const dockerVolumeRm = sinon.stub();
+  const removeNamedVolume = sinon.stub();
   const dockerComposeUpSafe = sinon.stub();
-  const dockerVolumeInspect = sinon.stub().resolves({
-    Driver: "local",
-    Labels: {},
-    Mountpoint: "/var/lib/docker/volumes/dappnodeeth_data/_data",
-    Name: "dappnodeeth_data",
-    Options: null,
-    Scope: "local"
-  });
 
   // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
 
-  const dnpList = [
+  const dnpList: PackageContainer[] = [
     {
       ...mockDnp,
       name: dnpNameCore,
       isCore: true,
       volumes: [
-        { ...mockVolume, name: "vol1", isOwner: true, users: [dnpNameCore] },
-        { ...mockVolume, name: "vol2", isOwner: true, users: [dnpNameCore] }
+        { ...mockVolume, name: "vol1" },
+        { ...mockVolume, name: "vol2" }
       ]
     },
     {
@@ -50,9 +45,7 @@ describe("Call function: packageRestartVolumes", function() {
       volumes: [
         {
           ...mockVolume,
-          name: "dappmanager_vol",
-          isOwner: true,
-          users: [dappmanagerId]
+          name: dappmanagerVolName
         }
       ]
     },
@@ -66,45 +59,27 @@ describe("Call function: packageRestartVolumes", function() {
       name: nginxId,
       volumes: [
         {
-          ...mockVolume,
-          type: "bind",
-          path: "/root/certs",
-          dest: "/etc/nginx/certs"
+          host: "/root/certs",
+          container: "/etc/nginx/certs"
         },
 
         {
           ...mockVolume,
-          name: "nginxproxydnpdappnodeeth_vhost.d",
-          users: [
-            "letsencrypt-nginx.dnp.dappnode.eth",
-            "nginx-proxy.dnp.dappnode.eth"
-          ],
-          owner: "nginx-proxy.dnp.dappnode.eth",
-          isOwner: true
+          name: "nginxproxydnpdappnodeeth_vhost.d"
         },
         {
           ...mockVolume,
-          type: "bind",
-          path: "/var/run/docker.sock",
-          dest: "/tmp/docker.sock"
+          host: "/var/run/docker.sock",
+          container: "/tmp/docker.sock"
         },
         {
           ...mockVolume,
-          name: "nginxproxydnpdappnodeeth_html",
-          users: [
-            "letsencrypt-nginx.dnp.dappnode.eth",
-            "nginx-proxy.dnp.dappnode.eth"
-          ],
-          owner: "nginx-proxy.dnp.dappnode.eth",
-          isOwner: true
+          name: "nginxproxydnpdappnodeeth_html"
         },
         {
           ...mockVolume,
           name:
-            "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
-          users: ["nginx-proxy.dnp.dappnode.eth"],
-          owner: "nginx-proxy.dnp.dappnode.eth",
-          isOwner: true
+            "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
         }
       ]
     },
@@ -115,21 +90,88 @@ describe("Call function: packageRestartVolumes", function() {
       volumes: [
         {
           ...mockVolume,
-          name: "raidentestnetdnpdappnodeeth_data",
-          isOwner: true,
-          users: [raidenTestnetId]
+          name: "raidentestnetdnpdappnodeeth_data"
         }
       ]
     }
-  ].map(dnp => ({
-    ...dnp,
-    packageName: dnp.isCore
-      ? `DAppNodePackage-${dnp.name}`
-      : `DAppNodeCore-${dnp.name}`
-  }));
+  ].map(
+    (dnp): PackageContainer => ({
+      // Must add the container name since dockerRm is called with that
+      ...dnp,
+      packageName: dnp.name
+    })
+  );
+
+  const mockVolumeData = {
+    createdAt: 150000000000,
+    mountpoint: "",
+    isOrphan: false
+  };
+
+  const volumesData: VolumeData[] = [
+    // Mock core volumes
+    {
+      ...mockVolumeData,
+      name: "vol1",
+      users: [dnpNameCore],
+      owner: dnpNameCore
+    },
+    {
+      ...mockVolumeData,
+      name: "vol2",
+      users: [dnpNameCore],
+      owner: dnpNameCore
+    },
+
+    // Dappmanager volumes
+    {
+      ...mockVolumeData,
+      name: dappmanagerVolName,
+      users: [dappmanagerId],
+      owner: dappmanagerId
+    },
+
+    // Nginx volumes
+    {
+      ...mockVolumeData,
+      name: "nginxproxydnpdappnodeeth_vhost.d",
+      users: [
+        "letsencrypt-nginx.dnp.dappnode.eth",
+        "nginx-proxy.dnp.dappnode.eth"
+      ],
+      owner: "nginx-proxy.dnp.dappnode.eth"
+    },
+    {
+      ...mockVolumeData,
+      name: "nginxproxydnpdappnodeeth_html",
+      users: [
+        "letsencrypt-nginx.dnp.dappnode.eth",
+        "nginx-proxy.dnp.dappnode.eth"
+      ],
+      owner: "nginx-proxy.dnp.dappnode.eth"
+    },
+    {
+      ...mockVolumeData,
+      name: "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
+      users: ["nginx-proxy.dnp.dappnode.eth"],
+      owner: "nginx-proxy.dnp.dappnode.eth"
+    },
+
+    // Raiden testnet volumes
+    {
+      ...mockVolumeData,
+      name: "raidentestnetdnpdappnodeeth_data",
+      users: [raidenTestnetId],
+      owner: raidenTestnetId
+    }
+  ];
 
   async function listContainers(): Promise<PackageContainer[]> {
     return dnpList;
+  }
+
+  async function volumesGet(): Promise<VolumeData[]> {
+    return volumesData;
   }
 
   let packageRestartVolumes: typeof packageRestartVolumesType;
@@ -139,16 +181,19 @@ describe("Call function: packageRestartVolumes", function() {
       () => import("../../src/calls/packageRestartVolumes"),
       mock => {
         mock(() => import("../../src/modules/docker/dockerCommands"))
-          .with({ dockerRm, dockerVolumeRm })
+          .with({ dockerRm })
           .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerSafe"))
           .with({ dockerComposeUpSafe })
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/dockerApi"))
-          .with({ dockerVolumeInspect })
-          .toBeUsed();
         mock(() => import("../../src/modules/docker/listContainers"))
           .with({ listContainers })
+          .toBeUsed();
+        mock(() => import("../../src/calls/volumesGet"))
+          .with({ volumesGet })
+          .toBeUsed();
+        mock(() => import("../../src/calls/volumeRemove"))
+          .with({ removeNamedVolume })
           .toBeUsed();
       }
     );
@@ -166,7 +211,7 @@ describe("Call function: packageRestartVolumes", function() {
   beforeEach(() => {
     dockerRm.resetHistory();
     dockerComposeUpSafe.resetHistory();
-    dockerVolumeRm.resetHistory();
+    removeNamedVolume.resetHistory();
   });
 
   it(`Should remove the package volumes of ${nginxId}`, async () => {
@@ -189,9 +234,9 @@ describe("Call function: packageRestartVolumes", function() {
       "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
     ];
     volumesInOrder.forEach((volName, i) => {
-      expect(dockerVolumeRm.getCall(i).args[0]).to.equal(
+      expect(removeNamedVolume.getCall(i).args[0]).to.equal(
         volName,
-        `Wrong volume name on dockerVolumeRm call #${i}`
+        `Wrong volume name on removeNamedVolume call #${i}`
       );
     });
 
@@ -213,9 +258,9 @@ describe("Call function: packageRestartVolumes", function() {
     // Assert correct call order for volumeRm
     const volumesInOrder = ["vol1", "vol2"];
     volumesInOrder.forEach((volName, i) => {
-      expect(dockerVolumeRm.getCall(i).args[0]).to.equal(
+      expect(removeNamedVolume.getCall(i).args[0]).to.equal(
         volName,
-        `Wrong volume name on dockerVolumeRm call #${i}`
+        `Wrong volume name on removeNamedVolume call #${i}`
       );
     });
     sinon.assert.called(dockerComposeUpSafe);
@@ -232,7 +277,7 @@ describe("Call function: packageRestartVolumes", function() {
     // Assert correct call order for volumeRm
     const volumesInOrder = ["vol1"];
     volumesInOrder.forEach((volName, i) => {
-      expect(dockerVolumeRm.getCall(i).args[0]).to.equal(
+      expect(removeNamedVolume.getCall(i).args[0]).to.equal(
         volName,
         `Wrong volume name on docker.volume.rm call #${i}`
       );
@@ -256,9 +301,9 @@ describe("Call function: packageRestartVolumes", function() {
     // Assert correct call order for volumeRm
     const volumesInOrder = ["raidentestnetdnpdappnodeeth_data"];
     volumesInOrder.forEach((volName, i) => {
-      expect(dockerVolumeRm.getCall(i).args[0]).to.equal(
+      expect(removeNamedVolume.getCall(i).args[0]).to.equal(
         volName,
-        `Wrong volume name on dockerVolumeRm call #${i}`
+        `Wrong volume name on removeNamedVolume call #${i}`
       );
     });
 

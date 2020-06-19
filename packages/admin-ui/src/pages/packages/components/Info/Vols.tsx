@@ -25,19 +25,17 @@ export default function Vols({
         // Display style:
         // - dncore_vpndnpdappnodeeth_data: 866B
         // - /etc/hostname: - (bind)
-        .map(({ name, container, size, host }) => {
-          const volumeDetail = volumesData.find(v => v.name === name);
-          const mountpointSize = volumeDetail?.size;
-          const mountpoint = volumeDetail?.mountpoint;
+        .map(({ name, container, host }) => {
+          const volumeData = volumesData.find(v => v.name === name);
+          const size = volumeData?.size;
+          const mountpoint = volumeData?.mountpoint;
           const prettyVol = prettyVolumeName(name || "", dnpName);
           const prettyVolString = [prettyVol.owner, prettyVol.name]
             .filter(s => s)
             .join(" - ");
           return {
             name: name ? prettyVolString : container || "Unknown",
-            size: mountpointSize
-              ? prettyBytes(mountpointSize)
-              : typeof size === "number" && !isNaN(size)
+            size: size
               ? prettyBytes(size)
               : !name
               ? "(bind) " + host || ""

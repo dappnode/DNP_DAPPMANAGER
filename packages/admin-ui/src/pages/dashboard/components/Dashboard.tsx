@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
 // Selectors
-import { getDappnodeVolumes } from "services/dnpInstalled/selectors";
 import { getChainData } from "services/chainData/selectors";
+import { getVolumes } from "services/dappnodeStatus/selectors";
 // Own module
 import { title } from "../data";
 import ChainCard from "./ChainCard";
@@ -15,7 +15,10 @@ import Title from "components/Title";
 
 export default function Dashboard() {
   const chainData = useSelector(getChainData);
-  const dappnodeVolumes = useSelector(getDappnodeVolumes);
+  const volumesData = useSelector(getVolumes);
+  const dappnodeVolumes = volumesData.filter(
+    v => v.name === "dncore_ipfsdnpdappnodeeth_data"
+  );
 
   return (
     <>
@@ -33,8 +36,8 @@ export default function Dashboard() {
 
       <SubTitle>Volumes</SubTitle>
       <div className="dashboard-cards">
-        {dappnodeVolumes.map(vol => (
-          <VolumeCard key={vol.name} {...vol} />
+        {dappnodeVolumes.map(volumeData => (
+          <VolumeCard key={volumeData.name} volumeData={volumeData} />
         ))}
       </div>
     </>

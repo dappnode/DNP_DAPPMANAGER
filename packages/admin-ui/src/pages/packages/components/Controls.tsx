@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // Components
 import CardList from "components/CardList";
 import Button from "components/Button";
 // Utils
 import { wifiName, ipfsName } from "params";
 import { VolumeMapping, ContainerState } from "types";
+import { getVolumes } from "services/dappnodeStatus/selectors";
 import {
   packageStartStop,
   packageRestartVolumes,
@@ -40,16 +41,17 @@ export function Controls({
   volumes: VolumeMapping[];
 }) {
   const dispatch = useDispatch();
+  const volumesData = useSelector(getVolumes);
 
-  const namedVols = (volumes || []).filter(vol => vol.name);
-  const namedOwnedVols = namedVols.filter(vol => vol.isOwner);
-  const namedExternalVols = namedVols
-    .filter(vol => !vol.isOwner && vol.owner)
-    .map(vol => ({
-      name: vol.name,
-      owner: vol.owner,
-      ownerPath: getRootPath(vol.owner || "") + "/" + vol.owner
-    }));
+  let hasNamedOwnedVols: boolean = false;
+  const namedExternalVols: { name: string; owner: any }[] = [];
+  for (const vol of volumes)
+    if (vol.name) {
+      const volumeData = volumesData.find(v => v.name === vol.name);
+      const owner = volumeData?.owner;
+      if (owner === id) hasNamedOwnedVols = true;
+      else if (owner) namedExternalVols.push({ name: vol.name, owner });
+    }
 
   const actions = [
     {
@@ -73,20 +75,23 @@ export function Controls({
       name: "Remove volumes",
       text: (
         <div>
-          {namedOwnedVols.length
+          {hasNamedOwnedVols
             ? `Deleting the volumes is a permanent action and all data will be lost.`
             : "This DAppNode Package is not the owner of any named volumes."}
           {namedExternalVols.map(vol => (
             <div key={vol.name} style={{ opacity: 0.6 }}>
-              Go to <Link to={vol.ownerPath}>{vol.owner}</Link> to remove the
-              volume {vol.name}
+              Go to{" "}
+              <Link to={`${getRootPath(vol.owner)}/${vol.owner}`}>
+                {vol.owner}
+              </Link>{" "}
+              to remove the volume {vol.name}
             </div>
           ))}
         </div>
       ),
       action: () => dispatch(packageRestartVolumes(id)),
       availableForCore: true,
-      disabled: !namedOwnedVols.length,
+      disabled: !hasNamedOwnedVols,
       type: "danger"
     },
     {

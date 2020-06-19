@@ -5,6 +5,17 @@ import { parseDevicePath } from "../modules/compose";
 import { VolumeData } from "../types";
 
 /**
+ * Normalizes a docker-compose project name 
+ * ```python
+ * def normalize_name(name):
+    return re.sub(r'[^-_a-z0-9]', '', name.lower())
+ * ```
+ * https://github.com/docker/compose/blob/854c14a5bcf566792ee8a972325c37590521656b/compose/cli/command.py#L178
+ */
+export const normalizeProjectName = (name: string): string =>
+  name.replace(/[^-_a-z0-9]/gi, "").toLowerCase();
+
+/**
  * Returns volume data
  */
 export async function volumesGet(): Promise<VolumeData[]> {
@@ -26,32 +37,41 @@ export async function volumesGet(): Promise<VolumeData[]> {
   // Append sizes after to optimize the number of calls to dockerDf and host
   const formatedVolumes = volumes.map(
     (vol): VolumeData => {
-      const pathParts = vol.Options
-        ? parseDevicePath(vol.Options.device)
-        : undefined;
+      // Get user names
+      const users = Array.from(
+        dnpList.reduce((_users, dnp) => {
+          if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.name);
+          return _users;
+        }, new Set<string>())
+      );
 
-      const { shortName, owner } = parseVolumeLabels(vol.Labels || {});
-      // Get the exact name of the volume owner if any
-      const containerOwner = dnpList.find(dnp =>
-        dnp.volumes.find(v => v.name === vol.Name && v.isOwner)
-      );
-      // For custom bind volumes find if they are used
-      const isUsed = dnpList.some(dnp =>
-        dnp.volumes.find(v => v.name === vol.Name)
-      );
+      // Get the volume owner
+      // TODO: Weak, derived from project name, may be exploited
+      const labels = vol.Labels || {};
+      const { normalizedOwnerName, internalName } = parseVolumeLabels(labels);
+      const ownerContainer = dnpList.find(dnp => {
+        normalizeProjectName(dnp.name) === normalizedOwnerName;
+      });
+      // Fallback, assign ownership to the first user
+      const owner = ownerContainer ? ownerContainer.name : users[0];
+
       // Get the size of the volume via docker system df -v
       const volDfData = volumesDf.find(v => v.Name === vol.Name);
       const size = volDfData ? volDfData.UsageData.Size : undefined;
       const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
-      const isOrphan = !refCount && !isUsed;
+      const isOrphan = !refCount && users.length === 0; // Check users for custom bind volumes
 
-      const volumeData: VolumeData = {
+      // Custom mountpoint data
+      const pathParts = vol.Options
+        ? parseDevicePath(vol.Options.device)
+        : undefined;
+
+      return {
         // Real volume and owner name to call delete on
         name: vol.Name,
-        owner: containerOwner ? containerOwner.name : undefined,
-        // Guessed volume and owner name for display
-        nameDisplay: shortName,
-        ownerDisplay: owner,
+        owner,
+        users,
+        internalName,
         createdAt: new Date(vol.CreatedAt).getTime(),
         mountpoint: pathParts ? pathParts.mountpoint : "",
         fileSystem: pathParts
@@ -61,7 +81,6 @@ export async function volumesGet(): Promise<VolumeData[]> {
         refCount,
         isOrphan
       };
-      return volumeData;
     }
   );
 
@@ -78,7 +97,7 @@ export async function volumesGet(): Promise<VolumeData[]> {
  */
 function parseVolumeLabels(labels?: {
   [labelName: string]: string;
-}): { shortName: string | undefined; owner: string | undefined } {
+}): { normalizedOwnerName: string; internalName?: string } {
   const project = (labels || {})["com.docker.compose.project"];
   const volume = (labels || {})["com.docker.compose.volume"];
   // Core: ".project": "dncore",
@@ -86,9 +105,9 @@ function parseVolumeLabels(labels?: {
   // Dnp:  ".project": "lightning-networkdnpdappnodeeth",
   //        ".volume": "lndconfig_backup"
   if (project === "dncore") {
-    const [owner, shortName] = volume.split("_");
-    return { shortName, owner };
+    const [normalizedOwnerName, internalName] = volume.split("_");
+    return { normalizedOwnerName, internalName: internalName || volume };
   } else {
-    return { shortName: volume, owner: project };
+    return { normalizedOwnerName: project, internalName: volume };
   }
 }

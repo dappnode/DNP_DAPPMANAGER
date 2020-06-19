@@ -256,17 +256,10 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
-export interface VolumeMappingDocker {
+export interface VolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
-}
-
-export interface VolumeMapping extends VolumeMappingDocker {
-  users?: string[];
-  owner?: string;
-  isOwner?: boolean;
-  size?: number;
 }
 
 export interface Dependencies {
@@ -826,8 +819,8 @@ export interface MountpointData {
 export interface VolumeData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  nameDisplay?: string; // "data", Guessed short name for display
-  ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
+  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
+  internalName?: string; // "data", Volume name as referenced inside the compose
   createdAt: number; // 1569346006000,
   mountpoint: string; // "/dev1/data",
   fileSystem?: MountpointData;

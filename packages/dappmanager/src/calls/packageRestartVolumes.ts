@@ -4,11 +4,13 @@ import { dockerRm } from "../modules/docker/dockerCommands";
 import { dockerComposeUpSafe } from "../modules/docker/dockerSafe";
 import { listContainers } from "../modules/docker/listContainers";
 import { removeNamedVolume } from "./volumeRemove";
+import { volumesGet } from "./volumesGet";
 import * as eventBus from "../eventBus";
 import params from "../params";
 // Utils
 import * as getPath from "../utils/getPath";
 import { logs } from "../logs";
+import { VolumeData, PackageContainer } from "../types";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -61,45 +63,20 @@ export async function restartPackageVolumesTask({
 
   // Needs the extended info that includes the volume ownership data
   // Fetching all containers to not re-fetch below
-  const dnpListExtended = await listContainers();
-  const dnp = dnpListExtended.find(_dnp => _dnp.name === id);
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnpList = await listContainers();
+  const volumesData = await volumesGet();
 
-  /**
-   * @param {object} namedOwnedVolumes = {
-   *   names: [
-   *     "nginxproxydnpdappnodeeth_html",
-   *     "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
-   *     "nginxproxydnpdappnodeeth_vhost.d"
-   *   ],
-   *   dnpsToRemove: [
-   *     "letsencrypt-nginx.dnp.dappnode.eth",
-   *     "nginx-proxy.dnp.dappnode.eth"
-   *   ]
-   * }
-   */
-  const namedOwnedVolumes = (dnp.volumes || []).filter(
-    vol => vol.name && vol.isOwner && (!volumeId || volumeId === vol.name)
-  );
+  const { dnpsToRemove, volumesToRemove } = getPackagesAndVolumesToRemove({
+    id,
+    volumeId,
+    dnpList,
+    volumesData
+  });
+
   // If there are no volumes don't do anything
-  if (!namedOwnedVolumes.length)
-    if (volumeId) throw Error(`Volume ${volumeId} of ${id} not found`);
-    else return { removedDnps: [], removedVols: [] };
+  if (volumesToRemove.length === 0) return { removedDnps: [], removedVols: [] };
 
-  // Destructure result and append the current requested DNP (id)
-  const volumeNames: string[] = []; // To satisfy typescript compiler
-  for (const vol of namedOwnedVolumes) if (vol.name) volumeNames.push(vol.name);
-  const dnpsToRemove = namedOwnedVolumes
-    .reduce((dnps: string[], vol) => uniq([...dnps, ...(vol.users || [])]), [])
-    /**
-     * It is critical up packages in the correct order,
-     * so that the named volumes are created before the users are started
-     * [NOTE] the next sort function is a simplified solution, where the
-     * id will always be the owner of the volumes, and other DNPs, the users.
-     */
-    .sort((dnpName: string) => (dnpName === id ? -1 : 1));
-
-  logs.debug({ volumeNames, dnpsToRemove });
+  logs.debug({ dnpsToRemove, volumesToRemove });
 
   // Verify results
   const composePaths: { [dnpName: string]: string } = {};
@@ -114,7 +91,7 @@ export async function restartPackageVolumesTask({
     if (dnpName.includes(params.dappmanagerDnpName))
       throw Error("The dappmanager cannot be restarted");
 
-    const dnpToRemove = dnpListExtended.find(_dnp => _dnp.name === dnpName);
+    const dnpToRemove = dnpList.find(_dnp => _dnp.name === dnpName);
     if (dnpToRemove) {
       const { isCore, packageName: containerName } = dnpToRemove;
       const composePath = getPath.dockerCompose(dnpName, isCore);
@@ -132,11 +109,12 @@ export async function restartPackageVolumesTask({
       if (containerNames[dnpName]) await dockerRm(containerNames[dnpName]);
 
     // `if` necessary for the compiler
-    for (const volName of volumeNames)
+    for (const volName of volumesToRemove)
       if (volName) await removeNamedVolume(volName);
   } catch (e) {
     err = e;
   }
+
   // Restart docker to apply changes
   // Offer a doNotRestart option for the removePackage call
   // NOTE: if a package is dependant on id's volume it cannot be up-ed
@@ -146,7 +124,9 @@ export async function restartPackageVolumesTask({
   if (doNotRestart) {
     logs.warn(`On restartPackageVolumes, doNotRestart = true`);
   } else {
-    for (const dnpName of dnpsToRemove)
+    // It is critical up packages in the correct order,
+    // so that the named volumes are created before the users are started
+    for (const dnpName of sortDnpsToRemove(dnpsToRemove, id))
       if (composePaths[dnpName])
         await dockerComposeUpSafe(composePaths[dnpName]);
   }
@@ -156,6 +136,80 @@ export async function restartPackageVolumesTask({
 
   return {
     removedDnps: dnpsToRemove,
-    removedVols: volumeNames
+    removedVols: volumesToRemove
   };
+}
+
+/**
+ * Util to compute list of packages and volumes to remove
+ * @returns
+ * ```
+ * dnpsToRemove = [
+ *   "letsencrypt-nginx.dnp.dappnode.eth",
+ *   "nginx-proxy.dnp.dappnode.eth"
+ * ]
+ * volumesToRemove = [
+ *   "nginxproxydnpdappnodeeth_html",
+ *   "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
+ *   "nginxproxydnpdappnodeeth_vhost.d"
+ * ]
+ * ```
+ */
+function getPackagesAndVolumesToRemove({
+  id,
+  volumeId,
+  dnpList,
+  volumesData
+}: {
+  id: string;
+  volumeId?: string;
+  dnpList: PackageContainer[];
+  volumesData: VolumeData[];
+}): {
+  dnpsToRemove: string[];
+  volumesToRemove: string[];
+} {
+  if (volumeId) {
+    // Only a single volume
+    const volumeData = volumesData.find(v => v.name === volumeId);
+    if (!volumeData) throw Error(`Volume ${volumeId} not found`);
+    if (volumeData.owner && volumeData.owner !== id)
+      throw Error(
+        `Volume ${volumeId} can only be deleted by its owner ${volumeData.owner}`
+      );
+    return {
+      dnpsToRemove: volumeData.users,
+      volumesToRemove: [volumeData.name]
+    };
+  } else {
+    const dnp = dnpList.find(_dnp => _dnp.name === id);
+    if (!dnp) throw Error(`No DNP was found for name ${id}`);
+
+    // All volumes
+    const dnpsToRemove: string[] = [];
+    const volumesToRemove: string[] = [];
+    for (const vol of dnp.volumes) {
+      if (vol.name) {
+        const volumeData = volumesData.find(v => v.name === vol.name);
+        if (volumeData && (!volumeData.owner || volumeData.owner === id)) {
+          for (const user of volumeData.users) dnpsToRemove.push(user);
+          volumesToRemove.push(vol.name);
+        }
+      }
+    }
+    return {
+      dnpsToRemove: uniq(dnpsToRemove),
+      volumesToRemove: uniq(volumesToRemove)
+    };
+  }
+}
+
+/**
+ * It is critical up packages in the correct order,
+ * so that the named volumes are created before the users are started
+ * [NOTE] the next sort function is a simplified solution, where the
+ * id will always be the owner of the volumes, and other DNPs, the users.
+ */
+function sortDnpsToRemove(dnpsToRemove: string[], id: string): string[] {
+  return dnpsToRemove.sort((dnpName: string) => (dnpName === id ? -1 : 1));
 }

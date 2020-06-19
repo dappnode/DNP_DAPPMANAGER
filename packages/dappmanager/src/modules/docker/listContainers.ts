@@ -17,7 +17,6 @@ import {
   readMetadataFromLabels
 } from "../compose";
 import { multiaddressToGatewayUrl } from "../../utils/distributedFile";
-import { uniq, concat } from "lodash";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -32,67 +31,9 @@ const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
 export async function listContainers(): Promise<PackageContainer[]> {
   const containers = await dockerList({});
 
-  /**
-   * Format containers
-   */
-  const dnpList: PackageContainer[] = containers
+  return containers
     .map(parseContainerInfo)
     .filter(pkg => pkg.isDnp || pkg.isCore);
-
-  /**
-   * [EXTENDS]
-   * Do data manipulation that requires info from other DNPs
-   */
-
-  /**
-   * Compile volume users
-   * @param {object} namedVolumesUsers = {
-   *   "nginxproxydnpdappnodeeth_html": [
-   *     "letsencrypt-nginx.dnp.dappnode.eth",
-   *     "nginx-proxy.dnp.dappnode.eth"
-   *   ]
-   * }
-   * @param {object} namedVolumesOwners = {
-   *   "nginxproxydnpdappnodeeth_html": "nginx-proxy.dnp.dappnode.eth"
-   * }
-   */
-  const namedVolumesUsers: { [dnpName: string]: string[] } = {};
-  const namedVolumesOwners: { [dnpName: string]: string } = {};
-  for (const dnp of dnpList)
-    for (const vol of dnp.volumes || [])
-      if (dnp.name && vol.name)
-        namedVolumesUsers[vol.name] = uniq(
-          concat(namedVolumesUsers[vol.name] || [], dnp.name)
-        );
-  for (const [volName, users] of Object.entries(namedVolumesUsers)) {
-    for (const dnpName of users)
-      if (volName.includes(dnpName.replace(/[^0-9a-z]/gi, "")))
-        // "nginx-proxy.dnp.dappnode.eth" => "nginxproxydnpdappnodeeth"
-        namedVolumesOwners[volName] = dnpName;
-
-    // Fallback, assign ownership to the first user
-    if (!namedVolumesOwners[volName]) namedVolumesOwners[volName] = users[0];
-  }
-
-  const dnpListExtended = dnpList.map(
-    (dnp): PackageContainer => {
-      if (!dnp.volumes) return dnp;
-      const volumes = dnp.volumes.map(
-        (vol): VolumeMapping => {
-          let newVol: VolumeMapping;
-          if (vol.name) {
-            const users = namedVolumesUsers[vol.name];
-            const owner = namedVolumesOwners[vol.name];
-            newVol = { ...vol, users, owner, isOwner: owner === dnp.name };
-          } else newVol = vol;
-          return newVol;
-        }
-      );
-      return { ...dnp, volumes };
-    }
-  );
-
-  return dnpListExtended;
 }
 
 export async function listContainerNoThrow(

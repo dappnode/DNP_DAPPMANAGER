@@ -6,7 +6,7 @@ import { getEthClientPrettyName } from "components/EthMultiClient";
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
 import { getDnpInstalledById } from "services/dnpInstalled/selectors";
-import { getEthClientTarget } from "services/dappnodeStatus/selectors";
+import { getEthClientTarget, getVolumes } from "services/dappnodeStatus/selectors";
 import { EthClientTarget } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
@@ -107,6 +107,7 @@ export const packageVolumeRemove = (
 ): AppThunk => async (dispatch, getState) => {
   // Make sure there are no colliding volumes with this DNP
   const dnp = getDnpInstalledById(getState(), dnpName);
+  const volumesData = getVolumes(getState());
   const prettyDnpName = shortNameCapitalized(dnpName);
   const prettyVolName = prettyVolumeName(volName, dnpName).name;
   const prettyVolRef = `${prettyDnpName} ${prettyVolName} volume`;
@@ -118,7 +119,7 @@ export const packageVolumeRemove = (
    * Alert the user about this fact
    */
   if (dnp) {
-    const vol = dnp.volumes.find(vol => vol.name === volName);
+    const vol = volumesData.find(v => v.name === volName);
     if (vol && vol.users) {
       const externalUsers = vol.users.filter(d => d !== dnpName);
       if (externalUsers.length > 0) {
