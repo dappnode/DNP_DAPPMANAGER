@@ -185,6 +185,10 @@ export function getDnpsToRemoveAll(
  * [NOTE] the next sort function is a simplified solution, where the
  * id will always be the owner of the volumes, and other DNPs, the users.
  */
-function sortDnpsToRemove(dnpsToRemove: string[], id: string): string[] {
-  return dnpsToRemove.sort((dnpName: string) => (dnpName === id ? -1 : 1));
+export function sortDnpsToRemove(dnpsToRemove: string[], id: string): string[] {
+  return dnpsToRemove.sort((a, b) => {
+    if (a === id && b !== id) return 1;
+    if (a !== id && b === id) return -1;
+    else return 0;
+  });
 }

@@ -9,6 +9,7 @@ import { mockDnp, mockVolume } from "../../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRestartVolumes as packageRestartVolumesType } from "../../../src/calls/packageRestartVolumes";
+import { sortDnpsToRemove } from "../../../src/modules/docker/restartPackageVolumes";
 
 describe("Docker action: restartPackageVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
@@ -323,5 +324,18 @@ describe("Docker action: restartPackageVolumes", function() {
       const dockerComposePath = getPath.dockerCompose(name, isCore);
       fs.unlinkSync(dockerComposePath);
     }
+  });
+});
+
+describe("sortDnpsToRemove", () => {
+  it("Should sort packages to remove", () => {
+    const id = "main.dnp.dappnode.eth";
+    const idDep = "dependency.dnp.dappnode.eth";
+    const dnpsToRemove = [id, idDep];
+    const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
+
+    const expectedDnpsToRemoveSorted = [idDep, id];
+
+    expect(dnpsToRemoveSorted).to.deep.equal(expectedDnpsToRemoveSorted);
   });
 });
