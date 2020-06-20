@@ -12,8 +12,23 @@ import { VolumeOwnershipData, PackageContainer } from "../../types";
 import { getVolumesOwnershipData } from "./volumesData";
 
 /**
- * Abstract the task itself to be used by `removePackage`
+ * ```
+ * dnpsToRemove = [
+ *   "letsencrypt-nginx.dnp.dappnode.eth",
+ *   "nginx-proxy.dnp.dappnode.eth"
+ * ]
+ * ```
  */
+type DnpsToRemove = string[];
+/**
+ * volumesToRemove = [
+ *   "nginxproxydnpdappnodeeth_html",
+ *   "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
+ *   "nginxproxydnpdappnodeeth_vhost.d"
+ * ]
+ * ```
+ */
+type VolumesToRemove = string[];
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -28,10 +43,7 @@ export async function restartPackageVolumes({
   id: string;
   doNotRestart?: boolean;
   volumeId?: string;
-}): Promise<{
-  removedDnps: string[];
-  removedVols: string[];
-}> {
+}): Promise<{ removedDnps: string[] }> {
   if (!id) throw Error("kwarg id must be defined");
 
   // Needs the extended info that includes the volume ownership data
@@ -39,15 +51,12 @@ export async function restartPackageVolumes({
   const dnpList = await listContainers();
   const volumesData = await getVolumesOwnershipData();
 
-  const { dnpsToRemove, volumesToRemove } = getPackagesAndVolumesToRemove({
-    id,
-    volumeId,
-    dnpList,
-    volumesData
-  });
+  const { dnpsToRemove, volumesToRemove } = volumeId
+    ? getDnpsToRemoveSingleVol({ id, volumeId, volumesData })
+    : getDnpsToRemoveAll({ id, dnpList, volumesData });
 
   // If there are no volumes don't do anything
-  if (volumesToRemove.length === 0) return { removedDnps: [], removedVols: [] };
+  if (volumesToRemove.length === 0) return { removedDnps: [] };
 
   const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
   logs.debug({ dnpsToRemoveSorted, volumesToRemove });
@@ -108,74 +117,71 @@ export async function restartPackageVolumes({
   // In case of error: FIRST up the dnp, THEN throw the error
   if (err) throw err;
 
+  return { removedDnps: dnpsToRemove };
+}
+
+/**
+ * Util: Remove a single package volume => compute list of packages and volumes to remove
+ */
+export function getDnpsToRemoveSingleVol({
+  id,
+  volumeId,
+  volumesData
+}: {
+  id: string;
+  volumeId: string;
+  volumesData: VolumeOwnershipData[];
+}): {
+  dnpsToRemove: string[];
+  volumesToRemove: string[];
+} {
+  // Only a single volume
+  const volumeData = volumesData.find(v => v.name === volumeId);
+  if (!volumeData) throw Error(`Volume ${volumeId} not found`);
+  if (volumeData.owner && volumeData.owner !== id)
+    throw Error(
+      `Volume ${volumeId} can only be deleted by its owner ${volumeData.owner}`
+    );
   return {
-    removedDnps: dnpsToRemove,
-    removedVols: volumesToRemove
+    dnpsToRemove: volumeData.users,
+    volumesToRemove: [volumeData.name]
   };
 }
 
 /**
- * Util to compute list of packages and volumes to remove
- * @returns
- * ```
- * dnpsToRemove = [
- *   "letsencrypt-nginx.dnp.dappnode.eth",
- *   "nginx-proxy.dnp.dappnode.eth"
- * ]
- * volumesToRemove = [
- *   "nginxproxydnpdappnodeeth_html",
- *   "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
- *   "nginxproxydnpdappnodeeth_vhost.d"
- * ]
- * ```
+ * Util: Remove all package volumes => compute list of packages and volumes to remove
  */
-function getPackagesAndVolumesToRemove({
+export function getDnpsToRemoveAll({
   id,
-  volumeId,
   dnpList,
   volumesData
 }: {
   id: string;
-  volumeId?: string;
   dnpList: PackageContainer[];
   volumesData: VolumeOwnershipData[];
 }): {
   dnpsToRemove: string[];
   volumesToRemove: string[];
 } {
-  if (volumeId) {
-    // Only a single volume
-    const volumeData = volumesData.find(v => v.name === volumeId);
-    if (!volumeData) throw Error(`Volume ${volumeId} not found`);
-    if (volumeData.owner && volumeData.owner !== id)
-      throw Error(
-        `Volume ${volumeId} can only be deleted by its owner ${volumeData.owner}`
-      );
-    return {
-      dnpsToRemove: volumeData.users,
-      volumesToRemove: [volumeData.name]
-    };
-  } else {
-    const dnp = dnpList.find(_dnp => _dnp.name === id);
-    if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnp = dnpList.find(_dnp => _dnp.name === id);
+  if (!dnp) throw Error(`No DNP was found for name ${id}`);
 
-    // All volumes
-    const dnpsToRemove: string[] = [];
-    const volumesToRemove: string[] = [];
-    for (const vol of dnp.volumes) {
-      if (vol.name) {
-        const volumeData = volumesData.find(v => v.name === vol.name);
-        if (volumeData && (!volumeData.owner || volumeData.owner === id)) {
-          for (const user of volumeData.users) dnpsToRemove.push(user);
-          volumesToRemove.push(vol.name);
-        }
+  // All volumes
+  const dnpsToRemove: string[] = [];
+  const volumesToRemove: string[] = [];
+  for (const vol of dnp.volumes) {
+    if (vol.name) {
+      const volumeData = volumesData.find(v => v.name === vol.name);
+      if (volumeData && (!volumeData.owner || volumeData.owner === id)) {
+        for (const user of volumeData.users) dnpsToRemove.push(user);
+        volumesToRemove.push(vol.name);
       }
     }
-    return {
-      dnpsToRemove: uniq(dnpsToRemove),
-      volumesToRemove: uniq(volumesToRemove)
-    };
   }
+  return {
+    dnpsToRemove: uniq(dnpsToRemove),
+    volumesToRemove: uniq(volumesToRemove)
+  };
 }
 
 /**

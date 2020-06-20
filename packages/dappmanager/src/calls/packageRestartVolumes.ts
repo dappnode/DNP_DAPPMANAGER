@@ -14,13 +14,10 @@ export async function packageRestartVolumes({
    */
   volumeId?: string;
 }): Promise<void> {
-  const { removedVols, removedDnps } = await restartPackageVolumes({
-    id,
-    volumeId
-  });
+  const { removedDnps } = await restartPackageVolumes({ id, volumeId });
 
   // Emit packages update
-  if (removedVols.length > 0) {
+  if (removedDnps.length > 0) {
     eventBus.requestPackages.emit();
     eventBus.packagesModified.emit({ ids: removedDnps });
   }
