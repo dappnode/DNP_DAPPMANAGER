@@ -256,17 +256,10 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
-export interface VolumeMappingDocker {
+export interface VolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
-}
-
-export interface VolumeMapping extends VolumeMappingDocker {
-  users?: string[];
-  owner?: string;
-  isOwner?: boolean;
-  size?: number;
 }
 
 export interface Dependencies {
@@ -319,6 +312,17 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   gettingStarted?: string;
   gettingStartedShow?: boolean;
   manifest?: Manifest;
+  /**
+   * Checks if there are volumes to be removed on this DNP
+   */
+  areThereVolumesToRemove: boolean;
+  /**
+   * If there are volumes which this DNP is the owner and some other
+   * DNPs are users, they will be removed by the DAPPMANAGER.
+   */
+  volumeUsersToRemove: string[];
+  dependantsOf: string[];
+  namedExternalVols: VolumeOwnershipData[];
 }
 
 export interface PackageEnvs {
@@ -823,17 +827,21 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
-export interface VolumeData {
+export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  nameDisplay?: string; // "data", Guessed short name for display
-  ownerDisplay?: string; // "gethdnpdappnodeeth", Guessed owner name for display
+  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
+}
+
+export interface VolumeData extends VolumeOwnershipData {
+  internalName?: string; // "data", Volume name as referenced inside the compose
   createdAt: number; // 1569346006000,
-  mountpoint: string; // "/dev1/data",
-  fileSystem?: MountpointData;
   size?: number; // 161254123,
   refCount?: number; // 2
   isOrphan: boolean; // if no container is using it
+  mountpoint: string; // "/dev1/data",
+  // Mountpoint extended data
+  fileSystem?: MountpointData;
 }
 
 /**

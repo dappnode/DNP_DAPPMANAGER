@@ -91,22 +91,11 @@ export function prettyVolumeName(
 }
 
 /**
- * Tries to make a docker volume owner string prettier
- * @param ownerDisplay "nginxproxydnpdappnodeeth"
- * @return "Nginxproxy"
- */
-function prettyVolumeOwnerDisplay(ownerDisplay: string): string {
-  return shortNameCapitalized(
-    ownerDisplay.replace(/dnpdappnodeeth|publicdappnodeeth/, "")
-  );
-}
-
-/**
  * Helper for VolumesGrid to get a pretty volume name from its volumeData
  * @return "Data", "Identity data"
  */
 export function getPrettyVolumeName(volData: VolumeData): string {
-  if (volData.nameDisplay) return capitalize(volData.nameDisplay);
+  if (volData.internalName) return capitalize(volData.internalName);
   return prettyVolumeName(volData.name, volData.owner).name;
 }
 
@@ -117,9 +106,7 @@ export function getPrettyVolumeName(volData: VolumeData): string {
 export function getPrettyVolumeOwner(volData: VolumeData): string | undefined {
   return volData.owner
     ? shortNameCapitalized(volData.owner)
-    : prettyVolumeName(volData.name).owner ||
-        prettyVolumeOwnerDisplay(volData.ownerDisplay || "") ||
-        undefined;
+    : prettyVolumeName(volData.name).owner;
 }
 
 /**

@@ -49,9 +49,6 @@ export const PackageById: React.FC<RouteComponentProps<{
 
   const dnpName = dnp.name;
   const {
-    isCore,
-    state,
-    volumes,
     ports,
     userSettings,
     setupWizard,
@@ -78,7 +75,7 @@ export const PackageById: React.FC<RouteComponentProps<{
     {
       name: "Controls",
       subPath: "controls",
-      render: () => <Controls id={dnpName} {...{ isCore, state, volumes }} />,
+      render: () => <Controls id={id} dnp={dnp} />,
       available: true
     },
     {

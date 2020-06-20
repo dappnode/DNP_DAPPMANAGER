@@ -13,7 +13,7 @@ import {
   Compose,
   UserSettings,
   UserSettingsAllDnps,
-  VolumeMappingDocker
+  VolumeMapping
 } from "../../types";
 import { cleanCompose } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";
@@ -155,7 +155,7 @@ export function applyUserSettings(
       // ##### <DEPRECATED> Kept for legacy compatibility
       const nextServiceVolumes = stringifyVolumeMappings(
         volumeMappings.map(
-          (vol): VolumeMappingDocker => {
+          (vol): VolumeMapping => {
             const hostUserSet =
               vol.name && (userSettings.legacyBindVolumes || {})[vol.name];
             if (hostUserSet && path.isAbsolute(hostUserSet))

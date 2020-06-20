@@ -20,18 +20,19 @@ import { VolumeData } from "types";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 // Actions
 import { volumeRemove, packageVolumeRemove } from "../actions";
-
 import "./volumes.scss";
 
 const shortLength = 3;
 const minSize = 10 * 1024 * 1024;
 
 export default function VolumesGrid() {
-  const volumes = useSelector(getVolumes);
-  const dispatch = useDispatch();
   const [showAll, setShowAll] = useState(false);
 
-  const getSize = (v: VolumeData) => v.size || (v.fileSystem || {}).used || 0;
+  const volumes = useSelector(getVolumes);
+  const dispatch = useDispatch();
+
+  // Fetch mountpoints if necessary
+  const getSize = (v: VolumeData) => v.size || v.fileSystem?.used || 0;
   const volumesFiltered = [...volumes]
     .sort((v1, v2) => getSize(v2) - getSize(v1))
     .sort((v1, v2) => (v1.isOrphan && !v2.isOrphan ? -1 : 1))
@@ -55,7 +56,7 @@ export default function VolumesGrid() {
       {showRemove && <header>Remove</header>}
 
       {volumesFiltered.map(volData => {
-        const { name, owner, size, fileSystem, createdAt, isOrphan } = volData;
+        const { name, owner, size, createdAt, isOrphan, fileSystem } = volData;
         const ownerPretty = getPrettyVolumeOwner(volData);
         const namePretty = getPrettyVolumeName(volData);
         const onDelete = isOrphan

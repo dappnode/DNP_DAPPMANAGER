@@ -522,7 +522,7 @@ describe("DNP lifecycle", function() {
       if (!dnpMainNext) throw Error(`DNP ${idMain} (next) not found`);
       expect(dnpMainPrev.id).to.not.equal(
         dnpMainNext.id,
-        `${idMain} container ids are not different, so it was not reseted`
+        `${idMain} container ids are not different, so it was not reseted: ${dnpMainPrev.id}`
       );
     });
 

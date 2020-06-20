@@ -1,7 +1,8 @@
-import { packageRestart } from "./packageRestart";
 import { PackageEnvs } from "../types";
 import { listContainer } from "../modules/docker/listContainers";
 import { ComposeFileEditor } from "../modules/compose/editor";
+import * as eventBus from "../eventBus";
+import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -27,5 +28,9 @@ export async function packageSetEnvironment({
   compose.service().mergeEnvs(envs);
   compose.write();
 
-  await packageRestart({ id });
+  await restartPackage(id);
+
+  // Emit packages update
+  eventBus.requestPackages.emit();
+  eventBus.packagesModified.emit({ ids: [id] });
 }

@@ -94,22 +94,13 @@ describe("listContainers", function() {
             host: "",
             container: "/etc/nginx/dhparam",
             name:
-              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
-            users: ["nginx-proxy.dnp.dappnode.eth"],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: true
+              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
           },
           {
             host:
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
-            name: "nginxproxydnpdappnodeeth_vhost.d",
-            users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
-            ],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: true
+            name: "nginxproxydnpdappnodeeth_vhost.d"
           },
           {
             host: "/var/run/docker.sock",
@@ -118,13 +109,7 @@ describe("listContainers", function() {
           {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
-            name: "nginxproxydnpdappnodeeth_html",
-            users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
-            ],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: true
+            name: "nginxproxydnpdappnodeeth_html"
           }
         ],
         state: "running",
@@ -150,10 +135,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/app/.ethchain",
-            name: "dncore_ethchaindnpdappnodeeth_data",
-            users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
-            owner: "ethchain.dnp.dappnode.eth",
-            isOwner: false
+            name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
         state: "running",
@@ -215,10 +197,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/usr/www/openvpn/cred",
-            name: "dncore_vpndnpdappnodeeth_shared",
-            users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
-            owner: "vpn.dnp.dappnode.eth",
-            isOwner: false
+            name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
         state: "running",
@@ -251,10 +230,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
             container: "/etc/openvpn",
-            name: "dncore_vpndnpdappnodeeth_config",
-            users: ["vpn.dnp.dappnode.eth"],
-            owner: "vpn.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_vpndnpdappnodeeth_config"
           },
           {
             host: "/etc/hostname",
@@ -271,10 +247,7 @@ describe("listContainers", function() {
           {
             host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
             container: "/usr/src/app/secrets",
-            name: "dncore_vpndnpdappnodeeth_data",
-            users: ["vpn.dnp.dappnode.eth"],
-            owner: "vpn.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_vpndnpdappnodeeth_data"
           },
           {
             host: "/var/run/docker.sock",
@@ -284,10 +257,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/var/spool/openvpn",
-            name: "dncore_vpndnpdappnodeeth_shared",
-            users: ["admin.dnp.dappnode.eth", "vpn.dnp.dappnode.eth"],
-            owner: "vpn.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
         state: "running",
@@ -317,10 +287,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
             container: "/usr/src/app/dnp_repo",
-            name: "dncore_dappmanagerdnpdappnodeeth_data",
-            users: ["dappmanager.dnp.dappnode.eth"],
-            owner: "dappmanager.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_dappmanagerdnpdappnodeeth_data"
           },
           {
             host: "/var/run/docker.sock",
@@ -356,10 +323,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
             container: "/etc/bind",
-            name: "dncore_binddnpdappnodeeth_data",
-            users: ["bind.dnp.dappnode.eth"],
-            owner: "bind.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_binddnpdappnodeeth_data"
           }
         ],
         state: "running",
@@ -404,10 +368,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/root/.local/share/io.parity.ethereum",
-            name: "dncore_ethchaindnpdappnodeeth_data",
-            users: ["vipnode.dnp.dappnode.eth", "ethchain.dnp.dappnode.eth"],
-            owner: "ethchain.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
         state: "running",
@@ -503,19 +464,13 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
             container: "/data/ipfs",
-            name: "dncore_ipfsdnpdappnodeeth_data",
-            users: ["ipfs.dnp.dappnode.eth"],
-            owner: "ipfs.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_ipfsdnpdappnodeeth_data"
           },
           {
             host:
               "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
             container: "/export",
-            name: "dncore_ipfsdnpdappnodeeth_export",
-            users: ["ipfs.dnp.dappnode.eth"],
-            owner: "ipfs.dnp.dappnode.eth",
-            isOwner: true
+            name: "dncore_ipfsdnpdappnodeeth_export"
           }
         ],
         state: "running",
@@ -572,10 +527,7 @@ describe("listContainers", function() {
           {
             host: "/var/lib/docker/volumes/swarmdnpdappnodeeth_swarm/_data",
             container: "/root/.ethereum",
-            name: "swarmdnpdappnodeeth_swarm",
-            users: ["swarm.dnp.dappnode.eth"],
-            owner: "swarm.dnp.dappnode.eth",
-            isOwner: true
+            name: "swarmdnpdappnodeeth_swarm"
           }
         ],
         state: "running",
@@ -605,24 +557,12 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
-            name: "nginxproxydnpdappnodeeth_vhost.d",
-            users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
-            ],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: false
+            name: "nginxproxydnpdappnodeeth_vhost.d"
           },
           {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
-            name: "nginxproxydnpdappnodeeth_html",
-            users: [
-              "nginx-proxy.dnp.dappnode.eth",
-              "letsencrypt-nginx.dnp.dappnode.eth"
-            ],
-            owner: "nginx-proxy.dnp.dappnode.eth",
-            isOwner: false
+            name: "nginxproxydnpdappnodeeth_html"
           },
           {
             host: "/var/run/docker.sock",
@@ -654,10 +594,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
             container: "/usr/src/app/data",
-            name: "ipfsreplicatordnpdappnodeeth_pin-data",
-            users: ["ipfs-replicator.dnp.dappnode.eth"],
-            owner: "ipfs-replicator.dnp.dappnode.eth",
-            isOwner: true
+            name: "ipfsreplicatordnpdappnodeeth_pin-data"
           }
         ],
         state: "running",
@@ -703,10 +640,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
             container: "/goerli",
-            name: "goerligethdnpdappnodeeth_goerli",
-            users: ["goerli-geth.dnp.dappnode.eth"],
-            owner: "goerli-geth.dnp.dappnode.eth",
-            isOwner: true
+            name: "goerligethdnpdappnodeeth_goerli"
           }
         ],
         state: "running",
@@ -750,10 +684,7 @@ describe("listContainers", function() {
             host:
               "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
             container: "/root/.lnd",
-            name: "lndnpdappnodeeth_lndconfig_data",
-            users: ["ln.dnp.dappnode.eth"],
-            owner: "ln.dnp.dappnode.eth",
-            isOwner: true
+            name: "lndnpdappnodeeth_lndconfig_data"
           }
         ],
         state: "running",

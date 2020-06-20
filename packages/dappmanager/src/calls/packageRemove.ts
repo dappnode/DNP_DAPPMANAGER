@@ -3,12 +3,11 @@ import * as eventBus from "../eventBus";
 import params from "../params";
 // Modules
 import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
-// External call
-import { restartPackageVolumesTask } from "./packageRestartVolumes";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listContainer } from "../modules/docker/listContainers";
+import { restartPackageVolumes } from "../modules/docker/restartPackageVolumes";
 import { logs } from "../logs";
 
 /**
@@ -39,7 +38,7 @@ export async function packageRemove({
   const packageRepoDir = getPath.packageRepoDir(id, false);
 
   // Necessary for eventBus dependants to know the exact list of deleted DNPs
-  let removedIds: string[] = [id];
+  let removedDnps: string[] = [id];
 
   /**
    * [NOTE] Not necessary to close the ports since they will just
@@ -48,11 +47,13 @@ export async function packageRemove({
 
   // Call restartPackageVolumes to safely delete dependant volumes
   if (deleteVolumes) {
-    const { removedDnps } = await restartPackageVolumesTask({
-      id,
-      doNotRestart: true
-    });
-    removedIds = removedDnps; // restartPackageVolumes may remove additional DNPs
+    // Note: restartPackageVolumes may remove additional DNPs
+    removedDnps = (
+      await restartPackageVolumes({
+        id,
+        doNotRestart: true
+      })
+    ).removedDnps;
   } else {
     /**
      * If there is no docker-compose, do a docker rm directly
@@ -77,5 +78,5 @@ export async function packageRemove({
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: removedIds, removed: true });
+  eventBus.packagesModified.emit({ ids: removedDnps, removed: true });
 }

@@ -40,18 +40,12 @@ export const openEthereum: MockDnp = {
       {
         host: "/var/lib/docker/volumes/paritydnpdappnodeeth_data/_data",
         container: "/app/.parity",
-        name: "paritydnpdappnodeeth_data",
-        users: ["parity.dnp.dappnode.eth"],
-        owner: "parity.dnp.dappnode.eth",
-        isOwner: true
+        name: "paritydnpdappnodeeth_data"
       },
       {
         host: "/var/lib/docker/volumes/paritydnpdappnodeeth_geth/_data",
         container: "/root/.ethereum/",
-        name: "paritydnpdappnodeeth_geth",
-        users: ["parity.dnp.dappnode.eth"],
-        owner: "parity.dnp.dappnode.eth",
-        isOwner: true
+        name: "paritydnpdappnodeeth_geth"
       }
     ],
     canBeFullnode: true
