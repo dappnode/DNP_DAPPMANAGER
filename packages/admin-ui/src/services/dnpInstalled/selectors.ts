@@ -12,8 +12,3 @@ export const getDnpInstalled = (state: RootState): PackageContainer[] =>
 
 export const getDnpInstalledById = (state: RootState, id: string) =>
   getDnpInstalled(state).find(({ name }) => name === id);
-
-export const getDependantsOfId = (state: RootState, id: string) =>
-  getDnpInstalled(state)
-    .filter(dnp => dnp.dependencies && dnp.dependencies[id])
-    .map(dnp => dnp.name);

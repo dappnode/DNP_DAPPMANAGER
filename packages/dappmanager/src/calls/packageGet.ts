@@ -4,6 +4,8 @@ import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
 import { ComposeFileEditor } from "../modules/compose/editor";
+import { getVolumesOwnershipData } from "../modules/docker/volumesData";
+import { getDnpsToRemoveAll } from "../modules/docker/restartPackageVolumes";
 
 /**
  * Toggles the visibility of a getting started block
@@ -19,7 +21,24 @@ export async function packageGet({
   const dnpList = await listContainers();
   const dnp = dnpList.find(_dnp => _dnp.name === id);
   if (!dnp) throw Error(`No DNP was found for name ${id}`);
-  const dnpData: InstalledPackageDetailData = dnp;
+  const volumesData = await getVolumesOwnershipData();
+
+  const dnpData: InstalledPackageDetailData = {
+    ...dnp,
+
+    // Metadata for package/:id/controls feedback
+    areThereVolumesToRemove:
+      dnp.volumes.length > 0 &&
+      dnp.volumes.some(vol => {
+        const owner = volumesData.find(v => v.name === vol.name)?.owner;
+        return !owner || owner === dnp.name;
+      }),
+    volumeUsersToRemove: getDnpsToRemoveAll(dnp, volumesData).dnpsToRemove,
+    dependantsOf: dnpList.filter(d => d.dependencies[id]).map(d => d.name),
+    namedExternalVols: volumesData.filter(
+      v => v.owner && v.owner !== dnp.name && v.users.includes(dnp.name)
+    )
+  };
 
   try {
     const manifest = readManifestIfExists(dnpData);
@@ -55,5 +74,5 @@ export async function packageGet({
     logs.warn(`Error getting user settings for ${dnpData.name}`, e);
   }
 
-  return dnp;
+  return dnpData;
 }

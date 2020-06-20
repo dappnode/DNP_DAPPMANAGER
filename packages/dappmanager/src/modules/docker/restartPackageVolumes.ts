@@ -51,9 +51,12 @@ export async function restartPackageVolumes({
   const dnpList = await listContainers();
   const volumesData = await getVolumesOwnershipData();
 
+  const dnp = dnpList.find(_dnp => _dnp.name === id);
+  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+
   const { dnpsToRemove, volumesToRemove } = volumeId
     ? getDnpsToRemoveSingleVol({ id, volumeId, volumesData })
-    : getDnpsToRemoveAll({ id, dnpList, volumesData });
+    : getDnpsToRemoveAll(dnp, volumesData);
 
   // If there are no volumes don't do anything
   if (volumesToRemove.length === 0) return { removedDnps: [] };
@@ -151,28 +154,20 @@ export function getDnpsToRemoveSingleVol({
 /**
  * Util: Remove all package volumes => compute list of packages and volumes to remove
  */
-export function getDnpsToRemoveAll({
-  id,
-  dnpList,
-  volumesData
-}: {
-  id: string;
-  dnpList: PackageContainer[];
-  volumesData: VolumeOwnershipData[];
-}): {
+export function getDnpsToRemoveAll(
+  dnp: PackageContainer,
+  volumesData: VolumeOwnershipData[]
+): {
   dnpsToRemove: string[];
   volumesToRemove: string[];
 } {
-  const dnp = dnpList.find(_dnp => _dnp.name === id);
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
-
   // All volumes
   const dnpsToRemove: string[] = [];
   const volumesToRemove: string[] = [];
   for (const vol of dnp.volumes) {
     if (vol.name) {
       const volumeData = volumesData.find(v => v.name === vol.name);
-      if (volumeData && (!volumeData.owner || volumeData.owner === id)) {
+      if (volumeData && (!volumeData.owner || volumeData.owner === dnp.name)) {
         for (const user of volumeData.users) dnpsToRemove.push(user);
         volumesToRemove.push(vol.name);
       }
