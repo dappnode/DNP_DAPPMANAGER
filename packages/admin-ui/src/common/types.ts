@@ -816,22 +816,21 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
-export interface VolumeData {
-  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
-  owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
-  internalName?: string; // "data", Volume name as referenced inside the compose
-  createdAt: number; // 1569346006000,
-  mountpoint: string; // "/dev1/data",
-  size?: number; // 161254123,
-  refCount?: number; // 2
-  isOrphan: boolean; // if no container is using it
-}
-
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
   users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
+}
+
+export interface VolumeData extends VolumeOwnershipData {
+  internalName?: string; // "data", Volume name as referenced inside the compose
+  createdAt: number; // 1569346006000,
+  size?: number; // 161254123,
+  refCount?: number; // 2
+  isOrphan: boolean; // if no container is using it
+  mountpoint: string; // "/dev1/data",
+  // Mountpoint extended data
+  fileSystem?: MountpointData;
 }
 
 /**

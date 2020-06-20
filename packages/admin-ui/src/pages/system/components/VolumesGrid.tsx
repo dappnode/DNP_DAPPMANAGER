@@ -20,9 +20,7 @@ import { VolumeData } from "types";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 // Actions
 import { volumeRemove, packageVolumeRemove } from "../actions";
-
 import "./volumes.scss";
-import { useApi } from "api";
 
 const shortLength = 3;
 const minSize = 10 * 1024 * 1024;
@@ -34,13 +32,7 @@ export default function VolumesGrid() {
   const dispatch = useDispatch();
 
   // Fetch mountpoints if necessary
-  const mountpointsRequest = useApi.mountpointsGet();
-
-  const getMountpoint = (v: VolumeData) =>
-    mountpointsRequest.data?.find(
-      fs => v.mountpoint && fs.mountpoint === v.mountpoint
-    );
-  const getSize = (v: VolumeData) => v.size || getMountpoint(v)?.used || 0;
+  const getSize = (v: VolumeData) => v.size || v.fileSystem?.used || 0;
   const volumesFiltered = [...volumes]
     .sort((v1, v2) => getSize(v2) - getSize(v1))
     .sort((v1, v2) => (v1.isOrphan && !v2.isOrphan ? -1 : 1))
@@ -64,10 +56,9 @@ export default function VolumesGrid() {
       {showRemove && <header>Remove</header>}
 
       {volumesFiltered.map(volData => {
-        const { name, owner, size, createdAt, isOrphan } = volData;
+        const { name, owner, size, createdAt, isOrphan, fileSystem } = volData;
         const ownerPretty = getPrettyVolumeOwner(volData);
         const namePretty = getPrettyVolumeName(volData);
-        const fileSystem = getMountpoint(volData);
         const onDelete = isOrphan
           ? () => dispatch(volumeRemove(name))
           : owner
@@ -122,8 +113,6 @@ export default function VolumesGrid() {
                 <MountpointDataView
                   fileSystem={fileSystem}
                 ></MountpointDataView>
-              ) : mountpointsRequest.isValidating ? (
-                "Loading..."
               ) : (
                 "Docker volume"
               ))}

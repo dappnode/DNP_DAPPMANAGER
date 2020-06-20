@@ -1,8 +1,8 @@
 import { dockerDf, dockerVolumesList } from "./dockerApi";
 import { listContainers } from "./listContainers";
 import { parseDevicePath } from "../compose";
-import { VolumeData } from "../../types";
-import { VolumeOwnershipData } from "../../common";
+import { VolumeData, VolumeOwnershipData, PackageContainer } from "../../types";
+import { detectMountpoints } from "../hostScripts";
 
 /**
  * Normalizes a docker-compose project name 
@@ -15,44 +15,23 @@ import { VolumeOwnershipData } from "../../common";
 export const normalizeProjectName = (name: string): string =>
   name.replace(/[^-_a-z0-9]/gi, "").toLowerCase();
 
+/**
+ * Returns only ownership data of each volume against all installed packages
+ */
 export async function getVolumesOwnershipData(): Promise<
   VolumeOwnershipData[]
 > {
   const volumes = await dockerVolumesList();
   const dnpList = await listContainers();
 
-  return volumes.map(
-    (vol): VolumeOwnershipData => {
-      // Get user names
-      const users = Array.from(
-        dnpList.reduce((_users, dnp) => {
-          if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.name);
-          return _users;
-        }, new Set<string>())
-      );
-
-      // Get the volume owner
-      // TODO: Weak, derived from project name, may be exploited
-      const labels = vol.Labels || {};
-      const { normalizedOwnerName } = parseVolumeLabels(labels);
-      const ownerContainer = dnpList.find(dnp => {
-        normalizeProjectName(dnp.name) === normalizedOwnerName;
-      });
-      // Fallback, assign ownership to the first user
-      const owner = ownerContainer ? ownerContainer.name : users[0];
-
-      return {
-        // Real volume and owner name to call delete on
-        name: vol.Name,
-        owner,
-        users
-      };
-    }
-  );
+  return volumes.map(vol => parseVolumeOwnershipData(vol, dnpList));
 }
 
 /**
- * Returns volume data
+ * Returns volume data. Expensive function
+ * - ownership data of each volume against all installed packages
+ * - volume system usage data from docker system df
+ * - mountpoint data if any
  */
 export async function getVolumeSystemData(): Promise<VolumeData[]> {
   const volumes = await dockerVolumesList();
@@ -60,6 +39,8 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
   const dnpList = await listContainers();
 
   // This expensive function won't be called on empty volDevicePaths
+  const callDetectMountpoints = volumes.some(vol => (vol.Options || {}).device);
+  const mountpoints = callDetectMountpoints ? await detectMountpoints() : [];
 
   // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
   //       calling du on massive dirs can take +30min (i.e. Storj data));
@@ -71,29 +52,14 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
   // Append sizes after to optimize the number of calls to dockerDf and host
   return volumes.map(
     (vol): VolumeData => {
-      // Get user names
-      const users = Array.from(
-        dnpList.reduce((_users, dnp) => {
-          if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.name);
-          return _users;
-        }, new Set<string>())
-      );
-
-      // Get the volume owner
-      // TODO: Weak, derived from project name, may be exploited
-      const labels = vol.Labels || {};
-      const { normalizedOwnerName, internalName } = parseVolumeLabels(labels);
-      const ownerContainer = dnpList.find(dnp => {
-        normalizeProjectName(dnp.name) === normalizedOwnerName;
-      });
-      // Fallback, assign ownership to the first user
-      const owner = ownerContainer ? ownerContainer.name : users[0];
+      const ownershipData = parseVolumeOwnershipData(vol, dnpList);
 
       // Get the size of the volume via docker system df -v
       const volDfData = volumesDf.find(v => v.Name === vol.Name);
       const size = volDfData ? volDfData.UsageData.Size : undefined;
       const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
-      const isOrphan = !refCount && users.length === 0; // Check users for custom bind volumes
+      // Check users for custom bind volumes
+      const isOrphan = !refCount && ownershipData.users.length === 0;
 
       // Custom mountpoint data
       const pathParts = vol.Options
@@ -103,17 +69,49 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
       return {
         // Real volume and owner name to call delete on
         name: vol.Name,
-        owner,
-        users,
-        internalName,
+        owner: ownershipData.owner,
+        users: ownershipData.users,
+        internalName: parseVolumeLabels(vol.Labels).internalName,
         createdAt: new Date(vol.CreatedAt).getTime(),
-        mountpoint: pathParts ? pathParts.mountpoint : "",
         size,
         refCount,
-        isOrphan
+        isOrphan,
+        mountpoint: pathParts ? pathParts.mountpoint : "",
+        fileSystem: pathParts
+          ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
+          : undefined
       };
     }
   );
+}
+
+export function parseVolumeOwnershipData(
+  vol: { Name: string; Labels: { [key: string]: string } },
+  dnpList: PackageContainer[]
+): VolumeOwnershipData {
+  // Get user names
+  const users = Array.from(
+    dnpList.reduce((_users, dnp) => {
+      if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.name);
+      return _users;
+    }, new Set<string>())
+  );
+
+  // Get the volume owner
+  // TODO: Weak, derived from project name, may be exploited
+  const { normalizedOwnerName } = parseVolumeLabels(vol.Labels || {});
+  const ownerContainer = dnpList.find(dnp => {
+    normalizeProjectName(dnp.name) === normalizedOwnerName;
+  });
+  // Fallback, assign ownership to the first user
+  const owner = ownerContainer ? ownerContainer.name : users[0];
+
+  return {
+    // Real volume and owner name to call delete on
+    name: vol.Name,
+    owner,
+    users
+  };
 }
 
 /**
