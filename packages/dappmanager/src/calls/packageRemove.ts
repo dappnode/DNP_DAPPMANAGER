@@ -3,12 +3,11 @@ import * as eventBus from "../eventBus";
 import params from "../params";
 // Modules
 import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
-// External call
-import { restartPackageVolumesTask } from "./packageRestartVolumes";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listContainer } from "../modules/docker/listContainers";
+import { restartPackageVolumes } from "../modules/docker/restartPackageVolumes";
 import { logs } from "../logs";
 
 /**
@@ -48,7 +47,7 @@ export async function packageRemove({
 
   // Call restartPackageVolumes to safely delete dependant volumes
   if (deleteVolumes) {
-    const { removedDnps } = await restartPackageVolumesTask({
+    const { removedDnps } = await restartPackageVolumes({
       id,
       doNotRestart: true
     });

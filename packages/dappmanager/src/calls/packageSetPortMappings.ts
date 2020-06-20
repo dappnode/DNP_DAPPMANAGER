@@ -1,9 +1,9 @@
-import { packageRestart } from "./packageRestart";
 import * as eventBus from "../eventBus";
 import params from "../params";
 import { listContainer } from "../modules/docker/listContainers";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { PortMapping } from "../types";
+import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -41,14 +41,14 @@ export async function packageSetPortMappings({
 
   try {
     // packageRestart triggers > eventBus emitPackages
-    await packageRestart({ id });
+    await restartPackage(id);
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
       service.setPortMapping(previousPortMappings);
       compose.write();
 
-      await packageRestart({ id });
+      await restartPackage(id);
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(
@@ -66,6 +66,10 @@ export async function packageSetPortMappings({
       );
     }
   }
+
+  // Emit packages update
+  eventBus.requestPackages.emit();
+  eventBus.packagesModified.emit({ ids: [id] });
 
   // Trigger a natRenewal update to open ports if necessary
   eventBus.runNatRenewal.emit();

@@ -2,15 +2,15 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
-import * as getPath from "../../src/utils/getPath";
-import * as validate from "../../src/utils/validate";
-import { PackageContainer, VolumeData } from "../../src/types";
-import { mockDnp, mockVolume } from "../testUtils";
+import * as getPath from "../../../src/utils/getPath";
+import * as validate from "../../../src/utils/validate";
+import { PackageContainer, VolumeOwnershipData } from "../../../src/types";
+import { mockDnp, mockVolume } from "../../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
-import { packageRestartVolumes as packageRestartVolumesType } from "../../src/calls/packageRestartVolumes";
+import { packageRestartVolumes as packageRestartVolumesType } from "../../../src/calls/packageRestartVolumes";
 
-describe("Call function: packageRestartVolumes", function() {
+describe("Docker action: restartPackageVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
   const dappmanagerId = "dappmanager.dnp.dappnode.eth";
   const noVolsDnpName = "no-vols.dnp.dappnode.eth";
@@ -102,22 +102,14 @@ describe("Call function: packageRestartVolumes", function() {
     })
   );
 
-  const mockVolumeData = {
-    createdAt: 150000000000,
-    mountpoint: "",
-    isOrphan: false
-  };
-
-  const volumesData: VolumeData[] = [
+  const volumesData: VolumeOwnershipData[] = [
     // Mock core volumes
     {
-      ...mockVolumeData,
       name: "vol1",
       users: [dnpNameCore],
       owner: dnpNameCore
     },
     {
-      ...mockVolumeData,
       name: "vol2",
       users: [dnpNameCore],
       owner: dnpNameCore
@@ -125,7 +117,6 @@ describe("Call function: packageRestartVolumes", function() {
 
     // Dappmanager volumes
     {
-      ...mockVolumeData,
       name: dappmanagerVolName,
       users: [dappmanagerId],
       owner: dappmanagerId
@@ -133,7 +124,6 @@ describe("Call function: packageRestartVolumes", function() {
 
     // Nginx volumes
     {
-      ...mockVolumeData,
       name: "nginxproxydnpdappnodeeth_vhost.d",
       users: [
         "letsencrypt-nginx.dnp.dappnode.eth",
@@ -142,7 +132,6 @@ describe("Call function: packageRestartVolumes", function() {
       owner: "nginx-proxy.dnp.dappnode.eth"
     },
     {
-      ...mockVolumeData,
       name: "nginxproxydnpdappnodeeth_html",
       users: [
         "letsencrypt-nginx.dnp.dappnode.eth",
@@ -151,7 +140,6 @@ describe("Call function: packageRestartVolumes", function() {
       owner: "nginx-proxy.dnp.dappnode.eth"
     },
     {
-      ...mockVolumeData,
       name: "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
       users: ["nginx-proxy.dnp.dappnode.eth"],
       owner: "nginx-proxy.dnp.dappnode.eth"
@@ -159,7 +147,6 @@ describe("Call function: packageRestartVolumes", function() {
 
     // Raiden testnet volumes
     {
-      ...mockVolumeData,
       name: "raidentestnetdnpdappnodeeth_data",
       users: [raidenTestnetId],
       owner: raidenTestnetId
@@ -170,7 +157,7 @@ describe("Call function: packageRestartVolumes", function() {
     return dnpList;
   }
 
-  async function volumesGet(): Promise<VolumeData[]> {
+  async function getVolumesOwnershipData(): Promise<VolumeOwnershipData[]> {
     return volumesData;
   }
 
@@ -178,21 +165,21 @@ describe("Call function: packageRestartVolumes", function() {
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../src/calls/packageRestartVolumes"),
+      () => import("../../../src/calls/packageRestartVolumes"),
       mock => {
-        mock(() => import("../../src/modules/docker/dockerCommands"))
+        mock(() => import("../../../src/modules/docker/dockerCommands"))
           .with({ dockerRm })
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/dockerSafe"))
+        mock(() => import("../../../src/modules/docker/dockerSafe"))
           .with({ dockerComposeUpSafe })
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/listContainers"))
           .with({ listContainers })
           .toBeUsed();
-        mock(() => import("../../src/calls/volumesGet"))
-          .with({ volumesGet })
+        mock(() => import("../../../src/modules/docker/volumesData"))
+          .with({ getVolumesOwnershipData })
           .toBeUsed();
-        mock(() => import("../../src/calls/volumeRemove"))
+        mock(() => import("../../../src/modules/docker/removeNamedVolume"))
           .with({ removeNamedVolume })
           .toBeUsed();
       }

@@ -828,6 +828,12 @@ export interface VolumeData {
   isOrphan: boolean; // if no container is using it
 }
 
+export interface VolumeOwnershipData {
+  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
+  owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
+  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
+}
+
 /**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
