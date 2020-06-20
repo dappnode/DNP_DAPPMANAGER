@@ -332,7 +332,7 @@ describe("sortDnpsToRemove", () => {
     const id = "main.dnp.dappnode.eth";
     const idDep = "dependency.dnp.dappnode.eth";
     const dnpsToRemove = [id, idDep];
-    const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
+    const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, idDep);
 
     const expectedDnpsToRemoveSorted = [idDep, id];
 

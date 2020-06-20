@@ -29,7 +29,7 @@ describe("listContainers", function() {
 
   it("should parse an entire listContainers", async () => {
     const dnpList = await listContainers();
-    console.log(JSON.stringify(dnpList, null, 2));
+    // console.log(JSON.stringify(dnpList, null, 2));
 
     const expectedDnpList: PackageContainer[] = [
       {

@@ -57,12 +57,12 @@ export async function restartPackageVolumes({
   const { dnpsToRemove, volumesToRemove } = volumeId
     ? getDnpsToRemoveSingleVol({ id, volumeId, volumesData })
     : getDnpsToRemoveAll(dnp, volumesData);
+  const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
+
+  logs.debug({ id, dnpsToRemoveSorted, volumesToRemove });
 
   // If there are no volumes don't do anything
   if (volumesToRemove.length === 0) return { removedDnps: [] };
-
-  const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
-  logs.debug({ dnpsToRemoveSorted, volumesToRemove });
 
   // Verify results
   const composePaths: { [dnpName: string]: string } = {};
@@ -182,13 +182,13 @@ export function getDnpsToRemoveAll(
 /**
  * It is critical up packages in the correct order,
  * so that the named volumes are created before the users are started
- * [NOTE] the next sort function is a simplified solution, where the
- * id will always be the owner of the volumes, and other DNPs, the users.
+ * - `id` should ALWAYS go first, with the simplified assumption that it will
+ *   be the owner of the volumes, and other DNPs, the users
  */
 export function sortDnpsToRemove(dnpsToRemove: string[], id: string): string[] {
   return dnpsToRemove.sort((a, b) => {
-    if (a === id && b !== id) return 1;
-    if (a !== id && b === id) return -1;
+    if (a === id && b !== id) return -1;
+    if (a !== id && b === id) return 1;
     else return 0;
   });
 }
