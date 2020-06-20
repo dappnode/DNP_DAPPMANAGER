@@ -61,11 +61,12 @@ export function parseDevicePath(
       mountpointPath: string;
     }
   | undefined {
-  const [mountpoint, dnpNameAndVolumeName] = devicePath.split(
+  // The docker API is not perfectly typed, devicePath may be undefined
+  const [mountpoint, dnpNameAndVolumeName] = (devicePath || "").split(
     "/" + params.MOUNTPOINT_DEVICE_PREFIX + "/"
   );
   if (!dnpNameAndVolumeName) return;
-  const [dnpName, volumeName] = dnpNameAndVolumeName.split("/");
+  const [dnpName, volumeName] = (dnpNameAndVolumeName || "").split("/");
   if (!volumeName) return;
   return {
     mountpoint: path.normalize(mountpoint),

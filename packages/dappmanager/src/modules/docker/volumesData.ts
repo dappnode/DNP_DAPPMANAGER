@@ -62,9 +62,10 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
       const isOrphan = !refCount && ownershipData.users.length === 0;
 
       // Custom mountpoint data
-      const pathParts = vol.Options
-        ? parseDevicePath(vol.Options.device)
-        : undefined;
+      const pathParts =
+        vol.Options && vol.Options.device
+          ? parseDevicePath(vol.Options.device)
+          : undefined;
 
       return {
         // Real volume and owner name to call delete on
