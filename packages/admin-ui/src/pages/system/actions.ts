@@ -6,10 +6,14 @@ import { getEthClientPrettyName } from "components/EthMultiClient";
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
 import { getDnpInstalledById } from "services/dnpInstalled/selectors";
-import { getEthClientTarget, getVolumes } from "services/dappnodeStatus/selectors";
+import {
+  getEthClientTarget,
+  getVolumes
+} from "services/dappnodeStatus/selectors";
 import { EthClientTarget } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
+import { markdownList } from "utils/markdown";
 
 // Redux Thunk actions
 
@@ -123,11 +127,10 @@ export const packageVolumeRemove = (
     if (vol && vol.users) {
       const externalUsers = vol.users.filter(d => d !== dnpName);
       if (externalUsers.length > 0) {
+        const externalUsersList = markdownList(externalUsers);
         warningsList.push({
           title: "Warning! DAppNode Packages to be removed",
-          body: `Some other DAppNode Packages will be reseted in order to remove ${prettyVolRef}. \n\n ${externalUsers
-            .map(name => `- ${name}`)
-            .join("\n")}`
+          body: `Some other DAppNode Packages will be reseted in order to remove ${prettyVolRef}. \n\n ${externalUsersList}`
         });
       }
     }

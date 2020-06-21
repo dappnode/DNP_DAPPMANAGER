@@ -13,6 +13,7 @@ import { wifiName, ipfsName, corePackages } from "params";
 import { packageRestart } from "pages/packages/actions";
 import { InstalledPackageDetailData } from "common";
 import { systemPackagesPath, rootPath as packagesRootPath } from "../data";
+import { markdownList } from "utils/markdown";
 
 interface WarningItem {
   title: string;
@@ -57,12 +58,10 @@ export function Controls({
      * Alert the user about this fact
      */
     if (volumeUsersToRemove.length > 0) {
-      const dnpsToRemoveList = volumeUsersToRemove
-        .map(name => `- ${name}`)
-        .join("\n");
+      const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
       warningsList.push({
         title: "Warning! DAppNode Packages to be removed",
-        body: `Some other DAppNode Packages will be reseted in order to remove ${id} volumes. \n\n ${dnpsToRemoveList}`
+        body: `Some other DAppNode Packages will be reseted in order to remove ${id} volumes. \n\n ${volumeUsersToRemoveList}`
       });
     }
 
@@ -108,7 +107,7 @@ export function Controls({
     // Don't show the same DNP in both dnpsToRemove and dependantsOf
     // dependantsOf = ["raiden.dnp.dappnode.eth", "another.dnp.dappnode.eth"]
     if (dependantsOf.length > 0) {
-      const dependantsOfList = dependantsOf.map(name => `- ${name}`).join("\n");
+      const dependantsOfList = markdownList(dependantsOf);
       dnpsToRemoveWarningsList.push({
         title: "Warning! There are package dependants",
         body: `Some DAppNode Packages depend on ${id} and may stop working if you continue. \n\n ${dependantsOfList}`
@@ -117,12 +116,10 @@ export function Controls({
 
     // dnpsToRemove = "raiden.dnp.dappnode.eth, another.dnp.dappnode.eth"
     if (volumeUsersToRemove.length > 0) {
-      const dnpsToRemoveList = volumeUsersToRemove
-        .map(name => `- ${name}`)
-        .join("\n");
+      const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
       dnpsToRemoveWarningsList.push({
         title: "Warning! Other packages to be removed",
-        body: `Some other DAppNode Packages will be removed as well because they are dependent on ${id} volumes. \n\n ${dnpsToRemoveList}`
+        body: `Some other DAppNode Packages will be removed as well because they are dependent on ${id} volumes. \n\n ${volumeUsersToRemoveList}`
       });
     }
 
