@@ -1,12 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { api } from "api";
 // Components
 import CardList from "components/CardList";
 import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
-import { withToastNoThrow } from "components/toast/Toast";
+import { withToastNoThrow, withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized as sn } from "utils/format";
 import { wifiName, ipfsName, corePackages } from "params";
@@ -41,6 +41,7 @@ export function Controls({
   } = dnp;
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   async function packageStartStop() {
     withToastNoThrow(() => api.packageStartStop({ id }), {
@@ -134,10 +135,16 @@ export function Controls({
         })
       );
 
-    await withToastNoThrow(() => api.packageRemove({ id, deleteVolumes }), {
-      message: `Removing ${sn(id)} ${deleteVolumes ? " and volumes" : ""}...`,
-      onSuccess: `Removed ${sn(id)}`
-    });
+    // Use a try/catch to capture a successful remove and go to packages
+    try {
+      await withToast(() => api.packageRemove({ id, deleteVolumes }), {
+        message: `Removing ${sn(id)} ${deleteVolumes ? " and volumes" : ""}...`,
+        onSuccess: `Removed ${sn(id)}`
+      });
+      history.push(packagesRootPath);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   const actions = [
