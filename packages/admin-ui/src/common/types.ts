@@ -311,7 +311,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   userSettings?: UserSettings;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
-  manifest?: Manifest;
+  backup?: PackageBackup[];
   /**
    * Checks if there are volumes to be removed on this DNP
    */
@@ -323,6 +323,8 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   volumeUsersToRemove: string[];
   dependantsOf: string[];
   namedExternalVols: VolumeOwnershipData[];
+  // Non-indexed data
+  manifest?: Manifest;
 }
 
 export interface PackageEnvs {

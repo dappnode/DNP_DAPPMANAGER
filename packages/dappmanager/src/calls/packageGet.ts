@@ -1,3 +1,4 @@
+import { omit } from "lodash";
 import { listContainers } from "../modules/docker/listContainers";
 import { readManifestIfExists } from "../modules/manifest";
 import * as db from "../db";
@@ -56,6 +57,16 @@ export async function packageGet({
       dnpData.gettingStartedShow = Boolean(
         db.packageGettingStartedShow.get(dnpData.name)
       );
+
+      // Backup
+      dnpData.backup = manifest.backup;
+
+      // Append manifest for general info
+      dnpData.manifest = omit(manifest, [
+        "setupWizard",
+        "gettingStarted",
+        "backup"
+      ]);
     }
   } catch (e) {
     logs.warn(`Error getting manifest for ${dnpData.name}`, e);

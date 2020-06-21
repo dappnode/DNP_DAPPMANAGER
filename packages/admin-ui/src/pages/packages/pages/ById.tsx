@@ -54,9 +54,9 @@ export const PackageById: React.FC<RouteComponentProps<{
     setupWizard,
     manifest,
     gettingStarted,
-    gettingStartedShow
+    gettingStartedShow,
+    backup = []
   } = dnp;
-  const { backup = [] } = manifest || {};
 
   /**
    * Construct all subroutes to iterate them both in:
