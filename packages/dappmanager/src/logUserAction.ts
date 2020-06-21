@@ -31,9 +31,9 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
+    ...log,
     ...(log.args ? { args: logSafeObjects(log.args) } : {}),
-    ...(log.result ? { result: logSafeObjects(log.result) } : {}),
-    ...log
+    ...(log.result ? { result: logSafeObjects(log.result) } : {})
   };
 
   // Emit the log to the UI
