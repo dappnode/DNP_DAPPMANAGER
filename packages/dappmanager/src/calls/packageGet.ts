@@ -24,23 +24,26 @@ export async function packageGet({
   if (!dnp) throw Error(`No DNP was found for name ${id}`);
   const volumesData = await getVolumesOwnershipData();
 
+  // Metadata for package/:id/controls feedback
+  const { dnpsToRemove } = getDnpsToRemoveAll(dnp, volumesData);
+
   const dnpData: InstalledPackageDetailData = {
     ...dnp,
 
-    // Metadata for package/:id/controls feedback
     areThereVolumesToRemove:
       dnp.volumes.length > 0 &&
       dnp.volumes.some(vol => {
         const owner = volumesData.find(v => v.name === vol.name)?.owner;
         return !owner || owner === dnp.name;
       }),
-    volumeUsersToRemove: getDnpsToRemoveAll(dnp, volumesData).dnpsToRemove,
+    volumeUsersToRemove: dnpsToRemove.filter(name => name !== dnp.name),
     dependantsOf: dnpList.filter(d => d.dependencies[id]).map(d => d.name),
     namedExternalVols: volumesData.filter(
       v => v.owner && v.owner !== dnp.name && v.users.includes(dnp.name)
     )
   };
 
+  // Add non-blocking data
   try {
     const manifest = readManifestIfExists(dnpData);
     if (manifest && manifest.setupWizard) {
