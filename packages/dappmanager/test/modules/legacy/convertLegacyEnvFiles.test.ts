@@ -71,7 +71,7 @@ describe("migrateLegacyEnvFiles", () => {
         services: {
           [name]: {
             image: `${name}:0.2.0`,
-            environment: parseEnvironment([envsString])
+            environment: [envsString]
           }
         }
       }),

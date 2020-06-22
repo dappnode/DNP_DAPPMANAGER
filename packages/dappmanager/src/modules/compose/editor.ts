@@ -24,7 +24,11 @@ import {
   parsePortMappings,
   mergePortMappings
 } from "./ports";
-import { parseEnvironment, mergeEnvs } from "./environment";
+import {
+  parseEnvironment,
+  mergeEnvs,
+  stringifyEnvironment
+} from "./environment";
 import { verifyCompose } from "./verify";
 import { UserSettingsAllDnps } from "../../common";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
@@ -76,9 +80,8 @@ class ComposeServiceEditor {
 
   mergeEnvs(newEnvs: PackageEnvs): void {
     this.edit(service => ({
-      environment: mergeEnvs(
-        newEnvs,
-        parseEnvironment(service.environment || [])
+      environment: stringifyEnvironment(
+        mergeEnvs(newEnvs, parseEnvironment(service.environment || []))
       )
     }));
   }
@@ -142,11 +145,20 @@ export class ComposeEditor {
      * - Removes service first levels keys that are objects or arrays and
      *   are empty (environment, env_files, ports, volumes)
      */
-    this.compose.services = mapValues(this.compose.services, service => ({
-      ...omitBy(service, el => isObject(el) && isEmpty(el)),
-      // Add mandatory properties for the ts compiler
-      ...pick(service, ["container_name", "image"])
-    }));
+    this.compose.services = mapValues(this.compose.services, service => {
+      // To be backwards compatible write ENVs as array
+      // Previous DAPPMANAGERs cannot in object form, blocking all docker actions + updates
+      if (
+        typeof service.environment === "object" &&
+        !Array.isArray(service.environment)
+      )
+        service.environment = stringifyEnvironment(service.environment);
+      return {
+        ...omitBy(service, el => isObject(el) && isEmpty(el)),
+        // Add mandatory properties for the ts compiler
+        ...pick(service, ["container_name", "image"])
+      };
+    });
 
     return this.compose;
   }

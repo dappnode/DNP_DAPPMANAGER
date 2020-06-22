@@ -386,7 +386,7 @@ export interface ComposeService {
   image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   ports?: string[];
-  environment?: PackageEnvs;
+  environment?: PackageEnvs | string[];
   labels?: { [labelName: string]: string };
   env_file?: string[];
   // ipv4_address: "172.33.1.7";
