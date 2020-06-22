@@ -10,8 +10,8 @@ const logDebug = /debug/i.test(process.env.LOG_LEVEL || "");
 // Not adding color codes since it makes it harder to read as plain text
 const tags = {
   debug: "DEBUG",
-  info: "INFO",
-  warn: "WARN",
+  info: "INFO ",
+  warn: "WARN ",
   error: "ERROR"
 };
 
@@ -105,7 +105,9 @@ export function getLocation(error: Error, stackCount: number): string | null {
 
   const fileName = firstOutsideRow.getFileName();
   const lineNumber = firstOutsideRow.getLineNumber();
-  let relativePath = path.relative(rootDir, fileName);
+  let relativePath = fileName.includes("webpack:")
+    ? fileName.replace("/usr/src/app/webpack:/src/", "")
+    : path.relative(rootDir, fileName);
 
   // Don't show unnecessary file info
   if (relativePath.endsWith(".ts")) relativePath = relativePath.slice(0, -3);
