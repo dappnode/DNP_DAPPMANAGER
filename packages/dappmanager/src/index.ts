@@ -6,9 +6,7 @@ import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
-import { migrateEthForward } from "./ethForward/migrateEthForward";
-import { removeLegacyBindVolume } from "./modules/legacy/removeLegacyBindVolume";
-import { migrateLegacyEnvFiles } from "./modules/legacy/migrateLegacyEnvFiles";
+import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
@@ -67,19 +65,13 @@ async function runLegacyOps(): Promise<void> {
     logs.error("Error migrating to new main DB", e);
   }
 
-  migrateLegacyEnvFiles().catch(e => logs.error("Error migrate env_files", e));
-
   migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
-
-  migrateEthForward().catch(e => logs.error("Error migrating ETHFORWARD", e));
-
-  removeLegacyBindVolume().catch(e =>
-    logs.error("Error removing legacy BIND volume", e)
-  );
 
   migrateUserActionLogs().catch(e =>
     logs.error("Error migrating userActionLogs", e)
   );
+
+  runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 }
 
 runLegacyOps();
