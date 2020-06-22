@@ -147,7 +147,7 @@ function DnpCardError({
   );
 }
 
-function DnpStore({
+export default function DnpStore({
   directory,
   openDnp,
   featured
@@ -191,6 +191,3 @@ function DnpStore({
     </div>
   );
 }
-
-// Use `compose` from "redux" if you need multiple HOC
-export default DnpStore;

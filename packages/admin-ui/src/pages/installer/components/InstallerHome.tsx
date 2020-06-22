@@ -26,7 +26,6 @@ import {
   getDirectoryRequestStatus
 } from "services/dnpDirectory/selectors";
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
-import { rootPath as packagesRootPath } from "pages/packages/data";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 // Styles
@@ -67,10 +66,7 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    const dnp = directory.find(({ name }) => name === id);
-    if (dnp && dnp.status === "ok" && dnp.isUpdated)
-      history.push(packagesRootPath + "/" + dnp.name);
-    else history.push(rootPath + "/" + encodeURIComponent(id));
+    history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
