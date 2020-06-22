@@ -8,7 +8,6 @@ interface RpcResponse {
 }
 
 const ajv = new Ajv({ allErrors: true });
-const validateParams = ajv.compile(routesArgumentsSchema);
 
 /**
  * Given a set of method handlers, parse a RPC request and handle it
@@ -18,35 +17,38 @@ const validateParams = ajv.compile(routesArgumentsSchema);
 export const getRpcHandler = (
   methods: Routes,
   loggerMiddleware?: LoggerMiddleware
-) => async (body: any): Promise<RpcResponse> => {
+) => {
+  const validateParams = ajv.compile(routesArgumentsSchema);
   const { onCall, onSuccess, onError } = loggerMiddleware || {};
 
-  try {
-    const { method, params } = parseRpcRequest(body);
+  return async (body: any): Promise<RpcResponse> => {
+    try {
+      const { method, params } = parseRpcRequest(body);
 
-    // Get handler
-    const handler = methods[method] as (...params: any[]) => Promise<any>;
-    if (!handler) throw new JsonRpcError(`Method not found ${method}`);
-    if (onCall) onCall(method, params);
+      // Get handler
+      const handler = methods[method] as (...params: any[]) => Promise<any>;
+      if (!handler) throw new JsonRpcError(`Method not found ${method}`);
+      if (onCall) onCall(method, params);
 
-    // Validate params
-    const valid = validateParams({ [method]: params });
-    if (!valid)
-      throw new JsonRpcError(formatErrors(validateParams.errors, method));
+      // Validate params
+      const valid = validateParams({ [method]: params });
+      if (!valid)
+        throw new JsonRpcError(formatErrors(validateParams.errors, method));
 
-    const result = await handler(...params);
-    if (onSuccess) onSuccess(method, result, params);
-    return { result };
-  } catch (e) {
-    if (e instanceof JsonRpcError) {
-      return { error: { code: e.code, message: e.message } };
-    } else {
-      // Unexpected error, log and send more details
-      const { method, params } = tryToParseRpcRequest(body);
-      if (onError) onError(method || "unknown-method", e, params || []);
-      return { error: { code: -32603, message: e.message, data: e.stack } };
+      const result = await handler(...params);
+      if (onSuccess) onSuccess(method, result, params);
+      return { result };
+    } catch (e) {
+      if (e instanceof JsonRpcError) {
+        return { error: { code: e.code, message: e.message } };
+      } else {
+        // Unexpected error, log and send more details
+        const { method, params } = tryToParseRpcRequest(body);
+        if (onError) onError(method || "unknown-method", e, params || []);
+        return { error: { code: -32603, message: e.message, data: e.stack } };
+      }
     }
-  }
+  };
 };
 
 /**

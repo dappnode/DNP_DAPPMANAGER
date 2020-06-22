@@ -1,5 +1,10 @@
+import Ajv from "ajv";
 import { mapValues } from "lodash";
+import { Subscriptions, subscriptionsData } from "../..";
+import subscriptionsArgumentsSchema from "../../schemas/SubscriptionsArguments.schema.json";
 import { Args, LoggerMiddleware } from "../types";
+
+const ajv = new Ajv({ allErrors: true });
 
 interface SocketIsh {
   /**
@@ -38,27 +43,19 @@ interface SocketIsh {
  * @param subscriptionsData
  * @param middleware
  */
-export function subscriptionsFactory<Subscriptions>(
+export function subscriptionsFactory(
   io: SocketIsh,
-  subscriptionsData: { [K in keyof Subscriptions]: {} },
-  options?: {
-    loggerMiddleware?: LoggerMiddleware;
-    validateArgs?: (route: string, args: Args) => void;
-  }
-): {
-  [K in keyof Subscriptions]: {
-    emit: (...args: Args) => void;
-    on: (handler: (...args: Args) => void) => void;
-  };
-} {
-  const { loggerMiddleware, validateArgs } = options || {};
-  const { onError } = loggerMiddleware || {};
+  loggerMiddleware?: LoggerMiddleware
+): Subscriptions {
+  const { onCall, onError } = loggerMiddleware || {};
+  const validateArgs = ajv.compile(subscriptionsArgumentsSchema);
 
   return mapValues(subscriptionsData, (_0, route) => {
     return {
       emit: async (...args: Args): Promise<void> => {
         // Use try / catch and await to be safe for async and sync methods
         try {
+          if (onCall) onCall(`emit - ${route}`, args);
           io.emit(route, args);
         } catch (e) {
           if (onError) onError(`emit - ${route}`, e, args);
@@ -68,7 +65,12 @@ export function subscriptionsFactory<Subscriptions>(
         io.on(route, async function endpoint(args?: Args): Promise<void> {
           // Use try / catch and await to be safe for async and sync methods
           try {
-            if (validateArgs) validateArgs(route, args || []);
+            if (onCall) onCall(`on - ${route}`, args);
+
+            // Validate params
+            const valid = validateArgs({ [route]: args });
+            if (!valid) throw Error(formatErrors(validateArgs.errors, route));
+
             await handler(...(args || []));
           } catch (e) {
             if (onError) onError(`on - ${route}`, e, args);
@@ -77,4 +79,17 @@ export function subscriptionsFactory<Subscriptions>(
       }
     };
   });
+}
+
+function formatErrors(
+  errors: Array<Ajv.ErrorObject> | null | undefined,
+  route: string
+): string {
+  const dataVar = `root_prop`;
+  const toReplace = `${dataVar}.${route}`;
+  const errorsText = ajv.errorsText(errors, { separator: "\n", dataVar });
+  return (
+    "Validation error:\n" +
+    errorsText.replace(new RegExp(toReplace, "g"), "params")
+  );
 }

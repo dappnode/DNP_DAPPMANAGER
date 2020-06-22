@@ -421,25 +421,33 @@ export interface Routes {
   volumesGet: () => Promise<VolumeData[]>;
 }
 
-export const routesData: { [P in keyof Routes]: {} } = {
+interface RouteData {
+  /**
+   * If true, all actions will be registered as userActionLogs
+   * Also, each action will be logged at an INFO level
+   */
+  log?: boolean;
+}
+
+export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateDataGet: {},
-  autoUpdateSettingsEdit: {},
+  autoUpdateSettingsEdit: { log: true },
   backupGet: {},
-  backupRestore: {},
-  changeIpfsTimeout: {},
+  backupRestore: { log: true },
+  changeIpfsTimeout: { log: true },
   cleanCache: {},
-  copyFileFrom: {},
-  copyFileTo: {},
-  deviceAdd: {},
-  deviceAdminToggle: {},
+  copyFileFrom: { log: true },
+  copyFileTo: { log: true },
+  deviceAdd: { log: true },
+  deviceAdminToggle: { log: true },
   deviceCredentialsGet: {},
-  deviceRemove: {},
-  deviceReset: {},
+  deviceRemove: { log: true },
+  deviceReset: { log: true },
   devicesList: {},
   diagnose: {},
-  domainAliasSet: {},
-  ethClientFallbackSet: {},
-  ethClientTargetSet: {},
+  domainAliasSet: { log: true },
+  ethClientFallbackSet: { log: true },
+  ethClientTargetSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
@@ -450,26 +458,26 @@ export const routesData: { [P in keyof Routes]: {} } = {
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
-  packageInstall: {},
+  packageInstall: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},
   packageLog: {},
-  packageRemove: {},
-  packageRestart: {},
-  packageRestartVolumes: {},
-  packageSetEnvironment: {},
-  packageSetPortMappings: {},
-  packageStartStop: {},
-  passwordChange: {},
+  packageRemove: { log: true },
+  packageRestart: { log: true },
+  packageRestartVolumes: { log: true },
+  packageSetEnvironment: { log: true },
+  packageSetPortMappings: { log: true },
+  packageStartStop: { log: true },
+  passwordChange: { log: true },
   passwordIsSecure: {},
-  poweroffHost: {},
-  rebootHost: {},
+  poweroffHost: { log: true },
+  rebootHost: { log: true },
   requestChainData: {},
-  seedPhraseSet: {},
-  setStaticIp: {},
+  seedPhraseSet: { log: true },
+  setStaticIp: { log: true },
   systemInfoGet: {},
-  volumeRemove: {},
+  volumeRemove: { log: true },
   volumesGet: {}
 };
 

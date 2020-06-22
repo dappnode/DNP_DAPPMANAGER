@@ -1,4 +1,4 @@
-import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
+import { vpnRpcCall } from "../../api/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";

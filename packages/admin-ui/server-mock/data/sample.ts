@@ -53,11 +53,16 @@ export const samplePackageContainer: InstalledPackageDetailData = {
   shortName: "demo-name",
   state: "running",
   running: true,
+  ip: "172.10.0.1",
   dependencies: {},
   ports: [],
   volumes: [],
-  defaultEnvironment: {},
-  defaultPorts: [],
-  defaultVolumes: [],
-  avatarUrl: ""
+  avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
+  origin: undefined,
+  gettingStarted: "",
+  gettingStartedShow: true,
+  areThereVolumesToRemove: false,
+  volumeUsersToRemove: [],
+  dependantsOf: [],
+  namedExternalVols: []
 };

@@ -12,7 +12,7 @@ import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
-import startHttpApi from "./httpApi";
+import startHttpApi from "./api";
 import { logs } from "./logs";
 
 // Start HTTP API

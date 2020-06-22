@@ -7,11 +7,7 @@ import * as methods from "./methods";
 import { mapSubscriptionsToEventBus } from "./subscriptions";
 import { getRpcHandler } from "../src/common/transport/jsonRpc";
 import { LoggerMiddleware } from "../src/common/transport/types";
-import {
-  subscriptionsFactory,
-  Subscriptions,
-  subscriptionsData
-} from "../src/common";
+import { subscriptionsFactory } from "../src/common";
 
 /* eslint-disable no-console */
 
@@ -23,6 +19,10 @@ const loggerMiddleware: LoggerMiddleware = {
   onSuccess: (route, result) => console.log("RPC result", route, result),
   onError: (route, error) => console.log("RPC error", route, error)
 };
+const subscriptionsLogger: LoggerMiddleware = {
+  onCall: (route, args) => console.log("Subscription", route, args),
+  onError: (route, error) => console.log("Subscription error", route, error)
+};
 const rpcHandler = getRpcHandler(methods, loggerMiddleware);
 
 const app = express();
@@ -32,10 +32,7 @@ const io = socketio(server, { serveClient: false });
 io.on("connection", socket => console.log(`Socket connected`, socket.id));
 
 // Subscriptions
-const subscriptions = subscriptionsFactory<Subscriptions>(
-  io,
-  subscriptionsData
-);
+const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
 mapSubscriptionsToEventBus(subscriptions);
 
 // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th

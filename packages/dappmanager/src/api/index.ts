@@ -1,111 +1,99 @@
-// import * as calls from "../calls";
-// import { mapSubscriptionsToEventBus } from "./subscriptions";
-// import { routesLoggerFactory, subscriptionsLoggerFactory } from "./middleware";
-// import {
-//   Routes,
-//   Subscriptions,
-//   subscriptionsData,
-//   RpcResult,
-//   validateRoutesArgsFactory,
-//   validateSubscriptionsArgsFactory
-// } from "../common";
-// import {
-//   subscriptionsFactory,
-//   parseWampError,
-//   registerRoutes
-// } from "./legacy-autobahn";
-// import { logs } from "../logs";
+import http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import compression from "compression";
+import fileUpload from "express-fileupload";
+import cors from "cors";
+import socketio from "socket.io";
+import path from "path";
+import params from "../params";
+import { isAdmin, isAdminIp } from "./auth";
+import { wrapHandler } from "./utils";
+import { download } from "./routes/download";
+import { upload } from "./routes/upload";
+import { containerLogs } from "./routes/containerLogs";
+import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
+import * as methods from "../calls";
+import { mapSubscriptionsToEventBus } from "../api/subscriptions";
+import { getRpcHandler, subscriptionsFactory } from "../common";
+import { getEthForwardHandler, isDwebRequest } from "../ethForward";
+import { subscriptionsLogger, routesLogger } from "./logger";
+import { logs } from "../logs";
 
-// /*
-//  * Connection configuration
-//  * ************************
-//  * Autobahn.js connects to the WAMP, whos url in defined in params.js
-//  * On connection open:
-//  * - all handlers are registered
-//  * - the native event bus is linked to the session to:
-//  *   - allow internal calls
-//  *   - publish progress logs and userAction logs
-//  * - it subscribe to userAction logs sent by the VPN to store them locally
-//  */
-// export async function startAutobahn({
-//   url,
-//   realm
-// }: {
-//   url: string;
-//   realm: string;
-// }): Promise<void> {
-//   const connection = new autobahn.Connection({ url, realm });
-//   connection.onopen = (session, details): void => {
-//     logs.info("Connected to DAppNode's WAMP", {
-//       url,
-//       realm,
-//       id: (details || {}).authid
-//     });
+const httpApiPort = params.HTTP_API_PORT;
+const uiFilesPath = params.UI_FILES_PATH;
+const whitelist = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://my.dappnode"
+];
 
-//     _session = session;
+/**
+ * HTTP API
+ *
+ * [NOTE] This API is not secure
+ * - It can't use HTTPS for the limitations with internal IPs certificates
+ *
+ * [NOTE] To enable express debugging set ENV DEBUG=express:*
+ */
+export default function startHttpApi(
+  port: number | string = httpApiPort
+): void {
+  const app = express();
+  const server = new http.Server(app);
+  const io = socketio(server, { serveClient: false });
 
-//     // Type assertion of calls <> Routes happen here
-//     registerRoutes<Routes>(session, calls, {
-//       loggerMiddleware: routesLoggerFactory(),
-//       validateArgs: validateRoutesArgsFactory()
-//     }).then(registrationResults => {
-//       for (const { ok, message } of registrationResults) {
-//         if (ok) logs.info(message);
-//         else logs.error(message);
-//       }
-//     });
+  io.use((socket, next) => {
+    const ip = socket.handshake.address;
+    if (isAdminIp(ip)) next();
+    else next(new Error(`Requires admin permission. Forbidden ip: ${ip}`));
+  });
 
-//     /**
-//      * All the session uses below can throw errors if the session closes.
-//      * so each single callback is wrapped in a try/catch block,
-//      * via the `eventBusOnSafe` method
-//      */
+  io.on("connection", function(socket) {
+    console.log(`Socket connected`, socket.id);
+  });
 
-//     const subscriptions = subscriptionsFactory<Subscriptions>(
-//       session,
-//       subscriptionsData,
-//       {
-//         loggerMiddleware: subscriptionsLoggerFactory(),
-//         validateArgs: validateSubscriptionsArgsFactory()
-//       }
-//     );
+  // Subscriptions
+  const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
+  mapSubscriptionsToEventBus(subscriptions);
 
-//     mapSubscriptionsToEventBus(subscriptions);
-//   };
+  const rpcHandler = getRpcHandler(methods, routesLogger);
+  const ethForwardHandler = getEthForwardHandler();
 
-//   connection.onclose = (reason, details): boolean => {
-//     logs.warn(`WAMP connection closed: ${reason} ${(details || {}).message}`);
-//     return false;
-//   };
+  // Intercept decentralized website requests first
+  app.use((req, res, next) => {
+    if (isDwebRequest(req)) ethForwardHandler(req, res);
+    else next();
+  });
+  // default options. ALL CORS + limit fileSize and file count
+  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
+  // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
+  app.use(cors({ credentials: true, origin: whitelist }));
+  app.use(compression());
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
 
-//   connection.open();
-//   logs.info("Attempting WAMP connection", { url, realm });
-// }
+  // Ping - health check
+  app.get("/ping", isAdmin, (req, res) => res.send(req.body));
 
-// /**
-//  * Call a VPN WAMP endpoint (LEGACY format)
-//  * @param route "addDevice"
-//  * @param args { id: "admin" }
-//  * ```js
-//  * vpnWampCall("addDevice", { id })
-//  * ```
-//  */
-// export async function vpnWampCall<R>(
-//   route: string,
-//   kwargs: { [key: string]: any } = {}
-// ): Promise<R> {
-//   if (!_session) throw Error(`Session not started`);
-//   if (!_session.isOpen) throw Error(`Session not open`);
+  // Methods that do not fit into RPC
+  app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));
+  app.get("/download/:fileId", isAdmin, wrapHandler(download));
+  app.get("/user-action-logs", isAdmin, wrapHandler(downloadUserActionLogs));
+  app.post("/upload", isAdmin, wrapHandler(upload));
 
-//   try {
-//     const res: RpcResult<R> = await _session
-//       .call<RpcResult<R>>(route + ".vpn.dnp.dappnode.eth", [], kwargs)
-//       .then(res => (typeof res === "string" ? JSON.parse(res) : res));
-//     // Handle route implementation errors
-//     if (res.success) return res.result;
-//     else throw Error(res.message);
-//   } catch (e) {
-//     const err: Error = parseWampError(e);
-//     throw err;
-//   }
-// }
+  // Rest of RPC methods
+  app.post(
+    "/rpc",
+    isAdmin,
+    wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
+  );
+
+  // Serve UI. React-router, index.html at all routes
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(uiFilesPath, "index.html"))
+  );
+
+  server.listen(port, () => logs.info(`HTTP API ${port}`));
+}

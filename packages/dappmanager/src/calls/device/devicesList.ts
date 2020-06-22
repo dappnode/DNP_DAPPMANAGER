@@ -1,4 +1,4 @@
-import { vpnRpcCall } from "../../httpApi/vpnRpcCall";
+import { vpnRpcCall } from "../../api/vpnRpcCall";
 import { VpnDevice } from "../../types";
 
 /**

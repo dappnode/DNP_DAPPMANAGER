@@ -160,13 +160,9 @@ export function start() {
   const socket = io(socketIoUrl);
 
   socket.on("connect", function(...args: any) {
-    const subscriptions = subscriptionsFactory<Subscriptions>(
-      socket,
-      subscriptionsData,
-      { loggerMiddleware: subscriptionsLoggerMiddleware }
-    );
+    const subscriptions = subscriptionsFactory(socket, subscriptionsLogger);
     mapValues(subscriptions, (handler, route) => {
-      handler.on((...args) => apiEventBridge.emit(route, ...args));
+      handler.on((...args: any[]) => apiEventBridge.emit(route, ...args));
     });
 
     mapSubscriptionsToRedux(subscriptions);
@@ -210,7 +206,7 @@ export function start() {
   socket.on("disconnect", handleConnectionError);
 }
 
-const subscriptionsLoggerMiddleware = {
+const subscriptionsLogger = {
   onError: (route: string, error: Error, args?: Args): void => {
     console.error(`Subscription error ${route}: ${error.stack}`, args);
   }

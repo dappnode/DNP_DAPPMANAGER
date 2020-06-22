@@ -10,6 +10,7 @@ import {
 } from "../../src/common";
 import * as eventBus from "../eventBus";
 import { dnpInstalled, directory, dnpRequests } from "../data";
+import { samplePackageContainer } from "../data/sample";
 import { pause } from "../utils";
 
 const pkgRestartMs = 2000;
@@ -104,29 +105,15 @@ export async function packageInstall({
 }): Promise<void> {
   await pause(pkgRestartMs);
   packages.set(name, {
+    ...samplePackageContainer,
     id: name,
     packageName: name,
     version: version || "0.1.0",
-    isDnp: true,
-    isCore: false,
-    created: 12635125631,
     image: `${name}:${version}`,
     name: name,
     shortName: name,
-    ip: "172.10.0.1",
-    state: "running",
-    running: true,
-    ports: [],
-    volumes: [],
-    defaultEnvironment: {},
-    defaultPorts: [],
-    defaultVolumes: [],
-    dependencies: {},
     avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
     origin: undefined,
-    // ### TODO: Move to PackageDetails, note it will require significant
-    // changes to the ADMIN UI in parts the code is not yet typed
-    // manifest?: Manifest;
     gettingStarted: `Welcome to the package **${name}**`,
     gettingStartedShow: true
   });
