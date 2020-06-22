@@ -1,0 +1,59 @@
+.help-text-relaunch {
+  color: var(--light-text-color);
+  transition: 0.15s ease;
+
+  &:hover {
+    color: var(--dappnode-color);
+  }
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  grid-gap: 1rem;
+
+  &.half {
+    grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
+  }
+}
+
+/* Chain cards */
+
+.chain-card .name,
+.stats-card .id,
+.volume-card .name {
+  text-transform: capitalize;
+  font-weight: 800;
+
+  display: flex;
+  .text {
+    flex: auto;
+  }
+  .help {
+    font-size: 140%;
+    display: flex;
+  }
+}
+.chain-card .message,
+.stats-card .usage,
+.volume-card .size {
+  opacity: 0.7;
+}
+
+.stats-card .id {
+  display: inline;
+}
+
+.chain-card {
+  .progress {
+    margin: 0.3rem 0 0.5rem;
+  }
+}
+
+/* Stats cards */
+
+.stats-card .progress {
+  margin: 0.3rem 0 0rem;
+}
+
+/* Volumes cards */

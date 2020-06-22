@@ -1,26 +1,28 @@
-node_modules/
-build/src/node_modules/
-build/src/tmp_dnp_repo/
-build/src/dnp_repo/
-build/src/DNCORE/
-build/src/cache/
-build/src/dist/
-build/src/dappmanagerdb.json
+packages/*/tmp_dnp_repo/
+packages/*/dnp_repo/
+packages/*/DNCORE/
+packages/*/cache/
+packages/*/dappmanagerdb.json
 test_build/
 .DS_Store
 .nyc_output
 build_*
 uploader
-# This project uses yarn
-build/src/package-lock.json
+
+# Dependencies
+node_modules/
 
 # Test artifacts
 test_build/
-build/src/undefined/
-build/src/test_files/
-build/src/test_files/*
-build/src/test_mountpoints_*/
-build/src/test_mountpoints_*/*
+packages/*/undefined/
+packages/*/test_files/
+packages/*/test_files/*
+packages/*/test_mountpoints_*/
+packages/*/test_mountpoints_*/*
+.temp-transfer
+
+# Built schemas
+packages/*/src/common/schemas
 
 # Version data file
 .version.json
@@ -31,3 +33,13 @@ node_modules/\.yarn-integrity
 # Typescript build artifacts
 build/src/dist/
 build/src/.temp-transfer/
+
+# Common
+packages/*/node_modules/
+packages/*/dist/
+packages/*/build
+packages/*/npm-debug.log*
+packages/*/yarn-debug.log*
+packages/*/yarn-error.log*
+# This project uses yarn
+packages/*/package-lock.json 

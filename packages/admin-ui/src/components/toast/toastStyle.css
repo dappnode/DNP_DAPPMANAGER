@@ -1,0 +1,59 @@
+.slider {
+  position: relative;
+  left: -8px;
+  bottom: -14px;
+  width: 100%;
+  height: 6px;
+  overflow-x: hidden;
+}
+
+.slider-fade {
+  background-image: linear-gradient(to right, #ff000000, white);
+  position: relative;
+  left: -8px;
+  bottom: -8px;
+  width: 100%;
+  height: 6px;
+  overflow-x: hidden;
+}
+
+.line {
+  position: absolute;
+  opacity: 0.4;
+  background: #2fbcb2;
+  width: 150%;
+  height: 6px;
+}
+
+.subline {
+  position: absolute;
+  background: #2fbcb2;
+  height: 6px;
+}
+.inc {
+  animation: increase 4s infinite;
+}
+.dec {
+  animation: decrease 4s 1s infinite;
+}
+
+@keyframes increase {
+  from {
+    left: -5%;
+    width: 5%;
+  }
+  to {
+    left: 130%;
+    width: 100%;
+  }
+}
+@keyframes decrease {
+  from {
+    left: -80%;
+    width: 80%;
+  }
+  to {
+    left: 110%;
+    width: 10%;
+  }
+}

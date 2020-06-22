@@ -1,0 +1,176 @@
+/* New Styles */
+.dnps-container {
+  // Line below to separate DNPs sections
+  > div:not(:last-child) {
+    border-bottom: var(--border-style);
+    padding-bottom: var(--default-spacing);
+    margin-bottom: var(--default-spacing);
+  }
+}
+
+.dnp-cards {
+  display: grid;
+  /* Must be auto-fill so when there's one card on big screens, it appears normal */
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  width: 100%;
+  // grid-gap: 2rem 2.5rem;
+  grid-gap: var(--default-spacing);
+}
+
+.dnp-card {
+  display: flex;
+  flex-direction: column;
+  box-shadow: 1px 1px 15px 0 rgba(0, 0, 0, 0.07);
+  text-align: center;
+  align-items: center;
+  > *:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+  }
+  .avatar {
+    --avatar-size: 4.5rem;
+    display: flex;
+    justify-content: center;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+  }
+  .title {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    word-break: break-word;
+    // Limit the number of text lines to N
+    line-height: 1.5rem; // X
+    max-height: 1.5rem; // X*N
+    overflow: hidden;
+  }
+
+  .description {
+    position: relative;
+    height: 7rem;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    // Limit the number of text lines to N
+    --description-line-height: 1.5rem;
+    line-height: var(--description-line-height); // X
+    max-height: calc(3 * var(--description-line-height)); // X*N
+    // Fade out to simulate an ellipsis for text
+    &:after {
+      content: "";
+      text-align: right;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 30%;
+      height: var(--description-line-height);
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 1) 50%
+      );
+    }
+  }
+  .action {
+    margin-top: 0.5rem;
+    align-self: stretch;
+  }
+}
+
+.dnp-cards.featured {
+  /* Must be auto-fill so when there's one card on big screens, it appears normal */
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+  @media screen and (max-width: 40rem) {
+    grid-template-columns: 1fr;
+  }
+
+  .dnp-card {
+    @media screen and (min-width: 40rem) {
+      flex-direction: row;
+      text-align: left;
+      align-items: flex-start;
+    }
+  }
+  .avatar-big {
+    width: 135px;
+    height: 135px;
+    flex-shrink: 0;
+    @media screen and (min-width: 40rem) {
+      margin-bottom: 0;
+      margin-right: 1rem;
+    }
+  }
+  .info-big {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    @media screen and (max-width: 40rem) {
+      align-items: center;
+    }
+
+    .badge.featured {
+      color: inherit;
+      background: none;
+      opacity: 0.5;
+      padding: 0;
+      margin-bottom: 0.4rem;
+    }
+
+    .title {
+      font-size: 2.2rem;
+      // Limit the number of text lines to N
+      line-height: 2.5rem; // X
+      max-height: 2.5rem; // X*N
+    }
+    // .verified-badge {
+    //   height: 1.6rem;
+    // }
+    .description {
+      height: 7rem;
+      font-size: 1.1rem;
+      // Limit the number of text lines to N
+      line-height: 1.5rem; // X
+      max-height: 4.5rem; // X*N
+    }
+  }
+  // Don't show the gradient if featured
+  // The white gradient looks awful on top of a colored gradient
+  .description:after {
+    display: none;
+  }
+}
+
+/* Type filter */
+
+.type-filter {
+  min-height: 37px;
+
+  &.placeholder {
+    width: 77px;
+    height: 3.5px;
+    margin-bottom: 12px;
+    border-radius: 0.25rem;
+    background-color: #e5e7e8;
+    opacity: 0.5;
+  }
+
+  > * {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  /* Make bootstrap buttons smaller */
+  .btn {
+    padding: 0.1rem 0.5rem;
+    border-color: #ced4da;
+  }
+}
+
+/* Dependency list */
+.dependency-list span {
+  overflow: hidden;
+}

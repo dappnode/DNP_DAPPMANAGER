@@ -1,0 +1,81 @@
+#sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidenav-item
+   ============
+ */
+
+/* Remember specificity order rules to override bootstrap */
+.sidenav-item {
+  border-left: 5px solid transparent;
+  color: black;
+  text-decoration: none;
+  transition: all 0.5s;
+  /* Try to standarize this size */
+  font-size: 0.94rem;
+}
+
+/* Subheader before the list of routes, with text: Admin UI */
+.sidenav-item .subheader {
+  font-size: 80%;
+  opacity: 0.6;
+}
+
+/* List of routes, with dynamic styles on hover and active */
+.sidenav-item.selectable {
+  cursor: pointer;
+  /* All transitions have to be specified with commas in a single transition property */
+  transition: background 150ms ease, color 150ms ease, border 150ms ease;
+}
+.sidenav-item.selectable:hover,
+.sidenav-item.selectable.active {
+  border-left: 5px solid var(--dappnode-strong-main-color);
+  color: black;
+  font-weight: 800;
+  text-decoration: none;
+  background-color: #e6eceb80;
+}
+.sidenav-item.selectable:hover svg,
+.sidenav-item.selectable.active svg {
+  opacity: 0.7;
+}
+
+.sidenav-item.selectable svg {
+  font-size: 1.5rem;
+}
+
+/* Funded-by
+   =========
+ */
+
+.funded-by-text {
+  opacity: 0.3;
+  text-align: center;
+}
+/* Controls the layout of the logos, all in one row with equal spacing */
+.funded-by-logos {
+  --spacing: 0.7rem;
+  display: grid;
+  grid-auto-columns: auto;
+  grid-auto-flow: column;
+  /* Auto-space the items only in-between, hard to achieve with flex */
+  grid-gap: var(--spacing);
+  padding: var(--spacing);
+}
+.funded-by-logo {
+  opacity: 0.15;
+  transition: opacity 500ms ease;
+}
+.funded-by-logo:hover {
+  opacity: 0.5;
+}
+
+/* Spacer
+   ======
+   To generate a responsive design with flexbox 
+*/
+#sidebar > .spacer {
+  flex: auto;
+}

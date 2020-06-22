@@ -1,0 +1,14 @@
+{
+  "network": {
+    "type": "environment",
+    "name": "NETWORK"
+  },
+  "relayer_fee": {
+    "type": "environment",
+    "name": "RELAYER_FEE"
+  },
+  "private_key": {
+    "type": "environment",
+    "name": "PRIVATE_KEY"
+  }
+}

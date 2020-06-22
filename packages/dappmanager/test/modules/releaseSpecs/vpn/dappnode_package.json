@@ -1,0 +1,25 @@
+{
+  "name": "vpn.dnp.dappnode.eth",
+  "version": "0.2.5",
+  "description": "Dappnode package responsible for providing the VPN (OpenVPN) connection",
+  "type": "dncore",
+  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+  "contributors": [
+    "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
+    "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)",
+    "vdo <vdo@giveth.io> (https://github.com/vdo)",
+    "Alex Floyd <alex@giveth.io> (https://github.com/mex20)"
+  ],
+  "keywords": ["DAppNodeCore", "VPN", "OpenVPN"],
+  "links": {
+    "homepage": "https://github.com/dappnode/DNP_VPN#readme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dappnode/DNP_VPN"
+  },
+  "bugs": {
+    "url": "https://github.com/dappnode/DNP_VPN/issues"
+  },
+  "license": "GPL-3.0"
+}

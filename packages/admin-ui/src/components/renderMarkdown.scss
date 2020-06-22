@@ -1,0 +1,13 @@
+.markdown-render {
+  &:not(.spacing) > p:last-child {
+    margin-bottom: 0;
+  }
+  img {
+    max-width: 100%;
+  }
+
+  // Supress p margin
+  &.noMargin p {
+    margin-bottom: 0;
+  }
+}

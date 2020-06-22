@@ -1,0 +1,19 @@
+.system-update-grid {
+  display: grid;
+  grid-gap: var(--default-spacing);
+}
+
+/* Align the UPDATE button to the right */
+.system-update-grid > button {
+  justify-self: end;
+}
+
+.system-update-grid > *:not(:last-child) {
+  padding-bottom: var(--default-spacing);
+  border-bottom: var(--border-style);
+}
+
+/* Remove bootstrap's alert bottom spacing */
+.system-update-grid .alert {
+  margin-bottom: 0 !important;
+}

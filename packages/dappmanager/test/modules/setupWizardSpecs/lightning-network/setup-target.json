@@ -1,0 +1,10 @@
+{
+  "alias": {
+    "type": "environment",
+    "name": "ALIAS"
+  },
+  "rtl_password": {
+    "type": "environment",
+    "name": "RTL_PASSWORD"
+  }
+}
