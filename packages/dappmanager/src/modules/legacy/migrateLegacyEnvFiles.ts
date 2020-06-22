@@ -1,19 +1,20 @@
 import fs from "fs";
 import { parseEnvironment } from "../compose";
 import { ComposeFileEditor } from "../compose/editor";
-import { packagesGet } from "../../calls";
 import * as getPath from "../../utils/getPath";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";
+import { PackageContainer } from "../../types";
 
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
  * This function will read the contents of .env files and add them in the
  * compose itself in the `environment` field in array format
  */
-export async function migrateLegacyEnvFiles(): Promise<void> {
+export async function migrateLegacyEnvFiles(
+  dnpList: PackageContainer[]
+): Promise<void> {
   try {
-    const dnpList = await packagesGet();
     for (const { name, isCore } of dnpList) migrateLegacyEnvFile(name, isCore);
     logs.info("Finished migrating legacy DNP .env files if any");
   } catch (e) {
