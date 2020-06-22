@@ -11,11 +11,10 @@ import Vols from "./Vols";
 import StateBadge from "../StateBadge";
 import newTabProps from "utils/newTabProps";
 import { PackageContainer, Manifest } from "types";
+import { ipfsGatewayUrl } from "pages/system/data";
 import "./info.scss";
 
-const ipfsGateway = "http://ipfs.dappnode:8080";
-
-function Info({
+export default function Info({
   dnp,
   manifest,
   gettingStarted,
@@ -84,7 +83,7 @@ function Info({
           <strong>Version: </strong>
           {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
           {origin ? (
-            <a href={`${ipfsGateway}${origin}`} {...newTabProps}>
+            <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
               {origin}
             </a>
           ) : null}
@@ -114,5 +113,3 @@ function Info({
     </>
   );
 }
-
-export default Info;

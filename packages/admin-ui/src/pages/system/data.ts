@@ -24,3 +24,4 @@ export const activateFallbackPath = `${rootPath}/${subPaths.repository}`;
 
 // DAppNode data
 export const ipfsApiUrl = "http://ipfs.dappnode:5001/api/v0";
+export const ipfsGatewayUrl = "http://ipfs.dappnode:8080";
