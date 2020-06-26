@@ -3,6 +3,12 @@ import stackTrace from "stack-trace";
 // "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
 import "source-map-support/register";
 import { logSafeObjects } from "./utils/logs";
+import { inspect } from "util";
+
+// Make NodeJS inspect render deeply nested objects
+// Print { b: { d: { f: { h: { i: 'i' } } } } }
+// Instead of { b: { d: [ Object ] } }
+inspect.defaultOptions.depth = null;
 
 const rootDir = __dirname;
 const logDebug = /debug/i.test(process.env.LOG_LEVEL || "");
