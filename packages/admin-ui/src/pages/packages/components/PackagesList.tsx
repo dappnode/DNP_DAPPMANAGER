@@ -18,6 +18,7 @@ import defaultAvatar from "img/defaultAvatar.png";
 import dappnodeIcon from "img/dappnode-logo-only.png";
 import "./packages.scss";
 import { renderResponse } from "components/SwrRender";
+import { coreName } from "params";
 
 export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
   const dnpsRequest = useApi.packagesGet();
@@ -28,7 +29,8 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
     ["Loading installed DAppNode Packages"],
     dnps => {
       const filteredDnps = dnps.filter(
-        dnp => Boolean(coreDnps) === Boolean(dnp.isCore)
+        dnp =>
+          Boolean(coreDnps) === Boolean(dnp.isCore) && dnp.name !== coreName
       );
       if (!filteredDnps.length) return <NoPackagesYet />;
 
