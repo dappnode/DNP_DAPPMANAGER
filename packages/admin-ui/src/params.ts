@@ -22,17 +22,17 @@ export const wifiEnvSSID = "SSID";
 export const wifiName = "wifi.dnp.dappnode.eth";
 export const ipfsName = "ipfs.dnp.dappnode.eth";
 export const coreName = "core.dnp.dappnode.eth";
+export const bindName = "bind.dnp.dappnode.eth";
+export const vpnName = "vpn.dnp.dappnode.eth";
 export const dappmanagerName = "dappmanager.dnp.dappnode.eth";
-export const corePackages = [
-  coreName,
+export const mandatoryCoreDnps = [
   dappmanagerName,
+  vpnName,
   ipfsName,
-  wifiName,
-  "admin.dnp.dappnode.eth",
-  "vpn.dnp.dappnode.eth",
-  "bind.dnp.dappnode.eth",
-  "wamp.dnp.dappnode.eth"
+  bindName,
+  wifiName
 ];
+export const corePackages = [...mandatoryCoreDnps, coreName];
 
 // NACL keys
 export const adminNaclSecretKey =

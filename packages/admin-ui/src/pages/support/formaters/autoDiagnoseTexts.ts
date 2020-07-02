@@ -1,5 +1,6 @@
 import { DiagnoseResult } from "../types";
 import { HostStats, PackageContainer, SystemInfo } from "common/types";
+import { mandatoryCoreDnps } from "params";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
 
@@ -135,14 +136,6 @@ export function coreDnpsRunning({
 
   if (!dnpInstalled) return null;
 
-  const mandatoryCoreDnps = [
-    "dappmanager.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
-    "admin.dnp.dappnode.eth",
-    "ipfs.dnp.dappnode.eth",
-    "wamp.dnp.dappnode.eth",
-    "bind.dnp.dappnode.eth"
-  ];
   const notFound = [];
   const notRunning = [];
   for (const coreDnpName of mandatoryCoreDnps) {
