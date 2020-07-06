@@ -11,6 +11,7 @@ import { shortNameDomain } from "../../utils/format";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../utils/globalEnvsFile";
+import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -67,7 +68,7 @@ export async function getRelease({
 
   compose.service().mergeLabels(
     writeMetadataToLabels({
-      dependencies: metadata.dependencies || {},
+      dependencies: sanitizeDependencies(metadata.dependencies || {}),
       avatar: fileToMultiaddress(avatarFile),
       chain: metadata.chain,
       origin,

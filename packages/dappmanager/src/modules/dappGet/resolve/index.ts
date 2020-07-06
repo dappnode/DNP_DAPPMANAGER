@@ -67,7 +67,7 @@ export default function resolver(
   const permutationsTable = getPermutationsTable(dnps);
   const totalCases = getTotalPermutations(permutationsTable);
   logs.debug(`dappGet found ${totalCases} possible cases`);
-  logs.debug(permutationsTable);
+  logs.debug(permutationsTable, dnps);
 
   if (!totalCases) throw Error("Aggregation error, total cases must be > 0");
 

@@ -1,5 +1,6 @@
 import { DappGetDnps, DappGetDnp } from "../types";
 import { Dependencies } from "../../../types";
+import { sanitizeDependencies } from "./sanitizeDependencies";
 
 function getVersion(
   dnps: DappGetDnps,
@@ -34,7 +35,7 @@ export function setVersion(
   dependencies: Dependencies
 ): void {
   if (!dnps[name]) dnps[name] = { versions: {} };
-  dnps[name].versions[version] = dependencies;
+  dnps[name].versions[version] = sanitizeDependencies(dependencies);
 }
 
 export function getVersionsFromDnp(

@@ -163,7 +163,7 @@ describe("dappGet/aggregate", () => {
           isInstalled: true,
           versions: {
             "0.0.4": {
-              "web.dnp.dappnode.eth": "latest"
+              "web.dnp.dappnode.eth": "*"
             }
           }
         },

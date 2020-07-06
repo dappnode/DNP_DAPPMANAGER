@@ -1,10 +1,11 @@
 import { Dependencies } from "../../../types";
 import { mapValues } from "lodash";
-// WARNING: manifest's dependencies is an external uncontrolled input, verify
 
-export default function sanitizeDependencies(
-  dependencies: Dependencies
-): Dependencies {
+/**
+ * WARNING: manifest's dependencies is an external uncontrolled input, verify
+ * @param dependencies
+ */
+export function sanitizeDependencies(dependencies: Dependencies): Dependencies {
   if (!dependencies) {
     throw Error("SANITIZE-ERROR: Dependencies is not defined");
   }

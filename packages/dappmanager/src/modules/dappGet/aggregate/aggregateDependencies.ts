@@ -1,6 +1,6 @@
 import { hasVersion, setVersion } from "../utils/dnpUtils";
-import sanitizeVersions from "./sanitizeVersions";
-import sanitizeDependencies from "./sanitizeDependencies";
+import { sanitizeVersions } from "../utils/sanitizeVersions";
+import { sanitizeDependencies } from "../utils/sanitizeDependencies";
 import { Dependencies } from "../../../types";
 import { DappGetDnps } from "../types";
 import { logs } from "../../../logs";
