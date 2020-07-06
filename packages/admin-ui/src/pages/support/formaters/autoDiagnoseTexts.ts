@@ -36,6 +36,29 @@ export function connection({
   };
 }
 
+export function internetConnection({
+  data: dappnodeParams,
+  isValidating
+}: {
+  data?: SystemInfo;
+  isValidating: boolean;
+}): DiagnoseResultOrNull {
+  if (isValidating) return { loading: true, msg: "Loading system info..." };
+  if (!dappnodeParams) return null;
+  const { publicIp, staticIp } = dappnodeParams;
+  return {
+    ok: Boolean(publicIp),
+    msg: publicIp
+      ? staticIp
+        ? "May have connected to the internet, static IP set"
+        : "Has connected to the internet, and detected own public IP"
+      : "Cannot connect to the internet. Could not fetch own public IP",
+    solutions: [
+      "Make sure your DAppNode is connected to the internet. Make sure to plug its ethernet cable to the router."
+    ]
+  };
+}
+
 export function openPorts({
   data: dappnodeParams,
   isValidating

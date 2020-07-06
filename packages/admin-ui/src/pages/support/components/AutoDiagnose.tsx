@@ -24,6 +24,7 @@ export default function AutoDiagnose() {
     formatDiagnose.ipfs(ipfsConnection),
     ...(isOpen
       ? [
+          formatDiagnose.internetConnection(systemInfo),
           formatDiagnose.openPorts(systemInfo),
           formatDiagnose.noNatLoopback(systemInfo),
           formatDiagnose.diskSpace(hostStats),

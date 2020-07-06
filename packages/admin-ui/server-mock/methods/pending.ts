@@ -298,6 +298,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     noNatLoopback: false,
     alertToOpenPorts: false,
     internalIp: "192.168.0.1",
+    publicIp: "85.84.83.82",
     dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "openethereum",
