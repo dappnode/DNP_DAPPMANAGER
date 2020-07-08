@@ -6,13 +6,13 @@ import getServerName from "./utils/getServerName";
 import getInternalIp from "./utils/getInternalIp";
 import getStaticIp from "./utils/getStaticIp";
 import getExternalUpnpIp from "./modules/upnpc/getExternalIp";
+import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls";
 import params from "./params";
 import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
 import retry from "async-retry";
 import shell from "./utils/shell";
-import * as globalEnvsFile from "./utils/globalEnvsFile";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
 import { packageRestart } from "./calls";
@@ -120,20 +120,6 @@ export default async function initializeDb(): Promise<void> {
   // NOTE: Runs as a forked process with retry and a try / catch block
   updateLocalDyndns();
 
-  // Set global ENVs from the DB values in this syntax for consistency
-  globalEnvsFile.setEnvs({
-    [params.GLOBAL_ENVS.INTERNAL_IP]: db.internalIp.get(),
-    [params.GLOBAL_ENVS.STATIC_IP]: db.staticIp.get(),
-    [params.GLOBAL_ENVS.HOSTNAME]: db.staticIp.get() || db.domain.get(),
-    [params.GLOBAL_ENVS.UPNP_AVAILABLE]: boolToString(db.upnpAvailable.get()),
-    [params.GLOBAL_ENVS.NO_NAT_LOOPBACK]: boolToString(db.noNatLoopback.get()),
-    [params.GLOBAL_ENVS.DOMAIN]: db.domain.get(),
-    [params.GLOBAL_ENVS.PUBKEY]: db.dyndnsIdentity.get().publicKey,
-    [params.GLOBAL_ENVS.ADDRESS]: db.dyndnsIdentity.get().address,
-    [params.GLOBAL_ENVS.PUBLIC_IP]: db.publicIp.get(),
-    [params.GLOBAL_ENVS.SERVER_NAME]: db.serverName.get()
-  });
-
   let shouldResetTheVpn = true;
   try {
     // [_DAPPNODE_GLOBAL_ENVS_ACTIVE=true _DAPPNODE_GLOBAL_INTERNAL_IP=1.2.3.4 ...]
@@ -148,6 +134,7 @@ export default async function initializeDb(): Promise<void> {
 
   if (shouldResetTheVpn)
     try {
+      writeGlobalEnvsToEnvFile();
       const vpnCompose = new ComposeFileEditor(vpnName, true);
       vpnCompose.service().addEnvFile(params.GLOBAL_ENVS_PATH_CORE);
       vpnCompose.write();
@@ -255,8 +242,4 @@ function returnNullIfError(
       return null;
     }
   };
-}
-
-function boolToString(bool: boolean): string {
-  return bool ? "true" : "false";
 }

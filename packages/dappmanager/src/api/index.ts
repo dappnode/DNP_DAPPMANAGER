@@ -9,16 +9,18 @@ import path from "path";
 import params from "../params";
 import { isAdmin, isAdminIp } from "./auth";
 import { wrapHandler } from "./utils";
-import { download } from "./routes/download";
-import { upload } from "./routes/upload";
-import { containerLogs } from "./routes/containerLogs";
-import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
 import * as methods from "../calls";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
 import { getRpcHandler, subscriptionsFactory } from "../common";
 import { getEthForwardHandler, isDwebRequest } from "../ethForward";
 import { subscriptionsLogger, routesLogger } from "./logger";
 import { logs } from "../logs";
+// Routes
+import { download } from "./routes/download";
+import { upload } from "./routes/upload";
+import { containerLogs } from "./routes/containerLogs";
+import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
+import { globalEnvs } from "./routes/globalEnvs";
 
 const httpApiPort = params.HTTP_API_PORT;
 const uiFilesPath = params.UI_FILES_PATH;
@@ -82,6 +84,8 @@ export default function startHttpApi(
   app.get("/download/:fileId", isAdmin, wrapHandler(download));
   app.get("/user-action-logs", isAdmin, wrapHandler(downloadUserActionLogs));
   app.post("/upload", isAdmin, wrapHandler(upload));
+  // Open endpoints (no auth)
+  app.get("/global-envs/:name?", wrapHandler(globalEnvs));
 
   // Rest of RPC methods
   app.post(

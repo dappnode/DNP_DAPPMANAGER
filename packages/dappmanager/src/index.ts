@@ -1,8 +1,6 @@
-import params from "./params";
 import * as db from "./db";
-
 import initializeDb from "./initializeDb";
-import * as globalEnvsFile from "./utils/globalEnvsFile";
+import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
 import { migrateEthchain } from "./modules/ethClient";
@@ -25,8 +23,7 @@ runWatchers();
 initializeDb();
 
 // Create the global env file
-globalEnvsFile.createFile();
-globalEnvsFile.setEnvs({ [params.GLOBAL_ENVS.ACTIVE]: "true" });
+createGlobalEnvsEnvFile();
 
 // Create local keys for NACL public encryption
 if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
