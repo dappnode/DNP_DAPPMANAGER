@@ -10,7 +10,7 @@ import { ComposeEditor } from "../compose/editor";
 import { shortNameDomain } from "../../utils/format";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
-import { getGlobalEnvsFilePath } from "../../utils/globalEnvsFile";
+import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 
 /**
