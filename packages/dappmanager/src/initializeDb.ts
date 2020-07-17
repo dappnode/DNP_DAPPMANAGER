@@ -15,12 +15,6 @@ import retry from "async-retry";
 import shell from "./utils/shell";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
-import { packageRestart } from "./calls";
-import { ComposeFileEditor } from "./modules/compose/editor";
-
-const vpnDataVolume = params.vpnDataVolume;
-const vpnName = params.vpnDnpName;
-const vpnContainerName = `${params.CONTAINER_CORE_NAME_PREFIX}${vpnName}`;
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -120,30 +114,10 @@ export default async function initializeDb(): Promise<void> {
   // NOTE: Runs as a forked process with retry and a try / catch block
   updateLocalDyndns();
 
-  let shouldResetTheVpn = true;
-  try {
-    // [_DAPPNODE_GLOBAL_ENVS_ACTIVE=true _DAPPNODE_GLOBAL_INTERNAL_IP=1.2.3.4 ...]
-    const envsString = await shell(
-      `docker inspect ${vpnContainerName} --format "{{.Config.Env}}"`
-    );
-    if (envsString && envsString.includes(params.GLOBAL_ENVS.ACTIVE))
-      shouldResetTheVpn = false;
-  } catch (e) {
-    logs.error("Error checking if should reset the VPN", e);
-  }
-
-  if (shouldResetTheVpn)
-    try {
-      writeGlobalEnvsToEnvFile();
-      const vpnCompose = new ComposeFileEditor(vpnName, true);
-      vpnCompose.service().addEnvFile(params.GLOBAL_ENVS_PATH_CORE);
-      vpnCompose.write();
-      await packageRestart({ id: vpnName });
-      logs.info("Added global ENVs and restarted the VPN");
-    } catch (e) {
-      logs.error("Error reseting the VPN", e);
-    }
-  else logs.info("Globals ENVs are already set in the VPN environment");
+  // After initializing all the internal params (hostname, internal_ip, etc)
+  // Persist them to the global ENVs file so other packages can consume it
+  // However, the prefered way to consume global envs is via API
+  writeGlobalEnvsToEnvFile();
 
   eventBus.initializedDb.emit();
 }
@@ -164,7 +138,7 @@ async function migrateVpnDb(): Promise<void> {
     }
     const image = await getDappmanagerImage();
     const output = await shell(
-      `docker run --rm -v  ${vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
+      `docker run --rm -v  ${params.vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
     );
     if (!output) throw Error(`VPN DB is empty`);
     const vpndb: VpnDb = JSON.parse(output);
