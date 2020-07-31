@@ -21,6 +21,7 @@ import { upload } from "./routes/upload";
 import { containerLogs } from "./routes/containerLogs";
 import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
 import { globalEnvs } from "./routes/globalEnvs";
+import { publicPackagesData } from "./routes/publicPackagesData";
 
 const httpApiPort = params.HTTP_API_PORT;
 const uiFilesPath = params.UI_FILES_PATH;
@@ -86,6 +87,7 @@ export default function startHttpApi(
   app.post("/upload", isAdmin, wrapHandler(upload));
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", wrapHandler(globalEnvs));
+  app.get("/public-packages/:id?", wrapHandler(publicPackagesData));
 
   // Rest of RPC methods
   app.post(
