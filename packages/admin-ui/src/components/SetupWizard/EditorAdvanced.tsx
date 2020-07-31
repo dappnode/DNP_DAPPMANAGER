@@ -1,0 +1,116 @@
+import React from "react";
+import { orderBy, isEmpty } from "lodash";
+// Components
+import Input from "components/Input";
+import { UserSettingsAllDnps } from "types";
+import { shortNameCapitalized } from "utils/format";
+import "./editorAdvanced.scss";
+
+interface EditableTableProps {
+  headers: string[];
+  placeholder: string;
+  values?: { [valueId: string]: string };
+  disabledValues?: { [valueId: string]: boolean };
+  setValue: (valueId: string, value: string) => void;
+}
+
+const EditableTable: React.FC<EditableTableProps> = ({
+  headers,
+  placeholder,
+  values,
+  disabledValues,
+  setValue
+}) => {
+  if (!values || isEmpty(values)) return null;
+  const valuesArray = orderBy(
+    Object.entries(values).map(([key, value]) => ({ id: key, value })),
+    ["id"]
+  );
+  return (
+    <table className="editor-advanced-table">
+      <thead>
+        <tr>
+          {headers.map(header => (
+            <td key={header} className="subtle-header">
+              {header}
+            </td>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {valuesArray.map(({ id, value = "" }) => (
+          <tr key={id}>
+            <td>
+              <Input lock={true} value={id} onValueChange={() => {}} />
+            </td>
+            <td>
+              <Input
+                placeholder={placeholder}
+                value={value}
+                onValueChange={(newValue: string) => setValue(id, newValue)}
+                lock={(disabledValues || {})[id]}
+              />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+export function EditorAdvanced({
+  userSettings,
+  onChange
+}: {
+  userSettings: UserSettingsAllDnps;
+  onChange: (newUserSettings: UserSettingsAllDnps) => void;
+}) {
+  return (
+    <div className="dnps-section">
+      {Object.entries(userSettings).map(([dnpName, dnpSettings]) => (
+        <div className="dnp-section" key={dnpName}>
+          <div className="dnp-name">{shortNameCapitalized(dnpName)}</div>
+          <EditableTable
+            headers={["Env name", "Env value"]}
+            placeholder="enter value..."
+            values={dnpSettings.environment}
+            setValue={(valueId, envValue) =>
+              onChange({
+                [dnpName]: {
+                  environment: { [valueId]: envValue }
+                }
+              })
+            }
+          />
+          <EditableTable
+            headers={["Port - container", "Port - host"]}
+            placeholder="Ephemeral port if unspecified"
+            values={dnpSettings.portMappings}
+            setValue={(valueId, hostPort) =>
+              onChange({
+                [dnpName]: {
+                  portMappings: { [valueId]: hostPort }
+                }
+              })
+            }
+          />
+          {/* Rules for volumes
+               - Can't be edited if they are already set 
+          */}
+          <EditableTable
+            headers={["Volume name", "Custom mountpoint path"]}
+            placeholder="default docker location if unspecified"
+            values={dnpSettings.namedVolumeMountpoints}
+            setValue={(valueId, mountpointHostPath) =>
+              onChange({
+                [dnpName]: {
+                  namedVolumeMountpoints: { [valueId]: mountpointHostPath }
+                }
+              })
+            }
+          />
+        </div>
+      ))}
+    </div>
+  );
+}

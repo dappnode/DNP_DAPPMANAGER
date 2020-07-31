@@ -1,0 +1,102 @@
+:root {
+  --eth-multi-client-description-font-size: 0.9rem;
+  --eth-multi-client-description-color: var(--light-text-color);
+}
+
+.eth-multi-clients {
+  display: grid;
+  grid-gap: var(--default-spacing);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+
+  // So it does not strech
+  align-self: flex-start;
+
+  margin: 0 auto;
+  width: 100%;
+}
+
+.eth-multi-client {
+  text-align: center;
+  // For the underline line that highlights on select
+  border-bottom: 6px solid white;
+  .title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    transition: color 0.15s;
+  }
+  .description {
+    font-size: var(--eth-multi-client-description-font-size);
+    color: var(--eth-multi-client-description-color);
+  }
+
+  > *:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  // Button feel
+  &:hover:not(.selected) {
+    border-color: rgb(218, 218, 218);
+    background-color: rgb(218, 218, 218);
+  }
+  &.selected {
+    border-color: var(--dappnode-color);
+    // background-image: linear-gradient(
+    //   rgba(255, 0, 0, 0) 0%,
+    //   #daedec 50%,
+    //   #99d9d4 77%,
+    //   #7acac4 87%,
+    //   var(--dappnode-color)
+    // );
+    // background-color: var(--dappnode-color);
+    .title {
+      color: var(--dappnode-color);
+    }
+  }
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.eth-multi-client-stats {
+  color: var(--light-text-color);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 0.1rem 0.2rem;
+
+  // Icons with status color
+  svg {
+    margin: auto;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    color: #b0b0b0;
+    &.active {
+      color: var(--success-color);
+    }
+  }
+
+  // Text with tag
+  div {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.eth-multi-clients-fallback {
+  label {
+    // opacity: 0.6;
+    font-size: var(--eth-multi-client-description-font-size);
+    color: var(--eth-multi-client-description-color);
+  }
+}
+
+.eth-multi-clients-and-fallback {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+
+  > .alert {
+    margin-top: var(--default-spacing);
+    margin-bottom: 0;
+  }
+}

@@ -1,0 +1,12 @@
+label.switch-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > span {
+    order: 2;
+    font-size: 0.85rem;
+    margin-top: 0.15rem;
+    cursor: pointer;
+  }
+}

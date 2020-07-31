@@ -1,0 +1,149 @@
+:root {
+  --dappnode-white-color: #fff;
+  --dappnode-strong-main-color: #2fbcb2;
+  --dappnode-darker-main-color: #218a82;
+  --dappnode-shadow-main-color: #218a8280;
+  --dappnode-light-main-color: #a0bdbb;
+  --dappnode-gray-main-color: #748888;
+  --dappnode-links-color: #0eaba0;
+  --dappnode-links-darker-color: #058078;
+  --dappnode-complimentary-color: #bc2f39;
+  --border-color: #e5e5e5;
+  /* Danger color from the complimentary color of #2fbcb2 (dappnode-color) */
+  /* Warning color from From https://www.colorcombos.com/color-schemes/429/ColorCombo429.html */
+  --danger-color: var(--dappnode-complimentary-color);
+  --warning-color: #ffcc00;
+  --success-color: var(--dappnode-strong-main-color);
+  --success-green-color: #34a853;
+  /* Shortcuts */
+  --dappnode-color: var(--dappnode-strong-main-color);
+  /* Text colors */
+  --light-text-color: #757575;
+  /* Opacity shades */
+  --opacity-soft: 0.6;
+}
+
+.color-danger {
+  color: var(--danger-color);
+}
+
+/* btn styles - extend bootstrap v4. Use with:
+   class="btn btn-dappnode"
+ */
+
+.btn-dappnode {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-strong-main-color);
+  border-color: var(--dappnode-strong-main-color);
+}
+
+.btn-dappnode:hover {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-darker-main-color);
+  border-color: var(--dappnode-darker-main-color);
+}
+
+.btn-dappnode:focus,
+.btn-dappnode.focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+}
+
+.btn-dappnode.disabled,
+.btn-dappnode:disabled {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-gray-main-color);
+  border-color: var(--dappnode-gray-main-color);
+}
+
+.btn-dappnode:not(:disabled):not(.disabled):active,
+.btn-dappnode:not(:disabled):not(.disabled).active,
+.show > .btn-dappnode.dropdown-toggle {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-darker-main-color);
+  border-color: var(--dappnode-darker-main-color);
+}
+
+.btn-outline-dappnode {
+  color: var(--dappnode-strong-main-color);
+  background-color: transparent;
+  background-image: none;
+  border-color: var(--dappnode-strong-main-color) !important;
+}
+
+.btn-outline-dappnode:hover {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-darker-main-color);
+  border-color: var(--dappnode-darker-main-color) !important;
+}
+
+.btn-outline-dappnode:focus,
+.btn-outline-dappnode.focus {
+  box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
+}
+
+.btn-outline-dappnode.disabled,
+.btn-outline-dappnode:disabled {
+  color: var(--dappnode-strong-main-color);
+  background-color: transparent;
+}
+
+.btn-outline-dappnode:not(:disabled):not(.disabled):active,
+.btn-outline-dappnode:not(:disabled):not(.disabled).active,
+.show > .btn-outline-dappnode.dropdown-toggle {
+  color: var(--dappnode-white-color);
+  background-color: var(--dappnode-strong-main-color);
+  border-color: var(--dappnode-strong-main-color);
+}
+
+.btn-outline-dappnode:not(:disabled):not(.disabled):active:focus,
+.btn-outline-dappnode:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-dappnode.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
+}
+
+/* Opacity shades */
+.opacity-soft {
+  opacity: var(--opacity-soft);
+}
+
+/* Pill variation - only shape */
+
+.btn.pill {
+  border-radius: 10rem;
+  padding: 0.25rem 1.2rem;
+}
+
+/* Toast variations, now they match the bootstrap color scheme */
+
+.Toastify__toast--success {
+  background: var(--success-color);
+}
+.Toastify__toast--warning {
+  background: var(--warning-color);
+}
+.Toastify__toast--error {
+  background: var(--danger-color);
+}
+
+/* Edit bootstrap styles */
+
+.text-danger {
+  color: var(--danger-color) !important;
+}
+.text-warning {
+  color: var(--warning-color) !important;
+}
+.text-success {
+  color: var(--success-color) !important;
+}
+.badge-danger {
+  background-color: var(--danger-color);
+}
+.badge-success {
+  background-color: var(--success-color);
+}
+.alert-warning {
+  color: #433c1d;
+  background-color: #ffeda6;
+  border-color: #ffeda6;
+}

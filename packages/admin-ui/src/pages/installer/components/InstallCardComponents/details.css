@@ -1,0 +1,31 @@
+/* Details */
+
+.installer-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, max-content));
+  grid-gap: var(--default-spacing);
+}
+.installer-details > img {
+  width: 100%;
+  max-width: 12rem;
+  justify-self: center;
+}
+
+/* Data grid */
+.installer-details .data {
+  margin-top: var(--default-spacing);
+}
+.installer-details .data > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
+}
+.installer-details .data > div > header {
+  width: 7rem;
+}
+.installer-details .data > * {
+  overflow: hidden;
+}
+.installer-details header,
+.installer-details .data > span:nth-child(2n-1) {
+  font-weight: 800;
+}

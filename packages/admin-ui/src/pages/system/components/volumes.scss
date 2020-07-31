@@ -1,0 +1,87 @@
+.list-grid.volumes {
+  /*
+  Col 1: Shrink the text to an extend, otherwise fill all available space
+  Col 2, 3: Fit to the link buttons / switch always
+  Col 4, 5: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+  grid-template-columns:
+    minmax(4rem, auto)
+    minmax(2.5rem, max-content)
+    minmax(2.5rem, max-content);
+
+  &.showMountpoint {
+    grid-template-columns:
+      minmax(4rem, auto)
+      minmax(2.5rem, max-content)
+      minmax(2.5rem, max-content)
+      minmax(2.5rem, max-content);
+  }
+
+  &.showRemove {
+    grid-template-columns:
+      minmax(4rem, auto)
+      minmax(2.5rem, max-content)
+      minmax(2.5rem, max-content)
+      minmax(calc(var(--icon-size) / 2), min-content);
+  }
+
+  &.showRemove.showMountpoint {
+    grid-template-columns:
+      minmax(4rem, auto)
+      minmax(2.5rem, max-content)
+      minmax(2.5rem, max-content)
+      minmax(2.5rem, max-content)
+      minmax(calc(var(--icon-size) / 2), min-content);
+  }
+
+  .mountpoint,
+  .created-at {
+    opacity: 0.6;
+  }
+  .name {
+    display: grid;
+    grid-template-columns: minmax(2rem, max-content) minmax(0.5rem, max-content);
+    align-items: center;
+    > *:not(:last-child) {
+      margin-right: 0.5rem;
+    }
+    .text,
+    .name,
+    .owner {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .text {
+      display: flex;
+      > *:not(:last-child) {
+        margin-right: 0.5rem;
+      }
+    }
+    a.owner {
+      color: inherit;
+      transition: color 0.2s ease;
+      &:hover {
+        color: var(--dappnode-color);
+        text-decoration: none;
+      }
+    }
+  }
+
+  .subtle-header {
+    display: flex;
+    width: 100%; // To achieve left align
+    height: 16px; // Force the cell to be smaller than the others
+    cursor: pointer;
+    transition: color ease 150ms;
+    &:hover {
+      color: black;
+    }
+    > svg {
+      font-size: 16px;
+    }
+    text-transform: none;
+  }
+}

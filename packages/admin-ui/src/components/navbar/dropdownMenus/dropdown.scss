@@ -1,0 +1,106 @@
+.tn-dropdown {
+  position: relative;
+
+  .icon-bubble {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    background: transparent;
+    border-radius: var(--bubble-size);
+    height: var(--bubble-size);
+    width: var(--bubble-size);
+
+    &.success {
+      background: var(--success-color);
+    }
+    &.warning {
+      background: var(--warning-color);
+    }
+    &.danger {
+      background: var(--danger-color);
+    }
+  }
+
+  > .menu {
+    /* Does not need a z-index, it has the topbar z-index */
+    background-color: white;
+    border: var(--border-style);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0;
+    /* Positioning */
+    position: absolute;
+    top: 2rem;
+    /* Display control */
+    display: none;
+    /* Sizing */
+    width: 22.5rem;
+    max-height: 30rem;
+    overflow-y: auto;
+
+    &.show {
+      display: block;
+    }
+
+    /* 22 * 90% = 19.8 (the min-width specified above) */
+    @media (max-width: 25rem) {
+      width: 90vw;
+    }
+
+    /* Menu items */
+    > div {
+      padding: 0.5rem 1rem;
+      overflow-wrap: break-word;
+
+      .title {
+        display: flex;
+        .text {
+          flex: auto;
+        }
+        .help {
+          font-size: 140%;
+          display: flex;
+        }
+      }
+    }
+    > div:not(:last-child) {
+      border-bottom: var(--border-style);
+    }
+    > .header {
+      color: #6c757d;
+    }
+    > .placeholder {
+      color: #6c757d;
+      opacity: 0.8;
+    }
+    .progress {
+      margin: 0.25rem 0;
+    }
+  }
+
+  /* Right position of the dropdown to prevent clipping on small screens */
+  &.notifications > .menu {
+    right: -0.4rem;
+  }
+  &.chainstatus > .menu {
+    right: -2.9rem;
+  }
+  &.dappnodeidentity > .menu {
+    right: -6.45rem;
+  }
+
+  // Regulate size of toggle icons
+  &.notifications .tn-dropdown-toggle svg {
+    font-size: 1.3rem;
+  }
+}
+
+.tn-dropdown-toggle {
+  /* flex automatically centers the toggle icons */
+  display: flex;
+  opacity: 0.6;
+  transition: opacity 150ms;
+  cursor: pointer;
+}
+.tn-dropdown-toggle:hover {
+  opacity: 1;
+}

@@ -1,0 +1,144 @@
+.welcome-container {
+  // Fade in animation
+  opacity: 0;
+  transition: opacity ease 0.3s;
+  &.opacity-1 {
+    opacity: 1;
+  }
+
+  // Full screen overlay
+  z-index: var(--z-index-welcome-dialog);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+
+.welcome {
+  padding: var(--default-spacing);
+  padding-bottom: 0;
+  border-radius: 0.5rem;
+  border: var(--border-style);
+  background: #fefefe;
+  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+  color: #666;
+
+  /* Sizing */
+  overflow-y: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 71rem;
+  margin: auto;
+  max-height: 100vh; // So it's scrollable in small views
+
+  display: grid;
+  grid-template-rows:
+    minmax(min-content, max-content)
+    1fr
+    auto;
+  grid-gap: 2rem;
+
+  // align-items: center;
+  // min-height: 100vh;
+
+  .header {
+    text-align: center;
+    .title {
+      font-weight: bold;
+      font-size: 2rem; // Titles must be big enough in 100% zoom
+      transition: color 0.15s;
+    }
+    .description {
+      font-size: 1rem; // Keep sizes stable
+      color: var(--light-text-color);
+      max-width: 40rem;
+      margin: auto;
+    }
+  }
+
+  .bottom-buttons {
+    // When there's only one button, align right
+    > *:only-child {
+      margin-left: auto;
+    }
+    .next {
+      float: right;
+    }
+    .back {
+      float: left;
+    }
+
+    // In very small screens, make sure the buttons don't clip to the bottom
+    margin-bottom: var(--default-spacing);
+  }
+
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+
+  // Helps automatically place
+  .space-between-placeholder {
+    margin: 0 !important;
+  }
+
+  // Custom password form
+  .change-password-form {
+    display: flex;
+    flex-direction: column;
+
+    > *:not(:last-child) {
+      margin-bottom: var(--default-spacing);
+    }
+  }
+
+  // Deprecated horizontal slideshow
+
+  .nav-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+
+    .dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 1rem;
+      .dot {
+        margin: 0 0.75rem;
+        height: 1rem;
+        width: 1rem;
+        border-radius: 50%;
+        background-color: #bcbcbc;
+        &.active {
+          background-color: var(--dappnode-color);
+        }
+      }
+    }
+
+    button {
+      border-radius: 100%;
+      padding: 0.5rem;
+      border: var(--border-style);
+
+      svg {
+        font-size: 2rem;
+      }
+    }
+  }
+
+  .big-centered-button {
+    align-self: baseline;
+    justify-self: center;
+    min-width: 10rem;
+    font-size: 1rem; // Keep sizes stable
+    // Give some bottom space to the button
+    margin-bottom: 3rem;
+  }
+}

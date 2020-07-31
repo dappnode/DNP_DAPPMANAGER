@@ -1,0 +1,26 @@
+{
+  "description": "Welcome to DAppNode's Trustlines Network Validator configuration wizard!\n\nThis package is for those who successfully bid for a [Validator slot](https://medium.com/trustlines-foundation/trustlines-validator-spotlight-deep-dive-on-rewards-economics-and-opportunities-for-validators-ec75f81088a6) during Trustlines Foundation's Validator Auction and will be validating the network.\n\n\nPlease note you won't be able to Validate if your address was not whitelisted at the end of the Validator Slots auction.",
+  "type": "object",
+  "properties": {
+    "keystore": {
+      "type": "string",
+      "format": "data-url",
+      "title": "Keystore",
+      "description": "Your Keystore/JSON file containing the private key that you want to use for this node"
+    },
+    "keystoreAddress": {
+      "type": "string",
+      "title": "Public Address",
+      "description": "Public address from the keystore.\nFor validators, you will use this address to seal blocks so it must be an authorized validator address, you can check the valid addresses in [this list](https://github.com/trustlines-protocol/blockchain/blob/1c664ff7d28998b7070c9edb3b325062a5365aad/chain/tlbc/tlbc-spec.json#L11)",
+      "pattern": "^0x[a-fA-F0-9]{40}$",
+      "customErrors": {
+        "pattern": "Must be a valid address (0x1fd16a...)"
+      }
+    },
+    "keystorePassword": {
+      "type": "string",
+      "title": "Password",
+      "description": "Password to unlock the uploaded keystore"
+    }
+  }
+}

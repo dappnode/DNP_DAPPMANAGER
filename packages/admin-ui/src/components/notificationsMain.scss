@@ -1,0 +1,26 @@
+.main-notification {
+  display: flex;
+  justify-content: space-between;
+
+  p {
+    margin-bottom: 0;
+  }
+  a {
+    margin-left: 0.5rem;
+  }
+
+  > a,
+  > button {
+    flex: none;
+  }
+
+  @media screen and (max-width: 40rem) {
+    display: block;
+    p {
+      margin-bottom: 0.5rem;
+    }
+    a {
+      margin-left: 0;
+    }
+  }
+}
