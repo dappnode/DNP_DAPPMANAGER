@@ -43,7 +43,11 @@ const inContainer = (_path: string) => path.join(testDirContainer, _path);
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-describe("Test a container restarting itself", function() {
+/**
+ * Skip until the image 'danielguerra/dind-compose' is publicly available
+ * in docker hub or a legitimate mirror
+ */
+describe.skip("Test a container restarting itself", function() {
   async function cleanContainers(): Promise<void> {
     try {
       await shell(
