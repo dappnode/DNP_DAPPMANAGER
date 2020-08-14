@@ -1,3 +1,4 @@
+import os from "os";
 import { mapValues } from "lodash";
 import * as ipfs from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
@@ -24,6 +25,7 @@ const source: "ipfs" = "ipfs";
 const releaseFilesRegex = {
   manifest: /dappnode_package.*\.json$/,
   image: /\.tar\.xz$/,
+  imageArm: /-arm64\.tar\.xz$/,
   compose: /compose.*\.yml$/,
   avatar: /avatar.*\.png$/,
   setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
@@ -77,7 +79,7 @@ export async function downloadReleaseIpfs(
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
       const manifestEntry = files.find(releaseFileIs.manifest);
-      const imageEntry = files.find(releaseFileIs.image);
+      const imageEntries = files.filter(releaseFileIs.image);
       const composeEntry = files.find(releaseFileIs.compose);
       const avatarEntry = files.find(releaseFileIs.avatar);
       const setupWizardEntry = files.find(releaseFileIs.setupWizard);
@@ -88,8 +90,9 @@ export async function downloadReleaseIpfs(
       const getStartedEntry = files.find(releaseFileIs.gettingStarted);
 
       if (!manifestEntry) throw Error("Release must contain a manifest");
-      if (!imageEntry) throw Error("Release must contain an image");
       if (!composeEntry) throw Error("Release must contain a docker compose");
+      if (imageEntries.length === 0)
+        throw Error("Release must contain an image");
 
       const [
         manifest,
@@ -119,6 +122,15 @@ export async function downloadReleaseIpfs(
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
 
+      const architecture = os.arch().includes("arm") ? "arm64" : "x64";
+      const imageByArch = {
+        arm64: imageEntries.find(file => releaseFileIs.imageArm(file)),
+        x64: imageEntries.find(file => !releaseFileIs.imageArm(file))
+      };
+      const imageEntry = imageByArch[architecture];
+      if (!imageEntry)
+        throw Error(`No image for architecture: ${architecture}`);
+
       return {
         manifestFile: getFileFromEntry(manifestEntry),
         imageFile: getFileFromEntry(imageEntry),
@@ -147,5 +159,3 @@ function getFileFromEntry({
 }): DistributedFile {
   return { hash, size, source };
 }
-
-// File finder helpers
