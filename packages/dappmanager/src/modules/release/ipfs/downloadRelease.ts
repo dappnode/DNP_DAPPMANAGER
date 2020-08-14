@@ -19,6 +19,7 @@ import {
   ManifestWithImage,
   Compose
 } from "../../../types";
+import { NoImageForArchError } from "../errors";
 
 const source: "ipfs" = "ipfs";
 
@@ -128,8 +129,7 @@ export async function downloadReleaseIpfs(
         x64: imageEntries.find(file => !releaseFileIs.imageArm(file))
       };
       const imageEntry = imageByArch[architecture];
-      if (!imageEntry)
-        throw Error(`No image for architecture: ${architecture}`);
+      if (!imageEntry) throw new NoImageForArchError(architecture);
 
       return {
         manifestFile: getFileFromEntry(manifestEntry),

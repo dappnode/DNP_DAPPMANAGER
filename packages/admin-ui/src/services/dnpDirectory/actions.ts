@@ -18,7 +18,9 @@ export const updateStatus = createAction<RequestStatus>(
 export const fetchDnpDirectory = (): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
-    dispatch(setDnpDirectory(await api.fetchDirectory()));
+    const directory = await api.fetchDirectory();
+    // Some items in directory may be undefined
+    dispatch(setDnpDirectory(directory.filter(Boolean)));
     dispatch(updateStatus({ loading: false, success: true }));
   } catch (e) {
     dispatch(updateStatus({ loading: false, error: e.message }));

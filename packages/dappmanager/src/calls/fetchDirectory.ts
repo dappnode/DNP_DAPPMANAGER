@@ -8,6 +8,7 @@ import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
+import { NoImageForArchError } from "../modules/release/errors";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -25,15 +26,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
   const directory = await getDirectory(provider);
-  const directoryDnps = directory.map(
-    ({ name, isFeatured }): DirectoryItem => ({
-      status: "loading",
-      name,
-      whitelisted: true,
-      isFeatured
-    })
-  );
-  emitDirectoryUpdate(directoryDnps);
+  const directoryDnps: DirectoryItem[] = [];
 
   await Promise.all(
     directory.map(
@@ -56,12 +49,16 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
             categories: metadata.categories || getFallBackCategories(name) || []
           };
         } catch (e) {
-          logs.error(`Error fetching ${name} release`, e);
-          directoryDnps[idx] = {
-            ...directoryItemBasic,
-            status: "error",
-            message: e.message
-          };
+          if (e instanceof NoImageForArchError) {
+            logs.debug(`Package ${name} is not available in current arch`);
+          } else {
+            logs.error(`Error fetching ${name} release`, e);
+            directoryDnps[idx] = {
+              ...directoryItemBasic,
+              status: "error",
+              message: e.message
+            };
+          }
         } finally {
           emitDirectoryUpdate(directoryDnps);
         }
