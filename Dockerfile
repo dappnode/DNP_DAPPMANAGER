@@ -9,7 +9,7 @@ RUN apk add --no-cache python build-base bash
 # Copy and install deps first to cache
 COPY package.json yarn.lock lerna.json ./
 COPY patches patches/
-RUN yarn --frozen-lockfile --non-interactive
+RUN yarn --frozen-lockfile --non-interactive --ignore-scripts
 COPY packages/admin-ui/package.json \ 
   packages/admin-ui/yarn.lock \ 
   packages/admin-ui/
