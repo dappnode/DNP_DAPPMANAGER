@@ -8,9 +8,9 @@ networks:
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
-  dappmanager.dnp.dappnode.eth:
+  dappmanager:
     build: .
-    image: "dappmanager.dnp.dappnode.eth:0.2.34"
+    image: "dappmanager:0.2.34"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     volumes:
@@ -30,3 +30,6 @@ services:
         ipv4_address: 172.33.1.7
     logging:
       driver: journald
+  admin:
+    build: mock-admin-build
+    image: "admin:0.2.34"

@@ -18,4 +18,6 @@ jobs:
           docker buildx create --name dappnode-arm-builder
           docker buildx use dappnode-arm-builder
           docker buildx inspect --bootstrap
-          docker buildx build --progress plain --platform linux/arm64 -t dappmanager.dnp.dappnode.eth:arm64-test . --output type=docker,dest=dappmanager-image.tar
+          docker buildx bake --progress plain --load --set=*.platform=linux/arm64
+          docker images
+          docker run --rm admin:0.2.34
