@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna clean --yes && lerna bootstrap -- --frozen-lockfile --non-interactive",
+    "bootstrap": "lerna clean --yes && lerna bootstrap --npm-client npm -- --loglevel verbose",
     "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
     "build": "lerna run build --stream",
