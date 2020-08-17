@@ -11,6 +11,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Do an arm64 build
         run: |
+          export DOCKER_CLI_EXPERIMENTAL=enabled
           docker version
           docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
           cat /proc/sys/fs/binfmt_misc/qemu-aarch64
@@ -18,5 +19,3 @@ jobs:
           docker buildx use dappnode-arm-builder
           docker buildx inspect --bootstrap
           docker buildx build --progress plain --platform linux/arm64 -t dappmanager.dnp.dappnode.eth:arm64-test --load .
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
