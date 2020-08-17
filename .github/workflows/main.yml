@@ -1,0 +1,67 @@
+name: "Main"
+on:
+  pull_request:
+    paths:
+      - 'build/**'
+      - 'packages/**'
+  push:
+    branches:
+      - 'master'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+    paths:
+      - 'build/**'
+      - 'packages/**'
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-16.04
+    name: Unit tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: yarn
+      - run: yarn bootstrap
+      - run: yarn generate
+      - run: yarn test
+
+  integration-test:
+    runs-on: ubuntu-16.04
+    name: In app integration tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: yarn # Caching only saves 30s
+      - run: yarn bootstrap
+      - run: yarn generate
+      - run: yarn test:int
+
+  build-test:
+    runs-on: ubuntu-16.04
+    name: Build test
+    if: github.event_name != 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: docker-compose build
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - name: Publish
+        run: npx @dappnode/dappnodesdk publish patch --dappnode_team_preset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
