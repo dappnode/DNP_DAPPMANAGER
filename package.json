@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive",
+    "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive --ignore-optional",
     "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
     "build": "lerna run build --stream",
