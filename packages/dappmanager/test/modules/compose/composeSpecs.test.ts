@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
 import { Manifest, Compose } from "../../../src/types";
+import { yamlParse, yamlDump } from "../../../src/utils/yaml";
 
 import {
   parseUnsafeCompose,
@@ -26,7 +26,7 @@ describe("Compose specs, against real DNPs", () => {
     describe(`${dirName}`, () => {
       function loadFile<T>(fileName: string): T {
         const filePath = path.join(specsDir, dirName, fileName);
-        return yaml.safeLoad(fs.readFileSync(filePath, "utf8"));
+        return yamlParse(fs.readFileSync(filePath, "utf8"));
       }
       function loadFileIfExists<T>(fileName: string): T | undefined {
         try {
@@ -50,7 +50,7 @@ describe("Compose specs, against real DNPs", () => {
           console.log(JSON.stringify(safeCompose, null, 2));
           fs.writeFileSync(
             path.join(specsDir, dirName, paths.composeParsed),
-            yaml.safeDump(safeCompose)
+            yamlDump(safeCompose)
           );
         } else {
           expect(safeCompose).to.deep.equal(composeParsed);

@@ -2,13 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
 import {
   SetupSchema,
   SetupUiJson,
   SetupTarget,
   SetupWizardField
 } from "../../../src/types";
+import { yamlParse, yamlDump } from "../../../src/utils/yaml";
 
 import { setupWizard1To2 } from "../../../src/modules/setupWizard/setupWizard1To2";
 import { isNotFoundError } from "../../../src/utils/node";
@@ -29,7 +29,7 @@ describe("Setup wizard", () => {
       it(`${dirName}`, () => {
         function loadFile<T>(fileName: string): T {
           const filePath = path.join(specsDir, dirName, fileName);
-          return yaml.safeLoad(fs.readFileSync(filePath, "utf8"));
+          return yamlParse(fs.readFileSync(filePath, "utf8"));
         }
 
         const setupTarget = loadFile<SetupTarget>(paths.setupTarget);
@@ -54,7 +54,7 @@ describe("Setup wizard", () => {
           console.log(JSON.stringify(computedSetupWizard, null, 2));
           fs.writeFileSync(
             path.join(specsDir, dirName, paths.setupWizard),
-            yaml.safeDump(computedSetupWizard)
+            yamlDump(computedSetupWizard)
           );
         } else {
           expect(computedSetupWizard).to.deep.equal(setupWizard);

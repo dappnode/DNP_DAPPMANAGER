@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import yaml from "js-yaml";
 import { createTestDir, cleanTestDir } from "../../testUtils";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
+import { yamlDump } from "../../../src/utils/yaml";
 
 import { migrateLegacyEnvFile } from "../../../src/modules/legacy/migrateLegacyEnvFiles";
-import { parseEnvironment } from "../../../src/modules/compose";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {
@@ -23,7 +22,7 @@ describe("migrateLegacyEnvFiles", () => {
       version: "3.4",
       services: { [name]: { image: `${name}:0.2.0` } }
     };
-    const composeString = yaml.safeDump(compose);
+    const composeString = yamlDump(compose);
     validate.path(envFilePath);
     fs.writeFileSync(envFilePath, "");
     fs.writeFileSync(composePath, composeString);
@@ -46,7 +45,7 @@ describe("migrateLegacyEnvFiles", () => {
     const envFilePath = getPath.envFile(name, isCore);
     const composePath = getPath.dockerCompose(name, isCore);
     const envsString = "NAME=VALUE";
-    const composeString = yaml.safeDump({
+    const composeString = yamlDump({
       version: "3.4",
       services: {
         [name]: {
@@ -66,7 +65,7 @@ describe("migrateLegacyEnvFiles", () => {
       ".env file should not exist"
     );
     expect(fs.readFileSync(composePath, "utf8")).to.equal(
-      yaml.safeDump({
+      yamlDump({
         version: "3.4",
         services: {
           [name]: {
