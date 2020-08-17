@@ -15,9 +15,7 @@ jobs:
           docker version
           docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
           cat /proc/sys/fs/binfmt_misc/qemu-aarch64
-          docker buildx create --name dappnode-arm-builder
-          docker buildx use dappnode-arm-builder
-          docker buildx inspect --bootstrap
+          docker buildx create --name dappnode-arm-builder --use
           docker buildx bake --progress plain --load --set=*.platform=linux/arm64
           docker images
           docker run --rm admin:0.2.34
