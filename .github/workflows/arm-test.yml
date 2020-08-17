@@ -13,7 +13,7 @@ jobs:
         run: |
           export DOCKER_CLI_EXPERIMENTAL=enabled
           docker version
-          docker run --rm --privileged docker/binfmt:latest
+          docker run --rm --privileged docker/binfmt
           cat /proc/sys/fs/binfmt_misc/qemu-aarch64
           docker buildx create --name dappnode-arm-builder
           docker buildx use dappnode-arm-builder
