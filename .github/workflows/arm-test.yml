@@ -17,6 +17,6 @@ jobs:
           docker buildx create --name dappnode-arm-builder
           docker buildx use dappnode-arm-builder
           docker buildx inspect --bootstrap
-          docker buildx build --platform linux/arm64 -t dappmanager.dnp.dappnode.eth:arm64-test --load .
+          docker buildx build --progress plain --platform linux/arm64 -t dappmanager.dnp.dappnode.eth:arm64-test --load .
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
