@@ -17,6 +17,7 @@
     "pre-commit": "lerna run pre-commit --stream"
   },
   "devDependencies": {
-    "lerna": "^3.22.1"
+    "lerna": "^3.22.1",
+    "patch-package": "^6.2.1"
   }
 }

@@ -16,7 +16,7 @@ COPY packages/admin-ui/package.json \
 COPY packages/dappmanager/package.json \ 
   packages/dappmanager/yarn.lock \
   packages/dappmanager/
-RUN yarn bootstrap --verbose
+RUN yarn bootstrap --production --verbose
 
 # Build UI
 WORKDIR /app/packages/admin-ui/
