@@ -57,7 +57,7 @@
     "start": "react-scripts start",
     "generate": "cd ../.. && node packages/admin-ui/src/common/validation/generateSchemas.js packages/admin-ui/tsconfig.json packages/admin-ui/src/common/schemas/",
     "prebuild": "npm run generate",
-    "build": "uname -m | grep 'arm' && react-scripts --max_old_space_size=3800 build || react-scripts build",
+    "build": "react-scripts build",
     "gzip": "gzip -r -k build",
     "test": "TEST=true react-scripts test --env=jsdom --watchAll=false",
     "test:watch": "TEST=true react-scripts test --env=jsdom",
