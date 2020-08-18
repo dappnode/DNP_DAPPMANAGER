@@ -17,7 +17,9 @@ import {
   Manifest,
   DistributedFile,
   ManifestWithImage,
-  Compose
+  Compose,
+  IpfsFileResult,
+  NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
 
@@ -26,7 +28,6 @@ const source: "ipfs" = "ipfs";
 const releaseFilesRegex = {
   manifest: /dappnode_package.*\.json$/,
   image: /\.tar\.xz$/,
-  imageArm: /-arm64\.tar\.xz$/,
   compose: /compose.*\.yml$/,
   avatar: /avatar.*\.png$/,
   setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
@@ -36,11 +37,6 @@ const releaseFilesRegex = {
   disclaimer: /disclaimer\.md$/i,
   gettingStarted: /getting.*started\.md$/i
 };
-
-const releaseFileIs = mapValues(
-  releaseFilesRegex,
-  fileRegex => ({ name }: { name: string }): boolean => fileRegex.test(name)
-);
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -63,7 +59,7 @@ export async function downloadReleaseIpfs(
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   try {
-    const manifest = await downloadManifest(hash);
+    const manifest = await downloadManifest({ hash });
     // Make sure manifest.image.hash exists. Otherwise, will throw
     const manifestWithImage = validateManifestWithImage(
       manifest as ManifestWithImage
@@ -79,21 +75,13 @@ export async function downloadReleaseIpfs(
   } catch (e) {
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
-      const manifestEntry = files.find(releaseFileIs.manifest);
-      const imageEntries = files.filter(releaseFileIs.image);
-      const composeEntry = files.find(releaseFileIs.compose);
-      const avatarEntry = files.find(releaseFileIs.avatar);
-      const setupWizardEntry = files.find(releaseFileIs.setupWizard);
-      const setupSchemaEntry = files.find(releaseFileIs.setupSchema);
-      const setupTargetEntry = files.find(releaseFileIs.setupTarget);
-      const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
-      const disclaimerEntry = files.find(releaseFileIs.disclaimer);
-      const getStartedEntry = files.find(releaseFileIs.gettingStarted);
+      const entries = mapValues(releaseFilesRegex, regex =>
+        findOne(files, regex)
+      );
 
-      if (!manifestEntry) throw Error("Release must contain a manifest");
-      if (!composeEntry) throw Error("Release must contain a docker compose");
-      if (imageEntries.length === 0)
-        throw Error("Release must contain an image");
+      if (!entries.manifest) throw Error("Release must contain a manifest");
+      if (!entries.compose)
+        throw Error("Release must contain a docker compose");
 
       const [
         manifest,
@@ -105,15 +93,18 @@ export async function downloadReleaseIpfs(
         disclaimer,
         gettingStarted
       ] = await Promise.all([
-        downloadManifest(manifestEntry.hash),
-        downloadCompose(composeEntry.hash),
-        setupWizardEntry && downloadSetupWizard(setupWizardEntry.hash),
-        setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
-        setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
-        setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
-        disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash),
-        getStartedEntry && downloadGetStarted(getStartedEntry.hash)
+        downloadManifest(entries.manifest),
+        downloadCompose(entries.compose),
+        entries.setupWizard && downloadSetupWizard(entries.setupWizard),
+        entries.setupSchema && downloadSetupSchema(entries.setupSchema),
+        entries.setupTarget && downloadSetupTarget(entries.setupTarget),
+        entries.setupUiJson && downloadSetupUiJson(entries.setupUiJson),
+        entries.disclaimer && downloadDisclaimer(entries.disclaimer),
+        entries.gettingStarted && downloadGetStarted(entries.gettingStarted)
       ]);
+
+      // Fetch image by arch, may require an extra call to IPFS
+      const imageEntry = await getImageByArch(files, os.arch() as NodeArch);
 
       // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
       if (setupWizard) manifest.setupWizard = setupWizard;
@@ -123,18 +114,10 @@ export async function downloadReleaseIpfs(
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
 
-      const architecture = os.arch().includes("arm") ? "arm64" : "x64";
-      const imageByArch = {
-        arm64: imageEntries.find(file => releaseFileIs.imageArm(file)),
-        x64: imageEntries.find(file => !releaseFileIs.imageArm(file))
-      };
-      const imageEntry = imageByArch[architecture];
-      if (!imageEntry) throw new NoImageForArchError(architecture);
-
       return {
-        manifestFile: getFileFromEntry(manifestEntry),
+        manifestFile: getFileFromEntry(entries.manifest),
         imageFile: getFileFromEntry(imageEntry),
-        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : undefined,
+        avatarFile: entries.avatar && getFileFromEntry(entries.avatar),
         manifest,
         composeUnsafe
       };
@@ -158,4 +141,37 @@ function getFileFromEntry({
   size: number;
 }): DistributedFile {
   return { hash, size, source };
+}
+
+function findOne(
+  files: IpfsFileResult[],
+  fileRegex: RegExp
+): IpfsFileResult | undefined {
+  const matches = files.filter(file => fileRegex.test(file.name));
+  if (matches.length > 1)
+    throw Error(`Multiple possible entries found for ${fileRegex}`);
+  return matches[0];
+}
+
+async function getImageByArch(
+  files: IpfsFileResult[],
+  arch: NodeArch
+): Promise<IpfsFileResult> {
+  switch (arch) {
+    case "arm":
+    case "arm64": {
+      const archDir = findOne(files, /arm64/);
+      if (!archDir) throw new NoImageForArchError(arch);
+      const archFiles = await ipfs.ls(archDir);
+      const image = findOne(archFiles, releaseFilesRegex.image);
+      if (!image) throw new NoImageForArchError(arch);
+      return image;
+    }
+
+    default: {
+      const image = findOne(files, releaseFilesRegex.image);
+      if (!image) throw Error(`No image found for default arch ${arch}`);
+      return image;
+    }
+  }
 }

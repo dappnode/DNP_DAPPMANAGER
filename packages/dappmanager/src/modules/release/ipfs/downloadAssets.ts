@@ -69,12 +69,15 @@ function downloadAssetFactory<T>({
   validate: (data: T) => T;
   maxLength?: number;
 }) {
-  async function downloadAsset(hash: string): Promise<T> {
+  async function downloadAsset({ hash }: { hash: string }): Promise<T> {
     const content = await ipfs.catString({ hash, maxLength });
     const data: T = parse(content);
     return validate(data);
   }
-  return memoize(downloadAsset, { promise: true });
+  return memoize(downloadAsset, {
+    promise: true,
+    normalizer: args => args[0].hash
+  });
 }
 
 /**
