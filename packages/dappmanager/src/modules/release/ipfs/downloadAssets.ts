@@ -1,10 +1,10 @@
 import * as ipfs from "../../ipfs";
-import yaml from "js-yaml";
 import memoize from "memoizee";
 import { Manifest, Compose, SetupTarget, SetupWizard } from "../../../types";
 import { SetupSchema, SetupUiJson } from "../../../types";
 import { validateManifestBasic } from "../../manifest";
 import { validateCompose } from "../../compose";
+import { yamlParse } from "../../../utils/yaml";
 
 export const downloadManifest = downloadAssetFactory<Manifest>({
   parse: jsonParse,
@@ -13,13 +13,13 @@ export const downloadManifest = downloadAssetFactory<Manifest>({
 });
 
 export const downloadCompose = downloadAssetFactory<Compose>({
-  parse: yaml.safeLoad,
+  parse: yamlParse,
   validate: validateCompose,
   maxLength: 10e3 // Limit size to ~10KB
 });
 
 export const downloadSetupWizard = downloadAssetFactory<SetupWizard>({
-  parse: yaml.safeLoad,
+  parse: yamlParse,
   validate: setupWizard => setupWizard,
   maxLength: 100e3 // Limit size to ~100KB
 });
@@ -69,12 +69,15 @@ function downloadAssetFactory<T>({
   validate: (data: T) => T;
   maxLength?: number;
 }) {
-  async function downloadAsset(hash: string): Promise<T> {
+  async function downloadAsset({ hash }: { hash: string }): Promise<T> {
     const content = await ipfs.catString({ hash, maxLength });
     const data: T = parse(content);
     return validate(data);
   }
-  return memoize(downloadAsset, { promise: true });
+  return memoize(downloadAsset, {
+    promise: true,
+    normalizer: args => args[0].hash
+  });
 }
 
 /**

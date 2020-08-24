@@ -1,6 +1,5 @@
 import path from "path";
 import fs from "fs";
-import yaml from "js-yaml";
 import { isEqual } from "lodash";
 import { testDir, cleanRepos } from "./testUtils";
 import shell from "../src/utils/shell";
@@ -17,6 +16,7 @@ import {
   Compose,
   SetupWizard
 } from "../src/types";
+import { yamlDump } from "../src/utils/yaml";
 
 /**
  * Generate mock releases in the different formats,
@@ -95,7 +95,7 @@ export async function uploadDirectoryRelease({
   }
 
   writeJson("dappnode_package.json", manifest); // Manifest
-  writeAsset("docker-compose.yml", yaml.safeDump(compose)); // Compose
+  writeAsset("docker-compose.yml", yamlDump(compose)); // Compose
   // const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
   await saveNewImageToDisk(manifest, releaseDir); // Image
   await shell(`cp ${mockDnpDir}/*.png ${releaseDir}`); // Avatar

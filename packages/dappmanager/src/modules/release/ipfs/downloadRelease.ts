@@ -1,3 +1,4 @@
+import os from "os";
 import { mapValues } from "lodash";
 import * as ipfs from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
@@ -16,28 +17,14 @@ import {
   Manifest,
   DistributedFile,
   ManifestWithImage,
-  Compose
+  Compose,
+  IpfsFileResult,
+  NodeArch
 } from "../../../types";
+import { NoImageForArchError } from "../errors";
+import { releaseFilesRegex, getImagePath, getLegacyImagePath } from "../paths";
 
 const source: "ipfs" = "ipfs";
-
-const releaseFilesRegex = {
-  manifest: /dappnode_package.*\.json$/,
-  image: /\.tar\.xz$/,
-  compose: /compose.*\.yml$/,
-  avatar: /avatar.*\.png$/,
-  setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
-  setupSchema: /setup\..*\.json$/,
-  setupTarget: /setup-target\..*json$/,
-  setupUiJson: /setup-ui\..*json$/,
-  disclaimer: /disclaimer\.md$/i,
-  gettingStarted: /getting.*started\.md$/i
-};
-
-const releaseFileIs = mapValues(
-  releaseFilesRegex,
-  fileRegex => ({ name }: { name: string }): boolean => fileRegex.test(name)
-);
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -60,7 +47,7 @@ export async function downloadReleaseIpfs(
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
   try {
-    const manifest = await downloadManifest(hash);
+    const manifest = await downloadManifest({ hash });
     // Make sure manifest.image.hash exists. Otherwise, will throw
     const manifestWithImage = validateManifestWithImage(
       manifest as ManifestWithImage
@@ -76,20 +63,13 @@ export async function downloadReleaseIpfs(
   } catch (e) {
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
-      const manifestEntry = files.find(releaseFileIs.manifest);
-      const imageEntry = files.find(releaseFileIs.image);
-      const composeEntry = files.find(releaseFileIs.compose);
-      const avatarEntry = files.find(releaseFileIs.avatar);
-      const setupWizardEntry = files.find(releaseFileIs.setupWizard);
-      const setupSchemaEntry = files.find(releaseFileIs.setupSchema);
-      const setupTargetEntry = files.find(releaseFileIs.setupTarget);
-      const setupUiJsonEntry = files.find(releaseFileIs.setupUiJson);
-      const disclaimerEntry = files.find(releaseFileIs.disclaimer);
-      const getStartedEntry = files.find(releaseFileIs.gettingStarted);
+      const entries = mapValues(releaseFilesRegex, regex =>
+        findOne(files, regex)
+      );
 
-      if (!manifestEntry) throw Error("Release must contain a manifest");
-      if (!imageEntry) throw Error("Release must contain an image");
-      if (!composeEntry) throw Error("Release must contain a docker compose");
+      if (!entries.manifest) throw Error("Release must contain a manifest");
+      if (!entries.compose)
+        throw Error("Release must contain a docker compose");
 
       const [
         manifest,
@@ -101,15 +81,20 @@ export async function downloadReleaseIpfs(
         disclaimer,
         gettingStarted
       ] = await Promise.all([
-        downloadManifest(manifestEntry.hash),
-        downloadCompose(composeEntry.hash),
-        setupWizardEntry && downloadSetupWizard(setupWizardEntry.hash),
-        setupSchemaEntry && downloadSetupSchema(setupSchemaEntry.hash),
-        setupTargetEntry && downloadSetupTarget(setupTargetEntry.hash),
-        setupUiJsonEntry && downloadSetupUiJson(setupUiJsonEntry.hash),
-        disclaimerEntry && downloadDisclaimer(disclaimerEntry.hash),
-        getStartedEntry && downloadGetStarted(getStartedEntry.hash)
+        downloadManifest(entries.manifest),
+        downloadCompose(entries.compose),
+        entries.setupWizard && downloadSetupWizard(entries.setupWizard),
+        entries.setupSchema && downloadSetupSchema(entries.setupSchema),
+        entries.setupTarget && downloadSetupTarget(entries.setupTarget),
+        entries.setupUiJson && downloadSetupUiJson(entries.setupUiJson),
+        entries.disclaimer && downloadDisclaimer(entries.disclaimer),
+        entries.gettingStarted && downloadGetStarted(entries.gettingStarted)
       ]);
+
+      // Fetch image by arch, may require an extra call to IPFS
+      const arch = os.arch() as NodeArch;
+      const imageEntry = getImageByArch(manifest, files, arch);
+      if (!imageEntry) throw new NoImageForArchError(arch);
 
       // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
       if (setupWizard) manifest.setupWizard = setupWizard;
@@ -120,9 +105,9 @@ export async function downloadReleaseIpfs(
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
 
       return {
-        manifestFile: getFileFromEntry(manifestEntry),
+        manifestFile: getFileFromEntry(entries.manifest),
         imageFile: getFileFromEntry(imageEntry),
-        avatarFile: avatarEntry ? getFileFromEntry(avatarEntry) : undefined,
+        avatarFile: entries.avatar && getFileFromEntry(entries.avatar),
         manifest,
         composeUnsafe
       };
@@ -148,4 +133,36 @@ function getFileFromEntry({
   return { hash, size, source };
 }
 
-// File finder helpers
+function findOne(
+  files: IpfsFileResult[],
+  fileRegex: RegExp
+): IpfsFileResult | undefined {
+  const matches = files.filter(file => fileRegex.test(file.name));
+  if (matches.length > 1)
+    throw Error(`Multiple possible entries found for ${fileRegex}`);
+  return matches[0];
+}
+
+function getImageByArch(
+  { name, version }: { name: string; version: string },
+  files: IpfsFileResult[],
+  arch: NodeArch
+): IpfsFileResult | undefined {
+  switch (arch) {
+    case "arm":
+    case "arm64":
+      return files.find(
+        file => file.name === getImagePath(name, version, "arm64")
+      );
+
+    default:
+      return (
+        files.find(
+          file => file.name === getImagePath(name, version, "amd64")
+        ) ||
+        // New DAppNodes should load old single arch packages,
+        // and consider their single image as amd64
+        files.find(file => file.name === getLegacyImagePath(name, version))
+      );
+  }
+}

@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 networks:
   network:
     driver: bridge
@@ -8,27 +8,28 @@ networks:
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
-  dappmanager.dnp.dappnode.eth:
-    build:
-      context: .
-      dockerfile: ./build/Dockerfile
-    image: 'dappmanager.dnp.dappnode.eth:0.2.34'
+  dappmanager:
+    build: .
+    image: "dappmanager:0.2.34"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     volumes:
-      - '/run/dbus/system_bus_socket:/run/dbus/system_bus_socket'
-      - 'dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/'
-      - '/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-      - '/etc/hostname:/etc/dappnodename:ro'
+      - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
+      - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
+      - "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/etc/hostname:/etc/dappnodename:ro"
     environment:
-      - 'LOG_LEVEL=info'
-      - 'WEB3_HOST='
-      - 'IPFS_HOST='
-      - 'REMOTE_MAINNET_RPC_URL='
+      - "LOG_LEVEL=info"
+      - "WEB3_HOST="
+      - "IPFS_HOST="
+      - "REMOTE_MAINNET_RPC_URL="
     dns: 172.33.1.2
     networks:
       network:
         ipv4_address: 172.33.1.7
     logging:
       driver: journald
+  admin:
+    build: mock-admin-build
+    image: "admin:0.2.34"

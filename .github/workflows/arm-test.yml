@@ -1,0 +1,21 @@
+name: "Main"
+on:
+  push:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-16.04
+    name: Build test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Do an arm64 build
+        run: |
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          docker version
+          docker run --rm --privileged docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+          cat /proc/sys/fs/binfmt_misc/qemu-aarch64
+          docker buildx create --name dappnode-arm-builder --use
+          docker buildx bake --progress plain --load --set=*.platform=linux/arm64
+          docker images
+          docker run --rm admin:0.2.34

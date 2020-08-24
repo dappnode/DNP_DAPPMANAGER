@@ -1,6 +1,6 @@
 # Common base so it's cached
 #####################################
-FROM node:10.15.3-alpine as build-monorepo
+FROM amd64/node:10.15.3-alpine as build-monorepo
 
 WORKDIR /app
 
@@ -9,14 +9,15 @@ RUN apk add --no-cache python build-base bash
 # Copy and install deps first to cache
 COPY package.json yarn.lock lerna.json ./
 COPY patches patches/
-RUN yarn --frozen-lockfile --non-interactive
+# Install lerna first
+RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
 COPY packages/admin-ui/package.json \ 
   packages/admin-ui/yarn.lock \ 
   packages/admin-ui/
 COPY packages/dappmanager/package.json \ 
   packages/dappmanager/yarn.lock \
   packages/dappmanager/
-RUN yarn bootstrap
+RUN yarn bootstrap --production
 
 # Build UI
 WORKDIR /app/packages/admin-ui/
@@ -34,7 +35,7 @@ RUN yarn build
 
 # Compute git data
 #####################################
-FROM node:10.15.3-alpine as git-data
+FROM amd64/node:10.15.3-alpine as git-data
 
 WORKDIR /usr/src/app
 
