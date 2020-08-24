@@ -1,4 +1,4 @@
-import { Architecture, NodeArch } from "../../types";
+import { Architecture } from "../../types";
 
 export const releaseFilesRegex = {
   manifest: /dappnode_package.*\.json$/,
@@ -22,18 +22,3 @@ export const getImagePath = (
 ): string => `${name}_${version}_${getArchTag(arch)}.txz`;
 export const getLegacyImagePath = (name: string, version: string): string =>
   `${name}_${version}.tar.xz`;
-
-/**
- * Utility to coerce NodeJS arch reported names to a common format
- * @param arch
- */
-export function parseNodeArch(arch: NodeArch): Architecture {
-  switch (arch) {
-    case "arm":
-    case "arm64":
-      return "arm64";
-
-    default:
-      return "amd64";
-  }
-}

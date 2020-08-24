@@ -22,7 +22,7 @@ import {
   NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
-import { releaseFilesRegex, getImagePath, parseNodeArch } from "../paths";
+import { releaseFilesRegex, getImagePath, getLegacyImagePath } from "../paths";
 
 const source: "ipfs" = "ipfs";
 
@@ -93,11 +93,7 @@ export async function downloadReleaseIpfs(
 
       // Fetch image by arch, may require an extra call to IPFS
       const arch = os.arch() as NodeArch;
-      const imageEntry = files.find(
-        file =>
-          file.name ===
-          getImagePath(manifest.name, manifest.version, parseNodeArch(arch))
-      );
+      const imageEntry = getImageByArch(manifest, files, arch);
       if (!imageEntry) throw new NoImageForArchError(arch);
 
       // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
@@ -145,4 +141,28 @@ function findOne(
   if (matches.length > 1)
     throw Error(`Multiple possible entries found for ${fileRegex}`);
   return matches[0];
+}
+
+function getImageByArch(
+  { name, version }: { name: string; version: string },
+  files: IpfsFileResult[],
+  arch: NodeArch
+): IpfsFileResult | undefined {
+  switch (arch) {
+    case "arm":
+    case "arm64":
+      return files.find(
+        file => file.name === getImagePath(name, version, "arm64")
+      );
+
+    default:
+      return (
+        files.find(
+          file => file.name === getImagePath(name, version, "amd64")
+        ) ||
+        // New DAppNodes should load old single arch packages,
+        // and consider their single image as amd64
+        files.find(file => file.name === getLegacyImagePath(name, version))
+      );
+  }
 }
