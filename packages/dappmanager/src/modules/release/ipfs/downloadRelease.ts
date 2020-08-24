@@ -22,21 +22,9 @@ import {
   NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
+import { releaseFilesRegex, getImagePath, parseNodeArch } from "../paths";
 
 const source: "ipfs" = "ipfs";
-
-const releaseFilesRegex = {
-  manifest: /dappnode_package.*\.json$/,
-  image: /\.tar\.xz$/,
-  compose: /compose.*\.yml$/,
-  avatar: /avatar.*\.png$/,
-  setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
-  setupSchema: /setup\..*\.json$/,
-  setupTarget: /setup-target\..*json$/,
-  setupUiJson: /setup-ui\..*json$/,
-  disclaimer: /disclaimer\.md$/i,
-  gettingStarted: /getting.*started\.md$/i
-};
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -104,7 +92,13 @@ export async function downloadReleaseIpfs(
       ]);
 
       // Fetch image by arch, may require an extra call to IPFS
-      const imageEntry = await getImageByArch(files, os.arch() as NodeArch);
+      const arch = os.arch() as NodeArch;
+      const imageEntry = files.find(
+        file =>
+          file.name ===
+          getImagePath(manifest.name, manifest.version, parseNodeArch(arch))
+      );
+      if (!imageEntry) throw new NoImageForArchError(arch);
 
       // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
       if (setupWizard) manifest.setupWizard = setupWizard;
@@ -151,27 +145,4 @@ function findOne(
   if (matches.length > 1)
     throw Error(`Multiple possible entries found for ${fileRegex}`);
   return matches[0];
-}
-
-async function getImageByArch(
-  files: IpfsFileResult[],
-  arch: NodeArch
-): Promise<IpfsFileResult> {
-  switch (arch) {
-    case "arm":
-    case "arm64": {
-      const archDir = findOne(files, /arm64/);
-      if (!archDir) throw new NoImageForArchError(arch);
-      const archFiles = await ipfs.ls(archDir);
-      const image = findOne(archFiles, releaseFilesRegex.image);
-      if (!image) throw new NoImageForArchError(arch);
-      return image;
-    }
-
-    default: {
-      const image = findOne(files, releaseFilesRegex.image);
-      if (!image) throw Error(`No image found for default arch ${arch}`);
-      return image;
-    }
-  }
 }
