@@ -72,12 +72,12 @@ export async function verifyDockerImage({
   name: string;
   version: string;
 }): Promise<void> {
-  const images = await dockerImageManifest(imagePath);
-  if (images.length !== 1)
-    throw Error("image tarball must contain strictly one image");
-  const imageTag = images[0].RepoTags[0];
   const expectedTag = `${name}:${version}`;
-  if (imageTag !== expectedTag) {
-    throw Error(`Wrong image tag ${imageTag}`);
+  const images = await dockerImageManifest(imagePath);
+  for (const image of images) {
+    for (const repoTag of image.RepoTags) {
+      if (!repoTag.endsWith(expectedTag))
+        throw Error(`Invalid image tag '${repoTag}' expected '${expectedTag}'`);
+    }
   }
 }
