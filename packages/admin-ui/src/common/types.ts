@@ -94,11 +94,11 @@ export interface SetupWizardField {
 }
 
 export type UserSettingTarget =
-  | { type: "environment"; name: string }
-  | { type: "portMapping"; containerPort: string }
+  | { type: "environment"; name: string; service?: string }
+  | { type: "portMapping"; containerPort: string; service?: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
   | { type: "allNamedVolumesMountpoint" }
-  | { type: "fileUpload"; path: string };
+  | { type: "fileUpload"; path: string; service?: string };
 
 export interface SetupWizardAllDnps {
   [dnpName: string]: SetupWizard;
