@@ -163,14 +163,30 @@ export interface SetupUiJson {
  * ```
  */
 export interface UserSettings {
-  environment?: { [envName: string]: string }; // Env value
-  portMappings?: { [containerPortAndType: string]: string }; // Host port
-  namedVolumeMountpoints?: { [volumeName: string]: string }; // Host absolute path to mountpoint
+  environment?: {
+    [serviceName: string]: {
+      [envName: string]: string; // Env value
+    };
+  };
+  portMappings?: {
+    [serviceName: string]: {
+      [containerPortAndType: string]: string; // Host port
+    };
+  };
+  namedVolumeMountpoints?: {
+    [volumeName: string]: string; // Host absolute path to mountpoint
+  };
   allNamedVolumeMountpoint?: string; // mountpoint
-  fileUploads?: { [containerPath: string]: string }; // dataURL
+  fileUploads?: {
+    [serviceName: string]: {
+      [containerPath: string]: string; // dataURL
+    };
+  };
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
-  legacyBindVolumes?: { [volumeName: string]: string }; // Host vol name to host bind absolute path
+  legacyBindVolumes?: {
+    [volumeName: string]: string; // Host vol name to host bind absolute path
+  };
 }
 
 export interface UserSettingsAllDnps {

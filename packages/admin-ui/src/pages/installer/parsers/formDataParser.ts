@@ -53,7 +53,7 @@ export function formDataToUserSettings(
             if (target.name)
               userSettings.environment = deepmerge(
                 userSettings.environment || {},
-                { [target.name]: envValue }
+                { [target.service || dnpName]: { [target.name]: envValue } }
               );
             break;
 
@@ -62,7 +62,11 @@ export function formDataToUserSettings(
             if (target.containerPort)
               userSettings.portMappings = deepmerge(
                 userSettings.portMappings || {},
-                { [target.containerPort]: hostPort }
+                {
+                  [target.service || dnpName]: {
+                    [target.containerPort]: hostPort
+                  }
+                }
               );
             break;
 
@@ -87,7 +91,7 @@ export function formDataToUserSettings(
             if (target.path)
               userSettings.fileUploads = deepmerge(
                 userSettings.fileUploads || {},
-                { [target.path]: fileDataUrl }
+                { [target.service || dnpName]: { [target.path]: fileDataUrl } }
               );
             break;
         }
@@ -125,21 +129,23 @@ export function userSettingsToFormData(
       if (target && target.type) {
         switch (target.type) {
           case "environment":
-            const { name } = target;
-            if (name && name in environment)
-              formDataDnp[propId] = environment[name];
+            if (target.name && target.name in environment)
+              formDataDnp[propId] =
+                environment[target.service || dnpName][target.name];
             break;
 
           case "portMapping":
-            const { containerPort } = target;
-            if (containerPort && containerPort in portMappings)
-              formDataDnp[propId] = portMappings[containerPort];
+            if (target.containerPort && target.containerPort in portMappings)
+              formDataDnp[propId] =
+                portMappings[target.service || dnpName][target.containerPort];
             break;
 
           case "namedVolumeMountpoint": {
-            const { volumeName } = target;
-            if (volumeName && volumeName in namedVolumeMountpoints)
-              formDataDnp[propId] = namedVolumeMountpoints[volumeName];
+            if (
+              target.volumeName &&
+              target.volumeName in namedVolumeMountpoints
+            )
+              formDataDnp[propId] = namedVolumeMountpoints[target.volumeName];
             break;
           }
 
@@ -149,9 +155,9 @@ export function userSettingsToFormData(
           }
 
           case "fileUpload":
-            const { path } = target;
-            if (path && path in fileUploads)
-              formDataDnp[propId] = fileUploads[path];
+            if (target.path && target.path in fileUploads)
+              formDataDnp[propId] =
+                fileUploads[target.service || dnpName][target.path];
             break;
         }
       }
