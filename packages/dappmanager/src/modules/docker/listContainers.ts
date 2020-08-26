@@ -1,8 +1,10 @@
-import { dockerList } from "./dockerApi";
 import { ContainerInfo } from "dockerode";
+import { pick } from "lodash";
+import { dockerList } from "./dockerApi";
 import params from "../../params";
 import {
   PackageContainer,
+  InstalledPackageData,
   VolumeMapping,
   ContainerState,
   PortProtocol,
@@ -20,6 +22,48 @@ const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
 const networkName = params.DNP_NETWORK_EXTERNAL_NAME;
 const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
+
+/**
+ * Return containers grouped by parent package. Necessary for multi-service packages
+ */
+export async function listPackages(): Promise<InstalledPackageData[]> {
+  const containers = await listContainers();
+  const dnps = new Map<string, InstalledPackageData>();
+  for (const container of containers) {
+    dnps.set(container.dnpName, {
+      ...pick(container, [
+        "dnpName",
+        "instanceName",
+        "version",
+        "isDnp",
+        "isCore",
+        "defaultEnvironment",
+        "defaultPorts",
+        "defaultVolumes",
+        "dependencies",
+        "avatarUrl",
+        "origin",
+        "chain",
+        "domainAlias",
+        "canBeFullnode"
+      ]),
+      containers: [
+        ...(dnps.get(container.dnpName)?.containers || []),
+        container
+      ]
+    });
+  }
+  return Array.from(dnps.values());
+}
+
+export async function listPackage(
+  dnpName: string
+): Promise<InstalledPackageData> {
+  const dnps = await listPackages();
+  const dnp = dnps.find(d => d.dnpName === dnpName);
+  if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
+  return dnp;
+}
 
 /**
  * Returns the list of containers
@@ -81,7 +125,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     containerName,
     serviceName:
       labels.serviceName || container.Labels["com.docker.compose.service"],
-    instanceName: labels.instanceName,
+    instanceName: labels.instanceName || "",
     dnpName,
     version: labels.version || (container.Image || "").split(":")[1] || "0.0.0",
     isDnp:
@@ -110,7 +154,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     ).map(
       (port): PortMapping => ({
         ...port,
-        deletable: isPortMappingDeletable(port, defaultPorts)
+        deletable: isPortMappingDeletable(port, defaultPorts || [])
       })
     ),
     volumes: container.Mounts.map(
@@ -125,8 +169,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     running: (container.State as ContainerState) === "running",
 
     // Additional package metadata to avoid having to read the manifest
-    dependencies: labels.dependencies,
-    avatarUrl: multiaddressToGatewayUrl(labels.avatar),
+    dependencies: labels.dependencies || {},
+    avatarUrl: labels.avatar ? multiaddressToGatewayUrl(labels.avatar) : "",
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),

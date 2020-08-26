@@ -6,12 +6,16 @@ import { restartPackage } from "../modules/docker/restartPackage";
  *
  * @param {string} id DNP .eth name
  */
-export async function packageRestart({ id }: { id: string }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+export async function packageRestart({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<void> {
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  await restartPackage(id);
+  await restartPackage({ dnpName, forceRecreate: true });
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: [id] });
+  eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 }

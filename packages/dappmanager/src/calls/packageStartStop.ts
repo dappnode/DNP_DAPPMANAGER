@@ -1,32 +1,25 @@
 import { listContainer } from "../modules/docker/listContainers";
-import * as getPath from "../utils/getPath";
-import {
-  dockerComposeStart,
-  dockerComposeStop
-} from "../modules/docker/dockerCommands";
+import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 
 /**
  * Stops or starts after fetching its status
  *
- * @param {string} id DNP .eth name
- * @param {number} timeout seconds to stop the package
+ * @param containerName Name of a docker container
+ * @param timeout seconds to stop the package
  */
 export async function packageStartStop({
-  id,
+  containerName,
   timeout = 10
 }: {
-  id: string;
+  containerName: string;
   timeout?: number;
 }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!containerName) throw Error("kwarg containerName must be defined");
 
-  const dockerComposePath = getPath.dockerComposeSmart(id);
-
-  const dnp = await listContainer(id);
-
-  if (dnp.running) await dockerComposeStop(dockerComposePath, { timeout });
-  else await dockerComposeStart(dockerComposePath);
+  const container = await listContainer(containerName);
+  if (container.running) await dockerStop(containerName, { t: timeout });
+  else await dockerStart(containerName);
 
   // Emit packages update
   eventBus.requestPackages.emit();

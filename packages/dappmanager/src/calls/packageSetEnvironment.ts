@@ -1,36 +1,30 @@
-import { PackageEnvs } from "../types";
-import { listContainer } from "../modules/docker/listContainers";
+import { UserSettings } from "../types";
+import { listPackage } from "../modules/docker/listContainers";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import * as eventBus from "../eventBus";
 import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- *
- * @param {string} id DNP .eth name
- * @param {object} envs environment variables
- * envs = {
- *   ENV_NAME: ENV_VALUE
- * }
  */
 export async function packageSetEnvironment({
-  id,
-  envs
+  dnpName,
+  environment
 }: {
-  id: string;
-  envs: PackageEnvs;
+  dnpName: string;
+  environment: Required<UserSettings>["environment"];
 }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
-  if (!envs) throw Error("kwarg envs must be defined");
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
+  if (!environment) throw Error("kwarg environment must be defined");
 
-  const dnp = await listContainer(id);
+  const dnp = await listPackage(dnpName);
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
-  compose.service().mergeEnvs(envs);
+  compose.applyUserSettings({ environment }, { dnpName });
   compose.write();
 
-  await restartPackage(id);
+  await restartPackage({ dnpName, forceRecreate: false });
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: [id] });
+  eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 }

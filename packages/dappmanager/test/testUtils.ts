@@ -51,12 +51,16 @@ export async function cleanRepos(): Promise<void> {
   await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
 }
 
-export async function cleanContainers(...ids: string[]): Promise<void> {
-  for (const id of ids) {
+export async function cleanContainers(
+  ...containerIds: string[]
+): Promise<void> {
+  for (const containerId of containerIds) {
     // Clean containers
-    await shellSafe(`docker rm -f $(docker ps -aq --filter name=${id})`);
+    await shellSafe(
+      `docker rm -f $(docker ps -aq --filter name=${containerId})`
+    );
     // Clean associated volumes
-    const volumePrefix = id;
+    const volumePrefix = containerId;
     await shellSafe(
       `docker volume rm -f $(docker volume ls --filter name=${volumePrefix} -q)`
     );
@@ -230,4 +234,12 @@ export const mockPackageData: InstallPackageData = {
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
   manifestBackupPath: "mock/path/manifest.backup.json"
+};
+
+// For copyFileTo and copyFileFrom
+export const sampleFile = {
+  dataUri:
+    "data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==",
+  filename: "config.json",
+  containerPath: "/usr/src/config.json"
 };

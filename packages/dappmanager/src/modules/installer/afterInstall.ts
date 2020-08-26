@@ -16,7 +16,7 @@ export async function afterInstall(dnpNames: string[]) {
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: dnpNames });
+  eventBus.packagesModified.emit({ dnpNames: dnpNames });
 
   // Flag the packages as NOT installing.
   // Must be called also on Error, otherwise packages can't be re-installed

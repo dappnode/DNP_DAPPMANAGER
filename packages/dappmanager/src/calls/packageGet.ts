@@ -1,5 +1,5 @@
 import { omit } from "lodash";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import { readManifestIfExists } from "../modules/manifest";
 import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";
@@ -13,15 +13,15 @@ import { getDnpsToRemoveAll } from "../modules/docker/restartPackageVolumes";
  * @param show Should be shown on hidden
  */
 export async function packageGet({
-  id
+  dnpName
 }: {
-  id: string;
+  dnpName: string;
 }): Promise<InstalledPackageDetailData> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!dnpName) throw Error("kwarg id must be defined");
 
-  const dnpList = await listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.dnpName === id);
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnpList = await listPackages();
+  const dnp = dnpList.find(d => d.dnpName === dnpName);
+  if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   const volumesData = await getVolumesOwnershipData();
 
   // Metadata for package/:id/controls feedback
@@ -31,13 +31,17 @@ export async function packageGet({
     ...dnp,
 
     areThereVolumesToRemove:
-      dnp.volumes.length > 0 &&
-      dnp.volumes.some(vol => {
-        const owner = volumesData.find(v => v.name === vol.name)?.owner;
-        return !owner || owner === dnp.dnpName;
-      }),
+      dnp.containers.some(container => container.volumes.length > 0) &&
+      dnp.containers.some(container =>
+        container.volumes.some(vol => {
+          const owner = volumesData.find(v => v.name === vol.name)?.owner;
+          return !owner || owner === dnp.dnpName;
+        })
+      ),
     volumeUsersToRemove: dnpsToRemove.filter(name => name !== dnp.dnpName),
-    dependantsOf: dnpList.filter(d => d.dependencies[id]).map(d => d.dnpName),
+    dependantsOf: dnpList
+      .filter(d => d.dependencies[dnpName])
+      .map(d => d.dnpName),
     namedExternalVols: volumesData.filter(
       v => v.owner && v.owner !== dnp.dnpName && v.users.includes(dnp.dnpName)
     )

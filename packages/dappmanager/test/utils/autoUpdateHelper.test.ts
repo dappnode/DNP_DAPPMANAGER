@@ -231,13 +231,13 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   describe("Feedback text for DNPs", () => {
-    const id = "bitcoin.dnp.dappnode.eth";
+    const dnpName = "bitcoin.dnp.dappnode.eth";
     const currentVersion = "0.2.6";
     const nextVersion = "0.2.7";
 
     it("1. Nothing happened yet", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {}
@@ -248,11 +248,11 @@ describe("Util: autoUpdateHelper", () => {
     it("2. DNP is seen", () => {
       const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now(),
             scheduledUpdate: timestamp,
@@ -265,11 +265,11 @@ describe("Util: autoUpdateHelper", () => {
 
     it("3A. DNP is manually updated", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion: nextVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12.3 * 60 * 60 * 1000,
@@ -282,11 +282,11 @@ describe("Util: autoUpdateHelper", () => {
 
     it("3B. DNP is in queue", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12.3 * 60 * 60 * 1000,
@@ -300,10 +300,10 @@ describe("Util: autoUpdateHelper", () => {
     it("3B. DNP is successfully updated", () => {
       const timestamp = Date.now();
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion: nextVersion,
         registry: {
-          [id]: {
+          [dnpName]: {
             [nextVersion]: {
               updated: timestamp,
               successful: true
@@ -311,7 +311,7 @@ describe("Util: autoUpdateHelper", () => {
           }
         },
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12 * 60 * 60 * 1000,
@@ -325,11 +325,11 @@ describe("Util: autoUpdateHelper", () => {
     it("3C. DNP update failed", () => {
       const errorMessage = "Mainnet is still syncing";
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
@@ -342,19 +342,19 @@ describe("Util: autoUpdateHelper", () => {
     });
 
     it("Swarm logic bug for rollback versions", () => {
-      const swarmId = "swarm.dnp.dappnode.eth";
+      const swarmDnpName = "swarm.dnp.dappnode.eth";
       const timestamp = Date.now() + 23.3 * 60 * 60 * 1000;
       const feedback = getDnpFeedbackMessage({
-        id: swarmId,
+        dnpName: swarmDnpName,
         currentVersion: "0.2.1",
         registry: {
-          [swarmId]: {
+          [swarmDnpName]: {
             "0.2.1": { updated: 1566058824278, successful: true },
             "0.2.2": { updated: 1566140083139, successful: true }
           }
         },
         pending: {
-          [swarmId]: {
+          [swarmDnpName]: {
             version: "0.2.2",
             firstSeen: timestamp - 24 * 60 * 60 * 1000,
             scheduledUpdate: timestamp,
@@ -372,7 +372,6 @@ describe("Util: autoUpdateHelper", () => {
       { dnpName: "vpn", version: "0.2.1" },
       { dnpName: "core", version: "0.2.0" }
     ]);
-    const id = coreDnpName;
 
     it("1. Nothing happened yet", () => {
       const feedback = getCoreFeedbackMessage({
@@ -389,7 +388,7 @@ describe("Util: autoUpdateHelper", () => {
         currentVersionId,
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
               { dnpName: "admin", version: "0.2.1" },
               { dnpName: "core", version: "0.2.1" }
@@ -412,7 +411,7 @@ describe("Util: autoUpdateHelper", () => {
         ]),
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
               { dnpName: "admin", version: "0.2.1" },
               { dnpName: "core", version: "0.2.1" }
@@ -440,7 +439,7 @@ describe("Util: autoUpdateHelper", () => {
       const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {
-          [id]: {
+          [coreDnpName]: {
             [nextVersion]: { updated: timestamp, successful: true }
           }
         },
@@ -455,7 +454,7 @@ describe("Util: autoUpdateHelper", () => {
         currentVersionId,
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
               { dnpName: "admin", version: "0.2.1" },
               { dnpName: "core", version: "0.2.1" }
@@ -562,7 +561,6 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("DAPPMANAGER update patch measures", () => {
     it("Should clear complete core updates if update was completed", () => {
-      const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
         { dnpName: "admin", version: "0.2.1" },
@@ -578,7 +576,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -597,7 +595,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getRegistry()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             [nextVersionId]: { updated: timestamp, successful: true }
           }
         },
@@ -606,7 +604,6 @@ describe("Util: autoUpdateHelper", () => {
     });
 
     it("Should NOT clear complete core updates if update was NOT completed", () => {
-      const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
         { dnpName: "admin", version: "0.2.0" },
@@ -622,7 +619,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -636,7 +633,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,

@@ -92,7 +92,13 @@ describe("Release format tests", () => {
         });
 
         // Verify it is running correctly
-        const result = await calls.packageLog({ id: releaseDnpName });
+        const dnps = await calls.packagesGet();
+        const dnp = dnps.find(d => d.dnpName === releaseDnpName);
+        if (!dnp) throw Error(`DNP ${releaseDnpName} not found`);
+        const container = dnp.containers[0];
+        const result = await calls.packageLog({
+          containerName: container.containerName
+        });
         expect(result).to.include(
           `Hello, ${releaseTest.envValue}`,
           `Wrong log from ${releaseDnpName} after installation`

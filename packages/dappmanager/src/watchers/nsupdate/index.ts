@@ -13,10 +13,10 @@ const nsupdateInterval = params.NSUPDATE_WATCHER_INTERVAL || 60 * 60 * 1000;
 let firstRun = true;
 
 async function runNsupdate({
-  ids,
+  dnpNames,
   removeOnly
 }: {
-  ids?: string[];
+  dnpNames?: string[];
   removeOnly?: boolean;
 }): Promise<void> {
   try {
@@ -30,16 +30,16 @@ async function runNsupdate({
     const nsupdateTxts = getNsupdateTxts({
       dnpList,
       domainAliases,
-      ids,
+      dnpNames,
       removeOnly
     });
 
     for (const nsupdateTxt of nsupdateTxts)
       await retry(() => execNsupdate(nsupdateTxt));
 
-    if (ids) {
-      if (removeOnly) logs.info("nsupdate delete", ids);
-      else logs.info("nsupdate add", ids);
+    if (dnpNames) {
+      if (removeOnly) logs.info("nsupdate delete", dnpNames);
+      else logs.info("nsupdate add", dnpNames);
     } else if (firstRun) {
       logs.info(`Successful initial nsupdate call for all DNPs`);
       firstRun = false;
@@ -74,12 +74,12 @@ export default function runWatcher(): void {
     nsupdateInterval //      60 min
   ]);
 
-  eventBus.packagesModified.on(({ ids, removed }) => {
+  eventBus.packagesModified.on(({ dnpNames, removed }) => {
     // When the BIND is re-created, run nsupdate on all domains. Wait 5s to be active
-    if (ids.includes(params.bindDnpName))
+    if (dnpNames.includes(params.bindDnpName))
       setTimeout(() => runNsupdate({}), 5000);
     // React immediatelly to new installs
-    else if (removed) runNsupdate({ ids, removeOnly: true });
-    else runNsupdate({ ids });
+    else if (removed) runNsupdate({ dnpNames, removeOnly: true });
+    else runNsupdate({ dnpNames });
   });
 }

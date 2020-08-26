@@ -152,33 +152,43 @@ export interface SetupUiJson {
 
 // Settings must include the previous user settings
 
-/**
- * ```js
- * "bitcoin.dnp.dappnode.eth": {
- *   environment: { MODE: "VALUE_SET_BEFORE" }
- *   portMappings: { "8443": "8443"; "8443/udp": "8443" },
- *   namedVolumeMountpoints: { data: "" }
- *   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
- * };
- * ```
- */
 export interface UserSettings {
   environment?: {
     [serviceName: string]: {
+      /**
+       * ```js
+       * { MODE: "VALUE_SET_BEFORE" }
+       * ```
+       */
       [envName: string]: string; // Env value
     };
   };
   portMappings?: {
     [serviceName: string]: {
+      /**
+       * ```js
+       * { "8443": "8443", "8443/udp": "8443" },
+       * ```
+       */
       [containerPortAndType: string]: string; // Host port
     };
   };
   namedVolumeMountpoints?: {
+    /**
+     * ```js
+     * { data: "/media/usb0" }
+     * ```
+     */
     [volumeName: string]: string; // Host absolute path to mountpoint
   };
   allNamedVolumeMountpoint?: string; // mountpoint
   fileUploads?: {
     [serviceName: string]: {
+      /**
+       * ```js
+       * { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
+       * ```
+       */
       [containerPath: string]: string; // dataURL
     };
   };
@@ -383,7 +393,25 @@ export interface PackageContainer {
   // envs?: PackageEnvs;
 }
 
-export interface InstalledPackageData extends PackageContainer {}
+export type InstalledPackageData = Pick<
+  PackageContainer,
+  | "dnpName"
+  | "instanceName"
+  | "version"
+  | "isDnp"
+  | "isCore"
+  | "defaultEnvironment"
+  | "defaultPorts"
+  | "defaultVolumes"
+  | "dependencies"
+  | "avatarUrl"
+  | "origin"
+  | "chain"
+  | "domainAlias"
+  | "canBeFullnode"
+> & {
+  containers: PackageContainer[];
+};
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
@@ -523,6 +551,7 @@ export interface DappnodeParams {
 export interface PackageBackup {
   name: string;
   path: string;
+  service?: string;
 }
 
 export type NotificationType = "danger" | "warning" | "success";

@@ -84,7 +84,7 @@ const busFactory = <T>(event: string) => ({
 //   call: "INTERNAL_CALL",
 
 export const chainData = busFactory<ChainData[]>("CHAIN_DATAS");
-type PackageModifiedType = { ids: string[]; removed?: boolean };
+type PackageModifiedType = { dnpNames: string[]; removed?: boolean };
 export const packagesModified = busFactory<PackageModifiedType>(
   "PACKAGE_MODIFIED"
 );

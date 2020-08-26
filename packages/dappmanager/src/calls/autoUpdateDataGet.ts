@@ -69,7 +69,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
         enabled,
         feedback: enabled
           ? autoUpdateHelper.getDnpFeedbackMessage({
-              id: dnp.dnpName,
+              dnpName: dnp.dnpName,
               currentVersion: dnp.version
             })
           : {}

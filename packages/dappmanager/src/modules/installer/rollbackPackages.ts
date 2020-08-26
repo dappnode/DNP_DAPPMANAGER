@@ -1,7 +1,6 @@
 import fs from "fs";
 import params from "../../params";
-import { dockerComposeRm } from "../docker/dockerCommands";
-import { dockerComposeUpSafe } from "../docker/dockerSafe";
+import { dockerComposeRm, dockerComposeUp } from "../docker/dockerCommands";
 import { Log } from "../../utils/logUi";
 import { InstallPackageDataPaths } from "../../types";
 import { logs } from "../../logs";
@@ -59,7 +58,7 @@ export async function rollbackPackages(
         // restartPatch failed before stopping the original container there's no need
         // to roll back, since the current container has the original version.
       } else if (isUpdate) {
-        await dockerComposeUpSafe(composePath);
+        await dockerComposeUp(composePath);
       } else {
         // Remove new containers that were NOT installed before this install call
         await dockerComposeRm(composePath);

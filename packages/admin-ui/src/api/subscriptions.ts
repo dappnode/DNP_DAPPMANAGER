@@ -25,7 +25,7 @@ export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
   });
 
   subscriptions.progressLog.on(progressLog => {
-    const { id, name: dnpName, message: log, clear } = progressLog;
+    const { id, dnpName, message: log, clear } = progressLog;
     if (clear) store.dispatch(clearIsInstallingLog({ id }));
     else store.dispatch(updateIsInstallingLog({ id, dnpName, log }));
   });

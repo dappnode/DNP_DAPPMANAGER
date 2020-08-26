@@ -113,8 +113,11 @@ export async function migrateEthchain(): Promise<void> {
   for (const { id, from, to } of volumesToMigrate) {
     try {
       // Remove all packages that are using the volume to safely move it
-      const idsToRemove = await shell(`docker ps -aq --filter volume=${from}`);
-      if (idsToRemove) await shell(`docker rm -f ${idsToRemove}`);
+      const containerIdsUsingVolume = await shell(
+        `docker ps -aq --filter volume=${from}`
+      );
+      if (containerIdsUsingVolume)
+        await shell(`docker rm -f ${containerIdsUsingVolume}`);
       // mv the docker var lib folder in the host context
       await migrateVolume(from, to);
       logs.info(`Migrated ETHCHAIN ${id}`, { from, to });
@@ -148,8 +151,11 @@ export async function migrateEthchain(): Promise<void> {
   for (const { id, name } of volumesToRemove) {
     try {
       // Remove all packages that are using the volume to safely move it
-      const idsToRemove = await shell(`docker ps -aq --filter volume=${name}`);
-      if (idsToRemove) throw Error(`Volume is used by ${idsToRemove}`);
+      const containerIdsUsingVolume = await shell(
+        `docker ps -aq --filter volume=${name}`
+      );
+      if (containerIdsUsingVolume)
+        throw Error(`Volume is used by ${containerIdsUsingVolume}`);
       await dockerVolumeRm(name);
       logs.info(`Removed ETHCHAIN ${id}`);
     } catch (e) {

@@ -1,11 +1,7 @@
-import params from "../params";
 import * as db from "../db";
-import { packageLog } from "./packageLog";
 import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { NewFeatureId, SystemInfo } from "../types";
-
-const wifiName = params.wifiDnpName;
 
 /**
  * Returns the current DAppNode system info
@@ -81,21 +77,4 @@ function getNewFeatureIds(): NewFeatureId[] {
     const status = db.newFeatureStatus.get(featureId);
     return status !== "seen";
   });
-}
-
-/**
- * Get the logs of the WIFI package to check if it's running or not
- * `[Warning] No interface found. Entering sleep mode.`
- */
-async function getIsWifiActive(): Promise<boolean> {
-  try {
-    const logs = await packageLog({
-      id: wifiName,
-      options: { timestamps: false, tail: 20 }
-    });
-    const firstLogLine = (logs || "").trim().split("\n")[0];
-    return !firstLogLine || !firstLogLine.includes("No interface found");
-  } catch (e) {
-    return false;
-  }
 }

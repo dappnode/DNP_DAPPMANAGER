@@ -67,7 +67,7 @@ describe("Resilience features, when things go wrong", function() {
       const composePath = getPath.dockerCompose(releaseDnpName, false);
       fs.unlinkSync(composePath);
       await calls.packageRemove({
-        id: releaseDnpName,
+        dnpName: releaseDnpName,
         deleteVolumes: true,
         timeout: 0
       });
@@ -87,7 +87,7 @@ describe("Resilience features, when things go wrong", function() {
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
       await calls.packageRemove({
-        id: releaseDnpName,
+        dnpName: releaseDnpName,
         deleteVolumes: true,
         timeout: 0
       });

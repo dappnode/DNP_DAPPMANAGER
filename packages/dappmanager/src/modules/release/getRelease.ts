@@ -53,7 +53,7 @@ export async function getRelease({
     parseUnsafeCompose(composeUnsafe, manifest)
   );
 
-  for (const service of compose.services()) {
+  for (const service of Object.values(compose.services())) {
     // Add SSL environment variables
     if (manifest.ssl) {
       const dnpSubDomain = shortNameDomainByService(

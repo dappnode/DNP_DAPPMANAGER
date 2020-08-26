@@ -30,10 +30,11 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
         try {
           // If DNP is exited, the port mapping is only available in the docker-compose
           const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
-          const portMappings = compose.service().getPortMappings();
-          // Only consider ports that are mapped (not ephemeral ports)
-          for (const port of portMappings)
-            if (port.host) addPortToOpen(port.protocol, port.host);
+          for (const service of Object.values(compose.services())) {
+            // Only consider ports that are mapped (not ephemeral ports)
+            for (const port of service.getPortMappings())
+              if (port.host) addPortToOpen(port.protocol, port.host);
+          }
         } catch (e) {
           logs.error(
             `Error getting ports of ${dnp.dnpName} from docker-compose`,

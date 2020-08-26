@@ -4,7 +4,6 @@ import {
   dockerCopyFileTo,
   dockerGetContainerWorkingDir
 } from "../modules/docker/dockerCommands";
-import { listContainer } from "../modules/docker/listContainers";
 // Utils
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";
@@ -15,11 +14,11 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
 /**
  * Copy file to a DNP:
  *
- * @param {string} id DNP .eth name
- * @param {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
- * @param {string} filename name of the uploaded file.
+ * @param containerName Name of a docker container
+ * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
+ * @param filename name of the uploaded file.
  * - MUST NOT be a path: "/app", "app/", "app/file.txt"
- * @param {string} toPath path to copy a file to
+ * @param toPath path to copy a file to
  * - If path = path to a file: "/usr/src/app/config.json".
  *   Copies the contents of dataUri to that file, overwritting it if necessary
  * - If path = path to a directory: "/usr/src/app".
@@ -30,27 +29,23 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  * - If empty, defaults to $WORKDIR
  */
 export async function copyFileTo({
-  id,
+  containerName,
   dataUri,
   filename,
   toPath
 }: {
-  id: string;
+  containerName: string;
   dataUri: string;
   filename: string;
   toPath: string;
 }): Promise<void> {
-  if (!id) throw Error("Argument id must be defined");
+  if (!containerName) throw Error("Argument containerName must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");
   // toPath is allowed to be empty, it will default to WORKDIR
   // if (!toPath) throw Error("Argument toPath must be defined");
   if (filename.includes("/"))
     throw Error(`filename must not be a path: ${filename}`);
-
-  // Get container name
-  const dnp = await listContainer(id);
-  const containerName = dnp.dnpName;
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect

@@ -1,6 +1,6 @@
 import { mapValues, omit } from "lodash";
 import semver from "semver";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
@@ -15,10 +15,10 @@ import {
   CompatibleDnps,
   PackageRelease,
   PackageReleaseMetadata,
-  PackageContainer,
   SetupWizardAllDnps,
   SetupWizardField,
-  SpecialPermissionAllDnps
+  SpecialPermissionAllDnps,
+  InstalledPackageData
 } from "../types";
 
 export async function fetchDnpRequest({
@@ -34,13 +34,13 @@ export async function fetchDnpRequest({
   const specialPermissions: SpecialPermissionAllDnps = {};
   const setupWizard: SetupWizardAllDnps = {};
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
     const { dnpName, metadata, compose, isCore } = release;
 
-    const container = dnpList.find(_dnp => _dnp.dnpName === dnpName);
-    const isInstalled = Boolean(container);
+    const dnp = dnpList.find(d => d.dnpName === dnpName);
+    const isInstalled = Boolean(dnp);
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
     const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(
@@ -62,18 +62,25 @@ export async function fetchDnpRequest({
                 // If the package is installed, ignore (all)namedVolumesMountpoint
                 return !isInstalled;
               case "fileUpload":
-                // If the container nad path of file upload exists, ignore fileUpload
-                if (container)
-                  try {
-                    const fileInfo = await dockerInfoArchive(
-                      getServiceContainerId(field.target.service, container.id),
-                      field.target.path
-                    );
-                    return !fileInfo.size;
-                  } catch (e) {
-                    // Ignore all errors: 404 Container not found,
-                    // 404 path not found, Base64 parsing, JSON parsing, etc.
-                  }
+                // If the container and path of file upload exists, ignore fileUpload
+                if (dnp) {
+                  const serviceName = field.target.service;
+                  // Find the container referenced by the target or the first one if unspecified
+                  const container = dnp.containers.find(
+                    c => !serviceName || c.serviceName === serviceName
+                  );
+                  if (container)
+                    try {
+                      const fileInfo = await dockerInfoArchive(
+                        container.containerId,
+                        field.target.path
+                      );
+                      return !fileInfo.size;
+                    } catch (e) {
+                      // Ignore all errors: 404 Container not found,
+                      // 404 path not found, Base64 parsing, JSON parsing, etc.
+                    }
+                }
             }
           }
           return true;
@@ -155,7 +162,7 @@ export async function fetchDnpRequest({
  */
 export function getIsInstalled(
   { dnpName }: { dnpName: string },
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): boolean {
   return !!dnpList.find(dnp => dnp.dnpName === dnpName);
 }
@@ -165,7 +172,7 @@ export function getIsInstalled(
  */
 export function getIsUpdated(
   { dnpName, reqVersion }: { dnpName: string; reqVersion: string },
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): boolean {
   const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
   if (!dnp) return false;
@@ -174,7 +181,7 @@ export function getIsUpdated(
 
 function getRequiresCoreUpdate(
   { metadata }: { metadata: PackageReleaseMetadata },
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): boolean {
   const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;

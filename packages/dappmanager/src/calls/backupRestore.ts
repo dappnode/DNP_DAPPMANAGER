@@ -3,12 +3,8 @@ import fs from "fs";
 import * as db from "../db";
 import params from "../params";
 import { logs } from "../logs";
-
-// Modules
-import { listContainer } from "../modules/docker/listContainers";
-// External call
+import { listPackage } from "../modules/docker/listContainers";
 import { packageRestart } from "./packageRestart";
-// Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";
 import { PackageBackup } from "../types";
@@ -17,24 +13,17 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
  * Restore a previous backup of a DNP, from the dataUri provided by the user
- *
- * @param {string} id DNP .eth name
- * @param {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
- * @param {array} backup [
- *   { name: "config", path: "/usr/.raiden/config" },
- *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
- * ]
  */
 export async function backupRestore({
-  id,
+  dnpName,
   backup,
   fileId
 }: {
-  id: string;
+  dnpName: string;
   backup: PackageBackup[];
   fileId: string;
 }): Promise<void> {
-  if (!id) throw Error("Argument id must be defined");
+  if (!dnpName) throw Error("Argument dnpName must be defined");
   if (!fileId) throw Error("Argument fileId must be defined");
   if (!backup) throw Error("Argument backup must be defined");
   if (!backup.length) throw Error("No backup items specified");
@@ -42,8 +31,7 @@ export async function backupRestore({
   validateBackupArray(backup);
 
   // Get container name
-  const dnp = await listContainer(id);
-  const containerName = dnp.dnpName;
+  const dnp = await listPackage(dnpName);
 
   // Intermediate step, the file is in local file system
   const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);
@@ -72,8 +60,15 @@ export async function backupRestore({
 
     const successfulBackups = [];
     let lastError: Error | null = null;
-    for (const { name, path: toPath } of backup) {
+    for (const { name, path: toPath, service } of backup) {
       try {
+        const container = dnp.containers.find(
+          c => !service || c.serviceName === service
+        );
+        if (!container)
+          throw Error(`No container found for service ${service}`);
+        const containerName = container.containerName;
+
         const fromPath = path.join(backupDir, name);
         // lstatSync throws if path does not exist, so must call existsSync first
         if (!fs.existsSync(fromPath))
@@ -91,7 +86,7 @@ export async function backupRestore({
         successfulBackups.push(name);
       } catch (e) {
         lastError = e;
-        logs.error(`Backup error ${id}`, { name, toPath }, e);
+        logs.error("Error restoring backup", { dnpName, name, toPath }, e);
       }
     }
 
@@ -105,7 +100,7 @@ export async function backupRestore({
     await shell(`rm -rf ${backupDirCompressed}`);
 
     // Restart package so the file changes take effect
-    await packageRestart({ id });
+    await packageRestart({ dnpName });
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
     await shell(`rm -rf ${tempTransferDir}`);

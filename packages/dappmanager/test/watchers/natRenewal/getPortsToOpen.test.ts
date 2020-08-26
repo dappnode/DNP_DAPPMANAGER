@@ -65,7 +65,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
         }
       }
     });
-    compose.service().setPortMapping([
+    compose.services()[stoppedDnp].setPortMapping([
       { host: 4001, container: 4001, protocol: "UDP" },
       { host: 4001, container: 4001, protocol: "TCP" }
     ]);

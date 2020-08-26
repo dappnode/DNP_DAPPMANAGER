@@ -142,7 +142,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     // Simulate the package starts running after being installed
     dnpList.push({
       ...mockDnp,
-      dnpName: newTargetData.name,
+      dnpName: newTargetData.dnpName,
       running: true
     });
     await runClientInstallerWatcher();

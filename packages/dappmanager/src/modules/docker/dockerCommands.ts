@@ -1,4 +1,5 @@
 import semver from "semver";
+import dargs from "dargs";
 import { DockerOptionsInterface } from "../../types";
 import shell from "../../utils/shell";
 import { imagesList, imageRemove } from "./dockerApi";
@@ -6,13 +7,24 @@ import { imagesList, imageRemove } from "./dockerApi";
 /* eslint-disable no-useless-escape */
 export interface DockerComposeUpOptions {
   noStart?: boolean;
+  forceRecreate?: boolean;
+}
+
+async function execDocker(
+  args: string[],
+  kwargs?: Parameters<typeof dargs>[0]
+): Promise<string> {
+  return shell(`docker ${[...args, ...dargs(kwargs || {})].join(" ")}`);
 }
 
 export function dockerComposeUp(
   dcPath: string,
   options?: DockerComposeUpOptions
 ): Promise<string> {
-  const flags = options && options.noStart ? "--no-start" : "-d";
+  const flags: string[] = [];
+  if (options?.noStart) flags.push("--no-start");
+  else flags.push("--detach");
+  if (options?.forceRecreate) flags.push("--force-recreate");
   // Adding <&- to prevent interactive mode
   return shell(`docker-compose -f ${dcPath} up ${flags} <&-`);
 }
@@ -24,6 +36,12 @@ export function dockerComposeDown(
   return shell(withOptions(`docker-compose -f ${dcPath} down`, options || {}));
 }
 
+/**
+ * Removes all containers from a compose project
+ * -f: Don't ask to confirm removal
+ * -s: Stop the containers, if required, before removing
+ * @param dcPath
+ */
 export function dockerComposeRm(dcPath: string): Promise<string> {
   return shell(`docker-compose -f ${dcPath} rm -sf`);
 }
@@ -47,12 +65,23 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return shell(`docker volume rm -f ${volumeName}`);
 }
 
+export function dockerStart(containerName: string): Promise<string> {
+  return execDocker(["start", containerName]);
+}
+
+export function dockerStop(
+  containerName: string,
+  options?: { t: number }
+): Promise<string> {
+  return execDocker(["stop", containerName], options);
+}
+
 export function dockerRm(
-  containerNameOrId: string,
+  containerName: string,
   options?: { volumes?: boolean }
 ): Promise<string> {
   const flags = (options || {}).volumes ? "--volumes" : "";
-  return shell(`docker rm -f ${flags} ${containerNameOrId}`);
+  return shell(`docker rm -f ${flags} ${containerName}`);
 }
 
 export function dockerLoad(imagePath: string): Promise<string> {

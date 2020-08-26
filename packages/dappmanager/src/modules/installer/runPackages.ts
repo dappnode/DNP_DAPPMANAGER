@@ -1,6 +1,6 @@
 import path from "path";
 import params from "../../params";
-import { dockerComposeUpSafe } from "../docker/dockerSafe";
+import { dockerComposeUp } from "../docker/dockerCommands";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
@@ -34,7 +34,7 @@ export async function runPackages(
         log(pkg.dnpName, "Copying file uploads...");
         logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-        await dockerComposeUpSafe(pkg.composePath, { noStart: true });
+        await dockerComposeUp(pkg.composePath, { noStart: true });
         for (const [serviceName, serviceFileUploads] of Object.entries(
           pkg.fileUploads
         ))
@@ -42,13 +42,15 @@ export async function runPackages(
             serviceFileUploads
           )) {
             const { dir: toPath, base: filename } = path.parse(containerPath);
-            const id = getContainerId(pkg.dnpName, serviceName);
-            await copyFileTo({ id, dataUri, filename, toPath });
+            const service = pkg.compose.services[serviceName];
+            if (!service) throw Error(`No service for ${serviceName}`);
+            const containerName = service.container_name;
+            await copyFileTo({ containerName, dataUri, filename, toPath });
           }
       }
 
       log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUpSafe(pkg.composePath);
+      await dockerComposeUp(pkg.composePath);
     }
 
     log(pkg.dnpName, "Package started");

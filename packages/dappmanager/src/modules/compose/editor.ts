@@ -128,9 +128,10 @@ export class ComposeEditor {
     return getPath.dockerCompose(dnpName, isCore);
   }
 
-  services(): ComposeServiceEditor[] {
-    return Object.keys(this.compose.services).map(
-      serviceName => new ComposeServiceEditor(this, serviceName)
+  services(): { [serviceName: string]: ComposeServiceEditor } {
+    return mapValues(
+      this.compose.services,
+      (_service, serviceName) => new ComposeServiceEditor(this, serviceName)
     );
   }
 

@@ -133,7 +133,7 @@ update delete fullnode.dappnode A`
       const nsupdateTxts = getNsupdateTxts({
         dnpList,
         domainAliases,
-        ids: [bitcoinDnpName]
+        dnpNames: [bitcoinDnpName]
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
@@ -150,7 +150,7 @@ update add bitcoin.dappnode 60 A 172.33.0.2`
       const nsupdateTxts = getNsupdateTxts({
         dnpList,
         domainAliases,
-        ids: [bitcoinDnpName],
+        dnpNames: [bitcoinDnpName],
         removeOnly: true
       });
 

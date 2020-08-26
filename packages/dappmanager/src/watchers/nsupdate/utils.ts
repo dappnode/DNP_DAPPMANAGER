@@ -121,12 +121,12 @@ export function getDotDappnodeDomain(dnpName: string): string {
 export function getNsupdateTxts({
   dnpList,
   domainAliases,
-  ids,
+  dnpNames,
   removeOnly = false
 }: {
   dnpList: PackageContainer[];
   domainAliases: AliasMap;
-  ids?: string[];
+  dnpNames?: string[];
   removeOnly?: boolean;
 }): string[] {
   const dnpsToUpdate: PackageContainerWithIp[] = [];
@@ -136,7 +136,7 @@ export function getNsupdateTxts({
       dnp.ip &&
       dnp.isDnp &&
       !dnp.isCore &&
-      (!ids || !ids.length || ids.includes(dnp.dnpName))
+      (!dnpNames || !dnpNames.length || dnpNames.includes(dnp.dnpName))
     )
       dnpsToUpdate.push({ ...dnp, ip: dnp.ip });
 
