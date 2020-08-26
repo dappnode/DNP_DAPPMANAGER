@@ -51,7 +51,7 @@ export async function restartPackageVolumes({
   const dnpList = await listContainers();
   const volumesData = await getVolumesOwnershipData();
 
-  const dnp = dnpList.find(_dnp => _dnp.name === id);
+  const dnp = dnpList.find(_dnp => _dnp.dnpName === id);
   if (!dnp) throw Error(`No DNP was found for name ${id}`);
 
   const { dnpsToRemove, volumesToRemove } = volumeId
@@ -77,9 +77,9 @@ export async function restartPackageVolumes({
     if (dnpName.includes(params.dappmanagerDnpName))
       throw Error("The dappmanager cannot be restarted");
 
-    const dnpToRemove = dnpList.find(_dnp => _dnp.name === dnpName);
+    const dnpToRemove = dnpList.find(_dnp => _dnp.dnpName === dnpName);
     if (dnpToRemove) {
-      const { isCore, packageName: containerName } = dnpToRemove;
+      const { isCore, dnpName: containerName } = dnpToRemove;
       const composePath = getPath.dockerCompose(dnpName, isCore);
       if (!fs.existsSync(composePath) && !doNotRestart)
         throw Error(`No compose found for ${dnpName}: ${composePath}`);
@@ -167,7 +167,10 @@ export function getDnpsToRemoveAll(
   for (const vol of dnp.volumes) {
     if (vol.name) {
       const volumeData = volumesData.find(v => v.name === vol.name);
-      if (volumeData && (!volumeData.owner || volumeData.owner === dnp.name)) {
+      if (
+        volumeData &&
+        (!volumeData.owner || volumeData.owner === dnp.dnpName)
+      ) {
         for (const user of volumeData.users) dnpsToRemove.push(user);
         volumesToRemove.push(vol.name);
       }

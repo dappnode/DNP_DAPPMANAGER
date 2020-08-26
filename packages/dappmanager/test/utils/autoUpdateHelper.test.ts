@@ -368,9 +368,9 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Feedback text for COREs", () => {
     const currentVersionId = getCoreVersionId([
-      { name: "admin", version: "0.2.0" },
-      { name: "vpn", version: "0.2.1" },
-      { name: "core", version: "0.2.0" }
+      { dnpName: "admin", version: "0.2.0" },
+      { dnpName: "vpn", version: "0.2.1" },
+      { dnpName: "core", version: "0.2.0" }
     ]);
     const id = coreDnpName;
 
@@ -391,8 +391,8 @@ describe("Util: autoUpdateHelper", () => {
         pending: {
           [id]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: timestamp,
@@ -406,16 +406,16 @@ describe("Util: autoUpdateHelper", () => {
     it("3A. Core is manually updated", () => {
       const feedback = getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId([
-          { name: "admin", version: "0.2.1" },
-          { name: "vpn", version: "0.2.1" },
-          { name: "core", version: "0.2.1" }
+          { dnpName: "admin", version: "0.2.1" },
+          { dnpName: "vpn", version: "0.2.1" },
+          { dnpName: "core", version: "0.2.1" }
         ]),
         registry: {},
         pending: {
           [id]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
@@ -429,13 +429,13 @@ describe("Util: autoUpdateHelper", () => {
     it("3B. Core is successfully updated", () => {
       const timestamp = Date.now();
       const nextVersion = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const currentVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const feedback = getCoreFeedbackMessage({
         currentVersionId,
@@ -457,8 +457,8 @@ describe("Util: autoUpdateHelper", () => {
         pending: {
           [id]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
@@ -472,22 +472,22 @@ describe("Util: autoUpdateHelper", () => {
 
     it("1 -> 4. Core full lifecycle", async () => {
       const currentVersionIdBefore = getCoreVersionId([
-        { name: "admin", version: "0.2.0" },
-        { name: "vpn", version: "0.2.0" },
-        { name: "core", version: "0.2.0" }
+        { dnpName: "admin", version: "0.2.0" },
+        { dnpName: "vpn", version: "0.2.0" },
+        { dnpName: "core", version: "0.2.0" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const currentVersionIdAfter = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.0" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.0" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersion2Id = getCoreVersionId([
-        { name: "admin", version: "0.2.2" },
-        { name: "core", version: "0.2.2" }
+        { dnpName: "admin", version: "0.2.2" },
+        { dnpName: "core", version: "0.2.2" }
       ]);
       const microDelay = 20;
 
@@ -510,11 +510,9 @@ describe("Util: autoUpdateHelper", () => {
         "2. Should be scheduled"
       );
 
-      await new Promise(
-        (r): void => {
-          setTimeout(r, 2 * microDelay);
-        }
-      );
+      await new Promise((r): void => {
+        setTimeout(r, 2 * microDelay);
+      });
 
       expect(
         getCoreFeedbackMessage({
@@ -567,13 +565,13 @@ describe("Util: autoUpdateHelper", () => {
       const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
@@ -611,13 +609,13 @@ describe("Util: autoUpdateHelper", () => {
       const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
-        { name: "admin", version: "0.2.0" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.0" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);

@@ -99,7 +99,7 @@ describe("Docker action: restartPackageVolumes", function() {
     (dnp): PackageContainer => ({
       // Must add the container name since dockerRm is called with that
       ...dnp,
-      packageName: dnp.name
+      dnpName: dnp.name
     })
   );
 
@@ -189,8 +189,8 @@ describe("Docker action: restartPackageVolumes", function() {
   });
 
   before(() => {
-    for (const { name, isCore } of dnpList) {
-      const dockerComposePath = getPath.dockerCompose(name, isCore);
+    for (const dnp of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
       validate.path(dockerComposePath);
       fs.writeFileSync(dockerComposePath, "docker-compose");
     }
@@ -320,8 +320,8 @@ describe("Docker action: restartPackageVolumes", function() {
   });
 
   after(() => {
-    for (const { name, isCore } of dnpList) {
-      const dockerComposePath = getPath.dockerCompose(name, isCore);
+    for (const dnp of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
       fs.unlinkSync(dockerComposePath);
     }
   });

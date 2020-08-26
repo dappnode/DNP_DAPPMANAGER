@@ -82,36 +82,36 @@ export default async function aggregate({
     // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
     // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
     installedDnps: dnpList.filter(
-      dnp => semver.valid(dnp.version) && dnp.name !== params.coreDnpName
+      dnp => semver.valid(dnp.version) && dnp.dnpName !== params.coreDnpName
     )
   });
   // Add relevant installed dnps and their dependencies to the dnps object
   await Promise.all(
-    relevantInstalledDnps.map(async ({ name, version, origin, ...dnp }) => {
+    relevantInstalledDnps.map(async ({ dnpName, version, origin, ...dnp }) => {
       try {
         if (origin) {
           // If package does not have an APM repo assume one single version
           // Use the cached dependencies stored in its container labels
           // Note: The IPFS hash MUST NOT be passed as a version or the package
           // will not be able to be updated
-          setVersion(dnps, name, version, dnp.dependencies);
+          setVersion(dnps, dnpName, version, dnp.dependencies);
         } else {
           await aggregateDependencies({
-            name,
+            name: dnpName,
             versionRange: `>=${version}`,
             dnps,
             dappGetFetcher // #### Injected dependency
           });
         }
       } catch (e) {
-        logs.warn(`Error fetching installed dnp ${name}`, e);
+        logs.warn(`Error fetching installed dnp ${dnpName}`, e);
       }
     })
   );
 
   // Label dnps. They are used to order versions
   for (const dnpName in dnps) {
-    const dnp = dnpList.find(dnp => dnp.name === dnpName);
+    const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
 
     // > Label isRequest + Enfore conditions:
     //   - requested DNP versions must match the provided versionRange
@@ -124,9 +124,7 @@ export default async function aggregate({
       }
       if (!Object.keys(dnps[dnpName].versions).length)
         throw Error(
-          `Aggregated versions of request ${req.name}@${
-            req.ver
-          } did not satisfy its range`
+          `Aggregated versions of request ${req.name}@${req.ver} did not satisfy its range`
         );
     }
     // > Label isInstalled + Enfore conditions:

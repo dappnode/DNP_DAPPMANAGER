@@ -75,7 +75,7 @@ describe("Release format tests", () => {
 
         const result = await calls.fetchDnpRequest({ id: releaseHash });
 
-        expect(result.name).to.equal(releaseDnpName, "Wrong manifest name");
+        expect(result.dnpName).to.equal(releaseDnpName, "Wrong manifest name");
         expect(result.semVersion).to.equal(
           releaseVersion,
           "Wrong manifest version"

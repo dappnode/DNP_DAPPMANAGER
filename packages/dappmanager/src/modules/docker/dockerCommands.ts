@@ -79,6 +79,7 @@ export async function dockerCleanOldImages(
   name: string,
   version: string
 ): Promise<void> {
+  testThisFunction();
   const repoImages = await imagesList({ filters: { reference: [name] } });
   const imagesToDelete = repoImages.filter(image =>
     image.RepoTags.every(tag => {

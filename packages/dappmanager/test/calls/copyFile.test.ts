@@ -18,7 +18,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   const containerSimulatedFolder = `${testDir}/container-volume`;
   const dockerPath = (_path: string): string =>
     containerSimulatedFolder + _path;
-  const id = "kovan.dnp.dappnode.eth";
+  const dnpName = "kovan.dnp.dappnode.eth";
   const containerName = "DAppNodePackage-kovan.dnp.dappnode.eth";
 
   async function dockerCopyFileTo(
@@ -49,7 +49,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   }
 
   async function listContainer(): Promise<PackageContainer> {
-    return { ...mockDnp, name: id, packageName: containerName };
+    return { ...mockDnp, dnpName, containerName };
   }
 
   let copyFileTo: typeof copyFileToType;
@@ -93,7 +93,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
 
   it("should copy a file to a container", async () => {
     await copyFileTo({
-      id,
+      id: dnpName,
       dataUri,
       filename,
       toPath: containerPath
@@ -101,7 +101,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   });
 
   it("should copy a file from a container", async () => {
-    const result = await copyFileFrom({ id, fromPath: containerPath });
+    const result = await copyFileFrom({ id: dnpName, fromPath: containerPath });
     // Check response message
     expect(result).to.be.ok;
     expect(result).to.equal(dataUri);

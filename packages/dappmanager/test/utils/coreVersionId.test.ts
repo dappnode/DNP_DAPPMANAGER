@@ -10,10 +10,10 @@ import {
 
 describe("Util: coreVersionId", () => {
   describe("Normal cases", () => {
-    const coreDnps: { name: string; version: string }[] = [
-      { name: "admin.dnp.dappnode.eth", version: "0.2.6" },
-      { name: "vpn.dnp.dappnode.eth", version: "0.2.2" },
-      { name: "core.dnp.dappnode.eth", version: "0.2.8" }
+    const coreDnps: { dnpName: string; version: string }[] = [
+      { dnpName: "admin.dnp.dappnode.eth", version: "0.2.6" },
+      { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.2" },
+      { dnpName: "core.dnp.dappnode.eth", version: "0.2.8" }
     ];
     const versionId = "admin@0.2.6,core@0.2.8,vpn@0.2.2";
 
@@ -23,22 +23,22 @@ describe("Util: coreVersionId", () => {
 
     it("Should parse a versionId", async () => {
       expect(parseCoreVersionId(versionId)).to.deep.equal(
-        coreDnps.sort((a, b) => (a.name > b.name ? 1 : -1))
+        coreDnps.sort((a, b) => (a.dnpName > b.dnpName ? 1 : -1))
       );
     });
   });
 
   describe("Edge cases", () => {
     it("Empty dnps array", async () => {
-      const coreDnps: { name: string; version: string }[] = [];
+      const coreDnps: { dnpName: string; version: string }[] = [];
       const versionId = "";
       expect(getCoreVersionId(coreDnps)).to.equal(versionId);
     });
 
     it("Empty and null versions", async () => {
-      const coreDnps: { name: string; version: string }[] = [
-        { name: "admin.dnp.dappnode.eth", version: "" },
-        { name: "core.dnp.dappnode.eth", version: "" }
+      const coreDnps: { dnpName: string; version: string }[] = [
+        { dnpName: "admin.dnp.dappnode.eth", version: "" },
+        { dnpName: "core.dnp.dappnode.eth", version: "" }
       ];
       const versionId = "";
       expect(getCoreVersionId(coreDnps)).to.equal(versionId);
@@ -54,13 +54,13 @@ describe("Util: coreVersionId", () => {
   });
 
   describe("areCoreVersionIdsIncluded", () => {
-    const coreVersionSubset: { name: string; version: string }[] = [
-      { name: "admin.dnp.dappnode.eth", version: "0.2.6" },
-      { name: "core.dnp.dappnode.eth", version: "0.2.8" }
+    const coreVersionSubset: { dnpName: string; version: string }[] = [
+      { dnpName: "admin.dnp.dappnode.eth", version: "0.2.6" },
+      { dnpName: "core.dnp.dappnode.eth", version: "0.2.8" }
     ];
-    const coreVersionSuperset: { name: string; version: string }[] = [
+    const coreVersionSuperset: { dnpName: string; version: string }[] = [
       ...coreVersionSubset,
-      { name: "vpn.dnp.dappnode.eth", version: "0.2.2" }
+      { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.2" }
     ];
     const coreVersionIdSubset = getCoreVersionId(coreVersionSubset);
     const coreVersionIdSuperset = getCoreVersionId(coreVersionSuperset);

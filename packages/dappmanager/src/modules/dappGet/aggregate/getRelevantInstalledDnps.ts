@@ -33,15 +33,17 @@ export default function getRelevantInstalledDnps({
   const state: { [dnpName: string]: PackageContainer } = {};
   const intersectedDnps = intersection(
     requestedDnps,
-    installedDnps.map(dnp => dnp.name)
+    installedDnps.map(dnp => dnp.dnpName)
   );
   const installedDnpsWithDeps = installedDnps.filter(dnp => dnp.dependencies);
   for (const dnpName of intersectedDnps) {
-    const dnp = installedDnps.find(dnp => dnp.name === dnpName);
+    const dnp = installedDnps.find(dnp => dnp.dnpName === dnpName);
     if (dnp) addDependants(dnp);
   }
   // Return only packages that are not already included in the requestedDnps array
-  return Object.values(state).filter(dnp => !requestedDnps.includes(dnp.name));
+  return Object.values(state).filter(
+    dnp => !requestedDnps.includes(dnp.dnpName)
+  );
 
   function addDependants(dnp: PackageContainer): void {
     // Prevent possible recursive loops
@@ -56,15 +58,15 @@ export default function getRelevantInstalledDnps({
   }
 
   function addToState(dnp: PackageContainer): void {
-    state[dnp.name] = dnp;
+    state[dnp.dnpName] = dnp;
   }
   function isInState(dnp: PackageContainer): boolean {
-    return Boolean(state[dnp.name]);
+    return Boolean(state[dnp.dnpName]);
   }
   function dependsOn(
     dependantPkg: PackageContainer,
     dnp: PackageContainer
   ): boolean {
-    return Boolean(dependantPkg.dependencies[dnp.name]);
+    return Boolean(dependantPkg.dependencies[dnp.dnpName]);
   }
 }

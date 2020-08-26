@@ -42,7 +42,7 @@ export async function copyFileFrom({
 
   // Get container name
   const dnp = await listContainer(id);
-  const containerName = dnp.packageName;
+  const containerName = dnp.dnpName;
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect

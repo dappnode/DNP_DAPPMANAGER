@@ -35,25 +35,25 @@ async function checkChainWatchers(): Promise<void> {
     // Remove chains
     for (const dnpName of Object.keys(activeChains)) {
       // If a chain is being watched but is not in the current dnpList
-      if (!dnpList.find(dnp => dnp.name === dnpName)) {
+      if (!dnpList.find(dnp => dnp.dnpName === dnpName)) {
         delete activeChains[dnpName];
       }
     }
 
     // Add new chains
     for (const dnp of dnpList) {
-      if (!activeChains[dnp.name]) {
+      if (!activeChains[dnp.dnpName]) {
         if (dnp.chain) {
-          const apiUrl = getDriverApi(dnp.chain, dnp.name);
+          const apiUrl = getDriverApi(dnp.chain, dnp.dnpName);
           if (apiUrl)
-            activeChains[dnp.name] = {
-              dnpName: dnp.name,
+            activeChains[dnp.dnpName] = {
+              dnpName: dnp.dnpName,
               driverName: dnp.chain,
               api: apiUrl
             };
         } else {
-          const knownChain = knownChains[dnp.name];
-          if (knownChain) activeChains[dnp.name] = knownChain;
+          const knownChain = knownChains[dnp.dnpName];
+          if (knownChain) activeChains[dnp.dnpName] = knownChain;
         }
       }
     }
@@ -74,7 +74,7 @@ async function getAndEmitChainData(): Promise<void> {
 
   const chainsToCall: Chain[] = [];
   for (const [dnpName, chain] of Object.entries(activeChains)) {
-    const dnp = dnpList.find(_dnp => _dnp.name === dnpName);
+    const dnp = dnpList.find(_dnp => _dnp.dnpName === dnpName);
     if (dnp && dnp.running) chainsToCall.push(chain);
   }
 

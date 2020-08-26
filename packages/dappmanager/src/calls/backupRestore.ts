@@ -43,10 +43,10 @@ export async function backupRestore({
 
   // Get container name
   const dnp = await listContainer(id);
-  const containerName = dnp.packageName;
+  const containerName = dnp.dnpName;
 
   // Intermediate step, the file is in local file system
-  const backupDir = path.join(tempTransferDir, `${dnp.name}_backup`);
+  const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);
   const backupDirCompressed = `${backupDir}.tar.xz`;
   await shell(`rm -rf ${backupDir}`); // Just to be sure it's clean
   await shell(`rm -rf ${backupDirCompressed}`); // Just to be sure it's clean

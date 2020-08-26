@@ -16,7 +16,7 @@ import { pause } from "../utils";
 const pkgRestartMs = 2000;
 
 const packages = new Map<string, InstalledPackageDetailData>(
-  dnpInstalled.map(pkg => [pkg.name, pkg])
+  dnpInstalled.map(pkg => [pkg.dnpName, pkg])
 );
 
 function update(
@@ -92,10 +92,10 @@ export async function fetchDnpRequest({
  * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
 export async function packageInstall({
-  name,
+  dnpName,
   version
 }: {
-  name: string;
+  dnpName: string;
   version?: string;
   userSettings?: UserSettingsAllDnps;
   options?: {
@@ -104,17 +104,15 @@ export async function packageInstall({
   };
 }): Promise<void> {
   await pause(pkgRestartMs);
-  packages.set(name, {
+  packages.set(dnpName, {
     ...samplePackageContainer,
-    id: name,
-    packageName: name,
+    containerName: `DAppNodePackage-${dnpName}`,
+    dnpName,
     version: version || "0.1.0",
-    image: `${name}:${version}`,
-    name: name,
-    shortName: name,
+    image: `${dnpName}:${version}`,
     avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
     origin: undefined,
-    gettingStarted: `Welcome to the package **${name}**`,
+    gettingStarted: `Welcome to the package **${dnpName}**`,
     gettingStartedShow: true
   });
 }
@@ -225,7 +223,12 @@ export async function packageSetEnvironment({
   update(id, dnp => ({
     userSettings: {
       ...dnp.userSettings,
-      environment: { ...(dnp.userSettings?.environment || {}), ...envs }
+      environment: {
+        [id]: {
+          ...((dnp.userSettings?.environment || {})[id] || {}),
+          ...envs
+        }
+      }
     }
   }));
 }

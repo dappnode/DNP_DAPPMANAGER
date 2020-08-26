@@ -14,28 +14,28 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
       {
         ...mockDnp,
         isCore: true,
-        name: "admin.dnp.dappnode.eth",
+        dnpName: "admin.dnp.dappnode.eth",
         ports: [{ container: 80, host: 8090, protocol: "TCP" }],
         running: true
       },
       {
         ...mockDnp,
         isCore: true,
-        name: "vpn.dnp.dappnode.eth",
+        dnpName: "vpn.dnp.dappnode.eth",
         ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
         running: true
       },
       {
         ...mockDnp,
         isCore: true,
-        name: "vpn.dnp.dappnode.eth2",
+        dnpName: "vpn.dnp.dappnode.eth2",
         ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
         running: true
       },
       {
         ...mockDnp,
         isCore: false,
-        name: "goerli.dnp.dappnode.eth",
+        dnpName: "goerli.dnp.dappnode.eth",
         ports: [
           { container: 30303, host: 32769, protocol: "TCP" },
           { container: 30303, host: 32771, protocol: "UDP" },
@@ -46,7 +46,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
       {
         ...mockDnp,
         isCore: false,
-        name: stoppedDnp,
+        dnpName: stoppedDnp,
         running: false
       }
     ];
@@ -126,13 +126,13 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
         {
           ...mockDnp,
           isCore: true,
-          name: "admin.dnp.dappnode.eth",
+          dnpName: "admin.dnp.dappnode.eth",
           ports: [{ container: 80, host: 8090, protocol: "TCP" }],
           running: true
         },
         {
           ...mockDnp,
-          name: throwsDnp,
+          dnpName: throwsDnp,
           running: false
         }
       ];

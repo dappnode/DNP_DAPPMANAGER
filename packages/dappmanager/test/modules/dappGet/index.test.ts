@@ -31,21 +31,21 @@ describe("dappGet", function() {
             "nginx-proxy.dnp.dappnode.eth": "latest",
             "letsencrypt-nginx.dnp.dappnode.eth": "latest"
           },
-          name: "web.dnp.dappnode.eth",
+          dnpName: "web.dnp.dappnode.eth",
           version: "0.1.0",
           origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-          name: "nginx-proxy.dnp.dappnode.eth",
+          dnpName: "nginx-proxy.dnp.dappnode.eth",
           version: "0.0.3",
           origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "web.dnp.dappnode.eth": "latest" },
-          name: "letsencrypt-nginx.dnp.dappnode.eth",
+          dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
           version: "0.0.4",
           origin: "/ipfs/Qm1234"
         }

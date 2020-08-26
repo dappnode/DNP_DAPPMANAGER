@@ -136,7 +136,7 @@ export function getNsupdateTxts({
       dnp.ip &&
       dnp.isDnp &&
       !dnp.isCore &&
-      (!ids || !ids.length || ids.includes(dnp.name))
+      (!ids || !ids.length || ids.includes(dnp.dnpName))
     )
       dnpsToUpdate.push({ ...dnp, ip: dnp.ip });
 
@@ -146,9 +146,9 @@ export function getNsupdateTxts({
   const dappnode: DomainMap = {};
 
   // Add domains from installed package names
-  for (const { name, ip } of dnpsToUpdate) {
-    eth[getMyDotEthdomain(name)] = ip;
-    dappnode[getDotDappnodeDomain(name)] = ip;
+  for (const dnp of dnpsToUpdate) {
+    eth[getMyDotEthdomain(dnp.dnpName)] = dnp.ip;
+    dappnode[getDotDappnodeDomain(dnp.dnpName)] = dnp.ip;
   }
 
   // Add dappnode domain alias from installed packages
@@ -160,12 +160,15 @@ export function getNsupdateTxts({
 
   // Add .dappnode domain alias from db (such as fullnode.dappnode)
   for (const [alias, dnpName] of Object.entries(domainAliases)) {
-    const dnp = dnpsToUpdate.find(dnp => dnpName && dnp.name === dnpName);
+    const dnp = dnpsToUpdate.find(dnp => dnpName && dnp.dnpName === dnpName);
     if (dnp) dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
   }
 
   return (
-    [{ zone: ethZone, domains: eth }, { zone: dappnodeZone, domains: dappnode }]
+    [
+      { zone: ethZone, domains: eth },
+      { zone: dappnodeZone, domains: dappnode }
+    ]
       // Only process zones that have domains / entries
       .filter(({ domains }) => !isEmpty(domains))
       // Convert domain maps to nsupdate txts

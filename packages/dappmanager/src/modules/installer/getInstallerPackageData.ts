@@ -13,14 +13,14 @@ export function getInstallerPackagesData({
 }: {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
-  currentVersions: { [name: string]: string | undefined };
+  currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
     getInstallerPackageData(
       release,
-      userSettings[release.name],
-      currentVersions[release.name]
+      userSettings[release.dnpName],
+      currentVersions[release.dnpName]
     )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
@@ -37,27 +37,25 @@ function getInstallerPackageData(
   userSettings: UserSettings,
   currentVersion: string | undefined
 ): InstallPackageData {
-  const { name, semVersion, isCore, imageFile } = release;
+  const { dnpName, semVersion, isCore, imageFile } = release;
 
   // Compute paths
-  const composePath = getPath.dockerCompose(name, isCore);
+  const composePath = getPath.dockerCompose(dnpName, isCore);
   const composeBackupPath = getPath.backupPath(composePath);
-  const manifestPath = getPath.manifest(name, isCore);
+  const manifestPath = getPath.manifest(dnpName, isCore);
   const manifestBackupPath = getPath.backupPath(manifestPath);
   // Prepend the hash to the version to make image files unique
   // Necessary for the image download cache to re-download different
   // images for the same semantic version
   const versionWithHash = `${semVersion}-${imageFile.hash}`;
-  const imagePath = getPath.image(name, versionWithHash, isCore);
+  const imagePath = getPath.image(dnpName, versionWithHash, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
-  const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
+  const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
 
   // Append to compose
   const compose = new ComposeEditor(release.compose);
-  compose.applyUserSettings(deepmerge(prevUserSet, userSettings), {
-    dnpName: name
-  });
+  compose.applyUserSettings(deepmerge(prevUserSet, userSettings), { dnpName });
 
   return {
     ...release,

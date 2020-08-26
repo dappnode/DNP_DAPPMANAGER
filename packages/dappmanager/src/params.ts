@@ -185,3 +185,22 @@ export const ethClientData: {
   openethereum: { name: "openethereum.dnp.dappnode.eth" },
   nethermind: { name: "nethermind.public.dappnode.eth" }
 };
+
+// Naming
+
+export const getImageTag = ({
+  serviceName,
+  dnpName,
+  version
+}: {
+  serviceName: string;
+  dnpName: string;
+  version: string;
+}): string => `${serviceName}.${dnpName}:${version}`;
+export const getImageTagSuffix = ({
+  dnpName,
+  version
+}: {
+  dnpName: string;
+  version: string;
+}): string => `${dnpName}:${version}`;

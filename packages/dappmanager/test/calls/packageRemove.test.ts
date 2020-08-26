@@ -24,7 +24,7 @@ describe("Call function: packageRemove", function() {
   const dnp: PackageContainer = {
     ...mockDnp,
     isCore: false,
-    packageName: `DAppNodePackage-${id}`,
+    dnpName: `DAppNodePackage-${id}`,
     name: id
   };
 

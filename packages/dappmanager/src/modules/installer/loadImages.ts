@@ -13,10 +13,10 @@ export async function loadImages(
   log: Log
 ): Promise<void> {
   await Promise.all(
-    packagesData.map(async function({ name, imagePath }) {
-      log(name, "Loading image...");
+    packagesData.map(async function({ dnpName, imagePath }) {
+      log(dnpName, "Loading image...");
       await dockerLoad(imagePath);
-      log(name, "Package Loaded");
+      log(dnpName, "Package Loaded");
     })
   );
 }

@@ -206,7 +206,7 @@ export interface CompatibleDnps {
 }
 
 export interface RequestedDnp {
-  packageName: string; // "bitcoin.dnp.dappnode.eth"
+  dnpName: string; // "bitcoin.dnp.dappnode.eth"
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
@@ -293,13 +293,14 @@ export type ContainerState =
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
 export type ChainDriver = "bitcoin" | "ethereum" | "monero";
+export const chainDrivers: ChainDriver[] = ["bitcoin", "ethereum", "monero"];
 
 /**
  * Type mapping of a package container labels
  * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
  */
 export interface ContainerLabelTypes {
-  "dappnode.dnp.packageName": string;
+  "dappnode.dnp.dnpName": string;
   "dappnode.dnp.version": string;
   "dappnode.dnp.serviceName": string;
   "dappnode.dnp.instanceName": string;
@@ -334,7 +335,7 @@ export interface PackageContainer {
    * "mypackage.dnp.dappnode.eth"
    * ```
    */
-  packageName: string;
+  dnpName: string;
   /**
    * Docker compose service name of this container, as declared in its package docker-compose
    * ```
@@ -563,7 +564,7 @@ export interface ChainData {
 
 export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
-  name: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
+  dnpName: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
   message: string; // "Downloading 75%", log message
   clear?: boolean; // to trigger the UI to clear the all logs of this id
 }
@@ -767,7 +768,7 @@ export interface SpecialPermissionAllDnps {
 }
 
 export interface PackageRelease {
-  packageName: string;
+  dnpName: string;
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
@@ -785,7 +786,7 @@ export interface PackageRelease {
 
 export type InstallPackageDataPaths = Pick<
   InstallPackageData,
-  | "packageName"
+  | "dnpName"
   | "semVersion"
   | "composePath"
   | "composeBackupPath"

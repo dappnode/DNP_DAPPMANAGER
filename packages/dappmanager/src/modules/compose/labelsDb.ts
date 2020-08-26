@@ -1,6 +1,7 @@
 import {
   Dependencies,
   ChainDriver,
+  chainDrivers,
   ContainerLabelsRaw,
   ContainerLabelTypes
 } from "../../types";
@@ -14,16 +15,14 @@ import { pick, mapValues } from "lodash";
  * the types are the same
  */
 
-const parseString = (value: string | undefined): string => value || "";
-const parseBool = (value: string | undefined): boolean =>
-  value === "true" ? true : false;
-const parseJsonSafe = <T>(value: string | undefined): T | null => {
-  if (!value) return null;
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
+const parseString = (value: string | undefined): string | undefined => value;
+const parseBool = (value: string | undefined): boolean | undefined =>
+  typeof value === "string" ? (value === "true" ? true : false) : undefined;
+const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
+  if (value)
+    try {
+      return JSON.parse(value);
+    } catch {}
 };
 
 const writeString = (data: string): string => data || "";
@@ -33,20 +32,23 @@ const writeJson = (data: object | string[]): string => JSON.stringify(data);
 const labelParseFns: {
   [K in keyof Required<ContainerLabelTypes>]: (
     labelValue: string | undefined
-  ) => ContainerLabelTypes[K];
+  ) => ContainerLabelTypes[K] | undefined;
 } = {
-  "dappnode.dnp.packageName": parseString,
+  "dappnode.dnp.dnpName": parseString,
   "dappnode.dnp.version": parseString,
   "dappnode.dnp.serviceName": parseString,
   "dappnode.dnp.instanceName": parseString,
   "dappnode.dnp.dependencies": value => parseJsonSafe(value) || {},
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
-  "dappnode.dnp.chain": value => parseString(value) as ChainDriver,
+  "dappnode.dnp.chain": value =>
+    value && chainDrivers.includes(value as ChainDriver)
+      ? (value as ChainDriver)
+      : undefined,
   "dappnode.dnp.isCore": parseBool,
-  "dappnode.dnp.default.environment": value => parseJsonSafe(value) || [],
-  "dappnode.dnp.default.ports": value => parseJsonSafe(value) || [],
-  "dappnode.dnp.default.volumes": value => parseJsonSafe(value) || []
+  "dappnode.dnp.default.environment": value => parseJsonSafe(value),
+  "dappnode.dnp.default.ports": value => parseJsonSafe(value),
+  "dappnode.dnp.default.volumes": value => parseJsonSafe(value)
 };
 
 const labelStringifyFns: {
@@ -54,7 +56,7 @@ const labelStringifyFns: {
     data: ContainerLabelTypes[K]
   ) => string;
 } = {
-  "dappnode.dnp.packageName": writeString,
+  "dappnode.dnp.dnpName": writeString,
   "dappnode.dnp.version": writeString,
   "dappnode.dnp.serviceName": writeString,
   "dappnode.dnp.instanceName": writeString,
@@ -70,10 +72,10 @@ const labelStringifyFns: {
 
 export function parseContainerLabels(
   labelsRaw: ContainerLabelsRaw
-): ContainerLabelTypes {
+): Partial<ContainerLabelTypes> {
   return mapValues(labelParseFns, (labelParseFn, label) =>
     labelParseFn(labelsRaw[label])
-  ) as ContainerLabelTypes;
+  ) as Partial<ContainerLabelTypes>;
 }
 
 export function stringifyContainerLabels(
@@ -111,8 +113,8 @@ export function writeDefaultsToLabels({
 
 export function readContainerLabels(
   labelsRaw: ContainerLabelsRaw
-): {
-  packageName: string;
+): Partial<{
+  dnpName: string;
   version: string;
   serviceName: string;
   instanceName: string;
@@ -124,10 +126,10 @@ export function readContainerLabels(
   origin: string;
   chain: ChainDriver;
   isCore: boolean;
-} {
+}> {
   const labelValues = parseContainerLabels(labelsRaw);
   return {
-    packageName: labelValues["dappnode.dnp.packageName"],
+    dnpName: labelValues["dappnode.dnp.dnpName"],
     version: labelValues["dappnode.dnp.version"],
     serviceName: labelValues["dappnode.dnp.serviceName"],
     instanceName: labelValues["dappnode.dnp.instanceName"],
@@ -143,7 +145,7 @@ export function readContainerLabels(
 }
 
 export function writeMetadataToLabels({
-  packageName,
+  dnpName,
   version,
   serviceName,
   dependencies,
@@ -152,7 +154,7 @@ export function writeMetadataToLabels({
   origin,
   isCore
 }: {
-  packageName: string;
+  dnpName: string;
   version: string;
   serviceName: string;
   dependencies?: Dependencies;
@@ -162,7 +164,7 @@ export function writeMetadataToLabels({
   isCore?: boolean;
 }): ContainerLabelsRaw {
   return stringifyContainerLabels({
-    "dappnode.dnp.packageName": packageName,
+    "dappnode.dnp.dnpName": dnpName,
     "dappnode.dnp.version": version,
     "dappnode.dnp.serviceName": serviceName,
     "dappnode.dnp.dependencies": dependencies,

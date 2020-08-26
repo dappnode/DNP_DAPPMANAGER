@@ -79,7 +79,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     async function listContainerNoThrow(
       name: string
     ): Promise<PackageContainer | null> {
-      return dnpList.find(dnp => dnp.name === name) || null;
+      return dnpList.find(dnp => dnp.dnpName === name) || null;
     }
 
     const packageInstall = sinon.mock().resolves({ message: "" });
@@ -142,7 +142,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     // Simulate the package starts running after being installed
     dnpList.push({
       ...mockDnp,
-      name: newTargetData.name,
+      dnpName: newTargetData.name,
       running: true
     });
     await runClientInstallerWatcher();

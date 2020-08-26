@@ -24,16 +24,17 @@ describe("docker > volumes data", () => {
     it("Should parse ownership data of a shared volume", () => {
       const dnpList: PackageContainer[] = [
         {
-          id:
+          containerId:
             "38e0f958856d16076bb241fa72d80bded9b4fd1101e5a7dbe29be68e9a61434d",
-          packageName: "DAppNodePackage-main.dnp.dappnode.eth",
+          containerName: "DAppNodePackage-main.dnp.dappnode.eth",
+          dnpName: "main.dnp.dappnode.eth",
+          serviceName: "main.dnp.dappnode.eth",
+          instanceName: "",
           version: "0.1.0",
           isDnp: true,
           isCore: false,
           created: 1592689345,
           image: "main.dnp.dappnode.eth:0.1.0",
-          name: "main.dnp.dappnode.eth",
-          shortName: "main",
           ip: "172.22.0.3",
           ports: [],
           volumes: [
@@ -63,16 +64,17 @@ describe("docker > volumes data", () => {
           canBeFullnode: false
         },
         {
-          id:
+          containerId:
             "c44f7803a4192db211367f5558dfee0ec48b3b800e5638e06bb43edf8b74cd1c",
-          packageName: "DAppNodePackage-dependency.dnp.dappnode.eth",
+          containerName: "DAppNodePackage-dependency.dnp.dappnode.eth",
+          dnpName: "dependency.dnp.dappnode.eth",
+          serviceName: "dependency.dnp.dappnode.eth",
+          instanceName: "",
           version: "0.1.0",
           isDnp: true,
           isCore: false,
           created: 1592689343,
           image: "dependency.dnp.dappnode.eth:0.1.0",
-          name: "dependency.dnp.dappnode.eth",
-          shortName: "dependency",
           ip: "172.22.0.2",
           ports: [],
           volumes: [

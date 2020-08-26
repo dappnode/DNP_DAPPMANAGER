@@ -79,12 +79,12 @@ send
     const dnpList: PackageContainer[] = [
       {
         ...mockDnp,
-        name: bitcoinDnpName,
+        dnpName: bitcoinDnpName,
         ip: "172.33.0.2"
       },
       {
         ...mockDnp,
-        name: gethDnpName,
+        dnpName: gethDnpName,
         ip: "172.33.0.3",
         chain: "ethereum"
       }

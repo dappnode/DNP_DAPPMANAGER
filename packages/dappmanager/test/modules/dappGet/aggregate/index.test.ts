@@ -39,28 +39,28 @@ const dnpList: PackageContainer[] = [
       [nginxId]: "latest",
       "letsencrypt-nginx.dnp.dappnode.eth": "latest"
     },
-    name: "web.dnp.dappnode.eth",
+    dnpName: "web.dnp.dappnode.eth",
     version: "0.0.0",
     origin: undefined
   },
   {
     ...mockDnp,
     dependencies: {},
-    name: "vpn.dnp.dappnode.eth",
+    dnpName: "vpn.dnp.dappnode.eth",
     version: "0.1.16",
     origin: undefined
   },
   {
     ...mockDnp,
     dependencies: { [nginxId]: "latest" },
-    name: nginxId,
+    dnpName: nginxId,
     version: "0.0.3",
     origin: undefined
   },
   {
     ...mockDnp,
     dependencies: { "web.dnp.dappnode.eth": "latest" },
-    name: "letsencrypt-nginx.dnp.dappnode.eth",
+    dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
     version: "0.0.4",
     origin: "/ipfs/Qm1234"
   }
@@ -93,11 +93,11 @@ async function aggregateDependencies({
     };
     return;
   }
-  const dnp = dnpList.find(dnp => dnp.name === name);
+  const dnp = dnpList.find(dnp => dnp.dnpName === name);
   if (dnp) {
-    dnps[dnp.name] = {
+    dnps[dnp.dnpName] = {
       versions: {
-        ...(dnps[dnp.name] ? dnps[dnp.name].versions || {} : {}),
+        ...(dnps[dnp.dnpName] ? dnps[dnp.dnpName].versions || {} : {}),
         [dnp.version]: dnp.dependencies
       }
     };
@@ -109,7 +109,7 @@ function getRelevantInstalledDnps(): PackageContainer[] {
     "web.dnp.dappnode.eth",
     "letsencrypt-nginx.dnp.dappnode.eth"
   ];
-  return dnpList.filter(dnp => relevantInstalledDnpNames.includes(dnp.name));
+  return dnpList.filter(dnp => relevantInstalledDnpNames.includes(dnp.dnpName));
 }
 
 const dappGetFetcherEmpty = new DappGetFetcherMock({});

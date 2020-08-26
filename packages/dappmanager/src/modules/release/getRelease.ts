@@ -45,7 +45,7 @@ export async function getRelease({
   if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
 
-  const name = manifest.name;
+  const dnpName = manifest.name;
   const isCore = getIsCore(manifest);
 
   const metadata = parseMetadataFromManifest(manifest);
@@ -57,7 +57,7 @@ export async function getRelease({
     // Add SSL environment variables
     if (manifest.ssl) {
       const dnpSubDomain = shortNameDomainByService(
-        `${shortNameDomain(name)}.${db.domain.get()}`
+        `${shortNameDomain(dnpName)}.${db.domain.get()}`
       );
       service.mergeEnvs({
         VIRTUAL_HOST: dnpSubDomain,
@@ -71,7 +71,7 @@ export async function getRelease({
 
     service.mergeLabels(
       writeMetadataToLabels({
-        packageName: manifest.name,
+        dnpName,
         version: manifest.version,
         serviceName: service.serviceName,
         dependencies: sanitizeDependencies(metadata.dependencies || {}),
@@ -84,7 +84,7 @@ export async function getRelease({
   }
 
   return {
-    name,
+    dnpName,
     reqVersion: origin || manifest.version,
     semVersion: manifest.version,
     origin,
@@ -98,9 +98,8 @@ export async function getRelease({
     // decide to throw an error or just show a warning in the UI
     warnings: {
       unverifiedCore:
-        isCore && Boolean(origin) && name.endsWith(".dnp.dappnode.eth"),
-      requestNameMismatch:
-        isEnsDomain(reqName || "") && reqName !== manifest.name
+        isCore && Boolean(origin) && dnpName.endsWith(".dnp.dappnode.eth"),
+      requestNameMismatch: isEnsDomain(reqName || "") && reqName !== dnpName
     }
   };
 }

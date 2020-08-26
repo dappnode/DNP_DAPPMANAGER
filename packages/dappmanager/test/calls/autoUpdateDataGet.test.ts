@@ -13,7 +13,7 @@ import { autoUpdateDataGet as autoUpdateDataGetType } from "../../src/calls/auto
 import { PackageContainer } from "../../src/types";
 
 describe("Call function: autoUpdateDataGet", () => {
-  const id = "bitcoin.dnp.dappnode.eth";
+  const dnpName = "bitcoin.dnp.dappnode.eth";
   const currentVersion = "0.2.6";
   const nextVersion = "0.2.7";
   const timestamp = Date.now() - 1000;
@@ -22,27 +22,27 @@ describe("Call function: autoUpdateDataGet", () => {
     return [
       {
         ...mockDnp,
-        name: id,
+        dnpName,
         isDnp: true,
         version: currentVersion
       },
       {
         ...mockDnp,
-        name: "admin",
+        dnpName: "admin",
         isDnp: false,
         isCore: true,
         version: "0.2.1"
       },
       {
         ...mockDnp,
-        name: "core",
+        dnpName: "core",
         isDnp: false,
         isCore: true,
         version: "0.2.1"
       },
       {
         ...mockDnp,
-        name: "vpn",
+        dnpName: "vpn",
         isDnp: false,
         isCore: true,
         version: "0.2.0"
@@ -71,9 +71,9 @@ describe("Call function: autoUpdateDataGet", () => {
     // Enable a few DNPs
     editCoreSetting(true);
     editDnpSetting(true);
-    editDnpSetting(true, id);
+    editDnpSetting(true, dnpName);
     // Trigger some versions
-    isUpdateDelayCompleted(id, nextVersion, timestamp);
+    isUpdateDelayCompleted(dnpName, nextVersion, timestamp);
     flagCompletedUpdate(
       "core.dnp.dappnode.eth",
       "admin@0.2.1,core@0.2.1",
@@ -120,7 +120,7 @@ describe("Call function: autoUpdateDataGet", () => {
           feedback: {}
         },
         {
-          id: id,
+          id: dnpName,
           displayName: "Bitcoin",
           enabled: true,
           feedback: { scheduled: timestamp + params.AUTO_UPDATE_DELAY }

@@ -6,12 +6,9 @@ import {
   PackageContainer,
   Manifest,
   VolumeMapping,
-  DirectoryDnp,
-  PortMapping,
   PackageRelease,
   Compose,
   ManifestWithImage,
-  ComposeService,
   InstallPackageData
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
@@ -81,15 +78,16 @@ export const mockSize = 1111111;
 export const mockHash = "/ipfs/QmWkAVYJhpwqApRfK4SZ6e2Xt2Daamc8uBpM1oMLmQ6fw4";
 
 export const mockDnp: PackageContainer = {
-  id: "17628371823",
-  packageName: mockDnpName,
+  containerId: "17628371823",
+  containerName: `DAppNodePackage-${mockDnpName}`,
+  dnpName: mockDnpName,
+  serviceName: mockDnpName,
+  instanceName: "",
   version: "0.0.0",
   isDnp: true,
   isCore: false,
   created: 1573712712,
   image: "mock-image",
-  name: "mock-name",
-  shortName: "mock-shortname",
   state: "running",
   running: true,
   ports: [],
@@ -212,7 +210,7 @@ export const mockCompose: Compose = {
 };
 
 export const mockRelease: PackageRelease = {
-  name: mockDnpName,
+  dnpName: mockDnpName,
   reqVersion: mockDnpVersion,
   semVersion: mockDnpVersion,
   manifestFile: { hash: mockHash, size: mockSize, source: "ipfs" },

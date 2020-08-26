@@ -37,9 +37,9 @@ describe("Fetch releases", () => {
   const testMountpointfetchMain = getTestMountpoint("fetch-main");
   const testMountpointfetchMountpoint = getTestMountpoint("fetch-mountpoint");
 
-  const idMain = "main.dnp.dappnode.eth";
-  const idDep = "dependency.dnp.dappnode.eth";
-  const ids = [idMain, idDep];
+  const dnpNameMain = "main.dnp.dappnode.eth";
+  const dnpNameDep = "dependency.dnp.dappnode.eth";
+  const dnpNames = [dnpNameMain, dnpNameDep];
   const mainVersion = "0.1.0";
   const depVersion = "0.0.1";
 
@@ -59,11 +59,11 @@ describe("Fetch releases", () => {
   });
 
   beforeEach("Clean container and volumes", async () => {
-    await cleanContainers(...ids);
+    await cleanContainers(...dnpNames);
   });
 
   after("Clean container and volumes", async () => {
-    await cleanContainers(...ids);
+    await cleanContainers(...dnpNames);
   });
 
   describe("fetchDnpRequest with dependencies (manifest release)", () => {
@@ -73,7 +73,7 @@ describe("Fetch releases", () => {
 
     // Manifest fetched from IPFS
     const mainDnpManifest: ManifestWithImage = {
-      name: idMain,
+      name: dnpNameMain,
       version: mainVersion,
       avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
       image: {
@@ -100,7 +100,7 @@ describe("Fetch releases", () => {
 
     // Manifest fetched from IPFS
     const dependencyManifest: ManifestWithImage = {
-      name: idDep,
+      name: dnpNameDep,
       version: depVersion,
       image: {
         hash: "",
@@ -127,9 +127,9 @@ describe("Fetch releases", () => {
     const composeMain = new ComposeEditor({
       version: "3.4",
       services: {
-        [idMain]: {
-          container_name: getContainerName(idMain, false),
-          image: getImage(idMain, mainVersion),
+        [dnpNameMain]: {
+          container_name: getContainerName(dnpNameMain, false),
+          image: getImage(dnpNameMain, mainVersion),
           environment: { PREVIOUS_SET: "PREV_VAL" },
           volumes: ["data0:/usr0", `${customVolumePath}:/usr1`],
           labels: writeDefaultsToLabels({
@@ -157,7 +157,7 @@ describe("Fetch releases", () => {
       const mainUpload = await uploadManifestRelease({
         ...mainDnpManifest,
         dependencies: {
-          [idDep]: depUpload.hash
+          [dnpNameDep]: depUpload.hash
         }
       });
 
@@ -166,7 +166,7 @@ describe("Fetch releases", () => {
       const mainDnpImageSize = mainUpload.imageSize;
 
       // Up mock docker packages
-      const composePathMain = ComposeEditor.getComposePath(idMain, false);
+      const composePathMain = ComposeEditor.getComposePath(dnpNameMain, false);
       composeMain.writeTo(composePathMain);
       await shell(`mkdir -p ${customMountpoint}`); // Create the mountpoint for the bind volume
       await dockerComposeUp(composePathMain);
@@ -175,34 +175,34 @@ describe("Fetch releases", () => {
       const result = await calls.fetchDnpRequest({ id: mainDnpReleaseHash });
 
       const expectRequestDnp: RequestedDnp = {
-        name: idMain,
+        dnpName: dnpNameMain,
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
         avatarUrl:
           "http://ipfs.dappnode:8080/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
         metadata: {
-          name: idMain,
+          name: dnpNameMain,
           version: mainVersion,
           dependencies: {
-            [idDep]: dependencyReleaseHash
+            [dnpNameDep]: dependencyReleaseHash
           },
           type: "service"
         },
         specialPermissions: {
-          [idDep]: [],
-          [idMain]: [
+          [dnpNameDep]: [],
+          [dnpNameMain]: [
             {
               name: "Access to package volume",
               details:
                 "Allows to read and write to the volume dependencydnpdappnodeeth_data",
-              serviceName: idMain
+              serviceName: dnpNameMain
             }
           ]
         },
 
         setupWizard: {
-          [idMain]: {
+          [dnpNameMain]: {
             version: "2",
             fields: [
               {
@@ -213,7 +213,7 @@ describe("Fetch releases", () => {
               }
             ]
           },
-          [idDep]: {
+          [dnpNameDep]: {
             version: "2",
             fields: [
               {
@@ -230,15 +230,15 @@ describe("Fetch releases", () => {
         isUpdated: false,
         isInstalled: true,
         settings: {
-          [idMain]: {
+          [dnpNameMain]: {
             environment: {
-              [idMain]: {
+              [dnpNameMain]: {
                 ENV_DEFAULT: "ORIGINAL",
                 PREVIOUS_SET: "PREV_VAL"
               }
             },
             portMappings: {
-              [idMain]: { "1111/TCP": "1111" }
+              [dnpNameMain]: { "1111/TCP": "1111" }
             },
             namedVolumeMountpoints: {
               data0: mountpoint,
@@ -246,15 +246,15 @@ describe("Fetch releases", () => {
               data2: ""
             },
             legacyBindVolumes: {
-              [idMain]: { data1: customVolumePath }
+              [dnpNameMain]: { data1: customVolumePath }
             }
           },
-          [idDep]: {
+          [dnpNameDep]: {
             environment: {
-              [idDep]: { DEP_ENV: "DEP_ORIGINAL" }
+              [dnpNameDep]: { DEP_ENV: "DEP_ORIGINAL" }
             },
             portMappings: {
-              [idDep]: { "2222/TCP": "2222" }
+              [dnpNameDep]: { "2222/TCP": "2222" }
             },
             namedVolumeMountpoints: {
               data: ""
@@ -268,8 +268,8 @@ describe("Fetch releases", () => {
             isCompatible: true,
             error: "",
             dnps: {
-              [idDep]: { from: undefined, to: dependencyReleaseHash },
-              [idMain]: { from: mainVersion, to: mainDnpReleaseHash }
+              [dnpNameDep]: { from: undefined, to: dependencyReleaseHash },
+              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
             }
           },
           available: {
@@ -285,7 +285,7 @@ describe("Fetch releases", () => {
 
   describe("fetchDnpRequest with misc files (directory release)", () => {
     const mainDnpManifest: Manifest = {
-      name: idMain,
+      name: dnpNameMain,
       version: mainVersion,
       avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt"
     };
@@ -293,9 +293,9 @@ describe("Fetch releases", () => {
     const composeMain = new ComposeEditor({
       version: "3.4",
       services: {
-        [idMain]: {
-          container_name: getContainerName(idMain, false),
-          image: getImage(idMain, mainVersion)
+        [dnpNameMain]: {
+          container_name: getContainerName(dnpNameMain, false),
+          image: getImage(dnpNameMain, mainVersion)
         }
       }
     });
@@ -324,7 +324,7 @@ describe("Fetch releases", () => {
       });
 
       // Up mock docker packages
-      const composePathMain = ComposeEditor.getComposePath(idMain, false);
+      const composePathMain = ComposeEditor.getComposePath(dnpNameMain, false);
       validate.path(composePathMain);
       composeMain.writeTo(composePathMain);
       await dockerComposeUp(composePathMain);
@@ -333,29 +333,29 @@ describe("Fetch releases", () => {
       const result = await calls.fetchDnpRequest({ id: mainDnpReleaseHash });
 
       const expectRequestDnp: RequestedDnp = {
-        name: idMain,
+        dnpName: dnpNameMain,
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
         avatarUrl:
           "http://ipfs.dappnode:8080/ipfs/QmYZkQjhSoqyq9mTaK3FiT3MDcrFDvEwQvzMGWW6f1nHGm",
         metadata: {
-          name: idMain,
+          name: dnpNameMain,
           version: mainVersion,
           type: "service",
           disclaimer: {
             message: disclaimer
           }
         },
-        specialPermissions: { [idMain]: [] },
+        specialPermissions: { [dnpNameMain]: [] },
 
         // Data added via files, to be tested
-        setupWizard: { [idMain]: setupWizard },
+        setupWizard: { [dnpNameMain]: setupWizard },
 
         isUpdated: false,
         isInstalled: true,
         settings: {
-          [idMain]: {}
+          [dnpNameMain]: {}
         },
         request: {
           compatible: {
@@ -364,7 +364,7 @@ describe("Fetch releases", () => {
             isCompatible: true,
             error: "",
             dnps: {
-              [idMain]: { from: mainVersion, to: mainDnpReleaseHash }
+              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
             }
           },
           available: {

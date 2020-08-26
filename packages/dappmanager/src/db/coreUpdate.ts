@@ -24,7 +24,7 @@ export const coreUpdatePackagesData = {
         ? packagesData.map(
             (packageData): InstallPackageDataPaths =>
               pick(packageData, [
-                "name",
+                "dnpName",
                 "semVersion",
                 "composePath",
                 "composeBackupPath",

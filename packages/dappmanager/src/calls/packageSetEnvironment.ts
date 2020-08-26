@@ -24,7 +24,7 @@ export async function packageSetEnvironment({
   if (!envs) throw Error("kwarg envs must be defined");
 
   const dnp = await listContainer(id);
-  const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+  const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   compose.service().mergeEnvs(envs);
   compose.write();
 

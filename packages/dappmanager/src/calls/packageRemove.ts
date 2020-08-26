@@ -27,14 +27,14 @@ export async function packageRemove({
 }): Promise<void> {
   if (!id) throw Error("kwarg id must be defined");
 
-  const { name, isCore, packageName: containerName } = await listContainer(id);
+  const { dnpName, isCore, containerName } = await listContainer(id);
 
   if (isCore || id === params.dappmanagerDnpName) {
     throw Error("Core packages cannot be cannot be removed");
   }
 
   // Only no-cores will
-  const composePath = getPath.dockerCompose(name, false);
+  const composePath = getPath.dockerCompose(dnpName, false);
   const packageRepoDir = getPath.packageRepoDir(id, false);
 
   // Necessary for eventBus dependants to know the exact list of deleted DNPs

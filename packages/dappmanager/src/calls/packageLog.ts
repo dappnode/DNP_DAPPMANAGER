@@ -14,7 +14,7 @@ export async function packageLog({
   if (!id) throw Error("kwarg id must be defined");
 
   const dnp = await listContainer(id);
-  const containerName = dnp.packageName;
+  const containerName = dnp.dnpName;
 
   return await logContainer(containerName, options);
 }

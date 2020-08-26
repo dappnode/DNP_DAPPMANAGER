@@ -44,12 +44,15 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   if (autoUpdateHelper.isDnpUpdateEnabled()) {
     const singleDnpsToShow: PackageContainer[] = [];
     for (const dnp of dnpList) {
-      const storedDnp = singleDnpsToShow.find(_dnp => _dnp.name === dnp.name);
+      const storedDnp = singleDnpsToShow.find(
+        _dnp => _dnp.dnpName === dnp.dnpName
+      );
       const storedVersion = storedDnp ? storedDnp.version : "";
       if (
-        dnp.name &&
+        dnp.dnpName &&
         // Ignore core DNPs
         dnp.isDnp &&
+        !dnp.isCore &&
         // Ignore wierd versions
         semver.valid(dnp.version) &&
         // Ensure there are no duplicates
@@ -59,14 +62,14 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
     }
 
     for (const dnp of singleDnpsToShow) {
-      const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
+      const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.dnpName);
       dnpsToShow.push({
-        id: dnp.name,
-        displayName: shortNameCapitalized(dnp.name),
+        id: dnp.dnpName,
+        displayName: shortNameCapitalized(dnp.dnpName),
         enabled,
         feedback: enabled
           ? autoUpdateHelper.getDnpFeedbackMessage({
-              id: dnp.name,
+              id: dnp.dnpName,
               currentVersion: dnp.version
             })
           : {}

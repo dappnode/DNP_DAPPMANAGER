@@ -41,10 +41,10 @@ export async function backupGet({
 
   // Get container name
   const dnp = await listContainer(id);
-  const containerName = dnp.packageName;
+  const containerName = dnp.dnpName;
 
   // Intermediate step, the file is in local file system
-  const backupDir = path.join(tempTransferDir, `${dnp.name}_backup`);
+  const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);
   await shell(`mkdir -p ${backupDir}`); // Never throws
 
   // Copy file from container to local file system

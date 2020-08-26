@@ -55,10 +55,10 @@ export async function runLegacyActions(): Promise<void> {
 
   // Remove legacy containers
   for (const dnpName of dnpsToRemove) {
-    const dnp = dnpList.find(d => d.name === dnpName);
+    const dnp = dnpList.find(d => d.dnpName === dnpName);
     if (dnp)
       try {
-        await dockerRm(dnp.id); // Remove / uninstall DNP
+        await dockerRm(dnp.maybeMultiContainerIdsForDnp); // Remove / uninstall DNP
         // Clean manifest and docker-compose
         for (const filepath of [
           getPath.dockerCompose(dnpName, true),

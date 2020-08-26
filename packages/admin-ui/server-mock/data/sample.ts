@@ -43,7 +43,7 @@ export const sampleDirectoryState: DirectoryItem = {
 
 export const samplePackageContainer: InstalledPackageDetailData = {
   id: "7s51a",
-  packageName: "demo-name",
+  dnpName: "demo-name",
   version: "0.0.0",
   isDnp: true,
   isCore: false,

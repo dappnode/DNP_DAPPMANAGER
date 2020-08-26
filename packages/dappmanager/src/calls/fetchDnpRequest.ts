@@ -37,16 +37,19 @@ export async function fetchDnpRequest({
   const dnpList = await listContainers();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
-    const { name, metadata, compose, isCore } = release;
+    const { dnpName, metadata, compose, isCore } = release;
 
-    const container = dnpList.find(_dnp => _dnp.name === name);
+    const container = dnpList.find(_dnp => _dnp.dnpName === dnpName);
     const isInstalled = Boolean(container);
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
-    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
-    settings[name] = deepmerge(defaultUserSet, prevUserSet);
+    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(
+      dnpName,
+      isCore
+    );
+    settings[dnpName] = deepmerge(defaultUserSet, prevUserSet);
 
-    specialPermissions[name] = parseSpecialPermissions(compose, isCore);
+    specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
     if (metadata.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
@@ -79,7 +82,7 @@ export async function fetchDnpRequest({
         if (await shouldAddSetupWizardField())
           activeSetupWizardFields.push(field);
       }
-      setupWizard[name] = {
+      setupWizard[dnpName] = {
         ...metadata.setupWizard,
         fields: activeSetupWizardFields
       };
@@ -92,13 +95,13 @@ export async function fetchDnpRequest({
   let compatibleError = "";
   let compatibleDnps: CompatibleDnps = {};
   try {
-    const { name, reqVersion } = mainRelease;
+    const { dnpName, reqVersion } = mainRelease;
     const {
       state,
       currentVersions,
       releases
     } = await releaseFetcher.getReleasesResolved({
-      name,
+      name: dnpName,
       ver: reqVersion
     });
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
@@ -108,13 +111,13 @@ export async function fetchDnpRequest({
 
     // Add dependencies' metadata
     for (const release of releases)
-      if (release.name !== name) await addReleaseToSettings(release);
+      if (release.dnpName !== dnpName) await addReleaseToSettings(release);
   } catch (e) {
     compatibleError = e.message;
   }
 
   return {
-    name: mainRelease.name, // "bitcoin.dnp.dappnode.eth"
+    dnpName: mainRelease.dnpName, // "bitcoin.dnp.dappnode.eth"
     semVersion: mainRelease.semVersion,
     reqVersion: mainRelease.reqVersion,
     origin: mainRelease.origin, // "/ipfs/Qm"
@@ -151,20 +154,20 @@ export async function fetchDnpRequest({
  * Helper to check if a package is installed
  */
 export function getIsInstalled(
-  { name }: { name: string },
+  { dnpName }: { dnpName: string },
   dnpList: PackageContainer[]
 ): boolean {
-  return !!dnpList.find(dnp => dnp.name === name);
+  return !!dnpList.find(dnp => dnp.dnpName === dnpName);
 }
 
 /**
  * Helper to check if a package is update to the latest version
  */
 export function getIsUpdated(
-  { name, reqVersion }: { name: string; reqVersion: string },
+  { dnpName, reqVersion }: { dnpName: string; reqVersion: string },
   dnpList: PackageContainer[]
 ): boolean {
-  const dnp = dnpList.find(dnp => dnp.name === name);
+  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
   if (!dnp) return false;
   return !shouldUpdate(dnp.version, reqVersion);
 }
@@ -173,7 +176,7 @@ function getRequiresCoreUpdate(
   { metadata }: { metadata: PackageReleaseMetadata },
   dnpList: PackageContainer[]
 ): boolean {
-  const coreDnp = dnpList.find(dnp => dnp.name === params.coreDnpName);
+  const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;
   const coreVersion = coreDnp.version;
   const minDnVersion = metadata.requirements

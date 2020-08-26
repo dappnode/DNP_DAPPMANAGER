@@ -96,7 +96,7 @@ export async function migrateEthchain(): Promise<void> {
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
   if (ethchainContainer)
     try {
-      await dockerRm(ethchainContainer.id);
+      await dockerRm(ethchainContainer.containerId);
       logs.info("Removed ETHCHAIN package");
 
       // Clean manifest and docker-compose

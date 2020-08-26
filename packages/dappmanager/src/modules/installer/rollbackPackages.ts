@@ -20,7 +20,7 @@ export async function rollbackPackages(
   // Restore all backup composes. Do it first to make sure the next version compose is not
   // used unintentionally if the installed package is restored
   for (const {
-    name,
+    dnpName,
     composePath,
     composeBackupPath,
     manifestPath,
@@ -37,23 +37,23 @@ export async function rollbackPackages(
         fs.unlinkSync(from);
       } catch (e) {
         if (!isNotFoundError(e) || isUpdate)
-          logs.error(`Rollback error restoring ${name} ${from}`, e);
+          logs.error(`Rollback error restoring ${dnpName} ${from}`, e);
       }
 
   // Delete image files
-  for (const { name, imagePath } of packagesData)
+  for (const { dnpName, imagePath } of packagesData)
     try {
       fs.unlinkSync(imagePath);
     } catch (e) {
-      logs.error(`Rollback error removing ${name} image`, e);
+      logs.error(`Rollback error removing ${dnpName} image`, e);
     }
 
   // Restore backup versions
-  for (const { name, composePath, isUpdate } of packagesData)
+  for (const { dnpName, composePath, isUpdate } of packagesData)
     try {
-      log(name, "Aborting and rolling back...");
+      log(dnpName, "Aborting and rolling back...");
 
-      if (name === params.dappmanagerDnpName) {
+      if (dnpName === params.dappmanagerDnpName) {
         // The DAPPMANAGER cannot be rolled back here. If the restartPatch has already
         // stopped the original container this line will never be reached. If the
         // restartPatch failed before stopping the original container there's no need
@@ -65,8 +65,8 @@ export async function rollbackPackages(
         await dockerComposeRm(composePath);
       }
 
-      log(name, "Aborted and rolled back...");
+      log(dnpName, "Aborted and rolled back...");
     } catch (e) {
-      logs.error(`Rollback error rolling starting ${name}`, e);
+      logs.error(`Rollback error rolling starting ${dnpName}`, e);
     }
 }

@@ -5,6 +5,7 @@ import verifyXz from "../../utils/verifyXz";
 import downloadImage from "./ipfs/downloadImage";
 import { DistributedFile } from "../../types";
 import { dockerImageManifest } from "../docker/dockerCommands";
+import { getImageTagSuffix } from "../../params";
 
 export default async function getImage(
   imageFile: DistributedFile,
@@ -65,19 +66,19 @@ export async function validateTarImage(path: string): Promise<void> {
  */
 export async function verifyDockerImage({
   imagePath,
-  name,
+  dnpName,
   version
 }: {
   imagePath: string;
-  name: string;
+  dnpName: string;
   version: string;
 }): Promise<void> {
-  const expectedTag = `${name}:${version}`;
+  const expectedTagSuffix = getImageTagSuffix({ dnpName, version });
   const images = await dockerImageManifest(imagePath);
   for (const image of images) {
     for (const repoTag of image.RepoTags) {
-      if (!repoTag.endsWith(expectedTag))
-        throw Error(`Invalid image tag '${repoTag}' expected '${expectedTag}'`);
+      if (!repoTag.endsWith(expectedTagSuffix))
+        throw Error(`Invalid image tag '${repoTag}' for ${dnpName} ${version}`);
     }
   }
 }

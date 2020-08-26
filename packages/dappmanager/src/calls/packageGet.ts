@@ -20,7 +20,7 @@ export async function packageGet({
   if (!id) throw Error("kwarg id must be defined");
 
   const dnpList = await listContainers();
-  const dnp = dnpList.find(_dnp => _dnp.name === id);
+  const dnp = dnpList.find(_dnp => _dnp.dnpName === id);
   if (!dnp) throw Error(`No DNP was found for name ${id}`);
   const volumesData = await getVolumesOwnershipData();
 
@@ -34,12 +34,12 @@ export async function packageGet({
       dnp.volumes.length > 0 &&
       dnp.volumes.some(vol => {
         const owner = volumesData.find(v => v.name === vol.name)?.owner;
-        return !owner || owner === dnp.name;
+        return !owner || owner === dnp.dnpName;
       }),
-    volumeUsersToRemove: dnpsToRemove.filter(name => name !== dnp.name),
-    dependantsOf: dnpList.filter(d => d.dependencies[id]).map(d => d.name),
+    volumeUsersToRemove: dnpsToRemove.filter(name => name !== dnp.dnpName),
+    dependantsOf: dnpList.filter(d => d.dependencies[id]).map(d => d.dnpName),
     namedExternalVols: volumesData.filter(
-      v => v.owner && v.owner !== dnp.name && v.users.includes(dnp.name)
+      v => v.owner && v.owner !== dnp.dnpName && v.users.includes(dnp.dnpName)
     )
   };
 
@@ -58,7 +58,7 @@ export async function packageGet({
       if (manifest.gettingStarted) {
         dnpData.gettingStarted = manifest.gettingStarted;
         dnpData.gettingStartedShow = Boolean(
-          db.packageGettingStartedShow.get(dnp.name)
+          db.packageGettingStartedShow.get(dnp.dnpName)
         );
       }
 
@@ -77,10 +77,10 @@ export async function packageGet({
         };
       }
     } else {
-      logs.debug(`No manifest found for ${dnp.name} core = ${dnp.isCore}`);
+      logs.debug(`No manifest found for ${dnp.dnpName} core = ${dnp.isCore}`);
     }
   } catch (e) {
-    logs.warn(`Error getting manifest for ${dnp.name}`, e);
+    logs.warn(`Error getting manifest for ${dnp.dnpName}`, e);
   }
 
   // User settings
@@ -89,14 +89,14 @@ export async function packageGet({
     // ENVs that are not declared in the compose will show up (i.e. PATH)
     // So it's easier and cleaner to just parse the docker-compose.yml
     const userSettings = ComposeFileEditor.getUserSettingsIfExist(
-      dnp.name,
+      dnp.dnpName,
       dnp.isCore
     );
     dnpData.userSettings = {
       environment: userSettings.environment
     };
   } catch (e) {
-    logs.warn(`Error getting user settings for ${dnp.name}`, e);
+    logs.warn(`Error getting user settings for ${dnp.dnpName}`, e);
   }
 
   return dnpData;

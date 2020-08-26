@@ -93,7 +93,7 @@ export function parseVolumeOwnershipData(
   // Get user names
   const users = Array.from(
     dnpList.reduce((_users, dnp) => {
-      if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.name);
+      if (dnp.volumes.some(v => v.name === vol.Name)) _users.add(dnp.dnpName);
       return _users;
     }, new Set<string>())
   );
@@ -102,14 +102,14 @@ export function parseVolumeOwnershipData(
   // TODO: Weak, derived from project name, may be exploited
   const { normalizedOwnerName } = parseVolumeLabels(vol.Labels || {});
   const ownerContainer = dnpList.find(
-    dnp => normalizeProjectName(dnp.name) === normalizedOwnerName
+    dnp => normalizeProjectName(dnp.dnpName) === normalizedOwnerName
   );
 
   return {
     // Real volume and owner name to call delete on
     name: vol.Name,
     // Do not assign to a fallback user, if the container has no owner it can be deleted by any user
-    owner: ownerContainer?.name,
+    owner: ownerContainer?.dnpName,
     users
   };
 }

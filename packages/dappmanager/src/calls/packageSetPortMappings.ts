@@ -29,10 +29,10 @@ export async function packageSetPortMappings({
 
   const dnp = await listContainer(id);
 
-  if (dnp.name === params.dappmanagerDnpName)
+  if (dnp.dnpName === params.dappmanagerDnpName)
     throw Error("Can not edit DAPPAMANAGER ports");
 
-  const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+  const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   const service = compose.service();
   const previousPortMappings = service.getPortMappings();
   if (options && options.merge) service.mergePortMapping(portMappings);

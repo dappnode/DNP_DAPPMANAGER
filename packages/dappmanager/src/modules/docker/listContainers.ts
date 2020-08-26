@@ -47,7 +47,7 @@ export async function listContainerNoThrow(
     .map(parseContainerInfo)
     .filter(
       container =>
-        container.containerName === byName || container.packageName === byName
+        container.containerName === byName || container.dnpName === byName
     );
   if (matches.length > 1) throw Error(`Multiple matches found for ${byName}`);
   return matches[0] || null;
@@ -63,8 +63,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
   const labels = readContainerLabels(container.Labels);
 
   const containerName = (container.Names[0] || "").replace("/", "");
-  const packageName =
-    labels.packageName ||
+  const dnpName =
+    labels.dnpName ||
     containerName.split(CONTAINER_NAME_PREFIX)[1] ||
     containerName.split(CONTAINER_CORE_NAME_PREFIX)[1];
 
@@ -82,11 +82,10 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     serviceName:
       labels.serviceName || container.Labels["com.docker.compose.service"],
     instanceName: labels.instanceName,
-    packageName,
+    dnpName,
     version: labels.version || (container.Image || "").split(":")[1] || "0.0.0",
     isDnp:
-      Boolean(labels.packageName) ||
-      containerName.includes(CONTAINER_NAME_PREFIX),
+      Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX),
     isCore:
       typeof labels.isCore === "boolean"
         ? labels.isCore
@@ -130,7 +129,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatarUrl: multiaddressToGatewayUrl(labels.avatar),
     origin: labels.origin,
     chain: labels.chain,
-    canBeFullnode: allowedFullnodeDnpNames.includes(packageName),
+    canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
     // Default settings on the original package version's docker-compose
     defaultEnvironment,
     defaultPorts,

@@ -29,11 +29,16 @@ export const publicPackagesData: express.Handler = async (req, res) => {
  */
 function getPublicPackageData(
   container: PackageContainer
-): Pick<PackageContainer, "name" | "version" | "ip" | "state"> {
+): {
+  name: string;
+  version: string;
+  state: string;
+  ip?: string;
+} {
   return {
-    name: container.name,
+    name: container.dnpName,
     version: container.version,
-    ip: container.ip,
-    state: container.state
+    state: container.state,
+    ip: container.ip
   };
 }
