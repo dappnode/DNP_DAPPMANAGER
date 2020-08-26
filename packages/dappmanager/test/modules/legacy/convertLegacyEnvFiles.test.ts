@@ -14,20 +14,20 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should NOT break a compose for an empty .env file", () => {
-    const name = "mock-dnp.dnp.dappnode.eth";
+    const dnpName = "mock-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(name, isCore);
-    const composePath = getPath.dockerCompose(name, isCore);
+    const envFilePath = getPath.envFile(dnpName, isCore);
+    const composePath = getPath.dockerCompose(dnpName, isCore);
     const compose = {
       version: "3.4",
-      services: { [name]: { image: `${name}:0.2.0` } }
+      services: { [dnpName]: { image: `${dnpName}:0.2.0` } }
     };
     const composeString = yamlDump(compose);
     validate.path(envFilePath);
     fs.writeFileSync(envFilePath, "");
     fs.writeFileSync(composePath, composeString);
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(true, "Should return true, indicating it merged ENVs");
     expect(fs.existsSync(envFilePath)).to.equal(
       false,
@@ -40,17 +40,17 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should merge existing envs", () => {
-    const name = "mock2-dnp.dnp.dappnode.eth";
+    const dnpName = "mock2-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(name, isCore);
-    const composePath = getPath.dockerCompose(name, isCore);
+    const envFilePath = getPath.envFile(dnpName, isCore);
+    const composePath = getPath.dockerCompose(dnpName, isCore);
     const envsString = "NAME=VALUE";
     const composeString = yamlDump({
       version: "3.4",
       services: {
-        [name]: {
-          image: `${name}:0.2.0`,
-          env_file: [name + ".env"]
+        [dnpName]: {
+          image: `${dnpName}:0.2.0`,
+          env_file: [dnpName + ".env"]
         }
       }
     });
@@ -58,7 +58,7 @@ describe("migrateLegacyEnvFiles", () => {
     fs.writeFileSync(envFilePath, envsString);
     fs.writeFileSync(composePath, composeString);
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(true, "Should return true, indicating it merged ENVs");
     expect(fs.existsSync(envFilePath)).to.equal(
       false,
@@ -68,8 +68,8 @@ describe("migrateLegacyEnvFiles", () => {
       yamlDump({
         version: "3.4",
         services: {
-          [name]: {
-            image: `${name}:0.2.0`,
+          [dnpName]: {
+            image: `${dnpName}:0.2.0`,
             environment: [envsString]
           }
         }
@@ -79,10 +79,10 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should ignore a DNP without .env", () => {
-    const name = "mock3-dnp.dnp.dappnode.eth";
+    const dnpName = "mock3-dnp.dnp.dappnode.eth";
     const isCore = false;
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(
       false,
       "Should return false, indicating it did not merge ENVs"

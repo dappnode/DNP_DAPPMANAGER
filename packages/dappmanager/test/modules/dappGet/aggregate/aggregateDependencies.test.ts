@@ -44,10 +44,15 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
 
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
 
-    const name = "kovan.dnp.dappnode.eth";
+    const dnpName = "kovan.dnp.dappnode.eth";
     const versionRange = "0.1.0";
     const dnps = {};
-    await aggregateDependencies({ name, versionRange, dnps, dappGetFetcher });
+    await aggregateDependencies({
+      name: dnpName,
+      versionRange,
+      dnps,
+      dappGetFetcher
+    });
 
     expect(dnps).to.deep.equal({
       "kovan.dnp.dappnode.eth": {
@@ -79,10 +84,15 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
 
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
 
-    const name = "dnpA.dnp.dappnode.eth";
+    const dnpName = "dnpA.dnp.dappnode.eth";
     const versionRange = "0.1.0";
     const dnps = {};
-    await aggregateDependencies({ name, versionRange, dnps, dappGetFetcher });
+    await aggregateDependencies({
+      name: dnpName,
+      versionRange,
+      dnps,
+      dappGetFetcher
+    });
 
     expect(dnps).to.deep.equal({
       "dnpA.dnp.dappnode.eth": {

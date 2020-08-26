@@ -31,7 +31,7 @@ import {
 } from "../../src/utils/autoUpdateHelper";
 import { clearDbs, createTestDir } from "../testUtils";
 
-const name = "bitcoin.dnp.dappnode.eth";
+const dnpName = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   before(async () => {
@@ -45,7 +45,7 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Auto update settings", () => {
     it("Should set active for my packages", () => {
-      const check = (): boolean => isDnpUpdateEnabled(name);
+      const check = (): boolean => isDnpUpdateEnabled(dnpName);
 
       // Enable my-packages
       expect(check()).to.equal(false, "Before enabling");
@@ -53,18 +53,18 @@ describe("Util: autoUpdateHelper", () => {
       expect(check()).to.equal(true, "After enabling");
 
       // Disable a single package
-      expect(check()).to.equal(true, "Before disabling name");
-      editDnpSetting(true, name);
-      expect(check()).to.equal(true, "Before disablingx2 name");
-      editDnpSetting(false, name);
-      expect(check()).to.equal(false, "After disabling name");
-      editDnpSetting(true, name);
-      expect(check()).to.equal(true, "After enabling name");
+      expect(check()).to.equal(true, `Before disabling ${dnpName}`);
+      editDnpSetting(true, dnpName);
+      expect(check()).to.equal(true, `Before disablingx2 ${dnpName}`);
+      editDnpSetting(false, dnpName);
+      expect(check()).to.equal(false, `After disabling ${dnpName}`);
+      editDnpSetting(true, dnpName);
+      expect(check()).to.equal(true, `After enabling ${dnpName}`);
 
       // Disable my-packages
       editDnpSetting(false);
       expect(check()).to.equal(false, "After disabling");
-      expect(check()).to.equal(false, "After disabling name final");
+      expect(check()).to.equal(false, `After disabling ${dnpName} final`);
     });
 
     it("Should set active for system packages", () => {
@@ -81,11 +81,11 @@ describe("Util: autoUpdateHelper", () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      flagCompletedUpdate(name, version1, timestamp);
-      flagCompletedUpdate(name, version2, timestamp);
+      flagCompletedUpdate(dnpName, version1, timestamp);
+      flagCompletedUpdate(dnpName, version2, timestamp);
       const registry = getRegistry();
       expect(registry).to.deep.equal({
-        [name]: {
+        [dnpName]: {
           [version1]: { updated: timestamp, successful: true },
           [version2]: { updated: timestamp, successful: true }
         }
@@ -97,14 +97,14 @@ describe("Util: autoUpdateHelper", () => {
     it("Should NOT allow the update if the delay is NOT completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now();
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -114,7 +114,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         false,
         "Should not allow again because the delay is not completed (24h)"
       );
@@ -123,14 +123,14 @@ describe("Util: autoUpdateHelper", () => {
     it("Should allow the update if the delay is completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now() - (updateDelay + 1);
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -140,12 +140,12 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         true,
         "Should allow again because the delay is completed (24h)"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         true,
         "Should allow again, a second time after the delay is completed"
       );
@@ -157,14 +157,14 @@ describe("Util: autoUpdateHelper", () => {
       const version2 = "0.2.5";
       const timestamp2 = Date.now() - 2 * updateDelay;
 
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -174,14 +174,14 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version2, timestamp2)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version2, timestamp2)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version: version2,
             firstSeen: timestamp2,
             scheduledUpdate: timestamp2 + updateDelay,
@@ -197,11 +197,11 @@ describe("Util: autoUpdateHelper", () => {
 
       const version = "0.2.6";
       const timestamp = 1563373272397;
-      isUpdateDelayCompleted(name, version, timestamp);
+      isUpdateDelayCompleted(dnpName, version, timestamp);
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -213,11 +213,11 @@ describe("Util: autoUpdateHelper", () => {
 
       // Simulation update Error
       const errorMessage = "Mainnet is still thinking";
-      flagErrorUpdate(name, errorMessage);
+      flagErrorUpdate(dnpName, errorMessage);
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,

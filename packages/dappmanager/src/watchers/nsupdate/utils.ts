@@ -100,9 +100,9 @@ export function getMyDotEthdomain(name: string): string {
  *
  * name=$(echo $name | sed 's/DAppNodePackage-//g'| sed 's/\.dappnode\.eth//g' |  sed 's/\.dnp//g' | tr -d '/_')
  */
-export function getDotDappnodeDomain(name: string): string {
+export function getDotDappnodeDomain(dnpName: string): string {
   return (
-    name
+    dnpName
       .replace(".dappnode", "")
       .replace(".eth", "")
       .replace(".dnp", "")

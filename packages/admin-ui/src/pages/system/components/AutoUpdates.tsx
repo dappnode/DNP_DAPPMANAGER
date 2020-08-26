@@ -44,10 +44,10 @@ export default function AutoUpdates() {
     try {
       const actioning = enabled ? "Enabling" : "Disabling";
       const actioned = enabled ? "Enabled" : "Disabled";
-      const name = shortNameCapitalized(id);
+      const dnpName = shortNameCapitalized(id);
       await withToast(() => api.autoUpdateSettingsEdit({ id, enabled }), {
-        message: `${actioning} auto updates for ${name}...`,
-        onSuccess: `${actioned} auto updates for ${name}`
+        message: `${actioning} auto updates for ${dnpName}...`,
+        onSuccess: `${actioned} auto updates for ${dnpName}`
       });
     } catch (e) {
       console.error(`Error on autoUpdateSettingsEdit: ${e.stack}`);

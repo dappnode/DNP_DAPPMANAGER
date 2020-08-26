@@ -7,7 +7,7 @@ import { manifestToCompose } from "../../../src/modules/manifest";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
 
 describe("manifestToCompose", () => {
-  const name = "mock-dnp.dappnode.eth";
+  const dnpName = "mock-dnp.dappnode.eth";
   const version = "0.0.0";
   const ports = ["1111/1111", "1111/1111:udp"];
   const volumes = ["mockdnpdappnodeeth_data:/mock/mock/mock/"];
@@ -15,7 +15,7 @@ describe("manifestToCompose", () => {
 
   it("Should parse imageData from a manifest", () => {
     const manifest: ManifestWithImage = {
-      name,
+      name: dnpName,
       version,
       image: {
         ...mockManifestWithImage.image,
@@ -27,9 +27,9 @@ describe("manifestToCompose", () => {
     const expectedCompose: Compose = {
       ...mockCompose,
       services: {
-        [name]: {
-          container_name: `DAppNodePackage-${name}`,
-          image: `${name}:${version}`,
+        [dnpName]: {
+          container_name: `DAppNodePackage-${dnpName}`,
+          image: `${dnpName}:${version}`,
           ports,
           volumes
         }
@@ -43,7 +43,7 @@ describe("manifestToCompose", () => {
 
   it("Should parse imageData from a manifest without data", () => {
     const manifest: ManifestWithImage = {
-      name,
+      name: dnpName,
       version,
       image: emptyImage
     };
@@ -51,9 +51,9 @@ describe("manifestToCompose", () => {
     const expectedCompose: Compose = {
       version: "3.4",
       services: {
-        [name]: {
-          container_name: `DAppNodePackage-${name}`,
-          image: `${name}:${version}`
+        [dnpName]: {
+          container_name: `DAppNodePackage-${dnpName}`,
+          image: `${dnpName}:${version}`
         }
       }
     };

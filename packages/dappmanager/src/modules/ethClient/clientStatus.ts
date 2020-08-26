@@ -46,8 +46,8 @@ export async function getClientStatus(
   try {
     const clientData = ethClientData[target];
     if (!clientData) throw Error(`Unsupported target '${target}'`);
-    const name = clientData.name;
-    const url = clientData.url || getEthClientApiUrl(name);
+    const dnpName = clientData.dnpName;
+    const url = clientData.url || getEthClientApiUrl(dnpName);
     try {
       // Provider API works? Do a single test call to check state
       if (await isSyncing(url)) {
@@ -56,7 +56,7 @@ export async function getClientStatus(
         try {
           if (await isApmStateCorrect(url)) {
             // All okay!
-            return { ok: true, url, name };
+            return { ok: true, url, dnpName };
           } else {
             // State is not correct, node is not synced but eth_syncing did not picked it up
             return { ok: false, code: "STATE_NOT_SYNCED" };
@@ -73,7 +73,7 @@ export async function getClientStatus(
       }
     } catch (eFromSyncing) {
       // syncing call failed, the node is not available, find out why
-      const dnp = await listContainerNoThrow(name);
+      const dnp = await listContainerNoThrow(dnpName);
       if (dnp) {
         // DNP is installed
         if (dnp.running) {
