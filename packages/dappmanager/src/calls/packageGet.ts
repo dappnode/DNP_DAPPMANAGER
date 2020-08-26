@@ -88,9 +88,12 @@ export async function packageGet({
     // Why not fetch the ENVs from a container inspect > config ??
     // ENVs that are not declared in the compose will show up (i.e. PATH)
     // So it's easier and cleaner to just parse the docker-compose.yml
-    const compose = new ComposeFileEditor(dnp.name, dnp.isCore);
+    const userSettings = ComposeFileEditor.getUserSettingsIfExist(
+      dnp.name,
+      dnp.isCore
+    );
     dnpData.userSettings = {
-      environment: compose.service().getEnvs()
+      environment: userSettings.environment
     };
   } catch (e) {
     logs.warn(`Error getting user settings for ${dnp.name}`, e);

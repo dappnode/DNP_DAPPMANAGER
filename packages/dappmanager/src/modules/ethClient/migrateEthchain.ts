@@ -42,12 +42,14 @@ export async function migrateEthchain(): Promise<void> {
   // Get ETHCHAIN's current status
   const ethchainContainer = await listContainerNoThrow(ethchainDnpName);
   // If ethchain compose does not exist, returns {}
-  const userSettingsCompose = ComposeFileEditor.getUserSettingsIfExist(
+  const userSettings = ComposeFileEditor.getUserSettingsIfExist(
     ethchainDnpName,
     true
   );
-  const userSettings = userSettingsCompose[ethchainDnpName] || {};
-  const envs: EthchainEnvs = userSettings.environment || {};
+  const ethchainServiceName =
+    Object.keys(userSettings.environment || {})[0] || ethchainDnpName;
+  const envs: EthchainEnvs =
+    (userSettings.environment || {})[ethchainServiceName] || {};
 
   const volumes = await dockerVolumesList();
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
@@ -167,7 +169,7 @@ export async function migrateEthchain(): Promise<void> {
 
     await changeEthMultiClient(target, false, {
       portMappings: userSettings.portMappings,
-      environment: EXTRA_OPTS ? { EXTRA_OPTS } : undefined
+      environment: { [ethchainServiceName]: EXTRA_OPTS ? { EXTRA_OPTS } : {} }
     });
 
     // Once the client has been successfully changed, delete temp migration settings

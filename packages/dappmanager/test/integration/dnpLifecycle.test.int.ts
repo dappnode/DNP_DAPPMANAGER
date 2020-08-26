@@ -179,31 +179,45 @@ describe("DNP lifecycle", function() {
   const userSettings: UserSettingsAllDnps = {
     [idMain]: {
       environment: {
-        [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue
+        [idMain]: {
+          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue
+        }
       },
       portMappings: {
-        [portsMain.two.portId]: String(portsMain.two.newHost)
+        [idMain]: {
+          [portsMain.two.portId]: String(portsMain.two.newHost)
+        }
       },
       namedVolumeMountpoints: {
         [volumesMain.changeme.name]: volumesMain.changeme.newHost
       },
       fileUploads: {
-        [demoFilePath]: fileDataUrlMain
+        [idMain]: {
+          [demoFilePath]: fileDataUrlMain
+        }
       }
     },
     [idDep]: {
       environment: {
-        [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue
+        [idDep]: {
+          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue
+        }
       },
       portMappings: {
-        [portsDep.three.portId]: String(portsDep.three.newHost),
-        [portsDep.four.portId]: String(portsDep.four.newHost)
+        [idDep]: {
+          [portsDep.three.portId]: String(portsDep.three.newHost),
+          [portsDep.four.portId]: String(portsDep.four.newHost)
+        }
       },
       legacyBindVolumes: {
-        [volumesDep.changeme.name]: volumesDep.changeme.newHost
+        [idDep]: {
+          [volumesDep.changeme.name]: volumesDep.changeme.newHost
+        }
       },
       fileUploads: {
-        [demoFilePath]: fileDataUrlDep
+        [idDep]: {
+          [demoFilePath]: fileDataUrlDep
+        }
       }
     }
   };

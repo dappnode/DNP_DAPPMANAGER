@@ -61,7 +61,7 @@ export async function packageInstall({
     const releaseFetcher = new ReleaseFetcher();
     const {
       state,
-      currentVersion,
+      currentVersions,
       releases
     } = await releaseFetcher.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
@@ -78,7 +78,7 @@ export async function packageInstall({
     const packagesData = getInstallerPackagesData({
       releases,
       userSettings,
-      currentVersion,
+      currentVersions,
       reqName
     });
     logs.debug("Packages data", packagesData);

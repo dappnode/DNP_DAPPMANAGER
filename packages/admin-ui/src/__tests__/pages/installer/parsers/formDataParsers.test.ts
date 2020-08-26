@@ -74,23 +74,31 @@ describe("formDataToUserSettings", () => {
   const userSettings: UserSettingsAllDnps = {
     [dnpName]: {
       environment: {
-        PAYOUT_ADDRESS: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+        [dnpName]: {
+          PAYOUT_ADDRESS: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+        }
       },
       fileUploads: {
-        "/usr/src/app/config.json":
-          "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+        [dnpName]: {
+          "/usr/src/app/config.json":
+            "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+        }
       }
     },
     [depName]: {
+      environment: {
+        [depName]: {
+          BTC_TXINDEX: "2"
+        }
+      },
       portMappings: {
-        "8080": "",
-        "5555/udp": "5800"
+        [depName]: {
+          "8080": "",
+          "5555/udp": "5800"
+        }
       },
       namedVolumeMountpoints: {
         bitcoin_data: ""
-      },
-      environment: {
-        BTC_TXINDEX: "2"
       }
     }
   };
@@ -135,15 +143,20 @@ describe("formDataToUserSettings", () => {
   });
 
   it("Should convert userSettings to form data with unknown props", () => {
+    const unknownDnpName = "unknown.dnp.eth";
     const userSettingsUnknownProps: UserSettingsAllDnps = {
-      "unknown.dnp.eth": {
+      [unknownDnpName]: {
         environment: {
-          unknownPropFromUnknownDnp: "?"
+          [unknownDnpName]: {
+            unknownPropFromUnknownDnp: "?"
+          }
         }
       },
       [dnpName]: {
         environment: {
-          unknownProp: "UNKNOWN"
+          [dnpName]: {
+            unknownProp: "UNKNOWN"
+          }
         }
       }
     };

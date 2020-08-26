@@ -29,7 +29,7 @@ import {
   stringifyEnvironment
 } from "./environment";
 import { verifyCompose } from "./verify";
-import { UserSettingsAllDnps } from "../../common";
+import { UserSettings } from "../../common";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
@@ -163,12 +163,15 @@ export class ComposeEditor {
     return this.compose;
   }
 
-  getUserSettings(): UserSettingsAllDnps {
+  getUserSettings(): UserSettings {
     return parseUserSettings(this.compose);
   }
 
-  applyUserSettings(userSettings: UserSettingsAllDnps): void {
-    this.compose = applyUserSettings(this.compose, userSettings);
+  applyUserSettings(
+    userSettings: UserSettings,
+    { dnpName }: { dnpName: string }
+  ): void {
+    this.compose = applyUserSettings(this.compose, userSettings, { dnpName });
   }
 
   dump(): string {
@@ -200,7 +203,7 @@ export class ComposeFileEditor extends ComposeEditor {
   static getUserSettingsIfExist(
     dnpName: string,
     isCore: boolean
-  ): UserSettingsAllDnps {
+  ): UserSettings {
     try {
       return new ComposeFileEditor(dnpName, isCore).getUserSettings();
     } catch (e) {

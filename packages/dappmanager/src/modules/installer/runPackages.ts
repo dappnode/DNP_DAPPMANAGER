@@ -35,10 +35,16 @@ export async function runPackages(
         logs.debug(`${name} fileUploads`, fileUploads);
 
         await dockerComposeUpSafe(composePath, { noStart: true });
-        for (const [containerPath, dataUri] of Object.entries(fileUploads)) {
-          const { dir: toPath, base: filename } = path.parse(containerPath);
-          await copyFileTo({ id: name, dataUri, filename, toPath });
-        }
+        for (const [serviceName, serviceFileUploads] of Object.entries(
+          fileUploads
+        ))
+          for (const [containerPath, dataUri] of Object.entries(
+            serviceFileUploads
+          )) {
+            const { dir: toPath, base: filename } = path.parse(containerPath);
+            const id = getContainerId(name, serviceName);
+            await copyFileTo({ id, dataUri, filename, toPath });
+          }
       }
 
       log(name, "Starting package... ");

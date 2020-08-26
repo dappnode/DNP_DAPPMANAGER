@@ -44,8 +44,7 @@ export async function fetchDnpRequest({
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
     const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
-    const userSettings = deepmerge(defaultUserSet, prevUserSet);
-    settings[name] = userSettings[name];
+    settings[name] = deepmerge(defaultUserSet, prevUserSet);
 
     specialPermissions[name] = parseSpecialPermissions(compose, isCore);
 
@@ -64,7 +63,7 @@ export async function fetchDnpRequest({
                 if (container)
                   try {
                     const fileInfo = await dockerInfoArchive(
-                      container.id,
+                      getServiceContainerId(field.target.service, container.id),
                       field.target.path
                     );
                     return !fileInfo.size;
@@ -96,14 +95,14 @@ export async function fetchDnpRequest({
     const { name, reqVersion } = mainRelease;
     const {
       state,
-      currentVersion,
+      currentVersions,
       releases
     } = await releaseFetcher.getReleasesResolved({
       name,
       ver: reqVersion
     });
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
-      from: currentVersion[dnpName],
+      from: currentVersions[dnpName],
       to: nextVersion
     }));
 

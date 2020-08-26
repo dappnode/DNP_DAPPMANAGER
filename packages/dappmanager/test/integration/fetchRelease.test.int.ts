@@ -232,11 +232,13 @@ describe("Fetch releases", () => {
         settings: {
           [idMain]: {
             environment: {
-              ENV_DEFAULT: "ORIGINAL",
-              PREVIOUS_SET: "PREV_VAL"
+              [idMain]: {
+                ENV_DEFAULT: "ORIGINAL",
+                PREVIOUS_SET: "PREV_VAL"
+              }
             },
             portMappings: {
-              "1111/TCP": "1111"
+              [idMain]: { "1111/TCP": "1111" }
             },
             namedVolumeMountpoints: {
               data0: mountpoint,
@@ -244,15 +246,15 @@ describe("Fetch releases", () => {
               data2: ""
             },
             legacyBindVolumes: {
-              data1: customVolumePath
+              [idMain]: { data1: customVolumePath }
             }
           },
           [idDep]: {
             environment: {
-              DEP_ENV: "DEP_ORIGINAL"
+              [idDep]: { DEP_ENV: "DEP_ORIGINAL" }
             },
             portMappings: {
-              "2222/TCP": "2222"
+              [idDep]: { "2222/TCP": "2222" }
             },
             namedVolumeMountpoints: {
               data: ""

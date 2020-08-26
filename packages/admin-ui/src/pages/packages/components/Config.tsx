@@ -46,7 +46,7 @@ export default function Config({
       return name;
     });
 
-    dispatch(packageSetEnvironment(id, diffEnvs, niceNames));
+    dispatch(packageSetEnvironment(id, diffEnvs[serviceName], niceNames));
   }
 
   return (

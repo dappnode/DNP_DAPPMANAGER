@@ -51,5 +51,5 @@ export interface DappGetResult {
   message: string;
   state: DappGetState;
   alreadyUpdated: DappGetState;
-  currentVersion: DappGetState;
+  currentVersions: DappGetState;
 }

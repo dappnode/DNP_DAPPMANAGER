@@ -1,23 +1,27 @@
 import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath";
 import orderInstallPackages from "./orderInstallPackages";
-import { UserSettingsAllDnps } from "../../types";
+import { UserSettingsAllDnps, UserSettings } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
 
 export function getInstallerPackagesData({
   releases,
   userSettings,
-  currentVersion,
+  currentVersions,
   reqName
 }: {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
-  currentVersion: { [name: string]: string | undefined };
+  currentVersions: { [name: string]: string | undefined };
   reqName: string;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
-    getInstallerPackageData(release, userSettings, currentVersion[release.name])
+    getInstallerPackageData(
+      release,
+      userSettings[release.name],
+      currentVersions[release.name]
+    )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
 }
@@ -30,7 +34,7 @@ export function getInstallerPackagesData({
  */
 function getInstallerPackageData(
   release: PackageRelease,
-  userSettings: UserSettingsAllDnps,
+  userSettings: UserSettings,
   currentVersion: string | undefined
 ): InstallPackageData {
   const { name, semVersion, isCore, imageFile } = release;
@@ -51,7 +55,9 @@ function getInstallerPackageData(
 
   // Append to compose
   const compose = new ComposeEditor(release.compose);
-  compose.applyUserSettings(deepmerge(prevUserSet, userSettings));
+  compose.applyUserSettings(deepmerge(prevUserSet, userSettings), {
+    dnpName: name
+  });
 
   return {
     ...release,
@@ -65,6 +71,6 @@ function getInstallerPackageData(
     // Data to write
     compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: (userSettings[name] || {}).fileUploads
+    fileUploads: userSettings.fileUploads
   };
 }

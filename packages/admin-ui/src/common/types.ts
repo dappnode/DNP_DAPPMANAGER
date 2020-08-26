@@ -185,7 +185,9 @@ export interface UserSettings {
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
   legacyBindVolumes?: {
-    [volumeName: string]: string; // Host vol name to host bind absolute path
+    [serviceName: string]: {
+      [volumeName: string]: string; // Host vol name to host bind absolute path
+    };
   };
 }
 
@@ -744,7 +746,7 @@ export interface InstallPackageData extends PackageRelease {
   // Data to write
   compose: Compose;
   // User settings to be applied after running
-  fileUploads?: { [containerPath: string]: string };
+  fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
 }
 
 export interface PackageReleaseMetadata {

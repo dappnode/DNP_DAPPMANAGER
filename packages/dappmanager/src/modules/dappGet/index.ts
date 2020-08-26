@@ -80,9 +80,7 @@ export default async function dappGet(
     });
   } catch (e) {
     logs.debug("dappGet/aggregate error", e);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on aggregate stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on aggregate stage: ${e.message}`;
     throw e;
   }
 
@@ -92,9 +90,7 @@ export default async function dappGet(
     result = resolve(dnps);
   } catch (e) {
     logs.debug("dappGet/resolve error", e);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on resolve stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on resolve stage: ${e.message}`;
     throw e;
   }
 
@@ -104,7 +100,7 @@ export default async function dappGet(
 
   // Otherwise, format the output
   const alreadyUpdated: DappGetState = {};
-  const currentVersion: DappGetState = {};
+  const currentVersions: DappGetState = {};
   for (const dnp of dnpList) {
     const prevVersion = dnp.version;
     const nextVersion = state[dnp.name];
@@ -114,8 +110,8 @@ export default async function dappGet(
       alreadyUpdated[dnp.name] = state[dnp.name];
       delete state[dnp.name];
     }
-    if (nextVersion && currentVersion) {
-      currentVersion[dnp.name] = prevVersion;
+    if (nextVersion) {
+      currentVersions[dnp.name] = prevVersion;
     }
   }
 
@@ -123,6 +119,6 @@ export default async function dappGet(
     message,
     state,
     alreadyUpdated,
-    currentVersion
+    currentVersions
   };
 }

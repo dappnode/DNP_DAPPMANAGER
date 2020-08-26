@@ -57,14 +57,14 @@ describe.skip("Call function: packageInstall", function() {
       message: string;
       state: DappGetState;
       alreadyUpdated: DappGetState;
-      currentVersion: DappGetState;
+      currentVersions: DappGetState;
     }> {
       dappGetSpy(req);
       return {
         message: "Found compatible state",
         state: { [pkgName]: pkgVer, [depName]: depVer },
         alreadyUpdated: {},
-        currentVersion: {},
+        currentVersions: {},
         releases: [pkgPkg, depPkg]
       };
     }

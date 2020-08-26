@@ -26,7 +26,7 @@ export default async function dappGetBasic(
     [req.name]: req.ver
   };
   const alreadyUpdated: DappGetState = {};
-  const currentVersion: DappGetState = {};
+  const currentVersions: DappGetState = {};
 
   // The function below does not directly affect funcionality.
   // However it would prevent already installed DNPs from installing
@@ -41,8 +41,8 @@ export default async function dappGetBasic(
         alreadyUpdated[dnp.name] = state[dnp.name];
         delete state[dnp.name];
       }
-      if (nextVersion && currentVersion) {
-        currentVersion[dnp.name] = prevVersion;
+      if (nextVersion) {
+        currentVersions[dnp.name] = prevVersion;
       }
     }
   } catch (e) {
@@ -53,6 +53,6 @@ export default async function dappGetBasic(
     message: "dappGet basic resolved first level dependencies",
     state,
     alreadyUpdated: {},
-    currentVersion
+    currentVersions
   };
 }
