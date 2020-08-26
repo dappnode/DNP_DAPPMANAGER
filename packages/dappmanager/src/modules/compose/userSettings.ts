@@ -11,7 +11,7 @@ import {
 import { PortMapping, Compose, UserSettings, VolumeMapping } from "../../types";
 import { cleanCompose, isOmitable } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";
-import { readDefaultsFromLabels, writeDefaultsToLabels } from "./labelsDb";
+import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb";
 
 /**
  * To be backwards compatible with older versions that do not store
@@ -62,9 +62,9 @@ export const parseUserSettingsFns: {
   legacyBindVolumes: compose =>
     mapValues(compose.services, (service, serviceName) => {
       const volumes = parseVolumeMappings(service.volumes || []);
-      const defaults = readDefaultsFromLabels(service.labels || {});
+      const labels = readContainerLabels(service.labels || {});
       const parsedDefaultVolumes = parseVolumeMappings(
-        defaults.volumes || legacyDefaultVolumes[serviceName] || []
+        labels.defaultVolumes || legacyDefaultVolumes[serviceName] || []
       );
       const legacyBindVolumes: { [volumeName: string]: string } = {};
       for (const { container, name } of parsedDefaultVolumes)

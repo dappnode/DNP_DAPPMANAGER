@@ -16,7 +16,7 @@ import {
   ComposeService,
   PortMapping,
   PackageEnvs,
-  ContainerLabels
+  ContainerLabelsRaw
 } from "../../types";
 import {
   stringifyPortMappings,
@@ -105,7 +105,7 @@ class ComposeServiceEditor {
     }));
   }
 
-  mergeLabels(labels: ContainerLabels): void {
+  mergeLabels(labels: ContainerLabelsRaw): void {
     this.edit(service => ({
       labels: { ...service.labels, ...labels }
     }));
@@ -128,10 +128,9 @@ export class ComposeEditor {
     return getPath.dockerCompose(dnpName, isCore);
   }
 
-  service(serviceName?: string): ComposeServiceEditor {
-    return new ComposeServiceEditor(
-      this,
-      serviceName || Object.keys(this.compose.services)[0]
+  services(): ComposeServiceEditor[] {
+    return Object.keys(this.compose.services).map(
+      serviceName => new ComposeServiceEditor(this, serviceName)
     );
   }
 

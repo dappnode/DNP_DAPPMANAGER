@@ -53,28 +53,35 @@ export async function getRelease({
     parseUnsafeCompose(composeUnsafe, manifest)
   );
 
-  // Add SSL environment variables
-  if (manifest.ssl) {
-    const dnpSubDomain = `${shortNameDomain(name)}.${db.domain.get()}`;
-    compose.service().mergeEnvs({
-      VIRTUAL_HOST: dnpSubDomain,
-      LETSENCRYPT_HOST: dnpSubDomain
-    });
+  for (const service of compose.services()) {
+    // Add SSL environment variables
+    if (manifest.ssl) {
+      const dnpSubDomain = shortNameDomainByService(
+        `${shortNameDomain(name)}.${db.domain.get()}`
+      );
+      service.mergeEnvs({
+        VIRTUAL_HOST: dnpSubDomain,
+        LETSENCRYPT_HOST: dnpSubDomain
+      });
+    }
+
+    // Add global env_file on request
+    if ((manifest.globalEnvs || {}).all)
+      service.addEnvFile(getGlobalEnvsFilePath(isCore));
+
+    service.mergeLabels(
+      writeMetadataToLabels({
+        packageName: manifest.name,
+        version: manifest.version,
+        serviceName: service.serviceName,
+        dependencies: sanitizeDependencies(metadata.dependencies || {}),
+        avatar: fileToMultiaddress(avatarFile),
+        chain: metadata.chain,
+        origin,
+        isCore
+      })
+    );
   }
-
-  // Add global env_file on request
-  if ((manifest.globalEnvs || {}).all)
-    compose.service().addEnvFile(getGlobalEnvsFilePath(isCore));
-
-  compose.service().mergeLabels(
-    writeMetadataToLabels({
-      dependencies: sanitizeDependencies(metadata.dependencies || {}),
-      avatar: fileToMultiaddress(avatarFile),
-      chain: metadata.chain,
-      origin,
-      isCore
-    })
-  );
 
   return {
     name,

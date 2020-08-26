@@ -206,7 +206,7 @@ export interface CompatibleDnps {
 }
 
 export interface RequestedDnp {
-  name: string; // "bitcoin.dnp.dappnode.eth"
+  packageName: string; // "bitcoin.dnp.dappnode.eth"
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
@@ -294,21 +294,81 @@ export type ContainerState =
 
 export type ChainDriver = "bitcoin" | "ethereum" | "monero";
 
+/**
+ * Type mapping of a package container labels
+ * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
+ */
+export interface ContainerLabelTypes {
+  "dappnode.dnp.packageName": string;
+  "dappnode.dnp.version": string;
+  "dappnode.dnp.serviceName": string;
+  "dappnode.dnp.instanceName": string;
+  "dappnode.dnp.dependencies": Dependencies;
+  "dappnode.dnp.avatar": string;
+  "dappnode.dnp.origin": string;
+  "dappnode.dnp.chain": ChainDriver;
+  "dappnode.dnp.isCore": boolean;
+  "dappnode.dnp.default.environment": string[];
+  "dappnode.dnp.default.ports": string[];
+  "dappnode.dnp.default.volumes": string[];
+}
+
 export interface PackageContainer {
-  id: string;
+  /**
+   * Docker container ID
+   * ```
+   * "3edc051920c61e02ff9c42cf35caf4f48f693d65f44d6652de29e9024f051405"
+   * ```
+   */
+  containerId: string;
+  /**
+   * Docker container name
+   * ```
+   * "DAppNodeCore-mypackage.dnp.dappnode.eth"
+   * ```
+   */
+  containerName: string;
+  /**
+   * ENS domain name of this container's package
+   * ```
+   * "mypackage.dnp.dappnode.eth"
+   * ```
+   */
   packageName: string;
+  /**
+   * Docker compose service name of this container, as declared in its package docker-compose
+   * ```
+   * "frontend"
+   * ```
+   */
+  serviceName: string;
+  /**
+   * Name given by the user when installing an instance of a package
+   * ```
+   * "my-package-test-instance"
+   * ```
+   */
+  instanceName: string;
+  /**
+   * Semantic version of this container's package
+   * ```
+   * "0.1.0"
+   * ```
+   */
   version: string;
-  isDnp: boolean;
-  isCore: boolean;
+
+  // Docker data
   created: number;
   image: string;
-  name: string;
-  shortName: string;
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerState;
   running: boolean;
   ports: PortMapping[];
   volumes: VolumeMapping[];
+
+  // DAppNode package data
+  isDnp: boolean;
+  isCore: boolean;
   defaultEnvironment?: PackageEnvs;
   defaultPorts?: PortMapping[];
   defaultVolumes?: VolumeMapping[];
@@ -707,7 +767,7 @@ export interface SpecialPermissionAllDnps {
 }
 
 export interface PackageRelease {
-  name: string;
+  packageName: string;
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
@@ -725,7 +785,7 @@ export interface PackageRelease {
 
 export type InstallPackageDataPaths = Pick<
   InstallPackageData,
-  | "name"
+  | "packageName"
   | "semVersion"
   | "composePath"
   | "composeBackupPath"
@@ -756,7 +816,7 @@ export interface PackageReleaseMetadata {
   shortDescription?: string;
   description?: string;
   type?: string;
-  chain?: string;
+  chain?: ChainDriver;
   dependencies?: Dependencies;
 
   // Safety properties to solve problematic updates
