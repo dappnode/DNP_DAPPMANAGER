@@ -177,7 +177,9 @@ export const ethClientData: {
 } = {
   "geth-light": {
     name: "geth.dnp.dappnode.eth",
-    userSettings: { environment: { SYNCMODE: "light" } }
+    userSettings: {
+      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
+    }
   },
   geth: { name: "geth.dnp.dappnode.eth" },
   openethereum: { name: "openethereum.dnp.dappnode.eth" },
