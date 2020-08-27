@@ -188,23 +188,6 @@ export const ethClientData: {
 
 // Naming
 
-export const getImageTag = ({
-  serviceName,
-  dnpName,
-  version
-}: {
-  serviceName: string;
-  dnpName: string;
-  version: string;
-}): string => `${serviceName}.${dnpName}:${version}`;
-export const getImageTagSuffix = ({
-  dnpName,
-  version
-}: {
-  dnpName: string;
-  version: string;
-}): string => `${dnpName}:${version}`;
-
 /**
  * Get a unique domain per container, considering multi-service packages
  */
@@ -212,8 +195,8 @@ export const getContainerDomain = ({
   dnpName,
   serviceName
 }: {
-  dnpName: string;
   serviceName: string;
+  dnpName: string;
 }): string => {
   if (!serviceName || serviceName === dnpName) {
     return dnpName;
@@ -221,3 +204,28 @@ export const getContainerDomain = ({
     return [serviceName, dnpName].join(".");
   }
 };
+
+export const getImageTag = ({
+  dnpName,
+  serviceName,
+  version
+}: {
+  dnpName: string;
+  serviceName: string;
+  version: string;
+}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
+
+export const getContainerName = ({
+  dnpName,
+  serviceName,
+  isCore
+}: {
+  dnpName: string;
+  serviceName: string;
+  isCore: boolean;
+}): string =>
+  // Note: _PREFIX variables already end with the character "-"
+  [
+    isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
+    getContainerDomain({ dnpName, serviceName })
+  ].join("");

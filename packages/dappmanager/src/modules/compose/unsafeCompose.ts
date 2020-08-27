@@ -1,5 +1,5 @@
 import { mapValues, pick, omit, toPairs, sortBy, fromPairs } from "lodash";
-import params from "../../params";
+import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
 import { parseEnvironment } from "./environment";
@@ -28,14 +28,6 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
 ];
 const volumeSafeKeys: (keyof ComposeVolumes)[] = ["external"];
 
-// Note: the prefixes already end with the character "-"
-export const getContainerName = (name: string, isCore: boolean): string =>
-  (isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX) +
-  name;
-
-export const getImage = (name: string, version: string): string =>
-  `${name}:${version}`;
-
 /**
  * Strict sanitation of a docker-compose to prevent
  * - Use of uncontroled features
@@ -47,13 +39,14 @@ export function parseUnsafeCompose(
   composeUnsafe: Compose,
   manifest: Manifest
 ): Compose {
-  const { name, version } = manifest;
+  const dnpName = manifest.name;
+  const version = manifest.version;
   const isCore = getIsCore(manifest);
 
   return cleanCompose({
     version: composeUnsafe.version || "3.4",
 
-    services: mapValues(composeUnsafe.services, serviceUnsafe =>
+    services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({
         // Overridable defaults
         restart: "always",
@@ -69,8 +62,8 @@ export function parseUnsafeCompose(
         ...pick(serviceUnsafe, serviceSafeKeys),
 
         // Mandatory values
-        container_name: getContainerName(name, isCore),
-        image: getImage(name, version),
+        container_name: getContainerName({ dnpName, serviceName, isCore }),
+        image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),
         dns: params.DNS_SERVICE, // Common DAppNode ENS
         networks: isCore
@@ -115,11 +108,11 @@ export function unsafeComposeAlerts(
 ): ValidationAlert[] {
   const alerts: ValidationAlert[] = [];
 
-  const { isCore, name, version } = metadata;
+  const dnpName = metadata.name;
+  const version = metadata.version;
+  const isCore = metadata.isCore;
 
-  for (const serviceName in composeUnsafe.services) {
-    const service = composeUnsafe.services[serviceName];
-
+  for (const [serviceName, service] of Object.entries(composeUnsafe.services)) {
     // Alert of ignored keys
     const ignoredObj = omit(service, serviceSafeKeys);
     for (const ignoredKey in ignoredObj)
@@ -136,11 +129,11 @@ export function unsafeComposeAlerts(
         serviceName
       });
 
-    const image = getImage(name, version);
-    if (image !== service.image)
+    const imageTag = getImageTag({ serviceName, dnpName, version });
+    if (imageTag !== service.image)
       alerts.push({
         name: "Invalid image",
-        details: `Service ${serviceName} image is ${service.image} instead of ${image}`,
+        details: `Service ${serviceName} image is ${service.image} instead of ${imageTag}`,
         serviceName
       });
   }

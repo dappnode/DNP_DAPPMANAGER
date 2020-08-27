@@ -1,11 +1,10 @@
 import { pick } from "lodash";
 import { parseVolumeMappings } from "../compose/volumes";
 import { parseEnvironment } from "../compose/environment";
-import params from "../../params";
+import params, { getContainerName, getImageTag } from "../../params";
 import { ComposeVolumes, Compose, ManifestWithImage } from "../../types";
 import { getIsCore } from "./getIsCore";
 import { cleanCompose } from "../compose/clean";
-import { getContainerName, getImage } from "../compose/unsafeCompose";
 
 /**
  * Legacy function to convert a manifest into a compose
@@ -15,9 +14,11 @@ import { getContainerName, getImage } from "../compose/unsafeCompose";
  * @param manifest
  */
 export function manifestToCompose(manifest: ManifestWithImage): Compose {
-  const { name, version, image } = manifest;
-  const serviceName = name;
+  const dnpName = manifest.name;
+  const version = manifest.version;
   const isCore = getIsCore(manifest);
+  const serviceName = dnpName;
+  const image = manifest.image;
 
   const volumes: ComposeVolumes = {};
   if (image.volumes)
@@ -45,8 +46,8 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
           "network_mode",
           "command"
         ]),
-        container_name: getContainerName(name, isCore),
-        image: getImage(name, version),
+        container_name: getContainerName({ dnpName, serviceName, isCore }),
+        image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(image.environment || {}),
         volumes: [...(image.volumes || []), ...(image.external_vol || [])],
         labels: parseEnvironment(image.labels || {}),

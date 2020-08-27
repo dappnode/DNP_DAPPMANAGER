@@ -24,11 +24,8 @@ import shell from "../../src/utils/shell";
 import * as validate from "../../src/utils/validate";
 import { dockerComposeUp } from "../../src/modules/docker/dockerCommands";
 import { ComposeEditor } from "../../src/modules/compose/editor";
-import {
-  writeDefaultsToLabels,
-  getContainerName,
-  getImage
-} from "../../src/modules/compose";
+import { writeDefaultsToLabels } from "../../src/modules/compose";
+import { getContainerName, getImageTag } from "../../src/params";
 
 describe("Fetch releases", () => {
   // This mountpoints have files inside created by docker with the root
@@ -128,8 +125,16 @@ describe("Fetch releases", () => {
       version: "3.4",
       services: {
         [dnpNameMain]: {
-          container_name: getContainerName(dnpNameMain, false),
-          image: getImage(dnpNameMain, mainVersion),
+          container_name: getContainerName({
+            dnpName: dnpNameMain,
+            serviceName: dnpNameMain,
+            isCore: false
+          }),
+          image: getImageTag({
+            dnpName: dnpNameMain,
+            serviceName: dnpNameMain,
+            version: mainVersion
+          }),
           environment: { PREVIOUS_SET: "PREV_VAL" },
           volumes: ["data0:/usr0", `${customVolumePath}:/usr1`],
           labels: writeDefaultsToLabels({
@@ -294,8 +299,16 @@ describe("Fetch releases", () => {
       version: "3.4",
       services: {
         [dnpNameMain]: {
-          container_name: getContainerName(dnpNameMain, false),
-          image: getImage(dnpNameMain, mainVersion)
+          container_name: getContainerName({
+            dnpName: dnpNameMain,
+            serviceName: dnpNameMain,
+            isCore: false
+          }),
+          image: getImageTag({
+            dnpName: dnpNameMain,
+            serviceName: dnpNameMain,
+            version: mainVersion
+          })
         }
       }
     });

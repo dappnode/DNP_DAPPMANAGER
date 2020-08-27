@@ -10,8 +10,7 @@ export function parseSpecialPermissions(
 ): SpecialPermission[] {
   const specialPermissions: SpecialPermission[] = [];
 
-  for (const serviceName in compose.services) {
-    const service = compose.services[serviceName];
+  for (const [serviceName, service] of Object.entries(compose.services)) {
     const { network_mode, privileged, cap_add } = service;
 
     if (compose.volumes)
