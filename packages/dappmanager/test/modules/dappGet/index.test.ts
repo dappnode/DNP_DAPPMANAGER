@@ -4,7 +4,7 @@ import sinon from "sinon";
 import rewiremock from "rewiremock";
 // Import for types
 import dappGetType from "../../../src/modules/dappGet";
-import { PackageContainer } from "../../../src/types";
+import { InstalledPackageData } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import { DappGetDnps } from "../../../src/modules/dappGet/types";
 import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
@@ -17,13 +17,13 @@ import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
 
 describe("dappGet", function() {
   this.timeout(5 * 1000); // For some reason the before step can last > 2s
-  const listContainersSpy = sinon.spy();
+  const listPackagesSpy = sinon.spy();
 
   let dappGet: typeof dappGetType;
 
   before("Mock", async () => {
-    async function listContainers(): Promise<PackageContainer[]> {
-      listContainersSpy();
+    async function listPackages(): Promise<InstalledPackageData[]> {
+      listPackagesSpy();
       return [
         {
           ...mockDnp,
@@ -80,7 +80,7 @@ describe("dappGet", function() {
           .withDefault(resolve)
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listContainers })
+          .with({ listPackages })
           .toBeUsed();
       }
     );
@@ -109,6 +109,6 @@ describe("dappGet", function() {
   });
 
   it("Should call list containers once", () => {
-    sinon.assert.calledOnce(listContainersSpy);
+    sinon.assert.calledOnce(listPackagesSpy);
   });
 });

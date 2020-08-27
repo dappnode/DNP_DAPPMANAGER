@@ -1,5 +1,5 @@
 import * as eventBus from "../../eventBus";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listPackages } from "../../modules/docker/listContainers";
 import params from "../../params";
 import { ChainData } from "../../types";
 import { knownChains } from "./knownChains";
@@ -30,7 +30,7 @@ const loggedError: { [chainName: string]: string | null } = {};
 
 async function checkChainWatchers(): Promise<void> {
   try {
-    const dnpList = await listContainers();
+    const dnpList = await listPackages();
 
     // Remove chains
     for (const dnpName of Object.keys(activeChains)) {
@@ -70,12 +70,17 @@ async function checkChainWatchers(): Promise<void> {
  */
 
 async function getAndEmitChainData(): Promise<void> {
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   const chainsToCall: Chain[] = [];
   for (const [dnpName, chain] of Object.entries(activeChains)) {
     const dnp = dnpList.find(_dnp => _dnp.dnpName === dnpName);
-    if (dnp && dnp.running) chainsToCall.push(chain);
+    if (dnp) {
+      const container = dnp.containers[0];
+      if (container && container.running) {
+        chainsToCall.push(chain);
+      }
+    }
   }
 
   const chainData = await Promise.all(
@@ -124,7 +129,7 @@ function parseChainErrors(error: Error): string {
  * Chains watcher.
  * Checks which chains are installed and queries their status (syncing + block height)
  */
-export default function runWatcher() {
+export default function runWatcher(): void {
   checkChainWatchers();
   // Call checkChainWatchers() again in case there was a race condition
   // during the DAppNode installation

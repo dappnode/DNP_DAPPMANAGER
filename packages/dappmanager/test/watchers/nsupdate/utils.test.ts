@@ -6,7 +6,7 @@ import {
   getDotDappnodeDomain,
   getNsupdateTxts
 } from "../../../src/watchers/nsupdate/utils";
-import { mockDnp } from "../../testUtils";
+import { mockContainer } from "../../testUtils";
 import { PackageContainer } from "../../../src/types";
 
 describe("watcher > nsupdate", () => {
@@ -76,14 +76,14 @@ send
   describe("getNsupdateTxts", () => {
     const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
     const gethDnpName = "geth.dnp.dappnode.eth";
-    const dnpList: PackageContainer[] = [
+    const containers: PackageContainer[] = [
       {
-        ...mockDnp,
+        ...mockContainer,
         dnpName: bitcoinDnpName,
         ip: "172.33.0.2"
       },
       {
-        ...mockDnp,
+        ...mockContainer,
         dnpName: gethDnpName,
         ip: "172.33.0.3",
         chain: "ethereum"
@@ -94,7 +94,7 @@ send
     };
 
     it("Should get nsupdate.txt contents for a normal case", () => {
-      const nsupdateTxts = getNsupdateTxts({ dnpList, domainAliases });
+      const nsupdateTxts = getNsupdateTxts({ containers, domainAliases });
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
@@ -113,7 +113,7 @@ update add fullnode.dappnode 60 A 172.33.0.3`
 
     it("Should get nsupdate.txt contents for remove only", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
         removeOnly: true
       });
@@ -131,7 +131,7 @@ update delete fullnode.dappnode A`
 
     it("Should get nsupdate.txt contents for installing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
         dnpNames: [bitcoinDnpName]
       });
@@ -148,7 +148,7 @@ update add bitcoin.dappnode 60 A 172.33.0.2`
 
     it("Should get nsupdate.txt contents for a removing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
         dnpNames: [bitcoinDnpName],
         removeOnly: true

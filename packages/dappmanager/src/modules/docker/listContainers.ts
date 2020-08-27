@@ -37,9 +37,6 @@ export async function listPackages(): Promise<InstalledPackageData[]> {
         "version",
         "isDnp",
         "isCore",
-        "defaultEnvironment",
-        "defaultPorts",
-        "defaultVolumes",
         "dependencies",
         "avatarUrl",
         "origin",
@@ -56,11 +53,21 @@ export async function listPackages(): Promise<InstalledPackageData[]> {
   return Array.from(dnps.values());
 }
 
-export async function listPackage(
-  dnpName: string
-): Promise<InstalledPackageData> {
+export async function listPackageNoThrow({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<InstalledPackageData | null> {
   const dnps = await listPackages();
-  const dnp = dnps.find(d => d.dnpName === dnpName);
+  return dnps.find(d => d.dnpName === dnpName) || null;
+}
+
+export async function listPackage({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<InstalledPackageData> {
+  const dnp = await listPackageNoThrow({ dnpName });
   if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   return dnp;
 }
@@ -78,10 +85,12 @@ export async function listContainers(): Promise<PackageContainer[]> {
     .filter(pkg => pkg.isDnp || pkg.isCore);
 }
 
-export async function listContainerNoThrow(
-  byName: string
-): Promise<PackageContainer | null> {
-  const containers = await dockerList({ filters: { name: [byName] } });
+export async function listContainerNoThrow({
+  containerName
+}: {
+  containerName: string;
+}): Promise<PackageContainer | null> {
+  const containers = await dockerList({ filters: { name: [containerName] } });
   // When querying "geth.dnp.dappnode.eth", if user has "goerli-geth.dnp.dappnode.eth"
   // The latter can be returned as the original container.
   // Return an exact match for
@@ -89,17 +98,19 @@ export async function listContainerNoThrow(
   // - name: "geth.dnp.dappnode.eth"
   const matches = containers
     .map(parseContainerInfo)
-    .filter(
-      container =>
-        container.containerName === byName || container.dnpName === byName
-    );
-  if (matches.length > 1) throw Error(`Multiple matches found for ${byName}`);
+    .filter(container => container.containerName === containerName);
+  if (matches.length > 1)
+    throw Error(`Multiple matches found for ${containerName}`);
   return matches[0] || null;
 }
 
-export async function listContainer(byName: string): Promise<PackageContainer> {
-  const container = await listContainerNoThrow(byName);
-  if (!container) throw Error(`${byName} package not found`);
+export async function listContainer({
+  containerName
+}: {
+  containerName: string;
+}): Promise<PackageContainer> {
+  const container = await listContainerNoThrow({ containerName });
+  if (!container) throw Error(`${containerName} package not found`);
   return container;
 }
 

@@ -31,7 +31,7 @@ export async function backupRestore({
   validateBackupArray(backup);
 
   // Get container name
-  const dnp = await listPackage(dnpName);
+  const dnp = await listPackage({ dnpName });
 
   // Intermediate step, the file is in local file system
   const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);

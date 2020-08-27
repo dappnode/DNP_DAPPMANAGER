@@ -12,7 +12,7 @@ export const publicPackagesData: express.Handler = async (req, res) => {
   const id = req.params.id as string | undefined;
 
   if (id) {
-    const privateDnpData = await listContainerNoThrow(id);
+    const privateDnpData = await listContainerNoThrow({ containerName: id });
     if (privateDnpData) {
       res.status(200).send(getPublicPackageData(privateDnpData));
     } else {

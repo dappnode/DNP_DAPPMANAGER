@@ -17,7 +17,7 @@ export async function packageStartStop({
 }): Promise<void> {
   if (!containerName) throw Error("kwarg containerName must be defined");
 
-  const container = await listContainer(containerName);
+  const container = await listContainer({ containerName });
   if (container.running) await dockerStop(containerName, { t: timeout });
   else await dockerStart(containerName);
 

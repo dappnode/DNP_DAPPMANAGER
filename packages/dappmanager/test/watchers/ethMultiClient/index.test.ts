@@ -4,11 +4,11 @@ import sinon from "sinon";
 import rewiremock from "rewiremock";
 // imports for typings
 import {
-  PackageContainer,
   EthClientTarget,
-  UserSettings
+  UserSettings,
+  InstalledPackageData
 } from "../../../src/types";
-import { mockDnp } from "../../testUtils";
+import { mockDnp, mockContainer } from "../../testUtils";
 import { EthClientInstallStatus } from "../../../src/modules/ethClient/types";
 import { ethClientData } from "../../../src/params";
 
@@ -33,7 +33,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     /**
      * Mutable state used by listContainerNoThrow
      */
-    const dnpList: PackageContainer[] = [];
+    const dnpList: InstalledPackageData[] = [];
 
     // Disable return typing for the db object since it's extremely verbose and unnecessary for a mock test
     // Also, it will be enforced by rewiremock in case of error
@@ -76,10 +76,8 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     };
     /* eslint-enable @typescript-eslint/explicit-function-return-type */
 
-    async function listContainerNoThrow(
-      name: string
-    ): Promise<PackageContainer | null> {
-      return dnpList.find(dnp => dnp.dnpName === name) || null;
+    async function listPackages(): Promise<InstalledPackageData[]> {
+      return dnpList;
     }
 
     const packageInstall = sinon.mock().resolves({ message: "" });
@@ -94,7 +92,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
           .with(db)
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listContainerNoThrow })
+          .with({ listPackages })
           .toBeUsed();
         mock(() => import("../../../src/calls"))
           .with({ packageInstall })
@@ -143,7 +141,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     dnpList.push({
       ...mockDnp,
       dnpName: newTargetData.dnpName,
-      running: true
+      containers: [{ ...mockContainer, running: true }]
     });
     await runClientInstallerWatcher();
     expect(state).to.deep.equal(

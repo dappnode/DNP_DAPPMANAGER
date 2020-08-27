@@ -1,5 +1,5 @@
 import semver from "semver";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listPackages } from "../../modules/docker/listContainers";
 import * as eventBus from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
 // Utils
@@ -17,7 +17,7 @@ import { logs } from "../../logs";
 export default async function updateMyPackages(
   releaseFetcher: ReleaseFetcher
 ): Promise<void> {
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   for (const { dnpName, isDnp, version: currentVersion } of dnpList) {
     if (

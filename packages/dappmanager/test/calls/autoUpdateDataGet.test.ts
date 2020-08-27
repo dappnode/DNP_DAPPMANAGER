@@ -10,7 +10,7 @@ import {
 import params from "../../src/params";
 import rewiremock from "rewiremock";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../src/calls/autoUpdateDataGet";
-import { PackageContainer } from "../../src/types";
+import { InstalledPackageData } from "../../src/types";
 
 describe("Call function: autoUpdateDataGet", () => {
   const dnpName = "bitcoin.dnp.dappnode.eth";
@@ -18,7 +18,7 @@ describe("Call function: autoUpdateDataGet", () => {
   const nextVersion = "0.2.7";
   const timestamp = Date.now() - 1000;
 
-  async function listContainers(): Promise<PackageContainer[]> {
+  async function listPackages(): Promise<InstalledPackageData[]> {
     return [
       {
         ...mockDnp,
@@ -57,7 +57,7 @@ describe("Call function: autoUpdateDataGet", () => {
       () => import("../../src/calls/autoUpdateDataGet"),
       mock => {
         mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainers })
+          .with({ listPackages })
           .toBeUsed();
       }
     );

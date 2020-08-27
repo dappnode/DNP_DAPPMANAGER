@@ -146,7 +146,7 @@ exit $UPEXIT
       entrypoint: `echo '${nextStartLog}' && sleep 100`
     });
 
-    const prev = await listContainer(mainContainerName);
+    const prev = await listContainer({ containerName: mainContainerName });
     console.log(`Launched prev, ID: ${prev.containerId}`);
 
     const restartCallExit = await callRestart();
@@ -160,7 +160,9 @@ exit $UPEXIT
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
     console.log(
       `Restart container ${restart.state}, ID: ${restart.containerId}`
     );
@@ -171,7 +173,7 @@ exit $UPEXIT
     );
 
     // Query the next container that should be running
-    const next = await listContainer(mainContainerName);
+    const next = await listContainer({ containerName: mainContainerName });
     console.log(`Next container ${next.state} ID: ${next.containerId}`);
     assert.notEqual(
       next.containerId,
@@ -227,7 +229,7 @@ exit $UPEXIT
       ports: [portMapping]
     });
 
-    const prev = await listContainer(mainContainerName);
+    const prev = await listContainer({ containerName: mainContainerName });
     console.log(`Launched prev, ID: ${prev.containerId}`);
 
     // Attach to prev container to see logs and know when it stops
@@ -244,7 +246,9 @@ exit $UPEXIT
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
     console.log(
       `Restart container ${restart.state}, ID: ${restart.containerId}`
     );
@@ -305,7 +309,7 @@ exit $UPEXIT
     // Write a corrupt next compose so it fails before removing the prev container
     fs.writeFileSync(inHost(nextComposeName), "--Corrupted--");
 
-    const prev = await listContainer(mainContainerName);
+    const prev = await listContainer({ containerName: mainContainerName });
     console.log(`Launched prev, ID: ${prev.containerId}`);
 
     // Attach to prev container to see logs and know when it stops
@@ -326,7 +330,9 @@ exit $UPEXIT
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
     console.log(
       `Restart container ${restart.state}, ID: ${restart.containerId}`
     );
@@ -337,7 +343,9 @@ exit $UPEXIT
     );
 
     // Query the next container that should be running
-    const next = await retry(() => listContainer(mainContainerName));
+    const next = await retry(() =>
+      listContainer({ containerName: mainContainerName })
+    );
     console.log(`Next container ${next.state}, ID: ${next.containerId}`);
     assert.strictEqual(
       next.containerId,

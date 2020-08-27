@@ -4,36 +4,36 @@ import defaultPortsToOpen from "../../../src/watchers/natRenewal/defaultPortsToO
 import { PackageContainer } from "../../../src/types";
 import rewiremock from "rewiremock";
 // imports for typings
-import { mockDnp } from "../../testUtils";
+import { mockContainer } from "../../testUtils";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
 
 describe("Watchers > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
     const stoppedDnp = "stopped.dnp.dappnode.eth";
-    const dnpList: PackageContainer[] = [
+    const containers: PackageContainer[] = [
       {
-        ...mockDnp,
+        ...mockContainer,
         isCore: true,
         dnpName: "admin.dnp.dappnode.eth",
         ports: [{ container: 80, host: 8090, protocol: "TCP" }],
         running: true
       },
       {
-        ...mockDnp,
+        ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth",
         ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
         running: true
       },
       {
-        ...mockDnp,
+        ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth2",
         ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
         running: true
       },
       {
-        ...mockDnp,
+        ...mockContainer,
         isCore: false,
         dnpName: "goerli.dnp.dappnode.eth",
         ports: [
@@ -44,7 +44,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
         running: true
       },
       {
-        ...mockDnp,
+        ...mockContainer,
         isCore: false,
         dnpName: stoppedDnp,
         running: false
@@ -52,7 +52,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     ];
 
     async function listContainers(): Promise<PackageContainer[]> {
-      return dnpList;
+      return containers;
     }
 
     // Write the compose of the stopped container
@@ -124,14 +124,14 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     async function listContainers(): Promise<PackageContainer[]> {
       return [
         {
-          ...mockDnp,
+          ...mockContainer,
           isCore: true,
           dnpName: "admin.dnp.dappnode.eth",
           ports: [{ container: 80, host: 8090, protocol: "TCP" }],
           running: true
         },
         {
-          ...mockDnp,
+          ...mockContainer,
           dnpName: throwsDnp,
           running: false
         }

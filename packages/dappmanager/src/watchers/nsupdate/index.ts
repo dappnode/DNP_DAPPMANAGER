@@ -20,7 +20,7 @@ async function runNsupdate({
   removeOnly?: boolean;
 }): Promise<void> {
   try {
-    const dnpList = await listContainers();
+    const containers = await listContainers();
 
     // Load domain alias from db
     const domainAliases = {
@@ -28,7 +28,7 @@ async function runNsupdate({
     };
 
     const nsupdateTxts = getNsupdateTxts({
-      dnpList,
+      containers,
       domainAliases,
       dnpNames,
       removeOnly

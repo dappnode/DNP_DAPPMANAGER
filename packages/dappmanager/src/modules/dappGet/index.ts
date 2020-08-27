@@ -1,4 +1,4 @@
-import { listContainers } from "../docker/listContainers";
+import { listPackages } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
@@ -67,7 +67,7 @@ export default async function dappGet(
    */
   if (options && options.BYPASS_RESOLVER) return await dappGetBasic(req);
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   // Aggregate
   let dnps: DappGetDnps;

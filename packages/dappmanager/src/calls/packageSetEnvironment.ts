@@ -17,7 +17,7 @@ export async function packageSetEnvironment({
   if (!dnpName) throw Error("kwarg dnpName must be defined");
   if (!environment) throw Error("kwarg environment must be defined");
 
-  const dnp = await listPackage(dnpName);
+  const dnp = await listPackage({ dnpName });
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   compose.applyUserSettings({ environment }, { dnpName });
   compose.write();

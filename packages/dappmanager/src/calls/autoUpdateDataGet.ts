@@ -1,9 +1,9 @@
 import semver from "semver";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
-import { AutoUpdateDataDnpView, PackageContainer } from "../types";
+import { AutoUpdateDataDnpView, InstalledPackageData } from "../types";
 import { AutoUpdateDataView } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
@@ -20,7 +20,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   const dnpsToShow: AutoUpdateDataDnpView[] = [
     {
@@ -42,7 +42,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   ];
 
   if (autoUpdateHelper.isDnpUpdateEnabled()) {
-    const singleDnpsToShow: PackageContainer[] = [];
+    const singleDnpsToShow: InstalledPackageData[] = [];
     for (const dnp of dnpList) {
       const storedDnp = singleDnpsToShow.find(
         _dnp => _dnp.dnpName === dnp.dnpName

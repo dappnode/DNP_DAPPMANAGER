@@ -30,7 +30,7 @@ export async function backupGet({
 
   validateBackupArray(backup);
 
-  const dnp = await listPackage(dnpName);
+  const dnp = await listPackage({ dnpName });
 
   // Intermediate step, the file is in local file system
   const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);

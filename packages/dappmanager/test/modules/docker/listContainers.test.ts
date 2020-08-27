@@ -28,10 +28,10 @@ describe("listContainers", function() {
   });
 
   it("should parse an entire listContainers", async () => {
-    const dnpList = await listContainers();
-    console.log(JSON.stringify(dnpList, null, 2));
+    const containers = await listContainers();
+    console.log(JSON.stringify(containers, null, 2));
 
-    const expectedDnpList: PackageContainer[] = [
+    const expectedContainers: PackageContainer[] = [
       {
         containerId:
           "5407d28e2cca82b4e83351b2f55d07469703223e2296934f5034a8922e99d76d",
@@ -480,7 +480,7 @@ describe("listContainers", function() {
     ];
 
     // Remove all values that are undefined
-    const dnpListClean = JSON.parse(JSON.stringify(dnpList));
-    expect(dnpListClean).to.deep.equal(expectedDnpList);
+    const containersClean = JSON.parse(JSON.stringify(containers));
+    expect(containersClean).to.deep.equal(expectedContainers);
   });
 });

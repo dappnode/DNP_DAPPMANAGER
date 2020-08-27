@@ -286,6 +286,8 @@ describe("DNP lifecycle", function() {
   describe("Should apply user settings on the installation", () => {
     let dnpMain: InstalledPackageData;
     let dnpDep: InstalledPackageData;
+    let containerMain: PackageContainer;
+    let containerDep: PackageContainer;
 
     before("Fetch DNPs", async () => {
       const _dnpMain = await getDnpFromListPackages(dnpNameMain);
@@ -294,23 +296,27 @@ describe("DNP lifecycle", function() {
       if (!_dnpDep) throw Error(`DNP ${dnpNameDep} not found`);
       dnpMain = _dnpMain;
       dnpDep = _dnpDep;
+      containerMain = dnpMain.containers[0];
+      containerDep = dnpDep.containers[0];
       // Print status as a sanity check for test debugging
       logs.debug({ dnpMain, dnpDep });
     });
 
     it(`${dnpNameMain} environment`, async () => {
-      await assertEnvironment(dnpNameMain, {
-        [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
-        [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
-      });
+      await assertEnvironment(
+        { containerName: containerMain.containerName },
+        {
+          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
+          [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
+        }
+      );
     });
 
     it(`${dnpNameMain} port mappings`, () => {
-      const container = dnpMain.containers[0];
-      const port1111 = container.ports.find(
+      const port1111 = containerMain.ports.find(
         port => port.container === portsMain.one.container
       );
-      const port2222 = container.ports.find(
+      const port2222 = containerMain.ports.find(
         port => port.container === portsMain.two.container
       );
       if (!port1111) throw Error(`Port 1111 not found`);
@@ -330,8 +336,7 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${dnpNameMain} name volume paths`, () => {
-      const container = dnpMain.containers[0];
-      const changemeVolume = container.volumes.find(
+      const changemeVolume = containerMain.volumes.find(
         vol => vol.container === volumesMain.changeme.container
       );
 
@@ -348,27 +353,29 @@ describe("DNP lifecycle", function() {
 
     it(`${dnpNameMain} fileuploads`, async () => {
       const result = await calls.copyFileFrom({
-        containerName: dnpMain.containers[0].containerName,
+        containerName: containerMain.containerName,
         fromPath: demoFilePath
       });
       expect(result).to.equal(fileDataUrlMain);
     });
 
     it(`${dnpNameDep} environment`, async () => {
-      await assertEnvironment(dnpNameDep, {
-        [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
-        [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
-      });
+      await assertEnvironment(
+        { containerName: containerDep.containerName },
+        {
+          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
+          [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
+        }
+      );
     });
 
     it(`${dnpNameDep} port mappings`, () => {
-      const container = dnpDep.containers[0];
       // Change from ephemeral to a defined host port
-      const port3333 = container.ports.find(
+      const port3333 = containerDep.ports.find(
         port => port.container === portsDep.three.container
       );
       // Change from a defined host port to ephemeral
-      const port4444 = container.ports.find(
+      const port4444 = containerDep.ports.find(
         port => port.container === portsDep.four.container
       );
 
@@ -382,8 +389,7 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${dnpNameDep} name volume paths`, () => {
-      const container = dnpDep.containers[0];
-      const changemeVolume = container.volumes.find(
+      const changemeVolume = containerDep.volumes.find(
         vol => vol.container === volumesDep.changeme.container
       );
       if (!changemeVolume) throw Error(`Volume changeme not found`);
@@ -392,7 +398,7 @@ describe("DNP lifecycle", function() {
 
     it(`${dnpNameDep} fileuploads`, async () => {
       const result = await calls.copyFileFrom({
-        containerName: dnpDep.containers[0].containerName,
+        containerName: containerDep.containerName,
         fromPath: demoFilePath
       });
       expect(result).to.equal(fileDataUrlDep);
@@ -431,13 +437,19 @@ describe("DNP lifecycle", function() {
   });
 
   describe("Test updating the package state", () => {
+    let containerMain: PackageContainer;
+
     before(`DNP should be running`, async () => {
-      const state = await getDnpState(dnpNameMain);
-      expect(state).to.equal("running");
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      containerMain = _dnpMain.containers[0];
+      if (!containerMain.running) throw Error(`DNP ${dnpNameMain} not running`);
     });
 
     it("Should update DNP envs and reset", async () => {
-      const dnpPrevEnvs = await getContainerEnvironment(dnpNameMain);
+      const dnpPrevEnvs = await getContainerEnvironment({
+        containerName: containerMain.containerName
+      });
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
@@ -446,7 +458,9 @@ describe("DNP lifecycle", function() {
         environment: { [dnpNameMain]: { time: envValue } }
       });
 
-      const dnpNextEnvs = await getContainerEnvironment(dnpNameMain);
+      const dnpNextEnvs = await getContainerEnvironment({
+        containerName: containerMain.containerName
+      });
       expect(
         pick(dnpNextEnvs, ["time", ...Object.keys(dnpPrevEnvs)])
       ).to.deep.equal({
@@ -632,17 +646,21 @@ describe("DNP lifecycle", function() {
  * Note: Likely to include additional ENVs from the ones defined in the compose
  * @param containerNameOrId
  */
-async function getContainerEnvironment(id: string): Promise<PackageEnvs> {
-  const container = await listContainer(id);
+async function getContainerEnvironment({
+  containerName
+}: {
+  containerName: string;
+}): Promise<PackageEnvs> {
+  const container = await listContainer({ containerName });
   const containerData = await containerInspect(container.containerId);
   return parseEnvironment(containerData.Config.Env);
 }
 
 async function assertEnvironment(
-  dnpName: string,
+  { containerName }: { containerName: string },
   expectedEnvs: PackageEnvs
 ): Promise<void> {
-  const dnpDepEnvs = await getContainerEnvironment(dnpName);
+  const dnpDepEnvs = await getContainerEnvironment({ containerName });
   expect(pick(dnpDepEnvs, Object.keys(expectedEnvs))).to.deep.equal(
     expectedEnvs,
     `Wrong environment: ${JSON.stringify(expectedEnvs)}`

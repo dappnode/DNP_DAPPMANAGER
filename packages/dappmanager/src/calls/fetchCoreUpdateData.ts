@@ -1,7 +1,7 @@
 import params from "../params";
 import { CoreUpdateData } from "../types";
 import { ReleaseFetcher } from "../modules/release";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import semver from "semver";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
@@ -48,7 +48,7 @@ export async function getCoreUpdateData(
     };
   }
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   /**
    * If the core.dnp.dappnode.eth is not installed,

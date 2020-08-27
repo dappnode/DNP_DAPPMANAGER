@@ -2,14 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import shell from "../../src/utils/shell";
 import path from "path";
-import { PackageContainer } from "../../src/types";
-import {
-  mockDnp,
-  testDir,
-  cleanTestDir,
-  createTestDir,
-  sampleFile
-} from "../testUtils";
+import { testDir, cleanTestDir, createTestDir, sampleFile } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { copyFileFrom as copyFileFromType } from "../../src/calls/copyFileFrom";
@@ -24,7 +17,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   const containerSimulatedFolder = `${testDir}/container-volume`;
   const dockerPath = (_path: string): string =>
     containerSimulatedFolder + _path;
-  const dnpName = "kovan.dnp.dappnode.eth";
   const containerName = "DAppNodePackage-kovan.dnp.dappnode.eth";
 
   async function dockerCopyFileTo(
@@ -54,10 +46,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     return "/";
   }
 
-  async function listContainer(): Promise<PackageContainer> {
-    return { ...mockDnp, dnpName, containerName };
-  }
-
   let copyFileTo: typeof copyFileToType;
   let copyFileFrom: typeof copyFileFromType;
 
@@ -65,9 +53,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileToImport = await rewiremock.around(
       () => import("../../src/calls/copyFileTo"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainer })
-          .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerCopyFileTo, dockerGetContainerWorkingDir })
           .toBeUsed();
@@ -76,9 +61,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileFromImport = await rewiremock.around(
       () => import("../../src/calls/copyFileFrom"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainer })
-          .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerCopyFileFrom, dockerGetContainerWorkingDir })
           .toBeUsed();

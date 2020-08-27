@@ -2,7 +2,7 @@ import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
 import { packageInstall } from "../../calls";
-import { listPackages } from "../../modules/docker/listContainers";
+import { listPackageNoThrow } from "../../modules/docker/listContainers";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
 import {
@@ -40,8 +40,7 @@ export async function runEthClientInstaller(
   const clientData = ethClientData[target];
   if (!clientData) throw Error(`No client data for target: ${target}`);
   const { dnpName, version, userSettings } = clientData;
-  const dnps = await listPackages();
-  const dnp = dnps.find(d => d.dnpName === dnpName);
+  const dnp = await listPackageNoThrow({ dnpName });
 
   const installStatus = db.ethClientInstallStatus.get(target);
   const status: InstallStatus = installStatus

@@ -84,8 +84,8 @@ send
  *
  * name=$(echo $name | sed 's/DAppNodePackage-//g'| tr -d '/_')
  */
-export function getMyDotEthdomain(name: string): string {
-  return "my." + name.replace(RegExp("_", "g"), "");
+export function getMyDotEthdomain(dnpName: string): string {
+  return "my." + dnpName.replace(RegExp("_", "g"), "");
 }
 
 /**
@@ -111,48 +111,67 @@ export function getDotDappnodeDomain(dnpName: string): string {
 }
 
 /**
+ * For multi-service packages, return the full ENS domain o a service
+ * Some services will be the main or root container, so they will have
+ * the root ENS domain of their package
+ * @param container
+ */
+export function getContainerFullEnsDomain(container: PackageContainer): string {
+  if (!container.dnpName)
+    throw Error(
+      `Container ${container.containerName ||
+        container.containerId} does not have a dnpName`
+    );
+
+  if (!container.serviceName || container.serviceName === container.dnpName) {
+    return container.dnpName;
+  } else {
+    return [container.serviceName, container.dnpName].join(".");
+  }
+}
+
+/**
  * Returns an array of nsupdate.txt files ready for nsupdate
  * If no update must happen, it returns an empty array
  *
- * @param dnpList Abstract this call for testability
- * @param ids Only updates this DNP names
- * @param removeOnly Only remove the record
+ * Note: This call is abstracted for testability
  */
 export function getNsupdateTxts({
-  dnpList,
+  containers,
   domainAliases,
   dnpNames,
   removeOnly = false
 }: {
-  dnpList: PackageContainer[];
+  containers: PackageContainer[];
   domainAliases: AliasMap;
   dnpNames?: string[];
   removeOnly?: boolean;
 }): string[] {
-  const dnpsToUpdate: PackageContainerWithIp[] = [];
+  const containersToUpdate: PackageContainerWithIp[] = [];
   // `dnp.ip` = Necessary to satisfy the typscript compiler
-  for (const dnp of dnpList)
+  for (const container of containers)
     if (
-      dnp.ip &&
-      dnp.isDnp &&
-      !dnp.isCore &&
-      (!dnpNames || !dnpNames.length || dnpNames.includes(dnp.dnpName))
+      container.ip &&
+      container.isDnp &&
+      !container.isCore &&
+      (!dnpNames || !dnpNames.length || dnpNames.includes(container.dnpName))
     )
-      dnpsToUpdate.push({ ...dnp, ip: dnp.ip });
+      containersToUpdate.push({ ...container, ip: container.ip });
 
-  if (!dnpsToUpdate.length) return [];
+  if (!containersToUpdate.length) return [];
 
   const eth: DomainMap = {};
   const dappnode: DomainMap = {};
 
   // Add domains from installed package names
-  for (const dnp of dnpsToUpdate) {
-    eth[getMyDotEthdomain(dnp.dnpName)] = dnp.ip;
-    dappnode[getDotDappnodeDomain(dnp.dnpName)] = dnp.ip;
+  for (const dnp of containersToUpdate) {
+    const fullEns = getContainerFullEnsDomain(dnp);
+    eth[getMyDotEthdomain(fullEns)] = dnp.ip;
+    dappnode[getDotDappnodeDomain(fullEns)] = dnp.ip;
   }
 
   // Add dappnode domain alias from installed packages
-  for (const dnp of dnpsToUpdate)
+  for (const dnp of containersToUpdate)
     if (dnp.domainAlias)
       for (const alias of dnp.domainAlias)
         if (isAliasAllowed(alias, dnp))
@@ -160,7 +179,9 @@ export function getNsupdateTxts({
 
   // Add .dappnode domain alias from db (such as fullnode.dappnode)
   for (const [alias, dnpName] of Object.entries(domainAliases)) {
-    const dnp = dnpsToUpdate.find(dnp => dnpName && dnp.dnpName === dnpName);
+    const dnp = containersToUpdate.find(
+      dnp => dnpName && dnp.dnpName === dnpName
+    );
     if (dnp) dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
   }
 

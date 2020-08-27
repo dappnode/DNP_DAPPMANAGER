@@ -17,11 +17,11 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
     };
     const getPortsToOpen = (): PackagePort[] => Object.values(portsToOpen);
 
-    const dnpList = await listContainers();
-    for (const dnp of dnpList) {
-      if (dnp.running) {
-        // If DNP is running the port mapping is available in the dnpList
-        for (const port of dnp.ports || []) {
+    const containers = await listContainers();
+    for (const container of containers) {
+      if (container.running) {
+        // If a container is running the port mapping is available in listContainers()
+        for (const port of container.ports || []) {
           if (port.host) {
             addPortToOpen(port.protocol, port.host);
           }
@@ -29,7 +29,10 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
       } else {
         try {
           // If DNP is exited, the port mapping is only available in the docker-compose
-          const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
+          const compose = new ComposeFileEditor(
+            container.dnpName,
+            container.isCore
+          );
           for (const service of Object.values(compose.services())) {
             // Only consider ports that are mapped (not ephemeral ports)
             for (const port of service.getPortMappings())
@@ -37,7 +40,7 @@ export default async function getPortsToOpen(): Promise<PackagePort[]> {
           }
         } catch (e) {
           logs.error(
-            `Error getting ports of ${dnp.dnpName} from docker-compose`,
+            `Error getting ports of ${container.dnpName} from docker-compose`,
             e
           );
         }

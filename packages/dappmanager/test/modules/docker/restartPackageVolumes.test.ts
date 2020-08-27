@@ -4,8 +4,12 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
-import { PackageContainer, VolumeOwnershipData } from "../../../src/types";
-import { mockDnp, mockVolume } from "../../testUtils";
+import {
+  PackageContainer,
+  VolumeOwnershipData,
+  InstalledPackageData
+} from "../../../src/types";
+import { mockVolume, mockContainer } from "../../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRestartVolumes as packageRestartVolumesType } from "../../../src/calls/packageRestartVolumes";
@@ -29,10 +33,10 @@ describe("Docker action: restartPackageVolumes", function() {
 
   // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
 
-  const dnpList: PackageContainer[] = [
+  const containers: PackageContainer[] = [
     {
-      ...mockDnp,
-      name: dnpNameCore,
+      ...mockContainer,
+      dnpName: dnpNameCore,
       isCore: true,
       volumes: [
         { ...mockVolume, name: "vol1" },
@@ -40,8 +44,8 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: dappmanagerId,
+      ...mockContainer,
+      dnpName: dappmanagerId,
       isCore: true,
       volumes: [
         {
@@ -51,13 +55,13 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: noVolsDnpName,
+      ...mockContainer,
+      dnpName: noVolsDnpName,
       volumes: []
     },
     {
-      ...mockDnp,
-      name: nginxId,
+      ...mockContainer,
+      dnpName: nginxId,
       volumes: [
         {
           host: "/root/certs",
@@ -85,8 +89,8 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: raidenTestnetId,
+      ...mockContainer,
+      dnpName: raidenTestnetId,
       isCore: false,
       volumes: [
         {
@@ -95,13 +99,16 @@ describe("Docker action: restartPackageVolumes", function() {
         }
       ]
     }
-  ].map(
-    (dnp): PackageContainer => ({
-      // Must add the container name since dockerRm is called with that
-      ...dnp,
-      dnpName: dnp.name
-    })
-  );
+  ];
+
+  const dnpList: InstalledPackageData[] = containers.map(container => ({
+    ...container,
+    containerName: container.dnpName,
+    containerId: container.dnpName,
+    dnpName: container.dnpName,
+    serviceName: container.dnpName,
+    containers: [container]
+  }));
 
   const volumesData: VolumeOwnershipData[] = [
     // Mock core volumes
@@ -154,7 +161,7 @@ describe("Docker action: restartPackageVolumes", function() {
     }
   ];
 
-  async function listContainers(): Promise<PackageContainer[]> {
+  async function listPackages(): Promise<InstalledPackageData[]> {
     return dnpList;
   }
 
@@ -172,7 +179,7 @@ describe("Docker action: restartPackageVolumes", function() {
           .with({ dockerRm, dockerComposeUp })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listContainers })
+          .with({ listPackages })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/volumesData"))
           .with({ getVolumesOwnershipData })

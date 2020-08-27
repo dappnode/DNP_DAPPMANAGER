@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import * as db from "../../db";
 import { ethClientData } from "../../params";
 import { EthClientStatus, EthClientTargetPackage } from "../../types";
-import { listContainerNoThrow } from "../../modules/docker/listContainers";
+import { listPackageNoThrow } from "../../modules/docker/listContainers";
 import { serializeError } from "./types";
 import { parseEthersSyncing } from "../../watchers/chains/utils";
 import { getEthClientApiUrl } from "./apiUrl";
@@ -73,10 +73,10 @@ export async function getClientStatus(
       }
     } catch (eFromSyncing) {
       // syncing call failed, the node is not available, find out why
-      const dnp = await listContainerNoThrow(dnpName);
+      const dnp = await listPackageNoThrow({ dnpName });
       if (dnp) {
         // DNP is installed
-        if (dnp.running) {
+        if (dnp.containers[0]?.running) {
           // syncing call failed, but the client is running
           // ???, a connection error?
           return {

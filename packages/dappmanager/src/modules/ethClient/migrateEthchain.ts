@@ -12,6 +12,7 @@ import { logs } from "../../logs";
 import { EthClientTargetPackage } from "../../types";
 
 const ethchainDnpName = "ethchain.dnp.dappnode.eth";
+const ethchainContainerName = "DAppNodeCore-ethchain.dnp.dappnode.eth";
 
 const ethchainVolumes = {
   data: "dncore_ethchaindnpdappnodeeth_data",
@@ -40,7 +41,9 @@ interface EthchainEnvs {
  */
 export async function migrateEthchain(): Promise<void> {
   // Get ETHCHAIN's current status
-  const ethchainContainer = await listContainerNoThrow(ethchainDnpName);
+  const ethchainContainer = await listContainerNoThrow({
+    containerName: ethchainContainerName
+  });
   // If ethchain compose does not exist, returns {}
   const userSettings = ComposeFileEditor.getUserSettingsIfExist(
     ethchainDnpName,

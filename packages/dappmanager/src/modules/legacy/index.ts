@@ -1,6 +1,6 @@
 import fs from "fs";
 import { dockerVolumesList } from "../docker/dockerApi";
-import { listContainers } from "../docker/listContainers";
+import { listPackages } from "../docker/listContainers";
 import { dockerRm } from "../docker/dockerCommands";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
@@ -33,7 +33,7 @@ const dnpsToRemove = [
  * Bundle legacy ops to prevent spamming the docker API
  */
 export async function runLegacyActions(): Promise<void> {
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
   const volumes = await dockerVolumesList();
 
   migrateLegacyEnvFiles(dnpList).catch(e =>
@@ -58,7 +58,8 @@ export async function runLegacyActions(): Promise<void> {
     const dnp = dnpList.find(d => d.dnpName === dnpName);
     if (dnp)
       try {
-        await dockerRm(dnp.maybeMultiContainerIdsForDnp); // Remove / uninstall DNP
+        for (const container of dnp.containers)
+          await dockerRm(container.containerName); // Remove / uninstall DNP
         // Clean manifest and docker-compose
         for (const filepath of [
           getPath.dockerCompose(dnpName, true),

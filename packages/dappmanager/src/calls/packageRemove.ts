@@ -6,7 +6,7 @@ import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/listContainers";
 import { restartPackageVolumes } from "../modules/docker/restartPackageVolumes";
 import { logs } from "../logs";
 
@@ -27,9 +27,7 @@ export async function packageRemove({
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  const dnps = await listPackages();
-  const dnp = dnps.find(d => (d.dnpName = dnpName));
-  if (!dnp) throw Error(`dnp ${dnp} not found`);
+  const dnp = await listPackage({ dnpName });
 
   if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     throw Error("Core packages cannot be cannot be removed");

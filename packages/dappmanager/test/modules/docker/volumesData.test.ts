@@ -22,7 +22,7 @@ describe("docker > volumes data", () => {
 
   describe("parseVolumeOwnershipData", () => {
     it("Should parse ownership data of a shared volume", () => {
-      const dnpList: PackageContainer[] = [
+      const containers: PackageContainer[] = [
         {
           containerId:
             "38e0f958856d16076bb241fa72d80bded9b4fd1101e5a7dbe29be68e9a61434d",
@@ -122,7 +122,7 @@ describe("docker > volumes data", () => {
 
       const volOwnershipData = parseVolumeOwnershipData(
         vol_dependencydnpdappnodeeth_data,
-        dnpList
+        containers
       );
 
       expect(volOwnershipData).to.deep.equal(expectedVolOwnershipData);

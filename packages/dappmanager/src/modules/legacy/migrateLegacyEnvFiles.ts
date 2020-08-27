@@ -4,7 +4,7 @@ import { ComposeFileEditor } from "../compose/editor";
 import * as getPath from "../../utils/getPath";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";
-import { PackageContainer } from "../../types";
+import { InstalledPackageData } from "../../types";
 
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
@@ -12,11 +12,10 @@ import { PackageContainer } from "../../types";
  * compose itself in the `environment` field in array format
  */
 export async function migrateLegacyEnvFiles(
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): Promise<void> {
   try {
-    for (const { dnpName, isCore } of dnpList)
-      migrateLegacyEnvFile(dnpName, isCore);
+    for (const dnp of dnpList) migrateLegacyEnvFile(dnp.dnpName, dnp.isCore);
     logs.info("Finished migrating legacy DNP .env files if any");
   } catch (e) {
     logs.error("Error migrating DNP .env files", e);

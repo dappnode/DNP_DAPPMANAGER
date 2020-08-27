@@ -4,7 +4,7 @@ import params from "../../../params";
 import * as safeSemver from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
-import { PackageContainer, PackageRequest } from "../../../types";
+import { InstalledPackageData, PackageRequest } from "../../../types";
 import { DappGetDnps } from "../types";
 import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch/DappGetFetcher";
@@ -60,7 +60,7 @@ export default async function aggregate({
   dappGetFetcher
 }: {
   req: PackageRequest;
-  dnpList: PackageContainer[];
+  dnpList: InstalledPackageData[];
   dappGetFetcher: DappGetFetcher;
 }): Promise<DappGetDnps> {
   // Minimal dependency injection (fetch). Proxyquire does not support subdependencies

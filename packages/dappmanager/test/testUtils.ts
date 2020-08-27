@@ -9,7 +9,8 @@ import {
   PackageRelease,
   Compose,
   ManifestWithImage,
-  InstallPackageData
+  InstallPackageData,
+  InstalledPackageData
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 import params from "../src/params";
@@ -81,7 +82,7 @@ export const mockDnpVersion = "0.0.0";
 export const mockSize = 1111111;
 export const mockHash = "/ipfs/QmWkAVYJhpwqApRfK4SZ6e2Xt2Daamc8uBpM1oMLmQ6fw4";
 
-export const mockDnp: PackageContainer = {
+export const mockContainer: PackageContainer = {
   containerId: "17628371823",
   containerName: `DAppNodePackage-${mockDnpName}`,
   dnpName: mockDnpName,
@@ -102,6 +103,18 @@ export const mockDnp: PackageContainer = {
   dependencies: {},
   origin: "",
   avatarUrl: ""
+};
+
+export const mockDnp: InstalledPackageData = {
+  dnpName: mockDnpName,
+  instanceName: "",
+  version: "0.0.0",
+  isDnp: true,
+  isCore: false,
+  dependencies: {},
+  origin: "",
+  avatarUrl: "",
+  containers: [mockContainer]
 };
 
 export const mockManifest: Manifest = {

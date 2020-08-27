@@ -1,14 +1,14 @@
 import { intersection } from "lodash";
-import { PackageContainer } from "../../../types";
+import { InstalledPackageData } from "../../../types";
 
 /**
- * @param {array} requestedDnps = [
+ * @param requestedDnps = [
  *   'nginx-proxy.dnp.dappnode.eth',
  *   'otpweb.dnp.dappnode.eth',
  *   'kovan.dnp.dappnode.eth'
  * ]
  *
- * @param {array} installedDnps = [
+ * @param installedDnps = [
  *    {
  *      version: '0.0.3',
  *      origin: '/ipfs/Qmb3L7wgoJ8UvduwcwjqUudcEnZgXKVAZvQ8rNE5L6vR34',
@@ -17,7 +17,6 @@ import { PackageContainer } from "../../../types";
  *    },
  *    ...
  *  ]
- * @returns {array}
  */
 
 export default function getRelevantInstalledDnps({
@@ -25,12 +24,12 @@ export default function getRelevantInstalledDnps({
   installedDnps
 }: {
   requestedDnps: string[];
-  installedDnps: PackageContainer[];
-}): PackageContainer[] {
+  installedDnps: InstalledPackageData[];
+}): InstalledPackageData[] {
   // Prevent possible recursive loops
   const start = Date.now();
 
-  const state: { [dnpName: string]: PackageContainer } = {};
+  const state: { [dnpName: string]: InstalledPackageData } = {};
   const intersectedDnps = intersection(
     requestedDnps,
     installedDnps.map(dnp => dnp.dnpName)
@@ -45,7 +44,7 @@ export default function getRelevantInstalledDnps({
     dnp => !requestedDnps.includes(dnp.dnpName)
   );
 
-  function addDependants(dnp: PackageContainer): void {
+  function addDependants(dnp: InstalledPackageData): void {
     // Prevent possible recursive loops
     if (Date.now() - start > 2000) return;
 
@@ -57,15 +56,15 @@ export default function getRelevantInstalledDnps({
     }
   }
 
-  function addToState(dnp: PackageContainer): void {
+  function addToState(dnp: InstalledPackageData): void {
     state[dnp.dnpName] = dnp;
   }
-  function isInState(dnp: PackageContainer): boolean {
+  function isInState(dnp: InstalledPackageData): boolean {
     return Boolean(state[dnp.dnpName]);
   }
   function dependsOn(
-    dependantPkg: PackageContainer,
-    dnp: PackageContainer
+    dependantPkg: InstalledPackageData,
+    dnp: InstalledPackageData
   ): boolean {
     return Boolean(dependantPkg.dependencies[dnp.dnpName]);
   }

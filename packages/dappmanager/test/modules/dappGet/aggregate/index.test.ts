@@ -6,7 +6,7 @@ import { DappGetFetcherMock } from "../testHelpers";
 
 // Import for types
 import aggregateType from "../../../../src/modules/dappGet/aggregate/index";
-import { PackageContainer } from "../../../../src/types";
+import { InstalledPackageData } from "../../../../src/types";
 import { mockDnp } from "../../../testUtils";
 import { DappGetDnps } from "../../../../src/modules/dappGet/types";
 
@@ -32,7 +32,7 @@ import { DappGetDnps } from "../../../../src/modules/dappGet/types";
 const nginxId = "nginx-proxy.dnp.dappnode.eth";
 const depId = "dependency.dnp.dappnode.eth";
 
-const dnpList: PackageContainer[] = [
+const dnpList: InstalledPackageData[] = [
   {
     ...mockDnp,
     dependencies: {
@@ -104,7 +104,7 @@ async function aggregateDependencies({
   }
 }
 
-function getRelevantInstalledDnps(): PackageContainer[] {
+function getRelevantInstalledDnps(): InstalledPackageData[] {
   const relevantInstalledDnpNames = [
     "web.dnp.dappnode.eth",
     "letsencrypt-nginx.dnp.dappnode.eth"
