@@ -1,7 +1,7 @@
-import { UserSettings } from "../types";
+import { PackageEnvs } from "../types";
+import * as eventBus from "../eventBus";
 import { listPackage } from "../modules/docker/listContainers";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import * as eventBus from "../eventBus";
 import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
@@ -9,17 +9,26 @@ import { restartPackage } from "../modules/docker/restartPackage";
  */
 export async function packageSetEnvironment({
   dnpName,
-  environment
+  environmentByService
 }: {
   dnpName: string;
-  environment: Required<UserSettings>["environment"];
+  environmentByService: { [serviceName: string]: PackageEnvs };
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
-  if (!environment) throw Error("kwarg environment must be defined");
+  if (!environmentByService) throw Error("kwarg environment must be defined");
 
   const dnp = await listPackage({ dnpName });
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
-  compose.applyUserSettings({ environment }, { dnpName });
+  const services = compose.services();
+
+  for (const [serviceName, environment] of Object.entries(
+    environmentByService
+  )) {
+    const service = services[serviceName];
+    if (!service) throw Error(`No service ${serviceName} in dnp ${dnpName}`);
+    service.mergeEnvs(environment);
+  }
+
   compose.write();
 
   await restartPackage({ dnpName, forceRecreate: false });

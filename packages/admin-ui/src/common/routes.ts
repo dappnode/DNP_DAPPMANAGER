@@ -22,7 +22,7 @@ import {
   UserActionLog,
   InstalledPackageData,
   InstalledPackageDetailData,
-  UserSettings
+  PackageEnvs
 } from "./types";
 
 export interface Routes {
@@ -330,12 +330,10 @@ export interface Routes {
 
   /**
    * Updates the .env file of a package. If requested, also re-ups it
-   * @param id DNP .eth name
-   * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
    */
   packageSetEnvironment: (kwargs: {
     dnpName: string;
-    environment: Required<UserSettings>["environment"];
+    environmentByService: { [serviceName: string]: PackageEnvs };
   }) => Promise<void>;
 
   /**

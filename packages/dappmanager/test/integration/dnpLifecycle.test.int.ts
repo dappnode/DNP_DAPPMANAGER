@@ -24,7 +24,6 @@ import {
   sampleFile
 } from "../testUtils";
 import { uploadManifestRelease } from "../testReleaseUtils";
-import fileToDataUri from "../../src/utils/fileToDataUri";
 import {
   stringifyPortMappings,
   parseEnvironment
@@ -455,7 +454,7 @@ describe("DNP lifecycle", function() {
       const envValue = String(Date.now());
       await calls.packageSetEnvironment({
         dnpName: dnpNameMain,
-        environment: { [dnpNameMain]: { time: envValue } }
+        environmentByService: { [dnpNameMain]: { time: envValue } }
       });
 
       const dnpNextEnvs = await getContainerEnvironment({
