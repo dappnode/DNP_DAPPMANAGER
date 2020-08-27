@@ -76,17 +76,34 @@ send
   describe("getNsupdateTxts", () => {
     const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
     const gethDnpName = "geth.dnp.dappnode.eth";
+    const pinnerDnpName = "pinner.dnp.dappnode.eth";
+    const pinnerService1 = "cluster";
+    const pinnerService2 = "app";
     const containers: PackageContainer[] = [
       {
         ...mockContainer,
         dnpName: bitcoinDnpName,
+        serviceName: bitcoinDnpName,
         ip: "172.33.0.2"
       },
       {
         ...mockContainer,
         dnpName: gethDnpName,
+        serviceName: gethDnpName,
         ip: "172.33.0.3",
         chain: "ethereum"
+      },
+      {
+        ...mockContainer,
+        dnpName: pinnerDnpName,
+        serviceName: pinnerService1,
+        ip: "172.33.0.4"
+      },
+      {
+        ...mockContainer,
+        dnpName: pinnerDnpName,
+        serviceName: pinnerService2,
+        ip: "172.33.0.5"
       }
     ];
     const domainAliases = {
@@ -100,14 +117,24 @@ send
 update delete my.bitcoin.dnp.dappnode.eth A
 update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
 update delete my.geth.dnp.dappnode.eth A
-update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3`,
+update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3
+update delete my.cluster.pinner.dnp.dappnode.eth A
+update add my.cluster.pinner.dnp.dappnode.eth 60 A 172.33.0.4
+update delete my.app.pinner.dnp.dappnode.eth A
+update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
+`,
         dappnode: `
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete geth.dappnode A
 update add geth.dappnode 60 A 172.33.0.3
+update delete cluster.pinner.dappnode A
+update add cluster.pinner.dappnode 60 A 172.33.0.4
+update delete app.pinner.dappnode A
+update add app.pinner.dappnode 60 A 172.33.0.5
 update delete fullnode.dappnode A
-update add fullnode.dappnode 60 A 172.33.0.3`
+update add fullnode.dappnode 60 A 172.33.0.3
+`
       });
     });
 
@@ -121,11 +148,17 @@ update add fullnode.dappnode 60 A 172.33.0.3`
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update delete my.geth.dnp.dappnode.eth A`,
+update delete my.geth.dnp.dappnode.eth A
+update delete my.cluster.pinner.dnp.dappnode.eth A
+update delete my.app.pinner.dnp.dappnode.eth A
+`,
         dappnode: `
 update delete bitcoin.dappnode A
 update delete geth.dappnode A
-update delete fullnode.dappnode A`
+update delete cluster.pinner.dappnode A
+update delete app.pinner.dappnode A
+update delete fullnode.dappnode A
+`
       });
     });
 
@@ -139,10 +172,12 @@ update delete fullnode.dappnode A`
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2`,
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
+`,
         dappnode: `
 update delete bitcoin.dappnode A
-update add bitcoin.dappnode 60 A 172.33.0.2`
+update add bitcoin.dappnode 60 A 172.33.0.2
+`
       });
     });
 
