@@ -19,11 +19,13 @@ export default function orderInstallPackages(
   requestName: string
 ): InstallPackageData[] {
   // Generic order, by name and the dappmanager the last
-  const basicOrder = sortBy(packagesData, ["name"]).sort((a, b) => {
-    if (a.dnpName === dappmanager && b.dnpName !== dappmanager) return 1;
-    if (a.dnpName !== dappmanager && b.dnpName === dappmanager) return -1;
-    else return 0;
-  });
+  const basicOrder = packagesData
+    .sort((a, b) => a.dnpName.localeCompare(b.dnpName))
+    .sort((a, b) => {
+      if (a.dnpName === dappmanager && b.dnpName !== dappmanager) return 1;
+      if (a.dnpName !== dappmanager && b.dnpName === dappmanager) return -1;
+      else return 0;
+    });
 
   // The requested package can provide an order to up the packages
   // runOrder: ["core.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"]

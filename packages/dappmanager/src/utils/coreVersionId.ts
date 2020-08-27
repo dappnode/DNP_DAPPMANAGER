@@ -20,13 +20,13 @@ export function getCoreVersionId(
 
 export function parseCoreVersionId(
   versionId: string
-): { name: string; version: string }[] {
+): { dnpName: string; version: string }[] {
   return versionId
     .split(",")
     .filter(nameAtVersion => nameAtVersion)
     .map(nameAtVersion => {
       const [shortName, version] = nameAtVersion.split("@");
-      return { name: `${shortName}.dnp.dappnode.eth`, version };
+      return { dnpName: `${shortName}.dnp.dappnode.eth`, version };
     });
 }
 

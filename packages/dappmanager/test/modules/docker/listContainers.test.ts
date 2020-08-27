@@ -29,7 +29,7 @@ describe("listContainers", function() {
 
   it("should parse an entire listContainers", async () => {
     const containers = await listContainers();
-    console.log(JSON.stringify(containers, null, 2));
+    // console.log(JSON.stringify(containers, null, 2));
 
     const expectedContainers: PackageContainer[] = [
       {
@@ -60,11 +60,7 @@ describe("listContainers", function() {
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -124,11 +120,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -156,11 +148,205 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
+        containerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
+        serviceName: "wifi.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "wifi.dnp.dappnode.eth",
+        version: "0.2.0",
+        isDnp: false,
+        isCore: true,
+        created: 1560354278,
+        image: "wifi.dnp.dappnode.eth:0.2.0",
+        ip: "",
+        ports: [],
+        volumes: [
+          {
+            host: "/var/run/docker.sock",
+            container: "/var/run/docker.sock"
+          }
+        ],
+        state: "exited",
+        running: false,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
+        containerName: "DAppNodeCore-admin.dnp.dappnode.eth",
+        serviceName: "admin.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "admin.dnp.dappnode.eth",
+        version: "0.2.3",
+        isDnp: false,
+        isCore: true,
+        created: 1560335154,
+        image: "admin.dnp.dappnode.eth:0.2.3",
+        ip: "172.33.1.9",
+        ports: [
+          {
+            host: 8090,
+            container: 8090,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            container: 80,
+            protocol: "TCP",
+            deletable: false
+          }
+        ],
+        volumes: [
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            container: "/usr/www/openvpn/cred",
+            name: "dncore_vpndnpdappnodeeth_shared"
+          }
+        ],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
+        containerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
+        serviceName: "vpn.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "vpn.dnp.dappnode.eth",
+        version: "0.2.0",
+        isDnp: false,
+        isCore: true,
+        created: 1560334861,
+        image: "vpn.dnp.dappnode.eth:0.2.0",
+        ip: "172.33.1.4",
+        ports: [
+          {
+            host: 1194,
+            container: 1194,
+            protocol: "UDP",
+            deletable: false
+          }
+        ],
+        volumes: [
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
+            container: "/etc/openvpn",
+            name: "dncore_vpndnpdappnodeeth_config"
+          },
+          {
+            host: "/etc/hostname",
+            container: "/etc/vpnname"
+          },
+          {
+            host: "/lib/modules",
+            container: "/lib/modules"
+          },
+          {
+            host: "/usr/src/dappnode/config",
+            container: "/usr/src/app/config"
+          },
+          {
+            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
+            container: "/usr/src/app/secrets",
+            name: "dncore_vpndnpdappnodeeth_data"
+          },
+          {
+            host: "/var/run/docker.sock",
+            container: "/var/run/docker.sock"
+          },
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            container: "/var/spool/openvpn",
+            name: "dncore_vpndnpdappnodeeth_shared"
+          }
+        ],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
+        containerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+        serviceName: "dappmanager.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        version: "0.2.3",
+        isDnp: false,
+        isCore: true,
+        created: 1560334707,
+        image: "dappmanager.dnp.dappnode.eth:0.2.3",
+        ip: "172.33.1.7",
+        ports: [],
+        volumes: [
+          {
+            host: "/usr/src/dappnode/DNCORE",
+            container: "/usr/src/app/DNCORE"
+          },
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
+            container: "/usr/src/app/dnp_repo",
+            name: "dncore_dappmanagerdnpdappnodeeth_data"
+          },
+          {
+            host: "/var/run/docker.sock",
+            container: "/var/run/docker.sock"
+          }
+        ],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
+        containerName: "DAppNodeCore-bind.dnp.dappnode.eth",
+        serviceName: "bind.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "bind.dnp.dappnode.eth",
+        version: "0.2.0",
+        isDnp: false,
+        isCore: true,
+        created: 1560334707,
+        image: "bind.dnp.dappnode.eth:0.2.0",
+        ip: "172.33.1.2",
+        ports: [
+          {
+            container: 53,
+            protocol: "UDP",
+            deletable: false
+          }
+        ],
+        volumes: [
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
+            container: "/etc/bind",
+            name: "dncore_binddnpdappnodeeth_data"
+          }
+        ],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
       },
       {
         containerId:
@@ -253,6 +439,89 @@ describe("listContainers", function() {
       },
       {
         containerId:
+          "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
+        containerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+        serviceName: "ipfs.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ipfs.dnp.dappnode.eth",
+        version: "0.2.2",
+        isDnp: false,
+        isCore: true,
+        created: 1560334697,
+        image: "ipfs.dnp.dappnode.eth:0.2.2",
+        ip: "172.33.1.5",
+        ports: [
+          {
+            container: 5001,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            container: 8080,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            container: 8081,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            host: 4001,
+            container: 4001,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            host: 4002,
+            container: 4002,
+            protocol: "UDP",
+            deletable: false
+          }
+        ],
+        volumes: [
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
+            container: "/data/ipfs",
+            name: "dncore_ipfsdnpdappnodeeth_data"
+          },
+          {
+            host:
+              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
+            container: "/export",
+            name: "dncore_ipfsdnpdappnodeeth_export"
+          }
+        ],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
+        containerName: "DAppNodeCore-ethforward.dnp.dappnode.eth",
+        serviceName: "ethforward.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ethforward.dnp.dappnode.eth",
+        version: "0.2.1",
+        isDnp: false,
+        isCore: true,
+        created: 1560334412,
+        image: "ethforward.dnp.dappnode.eth:0.2.1",
+        ip: "172.33.1.3",
+        ports: [],
+        volumes: [],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
+      },
+      {
+        containerId:
           "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
         containerName: "DAppNodePackage-swarm.dnp.dappnode.eth",
         serviceName: "swarm.dnp.dappnode.eth",
@@ -289,11 +558,7 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -336,11 +601,7 @@ describe("listContainers", function() {
           "nginx-proxy.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -369,10 +630,7 @@ describe("listContainers", function() {
         dependencies: {},
         avatarUrl: "",
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -419,12 +677,8 @@ describe("listContainers", function() {
         running: true,
         dependencies: {},
         avatarUrl: "",
-        origin: "",
         chain: "ethereum",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
       },
       {
         containerId:
@@ -471,11 +725,39 @@ describe("listContainers", function() {
           "bitcoin.dnp.dappnode.eth": "latest"
         },
         avatarUrl: "",
-        origin: "",
-        canBeFullnode: false,
-        defaultEnvironment: {},
-        defaultPorts: [],
-        defaultVolumes: []
+        canBeFullnode: false
+      },
+      {
+        containerId:
+          "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
+        containerName: "DAppNodeCore-wamp.dnp.dappnode.eth",
+        serviceName: "wamp.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "wamp.dnp.dappnode.eth",
+        version: "0.2.0",
+        isDnp: false,
+        isCore: true,
+        created: 1557330387,
+        image: "wamp.dnp.dappnode.eth:0.2.0",
+        ip: "172.33.1.8",
+        ports: [
+          {
+            container: 8000,
+            protocol: "TCP",
+            deletable: false
+          },
+          {
+            container: 8080,
+            protocol: "TCP",
+            deletable: false
+          }
+        ],
+        volumes: [],
+        state: "running",
+        running: true,
+        dependencies: {},
+        avatarUrl: "",
+        canBeFullnode: false
       }
     ];
 

@@ -6,14 +6,14 @@ import { parseApmVersionReturn, linspace } from "./apmUtils";
 /**
  * Fetch all versions of an APM repo
  * If provided version request range, only returns satisfying versions
- * @param name "bitcoin.dnp.dappnode.eth"
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
  */
 export async function fetchApmVersionsState(
   provider: ethers.providers.Provider,
-  name: string,
+  dnpName: string,
   lastVersionId = 0
 ): Promise<ApmVersionState[]> {
-  const repo = new ethers.Contract(name, repoContract.abi, provider);
+  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
 
   const versionCount: number = await repo.getVersionsCount().then(parseFloat);
 

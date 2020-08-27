@@ -105,15 +105,15 @@ export function dockerImageManifest(
  * Untagged: package.dnp.dappnode.eth:0.1.6
  */
 export async function dockerCleanOldImages(
-  name: string,
+  dnpName: string,
   version: string
 ): Promise<void> {
-  const repoImages = await imagesList({ filters: { reference: [name] } });
+  const repoImages = await imagesList({ filters: { reference: [dnpName] } });
   const imagesToDelete = repoImages.filter(image =>
     image.RepoTags.every(tag => {
       const [imageName, imageVersion] = tag.split(":");
       return (
-        imageName === name &&
+        imageName.includes(dnpName) &&
         semver.valid(imageVersion) &&
         semver.valid(version) &&
         semver.lt(imageVersion, version)

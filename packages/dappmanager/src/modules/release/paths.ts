@@ -16,9 +16,9 @@ export const releaseFilesRegex = {
 export const getArchTag = (arch: Architecture): string =>
   arch.replace(/\//g, "-");
 export const getImagePath = (
-  name: string,
+  dnpName: string,
   version: string,
   arch: Architecture
-): string => `${name}_${version}_${getArchTag(arch)}.txz`;
-export const getLegacyImagePath = (name: string, version: string): string =>
-  `${name}_${version}.tar.xz`;
+): string => `${dnpName}_${version}_${getArchTag(arch)}.txz`;
+export const getLegacyImagePath = (dnpName: string, version: string): string =>
+  `${dnpName}_${version}.tar.xz`;

@@ -8,9 +8,9 @@ import orderInstallPackages from "../../../src/modules/installer/orderInstallPac
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {
     function getPackagesData(names: string[]): InstallPackageData[] {
-      return names.map(name => ({
+      return names.map(dnpName => ({
         ...mockPackageData,
-        name
+        dnpName
       }));
     }
     const coreName = "core.dnp.dappnode.eth";

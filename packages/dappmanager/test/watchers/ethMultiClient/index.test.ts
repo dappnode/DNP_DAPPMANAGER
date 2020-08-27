@@ -76,8 +76,12 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     };
     /* eslint-enable @typescript-eslint/explicit-function-return-type */
 
-    async function listPackages(): Promise<InstalledPackageData[]> {
-      return dnpList;
+    async function listPackageNoThrow({
+      dnpName
+    }: {
+      dnpName: string;
+    }): Promise<InstalledPackageData | null> {
+      return dnpList.find(d => d.dnpName === dnpName) || null;
     }
 
     const packageInstall = sinon.mock().resolves({ message: "" });
@@ -92,7 +96,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
           .with(db)
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listPackages })
+          .with({ listPackageNoThrow })
           .toBeUsed();
         mock(() => import("../../../src/calls"))
           .with({ packageInstall })
