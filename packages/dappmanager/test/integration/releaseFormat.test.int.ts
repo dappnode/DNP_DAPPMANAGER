@@ -6,6 +6,7 @@ import params from "../../src/params";
 import shell from "../../src/utils/shell";
 import {
   prepareDirectoryTypeRelease,
+  prepareMultiServiceTypeRelease,
   prepareManifestTypeRelease,
   cleanInstallationArtifacts,
   verifyFiles,
@@ -23,6 +24,7 @@ import {
 /**
  * Aggregate the three type of tests
  * - Directory-type (with docker-compose)
+ * - Multi-service-type
  * - Manifest-type
  *
  * [NOTE] There are different default `NAME` env values
@@ -38,6 +40,11 @@ const releaseTests: {
     name: "Directory-type",
     prepareRelease: prepareDirectoryTypeRelease,
     envValue: "From_Compose"
+  },
+  {
+    name: "Multi-service-type",
+    prepareRelease: prepareMultiServiceTypeRelease,
+    envValue: "Multi-service"
   },
   {
     name: "Manifest-type",

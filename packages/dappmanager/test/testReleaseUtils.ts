@@ -35,6 +35,7 @@ const buildFilesDir = path.resolve(mockDnpDir, "buildFiles");
 const manifestFileOld = "dappnode_package.json";
 const manifestFileNoImage = "dappnode_package-no-image.json";
 const composeFile = "docker-compose-mock-test.yml";
+const composeMultiService = "docker-compose-multi-service.yml";
 const imageFile = "mock-test.public.dappnode.eth_0.0.1.tar.xz";
 const imagePath = path.join(buildFilesDir, imageFile);
 const imageTag = "mock-test.public.dappnode.eth:0.0.1";
@@ -46,6 +47,7 @@ export function verifyFiles(): void {
     manifestFileOld,
     manifestFileNoImage,
     composeFile,
+    composeMultiService,
     imageFile
   ]) {
     if (!fs.existsSync(path.join(buildFilesDir, file)))
@@ -166,6 +168,42 @@ export async function uploadManifestRelease(
 export async function prepareDirectoryTypeRelease(): Promise<string> {
   const releaseDir = path.join(testDir, "release-directory");
   const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
+
+  fs.mkdirSync(releaseDir, { recursive: true });
+  for (const file of filesToUpload)
+    fs.copyFileSync(
+      path.join(buildFilesDir, file),
+      path.join(releaseDir, file)
+    );
+
+  const rootHash = await ipfsAddDirFromFs(releaseDir);
+
+  // Verify the uploaded files
+  const files = await ipfs.ls({ hash: rootHash });
+  if (
+    !isEqual(
+      files.map(f => f.name),
+      filesToUpload
+    )
+  )
+    throw Error("Uploaded files do not match");
+
+  return rootHash;
+}
+
+/**
+ * Release type: `Directory-type`
+ * This function is a miniature version of the DAppNode SDK
+ * 1. Creates a new directory with the structure:
+ *  /dappnode_package-no-hashes.json
+ *  /mock-test.public.dappnode.eth_0.0.1.tar.xz
+ * 2. Uploads the entire folder and checks its contents
+ *
+ * @returns releaseHash
+ */
+export async function prepareMultiServiceTypeRelease(): Promise<string> {
+  const releaseDir = path.join(testDir, "release-multi-service");
+  const filesToUpload = [manifestFileNoImage, composeMultiService, imageFile];
 
   fs.mkdirSync(releaseDir, { recursive: true });
   for (const file of filesToUpload)

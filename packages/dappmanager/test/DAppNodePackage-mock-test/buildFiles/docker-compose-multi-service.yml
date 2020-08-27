@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+  frontend:
+    image: "frontend.mock-test.public.dappnode.eth:0.0.1"
+    build: ./build
+    restart: always
+    environment:
+      - NAME=Multi-service
+  backend:
+    image: "backend.mock-test.public.dappnode.eth:0.0.1"
+    build: ./build
+    restart: always
+    environment:
+      - NAME=Multi-service
