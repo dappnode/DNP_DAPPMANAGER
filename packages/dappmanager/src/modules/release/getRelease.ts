@@ -12,6 +12,7 @@ import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
+import { getContainerDomain } from "../../params";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -56,9 +57,14 @@ export async function getRelease({
   for (const service of Object.values(compose.services())) {
     // Add SSL environment variables
     if (manifest.ssl) {
-      const dnpSubDomain = shortNameDomainByService(
-        `${shortNameDomain(dnpName)}.${db.domain.get()}`
-      );
+      const containerDomain = getContainerDomain({
+        dnpName,
+        serviceName: service.serviceName
+      });
+      const dnpSubDomain = [
+        shortNameDomain(containerDomain),
+        db.domain.get()
+      ].join(".");
       service.mergeEnvs({
         VIRTUAL_HOST: dnpSubDomain,
         LETSENCRYPT_HOST: dnpSubDomain

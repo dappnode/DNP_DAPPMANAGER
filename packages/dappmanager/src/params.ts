@@ -204,3 +204,20 @@ export const getImageTagSuffix = ({
   dnpName: string;
   version: string;
 }): string => `${dnpName}:${version}`;
+
+/**
+ * Get a unique domain per container, considering multi-service packages
+ */
+export const getContainerDomain = ({
+  dnpName,
+  serviceName
+}: {
+  dnpName: string;
+  serviceName: string;
+}): string => {
+  if (!serviceName || serviceName === dnpName) {
+    return dnpName;
+  } else {
+    return [serviceName, dnpName].join(".");
+  }
+};

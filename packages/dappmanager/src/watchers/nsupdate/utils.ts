@@ -1,4 +1,5 @@
 import { PackageContainer } from "../../types";
+import { getContainerDomain } from "../../params";
 import { isEmpty } from "lodash";
 
 const TTL = 60;
@@ -164,25 +165,25 @@ export function getNsupdateTxts({
   const dappnode: DomainMap = {};
 
   // Add domains from installed package names
-  for (const dnp of containersToUpdate) {
-    const fullEns = getContainerFullEnsDomain(dnp);
-    eth[getMyDotEthdomain(fullEns)] = dnp.ip;
-    dappnode[getDotDappnodeDomain(fullEns)] = dnp.ip;
+  for (const container of containersToUpdate) {
+    const fullEns = getContainerDomain(container);
+    eth[getMyDotEthdomain(fullEns)] = container.ip;
+    dappnode[getDotDappnodeDomain(fullEns)] = container.ip;
   }
 
   // Add dappnode domain alias from installed packages
-  for (const dnp of containersToUpdate)
-    if (dnp.domainAlias)
-      for (const alias of dnp.domainAlias)
-        if (isAliasAllowed(alias, dnp))
-          dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+  for (const container of containersToUpdate)
+    if (container.domainAlias)
+      for (const alias of container.domainAlias)
+        if (isAliasAllowed(alias, container))
+          dappnode[getDotDappnodeDomain(alias)] = container.ip;
 
   // Add .dappnode domain alias from db (such as fullnode.dappnode)
   for (const [alias, dnpName] of Object.entries(domainAliases)) {
-    const dnp = containersToUpdate.find(
-      dnp => dnpName && dnp.dnpName === dnpName
+    const container = containersToUpdate.find(
+      c => dnpName && c.dnpName === dnpName
     );
-    if (dnp) dappnode[getDotDappnodeDomain(alias)] = dnp.ip;
+    if (container) dappnode[getDotDappnodeDomain(alias)] = container.ip;
   }
 
   return (
