@@ -34,7 +34,7 @@ export function getInstallerPackagesData({
  */
 function getInstallerPackageData(
   release: PackageRelease,
-  userSettings: UserSettings,
+  userSettings: UserSettings | undefined,
   currentVersion: string | undefined
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
@@ -52,10 +52,11 @@ function getInstallerPackageData(
 
   // If composePath does not exist, or is invalid: returns {}
   const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
+  const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
   // Append to compose
   const compose = new ComposeEditor(release.compose);
-  compose.applyUserSettings(deepmerge(prevUserSet, userSettings), { dnpName });
+  compose.applyUserSettings(nextUserSet, { dnpName });
 
   return {
     ...release,
@@ -69,6 +70,6 @@ function getInstallerPackageData(
     // Data to write
     compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: userSettings.fileUploads
+    fileUploads: userSettings?.fileUploads
   };
 }
