@@ -608,18 +608,6 @@ export interface UserActionLog {
 }
 
 /**
- * Docker
- */
-
-export interface DockerOptionsInterface {
-  timeout?: number;
-  timestamps?: boolean;
-  volumes?: boolean;
-  v?: boolean;
-  core?: string;
-}
-
-/**
  * Auto-update helper types
  */
 
