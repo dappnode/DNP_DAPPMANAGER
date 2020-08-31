@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import io from "socket.io-client";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash";
+import mitt from "mitt";
 import { store } from "../store";
 // Transport
 import { subscriptionsFactory } from "common/transport/socketIo";
@@ -19,7 +20,6 @@ import {
   connectionClose
 } from "services/connectionStatus/actions";
 import { initialCallsOnOpen } from "./initialCalls";
-import { PubSub } from "./utils";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
 
@@ -52,7 +52,7 @@ const routeSubscription: Partial<
  * ```
  * Or use the hook `useSubscription`
  */
-const apiEventBridge = new PubSub();
+const apiEventBridge = mitt();
 
 /**
  * Call a RPC route
