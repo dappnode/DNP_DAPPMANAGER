@@ -129,22 +129,19 @@ export function userSettingsToFormData(
       if (target && target.type) {
         switch (target.type) {
           case "environment":
-            if (target.name && target.name in environment)
-              formDataDnp[propId] =
-                environment[target.service || dnpName][target.name];
+            const environmentService = environment[target.service || dnpName];
+            if (hasProperty(target.name, environmentService))
+              formDataDnp[propId] = environmentService[target.name];
             break;
 
           case "portMapping":
-            if (target.containerPort && target.containerPort in portMappings)
-              formDataDnp[propId] =
-                portMappings[target.service || dnpName][target.containerPort];
+            const portMappingsService = portMappings[target.service || dnpName];
+            if (hasProperty(target.containerPort, portMappingsService))
+              formDataDnp[propId] = portMappingsService[target.containerPort];
             break;
 
           case "namedVolumeMountpoint": {
-            if (
-              target.volumeName &&
-              target.volumeName in namedVolumeMountpoints
-            )
+            if (hasProperty(target.volumeName, namedVolumeMountpoints))
               formDataDnp[propId] = namedVolumeMountpoints[target.volumeName];
             break;
           }
@@ -155,9 +152,9 @@ export function userSettingsToFormData(
           }
 
           case "fileUpload":
-            if (target.path && target.path in fileUploads)
-              formDataDnp[propId] =
-                fileUploads[target.service || dnpName][target.path];
+            const fileUploadsService = fileUploads[target.service || dnpName];
+            if (hasProperty(target.path, fileUploadsService))
+              formDataDnp[propId] = fileUploadsService[target.path];
             break;
         }
       }
@@ -191,6 +188,15 @@ export function filterActiveSetupWizard(
       }
     })
   }));
+}
+
+/**
+ * Util: Type-safe wrapper around `key in obj` which will be ok whatever type obj is
+ * @param key
+ * @param obj
+ */
+function hasProperty(key: string, obj: { [key: string]: string }): boolean {
+  return Boolean(key) && key in obj;
 }
 
 /**
