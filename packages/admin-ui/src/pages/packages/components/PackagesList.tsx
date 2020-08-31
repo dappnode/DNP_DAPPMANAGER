@@ -49,7 +49,8 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
                 <img
                   className="avatar"
                   src={avatarUrl || (coreDnps ? dappnodeIcon : defaultAvatar)}
-                  alt="Avatar"
+                  // Display the broken image logo with no text
+                  alt=" "
                 />
                 <NavLink className="name" to={`${packagesRootPath}/${dnpName}`}>
                   {shortNameCapitalized(dnpName)}

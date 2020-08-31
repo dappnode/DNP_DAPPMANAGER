@@ -22,9 +22,9 @@ import Title from "components/Title";
 import { shortNameCapitalized } from "utils/format";
 
 export const PackageById: React.FC<RouteComponentProps<{
-  dnpName: string;
+  id: string;
 }>> = ({ match }) => {
-  const id = decodeURIComponent(match.params.dnpName || "");
+  const id = decodeURIComponent(match.params.id || "");
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
   const dnp = dnpRequest.data;
