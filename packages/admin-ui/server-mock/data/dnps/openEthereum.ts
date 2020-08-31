@@ -29,30 +29,32 @@ export const openEthereum: MockDnp = {
 
     canBeFullnode: true
   },
-  installedContainer: {
-    ports: [
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "TCP"
-      },
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "UDP"
-      }
-    ],
-    volumes: [
-      {
-        host: "/var/lib/docker/volumes/paritydnpdappnodeeth_data/_data",
-        container: "/app/.parity",
-        name: "paritydnpdappnodeeth_data"
-      },
-      {
-        host: "/var/lib/docker/volumes/paritydnpdappnodeeth_geth/_data",
-        container: "/root/.ethereum/",
-        name: "paritydnpdappnodeeth_geth"
-      }
-    ]
+  installedContainers: {
+    [serviceName]: {
+      ports: [
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "TCP"
+        },
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "UDP"
+        }
+      ],
+      volumes: [
+        {
+          host: "/var/lib/docker/volumes/paritydnpdappnodeeth_data/_data",
+          container: "/app/.parity",
+          name: "paritydnpdappnodeeth_data"
+        },
+        {
+          host: "/var/lib/docker/volumes/paritydnpdappnodeeth_geth/_data",
+          container: "/root/.ethereum/",
+          name: "paritydnpdappnodeeth_geth"
+        }
+      ]
+    }
   }
 };

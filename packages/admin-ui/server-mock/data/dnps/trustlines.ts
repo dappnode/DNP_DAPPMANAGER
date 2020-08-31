@@ -120,7 +120,9 @@ export const trustlines: MockDnp = {
   installedData: {
     version: ""
   },
-  installedContainer: {
-    state: "exited"
+  installedContainers: {
+    [serviceName]: {
+      state: "exited"
+    }
   }
 };

@@ -22,7 +22,9 @@ export const wifi: MockDnp = {
       }
     }
   },
-  installedContainer: {
-    state: "running"
+  installedContainers: {
+    [serviceName]: {
+      state: "running"
+    }
   }
 };

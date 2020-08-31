@@ -18,5 +18,5 @@ export interface MockDnp {
   installedData?: Partial<
     InstalledPackageDetailData & { containers: PackageContainer[] }
   >;
-  installedContainer?: Partial<PackageContainer>;
+  installedContainers?: { [serviceName: string]: Partial<PackageContainer> };
 }

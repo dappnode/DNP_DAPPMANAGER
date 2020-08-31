@@ -20,12 +20,12 @@ const packages = new Map<string, InstalledPackageDetailData>(
 );
 
 function update(
-  id: string,
+  dnpName: string,
   fn: (dnp: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
 ) {
-  const dnp = packages.get(id);
-  if (!dnp) throw Error(`No id ${id}`);
-  packages.set(id, { ...dnp, ...fn(dnp) });
+  const dnp = packages.get(dnpName);
+  if (!dnp) throw Error(`No dnpName ${dnpName}`);
+  packages.set(dnpName, { ...dnp, ...fn(dnp) });
   eventBus.requestPackages.emit();
 }
 
@@ -93,7 +93,8 @@ export async function fetchDnpRequest({
  */
 export async function packageInstall({
   name,
-  version
+  version,
+  userSettings
 }: {
   name: string;
   version?: string;
@@ -112,6 +113,7 @@ export async function packageInstall({
     origin: undefined,
     gettingStarted: `Welcome to the package **${name}**`,
     gettingStartedShow: true,
+    userSettings: (userSettings || {})[name],
     containers: [
       {
         ...sampleContainer,

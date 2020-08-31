@@ -163,26 +163,28 @@ Content in the first column | Content in the second column
       }
     }
   },
-  installedContainer: {
-    state: "running",
-    ports: [
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "TCP"
-      },
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "UDP"
-      }
-    ],
-    volumes: [
-      {
-        name: "lightning-networkpublicdappnodeeth_data",
-        host: "data",
-        container: "./data/ethereum"
-      }
-    ]
+  installedContainers: {
+    [serviceName]: {
+      state: "running",
+      ports: [
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "TCP"
+        },
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "UDP"
+        }
+      ],
+      volumes: [
+        {
+          name: "lightning-networkpublicdappnodeeth_data",
+          host: "data",
+          container: "./data/ethereum"
+        }
+      ]
+    }
   }
 };

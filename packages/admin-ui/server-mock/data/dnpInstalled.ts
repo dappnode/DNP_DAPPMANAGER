@@ -1,32 +1,52 @@
-import { InstalledPackageDetailData } from "../../src/common";
+import { InstalledPackageDetailData, PackageContainer } from "../../src/common";
 import { sampleContainer, sampleDnp } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
 
 function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   const dnpName = dnp.metadata.name;
+
+  function getContainer(
+    serviceName: string,
+    container: Partial<PackageContainer>
+  ): PackageContainer {
+    return {
+      ...sampleContainer,
+      containerId: `0000000000000${dnpName}`,
+      containerName: `DAppNodePackage-${dnpName}`,
+      dnpName,
+      serviceName,
+      instanceName: "",
+      version: dnp.metadata.version,
+      ...container
+    };
+  }
+
   return {
     ...sampleDnp,
-    ...dnp.installedData,
+
     dnpName,
     instanceName: "",
     isCore: dnp.metadata.type === "dncore",
     avatarUrl: dnp.avatar || "",
     manifest: dnp.metadata,
-    userSettings: dnp.userSettings,
-    setupWizard: dnp.setupWizard,
-    containers: [
-      {
-        ...sampleContainer,
-        containerId: `0000000000000${dnpName}`,
-        containerName: `DAppNodePackage-${dnpName}`,
-        dnpName,
-        serviceName: dnpName,
-        instanceName: "",
-        version: dnp.metadata.version,
-        ...(dnp.installedContainer || {})
-      }
-    ]
+    userSettings: { environment: dnp.userSettings?.environment },
+    setupWizard: dnp.setupWizard && {
+      ...dnp.setupWizard,
+      fields: dnp.setupWizard.fields.filter(
+        f => f.target?.type === "environment"
+      )
+    },
+    containers: dnp.installedContainers
+      ? Object.entries(dnp.installedContainers).map(
+          ([serviceName, container]) => ({
+            ...getContainer(serviceName, container),
+            ...container
+          })
+        )
+      : [getContainer(dnpName, {})],
+
+    ...dnp.installedData
   };
 }
 

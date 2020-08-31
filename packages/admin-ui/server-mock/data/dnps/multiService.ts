@@ -84,5 +84,10 @@ export const multiService: MockDnp = {
         }
       }
     ]
+  },
+
+  installedContainers: {
+    [serviceNames.front]: {},
+    [serviceNames.back]: {}
   }
 };
