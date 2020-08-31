@@ -40,7 +40,7 @@
     "is-ipfs": "^1.0.3",
     "it-to-stream": "^0.1.1",
     "js-yaml": "^3.11.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "lowdb": "^1.0.0",
     "memoizee": "^0.4.14",
     "mime-types": "^2.1.27",
