@@ -12,30 +12,44 @@ export const FileManager = ({
 }: {
   containers: PackageContainer[];
 }) => {
-  const containerNames = containers.map(c => c.containerName);
-  const [containerName, setContainerName] = useState(containerNames[0]);
+  const serviceNames = containers.map(c => c.serviceName);
+  const [serviceName, setServiceName] = useState(serviceNames[0]);
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
+  const container = containers.find(c => c.serviceName === serviceName);
+  const containerName = container?.containerName;
+  const name = serviceNames.length === 1 ? "package" : serviceName;
+
   return (
     <Card spacing divider className="file-manager">
-      {containerNames.length > 1 && (
-        <Select
-          value={containerName}
-          onValueChange={setContainerName}
-          options={containerNames}
-        />
+      {serviceNames.length > 1 && (
+        <div>
+          <Select
+            value={serviceName}
+            onValueChange={setServiceName}
+            options={serviceNames}
+            prepend="Service"
+          />
+        </div>
       )}
 
-      <div>
-        <div className="subtle-header">Upload file to package</div>
-        <CopyFileTo containerName={containerName} toPathDefault={to} />
-      </div>
+      {containerName && (
+        <>
+          <div>
+            <div className="subtle-header">Upload file to {name}</div>
+            <CopyFileTo containerName={containerName} toPathDefault={to} />
+          </div>
 
-      <div>
-        <div className="subtle-header">Download file from package</div>
-        <CopyFileFrom containerName={containerName} fromPathDefault={from} />
-      </div>
+          <div>
+            <div className="subtle-header">Download file from {name}</div>
+            <CopyFileFrom
+              containerName={containerName}
+              fromPathDefault={from}
+            />
+          </div>
+        </>
+      )}
     </Card>
   );
 };

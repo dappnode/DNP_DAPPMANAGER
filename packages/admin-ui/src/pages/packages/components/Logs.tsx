@@ -13,6 +13,7 @@ import { stringIncludes, stringSplit } from "utils/strings";
 import { apiUrls } from "params";
 import { urlJoin } from "utils/url";
 import { PackageContainer } from "common";
+import "./logs.scss";
 
 const baseUrlDownloadAll = apiUrls.containerLogs;
 const refreshInterval = 2 * 1000;
@@ -21,8 +22,9 @@ const terminalID = "terminal";
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
 export function Logs({ containers }: { containers: PackageContainer[] }) {
-  const containerNames = containers.map(c => c.containerName);
-  const [containerName, setContainerName] = useState(containerNames[0]);
+  const serviceNames = containers.map(c => c.serviceName);
+  const [serviceName, setServiceName] = useState(serviceNames[0]);
+
   // User options
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [timestamps, setTimestamps] = useState(false);
@@ -30,6 +32,9 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
   const [lines, setLines] = useState(200);
   // Fetched data
   const [logs, setLogs] = useState("");
+
+  const container = containers.find(c => c.serviceName === serviceName);
+  const containerName = container?.containerName;
 
   /**
    * This use effect fetches the logs again everytime any of this variables changes:
@@ -48,6 +53,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
 
     async function logDnp() {
       try {
+        if (!containerName) throw Error("No containerName");
         const options = { timestamps, tail: lines };
         const logs = await api.packageLog({ containerName, options });
         if (typeof logs !== "string") throw Error("Logs must be a string");
@@ -90,16 +96,17 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
     : "Lines must be a number > 0";
 
   return (
-    <Card className="log-controls">
-      {containerNames.length > 1 && (
+    <Card spacing>
+      {serviceNames.length > 1 && (
         <Select
-          value={containerName}
-          onValueChange={setContainerName}
-          options={containerNames}
+          value={serviceName}
+          onValueChange={setServiceName}
+          options={serviceNames}
+          prepend="Service"
         />
       )}
 
-      <div>
+      <div className="logs-switches">
         <Switch
           checked={autoRefresh}
           onToggle={setAutoRefresh}
@@ -121,9 +128,14 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         type="number"
         prepend="Lines"
         append={
-          <a href={urlJoin(baseUrlDownloadAll, containerName)} {...newTabProps}>
-            <Button>Download all</Button>
-          </a>
+          containerName && (
+            <a
+              href={urlJoin(baseUrlDownloadAll, containerName)}
+              {...newTabProps}
+            >
+              <Button>Download all</Button>
+            </a>
+          )
         }
       />
 

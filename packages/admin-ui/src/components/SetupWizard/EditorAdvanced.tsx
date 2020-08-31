@@ -73,8 +73,8 @@ export function EditorAdvanced({
           {dnpSettings.environment &&
             Object.entries(dnpSettings.environment).map(
               ([serviceName, environment]) => (
-                <div className="dnp-sub-section" key={dnpName}>
-                  <div className="dnp-name">
+                <div className="service-section" key={serviceName}>
+                  <div className="service-name">
                     {shortNameCapitalized(serviceName)}
                   </div>
                   <EditableTable
@@ -98,8 +98,8 @@ export function EditorAdvanced({
           {dnpSettings.portMappings &&
             Object.entries(dnpSettings.portMappings).map(
               ([serviceName, portMappings]) => (
-                <div className="dnp-sub-section" key={dnpName}>
-                  <div className="dnp-name">
+                <div className="service-section" key={serviceName}>
+                  <div className="service-name">
                     {shortNameCapitalized(serviceName)}
                   </div>
                   <EditableTable

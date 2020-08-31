@@ -2,6 +2,7 @@ import { InstalledPackageDetailData, PackageContainer } from "../../src/common";
 import { sampleContainer, sampleDnp } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
+import { getContainerName, getImageTag } from "../params";
 
 function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   const dnpName = dnp.metadata.name;
@@ -13,7 +14,16 @@ function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
     return {
       ...sampleContainer,
       containerId: `0000000000000${dnpName}`,
-      containerName: `DAppNodePackage-${dnpName}`,
+      containerName: getContainerName({
+        dnpName,
+        serviceName,
+        isCore: dnp.metadata.type === "dncore"
+      }),
+      image: getImageTag({
+        dnpName,
+        serviceName,
+        version: dnp.metadata.version
+      }),
       dnpName,
       serviceName,
       instanceName: "",
