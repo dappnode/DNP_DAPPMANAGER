@@ -1,8 +1,11 @@
 import { MockDnp } from "./types";
 
+const dnpName = "wifi.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const wifi: MockDnp = {
   metadata: {
-    name: "wifi.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.2.6",
     description: "DAppNode wifi",
     type: "dncore"
@@ -10,12 +13,16 @@ export const wifi: MockDnp = {
 
   installedData: {
     version: "0.2.6",
-    state: "running",
     userSettings: {
       environment: {
-        SSID: "DAppNodeWIFI",
-        WPA_PASSPHRASE: "dappnode"
+        [serviceName]: {
+          SSID: "DAppNodeWIFI",
+          WPA_PASSPHRASE: "dappnode"
+        }
       }
     }
+  },
+  installedContainer: {
+    state: "running"
   }
 };

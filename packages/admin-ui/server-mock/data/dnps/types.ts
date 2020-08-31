@@ -3,7 +3,8 @@ import {
   UserSettings,
   SetupWizard,
   SpecialPermission,
-  InstalledPackageDetailData
+  InstalledPackageDetailData,
+  PackageContainer
 } from "../../../src/types";
 
 export interface MockDnp {
@@ -14,5 +15,8 @@ export interface MockDnp {
   specialPermissions?: SpecialPermission[];
   gettingStarted?: string;
   dependencies?: MockDnp[];
-  installedData?: Partial<InstalledPackageDetailData>;
+  installedData?: Partial<
+    InstalledPackageDetailData & { containers: PackageContainer[] }
+  >;
+  installedContainer?: Partial<PackageContainer>;
 }

@@ -1,10 +1,13 @@
 import { MockDnp } from "./types";
 
+const dnpName = "raiden.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const raiden: MockDnp = {
   avatar: "https://i.ibb.co/Y0YzyrG/raiden300-min.png",
 
   metadata: {
-    name: "raiden.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.0.1",
     upstreamVersion: "0.100.3",
     shortDescription: "Fast, cheap, scalable token transfers for Ethereum",
@@ -87,9 +90,11 @@ export const raiden: MockDnp = {
   userSettings: {
     namedVolumeMountpoints: { data: "" },
     environment: {
-      RAIDEN_KEYSTORE_PASSWORD: "",
-      RAIDEN_ADDRESS: "",
-      EXTRA_OPTS: "--disable-debug-logfile"
+      [serviceName]: {
+        RAIDEN_KEYSTORE_PASSWORD: "",
+        RAIDEN_ADDRESS: "",
+        EXTRA_OPTS: "--disable-debug-logfile"
+      }
     }
   }
 };

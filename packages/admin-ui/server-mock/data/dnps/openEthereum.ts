@@ -1,8 +1,11 @@
 import { MockDnp } from "./types";
 
+const dnpName = "open-ethereum.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const openEthereum: MockDnp = {
   metadata: {
-    name: "open-ethereum.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.2.6",
     description:
       "Dappnode package responsible for providing the Ethereum blockchain, based on Parity v2.5.8-stable",
@@ -23,7 +26,10 @@ export const openEthereum: MockDnp = {
 
   installedData: {
     version: "0.2.6",
-    state: "running",
+
+    canBeFullnode: true
+  },
+  installedContainer: {
     ports: [
       {
         host: 30303,
@@ -47,7 +53,6 @@ export const openEthereum: MockDnp = {
         container: "/root/.ethereum/",
         name: "paritydnpdappnodeeth_geth"
       }
-    ],
-    canBeFullnode: true
+    ]
   }
 };

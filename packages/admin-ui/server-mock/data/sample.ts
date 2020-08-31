@@ -1,11 +1,12 @@
 import {
   DirectoryItem,
   RequestedDnp,
-  InstalledPackageDetailData
+  InstalledPackageDetailData,
+  PackageContainer
 } from "../../src/common";
 
 export const sampleRequestState: RequestedDnp = {
-  name: "demo-name",
+  dnpName: "demo-name",
   semVersion: "0.0.0",
   reqVersion: "0.0.0",
   avatarUrl: "",
@@ -41,16 +42,17 @@ export const sampleDirectoryState: DirectoryItem = {
   categories: ["Blockchain"]
 };
 
-export const samplePackageContainer: InstalledPackageDetailData = {
-  id: "7s51a",
-  dnpName: "demo-name",
+export const sampleContainer: PackageContainer = {
+  containerId: "0000",
+  containerName: "mock",
+  dnpName: "mock",
+  serviceName: "mock",
+  instanceName: "",
   version: "0.0.0",
   isDnp: true,
   isCore: false,
   created: 12316723123,
   image: "demo-name:0.0.0",
-  name: "demo-name",
-  shortName: "demo-name",
   state: "running",
   running: true,
   ip: "172.10.0.1",
@@ -58,11 +60,23 @@ export const samplePackageContainer: InstalledPackageDetailData = {
   ports: [],
   volumes: [],
   avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
+  origin: undefined
+};
+
+export const sampleDnp: InstalledPackageDetailData = {
+  dnpName: "demo-name",
+  instanceName: "",
+  version: "0.0.0",
+  isDnp: true,
+  isCore: false,
+  dependencies: {},
+  avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
   origin: undefined,
   gettingStarted: "",
   gettingStartedShow: true,
   areThereVolumesToRemove: false,
   volumeUsersToRemove: [],
   dependantsOf: [],
-  namedExternalVols: []
+  namedExternalVols: [],
+  containers: []
 };
