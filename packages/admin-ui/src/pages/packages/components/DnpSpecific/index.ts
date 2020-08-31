@@ -1,6 +1,6 @@
 import React from "react";
 // Dedicated Components
-import DappmanagerDnpDappnodeEth from "./DappmanagerDnpDappnodeEth";
+import { DappmanagerDnpDappnodeEth } from "./DappmanagerDnpDappnodeEth";
 import { InstalledPackageData } from "common/types";
 
 export const dnpSpecific: {

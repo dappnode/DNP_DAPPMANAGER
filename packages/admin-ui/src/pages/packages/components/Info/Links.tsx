@@ -1,15 +1,11 @@
 import React from "react";
-import DataList from "./DataList";
+import {DataList} from "./DataList";
 // Utils
 import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { PackageReleaseMetadata } from "types";
 
-export default function Links({
-  links
-}: {
-  links: PackageReleaseMetadata["links"];
-}) {
+export function Links({ links }: { links: PackageReleaseMetadata["links"] }) {
   const linksArray =
     typeof links === "object"
       ? Object.entries(links || {})

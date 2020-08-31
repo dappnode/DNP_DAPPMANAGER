@@ -11,7 +11,7 @@ import {
 } from "types";
 import { difference } from "utils/lodashExtended";
 
-export default function Config({
+export function Config({
   dnpName,
   setupWizard,
   userSettings

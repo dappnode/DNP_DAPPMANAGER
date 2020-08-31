@@ -17,7 +17,7 @@ import { apiUrls } from "params";
 const baseUrlUpload = apiUrls.upload;
 const baseUrlDownload = apiUrls.download;
 
-export default function Backup({
+export function Backup({
   dnpName,
   backup
 }: {

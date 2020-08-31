@@ -4,8 +4,8 @@ import { NavLink } from "react-router-dom";
 import { useApi } from "api";
 import { packageRestart } from "../actions";
 // Components
-import NoPackagesYet from "./NoPackagesYet";
-import StateBadge from "./StateBadge";
+import { NoPackagesYet } from "./NoPackagesYet";
+import { StateBadge } from "./StateBadge";
 import Card from "components/Card";
 // Icons
 import { MdRefresh, MdOpenInNew } from "react-icons/md";

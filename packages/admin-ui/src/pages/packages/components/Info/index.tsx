@@ -6,15 +6,15 @@ import SubTitle from "components/SubTitle";
 import RenderMarkdown from "components/RenderMarkdown";
 import { MdClose } from "react-icons/md";
 // This
-import Links from "./Links";
-import Vols from "./Vols";
-import StateBadge from "../StateBadge";
+import { Links } from "./Links";
+import { Vols } from "./Vols";
+import { StateBadge } from "../StateBadge";
 import newTabProps from "utils/newTabProps";
 import { InstalledPackageData, Manifest } from "types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import "./info.scss";
 
-export default function Info({
+export function Info({
   dnp,
   manifest,
   gettingStarted,

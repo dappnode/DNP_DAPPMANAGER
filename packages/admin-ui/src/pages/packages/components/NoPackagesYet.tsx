@@ -4,7 +4,7 @@ import { rootPath as installerRootPath } from "pages/installer";
 // Components
 import { ButtonLight } from "components/Button";
 
-const NoPackagesYet = () => (
+export const NoPackagesYet = () => (
   <div className="centered-container">
     <h4>No installed DAppNode Packages yet</h4>
     <p>
@@ -15,5 +15,3 @@ const NoPackagesYet = () => (
     </Link>
   </div>
 );
-
-export default NoPackagesYet;

@@ -4,15 +4,15 @@ import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
-import Info from "../components/Info";
+import { Info } from "../components/Info";
 import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
 import { Logs } from "../components/Logs";
-import Config from "../components/Config";
+import { Config } from "../components/Config";
 import { Ports } from "../components/Ports";
 import { FileManager } from "../components/FileManager";
-import Backup from "../components/Backup";
+import { Backup } from "../components/Backup";
 import { Controls } from "../components/Controls";
-import NoDnpInstalled from "../components/NoDnpInstalled";
+import { NoDnpInstalled } from "../components/NoDnpInstalled";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
