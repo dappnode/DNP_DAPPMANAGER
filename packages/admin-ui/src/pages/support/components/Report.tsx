@@ -30,8 +30,8 @@ export default function Report() {
   const coreDnpVersions = dnps
     .filter(dnp => dnp.isCore)
     .map(dnp => ({
-      name: dnp.name,
-      version: versionDatas[dnp.name] || dnp.version
+      name: dnp.dnpName,
+      version: versionDatas[dnp.dnpName] || dnp.version
     }));
 
   const systemData = [

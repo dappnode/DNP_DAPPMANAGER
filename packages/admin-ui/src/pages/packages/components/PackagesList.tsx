@@ -18,7 +18,7 @@ import defaultAvatar from "img/defaultAvatar.png";
 import dappnodeIcon from "img/dappnode-logo-only.png";
 import "./packages.scss";
 import { renderResponse } from "components/SwrRender";
-import { coreName } from "params";
+import { coreDnpName } from "params";
 
 export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
   const dnpsRequest = useApi.packagesGet();
@@ -30,7 +30,8 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
     dnps => {
       const filteredDnps = dnps.filter(
         dnp =>
-          Boolean(coreDnps) === Boolean(dnp.isCore) && dnp.name !== coreName
+          Boolean(coreDnps) === Boolean(dnp.isCore) &&
+          dnp.dnpName !== coreDnpName
       );
       if (!filteredDnps.length) return <NoPackagesYet />;
 
@@ -41,25 +42,25 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
           <header>Name</header>
           <header>Open</header>
           <header className="restart">Restart</header>
-          {sortBy(filteredDnps, pkg => pkg.name).map(
-            ({ name, state, avatarUrl }) => (
-              <React.Fragment key={name}>
-                <StateBadge state={state} />
+          {sortBy(filteredDnps, pkg => pkg.dnpName).map(
+            ({ dnpName, containers, avatarUrl }) => (
+              <React.Fragment key={dnpName}>
+                <StateBadge state={containers[0].state} />
                 <img
                   className="avatar"
                   src={avatarUrl || (coreDnps ? dappnodeIcon : defaultAvatar)}
                   alt="Avatar"
                 />
-                <NavLink className="name" to={`${packagesRootPath}/${name}`}>
-                  {shortNameCapitalized(name)}
+                <NavLink className="name" to={`${packagesRootPath}/${dnpName}`}>
+                  {shortNameCapitalized(dnpName)}
                 </NavLink>
-                <NavLink className="open" to={`${packagesRootPath}/${name}`}>
+                <NavLink className="open" to={`${packagesRootPath}/${dnpName}`}>
                   <MdOpenInNew />
                 </NavLink>
                 <MdRefresh
                   className="restart"
                   style={{ fontSize: "1.05rem" }}
-                  onClick={() => dispatch(packageRestart(name))}
+                  onClick={() => dispatch(packageRestart(dnpName))}
                 />
                 <hr />
               </React.Fragment>

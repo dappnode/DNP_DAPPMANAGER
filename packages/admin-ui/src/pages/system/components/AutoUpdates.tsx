@@ -10,7 +10,7 @@ import { withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized } from "utils/format";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
-import { coreName, autoUpdateIds } from "params";
+import { coreDnpName, autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
 // External
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
@@ -102,7 +102,7 @@ export default function AutoUpdates() {
                   feedback,
                   isInstalling: Boolean(
                     (progressLogsByDnp || {})[
-                      id === SYSTEM_PACKAGES ? coreName : id
+                      id === SYSTEM_PACKAGES ? coreDnpName : id
                     ]
                   ),
                   isSinglePackage: getIsSinglePackage(id),

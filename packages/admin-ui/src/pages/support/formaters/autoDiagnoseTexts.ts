@@ -1,5 +1,5 @@
 import { DiagnoseResult } from "../types";
-import { HostStats, PackageContainer, SystemInfo } from "common/types";
+import { HostStats, SystemInfo, InstalledPackageData } from "common/types";
 import { mandatoryCoreDnps } from "params";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
@@ -148,7 +148,7 @@ export function coreDnpsRunning({
   data: dnpInstalled,
   isValidating
 }: {
-  data?: PackageContainer[];
+  data?: InstalledPackageData[];
   isValidating: boolean;
 }): DiagnoseResultOrNull {
   if (isValidating)
@@ -162,9 +162,10 @@ export function coreDnpsRunning({
   const notFound = [];
   const notRunning = [];
   for (const coreDnpName of mandatoryCoreDnps) {
-    const coreDnp = dnpInstalled.find(({ name }) => name === coreDnpName);
+    const coreDnp = dnpInstalled.find(dnp => dnp.dnpName === coreDnpName);
     if (!coreDnp) notFound.push(coreDnpName);
-    else if (!coreDnp.running) notRunning.push(coreDnpName);
+    else if (!coreDnp.containers.some(container => !container.running))
+      notRunning.push(coreDnpName);
   }
 
   const ok = !notFound.length && !notRunning.length;

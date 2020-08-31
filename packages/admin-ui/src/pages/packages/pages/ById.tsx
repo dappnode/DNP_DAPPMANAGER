@@ -6,9 +6,9 @@ import { isEmpty } from "lodash";
 // This module
 import Info from "../components/Info";
 import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
-import Logs from "../components/Logs";
+import { Logs } from "../components/Logs";
 import Config from "../components/Config";
-import Ports from "../components/Ports";
+import { Ports } from "../components/Ports";
 import { FileManager } from "../components/FileManager";
 import Backup from "../components/Backup";
 import { Controls } from "../components/Controls";
@@ -22,11 +22,11 @@ import Title from "components/Title";
 import { shortNameCapitalized } from "utils/format";
 
 export const PackageById: React.FC<RouteComponentProps<{
-  id: string;
+  dnpName: string;
 }>> = ({ match }) => {
-  const id = decodeURIComponent(match.params.id || "");
+  const id = decodeURIComponent(match.params.dnpName || "");
 
-  const dnpRequest = useApi.packageGet({ id });
+  const dnpRequest = useApi.packageGet({ dnpName: id });
   const dnp = dnpRequest.data;
   if (!dnp) {
     return (
@@ -45,17 +45,16 @@ export const PackageById: React.FC<RouteComponentProps<{
     );
   }
 
-  const DnpSpecific = dnpSpecific[dnp.name];
-
-  const dnpName = dnp.name;
+  const dnpName = dnp.dnpName;
+  const DnpSpecific = dnpSpecific[dnpName];
   const {
-    ports,
     userSettings,
     setupWizard,
     manifest,
     gettingStarted,
     gettingStartedShow,
-    backup = []
+    backup = [],
+    containers
   } = dnp;
 
   /**
@@ -75,37 +74,39 @@ export const PackageById: React.FC<RouteComponentProps<{
     {
       name: "Controls",
       subPath: "controls",
-      render: () => <Controls id={id} dnp={dnp} />,
+      render: () => <Controls dnpName={dnpName} dnp={dnp} />,
       available: true
     },
     {
       name: "Config",
       subPath: "config",
-      render: () => <Config id={dnpName} {...{ userSettings, setupWizard }} />,
+      render: () => (
+        <Config dnpName={dnpName} {...{ userSettings, setupWizard }} />
+      ),
       available: userSettings && !isEmpty(userSettings.environment)
     },
     {
       name: "Ports",
       subPath: "ports",
-      render: () => <Ports id={dnpName} {...{ ports }} />,
+      render: () => <Ports containers={containers} />,
       available: dnpName !== "dappmanager.dnp.dappnode.eth"
     },
     {
       name: "Logs",
       subPath: "logs",
-      render: () => <Logs id={dnpName} />,
+      render: () => <Logs containers={containers} />,
       available: true
     },
     {
       name: "Backup",
       subPath: "backup",
-      render: () => <Backup id={dnpName} {...{ backup }} />,
+      render: () => <Backup dnpName={dnpName} {...{ backup }} />,
       available: backup.length > 0
     },
     {
       name: "File Manager",
       subPath: "file-manager",
-      render: () => <FileManager id={dnpName} />,
+      render: () => <FileManager containers={containers} />,
       available: true
     },
     // DnpSpecific is a variable dynamic per DNP component

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { api } from "api";
 import newTabProps from "utils/newTabProps";
 // Components
+import Select from "components/Select";
 import Card from "components/Card";
 import Switch from "components/Switch";
 import Input from "components/Input";
@@ -10,6 +11,8 @@ import { Terminal } from "./Terminal";
 // Utils
 import { stringIncludes, stringSplit } from "utils/strings";
 import { apiUrls } from "params";
+import { urlJoin } from "utils/url";
+import { PackageContainer } from "common";
 
 const baseUrlDownloadAll = apiUrls.containerLogs;
 const refreshInterval = 2 * 1000;
@@ -17,7 +20,9 @@ const terminalID = "terminal";
 
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
-export default function Logs({ id }: { id: string }) {
+export function Logs({ containers }: { containers: PackageContainer[] }) {
+  const containerNames = containers.map(c => c.containerName);
+  const [containerName, setContainerName] = useState(containerNames[0]);
   // User options
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [timestamps, setTimestamps] = useState(false);
@@ -44,7 +49,7 @@ export default function Logs({ id }: { id: string }) {
     async function logDnp() {
       try {
         const options = { timestamps, tail: lines };
-        const logs = await api.packageLog({ id, options });
+        const logs = await api.packageLog({ containerName, options });
         if (typeof logs !== "string") throw Error("Logs must be a string");
 
         // Prevent updating the state of an unmounted component
@@ -66,7 +71,7 @@ export default function Logs({ id }: { id: string }) {
         unmounted = true;
       };
     }
-  }, [autoRefresh, timestamps, lines, id]);
+  }, [autoRefresh, timestamps, lines, containerName]);
 
   /**
    * Filter the logs text by lines that contain the query
@@ -86,6 +91,14 @@ export default function Logs({ id }: { id: string }) {
 
   return (
     <Card className="log-controls">
+      {containerNames.length > 1 && (
+        <Select
+          value={containerName}
+          onValueChange={setContainerName}
+          options={containerNames}
+        />
+      )}
+
       <div>
         <Switch
           checked={autoRefresh}
@@ -108,7 +121,7 @@ export default function Logs({ id }: { id: string }) {
         type="number"
         prepend="Lines"
         append={
-          <a href={`${baseUrlDownloadAll}/${id}`} {...newTabProps}>
+          <a href={urlJoin(baseUrlDownloadAll, containerName)} {...newTabProps}>
             <Button>Download all</Button>
           </a>
         }

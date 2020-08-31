@@ -10,7 +10,7 @@ import Links from "./Links";
 import Vols from "./Vols";
 import StateBadge from "../StateBadge";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer, Manifest } from "types";
+import { InstalledPackageData, Manifest } from "types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import "./info.scss";
 
@@ -20,7 +20,7 @@ export default function Info({
   gettingStarted,
   gettingStartedShow
 }: {
-  dnp: PackageContainer;
+  dnp: InstalledPackageData;
   manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
@@ -28,7 +28,7 @@ export default function Info({
   const [gettingStartedShowLocal, setGettingStartedIsShown] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { state, origin } = dnp;
+  const { dnpName, origin } = dnp;
   const { version, upstreamVersion, links } = manifest || {};
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function Info({
         setLoading(true);
         setGettingStartedIsShown(false);
         if (gettingStartedShow)
-          await api.packageGettingStartedToggle({ id: dnp.name, show: false });
+          await api.packageGettingStartedToggle({ dnpName, show: false });
       } catch (e) {
         console.error(`Error on packageGettingStartedToggle: ${e.stack}`);
       } finally {
@@ -76,7 +76,9 @@ export default function Info({
       <Card>
         <div>
           <strong>Status: </strong>
-          <StateBadge state={state} />
+          {dnp.containers.map(container => (
+            <StateBadge key={container.serviceName} state={container.state} />
+          ))}
         </div>
 
         <div className="version-info">
@@ -102,7 +104,13 @@ export default function Info({
         )}
 
         <div>
-          <Vols dnpName={dnp.name} volumes={dnp.volumes} />
+          {dnp.containers.map(container => (
+            <Vols
+              key={container.serviceName}
+              dnpName={dnpName}
+              volumes={container.volumes}
+            />
+          ))}
         </div>
 
         <div>

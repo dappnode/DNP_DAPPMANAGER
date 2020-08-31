@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PackageContainer } from "common/types";
+import { InstalledPackageData } from "common/types";
 
 // Service > dnpInstalled
 
@@ -8,10 +8,13 @@ export const dnpInstalledSlice = createSlice({
   initialState: {
     dnpInstalled: []
   } as {
-    dnpInstalled: PackageContainer[];
+    dnpInstalled: InstalledPackageData[];
   },
   reducers: {
-    setDnpInstalled: (state, action: PayloadAction<PackageContainer[]>) => ({
+    setDnpInstalled: (
+      state,
+      action: PayloadAction<InstalledPackageData[]>
+    ) => ({
       ...state,
       dnpInstalled: action.payload
     })

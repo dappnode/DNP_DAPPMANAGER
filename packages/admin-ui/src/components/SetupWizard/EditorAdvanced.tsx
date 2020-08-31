@@ -115,7 +115,7 @@ export function EditorAdvanced({
                         }
                       })
                     }
-                  />{" "}
+                  />
                 </div>
               )
             )}

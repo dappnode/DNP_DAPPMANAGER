@@ -12,11 +12,11 @@ import {
 import { difference } from "utils/lodashExtended";
 
 export default function Config({
-  id,
+  dnpName,
   setupWizard,
   userSettings
 }: {
-  id: string;
+  dnpName: string;
   setupWizard?: SetupWizardType;
   userSettings?: UserSettings;
 }) {
@@ -26,15 +26,15 @@ export default function Config({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (userSettings) setLocalUserSettings({ [id]: userSettings });
-  }, [userSettings, id]);
+    if (userSettings) setLocalUserSettings({ [dnpName]: userSettings });
+  }, [userSettings, dnpName]);
 
   function onSubmit(newUserSettings: UserSettingsAllDnps) {
     // Persist them here so the new settings don't dissapear on submission
     setLocalUserSettings(newUserSettings);
 
     const prevEnvs = userSettings?.environment || {};
-    const newEnvs = newUserSettings[id].environment;
+    const newEnvs = newUserSettings[dnpName].environment;
     if (!newEnvs) return console.error(`SetupWizard returned no ENVs`);
     const diffEnvs = difference(prevEnvs, newEnvs);
 
@@ -46,12 +46,12 @@ export default function Config({
       return name;
     });
 
-    dispatch(packageSetEnvironment(id, diffEnvs[serviceName], niceNames));
+    dispatch(packageSetEnvironment(dnpName, diffEnvs, niceNames));
   }
 
   return (
     <SetupWizard
-      setupWizard={setupWizard ? { [id]: setupWizard } : {}}
+      setupWizard={setupWizard ? { [dnpName]: setupWizard } : {}}
       userSettings={localUserSettings}
       onSubmit={onSubmit}
       submitTag="Update"

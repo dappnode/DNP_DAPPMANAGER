@@ -1,4 +1,4 @@
-import { dappmanagerName, coreName } from "params";
+import { dappmanagerDnpName, coreDnpName } from "params";
 
 export class PubSub extends EventTarget {
   callbacks: any;
@@ -49,7 +49,7 @@ export function continueIfCalleDisconnected(
     } catch (e) {
       if (
         isCallDisconnectedError(e) &&
-        (!dnpName || dnpName === dappmanagerName || dnpName === coreName)
+        (!dnpName || dnpName === dappmanagerDnpName || dnpName === coreDnpName)
       )
         return;
       else throw e;

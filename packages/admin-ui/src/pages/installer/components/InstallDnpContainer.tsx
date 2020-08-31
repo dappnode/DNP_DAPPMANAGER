@@ -21,14 +21,14 @@ const InstallDnpContainer: React.FC<RouteComponentProps<{ id: string }>> = ({
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // Get progressLogs
-  const progressLogs =
-    dnp && dnp.name ? progressLogsByDnp[dnp.name] : undefined;
+  const dnpName = dnp?.dnpName;
+  const progressLogs = dnpName ? progressLogsByDnp[dnpName] : undefined;
 
   return (
     <>
       <Title
         title={title}
-        subtitle={dnp && dnp.name ? shortNameCapitalized(dnp.name) : id}
+        subtitle={dnpName ? shortNameCapitalized(dnpName) : id}
       />
 
       {dnp ? (

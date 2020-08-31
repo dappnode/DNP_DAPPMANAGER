@@ -27,9 +27,8 @@ interface OkBadgeProps {
   msg: string;
 }
 
-const OkBadge: React.FC<
-  OkBadgeProps & React.HTMLAttributes<HTMLDivElement>
-> = ({ ok, loading, msg, ...props }) => {
+const OkBadge: React.FC<OkBadgeProps &
+  React.HTMLAttributes<HTMLDivElement>> = ({ ok, loading, msg, ...props }) => {
   const status = ok ? "ok" : loading ? "" : "not-ok";
   return (
     <Ok
@@ -63,7 +62,7 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
   const [showOptions, setShowOptions] = useState(false);
 
   const {
-    name,
+    dnpName,
     request,
     metadata,
     isUpdated,
@@ -145,7 +144,7 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
           <div className="right">
             <div className="right-top">
               <div className="info">
-                <DnpNameVerified name={name} origin={origin} />
+                <DnpNameVerified name={dnpName} origin={origin} />
                 <div className="subtle-header capitalize">
                   {shortAuthor(author)}
                 </div>

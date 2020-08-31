@@ -11,13 +11,19 @@ import { withToast } from "components/toast/Toast";
 
 const fileSizeWarning = 1e6;
 
-export default function To({ id, to }: { id: string; to?: string }) {
+export function CopyFileTo({
+  containerName,
+  toPathDefault
+}: {
+  containerName: string;
+  toPathDefault?: string;
+}) {
   const [file, setFile] = useState<File>();
   const [toPath, setToPath] = useState("");
 
   useEffect(() => {
-    if (to) setToPath(to);
-  }, [to]);
+    if (toPathDefault) setToPath(toPathDefault);
+  }, [toPathDefault]);
 
   const { name, size } = file || {};
 
@@ -27,14 +33,26 @@ export default function To({ id, to }: { id: string; to?: string }) {
         const dataUri = await fileToDataUri(file);
         const filename = name || "";
         await withToast(
-          () => api.copyFileTo({ id, dataUri, filename: name || "", toPath }),
+          () =>
+            api.copyFileTo({
+              containerName,
+              dataUri,
+              filename: name || "",
+              toPath
+            }),
           {
-            message: `Copying file ${filename} to ${sn(id)} ${toPath}...`,
-            onSuccess: `Copied file ${filename} to ${sn(id)} ${toPath}`
+            message: `Copying file ${filename} to ${sn(
+              containerName
+            )} ${toPath}...`,
+            onSuccess: `Copied file ${filename} to ${sn(
+              containerName
+            )} ${toPath}`
           }
         );
       } catch (e) {
-        console.error(`Error on copyFileFrom ${id} ${toPath}: ${e.stack}`);
+        console.error(
+          `Error on copyFileFrom ${containerName} ${toPath}: ${e.stack}`
+        );
       }
   }
 

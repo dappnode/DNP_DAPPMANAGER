@@ -9,7 +9,7 @@ import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow, withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized as sn } from "utils/format";
-import { wifiName, ipfsName, corePackages } from "params";
+import { wifiDnpName, ipfsDnpName, corePackages } from "params";
 import { packageRestart } from "pages/packages/actions";
 import { InstalledPackageDetailData } from "common";
 import { systemPackagesPath, rootPath as packagesRootPath } from "../data";
@@ -25,14 +25,13 @@ function getRootPath(dnpName: string) {
 }
 
 export function Controls({
-  id,
+  dnpName,
   dnp
 }: {
-  id: string;
+  dnpName: string;
   dnp: InstalledPackageDetailData;
 }) {
   const {
-    state,
     isCore,
     areThereVolumesToRemove,
     volumeUsersToRemove,
@@ -43,11 +42,17 @@ export function Controls({
   const dispatch = useDispatch();
   const history = useHistory();
 
+  let TO_DO;
+  const firstContainer = dnp.containers[0];
   async function packageStartStop() {
-    withToastNoThrow(() => api.packageStartStop({ id }), {
-      message: `Toggling ${sn(id)}...`,
-      onSuccess: `Toggled ${sn(id)}`
-    });
+    withToastNoThrow(
+      () =>
+        api.packageStartStop({ containerName: firstContainer.containerName }),
+      {
+        message: `Toggling ${sn(dnpName)}...`,
+        onSuccess: `Toggled ${sn(dnpName)}`
+      }
+    );
   }
 
   async function packageRestartVolumes() {
@@ -62,7 +67,7 @@ export function Controls({
       const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
       warningsList.push({
         title: "Warning! DAppNode Packages to be removed",
-        body: `Some other DAppNode Packages will be reseted in order to remove ${id} volumes. \n\n ${volumeUsersToRemoveList}`
+        body: `Some other DAppNode Packages will be reseted in order to remove ${dnpName} volumes. \n\n ${volumeUsersToRemoveList}`
       });
     }
 
@@ -70,7 +75,7 @@ export function Controls({
     // Display a dialog to confirm volumes reset
     await new Promise(resolve =>
       confirm({
-        title: `Removing ${sn(id)} data`,
+        title: `Removing ${sn(dnpName)} data`,
         text: `This action cannot be undone. If this DAppNode Package is a blockchain node, it will lose all the chain data and start syncing from scratch.`,
         list: warningsList,
         label: "Remove volumes",
@@ -78,9 +83,9 @@ export function Controls({
       })
     );
 
-    await withToastNoThrow(() => api.packageRestartVolumes({ id }), {
-      message: `Removing volumes of ${sn(id)}...`,
-      onSuccess: `Removed volumes of ${sn(id)}`
+    await withToastNoThrow(() => api.packageRestartVolumes({ dnpName }), {
+      message: `Removing volumes of ${sn(dnpName)}...`,
+      onSuccess: `Removed volumes of ${sn(dnpName)}`
     });
   }
 
@@ -88,12 +93,12 @@ export function Controls({
     // Dialog to confirm remove + USER INPUT for delete volumes
     const deleteVolumes = await new Promise(
       (resolve: (_deleteVolumes: boolean) => void) => {
-        const title = `Removing ${sn(id)}`;
+        const title = `Removing ${sn(dnpName)}`;
         let text = `This action cannot be undone.`;
         const buttons = [{ label: "Remove", onClick: () => resolve(false) }];
         if (areThereVolumesToRemove) {
           // Only show the remove data related text if necessary
-          text += ` If you do NOT want to keep ${id}'s data, remove it permanently clicking the "Remove and delete data" option.`;
+          text += ` If you do NOT want to keep ${dnpName}'s data, remove it permanently clicking the "Remove and delete data" option.`;
           // Only display the "Remove and delete data" button if necessary
           buttons.push({
             label: "Remove and delete data",
@@ -111,7 +116,7 @@ export function Controls({
       const dependantsOfList = markdownList(dependantsOf);
       dnpsToRemoveWarningsList.push({
         title: "Warning! There are package dependants",
-        body: `Some DAppNode Packages depend on ${id} and may stop working if you continue. \n\n ${dependantsOfList}`
+        body: `Some DAppNode Packages depend on ${dnpName} and may stop working if you continue. \n\n ${dependantsOfList}`
       });
     }
 
@@ -120,14 +125,14 @@ export function Controls({
       const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
       dnpsToRemoveWarningsList.push({
         title: "Warning! Other packages to be removed",
-        body: `Some other DAppNode Packages will be removed as well because they are dependent on ${id} volumes. \n\n ${volumeUsersToRemoveList}`
+        body: `Some other DAppNode Packages will be removed as well because they are dependent on ${dnpName} volumes. \n\n ${volumeUsersToRemoveList}`
       });
     }
 
     if (dnpsToRemoveWarningsList.length > 0)
       await new Promise(resolve =>
         confirm({
-          title: `Removing ${sn(id)}`,
+          title: `Removing ${sn(dnpName)}`,
           text: `This action cannot be undone.`,
           list: dnpsToRemoveWarningsList,
           label: "Continue",
@@ -137,9 +142,10 @@ export function Controls({
 
     // Use a try/catch to capture a successful remove and go to packages
     try {
-      await withToast(() => api.packageRemove({ id, deleteVolumes }), {
-        message: `Removing ${sn(id)} ${deleteVolumes ? " and volumes" : ""}...`,
-        onSuccess: `Removed ${sn(id)}`
+      const name = sn(dnpName);
+      await withToast(() => api.packageRemove({ dnpName, deleteVolumes }), {
+        message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
+        onSuccess: `Removed ${name}`
       });
       history.push(packagesRootPath);
     } catch (e) {
@@ -150,18 +156,22 @@ export function Controls({
   const actions = [
     {
       name:
-        state === "running" ? "Stop" : state === "exited" ? "Start" : "Toggle",
+        firstContainer.state === "running"
+          ? "Stop"
+          : firstContainer.state === "exited"
+          ? "Start"
+          : "Toggle",
       text: "Toggle the state of the package from running to paused",
       action: packageStartStop,
       availableForCore: false,
-      whitelist: [wifiName, ipfsName],
+      whitelist: [wifiDnpName, ipfsDnpName],
       type: "secondary"
     },
     {
       name: "Restart",
       text:
         "Restarting a package will interrupt the service during 1-10s but preserve its data",
-      action: () => dispatch(packageRestart(id)),
+      action: () => dispatch(packageRestart(dnpName)),
       availableForCore: true,
       type: "secondary"
     },
@@ -205,7 +215,7 @@ export function Controls({
           action =>
             action.availableForCore ||
             !isCore ||
-            (action.whitelist || []).includes(id)
+            (action.whitelist || []).includes(dnpName)
         )
         .map(({ name, text, type, action, disabled }) => (
           <div key={name} className="control-item">

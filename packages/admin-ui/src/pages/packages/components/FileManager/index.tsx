@@ -1,23 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 // Components
 import Card from "components/Card";
-import To from "./To";
-import From from "./From";
+import Select from "components/Select";
+import { CopyFileTo } from "./To";
+import { CopyFileFrom } from "./From";
+import { PackageContainer } from "common";
 
-export const FileManager = ({ id }: { id: string }) => {
+export const FileManager = ({
+  containers
+}: {
+  containers: PackageContainer[];
+}) => {
+  const containerNames = containers.map(c => c.containerName);
+  const [containerName, setContainerName] = useState(containerNames[0]);
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
   return (
     <Card spacing divider className="file-manager">
+      {containerNames.length > 1 && (
+        <Select
+          value={containerName}
+          onValueChange={setContainerName}
+          options={containerNames}
+        />
+      )}
+
       <div>
         <div className="subtle-header">Upload file to package</div>
-        <To id={id} to={to} />
+        <CopyFileTo containerName={containerName} toPathDefault={to} />
       </div>
+
       <div>
         <div className="subtle-header">Download file from package</div>
-        <From id={id} from={from} />
+        <CopyFileFrom containerName={containerName} fromPathDefault={from} />
       </div>
     </Card>
   );

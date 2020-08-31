@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
-import { PortMapping, PackageContainer } from "types";
+import { PortMapping } from "types";
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
@@ -12,14 +12,32 @@ import { shortNameCapitalized } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./ports.scss";
+import { InstalledPackageData, PackageContainer } from "common";
 
 const maxPortNumber = 32768 - 1;
 
-export default function Ports({
-  id,
+export function Ports({ containers }: { containers: PackageContainer[] }) {
+  return (
+    <>
+      {containers.map(container => (
+        <PortsByService
+          key={container.serviceName}
+          dnpName={container.dnpName}
+          serviceName={container.serviceName}
+          ports={container.ports}
+        />
+      ))}
+    </>
+  );
+}
+
+export function PortsByService({
+  dnpName,
+  serviceName,
   ports: portsFromDnp
 }: {
-  id: string;
+  dnpName: string;
+  serviceName: string;
   ports: PortMapping[];
 }) {
   const [ports, setPorts] = useState<PortMapping[]>(portsFromDnp);
@@ -43,10 +61,14 @@ export default function Ports({
   async function onUpdateEnvsSubmit() {
     setUpdating(true);
     await withToastNoThrow(
-      () => api.packageSetPortMappings({ id, portMappings: ports }),
+      () =>
+        api.packageSetPortMappings({
+          dnpName,
+          portMappingsByService: { [serviceName]: ports }
+        }),
       {
-        message: `Updating ${shortNameCapitalized(id)} port mappings...`,
-        onSuccess: `Updated ${shortNameCapitalized(id)} port mappings`
+        message: `Updating ${shortNameCapitalized(dnpName)} port mappings...`,
+        onSuccess: `Updated ${shortNameCapitalized(dnpName)} port mappings`
       }
     );
     setUpdating(false);
@@ -102,7 +124,7 @@ export default function Ports({
   function getConflictingPort() {
     for (const { host, protocol } of ports) {
       const owner = hostPortMapping[`${host}/${protocol}`];
-      if (owner && owner !== id) return { host, protocol, owner };
+      if (owner && owner !== dnpName) return { host, protocol, owner };
     }
   }
 
@@ -159,7 +181,6 @@ export default function Ports({
       updating
   );
 
-  // "auto auto minmax(min-content, max-content) min-content"
   return (
     <Card spacing className="ports-editor">
       <table>
@@ -279,11 +300,12 @@ function portsToId(portMappings: PortMapping[]): string {
  * hostPortMappings = { "8080/TCP": "bitcoin.dnp.dappnode.eth" }
  * ```
  */
-function getHostPortMappings(dnps: PackageContainer[]) {
+function getHostPortMappings(dnps: InstalledPackageData[]) {
   const hostPortMappings: { [portId: string]: string } = {};
   for (const dnp of dnps)
-    for (const port of dnp.ports || [])
-      if (port.host)
-        hostPortMappings[`${port.host}/${port.protocol}`] = dnp.name;
+    for (const container of dnp.containers)
+      for (const port of container.ports || [])
+        if (port.host)
+          hostPortMappings[`${port.host}/${port.protocol}`] = dnp.dnpName;
   return hostPortMappings;
 }
