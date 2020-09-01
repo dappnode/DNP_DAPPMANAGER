@@ -93,6 +93,10 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     }
   }
 
+  if (isCore) {
+    return null;
+  }
+
   // Table style -> Removes the space below the table, only for tables in cards
   return (
     <div className="remove-package">

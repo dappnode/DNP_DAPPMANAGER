@@ -11,7 +11,6 @@ import { Config } from "../components/Config";
 import { Ports } from "../components/Ports";
 import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
-import { Controls } from "../components/Controls";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
 import { title } from "../data";
 // Components
@@ -69,12 +68,6 @@ export const PackageById: React.FC<RouteComponentProps<{
       render: () => (
         <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />
       ),
-      available: true
-    },
-    {
-      name: "Controls",
-      subPath: "controls",
-      render: () => <Controls dnpName={dnpName} dnp={dnp} />,
       available: true
     },
     {
