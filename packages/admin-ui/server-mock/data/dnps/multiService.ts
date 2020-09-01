@@ -87,7 +87,52 @@ export const multiService: MockDnp = {
   },
 
   installedContainers: {
-    [serviceNames.front]: {},
-    [serviceNames.back]: {}
+    [serviceNames.front]: {
+      ports: [
+        {
+          container: 8088,
+          host: 8088,
+          protocol: "TCP"
+        }
+      ],
+      volumes: [
+        {
+          name: "multiservicednpdappnodeeth_data",
+          host: "data",
+          container: "./data/ethereum"
+        }
+      ]
+    },
+    [serviceNames.back]: {
+      ports: [
+        {
+          container: 6001,
+          host: 6001,
+          protocol: "TCP"
+        },
+        {
+          container: 6002,
+          host: 6002,
+          protocol: "TCP"
+        }
+      ],
+      volumes: [
+        {
+          name: "multiservicednpdappnodeeth_data",
+          host: "data",
+          container: "./data/ethereum"
+        },
+        {
+          name: "multiservicednpdappnodeeth_data_backend_1",
+          host: "data_backend_1",
+          container: "./data/backend1"
+        },
+        {
+          name: "multiservicednpdappnodeeth_data_backend_2",
+          host: "data_backend_2",
+          container: "./data/backend2"
+        }
+      ]
+    }
   }
 };

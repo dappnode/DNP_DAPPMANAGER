@@ -9,14 +9,14 @@
    */
   grid-template-columns:
     minmax(1.65rem, min-content)
-    2rem
+    min-content
     minmax(5rem, auto)
     minmax(calc(var(--icon-size) / 2), min-content)
     minmax(calc(var(--icon-size) / 2), min-content);
 
   &.core {
     grid-template-columns:
-      2rem
+      min-content
       minmax(1.65rem, min-content)
       minmax(5rem, auto)
       minmax(calc(var(--icon-size) / 2), min-content)
@@ -26,11 +26,11 @@
   @media screen and (max-width: 40rem) {
     grid-template-columns:
       1.65rem
-      2rem
+      min-content
       minmax(5rem, auto)
       minmax(calc(var(--icon-size) / 2), min-content);
 
-    .restart {
+    .hide-on-small {
       display: none;
     }
 
@@ -44,7 +44,7 @@
 
     &.core {
       grid-template-columns:
-        2rem
+        min-content
         minmax(1rem, min-content)
         minmax(5rem, auto)
         minmax(calc(var(--icon-size) / 2), min-content)
@@ -53,8 +53,16 @@
   }
 
   .avatar {
-    width: 100%;
+    width: 2rem;
     border-radius: 4px;
+  }
+
+  .actions-icon-group {
+    text-align: center;
+    display: flex;
+    > *:not(:last-child) {
+      margin-right: 0.25rem;
+    }
   }
 }
 /* Customize name inside NavLink */

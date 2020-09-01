@@ -14,8 +14,9 @@ export const lightningNetwork: MockDnp = {
     version: "0.0.3",
     upstreamVersion: "0.6.1-beta",
     shortDescription: "Scalable, instant Bitcoin/Blockchain transactions",
-    description:
-      "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.",
+    description: "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.".repeat(
+      10
+    ),
     type: "service",
     backup: [{ name: "data", path: "/root/.lnd/data" }],
     style: {

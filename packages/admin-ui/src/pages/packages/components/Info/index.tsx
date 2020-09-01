@@ -7,12 +7,13 @@ import RenderMarkdown from "components/RenderMarkdown";
 import { MdClose } from "react-icons/md";
 // This
 import { Links } from "./Links";
-import { Vols } from "./Vols";
-import { StateBadge } from "../StateBadge";
 import newTabProps from "utils/newTabProps";
-import { InstalledPackageData, Manifest } from "types";
+import { InstalledPackageDetailData, Manifest } from "types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import "./info.scss";
+import { RemovePackage } from "./RemovePackage";
+import { VolumesList } from "./VolumesList";
+import { ContainerList } from "./ContainerList";
 
 export function Info({
   dnp,
@@ -20,7 +21,7 @@ export function Info({
   gettingStarted,
   gettingStartedShow
 }: {
-  dnp: InstalledPackageData;
+  dnp: InstalledPackageDetailData;
   manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
@@ -72,23 +73,28 @@ export function Info({
         </>
       )}
 
-      <SubTitle>Details</SubTitle>
-      <Card>
-        <div>
-          <strong>Status: </strong>
-          {dnp.containers.map(container => (
-            <StateBadge key={container.serviceName} state={container.state} />
-          ))}
-        </div>
+      <Card spacing divider>
+        <div className="package-info">
+          {/* <ReadMoreMarkdown
+            source={
+              dnp.manifest?.description || dnp.manifest?.shortDescription || ""
+            }
+          /> */}
 
-        <div className="version-info">
-          <strong>Version: </strong>
-          {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
-          {origin ? (
-            <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
-              {origin}
-            </a>
-          ) : null}
+          <div className="version-info">
+            <strong>Version: </strong>
+            {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
+            {origin ? (
+              <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
+                {origin}
+              </a>
+            ) : null}
+          </div>
+
+          <div>
+            {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
+            <Links links={links || ((manifest as any) || {}).homepage || {}} />
+          </div>
         </div>
 
         {!gettingStartedShowLocal && (
@@ -103,20 +109,11 @@ export function Info({
           </div>
         )}
 
-        <div>
-          {dnp.containers.map(container => (
-            <Vols
-              key={container.serviceName}
-              dnpName={dnpName}
-              volumes={container.volumes}
-            />
-          ))}
-        </div>
+        <ContainerList dnp={dnp} />
 
-        <div>
-          {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
-          <Links links={links || ((manifest as any) || {}).homepage || {}} />
-        </div>
+        <VolumesList dnp={dnp} />
+
+        <RemovePackage dnp={dnp} />
       </Card>
     </>
   );

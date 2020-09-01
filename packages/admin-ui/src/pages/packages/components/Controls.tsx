@@ -171,7 +171,7 @@ export function Controls({
       name: "Restart",
       text:
         "Restarting a package will interrupt the service during 1-10s but preserve its data",
-      action: () => dispatch(packageRestart(dnpName)),
+      action: () => packageRestart(dnp).catch(console.error),
       availableForCore: true,
       type: "secondary"
     },
