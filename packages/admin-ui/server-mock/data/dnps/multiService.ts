@@ -104,6 +104,8 @@ export const multiService: MockDnp = {
       ]
     },
     [serviceNames.back]: {
+      state: "exited",
+      running: false,
       ports: [
         {
           container: 6001,

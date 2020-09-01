@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { packageRestart } from "../../actions";
-import { StateBadge } from "../StateBadge";
+import { StateBadge, getWorstState } from "../StateBadge";
 import { MdRefresh, MdPauseCircleOutline } from "react-icons/md";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { InstalledPackageData } from "common";
@@ -28,9 +28,9 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
       {/* DNP entry */}
       <React.Fragment>
-        <StateBadge state={dnp.containers[0].state} />
+        {showAll ? <span /> : <StateBadge state={getWorstState(dnp)} />}
         <span className="name">
-          <span>{sn(dnp.dnpName)} </span>
+          <span>All containers</span>
           {dnp.containers.length > 1 && (
             <span className="see-all" onClick={() => setShowAll(x => !x)}>
               {showAll ? <BsChevronContract /> : <BsChevronExpand />}
