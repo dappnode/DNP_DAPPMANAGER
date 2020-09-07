@@ -14,6 +14,7 @@ import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRestartVolumes as packageRestartVolumesType } from "../../../src/calls/packageRestartVolumes";
 import { sortDnpsToRemove } from "../../../src/modules/docker/restartPackageVolumes";
+import { getContainerName } from "../../../src/params";
 
 describe("Docker action: restartPackageVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
@@ -101,14 +102,16 @@ describe("Docker action: restartPackageVolumes", function() {
     }
   ];
 
-  const dnpList: InstalledPackageData[] = containers.map(container => ({
-    ...container,
-    containerName: container.dnpName,
-    containerId: container.dnpName,
-    dnpName: container.dnpName,
-    serviceName: container.dnpName,
-    containers: [container]
-  }));
+  const dnpList: InstalledPackageData[] = containers.map(container => {
+    container.serviceName = container.dnpName;
+    container.containerName = getContainerName(container);
+    container.containerId = container.containerName;
+    return {
+      ...container,
+      dnpName: container.dnpName,
+      containers: [container]
+    };
+  });
 
   const volumesData: VolumeOwnershipData[] = [
     // Mock core volumes
