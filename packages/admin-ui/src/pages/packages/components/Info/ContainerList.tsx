@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { packageRestart } from "../../actions";
 import { StateBadge, getWorstState } from "../StateBadge";
-import { MdRefresh, MdPauseCircleOutline } from "react-icons/md";
+import {
+  MdRefresh,
+  MdPauseCircleOutline,
+  MdPlayCircleOutline
+} from "react-icons/md";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { InstalledPackageData, PackageContainer } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
@@ -25,6 +29,8 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     });
   }
 
+  const stateDnp = getWorstState(dnp);
+
   return (
     <div className="list-grid containers">
       <header className="center">Status</header>
@@ -34,7 +40,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
       {/* DNP entry */}
       <React.Fragment>
-        {showAll ? <span /> : <StateBadge state={getWorstState(dnp)} />}
+        {showAll ? <span /> : <StateBadge state={stateDnp} />}
         <span className="name">
           <span>All containers</span>
           {dnp.containers.length > 1 && (
@@ -43,14 +49,12 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
             </span>
           )}
         </span>
-        <MdPauseCircleOutline
-          style={{ fontSize: "1.05rem" }}
-          onClick={() => onStartStop()}
-        />
-        <MdRefresh
-          style={{ fontSize: "1.05rem" }}
-          onClick={() => onRestart()}
-        />
+        {stateDnp === "running" ? (
+          <MdPauseCircleOutline onClick={() => onStartStop()} />
+        ) : (
+          <MdPlayCircleOutline onClick={() => onStartStop()} />
+        )}
+        <MdRefresh onClick={() => onRestart()} />
       </React.Fragment>
 
       {/* Container display */}
@@ -59,14 +63,12 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           <React.Fragment key={container.serviceName}>
             <StateBadge state={container.state} />
             <span className="name">{sn(container.serviceName)}</span>
-            <MdPauseCircleOutline
-              style={{ fontSize: "1.05rem" }}
-              onClick={() => onStartStop(container)}
-            />
-            <MdRefresh
-              style={{ fontSize: "1.05rem" }}
-              onClick={() => onRestart(container)}
-            />
+            {container.running ? (
+              <MdPauseCircleOutline onClick={() => onStartStop(container)} />
+            ) : (
+              <MdPlayCircleOutline onClick={() => onStartStop(container)} />
+            )}
+            <MdRefresh onClick={() => onRestart(container)} />
           </React.Fragment>
         ))}
     </div>
