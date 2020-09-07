@@ -186,6 +186,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
+    isMain: labels.isMain,
     // Default settings on the original package version's docker-compose
     defaultEnvironment,
     defaultPorts,

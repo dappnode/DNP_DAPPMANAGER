@@ -84,7 +84,8 @@ export async function getRelease({
         avatar: fileToMultiaddress(avatarFile),
         chain: metadata.chain,
         origin,
-        isCore
+        isCore,
+        isMain: metadata.mainService === service.serviceName ? true : undefined
       })
     );
   }

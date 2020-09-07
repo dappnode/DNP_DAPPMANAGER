@@ -169,6 +169,16 @@ export function getNsupdateTxts({
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
     dappnode[getDotDappnodeDomain(fullEns)] = container.ip;
+
+    // For multi-service DNPs, link the main container to the root URL
+    if (container.isMain) {
+      const fullDnpEns = getContainerDomain({
+        dnpName: container.dnpName,
+        serviceName: container.dnpName
+      });
+      eth[getMyDotEthdomain(fullDnpEns)] = container.ip;
+      dappnode[getDotDappnodeDomain(fullDnpEns)] = container.ip;
+    }
   }
 
   // Add dappnode domain alias from installed packages

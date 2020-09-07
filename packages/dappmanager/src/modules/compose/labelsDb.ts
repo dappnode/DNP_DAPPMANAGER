@@ -46,6 +46,7 @@ const labelParseFns: {
       ? (value as ChainDriver)
       : undefined,
   "dappnode.dnp.isCore": parseBool,
+  "dappnode.dnp.isMain": parseBool,
   "dappnode.dnp.default.environment": value => parseJsonSafe(value),
   "dappnode.dnp.default.ports": value => parseJsonSafe(value),
   "dappnode.dnp.default.volumes": value => parseJsonSafe(value)
@@ -65,6 +66,7 @@ const labelStringifyFns: {
   "dappnode.dnp.origin": writeString,
   "dappnode.dnp.chain": writeString,
   "dappnode.dnp.isCore": writeBool,
+  "dappnode.dnp.isMain": writeBool,
   "dappnode.dnp.default.environment": writeJson,
   "dappnode.dnp.default.ports": writeJson,
   "dappnode.dnp.default.volumes": writeJson
@@ -118,14 +120,15 @@ export function readContainerLabels(
   version: string;
   serviceName: string;
   instanceName: string;
-  defaultEnvironment: string[];
-  defaultPorts: string[];
-  defaultVolumes: string[];
   dependencies: Dependencies;
   avatar: string;
   origin: string;
   chain: ChainDriver;
   isCore: boolean;
+  isMain: boolean;
+  defaultEnvironment: string[];
+  defaultPorts: string[];
+  defaultVolumes: string[];
 }> {
   const labelValues = parseContainerLabels(labelsRaw);
   return {
@@ -138,6 +141,7 @@ export function readContainerLabels(
     origin: labelValues["dappnode.dnp.origin"],
     chain: labelValues["dappnode.dnp.chain"],
     isCore: labelValues["dappnode.dnp.isCore"],
+    isMain: labelValues["dappnode.dnp.isMain"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
     defaultPorts: labelValues["dappnode.dnp.default.ports"],
     defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
@@ -152,7 +156,8 @@ export function writeMetadataToLabels({
   avatar,
   chain,
   origin,
-  isCore
+  isCore,
+  isMain
 }: {
   dnpName: string;
   version: string;
@@ -162,6 +167,7 @@ export function writeMetadataToLabels({
   chain?: ChainDriver;
   origin?: string;
   isCore?: boolean;
+  isMain?: boolean;
 }): ContainerLabelsRaw {
   return stringifyContainerLabels({
     "dappnode.dnp.dnpName": dnpName,
@@ -171,6 +177,7 @@ export function writeMetadataToLabels({
     "dappnode.dnp.avatar": avatar,
     "dappnode.dnp.origin": origin,
     "dappnode.dnp.chain": chain,
-    "dappnode.dnp.isCore": isCore
+    "dappnode.dnp.isCore": isCore,
+    "dappnode.dnp.isMain": isMain
   });
 }

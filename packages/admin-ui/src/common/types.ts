@@ -319,6 +319,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.origin": string;
   "dappnode.dnp.chain": ChainDriver;
   "dappnode.dnp.isCore": boolean;
+  "dappnode.dnp.isMain": boolean;
   "dappnode.dnp.default.environment": string[];
   "dappnode.dnp.default.ports": string[];
   "dappnode.dnp.default.volumes": string[];
@@ -389,6 +390,7 @@ export interface PackageContainer {
   chain?: ChainDriver;
   domainAlias?: string[];
   canBeFullnode?: boolean;
+  isMain?: boolean;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -833,6 +835,7 @@ export interface PackageReleaseMetadata {
   type?: string;
   chain?: ChainDriver;
   dependencies?: Dependencies;
+  mainService?: string;
 
   // Safety properties to solve problematic updates
   runOrder?: string[];
