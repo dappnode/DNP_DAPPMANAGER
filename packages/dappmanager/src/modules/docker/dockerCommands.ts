@@ -132,18 +132,23 @@ export async function dockerCleanOldImages(
   dnpName: string,
   version: string
 ): Promise<void> {
-  const repoImages = await imagesList({ filters: { reference: [dnpName] } });
+  // Filtering by `reference` requires the repo name to be exact
+  // This prevents catching all images of a multi-service package
+  const repoImages = await imagesList();
   const imagesToDelete = repoImages.filter(image =>
     image.RepoTags.every(tag => {
       const [imageName, imageVersion] = tag.split(":");
       return (
-        imageName.includes(dnpName) &&
+        (imageName === dnpName ||
+          // Get multi-service images, but not mix `goerli-geth` with `goerli` for example
+          imageName.endsWith("." + dnpName)) &&
         semver.valid(imageVersion) &&
         semver.valid(version) &&
         semver.lt(imageVersion, version)
       );
     })
   );
+
   for (const image of imagesToDelete) {
     await imageRemove(image.Id);
   }
