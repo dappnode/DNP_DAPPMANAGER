@@ -45,7 +45,12 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
       <React.Fragment>
         {showAll ? <span /> : <StateBadge state={stateDnp} />}
         <span className="name">
-          <span>All containers</span>
+          {dnp.containers.length > 1 ? (
+            <span>All containers</span>
+          ) : (
+            <span>{sn(dnp.dnpName)}</span>
+          )}
+
           {dnp.containers.length > 1 && (
             <span className="see-all" onClick={() => setShowAll(x => !x)}>
               {showAll ? <BsChevronContract /> : <BsChevronExpand />}
