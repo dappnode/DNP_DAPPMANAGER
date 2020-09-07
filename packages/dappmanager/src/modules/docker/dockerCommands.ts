@@ -3,22 +3,19 @@ import dargs from "dargs";
 import shell from "../../utils/shell";
 import { imagesList, imageRemove } from "./dockerApi";
 
-/* eslint-disable no-useless-escape */
-export interface DockerComposeUpOptions {
-  noStart?: boolean;
-  forceRecreate?: boolean;
-}
-
 type Args = string[];
 type Kwargs = { [flag: string]: string | number | boolean | undefined };
 
-function parseArgs(args: Args, kwargs?: Kwargs): string {
+function parseArgs(args: Args, kwargs?: Kwargs): string[] {
   const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
-  return [...args, ...dargs(definedKwargs)].join(" ");
+  return [
+    ...args,
+    ...dargs(definedKwargs, { useEquals: false, ignoreFalse: true })
+  ];
 }
 
 async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
-  return shell(`docker ${parseArgs(args, kwargs)}`);
+  return shell(["docker", ...parseArgs(args, kwargs)]);
 }
 
 async function execDockerCompose(
@@ -26,12 +23,12 @@ async function execDockerCompose(
   args: Args,
   kwargs?: Kwargs
 ): Promise<string> {
-  return shell(`docker-compose -f ${dcPath} ${parseArgs(args, kwargs)}`);
+  return shell(["docker-compose", "-f", dcPath, ...parseArgs(args, kwargs)]);
 }
 
 export function dockerComposeUp(
   dcPath: string,
-  options?: DockerComposeUpOptions
+  options?: { noStart?: boolean; forceRecreate?: boolean }
 ): Promise<string> {
   const flags: string[] = [];
   if (options?.noStart) flags.push("--no-start");
@@ -47,9 +44,9 @@ export function dockerComposeUp(
  */
 export function dockerComposeDown(
   dcPath: string,
-  options?: { volumes?: boolean; timeout?: number }
+  { volumes, timeout }: { volumes?: boolean; timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["down"], options);
+  return execDockerCompose(dcPath, ["down"], { volumes, timeout });
 }
 
 /**
@@ -71,9 +68,9 @@ export function dockerComposeStart(dcPath: string): Promise<string> {
  */
 export function dockerComposeStop(
   dcPath: string,
-  options?: { timeout?: number }
+  { timeout }: { timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["stop"], options);
+  return execDockerCompose(dcPath, ["stop"], { timeout });
 }
 
 export function dockerComposeConfig(dcPath: string): Promise<string> {
@@ -90,16 +87,16 @@ export function dockerStart(containerName: string): Promise<string> {
 
 export function dockerStop(
   containerName: string,
-  options?: { t: number }
+  { time }: { time?: number } = {}
 ): Promise<string> {
-  return execDocker(["stop", containerName], options);
+  return execDocker(["stop", containerName], { time });
 }
 
 export function dockerRm(
   containerName: string,
-  options: { volumes?: boolean } = {}
+  { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  return execDocker(["rm", containerName], { f: true, ...options });
+  return execDocker(["rm", containerName], { force: true, volumes });
 }
 
 /**
