@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { api } from "api";
 import newTabProps from "utils/newTabProps";
 // Components
-import Select from "components/Select";
 import Card from "components/Card";
 import Switch from "components/Switch";
 import Input from "components/Input";
@@ -14,6 +13,7 @@ import { apiUrls } from "params";
 import { urlJoin } from "utils/url";
 import { PackageContainer } from "common";
 import "./logs.scss";
+import { ServiceSelector } from "./ServiceSelector";
 
 const baseUrlDownloadAll = apiUrls.containerLogs;
 const refreshInterval = 2 * 1000;
@@ -22,7 +22,7 @@ const terminalID = "terminal";
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
 export function Logs({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map(c => c.serviceName).sort();
   const [serviceName, setServiceName] = useState(serviceNames[0]);
 
   // User options
@@ -97,14 +97,11 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
 
   return (
     <Card spacing>
-      {serviceNames.length > 1 && (
-        <Select
-          value={serviceName}
-          onValueChange={setServiceName}
-          options={serviceNames}
-          prepend="Service"
-        />
-      )}
+      <ServiceSelector
+        serviceName={serviceName}
+        setServiceName={setServiceName}
+        containers={containers}
+      />
 
       <div className="logs-switches">
         <Switch

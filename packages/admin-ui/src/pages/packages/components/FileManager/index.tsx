@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 // Components
 import Card from "components/Card";
-import Select from "components/Select";
 import { CopyFileTo } from "./To";
 import { CopyFileFrom } from "./From";
 import { PackageContainer } from "common";
+import { ServiceSelector } from "../ServiceSelector";
 
 export const FileManager = ({
   containers
 }: {
   containers: PackageContainer[];
 }) => {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map(c => c.serviceName).sort();
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
@@ -23,16 +23,11 @@ export const FileManager = ({
 
   return (
     <Card spacing divider className="file-manager">
-      {serviceNames.length > 1 && (
-        <div>
-          <Select
-            value={serviceName}
-            onValueChange={setServiceName}
-            options={serviceNames}
-            prepend="Service"
-          />
-        </div>
-      )}
+      <ServiceSelector
+        serviceName={serviceName}
+        setServiceName={setServiceName}
+        containers={containers}
+      />
 
       {containerName && (
         <>

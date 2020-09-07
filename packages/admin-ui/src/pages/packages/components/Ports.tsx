@@ -13,27 +13,22 @@ import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./ports.scss";
 import { InstalledPackageData, PackageContainer } from "common";
+import { ServiceSelector } from "./ServiceSelector";
 
 const maxPortNumber = 32768 - 1;
 
 export function Ports({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map(c => c.serviceName).sort();
   const [serviceName, setServiceName] = useState(serviceNames[0]);
-
   const container = containers.find(c => c.serviceName === serviceName);
 
   return (
     <Card spacing className="ports-editor">
-      {serviceNames.length > 1 && (
-        <div>
-          <Select
-            value={serviceName}
-            onValueChange={setServiceName}
-            options={serviceNames}
-            prepend="Service"
-          />
-        </div>
-      )}
+      <ServiceSelector
+        serviceName={serviceName}
+        setServiceName={setServiceName}
+        containers={containers}
+      />
 
       {container && (
         <PortsByService
