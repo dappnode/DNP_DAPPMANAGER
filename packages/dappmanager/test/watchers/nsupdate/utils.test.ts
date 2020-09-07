@@ -15,7 +15,9 @@ describe("watcher > nsupdate", () => {
       "bitcoin.dnp.dappnode.eth": "my.bitcoin.dnp.dappnode.eth",
       "artis.public.dappnode.eth": "my.artis.public.dappnode.eth",
       "ln-network.dnp.dappnode.eth": "my.ln-network.dnp.dappnode.eth",
-      "with_under.dnp.dappnode.eth": "my.withunder.dnp.dappnode.eth"
+      "with_under.dnp.dappnode.eth": "my.withunder.dnp.dappnode.eth",
+      "service1.dappnodesdk.dnp.dappnode.eth":
+        "my.service1.dappnodesdk.dnp.dappnode.eth"
     };
 
     for (const [name, domain] of Object.entries(cases)) {
@@ -30,7 +32,8 @@ describe("watcher > nsupdate", () => {
       "bitcoin.dnp.dappnode.eth": "bitcoin.dappnode",
       "artis.public.dappnode.eth": "artis.public.dappnode",
       "ln-network.dnp.dappnode.eth": "ln-network.dappnode",
-      "with_under.dnp.dappnode.eth": "withunder.dappnode"
+      "with_under.dnp.dappnode.eth": "withunder.dappnode",
+      "service1.dappnodesdk.dnp.dappnode.eth": "service1.dappnodesdk.dappnode"
     };
 
     for (const [name, domain] of Object.entries(cases)) {

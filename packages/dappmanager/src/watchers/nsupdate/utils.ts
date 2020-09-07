@@ -76,6 +76,10 @@ send
 `.trim();
 }
 
+function stripCharacters(s: string): string {
+  return s.replace(RegExp("_", "g"), "");
+}
+
 /**
  * - Strip container prefix
  * - Strip "_"
@@ -86,7 +90,7 @@ send
  * name=$(echo $name | sed 's/DAppNodePackage-//g'| tr -d '/_')
  */
 export function getMyDotEthdomain(dnpName: string): string {
-  return "my." + dnpName.replace(RegExp("_", "g"), "");
+  return "my." + stripCharacters(dnpName);
 }
 
 /**
@@ -102,13 +106,9 @@ export function getMyDotEthdomain(dnpName: string): string {
  * name=$(echo $name | sed 's/DAppNodePackage-//g'| sed 's/\.dappnode\.eth//g' |  sed 's/\.dnp//g' | tr -d '/_')
  */
 export function getDotDappnodeDomain(dnpName: string): string {
-  return (
-    dnpName
-      .replace(".dappnode", "")
-      .replace(".eth", "")
-      .replace(".dnp", "")
-      .replace(RegExp("_", "g"), "") + ".dappnode"
-  );
+  for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
+    if (dnpName.endsWith(s)) dnpName = dnpName.slice(0, -s.length);
+  return stripCharacters(dnpName) + ".dappnode";
 }
 
 /**
