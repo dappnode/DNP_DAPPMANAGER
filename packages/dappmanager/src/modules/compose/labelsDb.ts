@@ -7,7 +7,7 @@ import {
 } from "../../types";
 import { stringifyEnvironment } from "./environment";
 import { ComposeService } from "../../common";
-import { pick, mapValues } from "lodash";
+import { pick, omitBy, mapValues } from "lodash";
 
 /**
  * This module ensures that data stored in a DNP's container labels
@@ -25,8 +25,9 @@ const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
     } catch {}
 };
 
-const writeString = (data: string): string => data || "";
-const writeBool = (data: boolean): string => (data ? "true" : "false");
+const writeString = (data: string | undefined): string | undefined => data;
+const writeBool = (data: boolean | undefined): string | undefined =>
+  data === true ? "true" : data === false ? "false" : undefined;
 const writeJson = (data: object | string[]): string => JSON.stringify(data);
 
 const labelParseFns: {
@@ -55,7 +56,7 @@ const labelParseFns: {
 const labelStringifyFns: {
   [K in keyof Required<ContainerLabelTypes>]: (
     data: ContainerLabelTypes[K]
-  ) => string;
+  ) => string | undefined;
 } = {
   "dappnode.dnp.dnpName": writeString,
   "dappnode.dnp.version": writeString,
@@ -83,13 +84,14 @@ export function parseContainerLabels(
 export function stringifyContainerLabels(
   labels: Partial<ContainerLabelTypes>
 ): ContainerLabelsRaw {
-  return mapValues(
+  const labelsRaw = mapValues(
     pick(labelStringifyFns, Object.keys(labels)),
     (labelStringifyFn, label) =>
       (labelStringifyFn as <T>(data: T) => string)(
         labels[label as keyof ContainerLabelTypes]
       )
   ) as ContainerLabelsRaw;
+  return omitBy(labelsRaw, value => value === undefined);
 }
 
 type ServiceDefaultSettings = Pick<
