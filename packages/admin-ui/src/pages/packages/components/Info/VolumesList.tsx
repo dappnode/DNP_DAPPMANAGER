@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { flatten, uniqBy } from "lodash";
+import { flatten, uniqBy, orderBy } from "lodash";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 import { api } from "api";
 import { BsTrash } from "react-icons/bs";
@@ -85,7 +85,8 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
         .filter(s => s)
         .join(" - ");
       return {
-        name: name ? prettyVolString : container || "Unknown",
+        name: name || host,
+        prettyName: name ? prettyVolString : container || "Unknown",
         size,
         mountpoint
       };
@@ -99,6 +100,8 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     (total, vol) => total + (vol.size || 0),
     0
   );
+
+  const sortVolumesByKeys: (keyof typeof volumes[0])[] = ["size", "prettyName"];
 
   return (
     <div className="list-grid container-volumes">
@@ -124,10 +127,12 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
       </React.Fragment>
 
       {showAll &&
-        volumes.map(vol => (
+        orderBy(volumes, sortVolumesByKeys, ["desc", "asc"]).map(vol => (
           <React.Fragment key={vol.name}>
-            <span className="name">{sn(vol.name)}</span>
-            <span>{vol.size ? prettyBytes(vol.size) : "-"}</span>
+            <span className="name">{sn(vol.prettyName)}</span>
+            <span>
+              {typeof vol.size === "number" ? prettyBytes(vol.size) : "-"}
+            </span>
 
             <BsTrash
               className="trash-icon"
