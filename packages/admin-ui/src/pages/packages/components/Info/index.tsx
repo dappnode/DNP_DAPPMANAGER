@@ -54,7 +54,7 @@ export function Info({
 
   return (
     <>
-      {gettingStartedShowLocal && gettingStarted && (
+      {gettingStarted && gettingStartedShowLocal && (
         <>
           <SubTitle
             className={`getting-started-header ${loading ? "loading" : ""}`}
@@ -91,23 +91,23 @@ export function Info({
             ) : null}
           </div>
 
+          {gettingStarted && !gettingStartedShowLocal && (
+            <div>
+              <strong>Getting started: </strong>
+              <span
+                className="a-style"
+                onClick={() => setGettingStartedIsShown(true)}
+              >
+                show
+              </span>
+            </div>
+          )}
+
           <div>
             {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
             <Links links={links || ((manifest as any) || {}).homepage || {}} />
           </div>
         </div>
-
-        {!gettingStartedShowLocal && (
-          <div>
-            <strong>Getting started: </strong>
-            <span
-              className="a-style"
-              onClick={() => setGettingStartedIsShown(true)}
-            >
-              show
-            </span>
-          </div>
-        )}
 
         <ContainerList dnp={dnp} />
 
