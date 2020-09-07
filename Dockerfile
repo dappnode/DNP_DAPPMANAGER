@@ -1,6 +1,8 @@
 # Common base so it's cached
+# ARCH is used to avoid emulated builds in muti-arch builds
 #####################################
-FROM amd64/node:10.15.3-alpine as build-monorepo
+ARG ARCH=
+FROM ${ARCH}node:10.15.3-alpine as build-monorepo
 
 WORKDIR /app
 
@@ -35,7 +37,7 @@ RUN yarn build
 
 # Compute git data
 #####################################
-FROM amd64/node:10.15.3-alpine as git-data
+FROM ${ARCH}node:10.15.3-alpine as git-data
 
 WORKDIR /usr/src/app
 
