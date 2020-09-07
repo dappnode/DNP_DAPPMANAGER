@@ -25,6 +25,7 @@
     "is-ipfs": "^0.6.0",
     "jquery": "^3.3.1",
     "lodash": "^4.17.15",
+    "mitt": "^2.1.0",
     "node-sass": "^4.14.1",
     "popper.js": "^1.14.3",
     "pretty-bytes": "^5.3.0",
