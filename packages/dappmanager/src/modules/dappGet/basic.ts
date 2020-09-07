@@ -1,4 +1,4 @@
-import { listContainers } from "../docker/listContainers";
+import { listPackages } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
@@ -31,7 +31,7 @@ export default async function dappGetBasic(
   // The function below does not directly affect funcionality.
   // However it would prevent already installed DNPs from installing
   try {
-    const installedDnps = await listContainers();
+    const installedDnps = await listPackages();
     for (const dnp of installedDnps) {
       const prevVersion = dnp.version;
       const nextVersion = state[dnp.dnpName];
