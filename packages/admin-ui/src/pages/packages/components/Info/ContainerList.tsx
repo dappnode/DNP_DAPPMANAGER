@@ -23,9 +23,12 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
   function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
     const serviceNames = container && [container.serviceName];
+    const name = container
+      ? [sn(dnpName), sn(container.serviceName)].join(" ")
+      : sn(dnpName);
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
-      message: `Toggling ${sn(dnp.dnpName)}...`,
-      onSuccess: `Toggled ${sn(dnp.dnpName)}`
+      message: `Toggling ${name}...`,
+      onSuccess: `Toggled ${name}`
     });
   }
 
