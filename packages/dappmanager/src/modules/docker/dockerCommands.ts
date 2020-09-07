@@ -28,12 +28,18 @@ async function execDockerCompose(
 
 export function dockerComposeUp(
   dcPath: string,
-  options?: { noStart?: boolean; forceRecreate?: boolean }
+  options?: {
+    noStart?: boolean;
+    forceRecreate?: boolean;
+    serviceNames?: string[];
+  }
 ): Promise<string> {
   const flags: string[] = [];
   if (options?.noStart) flags.push("--no-start");
   else flags.push("--detach");
   if (options?.forceRecreate) flags.push("--force-recreate");
+  if (options?.serviceNames)
+    for (const serviceName of options.serviceNames) flags.push(serviceName);
   // Adding <&- to prevent interactive mode
   return execDockerCompose(dcPath, ["up", ...flags, "<&-"]);
 }

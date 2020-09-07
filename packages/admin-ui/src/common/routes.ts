@@ -318,7 +318,10 @@ export interface Routes {
   /**
    * Calls docker rm and docker up on a package
    */
-  packageRestart: (kwargs: { dnpName: string }) => Promise<void>;
+  packageRestart: (kwargs: {
+    dnpName: string;
+    serviceNames?: string[];
+  }) => Promise<void>;
 
   /**
    * Removes a package volumes. The re-ups the package

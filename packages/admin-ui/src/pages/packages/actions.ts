@@ -7,6 +7,7 @@ import { withToastNoThrow } from "components/toast/Toast";
 import { PackageEnvs, InstalledPackageData } from "types";
 import { AppThunk } from "store";
 import { continueIfCalleDisconnected } from "api/utils";
+import { PackageContainer } from "common";
 
 // Used in package interface / envs
 
@@ -27,9 +28,17 @@ export const packageSetEnvironment = (
 
 // Used in package interface / controls
 
-export async function packageRestart(dnp: InstalledPackageData): Promise<void> {
+export async function packageRestart(
+  dnp: InstalledPackageData,
+  container?: PackageContainer
+): Promise<void> {
+  // Restart only a single service container
+  const serviceNames = container && [container.serviceName];
+
   const dnpName = dnp.dnpName;
-  const name = sn(dnpName);
+  const name = container
+    ? [sn(dnpName), sn(container.serviceName)].join(" ")
+    : sn(dnpName);
 
   // If the DNP is not gracefully stopped, ask for confirmation to reset
   if (dnp && dnp.containers.some(container => container.running))
@@ -44,7 +53,10 @@ export async function packageRestart(dnp: InstalledPackageData): Promise<void> {
 
   await withToastNoThrow(
     // If call errors with "callee disconnected", resolve with success
-    continueIfCalleDisconnected(() => api.packageRestart({ dnpName }), dnpName),
+    continueIfCalleDisconnected(
+      () => api.packageRestart({ dnpName, serviceNames }),
+      dnpName
+    ),
     {
       message: `Restarting ${name}...`,
       onSuccess: `Restarted ${name}`

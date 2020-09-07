@@ -59,7 +59,9 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
             />
             <MdRefresh
               style={{ fontSize: "1.05rem" }}
-              onClick={() => packageRestart(dnp).catch(console.error)}
+              onClick={() =>
+                packageRestart(dnp, container).catch(console.error)
+              }
             />
           </React.Fragment>
         ))}
