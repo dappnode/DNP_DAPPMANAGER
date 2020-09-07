@@ -1,25 +1,37 @@
-import { listContainer } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/listContainers";
 import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 
 /**
- * Stops or starts after fetching its status
- *
- * @param containerName Name of a docker container
+ * Stops or starts a package containers
  * @param timeout seconds to stop the package
  */
 export async function packageStartStop({
-  containerName,
+  dnpName,
+  serviceNames,
   timeout = 10
 }: {
-  containerName: string;
+  dnpName: string;
+  serviceNames?: string[];
   timeout?: number;
 }): Promise<void> {
-  if (!containerName) throw Error("kwarg containerName must be defined");
+  if (!dnpName) throw Error("kwarg containerName must be defined");
 
-  const container = await listContainer({ containerName });
-  if (container.running) await dockerStop(containerName, { time: timeout });
-  else await dockerStart(containerName);
+  const dnp = await listPackage({ dnpName });
+
+  const targetContainers = dnp.containers.filter(
+    c => !serviceNames || serviceNames.includes(c.serviceName)
+  );
+
+  if (targetContainers.length === 0) {
+    const queryId = [dnpName, ...(serviceNames || [])].join(", ");
+    throw Error(`No targetContainers found for ${queryId}`);
+  }
+
+  const containerNames = targetContainers.map(c => c.containerName);
+  if (targetContainers.every(container => container.running))
+    await dockerStop(containerNames, { time: timeout });
+  else await dockerStart(containerNames);
 
   // Emit packages update
   eventBus.requestPackages.emit();

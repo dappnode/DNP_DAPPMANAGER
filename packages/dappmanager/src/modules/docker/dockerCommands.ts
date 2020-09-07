@@ -87,15 +87,15 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return execDocker(["volume", "rm", volumeName], { f: true });
 }
 
-export function dockerStart(containerName: string): Promise<string> {
-  return execDocker(["start", containerName]);
+export function dockerStart(containerNames: string[]): Promise<string> {
+  return execDocker(["start", ...containerNames]);
 }
 
 export function dockerStop(
-  containerName: string,
+  containerNames: string[],
   { time }: { time?: number } = {}
 ): Promise<string> {
-  return execDocker(["stop", containerName], { time });
+  return execDocker(["stop", ...containerNames], { time });
 }
 
 export function dockerRm(

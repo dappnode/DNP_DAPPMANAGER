@@ -3,7 +3,7 @@ import { packageRestart } from "../../actions";
 import { StateBadge, getWorstState } from "../StateBadge";
 import { MdRefresh, MdPauseCircleOutline } from "react-icons/md";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
-import { InstalledPackageData } from "common";
+import { InstalledPackageData, PackageContainer } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import { shortNameCapitalized as sn } from "utils/format";
@@ -12,8 +12,14 @@ import "./containerList.scss";
 export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
   const [showAll, setShowAll] = useState(false);
 
-  async function packageStartStop(containerName: string) {
-    withToastNoThrow(() => api.packageStartStop({ containerName }), {
+  async function onRestart(container?: PackageContainer) {
+    packageRestart(dnp, container).catch(console.error);
+  }
+
+  function onStartStop(container?: PackageContainer) {
+    const dnpName = dnp.dnpName;
+    const serviceNames = container && [container.serviceName];
+    withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${sn(dnp.dnpName)}...`,
       onSuccess: `Toggled ${sn(dnp.dnpName)}`
     });
@@ -39,11 +45,11 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
         </span>
         <MdPauseCircleOutline
           style={{ fontSize: "1.05rem" }}
-          onClick={() => packageStartStop(dnp.containers[0].containerName)}
+          onClick={() => onStartStop()}
         />
         <MdRefresh
           style={{ fontSize: "1.05rem" }}
-          onClick={() => packageRestart(dnp).catch(console.error)}
+          onClick={() => onRestart()}
         />
       </React.Fragment>
 
@@ -55,13 +61,11 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
             <span className="name">{sn(container.serviceName)}</span>
             <MdPauseCircleOutline
               style={{ fontSize: "1.05rem" }}
-              onClick={() => packageStartStop(container.containerName)}
+              onClick={() => onStartStop(container)}
             />
             <MdRefresh
               style={{ fontSize: "1.05rem" }}
-              onClick={() =>
-                packageRestart(dnp, container).catch(console.error)
-              }
+              onClick={() => onRestart(container)}
             />
           </React.Fragment>
         ))}

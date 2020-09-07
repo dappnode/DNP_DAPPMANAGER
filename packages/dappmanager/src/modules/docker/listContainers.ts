@@ -58,6 +58,7 @@ export async function listPackageNoThrow({
 }: {
   dnpName: string;
 }): Promise<InstalledPackageData | null> {
+  if (!dnpName) throw Error(`Falsy dnpName: ${dnpName}`);
   const dnps = await listPackages();
   return dnps.find(d => d.dnpName === dnpName) || null;
 }

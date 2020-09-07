@@ -316,7 +316,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Calls docker rm and docker up on a package
+   * Recreates a package containers
    */
   packageRestart: (kwargs: {
     dnpName: string;
@@ -349,12 +349,12 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Stops or starts after fetching its status
-   * @param containerName Name of a docker container
+   * Stops or starts a package containers
    * @param timeout seconds to stop the package
    */
   packageStartStop: (kwargs: {
-    containerName: string;
+    dnpName: string;
+    serviceNames?: string[];
     options?: { timeout?: number };
   }) => Promise<void>;
 

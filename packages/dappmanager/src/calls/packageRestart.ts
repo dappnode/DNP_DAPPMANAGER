@@ -2,9 +2,7 @@ import * as eventBus from "../eventBus";
 import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
- * Calls docker rm and docker up on a package
- *
- * @param {string} id DNP .eth name
+ * Recreates a package containers
  */
 export async function packageRestart({
   dnpName,
