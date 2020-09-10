@@ -37,6 +37,7 @@ export interface VpnDevice {
  */
 // Information immediatelly available in the directory smart contract
 interface DirectoryItemBasic {
+  index: number;
   name: string;
   whitelisted: boolean;
   isFeatured: boolean;
@@ -54,18 +55,12 @@ export interface DirectoryItemOk extends DirectoryItemBasic {
   };
   categories: string[];
 }
-export interface DirectoryItemLoading extends DirectoryItemBasic {
-  status: "loading";
-  message?: string;
-}
+
 export interface DirectoryItemError extends DirectoryItemBasic {
   status: "error";
   message: string;
 }
-export type DirectoryItem =
-  | DirectoryItemOk
-  | DirectoryItemLoading
-  | DirectoryItemError;
+export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
 export interface RequestStatus {
   loading?: boolean;

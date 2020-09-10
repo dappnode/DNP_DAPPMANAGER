@@ -31,6 +31,7 @@ export const sampleRequestState: RequestedDnp = {
 };
 
 export const sampleDirectoryState: DirectoryItem = {
+  index: 0,
   status: "ok",
   name: "demo-name",
   description: "Demo description",

@@ -24,7 +24,7 @@ function update(
   fn: (dnp: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
 ) {
   const dnp = packages.get(dnpName);
-  if (!dnp) throw Error(`No dnpName ${dnpName}`);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
   packages.set(dnpName, { ...dnp, ...fn(dnp) });
   eventBus.requestPackages.emit();
 }
@@ -141,7 +141,7 @@ export async function packageGet({
   dnpName: string;
 }): Promise<InstalledPackageDetailData> {
   const dnp = packages.get(dnpName);
-  if (!dnp) throw Error(`${dnpName} package not found`);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
   return dnp;
 }
 
@@ -295,24 +295,21 @@ export async function packageSetPortMappings({
 
 /**
  * Stops or starts after fetching its status
- * @param id DNP .eth name
- * @param timeout seconds to stop the package
  */
 export async function packageStartStop({
-  containerName
+  dnpName,
+  serviceNames
 }: {
-  containerName: string;
-  options?: { timeout?: number };
+  dnpName: string;
+  serviceNames?: string[];
 }): Promise<void> {
   await pause(pkgRestartMs);
-  const dnp = Array.from(packages.values()).find(d =>
-    d.containers.some(c => c.containerName === containerName)
-  );
-  if (!dnp) throw Error(`containerName ${containerName} not found`);
+  const dnp = packages.get(dnpName);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
 
   update(dnp.dnpName, d => ({
     containers: d.containers.map(container =>
-      container.containerName === containerName
+      !serviceNames || serviceNames?.includes(container.serviceName)
         ? {
             ...container,
             running: !container.running,
