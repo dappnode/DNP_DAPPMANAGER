@@ -9,7 +9,7 @@ import {
 } from "services/isInstallingLogs/actions";
 import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
-import { setDnpDirectory } from "services/dnpDirectory/actions";
+import { updateDnpDirectory } from "services/dnpDirectory/actions";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
   subscriptions.chainData.on(chainsData => {
@@ -17,7 +17,7 @@ export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
   });
 
   subscriptions.directory.on(directoryDnps => {
-    store.dispatch(setDnpDirectory(directoryDnps));
+    store.dispatch(updateDnpDirectory(directoryDnps));
   });
 
   subscriptions.packages.on(dnpsInstalled => {

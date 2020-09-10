@@ -9,6 +9,10 @@ export const setDnpDirectory = createAction<DirectoryItem[]>(
   "dnpDirectory/set"
 );
 
+export const updateDnpDirectory = createAction<DirectoryItem[]>(
+  "dnpDirectory/update"
+);
+
 export const updateStatus = createAction<RequestStatus>(
   "dnpDirectory/updateStatus"
 );

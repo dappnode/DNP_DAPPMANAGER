@@ -1,18 +1,12 @@
 import React from "react";
 // Imgs
 import defaultAvatar from "img/defaultAvatar.png";
-import loadingAvatar from "img/light-gray-square.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 // Utility components
 import Card from "components/Card";
 import Button from "components/Button";
 import DnpNameVerified from "components/DnpNameVerified";
-import {
-  DirectoryItem,
-  DirectoryItemOk,
-  DirectoryItemLoading,
-  DirectoryItemError
-} from "types";
+import { DirectoryItem, DirectoryItemOk, DirectoryItemError } from "types";
 import "./dnpStore.scss";
 
 function getTag({
@@ -58,28 +52,6 @@ function DnpCardFeaturedOk({
   );
 }
 
-function DnpCardFeaturedLoading({
-  directoryItem: { name, message },
-  className,
-  ...props
-}: {
-  directoryItem: DirectoryItemLoading;
-  className: string;
-}) {
-  return (
-    <Card {...props} className={`${className} loading`}>
-      <div className="avatar-big">
-        <img src={loadingAvatar} alt="avatar" />
-      </div>
-      <div className="info-big">
-        <div className="badge gray featured">Featured</div>
-        <DnpNameVerified name={name} big />
-        <div className="description">{message}</div>
-      </div>
-    </Card>
-  );
-}
-
 function DnpCardOk({
   directoryItem,
   ...props
@@ -98,28 +70,6 @@ function DnpCardOk({
       {/* Show the button as disabled (gray) if it's updated */}
       <Button className="action" variant="dappnode" disabled={isUpdated}>
         {getTag(directoryItem)}
-      </Button>
-    </Card>
-  );
-}
-
-function DnpCardLoading({
-  directoryItem: { name, message },
-  className,
-  ...props
-}: {
-  directoryItem: DirectoryItemLoading;
-  className: string;
-}) {
-  return (
-    <Card {...props} className={`${className} loading`}>
-      <div className="avatar">
-        <img src={loadingAvatar} alt="avatar" />
-      </div>
-      <DnpNameVerified name={name} />
-      <div className="description">{message}</div>
-      <Button className="action" variant="dappnode" disabled={true}>
-        {"-"}
       </Button>
     </Card>
   );
@@ -175,12 +125,6 @@ export default function DnpStore({
                 <DnpCardFeaturedOk {...{ ...cardProps, directoryItem }} />
               ) : (
                 <DnpCardOk {...{ ...cardProps, directoryItem }} />
-              )
-            ) : directoryItem.status === "loading" ? (
-              directoryItem.isFeatured ? (
-                <DnpCardFeaturedLoading {...{ ...cardProps, directoryItem }} />
-              ) : (
-                <DnpCardLoading {...{ ...cardProps, directoryItem }} />
               )
             ) : directoryItem.status === "error" ? (
               <DnpCardError {...{ ...cardProps, directoryItem }} />

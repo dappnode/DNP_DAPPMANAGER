@@ -1,6 +1,6 @@
 import { keyBy } from "lodash";
 import { createReducer } from "@reduxjs/toolkit";
-import { setDnpDirectory, updateStatus } from "./actions";
+import { setDnpDirectory, updateDnpDirectory, updateStatus } from "./actions";
 import { DirectoryItem, RequestStatus } from "common/types";
 
 // Service > dnpDirectory
@@ -8,34 +8,22 @@ import { DirectoryItem, RequestStatus } from "common/types";
 export const reducer = createReducer<{
   directory: DirectoryItem[];
   requestStatus: RequestStatus;
-}>(
-  {
-    directory: [],
-    requestStatus: {}
-  },
-  builder => {
-    builder.addCase(setDnpDirectory, (state, action) => {
-      const directoryByName = keyBy(state.directory, dnp => dnp.name);
-      return {
-        ...state,
-        directory: action.payload.map(
-          (dnp): DirectoryItem => {
-            const currentDnp = directoryByName[dnp.name];
-            return dnp.status === "loading" &&
-              currentDnp &&
-              currentDnp.status === "ok"
-              ? currentDnp
-              : dnp;
-          }
-        )
-      };
-    });
+}>({ directory: [], requestStatus: {} }, builder => {
+  builder.addCase(setDnpDirectory, (state, action) => ({
+    ...state,
+    directory: action.payload
+  }));
 
-    builder.addCase(updateStatus, (state, action) => {
-      return {
-        ...state,
-        requestStatus: action.payload
-      };
-    });
-  }
-);
+  builder.addCase(updateDnpDirectory, (state, action) => ({
+    ...state,
+    directory: Object.values({
+      ...keyBy(state.directory, dnp => dnp.name),
+      ...keyBy(action.payload, dnp => dnp.name)
+    })
+  }));
+
+  builder.addCase(updateStatus, (state, action) => ({
+    ...state,
+    requestStatus: action.payload
+  }));
+});
