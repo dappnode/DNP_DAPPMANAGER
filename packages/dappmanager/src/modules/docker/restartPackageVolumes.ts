@@ -72,26 +72,30 @@ export async function restartPackageVolumes({
    * - All docker-compose must exist
    * - No DNP can be the "dappmanager.dnp.dappnode.eth"
    */
-  for (const dnpName of dnpsToRemoveSorted) {
-    if (dnpName.includes(params.dappmanagerDnpName))
+  for (const dnpNameToRemove of dnpsToRemoveSorted) {
+    if (dnpNameToRemove.includes(params.dappmanagerDnpName))
       throw Error("The dappmanager cannot be restarted");
 
-    const dnpToRemove = dnpList.find(_dnp => _dnp.dnpName === dnpName);
+    const dnpToRemove = dnpList.find(_dnp => _dnp.dnpName === dnpNameToRemove);
     if (dnpToRemove) {
-      const { isCore, dnpName } = dnpToRemove;
-      const composePath = getPath.dockerCompose(dnpName, isCore);
+      const composePath = getPath.dockerCompose(
+        dnpToRemove.dnpName,
+        dnpToRemove.isCore
+      );
       if (!fs.existsSync(composePath) && !doNotRestart)
-        throw Error(`No compose found for ${dnpName}: ${composePath}`);
+        throw Error(
+          `No compose found for ${dnpToRemove.dnpName}: ${composePath}`
+        );
 
-      composePaths[dnpName] = composePath;
+      composePaths[dnpToRemove.dnpName] = composePath;
 
-      for (const container of dnp.containers) {
+      for (const container of dnpToRemove.containers) {
         const containerUsesVolumeToRemove = container.volumes.some(volMapping =>
           volumesToRemove.some(volName => volMapping.name === volName)
         );
         if (containerUsesVolumeToRemove)
-          containerNames[dnpName] = [
-            ...(containerNames[dnpName] || []),
+          containerNames[dnpToRemove.dnpName] = [
+            ...(containerNames[dnpToRemove.dnpName] || []),
             container.containerName
           ];
       }

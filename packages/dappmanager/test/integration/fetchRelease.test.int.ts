@@ -19,7 +19,7 @@ import {
 import {
   uploadManifestRelease,
   uploadDirectoryRelease
-} from "../testReleaseUtils";
+} from "../integrationSpecs";
 import shell from "../../src/utils/shell";
 import * as validate from "../../src/utils/validate";
 import { dockerComposeUp } from "../../src/modules/docker/dockerCommands";
@@ -158,17 +158,15 @@ describe("Fetch releases", () => {
 
     it("Fetch manifest release with depedencies", async () => {
       // Create releases
-      const depUpload = await uploadManifestRelease(dependencyManifest);
-      const mainUpload = await uploadManifestRelease({
+      const dependencyReleaseHash = await uploadManifestRelease(
+        dependencyManifest
+      );
+      const mainDnpReleaseHash = await uploadManifestRelease({
         ...mainDnpManifest,
         dependencies: {
-          [dnpNameDep]: depUpload.hash
+          [dnpNameDep]: dependencyReleaseHash
         }
       });
-
-      const dependencyReleaseHash = depUpload.hash;
-      const mainDnpReleaseHash = mainUpload.hash;
-      const mainDnpImageSize = mainUpload.imageSize;
 
       // Up mock docker packages
       const composePathMain = ComposeEditor.getComposePath(dnpNameMain, false);
@@ -231,7 +229,9 @@ describe("Fetch releases", () => {
           }
         },
 
-        imageSize: mainDnpImageSize,
+        // Ignore in result checking, not relevant
+        imageSize: NaN,
+
         isUpdated: false,
         isInstalled: true,
         settings: {
@@ -284,6 +284,9 @@ describe("Fetch releases", () => {
         }
       };
 
+      // Ignore in result checking, not relevant
+      delete result.imageSize;
+      delete expectRequestDnp.imageSize;
       expect(result).to.deep.equal(expectRequestDnp);
     });
   });
@@ -351,7 +354,7 @@ describe("Fetch releases", () => {
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
         avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmYZkQjhSoqyq9mTaK3FiT3MDcrFDvEwQvzMGWW6f1nHGm",
+          "http://ipfs.dappnode:8080/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
         metadata: {
           name: dnpNameMain,
           version: mainVersion,

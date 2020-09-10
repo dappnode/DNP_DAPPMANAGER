@@ -23,13 +23,13 @@ import {
   cleanContainers,
   sampleFile
 } from "../testUtils";
-import { uploadManifestRelease } from "../testReleaseUtils";
 import {
   stringifyPortMappings,
   parseEnvironment
 } from "../../src/modules/compose";
 import { containerInspect } from "../../src/modules/docker/dockerApi";
 import { listContainer } from "../../src/modules/docker/listContainers";
+import { uploadManifestRelease } from "../integrationSpecs";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -250,14 +250,13 @@ describe("DNP lifecycle", function() {
     `Preparing releases for ${dnpNameMain} and ${dnpNameDep}`,
     async () => {
       // Prepare a package release with dependencies
-      const dependencyUpload = await uploadManifestRelease(dependencyManifest);
-      const mainDnpUpload = await uploadManifestRelease({
+      const depDnpReleaseHash = await uploadManifestRelease(dependencyManifest);
+      mainDnpReleaseHash = await uploadManifestRelease({
         ...mainDnpManifest,
         dependencies: {
-          [dnpNameDep]: dependencyUpload.hash
+          [dnpNameDep]: depDnpReleaseHash
         }
       });
-      mainDnpReleaseHash = mainDnpUpload.hash;
     }
   );
 

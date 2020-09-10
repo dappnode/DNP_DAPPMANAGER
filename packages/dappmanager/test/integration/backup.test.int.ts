@@ -51,7 +51,6 @@ describe("Integration test for backup to and from:", function() {
    */
 
   beforeEach("Up a test docker container", async function() {
-    this.timeout(60 * 1000);
     await createTestDir();
     // Create container
     await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
@@ -141,10 +140,9 @@ volumes:
       content,
       `Backup sub dir file (test/data.conf) contents are incorrect`
     );
-  }).timeout(60 * 1000);
+  });
 
   after("Clean test docker container", async function() {
-    this.timeout(60 * 1000);
     await cleanTestDir();
     await shell(`docker rm -f ${containerName}`);
   });

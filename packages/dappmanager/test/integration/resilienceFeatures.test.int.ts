@@ -3,39 +3,33 @@ import { expect } from "chai";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath";
 import * as calls from "../../src/calls";
-import { createTestDir, mockManifestWithImage } from "../testUtils";
+import {
+  createTestDir,
+  mockManifestWithImage,
+  beforeAndAfter
+} from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
-import {
-  prepareManifestTypeRelease,
-  cleanInstallationArtifacts,
-  verifyFiles,
-  releaseDnpName,
-  releaseVersion
-} from "../testReleaseUtils";
 import { getDnpFromListPackages } from "../testPackageUtils";
-
-/**
- * Generate mock releases in the different formats,
- * and try to retrieve and run them
- * - IPFS directory with docker-compose
- * - IPFS directory generate docker-compose from manifest
- * - IPFS manifest, generate docker-compose from manifest
- */
-
-/**
- * Aggregate the three type of tests
- * - Directory-type, WITH docker-compose
- * - Directory-type, NO docker-compose
- * - Manifest-type
- *
- * [NOTE] There are different default `NAME` env values
- * in the different files that each release typeis using
- */
+import {
+  uploadManifestRelease,
+  cleanInstallationArtifacts
+} from "../integrationSpecs";
+import { ManifestWithImage } from "../../src/types";
 
 describe("Resilience features, when things go wrong", function() {
-  this.timeout(60 * 1000);
+  const testMockPrefix = "testmock-";
+  const dnpName = testMockPrefix + "resilience-features.dnp.dappnode.eth";
+  const manifest: ManifestWithImage = {
+    ...mockManifestWithImage,
+    name: dnpName
+  };
   let releaseHash: string;
+
+  beforeAndAfter("Clean files", async () => {
+    await createTestDir();
+    await cleanInstallationArtifacts(testMockPrefix);
+  });
 
   before("Create DAppNode docker network", async () => {
     const dncoreNetwork = params.DNP_NETWORK_EXTERNAL_NAME;
@@ -45,71 +39,55 @@ describe("Resilience features, when things go wrong", function() {
     if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
   });
 
-  before("Clean files", async () => {
-    await createTestDir();
-    await cleanInstallationArtifacts();
-    verifyFiles();
-  });
-
   before("Upload a vanilla package", async () => {
-    releaseHash = await prepareManifestTypeRelease();
+    releaseHash = await uploadManifestRelease(manifest);
   });
 
   describe("Remove a package without compose", () => {
     before("Install the release", async () => {
       await calls.packageInstall({
-        name: releaseDnpName,
+        name: dnpName,
         version: releaseHash
       });
     });
 
     it("Remove the compose and then remove the package", async () => {
-      const composePath = getPath.dockerCompose(releaseDnpName, false);
+      const composePath = getPath.dockerCompose(dnpName, false);
       fs.unlinkSync(composePath);
-      await calls.packageRemove({
-        dnpName: releaseDnpName,
-        deleteVolumes: true,
-        timeout: 0
-      });
-    }).timeout(60 * 1000);
+      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+    });
   });
 
   describe("Remove a package with a broken compose", () => {
     before("Install the release", async () => {
       await calls.packageInstall({
-        name: releaseDnpName,
+        name: dnpName,
         version: releaseHash
       });
     });
 
     it("Break the compose and then remove the package", async () => {
-      const composePath = getPath.dockerCompose(releaseDnpName, false);
+      const composePath = getPath.dockerCompose(dnpName, false);
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
-      await calls.packageRemove({
-        dnpName: releaseDnpName,
-        deleteVolumes: true,
-        timeout: 0
-      });
-    }).timeout(60 * 1000);
+      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+    });
   });
 
   describe("Failing installation due to bad compose", () => {
     let brokenReleaseHash: string;
     before("Install the good release", async () => {
       await calls.packageInstall({
-        name: releaseDnpName,
+        name: dnpName,
         version: releaseHash
       });
     });
 
     before("Upload the bad release", async () => {
-      brokenReleaseHash = await prepareManifestTypeRelease({
-        ...mockManifestWithImage,
-        name: releaseDnpName,
-        version: releaseVersion,
+      brokenReleaseHash = await uploadManifestRelease({
+        ...manifest,
         image: {
-          ...mockManifestWithImage.image,
+          ...manifest.image,
           // Intentional error to make the installation fail
           ports: ["0:0"]
         }
@@ -117,23 +95,23 @@ describe("Resilience features, when things go wrong", function() {
     });
 
     it("Should do a rollback due to a broken compose", async () => {
-      const dnpBefore = await getDnpFromListPackages(releaseDnpName);
+      const dnpBefore = await getDnpFromListPackages(dnpName);
 
       let errorMessage = "--did not throw--";
       try {
         await calls.packageInstall({
-          name: releaseDnpName,
+          name: dnpName,
           version: brokenReleaseHash
         });
       } catch (e) {
         errorMessage = e.message;
       }
       expect(errorMessage).to.include(
-        `Cannot start service ${releaseDnpName}`,
+        `Cannot start service ${dnpName}`,
         "Wrong error message"
       );
 
-      const dnpAfter = await getDnpFromListPackages(releaseDnpName);
+      const dnpAfter = await getDnpFromListPackages(dnpName);
 
       if (!dnpBefore) throw Error("dnpBefore not found");
       if (!dnpAfter) throw Error("dnpAfter not found");
@@ -146,10 +124,6 @@ describe("Resilience features, when things go wrong", function() {
         dnpAfter.origin,
         "Rollback should leave the before version running"
       );
-    }).timeout(60 * 1000);
-  });
-
-  after("Clean installation artifacts", async () => {
-    await cleanInstallationArtifacts();
+    });
   });
 });

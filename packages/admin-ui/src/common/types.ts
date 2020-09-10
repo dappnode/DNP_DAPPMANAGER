@@ -832,7 +832,7 @@ export interface PackageReleaseMetadata {
   upstreamVersion?: string;
   shortDescription?: string;
   description?: string;
-  type?: string;
+  type?: "service" | "library" | "dncore";
   chain?: ChainDriver;
   dependencies?: Dependencies;
   mainService?: string;

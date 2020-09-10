@@ -17,6 +17,18 @@ import params from "../src/params";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";
+
+// Default file names
+export const manifestFileName = "dappnode_package.json";
+export const composeFileName = "docker-compose.yml";
+
+export const beforeAndAfter = (
+  ...args: Parameters<Mocha.HookFunction>
+): void => {
+  before(...args);
+  after(...args);
+};
+
 export const getTestMountpoint = (id: string): string => {
   const mountpointPath = path.join(testMountpoint, id);
   fs.mkdirSync(mountpointPath, { recursive: true });
