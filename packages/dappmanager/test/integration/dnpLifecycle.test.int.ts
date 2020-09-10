@@ -11,7 +11,8 @@ import {
   UserSettingsAllDnps,
   PackageContainer,
   ManifestWithImage,
-  PackageEnvs
+  PackageEnvs,
+  InstalledPackageData
 } from "../../src/types";
 import {
   clearDbs,
@@ -19,16 +20,16 @@ import {
   portProtocols,
   shellSafe,
   cleanRepos,
-  cleanContainers
+  cleanContainers,
+  sampleFile
 } from "../testUtils";
-import { uploadManifestRelease } from "../testReleaseUtils";
-import fileToDataUri from "../../src/utils/fileToDataUri";
 import {
   stringifyPortMappings,
   parseEnvironment
 } from "../../src/modules/compose";
 import { containerInspect } from "../../src/modules/docker/dockerApi";
 import { listContainer } from "../../src/modules/docker/listContainers";
+import { uploadManifestRelease } from "../integrationSpecs";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -54,9 +55,9 @@ const testMountpointDnpLifeCycleDep = getTestMountpoint("dnplifecycle-dep");
 describe("DNP lifecycle", function() {
   //         #### Must be function() for this.timeout ####
 
-  const idMain = "main.dnp.dappnode.eth";
-  const idDep = "dependency.dnp.dappnode.eth";
-  const ids = [idMain, idDep];
+  const dnpNameMain = "main.dnp.dappnode.eth";
+  const dnpNameDep = "dependency.dnp.dappnode.eth";
+  const dnpNames = [dnpNameMain, dnpNameDep];
   const envsMain = {
     ENV_TO_CHANGE: {
       key: "ENV_TO_CHANGE",
@@ -137,7 +138,7 @@ describe("DNP lifecycle", function() {
   };
 
   const mainDnpManifest: ManifestWithImage = {
-    name: idMain,
+    name: dnpNameMain,
     version: "0.1.0",
     image: {
       hash: "",
@@ -154,7 +155,7 @@ describe("DNP lifecycle", function() {
   };
 
   const dependencyManifest: ManifestWithImage = {
-    name: idDep,
+    name: dnpNameDep,
     version: "0.1.0",
     image: {
       hash: "",
@@ -173,37 +174,51 @@ describe("DNP lifecycle", function() {
     `data:application/json;base64,${Buffer.from(s).toString("base64")}`;
 
   const demoFilePath = "/usr/config.json";
-  const fileDataUrlMain = toDaraUrl(idMain); // The content of the test file is the name of the DNP
-  const fileDataUrlDep = toDaraUrl(idDep);
+  const fileDataUrlMain = toDaraUrl(dnpNameMain); // The content of the test file is the name of the DNP
+  const fileDataUrlDep = toDaraUrl(dnpNameDep);
 
   const userSettings: UserSettingsAllDnps = {
-    [idMain]: {
+    [dnpNameMain]: {
       environment: {
-        [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue
+        [dnpNameMain]: {
+          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue
+        }
       },
       portMappings: {
-        [portsMain.two.portId]: String(portsMain.two.newHost)
+        [dnpNameMain]: {
+          [portsMain.two.portId]: String(portsMain.two.newHost)
+        }
       },
       namedVolumeMountpoints: {
         [volumesMain.changeme.name]: volumesMain.changeme.newHost
       },
       fileUploads: {
-        [demoFilePath]: fileDataUrlMain
+        [dnpNameMain]: {
+          [demoFilePath]: fileDataUrlMain
+        }
       }
     },
-    [idDep]: {
+    [dnpNameDep]: {
       environment: {
-        [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue
+        [dnpNameDep]: {
+          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue
+        }
       },
       portMappings: {
-        [portsDep.three.portId]: String(portsDep.three.newHost),
-        [portsDep.four.portId]: String(portsDep.four.newHost)
+        [dnpNameDep]: {
+          [portsDep.three.portId]: String(portsDep.three.newHost),
+          [portsDep.four.portId]: String(portsDep.four.newHost)
+        }
       },
       legacyBindVolumes: {
-        [volumesDep.changeme.name]: volumesDep.changeme.newHost
+        [dnpNameDep]: {
+          [volumesDep.changeme.name]: volumesDep.changeme.newHost
+        }
       },
       fileUploads: {
-        [demoFilePath]: fileDataUrlDep
+        [dnpNameDep]: {
+          [demoFilePath]: fileDataUrlDep
+        }
       }
     }
   };
@@ -222,42 +237,44 @@ describe("DNP lifecycle", function() {
 
     // SUPER important to clean dnp_repo folder to avoid caches
     await cleanRepos();
-    await cleanContainers(...ids);
+    await cleanContainers(...dnpNames);
   });
 
   after("Clean environment", async () => {
     // SUPER important to clean dnp_repo folder to avoid caches
     await cleanRepos();
-    await cleanContainers(...ids);
+    await cleanContainers(...dnpNames);
   });
 
-  before(`Preparing releases for ${idMain} and ${idDep}`, async () => {
-    // Prepare a package release with dependencies
-    const dependencyUpload = await uploadManifestRelease(dependencyManifest);
-    const mainDnpUpload = await uploadManifestRelease({
-      ...mainDnpManifest,
-      dependencies: {
-        [idDep]: dependencyUpload.hash
-      }
-    });
-    mainDnpReleaseHash = mainDnpUpload.hash;
-  });
+  before(
+    `Preparing releases for ${dnpNameMain} and ${dnpNameDep}`,
+    async () => {
+      // Prepare a package release with dependencies
+      const depDnpReleaseHash = await uploadManifestRelease(dependencyManifest);
+      mainDnpReleaseHash = await uploadManifestRelease({
+        ...mainDnpManifest,
+        dependencies: {
+          [dnpNameDep]: depDnpReleaseHash
+        }
+      });
+    }
+  );
 
   before("Should resolve a request", async () => {
     const result = await calls.fetchDnpRequest({
       id: mainDnpReleaseHash
     });
-    expect(result.name, "Wrong result name").to.equal(idMain);
+    expect(result.dnpName, "Wrong result name").to.equal(dnpNameMain);
     expect(result.request.compatible, "Result is not compatible").to.be.ok;
     expect(
       result.request.compatible.dnps,
       "Resolved state should include this dnp"
-    ).to.have.property(idMain);
+    ).to.have.property(dnpNameMain);
   });
 
   before("Should install DNP", async () => {
     await calls.packageInstall({
-      name: idMain,
+      name: dnpNameMain,
       version: mainDnpReleaseHash,
       userSettings
     });
@@ -265,33 +282,40 @@ describe("DNP lifecycle", function() {
 
   // EXTRA, verify that the envs were set correctly
   describe("Should apply user settings on the installation", () => {
-    let dnpMain: PackageContainer;
-    let dnpDep: PackageContainer;
+    let dnpMain: InstalledPackageData;
+    let dnpDep: InstalledPackageData;
+    let containerMain: PackageContainer;
+    let containerDep: PackageContainer;
 
     before("Fetch DNPs", async () => {
-      const _dnpMain = await getDnpFromListPackages(idMain);
-      const _dnpDep = await getDnpFromListPackages(idDep);
-      if (!_dnpMain) throw Error(`DNP ${idMain} not found`);
-      if (!_dnpDep) throw Error(`DNP ${idDep} not found`);
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      const _dnpDep = await getDnpFromListPackages(dnpNameDep);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      if (!_dnpDep) throw Error(`DNP ${dnpNameDep} not found`);
       dnpMain = _dnpMain;
       dnpDep = _dnpDep;
+      containerMain = dnpMain.containers[0];
+      containerDep = dnpDep.containers[0];
       // Print status as a sanity check for test debugging
       logs.debug({ dnpMain, dnpDep });
     });
 
-    it(`${idMain} environment`, async () => {
-      await assertEnvironment(idMain, {
-        [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
-        [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
-      });
+    it(`${dnpNameMain} environment`, async () => {
+      await assertEnvironment(
+        { containerName: containerMain.containerName },
+        {
+          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
+          [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
+        }
+      );
     });
 
-    it(`${idMain} port mappings`, () => {
-      const port1111 = dnpMain.ports.find(
-        ({ container }) => container === portsMain.one.container
+    it(`${dnpNameMain} port mappings`, () => {
+      const port1111 = containerMain.ports.find(
+        port => port.container === portsMain.one.container
       );
-      const port2222 = dnpMain.ports.find(
-        ({ container }) => container === portsMain.two.container
+      const port2222 = containerMain.ports.find(
+        port => port.container === portsMain.two.container
       );
       if (!port1111) throw Error(`Port 1111 not found`);
       if (!port2222) throw Error(`Port 2222 not found`);
@@ -309,9 +333,9 @@ describe("DNP lifecycle", function() {
       });
     });
 
-    it(`${idMain} name volume paths`, () => {
-      const changemeVolume = dnpMain.volumes.find(
-        ({ container }) => container === volumesMain.changeme.container
+    it(`${dnpNameMain} name volume paths`, () => {
+      const changemeVolume = containerMain.volumes.find(
+        vol => vol.container === volumesMain.changeme.container
       );
 
       if (!changemeVolume) throw Error(`Volume changeme not found`);
@@ -319,35 +343,38 @@ describe("DNP lifecycle", function() {
       // is the default var lib docker
       const dockerDefaultPath = path.join(
         "/var/lib/docker/volumes",
-        `${idMain.replace(/\./g, "")}_${volumesMain.changeme.name}`,
+        `${dnpNameMain.replace(/\./g, "")}_${volumesMain.changeme.name}`,
         "_data"
       );
       expect(changemeVolume.host).to.equal(dockerDefaultPath);
     });
 
-    it(`${idMain} fileuploads`, async () => {
+    it(`${dnpNameMain} fileuploads`, async () => {
       const result = await calls.copyFileFrom({
-        id: idMain,
+        containerName: containerMain.containerName,
         fromPath: demoFilePath
       });
       expect(result).to.equal(fileDataUrlMain);
     });
 
-    it(`${idDep} environment`, async () => {
-      await assertEnvironment(idDep, {
-        [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
-        [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
-      });
+    it(`${dnpNameDep} environment`, async () => {
+      await assertEnvironment(
+        { containerName: containerDep.containerName },
+        {
+          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
+          [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
+        }
+      );
     });
 
-    it(`${idDep} port mappings`, () => {
+    it(`${dnpNameDep} port mappings`, () => {
       // Change from ephemeral to a defined host port
-      const port3333 = dnpDep.ports.find(
-        ({ container }) => container === portsDep.three.container
+      const port3333 = containerDep.ports.find(
+        port => port.container === portsDep.three.container
       );
       // Change from a defined host port to ephemeral
-      const port4444 = dnpDep.ports.find(
-        ({ container }) => container === portsDep.four.container
+      const port4444 = containerDep.ports.find(
+        port => port.container === portsDep.four.container
       );
 
       // Make sure port 4444 is ephemeral
@@ -359,17 +386,17 @@ describe("DNP lifecycle", function() {
       expect(port3333.host).to.equal(portsDep.three.newHost);
     });
 
-    it(`${idDep} name volume paths`, () => {
-      const changemeVolume = dnpDep.volumes.find(
-        ({ container }) => container === volumesDep.changeme.container
+    it(`${dnpNameDep} name volume paths`, () => {
+      const changemeVolume = containerDep.volumes.find(
+        vol => vol.container === volumesDep.changeme.container
       );
       if (!changemeVolume) throw Error(`Volume changeme not found`);
       expect(changemeVolume.host).to.equal(volumesDep.changeme.newHost);
     });
 
-    it(`${idDep} fileuploads`, async () => {
+    it(`${dnpNameDep} fileuploads`, async () => {
       const result = await calls.copyFileFrom({
-        id: idDep,
+        containerName: containerDep.containerName,
         fromPath: demoFilePath
       });
       expect(result).to.equal(fileDataUrlDep);
@@ -378,39 +405,60 @@ describe("DNP lifecycle", function() {
 
   // - > logPackage
   describe("Test logPackage", () => {
+    let containerMain: PackageContainer;
+    let containerDep: PackageContainer;
+
     before(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
-      expect(state).to.equal("running");
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      const _dnpDep = await getDnpFromListPackages(dnpNameDep);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      if (!_dnpDep) throw Error(`DNP ${dnpNameDep} not found`);
+      containerMain = _dnpMain.containers[0];
+      containerDep = _dnpDep.containers[0];
+      if (!containerMain.running) throw Error(`DNP ${dnpNameMain} not running`);
+      if (!containerDep.running) throw Error(`DNP ${dnpNameDep} not running`);
     });
 
-    it(`Should call logPackage for ${idMain}`, async () => {
-      const result = await calls.packageLog({ id: idMain });
+    it(`Should call logPackage for ${dnpNameMain}`, async () => {
+      const result = await calls.packageLog({
+        containerName: containerMain.containerName
+      });
       expect(result).to.be.a("string");
     });
 
-    it(`Should call logPackage for ${idDep}`, async () => {
-      const result = await calls.packageLog({ id: idDep });
+    it(`Should call logPackage for ${dnpNameDep}`, async () => {
+      const result = await calls.packageLog({
+        containerName: containerDep.containerName
+      });
       expect(result).to.be.a("string");
     });
   });
 
   describe("Test updating the package state", () => {
+    let containerMain: PackageContainer;
+
     before(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
-      expect(state).to.equal("running");
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      containerMain = _dnpMain.containers[0];
+      if (!containerMain.running) throw Error(`DNP ${dnpNameMain} not running`);
     });
 
     it("Should update DNP envs and reset", async () => {
-      const dnpPrevEnvs = await getContainerEnvironment(idMain);
+      const dnpPrevEnvs = await getContainerEnvironment({
+        containerName: containerMain.containerName
+      });
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
       await calls.packageSetEnvironment({
-        id: idMain,
-        envs: { time: envValue }
+        dnpName: dnpNameMain,
+        environmentByService: { [dnpNameMain]: { time: envValue } }
       });
 
-      const dnpNextEnvs = await getContainerEnvironment(idMain);
+      const dnpNextEnvs = await getContainerEnvironment({
+        containerName: containerMain.containerName
+      });
       expect(
         pick(dnpNextEnvs, ["time", ...Object.keys(dnpPrevEnvs)])
       ).to.deep.equal({
@@ -419,21 +467,23 @@ describe("DNP lifecycle", function() {
       });
     });
 
-    it(`Should update the port mappings of ${idMain}`, async () => {
+    it(`Should update the port mappings of ${dnpNameMain}`, async () => {
       const portNumber = 13131;
       const protocol = "TCP";
       const portMappings: PortMapping[] = [
         { host: portNumber, container: portNumber, protocol }
       ];
       await calls.packageSetPortMappings({
-        id: idMain,
-        portMappings
+        dnpName: dnpNameMain,
+        portMappingsByService: { [dnpNameMain]: portMappings }
       });
 
-      const dnp = await getDnpFromListPackages(idMain);
-      if (!dnp) throw Error(`${idMain} is not found running`);
+      const dnp = await getDnpFromListPackages(dnpNameMain);
+      if (!dnp) throw Error(`${dnpNameMain} is not found running`);
 
-      const addedPort = dnp.ports.find(p => p.container === portNumber);
+      const addedPort = dnp.containers[0].ports.find(
+        p => p.container === portNumber
+      );
       if (!addedPort)
         throw Error(`Added port on ${portNumber} ${protocol} not found`);
 
@@ -451,35 +501,39 @@ describe("DNP lifecycle", function() {
    */
 
   describe("Test stopping and removing", () => {
+    let containerMain: PackageContainer;
+
     before(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
-      expect(state).to.equal("running");
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      containerMain = _dnpMain.containers[0];
+      if (!containerMain.running) throw Error(`DNP ${dnpNameMain} not running`);
     });
 
     it("Should stop the DNP", async () => {
-      await calls.packageStartStop({ id: idMain, timeout: 0 });
+      await calls.packageStartStop({ dnpName: dnpNameMain, timeout: 0 });
     });
 
     it(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
+      const state = await getDnpState(dnpNameMain);
       expect(state).to.equal("exited");
     });
 
     it("Should start the DNP", async () => {
-      await calls.packageStartStop({ id: idMain, timeout: 0 });
+      await calls.packageStartStop({ dnpName: dnpNameMain, timeout: 0 });
     });
 
     it(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
+      const state = await getDnpState(dnpNameMain);
       expect(state).to.equal("running");
     });
 
     it("Should restart the DNP", async () => {
-      await calls.packageRestart({ id: idMain });
+      await calls.packageRestart({ dnpName: dnpNameMain });
     });
 
     it(`DNP should be running`, async () => {
-      const state = await getDnpState(idMain);
+      const state = await getDnpState(dnpNameMain);
       expect(state).to.equal("running");
     });
   });
@@ -489,22 +543,34 @@ describe("DNP lifecycle", function() {
    * - Copy to the container
    * - Copy from the container
    */
-  let dataUri;
-  const filename = "test.file";
-  const toPath = "";
+
   describe("Test the file transfer", () => {
-    it("Should copy the file TO the container", async () => {
-      dataUri = await fileToDataUri("./package.json");
-      await calls.copyFileTo({ id: idMain, dataUri, filename, toPath });
+    let containerMain: PackageContainer;
+
+    before(`DNP should be running`, async () => {
+      const _dnpMain = await getDnpFromListPackages(dnpNameMain);
+      if (!_dnpMain) throw Error(`DNP ${dnpNameMain} not found`);
+      containerMain = _dnpMain.containers[0];
+      if (!containerMain.running) throw Error(`DNP ${dnpNameMain} not running`);
     });
 
-    // ### TODO, mime-types do not match
+    it("Should copy the file TO the container", async () => {
+      await calls.copyFileTo({
+        containerName: containerMain.containerName,
+        dataUri: sampleFile.dataUri,
+        filename: sampleFile.filename,
+        toPath: sampleFile.containerPath
+      });
+    });
 
-    // it("Should copy the file FROM the container", async () => {
-    //   dataUri = await getDataUri("./package.json");
-    //   const res = await calls.copyFileFrom({ id, fromPath: filename });
-    //   expect(res.result).to.equal(dataUri, "Wrong dataUri");
-    // })
+    // WARNING: mime-types may not match
+    it("Should copy the file FROM the container", async () => {
+      const returnedDataUri = await calls.copyFileFrom({
+        containerName: containerMain.containerName,
+        fromPath: sampleFile.containerPath
+      });
+      expect(returnedDataUri).to.equal(sampleFile.dataUri, "Wrong dataUri");
+    });
   });
 
   /**
@@ -512,29 +578,32 @@ describe("DNP lifecycle", function() {
    */
   describe("Restart volumes", () => {
     // Main depends on the volume of dep, so main should be shutdown
-    it(`Should restart the package volumes of ${idDep}`, async () => {
-      const dnpMainPrev = await getDnpFromListPackages(idMain);
-      await calls.packageRestartVolumes({ id: idDep });
-      const dnpMainNext = await getDnpFromListPackages(idMain);
+    it(`Should restart the package volumes of ${dnpNameDep}`, async () => {
+      const dnpMainPrev = await getDnpFromListPackages(dnpNameMain);
+      await calls.packageRestartVolumes({ dnpName: dnpNameDep });
+      const dnpMainNext = await getDnpFromListPackages(dnpNameMain);
 
       // To know if main was restarted check that the container is different
-      if (!dnpMainPrev) throw Error(`DNP ${idMain} (prev) not found`);
-      if (!dnpMainNext) throw Error(`DNP ${idMain} (next) not found`);
-      expect(dnpMainPrev.id).to.not.equal(
-        dnpMainNext.id,
-        `${idMain} container ids are not different, so it was not reseted: ${dnpMainPrev.id}`
+      if (!dnpMainPrev) throw Error(`DNP ${dnpNameMain} (prev) not found`);
+      if (!dnpMainNext) throw Error(`DNP ${dnpNameMain} (next) not found`);
+      const containerIdPrev = dnpMainPrev.containers[0].containerId;
+      const containerIdNext = dnpMainNext.containers[0].containerId;
+
+      expect(containerIdPrev).to.not.equal(
+        containerIdNext,
+        `${dnpNameMain} container ids are not different, so it was not reseted: ${containerIdPrev}`
       );
     });
 
-    it(`Should restart the package volumes of ${idMain}`, async () => {
-      await calls.packageRestartVolumes({ id: idMain });
+    it(`Should restart the package volumes of ${dnpNameMain}`, async () => {
+      await calls.packageRestartVolumes({ dnpName: dnpNameMain });
       // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
       // removed but it's data will not. Only the reference in /var/lib/docker
       // is deleted
       // #### NOTE: order of the message is not guaranteed, check it by parts
-      // Possible message: `Restarted ${idMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
+      // Possible message: `Restarted ${dnpNameMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
       // for (const messagePart of [
-      //   idMain,
+      //   dnpNameMain,
       //   "maindnpdappnodeeth_changeme-main",
       //   "maindnpdappnodeeth_data"
       // ])
@@ -549,16 +618,16 @@ describe("DNP lifecycle", function() {
    */
 
   describe("Uninstall the DNP", () => {
-    before(`Should remove DNP ${idDep}`, async () => {
-      await calls.packageRemove({ id: idDep, deleteVolumes: true });
+    before(`Should remove DNP ${dnpNameDep}`, async () => {
+      await calls.packageRemove({ dnpName: dnpNameDep, deleteVolumes: true });
     });
 
     // Since main depends on a volume of main, it will removed at the same time
     // as dependency
-    it(`DNP ${idDep} and ${idMain} should be removed`, async () => {
-      const stateDep = await getDnpState(idDep);
+    it(`DNP ${dnpNameDep} and ${dnpNameMain} should be removed`, async () => {
+      const stateDep = await getDnpState(dnpNameDep);
       expect(stateDep).to.equal("down");
-      const stateMain = await getDnpState(idMain);
+      const stateMain = await getDnpState(dnpNameMain);
       expect(stateMain).to.equal("down");
     });
   });
@@ -569,17 +638,21 @@ describe("DNP lifecycle", function() {
  * Note: Likely to include additional ENVs from the ones defined in the compose
  * @param containerNameOrId
  */
-async function getContainerEnvironment(id: string): Promise<PackageEnvs> {
-  const container = await listContainer(id);
-  const containerData = await containerInspect(container.id);
+async function getContainerEnvironment({
+  containerName
+}: {
+  containerName: string;
+}): Promise<PackageEnvs> {
+  const container = await listContainer({ containerName });
+  const containerData = await containerInspect(container.containerId);
   return parseEnvironment(containerData.Config.Env);
 }
 
 async function assertEnvironment(
-  dnpName: string,
+  { containerName }: { containerName: string },
   expectedEnvs: PackageEnvs
 ): Promise<void> {
-  const dnpDepEnvs = await getContainerEnvironment(dnpName);
+  const dnpDepEnvs = await getContainerEnvironment({ containerName });
   expect(pick(dnpDepEnvs, Object.keys(expectedEnvs))).to.deep.equal(
     expectedEnvs,
     `Wrong environment: ${JSON.stringify(expectedEnvs)}`

@@ -1,7 +1,20 @@
 import React from "react";
-import { ContainerState } from "types";
+import { InstalledPackageData, ContainerState } from "types";
 
-export default function StateBadge({ state }: { state: ContainerState }) {
+export function getWorstState(dnp: InstalledPackageData): ContainerState {
+  const states = new Set<ContainerState>();
+  for (const container of dnp.containers) {
+    states.add(container.state);
+  }
+
+  return states.has("exited")
+    ? "exited"
+    : states.has("running")
+    ? "running"
+    : ("" as ContainerState);
+}
+
+export function StateBadge({ state }: { state: ContainerState }) {
   const styleColor =
     state === "running"
       ? "success"

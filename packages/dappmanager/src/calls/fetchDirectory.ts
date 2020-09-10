@@ -2,7 +2,7 @@ import * as eventBus from "../eventBus";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
 import { logs } from "../logs";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";
@@ -22,7 +22,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   // Prevent sending way to many updates in case the fetching process is fast
   const emitDirectoryUpdate = throttle(eventBus.directory.emit, loadThrottle);
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
   const directory = await getDirectory(provider);

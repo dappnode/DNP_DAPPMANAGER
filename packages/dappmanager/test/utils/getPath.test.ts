@@ -9,34 +9,40 @@ import * as getPath from "../../src/utils/getPath";
 const testDir = "test_files/";
 
 describe("Util: get paths", function() {
-  const name = "some_package";
+  const dnpName = "some_package.dnp.dappnode.eth";
   const version = "0.2.0";
 
   it("return PACKAGE_REPO_DIR path", () => {
-    expect(getPath.packageRepoDir(name, false)).to.equal(testDir + name);
+    expect(getPath.packageRepoDir(dnpName, false)).to.equal(testDir + dnpName);
   });
 
   it("return MANIFEST path", () => {
-    expect(getPath.manifest(name, false)).to.equal(
-      path.join(testDir, "some_package/dappnode_package.json")
+    expect(getPath.manifest(dnpName, false)).to.equal(
+      path.join(testDir, "some_package.dnp.dappnode.eth/dappnode_package.json")
     );
   });
 
   it("return DOCKERCOMPOSE path", () => {
-    expect(getPath.dockerCompose(name, false)).to.equal(
-      path.join(testDir, "some_package/docker-compose.yml")
+    expect(getPath.dockerCompose(dnpName, false)).to.equal(
+      path.join(testDir, "some_package.dnp.dappnode.eth/docker-compose.yml")
     );
   });
 
   it("return ENV_FILE path", () => {
-    expect(getPath.envFile(name, false)).to.equal(
-      path.join(testDir, "some_package/some_package.env")
+    expect(getPath.envFile(dnpName, false)).to.equal(
+      path.join(
+        testDir,
+        "some_package.dnp.dappnode.eth/some_package.dnp.dappnode.eth.env"
+      )
     );
   });
 
   it("return IMAGE path", () => {
-    expect(getPath.image(name, version, false)).to.equal(
-      path.join(testDir, "some_package/some_package_0.2.0.tar.xz")
+    expect(getPath.image(dnpName, version, false)).to.equal(
+      path.join(
+        testDir,
+        "some_package.dnp.dappnode.eth/some_package.dnp.dappnode.eth_0.2.0.tar.xz"
+      )
     );
   });
 

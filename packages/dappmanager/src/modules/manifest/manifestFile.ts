@@ -21,13 +21,13 @@ function readManifest(manfiestPath: string): Manifest {
 }
 
 export function readManifestIfExists({
-  name,
+  dnpName,
   isCore
 }: {
-  name: string;
+  dnpName: string;
   isCore: boolean;
 }): Manifest | null {
-  const manifestPath = validate.path(getPath.manifest(name, isCore));
+  const manifestPath = validate.path(getPath.manifest(dnpName, isCore));
   try {
     return readManifest(manifestPath);
   } catch (e) {

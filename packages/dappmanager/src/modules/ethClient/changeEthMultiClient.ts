@@ -27,7 +27,7 @@ export async function changeEthMultiClient(
       const clientData = ethClientData[prevTarget];
       if (clientData) {
         db.ethClientInstallStatus.set(prevTarget, { status: "UNINSTALLED" });
-        await packageRemove({ id: clientData.name, deleteVolumes });
+        await packageRemove({ dnpName: clientData.dnpName, deleteVolumes });
         // Must await uninstall because geth -> light, light -> geth
         // will create conflicts since it's the same DNP
       }

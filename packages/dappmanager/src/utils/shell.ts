@@ -18,13 +18,16 @@ const defaultTimeout = 15 * 60 * 1000; // ms
  * If the child process exits with code > 0, rejects
  */
 export default async function shell(
-  cmd: string,
+  cmd: string | string[],
   options?: { timeout?: number; maxBuffer?: number }
 ): Promise<string> {
   const timeout = options && options.timeout ? options.timeout : defaultTimeout;
   const maxBuffer = options && options.maxBuffer;
   try {
-    const { stdout = "" } = await exec(cmd, { timeout, maxBuffer });
+    const { stdout = "" } = await exec(
+      Array.isArray(cmd) ? cmd.join(" ") : cmd,
+      { timeout, maxBuffer }
+    );
     return stdout.trim();
   } catch (e) {
     // Rethrow a typed error, and ignore the internal NodeJS stack trace

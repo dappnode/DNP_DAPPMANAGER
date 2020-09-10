@@ -2,13 +2,13 @@ import {
   AutoUpdateDataView,
   ChainData,
   DirectoryItem,
-  PackageContainer,
   ProgressLog,
   PackageNotification,
   SystemInfo,
   UserActionLog,
   VolumeData,
-  VpnDevice
+  VpnDevice,
+  InstalledPackageData
 } from "./types";
 
 export interface SubscriptionsTypes {
@@ -40,7 +40,7 @@ export interface SubscriptionsTypes {
    * Installed packages updates
    * @param packages
    */
-  packages: (packages: PackageContainer[]) => void;
+  packages: (packages: InstalledPackageData[]) => void;
 
   /**
    * Installation progress logs

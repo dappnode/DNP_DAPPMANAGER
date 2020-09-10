@@ -1,18 +1,22 @@
 import { bitcoin } from "./bitcoin";
 import { MockDnp } from "./types";
 
+const dnpName = "lightning-network.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const lightningNetwork: MockDnp = {
   dependencies: [bitcoin],
 
-  avatar: "https://i.ibb.co/Twjv2f3/ln.png",
+  avatar: dnpName,
 
   metadata: {
     name: "lightning-network.dnp.dappnode.eth",
     version: "0.0.3",
     upstreamVersion: "0.6.1-beta",
     shortDescription: "Scalable, instant Bitcoin/Blockchain transactions",
-    description:
-      "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.",
+    description: "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.".repeat(
+      10
+    ),
     type: "service",
     backup: [{ name: "data", path: "/root/.lnd/data" }],
     style: {
@@ -96,17 +100,19 @@ export const lightningNetwork: MockDnp = {
   },
 
   userSettings: {
-    portMappings: { "9735": "9735" },
+    portMappings: { [serviceName]: { "9735": "9735" } },
     namedVolumeMountpoints: { lndconfig_data: "" },
     environment: {
-      RTL_PASSWORD: "",
-      RPCUSER: "dappnode",
-      RPCPASS: "dappnode",
-      BITCOIND_HOST: "my.bitcoin.dnp.dappnode.eth",
-      NETWORK: "mainnet",
-      ALIAS: "",
-      COLOR: "#5ACDC5",
-      EXT_IP: ""
+      [serviceName]: {
+        RTL_PASSWORD: "",
+        RPCUSER: "dappnode",
+        RPCPASS: "dappnode",
+        BITCOIND_HOST: "my.bitcoin.dnp.dappnode.eth",
+        NETWORK: "mainnet",
+        ALIAS: "",
+        COLOR: "#5ACDC5",
+        EXT_IP: ""
+      }
     }
   },
 
@@ -149,30 +155,37 @@ Content in the first column | Content in the second column
 
   installedData: {
     version: "0.1.0",
-    state: "running",
-    ports: [
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "TCP"
-      },
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "UDP"
-      }
-    ],
-    volumes: [
-      {
-        name: "lightning-networkpublicdappnodeeth_data",
-        host: "data",
-        container: "./data/ethereum"
-      }
-    ],
+
     userSettings: {
       environment: {
-        ENV_NAME: "ENV_VALUE"
+        [serviceName]: {
+          ENV_NAME: "ENV_VALUE"
+        }
       }
+    }
+  },
+  installedContainers: {
+    [serviceName]: {
+      state: "running",
+      ports: [
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "TCP"
+        },
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "UDP"
+        }
+      ],
+      volumes: [
+        {
+          name: "lightning-networkpublicdappnodeeth_data",
+          host: "data",
+          container: "./data/ethereum"
+        }
+      ]
     }
   }
 };

@@ -1,4 +1,4 @@
-import { dappmanagerName, coreName } from "params";
+import { dappmanagerDnpName, coreDnpName } from "params";
 
 /**
  * Restarting the DAPPMANAGER will cause this error
@@ -28,7 +28,7 @@ export function continueIfCalleDisconnected(
     } catch (e) {
       if (
         isCallDisconnectedError(e) &&
-        (!dnpName || dnpName === dappmanagerName || dnpName === coreName)
+        (!dnpName || dnpName === dappmanagerDnpName || dnpName === coreDnpName)
       )
         return;
       else throw e;

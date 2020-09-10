@@ -10,19 +10,25 @@ describe("lodashExtended", () => {
     const userSettings: UserSettingsAllDnps = {
       [dnpName]: {
         environment: {
-          PAYOUT_ADDRESS: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+          [dnpName]: {
+            PAYOUT_ADDRESS: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+          }
         }
       },
       [depName]: {
+        environment: {
+          [depName]: {
+            BTC_TXINDEX: "2"
+          }
+        },
         portMappings: {
-          "8080": "",
-          "5555/udp": "5800"
+          [depName]: {
+            "8080": "",
+            "5555/udp": "5800"
+          }
         },
         namedVolumeMountpoints: {
           bitcoin_data: ""
-        },
-        environment: {
-          BTC_TXINDEX: "2"
         }
       }
     };
@@ -30,13 +36,17 @@ describe("lodashExtended", () => {
     const additionalUserSettings: UserSettingsAllDnps = {
       [dnpName]: {
         fileUploads: {
-          "/usr/src/app/config.json":
-            "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+          [dnpName]: {
+            "/usr/src/app/config.json":
+              "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+          }
         }
       },
       [depName]: {
         portMappings: {
-          "5555/udp": ""
+          [depName]: {
+            "5555/udp": ""
+          }
         },
         namedVolumeMountpoints: {
           bitcoin_data: "/dev1/custom-path/"

@@ -4,38 +4,30 @@ import { api } from "api";
 import Input from "components/Input";
 import Button from "components/Button";
 // Utils
-import { shortName } from "utils/format";
+import { shortNameCapitalized } from "utils/format";
 import dataUriToBlob from "utils/dataUriToBlob";
 import { saveAs } from "file-saver";
 import { stringSplit } from "utils/strings";
 import { withToast } from "components/toast/Toast";
 
-export default function From({ id, from }: { id: string; from?: string }) {
+export function CopyFileFrom({
+  containerName,
+  fromPathDefault
+}: {
+  containerName: string;
+  fromPathDefault?: string;
+}) {
   const [fromPathInput, setFromPathInput] = useState("");
 
   const downloadFile = useCallback(
     async fromPath => {
       try {
-        /**
-         * [copyFileFrom]
-         * Copy file from a DNP and download it on the client
-         *
-         * @param {string} id DNP .eth name
-         * @param {string} fromPath path to copy file from
-         * - If path = path to a file: "/usr/src/app/config.json".
-         *   Downloads and sends that file
-         * - If path = path to a directory: "/usr/src/app".
-         *   Downloads all directory contents, tar them and send as a .tar.gz
-         * - If path = relative path: "config.json".
-         *   Path becomes $WORKDIR/config.json, then downloads and sends that file
-         *   Same for relative paths to directories.
-         * @returns {string} dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
-         */
+        const name = shortNameCapitalized(containerName);
         const dataUri = await withToast(
-          () => api.copyFileFrom({ id, fromPath }),
+          () => api.copyFileFrom({ containerName, fromPath }),
           {
-            message: `Copying file from ${shortName(id)} ${fromPath}...`,
-            onSuccess: `Copied file from ${shortName(id)} ${fromPath}`
+            message: `Copying file from ${name} ${fromPath}...`,
+            onSuccess: `Copied file from ${name} ${fromPath}`
           }
         );
         if (!dataUri) return;
@@ -45,18 +37,20 @@ export default function From({ id, from }: { id: string; from?: string }) {
 
         saveAs(blob, fileName);
       } catch (e) {
-        console.error(`Error on copyFileFrom ${id} ${fromPath}: ${e.stack}`);
+        console.error(
+          `Error on copyFileFrom ${containerName} ${fromPath}: ${e.stack}`
+        );
       }
     },
-    [id]
+    [containerName]
   );
 
   useEffect(() => {
-    if (from) {
-      setFromPathInput(from);
-      downloadFile(from);
+    if (fromPathDefault) {
+      setFromPathInput(fromPathDefault);
+      downloadFile(fromPathDefault);
     }
-  }, [from, downloadFile]);
+  }, [fromPathDefault, downloadFile]);
 
   return (
     <div className="card-subgroup">

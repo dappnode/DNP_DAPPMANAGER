@@ -1,6 +1,6 @@
 import path from "path";
 import params from "../../params";
-import { dockerComposeUpSafe } from "../docker/dockerSafe";
+import { dockerComposeUp } from "../docker/dockerCommands";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
@@ -15,12 +15,12 @@ export async function runPackages(
   packagesData: InstallPackageData[],
   log: Log
 ): Promise<void> {
-  for (const { name, composePath, fileUploads, ...pkg } of packagesData) {
+  for (const pkg of packagesData) {
     // patch to prevent installer from crashing
-    if (name == params.dappmanagerDnpName) {
-      log(name, "Reseting DAppNode... ");
+    if (pkg.dnpName == params.dappmanagerDnpName) {
+      log(pkg.dnpName, "Reseting DAppNode... ");
       await restartDappmanagerPatch({
-        composePath,
+        composePath: pkg.composePath,
         composeBackupPath: pkg.composeBackupPath,
         restartCommand: pkg.metadata.restartCommand,
         restartLaunchCommand: pkg.metadata.restartLaunchCommand,
@@ -30,21 +30,29 @@ export async function runPackages(
       // either throw, or never resolve because the main process is killed by docker
     } else {
       // Copy fileUploads if any to the container before up-ing
-      if (fileUploads) {
-        log(name, "Copying file uploads...");
-        logs.debug(`${name} fileUploads`, fileUploads);
+      if (pkg.fileUploads) {
+        log(pkg.dnpName, "Copying file uploads...");
+        logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-        await dockerComposeUpSafe(composePath, { noStart: true });
-        for (const [containerPath, dataUri] of Object.entries(fileUploads)) {
-          const { dir: toPath, base: filename } = path.parse(containerPath);
-          await copyFileTo({ id: name, dataUri, filename, toPath });
-        }
+        await dockerComposeUp(pkg.composePath, { noStart: true });
+        for (const [serviceName, serviceFileUploads] of Object.entries(
+          pkg.fileUploads
+        ))
+          for (const [containerPath, dataUri] of Object.entries(
+            serviceFileUploads
+          )) {
+            const { dir: toPath, base: filename } = path.parse(containerPath);
+            const service = pkg.compose.services[serviceName];
+            if (!service) throw Error(`No service for ${serviceName}`);
+            const containerName = service.container_name;
+            await copyFileTo({ containerName, dataUri, filename, toPath });
+          }
       }
 
-      log(name, "Starting package... ");
-      await dockerComposeUpSafe(composePath);
+      log(pkg.dnpName, "Starting package... ");
+      await dockerComposeUp(pkg.composePath);
     }
 
-    log(name, "Package started");
+    log(pkg.dnpName, "Package started");
   }
 }

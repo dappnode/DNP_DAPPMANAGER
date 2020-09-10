@@ -6,21 +6,22 @@ import SubTitle from "components/SubTitle";
 import RenderMarkdown from "components/RenderMarkdown";
 import { MdClose } from "react-icons/md";
 // This
-import Links from "./Links";
-import Vols from "./Vols";
-import StateBadge from "../StateBadge";
+import { Links } from "./Links";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer, Manifest } from "types";
+import { InstalledPackageDetailData, Manifest } from "types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import "./info.scss";
+import { RemovePackage } from "./RemovePackage";
+import { VolumesList } from "./VolumesList";
+import { ContainerList } from "./ContainerList";
 
-export default function Info({
+export function Info({
   dnp,
   manifest,
   gettingStarted,
   gettingStartedShow
 }: {
-  dnp: PackageContainer;
+  dnp: InstalledPackageDetailData;
   manifest?: Manifest;
   gettingStarted?: string;
   gettingStartedShow?: boolean;
@@ -28,7 +29,7 @@ export default function Info({
   const [gettingStartedShowLocal, setGettingStartedIsShown] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { state, origin } = dnp;
+  const { dnpName, origin } = dnp;
   const { version, upstreamVersion, links } = manifest || {};
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function Info({
         setLoading(true);
         setGettingStartedIsShown(false);
         if (gettingStartedShow)
-          await api.packageGettingStartedToggle({ id: dnp.name, show: false });
+          await api.packageGettingStartedToggle({ dnpName, show: false });
       } catch (e) {
         console.error(`Error on packageGettingStartedToggle: ${e.stack}`);
       } finally {
@@ -53,7 +54,7 @@ export default function Info({
 
   return (
     <>
-      {gettingStartedShowLocal && gettingStarted && (
+      {gettingStarted && gettingStartedShowLocal && (
         <>
           <SubTitle
             className={`getting-started-header ${loading ? "loading" : ""}`}
@@ -72,43 +73,47 @@ export default function Info({
         </>
       )}
 
-      <SubTitle>Details</SubTitle>
-      <Card>
-        <div>
-          <strong>Status: </strong>
-          <StateBadge state={state} />
-        </div>
+      <Card spacing divider>
+        <div className="package-info">
+          {/* <ReadMoreMarkdown
+            source={
+              dnp.manifest?.description || dnp.manifest?.shortDescription || ""
+            }
+          /> */}
 
-        <div className="version-info">
-          <strong>Version: </strong>
-          {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
-          {origin ? (
-            <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
-              {origin}
-            </a>
-          ) : null}
-        </div>
-
-        {!gettingStartedShowLocal && (
-          <div>
-            <strong>Getting started: </strong>
-            <span
-              className="a-style"
-              onClick={() => setGettingStartedIsShown(true)}
-            >
-              show
-            </span>
+          <div className="version-info">
+            <strong>Version: </strong>
+            {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
+            {origin ? (
+              <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
+                {origin}
+              </a>
+            ) : null}
           </div>
-        )}
 
-        <div>
-          <Vols dnpName={dnp.name} volumes={dnp.volumes} />
+          {gettingStarted && !gettingStartedShowLocal && (
+            <div>
+              <strong>Getting started: </strong>
+              <span
+                className="a-style"
+                onClick={() => setGettingStartedIsShown(true)}
+              >
+                show
+              </span>
+            </div>
+          )}
+
+          <div>
+            {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
+            <Links links={links || ((manifest as any) || {}).homepage || {}} />
+          </div>
         </div>
 
-        <div>
-          {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
-          <Links links={links || ((manifest as any) || {}).homepage || {}} />
-        </div>
+        <ContainerList dnp={dnp} />
+
+        <VolumesList dnp={dnp} />
+
+        <RemovePackage dnp={dnp} />
       </Card>
     </>
   );

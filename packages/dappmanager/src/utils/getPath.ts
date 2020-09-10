@@ -12,7 +12,6 @@ import params from "../params";
  * - packageRepoDir
  * - manifest
  * - dockerCompose
- * - envFile
  * - image
  *
  * Core DNPs and regular DNPs are located in different folders.
@@ -56,17 +55,11 @@ export function dockerComposeSmart(dnpName: string): string {
   return getDockerComposePath(dnpName, false);
 }
 
+/**
+ * DEPRECATED
+ */
 export function envFile(dnpName: string, isCore: boolean): string {
   return getEnvFilePath(dnpName, isCore);
-}
-
-export function envFileSmart(dnpName: string, isCore: boolean): string {
-  if (isCore) return getEnvFilePath(dnpName, true);
-  // First check for core docker-compose
-  const ENV_FILE_PATH = getEnvFilePath(dnpName, true);
-  if (fs.existsSync(ENV_FILE_PATH)) return ENV_FILE_PATH;
-  // Then check for dnp docker-compose
-  return getEnvFilePath(dnpName, false);
 }
 
 // Helper functions
@@ -78,6 +71,9 @@ function getDockerComposePath(dnpName: string, isCore: boolean): string {
   );
 }
 
+/**
+ * DEPRECATED
+ */
 function getEnvFilePath(dnpName: string, isCore: boolean): string {
   return path.join(getRepoDirPath(dnpName, isCore), `${dnpName}.env`);
 }

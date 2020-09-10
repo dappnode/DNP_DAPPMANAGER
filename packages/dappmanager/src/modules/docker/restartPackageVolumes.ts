@@ -1,15 +1,15 @@
 import fs from "fs";
 import { uniq } from "lodash";
-import { dockerRm } from "./dockerCommands";
-import { dockerComposeUpSafe } from "./dockerSafe";
-import { listContainers } from "./listContainers";
+import { dockerRm, dockerComposeUp } from "./dockerCommands";
+import { listPackages } from "./listContainers";
 import { removeNamedVolume } from "./removeNamedVolume";
 import params from "../../params";
 // Utils
 import * as getPath from "../../utils/getPath";
 import { logs } from "../../logs";
-import { VolumeOwnershipData, PackageContainer } from "../../types";
+import { VolumeOwnershipData } from "../../types";
 import { getVolumesOwnershipData } from "./volumesData";
+import { InstalledPackageData } from "../../common";
 
 /**
  * ```
@@ -36,63 +36,77 @@ type VolumesToRemove = string[];
  * @param {string} id DNP .eth name
  */
 export async function restartPackageVolumes({
-  id,
+  dnpName,
   doNotRestart,
   volumeId
 }: {
-  id: string;
+  dnpName: string;
   doNotRestart?: boolean;
   volumeId?: string;
 }): Promise<{ removedDnps: string[] }> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
 
   // Needs the extended info that includes the volume ownership data
   // Fetching all containers to not re-fetch below
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
   const volumesData = await getVolumesOwnershipData();
-
-  const dnp = dnpList.find(_dnp => _dnp.name === id);
-  if (!dnp) throw Error(`No DNP was found for name ${id}`);
+  const dnp = dnpList.find(d => d.dnpName === dnpName);
+  if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
 
   const { dnpsToRemove, volumesToRemove } = volumeId
-    ? getDnpsToRemoveSingleVol({ id, volumeId, volumesData })
+    ? getDnpsToRemoveSingleVol({ dnpName, volumeId, volumesData })
     : getDnpsToRemoveAll(dnp, volumesData);
-  const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, id);
+  const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, dnpName);
 
-  logs.debug({ id, dnpsToRemoveSorted, volumesToRemove });
+  logs.debug({ dnpName, dnpsToRemoveSorted, volumesToRemove });
 
   // If there are no volumes don't do anything
   if (volumesToRemove.length === 0) return { removedDnps: [] };
 
   // Verify results
   const composePaths: { [dnpName: string]: string } = {};
-  const containerNames: { [dnpName: string]: string } = {};
+  const containerNames: { [dnpName: string]: string[] } = {};
 
   /**
    * Load docker-compose paths and verify results
    * - All docker-compose must exist
    * - No DNP can be the "dappmanager.dnp.dappnode.eth"
    */
-  for (const dnpName of dnpsToRemoveSorted) {
-    if (dnpName.includes(params.dappmanagerDnpName))
+  for (const dnpNameToRemove of dnpsToRemoveSorted) {
+    if (dnpNameToRemove.includes(params.dappmanagerDnpName))
       throw Error("The dappmanager cannot be restarted");
 
-    const dnpToRemove = dnpList.find(_dnp => _dnp.name === dnpName);
+    const dnpToRemove = dnpList.find(_dnp => _dnp.dnpName === dnpNameToRemove);
     if (dnpToRemove) {
-      const { isCore, packageName: containerName } = dnpToRemove;
-      const composePath = getPath.dockerCompose(dnpName, isCore);
+      const composePath = getPath.dockerCompose(
+        dnpToRemove.dnpName,
+        dnpToRemove.isCore
+      );
       if (!fs.existsSync(composePath) && !doNotRestart)
-        throw Error(`No compose found for ${dnpName}: ${composePath}`);
+        throw Error(
+          `No compose found for ${dnpToRemove.dnpName}: ${composePath}`
+        );
 
-      composePaths[dnpName] = composePath;
-      containerNames[dnpName] = containerName;
+      composePaths[dnpToRemove.dnpName] = composePath;
+
+      for (const container of dnpToRemove.containers) {
+        const containerUsesVolumeToRemove = container.volumes.some(volMapping =>
+          volumesToRemove.some(volName => volMapping.name === volName)
+        );
+        if (containerUsesVolumeToRemove)
+          containerNames[dnpToRemove.dnpName] = [
+            ...(containerNames[dnpToRemove.dnpName] || []),
+            container.containerName
+          ];
+      }
     }
   }
 
   let err: Error | null = null;
   try {
     for (const dnpName of dnpsToRemoveSorted)
-      if (containerNames[dnpName]) await dockerRm(containerNames[dnpName]);
+      for (const containerName of containerNames[dnpName] || [])
+        await dockerRm(containerName);
 
     // `if` necessary for the compiler
     for (const volName of volumesToRemove)
@@ -113,8 +127,7 @@ export async function restartPackageVolumes({
     // It is critical up packages in the correct order,
     // so that the named volumes are created before the users are started
     for (const dnpName of dnpsToRemoveSorted)
-      if (composePaths[dnpName])
-        await dockerComposeUpSafe(composePaths[dnpName]);
+      if (composePaths[dnpName]) await dockerComposeUp(composePaths[dnpName]);
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
@@ -127,21 +140,21 @@ export async function restartPackageVolumes({
  * Util: Remove a single package volume => compute list of packages and volumes to remove
  */
 export function getDnpsToRemoveSingleVol({
-  id,
+  dnpName,
   volumeId,
   volumesData
 }: {
-  id: string;
+  dnpName: string;
   volumeId: string;
   volumesData: VolumeOwnershipData[];
 }): {
-  dnpsToRemove: string[];
-  volumesToRemove: string[];
+  dnpsToRemove: DnpsToRemove;
+  volumesToRemove: VolumesToRemove;
 } {
   // Only a single volume
   const volumeData = volumesData.find(v => v.name === volumeId);
   if (!volumeData) throw Error(`Volume ${volumeId} not found`);
-  if (volumeData.owner && volumeData.owner !== id)
+  if (volumeData.owner && volumeData.owner !== dnpName)
     throw Error(
       `Volume ${volumeId} can only be deleted by its owner ${volumeData.owner}`
     );
@@ -155,24 +168,28 @@ export function getDnpsToRemoveSingleVol({
  * Util: Remove all package volumes => compute list of packages and volumes to remove
  */
 export function getDnpsToRemoveAll(
-  dnp: PackageContainer,
+  dnp: InstalledPackageData,
   volumesData: VolumeOwnershipData[]
 ): {
-  dnpsToRemove: string[];
-  volumesToRemove: string[];
+  dnpsToRemove: DnpsToRemove;
+  volumesToRemove: VolumesToRemove;
 } {
   // All volumes
-  const dnpsToRemove: string[] = [];
-  const volumesToRemove: string[] = [];
-  for (const vol of dnp.volumes) {
-    if (vol.name) {
-      const volumeData = volumesData.find(v => v.name === vol.name);
-      if (volumeData && (!volumeData.owner || volumeData.owner === dnp.name)) {
-        for (const user of volumeData.users) dnpsToRemove.push(user);
-        volumesToRemove.push(vol.name);
+  const dnpsToRemove: DnpsToRemove = [];
+  const volumesToRemove: VolumesToRemove = [];
+  for (const container of dnp.containers)
+    for (const vol of container.volumes) {
+      if (vol.name) {
+        const volumeData = volumesData.find(v => v.name === vol.name);
+        if (
+          volumeData &&
+          (!volumeData.owner || volumeData.owner === container.dnpName)
+        ) {
+          for (const user of volumeData.users) dnpsToRemove.push(user);
+          volumesToRemove.push(vol.name);
+        }
       }
     }
-  }
   return {
     dnpsToRemove: uniq(dnpsToRemove),
     volumesToRemove: uniq(volumesToRemove)
@@ -185,7 +202,10 @@ export function getDnpsToRemoveAll(
  * - `id` should ALWAYS go first, with the simplified assumption that it will
  *   be the owner of the volumes, and other DNPs, the users
  */
-export function sortDnpsToRemove(dnpsToRemove: string[], id: string): string[] {
+export function sortDnpsToRemove(
+  dnpsToRemove: DnpsToRemove,
+  id: string
+): DnpsToRemove {
   return dnpsToRemove.sort((a, b) => {
     if (a === id && b !== id) return -1;
     if (a !== id && b === id) return 1;

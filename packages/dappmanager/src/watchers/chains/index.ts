@@ -1,5 +1,5 @@
 import * as eventBus from "../../eventBus";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listPackages } from "../../modules/docker/listContainers";
 import params from "../../params";
 import { ChainData } from "../../types";
 import { knownChains } from "./knownChains";
@@ -30,30 +30,30 @@ const loggedError: { [chainName: string]: string | null } = {};
 
 async function checkChainWatchers(): Promise<void> {
   try {
-    const dnpList = await listContainers();
+    const dnpList = await listPackages();
 
     // Remove chains
     for (const dnpName of Object.keys(activeChains)) {
       // If a chain is being watched but is not in the current dnpList
-      if (!dnpList.find(dnp => dnp.name === dnpName)) {
+      if (!dnpList.find(dnp => dnp.dnpName === dnpName)) {
         delete activeChains[dnpName];
       }
     }
 
     // Add new chains
     for (const dnp of dnpList) {
-      if (!activeChains[dnp.name]) {
+      if (!activeChains[dnp.dnpName]) {
         if (dnp.chain) {
-          const apiUrl = getDriverApi(dnp.chain, dnp.name);
+          const apiUrl = getDriverApi(dnp.chain, dnp.dnpName);
           if (apiUrl)
-            activeChains[dnp.name] = {
-              dnpName: dnp.name,
+            activeChains[dnp.dnpName] = {
+              dnpName: dnp.dnpName,
               driverName: dnp.chain,
               api: apiUrl
             };
         } else {
-          const knownChain = knownChains[dnp.name];
-          if (knownChain) activeChains[dnp.name] = knownChain;
+          const knownChain = knownChains[dnp.dnpName];
+          if (knownChain) activeChains[dnp.dnpName] = knownChain;
         }
       }
     }
@@ -70,12 +70,17 @@ async function checkChainWatchers(): Promise<void> {
  */
 
 async function getAndEmitChainData(): Promise<void> {
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   const chainsToCall: Chain[] = [];
   for (const [dnpName, chain] of Object.entries(activeChains)) {
-    const dnp = dnpList.find(_dnp => _dnp.name === dnpName);
-    if (dnp && dnp.running) chainsToCall.push(chain);
+    const dnp = dnpList.find(_dnp => _dnp.dnpName === dnpName);
+    if (dnp) {
+      const container = dnp.containers[0];
+      if (container && container.running) {
+        chainsToCall.push(chain);
+      }
+    }
   }
 
   const chainData = await Promise.all(
@@ -124,7 +129,7 @@ function parseChainErrors(error: Error): string {
  * Chains watcher.
  * Checks which chains are installed and queries their status (syncing + block height)
  */
-export default function runWatcher() {
+export default function runWatcher(): void {
   checkChainWatchers();
   // Call checkChainWatchers() again in case there was a race condition
   // during the DAppNode installation

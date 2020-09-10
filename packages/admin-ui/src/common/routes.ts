@@ -11,7 +11,6 @@ import {
   SystemInfo,
   VolumeData,
   PortMapping,
-  PackageEnvs,
   PackageNotification,
   PackageBackup,
   EthClientFallback,
@@ -22,7 +21,8 @@ import {
   PackageNotificationDb,
   UserActionLog,
   InstalledPackageData,
-  InstalledPackageDetailData
+  InstalledPackageDetailData,
+  PackageEnvs
 } from "./types";
 
 export interface Routes {
@@ -48,7 +48,7 @@ export interface Routes {
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupGet: (kwargs: {
-    id: string;
+    dnpName: string;
     backup: PackageBackup[];
   }) => Promise<string>;
 
@@ -59,7 +59,7 @@ export interface Routes {
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupRestore: (kwargs: {
-    id: string;
+    dnpName: string;
     backup: PackageBackup[];
     fileId: string;
   }) => Promise<void>;
@@ -77,7 +77,7 @@ export interface Routes {
 
   /**
    * Copy file from a DNP and downloaded on the client
-   * @param id DNP .eth name
+   * @param containerName Name of a docker container
    * @param fromPath path to copy file from
    * - If path = path to a file: "/usr/src/app/config.json".
    *   Downloads and sends that file
@@ -88,11 +88,14 @@ export interface Routes {
    *   Same for relative paths to directories.
    * @returns dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
    */
-  copyFileFrom: (kwargs: { id: string; fromPath: string }) => Promise<string>;
+  copyFileFrom: (kwargs: {
+    containerName: string;
+    fromPath: string;
+  }) => Promise<string>;
 
   /**
    * Copy file to a DNP:
-   * @param id DNP .eth name
+   * @param containerName Name of a docker container
    * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
    * @param filename name of the uploaded file.
    * - MUST NOT be a path: "/app", "app/", "app/file.txt"
@@ -107,7 +110,7 @@ export interface Routes {
    * - If empty, defaults to $WORKDIR
    */
   copyFileTo: (kwargs: {
-    id: string;
+    containerName: string;
     dataUri: string;
     filename: string;
     toPath: string;
@@ -270,7 +273,9 @@ export interface Routes {
   /**
    * Get package detail information
    */
-  packageGet: (kwargs: { id: string }) => Promise<InstalledPackageDetailData>;
+  packageGet: (kwargs: {
+    dnpName: string;
+  }) => Promise<InstalledPackageDetailData>;
 
   /**
    * Returns the list of current containers associated to packages
@@ -282,20 +287,20 @@ export interface Routes {
    * @param show Should be shown on hidden
    */
   packageGettingStartedToggle: (kwargs: {
-    id: string;
+    dnpName: string;
     show: boolean;
   }) => Promise<void>;
 
   /**
    * Returns the logs of the docker container of a package
-   * @param id DNP .eth name
+   * @param containerName Name of a docker container
    * @param options log options
    * - timestamps: Show timestamps
    * - tail: Number of lines to return from bottom: 200
    * @returns String with escape codes
    */
   packageLog: (kwargs: {
-    id: string;
+    containerName: string;
     options?: { timestamps?: boolean; tail?: number };
   }) => Promise<string>;
 
@@ -305,50 +310,51 @@ export interface Routes {
    * @param deleteVolumes flag to also clear permanent package data
    */
   packageRemove: (kwarg: {
-    id: string;
+    dnpName: string;
     deleteVolumes?: boolean;
     timeout?: number;
   }) => Promise<void>;
 
   /**
-   * Calls docker rm and docker up on a package
+   * Recreates a package containers
    */
-  packageRestart: (kwargs: { id: string }) => Promise<void>;
+  packageRestart: (kwargs: {
+    dnpName: string;
+    serviceNames?: string[];
+  }) => Promise<void>;
 
   /**
    * Removes a package volumes. The re-ups the package
    */
   packageRestartVolumes: (kwargs: {
-    id: string;
+    dnpName: string;
     volumeId?: string;
   }) => Promise<void>;
 
   /**
    * Updates the .env file of a package. If requested, also re-ups it
-   * @param id DNP .eth name
-   * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
    */
   packageSetEnvironment: (kwargs: {
-    id: string;
-    envs: PackageEnvs;
+    dnpName: string;
+    environmentByService: { [serviceName: string]: PackageEnvs };
   }) => Promise<void>;
 
   /**
    * Updates a package port mappings
    */
   packageSetPortMappings: (kwargs: {
-    id: string;
-    portMappings: PortMapping[];
+    dnpName: string;
+    portMappingsByService: { [serviceName: string]: PortMapping[] };
     options?: { merge: boolean };
   }) => Promise<void>;
 
   /**
-   * Stops or starts after fetching its status
-   * @param id DNP .eth name
+   * Stops or starts a package containers
    * @param timeout seconds to stop the package
    */
   packageStartStop: (kwargs: {
-    id: string;
+    dnpName: string;
+    serviceNames?: string[];
     options?: { timeout?: number };
   }) => Promise<void>;
 

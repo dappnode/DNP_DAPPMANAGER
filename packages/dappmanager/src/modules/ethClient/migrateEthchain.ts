@@ -12,6 +12,7 @@ import { logs } from "../../logs";
 import { EthClientTargetPackage } from "../../types";
 
 const ethchainDnpName = "ethchain.dnp.dappnode.eth";
+const ethchainContainerName = "DAppNodeCore-ethchain.dnp.dappnode.eth";
 
 const ethchainVolumes = {
   data: "dncore_ethchaindnpdappnodeeth_data",
@@ -40,14 +41,18 @@ interface EthchainEnvs {
  */
 export async function migrateEthchain(): Promise<void> {
   // Get ETHCHAIN's current status
-  const ethchainContainer = await listContainerNoThrow(ethchainDnpName);
+  const ethchainContainer = await listContainerNoThrow({
+    containerName: ethchainContainerName
+  });
   // If ethchain compose does not exist, returns {}
-  const userSettingsCompose = ComposeFileEditor.getUserSettingsIfExist(
+  const userSettings = ComposeFileEditor.getUserSettingsIfExist(
     ethchainDnpName,
     true
   );
-  const userSettings = userSettingsCompose[ethchainDnpName] || {};
-  const envs: EthchainEnvs = userSettings.environment || {};
+  const ethchainServiceName =
+    Object.keys(userSettings.environment || {})[0] || ethchainDnpName;
+  const envs: EthchainEnvs =
+    (userSettings.environment || {})[ethchainServiceName] || {};
 
   const volumes = await dockerVolumesList();
   const isNextOpenEthereum = /parity/i.test(envs.DEFAULT_CLIENT || "");
@@ -94,7 +99,7 @@ export async function migrateEthchain(): Promise<void> {
   // Non-blocking step of uninstalling the DNP_ETHCHAIN
   if (ethchainContainer)
     try {
-      await dockerRm(ethchainContainer.id);
+      await dockerRm(ethchainContainer.containerId);
       logs.info("Removed ETHCHAIN package");
 
       // Clean manifest and docker-compose
@@ -111,8 +116,11 @@ export async function migrateEthchain(): Promise<void> {
   for (const { id, from, to } of volumesToMigrate) {
     try {
       // Remove all packages that are using the volume to safely move it
-      const idsToRemove = await shell(`docker ps -aq --filter volume=${from}`);
-      if (idsToRemove) await shell(`docker rm -f ${idsToRemove}`);
+      const containerIdsUsingVolume = await shell(
+        `docker ps -aq --filter volume=${from}`
+      );
+      if (containerIdsUsingVolume)
+        await shell(`docker rm -f ${containerIdsUsingVolume}`);
       // mv the docker var lib folder in the host context
       await migrateVolume(from, to);
       logs.info(`Migrated ETHCHAIN ${id}`, { from, to });
@@ -146,8 +154,11 @@ export async function migrateEthchain(): Promise<void> {
   for (const { id, name } of volumesToRemove) {
     try {
       // Remove all packages that are using the volume to safely move it
-      const idsToRemove = await shell(`docker ps -aq --filter volume=${name}`);
-      if (idsToRemove) throw Error(`Volume is used by ${idsToRemove}`);
+      const containerIdsUsingVolume = await shell(
+        `docker ps -aq --filter volume=${name}`
+      );
+      if (containerIdsUsingVolume)
+        throw Error(`Volume is used by ${containerIdsUsingVolume}`);
       await dockerVolumeRm(name);
       logs.info(`Removed ETHCHAIN ${id}`);
     } catch (e) {
@@ -167,7 +178,7 @@ export async function migrateEthchain(): Promise<void> {
 
     await changeEthMultiClient(target, false, {
       portMappings: userSettings.portMappings,
-      environment: EXTRA_OPTS ? { EXTRA_OPTS } : undefined
+      environment: { [ethchainServiceName]: EXTRA_OPTS ? { EXTRA_OPTS } : {} }
     });
 
     // Once the client has been successfully changed, delete temp migration settings

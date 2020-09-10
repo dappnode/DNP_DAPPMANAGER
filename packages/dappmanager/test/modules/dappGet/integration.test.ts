@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import { PackageContainer } from "../../../src/types";
+import { InstalledPackageData } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import rewiremock from "rewiremock";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers";
@@ -42,7 +42,7 @@ describe("dappGet integration test", () => {
     describe(`Case: ${caseData.name}`, () => {
       // Prepare dependencies
 
-      const dnpList: PackageContainer[] = Object.keys(caseData.dnps)
+      const dnpList: InstalledPackageData[] = Object.keys(caseData.dnps)
         .filter(dnpName => caseData.dnps[dnpName].installed)
         .map(dnpName => {
           const installedVersion = caseData.dnps[dnpName].installed || "";
@@ -54,7 +54,7 @@ describe("dappGet integration test", () => {
 
           return {
             ...mockDnp,
-            name: dnpName,
+            dnpName: dnpName,
             version: installedVersion,
             origin: undefined,
             dependencies: dnp || {}
@@ -62,7 +62,7 @@ describe("dappGet integration test", () => {
         });
 
       // Autogenerate a listContainers reponse from the caseData object
-      async function listContainers(): Promise<PackageContainer[]> {
+      async function listPackages(): Promise<InstalledPackageData[]> {
         return dnpList;
       }
 
@@ -78,7 +78,7 @@ describe("dappGet integration test", () => {
           () => import("../../../src/modules/dappGet"),
           mock => {
             mock(() => import("../../../src/modules/docker/listContainers"))
-              .with({ listContainers })
+              .with({ listPackages })
               .toBeUsed();
           }
         );
@@ -121,7 +121,7 @@ describe("dappGet integration test", () => {
   }
 });
 
-function expectNotEmpty(obj: any) {
+function expectNotEmpty(obj: any): void {
   expect(isEmpty(obj), "Obj must not be empty: " + JSON.stringify(obj, null, 2))
     .to.be.false;
 }

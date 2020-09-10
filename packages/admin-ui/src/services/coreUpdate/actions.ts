@@ -1,7 +1,7 @@
 import { api } from "api";
 import { coreUpdate } from "./reducer";
 import { AppThunk } from "store";
-import { coreName } from "params";
+import { coreDnpName } from "params";
 import { getUpdatingCore } from "./selectors";
 import { withToast } from "components/toast/Toast";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
@@ -59,7 +59,7 @@ export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
 
     /* eslint-disable-next-line no-console */
     console.log(
-      `DAppNode ${coreName} (${coreUpdateData.versionId})`,
+      `DAppNode ${coreDnpName} (${coreUpdateData.versionId})`,
       coreUpdateData
     );
   } catch (e) {
@@ -86,7 +86,7 @@ export const updateCore = (): AppThunk => async (dispatch, getState) => {
     await withToast(
       () =>
         api.packageInstall({
-          name: coreName,
+          name: coreDnpName,
           version,
           options: { BYPASS_CORE_RESTRICTION: true, BYPASS_RESOLVER: true }
         }),
@@ -100,7 +100,7 @@ export const updateCore = (): AppThunk => async (dispatch, getState) => {
     dispatch(updateUpdatingCore(false));
 
     // Clear progressLogs, + Removes DNP from blacklist
-    dispatch(clearIsInstallingLog({ id: coreName }));
+    dispatch(clearIsInstallingLog({ id: coreDnpName }));
 
     // Call checkCoreUpdate to compute hide the "Update" warning and buttons
     dispatch(fetchCoreUpdateData());

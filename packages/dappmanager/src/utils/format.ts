@@ -8,10 +8,10 @@ export function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function shortName(ens: string): string {
-  if (!ens || typeof ens !== "string") return ens;
-  if (!ens.includes(".")) return ens;
-  return (ens || "").split(".")[0];
+export function shortName(dnpName: string): string {
+  if (!dnpName || typeof dnpName !== "string") return dnpName;
+  if (!dnpName.includes(".")) return dnpName;
+  return (dnpName || "").split(".")[0];
 }
 
 /**
@@ -19,12 +19,12 @@ export function shortName(ens: string): string {
  * "bitcoin.dnp.dappnode.eth" => "Bitcoin"
  * "raiden-testnet.dnp.dappnode.eth" => "Raiden Testnet"
  *
- * @param {string} name ENS name
- * @returns {string} pretty name
+ * @param dnpName ENS name
+ * @returns pretty name
  */
-export function shortNameCapitalized(name: string): string {
-  if (!name || typeof name !== "string") return name;
-  const _name = shortName(name)
+export function shortNameCapitalized(dnpName: string): string {
+  if (!dnpName || typeof dnpName !== "string") return dnpName;
+  const _dnpName = shortName(dnpName)
     // Convert all "-" and "_" to spaces
     .replace(new RegExp("-", "g"), " ")
     .replace(new RegExp("_", "g"), " ")
@@ -32,7 +32,7 @@ export function shortNameCapitalized(name: string): string {
     .map(capitalize)
     .join(" ");
 
-  return _name.charAt(0).toUpperCase() + _name.slice(1);
+  return _dnpName.charAt(0).toUpperCase() + _dnpName.slice(1);
 }
 
 /**
@@ -46,9 +46,9 @@ export function shortNameCapitalized(name: string): string {
  * @param name "goerli-geth.public.dappnode.eth"
  * @returns "goerli-geth-public"
  */
-export function shortNameDomain(name: string): string {
+export function shortNameDomain(dnpName: string): string {
   return (
-    name
+    dnpName
       .replace(".dappnode", "")
       .replace(".eth", "")
       .replace(".dnp", "")

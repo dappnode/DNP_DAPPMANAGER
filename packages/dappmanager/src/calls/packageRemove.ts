@@ -6,7 +6,7 @@ import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
 // Utils
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
-import { listContainer } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/listContainers";
 import { restartPackageVolumes } from "../modules/docker/restartPackageVolumes";
 import { logs } from "../logs";
 
@@ -17,28 +17,28 @@ import { logs } from "../logs";
  * @param {bool} deleteVolumes flag to also clear permanent package data
  */
 export async function packageRemove({
-  id,
+  dnpName,
   deleteVolumes = false,
   timeout = 10
 }: {
-  id: string;
+  dnpName: string;
   deleteVolumes?: boolean;
   timeout?: number;
 }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  const { name, isCore, packageName: containerName } = await listContainer(id);
+  const dnp = await listPackage({ dnpName });
 
-  if (isCore || id === params.dappmanagerDnpName) {
+  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     throw Error("Core packages cannot be cannot be removed");
   }
 
   // Only no-cores will
-  const composePath = getPath.dockerCompose(name, false);
-  const packageRepoDir = getPath.packageRepoDir(id, false);
+  const composePath = getPath.dockerCompose(dnp.dnpName, false);
+  const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
 
   // Necessary for eventBus dependants to know the exact list of deleted DNPs
-  let removedDnps: string[] = [id];
+  let removedDnps: string[] = [dnp.dnpName];
 
   /**
    * [NOTE] Not necessary to close the ports since they will just
@@ -50,7 +50,7 @@ export async function packageRemove({
     // Note: restartPackageVolumes may remove additional DNPs
     removedDnps = (
       await restartPackageVolumes({
-        id,
+        dnpName: dnp.dnpName,
         doNotRestart: true
       })
     ).removedDnps;
@@ -67,10 +67,14 @@ export async function packageRemove({
           timeout
         });
       } catch (e) {
-        logs.error(`Error on dockerComposeDown of ${id}`, e);
-        await dockerRm(containerName, { volumes: deleteVolumes });
+        logs.error(`Error on dockerComposeDown of ${dnp.dnpName}`, e);
+        for (const container of dnp.containers)
+          await dockerRm(container.containerName, { volumes: deleteVolumes });
       }
-    else await dockerRm(containerName, { volumes: deleteVolumes });
+    else {
+      for (const container of dnp.containers)
+        await dockerRm(container.containerName, { volumes: deleteVolumes });
+    }
   }
 
   // Remove DNP folder and files
@@ -78,5 +82,5 @@ export async function packageRemove({
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: removedDnps, removed: true });
+  eventBus.packagesModified.emit({ dnpNames: removedDnps, removed: true });
 }

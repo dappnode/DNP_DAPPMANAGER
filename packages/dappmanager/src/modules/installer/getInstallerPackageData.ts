@@ -1,23 +1,27 @@
 import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath";
 import orderInstallPackages from "./orderInstallPackages";
-import { UserSettingsAllDnps } from "../../types";
+import { UserSettingsAllDnps, UserSettings } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
 
 export function getInstallerPackagesData({
   releases,
   userSettings,
-  currentVersion,
+  currentVersions,
   reqName
 }: {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
-  currentVersion: { [name: string]: string | undefined };
+  currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
-    getInstallerPackageData(release, userSettings, currentVersion[release.name])
+    getInstallerPackageData(
+      release,
+      userSettings[release.dnpName],
+      currentVersions[release.dnpName]
+    )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
 }
@@ -30,28 +34,29 @@ export function getInstallerPackagesData({
  */
 function getInstallerPackageData(
   release: PackageRelease,
-  userSettings: UserSettingsAllDnps,
+  userSettings: UserSettings | undefined,
   currentVersion: string | undefined
 ): InstallPackageData {
-  const { name, semVersion, isCore, imageFile } = release;
+  const { dnpName, semVersion, isCore, imageFile } = release;
 
   // Compute paths
-  const composePath = getPath.dockerCompose(name, isCore);
+  const composePath = getPath.dockerCompose(dnpName, isCore);
   const composeBackupPath = getPath.backupPath(composePath);
-  const manifestPath = getPath.manifest(name, isCore);
+  const manifestPath = getPath.manifest(dnpName, isCore);
   const manifestBackupPath = getPath.backupPath(manifestPath);
   // Prepend the hash to the version to make image files unique
   // Necessary for the image download cache to re-download different
   // images for the same semantic version
   const versionWithHash = `${semVersion}-${imageFile.hash}`;
-  const imagePath = getPath.image(name, versionWithHash, isCore);
+  const imagePath = getPath.image(dnpName, versionWithHash, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
-  const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
+  const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
+  const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
   // Append to compose
   const compose = new ComposeEditor(release.compose);
-  compose.applyUserSettings(deepmerge(prevUserSet, userSettings));
+  compose.applyUserSettings(nextUserSet, { dnpName });
 
   return {
     ...release,
@@ -65,6 +70,6 @@ function getInstallerPackageData(
     // Data to write
     compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: (userSettings[name] || {}).fileUploads
+    fileUploads: userSettings?.fileUploads
   };
 }

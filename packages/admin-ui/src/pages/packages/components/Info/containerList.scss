@@ -1,0 +1,44 @@
+.list-grid.containers {
+  /*
+  Col 1, Fit to the link buttons / switch always
+  Col 2: Shrink the text to an extend, otherwise fill all available space
+  Col 3, 4: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+  grid-template-columns:
+    minmax(1.65rem, min-content)
+    minmax(min-content, auto)
+    minmax(calc(var(--icon-size) / 2), min-content)
+    minmax(calc(var(--icon-size) / 2), min-content);
+
+  grid-gap: calc(var(--grid-spacing) / 2) var(--grid-spacing);
+
+  @media screen and (max-width: 40rem) {
+    grid-template-columns:
+      1.65rem
+      minmax(min-content, auto)
+      minmax(calc(var(--icon-size) / 2), min-content)
+      minmax(calc(var(--icon-size) / 2), min-content);
+
+    .stateBadge {
+      height: 1.65rem;
+      width: 1.65rem;
+      border-radius: 1.65rem;
+      .content {
+        display: none;
+      }
+    }
+  }
+
+  .name {
+    display: flex;
+    font-size: inherit;
+
+    .see-all {
+      flex: 1 1;
+      text-align: right;
+    }
+  }
+}

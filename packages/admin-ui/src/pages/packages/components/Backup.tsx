@@ -17,11 +17,11 @@ import { apiUrls } from "params";
 const baseUrlUpload = apiUrls.upload;
 const baseUrlDownload = apiUrls.download;
 
-export default function Backup({
-  id,
+export function Backup({
+  dnpName,
   backup
 }: {
-  id: string;
+  dnpName: string;
   backup: PackageBackup[];
 }) {
   const [progress, setProgress] = useState<{
@@ -40,9 +40,9 @@ export default function Backup({
     try {
       setError("");
       setProgress({ label: "Preparing backup" });
-      const fileId = await withToast(() => api.backupGet({ id, backup }), {
-        message: `Preparing backup for ${shortName(id)}...`,
-        onSuccess: `Backup for ${shortName(id)} ready`
+      const fileId = await withToast(() => api.backupGet({ dnpName, backup }), {
+        message: `Preparing backup for ${shortName(dnpName)}...`,
+        onSuccess: `Backup for ${shortName(dnpName)} ready`
       });
       setProgress(undefined);
       if (!fileId) throw Error("Error preparing backup");
@@ -79,9 +79,9 @@ export default function Backup({
         return setError(`Wrong response: ${fileId}`);
 
       setProgress({ label: "Restoring backup..." });
-      withToastNoThrow(() => api.backupRestore({ id, backup, fileId }), {
-        message: `Restoring backup for ${shortName(id)}...`,
-        onSuccess: `Restored backup for ${shortName(id)}`
+      withToastNoThrow(() => api.backupRestore({ dnpName, backup, fileId }), {
+        message: `Restoring backup for ${shortName(dnpName)}...`,
+        onSuccess: `Restored backup for ${shortName(dnpName)}`
       }).then(() => {
         setProgress(undefined);
       });

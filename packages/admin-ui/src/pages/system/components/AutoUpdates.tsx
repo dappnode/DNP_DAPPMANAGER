@@ -10,7 +10,7 @@ import { withToast } from "components/toast/Toast";
 // Utils
 import { shortNameCapitalized } from "utils/format";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
-import { coreName, autoUpdateIds } from "params";
+import { coreDnpName, autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
 // External
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
@@ -44,10 +44,10 @@ export default function AutoUpdates() {
     try {
       const actioning = enabled ? "Enabling" : "Disabling";
       const actioned = enabled ? "Enabled" : "Disabled";
-      const name = shortNameCapitalized(id);
+      const dnpName = shortNameCapitalized(id);
       await withToast(() => api.autoUpdateSettingsEdit({ id, enabled }), {
-        message: `${actioning} auto updates for ${name}...`,
-        onSuccess: `${actioned} auto updates for ${name}`
+        message: `${actioning} auto updates for ${dnpName}...`,
+        onSuccess: `${actioned} auto updates for ${dnpName}`
       });
     } catch (e) {
       console.error(`Error on autoUpdateSettingsEdit: ${e.stack}`);
@@ -102,7 +102,7 @@ export default function AutoUpdates() {
                   feedback,
                   isInstalling: Boolean(
                     (progressLogsByDnp || {})[
-                      id === SYSTEM_PACKAGES ? coreName : id
+                      id === SYSTEM_PACKAGES ? coreDnpName : id
                     ]
                   ),
                   isSinglePackage: getIsSinglePackage(id),

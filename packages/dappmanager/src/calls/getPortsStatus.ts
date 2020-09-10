@@ -2,12 +2,6 @@ import * as db from "../db";
 import { PackagePort } from "../types";
 import { UpnpPortMapping } from "../modules/upnpc/types";
 
-interface ReturnData {
-  upnpAvailable: boolean;
-  portsToOpen: PackagePort[];
-  upnpPortMappings: UpnpPortMapping[];
-}
-
 /**
  * Returns the current ports status
  * - portsToOpen is computed from the current installed DNPs, by checking
@@ -29,7 +23,11 @@ interface ReturnData {
  *   ]
  * }
  */
-export async function getPortsStatus(): Promise<ReturnData> {
+export async function getPortsStatus(): Promise<{
+  upnpAvailable: boolean;
+  portsToOpen: PackagePort[];
+  upnpPortMappings: UpnpPortMapping[];
+}> {
   const upnpAvailable: boolean = db.upnpAvailable.get();
   const portsToOpen: PackagePort[] = db.portsToOpen.get();
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get();

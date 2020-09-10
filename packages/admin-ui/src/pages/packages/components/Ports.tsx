@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
-import { PortMapping, PackageContainer } from "types";
+import { PortMapping } from "types";
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
@@ -12,14 +12,43 @@ import { shortNameCapitalized } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./ports.scss";
+import { InstalledPackageData, PackageContainer } from "common";
+import { ServiceSelector } from "./ServiceSelector";
 
 const maxPortNumber = 32768 - 1;
 
-export default function Ports({
-  id,
+export function Ports({ containers }: { containers: PackageContainer[] }) {
+  const serviceNames = containers.map(c => c.serviceName).sort();
+  const [serviceName, setServiceName] = useState(serviceNames[0]);
+  const container = containers.find(c => c.serviceName === serviceName);
+
+  return (
+    <Card spacing className="ports-editor">
+      <ServiceSelector
+        serviceName={serviceName}
+        setServiceName={setServiceName}
+        containers={containers}
+      />
+
+      {container && (
+        <PortsByService
+          key={container.serviceName}
+          dnpName={container.dnpName}
+          serviceName={container.serviceName}
+          ports={container.ports}
+        />
+      )}
+    </Card>
+  );
+}
+
+export function PortsByService({
+  dnpName,
+  serviceName,
   ports: portsFromDnp
 }: {
-  id: string;
+  dnpName: string;
+  serviceName: string;
   ports: PortMapping[];
 }) {
   const [ports, setPorts] = useState<PortMapping[]>(portsFromDnp);
@@ -43,10 +72,14 @@ export default function Ports({
   async function onUpdateEnvsSubmit() {
     setUpdating(true);
     await withToastNoThrow(
-      () => api.packageSetPortMappings({ id, portMappings: ports }),
+      () =>
+        api.packageSetPortMappings({
+          dnpName,
+          portMappingsByService: { [serviceName]: ports }
+        }),
       {
-        message: `Updating ${shortNameCapitalized(id)} port mappings...`,
-        onSuccess: `Updated ${shortNameCapitalized(id)} port mappings`
+        message: `Updating ${shortNameCapitalized(dnpName)} port mappings...`,
+        onSuccess: `Updated ${shortNameCapitalized(dnpName)} port mappings`
       }
     );
     setUpdating(false);
@@ -75,39 +108,42 @@ export default function Ports({
     );
   }
 
-  function getDuplicatedContainerPort() {
+  function getDuplicatedContainerPorts(): PortMapping[] {
     const existingPorts = new Set<string>();
-    for (const { container, protocol } of ports) {
-      if (container) {
-        const key = `${container}-${protocol}`;
-        if (existingPorts.has(key)) return { container, protocol };
+    return ports.filter(port => {
+      if (port.container) {
+        const key = `${port.container}-${port.protocol}`;
+        if (existingPorts.has(key)) return true;
         else existingPorts.add(key);
       }
-    }
-    return null;
+      return false;
+    });
   }
 
-  function getDuplicatedHostPort() {
+  function getDuplicatedHostPorts(): PortMapping[] {
     const existingPorts = new Set<string>();
-    for (const { host, protocol } of ports) {
-      if (host) {
-        const key = `${host}-${protocol}`;
-        if (existingPorts.has(key)) return { host, protocol };
+    return ports.filter(port => {
+      if (port.host) {
+        const key = `${port.host}-${port.protocol}`;
+        if (existingPorts.has(key)) return true;
         else existingPorts.add(key);
       }
-    }
-    return null;
+      return false;
+    });
   }
 
-  function getConflictingPort() {
-    for (const { host, protocol } of ports) {
-      const owner = hostPortMapping[`${host}/${protocol}`];
-      if (owner && owner !== id) return { host, protocol, owner };
+  type ConflictingPort = PortMapping & { owner: string };
+  function getConflictingPorts(): ConflictingPort[] {
+    const conflictingPorts: ConflictingPort[] = [];
+    for (const port of ports) {
+      const owner = hostPortMapping[getHostPortId(port)];
+      if (owner && owner !== dnpName) conflictingPorts.push({ ...port, owner });
     }
+    return conflictingPorts;
   }
 
-  function getPortOverTheMax() {
-    return ports.find(
+  function getPortsOverTheMax(): PortMapping[] {
+    return ports.filter(
       ({ container, deletable }) => deletable && container > maxPortNumber
     );
   }
@@ -116,34 +152,33 @@ export default function Ports({
     ({ container, protocol, deletable }) =>
       deletable && (!container || !protocol)
   );
-  const duplicatedContainerPort = getDuplicatedContainerPort();
-  const duplicatedHostPort = getDuplicatedHostPort();
-  const conflictingPort = getConflictingPort();
-  const portOverTheMax = getPortOverTheMax();
+  const duplicatedContainerPorts = getDuplicatedContainerPorts();
+  const duplicatedHostPorts = getDuplicatedHostPorts();
+  const conflictingPorts = getConflictingPorts();
+  const portsOverTheMax = getPortsOverTheMax();
   const arePortsTheSame = portsToId(portsFromDnp) === portsToId(ports);
 
   // Aggregate error messages as an array of strings
   const errors: string[] = [];
-  if (duplicatedHostPort)
+  for (const duplicatedHostPort of duplicatedHostPorts)
     errors.push(
       `Duplicated mapping for host port ${duplicatedHostPort.host}/${duplicatedHostPort.protocol}. Each host port can only be mapped once.`
     );
 
-  if (duplicatedContainerPort)
+  for (const duplicatedContainerPort of duplicatedContainerPorts)
     errors.push(
       `Duplicated mapping for package port ${duplicatedContainerPort.container}/${duplicatedContainerPort.protocol}. Each package port can only be mapped once.`
     );
 
-  if (conflictingPort)
+  for (const conflictingPort of conflictingPorts) {
+    const portName = `${conflictingPort.host}/${conflictingPort.protocol}`;
+    const ownerName = shortNameCapitalized(conflictingPort.owner);
     errors.push(
-      `Port ${conflictingPort.host}/${
-        conflictingPort.protocol
-      } is already mapped by the DAppNode Package ${shortNameCapitalized(
-        conflictingPort.owner
-      )}`
+      `Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
     );
+  }
 
-  if (portOverTheMax)
+  for (const portOverTheMax of portsOverTheMax)
     errors.push(
       `Port mapping ${portOverTheMax.container}/${portOverTheMax.protocol} is in the ephemeral port range (32768-65535). It must be avoided.`
     );
@@ -151,17 +186,16 @@ export default function Ports({
   // Aggregate conditions to disable the update
   const disableUpdate = Boolean(
     areNewMappingsInvalid ||
-      duplicatedContainerPort ||
-      duplicatedHostPort ||
-      conflictingPort ||
-      portOverTheMax ||
+      duplicatedContainerPorts.length > 0 ||
+      duplicatedHostPorts.length > 0 ||
+      conflictingPorts.length > 0 ||
+      portsOverTheMax.length > 0 ||
       arePortsTheSame ||
       updating
   );
 
-  // "auto auto minmax(min-content, max-content) min-content"
   return (
-    <Card spacing className="ports-editor">
+    <>
       <table>
         <thead>
           <tr>
@@ -256,7 +290,7 @@ export default function Ports({
           <MdAdd />
         </Button>
       </div>
-    </Card>
+    </>
   );
 }
 
@@ -279,11 +313,15 @@ function portsToId(portMappings: PortMapping[]): string {
  * hostPortMappings = { "8080/TCP": "bitcoin.dnp.dappnode.eth" }
  * ```
  */
-function getHostPortMappings(dnps: PackageContainer[]) {
+function getHostPortMappings(dnps: InstalledPackageData[]) {
   const hostPortMappings: { [portId: string]: string } = {};
   for (const dnp of dnps)
-    for (const port of dnp.ports || [])
-      if (port.host)
-        hostPortMappings[`${port.host}/${port.protocol}`] = dnp.name;
+    for (const container of dnp.containers)
+      for (const port of container.ports || [])
+        if (port.host) hostPortMappings[getHostPortId(port)] = dnp.dnpName;
   return hostPortMappings;
+}
+
+function getHostPortId(port: PortMapping): string {
+  return `${port.host}/${port.protocol}`;
 }

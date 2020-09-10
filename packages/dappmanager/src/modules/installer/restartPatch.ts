@@ -101,7 +101,7 @@ exit $UPEXIT
   fs.writeFileSync(restartScriptPath, restartScript);
 
   const dappmCompose = new ComposeEditor(ComposeEditor.readFrom(composePath));
-  const dappmanagerNewImage = dappmCompose.service().get().image;
+  const dappmanagerNewImage = dappmCompose.services()[0].get().image;
 
   const composeRestart = new ComposeEditor({
     version: "3.4",
@@ -163,7 +163,7 @@ export async function postRestartPatch(): Promise<void> {
       logs.info(`No core update packages data found`);
     } else if (restart.State.ExitCode > 0) {
       // Error during update, needs to rollback
-      const dnpNames = packagesData.map(({ name }) => name);
+      const dnpNames = packagesData.map(({ dnpName }) => dnpName);
       flagPackagesAreInstalling(dnpNames);
       rollbackPackages(packagesData, log);
       afterInstall(dnpNames);

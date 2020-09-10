@@ -56,7 +56,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const dispatch = useDispatch();
 
-  const { name, reqVersion, settings, metadata, setupWizard } = dnp;
+  const { dnpName, reqVersion, settings, metadata, setupWizard } = dnp;
   const isCore = metadata.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
@@ -87,7 +87,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         : userSettings;
 
     const kwargs = {
-      name,
+      name: dnpName,
       version: reqVersion,
       // Send only relevant data, ignoring settings that are equal to the current
       userSettings: difference(settings || {}, _userSettings),
@@ -101,10 +101,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
       setIsInstalling(true);
       await withToast(
         // If call errors with "callee disconnected", resolve with success
-        continueIfCalleDisconnected(() => api.packageInstall(kwargs), name),
+        continueIfCalleDisconnected(() => api.packageInstall(kwargs), dnpName),
         {
-          message: `Installing ${shortNameCapitalized(name)}...`,
-          onSuccess: `Installed ${shortNameCapitalized(name)}`
+          message: `Installing ${shortNameCapitalized(dnpName)}...`,
+          onSuccess: `Installed ${shortNameCapitalized(dnpName)}`
         }
       );
       // Re-direct user to package page if installation is successful
@@ -113,14 +113,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
-            history.push(packagesRootPath + "/" + name);
+            history.push(packagesRootPath + "/" + dnpName);
           }
         }, 1000);
       }
     } catch (e) {
       console.error(e);
     } finally {
-      dispatch(clearIsInstallingLog({ id: name }));
+      dispatch(clearIsInstallingLog({ id: dnpName }));
       if (componentIsMounted.current) setIsInstalling(false);
     }
   };
@@ -129,7 +129,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
   const disclaimers: { name: string; message: string }[] = [];
   // Default disclaimer for public DNPs
-  if (!isDnpVerified(dnp.name) || dnp.origin)
+  if (!isDnpVerified(dnpName) || dnp.origin)
     disclaimers.push({
       name: "Unverified package",
       message:
@@ -137,7 +137,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
     });
   if (metadata.disclaimer)
     disclaimers.push({
-      name: shortNameCapitalized(name),
+      name: shortNameCapitalized(dnpName),
       message: metadata.disclaimer.message
     });
 
@@ -271,14 +271,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           <StatusIcon success={true} message="Successfully installed!" />
         </Card>
       ) : isInstalling ? (
-        <ProgressLogsView progressLogs={{ [name]: "Sending request..." }} />
+        <ProgressLogsView progressLogs={{ [dnpName]: "Sending request..." }} />
       ) : null}
 
       {requiresCoreUpdate && (
         <div className="alert alert-danger">
-          <strong>{shortNameCapitalized(name)}</strong> requires a more recent
-          version of DAppNode. <strong>Update your DAppNode</strong> before
-          continuing the installation.
+          <strong>{shortNameCapitalized(dnpName)}</strong> requires a more
+          recent version of DAppNode. <strong>Update your DAppNode</strong>{" "}
+          before continuing the installation.
         </div>
       )}
 

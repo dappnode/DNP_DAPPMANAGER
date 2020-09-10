@@ -1,11 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { pick } from "lodash";
-import {
-  Compose,
-  ComposeService,
-  UserSettingsAllDnps
-} from "../../../src/types";
+import { Compose, ComposeService, UserSettings } from "../../../src/types";
 
 import {
   parseUserSettings,
@@ -88,8 +84,8 @@ describe("parseUserSet", () => {
         }
       },
       volumes: {
-        bitcoinVolumeName: {},
         moredata: {},
+        [bitcoinVolumeName]: {},
         [bitcoinVolumeNameNew]: {
           driver_opts: {
             device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
@@ -102,21 +98,23 @@ describe("parseUserSet", () => {
 
     const userSettings = parseUserSettings(compose);
 
-    const expectedUserSet: UserSettingsAllDnps = {
-      [mockDnpName]: {
-        environment: {
+    const expectedUserSet: UserSettings = {
+      environment: {
+        [mockDnpName]: {
           ORIGINAL: "0",
           USERSET: "1"
-        },
-        namedVolumeMountpoints: {
-          [bitcoinVolumeNameNew]: "/dev0/data",
-          moredata: ""
-        },
-        portMappings: {
+        }
+      },
+      portMappings: {
+        [mockDnpName]: {
           "4001/TCP": "4001",
           "6000/TCP": "32764",
           "9090/TCP": "9090"
         }
+      },
+      namedVolumeMountpoints: {
+        [bitcoinVolumeNameNew]: "/dev0/data",
+        moredata: ""
       }
     };
 
@@ -142,12 +140,12 @@ describe("parseUserSet", () => {
 
     const userSettings = parseUserSettings(compose);
 
-    const expectedUserSet: UserSettingsAllDnps = {
-      [bitcoinName]: {
-        namedVolumeMountpoints: {
-          moredata: ""
-        },
-        legacyBindVolumes: {
+    const expectedUserSet: UserSettings = {
+      namedVolumeMountpoints: {
+        moredata: ""
+      },
+      legacyBindVolumes: {
+        [bitcoinName]: {
           [bitcoinVolumeName]: "/dev1/custom-path"
         }
       }
@@ -159,20 +157,22 @@ describe("parseUserSet", () => {
   it("Should parse correctly for an update with a named volume (bug)", () => {
     const userSettings = parseUserSettings(polkadotCurrentCompose);
 
-    const expectedUserSet: UserSettingsAllDnps = {
-      [polkadotServiceName]: {
-        environment: {
+    const expectedUserSet: UserSettings = {
+      environment: {
+        [polkadotServiceName]: {
           EXTRA_OPTS: "--out-peers 10 --in-peers 10",
           NODE_NAME: "DAppNodeNodler",
           TELEMETRY_ENABLE: "no",
           VALIDATOR_ENABLE: "no"
-        },
-        namedVolumeMountpoints: {
-          polkadot: ""
-        },
-        portMappings: {
+        }
+      },
+      portMappings: {
+        [polkadotServiceName]: {
           "30333/TCP": "30333"
         }
+      },
+      namedVolumeMountpoints: {
+        polkadot: ""
       }
     };
 
@@ -222,24 +222,26 @@ describe("parseUserSet", () => {
       }
     };
 
-    const expectedUserSet: UserSettingsAllDnps = {
-      [serviceName]: {
-        environment: {
+    const expectedUserSet: UserSettings = {
+      environment: {
+        [serviceName]: {
           EXTRA_OPTS: "--warp-barrier 9530000",
           EXTRA_OPTS_GETH: "",
           DEFAULT_CLIENT: "PARITY"
-        },
-        portMappings: {
+        }
+      },
+      portMappings: {
+        [serviceName]: {
           "30303/TCP": "35353",
           "30303/UDP": "35353",
           "30304/UDP": "35354"
-        },
-        namedVolumeMountpoints: {
-          ethchaindnpdappnodeeth_data: "",
-          ethchaindnpdappnodeeth_geth: "",
-          ethchaindnpdappnodeeth_identity: "",
-          ethchaindnpdappnodeeth_ipc: ""
         }
+      },
+      namedVolumeMountpoints: {
+        ethchaindnpdappnodeeth_data: "",
+        ethchaindnpdappnodeeth_geth: "",
+        ethchaindnpdappnodeeth_identity: "",
+        ethchaindnpdappnodeeth_ipc: ""
       }
     };
 
@@ -253,14 +255,12 @@ describe("applyUserSettings", () => {
    * Same function as applyUserSettings but without adding labels
    * To avoid having to add the labels to the test result data
    */
-  function applyUserSettingsTest(
-    compose: Parameters<typeof applyUserSettings>[0],
-    userSettingsService: Parameters<typeof applyUserSettings>[1]
-  ): ReturnType<typeof applyUserSettings> {
-    return applyUserSettings(compose, userSettingsService, {
-      skipLabels: true
-    });
-  }
+  const applyUserSettingsTest: typeof applyUserSettings = (...args) => {
+    const nextCompose = applyUserSettings(...args);
+    for (const serviceName in nextCompose.services)
+      delete nextCompose.services[serviceName].labels;
+    return nextCompose;
+  };
 
   it("Should apply some user settings", () => {
     const bitcoinVolumeName = "bitcoin_data";
@@ -286,25 +286,31 @@ describe("applyUserSettings", () => {
       }
     };
 
-    const userSet: UserSettingsAllDnps = {
-      [mockDnpName]: {
-        environment: {
+    const userSet: UserSettings = {
+      environment: {
+        [mockDnpName]: {
           USERSET: "NEW_VALUE"
-        },
-        portMappings: {
+        }
+      },
+      portMappings: {
+        [mockDnpName]: {
           "4001/TCP": "4111",
           "9090/UDP": ""
-        },
-        namedVolumeMountpoints: {
-          [bitcoinVolumeNameNew]: "/dev0/data"
-        },
-        legacyBindVolumes: {
+        }
+      },
+      namedVolumeMountpoints: {
+        [bitcoinVolumeNameNew]: "/dev0/data"
+      },
+      legacyBindVolumes: {
+        [mockDnpName]: {
           [bitcoinVolumeName]: "/dev2/user-set-path"
         }
       }
     };
 
-    const composeReturn = applyUserSettingsTest(compose, userSet);
+    const composeReturn = applyUserSettingsTest(compose, userSet, {
+      dnpName: mockDnpName
+    });
     const expectedCompose: Compose = {
       ...compose,
       services: {
@@ -344,16 +350,18 @@ describe("applyUserSettings", () => {
       }
     };
 
-    const userSet: UserSettingsAllDnps = {
-      [mockDnpName]: {
-        portMappings: { "3333/UDP": "3330", "4444/UDP": "" }
+    const userSet: UserSettings = {
+      portMappings: {
+        [mockDnpName]: { "3333/UDP": "3330", "4444/UDP": "" }
       }
     };
 
     const expectedServiceParts = {
       ports: ["3330:3333/udp", "4444/udp"]
     };
-    const composeReturn = applyUserSettingsTest(compose, userSet);
+    const composeReturn = applyUserSettingsTest(compose, userSet, {
+      dnpName: mockDnpName
+    });
     const serviceParts = pick(composeReturn.services[mockDnpName], ["ports"]);
 
     expect(serviceParts).to.deep.equal(expectedServiceParts);
@@ -363,7 +371,8 @@ describe("applyUserSettings", () => {
     const userSettings = parseUserSettings(polkadotCurrentCompose);
     const composeReturn = applyUserSettingsTest(
       polkadotNewCompose,
-      userSettings
+      userSettings,
+      { dnpName: mockDnpName }
     );
     expect(composeReturn).to.deep.equal(polkadotCurrentCompose);
   });
@@ -385,10 +394,8 @@ describe("applyUserSettings", () => {
       }
     };
 
-    const userSet: UserSettingsAllDnps = {
-      [mockDnpName]: {
-        allNamedVolumeMountpoint: mountpoint
-      }
+    const userSet: UserSettings = {
+      allNamedVolumeMountpoint: mountpoint
     };
 
     const expectedComposeAfterFirstInstall: Compose = {
@@ -419,16 +426,16 @@ describe("applyUserSettings", () => {
       }
     };
 
-    const expectedUserSettingsOnUpdate: UserSettingsAllDnps = {
-      [mockDnpName]: {
-        namedVolumeMountpoints: {
-          data: mountpoint,
-          identity: mountpoint
-        }
+    const expectedUserSettingsOnUpdate: UserSettings = {
+      namedVolumeMountpoints: {
+        data: mountpoint,
+        identity: mountpoint
       }
     };
 
-    expect(applyUserSettingsTest(originalCompose, userSet)).to.deep.equal(
+    expect(
+      applyUserSettingsTest(originalCompose, userSet, { dnpName: mockDnpName })
+    ).to.deep.equal(
       expectedComposeAfterFirstInstall,
       "allNamedVolumeMountpoint setting should be applied in first install"
     );
@@ -438,7 +445,9 @@ describe("applyUserSettings", () => {
     );
     expect(userSettingsOnUpdate).to.deep.equal(expectedUserSettingsOnUpdate);
     expect(
-      applyUserSettingsTest(originalCompose, userSettingsOnUpdate)
+      applyUserSettingsTest(originalCompose, userSettingsOnUpdate, {
+        dnpName: mockDnpName
+      })
     ).to.deep.equal(
       expectedComposeAfterFirstInstall,
       "After a future update the user settings from allNamedVolumeMountpoint should persist"
@@ -487,9 +496,9 @@ describe("applyUserSettings", () => {
       }
     };
 
-    const expectedUserSettingsOnUpdate: UserSettingsAllDnps = {
-      [dnpName]: {
-        legacyBindVolumes: {
+    const expectedUserSettingsOnUpdate: UserSettings = {
+      legacyBindVolumes: {
+        [dnpName]: {
           bitcoin_data: customBind
         }
       }
@@ -501,7 +510,7 @@ describe("applyUserSettings", () => {
       "Wrong userSettingsOnUpdate"
     );
     expect(
-      applyUserSettingsTest(newCompose, userSettingsOnUpdate)
+      applyUserSettingsTest(newCompose, userSettingsOnUpdate, { dnpName })
     ).to.deep.equal(expectedComposeAfterUpdate, "Wrong composeAfterUpdate");
   });
 });

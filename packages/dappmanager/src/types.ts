@@ -1,6 +1,6 @@
 export * from "./common";
 
-export interface ContainerLabels {
+export interface ContainerLabelsRaw {
   [labelId: string]: string;
 }
 

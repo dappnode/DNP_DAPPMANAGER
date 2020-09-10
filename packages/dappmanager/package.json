@@ -50,6 +50,7 @@
     "cids": "^0.8.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
+    "dargs": "^7.0.0",
     "data-uri-to-buffer": "^2.0.0",
     "deepmerge": "^2.2.1",
     "dockerode": "^2.5.8",

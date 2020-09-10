@@ -1,11 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { getVolumes } from "services/dappnodeStatus/selectors";
-import DataList from "./DataList";
+import { DataList } from "./DataList";
 import { prettyVolumeName, prettyBytes } from "utils/format";
 import { VolumeMapping } from "types";
 
-export default function Vols({
+export function Vols({
   dnpName,
   volumes
 }: {

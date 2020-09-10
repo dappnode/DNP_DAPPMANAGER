@@ -6,7 +6,7 @@ import {
   getDotDappnodeDomain,
   getNsupdateTxts
 } from "../../../src/watchers/nsupdate/utils";
-import { mockDnp } from "../../testUtils";
+import { mockContainer } from "../../testUtils";
 import { PackageContainer } from "../../../src/types";
 
 describe("watcher > nsupdate", () => {
@@ -15,7 +15,9 @@ describe("watcher > nsupdate", () => {
       "bitcoin.dnp.dappnode.eth": "my.bitcoin.dnp.dappnode.eth",
       "artis.public.dappnode.eth": "my.artis.public.dappnode.eth",
       "ln-network.dnp.dappnode.eth": "my.ln-network.dnp.dappnode.eth",
-      "with_under.dnp.dappnode.eth": "my.withunder.dnp.dappnode.eth"
+      "with_under.dnp.dappnode.eth": "my.withunder.dnp.dappnode.eth",
+      "service1.dappnodesdk.dnp.dappnode.eth":
+        "my.service1.dappnodesdk.dnp.dappnode.eth"
     };
 
     for (const [name, domain] of Object.entries(cases)) {
@@ -30,7 +32,8 @@ describe("watcher > nsupdate", () => {
       "bitcoin.dnp.dappnode.eth": "bitcoin.dappnode",
       "artis.public.dappnode.eth": "artis.public.dappnode",
       "ln-network.dnp.dappnode.eth": "ln-network.dappnode",
-      "with_under.dnp.dappnode.eth": "withunder.dappnode"
+      "with_under.dnp.dappnode.eth": "withunder.dappnode",
+      "service1.dappnodesdk.dnp.dappnode.eth": "service1.dappnodesdk.dappnode"
     };
 
     for (const [name, domain] of Object.entries(cases)) {
@@ -76,17 +79,34 @@ send
   describe("getNsupdateTxts", () => {
     const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
     const gethDnpName = "geth.dnp.dappnode.eth";
-    const dnpList: PackageContainer[] = [
+    const pinnerDnpName = "pinner.dnp.dappnode.eth";
+    const pinnerService1 = "cluster";
+    const pinnerService2 = "app";
+    const containers: PackageContainer[] = [
       {
-        ...mockDnp,
-        name: bitcoinDnpName,
+        ...mockContainer,
+        dnpName: bitcoinDnpName,
+        serviceName: bitcoinDnpName,
         ip: "172.33.0.2"
       },
       {
-        ...mockDnp,
-        name: gethDnpName,
+        ...mockContainer,
+        dnpName: gethDnpName,
+        serviceName: gethDnpName,
         ip: "172.33.0.3",
         chain: "ethereum"
+      },
+      {
+        ...mockContainer,
+        dnpName: pinnerDnpName,
+        serviceName: pinnerService1,
+        ip: "172.33.0.4"
+      },
+      {
+        ...mockContainer,
+        dnpName: pinnerDnpName,
+        serviceName: pinnerService2,
+        ip: "172.33.0.5"
       }
     ];
     const domainAliases = {
@@ -94,26 +114,36 @@ send
     };
 
     it("Should get nsupdate.txt contents for a normal case", () => {
-      const nsupdateTxts = getNsupdateTxts({ dnpList, domainAliases });
+      const nsupdateTxts = getNsupdateTxts({ containers, domainAliases });
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
 update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
 update delete my.geth.dnp.dappnode.eth A
-update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3`,
+update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3
+update delete my.cluster.pinner.dnp.dappnode.eth A
+update add my.cluster.pinner.dnp.dappnode.eth 60 A 172.33.0.4
+update delete my.app.pinner.dnp.dappnode.eth A
+update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
+`,
         dappnode: `
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete geth.dappnode A
 update add geth.dappnode 60 A 172.33.0.3
+update delete cluster.pinner.dappnode A
+update add cluster.pinner.dappnode 60 A 172.33.0.4
+update delete app.pinner.dappnode A
+update add app.pinner.dappnode 60 A 172.33.0.5
 update delete fullnode.dappnode A
-update add fullnode.dappnode 60 A 172.33.0.3`
+update add fullnode.dappnode 60 A 172.33.0.3
+`
       });
     });
 
     it("Should get nsupdate.txt contents for remove only", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
         removeOnly: true
       });
@@ -121,36 +151,44 @@ update add fullnode.dappnode 60 A 172.33.0.3`
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update delete my.geth.dnp.dappnode.eth A`,
+update delete my.geth.dnp.dappnode.eth A
+update delete my.cluster.pinner.dnp.dappnode.eth A
+update delete my.app.pinner.dnp.dappnode.eth A
+`,
         dappnode: `
 update delete bitcoin.dappnode A
 update delete geth.dappnode A
-update delete fullnode.dappnode A`
+update delete cluster.pinner.dappnode A
+update delete app.pinner.dappnode A
+update delete fullnode.dappnode A
+`
       });
     });
 
     it("Should get nsupdate.txt contents for installing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
-        ids: [bitcoinDnpName]
+        dnpNames: [bitcoinDnpName]
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2`,
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
+`,
         dappnode: `
 update delete bitcoin.dappnode A
-update add bitcoin.dappnode 60 A 172.33.0.2`
+update add bitcoin.dappnode 60 A 172.33.0.2
+`
       });
     });
 
     it("Should get nsupdate.txt contents for a removing bitcoin", () => {
       const nsupdateTxts = getNsupdateTxts({
-        dnpList,
+        containers,
         domainAliases,
-        ids: [bitcoinDnpName],
+        dnpNames: [bitcoinDnpName],
         removeOnly: true
       });
 

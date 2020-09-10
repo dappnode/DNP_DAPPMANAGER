@@ -4,7 +4,7 @@ import { ComposeFileEditor } from "../compose/editor";
 import * as getPath from "../../utils/getPath";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";
-import { PackageContainer } from "../../types";
+import { InstalledPackageData } from "../../types";
 
 /**
  * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
@@ -12,32 +12,43 @@ import { PackageContainer } from "../../types";
  * compose itself in the `environment` field in array format
  */
 export async function migrateLegacyEnvFiles(
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): Promise<void> {
   try {
-    for (const { name, isCore } of dnpList) migrateLegacyEnvFile(name, isCore);
+    for (const dnp of dnpList) migrateLegacyEnvFile(dnp.dnpName, dnp.isCore);
     logs.info("Finished migrating legacy DNP .env files if any");
   } catch (e) {
     logs.error("Error migrating DNP .env files", e);
   }
 }
 
-export function migrateLegacyEnvFile(name: string, isCore: boolean): boolean {
-  const envFilePath = getPath.envFile(name, isCore);
+export function migrateLegacyEnvFile(
+  dnpName: string,
+  isCore: boolean
+): boolean {
+  const envFilePath = getPath.envFile(dnpName, isCore);
   try {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
     const envsArray = envFileData.trim().split("\n");
 
-    const compose = new ComposeFileEditor(name, isCore);
-    compose.service().mergeEnvs(parseEnvironment(envsArray));
-    compose.service().omitDnpEnvFile();
-    compose.write();
+    const compose = new ComposeFileEditor(dnpName, isCore);
+    const singleService = compose.services()[dnpName];
+    if (singleService) {
+      singleService.mergeEnvs(parseEnvironment(envsArray));
+      singleService.omitDnpEnvFile();
+      compose.write();
 
-    fs.unlinkSync(envFilePath);
-    logs.info(`Converted ${name} .env file to compose environment`);
-    return true;
+      fs.unlinkSync(envFilePath);
+      logs.info(`Converted ${dnpName} .env file to compose environment`);
+      return true;
+    } else {
+      throw Error(
+        `Can not migrate ENVs for multi-service packages: ${dnpName}`
+      );
+    }
   } catch (e) {
-    if (!isNotFoundError(e)) logs.error(`Error migrating ${name} .env file`, e);
+    if (!isNotFoundError(e))
+      logs.error(`Error migrating ${dnpName} .env file`, e);
     return false;
   }
 }

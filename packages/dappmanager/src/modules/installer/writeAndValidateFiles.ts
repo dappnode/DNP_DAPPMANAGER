@@ -20,14 +20,14 @@ export async function writeAndValidateFiles(
 ): Promise<void> {
   for (const packageData of packagesData) {
     const {
-      name,
+      dnpName,
       composePath,
       composeBackupPath,
       metadata,
       manifestPath,
       manifestBackupPath
     } = packageData;
-    log(name, "Writing files...");
+    log(dnpName, "Writing files...");
 
     // Create the repoDir if necessary
     validate.path(composePath);

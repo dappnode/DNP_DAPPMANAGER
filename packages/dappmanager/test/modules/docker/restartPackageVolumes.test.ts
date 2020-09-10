@@ -4,12 +4,17 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
-import { PackageContainer, VolumeOwnershipData } from "../../../src/types";
-import { mockDnp, mockVolume } from "../../testUtils";
+import {
+  PackageContainer,
+  VolumeOwnershipData,
+  InstalledPackageData
+} from "../../../src/types";
+import { mockVolume, mockContainer } from "../../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRestartVolumes as packageRestartVolumesType } from "../../../src/calls/packageRestartVolumes";
 import { sortDnpsToRemove } from "../../../src/modules/docker/restartPackageVolumes";
+import { getContainerName } from "../../../src/params";
 
 describe("Docker action: restartPackageVolumes", function() {
   const dnpNameCore = "testCore.dnp.dappnode.eth";
@@ -25,14 +30,14 @@ describe("Docker action: restartPackageVolumes", function() {
   // docker-compose.yml will be generated for this DNP ids
   const dockerRm = sinon.stub();
   const removeNamedVolume = sinon.stub();
-  const dockerComposeUpSafe = sinon.stub();
+  const dockerComposeUp = sinon.stub();
 
   // Declare stub behaviour. If done chaining methods, sinon returns an erorr:
 
-  const dnpList: PackageContainer[] = [
+  const containers: PackageContainer[] = [
     {
-      ...mockDnp,
-      name: dnpNameCore,
+      ...mockContainer,
+      dnpName: dnpNameCore,
       isCore: true,
       volumes: [
         { ...mockVolume, name: "vol1" },
@@ -40,8 +45,8 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: dappmanagerId,
+      ...mockContainer,
+      dnpName: dappmanagerId,
       isCore: true,
       volumes: [
         {
@@ -51,13 +56,13 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: noVolsDnpName,
+      ...mockContainer,
+      dnpName: noVolsDnpName,
       volumes: []
     },
     {
-      ...mockDnp,
-      name: nginxId,
+      ...mockContainer,
+      dnpName: nginxId,
       volumes: [
         {
           host: "/root/certs",
@@ -85,8 +90,8 @@ describe("Docker action: restartPackageVolumes", function() {
       ]
     },
     {
-      ...mockDnp,
-      name: raidenTestnetId,
+      ...mockContainer,
+      dnpName: raidenTestnetId,
       isCore: false,
       volumes: [
         {
@@ -95,13 +100,18 @@ describe("Docker action: restartPackageVolumes", function() {
         }
       ]
     }
-  ].map(
-    (dnp): PackageContainer => ({
-      // Must add the container name since dockerRm is called with that
-      ...dnp,
-      packageName: dnp.name
-    })
-  );
+  ];
+
+  const dnpList: InstalledPackageData[] = containers.map(container => {
+    container.serviceName = container.dnpName;
+    container.containerName = getContainerName(container);
+    container.containerId = container.containerName;
+    return {
+      ...container,
+      dnpName: container.dnpName,
+      containers: [container]
+    };
+  });
 
   const volumesData: VolumeOwnershipData[] = [
     // Mock core volumes
@@ -154,7 +164,7 @@ describe("Docker action: restartPackageVolumes", function() {
     }
   ];
 
-  async function listContainers(): Promise<PackageContainer[]> {
+  async function listPackages(): Promise<InstalledPackageData[]> {
     return dnpList;
   }
 
@@ -169,13 +179,10 @@ describe("Docker action: restartPackageVolumes", function() {
       () => import("../../../src/calls/packageRestartVolumes"),
       mock => {
         mock(() => import("../../../src/modules/docker/dockerCommands"))
-          .with({ dockerRm })
-          .toBeUsed();
-        mock(() => import("../../../src/modules/docker/dockerSafe"))
-          .with({ dockerComposeUpSafe })
+          .with({ dockerRm, dockerComposeUp })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listContainers })
+          .with({ listPackages })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/volumesData"))
           .with({ getVolumesOwnershipData })
@@ -189,8 +196,8 @@ describe("Docker action: restartPackageVolumes", function() {
   });
 
   before(() => {
-    for (const { name, isCore } of dnpList) {
-      const dockerComposePath = getPath.dockerCompose(name, isCore);
+    for (const dnp of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
       validate.path(dockerComposePath);
       fs.writeFileSync(dockerComposePath, "docker-compose");
     }
@@ -198,12 +205,12 @@ describe("Docker action: restartPackageVolumes", function() {
 
   beforeEach(() => {
     dockerRm.resetHistory();
-    dockerComposeUpSafe.resetHistory();
+    dockerComposeUp.resetHistory();
     removeNamedVolume.resetHistory();
   });
 
   it(`Should remove the package volumes of ${nginxId}`, async () => {
-    await packageRestartVolumes({ id: nginxId });
+    await packageRestartVolumes({ dnpName: nginxId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -229,17 +236,17 @@ describe("Docker action: restartPackageVolumes", function() {
     });
 
     // Assert correct call order docker up
-    sinon.assert.called(dockerComposeUpSafe);
+    sinon.assert.called(dockerComposeUp);
     dnpsInOrder.forEach((volName, i) => {
-      expect(dockerComposeUpSafe.getCall(i).args[0]).to.includes(
+      expect(dockerComposeUp.getCall(i).args[0]).to.includes(
         volName,
-        `Wrong dnpName on dockerComposeUpSafe call #${i}`
+        `Wrong dnpName on dockerComposeUp call #${i}`
       );
     });
   });
 
   it(`Should remove the package volumes of ${dnpNameCore} (core)`, async () => {
-    await packageRestartVolumes({ id: dnpNameCore });
+    await packageRestartVolumes({ dnpName: dnpNameCore });
 
     // sinon.assert.called(dockerRm);
     sinon.assert.called(dockerRm);
@@ -251,14 +258,11 @@ describe("Docker action: restartPackageVolumes", function() {
         `Wrong volume name on removeNamedVolume call #${i}`
       );
     });
-    sinon.assert.called(dockerComposeUpSafe);
+    sinon.assert.called(dockerComposeUp);
   });
 
   it(`Should remove only one of the package volumes of ${dnpNameCore} (core)`, async () => {
-    await packageRestartVolumes({
-      id: dnpNameCore,
-      volumeId: "vol1"
-    });
+    await packageRestartVolumes({ dnpName: dnpNameCore, volumeId: "vol1" });
 
     // sinon.assert.called(docker.compose.rm);
     sinon.assert.callCount(dockerRm, 1);
@@ -270,11 +274,11 @@ describe("Docker action: restartPackageVolumes", function() {
         `Wrong volume name on docker.volume.rm call #${i}`
       );
     });
-    sinon.assert.called(dockerComposeUpSafe);
+    sinon.assert.called(dockerComposeUp);
   });
 
   it(`Should remove the package volumes of ${raidenTestnetId}`, async () => {
-    await packageRestartVolumes({ id: raidenTestnetId });
+    await packageRestartVolumes({ dnpName: raidenTestnetId });
 
     // Assert correct call order docker rm
     sinon.assert.called(dockerRm);
@@ -296,11 +300,11 @@ describe("Docker action: restartPackageVolumes", function() {
     });
 
     // Assert correct call order docker up
-    sinon.assert.called(dockerComposeUpSafe);
+    sinon.assert.called(dockerComposeUp);
     dnpsInOrder.forEach((volName, i) => {
-      expect(dockerComposeUpSafe.getCall(i).args[0]).to.includes(
+      expect(dockerComposeUp.getCall(i).args[0]).to.includes(
         volName,
-        `Wrong dnpName on dockerComposeUpSafe call #${i}`
+        `Wrong dnpName on dockerComposeUp call #${i}`
       );
     });
   });
@@ -308,7 +312,7 @@ describe("Docker action: restartPackageVolumes", function() {
   it("Should NOT allow id = dappmanager.dnp.dappnode.eth", async () => {
     let err = "did not throw";
     try {
-      await packageRestartVolumes({ id: "dappmanager.dnp.dappnode.eth" });
+      await packageRestartVolumes({ dnpName: "dappmanager.dnp.dappnode.eth" });
     } catch (e) {
       err = e.message;
     }
@@ -316,12 +320,12 @@ describe("Docker action: restartPackageVolumes", function() {
   });
 
   it("Should early return if the DNP has no volumes", async () => {
-    await packageRestartVolumes({ id: noVolsDnpName });
+    await packageRestartVolumes({ dnpName: noVolsDnpName });
   });
 
   after(() => {
-    for (const { name, isCore } of dnpList) {
-      const dockerComposePath = getPath.dockerCompose(name, isCore);
+    for (const dnp of dnpList) {
+      const dockerComposePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
       fs.unlinkSync(dockerComposePath);
     }
   });
@@ -329,12 +333,12 @@ describe("Docker action: restartPackageVolumes", function() {
 
 describe("sortDnpsToRemove", () => {
   it("Should sort packages to remove", () => {
-    const id = "main.dnp.dappnode.eth";
-    const idDep = "dependency.dnp.dappnode.eth";
-    const dnpsToRemove = [id, idDep];
-    const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, idDep);
+    const dnpNameMain = "main.dnp.dappnode.eth";
+    const dnpNameDep = "dependency.dnp.dappnode.eth";
+    const dnpsToRemove = [dnpNameMain, dnpNameDep];
+    const dnpsToRemoveSorted = sortDnpsToRemove(dnpsToRemove, dnpNameDep);
 
-    const expectedDnpsToRemoveSorted = [idDep, id];
+    const expectedDnpsToRemoveSorted = [dnpNameDep, dnpNameMain];
 
     expect(dnpsToRemoveSorted).to.deep.equal(expectedDnpsToRemoveSorted);
   });

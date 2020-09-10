@@ -1,0 +1,22 @@
+.list-grid.container-volumes {
+  grid-template-columns:
+    minmax(min-content, auto)
+    minmax(min-content, max-content)
+    minmax(calc(var(--icon-size) / 2), min-content);
+
+  grid-gap: calc(var(--grid-spacing) / 2) var(--grid-spacing);
+
+  .name {
+    display: flex;
+    font-size: inherit;
+
+    .see-all {
+      flex: 1 1;
+      text-align: right;
+    }
+  }
+
+  .trash-icon {
+    font-size: 0.8rem;
+  }
+}

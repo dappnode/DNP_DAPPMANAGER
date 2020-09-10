@@ -5,6 +5,7 @@ import verifyXz from "../../utils/verifyXz";
 import downloadImage from "./ipfs/downloadImage";
 import { DistributedFile } from "../../types";
 import { dockerImageManifest } from "../docker/dockerCommands";
+import { getImageTag } from "../../params";
 
 export default async function getImage(
   imageFile: DistributedFile,
@@ -65,19 +66,23 @@ export async function validateTarImage(path: string): Promise<void> {
  */
 export async function verifyDockerImage({
   imagePath,
-  name,
+  dnpName,
   version
 }: {
   imagePath: string;
-  name: string;
+  dnpName: string;
   version: string;
 }): Promise<void> {
+  const expectedTagSuffix = getImageTag({
+    dnpName,
+    serviceName: dnpName,
+    version
+  });
   const images = await dockerImageManifest(imagePath);
-  if (images.length !== 1)
-    throw Error("image tarball must contain strictly one image");
-  const imageTag = images[0].RepoTags[0];
-  const expectedTag = `${name}:${version}`;
-  if (imageTag !== expectedTag) {
-    throw Error(`Wrong image tag ${imageTag}`);
+  for (const image of images) {
+    for (const repoTag of image.RepoTags) {
+      if (!repoTag.endsWith(expectedTagSuffix))
+        throw Error(`Invalid image tag '${repoTag}' for ${dnpName} ${version}`);
+    }
   }
 }

@@ -1,62 +1,115 @@
 import semver from "semver";
-import { DockerOptionsInterface } from "../../types";
+import dargs from "dargs";
 import shell from "../../utils/shell";
 import { imagesList, imageRemove } from "./dockerApi";
 
-/* eslint-disable no-useless-escape */
-export interface DockerComposeUpOptions {
-  noStart?: boolean;
+type Args = string[];
+type Kwargs = { [flag: string]: string | number | boolean | undefined };
+
+function parseArgs(args: Args, kwargs?: Kwargs): string[] {
+  const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
+  return [
+    ...args,
+    ...dargs(definedKwargs, { useEquals: false, ignoreFalse: true })
+  ];
+}
+
+async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
+  return shell(["docker", ...parseArgs(args, kwargs)]);
+}
+
+async function execDockerCompose(
+  dcPath: string,
+  args: Args,
+  kwargs?: Kwargs
+): Promise<string> {
+  return shell(["docker-compose", "-f", dcPath, ...parseArgs(args, kwargs)]);
 }
 
 export function dockerComposeUp(
   dcPath: string,
-  options?: DockerComposeUpOptions
+  options?: {
+    noStart?: boolean;
+    forceRecreate?: boolean;
+    serviceNames?: string[];
+  }
 ): Promise<string> {
-  const flags = options && options.noStart ? "--no-start" : "-d";
+  const flags: string[] = [];
+  if (options?.noStart) flags.push("--no-start");
+  else flags.push("--detach");
+  if (options?.forceRecreate) flags.push("--force-recreate");
+  if (options?.serviceNames)
+    for (const serviceName of options.serviceNames) flags.push(serviceName);
   // Adding <&- to prevent interactive mode
-  return shell(`docker-compose -f ${dcPath} up ${flags} <&-`);
+  return execDockerCompose(dcPath, ["up", ...flags, "<&-"]);
 }
 
+/**
+ * --volumes           Remove named volumes declared in the `volumes`s.
+ * --timeout TIMEOUT   Specify a shutdown timeout in seconds.
+ */
 export function dockerComposeDown(
   dcPath: string,
-  options?: { volumes?: boolean; timeout?: number }
+  { volumes, timeout }: { volumes?: boolean; timeout?: number } = {}
 ): Promise<string> {
-  return shell(withOptions(`docker-compose -f ${dcPath} down`, options || {}));
+  return execDockerCompose(dcPath, ["down"], { volumes, timeout });
 }
 
+/**
+ * Removes all containers from a compose project
+ * -f: Don't ask to confirm removal
+ * -s: Stop the containers, if required, before removing
+ * @param dcPath
+ */
 export function dockerComposeRm(dcPath: string): Promise<string> {
-  return shell(`docker-compose -f ${dcPath} rm -sf`);
+  return execDockerCompose(dcPath, ["rm", "-sf"]);
 }
 
 export function dockerComposeStart(dcPath: string): Promise<string> {
-  return shell(withOptions(`docker-compose -f ${dcPath} start`, {}));
+  return execDockerCompose(dcPath, ["start"]);
 }
 
+/**
+ * --timeout TIMEOUT   Specify a shutdown timeout in seconds.
+ */
 export function dockerComposeStop(
   dcPath: string,
-  options?: { timeout?: number }
+  { timeout }: { timeout?: number } = {}
 ): Promise<string> {
-  return shell(withOptions(`docker-compose -f ${dcPath} stop`, options || {}));
+  return execDockerCompose(dcPath, ["stop"], { timeout });
 }
 
 export function dockerComposeConfig(dcPath: string): Promise<string> {
-  return shell(`docker-compose -f ${dcPath} config`);
+  return execDockerCompose(dcPath, ["config"]);
 }
 
 export function dockerVolumeRm(volumeName: string): Promise<string> {
-  return shell(`docker volume rm -f ${volumeName}`);
+  return execDocker(["volume", "rm", volumeName], { f: true });
+}
+
+export function dockerStart(containerNames: string[]): Promise<string> {
+  return execDocker(["start", ...containerNames]);
+}
+
+export function dockerStop(
+  containerNames: string[],
+  { time }: { time?: number } = {}
+): Promise<string> {
+  return execDocker(["stop", ...containerNames], { time });
 }
 
 export function dockerRm(
-  containerNameOrId: string,
-  options?: { volumes?: boolean }
+  containerName: string,
+  { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  const flags = (options || {}).volumes ? "--volumes" : "";
-  return shell(`docker rm -f ${flags} ${containerNameOrId}`);
+  return execDocker(["rm", containerName], { force: true, volumes });
 }
 
+/**
+ * --input , -i		Read from tar archive file, instead of STDIN
+ */
 export function dockerLoad(imagePath: string): Promise<string> {
-  return shell(`docker load -i ${imagePath}`);
+  return execDocker(["load"], { input: imagePath });
 }
 
 interface ImageManifest {
@@ -76,21 +129,26 @@ export function dockerImageManifest(
  * Untagged: package.dnp.dappnode.eth:0.1.6
  */
 export async function dockerCleanOldImages(
-  name: string,
+  dnpName: string,
   version: string
 ): Promise<void> {
-  const repoImages = await imagesList({ filters: { reference: [name] } });
+  // Filtering by `reference` requires the repo name to be exact
+  // This prevents catching all images of a multi-service package
+  const repoImages = await imagesList();
   const imagesToDelete = repoImages.filter(image =>
     image.RepoTags.every(tag => {
       const [imageName, imageVersion] = tag.split(":");
       return (
-        imageName === name &&
+        (imageName === dnpName ||
+          // Get multi-service images, but not mix `goerli-geth` with `goerli` for example
+          imageName.endsWith("." + dnpName)) &&
         semver.valid(imageVersion) &&
         semver.valid(version) &&
         semver.lt(imageVersion, version)
       );
     })
   );
+
   for (const image of imagesToDelete) {
     await imageRemove(image.Id);
   }
@@ -116,33 +174,4 @@ export function dockerCopyFileFrom(
 
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
-}
-
-/**
- * Wrapper for parseOptions. Will only extend the command string if necessary
- * @param {string} command
- * @param {object} options
- */
-function withOptions(command: string, options: DockerOptionsInterface): string {
-  return [command, parseOptions(options)].filter(x => x).join(" ");
-}
-
-function parseOptions({
-  timeout,
-  timestamps,
-  volumes,
-  v,
-  core
-}: DockerOptionsInterface): string {
-  const options = [];
-
-  // --timeout TIMEOUT      Specify a shutdown timeout in seconds (default: 10).
-  if (!isNaN(Number(timeout))) options.push(`--timeout ${timeout}`);
-  // -t, --timestamps    Show timestamps
-  if (timestamps) options.push(`--timestamps`);
-  if (volumes) options.push(`--volumes`);
-  if (v) options.push(`-v`);
-  if (core) options.push(`${core}`);
-
-  return options.join(" ");
 }

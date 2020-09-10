@@ -19,20 +19,22 @@ export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
 // DNP names
-export const wifiName = "wifi.dnp.dappnode.eth";
-export const ipfsName = "ipfs.dnp.dappnode.eth";
-export const coreName = "core.dnp.dappnode.eth";
-export const bindName = "bind.dnp.dappnode.eth";
-export const vpnName = "vpn.dnp.dappnode.eth";
-export const dappmanagerName = "dappmanager.dnp.dappnode.eth";
+export const wifiDnpName = "wifi.dnp.dappnode.eth";
+export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
+export const coreDnpName = "core.dnp.dappnode.eth";
+export const bindDnpName = "bind.dnp.dappnode.eth";
+export const vpnDnpName = "vpn.dnp.dappnode.eth";
+export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
-  dappmanagerName,
-  vpnName,
-  ipfsName,
-  bindName,
-  wifiName
+  dappmanagerDnpName,
+  vpnDnpName,
+  ipfsDnpName,
+  bindDnpName,
+  wifiDnpName
 ];
-export const corePackages = [...mandatoryCoreDnps, coreName];
+export const corePackages = [...mandatoryCoreDnps, coreDnpName];
+// Container names
+export const wifiContainerName = "DAppNodeCore-wifi.dnp.dappnode.eth";
 
 // NACL keys
 export const adminNaclSecretKey =

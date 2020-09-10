@@ -1,8 +1,11 @@
 import { MockDnp } from "./types";
 
+const dnpName = "open-ethereum.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const openEthereum: MockDnp = {
   metadata: {
-    name: "open-ethereum.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.2.6",
     description:
       "Dappnode package responsible for providing the Ethereum blockchain, based on Parity v2.5.8-stable",
@@ -23,31 +26,35 @@ export const openEthereum: MockDnp = {
 
   installedData: {
     version: "0.2.6",
-    state: "running",
-    ports: [
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "TCP"
-      },
-      {
-        host: 30303,
-        container: 30303,
-        protocol: "UDP"
-      }
-    ],
-    volumes: [
-      {
-        host: "/var/lib/docker/volumes/paritydnpdappnodeeth_data/_data",
-        container: "/app/.parity",
-        name: "paritydnpdappnodeeth_data"
-      },
-      {
-        host: "/var/lib/docker/volumes/paritydnpdappnodeeth_geth/_data",
-        container: "/root/.ethereum/",
-        name: "paritydnpdappnodeeth_geth"
-      }
-    ],
+
     canBeFullnode: true
+  },
+  installedContainers: {
+    [serviceName]: {
+      ports: [
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "TCP"
+        },
+        {
+          host: 30303,
+          container: 30303,
+          protocol: "UDP"
+        }
+      ],
+      volumes: [
+        {
+          host: "/var/lib/docker/volumes/paritydnpdappnodeeth_data/_data",
+          container: "/app/.parity",
+          name: "paritydnpdappnodeeth_data"
+        },
+        {
+          host: "/var/lib/docker/volumes/paritydnpdappnodeeth_geth/_data",
+          container: "/root/.ethereum/",
+          name: "paritydnpdappnodeeth_geth"
+        }
+      ]
+    }
   }
 };

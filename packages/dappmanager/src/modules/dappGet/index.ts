@@ -1,4 +1,4 @@
-import { listContainers } from "../docker/listContainers";
+import { listPackages } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import dappGetBasic from "./basic";
@@ -67,7 +67,7 @@ export default async function dappGet(
    */
   if (options && options.BYPASS_RESOLVER) return await dappGetBasic(req);
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   // Aggregate
   let dnps: DappGetDnps;
@@ -80,9 +80,7 @@ export default async function dappGet(
     });
   } catch (e) {
     logs.debug("dappGet/aggregate error", e);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on aggregate stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on aggregate stage: ${e.message}`;
     throw e;
   }
 
@@ -92,9 +90,7 @@ export default async function dappGet(
     result = resolve(dnps);
   } catch (e) {
     logs.debug("dappGet/resolve error", e);
-    e.message = `dappGet could not resolve request ${req.name}@${
-      req.ver
-    }, error on resolve stage: ${e.message}`;
+    e.message = `dappGet could not resolve request ${req.name}@${req.ver}, error on resolve stage: ${e.message}`;
     throw e;
   }
 
@@ -104,18 +100,18 @@ export default async function dappGet(
 
   // Otherwise, format the output
   const alreadyUpdated: DappGetState = {};
-  const currentVersion: DappGetState = {};
+  const currentVersions: DappGetState = {};
   for (const dnp of dnpList) {
     const prevVersion = dnp.version;
-    const nextVersion = state[dnp.name];
+    const nextVersion = state[dnp.dnpName];
     if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
       // DNP is already updated.
       // Remove from the success object and add it to the alreadyUpdatedd
-      alreadyUpdated[dnp.name] = state[dnp.name];
-      delete state[dnp.name];
+      alreadyUpdated[dnp.dnpName] = state[dnp.dnpName];
+      delete state[dnp.dnpName];
     }
-    if (nextVersion && currentVersion) {
-      currentVersion[dnp.name] = prevVersion;
+    if (nextVersion) {
+      currentVersions[dnp.dnpName] = prevVersion;
     }
   }
 
@@ -123,6 +119,6 @@ export default async function dappGet(
     message,
     state,
     alreadyUpdated,
-    currentVersion
+    currentVersions
   };
 }

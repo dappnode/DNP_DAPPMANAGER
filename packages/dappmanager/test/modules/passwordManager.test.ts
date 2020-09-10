@@ -4,7 +4,7 @@ import rewiremock from "rewiremock";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function getPasswordManager(
-  shellMock: (cmd: string) => Promise<string>,
+  shellMock: (cmd: string | string[]) => Promise<string>,
   image: string
 ) {
   return rewiremock.around(
@@ -27,7 +27,7 @@ describe("Module > passwordManager", () => {
 
   it("Should check if the password is secure", async () => {
     const { isPasswordSecure } = await getPasswordManager(
-      async (cmd: string) => {
+      async (cmd: string | string[]) => {
         if (cmd == grepCommand) return passwordHash;
         throw Error(`Unknown command ${cmd}`);
       },
@@ -40,12 +40,15 @@ describe("Module > passwordManager", () => {
 
   it("Should change the password", async () => {
     let lastCmd;
-    const { changePassword } = await getPasswordManager(async (cmd: string) => {
-      lastCmd = cmd;
-      if (cmd == grepCommand) return passwordHash;
-      if (cmd.includes("chpasswd")) return "";
-      throw Error(`Unknown command ${cmd}`);
-    }, image);
+    const { changePassword } = await getPasswordManager(
+      async (cmd: string | string[]) => {
+        lastCmd = cmd;
+        if (cmd == grepCommand) return passwordHash;
+        if (cmd.includes("chpasswd")) return "";
+        throw Error(`Unknown command ${cmd}`);
+      },
+      image
+    );
 
     const newPassword = "secret-password";
     await changePassword(newPassword);
@@ -55,10 +58,13 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password when it's secure", async () => {
-    const { changePassword } = await getPasswordManager(async (cmd: string) => {
-      if (cmd == grepCommand) return "";
-      throw Error(`Unknown command ${cmd}`);
-    }, image);
+    const { changePassword } = await getPasswordManager(
+      async (cmd: string | string[]) => {
+        if (cmd == grepCommand) return "";
+        throw Error(`Unknown command ${cmd}`);
+      },
+      image
+    );
 
     let errorMessage = "---did not throw---";
     try {
@@ -73,10 +79,13 @@ describe("Module > passwordManager", () => {
   });
 
   it("Should block changing the password if the input contains problematic characters", async () => {
-    const { changePassword } = await getPasswordManager(async (cmd: string) => {
-      if (cmd == grepCommand) return passwordHash;
-      throw Error(`Unknown command ${cmd}`);
-    }, image);
+    const { changePassword } = await getPasswordManager(
+      async (cmd: string | string[]) => {
+        if (cmd == grepCommand) return passwordHash;
+        throw Error(`Unknown command ${cmd}`);
+      },
+      image
+    );
 
     let errorMessage = "---did not throw---";
     try {

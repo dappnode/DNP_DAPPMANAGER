@@ -6,15 +6,15 @@ import * as eventBus from "../eventBus";
  * @param show Should be shown on hidden
  */
 export async function packageGettingStartedToggle({
-  id,
+  dnpName,
   show
 }: {
-  id: string;
+  dnpName: string;
   show: boolean;
 }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  db.packageGettingStartedShow.set(id, show);
+  db.packageGettingStartedShow.set(dnpName, show);
 
   // Emit packages update
   eventBus.requestPackages.emit();

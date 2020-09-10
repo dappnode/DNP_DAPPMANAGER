@@ -1,5 +1,6 @@
 import { VolumeData } from "../../src/types";
 import { pause } from "../utils";
+import { dnpInstalled } from "../data";
 import * as eventBus from "../eventBus";
 
 let volumes: VolumeData[] = [
@@ -55,6 +56,24 @@ let volumes: VolumeData[] = [
     isOrphan: false
   }
 ];
+
+for (const dnp of dnpInstalled) {
+  for (const container of dnp.containers) {
+    for (const vol of container.volumes) {
+      if (vol.name && !volumes.find(v => v.name === vol.name)) {
+        volumes.push({
+          name: vol.name,
+          owner: dnp.dnpName,
+          users: [dnp.dnpName],
+          size: 71570000000 * Math.random(),
+          createdAt: 1569146006000 + 100000000 * Math.random(),
+          mountpoint: "",
+          isOrphan: false
+        });
+      }
+    }
+  }
+}
 
 /**
  * Removes a docker volume by name

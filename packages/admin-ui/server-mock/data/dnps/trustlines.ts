@@ -1,10 +1,13 @@
 import { MockDnp } from "./types";
 
+const dnpName = "trustlines.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const trustlines: MockDnp = {
   avatar: "https://i.ibb.co/vLBbdGZ/avatar-min.png",
 
   metadata: {
-    name: "trustlines.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.0.1",
     upstreamVersion: "release4044",
     shortDescription: "Financial inclusion through OS decentralized systems",
@@ -52,8 +55,12 @@ export const trustlines: MockDnp = {
     }
   ],
   userSettings: {
-    environment: { ROLE: "observer", ADDRESS: "", PASSWORD: "" },
-    portMappings: { "30300": "", "30300/udp": "" },
+    environment: {
+      [serviceName]: { ROLE: "observer", ADDRESS: "", PASSWORD: "" }
+    },
+    portMappings: {
+      [serviceName]: { "30300": "", "30300/udp": "" }
+    },
     namedVolumeMountpoints: { data: "", config: "" }
   },
 
@@ -111,7 +118,11 @@ export const trustlines: MockDnp = {
   },
 
   installedData: {
-    version: "",
-    state: "exited"
+    version: ""
+  },
+  installedContainers: {
+    [serviceName]: {
+      state: "exited"
+    }
   }
 };

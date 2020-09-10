@@ -28,20 +28,22 @@ describe("listContainers", function() {
   });
 
   it("should parse an entire listContainers", async () => {
-    const dnpList = await listContainers();
-    // console.log(JSON.stringify(dnpList, null, 2));
+    const containers = await listContainers();
+    // console.log(JSON.stringify(containers, null, 2));
 
-    const expectedDnpList: PackageContainer[] = [
+    const expectedContainers: PackageContainer[] = [
       {
-        id: "5407d28e2cca82b4e83351b2f55d07469703223e2296934f5034a8922e99d76d",
-        packageName: "DAppNodePackage-otpweb.dnp.dappnode.eth",
+        containerId:
+          "5407d28e2cca82b4e83351b2f55d07469703223e2296934f5034a8922e99d76d",
+        containerName: "DAppNodePackage-otpweb.dnp.dappnode.eth",
+        serviceName: "otpweb.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "otpweb.dnp.dappnode.eth",
         version: "0.0.3",
         isDnp: true,
         isCore: false,
         created: 1560420780,
         image: "otpweb.dnp.dappnode.eth:0.0.3",
-        name: "otpweb.dnp.dappnode.eth",
-        shortName: "otpweb",
         ip: "172.33.0.9",
         ports: [
           {
@@ -61,15 +63,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "8a382e9a3b8ac449388470d06b98486b4fc965980fc5b72fd1c1cc77ae070484",
-        packageName: "DAppNodePackage-nginx-proxy.dnp.dappnode.eth",
+        containerId:
+          "8a382e9a3b8ac449388470d06b98486b4fc965980fc5b72fd1c1cc77ae070484",
+        containerName: "DAppNodePackage-nginx-proxy.dnp.dappnode.eth",
+        serviceName: "nginx-proxy.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "nginx-proxy.dnp.dappnode.eth",
         version: "0.0.3",
         isDnp: true,
         isCore: false,
         created: 1560420777,
         image: "nginx-proxy.dnp.dappnode.eth:0.0.3",
-        name: "nginx-proxy.dnp.dappnode.eth",
-        shortName: "nginx-proxy",
         ip: "172.33.0.6",
         ports: [
           {
@@ -119,15 +123,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "951426e3fa2cbfd49a5198840764383af3961c2b29ba33a6b5f3dd45b953db9f",
-        packageName: "DAppNodePackage-vipnode.dnp.dappnode.eth",
+        containerId:
+          "951426e3fa2cbfd49a5198840764383af3961c2b29ba33a6b5f3dd45b953db9f",
+        containerName: "DAppNodePackage-vipnode.dnp.dappnode.eth",
+        serviceName: "vipnode.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "vipnode.dnp.dappnode.eth",
         version: "0.0.2",
         isDnp: true,
         isCore: false,
         created: 1560369616,
         image: "vipnode.dnp.dappnode.eth:0.0.2",
-        name: "vipnode.dnp.dappnode.eth",
-        shortName: "vipnode",
         ip: "172.33.0.5",
         ports: [],
         volumes: [
@@ -145,15 +151,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
-        packageName: "DAppNodeCore-wifi.dnp.dappnode.eth",
+        containerId:
+          "539c5a2a32342365867689478b540d8d75c23d2dc1700bbed3b6171d754bb890",
+        containerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
+        serviceName: "wifi.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "wifi.dnp.dappnode.eth",
         version: "0.2.0",
         isDnp: false,
         isCore: true,
         created: 1560354278,
         image: "wifi.dnp.dappnode.eth:0.2.0",
-        name: "wifi.dnp.dappnode.eth",
-        shortName: "wifi",
         ip: "",
         ports: [],
         volumes: [
@@ -169,15 +177,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
-        packageName: "DAppNodeCore-admin.dnp.dappnode.eth",
+        containerId:
+          "02b71c411d1d2e503afad679ab1c16a3e5cf086d5a298476fb30548b62d716f0",
+        containerName: "DAppNodeCore-admin.dnp.dappnode.eth",
+        serviceName: "admin.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "admin.dnp.dappnode.eth",
         version: "0.2.3",
         isDnp: false,
         isCore: true,
         created: 1560335154,
         image: "admin.dnp.dappnode.eth:0.2.3",
-        name: "admin.dnp.dappnode.eth",
-        shortName: "admin",
         ip: "172.33.1.9",
         ports: [
           {
@@ -207,15 +217,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
-        packageName: "DAppNodeCore-vpn.dnp.dappnode.eth",
+        containerId:
+          "514b892b5e537f77515ee3278915a5fd1bf80228e8df6ed64b35c1a0fbdfbec0",
+        containerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
+        serviceName: "vpn.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "vpn.dnp.dappnode.eth",
         version: "0.2.0",
         isDnp: false,
         isCore: true,
         created: 1560334861,
         image: "vpn.dnp.dappnode.eth:0.2.0",
-        name: "vpn.dnp.dappnode.eth",
-        shortName: "vpn",
         ip: "172.33.1.4",
         ports: [
           {
@@ -267,15 +279,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
-        packageName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+        containerId:
+          "51eaaba5c184da5605bf5ce1af4026592cdb3be1d6ff209a5cf0e3cf09c3f6a4",
+        containerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+        serviceName: "dappmanager.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "dappmanager.dnp.dappnode.eth",
         version: "0.2.3",
         isDnp: false,
         isCore: true,
         created: 1560334707,
         image: "dappmanager.dnp.dappnode.eth:0.2.3",
-        name: "dappmanager.dnp.dappnode.eth",
-        shortName: "dappmanager",
         ip: "172.33.1.7",
         ports: [],
         volumes: [
@@ -301,15 +315,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
-        packageName: "DAppNodeCore-bind.dnp.dappnode.eth",
+        containerId:
+          "3dd5e6cd5756b7349636515bb0f50f3c9e35d75909ab9dfcb9c76cb9e54ab9c7",
+        containerName: "DAppNodeCore-bind.dnp.dappnode.eth",
+        serviceName: "bind.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "bind.dnp.dappnode.eth",
         version: "0.2.0",
         isDnp: false,
         isCore: true,
         created: 1560334707,
         image: "bind.dnp.dappnode.eth:0.2.0",
-        name: "bind.dnp.dappnode.eth",
-        shortName: "bind",
         ip: "172.33.1.2",
         ports: [
           {
@@ -333,15 +349,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "e1766fd7a9d8110398b66c7b0f68fe625ee856f49526b987a54537028448476b",
-        packageName: "DAppNodeCore-ethchain.dnp.dappnode.eth",
+        containerId:
+          "e1766fd7a9d8110398b66c7b0f68fe625ee856f49526b987a54537028448476b",
+        containerName: "DAppNodeCore-ethchain.dnp.dappnode.eth",
+        serviceName: "ethchain.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ethchain.dnp.dappnode.eth",
         version: "0.2.1",
         isDnp: false,
         isCore: true,
         created: 1560334707,
         image: "ethchain.dnp.dappnode.eth:0.2.1",
-        name: "ethchain.dnp.dappnode.eth",
-        shortName: "ethchain",
         ip: "172.33.1.6",
         ports: [
           {
@@ -420,15 +438,17 @@ describe("listContainers", function() {
         ]
       },
       {
-        id: "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
-        packageName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+        containerId:
+          "a4ae8b09bc9b2037ff76f99436ddf1890e1215c2a17533ab73445726b41b2bef",
+        containerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+        serviceName: "ipfs.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ipfs.dnp.dappnode.eth",
         version: "0.2.2",
         isDnp: false,
         isCore: true,
         created: 1560334697,
         image: "ipfs.dnp.dappnode.eth:0.2.2",
-        name: "ipfs.dnp.dappnode.eth",
-        shortName: "ipfs",
         ip: "172.33.1.5",
         ports: [
           {
@@ -480,15 +500,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
-        packageName: "DAppNodeCore-ethforward.dnp.dappnode.eth",
+        containerId:
+          "12cf3e376374f665d05a78bb20641cd9d5e36b7ab418b0ebec7c77b6798156c0",
+        containerName: "DAppNodeCore-ethforward.dnp.dappnode.eth",
+        serviceName: "ethforward.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ethforward.dnp.dappnode.eth",
         version: "0.2.1",
         isDnp: false,
         isCore: true,
         created: 1560334412,
         image: "ethforward.dnp.dappnode.eth:0.2.1",
-        name: "ethforward.dnp.dappnode.eth",
-        shortName: "ethforward",
         ip: "172.33.1.3",
         ports: [],
         volumes: [],
@@ -499,15 +521,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
-        packageName: "DAppNodePackage-swarm.dnp.dappnode.eth",
+        containerId:
+          "f789e9b7f00d7292c0db1f83b4dac063ce4a84d2bb3d55d12f9f492b7cbcbb2c",
+        containerName: "DAppNodePackage-swarm.dnp.dappnode.eth",
+        serviceName: "swarm.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "swarm.dnp.dappnode.eth",
         version: "0.1.0",
         isDnp: true,
         isCore: false,
         created: 1558708223,
         image: "swarm.dnp.dappnode.eth:0.1.0",
-        name: "swarm.dnp.dappnode.eth",
-        shortName: "swarm",
         ip: "172.33.0.7",
         ports: [
           {
@@ -537,15 +561,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
-        packageName: "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
+        containerId:
+          "b7f32fcefcd4bfb34d0c293378993e4a40eb3e62d8a928c4f183065834a10fb2",
+        containerName: "DAppNodePackage-letsencrypt-nginx.dnp.dappnode.eth",
+        serviceName: "letsencrypt-nginx.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
         version: "0.0.4",
         isDnp: true,
         isCore: false,
         created: 1558377639,
         image: "letsencrypt-nginx.dnp.dappnode.eth:0.0.4",
-        name: "letsencrypt-nginx.dnp.dappnode.eth",
-        shortName: "letsencrypt-nginx",
         ip: "172.33.0.8",
         ports: [],
         volumes: [
@@ -578,15 +604,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "c944a1549ba675b7229b55370cfd2f54dca1f86050fbef7df4ba453398f93c24",
-        packageName: "DAppNodePackage-ipfs-replicator.dnp.dappnode.eth",
+        containerId:
+          "c944a1549ba675b7229b55370cfd2f54dca1f86050fbef7df4ba453398f93c24",
+        containerName: "DAppNodePackage-ipfs-replicator.dnp.dappnode.eth",
+        serviceName: "ipfs-replicator.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ipfs-replicator.dnp.dappnode.eth",
         version: "0.1.0",
         isDnp: true,
         isCore: false,
         created: 1558258487,
         image: "ipfs-replicator.dnp.dappnode.eth:0.1.0",
-        name: "ipfs-replicator.dnp.dappnode.eth",
-        shortName: "ipfs-replicator",
         ip: "172.33.0.4",
         ports: [],
         volumes: [
@@ -605,15 +633,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "ffc3f4ed380ad42b7f847228862ad4de4ab471229bb5e1ed0aef46d4561309d2",
-        packageName: "DAppNodePackage-goerli-geth.dnp.dappnode.eth",
+        containerId:
+          "ffc3f4ed380ad42b7f847228862ad4de4ab471229bb5e1ed0aef46d4561309d2",
+        containerName: "DAppNodePackage-goerli-geth.dnp.dappnode.eth",
+        serviceName: "goerli-geth.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "goerli-geth.dnp.dappnode.eth",
         version: "0.2.2",
         isDnp: true,
         isCore: false,
         created: 1558258483,
         image: "goerli-geth.dnp.dappnode.eth:0.2.2",
-        name: "goerli-geth.dnp.dappnode.eth",
-        shortName: "goerli-geth",
         ip: "172.33.0.3",
         ports: [
           {
@@ -651,15 +681,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
-        packageName: "DAppNodePackage-ln.dnp.dappnode.eth",
+        containerId:
+          "94bde8655e2d8daca033486ef46e7d270c4f4b6f6c18b820d80c2cbf211130bd",
+        containerName: "DAppNodePackage-ln.dnp.dappnode.eth",
+        serviceName: "ln.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "ln.dnp.dappnode.eth",
         version: "0.1.1",
         isDnp: true,
         isCore: false,
         created: 1558258481,
         image: "ln.dnp.dappnode.eth:0.1.1",
-        name: "ln.dnp.dappnode.eth",
-        shortName: "ln",
         ip: "172.33.0.2",
         ports: [
           {
@@ -696,15 +728,17 @@ describe("listContainers", function() {
         canBeFullnode: false
       },
       {
-        id: "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
-        packageName: "DAppNodeCore-wamp.dnp.dappnode.eth",
+        containerId:
+          "d01badf202548868538e0435163e66a12f5bbb253e82150ed951e89a4c13690d",
+        containerName: "DAppNodeCore-wamp.dnp.dappnode.eth",
+        serviceName: "wamp.dnp.dappnode.eth",
+        instanceName: "",
+        dnpName: "wamp.dnp.dappnode.eth",
         version: "0.2.0",
         isDnp: false,
         isCore: true,
         created: 1557330387,
         image: "wamp.dnp.dappnode.eth:0.2.0",
-        name: "wamp.dnp.dappnode.eth",
-        shortName: "wamp",
         ip: "172.33.1.8",
         ports: [
           {
@@ -728,7 +762,7 @@ describe("listContainers", function() {
     ];
 
     // Remove all values that are undefined
-    const dnpListClean = JSON.parse(JSON.stringify(dnpList));
-    expect(dnpListClean).to.deep.equal(expectedDnpList);
+    const containersClean = JSON.parse(JSON.stringify(containers));
+    expect(containersClean).to.deep.equal(expectedContainers);
   });
 });

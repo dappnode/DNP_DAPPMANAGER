@@ -146,28 +146,38 @@ exit $UPEXIT
       entrypoint: `echo '${nextStartLog}' && sleep 100`
     });
 
-    const prev = await listContainer(mainContainerName);
-    console.log(`Launched prev, ID: ${prev.id}`);
+    const prev = await listContainer({ containerName: mainContainerName });
+    console.log(`Launched prev, ID: ${prev.containerId}`);
 
     const restartCallExit = await callRestart();
-    console.log(`EXITED: ${mainContainerName} ${prev.id}`, restartCallExit);
+    console.log(
+      `EXITED: ${mainContainerName} ${prev.containerId}`,
+      restartCallExit
+    );
     expect(restartCallExit.error.code).to.equal(
       137,
       "Restart call should exit with 137, killed by docker with SIGKILL"
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
-    console.log(`Restart container ${restart.state}, ID: ${restart.id}`);
-    const restartExit = await logUntilExited(restart.id, "restart");
-    console.log(`${restartContainerName} ${restart.id} exited`, restartExit);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
+    console.log(
+      `Restart container ${restart.state}, ID: ${restart.containerId}`
+    );
+    const restartExit = await logUntilExited(restart.containerId, "restart");
+    console.log(
+      `${restartContainerName} ${restart.containerId} exited`,
+      restartExit
+    );
 
     // Query the next container that should be running
-    const next = await listContainer(mainContainerName);
-    console.log(`Next container ${next.state} ID: ${next.id}`);
+    const next = await listContainer({ containerName: mainContainerName });
+    console.log(`Next container ${next.state} ID: ${next.containerId}`);
     assert.notEqual(
-      next.id,
-      prev.id,
+      next.containerId,
+      prev.containerId,
       `${mainContainerName} prev and next containers should NOT have the same ID`
     );
     assert.strictEqual(
@@ -178,7 +188,7 @@ exit $UPEXIT
 
     // Make sure the next container has been updated
     assert.strictEqual(
-      await getVersion(next.id),
+      await getVersion(next.containerId),
       versionNext,
       "Final container should have the next version"
     );
@@ -219,24 +229,34 @@ exit $UPEXIT
       ports: [portMapping]
     });
 
-    const prev = await listContainer(mainContainerName);
-    console.log(`Launched prev, ID: ${prev.id}`);
+    const prev = await listContainer({ containerName: mainContainerName });
+    console.log(`Launched prev, ID: ${prev.containerId}`);
 
     // Attach to prev container to see logs and know when it stops
     // The exit code should be 137 which means killed by docker with SIGKILL (kill -9) `kill -9 (128 + 9 = 137)`
     // https://success.docker.com/article/what-causes-a-container-to-exit-with-code-137
     const restartCallExit = await callRestart();
-    console.log(`EXITED: ${mainContainerName} ${prev.id}`, restartCallExit);
+    console.log(
+      `EXITED: ${mainContainerName} ${prev.containerId}`,
+      restartCallExit
+    );
     expect(restartCallExit.error.code).to.equal(
       137,
       "Restart call should exit with 137, killed by docker with SIGKILL"
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
-    console.log(`Restart container ${restart.state}, ID: ${restart.id}`);
-    const restartExit = await logUntilExited(restart.id, "restart");
-    console.log(`EXITED ${restartContainerName} ${restart.id}`, restartExit);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
+    console.log(
+      `Restart container ${restart.state}, ID: ${restart.containerId}`
+    );
+    const restartExit = await logUntilExited(restart.containerId, "restart");
+    console.log(
+      `EXITED ${restartContainerName} ${restart.containerId}`,
+      restartExit
+    );
 
     // Query the next container that should be running
     // Because it had failed to be brought up, it will be the temp renamed container
@@ -252,8 +272,8 @@ exit $UPEXIT
     );
     assert.notStrictEqual(
       next.Id,
-      prev.id,
-      `${mainContainerName} prev and next containers should have the same ID ${prev.id}`
+      prev.containerId,
+      `${mainContainerName} prev and next containers should have the same ID ${prev.containerId}`
     );
     assert.strictEqual(
       next.State,
@@ -289,12 +309,15 @@ exit $UPEXIT
     // Write a corrupt next compose so it fails before removing the prev container
     fs.writeFileSync(inHost(nextComposeName), "--Corrupted--");
 
-    const prev = await listContainer(mainContainerName);
-    console.log(`Launched prev, ID: ${prev.id}`);
+    const prev = await listContainer({ containerName: mainContainerName });
+    console.log(`Launched prev, ID: ${prev.containerId}`);
 
     // Attach to prev container to see logs and know when it stops
     const restartCallExit = await callRestart();
-    console.log(`EXITED: ${mainContainerName} ${prev.id}`, restartCallExit);
+    console.log(
+      `EXITED: ${mainContainerName} ${prev.containerId}`,
+      restartCallExit
+    );
 
     // The restart call should have failed for a parsing error
     expect(restartCallExit.error.code).to.equal(
@@ -307,8 +330,12 @@ exit $UPEXIT
     );
 
     // Attach to restart container to see logs and know when it stops
-    const restart = await listContainer(restartContainerName);
-    console.log(`Restart container ${restart.state}, ID: ${restart.id}`);
+    const restart = await listContainer({
+      containerName: restartContainerName
+    });
+    console.log(
+      `Restart container ${restart.state}, ID: ${restart.containerId}`
+    );
     assert.strictEqual(
       restart.state,
       "exited",
@@ -316,12 +343,14 @@ exit $UPEXIT
     );
 
     // Query the next container that should be running
-    const next = await retry(() => listContainer(mainContainerName));
-    console.log(`Next container ${next.state}, ID: ${next.id}`);
+    const next = await retry(() =>
+      listContainer({ containerName: mainContainerName })
+    );
+    console.log(`Next container ${next.state}, ID: ${next.containerId}`);
     assert.strictEqual(
-      next.id,
-      prev.id,
-      `${mainContainerName} prev and next containers should have the same ID ${prev.id}`
+      next.containerId,
+      prev.containerId,
+      `${mainContainerName} prev and next containers should have the same ID ${prev.containerId}`
     );
     assert.strictEqual(
       next.state,
@@ -330,7 +359,7 @@ exit $UPEXIT
     );
 
     assert.strictEqual(
-      await getVersion(next.id),
+      await getVersion(next.containerId),
       versionPrev,
       "Final container should have the previous version"
     );

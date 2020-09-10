@@ -1,18 +1,28 @@
 .setup-wizard {
-  .dnp-name {
+  .dnp-name,
+  .service-name {
     margin-bottom: 0.5rem;
-    font-size: 1.5rem;
     line-height: inherit;
     color: inherit;
     white-space: normal;
   }
 
+  .dnp-name {
+    font-size: 1.25rem;
+  }
+
+  .service-name {
+    font-size: 1.1rem;
+  }
+
   // Hide title if there is only one DNP section
-  .dnp-section:only-child .dnp-name {
+  .dnp-section:only-child > .dnp-name,
+  .service-section:only-child > .service-name {
     display: none;
   }
 
   .dnp-section:not(:last-child),
+  .service-section:not(:last-child),
   .field:not(:last-child) {
     padding-bottom: var(--default-spacing);
     margin-bottom: var(--default-spacing);

@@ -20,7 +20,7 @@ import { mountpoints } from "../mockData";
  * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 export async function backupGet(kwargs: {
-  id: string;
+  dnpName: string;
   backup: PackageBackup[];
 }): Promise<string> {
   return "";
@@ -33,7 +33,7 @@ export async function backupGet(kwargs: {
  * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 export async function backupRestore(kwargs: {
-  id: string;
+  dnpName: string;
   backup: PackageBackup[];
   fileId: string;
 }): Promise<void> {
@@ -71,7 +71,7 @@ export async function cleanCache(): Promise<void> {
  * @returns dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
  */
 export async function copyFileFrom(kwargs: {
-  id: string;
+  containerName: string;
   fromPath: string;
 }): Promise<string> {
   return "";
@@ -94,7 +94,7 @@ export async function copyFileFrom(kwargs: {
  * - If empty, defaults to $WORKDIR
  */
 export async function copyFileTo(kwargs: {
-  id: string;
+  containerName: string;
   dataUri: string;
   filename: string;
   toPath: string;

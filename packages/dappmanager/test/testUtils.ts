@@ -6,19 +6,29 @@ import {
   PackageContainer,
   Manifest,
   VolumeMapping,
-  DirectoryDnp,
-  PortMapping,
   PackageRelease,
   Compose,
   ManifestWithImage,
-  ComposeService,
-  InstallPackageData
+  InstallPackageData,
+  InstalledPackageData
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
 import params from "../src/params";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";
+
+// Default file names
+export const manifestFileName = "dappnode_package.json";
+export const composeFileName = "docker-compose.yml";
+
+export const beforeAndAfter = (
+  ...args: Parameters<Mocha.HookFunction>
+): void => {
+  before(...args);
+  after(...args);
+};
+
 export const getTestMountpoint = (id: string): string => {
   const mountpointPath = path.join(testMountpoint, id);
   fs.mkdirSync(mountpointPath, { recursive: true });
@@ -54,12 +64,16 @@ export async function cleanRepos(): Promise<void> {
   await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
 }
 
-export async function cleanContainers(...ids: string[]): Promise<void> {
-  for (const id of ids) {
+export async function cleanContainers(
+  ...containerIds: string[]
+): Promise<void> {
+  for (const containerId of containerIds) {
     // Clean containers
-    await shellSafe(`docker rm -f $(docker ps -aq --filter name=${id})`);
+    await shellSafe(
+      `docker rm -f $(docker ps -aq --filter name=${containerId})`
+    );
     // Clean associated volumes
-    const volumePrefix = id;
+    const volumePrefix = containerId;
     await shellSafe(
       `docker volume rm -f $(docker volume ls --filter name=${volumePrefix} -q)`
     );
@@ -80,16 +94,17 @@ export const mockDnpVersion = "0.0.0";
 export const mockSize = 1111111;
 export const mockHash = "/ipfs/QmWkAVYJhpwqApRfK4SZ6e2Xt2Daamc8uBpM1oMLmQ6fw4";
 
-export const mockDnp: PackageContainer = {
-  id: "17628371823",
-  packageName: mockDnpName,
+export const mockContainer: PackageContainer = {
+  containerId: "17628371823",
+  containerName: `DAppNodePackage-${mockDnpName}`,
+  dnpName: mockDnpName,
+  serviceName: mockDnpName,
+  instanceName: "",
   version: "0.0.0",
   isDnp: true,
   isCore: false,
   created: 1573712712,
   image: "mock-image",
-  name: "mock-name",
-  shortName: "mock-shortname",
   state: "running",
   running: true,
   ports: [],
@@ -100,6 +115,18 @@ export const mockDnp: PackageContainer = {
   dependencies: {},
   origin: "",
   avatarUrl: ""
+};
+
+export const mockDnp: InstalledPackageData = {
+  dnpName: mockDnpName,
+  instanceName: "",
+  version: "0.0.0",
+  isDnp: true,
+  isCore: false,
+  dependencies: {},
+  origin: "",
+  avatarUrl: "",
+  containers: [mockContainer]
 };
 
 export const mockManifest: Manifest = {
@@ -212,7 +239,7 @@ export const mockCompose: Compose = {
 };
 
 export const mockRelease: PackageRelease = {
-  name: mockDnpName,
+  dnpName: mockDnpName,
   reqVersion: mockDnpVersion,
   semVersion: mockDnpVersion,
   manifestFile: { hash: mockHash, size: mockSize, source: "ipfs" },
@@ -232,4 +259,13 @@ export const mockPackageData: InstallPackageData = {
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
   manifestBackupPath: "mock/path/manifest.backup.json"
+};
+
+// For copyFileTo and copyFileFrom
+export const sampleFile = {
+  dataUri:
+    "data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==",
+  filename: "config.json",
+  // Use a flat path to make sure it's base directory exists
+  containerPath: "/config.json"
 };

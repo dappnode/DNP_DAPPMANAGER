@@ -169,17 +169,63 @@ export default params;
  */
 export const ethClientData: {
   [P in EthClientTargetPackage]: {
-    name: string;
+    dnpName: string; // "geth.dnp.dappnode.eth"
     url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
     version?: string;
     userSettings?: UserSettings; // Custom installation for geth light client
   };
 } = {
   "geth-light": {
-    name: "geth.dnp.dappnode.eth",
-    userSettings: { environment: { SYNCMODE: "light" } }
+    dnpName: "geth.dnp.dappnode.eth",
+    userSettings: {
+      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
+    }
   },
-  geth: { name: "geth.dnp.dappnode.eth" },
-  openethereum: { name: "openethereum.dnp.dappnode.eth" },
-  nethermind: { name: "nethermind.public.dappnode.eth" }
+  geth: { dnpName: "geth.dnp.dappnode.eth" },
+  openethereum: { dnpName: "openethereum.dnp.dappnode.eth" },
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
 };
+
+// Naming
+
+/**
+ * Get a unique domain per container, considering multi-service packages
+ */
+export const getContainerDomain = ({
+  dnpName,
+  serviceName
+}: {
+  serviceName: string;
+  dnpName: string;
+}): string => {
+  if (!serviceName || serviceName === dnpName) {
+    return dnpName;
+  } else {
+    return [serviceName, dnpName].join(".");
+  }
+};
+
+export const getImageTag = ({
+  dnpName,
+  serviceName,
+  version
+}: {
+  dnpName: string;
+  serviceName: string;
+  version: string;
+}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
+
+export const getContainerName = ({
+  dnpName,
+  serviceName,
+  isCore
+}: {
+  dnpName: string;
+  serviceName: string;
+  isCore: boolean;
+}): string =>
+  // Note: _PREFIX variables already end with the character "-"
+  [
+    isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
+    getContainerDomain({ dnpName, serviceName })
+  ].join("");
