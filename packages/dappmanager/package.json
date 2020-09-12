@@ -34,7 +34,7 @@
     "ethers": "^4.0.38",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.5",
-    "http-proxy": "^1.18.0",
+    "http-proxy": "^1.18.1",
     "ipfs-http-client": "^44.0.1",
     "is-ip": "^3.0.0",
     "is-ipfs": "^1.0.3",
