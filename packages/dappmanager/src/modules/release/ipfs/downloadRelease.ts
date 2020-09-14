@@ -46,8 +46,14 @@ export async function downloadReleaseIpfs(
 }> {
   if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
 
+  const arch = os.arch() as NodeArch;
+
   try {
     const manifest = await downloadManifest({ hash });
+
+    // Disable manifest type releases for ARM architectures
+    if (isArmArch(arch)) throw new NoImageForArchError(arch);
+
     // Make sure manifest.image.hash exists. Otherwise, will throw
     const manifestWithImage = validateManifestWithImage(
       manifest as ManifestWithImage
@@ -92,7 +98,6 @@ export async function downloadReleaseIpfs(
       ]);
 
       // Fetch image by arch, may require an extra call to IPFS
-      const arch = os.arch() as NodeArch;
       const imageEntry = getImageByArch(manifest, files, arch);
       if (!imageEntry) throw new NoImageForArchError(arch);
 
@@ -164,5 +169,16 @@ function getImageByArch(
         // and consider their single image as amd64
         files.find(file => file.name === getLegacyImagePath(name, version))
       );
+  }
+}
+
+function isArmArch(arch: NodeArch): boolean {
+  switch (arch) {
+    case "arm":
+    case "arm64":
+      return true;
+
+    default:
+      return false;
   }
 }
