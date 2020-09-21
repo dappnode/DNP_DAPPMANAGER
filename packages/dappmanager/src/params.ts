@@ -1,5 +1,5 @@
 import path from "path";
-import { EthClientTargetPackage, UserSettings } from "./types";
+import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -229,3 +229,28 @@ export const getContainerName = ({
     isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
     getContainerDomain({ dnpName, serviceName })
   ].join("");
+
+// From SDK, must be in sync
+
+export const releaseFilesRegex = {
+  manifest: /dappnode_package.*\.json$/,
+  compose: /compose.*\.yml$/,
+  avatar: /avatar.*\.png$/,
+  setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
+  setupSchema: /setup\..*\.json$/,
+  setupTarget: /setup-target\..*json$/,
+  setupUiJson: /setup-ui\..*json$/,
+  disclaimer: /disclaimer\.md$/i,
+  gettingStarted: /getting.*started\.md$/i
+};
+
+// Single arch images
+export const getArchTag = (arch: Architecture): string =>
+  arch.replace(/\//g, "-");
+export const getImagePath = (
+  dnpName: string,
+  version: string,
+  arch: Architecture
+): string => `${dnpName}_${version}_${getArchTag(arch)}.txz`;
+export const getLegacyImagePath = (dnpName: string, version: string): string =>
+  `${dnpName}_${version}.tar.xz`;

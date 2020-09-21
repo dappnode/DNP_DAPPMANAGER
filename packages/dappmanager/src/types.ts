@@ -24,5 +24,3 @@ export type NodeArch =
   | "s390x"
   | "x32"
   | "x64";
-
-export type Architecture = "amd64" | "arm64";

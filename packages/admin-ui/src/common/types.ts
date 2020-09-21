@@ -821,6 +821,11 @@ export interface InstallPackageData extends PackageRelease {
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
 }
 
+// Must be in-sync with SDK types
+export type Architecture = "linux/amd64" | "linux/arm64";
+export const architectures: Architecture[] = ["linux/amd64", "linux/arm64"];
+export const defaultArch = "linux/amd64";
+
 export interface PackageReleaseMetadata {
   name: string;
   version: string;
@@ -831,6 +836,7 @@ export interface PackageReleaseMetadata {
   chain?: ChainDriver;
   dependencies?: Dependencies;
   mainService?: string;
+  architectures?: Architecture[];
 
   // Safety properties to solve problematic updates
   runOrder?: string[];

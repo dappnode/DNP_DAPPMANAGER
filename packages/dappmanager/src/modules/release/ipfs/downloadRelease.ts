@@ -19,10 +19,16 @@ import {
   ManifestWithImage,
   Compose,
   IpfsFileResult,
-  NodeArch
+  NodeArch,
+  Architecture,
+  defaultArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
-import { releaseFilesRegex, getImagePath, getLegacyImagePath } from "../paths";
+import {
+  releaseFilesRegex,
+  getImagePath,
+  getLegacyImagePath
+} from "../../../params";
 
 const source: "ipfs" = "ipfs";
 
@@ -97,9 +103,8 @@ export async function downloadReleaseIpfs(
         entries.gettingStarted && downloadGetStarted(entries.gettingStarted)
       ]);
 
-      // Fetch image by arch, may require an extra call to IPFS
+      // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);
-      if (!imageEntry) throw new NoImageForArchError(arch);
 
       // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
       if (setupWizard) manifest.setupWizard = setupWizard;
@@ -149,26 +154,44 @@ function findOne(
 }
 
 function getImageByArch(
-  { name, version }: { name: string; version: string },
+  manifest: Manifest,
   files: IpfsFileResult[],
-  arch: NodeArch
-): IpfsFileResult | undefined {
-  switch (arch) {
-    case "arm":
-    case "arm64":
-      return files.find(
-        file => file.name === getImagePath(name, version, "arm64")
-      );
-
-    default:
-      return (
-        files.find(
-          file => file.name === getImagePath(name, version, "amd64")
-        ) ||
-        // New DAppNodes should load old single arch packages,
+  nodeArch: NodeArch
+): IpfsFileResult {
+  const arch = parseNodeArch(nodeArch);
+  const { name, version } = manifest;
+  const imageAsset =
+    files.find(file => file.name === getImagePath(name, version, arch)) ||
+    (arch === defaultArch
+      ? // New DAppNodes should load old single arch packages,
         // and consider their single image as amd64
         files.find(file => file.name === getLegacyImagePath(name, version))
-      );
+      : undefined);
+
+  if (!imageAsset) {
+    throw new NoImageForArchError(
+      nodeArch,
+      // Add message if image should have had this arch available
+      manifest.architectures && manifest.architectures.includes(arch)
+        ? `image for ${arch} is missing in release`
+        : undefined
+    );
+  } else {
+    return imageAsset;
+  }
+}
+
+function parseNodeArch(nodeArch: NodeArch): Architecture {
+  switch (nodeArch) {
+    case "arm":
+    case "arm64":
+      return "linux/arm64";
+
+    case "x64":
+      return "linux/amd64";
+
+    default:
+      return defaultArch;
   }
 }
 
