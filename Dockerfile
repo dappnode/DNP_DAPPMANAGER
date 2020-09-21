@@ -1,8 +1,8 @@
 # Common base so it's cached
-# ARCH is used to avoid emulated builds in muti-arch builds
+# --platform=$BUILDPLATFORM is used build javascript source with host arch
+# Otherwise webpack builds on emulated archs can be extremely slow (+1h)
 #####################################
-ARG ARCH=
-FROM ${ARCH}node:10.15.3-alpine as build-monorepo
+FROM --platform=$BUILDPLATFORM node:10.15.3-alpine as build-monorepo
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN yarn build
 
 # Compute git data
 #####################################
-FROM ${ARCH}node:10.15.3-alpine as git-data
+FROM --platform=$BUILDPLATFORM node:10.15.3-alpine as git-data
 
 WORKDIR /usr/src/app
 
