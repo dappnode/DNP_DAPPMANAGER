@@ -16,7 +16,7 @@ type ScriptName = "detect_fs.sh" | "migrate_volume.sh";
 /**
  * Detects mountpoints in the host
  * Runs `detect_fs.sh`
- * @return mountpoints = [{
+ * @returns mountpoints = [{
  *   mountpoint: "/media/usb0",
  *   use: "87%",
  *   used: 6125361723

@@ -123,8 +123,8 @@ export async function copyFileFrom({
    * [NOTE] does not support directories, it will throw an error:
    *   Error: EISDIR: illegal operation on a directory, read
    *
-   * @param {object} path file path, will read the file at this path
-   * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
+   * @param path file path, will read the file at this path
+   * @returns data URI: data:application/zip;base64,UEsDBBQAAAg...
    */
   const dataUri = await fileToDataUri(toPath);
 
@@ -140,8 +140,8 @@ export async function copyFileFrom({
  * Limit max file size until a DAppNode <-> client transport method is adopted
  * $ du -s -k app/file.gz
  * 12 app/file.gz
- * @param {string} path "app/file.gz"
- * @returns {string} size in KB "12"
+ * @param path "app/file.gz"
+ * @returns size in KB "12"
  */
 async function getFileOrDirSize(path: string): Promise<number> {
   const output = await shell(`du -s -k ${path}`);

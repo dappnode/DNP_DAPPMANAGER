@@ -25,8 +25,8 @@ export function isEnsDomain(ensDomain: string): boolean {
  * isIPFS.cid('zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7') // true (CIDv1)
  * isIPFS.cid('noop') // false
  *
- * @param {string} hash
- * @returns {bool}
+ * @param hash
+ * @returns
  */
 export function isIpfsHash(hash: string): boolean {
   if (!hash || typeof hash !== "string") return false;
@@ -53,7 +53,7 @@ export function isIpfsRequest(req: PackageRequest): boolean {
 
 /**
  * Must accept regular semvers and "*"
- * @param {string} version
+ * @param version
  */
 export function isSemver(version: string): boolean {
   return Boolean(semver.valid(version));
@@ -61,7 +61,7 @@ export function isSemver(version: string): boolean {
 
 /**
  * Must accept regular semvers and "*"
- * @param {string} version
+ * @param version
  */
 export function isSemverRange(version: string): boolean {
   return Boolean(semver.validRange(version));

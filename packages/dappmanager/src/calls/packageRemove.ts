@@ -13,8 +13,8 @@ import { logs } from "../logs";
 /**
  * Remove package data: docker down + disk files
  *
- * @param {string} id DNP .eth name
- * @param {bool} deleteVolumes flag to also clear permanent package data
+ * @param id DNP .eth name
+ * @param deleteVolumes flag to also clear permanent package data
  */
 export async function packageRemove({
   dnpName,

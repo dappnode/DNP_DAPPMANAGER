@@ -24,7 +24,7 @@ export async function buildMockImage(): Promise<string> {
  * Saves an image correctly tagged with a different name and version
  * @param name "different.dnp.dappnode.eth"
  * @param version "0.2.0"
- * @return "mock-test.public.dappnode.eth_0.0.1.tar.xz"
+ * @returns "mock-test.public.dappnode.eth_0.0.1.tar.xz"
  */
 export async function saveNewImageToDisk(
   {

@@ -7,11 +7,11 @@ import { PackagePort } from "../../types";
  * Actual command example:
  *   docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 500 UDP
  *
- * @param {object} kwargs: {
+ * @param kwargs: {
  *   portNumber: '3000',
  *   protocol: 'TCP',
  * }
- * @returns {*}
+ * @returns
  */
 export default async function close(port: PackagePort): Promise<boolean> {
   const { portNumber, protocol } = port;

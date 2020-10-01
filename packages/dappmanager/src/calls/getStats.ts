@@ -41,7 +41,7 @@ export async function getStats(): Promise<HostStats> {
  * [0.124352, 0.16262, 0.32514]
  * [1 min, 5 min, 15 min] averages
  * This util takes only the 1min and limits it to 100%
- * @returns {string} cpu usage percent "36%"
+ * @returns cpu usage percent "36%"
  */
 function getCpuLoad(): string {
   let cpuFraction = os.loadavg()[0] / numCores;
@@ -51,8 +51,8 @@ function getCpuLoad(): string {
 
 /**
  * Wraps the shell calls to return null in case of error
- * @param {function} fn async getter
- * @param {string} name for the message
+ * @param fn async getter
+ * @param name for the message
  */
 async function wrapErrors<R>(
   fn: () => Promise<R>,

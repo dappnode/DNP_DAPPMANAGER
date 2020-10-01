@@ -41,8 +41,8 @@ import parseGeneralErrors from "./parseGeneralErrors";
 
 /**
  *
- * @param {string} terminalOutput A sample can be found above
- * @returns {*}
+ * @param terminalOutput A sample can be found above
+ * @returns
  */
 export default function parseCloseOutput(terminalOutput: string): boolean {
   parseGeneralErrors(terminalOutput);

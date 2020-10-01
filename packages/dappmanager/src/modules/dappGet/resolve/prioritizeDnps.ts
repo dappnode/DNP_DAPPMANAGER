@@ -30,14 +30,14 @@ interface PrioritizeDnpReturn extends DappGetDnp {
  *  It is more important for A to have a specific version than B,
  *  then order 2 should be followed
  *
- * @param {object} dnps = {
+ * @param dnps = {
  *   A: {isRequest: true, versions: []},
  *   B: {isInstalled: true, versions: []},
  *   C: {isInstalled: true, versions: []},
  *   D: {versions: []},
  *   E: {versions: []},
  * }
- * @returns {array} dnpsArray = [
+ * @returns dnpsArray = [
  *   {name: 'D', versions: []},
  *   {name: 'E', versions: []},
  *   {name: 'B', isInstalled: true, versions: []},

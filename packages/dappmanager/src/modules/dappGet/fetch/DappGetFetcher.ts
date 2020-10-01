@@ -26,11 +26,11 @@ export class DappGetFetcher {
    * - valid semver version (not range): Return that version
    * - unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
    *
-   * @param {object} kwargs: {
+   * @param kwargs: {
    *   name: Name of package i.e. "kovan.dnp.dappnode.eth"
    *   versionRange: version range requested i.e. "^0.1.0" or "0.1.0" or "/ipfs/Qmre4..."
    * }
-   * @returns {Set} set of versions
+   * @returns set of versions
    */
   async versions(name: string, versionRange: string): Promise<string[]> {
     if (semver.validRange(versionRange)) {

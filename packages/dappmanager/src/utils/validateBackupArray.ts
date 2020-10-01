@@ -6,7 +6,7 @@ import { PackageBackup } from "../types";
  * - All paths must be absolute
  * - All names must be unique
  *
- * @param {array} backup [
+ * @param backup [
  *   { name: "config", path: "/usr/.raiden/config" },
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]

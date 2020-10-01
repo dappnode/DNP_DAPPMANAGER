@@ -23,8 +23,8 @@ export async function diagnose(): Promise<Diagnose> {
 // Utils
 
 /**
- * @param {string} cmd
- * @returns {object} Returns a formated object for the diagnose call
+ * @param cmd
+ * @returns Returns a formated object for the diagnose call
  * - On success:
  *   { result: 'Docker version 18.06.1-ce, build e68fc7a' }
  * - On error:

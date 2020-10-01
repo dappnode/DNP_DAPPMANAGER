@@ -9,7 +9,7 @@ import {
 /**
  * Computes key parameters to construct all version permutations
  *
- * @param {object} dnps An object with the list of DNPs to install
+ * @param dnps An object with the list of DNPs to install
  * dnps = {
  *  "dependency.dnp.dappnode.eth": {
  *    versions: {
@@ -23,7 +23,7 @@ import {
  *      "0.0.4": { "web.dnp.dappnode.eth": "latest" }
  *    }
  *  },
- * @returns {array} Array of length = # of DNPs with key parameters
+ * @returns Array of length = # of DNPs with key parameters
  * to compute their permutation. The ordering of the versions is done careful
  * to test first the states with higher priority. 'm' is the total # of permutations
  * permutationsTable = [
@@ -66,12 +66,12 @@ export function getPermutationsTable(
 /**
  * Computes the total number of possible permutations
  *
- * @param {array} permutationsTable = [
+ * @param permutationsTable = [
  *   { name: 'A', versions: [ '2.2.0', '2.1.0', '2.0.0' ], n: 3, m: 1 },
  *   { name: 'C', versions: [ '2.0.0', '1.0.0' ], n: 2, m: 3 },
  *   { name: 'D', versions: [ '1.1.0', '1.0.0' ], n: 2, m: 6 }
  * ]
- * @returns {Integer} total number of possible permutations
+ * @returns total number of possible permutations
  */
 export function getTotalPermutations(
   permutationsTable: PermutationsTableInterface
@@ -87,15 +87,15 @@ export function getTotalPermutations(
  * First permutation => i = 0
  * Last permutation ==> i = permutationsNumber - 1
  *
- * @param {array} permutationsTable Array of length = # of DNPs with key parameters
+ * @param permutationsTable Array of length = # of DNPs with key parameters
  * to compute their permutation. The ordering of the versions is done careful
  * to test first the states with higher priority. 'm' is the total # of permutations
  * [ { name: 'A', versions: [ '2.2.0', '2.1.0', '2.0.0' ], n: 3, m: 1 },
  *   { name: 'C', versions: [ '2.0.0', '1.0.0' ], n: 2, m: 3 },
  *   { name: 'D', versions: [ '1.1.0', '1.0.0' ], n: 2, m: 6 }
  * ]
- * @param {integer} i #th permutation
- * @returns {object} A state with a specific set of versions
+ * @param i #th permutation
+ * @returns A state with a specific set of versions
  * { A: '2.2.0', C: '2.0.0', D: '1.1.0' }
  */
 export function getPermutation(

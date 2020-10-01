@@ -9,7 +9,7 @@ export class EthProviderError extends Error {}
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target
  * If the package target is not active it returns the remote URL
- * @return initialized ethers instance
+ * @returns initialized ethers instance
  */
 export async function getEthersProvider(): Promise<
   ethers.providers.JsonRpcProvider
@@ -23,7 +23,7 @@ export async function getEthersProvider(): Promise<
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target
  * If the package target is not active it returns the remote URLs
- * @return ethProvier http://geth.dappnode:8545
+ * @returns ethProvier http://geth.dappnode:8545
  */
 export async function getEthProviderUrl(): Promise<string> {
   const target = db.ethClientTarget.get();

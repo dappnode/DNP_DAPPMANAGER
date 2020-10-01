@@ -76,7 +76,7 @@ export async function listPackage({
 /**
  * Returns the list of containers
  * [NOTE] On a full DAppNode will 14 containers the call takes 17ms on average
- * @returns {array}
+ * @returns
  */
 export async function listContainers(): Promise<PackageContainer[]> {
   const containers = await dockerList({});

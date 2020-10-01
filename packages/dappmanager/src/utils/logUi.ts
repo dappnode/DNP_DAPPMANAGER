@@ -11,11 +11,11 @@ export type Log = (dnpName: string, message: string) => void;
  * which will be broadcasted to clients.
  *
  * [NOTE]: Params are de-structured to expose them
- * @param {string} id, overall log id (to bundle multiple logs)
+ * @param id, overall log id (to bundle multiple logs)
  * id = "ln.dnp.dappnode.eth@/ipfs/Qmabcdf"
- * @param {Sting} dnpName, dnpName the log is referring to
+ * @param dnpName, dnpName the log is referring to
  * name = "bitcoin.dnp.dappnode.eth"
- * @param {string} message, log message
+ * @param message, log message
  * message = "Downloading 75%"
  */
 function logUi(progressLog: ProgressLog): void {
@@ -33,7 +33,7 @@ export function logUiClear({ id }: { id: string }): void {
 
 /**
  * Curried version of logUi to simplify code
- * @param {string} id, overall log id (to bundle multiple logs)
+ * @param id, overall log id (to bundle multiple logs)
  */
 export const getLogUi = (id: string): Log => (
   dnpName: string,

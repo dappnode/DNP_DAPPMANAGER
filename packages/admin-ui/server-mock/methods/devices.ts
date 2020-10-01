@@ -14,7 +14,6 @@ const devices = new Map<string, VpnDevice>(
 /**
  * Creates a new device with the provided id.
  * Generates certificates and keys needed for OpenVPN.
- * @param id Device id name
  */
 export async function deviceAdd({ id }: { id: string }): Promise<void> {
   devices.set(id, { id, admin: false, ip });
@@ -24,7 +23,6 @@ export async function deviceAdd({ id }: { id: string }): Promise<void> {
  * Creates a new OpenVPN credentials file, encrypted.
  * The filename is the (16 chars short) result of hashing the generated salt in the db,
  * concatenated with the device id.
- * @param id Device id name
  */
 export async function deviceCredentialsGet(kwargs: {
   id: string;
@@ -38,7 +36,6 @@ export async function deviceCredentialsGet(kwargs: {
 
 /**
  * Removes the device with the provided id, if exists.
- * @param id Device id name
  */
 export async function deviceRemove({ id }: { id: string }): Promise<void> {
   devices.delete(id);
@@ -46,7 +43,6 @@ export async function deviceRemove({ id }: { id: string }): Promise<void> {
 
 /**
  * Resets the device credentials with the provided id, if exists.
- * @param id Device id name
  */
 export async function deviceReset({ id }: { id: string }): Promise<void> {
   id;
@@ -54,7 +50,6 @@ export async function deviceReset({ id }: { id: string }): Promise<void> {
 
 /**
  * Gives/removes admin rights to the provided device id.
- * @param id Device id name
  */
 export async function deviceAdminToggle({ id }: { id: string }): Promise<void> {
   const device = devices.get(id);

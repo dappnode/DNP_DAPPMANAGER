@@ -7,7 +7,6 @@ import { getNotifications } from "./selectors";
 
 /**
  * Using a `kwargs` form to make the `fromDappmanager` argument explicit
- * [Tested]
  */
 export const pushNotification = notificationsSlice.actions.pushNotification;
 

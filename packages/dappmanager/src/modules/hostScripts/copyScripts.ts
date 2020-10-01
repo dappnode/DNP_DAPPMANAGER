@@ -12,7 +12,7 @@ const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
  * - Add new scripts
  * - Update scripts by comparing sha256 hashes
  * - Remove scripts that are not here
- * @return For info and logging
+ * @returns For info and logging
  */
 export async function copyHostScripts(): Promise<void> {
   // Make sure the target scripts dir exists

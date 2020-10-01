@@ -8,7 +8,7 @@ import { UpnpPortMapping } from "./types";
  * Actual command:
  *   docker run --rm --net=host ${IMAGE} upnpc -l
  *
- * @returns {array} port mappings = [
+ * @returns port mappings = [
  *   {protocol: 'UDP', exPort: '500', inPort: '500'},
  *   {protocol: 'UDP', exPort: '4500', inPort: '4500'},
  *   {protocol: 'UDP', exPort: '30303', inPort: '30303'},

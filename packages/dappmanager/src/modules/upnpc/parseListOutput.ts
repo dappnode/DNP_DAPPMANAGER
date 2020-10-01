@@ -43,8 +43,8 @@ import { UpnpPortMapping } from "./types";
 
 /**
  *
- * @param {string} terminalOutput A sample can be found above
- * @returns {array} port mappings = [
+ * @param terminalOutput A sample can be found above
+ * @returns port mappings = [
  *   { protocol: "UDP", exPort: "500", inPort: "500", ip: "192.168.1.42" },
  *   { protocol: "UDP", exPort: "4500", inPort: "4500", ip: "192.168.1.42" },
  *   { protocol: "UDP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },

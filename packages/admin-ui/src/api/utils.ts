@@ -7,7 +7,6 @@ import { dappmanagerDnpName, coreDnpName } from "params";
  * ```
  * Expose this function as a utility of the API to easily modified if autobahn
  * is changed for a regular HTTP RPC
- * @param e
  */
 function isCallDisconnectedError(e: Error): boolean {
   return e.message.includes("wamp.error.canceled");
@@ -16,7 +15,6 @@ function isCallDisconnectedError(e: Error): boolean {
 /**
  * Wrapper to convert API calls that may throw a callee disconnected error
  * into successful resolved calls
- * @param fn
  */
 export function continueIfCalleDisconnected(
   fn: () => Promise<void>,

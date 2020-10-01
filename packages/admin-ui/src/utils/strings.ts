@@ -1,7 +1,7 @@
 /**
  * Safe version of String.toLowerCase
- * @param {string} s
- * @returns {string}
+ * @param s
+ * @returns
  */
 export const toLowercase = (s: string): string => {
   if (!s || typeof s !== "string") return "";
@@ -10,8 +10,8 @@ export const toLowercase = (s: string): string => {
 
 /**
  * Capitalizes a string
- * @param {string} string = "hello world"
- * @returns {string} "Hello world"
+ * @param string = "hello world"
+ * @returns "Hello world"
  */
 export const capitalize = (s: string): string => {
   if (!s || typeof s !== "string") return s;
@@ -22,9 +22,9 @@ export const capitalize = (s: string): string => {
  * Checks if string includes content.
  * - If string or content are undefined, returns false
  * - Does the check in lowerCase
- * @param {string} s = "HeLLo"
- * @param {string} content = "lo"
- * @returns {bool} = true
+ * @param s = "HeLLo"
+ * @param content = "lo"
+ * @returns = true
  */
 export const stringIncludes = (s: string, content: string): boolean => {
   if (!s || typeof s !== "string") return false;
@@ -36,9 +36,9 @@ export const stringIncludes = (s: string, content: string): boolean => {
  * Checks if string endsWith content.
  * - If string or content are undefined, returns false
  * - Does the check in lowerCase
- * @param {string} s = "HeLLo"
- * @param {string} content = "lo"
- * @returns {bool} = true
+ * @param s = "HeLLo"
+ * @param content = "lo"
+ * @returns = true
  */
 export const stringEndsWith = (s: string, content: string): boolean => {
   if (!s || typeof s !== "string") return false;
@@ -49,9 +49,9 @@ export const stringEndsWith = (s: string, content: string): boolean => {
 /**
  * Split string by separator.
  * - If string or separator are undefined, returns an empty array
- * @param {string} s = "vpn.eth"
- * @param {string|object} separator = ".", /\.(.+)/
- * @returns {array} ["vpn", "eth"]
+ * @param s = "vpn.eth"
+ * @param separator = ".", /\.(.+)/
+ * @returns ["vpn", "eth"]
  */
 export const stringSplit = (
   s: string,

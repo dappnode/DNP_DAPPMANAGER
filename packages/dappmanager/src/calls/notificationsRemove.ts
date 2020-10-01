@@ -3,7 +3,7 @@ import * as db from "../db";
 /**
  * Marks notifications as view by deleting them from the db
  *
- * @param {array} ids Array of ids to be marked as read
+ * @param ids Array of ids to be marked as read
  * ids = [ "notification-id1", "notification-id2" ]
  */
 export async function notificationsRemove({

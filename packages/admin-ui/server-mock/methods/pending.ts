@@ -15,8 +15,6 @@ import { mountpoints } from "../mockData";
 
 /**
  * Generates a backup of a package and sends it to the client for download.
- * @param id DNP .eth name
- * @param backup Backup definition
  * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 export async function backupGet(kwargs: {
@@ -28,8 +26,6 @@ export async function backupGet(kwargs: {
 
 /**
  * Restores a backup of a package from the dataUri provided by the user
- * @param id DNP .eth name
- * @param backup Backup definition
  * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
  */
 export async function backupRestore(kwargs: {
@@ -42,7 +38,6 @@ export async function backupRestore(kwargs: {
 
 /**
  * Used to test different IPFS timeout parameters live from the ADMIN UI.
- * @param timeout new IPFS timeout in ms
  */
 export async function changeIpfsTimeout(kwargs: {
   timeout: number;
@@ -59,16 +54,6 @@ export async function cleanCache(): Promise<void> {
 
 /**
  * Copy file from a DNP and downloaded on the client
- * @param id DNP .eth name
- * @param fromPath path to copy file from
- * - If path = path to a file: "/usr/src/app/config.json".
- *   Downloads and sends that file
- * - If path = path to a directory: "/usr/src/app".
- *   Downloads all directory contents, tar them and send as a .tar.gz
- * - If path = relative path: "config.json".
- *   Path becomes $WORKDIR/config.json, then downloads and sends that file
- *   Same for relative paths to directories.
- * @returns dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
  */
 export async function copyFileFrom(kwargs: {
   containerName: string;
@@ -79,19 +64,6 @@ export async function copyFileFrom(kwargs: {
 
 /**
  * Copy file to a DNP:
- * @param id DNP .eth name
- * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
- * @param filename name of the uploaded file.
- * - MUST NOT be a path: "/app", "app/", "app/file.txt"
- * @param toPath path to copy a file to
- * - If path = path to a file: "/usr/src/app/config.json".
- *   Copies the contents of dataUri to that file, overwritting it if necessary
- * - If path = path to a directory: "/usr/src/app".
- *   Copies the contents of dataUri to ${dir}/${filename}
- * - If path = relative path: "config.json".
- *   Path becomes $WORKDIR/config.json, then copies the contents of dataUri there
- *   Same for relative paths to directories.
- * - If empty, defaults to $WORKDIR
  */
 export async function copyFileTo(kwargs: {
   containerName: string;
@@ -187,7 +159,6 @@ export async function notificationsGet(): Promise<PackageNotificationDb[]> {
 
 /**
  * Marks notifications as view by deleting them from the db
- * @param ids Array of ids to be marked as read [ "n-id-1", "n-id-2" ]
  */
 export async function notificationsRemove(kwargs: {
   ids: string[];
@@ -259,7 +230,6 @@ export async function requestChainData(): Promise<void> {
  * 12 word mnemonic ethereum account. The extra layer of encryption
  * slightly increases the security of the exchange while the WAMP
  * module works over HTTP.
- * @param seedPhraseEncrypted tweetnacl base64 box with nonce
  */
 export async function seedPhraseSet(kwargs: {
   seedPhraseEncrypted: string;
@@ -269,7 +239,6 @@ export async function seedPhraseSet(kwargs: {
 
 /**
  * Sets the static IP
- * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
  */
 export async function setStaticIp(kwargs: { staticIp: string }): Promise<void> {
   //

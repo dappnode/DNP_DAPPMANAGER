@@ -154,7 +154,6 @@ interface OptionsMap {
 
 /**
  * Utility to pretty names to the actual target of that option
- * @param options
  */
 function getOptionsMap(options?: EthClientTarget[]): OptionsMap {
   return options

@@ -154,7 +154,6 @@ export async function packagesGet(): Promise<InstalledPackageData[]> {
 
 /**
  * Toggles the visibility of a getting started block
- * @param show Should be shown on hidden
  */
 export async function packageGettingStartedToggle({
   dnpName,
@@ -168,7 +167,7 @@ export async function packageGettingStartedToggle({
 
 /**
  * Returns the logs of the docker container of a package
- * @param options log options
+ * Log options
  * - timestamps: Show timestamps
  * - tail: Number of lines to return from bottom: 200
  * @returns String with escape codes
@@ -184,8 +183,7 @@ export async function packageLog({
 
 /**
  * Remove a package and its data
- * @param id DNP .eth name
- * @param deleteVolumes flag to also clear permanent package data
+ * deleteVolumes: flag to also clear permanent package data
  */
 export async function packageRemove({
   dnpName
@@ -237,8 +235,6 @@ export async function packageRestartVolumes({
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- * @param id DNP .eth name
- * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
  */
 export async function packageSetEnvironment({
   dnpName,
@@ -268,8 +264,6 @@ export async function packageSetEnvironment({
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- * @param dnpName DNP .eth name
- * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
  */
 export async function packageSetPortMappings({
   dnpName,

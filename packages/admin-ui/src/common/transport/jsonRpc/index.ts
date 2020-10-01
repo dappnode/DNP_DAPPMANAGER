@@ -11,8 +11,6 @@ const ajv = new Ajv({ allErrors: true });
 
 /**
  * Given a set of method handlers, parse a RPC request and handle it
- * @param methods
- * @param loggerMiddleware
  */
 export const getRpcHandler = (
   methods: Routes,
@@ -54,7 +52,6 @@ export const getRpcHandler = (
 
 /**
  * Parse RPC request, to be used in the server
- * @param body
  */
 function parseRpcRequest(body: any): { method: keyof Routes; params: any[] } {
   if (typeof body !== "object")
@@ -91,7 +88,6 @@ function formatErrors(
 /**
  * Parse RPC response, to be used in the client
  * RPC response must always have code 200
- * @param body
  */
 export async function parseRpcResponse<R>(body: RpcResponse): Promise<R> {
   if (body.error) {
