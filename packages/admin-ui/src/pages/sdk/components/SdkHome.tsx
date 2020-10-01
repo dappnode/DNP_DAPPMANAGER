@@ -1,6 +1,7 @@
 import React from "react";
 import { title } from "../data";
 import newTabProps from "utils/newTabProps";
+import { sdkPublishAppUrl, sdkGuideUrl } from "params";
 // Components
 import Title from "components/Title";
 import Card from "components/Card";
@@ -8,15 +9,12 @@ import SubTitle from "components/SubTitle";
 import { ButtonLight } from "components/Button";
 import "./sdk.scss";
 
-const SDK_GUIDE_LINK =
-  "https://github.com/dappnode/DAppNodeSDK/wiki/DAppNode-SDK-tutorial";
-
 const subRoutes = [
   {
     title: "Publish DAppNode Packages",
     subtitle: `To an Aragon's APM registry`,
     urlTag: "Publish",
-    url: "https://dappnode.github.io/publish"
+    url: sdkPublishAppUrl
   }
 ];
 
@@ -55,7 +53,7 @@ export default function SdkHome() {
 
         <a
           className="btn btn-outline-secondary float-right"
-          href={SDK_GUIDE_LINK}
+          href={sdkGuideUrl}
           {...newTabProps}
         >
           Full Guide
