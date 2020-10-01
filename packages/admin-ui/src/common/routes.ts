@@ -43,8 +43,6 @@ export interface Routes {
 
   /**
    * Generates a backup of a package and sends it to the client for download.
-   * @param id DNP .eth name
-   * @param backup Backup definition
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupGet: (kwargs: {
@@ -54,8 +52,6 @@ export interface Routes {
 
   /**
    * Restores a backup of a package from the dataUri provided by the user
-   * @param id DNP .eth name
-   * @param backup Backup definition
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupRestore: (kwargs: {

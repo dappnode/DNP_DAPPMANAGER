@@ -1,7 +1,7 @@
 /**
  * Capitalizes a string
- * @param {string} string = "hello world"
- * @returns {string} "Hello world"
+ * @param string = "hello world"
+ * @returns "Hello world"
  */
 export function capitalize(s: string): string {
   if (!s || typeof s !== "string") return s;

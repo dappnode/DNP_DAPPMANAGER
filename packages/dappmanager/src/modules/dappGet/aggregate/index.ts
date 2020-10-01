@@ -15,13 +15,13 @@ import { setVersion } from "../utils/dnpUtils";
  * The resulting "repo" (dnps) can be run directly through a brute force resolver
  * as it only includes DNPs of interest to that specific user request
  *
- * @param {object} req: The package request:
+ * @param req: The package request:
  * req = {
  *   name: 'nginx-proxy.dnp.dappnode.eth',
  *   ver: '^0.1.0',
  * }
  *
- * @returns {object} dnps: Local repo of packages of interest that may be installed
+ * @returns dnps: Local repo of packages of interest that may be installed
  * They include the name of the package, their versions and dependencies and a tag:
  *   - isRequest
  *   - isInstalled

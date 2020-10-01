@@ -21,7 +21,7 @@ const dyndnsInterval = params.DYNDNS_INTERVAL || 30 * 60 * 1000; // 30 minutes
  * If all queries were successful and all looks great skip update.
  * On any doubt, update the IP
  *
- * @returns {bool} should update
+ * @returns should update
  */
 async function shouldUpdate(): Promise<boolean> {
   try {

@@ -5,8 +5,8 @@ import { difference } from "lodash";
  * admin@0.2.4,vpn@0.2.2,core@0.2.6
  * - Sort alphabetically to ensure the version ID is deterministic
  *
- * @param {object[]} coreDnps
- * @return {string} versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"
+ * @param coreDnps
+ * @returns versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"
  */
 export function getCoreVersionId(
   coreDnps: { dnpName: string; version: string }[]
@@ -32,8 +32,8 @@ export function parseCoreVersionId(
 
 /**
  * Checks if `a2` includes all elements of `a1`
- * @param {array} a1
- * @param {array} a2
+ * @param a1
+ * @param a2
  */
 export function includesArray<T>(subset: T[], superset: T[]): boolean {
   return difference(subset, superset).length === 0;

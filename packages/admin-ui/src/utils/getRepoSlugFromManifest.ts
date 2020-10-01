@@ -6,8 +6,8 @@ const githubBaseUrl = "https://github.com/";
 /**
  * Gets the repo slug from a manifest, using the repository property
  *
- * @param {object} manifest
- * @returns {string} repoSlug = "dappnode/DNP_ADMIN"
+ * @param manifest
+ * @returns repoSlug = "dappnode/DNP_ADMIN"
  */
 export default function getRepoSlugFromManifest(manifest: Manifest) {
   const { type, url } = manifest.repository || {};

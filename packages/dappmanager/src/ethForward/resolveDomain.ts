@@ -132,8 +132,8 @@ function parseNetworkFromDomain(domain: string): Network {
 /**
  * Iterates over various interfaces to check if they are available
  *
- * @param {object} resolver ethjs contract instance
- * @returns {object} interfacesAvailable = {
+ * @param resolver ethjs contract instance
+ * @returns interfacesAvailable = {
  *   "0xbc1c58d1": false,
  *   [TEXT_INTERFACE_ID]: true,
  * }

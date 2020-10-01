@@ -26,13 +26,13 @@ export interface DappgetOptions {
  * - Newly installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
- * @param {object} req: The package request:
+ * @param req: The package request:
  * req = {
  *   name: 'nginx-proxy.dnp.dappnode.eth',
  *   ver: '^0.1.0',
  * }
  *
- * @returns {object} Result object = {
+ * @returns Result object = {
  *   message: 'Found compatible state at case 1/256',
  *   state: {
  *     'ipfs.dnp.dappnode.eth': '0.1.3',

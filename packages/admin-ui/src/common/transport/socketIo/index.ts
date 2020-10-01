@@ -13,7 +13,7 @@ interface SocketIsh {
    * @param args Any number of optional arguments to pass with the event. If the
    * last argument is a function, it will be called as an ack. The ack should
    * take whatever data was sent with the packet
-   * @return The default '/' Namespace
+   * @returns The default '/' Namespace
    */
   emit(event: string, ...args: any[]): any;
   /**
@@ -21,7 +21,7 @@ interface SocketIsh {
    * @param event The event that we want to add a listener for
    * @param listener The callback to call when we get the event. The parameters
    * for the callback depend on the event
-   * @return The default '/' Namespace
+   * @returns The default '/' Namespace
    */
   on(event: string, listener: Function): any;
 }
@@ -38,10 +38,6 @@ interface SocketIsh {
  * subscriptions.info.on(message => console.log(arg))
  * subscriptions.info.emit("hello")
  * ```
- *
- * @param session
- * @param subscriptionsData
- * @param middleware
  */
 export function subscriptionsFactory(
   io: SocketIsh,

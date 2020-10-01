@@ -182,7 +182,7 @@ interface DockerInfoArchive {
  * Takes ~ 100 ms, both in success and failure
  * @param id "89ab6595e6c5dd321efb94afdfa69c5682b21505108edadeb488832014c32de9"
  * @param path "bin/gzip"
- * @return path stats: {
+ * @returns path stats: {
  *   name: 'gzip',
  *   size: 12,
  *   mode: 134218239,

@@ -36,7 +36,7 @@ export function toApmVersionArray(version: string): [number, number, number] {
  * @param from 1
  * @param to 5
  * @param step 2
- * @return [1, 3, 5]
+ * @returns [1, 3, 5]
  */
 export function linspace(from: number, to: number, step = 1): number[] {
   // Guard against bugs that can cause // -Infinity

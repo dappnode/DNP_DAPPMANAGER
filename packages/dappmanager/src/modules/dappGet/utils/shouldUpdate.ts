@@ -1,10 +1,8 @@
 import semver from "semver";
 
 /**
- *
- * @param {String} v1 currentVersion
- * @param {String} v2 newVersion
- * @return {Bool}
+ * @param v1 currentVersion
+ * @param v2 newVersion
  */
 export default function shouldUpdate(v1: string, v2: string): boolean {
   // Deal with a double IPFS hash case

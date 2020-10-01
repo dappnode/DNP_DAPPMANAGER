@@ -5,11 +5,11 @@ import dns from "dns";
  * Usage:
  *   `await lookup("ipfs.io")` > "209.94.90.1"
  *
- * @param {string} hostname = "ipfs.io"
- * @param {object} options, available options:
+ * @param hostname = "ipfs.io"
+ * @param options, available options:
  * - ignoreErrors: {bool}. If true, on error doesn't log anything
  *   and returns null
- * @returns {string} address = "209.94.90.1"
+ * @returns address = "209.94.90.1"
  *
  *  Error: getaddrinfo EAI_AGAIN
  */

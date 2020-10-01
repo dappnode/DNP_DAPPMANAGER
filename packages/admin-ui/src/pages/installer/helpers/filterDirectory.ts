@@ -15,7 +15,6 @@ import { SelectedCategories } from "../types";
  * @param query = "bitco"
  * @param selectedCategories = { library: false, service: true }
  * @returns some elements of directory
- * [Tested]
  */
 export default function filterDirectory({
   directory,
@@ -44,10 +43,8 @@ export default function filterDirectory({
  * Tests inclusion of a string in an object.
  * In case of error, returns true
  *
- * @param {object} sourceObj = { hello: "world" }
- * @param {string} target = "hell"
- * @returns {Boolean} = true
- * [Tested]
+ * @param sourceObj = { hello: "world" }
+ * @param target = "hell"
  */
 function includesSafe(sourceObj: any, target: string): boolean {
   try {

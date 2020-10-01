@@ -7,7 +7,7 @@ import { dockerComposeUp } from "./dockerCommands";
 /**
  * Calls docker rm and docker up on a package
  *
- * @param {string} id DNP .eth name
+ * @param id DNP .eth name
  */
 export async function restartPackage({
   dnpName,

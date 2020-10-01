@@ -9,8 +9,8 @@ import { ProgressLogs } from "types";
 
 /**
  * Return string before the first "%" and after the last " "
- * @param {string} s = "Downloading 65%"
- * @returns {string} percent
+ * @param s = "Downloading 65%"
+ * @returns percent
  */
 function parsePercent(s: string) {
   return ((s || "").match(/\s(\d+?)%/) || [])[1];

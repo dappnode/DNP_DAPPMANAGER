@@ -57,7 +57,7 @@ export const downloadGetStarted = downloadAssetFactory<string>({
 /**
  * Download, parse and validate a DNP release file
  *
- * @param {string} hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+ * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
  */
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function downloadAssetFactory<T>({

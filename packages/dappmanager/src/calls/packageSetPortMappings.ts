@@ -9,8 +9,8 @@ import { mapValues } from "lodash";
 /**
  * Updates the .env file of a package. If requested, also re-ups it
  *
- * @param {string} id DNP .eth name
- * @param {array} portMappings [
+ * @param id DNP .eth name
+ * @param portMappings [
  *   { host: 30444, container: 30303, protocol: "UDP" },
  *   { host: 4000, container: 4000, protocol: "TCP" }
  * ]

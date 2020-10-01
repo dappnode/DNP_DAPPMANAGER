@@ -14,8 +14,8 @@ export function shortName(ens: string) {
  * "bitcoin.dnp.dappnode.eth" => "Bitcoin"
  * "raiden-testnet.dnp.dappnode.eth" => "Raiden Testnet"
  *
- * @param {string} name ENS name
- * @returns {string} pretty name
+ * @param name ENS name
+ * @returns pretty name
  */
 export function shortNameCapitalized(name: string) {
   if (!name || typeof name !== "string") return name;
@@ -39,8 +39,8 @@ export function shortAuthor(author: string) {
 
 /**
  *
- * @param {string} name "bitcoin.dnp.dappnode.eth"
- * @returns {bool} isVerified
+ * @param name "bitcoin.dnp.dappnode.eth"
+ * @returns isVerified
  */
 export function isDnpVerified(name: string) {
   return stringEndsWith(name, "dnp.dappnode.eth");
@@ -53,9 +53,9 @@ const coreString = "dncore_";
 /**
  * Formats nicely a docker volume name
  *
- * @param {string} volName "dncore_gethdnpdappnodeeth_data"
- * @param {string} dnpName "geth-user.dnp.dappnode.eth"
- * @return res = { name: "Data", "owner": "Geth User" }
+ * @param volName "dncore_gethdnpdappnodeeth_data"
+ * @param dnpName "geth-user.dnp.dappnode.eth"
+ * @returns res = { name: "Data", "owner": "Geth User" }
  */
 export function prettyVolumeName(
   volName: string,
@@ -92,7 +92,7 @@ export function prettyVolumeName(
 
 /**
  * Helper for VolumesGrid to get a pretty volume name from its volumeData
- * @return "Data", "Identity data"
+ * @returns "Data", "Identity data"
  */
 export function getPrettyVolumeName(volData: VolumeData): string {
   if (volData.internalName) return capitalize(volData.internalName);
@@ -101,7 +101,7 @@ export function getPrettyVolumeName(volData: VolumeData): string {
 
 /**
  * Helper for VolumesGrid to get a pretty volume owner from its volumeData
- * @return "Geth"
+ * @returns "Geth"
  */
 export function getPrettyVolumeOwner(volData: VolumeData): string | undefined {
   return volData.owner
@@ -111,8 +111,8 @@ export function getPrettyVolumeOwner(volData: VolumeData): string | undefined {
 
 /**
  * Returns human readable bytes
- * @param {number} bytes 32616256172
- * @return {string} "32GB"
+ * @param bytes 32616256172
+ * @returns "32GB"
  */
 export function prettyBytes(bytes: number) {
   if (typeof bytes === "number") return prettyBytesLib(bytes || 0);

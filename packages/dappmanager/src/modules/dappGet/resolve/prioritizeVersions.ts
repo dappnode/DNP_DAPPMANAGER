@@ -9,12 +9,12 @@ import { DappGetDnp } from "../types";
  * 3. New packages, newest first.
  * + Prioritize not installing new packages, first version = null.
  *
- * @param {object} dnp: {
+ * @param dnp: {
  *   versions: ['0.1.0', '0.1.2', '/ipfs/Qm443d2...']
  *   isRequest: true / false
  *   isInstalled true / false
  * }
- * @returns {array} versions: ['0.1.2', '0.1.0']
+ * @returns versions: ['0.1.2', '0.1.0']
  */
 export default function prioritizeVersions(dnp: DappGetDnp): (string | null)[] {
   const versions = Object.keys(getVersionsFromDnp(dnp));

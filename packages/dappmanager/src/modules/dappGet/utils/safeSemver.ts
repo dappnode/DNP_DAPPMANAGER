@@ -10,8 +10,8 @@ import { isIpfsHash } from "../../../utils/validate";
  * OUTPUT:
  *   ['/ipfs/QmHc33SZmas', '0.1.0', '0.2.0', 'fake'], or
  *   ['/ipfs/QmHc33SZmas', '0.2.0', '0.1.0', 'fake']
- * @param {function} sortFunction can be semver.rcompare for example
- * @returns {function} wrapped sort function
+ * @param sortFunction can be semver.rcompare for example
+ * @returns wrapped sort function
  */
 function safeSort(
   sortFunction: (a: string, b: string) => number

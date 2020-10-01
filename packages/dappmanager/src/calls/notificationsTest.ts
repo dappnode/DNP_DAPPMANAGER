@@ -7,7 +7,7 @@ import { PackageNotification, NotificationType } from "../types";
  * Set the notification param to null (or send none) to generate
  * a random notification
  *
- * @param {(null|Object)} notification: {
+ * @param notification: {
  *   id: "notification-id", {string}
  *   type: "danger", {string}
  *   title: "Some notification", {string},

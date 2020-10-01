@@ -33,7 +33,7 @@ export function setupWizardToSetupTarget(
  *
  * @param formData
  * @param setupSchema
- * @return userSettings
+ * @returns userSettings
  */
 export function formDataToUserSettings(
   formData: SetupWizardFormDataReturn,
@@ -107,7 +107,7 @@ export function formDataToUserSettings(
  *
  * @param userSettingsAllDnps
  * @param setupSchema
- * @return formData
+ * @returns formData
  */
 export function userSettingsToFormData(
   userSettingsAllDnps: UserSettingsAllDnps,

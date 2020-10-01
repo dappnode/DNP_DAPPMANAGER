@@ -366,7 +366,7 @@ function setPending(dnpName: string, data: AutoUpdatePendingEntry): void {
  *
  * @param dnpName "bitcoin.dnp.dappnode.eth"
  * @param currentVersion "0.2.6", must come from dockerList, dnp.version
- * @return feedback = {
+ * @returns feedback = {
  *   updated: 15363818244,
  *   manuallyUpdated: true,
  *   inQueue: true,
@@ -424,7 +424,7 @@ export function getDnpFeedbackMessage({
  *
  * @param dnpName "bitcoin.dnp.dappnode.eth"
  * @param currentVersion "0.2.6", must come from dockerList, dnp.version
- * @return feedback = {
+ * @returns feedback = {
  *   updated: 15363818244,
  *   manuallyUpdated: true,
  *   inQueue: true,

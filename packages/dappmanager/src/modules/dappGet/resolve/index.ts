@@ -22,7 +22,7 @@ const timeoutMs = 10 * 1000; // ms
  * - Not installed packages have the highest versions
  * This three conditions are prioritized as this list's order.
  *
- * @param {object} dnps = {
+ * @param dnps = {
  *  "dependency.dnp.dappnode.eth": {
  *    versions: {
  *      "0.1.1": {},
@@ -36,7 +36,7 @@ const timeoutMs = 10 * 1000; // ms
  *    }
  *  },
  *};
- * @returns {object} Result object = {
+ * @returns Result object = {
  *   success: true,
  *   message: 'Found compatible state at case 1/256',
  *   state: {

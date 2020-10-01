@@ -41,7 +41,7 @@ function isAliasAllowed(alias: string, dnp: PackageContainerWithIp): boolean {
  *   { domain: "monero.dappnode", ip: "172.33.0.3" }
  * ]
  * @param zone "dappnode."
- * @return nsupdate.txt contents
+ * @returns nsupdate.txt contents
  *
  * server 172.33.1.2
  * debug yes
@@ -85,7 +85,7 @@ function stripCharacters(s: string): string {
  * - Strip "_"
  *
  * @param name "bitcoin.dnp.dappnode.eth"
- * @return "my.bitcoin.dnp.dappnode.eth"
+ * @returns "my.bitcoin.dnp.dappnode.eth"
  *
  * name=$(echo $name | sed 's/DAppNodePackage-//g'| tr -d '/_')
  */
@@ -99,7 +99,7 @@ export function getMyDotEthdomain(dnpName: string): string {
  * - Strip "_"
  *
  * @param name "bitcoin.dnp.dappnode.eth"
- * @return "bitcoin"
+ * @returns "bitcoin"
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin.dappnode"
  * - "other.public.dappnode.eth" > "other.public.dappnode"
  *

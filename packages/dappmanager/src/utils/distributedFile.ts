@@ -4,7 +4,7 @@ import params from "../params";
 /**
  * Return a queriable gateway url for a distributed file
  * @param distributedFile
- * @return link to fetch file "http://ipfs-gateway/Qm7763518d4"
+ * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
  */
 export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
   // Fallback
@@ -17,7 +17,7 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
 /**
  * Stringifies a distributed file type into a single multiaddress string
  * @param distributedFile
- * @return multiaddress "/ipfs/Qm"
+ * @returns multiaddress "/ipfs/Qm"
  */
 export function fileToMultiaddress(distributedFile?: DistributedFile): string {
   if (!distributedFile || !distributedFile.hash) return "";
@@ -30,7 +30,7 @@ export function fileToMultiaddress(distributedFile?: DistributedFile): string {
 /**
  * Return a queriable gateway url for a multiaddress
  * @param multiaddress "/ipfs/Qm"
- * @return link to fetch file "http://ipfs-gateway/Qm7763518d4"
+ * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
  */
 export function multiaddressToGatewayUrl(multiaddress: string): string {
   const hash = normalizeHash(multiaddress);
@@ -44,7 +44,7 @@ export function multiaddressToGatewayUrl(multiaddress: string): string {
  * "/ipfs/Qm" => "Qm"
  * "ipfs"
  * @param hash "/ipfs/Qm" | "ipfs:Qm" | "Qm"
- * @return "Qm"
+ * @returns "Qm"
  */
 export function normalizeHash(hash: string): string {
   return (

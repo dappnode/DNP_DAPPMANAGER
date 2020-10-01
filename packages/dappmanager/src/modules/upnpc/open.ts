@@ -7,11 +7,11 @@ import { PackagePort } from "../../types";
  * Actual command example:
  * docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -a 192.168.178.31 9735 9735 TCP 7200
  *
- * @param {object} kwargs: {
+ * @param kwargs: {
  *   portNumber: '3000',
  *   protocol: 'TCP',
  * }
- * @returns {*}
+ * @returns
  */
 
 // Timeout in seconds. Should be greater than the natRenewalInterval

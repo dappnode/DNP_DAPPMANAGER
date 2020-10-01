@@ -10,9 +10,9 @@ import { isIpfsHash } from "../../../utils/validate";
  * 2. Cat stream to file system
  * 3. Validate downloaded image. Cache is automatically created at ${path}
  *
- * @param {string} hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- * @param {string} path "/usr/src/path-to-file/file.ext"
- * @param {string} options see "modules/ipfs/methods/catStreamToFs"
+ * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+ * @param path "/usr/src/path-to-file/file.ext"
+ * @param options see "modules/ipfs/methods/catStreamToFs"
  */
 
 export default async function downloadImage(

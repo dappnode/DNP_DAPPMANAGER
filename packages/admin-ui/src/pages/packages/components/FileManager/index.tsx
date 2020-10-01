@@ -52,7 +52,7 @@ export const FileManager = ({
 /**
  * Additional feature to auto-complete the from and to paths
  * Since it's not critical, errors are logged and ignored
- * @param {string} searchQuery
+ * @param searchQuery
  */
 function fetchParamsFromExtraUrl(
   searchQuery: string

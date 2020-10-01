@@ -33,7 +33,7 @@ type VolumesToRemove = string[];
 /**
  * Removes a package volumes. The re-ups the package
  *
- * @param {string} id DNP .eth name
+ * @param id DNP .eth name
  */
 export async function restartPackageVolumes({
   dnpName,
