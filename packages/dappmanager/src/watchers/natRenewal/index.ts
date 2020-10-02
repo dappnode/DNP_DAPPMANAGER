@@ -28,8 +28,12 @@ async function natRenewal(): Promise<void> {
       const portMappings = await upnpc.list();
       db.upnpAvailable.set(true);
       if (isFirstRun) {
-        logs.info("UPnP device available");
-        logs.info("Current UPNP port mappings", portMappings);
+        logs.info(
+          "UPnP device available. Current UPNP port mappings\n",
+          portMappings
+            .map(p => `${p.ip} ${p.exPort}:${p.inPort}/${p.protocol}`)
+            .join("\n")
+        );
       }
     } catch (e) {
       if (e.message.includes("NOUPNP")) {
@@ -44,7 +48,11 @@ async function natRenewal(): Promise<void> {
     // Fetch portsToOpen and store them in the DB
     const portsToOpen = await getPortsToOpen();
     db.portsToOpen.set(portsToOpen);
-    if (isFirstRun) logs.info("NAT renewal portsToOpen", portsToOpen);
+    if (isFirstRun)
+      logs.info(
+        "NAT renewal portsToOpen\n",
+        portsToOpen.map(p => `${p.portNumber}/${p.protocol}`).join(", ")
+      );
 
     // Fetch the localIp only once for all the portsToOpen
     const localIp = await getLocalIp();
