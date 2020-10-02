@@ -29,7 +29,7 @@ export function runOnlyOneSequentially<A, R>(
     tasks: { arg: A }[],
     callback: () => void
   ) {
-    fn(tasks[0].arg)
+    fn(tasks[0]?.arg)
       .then(() => {
         callback();
       })

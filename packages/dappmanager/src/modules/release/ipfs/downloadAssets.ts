@@ -76,7 +76,7 @@ function downloadAssetFactory<T>({
   }
   return memoize(downloadAsset, {
     promise: true,
-    normalizer: args => args[0].hash
+    normalizer: ([{ hash }]) => hash
   });
 }
 

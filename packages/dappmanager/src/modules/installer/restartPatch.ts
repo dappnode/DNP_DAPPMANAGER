@@ -101,7 +101,7 @@ exit $UPEXIT
   fs.writeFileSync(restartScriptPath, restartScript);
 
   const dappmCompose = new ComposeEditor(ComposeEditor.readFrom(composePath));
-  const dappmanagerNewImage = dappmCompose.services()[0].get().image;
+  const dappmanagerNewImage = dappmCompose.firstService().get().image;
 
   const composeRestart = new ComposeEditor({
     version: "3.4",

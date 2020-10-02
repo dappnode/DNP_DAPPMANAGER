@@ -32,8 +32,8 @@ export function migrateLegacyEnvFile(
     const envsArray = envFileData.trim().split("\n");
 
     const compose = new ComposeFileEditor(dnpName, isCore);
-    const singleService = compose.services()[dnpName];
-    if (singleService) {
+    const singleService = compose.firstService();
+    if (singleService && singleService.serviceName === dnpName) {
       singleService.mergeEnvs(parseEnvironment(envsArray));
       singleService.omitDnpEnvFile();
       compose.write();

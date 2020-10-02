@@ -128,6 +128,12 @@ export class ComposeEditor {
     return getPath.dockerCompose(dnpName, isCore);
   }
 
+  firstService(): ComposeServiceEditor {
+    const firstServiceName = Object.keys(this.compose.services)[0];
+    if (!firstServiceName) throw Error("Compose has no service");
+    return new ComposeServiceEditor(this, firstServiceName);
+  }
+
   services(): { [serviceName: string]: ComposeServiceEditor } {
     return mapValues(
       this.compose.services,
