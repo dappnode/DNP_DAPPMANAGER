@@ -23,25 +23,34 @@ async function execDockerCompose(
   args: Args,
   kwargs?: Kwargs
 ): Promise<string> {
-  return shell(["docker-compose", "-f", dcPath, ...parseArgs(args, kwargs)]);
+  return shell([
+    "docker-compose",
+    "-f",
+    dcPath,
+    ...parseArgs(args, kwargs),
+    // Adding <&- to prevent interactive mode
+    "<&-"
+  ]);
 }
 
 export function dockerComposeUp(
   dcPath: string,
-  options?: {
+  options: {
     noStart?: boolean;
+    detach?: boolean;
     forceRecreate?: boolean;
+    timeout?: number;
     serviceNames?: string[];
-  }
+  } = {}
 ): Promise<string> {
-  const flags: string[] = [];
-  if (options?.noStart) flags.push("--no-start");
-  else flags.push("--detach");
-  if (options?.forceRecreate) flags.push("--force-recreate");
-  if (options?.serviceNames)
-    for (const serviceName of options.serviceNames) flags.push(serviceName);
-  // Adding <&- to prevent interactive mode
-  return execDockerCompose(dcPath, ["up", ...flags, "<&-"]);
+  // --detach is invalid with --no-start
+  if (options.noStart) options.detach = false;
+  return execDockerCompose(dcPath, ["up", ...(options.serviceNames || [])], {
+    noStart: options.noStart,
+    detach: options.detach ?? true,
+    forceRecreate: options.forceRecreate,
+    timeout: options.timeout
+  });
 }
 
 /**
@@ -50,19 +59,19 @@ export function dockerComposeUp(
  */
 export function dockerComposeDown(
   dcPath: string,
-  { volumes, timeout }: { volumes?: boolean; timeout?: number } = {}
+  options: { volumes?: boolean; timeout?: number }
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["down"], { volumes, timeout });
+  return execDockerCompose(dcPath, ["down"], options);
 }
 
 /**
  * Removes all containers from a compose project
- * -f: Don't ask to confirm removal
- * -s: Stop the containers, if required, before removing
+ * --force   Don't ask to confirm removal
+ * --stop    Stop the containers, if required, before removing
  * @param dcPath
  */
 export function dockerComposeRm(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, ["rm", "-sf"]);
+  return execDockerCompose(dcPath, ["rm"], { force: true, stop: true });
 }
 
 export function dockerComposeStart(dcPath: string): Promise<string> {
@@ -74,9 +83,9 @@ export function dockerComposeStart(dcPath: string): Promise<string> {
  */
 export function dockerComposeStop(
   dcPath: string,
-  { timeout }: { timeout?: number } = {}
+  options: { timeout?: number }
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["stop"], { timeout });
+  return execDockerCompose(dcPath, ["stop"], options);
 }
 
 export function dockerComposeConfig(dcPath: string): Promise<string> {
