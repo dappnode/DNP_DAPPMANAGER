@@ -1,4 +1,3 @@
-import fs from "fs";
 import Docker from "dockerode";
 import memoize from "memoizee";
 import { stripDockerApiLogsHeader } from "./utils";
@@ -303,11 +302,39 @@ export async function imageRemove(imageNameOrId: string): Promise<void> {
   await image.remove();
 }
 
+interface DockerLoadProgress {
+  status: string; // "Loading layer";
+  progressDetail: {
+    current: number; // 221151232;
+    total: number; // 536990720;
+  };
+  progress: string; // "[====================>                              ]  221.2MB/537MB";
+  id: string; // "32c9b213197b";
+}
+
 /**
  * Load .tar.xz image sending it to the docker daemon
  * TODO: Get progress
  * @param imagePath
  */
-export async function loadImage(imagePath: string): Promise<void> {
-  await dockerApi.loadImage(fs.createReadStream(imagePath));
+export async function loadImage(
+  imagePath: string,
+  onProgress?: (event: DockerLoadProgress) => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Must disable quiet flag to receive progress updates
+    dockerApi.loadImage(imagePath, { quiet: "0" }, (err, stream) => {
+      if (err) reject(err);
+      else
+        dockerApi.modem.followProgress(
+          stream,
+          function onFinished(err: Error): void {
+            if (err) reject(err);
+            else resolve();
+          },
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          onProgress || ((): void => {})
+        );
+    });
+  });
 }
