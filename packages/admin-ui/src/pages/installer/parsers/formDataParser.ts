@@ -192,11 +192,12 @@ export function filterActiveSetupWizard(
 
 /**
  * Util: Type-safe wrapper around `key in obj` which will be ok whatever type obj is
- * @param key
- * @param obj
  */
-function hasProperty(key: string, obj: { [key: string]: string }): boolean {
-  return Boolean(key) && key in obj;
+function hasProperty(
+  key: string,
+  obj: { [key: string]: string } | undefined
+): boolean {
+  return Boolean(key && obj && key in obj);
 }
 
 /**
