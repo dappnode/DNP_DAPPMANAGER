@@ -1,3 +1,4 @@
+import fs from "fs";
 import Docker from "dockerode";
 import memoize from "memoizee";
 import { stripDockerApiLogsHeader } from "./utils";
@@ -297,7 +298,16 @@ export async function imagesList(
  * Remove a docker image
  * @param imageNameOrId "sha256:ed6467f4660f70714e8babab7b2d360596c0b074d296f92bf6514c8e95cd591a"
  */
-export async function imageRemove(imageNameOrId: string) {
+export async function imageRemove(imageNameOrId: string): Promise<void> {
   const image = dockerApi.getImage(imageNameOrId);
   await image.remove();
+}
+
+/**
+ * Load .tar.xz image sending it to the docker daemon
+ * TODO: Get progress
+ * @param imagePath
+ */
+export async function loadImage(imagePath: string): Promise<void> {
+  await dockerApi.loadImage(fs.createReadStream(imagePath));
 }

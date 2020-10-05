@@ -1,6 +1,6 @@
 import { InstallPackageData } from "../../types";
 import { Log } from "../../utils/logUi";
-import { dockerLoad } from "../docker/dockerCommands";
+import { loadImage } from "../docker/dockerApi";
 
 /**
  * Load the docker image .tar.xz. file of each package
@@ -15,7 +15,7 @@ export async function loadImages(
   await Promise.all(
     packagesData.map(async function({ dnpName, imagePath }) {
       log(dnpName, "Loading image...");
-      await dockerLoad(imagePath);
+      await loadImage(imagePath);
       log(dnpName, "Package Loaded");
     })
   );
