@@ -58,6 +58,5 @@ export const autoUpdateIds = {
 export const superAdminId = "dappnode_admin";
 
 // Support, where to send issues
-const githubRepo = "DNP_ADMIN";
-const githubUsername = "dappnode";
-export const issueBaseUrl = `https://github.com/${githubUsername}/${githubRepo}/issues/new`;
+const githubRepoSlugToReport = "dappnode/DAppNode";
+export const issueBaseUrl = `https://github.com/${githubRepoSlugToReport}/issues/new`;
