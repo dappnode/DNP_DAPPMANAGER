@@ -297,7 +297,44 @@ export async function imagesList(
  * Remove a docker image
  * @param imageNameOrId "sha256:ed6467f4660f70714e8babab7b2d360596c0b074d296f92bf6514c8e95cd591a"
  */
-export async function imageRemove(imageNameOrId: string) {
+export async function imageRemove(imageNameOrId: string): Promise<void> {
   const image = dockerApi.getImage(imageNameOrId);
   await image.remove();
+}
+
+interface DockerLoadProgress {
+  status: string; // "Loading layer";
+  progressDetail: {
+    current: number; // 221151232;
+    total: number; // 536990720;
+  };
+  progress: string; // "[====================>                              ]  221.2MB/537MB";
+  id: string; // "32c9b213197b";
+}
+
+/**
+ * Load .tar.xz image sending it to the docker daemon
+ * TODO: Get progress
+ * @param imagePath
+ */
+export async function loadImage(
+  imagePath: string,
+  onProgress?: (event: DockerLoadProgress) => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Must disable quiet flag to receive progress updates
+    dockerApi.loadImage(imagePath, { quiet: "0" }, (err, stream) => {
+      if (err) reject(err);
+      else
+        dockerApi.modem.followProgress(
+          stream,
+          function onFinished(err: Error): void {
+            if (err) reject(err);
+            else resolve();
+          },
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          onProgress || ((): void => {})
+        );
+    });
+  });
 }

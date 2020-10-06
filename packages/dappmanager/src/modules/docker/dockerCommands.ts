@@ -105,13 +105,6 @@ export function dockerRm(
   return execDocker(["rm", containerName], { force: true, volumes });
 }
 
-/**
- * --input , -i		Read from tar archive file, instead of STDIN
- */
-export function dockerLoad(imagePath: string): Promise<string> {
-  return execDocker(["load"], { input: imagePath });
-}
-
 interface ImageManifest {
   Config: string; // "f949e7d76d63befffc8eec2cbf8a6f509780f96fb3bacbdc24068d594a77f043.json"
   Layers: string[]; // ["14ec119e6215a169a53a8c9cdfb56ca873e10f2e5ea0a37692bfa71601f18ec7/layer.tar"]
