@@ -1,3 +1,4 @@
+import os from "os";
 import shellExec from "../utils/shell";
 import { Diagnose } from "../types";
 
@@ -17,7 +18,12 @@ export async function diagnose(): Promise<Diagnose> {
     ...(await shellExecFormated(`docker-compose -v`))
   };
 
-  return [dockerVersion, dockerComposeVersion];
+  const platform = {
+    name: "platform",
+    ...uname()
+  };
+
+  return [dockerVersion, dockerComposeVersion, platform];
 }
 
 // Utils
@@ -39,4 +45,15 @@ function shellExecFormated(
   return shellExec(cmd)
     .then((data: string) => ({ result: (data || "").trim() }))
     .catch((e: Error) => ({ error: e.message }));
+}
+
+function uname(): {
+  result?: string;
+  error?: string;
+} {
+  try {
+    return { result: [os.platform(), os.arch(), os.release()].join(", ") };
+  } catch (e) {
+    return { error: e.message };
+  }
 }
