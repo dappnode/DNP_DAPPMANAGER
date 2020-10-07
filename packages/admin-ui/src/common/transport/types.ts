@@ -1,6 +1,12 @@
-export type RpcResult<R> =
-  | { success: true; result: R }
-  | { success: false; message: string };
+export interface RpcResponse<R = any> {
+  result?: R;
+  error?: { code: number; message: string; data?: any };
+}
+
+export interface RpcPayload {
+  method: string;
+  params: Args;
+}
 
 export type Args = any[];
 export type Result = any | void;
