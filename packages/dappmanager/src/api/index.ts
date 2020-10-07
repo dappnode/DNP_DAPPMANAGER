@@ -11,7 +11,12 @@ import { isAdmin, isAdminIp } from "./auth";
 import { wrapHandler } from "./utils";
 import * as methods from "../calls";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
-import { getRpcHandler, subscriptionsFactory } from "../common";
+import {
+  getRpcHandler,
+  subscriptionsFactory,
+  RpcPayload,
+  RpcResponse
+} from "../common";
 import { getEthForwardHandler, isDwebRequest } from "../ethForward";
 import { subscriptionsLogger, routesLogger } from "./logger";
 import { logs } from "../logs";
@@ -52,8 +57,22 @@ export default function startHttpApi(
     else next(new Error(`Requires admin permission. Forbidden ip: ${ip}`));
   });
 
-  io.on("connection", function(socket) {
+  io.on("connection", socket => {
     console.log(`Socket connected`, socket.id);
+
+    // JSON RPC over WebSockets
+    socket.on(
+      "rpc",
+      (rpcPayload: RpcPayload, callback: (res: RpcResponse) => void) => {
+        if (typeof callback !== "function")
+          return logs.error("JSON RPC over WS req without cb", rpcPayload);
+
+        rpcHandler(rpcPayload)
+          .then(callback)
+          .catch(error => callback({ error }))
+          .catch(error => logs.error("Error on JSON RPC over WS cb", error));
+      }
+    );
   });
 
   // Subscriptions

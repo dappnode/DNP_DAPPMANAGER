@@ -1,11 +1,6 @@
 import Ajv from "ajv";
 import { Routes, routesArgumentsSchema } from "../../";
-import { LoggerMiddleware } from "../types";
-
-interface RpcResponse {
-  result?: any;
-  error?: { code: number; message: string; data?: any };
-}
+import { LoggerMiddleware, RpcPayload, RpcResponse } from "../types";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -19,7 +14,7 @@ export const getRpcHandler = (
   const validateParams = ajv.compile(routesArgumentsSchema);
   const { onCall, onSuccess, onError } = loggerMiddleware || {};
 
-  return async (body: any): Promise<RpcResponse> => {
+  return async (body: RpcPayload): Promise<RpcResponse> => {
     try {
       const { method, params } = parseRpcRequest(body);
 
@@ -53,7 +48,9 @@ export const getRpcHandler = (
 /**
  * Parse RPC request, to be used in the server
  */
-function parseRpcRequest(body: any): { method: keyof Routes; params: any[] } {
+function parseRpcRequest(
+  body: RpcPayload
+): { method: keyof Routes; params: any[] } {
   if (typeof body !== "object")
     throw Error(`body request must be an object, ${typeof body}`);
   const { method, params } = body;
@@ -61,7 +58,7 @@ function parseRpcRequest(body: any): { method: keyof Routes; params: any[] } {
   if (!params) throw new JsonRpcReqError("request body missing params");
   if (!Array.isArray(params))
     throw new JsonRpcReqError("request body params must be an array");
-  return { method, params };
+  return { method: method as keyof Routes, params };
 }
 
 function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
@@ -89,7 +86,7 @@ function formatErrors(
  * Parse RPC response, to be used in the client
  * RPC response must always have code 200
  */
-export async function parseRpcResponse<R>(body: RpcResponse): Promise<R> {
+export async function parseRpcResponse<R>(body: RpcResponse<R>): Promise<R> {
   if (body.error) {
     const error = new JsonRpcResError(body.error);
     if (typeof body.error.data === "string") {
@@ -98,7 +95,7 @@ export async function parseRpcResponse<R>(body: RpcResponse): Promise<R> {
     }
     throw error;
   } else {
-    return body.result;
+    return (body.result as unknown) as R;
   }
 }
 
