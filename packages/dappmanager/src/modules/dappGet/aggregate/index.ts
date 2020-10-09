@@ -9,6 +9,11 @@ import { DappGetDnps } from "../types";
 import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch/DappGetFetcher";
 import { setVersion } from "../utils/dnpUtils";
+import {
+  ErrorDappGetDowngrade,
+  ErrorDappGetNotSatisfyRange,
+  ErrorDappGetNoVersions
+} from "../errors";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -123,9 +128,7 @@ export default async function aggregate({
         }
       }
       if (!Object.keys(dnps[dnpName].versions).length)
-        throw Error(
-          `Aggregated versions of request ${req.name}@${req.ver} did not satisfy its range`
-        );
+        throw new ErrorDappGetNotSatisfyRange(req);
     }
     // > Label isInstalled + Enfore conditions:
     //   - installed DNPs cannot be downgraded (don't apply this condition to the request)
@@ -143,16 +146,13 @@ export default async function aggregate({
           delete dnps[dnpName].versions[version];
       }
       if (!Object.keys(dnps[dnpName].versions).length)
-        throw Error(
-          `Aggregated versions of installed package ${dnpName} cause a downgrade from ${dnpVersion}. Having a future development version could be the cause of this error.`
-        );
+        throw new ErrorDappGetDowngrade({ dnpName, dnpVersion });
     } else {
       // Validate aggregated dnps
       // - dnps must contain at least one version of the requested package
       if (!Object.keys(dnps[dnpName].versions).length) {
-        const reqId = `${req.name} @ ${req.ver}`;
-        logs.error("Faulty dnps object", reqId, dnps);
-        throw Error(`No version aggregated for ${dnpName}, request ${reqId}`);
+        logs.error("Faulty dnps object", req, dnps);
+        throw new ErrorDappGetNoVersions({ dnpName, req });
       }
     }
   }
