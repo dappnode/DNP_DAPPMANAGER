@@ -7,6 +7,7 @@ import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
 import Switch from "components/Switch";
 import { withToast } from "components/toast/Toast";
+import { confirm } from "components/ConfirmDialog";
 // Utils
 import { shortNameCapitalized } from "utils/format";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
@@ -24,6 +25,7 @@ import {
 // Styles
 import "./autoUpdates.scss";
 import { renderResponse } from "components/SwrRender";
+import { resolve } from "path";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateIds;
 const getIsSinglePackage = (id: string) =>
@@ -217,4 +219,43 @@ function AutoUpdateItem({
       <hr />
     </React.Fragment>
   );
+}
+
+/**
+ * Helper to enable updates for a given package (or all) from another part of the UI
+ * while keeping auto-update related logic in this file
+ * @param dnpName
+ */
+export async function enableAutoUpdatesForPackageWithConfirm(
+  dnpName: string
+): Promise<void> {
+  const autoUpdateData = await api.autoUpdateDataGet();
+  const autoUpdatesEnabledForAllPackages =
+    autoUpdateData.settings[MY_PACKAGES]?.enabled;
+  const autoUpdatesEnabledForThisPackage =
+    autoUpdateData.settings[dnpName]?.enabled;
+  if (!autoUpdatesEnabledForAllPackages && !autoUpdatesEnabledForThisPackage) {
+    // Allow user to enable for all packages or just this package
+    const idToEnable = await new Promise<string>(resolve => {
+      confirm({
+        title: "Enable auto-updates",
+        text: `Do you want to enable auto-update for ${shortNameCapitalized(
+          dnpName
+        )} so DAppNode to installs automatically the latest versions?`,
+        buttons: [
+          {
+            label: "Enable for all packages",
+            variant: "outline-secondary",
+            onClick: () => resolve(MY_PACKAGES)
+          },
+          {
+            label: "Enable",
+            variant: "dappnode",
+            onClick: () => resolve(dnpName)
+          }
+        ]
+      });
+    });
+    api.autoUpdateSettingsEdit({ id: idToEnable, enabled: true });
+  }
 }
