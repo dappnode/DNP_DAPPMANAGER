@@ -29,8 +29,9 @@ export const mandatoryCoreDnps = [
   dappmanagerDnpName,
   vpnDnpName,
   ipfsDnpName,
-  bindDnpName,
-  wifiDnpName
+  bindDnpName
+  // WIFI package is not mandatory to be running
+  // wifiDnpName
 ];
 export const corePackages = [...mandatoryCoreDnps, coreDnpName];
 // Container names

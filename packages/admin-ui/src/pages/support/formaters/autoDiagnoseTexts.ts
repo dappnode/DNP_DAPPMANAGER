@@ -164,21 +164,23 @@ export function coreDnpsRunning({
   for (const coreDnpName of mandatoryCoreDnps) {
     const coreDnp = dnpInstalled.find(dnp => dnp.dnpName === coreDnpName);
     if (!coreDnp) notFound.push(coreDnpName);
-    else if (!coreDnp.containers.some(container => !container.running))
+    else if (coreDnp.containers.some(container => !container.running))
       notRunning.push(coreDnpName);
   }
 
-  const ok = !notFound.length && !notRunning.length;
-  let errorMsg = "";
-  if (!ok && notFound.length)
-    errorMsg += `Core DAppNode Packages ${notFound.join(", ")} are not found. `;
-  if (!ok && notRunning.length)
-    errorMsg += `Core DAppNode Packages ${notFound.join(
-      ", "
-    )} are not running.`;
+  const errorMsgs: string[] = [];
+  if (notFound.length > 0)
+    errorMsgs.push(
+      `Core DAppNode Packages ${notFound.join(", ")} are not found`
+    );
+  if (notRunning.length > 0)
+    errorMsgs.push(
+      `Core DAppNode Packages ${notRunning.join(", ")} are not running`
+    );
+  const ok = notFound.length === 0 && notRunning.length === 0;
   return {
     ok,
-    msg: ok ? "All core DAppNode Packages are running" : errorMsg,
+    msg: ok ? "All core DAppNode Packages are running" : errorMsgs.join(". "),
     solutions: [
       "Make sure the disk is not too full. If so DAppNode automatically stops the IPFS package to prevent it from becoming un-usable",
       "Go to the System tab and restart each stopped DAppNode Package. Please inspect the logs to understand cause and report it if it was not expected"
