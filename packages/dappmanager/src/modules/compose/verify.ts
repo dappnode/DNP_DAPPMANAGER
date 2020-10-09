@@ -1,11 +1,14 @@
+import { maxPortNumber } from "../../params";
 import { Compose as ComposeObj } from "../../types";
 import { applyRecursivelyToStringValues } from "../../utils/objects";
+import { parsePortMappings } from "./ports";
 
 export function verifyCompose(compose: ComposeObj): void {
   for (const serviceName in compose.services) {
     const service = compose.services[serviceName];
     try {
       if (service.volumes) verifyServiceVolumes(service.volumes);
+      if (service.ports) verifyServicePorts(service.ports);
     } catch (e) {
       e.message = `${serviceName} validation: ${e.message}`;
       throw e;
@@ -29,6 +32,22 @@ function verifyServiceVolumes(volumes: string[]): void {
     } catch (e) {
       throw Error(`Invalid service.volumes '${vol}': ${e.message}`);
     }
+  }
+}
+
+function verifyServicePorts(ports: string[]): void {
+  if (!Array.isArray(ports)) throw Error("service.ports must be an array");
+
+  const portMappings = parsePortMappings(ports);
+  for (const portMapping of portMappings) {
+    if (portMapping.container > maxPortNumber)
+      throw Error(
+        `Port mapping container ${portMapping.container} is over the max ${maxPortNumber}`
+      );
+    if (portMapping.host && portMapping.host > maxPortNumber)
+      throw Error(
+        `Port mapping host ${portMapping.host} is over the max ${maxPortNumber}`
+      );
   }
 }
 

@@ -16,6 +16,7 @@ import { InstalledPackageData, PackageContainer } from "common";
 import { ServiceSelector } from "./ServiceSelector";
 
 const maxPortNumber = 32768 - 1;
+const maxEphemeralPortNumber = 65535;
 
 export function Ports({ containers }: { containers: PackageContainer[] }) {
   const serviceNames = containers.map(c => c.serviceName).sort();
@@ -144,7 +145,10 @@ export function PortsByService({
 
   function getPortsOverTheMax(): PortMapping[] {
     return ports.filter(
-      ({ container, deletable }) => deletable && container > maxPortNumber
+      ({ host, container, deletable }) =>
+        (deletable &&
+          (container > maxPortNumber || (host && host > maxPortNumber))) ||
+        (host && host > maxEphemeralPortNumber)
     );
   }
 

@@ -163,6 +163,11 @@ if (devMode) {
 
 export default params;
 
+// Docker params
+// Max port number (included) Otherwise it fails with
+// Cannot create container for service ipfs.dnp.dappnode.eth: invalid port specification: "65536"
+export const maxPortNumber = 65535;
+
 /**
  * Link between an ethClientTarget keyword and its pacakge information
  * Declared above to use stronger typings
