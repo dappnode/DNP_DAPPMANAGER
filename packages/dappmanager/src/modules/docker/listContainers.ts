@@ -166,7 +166,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     ).map(
       (port): PortMapping => ({
         ...port,
-        deletable: isPortMappingDeletable(port, defaultPorts || [])
+        deletable: isPortMappingDeletable(port, defaultPorts)
       })
     ),
     volumes: container.Mounts.map(
@@ -202,15 +202,15 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
  */
 function isPortMappingDeletable(
   port: PortMapping,
-  defaultPorts: PortMapping[]
+  defaultPorts: PortMapping[] | undefined
 ): boolean {
-  return Boolean(
-    defaultPorts &&
-      defaultPorts.length > 0 &&
-      !defaultPorts.find(
-        defaultPort =>
-          defaultPort.container == port.container &&
-          defaultPort.protocol == port.protocol
-      )
+  return (
+    // Assume if no defaultPorts they were empty, so all ports = deletable
+    !Array.isArray(defaultPorts) ||
+    !defaultPorts.find(
+      defaultPort =>
+        defaultPort.container == port.container &&
+        defaultPort.protocol == port.protocol
+    )
   );
 }

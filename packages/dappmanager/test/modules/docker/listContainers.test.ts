@@ -49,7 +49,7 @@ describe("listContainers", function() {
           {
             container: 80,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [],
@@ -59,6 +59,7 @@ describe("listContainers", function() {
           "nginx-proxy.dnp.dappnode.eth": "latest",
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
+        defaultPorts: [],
         avatarUrl: "",
         canBeFullnode: false
       },
@@ -80,13 +81,13 @@ describe("listContainers", function() {
             host: 443,
             container: 443,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             host: 80,
             container: 80,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -194,12 +195,12 @@ describe("listContainers", function() {
             host: 8090,
             container: 8090,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             container: 80,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -234,7 +235,7 @@ describe("listContainers", function() {
             host: 1194,
             container: 1194,
             protocol: "UDP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -331,7 +332,7 @@ describe("listContainers", function() {
           {
             container: 53,
             protocol: "UDP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -454,17 +455,17 @@ describe("listContainers", function() {
           {
             container: 5001,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             container: 8080,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             container: 8081,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             host: 4001,
@@ -495,6 +496,18 @@ describe("listContainers", function() {
         ],
         state: "running",
         running: true,
+        defaultPorts: [
+          {
+            container: 4001,
+            host: 4001,
+            protocol: "TCP"
+          },
+          {
+            container: 4002,
+            host: 4002,
+            protocol: "UDP"
+          }
+        ],
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -538,13 +551,13 @@ describe("listContainers", function() {
             host: 30399,
             container: 30399,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             host: 30399,
             container: 30399,
             protocol: "UDP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -650,19 +663,19 @@ describe("listContainers", function() {
             host: 32769,
             container: 30303,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             host: 32771,
             container: 30303,
             protocol: "UDP",
-            deletable: false
+            deletable: true
           },
           {
             host: 32770,
             container: 30304,
             protocol: "UDP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -697,18 +710,18 @@ describe("listContainers", function() {
           {
             container: 80,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             host: 9735,
             container: 9735,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             container: 10009,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [
@@ -744,12 +757,12 @@ describe("listContainers", function() {
           {
             container: 8000,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           },
           {
             container: 8080,
             protocol: "TCP",
-            deletable: false
+            deletable: true
           }
         ],
         volumes: [],
