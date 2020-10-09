@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { packageSetEnvironment } from "../actions";
 // Components
 import { SetupWizard } from "components/SetupWizard";
@@ -10,6 +9,7 @@ import {
   UserSettings
 } from "types";
 import { difference } from "utils/lodashExtended";
+import { PackageEnvs } from "common";
 
 export function Config({
   dnpName,
@@ -23,7 +23,6 @@ export function Config({
   const [localUserSettings, setLocalUserSettings] = useState<
     UserSettingsAllDnps
   >({});
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (userSettings) setLocalUserSettings({ [dnpName]: userSettings });
@@ -39,14 +38,17 @@ export function Config({
     const diffEnvs = difference(prevEnvs, newEnvs);
 
     // Try to get a more friendly name for each ENV
-    const niceNames = Object.keys(diffEnvs).map(name => {
+    const serviceEnvs: PackageEnvs = Object.values(diffEnvs)[0];
+    const niceNames = Object.keys(serviceEnvs).map(name => {
       for (const field of setupWizard?.fields || [])
         if (field.target?.type === "environment" && field.target.name === name)
           return field.title || name;
       return name;
     });
 
-    dispatch(packageSetEnvironment(dnpName, diffEnvs, niceNames));
+    packageSetEnvironment(dnpName, diffEnvs, niceNames).catch(e => {
+      console.error("Error on packageSetEnvironment", e);
+    });
   }
 
   return (

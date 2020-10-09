@@ -5,26 +5,25 @@ import { api } from "api";
 // Selectors
 import { withToastNoThrow } from "components/toast/Toast";
 import { PackageEnvs, InstalledPackageData } from "types";
-import { AppThunk } from "store";
 import { continueIfCalleDisconnected } from "api/utils";
 import { PackageContainer } from "common";
 
 // Used in package interface / envs
 
-export const packageSetEnvironment = (
+export async function packageSetEnvironment(
   dnpName: string,
   environmentByService: { [serviceName: string]: PackageEnvs },
   envNames?: string[]
-): AppThunk => () => {
+): Promise<void> {
   const envList = (envNames || []).join(", ");
-  withToastNoThrow(
+  await withToastNoThrow(
     () => api.packageSetEnvironment({ dnpName, environmentByService }),
     {
       message: `Updating ${sn(dnpName)} ${envList}...`,
       onSuccess: `Updated ${sn(dnpName)} ${envList}`
     }
   );
-};
+}
 
 // Used in package interface / controls
 
