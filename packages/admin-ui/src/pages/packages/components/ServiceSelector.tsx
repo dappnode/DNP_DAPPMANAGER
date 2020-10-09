@@ -13,7 +13,7 @@ export function ServiceSelector({
 }) {
   const serviceNames = containers.map(c => c.serviceName);
 
-  if (serviceNames.length === 0) return null;
+  if (serviceNames.length <= 1) return null;
 
   return (
     <div>
