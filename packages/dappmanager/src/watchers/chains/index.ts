@@ -19,6 +19,7 @@ const emitChainDataWatcherInterval =
 
 const activeChains: { [chainName: string]: Chain } = {};
 const loggedError: { [chainName: string]: string | null } = {};
+let lastEmittedChainData: string;
 
 /**
  * CHAIN MANAGMENT
@@ -109,7 +110,13 @@ async function getAndEmitChainData(): Promise<void> {
       }
     )
   );
-  eventBus.chainData.emit(chainData);
+
+  // Emit chain data only if it has changed
+  const emittedChainData = JSON.stringify(chainData);
+  if (emittedChainData !== lastEmittedChainData) {
+    eventBus.chainData.emit(chainData);
+    lastEmittedChainData = emittedChainData;
+  }
 }
 
 /**
