@@ -1,8 +1,10 @@
 import { RootState } from "rootReducer";
+import { orderBy } from "lodash";
 
 // Service > dnpDirectory
 
-export const getDnpDirectory = (state: RootState) =>
-  state.dnpDirectory.directory.sort((a, b) => a.index - b.index);
+export const getDnpDirectory = (state: RootState) => {
+  return orderBy(state.dnpDirectory.directory, item => item.index, ["asc"]);
+};
 export const getDirectoryRequestStatus = (state: RootState) =>
   state.dnpDirectory.requestStatus || {};
