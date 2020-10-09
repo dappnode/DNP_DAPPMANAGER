@@ -1,13 +1,23 @@
+import semver from "semver";
 import params from "../params";
-import { CoreUpdateData } from "../types";
+import { CoreUpdateData, PackageRelease } from "../types";
 import { ReleaseFetcher } from "../modules/release";
 import { listPackages } from "../modules/docker/listContainers";
-import semver from "semver";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
+import { ErrorDappGetDowngrade } from "../modules/dappGet/errors";
+import { logs } from "../logs";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";
+const coreAlreadyUpdated: CoreUpdateData = {
+  available: false,
+  type: undefined,
+  packages: [],
+  changelog: "",
+  updateAlerts: [],
+  versionId: ""
+};
 
 /**
  * Fetches the core update data, if available
@@ -32,20 +42,27 @@ export async function getCoreUpdateData(
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
   const releaseFetcher = new ReleaseFetcher();
-  const { releases } = await releaseFetcher.getReleasesResolved({
-    name: coreName,
-    ver: coreVersion
-  });
+
+  let releases: PackageRelease[];
+  try {
+    const dappgetResult = await releaseFetcher.getReleasesResolved({
+      name: coreName,
+      ver: coreVersion
+    });
+    releases = dappgetResult.releases;
+  } catch (e) {
+    if (e instanceof ErrorDappGetDowngrade) {
+      logs.debug(
+        `Core update to ${coreVersion} would cause a downgrade for ${e.dnpName} from ${e.dnpVersion}, assuming core is updated`
+      );
+      return coreAlreadyUpdated;
+    } else {
+      throw e;
+    }
+  }
 
   if (releases.length === 0) {
-    return {
-      available: false,
-      type: undefined,
-      packages: [],
-      changelog: "",
-      updateAlerts: [],
-      versionId: ""
-    };
+    return coreAlreadyUpdated;
   }
 
   const dnpList = await listPackages();
