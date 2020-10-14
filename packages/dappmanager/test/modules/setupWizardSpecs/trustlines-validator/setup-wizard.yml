@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 fields:
   - title: Keystore
     description: >-
@@ -16,7 +16,7 @@ fields:
       authorized validator address, you can check the valid addresses in [this
       list](https://github.com/trustlines-protocol/blockchain/blob/1c664ff7d28998b7070c9edb3b325062a5365aad/chain/tlbc/tlbc-spec.json#L11)
     id: keystoreAddress
-    pattern: '^0x[a-fA-F0-9]{40}$'
+    pattern: "^0x[a-fA-F0-9]{40}$"
     target:
       type: environment
       name: ADDRESS

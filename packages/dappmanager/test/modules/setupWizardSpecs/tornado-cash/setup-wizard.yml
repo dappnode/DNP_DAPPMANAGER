@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 fields:
   - title: Network
     description: In which network do you want to configure your relayer?

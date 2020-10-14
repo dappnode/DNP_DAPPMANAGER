@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 fields:
   - title: Your auth token
     description: >+
@@ -35,7 +35,7 @@ fields:
 
        ⚠️**Warning: an exchange address is not a valid address**⚠️
     id: wallet
-    pattern: '^0x[a-fA-F0-9]{40}$'
+    pattern: "^0x[a-fA-F0-9]{40}$"
     target:
       type: environment
       name: WALLET

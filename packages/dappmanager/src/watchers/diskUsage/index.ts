@@ -78,9 +78,7 @@ async function monitorDiskUsage(): Promise<void> {
          *   names: ''
          */
         let names;
-        const cmd = `docker stop $(docker ps ${
-          threshold.filterCommand
-        } --format "{{.Names}}")`;
+        const cmd = `docker stop $(docker ps ${threshold.filterCommand} --format "{{.Names}}")`;
         try {
           names = await shellExec(cmd);
         } catch (e) {
@@ -100,20 +98,14 @@ async function monitorDiskUsage(): Promise<void> {
             : "no DNPs";
 
         logs.warn(
-          `WARNING: DAppNode has stopped ${
-            threshold.containersDescription
-          } (${formatedNames}) after the disk space reached a ${threshold.id}`
+          `WARNING: DAppNode has stopped ${threshold.containersDescription} (${formatedNames}) after the disk space reached a ${threshold.id}`
         );
 
         eventBus.notification.emit({
           id: "diskSpaceRanOut-stoppedPackages",
           type: "danger",
           title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
-          body: `Available disk space is less than a ${
-            threshold.id
-          }. To prevent your DAppNode from becoming unusable ${
-            threshold.containersDescription
-          } where stopped (${formatedNames}). Please, free up enough disk space and start them again.`
+          body: `Available disk space is less than a ${threshold.id}. To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped (${formatedNames}). Please, free up enough disk space and start them again.`
         });
         thresholdIsActive[threshold.id] = true;
 
