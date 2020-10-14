@@ -17,6 +17,7 @@ import { postInstallClean } from "./postInstallClean";
 import { afterInstall } from "./afterInstall";
 import { flagPackagesAreInstalling } from "./packageIsInstalling";
 import { ComposeEditor } from "../compose/editor";
+import { InstallPackageDataPaths } from "../../common";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
@@ -156,20 +157,25 @@ export async function postRestartPatch(): Promise<void> {
   if (restart) {
     await logRestartPatchStatus(restart);
 
-    const packagesData = db.coreUpdatePackagesData.get();
+    const packagesDataRaw = db.coreUpdatePackagesData.get();
     const log = getLogUi(params.coreDnpName);
-    if (!packagesData) {
+    if (!packagesDataRaw) {
       // Assuming the dappmanager has been reseted, not updated
       logs.info(`No core update packages data found`);
-    } else if (restart.State.ExitCode > 0) {
-      // Error during update, needs to rollback
-      const dnpNames = packagesData.map(({ dnpName }) => dnpName);
-      flagPackagesAreInstalling(dnpNames);
-      rollbackPackages(packagesData, log);
-      afterInstall(dnpNames);
     } else {
-      // All okay, finish installation
-      postInstallClean(packagesData, log);
+      // Ensure compatibility across core updates
+      const packagesData = packagesDataRaw.map(parsePackageDataRaw);
+
+      if (restart.State.ExitCode > 0) {
+        // Error during update, needs to rollback
+        const dnpNames = packagesData.map(({ dnpName }) => dnpName);
+        flagPackagesAreInstalling(dnpNames);
+        rollbackPackages(packagesData, log);
+        afterInstall(dnpNames);
+      } else {
+        // All okay, finish installation
+        postInstallClean(packagesData, log);
+      }
     }
 
     // Remove the pending core update packages data
@@ -233,4 +239,32 @@ async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspect
     if (e.statusCode === 404 || e.reason === "no such container") return null;
     else throw e;
   }
+}
+
+/**
+ * Package data is stored in the DB before an update
+ * Previous versions of DAppNode had a different schema,
+ * so this function ensures compatibility cross-version
+ * - packageData from < v0.2.35, won't have property .dnpName
+ */
+function parsePackageDataRaw(
+  packageData: InstallPackageDataPaths
+): InstallPackageDataPaths {
+  if (packageData.dnpName) {
+    // New OK data
+    return packageData;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pre0235Data: { name: string; version: string } = packageData as any;
+  if (pre0235Data.name) {
+    // packageData from < v0.2.35, won't have property .dnpName
+    return {
+      ...packageData,
+      dnpName: pre0235Data.name,
+      semVersion: pre0235Data.version
+    };
+  }
+
+  throw Error(`Unknown packageData format: ${JSON.stringify(packageData)}`);
 }
