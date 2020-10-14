@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 fields:
   - title: Enable netstats
     description: >-
@@ -9,8 +9,8 @@ fields:
       type: environment
       name: NETSTATS_ENABLE
     enum:
-      - 'no'
-      - 'yes'
+      - "no"
+      - "yes"
     required: true
   - title: Username
     description: The user provided by the trustline foundation to connect to netstats
@@ -21,7 +21,7 @@ fields:
     if:
       netstats_enable:
         enum:
-          - 'yes'
+          - "yes"
     required: true
   - title: Password
     description: The password provided by the trustline foundation to connect to netstats
@@ -32,7 +32,7 @@ fields:
     if:
       netstats_enable:
         enum:
-          - 'yes'
+          - "yes"
     required: true
     secret: true
   - title: Instance name
@@ -44,7 +44,7 @@ fields:
     if:
       netstats_enable:
         enum:
-          - 'yes'
+          - "yes"
     required: true
   - title: Publicly Displayed
     description: Do you want to be publicly displayed as a validator?
@@ -53,10 +53,10 @@ fields:
       type: environment
       name: SHOW_VALIDATOR_STATUS
     enum:
-      - 'no'
-      - 'yes'
+      - "no"
+      - "yes"
     if:
       netstats_enable:
         enum:
-          - 'yes'
+          - "yes"
     required: true

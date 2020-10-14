@@ -19,20 +19,23 @@ export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
 // DNP names
-export const wifiName = "wifi.dnp.dappnode.eth";
-export const ipfsName = "ipfs.dnp.dappnode.eth";
-export const coreName = "core.dnp.dappnode.eth";
-export const bindName = "bind.dnp.dappnode.eth";
-export const vpnName = "vpn.dnp.dappnode.eth";
-export const dappmanagerName = "dappmanager.dnp.dappnode.eth";
+export const wifiDnpName = "wifi.dnp.dappnode.eth";
+export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
+export const coreDnpName = "core.dnp.dappnode.eth";
+export const bindDnpName = "bind.dnp.dappnode.eth";
+export const vpnDnpName = "vpn.dnp.dappnode.eth";
+export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
-  dappmanagerName,
-  vpnName,
-  ipfsName,
-  bindName,
-  wifiName
+  dappmanagerDnpName,
+  vpnDnpName,
+  ipfsDnpName,
+  bindDnpName
+  // WIFI package is not mandatory to be running
+  // wifiDnpName
 ];
-export const corePackages = [...mandatoryCoreDnps, coreName];
+export const corePackages = [...mandatoryCoreDnps, coreDnpName];
+// Container names
+export const wifiContainerName = "DAppNodeCore-wifi.dnp.dappnode.eth";
 
 // NACL keys
 export const adminNaclSecretKey =
@@ -43,6 +46,8 @@ export const adminNaclPublicKey =
 // URLs / Links
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
+export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
+export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {
@@ -54,6 +59,5 @@ export const autoUpdateIds = {
 export const superAdminId = "dappnode_admin";
 
 // Support, where to send issues
-const githubRepo = "DNP_ADMIN";
-const githubUsername = "dappnode";
-export const issueBaseUrl = `https://github.com/${githubUsername}/${githubRepo}/issues/new`;
+const githubRepoSlugToReport = "dappnode/DAppNode";
+export const issueBaseUrl = `https://github.com/${githubRepoSlugToReport}/issues/new`;

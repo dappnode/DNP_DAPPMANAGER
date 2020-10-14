@@ -29,7 +29,7 @@ export function runOnlyOneSequentially<A, R>(
     tasks: { arg: A }[],
     callback: () => void
   ) {
-    fn(tasks[0].arg)
+    fn(tasks[0]?.arg)
       .then(() => {
         callback();
       })
@@ -79,11 +79,9 @@ export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
  * @param ms Pause time (ms)
  */
 export function pause(ms: number): Promise<void> {
-  return new Promise(
-    (resolve): void => {
-      setTimeout(resolve, ms);
-    }
-  );
+  return new Promise((resolve): void => {
+    setTimeout(resolve, ms);
+  });
 }
 
 /**

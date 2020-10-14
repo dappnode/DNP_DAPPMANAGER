@@ -3,9 +3,9 @@ import { UpdateType } from "../types";
 
 /**
  * Compute the release type: major, minor, patch
- * @param {string} from 0.1.21
- * @param {string} to 0.2.0
- * @returns {string} release type: major, minor, patch
+ * @param from 0.1.21
+ * @param to 0.2.0
+ * @returns release type: major, minor, patch
  */
 export default function computeSemverUpdateType(
   from: string,

@@ -1,10 +1,13 @@
 import { MockDnp } from "./types";
 
+const dnpName = "raiden-testnet.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const raidenTestnet: MockDnp = {
   avatar: "https://i.ibb.co/2ynnctD/raiden-testnet-300.png",
 
   metadata: {
-    name: "raiden-testnet.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.0.2",
     description:
       "The Raiden Network is an off-chain scaling solution, enabling near-instant, low-fee and scalable payments. It’s complementary to the Ethereum blockchain and works with any ERC20 compatible token. \n\n\n **Getting started** \n\n Once you have installed the Raiden DAppNode Package you **must** upload your own keystore. Go to this [getting started guide](https://github.com/dappnode/DAppNodePackage-raiden) to learn how to do so.  \n\n\n All set? Check out the [documentation and introductory guides](https://raiden-network.readthedocs.io/en/stable/#how-to-get-started) to quickly get started doing payments.",
@@ -37,11 +40,13 @@ export const raidenTestnet: MockDnp = {
   userSettings: {
     namedVolumeMountpoints: { data: "" },
     environment: {
-      RAIDEN_ADDRESS: "",
-      RAIDEN_KEYSTORE_PASSWORD: "",
-      RAIDEN_ETH_RPC_ENDPOINT: "http://goerli-geth.dappnode:8545",
-      RAIDEN_NETWORK_ID: "goerli",
-      EXTRA_OPTS: "--disable-debug-logfile"
+      [serviceName]: {
+        RAIDEN_ADDRESS: "",
+        RAIDEN_KEYSTORE_PASSWORD: "",
+        RAIDEN_ETH_RPC_ENDPOINT: "http://goerli-geth.dappnode:8545",
+        RAIDEN_NETWORK_ID: "goerli",
+        EXTRA_OPTS: "--disable-debug-logfile"
+      }
     }
   }
 };

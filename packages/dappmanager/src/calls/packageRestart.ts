@@ -2,16 +2,20 @@ import * as eventBus from "../eventBus";
 import { restartPackage } from "../modules/docker/restartPackage";
 
 /**
- * Calls docker rm and docker up on a package
- *
- * @param {string} id DNP .eth name
+ * Recreates a package containers
  */
-export async function packageRestart({ id }: { id: string }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+export async function packageRestart({
+  dnpName,
+  serviceNames
+}: {
+  dnpName: string;
+  serviceNames?: string[];
+}): Promise<void> {
+  if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  await restartPackage(id);
+  await restartPackage({ dnpName, serviceNames, forceRecreate: true });
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ ids: [id] });
+  eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 }

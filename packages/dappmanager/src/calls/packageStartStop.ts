@@ -1,32 +1,37 @@
-import { listContainer } from "../modules/docker/listContainers";
-import * as getPath from "../utils/getPath";
-import {
-  dockerComposeStart,
-  dockerComposeStop
-} from "../modules/docker/dockerCommands";
+import { listPackage } from "../modules/docker/listContainers";
+import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 
 /**
- * Stops or starts after fetching its status
- *
- * @param {string} id DNP .eth name
- * @param {number} timeout seconds to stop the package
+ * Stops or starts a package containers
+ * @param timeout seconds to stop the package
  */
 export async function packageStartStop({
-  id,
+  dnpName,
+  serviceNames,
   timeout = 10
 }: {
-  id: string;
+  dnpName: string;
+  serviceNames?: string[];
   timeout?: number;
 }): Promise<void> {
-  if (!id) throw Error("kwarg id must be defined");
+  if (!dnpName) throw Error("kwarg containerName must be defined");
 
-  const dockerComposePath = getPath.dockerComposeSmart(id);
+  const dnp = await listPackage({ dnpName });
 
-  const dnp = await listContainer(id);
+  const targetContainers = dnp.containers.filter(
+    c => !serviceNames || serviceNames.includes(c.serviceName)
+  );
 
-  if (dnp.running) await dockerComposeStop(dockerComposePath, { timeout });
-  else await dockerComposeStart(dockerComposePath);
+  if (targetContainers.length === 0) {
+    const queryId = [dnpName, ...(serviceNames || [])].join(", ");
+    throw Error(`No targetContainers found for ${queryId}`);
+  }
+
+  const containerNames = targetContainers.map(c => c.containerName);
+  if (targetContainers.every(container => container.running))
+    await dockerStop(containerNames, { time: timeout });
+  else await dockerStart(containerNames);
 
   // Emit packages update
   eventBus.requestPackages.emit();

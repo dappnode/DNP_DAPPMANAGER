@@ -1,18 +1,23 @@
 import "mocha";
 import * as calls from "../src/calls";
-import { PackageContainer, ContainerState } from "../src/types";
+import { InstalledPackageData, ContainerState } from "../src/types";
 
 export async function getDnpFromListPackages(
-  id: string
-): Promise<PackageContainer | undefined> {
+  dnpName: string
+): Promise<InstalledPackageData | undefined> {
   const dnpList = await calls.packagesGet();
   if (!Array.isArray(dnpList)) throw Error("listPackages must return an array");
-  return dnpList.find(e => e.name.includes(id));
+  return dnpList.find(dnp => dnp.dnpName === dnpName);
 }
 
 export async function getDnpState(
-  id: string
+  dnpName: string,
+  serviceName?: string
 ): Promise<ContainerState | "down"> {
-  const dnp = await getDnpFromListPackages(id);
-  return dnp ? dnp.state : "down";
+  const dnp = await getDnpFromListPackages(dnpName);
+  if (!dnp) return "down";
+  const container = dnp.containers.find(
+    c => !serviceName || c.serviceName === serviceName
+  );
+  return container ? container.state : "down";
 }

@@ -6,7 +6,7 @@ import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 
-export default function DappmanagerDnpDappnodeEth() {
+export function DappmanagerDnpDappnodeEth() {
   async function cleanCache() {
     try {
       await new Promise(resolve =>

@@ -70,33 +70,57 @@ export function EditorAdvanced({
       {Object.entries(userSettings).map(([dnpName, dnpSettings]) => (
         <div className="dnp-section" key={dnpName}>
           <div className="dnp-name">{shortNameCapitalized(dnpName)}</div>
-          <EditableTable
-            headers={["Env name", "Env value"]}
-            placeholder="enter value..."
-            values={dnpSettings.environment}
-            setValue={(valueId, envValue) =>
-              onChange({
-                [dnpName]: {
-                  environment: { [valueId]: envValue }
-                }
-              })
-            }
-          />
-          <EditableTable
-            headers={["Port - container", "Port - host"]}
-            placeholder="Ephemeral port if unspecified"
-            values={dnpSettings.portMappings}
-            setValue={(valueId, hostPort) =>
-              onChange({
-                [dnpName]: {
-                  portMappings: { [valueId]: hostPort }
-                }
-              })
-            }
-          />
-          {/* Rules for volumes
-               - Can't be edited if they are already set 
-          */}
+          {dnpSettings.environment &&
+            Object.entries(dnpSettings.environment).map(
+              ([serviceName, environment]) => (
+                <div className="service-section" key={serviceName}>
+                  <div className="service-name">
+                    {shortNameCapitalized(serviceName)}
+                  </div>
+                  <EditableTable
+                    headers={["Env name", "Env value"]}
+                    placeholder="enter value..."
+                    values={environment}
+                    setValue={(valueId, envValue) =>
+                      onChange({
+                        [dnpName]: {
+                          environment: {
+                            [serviceName]: { [valueId]: envValue }
+                          }
+                        }
+                      })
+                    }
+                  />
+                </div>
+              )
+            )}
+
+          {dnpSettings.portMappings &&
+            Object.entries(dnpSettings.portMappings).map(
+              ([serviceName, portMappings]) => (
+                <div className="service-section" key={serviceName}>
+                  <div className="service-name">
+                    {shortNameCapitalized(serviceName)}
+                  </div>
+                  <EditableTable
+                    headers={["Port - container", "Port - host"]}
+                    placeholder="Ephemeral port if unspecified"
+                    values={portMappings}
+                    setValue={(valueId, hostPort) =>
+                      onChange({
+                        [dnpName]: {
+                          portMappings: {
+                            [serviceName]: { [valueId]: hostPort }
+                          }
+                        }
+                      })
+                    }
+                  />
+                </div>
+              )
+            )}
+
+          {/* Rules for volumes: Can't be edited if they are already set */}
           <EditableTable
             headers={["Volume name", "Custom mountpoint path"]}
             placeholder="default docker location if unspecified"

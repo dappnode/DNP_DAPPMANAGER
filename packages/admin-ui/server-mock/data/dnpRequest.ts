@@ -16,12 +16,12 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
   const compatibleDnps: CompatibleDnps = {};
 
   for (const dep of [dnp, ...(dnp.dependencies || [])]) {
-    const name = dep.metadata.name;
-    if (dep.userSettings) settings[name] = dep.userSettings;
-    if (dep.setupWizard) setupWizard[name] = dep.setupWizard;
+    const dnpName = dep.metadata.name;
+    if (dep.userSettings) settings[dnpName] = dep.userSettings;
+    if (dep.setupWizard) setupWizard[dnpName] = dep.setupWizard;
     if (dep.specialPermissions)
-      specialPermissions[name] = dep.specialPermissions;
-    compatibleDnps[name] = {
+      specialPermissions[dnpName] = dep.specialPermissions;
+    compatibleDnps[dnpName] = {
       from: dep.installedData?.version,
       to: dep.metadata.version
     };
@@ -29,7 +29,7 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
 
   return {
     ...sampleRequestState,
-    name: dnp.metadata.name,
+    dnpName: dnp.metadata.name,
     reqVersion: dnp.metadata.version,
     semVersion: dnp.metadata.version,
     avatarUrl: dnp.avatar || "",

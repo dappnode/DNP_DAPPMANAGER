@@ -10,6 +10,10 @@ import { Terminal } from "./Terminal";
 // Utils
 import { stringIncludes, stringSplit } from "utils/strings";
 import { apiUrls } from "params";
+import { urlJoin } from "utils/url";
+import { PackageContainer } from "common";
+import "./logs.scss";
+import { ServiceSelector } from "./ServiceSelector";
 
 const baseUrlDownloadAll = apiUrls.containerLogs;
 const refreshInterval = 2 * 1000;
@@ -17,7 +21,10 @@ const terminalID = "terminal";
 
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
-export default function Logs({ id }: { id: string }) {
+export function Logs({ containers }: { containers: PackageContainer[] }) {
+  const serviceNames = containers.map(c => c.serviceName).sort();
+  const [serviceName, setServiceName] = useState(serviceNames[0]);
+
   // User options
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [timestamps, setTimestamps] = useState(false);
@@ -25,6 +32,9 @@ export default function Logs({ id }: { id: string }) {
   const [lines, setLines] = useState(200);
   // Fetched data
   const [logs, setLogs] = useState("");
+
+  const container = containers.find(c => c.serviceName === serviceName);
+  const containerName = container?.containerName;
 
   /**
    * This use effect fetches the logs again everytime any of this variables changes:
@@ -43,8 +53,9 @@ export default function Logs({ id }: { id: string }) {
 
     async function logDnp() {
       try {
+        if (!containerName) throw Error("No containerName");
         const options = { timestamps, tail: lines };
-        const logs = await api.packageLog({ id, options });
+        const logs = await api.packageLog({ containerName, options });
         if (typeof logs !== "string") throw Error("Logs must be a string");
 
         // Prevent updating the state of an unmounted component
@@ -66,7 +77,7 @@ export default function Logs({ id }: { id: string }) {
         unmounted = true;
       };
     }
-  }, [autoRefresh, timestamps, lines, id]);
+  }, [autoRefresh, timestamps, lines, containerName]);
 
   /**
    * Filter the logs text by lines that contain the query
@@ -85,8 +96,14 @@ export default function Logs({ id }: { id: string }) {
     : "Lines must be a number > 0";
 
   return (
-    <Card className="log-controls">
-      <div>
+    <Card spacing>
+      <ServiceSelector
+        serviceName={serviceName}
+        setServiceName={setServiceName}
+        containers={containers}
+      />
+
+      <div className="logs-switches">
         <Switch
           checked={autoRefresh}
           onToggle={setAutoRefresh}
@@ -108,9 +125,14 @@ export default function Logs({ id }: { id: string }) {
         type="number"
         prepend="Lines"
         append={
-          <a href={`${baseUrlDownloadAll}/${id}`} {...newTabProps}>
-            <Button>Download all</Button>
-          </a>
+          containerName && (
+            <a
+              href={urlJoin(baseUrlDownloadAll, containerName)}
+              {...newTabProps}
+            >
+              <Button>Download all</Button>
+            </a>
+          )
         }
       />
 

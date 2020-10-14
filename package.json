@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna clean --yes && lerna bootstrap -- --frozen-lockfile --non-interactive",
+    "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive --ignore-optional",
     "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
     "build": "lerna run build --stream",
@@ -16,13 +16,8 @@
     "test:int": "lerna run test:int --stream",
     "pre-commit": "lerna run pre-commit --stream"
   },
-  "devDependencies": {
-    "husky": "^4.2.5",
-    "lerna": "^3.22.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run pre-commit"
-    }
+  "dependencies": {
+    "lerna": "^3.22.1",
+    "patch-package": "^6.2.1"
   }
 }

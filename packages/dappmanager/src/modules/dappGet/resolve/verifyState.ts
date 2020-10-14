@@ -6,9 +6,9 @@ import { StateInternalInterface, DappGetDnps } from "../types";
  * Checks if a specific combination of DNP versions is valid
  * It invalidates the state at the first incompatibility found
  *
- * @param {object} state Combination of DNP versions
+ * @param state Combination of DNP versions
  * {A: '2.0.0, B: '1.1.0', C: '1.0.0'}
- * @param {object} dnps The entire dnps, displaying all DNP versions and their deps
+ * @param dnps The entire dnps, displaying all DNP versions and their deps
   * repo = {
     "A": {
         "1.0.0": {"C": "^1.0.0"},
@@ -17,7 +17,7 @@ import { StateInternalInterface, DappGetDnps } from "../types";
     },
     "B": ...
     ...
- * @returns {obj} Object with two properties:
+ * @returns Object with two properties:
  * - res: boolean, true if the state is valid
  * - msg: metadata of which pkg and dep invalidated the state
  */

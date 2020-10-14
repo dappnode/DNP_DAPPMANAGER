@@ -1,6 +1,6 @@
 import { mapValues, omit } from "lodash";
 import semver from "semver";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
@@ -15,10 +15,10 @@ import {
   CompatibleDnps,
   PackageRelease,
   PackageReleaseMetadata,
-  PackageContainer,
   SetupWizardAllDnps,
   SetupWizardField,
-  SpecialPermissionAllDnps
+  SpecialPermissionAllDnps,
+  InstalledPackageData
 } from "../types";
 
 export async function fetchDnpRequest({
@@ -34,20 +34,22 @@ export async function fetchDnpRequest({
   const specialPermissions: SpecialPermissionAllDnps = {};
   const setupWizard: SetupWizardAllDnps = {};
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
-    const { name, metadata, compose, isCore } = release;
+    const { dnpName, metadata, compose, isCore } = release;
 
-    const container = dnpList.find(_dnp => _dnp.name === name);
-    const isInstalled = Boolean(container);
+    const dnp = dnpList.find(d => d.dnpName === dnpName);
+    const isInstalled = Boolean(dnp);
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
-    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(name, isCore);
-    const userSettings = deepmerge(defaultUserSet, prevUserSet);
-    settings[name] = userSettings[name];
+    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(
+      dnpName,
+      isCore
+    );
+    settings[dnpName] = deepmerge(defaultUserSet, prevUserSet);
 
-    specialPermissions[name] = parseSpecialPermissions(compose, isCore);
+    specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
     if (metadata.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
@@ -60,18 +62,25 @@ export async function fetchDnpRequest({
                 // If the package is installed, ignore (all)namedVolumesMountpoint
                 return !isInstalled;
               case "fileUpload":
-                // If the container nad path of file upload exists, ignore fileUpload
-                if (container)
-                  try {
-                    const fileInfo = await dockerInfoArchive(
-                      container.id,
-                      field.target.path
-                    );
-                    return !fileInfo.size;
-                  } catch (e) {
-                    // Ignore all errors: 404 Container not found,
-                    // 404 path not found, Base64 parsing, JSON parsing, etc.
-                  }
+                // If the container and path of file upload exists, ignore fileUpload
+                if (dnp) {
+                  const serviceName = field.target.service;
+                  // Find the container referenced by the target or the first one if unspecified
+                  const container = dnp.containers.find(
+                    c => !serviceName || c.serviceName === serviceName
+                  );
+                  if (container)
+                    try {
+                      const fileInfo = await dockerInfoArchive(
+                        container.containerId,
+                        field.target.path
+                      );
+                      return !fileInfo.size;
+                    } catch (e) {
+                      // Ignore all errors: 404 Container not found,
+                      // 404 path not found, Base64 parsing, JSON parsing, etc.
+                    }
+                }
             }
           }
           return true;
@@ -80,7 +89,7 @@ export async function fetchDnpRequest({
         if (await shouldAddSetupWizardField())
           activeSetupWizardFields.push(field);
       }
-      setupWizard[name] = {
+      setupWizard[dnpName] = {
         ...metadata.setupWizard,
         fields: activeSetupWizardFields
       };
@@ -93,29 +102,29 @@ export async function fetchDnpRequest({
   let compatibleError = "";
   let compatibleDnps: CompatibleDnps = {};
   try {
-    const { name, reqVersion } = mainRelease;
+    const { dnpName, reqVersion } = mainRelease;
     const {
       state,
-      currentVersion,
+      currentVersions,
       releases
     } = await releaseFetcher.getReleasesResolved({
-      name,
+      name: dnpName,
       ver: reqVersion
     });
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
-      from: currentVersion[dnpName],
+      from: currentVersions[dnpName],
       to: nextVersion
     }));
 
     // Add dependencies' metadata
     for (const release of releases)
-      if (release.name !== name) await addReleaseToSettings(release);
+      if (release.dnpName !== dnpName) await addReleaseToSettings(release);
   } catch (e) {
     compatibleError = e.message;
   }
 
   return {
-    name: mainRelease.name, // "bitcoin.dnp.dappnode.eth"
+    dnpName: mainRelease.dnpName, // "bitcoin.dnp.dappnode.eth"
     semVersion: mainRelease.semVersion,
     reqVersion: mainRelease.reqVersion,
     origin: mainRelease.origin, // "/ipfs/Qm"
@@ -152,29 +161,29 @@ export async function fetchDnpRequest({
  * Helper to check if a package is installed
  */
 export function getIsInstalled(
-  { name }: { name: string },
-  dnpList: PackageContainer[]
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
 ): boolean {
-  return !!dnpList.find(dnp => dnp.name === name);
+  return !!dnpList.find(dnp => dnp.dnpName === dnpName);
 }
 
 /**
  * Helper to check if a package is update to the latest version
  */
 export function getIsUpdated(
-  { name, reqVersion }: { name: string; reqVersion: string },
-  dnpList: PackageContainer[]
+  { dnpName, reqVersion }: { dnpName: string; reqVersion: string },
+  dnpList: InstalledPackageData[]
 ): boolean {
-  const dnp = dnpList.find(dnp => dnp.name === name);
+  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
   if (!dnp) return false;
   return !shouldUpdate(dnp.version, reqVersion);
 }
 
 function getRequiresCoreUpdate(
   { metadata }: { metadata: PackageReleaseMetadata },
-  dnpList: PackageContainer[]
+  dnpList: InstalledPackageData[]
 ): boolean {
-  const coreDnp = dnpList.find(dnp => dnp.name === params.coreDnpName);
+  const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;
   const coreVersion = coreDnp.version;
   const minDnVersion = metadata.requirements

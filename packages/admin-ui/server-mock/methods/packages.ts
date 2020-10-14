@@ -10,22 +10,22 @@ import {
 } from "../../src/common";
 import * as eventBus from "../eventBus";
 import { dnpInstalled, directory, dnpRequests } from "../data";
-import { samplePackageContainer } from "../data/sample";
+import { sampleContainer, sampleDnp } from "../data/sample";
 import { pause } from "../utils";
 
 const pkgRestartMs = 2000;
 
 const packages = new Map<string, InstalledPackageDetailData>(
-  dnpInstalled.map(pkg => [pkg.name, pkg])
+  dnpInstalled.map(dnp => [dnp.dnpName, dnp])
 );
 
 function update(
-  id: string,
-  fn: (pkg: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
+  dnpName: string,
+  fn: (dnp: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
 ) {
-  const pkg = packages.get(id);
-  if (!pkg) throw Error(`No id ${id}`);
-  packages.set(id, { ...pkg, ...fn(pkg) });
+  const dnp = packages.get(dnpName);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
+  packages.set(dnpName, { ...dnp, ...fn(dnp) });
   eventBus.requestPackages.emit();
 }
 
@@ -93,7 +93,8 @@ export async function fetchDnpRequest({
  */
 export async function packageInstall({
   name,
-  version
+  version,
+  userSettings
 }: {
   name: string;
   version?: string;
@@ -105,17 +106,29 @@ export async function packageInstall({
 }): Promise<void> {
   await pause(pkgRestartMs);
   packages.set(name, {
-    ...samplePackageContainer,
-    id: name,
-    packageName: name,
+    ...sampleDnp,
+    dnpName: name,
     version: version || "0.1.0",
-    image: `${name}:${version}`,
-    name: name,
-    shortName: name,
     avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
     origin: undefined,
     gettingStarted: `Welcome to the package **${name}**`,
-    gettingStartedShow: true
+    gettingStartedShow: true,
+    userSettings: (userSettings || {})[name],
+    containers: [
+      {
+        ...sampleContainer,
+        containerName: `DAppNodePackage-${name}`,
+        containerId: `00000000000${name}`,
+        serviceName: name,
+        instanceName: "",
+        created: 1500000000,
+        image: `${name}:${version}`,
+        state: "running",
+        running: true,
+        ports: [],
+        volumes: []
+      }
+    ]
   });
 }
 
@@ -123,13 +136,13 @@ export async function packageInstall({
  * Get package detail information
  */
 export async function packageGet({
-  id
+  dnpName
 }: {
-  id: string;
+  dnpName: string;
 }): Promise<InstalledPackageDetailData> {
-  const pkg = packages.get(id);
-  if (!pkg) throw Error(`${id} package not found`);
-  return pkg;
+  const dnp = packages.get(dnpName);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
+  return dnp;
 }
 
 /**
@@ -141,126 +154,162 @@ export async function packagesGet(): Promise<InstalledPackageData[]> {
 
 /**
  * Toggles the visibility of a getting started block
- * @param show Should be shown on hidden
  */
 export async function packageGettingStartedToggle({
-  id,
+  dnpName,
   show
 }: {
-  id: string;
+  dnpName: string;
   show: boolean;
 }): Promise<void> {
-  update(id, () => ({ gettingStartedShow: show }));
+  update(dnpName, () => ({ gettingStartedShow: show }));
 }
 
 /**
  * Returns the logs of the docker container of a package
- * @param id DNP .eth name
- * @param options log options
+ * Log options
  * - timestamps: Show timestamps
  * - tail: Number of lines to return from bottom: 200
  * @returns String with escape codes
  */
 export async function packageLog({
-  id
+  containerName
 }: {
-  id: string;
+  containerName: string;
   options?: { timestamps?: boolean; tail?: number };
 }): Promise<string> {
-  return `INFO: ${id} logs`;
+  return `INFO: ${containerName} logs`;
 }
 
 /**
  * Remove a package and its data
- * @param id DNP .eth name
- * @param deleteVolumes flag to also clear permanent package data
+ * deleteVolumes: flag to also clear permanent package data
  */
 export async function packageRemove({
-  id
+  dnpName
 }: {
-  id: string;
+  dnpName: string;
   deleteVolumes?: boolean;
   timeout?: number;
 }): Promise<void> {
   await pause(pkgRestartMs);
-  packages.delete(id);
+  packages.delete(dnpName);
 }
 
 /**
  * Calls docker rm and docker up on a package
  */
-export async function packageRestart({ id }: { id: string }): Promise<void> {
+export async function packageRestart({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<void> {
   await pause(pkgRestartMs);
-  update(id, () => ({ state: "exited" }));
+  update(dnpName, dnp => ({
+    containers: dnp.containers.map(container => ({
+      ...container,
+      state: "exited"
+    }))
+  }));
 
   await pause(pkgRestartMs);
-  update(id, () => ({ state: "running" }));
+  update(dnpName, dnp => ({
+    containers: dnp.containers.map(container => ({
+      ...container,
+      state: "running"
+    }))
+  }));
 }
 
 /**
  * Removes a package volumes. The re-ups the package
  */
 export async function packageRestartVolumes({
-  id
+  dnpName
 }: {
-  id: string;
+  dnpName: string;
   volumeId?: string;
 }): Promise<void> {
-  throw Error(`Not implemented: ${id}`);
+  throw Error(`Not implemented: ${dnpName}`);
 }
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- * @param id DNP .eth name
- * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
  */
 export async function packageSetEnvironment({
-  id,
-  envs
+  dnpName,
+  environmentByService
 }: {
-  id: string;
-  envs: PackageEnvs;
+  dnpName: string;
+  environmentByService: { [serviceName: string]: PackageEnvs };
 }): Promise<void> {
   await pause(pkgRestartMs);
-  update(id, dnp => ({
-    userSettings: {
-      ...dnp.userSettings,
-      environment: { ...(dnp.userSettings?.environment || {}), ...envs }
-    }
-  }));
+
+  for (const [serviceName, environment] of Object.entries(
+    environmentByService
+  )) {
+    update(dnpName, dnp => ({
+      userSettings: {
+        ...dnp.userSettings,
+        environment: {
+          [serviceName]: {
+            ...((dnp.userSettings?.environment || {})[serviceName] || {}),
+            ...environment
+          }
+        }
+      }
+    }));
+  }
 }
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- * @param id DNP .eth name
- * @param envs environment variables, envs = { ENV_NAME: ENV_VALUE }
  */
 export async function packageSetPortMappings({
-  id,
-  portMappings
+  dnpName,
+  portMappingsByService
 }: {
-  id: string;
-  portMappings: PortMapping[];
+  dnpName: string;
+  portMappingsByService: { [serviceName: string]: PortMapping[] };
   options?: { merge: boolean };
 }): Promise<void> {
   await pause(pkgRestartMs);
-  update(id, () => ({ ports: portMappings }));
+  for (const [serviceName, portMappings] of Object.entries(
+    portMappingsByService
+  )) {
+    update(dnpName, dnp => ({
+      containers: dnp.containers.map(container =>
+        container.serviceName === serviceName
+          ? { ...container, ports: portMappings }
+          : container
+      )
+    }));
+  }
 }
 
 /**
  * Stops or starts after fetching its status
- * @param id DNP .eth name
- * @param timeout seconds to stop the package
  */
 export async function packageStartStop({
-  id
+  dnpName,
+  serviceNames
 }: {
-  id: string;
-  options?: { timeout?: number };
+  dnpName: string;
+  serviceNames?: string[];
 }): Promise<void> {
   await pause(pkgRestartMs);
-  update(id, pkg => ({
-    running: !pkg.running,
-    state: pkg.running ? "exited" : "running"
+  const dnp = packages.get(dnpName);
+  if (!dnp) throw Error(`dnpName ${dnpName} not found`);
+
+  update(dnp.dnpName, d => ({
+    containers: d.containers.map(container =>
+      !serviceNames || serviceNames?.includes(container.serviceName)
+        ? {
+            ...container,
+            running: !container.running,
+            state: container.running ? "exited" : "running"
+          }
+        : container
+    )
   }));
 }

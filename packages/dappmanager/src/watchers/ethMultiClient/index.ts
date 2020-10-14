@@ -2,7 +2,7 @@ import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
 import { packageInstall } from "../../calls";
-import { listContainerNoThrow } from "../../modules/docker/listContainers";
+import { listPackageNoThrow } from "../../modules/docker/listContainers";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
 import {
@@ -39,8 +39,8 @@ export async function runEthClientInstaller(
 
   const clientData = ethClientData[target];
   if (!clientData) throw Error(`No client data for target: ${target}`);
-  const { name, version, userSettings } = clientData;
-  const dnp = await listContainerNoThrow(name);
+  const { dnpName, version, userSettings } = clientData;
+  const dnp = await listPackageNoThrow({ dnpName });
 
   const installStatus = db.ethClientInstallStatus.get(target);
   const status: InstallStatus = installStatus
@@ -66,11 +66,11 @@ export async function runEthClientInstaller(
         try {
           db.ethClientInstallStatus.set(target, { status: "INSTALLING" });
 
-          const installOptions = {
-            name,
+          const installOptions: Parameters<typeof packageInstall>[0] = {
+            name: dnpName,
             version,
             userSettings: {
-              [name]: merge(
+              [dnpName]: merge(
                 // Merge the default user settings with any customization from the user
                 userSettings || {},
                 db.ethClientUserSettings.get(target) || {}
@@ -87,8 +87,8 @@ export async function runEthClientInstaller(
             // covers this case by re-trying the installation with a locally available
             // IPFS content hash for all target packages
             if (e instanceof EthProviderError) {
-              const contentHash = getLocalFallbackContentHash(name);
-              if (!contentHash) throw Error(`No local version for ${name}`);
+              const contentHash = getLocalFallbackContentHash(dnpName);
+              if (!contentHash) throw Error(`No local version for ${dnpName}`);
               await packageInstall({ ...installOptions, version: contentHash });
             } else {
               throw e;
@@ -96,9 +96,9 @@ export async function runEthClientInstaller(
           }
 
           // Map fullnode.dappnode to package
-          db.fullnodeDomainTarget.set(name);
+          db.fullnodeDomainTarget.set(dnpName);
           // Run nsupdate
-          eventBus.packagesModified.emit({ ids: [name] });
+          eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 
           return { status: "INSTALLED" };
         } catch (e) {
@@ -122,7 +122,7 @@ export async function runEthClientInstaller(
  * Otherwise it can stay in installing state forever if the dappmanager
  * resets during an installation of the client
  */
-function verifyInitialStatusIsNotInstalling() {
+function verifyInitialStatusIsNotInstalling(): void {
   const target = db.ethClientTarget.get();
   if (target) {
     const status = db.ethClientInstallStatus.get(target);

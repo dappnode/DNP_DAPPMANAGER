@@ -11,15 +11,15 @@ if (!tsConfigPath || !baseDir)
 const typesToSchema = [
   "RoutesArguments",
   "RoutesReturn",
-  "SubscriptionsArguments",
+  "SubscriptionsArguments"
 ];
 
-const getPath = (typeName) => path.join(baseDir, `${typeName}.schema.json`);
+const getPath = typeName => path.join(baseDir, `${typeName}.schema.json`);
 fs.mkdirSync(baseDir, { recursive: true });
 
 // Pre-generate files so compilation doesn't fail
 for (const typeName of typesToSchema) {
-  fs.writeFileSync(getPath(typeName), "");
+  fs.writeFileSync(getPath(typeName), "{}");
 }
 
 // Compile types to schemas
@@ -28,7 +28,7 @@ for (const typeName of typesToSchema) {
   /* eslint-disable-next-line no-console */
   console.log(`Generating .schema.json of ${typeName}`);
   const schema = TJS.generateSchema(program, typeName, {
-    required: true,
+    required: true
   });
   if (!schema) throw Error(`Error generating ${typeName} schema`);
 

@@ -2,8 +2,9 @@ import { DirectoryItemOk, DirectoryItem } from "../../src/common";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
 
-function getDirectoryDnp(dnp: MockDnp): DirectoryItemOk {
+function getDirectoryDnp(dnp: MockDnp, index: number): DirectoryItemOk {
   return {
+    index,
     status: "ok",
     name: dnp.metadata.name,
     description:
@@ -20,16 +21,8 @@ function getDirectoryDnp(dnp: MockDnp): DirectoryItemOk {
 
 export const directory: DirectoryItem[] = [
   ...mockDnps.map(getDirectoryDnp),
-
   {
-    status: "loading",
-    name: "fetch-loads.dnp.dappnode.eth",
-    whitelisted: true,
-    isFeatured: false,
-    message:
-      "Loading manifest and more stuff really long text that goes on and on and more stuff 57%"
-  },
-  {
+    index: 99,
     status: "error",
     name: "fetch-fails.dnp.dappnode.eth",
     whitelisted: true,

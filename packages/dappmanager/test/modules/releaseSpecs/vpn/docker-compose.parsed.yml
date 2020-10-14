@@ -1,26 +1,26 @@
-version: '3.4'
+version: "3.4"
 services:
   vpn.dnp.dappnode.eth:
     container_name: DAppNodeCore-vpn.dnp.dappnode.eth
     dns: 172.33.1.2
-    image: 'vpn.dnp.dappnode.eth:0.2.5'
+    image: "vpn.dnp.dappnode.eth:0.2.5"
     logging:
       driver: journald
     networks:
       network:
         ipv4_address: 172.33.1.4
     ports:
-      - '1194:1194/udp'
+      - "1194:1194/udp"
     privileged: true
     restart: always
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
-      - '/etc/hostname:/etc/vpnname:ro'
-      - '/usr/src/dappnode/config:/usr/src/app/config:ro'
-      - '/lib/modules:/lib/modules:ro'
-      - 'vpndnpdappnodeeth_data:/usr/src/app/secrets'
-      - 'vpndnpdappnodeeth_config:/etc/openvpn'
-      - 'vpndnpdappnodeeth_shared:/var/spool/openvpn'
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/etc/hostname:/etc/vpnname:ro"
+      - "/usr/src/dappnode/config:/usr/src/app/config:ro"
+      - "/lib/modules:/lib/modules:ro"
+      - "vpndnpdappnodeeth_data:/usr/src/app/secrets"
+      - "vpndnpdappnodeeth_config:/etc/openvpn"
+      - "vpndnpdappnodeeth_shared:/var/spool/openvpn"
 volumes:
   vpndnpdappnodeeth_data: {}
   vpndnpdappnodeeth_config: {}

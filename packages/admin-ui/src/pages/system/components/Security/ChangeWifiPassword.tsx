@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { api } from "api";
-import { wifiName, wifiEnvSSID, wifiEnvWPA_PASSPHRASE } from "params";
+import { wifiDnpName, wifiEnvSSID, wifiEnvWPA_PASSPHRASE } from "params";
 import { getWifiStatus } from "services/dappnodeStatus/selectors";
 // Components
 import Card from "components/Card";
@@ -56,10 +56,17 @@ export default function ChangeWifiPassword() {
       [wifiEnvSSID]: ssid,
       [wifiEnvWPA_PASSPHRASE]: password
     };
-    withToastNoThrow(() => api.packageSetEnvironment({ id: wifiName, envs }), {
-      message: "Changing WIFI credentials...",
-      onSuccess: "Changed WIFI credentials"
-    });
+    withToastNoThrow(
+      () =>
+        api.packageSetEnvironment({
+          dnpName: wifiDnpName,
+          environmentByService: { [wifiDnpName]: envs }
+        }),
+      {
+        message: "Changing WIFI credentials...",
+        onSuccess: "Changed WIFI credentials"
+      }
+    );
   }
 
   return (

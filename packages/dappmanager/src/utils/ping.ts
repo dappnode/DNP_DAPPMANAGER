@@ -5,9 +5,7 @@ const max = 3;
 
 /**
  * Checks if a given IP resolves
- *
- * @param {string} ip
- * @return {Boolean} resolves
+ * @returns true if resolves
  */
 export default async function ping(ip: string): Promise<boolean> {
   let i = 0;

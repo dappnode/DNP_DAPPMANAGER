@@ -6,7 +6,7 @@ import { passwordIsSecure } from "./passwordIsSecure";
  * Changes the user `dappnode`'s password in the host machine
  * Only allows it if the current password has the salt `insecur3`
  *
- * @param {string} newPassword super-secure-password
+ * @param newPassword super-secure-password
  */
 export async function passwordChange({
   newPassword

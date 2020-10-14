@@ -28,8 +28,12 @@ export default function runVpnBridge(): void {
   getVersionDataVpn();
 
   // Fetch after updating the VPN
-  eventBus.packagesModified.on(({ ids }) => {
-    if (!ids || !Array.isArray(ids) || ids.includes(params.vpnDnpName)) {
+  eventBus.packagesModified.on(({ dnpNames }) => {
+    if (
+      !dnpNames ||
+      !Array.isArray(dnpNames) ||
+      dnpNames.includes(params.vpnDnpName)
+    ) {
       getVersionDataVpn();
     }
   });

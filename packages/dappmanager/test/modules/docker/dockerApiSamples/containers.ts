@@ -28,7 +28,8 @@ export const dockerApiResponseContainers: Docker.ContainerInfo[] = [
       "com.docker.compose.version": "1.20.1",
       "dappnode.dnp.dependencies":
         '{"nginx-proxy.dnp.dappnode.eth":"latest","letsencrypt-nginx.dnp.dappnode.eth":"latest"}',
-      maintainer: "NGINX Docker Maintainers <docker-maint@nginx.com>"
+      maintainer: "NGINX Docker Maintainers <docker-maint@nginx.com>",
+      "dappnode.dnp.default.ports": "[]"
     },
     Mounts: [],
     Names: ["/DAppNodePackage-otpweb.dnp.dappnode.eth"],
@@ -725,7 +726,8 @@ export const dockerApiResponseContainers: Docker.ContainerInfo[] = [
       "com.docker.compose.oneoff": "False",
       "com.docker.compose.project": "dncore",
       "com.docker.compose.service": "ipfs.dnp.dappnode.eth",
-      "com.docker.compose.version": "1.22.0"
+      "com.docker.compose.version": "1.22.0",
+      "dappnode.dnp.default.ports": '["4001:4001","4002:4002/udp"]'
     },
     Mounts: [
       {

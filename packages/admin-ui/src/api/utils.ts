@@ -1,4 +1,4 @@
-import { dappmanagerName, coreName } from "params";
+import { dappmanagerDnpName, coreDnpName } from "params";
 
 /**
  * Restarting the DAPPMANAGER will cause this error
@@ -7,7 +7,6 @@ import { dappmanagerName, coreName } from "params";
  * ```
  * Expose this function as a utility of the API to easily modified if autobahn
  * is changed for a regular HTTP RPC
- * @param e
  */
 function isCallDisconnectedError(e: Error): boolean {
   return e.message.includes("wamp.error.canceled");
@@ -16,7 +15,6 @@ function isCallDisconnectedError(e: Error): boolean {
 /**
  * Wrapper to convert API calls that may throw a callee disconnected error
  * into successful resolved calls
- * @param fn
  */
 export function continueIfCalleDisconnected(
   fn: () => Promise<void>,
@@ -28,7 +26,7 @@ export function continueIfCalleDisconnected(
     } catch (e) {
       if (
         isCallDisconnectedError(e) &&
-        (!dnpName || dnpName === dappmanagerName || dnpName === coreName)
+        (!dnpName || dnpName === dappmanagerDnpName || dnpName === coreDnpName)
       )
         return;
       else throw e;

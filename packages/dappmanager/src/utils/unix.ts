@@ -13,7 +13,7 @@ export interface DuResult {
  * 824208	/mnt/volume_ams3_01/dappnode-volumes/bitcoin.dnp.dappnode.eth
  * 824212	/mnt/volume_ams3_01/dappnode-volumes`
  * @param relativeFrom = "/mnt/volume_ams3_01/dappnode-volumes"
- * @return pathSizesArray = [
+ * @returns pathSizesArray = [
  *   { size: "824204", path: "bitcoin.dnp.dappnode.eth/bitcoin_data" },
  *   { size: "824208", path: "bitcoin.dnp.dappnode.eth" },
  *   { size: "824212", path: "." }

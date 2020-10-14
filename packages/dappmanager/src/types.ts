@@ -1,5 +1,26 @@
 export * from "./common";
 
-export interface ContainerLabels {
+export interface ContainerLabelsRaw {
   [labelId: string]: string;
 }
+
+export interface IpfsFileResult {
+  name: string; // 'avatar.png',
+  path: string; // 'QmR7ALYdVQCSfdob9tzE8mvPn3KJk653maMqLeqMo7eeTg/avatar.png',
+  size: number; // 9305,
+  hash: string; // 'QmRFfqN93JN5hDfqWhxaY6M16dafS6t9qzRCAKzzNT9ved',
+}
+
+// From https://nodejs.org/api/os.html#os_os_arch
+export type NodeArch =
+  | "arm"
+  | "arm64"
+  | "ia32"
+  | "mips"
+  | "mipsel"
+  | "ppc"
+  | "ppc64"
+  | "s390"
+  | "s390x"
+  | "x32"
+  | "x64";

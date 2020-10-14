@@ -5,20 +5,20 @@ import * as eventBus from "../eventBus";
  * Removes a package volumes. The re-ups the package
  */
 export async function packageRestartVolumes({
-  id,
+  dnpName,
   volumeId
 }: {
-  id: string;
+  dnpName: string;
   /**
    * volumeId = "gethdnpdappnodeeth_geth"
    */
   volumeId?: string;
 }): Promise<void> {
-  const { removedDnps } = await restartPackageVolumes({ id, volumeId });
+  const { removedDnps } = await restartPackageVolumes({ dnpName, volumeId });
 
   // Emit packages update
   if (removedDnps.length > 0) {
     eventBus.requestPackages.emit();
-    eventBus.packagesModified.emit({ ids: removedDnps });
+    eventBus.packagesModified.emit({ dnpNames: removedDnps });
   }
 }

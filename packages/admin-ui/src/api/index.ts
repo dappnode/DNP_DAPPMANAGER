@@ -12,7 +12,7 @@ import {
   SubscriptionsTypes
 } from "common/subscriptions";
 import { Routes, routesData, ResolvedType } from "common/routes";
-import { Args } from "common/transport/types";
+import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import {
@@ -23,10 +23,15 @@ import { initialCallsOnOpen } from "./initialCalls";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
 
-const apiRpcUrl = apiUrls.rpc;
 const socketIoUrl = apiUrl;
 /* eslint-disable-next-line no-console */
 console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
+let socketGlobal: SocketIOClient.Socket;
+
+function setupSocket(): SocketIOClient.Socket {
+  if (!socketGlobal) socketGlobal = io(socketIoUrl);
+  return socketGlobal;
+}
 
 const routeSubscription: Partial<
   {
@@ -60,28 +65,12 @@ const apiEventBridge = mitt();
  * @param args ["bitcoin.dnp.dappnode.eth"]
  */
 export async function callRoute<R>(route: string, args: any[]): Promise<R> {
-  const res = await fetch(apiRpcUrl, {
-    method: "post",
-    body: JSON.stringify({ method: route, params: args }),
-    headers: { "Content-Type": "application/json" }
+  const socket = setupSocket();
+  const rpcPayload: RpcPayload = { method: route, params: args };
+  const rpcResponse = await new Promise<RpcResponse<R>>(resolve => {
+    socket.emit("rpc", rpcPayload, resolve);
   });
-
-  // If body is not JSON log it to get info about the error. Express may respond with HTML
-  const bodyText = await res.text();
-  let body: any;
-  try {
-    body = JSON.parse(bodyText);
-  } catch (e) {
-    throw Error(
-      `Error parsing JSON body (${res.status} ${res.statusText}): ${e.message}\n${bodyText}`
-    );
-  }
-
-  if (!res.ok)
-    throw Error(`${res.status} ${res.statusText} ${body.message || ""}`);
-
-  // RPC response are always code 200
-  return parseRpcResponse<R>(body);
+  return parseRpcResponse(rpcResponse);
 }
 
 export const api: Routes = mapValues(
@@ -157,7 +146,7 @@ export const useSubscription: {
  * Store the session and map subscriptions
  */
 export function start() {
-  const socket = io(socketIoUrl);
+  const socket = setupSocket();
 
   socket.on("connect", function(...args: any) {
     const subscriptions = subscriptionsFactory(socket, subscriptionsLogger);

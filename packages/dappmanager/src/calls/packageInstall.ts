@@ -61,7 +61,7 @@ export async function packageInstall({
     const releaseFetcher = new ReleaseFetcher();
     const {
       state,
-      currentVersion,
+      currentVersions,
       releases
     } = await releaseFetcher.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
@@ -70,7 +70,7 @@ export async function packageInstall({
     for (const release of releases) {
       if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
         throw Error(
-          `Core package ${release.name} is from an unverified origin`
+          `Core package ${release.dnpName} is from an unverified origin`
         );
     }
 
@@ -78,14 +78,14 @@ export async function packageInstall({
     const packagesData = getInstallerPackagesData({
       releases,
       userSettings,
-      currentVersion,
+      currentVersions,
       reqName
     });
     logs.debug("Packages data", packagesData);
     logs.debug("User settings", userSettings);
 
     // Make sure that no package is already being installed
-    const dnpNames = packagesData.map(({ name }) => name);
+    const dnpNames = packagesData.map(({ dnpName }) => dnpName);
     for (const dnpName of dnpNames)
       if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 

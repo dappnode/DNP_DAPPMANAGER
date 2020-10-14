@@ -2,7 +2,8 @@ import { api } from "api";
 import { dappnodeStatus } from "./reducer";
 import { AppThunk } from "store";
 import {
-  wifiName,
+  wifiDnpName,
+  wifiContainerName,
   wifiEnvWPA_PASSPHRASE,
   wifiEnvSSID,
   wifiDefaultWPA_PASSPHRASE
@@ -40,13 +41,14 @@ export const fetchSystemInfo = (): AppThunk => async dispatch =>
  */
 export const fetchWifiStatus = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
-    const wifiDnp = await api.packageGet({ id: wifiName });
-    const environment = wifiDnp.userSettings?.environment || {};
-    const ssid = environment[wifiEnvSSID];
-    const pass = environment[wifiEnvWPA_PASSPHRASE];
+    const wifiDnp = await api.packageGet({ dnpName: wifiDnpName });
+    const environment =
+      (wifiDnp.userSettings?.environment || {})[wifiDnpName] || {};
+    const ssid: string = environment[wifiEnvSSID];
+    const pass: string = environment[wifiEnvWPA_PASSPHRASE];
     const isDefault = pass === wifiDefaultWPA_PASSPHRASE;
 
-    const logs = await api.packageLog({ id: wifiName });
+    const logs = await api.packageLog({ containerName: wifiContainerName });
     const firstLogLine = logs.trim().split("\n")[0];
     const running = !firstLogLine.includes("No interface found");
     dispatch(updateWifiStatus({ running, ssid, isDefault }));

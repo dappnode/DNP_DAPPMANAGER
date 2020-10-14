@@ -6,7 +6,7 @@ import { logs } from "../logs";
 /**
  * Sets the static IP
  *
- * @param {(string|null)} staticIp New static IP
+ * @param staticIp New static IP
  * - To enable: "85.84.83.82"
  * - To disable: null
  */

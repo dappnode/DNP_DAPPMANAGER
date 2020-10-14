@@ -1,14 +1,23 @@
-import params from "../params";
-import { omit, isEmpty } from "lodash";
-import { CoreUpdateData } from "../types";
-import { ReleaseFetcher } from "../modules/release";
-import { listContainers } from "../modules/docker/listContainers";
 import semver from "semver";
+import params from "../params";
+import { CoreUpdateData, PackageRelease } from "../types";
+import { ReleaseFetcher } from "../modules/release";
+import { listPackages } from "../modules/docker/listContainers";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
+import { ErrorDappGetDowngrade } from "../modules/dappGet/errors";
+import { logs } from "../logs";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";
+const coreAlreadyUpdated: CoreUpdateData = {
+  available: false,
+  type: undefined,
+  packages: [],
+  changelog: "",
+  updateAlerts: [],
+  versionId: ""
+};
 
 /**
  * Fetches the core update data, if available
@@ -33,38 +42,45 @@ export async function getCoreUpdateData(
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
   const releaseFetcher = new ReleaseFetcher();
-  const { releases } = await releaseFetcher.getReleasesResolved({
-    name: coreName,
-    ver: coreVersion
-  });
 
-  if (releases.length === 0) {
-    return {
-      available: false,
-      type: undefined,
-      packages: [],
-      changelog: "",
-      updateAlerts: [],
-      versionId: ""
-    };
+  let releases: PackageRelease[];
+  try {
+    const dappgetResult = await releaseFetcher.getReleasesResolved({
+      name: coreName,
+      ver: coreVersion
+    });
+    releases = dappgetResult.releases;
+  } catch (e) {
+    if (e instanceof ErrorDappGetDowngrade) {
+      logs.debug(
+        `Core update to ${coreVersion} would cause a downgrade for ${e.dnpName} from ${e.dnpVersion}, assuming core is updated`
+      );
+      return coreAlreadyUpdated;
+    } else {
+      throw e;
+    }
   }
 
-  const dnpList = await listContainers();
+  if (releases.length === 0) {
+    return coreAlreadyUpdated;
+  }
+
+  const dnpList = await listPackages();
 
   /**
    * If the core.dnp.dappnode.eth is not installed,
    * Ignore it to compute the update type
    */
-  const coreDnp = dnpList.find(_dnp => _dnp.name === coreName);
+  const coreDnp = dnpList.find(_dnp => _dnp.dnpName === coreName);
   const coreDnpsToBeInstalled = releases.filter(
-    ({ name }) => coreDnp || name !== coreName
+    ({ dnpName }) => coreDnp || dnpName !== coreName
   );
 
   const packages = coreDnpsToBeInstalled.map(release => {
-    const dnp = dnpList.find(_dnp => _dnp.name === release.name);
+    const dnp = dnpList.find(_dnp => _dnp.dnpName === release.dnpName);
     const { metadata: depManifest } = release;
     return {
-      name: release.name,
+      name: release.dnpName,
       from: dnp ? dnp.version : undefined,
       to: depManifest.version,
       warningOnInstall:
@@ -94,10 +110,10 @@ export async function getCoreUpdateData(
    * Compute updateAlerts
    */
   const coreRelease =
-    releases.find(({ name }) => name === coreName) ||
+    releases.find(({ dnpName }) => dnpName === coreName) ||
     (await releaseFetcher.getRelease(coreName, coreVersion));
   const { metadata: coreManifest } = coreRelease;
-  const dnpCore = dnpList.find(dnp => dnp.name === coreName);
+  const dnpCore = dnpList.find(dnp => dnp.dnpName === coreName);
   const from = dnpCore ? dnpCore.version : "";
   const to = coreManifest.version;
   const updateAlerts = (coreManifest.updateAlerts || []).filter(
@@ -112,7 +128,7 @@ export async function getCoreUpdateData(
 
   // versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"
   const versionId = getCoreVersionId(
-    packages.map(({ name, to }) => ({ name, version: to }))
+    packages.map(({ name, to }) => ({ dnpName: name, version: to }))
   );
 
   return {

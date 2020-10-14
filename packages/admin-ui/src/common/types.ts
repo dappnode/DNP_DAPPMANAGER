@@ -37,6 +37,7 @@ export interface VpnDevice {
  */
 // Information immediatelly available in the directory smart contract
 interface DirectoryItemBasic {
+  index: number;
   name: string;
   whitelisted: boolean;
   isFeatured: boolean;
@@ -54,18 +55,12 @@ export interface DirectoryItemOk extends DirectoryItemBasic {
   };
   categories: string[];
 }
-export interface DirectoryItemLoading extends DirectoryItemBasic {
-  status: "loading";
-  message?: string;
-}
+
 export interface DirectoryItemError extends DirectoryItemBasic {
   status: "error";
   message: string;
 }
-export type DirectoryItem =
-  | DirectoryItemOk
-  | DirectoryItemLoading
-  | DirectoryItemError;
+export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
 export interface RequestStatus {
   loading?: boolean;
@@ -94,11 +89,11 @@ export interface SetupWizardField {
 }
 
 export type UserSettingTarget =
-  | { type: "environment"; name: string }
-  | { type: "portMapping"; containerPort: string }
+  | { type: "environment"; name: string; service?: string }
+  | { type: "portMapping"; containerPort: string; service?: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
   | { type: "allNamedVolumesMountpoint" }
-  | { type: "fileUpload"; path: string };
+  | { type: "fileUpload"; path: string; service?: string };
 
 export interface SetupWizardAllDnps {
   [dnpName: string]: SetupWizard;
@@ -152,25 +147,53 @@ export interface SetupUiJson {
 
 // Settings must include the previous user settings
 
-/**
- * ```js
- * "bitcoin.dnp.dappnode.eth": {
- *   environment: { MODE: "VALUE_SET_BEFORE" }
- *   portMappings: { "8443": "8443"; "8443/udp": "8443" },
- *   namedVolumeMountpoints: { data: "" }
- *   fileUploads: { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
- * };
- * ```
- */
 export interface UserSettings {
-  environment?: { [envName: string]: string }; // Env value
-  portMappings?: { [containerPortAndType: string]: string }; // Host port
-  namedVolumeMountpoints?: { [volumeName: string]: string }; // Host absolute path to mountpoint
+  environment?: {
+    [serviceName: string]: {
+      /**
+       * ```js
+       * { MODE: "VALUE_SET_BEFORE" }
+       * ```
+       */
+      [envName: string]: string; // Env value
+    };
+  };
+  portMappings?: {
+    [serviceName: string]: {
+      /**
+       * ```js
+       * { "8443": "8443", "8443/udp": "8443" },
+       * ```
+       */
+      [containerPortAndType: string]: string; // Host port
+    };
+  };
+  namedVolumeMountpoints?: {
+    /**
+     * ```js
+     * { data: "/media/usb0" }
+     * ```
+     */
+    [volumeName: string]: string; // Host absolute path to mountpoint
+  };
   allNamedVolumeMountpoint?: string; // mountpoint
-  fileUploads?: { [containerPath: string]: string }; // dataURL
+  fileUploads?: {
+    [serviceName: string]: {
+      /**
+       * ```js
+       * { "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D" }
+       * ```
+       */
+      [containerPath: string]: string; // dataURL
+    };
+  };
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
-  legacyBindVolumes?: { [volumeName: string]: string }; // Host vol name to host bind absolute path
+  legacyBindVolumes?: {
+    [serviceName: string]: {
+      [volumeName: string]: string; // Host vol name to host bind absolute path
+    };
+  };
 }
 
 export interface UserSettingsAllDnps {
@@ -188,7 +211,7 @@ export interface CompatibleDnps {
 }
 
 export interface RequestedDnp {
-  name: string; // "bitcoin.dnp.dappnode.eth"
+  dnpName: string; // "bitcoin.dnp.dappnode.eth"
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   origin?: string; // "/ipfs/Qm"
@@ -275,22 +298,84 @@ export type ContainerState =
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
 export type ChainDriver = "bitcoin" | "ethereum" | "monero";
+export const chainDrivers: ChainDriver[] = ["bitcoin", "ethereum", "monero"];
+
+/**
+ * Type mapping of a package container labels
+ * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
+ */
+export interface ContainerLabelTypes {
+  "dappnode.dnp.dnpName": string;
+  "dappnode.dnp.version": string;
+  "dappnode.dnp.serviceName": string;
+  "dappnode.dnp.instanceName": string;
+  "dappnode.dnp.dependencies": Dependencies;
+  "dappnode.dnp.avatar": string;
+  "dappnode.dnp.origin": string;
+  "dappnode.dnp.chain": ChainDriver;
+  "dappnode.dnp.isCore": boolean;
+  "dappnode.dnp.isMain": boolean;
+  "dappnode.dnp.default.environment": string[];
+  "dappnode.dnp.default.ports": string[];
+  "dappnode.dnp.default.volumes": string[];
+}
 
 export interface PackageContainer {
-  id: string;
-  packageName: string;
+  /**
+   * Docker container ID
+   * ```
+   * "3edc051920c61e02ff9c42cf35caf4f48f693d65f44d6652de29e9024f051405"
+   * ```
+   */
+  containerId: string;
+  /**
+   * Docker container name
+   * ```
+   * "DAppNodeCore-mypackage.dnp.dappnode.eth"
+   * ```
+   */
+  containerName: string;
+  /**
+   * ENS domain name of this container's package
+   * ```
+   * "mypackage.dnp.dappnode.eth"
+   * ```
+   */
+  dnpName: string;
+  /**
+   * Docker compose service name of this container, as declared in its package docker-compose
+   * ```
+   * "frontend"
+   * ```
+   */
+  serviceName: string;
+  /**
+   * Name given by the user when installing an instance of a package
+   * ```
+   * "my-package-test-instance"
+   * ```
+   */
+  instanceName: string;
+  /**
+   * Semantic version of this container's package
+   * ```
+   * "0.1.0"
+   * ```
+   */
   version: string;
-  isDnp: boolean;
-  isCore: boolean;
+
+  // Docker data
   created: number;
   image: string;
-  name: string;
-  shortName: string;
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerState;
   running: boolean;
   ports: PortMapping[];
   volumes: VolumeMapping[];
+
+  // DAppNode package data
+  isDnp: boolean;
+  isCore: boolean;
   defaultEnvironment?: PackageEnvs;
   defaultPorts?: PortMapping[];
   defaultVolumes?: VolumeMapping[];
@@ -300,11 +385,27 @@ export interface PackageContainer {
   chain?: ChainDriver;
   domainAlias?: string[];
   canBeFullnode?: boolean;
+  isMain?: boolean;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
 
-export interface InstalledPackageData extends PackageContainer {}
+export type InstalledPackageData = Pick<
+  PackageContainer,
+  | "dnpName"
+  | "instanceName"
+  | "version"
+  | "isDnp"
+  | "isCore"
+  | "dependencies"
+  | "avatarUrl"
+  | "origin"
+  | "chain"
+  | "domainAlias"
+  | "canBeFullnode"
+> & {
+  containers: PackageContainer[];
+};
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
@@ -444,6 +545,7 @@ export interface DappnodeParams {
 export interface PackageBackup {
   name: string;
   path: string;
+  service?: string;
 }
 
 export type NotificationType = "danger" | "warning" | "success";
@@ -485,7 +587,7 @@ export interface ChainData {
 
 export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
-  name: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
+  dnpName: string; // "bitcoin.dnp.dappnode.eth", dnpName the log is referring to
   message: string; // "Downloading 75%", log message
   clear?: boolean; // to trigger the UI to clear the all logs of this id
 }
@@ -500,18 +602,6 @@ export interface UserActionLog {
   stack?: string; // If error: e.stack { string }
   // Additional properties to compress repeated logs (mainly errors)
   count?: number;
-}
-
-/**
- * Docker
- */
-
-export interface DockerOptionsInterface {
-  timeout?: number;
-  timestamps?: boolean;
-  volumes?: boolean;
-  v?: boolean;
-  core?: string;
 }
 
 /**
@@ -689,7 +779,7 @@ export interface SpecialPermissionAllDnps {
 }
 
 export interface PackageRelease {
-  name: string;
+  dnpName: string;
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
@@ -707,7 +797,7 @@ export interface PackageRelease {
 
 export type InstallPackageDataPaths = Pick<
   InstallPackageData,
-  | "name"
+  | "dnpName"
   | "semVersion"
   | "composePath"
   | "composeBackupPath"
@@ -728,8 +818,13 @@ export interface InstallPackageData extends PackageRelease {
   // Data to write
   compose: Compose;
   // User settings to be applied after running
-  fileUploads?: { [containerPath: string]: string };
+  fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
 }
+
+// Must be in-sync with SDK types
+export type Architecture = "linux/amd64" | "linux/arm64";
+export const architectures: Architecture[] = ["linux/amd64", "linux/arm64"];
+export const defaultArch = "linux/amd64";
 
 export interface PackageReleaseMetadata {
   name: string;
@@ -737,9 +832,11 @@ export interface PackageReleaseMetadata {
   upstreamVersion?: string;
   shortDescription?: string;
   description?: string;
-  type?: string;
-  chain?: string;
+  type?: "service" | "library" | "dncore";
+  chain?: ChainDriver;
   dependencies?: Dependencies;
+  mainService?: string;
+  architectures?: Architecture[];
 
   // Safety properties to solve problematic updates
   runOrder?: string[];
@@ -873,7 +970,7 @@ export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
 
 export type EthClientStatusOk =
   // All okay, client is functional
-  { ok: true; url: string; name: string };
+  { ok: true; url: string; dnpName: string };
 
 export type EthClientStatusError =
   // Unexpected error

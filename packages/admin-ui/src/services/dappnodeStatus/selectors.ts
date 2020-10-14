@@ -38,13 +38,12 @@ export const getEthClientWarning = (state: RootState): string | null => {
 
 /**
  * Returns the DAppNode "network" identity to be shown in the TopBar
- * @returns {object} params = {
+ * @returns params = {
  *   name: "MyDappNode",
  *   staticIp: "85.84.83.82" (optional)
  *   domain: "ab318d2.dyndns.io" (optional, if no staticIp)
  *   ip: "85.84.83.82" (optional, if no staticIp)
  * }
- * [Tested]
  */
 export const getDappnodeIdentityClean = (state: RootState) => {
   const systemInfo = getSystemInfo(state);

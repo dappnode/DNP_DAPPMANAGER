@@ -23,8 +23,8 @@ describe("Integration test for backup to and from:", function() {
    * /etc/nginx/conf.d - directory 8 KB
    */
   const content = "Amazing test content";
-  const id = "test-backup.dnp.dappnode.eth";
-  const containerName = `DAppNodePackage-${id}`;
+  const dnpName = "test-backup.dnp.dappnode.eth";
+  const containerName = `DAppNodePackage-${dnpName}`;
   const backupFileCompName = "test-backup.dnp.dappnode.eth_backup.tar.xz";
   const fileId =
     "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908";
@@ -51,7 +51,6 @@ describe("Integration test for backup to and from:", function() {
    */
 
   beforeEach("Up a test docker container", async function() {
-    this.timeout(60 * 1000);
     await createTestDir();
     // Create container
     await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
@@ -61,7 +60,7 @@ describe("Integration test for backup to and from:", function() {
       dockerComposePath,
       `version: '3.4'
 services:
-  ${id}:
+  ${dnpName}:
     image: 'nginx:alpine'
     container_name: ${containerName}
     volumes:
@@ -100,7 +99,7 @@ volumes:
     /**
      * Do restore
      */
-    await backupRestore({ id, fileId, backup });
+    await backupRestore({ dnpName, fileId, backup });
     // expect(resRestore.message).to.equal(
     //   "Restored backup test-backup.dnp.dappnode.eth, items: config, test",
     //   "Wrong response message for backupRestore"
@@ -109,7 +108,7 @@ volumes:
     /**
      * Do get
      */
-    const resultGet = await backupGet({ id, backup });
+    const resultGet = await backupGet({ dnpName, backup });
     // expect(resGet.message).to.equal(
     //   "Backup test-backup.dnp.dappnode.eth, items: config, test",
     //   "Wrong response message for backupGet"
@@ -141,10 +140,9 @@ volumes:
       content,
       `Backup sub dir file (test/data.conf) contents are incorrect`
     );
-  }).timeout(60 * 1000);
+  });
 
   after("Clean test docker container", async function() {
-    this.timeout(60 * 1000);
     await cleanTestDir();
     await shell(`docker rm -f ${containerName}`);
   });

@@ -7,30 +7,35 @@ import * as validate from "../../src/utils/validate";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../src/calls/packageRemove";
-import { PackageContainer } from "../../src/types";
-import { mockDnp, cleanTestDir } from "../testUtils";
+import { InstalledPackageData } from "../../src/types";
+import { mockDnp, cleanTestDir, mockContainer } from "../testUtils";
 
 describe("Call function: packageRemove", function() {
-  const id = "test.dnp.dappnode.eth";
-  const dockerComposePath = getPath.dockerCompose(id, false);
+  const dnpName = "test.dnp.dappnode.eth";
+  const dockerComposePath = getPath.dockerCompose(dnpName, false);
   const dockerComposeTemplate = `
   version: '3.4'
       services:
-          ${id}:
+          ${dnpName}:
               image: 'chentex/random-logger:latest'
               container_name: DNP_DAPPMANAGER_TEST_CONTAINER
   `.trim();
 
-  const dnp: PackageContainer = {
+  const dnp: InstalledPackageData = {
     ...mockDnp,
     isCore: false,
-    packageName: `DAppNodePackage-${id}`,
-    name: id
+    dnpName: dnpName,
+    containers: [
+      {
+        ...mockContainer,
+        containerName: `DAppNodePackage-${dnpName}`
+      }
+    ]
   };
 
   const dockerComposeDown = sinon.stub().resolves();
   const dockerRm = sinon.stub().resolves();
-  const listContainer = sinon.stub().resolves(dnp);
+  const listPackage = sinon.stub().resolves(dnp);
 
   const eventBus = {
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
@@ -50,7 +55,7 @@ describe("Call function: packageRemove", function() {
           .with(eventBus)
           .toBeUsed();
         mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainer })
+          .with({ listPackage })
           .toBeUsed();
       }
     );
@@ -63,14 +68,14 @@ describe("Call function: packageRemove", function() {
   });
 
   it("should stop the package with correct arguments", async () => {
-    await packageRemove({ id });
+    await packageRemove({ dnpName });
   });
 
   it("should have called docker-compose down", async () => {
     sinon.assert.callCount(dockerComposeDown, 1);
     expect(dockerComposeDown.firstCall.args).to.deep.equal(
       [dockerComposePath, { volumes: false, timeout: 10 }],
-      `should call docker.compose.down for the package ${id}`
+      `should call docker.compose.down for the package ${dnpName}`
     );
   });
 
@@ -78,7 +83,7 @@ describe("Call function: packageRemove", function() {
     sinon.assert.calledOnce(eventBus.requestPackages.emit);
     sinon.assert.calledOnce(eventBus.packagesModified.emit);
     expect(eventBus.packagesModified.emit.firstCall.lastArg).to.deep.equal({
-      ids: [id],
+      dnpNames: [dnpName],
       removed: true
     });
   });

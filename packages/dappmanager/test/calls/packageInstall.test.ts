@@ -18,11 +18,11 @@ describe.skip("Call function: packageInstall", function() {
     name: pkgName,
     type: "service"
   };
-  const pkgPkg = {
+  const pkgPkg: PackageRelease = {
     ...mockRelease,
-    manifest: pkgManifest,
-    name: pkgName,
-    version: pkgVer
+    metadata: pkgManifest,
+    dnpName: pkgName,
+    reqVersion: pkgVer
   };
 
   // Dep data
@@ -33,11 +33,11 @@ describe.skip("Call function: packageInstall", function() {
     name: depName,
     type: "library"
   };
-  const depPkg = {
+  const depPkg: PackageRelease = {
     ...mockRelease,
-    manifest: depManifest,
-    name: depName,
-    version: depVer
+    metadata: depManifest,
+    dnpName: depName,
+    reqVersion: depVer
   };
 
   // Stub packages module. Resolve always returning nothing
@@ -57,14 +57,14 @@ describe.skip("Call function: packageInstall", function() {
       message: string;
       state: DappGetState;
       alreadyUpdated: DappGetState;
-      currentVersion: DappGetState;
+      currentVersions: DappGetState;
     }> {
       dappGetSpy(req);
       return {
         message: "Found compatible state",
         state: { [pkgName]: pkgVer, [depName]: depVer },
         alreadyUpdated: {},
-        currentVersion: {},
+        currentVersions: {},
         releases: [pkgPkg, depPkg]
       };
     }

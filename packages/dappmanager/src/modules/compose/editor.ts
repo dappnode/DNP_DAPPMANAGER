@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
 import {
   mapValues,
   omitBy,
@@ -17,7 +16,7 @@ import {
   ComposeService,
   PortMapping,
   PackageEnvs,
-  ContainerLabels
+  ContainerLabelsRaw
 } from "../../types";
 import {
   stringifyPortMappings,
@@ -30,9 +29,10 @@ import {
   stringifyEnvironment
 } from "./environment";
 import { verifyCompose } from "./verify";
-import { UserSettingsAllDnps } from "../../common";
+import { UserSettings } from "../../common";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
+import { yamlDump, yamlParse } from "../../utils/yaml";
 
 class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -105,7 +105,7 @@ class ComposeServiceEditor {
     }));
   }
 
-  mergeLabels(labels: ContainerLabels): void {
+  mergeLabels(labels: ContainerLabelsRaw): void {
     this.edit(service => ({
       labels: { ...service.labels, ...labels }
     }));
@@ -121,17 +121,23 @@ export class ComposeEditor {
 
   static readFrom(composePath: string): Compose {
     const yamlString = fs.readFileSync(composePath, "utf8");
-    return parseComposeYaml(yamlString);
+    return yamlParse<Compose>(yamlString);
   }
 
   static getComposePath(dnpName: string, isCore: boolean): string {
     return getPath.dockerCompose(dnpName, isCore);
   }
 
-  service(serviceName?: string): ComposeServiceEditor {
-    return new ComposeServiceEditor(
-      this,
-      serviceName || Object.keys(this.compose.services)[0]
+  firstService(): ComposeServiceEditor {
+    const firstServiceName = Object.keys(this.compose.services)[0];
+    if (!firstServiceName) throw Error("Compose has no service");
+    return new ComposeServiceEditor(this, firstServiceName);
+  }
+
+  services(): { [serviceName: string]: ComposeServiceEditor } {
+    return mapValues(
+      this.compose.services,
+      (_service, serviceName) => new ComposeServiceEditor(this, serviceName)
     );
   }
 
@@ -163,18 +169,19 @@ export class ComposeEditor {
     return this.compose;
   }
 
-  getUserSettings(): UserSettingsAllDnps {
+  getUserSettings(): UserSettings {
     return parseUserSettings(this.compose);
   }
 
-  applyUserSettings(userSettings: UserSettingsAllDnps): void {
-    this.compose = applyUserSettings(this.compose, userSettings);
+  applyUserSettings(
+    userSettings: UserSettings,
+    { dnpName }: { dnpName: string }
+  ): void {
+    this.compose = applyUserSettings(this.compose, userSettings, { dnpName });
   }
 
   dump(): string {
-    // skipInvalid (default: false) - do not throw on invalid types (like function in
-    // the safe schema) and skip pairs and single values with such types.
-    return yaml.safeDump(this.output(), { indent: 2, skipInvalid: true });
+    return yamlDump(this.output());
   }
 
   /**
@@ -202,7 +209,7 @@ export class ComposeFileEditor extends ComposeEditor {
   static getUserSettingsIfExist(
     dnpName: string,
     isCore: boolean
-  ): UserSettingsAllDnps {
+  ): UserSettings {
     try {
       return new ComposeFileEditor(dnpName, isCore).getUserSettings();
     } catch (e) {
@@ -216,16 +223,5 @@ export class ComposeFileEditor extends ComposeEditor {
    */
   write(): void {
     this.writeTo(this.composePath);
-  }
-}
-
-/**
- * Util with a nice error message in case or parsing error
- */
-function parseComposeYaml(yamlString: string): Compose {
-  try {
-    return yaml.safeLoad(yamlString);
-  } catch (e) {
-    throw Error(`Error parsing compose yaml: ${e.message}`);
   }
 }

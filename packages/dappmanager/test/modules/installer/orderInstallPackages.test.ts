@@ -8,9 +8,9 @@ import orderInstallPackages from "../../../src/modules/installer/orderInstallPac
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {
     function getPackagesData(names: string[]): InstallPackageData[] {
-      return names.map(name => ({
+      return names.map(dnpName => ({
         ...mockPackageData,
-        name
+        dnpName
       }));
     }
     const coreName = "core.dnp.dappnode.eth";
@@ -44,7 +44,7 @@ describe("Module > Installer", () => {
       const orderedPackagesData = orderInstallPackages(
         packagesData,
         coreName
-      ).map(({ name }) => name);
+      ).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(expectedOrderedPackagesData);
     });
 
@@ -62,7 +62,7 @@ describe("Module > Installer", () => {
         dappmanagerName,
         "wifi.dnp.dappnode.eth"
       ]).map(pkg => {
-        if (pkg.name === coreName)
+        if (pkg.dnpName === coreName)
           return {
             ...pkg,
             metadata: {
@@ -88,7 +88,7 @@ describe("Module > Installer", () => {
       const orderedPackagesData = orderInstallPackages(
         packagesData,
         coreName
-      ).map(({ name }) => name);
+      ).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(expectedOrderedPackagesData);
     });
 
@@ -116,7 +116,7 @@ describe("Module > Installer", () => {
         dappmanagerName,
         "wifi.dnp.dappnode.eth"
       ]).map(pkg => {
-        if (pkg.name === coreName)
+        if (pkg.dnpName === coreName)
           return {
             ...pkg,
             metadata: {
@@ -130,7 +130,7 @@ describe("Module > Installer", () => {
       const orderedPackagesData = orderInstallPackages(
         packagesData,
         coreName
-      ).map(({ name }) => name);
+      ).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(runOrder);
     });
   });

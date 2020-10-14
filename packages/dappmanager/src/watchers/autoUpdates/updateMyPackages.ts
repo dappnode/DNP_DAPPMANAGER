@@ -1,5 +1,5 @@
 import semver from "semver";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listPackages } from "../../modules/docker/listContainers";
 import * as eventBus from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
 // Utils
@@ -17,20 +17,20 @@ import { logs } from "../../logs";
 export default async function updateMyPackages(
   releaseFetcher: ReleaseFetcher
 ): Promise<void> {
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
-  for (const { name, isDnp, version: currentVersion } of dnpList) {
+  for (const { dnpName, isDnp, version: currentVersion } of dnpList) {
     if (
-      name &&
+      dnpName &&
       // Ignore core DNPs
       isDnp &&
       // Ignore wierd versions
       semver.valid(currentVersion)
     ) {
       try {
-        await updateMyPackage(releaseFetcher, name, currentVersion);
+        await updateMyPackage(releaseFetcher, dnpName, currentVersion);
       } catch (e) {
-        logs.error(`Error auto-updating ${name}`, e);
+        logs.error(`Error auto-updating ${dnpName}`, e);
       }
     }
   }
@@ -42,18 +42,18 @@ export default async function updateMyPackages(
 
 async function updateMyPackage(
   releaseFetcher: ReleaseFetcher,
-  name: string,
+  dnpName: string,
   currentVersion: string
 ): Promise<void> {
   // Check if this specific dnp has auto-updates enabled
-  if (!isDnpUpdateEnabled(name)) return;
+  if (!isDnpUpdateEnabled(dnpName)) return;
 
   // MUST exist an APM repo with the package name
   // Check here instead of the if statement to be inside the try / catch
-  const repoExists = await releaseFetcher.repoExists(name);
+  const repoExists = await releaseFetcher.repoExists(dnpName);
   if (!repoExists) return;
 
-  const { version: latestVersion } = await releaseFetcher.fetchVersion(name);
+  const { version: latestVersion } = await releaseFetcher.fetchVersion(dnpName);
 
   // Compute if the update type is "patch"/"minor" = is allowed
   // If release is not allowed, abort
@@ -62,18 +62,18 @@ async function updateMyPackage(
 
   // Enforce a 24h delay before performing an auto-update
   // Also records the remaining time in the db for the UI
-  if (!isUpdateDelayCompleted(name, latestVersion)) return;
+  if (!isUpdateDelayCompleted(dnpName, latestVersion)) return;
 
-  logs.info(`Auto-updating ${name} to ${latestVersion}...`);
+  logs.info(`Auto-updating ${dnpName} to ${latestVersion}...`);
 
   try {
-    await packageInstall({ name, version: latestVersion });
+    await packageInstall({ name: dnpName, version: latestVersion });
 
-    flagCompletedUpdate(name, latestVersion);
+    flagCompletedUpdate(dnpName, latestVersion);
     logs.info(`Successfully auto-updated system packages`);
     eventBus.requestPackages.emit();
   } catch (e) {
-    flagErrorUpdate(name, e.message);
+    flagErrorUpdate(dnpName, e.message);
     throw e;
   }
 }

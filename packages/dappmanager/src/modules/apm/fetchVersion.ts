@@ -6,15 +6,15 @@ import semver from "semver";
 
 /**
  * Fetch a specific version of an APM repo
- * @param name "bitcoin.dnp.dappnode.eth"
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
  * @param version "0.2.4"
  */
 export async function fetchVersion(
   provider: ethers.providers.Provider,
-  name: string,
+  dnpName: string,
   version?: string
 ): Promise<ApmVersionRaw> {
-  const repo = new ethers.Contract(name, repoContract.abi, provider);
+  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
 
   const res: ApmRepoVersionReturn =
     version && semver.valid(version)

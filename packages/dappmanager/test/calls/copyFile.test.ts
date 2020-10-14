@@ -2,8 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import shell from "../../src/utils/shell";
 import path from "path";
-import { PackageContainer } from "../../src/types";
-import { mockDnp, testDir, cleanTestDir, createTestDir } from "../testUtils";
+import { testDir, cleanTestDir, createTestDir, sampleFile } from "../testUtils";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { copyFileFrom as copyFileFromType } from "../../src/calls/copyFileFrom";
@@ -18,7 +17,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
   const containerSimulatedFolder = `${testDir}/container-volume`;
   const dockerPath = (_path: string): string =>
     containerSimulatedFolder + _path;
-  const id = "kovan.dnp.dappnode.eth";
   const containerName = "DAppNodePackage-kovan.dnp.dappnode.eth";
 
   async function dockerCopyFileTo(
@@ -48,10 +46,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     return "/";
   }
 
-  async function listContainer(): Promise<PackageContainer> {
-    return { ...mockDnp, name: id, packageName: containerName };
-  }
-
   let copyFileTo: typeof copyFileToType;
   let copyFileFrom: typeof copyFileFromType;
 
@@ -59,9 +53,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileToImport = await rewiremock.around(
       () => import("../../src/calls/copyFileTo"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainer })
-          .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerCopyFileTo, dockerGetContainerWorkingDir })
           .toBeUsed();
@@ -70,9 +61,6 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileFromImport = await rewiremock.around(
       () => import("../../src/calls/copyFileFrom"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
-          .with({ listContainer })
-          .toBeUsed();
         mock(() => import("../../src/modules/docker/dockerCommands"))
           .with({ dockerCopyFileFrom, dockerGetContainerWorkingDir })
           .toBeUsed();
@@ -82,29 +70,27 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     copyFileFrom = copyFileFromImport.copyFileFrom;
   });
 
-  const dataUri =
-    "data:application/json;base64,ewogICJuYW1lIjogInRlc3QiLAogICJ2ZXJzaW9uIjogIjEuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiIiwKICAibWFpbiI6ICJpbmRleC5qcyIsCiAgInNjcmlwdHMiOiB7CiAgICAidGVzdCI6ICJlY2hvIFwiRXJyb3I6IG5vIHRlc3Qgc3BlY2lmaWVkXCIgJiYgZXhpdCAxIgogIH0sCiAgImtleXdvcmRzIjogW10sCiAgImF1dGhvciI6ICIiLAogICJsaWNlbnNlIjogIklTQyIsCiAgImRlcGVuZGVuY2llcyI6IHsKICAgICJldGhlcnMiOiAiXjQuMC4yMyIsCiAgICAibHotc3RyaW5nIjogIl4xLjQuNCIsCiAgICAicXJjb2RlLXRlcm1pbmFsIjogIl4wLjEyLjAiLAogICAgIndlYjMiOiAiXjEuMC4wLWJldGEuMzciCiAgfQp9Cg==";
-  const filename = "config.json";
-  const containerPath = "/usr/src/config.json";
-
   before(async () => {
     await createTestDir();
   });
 
   it("should copy a file to a container", async () => {
     await copyFileTo({
-      id,
-      dataUri,
-      filename,
-      toPath: containerPath
+      containerName,
+      dataUri: sampleFile.dataUri,
+      filename: sampleFile.filename,
+      toPath: sampleFile.containerPath
     });
   });
 
   it("should copy a file from a container", async () => {
-    const result = await copyFileFrom({ id, fromPath: containerPath });
+    const result = await copyFileFrom({
+      containerName,
+      fromPath: sampleFile.containerPath
+    });
     // Check response message
     expect(result).to.be.ok;
-    expect(result).to.equal(dataUri);
+    expect(result).to.equal(sampleFile.dataUri);
   });
 
   after(async () => {

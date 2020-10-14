@@ -1,5 +1,5 @@
 import path from "path";
-import { EthClientTargetPackage, UserSettings } from "./types";
+import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -163,23 +163,99 @@ if (devMode) {
 
 export default params;
 
+// Docker params
+// Max port number (included) Otherwise it fails with
+// Cannot create container for service ipfs.dnp.dappnode.eth: invalid port specification: "65536"
+export const maxPortNumber = 65535;
+
 /**
  * Link between an ethClientTarget keyword and its pacakge information
  * Declared above to use stronger typings
  */
 export const ethClientData: {
   [P in EthClientTargetPackage]: {
-    name: string;
+    dnpName: string; // "geth.dnp.dappnode.eth"
     url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
     version?: string;
     userSettings?: UserSettings; // Custom installation for geth light client
   };
 } = {
   "geth-light": {
-    name: "geth.dnp.dappnode.eth",
-    userSettings: { environment: { SYNCMODE: "light" } }
+    dnpName: "geth.dnp.dappnode.eth",
+    userSettings: {
+      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
+    }
   },
-  geth: { name: "geth.dnp.dappnode.eth" },
-  openethereum: { name: "openethereum.dnp.dappnode.eth" },
-  nethermind: { name: "nethermind.public.dappnode.eth" }
+  geth: { dnpName: "geth.dnp.dappnode.eth" },
+  openethereum: { dnpName: "openethereum.dnp.dappnode.eth" },
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
 };
+
+// Naming
+
+/**
+ * Get a unique domain per container, considering multi-service packages
+ */
+export const getContainerDomain = ({
+  dnpName,
+  serviceName
+}: {
+  serviceName: string;
+  dnpName: string;
+}): string => {
+  if (!serviceName || serviceName === dnpName) {
+    return dnpName;
+  } else {
+    return [serviceName, dnpName].join(".");
+  }
+};
+
+export const getImageTag = ({
+  dnpName,
+  serviceName,
+  version
+}: {
+  dnpName: string;
+  serviceName: string;
+  version: string;
+}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
+
+export const getContainerName = ({
+  dnpName,
+  serviceName,
+  isCore
+}: {
+  dnpName: string;
+  serviceName: string;
+  isCore: boolean;
+}): string =>
+  // Note: _PREFIX variables already end with the character "-"
+  [
+    isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
+    getContainerDomain({ dnpName, serviceName })
+  ].join("");
+
+// From SDK, must be in sync
+
+export const releaseFilesRegex = {
+  manifest: /dappnode_package.*\.json$/,
+  compose: /compose.*\.yml$/,
+  avatar: /avatar.*\.png$/,
+  setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
+  setupSchema: /setup\..*\.json$/,
+  setupTarget: /setup-target\..*json$/,
+  setupUiJson: /setup-ui\..*json$/,
+  disclaimer: /disclaimer\.md$/i,
+  gettingStarted: /getting.*started\.md$/i
+};
+
+// Single arch images
+export const getArchTag = (arch: Architecture): string =>
+  arch.replace(/\//g, "-");
+export const getImagePath = (
+  dnpName: string,
+  version: string,
+  arch: Architecture
+): string => `${dnpName}_${version}_${getArchTag(arch)}.txz`;
+export const getLegacyImagePath = (dnpName: string, version: string): string =>
+  `${dnpName}_${version}.tar.xz`;

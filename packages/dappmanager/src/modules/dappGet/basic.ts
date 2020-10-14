@@ -1,4 +1,4 @@
-import { listContainers } from "../docker/listContainers";
+import { listPackages } from "../docker/listContainers";
 // Internal
 import { PackageRequest } from "../../types";
 import shouldUpdate from "./utils/shouldUpdate";
@@ -26,23 +26,23 @@ export default async function dappGetBasic(
     [req.name]: req.ver
   };
   const alreadyUpdated: DappGetState = {};
-  const currentVersion: DappGetState = {};
+  const currentVersions: DappGetState = {};
 
   // The function below does not directly affect funcionality.
   // However it would prevent already installed DNPs from installing
   try {
-    const installedDnps = await listContainers();
+    const installedDnps = await listPackages();
     for (const dnp of installedDnps) {
       const prevVersion = dnp.version;
-      const nextVersion = state[dnp.name];
+      const nextVersion = state[dnp.dnpName];
       if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
         // DNP is already updated.
         // Remove from the success object and add it to the alreadyUpdatedd
-        alreadyUpdated[dnp.name] = state[dnp.name];
-        delete state[dnp.name];
+        alreadyUpdated[dnp.dnpName] = state[dnp.dnpName];
+        delete state[dnp.dnpName];
       }
-      if (nextVersion && currentVersion) {
-        currentVersion[dnp.name] = prevVersion;
+      if (nextVersion) {
+        currentVersions[dnp.dnpName] = prevVersion;
       }
     }
   } catch (e) {
@@ -53,6 +53,6 @@ export default async function dappGetBasic(
     message: "dappGet basic resolved first level dependencies",
     state,
     alreadyUpdated: {},
-    currentVersion
+    currentVersions
   };
 }

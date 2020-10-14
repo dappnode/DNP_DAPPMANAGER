@@ -12,7 +12,7 @@ const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
  * slightly increases the security of the exchange while the WAMP
  * module works over HTTP.
  *
- * @param {string} seedPhraseEncrypted tweetnacl base64 box with nonce
+ * @param seedPhraseEncrypted tweetnacl base64 box with nonce
  */
 export async function seedPhraseSet({
   seedPhraseEncrypted

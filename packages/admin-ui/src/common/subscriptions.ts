@@ -2,80 +2,69 @@ import {
   AutoUpdateDataView,
   ChainData,
   DirectoryItem,
-  PackageContainer,
   ProgressLog,
   PackageNotification,
   SystemInfo,
   UserActionLog,
   VolumeData,
-  VpnDevice
+  VpnDevice,
+  InstalledPackageData
 } from "./types";
 
 export interface SubscriptionsTypes {
   /**
    * Auto-updates data
-   * @param autoUpdateData
    */
   autoUpdateData: (autoUpdateData: AutoUpdateDataView) => void;
 
   /**
    * All running chains status
-   * @param chainData
    */
   chainData: (chainData: ChainData[]) => void;
 
   /**
    * All VPN devices
-   * @param devices
    */
   devices: (devices: VpnDevice[]) => void;
 
   /**
    * Directory updates
-   * @param directory
    */
   directory: (directory: DirectoryItem[]) => void;
 
   /**
    * Installed packages updates
-   * @param packages
    */
-  packages: (packages: PackageContainer[]) => void;
+  packages: (packages: InstalledPackageData[]) => void;
 
   /**
    * Installation progress logs
-   * @param progressLog
    */
   progressLog: (progressLog: ProgressLog) => void;
 
   /**
    * Push notification from the DAPPMANAGER
-   * @param notification
    */
   pushNotification: (notification: PackageNotification) => void;
 
   /**
    * Triggers a reload on the ADMIN UI client
-   * @param data
    * @param data.reason "New client version"
    */
   reloadClient: (data: { reason: string }) => void;
 
   /**
    * Relevant system params
-   * @param systemInfo
    */
   systemInfo: (systemInfo: SystemInfo) => void;
 
   /**
    * New user action log
-   * @param userActionLog
    */
   userActionLog: (userActionLog: UserActionLog) => void;
 
   /**
    * Volume data that's expensive to fetch, from docker system df -v
-   * @param volumes
    */
   volumes: (volumes: VolumeData[]) => void;
 }

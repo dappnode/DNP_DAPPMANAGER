@@ -10,7 +10,7 @@ const params = {
  *   alphanumeric characters and "-", "."
  * - The mountpoint must be an absolute path
  *
- * @return devicePath = "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
+ * @returns devicePath = "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
  */
 export function getDevicePath({
   mountpoint,
@@ -42,7 +42,7 @@ export function getDevicePath({
 /**
  * Reverses the result of `getDevicePath`
  * @param devicePath "/dev1/data/dappnode-volumes/bitcoin.dnp.dappnode.eth/data"
- * @return path parts = {
+ * @returns path parts = {
  *   mountpoint: "/dev1/data",
  *   dnpName: "bitcoin.dnp.dappnode.eth",
  *   volumeName: "data",

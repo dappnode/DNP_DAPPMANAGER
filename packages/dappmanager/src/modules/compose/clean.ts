@@ -22,7 +22,7 @@ export function cleanCompose(compose: Compose): Compose {
 }
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-function isOmitable(value: any): boolean {
+export function isOmitable(value: any): boolean {
   return (
     value === undefined || value === null || (isObject(value) && isEmpty(value))
   );

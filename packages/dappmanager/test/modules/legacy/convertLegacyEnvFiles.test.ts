@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import yaml from "js-yaml";
 import { createTestDir, cleanTestDir } from "../../testUtils";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
+import { yamlDump } from "../../../src/utils/yaml";
 
 import { migrateLegacyEnvFile } from "../../../src/modules/legacy/migrateLegacyEnvFiles";
-import { parseEnvironment } from "../../../src/modules/compose";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {
@@ -15,20 +14,20 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should NOT break a compose for an empty .env file", () => {
-    const name = "mock-dnp.dnp.dappnode.eth";
+    const dnpName = "mock-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(name, isCore);
-    const composePath = getPath.dockerCompose(name, isCore);
+    const envFilePath = getPath.envFile(dnpName, isCore);
+    const composePath = getPath.dockerCompose(dnpName, isCore);
     const compose = {
       version: "3.4",
-      services: { [name]: { image: `${name}:0.2.0` } }
+      services: { [dnpName]: { image: `${dnpName}:0.2.0` } }
     };
-    const composeString = yaml.safeDump(compose);
+    const composeString = yamlDump(compose);
     validate.path(envFilePath);
     fs.writeFileSync(envFilePath, "");
     fs.writeFileSync(composePath, composeString);
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(true, "Should return true, indicating it merged ENVs");
     expect(fs.existsSync(envFilePath)).to.equal(
       false,
@@ -41,17 +40,17 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should merge existing envs", () => {
-    const name = "mock2-dnp.dnp.dappnode.eth";
+    const dnpName = "mock2-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(name, isCore);
-    const composePath = getPath.dockerCompose(name, isCore);
+    const envFilePath = getPath.envFile(dnpName, isCore);
+    const composePath = getPath.dockerCompose(dnpName, isCore);
     const envsString = "NAME=VALUE";
-    const composeString = yaml.safeDump({
+    const composeString = yamlDump({
       version: "3.4",
       services: {
-        [name]: {
-          image: `${name}:0.2.0`,
-          env_file: [name + ".env"]
+        [dnpName]: {
+          image: `${dnpName}:0.2.0`,
+          env_file: [dnpName + ".env"]
         }
       }
     });
@@ -59,18 +58,18 @@ describe("migrateLegacyEnvFiles", () => {
     fs.writeFileSync(envFilePath, envsString);
     fs.writeFileSync(composePath, composeString);
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(true, "Should return true, indicating it merged ENVs");
     expect(fs.existsSync(envFilePath)).to.equal(
       false,
       ".env file should not exist"
     );
     expect(fs.readFileSync(composePath, "utf8")).to.equal(
-      yaml.safeDump({
+      yamlDump({
         version: "3.4",
         services: {
-          [name]: {
-            image: `${name}:0.2.0`,
+          [dnpName]: {
+            image: `${dnpName}:0.2.0`,
             environment: [envsString]
           }
         }
@@ -80,10 +79,10 @@ describe("migrateLegacyEnvFiles", () => {
   });
 
   it("Should ignore a DNP without .env", () => {
-    const name = "mock3-dnp.dnp.dappnode.eth";
+    const dnpName = "mock3-dnp.dnp.dappnode.eth";
     const isCore = false;
 
-    const res = migrateLegacyEnvFile(name, isCore);
+    const res = migrateLegacyEnvFile(dnpName, isCore);
     expect(res).to.equal(
       false,
       "Should return false, indicating it did not merge ENVs"

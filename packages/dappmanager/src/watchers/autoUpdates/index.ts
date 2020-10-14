@@ -82,10 +82,10 @@ export default function runWatcher(): void {
 
   checkAutoUpdates();
 
-  eventBus.packagesModified.on(({ ids, removed }) => {
-    for (const id of ids) {
-      if (removed) clearPendingUpdates(id);
-      clearRegistry(id);
+  eventBus.packagesModified.on(({ dnpNames, removed }) => {
+    for (const dnpName of dnpNames) {
+      if (removed) clearPendingUpdates(dnpName);
+      clearRegistry(dnpName);
     }
   });
 }

@@ -1,9 +1,10 @@
 import "mocha";
 import { expect } from "chai";
 import semver from "semver";
-import { mockDnp } from "../../../testUtils";
+import { mockDnp, mockContainer } from "../../../testUtils";
 
 import getRelevantInstalledDnps from "../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps";
+import { InstalledPackageData } from "../../../../src/types";
 
 /**
  * Purpose of the test. Make sure it is able to pick up relevant installed DNPs
@@ -20,19 +21,24 @@ import getRelevantInstalledDnps from "../../../../src/modules/dappGet/aggregate/
 
 describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
   it("Should pick a dependant dnp", () => {
-    const relevantPkg = {
+    const relevantPkg: InstalledPackageData = {
       ...mockDnp,
       version: "0.1.0",
-      name: "dnp-b.eth",
+      dnpName: "dnp-b.eth",
       dependencies: { "dnp-c.eth": "0.1.0" }
     };
-    const dnpList = [
+    const dnpList: InstalledPackageData[] = [
       relevantPkg,
       {
         ...mockDnp,
-        id: "17628371823",
         version: "0.1.0",
-        name: "dnp-c.eth"
+        dnpName: "dnp-c.eth",
+        containers: [
+          {
+            ...mockContainer,
+            containerId: "17628371823"
+          }
+        ]
       }
     ];
 
@@ -45,41 +51,61 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
   });
 
   it("should get the relevant installed dnps from a defined example case", async () => {
-    const dnpList = [
+    const dnpList: InstalledPackageData[] = [
       {
         ...mockDnp,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
-        name: "web.dnp.dappnode.eth",
+        dnpName: "web.dnp.dappnode.eth",
         version: "0.0.0"
       },
       {
         ...mockDnp,
-        name: "vpn.dnp.dappnode.eth",
+        dnpName: "vpn.dnp.dappnode.eth",
         version: "0.1.16"
       },
       {
         ...mockDnp,
-        name: "bind.dnp.dappnode.eth",
+        dnpName: "bind.dnp.dappnode.eth",
         version: "0.1.5"
       },
       {
         ...mockDnp,
-        name: "core.dnp.dappnode.eth",
+        dnpName: "core.dnp.dappnode.eth",
         version: "0.1.7"
       },
       {
         ...mockDnp,
         dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-        name: "nginx-proxy.dnp.dappnode.eth",
+        dnpName: "nginx-proxy.dnp.dappnode.eth",
         version: "0.0.3"
       },
       {
         ...mockDnp,
         dependencies: { "web.dnp.dappnode.eth": "latest" },
-        name: "letsencrypt-nginx.dnp.dappnode.eth",
+        dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
+        version: "0.0.4"
+      }
+    ];
+
+    const expectedRelevantInstalledDnps: InstalledPackageData[] = [
+      {
+        ...mockDnp,
+        dependencies: {
+          "nginx-proxy.dnp.dappnode.eth": "latest",
+          "letsencrypt-nginx.dnp.dappnode.eth": "latest"
+        },
+        dnpName: "web.dnp.dappnode.eth",
+        version: "0.0.0"
+      },
+      {
+        ...mockDnp,
+        dependencies: {
+          "web.dnp.dappnode.eth": "latest"
+        },
+        dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
         version: "0.0.4"
       }
     ];
@@ -89,25 +115,6 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
       installedDnps: dnpList.filter(pkg => semver.valid(pkg.version))
     });
 
-    const resultPkgNames = relevantInstalledDnps;
-    expect(resultPkgNames).to.deep.equal([
-      {
-        ...mockDnp,
-        dependencies: {
-          "nginx-proxy.dnp.dappnode.eth": "latest",
-          "letsencrypt-nginx.dnp.dappnode.eth": "latest"
-        },
-        name: "web.dnp.dappnode.eth",
-        version: "0.0.0"
-      },
-      {
-        ...mockDnp,
-        dependencies: {
-          "web.dnp.dappnode.eth": "latest"
-        },
-        name: "letsencrypt-nginx.dnp.dappnode.eth",
-        version: "0.0.4"
-      }
-    ]);
+    expect(relevantInstalledDnps).to.deep.equal(expectedRelevantInstalledDnps);
   });
 });

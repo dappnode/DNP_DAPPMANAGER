@@ -12,8 +12,8 @@ import mime from "mime-types";
  * [NOTE] does not support directories, it will throw an error:
  *   Error: EISDIR: illegal operation on a directory, read
  *
- * @param {object} path file path, will read the file at this path
- * @returns {string} data URI: data:application/zip;base64,UEsDBBQAAAg...
+ * @param path file path, will read the file at this path
+ * @returns data URI: data:application/zip;base64,UEsDBBQAAAg...
  */
 export default async function fileToDataUri(path: string): Promise<string> {
   const base64 = await fs.promises.readFile(path, { encoding: "base64" });

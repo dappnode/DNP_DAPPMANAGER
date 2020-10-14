@@ -1,6 +1,13 @@
-import { Dependencies, ChainDriver, ContainerLabels } from "../../types";
-import { parseEnvironment } from "./environment";
+import {
+  Dependencies,
+  ChainDriver,
+  chainDrivers,
+  ContainerLabelsRaw,
+  ContainerLabelTypes
+} from "../../types";
+import { stringifyEnvironment } from "./environment";
 import { ComposeService } from "../../common";
+import { pick, omitBy, mapValues } from "lodash";
 
 /**
  * This module ensures that data stored in a DNP's container labels
@@ -8,98 +15,171 @@ import { ComposeService } from "../../common";
  * the types are the same
  */
 
-const prefix = "dappnode.dnp.";
-const defaultEnvironmentId = prefix + "default.environment";
-const defaultPortsId = prefix + "default.ports";
-const defaultVolumesId = prefix + "default.volumes";
-const dependenciesId = prefix + "dependencies";
-const avatarId = prefix + "avatar";
-const originId = prefix + "origin";
-const chainId = prefix + "chain";
-const isCoreId = prefix + "isCore";
+const parseString = (value: string | undefined): string | undefined => value;
+const parseBool = (value: string | undefined): boolean | undefined =>
+  typeof value === "string" ? (value === "true" ? true : false) : undefined;
+const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
+  if (value)
+    try {
+      return JSON.parse(value);
+    } catch {}
+};
 
-function setJson(data: object | string[]): string {
-  return JSON.stringify(data);
+const writeString = (data: string | undefined): string | undefined => data;
+const writeBool = (data: boolean | undefined): string | undefined =>
+  data === true ? "true" : data === false ? "false" : undefined;
+const writeJson = (data: object | string[]): string => JSON.stringify(data);
+
+const labelParseFns: {
+  [K in keyof Required<ContainerLabelTypes>]: (
+    labelValue: string | undefined
+  ) => ContainerLabelTypes[K] | undefined;
+} = {
+  "dappnode.dnp.dnpName": parseString,
+  "dappnode.dnp.version": parseString,
+  "dappnode.dnp.serviceName": parseString,
+  "dappnode.dnp.instanceName": parseString,
+  "dappnode.dnp.dependencies": value => parseJsonSafe(value) || {},
+  "dappnode.dnp.avatar": parseString,
+  "dappnode.dnp.origin": parseString,
+  "dappnode.dnp.chain": value =>
+    value && chainDrivers.includes(value as ChainDriver)
+      ? (value as ChainDriver)
+      : undefined,
+  "dappnode.dnp.isCore": parseBool,
+  "dappnode.dnp.isMain": parseBool,
+  "dappnode.dnp.default.environment": value => parseJsonSafe(value),
+  "dappnode.dnp.default.ports": value => parseJsonSafe(value),
+  "dappnode.dnp.default.volumes": value => parseJsonSafe(value)
+};
+
+const labelStringifyFns: {
+  [K in keyof Required<ContainerLabelTypes>]: (
+    data: ContainerLabelTypes[K]
+  ) => string | undefined;
+} = {
+  "dappnode.dnp.dnpName": writeString,
+  "dappnode.dnp.version": writeString,
+  "dappnode.dnp.serviceName": writeString,
+  "dappnode.dnp.instanceName": writeString,
+  "dappnode.dnp.dependencies": writeJson,
+  "dappnode.dnp.avatar": writeString,
+  "dappnode.dnp.origin": writeString,
+  "dappnode.dnp.chain": writeString,
+  "dappnode.dnp.isCore": writeBool,
+  "dappnode.dnp.isMain": writeBool,
+  "dappnode.dnp.default.environment": writeJson,
+  "dappnode.dnp.default.ports": writeJson,
+  "dappnode.dnp.default.volumes": writeJson
+};
+
+export function parseContainerLabels(
+  labelsRaw: ContainerLabelsRaw
+): Partial<ContainerLabelTypes> {
+  return mapValues(labelParseFns, (labelParseFn, label) =>
+    labelParseFn(labelsRaw[label])
+  ) as Partial<ContainerLabelTypes>;
 }
 
-function getJson<T>(labelData: string): T {
-  return JSON.parse(labelData);
+export function stringifyContainerLabels(
+  labels: Partial<ContainerLabelTypes>
+): ContainerLabelsRaw {
+  const labelsRaw = mapValues(
+    pick(labelStringifyFns, Object.keys(labels)),
+    (labelStringifyFn, label) =>
+      (labelStringifyFn as <T>(data: T) => string)(
+        labels[label as keyof ContainerLabelTypes]
+      )
+  ) as ContainerLabelsRaw;
+  return omitBy(labelsRaw, value => value === undefined);
 }
-function safeGetJson<T>(labelData: string): T | null {
-  if (!labelData) return null;
-  try {
-    return getJson<T>(labelData);
-  } catch {
-    return null;
-  }
-}
-function safeGetArray(labelData: string): string[] | null {
-  return safeGetJson<string[]>(labelData);
-}
+
+type ServiceDefaultSettings = Pick<
+  ComposeService,
+  "environment" | "ports" | "volumes"
+>;
 
 export function writeDefaultsToLabels({
   environment,
   ports,
   volumes
-}: Pick<ComposeService, "environment" | "ports" | "volumes">): ContainerLabels {
-  const labels: ContainerLabels = {};
-  if (environment)
-    labels[defaultEnvironmentId] = setJson(parseEnvironment(environment));
-  if (ports) labels[defaultPortsId] = setJson(ports);
-  if (volumes) labels[defaultVolumesId] = setJson(volumes);
-  return labels;
+}: ServiceDefaultSettings): ContainerLabelsRaw {
+  return stringifyContainerLabels({
+    "dappnode.dnp.default.environment":
+      environment &&
+      (Array.isArray(environment)
+        ? environment
+        : stringifyEnvironment(environment)),
+    "dappnode.dnp.default.ports": ports,
+    "dappnode.dnp.default.volumes": volumes
+  });
 }
 
-export function readDefaultsFromLabels(
-  labels: ContainerLabels
-): {
-  environment: string[] | null;
-  ports: string[] | null;
-  volumes: string[] | null;
-} {
+export function readContainerLabels(
+  labelsRaw: ContainerLabelsRaw
+): Partial<{
+  dnpName: string;
+  version: string;
+  serviceName: string;
+  instanceName: string;
+  dependencies: Dependencies;
+  avatar: string;
+  origin: string;
+  chain: ChainDriver;
+  isCore: boolean;
+  isMain: boolean;
+  defaultEnvironment: string[];
+  defaultPorts: string[];
+  defaultVolumes: string[];
+}> {
+  const labelValues = parseContainerLabels(labelsRaw);
   return {
-    environment: safeGetArray(labels[defaultEnvironmentId]),
-    ports: safeGetArray(labels[defaultPortsId]),
-    volumes: safeGetArray(labels[defaultVolumesId])
+    dnpName: labelValues["dappnode.dnp.dnpName"],
+    version: labelValues["dappnode.dnp.version"],
+    serviceName: labelValues["dappnode.dnp.serviceName"],
+    instanceName: labelValues["dappnode.dnp.instanceName"],
+    dependencies: labelValues["dappnode.dnp.dependencies"],
+    avatar: labelValues["dappnode.dnp.avatar"],
+    origin: labelValues["dappnode.dnp.origin"],
+    chain: labelValues["dappnode.dnp.chain"],
+    isCore: labelValues["dappnode.dnp.isCore"],
+    isMain: labelValues["dappnode.dnp.isMain"],
+    defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
+    defaultPorts: labelValues["dappnode.dnp.default.ports"],
+    defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
   };
 }
 
 export function writeMetadataToLabels({
+  dnpName,
+  version,
+  serviceName,
   dependencies,
   avatar,
   chain,
   origin,
-  isCore
+  isCore,
+  isMain
 }: {
+  dnpName: string;
+  version: string;
+  serviceName: string;
   dependencies?: Dependencies;
   avatar?: string;
-  chain?: string;
+  chain?: ChainDriver;
   origin?: string;
   isCore?: boolean;
-}): ContainerLabels {
-  const labels: ContainerLabels = {};
-  if (dependencies) labels[dependenciesId] = setJson(dependencies);
-  if (avatar) labels[avatarId] = avatar;
-  if (typeof isCore === "boolean") labels[isCoreId] = isCore ? "true" : "false";
-  if (chain) labels[chainId] = chain;
-  if (origin) labels[originId] = origin;
-  return labels;
-}
-
-export function readMetadataFromLabels(
-  labels: ContainerLabels
-): {
-  dependencies: Dependencies;
-  avatar: string;
-  chain: ChainDriver;
-  origin?: string;
-  isCore: boolean;
-} {
-  return {
-    dependencies: (safeGetJson(labels[dependenciesId]) || {}) as Dependencies,
-    avatar: labels[avatarId] || "",
-    chain: (labels[chainId] as ChainDriver) || undefined,
-    origin: labels[originId] || undefined,
-    isCore: labels[isCoreId] === "true" ? true : false
-  };
+  isMain?: boolean;
+}): ContainerLabelsRaw {
+  return stringifyContainerLabels({
+    "dappnode.dnp.dnpName": dnpName,
+    "dappnode.dnp.version": version,
+    "dappnode.dnp.serviceName": serviceName,
+    "dappnode.dnp.dependencies": dependencies,
+    "dappnode.dnp.avatar": avatar,
+    "dappnode.dnp.origin": origin,
+    "dappnode.dnp.chain": chain,
+    "dappnode.dnp.isCore": isCore,
+    "dappnode.dnp.isMain": isMain
+  });
 }

@@ -31,7 +31,7 @@ import {
 } from "../../src/utils/autoUpdateHelper";
 import { clearDbs, createTestDir } from "../testUtils";
 
-const name = "bitcoin.dnp.dappnode.eth";
+const dnpName = "bitcoin.dnp.dappnode.eth";
 
 describe("Util: autoUpdateHelper", () => {
   before(async () => {
@@ -45,7 +45,7 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Auto update settings", () => {
     it("Should set active for my packages", () => {
-      const check = (): boolean => isDnpUpdateEnabled(name);
+      const check = (): boolean => isDnpUpdateEnabled(dnpName);
 
       // Enable my-packages
       expect(check()).to.equal(false, "Before enabling");
@@ -53,18 +53,18 @@ describe("Util: autoUpdateHelper", () => {
       expect(check()).to.equal(true, "After enabling");
 
       // Disable a single package
-      expect(check()).to.equal(true, "Before disabling name");
-      editDnpSetting(true, name);
-      expect(check()).to.equal(true, "Before disablingx2 name");
-      editDnpSetting(false, name);
-      expect(check()).to.equal(false, "After disabling name");
-      editDnpSetting(true, name);
-      expect(check()).to.equal(true, "After enabling name");
+      expect(check()).to.equal(true, `Before disabling ${dnpName}`);
+      editDnpSetting(true, dnpName);
+      expect(check()).to.equal(true, `Before disablingx2 ${dnpName}`);
+      editDnpSetting(false, dnpName);
+      expect(check()).to.equal(false, `After disabling ${dnpName}`);
+      editDnpSetting(true, dnpName);
+      expect(check()).to.equal(true, `After enabling ${dnpName}`);
 
       // Disable my-packages
       editDnpSetting(false);
       expect(check()).to.equal(false, "After disabling");
-      expect(check()).to.equal(false, "After disabling name final");
+      expect(check()).to.equal(false, `After disabling ${dnpName} final`);
     });
 
     it("Should set active for system packages", () => {
@@ -81,11 +81,11 @@ describe("Util: autoUpdateHelper", () => {
       const version1 = "0.2.5";
       const version2 = "0.2.6";
       const timestamp = 1563373272397;
-      flagCompletedUpdate(name, version1, timestamp);
-      flagCompletedUpdate(name, version2, timestamp);
+      flagCompletedUpdate(dnpName, version1, timestamp);
+      flagCompletedUpdate(dnpName, version2, timestamp);
       const registry = getRegistry();
       expect(registry).to.deep.equal({
-        [name]: {
+        [dnpName]: {
           [version1]: { updated: timestamp, successful: true },
           [version2]: { updated: timestamp, successful: true }
         }
@@ -97,14 +97,14 @@ describe("Util: autoUpdateHelper", () => {
     it("Should NOT allow the update if the delay is NOT completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now();
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -114,7 +114,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         false,
         "Should not allow again because the delay is not completed (24h)"
       );
@@ -123,14 +123,14 @@ describe("Util: autoUpdateHelper", () => {
     it("Should allow the update if the delay is completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now() - (updateDelay + 1);
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -140,12 +140,12 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         true,
         "Should allow again because the delay is completed (24h)"
       );
 
-      expect(isUpdateDelayCompleted(name, version)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version)).to.equal(
         true,
         "Should allow again, a second time after the delay is completed"
       );
@@ -157,14 +157,14 @@ describe("Util: autoUpdateHelper", () => {
       const version2 = "0.2.5";
       const timestamp2 = Date.now() - 2 * updateDelay;
 
-      expect(isUpdateDelayCompleted(name, version, timestamp)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -174,14 +174,14 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(name, version2, timestamp2)).to.equal(
+      expect(isUpdateDelayCompleted(dnpName, version2, timestamp2)).to.equal(
         false,
         "Should not allow on first check"
       );
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version: version2,
             firstSeen: timestamp2,
             scheduledUpdate: timestamp2 + updateDelay,
@@ -197,11 +197,11 @@ describe("Util: autoUpdateHelper", () => {
 
       const version = "0.2.6";
       const timestamp = 1563373272397;
-      isUpdateDelayCompleted(name, version, timestamp);
+      isUpdateDelayCompleted(dnpName, version, timestamp);
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -213,11 +213,11 @@ describe("Util: autoUpdateHelper", () => {
 
       // Simulation update Error
       const errorMessage = "Mainnet is still thinking";
-      flagErrorUpdate(name, errorMessage);
+      flagErrorUpdate(dnpName, errorMessage);
 
       expect(getPending()).to.deep.equal(
         {
-          [name]: {
+          [dnpName]: {
             version,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -231,13 +231,13 @@ describe("Util: autoUpdateHelper", () => {
   });
 
   describe("Feedback text for DNPs", () => {
-    const id = "bitcoin.dnp.dappnode.eth";
+    const dnpName = "bitcoin.dnp.dappnode.eth";
     const currentVersion = "0.2.6";
     const nextVersion = "0.2.7";
 
     it("1. Nothing happened yet", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {}
@@ -248,11 +248,11 @@ describe("Util: autoUpdateHelper", () => {
     it("2. DNP is seen", () => {
       const timestamp = Date.now() + 12.3 * 60 * 60 * 1000;
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now(),
             scheduledUpdate: timestamp,
@@ -265,11 +265,11 @@ describe("Util: autoUpdateHelper", () => {
 
     it("3A. DNP is manually updated", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion: nextVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12.3 * 60 * 60 * 1000,
@@ -282,11 +282,11 @@ describe("Util: autoUpdateHelper", () => {
 
     it("3B. DNP is in queue", () => {
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12.3 * 60 * 60 * 1000,
@@ -300,10 +300,10 @@ describe("Util: autoUpdateHelper", () => {
     it("3B. DNP is successfully updated", () => {
       const timestamp = Date.now();
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion: nextVersion,
         registry: {
-          [id]: {
+          [dnpName]: {
             [nextVersion]: {
               updated: timestamp,
               successful: true
@@ -311,7 +311,7 @@ describe("Util: autoUpdateHelper", () => {
           }
         },
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 12 * 60 * 60 * 1000,
@@ -325,11 +325,11 @@ describe("Util: autoUpdateHelper", () => {
     it("3C. DNP update failed", () => {
       const errorMessage = "Mainnet is still syncing";
       const feedback = getDnpFeedbackMessage({
-        id,
+        dnpName,
         currentVersion,
         registry: {},
         pending: {
-          [id]: {
+          [dnpName]: {
             version: nextVersion,
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
@@ -342,19 +342,19 @@ describe("Util: autoUpdateHelper", () => {
     });
 
     it("Swarm logic bug for rollback versions", () => {
-      const swarmId = "swarm.dnp.dappnode.eth";
+      const swarmDnpName = "swarm.dnp.dappnode.eth";
       const timestamp = Date.now() + 23.3 * 60 * 60 * 1000;
       const feedback = getDnpFeedbackMessage({
-        id: swarmId,
+        dnpName: swarmDnpName,
         currentVersion: "0.2.1",
         registry: {
-          [swarmId]: {
+          [swarmDnpName]: {
             "0.2.1": { updated: 1566058824278, successful: true },
             "0.2.2": { updated: 1566140083139, successful: true }
           }
         },
         pending: {
-          [swarmId]: {
+          [swarmDnpName]: {
             version: "0.2.2",
             firstSeen: timestamp - 24 * 60 * 60 * 1000,
             scheduledUpdate: timestamp,
@@ -368,11 +368,10 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Feedback text for COREs", () => {
     const currentVersionId = getCoreVersionId([
-      { name: "admin", version: "0.2.0" },
-      { name: "vpn", version: "0.2.1" },
-      { name: "core", version: "0.2.0" }
+      { dnpName: "admin", version: "0.2.0" },
+      { dnpName: "vpn", version: "0.2.1" },
+      { dnpName: "core", version: "0.2.0" }
     ]);
-    const id = coreDnpName;
 
     it("1. Nothing happened yet", () => {
       const feedback = getCoreFeedbackMessage({
@@ -389,10 +388,10 @@ describe("Util: autoUpdateHelper", () => {
         currentVersionId,
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: timestamp,
@@ -406,16 +405,16 @@ describe("Util: autoUpdateHelper", () => {
     it("3A. Core is manually updated", () => {
       const feedback = getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId([
-          { name: "admin", version: "0.2.1" },
-          { name: "vpn", version: "0.2.1" },
-          { name: "core", version: "0.2.1" }
+          { dnpName: "admin", version: "0.2.1" },
+          { dnpName: "vpn", version: "0.2.1" },
+          { dnpName: "core", version: "0.2.1" }
         ]),
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
@@ -429,18 +428,18 @@ describe("Util: autoUpdateHelper", () => {
     it("3B. Core is successfully updated", () => {
       const timestamp = Date.now();
       const nextVersion = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const currentVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const feedback = getCoreFeedbackMessage({
         currentVersionId,
         registry: {
-          [id]: {
+          [coreDnpName]: {
             [nextVersion]: { updated: timestamp, successful: true }
           }
         },
@@ -455,10 +454,10 @@ describe("Util: autoUpdateHelper", () => {
         currentVersionId,
         registry: {},
         pending: {
-          [id]: {
+          [coreDnpName]: {
             version: getCoreVersionId([
-              { name: "admin", version: "0.2.1" },
-              { name: "core", version: "0.2.1" }
+              { dnpName: "admin", version: "0.2.1" },
+              { dnpName: "core", version: "0.2.1" }
             ]),
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
@@ -472,22 +471,22 @@ describe("Util: autoUpdateHelper", () => {
 
     it("1 -> 4. Core full lifecycle", async () => {
       const currentVersionIdBefore = getCoreVersionId([
-        { name: "admin", version: "0.2.0" },
-        { name: "vpn", version: "0.2.0" },
-        { name: "core", version: "0.2.0" }
+        { dnpName: "admin", version: "0.2.0" },
+        { dnpName: "vpn", version: "0.2.0" },
+        { dnpName: "core", version: "0.2.0" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const currentVersionIdAfter = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.0" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.0" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersion2Id = getCoreVersionId([
-        { name: "admin", version: "0.2.2" },
-        { name: "core", version: "0.2.2" }
+        { dnpName: "admin", version: "0.2.2" },
+        { dnpName: "core", version: "0.2.2" }
       ]);
       const microDelay = 20;
 
@@ -510,11 +509,9 @@ describe("Util: autoUpdateHelper", () => {
         "2. Should be scheduled"
       );
 
-      await new Promise(
-        (r): void => {
-          setTimeout(r, 2 * microDelay);
-        }
-      );
+      await new Promise((r): void => {
+        setTimeout(r, 2 * microDelay);
+      });
 
       expect(
         getCoreFeedbackMessage({
@@ -564,23 +561,22 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("DAPPMANAGER update patch measures", () => {
     it("Should clear complete core updates if update was completed", () => {
-      const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -599,7 +595,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getRegistry()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             [nextVersionId]: { updated: timestamp, successful: true }
           }
         },
@@ -608,23 +604,22 @@ describe("Util: autoUpdateHelper", () => {
     });
 
     it("Should NOT clear complete core updates if update was NOT completed", () => {
-      const id = coreDnpName;
       const timestamp = Date.now();
       const versionId = getCoreVersionId([
-        { name: "admin", version: "0.2.0" },
-        { name: "vpn", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.0" },
+        { dnpName: "vpn", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { name: "admin", version: "0.2.1" },
-        { name: "core", version: "0.2.1" }
+        { dnpName: "admin", version: "0.2.1" },
+        { dnpName: "core", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,
@@ -638,7 +633,7 @@ describe("Util: autoUpdateHelper", () => {
 
       expect(getPending()).to.deep.equal(
         {
-          [id]: {
+          [coreDnpName]: {
             version: nextVersionId,
             firstSeen: timestamp,
             scheduledUpdate: timestamp + updateDelay,

@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function DataList({
+export function DataList({
   title,
   data
 }: {

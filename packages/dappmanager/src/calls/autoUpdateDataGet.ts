@@ -1,9 +1,9 @@
 import semver from "semver";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
-import { AutoUpdateDataDnpView, PackageContainer } from "../types";
+import { AutoUpdateDataDnpView, InstalledPackageData } from "../types";
 import { AutoUpdateDataView } from "../types";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
@@ -20,7 +20,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   const registry = autoUpdateHelper.getRegistry();
   const pending = autoUpdateHelper.getPending();
 
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   const dnpsToShow: AutoUpdateDataDnpView[] = [
     {
@@ -42,14 +42,17 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   ];
 
   if (autoUpdateHelper.isDnpUpdateEnabled()) {
-    const singleDnpsToShow: PackageContainer[] = [];
+    const singleDnpsToShow: InstalledPackageData[] = [];
     for (const dnp of dnpList) {
-      const storedDnp = singleDnpsToShow.find(_dnp => _dnp.name === dnp.name);
+      const storedDnp = singleDnpsToShow.find(
+        _dnp => _dnp.dnpName === dnp.dnpName
+      );
       const storedVersion = storedDnp ? storedDnp.version : "";
       if (
-        dnp.name &&
+        dnp.dnpName &&
         // Ignore core DNPs
         dnp.isDnp &&
+        !dnp.isCore &&
         // Ignore wierd versions
         semver.valid(dnp.version) &&
         // Ensure there are no duplicates
@@ -59,14 +62,14 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
     }
 
     for (const dnp of singleDnpsToShow) {
-      const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.name);
+      const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.dnpName);
       dnpsToShow.push({
-        id: dnp.name,
-        displayName: shortNameCapitalized(dnp.name),
+        id: dnp.dnpName,
+        displayName: shortNameCapitalized(dnp.dnpName),
         enabled,
         feedback: enabled
           ? autoUpdateHelper.getDnpFeedbackMessage({
-              id: dnp.name,
+              dnpName: dnp.dnpName,
               currentVersion: dnp.version
             })
           : {}

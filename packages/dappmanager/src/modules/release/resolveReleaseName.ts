@@ -17,9 +17,9 @@ export default async function resolveReleaseName(
   /**
    * Fetches the manifest hash
    *
-   * @param {string} name
-   * @param {string} ver
-   * @returns {string} manifestHash
+   * @param name
+   * @param ver
+   * @returns manifestHash
    */
   async function resolveApmVersion(
     name: string,

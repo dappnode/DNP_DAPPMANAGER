@@ -2,13 +2,13 @@ import { ethers } from "ethers";
 
 /**
  * Returns true if an APM repo exists for a package name
- * @param name "bitcoin.dnp.dappnode.eth"
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
  */
 export async function repoExists(
   provider: ethers.providers.Provider,
-  name: string
+  dnpName: string
 ): Promise<boolean> {
-  const address = await provider.resolveName(name);
+  const address = await provider.resolveName(dnpName);
 
   return Boolean(address);
 }

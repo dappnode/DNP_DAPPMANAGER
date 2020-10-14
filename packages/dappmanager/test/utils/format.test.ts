@@ -13,9 +13,9 @@ describe("Util: format", () => {
       "package0-1-2.public.dappnode.eth": "package-public"
     };
 
-    for (const name of Object.keys(cases)) {
-      it(`should get shortName domain for ${name}`, () => {
-        expect(shortNameDomain(name)).to.equal(cases[name]);
+    for (const dnpName of Object.keys(cases)) {
+      it(`should get shortName domain for dnpName ${dnpName}`, () => {
+        expect(shortNameDomain(dnpName)).to.equal(cases[dnpName]);
       });
     }
   });

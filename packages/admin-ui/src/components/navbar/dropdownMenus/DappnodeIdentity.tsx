@@ -10,8 +10,6 @@ import { stringSplit, stringIncludes } from "utils/strings";
  * With the <wbr> (word break opportunity) the domain will be shown as:
  *  12ab34ab12ab23ab
  *  .dyndns.dappnode.io
- * @param key
- * @param value
  */
 function parseIdentityKeyValue(key: string, value = "") {
   if (stringIncludes(key, "domain")) {

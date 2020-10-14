@@ -2,12 +2,13 @@ import * as eventBus from "../eventBus";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
 import { logs } from "../logs";
-import { listContainers } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/listContainers";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
+import { NoImageForArchError } from "../modules/release/errors";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -18,34 +19,36 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 
-  // Prevent sending way to many updates in case the fetching process is fast
-  const emitDirectoryUpdate = throttle(eventBus.directory.emit, loadThrottle);
-
-  const dnpList = await listContainers();
+  const dnpList = await listPackages();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
   const directory = await getDirectory(provider);
-  const directoryDnps = directory.map(
-    ({ name, isFeatured }): DirectoryItem => ({
-      status: "loading",
-      name,
-      whitelisted: true,
-      isFeatured
-    })
-  );
-  emitDirectoryUpdate(directoryDnps);
+  const directoryDnps: DirectoryItem[] = [];
+
+  let directoryDnpsPending: DirectoryItem[] = [];
+  // Prevent sending way to many updates in case the fetching process is fast
+  const emitDirectoryUpdate = throttle(() => {
+    eventBus.directory.emit(directoryDnpsPending);
+    directoryDnpsPending = [];
+  }, loadThrottle);
+
+  function pushDirectoryItem(item: DirectoryItem): void {
+    directoryDnps.push(item);
+    directoryDnpsPending.push(item);
+    emitDirectoryUpdate();
+  }
 
   await Promise.all(
     directory.map(
-      async ({ name, isFeatured }, idx): Promise<void> => {
+      async ({ name, isFeatured }, index): Promise<void> => {
         const whitelisted = true;
-        const directoryItemBasic = { name, whitelisted, isFeatured };
+        const directoryItemBasic = { index, name, whitelisted, isFeatured };
         try {
           // Now resolve the last version of the package
           const release = await releaseFetcher.getRelease(name);
           const { metadata, avatarFile } = release;
 
-          directoryDnps[idx] = {
+          pushDirectoryItem({
             ...directoryItemBasic,
             status: "ok",
             description: getShortDescription(metadata),
@@ -54,22 +57,24 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
             isUpdated: getIsUpdated(release, dnpList),
             featuredStyle: metadata.style,
             categories: metadata.categories || getFallBackCategories(name) || []
-          };
+          });
         } catch (e) {
-          logs.error(`Error fetching ${name} release`, e);
-          directoryDnps[idx] = {
-            ...directoryItemBasic,
-            status: "error",
-            message: e.message
-          };
-        } finally {
-          emitDirectoryUpdate(directoryDnps);
+          if (e instanceof NoImageForArchError) {
+            logs.debug(`Package ${name} is not available in current arch`);
+          } else {
+            logs.error(`Error fetching ${name} release`, e);
+            pushDirectoryItem({
+              ...directoryItemBasic,
+              status: "error",
+              message: e.message
+            });
+          }
         }
       }
     )
   );
 
-  return directoryDnps;
+  return directoryDnps.sort((a, b) => a.index - b.index);
 }
 
 // Helpers

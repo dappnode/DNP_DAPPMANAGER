@@ -21,9 +21,7 @@ export async function vpnRpcCall<R>(route: string, ...args: any[]): Promise<R> {
     body = JSON.parse(bodyText);
   } catch (e) {
     throw Error(
-      `Error parsing JSON body (${res.status} ${res.statusText}): ${
-        e.message
-      }\n${bodyText}`
+      `Error parsing JSON body (${res.status} ${res.statusText}): ${e.message}\n${bodyText}`
     );
   }
 

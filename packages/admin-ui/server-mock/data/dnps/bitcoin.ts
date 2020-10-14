@@ -1,10 +1,13 @@
 import { MockDnp } from "./types";
 
+const dnpName = "bitcoin.dnp.dappnode.eth";
+const serviceName = dnpName;
+
 export const bitcoin: MockDnp = {
   avatar: "https://en.bitcoin.it/w/images/en/2/29/BC_Logo_.png",
 
   metadata: {
-    name: "bitcoin.dnp.dappnode.eth",
+    name: dnpName,
     version: "0.1.3",
     description:
       "The Bitcoin Core daemon (0.18.0). Bitcoind is a program that implements the Bitcoin protocol for remote procedure call (RPC) use.",
@@ -36,17 +39,19 @@ export const bitcoin: MockDnp = {
   },
 
   userSettings: {
-    portMappings: { "8333": "8333" },
+    portMappings: { [serviceName]: { "8333": "8333" } },
     namedVolumeMountpoints: {
       bitcoin_data: "",
       bitcoin_data_old: "/dev0/data",
       bitcoin_data_old_legacy: "legacy:/dev1/data"
     },
     environment: {
-      BTC_RPCUSER: "dappnode",
-      BTC_RPCPASSWORD: "dappnode",
-      BTC_TXINDEX: "1",
-      BTC_PRUNE: "0"
+      [serviceName]: {
+        BTC_RPCUSER: "dappnode",
+        BTC_RPCPASSWORD: "dappnode",
+        BTC_TXINDEX: "1",
+        BTC_PRUNE: "0"
+      }
     }
   },
 

@@ -4,7 +4,7 @@ import sinon from "sinon";
 import rewiremock from "rewiremock";
 // Import for types
 import dappGetType from "../../../src/modules/dappGet";
-import { PackageContainer } from "../../../src/types";
+import { InstalledPackageData } from "../../../src/types";
 import { mockDnp } from "../../testUtils";
 import { DappGetDnps } from "../../../src/modules/dappGet/types";
 import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
@@ -17,13 +17,13 @@ import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
 
 describe("dappGet", function() {
   this.timeout(5 * 1000); // For some reason the before step can last > 2s
-  const listContainersSpy = sinon.spy();
+  const listPackagesSpy = sinon.spy();
 
   let dappGet: typeof dappGetType;
 
   before("Mock", async () => {
-    async function listContainers(): Promise<PackageContainer[]> {
-      listContainersSpy();
+    async function listPackages(): Promise<InstalledPackageData[]> {
+      listPackagesSpy();
       return [
         {
           ...mockDnp,
@@ -31,21 +31,21 @@ describe("dappGet", function() {
             "nginx-proxy.dnp.dappnode.eth": "latest",
             "letsencrypt-nginx.dnp.dappnode.eth": "latest"
           },
-          name: "web.dnp.dappnode.eth",
+          dnpName: "web.dnp.dappnode.eth",
           version: "0.1.0",
           origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
-          name: "nginx-proxy.dnp.dappnode.eth",
+          dnpName: "nginx-proxy.dnp.dappnode.eth",
           version: "0.0.3",
           origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "web.dnp.dappnode.eth": "latest" },
-          name: "letsencrypt-nginx.dnp.dappnode.eth",
+          dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
           version: "0.0.4",
           origin: "/ipfs/Qm1234"
         }
@@ -80,7 +80,7 @@ describe("dappGet", function() {
           .withDefault(resolve)
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/listContainers"))
-          .with({ listContainers })
+          .with({ listPackages })
           .toBeUsed();
       }
     );
@@ -109,6 +109,6 @@ describe("dappGet", function() {
   });
 
   it("Should call list containers once", () => {
-    sinon.assert.calledOnce(listContainersSpy);
+    sinon.assert.calledOnce(listPackagesSpy);
   });
 });

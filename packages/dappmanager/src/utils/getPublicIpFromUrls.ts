@@ -13,8 +13,8 @@ const urls = [
  * - If the first link doesn't return a valid IP, the second url is attempted
  * - If all urls have replied invalid IPs, then an error is returned
  *
- * @param {Boolean} silent suppress logs
- * @return {String} public IP: 85.84.83.82
+ * @param silent suppress logs
+ * @returns public IP: 85.84.83.82
  */
 export default async function getPublicIpFromUrls(): Promise<string> {
   const errors = [];

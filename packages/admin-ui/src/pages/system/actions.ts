@@ -5,7 +5,7 @@ import { getEthClientPrettyName } from "components/EthMultiClient";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
-import { getDnpInstalledById } from "services/dnpInstalled/selectors";
+import { getDnpInstalledByDnpName } from "services/dnpInstalled/selectors";
 import {
   getEthClientTarget,
   getVolumes
@@ -110,7 +110,7 @@ export const packageVolumeRemove = (
   volName: string
 ): AppThunk => async (dispatch, getState) => {
   // Make sure there are no colliding volumes with this DNP
-  const dnp = getDnpInstalledById(getState(), dnpName);
+  const dnp = getDnpInstalledByDnpName(getState(), dnpName);
   const volumesData = getVolumes(getState());
   const prettyDnpName = shortNameCapitalized(dnpName);
   const prettyVolName = prettyVolumeName(volName, dnpName).name;
@@ -149,7 +149,7 @@ export const packageVolumeRemove = (
   );
 
   await withToastNoThrow(
-    () => api.packageRestartVolumes({ id: dnpName, volumeId: volName }),
+    () => api.packageRestartVolumes({ dnpName, volumeId: volName }),
     {
       message: `Removing ${prettyVolRef}...`,
       onSuccess: `Removed ${prettyVolRef}`

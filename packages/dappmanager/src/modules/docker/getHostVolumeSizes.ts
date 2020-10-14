@@ -16,7 +16,7 @@ interface VolSizes {
  * @param volDevicePaths = {
  *   bitcoin_data: "/mnt/volume_ams3_01/dappnode-volumes/bitcoin.dnp.dappnode.eth/bitcoin_data"
  * }
- * @return volSizes = {
+ * @returns volSizes = {
  *   bitcoin_data: "823203"
  * }
  */

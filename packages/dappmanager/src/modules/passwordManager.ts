@@ -10,7 +10,7 @@ const baseCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint=""`;
  * is NOT the insecure default set at installation time.
  * It does so by checking if the current salt is `insecur3`
  *
- * @returns {bool} true = is secure / false = is not
+ * @returns true = is secure / false = is not
  */
 export async function isPasswordSecure(): Promise<boolean> {
   const image = await getDappmanagerImage();
@@ -34,7 +34,7 @@ export async function isPasswordSecure(): Promise<boolean> {
  * Changes the user `dappnode`'s password in the host machine
  * Only allows it if the current password is considered insecure
  *
- * @param {string} newPassword = "super-secure-password"
+ * @param newPassword = "super-secure-password"
  */
 export async function changePassword(newPassword: string): Promise<void> {
   if (!newPassword) throw Error("newPassword must be defined");

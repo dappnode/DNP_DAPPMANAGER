@@ -20,5 +20,5 @@ export async function domainAliasSet({
   }
 
   // Trigger an nsupdate run
-  eventBus.packagesModified.emit({ ids: [dnpName] });
+  eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 }

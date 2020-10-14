@@ -12,7 +12,7 @@ import * as db from "../db";
  *   - If the password is INSECURE this check will be run every
  *     time the admin requests it (on page load)
  *
- * @returns {bool} true = is secure / false = is not
+ * @returns true = is secure / false = is not
  */
 export async function passwordIsSecure(): Promise<boolean> {
   if (db.passwordIsSecure.get()) {

@@ -17,41 +17,52 @@ export class Apm {
   /**
    * Fetch a specific version of an APM repo
    * If version is falsy, gets the latest version
-   * @param name "bitcoin.dnp.dappnode.eth"
+   * @param dnpName "bitcoin.dnp.dappnode.eth"
    * @param version "0.2.4"
    */
-  async fetchVersion(name: string, version?: string): Promise<ApmVersionRaw> {
-    return fetchVersion(await this.getProvider(), name, version);
+  async fetchVersion(
+    dnpName: string,
+    version?: string
+  ): Promise<ApmVersionRaw> {
+    return fetchVersion(await this.getProvider(), dnpName, version);
   }
 
   /**
    * Fetch all versions of an APM repo
    * If provided version request range, only returns satisfying versions
-   * @param name "bitcoin.dnp.dappnode.eth"
+   * @param dnpName "bitcoin.dnp.dappnode.eth"
    */
   async fetchApmVersionsState(
-    name: string,
+    dnpName: string,
     lastVersionId?: number
   ): Promise<ApmVersionState[]> {
-    return fetchApmVersionsState(await this.getProvider(), name, lastVersionId);
+    return fetchApmVersionsState(
+      await this.getProvider(),
+      dnpName,
+      lastVersionId
+    );
   }
 
   /**
    * Fetches the new repos logs from a registry
-   * @param name "bitcoin.dnp.dappnode.eth"
+   * @param dnpName "bitcoin.dnp.dappnode.eth"
    */
   async fetchApmVersionsMetadata(
-    name: string,
+    dnpName: string,
     fromBlock?: number
   ): Promise<ApmVersionMetadata[]> {
-    return fetchApmVersionsMetadata(await this.getProvider(), name, fromBlock);
+    return fetchApmVersionsMetadata(
+      await this.getProvider(),
+      dnpName,
+      fromBlock
+    );
   }
 
   /**
-   * Returns true if an APM repo exists for a package name
-   * @param name "bitcoin.dnp.dappnode.eth"
+   * Returns true if an APM repo exists for a package dnpName
+   * @param dnpName "bitcoin.dnp.dappnode.eth"
    */
-  async repoExists(name: string): Promise<boolean> {
-    return repoExists(await this.getProvider(), name);
+  async repoExists(dnpName: string): Promise<boolean> {
+    return repoExists(await this.getProvider(), dnpName);
   }
 }

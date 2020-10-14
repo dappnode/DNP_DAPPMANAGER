@@ -33,7 +33,7 @@ export function setupWizardToSetupTarget(
  *
  * @param formData
  * @param setupSchema
- * @return userSettings
+ * @returns userSettings
  */
 export function formDataToUserSettings(
   formData: SetupWizardFormDataReturn,
@@ -53,7 +53,7 @@ export function formDataToUserSettings(
             if (target.name)
               userSettings.environment = deepmerge(
                 userSettings.environment || {},
-                { [target.name]: envValue }
+                { [target.service || dnpName]: { [target.name]: envValue } }
               );
             break;
 
@@ -62,7 +62,11 @@ export function formDataToUserSettings(
             if (target.containerPort)
               userSettings.portMappings = deepmerge(
                 userSettings.portMappings || {},
-                { [target.containerPort]: hostPort }
+                {
+                  [target.service || dnpName]: {
+                    [target.containerPort]: hostPort
+                  }
+                }
               );
             break;
 
@@ -87,7 +91,7 @@ export function formDataToUserSettings(
             if (target.path)
               userSettings.fileUploads = deepmerge(
                 userSettings.fileUploads || {},
-                { [target.path]: fileDataUrl }
+                { [target.service || dnpName]: { [target.path]: fileDataUrl } }
               );
             break;
         }
@@ -103,7 +107,7 @@ export function formDataToUserSettings(
  *
  * @param userSettingsAllDnps
  * @param setupSchema
- * @return formData
+ * @returns formData
  */
 export function userSettingsToFormData(
   userSettingsAllDnps: UserSettingsAllDnps,
@@ -125,21 +129,20 @@ export function userSettingsToFormData(
       if (target && target.type) {
         switch (target.type) {
           case "environment":
-            const { name } = target;
-            if (name && name in environment)
-              formDataDnp[propId] = environment[name];
+            const environmentService = environment[target.service || dnpName];
+            if (hasProperty(target.name, environmentService))
+              formDataDnp[propId] = environmentService[target.name];
             break;
 
           case "portMapping":
-            const { containerPort } = target;
-            if (containerPort && containerPort in portMappings)
-              formDataDnp[propId] = portMappings[containerPort];
+            const portMappingsService = portMappings[target.service || dnpName];
+            if (hasProperty(target.containerPort, portMappingsService))
+              formDataDnp[propId] = portMappingsService[target.containerPort];
             break;
 
           case "namedVolumeMountpoint": {
-            const { volumeName } = target;
-            if (volumeName && volumeName in namedVolumeMountpoints)
-              formDataDnp[propId] = namedVolumeMountpoints[volumeName];
+            if (hasProperty(target.volumeName, namedVolumeMountpoints))
+              formDataDnp[propId] = namedVolumeMountpoints[target.volumeName];
             break;
           }
 
@@ -149,9 +152,9 @@ export function userSettingsToFormData(
           }
 
           case "fileUpload":
-            const { path } = target;
-            if (path && path in fileUploads)
-              formDataDnp[propId] = fileUploads[path];
+            const fileUploadsService = fileUploads[target.service || dnpName];
+            if (hasProperty(target.path, fileUploadsService))
+              formDataDnp[propId] = fileUploadsService[target.path];
             break;
         }
       }
@@ -185,6 +188,16 @@ export function filterActiveSetupWizard(
       }
     })
   }));
+}
+
+/**
+ * Util: Type-safe wrapper around `key in obj` which will be ok whatever type obj is
+ */
+function hasProperty(
+  key: string,
+  obj: { [key: string]: string } | undefined
+): boolean {
+  return Boolean(key && obj && key in obj);
 }
 
 /**

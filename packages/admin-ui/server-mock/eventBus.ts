@@ -1,11 +1,11 @@
 import { EventEmitter } from "events";
 import {
   ChainData,
-  PackageContainer,
   ProgressLog,
   UserActionLog,
   PackageNotification,
-  DirectoryItem
+  DirectoryItem,
+  InstalledPackageData
 } from "../src/common/types";
 
 /** HOW TO:
@@ -84,12 +84,12 @@ const busFactory = <T>(event: string) => ({
 //   call: "INTERNAL_CALL",
 
 export const chainData = busFactory<ChainData[]>("CHAIN_DATAS");
-type PackageModifiedType = { ids: string[]; removed?: boolean };
+type PackageModifiedType = { dnpNames: string[]; removed?: boolean };
 export const packagesModified = busFactory<PackageModifiedType>(
   "PACKAGE_MODIFIED"
 );
 export const directory = busFactory<DirectoryItem[]>("DIRECTORY");
-export const packages = busFactory<PackageContainer[]>("PACKAGES");
+export const packages = busFactory<InstalledPackageData[]>("PACKAGES");
 export const logUi = busFactory<ProgressLog>("LOGUI");
 export const logUserAction = busFactory<UserActionLog>("LOG_USER_ACTION");
 export const notification = busFactory<PackageNotification>("NOTIFICATION");
