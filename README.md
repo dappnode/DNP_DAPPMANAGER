@@ -30,7 +30,7 @@ docker --version
 docker-compose --version
 ```
 
-Go to the pre-requisites setup guide if you any command returned an error and need to install a pre-requisite.
+Go to the [pre-requisites setup](https://github.com/dappnode/DAppNode/wiki/DAppNode-Installation-Guide#install-dappnode-prerequisites) in our installation guide if you any command returned an error and need to install a pre-requisite.
 
 ### Installing
 
