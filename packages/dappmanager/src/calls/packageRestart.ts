@@ -1,7 +1,7 @@
-import { PackageContainer } from "../common";
 import * as eventBus from "../eventBus";
 import { listPackage } from "../modules/docker/listContainers";
 import { restartPackage } from "../modules/docker/restartPackage";
+import { getDockerTimeoutMax } from "../modules/docker/utils";
 
 /**
  * Recreates a package containers
@@ -16,7 +16,7 @@ export async function packageRestart({
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
   const dnp = await listPackage({ dnpName });
-  const timeout = getDockerTimeout(dnp.containers);
+  const timeout = getDockerTimeoutMax(dnp.containers);
   await restartPackage({
     dnpName,
     serviceNames,
@@ -27,18 +27,4 @@ export async function packageRestart({
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnpName] });
-}
-
-function getDockerTimeout(containers: PackageContainer[]): number | undefined {
-  let timeout: number | undefined = undefined;
-
-  for (const container of containers) {
-    if (container.dockerTimeout) {
-      const timeoutNumber = parseInt(container.dockerTimeout);
-      if (!timeout || timeoutNumber > timeout) {
-        timeout = timeoutNumber;
-      }
-    }
-  }
-  return timeout;
 }
