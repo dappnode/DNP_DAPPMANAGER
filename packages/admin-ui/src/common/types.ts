@@ -386,6 +386,7 @@ export interface PackageContainer {
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
+  dockerTimeout?: string;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }

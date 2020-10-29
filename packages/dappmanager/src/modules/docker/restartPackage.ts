@@ -12,11 +12,13 @@ import { dockerComposeUp } from "./dockerCommands";
 export async function restartPackage({
   dnpName,
   serviceNames,
-  forceRecreate
+  forceRecreate,
+  timeout
 }: {
   dnpName: string;
   serviceNames?: string[];
   forceRecreate: boolean;
+  timeout?: number;
 }): Promise<void> {
   const composePath = getPath.dockerComposeSmart(dnpName);
   if (!fs.existsSync(composePath)) {
@@ -27,6 +29,10 @@ export async function restartPackage({
     await restartDappmanagerPatch({ composePath });
   } else {
     // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
-    await dockerComposeUp(composePath, { forceRecreate, serviceNames });
+    await dockerComposeUp(composePath, {
+      forceRecreate,
+      serviceNames,
+      timeout
+    });
   }
 }
