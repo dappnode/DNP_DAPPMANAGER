@@ -59,7 +59,7 @@ export function dockerComposeUp(
  */
 export function dockerComposeDown(
   dcPath: string,
-  options: { volumes?: boolean; timeout?: number }
+  options: { volumes?: boolean; timeout?: number } = {}
 ): Promise<string> {
   return execDockerCompose(dcPath, ["down"], options);
 }
@@ -83,7 +83,7 @@ export function dockerComposeStart(dcPath: string): Promise<string> {
  */
 export function dockerComposeStop(
   dcPath: string,
-  options: { timeout?: number }
+  options: { timeout?: number } = {}
 ): Promise<string> {
   return execDockerCompose(dcPath, ["stop"], options);
 }
