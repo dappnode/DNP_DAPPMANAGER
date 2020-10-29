@@ -806,6 +806,7 @@ export type InstallPackageDataPaths = Pick<
   | "manifestBackupPath"
   | "imagePath"
   | "isUpdate"
+  | "timeout"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -820,6 +821,7 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  timeout: number | undefined;
 }
 
 // Must be in-sync with SDK types
