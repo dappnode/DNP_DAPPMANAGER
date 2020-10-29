@@ -14,6 +14,7 @@ function parseArgs(args: Args, kwargs?: Kwargs): string[] {
   ];
 }
 
+//Lion just a quick doubt about the task? when calling the shell with the timeout parameter in <execDocker> or <execDockerCompose>, how does the shell know that the timeout needs the flag '-t'
 async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
   return shell(["docker", ...parseArgs(args, kwargs)]);
 }
@@ -100,13 +101,18 @@ export function dockerStart(containerNames: string[]): Promise<string> {
   return execDocker(["start", ...containerNames]);
 }
 
+// time is already the timeout i guess??
 export function dockerStop(
   containerNames: string[],
-  { time }: { time?: number } = {}
+  options: {
+    time?: number;
+    timeout?: number;
+  } = {}
 ): Promise<string> {
-  return execDocker(["stop", ...containerNames], { time });
+  return execDocker(["stop", ...containerNames], options);
 }
 
+// Is it necessary to do the timeout in docker rm --force?? I think no
 export function dockerRm(
   containerName: string,
   { volumes }: { volumes?: boolean } = {}
