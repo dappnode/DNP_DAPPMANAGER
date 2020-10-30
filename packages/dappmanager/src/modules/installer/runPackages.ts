@@ -50,7 +50,7 @@ export async function runPackages(
       }
 
       log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUp(pkg.composePath);
+      await dockerComposeUp(pkg.composePath, { timeout: pkg.timeout });
     }
 
     log(pkg.dnpName, "Package started");
