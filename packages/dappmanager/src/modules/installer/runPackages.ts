@@ -34,7 +34,10 @@ export async function runPackages(
         log(pkg.dnpName, "Copying file uploads...");
         logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-        await dockerComposeUp(pkg.composePath, { noStart: true });
+        await dockerComposeUp(pkg.composePath, {
+          noStart: true,
+          timeout: pkg.timeout
+        });
         for (const [serviceName, serviceFileUploads] of Object.entries(
           pkg.fileUploads
         ))

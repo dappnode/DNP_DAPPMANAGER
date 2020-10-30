@@ -1,6 +1,7 @@
 import { listPackage } from "../modules/docker/listContainers";
 import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
+import { getDockerTimeoutMax } from "../modules/docker/utils";
 
 /**
  * Stops or starts a package containers
@@ -8,16 +9,15 @@ import * as eventBus from "../eventBus";
  */
 export async function packageStartStop({
   dnpName,
-  serviceNames,
-  timeout = 10
+  serviceNames
 }: {
   dnpName: string;
   serviceNames?: string[];
-  timeout?: number;
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg containerName must be defined");
 
   const dnp = await listPackage({ dnpName });
+  const timeout = getDockerTimeoutMax(dnp.containers);
 
   const targetContainers = dnp.containers.filter(
     c => !serviceNames || serviceNames.includes(c.serviceName)
