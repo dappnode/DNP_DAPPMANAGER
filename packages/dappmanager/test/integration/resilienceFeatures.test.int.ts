@@ -54,7 +54,7 @@ describe("Resilience features, when things go wrong", function() {
     it("Remove the compose and then remove the package", async () => {
       const composePath = getPath.dockerCompose(dnpName, false);
       fs.unlinkSync(composePath);
-      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+      await calls.packageRemove({ dnpName, deleteVolumes: true });
     });
   });
 
@@ -70,7 +70,7 @@ describe("Resilience features, when things go wrong", function() {
       const composePath = getPath.dockerCompose(dnpName, false);
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
-      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+      await calls.packageRemove({ dnpName, deleteVolumes: true });
     });
   });
 

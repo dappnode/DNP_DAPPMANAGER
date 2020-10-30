@@ -258,7 +258,8 @@ export const mockPackageData: InstallPackageData = {
   composePath: "mock/path/compose",
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
-  manifestBackupPath: "mock/path/manifest.backup.json"
+  manifestBackupPath: "mock/path/manifest.backup.json",
+  timeout: undefined
 };
 
 // For copyFileTo and copyFileFrom

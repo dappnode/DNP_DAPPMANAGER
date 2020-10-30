@@ -511,7 +511,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should stop the DNP", async () => {
-      await calls.packageStartStop({ dnpName: dnpNameMain, timeout: 0 });
+      await calls.packageStartStop({ dnpName: dnpNameMain });
     });
 
     it(`DNP should be running`, async () => {
@@ -520,7 +520,7 @@ describe("DNP lifecycle", function() {
     });
 
     it("Should start the DNP", async () => {
-      await calls.packageStartStop({ dnpName: dnpNameMain, timeout: 0 });
+      await calls.packageStartStop({ dnpName: dnpNameMain });
     });
 
     it(`DNP should be running`, async () => {

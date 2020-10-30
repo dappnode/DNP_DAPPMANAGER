@@ -58,7 +58,7 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
-  const timeout;
+  const timeout = undefined;
 
   return {
     ...release,
