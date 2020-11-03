@@ -58,7 +58,7 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
-  const timeout = undefined;
+  const timeout = release.metadata.dockerTimeout;
 
   return {
     ...release,

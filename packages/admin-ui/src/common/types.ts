@@ -847,6 +847,9 @@ export interface PackageReleaseMetadata {
   restartCommand?: string;
   restartLaunchCommand?: string;
 
+  // "15min" | 3600
+  dockerTimeout?: string;
+
   requirements?: {
     minimumDappnodeVersion: string;
   };
