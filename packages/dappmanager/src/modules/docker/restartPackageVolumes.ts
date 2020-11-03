@@ -10,6 +10,7 @@ import { logs } from "../../logs";
 import { VolumeOwnershipData } from "../../types";
 import { getVolumesOwnershipData } from "./volumesData";
 import { InstalledPackageData } from "../../common";
+import { getDockerTimeoutMax } from "./utils";
 
 /**
  * ```
@@ -38,11 +39,13 @@ type VolumesToRemove = string[];
 export async function restartPackageVolumes({
   dnpName,
   doNotRestart,
-  volumeId
+  volumeId,
+  timeout
 }: {
   dnpName: string;
   doNotRestart?: boolean;
   volumeId?: string;
+  timeout?: number;
 }): Promise<{ removedDnps: string[] }> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
@@ -66,6 +69,7 @@ export async function restartPackageVolumes({
   // Verify results
   const composePaths: { [dnpName: string]: string } = {};
   const containerNames: { [dnpName: string]: string[] } = {};
+  const timeoutByDnpName: { [dnpName: string]: number | undefined } = {};
 
   /**
    * Load docker-compose paths and verify results
@@ -87,6 +91,9 @@ export async function restartPackageVolumes({
           `No compose found for ${dnpToRemove.dnpName}: ${composePath}`
         );
 
+      timeoutByDnpName[dnpToRemove.dnpName] = getDockerTimeoutMax(
+        dnpToRemove.containers
+      );
       composePaths[dnpToRemove.dnpName] = composePath;
 
       for (const container of dnpToRemove.containers) {
@@ -127,7 +134,10 @@ export async function restartPackageVolumes({
     // It is critical up packages in the correct order,
     // so that the named volumes are created before the users are started
     for (const dnpName of dnpsToRemoveSorted)
-      if (composePaths[dnpName]) await dockerComposeUp(composePaths[dnpName]);
+      if (composePaths[dnpName])
+        await dockerComposeUp(composePaths[dnpName], {
+          timeout: timeoutByDnpName[dnpName]
+        });
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error

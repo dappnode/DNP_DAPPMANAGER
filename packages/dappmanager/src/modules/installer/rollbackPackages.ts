@@ -48,7 +48,7 @@ export async function rollbackPackages(
     }
 
   // Restore backup versions
-  for (const { dnpName, composePath, isUpdate } of packagesData)
+  for (const { dnpName, composePath, isUpdate, timeout } of packagesData)
     try {
       log(dnpName, "Aborting and rolling back...");
 
@@ -58,7 +58,7 @@ export async function rollbackPackages(
         // restartPatch failed before stopping the original container there's no need
         // to roll back, since the current container has the original version.
       } else if (isUpdate) {
-        await dockerComposeUp(composePath);
+        await dockerComposeUp(composePath, { timeout });
       } else {
         // Remove new containers that were NOT installed before this install call
         await dockerComposeRm(composePath);

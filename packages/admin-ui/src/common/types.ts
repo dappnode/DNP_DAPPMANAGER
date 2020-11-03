@@ -386,6 +386,7 @@ export interface PackageContainer {
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
+  dockerTimeout?: string;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -805,6 +806,7 @@ export type InstallPackageDataPaths = Pick<
   | "manifestBackupPath"
   | "imagePath"
   | "isUpdate"
+  | "timeout"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -819,6 +821,7 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  timeout: number | undefined;
 }
 
 // Must be in-sync with SDK types

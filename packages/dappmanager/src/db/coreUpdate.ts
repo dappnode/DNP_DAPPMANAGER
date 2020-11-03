@@ -31,7 +31,8 @@ export const coreUpdatePackagesData = {
                 "manifestPath",
                 "manifestBackupPath",
                 "imagePath",
-                "isUpdate"
+                "isUpdate",
+                "timeout"
               ])
           )
         : packagesData

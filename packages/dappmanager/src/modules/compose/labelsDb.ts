@@ -131,6 +131,7 @@ export function readContainerLabels(
   defaultEnvironment: string[];
   defaultPorts: string[];
   defaultVolumes: string[];
+  dockerTimeout: string;
 }> {
   const labelValues = parseContainerLabels(labelsRaw);
   return {
@@ -147,6 +148,7 @@ export function readContainerLabels(
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
     defaultPorts: labelValues["dappnode.dnp.default.ports"],
     defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
+    //dockerTimeout: labelValues["dappnode.dnp.default.timeOut"]
   };
 }
 

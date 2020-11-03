@@ -130,6 +130,7 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     labels.defaultPorts && parsePortMappings(labels.defaultPorts);
   const defaultVolumes =
     labels.defaultVolumes && parseVolumeMappings(labels.defaultVolumes);
+  const dockerTimeout = labels.dockerTimeout;
 
   return {
     // Identification
@@ -190,7 +191,8 @@ function parseContainerInfo(container: ContainerInfo): PackageContainer {
     // Default settings on the original package version's docker-compose
     defaultEnvironment,
     defaultPorts,
-    defaultVolumes
+    defaultVolumes,
+    dockerTimeout
   };
 }
 

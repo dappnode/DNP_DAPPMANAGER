@@ -58,6 +58,8 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
+  const timeout = undefined;
+
   return {
     ...release,
     isUpdate: Boolean(currentVersion),
@@ -70,6 +72,7 @@ function getInstallerPackageData(
     // Data to write
     compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: userSettings?.fileUploads
+    fileUploads: userSettings?.fileUploads,
+    timeout
   };
 }
