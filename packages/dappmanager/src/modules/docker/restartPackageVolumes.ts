@@ -1,7 +1,7 @@
 import fs from "fs";
 import { uniq } from "lodash";
 import { dockerRm, dockerComposeUp } from "./dockerCommands";
-import { listPackage, listPackages } from "./listContainers";
+import { listPackages } from "./listContainers";
 import { removeNamedVolume } from "./removeNamedVolume";
 import params from "../../params";
 // Utils

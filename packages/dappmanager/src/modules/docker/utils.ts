@@ -1,4 +1,4 @@
-import { PackageContainer } from "../../common";
+import { PackageContainer } from "../../types";
 
 /**
  * When fetching logs from the API, each line is prefixed by a Header
