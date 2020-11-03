@@ -11,4 +11,7 @@ describe("Util: timeout", () => {
   it("It should return undefined timeout when the given parameter is undefined", () => {
     expect(parseTimeout(undefined)).to.equal(undefined);
   });
+  it("It should return number timeout when the given parameter is number", () => {
+    expect(parseTimeout(1)).to.equal(1);
+  });
 });
