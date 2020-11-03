@@ -315,6 +315,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.chain": ChainDriver;
   "dappnode.dnp.isCore": boolean;
   "dappnode.dnp.isMain": boolean;
+  "dappnode.dnp.timeout": number;
   "dappnode.dnp.default.environment": string[];
   "dappnode.dnp.default.ports": string[];
   "dappnode.dnp.default.volumes": string[];
@@ -845,6 +846,9 @@ export interface PackageReleaseMetadata {
   runOrder?: string[];
   restartCommand?: string;
   restartLaunchCommand?: string;
+
+  // "15min" | 3600
+  dockerTimeout?: string;
 
   requirements?: {
     minimumDappnodeVersion: string;

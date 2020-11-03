@@ -4,6 +4,7 @@ import orderInstallPackages from "./orderInstallPackages";
 import { UserSettingsAllDnps, UserSettings } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
+import { parseTimeout } from "../../utils/timeout";
 
 export function getInstallerPackagesData({
   releases,
@@ -58,7 +59,7 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
-  const timeout = undefined;
+  const timeout = parseTimeout(release.metadata.dockerTimeout);
 
   return {
     ...release,
