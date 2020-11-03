@@ -13,6 +13,7 @@ import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { getContainerDomain } from "../../params";
+import { parseTimeout } from "../../utils/timeout";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

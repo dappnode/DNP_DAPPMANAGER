@@ -76,6 +76,7 @@
     "socket.io": "^2.3.0",
     "source-map-support": "^0.5.19",
     "stack-trace": "^0.0.10",
+    "timestring": "^6.0.0",
     "ts-loader": "^8.0.2",
     "tweetnacl": "^1.0.1",
     "tweetnacl-util": "^0.15.0",
