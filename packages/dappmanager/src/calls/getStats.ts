@@ -34,6 +34,21 @@ export async function getStats(): Promise<HostStats> {
   };
 }
 
+export async function getCPUStats(): Promise<HostStatCpu> {
+  const cpuPercentage = await osu.cpu.usage(5000); // 10.38
+  return { used: (Math.round(cpuPercentage) + "%").toString() };
+}
+
+export async function getMemoryStats(): Promise<HostStatMemory> {
+  const mem = await shellExec(`free /`);
+  return parseMemoryStats(mem);
+}
+
+export async function getDiskStats(): Promise<HostStatDisk> {
+  const disk = await shellExec(`df /`);
+  return parseDiskStats(disk);
+}
+
 // Utils
 
 /**
