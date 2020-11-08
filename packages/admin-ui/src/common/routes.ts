@@ -22,7 +22,10 @@ import {
   UserActionLog,
   InstalledPackageData,
   InstalledPackageDetailData,
-  PackageEnvs
+  PackageEnvs,
+  HostStatCpu,
+  HostStatDisk,
+  HostStatMemory
 } from "./types";
 
 export interface Routes {
@@ -196,6 +199,12 @@ export interface Routes {
    * Return host machine stats (cpu, memory, etc)
    */
   getStats: () => Promise<HostStats>;
+
+  getCPUStats: () => Promise<HostStatCpu>;
+
+  getMemoryStats: () => Promise<HostStatMemory>;
+
+  getDiskStats: () => Promise<HostStatDisk>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -454,6 +463,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchDnpRequest: {},
   getStats: {},
+  getCPUStats: {},
+  getDiskStats: {},
+  getMemoryStats: {},
   getUserActionLogs: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
