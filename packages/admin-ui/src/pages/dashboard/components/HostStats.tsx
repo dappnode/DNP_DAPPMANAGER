@@ -42,14 +42,6 @@ export function HostStats() {
     };
   }, [diskStats]);
 
-  // eslint-disable-next-line no-console
-  console.log(cpuStats);
-  // eslint-disable-next-line no-console
-  console.log(memoryStats);
-  // eslint-disable-next-line no-console
-  console.log(diskStats);
-  //ERROR: Error: Method not found getDiskStats at parseRpcResponse
-
   useEffect(() => {
     const interval = setInterval(memoryStats.revalidate, 1000);
     // eslint-disable-next-line no-console

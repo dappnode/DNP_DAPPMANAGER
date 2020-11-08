@@ -20,8 +20,6 @@ export default function SystemInfo() {
 
   useEffect(() => {
     const interval = setInterval(diskStats.revalidate, 1000);
-    // eslint-disable-next-line no-console
-    console.log(diskStats);
     return () => {
       clearInterval(interval);
     };
@@ -29,8 +27,6 @@ export default function SystemInfo() {
 
   useEffect(() => {
     const interval = setInterval(memoryStats.revalidate, 1000);
-    // eslint-disable-next-line no-console
-    console.log(memoryStats);
     return () => {
       clearInterval(interval);
     };
