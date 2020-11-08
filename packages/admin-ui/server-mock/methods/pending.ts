@@ -9,7 +9,10 @@ import {
   NewFeatureStatus,
   PackageNotificationDb,
   PackageNotification,
-  SystemInfo
+  SystemInfo,
+  HostStatCpu,
+  HostStatDisk,
+  HostStatMemory
 } from "../../src/common";
 import { mountpoints } from "../mockData";
 
@@ -118,6 +121,34 @@ export async function getStats(): Promise<HostStats> {
     cpu: "35%",
     memory: "46%",
     disk: "57%"
+  };
+}
+
+export async function getCPUStats(): Promise<HostStatCpu> {
+  return {
+    used: "9"
+  };
+}
+
+export async function getMemoryStats(): Promise<HostStatMemory> {
+  return {
+    memTotal: "11",
+    memUsed: "11",
+    free: "11",
+    shared: "11",
+    buffCache: "11",
+    available: "11"
+  };
+}
+
+export async function getDiskStats(): Promise<HostStatDisk> {
+  return {
+    filesystem: "10",
+    kblocks: "10",
+    used: "10",
+    available: "10",
+    usepercentage: "10",
+    mountedon: "10"
   };
 }
 

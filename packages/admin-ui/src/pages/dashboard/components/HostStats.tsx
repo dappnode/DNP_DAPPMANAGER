@@ -42,6 +42,14 @@ export function HostStats() {
     };
   }, [diskStats]);
 
+  // eslint-disable-next-line no-console
+  console.log(cpuStats);
+  // eslint-disable-next-line no-console
+  console.log(memoryStats);
+  // eslint-disable-next-line no-console
+  console.log(diskStats);
+  //ERROR: Error: Method not found getDiskStats at parseRpcResponse
+
   useEffect(() => {
     const interval = setInterval(memoryStats.revalidate, 1000);
     // eslint-disable-next-line no-console
@@ -59,14 +67,14 @@ export function HostStats() {
         <StatsCard key={0} id={"cpu"} percent={"10"} />
       )}
       {diskStats.data?.used ? (
-        <StatsCard key={0} id={"disk"} percent={diskStats.data?.used} />
+        <StatsCard key={1} id={"disk"} percent={diskStats.data?.used} />
       ) : (
-        <StatsCard key={0} id={"disk"} percent={"10"} />
+        <StatsCard key={1} id={"disk"} percent={"10"} />
       )}
       {memoryStats.data?.memUsed ? (
-        <StatsCard key={0} id={"memory"} percent={memoryStats.data.memUsed} />
+        <StatsCard key={2} id={"memory"} percent={memoryStats.data.memUsed} />
       ) : (
-        <StatsCard key={0} id={"cpu"} percent={"10"} />
+        <StatsCard key={2} id={"cpu"} percent={"10"} />
       )}
     </div>
   );
