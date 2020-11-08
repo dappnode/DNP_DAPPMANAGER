@@ -22,21 +22,52 @@ function StatsCard({ id, percent }: { id: string; percent: string }) {
 }
 
 export function HostStats() {
-  const stats = useApi.getStats();
+  const cpuStats = useApi.getCPUStats();
+  const memoryStats = useApi.getMemoryStats();
+  const diskStats = useApi.getDiskStats();
 
   useEffect(() => {
-    const interval = setInterval(stats.revalidate, 5 * 1000);
+    const interval = setInterval(cpuStats.revalidate, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [stats]);
+  }, [cpuStats]);
+
+  useEffect(() => {
+    const interval = setInterval(diskStats.revalidate, 1000);
+    // eslint-disable-next-line no-console
+    console.log(diskStats);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [diskStats]);
+
+  useEffect(() => {
+    const interval = setInterval(memoryStats.revalidate, 1000);
+    // eslint-disable-next-line no-console
+    console.log(memoryStats);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [memoryStats]);
 
   return (
     <div className="dashboard-cards">
-      {stats.data &&
-        Object.entries(stats.data).map(([id, percent]) => (
-          <StatsCard key={id} id={id} percent={percent} />
-        ))}
+      {cpuStats.data?.used ? (
+        <StatsCard key={0} id={"cpu"} percent={cpuStats.data?.used} />
+      ) : (
+        <StatsCard key={0} id={"cpu"} percent={"10"} />
+      )}
+      {diskStats.data?.used ? (
+        <StatsCard key={0} id={"disk"} percent={diskStats.data?.used} />
+      ) : (
+        <StatsCard key={0} id={"disk"} percent={"10"} />
+      )}
+      {memoryStats.data?.memUsed ? (
+        <StatsCard key={0} id={"memory"} percent={memoryStats.data.memUsed} />
+      ) : (
+        <StatsCard key={0} id={"cpu"} percent={"10"} />
+      )}
     </div>
   );
 }
