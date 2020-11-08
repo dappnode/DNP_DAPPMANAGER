@@ -2,7 +2,7 @@ import os from "os";
 import shellParse from "shell-quote";
 import shellExec from "../utils/shell";
 import osu from "node-os-utils";
-import { HostStats } from "../types";
+import { HostStats, HostStatCpu, HostStatDisk, HostStatMemory } from "../types";
 import { logs } from "../logs";
 
 // Cache static values
@@ -79,35 +79,35 @@ async function wrapErrors<R>(
   } catch (e) {
     logs.warn(`Error fetching ${name}`, e);
   }
+}
 
-  /**
-   * Parses the 'df /' bash output command
-   * @param disk string with disk usage info
-   */
-  function parseDiskStats(disk: string): HostStatDisk {
-    const parsedDisk = shellParse.parse(disk);
-    return {
-      filesystem: parsedDisk[7].toString(),
-      kblocks: parsedDisk[8].toString(),
-      used: parsedDisk[9].toString(),
-      available: parsedDisk[10].toString(),
-      usepercentage: parsedDisk[11].toString(),
-      mountedon: parsedDisk[12].toString()
-    };
-  }
-  /**
-   * Parses the 'free /' bash output command
-   * @param mem string with memory usage info
-   */
-  function parseMemoryStats(mem: string): HostStatMemory {
-    const parsedMemory = shellParse.parse(mem);
-    return {
-      memTotal: parsedMemory[7].toString(),
-      memUsed: parsedMemory[8].toString(),
-      free: parsedMemory[9].toString(),
-      shared: parsedMemory[10].toString(),
-      buffCache: parsedMemory[11].toString(),
-      available: parsedMemory[12].toString()
-    };
-  }
+/**
+ * Parses the 'df /' bash output command
+ * @param disk string with disk usage info
+ */
+function parseDiskStats(disk: string): HostStatDisk {
+  const parsedDisk = shellParse.parse(disk);
+  return {
+    filesystem: parsedDisk[7].toString(),
+    kblocks: parsedDisk[8].toString(),
+    used: parsedDisk[9].toString(),
+    available: parsedDisk[10].toString(),
+    usepercentage: parsedDisk[11].toString(),
+    mountedon: parsedDisk[12].toString()
+  };
+}
+/**
+ * Parses the 'free /' bash output command
+ * @param mem string with memory usage info
+ */
+function parseMemoryStats(mem: string): HostStatMemory {
+  const parsedMemory = shellParse.parse(mem);
+  return {
+    memTotal: parsedMemory[7].toString(),
+    memUsed: parsedMemory[8].toString(),
+    free: parsedMemory[9].toString(),
+    shared: parsedMemory[10].toString(),
+    buffCache: parsedMemory[11].toString(),
+    available: parsedMemory[12].toString()
+  };
 }

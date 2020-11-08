@@ -1052,6 +1052,38 @@ export interface HostStats {
 }
 
 /**
+ * Host machine Memory stats: filesystem, used, available, etc
+ */
+export interface HostStatMemory {
+  // free
+  memTotal?: string;
+  memUsed?: string;
+  free?: string;
+  shared?: string;
+  buffCache?: string;
+  available?: string;
+}
+
+/**
+ * Host machine Disk stats: filesystem, used, available, etc
+ */
+export interface HostStatDisk {
+  filesystem?: string;
+  kblocks?: string;
+  used?: string;
+  available?: string;
+  usepercentage?: string;
+  mountedon?: string;
+}
+
+/**
+ * Host machine CPU used
+ */
+export interface HostStatCpu {
+  used?: string;
+}
+
+/**
  * Summary of diagnose checks performed by the DAppNode host
  */
 export interface DiagnoseItem {
