@@ -96,8 +96,6 @@ export function HostStats() {
         <StatsCard key={0} title={"cpu"} percent={cpuStats.data.used} />
       ) : cpuStats.error ? (
         <StatsCard key={0} title={"cpu"} percent={"1"} />
-      ) : cpuStats.isValidating ? (
-        <LoadingIndicator />
       ) : (
         <LoadingIndicator />
       )}
@@ -110,8 +108,6 @@ export function HostStats() {
         />
       ) : cpuStats.error ? (
         <StatsCard key={1} title={"disk"} percent={"0"} />
-      ) : cpuStats.isValidating ? (
-        <LoadingIndicator />
       ) : (
         <LoadingIndicator />
       )}
@@ -123,8 +119,6 @@ export function HostStats() {
         />
       ) : memoryStats.error ? (
         <StatsCard key={2} title={"memory"} percent={"0"} />
-      ) : memoryStats.isValidating ? (
-        <LoadingIndicator />
       ) : (
         <LoadingIndicator />
       )}
