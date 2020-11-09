@@ -5,7 +5,6 @@ import {
   CoreUpdateData,
   DirectoryItem,
   RequestedDnp,
-  HostStats,
   UserSettingsAllDnps,
   MountpointData,
   SystemInfo,
@@ -194,11 +193,6 @@ export interface Routes {
    * Fetch extended info about a new DNP
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
-
-  /**
-   * Return host machine stats (cpu, memory, etc)
-   */
-  getStats: () => Promise<HostStats>;
 
   getCPUStats: () => Promise<HostStatCpu>;
 
@@ -462,7 +456,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  getStats: {},
   getCPUStats: {},
   getDiskStats: {},
   getMemoryStats: {},

@@ -15,7 +15,7 @@ export default function Report() {
   const dnpsReq = useApi.packagesGet();
   const systemInfoReq = useApi.systemInfoGet();
   const diagnoseReq = useApi.diagnose();
-  const hostStatsReq = useApi.getStats();
+  const hostStatsReq = useApi.getDiskStats();
   const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diagnose = diagnoseReq.data || [];
@@ -36,7 +36,7 @@ export default function Report() {
 
   const systemData = [
     ...diagnose,
-    { name: "Disk usage", result: hostStats.disk }
+    { name: "Disk usage", result: hostStats.used }
   ];
 
   const issueBody = formatIssueBody(coreDnpVersions, systemData);

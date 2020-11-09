@@ -1043,15 +1043,6 @@ export interface SystemInfo {
 }
 
 /**
- * Host machine stats, cpu, memory, disk, etc
- */
-export interface HostStats {
-  cpu?: string; // "35%""
-  memory?: string; // "46%"
-  disk?: string; // "57%"
-}
-
-/**
  * Host machine Memory stats: filesystem, used, available, etc
  */
 export interface HostStatMemory {

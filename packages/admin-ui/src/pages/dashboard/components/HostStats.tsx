@@ -9,6 +9,12 @@ function parseVariant(value: number) {
   return "success";
 }
 
+function percentageMemoryUsed(memUsed: string, memTotal: string): string {
+  return (
+    Math.round((parseInt(memUsed) * 100) / parseInt(memTotal)) + "%".toString()
+  );
+}
+
 function StatsCard({ id, percent }: { id: string; percent: string }) {
   const value = parseInt(percent);
   return (
@@ -56,17 +62,28 @@ export function HostStats() {
       {cpuStats.data?.used ? (
         <StatsCard key={0} id={"cpu"} percent={cpuStats.data?.used} />
       ) : (
-        <StatsCard key={0} id={"cpu"} percent={"10"} />
+        <StatsCard key={0} id={"cpu"} percent={"0"} />
       )}
-      {diskStats.data?.used ? (
-        <StatsCard key={1} id={"disk"} percent={diskStats.data?.used} />
+      {diskStats.data?.usepercentage ? (
+        <StatsCard
+          key={1}
+          id={"disk"}
+          percent={diskStats.data?.usepercentage}
+        />
       ) : (
-        <StatsCard key={1} id={"disk"} percent={"10"} />
+        <StatsCard key={1} id={"disk"} percent={"0"} />
       )}
-      {memoryStats.data?.memUsed ? (
-        <StatsCard key={2} id={"memory"} percent={memoryStats.data.memUsed} />
+      {memoryStats.data?.memUsed && memoryStats.data?.memTotal ? (
+        <StatsCard
+          key={2}
+          id={"memory"}
+          percent={percentageMemoryUsed(
+            memoryStats.data.memUsed,
+            memoryStats.data.memTotal
+          )}
+        />
       ) : (
-        <StatsCard key={2} id={"cpu"} percent={"10"} />
+        <StatsCard key={2} id={"cpu"} percent={"0"} />
       )}
     </div>
   );
