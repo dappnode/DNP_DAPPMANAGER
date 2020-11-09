@@ -14,15 +14,7 @@ function parseVariant(value: number) {
 function LoadingIndicator() {
   return (
     <Card className="stats-card">
-      <div
-        style={{
-          width: "100%",
-          height: "100",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
+      <div className="loading">
         <Loader type="ThreeDots" color="#2BAD60" height={100} width={100} />
       </div>
     </Card>
@@ -50,8 +42,7 @@ function DiskStats({
   }
   return <p className="disk-usage">Info not available</p>;
 }
-// param texto ? => poner el texto extra
-// args: title, percentage, text?
+
 function StatsCard({
   title,
   percent,
@@ -98,7 +89,7 @@ export function HostStats() {
       clearInterval(interval);
     };
   }, [memoryStats]);
-  // exists or (error or validating)
+
   return (
     <div className="dashboard-cards">
       {cpuStats.data ? (
@@ -121,7 +112,9 @@ export function HostStats() {
         <StatsCard key={1} title={"disk"} percent={"0"} />
       ) : cpuStats.isValidating ? (
         <LoadingIndicator />
-      ) : null}
+      ) : (
+        <LoadingIndicator />
+      )}
       {memoryStats.data ? (
         <StatsCard
           key={2}
@@ -132,7 +125,9 @@ export function HostStats() {
         <StatsCard key={2} title={"memory"} percent={"0"} />
       ) : memoryStats.isValidating ? (
         <LoadingIndicator />
-      ) : null}
+      ) : (
+        <LoadingIndicator />
+      )}
     </div>
   );
 }
