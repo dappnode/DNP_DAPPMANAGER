@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useApi } from "api";
-import humanFileSize from "../../../utils/humanFileSize";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
+import humanFileSize from "utils/humanFileSize";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
@@ -10,21 +10,17 @@ function parseVariant(value: number) {
   return "success";
 }
 
-function percentageMemoryUsed(memUsed: string, memTotal: string): string {
-  return (
-    Math.round((parseInt(memUsed) * 100) / parseInt(memTotal)).toString() + "%"
-  );
-}
-
 function DiskStats({
-  diskUsed,
-  diskAvailable
+  percentage,
+  diskUsed
 }: {
+  percentage: string;
   diskUsed: string;
-  diskAvailable: string;
 }) {
-  const used = humanFileSize(parseInt(diskUsed) * 1024);
-  const available = humanFileSize(parseInt(diskAvailable) * 1024);
+  const used = humanFileSize(parseInt(diskUsed));
+  const available = humanFileSize(
+    (parseInt(diskUsed) * 100) / parseInt(percentage)
+  );
   if (typeof used === "string" && typeof available === "string") {
     const total = (parseInt(used) + parseInt(available)).toString() + "GB";
     return (
@@ -33,43 +29,28 @@ function DiskStats({
       </p>
     );
   }
-  return <p>Info not available</p>;
+  return <p className="disk-usage">Info not available</p>;
 }
-
+// param texto ? => poner el texto extra
+// args: title, percentage, text?
 function StatsCard({
-  id,
+  title,
   percent,
-  diskUsed,
-  diskAvailable
+  diskUsed
 }: {
-  id: string;
+  title: string;
   percent: string;
   diskUsed?: string;
-  diskAvailable?: string;
 }) {
   const value = parseInt(percent);
 
-  if (id === "disk" && diskUsed && diskAvailable) {
-    return (
-      <Card className="stats-card">
-        <div className="header">
-          <span className="id">{id}</span> <span className="usage">usage</span>
-        </div>
-        <ProgressBar
-          variant={parseVariant(value)}
-          now={value}
-          label={percent}
-        />
-        <DiskStats diskUsed={diskUsed} diskAvailable={diskAvailable} />
-      </Card>
-    );
-  }
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{id}</span> <span className="usage">usage</span>
+        <span className="id">{title}</span> <span className="usage">usage</span>
       </div>
       <ProgressBar variant={parseVariant(value)} now={value} label={percent} />
+      {diskUsed ? <DiskStats diskUsed={diskUsed} percentage={percent} /> : null}
     </Card>
   );
 }
@@ -98,39 +79,39 @@ export function HostStats() {
       clearInterval(interval);
     };
   }, [memoryStats]);
-
+  // exists or (error or validating)
   return (
     <div className="dashboard-cards">
-      {cpuStats.data?.used ? (
-        <StatsCard key={0} id={"cpu"} percent={cpuStats.data?.used} />
-      ) : (
-        <StatsCard key={0} id={"cpu"} percent={"0"} />
-      )}
-      {diskStats.data?.usepercentage &&
-      diskStats.data.used &&
-      diskStats.data.available ? (
+      {cpuStats.data ? (
+        <StatsCard key={0} title={"cpu"} percent={cpuStats.data.used} />
+      ) : cpuStats.error ? (
+        <StatsCard key={0} title={"cpu"} percent={"1"} />
+      ) : cpuStats.isValidating ? (
+        <StatsCard key={0} title={"cpu"} percent={"1"} />
+      ) : null}
+      {diskStats.data ? (
         <StatsCard
           key={1}
-          id={"disk"}
+          title={"disk"}
           percent={diskStats.data.usepercentage}
           diskUsed={diskStats.data.used}
-          diskAvailable={diskStats.data.available}
         />
-      ) : (
-        <StatsCard key={1} id={"disk"} percent={"0"} />
-      )}
-      {memoryStats.data?.memUsed && memoryStats.data?.memTotal ? (
+      ) : cpuStats.error ? (
+        <StatsCard key={1} title={"disk"} percent={"0"} />
+      ) : cpuStats.isValidating ? (
+        <StatsCard key={1} title={"disk"} percent={"0"} />
+      ) : null}
+      {memoryStats.data ? (
         <StatsCard
           key={2}
-          id={"memory"}
-          percent={percentageMemoryUsed(
-            memoryStats.data.memUsed,
-            memoryStats.data.memTotal
-          )}
+          title={"memory"}
+          percent={memoryStats.data.usepercentage}
         />
-      ) : (
-        <StatsCard key={2} id={"cpu"} percent={"0"} />
-      )}
+      ) : memoryStats.isValidating ? (
+        <StatsCard key={2} title={"cpu"} percent={"0"} />
+      ) : memoryStats.error ? (
+        <StatsCard key={2} title={"cpu"} percent={"0"} />
+      ) : null}
     </div>
   );
 }

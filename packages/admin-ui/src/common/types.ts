@@ -1046,32 +1046,32 @@ export interface SystemInfo {
  * Host machine Memory stats: filesystem, used, available, etc
  */
 export interface HostStatMemory {
-  // free
-  memTotal?: string;
-  memUsed?: string;
-  free?: string;
-  shared?: string;
-  buffCache?: string;
-  available?: string;
+  memTotal: string;
+  memUsed: string;
+  free: string;
+  shared: string;
+  buffCache: string;
+  available: string;
+  usepercentage: string;
 }
 
 /**
  * Host machine Disk stats: filesystem, used, available, etc
  */
 export interface HostStatDisk {
-  filesystem?: string;
-  kblocks?: string;
-  used?: string;
-  available?: string;
-  usepercentage?: string;
-  mountedon?: string;
+  filesystem: string;
+  kblocks: string;
+  used: string;
+  available: string;
+  usepercentage: string;
+  mountedon: string;
 }
 
 /**
  * Host machine CPU used
  */
 export interface HostStatCpu {
-  used?: string;
+  used: string;
 }
 
 /**

@@ -18,14 +18,14 @@ export async function getCPUStats(): Promise<HostStatCpu> {
  * Returns the memory statistics (use, free, shared, etc)
  */
 export async function getMemoryStats(): Promise<HostStatMemory> {
-  const mem = await shellExec(`free /`);
+  const mem = await shellExec(`free / --bytes`); // bytes format
   return parseMemoryStats(mem);
 }
 /**
  * Returns the disk statistics (used, available, etc)
  */
 export async function getDiskStats(): Promise<HostStatDisk> {
-  const disk = await shellExec(`df /`);
+  const disk = await shellExec(`df / --block-size=1`); // bytes format
   return parseDiskStats(disk);
 }
 
@@ -75,6 +75,7 @@ function parseDiskStats(disk: string): HostStatDisk {
     mountedon: parsedDisk[12].toString()
   };
 }
+
 /**
  * Parses the 'free /' bash output command
  * @param mem string with memory usage info
@@ -87,6 +88,11 @@ function parseMemoryStats(mem: string): HostStatMemory {
     free: parsedMemory[9].toString(),
     shared: parsedMemory[10].toString(),
     buffCache: parsedMemory[11].toString(),
-    available: parsedMemory[12].toString()
+    available: parsedMemory[12].toString(),
+    usepercentage: (
+      (parseInt(parsedMemory[15].toString()) /
+        parseInt(parsedMemory[7].toString())) *
+      100
+    ).toString()
   };
 }

@@ -44,6 +44,13 @@
   display: inline;
 }
 
+.stats-card {
+  .disk-usage {
+    color: #05022569;
+    margin: 0.7rem 0 0.5rem;
+  }
+}
+
 .chain-card {
   .progress {
     margin: 0.3rem 0 0.5rem;
@@ -57,10 +64,3 @@
 }
 
 /* Volumes cards */
-
-.stats-card {
-  .disk-usage {
-    color: #0a063869;
-    margin: 0.8rem 0 0.5rem;
-  }
-}
