@@ -108,9 +108,9 @@ export function HostStats() {
           percent={memoryStats.data.usepercentage}
         />
       ) : memoryStats.isValidating ? (
-        <StatsCard key={2} title={"cpu"} percent={"0"} />
+        <StatsCard key={2} title={"memory"} percent={"0"} />
       ) : memoryStats.error ? (
-        <StatsCard key={2} title={"cpu"} percent={"0"} />
+        <StatsCard key={2} title={"memory"} percent={"0"} />
       ) : null}
     </div>
   );
