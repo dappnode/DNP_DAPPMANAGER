@@ -1,7 +1,15 @@
 import * as ipfs from "../../ipfs";
 import memoize from "memoizee";
-import { Manifest, Compose, SetupTarget, SetupWizard } from "../../../types";
-import { SetupSchema, SetupUiJson } from "../../../types";
+import {
+  Manifest,
+  Compose,
+  SetupTarget,
+  SetupWizard,
+  SetupSchema,
+  SetupUiJson,
+  GrafanaDashboard,
+  PrometheusTarget
+} from "../../../types";
 import { validateManifestBasic } from "../../manifest";
 import { validateCompose } from "../../compose";
 import { yamlParse } from "../../../utils/yaml";
@@ -51,6 +59,18 @@ export const downloadDisclaimer = downloadAssetFactory<string>({
 export const downloadGetStarted = downloadAssetFactory<string>({
   parse: content => content,
   validate: gettingStarted => gettingStarted,
+  maxLength: 10e3 // Limit size to ~10KB
+});
+
+export const downloadGrafanaDashboard = downloadAssetFactory<GrafanaDashboard>({
+  parse: jsonParse,
+  validate: grafanaDashboard => grafanaDashboard,
+  maxLength: 10e6 // Limit size to ~10MB
+});
+
+export const downloadPrometheusTarget = downloadAssetFactory<PrometheusTarget>({
+  parse: jsonParse,
+  validate: prometheusTarget => prometheusTarget,
   maxLength: 10e3 // Limit size to ~10KB
 });
 

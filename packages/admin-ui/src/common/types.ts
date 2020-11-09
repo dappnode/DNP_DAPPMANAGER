@@ -242,6 +242,18 @@ export interface RequestedDnp {
   };
 }
 
+export interface GrafanaDashboard {
+  uid: string;
+}
+
+export interface PrometheusTarget {
+  targets: string[];
+  labels?: {
+    job?: string;
+    group?: string;
+  };
+}
+
 // Installing types
 
 export interface ProgressLogs {
@@ -873,6 +885,10 @@ export interface PackageReleaseMetadata {
   setupSchema?: SetupSchema;
   setupTarget?: SetupTarget;
   setupUiJson?: SetupUiJson;
+
+  // Monitoring
+  grafanaDashboards?: GrafanaDashboard[];
+  prometheusTargets?: PrometheusTarget[];
 
   author?: string;
   contributors?: string[];
