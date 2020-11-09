@@ -3,11 +3,30 @@ import { useApi } from "api";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
+import Loader from "react-loader-spinner";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
   if (value > 75) return "warning";
   return "success";
+}
+
+function LoadingIndicator() {
+  return (
+    <Card className="stats-card">
+      <div
+        style={{
+          width: "100%",
+          height: "100",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <Loader type="ThreeDots" color="#2BAD60" height={100} width={100} />
+      </div>
+    </Card>
+  );
 }
 
 function DiskStats({
@@ -60,7 +79,7 @@ export function HostStats() {
   const diskStats = useApi.getDiskStats();
 
   useEffect(() => {
-    const interval = setInterval(cpuStats.revalidate, 5 * 1000);
+    const interval = setInterval(cpuStats.revalidate, 4 * 1000);
     return () => {
       clearInterval(interval);
     };
@@ -87,7 +106,7 @@ export function HostStats() {
       ) : cpuStats.error ? (
         <StatsCard key={0} title={"cpu"} percent={"1"} />
       ) : cpuStats.isValidating ? (
-        <StatsCard key={0} title={"cpu"} percent={"1"} />
+        <LoadingIndicator />
       ) : null}
       {diskStats.data ? (
         <StatsCard
@@ -99,7 +118,7 @@ export function HostStats() {
       ) : cpuStats.error ? (
         <StatsCard key={1} title={"disk"} percent={"0"} />
       ) : cpuStats.isValidating ? (
-        <StatsCard key={1} title={"disk"} percent={"0"} />
+        <LoadingIndicator />
       ) : null}
       {memoryStats.data ? (
         <StatsCard
@@ -107,10 +126,10 @@ export function HostStats() {
           title={"memory"}
           percent={memoryStats.data.usepercentage}
         />
-      ) : memoryStats.isValidating ? (
-        <StatsCard key={2} title={"memory"} percent={"0"} />
       ) : memoryStats.error ? (
         <StatsCard key={2} title={"memory"} percent={"0"} />
+      ) : memoryStats.isValidating ? (
+        <LoadingIndicator />
       ) : null}
     </div>
   );
