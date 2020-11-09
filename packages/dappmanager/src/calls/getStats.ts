@@ -7,17 +7,23 @@ import { logs } from "../logs";
 
 // Cache static values
 const numCores = os.cpus().length;
-
+/**
+ * Returns the cpu use percentage in string
+ */
 export async function getCPUStats(): Promise<HostStatCpu> {
   const cpuPercentage = await osu.cpu.usage(5000); // 10.38
   return { used: (Math.round(cpuPercentage) + "%").toString() };
 }
-
+/**
+ * Returns the memory statistics (use, free, shared, etc)
+ */
 export async function getMemoryStats(): Promise<HostStatMemory> {
   const mem = await shellExec(`free /`);
   return parseMemoryStats(mem);
 }
-
+/**
+ * Returns the disk statistics (used, available, etc)
+ */
 export async function getDiskStats(): Promise<HostStatDisk> {
   const disk = await shellExec(`df /`);
   return parseDiskStats(disk);

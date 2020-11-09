@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useApi } from "api";
+import humanFileSize from "../../../utils/humanFileSize";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
@@ -11,54 +12,44 @@ function parseVariant(value: number) {
 
 function percentageMemoryUsed(memUsed: string, memTotal: string): string {
   return (
-    Math.round((parseInt(memUsed) * 100) / parseInt(memTotal)) + "%".toString()
+    Math.round((parseInt(memUsed) * 100) / parseInt(memTotal)).toString() + "%"
   );
-}
-
-/**
- *
- */
-function kiloBytesToGigaBytes(kiloBytes: number): number {
-  // 1 Kilobytes = 9.537×10-7 Gigabytes
-  const gigaBytes = Math.round(kiloBytes * 9.537 * Math.pow(10, -7));
-  return gigaBytes;
 }
 
 function DiskStats({
-  diskPercentage,
-  diskUsed
+  diskUsed,
+  diskAvailable
 }: {
-  diskPercentage: string;
   diskUsed: string;
+  diskAvailable: string;
 }) {
-  const used = kiloBytesToGigaBytes(parseInt(diskUsed));
-  const total =
-    used +
-    Math.round(
-      (kiloBytesToGigaBytes(parseInt(diskUsed)) * 100) /
-        parseInt(diskPercentage)
+  const used = humanFileSize(parseInt(diskUsed) * 1024);
+  const available = humanFileSize(parseInt(diskAvailable) * 1024);
+  if (typeof used === "string" && typeof available === "string") {
+    const total = (parseInt(used) + parseInt(available)).toString() + "GB";
+    return (
+      <p className="disk-usage">
+        {used}/{total}
+      </p>
     );
-  return (
-    <p>
-      {used}GB/
-      {total}
-      GB
-    </p>
-  );
+  }
+  return <p>Info not available</p>;
 }
 
 function StatsCard({
   id,
   percent,
-  diskUsed
+  diskUsed,
+  diskAvailable
 }: {
   id: string;
   percent: string;
   diskUsed?: string;
+  diskAvailable?: string;
 }) {
   const value = parseInt(percent);
 
-  if (id === "disk" && diskUsed) {
+  if (id === "disk" && diskUsed && diskAvailable) {
     return (
       <Card className="stats-card">
         <div className="header">
@@ -69,7 +60,7 @@ function StatsCard({
           now={value}
           label={percent}
         />
-        <DiskStats diskPercentage={percent} diskUsed={diskUsed} />
+        <DiskStats diskUsed={diskUsed} diskAvailable={diskAvailable} />
       </Card>
     );
   }
@@ -96,8 +87,6 @@ export function HostStats() {
 
   useEffect(() => {
     const interval = setInterval(diskStats.revalidate, 1000);
-    // eslint-disable-next-line no-console
-    console.log(diskStats);
     return () => {
       clearInterval(interval);
     };
@@ -105,8 +94,6 @@ export function HostStats() {
 
   useEffect(() => {
     const interval = setInterval(memoryStats.revalidate, 1000);
-    // eslint-disable-next-line no-console
-    console.log(memoryStats);
     return () => {
       clearInterval(interval);
     };
@@ -119,12 +106,15 @@ export function HostStats() {
       ) : (
         <StatsCard key={0} id={"cpu"} percent={"0"} />
       )}
-      {diskStats.data?.usepercentage && diskStats.data.used ? (
+      {diskStats.data?.usepercentage &&
+      diskStats.data.used &&
+      diskStats.data.available ? (
         <StatsCard
           key={1}
           id={"disk"}
-          percent={diskStats.data?.usepercentage}
+          percent={diskStats.data.usepercentage}
           diskUsed={diskStats.data.used}
+          diskAvailable={diskStats.data.available}
         />
       ) : (
         <StatsCard key={1} id={"disk"} percent={"0"} />
