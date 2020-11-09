@@ -15,12 +15,7 @@ export { ethClientFallbackSet } from "./ethClientFallbackSet";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
 export { fetchDirectory } from "./fetchDirectory";
 export { fetchDnpRequest } from "./fetchDnpRequest";
-export {
-  getStats,
-  getCPUStats,
-  getMemoryStats,
-  getDiskStats
-} from "./getStats";
+export { getCPUStats, getMemoryStats, getDiskStats } from "./getStats";
 export { getPortsStatus } from "./getPortsStatus";
 export { getUserActionLogs } from "./getUserActionLogs";
 export { mountpointsGet } from "./mountpointsGet";

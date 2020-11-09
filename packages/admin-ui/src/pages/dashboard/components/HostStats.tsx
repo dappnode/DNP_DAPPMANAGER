@@ -15,8 +15,64 @@ function percentageMemoryUsed(memUsed: string, memTotal: string): string {
   );
 }
 
-function StatsCard({ id, percent }: { id: string; percent: string }) {
+/**
+ *
+ */
+function kiloBytesToGigaBytes(kiloBytes: number): number {
+  // 1 Kilobytes = 9.537×10-7 Gigabytes
+  const gigaBytes = Math.round(kiloBytes * 9.537 * Math.pow(10, -7));
+  return gigaBytes;
+}
+
+function DiskStats({
+  diskPercentage,
+  diskUsed
+}: {
+  diskPercentage: string;
+  diskUsed: string;
+}) {
+  const used = kiloBytesToGigaBytes(parseInt(diskUsed));
+  const total =
+    used +
+    Math.round(
+      (kiloBytesToGigaBytes(parseInt(diskUsed)) * 100) /
+        parseInt(diskPercentage)
+    );
+  return (
+    <p>
+      {used}GB/
+      {total}
+      GB
+    </p>
+  );
+}
+
+function StatsCard({
+  id,
+  percent,
+  diskUsed
+}: {
+  id: string;
+  percent: string;
+  diskUsed?: string;
+}) {
   const value = parseInt(percent);
+
+  if (id === "disk" && diskUsed) {
+    return (
+      <Card className="stats-card">
+        <div className="header">
+          <span className="id">{id}</span> <span className="usage">usage</span>
+        </div>
+        <ProgressBar
+          variant={parseVariant(value)}
+          now={value}
+          label={percent}
+        />
+        <DiskStats diskPercentage={percent} diskUsed={diskUsed} />
+      </Card>
+    );
+  }
   return (
     <Card className="stats-card">
       <div className="header">
@@ -26,7 +82,6 @@ function StatsCard({ id, percent }: { id: string; percent: string }) {
     </Card>
   );
 }
-
 export function HostStats() {
   const cpuStats = useApi.getCPUStats();
   const memoryStats = useApi.getMemoryStats();
@@ -64,11 +119,12 @@ export function HostStats() {
       ) : (
         <StatsCard key={0} id={"cpu"} percent={"0"} />
       )}
-      {diskStats.data?.usepercentage ? (
+      {diskStats.data?.usepercentage && diskStats.data.used ? (
         <StatsCard
           key={1}
           id={"disk"}
           percent={diskStats.data?.usepercentage}
+          diskUsed={diskStats.data.used}
         />
       ) : (
         <StatsCard key={1} id={"disk"} percent={"0"} />
