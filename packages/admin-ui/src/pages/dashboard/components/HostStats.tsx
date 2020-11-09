@@ -107,7 +107,9 @@ export function HostStats() {
         <StatsCard key={0} title={"cpu"} percent={"1"} />
       ) : cpuStats.isValidating ? (
         <LoadingIndicator />
-      ) : null}
+      ) : (
+        <LoadingIndicator />
+      )}
       {diskStats.data ? (
         <StatsCard
           key={1}
