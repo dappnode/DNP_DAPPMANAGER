@@ -2841,11 +2841,6 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/shell-quote@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@types/shell-quote/-/shell-quote-1.7.0.tgz#0b6b930de00ad35128239b182c1fec8b8c40e876"
-  integrity sha512-0CJaSSayMigMKu/Egx1eVcFjgGYkP6T4dyPRs462BFrMB/OK2FAJFV/24+6R4cGIXw6ZQpZK8XEd2UCVKfkZRw==
-
 "@types/sinon@^7.0.13":
   version "7.5.2"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-7.5.2.tgz#5e2f1d120f07b9cda07e5dedd4f3bf8888fccdb9"
@@ -14587,7 +14582,7 @@ shebang-regex@^3.0.0:
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
 
-shell-quote@1.7.2, shell-quote@^1.7.2:
+shell-quote@1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
   integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==

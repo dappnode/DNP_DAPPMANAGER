@@ -1052,7 +1052,10 @@ export interface HostStatMemory {
   shared: string;
   buffCache: string;
   available: string;
-  usepercentage: string;
+  swapTotal: string;
+  swapUsed: string;
+  swapFree: string;
+  usePercentage: string; // Only argument not provided by the command free
 }
 
 /**
@@ -1060,11 +1063,11 @@ export interface HostStatMemory {
  */
 export interface HostStatDisk {
   filesystem: string;
-  kblocks: string;
+  bBlocks: string;
   used: string;
   available: string;
-  usepercentage: string;
-  mountedon: string;
+  usePercentage: string;
+  mountedOn: string;
 }
 
 /**

@@ -1,11 +1,10 @@
 import { HostStatDisk } from "../types";
-import shellParse from "shell-quote";
 import shellExec from "../utils/shell";
 /**
  * Returns the disk statistics (used, available, etc)
  */
 export async function getDiskStats(): Promise<HostStatDisk> {
-  const disk = await shellExec(`df / --block-size=1`); // bytes format
+  const disk = await shellExec(`df / --block-size=1`);
   return parseDiskStats(disk);
 }
 
@@ -14,13 +13,13 @@ export async function getDiskStats(): Promise<HostStatDisk> {
  * @param disk string with disk usage info
  */
 function parseDiskStats(disk: string): HostStatDisk {
-  const parsedDisk = shellParse.parse(disk);
+  const arr = disk.replace(/\n/g, " ").split(/\s+/);
   return {
-    filesystem: parsedDisk[7].toString(),
-    kblocks: parsedDisk[8].toString(),
-    used: parsedDisk[9].toString(),
-    available: parsedDisk[10].toString(),
-    usepercentage: parsedDisk[11].toString() + "%",
-    mountedon: parsedDisk[12].toString()
+    filesystem: arr[7],
+    bBlocks: arr[8],
+    used: arr[9],
+    available: arr[10],
+    usePercentage: arr[11],
+    mountedOn: arr[12]
   };
 }

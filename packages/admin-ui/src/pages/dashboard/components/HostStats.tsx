@@ -103,7 +103,7 @@ export function HostStats() {
         <StatsCard
           key={1}
           title={"disk"}
-          percent={diskStats.data.usepercentage}
+          percent={diskStats.data.usePercentage}
           diskUsed={diskStats.data.used}
         />
       ) : cpuStats.error ? (
@@ -115,7 +115,7 @@ export function HostStats() {
         <StatsCard
           key={2}
           title={"memory"}
-          percent={memoryStats.data.usepercentage}
+          percent={memoryStats.data.usePercentage}
         />
       ) : memoryStats.error ? (
         <StatsCard key={2} title={"memory"} percent={"0"} />
