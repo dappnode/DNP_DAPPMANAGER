@@ -19,7 +19,7 @@ function parseDiskStats(disk: string): HostStatDisk {
     bBlocks: arr[8],
     used: arr[9],
     available: arr[10],
-    usePercentage: arr[11],
+    usePercentage: parseInt(arr[11]).toString(),
     mountedOn: arr[12]
   };
 }

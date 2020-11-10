@@ -6,5 +6,5 @@ import { HostStatCpu } from "../types";
  */
 export async function statsCpuGet(): Promise<HostStatCpu> {
   const cpuPercentage = await osu.cpu.usage(5000);
-  return { used: (Math.round(cpuPercentage) + "%").toString() };
+  return { used: Math.round(cpuPercentage).toString() };
 }
