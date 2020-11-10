@@ -3,7 +3,7 @@ import shellExec from "../utils/shell";
 /**
  * Returns the memory statistics (use, free, shared, etc)
  */
-export async function getMemoryStats(): Promise<HostStatMemory> {
+export async function statsMemoryGet(): Promise<HostStatMemory> {
   const mem = await shellExec(`free / --bytes`);
   return parseMemoryStats(mem);
 }

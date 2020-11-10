@@ -15,7 +15,7 @@ export default function Report() {
   const dnpsReq = useApi.packagesGet();
   const systemInfoReq = useApi.systemInfoGet();
   const diagnoseReq = useApi.diagnose();
-  const hostStatsReq = useApi.getDiskStats();
+  const hostStatsReq = useApi.statsDiskGet();
   const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diagnose = diagnoseReq.data || [];

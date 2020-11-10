@@ -7,9 +7,9 @@ import { HostStats } from "pages/dashboard/components/HostStats";
 import SubTitle from "components/SubTitle";
 
 export default function SystemInfo() {
-  const cpuStats = useApi.getCPUStats();
-  const memoryStats = useApi.getMemoryStats();
-  const diskStats = useApi.getDiskStats();
+  const cpuStats = useApi.statsCpuGet();
+  const memoryStats = useApi.statsMemoryGet();
+  const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
     const interval = setInterval(cpuStats.revalidate, 5 * 1000);

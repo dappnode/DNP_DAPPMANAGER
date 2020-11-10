@@ -194,11 +194,11 @@ export interface Routes {
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
-  getCPUStats: () => Promise<HostStatCpu>;
+  statsCpuGet: () => Promise<HostStatCpu>;
 
-  getMemoryStats: () => Promise<HostStatMemory>;
+  statsMemoryGet: () => Promise<HostStatMemory>;
 
-  getDiskStats: () => Promise<HostStatDisk>;
+  statsDiskGet: () => Promise<HostStatDisk>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -456,9 +456,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  getCPUStats: {},
-  getDiskStats: {},
-  getMemoryStats: {},
+  statsCpuGet: {},
+  statsDiskGet: {},
+  statsMemoryGet: {},
   getUserActionLogs: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},

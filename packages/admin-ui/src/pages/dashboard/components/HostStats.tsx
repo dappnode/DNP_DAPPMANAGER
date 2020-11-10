@@ -3,7 +3,7 @@ import { useApi } from "api";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
-import Loader from "react-loader-spinner";
+import Loading from "../../../components/Loading";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
@@ -11,46 +11,34 @@ function parseVariant(value: number) {
   return "success";
 }
 
-function LoadingIndicator() {
-  return (
-    <Card className="stats-card">
-      <div className="loading">
-        <Loader type="ThreeDots" color="#2BAD60" height={100} width={100} />
-      </div>
-    </Card>
-  );
-}
-
+/**
+ * Returns an element to be rendered containing diskUsed/diskTotal. If not returns 0/0
+ * @param  param0 Parameters of the diskUsed and diskTotal provided by statsDiskGet
+ */
 function DiskStats({
-  percentage,
-  diskUsed
+  diskUsed,
+  diskTotal
 }: {
-  percentage: string;
   diskUsed: string;
+  diskTotal: string;
 }) {
-  const used = humanFileSize(parseInt(diskUsed));
-  const available = humanFileSize(
-    (parseInt(diskUsed) * 100) / parseInt(percentage)
+  return (
+    <p className="disk-usage">
+      {humanFileSize(parseInt(diskUsed))}/{humanFileSize(parseInt(diskTotal))}
+    </p>
   );
-  if (typeof used === "string" && typeof available === "string") {
-    const total = (parseInt(used) + parseInt(available)).toString() + "GB";
-    return (
-      <p className="disk-usage">
-        {used}/{total}
-      </p>
-    );
-  }
-  return <p className="disk-usage">Info not available</p>;
 }
 
 function StatsCard({
   title,
   percent,
-  diskUsed
+  diskUsed,
+  diskTotal
 }: {
   title: string;
   percent: string;
   diskUsed?: string;
+  diskTotal?: string;
 }) {
   const value = parseInt(percent);
 
@@ -60,14 +48,16 @@ function StatsCard({
         <span className="id">{title}</span> <span className="usage">usage</span>
       </div>
       <ProgressBar variant={parseVariant(value)} now={value} label={percent} />
-      {diskUsed ? <DiskStats diskUsed={diskUsed} percentage={percent} /> : null}
+      {diskUsed && diskTotal ? (
+        <DiskStats diskUsed={diskUsed} diskTotal={diskTotal} />
+      ) : null}
     </Card>
   );
 }
 export function HostStats() {
-  const cpuStats = useApi.getCPUStats();
-  const memoryStats = useApi.getMemoryStats();
-  const diskStats = useApi.getDiskStats();
+  const cpuStats = useApi.statsCpuGet();
+  const memoryStats = useApi.statsMemoryGet();
+  const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
     const interval = setInterval(cpuStats.revalidate, 4 * 1000);
@@ -97,7 +87,7 @@ export function HostStats() {
       ) : cpuStats.error ? (
         <StatsCard key={0} title={"cpu"} percent={"1"} />
       ) : (
-        <LoadingIndicator />
+        <Loading steps={["Loading cpu usage"]} />
       )}
       {diskStats.data ? (
         <StatsCard
@@ -105,11 +95,12 @@ export function HostStats() {
           title={"disk"}
           percent={diskStats.data.usePercentage}
           diskUsed={diskStats.data.used}
+          diskTotal={diskStats.data.bBlocks}
         />
       ) : cpuStats.error ? (
         <StatsCard key={1} title={"disk"} percent={"0"} />
       ) : (
-        <LoadingIndicator />
+        <Loading steps={["Loading disk usage"]} />
       )}
       {memoryStats.data ? (
         <StatsCard
@@ -120,7 +111,7 @@ export function HostStats() {
       ) : memoryStats.error ? (
         <StatsCard key={2} title={"memory"} percent={"0"} />
       ) : (
-        <LoadingIndicator />
+        <Loading steps={["Loading memory usage"]} />
       )}
     </div>
   );
