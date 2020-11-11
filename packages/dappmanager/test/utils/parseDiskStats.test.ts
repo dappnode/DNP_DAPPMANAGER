@@ -2,21 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import { parseDiskStats } from "../../src/utils/parseDiskStats";
 
-describe('Util: parseDiskStats', async function () {
-    it("Should parse df / output", () => {
-        const dfOutput = `Filesystem                1K-blocks      Used Available Use% Mounted on
-      /dev/mapper/mint--vg-root 235782040 184988848  38746448  83% /`;
-        
-        const diskStats = parseDiskStats(dfOutput);
-        expect(diskStats).to.deep.equal({
-            filesystem: "/dev/mapper/mint--vg-root",
-            bBlocks: "235782040",
-            used: "184988848",
-            available: "38746448",
-            use: "83%",
-            mountedOn: "/",
-            useFraction: 0.342153612,
-          });
-        }
-    )
-}
+describe("Util: parseDiskStats", async function() {
+  it("Should parse <df / --block-size=1> output", () => {
+    const dfOutput = `Filesystem         1B-blocks        Used    Available Use% Mounted on
+    /dev/nvme0n1p2 1006530654208 27418755072 927911559168   3% /`;
+
+    const diskStats = parseDiskStats(dfOutput);
+    expect(diskStats).to.not.be.empty;
+    expect(diskStats.filesystem).to.include("/"); // If filesystem argument has '/', the order should be correct.
+  });
+});

@@ -14,9 +14,9 @@ export function parseMemoryStats(freeOutput: string): HostStatMemory {
     shared,
     buffCache,
     available
-  ] = row1.split(/\s+/);
+  ] = row1.trim().split(/\s+/);
 
-  const [swapTitle, swapTotal, swapUsed, swapFree] = row2.split(/\s+/);
+  const [swapTitle, swapTotal, swapUsed, swapFree] = row2.trim().split(/\s+/);
 
   return {
     memTotal,

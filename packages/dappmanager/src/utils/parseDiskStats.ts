@@ -13,7 +13,7 @@ export function parseDiskStats(dfOutput: string): HostStatDisk {
     available,
     usePercentage,
     mountedOn
-  ] = row.split(/\s+/);
+  ] = row.trim().split(/\s+/);
   return {
     filesystem,
     bBlocks,
