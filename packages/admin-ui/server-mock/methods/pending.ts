@@ -114,7 +114,7 @@ export async function ethClientTargetSet(kwargs: {
 
 export async function statsCpuGet(): Promise<HostStatCpu> {
   return {
-    used: "9"
+    usedFraction: 0.88
   };
 }
 
@@ -129,7 +129,7 @@ export async function statsMemoryGet(): Promise<HostStatMemory> {
     swapTotal: "8312582144",
     swapUsed: "767557632",
     swapFree: "7545024512",
-    usePercentage: "67"
+    useFraction: 0.34
   };
 }
 
@@ -140,7 +140,8 @@ export async function statsDiskGet(): Promise<HostStatDisk> {
     used: "189458415616",
     available: "39646527488",
     usePercentage: "83%",
-    mountedOn: "/"
+    mountedOn: "/",
+    useFraction: 0.34
   };
 }
 
