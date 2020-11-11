@@ -4,6 +4,7 @@ import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
 import Loading from "../../../components/Loading";
+import ErrorView from "../../../components/ErrorView";
 import { HostStatDisk } from "common";
 
 function parseVariant(value: number) {
@@ -31,10 +32,10 @@ function StatsCard({
   disk
 }: {
   title: string;
-  percent: string;
+  percent: number;
   disk?: HostStatDisk;
 }) {
-  const value = parseInt(percent);
+  const value = Math.round(percent * 100);
 
   return (
     <Card className="stats-card">
@@ -44,7 +45,7 @@ function StatsCard({
       <ProgressBar
         variant={parseVariant(value)}
         now={value}
-        label={percent + "%"}
+        label={value + "%"}
       />
       {disk ? <DiskStats disk={disk} /> : null}
     </Card>
@@ -56,7 +57,7 @@ export function HostStats() {
   const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
-    const interval = setInterval(cpuStats.revalidate, 4 * 1000);
+    const interval = setInterval(cpuStats.revalidate, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
@@ -79,9 +80,9 @@ export function HostStats() {
   return (
     <div className="dashboard-cards">
       {cpuStats.data ? (
-        <StatsCard key={0} title={"cpu"} percent={cpuStats.data.used} />
+        <StatsCard key={0} title={"cpu"} percent={cpuStats.data.usedFraction} />
       ) : cpuStats.error ? (
-        <Loading steps={["Not possible to load cpu"]} />
+        <ErrorView error={cpuStats.error} />
       ) : (
         <Loading steps={["Loading cpu usage"]} />
       )}
@@ -89,11 +90,11 @@ export function HostStats() {
         <StatsCard
           key={1}
           title={"disk"}
-          percent={diskStats.data.usePercentage}
+          percent={diskStats.data.useFraction}
           disk={diskStats.data}
         />
-      ) : cpuStats.error ? (
-        <Loading steps={["Not possible to load disk"]} />
+      ) : diskStats.error ? (
+        <ErrorView error={diskStats.error} />
       ) : (
         <Loading steps={["Loading disk usage"]} />
       )}
@@ -101,10 +102,10 @@ export function HostStats() {
         <StatsCard
           key={2}
           title={"memory"}
-          percent={memoryStats.data.usePercentage}
+          percent={memoryStats.data.useFraction}
         />
       ) : memoryStats.error ? (
-        <Loading steps={["Not possible to load memory"]} />
+        <ErrorView error={memoryStats.error} />
       ) : (
         <Loading steps={["Loading memory usage"]} />
       )}

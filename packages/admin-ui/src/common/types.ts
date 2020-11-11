@@ -1055,7 +1055,7 @@ export interface HostStatMemory {
   swapTotal: string;
   swapUsed: string;
   swapFree: string;
-  usePercentage: string; // Only argument not provided by the command free
+  useFraction: number; // Only argument not provided by the command free
 }
 
 /**
@@ -1068,13 +1068,14 @@ export interface HostStatDisk {
   available: string;
   usePercentage: string;
   mountedOn: string;
+  useFraction: number;
 }
 
 /**
  * Host machine CPU used
  */
 export interface HostStatCpu {
-  used: string;
+  usedFraction: number;
 }
 
 /**

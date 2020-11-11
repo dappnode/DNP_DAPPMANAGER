@@ -45,22 +45,20 @@ describe("Get system data", () => {
     }
   }).timeout(10 * 1000);
 
-  it("Should return parsed disk stats from host machine", done => {
-    calls
-      .statsDiskGet()
-      .then(result => {
-        expect(result).to.be.ok;
-      })
-      .then(done, done);
-  });
-  it("Should return parsed memory stats from host machine", done => {
-    calls
-      .statsMemoryGet()
-      .then(result => {
-        expect(result).to.be.ok;
-      })
-      .then(done, done);
-  });
+  it("Should return parsed disk stats from host machine", async () => {
+    const result = await calls.statsDiskGet();
+    expect(result).to.be.ok;
+  }).timeout(10 * 1000);
+
+  it("Should return parsed memory stats from host machine", async () => {
+    const result = await calls.statsMemoryGet();
+    expect(result).to.be.ok;
+  }).timeout(10 * 1000);
+
+  it("Should return parsed CPU stats from host machine", async () => {
+    const result = await calls.statsCpuGet();
+    expect(result).to.be.ok;
+  }).timeout(10 * 1000);
 
   it("Should get DAPPMANAGER system info", async () => {
     await calls.systemInfoGet();
