@@ -246,7 +246,9 @@ export const releaseFilesRegex = {
   setupTarget: /setup-target\..*json$/,
   setupUiJson: /setup-ui\..*json$/,
   disclaimer: /disclaimer\.md$/i,
-  gettingStarted: /getting.*started\.md$/i
+  gettingStarted: /getting.*started\.md$/i,
+  grafanaDashboards: /.*grafana-dashboard.json$/,
+  prometheusTargets: /.*prometheus-targets.(json|yaml|yml)$/
 };
 
 // Single arch images

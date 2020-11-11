@@ -10,7 +10,9 @@ import {
   downloadSetupUiJson,
   downloadDisclaimer,
   downloadGetStarted,
-  downloadSetupWizard
+  downloadSetupWizard,
+  downloadGrafanaDashboard,
+  downloadPrometheusTarget
 } from "./downloadAssets";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
@@ -78,6 +80,9 @@ export async function downloadReleaseIpfs(
       const entries = mapValues(releaseFilesRegex, regex =>
         findOne(files, regex)
       );
+      const entriesMany = mapValues(releaseFilesRegex, regex =>
+        findMany(files, regex)
+      );
 
       if (!entries.manifest) throw Error("Release must contain a manifest");
       if (!entries.compose)
@@ -91,7 +96,9 @@ export async function downloadReleaseIpfs(
         setupTarget,
         setupUiJson,
         disclaimer,
-        gettingStarted
+        gettingStarted,
+        grafanaDashboards,
+        prometheusTargets
       ] = await Promise.all([
         downloadManifest(entries.manifest),
         downloadCompose(entries.compose),
@@ -100,7 +107,13 @@ export async function downloadReleaseIpfs(
         entries.setupTarget && downloadSetupTarget(entries.setupTarget),
         entries.setupUiJson && downloadSetupUiJson(entries.setupUiJson),
         entries.disclaimer && downloadDisclaimer(entries.disclaimer),
-        entries.gettingStarted && downloadGetStarted(entries.gettingStarted)
+        entries.gettingStarted && downloadGetStarted(entries.gettingStarted),
+        await Promise.all(
+          entriesMany.grafanaDashboards.map(downloadGrafanaDashboard)
+        ),
+        await Promise.all(
+          entriesMany.prometheusTargets.map(downloadPrometheusTarget)
+        )
       ]);
 
       // Fetch image by arch, will throw if not available
@@ -113,6 +126,10 @@ export async function downloadReleaseIpfs(
       if (setupUiJson) manifest.setupUiJson = setupUiJson;
       if (disclaimer) manifest.disclaimer = { message: disclaimer };
       if (gettingStarted) manifest.gettingStarted = gettingStarted;
+      if (grafanaDashboards.length > 0)
+        manifest.grafanaDashboards = grafanaDashboards;
+      if (prometheusTargets.length > 0)
+        manifest.prometheusTargets = prometheusTargets;
 
       return {
         manifestFile: getFileFromEntry(entries.manifest),
@@ -151,6 +168,13 @@ function findOne(
   if (matches.length > 1)
     throw Error(`Multiple possible entries found for ${fileRegex}`);
   return matches[0];
+}
+
+function findMany(
+  files: IpfsFileResult[],
+  fileRegex: RegExp
+): IpfsFileResult[] {
+  return files.filter(file => fileRegex.test(file.name));
 }
 
 function getImageByArch(
