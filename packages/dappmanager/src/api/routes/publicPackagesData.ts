@@ -9,10 +9,10 @@ import { PackageContainer } from "../../types";
  * Query publicly available packages data
  */
 export const publicPackagesData: express.Handler = async (req, res) => {
-  const id = req.params.id as string | undefined;
+  const containerName = req.params.containerName as string | undefined;
 
-  if (id) {
-    const privateDnpData = await listContainerNoThrow({ containerName: id });
+  if (containerName) {
+    const privateDnpData = await listContainerNoThrow({ containerName });
     if (privateDnpData) {
       res.status(200).send(getPublicPackageData(privateDnpData));
     } else {
