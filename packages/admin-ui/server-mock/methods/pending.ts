@@ -119,7 +119,8 @@ export async function statsCpuGet(): Promise<HostStatCpu> {
 }
 
 export async function statsMemoryGet(): Promise<HostStatMemory> {
-  return {
+  throw Error("This is my error");
+  /* return {
     memTotal: "8093155328",
     memUsed: "6535839744",
     free: "179961856",
@@ -130,7 +131,7 @@ export async function statsMemoryGet(): Promise<HostStatMemory> {
     swapUsed: "767557632",
     swapFree: "7545024512",
     useFraction: 0.34
-  };
+  } */
 }
 
 export async function statsDiskGet(): Promise<HostStatDisk> {

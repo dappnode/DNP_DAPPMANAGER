@@ -3,9 +3,10 @@ import { useApi } from "api";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
-import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
 import { HostStatDisk } from "common";
+import Ok from "../../../components/Ok";
+import RenderMarkdown from "components/RenderMarkdown";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
@@ -19,10 +20,17 @@ function parseVariant(value: number) {
  */
 function DiskStats({ disk }: { disk: HostStatDisk }) {
   return (
-    <p className="disk-usage">
-      {humanFileSize(parseInt(disk.used))}/
-      {humanFileSize(parseInt(disk.bBlocks))}
-    </p>
+    <div className="disk-usage">
+      <RenderMarkdown
+        source={
+          humanFileSize(parseInt(disk.used)) +
+          "/" +
+          humanFileSize(parseInt(disk.bBlocks))
+        }
+        noMargin
+        spacing
+      />
+    </div>
   );
 }
 
@@ -57,25 +65,15 @@ export function HostStats() {
   const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
-    const interval = setInterval(cpuStats.revalidate, 5 * 1000);
+    const interval = setInterval(() => {
+      cpuStats.revalidate();
+      diskStats.revalidate();
+      memoryStats.revalidate();
+    }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [cpuStats]);
-
-  useEffect(() => {
-    const interval = setInterval(diskStats.revalidate, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [diskStats]);
-
-  useEffect(() => {
-    const interval = setInterval(memoryStats.revalidate, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [memoryStats]);
+  }, [cpuStats, diskStats, memoryStats]);
 
   return (
     <div className="dashboard-cards">
@@ -84,8 +82,9 @@ export function HostStats() {
       ) : cpuStats.error ? (
         <ErrorView error={cpuStats.error} />
       ) : (
-        <Loading steps={["Loading cpu usage"]} />
+        <Ok msg={"Loading cpu usage"} loading={true} />
       )}
+
       {diskStats.data ? (
         <StatsCard
           key={1}
@@ -96,7 +95,7 @@ export function HostStats() {
       ) : diskStats.error ? (
         <ErrorView error={diskStats.error} />
       ) : (
-        <Loading steps={["Loading disk usage"]} />
+        <Ok msg={"Loading disk usage"} loading={true} />
       )}
       {memoryStats.data ? (
         <StatsCard
@@ -107,7 +106,7 @@ export function HostStats() {
       ) : memoryStats.error ? (
         <ErrorView error={memoryStats.error} />
       ) : (
-        <Loading steps={["Loading memory usage"]} />
+        <Ok msg={"Loading memory usage"} loading={true} />
       )}
     </div>
   );
