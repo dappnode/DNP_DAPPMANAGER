@@ -9,7 +9,17 @@ describe("Util: parseMemoryStats", async function() {
     Swap:    2147479552           0  2147479552`;
 
     const memoryStats = parseMemoryStats(freeOutput);
-    expect(memoryStats).to.not.be.empty;
-    expect(typeof memoryStats.useFraction).to.deep.equal("number"); // Only one number in memoryStats. If useFraction is number, the order is correct
+    expect(memoryStats).to.deep.equal({
+      memTotal: "16535027712",
+      memUsed: "5445357568",
+      free: "4503203840",
+      shared: "1618006016",
+      buffCache: "6586466304",
+      available: "9713278976",
+      swapTotal: "2147479552",
+      swapUsed: "0",
+      swapFree: "2147479552",
+      useFraction: 0
+    });
   });
 });
