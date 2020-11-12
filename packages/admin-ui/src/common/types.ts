@@ -795,7 +795,6 @@ export interface PackageRelease {
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
-  manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   // Data for release processing

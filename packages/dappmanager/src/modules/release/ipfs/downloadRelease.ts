@@ -30,7 +30,6 @@ const source: "ipfs" = "ipfs";
 export async function downloadReleaseIpfs(
   hash: string
 ): Promise<{
-  manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   composeUnsafe: Compose;
@@ -56,7 +55,6 @@ export async function downloadReleaseIpfs(
     );
     const { image, avatar } = manifestWithImage;
     return {
-      manifestFile: getFileFromHash(hash),
       imageFile: getFileFromHash(image.hash, image.size),
       avatarFile: avatar ? getFileFromHash(avatar) : undefined,
       manifest,
@@ -72,7 +70,6 @@ export async function downloadReleaseIpfs(
       const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
 
       return {
-        manifestFile: getFileFromEntry(entries.manifest),
         imageFile: getFileFromEntry(imageEntry),
         avatarFile: getFileFromEntry(avatarEntry),
         manifest,
