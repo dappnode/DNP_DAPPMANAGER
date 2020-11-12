@@ -40,11 +40,7 @@ export async function downloadReleaseIpfs(
   const arch = os.arch() as NodeArch;
 
   try {
-    const manifest = await downloadAssetRequired<Manifest>(
-      { hash },
-      releaseFiles.manifest,
-      "manifest"
-    );
+    const manifest = await downloadManifest({ hash });
 
     // Disable manifest type releases for ARM architectures
     if (isArmArch(arch)) throw new NoImageForArchError(arch);
@@ -82,6 +78,14 @@ export async function downloadReleaseIpfs(
 }
 
 // Helpers
+
+async function downloadManifest(file: { hash: string }): Promise<Manifest> {
+  return downloadAssetRequired<Manifest>(
+    file,
+    releaseFiles.manifest,
+    "manifest"
+  );
+}
 
 function getFileFromHash(hash: string, size?: number): DistributedFile {
   return { hash, size: size || 0, source };
