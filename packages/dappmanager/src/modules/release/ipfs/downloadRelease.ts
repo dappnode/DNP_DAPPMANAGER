@@ -10,10 +10,10 @@ import {
   NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
-import { parseReleaseDirectory } from "./parseDirectoryFiles";
 import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
-import { download } from "./downloadAssets";
 import { getImageByArch } from "./getImageByArch";
+import { findEntries } from "./findEntries";
+import { releaseFiles } from "../../../params";
 
 const source: "ipfs" = "ipfs";
 
@@ -60,16 +60,16 @@ export async function downloadReleaseIpfs(
   } catch (e) {
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
-      const entries = parseReleaseDirectory(files);
-      const { manifest, compose } = await downloadDirectoryFiles(entries);
+      const { manifest, compose } = await downloadDirectoryFiles(files);
 
       // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);
+      const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
 
       return {
         manifestFile: getFileFromEntry(entries.manifest),
         imageFile: getFileFromEntry(imageEntry),
-        avatarFile: entries.avatar && getFileFromEntry(entries.avatar),
+        avatarFile: getFileFromEntry(avatarEntry),
         manifest,
         composeUnsafe: compose
       };
