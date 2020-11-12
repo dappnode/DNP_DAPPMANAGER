@@ -49,8 +49,12 @@ export async function runPackages(
           }
       }
 
+      // To clean-up changing multi-service packages, remove orphans
+      // but NOT for core packages, which always have orphans
+      const removeOrphans = !pkg.isCore;
+
       log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUp(pkg.composePath);
+      await dockerComposeUp(pkg.composePath, { removeOrphans });
     }
 
     log(pkg.dnpName, "Package started");
