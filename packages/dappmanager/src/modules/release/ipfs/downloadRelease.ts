@@ -14,6 +14,7 @@ import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
 import { getImageByArch } from "./getImageByArch";
 import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
+import { downloadAssetRequired } from "./downloadAssets";
 
 const source: "ipfs" = "ipfs";
 
@@ -40,7 +41,11 @@ export async function downloadReleaseIpfs(
   const arch = os.arch() as NodeArch;
 
   try {
-    const manifest = await download.manifest({ hash });
+    const manifest = await downloadAssetRequired<Manifest>(
+      { hash },
+      releaseFiles.manifest,
+      "manifest"
+    );
 
     // Disable manifest type releases for ARM architectures
     if (isArmArch(arch)) throw new NoImageForArchError(arch);
