@@ -1,36 +1,19 @@
 import os from "os";
-import { mapValues } from "lodash";
 import * as ipfs from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
-import {
-  downloadManifest,
-  downloadCompose,
-  downloadSetupSchema,
-  downloadSetupTarget,
-  downloadSetupUiJson,
-  downloadDisclaimer,
-  downloadGetStarted,
-  downloadSetupWizard,
-  downloadGrafanaDashboard,
-  downloadPrometheusTarget
-} from "./downloadAssets";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
   DistributedFile,
   ManifestWithImage,
   Compose,
-  IpfsFileResult,
-  NodeArch,
-  Architecture,
-  defaultArch
+  NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
-import {
-  releaseFilesRegex,
-  getImagePath,
-  getLegacyImagePath
-} from "../../../params";
+import { parseReleaseDirectory } from "./parseDirectoryFiles";
+import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
+import { download } from "./downloadAssets";
+import { getImageByArch } from "./getImageByArch";
 
 const source: "ipfs" = "ipfs";
 
@@ -57,7 +40,7 @@ export async function downloadReleaseIpfs(
   const arch = os.arch() as NodeArch;
 
   try {
-    const manifest = await downloadManifest({ hash });
+    const manifest = await download.manifest({ hash });
 
     // Disable manifest type releases for ARM architectures
     if (isArmArch(arch)) throw new NoImageForArchError(arch);
@@ -77,66 +60,18 @@ export async function downloadReleaseIpfs(
   } catch (e) {
     if (e.message.includes("is a directory")) {
       const files = await ipfs.ls({ hash });
-      const entries = mapValues(releaseFilesRegex, regex =>
-        findOne(files, regex)
-      );
-      const entriesMany = mapValues(releaseFilesRegex, regex =>
-        findMany(files, regex)
-      );
-
-      if (!entries.manifest) throw Error("Release must contain a manifest");
-      if (!entries.compose)
-        throw Error("Release must contain a docker compose");
-
-      const [
-        manifest,
-        composeUnsafe,
-        setupWizard,
-        setupSchema,
-        setupTarget,
-        setupUiJson,
-        disclaimer,
-        gettingStarted,
-        grafanaDashboards,
-        prometheusTargets
-      ] = await Promise.all([
-        downloadManifest(entries.manifest),
-        downloadCompose(entries.compose),
-        entries.setupWizard && downloadSetupWizard(entries.setupWizard),
-        entries.setupSchema && downloadSetupSchema(entries.setupSchema),
-        entries.setupTarget && downloadSetupTarget(entries.setupTarget),
-        entries.setupUiJson && downloadSetupUiJson(entries.setupUiJson),
-        entries.disclaimer && downloadDisclaimer(entries.disclaimer),
-        entries.gettingStarted && downloadGetStarted(entries.gettingStarted),
-        await Promise.all(
-          entriesMany.grafanaDashboards.map(downloadGrafanaDashboard)
-        ),
-        await Promise.all(
-          entriesMany.prometheusTargets.map(downloadPrometheusTarget)
-        )
-      ]);
+      const entries = parseReleaseDirectory(files);
+      const { manifest, compose } = await downloadDirectoryFiles(entries);
 
       // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);
-
-      // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
-      if (setupWizard) manifest.setupWizard = setupWizard;
-      if (setupSchema) manifest.setupSchema = setupSchema;
-      if (setupTarget) manifest.setupTarget = setupTarget;
-      if (setupUiJson) manifest.setupUiJson = setupUiJson;
-      if (disclaimer) manifest.disclaimer = { message: disclaimer };
-      if (gettingStarted) manifest.gettingStarted = gettingStarted;
-      if (grafanaDashboards.length > 0)
-        manifest.grafanaDashboards = grafanaDashboards;
-      if (prometheusTargets.length > 0)
-        manifest.prometheusTargets = prometheusTargets;
 
       return {
         manifestFile: getFileFromEntry(entries.manifest),
         imageFile: getFileFromEntry(imageEntry),
         avatarFile: entries.avatar && getFileFromEntry(entries.avatar),
         manifest,
-        composeUnsafe
+        composeUnsafe: compose
       };
     } else {
       throw e;
@@ -158,65 +93,6 @@ function getFileFromEntry({
   size: number;
 }): DistributedFile {
   return { hash, size, source };
-}
-
-function findOne(
-  files: IpfsFileResult[],
-  fileRegex: RegExp
-): IpfsFileResult | undefined {
-  const matches = files.filter(file => fileRegex.test(file.name));
-  if (matches.length > 1)
-    throw Error(`Multiple possible entries found for ${fileRegex}`);
-  return matches[0];
-}
-
-function findMany(
-  files: IpfsFileResult[],
-  fileRegex: RegExp
-): IpfsFileResult[] {
-  return files.filter(file => fileRegex.test(file.name));
-}
-
-function getImageByArch(
-  manifest: Manifest,
-  files: IpfsFileResult[],
-  nodeArch: NodeArch
-): IpfsFileResult {
-  const arch = parseNodeArch(nodeArch);
-  const { name, version } = manifest;
-  const imageAsset =
-    files.find(file => file.name === getImagePath(name, version, arch)) ||
-    (arch === defaultArch
-      ? // New DAppNodes should load old single arch packages,
-        // and consider their single image as amd64
-        files.find(file => file.name === getLegacyImagePath(name, version))
-      : undefined);
-
-  if (!imageAsset) {
-    throw new NoImageForArchError(
-      nodeArch,
-      // Add message if image should have had this arch available
-      manifest.architectures && manifest.architectures.includes(arch)
-        ? `image for ${arch} is missing in release`
-        : undefined
-    );
-  } else {
-    return imageAsset;
-  }
-}
-
-function parseNodeArch(nodeArch: NodeArch): Architecture {
-  switch (nodeArch) {
-    case "arm":
-    case "arm64":
-      return "linux/arm64";
-
-    case "x64":
-      return "linux/amd64";
-
-    default:
-      return defaultArch;
-  }
 }
 
 function isArmArch(arch: NodeArch): boolean {

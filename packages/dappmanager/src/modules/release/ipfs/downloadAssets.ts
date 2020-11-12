@@ -1,4 +1,5 @@
 import * as ipfs from "../../ipfs";
+import { mapValues } from "lodash";
 import memoize from "memoizee";
 import {
   Manifest,
@@ -13,91 +14,73 @@ import {
 import { validateManifestBasic } from "../../manifest";
 import { validateCompose } from "../../compose";
 import { yamlParse } from "../../../utils/yaml";
+import { releaseFiles } from "../../../params";
 
-export const downloadManifest = downloadAssetFactory<Manifest>({
-  parse: jsonParse,
-  validate: validateManifestBasic,
-  maxLength: 100e3 // Limit size to ~100KB
+const { avatar: _, ...releaseFilesToDownload } = releaseFiles;
+
+type ResolvedFiles = {
+  manifest: Manifest;
+  compose: Compose;
+  setupWizard: SetupWizard;
+  setupSchema: SetupSchema;
+  setupTarget: SetupTarget;
+  setupUiJson: SetupUiJson;
+  disclaimer: string;
+  gettingStarted: string;
+  prometheusTargets: PrometheusTarget[];
+  grafanaDashboards: GrafanaDashboard;
+};
+
+const validators: {
+  [K in keyof Partial<typeof releaseFilesToDownload>]:
+    | ((data: ResolvedFiles[K]) => ResolvedFiles[K])
+    | null;
+} = {
+  manifest: validateManifestBasic,
+  compose: validateCompose
+};
+
+const ipfsCatStringMemoized = memoize(ipfs.catString, {
+  promise: true,
+  normalizer: ([{ hash }]) => hash
 });
 
-export const downloadCompose = downloadAssetFactory<Compose>({
-  parse: yamlParse,
-  validate: validateCompose,
-  maxLength: 10e3 // Limit size to ~10KB
-});
+export const download: {
+  [K in keyof ResolvedFiles]: (file: {
+    hash: string;
+  }) => Promise<ResolvedFiles[K]>;
+} = mapValues(releaseFilesToDownload, (fileConfig, assetId) =>
+  downloadAssetFactory(assetId as keyof ResolvedFiles)
+);
 
-export const downloadSetupWizard = downloadAssetFactory<SetupWizard>({
-  parse: yamlParse,
-  validate: setupWizard => setupWizard,
-  maxLength: 100e3 // Limit size to ~100KB
-});
+function downloadAssetFactory(
+  assetId: keyof ResolvedFiles
+): <T>(file: { hash: string }) => Promise<T> {
+  const validate = validators[assetId];
+  const maxLength = releaseFiles[assetId]?.maxSize;
+  const format = releaseFiles[assetId]?.format || "TEXT";
 
-export const downloadSetupSchema = downloadAssetFactory<SetupSchema>({
-  parse: jsonParse,
-  validate: setupSchema => setupSchema,
-  maxLength: 100e3 // Limit size to ~100KB
-});
+  return async function downloadAsset<T>(file: { hash: string }): Promise<T> {
+    const hash = file.hash;
+    const content = await ipfsCatStringMemoized({ hash, maxLength });
+    const data: any = parseFile(content, format);
+    return validate ? validate(data) : data;
+  };
+}
 
-export const downloadSetupTarget = downloadAssetFactory<SetupTarget>({
-  parse: jsonParse,
-  validate: setupTarget => setupTarget,
-  maxLength: 10e3 // Limit size to ~10KB
-});
+type Format = "JSON" | "YAML" | "TEXT";
 
-export const downloadSetupUiJson = downloadAssetFactory<SetupUiJson>({
-  parse: jsonParse,
-  validate: setupUiJson => setupUiJson,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadDisclaimer = downloadAssetFactory<string>({
-  parse: content => content,
-  validate: disclaimer => disclaimer,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadGetStarted = downloadAssetFactory<string>({
-  parse: content => content,
-  validate: gettingStarted => gettingStarted,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadGrafanaDashboard = downloadAssetFactory<GrafanaDashboard>({
-  parse: jsonParse,
-  validate: grafanaDashboard => grafanaDashboard,
-  maxLength: 10e6 // Limit size to ~10MB
-});
-
-export const downloadPrometheusTarget = downloadAssetFactory<PrometheusTarget>({
-  parse: jsonParse,
-  validate: prometheusTarget => prometheusTarget,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-/**
- * Download, parse and validate a DNP release file
- *
- * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- */
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-function downloadAssetFactory<T>({
-  parse,
-  validate,
-  maxLength
-}: {
-  parse: (content: string) => T;
-  validate: (data: T) => T;
-  maxLength?: number;
-}) {
-  async function downloadAsset({ hash }: { hash: string }): Promise<T> {
-    const content = await ipfs.catString({ hash, maxLength });
-    const data: T = parse(content);
-    return validate(data);
+function parseFile<T>(data: string, format: Format): T {
+  switch (format) {
+    case "YAML":
+      return yamlParse(data);
+    case "JSON":
+      return jsonParse(data);
+    case "TEXT":
+      return (data as unknown) as T;
+    default:
+      throw Error(`Attempting to parse unknown format ${format}`);
   }
-  return memoize(downloadAsset, {
-    promise: true,
-    normalizer: ([{ hash }]) => hash
-  });
 }
 
 /**
