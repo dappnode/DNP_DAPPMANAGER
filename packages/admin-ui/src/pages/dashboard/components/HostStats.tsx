@@ -3,10 +3,7 @@ import { useApi } from "api";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
-import ErrorView from "../../../components/ErrorView";
-import { HostStatDisk } from "common";
 import Ok from "../../../components/Ok";
-import RenderMarkdown from "components/RenderMarkdown";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
@@ -14,34 +11,14 @@ function parseVariant(value: number) {
   return "success";
 }
 
-/**
- * Returns an element to be rendered containing diskUsed/diskTotal. If not returns 0/0
- * @param  param0 Parameters of the diskUsed and diskTotal provided by statsDiskGet
- */
-function DiskStats({ disk }: { disk: HostStatDisk }) {
-  return (
-    <div className="disk-usage">
-      <RenderMarkdown
-        source={
-          humanFileSize(parseInt(disk.used)) +
-          "/" +
-          humanFileSize(parseInt(disk.bBlocks))
-        }
-        noMargin
-        spacing
-      />
-    </div>
-  );
-}
-
 function StatsCard({
   title,
   percent,
-  disk
+  text
 }: {
   title: string;
   percent: number;
-  disk?: HostStatDisk;
+  text?: string;
 }) {
   const value = Math.round(percent * 100);
 
@@ -55,11 +32,27 @@ function StatsCard({
         now={value}
         label={value + "%"}
       />
-      {disk ? <DiskStats disk={disk} /> : null}
+      {text ? <div className="text">{text}</div> : null}
     </Card>
   );
 }
+
+function okStatsCard(stat: string, ok?: boolean): JSX.Element {
+  return ok ? (
+    <Ok
+      msg={`Loading ${stat} usage`}
+      loading={true}
+      style={{ margin: "auto" }}
+    />
+  ) : (
+    <Ok msg={`Couldn't get ${stat} stats`} style={{ margin: "auto" }} />
+  );
+}
+
 export function HostStats() {
+  const cpu = "cpu";
+  const disk = "disk";
+  const memory = "memory";
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
@@ -78,35 +71,45 @@ export function HostStats() {
   return (
     <div className="dashboard-cards">
       {cpuStats.data ? (
-        <StatsCard key={0} title={"cpu"} percent={cpuStats.data.usedFraction} />
+        <StatsCard key={0} title={cpu} percent={cpuStats.data.usedFraction} />
       ) : cpuStats.error ? (
-        <ErrorView error={cpuStats.error} />
+        okStatsCard(cpu, false)
       ) : (
-        <Ok msg={"Loading cpu usage"} loading={true} />
+        okStatsCard(cpu, true)
       )}
 
       {diskStats.data ? (
         <StatsCard
           key={1}
-          title={"disk"}
+          title={disk}
           percent={diskStats.data.useFraction}
-          disk={diskStats.data}
+          text={
+            humanFileSize(parseInt(diskStats.data.used)) +
+            " / " +
+            humanFileSize(parseInt(diskStats.data.bBlocks))
+          }
         />
       ) : diskStats.error ? (
-        <ErrorView error={diskStats.error} />
+        okStatsCard(disk, false)
       ) : (
-        <Ok msg={"Loading disk usage"} loading={true} />
+        okStatsCard(disk, true)
       )}
+
       {memoryStats.data ? (
         <StatsCard
           key={2}
-          title={"memory"}
+          title={memory}
           percent={memoryStats.data.useFraction}
+          text={
+            humanFileSize(parseInt(memoryStats.data.swapUsed)) +
+            " / " +
+            humanFileSize(parseInt(memoryStats.data.memTotal))
+          }
         />
       ) : memoryStats.error ? (
-        <ErrorView error={memoryStats.error} />
+        okStatsCard(memory, false)
       ) : (
-        <Ok msg={"Loading memory usage"} loading={true} />
+        okStatsCard(memory, true)
       )}
     </div>
   );
