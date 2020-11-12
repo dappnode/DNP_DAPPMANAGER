@@ -3,8 +3,6 @@ import { Manifest, Compose, IpfsFileResult } from "../../../types";
 import { findEntries } from "./findEntries";
 import { downloadAsset } from "./downloadAssets";
 import { promiseAllValues } from "../../../utils/promises";
-import { validateManifestBasic } from "../../manifest";
-import { validateCompose } from "../../compose";
 import {
   releaseFilesToDownload,
   DirectoryFiles,
@@ -26,9 +24,6 @@ export async function downloadDirectoryFiles(
       return downloadAsset<any>(entries, fileConfig, fileId);
     })
   );
-
-  validateManifestBasic(files.manifest);
-  validateCompose(files.compose);
 
   return {
     manifest: joinFilesInManifest(files),
