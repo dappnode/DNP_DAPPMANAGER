@@ -32,12 +32,14 @@ export function dockerComposeUp(
     noStart?: boolean;
     forceRecreate?: boolean;
     serviceNames?: string[];
+    removeOrphans?: boolean;
   }
 ): Promise<string> {
   const flags: string[] = [];
   if (options?.noStart) flags.push("--no-start");
   else flags.push("--detach");
   if (options?.forceRecreate) flags.push("--force-recreate");
+  if (options?.removeOrphans) flags.push("--remove-orphans");
   if (options?.serviceNames)
     for (const serviceName of options.serviceNames) flags.push(serviceName);
   // Adding <&- to prevent interactive mode
