@@ -11,48 +11,44 @@ function parseVariant(value: number) {
   return "success";
 }
 
-function StatsCard({
-  title,
-  percent,
-  text
-}: {
-  title: string;
-  percent: number;
-  text?: string;
-}) {
-  const value = Math.round(percent * 100);
-
+const StatsCardContainer: React.FunctionComponent<{ title: string }> = ({
+  children,
+  title
+}) => {
   return (
     <Card className="stats-card">
       <div className="header">
         <span className="id">{title}</span> <span className="usage">usage</span>
       </div>
+      {children}
+    </Card>
+  );
+};
+
+function StatsCardOk({ percent, text }: { percent: number; text?: string }) {
+  const value = Math.round(percent * 100);
+
+  return (
+    <>
       <ProgressBar
         variant={parseVariant(value)}
         now={value}
         label={value + "%"}
       />
       {text ? <div className="text">{text}</div> : null}
-    </Card>
+    </>
   );
 }
 
-function okStatsCard(stat: string, ok?: boolean): JSX.Element {
-  return ok ? (
-    <Ok
-      msg={`Loading ${stat} usage`}
-      loading={true}
-      style={{ margin: "auto" }}
-    />
-  ) : (
-    <Ok msg={`Couldn't get ${stat} stats`} style={{ margin: "auto" }} />
-  );
+function StatsCardError({ error }: { error: Error }) {
+  return <Ok msg={error.message} style={{ margin: "auto" }} />;
+}
+
+function StatsCardLoading() {
+  return <Ok msg={"Loading..."} loading={true} style={{ margin: "auto" }} />;
 }
 
 export function HostStats() {
-  const cpu = "cpu";
-  const disk = "disk";
-  const memory = "memory";
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
@@ -70,47 +66,49 @@ export function HostStats() {
 
   return (
     <div className="dashboard-cards">
-      {cpuStats.data ? (
-        <StatsCard key={0} title={cpu} percent={cpuStats.data.usedFraction} />
-      ) : cpuStats.error ? (
-        okStatsCard(cpu, false)
-      ) : (
-        okStatsCard(cpu, true)
-      )}
+      <StatsCardContainer title={"cpu"}>
+        {cpuStats.data ? (
+          <StatsCardOk percent={cpuStats.data.usedFraction} />
+        ) : cpuStats.error ? (
+          <StatsCardError error={cpuStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
 
-      {diskStats.data ? (
-        <StatsCard
-          key={1}
-          title={disk}
-          percent={diskStats.data.useFraction}
-          text={
-            humanFileSize(parseInt(diskStats.data.used)) +
-            " / " +
-            humanFileSize(parseInt(diskStats.data.bBlocks))
-          }
-        />
-      ) : diskStats.error ? (
-        okStatsCard(disk, false)
-      ) : (
-        okStatsCard(disk, true)
-      )}
+      <StatsCardContainer title={"disk"}>
+        {memoryStats.data ? (
+          <StatsCardOk
+            percent={memoryStats.data.useFraction}
+            text={
+              humanFileSize(parseInt(memoryStats.data.swapUsed)) +
+              " / " +
+              humanFileSize(parseInt(memoryStats.data.memTotal))
+            }
+          />
+        ) : memoryStats.error ? (
+          <StatsCardError error={memoryStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
 
-      {memoryStats.data ? (
-        <StatsCard
-          key={2}
-          title={memory}
-          percent={memoryStats.data.useFraction}
-          text={
-            humanFileSize(parseInt(memoryStats.data.swapUsed)) +
-            " / " +
-            humanFileSize(parseInt(memoryStats.data.memTotal))
-          }
-        />
-      ) : memoryStats.error ? (
-        okStatsCard(memory, false)
-      ) : (
-        okStatsCard(memory, true)
-      )}
+      <StatsCardContainer title={"memory"}>
+        {diskStats.data ? (
+          <StatsCardOk
+            percent={diskStats.data.useFraction}
+            text={
+              humanFileSize(parseInt(diskStats.data.used)) +
+              " / " +
+              humanFileSize(parseInt(diskStats.data.bBlocks))
+            }
+          />
+        ) : diskStats.error ? (
+          <StatsCardError error={diskStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
     </div>
   );
 }

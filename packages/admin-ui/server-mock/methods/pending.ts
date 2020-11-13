@@ -113,12 +113,14 @@ export async function ethClientTargetSet(kwargs: {
 }
 
 export async function statsCpuGet(): Promise<HostStatCpu> {
+  // await new Promise(() => {});
   return {
     usedFraction: 0.88
   };
 }
 
 export async function statsMemoryGet(): Promise<HostStatMemory> {
+  // throw Error("Ups");
   return {
     memTotal: "8093155328",
     memUsed: "6535839744",
