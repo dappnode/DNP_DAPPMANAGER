@@ -7,14 +7,30 @@ import { HostStats } from "pages/dashboard/components/HostStats";
 import SubTitle from "components/SubTitle";
 
 export default function SystemInfo() {
-  const stats = useApi.getStats();
+  const cpuStats = useApi.statsCpuGet();
+  const memoryStats = useApi.statsMemoryGet();
+  const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
-    const interval = setInterval(stats.revalidate, 5 * 1000);
+    const interval = setInterval(cpuStats.revalidate, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [stats]);
+  }, [cpuStats]);
+
+  useEffect(() => {
+    const interval = setInterval(diskStats.revalidate, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [diskStats]);
+
+  useEffect(() => {
+    const interval = setInterval(memoryStats.revalidate, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [memoryStats]);
 
   return (
     <>

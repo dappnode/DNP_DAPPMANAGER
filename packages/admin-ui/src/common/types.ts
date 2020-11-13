@@ -1058,12 +1058,39 @@ export interface SystemInfo {
 }
 
 /**
- * Host machine stats, cpu, memory, disk, etc
+ * Host machine Memory stats: filesystem, used, available, etc
  */
-export interface HostStats {
-  cpu?: string; // "35%""
-  memory?: string; // "46%"
-  disk?: string; // "57%"
+export interface HostStatMemory {
+  memTotal: string;
+  memUsed: string;
+  free: string;
+  shared: string;
+  buffCache: string;
+  available: string;
+  swapTotal: string;
+  swapUsed: string;
+  swapFree: string;
+  useFraction: number; // Only argument not provided by the command free
+}
+
+/**
+ * Host machine Disk stats: filesystem, used, available, etc
+ */
+export interface HostStatDisk {
+  filesystem: string;
+  bBlocks: string;
+  used: string;
+  available: string;
+  usePercentage: string;
+  mountedOn: string;
+  useFraction: number;
+}
+
+/**
+ * Host machine CPU used
+ */
+export interface HostStatCpu {
+  usedFraction: number;
 }
 
 /**

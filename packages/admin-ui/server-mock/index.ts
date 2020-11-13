@@ -6,8 +6,12 @@ import socketio from "socket.io";
 import * as methods from "./methods";
 import { mapSubscriptionsToEventBus } from "./subscriptions";
 import { getRpcHandler } from "../src/common/transport/jsonRpc";
-import { LoggerMiddleware } from "../src/common/transport/types";
 import { subscriptionsFactory } from "../src/common";
+import {
+  LoggerMiddleware,
+  RpcPayload,
+  RpcResponse
+} from "../src/common/transport/types";
 
 /* eslint-disable no-console */
 
@@ -29,7 +33,23 @@ const app = express();
 const server = new http.Server(app);
 const io = socketio(server, { serveClient: false });
 
-io.on("connection", socket => console.log(`Socket connected`, socket.id));
+io.on("connection", socket => {
+  console.log(`Socket connected`, socket.id);
+
+  // JSON RPC over WebSockets
+  socket.on(
+    "rpc",
+    (rpcPayload: RpcPayload, callback: (res: RpcResponse) => void) => {
+      if (typeof callback !== "function")
+        return console.error("JSON RPC over WS req without cb", rpcPayload);
+
+      rpcHandler(rpcPayload)
+        .then(callback)
+        .catch(error => callback({ error }))
+        .catch(error => console.error("Error on JSON RPC over WS cb", error));
+    }
+  );
+});
 
 // Subscriptions
 const subscriptions = subscriptionsFactory(io, subscriptionsLogger);

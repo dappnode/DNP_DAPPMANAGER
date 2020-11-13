@@ -1,0 +1,16 @@
+.ok-indicator {
+  display: flex;
+  .icon-container {
+    display: flex;
+    margin-right: 6px;
+
+    svg,
+    .lds-ring {
+      width: 1.35rem;
+      height: 1.35rem;
+    }
+    .lds-ring {
+      margin-bottom: 2px;
+    }
+  }
+}
