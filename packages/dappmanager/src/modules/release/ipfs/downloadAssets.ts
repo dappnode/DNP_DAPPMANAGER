@@ -1,112 +1,53 @@
 import * as ipfs from "../../ipfs";
 import memoize from "memoizee";
-import {
-  Manifest,
-  Compose,
-  SetupTarget,
-  SetupWizard,
-  SetupSchema,
-  SetupUiJson,
-  GrafanaDashboard,
-  PrometheusTarget
-} from "../../../types";
-import { validateManifestBasic } from "../../manifest";
-import { validateCompose } from "../../compose";
-import { yamlParse } from "../../../utils/yaml";
+import { parseAsset } from "./parseAsset";
+import { FileConfig } from "./types";
+import { validateAsset, DirectoryFiles } from "./params";
 
-export const downloadManifest = downloadAssetFactory<Manifest>({
-  parse: jsonParse,
-  validate: validateManifestBasic,
-  maxLength: 100e3 // Limit size to ~100KB
-});
-
-export const downloadCompose = downloadAssetFactory<Compose>({
-  parse: yamlParse,
-  validate: validateCompose,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadSetupWizard = downloadAssetFactory<SetupWizard>({
-  parse: yamlParse,
-  validate: setupWizard => setupWizard,
-  maxLength: 100e3 // Limit size to ~100KB
-});
-
-export const downloadSetupSchema = downloadAssetFactory<SetupSchema>({
-  parse: jsonParse,
-  validate: setupSchema => setupSchema,
-  maxLength: 100e3 // Limit size to ~100KB
-});
-
-export const downloadSetupTarget = downloadAssetFactory<SetupTarget>({
-  parse: jsonParse,
-  validate: setupTarget => setupTarget,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadSetupUiJson = downloadAssetFactory<SetupUiJson>({
-  parse: jsonParse,
-  validate: setupUiJson => setupUiJson,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadDisclaimer = downloadAssetFactory<string>({
-  parse: content => content,
-  validate: disclaimer => disclaimer,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadGetStarted = downloadAssetFactory<string>({
-  parse: content => content,
-  validate: gettingStarted => gettingStarted,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-export const downloadGrafanaDashboard = downloadAssetFactory<GrafanaDashboard>({
-  parse: jsonParse,
-  validate: grafanaDashboard => grafanaDashboard,
-  maxLength: 10e6 // Limit size to ~10MB
-});
-
-export const downloadPrometheusTarget = downloadAssetFactory<PrometheusTarget>({
-  parse: jsonParse,
-  validate: prometheusTarget => prometheusTarget,
-  maxLength: 10e3 // Limit size to ~10KB
-});
-
-/**
- * Download, parse and validate a DNP release file
- *
- * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- */
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-function downloadAssetFactory<T>({
-  parse,
-  validate,
-  maxLength
-}: {
-  parse: (content: string) => T;
-  validate: (data: T) => T;
-  maxLength?: number;
-}) {
-  async function downloadAsset({ hash }: { hash: string }): Promise<T> {
-    const content = await ipfs.catString({ hash, maxLength });
-    const data: T = parse(content);
-    return validate(data);
-  }
-  return memoize(downloadAsset, {
-    promise: true,
-    normalizer: ([{ hash }]) => hash
-  });
+interface FileData {
+  hash: string;
 }
 
-/**
- * JSON.parse but with a better error message
- */
-function jsonParse<T>(jsonString: string): T {
-  try {
-    return JSON.parse(jsonString);
-  } catch (e) {
-    throw Error(`Error parsing JSON: ${e.message}`);
+const ipfsCatStringMemoized = memoize(ipfs.catString, {
+  promise: true,
+  normalizer: ([{ hash }]) => hash
+});
+
+export async function downloadAsset<T>(
+  file: FileData[] | FileData | undefined,
+  config: FileConfig,
+  fileId: keyof DirectoryFiles
+): Promise<T[] | T | undefined> {
+  if (!file) {
+    if (config.required) {
+      throw Error(`File ${fileId} not found`);
+    }
+    return undefined;
+  } else if (Array.isArray(file)) {
+    if (!config.multiple) {
+      throw Error(`Got multiple ${fileId}`);
+    }
+    return await Promise.all(
+      file.map(f => downloadAssetRequired<T>(f, config, fileId))
+    );
+  } else {
+    return downloadAssetRequired(file, config, fileId);
   }
+}
+
+export async function downloadAssetRequired<T>(
+  file: FileData,
+  config: FileConfig,
+  fileId: keyof DirectoryFiles
+): Promise<T> {
+  const maxLength = config.maxSize;
+  const format = config.format || "TEXT";
+  const validate = validateAsset[fileId];
+
+  const hash = file.hash;
+  const content = await ipfsCatStringMemoized({ hash, maxLength });
+  const data = parseAsset(content, format);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (validate ? validate(data as any) : data) as T;
 }
