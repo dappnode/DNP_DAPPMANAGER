@@ -26,7 +26,7 @@ const StatsCardContainer: React.FunctionComponent<{ title: string }> = ({
 };
 
 function StatsCardOk({ percent, text }: { percent: number; text?: string }) {
-  const value = Math.round(percent * 100);
+  const value = Math.round(percent);
 
   return (
     <>
@@ -68,7 +68,7 @@ export function HostStats() {
     <div className="dashboard-cards">
       <StatsCardContainer title={"cpu"}>
         {cpuStats.data ? (
-          <StatsCardOk percent={cpuStats.data.usedFraction} />
+          <StatsCardOk percent={cpuStats.data.usedPercentage} />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
         ) : (
@@ -79,11 +79,11 @@ export function HostStats() {
       <StatsCardContainer title={"memory"}>
         {memoryStats.data ? (
           <StatsCardOk
-            percent={memoryStats.data.useFraction}
+            percent={memoryStats.data.freePercentage}
             text={
-              humanFileSize(parseInt(memoryStats.data.swapUsed)) +
+              humanFileSize(memoryStats.data.used) +
               " / " +
-              humanFileSize(parseInt(memoryStats.data.memTotal))
+              humanFileSize(memoryStats.data.total)
             }
           />
         ) : memoryStats.error ? (
@@ -96,11 +96,11 @@ export function HostStats() {
       <StatsCardContainer title={"disk"}>
         {diskStats.data ? (
           <StatsCardOk
-            percent={diskStats.data.useFraction}
+            percent={diskStats.data.usedPercentage}
             text={
-              humanFileSize(parseInt(diskStats.data.used)) +
+              humanFileSize(diskStats.data.used) +
               " / " +
-              humanFileSize(parseInt(diskStats.data.bBlocks))
+              humanFileSize(diskStats.data.total)
             }
           />
         ) : diskStats.error ? (

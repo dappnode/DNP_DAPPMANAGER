@@ -1,10 +1,10 @@
 import { HostStatDisk } from "../types";
 import { parseDiskStats } from "../utils/parseDiskStats";
-import shellExec from "../utils/shell";
+import osu from "node-os-utils";
 /**
  * Returns the disk statistics (used, available, etc)
  */
 export async function statsDiskGet(): Promise<HostStatDisk> {
-  const disk = await shellExec(`df / -B 1`);
-  return parseDiskStats(disk);
+  const stats = await osu.drive.info("/");
+  return parseDiskStats(stats);
 }

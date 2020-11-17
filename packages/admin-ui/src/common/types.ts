@@ -1061,36 +1061,34 @@ export interface SystemInfo {
  * Host machine Memory stats: filesystem, used, available, etc
  */
 export interface HostStatMemory {
-  memTotal: string;
-  memUsed: string;
-  free: string;
-  shared: string;
-  buffCache: string;
-  available: string;
-  swapTotal: string;
-  swapUsed: string;
-  swapFree: string;
-  useFraction: number; // Only argument not provided by the command free
+  total: number;
+  used: number;
+  free: number;
+  freePercentage: number;
 }
 
 /**
  * Host machine Disk stats: filesystem, used, available, etc
  */
 export interface HostStatDisk {
-  filesystem: string;
-  bBlocks: string;
-  used: string;
-  available: string;
-  usePercentage: string;
-  mountedOn: string;
-  useFraction: number;
+  total: number;
+  used: number;
+  free: number;
+  usedPercentage: number;
+  freePercentage: number;
 }
 
 /**
  * Host machine CPU used
  */
 export interface HostStatCpu {
-  usedFraction: number;
+  usedPercentage: number;
+}
+/**
+ * Types of conversions accepted by toBytes() function
+ */
+export interface ToBytes {
+  meassure: "kb" | "mb" | "gb";
 }
 
 /**
