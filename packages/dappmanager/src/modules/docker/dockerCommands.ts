@@ -101,10 +101,10 @@ export function dockerStop(
 }
 
 export function dockerRm(
-  containerName: string,
+  containerNames: string[],
   { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  return execDocker(["rm", containerName], { force: true, volumes });
+  return execDocker(["rm", ...containerNames], { force: true, volumes });
 }
 
 interface ImageManifest {

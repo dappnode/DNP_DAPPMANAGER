@@ -1,14 +1,15 @@
 import fs from "fs";
 import * as eventBus from "../eventBus";
 import params from "../params";
-// Modules
-import { dockerComposeDown, dockerRm } from "../modules/docker/dockerCommands";
-// Utils
+import {
+  dockerComposeDown,
+  dockerRm,
+  dockerStop
+} from "../modules/docker/dockerCommands";
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/listContainers";
-import { restartPackageVolumes } from "../modules/docker/restartPackageVolumes";
-import { logs } from "../logs";
+import { assertNoExternalVolumeUsers } from "../modules/docker/restartPackageVolumes";
 
 /**
  * Remove package data: docker down + disk files
@@ -37,44 +38,23 @@ export async function packageRemove({
   const composePath = getPath.dockerCompose(dnp.dnpName, false);
   const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
 
-  // Necessary for eventBus dependants to know the exact list of deleted DNPs
-  let removedDnps: string[] = [dnp.dnpName];
+  // [NOTE] Not necessary to close the ports since they will just
+  // not be renewed in the next interval
 
-  /**
-   * [NOTE] Not necessary to close the ports since they will just
-   * not be renewed in the next interval
-   */
-
-  // Call restartPackageVolumes to safely delete dependant volumes
-  if (deleteVolumes) {
-    // Note: restartPackageVolumes may remove additional DNPs
-    removedDnps = (
-      await restartPackageVolumes({
-        dnpName: dnp.dnpName,
-        doNotRestart: true
-      })
-    ).removedDnps;
-  } else {
-    /**
-     * If there is no docker-compose, do a docker rm directly
-     * Otherwise, try to do a docker-compose down and if it fails,
-     * log to console and do docker-rm
-     */
-    if (fs.existsSync(composePath))
-      try {
-        await dockerComposeDown(composePath, {
-          volumes: deleteVolumes,
-          timeout
-        });
-      } catch (e) {
-        logs.error(`Error on dockerComposeDown of ${dnp.dnpName}`, e);
-        for (const container of dnp.containers)
-          await dockerRm(container.containerName, { volumes: deleteVolumes });
-      }
-    else {
-      for (const container of dnp.containers)
-        await dockerRm(container.containerName, { volumes: deleteVolumes });
+  if (fs.existsSync(composePath)) {
+    if (deleteVolumes) {
+      await assertNoExternalVolumeUsers(dnp);
     }
+
+    await dockerComposeDown(composePath, {
+      volumes: deleteVolumes,
+      timeout
+    });
+  } else {
+    // Still try to delete the package if there is not compose
+    const containerNames = dnp.containers.map(c => c.containerName);
+    await dockerStop(containerNames, { time: timeout });
+    await dockerRm(containerNames, { volumes: deleteVolumes });
   }
 
   // Remove DNP folder and files
@@ -82,5 +62,5 @@ export async function packageRemove({
 
   // Emit packages update
   eventBus.requestPackages.emit();
-  eventBus.packagesModified.emit({ dnpNames: removedDnps, removed: true });
+  eventBus.packagesModified.emit({ dnpNames: [dnp.dnpName], removed: true });
 }
