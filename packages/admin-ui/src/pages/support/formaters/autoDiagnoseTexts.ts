@@ -132,8 +132,8 @@ export function diskSpace({
   isValidating: boolean;
 }): DiagnoseResultOrNull {
   if (isValidating) return { loading: true, msg: "Checking disk usage..." };
-  if (!data || !data.used) return null;
-  const ok = parseInt(data.used) < 95;
+  if (!data || !data.usedPercentage) return null;
+  const ok = data.usedPercentage < 95;
   return {
     ok,
     msg: ok ? "Disk usage is ok (<95%)" : "Disk usage is over 95%",

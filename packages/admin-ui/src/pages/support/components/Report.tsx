@@ -19,7 +19,7 @@ export default function Report() {
   const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diagnose = diagnoseReq.data || [];
-  const hostStats = hostStatsReq.data?.used;
+  const hostStats = hostStatsReq.data?.used.toString();
 
   const versionDatas: { [name: string]: PackageVersionData | undefined } = {
     "dappmanager.dnp.dappnode.eth": versionData,
