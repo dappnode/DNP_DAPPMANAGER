@@ -429,13 +429,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
    * Checks if there are volumes to be removed on this DNP
    */
   areThereVolumesToRemove: boolean;
-  /**
-   * If there are volumes which this DNP is the owner and some other
-   * DNPs are users, they will be removed by the DAPPMANAGER.
-   */
-  volumeUsersToRemove: string[];
   dependantsOf: string[];
-  namedExternalVols: VolumeOwnershipData[];
   // Non-indexed data
   manifest?: Manifest;
 }
