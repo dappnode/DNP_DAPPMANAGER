@@ -76,7 +76,7 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"disk"}>
+      <StatsCardContainer title={"memory"}>
         {memoryStats.data ? (
           <StatsCardOk
             percent={memoryStats.data.useFraction}
@@ -93,7 +93,7 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"memory"}>
+      <StatsCardContainer title={"disk"}>
         {diskStats.data ? (
           <StatsCardOk
             percent={diskStats.data.useFraction}

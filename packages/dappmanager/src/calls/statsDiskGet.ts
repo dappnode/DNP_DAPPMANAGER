@@ -5,6 +5,6 @@ import shellExec from "../utils/shell";
  * Returns the disk statistics (used, available, etc)
  */
 export async function statsDiskGet(): Promise<HostStatDisk> {
-  const disk = await shellExec(`df / --block-size=1`);
+  const disk = await shellExec(`df / -B 1`);
   return parseDiskStats(disk);
 }
