@@ -36,7 +36,7 @@ export async function runPackages(
 
         await dockerComposeUp(pkg.composePath, {
           noStart: true,
-          timeout: pkg.timeout
+          timeout: pkg.dockerTimeout
         });
         for (const [serviceName, serviceFileUploads] of Object.entries(
           pkg.fileUploads
@@ -59,7 +59,7 @@ export async function runPackages(
       log(pkg.dnpName, "Starting package... ");
       await dockerComposeUp(pkg.composePath, {
         removeOrphans,
-        timeout: pkg.timeout
+        timeout: pkg.dockerTimeout
       });
     }
 

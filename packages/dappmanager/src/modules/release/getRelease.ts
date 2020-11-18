@@ -86,7 +86,7 @@ export async function getRelease({
         origin,
         isCore,
         isMain: metadata.mainService === service.serviceName ? true : undefined,
-        timeout: parseTimeout(metadata.dockerTimeout)
+        dockerTimeout: parseTimeout(metadata.dockerTimeout)
       })
     );
   }

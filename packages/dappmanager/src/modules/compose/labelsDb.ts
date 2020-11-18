@@ -16,7 +16,8 @@ import { pick, omitBy, mapValues } from "lodash";
  */
 
 const parseString = (value: string | undefined): string | undefined => value;
-const parseNumber = (value: string | undefined): number | undefined => value === undefined ? undefined : parseInt(value);
+const parseNumber = (value: string | undefined): number | undefined =>
+  value === undefined ? undefined : parseInt(value);
 const parseBool = (value: string | undefined): boolean | undefined =>
   typeof value === "string" ? (value === "true" ? true : false) : undefined;
 const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
@@ -27,7 +28,8 @@ const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
 };
 
 const writeString = (data: string | undefined): string | undefined => data;
-const writeNumber = (num: number | undefined): string | undefined => num === undefined ? undefined : String(num)
+const writeNumber = (num: number | undefined): string | undefined =>
+  num === undefined ? undefined : String(num);
 const writeBool = (data: boolean | undefined): string | undefined =>
   data === true ? "true" : data === false ? "false" : undefined;
 const writeJson = (data: object | string[]): string => JSON.stringify(data);
@@ -50,7 +52,7 @@ const labelParseFns: {
       : undefined,
   "dappnode.dnp.isCore": parseBool,
   "dappnode.dnp.isMain": parseBool,
-  "dappnode.dnp.timeout": parseNumber,
+  "dappnode.dnp.dockerTimeout": parseNumber,
   "dappnode.dnp.default.environment": value => parseJsonSafe(value),
   "dappnode.dnp.default.ports": value => parseJsonSafe(value),
   "dappnode.dnp.default.volumes": value => parseJsonSafe(value)
@@ -71,7 +73,7 @@ const labelStringifyFns: {
   "dappnode.dnp.chain": writeString,
   "dappnode.dnp.isCore": writeBool,
   "dappnode.dnp.isMain": writeBool,
-  "dappnode.dnp.timeout": writeNumber,
+  "dappnode.dnp.dockerTimeout": writeNumber,
   "dappnode.dnp.default.environment": writeJson,
   "dappnode.dnp.default.ports": writeJson,
   "dappnode.dnp.default.volumes": writeJson
@@ -132,11 +134,10 @@ export function readContainerLabels(
   chain: ChainDriver;
   isCore: boolean;
   isMain: boolean;
-  timeout: number;
+  dockerTimeout: number;
   defaultEnvironment: string[];
   defaultPorts: string[];
   defaultVolumes: string[];
-  dockerTimeout: string;
 }> {
   const labelValues = parseContainerLabels(labelsRaw);
   return {
@@ -150,10 +151,10 @@ export function readContainerLabels(
     chain: labelValues["dappnode.dnp.chain"],
     isCore: labelValues["dappnode.dnp.isCore"],
     isMain: labelValues["dappnode.dnp.isMain"],
-    timeout: labelValues["dappnode.dnp.timeout"],
+    dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
     defaultPorts: labelValues["dappnode.dnp.default.ports"],
-    defaultVolumes: labelValues["dappnode.dnp.default.volumes"],
+    defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
   };
 }
 
@@ -167,7 +168,7 @@ export function writeMetadataToLabels({
   origin,
   isCore,
   isMain,
-  timeout
+  dockerTimeout
 }: {
   dnpName: string;
   version: string;
@@ -178,7 +179,7 @@ export function writeMetadataToLabels({
   origin?: string;
   isCore?: boolean;
   isMain?: boolean;
-  timeout?: number;
+  dockerTimeout?: number;
 }): ContainerLabelsRaw {
   return stringifyContainerLabels({
     "dappnode.dnp.dnpName": dnpName,
@@ -190,6 +191,6 @@ export function writeMetadataToLabels({
     "dappnode.dnp.chain": chain,
     "dappnode.dnp.isCore": isCore,
     "dappnode.dnp.isMain": isMain,
-    "dappnode.dnp.timeout": timeout
+    "dappnode.dnp.dockerTimeout": dockerTimeout
   });
 }

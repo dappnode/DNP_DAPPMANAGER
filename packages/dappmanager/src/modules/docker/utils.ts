@@ -57,7 +57,7 @@ export function getDockerTimeoutMax(
 
   for (const container of containers) {
     if (container.dockerTimeout) {
-      const timeoutNumber = parseInt(container.dockerTimeout);
+      const timeoutNumber = container.dockerTimeout;
       if (!timeout || timeoutNumber > timeout) {
         timeout = timeoutNumber;
       }

@@ -59,7 +59,7 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
-  const timeout = parseTimeout(release.metadata.dockerTimeout);
+  const dockerTimeout = parseTimeout(release.metadata.dockerTimeout);
 
   return {
     ...release,
@@ -74,6 +74,6 @@ function getInstallerPackageData(
     compose: compose.output(),
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
-    timeout
+    dockerTimeout
   };
 }

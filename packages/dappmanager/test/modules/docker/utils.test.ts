@@ -1,7 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 
-import { stripDockerApiLogsHeader } from "../../../src/modules/docker/utils";
+import {
+  getDockerTimeoutMax,
+  stripDockerApiLogsHeader
+} from "../../../src/modules/docker/utils";
+import { PackageContainer } from "../../../src/types";
+import { mockContainer } from "../../testUtils";
 
 describe("docker API > utils", () => {
   describe("stripDockerApiLogsHeader", () => {
@@ -27,6 +32,23 @@ describe("docker API > utils", () => {
     it("Should not strip anything from clean logs", () => {
       const logSampleClean = stripDockerApiLogsHeader(logSampleCleanExpected);
       expect(logSampleClean).to.equal(logSampleCleanExpected);
+    });
+  });
+
+  describe("getDockerTimeoutMax", () => {
+    it("Should find the max dockerTimeout in all containers", () => {
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          dockerTimeout: 120000
+        },
+        {
+          ...mockContainer,
+          dockerTimeout: 60000
+        }
+      ];
+      const timeout = getDockerTimeoutMax(containers);
+      expect(timeout).to.equal(120000);
     });
   });
 });
