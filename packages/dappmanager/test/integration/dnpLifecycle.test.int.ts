@@ -137,6 +137,10 @@ describe("DNP lifecycle", function() {
       container: "/temp"
     }
   };
+  const staticVolume = {
+    name: "data",
+    container: "/usr"
+  };
 
   const manifestMain: Manifest = {
     name: dnpNameMain,
@@ -150,11 +154,15 @@ describe("DNP lifecycle", function() {
         image: "",
         environment: toEnvironment(envsMain),
         volumes: [
-          "data:/usr",
+          `${staticVolume.name}:${staticVolume.container}`,
           `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
         ],
         ports: stringifyPortMappings(Object.values(portsMain))
       }
+    },
+    volumes: {
+      [staticVolume.name]: {},
+      [volumesMain.changeme.name]: {}
     }
   };
 
@@ -170,11 +178,15 @@ describe("DNP lifecycle", function() {
         image: "",
         environment: toEnvironment(envsDep),
         volumes: [
-          "data:/usr",
+          `${staticVolume.name}:${staticVolume.container}`,
           `${volumesDep.changeme.name}:${volumesDep.changeme.container}`
         ],
         ports: stringifyPortMappings(Object.values(portsDep))
       }
+    },
+    volumes: {
+      [staticVolume.name]: {},
+      [volumesDep.changeme.name]: {}
     }
   };
 
