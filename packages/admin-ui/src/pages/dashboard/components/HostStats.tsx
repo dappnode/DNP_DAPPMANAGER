@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useApi } from "api";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
+import humanFileSize from "utils/humanFileSize";
+import Ok from "../../../components/Ok";
 
 function parseVariant(value: number) {
   if (value > 90) return "danger";
@@ -9,34 +11,104 @@ function parseVariant(value: number) {
   return "success";
 }
 
-function StatsCard({ id, percent }: { id: string; percent: string }) {
-  const value = parseInt(percent);
+const StatsCardContainer: React.FunctionComponent<{ title: string }> = ({
+  children,
+  title
+}) => {
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{id}</span> <span className="usage">usage</span>
+        <span className="id">{title}</span> <span className="usage">usage</span>
       </div>
-      <ProgressBar variant={parseVariant(value)} now={value} label={percent} />
+      {children}
     </Card>
+  );
+};
+
+function StatsCardOk({ percent, text }: { percent: number; text?: string }) {
+  const value = Math.round(percent);
+
+  return (
+    <>
+      <ProgressBar
+        variant={parseVariant(value)}
+        now={value}
+        label={value + "%"}
+      />
+      {text ? <div className="text">{text}</div> : null}
+    </>
   );
 }
 
+function StatsCardError({ error }: { error: Error }) {
+  return <Ok msg={error.message} style={{ margin: "auto" }} />;
+}
+
+function StatsCardLoading() {
+  return <Ok msg={"Loading..."} loading={true} style={{ margin: "auto" }} />;
+}
+
 export function HostStats() {
-  const stats = useApi.getStats();
+  const cpuStats = useApi.statsCpuGet();
+  const memoryStats = useApi.statsMemoryGet();
+  const diskStats = useApi.statsDiskGet();
 
   useEffect(() => {
-    const interval = setInterval(stats.revalidate, 5 * 1000);
+    const interval = setInterval(() => {
+      cpuStats.revalidate();
+      diskStats.revalidate();
+      memoryStats.revalidate();
+    }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [stats]);
+  }, [cpuStats, diskStats, memoryStats]);
 
   return (
     <div className="dashboard-cards">
-      {stats.data &&
-        Object.entries(stats.data).map(([id, percent]) => (
-          <StatsCard key={id} id={id} percent={percent} />
-        ))}
+      <StatsCardContainer title={"cpu"}>
+        {cpuStats.data ? (
+          <StatsCardOk percent={cpuStats.data.usedPercentage} />
+        ) : cpuStats.error ? (
+          <StatsCardError error={cpuStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"memory"}>
+        {memoryStats.data ? (
+          <StatsCardOk
+            percent={memoryStats.data.freePercentage}
+            text={
+              humanFileSize(memoryStats.data.used) +
+              " / " +
+              humanFileSize(memoryStats.data.total)
+            }
+          />
+        ) : memoryStats.error ? (
+          <StatsCardError error={memoryStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"disk"}>
+        {diskStats.data ? (
+          <StatsCardOk
+            percent={diskStats.data.usedPercentage}
+            text={
+              humanFileSize(diskStats.data.used) +
+              " / " +
+              humanFileSize(diskStats.data.total)
+            }
+          />
+        ) : diskStats.error ? (
+          <StatsCardError error={diskStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
     </div>
   );
 }

@@ -11,19 +11,6 @@ describe("Modules > compose", () => {
       const isCore = true;
       const compose: Compose = {
         ...mockCompose,
-        volumes: {
-          dncore_ipfsdnpdappnodeeth_data: {
-            external: {
-              name: "dncore_ipfsdnpdappnodeeth_data"
-            }
-          },
-          bitcoindnpdappnodeeth_data: {
-            external: {
-              name: "bitcoindnpdappnodeeth_data"
-            }
-          }
-        },
-
         services: mapValues(mockCompose.services, service => ({
           ...service,
           privileged: true,
@@ -40,8 +27,6 @@ describe("Modules > compose", () => {
       const specialPermissions = parseSpecialPermissions(compose, isCore);
 
       expect(specialPermissions.map(p => p.name)).to.deep.equal([
-        "Access to core volume",
-        "Access to package volume",
         "Privileged access to the system host",
         "Admin privileges in DAppNode's API",
         "Privileged system capability NET_ADMIN",

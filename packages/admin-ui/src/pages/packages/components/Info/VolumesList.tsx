@@ -12,7 +12,6 @@ import {
   prettyBytes,
   shortNameCapitalized as sn
 } from "utils/format";
-import { markdownList } from "utils/markdown";
 import { InstalledPackageDetailData } from "common";
 import "./volumesList.scss";
 
@@ -24,23 +23,10 @@ interface WarningItem {
 export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
   const [showAll, setShowAll] = useState(false);
 
-  const { dnpName, volumeUsersToRemove } = dnp;
+  const { dnpName } = dnp;
 
   async function packageRestartVolumes(volumeName?: string) {
     const warningsList: WarningItem[] = [];
-
-    /**
-     * If there are volumes which this DNP is the owner and some other
-     * DNPs are users, they will be removed by the DAPPMANAGER.
-     * Alert the user about this fact
-     */
-    if (volumeUsersToRemove.length > 0) {
-      const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
-      warningsList.push({
-        title: "Warning! DAppNode Packages to be removed",
-        body: `Some other DAppNode Packages will be reseted in order to remove ${dnpName} volumes. \n\n ${volumeUsersToRemoveList}`
-      });
-    }
 
     // If there are NOT conflicting volumes,
     // Display a dialog to confirm volumes reset

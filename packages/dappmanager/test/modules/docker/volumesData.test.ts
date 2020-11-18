@@ -4,7 +4,7 @@ import {
   parseVolumeOwnershipData,
   normalizeProjectName
 } from "../../../src/modules/docker/volumesData";
-import { PackageContainer } from "../../../src/types";
+import { PackageContainer, VolumeOwnershipData } from "../../../src/types";
 
 describe("docker > volumes data", () => {
   describe("normalizeProjectName", () => {
@@ -114,10 +114,9 @@ describe("docker > volumes data", () => {
         Scope: "local"
       };
 
-      const expectedVolOwnershipData = {
+      const expectedVolOwnershipData: VolumeOwnershipData = {
         name: "dependencydnpdappnodeeth_data",
-        owner: "dependency.dnp.dappnode.eth",
-        users: ["main.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
+        owner: "dependency.dnp.dappnode.eth"
       };
 
       const volOwnershipData = parseVolumeOwnershipData(

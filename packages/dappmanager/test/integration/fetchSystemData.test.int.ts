@@ -45,12 +45,19 @@ describe("Get system data", () => {
     }
   }).timeout(10 * 1000);
 
-  it("Should get host machine stats", async () => {
-    const result = await calls.getStats();
-    // Can't check actual returns since they vary
-    expect(result.cpu).to.include("%");
-    expect(result.memory).to.include("%");
-    expect(result.disk).to.include("%");
+  it("Should return parsed disk stats from host machine", async () => {
+    const result = await calls.statsDiskGet();
+    expect(result).to.be.ok;
+  }).timeout(10 * 1000);
+
+  it("Should return parsed memory stats from host machine", async () => {
+    const result = await calls.statsMemoryGet();
+    expect(result).to.be.ok;
+  }).timeout(10 * 1000);
+
+  it("Should return parsed CPU stats from host machine", async () => {
+    const result = await calls.statsCpuGet();
+    expect(result).to.be.ok;
   }).timeout(10 * 1000);
 
   it("Should get DAPPMANAGER system info", async () => {

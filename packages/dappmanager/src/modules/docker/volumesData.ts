@@ -59,7 +59,7 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
       const size = volDfData ? volDfData.UsageData.Size : undefined;
       const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
       // Check users for custom bind volumes
-      const isOrphan = !refCount && ownershipData.users.length === 0;
+      const isOrphan = !refCount && !ownershipData.owner;
 
       // Custom mountpoint data
       const pathParts =
@@ -71,7 +71,6 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
         // Real volume and owner name to call delete on
         name: vol.Name,
         owner: ownershipData.owner,
-        users: ownershipData.users,
         internalName: parseVolumeLabels(vol.Labels).internalName,
         createdAt: new Date(vol.CreatedAt).getTime(),
         size,
@@ -90,28 +89,17 @@ export function parseVolumeOwnershipData(
   vol: { Name: string; Labels: { [key: string]: string } },
   containers: PackageContainer[]
 ): VolumeOwnershipData {
-  // Get user names
-  const users = Array.from(
-    containers.reduce((_users, container) => {
-      if (container.volumes.some(v => v.name === vol.Name))
-        _users.add(container.dnpName);
-      return _users;
-    }, new Set<string>())
-  );
-
   // Get the volume owner
   // TODO: Weak, derived from project name, may be exploited
-  const { normalizedOwnerName } = parseVolumeLabels(vol.Labels || {});
-  const ownerContainer = containers.find(
-    container => normalizeProjectName(container.dnpName) === normalizedOwnerName
+  const ownerContainer = containers.find(container =>
+    isVolumeOwner(container, vol)
   );
 
   return {
     // Real volume and owner name to call delete on
     name: vol.Name,
     // Do not assign to a fallback user, if the container has no owner it can be deleted by any user
-    owner: ownerContainer?.dnpName,
-    users
+    owner: ownerContainer?.dnpName
   };
 }
 
@@ -138,4 +126,16 @@ function parseVolumeLabels(labels?: {
   } else {
     return { normalizedOwnerName: project, internalName: volume };
   }
+}
+
+/**
+ * Check if `dnp` is owner of `vol`,
+ * meaning they have the same docker-compose project
+ */
+export function isVolumeOwner(
+  dnp: { dnpName: string },
+  vol: { Labels: { [key: string]: string } }
+): boolean {
+  const { normalizedOwnerName } = parseVolumeLabels(vol.Labels || {});
+  return normalizeProjectName(dnp.dnpName) === normalizedOwnerName;
 }

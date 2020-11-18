@@ -24,9 +24,11 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
   if (image.volumes)
     for (const vol of parseVolumeMappings(image.volumes))
       if (vol.name) volumes[vol.name] = {};
-  if (image.external_vol)
-    for (const vol of parseVolumeMappings(image.external_vol))
-      if (vol.name) volumes[vol.name] = { external: { name: vol.name } };
+
+  // FORBID, DEPRECATED features
+  if (((image as unknown) as { external_vol: string[] }).external_vol) {
+    throw Error("External volumes are not allowed");
+  }
 
   // Clean undefined and empty values
   // Using ternary operators and undefined to avoid using if statements
@@ -49,7 +51,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
         container_name: getContainerName({ dnpName, serviceName, isCore }),
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(image.environment || {}),
-        volumes: [...(image.volumes || []), ...(image.external_vol || [])],
+        volumes: image.volumes,
         labels: parseEnvironment(image.labels || {}),
         networks:
           isCore && image.ipv4_address

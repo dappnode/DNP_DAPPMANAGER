@@ -13,29 +13,6 @@ export function parseSpecialPermissions(
   for (const [serviceName, service] of Object.entries(compose.services)) {
     const { network_mode, privileged, cap_add } = service;
 
-    if (compose.volumes)
-      for (const volId in compose.volumes) {
-        const vol = compose.volumes[volId];
-        if (vol.external) {
-          // volName = "gethdnpdappnodeeth_data"
-          const volName =
-            (typeof vol.external === "object" && vol.external.name) || volId;
-          const parts = volName.split("_");
-          if (parts[0] === "dncore")
-            specialPermissions.push({
-              name: "Access to core volume",
-              details: `Allows to read and write to the core volume ${volName}`,
-              serviceName
-            });
-          else
-            specialPermissions.push({
-              name: "Access to package volume",
-              details: `Allows to read and write to the volume ${volName}`,
-              serviceName
-            });
-        }
-      }
-
     if (privileged || (cap_add || []).includes("ALL"))
       specialPermissions.push({
         name: "Privileged access to the system host",

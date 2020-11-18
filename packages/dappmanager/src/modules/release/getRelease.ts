@@ -37,7 +37,6 @@ export async function getRelease({
   origin?: string;
 }): Promise<PackageRelease> {
   const {
-    manifestFile,
     imageFile,
     avatarFile,
     manifest,
@@ -98,7 +97,6 @@ export async function getRelease({
     semVersion: manifest.version,
     origin,
     isCore,
-    manifestFile,
     imageFile,
     avatarFile,
     metadata,
@@ -122,7 +120,6 @@ async function downloadRelease(
   hash: string,
   id: string
 ): Promise<{
-  manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   composeUnsafe: Compose;

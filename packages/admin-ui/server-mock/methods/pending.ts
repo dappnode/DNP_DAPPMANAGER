@@ -3,13 +3,15 @@ import {
   Diagnose,
   EthClientFallback,
   EthClientTarget,
-  HostStats,
   MountpointData,
   NewFeatureId,
   NewFeatureStatus,
   PackageNotificationDb,
   PackageNotification,
-  SystemInfo
+  SystemInfo,
+  HostStatCpu,
+  HostStatDisk,
+  HostStatMemory
 } from "../../src/common";
 import { mountpoints } from "../mockData";
 
@@ -110,14 +112,38 @@ export async function ethClientTargetSet(kwargs: {
   //
 }
 
-/**
- * Return host machine stats (cpu, memory, etc)
- */
-export async function getStats(): Promise<HostStats> {
+export async function statsCpuGet(): Promise<HostStatCpu> {
+  // await new Promise(() => {});
   return {
-    cpu: "35%",
-    memory: "46%",
-    disk: "57%"
+    usedFraction: 0.88
+  };
+}
+
+export async function statsMemoryGet(): Promise<HostStatMemory> {
+  // throw Error("Ups");
+  return {
+    memTotal: "8093155328",
+    memUsed: "6535839744",
+    free: "179961856",
+    shared: "596930560",
+    buffCache: "1377353728",
+    available: "714616832",
+    swapTotal: "8312582144",
+    swapUsed: "767557632",
+    swapFree: "7545024512",
+    useFraction: 0.34
+  };
+}
+
+export async function statsDiskGet(): Promise<HostStatDisk> {
+  return {
+    filesystem: "/dev/mapper/mint--vg-root",
+    bBlocks: "241440808960",
+    used: "189458415616",
+    available: "39646527488",
+    usePercentage: "83%",
+    mountedOn: "/",
+    useFraction: 0.34
   };
 }
 

@@ -27,6 +27,7 @@ import { containerLogs } from "./routes/containerLogs";
 import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
 import { globalEnvs } from "./routes/globalEnvs";
 import { publicPackagesData } from "./routes/publicPackagesData";
+import { packageManifest } from "./routes/packageManifest";
 
 const httpApiPort = params.HTTP_API_PORT;
 const uiFilesPath = params.UI_FILES_PATH;
@@ -100,13 +101,18 @@ export default function startHttpApi(
   app.get("/ping", isAdmin, (req, res) => res.send(req.body));
 
   // Methods that do not fit into RPC
-  app.get("/container-logs/:id", isAdmin, wrapHandler(containerLogs));
+  app.get(
+    "/container-logs/:containerName",
+    isAdmin,
+    wrapHandler(containerLogs)
+  );
   app.get("/download/:fileId", isAdmin, wrapHandler(download));
   app.get("/user-action-logs", isAdmin, wrapHandler(downloadUserActionLogs));
   app.post("/upload", isAdmin, wrapHandler(upload));
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", wrapHandler(globalEnvs));
-  app.get("/public-packages/:id?", wrapHandler(publicPackagesData));
+  app.get("/public-packages/:containerName?", wrapHandler(publicPackagesData));
+  app.get("/package-manifest/:dnpName", wrapHandler(packageManifest));
 
   // Rest of RPC methods
   app.post(

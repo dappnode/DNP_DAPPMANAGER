@@ -41,6 +41,7 @@ export function dockerComposeUp(
     forceRecreate?: boolean;
     timeout?: number;
     serviceNames?: string[];
+    removeOrphans?: boolean;
   } = {}
 ): Promise<string> {
   // --detach is invalid with --no-start
@@ -49,7 +50,8 @@ export function dockerComposeUp(
     noStart: options.noStart,
     detach: options.detach ?? true,
     forceRecreate: options.forceRecreate,
-    timeout: options.timeout
+    timeout: options.timeout,
+    removeOrphans: options.removeOrphans
   });
 }
 
@@ -96,24 +98,27 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return execDocker(["volume", "rm", volumeName], { f: true });
 }
 
-export function dockerStart(containerNames: string[]): Promise<string> {
-  return execDocker(["start", ...containerNames]);
+export function dockerStart(
+  containerNames: string | string[]
+): Promise<string> {
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["start", ...ids]);
 }
 
 export function dockerStop(
   containerNames: string[],
-  options: {
-    time?: number;
-  } = {}
+  options: { time?: number } = {}
 ): Promise<string> {
-  return execDocker(["stop", ...containerNames], options);
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["stop", ...ids], options);
 }
 
 export function dockerRm(
-  containerName: string,
+  containerNames: string | string[],
   { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  return execDocker(["rm", containerName], { force: true, volumes });
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["rm", ...ids], { force: true, volumes });
 }
 
 interface ImageManifest {
@@ -178,4 +183,8 @@ export function dockerCopyFileFrom(
 
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
+}
+
+function parseContainerIdArg(containerNames: string | string[]): string[] {
+  return Array.isArray(containerNames) ? containerNames : [containerNames];
 }
