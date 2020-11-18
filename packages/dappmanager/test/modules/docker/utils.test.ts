@@ -40,15 +40,15 @@ describe("docker API > utils", () => {
       const containers: PackageContainer[] = [
         {
           ...mockContainer,
-          dockerTimeout: 120000
+          dockerTimeout: 120
         },
         {
           ...mockContainer,
-          dockerTimeout: 60000
+          dockerTimeout: 60
         }
       ];
       const timeout = getDockerTimeoutMax(containers);
-      expect(timeout).to.equal(120000);
+      expect(timeout).to.equal(120);
     });
   });
 });

@@ -13,7 +13,7 @@ import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { getContainerDomain } from "../../params";
-import { parseTimeout } from "../../utils/timeout";
+import { parseTimeoutSeconds } from "../../utils/timeout";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -86,7 +86,7 @@ export async function getRelease({
         origin,
         isCore,
         isMain: metadata.mainService === service.serviceName ? true : undefined,
-        dockerTimeout: parseTimeout(metadata.dockerTimeout)
+        dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout)
       })
     );
   }

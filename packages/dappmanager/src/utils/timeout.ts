@@ -5,10 +5,10 @@
 import timestring from "timestring";
 
 /**
- * Parses a timeout string and returns a number in miliseconds
- * @param timeout "20min", "5000", undefined
+ * Parses a timeout string and returns a number in seconds
+ * @param timeout "20min", "5", undefined
  */
-export function parseTimeout(
+export function parseTimeoutSeconds(
   timeout: number | string | undefined
 ): number | undefined {
   switch (typeof timeout) {
@@ -20,7 +20,7 @@ export function parseTimeout(
       // Timestring returns in seconds
       const parsedString = timestring(timeout) || parseInt(timeout);
       if (!parsedString) throw Error(`Error parsing timeout: ${timeout}`);
-      return parsedString * 1000;
+      return parsedString;
     }
     case "undefined":
       return undefined;
