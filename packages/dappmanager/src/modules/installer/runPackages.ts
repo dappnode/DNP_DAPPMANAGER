@@ -34,7 +34,10 @@ export async function runPackages(
         log(pkg.dnpName, "Copying file uploads...");
         logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-        await dockerComposeUp(pkg.composePath, { noStart: true });
+        await dockerComposeUp(pkg.composePath, {
+          noStart: true,
+          timeout: pkg.dockerTimeout
+        });
         for (const [serviceName, serviceFileUploads] of Object.entries(
           pkg.fileUploads
         ))
@@ -54,7 +57,10 @@ export async function runPackages(
       const removeOrphans = !pkg.isCore;
 
       log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUp(pkg.composePath, { removeOrphans });
+      await dockerComposeUp(pkg.composePath, {
+        removeOrphans,
+        timeout: pkg.dockerTimeout
+      });
     }
 
     log(pkg.dnpName, "Package started");

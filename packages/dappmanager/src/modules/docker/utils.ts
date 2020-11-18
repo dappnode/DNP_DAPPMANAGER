@@ -1,3 +1,5 @@
+import { PackageContainer } from "../../types";
+
 /**
  * When fetching logs from the API, each line is prefixed by a Header
  *
@@ -42,4 +44,24 @@ function stripDockerApiLogHeader(line: string): string {
   } else {
     return line;
   }
+}
+
+/**
+ * Returns the maximum dockerTimeout param from the container or undefined if none
+ * @param containers
+ */
+export function getDockerTimeoutMax(
+  containers: PackageContainer[]
+): number | undefined {
+  let timeout: number | undefined = undefined;
+
+  for (const container of containers) {
+    if (container.dockerTimeout) {
+      const timeoutNumber = container.dockerTimeout;
+      if (!timeout || timeoutNumber > timeout) {
+        timeout = timeoutNumber;
+      }
+    }
+  }
+  return timeout;
 }

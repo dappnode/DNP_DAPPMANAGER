@@ -1,7 +1,11 @@
 import fs from "fs";
 import { uniq } from "lodash";
 import { listPackage } from "../modules/docker/listContainers";
-import { dockerComposeUp, dockerRm } from "../modules/docker/dockerCommands";
+import {
+  dockerComposeUp,
+  dockerRm,
+  dockerStop
+} from "../modules/docker/dockerCommands";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
 import * as eventBus from "../eventBus";
 import * as getPath from "../utils/getPath";
@@ -13,6 +17,7 @@ import {
 } from "../modules/docker/dockerApi";
 import { isVolumeOwner } from "../modules/docker/volumesData";
 import { InstalledPackageData } from "../types";
+import { getDockerTimeoutMax } from "../modules/docker/utils";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -33,6 +38,8 @@ export async function packageRestartVolumes({
   // Fetching all containers to not re-fetch below
   const volumes = await dockerVolumesList();
   const dnp = await listPackage({ dnpName });
+  const timeout = getDockerTimeoutMax(dnp.containers);
+
   if (dnp.dnpName === params.dappmanagerDnpName)
     throw Error("The dappmanager cannot be restarted");
 
@@ -54,14 +61,19 @@ export async function packageRestartVolumes({
 
   let err: Error | null = null;
   try {
-    if (containersToRemove.length > 0) await dockerRm(containersToRemove);
-    for (const volName of volumesToRemove) await removeNamedVolume(volName);
+    if (containersToRemove.length > 0) {
+      await dockerStop(containersToRemove, { time: timeout });
+      await dockerRm(containersToRemove);
+    }
+    for (const volName of volumesToRemove) {
+      await removeNamedVolume(volName);
+    }
   } catch (e) {
     err = e;
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
-  await dockerComposeUp(composePath);
+  await dockerComposeUp(composePath, { timeout });
   if (err) throw err;
 
   // Emit packages update

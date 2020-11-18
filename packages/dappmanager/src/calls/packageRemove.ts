@@ -10,6 +10,7 @@ import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/listContainers";
 import { logs } from "../logs";
+import { getDockerTimeoutMax } from "../modules/docker/utils";
 
 /**
  * Remove package data: docker down + disk files
@@ -19,16 +20,15 @@ import { logs } from "../logs";
  */
 export async function packageRemove({
   dnpName,
-  deleteVolumes = false,
-  timeout = 10
+  deleteVolumes = false
 }: {
   dnpName: string;
   deleteVolumes?: boolean;
-  timeout?: number;
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
   const dnp = await listPackage({ dnpName });
+  const timeout = getDockerTimeoutMax(dnp.containers);
 
   if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     throw Error("Core packages cannot be cannot be removed");
@@ -49,7 +49,8 @@ export async function packageRemove({
     try {
       await dockerComposeDown(composePath, {
         volumes: deleteVolumes,
-        timeout
+        // Ignore timeout is user doesn't want to keep any data
+        timeout: deleteVolumes ? undefined : timeout
       });
       hasRemoved = true; // To mimic an early return
     } catch (e) {

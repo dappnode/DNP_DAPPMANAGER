@@ -4,6 +4,7 @@ import orderInstallPackages from "./orderInstallPackages";
 import { UserSettingsAllDnps, UserSettings } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
+import { parseTimeoutSeconds } from "../../utils/timeout";
 
 export function getInstallerPackagesData({
   releases,
@@ -58,6 +59,8 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
+  const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
+
   return {
     ...release,
     isUpdate: Boolean(currentVersion),
@@ -70,6 +73,7 @@ function getInstallerPackageData(
     // Data to write
     compose: compose.output(),
     // User settings to be applied by the installer
-    fileUploads: userSettings?.fileUploads
+    fileUploads: userSettings?.fileUploads,
+    dockerTimeout
   };
 }

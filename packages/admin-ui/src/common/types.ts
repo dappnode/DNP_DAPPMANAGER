@@ -327,6 +327,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.chain": ChainDriver;
   "dappnode.dnp.isCore": boolean;
   "dappnode.dnp.isMain": boolean;
+  "dappnode.dnp.dockerTimeout": number;
   "dappnode.dnp.default.environment": string[];
   "dappnode.dnp.default.ports": string[];
   "dappnode.dnp.default.volumes": string[];
@@ -398,6 +399,7 @@ export interface PackageContainer {
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
+  dockerTimeout?: number;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -809,6 +811,7 @@ export type InstallPackageDataPaths = Pick<
   | "manifestBackupPath"
   | "imagePath"
   | "isUpdate"
+  | "dockerTimeout"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -823,6 +826,7 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  dockerTimeout: number | undefined;
 }
 
 // Must be in-sync with SDK types
@@ -846,6 +850,9 @@ export interface PackageReleaseMetadata {
   runOrder?: string[];
   restartCommand?: string;
   restartLaunchCommand?: string;
+
+  // "15min" | 3600
+  dockerTimeout?: string;
 
   requirements?: {
     minimumDappnodeVersion: string;
