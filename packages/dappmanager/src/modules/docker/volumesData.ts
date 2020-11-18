@@ -59,7 +59,7 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
       const size = volDfData ? volDfData.UsageData.Size : undefined;
       const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
       // Check users for custom bind volumes
-      const isOrphan = !refCount;
+      const isOrphan = !refCount && !ownershipData.owner;
 
       // Custom mountpoint data
       const pathParts =
