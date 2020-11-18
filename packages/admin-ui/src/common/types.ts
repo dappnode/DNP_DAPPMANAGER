@@ -449,7 +449,6 @@ interface ManifestImage {
   size: number;
   path: string;
   volumes?: string[];
-  external_vol?: string[];
   ports?: string[];
   environment?: string[];
   restart?: string;
@@ -911,7 +910,6 @@ export interface PackageReleaseImageData {
   ports?: string[];
   environment?: string[];
   // Non-mergable properties
-  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];
