@@ -25,6 +25,11 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
     for (const vol of parseVolumeMappings(image.volumes))
       if (vol.name) volumes[vol.name] = {};
 
+  // FORBID, DEPRECATED features
+  if (((image as unknown) as { external_vol: string[] }).external_vol) {
+    throw Error("External volumes are not allowed");
+  }
+
   // Clean undefined and empty values
   // Using ternary operators and undefined to avoid using if statements
   // and have a clearer docker-compose looking syntax
