@@ -26,7 +26,9 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "labels",
   "logging"
 ];
-const volumeSafeKeys: (keyof ComposeVolumes)[] = ["external"];
+
+// Disallow external volumes to prevent packages accessing sensitive data of others
+const volumeSafeKeys: (keyof ComposeVolumes)[] = [];
 
 /**
  * Strict sanitation of a docker-compose to prevent
