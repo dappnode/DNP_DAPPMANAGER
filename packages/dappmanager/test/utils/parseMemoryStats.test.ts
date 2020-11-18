@@ -1,25 +1,23 @@
 import "mocha";
 import { expect } from "chai";
 import { parseMemoryStats } from "../../src/utils/parseMemoryStats";
+import osu from "node-os-utils";
 
 describe("Util: parseMemoryStats", async function() {
-  it("Should parse <free / --bytes> output", () => {
-    const freeOutput = `total        used        free      shared  buff/cache   available
-    Mem:    16535027712  5445357568  4503203840  1618006016  6586466304  9713278976
-    Swap:    2147479552           0  2147479552`;
+  it("Should parse osu.drive.info output", () => {
+    const freeOutput: osu.MemInfo = {
+      totalMemMb: 15769.03,
+      usedMemMb: 5313.41,
+      freeMemMb: 10455.62,
+      freeMemPercentage: 66.3
+    };
 
     const memoryStats = parseMemoryStats(freeOutput);
     expect(memoryStats).to.deep.equal({
-      memTotal: "16535027712",
-      memUsed: "5445357568",
-      free: "4503203840",
-      shared: "1618006016",
-      buffCache: "6586466304",
-      available: "9713278976",
-      swapTotal: "2147479552",
-      swapUsed: "0",
-      swapFree: "2147479552",
-      useFraction: 0
+      total: 16535026401,
+      used: 5571514204,
+      free: 10963512197,
+      freePercentage: 66.3
     });
   });
 });
