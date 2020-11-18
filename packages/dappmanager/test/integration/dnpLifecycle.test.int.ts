@@ -10,9 +10,10 @@ import {
   PortMapping,
   UserSettingsAllDnps,
   PackageContainer,
-  ManifestWithImage,
   PackageEnvs,
-  InstalledPackageData
+  InstalledPackageData,
+  Compose,
+  Manifest
 } from "../../src/types";
 import {
   clearDbs,
@@ -29,7 +30,7 @@ import {
 } from "../../src/modules/compose";
 import { containerInspect } from "../../src/modules/docker/dockerApi";
 import { listContainer } from "../../src/modules/docker/listContainers";
-import { uploadManifestRelease } from "../integrationSpecs";
+import { uploadDirectoryRelease } from "../integrationSpecs";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -137,36 +138,43 @@ describe("DNP lifecycle", function() {
     }
   };
 
-  const mainDnpManifest: ManifestWithImage = {
+  const manifestMain: Manifest = {
     name: dnpNameMain,
-    version: "0.1.0",
-    image: {
-      hash: "",
-      size: 0,
-      path: "",
-      environment: toEnvironment(envsMain),
-      volumes: [
-        "data:/usr",
-        `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
-      ],
-      external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
-      ports: stringifyPortMappings(Object.values(portsMain))
+    version: "0.1.0"
+  };
+  const composeMain: Compose = {
+    version: "3.4",
+    services: {
+      [dnpNameMain]: {
+        container_name: "",
+        image: "",
+        environment: toEnvironment(envsMain),
+        volumes: [
+          "data:/usr",
+          `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
+        ],
+        ports: stringifyPortMappings(Object.values(portsMain))
+      }
     }
   };
 
-  const dependencyManifest: ManifestWithImage = {
+  const manifestDep: Manifest = {
     name: dnpNameDep,
-    version: "0.1.0",
-    image: {
-      hash: "",
-      size: 0,
-      path: "",
-      environment: toEnvironment(envsDep),
-      volumes: [
-        "data:/usr",
-        `${volumesDep.changeme.name}:${volumesDep.changeme.container}`
-      ],
-      ports: stringifyPortMappings(Object.values(portsDep))
+    version: "0.1.0"
+  };
+  const composeDep: Compose = {
+    version: "3.4",
+    services: {
+      [dnpNameDep]: {
+        container_name: "",
+        image: "",
+        environment: toEnvironment(envsDep),
+        volumes: [
+          "data:/usr",
+          `${volumesDep.changeme.name}:${volumesDep.changeme.container}`
+        ],
+        ports: stringifyPortMappings(Object.values(portsDep))
+      }
     }
   };
 
@@ -250,12 +258,16 @@ describe("DNP lifecycle", function() {
     `Preparing releases for ${dnpNameMain} and ${dnpNameDep}`,
     async () => {
       // Prepare a package release with dependencies
-      const depDnpReleaseHash = await uploadManifestRelease(dependencyManifest);
-      mainDnpReleaseHash = await uploadManifestRelease({
-        ...mainDnpManifest,
-        dependencies: {
-          [dnpNameDep]: depDnpReleaseHash
-        }
+      const depDnpReleaseHash = await uploadDirectoryRelease({
+        manifest: manifestDep,
+        compose: composeDep
+      });
+      mainDnpReleaseHash = await uploadDirectoryRelease({
+        manifest: {
+          ...manifestMain,
+          dependencies: { [dnpNameDep]: depDnpReleaseHash }
+        },
+        compose: composeMain
       });
     }
   );
@@ -577,38 +589,24 @@ describe("DNP lifecycle", function() {
    * Restart volumes
    */
   describe("Restart volumes", () => {
-    // Main depends on the volume of dep, so main should be shutdown
-    it(`Should restart the package volumes of ${dnpNameDep}`, async () => {
-      const dnpMainPrev = await getDnpFromListPackages(dnpNameMain);
-      await calls.packageRestartVolumes({ dnpName: dnpNameDep });
-      const dnpMainNext = await getDnpFromListPackages(dnpNameMain);
+    for (const dnpName of [dnpNameMain, dnpNameDep]) {
+      it(`Should restart the package volumes of ${dnpName}`, async () => {
+        const dnpPrev = await getDnpFromListPackages(dnpName);
+        await calls.packageRestartVolumes({ dnpName: dnpName });
+        const dnpNext = await getDnpFromListPackages(dnpName);
 
-      // To know if main was restarted check that the container is different
-      if (!dnpMainPrev) throw Error(`DNP ${dnpNameMain} (prev) not found`);
-      if (!dnpMainNext) throw Error(`DNP ${dnpNameMain} (next) not found`);
-      const containerIdPrev = dnpMainPrev.containers[0].containerId;
-      const containerIdNext = dnpMainNext.containers[0].containerId;
+        // To know if main was restarted check that the container is different
+        if (!dnpPrev) throw Error(`DNP ${dnpName} (prev) not found`);
+        if (!dnpNext) throw Error(`DNP ${dnpName} (next) not found`);
+        const containerIdPrev = dnpPrev.containers[0].containerId;
+        const containerIdNext = dnpNext.containers[0].containerId;
 
-      expect(containerIdPrev).to.not.equal(
-        containerIdNext,
-        `${dnpNameMain} container ids are not different, so it was not reseted: ${containerIdPrev}`
-      );
-    });
-
-    it(`Should restart the package volumes of ${dnpNameMain}`, async () => {
-      await calls.packageRestartVolumes({ dnpName: dnpNameMain });
-      // #### NOTE: The volume "maindnpdappnodeeth_changeme-main" will not be actually
-      // removed but it's data will not. Only the reference in /var/lib/docker
-      // is deleted
-      // #### NOTE: order of the message is not guaranteed, check it by parts
-      // Possible message: `Restarted ${dnpNameMain} volumes: maindnpdappnodeeth_changeme-main, maindnpdappnodeeth_data`
-      // for (const messagePart of [
-      //   dnpNameMain,
-      //   "maindnpdappnodeeth_changeme-main",
-      //   "maindnpdappnodeeth_data"
-      // ])
-      //   expect(res.message).to.include(messagePart, "Wrong result message");
-    });
+        expect(containerIdPrev).to.not.equal(
+          containerIdNext,
+          `${dnpName} container ids are not different, so it was not reseted: ${containerIdPrev}`
+        );
+      });
+    }
   });
 
   /**
