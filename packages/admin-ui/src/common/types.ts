@@ -938,7 +938,6 @@ export interface MountpointData {
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
 }
 
 export interface VolumeData extends VolumeOwnershipData {

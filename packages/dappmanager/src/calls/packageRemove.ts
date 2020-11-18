@@ -9,7 +9,6 @@ import {
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/listContainers";
-import { assertNoExternalVolumeUsers } from "../modules/docker/restartPackageVolumes";
 
 /**
  * Remove package data: docker down + disk files
@@ -42,10 +41,6 @@ export async function packageRemove({
   // not be renewed in the next interval
 
   if (fs.existsSync(composePath)) {
-    if (deleteVolumes) {
-      await assertNoExternalVolumeUsers(dnp);
-    }
-
     await dockerComposeDown(composePath, {
       volumes: deleteVolumes,
       timeout

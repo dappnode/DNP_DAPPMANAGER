@@ -89,22 +89,27 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return execDocker(["volume", "rm", volumeName], { f: true });
 }
 
-export function dockerStart(containerNames: string[]): Promise<string> {
-  return execDocker(["start", ...containerNames]);
+export function dockerStart(
+  containerNames: string | string[]
+): Promise<string> {
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["start", ...ids]);
 }
 
 export function dockerStop(
-  containerNames: string[],
+  containerNames: string | string[],
   { time }: { time?: number } = {}
 ): Promise<string> {
-  return execDocker(["stop", ...containerNames], { time });
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["stop", ...ids], { time });
 }
 
 export function dockerRm(
-  containerNames: string[],
+  containerNames: string | string[],
   { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  return execDocker(["rm", ...containerNames], { force: true, volumes });
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["rm", ...ids], { force: true, volumes });
 }
 
 interface ImageManifest {
@@ -169,4 +174,8 @@ export function dockerCopyFileFrom(
 
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
+}
+
+function parseContainerIdArg(containerNames: string | string[]): string[] {
+  return Array.isArray(containerNames) ? containerNames : [containerNames];
 }

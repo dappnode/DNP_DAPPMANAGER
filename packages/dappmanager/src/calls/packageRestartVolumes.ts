@@ -1,12 +1,18 @@
 import fs from "fs";
+import { uniq } from "lodash";
 import { listPackage } from "../modules/docker/listContainers";
 import { dockerComposeUp, dockerRm } from "../modules/docker/dockerCommands";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import { getContainersAndVolumesToRemove } from "../modules/docker/restartPackageVolumes";
 import * as eventBus from "../eventBus";
 import * as getPath from "../utils/getPath";
 import params from "../params";
 import { logs } from "../logs";
+import {
+  DockerVolumeListItem,
+  dockerVolumesList
+} from "../modules/docker/dockerApi";
+import { isVolumeOwner } from "../modules/docker/volumesData";
+import { InstalledPackageData } from "../types";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -25,6 +31,7 @@ export async function packageRestartVolumes({
 
   // Needs the extended info that includes the volume ownership data
   // Fetching all containers to not re-fetch below
+  const volumes = await dockerVolumesList();
   const dnp = await listPackage({ dnpName });
   if (dnp.dnpName === params.dappmanagerDnpName)
     throw Error("The dappmanager cannot be restarted");
@@ -37,7 +44,7 @@ export async function packageRestartVolumes({
   const {
     volumesToRemove,
     containersToRemove
-  } = getContainersAndVolumesToRemove(dnp, volumeName);
+  } = getContainersAndVolumesToRemove(dnp, volumeName, volumes);
   logs.debug({ dnpName, volumesToRemove, containersToRemove });
 
   // Skip early to prevent calling dockerComposeUp
@@ -60,4 +67,41 @@ export async function packageRestartVolumes({
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnpName] });
+}
+
+/**
+ * Util: Remove all package volumes => compute list of packages and volumes to remove
+ */
+export function getContainersAndVolumesToRemove(
+  dnp: InstalledPackageData,
+  volumeName: string | undefined,
+  volumes: DockerVolumeListItem[]
+): {
+  containersToRemove: string[];
+  volumesToRemove: string[];
+} {
+  // All volumes
+  const volumesToRemove: string[] = [];
+  const containersToRemove: string[] = [];
+
+  for (const container of dnp.containers) {
+    for (const vol of container.volumes) {
+      // Pick only named volumes
+      // Pick either the selected `volumeName` or all volumes
+      if (vol.name && (!volumeName || volumeName === vol.name)) {
+        const volData = volumes.find(v => v.Name === vol.name);
+        // Pick only own volumes (same compose project) unless isCore or noData
+        if (dnp.isCore || !volData || isVolumeOwner(dnp, volData)) {
+          // TODO: Make sure only to add volumes that are NOT external
+          volumesToRemove.push(vol.name);
+          containersToRemove.push(container.containerName);
+        }
+      }
+    }
+  }
+
+  return {
+    containersToRemove: uniq(containersToRemove),
+    volumesToRemove: uniq(volumesToRemove)
+  };
 }
