@@ -47,7 +47,11 @@ export async function packageRemove({
   let hasRemoved = false;
   if (fs.existsSync(composePath)) {
     try {
-      await dockerComposeDown(composePath, { volumes: deleteVolumes, timeout });
+      await dockerComposeDown(composePath, {
+        volumes: deleteVolumes,
+        // Ignore timeout is user doesn't want to keep any data
+        timeout: deleteVolumes ? undefined : timeout
+      });
       hasRemoved = true; // To mimic an early return
     } catch (e) {
       logs.error(`Error on dockerComposeDown of ${dnp.dnpName}`, e);
