@@ -6,7 +6,9 @@ import * as calls from "../../src/calls";
 import {
   createTestDir,
   mockManifestWithImage,
-  beforeAndAfter
+  beforeAndAfter,
+  cleanRepos,
+  cleanContainers
 } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
@@ -41,6 +43,12 @@ describe("Resilience features, when things go wrong", function() {
 
   before("Upload a vanilla package", async () => {
     releaseHash = await uploadManifestRelease(manifest);
+  });
+
+  afterEach("Clean environment", async () => {
+    // SUPER important to clean dnp_repo folder to avoid caches
+    await cleanRepos();
+    await cleanContainers(dnpName);
   });
 
   describe("Remove a package without compose", () => {
