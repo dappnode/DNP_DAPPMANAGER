@@ -1,33 +1,18 @@
 import { HostStatMemory } from "../types";
+import { toBytes } from "./toBytes";
+import osu from "node-os-utils";
 
 /**
  * Parses the 'free /' bash output command
  * @param mem string with memory usage info
  */
-export function parseMemoryStats(freeOutput: string): HostStatMemory {
-  const [headers, row1, row2] = freeOutput.split("\n");
-  const [
-    memoryTitle,
-    memTotal,
-    memUsed,
-    free,
-    shared,
-    buffCache,
-    available
-  ] = row1.trim().split(/\s+/);
-
-  const [swapTitle, swapTotal, swapUsed, swapFree] = row2.trim().split(/\s+/);
+export function parseMemoryStats(stats: osu.MemInfo): HostStatMemory {
+  const memoryStats = Object.values(stats).map(item => toBytes(item, "mb"));
 
   return {
-    memTotal,
-    memUsed,
-    free,
-    shared,
-    buffCache,
-    available,
-    swapTotal,
-    swapUsed,
-    swapFree,
-    useFraction: parseInt(swapUsed) / parseInt(memTotal)
+    total: memoryStats[0],
+    used: memoryStats[1],
+    free: memoryStats[2],
+    freePercentage: stats.freeMemPercentage
   };
 }
