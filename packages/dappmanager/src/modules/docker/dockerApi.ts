@@ -214,7 +214,7 @@ interface DockerApiListVolumesOptions {
   name?: string[]; // "<name> a container's name";
 }
 
-interface DockerVolumeListItem {
+export interface DockerVolumeListItem {
   CreatedAt: string; // "2019-12-10T11:54:22+01:00";
   Driver: string; // "local";
   Labels: { [labelKey: string]: string }; // { "com.docker.compose.version": "1.22.0" };

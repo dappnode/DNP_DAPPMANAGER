@@ -79,7 +79,6 @@ describe("Fetch releases", () => {
         path: "",
         environment: ["ENV_DEFAULT=ORIGINAL"],
         volumes: ["data0:/usr0", "data1:/usr1", "data2:/usr2"],
-        external_vol: ["dependencydnpdappnodeeth_data:/usrdep"],
         ports: ["1111:1111"]
       },
       setupWizard: {
@@ -194,14 +193,7 @@ describe("Fetch releases", () => {
         },
         specialPermissions: {
           [dnpNameDep]: [],
-          [dnpNameMain]: [
-            {
-              name: "Access to package volume",
-              details:
-                "Allows to read and write to the volume dependencydnpdappnodeeth_data",
-              serviceName: dnpNameMain
-            }
-          ]
+          [dnpNameMain]: []
         },
 
         setupWizard: {
@@ -285,8 +277,8 @@ describe("Fetch releases", () => {
       };
 
       // Ignore in result checking, not relevant
-      delete result.imageSize;
-      delete expectRequestDnp.imageSize;
+      result.imageSize = NaN;
+      expectRequestDnp.imageSize = NaN;
       expect(result).to.deep.equal(expectRequestDnp);
     });
   });

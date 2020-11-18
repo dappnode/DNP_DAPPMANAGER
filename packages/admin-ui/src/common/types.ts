@@ -429,13 +429,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
    * Checks if there are volumes to be removed on this DNP
    */
   areThereVolumesToRemove: boolean;
-  /**
-   * If there are volumes which this DNP is the owner and some other
-   * DNPs are users, they will be removed by the DAPPMANAGER.
-   */
-  volumeUsersToRemove: string[];
   dependantsOf: string[];
-  namedExternalVols: VolumeOwnershipData[];
   // Non-indexed data
   manifest?: Manifest;
 }
@@ -455,7 +449,6 @@ interface ManifestImage {
   size: number;
   path: string;
   volumes?: string[];
-  external_vol?: string[];
   ports?: string[];
   environment?: string[];
   restart?: string;
@@ -482,8 +475,8 @@ export interface ManifestWithImage extends Manifest {
 export interface ComposeVolumes {
   // volumeName: "dncore_ipfsdnpdappnodeeth_data"
   [volumeName: string]: {
-    // Allowed to user
-    external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
+    // FORBIDDEN
+    // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
     // NOT allowed to user, only used by DAppNode internally (if any)
     name?: string; // Volumes can only be declared locally or be external
     driver?: string; // Dangerous
@@ -917,7 +910,6 @@ export interface PackageReleaseImageData {
   ports?: string[];
   environment?: string[];
   // Non-mergable properties
-  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];
@@ -944,7 +936,6 @@ export interface MountpointData {
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
 }
 
 export interface VolumeData extends VolumeOwnershipData {
