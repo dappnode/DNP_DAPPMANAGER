@@ -9,6 +9,7 @@ import {
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/listContainers";
+import { logs } from "../logs";
 
 /**
  * Remove package data: docker down + disk files
@@ -33,20 +34,30 @@ export async function packageRemove({
     throw Error("Core packages cannot be cannot be removed");
   }
 
-  // Only no-cores will
+  // Only no-cores reach this block
   const composePath = getPath.dockerCompose(dnp.dnpName, false);
   const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
 
   // [NOTE] Not necessary to close the ports since they will just
   // not be renewed in the next interval
 
+  // If there is no docker-compose, do a docker rm directly
+  // Otherwise, try to do a docker-compose down and if it fails,
+  // log to console and do docker-rm
+  let hasRemoved = false;
   if (fs.existsSync(composePath)) {
-    await dockerComposeDown(composePath, {
-      volumes: deleteVolumes,
-      timeout
-    });
-  } else {
-    // Still try to delete the package if there is not compose
+    try {
+      await dockerComposeDown(composePath, {
+        volumes: deleteVolumes,
+        timeout
+      });
+      hasRemoved = true; // To mimic an early return
+    } catch (e) {
+      logs.error(`Error on dockerComposeDown of ${dnp.dnpName}`, e);
+    }
+  }
+
+  if (!hasRemoved) {
     const containerNames = dnp.containers.map(c => c.containerName);
     await dockerStop(containerNames, { time: timeout });
     await dockerRm(containerNames, { volumes: deleteVolumes });
