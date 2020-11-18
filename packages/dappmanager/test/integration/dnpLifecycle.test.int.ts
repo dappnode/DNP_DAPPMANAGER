@@ -604,7 +604,7 @@ describe("DNP lifecycle", function() {
     for (const dnpName of [dnpNameMain, dnpNameDep]) {
       it(`Should restart the package volumes of ${dnpName}`, async () => {
         const dnpPrev = await getDnpFromListPackages(dnpName);
-        await calls.packageRestartVolumes({ dnpName: dnpName });
+        await calls.packageRestartVolumes({ dnpName });
         const dnpNext = await getDnpFromListPackages(dnpName);
 
         // To know if main was restarted check that the container is different
@@ -622,24 +622,16 @@ describe("DNP lifecycle", function() {
   });
 
   /**
-   * Uninstall the DNP
-   * - Test `deleteVolumes: true` for dependency. It should also remove main
-   * - Test a normal delete for main
+   * Remove packages
    */
-
-  describe("Uninstall the DNP", () => {
-    before(`Should remove DNP ${dnpNameDep}`, async () => {
-      await calls.packageRemove({ dnpName: dnpNameDep, deleteVolumes: true });
-    });
-
-    // Since main depends on a volume of main, it will removed at the same time
-    // as dependency
-    it(`DNP ${dnpNameDep} and ${dnpNameMain} should be removed`, async () => {
-      const stateDep = await getDnpState(dnpNameDep);
-      expect(stateDep).to.equal("down");
-      const stateMain = await getDnpState(dnpNameMain);
-      expect(stateMain).to.equal("down");
-    });
+  describe("Remove packages", () => {
+    for (const dnpName of [dnpNameMain, dnpNameDep]) {
+      it(`Should remove DNP ${dnpName}`, async () => {
+        await calls.packageRemove({ dnpName, deleteVolumes: true });
+        const state = await getDnpState(dnpName);
+        expect(state).to.equal("down");
+      });
+    }
   });
 });
 
