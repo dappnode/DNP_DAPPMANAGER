@@ -5,15 +5,10 @@ import { getEthClientPrettyName } from "components/EthMultiClient";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
-import { getDnpInstalledByDnpName } from "services/dnpInstalled/selectors";
-import {
-  getEthClientTarget,
-  getVolumes
-} from "services/dappnodeStatus/selectors";
+import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { EthClientTarget } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { markdownList } from "utils/markdown";
 
 // Redux Thunk actions
 
@@ -108,33 +103,13 @@ export const volumeRemove = (name: string): AppThunk => async dispatch => {
 export const packageVolumeRemove = (
   dnpName: string,
   volName: string
-): AppThunk => async (dispatch, getState) => {
+): AppThunk => async () => {
   // Make sure there are no colliding volumes with this DNP
-  const dnp = getDnpInstalledByDnpName(getState(), dnpName);
-  const volumesData = getVolumes(getState());
   const prettyDnpName = shortNameCapitalized(dnpName);
   const prettyVolName = prettyVolumeName(volName, dnpName).name;
   const prettyVolRef = `${prettyDnpName} ${prettyVolName} volume`;
 
   const warningsList: { title: string; body: string }[] = [];
-  /**
-   * If there are volumes which this DNP is the owner and some other
-   * DNPs are users, they will be removed by the DAPPMANAGER.
-   * Alert the user about this fact
-   */
-  if (dnp) {
-    const vol = volumesData.find(v => v.name === volName);
-    if (vol && vol.users) {
-      const externalUsers = vol.users.filter(d => d !== dnpName);
-      if (externalUsers.length > 0) {
-        const externalUsersList = markdownList(externalUsers);
-        warningsList.push({
-          title: "Warning! DAppNode Packages to be removed",
-          body: `Some other DAppNode Packages will be reseted in order to remove ${prettyVolRef}. \n\n ${externalUsersList}`
-        });
-      }
-    }
-  }
 
   // If there are NOT conflicting volumes,
   // Display a dialog to confirm volumes reset
