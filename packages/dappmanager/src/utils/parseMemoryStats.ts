@@ -7,9 +7,7 @@ import osu from "node-os-utils";
  * @param mem string with memory usage info
  */
 export function parseMemoryStats(stats: osu.MemInfo): HostStatMemory {
-  const memoryStats = Object.values(stats).map(item =>
-    toBytes({ amount: item, option: { meassure: "mb" } })
-  );
+  const memoryStats = Object.values(stats).map(item => toBytes(item, "mb"));
 
   return {
     total: memoryStats[0],

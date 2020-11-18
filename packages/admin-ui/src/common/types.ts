@@ -1084,12 +1084,6 @@ export interface HostStatDisk {
 export interface HostStatCpu {
   usedPercentage: number;
 }
-/**
- * Types of conversions accepted by toBytes() function
- */
-export interface ToBytes {
-  meassure: "kb" | "mb" | "gb";
-}
 
 /**
  * Summary of diagnose checks performed by the DAppNode host

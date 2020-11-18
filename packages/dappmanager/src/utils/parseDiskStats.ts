@@ -7,9 +7,7 @@ import osu from "node-os-utils";
  * @param disk string with disk usage info
  */
 export function parseDiskStats(stats: osu.DriveInfo): HostStatDisk {
-  const diskStats = Object.values(stats).map(item =>
-    toBytes({ amount: item, option: { meassure: "gb" } })
-  );
+  const diskStats = Object.values(stats).map(item => toBytes(item, "gb"));
 
   return {
     total: diskStats[0],
