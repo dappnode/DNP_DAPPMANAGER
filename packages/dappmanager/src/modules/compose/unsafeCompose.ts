@@ -74,9 +74,7 @@ export function parseUnsafeCompose(
       })
     ),
 
-    volumes: mapValues(composeUnsafe.volumes || {}, vol =>
-      pick(vol, volumeSafeKeys)
-    ),
+    volumes: parseUnsafeVolumes(composeUnsafe.volumes),
 
     networks: isCore
       ? composeUnsafe.networks || {
@@ -89,6 +87,20 @@ export function parseUnsafeCompose(
           [params.DNP_NETWORK_EXTERNAL_NAME]: { external: true }
         }
   });
+}
+
+function parseUnsafeVolumes(
+  volumes: ComposeVolumes | undefined
+): ComposeVolumes | undefined {
+  if (!volumes) return undefined;
+
+  // External volumes are not allowed
+  for (const [volName, vol] of Object.entries(volumes)) {
+    if ((vol as { external: boolean }).external)
+      throw Error(`External volumes are not allowed '${volName}'`);
+  }
+
+  return mapValues(volumes, vol => pick(vol, volumeSafeKeys));
 }
 
 /**

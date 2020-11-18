@@ -193,14 +193,7 @@ describe("Fetch releases", () => {
         },
         specialPermissions: {
           [dnpNameDep]: [],
-          [dnpNameMain]: [
-            {
-              name: "Access to package volume",
-              details:
-                "Allows to read and write to the volume dependencydnpdappnodeeth_data",
-              serviceName: dnpNameMain
-            }
-          ]
+          [dnpNameMain]: []
         },
 
         setupWizard: {
