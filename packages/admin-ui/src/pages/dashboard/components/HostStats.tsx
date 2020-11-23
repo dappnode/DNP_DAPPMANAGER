@@ -79,7 +79,7 @@ export function HostStats() {
       <StatsCardContainer title={"memory"}>
         {memoryStats.data ? (
           <StatsCardOk
-            percent={memoryStats.data.freePercentage}
+            percent={memoryStats.data.usedPercentage}
             text={
               humanFileSize(memoryStats.data.used) +
               " / " +
