@@ -7,13 +7,10 @@ import osu from "node-os-utils";
  * @param disk string with disk usage info
  */
 export function parseDiskStats(stats: osu.DriveInfo): HostStatDisk {
-  const diskStats = Object.values(stats).map(item => toBytes(item, "gb"));
-
   return {
-    total: diskStats[0],
-    used: diskStats[1],
-    free: diskStats[2],
-    usedPercentage: stats.usedPercentage,
-    freePercentage: stats.freePercentage
+    total: toBytes(stats.totalGb, "gb"),
+    used: toBytes(stats.usedGb, "gb"),
+    free: toBytes(stats.freeGb, "gb"),
+    usedPercentage: stats.usedPercentage
   };
 }

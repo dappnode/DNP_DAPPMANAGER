@@ -1062,7 +1062,7 @@ export interface HostStatMemory {
   total: number;
   used: number;
   free: number;
-  freePercentage: number;
+  usedPercentage: number;
 }
 
 /**
@@ -1073,7 +1073,6 @@ export interface HostStatDisk {
   used: number;
   free: number;
   usedPercentage: number;
-  freePercentage: number;
 }
 
 /**

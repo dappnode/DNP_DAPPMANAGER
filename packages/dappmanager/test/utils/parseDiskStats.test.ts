@@ -13,13 +13,14 @@ describe("Util: parseDiskStats", async function() {
       freePercentage: 91.3
     };
 
-    const diskStats = parseDiskStats(dfOutput);
-    expect(diskStats).to.deep.equal({
+    const expectedResult: ReturnType<typeof parseDiskStats> = {
       total: 1006525585818,
       used: 35970351104,
       free: 919337749709,
-      usedPercentage: 3.6,
-      freePercentage: 91.3
-    });
+      usedPercentage: 3.6
+    };
+
+    const diskStats = parseDiskStats(dfOutput);
+    expect(diskStats).to.deep.equal(expectedResult);
   });
 });

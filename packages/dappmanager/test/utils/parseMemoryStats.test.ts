@@ -12,12 +12,14 @@ describe("Util: parseMemoryStats", async function() {
       freeMemPercentage: 66.3
     };
 
-    const memoryStats = parseMemoryStats(freeOutput);
-    expect(memoryStats).to.deep.equal({
+    const expectedResult: ReturnType<typeof parseMemoryStats> = {
       total: 16535026401,
       used: 5571514204,
       free: 10963512197,
-      freePercentage: 66.3
-    });
+      usedPercentage: 33.7
+    };
+
+    const memoryStats = parseMemoryStats(freeOutput);
+    expect(memoryStats).to.deep.equal(expectedResult);
   });
 });
