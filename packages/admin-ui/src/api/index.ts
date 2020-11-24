@@ -157,9 +157,6 @@ export function start() {
     mapSubscriptionsToRedux(subscriptions);
     initialCallsOnOpen();
 
-    // For testing:
-    window.call = (event, args) => socket.emit(event, args);
-
     // Delay announcing session is open until everything is setup
     store.dispatch(connectionOpen());
     /* eslint-disable-next-line no-console */
