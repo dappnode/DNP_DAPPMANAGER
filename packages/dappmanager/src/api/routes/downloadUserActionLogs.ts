@@ -1,10 +1,10 @@
-import express from "express";
 import * as logUserAction from "../../logUserAction";
+import { wrapHandler } from "../utils";
 
 /**
  * Endpoint to download user action logs.
  */
-export const downloadUserActionLogs: express.Handler = async (req, res) => {
+export const downloadUserActionLogs = wrapHandler(async (req, res) => {
   const logs = logUserAction.get();
 
   const filename = `dappnode-user-action-logs_${new Date().toISOString()}.json`;
@@ -13,4 +13,4 @@ export const downloadUserActionLogs: express.Handler = async (req, res) => {
   res.setHeader("Content-type", mimetype);
 
   res.status(200).send(JSON.stringify(logs, null, 2));
-};
+});

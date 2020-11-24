@@ -1,14 +1,14 @@
-import express from "express";
 import {
   listContainers,
   listContainerNoThrow
 } from "../../modules/docker/listContainers";
 import { PackageContainer } from "../../types";
+import { wrapHandler } from "../utils";
 
 /**
  * Query publicly available packages data
  */
-export const publicPackagesData: express.Handler = async (req, res) => {
+export const publicPackagesData = wrapHandler(async (req, res) => {
   const containerName = req.params.containerName as string | undefined;
 
   if (containerName) {
@@ -22,7 +22,7 @@ export const publicPackagesData: express.Handler = async (req, res) => {
     const privateDnpData = await listContainers();
     res.status(200).send(privateDnpData.map(getPublicPackageData));
   }
-};
+});
 
 /**
  * Return only non-sensitive data

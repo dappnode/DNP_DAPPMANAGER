@@ -34,6 +34,7 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_SESSIONS_PATH: path.resolve(DNCORE_DIR, "sessions.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out

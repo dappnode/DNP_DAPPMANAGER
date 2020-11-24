@@ -1,12 +1,12 @@
-import express from "express";
 import { pick } from "lodash";
 import { listPackage } from "../../modules/docker/listContainers";
 import { readManifestIfExists } from "../../modules/manifest";
+import { wrapHandler } from "../utils";
 
 /**
  * Query publicly available packages data
  */
-export const packageManifest: express.Handler = async (req, res) => {
+export const packageManifest = wrapHandler(async (req, res) => {
   const dnpName = req.params.dnpName as string | undefined;
   if (!dnpName) throw Error(`Must provide containerName`);
 
@@ -54,4 +54,4 @@ export const packageManifest: express.Handler = async (req, res) => {
   ]);
 
   res.status(200).send(filteredManifest);
-};
+});

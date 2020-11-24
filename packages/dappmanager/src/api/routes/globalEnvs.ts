@@ -1,10 +1,10 @@
-import express from "express";
 import { GlobalEnvs, computeGlobalEnvsFromDb } from "../../modules/globalEnvs";
+import { wrapHandler } from "../utils";
 
 /**
  * Query publicly available global envs
  */
-export const globalEnvs: express.Handler = async (req, res) => {
+export const globalEnvs = wrapHandler(async (req, res) => {
   const name = req.params.name as keyof GlobalEnvs | undefined;
   const globalEnvs = computeGlobalEnvsFromDb();
 
@@ -19,4 +19,4 @@ export const globalEnvs: express.Handler = async (req, res) => {
   } else {
     res.status(200).send(globalEnvs);
   }
-};
+});

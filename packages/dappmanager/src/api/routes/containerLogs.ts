@@ -1,11 +1,11 @@
-import express from "express";
 import * as calls from "../../calls";
+import { wrapHandler } from "../utils";
 
 /**
  * Endpoint to download all logs of a container as a file
  * Necessary to download large log files
  */
-export const containerLogs: express.Handler = async (req, res) => {
+export const containerLogs = wrapHandler(async (req, res) => {
   const containerName = req.params.containerName as string | undefined;
   if (!containerName) throw Error(`Must provide containerName`);
 
@@ -17,4 +17,4 @@ export const containerLogs: express.Handler = async (req, res) => {
   res.setHeader("Content-type", mimetype);
 
   res.status(200).send(logs);
-};
+});

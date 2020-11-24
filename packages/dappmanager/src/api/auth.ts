@@ -1,4 +1,7 @@
 import express from "express";
+import { HttpError, wrapHandler } from "./utils";
+
+// Initial insecure IP auth
 
 const allowAllIps = Boolean(process.env.ALLOW_ALL_IPS);
 
@@ -19,12 +22,73 @@ export function isAdminIp(ip: string): boolean {
   return allowAllIps || authorizedIpPrefixes.some(_ip => ip.includes(_ip));
 }
 
-export function isAdmin(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+export const isAdmin = wrapHandler((req, res, next): void => {
   const ip = req.ip;
   if (isAdminIp(ip)) next();
-  else res.status(403).send(`Requires admin permission. Forbidden ip: ${ip}`);
+  else
+    throw new HttpError(`Requires admin permission. Forbidden ip: ${ip}`, 403);
+});
+
+// Cookie auth
+
+const disablePassword = false;
+let adminPassword: string | null = null;
+
+declare module "express-session" {
+  interface SessionData {
+    isAdmin: boolean;
+  }
 }
+
+export const registerAdmin = wrapHandler((req, res) => {
+  const password = req.body.password;
+  if (!password) throw new HttpError("Missing credentials");
+
+  adminPassword = password;
+
+  res.send({ ok: true });
+});
+
+export const changeAdminPassword = wrapHandler((req, res) => {
+  const password = req.body.password;
+  const newPassword = req.body.newPassword;
+  if (!password) throw new HttpError("Missing credentials");
+  if (!adminPassword) throw new HttpError("Not registered");
+  if (password !== adminPassword) throw new HttpError("Wrong password");
+
+  adminPassword = newPassword;
+
+  res.send({ ok: true });
+});
+
+export const loginAdmin = wrapHandler((req, res) => {
+  if (!req.session) throw new HttpError("No session");
+
+  const password = req.body.password;
+  if (!password) throw new HttpError("Missing credentials");
+  if (!adminPassword) throw new HttpError("Not registered");
+  if (password !== adminPassword) throw new HttpError("Wrong password");
+
+  req.session.isAdmin = true;
+  res.send({ id: req.session.id });
+});
+
+export const logoutAdmin = wrapHandler(async (req, res) => {
+  if (!req.session) return new HttpError("No session");
+  const id = req.session.id;
+
+  await new Promise((resolve, reject) => {
+    req.session.destroy(err => (err ? reject(err) : resolve()));
+  });
+
+  res.send({ id });
+});
+
+export const onlyAdmin = wrapHandler((req, res, next) => {
+  if (disablePassword) return next();
+  if (!req.session) throw new HttpError("No session");
+  if (!req.headers["cookie"]) throw new HttpError("No cookie", 400);
+
+  if (req.session.isAdmin) next();
+  else throw new HttpError("Forbidden", 403);
+});

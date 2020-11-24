@@ -7,8 +7,8 @@ import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
 import params from "../params";
-import { isAdmin, isAdminIp } from "./auth";
-import { wrapHandler } from "./utils";
+import { loginAdmin, logoutAdmin, onlyAdmin, registerAdmin } from "./auth";
+import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
 import * as methods from "../calls";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
 import {
@@ -28,6 +28,7 @@ import { downloadUserActionLogs } from "./routes/downloadUserActionLogs";
 import { globalEnvs } from "./routes/globalEnvs";
 import { publicPackagesData } from "./routes/publicPackagesData";
 import { packageManifest } from "./routes/packageManifest";
+import { sessionHandler } from "./sessions";
 
 const httpApiPort = params.HTTP_API_PORT;
 const uiFilesPath = params.UI_FILES_PATH;
@@ -47,16 +48,38 @@ const whitelist = [
  */
 export default function startHttpApi(
   port: number | string = httpApiPort
-): void {
+): http.Server {
   const app = express();
   const server = new http.Server(app);
   const io = socketio(server, { serveClient: false });
 
-  io.use((socket, next) => {
-    const ip = socket.handshake.address;
-    if (isAdminIp(ip)) next();
-    else next(new Error(`Requires admin permission. Forbidden ip: ${ip}`));
+  // Subscriptions
+  const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
+  mapSubscriptionsToEventBus(subscriptions);
+
+  const rpcHandler = getRpcHandler(methods, routesLogger);
+  const ethForwardHandler = getEthForwardHandler();
+
+  app.disable("x-powered-by");
+  // Intercept decentralized website requests first
+  app.use((req, res, next) => {
+    if (isDwebRequest(req)) ethForwardHandler(req, res);
+    else next();
   });
+  // default options. ALL CORS + limit fileSize and file count
+  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
+  // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
+  app.use(cors({ credentials: true, origin: whitelist }));
+  app.use(compression());
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
+  app.use(sessionHandler);
+
+  // sessionHandler will mutate socket.handshake attaching .session object
+  // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
+  io.use(toSocketIoHandler(sessionHandler));
+  io.use(toSocketIoHandler(onlyAdmin));
 
   io.on("connection", socket => {
     console.log(`Socket connected`, socket.id);
@@ -76,50 +99,32 @@ export default function startHttpApi(
     );
   });
 
-  // Subscriptions
-  const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
-  mapSubscriptionsToEventBus(subscriptions);
-
-  const rpcHandler = getRpcHandler(methods, routesLogger);
-  const ethForwardHandler = getEthForwardHandler();
-
-  // Intercept decentralized website requests first
-  app.use((req, res, next) => {
-    if (isDwebRequest(req)) ethForwardHandler(req, res);
-    else next();
-  });
-  // default options. ALL CORS + limit fileSize and file count
-  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
-  // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
-  app.use(cors({ credentials: true, origin: whitelist }));
-  app.use(compression());
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(express.static(path.resolve(uiFilesPath), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
+  app.post("/login", loginAdmin);
+  app.post("/logout", onlyAdmin, logoutAdmin);
+  app.post("/register", registerAdmin);
 
   // Ping - health check
-  app.get("/ping", isAdmin, (req, res) => res.send(req.body));
+  app.get("/ping", onlyAdmin, (_, res) => res.send({}));
 
   // Methods that do not fit into RPC
-  app.get(
-    "/container-logs/:containerName",
-    isAdmin,
-    wrapHandler(containerLogs)
-  );
-  app.get("/download/:fileId", isAdmin, wrapHandler(download));
-  app.get("/user-action-logs", isAdmin, wrapHandler(downloadUserActionLogs));
-  app.post("/upload", isAdmin, wrapHandler(upload));
+  app.get("/container-logs/:containerName", onlyAdmin, containerLogs);
+  app.get("/download/:fileId", onlyAdmin, download);
+  app.get("/user-action-logs", onlyAdmin, downloadUserActionLogs);
+  app.post("/upload", onlyAdmin, upload);
   // Open endpoints (no auth)
-  app.get("/global-envs/:name?", wrapHandler(globalEnvs));
-  app.get("/public-packages/:containerName?", wrapHandler(publicPackagesData));
-  app.get("/package-manifest/:dnpName", wrapHandler(packageManifest));
+  app.get("/global-envs/:name?", globalEnvs);
+  app.get("/public-packages/:containerName?", publicPackagesData);
+  app.get("/package-manifest/:dnpName", packageManifest);
 
   // Rest of RPC methods
   app.post(
     "/rpc",
-    isAdmin,
+    onlyAdmin,
     wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
   );
+
+  // Default error handler must be the last
+  app.use(errorHandler);
 
   // Serve UI. React-router, index.html at all routes
   app.get("*", (req, res) =>
@@ -127,4 +132,5 @@ export default function startHttpApi(
   );
 
   server.listen(port, () => logs.info(`HTTP API ${port}`));
+  return server;
 }

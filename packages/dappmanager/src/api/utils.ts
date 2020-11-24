@@ -1,4 +1,5 @@
 import express from "express";
+import { Server } from "socket.io";
 
 export class HttpError extends Error {
   code: number;
@@ -19,12 +20,39 @@ export function wrapHandler(
     try {
       await handler(req, res, next);
     } catch (e) {
-      const error = { message: e.message, data: e.stack };
-      if (e instanceof HttpError) {
-        res.status(e.code).send({ error });
-      } else {
-        res.status(500).send({ error });
-      }
+      next(e);
     }
+  };
+}
+
+export const errorHandler: express.ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  next
+) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+  if (err instanceof HttpError) {
+    res.status(err.code).send({
+      error: { message: err.message }
+    });
+  } else {
+    res.status(500).send({
+      error: { message: err.message, data: err.stack }
+    });
+  }
+};
+
+export function toSocketIoHandler(
+  expressHandler: express.Handler
+): Parameters<Server["use"]>[0] {
+  return function(socket, next): void {
+    expressHandler(
+      (socket.handshake as unknown) as express.Request,
+      {} as express.Response,
+      next
+    );
   };
 }
