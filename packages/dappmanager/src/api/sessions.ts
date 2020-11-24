@@ -14,8 +14,16 @@ export function getSessionsSecretKey(): string {
 }
 
 export const sessionHandler = Session({
-  resave: false,
-  saveUninitialized: false,
+  cookie: {
+    path: "/",
+    httpOnly: true, // for security
+    secure: false, // DAppNode UI is server over HTTP
+    maxAge: 86400, // 1 day
+    sameSite: "strict" // for security
+  },
+  resave: true, // Recommended by express-session docs.
+  rolling: false, // Cookie expires on original maxAge
+  saveUninitialized: false, // Reduce server storage
   secret: getSessionsSecretKey(),
   store: new SessionStoreLowDb({
     dbPath: params.DB_SESSIONS_PATH,

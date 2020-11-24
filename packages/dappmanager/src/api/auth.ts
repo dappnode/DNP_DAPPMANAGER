@@ -1,4 +1,3 @@
-import express from "express";
 import { HttpError, wrapHandler } from "./utils";
 
 // Initial insecure IP auth
