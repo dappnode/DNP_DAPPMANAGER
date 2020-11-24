@@ -7,7 +7,14 @@ import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
 import params from "../params";
-import { loginAdmin, logoutAdmin, onlyAdmin, registerAdmin } from "./auth";
+import {
+  changeAdminPassword,
+  loginAdmin,
+  logoutAdmin,
+  onlyAdmin,
+  onlyAdminByIp,
+  registerAdmin
+} from "./auth";
 import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
 import * as methods from "../calls";
 import { mapSubscriptionsToEventBus } from "../api/subscriptions";
@@ -101,7 +108,8 @@ export default function startHttpApi(
 
   app.post("/login", loginAdmin);
   app.post("/logout", onlyAdmin, logoutAdmin);
-  app.post("/register", registerAdmin);
+  app.post("/register", onlyAdminByIp, registerAdmin);
+  app.post("/change-pass", onlyAdminByIp, changeAdminPassword);
 
   // Ping - health check
   app.get("/ping", onlyAdmin, (_, res) => res.send({}));
