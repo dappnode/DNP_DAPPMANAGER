@@ -1,6 +1,7 @@
 import { Store } from "express-session";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
+import * as validate from "../utils/validate";
 
 interface OptionsLowdbSessionStore {
   dbPath: string;
@@ -26,6 +27,7 @@ export class SessionStoreLowDb extends Store {
   constructor({ dbPath, ttl }: OptionsLowdbSessionStore) {
     super();
 
+    validate.path(dbPath);
     const adapter = new FileSync<DbSchema>(dbPath, { defaultValue: {} });
     this.db = low(adapter);
     this.ttl = ttl || 86400;

@@ -11,14 +11,16 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
-let DNCORE_DIR = "DNCORE"; // Bind volume
-let REPO_DIR = "dnp_repo"; // Named volume
+let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
+let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
+let SESSIONS_DIR = "/usr/src/app/sessions/";
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
   DNCORE_DIR = "test_files/";
   REPO_DIR = "test_files/";
+  SESSIONS_DIR = "test_files/";
 }
 
 const params = {
@@ -34,7 +36,7 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
-  DB_SESSIONS_PATH: path.resolve(DNCORE_DIR, "sessions.json"),
+  DB_SESSIONS_PATH: path.resolve(SESSIONS_DIR, "sessions.json"),
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
