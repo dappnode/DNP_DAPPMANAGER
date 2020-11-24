@@ -1,13 +1,16 @@
 import bcrypt from "bcryptjs";
 import params from "../params";
 import { SingleFileDb } from "../utils/singleFileDb";
+import { getRandomAlphanumericToken } from "../utils/token";
 import { HttpError, wrapHandler } from "./utils";
 
 // Initial insecure IP auth
 
 const allowAllIps = Boolean(process.env.ALLOW_ALL_IPS);
 const saltLength = 10;
+const recoveryTokenLength = 20;
 const passwordDb = new SingleFileDb(params.ADMIN_PASSWORD_FILE);
+const recoveryDb = new SingleFileDb(params.ADMIN_RECOVERY_FILE);
 
 if (allowAllIps) console.log(`WARNING! ALLOWING ALL IPFS`);
 
@@ -40,9 +43,11 @@ export const onlyAdminByIp = wrapHandler((req, res, next): void => {
 // Once registered, the password is set and must be used to
 // login all subsequent connections; IP auth is ignored
 //
-// To recover a lost password the user must SSH into the server
-// and delete the ADMIN_PASSWORD_FILE file, which will start
-// the register cycle again
+// To recover a lost password the user can:
+// A) Use the recoveryToken to set the admin password hash to ""
+//    which will start the register cycle again
+// B) SSH into the server and delete the ADMIN_PASSWORD_FILE file,
+//    which will start the register cycle again
 
 declare module "express-session" {
   interface SessionData {
@@ -71,7 +76,13 @@ export const registerAdmin = wrapHandler((req, res) => {
   if (passwordHash) throw new HttpError("Already registered", 403);
   setAdminPassword(req.body.password);
 
-  res.send({ ok: true });
+  let recoveryToken = recoveryDb.read();
+  if (!recoveryToken) {
+    recoveryToken = getRandomAlphanumericToken(recoveryTokenLength);
+    recoveryDb.write(recoveryToken);
+  }
+
+  res.send({ recoveryToken });
 });
 
 export const changeAdminPassword = wrapHandler((req, res) => {
@@ -79,6 +90,16 @@ export const changeAdminPassword = wrapHandler((req, res) => {
   const newPassword = req.body.newPassword;
   assertAdminPassword(currentPassword);
   setAdminPassword(newPassword);
+
+  res.send({ ok: true });
+});
+
+export const recoverAdminPassword = wrapHandler((req, res) => {
+  const recoveryToken = recoveryDb.read();
+  if (!req.body.token) throw new HttpError("Missing credentials");
+  if (!recoveryToken) throw new HttpError("Not registered", 401);
+  if (req.body.token !== recoveryToken) throw new HttpError("Wrong token");
+  passwordDb.write("");
 
   res.send({ ok: true });
 });

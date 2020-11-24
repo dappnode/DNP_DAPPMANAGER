@@ -13,6 +13,7 @@ import {
   logoutAdmin,
   onlyAdmin,
   onlyAdminByIp,
+  recoverAdminPassword,
   registerAdmin
 } from "./auth";
 import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
@@ -110,6 +111,7 @@ export default function startHttpApi(
   app.post("/logout", onlyAdmin, logoutAdmin);
   app.post("/register", onlyAdminByIp, registerAdmin);
   app.post("/change-pass", onlyAdminByIp, changeAdminPassword);
+  app.post("/recover-pass", onlyAdminByIp, recoverAdminPassword);
 
   // Ping - health check
   app.get("/ping", onlyAdmin, (_, res) => res.send({}));
