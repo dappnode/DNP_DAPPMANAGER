@@ -173,7 +173,8 @@ export function start() {
         store.dispatch(
           connectionClose({
             error: errorMessage,
-            isNotAdmin: res.status === 403
+            isNotAdmin: res.status === 403,
+            notRegistered: res.status === 401
           })
         );
       }

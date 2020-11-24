@@ -28,7 +28,9 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const { isOpen, isNotAdmin, error } = useSelector(getConnectionStatus);
+  const { isOpen, isNotAdmin, notRegistered, error } = useSelector(
+    getConnectionStatus
+  );
 
   if (isOpen) {
     return (
@@ -65,6 +67,8 @@ export default function App() {
         <ToastContainer />
       </div>
     );
+  } else if (notRegistered) {
+    return <h1>Register</h1>;
   } else if (isNotAdmin) {
     return <NonAdmin />;
   } else if (error) {

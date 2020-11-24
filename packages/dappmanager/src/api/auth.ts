@@ -53,7 +53,7 @@ export const changeAdminPassword = wrapHandler((req, res) => {
   const password = req.body.password;
   const newPassword = req.body.newPassword;
   if (!password) throw new HttpError("Missing credentials");
-  if (!adminPassword) throw new HttpError("Not registered");
+  if (!adminPassword) throw new HttpError("Not registered", 401);
   if (password !== adminPassword) throw new HttpError("Wrong password");
 
   adminPassword = newPassword;
@@ -66,7 +66,7 @@ export const loginAdmin = wrapHandler((req, res) => {
 
   const password = req.body.password;
   if (!password) throw new HttpError("Missing credentials");
-  if (!adminPassword) throw new HttpError("Not registered");
+  if (!adminPassword) throw new HttpError("Not registered", 401);
   if (password !== adminPassword) throw new HttpError("Wrong password");
 
   req.session.isAdmin = true;
@@ -86,6 +86,8 @@ export const logoutAdmin = wrapHandler(async (req, res) => {
 
 export const onlyAdmin = wrapHandler((req, res, next) => {
   if (disablePassword) return next();
+
+  if (!adminPassword) throw new HttpError("Not registered", 401);
   if (!req.session) throw new HttpError("No session");
   if (!req.headers["cookie"]) throw new HttpError("No cookie", 400);
 
