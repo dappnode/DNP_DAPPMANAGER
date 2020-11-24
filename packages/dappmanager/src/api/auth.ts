@@ -1,11 +1,13 @@
 import bcrypt from "bcryptjs";
-import * as db from "../db";
+import params from "../params";
+import { SingleFileDb } from "../utils/singleFileDb";
 import { HttpError, wrapHandler } from "./utils";
 
 // Initial insecure IP auth
 
 const allowAllIps = Boolean(process.env.ALLOW_ALL_IPS);
 const saltLength = 10;
+const passwordDb = new SingleFileDb(params.ADMIN_PASSWORD_FILE);
 
 if (allowAllIps) console.log(`WARNING! ALLOWING ALL IPFS`);
 
@@ -31,6 +33,16 @@ export const onlyAdminByIp = wrapHandler((req, res, next): void => {
 });
 
 // Password & sessions auth
+// ========================
+// There's one single admin account so no username is used
+//
+// To register initially the user must have a valid ADMIN IP
+// Once registered, the password is set and must be used to
+// login all subsequent connections; IP auth is ignored
+//
+// To recover a lost password the user must SSH into the server
+// and delete the ADMIN_PASSWORD_FILE file, which will start
+// the register cycle again
 
 declare module "express-session" {
   interface SessionData {
@@ -38,23 +50,26 @@ declare module "express-session" {
   }
 }
 
-function checkCurrentPassword(password: string): void {
-  const passwordHash = db.adminPasswordHash.get();
+function assertAdminPassword(password: string): void {
+  const passwordHash = passwordDb.read();
   if (!password) throw new HttpError("Missing credentials");
   if (!passwordHash) throw new HttpError("Not registered", 401);
-  if (!bcrypt.compareSync("not_bacon", passwordHash))
+  if (!bcrypt.compareSync(password, passwordHash))
     throw new HttpError("Wrong password");
 }
 
-function setPassword(password: string): void {
+function setAdminPassword(password: string): void {
   if (!password) throw new HttpError("Missing credentials");
   const passwordHash = bcrypt.hashSync(password, saltLength);
-  db.adminPasswordHash.set(passwordHash);
+  passwordDb.write(passwordHash);
 }
 
 // Must be authorized via a different mechanism; i.e. via IP
+// Password can only be set if it's un-initialized
 export const registerAdmin = wrapHandler((req, res) => {
-  setPassword(req.body.password);
+  const passwordHash = passwordDb.read();
+  if (passwordHash) throw new HttpError("Already registered", 403);
+  setAdminPassword(req.body.password);
 
   res.send({ ok: true });
 });
@@ -62,14 +77,14 @@ export const registerAdmin = wrapHandler((req, res) => {
 export const changeAdminPassword = wrapHandler((req, res) => {
   const currentPassword = req.body.password;
   const newPassword = req.body.newPassword;
-  checkCurrentPassword(currentPassword);
-  setPassword(newPassword);
+  assertAdminPassword(currentPassword);
+  setAdminPassword(newPassword);
 
   res.send({ ok: true });
 });
 
 export const loginAdmin = wrapHandler((req, res) => {
-  checkCurrentPassword(req.body.password);
+  assertAdminPassword(req.body.password);
 
   if (!req.session) throw new HttpError("No session");
   req.session.isAdmin = true;
@@ -89,7 +104,7 @@ export const logoutAdmin = wrapHandler(async (req, res) => {
 });
 
 export const onlyAdmin = wrapHandler((req, res, next) => {
-  const passwordHash = db.adminPasswordHash.get();
+  const passwordHash = passwordDb.read();
   if (!passwordHash) throw new HttpError("Not registered", 401);
   if (!req.session) throw new HttpError("No session");
   if (!req.headers["cookie"]) throw new HttpError("No cookie", 400);
