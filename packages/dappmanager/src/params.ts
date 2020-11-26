@@ -152,7 +152,10 @@ const params = {
   // ETHFORWARD / HTTP proxy params
   ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
-  ETHFORWARD_PIN_ON_VISIT: true
+  ETHFORWARD_PIN_ON_VISIT: true,
+
+  // Flags
+  DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || "")
 };
 
 if (devMode) {
