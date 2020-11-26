@@ -115,35 +115,26 @@ export async function ethClientTargetSet(kwargs: {
 export async function statsCpuGet(): Promise<HostStatCpu> {
   // await new Promise(() => {});
   return {
-    usedFraction: 0.88
+    usedPercentage: 88
   };
 }
 
 export async function statsMemoryGet(): Promise<HostStatMemory> {
   // throw Error("Ups");
   return {
-    memTotal: "8093155328",
-    memUsed: "6535839744",
-    free: "179961856",
-    shared: "596930560",
-    buffCache: "1377353728",
-    available: "714616832",
-    swapTotal: "8312582144",
-    swapUsed: "767557632",
-    swapFree: "7545024512",
-    useFraction: 0.34
+    total: 8093155328,
+    used: 6535839744,
+    free: 179961856,
+    usedPercentage: 34
   };
 }
 
 export async function statsDiskGet(): Promise<HostStatDisk> {
   return {
-    filesystem: "/dev/mapper/mint--vg-root",
-    bBlocks: "241440808960",
-    used: "189458415616",
-    available: "39646527488",
-    usePercentage: "83%",
-    mountedOn: "/",
-    useFraction: 0.34
+    total: 241440808960,
+    used: 189458415616,
+    free: 39646527488,
+    usedPercentage: 83
   };
 }
 
