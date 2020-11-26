@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npx @dappnode/dappnodesdk build --provider pinata
-        with:
+        env:
           PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
           PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
 
