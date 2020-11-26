@@ -5,7 +5,6 @@ import {
   CoreUpdateData,
   DirectoryItem,
   RequestedDnp,
-  HostStats,
   UserSettingsAllDnps,
   MountpointData,
   SystemInfo,
@@ -22,7 +21,10 @@ import {
   UserActionLog,
   InstalledPackageData,
   InstalledPackageDetailData,
-  PackageEnvs
+  PackageEnvs,
+  HostStatCpu,
+  HostStatDisk,
+  HostStatMemory
 } from "./types";
 
 export interface Routes {
@@ -192,10 +194,11 @@ export interface Routes {
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
-  /**
-   * Return host machine stats (cpu, memory, etc)
-   */
-  getStats: () => Promise<HostStats>;
+  statsCpuGet: () => Promise<HostStatCpu>;
+
+  statsMemoryGet: () => Promise<HostStatMemory>;
+
+  statsDiskGet: () => Promise<HostStatDisk>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -453,7 +456,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  getStats: {},
+  statsCpuGet: {},
+  statsDiskGet: {},
+  statsMemoryGet: {},
   getUserActionLogs: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},

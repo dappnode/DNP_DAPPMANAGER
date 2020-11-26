@@ -16,9 +16,6 @@ import {
   getLocalFallbackContentHash
 } from "../../modules/ethClient";
 
-// Enforces that the default value of status is correct
-type InstallStatus = EthClientInstallStatus["status"];
-
 /**
  * Check status of the Ethereum client and do next actions
  * This function should be run:
@@ -32,7 +29,8 @@ type InstallStatus = EthClientInstallStatus["status"];
  * It also retries each step automatically without added logic
  */
 export async function runEthClientInstaller(
-  target: EthClientTarget
+  target: EthClientTarget,
+  status: EthClientInstallStatus | undefined
 ): Promise<EthClientInstallStatus | null> {
   // Re-check just in case, on run the installer for local target clients
   if (target === "remote") return null;
@@ -42,18 +40,13 @@ export async function runEthClientInstaller(
   const { dnpName, version, userSettings } = clientData;
   const dnp = await listPackageNoThrow({ dnpName });
 
-  const installStatus = db.ethClientInstallStatus.get(target);
-  const status: InstallStatus = installStatus
-    ? installStatus.status
-    : "TO_INSTALL";
-
   if (dnp) {
     // OK: Client is already installed
     return { status: "INSTALLED" };
   } else {
     // Client is not installed
 
-    switch (status) {
+    switch (status?.status || "TO_INSTALL") {
       case "INSTALLING":
         // NOTE: This status has to be verified on DAPPMANAGER startup. Otherwise it can
         // stay in installing state forever if the dappmanager resets during the installation
@@ -94,11 +87,6 @@ export async function runEthClientInstaller(
               throw e;
             }
           }
-
-          // Map fullnode.dappnode to package
-          db.fullnodeDomainTarget.set(dnpName);
-          // Run nsupdate
-          eventBus.packagesModified.emit({ dnpNames: [dnpName] });
 
           return { status: "INSTALLED" };
         } catch (e) {
@@ -147,14 +135,22 @@ export default function runWatcher(): void {
     runOnlyOneSequentially(async () => {
       try {
         const target = db.ethClientTarget.get();
-        if (target && target !== "remote") {
-          const prevStatus = db.ethClientInstallStatus.get(target);
-          const nextStatus = await runEthClientInstaller(target);
-          if (nextStatus) {
-            db.ethClientInstallStatus.set(target, nextStatus);
-            if (!prevStatus || prevStatus.status !== nextStatus.status)
-              // Next run MUST be defered to next event loop for prevStatus to refresh
-              setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+        if (!target || target === "remote") return; // Nothing to install
+
+        const prev = db.ethClientInstallStatus.get(target);
+        const next = await runEthClientInstaller(target, prev);
+        if (!next) return; // Package is uninstalled
+
+        db.ethClientInstallStatus.set(target, next);
+
+        if (!prev || prev.status !== next.status) {
+          // Next run MUST be defered to next event loop for prevStatus to refresh
+          setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+
+          if (next.status === "INSTALLED") {
+            // If status switched to "INSTALLED", map to fullnode.dappnode
+            // Must be done here in case the package is already installed
+            db.fullnodeDomainTarget.set(ethClientData[target].dnpName);
           }
         }
       } catch (e) {

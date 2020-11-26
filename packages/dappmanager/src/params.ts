@@ -237,16 +237,93 @@ export const getContainerName = ({
 
 // From SDK, must be in sync
 
-export const releaseFilesRegex = {
-  manifest: /dappnode_package.*\.json$/,
-  compose: /compose.*\.yml$/,
-  avatar: /avatar.*\.png$/,
-  setupWizard: /setup-wizard\..*(json|yaml|yml)$/,
-  setupSchema: /setup\..*\.json$/,
-  setupTarget: /setup-target\..*json$/,
-  setupUiJson: /setup-ui\..*json$/,
-  disclaimer: /disclaimer\.md$/i,
-  gettingStarted: /getting.*started\.md$/i
+// Declare true as true for conditional static types to work
+const TRUE: true = true;
+const FALSE: false = false;
+const FORMAT = {
+  JSON: "JSON" as "JSON",
+  YAML: "YAML" as "YAML",
+  TEXT: "TEXT" as "TEXT"
+};
+
+export const releaseFiles = {
+  manifest: {
+    regex: /dappnode_package.*\.json$/,
+    format: FORMAT.JSON,
+    maxSize: 100e3, // Limit size to ~100KB
+    required: TRUE,
+    multiple: FALSE
+  },
+  compose: {
+    regex: /compose.*\.yml$/,
+    format: FORMAT.YAML,
+    maxSize: 10e3, // Limit size to ~10KB
+    required: TRUE,
+    multiple: FALSE
+  },
+  avatar: {
+    regex: /avatar.*\.png$/,
+    format: null,
+    maxSize: 100e3,
+    required: TRUE,
+    multiple: FALSE
+  },
+  setupWizard: {
+    regex: /setup-wizard\..*(json|yaml|yml)$/,
+    format: FORMAT.YAML,
+    maxSize: 100e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  setupSchema: {
+    regex: /setup\..*\.json$/,
+    format: FORMAT.JSON,
+    maxSize: 10e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  setupTarget: {
+    regex: /setup-target\..*json$/,
+    format: FORMAT.JSON,
+    maxSize: 10e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  setupUiJson: {
+    regex: /setup-ui\..*json$/,
+    format: FORMAT.JSON,
+    maxSize: 10e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  disclaimer: {
+    regex: /disclaimer\.md$/i,
+    format: FORMAT.TEXT,
+    maxSize: 100e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  gettingStarted: {
+    regex: /getting.*started\.md$/i,
+    format: FORMAT.TEXT,
+    maxSize: 100e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  prometheusTargets: {
+    regex: /.*prometheus-targets.(json|yaml|yml)$/,
+    format: FORMAT.YAML,
+    maxSize: 10e3,
+    required: FALSE,
+    multiple: FALSE
+  },
+  grafanaDashboards: {
+    regex: /.*grafana-dashboard.json$/,
+    format: FORMAT.JSON,
+    maxSize: 10e6, // ~ 10MB
+    required: FALSE,
+    multiple: TRUE
+  }
 };
 
 // Single arch images

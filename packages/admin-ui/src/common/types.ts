@@ -242,6 +242,18 @@ export interface RequestedDnp {
   };
 }
 
+export interface GrafanaDashboard {
+  uid: string;
+}
+
+export interface PrometheusTarget {
+  targets: string[];
+  labels?: {
+    job?: string;
+    group?: string;
+  };
+}
+
 // Installing types
 
 export interface ProgressLogs {
@@ -315,6 +327,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.chain": ChainDriver;
   "dappnode.dnp.isCore": boolean;
   "dappnode.dnp.isMain": boolean;
+  "dappnode.dnp.dockerTimeout": number;
   "dappnode.dnp.default.environment": string[];
   "dappnode.dnp.default.ports": string[];
   "dappnode.dnp.default.volumes": string[];
@@ -386,6 +399,7 @@ export interface PackageContainer {
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
+  dockerTimeout?: number;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -417,13 +431,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
    * Checks if there are volumes to be removed on this DNP
    */
   areThereVolumesToRemove: boolean;
-  /**
-   * If there are volumes which this DNP is the owner and some other
-   * DNPs are users, they will be removed by the DAPPMANAGER.
-   */
-  volumeUsersToRemove: string[];
   dependantsOf: string[];
-  namedExternalVols: VolumeOwnershipData[];
   // Non-indexed data
   manifest?: Manifest;
 }
@@ -443,7 +451,6 @@ interface ManifestImage {
   size: number;
   path: string;
   volumes?: string[];
-  external_vol?: string[];
   ports?: string[];
   environment?: string[];
   restart?: string;
@@ -470,8 +477,8 @@ export interface ManifestWithImage extends Manifest {
 export interface ComposeVolumes {
   // volumeName: "dncore_ipfsdnpdappnodeeth_data"
   [volumeName: string]: {
-    // Allowed to user
-    external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
+    // FORBIDDEN
+    // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
     // NOT allowed to user, only used by DAppNode internally (if any)
     name?: string; // Volumes can only be declared locally or be external
     driver?: string; // Dangerous
@@ -783,7 +790,6 @@ export interface PackageRelease {
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
   // File info for downloads
-  manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   // Data for release processing
@@ -805,6 +811,7 @@ export type InstallPackageDataPaths = Pick<
   | "manifestBackupPath"
   | "imagePath"
   | "isUpdate"
+  | "dockerTimeout"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -819,6 +826,7 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  dockerTimeout: number | undefined;
 }
 
 // Must be in-sync with SDK types
@@ -842,6 +850,9 @@ export interface PackageReleaseMetadata {
   runOrder?: string[];
   restartCommand?: string;
   restartLaunchCommand?: string;
+
+  // "15min" | 3600
+  dockerTimeout?: string;
 
   requirements?: {
     minimumDappnodeVersion: string;
@@ -874,6 +885,10 @@ export interface PackageReleaseMetadata {
   setupTarget?: SetupTarget;
   setupUiJson?: SetupUiJson;
 
+  // Monitoring
+  grafanaDashboards?: GrafanaDashboard[];
+  prometheusTargets?: PrometheusTarget[];
+
   author?: string;
   contributors?: string[];
   categories?: string[];
@@ -902,7 +917,6 @@ export interface PackageReleaseImageData {
   ports?: string[];
   environment?: string[];
   // Non-mergable properties
-  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];
@@ -929,7 +943,6 @@ export interface MountpointData {
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-  users: string[]; // ["geth.dnp.dappnode.eth", "dependency.dnp.dappnode.eth"]
 }
 
 export interface VolumeData extends VolumeOwnershipData {
@@ -1043,12 +1056,30 @@ export interface SystemInfo {
 }
 
 /**
- * Host machine stats, cpu, memory, disk, etc
+ * Host machine Memory stats: filesystem, used, available, etc
  */
-export interface HostStats {
-  cpu?: string; // "35%""
-  memory?: string; // "46%"
-  disk?: string; // "57%"
+export interface HostStatMemory {
+  total: number;
+  used: number;
+  free: number;
+  usedPercentage: number;
+}
+
+/**
+ * Host machine Disk stats: filesystem, used, available, etc
+ */
+export interface HostStatDisk {
+  total: number;
+  used: number;
+  free: number;
+  usedPercentage: number;
+}
+
+/**
+ * Host machine CPU used
+ */
+export interface HostStatCpu {
+  usedPercentage: number;
 }
 
 /**

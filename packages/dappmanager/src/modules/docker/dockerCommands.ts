@@ -23,25 +23,36 @@ async function execDockerCompose(
   args: Args,
   kwargs?: Kwargs
 ): Promise<string> {
-  return shell(["docker-compose", "-f", dcPath, ...parseArgs(args, kwargs)]);
+  return shell([
+    "docker-compose",
+    "-f",
+    dcPath,
+    ...parseArgs(args, kwargs),
+    // Adding <&- to prevent interactive mode
+    "<&-"
+  ]);
 }
 
 export function dockerComposeUp(
   dcPath: string,
-  options?: {
+  options: {
     noStart?: boolean;
+    detach?: boolean;
     forceRecreate?: boolean;
+    timeout?: number;
     serviceNames?: string[];
-  }
+    removeOrphans?: boolean;
+  } = {}
 ): Promise<string> {
-  const flags: string[] = [];
-  if (options?.noStart) flags.push("--no-start");
-  else flags.push("--detach");
-  if (options?.forceRecreate) flags.push("--force-recreate");
-  if (options?.serviceNames)
-    for (const serviceName of options.serviceNames) flags.push(serviceName);
-  // Adding <&- to prevent interactive mode
-  return execDockerCompose(dcPath, ["up", ...flags, "<&-"]);
+  // --detach is invalid with --no-start
+  if (options.noStart) options.detach = false;
+  return execDockerCompose(dcPath, ["up", ...(options.serviceNames || [])], {
+    noStart: options.noStart,
+    detach: options.detach ?? true,
+    forceRecreate: options.forceRecreate,
+    timeout: options.timeout,
+    removeOrphans: options.removeOrphans
+  });
 }
 
 /**
@@ -50,19 +61,19 @@ export function dockerComposeUp(
  */
 export function dockerComposeDown(
   dcPath: string,
-  { volumes, timeout }: { volumes?: boolean; timeout?: number } = {}
+  options: { volumes?: boolean; timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["down"], { volumes, timeout });
+  return execDockerCompose(dcPath, ["down"], options);
 }
 
 /**
  * Removes all containers from a compose project
- * -f: Don't ask to confirm removal
- * -s: Stop the containers, if required, before removing
+ * --force   Don't ask to confirm removal
+ * --stop    Stop the containers, if required, before removing
  * @param dcPath
  */
 export function dockerComposeRm(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, ["rm", "-sf"]);
+  return execDockerCompose(dcPath, ["rm"], { force: true, stop: true });
 }
 
 export function dockerComposeStart(dcPath: string): Promise<string> {
@@ -74,9 +85,9 @@ export function dockerComposeStart(dcPath: string): Promise<string> {
  */
 export function dockerComposeStop(
   dcPath: string,
-  { timeout }: { timeout?: number } = {}
+  options: { timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["stop"], { timeout });
+  return execDockerCompose(dcPath, ["stop"], options);
 }
 
 export function dockerComposeConfig(dcPath: string): Promise<string> {
@@ -87,22 +98,27 @@ export function dockerVolumeRm(volumeName: string): Promise<string> {
   return execDocker(["volume", "rm", volumeName], { f: true });
 }
 
-export function dockerStart(containerNames: string[]): Promise<string> {
-  return execDocker(["start", ...containerNames]);
+export function dockerStart(
+  containerNames: string | string[]
+): Promise<string> {
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["start", ...ids]);
 }
 
 export function dockerStop(
   containerNames: string[],
-  { time }: { time?: number } = {}
+  options: { time?: number } = {}
 ): Promise<string> {
-  return execDocker(["stop", ...containerNames], { time });
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["stop", ...ids], options);
 }
 
 export function dockerRm(
-  containerName: string,
+  containerNames: string | string[],
   { volumes }: { volumes?: boolean } = {}
 ): Promise<string> {
-  return execDocker(["rm", containerName], { force: true, volumes });
+  const ids = parseContainerIdArg(containerNames);
+  return execDocker(["rm", ...ids], { force: true, volumes });
 }
 
 interface ImageManifest {
@@ -167,4 +183,8 @@ export function dockerCopyFileFrom(
 
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
+}
+
+function parseContainerIdArg(containerNames: string | string[]): string[] {
+  return Array.isArray(containerNames) ? containerNames : [containerNames];
 }

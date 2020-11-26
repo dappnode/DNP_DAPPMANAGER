@@ -17,7 +17,7 @@
   }
 }
 
-/* Chain cards */
+/* Chain cards and  Stats cards */
 
 .chain-card .name,
 .stats-card .id,
@@ -36,24 +36,28 @@
 }
 .chain-card .message,
 .stats-card .usage,
+.stats-card .text,
 .volume-card .size {
   opacity: 0.7;
 }
 
-.stats-card .id {
-  display: inline;
-}
-
-.chain-card {
-  .progress {
-    margin: 0.3rem 0 0.5rem;
+.stats-card {
+  .id {
+    display: inline;
+  }
+  .ok-indicator {
+    opacity: 0.7;
+    margin-top: 0.3rem;
   }
 }
 
-/* Stats cards */
-
-.stats-card .progress {
-  margin: 0.3rem 0 0rem;
+.chain-card .progress,
+.stats-card .progress,
+.stats-card .text {
+  margin: 0.3rem 0 0.5rem;
+}
+.stats-card .text {
+  margin-bottom: 0;
 }
 
 /* Volumes cards */

@@ -13,6 +13,7 @@ import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { getContainerDomain } from "../../params";
+import { parseTimeoutSeconds } from "../../utils/timeout";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -36,7 +37,6 @@ export async function getRelease({
   origin?: string;
 }): Promise<PackageRelease> {
   const {
-    manifestFile,
     imageFile,
     avatarFile,
     manifest,
@@ -85,7 +85,8 @@ export async function getRelease({
         chain: metadata.chain,
         origin,
         isCore,
-        isMain: metadata.mainService === service.serviceName ? true : undefined
+        isMain: metadata.mainService === service.serviceName ? true : undefined,
+        dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout)
       })
     );
   }
@@ -96,7 +97,6 @@ export async function getRelease({
     semVersion: manifest.version,
     origin,
     isCore,
-    manifestFile,
     imageFile,
     avatarFile,
     metadata,
@@ -120,7 +120,6 @@ async function downloadRelease(
   hash: string,
   id: string
 ): Promise<{
-  manifestFile: DistributedFile;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   composeUnsafe: Compose;

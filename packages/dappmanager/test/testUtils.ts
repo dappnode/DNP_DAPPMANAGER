@@ -242,7 +242,6 @@ export const mockRelease: PackageRelease = {
   dnpName: mockDnpName,
   reqVersion: mockDnpVersion,
   semVersion: mockDnpVersion,
-  manifestFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   metadata: { name: mockDnpName, version: mockDnpVersion },
@@ -258,7 +257,8 @@ export const mockPackageData: InstallPackageData = {
   composePath: "mock/path/compose",
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
-  manifestBackupPath: "mock/path/manifest.backup.json"
+  manifestBackupPath: "mock/path/manifest.backup.json",
+  dockerTimeout: undefined
 };
 
 // For copyFileTo and copyFileFrom

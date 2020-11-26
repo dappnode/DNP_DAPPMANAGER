@@ -19,13 +19,7 @@ interface WarningItem {
 }
 
 export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
-  const {
-    dnpName,
-    areThereVolumesToRemove,
-    volumeUsersToRemove,
-    dependantsOf,
-    isCore
-  } = dnp;
+  const { dnpName, areThereVolumesToRemove, dependantsOf, isCore } = dnp;
 
   const history = useHistory();
 
@@ -57,15 +51,6 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
       dnpsToRemoveWarningsList.push({
         title: "Warning! There are package dependants",
         body: `Some DAppNode Packages depend on ${dnpName} and may stop working if you continue. \n\n ${dependantsOfList}`
-      });
-    }
-
-    // dnpsToRemove = "raiden.dnp.dappnode.eth, another.dnp.dappnode.eth"
-    if (volumeUsersToRemove.length > 0) {
-      const volumeUsersToRemoveList = markdownList(volumeUsersToRemove);
-      dnpsToRemoveWarningsList.push({
-        title: "Warning! Other packages to be removed",
-        body: `Some other DAppNode Packages will be removed as well because they are dependent on ${dnpName} volumes. \n\n ${volumeUsersToRemoveList}`
       });
     }
 

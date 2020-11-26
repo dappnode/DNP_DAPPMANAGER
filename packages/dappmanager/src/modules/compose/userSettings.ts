@@ -42,7 +42,7 @@ export const parseUserSettingsFns: {
   namedVolumeMountpoints: compose => {
     const namedVolumeMountpoints: { [volumeName: string]: string } = {};
     for (const [volumeName, volObj] of Object.entries(compose.volumes || {}))
-      if (!volObj.external && isComposeVolumeUsed(compose, volumeName))
+      if (isComposeVolumeUsed(compose, volumeName))
         if (volObj.driver_opts && volObj.driver_opts.device) {
           const devicePath = volObj.driver_opts.device;
           const mountpoint = parseDevicePathMountpoint(devicePath);
@@ -180,7 +180,7 @@ export function applyUserSettings(
     const mountpoint =
       (userSettings.namedVolumeMountpoints || {})[volumeName] ||
       userSettings.allNamedVolumeMountpoint;
-    if (mountpoint && !vol.external)
+    if (mountpoint)
       return {
         driver_opts: {
           type: "none",

@@ -1,5 +1,5 @@
 import { DiagnoseResult } from "../types";
-import { HostStats, SystemInfo, InstalledPackageData } from "common/types";
+import { SystemInfo, InstalledPackageData, HostStatDisk } from "common/types";
 import { mandatoryCoreDnps } from "params";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
@@ -128,12 +128,12 @@ export function diskSpace({
   data,
   isValidating
 }: {
-  data?: HostStats;
+  data?: HostStatDisk;
   isValidating: boolean;
 }): DiagnoseResultOrNull {
   if (isValidating) return { loading: true, msg: "Checking disk usage..." };
-  if (!data || !data.disk) return null;
-  const ok = parseInt(data.disk) < 95;
+  if (!data || !data.usedPercentage) return null;
+  const ok = data.usedPercentage < 95;
   return {
     ok,
     msg: ok ? "Disk usage is ok (<95%)" : "Disk usage is over 95%",

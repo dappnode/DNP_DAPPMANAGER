@@ -1,38 +1,8 @@
 import os from "os";
-import shellExec from "../utils/shell";
-import osu from "node-os-utils";
-import { HostStats } from "../types";
 import { logs } from "../logs";
 
 // Cache static values
 const numCores = os.cpus().length;
-
-/**
- * Returns relevant host machine stats such as disk space, memory, cpu, etc
- */
-export async function getStats(): Promise<HostStats> {
-  const cpuUsedPercent = await wrapErrors(async () => {
-    const cpuPercentage = await osu.cpu.usage(5000); // 10.38
-    return Math.round(cpuPercentage) + "%";
-  }, "cpuUsedPercent");
-
-  const memUsedPercent = await wrapErrors(async () => {
-    const memTotal = await shellExec(`free / | awk 'NR==2 { print $2}'`);
-    const memUsed = await shellExec(`free / | awk 'NR==3 { print $3}'`);
-    return Math.floor((100 * parseInt(memUsed)) / parseInt(memTotal)) + "%";
-  }, "memUsedPercent");
-
-  const diskUsedPercent = await wrapErrors(async () => {
-    const disk = await shellExec(`df / | awk 'NR>1 { print $5}'`);
-    return (disk || "").trim();
-  }, "diskUsedPercent");
-
-  return {
-    cpu: cpuUsedPercent,
-    memory: memUsedPercent,
-    disk: diskUsedPercent
-  };
-}
 
 // Utils
 

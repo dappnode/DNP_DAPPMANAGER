@@ -6,7 +6,9 @@ import * as calls from "../../src/calls";
 import {
   createTestDir,
   mockManifestWithImage,
-  beforeAndAfter
+  beforeAndAfter,
+  cleanRepos,
+  cleanContainers
 } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
@@ -43,6 +45,12 @@ describe("Resilience features, when things go wrong", function() {
     releaseHash = await uploadManifestRelease(manifest);
   });
 
+  afterEach("Clean environment", async () => {
+    // SUPER important to clean dnp_repo folder to avoid caches
+    await cleanRepos();
+    await cleanContainers(dnpName);
+  });
+
   describe("Remove a package without compose", () => {
     before("Install the release", async () => {
       await calls.packageInstall({
@@ -54,7 +62,7 @@ describe("Resilience features, when things go wrong", function() {
     it("Remove the compose and then remove the package", async () => {
       const composePath = getPath.dockerCompose(dnpName, false);
       fs.unlinkSync(composePath);
-      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+      await calls.packageRemove({ dnpName, deleteVolumes: true });
     });
   });
 
@@ -70,7 +78,7 @@ describe("Resilience features, when things go wrong", function() {
       const composePath = getPath.dockerCompose(dnpName, false);
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
-      await calls.packageRemove({ dnpName, deleteVolumes: true, timeout: 0 });
+      await calls.packageRemove({ dnpName, deleteVolumes: true });
     });
   });
 

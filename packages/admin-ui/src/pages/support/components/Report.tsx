@@ -15,11 +15,11 @@ export default function Report() {
   const dnpsReq = useApi.packagesGet();
   const systemInfoReq = useApi.systemInfoGet();
   const diagnoseReq = useApi.diagnose();
-  const hostStatsReq = useApi.getStats();
+  const hostStatsReq = useApi.statsDiskGet();
   const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diagnose = diagnoseReq.data || [];
-  const hostStats = hostStatsReq.data || {};
+  const hostStats = hostStatsReq.data?.used.toString();
 
   const versionDatas: { [name: string]: PackageVersionData | undefined } = {
     "dappmanager.dnp.dappnode.eth": versionData,
@@ -34,10 +34,7 @@ export default function Report() {
       version: versionDatas[dnp.dnpName] || dnp.version
     }));
 
-  const systemData = [
-    ...diagnose,
-    { name: "Disk usage", result: hostStats.disk }
-  ];
+  const systemData = [...diagnose, { name: "Disk usage", result: hostStats }];
 
   const issueBody = formatIssueBody(coreDnpVersions, systemData);
   const issueUrlWithData = formatIssueUrl(issueBody);

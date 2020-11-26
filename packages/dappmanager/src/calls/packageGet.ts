@@ -6,7 +6,6 @@ import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { getVolumesOwnershipData } from "../modules/docker/volumesData";
-import { getDnpsToRemoveAll } from "../modules/docker/restartPackageVolumes";
 
 /**
  * Toggles the visibility of a getting started block
@@ -24,9 +23,6 @@ export async function packageGet({
   if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   const volumesData = await getVolumesOwnershipData();
 
-  // Metadata for package/:id/controls feedback
-  const { dnpsToRemove } = getDnpsToRemoveAll(dnp, volumesData);
-
   const dnpData: InstalledPackageDetailData = {
     ...dnp,
 
@@ -38,13 +34,9 @@ export async function packageGet({
           return !owner || owner === dnp.dnpName;
         })
       ),
-    volumeUsersToRemove: dnpsToRemove.filter(name => name !== dnp.dnpName),
     dependantsOf: dnpList
       .filter(d => d.dependencies[dnpName])
-      .map(d => d.dnpName),
-    namedExternalVols: volumesData.filter(
-      v => v.owner && v.owner !== dnp.dnpName && v.users.includes(dnp.dnpName)
-    )
+      .map(d => d.dnpName)
   };
 
   // Add non-blocking data
