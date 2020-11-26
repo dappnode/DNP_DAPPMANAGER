@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "NODE_ENV=development ts-node src/index",
-    "dev:local": "ts-node -r dotenv/config src/index",
+    "dev": "nodemon -w src -e js,ts,json --require dotenv/config -x ts-node src/index.ts",
     "build": "webpack",
     "watch-ts": "tsc -w",
     "file": "node",
@@ -96,6 +95,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^6.2.2",
     "mocha": "^8.1.3",
+    "nodemon": "^2.0.6",
     "prettier": "^1.16.4",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",

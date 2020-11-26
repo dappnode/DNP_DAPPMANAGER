@@ -38,4 +38,12 @@
     white-space: pre-wrap;
     word-break: break-all;
   }
+
+  &.red,
+  pre {
+    color: var(--danger-color);
+    summary {
+      opacity: inherit;
+    }
+  }
 }

@@ -9,6 +9,7 @@ import path from "path";
 import params from "../params";
 import {
   changeAdminPassword,
+  loginAdminStatus,
   loginAdmin,
   logoutAdmin,
   onlyAdmin,
@@ -107,6 +108,7 @@ export default function startHttpApi(
     );
   });
 
+  app.post("/login-status", loginAdminStatus);
   app.post("/login", loginAdmin);
   app.post("/logout", onlyAdmin, logoutAdmin);
   app.post("/register", onlyAdminByIp, registerAdmin);

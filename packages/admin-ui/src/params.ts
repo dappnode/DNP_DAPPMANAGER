@@ -5,6 +5,16 @@ export const apiUrl =
   process.env.REACT_APP_API_URL || "http://my.dappmanager.dnp.dappnode.eth/";
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
+
+  // Auth routes
+  loginStatus: urlJoin(apiUrl, "login-status"),
+  login: urlJoin(apiUrl, "login"),
+  logout: urlJoin(apiUrl, "logout"),
+  register: urlJoin(apiUrl, "register"),
+  changePass: urlJoin(apiUrl, "change-pass"),
+  recoverPass: urlJoin(apiUrl, "recover-pass"),
+
+  // Regular routes
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),

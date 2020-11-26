@@ -12,6 +12,9 @@ const recoveryTokenLength = 20;
 const passwordDb = new SingleFileDb(params.ADMIN_PASSWORD_FILE);
 const recoveryDb = new SingleFileDb(params.ADMIN_RECOVERY_FILE);
 
+export const ERROR_NOT_REGISTERED = "NOT_REGISTERED";
+export const ERROR_NOT_LOGGED_IN = "NOT_LOGGED_IN";
+
 if (allowAllIps) console.log(`WARNING! ALLOWING ALL IPFS`);
 
 // Authorize by IP - INSECURE: use only for first login
@@ -58,7 +61,7 @@ declare module "express-session" {
 function assertAdminPassword(password: string): void {
   const passwordHash = passwordDb.read();
   if (!password) throw new HttpError("Missing credentials");
-  if (!passwordHash) throw new HttpError("Not registered", 401);
+  if (!passwordHash) throw new HttpError(ERROR_NOT_REGISTERED, 401);
   if (!bcrypt.compareSync(password, passwordHash))
     throw new HttpError("Wrong password");
 }
@@ -97,11 +100,19 @@ export const changeAdminPassword = wrapHandler((req, res) => {
 export const recoverAdminPassword = wrapHandler((req, res) => {
   const recoveryToken = recoveryDb.read();
   if (!req.body.token) throw new HttpError("Missing credentials");
-  if (!recoveryToken) throw new HttpError("Not registered", 401);
+  if (!recoveryToken) throw new HttpError(ERROR_NOT_REGISTERED, 401);
   if (req.body.token !== recoveryToken) throw new HttpError("Wrong token");
   passwordDb.write("");
 
   res.send({ ok: true });
+});
+
+export const loginAdminStatus = wrapHandler((req, res) => {
+  const recoveryToken = recoveryDb.read();
+  if (!recoveryToken) throw new HttpError(ERROR_NOT_REGISTERED, 401);
+  if (!req.session?.isAdmin) throw new HttpError(ERROR_NOT_LOGGED_IN, 403);
+
+  res.send({ sessionId: req.session.id });
 });
 
 export const loginAdmin = wrapHandler((req, res) => {
@@ -110,26 +121,26 @@ export const loginAdmin = wrapHandler((req, res) => {
   if (!req.session) throw new HttpError("No session");
   req.session.isAdmin = true;
 
-  res.send({ id: req.session.id });
+  res.send({ sessionId: req.session.id });
 });
 
 export const logoutAdmin = wrapHandler(async (req, res) => {
   if (!req.session) return new HttpError("No session");
-  const id = req.session.id;
+  const sessionId = req.session.id;
 
   await new Promise((resolve, reject) => {
     req.session.destroy(err => (err ? reject(err) : resolve()));
   });
 
-  res.send({ id });
+  res.send({ sessionId });
 });
 
 export const onlyAdmin = wrapHandler((req, res, next) => {
   const passwordHash = passwordDb.read();
-  if (!passwordHash) throw new HttpError("Not registered", 401);
+  if (!passwordHash) throw new HttpError(ERROR_NOT_REGISTERED, 401);
   if (!req.session) throw new HttpError("No session");
   if (!req.headers["cookie"]) throw new HttpError("No cookie", 400);
 
   if (req.session.isAdmin) next();
-  else throw new HttpError("Forbidden", 403);
+  else throw new HttpError(ERROR_NOT_LOGGED_IN, 403);
 });

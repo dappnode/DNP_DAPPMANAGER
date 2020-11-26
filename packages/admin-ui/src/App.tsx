@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 // Components
 import NotificationsMain from "./components/NotificationsMain";
-import NonAdmin from "./components/NonAdmin";
-import NoConnection from "components/NoConnection";
+import { NonAdmin } from "./start-pages/NonAdmin";
+import { NoConnection } from "start-pages/NoConnection";
+import { Register } from "./start-pages/Register";
+import { Login } from "./start-pages/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
 import TopBar from "./components/navbar/TopBar";
 import SideBar from "./components/navbar/SideBar";
@@ -15,8 +17,9 @@ import pages, { defaultPage } from "./pages";
 import { getConnectionStatus } from "services/connectionStatus/selectors";
 import { ToastContainer } from "react-toastify";
 import Welcome from "components/welcome/Welcome";
+import { fetchLoginStatus, LoginStatus } from "api/auth";
 
-export default function App() {
+function MainApp() {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN, then display the page for nonAdmin
@@ -28,52 +31,81 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const { isOpen, isNotAdmin, notRegistered, error } = useSelector(
+  return (
+    <div className="body">
+      {/* SideNav expands on big screens, while content-wrapper moves left */}
+      <SideBar />
+      <TopBar />
+      <div id="main">
+        <ErrorBoundary>
+          <NotificationsMain />
+        </ErrorBoundary>
+
+        <Switch>
+          {Object.values(pages).map(({ RootComponent, rootPath }) => (
+            <Route
+              key={rootPath}
+              path={rootPath}
+              render={props => (
+                <ErrorBoundary>
+                  <RootComponent {...props} />
+                </ErrorBoundary>
+              )}
+            />
+          ))}
+          {/* 404 routes redirect to dashboard or default page */}
+          <Route path="*">
+            <Redirect to={defaultPage.rootPath} />
+          </Route>
+        </Switch>
+      </div>
+
+      {/* Place here non-page components */}
+      <Welcome />
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default function App() {
+  const [loginStatus, setLoginStatus] = useState<LoginStatus>();
+  // Handles the login, register and connecting logic. Nothing else will render
+  // Until the app has been logged in
+
+  let { isOpen, isNotAdmin, notRegistered, error } = useSelector(
     getConnectionStatus
   );
 
-  if (isOpen) {
-    return (
-      <div className="body">
-        {/* SideNav expands on big screens, while content-wrapper moves left */}
-        <SideBar />
-        <TopBar />
-        <div id="main">
-          <ErrorBoundary>
-            <NotificationsMain />
-          </ErrorBoundary>
+  const onFetchLoginStatus = useCallback(
+    () =>
+      fetchLoginStatus()
+        .then(setLoginStatus)
+        .catch(console.error),
+    []
+  );
 
-          <Switch>
-            {Object.values(pages).map(({ RootComponent, rootPath }) => (
-              <Route
-                key={rootPath}
-                path={rootPath}
-                render={props => (
-                  <ErrorBoundary>
-                    <RootComponent {...props} />
-                  </ErrorBoundary>
-                )}
-              />
-            ))}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*">
-              <Redirect to={defaultPage.rootPath} />
-            </Route>
-          </Switch>
-        </div>
+  useEffect(() => {
+    onFetchLoginStatus();
+  }, [onFetchLoginStatus]);
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <ToastContainer />
-      </div>
-    );
-  } else if (notRegistered) {
-    return <h1>Register</h1>;
-  } else if (isNotAdmin) {
-    return <NonAdmin />;
-  } else if (error) {
-    return <NoConnection />;
-  } else {
+  notRegistered = true;
+
+  if (!loginStatus) {
     return <Loading steps={["Opening connection"]} />;
+  }
+
+  console.log(loginStatus);
+
+  switch (loginStatus.status) {
+    case "logged-in":
+      return <MainApp />;
+    case "not-logged-in":
+      return <Login refetchStatus={onFetchLoginStatus} />;
+    case "not-registered":
+      return <Register refetchStatus={onFetchLoginStatus} />;
+    case "error":
+      return <NoConnection />;
+    default:
+      return <NoConnection />;
   }
 }

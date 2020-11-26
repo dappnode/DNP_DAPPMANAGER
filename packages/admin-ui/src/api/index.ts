@@ -23,13 +23,15 @@ import { initialCallsOnOpen } from "./initialCalls";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
 
-const socketIoUrl = apiUrl;
-/* eslint-disable-next-line no-console */
-console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
 let socketGlobal: SocketIOClient.Socket;
 
 function setupSocket(): SocketIOClient.Socket {
-  if (!socketGlobal) socketGlobal = io(socketIoUrl);
+  if (!socketGlobal) {
+    const socketIoUrl = apiUrl;
+    /* eslint-disable-next-line no-console */
+    console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
+    socketGlobal = io(socketIoUrl);
+  }
   return socketGlobal;
 }
 
@@ -141,11 +143,16 @@ export const useSubscription: {
   };
 });
 
+let apiStarted = false;
 /**
  * Connect to the server's API
  * Store the session and map subscriptions
  */
 export function start() {
+  // Only run start() once
+  if (apiStarted) return;
+  else apiStarted = true;
+
   const socket = setupSocket();
 
   socket.on("connect", function(...args: any) {

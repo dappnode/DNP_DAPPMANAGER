@@ -3,7 +3,7 @@ import Input from "components/Input";
 import Button from "components/Button";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 
-export function InputFieldSecret({
+export function InputSecret({
   value,
   onValueChange
 }: {

@@ -1,13 +1,23 @@
 import React from "react";
 import errorImg from "img/error-min.png";
 import "./errorView.scss";
+import { joinCssClass } from "utils/css";
 
-export default function ErrorView({ error }: { error: Error | string }) {
+export default function ErrorView({
+  error,
+  hideIcon,
+  red
+}: {
+  error: Error | string;
+  hideIcon?: boolean;
+  red?: boolean;
+}) {
   const { message, detail } = parseError(error);
 
   return (
-    <div className="error-view">
-      <img src={errorImg} alt="Error icon" />
+    <div className={joinCssClass("error-view", { red })}>
+      {!hideIcon && <img src={errorImg} alt="Error icon" />}
+
       {detail ? (
         <details>
           <summary>{message.split("\n")[0]}</summary>
