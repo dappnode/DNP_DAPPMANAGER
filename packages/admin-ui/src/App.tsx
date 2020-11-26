@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 // Components
 import NotificationsMain from "./components/NotificationsMain";
 import { NonAdmin } from "./start-pages/NonAdmin";
@@ -14,10 +13,10 @@ import Loading from "components/Loading";
 // Pages
 import pages, { defaultPage } from "./pages";
 // Redux
-import { getConnectionStatus } from "services/connectionStatus/selectors";
 import { ToastContainer } from "react-toastify";
 import Welcome from "components/welcome/Welcome";
 import { fetchLoginStatus, LoginStatus } from "api/auth";
+import { start as apiStart } from "api";
 
 function MainApp() {
   // App is the parent container of any other component.
@@ -30,6 +29,11 @@ function MainApp() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  useEffect(() => {
+    // Start API and Socket.io once user has logged in
+    apiStart();
+  }, []);
 
   return (
     <div className="body">
@@ -72,10 +76,6 @@ export default function App() {
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in
 
-  let { isOpen, isNotAdmin, notRegistered, error } = useSelector(
-    getConnectionStatus
-  );
-
   const onFetchLoginStatus = useCallback(
     () =>
       fetchLoginStatus()
@@ -88,13 +88,9 @@ export default function App() {
     onFetchLoginStatus();
   }, [onFetchLoginStatus]);
 
-  notRegistered = true;
-
   if (!loginStatus) {
     return <Loading steps={["Opening connection"]} />;
   }
-
-  console.log(loginStatus);
 
   switch (loginStatus.status) {
     case "logged-in":

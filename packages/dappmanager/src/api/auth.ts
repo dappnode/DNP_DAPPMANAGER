@@ -100,7 +100,6 @@ export const changeAdminPassword = wrapHandler((req, res) => {
 export const recoverAdminPassword = wrapHandler((req, res) => {
   const recoveryToken = recoveryDb.read();
   if (!req.body.token) throw new HttpError("Missing credentials");
-  if (!recoveryToken) throw new HttpError(ERROR_NOT_REGISTERED, 401);
   if (req.body.token !== recoveryToken) throw new HttpError("Wrong token");
   passwordDb.write("");
 
@@ -108,8 +107,8 @@ export const recoverAdminPassword = wrapHandler((req, res) => {
 });
 
 export const loginAdminStatus = wrapHandler((req, res) => {
-  const recoveryToken = recoveryDb.read();
-  if (!recoveryToken) throw new HttpError(ERROR_NOT_REGISTERED, 401);
+  const passwordHash = passwordDb.read();
+  if (!passwordHash) throw new HttpError(ERROR_NOT_REGISTERED, 401);
   if (!req.session?.isAdmin) throw new HttpError(ERROR_NOT_LOGGED_IN, 403);
 
   res.send({ sessionId: req.session.id });

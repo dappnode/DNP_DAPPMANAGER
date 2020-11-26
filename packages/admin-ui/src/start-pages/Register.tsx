@@ -7,6 +7,7 @@ import { StandaloneContainer } from "./StandaloneContainer";
 import "./register.scss";
 import Alert from "react-bootstrap/Alert";
 import { ReqStatus } from "types";
+import ErrorView from "components/ErrorView";
 
 export function Register({
   refetchStatus
@@ -44,6 +45,8 @@ export function Register({
     );
   }
 
+  const passwordError = validatePassword({ password, password2 });
+
   // First phase of registration, user provides password
   return (
     <StandaloneContainer TopIcon={BsShieldLock} title="Register">
@@ -62,19 +65,20 @@ export function Register({
           className="register-button"
           onClick={onRegister}
           variant="dappnode"
+          disabled={
+            reqStatus.loading ||
+            !password ||
+            !password2 ||
+            Boolean(passwordError)
+          }
         >
           Register
         </Button>
       </div>
 
       <div>
-        {reqStatus.result
-          ? JSON.stringify(reqStatus.result)
-          : reqStatus.error
-          ? `Error ${reqStatus.error.message}`
-          : reqStatus.loading
-          ? "Loading..."
-          : null}
+        {passwordError && <ErrorView error={passwordError} hideIcon red />}
+        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </div>
     </StandaloneContainer>
   );
@@ -112,4 +116,22 @@ function CopyRecoveryToken({
       </div>
     </StandaloneContainer>
   );
+}
+
+function validatePassword({
+  password,
+  password2
+}: {
+  password: string;
+  password2: string;
+}): string | null {
+  if (!password) return null;
+
+  if (password.length < 8) return "Password must be at least 8 characters long";
+  if (!/\d+/.test(password)) return "Password must contain at least one number";
+  if (!/[A-Z]+/.test(password))
+    return "Password must contain at least one capital letter";
+  if (password2 && password !== password2) return "Passwords do not match";
+
+  return null;
 }

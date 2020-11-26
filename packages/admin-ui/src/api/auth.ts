@@ -110,7 +110,7 @@ export async function fetchLogin({
 }
 
 export async function fetchLogout(): Promise<LoginReturn> {
-  const res = await fetch(apiUrls.login, {
+  const res = await fetch(apiUrls.logout, {
     method: "POST"
   });
   return await parseResponse<LoginReturn>(res);
@@ -136,7 +136,7 @@ export async function fetchChangePass({
   password: string;
   newPassword: string;
 }): Promise<{ ok: true }> {
-  const res = await fetch(apiUrls.register, {
+  const res = await fetch(apiUrls.changePass, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ password, newPassword })
@@ -149,7 +149,7 @@ export async function fetchRecoverPass({
 }: {
   token: string;
 }): Promise<{ ok: true }> {
-  const res = await fetch(apiUrls.register, {
+  const res = await fetch(apiUrls.recoverPass, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token })

@@ -15,10 +15,6 @@ import { Routes, routesData, ResolvedType } from "common/routes";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
-import {
-  connectionOpen,
-  connectionClose
-} from "services/connectionStatus/actions";
 import { initialCallsOnOpen } from "./initialCalls";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
