@@ -4,7 +4,8 @@ import {
   SetupWizard,
   SpecialPermission,
   InstalledPackageDetailData,
-  PackageContainer
+  PackageContainer,
+  DirectoryItemOk
 } from "../../../src/types";
 
 export interface MockDnp {
@@ -19,4 +20,5 @@ export interface MockDnp {
     InstalledPackageDetailData & { containers: PackageContainer[] }
   >;
   installedContainers?: { [serviceName: string]: Partial<PackageContainer> };
+  directory?: Partial<DirectoryItemOk>;
 }

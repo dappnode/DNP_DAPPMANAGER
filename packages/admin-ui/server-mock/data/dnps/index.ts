@@ -4,6 +4,7 @@ import { isInstalling } from "./isInstalling";
 import { lightningNetwork } from "./lightningNetwork";
 import { multiService } from "./multiService";
 import { openEthereum } from "./openEthereum";
+import { prysm } from "./prysm";
 import { raiden } from "./raiden";
 import { raidenTestnet } from "./raidenTestnet";
 import { trustlines } from "./trustlines";
@@ -15,6 +16,7 @@ export const mockDnps: MockDnp[] = [
   lightningNetwork,
   multiService,
   openEthereum,
+  prysm,
   raiden,
   raidenTestnet,
   trustlines,

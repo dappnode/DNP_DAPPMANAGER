@@ -6,6 +6,10 @@ const serviceName = dnpName;
 export const raiden: MockDnp = {
   avatar: "https://i.ibb.co/Y0YzyrG/raiden300-min.png",
 
+  directory: {
+    isFeatured: false
+  },
+
   metadata: {
     name: dnpName,
     version: "0.0.1",

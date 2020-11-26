@@ -15,7 +15,8 @@ function getDirectoryDnp(dnp: MockDnp, index: number): DirectoryItemOk {
     isUpdated: false,
     whitelisted: true,
     featuredStyle: dnp.metadata.style,
-    categories: dnp.metadata.categories || []
+    categories: dnp.metadata.categories || [],
+    ...dnp.directory
   };
 }
 
