@@ -43,12 +43,10 @@ jobs:
     if: github.event_name != 'push'
     steps:
       - uses: actions/checkout@v2
-      - run: npx @dappnode/dappnodesdk build --skip_upload
-      - name: Upload release directory
-        uses: actions/upload-artifact@v2
+      - run: npx @dappnode/dappnodesdk build --provider pinata
         with:
-          name: release
-          path: build_*
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET_API_KEY: ${{ secrets.PINATA_SECRET_API_KEY }}
 
   release:
     name: Release
