@@ -424,6 +424,11 @@ export interface Routes {
    * Returns volume data
    */
   volumesGet: () => Promise<VolumeData[]>;
+
+  /**
+   * Returns public Ip in real time
+   */
+  ipPublicGet: () => Promise<string>;
 }
 
 interface RouteData {
@@ -485,7 +490,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   setStaticIp: { log: true },
   systemInfoGet: {},
   volumeRemove: { log: true },
-  volumesGet: {}
+  volumesGet: {},
+  ipPublicGet: {}
 };
 
 // DO NOT REMOVE

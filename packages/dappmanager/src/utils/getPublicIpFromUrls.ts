@@ -16,12 +16,14 @@ const urls = [
  * @param silent suppress logs
  * @returns public IP: 85.84.83.82
  */
-export default async function getPublicIpFromUrls(): Promise<string> {
+export default async function getPublicIpFromUrls(
+  timeout = 15 * 1000
+): Promise<string> {
   const errors = [];
   for (const url of urls) {
     try {
       const ip = await retry(() =>
-        fetch(url, { timeout: 15 * 1000 }).then(res => res.text())
+        fetch(url, { timeout: timeout }).then(res => res.text())
       );
       if (isIp(ip)) return ip;
       else throw Error(`Invalid IP format: ${ip}`);
