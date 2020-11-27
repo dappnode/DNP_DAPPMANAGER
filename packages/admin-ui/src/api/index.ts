@@ -3,7 +3,6 @@ import io from "socket.io-client";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash";
 import mitt from "mitt";
-import { store } from "../store";
 // Transport
 import { subscriptionsFactory } from "common/transport/socketIo";
 import {
@@ -144,7 +143,11 @@ let apiStarted = false;
  * Connect to the server's API
  * Store the session and map subscriptions
  */
-export function start() {
+export function start({
+  onConnectionError
+}: {
+  onConnectionError: (errorMessage: string) => void;
+}) {
   // Only run start() once
   if (apiStarted) return;
   else apiStarted = true;
@@ -160,30 +163,14 @@ export function start() {
     mapSubscriptionsToRedux(subscriptions);
     initialCallsOnOpen();
 
-    // Delay announcing session is open until everything is setup
-    store.dispatch(connectionOpen());
     /* eslint-disable-next-line no-console */
     console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
   });
 
   function handleConnectionError(err: Error | string): void {
     const errorMessage = err instanceof Error ? err.message : err;
-    fetch(apiUrls.ping).then(res => {
-      if (res.ok) {
-        // Warn that subscriptions are disabled
-        store.dispatch(connectionOpen());
-      } else {
-        store.dispatch(
-          connectionClose({
-            error: errorMessage,
-            isNotAdmin: res.status === 403,
-            notRegistered: res.status === 401
-          })
-        );
-      }
-    });
-
     console.error("SocketIO connection closed", errorMessage);
+    onConnectionError(errorMessage);
   }
 
   // Handles server errors

@@ -18,7 +18,7 @@ import Welcome from "components/welcome/Welcome";
 import { fetchLoginStatus, LoginStatus } from "api/auth";
 import { start as apiStart } from "api";
 
-function MainApp() {
+function MainApp({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN, then display the page for nonAdmin
@@ -32,8 +32,10 @@ function MainApp() {
 
   useEffect(() => {
     // Start API and Socket.io once user has logged in
-    apiStart();
-  }, []);
+    apiStart({
+      onConnectionError: () => refetchStatus()
+    });
+  }, [refetchStatus]);
 
   return (
     <div className="body">
@@ -94,7 +96,7 @@ export default function App() {
 
   switch (loginStatus.status) {
     case "logged-in":
-      return <MainApp />;
+      return <MainApp refetchStatus={onFetchLoginStatus} />;
     case "not-logged-in":
       return <Login refetchStatus={onFetchLoginStatus} />;
     case "not-registered":

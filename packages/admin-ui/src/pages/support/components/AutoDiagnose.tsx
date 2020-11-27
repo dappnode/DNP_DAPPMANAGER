@@ -15,19 +15,13 @@ export default function AutoDiagnose() {
   const dnpInstalled = useApi.packagesGet();
   const ipfsConnection = useSWR(["ipfsConnection"], checkIpfsConnection);
 
-  const isOpen = connectionStatus.isOpen;
   const diagnosesArray: DiagnoseResult[] = [
-    formatDiagnose.connection(connectionStatus),
     formatDiagnose.ipfs(ipfsConnection),
-    ...(isOpen
-      ? [
-          formatDiagnose.internetConnection(systemInfo),
-          formatDiagnose.openPorts(systemInfo),
-          formatDiagnose.noNatLoopback(systemInfo),
-          formatDiagnose.diskSpace(hostStats),
-          formatDiagnose.coreDnpsRunning(dnpInstalled)
-        ]
-      : [])
+    formatDiagnose.internetConnection(systemInfo),
+    formatDiagnose.openPorts(systemInfo),
+    formatDiagnose.noNatLoopback(systemInfo),
+    formatDiagnose.diskSpace(hostStats),
+    formatDiagnose.coreDnpsRunning(dnpInstalled)
   ].filter(notEmpty);
 
   return (
