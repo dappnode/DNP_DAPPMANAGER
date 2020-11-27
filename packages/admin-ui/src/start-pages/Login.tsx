@@ -3,13 +3,13 @@ import { useLocation, useHistory } from "react-router-dom";
 import { BsLock } from "react-icons/bs";
 import { InputSecret } from "components/InputSecret";
 import Button from "components/Button";
-import { fetchLogin, fetchRecoverPass } from "../api/auth";
+import { fetchLogin, fetchLoginStatus } from "../api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
-import "./login.scss";
 import { ReqStatus } from "types";
 import ErrorView from "components/ErrorView";
-import Alert from "react-bootstrap/esm/Alert";
 import Ok from "components/Ok";
+import { ResetPassword } from "./ResetPassword";
+import "./login.scss";
 
 const loginRootPath = "/";
 const forgotPasswordPath = "/forgot-password";
@@ -20,7 +20,7 @@ export function Login({
   refetchStatus: () => Promise<void>;
 }) {
   const [password, setPassword] = useState("");
-  const [reqStatus, setReqStatus] = useState<ReqStatus<string>>({});
+  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
   const location = useLocation();
   const history = useHistory();
@@ -28,8 +28,18 @@ export function Login({
   async function onLogin() {
     try {
       setReqStatus({ loading: true });
-      const { sessionId } = await fetchLogin({ password });
-      setReqStatus({ result: sessionId });
+      await fetchLogin({ password });
+      setReqStatus({ result: true });
+
+      // Make sure user is properly logged in
+      const status = await fetchLoginStatus();
+      switch (status.status) {
+        case "logged-in":
+          break; // OK
+        case "not-logged-in":
+          setReqStatus({ error: "Not logged in, are cookies enabled?" });
+          break;
+      }
     } catch (e) {
       setReqStatus({ error: e });
     } finally {
@@ -72,63 +82,9 @@ export function Login({
       </div>
 
       <div>
-        {reqStatus.result && (
-          <Ok ok msg={`Logged in! Session ${reqStatus.result}`}></Ok>
-        )}
+        {reqStatus.result && <Ok ok msg={"Logged in!"}></Ok>}
         {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </div>
-    </StandaloneContainer>
-  );
-}
-
-function ResetPassword({
-  onSuccessfulReset
-}: {
-  onSuccessfulReset: () => void;
-}) {
-  const [token, setToken] = useState("");
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-
-  async function onReset() {
-    try {
-      setReqStatus({ loading: true });
-      await fetchRecoverPass({ token });
-      setReqStatus({ result: true });
-      onSuccessfulReset();
-    } catch (e) {
-      setReqStatus({ error: e });
-    }
-  }
-
-  return (
-    <StandaloneContainer TopIcon={BsLock} title="Reset">
-      <div className="text">
-        Use your recovery token to reset the admin password and register again
-      </div>
-
-      <Alert variant="warning">
-        If you have lost your recovery token you have to directly access your
-        machine via SSH or by connecting a keyboard and screen and follow this
-        guide
-        <br />
-        <a href="#">Reset your DAppNode admin password TODO</a>
-      </Alert>
-
-      <div className="password-form">
-        <div className="text">Recovery token</div>
-        <InputSecret value={token} onValueChange={setToken} />
-
-        <Button
-          className="register-button"
-          onClick={onReset}
-          variant="dappnode"
-          disabled={reqStatus.loading || !token}
-        >
-          Reset password
-        </Button>
-      </div>
-
-      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );
 }

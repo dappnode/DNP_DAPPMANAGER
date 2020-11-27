@@ -1,7 +1,7 @@
 import React from "react";
 import logo from "img/dappnode-logo-wide-min.png";
-import "./standaloneContainer.scss";
 import { IconType } from "react-icons/lib";
+import "./standaloneContainer.scss";
 
 export const StandaloneContainer: React.FC<{
   TopIcon: IconType;

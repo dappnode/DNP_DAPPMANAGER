@@ -46,36 +46,17 @@ async function parseResponse<T>(res: Response): Promise<T> {
 }
 
 export type LoginStatus =
-  | {
-      status: "logged-in";
-      sessionId: string;
-    }
-  | {
-      status: "not-logged-in";
-    }
-  | {
-      status: "not-registered";
-    }
-  | {
-      status: "error";
-      error: Error;
-    };
-
-interface LoginReturn {
-  sessionId: string;
-}
-
-interface RegisterReturn {
-  recoveryToken: string;
-}
+  | { status: "logged-in" }
+  | { status: "not-logged-in" }
+  | { status: "not-registered" }
+  | { status: "error"; error: Error };
 
 export async function fetchLoginStatus(): Promise<LoginStatus> {
   try {
     const res = await fetch(apiUrls.loginStatus, { method: "POST" });
-    const body = await parseResponse<LoginReturn>(res);
+    await parseResponse<{ ok: true }>(res);
     return {
-      status: "logged-in",
-      sessionId: body.sessionId
+      status: "logged-in"
     };
   } catch (e) {
     switch (e.message) {
@@ -96,63 +77,40 @@ export async function fetchLoginStatus(): Promise<LoginStatus> {
   }
 }
 
-export async function fetchLogin({
-  password
-}: {
+export async function fetchLogin(data: {
   password: string;
-}): Promise<LoginReturn> {
-  const res = await fetch(apiUrls.login, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
-  return await parseResponse<LoginReturn>(res);
+}): Promise<{ ok: true }> {
+  return await fetchAuthPost(apiUrls.login, data);
 }
 
-export async function fetchLogout(): Promise<LoginReturn> {
-  const res = await fetch(apiUrls.logout, {
-    method: "POST"
-  });
-  return await parseResponse<LoginReturn>(res);
+export async function fetchLogout(): Promise<{ ok: true }> {
+  return await fetchAuthPost(apiUrls.logout);
 }
 
-export async function fetchRegister({
-  password
-}: {
+export async function fetchRegister(data: {
   password: string;
-}): Promise<RegisterReturn> {
-  const res = await fetch(apiUrls.register, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password })
-  });
-  return await parseResponse(res);
+}): Promise<{ recoveryToken: string }> {
+  return await fetchAuthPost(apiUrls.register, data);
 }
 
-export async function fetchChangePass({
-  password,
-  newPassword
-}: {
+export async function fetchChangePass(data: {
   password: string;
   newPassword: string;
 }): Promise<{ ok: true }> {
-  const res = await fetch(apiUrls.changePass, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password, newPassword })
-  });
-  return await parseResponse(res);
+  return await fetchAuthPost(apiUrls.changePass, data);
 }
 
-export async function fetchRecoverPass({
-  token
-}: {
+export async function fetchRecoverPass(data: {
   token: string;
 }): Promise<{ ok: true }> {
-  const res = await fetch(apiUrls.recoverPass, {
+  return await fetchAuthPost(apiUrls.recoverPass, data);
+}
+
+async function fetchAuthPost<T, R>(url: string, data?: T): Promise<R> {
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token })
+    body: JSON.stringify(data || {})
   });
   return await parseResponse(res);
 }

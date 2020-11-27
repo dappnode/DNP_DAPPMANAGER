@@ -14,7 +14,7 @@ export interface WifiStatus {
 
 export interface ReqStatus<T = true> {
   loading?: boolean;
-  error?: Error;
+  error?: Error | string;
   result?: T;
 }
 

@@ -4,10 +4,10 @@ import { InputSecret } from "components/InputSecret";
 import Button from "components/Button";
 import { fetchRegister } from "../api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
-import "./register.scss";
 import Alert from "react-bootstrap/Alert";
 import { ReqStatus } from "types";
 import ErrorView from "components/ErrorView";
+import "./register.scss";
 
 export function Register({
   refetchStatus
@@ -30,9 +30,8 @@ export function Register({
     }
   }
 
-  async function onCopiedRecoveryToken() {
-    await refetchStatus()?.catch(() => {});
-    setRecoveryToken(undefined);
+  function onCopiedRecoveryToken() {
+    refetchStatus()?.catch(() => {});
   }
 
   if (recoveryToken) {
