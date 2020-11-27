@@ -21,6 +21,8 @@ export const apiUrls = {
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs")
 };
+// Allow cross-domain cookies
+export const apiTestMode = process.env.REACT_APP_API_TEST;
 
 // WIFI
 export const wifiDefaultSSID = "DAppNodeWIFI";

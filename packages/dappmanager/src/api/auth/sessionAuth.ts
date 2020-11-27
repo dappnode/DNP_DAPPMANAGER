@@ -1,9 +1,17 @@
 import bcrypt from "bcryptjs";
+import { Request } from "express";
 import { SingleFileDb } from "../../utils/singleFileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
-import { HttpError, wrapHandler } from "../utils";
+import { wrapHandler } from "../utils";
 import { SessionsHandler } from "../sessions";
-import { NotLoggedInError, NotRegisteredError } from "./errors";
+import {
+  AlreadyRegisteredError,
+  MissingCredentialsError,
+  NotLoggedInError,
+  NotLoggedInNoCookieError,
+  NotRegisteredError,
+  WrongCredentialsError
+} from "./errors";
 
 // Password & sessions auth
 // ========================
@@ -40,16 +48,26 @@ export class AuthPasswordSession {
 
   private assertAdminPassword(password: string): void {
     const passwordHash = this.passwordDb.read();
-    if (!password) throw new HttpError("Missing credentials");
+    if (!password) throw new MissingCredentialsError();
     if (!passwordHash) throw new NotRegisteredError();
     if (!bcrypt.compareSync(password, passwordHash))
-      throw new HttpError("Wrong password");
+      throw new WrongCredentialsError();
   }
 
   private setAdminPassword(password: string): void {
-    if (!password) throw new HttpError("Missing credentials");
+    if (!password) throw new MissingCredentialsError();
     const passwordHash = bcrypt.hashSync(password, saltLength);
     this.passwordDb.write(passwordHash);
+  }
+
+  private assertOnlyAdmin(req: Request): void {
+    if (!this.passwordDb.read()) throw new NotRegisteredError();
+    if (!this.sessions.isAdmin(req)) {
+      console.log({ headers: req.headers });
+      // Sanity check for cookie existance
+      if (req.cookies) throw new NotLoggedInError();
+      else throw new NotLoggedInNoCookieError();
+    }
   }
 
   /**
@@ -60,7 +78,7 @@ export class AuthPasswordSession {
    * Password can only be set if it's un-initialized
    */
   registerAdmin = wrapHandler((req, res) => {
-    if (this.passwordDb.read()) throw new HttpError("Already registered", 403);
+    if (this.passwordDb.read()) throw new AlreadyRegisteredError();
     this.setAdminPassword(req.body.password);
 
     let recoveryToken = this.recoveryDb.read();
@@ -89,8 +107,8 @@ export class AuthPasswordSession {
    */
   recoverAdminPassword = wrapHandler((req, res) => {
     const recoveryToken = this.recoveryDb.read();
-    if (!req.body.token) throw new HttpError("Missing credentials");
-    if (req.body.token !== recoveryToken) throw new HttpError("Wrong token");
+    if (!req.body.token) throw new MissingCredentialsError();
+    if (req.body.token !== recoveryToken) throw new WrongCredentialsError();
     this.passwordDb.del();
 
     res.send({ ok: true });
@@ -103,8 +121,7 @@ export class AuthPasswordSession {
    * - ok: logged in
    */
   loginAdminStatus = wrapHandler((req, res) => {
-    if (!this.passwordDb.read()) throw new NotRegisteredError();
-    if (!this.sessions.isAdmin(req)) throw new NotLoggedInError();
+    this.assertOnlyAdmin(req);
     res.send({ ok: true });
   });
 
@@ -129,8 +146,7 @@ export class AuthPasswordSession {
    * Middleware to protect routes only for admin sessions
    */
   onlyAdmin = wrapHandler((req, res, next) => {
-    if (!this.passwordDb.read()) throw new NotRegisteredError();
-    if (!this.sessions.isAdmin(req)) throw new NotLoggedInError();
+    this.assertOnlyAdmin(req);
     next();
   });
 }

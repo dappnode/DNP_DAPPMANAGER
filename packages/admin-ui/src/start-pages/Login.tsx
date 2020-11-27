@@ -37,7 +37,11 @@ export function Login({
         case "logged-in":
           break; // OK
         case "not-logged-in":
-          setReqStatus({ error: "Not logged in, are cookies enabled?" });
+          if (status.noCookie) {
+            setReqStatus({ error: "Error logging in, cookies not enabled" });
+          } else {
+            setReqStatus({ error: "Error logging in, unknown error" });
+          }
           break;
       }
     } catch (e) {

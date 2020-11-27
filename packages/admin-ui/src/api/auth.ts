@@ -1,8 +1,9 @@
-import { apiUrls } from "../params";
+import { apiTestMode, apiUrls } from "../params";
 
 // Must be in sync with the DAPPMANAGER
 const ERROR_NOT_REGISTERED = "NOT_REGISTERED";
 const ERROR_NOT_LOGGED_IN = "NOT_LOGGED_IN";
+const ERROR_NOT_LOGGED_IN_NO_COOKIE = "NOT_LOGGED_IN_NO_COOKIE";
 
 interface ResponseBody {
   error?: {
@@ -47,32 +48,24 @@ async function parseResponse<T>(res: Response): Promise<T> {
 
 export type LoginStatus =
   | { status: "logged-in" }
-  | { status: "not-logged-in" }
+  | { status: "not-logged-in"; noCookie: boolean }
   | { status: "not-registered" }
   | { status: "error"; error: Error };
 
 export async function fetchLoginStatus(): Promise<LoginStatus> {
   try {
-    const res = await fetch(apiUrls.loginStatus, { method: "POST" });
-    await parseResponse<{ ok: true }>(res);
-    return {
-      status: "logged-in"
-    };
+    await fetchAuthPost(apiUrls.loginStatus);
+    return { status: "logged-in" };
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_REGISTERED:
-        return {
-          status: "not-registered"
-        };
+        return { status: "not-registered" };
       case ERROR_NOT_LOGGED_IN:
-        return {
-          status: "not-logged-in"
-        };
+        return { status: "not-logged-in", noCookie: false };
+      case ERROR_NOT_LOGGED_IN_NO_COOKIE:
+        return { status: "not-logged-in", noCookie: true };
       default:
-        return {
-          status: "error",
-          error: e
-        };
+        return { status: "error", error: e };
     }
   }
 }
@@ -110,7 +103,8 @@ async function fetchAuthPost<T, R>(url: string, data?: T): Promise<R> {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data || {})
+    body: JSON.stringify(data || {}),
+    credentials: apiTestMode ? "include" : undefined
   });
   return await parseResponse(res);
 }

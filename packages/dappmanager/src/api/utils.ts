@@ -2,10 +2,12 @@ import express from "express";
 import { Server } from "socket.io";
 
 export class HttpError extends Error {
-  code: number;
-  constructor(message?: string, code?: number) {
-    super(message);
-    this.code = code || 500;
+  name: string;
+  statusCode: number;
+  constructor({ name, statusCode }: { name: string; statusCode?: number }) {
+    super(name);
+    this.name = name;
+    this.statusCode = statusCode || 500;
   }
 }
 
@@ -36,8 +38,8 @@ export const errorHandler: express.ErrorRequestHandler = (
     return next(err);
   }
   if (err instanceof HttpError) {
-    res.status(err.code).send({
-      error: { message: err.message }
+    res.status(err.statusCode).send({
+      error: { name: err.name, message: err.message }
     });
   } else {
     res.status(500).send({

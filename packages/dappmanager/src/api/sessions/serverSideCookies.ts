@@ -1,7 +1,6 @@
 import express from "express";
 import Session from "express-session";
 import { SessionStoreLowDb } from "./sessionsDb";
-import { HttpError } from "../utils";
 import { SessionsSecretDb } from "./secret";
 import { SessionsHandler } from "./interface";
 
@@ -42,7 +41,7 @@ export class ServerSideCookies implements SessionsHandler {
   }
 
   makeAdmin(req: express.Request): void {
-    if (!req.session) throw new HttpError("No session");
+    if (!req.session) throw new Error("No session");
     req.session.isAdmin = true;
   }
 
@@ -51,7 +50,7 @@ export class ServerSideCookies implements SessionsHandler {
   }
 
   async destroy(req: express.Request): Promise<void> {
-    if (!req.session) throw new HttpError("No session");
+    if (!req.session) throw new Error("No session");
     await new Promise((resolve, reject) => {
       req.session.destroy(err => (err ? reject(err) : resolve()));
     });
