@@ -3,6 +3,7 @@ import React from "react";
 import DappnodeIdentity from "./dropdownMenus/DappnodeIdentity";
 import ChainDataDropdown from "./dropdownMenus/ChainDataDropdown";
 import Notifications from "./dropdownMenus/Notifications";
+import Profile from "./dropdownMenus/Profile";
 // Components
 import { toggleSideNav } from "./SideBar";
 // Styles
@@ -24,6 +25,7 @@ const TopBar = () => (
       <div className="topnav-icon-separator" />
       <ChainDataDropdown />
       <Notifications />
+      <Profile />
     </div>
   </div>
 );

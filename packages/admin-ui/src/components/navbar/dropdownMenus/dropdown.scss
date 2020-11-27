@@ -92,6 +92,15 @@
   &.notifications .tn-dropdown-toggle svg {
     font-size: 1.3rem;
   }
+
+  &.profile {
+    a {
+      color: inherit;
+    }
+    .tn-dropdown-toggle svg {
+      font-size: 1.6rem;
+    }
+  }
 }
 
 .tn-dropdown-toggle {
