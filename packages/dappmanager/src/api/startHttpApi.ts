@@ -22,7 +22,7 @@ import { Logs } from "../logs";
 
 interface HttpApiParams {
   DB_SESSIONS_PATH: string;
-  AUTH_IP_ALLOW_ALL_IPS: boolean;
+  AUTH_IP_ALLOW_LOCAL_IP: boolean;
   HTTP_API_PORT: number | string;
   UI_FILES_PATH: string;
   HTTP_CORS_WHITELIST: string[];

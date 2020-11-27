@@ -166,7 +166,7 @@ const params = {
   ETHFORWARD_PIN_ON_VISIT: true,
 
   // Flags
-  AUTH_IP_ALLOW_ALL_IPS: Boolean(process.env.ALLOW_ALL_IPS)
+  AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)
 };
 
 if (devMode) {

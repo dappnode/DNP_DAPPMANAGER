@@ -20,7 +20,7 @@ const subscriptionsLogger: LoggerMiddleware = {
 const server = startHttpApi({
   params: {
     DB_SESSIONS_PATH: path.join(testFileDir, "sessions.json"),
-    AUTH_IP_ALLOW_ALL_IPS: true,
+    AUTH_IP_ALLOW_LOCAL_IP: true,
     HTTP_API_PORT: process.env.PORT || 5000,
     UI_FILES_PATH: "./build",
     HTTP_CORS_WHITELIST: ["http://localhost:3000", "http://localhost:3001"],

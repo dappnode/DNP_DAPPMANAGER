@@ -5,16 +5,6 @@ import { HttpError, wrapHandler } from "../utils";
 import { SessionsHandler } from "../sessions";
 import { NotLoggedInError, NotRegisteredError } from "./errors";
 
-// Initial insecure IP auth
-
-interface AuthPasswordSessionParams {
-  ADMIN_PASSWORD_FILE: string;
-  ADMIN_RECOVERY_FILE: string;
-}
-
-const saltLength = 10;
-const recoveryTokenLength = 20;
-
 // Password & sessions auth
 // ========================
 // There's one single admin account so no username is used
@@ -28,6 +18,14 @@ const recoveryTokenLength = 20;
 //    which will start the register cycle again
 // B) SSH into the server and delete the ADMIN_PASSWORD_FILE file,
 //    which will start the register cycle again
+
+interface AuthPasswordSessionParams {
+  ADMIN_PASSWORD_FILE: string;
+  ADMIN_RECOVERY_FILE: string;
+}
+
+const saltLength = 10;
+const recoveryTokenLength = 20;
 
 export class AuthPasswordSession {
   sessions: SessionsHandler;
