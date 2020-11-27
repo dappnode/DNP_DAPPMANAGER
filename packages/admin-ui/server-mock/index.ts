@@ -1,6 +1,9 @@
+import path from "path";
 import * as methods from "./methods";
 import { startHttpApi } from "../../dappmanager/src/api/startHttpApi";
 import { LoggerMiddleware } from "../src/common/transport/types";
+
+const testFileDir = "test_files";
 
 /* eslint-disable no-console */
 
@@ -16,11 +19,14 @@ const subscriptionsLogger: LoggerMiddleware = {
 
 const server = startHttpApi({
   params: {
-    DB_SESSIONS_PATH: "test_files",
+    DB_SESSIONS_PATH: path.join(testFileDir, "sessions.json"),
     AUTH_IP_ALLOW_ALL_IPS: true,
     HTTP_API_PORT: process.env.PORT || 5000,
-    UI_FILES_PATH: ".",
-    HTTP_CORS_WHITELIST: ["http://localhost:3000", "http://localhost:3001"]
+    UI_FILES_PATH: "./build",
+    HTTP_CORS_WHITELIST: ["http://localhost:3000", "http://localhost:3001"],
+    ADMIN_PASSWORD_FILE: path.join(testFileDir, "ADMIN_PASSWORD_FILE.txt"),
+    ADMIN_RECOVERY_FILE: path.join(testFileDir, "ADMIN_RECOVERY_FILE.txt"),
+    SESSIONS_SECRET_FILE: path.join(testFileDir, "SESSIONS_SECRET_FILE.txt")
   },
   logs: {
     debug: console.log,
@@ -28,7 +34,15 @@ const server = startHttpApi({
     warn: console.log,
     error: console.log
   },
-  routes: {} as any,
+  routes: {
+    containerLogs: () => {},
+    download: () => {},
+    downloadUserActionLogs: () => {},
+    globalEnvs: () => {},
+    packageManifest: () => {},
+    publicPackagesData: () => {},
+    upload: () => {}
+  },
   ethForwardMiddleware: (req, res, next) => {
     next();
   },

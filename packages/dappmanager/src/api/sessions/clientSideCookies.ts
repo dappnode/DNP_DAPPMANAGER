@@ -3,7 +3,12 @@ import Session from "express-session";
 import { SessionStoreLowDb } from "./sessionsDb";
 import { HttpError } from "../utils";
 import { SessionsHandler } from "./interface";
-import { getSessionsSecretKey } from "./secret";
+import { SessionsSecretDb } from "./secret";
+
+interface ClientSideCookiesParams {
+  DB_SESSIONS_PATH: string;
+  SESSIONS_SECRET_FILE: string;
+}
 
 declare module "express-session" {
   interface SessionData {
@@ -14,7 +19,9 @@ declare module "express-session" {
 export class ClientSideCookies implements SessionsHandler {
   handler: express.RequestHandler;
 
-  constructor({ DB_SESSIONS_PATH }: { DB_SESSIONS_PATH: string }) {
+  constructor(params: ClientSideCookiesParams) {
+    const secretDb = new SessionsSecretDb(params.SESSIONS_SECRET_FILE);
+
     this.handler = Session({
       cookie: {
         path: "/",
@@ -26,9 +33,9 @@ export class ClientSideCookies implements SessionsHandler {
       resave: true, // Recommended by express-session docs.
       rolling: false, // Cookie expires on original maxAge
       saveUninitialized: false, // Reduce server storage
-      secret: getSessionsSecretKey(),
+      secret: secretDb.get(),
       store: new SessionStoreLowDb({
-        dbPath: DB_SESSIONS_PATH,
+        dbPath: params.DB_SESSIONS_PATH,
         ttl: 86400
       })
     });

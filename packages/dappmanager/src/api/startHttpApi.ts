@@ -26,6 +26,9 @@ interface HttpApiParams {
   HTTP_API_PORT: number | string;
   UI_FILES_PATH: string;
   HTTP_CORS_WHITELIST: string[];
+  ADMIN_PASSWORD_FILE: string;
+  ADMIN_RECOVERY_FILE: string;
+  SESSIONS_SECRET_FILE: string;
 }
 
 interface HttpRoutes {
@@ -93,7 +96,7 @@ export function startHttpApi({
 
   // Auth
   const authIp = new AuthIp(params);
-  const auth = new AuthPasswordSession(sessions);
+  const auth = new AuthPasswordSession(sessions, params);
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
