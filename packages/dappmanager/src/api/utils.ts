@@ -13,9 +13,10 @@ export class HttpError extends Error {
  * Wrap express routes to be able to safely throw errors and return JSON
  * @param handler
  */
-export function wrapHandler(
-  handler: express.RequestHandler
-): express.RequestHandler {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function wrapHandler<ReqParams extends { [key: string]: any } = {}>(
+  handler: express.RequestHandler<ReqParams>
+): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
     try {
       await handler(req, res, next);

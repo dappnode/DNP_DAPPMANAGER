@@ -3,11 +3,15 @@ import { listPackage } from "../../modules/docker/listContainers";
 import { readManifestIfExists } from "../../modules/manifest";
 import { wrapHandler } from "../utils";
 
+interface Params {
+  dnpName: string;
+}
+
 /**
  * Query publicly available packages data
  */
-export const packageManifest = wrapHandler(async (req, res) => {
-  const dnpName = req.params.dnpName as string | undefined;
+export const packageManifest = wrapHandler<Params>(async (req, res) => {
+  const { dnpName } = req.params;
   if (!dnpName) throw Error(`Must provide containerName`);
 
   const dnp = await listPackage({ dnpName });

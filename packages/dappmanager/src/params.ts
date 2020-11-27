@@ -59,8 +59,13 @@ const params = {
   UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
   // HTTP API parameters
-  ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
+  IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
+  HTTP_CORS_WHITELIST: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://my.dappnode"
+  ],
 
   // VPN API
   vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
@@ -158,7 +163,10 @@ const params = {
   // ETHFORWARD / HTTP proxy params
   ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
-  ETHFORWARD_PIN_ON_VISIT: true
+  ETHFORWARD_PIN_ON_VISIT: true,
+
+  // Flags
+  AUTH_IP_ALLOW_ALL_IPS: Boolean(process.env.ALLOW_ALL_IPS)
 };
 
 if (devMode) {

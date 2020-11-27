@@ -10,11 +10,25 @@ import { postRestartPatch } from "./modules/installer/restartPatch";
 import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
 import runWatchers from "./watchers";
-import startHttpApi from "./api";
+import { startHttpApi } from "./api/startHttpApi";
+import { routesLogger, subscriptionsLogger } from "./api/logger";
+import { mapSubscriptionsToEventBus } from "./api/subscriptions";
+import * as routes from "./api/routes";
 import { logs } from "./logs";
+import params from "./params";
+import { getEthForwardMiddleware } from "./ethForward";
 
 // Start HTTP API
-startHttpApi();
+const server = startHttpApi({
+  params,
+  logs,
+  routes,
+  ethForwardMiddleware: getEthForwardMiddleware(),
+  routesLogger,
+  methods: calls,
+  subscriptionsLogger,
+  mapSubscriptionsToEventBus
+});
 
 // Start watchers
 runWatchers();
@@ -82,3 +96,9 @@ runLegacyOps();
 copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
+
+// Graceful shutdown
+process.on("SIGINT", () => {
+  server.close();
+  process.exit(0);
+});

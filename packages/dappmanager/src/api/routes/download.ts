@@ -3,11 +3,15 @@ import * as db from "../../db";
 import { logs } from "../../logs";
 import { wrapHandler } from "../utils";
 
+interface Params {
+  fileId: string;
+}
+
 /**
  * Endpoint to download files.
  * File must be previously available at the specified fileId
  */
-export const download = wrapHandler((req, res) => {
+export const download = wrapHandler<Params>((req, res) => {
   const { fileId } = req.params;
   const filePath = db.fileTransferPath.get(fileId);
 

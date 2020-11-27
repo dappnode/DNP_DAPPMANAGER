@@ -5,11 +5,15 @@ import {
 import { PackageContainer } from "../../types";
 import { wrapHandler } from "../utils";
 
+interface Params {
+  containerName: string;
+}
+
 /**
  * Query publicly available packages data
  */
-export const publicPackagesData = wrapHandler(async (req, res) => {
-  const containerName = req.params.containerName as string | undefined;
+export const publicPackagesData = wrapHandler<Params>(async (req, res) => {
+  const { containerName } = req.params;
 
   if (containerName) {
     const privateDnpData = await listContainerNoThrow({ containerName });

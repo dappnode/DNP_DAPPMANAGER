@@ -1,7 +1,7 @@
 import { Store } from "express-session";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
-import * as validate from "../utils/validate";
+import * as validate from "../../utils/validate";
 
 interface OptionsLowdbSessionStore {
   dbPath: string;
