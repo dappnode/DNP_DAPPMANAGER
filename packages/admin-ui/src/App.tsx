@@ -102,7 +102,7 @@ export default function App() {
     case "not-registered":
       return <Register refetchStatus={onFetchLoginStatus} />;
     case "error":
-      return <NoConnection />;
+      return <NoConnection error={loginStatus.error} />;
     default:
       return <NoConnection />;
   }

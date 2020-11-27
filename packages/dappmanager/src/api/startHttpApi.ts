@@ -123,15 +123,13 @@ export function startHttpApi({
 
   app.post("/login-status", auth.loginAdminStatus);
   app.post("/login", auth.loginAdmin);
-  app.post("/logout", auth.onlyAdmin, auth.logoutAdmin);
+  app.post("/logout", auth.logoutAdmin);
+  app.post("/change-pass", auth.changeAdminPassword);
   app.post("/register", authIp.onlyAdminIp, auth.registerAdmin);
-  app.post("/change-pass", authIp.onlyAdminIp, auth.changeAdminPassword);
   app.post("/recover-pass", authIp.onlyAdminIp, auth.recoverAdminPassword);
 
   // Ping - health check
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
-
-  /* eslint-disable max-len */
 
   // Methods that do not fit into RPC
   // prettier-ignore

@@ -1,8 +1,9 @@
+import ErrorView from "components/ErrorView";
 import React from "react";
 import { FiWifiOff } from "react-icons/fi";
 import { StandaloneContainer } from "./StandaloneContainer";
 
-export const NoConnection = () => (
+export const NoConnection = ({ error }: { error?: Error | string }) => (
   <StandaloneContainer TopIcon={FiWifiOff} title="No connection">
     <div className="text">
       Could not connect to DAppNode. Please make sure your VPN connection is
@@ -14,5 +15,7 @@ export const NoConnection = () => (
       </a>
       .
     </div>
+
+    {error && <ErrorView error={error} hideIcon />}
   </StandaloneContainer>
 );
