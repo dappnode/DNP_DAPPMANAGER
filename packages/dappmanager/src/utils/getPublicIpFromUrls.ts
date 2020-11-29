@@ -19,6 +19,9 @@ const urls = [
 export default async function getPublicIpFromUrls({
   timeout = 15 * 1000,
   retries = 10
+}: {
+  timeout?: number;
+  retries?: number;
 }): Promise<string> {
   const errors = [];
   for (const url of urls) {

@@ -26,7 +26,7 @@ const dyndnsInterval = params.DYNDNS_INTERVAL || 30 * 60 * 1000; // 30 minutes
 async function shouldUpdate(): Promise<boolean> {
   try {
     const ipPrevious = db.publicIp.get();
-    const ip = await getPublicIpFromUrls();
+    const ip = await getPublicIpFromUrls({});
     // Store the IP on cache
     if (ip) db.publicIp.set(ip);
     // If there was an error fetching the IP or it change, update it
