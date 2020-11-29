@@ -24,7 +24,8 @@ import {
   PackageEnvs,
   HostStatCpu,
   HostStatDisk,
-  HostStatMemory
+  HostStatMemory,
+  RealTimePublicIp
 } from "./types";
 
 export interface Routes {
@@ -428,7 +429,7 @@ export interface Routes {
   /**
    * Returns public Ip in real time
    */
-  ipPublicGet: () => Promise<string>;
+  ipPublicGet: () => Promise<RealTimePublicIp>;
 }
 
 interface RouteData {

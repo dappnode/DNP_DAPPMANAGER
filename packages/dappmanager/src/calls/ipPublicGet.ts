@@ -1,6 +1,14 @@
+import { RealTimePublicIp } from "../common";
+import * as db from "../db";
 import getPublicIpFromUrls from "../utils/getPublicIpFromUrls";
 
-export async function ipPublicGet(): Promise<string> {
-  const publicIp = await getPublicIpFromUrls(1000);
-  return publicIp;
+export async function ipPublicGet(): Promise<RealTimePublicIp> {
+  return {
+    realTimePublicIp: await getPublicIpFromUrls({
+      timeout: 3 * 1000,
+      retries: 1
+    }),
+    publicIp: db.publicIp.get(),
+    staticIp: db.staticIp.get()
+  };
 }

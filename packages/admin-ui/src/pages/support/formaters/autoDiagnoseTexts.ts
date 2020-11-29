@@ -1,5 +1,10 @@
 import { DiagnoseResult } from "../types";
-import { SystemInfo, InstalledPackageData, HostStatDisk } from "common/types";
+import {
+  SystemInfo,
+  InstalledPackageData,
+  HostStatDisk,
+  RealTimePublicIp
+} from "common/types";
 import { mandatoryCoreDnps } from "params";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
@@ -35,23 +40,28 @@ export function connection({
     ]
   };
 }
-
+/**
+ * Check for the 9 combinations for the 3 params of the IP .
+ * @param param0
+ */
 export function internetConnection({
   data: dappnodeParams,
   isValidating
 }: {
-  data?: SystemInfo;
+  data?: RealTimePublicIp;
   isValidating: boolean;
 }): DiagnoseResultOrNull {
   if (isValidating) return { loading: true, msg: "Loading system info..." };
   if (!dappnodeParams) return null;
-  const { publicIp, staticIp } = dappnodeParams;
+  const { realTimePublicIp, publicIp, staticIp } = dappnodeParams;
   return {
-    ok: Boolean(publicIp),
-    msg: publicIp
-      ? staticIp
-        ? "May have connected to the internet, static IP set"
-        : "Has connected to the internet, and detected own public IP"
+    ok: Boolean(realTimePublicIp),
+    msg: realTimePublicIp
+      ? publicIp
+        ? staticIp
+          ? "May have connected to the internet, static IP set"
+          : "Has connected to the internet, and detected own public IP"
+        : "Has connected to the internet, IP is dynamic and has changed since last time"
       : "Cannot connect to the internet. Could not fetch own public IP",
     solutions: [
       "Make sure your DAppNode is connected to the internet. Make sure to plug its ethernet cable to the router."

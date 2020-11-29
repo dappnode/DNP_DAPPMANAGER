@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import useSWR from "swr";
 import { useApi } from "api";
 import { useSelector } from "react-redux";
@@ -10,7 +10,6 @@ import * as formatDiagnose from "../formaters/autoDiagnoseTexts";
 // Components
 import Card from "components/Card";
 import Ok from "components/Ok";
-import SystemInfo from "pages/system/components/SystemInfo";
 
 export default function AutoDiagnose() {
   const realTimePublicIp = useApi.ipPublicGet();
@@ -22,26 +21,12 @@ export default function AutoDiagnose() {
 
   const isOpen = connectionStatus.isOpen;
 
-  const [publicIpUpdated, setIp] = useState(realTimePublicIp.data);
-
-  useEffect(() => {
-    systemInfo.revalidate();
-    if (!realTimePublicIp.data) {
-      setIp("");
-    } else {
-      setIp(realTimePublicIp.data);
-      if (systemInfo.data?.publicIp && publicIpUpdated) {
-        systemInfo.data.publicIp = publicIpUpdated;
-      }
-    }
-  }, [realTimePublicIp]);
-
   const diagnosesArray: DiagnoseResult[] = [
     formatDiagnose.connection(connectionStatus),
     formatDiagnose.ipfs(ipfsConnection),
     ...(isOpen
       ? [
-          formatDiagnose.internetConnection(systemInfo),
+          formatDiagnose.internetConnection(realTimePublicIp),
           formatDiagnose.openPorts(systemInfo),
           formatDiagnose.noNatLoopback(systemInfo),
           formatDiagnose.diskSpace(hostStats),
