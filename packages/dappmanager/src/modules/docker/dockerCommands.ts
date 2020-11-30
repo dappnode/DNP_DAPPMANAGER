@@ -11,16 +11,8 @@ function parseKwargs(kwargs?: Kwargs): string[] {
   return dargs(definedKwargs, { useEquals: false, ignoreFalse: true });
 }
 
-function parseArgs(args: Args, kwargs?: Kwargs): string[] {
-  const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
-  return [
-    ...args,
-    ...dargs(definedKwargs, { useEquals: false, ignoreFalse: true })
-  ];
-}
-
 async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
-  return shell(["docker", ...parseArgs(args, kwargs)]);
+  return shell(["docker", ...args, ...parseKwargs(kwargs)]);
 }
 
 async function execDockerCompose(
