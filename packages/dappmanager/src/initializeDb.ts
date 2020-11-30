@@ -204,12 +204,12 @@ async function updateLocalDyndns(): Promise<void> {
 // Utils
 
 function returnNullIfError(
-  fn: ({}) => Promise<string>,
+  fn: () => Promise<string>,
   silent?: boolean
 ): () => Promise<string | null> {
   return async function(): Promise<string | null> {
     try {
-      return await fn({});
+      return await fn();
     } catch (e) {
       if (silent) logs.warn(e.message);
       else logs.error(e);

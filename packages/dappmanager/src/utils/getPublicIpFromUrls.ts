@@ -16,13 +16,13 @@ const urls = [
  * @param silent suppress logs
  * @returns public IP: 85.84.83.82
  */
-export default async function getPublicIpFromUrls({
-  timeout = 15 * 1000,
-  retries = 10
-}: {
+export default async function getPublicIpFromUrls(options?: {
   timeout?: number;
   retries?: number;
 }): Promise<string> {
+  const timeout = options?.timeout || 15 * 1000;
+  const retries = options?.retries || 10;
+
   const errors = [];
   for (const url of urls) {
     try {
