@@ -12,7 +12,7 @@ import Card from "components/Card";
 import Ok from "components/Ok";
 
 export default function AutoDiagnose() {
-  const realTimePublicIp = useApi.ipPublicGet();
+  const publicIpRes = useApi.ipPublicGet();
   const connectionStatus = useSelector(getConnectionStatus);
   const systemInfo = useApi.systemInfoGet();
   const hostStats = useApi.statsDiskGet();
@@ -26,7 +26,7 @@ export default function AutoDiagnose() {
     formatDiagnose.ipfs(ipfsConnection),
     ...(isOpen
       ? [
-          formatDiagnose.internetConnection(realTimePublicIp),
+          formatDiagnose.internetConnection(publicIpRes, systemInfo),
           formatDiagnose.openPorts(systemInfo),
           formatDiagnose.noNatLoopback(systemInfo),
           formatDiagnose.diskSpace(hostStats),

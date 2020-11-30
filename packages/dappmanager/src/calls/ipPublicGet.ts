@@ -1,14 +1,11 @@
-import { RealTimePublicIp } from "../common";
-import * as db from "../db";
+import { PublicIpResponse } from "../types";
 import getPublicIpFromUrls from "../utils/getPublicIpFromUrls";
 
-export async function ipPublicGet(): Promise<RealTimePublicIp> {
+export async function ipPublicGet(): Promise<PublicIpResponse> {
   return {
-    realTimePublicIp: await getPublicIpFromUrls({
+    publicIp: await getPublicIpFromUrls({
       timeout: 3 * 1000,
       retries: 1
-    }),
-    publicIp: db.publicIp.get(),
-    staticIp: db.staticIp.get()
+    })
   };
 }

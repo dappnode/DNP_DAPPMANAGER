@@ -27,15 +27,14 @@ export default async function getPublicIpFromUrls({
   for (const url of urls) {
     try {
       const ip = await retry(
-        () => fetch(url, { timeout: timeout }).then(res => res.text()),
-        { retries: retries }
+        () => fetch(url, { timeout }).then(res => res.text()),
+        { retries }
       );
       if (isIp(ip)) return ip;
       else throw Error(`Invalid IP format: ${ip}`);
     } catch (e) {
-      const error = `Error getting IP from ${url}: ${e.message}`;
-      errors.push(error);
+      errors.push(`${url}: ${e.message}`);
     }
   }
-  throw Error(`No valid IP was returned by urls:\n${errors.join("\n")}`);
+  throw Error(`Error fetching public IP\n${errors.join("\n")}`);
 }

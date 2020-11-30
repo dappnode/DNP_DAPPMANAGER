@@ -1018,14 +1018,6 @@ export interface ErrorSerialized {
 }
 
 /**
- * Public Ip in real time
- */
-export interface RealTimePublicIp {
-  realTimePublicIp: string;
-  publicIp: string;
-  staticIp: string;
-}
-/**
  * Aggregated DAppNode system info
  */
 export interface SystemInfo {
@@ -1099,6 +1091,10 @@ export interface DiagnoseItem {
   error?: string;
 }
 export type Diagnose = DiagnoseItem[];
+
+export interface PublicIpResponse {
+  publicIp: string;
+}
 
 /**
  * Welcome wizard / setup flow

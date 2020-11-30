@@ -25,7 +25,7 @@ import {
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
-  RealTimePublicIp
+  PublicIpResponse
 } from "./types";
 
 export interface Routes {
@@ -429,7 +429,7 @@ export interface Routes {
   /**
    * Returns public Ip in real time
    */
-  ipPublicGet: () => Promise<RealTimePublicIp>;
+  ipPublicGet: () => Promise<PublicIpResponse>;
 }
 
 interface RouteData {
