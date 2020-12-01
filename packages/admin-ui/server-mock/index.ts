@@ -19,14 +19,15 @@ const subscriptionsLogger: LoggerMiddleware = {
 
 const server = startHttpApi({
   params: {
-    DB_SESSIONS_PATH: path.join(testFileDir, "sessions.json"),
     AUTH_IP_ALLOW_LOCAL_IP: true,
     HTTP_API_PORT: process.env.PORT || 5000,
     UI_FILES_PATH: "./build",
     HTTP_CORS_WHITELIST: ["http://localhost:3000", "http://localhost:3001"],
     ADMIN_PASSWORD_FILE: path.join(testFileDir, "ADMIN_PASSWORD_FILE.txt"),
     ADMIN_RECOVERY_FILE: path.join(testFileDir, "ADMIN_RECOVERY_FILE.txt"),
-    SESSIONS_SECRET_FILE: path.join(testFileDir, "SESSIONS_SECRET_FILE.txt")
+    SESSIONS_SECRET_FILE: path.join(testFileDir, "SESSIONS_SECRET_FILE.txt"),
+    SESSIONS_MAX_TTL_MS: 24 * 60 * 60 * 100,
+    SESSIONS_TTL_MS: 24 * 60 * 60 * 100
   },
   logs: {
     debug: console.log,

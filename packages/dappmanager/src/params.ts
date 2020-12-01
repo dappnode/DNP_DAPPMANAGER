@@ -13,14 +13,12 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  */
 let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
 let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
-let SESSIONS_DIR = "/usr/src/app/sessions/";
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
   DNCORE_DIR = "test_files/";
   REPO_DIR = "test_files/";
-  SESSIONS_DIR = "test_files/";
 }
 
 const params = {
@@ -36,7 +34,6 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
-  DB_SESSIONS_PATH: path.resolve(SESSIONS_DIR, "sessions.json"),
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_PASSWORD_FILE: path.join(DNCORE_DIR, "admin-password-hash.txt"),
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
@@ -66,6 +63,11 @@ const params = {
     "http://localhost:3001",
     "http://my.dappnode"
   ],
+
+  // API auth sessions
+  SESSIONS_SECRET_FILE: path.join(DNCORE_DIR, "sessions-secret-key.txt"),
+  SESSIONS_MAX_TTL_MS: 24 * 60 * 60 * 100,
+  SESSIONS_TTL_MS: 24 * 60 * 60 * 100,
 
   // VPN API
   vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",

@@ -27,7 +27,7 @@ import {
 // B) SSH into the server and delete the ADMIN_PASSWORD_FILE file,
 //    which will start the register cycle again
 
-interface AuthPasswordSessionParams {
+export interface AuthPasswordSessionParams {
   ADMIN_PASSWORD_FILE: string;
   ADMIN_RECOVERY_FILE: string;
 }

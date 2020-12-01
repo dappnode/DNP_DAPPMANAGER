@@ -7,6 +7,9 @@ import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
 import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
+import { AuthIp, AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
+import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
+import { Logs } from "../logs";
 import {
   getRpcHandler,
   subscriptionsFactory,
@@ -15,20 +18,15 @@ import {
   LoggerMiddleware,
   Routes,
   Subscriptions
-} from "../common";
-import { AuthIp, AuthPasswordSession } from "./auth";
-import { ServerSideCookies } from "./sessions";
-import { Logs } from "../logs";
+} from "../types";
 
-interface HttpApiParams {
-  DB_SESSIONS_PATH: string;
+interface HttpApiParams
+  extends ClientSideCookiesParams,
+    AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
   HTTP_API_PORT: number | string;
   UI_FILES_PATH: string;
   HTTP_CORS_WHITELIST: string[];
-  ADMIN_PASSWORD_FILE: string;
-  ADMIN_RECOVERY_FILE: string;
-  SESSIONS_SECRET_FILE: string;
 }
 
 interface HttpRoutes {
@@ -88,10 +86,11 @@ export function startHttpApi({
   app.use(compression());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(express.static(path.resolve(params.UI_FILES_PATH), { maxAge: "1d" })); // Express uses "ETags" (hashes of the files requested) to know when the file changed
+  // Express uses "ETags" (hashes of the files requested) to know when the file changed
+  app.use(express.static(path.resolve(params.UI_FILES_PATH), { maxAge: "1d" }));
 
   // Sessions
-  const sessions = new ServerSideCookies(params);
+  const sessions = new ClientSideCookies(params);
   app.use(sessions.handler);
 
   // Auth
