@@ -71,7 +71,7 @@ describe("Release format tests", () => {
               path: `${dnpName}_0.0.1.tar.xz`,
               hash: "",
               size: 0,
-              restart: "always",
+              restart: "unless-stopped",
               environment: mockEnvs(expectedEnvValue)
             },
             author: "lion",
@@ -105,7 +105,7 @@ describe("Release format tests", () => {
               version: "3.4",
               services: {
                 [dnpName]: {
-                  restart: "always",
+                  restart: "unless-stopped",
                   environment: mockEnvs(expectedEnvValue)
                 }
               }
@@ -141,11 +141,11 @@ describe("Release format tests", () => {
               version: "3.4",
               services: {
                 [serviceNames.frontend]: {
-                  restart: "always",
+                  restart: "unless-stopped",
                   environment: mockEnvs(expectedEnvValues.frontend)
                 },
                 [serviceNames.backend]: {
-                  restart: "always",
+                  restart: "unless-stopped",
                   environment: mockEnvs(expectedEnvValues.backend)
                 }
               }
