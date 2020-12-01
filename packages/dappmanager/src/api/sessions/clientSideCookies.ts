@@ -1,6 +1,5 @@
 import express from "express";
-import Session from "express-session";
-import { SessionStoreLowDb } from "./sessionsDb";
+import cookieSession from "cookie-session";
 import { SessionsHandler } from "./interface";
 import { SessionsSecretDb } from "./secret";
 
@@ -21,22 +20,15 @@ export class ClientSideCookies implements SessionsHandler {
   constructor(params: ClientSideCookiesParams) {
     const secretDb = new SessionsSecretDb(params.SESSIONS_SECRET_FILE);
 
-    this.handler = Session({
-      cookie: {
-        path: "/",
-        httpOnly: true, // for security
-        secure: false, // DAppNode UI is server over HTTP
-        maxAge: 86400, // 1 day
-        sameSite: "strict" // for security
-      },
-      resave: true, // Recommended by express-session docs.
-      rolling: false, // Cookie expires on original maxAge
-      saveUninitialized: false, // Reduce server storage
+    this.handler = cookieSession({
       secret: secretDb.get(),
-      store: new SessionStoreLowDb({
-        dbPath: params.DB_SESSIONS_PATH,
-        ttl: 86400
-      })
+      signed: true,
+      // Cookie settings
+      path: "/",
+      httpOnly: true, // for security
+      secure: false, // DAppNode UI is server over HTTP
+      maxAge: 86400, // 1 day
+      sameSite: "strict" // for security
     });
   }
 
