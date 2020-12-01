@@ -78,14 +78,17 @@
   }
 
   /* Right position of the dropdown to prevent clipping on small screens */
+  &.profile > .menu {
+    right: -0.5rem;
+  }
   &.notifications > .menu {
-    right: -0.4rem;
+    right: -3.1rem;
   }
   &.chainstatus > .menu {
-    right: -2.9rem;
+    right: -5.6rem;
   }
   &.dappnodeidentity > .menu {
-    right: -6.45rem;
+    right: -9.2rem;
   }
 
   // Regulate size of toggle icons

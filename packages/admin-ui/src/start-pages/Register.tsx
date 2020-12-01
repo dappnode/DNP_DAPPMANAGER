@@ -117,7 +117,7 @@ function CopyRecoveryToken({
   );
 }
 
-function validatePassword({
+export function validatePassword({
   password,
   password2
 }: {

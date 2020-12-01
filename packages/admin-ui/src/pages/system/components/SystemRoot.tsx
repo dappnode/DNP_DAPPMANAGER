@@ -17,6 +17,7 @@ import SystemUpdate from "./SystemUpdate";
 import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
+import Profile from "./Profile";
 import Title from "components/Title";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
@@ -67,6 +68,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Peers",
       subPath: subPaths.peers,
       component: Peers
+    },
+    {
+      name: "Profile",
+      subPath: subPaths.profile,
+      component: Profile
     },
     {
       name: "Power",

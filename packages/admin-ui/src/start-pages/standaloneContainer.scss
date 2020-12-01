@@ -1,4 +1,11 @@
 .standalone-container {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  padding: 3em 1em;
+  text-align: center;
+  background-color: var(--color-background);
+  min-height: 100vh;
   max-width: 35rem;
   margin: auto;
 
