@@ -39,7 +39,7 @@ const polkadotNewCompose = {
         TELEMETRY_ENABLE: "no",
         EXTRA_OPTS: "--out-peers 10 --in-peers 10"
       },
-      restart: "always",
+      restart: "unless-stopped",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
       dns: "172.33.1.2",
       networks: ["dncore_network"]
@@ -199,7 +199,7 @@ describe("parseUserSet", () => {
         [serviceName]: {
           image: "ethchain.dnp.dappnode.eth:0.2.20",
           container_name: "DAppNodeCore-ethchain.dnp.dappnode.eth",
-          restart: "always",
+          restart: "unless-stopped",
           volumes: [
             "ethchaindnpdappnodeeth_data:/root/.local/share/io.parity.ethereum",
             "ethchaindnpdappnodeeth_geth:/root/.ethereum",

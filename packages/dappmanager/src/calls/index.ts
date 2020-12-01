@@ -46,3 +46,4 @@ export { setStaticIp } from "./setStaticIp";
 export { systemInfoGet } from "./systemInfoGet";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
+export { ipPublicGet } from "./ipPublicGet";
