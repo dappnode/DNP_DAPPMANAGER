@@ -1092,6 +1092,10 @@ export interface DiagnoseItem {
 }
 export type Diagnose = DiagnoseItem[];
 
+export interface PublicIpResponse {
+  publicIp: string;
+}
+
 /**
  * Welcome wizard / setup flow
  * Available routes / views in the UI
