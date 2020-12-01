@@ -26,7 +26,7 @@ export class ServerSideCookies implements SessionsHandler {
         path: "/",
         httpOnly: true, // for security
         secure: false, // DAppNode UI is server over HTTP
-        maxAge: 86400, // 1 day
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: "strict" // for security
       },
       resave: true, // Recommended by express-session docs.
@@ -35,7 +35,7 @@ export class ServerSideCookies implements SessionsHandler {
       secret: secretDb.get(),
       store: new SessionStoreLowDb({
         dbPath: params.DB_SESSIONS_PATH,
-        ttl: 86400
+        ttlMs: 24 * 60 * 60 * 1000 // 1 day
       })
     });
   }

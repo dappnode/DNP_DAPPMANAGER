@@ -27,7 +27,7 @@ export class ClientSideCookies implements SessionsHandler {
       path: "/",
       httpOnly: true, // for security
       secure: false, // DAppNode UI is server over HTTP
-      maxAge: 86400, // 1 day
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       sameSite: "strict" // for security
     });
   }
