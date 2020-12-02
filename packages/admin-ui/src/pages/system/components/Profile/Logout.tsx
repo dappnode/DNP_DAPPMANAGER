@@ -21,16 +21,14 @@ export function Logout() {
 
   return (
     <>
-      <div className="password-form">
-        <Button
-          className="register-button"
-          onClick={onLogout}
-          variant="dappnode"
-          disabled={reqStatus.loading}
-        >
-          Logout
-        </Button>
-      </div>
+      <Button
+        className="register-button"
+        onClick={onLogout}
+        variant="dappnode"
+        disabled={reqStatus.loading}
+      >
+        Logout
+      </Button>
 
       <div>
         {reqStatus.result && <Ok ok msg={"Logged out"}></Ok>}

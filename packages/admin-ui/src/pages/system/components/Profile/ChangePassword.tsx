@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import Button from "components/Button";
-import { validatePassword } from "start-pages/Register";
 import ErrorView from "components/ErrorView";
-import { InputSecret } from "components/InputSecret";
 import { fetchChangePass } from "api/auth";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
+import {
+  validatePasswordsMatch,
+  validateStrongPassword
+} from "utils/validation";
+import { InputForm } from "components/InputForm";
 
 export function ChangePassword() {
   const [oldPassword, setOldPassword] = useState("");
@@ -13,52 +16,66 @@ export function ChangePassword() {
   const [newPassword2, setNewPassword2] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
-  async function onChangePassword() {
-    try {
-      setReqStatus({ loading: true });
-      await fetchChangePass({
-        password: oldPassword,
-        newPassword
-      });
-      setReqStatus({ result: true });
-    } catch (e) {
-      setReqStatus({ error: e });
-    }
-  }
+  const passwordError = validateStrongPassword(newPassword);
+  const password2Error = validatePasswordsMatch(newPassword, newPassword2);
+  const isValid =
+    oldPassword &&
+    newPassword &&
+    newPassword2 &&
+    !passwordError &&
+    !password2Error;
 
-  const passwordError = validatePassword({
-    password: newPassword,
-    password2: newPassword2
-  });
+  async function onChangePassword() {
+    if (isValid)
+      try {
+        setReqStatus({ loading: true });
+        await fetchChangePass({
+          password: oldPassword,
+          newPassword
+        });
+        setReqStatus({ result: true });
+      } catch (e) {
+        setReqStatus({ error: e });
+      }
+  }
 
   return (
     <>
-      <div className="password-form">
-        <div className="text">Current password</div>
-        <InputSecret value={oldPassword} onValueChange={setOldPassword} />
-        <div className="text">New password</div>
-        <InputSecret value={newPassword} onValueChange={setNewPassword} />
-        <div className="text">Confirm new password</div>
-        <InputSecret value={newPassword2} onValueChange={setNewPassword2} />
-
-        <Button
-          className="register-button"
-          onClick={onChangePassword}
-          variant="dappnode"
-          disabled={
-            reqStatus.loading ||
-            !newPassword ||
-            !newPassword2 ||
-            Boolean(passwordError)
+      <InputForm
+        fields={[
+          {
+            title: "Current password",
+            secret: true,
+            value: oldPassword,
+            onValueChange: setOldPassword
+          },
+          {
+            title: "New password",
+            secret: true,
+            value: newPassword,
+            onValueChange: setNewPassword,
+            error: passwordError
+          },
+          {
+            title: "Confirm new password",
+            secret: true,
+            value: newPassword2,
+            onValueChange: setNewPassword2,
+            error: password2Error
           }
-        >
-          Change password
-        </Button>
-      </div>
+        ]}
+      />
+
+      <Button
+        onClick={onChangePassword}
+        variant="dappnode"
+        disabled={reqStatus.loading || !isValid}
+      >
+        Change password
+      </Button>
 
       <div>
         {reqStatus.result && <Ok ok msg={"Changed password"}></Ok>}
-        {passwordError && <ErrorView error={passwordError} hideIcon red />}
         {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </div>
     </>

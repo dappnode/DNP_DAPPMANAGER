@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { BsLock } from "react-icons/bs";
-import { InputSecret } from "components/InputSecret";
+import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
-import { fetchRecoverPass } from "../api/auth";
+import ErrorView from "components/ErrorView";
+import { fetchRecoverPass } from "api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
-import ErrorView from "components/ErrorView";
-import Alert from "react-bootstrap/esm/Alert";
+import { InputForm } from "components/InputForm";
 
 export function ResetPassword({
   onSuccessfulReset
@@ -41,19 +41,26 @@ export function ResetPassword({
         <a href="#">Reset your DAppNode admin password TODO</a>
       </Alert>
 
-      <div className="password-form">
-        <div className="text">Recovery token</div>
-        <InputSecret value={token} onValueChange={setToken} />
+      <InputForm
+        fields={[
+          {
+            title: "Recovery token",
+            secret: true,
+            value: token,
+            onValueChange: setToken
+          }
+        ]}
+      />
 
-        <Button
-          className="register-button"
-          onClick={onReset}
-          variant="dappnode"
-          disabled={reqStatus.loading || !token}
-        >
-          Reset password
-        </Button>
-      </div>
+      <Button
+        className="register-button"
+        onClick={onReset}
+        variant="dappnode"
+        disabled={reqStatus.loading || !token}
+        fullwidth
+      >
+        Reset password
+      </Button>
 
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>

@@ -1,0 +1,16 @@
+.input-form {
+  text-align: left;
+
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+
+  .title {
+    font-size: 90%;
+    color: var(--light-text-color);
+  }
+  .error-feedback {
+    color: var(--danger-color);
+    margin-top: 0.2rem;
+  }
+}

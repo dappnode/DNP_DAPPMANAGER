@@ -15,6 +15,8 @@ import {
 } from "../../src/common";
 import { mountpoints } from "../mockData";
 
+let hostPasswordIsSecureState = false;
+
 /**
  * Generates a backup of a package and sends it to the client for download.
  * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
@@ -200,7 +202,7 @@ export async function notificationsTest(kwargs: {
 export async function passwordChange(kwargs: {
   newPassword: string;
 }): Promise<void> {
-  //
+  hostPasswordIsSecureState = true;
 }
 
 /**
@@ -217,7 +219,7 @@ export async function passwordChange(kwargs: {
  * @returns true = is secure / false = is not
  */
 export async function passwordIsSecure(): Promise<boolean> {
-  return true;
+  return hostPasswordIsSecureState;
 }
 
 /**

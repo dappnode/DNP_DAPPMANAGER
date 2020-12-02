@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { BsLock } from "react-icons/bs";
-import { InputSecret } from "components/InputSecret";
+import { fetchLogin, fetchLoginStatus } from "api/auth";
 import Button from "components/Button";
-import { fetchLogin, fetchLoginStatus } from "../api/auth";
-import { StandaloneContainer } from "./StandaloneContainer";
-import { ReqStatus } from "types";
+import { InputForm } from "components/InputForm";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
+import { StandaloneContainer } from "./StandaloneContainer";
+import { ReqStatus } from "types";
 import { ResetPassword } from "./ResetPassword";
 import "./login.scss";
 
@@ -67,19 +67,26 @@ export function Login({
 
   return (
     <StandaloneContainer TopIcon={BsLock} title="Login">
-      <div className="password-form">
-        <div className="text">Password</div>
-        <InputSecret value={password} onValueChange={setPassword} />
+      <InputForm
+        fields={[
+          {
+            title: "Password",
+            secret: true,
+            value: password,
+            onValueChange: setPassword
+          }
+        ]}
+      />
 
-        <Button
-          className="register-button"
-          onClick={onLogin}
-          variant="dappnode"
-          disabled={reqStatus.loading || !password}
-        >
-          Login
-        </Button>
-      </div>
+      <Button
+        className="register-button"
+        onClick={onLogin}
+        variant="dappnode"
+        disabled={reqStatus.loading || !password}
+        fullwidth
+      >
+        Login
+      </Button>
 
       <div className="forgot-password-text" onClick={onForgotPassword}>
         Forgot password?

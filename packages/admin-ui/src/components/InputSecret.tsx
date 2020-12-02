@@ -3,19 +3,12 @@ import Input from "components/Input";
 import Button from "components/Button";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 
-export function InputSecret({
-  value,
-  onValueChange
-}: {
-  onValueChange: (value: string) => void;
-  value: string | number;
-}) {
+export const InputSecret: typeof Input = props => {
   const [show, setShow] = useState(false);
   return (
     <>
       <Input
-        value={value}
-        onValueChange={onValueChange}
+        {...props}
         type={show ? "text" : "password"}
         append={
           <Button
@@ -28,4 +21,4 @@ export function InputSecret({
       />
     </>
   );
-}
+};

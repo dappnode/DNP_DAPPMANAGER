@@ -1,6 +1,6 @@
-import ErrorView from "components/ErrorView";
 import React from "react";
 import { FiWifiOff } from "react-icons/fi";
+import ErrorView from "components/ErrorView";
 import { StandaloneContainer } from "./StandaloneContainer";
 
 export const NoConnection = ({ error }: { error?: Error | string }) => (

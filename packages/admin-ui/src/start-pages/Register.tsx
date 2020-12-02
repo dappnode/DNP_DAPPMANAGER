@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { BsShieldLock } from "react-icons/bs";
-import { InputSecret } from "components/InputSecret";
-import Button from "components/Button";
-import { fetchRegister } from "../api/auth";
-import { StandaloneContainer } from "./StandaloneContainer";
 import Alert from "react-bootstrap/Alert";
+import { fetchRegister } from "api/auth";
+import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
+import Button from "components/Button";
 import ErrorView from "components/ErrorView";
+import { InputForm } from "components/InputForm";
+import {
+  validatePasswordsMatch,
+  validateStrongPassword
+} from "utils/validation";
 import "./register.scss";
 
 export function Register({
@@ -19,15 +23,20 @@ export function Register({
   const [recoveryToken, setRecoveryToken] = useState<string>();
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
+  const passwordError = validateStrongPassword(password);
+  const password2Error = validatePasswordsMatch(password, password2);
+  const isValid = password && password2 && !passwordError && !password2Error;
+
   async function onRegister() {
-    try {
-      setReqStatus({ loading: true });
-      const res = await fetchRegister({ password });
-      setRecoveryToken(res.recoveryToken);
-      setReqStatus({ result: true });
-    } catch (e) {
-      setReqStatus({ error: e });
-    }
+    if (isValid)
+      try {
+        setReqStatus({ loading: true });
+        const res = await fetchRegister({ password });
+        setRecoveryToken(res.recoveryToken);
+        setReqStatus({ result: true });
+      } catch (e) {
+        setReqStatus({ error: e });
+      }
   }
 
   function onCopiedRecoveryToken() {
@@ -44,8 +53,6 @@ export function Register({
     );
   }
 
-  const passwordError = validatePassword({ password, password2 });
-
   // First phase of registration, user provides password
   return (
     <StandaloneContainer TopIcon={BsShieldLock} title="Register">
@@ -54,26 +61,33 @@ export function Register({
         recommended to use a password manager to set a very strong password
       </div>
 
-      <div className="password-form">
-        <div className="text">Password</div>
-        <InputSecret value={password} onValueChange={setPassword} />
-        <div className="text">Confirm password</div>
-        <InputSecret value={password2} onValueChange={setPassword2} />
-
-        <Button
-          className="register-button"
-          onClick={onRegister}
-          variant="dappnode"
-          disabled={
-            reqStatus.loading ||
-            !password ||
-            !password2 ||
-            Boolean(passwordError)
+      <InputForm
+        fields={[
+          {
+            title: "New password",
+            secret: true,
+            value: password,
+            onValueChange: setPassword,
+            error: passwordError
+          },
+          {
+            title: "Confirm new password",
+            secret: true,
+            value: password2,
+            onValueChange: setPassword2,
+            error: password2Error
           }
-        >
-          Register
-        </Button>
-      </div>
+        ]}
+      />
+
+      <Button
+        onClick={onRegister}
+        variant="dappnode"
+        disabled={reqStatus.loading || !isValid}
+        fullwidth
+      >
+        Register
+      </Button>
 
       <div>
         {passwordError && <ErrorView error={passwordError} hideIcon red />}
@@ -115,22 +129,4 @@ function CopyRecoveryToken({
       </div>
     </StandaloneContainer>
   );
-}
-
-export function validatePassword({
-  password,
-  password2
-}: {
-  password: string;
-  password2: string;
-}): string | null {
-  if (!password) return null;
-
-  if (password.length < 8) return "Password must be at least 8 characters long";
-  if (!/\d+/.test(password)) return "Password must contain at least one number";
-  if (!/[A-Z]+/.test(password))
-    return "Password must contain at least one capital letter";
-  if (password2 && password !== password2) return "Passwords do not match";
-
-  return null;
 }
