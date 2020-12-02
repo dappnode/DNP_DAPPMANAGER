@@ -6,12 +6,19 @@
   text-align: center;
   background-color: var(--color-background);
   min-height: 100vh;
-  max-width: 35rem;
+  max-width: 30rem;
   margin: auto;
 
-  > div,
-  > img {
-    margin: 0.7rem;
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+  // Make sure everything is stretched to the same witdth
+  > * {
+    width: 100%;
+  }
+  // Space the bottom button if any a bit more
+  > .btn {
+    margin-top: calc(var(--default-spacing) / 2);
   }
 
   > .toplogo {

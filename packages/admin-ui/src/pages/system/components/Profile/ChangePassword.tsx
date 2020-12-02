@@ -71,13 +71,11 @@ export function ChangePassword() {
         variant="dappnode"
         disabled={reqStatus.loading || !isValid}
       >
-        Change password
+        Change UI password
       </Button>
 
-      <div>
-        {reqStatus.result && <Ok ok msg={"Changed password"}></Ok>}
-        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
-      </div>
+      {reqStatus.result && <Ok ok msg={"Changed password"}></Ok>}
+      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </>
   );
 }

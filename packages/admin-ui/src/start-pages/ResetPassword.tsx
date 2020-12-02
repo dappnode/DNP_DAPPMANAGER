@@ -7,6 +7,7 @@ import { fetchRecoverPass } from "api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import { InputForm } from "components/InputForm";
+import Ok from "components/Ok";
 
 export function ResetPassword({
   onSuccessfulReset
@@ -62,6 +63,7 @@ export function ResetPassword({
         Reset password
       </Button>
 
+      {reqStatus.result && <Ok ok msg={"Reseted password"}></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );

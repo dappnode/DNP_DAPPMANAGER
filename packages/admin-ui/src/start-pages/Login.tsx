@@ -92,10 +92,8 @@ export function Login({
         Forgot password?
       </div>
 
-      <div>
-        {reqStatus.result && <Ok ok msg={"Logged in!"}></Ok>}
-        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
-      </div>
+      {reqStatus.result && <Ok ok msg={"Logged in"}></Ok>}
+      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );
 }

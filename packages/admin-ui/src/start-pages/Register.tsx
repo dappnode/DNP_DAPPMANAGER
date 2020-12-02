@@ -12,6 +12,7 @@ import {
   validateStrongPassword
 } from "utils/validation";
 import "./register.scss";
+import Ok from "components/Ok";
 
 export function Register({
   refetchStatus
@@ -89,10 +90,8 @@ export function Register({
         Register
       </Button>
 
-      <div>
-        {passwordError && <ErrorView error={passwordError} hideIcon red />}
-        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
-      </div>
+      {reqStatus.result && <Ok ok msg={"Registered"}></Ok>}
+      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );
 }
@@ -118,15 +117,13 @@ function CopyRecoveryToken({
         access your machine
       </Alert>
 
-      <div>
-        <Button
-          className="register-button"
-          onClick={onCopiedRecoveryToken}
-          variant="dappnode"
-        >
-          I've copied the recovery token
-        </Button>
-      </div>
+      <Button
+        className="register-button"
+        onClick={onCopiedRecoveryToken}
+        variant="dappnode"
+      >
+        I've copied the recovery token
+      </Button>
     </StandaloneContainer>
   );
 }

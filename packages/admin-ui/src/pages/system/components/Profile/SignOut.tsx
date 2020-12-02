@@ -5,7 +5,7 @@ import { fetchLogout } from "api/auth";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
 
-export function Logout() {
+export function SignOut() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
   async function onLogout() {
@@ -24,16 +24,14 @@ export function Logout() {
       <Button
         className="register-button"
         onClick={onLogout}
-        variant="dappnode"
+        variant="outline-danger"
         disabled={reqStatus.loading}
       >
-        Logout
+        Sign out
       </Button>
 
-      <div>
-        {reqStatus.result && <Ok ok msg={"Logged out"}></Ok>}
-        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
-      </div>
+      {reqStatus.result && <Ok ok msg={"Logged out"}></Ok>}
+      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </>
   );
 }
