@@ -38,7 +38,7 @@ function LogoutListItem() {
 
   return (
     <div onClick={onLogout}>
-      <div>Sign out</div>
+      <div className="sign-out">Sign out</div>
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </div>
   );
