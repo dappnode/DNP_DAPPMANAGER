@@ -32,15 +32,6 @@ export const InputForm: React.FC<InputFormProps> = ({ children, fields }) => {
       })}
 
       {children}
-
-      {/* <Button
-        className="register-button"
-        variant="dappnode"
-        disabled={!isValid}
-        onClick={onChangePassword}
-      >
-        Change password
-      </Button> */}
     </div>
   );
 };
