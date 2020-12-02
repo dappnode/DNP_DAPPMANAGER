@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 // Components
-import { ButtonLight } from "components/Button";
+import Button from "components/Button";
 // Modules
 import { rootPath as installerRootPath } from "pages/installer";
 import { rootPath as packagesRootPath } from "pages/packages";
@@ -13,12 +13,10 @@ export const NoDnpInstalled = ({ id }: { id: string }) => (
     <h4>{id} is not installed</h4>
     <p>Go back to packages or click below to install it</p>
     <Link style={{ margin: "0 10px" }} to={packagesRootPath}>
-      <ButtonLight style={{ textTransform: "capitalize" }}>
-        Packages
-      </ButtonLight>
+      <Button style={{ textTransform: "capitalize" }}>Packages</Button>
     </Link>
     <Link style={{ margin: "0 10px" }} to={installerRootPath + "/" + id}>
-      <ButtonLight>Install {shortNameCapitalized(id)}</ButtonLight>
+      <Button>Install {shortNameCapitalized(id)}</Button>
     </Link>
   </div>
 );

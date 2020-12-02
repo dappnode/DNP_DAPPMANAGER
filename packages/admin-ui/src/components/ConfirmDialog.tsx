@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Button from "components/Button";
+import Button, { ButtonVariant } from "components/Button";
 import { render, unmountComponentAtNode } from "react-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import { stringIncludes } from "utils/strings";
@@ -7,8 +7,8 @@ import "./confirmDialog.scss";
 
 interface ModalButtonData {
   label: string;
-  variant?: string;
   onClick?: () => void;
+  variant?: ButtonVariant;
 }
 
 interface ConfirmDialogProps {
@@ -22,7 +22,7 @@ interface ConfirmDialogProps {
   // Main Button
   label?: string;
   onClick?: () => void;
-  variant?: string;
+  variant?: ButtonVariant;
 }
 
 /**

@@ -3,10 +3,20 @@ import { IconType } from "react-icons/lib";
 import { joinCssClass } from "utils/css";
 import "./button.scss";
 
-type ButtonType = "button" | "submit" | "reset" | undefined;
+export type ButtonType = "button" | "submit" | "reset" | undefined;
+export type ButtonVariant =
+  | "secondary"
+  | "dappnode"
+  | "warning"
+  | "danger"
+  | "outline-secondary"
+  | "outline-dappnode"
+  | "outline-warning"
+  | "outline-danger";
+const defaultVariant: ButtonVariant = "outline-secondary";
 
 interface ButtonProps {
-  variant?: string;
+  variant?: ButtonVariant;
   pill?: boolean;
   fullwidth?: boolean;
   disabled?: boolean;
@@ -16,7 +26,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps &
   React.HTMLAttributes<HTMLButtonElement>> = ({
-  variant,
+  variant = defaultVariant,
   children,
   pill,
   fullwidth,
@@ -27,7 +37,7 @@ const Button: React.FC<ButtonProps &
 }) => (
   <button
     className={joinCssClass(
-      `btn btn-${variant || "outline-secondary"}`,
+      `btn btn-${variant}`,
       { pill, fullwidth },
       className
     )}
@@ -43,12 +53,6 @@ const Button: React.FC<ButtonProps &
       children
     )}
   </button>
-);
-
-export const ButtonLight: typeof Button = props => (
-  <Button variant={"outline-secondary"} {...props}>
-    {props.children}
-  </Button>
 );
 
 export default Button;
