@@ -11,7 +11,8 @@ import {
   SystemInfo,
   HostStatCpu,
   HostStatDisk,
-  HostStatMemory
+  HostStatMemory,
+  PublicIpResponse
 } from "../../src/common";
 import { mountpoints } from "../mockData";
 
@@ -304,5 +305,11 @@ export async function systemInfoGet(): Promise<SystemInfo> {
       // "system-auto-updates",
       // "change-host-password"
     ]
+  };
+}
+
+export async function ipPublicGet(): Promise<PublicIpResponse> {
+  return {
+    publicIp: "85.84.83.82"
   };
 }
