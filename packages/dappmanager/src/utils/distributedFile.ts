@@ -11,7 +11,7 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
   if (!distributedFile || !distributedFile.hash) return "";
 
   const hash = normalizeHash(distributedFile.hash);
-  return `${params.ipfsGateway}${hash}`;
+  return `${params.IPFS_GATEWAY}${hash}`;
 }
 
 /**
