@@ -11,11 +11,19 @@ interface InputFormProps {
     onValueChange: (newValue: string) => void;
     error?: string | null;
   }[];
+  childrenBefore?: React.ReactNode;
+  childrenAfter?: React.ReactNode;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({ children, fields }) => {
+export const InputForm: React.FC<InputFormProps> = ({
+  fields,
+  childrenBefore,
+  childrenAfter
+}) => {
   return (
     <div className="input-form">
+      {childrenBefore}
+
       {fields.map(({ title, secret, value, onValueChange, error }, i) => {
         const InputComponent = secret ? InputSecret : Input;
         return (
@@ -31,7 +39,7 @@ export const InputForm: React.FC<InputFormProps> = ({ children, fields }) => {
         );
       })}
 
-      {children}
+      {childrenAfter}
     </div>
   );
 };

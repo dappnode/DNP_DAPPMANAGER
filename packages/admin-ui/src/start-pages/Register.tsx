@@ -13,6 +13,7 @@ import {
 } from "utils/validation";
 import "./register.scss";
 import Ok from "components/Ok";
+import Input from "components/Input";
 
 export function Register({
   refetchStatus
@@ -24,6 +25,9 @@ export function Register({
   const [recoveryToken, setRecoveryToken] = useState<string>();
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
+  // Virtual username for password managers
+  // TODO: Use DAppnode's name
+  const username = "admin";
   const passwordError = validateStrongPassword(password);
   const password2Error = validatePasswordsMatch(password, password2);
   const isValid = password && password2 && !passwordError && !password2Error;
@@ -79,6 +83,14 @@ export function Register({
             error: password2Error
           }
         ]}
+        // Add an input that is there but not visible for password managers
+        // With this input the password will be registered with a valid username
+        // which makes better UX :)
+        childrenBefore={
+          <div className="hidden-input">
+            <Input value={username} onValueChange={() => {}}></Input>
+          </div>
+        }
       />
 
       <Button
