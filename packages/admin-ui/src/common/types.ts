@@ -500,7 +500,7 @@ export interface ComposeService {
   // ipv4_address: "172.33.1.7";
   networks?: string[] | { [networkName: string]: { ipv4_address: string } };
   dns?: string; // "172.33.1.2";
-  restart?: string; // "always";
+  restart?: string; // "unless-stopped";
   privileged?: boolean;
   cap_add?: string[];
   cap_drop?: string[];
@@ -1091,6 +1091,10 @@ export interface DiagnoseItem {
   error?: string;
 }
 export type Diagnose = DiagnoseItem[];
+
+export interface PublicIpResponse {
+  publicIp: string;
+}
 
 /**
  * Welcome wizard / setup flow

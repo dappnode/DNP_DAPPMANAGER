@@ -10,6 +10,7 @@ import Card from "components/Card";
 import Ok from "components/Ok";
 
 export default function AutoDiagnose() {
+  const publicIpRes = useApi.ipPublicGet();
   const systemInfo = useApi.systemInfoGet();
   const hostStats = useApi.statsDiskGet();
   const dnpInstalled = useApi.packagesGet();
@@ -17,7 +18,7 @@ export default function AutoDiagnose() {
 
   const diagnosesArray: DiagnoseResult[] = [
     formatDiagnose.ipfs(ipfsConnection),
-    formatDiagnose.internetConnection(systemInfo),
+    formatDiagnose.internetConnection(publicIpRes, systemInfo),
     formatDiagnose.openPorts(systemInfo),
     formatDiagnose.noNatLoopback(systemInfo),
     formatDiagnose.diskSpace(hostStats),

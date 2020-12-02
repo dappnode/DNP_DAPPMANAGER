@@ -2,6 +2,9 @@ import { listPackage } from "../modules/docker/listContainers";
 import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
+import params from "../params";
+
+const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName];
 
 /**
  * Stops or starts a package containers
@@ -18,6 +21,14 @@ export async function packageStartStop({
 
   const dnp = await listPackage({ dnpName });
   const timeout = getDockerTimeoutMax(dnp.containers);
+
+  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
+    if (dnpsAllowedToStop.includes(dnp.dnpName)) {
+      // whitelisted, ok to stop
+    } else {
+      throw Error("Core packages cannot be stopped");
+    }
+  }
 
   const targetContainers = dnp.containers.filter(
     c => !serviceNames || serviceNames.includes(c.serviceName)

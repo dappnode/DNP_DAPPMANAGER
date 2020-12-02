@@ -1,6 +1,12 @@
 import { DiagnoseResult } from "../types";
-import { SystemInfo, InstalledPackageData, HostStatDisk } from "common/types";
+import {
+  SystemInfo,
+  InstalledPackageData,
+  HostStatDisk,
+  PublicIpResponse
+} from "common/types";
 import { mandatoryCoreDnps } from "params";
+import { responseInterface } from "swr";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
 
@@ -35,28 +41,41 @@ export function connection({
     ]
   };
 }
+/**
+ * Check for the 9 combinations for the 3 params of the IP .
+ * @param param0
+ */
+export function internetConnection(
+  publicIpRes: responseInterface<PublicIpResponse, Error>,
+  systemInfo: responseInterface<SystemInfo, Error>
+): DiagnoseResultOrNull {
+  if (publicIpRes.isValidating)
+    return { loading: true, msg: "Fetching public IP..." };
 
-export function internetConnection({
-  data: dappnodeParams,
-  isValidating
-}: {
-  data?: SystemInfo;
-  isValidating: boolean;
-}): DiagnoseResultOrNull {
-  if (isValidating) return { loading: true, msg: "Loading system info..." };
-  if (!dappnodeParams) return null;
-  const { publicIp, staticIp } = dappnodeParams;
-  return {
-    ok: Boolean(publicIp),
-    msg: publicIp
-      ? staticIp
-        ? "May have connected to the internet, static IP set"
-        : "Has connected to the internet, and detected own public IP"
-      : "Cannot connect to the internet. Could not fetch own public IP",
-    solutions: [
-      "Make sure your DAppNode is connected to the internet. Make sure to plug its ethernet cable to the router."
-    ]
-  };
+  if (publicIpRes.data?.publicIp) {
+    return {
+      ok: true,
+      msg: "Has connected to the internet, and detected own public IP"
+    };
+  } else {
+    const msgs: string[] = [
+      "Cannot connect to the internet",
+      "Could not fetch own public IP"
+    ];
+    if (systemInfo.data?.publicIp) {
+      msgs.push("Was previously connected but got disconnected");
+    }
+    if (publicIpRes.error?.message) {
+      msgs.push(publicIpRes.error?.message);
+    }
+    return {
+      ok: false,
+      msg: msgs.join(". "),
+      solutions: [
+        "Make sure your DAppNode is connected to the internet. Make sure to plug its ethernet cable to the router."
+      ]
+    };
+  }
 }
 
 export function openPorts({

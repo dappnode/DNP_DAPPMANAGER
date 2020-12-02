@@ -6,28 +6,30 @@ import { imagesList, imageRemove } from "./dockerApi";
 type Args = string[];
 type Kwargs = { [flag: string]: string | number | boolean | undefined };
 
-function parseArgs(args: Args, kwargs?: Kwargs): string[] {
+function parseKwargs(kwargs?: Kwargs): string[] {
   const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
-  return [
-    ...args,
-    ...dargs(definedKwargs, { useEquals: false, ignoreFalse: true })
-  ];
+  return dargs(definedKwargs, { useEquals: false, ignoreFalse: true });
 }
 
 async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
-  return shell(["docker", ...parseArgs(args, kwargs)]);
+  return shell(["docker", ...args, ...parseKwargs(kwargs)]);
 }
 
 async function execDockerCompose(
   dcPath: string,
-  args: Args,
-  kwargs?: Kwargs
+  subcommand: string,
+  kwargs?: Kwargs,
+  serviceNames?: string[]
 ): Promise<string> {
+  // Usage: subcommand [options] [--scale SERVICE=NUM...] [SERVICE...]
   return shell([
     "docker-compose",
     "-f",
     dcPath,
-    ...parseArgs(args, kwargs),
+    subcommand,
+    ...parseKwargs(kwargs),
+    // service names MUST go after the options
+    ...(serviceNames || []),
     // Adding <&- to prevent interactive mode
     "<&-"
   ]);
@@ -46,13 +48,18 @@ export function dockerComposeUp(
 ): Promise<string> {
   // --detach is invalid with --no-start
   if (options.noStart) options.detach = false;
-  return execDockerCompose(dcPath, ["up", ...(options.serviceNames || [])], {
-    noStart: options.noStart,
-    detach: options.detach ?? true,
-    forceRecreate: options.forceRecreate,
-    timeout: options.timeout,
-    removeOrphans: options.removeOrphans
-  });
+  return execDockerCompose(
+    dcPath,
+    "up",
+    {
+      noStart: options.noStart,
+      detach: options.detach ?? true,
+      forceRecreate: options.forceRecreate,
+      timeout: options.timeout,
+      removeOrphans: options.removeOrphans
+    },
+    options.serviceNames
+  );
 }
 
 /**
@@ -63,7 +70,7 @@ export function dockerComposeDown(
   dcPath: string,
   options: { volumes?: boolean; timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["down"], options);
+  return execDockerCompose(dcPath, "down", options);
 }
 
 /**
@@ -73,11 +80,11 @@ export function dockerComposeDown(
  * @param dcPath
  */
 export function dockerComposeRm(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, ["rm"], { force: true, stop: true });
+  return execDockerCompose(dcPath, "rm", { force: true, stop: true });
 }
 
 export function dockerComposeStart(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, ["start"]);
+  return execDockerCompose(dcPath, "start");
 }
 
 /**
@@ -87,11 +94,11 @@ export function dockerComposeStop(
   dcPath: string,
   options: { timeout?: number } = {}
 ): Promise<string> {
-  return execDockerCompose(dcPath, ["stop"], options);
+  return execDockerCompose(dcPath, "stop", options);
 }
 
 export function dockerComposeConfig(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, ["config"]);
+  return execDockerCompose(dcPath, "config");
 }
 
 export function dockerVolumeRm(volumeName: string): Promise<string> {
