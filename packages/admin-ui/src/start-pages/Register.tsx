@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BsShieldLock } from "react-icons/bs";
 import Alert from "react-bootstrap/Alert";
 import { fetchRegister } from "api/auth";
+import { apiUrls } from "params";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import Button from "components/Button";
@@ -24,10 +25,10 @@ export function Register({
   const [password2, setPassword2] = useState("");
   const [recoveryToken, setRecoveryToken] = useState<string>();
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-
   // Virtual username for password managers
   // TODO: Use DAppnode's name
-  const username = "admin";
+  const [username, setUsername] = useState("admin");
+
   const passwordError = validateStrongPassword(password);
   const password2Error = validatePasswordsMatch(password, password2);
   const isValid = password && password2 && !passwordError && !password2Error;
@@ -47,6 +48,17 @@ export function Register({
   function onCopiedRecoveryToken() {
     refetchStatus()?.catch(() => {});
   }
+
+  useEffect(() => {
+    async function fetchServerName() {
+      const res = await fetch(apiUrls.globalEnvsServerName);
+      const serverName = await res.text();
+      if (res.ok && serverName) setUsername(serverName);
+    }
+    fetchServerName().catch(e => {
+      console.warn(`Error fetching serverName: ${e.message}`);
+    });
+  }, []);
 
   if (recoveryToken) {
     // Second phase of registration, user must copy the recovery token
