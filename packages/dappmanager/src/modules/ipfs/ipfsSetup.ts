@@ -19,7 +19,7 @@ export const TimeoutErrorKy = class TimeoutError extends Error {
  * The exported ipfs object will only be initialized once in the entire application.
  */
 const IPFS_HOST = params.IPFS_HOST;
-const ipfs = process.env.TEST
+const ipfs = process.env.DISABLE_IPFS
   ? {}
   : ipfsClient(IPFS_HOST, { timeout: timeoutMs });
 

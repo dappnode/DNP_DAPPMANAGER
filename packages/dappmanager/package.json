@@ -8,7 +8,7 @@
     "watch-ts": "tsc -w",
     "file": "node",
     "test": "npm run test:file \"./{,!(node_modules)/**}/*.test.ts\" ",
-    "test:file": "TEST=true mocha",
+    "test:file": "DISABLE_IPFS=true mocha",
     "test:int": "npm run test:int:file \"./{,!(node_modules)/**}/*.test.int.ts\" ",
     "test:int:file": "mocha --timeout 120000",
     "test:all": "npm run test && npm run test:int",
