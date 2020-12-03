@@ -17,6 +17,7 @@ import {
   afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
+import { listPackage, listPackages } from "../modules/docker/listContainers";
 
 /**
  * Installs a DAppNode Package.
@@ -74,12 +75,15 @@ export async function packageInstall({
         );
     }
 
+    const packagesInfo = await listPackages();
+
     // Gather all data necessary for the install. Isolated in a pure function to ease testing
     const packagesData = getInstallerPackagesData({
       releases,
       userSettings,
       currentVersions,
-      reqName
+      reqName,
+      packagesInfo
     });
     logs.debug("Packages data", packagesData);
     logs.debug("User settings", userSettings);

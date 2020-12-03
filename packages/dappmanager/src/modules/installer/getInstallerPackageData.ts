@@ -1,27 +1,35 @@
 import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath";
 import orderInstallPackages from "./orderInstallPackages";
-import { UserSettingsAllDnps, UserSettings } from "../../types";
+import {
+  UserSettingsAllDnps,
+  UserSettings,
+  InstalledPackageData
+} from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
 import { parseTimeoutSeconds } from "../../utils/timeout";
+import { fetchDnpRequest } from "../../calls";
 
 export function getInstallerPackagesData({
   releases,
   userSettings,
   currentVersions,
-  reqName
+  reqName,
+  packagesInfo
 }: {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
+  packagesInfo: InstalledPackageData[];
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
     getInstallerPackageData(
       release,
       userSettings[release.dnpName],
-      currentVersions[release.dnpName]
+      currentVersions[release.dnpName],
+      packagesInfo.find(pkg => pkg.dnpName === release.dnpName)
     )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
@@ -36,7 +44,8 @@ export function getInstallerPackagesData({
 function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
-  currentVersion: string | undefined
+  currentVersion: string | undefined,
+  packageInfo?: InstalledPackageData
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
 
@@ -61,6 +70,8 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
+  const running = packageInfo?.running;
+
   return {
     ...release,
     isUpdate: Boolean(currentVersion),
@@ -74,6 +85,7 @@ function getInstallerPackageData(
     compose: compose.output(),
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
-    dockerTimeout
+    dockerTimeout,
+    running
   };
 }

@@ -58,6 +58,7 @@ export async function runPackages(
 
       log(pkg.dnpName, "Starting package... ");
       await dockerComposeUp(pkg.composePath, {
+        noStart: pkg.running,
         removeOrphans,
         timeout: pkg.dockerTimeout
       });
