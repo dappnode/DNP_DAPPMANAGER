@@ -42,8 +42,7 @@ export async function listPackages(): Promise<InstalledPackageData[]> {
         "origin",
         "chain",
         "domainAlias",
-        "canBeFullnode",
-        "running"
+        "canBeFullnode"
       ]),
       containers: [
         ...(dnps.get(container.dnpName)?.containers || []),

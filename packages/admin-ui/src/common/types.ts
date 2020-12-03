@@ -417,7 +417,6 @@ export type InstalledPackageData = Pick<
   | "chain"
   | "domainAlias"
   | "canBeFullnode"
-  | "running"
 > & {
   containers: PackageContainer[];
 };
@@ -828,7 +827,7 @@ export interface InstallPackageData extends PackageRelease {
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
   dockerTimeout: number | undefined;
-  running: boolean | undefined;
+  running: boolean;
 }
 
 // Must be in-sync with SDK types

@@ -9,7 +9,6 @@ import {
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
 import { parseTimeoutSeconds } from "../../utils/timeout";
-import { fetchDnpRequest } from "../../calls";
 
 export function getInstallerPackagesData({
   releases,
@@ -29,7 +28,11 @@ export function getInstallerPackagesData({
       release,
       userSettings[release.dnpName],
       currentVersions[release.dnpName],
-      packagesInfo.find(pkg => pkg.dnpName === release.dnpName)
+      packagesInfo.find(pkg =>
+        pkg.containers.filter(
+          container => container.dnpName === release.dnpName
+        )
+      )
     )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
@@ -70,7 +73,13 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
-  const running = packageInfo?.running;
+  const runningContainers = packageInfo?.containers.filter(
+    container => container.running
+  );
+
+  const running = runningContainers
+    ? Boolean(runningContainers?.length > 0)
+    : false;
 
   return {
     ...release,
