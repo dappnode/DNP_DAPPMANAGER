@@ -74,7 +74,7 @@ function getInstallerPackageData(
   );
 
   const running = runningContainers
-    ? Boolean(runningContainers?.length > 0)
+    ? Boolean(runningContainers.length > 0)
     : false;
 
   return {
