@@ -17,8 +17,8 @@ const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
-  DNCORE_DIR = "test_files/";
-  REPO_DIR = "test_files/";
+  DNCORE_DIR = "./DNCORE";
+  REPO_DIR = "./dnp_repo";
 }
 
 const params = {
