@@ -11,9 +11,12 @@ import {
   SystemInfo,
   HostStatCpu,
   HostStatDisk,
-  HostStatMemory
+  HostStatMemory,
+  PublicIpResponse
 } from "../../src/common";
 import { mountpoints } from "../mockData";
+
+let hostPasswordIsSecureState = false;
 
 /**
  * Generates a backup of a package and sends it to the client for download.
@@ -115,26 +118,26 @@ export async function ethClientTargetSet(kwargs: {
 export async function statsCpuGet(): Promise<HostStatCpu> {
   // await new Promise(() => {});
   return {
-    usedPercentage: 0.88
+    usedPercentage: 88
   };
 }
 
 export async function statsMemoryGet(): Promise<HostStatMemory> {
   // throw Error("Ups");
   return {
-    total: 34,
-    used: 34,
-    free: 34,
+    total: 8093155328,
+    used: 6535839744,
+    free: 179961856,
     usedPercentage: 34
   };
 }
 
 export async function statsDiskGet(): Promise<HostStatDisk> {
   return {
-    total: 2,
-    used: 2,
-    free: 2,
-    usedPercentage: 2
+    total: 241440808960,
+    used: 189458415616,
+    free: 39646527488,
+    usedPercentage: 83
   };
 }
 
@@ -200,7 +203,7 @@ export async function notificationsTest(kwargs: {
 export async function passwordChange(kwargs: {
   newPassword: string;
 }): Promise<void> {
-  //
+  hostPasswordIsSecureState = true;
 }
 
 /**
@@ -217,7 +220,7 @@ export async function passwordChange(kwargs: {
  * @returns true = is secure / false = is not
  */
 export async function passwordIsSecure(): Promise<boolean> {
-  return true;
+  return hostPasswordIsSecureState;
 }
 
 /**
@@ -302,5 +305,11 @@ export async function systemInfoGet(): Promise<SystemInfo> {
       // "system-auto-updates",
       // "change-host-password"
     ]
+  };
+}
+
+export async function ipPublicGet(): Promise<PublicIpResponse> {
+  return {
+    publicIp: "85.84.83.82"
   };
 }

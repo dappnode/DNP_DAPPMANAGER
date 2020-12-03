@@ -6,7 +6,6 @@ import { HashRouter as Router } from "react-router-dom";
 
 import { store } from "./store";
 import App from "./App";
-import * as api from "./api";
 import { cleanObj } from "utils/objects";
 
 // Init css
@@ -25,8 +24,6 @@ import "./dappnode_colors.css";
 window.jQuery = window.$ = $;
 window.Tether = Tether;
 window.Popper = Popper;
-
-api.start();
 
 // This process.env. vars will be substituted at build time
 // The REACT_APP_ prefix is mandatory for the substitution to work

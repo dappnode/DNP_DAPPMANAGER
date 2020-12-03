@@ -21,11 +21,3 @@ export const store = configureStore({
   middleware: [thunk],
   devTools: { actionsBlacklist: ["chainData/update"] }
 });
-
-declare global {
-  interface Window {
-    store: typeof store;
-  }
-}
-
-window.store = store;

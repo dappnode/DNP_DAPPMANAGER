@@ -5,4 +5,4 @@ services:
     ports:
       - "8000:80"
     environment:
-      ALLOW_ALL_IPS: "true"
+      AUTH_IP_ALLOW_LOCAL_IP: "true"
