@@ -1,9 +1,8 @@
-import { vpnRpcCall } from "../../api/vpnRpcCall";
+import { vpnApi } from "../../api/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import retry from "async-retry";
-import { PackageVersionData } from "../../types";
 import { logs } from "../../logs";
 
 /**
@@ -13,10 +12,9 @@ import { logs } from "../../logs";
  */
 async function getVersionDataVpn(): Promise<void> {
   try {
-    const versionDataVpn = await retry(
-      () => vpnRpcCall<PackageVersionData>("getVersionData"),
-      { retries: 3 }
-    );
+    const versionDataVpn = await retry(() => vpnApi.getVersionData(), {
+      retries: 3
+    });
     db.versionDataVpn.set(versionDataVpn);
   } catch (e) {
     logs.error(`Error fetching VPN data`);

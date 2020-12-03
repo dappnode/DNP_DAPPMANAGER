@@ -1,8 +1,6 @@
 // Device types
 
 export interface VpnDeviceCredentials {
-  filename: string;
-  key: string;
   url: string;
 }
 
