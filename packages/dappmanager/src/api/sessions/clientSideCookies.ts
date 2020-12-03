@@ -1,6 +1,6 @@
 import express from "express";
 import cookieSession from "cookie-session";
-import { SessionsHandler } from "./interface";
+import { SessionData, SessionsManager } from "./interface";
 import { SessionsSecretDb } from "./secret";
 
 export interface ClientSideCookiesParams {
@@ -10,14 +10,13 @@ export interface ClientSideCookiesParams {
 }
 
 declare global {
-  interface CookieSessionObject {
-    isAdmin: boolean;
+  interface CookieSessionObject extends SessionData {
     // Unix timestamp in miliseconds
     expires: number;
   }
 }
 
-export class ClientSideCookies implements SessionsHandler {
+export class ClientSideCookies implements SessionsManager {
   handler: express.RequestHandler;
   maxTtlMs: number;
 
@@ -36,24 +35,23 @@ export class ClientSideCookies implements SessionsHandler {
     });
   }
 
-  makeAdmin(req: express.Request): void {
+  setSession(req: express.Request, data: SessionData): void {
     if (!req.session) throw new Error("No session");
-    req.session.isAdmin = true;
+    Object.assign(req.session, data);
+
     // Add expires property as part of the payload so the
     // signed cookie will eventually be useless
     req.session.expires = Date.now() + this.maxTtlMs;
   }
 
-  isAdmin(req: express.Request): boolean {
-    return Boolean(
-      // Has a sessions
-      req.session &&
-        // Is admin
-        req.session.isAdmin &&
-        // Not expired
-        req.session.expires &&
-        Date.now() < parseInt((req.session.expires as unknown) as string)
-    );
+  getSession(req: express.Request): SessionData | null {
+    if (!req.session) return null;
+
+    // Reject session if the cookie is already expired
+    const expires = parseInt(req.session.expires);
+    if (!expires || Date.now() > expires) return null;
+
+    return (req.session as SessionData) || null;
   }
 
   async destroy(req: express.Request): Promise<void> {

@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-export class SingleFileDb {
-  filepath: string;
+export class PlainTextFileDb {
+  private filepath: string;
 
   constructor(filepath: string) {
     this.filepath = filepath;
@@ -27,5 +27,26 @@ export class SingleFileDb {
     } catch (e) {
       if (e.code !== "ENOENT") throw e;
     }
+  }
+}
+
+export class JsonFileDb<T> {
+  fileDb: PlainTextFileDb;
+
+  constructor(filepath: string) {
+    this.fileDb = new PlainTextFileDb(filepath);
+  }
+
+  read(): T | undefined {
+    const data = this.fileDb.read();
+    if (data) return JSON.parse(data);
+  }
+
+  write(data: T): void {
+    this.fileDb.write(JSON.stringify(data));
+  }
+
+  del(): void {
+    this.fileDb.del();
   }
 }

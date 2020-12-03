@@ -65,9 +65,8 @@
 .device-settings > header > .card-title {
   margin-bottom: 0;
 }
-.device-settings > .help {
-  color: gray;
-  font-size: 90%;
+.device-settings .help-text {
+  margin: 0.15rem 0 0.5rem;
 }
 .device-settings > .alert {
   margin: 0;

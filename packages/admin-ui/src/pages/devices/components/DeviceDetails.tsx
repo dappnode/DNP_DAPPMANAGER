@@ -20,11 +20,13 @@ import Title from "components/Title";
 function DeviceDetailsLoaded({
   admin,
   id,
-  url
+  url,
+  password
 }: {
   admin: boolean;
   id: string;
   url: string;
+  password?: string;
 }) {
   const [showQr, setShowQr] = useState(false);
 
@@ -52,33 +54,32 @@ function DeviceDetailsLoaded({
         </span>
       )}
 
-      <div className="help-text">
-        Open the link below to get access to this device's credentials. You can
-        share it with external users to give them access to your DAppNode.
-      </div>
+      <div>
+        <strong>Credentials URL</strong>
 
-      <Input
-        lock={true}
-        value={url || ""}
-        onValueChange={() => {}}
-        className="copy-input"
-        append={
-          <>
-            <Button className="copy-input-copy" data-clipboard-text={url}>
-              <GoClippy />
-            </Button>
-            <Button className="copy-input-open">
-              <a href={url} {...newTabProps} className="no-a-style">
-                <MdOpenInNew />
-              </a>
-            </Button>
-          </>
-        }
-      />
+        <div className="help-text">
+          Open the link below to get access to this device's credentials. You
+          can share it through a secure channel.
+        </div>
 
-      <div className="alert alert-secondary" role="alert">
-        Beware of shoulder surfing attacks (unsolicited observers), This QR code
-        will grant them access to your DAppNode
+        <Input
+          lock={true}
+          value={url || ""}
+          onValueChange={() => {}}
+          className="copy-input"
+          append={
+            <>
+              <Button className="copy-input-copy" data-clipboard-text={url}>
+                <GoClippy />
+              </Button>
+              <Button className="copy-input-open">
+                <a href={url} {...newTabProps} className="no-a-style">
+                  <MdOpenInNew />
+                </a>
+              </Button>
+            </>
+          }
+        />
       </div>
 
       <Button onClick={() => setShowQr(!showQr)}>
@@ -86,6 +87,39 @@ function DeviceDetailsLoaded({
       </Button>
 
       {showQr && url && <QrCode url={url} width={"400px"} />}
+
+      {admin && password && (
+        <div>
+          <strong>Admin password</strong>
+
+          <div className="help-text">
+            Unique password to grant external users acess. It will be revoked
+            when deleting this device
+          </div>
+
+          <Input
+            lock={true}
+            value={password || ""}
+            onValueChange={() => {}}
+            className="copy-input"
+            append={
+              <>
+                <Button
+                  className="copy-input-copy"
+                  data-clipboard-text={password}
+                >
+                  <GoClippy />
+                </Button>
+              </>
+            }
+          />
+        </div>
+      )}
+
+      <div className="alert alert-secondary" role="alert">
+        Beware of shoulder surfing attacks (unsolicited observers), This data
+        grants admin access to your DAppNode
+      </div>
     </Card>
   );
 }
@@ -94,17 +128,22 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
   match
 }) => {
   const id = match.params.id;
-  const { data, error, isValidating } = useApi.deviceCredentialsGet({ id });
+  const deviceCredentials = useApi.deviceCredentialsGet({ id });
 
   return (
     <>
       <Title title={title} subtitle={id} />
 
-      {data ? (
-        <DeviceDetailsLoaded admin={false} id={id} url={data.url} />
-      ) : error ? (
-        <ErrorView error={error} />
-      ) : isValidating ? (
+      {deviceCredentials.data ? (
+        <DeviceDetailsLoaded
+          admin={deviceCredentials.data.admin}
+          id={id}
+          url={deviceCredentials.data.url}
+          password={deviceCredentials.data.password}
+        />
+      ) : deviceCredentials.error ? (
+        <ErrorView error={deviceCredentials.error} />
+      ) : deviceCredentials.isValidating ? (
         <Loading steps={["Loading device credentials"]} />
       ) : null}
     </>

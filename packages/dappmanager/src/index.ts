@@ -1,4 +1,5 @@
 import * as db from "./db";
+import * as eventBus from "./eventBus";
 import initializeDb from "./initializeDb";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
 import { generateKeyPair } from "./utils/publickeyEncryption";
@@ -7,16 +8,29 @@ import { migrateEthchain } from "./modules/ethClient";
 import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
-import { getVersionData } from "./utils/getVersionData";
 import * as calls from "./calls";
+import { DeviceCalls } from "./calls/device";
 import runWatchers from "./watchers";
 import { startHttpApi } from "./api/startHttpApi";
+import { AdminPasswordDb } from "./api/auth/adminPasswordDb";
 import { routesLogger, subscriptionsLogger } from "./api/logger";
-import { mapSubscriptionsToEventBus } from "./api/subscriptions";
 import * as routes from "./api/routes";
 import { logs } from "./logs";
 import params from "./params";
 import { getEthForwardMiddleware } from "./ethForward";
+import { getVpnApiClient } from "./api/vpnApiClient";
+import {
+  getVersionData,
+  isNewDappmanagerVersion
+} from "./utils/getVersionData";
+
+const vpnApiClient = getVpnApiClient(params);
+const adminPasswordDb = new AdminPasswordDb(params);
+const deviceCalls = new DeviceCalls({
+  eventBus,
+  adminPasswordDb,
+  vpnApiClient
+});
 
 // Start HTTP API
 const server = startHttpApi({
@@ -25,9 +39,11 @@ const server = startHttpApi({
   routes,
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
-  methods: calls,
+  methods: { ...calls, ...deviceCalls },
   subscriptionsLogger,
-  mapSubscriptionsToEventBus
+  adminPasswordDb,
+  eventBus,
+  isNewDappmanagerVersion
 });
 
 // Start watchers
@@ -45,6 +61,12 @@ if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
   db.naclPublicKey.set(publicKey);
   db.naclSecretKey.set(secretKey);
 }
+
+// TODO: find a proper place for this
+// Store pushed notifications in DB
+eventBus.notification.on(notification => {
+  db.notificationPush(notification.id, notification);
+});
 
 // Initial calls to check this DAppNode's status
 calls

@@ -24,11 +24,17 @@ export async function deviceAdd({ id }: { id: string }): Promise<void> {
  * The filename is the (16 chars short) result of hashing the generated salt in the db,
  * concatenated with the device id.
  */
-export async function deviceCredentialsGet(kwargs: {
+export async function deviceCredentialsGet({
+  id
+}: {
   id: string;
 }): Promise<VpnDeviceCredentials> {
+  const device = devices.get(id);
+  if (!device) throw Error(`No device ${id}`);
   return {
-    url
+    ...device,
+    url,
+    password: "Wka2Sb1NbiVBV2QX"
   };
 }
 
@@ -43,7 +49,7 @@ export async function deviceRemove({ id }: { id: string }): Promise<void> {
  * Resets the device credentials with the provided id, if exists.
  */
 export async function deviceReset({ id }: { id: string }): Promise<void> {
-  id;
+  //
 }
 
 /**

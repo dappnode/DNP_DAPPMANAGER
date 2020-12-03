@@ -1,10 +1,11 @@
 import crypto from "crypto";
-import { SingleFileDb } from "../../utils/singleFileDb";
+import { PlainTextFileDb } from "../../utils/fileDb";
 
 export class SessionsSecretDb {
-  private filedb: SingleFileDb;
+  private filedb: PlainTextFileDb;
+
   constructor(filepath: string) {
-    this.filedb = new SingleFileDb(filepath);
+    this.filedb = new PlainTextFileDb(filepath);
   }
 
   get(): string {

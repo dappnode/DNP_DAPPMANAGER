@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import { Request } from "express";
-import { SingleFileDb } from "../../utils/singleFileDb";
+import { PlainTextFileDb } from "../../utils/fileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
 import { wrapHandler } from "../utils";
-import { SessionsHandler } from "../sessions";
+import { SessionsManager } from "../sessions";
 import {
   AlreadyRegisteredError,
   MissingCredentialsError,
@@ -12,6 +12,7 @@ import {
   NotRegisteredError,
   WrongCredentialsError
 } from "./errors";
+import { AdminPasswordDb } from "./adminPasswordDb";
 
 // Password & sessions auth
 // ========================
@@ -30,28 +31,45 @@ import {
 export interface AuthPasswordSessionParams {
   ADMIN_PASSWORD_FILE: string;
   ADMIN_RECOVERY_FILE: string;
+  VPN_MAIN_ADMIN_ID: string;
 }
 
 const saltLength = 10;
 const recoveryTokenLength = 20;
 
 export class AuthPasswordSession {
-  sessions: SessionsHandler;
-  passwordDb: SingleFileDb;
-  recoveryDb: SingleFileDb;
+  sessions: SessionsManager;
+  adminPasswordDb: AdminPasswordDb;
+  passwordDb: PlainTextFileDb;
+  recoveryDb: PlainTextFileDb;
+  VPN_MAIN_ADMIN_ID: string;
 
-  constructor(sessions: SessionsHandler, params: AuthPasswordSessionParams) {
+  constructor(
+    sessions: SessionsManager,
+    adminPasswordDb: AdminPasswordDb,
+    params: AuthPasswordSessionParams
+  ) {
     this.sessions = sessions;
-    this.passwordDb = new SingleFileDb(params.ADMIN_PASSWORD_FILE);
-    this.recoveryDb = new SingleFileDb(params.ADMIN_RECOVERY_FILE);
+    this.adminPasswordDb = adminPasswordDb;
+    this.passwordDb = new PlainTextFileDb(params.ADMIN_PASSWORD_FILE);
+    this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
+    this.VPN_MAIN_ADMIN_ID = params.VPN_MAIN_ADMIN_ID;
   }
 
-  private assertAdminPassword(password: string): void {
+  private assertAdminPassword(password: string): string {
     const passwordHash = this.passwordDb.read();
     if (!password) throw new MissingCredentialsError();
     if (!passwordHash) throw new NotRegisteredError();
-    if (!bcrypt.compareSync(password, passwordHash))
-      throw new WrongCredentialsError();
+
+    // Check if it's main admin
+    if (bcrypt.compareSync(password, passwordHash))
+      return this.VPN_MAIN_ADMIN_ID;
+
+    // Check if it's an external admin
+    const externalAdminId = this.adminPasswordDb.getIdByPassword(password);
+    if (externalAdminId) return externalAdminId;
+
+    throw new WrongCredentialsError();
   }
 
   private setAdminPassword(password: string): void {
@@ -62,8 +80,19 @@ export class AuthPasswordSession {
 
   private assertOnlyAdmin(req: Request): void {
     if (!this.passwordDb.read()) throw new NotRegisteredError();
-    if (!this.sessions.isAdmin(req)) {
-      console.log({ headers: req.headers });
+
+    const sessionData = this.sessions.getSession(req);
+
+    if (
+      sessionData &&
+      sessionData.isAdmin &&
+      sessionData.adminId &&
+      (sessionData.adminId === this.VPN_MAIN_ADMIN_ID ||
+        // Allows to revoke active sessions when device is deleted
+        this.adminPasswordDb.hasAdminId(sessionData.adminId))
+    ) {
+      // OK
+    } else {
       // Sanity check for cookie existance
       if (req.cookies) throw new NotLoggedInError();
       else throw new NotLoggedInNoCookieError();
@@ -127,10 +156,19 @@ export class AuthPasswordSession {
 
   /**
    * Login session if `password` is correct
+   * Figure out which admin account this is based on the password used
+   * Persist the admin username / ID in the cookie to revoke access
+   * When the device gets removed, do not allow that device ID if it's
+   * not available locally
    */
   loginAdmin = wrapHandler((req, res) => {
-    this.assertAdminPassword(req.body.password);
-    this.sessions.makeAdmin(req);
+    const adminId = this.assertAdminPassword(req.body.password);
+
+    this.sessions.setSession(req, {
+      isAdmin: true,
+      adminId
+    });
+
     res.send({ ok: true });
   });
 

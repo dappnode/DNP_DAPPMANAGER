@@ -34,9 +34,12 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_PASSWORD_FILE: path.join(DNCORE_DIR, "admin-password-hash.txt"),
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
+  ADMIN_PASSWORDS_JSON_FILE: path.join(DNCORE_DIR, "admin-passwords.json"),
+
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
@@ -70,7 +73,8 @@ const params = {
   SESSIONS_TTL_MS: 24 * 60 * 60 * 100,
 
   // VPN API
-  vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
+  VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
+  VPN_MAIN_ADMIN_ID: "dappnode_admin",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",

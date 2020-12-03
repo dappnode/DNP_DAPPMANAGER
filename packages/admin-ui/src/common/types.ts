@@ -1,7 +1,8 @@
 // Device types
 
-export interface VpnDeviceCredentials {
+export interface VpnDeviceCredentials extends VpnDevice {
   url: string;
+  password?: string;
 }
 
 export interface VpnDevice {
