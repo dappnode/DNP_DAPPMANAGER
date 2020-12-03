@@ -28,11 +28,7 @@ export function getInstallerPackagesData({
       release,
       userSettings[release.dnpName],
       currentVersions[release.dnpName],
-      packagesInfo.find(pkg =>
-        pkg.containers.filter(
-          container => container.dnpName === release.dnpName
-        )
-      )
+      packagesInfo.find(pkg => pkg.dnpName === release.dnpName)
     )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
