@@ -28,8 +28,6 @@ export async function deviceCredentialsGet(kwargs: {
   id: string;
 }): Promise<VpnDeviceCredentials> {
   return {
-    filename: "filename",
-    key: "key",
     url
   };
 }
