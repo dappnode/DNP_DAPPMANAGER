@@ -3,7 +3,8 @@ import { Request } from "express";
 import { PlainTextFileDb } from "../../utils/fileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
 import { wrapHandler } from "../utils";
-import { SessionsManager } from "../sessions";
+import { SessionData, SessionsManager } from "../sessions";
+import { LoginStatusReturn } from "../../types";
 import {
   AlreadyRegisteredError,
   MissingCredentialsError,
@@ -78,7 +79,7 @@ export class AuthPasswordSession {
     this.passwordDb.write(passwordHash);
   }
 
-  private assertOnlyAdmin(req: Request): void {
+  private assertOnlyAdmin(req: Request): SessionData {
     if (!this.passwordDb.read()) throw new NotRegisteredError();
 
     const sessionData = this.sessions.getSession(req);
@@ -91,7 +92,7 @@ export class AuthPasswordSession {
         // Allows to revoke active sessions when device is deleted
         this.adminPasswordDb.hasAdminId(sessionData.adminId))
     ) {
-      // OK
+      return sessionData;
     } else {
       // Sanity check for cookie existance
       if (req.cookies) throw new NotLoggedInError();
@@ -150,8 +151,15 @@ export class AuthPasswordSession {
    * - ok: logged in
    */
   loginAdminStatus = wrapHandler((req, res) => {
-    this.assertOnlyAdmin(req);
-    res.send({ ok: true });
+    const sessionData = this.assertOnlyAdmin(req);
+
+    const resData: LoginStatusReturn = {
+      isAdmin: sessionData.isAdmin,
+      adminId: sessionData.adminId,
+      // Return isMainAdmin to show the change password UI
+      isMainAdmin: sessionData.adminId === this.VPN_MAIN_ADMIN_ID
+    };
+    res.send(resData);
   });
 
   /**
