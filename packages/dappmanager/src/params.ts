@@ -55,6 +55,9 @@ const params = {
   // UI static files
   UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
+  // Signature API
+  SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
+
   // HTTP API parameters
   IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,

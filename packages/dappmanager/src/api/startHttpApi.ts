@@ -36,6 +36,7 @@ interface HttpRoutes {
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
   publicPackagesData: RequestHandler<{ containerName: string }>;
+  signFromPackage: RequestHandler<{ data: string }>;
   upload: RequestHandler<{}>;
 }
 
@@ -140,6 +141,7 @@ export function startHttpApi({
   app.get("/global-envs/:name?", routes.globalEnvs);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
   app.get("/package-manifest/:dnpName", routes.packageManifest);
+  app.post("/sign", routes.signFromPackage);
 
   // Rest of RPC methods
   app.post(
