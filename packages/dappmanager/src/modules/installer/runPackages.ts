@@ -6,6 +6,7 @@ import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
+import { listPackage } from "../docker/listContainers";
 
 /**
  * Create and run each package container in series
@@ -54,14 +55,31 @@ export async function runPackages(
 
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
-      const removeOrphans = !pkg.isCore;
 
       log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUp(pkg.composePath, {
-        noStart: pkg.running,
-        removeOrphans,
-        timeout: pkg.dockerTimeout
-      });
+      const removeOrphans = !pkg.isCore;
+
+      if (!pkg.running) {
+        await dockerComposeUp(pkg.composePath, {
+          noStart: pkg.running,
+          removeOrphans,
+          timeout: pkg.dockerTimeout
+        });
+      } else if (pkg.running) {
+        const packageInfo = await listPackage(pkg);
+        const runningContainers = packageInfo.containers.filter(
+          container => container.running
+        );
+        const servicesRunning = runningContainers.map(
+          container => container.serviceName
+        );
+        await dockerComposeUp(pkg.composePath, {
+          serviceNames: servicesRunning,
+          noStart: pkg.running,
+          removeOrphans,
+          timeout: pkg.dockerTimeout
+        });
+      }
     }
 
     log(pkg.dnpName, "Package started");
