@@ -6,15 +6,13 @@ import {
 } from "../../utils/sign";
 import { wrapHandler } from "../utils";
 
-interface Params {
-  data: string;
-}
+type Params = {};
 
 /**
  * Sign arbitrary requests by packages
  */
-export const signFromPackage = wrapHandler<Params>(async (req, res) => {
-  const data = req.params.data as string | undefined;
+export const sign = wrapHandler<Params>(async (req, res) => {
+  const data = req.body as string | undefined;
 
   try {
     if (typeof data === undefined) throw Error("missing");
