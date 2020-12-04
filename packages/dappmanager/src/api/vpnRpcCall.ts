@@ -1,13 +1,17 @@
 import fetch from "node-fetch";
+import { mapValues } from "lodash";
 import { parseRpcResponse } from "../common";
+import { PackageVersionData } from "../types";
 import params from "../params";
+
+type Args = any[];
 
 /**
  * Call a VPN RPC JSON API route
  * @param route "addDevice"
  * @param args [ { id: "name" } ]
  */
-export async function vpnRpcCall<R>(route: string, ...args: any[]): Promise<R> {
+async function vpnRpcCall<R>(route: string, ...args: Args): Promise<R> {
   const res = await fetch(params.vpnApiRpcUrl, {
     method: "post",
     body: JSON.stringify({ method: route, params: args }),
@@ -31,3 +35,30 @@ export async function vpnRpcCall<R>(route: string, ...args: any[]): Promise<R> {
   // RPC response are always code 200
   return parseRpcResponse<R>(body);
 }
+
+interface VpnApi {
+  addDevice: (kwargs: { id: string }) => Promise<void>;
+  toggleAdmin: (kwargs: { id: string }) => Promise<void>;
+  removeDevice: (kwargs: { id: string }) => Promise<void>;
+  resetDevice: (kwargs: { id: string }) => Promise<void>;
+  listDevices: () => Promise<{ id: string; admin: boolean; ip: string }[]>;
+  getDeviceCredentials: (kwargs: {
+    id: string;
+  }) => Promise<{ filename: string; key: string; url: string }>;
+  getVersionData: () => Promise<PackageVersionData>;
+}
+
+const vpnApiRoutesData = {
+  addDevice: true,
+  toggleAdmin: true,
+  removeDevice: true,
+  resetDevice: true,
+  listDevices: true,
+  getDeviceCredentials: true,
+  getVersionData: true
+};
+
+export const vpnApi: VpnApi = mapValues(
+  vpnApiRoutesData,
+  (data, route) => (...args: Args): any => vpnRpcCall(route, ...args)
+);

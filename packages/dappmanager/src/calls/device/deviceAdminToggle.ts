@@ -1,4 +1,4 @@
-import { vpnRpcCall } from "../../api/vpnRpcCall";
+import { vpnApi } from "../../api/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 
 /**
@@ -6,6 +6,7 @@ import * as eventBus from "../../eventBus";
  * @param id Device id name
  */
 export async function deviceAdminToggle({ id }: { id: string }): Promise<void> {
-  await vpnRpcCall<void>("toggleAdmin", { id });
+  await vpnApi.toggleAdmin({ id });
+
   eventBus.requestDevices.emit();
 }

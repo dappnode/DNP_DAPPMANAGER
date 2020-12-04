@@ -1,4 +1,4 @@
-import { vpnRpcCall } from "../../api/vpnRpcCall";
+import { vpnApi } from "../../api/vpnRpcCall";
 import * as eventBus from "../../eventBus";
 
 /**
@@ -6,7 +6,7 @@ import * as eventBus from "../../eventBus";
  * @param id Device id name
  */
 export async function deviceRemove({ id }: { id: string }): Promise<void> {
-  await vpnRpcCall<void>("removeDevice", { id });
+  await vpnApi.removeDevice({ id });
 
   eventBus.requestDevices.emit();
 }

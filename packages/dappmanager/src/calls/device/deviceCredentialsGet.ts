@@ -1,4 +1,4 @@
-import { vpnRpcCall } from "../../api/vpnRpcCall";
+import { vpnApi } from "../../api/vpnRpcCall";
 import { VpnDeviceCredentials } from "../../types";
 
 /**
@@ -12,7 +12,9 @@ export async function deviceCredentialsGet({
 }: {
   id: string;
 }): Promise<VpnDeviceCredentials> {
-  return await vpnRpcCall<VpnDeviceCredentials>("getDeviceCredentials", {
-    id
-  });
+  const data = await vpnApi.getDeviceCredentials({ id });
+
+  return {
+    url: data.url
+  };
 }
