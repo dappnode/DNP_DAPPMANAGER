@@ -42,6 +42,7 @@ const server = startHttpApi({
     globalEnvs: () => {},
     packageManifest: () => {},
     publicPackagesData: () => {},
+    sign: () => {},
     upload: () => {}
   },
   ethForwardMiddleware: (req, res, next) => {
