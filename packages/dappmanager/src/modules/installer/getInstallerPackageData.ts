@@ -15,20 +15,20 @@ export function getInstallerPackagesData({
   userSettings,
   currentVersions,
   reqName,
-  packagesInfo
+  packageInfo
 }: {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
-  packagesInfo: InstalledPackageData[];
+  packageInfo: InstalledPackageData;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
     getInstallerPackageData(
       release,
       userSettings[release.dnpName],
       currentVersions[release.dnpName],
-      packagesInfo.find(pkg => pkg.dnpName === release.dnpName)
+      packageInfo
     )
   );
   return orderInstallPackages(packagesDataUnordered, reqName);
@@ -69,13 +69,9 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
-  const runningContainers = packageInfo?.containers.filter(
-    container => container.running
-  );
-
-  const running = runningContainers
-    ? Boolean(runningContainers.length > 0)
-    : false;
+  const runningContainers = packageInfo?.containers
+    .filter(container => container.running)
+    .map(container => container.serviceName);
 
   return {
     ...release,
@@ -91,6 +87,6 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    running
+    runningContainers
   };
 }

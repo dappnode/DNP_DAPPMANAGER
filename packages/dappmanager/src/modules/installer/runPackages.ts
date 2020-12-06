@@ -59,27 +59,11 @@ export async function runPackages(
       log(pkg.dnpName, "Starting package... ");
       const removeOrphans = !pkg.isCore;
 
-      if (!pkg.running) {
-        await dockerComposeUp(pkg.composePath, {
-          noStart: pkg.running,
-          removeOrphans,
-          timeout: pkg.dockerTimeout
-        });
-      } else if (pkg.running) {
-        const packageInfo = await listPackage(pkg);
-        const runningContainers = packageInfo.containers.filter(
-          container => container.running
-        );
-        const servicesRunning = runningContainers.map(
-          container => container.serviceName
-        );
-        await dockerComposeUp(pkg.composePath, {
-          serviceNames: servicesRunning,
-          noStart: pkg.running,
-          removeOrphans,
-          timeout: pkg.dockerTimeout
-        });
-      }
+      await dockerComposeUp(pkg.composePath, {
+        serviceNames: pkg.runningContainers,
+        removeOrphans,
+        timeout: pkg.dockerTimeout
+      });
     }
 
     log(pkg.dnpName, "Package started");

@@ -827,7 +827,7 @@ export interface InstallPackageData extends PackageRelease {
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
   dockerTimeout: number | undefined;
-  running: boolean;
+  runningContainers?: string[];
 }
 
 // Must be in-sync with SDK types
