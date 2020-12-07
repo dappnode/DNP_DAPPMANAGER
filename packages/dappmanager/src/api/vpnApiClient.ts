@@ -5,7 +5,7 @@ import { PackageVersionData } from "../types";
 
 export interface VpnApiClient {
   addDevice: (kwargs: { id: string }) => Promise<void>;
-  toggleAdmin: (kwargs: { id: string }) => Promise<void>;
+  toggleAdmin: (kwargs: { id: string; isAdmin: boolean }) => Promise<void>;
   removeDevice: (kwargs: { id: string }) => Promise<void>;
   resetDevice: (kwargs: { id: string }) => Promise<void>;
   listDevices: () => Promise<{ id: string; admin: boolean; ip: string }[]>;

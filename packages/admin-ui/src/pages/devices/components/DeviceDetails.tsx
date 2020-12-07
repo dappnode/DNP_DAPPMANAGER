@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, RouteComponentProps } from "react-router-dom";
-import { useApi } from "api";
+import { api, useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
 import { rootPath, title } from "../data";
@@ -16,24 +16,38 @@ import ErrorView from "components/ErrorView";
 import { MdOpenInNew } from "react-icons/md";
 import { GoClippy } from "react-icons/go";
 import Title from "components/Title";
+import { ReqStatus } from "types";
+import Ok from "components/Ok";
 
 function DeviceDetailsLoaded({
   admin,
   id,
-  url,
-  password
+  url
 }: {
   admin: boolean;
   id: string;
   url: string;
-  password?: string;
 }) {
   const [showQr, setShowQr] = useState(false);
+  const [password, setPassword] = useState<string>();
+  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
   useEffect(() => {
     // Activate the copy functionality
     new ClipboardJS(".copy-input-copy");
   }, []);
+
+  async function onGeneratePassword() {
+    try {
+      setReqStatus({ loading: true });
+      const passwordRes = await api.devicePasswordGet({ id });
+      setPassword(passwordRes);
+      setReqStatus({ result: true });
+    } catch (e) {
+      setReqStatus({ error: e });
+      console.error("Error on devicePasswordGet", e);
+    }
+  }
 
   return (
     <Card className="device-settings">
@@ -88,33 +102,49 @@ function DeviceDetailsLoaded({
 
       {showQr && url && <QrCode url={url} width={"400px"} />}
 
-      {admin && password && (
+      {admin ? (
         <div>
           <strong>Admin password</strong>
 
           <div className="help-text">
-            Unique password to grant external users acess. It will be revoked
-            when deleting this device
+            Share a unique password to grant external users acess. It will be
+            revoked when deleting this device
           </div>
 
-          <Input
-            lock={true}
-            value={password || ""}
-            onValueChange={() => {}}
-            className="copy-input"
-            append={
-              <>
-                <Button
-                  className="copy-input-copy"
-                  data-clipboard-text={password}
-                >
-                  <GoClippy />
-                </Button>
-              </>
-            }
-          />
+          {password ? (
+            <Input
+              lock={true}
+              value={password || ""}
+              onValueChange={() => {}}
+              className="copy-input"
+              append={
+                <>
+                  <Button
+                    className="copy-input-copy"
+                    data-clipboard-text={password}
+                  >
+                    <GoClippy />
+                  </Button>
+                </>
+              }
+            />
+          ) : (
+            <Button onClick={onGeneratePassword}>
+              Generate new admin password
+            </Button>
+          )}
+
+          <div className="request-status-container">
+            {reqStatus.loading && (
+              <Ok loading msg="Generating password..."></Ok>
+            )}
+            {reqStatus.result && <Ok ok msg="Generated password"></Ok>}
+            {reqStatus.error && (
+              <ErrorView error={reqStatus.error} hideIcon red />
+            )}
+          </div>
         </div>
-      )}
+      ) : null}
 
       <div className="alert alert-secondary" role="alert">
         Beware of shoulder surfing attacks (unsolicited observers), This data
@@ -139,7 +169,6 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
           admin={deviceCredentials.data.admin}
           id={id}
           url={deviceCredentials.data.url}
-          password={deviceCredentials.data.password}
         />
       ) : deviceCredentials.error ? (
         <ErrorView error={deviceCredentials.error} />

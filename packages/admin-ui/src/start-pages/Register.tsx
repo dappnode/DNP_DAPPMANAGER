@@ -114,7 +114,7 @@ export function Register({
         Register
       </Button>
 
-      {reqStatus.result && <Ok ok msg={"Registered"}></Ok>}
+      {reqStatus.result && <Ok ok msg="Registered"></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );

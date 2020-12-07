@@ -63,7 +63,7 @@ export function ResetPassword({
         Reset password
       </Button>
 
-      {reqStatus.result && <Ok ok msg={"Reseted password"}></Ok>}
+      {reqStatus.result && <Ok ok msg="Reseted password"></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );

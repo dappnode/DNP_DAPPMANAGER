@@ -147,8 +147,25 @@ export interface Routes {
   /**
    * Gives/removes admin rights to the provided device id.
    * @param id Device id name
+   * @param isAdmin new admin status
    */
-  deviceAdminToggle: (kwargs: { id: string }) => Promise<void>;
+  deviceAdminToggle: (kwargs: {
+    id: string;
+    isAdmin: boolean;
+  }) => Promise<void>;
+
+  /**
+   * Returns true if a password has been created for this device
+   * @param id Device id name
+   */
+  devicePasswordHas: (kwargs: { id: string }) => Promise<boolean>;
+
+  /**
+   * Returns the login token of this device, creating it if necessary
+   * If the password has been changed and is no longer a login token, throws
+   * @param id Device id name
+   */
+  devicePasswordGet: (kwargs: { id: string }) => Promise<string>;
 
   /**
    * Returns a list of the existing devices, with the admin property
@@ -454,6 +471,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   deviceCredentialsGet: {},
   deviceRemove: { log: true },
   deviceReset: { log: true },
+  devicePasswordGet: {},
+  devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
   domainAliasSet: { log: true },

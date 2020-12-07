@@ -48,7 +48,7 @@ async function parseResponse<T>(res: Response): Promise<T> {
 }
 
 export type LoginStatus =
-  | { status: "logged-in"; isMainAdmin: boolean }
+  | { status: "logged-in"; adminId: string }
   | { status: "not-logged-in"; noCookie: boolean }
   | { status: "not-registered" }
   | { status: "error"; error: Error };
@@ -56,7 +56,7 @@ export type LoginStatus =
 export async function fetchLoginStatus(): Promise<LoginStatus> {
   try {
     const res = await fetchAuthPost<{}, LoginStatusReturn>(apiUrls.loginStatus);
-    return { status: "logged-in", isMainAdmin: res.isMainAdmin };
+    return { status: "logged-in", adminId: res.adminId };
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_REGISTERED:

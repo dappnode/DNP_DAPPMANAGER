@@ -90,7 +90,8 @@ export class AuthPasswordSession {
       sessionData.adminId &&
       (sessionData.adminId === this.VPN_MAIN_ADMIN_ID ||
         // Allows to revoke active sessions when device is deleted
-        this.adminPasswordDb.hasAdminId(sessionData.adminId))
+        // or its status is changed to non-admin
+        this.adminPasswordDb.isAdmin(sessionData.adminId))
     ) {
       return sessionData;
     } else {
@@ -153,11 +154,10 @@ export class AuthPasswordSession {
   loginAdminStatus = wrapHandler((req, res) => {
     const sessionData = this.assertOnlyAdmin(req);
 
+    // Re-assign to new object to prevent leaking sessionData in the response
     const resData: LoginStatusReturn = {
       isAdmin: sessionData.isAdmin,
-      adminId: sessionData.adminId,
-      // Return isMainAdmin to show the change password UI
-      isMainAdmin: sessionData.adminId === this.VPN_MAIN_ADMIN_ID
+      adminId: sessionData.adminId
     };
     res.send(resData);
   });

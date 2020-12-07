@@ -40,8 +40,19 @@ export class DeviceCalls {
    * Gives/removes admin rights to the provided device id.
    * @param id Device id name
    */
-  deviceAdminToggle = async ({ id }: { id: string }): Promise<void> => {
-    await this.vpnApiClient.toggleAdmin({ id });
+  deviceAdminToggle = async ({
+    id,
+    isAdmin
+  }: {
+    id: string;
+    isAdmin: boolean;
+  }): Promise<void> => {
+    // Set admin status in VPN
+    await this.vpnApiClient.toggleAdmin({ id, isAdmin });
+
+    // Set admin status in local DB
+    this.adminPasswordDb.setIsAdmin(id, isAdmin);
+
     this.eventBus.requestDevices.emit();
   };
 
@@ -57,20 +68,29 @@ export class DeviceCalls {
     id: string;
   }): Promise<VpnDeviceCredentials> => {
     const data = await this.vpnApiClient.getDeviceCredentials({ id });
+    const device = await this.devicelist(id);
 
-    const devices = await this.vpnApiClient.listDevices();
-    const device = devices.find(d => d.id === id);
+    return { url: data.url, ...device };
+  };
 
-    if (!device) throw Error(`Device ${id} not found`);
+  /**
+   * Returns true if a password has been created for this device
+   * @param id Device id name
+   */
+  devicePasswordHas = async ({ id }: { id: string }): Promise<boolean> => {
+    return this.adminPasswordDb.hasAdminId(id);
+  };
 
-    return {
-      ...device,
-      url: data.url,
-      // Only get it if it's admin
-      password: device?.admin
-        ? this.adminPasswordDb.generatePasswordById(id)
-        : undefined
-    };
+  /**
+   * Returns the login token of this device, creating it if necessary
+   * If the password has been changed and is no longer a login token, throws
+   * @param id Device id name
+   */
+  devicePasswordGet = async ({ id }: { id: string }): Promise<string> => {
+    const device = await this.devicelist(id);
+    if (!device.admin) throw Error(`Device ${id} is not admin`);
+
+    return this.adminPasswordDb.generateLoginToken(id);
   };
 
   /**
@@ -101,5 +121,12 @@ export class DeviceCalls {
    */
   devicesList = async (): Promise<VpnDevice[]> => {
     return await this.vpnApiClient.listDevices();
+  };
+
+  private devicelist = async (id: string): Promise<VpnDevice> => {
+    const devices = await this.vpnApiClient.listDevices();
+    const device = devices.find(d => d.id === id);
+    if (!device) throw Error(`Device ${id} not found`);
+    return device;
   };
 }

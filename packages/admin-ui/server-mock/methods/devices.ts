@@ -6,6 +6,7 @@ const initialDevices: VpnDevice[] = [
   { id: "admin-name", admin: true, ip },
   { id: "other-user", admin: false, ip }
 ];
+const adminPasswords = new Map<string, string>();
 
 const devices = new Map<string, VpnDevice>(
   initialDevices.map(device => [device.id, device])
@@ -33,8 +34,7 @@ export async function deviceCredentialsGet({
   if (!device) throw Error(`No device ${id}`);
   return {
     ...device,
-    url,
-    password: "Wka2Sb1NbiVBV2QX"
+    url
   };
 }
 
@@ -59,6 +59,36 @@ export async function deviceAdminToggle({ id }: { id: string }): Promise<void> {
   const device = devices.get(id);
   if (!device) throw Error(`No id ${id}`);
   devices.set(id, { ...device, admin: !device.admin });
+}
+
+/**
+ * Returns true if a password has been created for this device
+ * @param id Device id name
+ */
+export async function devicePasswordHas({
+  id
+}: {
+  id: string;
+}): Promise<boolean> {
+  return adminPasswords.has(id);
+}
+
+/**
+ * Returns the login token of this device, creating it if necessary
+ * If the password has been changed and is no longer a login token, throws
+ * @param id Device id name
+ */
+export async function devicePasswordGet({
+  id
+}: {
+  id: string;
+}): Promise<string> {
+  let password = adminPasswords.get(id);
+  if (!password) {
+    password = String(Math.random()).slice(2);
+    adminPasswords.set(id, password);
+  }
+  return password;
 }
 
 /**

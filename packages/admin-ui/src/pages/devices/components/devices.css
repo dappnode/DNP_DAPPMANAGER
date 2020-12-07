@@ -87,3 +87,6 @@
 .device-settings .device-url-open > a {
   display: flex;
 }
+.device-settings .request-status-container > * {
+  margin-top: 0.5rem;
+}
