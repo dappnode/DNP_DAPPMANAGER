@@ -46,7 +46,7 @@ export class JsonFileDb<T> {
   }
 
   write(data: T): void {
-    this.fileDb.write(JSON.stringify(data));
+    this.fileDb.write(JSON.stringify(data, null, 2));
   }
 
   del(): void {
