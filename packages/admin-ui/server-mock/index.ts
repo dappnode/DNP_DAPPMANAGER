@@ -1,8 +1,9 @@
 import path from "path";
 import * as methods from "./methods";
-import { startDappmanager } from "../../dappmanager/src/startDappmanager";
+import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
 import { LoggerMiddleware } from "../src/common/transport/types";
 import { MockVpnApiClient } from "./mockVpnClient";
+import { eventBus } from "./eventBus";
 
 const testFileDir = "test_files";
 
@@ -31,9 +32,6 @@ const subscriptionsLogger: LoggerMiddleware = {
   onError: (route, error) => console.log("Subscription error", route, error)
 };
 
-// Mock placeholder empty subscription object to allow compilation
-const emptySubscription = { on: () => {}, emit: () => {} };
-
 const server = startDappmanager({
   params,
   logs: {
@@ -57,23 +55,7 @@ const server = startDappmanager({
   methods,
   routesLogger,
   subscriptionsLogger,
-  eventBus: {
-    chainData: emptySubscription,
-    packagesModified: emptySubscription,
-    directory: emptySubscription,
-    packages: emptySubscription,
-    logUi: emptySubscription,
-    logUserAction: emptySubscription,
-    notification: emptySubscription,
-    requestChainData: emptySubscription,
-    requestAutoUpdateData: emptySubscription,
-    requestDevices: emptySubscription,
-    requestPackages: emptySubscription,
-    requestSystemInfo: emptySubscription,
-    runNatRenewal: emptySubscription,
-    initializedDb: emptySubscription,
-    runEthClientInstaller: emptySubscription
-  },
+  eventBus,
   isNewDappmanagerVersion: () => false,
   vpnApiClient: new MockVpnApiClient()
 });

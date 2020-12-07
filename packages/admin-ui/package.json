@@ -71,6 +71,7 @@
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json"
   },
   "devDependencies": {
+    "@dappnode/dappmanager": "^0.1.0",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.6",
     "cookie-session": "^1.4.0",

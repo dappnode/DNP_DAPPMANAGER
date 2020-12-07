@@ -1,4 +1,4 @@
-import { VpnApiClient } from "../../dappmanager/src/api/vpnApiClient";
+import { VpnApiClient } from "@dappnode/dappmanager/src/api/vpnApiClient";
 import { PackageVersionData, VpnDevice } from "../src/types";
 
 const ip = "1.1.1.1";
