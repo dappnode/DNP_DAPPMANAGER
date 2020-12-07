@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 // Components
 import NotificationsMain from "./components/NotificationsMain";
-import { NonAdmin } from "./start-pages/NonAdmin";
 import { NoConnection } from "start-pages/NoConnection";
 import { Register } from "./start-pages/Register";
 import { Login } from "./start-pages/Login";
