@@ -69,15 +69,14 @@ export class AuthPasswordSession {
 
     const sessionData = this.sessions.getSession(req);
 
-    if (
-      sessionData &&
-      sessionData.isAdmin &&
-      sessionData.username &&
+    if (sessionData && sessionData.isAdmin && sessionData.username) {
       // Allows to revoke active sessions when device is deleted
       // or its status is changed to non-admin
-      this.adminPasswordDb.isAdmin(sessionData.username)
-    ) {
-      return sessionData;
+      if (this.adminPasswordDb.isAdmin(sessionData.username)) {
+        return sessionData;
+      } else {
+        throw new NotLoggedInError();
+      }
     } else {
       // Sanity check for cookie existance
       if (req.cookies) throw new NotLoggedInError();
@@ -103,6 +102,9 @@ export class AuthPasswordSession {
       throw new AlreadyRegisteredError();
 
     this.adminPasswordDb.setPassword(username, password);
+
+    // Register username as admin
+    this.adminPasswordDb.setIsAdmin(username, true);
 
     // Create recovery token for main admin only
     let recoveryToken = this.recoveryDb.read();
