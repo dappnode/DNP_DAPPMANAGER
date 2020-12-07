@@ -11,7 +11,7 @@ import "./topbar.css";
 import "./notifications.css";
 import { MdMenu } from "react-icons/md";
 
-const TopBar = () => (
+export const TopBar = ({ username }: { username: string }) => (
   <div id="topbar">
     {/* Left justified items */}
     <div className="left">
@@ -25,9 +25,7 @@ const TopBar = () => (
       <div className="topnav-icon-separator" />
       <ChainDataDropdown />
       <Notifications />
-      <Profile />
+      <Profile username={username} />
     </div>
   </div>
 );
-
-export default TopBar;
