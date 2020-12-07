@@ -53,8 +53,9 @@ function isValidPassword(password: string, hash: string): boolean {
 }
 
 export class AdminPasswordDb {
-  passwordDb: JsonFileDb<PasswordByIdMap>;
-  statusDb: JsonFileDb<AdminStatusById>;
+  private passwordDb: JsonFileDb<PasswordByIdMap>;
+  // NOTE: Requires to be synced with remote VPN DB
+  private statusDb: JsonFileDb<AdminStatusById>;
 
   constructor(params: AdminPasswordDbParams) {
     this.passwordDb = new JsonFileDb(params.ADMIN_PASSWORDS_JSON_FILE, {});

@@ -22,7 +22,7 @@ import {
   Routes
 } from "../types";
 
-interface HttpApiParams
+export interface HttpApiParams
   extends ClientSideCookiesParams,
     AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
