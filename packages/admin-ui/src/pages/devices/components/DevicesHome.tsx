@@ -61,10 +61,10 @@ export default function DevicesHome() {
     });
   }
 
-  function toggleAdmin(id: string) {
-    withToastNoThrow(() => api.deviceAdminToggle({ id }), {
-      message: `Toggling ${id} admin...`,
-      onSuccess: `Toggled ${id} admin`
+  function toggleAdmin(id: string, isAdmin: boolean) {
+    withToastNoThrow(() => api.deviceAdminToggle({ id, isAdmin }), {
+      message: `${isAdmin ? "Removing" : "Making"} ${id} admin...`,
+      onSuccess: `${isAdmin ? "Removed" : "Made"} ${id} admin`
     }).then(devicesReq.revalidate);
   }
 
@@ -119,7 +119,10 @@ export default function DevicesHome() {
                   <Button className="get-link">Get</Button>
                 </NavLink>
 
-                <Switch checked={admin} onToggle={() => toggleAdmin(id)} />
+                <Switch
+                  checked={admin}
+                  onToggle={() => toggleAdmin(id, !admin)}
+                />
                 <MdRefresh
                   style={{ fontSize: "1.05rem" }}
                   onClick={() => resetDevice(id)}
