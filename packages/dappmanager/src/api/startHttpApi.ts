@@ -31,7 +31,7 @@ export interface HttpApiParams
   HTTP_CORS_WHITELIST: string[];
 }
 
-interface HttpRoutes {
+export interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
   download: RequestHandler<{ fileId: string }>;
   downloadUserActionLogs: RequestHandler<{}>;

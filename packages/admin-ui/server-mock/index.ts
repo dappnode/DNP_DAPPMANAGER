@@ -1,8 +1,8 @@
 import path from "path";
 import * as methods from "./methods";
-import { startHttpApi } from "../../dappmanager/src/api/startHttpApi";
+import { startDappmanager } from "../../dappmanager/src/startDappmanager";
 import { LoggerMiddleware } from "../src/common/transport/types";
-import { AdminPasswordDb } from "../../dappmanager/src/api/auth/adminPasswordDb";
+import { MockVpnApiClient } from "./mockVpnClient";
 
 const testFileDir = "test_files";
 
@@ -34,9 +34,7 @@ const subscriptionsLogger: LoggerMiddleware = {
 // Mock placeholder empty subscription object to allow compilation
 const emptySubscription = { on: () => {}, emit: () => {} };
 
-const adminPasswordDb = new AdminPasswordDb(params);
-
-const server = startHttpApi({
+const server = startDappmanager({
   params,
   logs: {
     debug: console.log,
@@ -59,7 +57,6 @@ const server = startHttpApi({
   methods,
   routesLogger,
   subscriptionsLogger,
-  adminPasswordDb,
   eventBus: {
     chainData: emptySubscription,
     packagesModified: emptySubscription,
@@ -77,7 +74,8 @@ const server = startHttpApi({
     initializedDb: emptySubscription,
     runEthClientInstaller: emptySubscription
   },
-  isNewDappmanagerVersion: () => false
+  isNewDappmanagerVersion: () => false,
+  vpnApiClient: new MockVpnApiClient()
 });
 
 // Graceful shutdown

@@ -1,4 +1,3 @@
-import retry from "async-retry";
 import * as db from "./db";
 import * as eventBus from "./eventBus";
 import initializeDb from "./initializeDb";
@@ -10,10 +9,7 @@ import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
 import * as calls from "./calls";
-import { DeviceCalls } from "./calls/device";
 import runWatchers from "./watchers";
-import { startHttpApi } from "./api/startHttpApi";
-import { AdminPasswordDb } from "./api/auth/adminPasswordDb";
 import { routesLogger, subscriptionsLogger } from "./api/logger";
 import * as routes from "./api/routes";
 import { logs } from "./logs";
@@ -24,27 +20,22 @@ import {
   getVersionData,
   isNewDappmanagerVersion
 } from "./utils/getVersionData";
+import { startDappmanager } from "./startDappmanager";
 
 const vpnApiClient = getVpnApiClient(params);
-const adminPasswordDb = new AdminPasswordDb(params);
-const deviceCalls = new DeviceCalls({
-  eventBus,
-  adminPasswordDb,
-  vpnApiClient
-});
 
 // Start HTTP API
-const server = startHttpApi({
+const server = startDappmanager({
   params,
   logs,
   routes,
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
-  methods: { ...calls, ...deviceCalls },
+  methods: calls,
   subscriptionsLogger,
-  adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion
+  isNewDappmanagerVersion,
+  vpnApiClient
 });
 
 // Start watchers
@@ -62,17 +53,6 @@ if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
   db.naclPublicKey.set(publicKey);
   db.naclSecretKey.set(secretKey);
 }
-
-// Sync local adminPasswordDb status with VPN's DB
-retry(
-  async function syncAdminPasswordDb() {
-    for (const device of await vpnApiClient.listDevices())
-      adminPasswordDb.setIsAdmin(device.id, device.admin);
-  },
-  { retries: 50, minTimeout: 2000, maxRetryTime: 5 * 60 * 1000 }
-)
-  .then(() => logs.info("Synced adminPasswordDb with VPN devices"))
-  .catch(e => logs.error("Èrror syncing adminPasswordDb", e));
 
 // TODO: find a proper place for this
 // Store pushed notifications in DB
