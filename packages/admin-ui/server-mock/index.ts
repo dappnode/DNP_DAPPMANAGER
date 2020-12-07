@@ -16,8 +16,7 @@ const params = {
   ADMIN_PASSWORDS_JSON_FILE: path.join(testFileDir, "ADMIN_PASSWORDS.json"),
   ADMIN_STATUS_JSON_FILE: path.join(testFileDir, "ADMIN_STATUS.json"),
   SESSIONS_MAX_TTL_MS: 24 * 60 * 60 * 100,
-  SESSIONS_TTL_MS: 24 * 60 * 60 * 100,
-  VPN_MAIN_ADMIN_ID: "dappnode_admin"
+  SESSIONS_TTL_MS: 24 * 60 * 60 * 100
 };
 
 /* eslint-disable no-console */

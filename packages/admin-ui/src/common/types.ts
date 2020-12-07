@@ -1,6 +1,6 @@
 // AUTH, SESSION types
 export interface LoginStatusReturn {
-  adminId: string;
+  username: string;
   isAdmin: boolean;
 }
 

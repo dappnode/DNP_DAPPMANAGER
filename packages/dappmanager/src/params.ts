@@ -74,7 +74,6 @@ const params = {
 
   // VPN API
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
-  VPN_MAIN_ADMIN_ID: "dappnode_admin",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",

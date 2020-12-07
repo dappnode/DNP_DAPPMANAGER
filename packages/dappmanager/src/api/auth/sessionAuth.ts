@@ -30,7 +30,6 @@ import { AdminPasswordDb } from "./adminPasswordDb";
 
 export interface AuthPasswordSessionParams {
   ADMIN_RECOVERY_FILE: string;
-  VPN_MAIN_ADMIN_ID: string;
 }
 
 const recoveryTokenLength = 20;
@@ -39,7 +38,6 @@ export class AuthPasswordSession {
   sessions: SessionsManager;
   adminPasswordDb: AdminPasswordDb;
   recoveryDb: PlainTextFileDb;
-  VPN_MAIN_ADMIN_ID: string;
 
   constructor(
     sessions: SessionsManager,
@@ -49,7 +47,6 @@ export class AuthPasswordSession {
     this.sessions = sessions;
     this.adminPasswordDb = adminPasswordDb;
     this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
-    this.VPN_MAIN_ADMIN_ID = params.VPN_MAIN_ADMIN_ID;
   }
 
   private assertPassword(username: string, password: string): void {
@@ -75,11 +72,10 @@ export class AuthPasswordSession {
     if (
       sessionData &&
       sessionData.isAdmin &&
-      sessionData.adminId &&
-      (sessionData.adminId === this.VPN_MAIN_ADMIN_ID ||
-        // Allows to revoke active sessions when device is deleted
-        // or its status is changed to non-admin
-        this.adminPasswordDb.isAdmin(sessionData.adminId))
+      sessionData.username &&
+      // Allows to revoke active sessions when device is deleted
+      // or its status is changed to non-admin
+      this.adminPasswordDb.isAdmin(sessionData.username)
     ) {
       return sessionData;
     } else {
@@ -124,14 +120,14 @@ export class AuthPasswordSession {
    * - Any admin user can change its password
    */
   changeAdminPassword = wrapHandler((req, res) => {
-    const username = req.body.username;
     const prevPassword = req.body.password;
     const newPassword = req.body.newPassword;
 
-    if (!username || !prevPassword || !newPassword)
-      throw new MissingCredentialsError();
+    if (!prevPassword || !newPassword) throw new MissingCredentialsError();
 
-    this.assertPassword(username, prevPassword);
+    const sessionData = this.assertOnlyAdmin(req);
+    const username = sessionData.username;
+
     this.adminPasswordDb.setPassword(username, newPassword);
 
     res.send({ ok: true });
@@ -163,7 +159,7 @@ export class AuthPasswordSession {
     // Re-assign to new object to prevent leaking sessionData in the response
     const resData: LoginStatusReturn = {
       isAdmin: sessionData.isAdmin,
-      adminId: sessionData.adminId
+      username: sessionData.username
     };
     res.send(resData);
   });
@@ -180,10 +176,7 @@ export class AuthPasswordSession {
 
     this.assertPassword(username, password);
 
-    this.sessions.setSession(req, {
-      isAdmin: true,
-      adminId: username
-    });
+    this.sessions.setSession(req, { isAdmin: true, username });
 
     res.send({ ok: true });
   });

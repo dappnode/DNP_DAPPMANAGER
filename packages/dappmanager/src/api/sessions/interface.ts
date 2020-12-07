@@ -2,7 +2,7 @@ import express from "express";
 
 export interface SessionData {
   isAdmin: boolean;
-  adminId: string;
+  username: string;
 }
 
 export interface SessionsManager {

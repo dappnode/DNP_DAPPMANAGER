@@ -19,6 +19,7 @@ export function Login({
 }: {
   refetchStatus: () => Promise<void>;
 }) {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
@@ -28,7 +29,7 @@ export function Login({
   async function onLogin() {
     try {
       setReqStatus({ loading: true });
-      await fetchLogin({ password });
+      await fetchLogin({ username, password });
       setReqStatus({ result: true });
 
       // Make sure user is properly logged in
@@ -69,6 +70,11 @@ export function Login({
     <StandaloneContainer TopIcon={BsLock} title="Login">
       <InputForm
         fields={[
+          {
+            title: "Username",
+            value: username,
+            onValueChange: setUsername
+          },
           {
             title: "Password",
             secret: true,
