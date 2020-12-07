@@ -6,7 +6,6 @@ import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
-import { listPackage } from "../docker/listContainers";
 
 /**
  * Create and run each package container in series
@@ -59,16 +58,12 @@ export async function runPackages(
       log(pkg.dnpName, "Starting package... ");
       const removeOrphans = !pkg.isCore;
 
-      pkg.runningContainers
-        ? await dockerComposeUp(pkg.composePath, {
-            serviceNames: pkg.runningContainers,
-            removeOrphans,
-            timeout: pkg.dockerTimeout
-          })
-        : await dockerComposeUp(pkg.composePath, {
-            removeOrphans,
-            timeout: pkg.dockerTimeout
-          });
+      await dockerComposeUp(pkg.composePath, {
+        serviceNames: pkg.runningContainers,
+        noStart: pkg.packageStopped,
+        removeOrphans,
+        timeout: pkg.dockerTimeout
+      });
     }
 
     log(pkg.dnpName, "Package started");

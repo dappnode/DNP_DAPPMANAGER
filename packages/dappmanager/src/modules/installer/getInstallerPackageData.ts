@@ -4,7 +4,8 @@ import orderInstallPackages from "./orderInstallPackages";
 import {
   UserSettingsAllDnps,
   UserSettings,
-  InstalledPackageData
+  InstalledPackageData,
+  PackageContainer
 } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
@@ -44,7 +45,7 @@ function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
   currentVersion: string | undefined,
-  packageInfo?: InstalledPackageData
+  packageInfo: InstalledPackageData
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
 
@@ -69,9 +70,7 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
-  const runningContainers = packageInfo?.containers
-    .filter(container => container.running)
-    .map(container => container.serviceName);
+  const runningContainersInfo = getRunningContainers(packageInfo);
 
   return {
     ...release,
@@ -87,6 +86,32 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    runningContainers
+    runningContainers: runningContainersInfo.runningContainers,
+    packageStopped: runningContainersInfo.packageStopped
   };
+}
+
+/**
+ * This function will return: 1. Array with running containers
+ * 2. Empty array(no running containers) 3. Undefined if all containers running
+ * @param packageInfo
+ */
+function getRunningContainers(
+  packageInfo: InstalledPackageData
+): { runningContainers: string[] | undefined; packageStopped?: boolean } {
+  const running = packageInfo.containers
+    .filter(container => container.running)
+    .map(container => container.serviceName);
+
+  switch (running.length) {
+    // All containers running
+    case packageInfo.containers.length:
+      return { runningContainers: undefined, packageStopped: false };
+    // All containers stopped. Package stopped
+    case 0:
+      return { runningContainers: undefined, packageStopped: true };
+    // Some containers stopped/running
+    default:
+      return { runningContainers: running, packageStopped: false };
+  }
 }
