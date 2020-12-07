@@ -143,11 +143,7 @@ let apiStarted = false;
  * Connect to the server's API
  * Store the session and map subscriptions
  */
-export function start({
-  onConnectionError
-}: {
-  onConnectionError: (errorMessage: string) => void;
-}) {
+export function start({ refetchStatus }: { refetchStatus: () => void }) {
   // Only run start() once
   if (apiStarted) return;
   else apiStarted = true;
@@ -165,12 +161,15 @@ export function start({
 
     /* eslint-disable-next-line no-console */
     console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
+
+    // When Socket.io re-establishes connection check if still logged in
+    refetchStatus();
   });
 
   function handleConnectionError(err: Error | string): void {
     const errorMessage = err instanceof Error ? err.message : err;
     console.error("SocketIO connection closed", errorMessage);
-    onConnectionError(errorMessage);
+    refetchStatus();
   }
 
   // Handles server errors

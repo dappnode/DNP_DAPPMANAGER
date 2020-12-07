@@ -32,9 +32,7 @@ function MainApp({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
 
   useEffect(() => {
     // Start API and Socket.io once user has logged in
-    apiStart({
-      onConnectionError: () => refetchStatus()
-    });
+    apiStart({ refetchStatus });
   }, [refetchStatus]);
 
   return (
