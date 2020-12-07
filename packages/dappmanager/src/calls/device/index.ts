@@ -101,7 +101,7 @@ export class DeviceCalls {
     await this.vpnApiClient.removeDevice({ id });
     this.eventBus.requestDevices.emit();
 
-    this.adminPasswordDb.removePasswordById(id);
+    this.adminPasswordDb.removeId(id);
 
     // TODO: Add a timeout in the Socket.io to close socket connections
     // every once in a while to prevent long running logins

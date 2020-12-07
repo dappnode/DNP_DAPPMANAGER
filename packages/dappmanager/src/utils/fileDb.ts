@@ -31,15 +31,18 @@ export class PlainTextFileDb {
 }
 
 export class JsonFileDb<T> {
-  fileDb: PlainTextFileDb;
+  private fileDb: PlainTextFileDb;
+  private defaultValue: T;
 
-  constructor(filepath: string) {
+  constructor(filepath: string, defaultValue: T) {
     this.fileDb = new PlainTextFileDb(filepath);
+    this.defaultValue = defaultValue;
   }
 
-  read(): T | undefined {
+  read(): T {
     const data = this.fileDb.read();
     if (data) return JSON.parse(data);
+    else return this.defaultValue;
   }
 
   write(data: T): void {

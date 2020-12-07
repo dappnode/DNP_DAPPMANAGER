@@ -36,9 +36,9 @@ const params = {
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
 
   // File with sole purpose of handling admin password hash. Must be deletable
-  ADMIN_PASSWORD_FILE: path.join(DNCORE_DIR, "admin-password-hash.txt"),
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
   ADMIN_PASSWORDS_JSON_FILE: path.join(DNCORE_DIR, "admin-passwords.json"),
+  ADMIN_STATUS_JSON_FILE: path.join(DNCORE_DIR, "admin-status.json"),
 
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),

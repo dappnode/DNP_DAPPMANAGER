@@ -3,7 +3,6 @@ import { JsonFileDb } from "../../utils/fileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
 
 const passwordLength = 16;
-const recoveryTokenLength = 20;
 const difficultyFactor = 10;
 const loginTokenPrefix = "login-token.";
 
@@ -23,8 +22,13 @@ interface PasswordByIdMap {
   [id: string]: string; // password token
 }
 
+interface AdminStatusById {
+  [id: string]: { isAdmin: boolean };
+}
+
 export interface AdminPasswordDbParams {
   ADMIN_PASSWORDS_JSON_FILE: string;
+  ADMIN_STATUS_JSON_FILE: string;
 }
 
 function parseLoginToken(hash: string): string | null {
@@ -49,35 +53,26 @@ function isValidPassword(password: string, hash: string): boolean {
 }
 
 export class AdminPasswordDb {
-  jsonDb: JsonFileDb<PasswordByIdMap>;
-  adminStatusDb: Map<string, boolean>;
+  passwordDb: JsonFileDb<PasswordByIdMap>;
+  statusDb: JsonFileDb<AdminStatusById>;
 
   constructor(params: AdminPasswordDbParams) {
-    this.jsonDb = new JsonFileDb(params.ADMIN_PASSWORDS_JSON_FILE);
-    this.adminStatusDb = new Map();
+    this.passwordDb = new JsonFileDb(params.ADMIN_PASSWORDS_JSON_FILE, {});
+    this.statusDb = new JsonFileDb(params.ADMIN_STATUS_JSON_FILE, {});
   }
 
-  changePassword(id: string, prevPassword: string, newPassword: string): void {
-    const passwordMap = this.read();
-
-    // Validate password
-    const prevHash = passwordMap[id];
-    if (!prevHash) {
-      throw Error("NOT_REGISTERED");
-    }
-    if (!isValidPassword(prevPassword, prevHash)) {
-      throw Error("WRONG_PASSWORD");
-    }
+  setPassword(id: string, newPassword: string): void {
+    const passwordMap = this.passwordDb.read();
 
     // Hash password and store
     const newHash = bcrypt.hashSync(newPassword, difficultyFactor);
     passwordMap[id] = newHash;
 
-    this.write(passwordMap);
+    this.passwordDb.write(passwordMap);
   }
 
   generateLoginToken(id: string): string {
-    const passwordMap = this.read();
+    const passwordMap = this.passwordDb.read();
 
     // If registered, return token if password has not changed
     const hash = passwordMap[id];
@@ -90,49 +85,56 @@ export class AdminPasswordDb {
     // If not registered generate and write token
     const loginToken = getRandomAlphanumericToken(passwordLength);
     passwordMap[id] = stringifyLoginToken(loginToken);
-    this.write(passwordMap);
+    this.passwordDb.write(passwordMap);
     return loginToken;
   }
 
   isValidPassword(id: string, password: string): boolean {
-    const passwordMap = this.read();
+    const passwordMap = this.passwordDb.read();
+
     const hash = passwordMap[id];
+    if (!hash) throw Error("NOT_REGISTERED");
 
     return isValidPassword(password, hash);
   }
 
-  getIdByPassword(password: string): string | null {
-    const passwordMap = this.read();
-    for (const [adminId, _password] of Object.entries(passwordMap)) {
-      if (password === _password) return adminId;
-    }
-    return null;
-  }
-
   hasAdminId(id: string): boolean {
-    const passwordMap = this.read();
+    const passwordMap = this.passwordDb.read();
     return Boolean(passwordMap[id]);
   }
 
   setIsAdmin(id: string, isAdmin: boolean): void {
-    this.adminStatusDb.set(id, isAdmin);
+    const status = this.statusDb.read();
+    status[id] = { isAdmin };
+    this.statusDb.write(status);
   }
 
   isAdmin(id: string): boolean {
-    return this.adminStatusDb.get(id) ?? false;
+    const status = this.statusDb.read();
+    return status[id]?.isAdmin ?? false;
   }
 
-  removePasswordById(id: string): void {
-    const passwordMap = this.read();
+  removeId(id: string): void {
+    // Remove password
+    const passwordMap = this.passwordDb.read() || {};
     delete passwordMap[id];
-    this.write(passwordMap);
+    this.passwordDb.write(passwordMap);
+
+    // Remove admin status
+    const status = this.statusDb.read();
+    delete status[id];
+    this.statusDb.write(status);
   }
 
-  private read(): PasswordByIdMap {
-    return this.jsonDb.read() || {};
+  removeAllPasswords(): void {
+    // Remove all passwords
+    this.passwordDb.write({});
+
+    // Keep admin statuses
   }
 
-  private write(passwordMap: PasswordByIdMap): void {
-    this.jsonDb.write(passwordMap);
+  hasSomePassword(): boolean {
+    const passwordMap = this.passwordDb.read();
+    return Object.keys(passwordMap).length > 0;
   }
 }
