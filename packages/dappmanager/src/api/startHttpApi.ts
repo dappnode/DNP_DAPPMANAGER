@@ -36,6 +36,7 @@ interface HttpRoutes {
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
   publicPackagesData: RequestHandler<{ containerName: string }>;
+  sign: RequestHandler<{}>;
   upload: RequestHandler<{}>;
 }
 
@@ -85,6 +86,7 @@ export function startHttpApi({
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
   app.use(bodyParser.json());
+  app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
   // Express uses "ETags" (hashes of the files requested) to know when the file changed
   app.use(express.static(path.resolve(params.UI_FILES_PATH), { maxAge: "1d" }));
@@ -140,6 +142,7 @@ export function startHttpApi({
   app.get("/global-envs/:name?", routes.globalEnvs);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
   app.get("/package-manifest/:dnpName", routes.packageManifest);
+  app.post("/sign", routes.sign);
 
   // Rest of RPC methods
   app.post(
