@@ -10,6 +10,7 @@ import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
 import { startDaemons } from "./daemons";
+import { SshManager } from "./modules/sshManager";
 import * as calls from "./calls";
 import { routesLogger, subscriptionsLogger } from "./api/logger";
 import * as routes from "./api/routes";
@@ -21,11 +22,13 @@ import {
   getVersionData,
   isNewDappmanagerVersion
 } from "./utils/getVersionData";
+import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
 
 const controller = new AbortController();
 
 const vpnApiClient = getVpnApiClient(params);
+const sshManager = new SshManager({ shellHost });
 
 // Start HTTP API
 const server = startDappmanager({
@@ -38,7 +41,8 @@ const server = startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion,
-  vpnApiClient
+  vpnApiClient,
+  sshManager
 });
 
 // Start daemons
