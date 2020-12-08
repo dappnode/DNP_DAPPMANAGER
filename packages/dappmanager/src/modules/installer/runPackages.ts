@@ -52,22 +52,21 @@ export async function runPackages(
           }
       }
 
-      // To clean-up changing multi-service packages, remove orphans
-      // but NOT for core packages, which always have orphans
-
       log(pkg.dnpName, "Starting package... ");
-      const removeOrphans = !pkg.isCore;
 
-      if (pkg.fullWorking) {
+      await dockerComposeUp(pkg.composePath, {
+        noStart: true,
+        // To clean-up changing multi-service packages, remove orphans
+        // but NOT for core packages, which always have orphans
+        removeOrphans: !pkg.isCore,
+        timeout: pkg.dockerTimeout
+      });
+
+      if (pkg.allServicesRunning) {
+        await dockerComposeUp(pkg.composePath);
+      } else if (pkg.runningServicesNames.length > 0) {
         await dockerComposeUp(pkg.composePath, {
-          removeOrphans,
-          timeout: pkg.dockerTimeout
-        });
-      } else if (pkg.runningContainers?.length !== 0) {
-        await dockerComposeUp(pkg.composePath, {
-          serviceNames: pkg.runningContainers,
-          removeOrphans,
-          timeout: pkg.dockerTimeout
+          serviceNames: pkg.runningServicesNames
         });
       }
     }

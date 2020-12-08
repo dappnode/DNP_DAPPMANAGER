@@ -70,12 +70,13 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
-  const runningContainers = packageInfo.containers
+  const runningServicesNames = packageInfo.containers
     .filter(container => container.running)
     .map(container => container.serviceName);
 
-  const fullWorking =
-    runningContainers.length === packageInfo.containers.length;
+  const allServicesRunning = packageInfo.containers.every(
+    container => container.running
+  );
 
   return {
     ...release,
@@ -91,7 +92,7 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    runningContainers,
-    fullWorking
+    runningServicesNames,
+    allServicesRunning
   };
 }
