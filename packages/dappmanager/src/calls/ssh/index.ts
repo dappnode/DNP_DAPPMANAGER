@@ -1,4 +1,9 @@
-import { ShhStatus, SshManager } from "../../modules/sshManager";
+import { SshManager } from "../../modules/sshManager";
+import { ShhStatus } from "../../types";
+
+// ### TODO: Review this numbers
+const maxPortNumber = 32600;
+const minPortNumber = 22;
 
 export interface SshCallsModules {
   sshManager: SshManager;
@@ -31,6 +36,12 @@ export class SshCalls {
   };
 
   sshPortChange = async ({ port }: { port: number }): Promise<void> => {
+    if (isNaN(port) || !isFinite(port)) throw Error(`Invalid port ${port}`);
+    if (port > maxPortNumber)
+      throw Error(`Port ${port} over maxPortNumber ${maxPortNumber}`);
+    if (port < minPortNumber)
+      throw Error(`Port ${port} under minPortNumber ${minPortNumber}`);
+
     await this.sshManager.changePort(port);
   };
 }

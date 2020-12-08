@@ -1,0 +1,5 @@
+.ssh-status-manager-buttons {
+  > *:not(:last-child) {
+    margin-right: calc(var(--default-spacing) / 2);
+  }
+}

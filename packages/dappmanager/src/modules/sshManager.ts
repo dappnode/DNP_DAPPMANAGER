@@ -1,5 +1,6 @@
+import { ShhStatus } from "../types";
+
 export type ShellHost = (cmd: string) => Promise<string>;
-export type ShhStatus = "enabled" | "disabled";
 
 export class SshManager {
   readonly shellHost: ShellHost;
