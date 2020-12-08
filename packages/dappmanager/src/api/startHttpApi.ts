@@ -8,19 +8,21 @@ import socketio from "socket.io";
 import path from "path";
 import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
 import { AuthIp, AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
+import { AdminPasswordDb } from "./auth/adminPasswordDb";
 import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
+import { mapSubscriptionsToEventBus } from "./subscriptions";
 import { Logs } from "../logs";
+import { EventBus } from "../eventBus";
 import {
   getRpcHandler,
   subscriptionsFactory,
   RpcPayload,
   RpcResponse,
   LoggerMiddleware,
-  Routes,
-  Subscriptions
+  Routes
 } from "../types";
 
-interface HttpApiParams
+export interface HttpApiParams
   extends ClientSideCookiesParams,
     AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -29,7 +31,7 @@ interface HttpApiParams
   HTTP_CORS_WHITELIST: string[];
 }
 
-interface HttpRoutes {
+export interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
   download: RequestHandler<{ fileId: string }>;
   downloadUserActionLogs: RequestHandler<{}>;
@@ -56,7 +58,9 @@ export function startHttpApi({
   routesLogger,
   methods,
   subscriptionsLogger,
-  mapSubscriptionsToEventBus
+  adminPasswordDb,
+  eventBus,
+  isNewDappmanagerVersion
 }: {
   params: HttpApiParams;
   logs: Logs;
@@ -65,7 +69,9 @@ export function startHttpApi({
   routesLogger: LoggerMiddleware;
   methods: Routes;
   subscriptionsLogger: LoggerMiddleware;
-  mapSubscriptionsToEventBus(subscriptions: Subscriptions): void;
+  adminPasswordDb: AdminPasswordDb;
+  eventBus: EventBus;
+  isNewDappmanagerVersion: () => boolean;
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
@@ -73,7 +79,7 @@ export function startHttpApi({
 
   // Subscriptions
   const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
-  mapSubscriptionsToEventBus(subscriptions);
+  mapSubscriptionsToEventBus(subscriptions, methods, eventBus);
 
   const rpcHandler = getRpcHandler(methods, routesLogger);
 
@@ -97,7 +103,7 @@ export function startHttpApi({
 
   // Auth
   const authIp = new AuthIp(params);
-  const auth = new AuthPasswordSession(sessions, params);
+  const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
@@ -120,6 +126,11 @@ export function startHttpApi({
           .catch(error => logs.error("Error on JSON RPC over WS cb", error));
       }
     );
+
+    // If DAPPMANAGER's version has changed reload the client
+    if (isNewDappmanagerVersion()) {
+      subscriptions.reloadClient.emit({ reason: "New version" });
+    }
   });
 
   app.post("/login-status", auth.loginAdminStatus);

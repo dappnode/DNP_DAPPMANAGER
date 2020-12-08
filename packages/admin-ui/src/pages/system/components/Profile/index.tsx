@@ -4,6 +4,8 @@ import SubTitle from "components/SubTitle";
 import { ChangePassword } from "./ChangePassword";
 import { SignOut } from "./SignOut";
 
+type ShowStatus = "loading" | "show" | "hide";
+
 export default function Profile() {
   return (
     <>
@@ -14,6 +16,7 @@ export default function Profile() {
           protects you from Cross Site Scripting (XSS) attacks, and un-wanted
           access from other users in the DAppNodeWIFI network.
         </div>
+
         <ChangePassword />
       </Card>
 

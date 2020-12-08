@@ -2,12 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
 // Components
 import NotificationsMain from "./components/NotificationsMain";
-import { NonAdmin } from "./start-pages/NonAdmin";
 import { NoConnection } from "start-pages/NoConnection";
 import { Register } from "./start-pages/Register";
 import { Login } from "./start-pages/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
-import TopBar from "./components/navbar/TopBar";
+import { TopBar } from "./components/navbar/TopBar";
 import SideBar from "./components/navbar/SideBar";
 import Loading from "components/Loading";
 // Pages
@@ -18,7 +17,13 @@ import Welcome from "components/welcome/Welcome";
 import { fetchLoginStatus, LoginStatus } from "api/auth";
 import { start as apiStart } from "api";
 
-function MainApp({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
+function MainApp({
+  refetchStatus,
+  username
+}: {
+  refetchStatus: () => Promise<void>;
+  username: string;
+}) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN, then display the page for nonAdmin
@@ -32,16 +37,14 @@ function MainApp({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
 
   useEffect(() => {
     // Start API and Socket.io once user has logged in
-    apiStart({
-      onConnectionError: () => refetchStatus()
-    });
+    apiStart({ refetchStatus });
   }, [refetchStatus]);
 
   return (
     <div className="body">
       {/* SideNav expands on big screens, while content-wrapper moves left */}
       <SideBar />
-      <TopBar />
+      <TopBar username={username} />
       <div id="main">
         <ErrorBoundary>
           <NotificationsMain />
@@ -96,7 +99,12 @@ export default function App() {
 
   switch (loginStatus.status) {
     case "logged-in":
-      return <MainApp refetchStatus={onFetchLoginStatus} />;
+      return (
+        <MainApp
+          refetchStatus={onFetchLoginStatus}
+          username={loginStatus.username}
+        />
+      );
     case "not-logged-in":
       return <Login refetchStatus={onFetchLoginStatus} />;
     case "not-registered":

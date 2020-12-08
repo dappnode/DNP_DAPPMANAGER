@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import { logs } from "./logs";
 import {
   ChainData,
@@ -108,3 +108,21 @@ export const initializedDb = busFactoryNoArg("INITIALIZED_DB");
 export const runEthClientInstaller = busFactoryNoArg(
   "RUN_ETH_MULTI_CLIENT_WATCHER"
 );
+
+export interface EventBus {
+  chainData: typeof chainData;
+  packagesModified: typeof packagesModified;
+  directory: typeof directory;
+  packages: typeof packages;
+  logUi: typeof logUi;
+  logUserAction: typeof logUserAction;
+  notification: typeof notification;
+  requestChainData: typeof requestChainData;
+  requestAutoUpdateData: typeof requestAutoUpdateData;
+  requestDevices: typeof requestDevices;
+  requestPackages: typeof requestPackages;
+  requestSystemInfo: typeof requestSystemInfo;
+  runNatRenewal: typeof runNatRenewal;
+  initializedDb: typeof initializedDb;
+  runEthClientInstaller: typeof runEthClientInstaller;
+}

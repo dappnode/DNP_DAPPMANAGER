@@ -1,9 +1,11 @@
-import { vpnApi } from "../../api/vpnRpcCall";
+import { getVpnApiClient } from "../../api/vpnApiClient";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import retry from "async-retry";
 import { logs } from "../../logs";
+
+const vpnApiClient = getVpnApiClient(params);
 
 /**
  * Creates a new device with the provided id.
@@ -12,7 +14,7 @@ import { logs } from "../../logs";
  */
 async function getVersionDataVpn(): Promise<void> {
   try {
-    const versionDataVpn = await retry(() => vpnApi.getVersionData(), {
+    const versionDataVpn = await retry(() => vpnApiClient.getVersionData(), {
       retries: 3
     });
     db.versionDataVpn.set(versionDataVpn);

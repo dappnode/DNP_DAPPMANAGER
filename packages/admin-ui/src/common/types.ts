@@ -1,6 +1,12 @@
+// AUTH, SESSION types
+export interface LoginStatusReturn {
+  username: string;
+  isAdmin: boolean;
+}
+
 // Device types
 
-export interface VpnDeviceCredentials {
+export interface VpnDeviceCredentials extends VpnDevice {
   url: string;
 }
 

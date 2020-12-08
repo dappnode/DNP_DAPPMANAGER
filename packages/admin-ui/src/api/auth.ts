@@ -1,3 +1,4 @@
+import { LoginStatusReturn } from "types";
 import { apiTestMode, apiUrls } from "../params";
 
 // Must be in sync with the DAPPMANAGER
@@ -47,15 +48,15 @@ async function parseResponse<T>(res: Response): Promise<T> {
 }
 
 export type LoginStatus =
-  | { status: "logged-in" }
+  | { status: "logged-in"; username: string }
   | { status: "not-logged-in"; noCookie: boolean }
   | { status: "not-registered" }
   | { status: "error"; error: Error };
 
 export async function fetchLoginStatus(): Promise<LoginStatus> {
   try {
-    await fetchAuthPost(apiUrls.loginStatus);
-    return { status: "logged-in" };
+    const res = await fetchAuthPost<{}, LoginStatusReturn>(apiUrls.loginStatus);
+    return { status: "logged-in", username: res.username };
   } catch (e) {
     switch (e.message) {
       case ERROR_NOT_REGISTERED:
@@ -71,6 +72,7 @@ export async function fetchLoginStatus(): Promise<LoginStatus> {
 }
 
 export async function fetchLogin(data: {
+  username: string;
   password: string;
 }): Promise<{ ok: true }> {
   return await fetchAuthPost(apiUrls.login, data);
@@ -81,6 +83,7 @@ export async function fetchLogout(): Promise<{ ok: true }> {
 }
 
 export async function fetchRegister(data: {
+  username: string;
   password: string;
 }): Promise<{ recoveryToken: string }> {
   return await fetchAuthPost(apiUrls.register, data);

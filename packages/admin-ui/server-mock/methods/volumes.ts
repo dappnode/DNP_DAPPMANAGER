@@ -1,7 +1,7 @@
 import { VolumeData } from "../../src/types";
 import { pause } from "../utils";
 import { dnpInstalled } from "../data";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 let volumes: VolumeData[] = [
   {

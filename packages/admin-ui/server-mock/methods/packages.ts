@@ -8,7 +8,7 @@ import {
   InstalledPackageData,
   InstalledPackageDetailData
 } from "../../src/common";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { dnpInstalled, directory, dnpRequests } from "../data";
 import { sampleContainer, sampleDnp } from "../data/sample";
 import { pause } from "../utils";

@@ -62,6 +62,8 @@ export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
+export const recoverPasswordGuideUrl =
+  "https://dappnode.github.io/DAppNodeDocs/troubleshooting/#recover-password";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {

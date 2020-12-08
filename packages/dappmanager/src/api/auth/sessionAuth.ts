@@ -1,9 +1,9 @@
-import bcrypt from "bcryptjs";
 import { Request } from "express";
-import { SingleFileDb } from "../../utils/singleFileDb";
+import { PlainTextFileDb } from "../../utils/fileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
 import { wrapHandler } from "../utils";
-import { SessionsHandler } from "../sessions";
+import { SessionData, SessionsManager } from "../sessions";
+import { LoginStatusReturn } from "../../types";
 import {
   AlreadyRegisteredError,
   MissingCredentialsError,
@@ -12,6 +12,7 @@ import {
   NotRegisteredError,
   WrongCredentialsError
 } from "./errors";
+import { AdminPasswordDb } from "./adminPasswordDb";
 
 // Password & sessions auth
 // ========================
@@ -28,42 +29,55 @@ import {
 //    which will start the register cycle again
 
 export interface AuthPasswordSessionParams {
-  ADMIN_PASSWORD_FILE: string;
   ADMIN_RECOVERY_FILE: string;
 }
 
-const saltLength = 10;
 const recoveryTokenLength = 20;
 
 export class AuthPasswordSession {
-  sessions: SessionsHandler;
-  passwordDb: SingleFileDb;
-  recoveryDb: SingleFileDb;
+  sessions: SessionsManager;
+  adminPasswordDb: AdminPasswordDb;
+  recoveryDb: PlainTextFileDb;
 
-  constructor(sessions: SessionsHandler, params: AuthPasswordSessionParams) {
+  constructor(
+    sessions: SessionsManager,
+    adminPasswordDb: AdminPasswordDb,
+    params: AuthPasswordSessionParams
+  ) {
     this.sessions = sessions;
-    this.passwordDb = new SingleFileDb(params.ADMIN_PASSWORD_FILE);
-    this.recoveryDb = new SingleFileDb(params.ADMIN_RECOVERY_FILE);
+    this.adminPasswordDb = adminPasswordDb;
+    this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
   }
 
-  private assertAdminPassword(password: string): void {
-    const passwordHash = this.passwordDb.read();
-    if (!password) throw new MissingCredentialsError();
-    if (!passwordHash) throw new NotRegisteredError();
-    if (!bcrypt.compareSync(password, passwordHash))
+  private assertPassword(username: string, password: string): void {
+    if (!username || !password) throw new MissingCredentialsError();
+
+    if (!this.adminPasswordDb.isValidPassword(username, password)) {
       throw new WrongCredentialsError();
+    }
   }
 
-  private setAdminPassword(password: string): void {
-    if (!password) throw new MissingCredentialsError();
-    const passwordHash = bcrypt.hashSync(password, saltLength);
-    this.passwordDb.write(passwordHash);
-  }
+  /**
+   * Check if user login status is ok. It may throw an error if
+   *
+   * - No user registered yet (for UI/UX) >> NotRegisteredError
+   * - Some user registered invalid session >> NotLoggedInError
+   * - Some user registered no cookie in req >> NotLoggedInNoCookieError
+   */
+  private assertOnlyAdmin(req: Request): SessionData {
+    if (!this.adminPasswordDb.hasSomePassword()) throw new NotRegisteredError();
 
-  private assertOnlyAdmin(req: Request): void {
-    if (!this.passwordDb.read()) throw new NotRegisteredError();
-    if (!this.sessions.isAdmin(req)) {
-      console.log({ headers: req.headers });
+    const sessionData = this.sessions.getSession(req);
+
+    if (sessionData && sessionData.isAdmin && sessionData.username) {
+      // Allows to revoke active sessions when device is deleted
+      // or its status is changed to non-admin
+      if (this.adminPasswordDb.isAdmin(sessionData.username)) {
+        return sessionData;
+      } else {
+        throw new NotLoggedInError();
+      }
+    } else {
       // Sanity check for cookie existance
       if (req.cookies) throw new NotLoggedInError();
       else throw new NotLoggedInNoCookieError();
@@ -74,13 +88,25 @@ export class AuthPasswordSession {
    * Write new admin password (hashed) to local DB.
    * Returns the existing or new recovery token
    *
-   * Must be authorized via a different mechanism; i.e. via IP
-   * Password can only be set if it's un-initialized
+   * - Must be authorized via a different mechanism; i.e. via IP
+   *   Password can only be set if it's un-initialized
+   * - Only works if no other user is registered since it's unsafe
+   * - To be able to use this method call recoverAdminPassword()
    */
   registerAdmin = wrapHandler((req, res) => {
-    if (this.passwordDb.read()) throw new AlreadyRegisteredError();
-    this.setAdminPassword(req.body.password);
+    const username = req.body.username;
+    const password = req.body.password;
 
+    if (!username || !password) throw new MissingCredentialsError();
+    if (this.adminPasswordDb.hasSomePassword())
+      throw new AlreadyRegisteredError();
+
+    this.adminPasswordDb.setPassword(username, password);
+
+    // Register username as admin
+    this.adminPasswordDb.setIsAdmin(username, true);
+
+    // Create recovery token for main admin only
     let recoveryToken = this.recoveryDb.read();
     if (!recoveryToken) {
       recoveryToken = getRandomAlphanumericToken(recoveryTokenLength);
@@ -92,45 +118,68 @@ export class AuthPasswordSession {
 
   /**
    * Validate `password` and set `newPassword`
+   *
+   * - Any admin user can change its password
    */
   changeAdminPassword = wrapHandler((req, res) => {
-    const currentPassword = req.body.password;
+    const prevPassword = req.body.password;
     const newPassword = req.body.newPassword;
-    this.assertAdminPassword(currentPassword);
-    this.setAdminPassword(newPassword);
+
+    if (!prevPassword || !newPassword) throw new MissingCredentialsError();
+
+    const sessionData = this.assertOnlyAdmin(req);
+    const username = sessionData.username;
+
+    this.adminPasswordDb.setPassword(username, newPassword);
 
     res.send({ ok: true });
   });
 
   /**
-   * If `token` is correct delete record of hashed admin password
+   * If `token` is correct deletes all user's passwords
+   *
+   * - After recovering, the first user to register can call
+   *   registerAdmin() and set a new password without a login token
    */
   recoverAdminPassword = wrapHandler((req, res) => {
     const recoveryToken = this.recoveryDb.read();
     if (!req.body.token) throw new MissingCredentialsError();
     if (req.body.token !== recoveryToken) throw new WrongCredentialsError();
-    this.passwordDb.del();
+
+    this.adminPasswordDb.removeAllPasswords();
 
     res.send({ ok: true });
   });
 
   /**
-   * Check if user login status is
-   * - `NOT_REGISTERED`
-   * - `NOT_LOGGED_IN`
-   * - ok: logged in
+   * Returns sessionData if logged in, returns error otherwise
+   * @see assertOnlyAdmin for error conditions
    */
   loginAdminStatus = wrapHandler((req, res) => {
-    this.assertOnlyAdmin(req);
-    res.send({ ok: true });
+    const sessionData = this.assertOnlyAdmin(req);
+
+    // Re-assign to new object to prevent leaking sessionData in the response
+    const resData: LoginStatusReturn = {
+      isAdmin: sessionData.isAdmin,
+      username: sessionData.username
+    };
+    res.send(resData);
   });
 
   /**
-   * Login session if `password` is correct
+   * Login session if `username` and `password` is correct
+   *
+   * - Persist the admin username in the cookie to revoke access
+   *   when the device gets removed and admin status revoked
    */
   loginAdmin = wrapHandler((req, res) => {
-    this.assertAdminPassword(req.body.password);
-    this.sessions.makeAdmin(req);
+    const username = req.body.username;
+    const password = req.body.password;
+
+    this.assertPassword(username, password);
+
+    this.sessions.setSession(req, { isAdmin: true, username });
+
     res.send({ ok: true });
   });
 

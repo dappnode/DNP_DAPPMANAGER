@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 import { ReqStatus } from "types";
 import BaseDropdown from "./BaseDropdown";
 
-export default function Profile() {
+export default function Profile({ username }: { username: string }) {
   return (
     <BaseDropdown
-      name="Profile"
+      name={`User: ${username || ""}`}
       messages={[
         { title: <Link to={systemProfilePath}>Change password</Link> },
         { title: <LogoutListItem /> }
