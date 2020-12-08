@@ -1,0 +1,8 @@
+{
+  "watch": ["server-mock", "../dappmanager/src", "src"],
+  "ext": "js,ts,json",
+  "ignore": ["*.test.ts"],
+  "execMap": {
+    "ts": "ts-node --project server-mock/tsconfig.json"
+  }
+}
