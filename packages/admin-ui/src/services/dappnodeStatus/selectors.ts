@@ -48,10 +48,14 @@ export const getEthClientWarning = (state: RootState): string | null => {
 export const getDappnodeIdentityClean = (state: RootState) => {
   const systemInfo = getSystemInfo(state);
   if (systemInfo) {
-    // If the static IP is set, don't show the regular IP
-    const { ip, name, staticIp, domain } = systemInfo;
-    if (staticIp) return { name, staticIp };
-    else return { name, domain, ip };
+    // Show all info always
+    return {
+      name: systemInfo.name,
+      domain: systemInfo.domain,
+      ip: systemInfo.staticIp || systemInfo.ip,
+      // Internal IP is very useful for debugging networking issues
+      internalIp: systemInfo.internalIp
+    };
   } else {
     return {};
   }
