@@ -1,22 +1,15 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.2.37",
+  "version": "0.2.39",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "type": "dncore",
-  "architectures": [
-    "linux/amd64",
-    "linux/arm64"
-  ],
+  "architectures": ["linux/amd64", "linux/arm64"],
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "contributors": [
     "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
     "DAppLion <dapplion@giveth.io> (https://github.com/dapplion)"
   ],
-  "keywords": [
-    "DAppNodeCore",
-    "Manager",
-    "Installer"
-  ],
+  "keywords": ["DAppNodeCore", "Manager", "Installer"],
   "links": {
     "ui": "http://my.dappnode/",
     "homepage": "https://github.com/dappnode/DNP_DAPPMANAGER#readme"
