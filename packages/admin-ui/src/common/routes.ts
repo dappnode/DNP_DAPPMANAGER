@@ -25,7 +25,8 @@ import {
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
-  PublicIpResponse
+  PublicIpResponse,
+  ChainData
 } from "./types";
 
 export interface Routes {
@@ -62,6 +63,12 @@ export interface Routes {
     backup: PackageBackup[];
     fileId: string;
   }) => Promise<void>;
+
+  /**
+   * Returns chain data for all installed packages declared as chains
+   * Result is cached for 5 seconds across all consumers
+   */
+  chainDataGet(): Promise<ChainData[]>;
 
   /**
    * Used to test different IPFS timeout parameters live from the ADMIN UI.
@@ -456,6 +463,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: { log: true },
   backupGet: {},
   backupRestore: { log: true },
+  chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
   copyFileFrom: { log: true },
