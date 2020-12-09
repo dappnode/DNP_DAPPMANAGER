@@ -56,7 +56,7 @@ async function natRenewal(): Promise<void> {
 
     // Fetch the localIp only once for all the portsToOpen
     const localIp = await getLocalIp();
-
+    if (localIp) db.internalIp.set(localIp);
     // NOTE: Open every port regardless if it's already open
 
     // 2. Renew NAT mapping
