@@ -1,5 +1,10 @@
 import { RootState } from "rootReducer";
-import { getEthClientPrettyStatusError } from "components/EthMultiClient";
+import {
+  getEthClientPrettyStatusError,
+  getEthClientType
+} from "components/EthMultiClient";
+import { ChainData } from "types";
+import { activateFallbackPath } from "pages/system/data";
 
 // Service > dappnodeStatus
 
@@ -66,3 +71,79 @@ export const getStaticIp = (state: RootState) =>
 
 export const getWifiStatus = (state: RootState) =>
   state.dappnodeStatus.wifiStatus;
+
+/**
+ * Returns a partial ChainData object with repository source status
+ * To be shown alongside other chain data
+ * @param state
+ */
+export function getRepositorySourceChainItem(
+  state: RootState
+): ChainData | null {
+  const repositoryResult = _getRepositorySourceChainItem(state);
+  return repositoryResult
+    ? {
+        ...repositoryResult,
+        dnpName: "repository-source",
+        name: "Repository source",
+        help: activateFallbackPath
+      }
+    : null;
+}
+
+function _getRepositorySourceChainItem(
+  state: RootState
+): Omit<ChainData, "dnpName"> | null {
+  const target = getEthClientTarget(state);
+  const fallback = getEthClientFallback(state);
+  const status = getEthClientStatus(state);
+
+  if (target === "remote") {
+    // Remote selected
+    // Remote | Ok
+    return {
+      error: false,
+      syncing: false,
+      message: "Remote: Ok"
+    };
+  } else {
+    if (!status || !target) return null;
+    const clientType = getEthClientType(target);
+    if (status.ok) {
+      // Using local ethclient
+      // Full client | Ok
+      return {
+        error: false,
+        syncing: false,
+        message: `${clientType}: Ok`
+      };
+    } else {
+      const prettyStatus = getEthClientPrettyStatusError(status);
+      if (fallback === "on") {
+        // Using fallback, local client off
+        // Full client | fallback
+        return {
+          error: false,
+          syncing: true,
+          message: multiline(`${clientType}: using remote`, prettyStatus)
+        };
+      } else {
+        // Error, not using anything
+        // Full client | off
+        return {
+          error: true,
+          syncing: false,
+          message: multiline(`${clientType}: not available`, prettyStatus)
+        };
+      }
+    }
+  }
+}
+
+/**
+ * Returns a valid markdown multiline string from individual rows
+ * @param strings
+ */
+function multiline(...strings: string[]): string {
+  return strings.join("\n\n");
+}

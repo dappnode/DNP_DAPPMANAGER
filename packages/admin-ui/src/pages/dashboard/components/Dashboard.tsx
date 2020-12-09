@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 // Selectors
-import { getChainData } from "services/chainData/selectors";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 // Own module
 import { title } from "../data";
@@ -12,9 +11,10 @@ import "./dashboard.scss";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
+import { useChainData } from "hooks/chainData";
 
 export default function Dashboard() {
-  const chainData = useSelector(getChainData);
+  const chainData = useChainData();
   const volumesData = useSelector(getVolumes);
   const dappnodeVolumes = volumesData.filter(
     v => v.name === "dncore_ipfsdnpdappnodeeth_data"
