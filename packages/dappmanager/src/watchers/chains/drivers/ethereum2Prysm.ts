@@ -36,11 +36,14 @@ export async function ethereum2Prysm(apiUrl: string): Promise<ChainDataResult> {
 export function parseEthereum2PrysmState(
   genesis: PrysmGenesis,
   config: PrysmConfig,
-  chainhead: PrysmChainhead
+  chainhead: PrysmChainhead,
+  currentTimeMs = Date.now() // For deterministic testing
 ): ChainDataResult {
   const genesisDate = new Date(genesis.genesisTime);
-  const secondsSinceGenesis = (Date.now() - genesisDate.getTime()) / 1000;
-  const clockSlot = secondsSinceGenesis / parseInt(config.SecondsPerSlot);
+  const secondsSinceGenesis = (currentTimeMs - genesisDate.getTime()) / 1000;
+  const clockSlot = Math.floor(
+    secondsSinceGenesis / parseInt(config.SecondsPerSlot)
+  );
 
   const headSlot = parseInt(chainhead.headSlot);
 
@@ -48,7 +51,7 @@ export function parseEthereum2PrysmState(
     return {
       syncing: false,
       error: false,
-      message: `Synced # ${headSlot}`
+      message: `Synced #${headSlot}`
     };
   } else {
     return {

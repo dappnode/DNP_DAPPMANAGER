@@ -56,7 +56,7 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: "Synced #" + blockNumber
+        message: `Synced #${blockNumber}`
       };
 
     // Geth sync with states
@@ -106,7 +106,7 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: "Synced #" + blockNumber
+        message: `Synced #${blockNumber}`
       };
     }
   }
