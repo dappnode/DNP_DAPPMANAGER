@@ -4,8 +4,8 @@ import { ethClientData } from "../../params";
 import { EthClientStatus, EthClientTargetPackage } from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/listContainers";
 import { serializeError } from "./types";
-import { parseEthersSyncing } from "../../watchers/chains/utils";
 import { getEthClientApiUrl } from "./apiUrl";
+import { parseEthersSyncing } from "../../utils/ethers";
 
 /**
  * Minimum block difference to consider a local ethereum mainnet node synced

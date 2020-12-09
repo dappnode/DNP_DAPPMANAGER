@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { ChainDataResult } from "../../../src/watchers/chains/types";
-import { parseEthereum2PrysmState } from "../../../src/watchers/chains/drivers/ethereum2Prysm";
+import { ChainDataResult } from "../../../src/modules/chains/types";
+import { parseEthereum2PrysmState } from "../../../src/modules/chains/drivers/ethereum2Prysm";
 
 describe("Watchers > chains > ethereum2Prysm", () => {
   describe("parseEthereum2PrysmState", () => {

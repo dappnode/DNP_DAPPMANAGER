@@ -1,9 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 
-import { parseEthereumState } from "../../../src/watchers/chains/drivers/ethereum";
-import { ChainDataResult } from "../../../src/watchers/chains/types";
-import { parseEthersSyncing } from "../../../src/watchers/chains/utils";
+import { parseEthersSyncing } from "../../../src/utils/ethers";
+import { parseEthereumState } from "../../../src/modules/chains/drivers/ethereum";
+import { ChainDataResult } from "../../../src/modules/chains/types";
 
 describe("Watchers > chains > ethereum", () => {
   describe("parseEthereumState", () => {

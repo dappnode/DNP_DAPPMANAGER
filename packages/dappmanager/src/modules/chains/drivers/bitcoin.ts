@@ -102,12 +102,19 @@ export function parseCredentialsFromEnvs(
   port: number | null;
 } {
   const envs = parseEnvironment(envsArray);
-  const { RPCUSER, RPCPASSWORD, RPCPORT } = envs;
-  if (!RPCUSER) throw Error("RPCUSER not defined");
-  if (!RPCPASSWORD) throw Error("RPCPASSWORD not defined");
-  return {
-    username: RPCUSER,
-    password: RPCPASSWORD,
-    port: parseInt(RPCPORT) ?? null
-  };
+  const keys = Object.keys(envs);
+
+  // Find keys for both bitcoin and zcash packages
+  const userKey = keys.find(key => key.includes("_RPCUSER"));
+  const passKey = keys.find(key => key.includes("_RPCPASSWORD"));
+  const portKey = keys.find(key => key.includes("_RPCPORT"));
+
+  if (!userKey) throw Error("RPCUSER not defined");
+  if (!passKey) throw Error("RPCPASSWORD not defined");
+
+  const username = envs[userKey];
+  const password = envs[passKey];
+  const port = portKey ? parseInt(envs[portKey]) || null : null;
+
+  return { username, password, port };
 }

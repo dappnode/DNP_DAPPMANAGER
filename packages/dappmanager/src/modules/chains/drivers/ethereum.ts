@@ -1,9 +1,10 @@
 import { ethers } from "ethers";
 import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
+import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
 import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 import { ChainDataResult } from "../types";
-import { EthSyncing, parseEthersSyncing, safeProgress } from "../utils";
+import { safeProgress } from "../utils";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
