@@ -1,14 +1,16 @@
 import { ethers } from "ethers";
+import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
+import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
+import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 import { ChainDataResult } from "../types";
-import { EthSyncing, parseEthersSyncing, safeProgress } from "../utils";
+import { safeProgress } from "../utils";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
 
 /**
  * Returns a chain data object for an [ethereum] API
- * @param api = "http://geth.dappnode:8545"
  * @returns
  * - On success: {
  *   syncing: true, {bool}
@@ -20,8 +22,14 @@ const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
  *   error: true {bool},
  * }
  */
-export default async function ethereum(api: string): Promise<ChainDataResult> {
-  const provider = new ethers.providers.JsonRpcProvider(api);
+export async function ethereum(
+  dnp: InstalledPackageData
+): Promise<ChainDataResult> {
+  const packageDomain = getDotDappnodeDomain(dnp.dnpName);
+  // http://ropsten.dappnode:8545
+  const apiUrl = `http://${packageDomain}:8545`;
+
+  const provider = new ethers.providers.JsonRpcProvider(apiUrl);
   const [syncing, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
     provider.getBlockNumber()
@@ -56,7 +64,7 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: "Synced #" + blockNumber
+        message: `Synced #${blockNumber}`
       };
 
     // Geth sync with states
@@ -106,7 +114,7 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: "Synced #" + blockNumber
+        message: `Synced #${blockNumber}`
       };
     }
   }

@@ -25,7 +25,8 @@ import {
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
-  PublicIpResponse
+  PublicIpResponse,
+  ChainData
 } from "./types";
 
 export interface Routes {
@@ -62,6 +63,12 @@ export interface Routes {
     backup: PackageBackup[];
     fileId: string;
   }) => Promise<void>;
+
+  /**
+   * Returns chain data for all installed packages declared as chains
+   * Result is cached for 5 seconds across all consumers
+   */
+  chainDataGet(): Promise<ChainData[]>;
 
   /**
    * Used to test different IPFS timeout parameters live from the ADMIN UI.
@@ -407,12 +414,6 @@ export interface Routes {
   rebootHost: () => Promise<void>;
 
   /**
-   * Requests chain data. Also instructs the DAPPMANAGER
-   * to keep sending data for a period of time (5 minutes)
-   */
-  requestChainData: () => Promise<void>;
-
-  /**
    * Receives an encrypted message containing the seed phrase of
    * 12 word mnemonic ethereum account. The extra layer of encryption
    * slightly increases the security of the exchange while the WAMP
@@ -462,6 +463,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: { log: true },
   backupGet: {},
   backupRestore: { log: true },
+  chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
   copyFileFrom: { log: true },
@@ -505,7 +507,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  requestChainData: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   systemInfoGet: {},

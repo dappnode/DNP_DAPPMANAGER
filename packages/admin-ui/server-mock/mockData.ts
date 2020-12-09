@@ -1,5 +1,3 @@
-import { ChainData } from "../src/common";
-
 export const coreName = "core.dnp.dappnode.eth";
 
 /**
@@ -59,28 +57,3 @@ export const devices = {
     "other-user": { id: "other-user", admin: false, ip: "172.10.0.2" }
   }
 };
-
-/**
- * Actual mockState
- * ================
- */
-
-export const chainData: ChainData[] = [
-  {
-    dnpName: "geth.dnp.dappnode.eth",
-    syncing: true,
-    error: false,
-    message: [
-      "Blocks synced: 543000 / 654000",
-      "States pulled: 25314123 / 154762142"
-    ].join("\n\n"),
-    help: "http://geth.io"
-  },
-  {
-    dnpName: "rinkeby.dnp.dappnode.eth",
-    syncing: true,
-    error: false,
-    message: "Blocks synced: 543000 / 654000",
-    progress: 0.83027522935
-  }
-];

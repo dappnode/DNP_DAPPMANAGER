@@ -7,7 +7,6 @@ export function mapSubscriptionsToEventBus(
   eventBus: EventBus
 ): void {
   // Pipe local events to WAMP
-  eventBus.chainData.on(subscriptions.chainData.emit);
   eventBus.logUi.on(subscriptions.progressLog.emit);
   eventBus.logUserAction.on(subscriptions.userActionLog.emit);
   eventBus.packages.on(subscriptions.packages.emit);

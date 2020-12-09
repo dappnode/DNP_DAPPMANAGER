@@ -84,7 +84,6 @@ const busFactory = <T>(event: string) => ({
 
 //   call: "INTERNAL_CALL",
 
-export const chainData = busFactory<ChainData[]>("CHAIN_DATAS");
 type PackageModifiedType = { dnpNames: string[]; removed?: boolean };
 export const packagesModified = busFactory<PackageModifiedType>(
   "PACKAGE_MODIFIED"
@@ -96,7 +95,6 @@ export const logUserAction = busFactory<UserActionLog>("LOG_USER_ACTION");
 export const notification = busFactory<PackageNotification>("NOTIFICATION");
 
 // Requests (without argument)
-export const requestChainData = busFactoryNoArg("REQUEST_CHAIN_DATA");
 export const requestAutoUpdateData = busFactoryNoArgAsync(
   "REQUEST_AUTO_UPDATE_DATA"
 );
@@ -110,14 +108,12 @@ export const runEthClientInstaller = busFactoryNoArg(
 );
 
 export interface EventBus {
-  chainData: typeof chainData;
   packagesModified: typeof packagesModified;
   directory: typeof directory;
   packages: typeof packages;
   logUi: typeof logUi;
   logUserAction: typeof logUserAction;
   notification: typeof notification;
-  requestChainData: typeof requestChainData;
   requestAutoUpdateData: typeof requestAutoUpdateData;
   requestDevices: typeof requestDevices;
   requestPackages: typeof requestPackages;

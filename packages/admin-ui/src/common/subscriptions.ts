@@ -1,6 +1,5 @@
 import {
   AutoUpdateDataView,
-  ChainData,
   DirectoryItem,
   ProgressLog,
   PackageNotification,
@@ -16,11 +15,6 @@ export interface SubscriptionsTypes {
    * Auto-updates data
    */
   autoUpdateData: (autoUpdateData: AutoUpdateDataView) => void;
-
-  /**
-   * All running chains status
-   */
-  chainData: (chainData: ChainData[]) => void;
 
   /**
    * All VPN devices
@@ -96,7 +90,6 @@ export type Subscriptions = {
 
 export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   autoUpdateData: {},
-  chainData: {},
   devices: {},
   directory: {},
   packages: {},
