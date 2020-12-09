@@ -17,7 +17,7 @@ import {
   afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackageNoThrow } from "../modules/docker/listContainers";
 
 /**
  * Installs a DAppNode Package.
@@ -75,7 +75,7 @@ export async function packageInstall({
         );
     }
 
-    const packageInfo = await listPackage({ dnpName: req.name });
+    const packageInfo = await listPackageNoThrow({ dnpName: req.name });
 
     // Gather all data necessary for the install. Isolated in a pure function to ease testing
     const packagesData = getInstallerPackagesData({
@@ -83,7 +83,7 @@ export async function packageInstall({
       userSettings,
       currentVersions,
       reqName,
-      packageInfo
+      packageInfo: packageInfo ? packageInfo : undefined
     });
     logs.debug("Packages data", packagesData);
     logs.debug("User settings", userSettings);

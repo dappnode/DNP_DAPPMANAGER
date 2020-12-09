@@ -4,8 +4,7 @@ import orderInstallPackages from "./orderInstallPackages";
 import {
   UserSettingsAllDnps,
   UserSettings,
-  InstalledPackageData,
-  PackageContainer
+  InstalledPackageData
 } from "../../types";
 import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
@@ -22,7 +21,7 @@ export function getInstallerPackagesData({
   userSettings: UserSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
-  packageInfo: InstalledPackageData;
+  packageInfo?: InstalledPackageData;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
     getInstallerPackageData(
@@ -45,7 +44,7 @@ function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
   currentVersion: string | undefined,
-  packageInfo: InstalledPackageData
+  packageInfo?: InstalledPackageData
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
 
@@ -70,11 +69,11 @@ function getInstallerPackageData(
 
   const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
 
-  const runningServicesNames = packageInfo.containers
+  const runningServicesNames = packageInfo?.containers
     .filter(container => container.running)
     .map(container => container.serviceName);
 
-  const allServicesRunning = packageInfo.containers.every(
+  const allServicesRunning = packageInfo?.containers.every(
     container => container.running
   );
 
@@ -92,7 +91,9 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    runningServicesNames,
-    allServicesRunning
+    runningServicesNames: runningServicesNames
+      ? runningServicesNames
+      : undefined,
+    allServicesRunning: allServicesRunning ? allServicesRunning : undefined
   };
 }
