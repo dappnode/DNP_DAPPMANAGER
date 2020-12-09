@@ -172,6 +172,7 @@ const params = {
   ETHFORWARD_PIN_ON_VISIT: true,
 
   // Flags
+  DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)
 };
 

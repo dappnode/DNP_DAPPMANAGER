@@ -17,6 +17,10 @@ const portId = (port: PackagePort): string =>
 
 let isFirstRunGlobal = true;
 async function natRenewal(): Promise<void> {
+  if (params.DISABLE_UPNP) {
+    return logs.debug("UPNP is disabled by flag");
+  }
+
   // Signal it's no longer the first run
   const isFirstRun = isFirstRunGlobal;
   isFirstRunGlobal = false;

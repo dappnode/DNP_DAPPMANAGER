@@ -24,6 +24,7 @@ services:
       - WEB3_HOST=
       - IPFS_HOST=
       - REMOTE_MAINNET_RPC_URL=
+      - DISABLE_UPNP=
     dns: 172.33.1.2
     networks:
       network:
