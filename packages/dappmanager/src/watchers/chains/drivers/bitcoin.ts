@@ -37,7 +37,7 @@ const cache: {
  *   error: true {bool},
  * }
  */
-export default async function bitcoin(api: string): Promise<ChainDataResult> {
+export async function bitcoin(api: string): Promise<ChainDataResult> {
   // To initialize the bitcoin client, the RPC user and password are necessary
   // They are stored in the package envs
   const containerName = getContainerNameFromApi(api);

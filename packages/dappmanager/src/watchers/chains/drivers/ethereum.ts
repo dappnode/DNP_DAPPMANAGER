@@ -20,7 +20,7 @@ const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
  *   error: true {bool},
  * }
  */
-export default async function ethereum(api: string): Promise<ChainDataResult> {
+export async function ethereum(api: string): Promise<ChainDataResult> {
   const provider = new ethers.providers.JsonRpcProvider(api);
   const [syncing, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),

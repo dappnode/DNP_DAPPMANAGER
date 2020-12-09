@@ -49,7 +49,7 @@ interface MoneroRpcGetInfoResult {
  *   error: true {bool},
  * }
  */
-export default async function monero(api: string): Promise<ChainDataResult> {
+export async function monero(api: string): Promise<ChainDataResult> {
   const info: MoneroRpcGetInfoResult = await new Promise(
     (resolve, reject): void => {
       const daemon = new Daemon(api);

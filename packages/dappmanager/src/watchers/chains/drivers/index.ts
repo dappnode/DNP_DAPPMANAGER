@@ -1,9 +1,10 @@
 import { ChainDriver } from "../../../types";
 import memoize from "memoizee";
 // Drivers
-import { default as bitcoin } from "./bitcoin";
-import { default as ethereum } from "./ethereum";
-import { default as monero } from "./monero";
+import { bitcoin } from "./bitcoin";
+import { ethereum } from "./ethereum";
+import { ethereum2Prysm } from "./ethereum2Prysm";
+import { monero } from "./monero";
 import { Chain } from "../types";
 import { ChainDataResult } from "../types";
 
@@ -21,6 +22,10 @@ export function getDriverApi(driverName: ChainDriver, dnpName: string): string {
     case "ethereum":
       //     'http://my.ropsten.dnp.dappnode.eth:8545'
       return `http://my.${dnpName}:8545`;
+
+    case "ethereum2-prysm":
+      //      http://beacon-chain.prysm-pyrmont.dappnode:3500/
+      return `http://my.${dnpName}:3500`;
 
     case "monero":
       //     'http://my.monero.dnp.dappnode.eth:18081'
@@ -54,6 +59,8 @@ async function runDriver(chain: Chain): Promise<ChainDataResult> {
       return await bitcoin(chain.api);
     case "ethereum":
       return await ethereum(chain.api);
+    case "ethereum2-prysm":
+      return await ethereum2Prysm(chain.api);
     case "monero":
       return await monero(chain.api);
     default:

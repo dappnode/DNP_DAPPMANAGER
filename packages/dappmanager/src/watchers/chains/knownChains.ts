@@ -30,5 +30,17 @@ export const knownChains: { [dnpName: string]: Chain } = {
     dnpName: "monero.dnp.dappnode.eth",
     driverName: "monero",
     api: "http://my.monero.dnp.dappnode.eth:18081"
+  },
+
+  // New Eth2.0 chains
+  "prysm.dnp.dappnode.eth": {
+    dnpName: "prysm.dnp.dappnode.eth",
+    driverName: "ethereum2-prysm",
+    api: "http://my.prysm.dnp.dappnode.eth:3500"
+  },
+  "prysm-pyrmont.dnp.dappnode.eth": {
+    dnpName: "prysm-pyrmont.dnp.dappnode.eth",
+    driverName: "ethereum2-prysm",
+    api: "http://my.prysm-pyrmont.dnp.dappnode.eth:3500"
   }
 };
