@@ -21,7 +21,7 @@ export function getInstallerPackagesData({
   userSettings: UserSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
-  packageInfo?: InstalledPackageData;
+  packageInfo: InstalledPackageData | null;
 }): InstallPackageData[] {
   const packagesDataUnordered = releases.map(release =>
     getInstallerPackageData(
@@ -44,7 +44,7 @@ function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
   currentVersion: string | undefined,
-  packageInfo?: InstalledPackageData
+  packageInfo: InstalledPackageData | null
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
 
@@ -91,9 +91,7 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    runningServicesNames: runningServicesNames
-      ? runningServicesNames
-      : undefined,
-    allServicesRunning: allServicesRunning ? allServicesRunning : undefined
+    runningServicesNames,
+    allServicesRunning
   };
 }

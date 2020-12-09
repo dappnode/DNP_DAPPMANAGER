@@ -83,7 +83,7 @@ export async function packageInstall({
       userSettings,
       currentVersions,
       reqName,
-      packageInfo: packageInfo ? packageInfo : undefined
+      packageInfo
     });
     logs.debug("Packages data", packagesData);
     logs.debug("User settings", userSettings);

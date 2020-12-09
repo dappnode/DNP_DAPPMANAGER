@@ -61,10 +61,7 @@ export async function runPackages(
         removeOrphans: !pkg.isCore,
         timeout: pkg.dockerTimeout
       });
-      if (
-        typeof pkg.runningServicesNames === "undefined" ||
-        pkg.allServicesRunning === true
-      ) {
+      if (!pkg.runningServicesNames || pkg.allServicesRunning === true) {
         // Executed if: 1. New package installation 2. Package update and all services running
         await dockerComposeUp(pkg.composePath);
       } else if (pkg.runningServicesNames.length > 0) {
