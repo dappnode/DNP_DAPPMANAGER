@@ -9,7 +9,7 @@ describe("Watchers > chains > ethereum2Prysm", () => {
       const currentTime = 1607525912672;
       const chainData = parseEthereum2PrysmState(
         { genesisTime: "2020-11-18T12:00:07Z" },
-        { SecondsPerSlot: "12" },
+        { config: { SecondsPerSlot: "12" } },
         { headSlot: "76050" },
         currentTime
       );
@@ -28,7 +28,7 @@ describe("Watchers > chains > ethereum2Prysm", () => {
       const currentTime = 1607525912672;
       const chainData = parseEthereum2PrysmState(
         { genesisTime: "2020-11-18T12:00:07Z" },
-        { SecondsPerSlot: "12" },
+        { config: { SecondsPerSlot: "12" } },
         { headSlot: "152105" },
         currentTime
       );

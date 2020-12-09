@@ -39,13 +39,18 @@ export function parseEthereum2PrysmState(
   chainhead: PrysmChainhead,
   currentTimeMs = Date.now() // For deterministic testing
 ): ChainDataResult {
+  const genesisTime = genesis.genesisTime;
+  const headSlot = parseInt(chainhead.headSlot);
+  const secondsPerSlot = parseInt(config.config?.SecondsPerSlot);
+
+  if (!genesisTime) throw Error(`Invalid genesisTime ${genesisTime}`);
+  if (isNaN(headSlot)) throw Error(`Invalid headSlot ${chainhead.headSlot}`);
+  if (isNaN(secondsPerSlot))
+    throw Error(`Invalid secondsPerSlot ${config.config?.SecondsPerSlot}`);
+
   const genesisDate = new Date(genesis.genesisTime);
   const secondsSinceGenesis = (currentTimeMs - genesisDate.getTime()) / 1000;
-  const clockSlot = Math.floor(
-    secondsSinceGenesis / parseInt(config.SecondsPerSlot)
-  );
-
-  const headSlot = parseInt(chainhead.headSlot);
+  const clockSlot = Math.floor(secondsSinceGenesis / secondsPerSlot);
 
   if (clockSlot - headSlot < MIN_SLOT_DIFF_SYNC) {
     return {
@@ -103,7 +108,9 @@ interface PrysmChainhead {
  * }
  */
 interface PrysmConfig {
-  SecondsPerSlot: string;
+  config: {
+    SecondsPerSlot: string;
+  };
 }
 
 async function fetchGenesis(baseUrl: string): Promise<PrysmGenesis> {
