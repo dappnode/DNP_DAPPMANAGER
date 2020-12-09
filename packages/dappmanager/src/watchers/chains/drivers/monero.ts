@@ -37,7 +37,7 @@ interface MoneroRpcGetInfoResult {
 
 /**
  * Returns a chain data object for an [monero] API
- * @param api = "http://my.monero.dnp.dappnode.eth:18081"
+ * @param api = "http://monero.dappnode:18081"
  * @returns
  * - On success: {
  *   syncing: true, {bool}

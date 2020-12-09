@@ -1,5 +1,6 @@
 import { ChainDriver } from "../../../types";
 import memoize from "memoizee";
+import { getDotDappnodeDomain } from "../../nsupdate/utils";
 // Drivers
 import { bitcoin } from "./bitcoin";
 import { ethereum } from "./ethereum";
@@ -14,22 +15,24 @@ import { ChainDataResult } from "../types";
  * @param dnpName
  */
 export function getDriverApi(driverName: ChainDriver, dnpName: string): string {
+  const packageDomain = getDotDappnodeDomain(dnpName);
+
   switch (driverName) {
     case "bitcoin":
-      //     'my.bitcoin.dnp.dappnode.eth'
-      return `my.${dnpName}`;
+      //     'bitcoin.dappnode'
+      return packageDomain;
 
     case "ethereum":
-      //     'http://my.ropsten.dnp.dappnode.eth:8545'
-      return `http://my.${dnpName}:8545`;
+      //     'http://ropsten.dappnode:8545'
+      return `http://${packageDomain}:8545`;
 
     case "ethereum2-prysm":
       //      http://beacon-chain.prysm-pyrmont.dappnode:3500/
-      return `http://my.${dnpName}:3500`;
+      return `http://beacon-chain.${packageDomain}:3500`;
 
     case "monero":
-      //     'http://my.monero.dnp.dappnode.eth:18081'
-      return `http://my.${dnpName}:18081`;
+      //     'http://monero.dappnode:18081'
+      return `http://${packageDomain}:18081`;
   }
 }
 

@@ -25,7 +25,7 @@ const cache: {
 
 /**
  * Returns a chain data object for a [bitcoin] API
- * @param api = "my.bitcoin.dnp.dappnode.eth"
+ * @param api = "bitcoin.dappnode"
  * @returns
  * - On success: {
  *   syncing: true, {bool}

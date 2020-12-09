@@ -13,13 +13,13 @@ const fetchConfigMemo = memoize(fetchConfig, { promise: true, maxAge: 3e6 });
 
 /**
  * Returns a chain data object for an Ethereum 2.0 Prysm beacon chain node
- * @param api = "http://beacon-chain.prysm-pyrmont.dappnode:3500/"
+ * @param apiUrl = "http://beacon-chain.prysm-pyrmont.dappnode:3500/"
  */
-export async function ethereum2Prysm(api: string): Promise<ChainDataResult> {
+export async function ethereum2Prysm(apiUrl: string): Promise<ChainDataResult> {
   const [genesis, config, chainhead] = await Promise.all([
-    fetchGenesisMemo(api),
-    fetchConfigMemo(api),
-    fetchChainhead(api)
+    fetchGenesisMemo(apiUrl),
+    fetchConfigMemo(apiUrl),
+    fetchChainhead(apiUrl)
   ]);
 
   return parseEthereum2PrysmState(genesis, config, chainhead);
