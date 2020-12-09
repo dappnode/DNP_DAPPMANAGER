@@ -17,7 +17,7 @@ import { monero } from "./monero";
 export async function runWithChainDriver(
   dnp: InstalledPackageData,
   chainDriverName: ChainDriver
-): Promise<ChainDataResult> {
+): Promise<ChainDataResult | null> {
   switch (chainDriverName) {
     case "bitcoin":
       return await bitcoin(dnp);

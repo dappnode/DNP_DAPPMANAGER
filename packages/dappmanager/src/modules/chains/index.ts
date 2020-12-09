@@ -24,13 +24,18 @@ export async function getChainsData(): Promise<ChainData[]> {
         const chainDriverName = getChainDriverName(dnp);
         if (!chainDriverName) return;
 
+        // Ignore packages where all containers are not running
+        // Ethereum 2.0 multiservice should be handled in the driver
+        if (dnp.containers.every(container => !container.running)) return;
+
         const chainData = await runWithChainDriver(dnp, chainDriverName);
         loggedErrors.delete(dnp.dnpName); // Reset last seen error
 
-        chainsData.push({
-          dnpName: dnp.dnpName,
-          ...chainData
-        });
+        if (chainData)
+          chainsData.push({
+            dnpName: dnp.dnpName,
+            ...chainData
+          });
       } catch (e) {
         // Only log chain errors the first time they are seen
         if (loggedErrors.get(dnp.dnpName) !== e.message)

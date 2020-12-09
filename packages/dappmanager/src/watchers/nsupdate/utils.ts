@@ -112,26 +112,6 @@ export function getDotDappnodeDomain(dnpName: string): string {
 }
 
 /**
- * For multi-service packages, return the full ENS domain o a service
- * Some services will be the main or root container, so they will have
- * the root ENS domain of their package
- * @param container
- */
-export function getContainerFullEnsDomain(container: PackageContainer): string {
-  if (!container.dnpName)
-    throw Error(
-      `Container ${container.containerName ||
-        container.containerId} does not have a dnpName`
-    );
-
-  if (!container.serviceName || container.serviceName === container.dnpName) {
-    return container.dnpName;
-  } else {
-    return [container.serviceName, container.dnpName].join(".");
-  }
-}
-
-/**
  * Returns an array of nsupdate.txt files ready for nsupdate
  * If no update must happen, it returns an empty array
  *

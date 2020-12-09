@@ -1,12 +1,14 @@
 import fetch from "node-fetch";
 import memoize from "memoizee";
+import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 import { urlJoin } from "../../../utils/url";
+import { getContainerDomain } from "../../../params";
+import { InstalledPackageData } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
-import { InstalledPackageData } from "../../../common";
-import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 
 const MIN_SLOT_DIFF_SYNC = 60;
+const beaconChainServiceName = "beacon-chain";
 
 // Wait for Promises to resolve. Do not cache rejections
 // Cache for 1 hour, genesis and config should never change
@@ -19,10 +21,22 @@ const fetchConfigMemo = memoize(fetchConfig, { promise: true, maxAge: 3e6 });
  */
 export async function ethereum2Prysm(
   dnp: InstalledPackageData
-): Promise<ChainDataResult> {
-  const packageDomain = getDotDappnodeDomain(dnp.dnpName);
+): Promise<ChainDataResult | null> {
+  const beaconChainContainer = dnp.containers.find(
+    container => container.serviceName === beaconChainServiceName
+  );
+  if (!beaconChainContainer) {
+    throw Error(`${beaconChainServiceName} service not found`);
+  }
+  if (!beaconChainContainer.running) {
+    return null; // OK to not be running, just ignore
+  }
+
+  const containerEnsDomain = getContainerDomain(beaconChainContainer);
+  const containerDappnodeDomain = getDotDappnodeDomain(containerEnsDomain);
+
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
-  const apiUrl = `http://beacon-chain.${packageDomain}:3500`;
+  const apiUrl = `http://${containerDappnodeDomain}:3500`;
 
   const [genesis, config, chainhead] = await Promise.all([
     fetchGenesisMemo(apiUrl),
