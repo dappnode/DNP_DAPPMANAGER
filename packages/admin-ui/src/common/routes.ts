@@ -24,7 +24,9 @@ import {
   PackageEnvs,
   HostStatCpu,
   HostStatDisk,
-  HostStatMemory
+  HostStatMemory,
+  PublicIpResponse,
+  ChainData
 } from "./types";
 
 export interface Routes {
@@ -61,6 +63,12 @@ export interface Routes {
     backup: PackageBackup[];
     fileId: string;
   }) => Promise<void>;
+
+  /**
+   * Returns chain data for all installed packages declared as chains
+   * Result is cached for 5 seconds across all consumers
+   */
+  chainDataGet(): Promise<ChainData[]>;
 
   /**
    * Used to test different IPFS timeout parameters live from the ADMIN UI.
@@ -146,8 +154,25 @@ export interface Routes {
   /**
    * Gives/removes admin rights to the provided device id.
    * @param id Device id name
+   * @param isAdmin new admin status
    */
-  deviceAdminToggle: (kwargs: { id: string }) => Promise<void>;
+  deviceAdminToggle: (kwargs: {
+    id: string;
+    isAdmin: boolean;
+  }) => Promise<void>;
+
+  /**
+   * Returns true if a password has been created for this device
+   * @param id Device id name
+   */
+  devicePasswordHas: (kwargs: { id: string }) => Promise<boolean>;
+
+  /**
+   * Returns the login token of this device, creating it if necessary
+   * If the password has been changed and is no longer a login token, throws
+   * @param id Device id name
+   */
+  devicePasswordGet: (kwargs: { id: string }) => Promise<string>;
 
   /**
    * Returns a list of the existing devices, with the admin property
@@ -389,12 +414,6 @@ export interface Routes {
   rebootHost: () => Promise<void>;
 
   /**
-   * Requests chain data. Also instructs the DAPPMANAGER
-   * to keep sending data for a period of time (5 minutes)
-   */
-  requestChainData: () => Promise<void>;
-
-  /**
    * Receives an encrypted message containing the seed phrase of
    * 12 word mnemonic ethereum account. The extra layer of encryption
    * slightly increases the security of the exchange while the WAMP
@@ -424,6 +443,11 @@ export interface Routes {
    * Returns volume data
    */
   volumesGet: () => Promise<VolumeData[]>;
+
+  /**
+   * Returns public Ip in real time
+   */
+  ipPublicGet: () => Promise<PublicIpResponse>;
 }
 
 interface RouteData {
@@ -439,6 +463,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: { log: true },
   backupGet: {},
   backupRestore: { log: true },
+  chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
   copyFileFrom: { log: true },
@@ -448,6 +473,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   deviceCredentialsGet: {},
   deviceRemove: { log: true },
   deviceReset: { log: true },
+  devicePasswordGet: {},
+  devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
   domainAliasSet: { log: true },
@@ -480,12 +507,12 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  requestChainData: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   systemInfoGet: {},
   volumeRemove: { log: true },
-  volumesGet: {}
+  volumesGet: {},
+  ipPublicGet: {}
 };
 
 // DO NOT REMOVE

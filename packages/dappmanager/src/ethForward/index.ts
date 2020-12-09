@@ -1,5 +1,6 @@
 import http from "http";
 import httpProxy from "http-proxy";
+import express from "express";
 import params from "../params";
 import { EthProviderError } from "../modules/ethClient";
 import { pinAddNoThrow } from "../modules/ipfs/methods/pinAdd";
@@ -14,6 +15,14 @@ import {
   Content
 } from "./types";
 import { logs } from "../logs";
+
+export function getEthForwardMiddleware(): express.RequestHandler {
+  const ethForwardHandler = getEthForwardHandler();
+  return (req, res, next): void => {
+    if (isDwebRequest(req)) ethForwardHandler(req, res);
+    else next();
+  };
+}
 
 // Define params
 
@@ -40,7 +49,7 @@ function getTargetUrl(content: Content): string {
  * - my.dappmanager.dnp.dappnode.eth => false
  * - my.dappnode => false
  */
-export function isDwebRequest(req: http.IncomingMessage): boolean {
+function isDwebRequest(req: http.IncomingMessage): boolean {
   const domain = req.headers.host;
   return (
     typeof domain === "string" &&
@@ -52,7 +61,7 @@ export function isDwebRequest(req: http.IncomingMessage): boolean {
 /**
  * Start eth forward http proxy
  */
-export function getEthForwardHandler(): (
+function getEthForwardHandler(): (
   req: http.IncomingMessage,
   res: http.ServerResponse
 ) => Promise<void> {

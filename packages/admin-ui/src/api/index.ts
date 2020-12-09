@@ -3,7 +3,6 @@ import io from "socket.io-client";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash";
 import mitt from "mitt";
-import { store } from "../store";
 // Transport
 import { subscriptionsFactory } from "common/transport/socketIo";
 import {
@@ -15,21 +14,19 @@ import { Routes, routesData, ResolvedType } from "common/routes";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
-import {
-  connectionOpen,
-  connectionClose
-} from "services/connectionStatus/actions";
 import { initialCallsOnOpen } from "./initialCalls";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
 
-const socketIoUrl = apiUrl;
-/* eslint-disable-next-line no-console */
-console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
 let socketGlobal: SocketIOClient.Socket;
 
 function setupSocket(): SocketIOClient.Socket {
-  if (!socketGlobal) socketGlobal = io(socketIoUrl);
+  if (!socketGlobal) {
+    const socketIoUrl = apiUrl;
+    /* eslint-disable-next-line no-console */
+    console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
+    socketGlobal = io(socketIoUrl);
+  }
   return socketGlobal;
 }
 
@@ -141,11 +138,16 @@ export const useSubscription: {
   };
 });
 
+let apiStarted = false;
 /**
  * Connect to the server's API
  * Store the session and map subscriptions
  */
-export function start() {
+export function start({ refetchStatus }: { refetchStatus: () => void }) {
+  // Only run start() once
+  if (apiStarted) return;
+  else apiStarted = true;
+
   const socket = setupSocket();
 
   socket.on("connect", function(...args: any) {
@@ -157,32 +159,17 @@ export function start() {
     mapSubscriptionsToRedux(subscriptions);
     initialCallsOnOpen();
 
-    // For testing:
-    window.call = (event, args) => socket.emit(event, args);
-
-    // Delay announcing session is open until everything is setup
-    store.dispatch(connectionOpen());
     /* eslint-disable-next-line no-console */
     console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
+
+    // When Socket.io re-establishes connection check if still logged in
+    refetchStatus();
   });
 
   function handleConnectionError(err: Error | string): void {
     const errorMessage = err instanceof Error ? err.message : err;
-    fetch(apiUrls.ping).then(res => {
-      if (res.ok) {
-        // Warn that subscriptions are disabled
-        store.dispatch(connectionOpen());
-      } else {
-        store.dispatch(
-          connectionClose({
-            error: errorMessage,
-            isNotAdmin: res.status === 403
-          })
-        );
-      }
-    });
-
     console.error("SocketIO connection closed", errorMessage);
+    refetchStatus();
   }
 
   // Handles server errors

@@ -1,7 +1,7 @@
 import React from "react";
 import "./input.css";
 
-interface InputProps {
+export interface InputProps {
   onEnterPress?: () => void;
   onValueChange: (value: string) => void;
   value: string | number;

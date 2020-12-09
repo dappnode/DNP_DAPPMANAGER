@@ -22,6 +22,8 @@ jobs:
       - run: yarn bootstrap
       - run: yarn generate
       - run: yarn test
+      - run: yarn server-mock:check-types
+        working-directory: packages/admin-ui
 
   integration-test:
     runs-on: ubuntu-16.04

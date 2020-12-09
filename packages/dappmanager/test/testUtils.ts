@@ -36,8 +36,16 @@ export const getTestMountpoint = (id: string): string => {
 };
 
 export function clearDbs(): void {
-  lowLevelCacheDb.clearDb();
-  lowLevelMainDb.clearDb();
+  try {
+    lowLevelMainDb.clearDb();
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
+  try {
+    lowLevelCacheDb.clearDb();
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {

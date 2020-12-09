@@ -1,13 +1,12 @@
 import { VolumeData } from "../../src/types";
 import { pause } from "../utils";
 import { dnpInstalled } from "../data";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 let volumes: VolumeData[] = [
   {
     name: "gethdnpdappnodeeth_data",
     owner: undefined,
-    users: ["geth.dnp.dappnode.eth"],
     internalName: "data",
     createdAt: 1569346006000,
     mountpoint: "",
@@ -18,7 +17,6 @@ let volumes: VolumeData[] = [
   {
     name: "lightning-networkpublicdappnodeeth_data",
     owner: "lightning-network.public.dappnode.eth",
-    users: ["lightning-network.public.dappnode.eth"],
     internalName: "data",
     createdAt: 1569146006000,
     mountpoint: "/media/usb0",
@@ -29,7 +27,6 @@ let volumes: VolumeData[] = [
   {
     name: "d19f0771fe2e5b813cf0d138a77eddc33ae3fd6afc1cc6daf0fba42ed73e36ae",
     owner: undefined,
-    users: [],
     internalName: "",
     createdAt: 1569306006000,
     mountpoint: "",
@@ -40,7 +37,6 @@ let volumes: VolumeData[] = [
   {
     name: "paritydnpdappnodeeth_data",
     owner: "parity.dnp.dappnode.eth",
-    users: ["parity.dnp.dappnode.eth"],
     size: 71570000000,
     createdAt: 1569146006000,
     mountpoint: "",
@@ -49,7 +45,6 @@ let volumes: VolumeData[] = [
   {
     name: "paritydnpdappnodeeth_geth",
     owner: "parity.dnp.dappnode.eth",
-    users: ["parity.dnp.dappnode.eth"],
     size: 94620000000,
     createdAt: 1569146006000,
     mountpoint: "",
@@ -64,7 +59,6 @@ for (const dnp of dnpInstalled) {
         volumes.push({
           name: vol.name,
           owner: dnp.dnpName,
-          users: [dnp.dnpName],
           size: 71570000000 * Math.random(),
           createdAt: 1569146006000 + 100000000 * Math.random(),
           mountpoint: "",

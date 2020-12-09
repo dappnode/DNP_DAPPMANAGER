@@ -1,10 +1,13 @@
 import express from "express";
+import { Server } from "socket.io";
 
 export class HttpError extends Error {
-  code: number;
-  constructor(message?: string, code?: number) {
-    super(message);
-    this.code = code || 500;
+  name: string;
+  statusCode: number;
+  constructor({ name, statusCode }: { name: string; statusCode?: number }) {
+    super(name);
+    this.name = name;
+    this.statusCode = statusCode || 500;
   }
 }
 
@@ -12,19 +15,47 @@ export class HttpError extends Error {
  * Wrap express routes to be able to safely throw errors and return JSON
  * @param handler
  */
-export function wrapHandler(
-  handler: express.RequestHandler
-): express.RequestHandler {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function wrapHandler<ReqParams extends { [key: string]: any } = {}>(
+  handler: express.RequestHandler<ReqParams>
+): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
     try {
       await handler(req, res, next);
     } catch (e) {
-      const error = { message: e.message, data: e.stack };
-      if (e instanceof HttpError) {
-        res.status(e.code).send({ error });
-      } else {
-        res.status(500).send({ error });
-      }
+      next(e);
     }
+  };
+}
+
+export const errorHandler: express.ErrorRequestHandler = (
+  err,
+  req,
+  res,
+  next
+) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+  if (err instanceof HttpError) {
+    res.status(err.statusCode).send({
+      error: { name: err.name, message: err.message }
+    });
+  } else {
+    res.status(500).send({
+      error: { message: err.message, data: err.stack }
+    });
+  }
+};
+
+export function toSocketIoHandler(
+  expressHandler: express.Handler
+): Parameters<Server["use"]>[0] {
+  return function(socket, next): void {
+    expressHandler(
+      (socket.handshake as unknown) as express.Request,
+      {} as express.Response,
+      next
+    );
   };
 }

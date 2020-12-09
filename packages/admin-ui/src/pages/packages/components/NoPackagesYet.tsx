@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { rootPath as installerRootPath } from "pages/installer";
 // Components
-import { ButtonLight } from "components/Button";
+import Button from "components/Button";
 
 export const NoPackagesYet = () => (
   <div className="centered-container">
@@ -11,7 +11,7 @@ export const NoPackagesYet = () => (
       If you would like install a DAppNode package, go to the DAppStore tab.
     </p>
     <Link to={installerRootPath}>
-      <ButtonLight>Go to DAppStore</ButtonLight>
+      <Button>Go to DAppStore</Button>
     </Link>
   </div>
 );

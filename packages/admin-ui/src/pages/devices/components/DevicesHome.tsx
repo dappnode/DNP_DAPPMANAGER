@@ -8,11 +8,10 @@ import coerceDeviceName from "../helpers/coerceDeviceName";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
-import Button from "components/Button";
 import Title from "components/Title";
 import Card from "components/Card";
 import Switch from "components/Switch";
-import { ButtonLight } from "components/Button";
+import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
@@ -62,10 +61,10 @@ export default function DevicesHome() {
     });
   }
 
-  function toggleAdmin(id: string) {
-    withToastNoThrow(() => api.deviceAdminToggle({ id }), {
-      message: `Toggling ${id} admin...`,
-      onSuccess: `Toggled ${id} admin`
+  function toggleAdmin(id: string, isAdmin: boolean) {
+    withToastNoThrow(() => api.deviceAdminToggle({ id, isAdmin }), {
+      message: `${isAdmin ? "Removing" : "Making"} ${id} admin...`,
+      onSuccess: `${isAdmin ? "Removed" : "Made"} ${id} admin`
     }).then(devicesReq.revalidate);
   }
 
@@ -117,10 +116,13 @@ export default function DevicesHome() {
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
                 <NavLink to={"/devices/" + id} className="no-a-style">
-                  <ButtonLight className="get-link">Get</ButtonLight>
+                  <Button className="get-link">Get</Button>
                 </NavLink>
 
-                <Switch checked={admin} onToggle={() => toggleAdmin(id)} />
+                <Switch
+                  checked={admin}
+                  onToggle={() => toggleAdmin(id, !admin)}
+                />
                 <MdRefresh
                   style={{ fontSize: "1.05rem" }}
                   onClick={() => resetDevice(id)}

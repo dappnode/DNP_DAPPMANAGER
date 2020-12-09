@@ -32,7 +32,7 @@ describe("parseUnsafeCompose", () => {
       services: {
         [serviceName]: {
           ...mockCompose.services[serviceName],
-          restart: "always",
+          restart: "unless-stopped",
           ports,
           volumes,
           logging: customLogging,

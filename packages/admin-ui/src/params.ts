@@ -5,12 +5,26 @@ export const apiUrl =
   process.env.REACT_APP_API_URL || "http://my.dappmanager.dnp.dappnode.eth/";
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
+
+  // Auth routes
+  loginStatus: urlJoin(apiUrl, "login-status"),
+  login: urlJoin(apiUrl, "login"),
+  logout: urlJoin(apiUrl, "logout"),
+  register: urlJoin(apiUrl, "register"),
+  changePass: urlJoin(apiUrl, "change-pass"),
+  recoverPass: urlJoin(apiUrl, "recover-pass"),
+
+  // Regular routes
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
-  userActionLogs: urlJoin(apiUrl, "user-action-logs")
+  userActionLogs: urlJoin(apiUrl, "user-action-logs"),
+  globalEnvs: urlJoin(apiUrl, "global-envs"),
+  globalEnvsServerName: urlJoin(apiUrl, "global-envs/SERVER_NAME")
 };
+// Allow cross-domain cookies
+export const apiTestMode = process.env.REACT_APP_API_TEST;
 
 // WIFI
 export const wifiDefaultSSID = "DAppNodeWIFI";
@@ -48,6 +62,8 @@ export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
+export const recoverPasswordGuideUrl =
+  "https://dappnode.github.io/DAppNodeDocs/troubleshooting/#recover-password";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {

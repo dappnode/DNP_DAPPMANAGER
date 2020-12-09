@@ -5,33 +5,36 @@ import path from "path";
 chai.should();
 
 import * as getPath from "../../src/utils/getPath";
+import params from "../../src/params";
 
-const testDir = "test_files/";
+const { REPO_DIR } = params;
 
 describe("Util: get paths", function() {
   const dnpName = "some_package.dnp.dappnode.eth";
   const version = "0.2.0";
 
   it("return PACKAGE_REPO_DIR path", () => {
-    expect(getPath.packageRepoDir(dnpName, false)).to.equal(testDir + dnpName);
+    expect(getPath.packageRepoDir(dnpName, false)).to.equal(
+      path.join(REPO_DIR, dnpName)
+    );
   });
 
   it("return MANIFEST path", () => {
     expect(getPath.manifest(dnpName, false)).to.equal(
-      path.join(testDir, "some_package.dnp.dappnode.eth/dappnode_package.json")
+      path.join(REPO_DIR, "some_package.dnp.dappnode.eth/dappnode_package.json")
     );
   });
 
   it("return DOCKERCOMPOSE path", () => {
     expect(getPath.dockerCompose(dnpName, false)).to.equal(
-      path.join(testDir, "some_package.dnp.dappnode.eth/docker-compose.yml")
+      path.join(REPO_DIR, "some_package.dnp.dappnode.eth/docker-compose.yml")
     );
   });
 
   it("return ENV_FILE path", () => {
     expect(getPath.envFile(dnpName, false)).to.equal(
       path.join(
-        testDir,
+        REPO_DIR,
         "some_package.dnp.dappnode.eth/some_package.dnp.dappnode.eth.env"
       )
     );
@@ -40,7 +43,7 @@ describe("Util: get paths", function() {
   it("return IMAGE path", () => {
     expect(getPath.image(dnpName, version, false)).to.equal(
       path.join(
-        testDir,
+        REPO_DIR,
         "some_package.dnp.dappnode.eth/some_package.dnp.dappnode.eth_0.2.0.tar.xz"
       )
     );

@@ -1,8 +1,12 @@
+// AUTH, SESSION types
+export interface LoginStatusReturn {
+  username: string;
+  isAdmin: boolean;
+}
+
 // Device types
 
-export interface VpnDeviceCredentials {
-  filename: string;
-  key: string;
+export interface VpnDeviceCredentials extends VpnDevice {
   url: string;
 }
 
@@ -309,8 +313,17 @@ export type ContainerState =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
-export type ChainDriver = "bitcoin" | "ethereum" | "monero";
-export const chainDrivers: ChainDriver[] = ["bitcoin", "ethereum", "monero"];
+export type ChainDriver =
+  | "bitcoin"
+  | "ethereum"
+  | "ethereum2-beacon-chain-prysm"
+  | "monero";
+export const chainDrivers: ChainDriver[] = [
+  "bitcoin",
+  "ethereum",
+  "ethereum2-beacon-chain-prysm",
+  "monero"
+];
 
 /**
  * Type mapping of a package container labels
@@ -500,7 +513,7 @@ export interface ComposeService {
   // ipv4_address: "172.33.1.7";
   networks?: string[] | { [networkName: string]: { ipv4_address: string } };
   dns?: string; // "172.33.1.2";
-  restart?: string; // "always";
+  restart?: string; // "unless-stopped";
   privileged?: boolean;
   cap_add?: string[];
   cap_drop?: string[];
@@ -1091,6 +1104,10 @@ export interface DiagnoseItem {
   error?: string;
 }
 export type Diagnose = DiagnoseItem[];
+
+export interface PublicIpResponse {
+  publicIp: string;
+}
 
 /**
  * Welcome wizard / setup flow

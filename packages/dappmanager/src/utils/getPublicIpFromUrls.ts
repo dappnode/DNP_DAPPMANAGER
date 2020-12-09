@@ -16,19 +16,25 @@ const urls = [
  * @param silent suppress logs
  * @returns public IP: 85.84.83.82
  */
-export default async function getPublicIpFromUrls(): Promise<string> {
+export default async function getPublicIpFromUrls(options?: {
+  timeout?: number;
+  retries?: number;
+}): Promise<string> {
+  const timeout = options?.timeout || 15 * 1000;
+  const retries = options?.retries || 10;
+
   const errors = [];
   for (const url of urls) {
     try {
-      const ip = await retry(() =>
-        fetch(url, { timeout: 15 * 1000 }).then(res => res.text())
+      const ip = await retry(
+        () => fetch(url, { timeout }).then(res => res.text()),
+        { retries }
       );
       if (isIp(ip)) return ip;
       else throw Error(`Invalid IP format: ${ip}`);
     } catch (e) {
-      const error = `Error getting IP from ${url}: ${e.message}`;
-      errors.push(error);
+      errors.push(`${url}: ${e.message}`);
     }
   }
-  throw Error(`No valid IP was returned by urls:\n${errors.join("\n")}`);
+  throw Error(`Error fetching public IP\n${errors.join("\n")}`);
 }

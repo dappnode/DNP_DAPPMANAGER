@@ -11,9 +11,13 @@ import {
   SystemInfo,
   HostStatCpu,
   HostStatDisk,
-  HostStatMemory
+  HostStatMemory,
+  PublicIpResponse,
+  ChainData
 } from "../../src/common";
 import { mountpoints } from "../mockData";
+
+let hostPasswordIsSecureState = false;
 
 /**
  * Generates a backup of a package and sends it to the client for download.
@@ -36,6 +40,28 @@ export async function backupRestore(kwargs: {
   fileId: string;
 }): Promise<void> {
   //
+}
+
+export async function chainDataGet(): Promise<ChainData[]> {
+  return [
+    {
+      dnpName: "geth.dnp.dappnode.eth",
+      syncing: true,
+      error: false,
+      message: [
+        "Blocks synced: 543000 / 654000",
+        "States pulled: 25314123 / 154762142"
+      ].join("\n\n"),
+      help: "http://geth.io"
+    },
+    {
+      dnpName: "rinkeby.dnp.dappnode.eth",
+      syncing: true,
+      error: false,
+      message: "Blocks synced: 543000 / 654000",
+      progress: 0.83027522935
+    }
+  ];
 }
 
 /**
@@ -115,35 +141,26 @@ export async function ethClientTargetSet(kwargs: {
 export async function statsCpuGet(): Promise<HostStatCpu> {
   // await new Promise(() => {});
   return {
-    usedFraction: 0.88
+    usedPercentage: 88
   };
 }
 
 export async function statsMemoryGet(): Promise<HostStatMemory> {
   // throw Error("Ups");
   return {
-    memTotal: "8093155328",
-    memUsed: "6535839744",
-    free: "179961856",
-    shared: "596930560",
-    buffCache: "1377353728",
-    available: "714616832",
-    swapTotal: "8312582144",
-    swapUsed: "767557632",
-    swapFree: "7545024512",
-    useFraction: 0.34
+    total: 8093155328,
+    used: 6535839744,
+    free: 179961856,
+    usedPercentage: 34
   };
 }
 
 export async function statsDiskGet(): Promise<HostStatDisk> {
   return {
-    filesystem: "/dev/mapper/mint--vg-root",
-    bBlocks: "241440808960",
-    used: "189458415616",
-    available: "39646527488",
-    usePercentage: "83%",
-    mountedOn: "/",
-    useFraction: 0.34
+    total: 241440808960,
+    used: 189458415616,
+    free: 39646527488,
+    usedPercentage: 83
   };
 }
 
@@ -209,7 +226,7 @@ export async function notificationsTest(kwargs: {
 export async function passwordChange(kwargs: {
   newPassword: string;
 }): Promise<void> {
-  //
+  hostPasswordIsSecureState = true;
 }
 
 /**
@@ -226,7 +243,7 @@ export async function passwordChange(kwargs: {
  * @returns true = is secure / false = is not
  */
 export async function passwordIsSecure(): Promise<boolean> {
-  return true;
+  return hostPasswordIsSecureState;
 }
 
 /**
@@ -240,14 +257,6 @@ export async function poweroffHost(): Promise<void> {
  * Reboots the host machine via the DBus socket
  */
 export async function rebootHost(): Promise<void> {
-  //
-}
-
-/**
- * Requests chain data. Also instructs the DAPPMANAGER
- * to keep sending data for a period of time (5 minutes)
- */
-export async function requestChainData(): Promise<void> {
   //
 }
 
@@ -311,5 +320,11 @@ export async function systemInfoGet(): Promise<SystemInfo> {
       // "system-auto-updates",
       // "change-host-password"
     ]
+  };
+}
+
+export async function ipPublicGet(): Promise<PublicIpResponse> {
+  return {
+    publicIp: "85.84.83.82"
   };
 }

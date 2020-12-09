@@ -12,6 +12,12 @@ export interface WifiStatus {
   isDefault: boolean;
 }
 
+export interface ReqStatus<T = true> {
+  loading?: boolean;
+  error?: Error | string;
+  result?: T;
+}
+
 // Window extension
 
 declare global {

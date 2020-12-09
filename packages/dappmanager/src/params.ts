@@ -11,14 +11,14 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
-let DNCORE_DIR = "DNCORE"; // Bind volume
-let REPO_DIR = "dnp_repo"; // Named volume
+let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
+let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
-  DNCORE_DIR = "test_files/";
-  REPO_DIR = "test_files/";
+  DNCORE_DIR = "./DNCORE";
+  REPO_DIR = "./dnp_repo";
 }
 
 const params = {
@@ -34,6 +34,12 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+
+  // File with sole purpose of handling admin password hash. Must be deletable
+  ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
+  ADMIN_PASSWORDS_JSON_FILE: path.join(DNCORE_DIR, "admin-passwords.json"),
+  ADMIN_STATUS_JSON_FILE: path.join(DNCORE_DIR, "admin-status.json"),
+
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
@@ -52,12 +58,25 @@ const params = {
   // UI static files
   UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
+  // Signature API
+  SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
+
   // HTTP API parameters
-  ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
+  IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
+  HTTP_CORS_WHITELIST: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://my.dappnode"
+  ],
+
+  // API auth sessions
+  SESSIONS_SECRET_FILE: path.join(DNCORE_DIR, "sessions-secret-key.txt"),
+  SESSIONS_MAX_TTL_MS: 24 * 60 * 60 * 100,
+  SESSIONS_TTL_MS: 24 * 60 * 60 * 100,
 
   // VPN API
-  vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
+  VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -75,8 +94,6 @@ const params = {
 
   // Watchers
   AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  CHECK_CHAIN_WATCHER_INTERVAL: 60 * 1000, // 1 minute
-  EMIT_CHAIN_DATA_WATCHER_INTERVAL: 5 * 1000, // 5 seconds
   CHECK_DISK_USAGE_WATCHER_INTERVAL: 60 * 1000, // 1 minute
   NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
   NSUPDATE_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
@@ -90,7 +107,6 @@ const params = {
 
   // Web3 parameters
   WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
-  CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -99,6 +115,7 @@ const params = {
   restartDnpName: "restart.dnp.dappnode.eth",
   vpnDnpName: "vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
+  ipfsDnpName: "ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [
@@ -155,7 +172,8 @@ const params = {
   ETHFORWARD_PIN_ON_VISIT: true,
 
   // Flags
-  DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || "")
+  DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
+  AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)
 };
 
 if (devMode) {

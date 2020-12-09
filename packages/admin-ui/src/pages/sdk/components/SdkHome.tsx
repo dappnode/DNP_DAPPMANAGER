@@ -6,7 +6,7 @@ import { sdkPublishAppUrl, sdkGuideUrl } from "params";
 import Title from "components/Title";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
-import { ButtonLight } from "components/Button";
+import Button from "components/Button";
 import "./sdk.scss";
 
 const subRoutes = [
@@ -68,7 +68,7 @@ export default function SdkHome() {
             <div style={{ opacity: "0.5" }}>{subtitle}</div>
           </div>
           <a href={url} {...newTabProps}>
-            <ButtonLight>{urlTag}</ButtonLight>
+            <Button>{urlTag}</Button>
           </a>
         </Card>
       ))}

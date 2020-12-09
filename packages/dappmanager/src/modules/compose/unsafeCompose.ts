@@ -51,7 +51,7 @@ export function parseUnsafeCompose(
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({
         // Overridable defaults
-        restart: "always",
+        restart: "unless-stopped",
         logging: {
           driver: "json-file",
           options: {

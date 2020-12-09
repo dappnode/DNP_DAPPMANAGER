@@ -19,13 +19,5 @@ export const store = configureStore({
   // ### Todo: Fix type bug: 'state !== state', because state can be undefined
   reducer: rootReducer as Reducer,
   middleware: [thunk],
-  devTools: { actionsBlacklist: ["chainData/update"] }
+  devTools: {}
 });
-
-declare global {
-  interface Window {
-    store: typeof store;
-  }
-}
-
-window.store = store;

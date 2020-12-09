@@ -1,7 +1,7 @@
 import { AutoUpdateDataView } from "../../src/common";
 import { coreName } from "../mockData";
 import { pause } from "../utils";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 const autoUpdateData: AutoUpdateDataView = {
   settings: {

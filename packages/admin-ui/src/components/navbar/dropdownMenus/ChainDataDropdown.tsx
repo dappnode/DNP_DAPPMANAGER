@@ -1,26 +1,11 @@
-import React, { useEffect } from "react";
-import { useApi } from "api";
-import { useSelector } from "react-redux";
+import React from "react";
 import BaseDropdown, { BaseDropdownMessage } from "./BaseDropdown";
-import { getChainData } from "services/chainData/selectors";
 import { shortNameCapitalized } from "utils/format";
-// Icons
 import { FiBox } from "react-icons/fi";
+import { useChainData } from "hooks/chainData";
 
 export default function ChainDataDropdown() {
-  const requestChainData = useApi.requestChainData();
-  useEffect(() => {
-    const interval = setInterval(requestChainData.revalidate, 5 * 60 * 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [requestChainData]);
-
-  const chainData = useSelector(getChainData);
-  if (!chainData || !Array.isArray(chainData)) {
-    console.error("chainData must be an array");
-    return null;
-  }
+  const chainData = useChainData();
 
   return (
     <BaseDropdown
