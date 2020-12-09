@@ -26,7 +26,7 @@ export function getDriverApi(driverName: ChainDriver, dnpName: string): string {
       //     'http://ropsten.dappnode:8545'
       return `http://${packageDomain}:8545`;
 
-    case "ethereum2-prysm":
+    case "ethereum2-beacon-chain-prysm":
       //      http://beacon-chain.prysm-pyrmont.dappnode:3500/
       return `http://beacon-chain.${packageDomain}:3500`;
 
@@ -62,7 +62,7 @@ async function runDriver(chain: Chain): Promise<ChainDataResult> {
       return await bitcoin(chain.api);
     case "ethereum":
       return await ethereum(chain.api);
-    case "ethereum2-prysm":
+    case "ethereum2-beacon-chain-prysm":
       return await ethereum2Prysm(chain.api);
     case "monero":
       return await monero(chain.api);

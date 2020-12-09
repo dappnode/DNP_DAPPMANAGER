@@ -35,12 +35,12 @@ export const knownChains: { [dnpName: string]: Chain } = {
   // New Eth2.0 chains
   "prysm.dnp.dappnode.eth": {
     dnpName: "prysm.dnp.dappnode.eth",
-    driverName: "ethereum2-prysm",
+    driverName: "ethereum2-beacon-chain-prysm",
     api: "http://beacon-chain.prysm.dappnode:3500"
   },
   "prysm-pyrmont.dnp.dappnode.eth": {
     dnpName: "prysm-pyrmont.dnp.dappnode.eth",
-    driverName: "ethereum2-prysm",
+    driverName: "ethereum2-beacon-chain-prysm",
     api: "http://beacon-chain.prysm-pyrmont.dappnode:3500"
   }
 };
