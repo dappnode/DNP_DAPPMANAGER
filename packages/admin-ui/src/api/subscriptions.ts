@@ -2,7 +2,6 @@ import { store } from "../store";
 import { Subscriptions } from "../common/subscriptions";
 // Actions to push received content
 import { pushNotification } from "services/notifications/actions";
-import { updateChainData } from "services/chainData/actions";
 import {
   clearIsInstallingLog,
   updateIsInstallingLog
@@ -12,10 +11,6 @@ import { setDnpInstalled } from "services/dnpInstalled/actions";
 import { updateDnpDirectory } from "services/dnpDirectory/actions";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
-  subscriptions.chainData.on(chainsData => {
-    store.dispatch(updateChainData(chainsData));
-  });
-
   subscriptions.directory.on(directoryDnps => {
     store.dispatch(updateDnpDirectory(directoryDnps));
   });

@@ -3,6 +3,8 @@ import memoize from "memoizee";
 import { urlJoin } from "../../../utils/url";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
+import { InstalledPackageData } from "../../../common";
+import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 
 const MIN_SLOT_DIFF_SYNC = 60;
 
@@ -15,7 +17,13 @@ const fetchConfigMemo = memoize(fetchConfig, { promise: true, maxAge: 3e6 });
  * Returns a chain data object for an Ethereum 2.0 Prysm beacon chain node
  * @param apiUrl = "http://beacon-chain.prysm-pyrmont.dappnode:3500/"
  */
-export async function ethereum2Prysm(apiUrl: string): Promise<ChainDataResult> {
+export async function ethereum2Prysm(
+  dnp: InstalledPackageData
+): Promise<ChainDataResult> {
+  const packageDomain = getDotDappnodeDomain(dnp.dnpName);
+  // http://beacon-chain.prysm-pyrmont.dappnode:3500/
+  const apiUrl = `http://beacon-chain.${packageDomain}:3500`;
+
   const [genesis, config, chainhead] = await Promise.all([
     fetchGenesisMemo(apiUrl),
     fetchConfigMemo(apiUrl),

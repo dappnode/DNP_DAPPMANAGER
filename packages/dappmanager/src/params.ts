@@ -94,8 +94,6 @@ const params = {
 
   // Watchers
   AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  CHECK_CHAIN_WATCHER_INTERVAL: 60 * 1000, // 1 minute
-  EMIT_CHAIN_DATA_WATCHER_INTERVAL: 5 * 1000, // 5 seconds
   CHECK_DISK_USAGE_WATCHER_INTERVAL: 60 * 1000, // 1 minute
   NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
   NSUPDATE_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
@@ -109,7 +107,6 @@ const params = {
 
   // Web3 parameters
   WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
-  CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",

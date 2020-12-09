@@ -407,12 +407,6 @@ export interface Routes {
   rebootHost: () => Promise<void>;
 
   /**
-   * Requests chain data. Also instructs the DAPPMANAGER
-   * to keep sending data for a period of time (5 minutes)
-   */
-  requestChainData: () => Promise<void>;
-
-  /**
    * Receives an encrypted message containing the seed phrase of
    * 12 word mnemonic ethereum account. The extra layer of encryption
    * slightly increases the security of the exchange while the WAMP
@@ -505,7 +499,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  requestChainData: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   systemInfoGet: {},

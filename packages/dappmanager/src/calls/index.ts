@@ -38,7 +38,6 @@ export { passwordChange } from "./passwordChange";
 export { passwordIsSecure } from "./passwordIsSecure";
 export { poweroffHost } from "./poweroffHost";
 export { rebootHost } from "./rebootHost";
-export { requestChainData } from "./requestChainData";
 export { seedPhraseSet } from "./seedPhraseSet";
 export { setStaticIp } from "./setStaticIp";
 export { systemInfoGet } from "./systemInfoGet";
