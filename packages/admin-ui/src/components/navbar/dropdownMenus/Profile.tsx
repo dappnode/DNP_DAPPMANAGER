@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fetchLogout } from "api/auth";
+import { fetchLogoutAndReload } from "api/auth";
 import ErrorView from "components/ErrorView";
 import { systemProfilePath } from "pages/system/data";
 import { AiOutlineUser } from "react-icons/ai";
@@ -28,9 +28,8 @@ function LogoutListItem() {
   async function onLogout() {
     try {
       setReqStatus({ loading: true });
-      await fetchLogout();
+      await fetchLogoutAndReload();
       setReqStatus({ result: true });
-      window.location.reload();
     } catch (e) {
       setReqStatus({ error: e });
     }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import { fetchLogout } from "api/auth";
+import { fetchLogoutAndReload } from "api/auth";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
 
@@ -11,9 +11,8 @@ export function SignOut() {
   async function onLogout() {
     try {
       setReqStatus({ loading: true });
-      await fetchLogout();
+      await fetchLogoutAndReload();
       setReqStatus({ result: true });
-      window.location.reload();
     } catch (e) {
       setReqStatus({ error: e });
     }

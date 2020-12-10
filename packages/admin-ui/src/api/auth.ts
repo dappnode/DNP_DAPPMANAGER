@@ -82,6 +82,11 @@ export async function fetchLogout(): Promise<{ ok: true }> {
   return await fetchAuthPost(apiUrls.logout);
 }
 
+export async function fetchLogoutAndReload(): Promise<void> {
+  await fetchLogout();
+  window.location.reload();
+}
+
 export async function fetchRegister(data: {
   username: string;
   password: string;

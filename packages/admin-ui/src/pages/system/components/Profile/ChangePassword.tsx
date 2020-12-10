@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import { fetchChangePass, fetchLogout } from "api/auth";
+import { fetchChangePass, fetchLogoutAndReload } from "api/auth";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
 import {
@@ -36,7 +36,7 @@ export function ChangePassword() {
         setReqStatus({ result: true });
 
         // Logout so user re-enters the password
-        await fetchLogout();
+        await fetchLogoutAndReload();
       } catch (e) {
         setReqStatus({ error: e });
       }
