@@ -1,5 +1,6 @@
 import React from "react";
 import { IconType } from "react-icons/lib";
+import ButtonBootstap from "react-bootstrap/esm/Button";
 import { joinCssClass } from "utils/css";
 import "./button.scss";
 
@@ -35,24 +36,24 @@ const Button: React.FC<ButtonProps &
   Icon,
   ...props
 }) => (
-  <button
-    className={joinCssClass(
-      `btn btn-${variant}`,
-      { pill, fullwidth },
-      className
-    )}
-    disabled={disabled}
-    {...props}
-  >
-    {Icon ? (
-      <span className="btn-with-icon">
-        <Icon />
-        <span>{children}</span>
-      </span>
-    ) : (
-      children
-    )}
-  </button>
+  <>
+    <ButtonBootstap
+      variant={variant}
+      disabled={disabled}
+      block={fullwidth}
+      className={joinCssClass({ pill }, className)}
+      {...props}
+    >
+      {Icon ? (
+        <span className="btn-with-icon">
+          <Icon />
+          <span>{children}</span>
+        </span>
+      ) : (
+        children
+      )}
+    </ButtonBootstap>
+  </>
 );
 
 export default Button;
