@@ -73,6 +73,7 @@ export function Login({
           {
             label: "Username",
             labelId: "username",
+            autoFocus: true,
             value: username,
             onValueChange: setUsername
           },

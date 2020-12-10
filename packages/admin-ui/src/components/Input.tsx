@@ -14,6 +14,7 @@ export interface InputProps {
   placeholder?: string;
   error?: string;
   required?: boolean;
+  autoFocus?: boolean;
 }
 
 const Input: React.FC<InputProps & FormControlProps> = ({
@@ -42,7 +43,6 @@ const Input: React.FC<InputProps & FormControlProps> = ({
       }}
       value={value}
       readOnly={lock}
-      required
       {...props}
     />
   );

@@ -80,6 +80,7 @@ export function Register({
           {
             label: "Username",
             labelId: "username",
+            autoFocus: true,
             value: username,
             onValueChange: setUsername
           },

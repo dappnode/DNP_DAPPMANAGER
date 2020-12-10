@@ -12,6 +12,7 @@ interface InputFormProps {
     value: string;
     onValueChange: (newValue: string) => void;
     error?: string | null;
+    autoFocus?: boolean;
   }[];
   childrenBefore?: React.ReactNode;
 }
@@ -25,26 +26,37 @@ export const InputForm: React.FC<InputFormProps> = ({
     <Form className="input-form">
       {childrenBefore}
 
-      {fields.map(({ labelId, label, secret, value, onValueChange, error }) => {
-        const InputComponent = secret ? InputSecret : Input;
-        return (
-          <Form.Group key={labelId} controlId={labelId}>
-            <Form.Label>{label}</Form.Label>
-            <InputComponent
-              value={value}
-              onValueChange={onValueChange}
-              isInvalid={Boolean(value && error)}
-              // All consumers of this input form require all fields
-              // Add a prop "optional" if a field it's not required
-              required
-            />
+      {fields.map(
+        ({
+          labelId,
+          label,
+          secret,
+          value,
+          onValueChange,
+          error,
+          autoFocus
+        }) => {
+          const InputComponent = secret ? InputSecret : Input;
+          return (
+            <Form.Group key={labelId} controlId={labelId}>
+              <Form.Label>{label}</Form.Label>
+              <InputComponent
+                value={value}
+                onValueChange={onValueChange}
+                isInvalid={Boolean(value && error)}
+                autoFocus={autoFocus}
+                // All consumers of this input form require all fields
+                // Add a prop "optional" if a field it's not required
+                required
+              />
 
-            {value && error && (
-              <Form.Text className="text-danger">{error}</Form.Text>
-            )}
-          </Form.Group>
-        );
-      })}
+              {value && error && (
+                <Form.Text className="text-danger">{error}</Form.Text>
+              )}
+            </Form.Group>
+          );
+        }
+      )}
 
       {children}
     </Form>
