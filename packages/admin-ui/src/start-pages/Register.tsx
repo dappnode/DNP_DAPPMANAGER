@@ -100,16 +100,17 @@ export function Register({
             error: password2Error
           }
         ]}
-      />
-
-      <Button
-        onClick={onRegister}
-        variant="dappnode"
-        disabled={reqStatus.loading || !isValid}
-        fullwidth
       >
-        Register
-      </Button>
+        <Button
+          type="submit"
+          onClick={onRegister}
+          variant="dappnode"
+          disabled={reqStatus.loading || !isValid}
+          fullwidth
+        >
+          Register
+        </Button>
+      </InputForm>
 
       {reqStatus.result && <Ok ok msg="Registered"></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}

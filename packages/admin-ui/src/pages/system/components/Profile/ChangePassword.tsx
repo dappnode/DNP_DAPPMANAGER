@@ -70,15 +70,16 @@ export function ChangePassword() {
             error: password2Error
           }
         ]}
-      />
-
-      <Button
-        onClick={onChangePassword}
-        variant="dappnode"
-        disabled={reqStatus.loading || !isValid}
       >
-        Change UI password
-      </Button>
+        <Button
+          type="submit"
+          onClick={onChangePassword}
+          variant="dappnode"
+          disabled={reqStatus.loading}
+        >
+          Change UI password
+        </Button>
+      </InputForm>
 
       {reqStatus.result && <Ok ok msg={"Changed password"}></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}

@@ -92,11 +92,16 @@ export default function ChangeWifiPassword() {
             error: password2Error
           }
         ]}
-      />
-
-      <Button variant="dappnode" disabled={!isValid} onClick={onChangePassword}>
-        Change password
-      </Button>
+      >
+        <Button
+          type="submit"
+          variant="dappnode"
+          disabled={!isValid}
+          onClick={onChangePassword}
+        >
+          Change password
+        </Button>
+      </InputForm>
     </Card>
   );
 }

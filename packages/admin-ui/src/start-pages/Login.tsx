@@ -84,17 +84,18 @@ export function Login({
             onValueChange: setPassword
           }
         ]}
-      />
-
-      <Button
-        className="register-button"
-        onClick={onLogin}
-        variant="dappnode"
-        disabled={reqStatus.loading || !password}
-        fullwidth
       >
-        Login
-      </Button>
+        <Button
+          type="submit"
+          className="register-button"
+          onClick={onLogin}
+          variant="dappnode"
+          disabled={reqStatus.loading || !password}
+          fullwidth
+        >
+          Login
+        </Button>
+      </InputForm>
 
       <div className="forgot-password-text" onClick={onForgotPassword}>
         Forgot password?
