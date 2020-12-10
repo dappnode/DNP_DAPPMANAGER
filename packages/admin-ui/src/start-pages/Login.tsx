@@ -71,28 +71,36 @@ export function Login({
       <InputForm
         fields={[
           {
-            title: "Username",
+            label: "Username",
+            labelId: "username",
+            name: "username",
+            autoComplete: "username",
+            autoFocus: true,
             value: username,
             onValueChange: setUsername
           },
           {
-            title: "Password",
+            label: "Password",
+            labelId: "password",
+            name: "current-password",
+            autoComplete: "current-password",
             secret: true,
             value: password,
             onValueChange: setPassword
           }
         ]}
-      />
-
-      <Button
-        className="register-button"
-        onClick={onLogin}
-        variant="dappnode"
-        disabled={reqStatus.loading || !password}
-        fullwidth
       >
-        Login
-      </Button>
+        <Button
+          type="submit"
+          className="register-button"
+          onClick={onLogin}
+          variant="dappnode"
+          disabled={reqStatus.loading || !password}
+          fullwidth
+        >
+          Login
+        </Button>
+      </InputForm>
 
       <div className="forgot-password-text" onClick={onForgotPassword}>
         Forgot password?

@@ -48,23 +48,27 @@ export function ResetPassword({
       <InputForm
         fields={[
           {
-            title: "Recovery token",
+            label: "Recovery token",
+            labelId: "recovery-token",
+            name: "recovery-token",
+            autoFocus: true,
             secret: true,
             value: token,
             onValueChange: setToken
           }
         ]}
-      />
-
-      <Button
-        className="register-button"
-        onClick={onReset}
-        variant="dappnode"
-        disabled={reqStatus.loading || !token}
-        fullwidth
       >
-        Reset password
-      </Button>
+        <Button
+          type="submit"
+          className="register-button"
+          onClick={onReset}
+          variant="dappnode"
+          disabled={reqStatus.loading || !token}
+          fullwidth
+        >
+          Reset password
+        </Button>
+      </InputForm>
 
       {reqStatus.result && <Ok ok msg="Reseted password"></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}

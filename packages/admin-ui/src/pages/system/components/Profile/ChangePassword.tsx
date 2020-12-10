@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import { fetchChangePass, fetchLogout } from "api/auth";
+import { fetchChangePass, fetchLogoutAndReload } from "api/auth";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
 import {
@@ -36,7 +36,7 @@ export function ChangePassword() {
         setReqStatus({ result: true });
 
         // Logout so user re-enters the password
-        await fetchLogout();
+        await fetchLogoutAndReload();
       } catch (e) {
         setReqStatus({ error: e });
       }
@@ -47,35 +47,45 @@ export function ChangePassword() {
       <InputForm
         fields={[
           {
-            title: "Current password",
+            label: "Current password",
+            labelId: "current-password",
+            name: "current-password",
+            autoComplete: "current-password",
             secret: true,
             value: oldPassword,
             onValueChange: setOldPassword
           },
           {
-            title: "New password",
+            label: "New password",
+            labelId: "new-password",
+            name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: newPassword,
             onValueChange: setNewPassword,
             error: passwordError
           },
           {
-            title: "Confirm new password",
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
+            name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: newPassword2,
             onValueChange: setNewPassword2,
             error: password2Error
           }
         ]}
-      />
-
-      <Button
-        onClick={onChangePassword}
-        variant="dappnode"
-        disabled={reqStatus.loading || !isValid}
       >
-        Change UI password
-      </Button>
+        <Button
+          type="submit"
+          onClick={onChangePassword}
+          variant="dappnode"
+          disabled={reqStatus.loading}
+        >
+          Change UI password
+        </Button>
+      </InputForm>
 
       {reqStatus.result && <Ok ok msg={"Changed password"}></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}

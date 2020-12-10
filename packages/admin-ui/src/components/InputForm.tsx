@@ -1,45 +1,54 @@
 import React from "react";
-import Input from "./Input";
+import Form from "react-bootstrap/esm/Form";
+import Input, { InputProps } from "./Input";
 import { InputSecret } from "./InputSecret";
 import "./inputForm.scss";
 
+interface InputFormFieldProps extends InputProps {
+  labelId: string;
+  label: string;
+  secret?: boolean;
+  error?: string | null;
+}
+
 interface InputFormProps {
-  fields: {
-    title: string;
-    secret?: boolean;
-    value: string;
-    onValueChange: (newValue: string) => void;
-    error?: string | null;
-  }[];
+  fields: InputFormFieldProps[];
   childrenBefore?: React.ReactNode;
-  childrenAfter?: React.ReactNode;
 }
 
 export const InputForm: React.FC<InputFormProps> = ({
   fields,
-  childrenBefore,
-  childrenAfter
+  children,
+  childrenBefore
 }) => {
   return (
-    <div className="input-form">
+    <Form className="input-form" onSubmit={e => e.preventDefault()}>
       {childrenBefore}
 
-      {fields.map(({ title, secret, value, onValueChange, error }, i) => {
+      {fields.map(({ labelId, label, secret, error, ...props }) => {
         const InputComponent = secret ? InputSecret : Input;
+        const isInvalid = Boolean(props.value && error);
         return (
-          <div key={i} className="input-form-field">
-            <div className="title">{title}</div>
+          <Form.Group key={labelId} controlId={labelId}>
+            <Form.Label>{label}</Form.Label>
             <InputComponent
-              value={value}
-              onValueChange={onValueChange}
-              isInvalid={Boolean(value && error)}
+              isInvalid={isInvalid}
+              // All consumers of this input form require all fields
+              // Add a prop "optional" if a field it's not required
+              required
+              {...props}
             />
-            {value && error && <div className="error-feedback">{error}</div>}
-          </div>
+
+            {isInvalid && (
+              <Form.Text className="text-danger" as="span">
+                {error}
+              </Form.Text>
+            )}
+          </Form.Group>
         );
       })}
 
-      {childrenAfter}
-    </div>
+      {children}
+    </Form>
   );
 };

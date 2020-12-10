@@ -78,35 +78,46 @@ export function Register({
       <InputForm
         fields={[
           {
-            title: "Username",
+            label: "Username",
+            labelId: "username",
+            name: "username",
+            autoComplete: "username",
+            autoFocus: true,
             value: username,
             onValueChange: setUsername
           },
           {
-            title: "New password",
+            label: "New password",
+            labelId: "new-password",
+            name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
             error: passwordError
           },
           {
-            title: "Confirm new password",
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
+            name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,
             error: password2Error
           }
         ]}
-      />
-
-      <Button
-        onClick={onRegister}
-        variant="dappnode"
-        disabled={reqStatus.loading || !isValid}
-        fullwidth
       >
-        Register
-      </Button>
+        <Button
+          type="submit"
+          onClick={onRegister}
+          variant="dappnode"
+          disabled={reqStatus.loading || !isValid}
+          fullwidth
+        >
+          Register
+        </Button>
+      </InputForm>
 
       {reqStatus.result && <Ok ok msg="Registered"></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
