@@ -1,6 +1,6 @@
 import React from "react";
 import InputGroup from "react-bootstrap/esm/InputGroup";
-import FormControl, { FormControlProps } from "react-bootstrap/esm/FormControl";
+import { joinCssClass } from "utils/css";
 
 export interface InputProps {
   onEnterPress?: () => void;
@@ -10,18 +10,27 @@ export interface InputProps {
   prepend?: string | React.ReactElement;
   append?: string | React.ReactElement;
   className?: string;
+  isInvalid?: boolean;
   type?: string;
   placeholder?: string;
   required?: boolean;
   autoFocus?: boolean;
+  /**
+   * Triggers browser auto-completition by remembering inputs
+   */
   name?: string;
+  /**
+   * Triggers browser functionality such as password generation
+   * if autocomplete="new-password"
+   */
   autoComplete?: string;
 }
 
-const Input: React.FC<InputProps & FormControlProps> = ({
+const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
   value,
   onValueChange,
   onEnterPress,
+  isInvalid,
   lock,
   prepend,
   append,
@@ -33,7 +42,12 @@ const Input: React.FC<InputProps & FormControlProps> = ({
    * Construct the basic input element
    */
   const input = (
-    <FormControl
+    // Using raw input instead of FormControl because it does not pass the prop
+    // autocomplete, and it's necessary to trigger password generation on register
+    <input
+      className={joinCssClass("form-control", className, {
+        "is-invalid": isInvalid
+      })}
       type={type || "text"}
       onChange={e => {
         onValueChange(e.target.value);

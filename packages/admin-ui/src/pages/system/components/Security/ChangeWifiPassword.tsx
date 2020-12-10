@@ -71,6 +71,8 @@ export default function ChangeWifiPassword() {
           {
             label: "SSID",
             labelId: "ssid",
+            name: "ssid",
+            autoComplete: "ssid",
             value: ssid,
             onValueChange: setSsid,
             error: ssidError
@@ -78,6 +80,8 @@ export default function ChangeWifiPassword() {
           {
             label: "New password",
             labelId: "new-password",
+            name: "new-wifi-password",
+            autoComplete: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
@@ -86,6 +90,8 @@ export default function ChangeWifiPassword() {
           {
             label: "Confirm new password",
             labelId: "confirm-new-password",
+            name: "new-wifi-password",
+            autoComplete: "new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,

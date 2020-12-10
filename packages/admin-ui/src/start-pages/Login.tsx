@@ -74,6 +74,7 @@ export function Login({
             label: "Username",
             labelId: "username",
             name: "username",
+            autoComplete: "username",
             autoFocus: true,
             value: username,
             onValueChange: setUsername
@@ -82,6 +83,7 @@ export function Login({
             label: "Password",
             labelId: "password",
             name: "current-password",
+            autoComplete: "current-password",
             secret: true,
             value: password,
             onValueChange: setPassword

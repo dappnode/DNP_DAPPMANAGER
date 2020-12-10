@@ -50,6 +50,7 @@ export function ResetPassword({
           {
             label: "Recovery token",
             labelId: "recovery-token",
+            name: "recovery-token",
             autoFocus: true,
             secret: true,
             value: token,

@@ -60,6 +60,8 @@ export default function ChangeHostPassword({
           {
             label: "New password",
             labelId: "new-password",
+            name: "new-host-password",
+            autoComplete: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
@@ -68,6 +70,8 @@ export default function ChangeHostPassword({
           {
             label: "Confirm new password",
             labelId: "confirm-new-password",
+            name: "new-host-password",
+            autoComplete: "new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,

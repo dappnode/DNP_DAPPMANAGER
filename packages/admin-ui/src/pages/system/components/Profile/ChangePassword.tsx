@@ -50,6 +50,7 @@ export function ChangePassword() {
             label: "Current password",
             labelId: "current-password",
             name: "current-password",
+            autoComplete: "current-password",
             secret: true,
             value: oldPassword,
             onValueChange: setOldPassword
@@ -58,6 +59,7 @@ export function ChangePassword() {
             label: "New password",
             labelId: "new-password",
             name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: newPassword,
             onValueChange: setNewPassword,
@@ -67,6 +69,7 @@ export function ChangePassword() {
             label: "Confirm new password",
             labelId: "confirm-new-password",
             name: "new-password",
+            autoComplete: "new-password",
             secret: true,
             value: newPassword2,
             onValueChange: setNewPassword2,
