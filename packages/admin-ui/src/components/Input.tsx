@@ -12,9 +12,10 @@ export interface InputProps {
   className?: string;
   type?: string;
   placeholder?: string;
-  error?: string;
   required?: boolean;
   autoFocus?: boolean;
+  name?: string;
+  autoComplete?: string;
 }
 
 const Input: React.FC<InputProps & FormControlProps> = ({

@@ -80,6 +80,7 @@ export function Register({
           {
             label: "Username",
             labelId: "username",
+            name: "username",
             autoFocus: true,
             value: username,
             onValueChange: setUsername
@@ -87,6 +88,7 @@ export function Register({
           {
             label: "New password",
             labelId: "new-password",
+            name: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
@@ -95,6 +97,7 @@ export function Register({
           {
             label: "Confirm new password",
             labelId: "confirm-new-password",
+            name: "new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,

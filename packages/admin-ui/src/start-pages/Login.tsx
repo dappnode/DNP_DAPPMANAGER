@@ -73,6 +73,7 @@ export function Login({
           {
             label: "Username",
             labelId: "username",
+            name: "username",
             autoFocus: true,
             value: username,
             onValueChange: setUsername
@@ -80,6 +81,7 @@ export function Login({
           {
             label: "Password",
             labelId: "password",
+            name: "current-password",
             secret: true,
             value: password,
             onValueChange: setPassword
