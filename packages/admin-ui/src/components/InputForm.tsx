@@ -30,7 +30,7 @@ export const InputForm: React.FC<InputFormProps> = ({
         ({ labelId, label, secret, value, onValueChange, error }, i) => {
           const InputComponent = secret ? InputSecret : Input;
           return (
-            <Form.Group controlId={labelId}>
+            <Form.Group key={labelId} controlId={labelId}>
               <Form.Label>{label}</Form.Label>
               <InputComponent
                 value={value}
