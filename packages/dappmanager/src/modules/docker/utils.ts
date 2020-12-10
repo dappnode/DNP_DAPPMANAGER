@@ -32,6 +32,7 @@ import { PackageContainer } from "../../types";
  * is the header
  */
 export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
+  // Running strip-ansi for each line is 20-25 times slower than all at once.
   return stripAnsi(
     logs
       .split("\n")
