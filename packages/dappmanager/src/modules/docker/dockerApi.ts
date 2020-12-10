@@ -1,6 +1,6 @@
 import Docker from "dockerode";
 import memoize from "memoizee";
-import { stripDockerApiLogsHeader } from "./utils";
+import { stripDockerApiLogsHeaderAndAnsi } from "./utils";
 
 const dockerApi = new Docker({ socketPath: "/var/run/docker.sock" });
 
@@ -264,7 +264,7 @@ export async function logContainer(
   const data: string = (res as any) || "";
 
   // Remove prepended bytes added to each line by the docker API
-  return stripDockerApiLogsHeader(data);
+  return stripDockerApiLogsHeaderAndAnsi(data.toString());
 }
 
 /**

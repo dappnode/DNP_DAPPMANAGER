@@ -1,3 +1,4 @@
+import stripAnsi from "strip-ansi";
 import { PackageContainer } from "../../types";
 
 /**
@@ -30,11 +31,14 @@ import { PackageContainer } from "../../types";
  *
  * is the header
  */
-export function stripDockerApiLogsHeader(logs: string): string {
-  return logs
-    .split("\n")
-    .map(stripDockerApiLogHeader)
-    .join("\n");
+export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
+  // Running strip-ansi for each line is 20-25 times slower than all at once.
+  return stripAnsi(
+    logs
+      .split("\n")
+      .map(line => stripDockerApiLogHeader(line))
+      .join("\n")
+  );
 }
 
 function stripDockerApiLogHeader(line: string): string {
