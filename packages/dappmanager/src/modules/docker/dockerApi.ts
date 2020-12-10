@@ -261,10 +261,10 @@ export async function logContainer(
   const res = await container.logs({ stdout: true, stderr: true, ...options });
   // Return is incorrectly typed as NodeJS.ReadableStream, but it's string
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const data: string = (res as any) || "";
+  //const data: string = (res as any) || "";
 
   // Remove prepended bytes added to each line by the docker API
-  return stripDockerApiLogsHeader(data);
+  return stripDockerApiLogsHeader(res.toString());
 }
 
 /**
