@@ -72,7 +72,7 @@ export const autoUpdateIds = {
 };
 
 // VPN
-export const superAdminId = "dappnode_admin";
+export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Support, where to send issues
 const githubRepoSlugToReport = "dappnode/DAppNode";
