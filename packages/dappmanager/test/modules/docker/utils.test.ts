@@ -18,11 +18,11 @@ describe("docker API > utils", () => {
 \u0001\u0000\u0000\u0000\u0000\u0000\u00003\u001b[32minfo\u001b[39m Webserver on 80, /usr/src/app/dist`;
 
     const logSampleCleanExpected = `
-\u001b[32minfo\u001b[39m Starting cache DB cacheDbPath: \"/usr/src/app/data/cachedb.json\"\n
-\u001b[32minfo\u001b[39m IPFS HTTP API httpApiUrl: \"http://ipfs.dappnode:5001/api/v0\"
-\u001b[32minfo\u001b[39m IPFS Cluster HTTP API clusterApiUrl: \"http://ipfs-cluster.dappnode:9094\"
-\u001b[32minfo\u001b[39m Web3 connected (ethers 4.0.39): http://fullnode.dappnode:8545
-\u001b[32minfo\u001b[39m Webserver on 80, /usr/src/app/dist`;
+info Starting cache DB cacheDbPath: "/usr/src/app/data/cachedb.json"\n
+info IPFS HTTP API httpApiUrl: "http://ipfs.dappnode:5001/api/v0"
+info IPFS Cluster HTTP API clusterApiUrl: "http://ipfs-cluster.dappnode:9094"
+info Web3 connected (ethers 4.0.39): http://fullnode.dappnode:8545
+info Webserver on 80, /usr/src/app/dist`;
 
     it("Should strip header from logs with header", () => {
       const logSampleClean = stripDockerApiLogsHeader(logSample);

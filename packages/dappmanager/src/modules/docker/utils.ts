@@ -1,5 +1,4 @@
 import stripAnsi from "strip-ansi";
-import hasAnsi from "has-ansi";
 import { PackageContainer } from "../../types";
 
 /**
@@ -35,8 +34,7 @@ import { PackageContainer } from "../../types";
 export function stripDockerApiLogsHeader(logs: string): string {
   return logs
     .split("\n")
-    .map(line => (hasAnsi(line) ? stripAnsi(line) : line))
-    .map(line => stripDockerApiLogHeader(line))
+    .map(line => stripAnsi(stripDockerApiLogHeader(line)))
     .join("\n");
 }
 
