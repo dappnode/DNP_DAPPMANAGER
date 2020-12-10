@@ -22,7 +22,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   childrenBefore
 }) => {
   return (
-    <Form className="input-form">
+    <Form className="input-form" onSubmit={e => e.preventDefault()}>
       {childrenBefore}
 
       {fields.map(({ labelId, label, secret, error, ...props }) => {
