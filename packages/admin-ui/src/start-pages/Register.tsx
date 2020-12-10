@@ -78,19 +78,22 @@ export function Register({
       <InputForm
         fields={[
           {
-            title: "Username",
+            label: "Username",
+            labelId: "username",
             value: username,
             onValueChange: setUsername
           },
           {
-            title: "New password",
+            label: "New password",
+            labelId: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
             error: passwordError
           },
           {
-            title: "Confirm new password",
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,

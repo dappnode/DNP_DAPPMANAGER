@@ -48,7 +48,8 @@ export function ResetPassword({
       <InputForm
         fields={[
           {
-            title: "Recovery token",
+            label: "Recovery token",
+            labelId: "recovery-token",
             secret: true,
             value: token,
             onValueChange: setToken

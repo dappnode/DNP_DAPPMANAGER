@@ -1,24 +1,25 @@
 import React from "react";
-import "./input.css";
+import InputGroup from "react-bootstrap/esm/InputGroup";
+import FormControl, { FormControlProps } from "react-bootstrap/esm/FormControl";
 
 export interface InputProps {
   onEnterPress?: () => void;
   onValueChange: (value: string) => void;
   value: string | number;
   lock?: boolean;
-  isInvalid?: boolean;
   prepend?: string | React.ReactElement;
   append?: string | React.ReactElement;
   className?: string;
   type?: string;
+  placeholder?: string;
+  error?: string;
 }
 
-const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
+const Input: React.FC<InputProps & FormControlProps> = ({
   value,
   onValueChange,
   onEnterPress,
   lock,
-  isInvalid,
   prepend,
   append,
   className,
@@ -29,78 +30,71 @@ const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
    * Construct the basic input element
    */
   const input = (
-    <input
+    <FormControl
       type={type || "text"}
-      className={`form-control ${className} ${isInvalid ? "is-invalid" : ""}`}
-      onChange={e => onValueChange(e.target.value)}
-      onKeyPress={e => {
+      onChange={e => {
+        onValueChange(e.target.value);
+      }}
+      onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
         const key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
         if (key === 13 && onEnterPress) onEnterPress();
       }}
       value={value}
-      // Lock props
       readOnly={lock}
       {...props}
     />
   );
 
-  /**
-   * Add the `append` and `prepend` components
-   */
-  let inputWithPreAndAppend;
-
   if (prepend && append)
-    inputWithPreAndAppend = (
-      <div className="input-group">
-        <div className="input-group-prepend">
-          {typeof prepend === "string" ? (
-            <span className="input-group-text">{prepend}</span>
-          ) : (
-            prepend
-          )}
-        </div>
+    return (
+      <InputGroup>
+        <InputPrepend>{prepend}</InputPrepend>
         {input}
-        <div className="input-group-append">
-          {typeof append === "string" ? (
-            <span className="input-group-text">{append}</span>
-          ) : (
-            append
-          )}
-        </div>
-      </div>
+        <InputAppend>{append}</InputAppend>
+      </InputGroup>
     );
-  else if (prepend)
-    inputWithPreAndAppend = (
-      <div className="input-group">
-        <div className="input-group-prepend">
-          {typeof prepend === "string" ? (
-            <span className="input-group-text">{prepend}</span>
-          ) : (
-            prepend
-          )}
-        </div>
-        {input}
-      </div>
-    );
-  else if (append)
-    inputWithPreAndAppend = (
-      <div className="input-group">
-        {input}
-        <div className="input-group-append">
-          {typeof append === "string" ? (
-            <span className="input-group-text">{append}</span>
-          ) : (
-            append
-          )}
-        </div>
-      </div>
-    );
-  else inputWithPreAndAppend = input;
 
-  /**
-   * Return the final component
-   */
-  return inputWithPreAndAppend;
+  if (prepend)
+    return (
+      <InputGroup>
+        <InputPrepend>{prepend}</InputPrepend>
+        {input}
+      </InputGroup>
+    );
+
+  if (append)
+    return (
+      <InputGroup>
+        {input}
+        <InputAppend>{append}</InputAppend>
+      </InputGroup>
+    );
+
+  return input;
 };
+
+/**
+ * If children is plain text wrapper it with InputGroupText
+ * Otherwise return children as-is. Use React.Fragment due to Typescript
+ */
+const InputPrepend: React.FC = ({ children }) => (
+  <InputGroup.Prepend>
+    {typeof children === "string" ? (
+      <InputGroup.Text>{children}</InputGroup.Text>
+    ) : (
+      children
+    )}
+  </InputGroup.Prepend>
+);
+
+const InputAppend: React.FC = ({ children }) => (
+  <InputGroup.Append>
+    {typeof children === "string" ? (
+      <InputGroup.Text>{children}</InputGroup.Text>
+    ) : (
+      children
+    )}
+  </InputGroup.Append>
+);
 
 export default Input;

@@ -71,12 +71,14 @@ export function Login({
       <InputForm
         fields={[
           {
-            title: "Username",
+            label: "Username",
+            labelId: "username",
             value: username,
             onValueChange: setUsername
           },
           {
-            title: "Password",
+            label: "Password",
+            labelId: "password",
             secret: true,
             value: password,
             onValueChange: setPassword

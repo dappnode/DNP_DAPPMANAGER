@@ -33,14 +33,16 @@ export default function ChangeHostUserPassword() {
       <InputForm
         fields={[
           {
-            title: "New password",
+            label: "New password",
+            labelId: "new-password",
             secret: true,
             value: password,
             onValueChange: setPassword,
             error: passwordError
           },
           {
-            title: "Confirm new password",
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
             secret: true,
             value: password2,
             onValueChange: setPassword2,

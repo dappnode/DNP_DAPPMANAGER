@@ -1,11 +1,13 @@
 import React from "react";
+import Form from "react-bootstrap/esm/Form";
 import Input from "./Input";
 import { InputSecret } from "./InputSecret";
 import "./inputForm.scss";
 
 interface InputFormProps {
   fields: {
-    title: string;
+    labelId: string;
+    label: string;
     secret?: boolean;
     value: string;
     onValueChange: (newValue: string) => void;
@@ -21,25 +23,30 @@ export const InputForm: React.FC<InputFormProps> = ({
   childrenAfter
 }) => {
   return (
-    <div className="input-form">
+    <Form className="input-form">
       {childrenBefore}
 
-      {fields.map(({ title, secret, value, onValueChange, error }, i) => {
-        const InputComponent = secret ? InputSecret : Input;
-        return (
-          <div key={i} className="input-form-field">
-            <div className="title">{title}</div>
-            <InputComponent
-              value={value}
-              onValueChange={onValueChange}
-              isInvalid={Boolean(value && error)}
-            />
-            {value && error && <div className="error-feedback">{error}</div>}
-          </div>
-        );
-      })}
+      {fields.map(
+        ({ labelId, label, secret, value, onValueChange, error }, i) => {
+          const InputComponent = secret ? InputSecret : Input;
+          return (
+            <Form.Group controlId={labelId}>
+              <Form.Label>{label}</Form.Label>
+              <InputComponent
+                value={value}
+                onValueChange={onValueChange}
+                isInvalid={Boolean(value && error)}
+              />
+
+              {value && error && (
+                <Form.Text className="text-danger">{error}</Form.Text>
+              )}
+            </Form.Group>
+          );
+        }
+      )}
 
       {childrenAfter}
-    </div>
+    </Form>
   );
 };

@@ -47,20 +47,23 @@ export function ChangePassword() {
       <InputForm
         fields={[
           {
-            title: "Current password",
+            label: "Current password",
+            labelId: "current-password",
             secret: true,
             value: oldPassword,
             onValueChange: setOldPassword
           },
           {
-            title: "New password",
+            label: "New password",
+            labelId: "new-password",
             secret: true,
             value: newPassword,
             onValueChange: setNewPassword,
             error: passwordError
           },
           {
-            title: "Confirm new password",
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
             secret: true,
             value: newPassword2,
             onValueChange: setNewPassword2,
