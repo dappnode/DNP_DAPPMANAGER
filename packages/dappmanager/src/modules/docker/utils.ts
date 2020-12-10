@@ -32,10 +32,12 @@ import { PackageContainer } from "../../types";
  * is the header
  */
 export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
-  return logs
-    .split("\n")
-    .map(line => stripAnsi(stripDockerApiLogHeader(line)))
-    .join("\n");
+  return stripAnsi(
+    logs
+      .split("\n")
+      .map(line => stripDockerApiLogHeader(line))
+      .join("\n")
+  );
 }
 
 function stripDockerApiLogHeader(line: string): string {
