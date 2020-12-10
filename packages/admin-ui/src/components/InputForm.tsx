@@ -40,7 +40,9 @@ export const InputForm: React.FC<InputFormProps> = ({
             />
 
             {isInvalid && (
-              <Form.Text className="text-danger">{error}</Form.Text>
+              <Form.Text className="text-danger" as="span">
+                {error}
+              </Form.Text>
             )}
           </Form.Group>
         );
