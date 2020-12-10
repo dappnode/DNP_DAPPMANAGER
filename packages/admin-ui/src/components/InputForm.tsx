@@ -1,19 +1,18 @@
 import React from "react";
 import Form from "react-bootstrap/esm/Form";
-import Input from "./Input";
+import Input, { InputProps } from "./Input";
 import { InputSecret } from "./InputSecret";
 import "./inputForm.scss";
 
+interface InputFormFieldProps extends InputProps {
+  labelId: string;
+  label: string;
+  secret?: boolean;
+  error?: string | null;
+}
+
 interface InputFormProps {
-  fields: {
-    labelId: string;
-    label: string;
-    secret?: boolean;
-    value: string;
-    onValueChange: (newValue: string) => void;
-    error?: string | null;
-    autoFocus?: boolean;
-  }[];
+  fields: InputFormFieldProps[];
   childrenBefore?: React.ReactNode;
 }
 
@@ -26,37 +25,26 @@ export const InputForm: React.FC<InputFormProps> = ({
     <Form className="input-form">
       {childrenBefore}
 
-      {fields.map(
-        ({
-          labelId,
-          label,
-          secret,
-          value,
-          onValueChange,
-          error,
-          autoFocus
-        }) => {
-          const InputComponent = secret ? InputSecret : Input;
-          return (
-            <Form.Group key={labelId} controlId={labelId}>
-              <Form.Label>{label}</Form.Label>
-              <InputComponent
-                value={value}
-                onValueChange={onValueChange}
-                isInvalid={Boolean(value && error)}
-                autoFocus={autoFocus}
-                // All consumers of this input form require all fields
-                // Add a prop "optional" if a field it's not required
-                required
-              />
+      {fields.map(({ labelId, label, secret, error, ...props }) => {
+        const InputComponent = secret ? InputSecret : Input;
+        const isInvalid = Boolean(props.value && error);
+        return (
+          <Form.Group key={labelId} controlId={labelId}>
+            <Form.Label>{label}</Form.Label>
+            <InputComponent
+              isInvalid={isInvalid}
+              // All consumers of this input form require all fields
+              // Add a prop "optional" if a field it's not required
+              required
+              {...props}
+            />
 
-              {value && error && (
-                <Form.Text className="text-danger">{error}</Form.Text>
-              )}
-            </Form.Group>
-          );
-        }
-      )}
+            {isInvalid && (
+              <Form.Text className="text-danger">{error}</Form.Text>
+            )}
+          </Form.Group>
+        );
+      })}
 
       {children}
     </Form>
