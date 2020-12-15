@@ -9,7 +9,7 @@ import {
 } from "../types";
 import { joinWithDot, stripDots } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";

@@ -1,7 +1,7 @@
 import { storePrivateKeyFromSeed } from "../utils/seedPhrase";
 import { decrypt } from "../utils/publickeyEncryption";
 import * as db from "../db";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import params from "../params";
 
 const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;

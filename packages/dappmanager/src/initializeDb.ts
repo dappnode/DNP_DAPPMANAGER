@@ -1,5 +1,5 @@
 import * as db from "./db";
-import * as eventBus from "./eventBus";
+import { eventBus } from "./eventBus";
 import * as dyndns from "./modules/dyndns";
 import getDappmanagerImage from "./utils/getDappmanagerImage";
 import getServerName from "./utils/getServerName";

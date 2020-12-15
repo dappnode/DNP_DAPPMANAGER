@@ -4,7 +4,7 @@ import { listPackage } from "../modules/docker/list";
 import { dockerComposeUp } from "../modules/docker/compose";
 import { dockerContainerRemove, dockerContainerStop } from "../modules/docker";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import * as getPath from "../utils/getPath";
 import params from "../params";
 import { logs } from "../logs";

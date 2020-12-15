@@ -1,124 +1,92 @@
 import { EventEmitter } from "events";
 import { logs } from "./logs";
+import { mapValues } from "lodash";
 import {
   ChainData,
+  InstalledPackageData,
   ProgressLog,
   UserActionLog,
   PackageNotification,
-  DirectoryItem,
-  InstalledPackageData
+  DirectoryItem
 } from "./types";
 
-/** HOW TO:
- * - ON:
- * eventBus.on(eventBusTag.logUi, (data) => {
- *   doStuff(data);
- * });
- *
- * - EMIT:
- * eventBus.emit(eventBusTag.logUi, data);
- */
-class MyEmitter extends EventEmitter {}
-
-const eventBus = new MyEmitter();
-
-/**
- * Offer a default mechanism to run listeners within a try/catch block
- */
-
-function eventBusOnSafe<T>(
-  eventName: string,
-  listener: (arg: T) => void
-): void {
-  eventBus.on(eventName, (arg: T) => {
-    try {
-      listener(arg);
-    } catch (e) {
-      logs.error("Error on event", eventName, e);
-    }
-  });
+interface EventTypes {
+  chainData: ChainData[];
+  directory: DirectoryItem[];
+  logUi: ProgressLog;
+  logUserAction: UserActionLog;
+  notification: PackageNotification;
+  packages: InstalledPackageData[];
+  packagesModified: { dnpNames: string[]; removed?: boolean };
+  // Events without arguments
+  initializedDb: void;
+  requestAutoUpdateData: void;
+  requestChainData: void;
+  requestDevices: void;
+  requestPackages: void;
+  requestSystemInfo: void;
+  runEthClientInstaller: void;
+  runNatRenewal: void;
 }
 
-function eventBusOnSafeAsync<T>(
-  eventName: string,
-  listener: (arg: T) => void
-): void {
-  eventBus.on(eventName, async (arg: T) => {
-    try {
-      await listener(arg);
-    } catch (e) {
-      logs.error("Error on event", eventName, e);
-    }
-  });
-}
+const eventBusData: { [P in keyof EventTypes]: {} } = {
+  chainData: {},
+  directory: {},
+  logUi: {},
+  logUserAction: {},
+  notification: {},
+  packages: {},
+  packagesModified: {},
+  // Events without arguments
+  initializedDb: {},
+  requestAutoUpdateData: {},
+  requestChainData: {},
+  requestDevices: {},
+  requestPackages: {},
+  requestSystemInfo: {},
+  runEthClientInstaller: {},
+  runNatRenewal: {}
+};
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const busFactoryNoArgAsync = (event: string) => ({
-  on: (listener: () => Promise<void>): void =>
-    eventBusOnSafeAsync(event, listener),
-  emit: (): void => {
-    eventBus.emit(event);
+const eventEmitter = new EventEmitter();
+
+type GetEventBus<T> = {
+  [P in keyof T]: {
+    on: (
+      listener: T[P] extends void
+        ? () => void | Promise<void>
+        : (arg: T[P]) => void | Promise<void>
+    ) => void;
+    emit: T[P] extends void ? () => void : (arg: T[P]) => void;
+  };
+};
+
+export type EventBus = GetEventBus<EventTypes>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type EventArg = any;
+
+export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
+  on: (listener: (...args: EventArg[]) => void | Promise<void>): void => {
+    eventEmitter.on(eventName, async (...args: EventArg[]) => {
+      /**
+       * Always run listeners within a try/catch block
+       * Note: This syntax captures errors for sync and async listeners
+       * Note: Error parsing `e.stack || e.message || e` is necessary
+       * because there has been instances where the error captured
+       * didn't had the stack property
+       */
+      try {
+        await listener(...args);
+      } catch (e) {
+        logs.error(
+          `Error on event '${eventName}': ${e.stack || e.message || e}`
+        );
+      }
+    });
+  },
+
+  emit: (...args: EventArg[]): void => {
+    eventEmitter.emit(eventName, ...args);
   }
-});
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const busFactoryNoArg = (event: string) => ({
-  on: (listener: () => void): void => eventBusOnSafe(event, listener),
-  emit: (): void => {
-    eventBus.emit(event);
-  }
-});
-// const busFactoryAsync = <T>(event: string) => ({
-//   on: (listener: (arg: T) => Promise<void>) =>
-//     eventBusOnSafeAsync<T>(event, listener),
-//   emit: (arg: T): void => {
-//     eventBus.emit(event, arg);
-//   }
-// });
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const busFactory = <T>(event: string) => ({
-  on: (listener: (arg: T) => void): void => eventBusOnSafe<T>(event, listener),
-  emit: (arg: T): void => {
-    eventBus.emit(event, arg);
-  }
-});
-
-//   call: "INTERNAL_CALL",
-
-type PackageModifiedType = { dnpNames: string[]; removed?: boolean };
-export const packagesModified = busFactory<PackageModifiedType>(
-  "PACKAGE_MODIFIED"
-);
-export const directory = busFactory<DirectoryItem[]>("DIRECTORY");
-export const packages = busFactory<InstalledPackageData[]>("PACKAGES");
-export const logUi = busFactory<ProgressLog>("LOGUI");
-export const logUserAction = busFactory<UserActionLog>("LOG_USER_ACTION");
-export const notification = busFactory<PackageNotification>("NOTIFICATION");
-
-// Requests (without argument)
-export const requestAutoUpdateData = busFactoryNoArgAsync(
-  "REQUEST_AUTO_UPDATE_DATA"
-);
-export const requestDevices = busFactoryNoArgAsync("REQUEST_DEVICES");
-export const requestPackages = busFactoryNoArgAsync("REQUEST_PACKAGES");
-export const requestSystemInfo = busFactoryNoArgAsync("REQUEST_SYSTEM_INFO");
-export const runNatRenewal = busFactoryNoArg("RUN_NAT_RENEWAL");
-export const initializedDb = busFactoryNoArg("INITIALIZED_DB");
-export const runEthClientInstaller = busFactoryNoArg(
-  "RUN_ETH_MULTI_CLIENT_WATCHER"
-);
-
-export interface EventBus {
-  packagesModified: typeof packagesModified;
-  directory: typeof directory;
-  packages: typeof packages;
-  logUi: typeof logUi;
-  logUserAction: typeof logUserAction;
-  notification: typeof notification;
-  requestAutoUpdateData: typeof requestAutoUpdateData;
-  requestDevices: typeof requestDevices;
-  requestPackages: typeof requestPackages;
-  requestSystemInfo: typeof requestSystemInfo;
-  runNatRenewal: typeof runNatRenewal;
-  initializedDb: typeof initializedDb;
-  runEthClientInstaller: typeof runEthClientInstaller;
-}
+}));

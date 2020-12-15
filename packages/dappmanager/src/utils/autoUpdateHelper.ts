@@ -1,6 +1,6 @@
 import * as db from "../db";
 import params from "../params";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { pick, omit } from "lodash";
 import { areCoreVersionIdsIncluded } from "./coreVersionId";
 import {

@@ -1,4 +1,4 @@
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { listPackage } from "../modules/docker/list";
 import { restartPackage } from "../modules/docker/restartPackage";
 import { getDockerTimeoutMax } from "../modules/docker/utils";

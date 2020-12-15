@@ -1,5 +1,5 @@
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 /**
  * Removes a docker volume by name

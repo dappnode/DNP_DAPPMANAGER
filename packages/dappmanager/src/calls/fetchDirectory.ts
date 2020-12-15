@@ -1,4 +1,4 @@
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
 import { logs } from "../logs";

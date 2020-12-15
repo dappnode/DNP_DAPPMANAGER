@@ -1,7 +1,7 @@
 import { AbortSignal } from "abort-controller";
 import shellExec from "../../utils/shell";
 import params from "../../params";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runAtMostEvery } from "../../utils/asyncFlows";
 
