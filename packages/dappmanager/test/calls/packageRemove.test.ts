@@ -54,7 +54,7 @@ describe("Call function: packageRemove", function() {
         mock(() => import("../../src/eventBus"))
           .with(eventBus)
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/listContainers"))
+        mock(() => import("../../src/modules/docker/list"))
           .with({ listPackage })
           .toBeUsed();
       }

@@ -1,5 +1,5 @@
 import { omit } from "lodash";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import { readManifestIfExists } from "../modules/manifest";
 import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";

@@ -1,4 +1,4 @@
-import { listContainers } from "../../modules/docker/listContainers";
+import { listContainers } from "../../modules/docker/list";
 // Default ports to open in case getPortsToOpen throws
 import defaultPortsToOpen from "./defaultPortsToOpen";
 import { PackagePort, PortProtocol } from "../../types";

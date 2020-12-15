@@ -2,7 +2,7 @@ import * as eventBus from "../eventBus";
 import { getDirectory } from "../modules/directory";
 import { DirectoryItem } from "../types";
 import { logs } from "../logs";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { throttle } from "lodash";

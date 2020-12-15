@@ -1,6 +1,6 @@
 import { ChainData } from "../../types";
 import { logs } from "../../logs";
-import { listPackages } from "../docker/listContainers";
+import { listPackages } from "../docker/list";
 import { parseChainErrors } from "./utils";
 import { runWithChainDriver } from "./drivers";
 import { getChainDriverName } from "./getChainDriverName";

@@ -7,7 +7,7 @@ import path from "path";
 import shell from "../../src/utils/shell";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../testUtils";
-import { listContainer } from "../../src/modules/docker/listContainers";
+import { listContainer } from "../../src/modules/docker/list";
 import {
   dockerList,
   containerInspect

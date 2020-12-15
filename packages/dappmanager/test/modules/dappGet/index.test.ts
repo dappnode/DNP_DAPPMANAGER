@@ -79,7 +79,7 @@ describe("dappGet", function() {
         mock(() => import("../../../src/modules/dappGet/resolve"))
           .withDefault(resolve)
           .toBeUsed();
-        mock(() => import("../../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/list"))
           .with({ listPackages })
           .toBeUsed();
       }

@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { listPackage } from "../../modules/docker/listContainers";
+import { listPackage } from "../../modules/docker/list";
 import { readManifestIfExists } from "../../modules/manifest";
 import { wrapHandler } from "../utils";
 

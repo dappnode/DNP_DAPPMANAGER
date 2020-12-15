@@ -8,7 +8,7 @@ import {
 } from "../modules/docker/dockerCommands";
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 import { logs } from "../logs";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
 

@@ -1,7 +1,7 @@
 import {
   listContainers,
   listContainerNoThrow
-} from "../../modules/docker/listContainers";
+} from "../../modules/docker/list";
 import { PackageContainer } from "../../types";
 import { wrapHandler } from "../utils";
 
