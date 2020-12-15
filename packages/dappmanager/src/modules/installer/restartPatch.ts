@@ -10,7 +10,7 @@ import { logs } from "../../logs";
 import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
 import { containerInspect, logContainer } from "../docker/api";
-import { dockerRm } from "../docker/dockerCommands";
+import { dockerRm } from "../docker/cli";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";
 import { postInstallClean } from "./postInstallClean";

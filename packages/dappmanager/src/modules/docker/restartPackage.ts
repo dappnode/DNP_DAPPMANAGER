@@ -2,7 +2,7 @@ import fs from "fs";
 import params from "../../params";
 import * as getPath from "../../utils/getPath";
 import { restartDappmanagerPatch } from "../installer/restartPatch";
-import { dockerComposeUp } from "./dockerCommands";
+import { dockerComposeUp } from "./compose";
 
 /**
  * Calls docker rm and docker up on a package

@@ -53,7 +53,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileToImport = await rewiremock.around(
       () => import("../../src/calls/copyFileTo"),
       mock => {
-        mock(() => import("../../src/modules/docker/dockerCommands"))
+        mock(() => import("../../src/modules/docker/cli"))
           .with({ dockerCopyFileTo, dockerGetContainerWorkingDir })
           .toBeUsed();
       }
@@ -61,7 +61,7 @@ describe("Call function: copyFileTo and copyFileFrom", () => {
     const copyFileFromImport = await rewiremock.around(
       () => import("../../src/calls/copyFileFrom"),
       mock => {
-        mock(() => import("../../src/modules/docker/dockerCommands"))
+        mock(() => import("../../src/modules/docker/cli"))
           .with({ dockerCopyFileFrom, dockerGetContainerWorkingDir })
           .toBeUsed();
       }

@@ -1,6 +1,6 @@
 import fs from "fs";
 import params from "../../params";
-import { dockerComposeRm, dockerComposeUp } from "../docker/dockerCommands";
+import { dockerComposeRm, dockerComposeUp } from "../docker/compose";
 import { Log } from "../../utils/logUi";
 import { InstallPackageDataPaths } from "../../types";
 import { logs } from "../../logs";

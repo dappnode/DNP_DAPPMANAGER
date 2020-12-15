@@ -1,11 +1,8 @@
 import fs from "fs";
 import { uniq } from "lodash";
 import { listPackage } from "../modules/docker/list";
-import {
-  dockerComposeUp,
-  dockerRm,
-  dockerStop
-} from "../modules/docker/dockerCommands";
+import { dockerComposeUp } from "../modules/docker/compose";
+import { dockerRm, dockerStop } from "../modules/docker/cli";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
 import * as eventBus from "../eventBus";
 import * as getPath from "../utils/getPath";

@@ -3,7 +3,7 @@ import * as db from "../../db";
 import { changeEthMultiClient } from "./changeEthMultiClient";
 import { listContainerNoThrow } from "../docker/list";
 import { dockerVolumesList, dockerDf } from "../docker/api";
-import { dockerRm, dockerVolumeRm } from "../docker/dockerCommands";
+import { dockerRm, dockerVolumeRm } from "../docker/cli";
 import { ComposeFileEditor } from "../compose/editor";
 import { migrateVolume } from "../hostScripts";
 import * as getPath from "../../utils/getPath";

@@ -1,11 +1,10 @@
 import fs from "fs";
 import { dockerVolumesList } from "../docker/api";
 import { listPackages } from "../docker/list";
-import { dockerRm } from "../docker/dockerCommands";
+import { dockerRm, dockerVolumeRm } from "../docker/cli";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
 import * as getPath from "../../utils/getPath";
-import { dockerVolumeRm } from "../docker/dockerCommands";
 import { migrateLegacyEnvFiles } from "./migrateLegacyEnvFiles";
 
 const volumesToRemove = [
