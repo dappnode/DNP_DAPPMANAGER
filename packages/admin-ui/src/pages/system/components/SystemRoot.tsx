@@ -19,6 +19,7 @@ import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import Title from "components/Title";
+import Notifications from "./Notifications";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -78,6 +79,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Power",
       subPath: subPaths.power,
       component: PowerManagment
+    },
+    {
+      name: "Notifications",
+      subPath: subPaths.notifications,
+      component: Notifications
     }
   ];
 

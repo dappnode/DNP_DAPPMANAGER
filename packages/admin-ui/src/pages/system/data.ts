@@ -17,7 +17,8 @@ export const subPaths = {
   // Must be "add-ipfs-peer" for backwards compatibility with the previous IFPS peer links
   peers: "add-ipfs-peer",
   power: "power",
-  profile: "profile"
+  profile: "profile",
+  notifications: "notifications"
 };
 
 // Computed paths

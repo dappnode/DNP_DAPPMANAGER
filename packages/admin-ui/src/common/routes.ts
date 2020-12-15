@@ -429,6 +429,20 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
+   * Sets telegram config (token and status)
+   */
+  setTelegramConfig: (kwargs: {
+    telegramToken: string;
+    telegramStatus: boolean;
+    telegramChannelId?: string | number | null;
+  }) => Promise<void>;
+
+  /**
+   * Gets bot telegram status
+   */
+  getTelegramStatus: () => Promise<boolean>;
+
+  /**
    * Returns the current DAppNode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
@@ -487,6 +501,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsDiskGet: {},
   statsMemoryGet: {},
   getUserActionLogs: {},
+  getTelegramStatus: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -507,6 +522,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
+  setTelegramConfig: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   systemInfoGet: {},
