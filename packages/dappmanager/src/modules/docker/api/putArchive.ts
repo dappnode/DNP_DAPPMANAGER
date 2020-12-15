@@ -7,20 +7,15 @@ import tar from "tar-stream";
  * a 404 error will be returned
  *
  * @param containerNameOrId "DAppNodePackage-geth.dnp.dappnode.eth"
- * @param path "bin/gzip"
+ * @param rootTarPath Path at which the tar should be dumped. Paths inside the tar are relative
+ * to this path. It must exist before putArchive
+ * @param file The input stream must be a tar archive compressed with one of the
+ * following algorithms: identity (no compression), gzip, bzip2, xz.
+ * - If typeof file === "string", uses fs.createReadableStream(file)
  */
 export async function dockerPutArchive(
   containerNameOrId: string,
-  /**
-   * Path at which the tar should be dumped. Paths inside the tar are relative
-   * to this path. It must exist before putArchive
-   */
   rootTarPath: string,
-  /**
-   * The input stream must be a tar archive compressed with one of the
-   * following algorithms: identity (no compression), gzip, bzip2, xz.
-   * - If typeof file === "string", uses fs.createReadableStream(file)
-   */
   file: Buffer | NodeJS.ReadableStream,
   options?: DockerPutArchiveOptions
 ): Promise<void> {

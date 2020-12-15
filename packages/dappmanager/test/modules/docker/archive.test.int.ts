@@ -1,18 +1,16 @@
+import { expect } from "chai";
 import { docker } from "../../../src/modules/docker/api/docker";
-import {
-  dockerPutArchive,
-  dockerPutArchiveSingleFile
-} from "../../../src/modules/docker/api/putArchive";
+import { dockerGetArchiveSingleFile } from "../../../src/modules/docker/api/getArchive";
+import { dockerPutArchiveSingleFile } from "../../../src/modules/docker/api/putArchive";
 
 describe("docker / archive put, get", function() {
   const containerName = "DAppNodeTest-file-transfer";
-  const filePath = "sample.json";
+  const filePath = "/a/b/c/sample.json";
   const fileContent = JSON.stringify(
     { sampleConfig: true, someValue: 22 },
     null,
     2
   );
-  const fileContentBuffer = Buffer.from(fileContent);
 
   async function removeContainer(): Promise<void> {
     const container = docker.getContainer(containerName);
@@ -45,11 +43,21 @@ describe("docker / archive put, get", function() {
     await container.start();
   });
 
-  it("Should put a file", async () => {
+  it("Should put and get a file", async () => {
     await dockerPutArchiveSingleFile(
       containerName,
       filePath,
-      fileContentBuffer
+      Buffer.from(fileContent)
+    );
+
+    const returnedFileBuffer = await dockerGetArchiveSingleFile(
+      containerName,
+      filePath
+    );
+    const returnedFileContent = returnedFileBuffer.toString("utf8");
+    expect(returnedFileContent).to.equal(
+      fileContent,
+      "returned file does not match put file"
     );
   });
 });
