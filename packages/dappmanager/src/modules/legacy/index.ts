@@ -1,7 +1,7 @@
 import fs from "fs";
 import { dockerVolumesList } from "../docker/api";
 import { listPackages } from "../docker/list";
-import { dockerRm, dockerVolumeRemove } from "../docker";
+import { dockerContainerRemove, dockerVolumeRemove } from "../docker";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
 import * as getPath from "../../utils/getPath";
@@ -57,14 +57,17 @@ export async function runLegacyActions(): Promise<void> {
     const dnp = dnpList.find(d => d.dnpName === dnpName);
     if (dnp)
       try {
+        // Remove / uninstall DNP
         for (const container of dnp.containers)
-          await dockerRm(container.containerName); // Remove / uninstall DNP
+          await dockerContainerRemove(container.containerName);
+
         // Clean manifest and docker-compose
         for (const filepath of [
           getPath.dockerCompose(dnpName, true),
           getPath.manifest(dnpName, true)
         ])
           if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+
         logs.info(`Removed legacy DNP ${dnpName}`);
       } catch (e) {
         logs.error(`Error removing legacy DNP ${dnpName}`);

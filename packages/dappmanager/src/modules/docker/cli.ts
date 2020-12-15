@@ -1,40 +1,4 @@
-import dargs from "dargs";
 import shell from "../../utils/shell";
-
-type Args = string[];
-type Kwargs = { [flag: string]: string | number | boolean | undefined };
-
-function parseKwargs(kwargs?: Kwargs): string[] {
-  const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
-  return dargs(definedKwargs, { useEquals: false, ignoreFalse: true });
-}
-
-async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
-  return shell(["docker", ...args, ...parseKwargs(kwargs)]);
-}
-
-export function dockerStart(
-  containerNames: string | string[]
-): Promise<string> {
-  const ids = parseContainerIdArg(containerNames);
-  return execDocker(["start", ...ids]);
-}
-
-export function dockerStop(
-  containerNames: string[],
-  options: { time?: number } = {}
-): Promise<string> {
-  const ids = parseContainerIdArg(containerNames);
-  return execDocker(["stop", ...ids], options);
-}
-
-export function dockerRm(
-  containerNames: string | string[],
-  { volumes }: { volumes?: boolean } = {}
-): Promise<string> {
-  const ids = parseContainerIdArg(containerNames);
-  return execDocker(["rm", ...ids], { force: true, volumes });
-}
 
 interface ImageManifest {
   Config: string; // "f949e7d76d63befffc8eec2cbf8a6f509780f96fb3bacbdc24068d594a77f043.json"
@@ -67,8 +31,4 @@ export function dockerCopyFileFrom(
 
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
-}
-
-function parseContainerIdArg(containerNames: string | string[]): string[] {
-  return Array.isArray(containerNames) ? containerNames : [containerNames];
 }

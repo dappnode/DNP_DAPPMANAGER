@@ -2,7 +2,7 @@ import fs from "fs";
 import { uniq } from "lodash";
 import { listPackage } from "../modules/docker/list";
 import { dockerComposeUp } from "../modules/docker/compose";
-import { dockerRm, dockerStop } from "../modules/docker/cli";
+import { dockerContainerRemove, dockerContainerStop } from "../modules/docker";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
 import * as eventBus from "../eventBus";
 import * as getPath from "../utils/getPath";
@@ -56,8 +56,12 @@ export async function packageRestartVolumes({
   let err: Error | null = null;
   try {
     if (containersToRemove.length > 0) {
-      await dockerStop(containersToRemove, { time: timeout });
-      await dockerRm(containersToRemove);
+      await Promise.all(
+        containersToRemove.map(async containerName => {
+          await dockerContainerStop(containerName, { timeout });
+          await dockerContainerRemove(containerName);
+        })
+      );
     }
     for (const volName of volumesToRemove) {
       await removeNamedVolume(volName);

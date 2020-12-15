@@ -9,8 +9,11 @@ import params from "../../params";
 import { logs } from "../../logs";
 import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
-import { dockerContainerInspect, logContainer } from "../docker/api";
-import { dockerRm } from "../docker/cli";
+import {
+  dockerContainerInspect,
+  logContainer,
+  dockerContainerRemove
+} from "../docker/api";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";
 import { postInstallClean } from "./postInstallClean";
@@ -62,7 +65,7 @@ export async function restartDappmanagerPatch({
     // Remove it to make sure that the exit signal after running the restart patch is for this run
     if (restart) {
       await logRestartPatchStatus(restart);
-      await dockerRm(restart.Id);
+      await dockerContainerRemove(restart.Id);
     }
   } catch (e) {
     // Since removing restart is non-essential, don't block a core update, just log
@@ -182,7 +185,7 @@ export async function postRestartPatch(): Promise<void> {
     db.coreUpdatePackagesData.set(null);
 
     // Remove restart patch container
-    await dockerRm(params.restartContainerName);
+    await dockerContainerRemove(params.restartContainerName);
   } else {
     logs.info(`No restart patch found, assuming a manual restart`);
   }

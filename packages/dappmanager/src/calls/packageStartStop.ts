@@ -1,5 +1,5 @@
 import { listPackage } from "../modules/docker/list";
-import { dockerStart, dockerStop } from "../modules/docker/cli";
+import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
 import * as eventBus from "../eventBus";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
 import params from "../params";
@@ -40,9 +40,19 @@ export async function packageStartStop({
   }
 
   const containerNames = targetContainers.map(c => c.containerName);
-  if (targetContainers.every(container => container.running))
-    await dockerStop(containerNames, { time: timeout });
-  else await dockerStart(containerNames);
+  if (targetContainers.every(container => container.running)) {
+    await Promise.all(
+      containerNames.map(async containerName =>
+        dockerContainerStop(containerName, { timeout })
+      )
+    );
+  } else {
+    await Promise.all(
+      containerNames.map(async containerName =>
+        dockerContainerStart(containerName)
+      )
+    );
+  }
 
   // Emit packages update
   eventBus.requestPackages.emit();

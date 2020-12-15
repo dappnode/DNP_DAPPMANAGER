@@ -34,7 +34,7 @@ describe("Call function: packageRemove", function() {
   };
 
   const dockerComposeDown = sinon.stub().resolves();
-  const dockerRm = sinon.stub().resolves();
+  const dockerContainerRemove = sinon.stub().resolves();
   const listPackage = sinon.stub().resolves(dnp);
 
   const eventBus = {
@@ -51,8 +51,8 @@ describe("Call function: packageRemove", function() {
         mock(() => import("../../src/modules/docker/compose"))
           .with({ dockerComposeDown })
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/cli"))
-          .with({ dockerRm })
+        mock(() => import("../../src/modules/docker"))
+          .with({ dockerContainerRemove })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
           .with(eventBus)
