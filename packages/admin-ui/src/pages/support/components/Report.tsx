@@ -19,7 +19,10 @@ export default function Report() {
   const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diagnose = diagnoseReq.data || [];
-  const hostStats = hostStatsReq.data?.used.toString();
+  const diskUsedPercentage =
+    hostStatsReq.data?.usedPercentage != null
+      ? `${hostStatsReq.data?.usedPercentage}%`
+      : "...";
 
   const versionDatas: { [name: string]: PackageVersionData | undefined } = {
     "dappmanager.dnp.dappnode.eth": versionData,
@@ -34,7 +37,10 @@ export default function Report() {
       version: versionDatas[dnp.dnpName] || dnp.version
     }));
 
-  const systemData = [...diagnose, { name: "Disk usage", result: hostStats }];
+  const systemData = [
+    ...diagnose,
+    { name: "Disk usage", result: diskUsedPercentage }
+  ];
 
   const issueBody = formatIssueBody(coreDnpVersions, systemData);
   const issueUrlWithData = formatIssueUrl(issueBody);
