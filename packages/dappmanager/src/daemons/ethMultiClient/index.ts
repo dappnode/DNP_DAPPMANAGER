@@ -1,10 +1,12 @@
+import merge from "deepmerge";
+import { AbortSignal } from "abort-controller";
 import * as db from "../../db";
 import * as eventBus from "../../eventBus";
-import { ethClientData } from "../../params";
+import params, { ethClientData } from "../../params";
 import { packageInstall } from "../../calls";
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import merge from "deepmerge";
+import { runAtMostEvery } from "../../utils/asyncFlows";
 import {
   EthClientInstallStatus,
   serializeError
@@ -121,43 +123,47 @@ function verifyInitialStatusIsNotInstalling(): void {
 }
 
 /**
- * Eth multi-client watcher. Handles ETH client switching logic
+ * Eth multi-client daemon. Handles ETH client switching logic
  * Must run:
  * - every interval
  * - after changing the client
  * - after completing a run if the status has changed
  */
-export default function runWatcher(): void {
+export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
-  // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(
-    runOnlyOneSequentially(async () => {
-      try {
-        const target = db.ethClientTarget.get();
-        if (!target || target === "remote") return; // Nothing to install
+  const runEthMultiClientTaskMemo = runOnlyOneSequentially(async () => {
+    try {
+      const target = db.ethClientTarget.get();
+      if (!target || target === "remote") return; // Nothing to install
 
-        const prev = db.ethClientInstallStatus.get(target);
-        const next = await runEthClientInstaller(target, prev);
-        if (!next) return; // Package is uninstalled
+      const prev = db.ethClientInstallStatus.get(target);
+      const next = await runEthClientInstaller(target, prev);
+      if (!next) return; // Package is uninstalled
 
-        db.ethClientInstallStatus.set(target, next);
+      db.ethClientInstallStatus.set(target, next);
 
-        if (!prev || prev.status !== next.status) {
-          // Next run MUST be defered to next event loop for prevStatus to refresh
-          setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+      if (!prev || prev.status !== next.status) {
+        // Next run MUST be defered to next event loop for prevStatus to refresh
+        setTimeout(eventBus.runEthClientInstaller.emit, 1000);
 
-          if (next.status === "INSTALLED") {
-            // If status switched to "INSTALLED", map to fullnode.dappnode
-            // Must be done here in case the package is already installed
-            db.fullnodeDomainTarget.set(ethClientData[target].dnpName);
-          }
+        if (next.status === "INSTALLED") {
+          // If status switched to "INSTALLED", map to fullnode.dappnode
+          // Must be done here in case the package is already installed
+          db.fullnodeDomainTarget.set(ethClientData[target].dnpName);
         }
-      } catch (e) {
-        logs.error("Error on eth client installer watcher", e);
       }
-    })
-  );
+    } catch (e) {
+      logs.error("Error on eth client installer daemon", e);
+    }
+  });
 
-  setInterval(eventBus.runEthClientInstaller.emit, 1 * 60 * 1000);
+  // Subscribe with a throttle to run only one time at once
+  eventBus.runEthClientInstaller.on(runEthMultiClientTaskMemo);
+
+  runAtMostEvery(
+    async () => runEthMultiClientTaskMemo(),
+    params.AUTO_UPDATE_DAEMON_INTERVAL,
+    signal
+  );
 }

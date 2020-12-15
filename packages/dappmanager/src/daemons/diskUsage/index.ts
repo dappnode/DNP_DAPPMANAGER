@@ -1,10 +1,9 @@
+import { AbortSignal } from "abort-controller";
 import shellExec from "../../utils/shell";
 import params from "../../params";
 import * as eventBus from "../../eventBus";
 import { logs } from "../../logs";
-
-const monitoringInterval =
-  params.CHECK_DISK_USAGE_WATCHER_INTERVAL || 60 * 1000; // (ms) (1 minute)
+import { runAtMostEvery } from "../../utils/asyncFlows";
 
 /**
  * Commands
@@ -37,8 +36,6 @@ const thresholdIsActive: {
  * Monitors disk usage of this DAppNode
  * If disk usage reaches a critical level (< 1GB)
  * it will stop all non cores + etchain + ipfs
- *
- * @returns
  */
 async function monitorDiskUsage(): Promise<void> {
   try {
@@ -85,7 +82,7 @@ async function monitorDiskUsage(): Promise<void> {
           if (e.message.includes("requires at least 1 argument")) {
             logs.warn(`No containers stopped by the "${cmd}" command`);
           } else {
-            logs.error("Error stopping containers on disk usage watcher", e);
+            logs.error("Error stopping containers on disk usage daemon", e);
           }
         }
 
@@ -124,11 +121,13 @@ async function monitorDiskUsage(): Promise<void> {
 }
 
 /**
- * Disk usage watcher.
+ * Disk usage daemon.
  * Prevents disk usage from getting full by stopping non-essential packages
  */
-export default function runWatcher(): void {
-  setInterval(() => {
-    monitorDiskUsage();
-  }, monitoringInterval);
+export function startDiskUsageDaemon(signal: AbortSignal): void {
+  runAtMostEvery(
+    monitorDiskUsage,
+    params.CHECK_DISK_USAGE_DAEMON_INTERVAL,
+    signal
+  );
 }

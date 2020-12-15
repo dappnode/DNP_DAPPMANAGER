@@ -39,7 +39,7 @@ export async function getChainsData(): Promise<ChainData[]> {
       } catch (e) {
         // Only log chain errors the first time they are seen
         if (loggedErrors.get(dnp.dnpName) !== e.message)
-          logs.debug(`Error on chain ${dnp.dnpName} watcher`, e);
+          logs.debug(`Error getting chain data ${dnp.dnpName}`, e);
         loggedErrors.set(dnp.dnpName, e.message);
 
         chainsData.push({

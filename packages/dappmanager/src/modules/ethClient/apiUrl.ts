@@ -1,4 +1,4 @@
-import { getDotDappnodeDomain } from "../../watchers/nsupdate/utils";
+import { getDotDappnodeDomain } from "../nsupdate";
 
 /**
  * Computes the JSON RPC url of an Eth client package from its name

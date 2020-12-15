@@ -1,3 +1,4 @@
+import { AbortController } from "abort-controller";
 import * as db from "./db";
 import * as eventBus from "./eventBus";
 import initializeDb from "./initializeDb";
@@ -8,8 +9,8 @@ import { migrateEthchain } from "./modules/ethClient";
 import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
+import { startDaemons } from "./daemons";
 import * as calls from "./calls";
-import runWatchers from "./watchers";
 import { routesLogger, subscriptionsLogger } from "./api/logger";
 import * as routes from "./api/routes";
 import { logs } from "./logs";
@@ -21,6 +22,8 @@ import {
   isNewDappmanagerVersion
 } from "./utils/getVersionData";
 import { startDappmanager } from "./startDappmanager";
+
+const controller = new AbortController();
 
 const vpnApiClient = getVpnApiClient(params);
 
@@ -38,8 +41,8 @@ const server = startDappmanager({
   vpnApiClient
 });
 
-// Start watchers
-runWatchers();
+// Start daemons
+startDaemons(controller.signal);
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
@@ -113,6 +116,7 @@ postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 
 // Graceful shutdown
 process.on("SIGINT", () => {
+  controller.abort();
   server.close();
   process.exit(0);
 });

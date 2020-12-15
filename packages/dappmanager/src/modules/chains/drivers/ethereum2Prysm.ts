@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import memoize from "memoizee";
-import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
+import { getDotDappnodeDomain } from "../../nsupdate";
 import { urlJoin } from "../../../utils/url";
 import { getContainerDomain } from "../../../params";
 import { InstalledPackageData } from "../../../types";

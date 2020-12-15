@@ -1,6 +1,6 @@
 const Daemon = require("monero-rpc").Daemon;
 import { InstalledPackageData } from "../../../common";
-import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
+import { getDotDappnodeDomain } from "../../nsupdate";
 import { ChainDataResult } from "../types";
 
 // Monero's average block time is 2 minutes

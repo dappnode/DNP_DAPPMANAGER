@@ -5,11 +5,11 @@ import {
   getMyDotEthdomain,
   getDotDappnodeDomain,
   getNsupdateTxts
-} from "../../../src/watchers/nsupdate/utils";
+} from "../../../src/modules/nsupdate/utils";
 import { mockContainer } from "../../testUtils";
 import { PackageContainer } from "../../../src/types";
 
-describe("watcher > nsupdate", () => {
+describe("modules > nsupdate", () => {
   describe("getMyDotEthdomain", () => {
     const cases: { [name: string]: string } = {
       "bitcoin.dnp.dappnode.eth": "my.bitcoin.dnp.dappnode.eth",
