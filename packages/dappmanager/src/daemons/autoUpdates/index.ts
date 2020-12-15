@@ -1,9 +1,9 @@
+import { AbortSignal } from "abort-controller";
 import params from "../../params";
 import * as eventBus from "../../eventBus";
 import { fetchCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../../modules/release";
 import { EthProviderError } from "../../modules/ethClient";
-// Utils
 import {
   isDnpUpdateEnabled,
   isCoreUpdateEnabled,
@@ -11,12 +11,10 @@ import {
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper";
+import { runAtMostEvery } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-
 import updateMyPackages from "./updateMyPackages";
 import updateSystemPackages from "./updateSystemPackages";
-
-const monitoringInterval = params.AUTO_UPDATE_WATCHER_INTERVAL || 5 * 60 * 1000; // (ms) (5 minutes)
 
 /**
  * Auto-update:
@@ -54,9 +52,6 @@ async function checkAutoUpdates(): Promise<void> {
   } catch (e) {
     logs.error("Error on autoUpdates interval", e);
   }
-
-  // Trigger the interval loop with setTimeouts to prevent double execution
-  setTimeout(checkAutoUpdates, monitoringInterval);
 }
 
 /**
@@ -65,27 +60,24 @@ async function checkAutoUpdates(): Promise<void> {
  * update happen before restarting
  */
 async function checkForCompletedCoreUpdates(): Promise<void> {
-  try {
-    const { versionId } = await fetchCoreUpdateData({});
-    clearCompletedCoreUpdatesIfAny(versionId);
-  } catch (e) {
-    logs.error("Error on clearCompletedCoreUpdatesIfAny", e);
-  }
+  const { versionId } = await fetchCoreUpdateData({});
+  clearCompletedCoreUpdatesIfAny(versionId);
 }
 
 /**
- * Auto updates watcher.
- * If there are new package versions available installs them
+ * Auto updates daemon, run at most every interval
  */
-export default function runWatcher(): void {
-  checkForCompletedCoreUpdates();
-
-  checkAutoUpdates();
-
+export function startAutoUpdatesDaemon(signal: AbortSignal): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
     for (const dnpName of dnpNames) {
       if (removed) clearPendingUpdates(dnpName);
       clearRegistry(dnpName);
     }
   });
+
+  checkForCompletedCoreUpdates().catch(e => {
+    logs.error("Error on checkForCompletedCoreUpdates", e);
+  });
+
+  runAtMostEvery(checkAutoUpdates, params.AUTO_UPDATE_DAEMON_INTERVAL, signal);
 }

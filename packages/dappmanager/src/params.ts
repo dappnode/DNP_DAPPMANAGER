@@ -93,10 +93,10 @@ const params = {
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Watchers
-  AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  CHECK_DISK_USAGE_WATCHER_INTERVAL: 60 * 1000, // 1 minute
-  NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
-  NSUPDATE_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
+  AUTO_UPDATE_DAEMON_INTERVAL: 5 * 60 * 1000, // 5 minutes
+  CHECK_DISK_USAGE_DAEMON_INTERVAL: 60 * 1000, // 1 minute
+  NAT_RENEWAL_DAEMON_INTERVAL: 60 * 60 * 1000, // 1 hour
+  NSUPDATE_DAEMON_INTERVAL: 60 * 60 * 1000, // 1 hour
 
   // IPFS parameters
   IPFS_HOST:
@@ -178,7 +178,7 @@ const params = {
 
 if (devMode) {
   params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
-  params.AUTO_UPDATE_WATCHER_INTERVAL = 1 * 1000; // 1 second
+  params.AUTO_UPDATE_DAEMON_INTERVAL = 1 * 1000; // 1 second
   params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
 }
 

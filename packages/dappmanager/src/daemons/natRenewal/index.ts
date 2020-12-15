@@ -1,3 +1,4 @@
+import { AbortSignal } from "abort-controller";
 import * as upnpc from "../../modules/upnpc";
 import * as eventBus from "../../eventBus";
 import params from "../../params";
@@ -5,15 +6,9 @@ import * as db from "../../db";
 import getPortsToOpen from "./getPortsToOpen";
 import getLocalIp from "../../utils/getLocalIp";
 // Utils
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
+import { runAtMostEvery, runOnlyOneSequentially } from "../../utils/asyncFlows";
 import { PackagePort } from "../../types";
 import { logs } from "../../logs";
-
-const natRenewalInterval =
-  params.NAT_RENEWAL_WATCHER_INTERVAL || 60 * 60 * 1000;
-
-const portId = (port: PackagePort): string =>
-  `${port.portNumber} ${port.protocol}`;
 
 let isFirstRunGlobal = true;
 async function natRenewal(): Promise<void> {
@@ -110,25 +105,32 @@ async function natRenewal(): Promise<void> {
 }
 
 /**
- * runOnlyOneSequentially makes sure that natRenewal is not run twice
- * in parallel. Also, if multiple requests to run natRenewal, they will
- * be ignored and run only once more after the previous natRenewal is
- * completed.
+ * Util to render ports in a consistent way
  */
-
-const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+function portId(port: PackagePort): string {
+  return `${port.portNumber} ${port.protocol}`;
+}
 
 /**
- * NAT renewal watcher.
+ * NAT renewal daemon.
  * Makes sure all necessary ports are mapped using UPNP
  */
-export default function runWatcher(): void {
-  throttledNatRenewal();
-  setInterval(() => {
-    throttledNatRenewal();
-  }, natRenewalInterval);
+export function startNatRenewalDaemon(signal: AbortSignal): void {
+  /**
+   * runOnlyOneSequentially makes sure that natRenewal is not run twice
+   * in parallel. Also, if multiple requests to run natRenewal, they will
+   * be ignored and run only once more after the previous natRenewal is
+   * completed.
+   */
+  const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
 
   eventBus.runNatRenewal.on(() => {
     throttledNatRenewal();
   });
+
+  runAtMostEvery(
+    async () => throttledNatRenewal(),
+    params.NAT_RENEWAL_DAEMON_INTERVAL,
+    signal
+  );
 }

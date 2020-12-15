@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
-import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
+import { getDotDappnodeDomain } from "../../nsupdate";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 

@@ -15,7 +15,7 @@ import { exec } from "child_process";
  * show
  * send
  */
-export default function execNsupdate(nsupdateTxt: string): Promise<string> {
+export function execNsupdate(nsupdateTxt: string): Promise<string> {
   return new Promise((resolve, reject): void => {
     const child = exec("nsupdate -v", (error, stdout, stderr) => {
       if (error) reject(error);

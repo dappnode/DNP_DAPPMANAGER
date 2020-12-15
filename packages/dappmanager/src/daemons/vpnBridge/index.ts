@@ -1,3 +1,4 @@
+import { AbortSignal } from "abort-controller";
 import { getVpnApiClient } from "../../api/vpnApiClient";
 import * as eventBus from "../../eventBus";
 import * as db from "../../db";
@@ -23,7 +24,7 @@ async function getVersionDataVpn(): Promise<void> {
   }
 }
 
-export default function runVpnBridge(): void {
+export function startVpnBridgeDaemon(signal: AbortSignal): void {
   // Initial fetch on start-up
   getVersionDataVpn();
 

@@ -17,7 +17,7 @@ interface State {
   status: { [target: string]: EthClientInstallStatus };
 }
 
-describe("Watchers > ethMultiClient > runWatcher", () => {
+describe("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     const newTarget: EthClientTarget = "geth";
     const newTargetData = ethClientData[newTarget];
@@ -90,7 +90,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
     // }
 
     const { runEthClientInstaller } = await rewiremock.around(
-      () => import("../../../src/watchers/ethMultiClient"),
+      () => import("../../../src/daemons/ethMultiClient"),
       mock => {
         mock(() => import("../../../src/db"))
           .with(db)

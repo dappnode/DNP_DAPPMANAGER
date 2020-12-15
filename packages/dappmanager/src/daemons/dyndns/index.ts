@@ -1,3 +1,4 @@
+import { AbortSignal } from "abort-controller";
 import * as eventBus from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";
@@ -5,8 +6,7 @@ import updateIp from "../../modules/dyndns/updateIp";
 import lookup from "../../utils/lookup";
 import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls";
 import { logs } from "../../logs";
-
-const dyndnsInterval = params.DYNDNS_INTERVAL || 30 * 60 * 1000; // 30 minutes
+import { runAtMostEvery } from "../../utils/asyncFlows";
 
 /**
  * DynDNS interval check
@@ -89,12 +89,12 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
 }
 
 /**
- * Dyndns watcher.
+ * Dyndns daemon
  */
-export default function runWatcher(): void {
-  setInterval(() => {
+export function startDynDnsDaemon(signal: AbortSignal): void {
+  eventBus.initializedDb.on(() => {
     checkIpAndUpdateIfNecessary();
-  }, dyndnsInterval);
+  });
 
-  eventBus.initializedDb.on(checkIpAndUpdateIfNecessary);
+  runAtMostEvery(checkIpAndUpdateIfNecessary, params.DYNDNS_INTERVAL, signal);
 }

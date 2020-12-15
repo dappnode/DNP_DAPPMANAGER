@@ -1,0 +1,18 @@
+import { AbortSignal } from "abort-controller";
+import { startAutoUpdatesDaemon } from "./autoUpdates";
+import { startDiskUsageDaemon } from "./diskUsage";
+import { startDynDnsDaemon } from "./dyndns";
+import { startEthMultiClientDaemon } from "./ethMultiClient";
+import { startNatRenewalDaemon } from "./natRenewal";
+import { startNsUpdateDaemon } from "./nsupdate";
+import { startVpnBridgeDaemon } from "./vpnBridge";
+
+export function startDaemons(signal: AbortSignal): void {
+  startAutoUpdatesDaemon(signal);
+  startDiskUsageDaemon(signal);
+  startDynDnsDaemon(signal);
+  startEthMultiClientDaemon(signal);
+  startNatRenewalDaemon(signal);
+  startNsUpdateDaemon(signal);
+  startVpnBridgeDaemon(signal);
+}

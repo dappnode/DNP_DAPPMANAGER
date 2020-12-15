@@ -1,7 +1,7 @@
 const Client = require("bitcoin-core");
 import { ChainDataResult } from "../types";
-import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 import { InstalledPackageData } from "../../../types";
+import { getDotDappnodeDomain } from "../../nsupdate";
 import { containerInspect } from "../../docker/api";
 import { parseEnvironment } from "../../compose";
 

@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import defaultPortsToOpen from "../../../src/watchers/natRenewal/defaultPortsToOpen";
+import defaultPortsToOpen from "../../../src/daemons/natRenewal/defaultPortsToOpen";
 import { PackageContainer } from "../../../src/types";
 import rewiremock from "rewiremock";
 // imports for typings
 import { mockContainer } from "../../testUtils";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
 
-describe("Watchers > natRenewal > getPortsToOpen", () => {
+describe("daemons > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
     const stoppedDnp = "stopped.dnp.dappnode.eth";
     const containers: PackageContainer[] = [
@@ -72,7 +72,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
     const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
       mock => {
         mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
@@ -103,7 +103,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     }
 
     const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
       mock => {
         mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
@@ -150,7 +150,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     // }
 
     const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
+      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
       mock => {
         mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
