@@ -1,7 +1,7 @@
 import fs from "fs";
 import { dockerVolumesList } from "../docker/api";
 import { listPackages } from "../docker/list";
-import { dockerRm, dockerVolumeRm } from "../docker/cli";
+import { dockerRm, dockerVolumeRemove } from "../docker";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
 import * as getPath from "../../utils/getPath";
@@ -46,7 +46,7 @@ export async function runLegacyActions(): Promise<void> {
         const users = await shell(`docker ps -aq --filter volume=${volName}`);
         // Delete only if has no users
         if (users) throw Error(`legacy volume ${volName} has users: ${users}`);
-        await dockerVolumeRm(volName);
+        await dockerVolumeRemove(volName);
         logs.info(`Removed legacy volume ${volName}`);
       } catch (e) {
         logs.error(`Error removing legacy volume ${volName}`, e);

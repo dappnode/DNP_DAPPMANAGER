@@ -1,4 +1,4 @@
-import { dockerVolumeRm } from "./cli";
+import { dockerVolumeRemove } from "./api";
 import { dockerVolumeInspect } from "./api";
 import { shellHost } from "../../utils/shell";
 import params from "../../params";
@@ -40,5 +40,5 @@ export async function removeNamedVolume(volName: string): Promise<void> {
   }
 
   // Remove docker volume for both custom binds and normal named volumes
-  await dockerVolumeRm(volName);
+  await dockerVolumeRemove(volName);
 }

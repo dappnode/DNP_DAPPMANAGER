@@ -13,10 +13,6 @@ async function execDocker(args: Args, kwargs?: Kwargs): Promise<string> {
   return shell(["docker", ...args, ...parseKwargs(kwargs)]);
 }
 
-export function dockerVolumeRm(volumeName: string): Promise<string> {
-  return execDocker(["volume", "rm", volumeName], { f: true });
-}
-
 export function dockerStart(
   containerNames: string | string[]
 ): Promise<string> {

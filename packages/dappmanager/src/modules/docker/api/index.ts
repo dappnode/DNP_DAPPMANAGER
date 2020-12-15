@@ -7,4 +7,4 @@ export * from "./listImages";
 export * from "./listVolumes";
 export * from "./loadImage";
 export * from "./logs";
-export * from "./volumeInspect";
+export * from "./volume";

@@ -3,7 +3,7 @@ import * as db from "../../db";
 import { changeEthMultiClient } from "./changeEthMultiClient";
 import { listContainerNoThrow } from "../docker/list";
 import { dockerVolumesList, dockerDf } from "../docker/api";
-import { dockerRm, dockerVolumeRm } from "../docker/cli";
+import { dockerRm, dockerVolumeRemove } from "../docker";
 import { ComposeFileEditor } from "../compose/editor";
 import { migrateVolume } from "../hostScripts";
 import * as getPath from "../../utils/getPath";
@@ -159,7 +159,7 @@ export async function migrateEthchain(): Promise<void> {
       );
       if (containerIdsUsingVolume)
         throw Error(`Volume is used by ${containerIdsUsingVolume}`);
-      await dockerVolumeRm(name);
+      await dockerVolumeRemove(name);
       logs.info(`Removed ETHCHAIN ${id}`);
     } catch (e) {
       logs.error(`Error removing ETHCHAIN ${id}`, e);
