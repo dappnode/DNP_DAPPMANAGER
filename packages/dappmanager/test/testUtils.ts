@@ -12,7 +12,7 @@ import {
   InstallPackageData,
   InstalledPackageData
 } from "../src/types";
-import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
+import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
 
 export const testDir = "./test_files/";

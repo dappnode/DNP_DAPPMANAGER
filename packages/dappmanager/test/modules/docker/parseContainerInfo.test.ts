@@ -1,34 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { PackageContainer } from "../../../src/types";
-import Docker from "dockerode";
-import rewiremock from "rewiremock";
-// Imports for typing
-import { listContainers as listContainersType } from "../../../src/modules/docker/list";
-
+import { parseContainerInfo } from "../../../src/modules/docker/list/parseContainerInfo";
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
 
-describe("listContainers", function() {
-  async function dockerList(): Promise<Docker.ContainerInfo[]> {
-    return dockerApiResponseContainers;
-  }
-
-  let listContainers: typeof listContainersType;
-
-  before("Mock", async () => {
-    const mock = await rewiremock.around(
-      () => import("../../../src/modules/docker/list"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/dockerApi"))
-          .with({ dockerList })
-          .toBeUsed();
-      }
-    );
-    listContainers = mock.listContainers;
-  });
-
-  it("should parse an entire listContainers", async () => {
-    const containers = await listContainers();
+describe("modules / docker / parseContainerInfo", function() {
+  it("should parse docker containers", async () => {
+    const containers = dockerApiResponseContainers.map(parseContainerInfo);
     // console.log(JSON.stringify(containers, null, 2));
 
     const expectedContainers: PackageContainer[] = [

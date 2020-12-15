@@ -1,5 +1,5 @@
 import { dockerVolumeRm } from "./dockerCommands";
-import { dockerVolumeInspect } from "./dockerApi";
+import { dockerVolumeInspect } from "./api";
 import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import { logs } from "../../logs";

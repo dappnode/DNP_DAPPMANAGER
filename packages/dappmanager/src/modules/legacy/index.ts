@@ -1,5 +1,5 @@
 import fs from "fs";
-import { dockerVolumesList } from "../docker/dockerApi";
+import { dockerVolumesList } from "../docker/api";
 import { listPackages } from "../docker/list";
 import { dockerRm } from "../docker/dockerCommands";
 import { logs } from "../../logs";

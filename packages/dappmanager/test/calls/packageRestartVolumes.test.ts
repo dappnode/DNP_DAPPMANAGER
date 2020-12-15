@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { getContainersAndVolumesToRemove } from "../../src/calls/packageRestartVolumes";
-import { DockerVolumeListItem } from "../../src/modules/docker/dockerApi";
+import { DockerVolumeListItem } from "../../src/modules/docker/api";
 import { normalizeProjectName } from "../../src/modules/docker/volumesData";
 import { InstalledPackageData } from "../../src/types";
 import { mockContainer, mockDnp, mockVolume } from "../testUtils";

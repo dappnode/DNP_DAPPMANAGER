@@ -1,6 +1,6 @@
 import { InstallPackageData } from "../../types";
 import { Log } from "../../utils/logUi";
-import { loadImage } from "../docker/dockerApi";
+import { loadImage } from "../docker/api";
 import { dockerImageManifest } from "../docker/dockerCommands";
 
 /**

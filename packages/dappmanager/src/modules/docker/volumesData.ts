@@ -1,4 +1,4 @@
-import { dockerDf, dockerVolumesList } from "./dockerApi";
+import { dockerDf, dockerVolumesList } from "./api";
 import { listContainers } from "./list";
 import { parseDevicePath } from "../compose";
 import { VolumeData, VolumeOwnershipData, PackageContainer } from "../../types";

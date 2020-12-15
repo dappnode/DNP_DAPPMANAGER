@@ -9,7 +9,7 @@ import params from "../../params";
 import { logs } from "../../logs";
 import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
-import { containerInspect, logContainer } from "../docker/dockerApi";
+import { containerInspect, logContainer } from "../docker/api";
 import { dockerRm } from "../docker/dockerCommands";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";

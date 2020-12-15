@@ -1,4 +1,4 @@
-import { dockerList } from "../dockerApi";
+import { listContainers as dockerApiListContainers } from "../api";
 import { PackageContainer } from "../../../types";
 import { parseContainerInfo } from "./parseContainerInfo";
 
@@ -10,7 +10,7 @@ import { parseContainerInfo } from "./parseContainerInfo";
 export async function listContainers(filters?: {
   containerName: string;
 }): Promise<PackageContainer[]> {
-  const containers = await dockerList(
+  const containers = await dockerApiListContainers(
     filters ? { filters: { name: [filters.containerName] } } : {}
   );
 

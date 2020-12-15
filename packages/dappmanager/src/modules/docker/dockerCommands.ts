@@ -1,7 +1,7 @@
 import semver from "semver";
 import dargs from "dargs";
 import shell from "../../utils/shell";
-import { imagesList, imageRemove } from "./dockerApi";
+import { imagesList, imageRemove } from "./api";
 
 type Args = string[];
 type Kwargs = { [flag: string]: string | number | boolean | undefined };

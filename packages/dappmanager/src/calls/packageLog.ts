@@ -1,4 +1,4 @@
-import { logContainer } from "../modules/docker/dockerApi";
+import { logContainer } from "../modules/docker/api";
 
 /**
  * Returns the logs of the docker container of a package
