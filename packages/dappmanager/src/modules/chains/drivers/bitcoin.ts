@@ -2,7 +2,7 @@ const Client = require("bitcoin-core");
 import { ChainDataResult } from "../types";
 import { InstalledPackageData } from "../../../types";
 import { getDotDappnodeDomain } from "../../nsupdate";
-import { containerInspect } from "../../docker/api";
+import { dockerContainerInspect } from "../../docker";
 import { parseEnvironment } from "../../compose";
 
 function getMinBlockDiffSync(dnpName: string): number {
@@ -38,7 +38,7 @@ export async function bitcoin(
   // To initialize the bitcoin client, the RPC user and password are necessary
   // They are stored in the package envs
   const containerName = dnp.containers[0].containerName;
-  const container = await containerInspect(containerName);
+  const container = await dockerContainerInspect(containerName);
   const { username, password, port } = parseCredentialsFromEnvs(
     container.Config.Env
   );

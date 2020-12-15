@@ -2,7 +2,7 @@ import fs from "fs";
 import * as eventBus from "../eventBus";
 import params from "../params";
 import { dockerComposeDown } from "../modules/docker/compose";
-import { dockerRm, dockerStop } from "../modules/docker/cli";
+import { dockerContainerRemove, dockerContainerStop } from "../modules/docker";
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/list";
@@ -57,8 +57,12 @@ export async function packageRemove({
 
   if (!hasRemoved) {
     const containerNames = dnp.containers.map(c => c.containerName);
-    await dockerStop(containerNames, { time: timeout });
-    await dockerRm(containerNames, { volumes: deleteVolumes });
+    await Promise.all(
+      containerNames.map(async containerName => {
+        await dockerContainerStop(containerName, { timeout });
+        await dockerContainerRemove(containerName, { volumes: deleteVolumes });
+      })
+    );
   }
 
   // Remove DNP folder and files
