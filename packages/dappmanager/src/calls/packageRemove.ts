@@ -1,11 +1,8 @@
 import fs from "fs";
 import * as eventBus from "../eventBus";
 import params from "../params";
-import {
-  dockerComposeDown,
-  dockerRm,
-  dockerStop
-} from "../modules/docker/dockerCommands";
+import { dockerComposeDown } from "../modules/docker/compose";
+import { dockerRm, dockerStop } from "../modules/docker/cli";
 import * as getPath from "../utils/getPath";
 import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/list";

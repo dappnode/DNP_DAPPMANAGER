@@ -22,7 +22,7 @@ import {
 } from "../integrationSpecs";
 import shell from "../../src/utils/shell";
 import * as validate from "../../src/utils/validate";
-import { dockerComposeUp } from "../../src/modules/docker/dockerCommands";
+import { dockerComposeUp } from "../../src/modules/docker/compose";
 import { ComposeEditor } from "../../src/modules/compose/editor";
 import { writeDefaultsToLabels } from "../../src/modules/compose";
 import { getContainerName, getImageTag } from "../../src/params";

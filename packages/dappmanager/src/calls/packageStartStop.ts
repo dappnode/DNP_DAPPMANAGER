@@ -1,5 +1,5 @@
 import { listPackage } from "../modules/docker/list";
-import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
+import { dockerStart, dockerStop } from "../modules/docker/cli";
 import * as eventBus from "../eventBus";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
 import params from "../params";

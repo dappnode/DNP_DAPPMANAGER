@@ -1,6 +1,6 @@
 import path from "path";
 import params from "../../params";
-import { dockerComposeUp } from "../docker/dockerCommands";
+import { dockerComposeUp } from "../docker/compose";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";

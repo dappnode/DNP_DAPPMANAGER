@@ -48,8 +48,11 @@ describe("Call function: packageRemove", function() {
     const mock = await rewiremock.around(
       () => import("../../src/calls/packageRemove"),
       mock => {
-        mock(() => import("../../src/modules/docker/dockerCommands"))
-          .with({ dockerComposeDown, dockerRm })
+        mock(() => import("../../src/modules/docker/compose"))
+          .with({ dockerComposeDown })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker/cli"))
+          .with({ dockerRm })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
           .with(eventBus)

@@ -4,8 +4,8 @@ import * as validate from "../../utils/validate";
 import verifyXz from "../../utils/verifyXz";
 import downloadImage from "./ipfs/downloadImage";
 import { DistributedFile } from "../../types";
-import { dockerImageManifest } from "../docker/dockerCommands";
 import { getImageTag } from "../../params";
+import { dockerImageManifest } from "../docker/cli";
 
 export default async function getImage(
   imageFile: DistributedFile,

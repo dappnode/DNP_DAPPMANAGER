@@ -1,7 +1,7 @@
 import { InstallPackageData } from "../../types";
 import { Log } from "../../utils/logUi";
 import { loadImage } from "../docker/api";
-import { dockerImageManifest } from "../docker/dockerCommands";
+import { dockerImageManifest } from "../docker/cli";
 
 /**
  * Load the docker image .tar.xz. file of each package

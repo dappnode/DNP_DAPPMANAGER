@@ -4,7 +4,7 @@ import fs from "fs";
 import {
   dockerCopyFileFrom,
   dockerGetContainerWorkingDir
-} from "../modules/docker/dockerCommands";
+} from "../modules/docker/cli";
 // Utils
 import shell from "../utils/shell";
 import fileToDataUri from "../utils/fileToDataUri";

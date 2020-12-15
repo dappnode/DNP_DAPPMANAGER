@@ -2,7 +2,7 @@ import fs from "fs";
 import { Log } from "../../utils/logUi";
 import * as validate from "../../utils/validate";
 import { InstallPackageData } from "../../types";
-import { dockerComposeConfig } from "../docker/dockerCommands";
+import { dockerComposeConfig } from "../docker/compose";
 import { ComposeEditor } from "../compose/editor";
 import { writeManifest } from "../manifest/manifestFile";
 import { isNotFoundError } from "../../utils/node";
