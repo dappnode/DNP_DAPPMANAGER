@@ -8,7 +8,7 @@ import shell from "../../src/utils/shell";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../testUtils";
 import { listContainer, listContainers } from "../../src/modules/docker/list";
-import { containerInspect } from "../../src/modules/docker/api";
+import { dockerContainerInspect } from "../../src/modules/docker/api";
 import { ComposeEditor } from "../../src/modules/compose/editor";
 
 /**
@@ -190,7 +190,7 @@ exit $UPEXIT
       "Final container should have the next version"
     );
 
-    const restartInspect = await containerInspect(restartContainerName);
+    const restartInspect = await dockerContainerInspect(restartContainerName);
 
     console.log(restartInspect.State);
     const restartFinished = new Date(restartInspect.State.FinishedAt);

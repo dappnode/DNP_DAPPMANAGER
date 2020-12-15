@@ -28,7 +28,7 @@ import {
   stringifyPortMappings,
   parseEnvironment
 } from "../../src/modules/compose";
-import { containerInspect } from "../../src/modules/docker/api";
+import { dockerContainerInspect } from "../../src/modules/docker/api";
 import { listContainer } from "../../src/modules/docker/list";
 import { uploadDirectoryRelease } from "../integrationSpecs";
 
@@ -646,7 +646,7 @@ async function getContainerEnvironment({
   containerName: string;
 }): Promise<PackageEnvs> {
   const container = await listContainer({ containerName });
-  const containerData = await containerInspect(container.containerId);
+  const containerData = await dockerContainerInspect(container.containerId);
   return parseEnvironment(containerData.Config.Env);
 }
 

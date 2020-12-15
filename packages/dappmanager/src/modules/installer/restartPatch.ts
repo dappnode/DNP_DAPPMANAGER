@@ -9,7 +9,7 @@ import params from "../../params";
 import { logs } from "../../logs";
 import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
-import { containerInspect, logContainer } from "../docker/api";
+import { dockerContainerInspect, logContainer } from "../docker/api";
 import { dockerRm } from "../docker/cli";
 import { getLogUi } from "../../utils/logUi";
 import { rollbackPackages } from "./rollbackPackages";
@@ -225,13 +225,13 @@ ${restartLogsIndented}
  */
 async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspectInfo | null> {
   try {
-    let restart = await containerInspect(restartContainerName);
+    let restart = await dockerContainerInspect(restartContainerName);
     const start = Date.now();
     while (
       Date.now() - start < timeoutWaitForRestart &&
       restart.State.Running
     ) {
-      restart = await containerInspect(restartContainerName);
+      restart = await dockerContainerInspect(restartContainerName);
       await pause(1000);
     }
     return restart;

@@ -1,4 +1,4 @@
-export * from "./containerInspect";
+export * from "./container";
 export * from "./df";
 export * from "./imageRemove";
 export * from "./infoArchive";
