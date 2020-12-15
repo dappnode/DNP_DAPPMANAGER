@@ -11,10 +11,7 @@ import * as eventBus from "../eventBus";
 import * as getPath from "../utils/getPath";
 import params from "../params";
 import { logs } from "../logs";
-import {
-  DockerVolumeListItem,
-  dockerVolumesList
-} from "../modules/docker/dockerApi";
+import { DockerVolumeListItem, dockerVolumesList } from "../modules/docker/api";
 import { isVolumeOwner } from "../modules/docker/volumesData";
 import { InstalledPackageData } from "../types";
 import { getDockerTimeoutMax } from "../modules/docker/utils";

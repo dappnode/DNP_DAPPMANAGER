@@ -28,7 +28,7 @@ import {
   stringifyPortMappings,
   parseEnvironment
 } from "../../src/modules/compose";
-import { containerInspect } from "../../src/modules/docker/dockerApi";
+import { containerInspect } from "../../src/modules/docker/api";
 import { listContainer } from "../../src/modules/docker/list";
 import { uploadDirectoryRelease } from "../integrationSpecs";
 

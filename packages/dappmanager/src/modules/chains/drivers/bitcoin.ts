@@ -2,7 +2,7 @@ const Client = require("bitcoin-core");
 import { ChainDataResult } from "../types";
 import { getDotDappnodeDomain } from "../../../watchers/nsupdate/utils";
 import { InstalledPackageData } from "../../../types";
-import { containerInspect } from "../../docker/dockerApi";
+import { containerInspect } from "../../docker/api";
 import { parseEnvironment } from "../../compose";
 
 function getMinBlockDiffSync(dnpName: string): number {
