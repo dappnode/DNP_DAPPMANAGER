@@ -1,6 +1,6 @@
 import { AbortController } from "abort-controller";
 import * as db from "./db";
-import * as eventBus from "./eventBus";
+import { eventBus } from "./eventBus";
 import initializeDb from "./initializeDb";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
 import { generateKeyPair } from "./utils/publickeyEncryption";

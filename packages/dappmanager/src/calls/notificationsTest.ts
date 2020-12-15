@@ -1,4 +1,4 @@
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import * as db from "../db";
 import { PackageNotification, NotificationType } from "../types";
 

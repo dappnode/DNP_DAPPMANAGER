@@ -1,5 +1,5 @@
 import * as db from "../db";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 /**
  * Set a domain alias to a DAppNode package by name

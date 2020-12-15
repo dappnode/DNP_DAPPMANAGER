@@ -1,6 +1,6 @@
 import semver from "semver";
 import { listPackages } from "../../modules/docker/list";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
 // Utils
 import computeSemverUpdateType from "../../utils/computeSemverUpdateType";

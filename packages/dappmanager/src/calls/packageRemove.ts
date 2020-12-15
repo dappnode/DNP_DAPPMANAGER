@@ -1,5 +1,5 @@
 import fs from "fs";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import params from "../params";
 import { dockerComposeDown } from "../modules/docker/compose";
 import { dockerContainerRemove, dockerContainerStop } from "../modules/docker";

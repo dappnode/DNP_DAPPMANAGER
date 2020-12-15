@@ -1,6 +1,6 @@
 import { AbortSignal } from "abort-controller";
 import { getVpnApiClient } from "../../api/vpnApiClient";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import retry from "async-retry";

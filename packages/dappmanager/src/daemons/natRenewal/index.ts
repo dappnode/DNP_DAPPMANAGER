@@ -1,6 +1,6 @@
 import { AbortSignal } from "abort-controller";
 import * as upnpc from "../../modules/upnpc";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";
 import getPortsToOpen from "./getPortsToOpen";

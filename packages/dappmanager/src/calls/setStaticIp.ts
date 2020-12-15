@@ -1,6 +1,6 @@
 import * as db from "../db";
 import * as dyndns from "../modules/dyndns";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { logs } from "../logs";
 
 /**

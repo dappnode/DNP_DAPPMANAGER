@@ -1,7 +1,7 @@
 import merge from "deepmerge";
 import { AbortSignal } from "abort-controller";
 import * as db from "../../db";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import params, { ethClientData } from "../../params";
 import { packageInstall } from "../../calls";
 import { listPackageNoThrow } from "../../modules/docker/list";

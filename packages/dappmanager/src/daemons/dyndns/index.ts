@@ -1,5 +1,5 @@
 import { AbortSignal } from "abort-controller";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";
 import updateIp from "../../modules/dyndns/updateIp";

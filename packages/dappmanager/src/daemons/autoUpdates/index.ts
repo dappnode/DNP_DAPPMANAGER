@@ -1,6 +1,6 @@
 import { AbortSignal } from "abort-controller";
 import params from "../../params";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import { fetchCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../../modules/release";
 import { EthProviderError } from "../../modules/ethClient";

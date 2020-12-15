@@ -1,6 +1,6 @@
 import { AbortSignal } from "abort-controller";
 import retry from "async-retry";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import { listContainers } from "../../modules/docker/list";

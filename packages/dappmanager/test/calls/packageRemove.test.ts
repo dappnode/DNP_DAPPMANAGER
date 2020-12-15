@@ -37,7 +37,7 @@ describe("Call function: packageRemove", function() {
   const dockerContainerRemove = sinon.stub().resolves();
   const listPackage = sinon.stub().resolves(dnp);
 
-  const eventBus = {
+  const eventBus: any = {
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
     packagesModified: { emit: sinon.stub(), on: sinon.stub() }
   };
@@ -55,7 +55,7 @@ describe("Call function: packageRemove", function() {
           .with({ dockerContainerRemove })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
-          .with(eventBus)
+          .with({ eventBus })
           .toBeUsed();
         mock(() => import("../../src/modules/docker/list"))
           .with({ listPackage })
