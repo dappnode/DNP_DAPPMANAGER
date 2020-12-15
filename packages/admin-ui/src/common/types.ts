@@ -517,6 +517,7 @@ export interface ComposeService {
   privileged?: boolean;
   cap_add?: string[];
   cap_drop?: string[];
+  extra_hosts?: string[];
   devices?: string[];
   network_mode?: string;
   command?: string;

@@ -19,6 +19,7 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "privileged",
   "cap_add",
   "cap_drop",
+  "extra_hosts",
   "devices",
   "network_mode",
   "networks",
