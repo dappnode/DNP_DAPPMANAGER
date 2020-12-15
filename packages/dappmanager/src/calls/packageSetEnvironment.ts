@@ -1,6 +1,6 @@
 import { PackageEnvs } from "../types";
 import * as eventBus from "../eventBus";
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { restartPackage } from "../modules/docker/restartPackage";
 

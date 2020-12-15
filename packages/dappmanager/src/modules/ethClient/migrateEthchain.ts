@@ -1,7 +1,7 @@
 import fs from "fs";
 import * as db from "../../db";
 import { changeEthMultiClient } from "./changeEthMultiClient";
-import { listContainerNoThrow } from "../docker/listContainers";
+import { listContainerNoThrow } from "../docker/list";
 import { dockerVolumesList, dockerDf } from "../docker/dockerApi";
 import { dockerRm, dockerVolumeRm } from "../docker/dockerCommands";
 import { ComposeFileEditor } from "../compose/editor";

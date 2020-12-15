@@ -1,5 +1,5 @@
 import * as db from "../../db";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listContainers } from "../../modules/docker/list";
 import {
   signDataFromPackage,
   getAddressFromPrivateKey

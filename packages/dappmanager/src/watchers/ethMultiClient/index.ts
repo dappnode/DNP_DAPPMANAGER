@@ -2,7 +2,7 @@ import * as db from "../../db";
 import * as eventBus from "../../eventBus";
 import { ethClientData } from "../../params";
 import { packageInstall } from "../../calls";
-import { listPackageNoThrow } from "../../modules/docker/listContainers";
+import { listPackageNoThrow } from "../../modules/docker/list";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import merge from "deepmerge";
 import {

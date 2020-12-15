@@ -74,7 +74,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = await rewiremock.around(
       () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
       mock => {
-        mock(() => import("../../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
           .toBeUsed();
       }
@@ -105,7 +105,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = await rewiremock.around(
       () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
       mock => {
-        mock(() => import("../../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
           .toBeUsed();
         // mock(() => import("../../../src/utils/dockerComposeFile"))
@@ -152,7 +152,7 @@ describe("Watchers > natRenewal > getPortsToOpen", () => {
     const { default: getPortsToOpen } = await rewiremock.around(
       () => import("../../../src/watchers/natRenewal/getPortsToOpen"),
       mock => {
-        mock(() => import("../../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/list"))
           .with({ listContainers })
           .toBeUsed();
       }

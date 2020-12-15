@@ -1,5 +1,5 @@
 import semver from "semver";
-import { listPackages } from "../../modules/docker/listContainers";
+import { listPackages } from "../../modules/docker/list";
 import * as eventBus from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
 // Utils

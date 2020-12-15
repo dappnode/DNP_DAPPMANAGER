@@ -95,7 +95,7 @@ describe("Watchers > ethMultiClient > runWatcher", () => {
         mock(() => import("../../../src/db"))
           .with(db)
           .toBeUsed();
-        mock(() => import("../../../src/modules/docker/listContainers"))
+        mock(() => import("../../../src/modules/docker/list"))
           .with({ listPackageNoThrow })
           .toBeUsed();
         mock(() => import("../../../src/calls"))

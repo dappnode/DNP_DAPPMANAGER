@@ -29,7 +29,7 @@ import {
   parseEnvironment
 } from "../../src/modules/compose";
 import { containerInspect } from "../../src/modules/docker/dockerApi";
-import { listContainer } from "../../src/modules/docker/listContainers";
+import { listContainer } from "../../src/modules/docker/list";
 import { uploadDirectoryRelease } from "../integrationSpecs";
 
 // This mountpoints have files inside created by docker with the root

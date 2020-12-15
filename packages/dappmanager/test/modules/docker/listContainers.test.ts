@@ -4,7 +4,7 @@ import { PackageContainer } from "../../../src/types";
 import Docker from "dockerode";
 import rewiremock from "rewiremock";
 // Imports for typing
-import { listContainers as listContainersType } from "../../../src/modules/docker/listContainers";
+import { listContainers as listContainersType } from "../../../src/modules/docker/list";
 
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
 
@@ -17,7 +17,7 @@ describe("listContainers", function() {
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../../src/modules/docker/listContainers"),
+      () => import("../../../src/modules/docker/list"),
       mock => {
         mock(() => import("../../../src/modules/docker/dockerApi"))
           .with({ dockerList })

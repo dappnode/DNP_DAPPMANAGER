@@ -1,4 +1,4 @@
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import { InstalledPackageData } from "../types";
 
 /**

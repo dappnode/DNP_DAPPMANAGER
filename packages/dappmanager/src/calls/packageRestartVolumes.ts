@@ -1,6 +1,6 @@
 import fs from "fs";
 import { uniq } from "lodash";
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 import {
   dockerComposeUp,
   dockerRm,

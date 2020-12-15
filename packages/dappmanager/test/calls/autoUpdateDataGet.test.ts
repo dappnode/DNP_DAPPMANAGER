@@ -56,7 +56,7 @@ describe("Call function: autoUpdateDataGet", () => {
     const mock = await rewiremock.around(
       () => import("../../src/calls/autoUpdateDataGet"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
+        mock(() => import("../../src/modules/docker/list"))
           .with({ listPackages })
           .toBeUsed();
       }

@@ -3,7 +3,7 @@ import * as eventBus from "../../eventBus";
 import * as db from "../../db";
 import params from "../../params";
 import execNsupdate from "./execNsupdate";
-import { listContainers } from "../../modules/docker/listContainers";
+import { listContainers } from "../../modules/docker/list";
 import { setIntervalDynamic } from "../../utils/asyncFlows";
 // Utils
 import { getNsupdateTxts } from "./utils";

@@ -2,7 +2,7 @@ import semver from "semver";
 import params from "../params";
 import { CoreUpdateData, PackageRelease } from "../types";
 import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import { ErrorDappGetDowngrade } from "../modules/dappGet/errors";

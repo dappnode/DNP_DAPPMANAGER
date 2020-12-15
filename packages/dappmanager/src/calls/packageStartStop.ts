@@ -1,4 +1,4 @@
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 import { dockerStart, dockerStop } from "../modules/docker/dockerCommands";
 import * as eventBus from "../eventBus";
 import { getDockerTimeoutMax } from "../modules/docker/utils";

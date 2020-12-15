@@ -1,6 +1,6 @@
 import fs from "fs";
 import { dockerVolumesList } from "../docker/dockerApi";
-import { listPackages } from "../docker/listContainers";
+import { listPackages } from "../docker/list";
 import { dockerRm } from "../docker/dockerCommands";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
