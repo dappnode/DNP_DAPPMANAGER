@@ -17,14 +17,14 @@ export function decodeContentHash(contenthash: string): Content {
 
   if (contentCodec.startsWith("ipfs")) {
     const value = multicodec.rmPrefix(contentHashEncoded);
-    const cid = new CID(value);
+    const cid = new CID(value as Buffer);
     return {
       location: "ipfs",
       hash: multihash.toB58String(cid.multihash)
     };
   } else if (contentCodec.startsWith("swarm")) {
     const value = multicodec.rmPrefix(contentHashEncoded);
-    const cid = new CID(value);
+    const cid = new CID(value as Buffer);
     return {
       location: "swarm",
       hash: multihash.decode(cid.multihash).digest.toString("hex")
