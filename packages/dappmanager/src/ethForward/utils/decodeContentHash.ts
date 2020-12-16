@@ -2,7 +2,7 @@ import CID from "cids";
 import multicodec from "multicodec";
 import { Content } from "../types";
 import { isEmpty } from "./isEmpty";
-const multihash: Multihash = require("multihashes");
+import multihash from "multihashes";
 
 /**
  * Used in the CONTENTHASH_INTERFACE_ID = "0xbc1c58d1"
@@ -32,30 +32,4 @@ export function decodeContentHash(contenthash: string): Content {
   } else {
     throw Error(`Unsupported coded: ${contentCodec}`);
   }
-}
-
-/**
- * multihashes is not typed, nor @types/multihashes exists
- */
-interface Multihash {
-  /**
-   * Convert the given multihash to a base58 encoded string.
-   * @param hash
-   * @returns
-   */
-  toB58String(hash: Buffer): string;
-
-  /**
-   * Decode a hash from the given multihash.
-   * @param buf
-   * @returns result
-   */
-  decode(
-    buf: Buffer
-  ): {
-    code: number;
-    name: string;
-    length: number;
-    digest: Buffer;
-  };
 }
