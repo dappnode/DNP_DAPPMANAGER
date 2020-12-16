@@ -27,7 +27,7 @@ export function decodeContentHash(contenthash: string): Content {
     const cid = new CID(value as Buffer);
     return {
       location: "swarm",
-      hash: multihash.decode(cid.multihash).digest.toString("hex")
+      hash: Buffer.from(multihash.decode(cid.multihash).digest).toString("hex")
     };
   } else {
     throw Error(`Unsupported coded: ${contentCodec}`);
