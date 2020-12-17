@@ -106,5 +106,14 @@ export const bitcoin: MockDnp = {
         }
       }
     ]
+  },
+
+  installedData: {
+    backup: [
+      {
+        name: "data",
+        path: "/data"
+      }
+    ]
   }
 };

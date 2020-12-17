@@ -14,4 +14,8 @@
   > * {
     flex: auto;
   }
+
+  &.spacing > div > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
 }

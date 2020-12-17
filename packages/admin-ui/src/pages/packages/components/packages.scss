@@ -115,15 +115,6 @@
 
 /* Button file selectors */
 
-.backup {
-  > *:not(:last-child) {
-    margin-bottom: var(--default-spacing);
-  }
-  > span:not(:last-child) {
-    margin-right: var(--default-spacing);
-  }
-}
-
 .button-file-input {
   position: relative;
 
@@ -140,11 +131,8 @@
   }
 }
 
-.backup,
-.file-manager {
-  .subtle-header {
-    margin-bottom: 0.5rem;
-  }
+.file-manager .subtle-header {
+  margin-bottom: 0.5rem;
 }
 
 // Internal packages navigation
