@@ -3,14 +3,14 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 // Components
 import Button from "components/Button";
-import ProgressBar from "react-bootstrap/ProgressBar";
+import ProgressBar from "react-bootstrap/esm/ProgressBar";
+import { withToastNoThrow } from "components/toast/Toast";
+import ErrorView from "components/ErrorView";
 // Utils
 import { shortName } from "utils/format";
 import humanFS from "utils/humanFileSize";
-import { PackageBackup } from "common/types";
-import { withToastNoThrow } from "components/toast/Toast";
+import { PackageBackup } from "types";
 import { apiUrls } from "params";
-import ErrorView from "components/ErrorView";
 
 const baseUrlUpload = apiUrls.upload;
 

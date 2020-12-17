@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { api } from "api";
 // Components
 import Button from "components/Button";
-import ProgressBar from "react-bootstrap/ProgressBar";
+import ProgressBar from "react-bootstrap/esm/ProgressBar";
+import Alert from "react-bootstrap/esm/Alert";
+import { withToast } from "components/toast/Toast";
+import ErrorView from "components/ErrorView";
 // Utils
 import { shortName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { PackageBackup } from "common/types";
-import { withToast } from "components/toast/Toast";
 import { apiUrls } from "params";
-import { ReqStatus } from "types";
-import ErrorView from "components/ErrorView";
+import { PackageBackup, ReqStatus } from "types";
 
 const baseUrlDownload = apiUrls.download;
 
@@ -53,18 +53,24 @@ export function BackupDownload({
       </p>
 
       {reqStatus.result ? (
-        <a href={reqStatus.result} {...newTabProps} className="no-a-style">
-          <Button variant="dappnode">Download backup</Button>
-          <div
-            style={{
-              opacity: 0.7,
-              fontSize: "0.8rem",
-              marginTop: "0.5rem"
-            }}
-          >
-            Allow browser pop-ups or click download
-          </div>
-        </a>
+        <>
+          <a href={reqStatus.result} {...newTabProps} className="no-a-style">
+            <Button variant="dappnode">Download backup</Button>
+            <div
+              style={{
+                opacity: 0.7,
+                fontSize: "0.8rem",
+                marginTop: "0.5rem"
+              }}
+            >
+              Allow browser pop-ups or click download
+            </div>
+          </a>
+          <Alert variant="warning" className="alert-download-sensitive">
+            This backup may contain sensitive data such as private keys. Make
+            sure to store it safely
+          </Alert>
+        </>
       ) : (
         <Button
           onClick={prepareBackupForDownload}

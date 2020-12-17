@@ -1,9 +1,7 @@
 import React from "react";
-// Components
 import Card from "components/Card";
 import Columns from "components/Columns";
-// Utils
-import { PackageBackup } from "common/types";
+import { PackageBackup } from "types";
 import { BackupDownload } from "./Download";
 import { BackupRestore } from "./Restore";
 import "./backup.scss";
