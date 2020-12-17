@@ -1,4 +1,4 @@
-import { api } from "api";
+import { api, useApi } from "api";
 import Button from "components/Button";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
@@ -6,10 +6,12 @@ import Switch from "components/Switch";
 import React, { useEffect, useState } from "react";
 import { InputForm } from "../../../../components/InputForm";
 
-export default async function Notifications() {
-  const telegramStatus = await api.getTelegramStatus();
+export default function Notifications() {
+  const telegramStatus = useApi.getTelegramStatus();
   const [token, setToken] = useState("");
-  const [botStatus, setBotStatus] = useState(telegramStatus);
+  const [botStatus, setBotStatus] = useState(
+    telegramStatus.data ? telegramStatus.data : false
+  );
 
   useEffect(() => {
     setBotStatus(botStatus);
@@ -27,33 +29,36 @@ export default async function Notifications() {
   }
 
   return (
-    <Card>
-      <SubTitle>Telegram</SubTitle>
-      <InputForm
-        fields={[
-          {
-            label: "Telegram token",
-            labelId: "Telegram token",
-            name: "Telegram token",
-            autoComplete: "Telegram token",
-            autoFocus: true,
-            value: token,
-            secret: true,
-            required: true,
-            onValueChange: setToken
-          }
-        ]}
-      >
-        <Switch checked={botStatus} onToggle={setBotStatus}></Switch>
-        <Button
-          type="submit"
-          className="register-button"
-          onClick={updateTelegramConfig}
-          variant="dappnode"
+    <>
+      <SubTitle>Telegram notifications</SubTitle>
+      <Card>
+        <SubTitle>Telegram</SubTitle>
+        <InputForm
+          fields={[
+            {
+              label: "Telegram token",
+              labelId: "Telegram token",
+              name: "Telegram token",
+              autoComplete: "Telegram token",
+              autoFocus: true,
+              value: token,
+              secret: true,
+              required: true,
+              onValueChange: setToken
+            }
+          ]}
         >
-          Submit
-        </Button>
-      </InputForm>{" "}
-    </Card>
+          <Switch checked={botStatus} onToggle={setBotStatus}></Switch>
+          <Button
+            type="submit"
+            className="register-button"
+            onClick={updateTelegramConfig}
+            variant="dappnode"
+          >
+            Submit
+          </Button>
+        </InputForm>{" "}
+      </Card>
+    </>
   );
 }
