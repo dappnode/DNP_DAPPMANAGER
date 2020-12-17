@@ -1,0 +1,17 @@
+.backup {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+  > span:not(:last-child) {
+    margin-right: var(--default-spacing);
+  }
+}
+
+.backup .subtle-header {
+  margin-bottom: 0.5rem;
+}
+
+.alert-download-sensitive {
+  margin-top: var(--default-spacing);
+  margin-bottom: 0;
+}
