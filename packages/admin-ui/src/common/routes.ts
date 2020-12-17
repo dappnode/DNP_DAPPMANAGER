@@ -434,7 +434,6 @@ export interface Routes {
   setTelegramConfig: (kwargs: {
     telegramToken: string;
     telegramStatus: boolean;
-    telegramChannelId?: string | number | null;
   }) => Promise<void>;
 
   /**

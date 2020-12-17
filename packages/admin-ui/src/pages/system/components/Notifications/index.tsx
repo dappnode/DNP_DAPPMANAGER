@@ -9,7 +9,6 @@ import { InputForm } from "../../../../components/InputForm";
 export default async function Notifications() {
   const telegramStatus = await api.getTelegramStatus();
   const [token, setToken] = useState("");
-  const [channelId, setChannelId] = useState("");
   const [botStatus, setBotStatus] = useState(telegramStatus);
 
   useEffect(() => {
@@ -20,15 +19,10 @@ export default async function Notifications() {
     setToken(token);
   }, [token]);
 
-  useEffect(() => {
-    setChannelId(channelId);
-  }, [channelId]);
-
   function updateTelegramConfig() {
     api.setTelegramConfig({
       telegramToken: token,
-      telegramStatus: botStatus,
-      telegramChannelId: channelId
+      telegramStatus: botStatus
     });
   }
 
@@ -47,17 +41,6 @@ export default async function Notifications() {
             secret: true,
             required: true,
             onValueChange: setToken
-          },
-          {
-            label: "Telegram channelId (optional)",
-            labelId: "Telegram channelId",
-            name: "Telegram channelId",
-            autoComplete: "Telegram channelId",
-            autoFocus: true,
-            value: channelId,
-            secret: false,
-            required: false,
-            onValueChange: setChannelId
           }
         ]}
       >
