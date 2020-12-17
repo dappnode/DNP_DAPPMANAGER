@@ -21,8 +21,8 @@ export default function Notifications() {
     setToken(token);
   }, [token]);
 
-  function updateTelegramConfig() {
-    api.setTelegramConfig({
+  async function updateTelegramConfig() {
+    await api.setTelegramConfig({
       telegramToken: token,
       telegramStatus: botStatus
     });
