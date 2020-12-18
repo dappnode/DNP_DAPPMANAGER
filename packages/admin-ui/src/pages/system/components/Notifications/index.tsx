@@ -10,12 +10,12 @@ export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
   const [token, setToken] = useState("");
   const [botStatus, setBotStatus] = useState(
-    telegramStatus.data ? telegramStatus.data : false
+    telegramStatus.data !== undefined ? telegramStatus.data : false
   );
 
   useEffect(() => {
     setBotStatus(botStatus);
-  }, [botStatus]);
+  }, [telegramStatus, botStatus]);
 
   useEffect(() => {
     setToken(token);
@@ -48,7 +48,11 @@ export default function Notifications() {
             }
           ]}
         >
-          <Switch checked={botStatus} onToggle={setBotStatus}></Switch>
+          <Switch
+            label="Status"
+            checked={botStatus}
+            onToggle={setBotStatus}
+          ></Switch>
           <Button
             type="submit"
             className="register-button"
