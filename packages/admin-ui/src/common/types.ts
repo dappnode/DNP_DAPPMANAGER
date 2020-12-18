@@ -4,6 +4,10 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
+// SSH types
+
+export type ShhStatus = "enabled" | "disabled";
+
 // Device types
 
 export interface VpnDeviceCredentials extends VpnDevice {

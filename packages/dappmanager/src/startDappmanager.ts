@@ -9,8 +9,10 @@ import { Logs } from "./logs";
 import { EventBus } from "./eventBus";
 import { LoggerMiddleware, Routes } from "./types";
 import { DeviceCalls } from "./calls/device";
+import { SshCalls } from "./calls/ssh";
 import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi";
 import { VpnApiClient } from "./api/vpnApiClient";
+import { SshManager } from "./modules/sshManager";
 
 interface DappmanagerParams extends HttpApiParams, AdminPasswordDbParams {}
 
@@ -24,18 +26,20 @@ export function startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion,
-  vpnApiClient
+  vpnApiClient,
+  sshManager
 }: {
   params: DappmanagerParams;
   logs: Logs;
   routes: HttpRoutes;
   ethForwardMiddleware: RequestHandler;
   routesLogger: LoggerMiddleware;
-  methods: Omit<Routes, keyof DeviceCalls>;
+  methods: Omit<Routes, keyof DeviceCalls | keyof SshCalls>;
   subscriptionsLogger: LoggerMiddleware;
   eventBus: EventBus;
   isNewDappmanagerVersion: () => boolean;
   vpnApiClient: VpnApiClient;
+  sshManager: SshManager;
 }): http.Server {
   const adminPasswordDb = new AdminPasswordDb(params);
   const deviceCalls = new DeviceCalls({
@@ -43,6 +47,7 @@ export function startDappmanager({
     adminPasswordDb,
     vpnApiClient
   });
+  const sshCalls = new SshCalls({ sshManager });
 
   // Sync local adminPasswordDb status with VPN's DB
   retry(
@@ -62,7 +67,7 @@ export function startDappmanager({
     routes,
     ethForwardMiddleware,
     routesLogger,
-    methods: { ...methods, ...deviceCalls },
+    methods: { ...methods, ...deviceCalls, ...sshCalls },
     subscriptionsLogger,
     adminPasswordDb,
     eventBus,
