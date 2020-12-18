@@ -396,6 +396,7 @@ export interface PackageContainer {
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerState;
   running: boolean;
+  exitCode: number | null;
   ports: PortMapping[];
   volumes: VolumeMapping[];
 

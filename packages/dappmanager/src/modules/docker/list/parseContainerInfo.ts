@@ -15,6 +15,7 @@ import {
 } from "../../compose";
 import { multiaddressToGatewayUrl } from "../../../utils/distributedFile";
 import { isPortMappingDeletable } from "./isPortMappingDeletable";
+import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -37,6 +38,9 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
   const defaultVolumes =
     labels.defaultVolumes && parseVolumeMappings(labels.defaultVolumes);
   const dockerTimeout = labels.dockerTimeout;
+
+  const state = container.State as ContainerState;
+  const exitCode = parseExitCodeFromStatus(container.Status);
 
   return {
     // Identification
@@ -84,8 +88,10 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
         ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
       })
     ),
-    state: container.State as ContainerState,
-    running: (container.State as ContainerState) === "running",
+
+    state,
+    running: state === "running",
+    exitCode,
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},

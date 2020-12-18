@@ -56,6 +56,7 @@ export const sampleContainer: PackageContainer = {
   image: "demo-name:0.0.0",
   state: "running",
   running: true,
+  exitCode: null,
   ip: "172.10.0.1",
   dependencies: {},
   ports: [],

@@ -29,7 +29,7 @@
     color: #8c8c8c;
   }
 
-  .stateBadge {
+  .state-badge {
     width: 2.5rem;
     overflow: hidden;
     overflow-wrap: normal;
@@ -69,7 +69,7 @@
   }
 
   @media screen and (max-width: 40rem) {
-    .stateBadge,
+    .state-badge,
     .last-update {
       display: none;
     }

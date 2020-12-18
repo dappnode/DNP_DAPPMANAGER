@@ -115,6 +115,7 @@ export const mockContainer: PackageContainer = {
   image: "mock-image",
   state: "running",
   running: true,
+  exitCode: null,
   ports: [],
   volumes: [],
   defaultEnvironment: {},
