@@ -38,7 +38,7 @@ export function StateBadgeLegend({ dnps }: { dnps: InstalledPackageData[] }) {
       {Array.from(states.values())
         .sort((a, b) => a.state.localeCompare(b.state))
         .map(({ variant, state }) => (
-          <span className="state-badge-legend-item">
+          <span key={state} className="state-badge-legend-item">
             <span className={`state-badge badge-${variant}`}></span>
             <span className="legend-label">{state}</span>
           </span>

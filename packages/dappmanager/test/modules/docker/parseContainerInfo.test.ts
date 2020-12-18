@@ -33,6 +33,7 @@ describe("modules / docker / parseContainerInfo", function() {
         volumes: [],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
           "letsencrypt-nginx.dnp.dappnode.eth": "latest"
@@ -97,6 +98,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -125,6 +127,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -151,6 +154,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "exited",
         running: false,
+        exitCode: 137,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -191,6 +195,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -253,6 +258,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -289,6 +295,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -323,6 +330,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -370,6 +378,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl:
           "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
@@ -474,6 +483,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         defaultPorts: [
           {
             container: 4001,
@@ -507,6 +517,7 @@ describe("modules / docker / parseContainerInfo", function() {
         volumes: [],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -547,6 +558,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
@@ -588,6 +600,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest"
         },
@@ -618,6 +631,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
@@ -666,6 +680,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         chain: "ethereum",
@@ -712,6 +727,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {
           "bitcoin.dnp.dappnode.eth": "latest"
         },
@@ -746,6 +762,7 @@ describe("modules / docker / parseContainerInfo", function() {
         volumes: [],
         state: "running",
         running: true,
+        exitCode: null,
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false

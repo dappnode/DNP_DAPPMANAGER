@@ -19,18 +19,17 @@ export function StateBadgeDnp({ dnp }: { dnp: InstalledPackageData }) {
 
   return (
     <span className="state-badge state-badge-dnp center">
-      {containers.map((container, i) => {
-        const { variant, state, title } = parseContainerState(container);
-        const firstLetter = typeof state === "string" ? state.slice(0, 1) : "|";
+      {containers.map(container => {
+        const { variant, title } = parseContainerState(container);
 
         return (
           <span
-            key={i}
+            key={container.serviceName}
             className={`state-badge badge-${variant}`}
             title={title}
           >
             {/* Use a single character to force consistent height */}
-            <span className="content">{firstLetter}</span>
+            <span className="content">|</span>
           </span>
         );
       })}
