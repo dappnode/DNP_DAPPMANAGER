@@ -15,13 +15,13 @@ export default function Notifications() {
   }, [token]);
 
   async function updateTelegramToken() {
-    await api.setTelegramToken(token);
+    await api.setTelegramToken({ telegramToken: token });
     setToken("");
   }
 
   async function updateTelegramStatus() {
     if (telegramStatus.data !== undefined) {
-      await api.setTelegramStatus(telegramStatus.data);
+      await api.setTelegramStatus({ telegramStatus: telegramStatus.data });
     }
   }
   return (
@@ -49,9 +49,7 @@ export default function Notifications() {
               checked={telegramStatus.data}
               onToggle={updateTelegramStatus}
             ></Switch>
-          ) : (
-            {}
-          )}
+          ) : null}
           <Button
             type="submit"
             className="register-button"

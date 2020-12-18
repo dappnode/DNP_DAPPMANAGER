@@ -5,6 +5,10 @@ import * as db from "../db";
  *
  * @param telegramToken New telegram token
  */
-export async function setTelegramToken(telegramToken: string): Promise<void> {
+export async function setTelegramToken({
+  telegramToken
+}: {
+  telegramToken: string;
+}): Promise<void> {
   db.telegramToken.set(telegramToken);
 }

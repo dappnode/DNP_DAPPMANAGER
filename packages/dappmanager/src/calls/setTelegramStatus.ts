@@ -6,9 +6,11 @@ import { eventBus } from "../eventBus";
  *
  * @param telegramStatus switch telegram bot status
  */
-export async function setTelegramStatus(
-  telegramStatus: boolean
-): Promise<void> {
+export async function setTelegramStatus({
+  telegramStatus
+}: {
+  telegramStatus: boolean;
+}): Promise<void> {
   db.telegramStatus.set(telegramStatus);
 
   // consider using string 'enable' / 'disable' instead of boolean
