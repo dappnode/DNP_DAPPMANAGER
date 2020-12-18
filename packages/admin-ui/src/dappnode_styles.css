@@ -135,7 +135,7 @@ p.no-p-style:last-child {
 }
 
 .list-grid > header {
-  opacity: 0.5;
+  color: var(--light-text-color);
   text-transform: capitalize;
   /* When the screen is really small, hide the name of the actions */
   white-space: nowrap;

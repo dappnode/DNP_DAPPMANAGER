@@ -33,3 +33,26 @@
   // Make the background colors softer, stock are too strong
   opacity: 0.85;
 }
+
+.state-badge-legend {
+  > *:not(:last-child) {
+    margin-right: var(--default-spacing);
+  }
+
+  .state-badge-legend-item {
+    display: inline-flex;
+    align-items: center;
+
+    .state-badge {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.25rem;
+    }
+
+    .legend-label {
+      color: var(--light-text-color);
+      font-size: 0.9rem;
+    }
+  }
+}

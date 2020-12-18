@@ -1,3 +1,9 @@
+.info-container-list {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+}
+
 .list-grid.containers {
   /*
   Col 1, Fit to the link buttons / switch always
