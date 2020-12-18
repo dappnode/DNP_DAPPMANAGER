@@ -18,6 +18,7 @@ interface EventTypes {
   notification: PackageNotification;
   packages: InstalledPackageData[];
   packagesModified: { dnpNames: string[]; removed?: boolean };
+  telegramStatusChanged: boolean;
   // Events without arguments
   initializedDb: void;
   requestAutoUpdateData: void;
@@ -37,6 +38,7 @@ const eventBusData: { [P in keyof EventTypes]: {} } = {
   notification: {},
   packages: {},
   packagesModified: {},
+  telegramStatusChanged: {},
   // Events without arguments
   initializedDb: {},
   requestAutoUpdateData: {},

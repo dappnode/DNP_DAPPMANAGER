@@ -9,25 +9,27 @@ import { InputForm } from "../../../../components/InputForm";
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
   const [token, setToken] = useState("");
-  const [botStatus, setBotStatus] = useState(
-    telegramStatus.data !== undefined ? telegramStatus.data : false
-  );
+  const [botStatus, setBotStatus] = useState(telegramStatus.data);
 
   useEffect(() => {
     setBotStatus(botStatus);
-  }, [telegramStatus, botStatus]);
+  }, [botStatus]);
 
   useEffect(() => {
     setToken(token);
   }, [token]);
 
-  async function updateTelegramConfig() {
-    await api.setTelegramConfig({
-      telegramToken: token,
-      telegramStatus: botStatus
-    });
+  async function updateTelegramToken() {
+    await api.setTelegramToken(token);
+    setToken("");
   }
 
+  async function updateTelegramStatus() {
+    if (botStatus !== undefined) {
+      await api.setTelegramStatus(botStatus);
+      setBotStatus(botStatus);
+    }
+  }
   return (
     <>
       <SubTitle>Telegram notifications</SubTitle>
@@ -48,15 +50,19 @@ export default function Notifications() {
             }
           ]}
         >
-          <Switch
-            label="Status"
-            checked={botStatus}
-            onToggle={setBotStatus}
-          ></Switch>
+          {telegramStatus.data ? (
+            <Switch
+              label="Status"
+              checked={telegramStatus.data}
+              onToggle={updateTelegramStatus}
+            ></Switch>
+          ) : (
+            {}
+          )}
           <Button
             type="submit"
             className="register-button"
-            onClick={updateTelegramConfig}
+            onClick={updateTelegramToken}
             variant="dappnode"
           >
             Submit

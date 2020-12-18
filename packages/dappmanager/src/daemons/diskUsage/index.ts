@@ -4,7 +4,7 @@ import params from "../../params";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runAtMostEvery } from "../../utils/asyncFlows";
-import { telegramBot } from "../../utils/telegramBot";
+import { telegramBot } from "../telegram";
 
 /**
  * Commands

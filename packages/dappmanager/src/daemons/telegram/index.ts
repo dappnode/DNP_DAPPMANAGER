@@ -1,11 +1,20 @@
 import TelegramBot from "node-telegram-bot-api";
-import * as db from "../db";
+import * as db from "../../db";
+import { eventBus } from "../../eventBus";
 
 /**
  * Tlegram bot
  * @param telegramMessage
  */
 export async function telegramBot(telegramMessage?: string): Promise<void> {
+  // two notifications to be subscribed to:
+  // 1. Telegram status : true/false
+  // 2. alert disk usage
+  eventBus.telegramStatusChanged.on(status => {
+    if (status === true) {
+    }
+  });
+
   const telegramToken = db.telegramToken.get();
   const telegramStatus = db.telegramStatus.get();
   if (telegramStatus && telegramToken) {

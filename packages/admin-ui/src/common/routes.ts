@@ -429,12 +429,16 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
-   * Sets telegram config (token and status)
+   * Sets the status of the telegram bot
+   * @param telegramStatus new status of the bot
    */
-  setTelegramConfig: (kwargs: {
-    telegramToken: string;
-    telegramStatus: boolean;
-  }) => Promise<void>;
+  setTelegramStatus: (telegramStatus: boolean) => Promise<void>;
+
+  /**
+   * Sets the telegram token
+   * @param telegramToken new bot token
+   */
+  setTelegramToken: (telegramToken: string) => Promise<void>;
 
   /**
    * Gets bot telegram status
@@ -521,7 +525,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  setTelegramConfig: {},
+  setTelegramStatus: {},
+  setTelegramToken: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   systemInfoGet: {},
