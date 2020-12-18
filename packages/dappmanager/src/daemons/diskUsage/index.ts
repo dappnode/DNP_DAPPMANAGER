@@ -4,7 +4,6 @@ import params from "../../params";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runAtMostEvery } from "../../utils/asyncFlows";
-import { telegramBot } from "../telegram";
 
 /**
  * Commands
@@ -61,11 +60,6 @@ async function monitorDiskUsage(): Promise<void> {
         // If packages have already been stopped, skip
         if (thresholdIsActive[threshold.id]) continue;
         else thresholdIsActive[threshold.id] = true;
-
-        // Send telegram alert
-        telegramBot(
-          `ALERT! your DAppNode has been stopped. REASON your disk available has reach the treshold: ${diskAvailableBytes} < ${threshold.kb}`
-        );
 
         // Log that the threshold has been triggered
         logs.warn(`Disk usage threshold "${threshold.id}" has been triggered`);
