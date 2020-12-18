@@ -115,7 +115,7 @@ export class SshManager {
     await this.shellHost("systemctl restart ssh.service");
   }
 
-  private async removeRootAccess(): Promise<void> {
+  async removeRootAccess(): Promise<void> {
     // NOTE: "--" MUST be used to make the flag and the command work
     await this.shellHost(
       `sed -- -i "s/.*PermitRootLogin .*/PermitRootLogin no/g" /etc/ssh/sshd_config`
