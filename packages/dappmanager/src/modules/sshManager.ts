@@ -104,10 +104,9 @@ export class SshManager {
    * Then restarts ssh.service (sshd)
    */
   async changePort(port: number): Promise<void> {
-    // ## Change Port
-    // export SSH_PORT=2222
-    // sed -i "s/.*Port .*/Port $SSH_PORT/g" /etc/ssh/sshd_config
-    // systemctl restart ssh.service
+    if (isNaN(port)) throw Error(`Port is not a number: ${port}`);
+    if (port <= 0) throw Error(`Port must be > 0: ${port}`);
+    if (port >= 65536) throw Error(`Port must be < 65536: ${port}`);
 
     // NOTE: "--" MUST be used to make the flag and the command work
     await this.shellHost(
