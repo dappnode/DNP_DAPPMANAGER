@@ -44,7 +44,7 @@ export default function Notifications() {
             }
           ]}
         >
-          {telegramStatus.data ? (
+          {telegramStatus.data !== undefined ? (
             <Switch
               checked={telegramStatus.data}
               onToggle={updateTelegramStatus}
