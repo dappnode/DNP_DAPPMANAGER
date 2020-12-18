@@ -4,7 +4,7 @@ import { useApi } from "api";
 import { packageRestart } from "../actions";
 // Components
 import { NoPackagesYet } from "./NoPackagesYet";
-import { StateBadge, getWorstState } from "./StateBadge";
+import { StateBadgeDnp } from "./StateBadge";
 import Card from "components/Card";
 // Icons
 import { MdRefresh, MdOpenInNew } from "react-icons/md";
@@ -43,7 +43,8 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
           <header className="hide-on-small">Restart</header>
           {sortBy(filteredDnps, dnp => dnp.dnpName).map(dnp => (
             <React.Fragment key={dnp.dnpName}>
-              <StateBadge state={getWorstState(dnp)} />
+              {/* <StateBadge state={getWorstState(dnp)} /> */}
+              <StateBadgeDnp dnp={dnp} />
               <img
                 className="avatar"
                 src={dnp.avatarUrl || (coreDnps ? dappnodeIcon : defaultAvatar)}

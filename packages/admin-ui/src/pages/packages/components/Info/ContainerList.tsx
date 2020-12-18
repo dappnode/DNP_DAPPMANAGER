@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { packageRestart } from "../../actions";
-import { StateBadge, getWorstState } from "../StateBadge";
+import { StateBadgeDnp, StateBadgeContainer } from "../StateBadge";
 import {
   MdRefresh,
   MdPauseCircleOutline,
@@ -32,7 +32,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     });
   }
 
-  const stateDnp = getWorstState(dnp);
+  const allContainersRunning = dnp.containers.every(c => c.running);
 
   return (
     <div className="list-grid containers">
@@ -43,7 +43,8 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
       {/* DNP entry */}
       <React.Fragment>
-        {showAll ? <span /> : <StateBadge state={stateDnp} />}
+        <StateBadgeDnp dnp={dnp} />
+
         <span className="name">
           {dnp.containers.length > 1 ? (
             <span>All containers</span>
@@ -57,28 +58,32 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
             </span>
           )}
         </span>
-        {stateDnp === "running" ? (
+
+        {allContainersRunning ? (
           <MdPauseCircleOutline onClick={() => onStartStop()} />
         ) : (
           <MdPlayCircleOutline onClick={() => onStartStop()} />
         )}
+
         <MdRefresh onClick={() => onRestart()} />
       </React.Fragment>
 
       {/* Container display */}
       {showAll &&
-        dnp.containers.map(container => (
-          <React.Fragment key={container.serviceName}>
-            <StateBadge state={container.state} />
-            <span className="name">{sn(container.serviceName)}</span>
-            {container.running ? (
-              <MdPauseCircleOutline onClick={() => onStartStop(container)} />
-            ) : (
-              <MdPlayCircleOutline onClick={() => onStartStop(container)} />
-            )}
-            <MdRefresh onClick={() => onRestart(container)} />
-          </React.Fragment>
-        ))}
+        dnp.containers
+          .sort((a, b) => a.serviceName.localeCompare(b.serviceName))
+          .map(container => (
+            <React.Fragment key={container.serviceName}>
+              <StateBadgeContainer container={container} />
+              <span className="name">{sn(container.serviceName)}</span>
+              {container.running ? (
+                <MdPauseCircleOutline onClick={() => onStartStop(container)} />
+              ) : (
+                <MdPlayCircleOutline onClick={() => onStartStop(container)} />
+              )}
+              <MdRefresh onClick={() => onRestart(container)} />
+            </React.Fragment>
+          ))}
     </div>
   );
 };

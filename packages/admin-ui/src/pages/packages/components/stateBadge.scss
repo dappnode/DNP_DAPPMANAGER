@@ -1,0 +1,35 @@
+.state-badge-dnp {
+  display: flex;
+  align-items: stretch;
+
+  // Height is not necessary as long as there's dummy text inside content
+  // height: 100%;
+  width: 100%;
+
+  // Remove padding so the inner badges fill all
+  padding: 0 !important;
+
+  // So the border-radius is visible
+  overflow: hidden;
+
+  // Force a min-size so on a packages/:id view the badge on its own is not too small
+  min-width: 4.9rem;
+
+  > span {
+    width: 100%;
+    height: 100%;
+  }
+
+  > .state-badge {
+    // Over-write .state-badge styles that would make the text too small
+    border-radius: 0 !important;
+    font-size: 100% !important;
+    color: transparent;
+  }
+}
+
+.state-badge-container,
+.state-badge-dnp {
+  // Make the background colors softer, stock are too strong
+  opacity: 0.85;
+}
