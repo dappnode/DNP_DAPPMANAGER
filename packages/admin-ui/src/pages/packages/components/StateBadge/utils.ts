@@ -17,7 +17,8 @@ export function parseContainerState(
 
     case "exited":
       // Be conservative, if exitCode could not be parsed assume crashed
-      // NO, call container.inspect if state == exited and exitCode == null
+      // This only affects visual UI elements, for critical DAPPMANAGER code
+      // if exitCode is not known call container.inspect and get the exitCode
       if (exitCode === 0) {
         return { variant: "secondary", state: "stopped", title: "Exited (0)" };
       } else {
