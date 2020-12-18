@@ -1,15 +1,16 @@
 import { PackageContainer } from "common";
 import React from "react";
-import { InstalledPackageData, ContainerState } from "types";
+import { InstalledPackageData } from "types";
 import "./stateBadge.scss";
 
 type SimpleState = "stopped" | "crashed" | "running";
 type BadgeVariant = "danger" | "success" | "secondary";
 
-function stateToVariant(
-  state: ContainerState,
-  exitCode: number | null
+function parseContainerState(
+  container: PackageContainer
 ): { variant: BadgeVariant; state: SimpleState; title: string } {
+  const { state, exitCode } = container;
+
   switch (state) {
     case "created":
       return { variant: "secondary", state: "stopped", title: "Created" };
@@ -46,10 +47,7 @@ export function StateBadgeContainer({
 }: {
   container: PackageContainer;
 }) {
-  const { variant, state, title } = stateToVariant(
-    container.state,
-    container.exitCode
-  );
+  const { variant, state, title } = parseContainerState(container);
   return (
     <span
       className={`state-badge state-badge-container center badge-${variant}`}
@@ -61,7 +59,20 @@ export function StateBadgeContainer({
 }
 
 export function StateBadgeDnp({ dnp }: { dnp: InstalledPackageData }) {
-  if (dnp.containers.length === 1) {
+  if (dnp.containers.length === 0) {
+    return null;
+  }
+
+  if (
+    // Only one container
+    dnp.containers.length === 1 ||
+    // Every container has the same visual state (variant)
+    dnp.containers.every(
+      container =>
+        parseContainerState(container).variant ===
+        parseContainerState(dnp.containers[0]).variant
+    )
+  ) {
     return <StateBadgeContainer container={dnp.containers[0]} />;
   }
 
@@ -72,10 +83,7 @@ export function StateBadgeDnp({ dnp }: { dnp: InstalledPackageData }) {
   return (
     <span className="state-badge state-badge-dnp center">
       {containers.map((container, i) => {
-        const { variant, state, title } = stateToVariant(
-          container.state,
-          container.exitCode
-        );
+        const { variant, state, title } = parseContainerState(container);
         const firstLetter = typeof state === "string" ? state.slice(0, 1) : "|";
 
         return (
