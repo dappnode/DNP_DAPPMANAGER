@@ -1,4 +1,5 @@
 import { ShhStatus } from "../types";
+import { ShellError } from "../utils/shell";
 
 export type ShellHost = (cmd: string) => Promise<string>;
 
@@ -16,17 +17,16 @@ export class SshManager {
 
     // Sample response if disabled
     // ---------------------------
-    // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl start ssh.service
-    // (no stdout)
-
-    // Sample response if disabled
-    // ---------------------------
     // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl enable ssh.service
     // Synchronizing state of ssh.service with SysV service script with /lib/systemd/systemd-sysv-install.
     // Executing: /lib/systemd/systemd-sysv-install enable ssh
 
-    await this.shellHost("systemctl start ssh.service");
-    await this.shellHost("systemctl enable ssh.service");
+    // --now
+    //     When used with enable, the units will also be started. When used with disable or mask, the units will also be stopped
+    //     The start or stop operation is only carried out when the respective enable or disable operation has been successful.
+    // From https://www.freedesktop.org/software/systemd/man/systemctl.html
+    // NOTE: "--" MUST be used to make the flag and the command work
+    await this.shellHost("systemctl enable -- --now ssh.service");
   }
 
   async disable(): Promise<void> {
@@ -36,16 +36,16 @@ export class SshManager {
 
     // Sample response if disabled
     // ---------------------------
-    // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl stop ssh.service
-
-    // Sample response if disabled
-    // ---------------------------
     // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl disable ssh.service
     // Synchronizing state of ssh.service with SysV service script with /lib/systemd/systemd-sysv-install.
     // Executing: /lib/systemd/systemd-sysv-install disable ssh
 
-    await this.shellHost("systemctl stop ssh.service");
-    await this.shellHost("systemctl disable ssh.service");
+    // --now
+    //     When used with enable, the units will also be started. When used with disable or mask, the units will also be stopped
+    //     The start or stop operation is only carried out when the respective enable or disable operation has been successful.
+    // From https://www.freedesktop.org/software/systemd/man/systemctl.html
+    // NOTE: "--" MUST be used to make the flag and the command work
+    await this.shellHost("systemctl disable -- --now ssh.service");
   }
 
   async getStatus(): Promise<ShhStatus> {
@@ -97,22 +97,25 @@ export class SshManager {
     // Dec 08 11:17:56 DAppNodeLion systemd[1]: ssh.service: Succeeded.
     // Dec 08 11:17:56 DAppNodeLion systemd[1]: Stopped OpenBSD Secure Shell server.
 
-    const statusRes = await this.shellHost("systemctl status ssh.service");
-
-    // Sample response if active (exit code 0)
-    // -------------------------
-    // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl is-enabled ssh.service
-    // enabled
-
-    // Sample response if inactive
-    // -------------------------
-    // ???? How to achieve?
-
-    const isEnabled = await this.shellHost("systemctl is-enabled ssh.service");
-
-    if (statusRes.includes("Active: active")) return "enabled";
-    if (statusRes.includes("Active: inactive")) return "disabled";
-    throw Error("Unknown status");
+    // is-active PATTERN...
+    //     Check whether any of the specified units are active (i.e. running).
+    //     Returns an exit code 0 if at least one is active, or non-zero otherwise.
+    //     Unless --quiet is specified, this will also print the current unit state to standard output.
+    // From https://www.freedesktop.org/software/systemd/man/systemctl.html
+    //
+    try {
+      const statusRes = await this.shellHost("systemctl is-active sshd");
+      console.log({ sshStatusOk: statusRes });
+      return "enabled";
+    } catch (e) {
+      if (e instanceof ShellError) {
+        console.log({ sshStatusError: e });
+        return "disabled";
+      } else {
+        e.message = `Error getting SSH status: ${e.message}`;
+        throw e;
+      }
+    }
   }
 
   async changePort(port: number): Promise<void> {
@@ -128,7 +131,7 @@ export class SshManager {
     await this.shellHost("systemctl restart ssh.service");
   }
 
-  async removeRootAccess(): Promise<void> {
+  private async removeRootAccess(): Promise<void> {
     // ## Avoid root access
     // sed -i "s/.*PermitRootLogin .*/PermitRootLogin no/g" /etc/ssh/sshd_config
 
