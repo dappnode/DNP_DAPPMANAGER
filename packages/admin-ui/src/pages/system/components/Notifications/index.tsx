@@ -9,11 +9,6 @@ import { InputForm } from "../../../../components/InputForm";
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
   const [token, setToken] = useState("");
-  const [botStatus, setBotStatus] = useState(telegramStatus.data);
-
-  useEffect(() => {
-    setBotStatus(botStatus);
-  }, [botStatus]);
 
   useEffect(() => {
     setToken(token);
@@ -25,9 +20,8 @@ export default function Notifications() {
   }
 
   async function updateTelegramStatus() {
-    if (botStatus !== undefined) {
-      await api.setTelegramStatus(botStatus);
-      setBotStatus(botStatus);
+    if (telegramStatus.data !== undefined) {
+      await api.setTelegramStatus(telegramStatus.data);
     }
   }
   return (
@@ -52,7 +46,6 @@ export default function Notifications() {
         >
           {telegramStatus.data ? (
             <Switch
-              label="Status"
               checked={telegramStatus.data}
               onToggle={updateTelegramStatus}
             ></Switch>
