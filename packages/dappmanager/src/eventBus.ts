@@ -9,6 +9,7 @@ import {
   PackageNotification,
   DirectoryItem
 } from "./types";
+import { telegramStatus } from "./common";
 
 interface EventTypes {
   chainData: ChainData[];

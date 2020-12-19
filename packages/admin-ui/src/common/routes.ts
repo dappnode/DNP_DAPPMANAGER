@@ -432,13 +432,13 @@ export interface Routes {
    * Sets the status of the telegram bot
    * @param telegramStatus new status of the bot
    */
-  setTelegramStatus: (kwarg: {telegramStatus: boolean}) => Promise<void>;
+  setTelegramStatus: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
    * Sets the telegram token
    * @param telegramToken new bot token
    */
-  setTelegramToken: (kwarg: {telegramToken: string}) => Promise<void>;
+  setTelegramToken: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
    * Gets bot telegram status
