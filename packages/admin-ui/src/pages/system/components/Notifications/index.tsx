@@ -31,8 +31,8 @@ export default function Notifications() {
     try {
       setReqStatus({ loading: true });
       await api.setTelegramStatus({ telegramStatus: newStatus });
+      setBotStatus(newStatus);
       setReqStatus({ result: true });
-      setBotStatus(botStatus);
     } catch (e) {
       setReqStatus({ error: e });
       console.error("Error on setTelegramStatus", e);
