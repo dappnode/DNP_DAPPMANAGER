@@ -11,8 +11,9 @@ import ErrorView from "components/ErrorView";
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
 
-  const [token, setToken] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const [botStatus, setBotStatus] = useState(telegramStatus.data);
+  const [token, setToken] = useState("");
 
   async function updateTelegramToken() {
     try {
@@ -31,6 +32,7 @@ export default function Notifications() {
       setReqStatus({ loading: true });
       await api.setTelegramStatus({ telegramStatus: newStatus });
       setReqStatus({ result: true });
+      setBotStatus(botStatus);
     } catch (e) {
       setReqStatus({ error: e });
       console.error("Error on setTelegramStatus", e);
@@ -55,9 +57,9 @@ export default function Notifications() {
             }
           ]}
         >
-          {telegramStatus.data !== undefined ? (
+          {botStatus !== undefined ? (
             <Switch
-              checked={telegramStatus.data}
+              checked={botStatus}
               onToggle={updateTelegramStatus}
             ></Switch>
           ) : null}
