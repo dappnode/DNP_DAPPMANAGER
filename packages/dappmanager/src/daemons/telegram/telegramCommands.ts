@@ -11,6 +11,7 @@ import { buildTelegramMessage } from "./buildTelegramMessage";
  */
 export async function telegramCommands(bot: TelegramBot): Promise<void> {
   try {
+    console.log("telegram commands");
     bot.startPolling();
     // POLLING ERRORS
     // 1. EFATAL if error was fatal e.g. network error
