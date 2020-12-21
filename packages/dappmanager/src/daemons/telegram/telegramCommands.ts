@@ -1,8 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
-import { statsDiskGet } from "../../calls";
+import { statsCpuGet, statsDiskGet, statsMemoryGet } from "../../calls";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { buildTelegramMessage } from "./buildTelegramMessage";
+import { bold } from "./utils";
 
 /**
  * Polls for commands and responds.
@@ -26,7 +27,13 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const diskStats = await statsDiskGet();
-        const diskMessage = `*Disk free:* ${diskStats.free} bytes | *Disk used:* ${diskStats.used} bytes | *Disk total:* ${diskStats.total} bytes | *Disk percentage:* ${diskStats.usedPercentage} %`;
+        const diskMessage = `${bold("Disk free")} ${
+          diskStats.free
+        } bytes | ${bold("Disk used")} ${diskStats.used} bytes | ${bold(
+          "Disk total"
+        )} ${diskStats.total} bytes | ${bold("Disk percentage")} ${
+          diskStats.usedPercentage
+        } %`;
         const message = buildTelegramMessage({
           telegramMessage: diskMessage,
           telegramMessageType: "Stats"
@@ -37,7 +44,49 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
         logs.error("Error on telegram daemon. /disk command", e);
       }
     });
-    // Investigate try catch telegram functions
+
+    // get cpu stats
+    bot.onText(/\/cpu/, async msg => {
+      try {
+        const chatId = msg.chat.id.toString();
+        const cpuStats = await statsCpuGet();
+        const cpuMessage = `${bold("CPU percentage")} ${
+          cpuStats.usedPercentage
+        } %`;
+        const message = buildTelegramMessage({
+          telegramMessage: cpuMessage,
+          telegramMessageType: "Stats"
+        });
+
+        await sendTelegramMessage({ bot, chatId, message });
+      } catch (e) {
+        logs.error("Error on telegram daemon. /cpu command", e);
+      }
+    });
+
+    // get memory stats
+    bot.onText(/\/memory/, async msg => {
+      try {
+        const chatId = msg.chat.id.toString();
+        const memoryStats = await statsMemoryGet();
+        const memoryMessage = `${bold("Memory stats")} ${
+          memoryStats.free
+        } bytes | ${bold("Memory used")} ${memoryStats.used} bytes  | ${bold(
+          "Memory total"
+        )} ${memoryStats.total} bytes | ${bold("Memory percentage")} ${
+          memoryStats.usedPercentage
+        } %`;
+        const message = buildTelegramMessage({
+          telegramMessage: memoryMessage,
+          telegramMessageType: "Stats"
+        });
+
+        await sendTelegramMessage({ bot, chatId, message });
+      } catch (e) {
+        logs.error("Error on telegram daemon. /memory command", e);
+      }
+    });
+
     // set the channel ID
     bot.onText(/\/channel/, async msg => {
       try {

@@ -49,9 +49,13 @@ export default function Notifications() {
           </a>
         </div>
         <div>
-          <strong>Commands</strong>
-          <p>/channel</p>
-          <p>/channelremove</p>
+          Read more about how to use the telegram Bot{" "}
+          <a href="https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA">here</a>
+          <strong>/channel</strong>
+          <strong>/channelremove</strong>
+          <strong>/disk</strong>
+          <strong>/cpu</strong>
+          <strong>/memory</strong>
         </div>
         <InputForm
           fields={[
