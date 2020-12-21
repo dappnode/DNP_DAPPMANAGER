@@ -11,7 +11,6 @@ import { buildTelegramMessage } from "./buildTelegramMessage";
  */
 export async function telegramCommands(bot: TelegramBot): Promise<void> {
   try {
-    console.log("telegram commands");
     bot.startPolling();
     // POLLING ERRORS
     // 1. EFATAL if error was fatal e.g. network error
@@ -25,15 +24,15 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
     // get disk stats
     bot.onText(/\/disk/, async msg => {
       try {
-        const chatId = msg.chat.id;
+        const chatId = msg.chat.id.toString();
         const diskStats = await statsDiskGet();
-        const diskMessage = `**Disk free:** ${diskStats.free} bytes | **Disk used:** ${diskStats.used} bytes | **Disk total:** ${diskStats.total} bytes | **Disk percentage:** ${diskStats.usedPercentage} %`;
+        const diskMessage = `*Disk free:* ${diskStats.free} bytes | *Disk used:* ${diskStats.used} bytes | *Disk total:* ${diskStats.total} bytes | *Disk percentage:* ${diskStats.usedPercentage} %`;
         const message = buildTelegramMessage({
           telegramMessage: diskMessage,
           telegramMessageType: "Stats"
         });
 
-        await bot.sendMessage(chatId, message);
+        await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
         logs.error("Error on telegram daemon. /disk command", e);
       }
@@ -44,15 +43,22 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const channelIds = db.telegramChannelIds.get();
-        console.log("CHANNEL IDs: ", channelIds);
-        channelIds.push(chatId);
-        db.telegramChannelIds.set(channelIds);
-        const message = buildTelegramMessage({
-          telegramMessage: "Succesfully saved channel ID",
-          telegramMessageType: "Success"
-        });
+        let message = "";
+        if (channelIds.includes(chatId)) {
+          message = buildTelegramMessage({
+            telegramMessage: "Channel ID already exists",
+            telegramMessageType: "Danger"
+          });
+        } else {
+          channelIds.push(chatId);
+          db.telegramChannelIds.set(channelIds);
+          message = buildTelegramMessage({
+            telegramMessage: "Succesfully saved channel ID",
+            telegramMessageType: "Success"
+          });
+        }
 
-        await bot.sendMessage(chatId, message);
+        await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
         logs.error("Error on telegram daemon. /channel command", e);
       }
@@ -78,7 +84,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
           });
         }
 
-        await bot.sendMessage(chatId, message);
+        await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
         logs.error("Error on telegram daemon. /channel command", e);
       }
@@ -86,4 +92,16 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
   } catch (e) {
     throw Error("Error sending telegram message");
   }
+}
+
+async function sendTelegramMessage({
+  bot,
+  chatId,
+  message
+}: {
+  bot: TelegramBot;
+  chatId: string;
+  message: string;
+}): Promise<void> {
+  await bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
 }

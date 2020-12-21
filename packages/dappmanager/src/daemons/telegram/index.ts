@@ -15,14 +15,10 @@ let bot: TelegramBot | null = null;
  */
 async function checkTelegramStatus(): Promise<void> {
   try {
-    console.log("inside checkTelegramStatus()");
     const isEnabled = db.telegramStatus.get();
     const telegramToken = db.telegramToken.get();
-    console.log("isEnabled: ", isEnabled);
-    console.log("telegramToken: ", telegramToken);
 
     if (isEnabled === true) {
-      console.log("telegram Status is TRUE");
       if (!telegramToken) throw Error("Error: telegram token must exist");
       // TODO: if token has changed => DELETE CHANNEL IDS
       // TODO: ADD COMMENT WHY DELETE CHANNELS IDs, the token may not have access to the channels anymore
@@ -37,7 +33,6 @@ async function checkTelegramStatus(): Promise<void> {
 
       telegramCommands(bot);
     } else if (isEnabled === false) {
-      console.log("telegram status is false");
       if (bot) {
         bot.stopPolling();
       }
@@ -52,7 +47,6 @@ async function checkTelegramStatus(): Promise<void> {
  * @param telegramMessage
  */
 export async function startTelegramDaemon(): Promise<void> {
-  console.log("Initialize docker daemon");
   //  When dappmanager reboots, it should persists the bot
   checkTelegramStatus();
   // User may change the telegramToken, if so currentTelegramToken (UNupdated)

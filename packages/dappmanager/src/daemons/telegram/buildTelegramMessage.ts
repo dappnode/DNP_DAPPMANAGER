@@ -1,3 +1,5 @@
+import { bold } from "./utils";
+
 /**
  * Builds the telegram message to be sent
  * @param param0
@@ -16,14 +18,14 @@ export function buildTelegramMessage({
 }): string {
   switch (telegramMessageType) {
     case "Alert":
-      return `❌ 📢 **${telegramMessageType}**❗: ${telegramMessage}`;
+      return `❌ 📢 ${bold(telegramMessageType)}❗: ${telegramMessage}`;
     case "Danger":
-      return `⚠ **${telegramMessageType}**❗: ${telegramMessage}`;
+      return `⚠ ${bold(telegramMessageType)}❗: ${telegramMessage}`;
     case "Success":
-      return `✅ **${telegramMessageType}** ✅: ${telegramMessage}`;
+      return `✅ ${bold(telegramMessageType)} ✅: ${telegramMessage}`;
     case "Notification":
-      return `🔔 **${telegramMessageType}** 🔔: ${telegramMessage}`;
+      return `🔔 ${bold(telegramMessageType)} 🔔: ${telegramMessage}`;
     case "Stats":
-      return `📊 **${telegramMessageType}** 📉: ${telegramMessage}`;
+      return `📊 ${bold(telegramMessageType)} 📉: ${telegramMessage}`;
   }
 }

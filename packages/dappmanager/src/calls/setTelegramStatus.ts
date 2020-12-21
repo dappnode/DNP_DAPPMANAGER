@@ -12,6 +12,5 @@ export async function setTelegramStatus({
   telegramStatus: boolean;
 }): Promise<void> {
   db.telegramStatus.set(telegramStatus);
-  console.log("telegram token set: ", telegramStatus);
   eventBus.telegramStatusChanged.emit();
 }
