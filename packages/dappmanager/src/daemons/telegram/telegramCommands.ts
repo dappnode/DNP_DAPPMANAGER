@@ -27,7 +27,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id;
         const diskStats = await statsDiskGet();
-        const diskMessage = `*Disk free:* ${diskStats.free} | *Disk used:* ${diskStats.used} | *Disk total:* ${diskStats.total} | *Disk percentage:* ${diskStats.usedPercentage}`;
+        const diskMessage = `**Disk free:** ${diskStats.free} bytes | **Disk used:** ${diskStats.used} bytes | **Disk total:** ${diskStats.total} bytes | **Disk percentage:** ${diskStats.usedPercentage} %`;
         const message = buildTelegramMessage({
           telegramMessage: diskMessage,
           telegramMessageType: "Stats"
@@ -44,6 +44,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const channelIds = db.telegramChannelIds.get();
+        console.log("CHANNEL IDs: ", channelIds);
         channelIds.push(chatId);
         db.telegramChannelIds.set(channelIds);
         const message = buildTelegramMessage({

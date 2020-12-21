@@ -16,14 +16,14 @@ export function buildTelegramMessage({
 }): string {
   switch (telegramMessageType) {
     case "Alert":
-      return `❌ 📢 *${telegramMessageType}*❗: ${telegramMessage}`;
+      return `❌ 📢 **${telegramMessageType}**❗: ${telegramMessage}`;
     case "Danger":
-      return `⚠ *${telegramMessageType}*❗: ${telegramMessage}`;
+      return `⚠ **${telegramMessageType}**❗: ${telegramMessage}`;
     case "Success":
-      return `✅ *${telegramMessageType}* ✅: ${telegramMessage}`;
+      return `✅ **${telegramMessageType}** ✅: ${telegramMessage}`;
     case "Notification":
-      return `🔔 *${telegramMessageType}* 🔔: ${telegramMessage}`;
+      return `🔔 **${telegramMessageType}** 🔔: ${telegramMessage}`;
     case "Stats":
-      return `📊 *${telegramMessageType}* 📉: ${telegramMessage}`;
+      return `📊 **${telegramMessageType}** 📉: ${telegramMessage}`;
   }
 }
