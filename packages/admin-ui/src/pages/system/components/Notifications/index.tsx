@@ -12,7 +12,6 @@ export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
 
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  const [botStatus, setBotStatus] = useState(telegramStatus.data);
   const [token, setToken] = useState("");
 
   async function updateTelegramToken() {
@@ -31,7 +30,6 @@ export default function Notifications() {
     try {
       setReqStatus({ loading: true });
       await api.setTelegramStatus({ telegramStatus: newStatus });
-      setBotStatus(newStatus);
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e });
@@ -42,6 +40,19 @@ export default function Notifications() {
     <>
       <Card>
         <SubTitle>Telegram</SubTitle>
+        <div>
+          {/* COnsider using BIG BUTTON || STUDY HOOOOKS! */}
+          Receive important notifications directly to your telegram account. To
+          get your own token follow{" "}
+          <a href="https://core.telegram.org/bots#creating-a-new-bot">
+            this guide
+          </a>
+        </div>
+        <div>
+          <strong>Commands</strong>
+          <p>/channel</p>
+          <p>/channelremove</p>
+        </div>
         <InputForm
           fields={[
             {
@@ -57,15 +68,6 @@ export default function Notifications() {
             }
           ]}
         >
-          {botStatus !== undefined ? (
-            <Switch
-              checked={botStatus}
-              onToggle={updateTelegramStatus}
-            ></Switch>
-          ) : null}
-          {reqStatus.error && (
-            <ErrorView error={reqStatus.error} hideIcon red />
-          )}
           <Button
             type="submit"
             className="register-button"
@@ -74,6 +76,15 @@ export default function Notifications() {
           >
             Submit
           </Button>
+          {telegramStatus.data !== undefined ? (
+            <Switch
+              checked={telegramStatus.data}
+              onToggle={updateTelegramStatus}
+            ></Switch>
+          ) : null}
+          {reqStatus.error && (
+            <ErrorView error={reqStatus.error} hideIcon red />
+          )}
         </InputForm>{" "}
       </Card>
     </>

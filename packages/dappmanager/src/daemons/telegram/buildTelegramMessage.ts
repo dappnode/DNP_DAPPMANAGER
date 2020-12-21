@@ -20,9 +20,9 @@ export function buildTelegramMessage({
     case "Danger":
       return `⚠ *${telegramMessageType}*❗: ${telegramMessage}`;
     case "Success":
-      return `✅ *${telegramMessageType}* ❗: ${telegramMessage}`;
+      return `✅ *${telegramMessageType}* ✅: ${telegramMessage}`;
     case "Notification":
-      return `🔔 *${telegramMessageType}*❗: ${telegramMessage}`;
+      return `🔔 *${telegramMessageType}* 🔔: ${telegramMessage}`;
     case "Stats":
       return `📊 *${telegramMessageType}* 📉: ${telegramMessage}`;
   }

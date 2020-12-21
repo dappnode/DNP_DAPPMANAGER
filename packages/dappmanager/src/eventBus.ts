@@ -9,7 +9,6 @@ import {
   PackageNotification,
   DirectoryItem
 } from "./types";
-import { telegramStatus } from "./common";
 
 interface EventTypes {
   chainData: ChainData[];
@@ -19,8 +18,9 @@ interface EventTypes {
   notification: PackageNotification;
   packages: InstalledPackageData[];
   packagesModified: { dnpNames: string[]; removed?: boolean };
-  telegramStatusChanged: boolean;
+
   // Events without arguments
+  telegramStatusChanged: void;
   initializedDb: void;
   requestAutoUpdateData: void;
   requestChainData: void;

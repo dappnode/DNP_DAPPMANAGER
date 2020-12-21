@@ -39,9 +39,9 @@ export const telegramToken = dbMain.staticKey<string | null>(
 
 // Telegram channel Id
 
-export const telegramChannelId = dbMain.staticKey<string | number | null>(
+export const telegramChannelIds = dbMain.staticKey<string[]>(
   TELEGRAM_CHANNEL_ID,
-  null
+  []
 );
 
 // Cache version information to detect updates

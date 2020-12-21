@@ -1,4 +1,5 @@
 import * as db from "../db";
+import { eventBus } from "../eventBus";
 
 /**
  * Sets the telegram token
@@ -11,4 +12,6 @@ export async function setTelegramToken({
   telegramToken: string;
 }): Promise<void> {
   db.telegramToken.set(telegramToken);
+
+  eventBus.telegramStatusChanged.emit();
 }

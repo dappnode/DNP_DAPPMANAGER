@@ -13,6 +13,5 @@ export async function setTelegramStatus({
 }): Promise<void> {
   db.telegramStatus.set(telegramStatus);
 
-  // consider using string 'enable' / 'disable' instead of boolean
-  eventBus.telegramStatusChanged.emit(telegramStatus);
+  eventBus.telegramStatusChanged.emit();
 }
