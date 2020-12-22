@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
-import { buildTelegramNotificationMessage } from "./buildTelegramMessage";
+import { buildTelegramNotificationMessage } from "./buildTelegramNotificationMessage";
 import { telegramCommands } from "./telegramCommands";
 
 // Telegram setup When reboot it lost
@@ -62,23 +62,19 @@ export async function startTelegramBotDaemon(): Promise<void> {
 
     if (!bot || telegramChannelIds.length === 0) return;
 
-    if (
-      notification.id === "diskSpaceRanOut-stoppedPackages" &&
-      notification.type === "danger"
-    ) {
-      try {
-        const message = buildTelegramNotificationMessage({
-          notificationType: "danger",
-          telegramMessage: notification.body
+    try {
+      const message = buildTelegramNotificationMessage({
+        notificationType: "danger",
+        telegramMessage: notification.body
+      });
+      for (const channelId of telegramChannelIds) {
+        bot.sendMessage(channelId, message, {
+          parse_mode: "Markdown"
         });
-        for (const channelId of telegramChannelIds) {
-          bot.sendMessage(channelId, message, {
-            parse_mode: "Markdown"
-          });
-        }
-      } catch (e) {
-        throw Error("Error: error happened sending telegram message");
       }
+    } catch (e) {
+      e.message = `Error sending telegram message: ${e.message}`;
+      throw e;
     }
   });
 }

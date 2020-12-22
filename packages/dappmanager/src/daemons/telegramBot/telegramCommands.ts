@@ -1,8 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { bold, url, formatTelegramCommandHeader } from "./buildTelegramMessage";
+import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
 import { commandsList } from "./commandsList";
+import { bold, url } from "./markdown";
 
 /**
  * Polls for commands and responds.
@@ -19,7 +20,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
     // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
     // ETELEGRAM: 404 Not Found => wrong token or not found
     bot.on("polling_error", error => {
-      throw Error(`${error.name}: ${error.message}`);
+      logs.error(`${error.name}: ${error.message}`);
     });
 
     // Listen for any messages. If channel ID does not exists, it saves the channel ID
@@ -44,8 +45,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         let message = "";
-        const channelExists = checkIfChannelIdExists(chatId);
-        if (channelExists === true) {
+        if (checkIfChannelIdExists(chatId)) {
           unsubscribeChannelId(chatId);
           message =
             formatTelegramCommandHeader("Success") +
