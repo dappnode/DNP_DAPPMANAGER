@@ -3,7 +3,7 @@ import { statsCpuGet, statsDiskGet, statsMemoryGet } from "../../calls";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { buildTelegramMessage } from "./buildTelegramMessage";
-import { bold } from "./utils";
+import { bold, url } from "./utils";
 
 /**
  * Polls for commands and responds.
@@ -69,7 +69,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const memoryStats = await statsMemoryGet();
-        const memoryMessage = `${bold("Memory stats")} ${
+        const memoryMessage = `${bold("Memory free")} ${
           memoryStats.free
         } bytes | ${bold("Memory used")} ${memoryStats.used} bytes  | ${bold(
           "Memory total"
@@ -136,6 +136,30 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
         await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
         logs.error("Error on telegram daemon. /channel command", e);
+      }
+    });
+
+    // returns help content
+    bot.onText(/\/help/, async msg => {
+      try {
+        const chatId = msg.chat.id.toString();
+        const message = buildTelegramMessage({
+          telegramMessage: `Commands: ${bold("/disk")} & ${bold(
+            "/memory"
+          )} & ${bold("/cpu")} returns stats from your DAppNode | ${bold(
+            "/channel"
+          )} sets the channel ID to receive alerts | ${bold(
+            "/channelremove"
+          )} removes the channel ID | more information ${url(
+            "here",
+            "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
+          )}`,
+          telegramMessageType: "Notification"
+        });
+
+        await sendTelegramMessage({ bot, chatId, message });
+      } catch (e) {
+        logs.error("Error on telegram daemon. /help command", e);
       }
     });
   } catch (e) {

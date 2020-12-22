@@ -17,11 +17,9 @@ async function checkTelegramStatus(): Promise<void> {
   try {
     const isEnabled = db.telegramStatus.get();
     const telegramToken = db.telegramToken.get();
-
     if (isEnabled === true) {
       if (!telegramToken) throw Error("Error: telegram token must exist");
-      // TODO: if token has changed => DELETE CHANNEL IDS
-      // TODO: ADD COMMENT WHY DELETE CHANNELS IDs, the token may not have access to the channels anymore
+
       if (bot && telegramToken !== currentTelegramToken) {
         currentTelegramToken = telegramToken;
         bot.stopPolling();

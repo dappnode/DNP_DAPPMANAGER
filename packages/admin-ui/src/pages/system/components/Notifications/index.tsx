@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import { InputForm } from "components/InputForm";
 import { ReqStatus } from "types";
 import ErrorView from "components/ErrorView";
+import Ok from "components/Ok";
 
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
@@ -51,11 +52,23 @@ export default function Notifications() {
         <div>
           Read more about how to use the telegram Bot{" "}
           <a href="https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA">here</a>
-          <strong>/channel</strong>
-          <strong>/channelremove</strong>
-          <strong>/disk</strong>
-          <strong>/cpu</strong>
-          <strong>/memory</strong>
+          <ul>
+            <li>
+              <strong>/channel</strong>
+            </li>
+            <li>
+              <strong>/channelremove</strong>
+            </li>
+            <li>
+              <strong>/disk</strong>
+            </li>
+            <li>
+              <strong>/cpu</strong>
+            </li>
+            <li>
+              <strong>/memory</strong>
+            </li>
+          </ul>
         </div>
         <InputForm
           fields={[
@@ -80,12 +93,22 @@ export default function Notifications() {
           >
             Submit
           </Button>
-          {telegramStatus.data !== undefined ? (
+          <br />
+          {telegramStatus.data ? (
             <Switch
               checked={telegramStatus.data}
+              label={telegramStatus.data === true ? "On" : "Off"}
               onToggle={updateTelegramStatus}
             ></Switch>
-          ) : null}
+          ) : telegramStatus.error ? (
+            <Ok msg={"Error getting status"} style={{ margin: "auto" }} />
+          ) : (
+            <Ok
+              msg={"Loading status..."}
+              loading={true}
+              style={{ margin: "auto" }}
+            />
+          )}
           {reqStatus.error && (
             <ErrorView error={reqStatus.error} hideIcon red />
           )}
