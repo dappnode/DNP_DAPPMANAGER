@@ -1,40 +1,58 @@
-import { TelegramMessageHeader } from "./types";
+import { NotificationType } from "../../types";
+import { TelegramCommandMessageHeader } from "./types";
+
+// TELEGRAM DAPPNODE NOTIFICATIONS MESSAGES
 
 /**
  * Returns the message formatted with the header
  * @param param0
  */
-export function buildTelegramMessage({
-  header,
+export function buildTelegramNotificationMessage({
+  notificationType,
   telegramMessage
 }: {
-  header: TelegramMessageHeader;
+  notificationType: NotificationType;
   telegramMessage: string;
 }): string {
-  const head = formatTelegramHeader(header);
+  const head = formatTelegramNotificationHeader(notificationType);
   return bold("DAppNode ") + head + telegramMessage;
 }
 
 /**
- * Builds the telegram header
+ * Builds the DAppNode notification header
  * @param param0
  */
-function formatTelegramHeader(header: TelegramMessageHeader): string {
+function formatTelegramNotificationHeader(header: NotificationType): string {
   switch (header) {
-    case "Alert":
-      return `❌ 📢 ${bold(header)}❗:\n`;
-    case "Danger":
-      return `⚠ ${bold(header)} ⚡:\n`;
+    case "danger":
+      return `⚠ ${bold(header)} ⚡:\n\n`;
+    case "success":
+      return `✅ ${bold(header)} ✅:\n\n`;
+    case "warning":
+      return `🔔 ${bold(header)} 🔔:\n\n`;
+  }
+}
+
+// TELEGRAM COMMANDS MESSAGES
+
+/**
+ * Builds the telegram command message header
+ * @param param0
+ */
+export function formatTelegramCommandHeader(
+  header: TelegramCommandMessageHeader
+): string {
+  switch (header) {
+    case "Fail":
+      return `❌ `;
     case "Success":
-      return `✅ ${bold(header)} ✅:\n`;
-    case "Notification":
-      return `🔔 ${bold(header)} 🔔:\n`;
+      return `✅ `;
     case "Stats":
-      return `📊 ${bold(header)} 📉:\n`;
+      return `📊 `;
     case "Note":
-      return `📋 ${bold(header)} 📋:\n`;
+      return `📋 `;
     case "Help":
-      return `ℹ️ ${bold(header)} ℹ️:\n `;
+      return `ℹ️ `;
   }
 }
 

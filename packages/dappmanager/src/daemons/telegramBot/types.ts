@@ -1,7 +1,5 @@
-export type TelegramMessageHeader =
-  | "Alert"
-  | "Danger"
-  | "Notification"
+export type TelegramCommandMessageHeader =
+  | "Fail"
   | "Success"
   | "Stats"
   | "Help"

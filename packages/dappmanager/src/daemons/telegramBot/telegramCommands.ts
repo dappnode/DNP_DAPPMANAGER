@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { bold, buildTelegramMessage, url } from "./buildTelegramMessage";
+import { bold, url, formatTelegramCommandHeader } from "./buildTelegramMessage";
 import { commandsList } from "./commandsList";
 
 /**
@@ -28,10 +28,9 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
         try {
           const chatId = msg.chat.id.toString();
           if (!checkIfChannelIdExists(chatId)) {
-            const message = buildTelegramMessage({
-              header: "Success",
-              telegramMessage: "Succesfully saved channel ID"
-            });
+            const message =
+              formatTelegramCommandHeader("Success") +
+              "Succesfully saved channel ID";
             subscribeChannelId(chatId);
             await sendTelegramMessage({ bot, chatId, message });
           }
@@ -48,15 +47,12 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
         const channelExists = checkIfChannelIdExists(chatId);
         if (channelExists === true) {
           unsubscribeChannelId(chatId);
-          message = buildTelegramMessage({
-            header: "Success",
-            telegramMessage: "Succesfully removed channel ID"
-          });
+          message =
+            formatTelegramCommandHeader("Success") +
+            "Succesfully removed channel ID";
         } else {
-          message = buildTelegramMessage({
-            header: "Danger",
-            telegramMessage: "Channel Id not found"
-          });
+          message =
+            formatTelegramCommandHeader("Fail") + "Channel ID not found";
         }
 
         await sendTelegramMessage({ bot, chatId, message });
@@ -69,16 +65,15 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
     bot.onText(/\/help/, async msg => {
       try {
         const chatId = msg.chat.id.toString();
-        const message = buildTelegramMessage({
-          header: "Help",
-          telegramMessage: `${bold("Commands")}:\n\n
-           ${bold("/unsubscribe")} unsubscribes the channel\n
-           ${bold("/help")} returns help content\n\n
-            More information ${url(
-              "here",
-              "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
-            )}`
-        });
+        const message = [
+          bold("Commands"),
+          bold("/unsubscribe"),
+          bold("/help"),
+          `More information ${url(
+            "here",
+            "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
+          )}`
+        ].join("\n\n");
 
         await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {

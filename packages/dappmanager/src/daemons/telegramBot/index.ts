@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
-import { buildTelegramMessage } from "./buildTelegramMessage";
+import { buildTelegramNotificationMessage } from "./buildTelegramMessage";
 import { telegramCommands } from "./telegramCommands";
 
 // Telegram setup When reboot it lost
@@ -67,13 +67,13 @@ export async function startTelegramBotDaemon(): Promise<void> {
       notification.type === "danger"
     ) {
       try {
-        const message = buildTelegramMessage({
-          header: "Alert",
+        const message = buildTelegramNotificationMessage({
+          notificationType: "danger",
           telegramMessage: notification.body
         });
         for (const channelId of telegramChannelIds) {
           bot.sendMessage(channelId, message, {
-            parse_mode: "MarkdownV2"
+            parse_mode: "Markdown"
           });
         }
       } catch (e) {
