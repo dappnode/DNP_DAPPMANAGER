@@ -31,6 +31,7 @@ export default function Notifications() {
     try {
       setReqStatus({ loading: true });
       await api.setTelegramStatus({ telegramStatus: newStatus });
+      telegramStatus.revalidate();
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e });

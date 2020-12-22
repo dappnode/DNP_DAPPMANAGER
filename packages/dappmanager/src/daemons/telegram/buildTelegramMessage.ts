@@ -20,31 +20,24 @@ export function buildTelegramMessage({
   switch (telegramMessageType) {
     case "Alert":
       return `❌ 📢 ${bold(dappNodeMessage + telegramMessageType)}❗:\n
-      \n
       ${telegramMessage}`;
     case "Danger":
       return `⚠ ${bold(dappNodeMessage + telegramMessageType)} ⚡:\n
-      \n
       ${telegramMessage}`;
     case "Success":
-      return `✅ ${bold(dappNodeMessage + telegramMessageType)} ✅:\n
-      \n
+      return `✅ ${bold(dappNodeMessage + telegramMessageType)} ✅:\n   
       ${telegramMessage}`;
     case "Notification":
       return `🔔 ${bold(dappNodeMessage + telegramMessageType)} 🔔:\n
-      \n
       ${telegramMessage}`;
     case "Stats":
-      return `📊 ${bold(dappNodeMessage + telegramMessageType)} 📉:\n
-      \n
+      return `📊 ${bold(dappNodeMessage + telegramMessageType)} 📉:\n  
       ${telegramMessage}`;
     case "Note":
       return `📋 ${bold(dappNodeMessage + telegramMessageType)} 📋:\n
-      \n
       ${telegramMessage}`;
     case "Help":
-      return `ℹ️ ${bold(dappNodeMessage + telegramMessageType)} ℹ️:\n
-      \n
+      return `ℹ️ ${bold(dappNodeMessage + telegramMessageType)} ℹ️:\n 
       ${telegramMessage}`;
   }
 }
