@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { bold, buildTelegramMessage, url } from "./buildTelegramMessage";
+import { commandsList } from "./commandsList";
 
 /**
  * Polls for commands and responds.
@@ -23,10 +24,11 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
 
     // Listen for any messages. If channel ID does not exists, it saves the channel ID
     bot.on("message", async msg => {
-      if (msg.text !== "/unsubscribe")
+      if (msg.text && commandsList.includes(msg.text) === false)
         try {
           const chatId = msg.chat.id.toString();
-          if (!checkIfChannelIdExists(chatId)) {
+          const channelExists = checkIfChannelIdExists(chatId);
+          if (channelExists === false) {
             const message = buildTelegramMessage({
               telegramMessage: "Succesfully saved channel ID",
               telegramMessageType: "Success"
@@ -44,7 +46,8 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         let message = "";
-        if (checkIfChannelIdExists(chatId)) {
+        const channelExists = checkIfChannelIdExists(chatId);
+        if (channelExists === true) {
           unsubscribeChannelId(chatId);
           message = buildTelegramMessage({
             telegramMessage: "Succesfully removed channel ID",
@@ -68,12 +71,9 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const message = buildTelegramMessage({
-          telegramMessage: `Commands:\n
-           ${bold("/disk")}\n
-           ${bold("/memory")}\n
-           ${bold("/cpu")}\n
-           ${bold("/channel")} sets the channel ID to receive alerts\n
-           ${bold("/removechannel")} removes the channel ID\n
+          telegramMessage: `${bold("Commands")}:\n
+           ${bold("/unsubscribe")} unsubscribes the channel\n
+           ${bold("/help")} returns help content\n
             More information ${url(
               "here",
               "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
