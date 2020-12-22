@@ -35,7 +35,6 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
 
   const container = containers.find(c => c.serviceName === serviceName);
   const containerName = container?.containerName;
-  console.log(containerName);
 
   /**
    * This use effect fetches the logs again everytime any of this variables changes:
@@ -60,8 +59,9 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         if (typeof logs !== "string") throw Error("Logs must be a string");
 
         // Prevent updating the state of an unmounted component
+        console.log("ContainerName: ", containerName);
         if (unmounted) return;
-
+        console.log("ContainerName: ", containerName);
         setLogs(logs);
         // Auto scroll to bottom (deffered after the paint)
         setTimeout(scrollToBottom, 10);
@@ -78,7 +78,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         unmounted = true;
       };
     }
-  }, [autoRefresh, timestamps, lines, containerName, serviceName]);
+  }, [autoRefresh, timestamps, lines, containerName]);
 
   /**
    * Filter the logs text by lines that contain the query
