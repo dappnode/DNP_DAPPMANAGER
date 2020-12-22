@@ -24,6 +24,7 @@ const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 export function Logs({ containers }: { containers: PackageContainer[] }) {
   const serviceNames = containers.map(c => c.serviceName).sort();
   const [serviceName, setServiceName] = useState(serviceNames[0]);
+  const [serviceNameHasChanged, setServiceNameHasChanged] = useState(false);
 
   // User options
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -59,9 +60,9 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         if (typeof logs !== "string") throw Error("Logs must be a string");
 
         // Prevent updating the state of an unmounted component
-        console.log("ContainerName: ", containerName);
         if (unmounted) return;
-        console.log("ContainerName: ", containerName);
+
+        setServiceNameHasChanged(false);
         setLogs(logs);
         // Auto scroll to bottom (deffered after the paint)
         setTimeout(scrollToBottom, 10);
@@ -70,7 +71,10 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         setAutoRefresh(false);
       }
     }
-    if (autoRefresh && validateLines(lines)) {
+    if (
+      (autoRefresh && validateLines(lines)) ||
+      serviceNameHasChanged === true
+    ) {
       setLogs("fetching...");
       const interval = setInterval(logDnp, refreshInterval);
       return () => {
@@ -78,7 +82,12 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         unmounted = true;
       };
     }
-  }, [autoRefresh, timestamps, lines, containerName]);
+  }, [autoRefresh, timestamps, lines, containerName, serviceNameHasChanged]);
+
+  function handleSetServiceName() {
+    setServiceName(serviceName);
+    setServiceNameHasChanged(true);
+  }
 
   /**
    * Filter the logs text by lines that contain the query
@@ -100,7 +109,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
     <Card spacing>
       <ServiceSelector
         serviceName={serviceName}
-        setServiceName={setServiceName}
+        setServiceName={handleSetServiceName}
         containers={containers}
       />
 
