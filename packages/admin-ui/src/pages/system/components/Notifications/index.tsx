@@ -51,6 +51,7 @@ export default function Notifications() {
           </a>
         </div>
         <div>
+          Available commands in bot chat
           <ul>
             <li>
               <strong>/help</strong>

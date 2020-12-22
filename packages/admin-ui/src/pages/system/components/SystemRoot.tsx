@@ -35,6 +35,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: SystemInfo
     },
     {
+      name: "Notifications",
+      subPath: subPaths.notifications,
+      component: Notifications
+    },
+    {
       name: "Identity",
       subPath: subPaths.identity,
       component: Identity,
@@ -85,11 +90,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Power",
       subPath: subPaths.power,
       component: PowerManagment
-    },
-    {
-      name: "Notifications",
-      subPath: subPaths.notifications,
-      component: Notifications
     }
   ];
 

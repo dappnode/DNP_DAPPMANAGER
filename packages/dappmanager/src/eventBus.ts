@@ -18,7 +18,6 @@ interface EventTypes {
   notification: PackageNotification;
   packages: InstalledPackageData[];
   packagesModified: { dnpNames: string[]; removed?: boolean };
-
   // Events without arguments
   telegramStatusChanged: void;
   initializedDb: void;

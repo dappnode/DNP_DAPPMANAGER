@@ -430,7 +430,6 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
-
    * Sets the status of the telegram bot
    * @param telegramStatus new status of the bot
    */

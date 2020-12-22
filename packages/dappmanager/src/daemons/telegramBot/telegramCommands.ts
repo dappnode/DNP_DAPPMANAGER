@@ -24,20 +24,19 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
 
     // Listen for any messages. If channel ID does not exists, it saves the channel ID
     bot.on("message", async msg => {
-      if (msg.text && commandsList.includes(msg.text) === false)
+      if (msg.text && !commandsList.includes(msg.text))
         try {
           const chatId = msg.chat.id.toString();
-          const channelExists = checkIfChannelIdExists(chatId);
-          if (channelExists === false) {
+          if (!checkIfChannelIdExists(chatId)) {
             const message = buildTelegramMessage({
-              telegramMessage: "Succesfully saved channel ID",
-              telegramMessageType: "Success"
+              header: "Success",
+              telegramMessage: "Succesfully saved channel ID"
             });
             subscribeChannelId(chatId);
             await sendTelegramMessage({ bot, chatId, message });
           }
         } catch (e) {
-          logs.error("Error on telegram daemon. message polling", e);
+          logs.error("Error on telegram message handler", e);
         }
     });
 
@@ -50,13 +49,13 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
         if (channelExists === true) {
           unsubscribeChannelId(chatId);
           message = buildTelegramMessage({
-            telegramMessage: "Succesfully removed channel ID",
-            telegramMessageType: "Success"
+            header: "Success",
+            telegramMessage: "Succesfully removed channel ID"
           });
         } else {
           message = buildTelegramMessage({
-            telegramMessage: "Channel Id not found",
-            telegramMessageType: "Danger"
+            header: "Danger",
+            telegramMessage: "Channel Id not found"
           });
         }
 
@@ -71,14 +70,14 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       try {
         const chatId = msg.chat.id.toString();
         const message = buildTelegramMessage({
-          telegramMessage: `${bold("Commands")}:\n
+          header: "Help",
+          telegramMessage: `${bold("Commands")}:\n\n
            ${bold("/unsubscribe")} unsubscribes the channel\n
-           ${bold("/help")} returns help content\n
+           ${bold("/help")} returns help content\n\n
             More information ${url(
               "here",
               "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
-            )}`,
-          telegramMessageType: "Help"
+            )}`
         });
 
         await sendTelegramMessage({ bot, chatId, message });
@@ -87,7 +86,7 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
       }
     });
   } catch (e) {
-    throw Error("Error sending telegram message");
+    logs.error("Error sending telegram message", e);
   }
 }
 
@@ -107,11 +106,7 @@ async function sendTelegramMessage({
 
 function checkIfChannelIdExists(chatId: string): boolean {
   const channelIds = db.telegramChannelIds.get();
-  if (channelIds.includes(chatId)) {
-    return true;
-  } else {
-    return false;
-  }
+  return channelIds.includes(chatId);
 }
 
 function subscribeChannelId(channelId: string): void {
@@ -122,6 +117,5 @@ function subscribeChannelId(channelId: string): void {
 
 function unsubscribeChannelId(channelId: string): void {
   const channelIds = db.telegramChannelIds.get();
-  channelIds.splice(channelIds.indexOf(channelId), 1);
-  db.telegramChannelIds.set(channelIds);
+  db.telegramChannelIds.set(channelIds.filter(chatId => chatId !== channelId));
 }

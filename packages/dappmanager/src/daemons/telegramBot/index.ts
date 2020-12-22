@@ -44,7 +44,7 @@ async function checkTelegramStatus(): Promise<void> {
  * Telegram bot
  * @param telegramMessage
  */
-export async function startTelegramDaemon(): Promise<void> {
+export async function startTelegramBotDaemon(): Promise<void> {
   //  When dappmanager reboots, it should persists the bot
   checkTelegramStatus();
   // User may change the telegramToken, if so currentTelegramToken (UNupdated)
@@ -68,8 +68,8 @@ export async function startTelegramDaemon(): Promise<void> {
     ) {
       try {
         const message = buildTelegramMessage({
-          telegramMessage: notification.body,
-          telegramMessageType: "Alert"
+          header: "Alert",
+          telegramMessage: notification.body
         });
         for (const channelId of telegramChannelIds) {
           bot.sendMessage(channelId, message, {
