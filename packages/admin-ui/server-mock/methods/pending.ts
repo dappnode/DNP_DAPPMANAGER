@@ -27,7 +27,7 @@ export async function backupGet(kwargs: {
   dnpName: string;
   backup: PackageBackup[];
 }): Promise<string> {
-  return "";
+  return "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc";
 }
 
 /**

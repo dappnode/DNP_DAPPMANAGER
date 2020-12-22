@@ -34,7 +34,7 @@
       display: none;
     }
 
-    .stateBadge {
+    .state-badge {
       height: 1.65rem;
       border-radius: 1.65rem;
       .content {
@@ -72,7 +72,7 @@
   transition: color 0.2s ease;
 }
 /* Width must be 100% for proper hidding on small screens */
-.list-grid.dnps .stateBadge {
+.list-grid.dnps .state-badge {
   width: 100%;
   overflow: hidden;
   overflow-wrap: normal;
@@ -90,7 +90,7 @@
   white-space: nowrap;
 }
 
-.stateBadge {
+.state-badge {
   border-radius: 6px;
   padding: 1px 5px;
   color: white;
@@ -115,15 +115,6 @@
 
 /* Button file selectors */
 
-.backup {
-  > *:not(:last-child) {
-    margin-bottom: var(--default-spacing);
-  }
-  > span:not(:last-child) {
-    margin-right: var(--default-spacing);
-  }
-}
-
 .button-file-input {
   position: relative;
 
@@ -140,11 +131,8 @@
   }
 }
 
-.backup,
-.file-manager {
-  .subtle-header {
-    margin-bottom: 0.5rem;
-  }
+.file-manager .subtle-header {
+  margin-bottom: 0.5rem;
 }
 
 // Internal packages navigation

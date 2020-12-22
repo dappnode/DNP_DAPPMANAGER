@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { packageRestart } from "../../actions";
-import { StateBadge, getWorstState } from "../StateBadge";
+import {
+  StateBadgeDnp,
+  StateBadgeContainer,
+  StateBadgeLegend
+} from "../StateBadge";
 import {
   MdRefresh,
   MdPauseCircleOutline,
@@ -32,53 +36,64 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     });
   }
 
-  const stateDnp = getWorstState(dnp);
+  const allContainersRunning = dnp.containers.every(c => c.running);
 
   return (
-    <div className="list-grid containers">
-      <header className="center">Status</header>
-      <header></header>
-      <header className="center">Pause</header>
-      <header className="center">Restart</header>
+    <div className="info-container-list">
+      <div className="list-grid containers">
+        <header className="center">Status</header>
+        <header></header>
+        <header className="center">Pause</header>
+        <header className="center">Restart</header>
 
-      {/* DNP entry */}
-      <React.Fragment>
-        {showAll ? <span /> : <StateBadge state={stateDnp} />}
-        <span className="name">
-          {dnp.containers.length > 1 ? (
-            <span>All containers</span>
-          ) : (
-            <span>{sn(dnp.dnpName)}</span>
-          )}
+        {/* DNP entry */}
+        <React.Fragment>
+          <StateBadgeDnp dnp={dnp} />
 
-          {dnp.containers.length > 1 && (
-            <span className="see-all" onClick={() => setShowAll(x => !x)}>
-              {showAll ? <BsChevronContract /> : <BsChevronExpand />}
-            </span>
-          )}
-        </span>
-        {stateDnp === "running" ? (
-          <MdPauseCircleOutline onClick={() => onStartStop()} />
-        ) : (
-          <MdPlayCircleOutline onClick={() => onStartStop()} />
-        )}
-        <MdRefresh onClick={() => onRestart()} />
-      </React.Fragment>
-
-      {/* Container display */}
-      {showAll &&
-        dnp.containers.map(container => (
-          <React.Fragment key={container.serviceName}>
-            <StateBadge state={container.state} />
-            <span className="name">{sn(container.serviceName)}</span>
-            {container.running ? (
-              <MdPauseCircleOutline onClick={() => onStartStop(container)} />
+          <span className="name">
+            {dnp.containers.length > 1 ? (
+              <span>All containers</span>
             ) : (
-              <MdPlayCircleOutline onClick={() => onStartStop(container)} />
+              <span>{sn(dnp.dnpName)}</span>
             )}
-            <MdRefresh onClick={() => onRestart(container)} />
-          </React.Fragment>
-        ))}
+
+            {dnp.containers.length > 1 && (
+              <span className="see-all" onClick={() => setShowAll(x => !x)}>
+                {showAll ? <BsChevronContract /> : <BsChevronExpand />}
+              </span>
+            )}
+          </span>
+
+          {allContainersRunning ? (
+            <MdPauseCircleOutline onClick={() => onStartStop()} />
+          ) : (
+            <MdPlayCircleOutline onClick={() => onStartStop()} />
+          )}
+
+          <MdRefresh onClick={() => onRestart()} />
+        </React.Fragment>
+
+        {/* Container display */}
+        {showAll &&
+          dnp.containers
+            .sort((a, b) => a.serviceName.localeCompare(b.serviceName))
+            .map(container => (
+              <React.Fragment key={container.serviceName}>
+                <StateBadgeContainer container={container} />
+                <span className="name">{sn(container.serviceName)}</span>
+                {container.running ? (
+                  <MdPauseCircleOutline
+                    onClick={() => onStartStop(container)}
+                  />
+                ) : (
+                  <MdPlayCircleOutline onClick={() => onStartStop(container)} />
+                )}
+                <MdRefresh onClick={() => onRestart(container)} />
+              </React.Fragment>
+            ))}
+      </div>
+
+      {!showAll && <StateBadgeLegend dnps={[dnp]} />}
     </div>
   );
 };

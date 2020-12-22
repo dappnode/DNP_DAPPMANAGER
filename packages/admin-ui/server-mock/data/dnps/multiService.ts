@@ -3,7 +3,8 @@ import { MockDnp } from "./types";
 const dnpName = "multi-service.dnp.dappnode.eth";
 const serviceNames = {
   front: "front",
-  back: "back"
+  back: "back",
+  crashed: "crashed"
 };
 
 export const multiService: MockDnp = {
@@ -106,6 +107,7 @@ export const multiService: MockDnp = {
     [serviceNames.back]: {
       state: "exited",
       running: false,
+      exitCode: 0,
       ports: [
         {
           container: 6001,
@@ -135,6 +137,11 @@ export const multiService: MockDnp = {
           container: "./data/backend2"
         }
       ]
+    },
+    [serviceNames.crashed]: {
+      state: "exited",
+      running: false,
+      exitCode: 127
     }
   }
 };

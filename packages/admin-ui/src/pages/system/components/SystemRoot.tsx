@@ -18,6 +18,7 @@ import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
+import { Advanced } from "./Advanced";
 import Title from "components/Title";
 import Notifications from "./Notifications";
 
@@ -74,6 +75,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Profile",
       subPath: subPaths.profile,
       component: Profile
+    },
+    {
+      name: "Advanced",
+      subPath: subPaths.advanced,
+      component: Advanced
     },
     {
       name: "Power",

@@ -61,7 +61,7 @@ function DeviceDetailsLoaded({
 
       {admin && (
         <span
-          className={`stateBadge center badge-success`}
+          className={`state-badge center badge-success`}
           style={{ opacity: 0.85, justifySelf: "left" }}
         >
           ADMIN

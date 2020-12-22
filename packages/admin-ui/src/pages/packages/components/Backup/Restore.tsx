@@ -2,22 +2,19 @@ import React, { useState } from "react";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 // Components
-import Card from "components/Card";
 import Button from "components/Button";
-import Columns from "components/Columns";
-import ProgressBar from "react-bootstrap/ProgressBar";
+import ProgressBar from "react-bootstrap/esm/ProgressBar";
+import { withToastNoThrow } from "components/toast/Toast";
+import ErrorView from "components/ErrorView";
 // Utils
 import { shortName } from "utils/format";
 import humanFS from "utils/humanFileSize";
-import newTabProps from "utils/newTabProps";
-import { PackageBackup } from "common/types";
-import { withToast, withToastNoThrow } from "components/toast/Toast";
+import { PackageBackup } from "types";
 import { apiUrls } from "params";
 
 const baseUrlUpload = apiUrls.upload;
-const baseUrlDownload = apiUrls.download;
 
-export function Backup({
+export function BackupRestore({
   dnpName,
   backup
 }: {
@@ -28,40 +25,15 @@ export function Backup({
     label: string;
     percent?: number;
   }>();
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | Error>();
   const isOnProgress = Boolean(progress && progress.label);
-  // Specific state for get backup
-  const [url, setUrl] = useState("");
-
-  /**
-   * Prepares a backup for download
-   */
-  async function prepareBackupForDownload() {
-    try {
-      setError("");
-      setProgress({ label: "Preparing backup" });
-      const fileId = await withToast(() => api.backupGet({ dnpName, backup }), {
-        message: `Preparing backup for ${shortName(dnpName)}...`,
-        onSuccess: `Backup for ${shortName(dnpName)} ready`
-      });
-      setProgress(undefined);
-      if (!fileId) throw Error("Error preparing backup");
-      const _url = `${baseUrlDownload}/${fileId}`;
-      setUrl(_url);
-      window.open(_url, "_newtab");
-    } catch (e) {
-      setProgress(undefined);
-      setError(e.message);
-      console.error(`Error requesting Backup: ${e.message}`);
-    }
-  }
 
   /**
    * Restores a DNP backup given a backup file
    * @param file
    */
   async function restoreBackup(file: File) {
-    setError("");
+    setError(undefined);
 
     const xhr = new XMLHttpRequest();
     // Bind the FormData object and the form element
@@ -90,7 +62,7 @@ export function Backup({
     // Define what happens in case of error
     xhr.addEventListener("error", e => {
       setProgress(undefined);
-      setError("Something went wrong");
+      setError("Error loading file");
     });
 
     if (xhr.upload)
@@ -132,61 +104,25 @@ export function Backup({
   if (!Array.isArray(backup)) return null;
 
   return (
-    <Card className="backup">
-      {/* Get backup */}
-      <Columns>
-        <div>
-          <div className="subtle-header">DOWNLOAD BACKUP</div>
-          <p>
-            Download a backup of the critical files of this package in you local
-            machine.
-          </p>
-          {url ? (
-            <a href={url} {...newTabProps} className="no-a-style">
-              <Button variant="dappnode">Download backup</Button>
-              <div
-                style={{
-                  opacity: 0.7,
-                  fontSize: "0.8rem",
-                  marginTop: "0.5rem"
-                }}
-              >
-                Allow browser pop-ups or click download
-              </div>
-            </a>
-          ) : (
-            <Button
-              onClick={prepareBackupForDownload}
-              disabled={isOnProgress}
-              variant="dappnode"
-            >
-              Backup now
-            </Button>
-          )}
-        </div>
+    <>
+      <p>
+        Restore an existing backup. Note that this action will overwrite
+        existing data.
+      </p>
 
-        {/* Restore backup */}
-        <div>
-          <div className="subtle-header">RESTORE BACKUP</div>
-          <p>
-            Restore an existing backup. Note that this action will overwrite
-            existing data.
-          </p>
-          <Button className="button-file-input" disabled={isOnProgress}>
-            <span>Restore</span>
-            <input
-              type="file"
-              id="backup_upload"
-              name="file"
-              accept=".tar, .xz, .tar.xz, .zip"
-              onChange={e => {
-                if (e.target.files) handleClickRestore(e.target.files[0]);
-              }}
-              disabled={isOnProgress}
-            />
-          </Button>
-        </div>
-      </Columns>
+      <Button className="button-file-input" disabled={isOnProgress}>
+        <span>Restore</span>
+        <input
+          type="file"
+          id="backup_upload"
+          name="file"
+          accept=".tar, .xz, .tar.xz, .zip"
+          onChange={e => {
+            if (e.target.files) handleClickRestore(e.target.files[0]);
+          }}
+          disabled={isOnProgress}
+        />
+      </Button>
 
       {progress && (
         <div>
@@ -198,7 +134,7 @@ export function Backup({
         </div>
       )}
 
-      {error && <div style={{ color: "red" }}>Error: {error}</div>}
-    </Card>
+      {error && <ErrorView error={error} red hideIcon />}
+    </>
   );
 }

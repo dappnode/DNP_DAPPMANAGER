@@ -1,3 +1,9 @@
+.info-container-list {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+}
+
 .list-grid.containers {
   /*
   Col 1, Fit to the link buttons / switch always
@@ -22,7 +28,7 @@
       minmax(calc(var(--icon-size) / 2), min-content)
       minmax(calc(var(--icon-size) / 2), min-content);
 
-    .stateBadge {
+    .state-badge {
       height: 1.65rem;
       width: 1.65rem;
       border-radius: 1.65rem;

@@ -26,7 +26,8 @@ import {
   HostStatDisk,
   HostStatMemory,
   PublicIpResponse,
-  ChainData
+  ChainData,
+  ShhStatus
 } from "./types";
 
 export interface Routes {
@@ -429,6 +430,7 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
+
    * Sets the status of the telegram bot
    * @param telegramStatus new status of the bot
    */
@@ -444,6 +446,19 @@ export interface Routes {
    * Gets bot telegram status
    */
   getTelegramStatus: () => Promise<boolean>;
+
+  /*
+   * Change the SHH port on the DAppNode host
+   */
+  sshPortChange: (kwargs: { port: number }) => Promise<void>;
+  /**
+   * Disable or enable SSH on the DAppNode host
+   */
+  sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
+  /**
+   * Check if SSH is enabled of disabled in the DAppNode host
+   */
+  sshStatusGet: () => Promise<ShhStatus>;
 
   /**
    * Returns the current DAppNode system info
@@ -529,6 +544,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   setTelegramToken: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
+  sshPortChange: { log: true },
+  sshStatusGet: {},
+  sshStatusSet: { log: true },
   systemInfoGet: {},
   volumeRemove: { log: true },
   volumesGet: {},

@@ -4,6 +4,10 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
+// SSH types
+
+export type ShhStatus = "enabled" | "disabled";
+
 // Device types
 
 export interface VpnDeviceCredentials extends VpnDevice {
@@ -396,6 +400,7 @@ export interface PackageContainer {
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerState;
   running: boolean;
+  exitCode: number | null;
   ports: PortMapping[];
   volumes: VolumeMapping[];
 
