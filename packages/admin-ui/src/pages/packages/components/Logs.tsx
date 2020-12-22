@@ -35,6 +35,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
 
   const container = containers.find(c => c.serviceName === serviceName);
   const containerName = container?.containerName;
+  console.log(containerName);
 
   /**
    * This use effect fetches the logs again everytime any of this variables changes:
@@ -77,7 +78,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         unmounted = true;
       };
     }
-  }, [autoRefresh, timestamps, lines, containerName]);
+  }, [autoRefresh, timestamps, lines, containerName, serviceName]);
 
   /**
    * Filter the logs text by lines that contain the query
