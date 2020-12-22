@@ -50,23 +50,12 @@ export default function Notifications() {
           </a>
         </div>
         <div>
-          Read more about how to use the telegram Bot{" "}
-          <a href="https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA">here</a>
           <ul>
             <li>
-              <strong>/channel</strong>
+              <strong>/help</strong>
             </li>
             <li>
-              <strong>/channelremove</strong>
-            </li>
-            <li>
-              <strong>/disk</strong>
-            </li>
-            <li>
-              <strong>/cpu</strong>
-            </li>
-            <li>
-              <strong>/memory</strong>
+              <strong>/unsubscribe</strong>
             </li>
           </ul>
         </div>
@@ -94,7 +83,7 @@ export default function Notifications() {
             Submit
           </Button>
           <br />
-          {telegramStatus.data ? (
+          {telegramStatus.data !== undefined ? (
             <Switch
               checked={telegramStatus.data}
               label={telegramStatus.data === true ? "On" : "Off"}

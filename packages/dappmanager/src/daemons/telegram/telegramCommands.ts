@@ -1,9 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
-import { statsCpuGet, statsDiskGet, statsMemoryGet } from "../../calls";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { buildTelegramMessage } from "./buildTelegramMessage";
-import { bold, url } from "./utils";
+import { bold, buildTelegramMessage, url } from "./buildTelegramMessage";
 
 /**
  * Polls for commands and responds.
@@ -22,106 +20,32 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
     bot.on("polling_error", error => {
       throw Error(`${error.name}: ${error.message}`);
     });
-    // get disk stats
-    bot.onText(/\/disk/, async msg => {
-      try {
-        const chatId = msg.chat.id.toString();
-        const diskStats = await statsDiskGet();
-        const diskMessage = `${bold("Disk free")} ${
-          diskStats.free
-        } bytes | ${bold("Disk used")} ${diskStats.used} bytes | ${bold(
-          "Disk total"
-        )} ${diskStats.total} bytes | ${bold("Disk percentage")} ${
-          diskStats.usedPercentage
-        } %`;
-        const message = buildTelegramMessage({
-          telegramMessage: diskMessage,
-          telegramMessageType: "Stats"
-        });
 
-        await sendTelegramMessage({ bot, chatId, message });
-      } catch (e) {
-        logs.error("Error on telegram daemon. /disk command", e);
-      }
-    });
-
-    // get cpu stats
-    bot.onText(/\/cpu/, async msg => {
-      try {
-        const chatId = msg.chat.id.toString();
-        const cpuStats = await statsCpuGet();
-        const cpuMessage = `${bold("CPU percentage")} ${
-          cpuStats.usedPercentage
-        } %`;
-        const message = buildTelegramMessage({
-          telegramMessage: cpuMessage,
-          telegramMessageType: "Stats"
-        });
-
-        await sendTelegramMessage({ bot, chatId, message });
-      } catch (e) {
-        logs.error("Error on telegram daemon. /cpu command", e);
-      }
-    });
-
-    // get memory stats
-    bot.onText(/\/memory/, async msg => {
-      try {
-        const chatId = msg.chat.id.toString();
-        const memoryStats = await statsMemoryGet();
-        const memoryMessage = `${bold("Memory free")} ${
-          memoryStats.free
-        } bytes | ${bold("Memory used")} ${memoryStats.used} bytes  | ${bold(
-          "Memory total"
-        )} ${memoryStats.total} bytes | ${bold("Memory percentage")} ${
-          memoryStats.usedPercentage
-        } %`;
-        const message = buildTelegramMessage({
-          telegramMessage: memoryMessage,
-          telegramMessageType: "Stats"
-        });
-
-        await sendTelegramMessage({ bot, chatId, message });
-      } catch (e) {
-        logs.error("Error on telegram daemon. /memory command", e);
-      }
-    });
-
-    // set the channel ID
-    bot.onText(/\/channel/, async msg => {
-      try {
-        const chatId = msg.chat.id.toString();
-        const channelIds = db.telegramChannelIds.get();
-        let message = "";
-        if (channelIds.includes(chatId)) {
-          message = buildTelegramMessage({
-            telegramMessage: "Channel ID already exists",
-            telegramMessageType: "Danger"
-          });
-        } else {
-          channelIds.push(chatId);
-          db.telegramChannelIds.set(channelIds);
-          message = buildTelegramMessage({
-            telegramMessage: "Succesfully saved channel ID",
-            telegramMessageType: "Success"
-          });
+    // Listen for any messages. If channel ID does not exists, it saves the channel ID
+    bot.on("message", async msg => {
+      if (msg.text !== "/unsubscribe")
+        try {
+          const chatId = msg.chat.id.toString();
+          if (!checkIfChannelIdExists(chatId)) {
+            const message = buildTelegramMessage({
+              telegramMessage: "Succesfully saved channel ID",
+              telegramMessageType: "Success"
+            });
+            subscribeChannelId(chatId);
+            await sendTelegramMessage({ bot, chatId, message });
+          }
+        } catch (e) {
+          logs.error("Error on telegram daemon. message polling", e);
         }
-
-        await sendTelegramMessage({ bot, chatId, message });
-      } catch (e) {
-        logs.error("Error on telegram daemon. /channel command", e);
-      }
     });
 
     // Remove channel ID
-    bot.onText(/\/channelremove/, async msg => {
+    bot.onText(/\/unsubscribe/, async msg => {
       try {
         const chatId = msg.chat.id.toString();
-        const channelIds = db.telegramChannelIds.get();
         let message = "";
-        if (channelIds.includes(chatId)) {
-          channelIds.splice(channelIds.indexOf(chatId), 1);
-          db.telegramChannelIds.set(channelIds);
+        if (checkIfChannelIdExists(chatId)) {
+          unsubscribeChannelId(chatId);
           message = buildTelegramMessage({
             telegramMessage: "Succesfully removed channel ID",
             telegramMessageType: "Success"
@@ -135,26 +59,26 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
 
         await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
-        logs.error("Error on telegram daemon. /channel command", e);
+        logs.error("Error on telegram daemon. /unsubscribe command", e);
       }
     });
 
-    // returns help content
+    // Returns help content
     bot.onText(/\/help/, async msg => {
       try {
         const chatId = msg.chat.id.toString();
         const message = buildTelegramMessage({
-          telegramMessage: `Commands: ${bold("/disk")} & ${bold(
-            "/memory"
-          )} & ${bold("/cpu")} returns stats from your DAppNode | ${bold(
-            "/channel"
-          )} sets the channel ID to receive alerts | ${bold(
-            "/channelremove"
-          )} removes the channel ID | more information ${url(
-            "here",
-            "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
-          )}`,
-          telegramMessageType: "Notification"
+          telegramMessage: `Commands:\n
+           ${bold("/disk")}\n
+           ${bold("/memory")}\n
+           ${bold("/cpu")}\n
+           ${bold("/channel")} sets the channel ID to receive alerts\n
+           ${bold("/removechannel")} removes the channel ID\n
+            More information ${url(
+              "here",
+              "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
+            )}`,
+          telegramMessageType: "Help"
         });
 
         await sendTelegramMessage({ bot, chatId, message });
@@ -167,6 +91,8 @@ export async function telegramCommands(bot: TelegramBot): Promise<void> {
   }
 }
 
+// TELEGRAM COMMANDS UTILS
+
 async function sendTelegramMessage({
   bot,
   chatId,
@@ -177,4 +103,25 @@ async function sendTelegramMessage({
   message: string;
 }): Promise<void> {
   await bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
+}
+
+function checkIfChannelIdExists(chatId: string): boolean {
+  const channelIds = db.telegramChannelIds.get();
+  if (channelIds.includes(chatId)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function subscribeChannelId(channelId: string): void {
+  const channelIds = db.telegramChannelIds.get();
+  channelIds.push(channelId);
+  db.telegramChannelIds.set(channelIds);
+}
+
+function unsubscribeChannelId(channelId: string): void {
+  const channelIds = db.telegramChannelIds.get();
+  channelIds.splice(channelIds.indexOf(channelId), 1);
+  db.telegramChannelIds.set(channelIds);
 }
