@@ -73,8 +73,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
         });
       }
     } catch (e) {
-      e.message = `Error sending telegram message: ${e.message}`;
-      throw e;
+      throw Error(`Error sending telegram message: ${e}`);
     }
   });
 }
