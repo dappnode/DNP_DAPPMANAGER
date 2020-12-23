@@ -4,11 +4,11 @@ import { useApi } from "api";
 import Card from "components/Card";
 // Styles
 import RenderMarkdown from "components/RenderMarkdown";
-import { formatIssueBody, formatIssueUrl } from "../formaters/githubIssue";
-import { issueBaseUrl } from "params";
+import { formatTopicBody, formatTopicUrl } from "../formaters/discourseTopic";
+import { topicBaseUrl } from "params";
 import { PackageVersionData } from "common/types";
 import Ok from "components/Ok";
-import { FaGithub } from "react-icons/fa";
+import { FaDiscourse } from "react-icons/fa";
 import { MdChevronRight } from "react-icons/md";
 
 export default function Report() {
@@ -42,9 +42,9 @@ export default function Report() {
     { name: "Disk usage", result: diskUsedPercentage }
   ];
 
-  const issueBody = formatIssueBody(coreDnpVersions, systemData);
-  const issueUrlWithData = formatIssueUrl(issueBody);
-  const issueUrlNoData = issueBaseUrl;
+  const topicBody = formatTopicBody(coreDnpVersions, systemData);
+  const topicUrlWithData = formatTopicUrl(topicBody);
+  const topicUrlNoData = topicBaseUrl;
   const reqs = [dnpsReq, systemInfoReq, diagnoseReq, hostStatsReq];
   const isLoading = reqs.some(req => req.isValidating);
   const isLoaded = reqs.every(req => req.data);
@@ -52,19 +52,19 @@ export default function Report() {
   return (
     <Card>
       <p>
-        To help the support team, the <strong>Report issue</strong> button will
-        prefill the Github issue with the information shown below. If you don't
+        To help the support team, the <strong>Report</strong> button will
+        prefill a new forum topic with the information shown below. If you don't
         want to share any information, use the{" "}
-        <strong>Report issue without providing information</strong> button.
+        <strong>Report without providing information</strong> button.
       </p>
 
-      <div className="github-issue-header">
+      <div className="discourse-topic-header">
         <span className="location">
           <span className="logo">
-            <FaGithub />
+            <FaDiscourse />
           </span>
           <MdChevronRight className="arrow" />
-          <span>New issue</span>
+          <span>New topic</span>
           <MdChevronRight className="arrow" />
           <span>Body</span>
         </span>
@@ -73,14 +73,14 @@ export default function Report() {
           <Ok msg="" loading={isLoading} ok={isLoaded} />
         </span>
       </div>
-      <div className="github-issue-body">
-        <RenderMarkdown source={issueBody} />
+      <div className="discourse-topic-body">
+        <RenderMarkdown source={topicBody} />
       </div>
-      <a className="btn btn-dappnode mt-3 mr-3" href={issueUrlWithData}>
-        Report issue
+      <a className="btn btn-dappnode mt-3 mr-3" href={topicUrlWithData}>
+        Report
       </a>
-      <a className="btn btn-outline-dappnode mt-3" href={issueUrlNoData}>
-        Report issue without providing information
+      <a className="btn btn-outline-dappnode mt-3" href={topicUrlNoData}>
+        Report without providing information
       </a>
     </Card>
   );
