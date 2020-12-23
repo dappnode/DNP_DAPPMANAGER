@@ -11,78 +11,73 @@ import { bold, url } from "./markdown";
  * @param telegramToken
  */
 export async function telegramCommands(bot: TelegramBot): Promise<void> {
-  try {
-    bot.startPolling();
-    // POLLING ERRORS
-    // 1. EFATAL if error was fatal e.g. network error
-    // 2. EPARSE if response body could not be parsed
-    // 3. ETELEGRAM if error was returned from Telegram servers
-    // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
-    // ETELEGRAM: 404 Not Found => wrong token or not found
-    bot.on("polling_error", error => {
-      logs.error(`${error.name}: ${error.message}`);
-    });
+  bot.startPolling();
+  // POLLING ERRORS
+  // 1. EFATAL if error was fatal e.g. network error
+  // 2. EPARSE if response body could not be parsed
+  // 3. ETELEGRAM if error was returned from Telegram servers
+  // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
+  // ETELEGRAM: 404 Not Found => wrong token or not found
+  bot.on("polling_error", error => {
+    logs.error(`${error.name}: ${error.message}`);
+  });
 
-    // Listen for any messages. If channel ID does not exists, it saves the channel ID
-    bot.on("message", async msg => {
-      if (msg.text && !commandsList.includes(msg.text))
-        try {
-          const chatId = msg.chat.id.toString();
-          if (!checkIfChannelIdExists(chatId)) {
-            const message =
-              formatTelegramCommandHeader("Success") +
-              "Succesfully saved channel ID";
-            subscribeChannelId(chatId);
-            await sendTelegramMessage({ bot, chatId, message });
-          }
-        } catch (e) {
-          logs.error("Error on telegram message handler", e);
-        }
-    });
-
-    // Remove channel ID
-    bot.onText(/\/unsubscribe/, async msg => {
+  // Listen for any messages. If channel ID does not exists, it saves the channel ID
+  bot.on("message", async msg => {
+    if (msg.text && !commandsList.includes(msg.text))
       try {
         const chatId = msg.chat.id.toString();
-        let message = "";
-        if (checkIfChannelIdExists(chatId)) {
-          unsubscribeChannelId(chatId);
-          message =
+        if (!checkIfChannelIdExists(chatId)) {
+          const message =
             formatTelegramCommandHeader("Success") +
-            "Succesfully removed channel ID";
-        } else {
-          message =
-            formatTelegramCommandHeader("Fail") + "Channel ID not found";
+            "Succesfully saved channel ID";
+          subscribeChannelId(chatId);
+          await sendTelegramMessage({ bot, chatId, message });
         }
-
-        await sendTelegramMessage({ bot, chatId, message });
       } catch (e) {
-        logs.error("Error on telegram daemon. /unsubscribe command", e);
+        logs.error("Error on telegram message handler", e);
       }
-    });
+  });
 
-    // Returns help content
-    bot.onText(/\/help/, async msg => {
-      try {
-        const chatId = msg.chat.id.toString();
-        const message = [
-          bold("Commands"),
-          bold("/unsubscribe"),
-          bold("/help"),
-          `More information ${url(
-            "here",
-            "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
-          )}`
-        ].join("\n\n");
-
-        await sendTelegramMessage({ bot, chatId, message });
-      } catch (e) {
-        logs.error("Error on telegram daemon. /help command", e);
+  // Remove channel ID
+  bot.onText(/\/unsubscribe/, async msg => {
+    try {
+      const chatId = msg.chat.id.toString();
+      let message = "";
+      if (checkIfChannelIdExists(chatId)) {
+        unsubscribeChannelId(chatId);
+        message =
+          formatTelegramCommandHeader("Success") +
+          "Succesfully removed channel ID";
+      } else {
+        message = formatTelegramCommandHeader("Fail") + "Channel ID not found";
       }
-    });
-  } catch (e) {
-    logs.error("Error sending telegram message", e);
-  }
+
+      await sendTelegramMessage({ bot, chatId, message });
+    } catch (e) {
+      logs.error("Error on telegram daemon. /unsubscribe command", e);
+    }
+  });
+
+  // Returns help content
+  bot.onText(/\/help/, async msg => {
+    try {
+      const chatId = msg.chat.id.toString();
+      const message = [
+        bold("Commands"),
+        bold("/unsubscribe"),
+        bold("/help"),
+        `More information ${url(
+          "here",
+          "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
+        )}`
+      ].join("\n\n");
+
+      await sendTelegramMessage({ bot, chatId, message });
+    } catch (e) {
+      logs.error("Error on telegram daemon. /help command", e);
+    }
+  });
 }
 
 // TELEGRAM COMMANDS UTILS
