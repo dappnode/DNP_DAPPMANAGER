@@ -1,13 +1,12 @@
-import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { buildTelegramNotificationMessage } from "./buildTelegramNotificationMessage";
-import { telegramCommands } from "./telegramCommands";
+import { DappnodeTelegramBot } from "./commands";
 
 // Telegram setup When reboot it lost
 let currentTelegramToken: string | null;
-let bot: TelegramBot | null = null;
+let bot: DappnodeTelegramBot | null = null;
 
 /**
  * This function should be called once after dappmanager
@@ -26,10 +25,8 @@ async function checkTelegramStatus(): Promise<void> {
         bot = null;
       }
       if (!bot) {
-        bot = new TelegramBot(telegramToken);
+        bot = new DappnodeTelegramBot(telegramToken);
       }
-
-      telegramCommands(bot);
     } else {
       if (bot) {
         bot.stopPolling();
