@@ -1,7 +1,5 @@
 import { eventBus } from "../eventBus";
-import { listPackage } from "../modules/docker/list";
-import { restartPackage } from "../modules/docker/restartPackage";
-import { getDockerTimeoutMax } from "../modules/docker/utils";
+import { dockerComposeUpPackage, getContainersStatus } from "../modules/docker";
 
 /**
  * Recreates a package containers
@@ -15,13 +13,10 @@ export async function packageRestart({
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  const dnp = await listPackage({ dnpName });
-  const timeout = getDockerTimeoutMax(dnp.containers);
-  await restartPackage({
-    dnpName,
+  const containersStatus = await getContainersStatus({ dnpName });
+  await dockerComposeUpPackage({ dnpName }, containersStatus, {
     serviceNames,
-    forceRecreate: true,
-    timeout
+    forceRecreate: true
   });
 
   // Emit packages update

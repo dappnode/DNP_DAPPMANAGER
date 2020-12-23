@@ -831,6 +831,7 @@ export type InstallPackageDataPaths = Pick<
   | "imagePath"
   | "isUpdate"
   | "dockerTimeout"
+  | "containersStatus"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -845,6 +846,16 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  dockerTimeout: number | undefined;
+  containersStatus: ContainersStatus;
+}
+
+export interface ContainersStatus {
+  [serviceName: string]: ContainerStatus;
+}
+
+export interface ContainerStatus {
+  targetStatus: "stopped" | "running";
   dockerTimeout: number | undefined;
 }
 

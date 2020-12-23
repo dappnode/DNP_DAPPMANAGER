@@ -3,8 +3,8 @@ import params from "../params";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { PortMapping } from "../types";
-import { restartPackage } from "../modules/docker/restartPackage";
 import { mapValues } from "lodash";
+import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -28,10 +28,10 @@ export async function packageSetPortMappings({
   if (!portMappingsByService)
     throw Error("kwarg portMappingsByService must be defined");
 
-  const dnp = await listPackage({ dnpName });
-
-  if (dnp.dnpName === params.dappmanagerDnpName)
+  if (dnpName === params.dappmanagerDnpName)
     throw Error("Can not edit DAPPAMANAGER ports");
+
+  const dnp = await listPackage({ dnpName });
 
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   const services = compose.services();
@@ -50,9 +50,10 @@ export async function packageSetPortMappings({
 
   compose.write();
 
+  const containersStatus = await getContainersStatus({ dnpName });
+
   try {
-    // packageRestart triggers > eventBus emitPackages
-    await restartPackage({ dnpName, forceRecreate: false });
+    await dockerComposeUpPackage({ dnpName }, containersStatus);
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
@@ -63,7 +64,7 @@ export async function packageSetPortMappings({
           services[serviceName].setPortMapping(portMappings);
       compose.write();
 
-      await restartPackage({ dnpName, forceRecreate: false });
+      await dockerComposeUpPackage({ dnpName }, containersStatus);
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(

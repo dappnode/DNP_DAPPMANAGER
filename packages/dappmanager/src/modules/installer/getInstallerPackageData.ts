@@ -74,6 +74,7 @@ function getInstallerPackageData(
     compose: compose.output(),
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
-    dockerTimeout
+    dockerTimeout,
+    containersStatus
   };
 }

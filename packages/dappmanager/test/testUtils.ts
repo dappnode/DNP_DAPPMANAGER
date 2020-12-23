@@ -267,7 +267,8 @@ export const mockPackageData: InstallPackageData = {
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
   manifestBackupPath: "mock/path/manifest.backup.json",
-  dockerTimeout: undefined
+  dockerTimeout: undefined,
+  containersStatus: {}
 };
 
 // For copyFileTo and copyFileFrom
