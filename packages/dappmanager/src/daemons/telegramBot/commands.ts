@@ -5,19 +5,15 @@ import { logs } from "../../logs";
 import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
 import { bold, url } from "./markdown";
 
-const messageOptions: TelegramBot.SendMessageOptions = {
-  parse_mode: "Markdown"
-};
-
 /**
  * Polls for commands and responds.
  * Channel ID is not needed to response to messages
  */
-export class DappnodeTelegramBot extends TelegramBot {
-  constructor(telegramToken: string) {
-    super(telegramToken);
+export class DappnodeTelegramBot {
+  private bot: TelegramBot;
 
-    this.startPolling();
+  constructor(telegramToken: string) {
+    this.bot = new TelegramBot(telegramToken);
 
     // POLLING ERRORS
     // 1. EFATAL if error was fatal e.g. network error
@@ -25,12 +21,12 @@ export class DappnodeTelegramBot extends TelegramBot {
     // 3. ETELEGRAM if error was returned from Telegram servers
     // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
     // ETELEGRAM: 404 Not Found => wrong token or not found
-    this.on("polling_error", error => {
+    this.bot.on("polling_error", error => {
       logs.error(`${error.name}: ${error.message}`);
     });
 
     // Listen for any messages. If channel ID does not exists, it saves the channel ID
-    this.on("message", async msg => {
+    this.bot.on("message", async msg => {
       try {
         if (!msg.text) return;
 
@@ -50,6 +46,20 @@ export class DappnodeTelegramBot extends TelegramBot {
     });
   }
 
+  async start(): Promise<void> {
+    await this.bot.startPolling();
+  }
+
+  async stop(): Promise<void> {
+    await this.bot.stopPolling();
+  }
+
+  async sendMessage(chatId: string | number, text: string): Promise<void> {
+    await this.bot.sendMessage(chatId, text, {
+      parse_mode: "Markdown"
+    });
+  }
+
   /**
    * Add channel ID
    */
@@ -60,7 +70,7 @@ export class DappnodeTelegramBot extends TelegramBot {
 
     this.addChannelId(chatId);
 
-    await this.sendMessage(chatId, message, messageOptions);
+    await this.sendMessage(chatId, message);
   }
 
   /**
@@ -79,7 +89,7 @@ export class DappnodeTelegramBot extends TelegramBot {
       message = formatTelegramCommandHeader("Fail") + "Channel ID not found";
     }
 
-    await this.sendMessage(chatId, message, messageOptions);
+    await this.sendMessage(chatId, message);
   }
 
   /**
@@ -97,7 +107,7 @@ export class DappnodeTelegramBot extends TelegramBot {
       )}`
     ].join("\n\n");
 
-    await this.sendMessage(chatId, message, messageOptions);
+    await this.sendMessage(chatId, message);
   }
 
   private channelIdExists(chatId: string): boolean {
