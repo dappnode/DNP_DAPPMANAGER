@@ -24,7 +24,6 @@ const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 export function Logs({ containers }: { containers: PackageContainer[] }) {
   const serviceNames = containers.map(c => c.serviceName).sort();
   const [serviceName, setServiceName] = useState(serviceNames[0]);
-  const [serviceNameHasChanged, setServiceNameHasChanged] = useState(false);
 
   // User options
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -62,7 +61,6 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         // Prevent updating the state of an unmounted component
         if (unmounted) return;
 
-        setServiceNameHasChanged(false);
         setLogs(logs);
         // Auto scroll to bottom (deffered after the paint)
         setTimeout(scrollToBottom, 10);
@@ -71,23 +69,19 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         setAutoRefresh(false);
       }
     }
-    if (
-      (autoRefresh && validateLines(lines)) ||
-      serviceNameHasChanged === true
-    ) {
-      setLogs("fetching...");
+    if (autoRefresh) {
       const interval = setInterval(logDnp, refreshInterval);
       return () => {
         clearInterval(interval);
         unmounted = true;
       };
+    } else {
+      logDnp();
+      return () => {
+        unmounted = true;
+      };
     }
-  }, [autoRefresh, timestamps, lines, containerName, serviceNameHasChanged]);
-
-  function handleSetServiceName(serviceName: string) {
-    setServiceName(serviceName);
-    setServiceNameHasChanged(true);
-  }
+  }, [autoRefresh, timestamps, lines, containerName]);
 
   /**
    * Filter the logs text by lines that contain the query
@@ -109,7 +103,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
     <Card spacing>
       <ServiceSelector
         serviceName={serviceName}
-        setServiceName={handleSetServiceName}
+        setServiceName={setServiceName}
         containers={containers}
       />
 
