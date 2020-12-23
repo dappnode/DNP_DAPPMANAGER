@@ -122,6 +122,11 @@ const params = {
     "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
     "/var/run/docker.sock:/var/run/docker.sock"
   ],
+  corePackagesThatMustBeRunning: [
+    "bind.dnp.dappnode.eth",
+    "dappmanager.dnp.dappnode.eth",
+    "vpn.dnp.dappnode.eth"
+  ],
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",

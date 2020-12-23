@@ -29,16 +29,18 @@ async function execDockerCompose(
   ]);
 }
 
+export interface DockerComposeUpOptions {
+  noStart?: boolean;
+  detach?: boolean;
+  forceRecreate?: boolean;
+  timeout?: number;
+  serviceNames?: string[];
+  removeOrphans?: boolean;
+}
+
 export function dockerComposeUp(
   dcPath: string,
-  options: {
-    noStart?: boolean;
-    detach?: boolean;
-    forceRecreate?: boolean;
-    timeout?: number;
-    serviceNames?: string[];
-    removeOrphans?: boolean;
-  } = {}
+  options: DockerComposeUpOptions = {}
 ): Promise<string> {
   // --detach is invalid with --no-start
   if (options.noStart) options.detach = false;

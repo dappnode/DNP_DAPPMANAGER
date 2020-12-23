@@ -2,7 +2,7 @@ import { PackageEnvs } from "../types";
 import { eventBus } from "../eventBus";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import { restartPackage } from "../modules/docker/restartPackage";
+import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -31,7 +31,8 @@ export async function packageSetEnvironment({
 
   compose.write();
 
-  await restartPackage({ dnpName, forceRecreate: false });
+  const containersStatus = await getContainersStatus({ dnpName });
+  await dockerComposeUpPackage({ dnpName }, containersStatus);
 
   // Emit packages update
   eventBus.requestPackages.emit();

@@ -1,5 +1,4 @@
 import stripAnsi from "strip-ansi";
-import { PackageContainer } from "../../types";
 
 /**
  * When fetching logs from the API, each line is prefixed by a Header
@@ -55,7 +54,7 @@ function stripDockerApiLogHeader(line: string): string {
  * @param containers
  */
 export function getDockerTimeoutMax(
-  containers: PackageContainer[]
+  containers: { dockerTimeout?: number }[]
 ): number | undefined {
   let timeout: number | undefined = undefined;
 

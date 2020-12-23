@@ -74,8 +74,8 @@ export async function packageInstall({
         );
     }
 
-    // Gather all data necessary for the install. Isolated in a pure function to ease testing
-    const packagesData = getInstallerPackagesData({
+    // Gather all data necessary for the install
+    const packagesData = await getInstallerPackagesData({
       releases,
       userSettings,
       currentVersions,
