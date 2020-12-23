@@ -1,5 +1,5 @@
 import { PackageVersionData } from "types";
-import { issueBaseUrl } from "params";
+import { topicBaseUrl } from "params";
 
 /**
  * Info selectors
@@ -13,17 +13,17 @@ import { issueBaseUrl } from "params";
  *   error: {string}
  * }
  */
-interface IssueDataItem {
+interface TopicDataItem {
   name: string;
   result?: string;
   error?: string;
 }
 
 /**
- * Construct github issue
+ * Construct discourse topic
  * ======================
  *
- * Before filing a new issue...
+ * Before filing a new topic...
  *
  * Core DNPs versions
  * - admin.dnp.dappnode.eth: 0.1.18
@@ -34,16 +34,16 @@ interface IssueDataItem {
  * ...
  */
 
-interface IssueBodySection {
+interface TopicBodySection {
   title: string;
   items: { name: string; data: string }[];
 }
 
-export function formatIssueBody(
+export function formatTopicBody(
   coreDnpVersions: { name: string; version: string | PackageVersionData }[],
-  systemData: IssueDataItem[]
+  systemData: TopicDataItem[]
 ): string {
-  const sections: IssueBodySection[] = [
+  const sections: TopicBodySection[] = [
     {
       title: "Core DAppNode Packages versions",
       items: coreDnpVersions.map(({ name, version }) => ({
@@ -63,7 +63,7 @@ export function formatIssueBody(
   ];
 
   return [
-    "*Before filing a new issue, please **provide the following information**.*",
+    "*Before filing a new topic, please **provide the following information**.*",
     ...sections
       .filter(({ items }) => items.length)
       .map(
@@ -74,14 +74,16 @@ export function formatIssueBody(
   ].join("\n\n");
 }
 
-export function formatIssueUrl(body: string) {
-  // Construct issueUrl from the available info
+export function formatTopicUrl(body: string) {
+  // Construct topicUrl from the available info
+  const topicCategory = "5"; // This category is technical support
   const title = "";
   const params = [
     "title=" + encodeURIComponent(title),
-    "body=" + encodeURIComponent(body)
+    "body=" + encodeURIComponent(body),
+    "category_id=" + encodeURIComponent(topicCategory)
   ];
-  return issueBaseUrl + "?" + params.join("&");
+  return topicBaseUrl + "?" + params.join("&");
 }
 
 /**
