@@ -69,11 +69,16 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         setAutoRefresh(false);
       }
     }
-    if (autoRefresh && validateLines(lines)) {
-      setLogs("fetching...");
+    setLogs("fetching...");
+    if (autoRefresh) {
       const interval = setInterval(logDnp, refreshInterval);
       return () => {
         clearInterval(interval);
+        unmounted = true;
+      };
+    } else {
+      logDnp();
+      return () => {
         unmounted = true;
       };
     }
