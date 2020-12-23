@@ -30,7 +30,7 @@ async function checkTelegramStatus(): Promise<void> {
       }
 
       telegramCommands(bot);
-    } else if (isEnabled === false) {
+    } else {
       if (bot) {
         bot.stopPolling();
       }
