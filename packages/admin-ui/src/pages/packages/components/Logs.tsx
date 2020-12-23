@@ -84,7 +84,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
     }
   }, [autoRefresh, timestamps, lines, containerName, serviceNameHasChanged]);
 
-  function handleSetServiceName() {
+  function handleSetServiceName(serviceName: string) {
     setServiceName(serviceName);
     setServiceNameHasChanged(true);
   }
