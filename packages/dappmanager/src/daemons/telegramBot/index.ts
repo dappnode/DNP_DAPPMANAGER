@@ -64,7 +64,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
 
     try {
       const message = buildTelegramNotificationMessage({
-        notificationType: "danger",
+        notificationType: notification.type,
         telegramMessage: notification.body
       });
       for (const channelId of telegramChannelIds) {
@@ -73,7 +73,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
         });
       }
     } catch (e) {
-      throw Error(`Error sending telegram message: ${e}`);
+      logs.error("Error sending telegram notification", e);
     }
   });
 }
