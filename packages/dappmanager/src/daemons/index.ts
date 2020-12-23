@@ -5,6 +5,7 @@ import { startDynDnsDaemon } from "./dyndns";
 import { startEthMultiClientDaemon } from "./ethMultiClient";
 import { startNatRenewalDaemon } from "./natRenewal";
 import { startNsUpdateDaemon } from "./nsupdate";
+import { startTelegramBotDaemon } from "./telegramBot";
 import { startVpnBridgeDaemon } from "./vpnBridge";
 
 export function startDaemons(signal: AbortSignal): void {
@@ -15,4 +16,5 @@ export function startDaemons(signal: AbortSignal): void {
   startNatRenewalDaemon(signal);
   startNsUpdateDaemon(signal);
   startVpnBridgeDaemon(signal);
+  startTelegramBotDaemon();
 }

@@ -430,6 +430,23 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
+   * Sets the status of the telegram bot
+   * @param telegramStatus new status of the bot
+   */
+  setTelegramStatus: (kwarg: { telegramStatus: boolean }) => Promise<void>;
+
+  /**
+   * Sets the telegram token
+   * @param telegramToken new bot token
+   */
+  setTelegramToken: (kwarg: { telegramToken: string }) => Promise<void>;
+
+  /**
+   * Gets bot telegram status
+   */
+  getTelegramStatus: () => Promise<boolean>;
+
+  /*
    * Change the SHH port on the DAppNode host
    */
   sshPortChange: (kwargs: { port: number }) => Promise<void>;
@@ -501,6 +518,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsDiskGet: {},
   statsMemoryGet: {},
   getUserActionLogs: {},
+  getTelegramStatus: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -521,6 +539,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
+  setTelegramStatus: {},
+  setTelegramToken: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   sshPortChange: { log: true },

@@ -11,6 +11,8 @@ export const eventBus: EventBus = {
   notification: emptySubscription,
   packages: emptySubscription,
   packagesModified: emptySubscription,
+  telegramStatusChanged: emptySubscription,
+
   // Events without arguments
   initializedDb: emptySubscription,
   requestAutoUpdateData: emptySubscription,

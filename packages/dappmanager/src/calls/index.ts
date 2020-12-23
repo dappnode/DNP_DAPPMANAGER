@@ -45,3 +45,6 @@ export { systemInfoGet } from "./systemInfoGet";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export { ipPublicGet } from "./ipPublicGet";
+export { getTelegramStatus } from "./getTelegramStatus";
+export { setTelegramStatus } from "./setTelegramStatus";
+export { setTelegramToken } from "./setTelegramToken";

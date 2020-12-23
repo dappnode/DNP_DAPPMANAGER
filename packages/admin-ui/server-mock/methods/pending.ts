@@ -328,3 +328,32 @@ export async function ipPublicGet(): Promise<PublicIpResponse> {
     publicIp: "85.84.83.82"
   };
 }
+
+/**
+ * Sets the telegram token
+ *
+ * @param telegramToken New telegram token
+ */
+export async function setTelegramToken({
+  telegramToken
+}: {
+  telegramToken: string;
+}): Promise<void> {}
+
+/**
+ * Sets the telegram status
+ *
+ * @param telegramStatus switch telegram bot status
+ */
+export async function setTelegramStatus({
+  telegramStatus
+}: {
+  telegramStatus: boolean;
+}): Promise<void> {}
+
+/**
+ * Returns the status of the telegram bot
+ */
+export async function getTelegramStatus(): Promise<boolean> {
+  return true;
+}
