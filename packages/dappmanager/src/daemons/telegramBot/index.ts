@@ -1,13 +1,13 @@
-import TelegramBot from "node-telegram-bot-api";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
+import { runOnlyOneSequentially } from "../../utils/asyncFlows";
 import { buildTelegramNotificationMessage } from "./buildTelegramNotificationMessage";
-import { telegramCommands } from "./telegramCommands";
+import { DappnodeTelegramBot } from "./commands";
 
 // Telegram setup When reboot it lost
 let currentTelegramToken: string | null;
-let bot: TelegramBot | null = null;
+let bot: DappnodeTelegramBot | null = null;
 
 /**
  * This function should be called once after dappmanager
@@ -20,19 +20,22 @@ async function checkTelegramStatus(): Promise<void> {
     if (isEnabled === true) {
       if (!telegramToken) throw Error("Error: telegram token must exist");
 
+      // Token changed, stop and destroy existing instance
       if (bot && telegramToken !== currentTelegramToken) {
         currentTelegramToken = telegramToken;
-        bot.stopPolling();
+        await bot.stop();
         bot = null;
       }
+
+      // Create new instance or restart existing
       if (!bot) {
-        bot = new TelegramBot(telegramToken);
+        bot = new DappnodeTelegramBot(telegramToken);
       }
 
-      telegramCommands(bot);
-    } else if (isEnabled === false) {
+      await bot.start();
+    } else {
       if (bot) {
-        bot.stopPolling();
+        await bot.stop();
       }
     }
   } catch (e) {
@@ -40,40 +43,49 @@ async function checkTelegramStatus(): Promise<void> {
   }
 }
 
+const checkTelegramStatusThrottled = runOnlyOneSequentially(
+  checkTelegramStatus
+);
+
 /**
  * Telegram bot
  * @param telegramMessage
  */
 export async function startTelegramBotDaemon(): Promise<void> {
-  //  When dappmanager reboots, it should persists the bot
-  checkTelegramStatus();
+  // Make sure that the DAPPMANAGER starts the bot on start-up
+  checkTelegramStatusThrottled();
+
   // User may change the telegramToken, if so currentTelegramToken (UNupdated)
   // will be used to compare it with the newToken and update it.
   currentTelegramToken = db.telegramToken.get();
 
-  // NOTIFICATION SUBSCRIPTION => checks if either, token and status, have changed
+  // 'telegramStatusChanged' event is emitted when
+  // user changes telegram status or token via an API call
   eventBus.telegramStatusChanged.on(() => {
-    checkTelegramStatus();
+    checkTelegramStatusThrottled();
   });
 
   // NOTIFICATION SUBSCRIPTION => checks if the packages has been stopped
-  eventBus.notification.on(notification => {
-    const telegramChannelIds = db.telegramChannelIds.get();
-
-    if (!bot || telegramChannelIds.length === 0) return;
-
+  eventBus.notification.on(async notification => {
     try {
+      const telegramChannelIds = db.telegramChannelIds.get();
+
+      if (!bot || telegramChannelIds.length === 0) {
+        return;
+      }
+
       const message = buildTelegramNotificationMessage({
         notificationType: notification.type,
         telegramMessage: notification.body
       });
-      for (const channelId of telegramChannelIds) {
-        bot.sendMessage(channelId, message, {
-          parse_mode: "Markdown"
-        });
-      }
+
+      await Promise.all(
+        telegramChannelIds.map(async channelId => {
+          if (bot) await bot.sendMessage(channelId, message);
+        })
+      );
     } catch (e) {
-      logs.error("Error sending telegram notification", e);
+      logs.error("Error sending notification over telegram", e);
     }
   });
 }
