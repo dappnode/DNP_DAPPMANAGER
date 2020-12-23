@@ -69,6 +69,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         setAutoRefresh(false);
       }
     }
+    setLogs("fetching...");
     if (autoRefresh) {
       const interval = setInterval(logDnp, refreshInterval);
       return () => {
