@@ -58,6 +58,11 @@ export default function Report() {
         <strong>Report without providing information</strong> button.
       </p>
 
+      <p>
+        Before report, please, make sure that the topic does not already exits
+        in our <a href="https://forum.dappnode.io">forum</a>
+      </p>
+
       <div className="discourse-topic-header">
         <span className="location">
           <span className="logo">

@@ -76,7 +76,7 @@ export function formatTopicBody(
 
 export function formatTopicUrl(body: string) {
   // Construct topicUrl from the available info
-  const topicCategory = "4";
+  const topicCategory = "5"; // This category is technical support
   const title = "";
   const params = [
     "title=" + encodeURIComponent(title),
