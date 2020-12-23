@@ -1,29 +1,50 @@
 import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath";
 import orderInstallPackages from "./orderInstallPackages";
-import { UserSettingsAllDnps, UserSettings } from "../../types";
-import { PackageRelease, InstallPackageData } from "../../types";
 import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
+import { getContainersStatus } from "../docker";
 import { parseTimeoutSeconds } from "../../utils/timeout";
+import {
+  UserSettingsAllDnps,
+  UserSettings,
+  PackageRelease,
+  InstallPackageData,
+  ContainersStatus
+} from "../../types";
+import { listPackages } from "../docker/list";
 
-export function getInstallerPackagesData({
-  releases,
-  userSettings,
-  currentVersions,
-  reqName
-}: {
+interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
-}): InstallPackageData[] {
-  const packagesDataUnordered = releases.map(release =>
-    getInstallerPackageData(
-      release,
-      userSettings[release.dnpName],
-      currentVersions[release.dnpName]
+}
+
+export async function getInstallerPackagesData({
+  releases,
+  userSettings,
+  currentVersions,
+  reqName
+}: GetInstallerPackageDataArg): Promise<InstallPackageData[]> {
+  // Gather packageData first to prevent calling multiple times
+  // listPackage inside of getContainersStatus
+  const dnps = await listPackages();
+
+  const packagesDataUnordered = await Promise.all(
+    releases.map(
+      async (release): Promise<InstallPackageData> =>
+        getInstallerPackageData(
+          release,
+          userSettings[release.dnpName],
+          currentVersions[release.dnpName],
+          await getContainersStatus({
+            dnpName: release.dnpName,
+            dnp: dnps.find(pkg => pkg.dnpName === release.dnpName)
+          })
+        )
     )
   );
+
   return orderInstallPackages(packagesDataUnordered, reqName);
 }
 
@@ -36,7 +57,8 @@ export function getInstallerPackagesData({
 function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
-  currentVersion: string | undefined
+  currentVersion: string | undefined,
+  containersStatus: ContainersStatus
 ): InstallPackageData {
   const { dnpName, semVersion, isCore, imageFile } = release;
 

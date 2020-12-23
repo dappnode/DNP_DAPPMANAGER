@@ -4,10 +4,11 @@ import * as getPath from "../../utils/getPath";
 import { restartDappmanagerPatch } from "../installer/restartPatch";
 import { ComposeFileEditor } from "../compose/editor";
 import { dockerComposeUp, DockerComposeUpOptions } from "./compose";
-import { listPackage } from "./list";
+import { listPackageNoThrow } from "./list";
 import { getDockerTimeoutMax } from "./utils";
 import { dockerContainerInspect } from "./api";
 import { ContainersStatus, PackageContainer } from "../../types";
+import { InstalledPackageData } from "../../common";
 
 interface ComposeUpArgs {
   dnpName: string;
@@ -77,11 +78,19 @@ function readComposeServiceNames(composePath: string): string[] {
  * - Get its docker timeout
  */
 export async function getContainersStatus({
-  dnpName
+  dnpName,
+  dnp
 }: {
   dnpName: string;
+  dnp?: InstalledPackageData | null;
 }): Promise<ContainersStatus> {
-  const dnp = await listPackage({ dnpName });
+  if (!dnp) {
+    dnp = await listPackageNoThrow({ dnpName });
+  }
+
+  if (!dnp) {
+    return {};
+  }
 
   const containersStatus: ContainersStatus = {};
 
