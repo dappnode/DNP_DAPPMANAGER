@@ -1,4 +1,5 @@
 import { wrapHandlerHtml } from "../utils";
+import { dockerInfoArchive } from "../../modules/docker";
 import {
   dockerGetFileOrDirBasedOnExtension,
   dockerGetPathType
@@ -16,6 +17,16 @@ export const fileDownload = wrapHandlerHtml<Params>(async (req, res) => {
   const filepath = req.query.path as string;
 
   const filePathAbsolute = filepath;
+
+  // Display a nice error if path does not exist,
+  // since dockerGetFileOrDirBasedOnExtension can be very obscure
+  try {
+    await dockerInfoArchive(containerNameOrId, filepath);
+  } catch (e) {
+    if (e.message.includes("404"))
+      e.message = `No file found at:\ncontainer: ${containerNameOrId}\npath: ${filepath}\n\n${e.message}`;
+    throw e;
+  }
 
   const filetype = await dockerGetPathType(containerNameOrId, filepath);
   const isSingleFile = filetype === "file";
