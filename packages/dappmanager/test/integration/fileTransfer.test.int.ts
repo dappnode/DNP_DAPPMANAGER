@@ -30,9 +30,9 @@ describe("file transfer - docker archive put, get", function() {
     });
   });
 
-  // after("Remove test container", async () => {
-  //   await removeContainer();
-  // });
+  after("Remove test container", async () => {
+    await removeContainer();
+  });
 
   before("Start test container", async function() {
     this.timeout(60 * 1000);
