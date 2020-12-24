@@ -21,14 +21,6 @@ export function dockerCopyFileTo(
   return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
 }
 
-export function dockerCopyFileFrom(
-  id: string,
-  fromPath: string,
-  toPath: string
-): Promise<string> {
-  return shell(`docker cp --follow-link ${id}:${fromPath} ${toPath}`);
-}
-
 export function dockerGetContainerWorkingDir(id: string): Promise<string> {
   return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
 }

@@ -1,6 +1,7 @@
 import { docker } from "./docker";
-import tar from "tar-stream";
 import path from "path";
+import { Writable } from "stream";
+import { tarExtractSingleFile } from "../../../utils/tarExtractSingleFile";
 
 /**
  * Get a tar archive of a resource in the filesystem of container id.
@@ -29,53 +30,14 @@ export async function dockerGetArchive(
  */
 export async function dockerGetArchiveSingleFile(
   containerNameOrId: string,
-  filePathAbsolute: string
-): Promise<Buffer> {
-  const readableStream = await dockerGetArchive(
+  filePathAbsolute: string,
+  fileContentSink: Writable
+): Promise<void> {
+  const tarReadableStream = await dockerGetArchive(
     containerNameOrId,
     filePathAbsolute
   );
 
-  const extract = tar.extract();
-
   const targetFile = path.parse(filePathAbsolute).base;
-
-  return new Promise((resolve, reject) => {
-    let fileContents: Buffer | null = null;
-
-    extract.on("entry", async function(header, stream, next) {
-      // header is the tar header
-      // stream is the content body (might be an empty stream)
-      // call next when you are done with this entry
-
-      if (header.name === targetFile && header.type === "file") {
-        const bufferArr = await all<Buffer>(stream);
-        fileContents = Buffer.concat(bufferArr);
-      }
-
-      next(); // ready for next entry
-    });
-
-    extract.on("finish", function() {
-      if (fileContents) {
-        resolve(fileContents);
-      } else {
-        reject(Error(`file ${targetFile} not found in tar`));
-      }
-    });
-
-    extract.on("error", reject);
-
-    readableStream.pipe(extract);
-  });
-}
-
-async function all<T>(source: AsyncIterable<T> | Iterable<T>): Promise<T[]> {
-  const arr: T[] = [];
-
-  for await (const entry of source) {
-    arr.push(entry);
-  }
-
-  return arr;
+  await tarExtractSingleFile(tarReadableStream, fileContentSink, targetFile);
 }

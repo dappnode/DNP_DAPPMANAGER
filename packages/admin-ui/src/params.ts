@@ -18,6 +18,7 @@ export const apiUrls = {
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),
+  fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs"),
   globalEnvs: urlJoin(apiUrl, "global-envs"),
