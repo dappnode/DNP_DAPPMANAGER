@@ -26,6 +26,15 @@ export async function dockerContainerStop(
     .stop({ t: options?.timeout });
 }
 
+export async function dockerContainerRestart(
+  containerNameOrId: string,
+  options?: DockerStopOptions
+): Promise<Docker.ContainerInspectInfo> {
+  return await docker
+    .getContainer(containerNameOrId)
+    .restart({ t: options?.timeout });
+}
+
 export async function dockerContainerRemove(
   containerNameOrId: string,
   options?: DockerRemoveOptions
