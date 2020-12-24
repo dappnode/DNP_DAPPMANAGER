@@ -1,4 +1,4 @@
-import { wrapHandler } from "../utils";
+import { wrapHandlerHtml } from "../utils";
 import {
   dockerGetFileOrDirBasedOnExtension,
   dockerGetPathType
@@ -11,7 +11,7 @@ interface Params {
 /**
  * Endpoint to download files.
  */
-export const fileDownload = wrapHandler<Params>(async (req, res) => {
+export const fileDownload = wrapHandlerHtml<Params>(async (req, res) => {
   const containerNameOrId = req.params.containerName;
   const filepath = req.query.path as string;
 

@@ -6,7 +6,7 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
-import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
+import { toSocketIoHandler, wrapHandler } from "./utils";
 import { AuthIp, AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
 import { AdminPasswordDb } from "./auth/adminPasswordDb";
 import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
@@ -166,7 +166,7 @@ export function startHttpApi({
   );
 
   // Default error handler must be the last
-  app.use(errorHandler);
+  // app.use(errorHandler);
 
   // Serve UI. React-router, index.html at all routes
   app.get("*", (req, res) =>
