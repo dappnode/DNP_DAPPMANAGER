@@ -1,9 +1,10 @@
 import { expect } from "chai";
-import { docker } from "../../../src/modules/docker/api/docker";
-import { dockerGetArchiveSingleFile } from "../../../src/modules/docker/api/getArchive";
-import { dockerPutArchiveSingleFile } from "../../../src/modules/docker/api/putArchive";
+import { Writable } from "stream";
+import { docker } from "../../src/modules/docker/api/docker";
+import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArchive";
+import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive";
 
-describe("docker / archive put, get", function() {
+describe("file transfer - docker archive put, get", function() {
   const containerName = "DAppNodeTest-file-transfer";
   const filePath = "/a/b/c/sample.json";
   const fileContent = JSON.stringify(
@@ -50,10 +51,17 @@ describe("docker / archive put, get", function() {
       Buffer.from(fileContent)
     );
 
-    const returnedFileBuffer = await dockerGetArchiveSingleFile(
-      containerName,
-      filePath
-    );
+    const returnedFileBufferArr: Buffer[] = [];
+    const fileContentSink = new Writable({
+      write: (chunk, encoding, cb): void => {
+        returnedFileBufferArr.push(chunk);
+        cb();
+      }
+    });
+
+    await dockerGetArchiveSingleFile(containerName, filePath, fileContentSink);
+
+    const returnedFileBuffer = Buffer.concat(returnedFileBufferArr);
     const returnedFileContent = returnedFileBuffer.toString("utf8");
     expect(returnedFileContent).to.equal(
       fileContent,
