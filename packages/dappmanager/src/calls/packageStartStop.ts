@@ -1,7 +1,6 @@
 import { listPackage } from "../modules/docker/list";
 import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
 import { eventBus } from "../eventBus";
-import { getDockerTimeoutMax } from "../modules/docker/utils";
 import params from "../params";
 
 const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName];
@@ -20,7 +19,6 @@ export async function packageStartStop({
   if (!dnpName) throw Error("kwarg containerName must be defined");
 
   const dnp = await listPackage({ dnpName });
-  const timeout = getDockerTimeoutMax(dnp.containers);
 
   if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     if (dnpsAllowedToStop.includes(dnp.dnpName)) {
@@ -39,17 +37,16 @@ export async function packageStartStop({
     throw Error(`No targetContainers found for ${queryId}`);
   }
 
-  const containerNames = targetContainers.map(c => c.containerName);
   if (targetContainers.every(container => container.running)) {
     await Promise.all(
-      containerNames.map(async containerName =>
-        dockerContainerStop(containerName, { timeout })
+      targetContainers.map(async c =>
+        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
       )
     );
   } else {
     await Promise.all(
-      containerNames.map(async containerName =>
-        dockerContainerStart(containerName)
+      targetContainers.map(async container =>
+        dockerContainerStart(container.containerName)
       )
     );
   }
