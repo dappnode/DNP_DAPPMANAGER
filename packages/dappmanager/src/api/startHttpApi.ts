@@ -6,7 +6,7 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
-import { errorHandler, toSocketIoHandler, wrapHandler } from "./utils";
+import { toSocketIoHandler, wrapHandler } from "./utils";
 import { AuthIp, AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
 import { AdminPasswordDb } from "./auth/adminPasswordDb";
 import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
@@ -35,6 +35,7 @@ export interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
   download: RequestHandler<{ fileId: string }>;
   downloadUserActionLogs: RequestHandler<{}>;
+  fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
   publicPackagesData: RequestHandler<{ containerName: string }>;
@@ -143,12 +144,14 @@ export function startHttpApi({
   // Ping - health check
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
 
-  // Methods that do not fit into RPC
+  // ADMIN ONLY methods that do not fit into RPC
   // prettier-ignore
   app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
+  app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
   app.post("/upload", auth.onlyAdmin, routes.upload);
+
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
@@ -163,7 +166,7 @@ export function startHttpApi({
   );
 
   // Default error handler must be the last
-  app.use(errorHandler);
+  // app.use(errorHandler);
 
   // Serve UI. React-router, index.html at all routes
   app.get("*", (req, res) =>

@@ -1,5 +1,5 @@
 import * as calls from "../../calls";
-import { wrapHandler } from "../utils";
+import { wrapHandlerHtml } from "../utils";
 
 interface Params {
   containerName: string;
@@ -9,7 +9,7 @@ interface Params {
  * Endpoint to download all logs of a container as a file
  * Necessary to download large log files
  */
-export const containerLogs = wrapHandler<Params>(async (req, res) => {
+export const containerLogs = wrapHandlerHtml<Params>(async (req, res) => {
   const containerName = req.params.containerName;
   if (!containerName) throw Error(`Must provide containerName`);
 

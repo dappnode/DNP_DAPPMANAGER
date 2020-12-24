@@ -81,16 +81,6 @@ export async function cleanCache(): Promise<void> {
 }
 
 /**
- * Copy file from a DNP and downloaded on the client
- */
-export async function copyFileFrom(kwargs: {
-  containerName: string;
-  fromPath: string;
-}): Promise<string> {
-  return "";
-}
-
-/**
  * Copy file to a DNP:
  */
 export async function copyFileTo(kwargs: {

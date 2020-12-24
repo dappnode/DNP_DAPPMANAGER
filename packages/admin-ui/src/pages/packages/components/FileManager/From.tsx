@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { api } from "api";
-// Components
+import { fileDownloadUrl } from "api/routes";
 import Input from "components/Input";
 import Button from "components/Button";
-// Utils
-import { shortNameCapitalized } from "utils/format";
-import dataUriToBlob from "utils/dataUriToBlob";
-import { saveAs } from "file-saver";
-import { stringSplit } from "utils/strings";
-import { withToast } from "components/toast/Toast";
+import newTabProps from "utils/newTabProps";
 
 export function CopyFileFrom({
   containerName,
@@ -19,30 +13,14 @@ export function CopyFileFrom({
 }) {
   const [fromPathInput, setFromPathInput] = useState("");
 
-  const downloadFile = useCallback(
-    async fromPath => {
-      try {
-        const name = shortNameCapitalized(containerName);
-        const dataUri = await withToast(
-          () => api.copyFileFrom({ containerName, fromPath }),
-          {
-            message: `Copying file from ${name} ${fromPath}...`,
-            onSuccess: `Copied file from ${name} ${fromPath}`
-          }
-        );
-        if (!dataUri) return;
-
-        const blob = dataUriToBlob(dataUri);
-        const fileName = parseFileName(fromPath, blob.type);
-
-        saveAs(blob, fileName);
-      } catch (e) {
-        console.error(
-          `Error on copyFileFrom ${containerName} ${fromPath}: ${e.stack}`
-        );
-      }
-    },
+  const getDownloadUrl = useCallback(
+    fromPath => fileDownloadUrl({ containerName, path: fromPath }),
     [containerName]
+  );
+
+  const downloadFile = useCallback(
+    fromPath => window.open(getDownloadUrl(fromPath), "_newtab"),
+    [getDownloadUrl]
   );
 
   useEffect(() => {
@@ -50,7 +28,7 @@ export function CopyFileFrom({
       setFromPathInput(fromPathDefault);
       downloadFile(fromPathDefault);
     }
-  }, [fromPathDefault, downloadFile]);
+  }, [fromPathDefault, containerName, downloadFile]);
 
   return (
     <div className="card-subgroup">
@@ -61,31 +39,15 @@ export function CopyFileFrom({
         onValueChange={setFromPathInput}
         onEnterPress={() => downloadFile(fromPathInput)}
         append={
-          <Button
-            onClick={() => downloadFile(fromPathInput)}
-            disabled={!fromPathInput}
-            variant="dappnode"
+          <a
+            href={getDownloadUrl(fromPathInput)}
+            {...newTabProps}
+            className="no-a-style"
           >
-            Download
-          </Button>
+            <Button variant="dappnode">Download</Button>
+          </a>
         }
       />
     </div>
   );
-}
-
-function parseFileName(path: string, mimeType: string): string {
-  if (!path || typeof path !== "string") return path;
-  const subPaths = stringSplit(path, "/");
-  let fileName = subPaths[subPaths.length - 1] || "";
-
-  // Add extension in case it is a compressed directory
-  if (
-    mimeType === "application/gzip" &&
-    !fileName.endsWith(".gzip") &&
-    !fileName.endsWith(".gz")
-  )
-    fileName = `${fileName}.tar.gz`;
-
-  return fileName;
 }

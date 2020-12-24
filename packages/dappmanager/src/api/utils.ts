@@ -23,30 +23,38 @@ export function wrapHandler<ReqParams extends { [key: string]: any } = {}>(
     try {
       await handler(req, res, next);
     } catch (e) {
-      next(e);
+      if (res.headersSent) {
+        next(e);
+      } else if (e instanceof HttpError) {
+        res.status(e.statusCode).send({
+          error: { name: e.name, message: e.message }
+        });
+      } else {
+        res.status(500).send({
+          error: { message: e.message, data: e.stack }
+        });
+      }
     }
   };
 }
 
-export const errorHandler: express.ErrorRequestHandler = (
-  err,
-  req,
-  res,
-  next
-) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-  if (err instanceof HttpError) {
-    res.status(err.statusCode).send({
-      error: { name: err.name, message: err.message }
-    });
-  } else {
-    res.status(500).send({
-      error: { message: err.message, data: err.stack }
-    });
-  }
-};
+/**
+ * Use this wrapper when user opens its URL directly on the browser
+ * Wrap express routes to be able to safely throw errors and return HTML
+ * @param handler
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function wrapHandlerHtml<ReqParams extends { [key: string]: any } = {}>(
+  handler: express.RequestHandler<ReqParams>
+): express.RequestHandler<ReqParams> {
+  return async (req, res, next): Promise<void> => {
+    try {
+      await handler(req, res, next);
+    } catch (e) {
+      next(e);
+    }
+  };
+}
 
 export function toSocketIoHandler(
   expressHandler: express.Handler

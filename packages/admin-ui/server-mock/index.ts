@@ -45,6 +45,7 @@ const server = startDappmanager({
     containerLogs: () => {},
     download: () => {},
     downloadUserActionLogs: () => {},
+    fileDownload: () => {},
     globalEnvs: () => {},
     packageManifest: () => {},
     publicPackagesData: () => {},
