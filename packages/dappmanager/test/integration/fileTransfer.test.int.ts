@@ -9,6 +9,7 @@ import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArch
 import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive";
 import { fileDownload } from "../../src/api/routes/fileDownload";
 import { URL } from "url";
+import { MemoryWritable } from "../testStreamUtils";
 
 describe("file transfer - docker archive put, get", function() {
   const containerName = "DAppNodeTest-file-transfer";
@@ -58,13 +59,7 @@ describe("file transfer - docker archive put, get", function() {
         Buffer.from(fileContent)
       );
 
-      const returnedFileBufferArr: Buffer[] = [];
-      const fileContentSink = new Writable({
-        write: (chunk, encoding, cb): void => {
-          returnedFileBufferArr.push(chunk);
-          cb();
-        }
-      });
+      const fileContentSink = new MemoryWritable<Buffer>();
 
       await dockerGetArchiveSingleFile(
         containerName,
@@ -72,7 +67,7 @@ describe("file transfer - docker archive put, get", function() {
         fileContentSink
       );
 
-      const returnedFileBuffer = Buffer.concat(returnedFileBufferArr);
+      const returnedFileBuffer = Buffer.concat(fileContentSink.chunks);
       const returnedFileContent = returnedFileBuffer.toString("utf8");
       expect(returnedFileContent).to.equal(
         fileContent,

@@ -28,9 +28,13 @@ import {
   stringifyPortMappings,
   parseEnvironment
 } from "../../src/modules/compose";
-import { dockerContainerInspect } from "../../src/modules/docker/api";
+import {
+  dockerContainerInspect,
+  dockerGetArchiveSingleFile
+} from "../../src/modules/docker/api";
 import { listContainer } from "../../src/modules/docker/list";
 import { uploadDirectoryRelease } from "../integrationSpecs";
+import { MemoryWritable } from "../testStreamUtils";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -374,11 +378,11 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${dnpNameMain} fileuploads`, async () => {
-      const result = await calls.copyFileFrom({
+      const result = await copyFileFrom({
         containerName: containerMain.containerName,
         fromPath: demoFilePath
       });
-      expect(result).to.equal(fileDataUrlMain);
+      expect(toDaraUrl(result)).to.equal(fileDataUrlMain);
     });
 
     it(`${dnpNameDep} environment`, async () => {
@@ -419,11 +423,11 @@ describe("DNP lifecycle", function() {
     });
 
     it(`${dnpNameDep} fileuploads`, async () => {
-      const result = await calls.copyFileFrom({
+      const result = await copyFileFrom({
         containerName: containerDep.containerName,
         fromPath: demoFilePath
       });
-      expect(result).to.equal(fileDataUrlDep);
+      expect(toDaraUrl(result)).to.equal(fileDataUrlDep);
     });
   });
 
@@ -589,11 +593,11 @@ describe("DNP lifecycle", function() {
 
     // WARNING: mime-types may not match
     it("Should copy the file FROM the container", async () => {
-      const returnedDataUri = await calls.copyFileFrom({
+      const result = await copyFileFrom({
         containerName: containerMain.containerName,
         fromPath: sampleFile.containerPath
       });
-      expect(returnedDataUri).to.equal(sampleFile.dataUri, "Wrong dataUri");
+      expect(toDaraUrl(result)).to.equal(sampleFile.dataUri, "Wrong dataUri");
     });
   });
 
@@ -659,4 +663,23 @@ async function assertEnvironment(
     expectedEnvs,
     `Wrong environment: ${JSON.stringify(expectedEnvs)}`
   );
+}
+
+/**
+ * Copy file from container as UTF8 (not base64 encoded)
+ * @param containerName
+ * @param filepath
+ */
+async function copyFileFrom({
+  containerName,
+  fromPath
+}: {
+  containerName: string;
+  fromPath: string;
+}): Promise<string> {
+  const sink = new MemoryWritable<Buffer>();
+  await dockerGetArchiveSingleFile(containerName, fromPath, sink);
+
+  const resultBuffer = Buffer.concat(sink.chunks);
+  return resultBuffer.toString("utf8");
 }
