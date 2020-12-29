@@ -80,7 +80,7 @@ export const PackageById: React.FC<RouteComponentProps<{
     },
     {
       name: "Network",
-      subPath: "Network",
+      subPath: "network",
       render: () => <Network containers={containers} />,
       available: dnpName !== "dappmanager.dnp.dappnode.eth"
     },
