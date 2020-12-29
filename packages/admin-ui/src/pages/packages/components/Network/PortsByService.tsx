@@ -8,7 +8,7 @@ import Input from "components/Input";
 import Select from "components/Select";
 // Utils
 import { shortNameCapitalized } from "utils/format";
-import { MdClose } from "react-icons/md";
+import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./network.scss";
 import { InstalledPackageData } from "common";
@@ -263,11 +263,9 @@ export function PortsByService({
           Update port mappings
         </Button>
 
-        <Button
-          className="add-button"
-          onClick={addNewPort}
-          placeholder="New port"
-        ></Button>
+        <Button className="add-button" onClick={addNewPort}>
+          New port <MdAdd />
+        </Button>
       </div>
     </>
   );
