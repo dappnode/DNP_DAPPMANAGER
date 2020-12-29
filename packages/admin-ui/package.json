@@ -74,8 +74,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.17.1",
     "nodemon": "^2.0.4",
-    "prettier": "^1.16.4",
-    "why-did-you-update": "0.1.1"
+    "prettier": "^1.16.4"
   },
   "browserslist": {
     "production": [
