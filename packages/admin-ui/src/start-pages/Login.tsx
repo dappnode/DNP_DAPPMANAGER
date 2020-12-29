@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { BsLock } from "react-icons/bs";
-import { fetchLogin, fetchLoginStatus } from "api/auth";
+import { authApi } from "api/auth";
 import Button from "components/Button";
 import { InputForm } from "components/InputForm";
 import ErrorView from "components/ErrorView";
@@ -29,11 +29,11 @@ export function Login({
   async function onLogin() {
     try {
       setReqStatus({ loading: true });
-      await fetchLogin({ username, password });
+      await authApi.login({ username, password });
       setReqStatus({ result: true });
 
       // Make sure user is properly logged in
-      const status = await fetchLoginStatus();
+      const status = await authApi.fetchLoginStatus();
       switch (status.status) {
         case "logged-in":
           break; // OK

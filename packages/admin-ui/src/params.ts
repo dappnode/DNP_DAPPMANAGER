@@ -27,6 +27,11 @@ export const apiUrls = {
 // Allow cross-domain cookies
 export const apiTestMode = process.env.REACT_APP_API_TEST;
 
+// API Auth errors. Must be in sync with the DAPPMANAGER
+export const ERROR_NOT_REGISTERED = "NOT_REGISTERED";
+export const ERROR_NOT_LOGGED_IN = "NOT_LOGGED_IN";
+export const ERROR_NOT_LOGGED_IN_NO_COOKIE = "NOT_LOGGED_IN_NO_COOKIE";
+
 // WIFI
 export const wifiDefaultSSID = "DAppNodeWIFI";
 export const wifiDefaultWPA_PASSPHRASE = "dappnode";

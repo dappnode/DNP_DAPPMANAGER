@@ -3,7 +3,7 @@ import { BsLock } from "react-icons/bs";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import { fetchRecoverPass } from "api/auth";
+import { authApi } from "api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import { InputForm } from "components/InputForm";
@@ -21,7 +21,7 @@ export function ResetPassword({
   async function onReset() {
     try {
       setReqStatus({ loading: true });
-      await fetchRecoverPass({ token });
+      await authApi.recoverPass({ token });
       setReqStatus({ result: true });
       onSuccessfulReset();
     } catch (e) {

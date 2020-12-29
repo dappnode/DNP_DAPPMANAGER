@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BsShieldLock } from "react-icons/bs";
 import Alert from "react-bootstrap/Alert";
-import { fetchRegister } from "api/auth";
+import { authApi } from "api/auth";
 import { apiUrls } from "params";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
@@ -34,7 +34,7 @@ export function Register({
     if (isValid)
       try {
         setReqStatus({ loading: true });
-        const res = await fetchRegister({ username, password });
+        const res = await authApi.register({ username, password });
         setRecoveryToken(res.recoveryToken);
         setReqStatus({ result: true });
       } catch (e) {

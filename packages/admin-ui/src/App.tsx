@@ -14,7 +14,7 @@ import pages, { defaultPage } from "./pages";
 // Redux
 import { ToastContainer } from "react-toastify";
 import Welcome from "components/welcome/Welcome";
-import { fetchLoginStatus, LoginStatus } from "api/auth";
+import { authApi, LoginStatus } from "api/auth";
 import { start as apiStart } from "api";
 
 function MainApp({
@@ -83,7 +83,8 @@ export default function App() {
 
   const onFetchLoginStatus = useCallback(
     () =>
-      fetchLoginStatus()
+      authApi
+        .fetchLoginStatus()
         .then(setLoginStatus)
         .catch(console.error),
     []
