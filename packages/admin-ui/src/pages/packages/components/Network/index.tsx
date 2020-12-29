@@ -1,11 +1,16 @@
+// React
 import React from "react";
-import { PackageContainer } from "common";
 import { useState } from "react";
+
+// Components
 import Card from "components/Card";
+import { IpsByService } from "./IpsByService";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
+import { PackageContainer } from "common";
+
+// Styles
 import "./network.scss";
-import { IpsByService } from "./IpsByService";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
   const serviceNames = containers.map(c => c.serviceName).sort();
