@@ -4,7 +4,6 @@ import { useState } from "react";
 
 // Components
 import Card from "components/Card";
-import { IpsByService } from "./IpsByService";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
 import { PackageContainer } from "common";
@@ -23,15 +22,21 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
         setServiceName={setServiceName}
         containers={containers}
       />
-      {container && <IpsByService ip={container.ip} />}
 
       {container && (
-        <PortsByService
-          key={container.serviceName}
-          dnpName={container.dnpName}
-          serviceName={container.serviceName}
-          ports={container.ports}
-        />
+        <>
+          <div>
+            <strong>Container IP: </strong>
+            {container.ip || "Not available"}
+          </div>
+
+          <PortsByService
+            key={container.serviceName}
+            dnpName={container.dnpName}
+            serviceName={container.serviceName}
+            ports={container.ports}
+          />
+        </>
       )}
     </Card>
   );
