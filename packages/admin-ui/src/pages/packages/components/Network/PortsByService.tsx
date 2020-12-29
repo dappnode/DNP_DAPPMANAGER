@@ -263,7 +263,7 @@ export function PortsByService({
           Update port mappings
         </Button>
 
-        <Button className="add-button" onClick={addNewPort}>
+        <Button variant={"dappnode"} onClick={addNewPort}>
           New port <MdAdd />
         </Button>
       </div>
