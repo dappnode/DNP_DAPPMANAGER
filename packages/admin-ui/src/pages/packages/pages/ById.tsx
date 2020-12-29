@@ -8,7 +8,6 @@ import { Info } from "../components/Info";
 import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
 import { Logs } from "../components/Logs";
 import { Config } from "../components/Config";
-import { Ports } from "../components/Ports";
 import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
@@ -19,6 +18,7 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
 import { shortNameCapitalized } from "utils/format";
+import { Network } from "../components/Network";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -79,9 +79,9 @@ export const PackageById: React.FC<RouteComponentProps<{
       available: userSettings && !isEmpty(userSettings.environment)
     },
     {
-      name: "Ports",
-      subPath: "ports",
-      render: () => <Ports containers={containers} />,
+      name: "Network",
+      subPath: "Network",
+      render: () => <Network containers={containers} />,
       available: dnpName !== "dappmanager.dnp.dappnode.eth"
     },
     {

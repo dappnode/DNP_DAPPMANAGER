@@ -3,7 +3,6 @@ import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
 import { PortMapping } from "types";
 // Components
-import Card from "components/Card";
 import Button from "components/Button";
 import Input from "components/Input";
 import Select from "components/Select";
@@ -11,37 +10,11 @@ import Select from "components/Select";
 import { shortNameCapitalized } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
-import "./ports.scss";
-import { InstalledPackageData, PackageContainer } from "common";
-import { ServiceSelector } from "./ServiceSelector";
+import "./network.scss";
+import { InstalledPackageData } from "common";
 
 const maxPortNumber = 32768 - 1;
 const maxEphemeralPortNumber = 65535;
-
-export function Ports({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName).sort();
-  const [serviceName, setServiceName] = useState(serviceNames[0]);
-  const container = containers.find(c => c.serviceName === serviceName);
-
-  return (
-    <Card spacing className="ports-editor">
-      <ServiceSelector
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        containers={containers}
-      />
-
-      {container && (
-        <PortsByService
-          key={container.serviceName}
-          dnpName={container.dnpName}
-          serviceName={container.serviceName}
-          ports={container.ports}
-        />
-      )}
-    </Card>
-  );
-}
 
 export function PortsByService({
   dnpName,
@@ -290,7 +263,11 @@ export function PortsByService({
           Update port mappings
         </Button>
 
-        <Button className="add-button" onClick={addNewPort}>
+        <Button
+          className="add-button"
+          onClick={addNewPort}
+          placeholder="New port"
+        >
           <MdAdd />
         </Button>
       </div>
