@@ -5,7 +5,7 @@ import {
   SpecialPermission,
   InstalledPackageDetailData,
   PackageContainer
-} from "../../../src/types";
+} from "../../../common";
 
 export interface MockDnp {
   metadata: PackageReleaseMetadata;

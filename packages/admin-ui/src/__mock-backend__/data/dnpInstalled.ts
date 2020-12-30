@@ -1,8 +1,8 @@
-import { InstalledPackageDetailData, PackageContainer } from "../../src/common";
+import { InstalledPackageDetailData, PackageContainer } from "../../common";
 import { sampleContainer, sampleDnp } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
-import { getContainerName, getImageTag } from "../params";
+import { getContainerName, getImageTag } from "./params";
 
 function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   const dnpName = dnp.metadata.name;

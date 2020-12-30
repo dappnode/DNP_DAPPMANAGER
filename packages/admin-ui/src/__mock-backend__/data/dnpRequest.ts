@@ -4,7 +4,7 @@ import {
   UserSettingsAllDnps,
   SetupWizardAllDnps,
   CompatibleDnps
-} from "../../src/common";
+} from "../../common";
 import { sampleRequestState } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";

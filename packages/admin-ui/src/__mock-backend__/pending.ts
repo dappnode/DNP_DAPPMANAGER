@@ -6,18 +6,13 @@ import {
   MountpointData,
   NewFeatureId,
   NewFeatureStatus,
-  PackageNotificationDb,
-  PackageNotification,
   SystemInfo,
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
   PublicIpResponse,
   ChainData
-} from "../../src/common";
-import { mountpoints } from "../mockData";
-
-let hostPasswordIsSecureState = false;
+} from "../common";
 
 /**
  * Generates a backup of a package and sends it to the client for download.
@@ -159,7 +154,44 @@ export async function statsDiskGet(): Promise<HostStatDisk> {
  * by running a pre-written script in the host
  */
 export async function mountpointsGet(): Promise<MountpointData[]> {
-  return mountpoints;
+  return [
+    {
+      mountpoint: "",
+      use: "87%",
+      used: 43e9,
+      total: 0,
+      free: 121e9,
+      vendor: "Host",
+      model: "(default)"
+    },
+    {
+      mountpoint: "/data",
+      use: "68%",
+      used: 380e9,
+      total: 500e9,
+      free: 141e9,
+      vendor: "ATA",
+      model: "CT500MX500SSD4"
+    },
+    {
+      mountpoint: "/media/usb0",
+      use: "89%",
+      used: 198642520,
+      total: 235782040,
+      free: 25092776,
+      vendor: "SanDisk",
+      model: "Ultra_USB_3.0"
+    },
+    {
+      mountpoint: "/media/usb1",
+      use: "100%",
+      used: 4e9,
+      total: 16e9,
+      free: 7.1e9,
+      vendor: "SanDisk",
+      model: "Ultra_USB_3.0"
+    }
+  ];
 }
 
 /**
@@ -170,70 +202,6 @@ export async function newFeatureStatusSet(kwargs: {
   status: NewFeatureStatus;
 }): Promise<void> {
   //
-}
-
-/**
- * Returns not viewed notifications.
- * Use an array as the keys are not known in advance and the array form
- * is okay for RPC transport, as uniqueness is guaranteed
- */
-export async function notificationsGet(): Promise<PackageNotificationDb[]> {
-  return [
-    {
-      id: "diskSpaceRanOut-stoppedPackages",
-      type: "danger",
-      title: "Disk space ran out, stopped packages",
-      body: "Available disk space gone wrong ".repeat(10),
-      timestamp: 153834824,
-      viewed: false
-    }
-  ];
-}
-
-/**
- * Marks notifications as view by deleting them from the db
- */
-export async function notificationsRemove(kwargs: {
-  ids: string[];
-}): Promise<void> {
-  //
-}
-
-/**
- * Adds a notification to be shown the UI.
- * Set the notification param to null for a random notification
- */
-export async function notificationsTest(kwargs: {
-  notification?: PackageNotification;
-}): Promise<void> {
-  //
-}
-
-/**
- * Changes the user `dappnode`'s password in the host machine
- * Only allows it if the current password has the salt `insecur3`
- */
-export async function passwordChange(kwargs: {
-  newPassword: string;
-}): Promise<void> {
-  hostPasswordIsSecureState = true;
-}
-
-/**
- * Checks if the user `dappnode`'s password in the host machine
- * is NOT the insecure default set at installation time.
- * It does so by checking if the current salt is `insecur3`
- *
- * - This check will be run every time this node app is started
- *   - If the password is SECURE it will NOT be run anymore
- *     and this call will return true always
- *   - If the password is INSECURE this check will be run every
- *     time the admin requests it (on page load)
- *
- * @returns true = is secure / false = is not
- */
-export async function passwordIsSecure(): Promise<boolean> {
-  return hostPasswordIsSecureState;
 }
 
 /**
@@ -317,33 +285,4 @@ export async function ipPublicGet(): Promise<PublicIpResponse> {
   return {
     publicIp: "85.84.83.82"
   };
-}
-
-/**
- * Sets the telegram token
- *
- * @param telegramToken New telegram token
- */
-export async function setTelegramToken({
-  telegramToken
-}: {
-  telegramToken: string;
-}): Promise<void> {}
-
-/**
- * Sets the telegram status
- *
- * @param telegramStatus switch telegram bot status
- */
-export async function setTelegramStatus({
-  telegramStatus
-}: {
-  telegramStatus: boolean;
-}): Promise<void> {}
-
-/**
- * Returns the status of the telegram bot
- */
-export async function getTelegramStatus(): Promise<boolean> {
-  return true;
 }

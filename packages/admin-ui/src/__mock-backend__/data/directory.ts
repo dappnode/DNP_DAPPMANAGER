@@ -1,4 +1,4 @@
-import { DirectoryItemOk, DirectoryItem } from "../../src/common";
+import { DirectoryItemOk, DirectoryItem } from "../../common";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
 

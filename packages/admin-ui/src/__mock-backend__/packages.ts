@@ -7,11 +7,10 @@ import {
   PortMapping,
   InstalledPackageData,
   InstalledPackageDetailData
-} from "../../src/common";
-import { eventBus } from "../eventBus";
-import { dnpInstalled, directory, dnpRequests } from "../data";
-import { sampleContainer, sampleDnp } from "../data/sample";
-import { pause } from "../utils";
+} from "../common";
+import { dnpInstalled, directory, dnpRequests } from "./data";
+import { sampleContainer, sampleDnp } from "./data/sample";
+import { pause } from "./utils/pause";
 
 const pkgRestartMs = 2000;
 
@@ -26,7 +25,6 @@ function update(
   const dnp = packages.get(dnpName);
   if (!dnp) throw Error(`dnpName ${dnpName} not found`);
   packages.set(dnpName, { ...dnp, ...fn(dnp) });
-  eventBus.requestPackages.emit();
 }
 
 /**

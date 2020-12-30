@@ -1,5 +1,5 @@
 import path from "path";
-import * as methods from "./methods";
+import * as methods from "./calls";
 import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
 import { LoggerMiddleware } from "../src/common/transport/types";
 import { MockVpnApiClient } from "./mockVpnClient";
