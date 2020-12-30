@@ -16,7 +16,7 @@ export function buildTelegramNotificationMessage({
   telegramMessage: string;
 }): string {
   const head = formatTelegramNotificationHeader(notificationType);
-  return bold("DAppNode ") + head + telegramMessage;
+  return bold("DAppNode ") + head + parseStoppedPackages(telegramMessage);
 }
 
 /**
@@ -32,4 +32,25 @@ function formatTelegramNotificationHeader(header: NotificationType): string {
     case "warning":
       return `⚡ ${bold(header)} ⚡:\n\n`;
   }
+}
+
+/**
+ * Parses the message and list the stopped packages in a beautiful way
+ * @param message
+ */
+function parseStoppedPackages(message: string): string {
+  const arr = message.split(/[()]/);
+  const packagesList = arr[1]
+    .split(", ")
+    .map(item => "- " + item + "\n")
+    .join("");
+  return (
+    arr[0] +
+    "\n\n" +
+    bold("Stopped packages:") +
+    "\n" +
+    packagesList +
+    "\n" +
+    arr[2]
+  );
 }

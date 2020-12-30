@@ -15,7 +15,7 @@ describe("daemons > telegramBot > runWatcher", () => {
 
     //Example of notification
     const formatedNames =
-      "DAppNodePackage-hello3\nDAppNodePackage-hello2\nDAppNodePackage-hello";
+      "DAppNodePackage-hello3, DAppNodePackage-hello2, DAppNodePackage-hello";
     const notification: PackageNotification = {
       id: "diskSpaceRanOut-stoppedPackages",
       type: "danger",
@@ -30,9 +30,14 @@ describe("daemons > telegramBot > runWatcher", () => {
 
     const result = `*DAppNode *⚠ *danger* ⚠:
 
-Available disk space is less than a dangerous level of 5 GB. To prevent your DAppNode from becoming unusable all non-core DNPs where stopped (DAppNodePackage-hello3
-DAppNodePackage-hello2
-DAppNodePackage-hello). Please, free up enough disk space and start them again.`;
+Available disk space is less than a dangerous level of 5 GB. To prevent your DAppNode from becoming unusable all non-core DNPs where stopped 
+    
+*Stopped packages:*
+- DAppNodePackage-hello3
+- DAppNodePackage-hello2
+- DAppNodePackage-hello
+    
+. Please, free up enough disk space and start them again.`;
 
     expect(message).to.deep.equal(result);
   });
