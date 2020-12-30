@@ -31,7 +31,7 @@ describe("daemons > telegramBot > runWatcher", () => {
     const result = `*DAppNode *⚠ *danger* ⚠:
 
 Available disk space is less than a dangerous level of 5 GB. To prevent your DAppNode from becoming unusable all non-core DNPs where stopped 
-    
+
 *Stopped packages:*
 - DAppNodePackage-hello3
 - DAppNodePackage-hello2
