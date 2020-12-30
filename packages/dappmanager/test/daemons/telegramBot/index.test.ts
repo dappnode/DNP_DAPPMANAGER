@@ -36,7 +36,7 @@ Available disk space is less than a dangerous level of 5 GB. To prevent your DAp
 - DAppNodePackage-hello3
 - DAppNodePackage-hello2
 - DAppNodePackage-hello
-    
+
 . Please, free up enough disk space and start them again.`;
 
     expect(message).to.deep.equal(result);
