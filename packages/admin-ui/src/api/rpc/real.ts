@@ -2,11 +2,7 @@ import { Emitter } from "mitt";
 import { mapValues } from "lodash";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 import { subscriptionsFactory } from "common";
-
-interface IApiRpc {
-  start(apiEventBridge: Emitter): void;
-  call<R>(payload: RpcPayload): Promise<RpcResponse<R>>;
-}
+import { IApiRpc } from "./interface";
 
 let socketIoUrl: string;
 let socketGlobal: SocketIOClient.Socket | null = null;
@@ -20,7 +16,7 @@ export const rpc: IApiRpc = {
     });
   },
 
-  start(apiEventBridge: Emitter) {
+  start(apiEventBridge: Emitter, onConnect, onError) {
     // Only run start() once
     if (apiStarted) {
       return;
@@ -36,12 +32,12 @@ export const rpc: IApiRpc = {
         handler.on((...args: any[]) => apiEventBridge.emit(route, ...args));
       });
 
-      apiEventBridge.emit("CONNECTED");
+      onConnect();
     });
 
     function handleConnectionError(err: Error | string): void {
       const errorMessage = err instanceof Error ? err.message : err;
-      apiEventBridge.emit("CONNECTION_ERROR", errorMessage);
+      onError(errorMessage);
     }
 
     // Handles server errors

@@ -16,11 +16,13 @@ import { parseRpcResponse } from "common/transport/jsonRpc";
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";
 import { socketIoUrl } from "params";
-import * as apiReal from "./setup_real";
+import * as apiReal from "./rpc/real";
 
 const apiInstancePromise = process.env.REACT_APP_MOCK
-  ? import("./setup_mock")
+  ? import("./rpc/mock")
   : apiReal;
+
+/* eslint-disable no-console */
 
 /**
  * Bridges events from the API websockets client to any consumer in the App
@@ -36,9 +38,22 @@ const apiEventBridge = mitt();
 // Map redux subscriptions to eventBridge
 mapSubscriptionsToRedux(subscriptionsFactory(apiEventBridge));
 
-export async function startApi() {
+export async function startApi(refetchStatus: () => void) {
   const apiInstance = await apiInstancePromise;
-  apiInstance.rpc.start(apiEventBridge);
+  apiInstance.rpc.start(
+    apiEventBridge,
+    function onConnect() {
+      initialCallsOnOpen();
+
+      console.log("SocketIO connected");
+      // When Socket.io re-establishes connection check if still logged in
+      refetchStatus();
+    },
+    function onError(errorMessage: string) {
+      console.error("SocketIO connection closed", errorMessage);
+      refetchStatus();
+    }
+  );
 }
 
 const routeSubscription: Partial<
@@ -143,19 +158,3 @@ export const useSubscription: {
     useSubscribe(route as keyof Subscriptions, callback);
   };
 });
-
-function onConnect() {
-  initialCallsOnOpen();
-
-  /* eslint-disable-next-line no-console */
-  console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
-
-  // When Socket.io re-establishes connection check if still logged in
-  refetchStatus();
-}
-
-function onError() {
-  const errorMessage = err instanceof Error ? err.message : err;
-  console.error("SocketIO connection closed", errorMessage);
-  refetchStatus();
-}

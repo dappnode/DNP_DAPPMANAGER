@@ -15,15 +15,9 @@ import pages, { defaultPage } from "./pages";
 import { ToastContainer } from "react-toastify";
 import Welcome from "components/welcome/Welcome";
 import { authApi, LoginStatus } from "api/auth";
-import { start as apiStart } from "api";
+import { startApi } from "api";
 
-function MainApp({
-  refetchStatus,
-  username
-}: {
-  refetchStatus: () => Promise<void>;
-  username: string;
-}) {
+function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN, then display the page for nonAdmin
@@ -34,11 +28,6 @@ function MainApp({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
-
-  useEffect(() => {
-    // Start API and Socket.io once user has logged in
-    apiStart({ refetchStatus });
-  }, [refetchStatus]);
 
   return (
     <div className="body">
@@ -80,6 +69,7 @@ export default function App() {
   const [loginStatus, setLoginStatus] = useState<LoginStatus>();
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in
+  const isLoggedIn = loginStatus?.status === "logged-in";
 
   const onFetchLoginStatus = useCallback(
     () =>
@@ -94,18 +84,21 @@ export default function App() {
     onFetchLoginStatus();
   }, [onFetchLoginStatus]);
 
+  useEffect(() => {
+    // Start API and Socket.io once user has logged in
+    if (isLoggedIn)
+      startApi({ refetchStatus: onFetchLoginStatus }).catch(e =>
+        console.error("Error on startApi", e)
+      );
+  }, [isLoggedIn, onFetchLoginStatus]);
+
   if (!loginStatus) {
     return <Loading steps={["Opening connection"]} />;
   }
 
   switch (loginStatus.status) {
     case "logged-in":
-      return (
-        <MainApp
-          refetchStatus={onFetchLoginStatus}
-          username={loginStatus.username}
-        />
-      );
+      return <MainApp username={loginStatus.username} />;
     case "not-logged-in":
       return <Login refetchStatus={onFetchLoginStatus} />;
     case "not-registered":

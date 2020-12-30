@@ -1,11 +1,6 @@
-import { Emitter } from "mitt";
 import { RpcPayload, RpcResponse } from "common/transport/types";
-import { calls } from "../__mock-backend__";
-
-interface IApiRpc {
-  start(apiEventBridge: Emitter): void;
-  call<R>(payload: RpcPayload): Promise<RpcResponse<R>>;
-}
+import { calls } from "../../__mock-backend__";
+import { IApiRpc } from "./interface";
 
 export const rpc: IApiRpc = {
   async call<R>(payload: RpcPayload): Promise<RpcResponse<R>> {
@@ -18,5 +13,7 @@ export const rpc: IApiRpc = {
     );
   },
 
-  start() {}
+  start(apiEventBridge, onConnect) {
+    onConnect();
+  }
 };
