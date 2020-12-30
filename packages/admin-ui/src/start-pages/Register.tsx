@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BsShieldLock } from "react-icons/bs";
 import Alert from "react-bootstrap/Alert";
 import { authApi } from "api/auth";
-import { apiUrls } from "params";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import Button from "components/Button";
@@ -45,17 +44,6 @@ export function Register({
   function onCopiedRecoveryToken() {
     refetchStatus()?.catch(() => {});
   }
-
-  useEffect(() => {
-    async function fetchServerName() {
-      const res = await fetch(apiUrls.globalEnvsServerName);
-      const serverName = await res.text();
-      if (res.ok && serverName) setUsername(serverName);
-    }
-    fetchServerName().catch(e => {
-      console.warn(`Error fetching serverName: ${e.message}`);
-    });
-  }, []);
 
   if (recoveryToken) {
     // Second phase of registration, user must copy the recovery token
