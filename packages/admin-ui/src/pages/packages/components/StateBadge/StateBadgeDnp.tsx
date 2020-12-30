@@ -13,7 +13,7 @@ export function StateBadgeDnp({ dnp }: { dnp: InstalledPackageData }) {
     return <StateBadgeContainer container={dnp.containers[0]} />;
   }
 
-  const containers = dnp.containers.sort((a, b) =>
+  const containers = [...dnp.containers].sort((a, b) =>
     a.serviceName.localeCompare(b.serviceName)
   );
 
