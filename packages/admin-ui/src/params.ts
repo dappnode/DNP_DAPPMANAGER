@@ -22,6 +22,8 @@ export const apiUrls = {
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs")
 };
+export const socketIoUrl = apiUrl;
+
 // Allow cross-domain cookies
 export const apiTestMode = process.env.REACT_APP_API_TEST;
 
