@@ -5,10 +5,10 @@ import {
   ERROR_NOT_LOGGED_IN,
   ERROR_NOT_LOGGED_IN_NO_COOKIE,
   ERROR_NOT_REGISTERED
-} from "../../params";
+} from "../params";
 import { IApiAuth } from "./interface";
 
-export const authApi: IApiAuth = {
+export const apiAuth: IApiAuth = {
   async fetchLoginStatus() {
     try {
       const res = await fetchAuthPost<{}, LoginStatusReturn>(

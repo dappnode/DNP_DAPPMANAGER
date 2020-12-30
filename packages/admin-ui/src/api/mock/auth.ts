@@ -1,13 +1,6 @@
-import { IApiAuth } from "./interface";
+import { IApiAuth } from "../interface";
 
-// @ts-ignore
-window.mockEnabled = true;
-console.warn("Mock mode enabled");
-if (window.location.host === "my.dappnode") {
-  throw Error("Mock must never be used in production");
-}
-
-export const authApi: IApiAuth = {
+export const apiAuth: IApiAuth = {
   async fetchLoginStatus() {
     return { status: "logged-in", username: "admin" };
   },

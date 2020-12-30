@@ -14,7 +14,7 @@ import pages, { defaultPage } from "./pages";
 // Redux
 import { ToastContainer } from "react-toastify";
 import Welcome from "components/welcome/Welcome";
-import { authApi, LoginStatus } from "api/auth";
+import { apiAuth, LoginStatus } from "api";
 import { startApi } from "api";
 
 function MainApp({ username }: { username: string }) {
@@ -70,10 +70,11 @@ export default function App() {
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in
   const isLoggedIn = loginStatus?.status === "logged-in";
+  const isError = loginStatus?.status === "error";
 
   const onFetchLoginStatus = useCallback(
     () =>
-      authApi
+      apiAuth
         .fetchLoginStatus()
         .then(setLoginStatus)
         .catch(console.error),
@@ -84,13 +85,28 @@ export default function App() {
     onFetchLoginStatus();
   }, [onFetchLoginStatus]);
 
+  // Start API and Socket.io once user has logged in
   useEffect(() => {
-    // Start API and Socket.io once user has logged in
     if (isLoggedIn)
-      startApi({ refetchStatus: onFetchLoginStatus }).catch(e =>
+      startApi(onFetchLoginStatus).catch(e =>
         console.error("Error on startApi", e)
       );
   }, [isLoggedIn, onFetchLoginStatus]);
+
+  // Keep retrying if there was a network error
+  useEffect(() => {
+    if (isError) {
+      let timeToNext = 500;
+      let timeout: number;
+      const recursiveTimeout = () => {
+        console.log("RECURSIVE CALL");
+        onFetchLoginStatus();
+        timeout = setTimeout(recursiveTimeout, (timeToNext *= 2));
+      };
+      recursiveTimeout();
+      return () => clearTimeout(timeout);
+    }
+  }, [isError, onFetchLoginStatus]);
 
   if (!loginStatus) {
     return <Loading steps={["Opening connection"]} />;

@@ -3,12 +3,12 @@ import { mapValues } from "lodash";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 import { subscriptionsFactory } from "common";
 import { IApiRpc } from "./interface";
+import { socketIoUrl } from "params";
 
-let socketIoUrl: string;
 let socketGlobal: SocketIOClient.Socket | null = null;
 let apiStarted = false;
 
-export const rpc: IApiRpc = {
+export const apiRpc: IApiRpc = {
   async call<R>(payload: RpcPayload) {
     const socket = setupSocket();
     return await new Promise<RpcResponse<R>>(resolve => {

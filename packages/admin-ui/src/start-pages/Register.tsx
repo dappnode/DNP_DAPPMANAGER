@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { apiAuth } from "api";
 import { BsShieldLock } from "react-icons/bs";
 import Alert from "react-bootstrap/Alert";
-import { authApi } from "api/auth";
 import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import Button from "components/Button";
@@ -33,7 +33,7 @@ export function Register({
     if (isValid)
       try {
         setReqStatus({ loading: true });
-        const res = await authApi.register({ username, password });
+        const res = await apiAuth.register({ username, password });
         setRecoveryToken(res.recoveryToken);
         setReqStatus({ result: true });
       } catch (e) {

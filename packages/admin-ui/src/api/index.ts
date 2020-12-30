@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import io from "socket.io-client";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash";
 import mitt from "mitt";
@@ -15,12 +14,19 @@ import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";
-import { socketIoUrl } from "params";
-import * as apiReal from "./rpc/real";
+import { LoginStatus as _LoginStatus } from "./interface";
+import { apiRpc } from "./rpc";
+import { apiAuth } from "./auth";
 
-const apiInstancePromise = process.env.REACT_APP_MOCK
-  ? import("./rpc/mock")
-  : apiReal;
+export type LoginStatus = _LoginStatus;
+export { apiAuth };
+
+if (process.env.REACT_APP_MOCK) {
+  import("./mock").then(mock => {
+    Object.assign(apiAuth, mock.apiAuth);
+    Object.assign(apiRpc, mock.apiRpc);
+  });
+}
 
 /* eslint-disable no-console */
 
@@ -39,8 +45,7 @@ const apiEventBridge = mitt();
 mapSubscriptionsToRedux(subscriptionsFactory(apiEventBridge));
 
 export async function startApi(refetchStatus: () => void) {
-  const apiInstance = await apiInstancePromise;
-  apiInstance.rpc.start(
+  apiRpc.start(
     apiEventBridge,
     function onConnect() {
       initialCallsOnOpen();
@@ -77,8 +82,7 @@ const routeSubscription: Partial<
  * @param args ["bitcoin.dnp.dappnode.eth"]
  */
 async function callRoute<R>(method: string, params: any[]): Promise<R> {
-  const apiInstance = await apiInstancePromise;
-  const rpcResponse = await apiInstance.rpc.call<R>({ method, params });
+  const rpcResponse = await apiRpc.call<R>({ method, params });
   return parseRpcResponse(rpcResponse);
 }
 

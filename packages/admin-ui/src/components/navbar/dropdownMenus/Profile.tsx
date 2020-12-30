@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { authApi } from "api/auth";
+import { apiAuth } from "api";
 import ErrorView from "components/ErrorView";
 import { systemProfilePath } from "pages/system/data";
 import { AiOutlineUser } from "react-icons/ai";
@@ -28,7 +28,7 @@ function LogoutListItem() {
   async function onLogout() {
     try {
       setReqStatus({ loading: true });
-      await authApi.logoutAndReload();
+      await apiAuth.logoutAndReload();
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e });

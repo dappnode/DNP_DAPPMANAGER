@@ -1,8 +1,8 @@
 import { RpcPayload, RpcResponse } from "common/transport/types";
 import { calls } from "../../__mock-backend__";
-import { IApiRpc } from "./interface";
+import { IApiRpc } from "../interface";
 
-export const rpc: IApiRpc = {
+export const apiRpc: IApiRpc = {
   async call<R>(payload: RpcPayload): Promise<RpcResponse<R>> {
     const method = payload.method as keyof typeof calls;
     if (typeof calls[method] !== "function") {

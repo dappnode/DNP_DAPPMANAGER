@@ -1,3 +1,6 @@
+import { Emitter } from "mitt";
+import { RpcPayload, RpcResponse } from "common/transport/types";
+
 export type LoginStatus =
   | { status: "logged-in"; username: string }
   | { status: "not-logged-in"; noCookie: boolean }
@@ -17,4 +20,18 @@ export interface IApiAuth {
     newPassword: string;
   }): Promise<{ ok: true }>;
   recoverPass(data: { token: string }): Promise<{ ok: true }>;
+}
+
+export interface IApiRpc {
+  start(
+    apiEventBridge: Emitter,
+    onConnect: () => void,
+    onError: (errorMessage: string) => void
+  ): void;
+  call<R>(payload: RpcPayload): Promise<RpcResponse<R>>;
+}
+
+export interface IApi {
+  auth: IApiAuth;
+  rpc: IApiRpc;
 }
