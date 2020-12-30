@@ -12,10 +12,10 @@ import {
 } from "common/subscriptions";
 import { Routes, routesData, ResolvedType } from "common/routes";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
+import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";
-import { parseRpcResponse } from "common/transport/jsonRpc";
 import { apiUrl, apiUrls } from "params";
 
 let socketGlobal: SocketIOClient.Socket;

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { api } from "api";
-import { confirm } from "components/ConfirmDialog";
+import { uploadFile } from "api/routes";
 // Components
+import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import { withToastNoThrow } from "components/toast/Toast";
@@ -9,10 +10,10 @@ import ErrorView from "components/ErrorView";
 // Utils
 import { shortName } from "utils/format";
 import humanFS from "utils/humanFileSize";
-import { PackageBackup } from "types";
-import { apiUrls } from "params";
+import { PackageBackup, ReqStatus } from "types";
 
-const baseUrlUpload = apiUrls.upload;
+type ProgressType = { label: string; percent?: number };
+type UploadReqStatus = ReqStatus<true, ProgressType>;
 
 export function BackupRestore({
   dnpName,
@@ -21,70 +22,39 @@ export function BackupRestore({
   dnpName: string;
   backup: PackageBackup[];
 }) {
-  const [progress, setProgress] = useState<{
-    label: string;
-    percent?: number;
-  }>();
-  const [error, setError] = useState<string | Error>();
-  const isOnProgress = Boolean(progress && progress.label);
+  const [reqStatus, setReqStatus] = useState<UploadReqStatus>({});
+  const isOnProgress = Boolean(reqStatus.loading !== undefined);
 
   /**
    * Restores a DNP backup given a backup file
-   * @param file
    */
   async function restoreBackup(file: File) {
-    setError(undefined);
+    try {
+      setReqStatus({ loading: { label: "Uploading file" } });
 
-    const xhr = new XMLHttpRequest();
-    // Bind the FormData object and the form element
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // Define what happens on successful data submission
-    xhr.addEventListener("load", e => {
-      setProgress(undefined);
-      if (!e.target) return setError(`No upload responseText`);
-      // ### Pending bug: .responseText is not typed in XMLHttpRequestEventTarget
-      const fileId = (e.target as any).responseText;
-      // if responseText is not a 32bytes hex, abort
-      if (!/[0-9A-Fa-f]{64}/.test(fileId))
-        return setError(`Wrong response: ${fileId}`);
-
-      setProgress({ label: "Restoring backup..." });
-      withToastNoThrow(() => api.backupRestore({ dnpName, backup, fileId }), {
-        message: `Restoring backup for ${shortName(dnpName)}...`,
-        onSuccess: `Restored backup for ${shortName(dnpName)}`
-      }).then(() => {
-        setProgress(undefined);
+      const { fileId } = await uploadFile(file, progressData => {
+        const { loaded, total } = progressData;
+        const percent = parseFloat(
+          ((100 * (loaded || 0)) / (total || 1)).toFixed(2)
+        );
+        const label = `${percent}% ${humanFS(loaded)} / ${humanFS(total)}`;
+        setReqStatus({ loading: { percent, label } });
       });
-    });
 
-    // Define what happens in case of error
-    xhr.addEventListener("error", e => {
-      setProgress(undefined);
-      setError("Error loading file");
-    });
+      setReqStatus({ loading: { label: "Restoring backup..." } });
 
-    if (xhr.upload)
-      xhr.upload.addEventListener(
-        "progress",
-        e => {
-          const { loaded, total } = e;
-          const percent = parseFloat(
-            ((100 * (loaded || 0)) / (total || 1)).toFixed(2)
-          );
-          setProgress({
-            percent,
-            label: `${percent}% ${humanFS(loaded)} / ${humanFS(total)}`
-          });
-        },
-        false
+      await withToastNoThrow(
+        () => api.backupRestore({ dnpName, backup, fileId }),
+        {
+          message: `Restoring backup for ${shortName(dnpName)}...`,
+          onSuccess: `Restored backup for ${shortName(dnpName)}`
+        }
       );
 
-    // Set up our request
-    xhr.open("POST", baseUrlUpload);
-    // The data sent is what the user provided in the form
-    xhr.send(formData);
+      setReqStatus({ result: true });
+    } catch (e) {
+      setReqStatus({ error: e });
+    }
   }
 
   function handleClickRestore(file: File) {
@@ -124,17 +94,17 @@ export function BackupRestore({
         />
       </Button>
 
-      {progress && (
+      {reqStatus.loading && (
         <div>
           <ProgressBar
-            now={progress.percent || 100}
+            now={reqStatus.loading.percent || 100}
             animated={true}
-            label={progress.label || ""}
+            label={reqStatus.loading.label || ""}
           />
         </div>
       )}
 
-      {error && <ErrorView error={error} red hideIcon />}
+      {reqStatus.error && <ErrorView error={reqStatus.error} red hideIcon />}
     </>
   );
 }
