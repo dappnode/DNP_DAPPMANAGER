@@ -8,9 +8,10 @@ export const rpc: IApiRpc = {
     if (typeof calls[method] !== "function") {
       throw Error(`method ${payload.method} not supported`);
     }
-    return await (calls[method] as (...params: any[]) => Promise<any>)(
-      ...payload.params
-    );
+    const result: R = await (calls[method] as (
+      ...params: any[]
+    ) => Promise<any>)(...payload.params);
+    return { result };
   },
 
   start(apiEventBridge, onConnect) {
