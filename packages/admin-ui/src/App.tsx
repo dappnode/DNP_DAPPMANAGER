@@ -37,6 +37,8 @@ function MainApp({ username }: { username: string }) {
           <NotificationsMain />
         </ErrorBoundary>
 
+        <h1>HHIHIHIIHIIHIHIHI</h1>
+
         <Switch>
           {Object.values(pages).map(({ RootComponent, rootPath }) => (
             <Route
