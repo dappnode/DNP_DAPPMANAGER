@@ -1,3 +1,4 @@
+import io from "socket.io-client";
 import { Emitter } from "mitt";
 import { mapValues } from "lodash";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
