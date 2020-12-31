@@ -21,6 +21,8 @@ import { apiAuth } from "./auth";
 export type LoginStatus = _LoginStatus;
 export { apiAuth };
 
+// Inject mock API code to have a workable UI offline
+// Usefull for developing and testing UI elements without any server
 if (process.env.REACT_APP_MOCK) {
   import("./mock").then(mock => {
     Object.assign(apiAuth, mock.apiAuth);

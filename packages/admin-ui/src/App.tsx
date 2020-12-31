@@ -1,21 +1,19 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Switch, Route, Redirect, useLocation } from "react-router-dom";
+import { startApi, apiAuth, LoginStatus } from "api";
 // Components
+import { ToastContainer } from "react-toastify";
 import NotificationsMain from "./components/NotificationsMain";
-import { NoConnection } from "start-pages/NoConnection";
-import { Register } from "./start-pages/Register";
-import { Login } from "./start-pages/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { TopBar } from "./components/navbar/TopBar";
 import SideBar from "./components/navbar/SideBar";
 import Loading from "components/Loading";
+import Welcome from "components/welcome/Welcome";
 // Pages
 import pages, { defaultPage } from "./pages";
-// Redux
-import { ToastContainer } from "react-toastify";
-import Welcome from "components/welcome/Welcome";
-import { apiAuth, LoginStatus } from "api";
-import { startApi } from "api";
+import { Login } from "./start-pages/Login";
+import { Register } from "./start-pages/Register";
+import { NoConnection } from "start-pages/NoConnection";
 
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
@@ -72,14 +70,13 @@ export default function App() {
   const isLoggedIn = loginStatus?.status === "logged-in";
   const isError = loginStatus?.status === "error";
 
-  const onFetchLoginStatus = useCallback(
-    () =>
-      apiAuth
-        .fetchLoginStatus()
-        .then(setLoginStatus)
-        .catch(console.error),
-    []
-  );
+  const onFetchLoginStatus = useCallback(async () => {
+    try {
+      setLoginStatus(await apiAuth.fetchLoginStatus());
+    } catch (e) {
+      console.error("Error on fetchLoginStatus", e);
+    }
+  }, []);
 
   useEffect(() => {
     onFetchLoginStatus();
@@ -93,13 +90,12 @@ export default function App() {
       );
   }, [isLoggedIn, onFetchLoginStatus]);
 
-  // Keep retrying if there was a network error
+  // Keep retrying if there is a loggin error, probably due a network error
   useEffect(() => {
     if (isError) {
       let timeToNext = 500;
       let timeout: number;
       const recursiveTimeout = () => {
-        console.log("RECURSIVE CALL");
         onFetchLoginStatus();
         timeout = setTimeout(recursiveTimeout, (timeToNext *= 2));
       };

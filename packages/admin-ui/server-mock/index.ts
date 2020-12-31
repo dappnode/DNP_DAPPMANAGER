@@ -1,5 +1,5 @@
 import path from "path";
-import * as methods from "./calls";
+import { calls } from "../src/__mock-backend__";
 import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
 import { LoggerMiddleware } from "../src/common/transport/types";
 import { MockVpnApiClient } from "./mockVpnClient";
@@ -55,7 +55,7 @@ const server = startDappmanager({
   ethForwardMiddleware: (req, res, next) => {
     next();
   },
-  methods,
+  methods: calls,
   routesLogger,
   subscriptionsLogger,
   eventBus,
