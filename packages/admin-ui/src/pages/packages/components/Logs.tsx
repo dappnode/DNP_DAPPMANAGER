@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { api } from "api";
-import { containerLogsUrl } from "api/routes";
+import { api, apiRoutes } from "api";
 // Components
 import Card from "components/Card";
 import Switch from "components/Switch";
@@ -129,7 +128,10 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         prepend="Lines"
         append={
           containerName && (
-            <a href={containerLogsUrl({ containerName })} {...newTabProps}>
+            <a
+              href={apiRoutes.containerLogsUrl({ containerName })}
+              {...newTabProps}
+            >
               <Button>Download all</Button>
             </a>
           )

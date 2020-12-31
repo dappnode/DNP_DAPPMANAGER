@@ -15,17 +15,20 @@ import { parseRpcResponse } from "common/transport/jsonRpc";
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";
 import { LoginStatus as _LoginStatus } from "./interface";
-import { apiRpc } from "./rpc";
 import { apiAuth } from "./auth";
+import { apiRoutes } from "./routes";
+import { apiRpc } from "./rpc";
 
 export type LoginStatus = _LoginStatus;
 export { apiAuth };
+export { apiRoutes };
 
 // Inject mock API code to have a workable UI offline
 // Usefull for developing and testing UI elements without any server
 if (process.env.REACT_APP_MOCK) {
   import("./mock").then(mock => {
     Object.assign(apiAuth, mock.apiAuth);
+    Object.assign(apiRoutes, mock.apiRoutes);
     Object.assign(apiRpc, mock.apiRpc);
   });
 }

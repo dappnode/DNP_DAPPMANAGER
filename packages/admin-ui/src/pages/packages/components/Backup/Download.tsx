@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { api } from "api";
-import { downloadUrl } from "api/routes";
+import { api, apiRoutes } from "api";
 // Components
 import Button from "components/Button";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
@@ -33,7 +32,7 @@ export function BackupDownload({
       });
 
       if (!fileId) throw Error("Error preparing backup, no fileId returned");
-      const backupDownloadUrl = downloadUrl({ fileId });
+      const backupDownloadUrl = apiRoutes.downloadUrl({ fileId });
       window.open(backupDownloadUrl, "_newtab");
 
       setReqStatus({ result: backupDownloadUrl });

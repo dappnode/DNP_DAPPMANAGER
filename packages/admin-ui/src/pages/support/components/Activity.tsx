@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSubscription, useApi } from "api";
-import { userActionLogsUrl } from "api/routes";
+import { useSubscription, useApi, apiRoutes } from "api";
 import { UserActionLog } from "types";
 // Components
 import CardList from "components/CardList";
@@ -48,7 +47,11 @@ export default function Activity() {
       </p>
 
       <div>
-        <a href={userActionLogsUrl()} {...newTabProps} className="no-a-style">
+        <a
+          href={apiRoutes.userActionLogsUrl()}
+          {...newTabProps}
+          className="no-a-style"
+        >
           <Button variant="dappnode"> Download all logs</Button>
         </a>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { fileDownloadUrl } from "api/routes";
+import { apiRoutes } from "api";
 import Input from "components/Input";
 import Button from "components/Button";
 import newTabProps from "utils/newTabProps";
@@ -14,7 +14,7 @@ export function CopyFileFrom({
   const [fromPathInput, setFromPathInput] = useState("");
 
   const getDownloadUrl = useCallback(
-    fromPath => fileDownloadUrl({ containerName, path: fromPath }),
+    fromPath => apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
     [containerName]
   );
 

@@ -1,4 +1,5 @@
 export { apiAuth } from "./auth";
+export { apiRoutes } from "./routes";
 export { apiRpc } from "./rpc";
 
 // Make sure to crash the UI if mock node is enabled in production

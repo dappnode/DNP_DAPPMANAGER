@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { api } from "api";
-import { uploadFile } from "api/routes";
+import { api, apiRoutes } from "api";
 // Components
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
@@ -32,7 +31,7 @@ export function BackupRestore({
     try {
       setReqStatus({ loading: { label: "Uploading file" } });
 
-      const { fileId } = await uploadFile(file, progressData => {
+      const { fileId } = await apiRoutes.uploadFile(file, progressData => {
         const { loaded, total } = progressData;
         const percent = parseFloat(
           ((100 * (loaded || 0)) / (total || 1)).toFixed(2)
