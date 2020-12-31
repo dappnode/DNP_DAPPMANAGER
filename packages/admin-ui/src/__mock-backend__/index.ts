@@ -1,5 +1,4 @@
-import { Routes } from "common";
-
+import { Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
