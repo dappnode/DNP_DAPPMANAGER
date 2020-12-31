@@ -3,7 +3,7 @@ import {
   RequestedDnp,
   InstalledPackageDetailData,
   PackageContainer
-} from "../../src/common";
+} from "../../common";
 
 export const sampleRequestState: RequestedDnp = {
   dnpName: "demo-name",

@@ -20,12 +20,17 @@ export const apiUrls = {
   download: urlJoin(apiUrl, "download"),
   fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
-  userActionLogs: urlJoin(apiUrl, "user-action-logs"),
-  globalEnvs: urlJoin(apiUrl, "global-envs"),
-  globalEnvsServerName: urlJoin(apiUrl, "global-envs/SERVER_NAME")
+  userActionLogs: urlJoin(apiUrl, "user-action-logs")
 };
+export const socketIoUrl = apiUrl;
+
 // Allow cross-domain cookies
 export const apiTestMode = process.env.REACT_APP_API_TEST;
+
+// API Auth errors. Must be in sync with the DAPPMANAGER
+export const ERROR_NOT_REGISTERED = "NOT_REGISTERED";
+export const ERROR_NOT_LOGGED_IN = "NOT_LOGGED_IN";
+export const ERROR_NOT_LOGGED_IN_NO_COOKIE = "NOT_LOGGED_IN_NO_COOKIE";
 
 // WIFI
 export const wifiDefaultSSID = "DAppNodeWIFI";

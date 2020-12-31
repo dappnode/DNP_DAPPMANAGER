@@ -12,8 +12,8 @@ export interface WifiStatus {
   isDefault: boolean;
 }
 
-export interface ReqStatus<T = true> {
-  loading?: boolean;
+export interface ReqStatus<T = true, P = boolean> {
+  loading?: P;
   error?: Error | string;
   result?: T;
 }

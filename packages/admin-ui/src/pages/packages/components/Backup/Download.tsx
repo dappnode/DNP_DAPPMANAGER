@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { api } from "api";
+import { api, apiRoutes } from "api";
 // Components
 import Button from "components/Button";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
@@ -9,10 +9,7 @@ import ErrorView from "components/ErrorView";
 // Utils
 import { shortName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { apiUrls } from "params";
 import { PackageBackup, ReqStatus } from "types";
-
-const baseUrlDownload = apiUrls.download;
 
 export function BackupDownload({
   dnpName,
@@ -35,7 +32,7 @@ export function BackupDownload({
       });
 
       if (!fileId) throw Error("Error preparing backup, no fileId returned");
-      const backupDownloadUrl = `${baseUrlDownload}/${fileId}`;
+      const backupDownloadUrl = apiRoutes.downloadUrl({ fileId });
       window.open(backupDownloadUrl, "_newtab");
 
       setReqStatus({ result: backupDownloadUrl });

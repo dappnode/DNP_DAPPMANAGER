@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { api } from "api";
-import newTabProps from "utils/newTabProps";
+import { api, apiRoutes } from "api";
 // Components
 import Card from "components/Card";
 import Switch from "components/Switch";
 import Input from "components/Input";
 import Button from "components/Button";
 import { Terminal } from "./Terminal";
-// Utils
-import { stringIncludes, stringSplit } from "utils/strings";
-import { apiUrls } from "params";
-import { urlJoin } from "utils/url";
-import { PackageContainer } from "common";
-import "./logs.scss";
 import { ServiceSelector } from "./ServiceSelector";
+// Utils
+import newTabProps from "utils/newTabProps";
+import { stringIncludes, stringSplit } from "utils/strings";
+import { PackageContainer } from "types";
+import "./logs.scss";
 
-const baseUrlDownloadAll = apiUrls.containerLogs;
 const refreshInterval = 2 * 1000;
 const terminalID = "terminal";
 
@@ -132,7 +129,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
         append={
           containerName && (
             <a
-              href={urlJoin(baseUrlDownloadAll, containerName)}
+              href={apiRoutes.containerLogsUrl({ containerName })}
               {...newTabProps}
             >
               <Button>Download all</Button>

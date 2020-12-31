@@ -75,7 +75,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
         {/* Container display */}
         {showAll &&
-          dnp.containers
+          [...dnp.containers]
             .sort((a, b) => a.serviceName.localeCompare(b.serviceName))
             .map(container => (
               <React.Fragment key={container.serviceName}>

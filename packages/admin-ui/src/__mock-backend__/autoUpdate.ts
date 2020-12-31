@@ -1,7 +1,23 @@
-import { AutoUpdateDataView } from "../../src/common";
-import { coreName } from "../mockData";
-import { pause } from "../utils";
-import { eventBus } from "../eventBus";
+import { AutoUpdateDataView, Routes } from "../../src/common";
+import { pause } from "./utils/pause";
+
+export const autoUpdate: Pick<
+  Routes,
+  "autoUpdateDataGet" | "autoUpdateSettingsEdit"
+> = {
+  autoUpdateDataGet: async () => autoUpdateData,
+  autoUpdateSettingsEdit: async ({ id, enabled }) => {
+    await pause(500);
+    if (autoUpdateData.settings[id])
+      autoUpdateData.settings[id].enabled = enabled;
+
+    for (const dnp of autoUpdateData.dnpsToShow) {
+      if (dnp.id === id) dnp.enabled = enabled;
+    }
+  }
+};
+
+const coreName = "core.dnp.dappnode.eth";
 
 const autoUpdateData: AutoUpdateDataView = {
   settings: {
@@ -69,33 +85,3 @@ const autoUpdateData: AutoUpdateDataView = {
     }
   ]
 };
-
-/**
- * Returns formated auto-update data
- */
-export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
-  return autoUpdateData;
-}
-
-/**
- * Edits the auto-update settings
- * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
- * @param enabled Auto update is enabled for ID
- */
-export async function autoUpdateSettingsEdit({
-  id,
-  enabled
-}: {
-  id: string;
-  enabled: boolean;
-}): Promise<void> {
-  await pause(500);
-  if (autoUpdateData.settings[id])
-    autoUpdateData.settings[id].enabled = enabled;
-
-  for (const dnp of autoUpdateData.dnpsToShow) {
-    if (dnp.id === id) dnp.enabled = enabled;
-  }
-
-  eventBus.requestAutoUpdateData.emit();
-}

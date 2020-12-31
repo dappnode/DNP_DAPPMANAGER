@@ -7,4 +7,11 @@
 // Into:
 //   <a href={url} {...newTabProps}>
 
-export default { rel: "noopener noreferrer", target: "_blank" };
+const newTabProps: {
+  rel: string;
+  target: string;
+  // Standalone mock may inject this prop to make URLs downloadable
+  download?: string;
+} = { rel: "noopener noreferrer", target: "_blank" };
+
+export default newTabProps;
