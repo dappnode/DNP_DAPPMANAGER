@@ -1,6 +1,9 @@
 import { IApiRoutes } from "api/interface";
 import { apiUrls } from "params";
 import { urlJoin } from "utils/url";
+import newTabProps from "utils/newTabProps";
+
+newTabProps.download = "test-dappnode-file";
 
 export const apiRoutes: IApiRoutes = {
   fileDownloadUrl({ containerName, path }) {
