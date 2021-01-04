@@ -87,22 +87,27 @@ async function monitorDiskUsage(): Promise<void> {
         }
 
         // Format the names output to display the exact list of stopped containers
-        const formatedNames =
-          names && typeof names === "string"
-            ? names
-                .replace(/\r?\n/g, ", ")
-                .replace(/(DAppNodePackage-)|(DAppNodeCore-)/g, "")
-            : "no DNPs";
+        const stoppedContainerNames =
+          names && typeof names === "string" ? names.split(/\r?\n/g) : [];
+        const stoppedDnpNames = stoppedContainerNames.map(name =>
+          name.replace(/(DAppNodePackage-)|(DAppNodeCore-)/g, "")
+        );
+        const stoppedDnpNameList = stoppedDnpNames.join(", ");
 
         logs.warn(
-          `WARNING: DAppNode has stopped ${threshold.containersDescription} (${formatedNames}) after the disk space reached a ${threshold.id}`
+          `WARNING: DAppNode has stopped ${threshold.containersDescription} (${stoppedDnpNameList}) after the disk space reached a ${threshold.id}`
         );
 
         eventBus.notification.emit({
           id: "diskSpaceRanOut-stoppedPackages",
           type: "danger",
           title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
-          body: `Available disk space is less than a ${threshold.id}. To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped (${formatedNames}). Please, free up enough disk space and start them again.`
+          body: [
+            `Available disk space is less than a ${threshold.id}.`,
+            `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
+            stoppedDnpNames.map(dnpName => ` - ${dnpName}`).join("\n"),
+            `Please, free up enough disk space and start them again.`
+          ].join("\n\n")
         });
         thresholdIsActive[threshold.id] = true;
 
