@@ -62,43 +62,37 @@ docker-compose logs -f
 
 ### Developing
 
-Currently, there are 3 different developing modes:
+There are 3 different developing modes:
 
-1. Server mock: this mode allow to simulate excepctional backend situations, such as alerts and notifications. You will have to stand up the mock and server-mock.
-
-````
-
-cd packages/admin-ui
-yarn server-mock
+1. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, to develop and test UI elements without connecting to a DAppNode or a mock server. This is a fully static site that will be deployed to Netlify on every PR to speed up the reviewing process of PRs.
 
 ```
-
-```
-
-cd packages/admin-ui
-yarn mock
-
-```
-
-2. Dappmanager: this mode will use the real dappmanager as the backend, so you will have the full cuntionality of the dappmanager.
-
-```
-
-cd packages/admin-ui
-yarn start
-
-```
-
-**This mode is not working for the moment since the cookies are enabled.**
-
-3. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, which letś you develop and test UI eleements without connecting to a DAppNode. This is a fully static site that should be deployed to Netlify on every PR to significantly speed the reviewing process of PRs.
-
-```
-
 cd packages/admin-ui
 yarn mock-standalone
+```
 
-````
+2. Server mock: this mode allow to simulate backend situations, such as cookies and sessions, alerts, or notifications. You should run the UI devserver and a mock backend server with:
+
+```
+cd packages/admin-ui
+yarn server-mock
+```
+
+```
+cd packages/admin-ui
+yarn mock
+```
+
+3. Actual DAPPMANAGER: this mode will connect to your DAppNode's actual DAPPMANAGER, useful to develop and test functionality OS dependant such as the SSH manager, host password manager, etc. You must be connected to your DAppNode via VPN or WIFI.
+
+```
+cd packages/admin-ui
+yarn start
+```
+
+*Note: This mode is not working a the moment since cross-domain cookies are not enabled.*
+
+
 
 ### Distributing
 
