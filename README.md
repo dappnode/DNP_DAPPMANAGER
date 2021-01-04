@@ -60,6 +60,46 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
+### Developing
+
+Currently, there are 3 different developing modes:
+
+1. Server mock: this mode allow to simulate excepctional backend situations, such as alerts and notifications. You will have to stand up the mock and server-mock.
+
+````
+
+cd packages/admin-ui
+yarn server-mock
+
+```
+
+```
+
+cd packages/admin-ui
+yarn mock
+
+```
+
+2. Dappmanager: this mode will use the real dappmanager as the backend, so you will have the full cuntionality of the dappmanager.
+
+```
+
+cd packages/admin-ui
+yarn start
+
+```
+
+**This mode is not working for the moment since the cookies are enabled.**
+
+3. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, which letś you develop and test UI eleements without connecting to a DAppNode. This is a fully static site that should be deployed to Netlify on every PR to significantly speed the reviewing process of PRs.
+
+```
+
+cd packages/admin-ui
+yarn mock-standalone
+
+````
+
 ### Distributing
 
 Now, generate a tar.xz image ([get the xz library](https://tukaani.org/xz/)).
