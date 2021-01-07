@@ -15,6 +15,7 @@ import { InstalledPackageData, PackageContainer } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import { shortNameCapitalized as sn } from "utils/format";
+import { confirm } from "components/ConfirmDialog";
 import "./containerList.scss";
 
 export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
@@ -83,7 +84,23 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
                 <span className="name">{sn(container.serviceName)}</span>
                 {container.running ? (
                   <MdPauseCircleOutline
-                    onClick={() => onStartStop(container)}
+                    onClick={() =>
+                      dnp.dnpName === "wifi.dnp.dappnode.eth"
+                        ? confirm({
+                            title: `Disabling wifi service`,
+                            text: "You may loose access",
+                            label: "Disable",
+                            onClick: () =>
+                              withToastNoThrow(
+                                async () => onStartStop(container),
+                                {
+                                  message: `Disabling wifi...`,
+                                  onSuccess: `Disabled wifi`
+                                }
+                              )
+                          })
+                        : onStartStop(container)
+                    }
                   />
                 ) : (
                   <MdPlayCircleOutline onClick={() => onStartStop(container)} />
