@@ -66,7 +66,22 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           </span>
 
           {allContainersRunning ? (
-            <MdPauseCircleOutline onClick={() => onStartStop()} />
+            <MdPauseCircleOutline
+              onClick={() =>
+                dnp.dnpName === "wifi.dnp.dappnode.eth"
+                  ? confirm({
+                      title: `Disabling wifi service `,
+                      text: "You may loose access",
+                      label: "Disable",
+                      onClick: () =>
+                        withToastNoThrow(async () => onStartStop(), {
+                          message: `Disabling wifi...`,
+                          onSuccess: `Disabled wifi`
+                        })
+                    })
+                  : onStartStop()
+              }
+            />
           ) : (
             <MdPlayCircleOutline onClick={() => onStartStop()} />
           )}
@@ -84,23 +99,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
                 <span className="name">{sn(container.serviceName)}</span>
                 {container.running ? (
                   <MdPauseCircleOutline
-                    onClick={() =>
-                      dnp.dnpName === "wifi.dnp.dappnode.eth"
-                        ? confirm({
-                            title: `Disabling wifi service `,
-                            text: "You may loose access",
-                            label: "Disable",
-                            onClick: () =>
-                              withToastNoThrow(
-                                async () => onStartStop(container),
-                                {
-                                  message: `Disabling wifi...`,
-                                  onSuccess: `Disabled wifi`
-                                }
-                              )
-                          })
-                        : onStartStop(container)
-                    }
+                    onClick={() => onStartStop(container)}
                   />
                 ) : (
                   <MdPlayCircleOutline onClick={() => onStartStop(container)} />
