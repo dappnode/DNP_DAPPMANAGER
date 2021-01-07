@@ -27,31 +27,40 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
   function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
+    const isWifi = isWifiPackage();
     const serviceNames = container && [container.serviceName];
     const name = container
       ? [sn(dnpName), sn(container.serviceName)].join(" ")
       : sn(dnpName);
+    if (isWifi) {
+      confirm({
+        title: `Disabling wifi service`,
+        text:
+          "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
+        label: "Disable",
+        onClick: () => packageStartStop({ dnpName, serviceNames, name })
+      });
+    } else {
+      packageStartStop({ dnpName, serviceNames, name });
+    }
+  }
+
+  function packageStartStop({
+    dnpName,
+    serviceNames,
+    name
+  }: {
+    dnpName: string;
+    serviceNames: string[] | undefined;
+    name: string;
+  }) {
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${name}...`,
       onSuccess: `Toggled ${name}`
     });
   }
 
-  function onStartStopConfirm() {
-    confirm({
-      title: `Disabling wifi service`,
-      text:
-        "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
-      label: "Disable",
-      onClick: () =>
-        withToastNoThrow(async () => onStartStop(), {
-          message: `Disabling wifi...`,
-          onSuccess: `Disabled wifi`
-        })
-    });
-  }
-
-  function isWifiPackage() {
+  function isWifiPackage(): boolean {
     if (dnp.dnpName === "wifi.dnp.dappnode.eth") return true;
     return false;
   }
@@ -85,11 +94,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           </span>
 
           {allContainersRunning ? (
-            <MdPauseCircleOutline
-              onClick={() =>
-                isWifiPackage() ? onStartStopConfirm() : onStartStop()
-              }
-            />
+            <MdPauseCircleOutline onClick={() => onStartStop()} />
           ) : (
             <MdPlayCircleOutline onClick={() => onStartStop()} />
           )}
