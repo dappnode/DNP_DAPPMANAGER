@@ -37,6 +37,25 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     });
   }
 
+  function onStartStopConfirm() {
+    confirm({
+      title: `Disabling wifi service`,
+      text:
+        "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
+      label: "Disable",
+      onClick: () =>
+        withToastNoThrow(async () => onStartStop(), {
+          message: `Disabling wifi...`,
+          onSuccess: `Disabled wifi`
+        })
+    });
+  }
+
+  function isWifiPackage() {
+    if (dnp.dnpName === "wifi.dnp.dappnode.eth") return true;
+    return false;
+  }
+
   const allContainersRunning = dnp.containers.every(c => c.running);
 
   return (
@@ -68,18 +87,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           {allContainersRunning ? (
             <MdPauseCircleOutline
               onClick={() =>
-                dnp.dnpName === "wifi.dnp.dappnode.eth"
-                  ? confirm({
-                      title: `Disabling wifi service `,
-                      text: "You may loose access",
-                      label: "Disable",
-                      onClick: () =>
-                        withToastNoThrow(async () => onStartStop(), {
-                          message: `Disabling wifi...`,
-                          onSuccess: `Disabled wifi`
-                        })
-                    })
-                  : onStartStop()
+                isWifiPackage() ? onStartStopConfirm() : onStartStop()
               }
             />
           ) : (

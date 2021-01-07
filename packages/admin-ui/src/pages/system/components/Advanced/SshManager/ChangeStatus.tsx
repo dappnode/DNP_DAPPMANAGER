@@ -37,6 +37,20 @@ export function SshManagerChangeStatus() {
     }
   }
 
+  function confirmChangeSsh() {
+    confirm({
+      title: `Disabling SSH service`,
+      text:
+        "You may loose SSH access to your DAppNode. Are you sure you want to disable it?",
+      label: "Disable",
+      onClick: () =>
+        withToastNoThrow(() => changeSshStatus("disabled"), {
+          message: `Disabling SSH...`,
+          onSuccess: `Disabled SSH`
+        })
+    });
+  }
+
   return (
     <>
       <Input
@@ -64,18 +78,7 @@ export function SshManagerChangeStatus() {
         </Button>
         <Button
           disabled={reqSetStatus.loading}
-          onClick={() =>
-            confirm({
-              title: `Disabling SSH service`,
-              text: "You may loose access",
-              label: "Disable",
-              onClick: () =>
-                withToastNoThrow(() => changeSshStatus("disabled"), {
-                  message: `Disabling SSH...`,
-                  onSuccess: `Disabled SSH`
-                })
-            })
-          }
+          onClick={() => confirmChangeSsh()}
         >
           Disable
         </Button>
