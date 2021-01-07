@@ -13,24 +13,31 @@ import { withToastNoThrow } from "components/toast/Toast";
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
 
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const [reqStatusToken, setReqStatusToken] = useState<ReqStatus>({});
+  const [reqStatusStatus, setReqStatusStatus] = useState<ReqStatus>({});
   const [token, setToken] = useState("");
 
   async function updateTelegramToken() {
     try {
-      setReqStatus({ loading: true });
-      await api.setTelegramToken({ telegramToken: token });
-      setReqStatus({ result: true });
+      setReqStatusToken({ loading: true });
+      await withToastNoThrow(
+        () => api.setTelegramToken({ telegramToken: token }),
+        {
+          message: `Setting telegram token...`,
+          onSuccess: `Updated telegram token`
+        }
+      );
+      setReqStatusToken({ result: true });
       setToken("");
     } catch (e) {
-      setReqStatus({ error: e });
+      setReqStatusToken({ error: e });
       console.error("Error on setTelegramToken", e);
     }
   }
 
   async function updateTelegramStatus(newStatus: boolean) {
     try {
-      setReqStatus({ loading: true });
+      setReqStatusStatus({ loading: true });
       await withToastNoThrow(
         () => api.setTelegramStatus({ telegramStatus: newStatus }),
         {
@@ -39,9 +46,9 @@ export default function Notifications() {
         }
       );
       telegramStatus.revalidate();
-      setReqStatus({ result: true });
+      setReqStatusStatus({ result: true });
     } catch (e) {
-      setReqStatus({ error: e });
+      setReqStatusStatus({ error: e });
       console.error("Error on setTelegramStatus", e);
     }
   }
@@ -50,7 +57,6 @@ export default function Notifications() {
       <Card>
         <SubTitle>Telegram</SubTitle>
         <div>
-          {/* COnsider using BIG BUTTON || STUDY HOOOOKS! */}
           Receive important notifications directly to your telegram account. To
           get your own token follow{" "}
           <a href="https://core.telegram.org/bots#creating-a-new-bot">
@@ -107,8 +113,11 @@ export default function Notifications() {
               style={{ margin: "auto" }}
             />
           )}
-          {reqStatus.error && (
-            <ErrorView error={reqStatus.error} hideIcon red />
+          {reqStatusToken.error && (
+            <ErrorView error={reqStatusToken.error} hideIcon red />
+          )}
+          {reqStatusStatus.error && (
+            <ErrorView error={reqStatusStatus.error} hideIcon red />
           )}
         </InputForm>{" "}
       </Card>
