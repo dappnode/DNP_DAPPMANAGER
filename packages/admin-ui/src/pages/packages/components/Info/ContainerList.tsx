@@ -87,7 +87,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
                     onClick={() =>
                       dnp.dnpName === "wifi.dnp.dappnode.eth"
                         ? confirm({
-                            title: `Disabling wifi service`,
+                            title: `Disabling wifi service `,
                             text: "You may loose access",
                             label: "Disable",
                             onClick: () =>
