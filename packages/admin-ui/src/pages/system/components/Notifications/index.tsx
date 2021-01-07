@@ -8,6 +8,7 @@ import { InputForm } from "components/InputForm";
 import { ReqStatus } from "types";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
+import { withToastNoThrow } from "components/toast/Toast";
 
 export default function Notifications() {
   const telegramStatus = useApi.getTelegramStatus();
@@ -30,7 +31,13 @@ export default function Notifications() {
   async function updateTelegramStatus(newStatus: boolean) {
     try {
       setReqStatus({ loading: true });
-      await api.setTelegramStatus({ telegramStatus: newStatus });
+      await withToastNoThrow(
+        () => api.setTelegramStatus({ telegramStatus: newStatus }),
+        {
+          message: `Switching telegram status...`,
+          onSuccess: `Switched telegram status`
+        }
+      );
       telegramStatus.revalidate();
       setReqStatus({ result: true });
     } catch (e) {
