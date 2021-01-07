@@ -4,8 +4,10 @@ import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import Input from "components/Input";
 import Ok from "components/Ok";
+import { confirm } from "components/ConfirmDialog";
 import { ReqStatus, ShhStatus } from "types";
 import "./sshManager.scss";
+import { withToastNoThrow } from "components/toast/Toast";
 
 export function SshManagerChangeStatus() {
   const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});
@@ -62,7 +64,18 @@ export function SshManagerChangeStatus() {
         </Button>
         <Button
           disabled={reqSetStatus.loading}
-          onClick={() => changeSshStatus("disabled")}
+          onClick={() =>
+            confirm({
+              title: `Disabling SSH service`,
+              text: "You may loose access",
+              label: "Disable",
+              onClick: () =>
+                withToastNoThrow(() => changeSshStatus("disabled"), {
+                  message: `Disabling SSH...`,
+                  onSuccess: `Disabled SSH`
+                })
+            })
+          }
         >
           Disable
         </Button>
