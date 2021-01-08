@@ -43,12 +43,12 @@ async function monitorDiskUsage(): Promise<void> {
     if (!diskAvailable || typeof diskAvailable !== "string")
       throw Error("diskAvailable return must be a string");
 
-    const diskAvailableBytes = parseInt(diskAvailable.trim());
-    if (isNaN(diskAvailableBytes))
-      throw Error("diskAvailableBytes must be a number");
+    const diskAvailableKBytes = parseInt(diskAvailable.trim());
+    if (isNaN(diskAvailableKBytes))
+      throw Error("diskAvailableKBytes must be a number");
 
     for (const threshold of thresholds) {
-      if (diskAvailableBytes < threshold.kb) {
+      if (diskAvailableKBytes < threshold.kb) {
         /**
          * This is a critical function that has failed in the past. The
          * execution order is critical and should be from more prioritary to
@@ -113,7 +113,7 @@ async function monitorDiskUsage(): Promise<void> {
 
         // Emit packages update
         eventBus.requestPackages.emit();
-      } else if (diskAvailableBytes > 1.2 * threshold.kb) {
+      } else if (diskAvailableKBytes > 1.2 * threshold.kb) {
         // If there is again enough free space, allow packages to be stopped
         // if disk space runs out agains
         if (thresholdIsActive[threshold.id])
