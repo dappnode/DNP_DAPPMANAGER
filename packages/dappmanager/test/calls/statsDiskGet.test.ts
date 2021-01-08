@@ -11,7 +11,7 @@ describe("calls / statsDiskGet", () => {
 
       const expectedResult: ReturnType<typeof parseDfPB1Output> = {
         total: 420695474176,
-        used: 97052733440,
+        used: 118494277632,
         free: 302201196544,
         usedPercentage: 28
       };
@@ -27,7 +27,7 @@ describe("calls / statsDiskGet", () => {
 
       const expectedResult: ReturnType<typeof parseDfPB1Output> = {
         total: 410835424000,
-        used: 388579748000,
+        used: 409518756000,
         free: 1316668000,
         usedPercentage: 100
       };

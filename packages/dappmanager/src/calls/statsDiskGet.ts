@@ -18,12 +18,22 @@ export function parseDfPB1Output(output: string): HostStatDisk {
 
   // Filesystem           1-blocks       Used Available Capacity Mounted on
   // overlay              420695474176 97052733440 302201196544  24% /
-  const [, blocks, Used, Available] = lines[1].trim().split(/\s+/);
+  const [, blocks, , Available] = lines[1].trim().split(/\s+/);
+
+  // In DAPPMANAGER the total disk usage does not match
+  // Used + Available != Blocks
+  //
+  // Instead there is some disk space reserved for something
+  // therefore if we display Used / Total (%Used) it will look like this
+  // 370.62 GB / 391.8 GB (100%)
+  //
+  // To make things easier to understand, we display Used = Total - Avail
+  // so that Used + Avail = Total, and thinks look logical in the UI...
 
   const total = parseInt(blocks, 10);
-  const used = parseInt(Used, 10);
   const free = parseInt(Available, 10);
-  const usedPercentage = Math.round(100 * (1 - free / total));
+  const used = total - free;
+  const usedPercentage = Math.round(100 * (used / total));
 
   return { total, used, free, usedPercentage };
 }
