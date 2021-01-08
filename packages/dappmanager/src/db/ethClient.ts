@@ -5,7 +5,8 @@ import {
   UserSettings,
   EthClientFallback,
   EthClientStatus,
-  EthClientTargetPackage
+  EthClientTargetPackage,
+  EthClientSyncedNotificationStatus
 } from "../types";
 import { joinWithDot, stripDots } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
@@ -21,6 +22,8 @@ const ETH_CLIENT_STATUS = "eth-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
 const ETH_CLIENT_MIGRATION_TEMP_SETTINGS = "eth-client-migration-temp-status";
+const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
+  "eth-client-synced-notification-status";
 
 // Re-export to consider the first value (when it's not set)
 // but do not allow to set null again. Using to express intentionality
@@ -109,3 +112,10 @@ export const ethClientMigrationTempSettings = dbCache.staticKey<{
   target: EthClientTargetPackage;
   EXTRA_OPTS: string;
 } | null>(ETH_CLIENT_MIGRATION_TEMP_SETTINGS, null);
+
+/**
+ * Cache the status of the eth client install loop
+ */
+export const ethClientSyncedNotificationStatus = dbCache.staticKey<
+  EthClientSyncedNotificationStatus
+>(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);

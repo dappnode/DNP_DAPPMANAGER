@@ -3,6 +3,7 @@ import * as db from "../../db";
 import params from "../../params";
 import { getClientStatus } from "./clientStatus";
 import { EthClientStatusError } from "../../types";
+import { emitSyncedNotification } from "./syncedNotification";
 
 export class EthProviderError extends Error {}
 
@@ -37,6 +38,7 @@ export async function getEthProviderUrl(): Promise<string> {
 
   const status = await getClientStatus(target);
   db.ethClientStatus.set(target, status);
+  emitSyncedNotification(target, status);
 
   if (status.ok) {
     // Package test succeeded return its url
