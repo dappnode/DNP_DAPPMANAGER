@@ -27,45 +27,26 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
   async function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
-    const isWifi = isWifiPackage();
-    const serviceNames = container && [container.serviceName];
-    const name = container
-      ? [sn(dnpName), sn(container.serviceName)].join(" ")
-      : sn(dnpName);
-    if (isWifi) {
+    if (dnpName === "wifi.dnp.dappnode.eth")
       await new Promise<void>(resolve => {
         confirm({
-          title: `Disabling wifi service`,
+          title: `Disabling Wifi package`,
           text:
-            "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
+            "You may loose Wifi access to your DAppNode. Are you sure you want to disable it?",
           label: "Disable",
           onClick: resolve
         });
       });
-      packageStartStop({ dnpName, serviceNames, name });
-    } else {
-      packageStartStop({ dnpName, serviceNames, name });
-    }
-  }
 
-  function packageStartStop({
-    dnpName,
-    serviceNames,
-    name
-  }: {
-    dnpName: string;
-    serviceNames: string[] | undefined;
-    name: string;
-  }) {
+    const serviceNames = container && [container.serviceName];
+    const name = container
+      ? [sn(dnpName), sn(container.serviceName)].join(" ")
+      : sn(dnpName);
+
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${name}...`,
       onSuccess: `Toggled ${name}`
     });
-  }
-
-  function isWifiPackage(): boolean {
-    if (dnp.dnpName === "wifi.dnp.dappnode.eth") return true;
-    return false;
   }
 
   const allContainersRunning = dnp.containers.every(c => c.running);
