@@ -12,20 +12,26 @@ interface ValidationAlert {
 }
 
 const serviceSafeKeys: (keyof ComposeService)[] = [
-  "volumes",
-  "ports",
-  "environment",
-  "restart",
-  "privileged",
   "cap_add",
   "cap_drop",
-  "extra_hosts",
+  "command",
   "devices",
+  "entrypoint",
+  "environment",
+  "expose",
+  "extra_hosts",
+  "labels",
+  "logging",
   "network_mode",
   "networks",
-  "command",
-  "labels",
-  "logging"
+  "ports",
+  "privileged",
+  "restart",
+  "stop_grace_period",
+  "stop_signal",
+  "user",
+  "volumes",
+  "working_dir"
 ];
 
 // Disallow external volumes to prevent packages accessing sensitive data of others
