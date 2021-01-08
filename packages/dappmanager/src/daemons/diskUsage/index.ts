@@ -4,6 +4,7 @@ import params from "../../params";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runAtMostEvery } from "../../utils/asyncFlows";
+import { shortNameCapitalized } from "../../utils/format";
 
 /**
  * Commands
@@ -105,7 +106,9 @@ async function monitorDiskUsage(): Promise<void> {
           body: [
             `Available disk space is less than a ${threshold.id}.`,
             `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
-            stoppedDnpNames.map(dnpName => ` - ${dnpName}`).join("\n"),
+            stoppedDnpNames
+              .map(dnpName => ` - ${shortNameCapitalized(dnpName)}`)
+              .join("\n"),
             `Please, free up enough disk space and start them again.`
           ].join("\n\n")
         });
