@@ -18,13 +18,13 @@ const thresholds = [
     id: "dangerous level of 5 GB",
     kb: 5 * 1e6, // ~ 5 GB
     filterCommand: `--filter "name=DAppNodePackage"`,
-    containersDescription: "all non-core DNPs"
+    containersDescription: "all non-core DAppNode packages"
   },
   {
     id: "critical level of 1 GB",
     kb: 1 * 1e6, // ~ 1 GB
     filterCommand: `--filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth"`,
-    containersDescription: "all non-core DNPs plus the Ethchain and IPFS"
+    containersDescription: "all non-core DAppNode packages and the IPFS package"
   }
 ];
 
