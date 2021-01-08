@@ -9,7 +9,7 @@ import { withToast } from "components/toast/Toast";
 export function DappmanagerDnpDappnodeEth() {
   async function cleanCache() {
     try {
-      await new Promise(resolve =>
+      await new Promise<void>(resolve =>
         confirm({
           title: `Deleting cache`,
           text: `This action cannot be undone. You should only clean the cache in response to a problem.`,

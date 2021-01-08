@@ -25,7 +25,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     packageRestart(dnp, container).catch(console.error);
   }
 
-  function onStartStop(container?: PackageContainer) {
+  async function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
     const isWifi = isWifiPackage();
     const serviceNames = container && [container.serviceName];
@@ -33,13 +33,16 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
       ? [sn(dnpName), sn(container.serviceName)].join(" ")
       : sn(dnpName);
     if (isWifi) {
-      confirm({
-        title: `Disabling wifi service`,
-        text:
-          "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
-        label: "Disable",
-        onClick: () => packageStartStop({ dnpName, serviceNames, name })
+      await new Promise<void>(resolve => {
+        confirm({
+          title: `Disabling wifi service`,
+          text:
+            "You may loose wifi access to your DAppNode. Are you sure you want to disable it?",
+          label: "Disable",
+          onClick: resolve
+        });
       });
+      packageStartStop({ dnpName, serviceNames, name });
     } else {
       packageStartStop({ dnpName, serviceNames, name });
     }

@@ -41,7 +41,7 @@ export async function packageRestart(
 
   // If the DNP is not gracefully stopped, ask for confirmation to reset
   if (dnp && dnp.containers.some(container => container.running))
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       confirm({
         title: `Restarting ${name}`,
         text: `This action cannot be undone. If this DAppNode Package holds state, it may be lost.`,
