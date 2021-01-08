@@ -41,7 +41,7 @@ export function SshManagerChangeStatus() {
     confirm({
       title: `Disabling SSH service`,
       text:
-        "You may loose SSH access to your DAppNode. Are you sure you want to disable it?",
+        "You will loose SSH access to your DAppNode. Make sure to have an alternative way to access your DAppNode, such as physically with a screen and keyboard before disabling SSH access",
       label: "Disable",
       onClick: () =>
         withToastNoThrow(() => changeSshStatus("disabled"), {

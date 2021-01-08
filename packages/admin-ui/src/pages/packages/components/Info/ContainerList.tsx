@@ -32,7 +32,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
         confirm({
           title: `Disabling Wifi package`,
           text:
-            "You may loose Wifi access to your DAppNode. Are you sure you want to disable it?",
+            "Warning, if you are connected via WIFI you will lose access to your DAppNode. Make sure to have another way to connect to it before disabling WIFI",
           label: "Disable",
           onClick: resolve
         });
