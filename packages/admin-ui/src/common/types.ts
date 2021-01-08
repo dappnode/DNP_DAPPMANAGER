@@ -508,32 +508,36 @@ export interface ComposeVolumes {
 }
 
 export interface ComposeService {
-  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
-  ports?: string[];
-  environment?: PackageEnvs | string[];
-  labels?: { [labelName: string]: string };
-  env_file?: string[];
-  // ipv4_address: "172.33.1.7";
-  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
-  dns?: string; // "172.33.1.2";
-  restart?: string; // "unless-stopped";
-  privileged?: boolean;
   cap_add?: string[];
   cap_drop?: string[];
-  extra_hosts?: string[];
-  devices?: string[];
-  network_mode?: string;
   command?: string;
+  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  devices?: string[];
+  dns?: string; // "172.33.1.2";
   entrypoint?: string;
-  // Logging
+  env_file?: string[];
+  environment?: PackageEnvs | string[];
+  expose?: string[];
+  extra_hosts?: string[];
+  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+  // ipv4_address: "172.33.1.7";
+  labels?: { [labelName: string]: string };
   logging?: {
     driver?: string;
     options?: {
       [optName: string]: string | number | null;
     };
   };
+  network_mode?: string;
+  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
+  ports?: string[];
+  privileged?: boolean;
+  restart?: string; // "unless-stopped";
+  stop_grace_period?: string;
+  stop_signal?: string;
+  user?: string;
+  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
+  working_dir?: string;
 }
 
 export interface Compose {
