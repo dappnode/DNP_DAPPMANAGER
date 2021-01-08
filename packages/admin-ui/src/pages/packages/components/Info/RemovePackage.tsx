@@ -55,7 +55,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     }
 
     if (dnpsToRemoveWarningsList.length > 0)
-      await new Promise(resolve =>
+      await new Promise<void>(resolve =>
         confirm({
           title: `Removing ${sn(dnpName)}`,
           text: `This action cannot be undone.`,

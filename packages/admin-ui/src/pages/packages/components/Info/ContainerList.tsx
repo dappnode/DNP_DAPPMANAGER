@@ -15,6 +15,7 @@ import { InstalledPackageData, PackageContainer } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import { shortNameCapitalized as sn } from "utils/format";
+import { confirm } from "components/ConfirmDialog";
 import "./containerList.scss";
 
 export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
@@ -24,12 +25,24 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     packageRestart(dnp, container).catch(console.error);
   }
 
-  function onStartStop(container?: PackageContainer) {
+  async function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
+    if (dnpName === "wifi.dnp.dappnode.eth")
+      await new Promise<void>(resolve => {
+        confirm({
+          title: `Disabling Wifi package`,
+          text:
+            "Warning, if you are connected via WIFI you will lose access to your DAppNode. Make sure to have another way to connect to it before disabling WIFI",
+          label: "Disable",
+          onClick: resolve
+        });
+      });
+
     const serviceNames = container && [container.serviceName];
     const name = container
       ? [sn(dnpName), sn(container.serviceName)].join(" ")
       : sn(dnpName);
+
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${name}...`,
       onSuccess: `Toggled ${name}`

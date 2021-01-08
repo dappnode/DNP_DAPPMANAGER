@@ -35,7 +35,7 @@ export default function Identity() {
     try {
       setIsOnProgress(true);
       if (identityAddress)
-        await new Promise(resolve =>
+        await new Promise<void>(resolve =>
           confirm({
             title: `Changing DAppNode Identity`,
             text: `Are you sure you want to change the current DAppNode's identity?`,

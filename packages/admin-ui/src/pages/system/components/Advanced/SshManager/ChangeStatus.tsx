@@ -4,17 +4,34 @@ import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import Input from "components/Input";
 import Ok from "components/Ok";
+import { confirm } from "components/ConfirmDialog";
 import { ReqStatus, ShhStatus } from "types";
 import "./sshManager.scss";
+import { withToast } from "components/toast/Toast";
 
 export function SshManagerChangeStatus() {
   const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});
   const [reqSetStatus, setReqSetStatus] = useState<ReqStatus<ShhStatus>>({});
 
   async function changeSshStatus(status: ShhStatus) {
+    if (status === "disabled") {
+      await new Promise<void>(resolve => {
+        confirm({
+          title: `Disabling SSH service`,
+          text:
+            "Warning, you will loose SSH access to your DAppNode. Having direct access to your host machine may be necessary to fix bugs. Make sure to have an alternative way to access your DAppNode, such as physically with a screen and keyboard before disabling SSH access",
+          label: "Disable",
+          onClick: resolve
+        });
+      });
+    }
+
     try {
       setReqSetStatus({ loading: true });
-      await api.sshStatusSet({ status });
+      await withToast(() => api.sshStatusSet({ status }), {
+        message: `${status === "enabled" ? "Enabling" : "Disabling"} SSH...`,
+        onSuccess: `${status === "enabled" ? "Enabled" : "Disabled"} SSH...`
+      });
       setReqSetStatus({ result: status });
     } catch (e) {
       setReqSetStatus({ error: e });
