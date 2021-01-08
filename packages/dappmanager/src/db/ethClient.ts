@@ -5,7 +5,8 @@ import {
   UserSettings,
   EthClientFallback,
   EthClientStatus,
-  EthClientTargetPackage
+  EthClientTargetPackage,
+  EthClientSyncedNotificationStatus
 } from "../types";
 import { joinWithDot, stripDots } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
@@ -115,7 +116,6 @@ export const ethClientMigrationTempSettings = dbCache.staticKey<{
 /**
  * Cache the status of the eth client install loop
  */
-export const ethClientSyncedNotificationStatus = dbCache.staticKey<{
-  target: EthClientTargetPackage;
-  status: "AwaitingSynced" | "Synced";
-} | null>(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);
+export const ethClientSyncedNotificationStatus = dbCache.staticKey<
+  EthClientSyncedNotificationStatus
+>(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);
