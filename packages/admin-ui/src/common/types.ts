@@ -756,14 +756,21 @@ export interface DependencyListItem {
   warningOnInstall?: string;
 }
 
-export interface CoreUpdateData {
-  available: boolean;
+export interface CoreUpdateDataNotAvailable {
+  available: false;
+}
+export interface CoreUpdateDataAvailable {
+  available: true;
   type?: string;
   packages: DependencyListItem[];
   changelog: string;
   updateAlerts: ManifestUpdateAlert[];
   versionId: string;
+  coreVersion: string;
 }
+export type CoreUpdateData =
+  | CoreUpdateDataNotAvailable
+  | CoreUpdateDataAvailable;
 
 /**
  * Releases types

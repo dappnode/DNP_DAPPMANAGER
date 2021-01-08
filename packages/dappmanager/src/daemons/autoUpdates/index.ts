@@ -5,16 +5,14 @@ import { fetchCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../../modules/release";
 import { EthProviderError } from "../../modules/ethClient";
 import {
-  isDnpUpdateEnabled,
-  isCoreUpdateEnabled,
   clearPendingUpdates,
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper";
 import { runAtMostEvery } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-import updateMyPackages from "./updateMyPackages";
-import updateSystemPackages from "./updateSystemPackages";
+import { checkNewPackagesVersion } from "./updateMyPackages";
+import { checkSystemPackagesVersion } from "./updateSystemPackages";
 
 /**
  * Auto-update:
@@ -26,28 +24,23 @@ async function checkAutoUpdates(): Promise<void> {
     const releaseFetcher = new ReleaseFetcher();
     // Make sure the eth client provider is available before checking each package
     // Do it once and return for expected errors to reduce cluttering
-    if (isDnpUpdateEnabled() || isCoreUpdateEnabled())
-      try {
-        await releaseFetcher.getProvider();
-      } catch (e) {
-        if (e instanceof EthProviderError) return;
-        logs.warn("Error getting eth provider", e);
-      }
-
-    if (isDnpUpdateEnabled()) {
-      try {
-        await updateMyPackages(releaseFetcher);
-      } catch (e) {
-        logs.error("Error on updateMyPackages", e);
-      }
+    try {
+      await releaseFetcher.getProvider();
+    } catch (e) {
+      if (e instanceof EthProviderError) return;
+      logs.warn("Error getting eth provider", e);
     }
 
-    if (isCoreUpdateEnabled()) {
-      try {
-        await updateSystemPackages();
-      } catch (e) {
-        logs.error("Error on updateSystemPackages", e);
-      }
+    try {
+      await checkNewPackagesVersion(releaseFetcher);
+    } catch (e) {
+      logs.error("Error on updateMyPackages", e);
+    }
+
+    try {
+      await checkSystemPackagesVersion();
+    } catch (e) {
+      logs.error("Error on updateSystemPackages", e);
     }
   } catch (e) {
     logs.error("Error on autoUpdates interval", e);
@@ -60,8 +53,9 @@ async function checkAutoUpdates(): Promise<void> {
  * update happen before restarting
  */
 async function checkForCompletedCoreUpdates(): Promise<void> {
-  const { versionId } = await fetchCoreUpdateData({});
-  clearCompletedCoreUpdatesIfAny(versionId);
+  const coreUpdateData = await fetchCoreUpdateData({});
+  if (coreUpdateData.available)
+    clearCompletedCoreUpdatesIfAny(coreUpdateData.versionId);
 }
 
 /**
