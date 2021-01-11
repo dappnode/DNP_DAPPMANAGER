@@ -57,11 +57,16 @@ export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
     dispatch(updateCoreRequestStatus({ success: true }));
     dispatch(updateCoreUpdateData(coreUpdateData));
 
-    /* eslint-disable-next-line no-console */
-    console.log(
-      `DAppNode ${coreDnpName} (${coreUpdateData.versionId})`,
-      coreUpdateData
-    );
+    if (coreUpdateData.available) {
+      /* eslint-disable-next-line no-console */
+      console.log(
+        `DAppNode ${coreDnpName} (${coreUpdateData.versionId})`,
+        coreUpdateData
+      );
+    } else {
+      /* eslint-disable-next-line no-console */
+      console.log(`DAppNode is updated`);
+    }
   } catch (e) {
     dispatch(updateCoreRequestStatus({ error: e.message }));
     console.error(`Error on checkCoreUpdate: ${e.stack}`);

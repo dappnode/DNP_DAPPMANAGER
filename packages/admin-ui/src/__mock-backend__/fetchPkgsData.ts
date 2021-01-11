@@ -1,4 +1,4 @@
-import { CoreUpdateData, Routes } from "../common";
+import { CoreUpdateDataAvailable, Routes } from "../common";
 import { directory, dnpRequests } from "./data";
 
 export const fetchPkgsData: Pick<
@@ -14,7 +14,7 @@ export const fetchPkgsData: Pick<
   }
 };
 
-const sampleCoreUpdateData: CoreUpdateData = {
+const sampleCoreUpdateData: CoreUpdateDataAvailable = {
   available: true,
   type: "patch",
   packages: [
@@ -34,5 +34,6 @@ const sampleCoreUpdateData: CoreUpdateData = {
       message: "Conditional update alert: **Markdown**"
     }
   ],
-  versionId: ""
+  versionId: "admin@0.2.6",
+  coreVersion: "0.2.10"
 };
