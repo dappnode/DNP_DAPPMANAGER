@@ -4,6 +4,11 @@ import * as db from "../../db";
 import { logs } from "../../logs";
 import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
 import { bold, url } from "./markdown";
+import { editCoreSetting, editDnpSetting } from "../../utils/autoUpdateHelper";
+
+export const enableAutoUpdatesCmd = "/enable-auto-updates";
+export const unsubscribeCmd = "/unsubscribe";
+export const helpCmd = "/help";
 
 /**
  * Polls for commands and responds.
@@ -30,9 +35,11 @@ export class DappnodeTelegramBot {
       try {
         if (!msg.text) return;
 
-        if (/\/unsubscribe/.test(msg.text)) {
+        if (msg.text.startsWith(enableAutoUpdatesCmd)) {
+          this.enableAutoUpdatesCmd(msg);
+        } else if (msg.text.startsWith(unsubscribeCmd)) {
           this.unsubscribeCmd(msg);
-        } else if (/\/help/.test(msg.text)) {
+        } else if (msg.text.startsWith(helpCmd)) {
           this.helpCmd(msg);
         } else {
           // If channel is not subscribed yet, subscribe
@@ -61,12 +68,26 @@ export class DappnodeTelegramBot {
   }
 
   /**
+   * Enable auto-updates for system and regular packages
+   */
+  private async enableAutoUpdatesCmd(msg: TelegramBot.Message): Promise<void> {
+    editDnpSetting(true);
+    editCoreSetting(true);
+
+    const message = [
+      "Successfully enabled auto-updates",
+      "You can manage or disable auto-update in the Admin UI"
+    ].join("\n\n");
+    await this.sendMessage(msg.chat.id.toString(), message);
+  }
+
+  /**
    * Add channel ID
    */
   private async subscribeCmd(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     const message =
-      formatTelegramCommandHeader("Success") + "Succesfully saved channel ID";
+      formatTelegramCommandHeader("Success") + "Successfully saved channel ID";
 
     this.addChannelId(chatId);
 

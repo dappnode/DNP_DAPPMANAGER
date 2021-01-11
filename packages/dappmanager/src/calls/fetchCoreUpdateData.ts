@@ -10,14 +10,6 @@ import { logs } from "../logs";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";
-const coreAlreadyUpdated: CoreUpdateData = {
-  available: false,
-  type: undefined,
-  packages: [],
-  changelog: "",
-  updateAlerts: [],
-  versionId: ""
-};
 
 /**
  * Fetches the core update data, if available
@@ -55,14 +47,14 @@ export async function getCoreUpdateData(
       logs.debug(
         `Core update to ${coreVersion} would cause a downgrade for ${e.dnpName} from ${e.dnpVersion}, assuming core is updated`
       );
-      return coreAlreadyUpdated;
+      return { available: false };
     } else {
       throw e;
     }
   }
 
   if (releases.length === 0) {
-    return coreAlreadyUpdated;
+    return { available: false };
   }
 
   const dnpList = await listPackages();
@@ -137,6 +129,7 @@ export async function getCoreUpdateData(
     packages,
     changelog: coreManifest.changelog || "",
     updateAlerts,
-    versionId
+    versionId,
+    coreVersion: coreManifest.version
   };
 }

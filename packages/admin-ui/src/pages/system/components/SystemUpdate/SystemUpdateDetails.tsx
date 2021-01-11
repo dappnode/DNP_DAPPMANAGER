@@ -5,35 +5,38 @@ import RenderMarkdown from "components/RenderMarkdown";
 // Actions
 import { updateCore } from "services/coreUpdate/actions";
 // Selectors
-import {
-  getCoreDeps,
-  getCoreUpdateAlerts,
-  getCoreChangelog
-} from "services/coreUpdate/selectors";
+import { getCoreUpdateData } from "services/coreUpdate/selectors";
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
 // Icons
 import { FaArrowRight } from "react-icons/fa";
+import { DependencyListItem } from "common";
 
 export default function SystemUpdateDetails() {
-  const coreDeps = useSelector(getCoreDeps);
-  const coreUpdateAlerts = useSelector(getCoreUpdateAlerts);
-  const coreChangelog = useSelector(getCoreChangelog);
+  const coreUpdateData = useSelector(getCoreUpdateData);
   const dispatch = useDispatch();
+
+  if (coreUpdateData === null || !coreUpdateData.available) {
+    return null;
+  }
+
+  const coreChangelog = coreUpdateData.changelog;
+  const updateAlerts = coreUpdateData.updateAlerts;
+  const coreDeps = getCoreDeps(coreUpdateData.packages);
 
   return (
     <Card className="system-update-grid" spacing>
       {coreChangelog && <RenderMarkdown source={coreChangelog} />}
 
-      {coreUpdateAlerts.map(({ from, to, message }) => (
+      {updateAlerts.map(({ from, to, message }) => (
         <div
           key={from + to}
           className="alert alert-warning"
           style={{ margin: "12px 0 6px 0" }}
         >
           {/* If there are multiple alerts, display the update jump */}
-          {coreUpdateAlerts.length > 1 && (
+          {updateAlerts.length > 1 && (
             <div style={{ fontWeight: "bold" }}>
               {from} <FaArrowRight style={{ fontSize: ".7rem" }} /> {to}
             </div>
@@ -50,4 +53,28 @@ export default function SystemUpdateDetails() {
       </Button>
     </Card>
   );
+}
+
+/**
+ * Returns core dependencies,
+ * unless the core package is the only one, then returns it
+ */
+export function getCoreDeps(
+  corePackages: DependencyListItem[]
+): DependencyListItem[] {
+  const coreDeps = corePackages.filter(
+    dnp => !(dnp.name || "").includes("core")
+  );
+  if (coreDeps.length) return coreDeps;
+
+  const coreDnp = corePackages.find(dnp => (dnp.name || "").includes("core"));
+  if (coreDnp) {
+    // #### TODO: to prevent show the legacy OpenVPN 0.2.0 warning alert
+    // remove the warning on install for the core.dnp.dappnode.eth DNP
+    // Alerts can be added via the conditional update alerts
+    coreDnp.warningOnInstall = "";
+    return [coreDnp];
+  }
+
+  return [];
 }
