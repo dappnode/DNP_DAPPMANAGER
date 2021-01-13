@@ -2,7 +2,7 @@ import * as db from "../db";
 import params from "../params";
 import { eventBus } from "../eventBus";
 import { pick, omit } from "lodash";
-import { areCoreVersionIdsIncluded } from "./coreVersionId";
+import { areCoreVersionIdsIncluded, getCoreVersionId } from "./coreVersionId";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
@@ -252,14 +252,17 @@ export function clearRegistry(dnpName: string): void {
  * "completed". So on every DAPPMANAGER start it must checked if a successful
  * update happen before restarting
  *
- * @param currentVersionId "admin@0.2.6,core@0.2.8"
+ * @param currentCorePackages To get the current version of installed packages
+ * If stored pending coreVersionId contains versions higher than this, it will
+ * be marked as done
  * @param timestamp Use ONLY to make tests deterministic
  */
 export function clearCompletedCoreUpdatesIfAny(
-  currentVersionId: string,
+  currentCorePackages: { dnpName: string; version: string }[],
   timestamp?: number
 ): void {
   const pending = getPending();
+  const currentVersionId = getCoreVersionId(currentCorePackages);
 
   const { version: pendingVersionId } =
     pending[coreDnpName] || ({} as AutoUpdatePendingEntry);

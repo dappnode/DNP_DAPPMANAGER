@@ -562,11 +562,12 @@ describe("Util: autoUpdateHelper", () => {
   describe("DAPPMANAGER update patch measures", () => {
     it("Should clear complete core updates if update was completed", () => {
       const timestamp = Date.now();
-      const versionId = getCoreVersionId([
+      const currentCorePackages = [
         { dnpName: "admin", version: "0.2.1" },
         { dnpName: "vpn", version: "0.2.1" },
         { dnpName: "core", version: "0.2.1" }
-      ]);
+      ];
+      const versionId = getCoreVersionId(currentCorePackages);
       const nextVersionId = getCoreVersionId([
         { dnpName: "admin", version: "0.2.1" },
         { dnpName: "core", version: "0.2.1" }
@@ -586,7 +587,7 @@ describe("Util: autoUpdateHelper", () => {
         "Core update should be pending"
       );
 
-      clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+      clearCompletedCoreUpdatesIfAny(currentCorePackages, timestamp);
 
       expect(getPending()).to.deep.equal(
         {},
@@ -605,11 +606,11 @@ describe("Util: autoUpdateHelper", () => {
 
     it("Should NOT clear complete core updates if update was NOT completed", () => {
       const timestamp = Date.now();
-      const versionId = getCoreVersionId([
+      const currentCorePackages = [
         { dnpName: "admin", version: "0.2.0" },
         { dnpName: "vpn", version: "0.2.1" },
         { dnpName: "core", version: "0.2.1" }
-      ]);
+      ];
       const nextVersionId = getCoreVersionId([
         { dnpName: "admin", version: "0.2.1" },
         { dnpName: "core", version: "0.2.1" }
@@ -629,7 +630,7 @@ describe("Util: autoUpdateHelper", () => {
         "Core update should be pending"
       );
 
-      clearCompletedCoreUpdatesIfAny(versionId, timestamp);
+      clearCompletedCoreUpdatesIfAny(currentCorePackages, timestamp);
 
       expect(getPending()).to.deep.equal(
         {
