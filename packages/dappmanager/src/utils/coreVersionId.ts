@@ -1,4 +1,3 @@
-import { difference } from "lodash";
 import semver from "semver";
 
 /**
@@ -29,29 +28,6 @@ export function parseCoreVersionId(
       const [shortName, version] = nameAtVersion.split("@");
       return { dnpName: `${shortName}.dnp.dappnode.eth`, version };
     });
-}
-
-/**
- * Checks if `a2` includes all elements of `a1`
- * @param a1
- * @param a2
- */
-export function includesArray<T>(subset: T[], superset: T[]): boolean {
-  return difference(subset, superset).length === 0;
-}
-
-function parseCoreVersionIdToStrings(versionId: string): string[] {
-  return (versionId || "").split(",");
-}
-
-export function areCoreVersionIdsIncluded(
-  coreVersionIdSubset: string,
-  coreVersionIdSuperset: string
-): boolean {
-  return includesArray(
-    parseCoreVersionIdToStrings(coreVersionIdSubset),
-    parseCoreVersionIdToStrings(coreVersionIdSuperset)
-  );
 }
 
 /**
