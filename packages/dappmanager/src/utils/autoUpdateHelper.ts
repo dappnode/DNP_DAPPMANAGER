@@ -2,7 +2,7 @@ import * as db from "../db";
 import params from "../params";
 import { eventBus } from "../eventBus";
 import { pick, omit } from "lodash";
-import { areCoreVersionIdsIncluded, getCoreVersionId } from "./coreVersionId";
+import { areCoreVersionIdsIncluded, isVersionIdUpdated } from "./coreVersionId";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
@@ -262,13 +262,12 @@ export function clearCompletedCoreUpdatesIfAny(
   timestamp?: number
 ): void {
   const pending = getPending();
-  const currentVersionId = getCoreVersionId(currentCorePackages);
 
   const { version: pendingVersionId } =
     pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
   const pendingVersionsAreInstalled =
     pendingVersionId &&
-    areCoreVersionIdsIncluded(pendingVersionId, currentVersionId);
+    isVersionIdUpdated(pendingVersionId, currentCorePackages);
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
     flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
