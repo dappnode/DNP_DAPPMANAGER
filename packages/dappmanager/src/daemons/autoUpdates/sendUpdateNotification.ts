@@ -41,7 +41,7 @@ export async function sendUpdatePackageNotificationMaybe(
   eventBus.notification // Emit notification about new version available
     .emit({
       id: `update-available-${dnpName}-${newVersion}`,
-      type: "success",
+      type: "info",
       title: `Update available for ${shortNameCapitalized(dnpName)}`,
       body: formatPackageUpdateNotification({
         dnpName: dnpName,
@@ -74,7 +74,7 @@ export async function sendUpdateSystemNotificationMaybe(
   eventBus.notification // Emit notification about new version available
     .emit({
       id: `update-available-${dnpName}-${newVersion}`,
-      type: "success",
+      type: "info",
       title: "System update available",
       body: formatSystemUpdateNotification({
         packages: data.packages,
