@@ -368,9 +368,9 @@ describe("Util: autoUpdateHelper", () => {
 
   describe("Feedback text for COREs", () => {
     const currentVersionId = getCoreVersionId([
-      { dnpName: "admin", version: "0.2.0" },
-      { dnpName: "vpn", version: "0.2.1" },
-      { dnpName: "core", version: "0.2.0" }
+      { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" },
+      { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.1" },
+      { dnpName: "core.dnp.dappnode.eth", version: "0.2.0" }
     ]);
 
     it("1. Nothing happened yet", () => {
@@ -390,8 +390,8 @@ describe("Util: autoUpdateHelper", () => {
         pending: {
           [coreDnpName]: {
             version: getCoreVersionId([
-              { dnpName: "admin", version: "0.2.1" },
-              { dnpName: "core", version: "0.2.1" }
+              { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+              { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: timestamp,
@@ -405,16 +405,16 @@ describe("Util: autoUpdateHelper", () => {
     it("3A. Core is manually updated", () => {
       const feedback = getCoreFeedbackMessage({
         currentVersionId: getCoreVersionId([
-          { dnpName: "admin", version: "0.2.1" },
-          { dnpName: "vpn", version: "0.2.1" },
-          { dnpName: "core", version: "0.2.1" }
+          { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+          { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.1" },
+          { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
         ]),
         registry: {},
         pending: {
           [coreDnpName]: {
             version: getCoreVersionId([
-              { dnpName: "admin", version: "0.2.1" },
-              { dnpName: "core", version: "0.2.1" }
+              { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+              { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
             ]),
             firstSeen: Date.now(),
             scheduledUpdate: Date.now() + 12.3 * 60 * 60 * 1000,
@@ -428,13 +428,13 @@ describe("Util: autoUpdateHelper", () => {
     it("3B. Core is successfully updated", () => {
       const timestamp = Date.now();
       const nextVersion = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
       const currentVersionId = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "vpn", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
       const feedback = getCoreFeedbackMessage({
         currentVersionId,
@@ -456,8 +456,8 @@ describe("Util: autoUpdateHelper", () => {
         pending: {
           [coreDnpName]: {
             version: getCoreVersionId([
-              { dnpName: "admin", version: "0.2.1" },
-              { dnpName: "core", version: "0.2.1" }
+              { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+              { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
             ]),
             firstSeen: Date.now() - 24.3 * 60 * 60 * 1000,
             scheduledUpdate: Date.now() - 0.3 * 60 * 60 * 1000,
@@ -471,22 +471,22 @@ describe("Util: autoUpdateHelper", () => {
 
     it("1 -> 4. Core full lifecycle", async () => {
       const currentVersionIdBefore = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.0" },
-        { dnpName: "vpn", version: "0.2.0" },
-        { dnpName: "core", version: "0.2.0" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" },
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.0" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.0" }
       ]);
       const nextVersionId = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
       const currentVersionIdAfter = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "vpn", version: "0.2.0" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.0" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
       const nextVersion2Id = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.2" },
-        { dnpName: "core", version: "0.2.2" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.2" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.2" }
       ]);
       const microDelay = 20;
 
@@ -563,14 +563,13 @@ describe("Util: autoUpdateHelper", () => {
     it("Should clear complete core updates if update was completed", () => {
       const timestamp = Date.now();
       const currentCorePackages = [
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "vpn", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ];
-      const versionId = getCoreVersionId(currentCorePackages);
       const nextVersionId = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
@@ -607,13 +606,13 @@ describe("Util: autoUpdateHelper", () => {
     it("Should NOT clear complete core updates if update was NOT completed", () => {
       const timestamp = Date.now();
       const currentCorePackages = [
-        { dnpName: "admin", version: "0.2.0" },
-        { dnpName: "vpn", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" },
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ];
       const nextVersionId = getCoreVersionId([
-        { dnpName: "admin", version: "0.2.1" },
-        { dnpName: "core", version: "0.2.1" }
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.1" }
       ]);
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
