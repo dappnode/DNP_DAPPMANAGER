@@ -5,7 +5,7 @@ import {
   getCoreVersionId,
   parseCoreVersionId,
   includesArray,
-  areCoreVersionIdsIncluded
+  isVersionIdUpdated
 } from "../../src/utils/coreVersionId";
 
 describe("Util: coreVersionId", () => {
@@ -53,28 +53,52 @@ describe("Util: coreVersionId", () => {
     });
   });
 
-  describe("areCoreVersionIdsIncluded", () => {
-    const coreVersionSubset: { dnpName: string; version: string }[] = [
-      { dnpName: "admin.dnp.dappnode.eth", version: "0.2.6" },
-      { dnpName: "core.dnp.dappnode.eth", version: "0.2.8" }
-    ];
-    const coreVersionSuperset: { dnpName: string; version: string }[] = [
-      ...coreVersionSubset,
-      { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.2" }
-    ];
-    const coreVersionIdSubset = getCoreVersionId(coreVersionSubset);
-    const coreVersionIdSuperset = getCoreVersionId(coreVersionSuperset);
+  describe("isVersionIdUpdated", () => {
+    describe("Compare versions encoded", () => {
+      const corePkgsPrev = [
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" }
+      ];
+      const corePkgsNext = [
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" }
+      ];
 
-    it("Should return true for including core version ids", () => {
-      expect(
-        areCoreVersionIdsIncluded(coreVersionIdSubset, coreVersionIdSuperset)
-      ).to.be.true;
+      const versionIdPrev = getCoreVersionId(corePkgsPrev);
+      const versionIdNext = getCoreVersionId(corePkgsNext);
+
+      it("prev should NOT be gte next", () => {
+        expect(isVersionIdUpdated(versionIdPrev, corePkgsNext)).to.be.false;
+      });
+
+      it("next should be gte prev", () => {
+        expect(isVersionIdUpdated(versionIdNext, corePkgsPrev)).to.be.true;
+      });
+
+      it("next should be gte next", () => {
+        expect(isVersionIdUpdated(versionIdNext, corePkgsNext)).to.be.true;
+      });
     });
 
-    it("Should return false for NOT including core version ids", () => {
-      expect(
-        areCoreVersionIdsIncluded(coreVersionIdSuperset, coreVersionIdSubset)
-      ).to.be.false;
+    describe("Compare a subset with a superset", () => {
+      const corePkgsSubset = [
+        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" },
+        { dnpName: "core.dnp.dappnode.eth", version: "0.2.0" }
+      ];
+      const corePkgsSuperset = [
+        ...corePkgsSubset,
+        { dnpName: "vpn.dnp.dappnode.eth", version: "0.2.0" }
+      ];
+      const versionIdSubset = getCoreVersionId(corePkgsSubset);
+      const versionIdSuperset = getCoreVersionId(corePkgsSuperset);
+
+      it("Should return true for including core version ids", () => {
+        expect(isVersionIdUpdated(versionIdSubset, corePkgsSuperset)).to.be
+          .true;
+      });
+
+      it("Should return false for NOT including core version ids", () => {
+        expect(isVersionIdUpdated(versionIdSuperset, corePkgsSubset)).to.be
+          .false;
+      });
     });
   });
 });

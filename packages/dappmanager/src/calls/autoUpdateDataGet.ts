@@ -27,11 +27,9 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
       id: SYSTEM_PACKAGES,
       displayName: "System packages",
       enabled: autoUpdateHelper.isCoreUpdateEnabled(),
-      feedback: autoUpdateHelper.getCoreFeedbackMessage({
-        currentVersionId: getCoreVersionId(
-          dnpList.filter(({ isCore }) => isCore)
-        )
-      })
+      feedback: autoUpdateHelper.getCoreFeedbackMessage(
+        dnpList.filter(({ isCore }) => isCore)
+      )
     },
     {
       id: MY_PACKAGES,
