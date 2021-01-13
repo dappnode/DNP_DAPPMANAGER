@@ -578,7 +578,7 @@ export interface PackageBackup {
   service?: string;
 }
 
-export type NotificationType = "danger" | "warning" | "success";
+export type NotificationType = "danger" | "warning" | "success" | "info";
 export interface PackageNotification {
   id: string; // "notification-id"
   type: NotificationType;

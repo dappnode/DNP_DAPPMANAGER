@@ -66,6 +66,6 @@ function randomSentence(numOfWords: number): string {
 }
 
 function randomType(): NotificationType {
-  const types: NotificationType[] = ["danger", "warning", "success"];
+  const types: NotificationType[] = ["danger", "warning", "success", "info"];
   return types[Math.floor(Math.random() * types.length)];
 }

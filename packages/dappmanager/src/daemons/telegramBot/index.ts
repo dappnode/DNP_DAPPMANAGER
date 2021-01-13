@@ -2,7 +2,7 @@ import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import { buildTelegramNotificationMessage } from "./buildTelegramNotificationMessage";
+import { formatNotification } from "./formatNotification";
 import { DappnodeTelegramBot } from "./commands";
 
 // Telegram setup When reboot it lost
@@ -74,10 +74,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
         return;
       }
 
-      const message = buildTelegramNotificationMessage({
-        notificationType: notification.type,
-        telegramMessage: notification.body
-      });
+      const message = formatNotification(notification);
 
       await Promise.all(
         telegramChannelIds.map(async channelId => {
