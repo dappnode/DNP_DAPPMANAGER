@@ -22,7 +22,7 @@ function parseMessagesType(messages: BaseDropdownMessage[]) {
   for (const message of messages)
     if (!message.viewed && message.type) notViewedTypes[message.type] = true;
 
-  for (const type of ["danger", "warning", "success"])
+  for (const type of ["danger", "warning", "success", "info"])
     if (notViewedTypes[type]) return type;
   return "light";
 }
@@ -31,7 +31,7 @@ function areMessagesUnread(messages: BaseDropdownMessage[]) {
   return messages.some(message => message && !message.viewed);
 }
 
-type MessageType = "danger" | "warning" | "success";
+type MessageType = "danger" | "warning" | "success" | "info";
 
 export interface BaseDropdownMessage {
   type?: MessageType;
