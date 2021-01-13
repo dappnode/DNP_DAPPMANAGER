@@ -1,4 +1,4 @@
-import { difference } from "lodash";
+import semver from "semver";
 
 /**
  * Compute version id:
@@ -31,24 +31,20 @@ export function parseCoreVersionId(
 }
 
 /**
- * Checks if `a2` includes all elements of `a1`
- * @param a1
- * @param a2
+ * Returns true if the package versions of `coreVersionId` are greater than or equal
+ * to their version in `coreDnps`
+ * @param coreVersionId "admin@0.2.4,vpn@0.2.2,core@0.2.6"
  */
-export function includesArray<T>(subset: T[], superset: T[]): boolean {
-  return difference(subset, superset).length === 0;
-}
-
-function parseCoreVersionIdToStrings(versionId: string): string[] {
-  return (versionId || "").split(",");
-}
-
-export function areCoreVersionIdsIncluded(
-  coreVersionIdSubset: string,
-  coreVersionIdSuperset: string
+export function isVersionIdUpdated(
+  coreVersionId: string,
+  currentCorePackages: { dnpName: string; version: string }[]
 ): boolean {
-  return includesArray(
-    parseCoreVersionIdToStrings(coreVersionIdSubset),
-    parseCoreVersionIdToStrings(coreVersionIdSuperset)
+  const currentVersions = new Map<string, string>(
+    currentCorePackages.map(p => [p.dnpName, p.version])
   );
+  const versionIdDnps = parseCoreVersionId(coreVersionId);
+  return versionIdDnps.every(versionIdDnp => {
+    const currentVersion = currentVersions.get(versionIdDnp.dnpName);
+    return currentVersion && semver.gte(currentVersion, versionIdDnp.version);
+  });
 }

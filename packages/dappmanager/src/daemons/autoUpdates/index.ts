@@ -1,9 +1,9 @@
 import { AbortSignal } from "abort-controller";
 import params from "../../params";
 import { eventBus } from "../../eventBus";
-import { fetchCoreUpdateData } from "../../calls/fetchCoreUpdateData";
 import { ReleaseFetcher } from "../../modules/release";
 import { EthProviderError } from "../../modules/ethClient";
+import { listPackages } from "../../modules/docker/list";
 import {
   clearPendingUpdates,
   clearRegistry,
@@ -53,9 +53,9 @@ async function checkAutoUpdates(): Promise<void> {
  * update happen before restarting
  */
 async function checkForCompletedCoreUpdates(): Promise<void> {
-  const coreUpdateData = await fetchCoreUpdateData({});
-  if (coreUpdateData.available)
-    clearCompletedCoreUpdatesIfAny(coreUpdateData.versionId);
+  const dnps = await listPackages();
+  const currentCorePackages = dnps.filter(d => d.isCore);
+  clearCompletedCoreUpdatesIfAny(currentCorePackages);
 }
 
 /**
