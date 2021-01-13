@@ -45,26 +45,22 @@ describe("Util: coreVersionId", () => {
 
   describe("isVersionIdUpdated", () => {
     describe("Compare versions encoded", () => {
-      const corePkgsPrev = [
-        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.0" }
-      ];
-      const corePkgsNext = [
-        { dnpName: "admin.dnp.dappnode.eth", version: "0.2.1" }
-      ];
+      const dnpName = "admin.dnp.dappnode.eth";
+      const corePkgs = [{ dnpName, version: "0.2.0" }];
+      const versionIdPrev = getCoreVersionId([{ dnpName, version: "0.1.9" }]);
+      const versionIdSame = getCoreVersionId([{ dnpName, version: "0.2.0" }]);
+      const versionIdNext = getCoreVersionId([{ dnpName, version: "0.2.1" }]);
 
-      const versionIdPrev = getCoreVersionId(corePkgsPrev);
-      const versionIdNext = getCoreVersionId(corePkgsNext);
-
-      it("prev should NOT be gte next", () => {
-        expect(isVersionIdUpdated(versionIdPrev, corePkgsNext)).to.be.false;
+      it("previous version than current = updated", () => {
+        expect(isVersionIdUpdated(versionIdPrev, corePkgs)).to.equal(true);
       });
 
-      it("next should be gte prev", () => {
-        expect(isVersionIdUpdated(versionIdNext, corePkgsPrev)).to.be.true;
+      it("same version as current = updated", () => {
+        expect(isVersionIdUpdated(versionIdSame, corePkgs)).to.equal(true);
       });
 
-      it("next should be gte next", () => {
-        expect(isVersionIdUpdated(versionIdNext, corePkgsNext)).to.be.true;
+      it("higher version than current = NOT updated", () => {
+        expect(isVersionIdUpdated(versionIdNext, corePkgs)).to.equal(false);
       });
     });
 
