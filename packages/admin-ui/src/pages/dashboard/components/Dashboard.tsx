@@ -1,12 +1,8 @@
 import React from "react";
-import { useSelector } from "react-redux";
-// Selectors
-import { getVolumes } from "services/dappnodeStatus/selectors";
 // Own module
 import { title } from "../data";
 import ChainCard from "./ChainCard";
 import { HostStats } from "./HostStats";
-import VolumeCard from "./VolumeCard";
 import "./dashboard.scss";
 // Components
 import SubTitle from "components/SubTitle";
@@ -15,10 +11,6 @@ import { useChainData } from "hooks/chainData";
 
 export default function Dashboard() {
   const chainData = useChainData();
-  const volumesData = useSelector(getVolumes);
-  const dappnodeVolumes = volumesData.filter(
-    v => v.name === "dncore_ipfsdnpdappnodeeth_data"
-  );
 
   return (
     <>
@@ -33,13 +25,6 @@ export default function Dashboard() {
 
       <SubTitle>Machine stats</SubTitle>
       <HostStats />
-
-      <SubTitle>Volumes</SubTitle>
-      <div className="dashboard-cards">
-        {dappnodeVolumes.map(volumeData => (
-          <VolumeCard key={volumeData.name} volumeData={volumeData} />
-        ))}
-      </div>
     </>
   );
 }
