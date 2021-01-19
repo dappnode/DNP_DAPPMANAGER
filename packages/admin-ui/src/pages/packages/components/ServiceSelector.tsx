@@ -11,7 +11,7 @@ export function ServiceSelector({
   setServiceName: (serviceName: string) => void;
   containers: PackageContainer[];
 }) {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map(c => c.serviceName).sort();
 
   if (serviceNames.length <= 1) return null;
 
