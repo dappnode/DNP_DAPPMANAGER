@@ -55,19 +55,20 @@ export default function Notifications() {
         <SubTitle>Telegram</SubTitle>
         <div>
           Receive important notifications directly to your telegram account. To
-          get your own token follow{" "}
+          get your own token from Telegram botfather follow{" "}
           <a href="https://core.telegram.org/bots#creating-a-new-bot">
             this guide
           </a>
         </div>
         <div>
-          Available commands in bot chat
+          Available commands in to start your bot chat
           <ul>
             <li>
-              <strong>/help</strong>
+              <strong>/start</strong>: Send after starting a conversation
+              (channel) with your bot. You subscribe to future notifications
             </li>
             <li>
-              <strong>/unsubscribe</strong>
+              <strong>/help</strong>: Display all available commands
             </li>
           </ul>
         </div>
