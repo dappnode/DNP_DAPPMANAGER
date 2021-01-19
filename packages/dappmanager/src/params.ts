@@ -279,7 +279,7 @@ const FORMAT = {
 export const releaseFiles = {
   manifest: {
     regex: /dappnode_package.*\.json$/,
-    format: FORMAT.JSON,
+    format: FORMAT.YAML,
     maxSize: 100e3, // Limit size to ~100KB
     required: TRUE,
     multiple: FALSE
