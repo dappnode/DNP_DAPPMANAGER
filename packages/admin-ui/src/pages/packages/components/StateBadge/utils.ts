@@ -33,7 +33,7 @@ export function parseContainerState(
       return { variant: "success", state: "running", title: "Running" };
 
     case "restarting":
-      return { variant: "success", state: "running", title: "Restarting" };
+      return { variant: "secondary", state: "stopped", title: "Restarting" };
 
     case "dead":
       return { variant: "danger", state: "crashed", title: "Dead" };
