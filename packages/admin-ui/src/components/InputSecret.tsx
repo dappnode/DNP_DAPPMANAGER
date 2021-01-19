@@ -11,12 +11,15 @@ export const InputSecret: typeof Input = props => {
         {...props}
         type={show ? "text" : "password"}
         append={
-          <Button
-            onClick={() => setShow(x => !x)}
-            className="input-field-secret-toggle"
-          >
-            {show ? <GoEyeClosed /> : <GoEye />}
-          </Button>
+          <>
+            <Button
+              onClick={() => setShow(x => !x)}
+              className="input-field-secret-toggle"
+            >
+              {show ? <GoEyeClosed /> : <GoEye />}
+            </Button>
+            {props.append ?? null}
+          </>
         }
       />
     </>
