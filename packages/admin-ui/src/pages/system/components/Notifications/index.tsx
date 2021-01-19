@@ -26,6 +26,9 @@ export default function Notifications() {
         onSuccess: `Updated telegram token`
       });
       setReqStatusToken({ result: true });
+      if (telegramStatus.data === false) {
+        await updateTelegramStatus(true);
+      }
       setToken("");
     } catch (e) {
       setReqStatusToken({ error: e });
