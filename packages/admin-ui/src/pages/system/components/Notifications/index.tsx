@@ -53,6 +53,22 @@ export default function Notifications() {
       console.error("Error on setTelegramStatus", e);
     }
   }
+
+  async function sendTestNotification() {
+    try {
+      await api.notificationsTest({
+        notification: {
+          id: "test-notification",
+          type: "info",
+          title: "Test notification",
+          body: "This is a test notification manually triggered by the user"
+        }
+      });
+    } catch (e) {
+      console.error("Error on sendTestNotification", e);
+    }
+  }
+
   return (
     <Card spacing>
       <SubTitle>Telegram</SubTitle>
@@ -122,6 +138,10 @@ export default function Notifications() {
       {reqStatusStatus.error && (
         <ErrorView error={reqStatusStatus.error} hideIcon red />
       )}
+
+      <hr />
+
+      <Button onClick={sendTestNotification}>Send test notification</Button>
     </Card>
   );
 }
