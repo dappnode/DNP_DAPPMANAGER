@@ -3,6 +3,7 @@ import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
 import compression from "compression";
 import fileUpload from "express-fileupload";
+import { helmetConf } from "./helmet";
 import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
@@ -84,7 +85,7 @@ export function startHttpApi({
 
   const rpcHandler = getRpcHandler(methods, routesLogger);
 
-  app.disable("x-powered-by");
+  app.use(helmetConf());
   // Intercept decentralized website requests first
   app.use(ethForwardMiddleware);
   // default options. ALL CORS + limit fileSize and file count
