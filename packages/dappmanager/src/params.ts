@@ -3,6 +3,10 @@ import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
+const MINUTE = 60 * 1000; // miliseconds
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
 /**
  * DAPPMANAGER Parameters. This parameters are modified on execution for testing
  */
@@ -72,8 +76,8 @@ const params = {
 
   // API auth sessions
   SESSIONS_SECRET_FILE: path.join(DNCORE_DIR, "sessions-secret-key.txt"),
-  SESSIONS_MAX_TTL_MS: 24 * 60 * 60 * 100,
-  SESSIONS_TTL_MS: 24 * 60 * 60 * 100,
+  SESSIONS_MAX_TTL_MS: 7 * DAY,
+  SESSIONS_TTL_MS: 7 * DAY,
 
   // VPN API
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
@@ -89,21 +93,21 @@ const params = {
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
 
   // Auto-update parameters
-  AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
+  AUTO_UPDATE_DELAY: 1 * DAY,
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Watchers
-  AUTO_UPDATE_DAEMON_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  CHECK_DISK_USAGE_DAEMON_INTERVAL: 60 * 1000, // 1 minute
-  NAT_RENEWAL_DAEMON_INTERVAL: 60 * 60 * 1000, // 1 hour
-  NSUPDATE_DAEMON_INTERVAL: 60 * 60 * 1000, // 1 hour
+  AUTO_UPDATE_DAEMON_INTERVAL: 5 * MINUTE,
+  CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
+  NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
+  NSUPDATE_DAEMON_INTERVAL: 1 * HOUR,
 
   // IPFS parameters
   IPFS_HOST:
     process.env.IPFS_HOST ||
     process.env.IPFS_REDIRECT ||
     "http://ipfs.dappnode:5001",
-  IPFS_TIMEOUT: 30 * 1000,
+  IPFS_TIMEOUT: 0.5 * MINUTE,
 
   // Web3 parameters
   WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
@@ -182,8 +186,8 @@ const params = {
 };
 
 if (devMode) {
-  params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
-  params.AUTO_UPDATE_DAEMON_INTERVAL = 1 * 1000; // 1 second
+  params.AUTO_UPDATE_DELAY = 3000;
+  params.AUTO_UPDATE_DAEMON_INTERVAL = 1000;
   params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
 }
 
