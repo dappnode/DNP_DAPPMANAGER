@@ -14,7 +14,7 @@ import {
   MdDashboard
 } from "react-icons/md";
 
-export const fundedBy: { logo: string; text: string; link?: string }[] = [
+export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
     logo: EfgLogo,
     text: "Ethereum Foundation",
@@ -33,7 +33,8 @@ export const fundedBy: { logo: string; text: string; link?: string }[] = [
   },
   {
     logo: EcfLogo,
-    text: "Ethereum Community Fund"
+    text: "Ethereum Community Fund",
+    link: "https://ecf.network/"
   }
 ];
 
