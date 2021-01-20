@@ -4,7 +4,8 @@ const dnpName = "multi-service.dnp.dappnode.eth";
 const serviceNames = {
   front: "front",
   back: "back",
-  crashed: "crashed"
+  crashed: "crashed",
+  restarting: "restarting"
 };
 
 export const multiService: MockDnp = {
@@ -89,6 +90,8 @@ export const multiService: MockDnp = {
 
   installedContainers: {
     [serviceNames.front]: {
+      state: "running",
+      running: true,
       ports: [
         {
           container: 8088,
@@ -142,6 +145,11 @@ export const multiService: MockDnp = {
       state: "exited",
       running: false,
       exitCode: 127
+    },
+    [serviceNames.restarting]: {
+      state: "restarting",
+      running: false,
+      exitCode: 0
     }
   }
 };

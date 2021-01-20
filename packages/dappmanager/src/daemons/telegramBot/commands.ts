@@ -3,12 +3,32 @@ import { uniq } from "lodash";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
-import { bold, url } from "./markdown";
+import { bold } from "./markdown";
 import { editCoreSetting, editDnpSetting } from "../../utils/autoUpdateHelper";
 
 export const enableAutoUpdatesCmd = "/enable-auto-updates";
+export const startCmd = "/start";
 export const unsubscribeCmd = "/unsubscribe";
 export const helpCmd = "/help";
+
+const cmds = [
+  {
+    cmd: enableAutoUpdatesCmd,
+    help: "Enable auto-updates for all packages"
+  },
+  {
+    cmd: startCmd,
+    help: "Subscribe to future notifications"
+  },
+  {
+    cmd: unsubscribeCmd,
+    help: "Unsubcribe from future notifications"
+  },
+  {
+    cmd: helpCmd,
+    help: "Display all available commands"
+  }
+];
 
 /**
  * Polls for commands and responds.
@@ -36,15 +56,20 @@ export class DappnodeTelegramBot {
         if (!msg.text) return;
 
         if (msg.text.startsWith(enableAutoUpdatesCmd)) {
-          this.enableAutoUpdatesCmd(msg);
+          await this.enableAutoUpdatesCmd(msg);
         } else if (msg.text.startsWith(unsubscribeCmd)) {
-          this.unsubscribeCmd(msg);
+          await this.unsubscribeCmd(msg);
         } else if (msg.text.startsWith(helpCmd)) {
-          this.helpCmd(msg);
+          await this.helpCmd(msg);
         } else {
           // If channel is not subscribed yet, subscribe
           if (!this.channelIdExists(msg.chat.id.toString())) {
-            this.subscribeCmd(msg);
+            await this.subscribeCmd(msg);
+          } else if (msg.text.startsWith(helpCmd)) {
+            await this.sendMessage(
+              msg.chat.id.toString(),
+              "Already subscribed"
+            );
           }
         }
       } catch (e) {
@@ -120,12 +145,7 @@ export class DappnodeTelegramBot {
     const chatId = msg.chat.id.toString();
     const message = [
       bold("Commands"),
-      bold("/unsubscribe"),
-      bold("/help"),
-      `More information ${url(
-        "here",
-        "https://hackmd.io/iJngUGVkRMqxOEqFEjT0XA"
-      )}`
+      cmds.map(({ cmd, help }) => `${bold(cmd)} ${help}`).join("\n")
     ].join("\n\n");
 
     await this.sendMessage(chatId, message);

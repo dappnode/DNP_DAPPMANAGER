@@ -1,7 +1,7 @@
 import { PackageContainer } from "types";
 
-export type SimpleState = "stopped" | "crashed" | "running";
-export type BadgeVariant = "danger" | "success" | "secondary";
+export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
+export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
 
 export function parseContainerState(
   container: PackageContainer
@@ -33,7 +33,7 @@ export function parseContainerState(
       return { variant: "success", state: "running", title: "Running" };
 
     case "restarting":
-      return { variant: "success", state: "running", title: "Restarting" };
+      return { variant: "warning", state: "restarting", title: "Restarting" };
 
     case "dead":
       return { variant: "danger", state: "crashed", title: "Dead" };
