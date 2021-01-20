@@ -6,7 +6,8 @@ import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
 import { bold } from "./markdown";
 import { editCoreSetting, editDnpSetting } from "../../utils/autoUpdateHelper";
 
-export const enableAutoUpdatesCmd = "/enable-auto-updates";
+// Note: Telegram commands MUST NOT contain "-", only "_"
+export const enableAutoUpdatesCmd = "/enable_auto_updates";
 export const startCmd = "/start";
 export const unsubscribeCmd = "/unsubscribe";
 export const helpCmd = "/help";
