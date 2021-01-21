@@ -10,14 +10,17 @@ export type ShhStatus = "enabled" | "disabled";
 
 // Device types
 
-export interface VpnDeviceCredentials extends VpnDevice {
-  url: string;
-}
+export type VpnDeviceAdminPassword =
+  | { hasChangedPassword: true }
+  | { hasChangedPassword: false; password: string };
 
-export interface VpnDevice {
-  id: string;
-  admin: boolean;
-}
+export type VpnDevice =
+  | { id: string; admin: false }
+  | ({ id: string; admin: true } & VpnDeviceAdminPassword);
+
+export type VpnDeviceCredentials = VpnDevice & {
+  url: string;
+};
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 

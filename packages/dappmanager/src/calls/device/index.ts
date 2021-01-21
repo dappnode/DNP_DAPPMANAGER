@@ -1,6 +1,13 @@
-import { AdminPasswordDb } from "../../api/auth/adminPasswordDb";
+import {
+  AdminPasswordDb,
+  AdminPasswordDbError
+} from "../../api/auth/adminPasswordDb";
 import { VpnApiClient } from "../../api/vpnApiClient";
-import { VpnDeviceCredentials, VpnDevice } from "../../types";
+import {
+  VpnDeviceCredentials,
+  VpnDevice,
+  VpnDeviceAdminPassword
+} from "../../types";
 
 // Temporal solution until eventBus is properly typed
 interface EventBusDevices {
@@ -118,19 +125,35 @@ export class DeviceCalls {
    */
   devicesList = async (): Promise<VpnDevice[]> => {
     const vpnDevices = await this.vpnApiClient.listDevices();
-    return vpnDevices.map(device => ({
-      id: device.id,
-      admin: this.adminPasswordDb.isAdmin(device.id)
-    }));
+    return vpnDevices.map((device): VpnDevice => this.readDevice(device.id));
   };
 
   private devicelist = async (id: string): Promise<VpnDevice> => {
     const vpnDevices = await this.vpnApiClient.listDevices();
     const device = vpnDevices.find(d => d.id === id);
     if (!device) throw Error(`Device ${id} not found`);
-    return {
-      id: device.id,
-      admin: this.adminPasswordDb.isAdmin(device.id)
-    };
+    return this.readDevice(device.id);
   };
+
+  private readDevice(id: string): VpnDevice {
+    const admin = this.adminPasswordDb.isAdmin(id);
+    if (admin) {
+      return { id, admin, ...this.getAdminPassword(id) };
+    } else {
+      return { id, admin };
+    }
+  }
+
+  private getAdminPassword(id: string): VpnDeviceAdminPassword {
+    try {
+      const password = this.adminPasswordDb.generateLoginToken(id);
+      return { hasChangedPassword: false as const, password };
+    } catch (e) {
+      if (e.message === AdminPasswordDbError.PASSWORD_CHANGED) {
+        return { hasChangedPassword: true as const };
+      } else {
+        throw e;
+      }
+    }
+  }
 }

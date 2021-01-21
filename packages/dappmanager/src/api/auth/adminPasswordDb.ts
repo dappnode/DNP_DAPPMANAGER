@@ -2,6 +2,10 @@ import bcrypt from "bcryptjs";
 import { JsonFileDb } from "../../utils/fileDb";
 import { getRandomAlphanumericToken } from "../../utils/token";
 
+export enum AdminPasswordDbError {
+  PASSWORD_CHANGED = "ADMIN_PASSWORD_DB_ERROR_PASSWORD_CHANGED"
+}
+
 const passwordLength = 16;
 const difficultyFactor = 10;
 const loginTokenPrefix = "login-token.";
@@ -79,7 +83,8 @@ export class AdminPasswordDb {
     const hash = passwordMap[id];
     if (hash) {
       const loginToken = parseLoginToken(hash);
-      if (loginToken == null) throw Error("PASSWORD_CHANGED");
+      if (loginToken == null)
+        throw Error(AdminPasswordDbError.PASSWORD_CHANGED);
       return loginToken;
     }
 

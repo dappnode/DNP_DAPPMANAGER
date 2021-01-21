@@ -2,9 +2,11 @@ import { VpnApiClient } from "@dappnode/dappmanager/src/api/vpnApiClient";
 import { PackageVersionData, VpnDevice } from "../src/types";
 
 const url = "link-to-otp/?id=617824#hdfuisf";
+const password = "SAMPLETEMPPASSWORD";
 const initialDevices: VpnDevice[] = [
-  { id: "admin-name", admin: true },
-  { id: "other-user", admin: false }
+  { id: "admin-name", admin: true, hasChangedPassword: true },
+  { id: "other-user", admin: false },
+  { id: "second-device", admin: true, hasChangedPassword: false, password }
 ];
 
 export class MockVpnApiClient implements VpnApiClient {
@@ -24,7 +26,16 @@ export class MockVpnApiClient implements VpnApiClient {
     const { id, isAdmin } = kwargs;
     const device = this.devices.get(id);
     if (!device) throw Error(`No id ${id}`);
-    this.devices.set(id, { ...device, admin: isAdmin });
+    if (isAdmin) {
+      this.devices.set(id, {
+        id: device.id,
+        admin: true,
+        hasChangedPassword: false,
+        password
+      });
+    } else {
+      this.devices.set(id, { id: device.id, admin: false });
+    }
   }
 
   async removeDevice({ id }: { id: string }): Promise<void> {
