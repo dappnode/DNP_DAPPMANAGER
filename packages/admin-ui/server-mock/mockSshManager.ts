@@ -31,7 +31,12 @@ export class MockSshManager implements SshManager {
     return this.status;
   }
 
-  async changePort(port: number): Promise<void> {
+  async getPort(): Promise<number> {
+    await shellHostDelay();
+    return this.port;
+  }
+
+  async setPort(port: number): Promise<void> {
     await shellHostDelay();
     this.port = port;
   }
