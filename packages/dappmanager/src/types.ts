@@ -30,3 +30,7 @@ export type EthClientSyncedNotificationStatus = {
   target: EthClientTargetPackage;
   status: "AwaitingSynced" | "Synced";
 } | null;
+
+export interface DiskUsageThresholds {
+  [thresholdId: string]: boolean;
+}
