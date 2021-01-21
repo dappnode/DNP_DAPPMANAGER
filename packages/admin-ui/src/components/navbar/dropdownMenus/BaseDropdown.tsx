@@ -4,6 +4,9 @@ import RenderMarkdown from "components/RenderMarkdown";
 import "./dropdown.scss";
 import { HelpTo } from "components/Help";
 
+// Bubble color does not support "info", nor "light"
+type BubbleColor = "danger" | "warning" | "success";
+
 // Utilities
 
 const ProgressBarWrapper = ({ progress }: { progress: number }) => {
@@ -17,14 +20,17 @@ const ProgressBarWrapper = ({ progress }: { progress: number }) => {
   );
 };
 
-function parseMessagesType(messages: BaseDropdownMessage[]) {
-  const notViewedTypes: { [type: string]: boolean } = {};
-  for (const message of messages)
-    if (!message.viewed && message.type) notViewedTypes[message.type] = true;
+function parseMessagesType(messages: BaseDropdownMessage[]): BubbleColor {
+  const types = new Set<MessageType>();
 
-  for (const type of ["danger", "warning", "success", "info"])
-    if (notViewedTypes[type]) return type;
-  return "light";
+  for (const message of messages)
+    if (!message.viewed && message.type) types.add(message.type);
+
+  if (types.has("danger")) return "danger";
+  if (types.has("warning")) return "warning";
+  if (types.has("success")) return "success";
+  if (types.has("info")) return "success";
+  return "success";
 }
 
 function areMessagesUnread(messages: BaseDropdownMessage[]) {
@@ -109,7 +115,7 @@ function BaseDropdown({
   }
 
   // A message type can be "", ignore it
-  const globalType = parseMessagesType(messages);
+  const bubbleColor = parseMessagesType(messages);
   const messagesAvailable = areMessagesUnread(messages);
 
   const attentionGrab = moreVisible && messagesAvailable;
@@ -126,7 +132,7 @@ function BaseDropdown({
         data-delay="300"
       >
         <Icon />
-        <div className={`icon-bubble ${globalType}`} />
+        <div className={`icon-bubble ${bubbleColor}`} />
       </div>
 
       {/* offset controls the position of the dropdown menu.
