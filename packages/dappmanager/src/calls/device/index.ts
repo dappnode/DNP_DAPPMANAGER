@@ -47,9 +47,6 @@ export class DeviceCalls {
     id: string;
     isAdmin: boolean;
   }): Promise<void> => {
-    // Set admin status in VPN
-    await this.vpnApiClient.toggleAdmin({ id, isAdmin });
-
     // Set admin status in local DB
     this.adminPasswordDb.setIsAdmin(id, isAdmin);
 
@@ -120,13 +117,20 @@ export class DeviceCalls {
    * Returns a list of the existing devices, with the admin property
    */
   devicesList = async (): Promise<VpnDevice[]> => {
-    return await this.vpnApiClient.listDevices();
+    const vpnDevices = await this.vpnApiClient.listDevices();
+    return vpnDevices.map(device => ({
+      id: device.id,
+      admin: this.adminPasswordDb.isAdmin(device.id)
+    }));
   };
 
   private devicelist = async (id: string): Promise<VpnDevice> => {
-    const devices = await this.vpnApiClient.listDevices();
-    const device = devices.find(d => d.id === id);
+    const vpnDevices = await this.vpnApiClient.listDevices();
+    const device = vpnDevices.find(d => d.id === id);
     if (!device) throw Error(`Device ${id} not found`);
-    return device;
+    return {
+      id: device.id,
+      admin: this.adminPasswordDb.isAdmin(device.id)
+    };
   };
 }

@@ -17,7 +17,6 @@ export interface VpnDeviceCredentials extends VpnDevice {
 export interface VpnDevice {
   id: string;
   admin: boolean;
-  ip: string;
 }
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'

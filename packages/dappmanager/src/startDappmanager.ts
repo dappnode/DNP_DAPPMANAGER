@@ -49,17 +49,6 @@ export function startDappmanager({
   });
   const sshCalls = new SshCalls({ sshManager });
 
-  // Sync local adminPasswordDb status with VPN's DB
-  retry(
-    async function syncAdminPasswordDb() {
-      for (const device of await vpnApiClient.listDevices())
-        adminPasswordDb.setIsAdmin(device.id, device.admin);
-    },
-    { retries: 50, minTimeout: 2000, maxRetryTime: 5 * 60 * 1000 }
-  )
-    .then(() => logs.info("Synced adminPasswordDb with VPN devices"))
-    .catch(e => logs.error("Èrror syncing adminPasswordDb", e));
-
   // Start HTTP API
   return startHttpApi({
     params,
