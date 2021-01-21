@@ -3,25 +3,38 @@ import { useSelector } from "react-redux";
 import BaseDropdown, { BaseDropdownMessage } from "./BaseDropdown";
 import makeBlockie from "ethereum-blockies-base64";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
-import { stringSplit, stringIncludes } from "utils/strings";
+import { stringSplit } from "utils/strings";
 
-/**
- * Patch to fix the visual issue of the domain being too long.
- * With the <wbr> (word break opportunity) the domain will be shown as:
- *  12ab34ab12ab23ab
- *  .dyndns.dappnode.io
- */
-function parseIdentityKeyValue(key: string, value = "") {
-  if (stringIncludes(key, "domain")) {
-    const [hex, rootDomain] = stringSplit(value, /\.(.+)/);
-    return (
-      <>
-        {hex}
-        <wbr />.{rootDomain}
-      </>
-    );
-  } else {
-    return value;
+type DappnodeIdentity = ReturnType<typeof getDappnodeIdentityClean>;
+
+function renderIdentityValue(
+  key: keyof DappnodeIdentity,
+  value?: string
+): JSX.Element | string | null {
+  switch (key) {
+    /**
+     * Patch to fix the visual issue of the domain being too long.
+     * With the <wbr> (word break opportunity) the domain will be shown as:
+     *  12ab34ab12ab23ab
+     *  .dyndns.dappnode.io
+     */
+    case "domain":
+      const [hex, rootDomain] = stringSplit(value || "", /\.(.+)/);
+      return (
+        <>
+          {hex}
+          <wbr />.{rootDomain}
+        </>
+      );
+
+    case "name":
+      return value ?? null;
+
+    case "ip":
+      return `${value} (public IP)`;
+
+    case "internalIp":
+      return `${value} (internal IP)`;
   }
 }
 
@@ -54,7 +67,10 @@ export default function DappnodeIdentity() {
         .filter(([_, value]) => value)
         .map(
           ([key, value]): BaseDropdownMessage => ({
-            title: parseIdentityKeyValue(key, value)
+            title: renderIdentityValue(
+              key as keyof typeof dappnodeIdentity,
+              value
+            )
           })
         )}
       Icon={Icon}

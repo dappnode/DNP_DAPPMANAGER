@@ -35,7 +35,7 @@ type MessageType = "danger" | "warning" | "success" | "info";
 
 export interface BaseDropdownMessage {
   type?: MessageType;
-  title?: string | JSX.Element;
+  title?: string | JSX.Element | null;
   body?: string;
   help?: string; // href link to attach to help icon
   progress?: number;
