@@ -4,8 +4,8 @@ import RenderMarkdown from "components/RenderMarkdown";
 import "./dropdown.scss";
 import { HelpTo } from "components/Help";
 
-// Bubble color does not support "info", nor "light"
-type BubbleColor = "danger" | "warning" | "success";
+// Bubble color does not support "info", nor "light". So "light" with display nothing
+type BubbleColor = "danger" | "warning" | "success" | "light";
 
 // Utilities
 
@@ -25,6 +25,9 @@ function parseMessagesType(messages: BaseDropdownMessage[]): BubbleColor {
 
   for (const message of messages)
     if (!message.viewed && message.type) types.add(message.type);
+
+  // Don't show any color if there are no not-viewed notifications
+  if (types.size === 0) return "light";
 
   if (types.has("danger")) return "danger";
   if (types.has("warning")) return "warning";
