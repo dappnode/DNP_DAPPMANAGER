@@ -10,16 +10,29 @@ import "./sshManager.scss";
 
 export function SshManagerChangePort() {
   const [port, setPort] = useState("");
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const [reqGetStatus, setReqGetStatus] = useState<ReqStatus>({});
+  const [reqSetStatus, setReqSetStatus] = useState<ReqStatus>({});
 
   async function updatePort() {
     try {
-      setReqStatus({ loading: true });
-      await api.sshPortChange({ port: parseInt(port, 10) });
-      setReqStatus({ result: true });
+      setReqSetStatus({ loading: true });
+      await api.sshPortSet({ port: parseInt(port, 10) });
+      setReqSetStatus({ result: true });
     } catch (e) {
-      setReqStatus({ error: e });
-      console.error("Error on sshPortChange", e);
+      setReqSetStatus({ error: e });
+      console.error("Error on sshPortSet", e);
+    }
+  }
+
+  async function fetchPort() {
+    try {
+      setReqGetStatus({ loading: true });
+      const _port = await api.sshPortGet();
+      setPort(String(_port));
+      setReqGetStatus({ result: true });
+    } catch (e) {
+      setReqGetStatus({ error: e });
+      console.error("Error on sshStatusGet", e);
     }
   }
 
@@ -28,19 +41,23 @@ export function SshManagerChangePort() {
   return (
     <>
       <Input
-        placeholder="New SSH port i.e. 1024"
-        value={port}
+        value={port || "?"}
         onValueChange={setPort}
         type="number"
         isInvalid={Boolean(port && portError)}
         append={
-          <Button
-            variant="dappnode"
-            disabled={!port || reqStatus.loading}
-            onClick={updatePort}
-          >
-            Change
-          </Button>
+          <>
+            <Button disabled={reqGetStatus.loading} onClick={fetchPort}>
+              Fetch port
+            </Button>
+            <Button
+              variant="dappnode"
+              disabled={!port || reqSetStatus.loading}
+              onClick={updatePort}
+            >
+              Change
+            </Button>
+          </>
         }
       />
       {port && portError && (
@@ -49,9 +66,16 @@ export function SshManagerChangePort() {
         </Form.Text>
       )}
 
-      {reqStatus.loading && <Ok loading msg="Changing SSH port..."></Ok>}
-      {reqStatus.result && <Ok ok msg="Changed SSH port"></Ok>}
-      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
+      {reqGetStatus.loading && <Ok loading msg="Fetching SSH port..."></Ok>}
+      {reqGetStatus.error && (
+        <ErrorView error={reqGetStatus.error} hideIcon red />
+      )}
+
+      {reqSetStatus.loading && <Ok loading msg="Changing SSH port..."></Ok>}
+      {reqSetStatus.result && <Ok ok msg="Changed SSH port"></Ok>}
+      {reqSetStatus.error && (
+        <ErrorView error={reqSetStatus.error} hideIcon red />
+      )}
     </>
   );
 }

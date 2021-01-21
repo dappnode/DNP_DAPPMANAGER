@@ -433,10 +433,14 @@ export interface Routes {
    */
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
-  /*
+  /**
+   * Return the current SSH port from sshd
+   */
+  sshPortGet: () => Promise<number>;
+  /**
    * Change the SHH port on the DAppNode host
    */
-  sshPortChange: (kwargs: { port: number }) => Promise<void>;
+  sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
    * Disable or enable SSH on the DAppNode host
    */
@@ -530,7 +534,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
-  sshPortChange: { log: true },
+  sshPortGet: {},
+  sshPortSet: { log: true },
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},

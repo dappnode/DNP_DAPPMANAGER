@@ -103,7 +103,7 @@ export class SshManager {
    * Change SSH port by modifing /etc/ssh/sshd_config
    * Then restarts ssh.service (sshd)
    */
-  async changePort(port: number): Promise<void> {
+  async setPort(port: number): Promise<void> {
     if (isNaN(port)) throw Error(`Port is not a number: ${port}`);
     if (port <= 0) throw Error(`Port must be > 0: ${port}`);
     if (port >= 65536) throw Error(`Port must be < 65536: ${port}`);
@@ -113,6 +113,24 @@ export class SshManager {
       `sed -- -i "s/.*Port .*/Port ${port}/g" /etc/ssh/sshd_config`
     );
     await this.shellHost("systemctl restart ssh.service");
+  }
+
+  /**
+   * Cat /etc/ssh/sshd_config and parse the line
+   * ```
+   * Port 22
+   * ```
+   * to get the current port
+   */
+  async getPort(): Promise<number> {
+    const sshdConfig = await this.shellHost("cat /etc/ssh/sshd_config");
+
+    const regexMatch = sshdConfig.match(/Port (\d+)/);
+    if (!regexMatch) throw Error("Error parsing sshd_config");
+
+    const portNumber = parseInt(regexMatch[1]);
+    if (isNaN(portNumber)) throw Error("Error parsing sshd_config");
+    return portNumber;
   }
 
   async removeRootAccess(): Promise<void> {

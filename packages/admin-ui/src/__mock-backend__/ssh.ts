@@ -1,12 +1,16 @@
 import { Routes } from "../common";
 
+let sshPort = 22;
 let sshStatus: "enabled" | "disabled" = "enabled";
 
 export const ssh: Pick<
   Routes,
-  "sshPortChange" | "sshStatusGet" | "sshStatusSet"
+  "sshPortGet" | "sshPortSet" | "sshStatusGet" | "sshStatusSet"
 > = {
-  sshPortChange: async () => {},
+  sshPortGet: async () => sshPort,
+  sshPortSet: async ({ port }) => {
+    sshPort = port;
+  },
   sshStatusGet: async () => sshStatus,
   sshStatusSet: async ({ status }) => {
     sshStatus = status;
