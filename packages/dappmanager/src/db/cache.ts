@@ -1,7 +1,7 @@
 import { dynamicKeyValidate } from "./dbCache";
 import { Manifest, ApmVersion, Compose } from "../types";
 import semver from "semver";
-import { joinWithDot, stripDots } from "./dbUtils";
+import { joinWithDot } from "./dbUtils";
 
 const CACHE = "cache";
 const CACHE_MANIFEST = `${CACHE}.manifest`;
@@ -28,7 +28,7 @@ export const manifestCache = dynamicKeyValidate<Manifest, string>(
 
 type ApmKeyArg = { name: string; version: string };
 const apmCacheKeyGetter = ({ name, version }: ApmKeyArg): string =>
-  joinWithDot(CACHE_APM, stripDots(`${name}-${version}`));
+  joinWithDot(CACHE_APM, `${name}-${version}`);
 const apmCacheValidate = (
   { name, version }: ApmKeyArg,
   apmVersion?: ApmVersion

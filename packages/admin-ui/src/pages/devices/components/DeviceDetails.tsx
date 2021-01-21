@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, RouteComponentProps } from "react-router-dom";
-import { api, useApi } from "api";
+import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
 import { rootPath, title } from "../data";
 // Components
+import Form from "react-bootstrap/esm/Form";
+import Alert from "react-bootstrap/esm/Alert";
 import Card from "components/Card";
 import Button from "components/Button";
 import Input from "components/Input";
@@ -12,45 +14,23 @@ import QrCode from "components/QrCode";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
+import Title from "components/Title";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
 import { GoClippy } from "react-icons/go";
-import Title from "components/Title";
-import { ReqStatus } from "types";
-import Ok from "components/Ok";
+import { VpnDeviceCredentials } from "types";
 
-function DeviceDetailsLoaded({
-  admin,
-  id,
-  url
-}: {
-  admin: boolean;
-  id: string;
-  url: string;
-}) {
+function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
   const [showQr, setShowQr] = useState(false);
-  const [password, setPassword] = useState<string>();
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const { id, url } = device;
 
   useEffect(() => {
     // Activate the copy functionality
     new ClipboardJS(".copy-input-copy");
   }, []);
 
-  async function onGeneratePassword() {
-    try {
-      setReqStatus({ loading: true });
-      const passwordRes = await api.devicePasswordGet({ id });
-      setPassword(passwordRes);
-      setReqStatus({ result: true });
-    } catch (e) {
-      setReqStatus({ error: e });
-      console.error("Error on devicePasswordGet", e);
-    }
-  }
-
   return (
-    <Card className="device-settings">
+    <Card className="device-settings" spacing>
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
@@ -59,23 +39,14 @@ function DeviceDetailsLoaded({
         </NavLink>
       </header>
 
-      {admin && (
-        <span
-          className={`state-badge center badge-success`}
-          style={{ opacity: 0.85, justifySelf: "left" }}
-        >
-          ADMIN
-        </span>
-      )}
+      <div className="help-text">
+        Use the VPN credentials URL to connect a new device to this DAppNode.
+        You can then use the user and admin password to log in to the UI. You
+        can share them with a trusted person through a secure channel.
+      </div>
 
-      <div>
-        <strong>Credentials URL</strong>
-
-        <div className="help-text">
-          Open the link below to get access to this device's credentials. You
-          can share it through a secure channel.
-        </div>
-
+      <Form.Group>
+        <Form.Label>VPN credentials URL</Form.Label>
         <Input
           lock={true}
           value={url || ""}
@@ -94,56 +65,62 @@ function DeviceDetailsLoaded({
             </>
           }
         />
-      </div>
+      </Form.Group>
 
       <Button onClick={() => setShowQr(!showQr)}>
-        {showQr ? "Hide" : "Show"} QR code
+        {showQr ? "Hide" : "Show"} VPN credentials URL QR code
       </Button>
 
       {showQr && url && <QrCode url={url} width={"400px"} />}
 
-      {admin ? (
-        <div>
-          <strong>Admin password</strong>
-
-          <div className="help-text">
-            Share a unique password to grant external users acess. It will be
-            revoked when deleting this device
-          </div>
-
-          {password ? (
-            <Input
-              lock={true}
-              value={password || ""}
-              onValueChange={() => {}}
-              className="copy-input"
-              append={
-                <>
-                  <Button
-                    className="copy-input-copy"
-                    data-clipboard-text={password}
-                  >
-                    <GoClippy />
-                  </Button>
-                </>
-              }
-            />
-          ) : (
-            <Button onClick={onGeneratePassword}>
-              Generate new admin password
-            </Button>
-          )}
-
-          <div className="request-status-container">
-            {reqStatus.loading && (
-              <Ok loading msg="Generating password..."></Ok>
-            )}
-            {reqStatus.result && <Ok ok msg="Generated password"></Ok>}
-            {reqStatus.error && (
-              <ErrorView error={reqStatus.error} hideIcon red />
-            )}
-          </div>
-        </div>
+      {device.admin ? (
+        device.hasChangedPassword ? (
+          <Alert variant="info">
+            This admin user has already changed the password. Only the initial
+            auto-generated password is visible
+          </Alert>
+        ) : (
+          <>
+            <Form.Group>
+              <Form.Label>Username</Form.Label>
+              <Input
+                lock={true}
+                value={device.id || ""}
+                onValueChange={() => {}}
+                className="copy-input"
+                append={
+                  <>
+                    <Button
+                      className="copy-input-copy"
+                      data-clipboard-text={device.id}
+                    >
+                      <GoClippy />
+                    </Button>
+                  </>
+                }
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Admin password</Form.Label>
+              <Input
+                lock={true}
+                value={device.password || ""}
+                onValueChange={() => {}}
+                className="copy-input"
+                append={
+                  <>
+                    <Button
+                      className="copy-input-copy"
+                      data-clipboard-text={device.password}
+                    >
+                      <GoClippy />
+                    </Button>
+                  </>
+                }
+              />
+            </Form.Group>
+          </>
+        )
       ) : null}
 
       <div className="alert alert-secondary" role="alert">
@@ -165,11 +142,7 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
       <Title title={title} subtitle={id} />
 
       {deviceCredentials.data ? (
-        <DeviceDetailsLoaded
-          admin={deviceCredentials.data.admin}
-          id={id}
-          url={deviceCredentials.data.url}
-        />
+        <DeviceDetailsLoaded device={deviceCredentials.data} />
       ) : deviceCredentials.error ? (
         <ErrorView error={deviceCredentials.error} />
       ) : deviceCredentials.isValidating ? (

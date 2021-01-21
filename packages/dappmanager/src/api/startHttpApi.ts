@@ -8,7 +8,7 @@ import cors from "cors";
 import socketio from "socket.io";
 import path from "path";
 import { toSocketIoHandler, wrapHandler } from "./utils";
-import { AuthIp, AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
+import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
 import { AdminPasswordDb } from "./auth/adminPasswordDb";
 import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
 import { mapSubscriptionsToEventBus } from "./subscriptions";
@@ -104,7 +104,6 @@ export function startHttpApi({
   app.use(sessions.handler);
 
   // Auth
-  const authIp = new AuthIp(params);
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
 
   // sessionHandler will mutate socket.handshake attaching .session object
@@ -139,8 +138,8 @@ export function startHttpApi({
   app.post("/login", auth.loginAdmin);
   app.post("/logout", auth.logoutAdmin);
   app.post("/change-pass", auth.changeAdminPassword);
-  app.post("/register", authIp.onlyAdminIp, auth.registerAdmin);
-  app.post("/recover-pass", authIp.onlyAdminIp, auth.recoverAdminPassword);
+  app.post("/register", auth.registerAdmin);
+  app.post("/recover-pass", auth.recoverAdminPassword);
 
   // Ping - health check
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));

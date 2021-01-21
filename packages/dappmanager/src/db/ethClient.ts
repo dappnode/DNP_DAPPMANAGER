@@ -8,7 +8,7 @@ import {
   EthClientTargetPackage,
   EthClientSyncedNotificationStatus
 } from "../types";
-import { joinWithDot, stripDots } from "./dbUtils";
+import { joinWithDot } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
 import { eventBus } from "../eventBus";
 
@@ -44,7 +44,7 @@ export const ethClientFallback = interceptOnSet(
 // be kept after switching between clients
 
 const ethClientUserSettingsKeyGetter = (target: EthClientTarget): string =>
-  joinWithDot(ETH_CLIENT_USER_SETTINGS, stripDots(target));
+  joinWithDot(ETH_CLIENT_USER_SETTINGS, target);
 const ethClientUserSettingsValidate = (
   id: string,
   userSettings?: UserSettings
@@ -63,7 +63,7 @@ export const ethClientUserSettings = dbMain.dynamicKeyValidate<
 export const ethClientInstallStatus = interceptOnSet(
   dbCache.dynamicKeyValidate<EthClientInstallStatus, EthClientTarget>(
     (target: EthClientTarget): string =>
-      joinWithDot(ETH_CLIENT_INSTALL_STATUS, stripDots(target)),
+      joinWithDot(ETH_CLIENT_INSTALL_STATUS, target),
     (id: string, installStatus?: EthClientInstallStatus): boolean =>
       typeof id === "string" && typeof installStatus === "object"
   )
@@ -74,8 +74,7 @@ export const ethClientInstallStatus = interceptOnSet(
  */
 export const ethClientStatus = interceptOnSet(
   dbCache.dynamicKeyValidate<EthClientStatus, EthClientTarget>(
-    (target: EthClientTarget): string =>
-      joinWithDot(ETH_CLIENT_STATUS, stripDots(target)),
+    (target: EthClientTarget): string => joinWithDot(ETH_CLIENT_STATUS, target),
     (id: string, status?: EthClientStatus): boolean =>
       typeof id === "string" && typeof status === "object"
   )

@@ -1,5 +1,10 @@
 import { CoreUpdateDataAvailable } from "../../common";
+import {
+  adminUiInstallPackageUrl,
+  adminUiUpdateCoreUrl
+} from "../../externalLinks";
 import { shortNameCapitalized } from "../../utils/format";
+import { urlJoin } from "../../utils/url";
 import { enableAutoUpdatesCmd } from "../telegramBot/commands";
 
 export function formatPackageUpdateNotification({
@@ -16,6 +21,7 @@ export function formatPackageUpdateNotification({
   autoUpdatesEnabled: boolean;
 }): string {
   const prettyName = shortNameCapitalized(dnpName);
+  const installUrl = urlJoin(adminUiInstallPackageUrl, dnpName);
 
   return [
     `New version ready to install for ${prettyName} (current version ${currentVersion})`,
@@ -24,7 +30,7 @@ export function formatPackageUpdateNotification({
         ` - upstream version: ${upstreamVersion}`
       : ` - version: ${newVersion}`,
 
-    `Connect to your DAppNode to install this new version [install / ${prettyName}](url).`,
+    `Connect to your DAppNode to install this new version [install / ${prettyName}](${installUrl}).`,
     autoUpdatesEnabled
       ? `You may also wait for auto-updates to automatically install this version for you`
       : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  ${enableAutoUpdatesCmd}`
@@ -47,7 +53,7 @@ export function formatSystemUpdateNotification({
         }`
     ),
 
-    `Connect to your DAppNode to install this [system / update](url).`,
+    `Connect to your DAppNode to install this [system / update](${adminUiUpdateCoreUrl}).`,
     autoUpdatesEnabled
       ? `You may also wait for auto-updates to automatically install this version for you`
       : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  ${enableAutoUpdatesCmd}`

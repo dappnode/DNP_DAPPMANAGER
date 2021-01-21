@@ -51,10 +51,6 @@
 
 /* Device Settings `/devices/:id` */
 
-.device-settings {
-  display: grid;
-  grid-gap: var(--default-spacing);
-}
 .device-settings > header {
   display: grid;
   justify-content: space-between;

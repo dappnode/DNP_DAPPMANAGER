@@ -35,13 +35,17 @@ export class SshCalls {
     return await this.sshManager.getStatus();
   };
 
-  sshPortChange = async ({ port }: { port: number }): Promise<void> => {
+  sshPortSet = async ({ port }: { port: number }): Promise<void> => {
     if (isNaN(port) || !isFinite(port)) throw Error(`Invalid port ${port}`);
     if (port > maxPortNumber)
       throw Error(`Port ${port} over maxPortNumber ${maxPortNumber}`);
     if (port < minPortNumber)
       throw Error(`Port ${port} under minPortNumber ${minPortNumber}`);
 
-    await this.sshManager.changePort(port);
+    await this.sshManager.setPort(port);
+  };
+
+  sshPortGet = async (): Promise<number> => {
+    return await this.sshManager.getPort();
   };
 }

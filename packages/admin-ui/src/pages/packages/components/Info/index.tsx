@@ -29,8 +29,10 @@ export function Info({
   const [gettingStartedShowLocal, setGettingStartedIsShown] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { dnpName, origin } = dnp;
-  const { version, upstreamVersion, links } = manifest || {};
+  // Show the version from `docker ps`, which the one affecting logic
+  const { dnpName, version, origin } = dnp;
+  // Show the upstream version from the manifest which is used for metadata only
+  const { upstreamVersion, links } = manifest || {};
 
   useEffect(() => {
     setGettingStartedIsShown(Boolean(gettingStartedShow));

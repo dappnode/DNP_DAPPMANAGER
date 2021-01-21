@@ -1,6 +1,13 @@
-import { AdminPasswordDb } from "../../api/auth/adminPasswordDb";
+import {
+  AdminPasswordDb,
+  AdminPasswordDbError
+} from "../../api/auth/adminPasswordDb";
 import { VpnApiClient } from "../../api/vpnApiClient";
-import { VpnDeviceCredentials, VpnDevice } from "../../types";
+import {
+  VpnDeviceCredentials,
+  VpnDevice,
+  VpnDeviceAdminPassword
+} from "../../types";
 
 // Temporal solution until eventBus is properly typed
 interface EventBusDevices {
@@ -47,9 +54,6 @@ export class DeviceCalls {
     id: string;
     isAdmin: boolean;
   }): Promise<void> => {
-    // Set admin status in VPN
-    await this.vpnApiClient.toggleAdmin({ id, isAdmin });
-
     // Set admin status in local DB
     this.adminPasswordDb.setIsAdmin(id, isAdmin);
 
@@ -120,13 +124,36 @@ export class DeviceCalls {
    * Returns a list of the existing devices, with the admin property
    */
   devicesList = async (): Promise<VpnDevice[]> => {
-    return await this.vpnApiClient.listDevices();
+    const vpnDevices = await this.vpnApiClient.listDevices();
+    return vpnDevices.map((device): VpnDevice => this.readDevice(device.id));
   };
 
   private devicelist = async (id: string): Promise<VpnDevice> => {
-    const devices = await this.vpnApiClient.listDevices();
-    const device = devices.find(d => d.id === id);
+    const vpnDevices = await this.vpnApiClient.listDevices();
+    const device = vpnDevices.find(d => d.id === id);
     if (!device) throw Error(`Device ${id} not found`);
-    return device;
+    return this.readDevice(device.id);
   };
+
+  private readDevice(id: string): VpnDevice {
+    const admin = this.adminPasswordDb.isAdmin(id);
+    if (admin) {
+      return { id, admin, ...this.getAdminPassword(id) };
+    } else {
+      return { id, admin };
+    }
+  }
+
+  private getAdminPassword(id: string): VpnDeviceAdminPassword {
+    try {
+      const password = this.adminPasswordDb.generateLoginToken(id);
+      return { hasChangedPassword: false as const, password };
+    } catch (e) {
+      if (e.message === AdminPasswordDbError.PASSWORD_CHANGED) {
+        return { hasChangedPassword: true as const };
+      } else {
+        throw e;
+      }
+    }
+  }
 }

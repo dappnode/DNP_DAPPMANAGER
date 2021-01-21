@@ -1,5 +1,4 @@
 import { eventBus } from "../eventBus";
-import * as db from "../db";
 import { PackageNotification, NotificationType } from "../types";
 
 /**
@@ -27,8 +26,6 @@ export async function notificationsTest({
       body: randomSentence(20)
     };
   }
-
-  db.notificationPush(notification.id, notification);
 
   eventBus.notification.emit(notification);
 }

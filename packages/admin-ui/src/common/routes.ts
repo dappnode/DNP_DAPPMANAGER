@@ -412,26 +412,35 @@ export interface Routes {
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
+   * Gets bot telegram status
+   */
+  telegramStatusGet: () => Promise<boolean>;
+
+  /**
    * Sets the status of the telegram bot
    * @param telegramStatus new status of the bot
    */
-  setTelegramStatus: (kwarg: { telegramStatus: boolean }) => Promise<void>;
+  telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
+
+  /**
+   * Gets bot telegram token
+   */
+  telegramTokenGet: () => Promise<string | null>;
 
   /**
    * Sets the telegram token
    * @param telegramToken new bot token
    */
-  setTelegramToken: (kwarg: { telegramToken: string }) => Promise<void>;
+  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
-   * Gets bot telegram status
+   * Return the current SSH port from sshd
    */
-  getTelegramStatus: () => Promise<boolean>;
-
-  /*
+  sshPortGet: () => Promise<number>;
+  /**
    * Change the SHH port on the DAppNode host
    */
-  sshPortChange: (kwargs: { port: number }) => Promise<void>;
+  sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
    * Disable or enable SSH on the DAppNode host
    */
@@ -499,7 +508,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsDiskGet: {},
   statsMemoryGet: {},
   getUserActionLogs: {},
-  getTelegramStatus: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -520,11 +528,14 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  setTelegramStatus: { log: true },
-  setTelegramToken: { log: true },
+  telegramStatusGet: {},
+  telegramStatusSet: { log: true },
+  telegramTokenGet: {},
+  telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
-  sshPortChange: { log: true },
+  sshPortGet: {},
+  sshPortSet: { log: true },
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},

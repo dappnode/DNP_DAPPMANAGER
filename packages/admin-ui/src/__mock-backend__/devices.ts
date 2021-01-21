@@ -1,10 +1,11 @@
 import { VpnDevice, Routes } from "../../src/common";
 
-const ip = "1.1.1.1";
 const url = "link-to-otp/?id=617824#hdfuisf";
+const password = "SAMPLETEMPPASSWORD";
 const initialDevices: VpnDevice[] = [
-  { id: "admin-name", admin: true, ip },
-  { id: "other-user", admin: false, ip }
+  { id: "admin-name", admin: true, hasChangedPassword: true },
+  { id: "other-user", admin: false },
+  { id: "second-admin", admin: true, hasChangedPassword: false, password }
 ];
 
 const devicesState = new Map<string, VpnDevice>(
@@ -23,12 +24,21 @@ export const devices: Pick<
   | "devicesList"
 > = {
   deviceAdd: async ({ id }) => {
-    devicesState.set(id, { id, admin: false, ip });
+    devicesState.set(id, { id, admin: false });
   },
-  deviceAdminToggle: async ({ id }) => {
+  deviceAdminToggle: async ({ id, isAdmin }) => {
     const device = devicesState.get(id);
     if (!device) throw Error(`No id ${id}`);
-    devicesState.set(id, { ...device, admin: !device.admin });
+    if (isAdmin) {
+      devicesState.set(id, {
+        id: device.id,
+        admin: true,
+        hasChangedPassword: false,
+        password
+      });
+    } else {
+      devicesState.set(id, { id: device.id, admin: false });
+    }
   },
   deviceCredentialsGet: async ({ id }) => {
     const device = devicesState.get(id);

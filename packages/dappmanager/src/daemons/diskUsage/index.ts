@@ -1,4 +1,5 @@
 import { AbortSignal } from "abort-controller";
+import * as db from "../../db";
 import shellExec from "../../utils/shell";
 import params from "../../params";
 import { eventBus } from "../../eventBus";
@@ -29,10 +30,6 @@ const thresholds = [
   }
 ];
 
-const thresholdIsActive: {
-  [thresholdId: string]: boolean;
-} = {};
-
 /**
  * Monitors disk usage of this DAppNode
  * If disk usage reaches a critical level (< 1GB)
@@ -49,6 +46,8 @@ async function monitorDiskUsage(): Promise<void> {
       throw Error("diskAvailableKBytes must be a number");
 
     for (const threshold of thresholds) {
+      const thresholdIsActive = db.diskUsageThreshold.get(threshold.id);
+
       if (diskAvailableKBytes < threshold.kb) {
         /**
          * This is a critical function that has failed in the past. The
@@ -59,8 +58,9 @@ async function monitorDiskUsage(): Promise<void> {
          */
 
         // If packages have already been stopped, skip
-        if (thresholdIsActive[threshold.id]) continue;
-        else thresholdIsActive[threshold.id] = true;
+
+        if (thresholdIsActive) continue;
+        db.diskUsageThreshold.set(threshold.id, true);
 
         // Log that the threshold has been triggered
         logs.warn(`Disk usage threshold "${threshold.id}" has been triggered`);
@@ -112,15 +112,13 @@ async function monitorDiskUsage(): Promise<void> {
             `Please, free up enough disk space and start them again.`
           ].join("\n\n")
         });
-        thresholdIsActive[threshold.id] = true;
 
         // Emit packages update
         eventBus.requestPackages.emit();
       } else if (diskAvailableKBytes > 1.2 * threshold.kb) {
         // If there is again enough free space, allow packages to be stopped
         // if disk space runs out agains
-        if (thresholdIsActive[threshold.id])
-          thresholdIsActive[threshold.id] = false;
+        if (thresholdIsActive) db.diskUsageThreshold.set(threshold.id, false);
       }
     }
   } catch (e) {
