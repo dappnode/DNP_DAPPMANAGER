@@ -9,7 +9,7 @@ export const NoConnection = ({ error }: { error?: Error | string }) => (
       Could not connect to DAppNode. Please make sure your VPN connection is
       still active. Otherwise, stop the connection and reconnect and try
       accessing this page again. If the problems persist, please reach us via{" "}
-      <a href="https://riot.im/app/#/room/#DAppNode:matrix.org">Riot</a> or{" "}
+      <a href="https://discord.gg/c28an8dA5k">Discord</a> or{" "}
       <a href="https://github.com/dappnode/DAppNode/issues/new">
         opening a Github issue
       </a>
