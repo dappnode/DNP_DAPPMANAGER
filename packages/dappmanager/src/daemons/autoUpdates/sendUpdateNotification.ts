@@ -38,19 +38,19 @@ export async function sendUpdatePackageNotificationMaybe(
   // Ensure the release resolves on IPFS
   const release = await releaseFetcher.getRelease(dnpName, newVersion);
 
-  eventBus.notification // Emit notification about new version available
-    .emit({
-      id: `update-available-${dnpName}-${newVersion}`,
-      type: "info",
-      title: `Update available for ${shortNameCapitalized(dnpName)}`,
-      body: formatPackageUpdateNotification({
-        dnpName: dnpName,
-        newVersion,
-        upstreamVersion: release.metadata.upstreamVersion,
-        currentVersion,
-        autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
-      })
-    });
+  // Emit notification about new version available
+  eventBus.notification.emit({
+    id: `update-available-${dnpName}-${newVersion}`,
+    type: "info",
+    title: `Update available for ${shortNameCapitalized(dnpName)}`,
+    body: formatPackageUpdateNotification({
+      dnpName: dnpName,
+      newVersion,
+      upstreamVersion: release.metadata.upstreamVersion,
+      currentVersion,
+      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+    })
+  });
 
   // Register version to prevent sending notification again
   db.notificationLastEmitVersion.set(dnpName, newVersion);
@@ -71,16 +71,16 @@ export async function sendUpdateSystemNotificationMaybe(
   )
     return; // Already emitted update available for this version
 
-  eventBus.notification // Emit notification about new version available
-    .emit({
-      id: `update-available-${dnpName}-${newVersion}`,
-      type: "info",
-      title: "System update available",
-      body: formatSystemUpdateNotification({
-        packages: data.packages,
-        autoUpdatesEnabled: isCoreUpdateEnabled()
-      })
-    });
+  // Emit notification about new version available
+  eventBus.notification.emit({
+    id: `update-available-${dnpName}-${newVersion}`,
+    type: "info",
+    title: "System update available",
+    body: formatSystemUpdateNotification({
+      packages: data.packages,
+      autoUpdatesEnabled: isCoreUpdateEnabled()
+    })
+  });
 
   data.packages;
 
