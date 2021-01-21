@@ -1,14 +1,21 @@
 import { Routes } from "../common";
 
 let isEnabled = false;
+let token: string | null = null;
 
 export const telegram: Pick<
   Routes,
-  "getTelegramStatus" | "setTelegramStatus" | "setTelegramToken"
+  | "telegramStatusGet"
+  | "telegramStatusSet"
+  | "telegramTokenGet"
+  | "telegramTokenSet"
 > = {
-  getTelegramStatus: async () => isEnabled,
-  setTelegramStatus: async ({ telegramStatus }) => {
+  telegramStatusGet: async () => isEnabled,
+  telegramStatusSet: async ({ telegramStatus }) => {
     isEnabled = telegramStatus;
   },
-  setTelegramToken: async () => {}
+  telegramTokenGet: async () => token,
+  telegramTokenSet: async ({ telegramToken }) => {
+    token = telegramToken;
+  }
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api, useApi } from "api";
 import { ReqStatus } from "types";
 import Form from "react-bootstrap/esm/Form";
@@ -12,16 +12,22 @@ import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
 
 export default function Notifications() {
-  const telegramStatus = useApi.getTelegramStatus();
+  const telegramStatus = useApi.telegramStatusGet();
+  const telegramToken = useApi.telegramTokenGet();
 
   const [reqStatusToken, setReqStatusToken] = useState<ReqStatus>({});
   const [reqStatusStatus, setReqStatusStatus] = useState<ReqStatus>({});
   const [token, setToken] = useState("");
 
+  // Update local `token` input with the token stored in the DAPPMANAGER DB `telegramToken`
+  useEffect(() => {
+    if (telegramToken.data) setToken(telegramToken.data);
+  }, [telegramToken.data]);
+
   async function updateTelegramToken() {
     try {
       setReqStatusToken({ loading: true });
-      await withToast(() => api.setTelegramToken({ telegramToken: token }), {
+      await withToast(() => api.telegramTokenSet({ telegramToken: token }), {
         message: `Setting telegram token...`,
         onSuccess: `Updated telegram token`
       });
@@ -32,7 +38,7 @@ export default function Notifications() {
       setToken("");
     } catch (e) {
       setReqStatusToken({ error: e });
-      console.error("Error on setTelegramToken", e);
+      console.error("Error on telegramTokenSet", e);
     }
   }
 
@@ -40,7 +46,7 @@ export default function Notifications() {
     try {
       setReqStatusStatus({ loading: true });
       await withToast(
-        () => api.setTelegramStatus({ telegramStatus: newStatus }),
+        () => api.telegramStatusSet({ telegramStatus: newStatus }),
         {
           message: newStatus ? "Enabling telegram..." : "Disabling telegram...",
           onSuccess: newStatus ? "Telegram ON" : "Telegram OFF"
@@ -50,7 +56,7 @@ export default function Notifications() {
       setReqStatusStatus({ result: true });
     } catch (e) {
       setReqStatusStatus({ error: e });
-      console.error("Error on setTelegramStatus", e);
+      console.error("Error on telegramStatusSet", e);
     }
   }
 
