@@ -10,7 +10,7 @@ import "./sshManager.scss";
 
 export function SshManagerChangePort() {
   const [port, setPort] = useState("");
-  const [reqGetStatus, setReqGetStatus] = useState<ReqStatus>({});
+  const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<number>>({});
   const [reqSetStatus, setReqSetStatus] = useState<ReqStatus>({});
 
   async function updatePort() {
@@ -29,7 +29,7 @@ export function SshManagerChangePort() {
       setReqGetStatus({ loading: true });
       const _port = await api.sshPortGet();
       setPort(String(_port));
-      setReqGetStatus({ result: true });
+      setReqGetStatus({ result: _port });
     } catch (e) {
       setReqGetStatus({ error: e });
       console.error("Error on sshStatusGet", e);
@@ -37,6 +37,8 @@ export function SshManagerChangePort() {
   }
 
   const portError = validatePort(port);
+  const portIsSame =
+    reqGetStatus.result && port && String(reqGetStatus.result) === port;
 
   return (
     <>
@@ -52,7 +54,7 @@ export function SshManagerChangePort() {
             </Button>
             <Button
               variant="dappnode"
-              disabled={!port || reqSetStatus.loading}
+              disabled={!port || portIsSame || reqSetStatus.loading}
               onClick={updatePort}
             >
               Change
