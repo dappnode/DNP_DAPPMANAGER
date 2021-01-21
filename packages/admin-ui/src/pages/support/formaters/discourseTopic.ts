@@ -46,10 +46,13 @@ export function formatTopicBody(
   const sections: TopicBodySection[] = [
     {
       title: "Core DAppNode Packages versions",
-      items: coreDnpVersions.map(({ name, version }) => ({
-        name,
-        data: typeof version === "object" ? printVersionData(version) : version
-      }))
+      items: coreDnpVersions
+        .map(({ name, version }) => ({
+          name,
+          data:
+            typeof version === "object" ? printVersionData(version) : version
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
     },
     {
       title: "System info",
