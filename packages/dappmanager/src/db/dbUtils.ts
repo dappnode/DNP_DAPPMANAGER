@@ -6,17 +6,19 @@
  *     secondKey: "value"
  *   }
  * }
+ *
+ * Runs `stripDots()` on all keys
  */
-export function joinWithDot(key1: string, key2: string): string {
-  return [key1, key2].join(".");
+export function joinWithDot(...keys: string[]): string {
+  return keys.map(stripDots).join(".");
 }
 
 /**
  * Convert "0.2.5" to "0-2-5". `MUST` be applied to any key that
  * may contain the dot character "."
  */
-export function stripDots(string: string): string {
-  return string.split(".").join("-");
+function stripDots(string: string): string {
+  return string.replace(/\./g, "-");
 }
 
 /**
