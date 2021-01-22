@@ -40,8 +40,10 @@ export default function SystemSecurity() {
       name: "Change WIFI default password",
       severity: "critical",
       component: ChangeWifiPassword,
-      isActive: Boolean(wifiStatus?.isDefault && wifiStatus?.running),
-      okMessage: wifiStatus?.running
+      isActive: Boolean(
+        wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
+      ),
+      okMessage: wifiStatus?.isRunning
         ? "WIFI credentials changed"
         : "WIFI is disabled"
     }

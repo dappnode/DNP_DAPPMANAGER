@@ -53,8 +53,6 @@ export const mandatoryCoreDnps = [
   // wifiDnpName
 ];
 export const corePackages = [...mandatoryCoreDnps, coreDnpName];
-// Container names
-export const wifiContainerName = "DAppNodeCore-wifi.dnp.dappnode.eth";
 
 // NACL keys
 export const adminNaclSecretKey =

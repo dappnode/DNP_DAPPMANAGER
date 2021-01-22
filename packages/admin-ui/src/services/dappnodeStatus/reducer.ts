@@ -1,12 +1,12 @@
 import { mapValues } from "lodash";
-import { SystemInfo, VolumeData, WifiStatus } from "types";
+import { SystemInfo, VolumeData, WifiCredentials } from "types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Service > dappnodeStatus
 
 interface DappnodeStatusState {
   systemInfo: SystemInfo | null;
-  wifiStatus: WifiStatus | null;
+  wifiCredentials: WifiCredentials | null;
   /**
    * Will trigger alerts when it's a boolean and false, x === false
    * Must be null at start
@@ -17,7 +17,7 @@ interface DappnodeStatusState {
 
 const initialState: DappnodeStatusState = {
   systemInfo: null,
-  wifiStatus: null,
+  wifiCredentials: null,
   passwordIsSecure: null,
   volumes: []
 };
