@@ -63,8 +63,8 @@ export default function DevicesHome() {
 
   function toggleAdmin(id: string, isAdmin: boolean) {
     withToastNoThrow(() => api.deviceAdminToggle({ id, isAdmin }), {
-      message: `${isAdmin ? "Removing" : "Making"} ${id} admin...`,
-      onSuccess: `${isAdmin ? "Made" : "Removed"} ${id} admin`
+      message: `${isAdmin ? "Making" : "Revoking"} ${id} admin...`,
+      onSuccess: `${isAdmin ? "Made" : "Revoked"} ${id} admin`
     }).then(devicesReq.revalidate);
   }
 
