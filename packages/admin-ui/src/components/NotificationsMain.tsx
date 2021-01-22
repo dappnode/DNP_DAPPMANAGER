@@ -68,7 +68,7 @@ export default function NotificationsView() {
       linkPath: systemRootPath + "/" + systemSubPaths.security,
       body:
         "**Change the DAppNode WIFI credentials**, they are insecure default values.",
-      active: wifiStatus?.isDefault && wifiStatus?.running
+      active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
     },
     /**
      * [HOST-USER-PASSWORD]

@@ -6,10 +6,9 @@ export interface DiagnoseObj {
   [diagnoseId: string]: DiagnoseItem;
 }
 
-export interface WifiStatus {
-  running: boolean;
+export interface WifiCredentials {
   ssid: string;
-  isDefault: boolean;
+  isDefaultPassphrase: boolean;
 }
 
 export interface ReqStatus<T = true, P = boolean> {

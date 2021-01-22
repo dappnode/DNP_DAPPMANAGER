@@ -5,6 +5,8 @@ import {
 } from "components/EthMultiClient";
 import { ChainData } from "types";
 import { activateFallbackPath } from "pages/system/data";
+import { getDnpInstalled } from "services/dnpInstalled/selectors";
+import { wifiDnpName } from "params";
 
 // Service > dappnodeStatus
 
@@ -69,8 +71,23 @@ export const getDappnodeIdentityClean = (state: RootState) => {
 export const getStaticIp = (state: RootState) =>
   (getSystemInfo(state) || {}).staticIp || "";
 
-export const getWifiStatus = (state: RootState) =>
-  state.dappnodeStatus.wifiStatus;
+function isWifiFirstContainerRunning(state: RootState): boolean {
+  const installedPackages = getDnpInstalled(state);
+  const wifiDnp = installedPackages.find(dnp => dnp.dnpName === wifiDnpName);
+  if (!wifiDnp) return false;
+
+  const wifiContainer = wifiDnp.containers[0];
+  if (!wifiContainer) return false;
+
+  return wifiContainer.running;
+}
+
+export const getWifiStatus = (state: RootState) => ({
+  isDefaultPassphrase:
+    state.dappnodeStatus.wifiCredentials?.isDefaultPassphrase,
+  isRunning: isWifiFirstContainerRunning(state),
+  ssid: state.dappnodeStatus.wifiCredentials?.ssid
+});
 
 /**
  * Returns a partial ChainData object with repository source status
