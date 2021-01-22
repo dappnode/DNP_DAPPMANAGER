@@ -25,6 +25,9 @@ if (process.env.TEST) {
   REPO_DIR = "./dnp_repo";
 }
 
+/** Absolute global ENVs .env file from DAPPMANAGER containers */
+const GLOBAL_ENVS_PATH = path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME);
+
 const params = {
   // File paths
   REPO_DIR,
@@ -47,9 +50,10 @@ const params = {
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
-  GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
-  GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
-  GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
+  /** Relative path to global ENVs from a core DNP docker-compose */
+  GLOBAL_ENVS_PATH_FOR_CORE: path.relative(DNCORE_DIR, GLOBAL_ENVS_PATH),
+  GLOBAL_ENVS_PATH_FOR_DNP: GLOBAL_ENVS_PATH,
+  GLOBAL_ENVS_PATH: GLOBAL_ENVS_PATH,
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),

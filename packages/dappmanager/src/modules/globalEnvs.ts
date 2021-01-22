@@ -27,10 +27,12 @@ export function computeGlobalEnvsFromDb(): GlobalEnvs {
   };
 }
 
-export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH_NODE;
+export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
 
 export function getGlobalEnvsFilePath(isCore: boolean): string {
-  return isCore ? params.GLOBAL_ENVS_PATH_CORE : params.GLOBAL_ENVS_PATH_DNP;
+  return isCore
+    ? params.GLOBAL_ENVS_PATH_FOR_CORE
+    : params.GLOBAL_ENVS_PATH_FOR_DNP;
 }
 
 /**
