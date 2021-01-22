@@ -2,8 +2,7 @@ import React from "react";
 import Button from "components/Button";
 import BottomButtons from "./BottomButtons";
 import newTabProps from "utils/newTabProps";
-
-const userGuideUrl = "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
+import { dappnodeUserGuideUrl } from "params";
 
 export default function Finished({
   onBack,
@@ -18,7 +17,7 @@ export default function Finished({
         <div className="title">All set!</div>
         <div className="description">
           Visit the{" "}
-          <a href={userGuideUrl} {...newTabProps}>
+          <a href={dappnodeUserGuideUrl} {...newTabProps}>
             user guide
           </a>{" "}
           for more info

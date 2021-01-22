@@ -5,7 +5,7 @@ import Card from "components/Card";
 // Styles
 import RenderMarkdown from "components/RenderMarkdown";
 import { formatTopicBody, formatTopicUrl } from "../formaters/discourseTopic";
-import { topicBaseUrl } from "params";
+import { topicBaseUrl, dappnodeForumUrl } from "params";
 import { PackageVersionData } from "common/types";
 import Ok from "components/Ok";
 import { FaDiscourse } from "react-icons/fa";
@@ -60,7 +60,7 @@ export default function Report() {
 
       <p>
         Before report, please, make sure that the topic does not already exits
-        in our <a href="https://forum.dappnode.io">forum</a>
+        in our <a href={dappnodeForumUrl}>forum</a>
       </p>
 
       <div className="discourse-topic-header">
