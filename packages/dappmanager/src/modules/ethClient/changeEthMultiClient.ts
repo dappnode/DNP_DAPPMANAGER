@@ -1,5 +1,5 @@
 import * as db from "../../db";
-import * as eventBus from "../../eventBus";
+import { eventBus } from "../../eventBus";
 import { ethClientData } from "../../params";
 import { packageRemove } from "../../calls";
 import { EthClientTarget, UserSettings } from "../../types";

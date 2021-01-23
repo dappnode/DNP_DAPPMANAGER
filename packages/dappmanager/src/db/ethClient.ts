@@ -5,11 +5,12 @@ import {
   UserSettings,
   EthClientFallback,
   EthClientStatus,
-  EthClientTargetPackage
+  EthClientTargetPackage,
+  EthClientSyncedNotificationStatus
 } from "../types";
-import { joinWithDot, stripDots } from "./dbUtils";
+import { joinWithDot } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";
@@ -21,6 +22,8 @@ const ETH_CLIENT_STATUS = "eth-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
 const ETH_CLIENT_MIGRATION_TEMP_SETTINGS = "eth-client-migration-temp-status";
+const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
+  "eth-client-synced-notification-status";
 
 // Re-export to consider the first value (when it's not set)
 // but do not allow to set null again. Using to express intentionality
@@ -41,7 +44,7 @@ export const ethClientFallback = interceptOnSet(
 // be kept after switching between clients
 
 const ethClientUserSettingsKeyGetter = (target: EthClientTarget): string =>
-  joinWithDot(ETH_CLIENT_USER_SETTINGS, stripDots(target));
+  joinWithDot(ETH_CLIENT_USER_SETTINGS, target);
 const ethClientUserSettingsValidate = (
   id: string,
   userSettings?: UserSettings
@@ -60,7 +63,7 @@ export const ethClientUserSettings = dbMain.dynamicKeyValidate<
 export const ethClientInstallStatus = interceptOnSet(
   dbCache.dynamicKeyValidate<EthClientInstallStatus, EthClientTarget>(
     (target: EthClientTarget): string =>
-      joinWithDot(ETH_CLIENT_INSTALL_STATUS, stripDots(target)),
+      joinWithDot(ETH_CLIENT_INSTALL_STATUS, target),
     (id: string, installStatus?: EthClientInstallStatus): boolean =>
       typeof id === "string" && typeof installStatus === "object"
   )
@@ -71,8 +74,7 @@ export const ethClientInstallStatus = interceptOnSet(
  */
 export const ethClientStatus = interceptOnSet(
   dbCache.dynamicKeyValidate<EthClientStatus, EthClientTarget>(
-    (target: EthClientTarget): string =>
-      joinWithDot(ETH_CLIENT_STATUS, stripDots(target)),
+    (target: EthClientTarget): string => joinWithDot(ETH_CLIENT_STATUS, target),
     (id: string, status?: EthClientStatus): boolean =>
       typeof id === "string" && typeof status === "object"
   )
@@ -109,3 +111,10 @@ export const ethClientMigrationTempSettings = dbCache.staticKey<{
   target: EthClientTargetPackage;
   EXTRA_OPTS: string;
 } | null>(ETH_CLIENT_MIGRATION_TEMP_SETTINGS, null);
+
+/**
+ * Cache the status of the eth client install loop
+ */
+export const ethClientSyncedNotificationStatus = dbCache.staticKey<
+  EthClientSyncedNotificationStatus
+>(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);

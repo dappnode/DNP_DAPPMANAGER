@@ -1,6 +1,74 @@
+import { AbortSignal } from "abort-controller";
 import async from "async";
 import memoize from "memoizee";
 import { logs } from "../logs";
+
+/**
+ * Throw this error when an upstream abort signal aborts
+ */
+export class ErrorAborted extends Error {
+  constructor(message?: string) {
+    super(`Aborted ${message || ""}`);
+  }
+}
+
+/**
+ * Abortable async setInterval that runs its callback once at max between `intervalMs` at minimum
+ * Returns on aborted
+ */
+export async function runAtMostEvery(
+  fn: () => Promise<void>,
+  intervalMs: number,
+  signal: AbortSignal
+): Promise<void> {
+  let lastRunMs = 0;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    lastRunMs = Date.now();
+
+    await fn().catch(e => {
+      console.error("Callbacks in runAtMostEvery should never throw", e);
+    });
+
+    const sleepTime = Math.max(intervalMs + lastRunMs - Date.now(), 0);
+
+    try {
+      await sleep(sleepTime, signal);
+    } catch (e) {
+      if (e instanceof ErrorAborted) return;
+      else throw e;
+    }
+  }
+}
+
+/**
+ * Abortable sleep function. Cleans everything on all cases preventing leaks
+ * On abort throws ErrorAborted
+ */
+export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal && signal.aborted) return reject(new ErrorAborted());
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    let onDone: () => void = () => {};
+
+    const timeout = setTimeout(() => {
+      onDone();
+      resolve();
+    }, ms);
+    const onAbort = (): void => {
+      onDone();
+      reject(new ErrorAborted());
+    };
+    if (signal) signal.addEventListener("abort", onAbort);
+
+    onDone = (): void => {
+      clearTimeout(timeout);
+      if (signal) signal.removeEventListener("abort", onAbort);
+    };
+  });
+}
 
 /**
  * Makes sure the target async function is running only once at every instant.
@@ -100,14 +168,20 @@ export function pause(ms: number): Promise<void> {
  */
 export function setIntervalDynamic(
   fn: () => void | Promise<void>,
-  msArray: number[]
+  msArray: number[],
+  signal: AbortSignal
 ): void {
+  let timeout: NodeJS.Timeout;
+  signal.addEventListener("abort", () => {
+    clearTimeout(timeout);
+  });
+
   const msFinal = msArray[msArray.length - 1];
   if (typeof msFinal !== "number")
     throw Error(`msArray must have at least one element`);
 
   function run(): void {
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       fn();
       run();
     }, msArray.shift() || msFinal);

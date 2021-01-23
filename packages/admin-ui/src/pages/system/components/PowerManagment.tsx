@@ -10,7 +10,7 @@ import { withToast } from "components/toast/Toast";
 function PowerManagment() {
   async function reboot() {
     try {
-      await new Promise(resolve =>
+      await new Promise<void>(resolve =>
         confirm({
           title: `Rebooting host`,
           text: `Are you sure you want to reboot the host machine? Only do this if it’s strictly necessary.`,
@@ -32,7 +32,7 @@ function PowerManagment() {
   async function powerOff() {
     try {
       // Since there are two consecutive modals, the async form must be used
-      await new Promise(resolve =>
+      await new Promise<void>(resolve =>
         confirm({
           title: `Powering off host`,
           text: `WARNING! Your machine will power off and you will not be able to turn it back on without physical access or a remote way to switch on the power.`,
@@ -42,7 +42,7 @@ function PowerManagment() {
         })
       );
 
-      await new Promise(resolve =>
+      await new Promise<void>(resolve =>
         confirm({
           title: `Are you sure?`,
           text: `Please make sure you have a way of turning the host machine’s power back on.`,

@@ -1,6 +1,6 @@
 import fs from "fs";
 import { orderBy } from "lodash";
-import * as eventBus from "./eventBus";
+import { eventBus } from "./eventBus";
 import params from "./params";
 import { UserActionLog } from "./types";
 import low from "lowdb";

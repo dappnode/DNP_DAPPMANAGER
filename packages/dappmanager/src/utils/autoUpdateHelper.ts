@@ -1,8 +1,8 @@
 import * as db from "../db";
 import params from "../params";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { pick, omit } from "lodash";
-import { areCoreVersionIdsIncluded } from "./coreVersionId";
+import { isVersionIdUpdated } from "./coreVersionId";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,
@@ -252,11 +252,13 @@ export function clearRegistry(dnpName: string): void {
  * "completed". So on every DAPPMANAGER start it must checked if a successful
  * update happen before restarting
  *
- * @param currentVersionId "admin@0.2.6,core@0.2.8"
+ * @param currentCorePackages To get the current version of installed packages
+ * If stored pending coreVersionId contains versions higher than this, it will
+ * be marked as done
  * @param timestamp Use ONLY to make tests deterministic
  */
 export function clearCompletedCoreUpdatesIfAny(
-  currentVersionId: string,
+  currentCorePackages: { dnpName: string; version: string }[],
   timestamp?: number
 ): void {
   const pending = getPending();
@@ -265,7 +267,7 @@ export function clearCompletedCoreUpdatesIfAny(
     pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
   const pendingVersionsAreInstalled =
     pendingVersionId &&
-    areCoreVersionIdsIncluded(pendingVersionId, currentVersionId);
+    isVersionIdUpdated(pendingVersionId, currentCorePackages);
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
     flagCompletedUpdate(coreDnpName, pendingVersionId, timestamp);
@@ -365,7 +367,7 @@ function setPending(dnpName: string, data: AutoUpdatePendingEntry): void {
  * Get an auto-update feedback message
  *
  * @param dnpName "bitcoin.dnp.dappnode.eth"
- * @param currentVersion "0.2.6", must come from dockerList, dnp.version
+ * @param currentVersion "0.2.6", must come from dnp.version
  * @returns feedback = {
  *   updated: 15363818244,
  *   manuallyUpdated: true,
@@ -423,7 +425,7 @@ export function getDnpFeedbackMessage({
  * the logic is different than for a single version DNP
  *
  * @param dnpName "bitcoin.dnp.dappnode.eth"
- * @param currentVersion "0.2.6", must come from dockerList, dnp.version
+ * @param currentVersion "0.2.6", must come from dnp.version
  * @returns feedback = {
  *   updated: 15363818244,
  *   manuallyUpdated: true,
@@ -431,17 +433,12 @@ export function getDnpFeedbackMessage({
  *   scheduled: 15363818244
  * }
  */
-export function getCoreFeedbackMessage({
-  currentVersionId,
-  registry,
-  pending
-}: {
-  currentVersionId: string;
-  registry?: AutoUpdateRegistry;
-  pending?: AutoUpdatePending;
-}): AutoUpdateFeedback {
-  if (!registry) registry = getRegistry();
-  if (!pending) pending = getPending();
+export function getCoreFeedbackMessage(
+  currentCorePackages: { dnpName: string; version: string }[],
+  data?: { registry?: AutoUpdateRegistry; pending?: AutoUpdatePending }
+): AutoUpdateFeedback {
+  const registry = data?.registry || getRegistry();
+  const pending = data?.pending || getPending();
 
   /**
    * Let's figure out the version of the core
@@ -452,10 +449,9 @@ export function getCoreFeedbackMessage({
   const lastUpdatedVersion = getLastRegistryEntry(registry[coreDnpName] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
-    areCoreVersionIdsIncluded(lastUpdatedVersion.version, currentVersionId);
+    isVersionIdUpdated(lastUpdatedVersion.version, currentCorePackages);
   const pendingVersionsAreInstalled =
-    pendingVersion &&
-    areCoreVersionIdsIncluded(pendingVersion, currentVersionId);
+    pendingVersion && isVersionIdUpdated(pendingVersion, currentCorePackages);
 
   if (scheduledUpdate) {
     // If the pending version is the current BUT it is NOT in the registry,

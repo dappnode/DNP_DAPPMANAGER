@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSubscription, useApi } from "api";
+import { useSubscription, useApi, apiRoutes } from "api";
 import { UserActionLog } from "types";
-import { apiUrls } from "params";
 // Components
 import CardList from "components/CardList";
 import ErrorView from "components/ErrorView";
@@ -16,7 +15,6 @@ import newTabProps from "utils/newTabProps";
 import "./activity.css";
 
 const badgeClass = "badge badge-pill badge-";
-const downloadUserActionLogsUrl = apiUrls.userActionLogs;
 
 function parseLevel(level: "error" | "warn" | "info"): string {
   if (level === "error") return "danger";
@@ -50,7 +48,7 @@ export default function Activity() {
 
       <div>
         <a
-          href={downloadUserActionLogsUrl}
+          href={apiRoutes.userActionLogsUrl()}
           {...newTabProps}
           className="no-a-style"
         >

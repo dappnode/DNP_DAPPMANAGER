@@ -1,37 +1,26 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import * as a from "../../actions";
+import {
+  validatePasswordsMatch,
+  validateStrongPasswordAsDockerEnv
+} from "utils/validation";
 // Components
 import Card from "components/Card";
-import Input from "components/Input";
 import Button from "components/Button";
-import Switch from "components/Switch";
-// Style
-import "./changeHostUserPassword.scss";
+import { InputForm } from "components/InputForm";
 
 export default function ChangeHostUserPassword() {
   const dispatch = useDispatch();
-  const [input, setInput] = useState("");
-  const [confirmInput, setConfirmInput] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
 
-  const errors = [];
-  if (input && input.length < 8)
-    errors.push("Password must be at least 8 characters long");
-  if (input.includes("'")) errors.push("Password MUST not include the quotes");
-  if (!/^([\x20-\x7F])*$/.test(input))
-    errors.push("Password must include only simple ASCII characters");
-
-  const errorsConfirm = [];
-  if (confirmInput && confirmInput !== input)
-    errorsConfirm.push("Passwords do not match");
-
-  const invalid =
-    !input || !confirmInput || errors.length || errorsConfirm.length;
-
-  const update = () => {
-    if (!invalid) dispatch(a.passwordChange(input));
-  };
+  const passwordError = validateStrongPasswordAsDockerEnv(password);
+  const password2Error = validatePasswordsMatch(password, password2);
+  const isValid = password && password2 && !passwordError && !password2Error;
+  function onChangePassword() {
+    if (isValid) dispatch(a.passwordChange(password));
+  }
 
   return (
     <Card spacing>
@@ -41,69 +30,39 @@ export default function ChangeHostUserPassword() {
         your DAppNode from external attackers.
       </div>
 
-      <div className="change-password-form">
-        <span>New password</span>
-        <div>
-          <Input
-            type={showPassword ? "text" : "password"}
-            placeholder="password..."
-            value={input}
-            onValueChange={setInput}
-            onEnterPress={update}
-            className={errors.length ? "is-invalid" : ""}
-          />
-          <div className="feedback-error">
-            {errors.map((line, i) => (
-              <span key={i}>
-                {line}
-                <br />
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <span>Confirm</span>
-        <div>
-          <Input
-            type={showPassword ? "text" : "password"}
-            placeholder="password..."
-            value={confirmInput}
-            onValueChange={setConfirmInput}
-            onEnterPress={update}
-            className={errorsConfirm.length ? "is-invalid" : ""}
-          />
-          <div className="feedback-error">
-            {errorsConfirm.map((line, i) => (
-              <span key={i}>
-                {line}
-                <br />
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <span className="separator" />
-        <div className="toggle">
-          <Switch
-            checked={showPassword}
-            onToggle={() => setShowPassword(_show => !_show)}
-            label="Show my password"
-            id="switch-password-visibility"
-            highlightOnHover
-          />
-        </div>
-
-        <span className="separator" />
-        <div className="submit-buttons">
-          <Button
-            variant="dappnode"
-            disabled={Boolean(invalid)}
-            onClick={update}
-          >
-            Change
-          </Button>
-        </div>
-      </div>
+      <InputForm
+        fields={[
+          {
+            label: "New password",
+            labelId: "new-password",
+            name: "new-host-password",
+            autoComplete: "new-password",
+            secret: true,
+            value: password,
+            onValueChange: setPassword,
+            error: passwordError
+          },
+          {
+            label: "Confirm new password",
+            labelId: "confirm-new-password",
+            name: "new-host-password",
+            autoComplete: "new-password",
+            secret: true,
+            value: password2,
+            onValueChange: setPassword2,
+            error: password2Error
+          }
+        ]}
+      >
+        <Button
+          type="submit"
+          variant="dappnode"
+          disabled={!isValid}
+          onClick={onChangePassword}
+        >
+          Change password
+        </Button>
+      </InputForm>
     </Card>
   );
 }

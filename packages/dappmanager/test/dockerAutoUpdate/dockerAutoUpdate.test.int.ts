@@ -7,11 +7,8 @@ import path from "path";
 import shell from "../../src/utils/shell";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../testUtils";
-import { listContainer } from "../../src/modules/docker/listContainers";
-import {
-  dockerList,
-  containerInspect
-} from "../../src/modules/docker/dockerApi";
+import { listContainer, listContainers } from "../../src/modules/docker/list";
+import { dockerContainerInspect } from "../../src/modules/docker/api";
 import { ComposeEditor } from "../../src/modules/compose/editor";
 
 /**
@@ -193,7 +190,7 @@ exit $UPEXIT
       "Final container should have the next version"
     );
 
-    const restartInspect = await containerInspect(restartContainerName);
+    const restartInspect = await dockerContainerInspect(restartContainerName);
 
     console.log(restartInspect.State);
     const restartFinished = new Date(restartInspect.State.FinishedAt);
@@ -261,28 +258,28 @@ exit $UPEXIT
     // Query the next container that should be running
     // Because it had failed to be brought up, it will be the temp renamed container
     // cea8fecfa936_DAppNodeTest-main-service
-    const [next] = await dockerList({ filters: { name: [mainContainerName] } });
+    const [next] = await listContainers();
     console.log(
-      `Next container ${next.Names[0]} ${next.State}, ID: ${next.Id}`
+      `Next container ${next.containerName} ${next.state}, ID: ${next.containerId}`
     );
     assert.strictEqual(
-      next.Names[0],
+      next.containerName,
       "/" + mainContainerName,
       "Wrong next container name, should not have a hex prefix"
     );
     assert.notStrictEqual(
-      next.Id,
+      next.containerId,
       prev.containerId,
       `${mainContainerName} prev and next containers should have the same ID ${prev.containerId}`
     );
     assert.strictEqual(
-      next.State,
+      next.state,
       "running",
       "Next container should be running"
     );
 
     assert.strictEqual(
-      await getVersion(next.Id),
+      await getVersion(next.containerId),
       versionPrev,
       "Final container should have the previous version"
     );

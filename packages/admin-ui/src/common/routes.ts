@@ -25,7 +25,9 @@ import {
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
-  PublicIpResponse
+  PublicIpResponse,
+  ChainData,
+  ShhStatus
 } from "./types";
 
 export interface Routes {
@@ -64,6 +66,12 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Returns chain data for all installed packages declared as chains
+   * Result is cached for 5 seconds across all consumers
+   */
+  chainDataGet(): Promise<ChainData[]>;
+
+  /**
    * Used to test different IPFS timeout parameters live from the ADMIN UI.
    * @param timeout new IPFS timeout in ms
    */
@@ -73,24 +81,6 @@ export interface Routes {
    * Cleans the cache files of the DAPPMANAGER:
    */
   cleanCache: () => Promise<void>;
-
-  /**
-   * Copy file from a DNP and downloaded on the client
-   * @param containerName Name of a docker container
-   * @param fromPath path to copy file from
-   * - If path = path to a file: "/usr/src/app/config.json".
-   *   Downloads and sends that file
-   * - If path = path to a directory: "/usr/src/app".
-   *   Downloads all directory contents, tar them and send as a .tar.gz
-   * - If path = relative path: "config.json".
-   *   Path becomes $WORKDIR/config.json, then downloads and sends that file
-   *   Same for relative paths to directories.
-   * @returns dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
-   */
-  copyFileFrom: (kwargs: {
-    containerName: string;
-    fromPath: string;
-  }) => Promise<string>;
 
   /**
    * Copy file to a DNP:
@@ -147,8 +137,25 @@ export interface Routes {
   /**
    * Gives/removes admin rights to the provided device id.
    * @param id Device id name
+   * @param isAdmin new admin status
    */
-  deviceAdminToggle: (kwargs: { id: string }) => Promise<void>;
+  deviceAdminToggle: (kwargs: {
+    id: string;
+    isAdmin: boolean;
+  }) => Promise<void>;
+
+  /**
+   * Returns true if a password has been created for this device
+   * @param id Device id name
+   */
+  devicePasswordHas: (kwargs: { id: string }) => Promise<boolean>;
+
+  /**
+   * Returns the login token of this device, creating it if necessary
+   * If the password has been changed and is no longer a login token, throws
+   * @param id Device id name
+   */
+  devicePasswordGet: (kwargs: { id: string }) => Promise<string>;
 
   /**
    * Returns a list of the existing devices, with the admin property
@@ -390,12 +397,6 @@ export interface Routes {
   rebootHost: () => Promise<void>;
 
   /**
-   * Requests chain data. Also instructs the DAPPMANAGER
-   * to keep sending data for a period of time (5 minutes)
-   */
-  requestChainData: () => Promise<void>;
-
-  /**
    * Receives an encrypted message containing the seed phrase of
    * 12 word mnemonic ethereum account. The extra layer of encryption
    * slightly increases the security of the exchange while the WAMP
@@ -409,6 +410,45 @@ export interface Routes {
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
+
+  /**
+   * Gets bot telegram status
+   */
+  telegramStatusGet: () => Promise<boolean>;
+
+  /**
+   * Sets the status of the telegram bot
+   * @param telegramStatus new status of the bot
+   */
+  telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
+
+  /**
+   * Gets bot telegram token
+   */
+  telegramTokenGet: () => Promise<string | null>;
+
+  /**
+   * Sets the telegram token
+   * @param telegramToken new bot token
+   */
+  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
+
+  /**
+   * Return the current SSH port from sshd
+   */
+  sshPortGet: () => Promise<number>;
+  /**
+   * Change the SHH port on the DAppNode host
+   */
+  sshPortSet: (kwargs: { port: number }) => Promise<void>;
+  /**
+   * Disable or enable SSH on the DAppNode host
+   */
+  sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
+  /**
+   * Check if SSH is enabled of disabled in the DAppNode host
+   */
+  sshStatusGet: () => Promise<ShhStatus>;
 
   /**
    * Returns the current DAppNode system info
@@ -445,15 +485,17 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: { log: true },
   backupGet: {},
   backupRestore: { log: true },
+  chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
-  copyFileFrom: { log: true },
   copyFileTo: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
   deviceCredentialsGet: {},
   deviceRemove: { log: true },
   deviceReset: { log: true },
+  devicePasswordGet: {},
+  devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
   domainAliasSet: { log: true },
@@ -486,9 +528,16 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordIsSecure: {},
   poweroffHost: { log: true },
   rebootHost: { log: true },
-  requestChainData: {},
+  telegramStatusGet: {},
+  telegramStatusSet: { log: true },
+  telegramTokenGet: {},
+  telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
+  sshPortGet: {},
+  sshPortSet: { log: true },
+  sshStatusGet: {},
+  sshStatusSet: { log: true },
   systemInfoGet: {},
   volumeRemove: { log: true },
   volumesGet: {},

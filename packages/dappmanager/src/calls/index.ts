@@ -1,12 +1,10 @@
-export * from "./device";
-
 export { autoUpdateDataGet } from "./autoUpdateDataGet";
 export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit";
 export { backupGet } from "./backupGet";
 export { backupRestore } from "./backupRestore";
+export { chainDataGet } from "./chainDataGet";
 export { changeIpfsTimeout } from "./changeIpfsTimeout";
 export { cleanCache } from "./cleanCache";
-export { copyFileFrom } from "./copyFileFrom";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
 export { domainAliasSet } from "./domainAliasSet";
@@ -40,10 +38,10 @@ export { passwordChange } from "./passwordChange";
 export { passwordIsSecure } from "./passwordIsSecure";
 export { poweroffHost } from "./poweroffHost";
 export { rebootHost } from "./rebootHost";
-export { requestChainData } from "./requestChainData";
 export { seedPhraseSet } from "./seedPhraseSet";
 export { setStaticIp } from "./setStaticIp";
 export { systemInfoGet } from "./systemInfoGet";
+export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export { ipPublicGet } from "./ipPublicGet";

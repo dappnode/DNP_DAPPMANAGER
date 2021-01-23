@@ -8,10 +8,8 @@ import { MdHome, MdRefresh } from "react-icons/md";
 import { joinCssClass } from "utils/css";
 import { MountpointData } from "types";
 import newTabProps from "utils/newTabProps";
+import { troubleShootMountpointsGuideUrl } from "params";
 import "./selectMountpoint.scss";
-
-const troubleshootUrl =
-  "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
 
 function renderMountpointDataSummary({
   mountpoint,
@@ -172,7 +170,7 @@ export default function SelectMountpoint({
             )}
 
             <Dropdown.Item
-              href={troubleshootUrl}
+              href={troubleShootMountpointsGuideUrl}
               {...newTabProps}
               className="troubleshoot"
             >

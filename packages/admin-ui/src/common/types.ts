@@ -1,16 +1,26 @@
+// AUTH, SESSION types
+export interface LoginStatusReturn {
+  username: string;
+  isAdmin: boolean;
+}
+
+// SSH types
+
+export type ShhStatus = "enabled" | "disabled";
+
 // Device types
 
-export interface VpnDeviceCredentials {
-  filename: string;
-  key: string;
-  url: string;
-}
+export type VpnDeviceAdminPassword =
+  | { hasChangedPassword: true }
+  | { hasChangedPassword: false; password: string };
 
-export interface VpnDevice {
-  id: string;
-  admin: boolean;
-  ip: string;
-}
+export type VpnDevice =
+  | { id: string; admin: false }
+  | ({ id: string; admin: true } & VpnDeviceAdminPassword);
+
+export type VpnDeviceCredentials = VpnDevice & {
+  url: string;
+};
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
@@ -309,8 +319,17 @@ export type ContainerState =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
-export type ChainDriver = "bitcoin" | "ethereum" | "monero";
-export const chainDrivers: ChainDriver[] = ["bitcoin", "ethereum", "monero"];
+export type ChainDriver =
+  | "bitcoin"
+  | "ethereum"
+  | "ethereum2-beacon-chain-prysm"
+  | "monero";
+export const chainDrivers: ChainDriver[] = [
+  "bitcoin",
+  "ethereum",
+  "ethereum2-beacon-chain-prysm",
+  "monero"
+];
 
 /**
  * Type mapping of a package container labels
@@ -383,6 +402,7 @@ export interface PackageContainer {
   ip?: string; // IP of the DNP in the dappnode network
   state: ContainerState;
   running: boolean;
+  exitCode: number | null;
   ports: PortMapping[];
   volumes: VolumeMapping[];
 
@@ -490,31 +510,36 @@ export interface ComposeVolumes {
 }
 
 export interface ComposeService {
-  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
-  ports?: string[];
-  environment?: PackageEnvs | string[];
-  labels?: { [labelName: string]: string };
-  env_file?: string[];
-  // ipv4_address: "172.33.1.7";
-  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
-  dns?: string; // "172.33.1.2";
-  restart?: string; // "unless-stopped";
-  privileged?: boolean;
   cap_add?: string[];
   cap_drop?: string[];
-  devices?: string[];
-  network_mode?: string;
   command?: string;
+  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  devices?: string[];
+  dns?: string; // "172.33.1.2";
   entrypoint?: string;
-  // Logging
+  env_file?: string[];
+  environment?: PackageEnvs | string[];
+  expose?: string[];
+  extra_hosts?: string[];
+  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
+  // ipv4_address: "172.33.1.7";
+  labels?: { [labelName: string]: string };
   logging?: {
     driver?: string;
     options?: {
       [optName: string]: string | number | null;
     };
   };
+  network_mode?: string;
+  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
+  ports?: string[];
+  privileged?: boolean;
+  restart?: string; // "unless-stopped";
+  stop_grace_period?: string;
+  stop_signal?: string;
+  user?: string;
+  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
+  working_dir?: string;
 }
 
 export interface Compose {
@@ -555,7 +580,7 @@ export interface PackageBackup {
   service?: string;
 }
 
-export type NotificationType = "danger" | "warning" | "success";
+export type NotificationType = "danger" | "warning" | "success" | "info";
 export interface PackageNotification {
   id: string; // "notification-id"
   type: NotificationType;
@@ -733,14 +758,21 @@ export interface DependencyListItem {
   warningOnInstall?: string;
 }
 
-export interface CoreUpdateData {
-  available: boolean;
+export interface CoreUpdateDataNotAvailable {
+  available: false;
+}
+export interface CoreUpdateDataAvailable {
+  available: true;
   type?: string;
   packages: DependencyListItem[];
   changelog: string;
   updateAlerts: ManifestUpdateAlert[];
   versionId: string;
+  coreVersion: string;
 }
+export type CoreUpdateData =
+  | CoreUpdateDataNotAvailable
+  | CoreUpdateDataAvailable;
 
 /**
  * Releases types
@@ -812,6 +844,7 @@ export type InstallPackageDataPaths = Pick<
   | "imagePath"
   | "isUpdate"
   | "dockerTimeout"
+  | "containersStatus"
 >;
 
 export interface InstallPackageData extends PackageRelease {
@@ -826,6 +859,16 @@ export interface InstallPackageData extends PackageRelease {
   compose: Compose;
   // User settings to be applied after running
   fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  dockerTimeout: number | undefined;
+  containersStatus: ContainersStatus;
+}
+
+export interface ContainersStatus {
+  [serviceName: string]: ContainerStatus;
+}
+
+export interface ContainerStatus {
+  targetStatus: "stopped" | "running";
   dockerTimeout: number | undefined;
 }
 

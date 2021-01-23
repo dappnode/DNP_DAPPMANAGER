@@ -16,7 +16,7 @@ import DnpStore from "./DnpStore";
 // Components
 import Title from "components/Title";
 import Input from "components/Input";
-import Button, { ButtonLight } from "components/Button";
+import Button from "components/Button";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Alert from "react-bootstrap/Alert";
@@ -114,7 +114,7 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
         value={query}
         onValueChange={(value: string) => setQuery(correctPackageName(value))}
         onEnterPress={runQuery}
-        append={<ButtonLight onClick={runQuery}>Search</ButtonLight>}
+        append={<Button onClick={runQuery}>Search</Button>}
       />
 
       {isEmpty(categories) && directory.length ? (

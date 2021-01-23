@@ -8,15 +8,14 @@ import coerceDeviceName from "../helpers/coerceDeviceName";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
-import Button from "components/Button";
 import Title from "components/Title";
 import Card from "components/Card";
 import Switch from "components/Switch";
-import { ButtonLight } from "components/Button";
+import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
-import { superAdminId } from "params";
+import { MAIN_ADMIN_NAME } from "params";
 
 export default function DevicesHome() {
   const [input, setInput] = useState("");
@@ -45,13 +44,13 @@ export default function DevicesHome() {
   }
 
   function resetDevice(id: string) {
-    const isSuperAdmin = id === superAdminId;
+    const isMainAdmin = id === MAIN_ADMIN_NAME;
     confirm({
-      title: isSuperAdmin
-        ? `WARNING! Reseting super admin`
+      title: isMainAdmin
+        ? `WARNING! Reseting main admin`
         : `Reseting ${id} device`,
-      text: isSuperAdmin
-        ? "You should only reset the credentials of the super admin if you suspect an unwanted party gained access to this credentials. If that is the case, reset the credentials, BUT download and install the new credentials IMMEDIATELY. Otherwise, you will lose access to your DAppNode when this connection stops"
+      text: isMainAdmin
+        ? "You should only reset the credentials of the main admin if you suspect an unwanted party gained access to this credentials. If that is the case, reset the credentials, BUT download and install the new credentials IMMEDIATELY. Otherwise, you will lose access to your DAppNode when this connection stops"
         : "All profiles and links pointing to this device will no longer be valid",
       label: `Reset`,
       onClick: () =>
@@ -62,10 +61,10 @@ export default function DevicesHome() {
     });
   }
 
-  function toggleAdmin(id: string) {
-    withToastNoThrow(() => api.deviceAdminToggle({ id }), {
-      message: `Toggling ${id} admin...`,
-      onSuccess: `Toggled ${id} admin`
+  function toggleAdmin(id: string, isAdmin: boolean) {
+    withToastNoThrow(() => api.deviceAdminToggle({ id, isAdmin }), {
+      message: `${isAdmin ? "Making" : "Revoking"} ${id} admin...`,
+      onSuccess: `${isAdmin ? "Made" : "Revoked"} ${id} admin`
     }).then(devicesReq.revalidate);
   }
 
@@ -111,16 +110,19 @@ export default function DevicesHome() {
           <header>Reset</header>
           <header>Remove</header>
           {[...data]
-            // Sort super admin device as first
-            .sort(d1 => (d1.id === superAdminId ? -1 : 0))
+            // Sort main admin device as first
+            .sort(d1 => (d1.id === MAIN_ADMIN_NAME ? -1 : 0))
             .map(({ id, admin }) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
                 <NavLink to={"/devices/" + id} className="no-a-style">
-                  <ButtonLight className="get-link">Get</ButtonLight>
+                  <Button className="get-link">Get</Button>
                 </NavLink>
 
-                <Switch checked={admin} onToggle={() => toggleAdmin(id)} />
+                <Switch
+                  checked={admin}
+                  onToggle={() => toggleAdmin(id, !admin)}
+                />
                 <MdRefresh
                   style={{ fontSize: "1.05rem" }}
                   onClick={() => resetDevice(id)}

@@ -1,10 +1,10 @@
 import React from "react";
 import { SetupWizardField } from "types";
 import Input from "components/Input";
-import { InputFieldSecret } from "./InputFieldSecret";
 import InputFieldSelect from "./InputFieldSelect";
 import InputFieldFile from "./InputFieldFile";
 import SelectMountpoint from "./SelectMountpoint";
+import { InputSecret } from "components/InputSecret";
 
 export default function InputField({
   field,
@@ -29,7 +29,7 @@ export default function InputField({
         />
       );
     else if (isSecret(field))
-      return <InputFieldSecret value={value} onValueChange={onValueChange} />;
+      return <InputSecret value={value} onValueChange={onValueChange} />;
     else return <Input value={value} onValueChange={onValueChange} />;
   } else if (field.target.type === "fileUpload") {
     return (

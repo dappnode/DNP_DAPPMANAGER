@@ -1,12 +1,12 @@
-import * as eventBus from "../eventBus";
-import { Subscriptions } from "../common";
-import * as db from "../db";
-import { isNewDappmanagerVersion } from "../utils/getVersionData";
-import * as calls from "../calls";
+import { EventBus } from "../eventBus";
+import { Subscriptions, Routes } from "../common";
 
-export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
+export function mapSubscriptionsToEventBus(
+  subscriptions: Subscriptions,
+  calls: Routes,
+  eventBus: EventBus
+): void {
   // Pipe local events to WAMP
-  eventBus.chainData.on(subscriptions.chainData.emit);
   eventBus.logUi.on(subscriptions.progressLog.emit);
   eventBus.logUserAction.on(subscriptions.userActionLog.emit);
   eventBus.packages.on(subscriptions.packages.emit);
@@ -33,9 +33,8 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
     subscriptions.systemInfo.emit(await calls.systemInfoGet());
   });
 
-  // Store notification in DB and push it to the UI
+  // Push notifications to the UI
   eventBus.notification.on(notification => {
-    db.notificationPush(notification.id, notification);
     subscriptions.pushNotification.emit(notification);
   });
 
@@ -46,8 +45,4 @@ export function mapSubscriptionsToEventBus(subscriptions: Subscriptions): void {
    */
   eventBus.requestAutoUpdateData.emit();
   eventBus.requestPackages.emit();
-
-  // If DAPPMANAGER's version has changed reload the client
-  if (isNewDappmanagerVersion())
-    subscriptions.reloadClient.emit({ reason: "New version" });
 }

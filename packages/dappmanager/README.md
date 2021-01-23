@@ -6,4 +6,4 @@ The list of available **remote procedure calls** ([**RPC**](https://wamp-proto.o
 
 The non-trivial handlers of the aforementioned RPCs use **modules** to perform actions. The available modules can be found in the [`src/modules`](./src/modules) directory.
 
-The dappmanager also performs long running tasks which are named **watchers**. The available modules can be found in the [`src/watchers`](./src/watchers) directory.
+The dappmanager also performs long running tasks which are named **daemons**. The available modules can be found in the [`src/daemons`](./src/daemons) directory.

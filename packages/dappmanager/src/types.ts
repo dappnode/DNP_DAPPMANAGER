@@ -1,3 +1,4 @@
+import { EthClientTargetPackage } from "./common";
 export * from "./common";
 
 export interface ContainerLabelsRaw {
@@ -24,3 +25,12 @@ export type NodeArch =
   | "s390x"
   | "x32"
   | "x64";
+
+export type EthClientSyncedNotificationStatus = {
+  target: EthClientTargetPackage;
+  status: "AwaitingSynced" | "Synced";
+} | null;
+
+export interface DiskUsageThresholds {
+  [thresholdId: string]: boolean;
+}

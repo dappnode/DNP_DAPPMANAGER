@@ -17,7 +17,10 @@ import SystemUpdate from "./SystemUpdate";
 import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
+import Profile from "./Profile";
+import { Advanced } from "./Advanced";
 import Title from "components/Title";
+import Notifications from "./Notifications";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -30,6 +33,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Info",
       subPath: subPaths.info,
       component: SystemInfo
+    },
+    {
+      name: "Notifications",
+      subPath: subPaths.notifications,
+      component: Notifications
     },
     {
       name: "Identity",
@@ -67,6 +75,16 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Peers",
       subPath: subPaths.peers,
       component: Peers
+    },
+    {
+      name: "Profile",
+      subPath: subPaths.profile,
+      component: Profile
+    },
+    {
+      name: "Advanced",
+      subPath: subPaths.advanced,
+      component: Advanced
     },
     {
       name: "Power",

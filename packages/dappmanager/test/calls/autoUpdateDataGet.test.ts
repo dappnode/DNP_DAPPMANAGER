@@ -28,21 +28,21 @@ describe("Call function: autoUpdateDataGet", () => {
       },
       {
         ...mockDnp,
-        dnpName: "admin",
+        dnpName: "admin.dnp.dappnode.eth",
         isDnp: false,
         isCore: true,
         version: "0.2.1"
       },
       {
         ...mockDnp,
-        dnpName: "core",
+        dnpName: "core.dnp.dappnode.eth",
         isDnp: false,
         isCore: true,
         version: "0.2.1"
       },
       {
         ...mockDnp,
-        dnpName: "vpn",
+        dnpName: "vpn.dnp.dappnode.eth",
         isDnp: false,
         isCore: true,
         version: "0.2.0"
@@ -56,7 +56,7 @@ describe("Call function: autoUpdateDataGet", () => {
     const mock = await rewiremock.around(
       () => import("../../src/calls/autoUpdateDataGet"),
       mock => {
-        mock(() => import("../../src/modules/docker/listContainers"))
+        mock(() => import("../../src/modules/docker/list"))
           .with({ listPackages })
           .toBeUsed();
       }

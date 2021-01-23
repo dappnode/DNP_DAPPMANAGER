@@ -1,0 +1,37 @@
+.network-editor {
+  table {
+    width: 100%;
+
+    tr:not(:last-child) td,
+    thead td {
+      padding-bottom: var(--default-spacing);
+    }
+    td:not(:last-child) {
+      padding-right: var(--default-spacing);
+    }
+  }
+
+  .error {
+    color: var(--danger-color);
+  }
+
+  .button-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .unmapped-ports {
+    .text {
+      color: var(--light-text-color);
+    }
+    .buttons {
+      > *:not(:last-child) {
+        margin-right: 1rem;
+      }
+      > * {
+        margin-bottom: 1rem;
+      }
+      margin-bottom: -1rem;
+    }
+  }
+}

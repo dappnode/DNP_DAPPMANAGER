@@ -1,0 +1,8 @@
+.forgot-password-text {
+  color: var(--light-text-color);
+  cursor: pointer;
+  transition: color 0.1s;
+  &:hover {
+    color: inherit;
+  }
+}

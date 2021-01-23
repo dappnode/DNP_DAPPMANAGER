@@ -3,7 +3,7 @@ import fs from "fs";
 import * as db from "../db";
 import params from "../params";
 import { logs } from "../logs";
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 import { packageRestart } from "./packageRestart";
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";

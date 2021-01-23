@@ -34,10 +34,10 @@ describe("Call function: packageRemove", function() {
   };
 
   const dockerComposeDown = sinon.stub().resolves();
-  const dockerRm = sinon.stub().resolves();
+  const dockerContainerRemove = sinon.stub().resolves();
   const listPackage = sinon.stub().resolves(dnp);
 
-  const eventBus = {
+  const eventBus: any = {
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
     packagesModified: { emit: sinon.stub(), on: sinon.stub() }
   };
@@ -48,13 +48,16 @@ describe("Call function: packageRemove", function() {
     const mock = await rewiremock.around(
       () => import("../../src/calls/packageRemove"),
       mock => {
-        mock(() => import("../../src/modules/docker/dockerCommands"))
-          .with({ dockerComposeDown, dockerRm })
+        mock(() => import("../../src/modules/docker/compose"))
+          .with({ dockerComposeDown })
+          .toBeUsed();
+        mock(() => import("../../src/modules/docker"))
+          .with({ dockerContainerRemove })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
-          .with(eventBus)
+          .with({ eventBus })
           .toBeUsed();
-        mock(() => import("../../src/modules/docker/listContainers"))
+        mock(() => import("../../src/modules/docker/list"))
           .with({ listPackage })
           .toBeUsed();
       }

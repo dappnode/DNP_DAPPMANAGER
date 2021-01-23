@@ -30,7 +30,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
 
     // If there are NOT conflicting volumes,
     // Display a dialog to confirm volumes reset
-    await new Promise(resolve =>
+    await new Promise<void>(resolve =>
       confirm({
         title: `Removing ${sn(dnpName)} data`,
         text: `This action cannot be undone. If this DAppNode Package is a blockchain node, it will lose all the chain data and start syncing from scratch.`,

@@ -17,7 +17,9 @@ describe("Fetch external data", () => {
   describe("fetchCoreUpdateData", () => {
     it("Should fetch core update data", async () => {
       const result = await calls.fetchCoreUpdateData({});
-      expect(result.available, "Core update should be available").to.be.true;
+      if (!result.available) {
+        throw Error("Core update should be available");
+      }
       const dnpBind = result.packages.find(({ name }) => name === bindId);
       expect(dnpBind, "Bind DNP must be in packages array").to.be.ok;
     });

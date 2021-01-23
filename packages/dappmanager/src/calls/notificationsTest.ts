@@ -1,5 +1,4 @@
-import * as eventBus from "../eventBus";
-import * as db from "../db";
+import { eventBus } from "../eventBus";
 import { PackageNotification, NotificationType } from "../types";
 
 /**
@@ -27,8 +26,6 @@ export async function notificationsTest({
       body: randomSentence(20)
     };
   }
-
-  db.notificationPush(notification.id, notification);
 
   eventBus.notification.emit(notification);
 }
@@ -66,6 +63,6 @@ function randomSentence(numOfWords: number): string {
 }
 
 function randomType(): NotificationType {
-  const types: NotificationType[] = ["danger", "warning", "success"];
+  const types: NotificationType[] = ["danger", "warning", "success", "info"];
   return types[Math.floor(Math.random() * types.length)];
 }

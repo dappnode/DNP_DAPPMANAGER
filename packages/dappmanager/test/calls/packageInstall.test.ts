@@ -70,7 +70,7 @@ describe.skip("Call function: packageInstall", function() {
     }
   }
 
-  const eventBus = {
+  const eventBus: any = {
     runNatRenewal: { emit: sinon.stub(), on: sinon.stub() },
     requestPackages: { emit: sinon.stub(), on: sinon.stub() },
     packageModified: { emit: sinon.stub(), on: sinon.stub() }
@@ -86,7 +86,7 @@ describe.skip("Call function: packageInstall", function() {
           .with({ ReleaseFetcher: ReleaseFetcherMock })
           .toBeUsed();
         mock(() => import("../../src/eventBus"))
-          .with(eventBus)
+          .with({ eventBus })
           .toBeUsed();
       }
     );

@@ -1,12 +1,12 @@
 import { mapValues, omit } from "lodash";
 import semver from "semver";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import deepmerge from "deepmerge";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { ReleaseFetcher } from "../modules/release";
-import { dockerInfoArchive } from "../modules/docker/dockerApi";
+import { dockerInfoArchive } from "../modules/docker/api";
 import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor";
 import { parseSpecialPermissions } from "../modules/compose/specialPermissions";
 import {

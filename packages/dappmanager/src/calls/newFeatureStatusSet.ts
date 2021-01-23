@@ -1,5 +1,5 @@
 import * as db from "../db";
-import * as eventBus from "../eventBus";
+import { eventBus } from "../eventBus";
 import { NewFeatureId, NewFeatureStatus } from "../types";
 
 /**

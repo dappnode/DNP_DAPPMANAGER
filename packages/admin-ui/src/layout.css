@@ -232,24 +232,6 @@ body {
   margin-bottom: var(--default-spacing);
 }
 
-/********************
-  SPECIAL STAND-ALONE
-  *******************
-  Used in:
-  - NonAdmin
-  - NoConnection
- */
-.standalone-container {
-  display: flex;
-  flex-direction: column;
-  place-items: center;
-  padding: 5em;
-  padding: 5em 1em;
-  text-align: center;
-  background-color: var(--color-background);
-  min-height: 100vh;
-}
-
 /*************
   Additional
   ************

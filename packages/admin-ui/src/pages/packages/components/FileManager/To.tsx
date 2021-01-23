@@ -51,7 +51,7 @@ export function CopyFileTo({
         );
       } catch (e) {
         console.error(
-          `Error on copyFileFrom ${containerName} ${toPath}: ${e.stack}`
+          `Error on copyFileTo ${containerName} ${toPath}: ${e.stack}`
         );
       }
   }

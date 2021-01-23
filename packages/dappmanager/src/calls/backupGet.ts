@@ -6,7 +6,7 @@ import { logs } from "../logs";
 import * as db from "../db";
 import params from "../params";
 // Modules
-import { listPackage } from "../modules/docker/listContainers";
+import { listPackage } from "../modules/docker/list";
 // Utils
 import shell from "../utils/shell";
 import validateBackupArray from "../utils/validateBackupArray";

@@ -1,4 +1,4 @@
-import { PackageContainer } from "../../types";
+import stripAnsi from "strip-ansi";
 
 /**
  * When fetching logs from the API, each line is prefixed by a Header
@@ -30,11 +30,14 @@ import { PackageContainer } from "../../types";
  *
  * is the header
  */
-export function stripDockerApiLogsHeader(logs: string): string {
-  return logs
-    .split("\n")
-    .map(stripDockerApiLogHeader)
-    .join("\n");
+export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
+  // Running strip-ansi for each line is 20-25 times slower than all at once.
+  return stripAnsi(
+    logs
+      .split("\n")
+      .map(line => stripDockerApiLogHeader(line))
+      .join("\n")
+  );
 }
 
 function stripDockerApiLogHeader(line: string): string {
@@ -51,7 +54,7 @@ function stripDockerApiLogHeader(line: string): string {
  * @param containers
  */
 export function getDockerTimeoutMax(
-  containers: PackageContainer[]
+  containers: { dockerTimeout?: number }[]
 ): number | undefined {
   let timeout: number | undefined = undefined;
 

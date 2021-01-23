@@ -5,6 +5,13 @@ import "source-map-support/register";
 import { logSafeObjects } from "./utils/logs";
 import { inspect } from "util";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LogArguments = string | Error | { [key: string]: any };
+type LogLevel = "debug" | "info" | "warn" | "error";
+export type Logs = {
+  [P in LogLevel]: (...items: LogArguments[]) => void;
+};
+
 // Make NodeJS inspect render deeply nested objects
 // Print { b: { d: { f: { h: { i: 'i' } } } } }
 // Instead of { b: { d: [ Object ] } }
@@ -23,7 +30,7 @@ const tags = {
 
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-console */
-export const logs = {
+export const logs: Logs = {
   /**
    * Allows to log any type of data. Strings will be shown first.
    * ```js
@@ -60,10 +67,8 @@ export const logs = {
 
 export class ErrorNoStack extends Error {}
 
-function formatLogger(tag: string, logger: (...args: any[]) => void) {
-  return function log(
-    ...items: (string | Error | { [key: string]: any })[]
-  ): void {
+function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
+  return function log(...items: LogArguments[]): void {
     try {
       const caller = getLocation(Error(), 1) || "??";
       const data = items

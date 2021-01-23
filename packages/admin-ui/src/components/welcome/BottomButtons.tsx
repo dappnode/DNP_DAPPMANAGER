@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "components/Button";
+import Button, { ButtonVariant } from "components/Button";
 
 export default function BottomButtons({
   onBack,
@@ -13,8 +13,8 @@ export default function BottomButtons({
   onNext?: () => void;
   backTag?: string;
   nextTag?: string;
-  backVariant?: string;
-  nextVariant?: string;
+  backVariant?: ButtonVariant;
+  nextVariant?: ButtonVariant;
 }) {
   return (
     <div className="bottom-buttons">

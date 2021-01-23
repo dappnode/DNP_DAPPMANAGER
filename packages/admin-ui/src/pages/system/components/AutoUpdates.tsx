@@ -85,7 +85,7 @@ export default function AutoUpdates() {
 
           <div className="list-grid auto-updates">
             {/* Table header */}
-            <span className="stateBadge" />
+            <span className="state-badge" />
             <span className="name" />
             <span className="last-update header">Last auto-update</span>
             <span className="header">Enabled</span>
@@ -178,7 +178,7 @@ function AutoUpdateItem({
   return (
     <React.Fragment key={id}>
       <span
-        className={`stateBadge center badge-${
+        className={`state-badge center badge-${
           enabled ? "success" : "secondary"
         }`}
         style={{ opacity: 0.85 }}

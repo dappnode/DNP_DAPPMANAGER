@@ -3,7 +3,7 @@ import path from "path";
 import {
   dockerCopyFileTo,
   dockerGetContainerWorkingDir
-} from "../modules/docker/dockerCommands";
+} from "../modules/docker/cli";
 // Utils
 import shell from "../utils/shell";
 import dataUriToFile from "../utils/dataUriToFile";

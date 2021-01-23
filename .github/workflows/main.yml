@@ -22,6 +22,8 @@ jobs:
       - run: yarn bootstrap
       - run: yarn generate
       - run: yarn test
+      - run: yarn server-mock:check-types
+        working-directory: packages/admin-ui
 
   integration-test:
     runs-on: ubuntu-16.04
@@ -36,15 +38,6 @@ jobs:
       - run: yarn bootstrap
       - run: yarn generate
       - run: yarn test:int
-
-  build-test:
-    runs-on: ubuntu-16.04
-    name: Build test
-    if: github.event_name != 'push'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - run: docker-compose build
 
   release:
     name: Release

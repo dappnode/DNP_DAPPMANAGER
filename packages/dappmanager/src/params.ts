@@ -3,6 +3,10 @@ import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
+const MINUTE = 60 * 1000; // miliseconds
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
 /**
  * DAPPMANAGER Parameters. This parameters are modified on execution for testing
  */
@@ -11,15 +15,18 @@ const devMode = process.env.LOG_LEVEL === "DEV_MODE";
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
-let DNCORE_DIR = "DNCORE"; // Bind volume
-let REPO_DIR = "dnp_repo"; // Named volume
+let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
+let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
-  DNCORE_DIR = "test_files/";
-  REPO_DIR = "test_files/";
+  DNCORE_DIR = "./DNCORE";
+  REPO_DIR = "./dnp_repo";
 }
+
+/** Absolute global ENVs .env file from DAPPMANAGER containers */
+const GLOBAL_ENVS_PATH = path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME);
 
 const params = {
   // File paths
@@ -34,12 +41,19 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+
+  // File with sole purpose of handling admin password hash. Must be deletable
+  ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
+  ADMIN_PASSWORDS_JSON_FILE: path.join(DNCORE_DIR, "admin-passwords.json"),
+  ADMIN_STATUS_JSON_FILE: path.join(DNCORE_DIR, "admin-status.json"),
+
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
-  GLOBAL_ENVS_PATH_CORE: path.join(".", GLOBAL_ENVS_FILE_NAME),
-  GLOBAL_ENVS_PATH_DNP: path.join("../../", DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
-  GLOBAL_ENVS_PATH_NODE: path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME),
+  /** Relative path to global ENVs from a core DNP docker-compose */
+  GLOBAL_ENVS_PATH_FOR_CORE: path.relative(DNCORE_DIR, GLOBAL_ENVS_PATH),
+  GLOBAL_ENVS_PATH_FOR_DNP: GLOBAL_ENVS_PATH,
+  GLOBAL_ENVS_PATH: GLOBAL_ENVS_PATH,
   PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
@@ -52,12 +66,25 @@ const params = {
   // UI static files
   UI_FILES_PATH: process.env.UI_FILES_PATH || "dist",
 
+  // Signature API
+  SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
+
   // HTTP API parameters
-  ipfsGateway: "http://ipfs.dappnode:8080/ipfs/",
+  IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
+  HTTP_CORS_WHITELIST: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://my.dappnode"
+  ],
+
+  // API auth sessions
+  SESSIONS_SECRET_FILE: path.join(DNCORE_DIR, "sessions-secret-key.txt"),
+  SESSIONS_MAX_TTL_MS: 7 * DAY,
+  SESSIONS_TTL_MS: 7 * DAY,
 
   // VPN API
-  vpnApiRpcUrl: "http://172.33.1.4:3000/rpc",
+  VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
@@ -70,27 +97,24 @@ const params = {
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
 
   // Auto-update parameters
-  AUTO_UPDATE_DELAY: 24 * 60 * 60 * 1000, // 1 day
+  AUTO_UPDATE_DELAY: 1 * DAY,
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Watchers
-  AUTO_UPDATE_WATCHER_INTERVAL: 5 * 60 * 1000, // 5 minutes
-  CHECK_CHAIN_WATCHER_INTERVAL: 60 * 1000, // 1 minute
-  EMIT_CHAIN_DATA_WATCHER_INTERVAL: 5 * 1000, // 5 seconds
-  CHECK_DISK_USAGE_WATCHER_INTERVAL: 60 * 1000, // 1 minute
-  NAT_RENEWAL_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
-  NSUPDATE_WATCHER_INTERVAL: 60 * 60 * 1000, // 1 hour
+  AUTO_UPDATE_DAEMON_INTERVAL: 5 * MINUTE,
+  CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
+  NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
+  NSUPDATE_DAEMON_INTERVAL: 1 * HOUR,
 
   // IPFS parameters
   IPFS_HOST:
     process.env.IPFS_HOST ||
     process.env.IPFS_REDIRECT ||
     "http://ipfs.dappnode:5001",
-  IPFS_TIMEOUT: 30 * 1000,
+  IPFS_TIMEOUT: 0.5 * MINUTE,
 
   // Web3 parameters
   WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
-  CHAIN_DATA_UNTIL: 0,
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -105,6 +129,11 @@ const params = {
   restartDnpVolumes: [
     "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
     "/var/run/docker.sock:/var/run/docker.sock"
+  ],
+  corePackagesThatMustBeRunning: [
+    "bind.dnp.dappnode.eth",
+    "dappmanager.dnp.dappnode.eth",
+    "vpn.dnp.dappnode.eth"
   ],
 
   // DYNDNS parameters
@@ -153,12 +182,16 @@ const params = {
   // ETHFORWARD / HTTP proxy params
   ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
-  ETHFORWARD_PIN_ON_VISIT: true
+  ETHFORWARD_PIN_ON_VISIT: true,
+
+  // Flags
+  DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
+  AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)
 };
 
 if (devMode) {
-  params.AUTO_UPDATE_DELAY = 3 * 60 * 1000; // 3 minutes
-  params.AUTO_UPDATE_WATCHER_INTERVAL = 1 * 1000; // 1 second
+  params.AUTO_UPDATE_DELAY = 3000;
+  params.AUTO_UPDATE_DAEMON_INTERVAL = 1000;
   params.AUTO_UPDATE_INCLUDE_IPFS_VERSIONS = true;
 }
 
@@ -250,7 +283,7 @@ const FORMAT = {
 export const releaseFiles = {
   manifest: {
     regex: /dappnode_package.*\.json$/,
-    format: FORMAT.JSON,
+    format: FORMAT.YAML,
     maxSize: 100e3, // Limit size to ~100KB
     required: TRUE,
     multiple: FALSE

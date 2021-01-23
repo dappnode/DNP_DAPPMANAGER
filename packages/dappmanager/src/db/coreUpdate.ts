@@ -32,7 +32,8 @@ export const coreUpdatePackagesData = {
                 "manifestBackupPath",
                 "imagePath",
                 "isUpdate",
-                "dockerTimeout"
+                "dockerTimeout",
+                "containersStatus"
               ])
           )
         : packagesData

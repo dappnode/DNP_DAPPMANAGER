@@ -1,5 +1,5 @@
 import semver from "semver";
-import { listPackages } from "../modules/docker/listContainers";
+import { listPackages } from "../modules/docker/list";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { shortNameCapitalized } from "../utils/format";
@@ -27,11 +27,9 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
       id: SYSTEM_PACKAGES,
       displayName: "System packages",
       enabled: autoUpdateHelper.isCoreUpdateEnabled(),
-      feedback: autoUpdateHelper.getCoreFeedbackMessage({
-        currentVersionId: getCoreVersionId(
-          dnpList.filter(({ isCore }) => isCore)
-        )
-      })
+      feedback: autoUpdateHelper.getCoreFeedbackMessage(
+        dnpList.filter(({ isCore }) => isCore)
+      )
     },
     {
       id: MY_PACKAGES,

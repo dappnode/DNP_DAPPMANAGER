@@ -53,15 +53,16 @@ export default function dbFactory(dbPath: string) {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   function dynamicKeyValidate<T, K>(
     keyGetter: (keyArg: K) => string,
-    validate: (keyArg: K, value?: T) => boolean
+    validate?: (keyArg: K, value?: T) => boolean
   ) {
     return {
       get: (keyArg: K): T | undefined => {
         const value = get(keyGetter(keyArg));
-        if (validate(keyArg, value)) return value;
+        if (!validate || validate(keyArg, value)) return value;
       },
       set: (keyArg: K, newValue: T): void => {
-        if (validate(keyArg, newValue)) set(keyGetter(keyArg), newValue);
+        if (!validate || validate(keyArg, newValue))
+          set(keyGetter(keyArg), newValue);
       },
       remove: (keyArg: K): void => {
         del(keyGetter(keyArg));

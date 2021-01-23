@@ -64,7 +64,7 @@ export const passwordChange = (
   newPassword: string
 ): AppThunk => async dispatch => {
   // Display a dialog to confirm the password change
-  await new Promise(resolve =>
+  await new Promise<void>(resolve =>
     confirm({
       title: `Changing host user password`,
       text: `Make sure to safely store this password and keep a back up. \n\nYou will never be able to see this password again. If you lose it, you will not be able to recover it in any way.`,
@@ -84,7 +84,7 @@ export const passwordChange = (
 
 export const volumeRemove = (name: string): AppThunk => async dispatch => {
   // Display a dialog to confirm the password change
-  await new Promise(resolve =>
+  await new Promise<void>(resolve =>
     confirm({
       title: `Removing volume`,
       text: `Are you sure you want to permanently remove volume ${name}?`,
@@ -113,7 +113,7 @@ export const packageVolumeRemove = (
 
   // If there are NOT conflicting volumes,
   // Display a dialog to confirm volumes reset
-  await new Promise(resolve =>
+  await new Promise<void>(resolve =>
     confirm({
       title: `Removing ${prettyVolRef}`,
       text: `Are you sure you want to permanently remove this volume? This action cannot be undone. If this DAppNode Package is a blockchain node, it will lose all the chain data and start syncing from scratch.`,

@@ -1,11 +1,12 @@
 import path from "path";
 import params from "../../params";
-import { dockerComposeUp } from "../docker/dockerCommands";
+import { dockerComposeUp } from "../docker/compose";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
+import { dockerComposeUpPackage } from "../docker";
 
 /**
  * Create and run each package container in series
@@ -26,42 +27,51 @@ export async function runPackages(
         restartLaunchCommand: pkg.metadata.restartLaunchCommand,
         packagesData
       });
+
+      continue;
       // This line should never be reached, because restartDappmanagerPatch() should
       // either throw, or never resolve because the main process is killed by docker
-    } else {
-      // Copy fileUploads if any to the container before up-ing
-      if (pkg.fileUploads) {
-        log(pkg.dnpName, "Copying file uploads...");
-        logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
+    }
 
-        await dockerComposeUp(pkg.composePath, {
-          noStart: true,
-          timeout: pkg.dockerTimeout
-        });
-        for (const [serviceName, serviceFileUploads] of Object.entries(
-          pkg.fileUploads
-        ))
-          for (const [containerPath, dataUri] of Object.entries(
-            serviceFileUploads
-          )) {
-            const { dir: toPath, base: filename } = path.parse(containerPath);
-            const service = pkg.compose.services[serviceName];
-            if (!service) throw Error(`No service for ${serviceName}`);
-            const containerName = service.container_name;
-            await copyFileTo({ containerName, dataUri, filename, toPath });
-          }
-      }
-
+    // Create the new containers first starting to
+    // - Allow copying files without duplicating logic
+    // - Allow conditionally starting containers latter if were previously running
+    log(pkg.dnpName, "Preparing package...");
+    await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
-      const removeOrphans = !pkg.isCore;
+      removeOrphans: !pkg.isCore,
+      noStart: true,
+      timeout: pkg.dockerTimeout
+    });
 
-      log(pkg.dnpName, "Starting package... ");
-      await dockerComposeUp(pkg.composePath, {
-        removeOrphans,
-        timeout: pkg.dockerTimeout
-      });
+    // Copy fileUploads if any to the container before up-ing
+    if (pkg.fileUploads) {
+      log(pkg.dnpName, "Copying file uploads...");
+      logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
+
+      for (const [serviceName, serviceFileUploads] of Object.entries(
+        pkg.fileUploads
+      ))
+        for (const [containerPath, dataUri] of Object.entries(
+          serviceFileUploads
+        )) {
+          const { dir: toPath, base: filename } = path.parse(containerPath);
+          const service = pkg.compose.services[serviceName];
+          if (!service) throw Error(`No service for ${serviceName}`);
+          const containerName = service.container_name;
+          await copyFileTo({ containerName, dataUri, filename, toPath });
+        }
     }
+
+    log(pkg.dnpName, "Starting package... ");
+
+    // containersStatus captures the container status before updating
+    // If previous container was exited with code === 0, do not start it
+    await dockerComposeUpPackage(
+      { dnpName: pkg.dnpName, composePath: pkg.composePath },
+      pkg.containersStatus
+    );
 
     log(pkg.dnpName, "Package started");
   }

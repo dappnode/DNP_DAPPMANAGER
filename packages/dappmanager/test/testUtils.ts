@@ -12,7 +12,7 @@ import {
   InstallPackageData,
   InstalledPackageData
 } from "../src/types";
-import { DockerApiSystemDfReturn } from "../src/modules/docker/dockerApi";
+import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
 
 export const testDir = "./test_files/";
@@ -36,8 +36,16 @@ export const getTestMountpoint = (id: string): string => {
 };
 
 export function clearDbs(): void {
-  lowLevelCacheDb.clearDb();
-  lowLevelMainDb.clearDb();
+  try {
+    lowLevelMainDb.clearDb();
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
+  try {
+    lowLevelCacheDb.clearDb();
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
+  }
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
@@ -107,6 +115,7 @@ export const mockContainer: PackageContainer = {
   image: "mock-image",
   state: "running",
   running: true,
+  exitCode: null,
   ports: [],
   volumes: [],
   defaultEnvironment: {},
@@ -258,7 +267,8 @@ export const mockPackageData: InstallPackageData = {
   composeBackupPath: "mock/path/compose.backup.yml",
   manifestPath: "mock/path/manifest.json",
   manifestBackupPath: "mock/path/manifest.backup.json",
-  dockerTimeout: undefined
+  dockerTimeout: undefined,
+  containersStatus: {}
 };
 
 // For copyFileTo and copyFileFrom

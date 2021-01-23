@@ -88,16 +88,6 @@
     margin: 0 !important;
   }
 
-  // Custom password form
-  .change-password-form {
-    display: flex;
-    flex-direction: column;
-
-    > *:not(:last-child) {
-      margin-bottom: var(--default-spacing);
-    }
-  }
-
   // Deprecated horizontal slideshow
 
   .nav-buttons {

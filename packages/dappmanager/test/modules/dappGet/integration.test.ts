@@ -77,7 +77,7 @@ describe("dappGet integration test", () => {
         const dappGetImport = await rewiremock.around(
           () => import("../../../src/modules/dappGet"),
           mock => {
-            mock(() => import("../../../src/modules/docker/listContainers"))
+            mock(() => import("../../../src/modules/docker/list"))
               .with({ listPackages })
               .toBeUsed();
           }

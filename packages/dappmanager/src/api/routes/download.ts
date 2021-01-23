@@ -1,13 +1,17 @@
-import express from "express";
 import fs from "fs";
 import * as db from "../../db";
 import { logs } from "../../logs";
+import { wrapHandlerHtml } from "../utils";
+
+interface Params {
+  fileId: string;
+}
 
 /**
  * Endpoint to download files.
  * File must be previously available at the specified fileId
  */
-export const download: express.Handler = async (req, res) => {
+export const download = wrapHandlerHtml<Params>((req, res) => {
   const { fileId } = req.params;
   const filePath = db.fileTransferPath.get(fileId);
 
@@ -22,4 +26,4 @@ export const download: express.Handler = async (req, res) => {
         if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
       });
   });
-};
+});

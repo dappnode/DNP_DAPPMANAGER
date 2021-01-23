@@ -5,7 +5,7 @@ import {
   fetchSystemInfo,
   fetchVolumes,
   fetchPasswordIsSecure,
-  fetchWifiStatus
+  fetchWifiCredentials
 } from "services/dappnodeStatus/actions";
 
 export function initialCallsOnOpen() {
@@ -14,5 +14,5 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchSystemInfo());
   store.dispatch<any>(fetchVolumes());
   store.dispatch<any>(fetchPasswordIsSecure());
-  store.dispatch<any>(fetchWifiStatus());
+  store.dispatch<any>(fetchWifiCredentials());
 }

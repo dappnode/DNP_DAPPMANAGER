@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import io from "socket.io-client";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash";
 import mitt from "mitt";
-import { store } from "../store";
 // Transport
 import { subscriptionsFactory } from "common/transport/socketIo";
 import {
@@ -12,25 +10,60 @@ import {
   SubscriptionsTypes
 } from "common/subscriptions";
 import { Routes, routesData, ResolvedType } from "common/routes";
-import { Args, RpcPayload, RpcResponse } from "common/transport/types";
+import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
-import {
-  connectionOpen,
-  connectionClose
-} from "services/connectionStatus/actions";
 import { initialCallsOnOpen } from "./initialCalls";
-import { parseRpcResponse } from "common/transport/jsonRpc";
-import { apiUrl, apiUrls } from "params";
+import { LoginStatus as _LoginStatus } from "./interface";
+import { apiAuth } from "./auth";
+import { apiRoutes } from "./routes";
+import { apiRpc } from "./rpc";
 
-const socketIoUrl = apiUrl;
-/* eslint-disable-next-line no-console */
-console.log(`Connecting to API at`, apiUrl, apiUrls.rpc);
-let socketGlobal: SocketIOClient.Socket;
+export type LoginStatus = _LoginStatus;
+export { apiAuth };
+export { apiRoutes };
 
-function setupSocket(): SocketIOClient.Socket {
-  if (!socketGlobal) socketGlobal = io(socketIoUrl);
-  return socketGlobal;
+// Inject mock API code to have a workable UI offline
+// Usefull for developing and testing UI elements without any server
+if (process.env.REACT_APP_MOCK) {
+  import("./mock").then(mock => {
+    Object.assign(apiAuth, mock.apiAuth);
+    Object.assign(apiRoutes, mock.apiRoutes);
+    Object.assign(apiRpc, mock.apiRpc);
+  });
+}
+
+/* eslint-disable no-console */
+
+/**
+ * Bridges events from the API websockets client to any consumer in the App
+ * All WAMP events will be emitted in this PubSub instance
+ * If a part of the App wants to subscribe to an event just do
+ * ```
+ * apiEventBridge.on(route, callback)
+ * ```
+ * Or use the hook `useSubscription`
+ */
+const apiEventBridge = mitt();
+
+// Map redux subscriptions to eventBridge
+mapSubscriptionsToRedux(subscriptionsFactory(apiEventBridge));
+
+export async function startApi(refetchStatus: () => void) {
+  apiRpc.start(
+    apiEventBridge,
+    function onConnect() {
+      initialCallsOnOpen();
+
+      console.log("SocketIO connected");
+      // When Socket.io re-establishes connection check if still logged in
+      refetchStatus();
+    },
+    function onError(errorMessage: string) {
+      console.error("SocketIO connection closed", errorMessage);
+      refetchStatus();
+    }
+  );
 }
 
 const routeSubscription: Partial<
@@ -49,35 +82,27 @@ const routeSubscription: Partial<
 };
 
 /**
- * Bridges events from the API websockets client to any consumer in the App
- * All WAMP events will be emitted in this PubSub instance
- * If a part of the App wants to subscribe to an event just do
- * ```
- * apiEventBridge.on(route, callback)
- * ```
- * Or use the hook `useSubscription`
- */
-const apiEventBridge = mitt();
-
-/**
  * Call a RPC route
  * @param route "restartPackage"
  * @param args ["bitcoin.dnp.dappnode.eth"]
  */
-export async function callRoute<R>(route: string, args: any[]): Promise<R> {
-  const socket = setupSocket();
-  const rpcPayload: RpcPayload = { method: route, params: args };
-  const rpcResponse = await new Promise<RpcResponse<R>>(resolve => {
-    socket.emit("rpc", rpcPayload, resolve);
-  });
+async function callRoute<R>(method: string, params: any[]): Promise<R> {
+  const rpcResponse = await apiRpc.call<R>({ method, params });
   return parseRpcResponse(rpcResponse);
 }
 
+/**
+ * Typed API object to perform RPC calls
+ */
 export const api: Routes = mapValues(
   routesData,
   (data, route) => (...args: any[]) => callRoute<any>(route, args)
 );
 
+/**
+ * React hook to perform RPC calls on component mount
+ * Usefull to keep track of changing data that may need to be revalidated
+ */
 export const useApi: {
   [K in keyof Routes]: (
     ...args: Parameters<Routes[K]>
@@ -97,7 +122,8 @@ export const useApi: {
 });
 
 /**
- * Bridges a single event from the API websockets client to any consumer in the App
+ * React hook to subscribe to generic events
+ * Bridges a single event from the websockets API client to any consumer in the App
  * **Note**: this callback MUST be memoized
  */
 export function useSubscribe(
@@ -113,6 +139,7 @@ export function useSubscribe(
 }
 
 /**
+ * React hook to subscribe to typed events
  * Bridges events from the API websockets client to any consumer in the App
  * **Note**: this callback MUST be memoized
  * or the hook will unsubscribe and re-subscribe the new callback on each
@@ -140,63 +167,3 @@ export const useSubscription: {
     useSubscribe(route as keyof Subscriptions, callback);
   };
 });
-
-/**
- * Connect to the server's API
- * Store the session and map subscriptions
- */
-export function start() {
-  const socket = setupSocket();
-
-  socket.on("connect", function(...args: any) {
-    const subscriptions = subscriptionsFactory(socket, subscriptionsLogger);
-    mapValues(subscriptions, (handler, route) => {
-      handler.on((...args: any[]) => apiEventBridge.emit(route, ...args));
-    });
-
-    mapSubscriptionsToRedux(subscriptions);
-    initialCallsOnOpen();
-
-    // For testing:
-    window.call = (event, args) => socket.emit(event, args);
-
-    // Delay announcing session is open until everything is setup
-    store.dispatch(connectionOpen());
-    /* eslint-disable-next-line no-console */
-    console.log(`SocketIO connected to ${socket.io.uri}, ID ${socket.id}`);
-  });
-
-  function handleConnectionError(err: Error | string): void {
-    const errorMessage = err instanceof Error ? err.message : err;
-    fetch(apiUrls.ping).then(res => {
-      if (res.ok) {
-        // Warn that subscriptions are disabled
-        store.dispatch(connectionOpen());
-      } else {
-        store.dispatch(
-          connectionClose({
-            error: errorMessage,
-            isNotAdmin: res.status === 403
-          })
-        );
-      }
-    });
-
-    console.error("SocketIO connection closed", errorMessage);
-  }
-
-  // Handles server errors
-  socket.io.on("connect_error", handleConnectionError);
-
-  // Handles middleware / authentication errors
-  socket.on("error", handleConnectionError);
-
-  // Handles individual socket errors
-  socket.on("disconnect", handleConnectionError);
-}
-
-const subscriptionsLogger = {
-  onError: (route: string, error: Error, args?: Args): void => {
-    console.error(`Subscription error ${route}: ${error.stack}`, args);
-  }
-};
