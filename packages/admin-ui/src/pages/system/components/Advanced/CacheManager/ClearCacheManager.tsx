@@ -33,7 +33,7 @@ export default function ClearCache() {
         Activity tab.
       </p>
 
-      <Button onClick={cleanCache}>Clear cache</Button>
+      <Button onClick={cleanCache}>Clean cache</Button>
     </>
   );
 }
