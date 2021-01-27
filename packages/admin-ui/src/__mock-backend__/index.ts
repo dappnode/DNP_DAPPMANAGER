@@ -48,6 +48,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ],
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
+  cleanDb: async () => {},
   copyFileTo: async () => {},
   diagnose: async () => [],
   domainAliasSet: async () => {},

@@ -83,6 +83,11 @@ export interface Routes {
   cleanCache: () => Promise<void>;
 
   /**
+   * Cleans the main database of the DAPPMANAGER:
+   */
+  cleanDb: () => Promise<void>;
+
+  /**
    * Copy file to a DNP:
    * @param containerName Name of a docker container
    * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
@@ -488,6 +493,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
+  cleanDb: {},
   copyFileTo: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },

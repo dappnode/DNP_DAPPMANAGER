@@ -38,5 +38,7 @@ export function migrateToNewMainDb(): void {
  */
 export const clearCache = lowLevelCacheDb.clearDb;
 
+export const cleardb = lowLevelMainDb.clearDb;
+
 // Aditional low levels methods
 export { lowLevelMainDb, lowLevelCacheDb };
