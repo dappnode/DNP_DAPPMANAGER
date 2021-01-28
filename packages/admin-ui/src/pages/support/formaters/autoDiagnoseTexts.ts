@@ -87,7 +87,7 @@ export function openPorts({
 }): DiagnoseResultOrNull {
   if (isValidating) return { loading: true, msg: "Loading system info..." };
   if (!dappnodeParams) return null;
-  const { alertToOpenPorts } = dappnodeParams;
+  const { alertToOpenPorts, internalIp } = dappnodeParams;
   return {
     ok: !alertToOpenPorts,
     msg: alertToOpenPorts
@@ -95,7 +95,8 @@ export function openPorts({
       : "No ports have to be opened OR the router has UPnP enabled",
     solutions: [
       "If you are capable of opening ports manually, please ignore this error",
-      "Your router may have UPnP but it is not turned on yet. Please research if your specific router has UPnP and turn it on"
+      "Your router may have UPnP but it is not turned on yet. Please research if your specific router has UPnP and turn it on",
+      `You can check your ports here: https://check-host.net/check-udp?host=${internalIp}%3A1194`
     ]
   };
 }
