@@ -26,7 +26,6 @@ export default function ClearMainDb() {
   }
   return (
     <>
-      <div className="subtle-header">CLEAN DATABASE CONTENT</div>
       <p>
         Remove the local database which contains critical information about your
         DAppNode.

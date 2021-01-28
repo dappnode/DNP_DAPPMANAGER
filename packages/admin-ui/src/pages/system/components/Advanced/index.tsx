@@ -10,10 +10,10 @@ export function Advanced() {
       <SubTitle>SSH</SubTitle>
       <SshManager />
 
-      <SubTitle>Database</SubTitle>
+      <SubTitle>Dappmanager database</SubTitle>
       <MaindbManager />
 
-      <SubTitle>Cache</SubTitle>
+      <SubTitle>Dappmanager cache</SubTitle>
       <ClearCacheManager />
     </>
   );

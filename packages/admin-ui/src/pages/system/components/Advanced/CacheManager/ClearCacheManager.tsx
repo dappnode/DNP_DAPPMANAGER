@@ -26,7 +26,6 @@ export default function ClearCache() {
   }
   return (
     <>
-      <div className="subtle-header">CLEAR CACHE CONTENT</div>
       <p>
         Remove the local cache of Aragon Package Manager (APM) entries,
         manifests, avatars. Also remove the user action logs shown in the
