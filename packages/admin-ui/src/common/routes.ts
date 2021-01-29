@@ -30,7 +30,6 @@ import {
   ShhStatus,
   PackagePort,
   UpnpPortMapping,
-  LocalIpResponse
 } from "./types";
 
 export interface Routes {
@@ -485,11 +484,6 @@ export interface Routes {
    * Returns public Ip in real time
    */
   ipPublicGet: () => Promise<PublicIpResponse>;
-
-  /**
-   * Returns local Ip
-   */
-  ipLocalGet: () => Promise<LocalIpResponse>
 }
 
 interface RouteData {
@@ -563,7 +557,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
-  ipLocalGet: {}
 };
 
 // DO NOT REMOVE

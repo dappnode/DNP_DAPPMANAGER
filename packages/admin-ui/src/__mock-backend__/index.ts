@@ -57,8 +57,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
-  ipLocalGet: async () => ({ localIp: "192.168.1.56" }),
-
   getPortsStatus: async () => ({ upnpAvailable: true, portsToOpen: [], upnpPortMappings: [] }),
 
   statsCpuGet: async () => ({

@@ -4,11 +4,11 @@ import { Table } from "react-bootstrap";
 
 export default function UpNp() {
   const upnpInfo = useApi.getPortsStatus();
-  const localIpInfo = useApi.ipLocalGet();
+  const systemInfo = useApi.systemInfoGet();
   const publicIpInfo = useApi.ipPublicGet();
 
   const publicIp = publicIpInfo.data?.publicIp;
-  const localIp = localIpInfo.data?.localIp;
+  const localIp = systemInfo.data?.internalIp;
   const isUpnpAvailable = upnpInfo.data?.upnpAvailable;
   const portsToOpen = upnpInfo.data?.portsToOpen;
   const upnpPortsMapping = upnpInfo.data?.upnpPortMappings;
