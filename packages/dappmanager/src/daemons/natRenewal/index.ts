@@ -79,10 +79,13 @@ async function natRenewal(): Promise<void> {
       }
     }
 
+    // Persist ports in the DB
+    const upnpPortMappings = await upnpc.list();
+    db.upnpPortMappings.set(upnpPortMappings);
+
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
-      const upnpPortMappings = await upnpc.list();
-      db.upnpPortMappings.set(upnpPortMappings);
+
       for (const portToOpen of portsToOpen) {
         const currentPort = upnpPortMappings.find(
           p =>
