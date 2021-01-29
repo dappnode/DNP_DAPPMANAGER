@@ -28,7 +28,8 @@ export default function ClearMainDb() {
     <>
       <p>
         Remove the local database which contains critical information about your
-        DAppNode.
+        DAppNode, such as the dyndns identity, Ips registry, telegram
+        configuration and more.
       </p>
 
       <Button onClick={cleanDb}>Clean database</Button>
