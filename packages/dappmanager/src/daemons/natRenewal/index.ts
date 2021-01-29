@@ -81,8 +81,6 @@ async function natRenewal(): Promise<void> {
       }
     }
 
-
-
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
       const upnpPortMappings = await upnpc.list();

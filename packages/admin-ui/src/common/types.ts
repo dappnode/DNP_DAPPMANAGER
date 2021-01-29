@@ -1146,6 +1146,10 @@ export interface PublicIpResponse {
   publicIp: string;
 }
 
+export interface LocalIpResponse {
+  localIp: string
+}
+
 /**
  * Welcome wizard / setup flow
  * Available routes / views in the UI
