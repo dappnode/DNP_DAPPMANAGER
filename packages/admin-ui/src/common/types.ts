@@ -301,6 +301,13 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
+export interface UpnpPortMapping {
+  protocol: PortProtocol;
+  exPort: string;
+  inPort: string;
+  ip: string;
+}
+
 export interface VolumeMapping {
   host: string; // path
   container: string; // dest

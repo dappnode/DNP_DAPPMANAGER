@@ -57,6 +57,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
+  getPortsStatus: async () => ({ upnpAvailable: true, portsToOpen: [], upnpPortMappings: [] }),
+
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
