@@ -9,6 +9,8 @@ services:
     networks:
       network:
         ipv4_address: 172.33.1.7
+        aliases:
+          - "dappmanager.dappnode"
     restart: always
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"

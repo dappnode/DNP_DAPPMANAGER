@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  sample-core:
+    build: .
+    container_name: sample-core
+    restart: always
+    volumes:
+      - "data:/data"
+volumes:
+  data: {}
