@@ -76,8 +76,8 @@ export function parseUnsafeCompose(
         environment: parseEnvironment(serviceUnsafe.environment || {}),
         dns: params.DNS_SERVICE, // Common DAppNode ENS
         networks: isCore
-          ? serviceUnsafe.networks || [params.DNP_NETWORK_EXTERNAL_NAME]
-          : [params.DNP_NETWORK_EXTERNAL_NAME]
+          ? serviceUnsafe.networks || [params.DNP_PRIVATE_NETWORK_NAME]
+          : [params.DNP_PRIVATE_NETWORK_NAME]
       })
     ),
 
@@ -85,13 +85,13 @@ export function parseUnsafeCompose(
 
     networks: isCore
       ? composeUnsafe.networks || {
-          [params.DNP_NETWORK_INTERNAL_NAME]: {
+          [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: {
             driver: "bridge",
             ipam: { config: [{ subnet: "172.33.0.0/16" }] }
           }
         }
       : {
-          [params.DNP_NETWORK_EXTERNAL_NAME]: { external: true }
+          [params.DNP_PRIVATE_NETWORK_NAME]: { external: true }
         }
   });
 }

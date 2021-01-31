@@ -88,8 +88,10 @@ const params = {
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
-  DNP_NETWORK_EXTERNAL_NAME: "dncore_network",
-  DNP_NETWORK_INTERNAL_NAME: "network",
+  DNP_PRIVATE_NETWORK_NAME: "dncore_network",
+  DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
+  DNP_PUBLIC_NETWORK_NAME: "dnpublic_network",
+
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",

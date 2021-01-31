@@ -19,7 +19,7 @@ import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
-const networkName = params.DNP_NETWORK_EXTERNAL_NAME;
+const networkName = params.DNP_PRIVATE_NETWORK_NAME;
 const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
 
 export function parseContainerInfo(container: ContainerInfo): PackageContainer {
