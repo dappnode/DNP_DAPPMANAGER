@@ -7,8 +7,8 @@ import Profile from "./dropdownMenus/Profile";
 // Components
 import { toggleSideNav } from "./SideBar";
 // Styles
-import "./topbar.css";
-import "./notifications.css";
+import "./topbar.scss";
+import "./notifications.scss";
 import { MdMenu } from "react-icons/md";
 
 export const TopBar = ({ username }: { username: string }) => (

@@ -59,7 +59,7 @@
       }
 
       .status-badges {
-        & > *:not(:last-child) {
+        > *:not(:last-child) {
           margin-right: 8px;
         }
       }
@@ -158,7 +158,7 @@
     }
   }
 
-  & > *:not(.installer-details) {
+  > *:not(.installer-details) {
     justify-self: end;
   }
 

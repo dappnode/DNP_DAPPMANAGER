@@ -12,7 +12,7 @@
   -ms-align-items: center;
   align-items: center;
 
-  & > .dialog {
+  > .dialog {
     padding: var(--default-spacing);
     padding-bottom: 0;
     border-radius: 0.5rem;

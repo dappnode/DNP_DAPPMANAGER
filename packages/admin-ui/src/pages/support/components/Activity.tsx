@@ -12,7 +12,7 @@ import { stringifyObjSafe } from "utils/objects";
 import { stringSplit } from "utils/strings";
 import newTabProps from "utils/newTabProps";
 // Own module
-import "./activity.css";
+import "./activity.scss";
 
 const badgeClass = "badge badge-pill badge-";
 

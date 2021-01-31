@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 // Icons
 import { MdUnfoldMore, MdUnfoldLess } from "react-icons/md";
 // Styles
-import "./readMore.css";
+import "./readMore.scss";
 
 /**
  * Fully responsive text box with a Read More label

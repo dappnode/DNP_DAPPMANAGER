@@ -39,24 +39,24 @@
   color: var(--dappnode-white-color);
   background-color: var(--dappnode-strong-main-color);
   border-color: var(--dappnode-strong-main-color);
-}
 
-.btn-dappnode:hover {
-  color: var(--dappnode-white-color);
-  background-color: var(--dappnode-darker-main-color);
-  border-color: var(--dappnode-darker-main-color);
-}
+  &:hover {
+    color: var(--dappnode-white-color);
+    background-color: var(--dappnode-darker-main-color);
+    border-color: var(--dappnode-darker-main-color);
+  }
 
-.btn-dappnode:focus,
-.btn-dappnode.focus {
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
-}
+  &:focus,
+  &.focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+  }
 
-.btn-dappnode.disabled,
-.btn-dappnode:disabled {
-  color: var(--dappnode-white-color);
-  background-color: var(--dappnode-gray-main-color);
-  border-color: var(--dappnode-gray-main-color);
+  &.disabled,
+  &:disabled {
+    color: var(--dappnode-white-color);
+    background-color: var(--dappnode-gray-main-color);
+    border-color: var(--dappnode-gray-main-color);
+  }
 }
 
 .btn-dappnode:not(:disabled):not(.disabled):active,
@@ -72,23 +72,23 @@
   background-color: transparent;
   background-image: none;
   border-color: var(--dappnode-strong-main-color) !important;
-}
 
-.btn-outline-dappnode:hover {
-  color: var(--dappnode-white-color);
-  background-color: var(--dappnode-darker-main-color);
-  border-color: var(--dappnode-darker-main-color) !important;
-}
+  &:hover {
+    color: var(--dappnode-white-color);
+    background-color: var(--dappnode-darker-main-color);
+    border-color: var(--dappnode-darker-main-color) !important;
+  }
 
-.btn-outline-dappnode:focus,
-.btn-outline-dappnode.focus {
-  box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
-}
+  &:focus,
+  &.focus {
+    box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
+  }
 
-.btn-outline-dappnode.disabled,
-.btn-outline-dappnode:disabled {
-  color: var(--dappnode-strong-main-color);
-  background-color: transparent;
+  &.disabled,
+  &:disabled {
+    color: var(--dappnode-strong-main-color);
+    background-color: transparent;
+  }
 }
 
 .btn-outline-dappnode:not(:disabled):not(.disabled):active,
