@@ -4,6 +4,7 @@ import { Table } from "react-bootstrap";
 import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
 import SubTitle from "components/SubTitle";
+import Ok from "components/Ok";
 
 function TableLoading({ steps }: { steps: string[] }) {
   return <Loading steps={steps} />;
@@ -27,7 +28,7 @@ function PortsOpened({ localIp }: { localIp: string }) {
                 <th>Protocol</th>
                 <th>Router port</th>
                 <th>DAppNode port</th>
-                <th>DAppNode ip</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -39,7 +40,20 @@ function PortsOpened({ localIp }: { localIp: string }) {
                       <td>{route.protocol}</td>
                       <td>{route.exPort}</td>
                       <td>{route.inPort}</td>
-                      <td>{route.ip}</td>
+                      <td>
+                        {upnpInfo.data ? (
+                          upnpInfo.data.portsToOpen.some(
+                            route2 =>
+                              route2.portNumber.toString() === route.inPort
+                          ) ? (
+                            <Ok ok={true} msg={"Open"} />
+                          ) : (
+                            <Ok ok={false} msg={"Closed"} />
+                          )
+                        ) : (
+                          <Ok ok={false} msg={"Unknown"} />
+                        )}
+                      </td>
                     </tr>
                   );
                 })}{" "}
