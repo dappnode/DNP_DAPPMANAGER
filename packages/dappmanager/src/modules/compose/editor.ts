@@ -8,7 +8,8 @@ import {
   pick,
   pull,
   uniq,
-  concat
+  concat,
+  omit
 } from "lodash";
 import * as getPath from "../../utils/getPath";
 import {
@@ -28,11 +29,13 @@ import {
   mergeEnvs,
   stringifyEnvironment
 } from "./environment";
+import { parseServiceNetworks } from "./networks";
 import { verifyCompose } from "./verify";
-import { UserSettings } from "../../common";
+import { UserSettings, ComposeServiceNetwork } from "../../types";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
+import { ComposeNetwork } from "../../common";
 
 class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -109,6 +112,52 @@ class ComposeServiceEditor {
     this.edit(service => ({
       labels: { ...service.labels, ...labels }
     }));
+  }
+
+  /**
+   * Add a network to a service, makes sure it's defined in the main networks section
+   * If the network is not define uses `networkConfig` or defualts to external network
+   */
+  addNetwork(
+    networkName: string,
+    serviceNetwork?: ComposeServiceNetwork,
+    networkConfig?: ComposeNetwork
+  ): void {
+    // Add network to service
+    this.edit(service => {
+      const networks = parseServiceNetworks(service.networks || {});
+      return {
+        networks: {
+          ...networks,
+          [networkName]: {
+            ...(networks[networkName] || {}),
+            ...(serviceNetwork || {})
+          }
+        }
+      };
+    });
+
+    // Make sure the network is declared in the networks section
+    if (!this.parent.compose.networks) this.parent.compose.networks = {};
+    if (!this.parent.compose.networks[networkName])
+      this.parent.compose.networks[networkName] = networkConfig || {
+        external: true
+      };
+  }
+
+  /**
+   * Remove a network (if exists) from service
+   */
+  removeNetwork(networkName: string): void {
+    // Remove network from service
+    this.edit(service => {
+      const networks = parseServiceNetworks(service.networks || {});
+      return { networks: omit(networks, [networkName]) };
+    });
+
+    // Remove network from networks section
+    if (this.parent.compose.networks)
+      delete this.parent.compose.networks[networkName];
   }
 }
 

@@ -532,9 +532,10 @@ export interface ComposeServiceNetwork {
   aliases?: string[];
 }
 
-export type ComposeServiceNetworks =
-  | string[]
-  | { [networkName: string]: ComposeServiceNetwork };
+export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
+export type ComposeServiceNetworksObj = {
+  [networkName: string]: ComposeServiceNetwork;
+};
 
 export interface ComposeNetwork {
   external?: boolean;
