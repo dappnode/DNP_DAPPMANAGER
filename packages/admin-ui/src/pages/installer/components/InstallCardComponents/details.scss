@@ -1,0 +1,36 @@
+/* Details */
+
+.installer-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, max-content));
+  grid-gap: var(--default-spacing);
+
+  & > img {
+    width: 100%;
+    max-width: 12rem;
+    justify-self: center;
+  }
+
+  /* Data grid */
+  .data {
+    margin-top: var(--default-spacing);
+
+    > div {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, max-content));
+
+      > header {
+        width: 7rem;
+      }
+    }
+
+    > * {
+      overflow: hidden;
+    }
+  }
+
+  header,
+  .data > span:nth-child(2n-1) {
+    font-weight: 800;
+  }
+}

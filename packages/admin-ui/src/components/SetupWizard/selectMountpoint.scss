@@ -106,7 +106,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(min-content, max-content));
     align-items: center;
-    & > *:not(:last-child) {
+    > *:not(:last-child) {
       margin-right: 0.5rem;
     }
 

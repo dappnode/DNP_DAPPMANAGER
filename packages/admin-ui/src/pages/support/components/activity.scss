@@ -1,0 +1,80 @@
+.error-stack {
+  /* Spacing */
+  padding: 0.5rem;
+  /* Box styling */
+  border: solid 1px #d3d3d396;
+  border-radius: 5px;
+  background-color: #f5f5f552;
+  /* Text styling */
+  display: block;
+  white-space: pre;
+  font-size: 75%;
+  font-family: "Inconsolata", monospace;
+  overflow: auto;
+  max-height: 500px;
+}
+
+.background-color-fade {
+  &:hover {
+    background: radial-gradient(#d7d7d7, #a0a0a000);
+  }
+  &:active {
+    background: radial-gradient(#d7d7d7, #ffffff00);
+  }
+}
+
+/* Spacing */
+
+.user-log {
+  padding: 0 !important;
+  > div {
+    padding: var(--default-spacing);
+  }
+  > .show {
+    padding-top: 0;
+  }
+  > .hide {
+    display: none;
+  }
+}
+
+.user-log {
+  /* Control styling and opacity */
+
+  .date {
+    font-size: 90%;
+    opacity: 0.6;
+  }
+  .log-header {
+    margin-bottom: 10px;
+  }
+  .reply {
+    opacity: 0.4;
+  }
+  .call-to {
+    opacity: 0.7;
+  }
+
+  /* Don't show external borders of the user logs list 
+     Using user-logs > x, to win the bootstrap css in specificity
+  */
+
+  > .user-log {
+    border-left-width: 0;
+    border-right-width: 0;
+    padding: 0;
+
+    > &:first-child {
+      border-top-width: 0;
+    }
+    > &:last-child {
+      border-bottom-width: 0;
+    }
+
+    /* Polish bootstrap style */
+
+    .badge {
+      margin-right: 0.5rem;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+/* Read more */
+
+.read-more {
+  overflow: hidden;
+
+  &.short {
+    /* DO NOT CHANGE THIS VALUE. Linked to ReadMore.jsx */
+    max-height: 121px;
+  }
+}
+
+.read-more-toggle {
+  color: var(--dappnode-gray-main-color);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--dappnode-strong-main-color);
+  }
+}
