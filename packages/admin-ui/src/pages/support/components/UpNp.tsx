@@ -6,14 +6,6 @@ import ErrorView from "../../../components/ErrorView";
 import SubTitle from "components/SubTitle";
 import Ok from "components/Ok";
 
-function TableLoading({ steps }: { steps: string[] }) {
-  return <Loading steps={steps} />;
-}
-
-function TableError({ error }: { error: Error | string }) {
-  return <ErrorView error={error} />;
-}
-
 function PortsOpened({ localIp }: { localIp: string }) {
   const upnpInfo = useApi.getPortsStatus();
 
@@ -61,45 +53,9 @@ function PortsOpened({ localIp }: { localIp: string }) {
           </Table>
         </>
       ) : upnpInfo.error ? (
-        <TableError error={upnpInfo.error} />
+        <ErrorView error={upnpInfo.error} />
       ) : (
-        <TableLoading steps={["Loading opened ports"]} />
-      )}
-    </>
-  );
-}
-
-function PortsToBeOpened() {
-  const upnpInfo = useApi.getPortsStatus();
-
-  return (
-    <>
-      {upnpInfo.data ? (
-        <>
-          <SubTitle>Port to be opened</SubTitle>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Protocol</th>
-                <th>Router port</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upnpInfo.data.portsToOpen.map(route => {
-                return (
-                  <tr>
-                    <td>{route.protocol}</td>
-                    <td>{route.portNumber}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        </>
-      ) : upnpInfo.error ? (
-        <TableError error={upnpInfo.error} />
-      ) : (
-        <TableLoading steps={["Loading ports to be opened"]} />
+        <Loading steps={["Loading opened ports"]} />
       )}
     </>
   );
@@ -114,17 +70,22 @@ export default function UpNp() {
         systemInfo.data.publicIp !== systemInfo.data.internalIp ? (
           systemInfo.data.upnpAvailable ? (
             <>
-              <p>DAppNode has detected UpNp as enabled</p>
+              <Ok ok={true} msg={"DAppNode has detected UpNp as enabled"} />
               <PortsOpened localIp={systemInfo.data.internalIp} />
             </>
           ) : (
             <>
-              <p>DAppNode requires UpNp to be enabled</p>
-              <PortsToBeOpened />
+              <Ok ok={false} msg={"DAppNode has detected UpNp as disabled"} />
+              <PortsOpened localIp={systemInfo.data.internalIp} />
             </>
           )
         ) : (
-          <>DAppNode is running in a remote machine and does not require UpNp</>
+          <Ok
+            ok={false}
+            msg={
+              "DAppNode is running in a remote machine and does not require UpNp"
+            }
+          />
         )
       ) : systemInfo.error ? (
         <ErrorView error={systemInfo.error} />
