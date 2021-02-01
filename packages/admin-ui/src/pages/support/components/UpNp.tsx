@@ -25,7 +25,7 @@ function PortsOpened({ localIp }: { localIp: string }) {
             </thead>
             <tbody>
               {upnpInfo.data.upnpPortMappings
-                .filter(route => route.ip === localIp) // Check only map routing for the dappnode
+                .filter(route => route.ip === localIp) // Check only map routing for the dappnode IP
                 .map(route => {
                   return (
                     <tr>
@@ -36,7 +36,7 @@ function PortsOpened({ localIp }: { localIp: string }) {
                         {upnpInfo.data ? (
                           upnpInfo.data.portsToOpen.some(
                             route2 =>
-                              route2.portNumber.toString() === route.exPort
+                              route2.portNumber.toString() === route.exPort // Will display if even having UPNP enabled the port is opened or still closed
                           ) ? (
                             <Ok ok={true} msg={"Open"} />
                           ) : (
@@ -61,6 +61,43 @@ function PortsOpened({ localIp }: { localIp: string }) {
   );
 }
 
+function PortsToOpen() {
+  const upnpInfo = useApi.getPortsStatus();
+
+  // if UpNp is not available then cannot be knwown the status of the ports
+  return (
+    <>
+      {upnpInfo.data ? (
+        <>
+          <SubTitle>Ports to open</SubTitle>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Protocol</th>
+                <th>Port number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {upnpInfo.data.portsToOpen.map(route => {
+                return (
+                  <tr>
+                    <td>{route.protocol}</td>
+                    <td>{route.portNumber}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </>
+      ) : upnpInfo.error ? (
+        <ErrorView error={upnpInfo.error} />
+      ) : (
+        <Loading steps={["Loading ports to open"]} />
+      )}
+    </>
+  );
+}
+
 export default function UpNp() {
   const systemInfo = useApi.systemInfoGet();
 
@@ -76,14 +113,22 @@ export default function UpNp() {
           ) : (
             <>
               <Ok ok={false} msg={"DAppNode has detected UpNp as disabled"} />
-              <PortsOpened localIp={systemInfo.data.internalIp} />
+              <p>
+                Enable UpNp or manually open the necessary ports in your router
+                for your DAppNode Ip:{" "}
+                <strong>{systemInfo.data.internalIp}</strong>
+              </p>
+
+              <p>If ports are opended, please ignore this warming</p>
+
+              <PortsToOpen />
             </>
           )
         ) : (
           <Ok
             ok={true}
             msg={
-              "DAppNode is running in a remote machine and does not require UpNp"
+              "DAppNode is running on a remote machine and does not require UpNp"
             }
           />
         )
