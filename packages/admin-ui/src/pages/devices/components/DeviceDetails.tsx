@@ -121,8 +121,6 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
         )
       ) : null}
 
-
-
       {showQr && url && <QrCode url={url} width={"400px"} />}
 
       <div className="alert alert-secondary" role="alert">
