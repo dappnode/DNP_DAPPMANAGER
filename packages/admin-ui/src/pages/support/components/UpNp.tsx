@@ -36,7 +36,7 @@ function PortsOpened({ localIp }: { localIp: string }) {
                         {upnpInfo.data ? (
                           upnpInfo.data.portsToOpen.some(
                             route2 =>
-                              route2.portNumber.toString() === route.inPort
+                              route2.portNumber.toString() === route.exPort
                           ) ? (
                             <Ok ok={true} msg={"Open"} />
                           ) : (
@@ -81,7 +81,7 @@ export default function UpNp() {
           )
         ) : (
           <Ok
-            ok={false}
+            ok={true}
             msg={
               "DAppNode is running in a remote machine and does not require UpNp"
             }

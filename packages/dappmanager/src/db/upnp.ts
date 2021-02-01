@@ -4,7 +4,7 @@ import { PackagePort } from "../types";
 
 const UPNP_AVAILABLE = "upnp-available";
 const UPNP_PORT_MAPPINGS = "upnp-port-mappings";
-const PORTS_TO_OPEN = "ports-to-open";
+const PORTS_TO_OPEN = "ports-to-ppen";
 
 export const upnpAvailable = staticKey<boolean>(UPNP_AVAILABLE, false);
 
