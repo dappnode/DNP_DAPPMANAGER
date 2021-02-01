@@ -67,6 +67,10 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
         />
       </Form.Group>
 
+      <Button onClick={() => setShowQr(!showQr)}>
+        {showQr ? "Hide" : "Show"} VPN credentials URL QR code
+      </Button>
+
       {device.admin ? (
         device.hasChangedPassword ? (
           <Alert variant="info">
@@ -117,9 +121,7 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
         )
       ) : null}
 
-      <Button onClick={() => setShowQr(!showQr)}>
-        {showQr ? "Hide" : "Show"} VPN credentials URL QR code
-      </Button>
+
 
       {showQr && url && <QrCode url={url} width={"400px"} />}
 
