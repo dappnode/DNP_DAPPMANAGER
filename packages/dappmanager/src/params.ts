@@ -184,6 +184,9 @@ const params = {
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
   ETHFORWARD_PIN_ON_VISIT: true,
 
+  // API endpoint check tcp ports. req: /publicIp?tcpPorts=8092,1194 | res: /[{tcpPort, status}]
+  PORT_SCANNER_SERVICE_URL: "http://173.249.41.199:3000",
+
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)

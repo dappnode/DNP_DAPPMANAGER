@@ -14,7 +14,7 @@ import Activity from "./Activity";
 import Title from "components/Title";
 // Styles
 import "./support.scss";
-import UpNp from "./UpNp";
+import UPnP from "./UPnP";
 
 const SupportRoot: React.FC<RouteComponentProps> = ({ match }) => {
   const routes = [
@@ -29,9 +29,9 @@ const SupportRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: Report
     },
     {
-      name: "UpNp",
+      name: "UPnP",
       subPath: "upnp",
-      component: UpNp
+      component: UPnP
     },
     {
       name: "Activity",

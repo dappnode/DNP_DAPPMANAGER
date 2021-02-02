@@ -57,7 +57,27 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
-  getPortsStatus: async () => ({ upnpAvailable: true, portsToOpen: [], upnpPortMappings: [] }),
+  getPortsStatus: async () => ({
+    upnpAvailable: true,
+    portsToOpen: [
+      { portNumber: 8092, protocol: "TCP" },
+      { portNumber: 1194, protocol: "UDP" }
+    ],
+    upnpPortMappings: [
+      {
+        protocol: "TCP",
+        exPort: "8092",
+        inPort: "8092",
+        ip: "192.168.1.65"
+      },
+      {
+        protocol: "UDP",
+        exPort: "1194",
+        inPort: "1194",
+        ip: "192.168.1.65"
+      }
+    ]
+  }),
 
   statsCpuGet: async () => ({
     usedPercentage: 88
@@ -74,6 +94,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
+
+  portsScanGet: async () => [
+    { tcpPort: 8092, status: "closed" },
+    { tcpPort: 1194, status: "open" }
+  ],
 
   mountpointsGet: async () => [
     {

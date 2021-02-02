@@ -30,6 +30,7 @@ import {
   ShhStatus,
   PackagePort,
   UpnpPortMapping,
+  PortScanResponse
 } from "./types";
 
 export interface Routes {
@@ -77,7 +78,7 @@ export interface Routes {
    * Used to test different IPFS timeout parameters live from the ADMIN UI.
    * @param timeout new IPFS timeout in ms
    */
-  changeIpfsTimeout: (kwargs: { timeout: number; }) => Promise<void>;
+  changeIpfsTimeout: (kwargs: { timeout: number }) => Promise<void>;
 
   /**
    * Cleans the cache files of the DAPPMANAGER:
@@ -112,7 +113,7 @@ export interface Routes {
    * Generates certificates and keys needed for OpenVPN.
    * @param id Device id name
    */
-  deviceAdd: (kwargs: { id: string; }) => Promise<void>;
+  deviceAdd: (kwargs: { id: string }) => Promise<void>;
 
   /**
    * Creates a new OpenVPN credentials file, encrypted.
@@ -128,13 +129,13 @@ export interface Routes {
    * Removes the device with the provided id, if exists.
    * @param id Device id name
    */
-  deviceRemove: (kwargs: { id: string; }) => Promise<void>;
+  deviceRemove: (kwargs: { id: string }) => Promise<void>;
 
   /**
    * Resets the device credentials with the provided id, if exists.
    * @param id Device id name
    */
-  deviceReset: (kwargs: { id: string; }) => Promise<void>;
+  deviceReset: (kwargs: { id: string }) => Promise<void>;
 
   /**
    * Gives/removes admin rights to the provided device id.
@@ -150,14 +151,14 @@ export interface Routes {
    * Returns true if a password has been created for this device
    * @param id Device id name
    */
-  devicePasswordHas: (kwargs: { id: string; }) => Promise<boolean>;
+  devicePasswordHas: (kwargs: { id: string }) => Promise<boolean>;
 
   /**
    * Returns the login token of this device, creating it if necessary
    * If the password has been changed and is no longer a login token, throws
    * @param id Device id name
    */
-  devicePasswordGet: (kwargs: { id: string; }) => Promise<string>;
+  devicePasswordGet: (kwargs: { id: string }) => Promise<string>;
 
   /**
    * Returns a list of the existing devices, with the admin property
@@ -172,7 +173,7 @@ export interface Routes {
   /**
    * Set a domain alias to a DAppNode package by name
    */
-  domainAliasSet: (kwargs: { alias: string; dnpName: string; }) => Promise<void>;
+  domainAliasSet: (kwargs: { alias: string; dnpName: string }) => Promise<void>;
 
   /**
    * Sets if a fallback should be used
@@ -192,7 +193,7 @@ export interface Routes {
   /**
    * Return formated core update data
    */
-  fetchCoreUpdateData: (kwarg: { version?: string; }) => Promise<CoreUpdateData>;
+  fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
 
   /**
    * Fetch directory summary
@@ -202,7 +203,7 @@ export interface Routes {
   /**
    * Fetch extended info about a new DNP
    */
-  fetchDnpRequest: (kwargs: { id: string; }) => Promise<RequestedDnp>;
+  fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
   statsCpuGet: () => Promise<HostStatCpu>;
 
@@ -223,8 +224,8 @@ export interface Routes {
   }) => Promise<UserActionLog[]>;
 
   /**
-   * Returns UpNp info
-   * - UpNp available
+   * Returns UPnP info
+   * - UPnP available
    * - Ports to be opened
    * - Ports opened
    */
@@ -233,6 +234,8 @@ export interface Routes {
     portsToOpen: PackagePort[];
     upnpPortMappings: UpnpPortMapping[];
   }>;
+
+  portsScanGet: () => Promise<PortScanResponse[]>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -259,7 +262,7 @@ export interface Routes {
    * Marks notifications as view by deleting them from the db
    * @param ids Array of ids to be marked as read [ "n-id-1", "n-id-2" ]
    */
-  notificationsRemove: (kwargs: { ids: string[]; }) => Promise<void>;
+  notificationsRemove: (kwargs: { ids: string[] }) => Promise<void>;
 
   /**
    * Adds a notification to be shown the UI.
@@ -322,7 +325,7 @@ export interface Routes {
    */
   packageLog: (kwargs: {
     containerName: string;
-    options?: { timestamps?: boolean; tail?: number; };
+    options?: { timestamps?: boolean; tail?: number };
   }) => Promise<string>;
 
   /**
@@ -357,7 +360,7 @@ export interface Routes {
    */
   packageSetEnvironment: (kwargs: {
     dnpName: string;
-    environmentByService: { [serviceName: string]: PackageEnvs; };
+    environmentByService: { [serviceName: string]: PackageEnvs };
   }) => Promise<void>;
 
   /**
@@ -365,8 +368,8 @@ export interface Routes {
    */
   packageSetPortMappings: (kwargs: {
     dnpName: string;
-    portMappingsByService: { [serviceName: string]: PortMapping[]; };
-    options?: { merge: boolean; };
+    portMappingsByService: { [serviceName: string]: PortMapping[] };
+    options?: { merge: boolean };
   }) => Promise<void>;
 
   /**
@@ -376,14 +379,14 @@ export interface Routes {
   packageStartStop: (kwargs: {
     dnpName: string;
     serviceNames?: string[];
-    options?: { timeout?: number; };
+    options?: { timeout?: number };
   }) => Promise<void>;
 
   /**
    * Changes the user `dappnode`'s password in the host machine
    * Only allows it if the current password has the salt `insecur3`
    */
-  passwordChange: (kwargs: { newPassword: string; }) => Promise<void>;
+  passwordChange: (kwargs: { newPassword: string }) => Promise<void>;
 
   /**
    * Checks if the user `dappnode`'s password in the host machine
@@ -417,13 +420,13 @@ export interface Routes {
    * module works over HTTP.
    * @param seedPhraseEncrypted tweetnacl base64 box with nonce
    */
-  seedPhraseSet: (kwargs: { seedPhraseEncrypted: string; }) => Promise<void>;
+  seedPhraseSet: (kwargs: { seedPhraseEncrypted: string }) => Promise<void>;
 
   /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
-  setStaticIp: (kwargs: { staticIp: string; }) => Promise<void>;
+  setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
   /**
    * Gets bot telegram status
@@ -434,7 +437,7 @@ export interface Routes {
    * Sets the status of the telegram bot
    * @param telegramStatus new status of the bot
    */
-  telegramStatusSet: (kwarg: { telegramStatus: boolean; }) => Promise<void>;
+  telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
    * Gets bot telegram token
@@ -445,7 +448,7 @@ export interface Routes {
    * Sets the telegram token
    * @param telegramToken new bot token
    */
-  telegramTokenSet: (kwarg: { telegramToken: string; }) => Promise<void>;
+  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
    * Return the current SSH port from sshd
@@ -454,11 +457,11 @@ export interface Routes {
   /**
    * Change the SHH port on the DAppNode host
    */
-  sshPortSet: (kwargs: { port: number; }) => Promise<void>;
+  sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
    * Disable or enable SSH on the DAppNode host
    */
-  sshStatusSet: (kwargs: { status: ShhStatus; }) => Promise<void>;
+  sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
   /**
    * Check if SSH is enabled of disabled in the DAppNode host
    */
@@ -473,7 +476,7 @@ export interface Routes {
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
-  volumeRemove: (kwargs: { name: string; }) => Promise<void>;
+  volumeRemove: (kwargs: { name: string }) => Promise<void>;
 
   /**
    * Returns volume data
@@ -542,6 +545,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
+  portsScanGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
@@ -556,7 +560,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   volumeRemove: { log: true },
   volumesGet: {},
-  ipPublicGet: {},
+  ipPublicGet: {}
 };
 
 // DO NOT REMOVE

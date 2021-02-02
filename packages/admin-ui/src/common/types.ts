@@ -448,6 +448,11 @@ export type InstalledPackageData = Pick<
   containers: PackageContainer[];
 };
 
+export interface PortScanResponse {
+  tcpPort: number;
+  status: "open" | "closed";
+}
+
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;
@@ -1147,7 +1152,7 @@ export interface PublicIpResponse {
 }
 
 export interface LocalIpResponse {
-  localIp: string
+  localIp: string;
 }
 
 /**
