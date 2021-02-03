@@ -86,6 +86,9 @@ const params = {
   // VPN API
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
+  // HTTPS Portal API URL
+  HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
   DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",

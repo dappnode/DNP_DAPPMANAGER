@@ -8,10 +8,10 @@ export const httpsPortal: Pick<
   | "httpsPortalMappingRemove"
   | "httpsPortalMappingsGet"
 > = {
-  httpsPortalMappingAdd: async ({ mapping }) => {
+  httpsPortalMappingAdd: async mapping => {
     mappings.set(mapping.fromSubdomain, mapping);
   },
-  httpsPortalMappingRemove: async ({ mapping }) => {
+  httpsPortalMappingRemove: async mapping => {
     mappings.delete(mapping.fromSubdomain);
   },
   httpsPortalMappingsGet: async () => Array.from(mappings.values())

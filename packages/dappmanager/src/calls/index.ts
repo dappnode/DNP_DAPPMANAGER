@@ -18,6 +18,7 @@ export { statsMemoryGet } from "./statsMemoryGet";
 export { statsDiskGet } from "./statsDiskGet";
 export { getPortsStatus } from "./getPortsStatus";
 export { getUserActionLogs } from "./getUserActionLogs";
+export * from "./httpsPortal";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";

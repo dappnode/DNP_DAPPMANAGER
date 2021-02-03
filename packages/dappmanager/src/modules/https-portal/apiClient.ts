@@ -2,18 +2,18 @@ import fetch from "node-fetch";
 import querystring from "querystring";
 import { urlJoin } from "../../utils/url";
 
-interface HttpPortalEntry {
+export interface HttpPortalEntry {
   /**
    * The public subdomain
    * `"validator-prysm"`, `"customsubdomain"`
    * Note that there is a max length for domains, and must not use special characters
    */
-  fromPublicSubdomain: string;
+  fromSubdomain: string;
   /**
    *  The internal resource to target
    * `"validator-prysm"`, `"internal-docker-dns-based-host"`
    */
-  toInternalDomain: string;
+  toHost: string;
 }
 
 export class HttpsPortalApiClient {
@@ -39,13 +39,10 @@ export class HttpsPortalApiClient {
    * GET /add?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async add({
-    fromPublicSubdomain,
-    toInternalDomain
-  }: HttpPortalEntry): Promise<void> {
+  async add({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
-      from: fromPublicSubdomain,
-      to: toInternalDomain
+      from: fromSubdomain,
+      to: toHost
     });
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
@@ -57,13 +54,10 @@ export class HttpsPortalApiClient {
    * GET /remove?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async remove({
-    fromPublicSubdomain,
-    toInternalDomain
-  }: HttpPortalEntry): Promise<void> {
+  async remove({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
-      from: fromPublicSubdomain,
-      to: toInternalDomain
+      from: fromSubdomain,
+      to: toHost
     });
     await this.get(urlJoin(this.baseUrl, `/remove?${search}`));
   }
@@ -80,8 +74,8 @@ export class HttpsPortalApiClient {
     );
 
     return entries.map(entry => ({
-      fromPublicSubdomain: entry.from,
-      toInternalDomain: entry.to
+      fromSubdomain: entry.from,
+      toHost: entry.to
     }));
   }
 

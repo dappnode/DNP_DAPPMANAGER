@@ -224,14 +224,12 @@ export interface Routes {
   /**
    * HTTPs Portal: map a subdomain
    */
-  httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
+  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
 
   /**
    * HTTPs Portal: remove an existing mapping
    */
-  httpsPortalMappingRemove(kwargs: {
-    mapping: HttpsPortalMapping;
-  }): Promise<void>;
+  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
 
   /**
    * HTTPs Portal: get all mappings
