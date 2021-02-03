@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
+import { HttpsPortalMapping } from "types";
 import Form from "react-bootstrap/esm/Form";
+import { MdAdd } from "react-icons/md";
 import Input from "components/Input";
 import Button from "components/Button";
 import { getPublicSubdomain } from "utils/domains";
-import "./network.scss";
-import { MdAdd } from "react-icons/md";
-import { useSelector } from "react-redux";
-import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { shortNameCapitalized as sn } from "utils/format";
-import { HttpsPortalMapping } from "common";
+import "./https-mapping.scss";
 
 export function HttpsPortalNewMapping({
   dnpName,

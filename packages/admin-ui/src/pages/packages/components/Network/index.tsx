@@ -1,15 +1,10 @@
-// React
 import React from "react";
 import { useState } from "react";
-
-// Components
 import Card from "components/Card";
+import { PackageContainer } from "types";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
-import { PackageContainer } from "common";
-import { HttpsMappings } from "./Network";
-
-// Styles
+import { HttpsMappings } from "./HttpsMappings";
 import "./network.scss";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
@@ -36,6 +31,8 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
             dnpName={container.dnpName}
             serviceName={container.serviceName}
           />
+
+          <hr />
 
           <div className="subtle-header">PUBLIC PORT MAPPING</div>
           <PortsByService

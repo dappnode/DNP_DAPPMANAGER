@@ -8,8 +8,8 @@ import { confirmPromise } from "components/ConfirmDialog";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { shortNameCapitalized as sn } from "utils/format";
-import { HttpsPortalNewMapping } from "./NewMapping";
-import "./network.scss";
+import { HttpsPortalNewMapping } from "./HttpsMappingsNew";
+import "./https-mapping.scss";
 
 interface Mapping {
   from: string;
@@ -37,7 +37,7 @@ export function HttpsMappings({
         text:
           "Are you sure you want to expose this service to the public internet?",
         label: "Expose",
-        variant: "outline-danger"
+        variant: "dappnode"
       });
 
       setReqStatus({ loading: true });
