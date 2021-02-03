@@ -231,13 +231,8 @@ export function PortsByService({
               {deletable && (
                 <td className="delete">
                   <Button
+                    className="network-delete-port-row"
                     onClick={() => removePort(i)}
-                    style={{
-                      display: "flex",
-                      fontSize: "1.5rem",
-                      padding: ".375rem",
-                      borderColor: "#ced4da"
-                    }}
                   >
                     <MdClose />
                   </Button>

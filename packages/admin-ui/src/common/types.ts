@@ -4,6 +4,15 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
+// HTTPS portal mappings
+
+export interface HttpsPortalMapping {
+  fromSubdomain: string;
+  dnpName: string;
+  serviceName: string;
+  port: number;
+}
+
 // SSH types
 
 export type ShhStatus = "enabled" | "disabled";

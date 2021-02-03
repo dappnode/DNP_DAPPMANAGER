@@ -21,7 +21,6 @@ import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Advanced } from "./Advanced";
 import Notifications from "./Notifications";
-import { Network } from "./Network";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -60,11 +59,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Repository",
       subPath: subPaths.repository,
       component: Repository
-    },
-    {
-      name: "Network",
-      subPath: "network",
-      component: Network
     },
     {
       name: "Static IP",

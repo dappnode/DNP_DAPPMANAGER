@@ -129,3 +129,12 @@ export function confirm(props: ConfirmDialogProps) {
     root
   );
 }
+
+export function confirmPromise(props: ConfirmDialogProps): Promise<void> {
+  return new Promise<void>(resolve =>
+    confirm({
+      ...props,
+      onClick: resolve
+    })
+  );
+}
