@@ -65,12 +65,12 @@ export class HttpsPortalApiClient {
   /**
    * List existing record entries in the https-portal NGINX
    *
-   * GET /dump/json
+   * GET /?format=json
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
     const entries = await this.get<{ from: string; to: string }[]>(
-      urlJoin(this.baseUrl, `/dump/json`)
+      urlJoin(this.baseUrl, `/?format=json`)
     );
 
     return entries.map(entry => ({
