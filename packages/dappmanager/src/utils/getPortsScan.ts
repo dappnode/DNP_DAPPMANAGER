@@ -1,4 +1,6 @@
 import fetch from "node-fetch";
+import assert from "assert";
+import { logs } from "../logs";
 import params from "../params";
 import { PortScanResponse } from "../types";
 
@@ -6,17 +8,44 @@ const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
 
 export async function getPortsScan({
   publicIp,
-  ports
+  tcpPorts
 }: {
   publicIp: string;
-  ports: string[];
+  tcpPorts: string[];
 }): Promise<PortScanResponse[]> {
   try {
     const response = await fetch(
-      `${apiEndpoint}/${publicIp}?tcpPorts=${ports.join(",")}`
+      `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts.join(",")}`
     );
-    return await response.json();
+    const responseJson = await response.json();
+    sanitizeApiResponse(responseJson);
+    return responseJson();
   } catch (e) {
-    throw Error(`Error fetching port scanner ${e.message}`);
+    logs.error(`Error fetching port scanner ${e.message}`);
+
+    // Returns ports with status "unknown" when an error occurs fetching the API
+    return tcpPorts.map(tcpPort => {
+      return {
+        tcpPort: parseInt(tcpPort),
+        status: "unknown"
+      };
+    });
   }
+}
+
+function sanitizeApiResponse(responseJson: PortScanResponse[]): void {
+  assert.deepStrictEqual(
+    responseJson.some(
+      (route: PortScanResponse) => typeof route.tcpPort !== "number"
+    ),
+    false,
+    "API response returned port as number"
+  );
+  assert.deepStrictEqual(
+    responseJson.some(
+      (route: PortScanResponse) => route.status !== "open" && "closed"
+    ),
+    false,
+    "API response returned status different than open or closed"
+  );
 }

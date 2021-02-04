@@ -450,7 +450,7 @@ export type InstalledPackageData = Pick<
 
 export interface PortScanResponse {
   tcpPort: number;
-  status: "open" | "closed";
+  status: "open" | "closed" | "unknown";
 }
 
 export interface InstalledPackageDetailData extends InstalledPackageData {

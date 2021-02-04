@@ -25,8 +25,7 @@ async function natRenewal(): Promise<void> {
     // portMappings = [ {protocol: 'UDP', exPort: '500', inPort: '500'} ]
     try {
       const portMappings = await upnpc.list();
-      // Persist opened ports in the DB
-      db.upnpPortMappings.set(portMappings);
+
       db.upnpAvailable.set(true);
       if (isFirstRun) {
         logs.info(
