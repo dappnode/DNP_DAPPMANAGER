@@ -40,7 +40,7 @@ export async function dockerNetworkDisconnect(
  * Create a new docker network
  */
 export async function dockerCreateNetwork(networkName: string): Promise<void> {
-  docker.createNetwork({
+  await docker.createNetwork({
     Name: networkName,
     // Check for networks with duplicate names. Since Network is primarily
     // keyed based on a random ID and not on the name, and network name is
@@ -53,4 +53,23 @@ export async function dockerCreateNetwork(networkName: string): Promise<void> {
     // Default plugin
     Driver: "bridge"
   });
+}
+
+interface ListNetworksItem {
+  Name: string; // "bridge";
+  Id: string; // "f2de39df4171b0dc801e8002d1d999b77256983dfc63041c0f34030aa3977566";
+  Created: string; // "2016-10-19T06:21:00.416543526Z";
+  Scope: string; // "local";
+  Driver: string; // "bridge";
+  EnableIPv6: boolean; // false;
+  Internal: boolean; // false;
+  Attachable: boolean; // false;
+  Ingress: boolean; // false;
+  IPAM: {};
+  Containers: {};
+  Options: {};
+}
+
+export async function dockerListNetworks(): Promise<ListNetworksItem[]> {
+  return await docker.listNetworks();
 }

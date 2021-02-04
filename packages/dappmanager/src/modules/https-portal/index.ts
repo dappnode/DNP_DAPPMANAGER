@@ -1,4 +1,10 @@
-import { dockerNetworkConnect, dockerNetworkDisconnect } from "../docker";
+import {
+  dockerContainerInspect,
+  dockerCreateNetwork,
+  dockerListNetworks,
+  dockerNetworkConnect,
+  dockerNetworkDisconnect
+} from "../docker";
 import { listContainers } from "../docker/list";
 import { ComposeFileEditor } from "../compose/editor";
 import params from "../../params";
@@ -31,12 +37,22 @@ export class HttpsPortal {
       toHost: externalNetworkAlias
     });
 
+    // Ensure network exists
+    const networks = await dockerListNetworks();
+    if (!networks.find(network => network.Name === externalNetworkName)) {
+      await dockerCreateNetwork(externalNetworkName);
+    }
+
     // Container joins external network with a designated alias (immeditate)
-    await dockerNetworkConnect(
-      externalNetworkName,
-      container.containerName,
-      aliases
-    );
+    // Check first is it's already connected, or dockerNetworkConnect throws
+    const containerData = await dockerContainerInspect(container.containerName);
+    if (!containerData.NetworkSettings.Networks[externalNetworkName]) {
+      await dockerNetworkConnect(
+        externalNetworkName,
+        container.containerName,
+        aliases
+      );
+    }
 
     // Edit compose to persist the setting
     const compose = new ComposeFileEditor(container.dnpName, container.isCore);
@@ -65,7 +81,14 @@ export class HttpsPortal {
     }
 
     // Container leaves external network
-    await dockerNetworkDisconnect(externalNetworkName, container.containerName);
+    // Check first is it's connected, or dockerNetworkDisconnect throws
+    const containerData = await dockerContainerInspect(container.containerName);
+    if (containerData.NetworkSettings.Networks[externalNetworkName]) {
+      await dockerNetworkDisconnect(
+        externalNetworkName,
+        container.containerName
+      );
+    }
 
     // Edit compose to persist the setting
     const compose = new ComposeFileEditor(container.dnpName, container.isCore);
