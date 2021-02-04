@@ -88,6 +88,7 @@ const params = {
 
   // HTTPS Portal API URL
   HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
+  HTTPS_PORTAL_DNPNAME: "https-portal.dnp.dappnode.eth",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",

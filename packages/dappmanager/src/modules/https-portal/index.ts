@@ -1,5 +1,4 @@
 import {
-  dockerContainerInspect,
   dockerCreateNetwork,
   dockerListNetworks,
   dockerNetworkConnect,
@@ -26,7 +25,8 @@ export class HttpsPortal {
    * Expose an internal container to the external internet through the https-portal
    */
   async addMapping(mapping: HttpsPortalMapping): Promise<void> {
-    const container = await this.getContainerForMapping(mapping);
+    const containers = await listContainers();
+    const container = await this.getContainerForMapping(mapping, containers);
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
     const aliases = [externalNetworkAlias];
@@ -43,10 +43,21 @@ export class HttpsPortal {
       await dockerCreateNetwork(externalNetworkName);
     }
 
-    // Container joins external network with a designated alias (immeditate)
+    // Ensure the HTTPs portal container is connected to `externalNetworkName`
+    const httpsPortalContainer = containers.find(
+      c => c.dnpName === params.HTTPS_PORTAL_DNPNAME
+    );
+    if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
+    if (!this.isConnected(httpsPortalContainer)) {
+      await dockerNetworkConnect(
+        externalNetworkName,
+        httpsPortalContainer.containerName
+      );
+    }
+
+    // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
-    const containerData = await dockerContainerInspect(container.containerName);
-    if (!containerData.NetworkSettings.Networks[externalNetworkName]) {
+    if (!this.isConnected(container)) {
       await dockerNetworkConnect(
         externalNetworkName,
         container.containerName,
@@ -65,7 +76,8 @@ export class HttpsPortal {
    * Remove an internal container from being exposed to the external internet
    */
   async removeMapping(mapping: HttpsPortalMapping): Promise<void> {
-    const container = await this.getContainerForMapping(mapping);
+    const containers = await listContainers();
+    const container = await this.getContainerForMapping(mapping, containers);
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
 
@@ -75,15 +87,18 @@ export class HttpsPortal {
       toHost: externalNetworkAlias
     });
 
-    if (await this.containerHasMappings(container)) {
-      // Container still has mappings, skip
-      return;
-    }
+    // If container still has mappings, don't disconnect from network
+    const mappings = await this.getMappings(containers);
+    const containerHasMappings = mappings.some(
+      mapping =>
+        mapping.dnpName === container.dnpName &&
+        mapping.serviceName === container.serviceName
+    );
+    if (containerHasMappings) return;
 
     // Container leaves external network
     // Check first is it's connected, or dockerNetworkDisconnect throws
-    const containerData = await dockerContainerInspect(container.containerName);
-    if (containerData.NetworkSettings.Networks[externalNetworkName]) {
+    if (this.isConnected(container)) {
       await dockerNetworkDisconnect(
         externalNetworkName,
         container.containerName
@@ -97,10 +112,12 @@ export class HttpsPortal {
     compose.write();
   }
 
-  async getMappings(): Promise<HttpsPortalMapping[]> {
-    const entries = await this.httpsPortalApiClient.list();
+  async getMappings(
+    containers?: PackageContainer[]
+  ): Promise<HttpsPortalMapping[]> {
+    if (!containers) containers = await listContainers();
 
-    const containers = await listContainers();
+    const entries = await this.httpsPortalApiClient.list();
 
     const aliases = new Map<string, PackageContainer>();
     for (const container of containers) {
@@ -124,21 +141,12 @@ export class HttpsPortal {
     return mappings;
   }
 
-  private async containerHasMappings(
-    container: PackageContainer
-  ): Promise<boolean> {
-    const mappings = await this.getMappings();
-    return mappings.some(
-      mapping =>
-        mapping.dnpName === container.dnpName &&
-        mapping.serviceName === container.serviceName
-    );
-  }
-
   private async getContainerForMapping(
-    mapping: HttpsPortalMapping
+    mapping: HttpsPortalMapping,
+    containers?: PackageContainer[]
   ): Promise<PackageContainer> {
-    const containers = await listContainers();
+    if (!containers) containers = await listContainers();
+
     const container = containers.find(
       c =>
         c.dnpName === mapping.dnpName && c.serviceName === mapping.serviceName
@@ -149,5 +157,9 @@ export class HttpsPortal {
       );
 
     return container;
+  }
+
+  private isConnected(container: PackageContainer): boolean {
+    return container.networks.some(n => n.name === externalNetworkName);
   }
 }

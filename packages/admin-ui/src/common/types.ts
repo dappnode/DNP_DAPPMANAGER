@@ -414,6 +414,7 @@ export interface PackageContainer {
   exitCode: number | null;
   ports: PortMapping[];
   volumes: VolumeMapping[];
+  networks: { name: string; ip: string }[];
 
   // DAppNode package data
   isDnp: boolean;

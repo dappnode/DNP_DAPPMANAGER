@@ -19,7 +19,6 @@ import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
-const networkName = params.DNP_PRIVATE_NETWORK_NAME;
 const allowedFullnodeDnpNames = params.ALLOWED_FULLNODE_DNP_NAMES;
 
 export function parseContainerInfo(container: ContainerInfo): PackageContainer {
@@ -42,6 +41,14 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
   const state = container.State as ContainerState;
   const exitCode = parseExitCodeFromStatus(container.Status);
 
+  const containerNetworks = container.NetworkSettings?.Networks || {};
+  const networks = Object.entries(containerNetworks).map(
+    ([networkName, network]) => ({
+      name: networkName,
+      ip: network.IPAddress
+    })
+  );
+
   return {
     // Identification
     containerId: container.Id,
@@ -61,12 +68,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     // Docker data
     created: container.Created,
     image: container.Image,
-    ip:
-      container.NetworkSettings &&
-      container.NetworkSettings.Networks &&
-      container.NetworkSettings.Networks[networkName]
-        ? container.NetworkSettings.Networks[networkName].IPAddress
-        : undefined,
+    ip: containerNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.IPAddress,
     ports: container.Ports.map(
       ({ PrivatePort, PublicPort, Type }): PortMapping => ({
         // "PublicPort" will be undefined / null / 0 if the port is not mapped
@@ -88,6 +90,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
         ...(Name ? { name: Name } : {}) // "nginxproxydnpdappnodeeth_vhost.d"
       })
     ),
+    networks,
 
     state,
     running: state === "running",
