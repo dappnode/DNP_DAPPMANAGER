@@ -8,7 +8,8 @@ export async function portsScanGet(): Promise<PortScanResponse[]> {
   // as a better approach, if tcp ports were opened with UpNp, udp quite probably were opened as well
   const tcpPorts = packagePort
     .filter(port => port.protocol === "TCP")
-    .map(port => port.portNumber.toString());
+    .map(port => port.portNumber.toString())
+    .join(",");
   const publicIp = db.publicIp.get();
 
   return await getPortsScan({

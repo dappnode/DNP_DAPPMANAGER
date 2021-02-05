@@ -7,105 +7,47 @@ import SubTitle from "components/SubTitle";
 import Ok from "components/Ok";
 import Card from "components/Card";
 
-function PortsOpened({ localIp }: { localIp: string }) {
+function PortsTable() {
   const upnpInfo = useApi.getPortsStatus();
 
   return (
     <>
       {upnpInfo.data ? (
         <>
-          <SubTitle>Opened ports</SubTitle>
+          <SubTitle>Ports table</SubTitle>
           <Table striped bordered hover>
             <thead>
               <tr>
                 <th>Protocol</th>
-                <th>Router port</th>
-                <th>DAppNode port</th>
-                <th>Status</th>
+                <th>Port</th>
+                <th>Service</th>
+                <th>Status API</th>
+                <th>Status UPnP</th>
               </tr>
             </thead>
             <tbody>
-              {upnpInfo.data.upnpPortMappings
-                .filter(route => route.ip === localIp) // Check only map routing for the dappnode IP
-                .map(route => {
-                  return (
-                    <tr>
-                      <td>{route.protocol}</td>
-                      <td>{route.exPort}</td>
-                      <td>{route.inPort}</td>
-                      <td>
-                        {upnpInfo.data ? (
-                          upnpInfo.data.portsToOpen.some(
-                            route2 =>
-                              route2.portNumber.toString() === route.exPort // Will display if even having UPNP enabled the port is opened or still closed
-                          ) ? (
-                            <Ok ok={true} msg={"Open"} />
-                          ) : (
-                            <Ok ok={false} msg={"Closed"} />
-                          )
-                        ) : (
-                          <Ok ok={false} msg={"Unknown"} />
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}{" "}
-            </tbody>
-          </Table>
-        </>
-      ) : upnpInfo.error ? (
-        <ErrorView error={upnpInfo.error} />
-      ) : (
-        <Loading steps={["Loading opened ports"]} />
-      )}
-    </>
-  );
-}
-
-function PortsToOpen() {
-  const upnpInfo = useApi.getPortsStatus();
-  const portsScanInfo = useApi.portsScanGet();
-
-  return (
-    <>
-      {upnpInfo.data ? (
-        <>
-          <SubTitle>Ports to open</SubTitle>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Protocol</th>
-                <th>Port number</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upnpInfo.data.portsToOpen.map(route => {
+              {upnpInfo.data.portsData.map(port => {
                 return (
                   <tr>
-                    <td>{route.protocol}</td>
-                    <td>{route.portNumber}</td>
+                    <td>{port.protocol}</td>
+                    <td>{port.port}</td>
+                    <td>{port.service}</td>
                     <td>
-                      {route.protocol === "UDP" ? (
-                        "Unknown"
-                      ) : portsScanInfo.data ? (
-                        portsScanInfo.data.find(
-                          port =>
-                            port.tcpPort === route.portNumber &&
-                            port.status === "open"
-                        ) ? (
-                          <Ok ok={true} msg={"Open"} />
-                        ) : (
-                          <Ok ok={false} msg={"Closed"} />
-                        )
-                      ) : portsScanInfo.error ? (
-                        "Unknown"
+                      {port.apiStatus === "open" ? (
+                        <Ok ok={true} msg={"Open"} />
+                      ) : port.apiStatus === "closed" ? (
+                        <Ok ok={false} msg={"Closed"} />
                       ) : (
-                        <Ok
-                          msg={"Scanning..."}
-                          loading={true}
-                          style={{ margin: "auto" }}
-                        />
+                        "Unknown"
+                      )}
+                    </td>
+                    <td>
+                      {port.upnpStatus === "open" ? (
+                        <Ok ok={true} msg={"Open"} />
+                      ) : port.upnpStatus === "closed" ? (
+                        <Ok ok={false} msg={"Closed"} />
+                      ) : (
+                        "Unknown"
                       )}
                     </td>
                   </tr>
@@ -117,7 +59,7 @@ function PortsToOpen() {
       ) : upnpInfo.error ? (
         <ErrorView error={upnpInfo.error} />
       ) : (
-        <Loading steps={["Loading ports to open"]} />
+        <Loading steps={["Loading opened ports"]} />
       )}
     </>
   );
@@ -133,7 +75,7 @@ export default function UPnP() {
           systemInfo.data.upnpAvailable ? (
             <>
               <Ok ok={true} msg={"DAppNode has detected UPnP as enabled"} />
-              <PortsOpened localIp={systemInfo.data.internalIp} />
+              <PortsTable />
             </>
           ) : (
             <>
@@ -146,7 +88,7 @@ export default function UPnP() {
 
               <strong>UDP ports must be manually checked in the router</strong>
 
-              <PortsToOpen />
+              <PortsTable />
             </>
           )
         ) : (

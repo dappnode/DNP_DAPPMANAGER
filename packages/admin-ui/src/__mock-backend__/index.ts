@@ -59,22 +59,20 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
 
   getPortsStatus: async () => ({
     upnpAvailable: true,
-    portsToOpen: [
-      { portNumber: 8092, protocol: "TCP" },
-      { portNumber: 1194, protocol: "UDP" }
-    ],
-    upnpPortMappings: [
+    portsData: [
       {
-        protocol: "TCP",
-        exPort: "8092",
-        inPort: "8092",
-        ip: "192.168.1.65"
+        port: 8092,
+        protocol: "UDP",
+        upnpStatus: "open",
+        apiStatus: "open",
+        service: "vpn"
       },
       {
-        protocol: "UDP",
-        exPort: "1194",
-        inPort: "1194",
-        ip: "192.168.1.65"
+        port: 1194,
+        protocol: "TCP",
+        upnpStatus: "unknown",
+        apiStatus: "open",
+        service: "string"
       }
     ]
   }),

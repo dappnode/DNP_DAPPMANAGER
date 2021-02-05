@@ -28,9 +28,8 @@ import {
   PublicIpResponse,
   ChainData,
   ShhStatus,
-  PackagePort,
-  UpnpPortMapping,
-  PortScanResponse
+  PortScanResponse,
+  PortsTable
 } from "./types";
 
 export interface Routes {
@@ -231,8 +230,7 @@ export interface Routes {
    */
   getPortsStatus: () => Promise<{
     upnpAvailable: boolean;
-    portsToOpen: PackagePort[];
-    upnpPortMappings: UpnpPortMapping[];
+    portsData: PortsTable[];
   }>;
 
   portsScanGet: () => Promise<PortScanResponse[]>;

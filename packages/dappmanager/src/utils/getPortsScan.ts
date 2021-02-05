@@ -11,20 +11,20 @@ export async function getPortsScan({
   tcpPorts
 }: {
   publicIp: string;
-  tcpPorts: string[];
+  tcpPorts: string;
 }): Promise<PortScanResponse[]> {
   try {
     const response = await fetch(
-      `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts.join(",")}`
+      `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`
     );
     const responseJson = await response.json();
     sanitizeApiResponse(responseJson);
-    return responseJson();
+    return responseJson;
   } catch (e) {
     logs.error(`Error fetching port scanner ${e.message}`);
 
     // Returns ports with status "unknown" when an error occurs fetching the API
-    return tcpPorts.map(tcpPort => {
+    return tcpPorts.split(",").map(tcpPort => {
       return {
         tcpPort: parseInt(tcpPort),
         status: "unknown"

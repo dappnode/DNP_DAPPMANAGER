@@ -308,6 +308,14 @@ export interface UpnpPortMapping {
   ip: string;
 }
 
+export interface PortsTable {
+  port: number;
+  protocol: "UDP" | "TCP";
+  upnpStatus: "open" | "closed" | "unknown";
+  apiStatus: "open" | "closed" | "unknown";
+  service: string; // if not found then unknown
+}
+
 export interface VolumeMapping {
   host: string; // path
   container: string; // dest

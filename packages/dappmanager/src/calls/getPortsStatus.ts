@@ -4,7 +4,7 @@ import { UpnpPortMapping } from "../modules/upnpc/types";
 import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen";
 import { getPortsScan } from "../utils/getPortsScan";
 import { listPackages } from "../modules/docker/list";
-import { InstalledPackageData } from "../common";
+import { InstalledPackageData, PortsTable } from "../common";
 import { portsTableData } from "../utils/portsTableData";
 
 /**
@@ -15,8 +15,7 @@ import { portsTableData } from "../utils/portsTableData";
  */
 export async function getPortsStatus(): Promise<{
   upnpAvailable: boolean;
-  portsToOpen: PackagePort[];
-  upnpPortMappings: UpnpPortMapping[];
+  portsData: PortsTable[];
 }> {
   // DATA
   const upnpAvailable: boolean = db.upnpAvailable.get();
@@ -27,7 +26,8 @@ export async function getPortsStatus(): Promise<{
   // API
   const tcpPorts = portsToOpen
     .filter(port => port.protocol === "TCP")
-    .map(port => port.portNumber.toString());
+    .map(port => port.portNumber.toString())
+    .join(",");
   const publicIp = db.publicIp.get();
 
   const apiTcpPortsStatus = await getPortsScan({
@@ -36,7 +36,7 @@ export async function getPortsStatus(): Promise<{
   });
 
   // Data ports table
-  const data = portsTableData({
+  const portsData = portsTableData({
     apiTcpPortsStatus,
     packages,
     upnpPortMappings,
@@ -45,7 +45,6 @@ export async function getPortsStatus(): Promise<{
 
   return {
     upnpAvailable,
-    portsToOpen,
-    upnpPortMappings
+    portsData
   };
 }
