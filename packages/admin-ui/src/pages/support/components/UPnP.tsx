@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useApi } from "api";
+import React, { useState } from "react";
+import { useApi, api } from "api";
 import { Table } from "react-bootstrap";
 import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
@@ -8,8 +8,9 @@ import Button from "components/Button";
 import Switch from "components/Switch";
 import Ok from "components/Ok";
 import Card from "components/Card";
-import { ReqStatus, PortsTable } from "types";
+import { ReqStatus } from "types";
 import { withToast } from "components/toast/Toast";
+import { shortNameCapitalized } from "utils/format";
 
 function PortsStatusTable() {
   const upnpInfo = useApi.getPortsStatus();
@@ -17,25 +18,17 @@ function PortsStatusTable() {
   const [reqStatusPortsStatus, setReqStatusPortsStatus] = useState<ReqStatus>(
     {}
   );
-  const [portsStatus, setPortsStatus] = useState<PortsTable[]>([
-    {} as PortsTable
-  ]);
   const [advancedMode, setAdvancedMode] = useState(false);
-
-  useEffect(() => {
-    if (upnpInfo.data) setPortsStatus(upnpInfo.data.portsData);
-  }, [upnpInfo.data]);
 
   async function updatePortsStatus() {
     try {
       setReqStatusPortsStatus({ loading: true });
-      await withToast(async () => useApi.getPortsStatus(), {
+      await withToast(() => api.getPortsStatus(), {
         message: `Updating ports status`,
         onSuccess: `Updated ports status`,
         onError: `Error updating ports status`
-      });
+      }).then(upnpInfo.revalidate);
       setReqStatusPortsStatus({ result: true });
-      if (upnpInfo.data) setPortsStatus(upnpInfo.data.portsData);
     } catch (e) {
       setReqStatusPortsStatus({ error: e });
       console.error("Error on getPortsStatus", e);
@@ -44,14 +37,14 @@ function PortsStatusTable() {
 
   return (
     <>
-      {portsStatus ? (
+      {upnpInfo.data ? (
         <>
           <SubTitle>
             Ports table
             <Button
               variant={"dappnode"}
               className="float-right"
-              onClick={updatePortsStatus}
+              onClick={async () => await updatePortsStatus()}
             >
               Scan ports
             </Button>
@@ -63,35 +56,65 @@ function PortsStatusTable() {
                 <th>Protocol</th>
                 <th>Port</th>
                 <th>Service</th>
-                <th>Status API</th>
-                <th>Status UPnP</th>
+                {advancedMode ? (
+                  <>
+                    <th>Status API *</th>
+                    <th>Status UPnP *</th>
+                  </>
+                ) : (
+                  <th>Status</th>
+                )}
               </tr>
             </thead>
             <tbody>
-              {portsStatus.map(port => {
+              {upnpInfo.data.map(port => {
                 return (
                   <tr>
                     <td>{port.protocol}</td>
                     <td>{port.port}</td>
-                    <td>{port.service}</td>
-                    <td>
-                      {port.apiStatus === "open" ? (
-                        <Ok ok={true} msg={"Open"} />
-                      ) : port.apiStatus === "closed" ? (
-                        <Ok ok={false} msg={"Closed"} />
-                      ) : (
-                        "Unknown"
-                      )}
-                    </td>
-                    <td>
-                      {port.upnpStatus === "open" ? (
-                        <Ok ok={true} msg={"Open"} />
-                      ) : port.upnpStatus === "closed" ? (
-                        <Ok ok={false} msg={"Closed"} />
-                      ) : (
-                        "Unknown"
-                      )}
-                    </td>
+                    <td>{shortNameCapitalized(port.service)}</td>
+                    {/* Advanced mode: both api and upnp. Non-advanced: api*/}
+                    {advancedMode ? (
+                      <>
+                        <td>
+                          {port.apiStatus === "open" ? (
+                            <Ok ok={true} msg={"Open"} />
+                          ) : port.apiStatus === "closed" ? (
+                            <Ok ok={false} msg={"Closed"} />
+                          ) : (
+                            "Unknown"
+                          )}
+                        </td>
+                        <td>
+                          {port.upnpStatus === "open" ? (
+                            <Ok ok={true} msg={"Open"} />
+                          ) : port.upnpStatus === "closed" ? (
+                            <Ok ok={false} msg={"Closed"} />
+                          ) : (
+                            "Unknown"
+                          )}
+                        </td>
+                      </>
+                    ) : (
+                      <td>
+                        {port.protocol === "UDP" ||
+                        port.apiStatus === "unknown" ? (
+                          port.upnpStatus === "open" ? (
+                            <Ok ok={true} msg={"Open"} />
+                          ) : port.upnpStatus === "closed" ? (
+                            <Ok ok={false} msg={"Closed"} />
+                          ) : (
+                            "Unknown"
+                          )
+                        ) : port.apiStatus === "open" ? (
+                          <Ok ok={true} msg={"Open"} />
+                        ) : port.apiStatus === "closed" ? (
+                          <Ok ok={false} msg={"Closed"} />
+                        ) : (
+                          "Unknown"
+                        )}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -105,6 +128,15 @@ function PortsStatusTable() {
             }
             highlightOnHover={true}
           />
+          <hr />
+          {advancedMode ? (
+            <p>
+              <strong>Status API*: </strong>sport status using an API scan
+              service
+              <br />
+              <strong>Status UPnP*: </strong>port status using UPnP scan
+            </p>
+          ) : null}
         </>
       ) : upnpInfo.error ? (
         <ErrorView error={upnpInfo.error} />
@@ -128,6 +160,7 @@ export default function UPnP() {
           systemInfo.data.upnpAvailable ? (
             <>
               <Ok ok={true} msg={"DAppNode has detected UPnP as enabled"} />
+              <hr />
               <PortsStatusTable />
             </>
           ) : (
@@ -138,19 +171,24 @@ export default function UPnP() {
                 in the router to the DAppNode local Ip:
                 <strong>{systemInfo.data.internalIp}</strong>
               </p>
-
+              <br />
               <strong>UDP ports must be manually checked in the router</strong>
+
+              <hr />
 
               <PortsStatusTable />
             </>
           )
         ) : (
-          <Ok
-            ok={true}
-            msg={
-              "DAppNode is running on a remote machine and does not require UPnP"
-            }
-          />
+          <>
+            <Ok
+              ok={true}
+              msg={
+                "DAppNode is running on a remote machine and does not require UPnP"
+              }
+            />
+            <PortsStatusTable />
+          </>
         )
       ) : systemInfo.error ? (
         <ErrorView error={systemInfo.error} />

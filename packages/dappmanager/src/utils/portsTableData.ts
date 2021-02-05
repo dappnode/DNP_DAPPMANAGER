@@ -5,8 +5,12 @@ import {
   PortsTable,
   UpnpPortMapping
 } from "../common";
-import { upnpAvailable } from "../db";
+import * as db from "../db";
 
+/**
+ * Returns the necessary data for display the
+ * ports table in the UI well formatted
+ */
 export function portsTableData({
   apiTcpPortsStatus,
   packages,
@@ -18,49 +22,93 @@ export function portsTableData({
   upnpPortMappings: UpnpPortMapping[];
   portsToOpen: PackagePort[];
 }): PortsTable[] {
+  const upnpAvailable = db.upnpAvailable.get();
+
   // COOKING DATA
   return portsToOpen.map(port => {
     return {
       port: port.portNumber,
       protocol: port.protocol,
-      // UPnP:
-      // 1.UPnP available AND port open
-      // 2.UPnP available AND port closed
-      // 3.UPnP not available port unknown
-      upnpStatus: !upnpAvailable
-        ? "unknown"
-        : upnpPortMappings.some(
-            upnpPort => parseInt(upnpPort.inPort) === port.portNumber
-          )
-        ? "open"
-        : "closed",
-      // API
-      // 1.API available AND port open
-      // 2.API available AND port closed
-      // 3.API not available port unknown
-      apiStatus:
-        apiTcpPortsStatus.find(apiPort => apiPort.tcpPort === port.portNumber)
-          ?.status || "unknown",
-
-      // Service name
-      service:
-        // 1.Look for matching ports in containers > default ports
-        packages.find(dappnodePackage =>
-          dappnodePackage.containers.map(container =>
-            container.defaultPorts?.map(
-              packagePort => port.portNumber === packagePort.container
-            )
-          )
-        )?.dnpName ||
-        // 2.Look for matching ports in containers > ports
-        packages.find(dappnodePackage =>
-          dappnodePackage.containers.map(container =>
-            container.ports?.map(
-              packagePort => port.portNumber === packagePort.container
-            )
-          )
-        )?.dnpName ||
-        "unknown"
+      upnpStatus: getUpnpStatus({ port, upnpAvailable, upnpPortMappings }),
+      apiStatus: getApiStatus({ port, apiTcpPortsStatus }),
+      service: getServiceName({ port, packages })
     };
   });
+}
+
+// UTILS
+
+/**
+ * UPnP:
+ * 1.UPnP available AND port open => "open"
+ * 2.UPnP available AND port closed => "closed"
+ * 3.UPnP not available => "unknown"
+ */
+function getUpnpStatus({
+  port,
+  upnpAvailable,
+  upnpPortMappings
+}: {
+  port: PackagePort;
+  upnpAvailable: boolean;
+  upnpPortMappings: UpnpPortMapping[];
+}): "open" | "closed" | "unknown" {
+  return !upnpAvailable
+    ? "unknown"
+    : upnpPortMappings.some(
+        upnpPort => parseInt(upnpPort.inPort) === port.portNumber
+      )
+    ? "open"
+    : "closed";
+}
+
+/**
+ * API
+ * 1.API available AND port open => "open"
+ * 2.API available AND port closed => "closed"
+ * 3.API not available OR port not found => "unknown"
+ */
+function getApiStatus({
+  port,
+  apiTcpPortsStatus
+}: {
+  port: PackagePort;
+  apiTcpPortsStatus: PortScanResponse[];
+}): "open" | "closed" | "unknown" {
+  return (
+    apiTcpPortsStatus.find(apiPort => apiPort.tcpPort === port.portNumber)
+      ?.status || "unknown"
+  );
+}
+
+/**
+ * Service name:
+ * 1. First look for matching ports in default ports
+ * 2. Secondly look for matching ports in custom ports
+ * Returns "unknown" if no match
+ */
+function getServiceName({
+  port,
+  packages
+}: {
+  port: PackagePort;
+  packages: InstalledPackageData[];
+}): string {
+  return (
+    packages.find(dappnodePackage =>
+      dappnodePackage.containers.find(container =>
+        container.defaultPorts?.find(
+          packagePort => port.portNumber === packagePort.host
+        )
+      )
+    )?.dnpName ||
+    packages.find(dappnodePackage =>
+      dappnodePackage.containers.find(container =>
+        container.ports?.find(
+          packagePort => port.portNumber === packagePort.host
+        )
+      )
+    )?.dnpName ||
+    "unknown"
+  );
 }

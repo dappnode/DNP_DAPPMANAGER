@@ -6,7 +6,7 @@ import { PortScanResponse } from "../types";
 
 const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
 
-export async function getPortsScan({
+export async function performPortsScan({
   publicIp,
   tcpPorts
 }: {
@@ -33,17 +33,29 @@ export async function getPortsScan({
   }
 }
 
+/**
+ * Check if the response from the scan ports API
+ * is well formatted
+ */
 function sanitizeApiResponse(responseJson: PortScanResponse[]): void {
+  assert.deepStrictEqual(
+    responseJson.some((route: PortScanResponse) =>
+      Object.keys(route).some(key => key !== "tcpPort" && key !== "status")
+    ),
+    false,
+    "API response returned wrong key JSON"
+  );
   assert.deepStrictEqual(
     responseJson.some(
       (route: PortScanResponse) => typeof route.tcpPort !== "number"
     ),
     false,
-    "API response returned port as number"
+    "API response returned port different than number"
   );
   assert.deepStrictEqual(
     responseJson.some(
-      (route: PortScanResponse) => route.status !== "open" && "closed"
+      (route: PortScanResponse) =>
+        route.status !== "closed" && route.status !== "open"
     ),
     false,
     "API response returned status different than open or closed"

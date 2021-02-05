@@ -57,24 +57,22 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
-  getPortsStatus: async () => ({
-    portsData: [
-      {
-        port: 8092,
-        protocol: "UDP",
-        upnpStatus: "open",
-        apiStatus: "open",
-        service: "vpn"
-      },
-      {
-        port: 1194,
-        protocol: "TCP",
-        upnpStatus: "unknown",
-        apiStatus: "open",
-        service: "string"
-      }
-    ]
-  }),
+  getPortsStatus: async () => [
+    {
+      port: 8092,
+      protocol: "UDP",
+      upnpStatus: "open",
+      apiStatus: "unknown",
+      service: "dnp.dappmanager.eth"
+    },
+    {
+      port: 1194,
+      protocol: "TCP",
+      upnpStatus: "unknown",
+      apiStatus: "open",
+      service: "dnp.vpn.eth"
+    }
+  ],
 
   statsCpuGet: async () => ({
     usedPercentage: 88

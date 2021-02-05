@@ -2,7 +2,7 @@ import * as db from "../db";
 import { PackagePort } from "../types";
 import { UpnpPortMapping } from "../modules/upnpc/types";
 import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen";
-import { getPortsScan } from "../utils/getPortsScan";
+import { performPortsScan } from "../utils/performPortsScan";
 import { listPackages } from "../modules/docker/list";
 import { InstalledPackageData, PortsTable } from "../common";
 import { portsTableData } from "../utils/portsTableData";
@@ -13,12 +13,10 @@ import { portsTableData } from "../utils/portsTableData";
  *   their port mapping and reading the docker-compose
  * - upnpPortMappings is obtained directly from UPnP
  */
-export async function getPortsStatus(): Promise<{
-  portsData: PortsTable[];
-}> {
+export async function getPortsStatus(): Promise<PortsTable[]> {
   // DATA
   const portsToOpen: PackagePort[] = await getPortsToOpen(); // Ports to be opened
-  const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UpNp
+  const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UPnP
   const packages: InstalledPackageData[] = await listPackages();
 
   // API
@@ -28,20 +26,15 @@ export async function getPortsStatus(): Promise<{
     .join(",");
   const publicIp = db.publicIp.get();
 
-  const apiTcpPortsStatus = await getPortsScan({
+  const apiTcpPortsStatus = await performPortsScan({
     publicIp,
     tcpPorts
   });
 
-  // Data ports table
-  const portsData = portsTableData({
+  return portsTableData({
     apiTcpPortsStatus,
     packages,
     upnpPortMappings,
     portsToOpen
   });
-
-  return {
-    portsData
-  };
 }

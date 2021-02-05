@@ -228,9 +228,7 @@ export interface Routes {
    * - Ports to be opened
    * - Ports opened
    */
-  getPortsStatus: () => Promise<{
-    portsData: PortsTable[];
-  }>;
+  getPortsStatus: () => Promise<PortsTable[]>;
 
   portsScanGet: () => Promise<PortScanResponse[]>;
 
