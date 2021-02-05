@@ -48,7 +48,7 @@ export function portsTableData({
         packages.find(dappnodePackage =>
           dappnodePackage.containers.map(container =>
             container.defaultPorts?.map(
-              packagePort => port.portNumber === packagePort.host
+              packagePort => port.portNumber === packagePort.container
             )
           )
         )?.dnpName ||
@@ -56,7 +56,7 @@ export function portsTableData({
         packages.find(dappnodePackage =>
           dappnodePackage.containers.map(container =>
             container.ports?.map(
-              packagePort => port.portNumber === packagePort.host
+              packagePort => port.portNumber === packagePort.container
             )
           )
         )?.dnpName ||

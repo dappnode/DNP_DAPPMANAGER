@@ -14,11 +14,9 @@ import { portsTableData } from "../utils/portsTableData";
  * - upnpPortMappings is obtained directly from UPnP
  */
 export async function getPortsStatus(): Promise<{
-  upnpAvailable: boolean;
   portsData: PortsTable[];
 }> {
   // DATA
-  const upnpAvailable: boolean = db.upnpAvailable.get();
   const portsToOpen: PackagePort[] = await getPortsToOpen(); // Ports to be opened
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UpNp
   const packages: InstalledPackageData[] = await listPackages();
@@ -44,7 +42,6 @@ export async function getPortsStatus(): Promise<{
   });
 
   return {
-    upnpAvailable,
     portsData
   };
 }

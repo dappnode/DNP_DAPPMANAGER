@@ -229,7 +229,6 @@ export interface Routes {
    * - Ports opened
    */
   getPortsStatus: () => Promise<{
-    upnpAvailable: boolean;
     portsData: PortsTable[];
   }>;
 

@@ -58,7 +58,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
 
   getPortsStatus: async () => ({
-    upnpAvailable: true,
     portsData: [
       {
         port: 8092,
