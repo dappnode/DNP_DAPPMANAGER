@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api, useApi } from "api";
-import { ReqStatus, HttpsPortalMapping } from "types";
+import { useSelector } from "react-redux";
+import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
+import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 import { BsArrowRight } from "react-icons/bs";
 import { withToast } from "components/toast/Toast";
 import { confirmPromise } from "components/ConfirmDialog";
+import { InputForm } from "components/InputForm";
+import Button from "components/Button";
+import Switch from "components/Switch";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
+import { getPublicSubdomain } from "utils/domains";
 import { shortNameCapitalized as sn } from "utils/format";
-import { HttpsPortalNewMapping } from "./HttpsMappingsNew";
+import newTabProps from "utils/newTabProps";
+import { ReqStatus, HttpsPortalMapping } from "types";
 import "./https-mapping.scss";
-
-interface Mapping {
-  from: string;
-  dnpName: string;
-  serviceName: string;
-  portNumber: number;
-}
 
 export function HttpsMappings({
   dnpName,
@@ -25,11 +25,31 @@ export function HttpsMappings({
   dnpName: string;
   serviceName: string;
 }) {
+  const [showAll, setShowAll] = useState(false);
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const [editing, setEditing] = useState(false);
+  const [from, setFrom] = useState("");
+  const [port, setPort] = useState("80");
+
   const mappings = useApi.httpsPortalMappingsGet();
 
-  async function addMapping(mapping: HttpsPortalMapping) {
+  const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
+
+  // Prefill the `from` input with the recommended subdomain on every select change
+  useEffect(() => {
+    setFrom(getPublicSubdomain({ dnpName, serviceName }));
+  }, [dnpName, serviceName]);
+
+  /** Add the new mapping created in the local editor */
+  async function addMapping() {
     if (reqStatus.loading) return;
+
+    const mapping: HttpsPortalMapping = {
+      fromSubdomain: from,
+      dnpName,
+      serviceName,
+      port: parseInt(port)
+    };
 
     try {
       await confirmPromise({
@@ -46,6 +66,10 @@ export function HttpsMappings({
         onSuccess: "Added HTTPs mapping"
       });
       setReqStatus({ result: true });
+
+      // Clear editor
+      setFrom("");
+      setEditing(false);
     } catch (e) {
       setReqStatus({ error: e.message });
     } finally {
@@ -53,6 +77,7 @@ export function HttpsMappings({
     }
   }
 
+  /** Remove any mapping, could be external to this service */
   async function removeMapping(mapping: HttpsPortalMapping) {
     if (reqStatus.loading) return;
 
@@ -83,43 +108,128 @@ export function HttpsMappings({
 
   const serviceMappings = mappings.data.filter(
     mapping =>
-      mapping.dnpName === dnpName && mapping.serviceName === serviceName
+      showAll ||
+      (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
   );
+
+  // New mapping validation
+  const fromError = validateFromSubdomain(from, mappings.data);
+  const portError = validatePort(port);
+  const isValid = !fromError && !portError;
 
   return (
     <div className="network-mappings">
-      {serviceMappings.length > 0 && (
-        <div className="list-grid">
-          {/* Table header */}
-          <header className="name">From</header>
-          <header className="name" />
-          <header className="name">To</header>
-          <header className="header">Remove</header>
+      <div className="list-grid">
+        {/* Table header */}
+        <header className="name">FROM</header>
+        <header className="name" />
+        <header className="name">TO</header>
+        <header className="header">REMOVE</header>
 
-          <hr />
+        <hr />
 
-          {serviceMappings.map(mapping => (
-            <React.Fragment key={mapping.fromSubdomain}>
-              <span className="name">{mapping.fromSubdomain}</span>
-              <span className="name">
-                <BsArrowRight />
-              </span>
-              <span className="name">
-                {sn(mapping.dnpName)} {sn(mapping.serviceName)}
-              </span>
+        {serviceMappings.length === 0 && (
+          <span className="no-mappings">No mappings</span>
+        )}
 
-              <MdClose onClick={() => removeMapping(mapping)} />
-            </React.Fragment>
-          ))}
-        </div>
+        {serviceMappings.map(mapping => (
+          <React.Fragment key={mapping.fromSubdomain}>
+            <span className="name">
+              <a
+                href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
+                {...newTabProps}
+              >
+                {mapping.fromSubdomain}
+              </a>
+            </span>
+            <span className="name">
+              <BsArrowRight />
+            </span>
+            <span className="name">
+              {sn(mapping.dnpName)} {sn(mapping.serviceName)}
+            </span>
+
+            <MdClose onClick={() => removeMapping(mapping)} />
+          </React.Fragment>
+        ))}
+      </div>
+
+      {editing && (
+        <InputForm
+          fields={[
+            {
+              label: "From subdomain",
+              labelId: "from-subdomain",
+              value: from,
+              onValueChange: setFrom,
+              error: fromError
+            },
+            {
+              label: "To port",
+              labelId: "to-port",
+              type: "number",
+              value: port,
+              onValueChange: setPort,
+              error: portError
+            }
+          ]}
+        >
+          <Button
+            type="submit"
+            variant="dappnode"
+            onClick={addMapping}
+            disabled={!isValid || reqStatus.loading}
+          >
+            Add mapping
+          </Button>
+        </InputForm>
       )}
 
-      <HttpsPortalNewMapping
-        dnpName={dnpName}
-        serviceName={serviceName}
-        mappings={mappings.data}
-        addMapping={addMapping}
-      />
+      <div className="bottom-buttons">
+        <Switch
+          className="show-all"
+          checked={showAll}
+          onToggle={setShowAll}
+          label="Show all"
+        />
+
+        {editing ? (
+          <Button onClick={() => setEditing(false)}>Cancel</Button>
+        ) : (
+          <Button
+            className="new-mapping-button"
+            variant="dappnode"
+            onClick={() => setEditing(true)}
+          >
+            New mapping <MdAdd />
+          </Button>
+        )}
+      </div>
     </div>
   );
+}
+
+function validateFromSubdomain(
+  from: string,
+  mappings: HttpsPortalMapping[]
+): string | null {
+  if (!from) {
+    return "from subdomain is empty";
+  }
+
+  const dupMapping = mappings.find(m => m.fromSubdomain === from);
+  if (dupMapping) {
+    const target = `${sn(dupMapping.dnpName)} ${sn(dupMapping.serviceName)}`;
+    return `subdomain is already used to map to ${target}`;
+  }
+
+  return null;
+}
+
+function validatePort(port: string): string | null {
+  if (!port) return "Invalid empty port";
+  const portNum = parseInt(port);
+  if (!portNum) return "Invalid port number";
+  if (portNum > 65535) return "Port number too high";
+  return null;
 }
