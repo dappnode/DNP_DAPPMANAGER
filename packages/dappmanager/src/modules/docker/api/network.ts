@@ -14,7 +14,9 @@ export async function dockerNetworkConnect(
   const network = docker.getNetwork(networkName);
   await network.connect({
     Container: containerName,
-    Aliases: aliases
+    EndpointConfig: {
+      Aliases: aliases
+    }
   });
 }
 
