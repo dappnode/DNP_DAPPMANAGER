@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
+import { rootPath as installedRootPath } from "pages/installer";
+import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
 import { BsArrowRight } from "react-icons/bs";
@@ -16,6 +19,7 @@ import { getPublicSubdomain } from "utils/domains";
 import { shortNameCapitalized as sn } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping } from "types";
+import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 
 export function HttpsMappings({
@@ -32,7 +36,7 @@ export function HttpsMappings({
   const [port, setPort] = useState("80");
 
   const mappings = useApi.httpsPortalMappingsGet();
-
+  const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
   // Prefill the `from` input with the recommended subdomain on every select change
@@ -105,6 +109,22 @@ export function HttpsMappings({
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
   if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
+
+  // Helper UI in case the HTTPs Portal is bad
+  if (dnpsRequest.data) {
+    const httpsPortalDnp = dnpsRequest.data.find(
+      dnp => dnp.dnpName === httpsPortalDnpName
+    );
+    if (!httpsPortalDnp) {
+      const url = `${installedRootPath}/${httpsPortalDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
+          this feature
+        </Alert>
+      );
+    }
+  }
 
   const serviceMappings = mappings.data.filter(
     mapping =>
