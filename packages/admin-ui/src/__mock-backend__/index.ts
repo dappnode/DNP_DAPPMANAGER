@@ -57,6 +57,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
+  dappnodeWebNameSet: async () => {},
+
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
@@ -132,6 +134,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ip: "85.84.83.82",
     name: "My-DAppNode",
     staticIp: "", // "85.84.83.82",
+    dappnodeWebName: "dappnodeWebName",
     domain: "1234acbd.dyndns.io",
     upnpAvailable: true,
     noNatLoopback: false,
