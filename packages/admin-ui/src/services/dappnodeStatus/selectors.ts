@@ -57,7 +57,7 @@ export const getDappnodeIdentityClean = (state: RootState) => {
   if (systemInfo) {
     // Show all info always
     return {
-      name: systemInfo.name,
+      name: systemInfo.dappnodeWebName,
       domain: systemInfo.domain,
       ip: systemInfo.staticIp || systemInfo.ip,
       // Internal IP is very useful for debugging networking issues
@@ -67,6 +67,9 @@ export const getDappnodeIdentityClean = (state: RootState) => {
     return {};
   }
 };
+
+export const getDappnodeName = (state: RootState) =>
+  (getSystemInfo(state) || {}).dappnodeWebName || "";
 
 export const getStaticIp = (state: RootState) =>
   (getSystemInfo(state) || {}).staticIp || "";
