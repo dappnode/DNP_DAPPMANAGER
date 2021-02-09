@@ -1,5 +1,9 @@
 import * as db from "../db";
 
+/**
+ * Sets the dappnodeWebName
+ * @param dappnodeWebName New dappnodeWebName
+ */
 export async function dappnodeWebNameSet({
   dappnodeWebName
 }: {
