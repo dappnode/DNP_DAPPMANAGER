@@ -105,6 +105,10 @@ export interface Routes {
     toPath: string;
   }) => Promise<void>;
 
+  /** Set the dappnodeWebNameSet */
+
+  dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
+
   /**
    * Creates a new device with the provided id.
    * Generates certificates and keys needed for OpenVPN.
@@ -489,6 +493,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   changeIpfsTimeout: { log: true },
   cleanCache: {},
   copyFileTo: { log: true },
+  dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
   deviceCredentialsGet: {},
