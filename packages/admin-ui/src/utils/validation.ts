@@ -73,7 +73,7 @@ export function validateDappnodeWebName(dappnodeWebName: string): string | null 
   if (dappnodeWebName.length < minLength) {
     return `Dappnode Web Name must be at least ${minLength} characters long`;
   }
-  if (dappnodeWebName.length < maxLength) {
+  if (dappnodeWebName.length > maxLength) {
     return `Dappnode Web Name must be less than ${maxLength} characters `;
   }
   if (/[`+´.,"!·$%&/()=?¿*^ºª|@#~½¬\{\}\[\]]/.test(dappnodeWebName)) {

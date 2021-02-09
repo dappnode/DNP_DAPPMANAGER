@@ -5,12 +5,18 @@ import { InputForm } from "components/InputForm";
 import { useSelector } from "react-redux";
 import { getDappnodeName } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
+import { validateDappnodeWebName } from "utils/validation";
+import ErrorView from "components/ErrorView";
+import Ok from "components/Ok";
+import { ReqStatus } from "types";
 
 export function ChangeDappnodeWebName() {
     
     const dappnodeWebName = useSelector(getDappnodeName);
     const [input, setInput] = useState(dappnodeWebName);
+    const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
+    const isValid = validateDappnodeWebName(dappnodeWebName);
 
     useEffect(() => {
         setInput(dappnodeWebName);
@@ -18,10 +24,16 @@ export function ChangeDappnodeWebName() {
 
 
     async function onChangeDappNodeWebName(newDappnodeWebName: string){
-        withToastNoThrow(() => api.dappnodeWebNameSet({ dappnodeWebName: newDappnodeWebName }), {
-            message: "Setting Dappnode Web Name...",
-            onSuccess: "Set Dappnode Web Name"
-          });
+        if(isValid){
+            try{
+                setReqStatus({ loading: true });
+                await api.dappnodeWebNameSet({ dappnodeWebName: newDappnodeWebName });
+                setReqStatus({ result: true });
+            }catch(e){
+                setReqStatus({ error: e });
+            }
+        }
+
     }
 
 
@@ -35,7 +47,8 @@ export function ChangeDappnodeWebName() {
                 autoComplete: "current-dappnode-name",
                 secret: false,
                 value: input,
-                onValueChange: setInput
+                onValueChange: setInput,
+                error: isValid
             }
             ]}
             >
@@ -43,10 +56,13 @@ export function ChangeDappnodeWebName() {
                 type="submit"
                 onClick={() => onChangeDappNodeWebName(input)}
                 variant="dappnode"
+                disabled={reqStatus.loading}
             >
                     Change dappnode Name
                 </Button>
             </InputForm>
+            {reqStatus.result && <Ok ok msg={"Dappnode name changed, refresh the page to see the changes"}></Ok>}
+            {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </>
 
     );
