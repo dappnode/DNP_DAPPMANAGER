@@ -23,18 +23,13 @@ export function ChangeDappnodeWebName() {
       }, [dappnodeWebName]);
 
 
-    async function onChangeDappNodeWebName(newDappnodeWebName: string){
-        if(isValid){
-            try{
-                setReqStatus({ loading: true });
-                await api.dappnodeWebNameSet({ dappnodeWebName: newDappnodeWebName });
-                setReqStatus({ result: true });
-            }catch(e){
-                setReqStatus({ error: e });
-            }
-        }
-
-    }
+    function onChangeDappNodeWebName(newDappnodeWebName: string) {
+        withToastNoThrow(() => api.dappnodeWebNameSet({ dappnodeWebName: newDappnodeWebName }), {
+          message: "Setting dappnode name ...",
+          onSuccess: "Regresh the page to see the changes"
+        });
+      }
+    
 
 
     return (
@@ -48,7 +43,6 @@ export function ChangeDappnodeWebName() {
                 secret: false,
                 value: input,
                 onValueChange: setInput,
-                error: isValid
             }
             ]}
             >
@@ -61,8 +55,6 @@ export function ChangeDappnodeWebName() {
                     Change dappnode Name
                 </Button>
             </InputForm>
-            {reqStatus.result && <Ok ok msg={"Dappnode name changed, refresh the page to see the changes"}></Ok>}
-            {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </>
 
     );
