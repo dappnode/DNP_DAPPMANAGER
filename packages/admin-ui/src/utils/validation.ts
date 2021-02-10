@@ -66,18 +66,3 @@ export function validateStrongPasswordAsDockerEnv(
     validateDockerEnv(password, "Password") || validateStrongPassword(password)
   );
 }
-
-export function validateDappnodeWebName(dappnodeWebName: string): string | null {
-  let minLength = 1;
-  let maxLength = 25;
-  if (dappnodeWebName.length < minLength) {
-    return `Dappnode Web Name must be at least ${minLength} characters long`;
-  }
-  if (dappnodeWebName.length > maxLength) {
-    return `Dappnode Web Name must be less than ${maxLength} characters `;
-  }
-  if (/[`+´.,"!·$%&/()=?¿*^ºª|@#~½¬\{\}\[\]]/.test(dappnodeWebName)) {
-    return "Dappnode Web Name must not contain the next special characters: ` + ´ . , \" ! · $ % & / ( ) = ? ¿ * ^ º ª | @ # ~ ½ ¬ { } [ ] ";
-  }
-  return null;
-}
