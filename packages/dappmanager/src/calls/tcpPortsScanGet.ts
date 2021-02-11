@@ -1,8 +1,8 @@
-import { PortScanResponse } from "../types";
-import { performPortsScan } from "../utils/performPortsScan";
 import * as db from "../db";
+import { performPortsScan } from "../utils/performPortsScan";
+import { TcpPortScan } from "../common";
 
-export async function portsScanGet(): Promise<PortScanResponse[]> {
+export async function tcpPortsScanGet(): Promise<TcpPortScan[]> {
   const packagePort = db.portsToOpen.get();
   // udp ports cannot be scanned
   // as a better approach, if tcp ports were opened with UPnP, udp quite probably were opened as well

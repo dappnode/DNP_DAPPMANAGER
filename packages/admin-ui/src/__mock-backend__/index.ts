@@ -90,9 +90,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     usedPercentage: 83
   }),
 
-  portsScanGet: async () => [
-    { tcpPort: 8092, status: "closed" },
-    { tcpPort: 1194, status: "open" }
+  tcpPortsScanGet: async () => [
+    { port: 1194, status: "closed" },
+    { port: 8092, status: "open" },
+    { port: 4001, status: "open" },
+    { port: 9843, status: "error" }
   ],
 
   mountpointsGet: async () => [

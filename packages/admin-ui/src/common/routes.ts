@@ -28,8 +28,8 @@ import {
   PublicIpResponse,
   ChainData,
   ShhStatus,
-  PortScanResponse,
-  PortsTable
+  PortsTable,
+  TcpPortScan
 } from "./types";
 
 export interface Routes {
@@ -230,7 +230,10 @@ export interface Routes {
    */
   getPortsStatus: () => Promise<PortsTable[]>;
 
-  portsScanGet: () => Promise<PortScanResponse[]>;
+  /**
+   * Returns the tcp ports response from the API
+   */
+  tcpPortsScanGet: () => Promise<TcpPortScan[]>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -540,7 +543,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
-  portsScanGet: {},
+  tcpPortsScanGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },

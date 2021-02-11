@@ -1,8 +1,8 @@
 import {
   InstalledPackageData,
   PackagePort,
-  PortScanResponse,
   PortsTable,
+  TcpPortScan,
   UpnpPortMapping
 } from "../common";
 import * as db from "../db";
@@ -17,7 +17,7 @@ export function portsTableData({
   upnpPortMappings,
   portsToOpen
 }: {
-  apiTcpPortsStatus: PortScanResponse[];
+  apiTcpPortsStatus: TcpPortScan[];
   packages: InstalledPackageData[];
   upnpPortMappings: UpnpPortMapping[];
   portsToOpen: PackagePort[];
@@ -66,17 +66,18 @@ function getUpnpStatus({
  * API
  * 1.API available AND port open => "open"
  * 2.API available AND port closed => "closed"
- * 3.API not available OR port not found => "unknown"
+ * 3.API available AND port error => "error"
+ * 4.API not available OR port not found => "unknown"
  */
 function getApiStatus({
   port,
   apiTcpPortsStatus
 }: {
   port: PackagePort;
-  apiTcpPortsStatus: PortScanResponse[];
-}): "open" | "closed" | "unknown" {
+  apiTcpPortsStatus: TcpPortScan[];
+}): "open" | "closed" | "unknown" | "error" {
   return (
-    apiTcpPortsStatus.find(apiPort => apiPort.tcpPort === port.portNumber)
+    apiTcpPortsStatus.find(apiPort => apiPort.port === port.portNumber)
       ?.status || "unknown"
   );
 }

@@ -312,7 +312,7 @@ export interface PortsTable {
   port: number;
   protocol: "UDP" | "TCP";
   upnpStatus: "open" | "closed" | "unknown";
-  apiStatus: "open" | "closed" | "unknown";
+  apiStatus: "open" | "closed" | "error" | "unknown";
   service: string; // if not found then unknown
 }
 
@@ -457,8 +457,20 @@ export type InstalledPackageData = Pick<
 };
 
 export interface PortScanResponse {
-  tcpPort: number;
-  status: "open" | "closed" | "unknown";
+  tcpPorts: TcpPortScan[];
+  udpPorts: UdpPortScan[];
+}
+
+export interface TcpPortScan {
+  port: number;
+  status: "open" | "closed" | "error" | "unknown";
+  message?: string;
+}
+
+export interface UdpPortScan {
+  port: number;
+  status: "open" | "closed" | "error" | "unknown";
+  message?: string;
 }
 
 export interface InstalledPackageDetailData extends InstalledPackageData {

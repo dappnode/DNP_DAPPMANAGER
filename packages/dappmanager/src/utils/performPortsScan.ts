@@ -3,6 +3,7 @@ import assert from "assert";
 import { logs } from "../logs";
 import params from "../params";
 import { PortScanResponse } from "../types";
+import { TcpPortScan } from "../common";
 
 const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
 
@@ -12,21 +13,21 @@ export async function performPortsScan({
 }: {
   publicIp: string;
   tcpPorts: string;
-}): Promise<PortScanResponse[]> {
+}): Promise<TcpPortScan[]> {
   try {
     const response = await fetch(
       `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`
     );
     const responseJson = await response.json();
     sanitizeApiResponse(responseJson);
-    return responseJson;
+    return responseJson.tcpPorts;
   } catch (e) {
-    logs.error(`Error fetching port scanner ${e.message}`);
-
     // Returns ports with status "unknown" when an error occurs fetching the API
+    // It is an "unknown" instead of "error" state because API not even returned nothing
+    logs.error(`Error fetching port scanner ${e.message}`);
     return tcpPorts.split(",").map(tcpPort => {
       return {
-        tcpPort: parseInt(tcpPort),
+        port: parseInt(tcpPort),
         status: "unknown"
       };
     });
@@ -37,25 +38,41 @@ export async function performPortsScan({
  * Check if the response from the scan ports API
  * is well formatted
  */
-function sanitizeApiResponse(responseJson: PortScanResponse[]): void {
+function sanitizeApiResponse(responseJson: PortScanResponse): void {
+  // Check for keys "tcpPorts" and "udpPorts"
   assert.deepStrictEqual(
-    responseJson.some((route: PortScanResponse) =>
-      Object.keys(route).some(key => key !== "tcpPort" && key !== "status")
+    Object.keys(responseJson).some(
+      key => key !== "tcpPorts" && key !== "udpPorts"
     ),
     false,
-    "API response returned wrong key JSON"
+    "API response returned wrong JSON keys"
   );
+  // Inside "tcpPorts" check for keys "port", "status", "message"
   assert.deepStrictEqual(
-    responseJson.some(
-      (route: PortScanResponse) => typeof route.tcpPort !== "number"
+    responseJson.tcpPorts.some((route: TcpPortScan) =>
+      Object.keys(route).some(
+        key => key !== "port" && key !== "status" && key !== "message"
+      )
+    ),
+    false,
+    "API response returned wrong JSON keys"
+  );
+  // ports must be numbers
+  assert.deepStrictEqual(
+    responseJson.tcpPorts.some(
+      (route: TcpPortScan) => typeof route.port !== "number"
     ),
     false,
     "API response returned port different than number"
   );
+  // ports status check
   assert.deepStrictEqual(
-    responseJson.some(
-      (route: PortScanResponse) =>
-        route.status !== "closed" && route.status !== "open"
+    responseJson.tcpPorts.some(
+      (route: TcpPortScan) =>
+        route.status !== "closed" &&
+        route.status !== "open" &&
+        route.status !== "error" &&
+        route.status !== "unknown"
     ),
     false,
     "API response returned status different than open or closed"

@@ -1,6 +1,3 @@
-import React, { useState } from "react";
-import { useApi, api } from "api";
-import { Table } from "react-bootstrap";
 import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
 import SubTitle from "components/SubTitle";
@@ -8,6 +5,10 @@ import Button from "components/Button";
 import Switch from "components/Switch";
 import Ok from "components/Ok";
 import Card from "components/Card";
+
+import React, { useState } from "react";
+import { useApi, api } from "api";
+import { Table } from "react-bootstrap";
 import { ReqStatus } from "types";
 import { withToast } from "components/toast/Toast";
 import { shortNameCapitalized } from "utils/format";
