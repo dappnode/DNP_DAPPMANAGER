@@ -2,6 +2,7 @@ import { Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
+import { httpsPortal } from "./httpsPortal";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -14,6 +15,7 @@ const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
   ...fetchPkgsData,
+  ...httpsPortal,
   ...notifications,
   ...packages,
   ...password,

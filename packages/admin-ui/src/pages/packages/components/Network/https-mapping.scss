@@ -1,0 +1,63 @@
+.network-mappings {
+  > *:not(:last-child) {
+    margin-bottom: var(--default-spacing);
+  }
+
+  .list-grid {
+    /*
+  Col 1, Fit to the link buttons / switch always
+  Col 2: Shrink the text to an extend, otherwise fill all available space
+  Col 3, 4: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+    grid-template-columns:
+      minmax(min-content, max-content)
+      minmax(min-content, max-content)
+      minmax(min-content, auto)
+      minmax(calc(var(--icon-size) / 2), min-content);
+
+    grid-gap: calc(var(--grid-spacing) / 2) var(--grid-spacing);
+
+    .name {
+      display: flex;
+      font-size: inherit;
+
+      .see-all {
+        flex: 1 1;
+        text-align: right;
+      }
+    }
+  }
+
+  /* Customize name inside NavLink */
+  a {
+    color: inherit;
+    text-decoration: inherit;
+    transition: color 0.2s ease;
+    &:hover {
+      color: var(--dappnode-color);
+      text-decoration: none;
+    }
+  }
+
+  .no-mappings {
+    opacity: 0.5;
+    grid-column: 1 / -1;
+  }
+
+  .show-all {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .bottom-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

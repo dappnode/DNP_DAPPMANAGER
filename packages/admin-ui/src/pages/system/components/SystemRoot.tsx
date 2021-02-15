@@ -8,6 +8,7 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 // Components
+import Title from "components/Title";
 import StaticIp from "./StaticIp";
 import AutoUpdates from "./AutoUpdates";
 import Repository from "./Repository";
@@ -19,7 +20,6 @@ import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Advanced } from "./Advanced";
-import Title from "components/Title";
 import Notifications from "./Notifications";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {

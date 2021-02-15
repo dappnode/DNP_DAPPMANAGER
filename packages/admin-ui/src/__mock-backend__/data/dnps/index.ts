@@ -1,5 +1,6 @@
 import { MockDnp } from "./types";
 import { bitcoin } from "./bitcoin";
+import { httpsPortal } from "./https-portal";
 import { isInstalling } from "./isInstalling";
 import { lightningNetwork } from "./lightningNetwork";
 import { multiService } from "./multiService";
@@ -11,6 +12,7 @@ import { wifi } from "./wifi";
 
 export const mockDnps: MockDnp[] = [
   bitcoin,
+  httpsPortal,
   isInstalling,
   lightningNetwork,
   multiService,

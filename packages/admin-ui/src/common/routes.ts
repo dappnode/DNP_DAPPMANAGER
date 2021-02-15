@@ -27,7 +27,8 @@ import {
   HostStatMemory,
   PublicIpResponse,
   ChainData,
-  ShhStatus
+  ShhStatus,
+  HttpsPortalMapping
 } from "./types";
 
 export interface Routes {
@@ -219,6 +220,21 @@ export interface Routes {
     first?: number;
     after?: number;
   }) => Promise<UserActionLog[]>;
+
+  /**
+   * HTTPs Portal: map a subdomain
+   */
+  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
+
+  /**
+   * HTTPs Portal: remove an existing mapping
+   */
+  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
+
+  /**
+   * HTTPs Portal: get all mappings
+   */
+  httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -508,6 +524,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsDiskGet: {},
   statsMemoryGet: {},
   getUserActionLogs: {},
+  httpsPortalMappingAdd: { log: true },
+  httpsPortalMappingRemove: { log: true },
+  httpsPortalMappingsGet: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},

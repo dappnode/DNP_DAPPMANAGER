@@ -118,6 +118,7 @@ export const mockContainer: PackageContainer = {
   exitCode: null,
   ports: [],
   volumes: [],
+  networks: [],
   defaultEnvironment: {},
   defaultPorts: [],
   defaultVolumes: [],

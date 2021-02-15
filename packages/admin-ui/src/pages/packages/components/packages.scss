@@ -64,24 +64,25 @@
       margin-right: 0.25rem;
     }
   }
-}
-/* Customize name inside NavLink */
-.list-grid.dnps a:hover {
-  color: var(--dappnode-color);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-/* Width must be 100% for proper hidding on small screens */
-.list-grid.dnps .state-badge {
-  width: 100%;
-  overflow: hidden;
-  overflow-wrap: normal;
-}
-.list-grid.dnps .name {
-  white-space: nowrap;
-  width: 100%;
-  overflow: hidden;
-  overflow-wrap: normal;
+
+  /* Customize name inside NavLink */
+  a:hover {
+    color: var(--dappnode-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  /* Width must be 100% for proper hidding on small screens */
+  .state-badge {
+    width: 100%;
+    overflow: hidden;
+    overflow-wrap: normal;
+  }
+  .name {
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    overflow-wrap: normal;
+  }
 }
 
 .pkg-row-text {

@@ -1,14 +1,10 @@
-// React
 import React from "react";
 import { useState } from "react";
-
-// Components
 import Card from "components/Card";
+import { PackageContainer } from "types";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
-import { PackageContainer } from "common";
-
-// Styles
+import { HttpsMappings } from "./HttpsMappings";
 import "./network.scss";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
@@ -30,8 +26,16 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
             {container.ip || "Not available"}
           </div>
 
+          <div className="subtle-header">HTTPS DOMAIN MAPPING</div>
+          <HttpsMappings
+            dnpName={container.dnpName}
+            serviceName={container.serviceName}
+          />
+
+          <hr />
+
+          <div className="subtle-header">PUBLIC PORT MAPPING</div>
           <PortsByService
-            key={container.serviceName}
             dnpName={container.dnpName}
             serviceName={container.serviceName}
             ports={container.ports}

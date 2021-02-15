@@ -61,6 +61,7 @@ export const sampleContainer: PackageContainer = {
   dependencies: {},
   ports: [],
   volumes: [],
+  networks: [],
   avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
   origin: undefined
 };

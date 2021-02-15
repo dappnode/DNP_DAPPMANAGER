@@ -56,7 +56,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
         networks:
           isCore && image.ipv4_address
             ? {
-                [params.DNP_NETWORK_INTERNAL_NAME]: {
+                [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: {
                   ipv4_address: image.ipv4_address
                 }
               }
@@ -68,7 +68,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
 
     networks: isCore
       ? {
-          [params.DNP_NETWORK_INTERNAL_NAME]: {
+          [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: {
             driver: "bridge",
             ipam: {
               config: [{ subnet: image.subnet || "172.33.0.0/16" }]
