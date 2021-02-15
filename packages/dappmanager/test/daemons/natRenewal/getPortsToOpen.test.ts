@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import defaultPortsToOpen from "../../../src/daemons/natRenewal/defaultPortsToOpen";
 import { PackageContainer } from "../../../src/types";
-import rewiremock from "rewiremock";
+
 // imports for typings
 import { mockContainer } from "../../testUtils";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
+import getPortsToOpen from "../../../src/daemons/natRenewal/getPortsToOpen";
 
 describe("daemons > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
@@ -71,16 +71,8 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     ]);
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-      }
-    );
-
-    const portsToOpen = await getPortsToOpen();
+    const containersListed = await listContainers();
+    const portsToOpen = getPortsToOpen(containersListed);
 
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
@@ -95,27 +87,6 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
       { protocol: "UDP", portNumber: 4001 },
       { protocol: "TCP", portNumber: 4001 }
     ]);
-  });
-
-  it("Return default ports if portsToOpen throws", async () => {
-    async function listContainers(): Promise<PackageContainer[]> {
-      throw Error("Demo Error for listContainers");
-    }
-
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-        // mock(() => import("../../../src/utils/dockerComposeFile"))
-        //   .with({ getComposeInstance })
-        //   .toBeUsed();
-      }
-    );
-
-    const portsToOpen = await getPortsToOpen();
-    expect(portsToOpen).to.deep.equal(defaultPortsToOpen);
   });
 
   it("Ignore a DNP if it throws fetching it's docker-compose", async () => {
@@ -149,16 +120,8 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     //   }
     // }
 
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-      }
-    );
-
-    const portsToOpen = await getPortsToOpen();
+    const containers = await listContainers();
+    const portsToOpen = getPortsToOpen(containers);
     expect(portsToOpen).to.deep.equal([
       // Should return only the admin's ports and ignore the other DNP's
       // From "admin.dnp.dappnode.eth"

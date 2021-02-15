@@ -310,11 +310,19 @@ export interface UpnpPortMapping {
 
 export interface PortsTable {
   port: number;
-  protocol: "UDP" | "TCP";
-  upnpStatus: "open" | "closed" | "unknown";
-  apiStatus: "open" | "closed" | "error" | "unknown";
-  service: string; // if not found then unknown
+  protocol: PortProtocol;
+  upnpStatus: UpnpStatus;
+  apiStatus: ApiStatus;
+  mergedStatus: MergedStatus;
+  serviceName: string; // if not found then unknown
+  dnpName: string;
 }
+
+export type MergedStatus = "open" | "closed" | "unknown";
+
+export type ApiStatus = "open" | "closed" | "unknown" | "error";
+
+export type UpnpStatus = "open" | "closed" | "unknown";
 
 export interface VolumeMapping {
   host: string; // path

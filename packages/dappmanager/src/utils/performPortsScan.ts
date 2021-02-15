@@ -28,7 +28,8 @@ export async function performPortsScan({
     return tcpPorts.split(",").map(tcpPort => {
       return {
         port: parseInt(tcpPort),
-        status: "unknown"
+        status: "error",
+        message: e.message
       };
     });
   }

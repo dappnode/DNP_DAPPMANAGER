@@ -9,6 +9,7 @@ import getLocalIp from "../../utils/getLocalIp";
 import { runAtMostEvery, runOnlyOneSequentially } from "../../utils/asyncFlows";
 import { PackagePort } from "../../types";
 import { logs } from "../../logs";
+import { listContainers } from "../../modules/docker/list";
 
 let isFirstRunGlobal = true;
 async function natRenewal(): Promise<void> {
@@ -46,7 +47,8 @@ async function natRenewal(): Promise<void> {
     }
 
     // Fetch portsToOpen and store them in the DB
-    const portsToOpen = await getPortsToOpen();
+    const containers = await listContainers();
+    const portsToOpen = getPortsToOpen(containers);
     db.portsToOpen.set(portsToOpen);
     if (isFirstRun)
       logs.info(

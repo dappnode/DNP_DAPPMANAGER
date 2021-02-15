@@ -63,14 +63,18 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       protocol: "UDP",
       upnpStatus: "open",
       apiStatus: "unknown",
-      service: "dnp.dappmanager.eth"
+      mergedStatus: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
       protocol: "TCP",
       upnpStatus: "unknown",
       apiStatus: "open",
-      service: "dnp.vpn.eth"
+      mergedStatus: "unknown",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
     }
   ],
 
