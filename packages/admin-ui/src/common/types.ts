@@ -312,7 +312,7 @@ export interface PortsTable {
   port: number;
   protocol: PortProtocol;
   upnpStatus: UpnpStatus;
-  apiStatus: ApiStatus;
+  apiStatus: ApiStatus; // if not scanned status is "not-fetched"
   mergedStatus: MergedStatus;
   serviceName: string; // if not found then unknown
   dnpName: string;
@@ -320,9 +320,15 @@ export interface PortsTable {
 
 export type MergedStatus = "open" | "closed" | "unknown";
 
-export type ApiStatus = "open" | "closed" | "unknown" | "error";
+// ApiStatus data structure is different than UpnpStatus because we want to attach an error message
+export type ApiStatus =
+  | { status: "open" }
+  | { status: "closed" }
+  | { status: "not-fetched" }
+  | { status: "unknown" } // port not found
+  | { status: "error"; message?: string }; // error from/fetching the API
 
-export type UpnpStatus = "open" | "closed" | "unknown";
+export type UpnpStatus = "open" | "closed" | "unknown"; // unknown => port not found
 
 export interface VolumeMapping {
   host: string; // path

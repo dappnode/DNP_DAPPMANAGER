@@ -231,11 +231,6 @@ export interface Routes {
   getPortsStatus: () => Promise<PortsTable[]>;
 
   /**
-   * Returns the tcp ports response from the API
-   */
-  tcpPortsScanGet: () => Promise<TcpPortScan[]>;
-
-  /**
    * Returns the list of current mountpoints in the host,
    * by running a pre-written script in the host
    */
@@ -543,7 +538,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
-  tcpPortsScanGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },

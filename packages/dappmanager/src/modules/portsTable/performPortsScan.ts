@@ -1,29 +1,37 @@
 import fetch from "node-fetch";
 import assert from "assert";
-import { logs } from "../logs";
-import params from "../params";
-import { PortScanResponse } from "../types";
-import { TcpPortScan } from "../common";
+import params from "../../params";
+import { TcpPortScan, PortScanResponse, PackagePort } from "../../common";
+import { logs } from "../../logs";
 
 const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
 
+/**
+ * Fetch check ports scan service for TCP ports
+ */
 export async function performPortsScan({
   publicIp,
-  tcpPorts
+  portsToOpen
 }: {
   publicIp: string;
-  tcpPorts: string;
+  portsToOpen: PackagePort[];
 }): Promise<TcpPortScan[]> {
+  const tcpPorts = portsToOpen
+    .filter(port => port.protocol === "TCP")
+    .map(port => port.portNumber.toString())
+    .join(",");
+
   try {
     const response = await fetch(
       `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`
     );
+
     const responseJson = await response.json();
     sanitizeApiResponse(responseJson);
+
     return responseJson.tcpPorts;
   } catch (e) {
-    // Returns ports with status "unknown" when an error occurs fetching the API
-    // It is an "unknown" instead of "error" state because API not even returned nothing
+    // Returns ports with status "error" when an error occurs fetching the API
     logs.error(`Error fetching port scanner ${e.message}`);
     return tcpPorts.split(",").map(tcpPort => {
       return {

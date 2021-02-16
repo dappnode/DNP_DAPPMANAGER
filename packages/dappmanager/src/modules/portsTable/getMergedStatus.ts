@@ -18,32 +18,19 @@ export function getMergedStatus({
   upnpStatus: UpnpStatus;
   protocol: PortProtocol;
 }): MergedStatus {
-  /**
-   * API status:
-   * 1.API available AND protocol TCP AND port open => "open"
-   * 2.API available AND protocol TCP AND port closed => "closed"
-   * 3.API available AND protocol TCP AND port error => "error"
-   * 4.API not available OR port not found AND protocol TCP => "unknown"
-   */
+  // if option apiScanEnabled is false or protocol is UDP return udpStatus
+  // (The API is not able to scan UDP ports. If)
+  if (protocol === "UDP" || apiStatus.status === "not-fetched")
+    return upnpStatus; // protocol UDP or apiScanEnabled = false => upnpStatus
 
-  /**
-   * UPnP status:
-   * 1.UPnP available AND port open => "open"
-   * 2.UPnP available AND port closed => "closed"
-   * 3.UPnP not available => "unknown"
-   */
-
-  // The API is not able to scan UDP ports
-  if (protocol === "UDP") return upnpStatus;
-
-  switch (apiStatus) {
+  switch (apiStatus.status) {
     case "open":
-      return "open";
+      return "open"; // API available AND protocol TCP AND APIport open => "open"
     case "closed":
-      return "closed";
+      return "closed"; // API available AND protocol TCP AND APIport closed => "closed"
     case "unknown":
-      return "unknown";
+      return upnpStatus; // API available AND protocol TCP AND APIport not found => "unknown"
     case "error":
-      return upnpStatus;
+      return upnpStatus; // API available AND protocol TCP AND port error => "error"
   }
 }

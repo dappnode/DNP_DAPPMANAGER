@@ -45,4 +45,3 @@ export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export { ipPublicGet } from "./ipPublicGet";
-export { tcpPortsScanGet } from "./tcpPortsScanGet";

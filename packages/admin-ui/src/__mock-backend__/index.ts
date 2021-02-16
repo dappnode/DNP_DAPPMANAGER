@@ -62,7 +62,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       port: 8092,
       protocol: "UDP",
       upnpStatus: "open",
-      apiStatus: "unknown",
+      apiStatus: { status: "unknown" },
       mergedStatus: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
@@ -71,7 +71,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       port: 1194,
       protocol: "TCP",
       upnpStatus: "unknown",
-      apiStatus: "open",
+      apiStatus: { status: "error", message: "something wrong" },
       mergedStatus: "unknown",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
@@ -93,13 +93,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-
-  tcpPortsScanGet: async () => [
-    { port: 1194, status: "closed" },
-    { port: 8092, status: "open" },
-    { port: 4001, status: "open" },
-    { port: 9843, status: "error" }
-  ],
 
   mountpointsGet: async () => [
     {
