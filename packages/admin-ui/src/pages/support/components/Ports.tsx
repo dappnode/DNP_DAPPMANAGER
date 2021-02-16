@@ -7,7 +7,7 @@ import React from "react";
 import { useApi } from "api";
 import { PortsStatusTable } from "./PortsStatusTable";
 
-export default function UPnP() {
+export default function Ports() {
   const systemInfo = useApi.systemInfoGet();
 
   return (

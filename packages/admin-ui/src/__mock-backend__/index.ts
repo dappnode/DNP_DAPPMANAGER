@@ -70,9 +70,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     {
       port: 1194,
       protocol: "TCP",
-      upnpStatus: "unknown",
+      upnpStatus: "open",
       apiStatus: { status: "error", message: "something wrong" },
-      mergedStatus: "unknown",
+      mergedStatus: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     }

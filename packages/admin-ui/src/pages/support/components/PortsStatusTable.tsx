@@ -12,21 +12,25 @@ import { ReqStatus } from "types";
 import { shortNameCapitalized } from "utils/format";
 
 export function PortsStatusTable() {
-  const upnpInfo = useApi.getPortsStatus();
+  const [isApiScanEnabled, setIsApiScanEnabled] = useState(false);
+  const [advancedMode, setAdvancedMode] = useState(false);
+
+  const upnpInfo = useApi.getPortsStatus({ isApiScanEnabled });
 
   const [reqStatusPortsStatus, setReqStatusPortsStatus] = useState<ReqStatus>(
     {}
   );
-  const [advancedMode, setAdvancedMode] = useState(false);
 
   async function updatePortsStatus() {
     try {
       setReqStatusPortsStatus({ loading: true });
-      await withToast(() => api.getPortsStatus(), {
+      setIsApiScanEnabled(true);
+      await withToast(() => api.getPortsStatus({ isApiScanEnabled }), {
         message: `Updating ports status`,
         onSuccess: `Updated ports status`,
         onError: `Error updating ports status`
       }).then(upnpInfo.revalidate);
+      setIsApiScanEnabled(false);
       setReqStatusPortsStatus({ result: true });
     } catch (e) {
       setReqStatusPortsStatus({ error: e });
@@ -59,7 +63,7 @@ export function PortsStatusTable() {
             <th>Service</th>
             {advancedMode ? (
               <>
-                <th>Status (external service) *</th>
+                <th>Status (API) *</th>
                 <th>Status (UPnP) *</th>
               </>
             ) : (
@@ -73,21 +77,24 @@ export function PortsStatusTable() {
               <tr>
                 <td>{port.port}</td>
                 <td>{port.protocol}</td>
-                <td>{`${shortNameCapitalized(port.dnpName)} ${
-                  port.serviceName
-                }`}</td>
+                <td>{shortNameCapitalized(port.dnpName)}</td>
                 {/* Advanced mode: both status api and upnp. Non-advanced: merged status UPnP and api*/}
                 {advancedMode ? (
                   <>
                     <td>
-                      {port.apiStatus === "open" ? (
+                      {port.apiStatus.status === "open" ? (
                         <Ok ok={true} msg={"Open"} />
-                      ) : port.apiStatus === "closed" ? (
+                      ) : port.apiStatus.status === "closed" ? (
                         <Ok ok={false} msg={"Closed"} />
-                      ) : port.apiStatus === "error" ? (
-                        <Ok ok={false} msg={"Error"} />
-                      ) : (
+                      ) : port.apiStatus.status === "error" ? (
+                        <Ok
+                          ok={false}
+                          msg={`Error: ${port.apiStatus.message}`}
+                        />
+                      ) : port.apiStatus.status === "unknown" ? (
                         "Unknown"
+                      ) : (
+                        "Not fetched"
                       )}
                     </td>
                     <td>

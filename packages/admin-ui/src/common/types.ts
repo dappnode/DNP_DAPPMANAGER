@@ -318,7 +318,7 @@ export interface PortsTable {
   dnpName: string;
 }
 
-export type MergedStatus = "open" | "closed" | "unknown";
+export type MergedStatus = ApiStatus | UpnpStatus;
 
 // ApiStatus data structure is different than UpnpStatus because we want to attach an error message
 export type ApiStatus =
@@ -328,7 +328,8 @@ export type ApiStatus =
   | { status: "unknown" } // port not found
   | { status: "error"; message?: string }; // error from/fetching the API
 
-export type UpnpStatus = "open" | "closed" | "unknown"; // unknown => port not found
+// unknown => port not found. not-available => UPnP disabled or not recognized
+export type UpnpStatus = "open" | "closed" | "upnp-disabled";
 
 export interface VolumeMapping {
   host: string; // path

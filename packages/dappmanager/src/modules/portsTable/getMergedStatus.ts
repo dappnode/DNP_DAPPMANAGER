@@ -7,7 +7,7 @@ import {
 
 /**
  * Returns the ports status merging API and UPnP status
- * Error will be displayed only in the API status advanced mode.
+ * Error will be displayed only in the API status in advanced mode.
  */
 export function getMergedStatus({
   apiStatus,
@@ -18,10 +18,10 @@ export function getMergedStatus({
   upnpStatus: UpnpStatus;
   protocol: PortProtocol;
 }): MergedStatus {
-  // if option apiScanEnabled is false or protocol is UDP return udpStatus
-  // (The API is not able to scan UDP ports. If)
+  // protocol = UDP or isApiScanEnabled = false => upnpStatus
+  // (The API is not able to scan UDP ports)
   if (protocol === "UDP" || apiStatus.status === "not-fetched")
-    return upnpStatus; // protocol UDP or apiScanEnabled = false => upnpStatus
+    return upnpStatus;
 
   switch (apiStatus.status) {
     case "open":

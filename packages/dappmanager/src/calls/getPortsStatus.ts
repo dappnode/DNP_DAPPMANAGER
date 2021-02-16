@@ -8,23 +8,22 @@ import { formatPortsTableData } from "../modules/portsTable/formatPortsTableData
 import { performPortsScan } from "../modules/portsTable/performPortsScan";
 
 /**
- * Returns the current ports status
- * - portsToOpen is computed from the current installed DNPs, by checking
- *   their port mapping and reading the docker-compose
- * - upnpPortMappings is obtained directly from UPnP
+ * Returns the current ports status using:
+ * - UPnP port mapping
+ * - API check ports
  */
 export async function getPortsStatus({
-  apiScanEnabled
+  isApiScanEnabled
 }: {
-  apiScanEnabled: boolean;
+  isApiScanEnabled: boolean;
 }): Promise<PortsTable[]> {
-  // DATA
+  // Data available in the dappmanager
   const containers: PackageContainer[] = await listContainers();
   const portsToOpen: PackagePort[] = getPortsToOpen(containers); // Ports to be opened
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UPnP
 
-  // API
-  const apiTcpPortsStatus = apiScanEnabled
+  // API data: tcp ports status
+  const apiTcpPortsStatus = isApiScanEnabled
     ? await performPortsScan({
         publicIp: db.publicIp.get(),
         portsToOpen

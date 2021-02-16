@@ -28,8 +28,7 @@ import {
   PublicIpResponse,
   ChainData,
   ShhStatus,
-  PortsTable,
-  TcpPortScan
+  PortsTable
 } from "./types";
 
 export interface Routes {
@@ -226,9 +225,13 @@ export interface Routes {
    * Returns UPnP info
    * - UPnP available
    * - Ports to be opened
-   * - Ports opened
+   * - Ports opened: from API and UPnP
    */
-  getPortsStatus: () => Promise<PortsTable[]>;
+  getPortsStatus: ({
+    isApiScanEnabled
+  }: {
+    isApiScanEnabled: boolean;
+  }) => Promise<PortsTable[]>;
 
   /**
    * Returns the list of current mountpoints in the host,
