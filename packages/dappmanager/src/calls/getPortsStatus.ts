@@ -1,6 +1,6 @@
 import * as db from "../db";
 import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen";
-import { PackagePort } from "../types";
+import { PortToOpen } from "../types";
 import { UpnpPortMapping } from "../modules/upnpc/types";
 import { PackageContainer, PortsTable } from "../common";
 import { listContainers } from "../modules/docker/list";
@@ -19,7 +19,7 @@ export async function getPortsStatus({
 }): Promise<PortsTable[]> {
   // Data available in the dappmanager
   const containers: PackageContainer[] = await listContainers();
-  const portsToOpen: PackagePort[] = getPortsToOpen(containers); // Ports to be opened
+  const portsToOpen: PortToOpen[] = getPortsToOpen(containers); // Ports to be opened
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UPnP
 
   // API data: tcp ports status
@@ -32,7 +32,6 @@ export async function getPortsStatus({
 
   return formatPortsTableData({
     apiTcpPortsStatus,
-    containers,
     upnpPortMappings,
     portsToOpen
   });

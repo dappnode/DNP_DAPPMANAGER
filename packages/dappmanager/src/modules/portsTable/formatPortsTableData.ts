@@ -1,14 +1,9 @@
-import {
-  TcpPortScan,
-  PackageContainer,
-  UpnpPortMapping,
-  PackagePort,
-  PortsTable
-} from "../../common";
+import { TcpPortScan, UpnpPortMapping, PortsTable } from "../../common";
 import { getApiStatus } from "./getApiStatus";
 import { getMergedStatus } from "./getMergedStatus";
 import { getUpnpStatus } from "./getUpnpStatus";
 import * as db from "../../db";
+import { PortToOpen } from "../../types";
 
 /**
  * Returns the necessary data for display the
@@ -16,38 +11,20 @@ import * as db from "../../db";
  */
 export function formatPortsTableData({
   apiTcpPortsStatus = undefined,
-  containers,
   upnpPortMappings,
   portsToOpen
 }: {
   apiTcpPortsStatus: TcpPortScan[] | undefined;
-  containers: PackageContainer[];
   upnpPortMappings: UpnpPortMapping[];
-  portsToOpen: PackagePort[];
+  portsToOpen: PortToOpen[];
 }): PortsTable[] {
-  const upnpAvailable = db.upnpAvailable.get();
-
-  const packagesPortsContainers = new Map<
-    PackagePort,
-    PackageContainer | undefined
-  >(
-    portsToOpen.map(portPackage => [
-      portPackage,
-      containers.find(
-        container =>
-          container.ports.find(
-            portMapping => portMapping.host === portPackage.portNumber
-          ) ||
-          container.defaultPorts?.find(
-            portMapping => portMapping.host === portPackage.portNumber
-          )
-      ) || undefined
-    ])
-  );
-
   return portsToOpen.map(port => {
     const apiStatus = getApiStatus({ port, apiTcpPortsStatus });
-    const upnpStatus = getUpnpStatus({ port, upnpAvailable, upnpPortMappings });
+    const upnpStatus = getUpnpStatus({
+      port,
+      upnpAvailable: db.upnpAvailable.get(),
+      upnpPortMappings
+    });
     return {
       port: port.portNumber,
       protocol: port.protocol,
@@ -58,16 +35,8 @@ export function formatPortsTableData({
         upnpStatus,
         protocol: port.protocol
       }),
-      serviceName:
-        packagesPortsContainers.get({
-          portNumber: port.portNumber,
-          protocol: port.protocol
-        })?.serviceName || "unknown",
-      dnpName:
-        packagesPortsContainers.get({
-          portNumber: port.portNumber,
-          protocol: port.protocol
-        })?.dnpName || "unknown"
+      serviceName: port.serviceName,
+      dnpName: port.dnpName
     };
   });
 }

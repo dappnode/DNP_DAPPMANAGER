@@ -1,11 +1,10 @@
-import { useApi, api } from "api";
+import { useApi } from "api";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 import Ok from "components/Ok";
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
-import { withToast } from "components/toast/Toast";
 import React, { useState } from "react";
 import { Table } from "react-bootstrap";
 import { ReqStatus } from "types";
@@ -25,11 +24,7 @@ export function PortsStatusTable() {
     try {
       setReqStatusPortsStatus({ loading: true });
       setIsApiScanEnabled(true);
-      await withToast(() => api.getPortsStatus({ isApiScanEnabled }), {
-        message: `Updating ports status`,
-        onSuccess: `Updated ports status`,
-        onError: `Error updating ports status`
-      }).then(upnpInfo.revalidate);
+      upnpInfo.revalidate();
       setIsApiScanEnabled(false);
       setReqStatusPortsStatus({ result: true });
     } catch (e) {

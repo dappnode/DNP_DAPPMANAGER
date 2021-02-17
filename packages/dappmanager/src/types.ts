@@ -1,4 +1,4 @@
-import { EthClientTargetPackage } from "./common";
+import { EthClientTargetPackage, PackagePort } from "./common";
 export * from "./common";
 
 export interface ContainerLabelsRaw {
@@ -33,4 +33,9 @@ export type EthClientSyncedNotificationStatus = {
 
 export interface DiskUsageThresholds {
   [thresholdId: string]: boolean;
+}
+
+export interface PortToOpen extends PackagePort {
+  serviceName: string;
+  dnpName: string;
 }
