@@ -1,4 +1,3 @@
-import { useApi } from "api";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
@@ -6,8 +5,8 @@ import Ok from "components/Ok";
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
 import React, { useState } from "react";
+import { useApi } from "api";
 import { Table } from "react-bootstrap";
-import { ReqStatus } from "types";
 import { shortNameCapitalized } from "utils/format";
 
 export function PortsStatusTable() {
@@ -15,23 +14,6 @@ export function PortsStatusTable() {
   const [advancedMode, setAdvancedMode] = useState(false);
 
   const upnpInfo = useApi.getPortsStatus({ isApiScanEnabled });
-
-  const [reqStatusPortsStatus, setReqStatusPortsStatus] = useState<ReqStatus>(
-    {}
-  );
-
-  async function updatePortsStatus() {
-    try {
-      setReqStatusPortsStatus({ loading: true });
-      setIsApiScanEnabled(true);
-      upnpInfo.revalidate();
-      setIsApiScanEnabled(false);
-      setReqStatusPortsStatus({ result: true });
-    } catch (e) {
-      setReqStatusPortsStatus({ error: e });
-      console.error("Error on getPortsStatus", e);
-    }
-  }
 
   if (upnpInfo.error) return <ErrorView error={upnpInfo.error} />;
   if (upnpInfo.isValidating) return <Loading steps={["Loading ports table"]} />;
@@ -42,9 +24,10 @@ export function PortsStatusTable() {
       <SubTitle>
         Ports table
         <Button
+          disabled={upnpInfo.isValidating ? true : false}
           variant={"dappnode"}
           className="float-right"
-          onClick={updatePortsStatus}
+          onClick={() => setIsApiScanEnabled(true)}
         >
           Scan ports
         </Button>
@@ -133,10 +116,6 @@ export function PortsStatusTable() {
           <strong>Status (UPnP)**: </strong>port status using UPnP scan
         </p>
       ) : null}
-
-      {reqStatusPortsStatus.error && (
-        <ErrorView error={reqStatusPortsStatus.error} hideIcon red />
-      )}
     </>
   );
 }
