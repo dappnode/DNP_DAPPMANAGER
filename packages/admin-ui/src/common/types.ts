@@ -1069,7 +1069,8 @@ export interface SystemInfo {
   versionDataVpn: PackageVersionData;
   // Network params
   ip: string; // "85.84.83.82",
-  dappnodeWebName: string; // "My-DAppNode", It's a front-end value
+  name: string; // hostname
+  dappnodeWebName: string; // It's a front-end value
   staticIp: string; // "85.84.83.82" | null,
   domain: string; // "1234acbd.dyndns.io",
   upnpAvailable: boolean;
