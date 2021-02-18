@@ -102,7 +102,6 @@ export default async function initializeDb(): Promise<void> {
   db.doubleNat.set(doubleNat);
   db.alertToOpenPorts.set(alertUserToOpenPorts);
   db.internalIp.set(internalIp);
-  db.dappnodeWebName.set(serverName);
 
   // Create VPN's address + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
