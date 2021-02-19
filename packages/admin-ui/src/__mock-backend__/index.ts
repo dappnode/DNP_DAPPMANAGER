@@ -57,22 +57,42 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82"
   }),
 
-  getPortsStatus: async () => [
+  portsToOpenGet: async () => [
+    {
+      portNumber: 8092,
+      protocol: "TCP",
+      serviceName: "validator",
+      dnpName: "Prysm"
+    }
+  ],
+  portsUpnpStatusGet: async () => [
     {
       port: 8092,
       protocol: "UDP",
-      upnpStatus: "open",
-      apiStatus: { status: "unknown" },
-      mergedStatus: "open",
+      status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
       protocol: "TCP",
-      upnpStatus: "open",
-      apiStatus: { status: "error", message: "something wrong" },
-      mergedStatus: "open",
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    }
+  ],
+  portsApiStatusGet: async () => [
+    {
+      port: 8092,
+      protocol: "UDP",
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    },
+    {
+      port: 1194,
+      protocol: "TCP",
+      status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     }

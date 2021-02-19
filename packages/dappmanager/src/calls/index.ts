@@ -16,7 +16,7 @@ export { fetchDnpRequest } from "./fetchDnpRequest";
 export { statsCpuGet } from "./statsCpuGet";
 export { statsMemoryGet } from "./statsMemoryGet";
 export { statsDiskGet } from "./statsDiskGet";
-export { getPortsStatus } from "./getPortsStatus";
+
 export { getUserActionLogs } from "./getUserActionLogs";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
@@ -37,6 +37,9 @@ export { packageGettingStartedToggle } from "./packageGettingStartedToggle";
 export { passwordChange } from "./passwordChange";
 export { passwordIsSecure } from "./passwordIsSecure";
 export { poweroffHost } from "./poweroffHost";
+export { portsApiStatusGet } from "./portsStatusGet";
+export { portsUpnpStatusGet } from "./portsStatusGet";
+export { portsToOpenGet } from "./portsToOpenGet";
 export { rebootHost } from "./rebootHost";
 export { seedPhraseSet } from "./seedPhraseSet";
 export { setStaticIp } from "./setStaticIp";

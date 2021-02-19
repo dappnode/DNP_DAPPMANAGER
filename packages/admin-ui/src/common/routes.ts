@@ -28,7 +28,9 @@ import {
   PublicIpResponse,
   ChainData,
   ShhStatus,
-  PortsTable
+  PortToOpen,
+  UpnpTablePortStatus,
+  ApiTablePortStatus
 } from "./types";
 
 export interface Routes {
@@ -222,18 +224,6 @@ export interface Routes {
   }) => Promise<UserActionLog[]>;
 
   /**
-   * Returns UPnP info
-   * - UPnP available
-   * - Ports to be opened
-   * - Ports opened: from API and UPnP
-   */
-  getPortsStatus: ({
-    isApiScanEnabled
-  }: {
-    isApiScanEnabled: boolean;
-  }) => Promise<PortsTable[]>;
-
-  /**
    * Returns the list of current mountpoints in the host,
    * by running a pre-written script in the host
    */
@@ -405,6 +395,25 @@ export interface Routes {
   poweroffHost: () => Promise<void>;
 
   /**
+   * Returns ports to open
+   */
+  portsToOpenGet: () => Promise<PortToOpen[]>;
+
+  /**
+   * Returns ports status from upnp scanning
+   */
+  portsUpnpStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<UpnpTablePortStatus[]>;
+
+  /**
+   * Returns ports status from API scanning
+   */
+  portsApiStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<ApiTablePortStatus[]>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -517,7 +526,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  getPortsStatus: {},
   statsCpuGet: {},
   statsDiskGet: {},
   statsMemoryGet: {},
@@ -541,6 +549,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
+  portsToOpenGet: {},
+  portsUpnpStatusGet: {},
+  portsApiStatusGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },

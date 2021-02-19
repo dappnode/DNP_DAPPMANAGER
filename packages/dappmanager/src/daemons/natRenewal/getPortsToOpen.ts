@@ -1,7 +1,7 @@
-// Default ports to open in case getPortsToOpen throws
-import { PortProtocol, PackageContainer, PortToOpen } from "../../types";
+import { PackageContainer, PortMapping } from "../../common";
 import { logs } from "../../logs";
 import { ComposeFileEditor } from "../../modules/compose/editor";
+import { PortToOpen } from "../../types";
 
 export default function getPortsToOpen(
   containers: PackageContainer[]
@@ -9,32 +9,24 @@ export default function getPortsToOpen(
   // Aggreate ports with an object form to prevent duplicates
   const portsToOpen = new Map<string, PortToOpen>();
   const addPortToOpen = (
-    protocol: PortProtocol,
-    host: number,
-    serviceName: string,
-    dnpName: string
+    port: PortMapping,
+    container: PackageContainer
   ): void => {
-    const portNumber = host;
-    portsToOpen.set(`${portNumber}-${protocol}`, {
-      protocol,
-      portNumber,
-      serviceName,
-      dnpName
-    });
+    if (port.host) {
+      portsToOpen.set(`${port.host}-${port.protocol}`, {
+        protocol: port.protocol,
+        portNumber: port.host,
+        serviceName: container.serviceName,
+        dnpName: container.dnpName
+      });
+    }
   };
 
   for (const container of containers) {
     if (container.running) {
       // If a container is running the port mapping is available in listContainers()
       for (const port of container.ports || []) {
-        if (port.host) {
-          addPortToOpen(
-            port.protocol,
-            port.host,
-            container.serviceName,
-            container.dnpName
-          );
-        }
+        addPortToOpen(port, container);
       }
     } else {
       try {
@@ -43,16 +35,12 @@ export default function getPortsToOpen(
           container.dnpName,
           container.isCore
         );
-        for (const service of Object.values(compose.services())) {
+
+        const service = compose.services()[container.serviceName];
+        if (service) {
           // Only consider ports that are mapped (not ephemeral ports)
           for (const port of service.getPortMappings())
-            if (port.host)
-              addPortToOpen(
-                port.protocol,
-                port.host,
-                container.serviceName,
-                container.dnpName
-              );
+            addPortToOpen(port, container);
         }
       } catch (e) {
         logs.error(

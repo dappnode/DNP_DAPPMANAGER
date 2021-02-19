@@ -35,12 +35,12 @@ export default function Ports() {
             <Ok
               ok={true}
               msg={
-                "DAppNode is running on a remote machine and does not require UPnP"
+                "Public and local IPs are the same. Your DAppNode is directly exposed to the internet and does not require UPnP"
               }
             />
           )}
           <hr />
-          <PortsStatusTable />
+          <PortsStatusTable isUpnpEnabled={systemInfo.data.upnpAvailable} />
         </>
       ) : systemInfo.error ? (
         <ErrorView error={systemInfo.error} />

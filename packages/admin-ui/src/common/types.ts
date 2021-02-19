@@ -308,28 +308,31 @@ export interface UpnpPortMapping {
   ip: string;
 }
 
-export interface PortsTable {
+export interface TablePortsStatus {
   port: number;
   protocol: PortProtocol;
-  upnpStatus: UpnpStatus;
-  apiStatus: ApiStatus; // if not scanned status is "not-fetched"
-  mergedStatus: MergedStatus;
-  serviceName: string; // if not found then unknown
+  serviceName: string;
   dnpName: string;
+  message?: string;
 }
 
-export type MergedStatus = ApiStatus | UpnpStatus;
+export interface ApiTablePortStatus extends TablePortsStatus {
+  status: ApiStatus;
+}
+
+export interface UpnpTablePortStatus extends TablePortsStatus {
+  status: UpnpStatus;
+}
 
 // ApiStatus data structure is different than UpnpStatus because we want to attach an error message
 export type ApiStatus =
-  | { status: "open" }
-  | { status: "closed" }
-  | { status: "not-fetched" }
-  | { status: "unknown" } // port not found
-  | { status: "error"; message?: string }; // error from/fetching the API
+  | "open"
+  | "closed"
+  | "unknown" // port not found or protocol UDP
+  | "error"; // error from/fetching the API
 
 // unknown => port not found. not-available => UPnP disabled or not recognized
-export type UpnpStatus = "open" | "closed" | "upnp-disabled";
+export type UpnpStatus = "open" | "closed";
 
 export interface VolumeMapping {
   host: string; // path
@@ -472,17 +475,11 @@ export type InstalledPackageData = Pick<
 };
 
 export interface PortScanResponse {
-  tcpPorts: TcpPortScan[];
-  udpPorts: UdpPortScan[];
+  tcpPorts: PortScanResult[];
+  udpPorts: PortScanResult[];
 }
 
-export interface TcpPortScan {
-  port: number;
-  status: "open" | "closed" | "error" | "unknown";
-  message?: string;
-}
-
-export interface UdpPortScan {
+export interface PortScanResult {
   port: number;
   status: "open" | "closed" | "error" | "unknown";
   message?: string;
@@ -608,6 +605,11 @@ export interface Compose {
 export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
+}
+
+export interface PortToOpen extends PackagePort {
+  serviceName: string;
+  dnpName: string;
 }
 
 export interface PackageRequest {

@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import assert from "assert";
 import params from "../../params";
-import { TcpPortScan, PortScanResponse, PackagePort } from "../../common";
+import { PortScanResult, PortScanResponse, PackagePort } from "../../common";
 import { logs } from "../../logs";
 
 const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
@@ -15,7 +15,7 @@ export async function performPortsScan({
 }: {
   publicIp: string;
   portsToOpen: PackagePort[];
-}): Promise<TcpPortScan[]> {
+}): Promise<PortScanResult[]> {
   const tcpPorts = portsToOpen
     .filter(port => port.protocol === "TCP")
     .map(port => port.portNumber.toString())
@@ -58,7 +58,7 @@ function sanitizeApiResponse(responseJson: PortScanResponse): void {
   );
   // Inside "tcpPorts" check for keys "port", "status", "message"
   assert.deepStrictEqual(
-    responseJson.tcpPorts.some((route: TcpPortScan) =>
+    responseJson.tcpPorts.some((route: PortScanResult) =>
       Object.keys(route).some(
         key => key !== "port" && key !== "status" && key !== "message"
       )
@@ -69,7 +69,7 @@ function sanitizeApiResponse(responseJson: PortScanResponse): void {
   // ports must be numbers
   assert.deepStrictEqual(
     responseJson.tcpPorts.some(
-      (route: TcpPortScan) => typeof route.port !== "number"
+      (route: PortScanResult) => typeof route.port !== "number"
     ),
     false,
     "API response returned port different than number"
@@ -77,7 +77,7 @@ function sanitizeApiResponse(responseJson: PortScanResponse): void {
   // ports status check
   assert.deepStrictEqual(
     responseJson.tcpPorts.some(
-      (route: TcpPortScan) =>
+      (route: PortScanResult) =>
         route.status !== "closed" &&
         route.status !== "open" &&
         route.status !== "error" &&
