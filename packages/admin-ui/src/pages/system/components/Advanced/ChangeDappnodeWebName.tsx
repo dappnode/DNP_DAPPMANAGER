@@ -15,7 +15,7 @@ export function ChangeDappnodeWebName() {
   }, [dappnodeWebName]);
 
   function onChangeDappNodeWebName() {
-    withToastNoThrow(() => api.dappnodeWebNameSet({ dappnodeWebName: input }), {
+    withToastNoThrow(() => api.dappnodeWebNameSet(input), {
       message: "Setting dappnode name ...",
       onSuccess: "Regresh the page to see the changes"
     });
