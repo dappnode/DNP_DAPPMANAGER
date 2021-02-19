@@ -25,6 +25,8 @@ const namedSpacedCalls = {
   ...volumes
 };
 
+let dappnodeWebName = "Mock-DAppNode";
+
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () =>
     "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
@@ -58,6 +60,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
+
+  dappnodeWebNameSet: async newDappnodeWebName => {
+    dappnodeWebName = newDappnodeWebName;
+  },
 
   statsCpuGet: async () => ({
     usedPercentage: 88
@@ -134,6 +140,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ip: "85.84.83.82",
     name: "My-DAppNode",
     staticIp: "", // "85.84.83.82",
+    dappnodeWebName,
     domain: "1234acbd.dyndns.io",
     upnpAvailable: true,
     noNatLoopback: false,
