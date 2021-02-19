@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getDappnodeName } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { fetchSystemInfo } from "services/dappnodeStatus/actions";
+
 export function ChangeDappnodeWebName() {
   const dappnodeWebName = useSelector(getDappnodeName);
   const [input, setInput] = useState(dappnodeWebName);
