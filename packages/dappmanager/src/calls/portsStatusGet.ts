@@ -42,7 +42,6 @@ export async function portsApiStatusGet({
 }: {
   portsToOpen: PortToOpen[];
 }): Promise<ApiTablePortStatus[]> {
-  // API data: tcp ports status
   const apiTcpPortsStatus = await performPortsScan({
     publicIp: db.publicIp.get(),
     portsToOpen

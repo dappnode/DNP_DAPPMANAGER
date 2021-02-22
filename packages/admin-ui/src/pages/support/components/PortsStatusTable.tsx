@@ -4,10 +4,10 @@ import Ok from "components/Ok";
 import SubTitle from "components/SubTitle";
 import React, { useState } from "react";
 import Button from "components/Button";
+import Table from "react-bootstrap/Table";
 import { ReqStatus } from "types";
 import { useApi } from "api";
 import { api } from "api";
-import { Table } from "react-bootstrap";
 import { shortNameCapitalized } from "utils/format";
 import {
   ApiTablePortStatus,
@@ -22,8 +22,12 @@ export function PortsStatusTable({
 }) {
   const [upnpScanResult, setUpnpScanResult] = useState<UpnpTablePortStatus[]>();
   const [apiScanResult, setApiScanResult] = useState<ApiTablePortStatus[]>();
-  const [upnpReqStatus, setUpnpReqStatus] = useState<ReqStatus>({});
-  const [apiReqStatus, setApiReqStatus] = useState<ReqStatus>({});
+  const [upnpReqStatus, setUpnpReqStatus] = useState<
+    ReqStatus<UpnpTablePortStatus[]>
+  >({});
+  const [apiReqStatus, setApiReqStatus] = useState<
+    ReqStatus<ApiTablePortStatus[]>
+  >({});
 
   const portsToOpen = useApi.portsToOpenGet();
 
@@ -34,9 +38,8 @@ export function PortsStatusTable({
         const apiPorts = await api.portsApiStatusGet({
           portsToOpen: portsToOpen.data
         });
-        setApiReqStatus({ loading: false });
         setApiScanResult(apiPorts);
-        setApiReqStatus({ result: true });
+        setApiReqStatus({ result: apiPorts });
       } catch (e) {
         setApiReqStatus({ error: e });
       }
@@ -49,9 +52,8 @@ export function PortsStatusTable({
         const upnpPorts = await api.portsUpnpStatusGet({
           portsToOpen: portsToOpen.data
         });
-        setUpnpReqStatus({ loading: false });
         setUpnpScanResult(upnpPorts);
-        setUpnpReqStatus({ result: true });
+        setUpnpReqStatus({ result: upnpPorts });
       } catch (e) {
         setUpnpReqStatus({ error: e });
       }
@@ -68,11 +70,11 @@ export function PortsStatusTable({
       apiPort => apiPort.port === portToOpen.portNumber
     );
 
-    if (!apiPortMatch) return <Ok msg="Not found" />;
+    if (!apiPortMatch) return <Ok unknown={true} msg="Not found" />;
 
     switch (apiPortMatch.status) {
       case "unknown":
-        return <Ok msg="Unknown" />;
+        return <Ok unknown={true} msg="Unknown" />;
       case "open":
         return <Ok ok={true} msg="Open" />;
       case "closed":
@@ -98,7 +100,7 @@ export function PortsStatusTable({
       upnpPort => upnpPort.port === portToOpen.portNumber
     );
 
-    if (!upnpPortMatch) return <Ok msg="Unknown" />;
+    if (!upnpPortMatch) return <Ok unknown={true} msg="Not found" />;
 
     switch (upnpPortMatch.status) {
       case "open":
@@ -114,7 +116,7 @@ export function PortsStatusTable({
 
   if (portsToOpen.data)
     return (
-      <SubTitle>
+      <>
         <SubTitle>
           Ports table
           <Button
@@ -153,10 +155,6 @@ export function PortsStatusTable({
                 <th>Status (UPnP) **</th>
               )}
               {upnpReqStatus.error && <ErrorView error={upnpReqStatus.error} />}
-
-              {apiReqStatus.result && upnpReqStatus.result && (
-                <th>Status merged ***</th>
-              )}
             </tr>
           </thead>
           <tbody>
@@ -194,18 +192,6 @@ export function PortsStatusTable({
                       <ScanningPort />
                     </td>
                   )}
-
-                  {upnpReqStatus.result &&
-                    upnpScanResult &&
-                    apiReqStatus.result &&
-                    apiScanResult && (
-                      <td>
-                        <RenderApiStatus
-                          apiScanResult={apiScanResult}
-                          portToOpen={port}
-                        />
-                      </td>
-                    )}
                 </tr>
               );
             })}
@@ -216,27 +202,19 @@ export function PortsStatusTable({
         {apiReqStatus.result ? (
           <p>
             <br />
-            <strong>Status API*: </strong>ports status using an API scan
-            service. Not valid for UDP ports.
+            <strong>Status API*: </strong>ports status according to API scan.
+            Not valid for UDP ports.
           </p>
         ) : null}
 
         {upnpReqStatus.result ? (
           <p>
             <br />
-            <strong>Status UPnP**: </strong>ports status using UPnP scan. Only
-            available if UPnP is enabled.
+            <strong>Status UPnP**: </strong>ports status according to UPnP scan.
+            Only available if UPnP is enabled.
           </p>
         ) : null}
-
-        {upnpReqStatus.result && apiReqStatus.result ? (
-          <p>
-            <br />
-            <strong>Status merged ***: </strong>status merged taking into
-            account UPnP and API scans.
-          </p>
-        ) : null}
-      </SubTitle>
+      </>
     );
   if (portsToOpen.error) return <ErrorView error={portsToOpen.error} />;
   if (portsToOpen.isValidating)
