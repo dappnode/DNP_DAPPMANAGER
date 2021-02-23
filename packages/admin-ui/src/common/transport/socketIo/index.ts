@@ -52,13 +52,13 @@ export function subscriptionsFactory(
         // Use try / catch and await to be safe for async and sync methods
         try {
           if (onCall) onCall(`emit - ${route}`, args);
-          io.emit(route, args);
+          io.emit(route, ...args);
         } catch (e) {
           if (onError) onError(`emit - ${route}`, e, args);
         }
       },
       on: (handler: (...args: Args) => void | Promise<void>): void => {
-        io.on(route, async function endpoint(args?: Args): Promise<void> {
+        io.on(route, async function(...args: Args): Promise<void> {
           // Use try / catch and await to be safe for async and sync methods
           try {
             if (onCall) onCall(`on - ${route}`, args);
@@ -67,7 +67,7 @@ export function subscriptionsFactory(
             const valid = validateArgs({ [route]: args });
             if (!valid) throw Error(formatErrors(validateArgs.errors, route));
 
-            await handler(...(args || []));
+            await handler(...args);
           } catch (e) {
             if (onError) onError(`on - ${route}`, e, args);
           }

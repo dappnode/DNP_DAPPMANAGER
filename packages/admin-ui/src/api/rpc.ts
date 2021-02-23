@@ -1,11 +1,9 @@
 import io from "socket.io-client";
 import { Emitter } from "mitt";
-import { mapValues } from "lodash";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
-import { subscriptionsFactory } from "common";
+import { subscriptionsData } from "common";
 import { IApiRpc } from "./interface";
 import { socketIoUrl } from "params";
-import { subscriptionsLogger } from "./utils";
 
 let socketGlobal: SocketIOClient.Socket | null = null;
 let apiStarted = false;
@@ -29,11 +27,11 @@ export const apiRpc: IApiRpc = {
     const socket = setupSocket();
 
     socket.on("connect", function() {
-      const subscriptions = subscriptionsFactory(socket, subscriptionsLogger);
-      mapValues(subscriptions, (handler, route) => {
-        handler.on((...args: Args) => apiEventBridge.emit(route, ...args));
-      });
-
+      for (const route of Object.keys(subscriptionsData)) {
+        socket.on(route, (...args: Args) => {
+          apiEventBridge.emit(route, ...args);
+        });
+      }
       onConnect();
     });
 
