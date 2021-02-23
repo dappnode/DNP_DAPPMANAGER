@@ -18,6 +18,7 @@ import { LoginStatus as _LoginStatus } from "./interface";
 import { apiAuth } from "./auth";
 import { apiRoutes } from "./routes";
 import { apiRpc } from "./rpc";
+import { subscriptionsLogger } from "./utils";
 
 export type LoginStatus = _LoginStatus;
 export { apiAuth };
@@ -47,7 +48,9 @@ if (process.env.REACT_APP_MOCK) {
 const apiEventBridge = mitt();
 
 // Map redux subscriptions to eventBridge
-mapSubscriptionsToRedux(subscriptionsFactory(apiEventBridge));
+mapSubscriptionsToRedux(
+  subscriptionsFactory(apiEventBridge, subscriptionsLogger)
+);
 
 export async function startApi(refetchStatus: () => void) {
   apiRpc.start(
