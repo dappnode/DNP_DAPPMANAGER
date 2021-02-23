@@ -5,6 +5,7 @@ import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 import { subscriptionsFactory } from "common";
 import { IApiRpc } from "./interface";
 import { socketIoUrl } from "params";
+import { subscriptionsLogger } from "./utils";
 
 let socketGlobal: SocketIOClient.Socket | null = null;
 let apiStarted = false;
@@ -27,10 +28,10 @@ export const apiRpc: IApiRpc = {
 
     const socket = setupSocket();
 
-    socket.on("connect", function(...args: any) {
+    socket.on("connect", function() {
       const subscriptions = subscriptionsFactory(socket, subscriptionsLogger);
       mapValues(subscriptions, (handler, route) => {
-        handler.on((...args: any[]) => apiEventBridge.emit(route, ...args));
+        handler.on((...args: Args) => apiEventBridge.emit(route, ...args));
       });
 
       onConnect();
@@ -60,9 +61,3 @@ function setupSocket(): SocketIOClient.Socket {
   }
   return socketGlobal;
 }
-
-const subscriptionsLogger = {
-  onError: (route: string, error: Error, args?: Args): void => {
-    console.error(`Subscription error ${route}: ${error.stack}`, args);
-  }
-};
