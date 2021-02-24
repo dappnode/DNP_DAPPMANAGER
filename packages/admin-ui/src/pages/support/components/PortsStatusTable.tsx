@@ -15,13 +15,66 @@ import {
   UpnpTablePortStatus
 } from "common/types";
 
+function RenderApiStatus({
+  apiScanResult,
+  portToOpen
+}: {
+  apiScanResult: ApiTablePortStatus[];
+  portToOpen: PortToOpen;
+}) {
+  const apiPortMatch = apiScanResult.find(
+    apiPort => apiPort.port === portToOpen.portNumber
+  );
+
+  if (!apiPortMatch) return <Ok unknown={true} msg="Not found" />;
+
+  switch (apiPortMatch.status) {
+    case "unknown":
+      return <Ok unknown={true} msg="Unknown" />;
+    case "open":
+      return <Ok ok={true} msg="Open" />;
+    case "closed":
+      return <Ok ok={false} msg="Closed" />;
+    case "error":
+      return (
+        <Ok
+          ok={false}
+          msg={"Error " + (apiPortMatch.message ? apiPortMatch.message : "")}
+        />
+      );
+  }
+}
+
+function RenderUpnpStatus({
+  upnpScanResult,
+  portToOpen
+}: {
+  upnpScanResult: UpnpTablePortStatus[];
+  portToOpen: PortToOpen;
+}) {
+  const upnpPortMatch = upnpScanResult.find(
+    upnpPort => upnpPort.port === portToOpen.portNumber
+  );
+
+  if (!upnpPortMatch) return <Ok unknown={true} msg="Not found" />;
+
+  switch (upnpPortMatch.status) {
+    case "open":
+      return <Ok ok={true} msg="Open" />;
+    case "closed":
+      return <Ok ok={false} msg="Closed" />;
+  }
+}
+
+function ScanningPort() {
+  return <Ok loading={true} msg="Scanning" />;
+}
+
 export function PortsStatusTable({
   isUpnpEnabled
 }: {
   isUpnpEnabled: boolean;
 }) {
-  const [upnpScanResult, setUpnpScanResult] = useState<UpnpTablePortStatus[]>();
-  const [apiScanResult, setApiScanResult] = useState<ApiTablePortStatus[]>();
   const [upnpReqStatus, setUpnpReqStatus] = useState<
     ReqStatus<UpnpTablePortStatus[]>
   >({});
@@ -38,7 +91,6 @@ export function PortsStatusTable({
         const apiPorts = await api.portsApiStatusGet({
           portsToOpen: portsToOpen.data
         });
-        setApiScanResult(apiPorts);
         setApiReqStatus({ result: apiPorts });
       } catch (e) {
         setApiReqStatus({ error: e });
@@ -52,66 +104,10 @@ export function PortsStatusTable({
         const upnpPorts = await api.portsUpnpStatusGet({
           portsToOpen: portsToOpen.data
         });
-        setUpnpScanResult(upnpPorts);
         setUpnpReqStatus({ result: upnpPorts });
       } catch (e) {
         setUpnpReqStatus({ error: e });
       }
-  }
-
-  function RenderApiStatus({
-    apiScanResult,
-    portToOpen
-  }: {
-    apiScanResult: ApiTablePortStatus[];
-    portToOpen: PortToOpen;
-  }) {
-    const apiPortMatch = apiScanResult.find(
-      apiPort => apiPort.port === portToOpen.portNumber
-    );
-
-    if (!apiPortMatch) return <Ok unknown={true} msg="Not found" />;
-
-    switch (apiPortMatch.status) {
-      case "unknown":
-        return <Ok unknown={true} msg="Unknown" />;
-      case "open":
-        return <Ok ok={true} msg="Open" />;
-      case "closed":
-        return <Ok ok={false} msg="Closed" />;
-      case "error":
-        return (
-          <Ok
-            ok={false}
-            msg={"Error " + (apiPortMatch.message ? apiPortMatch.message : "")}
-          />
-        );
-    }
-  }
-
-  function RenderUpnpStatus({
-    upnpScanResult,
-    portToOpen
-  }: {
-    upnpScanResult: UpnpTablePortStatus[];
-    portToOpen: PortToOpen;
-  }) {
-    const upnpPortMatch = upnpScanResult.find(
-      upnpPort => upnpPort.port === portToOpen.portNumber
-    );
-
-    if (!upnpPortMatch) return <Ok unknown={true} msg="Not found" />;
-
-    switch (upnpPortMatch.status) {
-      case "open":
-        return <Ok ok={true} msg="Open" />;
-      case "closed":
-        return <Ok ok={false} msg="Closed" />;
-    }
-  }
-
-  function ScanningPort() {
-    return <Ok loading={true} msg="Scanning" />;
   }
 
   if (portsToOpen.data)
@@ -165,10 +161,10 @@ export function PortsStatusTable({
                   <td>{port.protocol}</td>
                   <td>{shortNameCapitalized(port.dnpName)}</td>
 
-                  {apiReqStatus.result && apiScanResult && (
+                  {apiReqStatus.result && (
                     <td>
                       <RenderApiStatus
-                        apiScanResult={apiScanResult}
+                        apiScanResult={apiReqStatus.result}
                         portToOpen={port}
                       />
                     </td>
@@ -179,10 +175,10 @@ export function PortsStatusTable({
                     </td>
                   )}
 
-                  {upnpReqStatus.result && upnpScanResult && (
+                  {upnpReqStatus.result && (
                     <td>
                       <RenderUpnpStatus
-                        upnpScanResult={upnpScanResult}
+                        upnpScanResult={upnpReqStatus.result}
                         portToOpen={port}
                       />
                     </td>

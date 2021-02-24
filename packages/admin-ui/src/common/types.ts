@@ -474,17 +474,6 @@ export type InstalledPackageData = Pick<
   containers: PackageContainer[];
 };
 
-export interface PortScanResponse {
-  tcpPorts: PortScanResult[];
-  udpPorts: PortScanResult[];
-}
-
-export interface PortScanResult {
-  port: number;
-  status: "open" | "closed" | "error" | "unknown";
-  message?: string;
-}
-
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;

@@ -1,10 +1,23 @@
 import fetch from "node-fetch";
-import assert from "assert";
 import params from "../../params";
-import { PortScanResult, PortScanResponse, PackagePort } from "../../common";
+import Ajv from "ajv";
+import { PackagePort } from "../../common";
 import { logs } from "../../logs";
 
+interface PortScanResponse {
+  tcpPorts: PortScanResult[];
+  udpPorts: PortScanResult[];
+}
+
+interface PortScanResult {
+  port: number;
+  status: "open" | "closed" | "error" | "unknown";
+  message?: string;
+}
+
 const apiEndpoint = params.PORT_SCANNER_SERVICE_URL;
+
+const ajv = new Ajv({ allErrors: true });
 
 /**
  * Fetch check ports scan service for TCP ports
@@ -27,9 +40,9 @@ export async function performPortsScan({
     );
 
     const responseJson = await response.json();
-    sanitizeApiResponse(responseJson);
+    const responseJsonSanitized = sanitizeApiResponse(responseJson);
 
-    return responseJson.tcpPorts;
+    return responseJsonSanitized.tcpPorts;
   } catch (e) {
     // Returns ports with status "error" when an error occurs fetching the API
     logs.error(`Error fetching port scanner ${e.message}`);
@@ -47,43 +60,71 @@ export async function performPortsScan({
  * Check if the response from the scan ports API
  * is well formatted
  */
-function sanitizeApiResponse(responseJson: PortScanResponse): void {
-  // Check for keys "tcpPorts" and "udpPorts"
-  assert.deepStrictEqual(
-    Object.keys(responseJson).some(
-      key => key !== "tcpPorts" && key !== "udpPorts"
-    ),
-    false,
-    "API response returned wrong JSON keys"
-  );
-  // Inside "tcpPorts" check for keys "port", "status", "message"
-  assert.deepStrictEqual(
-    responseJson.tcpPorts.some((route: PortScanResult) =>
-      Object.keys(route).some(
-        key => key !== "port" && key !== "status" && key !== "message"
-      )
-    ),
-    false,
-    "API response returned wrong JSON keys"
-  );
-  // ports must be numbers
-  assert.deepStrictEqual(
-    responseJson.tcpPorts.some(
-      (route: PortScanResult) => typeof route.port !== "number"
-    ),
-    false,
-    "API response returned port different than number"
-  );
-  // ports status check
-  assert.deepStrictEqual(
-    responseJson.tcpPorts.some(
-      (route: PortScanResult) =>
-        route.status !== "closed" &&
-        route.status !== "open" &&
-        route.status !== "error" &&
-        route.status !== "unknown"
-    ),
-    false,
-    "API response returned status different than open or closed"
-  );
+function sanitizeApiResponse(response: any): PortScanResponse {
+  //If the keyword value is an object, then for the data array to be valid
+  // each item of the array should be valid according to the schema in this value.
+  // In this case the additionalItems keyword is ignored.
+  const schema = {
+    type: "object",
+    maxProperties: 2,
+    additionalProperties: false,
+    properties: {
+      tcpPorts: {
+        uniqueItems: true,
+        type: "array",
+        items: {
+          type: "object",
+          maxProperties: 3,
+          minProperties: 2,
+          additionalProperties: false,
+          required: ["port", "status"],
+          properties: {
+            port: {
+              type: "integer",
+              minimum: 0,
+              maximum: 65535
+            },
+            status: {
+              type: "string",
+              pattern: "^(open|closed|error|unknown)$"
+            },
+            message: {
+              type: "string"
+            }
+          }
+        }
+      },
+      udpPorts: {
+        uniqueItems: true,
+        type: "array",
+        items: {
+          type: "object",
+          maxProperties: 3,
+          minProperties: 2,
+          additionalProperties: false,
+          required: ["port", "status"],
+          properties: {
+            port: {
+              type: "integer",
+              minimum: 0,
+              maximum: 65535
+            },
+            status: {
+              type: "string",
+              pattern: "^(open|closed|error|unknown)$"
+            },
+            message: {
+              type: "string"
+            }
+          }
+        }
+      }
+    }
+  };
+
+  if (ajv.validate(schema, response)) {
+    const responseSanitized = response as PortScanResponse;
+    return responseSanitized;
+  }
+  throw Error("Error: API response not validated by the schema");
 }
