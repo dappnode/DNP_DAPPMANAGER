@@ -3,7 +3,16 @@ import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
 import { parseEnvironment } from "./environment";
-import { Compose, ComposeService, ComposeVolumes, Manifest } from "../../types";
+import { getPrivateNetworkAlias } from "../../domains";
+import {
+  Compose,
+  ComposeService,
+  ComposeServiceNetworks,
+  ComposeVolumes,
+  ComposeNetwork,
+  ComposeNetworks,
+  Manifest
+} from "../../types";
 
 interface ValidationAlert {
   name: string;
@@ -75,25 +84,65 @@ export function parseUnsafeCompose(
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),
         dns: params.DNS_SERVICE, // Common DAppNode ENS
-        networks: isCore
-          ? serviceUnsafe.networks || [params.DNP_NETWORK_EXTERNAL_NAME]
-          : [params.DNP_NETWORK_EXTERNAL_NAME]
+        networks: parseUnsafeServiceNetworks(serviceUnsafe.networks, isCore, {
+          serviceName,
+          dnpName
+        })
       })
     ),
 
     volumes: parseUnsafeVolumes(composeUnsafe.volumes),
 
-    networks: isCore
-      ? composeUnsafe.networks || {
-          [params.DNP_NETWORK_INTERNAL_NAME]: {
-            driver: "bridge",
-            ipam: { config: [{ subnet: "172.33.0.0/16" }] }
-          }
-        }
-      : {
-          [params.DNP_NETWORK_EXTERNAL_NAME]: { external: true }
-        }
+    networks: parseUnsafeNetworks(composeUnsafe.networks, isCore)
   });
+}
+
+function parseUnsafeServiceNetworks(
+  networks: ComposeServiceNetworks | undefined,
+  isCore: boolean,
+  service: { serviceName: string; dnpName: string }
+): ComposeServiceNetworks {
+  // TODO: See note in parseUnsafeNetworks() about name property
+  const dnpPrivateNetworkName = isCore
+    ? params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE
+    : params.DNP_PRIVATE_NETWORK_NAME;
+
+  // Only allow customizing config for core packages
+  const dnpPrivateNetwork =
+    isCore && networks && !Array.isArray(networks)
+      ? networks[dnpPrivateNetworkName]
+      : {};
+
+  const alias = getPrivateNetworkAlias(service);
+
+  return {
+    [dnpPrivateNetworkName]: {
+      aliases: [alias],
+      ...dnpPrivateNetwork
+    }
+  };
+}
+
+function parseUnsafeNetworks(
+  networks: ComposeNetworks | undefined,
+  isCore: boolean
+): ComposeNetworks {
+  const dnpPrivateNetwork: ComposeNetwork = {
+    driver: "bridge",
+    ipam: { config: [{ subnet: params.DNP_PRIVATE_NETWORK_SUBNET }] }
+  };
+
+  // TODO: Use the name property so we can use the same name of core and non-core
+  // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
+  // Warning: It's only available on compose >=3.5, docker >=17.12.0
+  return isCore
+    ? {
+        [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: dnpPrivateNetwork,
+        ...networks
+      }
+    : {
+        [params.DNP_PRIVATE_NETWORK_NAME]: { external: true }
+      };
 }
 
 function parseUnsafeVolumes(

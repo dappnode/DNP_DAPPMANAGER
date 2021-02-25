@@ -8,6 +8,7 @@ export { cleanCache } from "./cleanCache";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
 export { domainAliasSet } from "./domainAliasSet";
+export { dappnodeWebNameSet } from "./dappnodeWebNameSet";
 export { ethClientTargetSet } from "./ethClientTargetSet";
 export { ethClientFallbackSet } from "./ethClientFallbackSet";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
@@ -18,6 +19,7 @@ export { statsMemoryGet } from "./statsMemoryGet";
 export { statsDiskGet } from "./statsDiskGet";
 
 export { getUserActionLogs } from "./getUserActionLogs";
+export * from "./httpsPortal";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";

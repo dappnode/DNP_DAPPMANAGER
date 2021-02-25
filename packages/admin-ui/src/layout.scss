@@ -85,16 +85,26 @@ body {
   box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   /* place sidebar on top of the header and content */
   z-index: var(--z-index-sidebar);
+
+  > .nav {
+    padding: 0.8rem 0;
+    flex: none;
+  }
+
+  /* Make this section dissapear small heights */
+  > .funded-by {
+    width: 100%;
+    flex: 0 1 auto;
+    overflow: hidden;
+  }
 }
 
 .sidebar-logo {
   width: calc(0.7 * var(--sidenav-width));
 }
+
 /* SIDEBAR > NAV */
-#sidebar > .nav {
-  padding: 0.8rem 0;
-  flex: none;
-}
+
 .sidenav-item {
   display: grid;
   grid-template-columns: 1rem 2rem auto;
@@ -102,32 +112,28 @@ body {
   place-items: center start;
   transition: all 0.5s;
   width: 100%;
-}
-.sidenav-item:not(.top) {
-  height: 2.5rem;
-}
-.sidenav-item .icon,
-.sidenav-item svg {
-  grid-column: 2/3;
-  opacity: 0.3;
-}
-.sidenav-item .header,
-.sidenav-item .subheader {
-  grid-column: 2/4;
-}
-/* Make this section dissapear small heights */
-#sidebar > .funded-by {
-  width: 100%;
-  flex: 0 1 auto;
-  overflow: hidden;
-}
 
-/* SIDEBAR > TOP */
-.sidenav-item.top {
-  height: var(--topbar-height);
-  border-bottom: var(--border-style);
-  /* Prevent the item from shrinking */
-  flex-shrink: 0;
+  /* SIDEBAR > TOP */
+  &.top {
+    height: var(--topbar-height);
+    border-bottom: var(--border-style);
+    /* Prevent the item from shrinking */
+    flex-shrink: 0;
+  }
+  &:not(.top) {
+    height: 2.5rem;
+  }
+
+  .icon,
+  svg {
+    grid-column: 2/3;
+    opacity: 0.3;
+  }
+
+  .header,
+  .subheader {
+    grid-column: 2/4;
+  }
 }
 
 /* Styles below apply when screen width big */
@@ -158,29 +164,30 @@ body {
   padding: 0 var(--container-padding);
   /* place topbar between the sidebar (2) and the main (0) */
   z-index: var(--z-index-topbar);
-}
-#topbar .right,
-#topbar .left {
-  display: flex;
-  align-items: center;
-}
 
-/* Align right to the right so the position does not change when the left div is not there */
-#topbar .right {
-  --icon-size: 1.5rem;
-  flex: auto;
-  display: grid;
-  /* Create as much columns as necessary aligned center vertically and justified to the right */
-  grid-template-columns:
-    minmax(var(--icon-size), min-content)
-    min-content
-    minmax(var(--icon-size), min-content)
-    minmax(var(--icon-size), min-content);
+  .right,
+  .left {
+    display: flex;
+    align-items: center;
+  }
 
-  grid-auto-flow: column;
-  place-content: center end;
-  /* Auto-space the items only in-between, hard to achieve with flex */
-  grid-gap: 1rem;
+  /* Align right to the right so the position does not change when the left div is not there */
+  .right {
+    --icon-size: 1.5rem;
+    flex: auto;
+    display: grid;
+    /* Create as much columns as necessary aligned center vertically and justified to the right */
+    grid-template-columns:
+      minmax(var(--icon-size), min-content)
+      min-content
+      minmax(var(--icon-size), min-content)
+      minmax(var(--icon-size), min-content);
+
+    grid-auto-flow: column;
+    place-content: center end;
+    /* Auto-space the items only in-between, hard to achieve with flex */
+    grid-gap: 1rem;
+  }
 }
 
 /*****
@@ -195,10 +202,10 @@ body {
   margin-left: var(--sidenav-width);
   background-color: var(--color-background);
   padding: var(--container-padding);
-}
 
-#main > div {
-  margin-bottom: var(--default-spacing);
+  > div {
+    margin-bottom: var(--default-spacing);
+  }
 }
 
 /********************

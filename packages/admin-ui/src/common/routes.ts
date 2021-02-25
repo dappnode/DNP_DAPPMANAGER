@@ -30,7 +30,8 @@ import {
   ShhStatus,
   PortToOpen,
   UpnpTablePortStatus,
-  ApiTablePortStatus
+  ApiTablePortStatus,
+  HttpsPortalMapping
 } from "./types";
 
 export interface Routes {
@@ -107,6 +108,10 @@ export interface Routes {
     filename: string;
     toPath: string;
   }) => Promise<void>;
+
+  /** Set the dappnodeWebNameSet */
+
+  dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
 
   /**
    * Creates a new device with the provided id.
@@ -222,6 +227,21 @@ export interface Routes {
     first?: number;
     after?: number;
   }) => Promise<UserActionLog[]>;
+
+  /**
+   * HTTPs Portal: map a subdomain
+   */
+  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
+
+  /**
+   * HTTPs Portal: remove an existing mapping
+   */
+  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
+
+  /**
+   * HTTPs Portal: get all mappings
+   */
+  httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -511,6 +531,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   changeIpfsTimeout: { log: true },
   cleanCache: {},
   copyFileTo: { log: true },
+  dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
   deviceCredentialsGet: {},
@@ -530,6 +551,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsDiskGet: {},
   statsMemoryGet: {},
   getUserActionLogs: {},
+  httpsPortalMappingAdd: { log: true },
+  httpsPortalMappingRemove: { log: true },
+  httpsPortalMappingsGet: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},

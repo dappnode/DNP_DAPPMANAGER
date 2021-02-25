@@ -132,58 +132,66 @@ p.no-p-style:last-child {
   /* Specify a custom grid-template-columns:  */
   grid-gap: var(--grid-spacing);
   place-items: center;
-}
 
-.list-grid > header {
-  color: var(--light-text-color);
-  text-transform: capitalize;
-  /* When the screen is really small, hide the name of the actions */
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-  font-size: 0.9rem;
-}
-.list-grid > *:not(header) {
-  align-items: center;
-}
+  > header {
+    color: var(--light-text-color);
+    text-transform: capitalize;
+    /* When the screen is really small, hide the name of the actions */
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  > *:not(header) {
+    align-items: center;
+  }
 
-/* Make the text break word */
-.list-grid > .name {
-  justify-self: left;
-  white-space: normal;
-  width: 100%;
-  font-size: 1.1rem;
-}
+  /* Make the text break word */
+  > .name {
+    justify-self: left;
+    white-space: normal;
+    width: 100%;
+    font-size: 1.1rem;
+  }
 
-/* Custom alignment */
-.list-grid > .center {
-  justify-self: center;
-  text-align: center;
-}
+  /* Custom alignment */
+  > .center {
+    justify-self: center;
+    text-align: center;
+  }
 
-.list-grid svg {
-  height: var(--icon-size);
-  width: var(--icon-size);
-  opacity: 0.5;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-.list-grid svg:hover:not(.disabled) {
-  opacity: 0.8;
-}
-.list-grid svg.disabled {
-  opacity: 0.15;
-  cursor: not-allowed;
-}
-.list-grid > hr {
-  grid-column: 1 / -1;
-  border-top: var(--border-style);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-.list-grid > hr:last-child {
-  display: none;
+  svg {
+    height: var(--icon-size);
+    width: var(--icon-size);
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(.disabled) {
+      opacity: 0.8;
+    }
+    &.disabled {
+      opacity: 0.15;
+      cursor: not-allowed;
+    }
+  }
+
+  > hr {
+    grid-column: 1 / -1;
+    border-top: var(--border-style);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    &:last-child {
+      display: none;
+    }
+  }
+
+  /* Center the button inside the NavLink */
+  a {
+    display: flex;
+  }
 }
 
 /* Generic centered container */
@@ -242,7 +250,7 @@ p.no-p-style:last-child {
   color: #757575;
   font-size: 0.88rem;
   text-transform: uppercase;
-}
-.subtle-header.capitalize {
-  text-transform: capitalize;
+  .capitalize {
+    text-transform: capitalize;
+  }
 }

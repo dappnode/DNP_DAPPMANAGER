@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { sidenavItems, fundedBy } from "./navbarItems";
 import logo from "img/dappnode-logo-wide-min.png";
-import "./sidebar.css";
+import "./sidebar.scss";
 
 if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");

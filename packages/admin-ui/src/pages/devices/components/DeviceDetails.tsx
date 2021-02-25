@@ -71,8 +71,6 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
         {showQr ? "Hide" : "Show"} VPN credentials URL QR code
       </Button>
 
-      {showQr && url && <QrCode url={url} width={"400px"} />}
-
       {device.admin ? (
         device.hasChangedPassword ? (
           <Alert variant="info">
@@ -122,6 +120,8 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
           </>
         )
       ) : null}
+
+      {showQr && url && <QrCode url={url} width={"400px"} />}
 
       <div className="alert alert-secondary" role="alert">
         Beware of shoulder surfing attacks (unsolicited observers), This data

@@ -8,5 +8,6 @@ export * from "./listImages";
 export * from "./listVolumes";
 export * from "./loadImage";
 export * from "./logs";
+export * from "./network";
 export * from "./putArchive";
 export * from "./volume";

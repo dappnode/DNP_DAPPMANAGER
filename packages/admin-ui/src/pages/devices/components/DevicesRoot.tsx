@@ -4,7 +4,7 @@ import { Route, RouteComponentProps } from "react-router-dom";
 import { DeviceDetails } from "./DeviceDetails";
 import DevicesHome from "./DevicesHome";
 // General styles
-import "./devices.css";
+import "./devices.scss";
 
 export const DevicesRoot: React.FC<RouteComponentProps> = ({ match }) => {
   return (

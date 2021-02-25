@@ -46,7 +46,8 @@
   /* Center icon vertically */
   display: flex;
   align-items: center;
-}
-.sidenav-toggler:hover {
-  opacity: 1;
+
+  &:hover {
+    opacity: 1;
+  }
 }

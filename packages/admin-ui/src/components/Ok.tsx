@@ -1,7 +1,7 @@
 import React from "react";
 import { MdCheck, MdClose, MdHelpOutline } from "react-icons/md";
 import "./ok.scss";
-import "./loader-icon.css";
+import "./loader-icon.scss";
 
 interface OkProps {
   ok?: boolean;

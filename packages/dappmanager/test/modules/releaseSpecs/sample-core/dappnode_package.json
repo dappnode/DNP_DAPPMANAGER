@@ -1,0 +1,6 @@
+{
+  "name": "sample-core.dnp.dappnode.eth",
+  "version": "0.2.33",
+  "description": "Sample core with custom networks not defined",
+  "type": "dncore"
+}

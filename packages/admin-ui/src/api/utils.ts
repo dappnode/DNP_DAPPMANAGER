@@ -1,4 +1,5 @@
 import { dappmanagerDnpName, coreDnpName } from "params";
+import { Args } from "common";
 
 /**
  * Restarting the DAPPMANAGER will cause this error
@@ -33,3 +34,9 @@ export function continueIfCalleDisconnected(
     }
   };
 }
+
+export const subscriptionsLogger = {
+  onError: (route: string, error: Error, args?: Args): void => {
+    console.error(`Subscription error ${route}: ${error.stack}`, args);
+  }
+};

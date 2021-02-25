@@ -16,6 +16,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     // Network params
     ip: db.publicIp.get(),
     name: db.serverName.get(),
+    dappnodeWebName: db.dappnodeWebName.get() || db.serverName.get(),
     staticIp: db.staticIp.get(),
     domain: db.domain.get(),
     upnpAvailable: db.upnpAvailable.get(),

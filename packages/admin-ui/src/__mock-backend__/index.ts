@@ -2,6 +2,7 @@ import { Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
+import { httpsPortal } from "./httpsPortal";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -14,6 +15,7 @@ const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
   ...fetchPkgsData,
+  ...httpsPortal,
   ...notifications,
   ...packages,
   ...password,
@@ -22,6 +24,8 @@ const namedSpacedCalls = {
   ...userActionLogs,
   ...volumes
 };
+
+let dappnodeWebName = "Mock-DAppNode";
 
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () =>
@@ -97,7 +101,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-
+  dappnodeWebNameSet: async newDappnodeWebName => {
+    dappnodeWebName = newDappnodeWebName;
+  },
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
@@ -173,6 +179,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ip: "85.84.83.82",
     name: "My-DAppNode",
     staticIp: "", // "85.84.83.82",
+    dappnodeWebName,
     domain: "1234acbd.dyndns.io",
     upnpAvailable: true,
     noNatLoopback: false,

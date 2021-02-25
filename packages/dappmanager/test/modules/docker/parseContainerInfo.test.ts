@@ -31,6 +31,7 @@ describe("modules / docker / parseContainerInfo", function() {
           }
         ],
         volumes: [],
+        networks: [{ name: "dncore_network", ip: "172.33.0.9" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -96,6 +97,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "nginxproxydnpdappnodeeth_html"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.6" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -125,6 +127,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.5" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -152,6 +155,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "" }],
         state: "exited",
         running: false,
         exitCode: 137,
@@ -193,6 +197,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.9" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -256,6 +261,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.4" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -293,6 +299,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.7" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -328,6 +335,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_binddnpdappnodeeth_data"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.2" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -376,6 +384,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.6" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -481,6 +490,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ipfsdnpdappnodeeth_export"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.1.5" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -515,6 +525,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ip: "172.33.1.3",
         ports: [],
         volumes: [],
+        networks: [{ name: "dncore_network", ip: "172.33.1.3" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -556,6 +567,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "swarmdnpdappnodeeth_swarm"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.7" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -598,6 +610,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.8" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -629,6 +642,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "ipfsreplicatordnpdappnodeeth_pin-data"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.4" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -678,6 +692,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "goerligethdnpdappnodeeth_goerli"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.3" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -725,6 +740,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "lndnpdappnodeeth_lndconfig_data"
           }
         ],
+        networks: [{ name: "dncore_network", ip: "172.33.0.2" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -760,6 +776,7 @@ describe("modules / docker / parseContainerInfo", function() {
           }
         ],
         volumes: [],
+        networks: [{ name: "dncore_network", ip: "172.33.1.8" }],
         state: "running",
         running: true,
         exitCode: null,

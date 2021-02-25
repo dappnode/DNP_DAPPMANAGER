@@ -86,10 +86,17 @@ const params = {
   // VPN API
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
+  // HTTPS Portal API URL
+  HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
+  HTTPS_PORTAL_DNPNAME: "https-portal.dnp.dappnode.eth",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
-  DNP_NETWORK_EXTERNAL_NAME: "dncore_network",
-  DNP_NETWORK_INTERNAL_NAME: "network",
+  DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",
+  DNP_PRIVATE_NETWORK_NAME: "dncore_network",
+  DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
+  DNP_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",

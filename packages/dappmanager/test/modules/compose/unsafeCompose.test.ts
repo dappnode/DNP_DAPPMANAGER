@@ -37,7 +37,11 @@ describe("parseUnsafeCompose", () => {
           volumes,
           logging: customLogging,
           dns: "172.33.1.2",
-          networks: ["dncore_network"]
+          networks: {
+            dncore_network: {
+              aliases: ["mock-dnp.dappnode"]
+            }
+          }
         }
       },
       networks: {

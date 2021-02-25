@@ -1,7 +1,7 @@
 import React from "react";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
-import "./toastStyle.css";
+import "./toastStyle.scss";
 // External
 import { activityPath } from "pages/support/data";
 
