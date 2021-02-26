@@ -76,16 +76,40 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
 
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 8090 },
+      {
+        dnpName: "admin.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 8090,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
       // From  "vpn.dnp.dappnode.eth"
-      { protocol: "UDP", portNumber: 1194 },
+      {
+        dnpName: "vpn.dnp.dappnode.eth2",
+        protocol: "UDP",
+        portNumber: 1194,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
       // From "goerli.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 32769 },
-      { protocol: "UDP", portNumber: 32771 },
-      { protocol: "UDP", portNumber: 32770 },
+
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 32769,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "UDP",
+        portNumber: 32771,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "UDP",
+        portNumber: 32770,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      }
       // From "stopped.dnp.dappnode.eth"
-      { protocol: "UDP", portNumber: 4001 },
-      { protocol: "TCP", portNumber: 4001 }
     ]);
   });
 
@@ -125,7 +149,12 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     expect(portsToOpen).to.deep.equal([
       // Should return only the admin's ports and ignore the other DNP's
       // From "admin.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 8090 }
+      {
+        dnpName: "admin.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 8090,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      }
     ]);
   });
 });
