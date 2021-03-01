@@ -90,6 +90,14 @@ const params = {
   HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
   HTTPS_PORTAL_DNPNAME: "https-portal.dnp.dappnode.eth",
 
+  // Wireguard params
+  WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
+  WIREGUARD_ISCORE: false,
+  WIREGUARD_MAIN_SERVICE: "wireguard",
+  /** api.wireguard.dappnode/:device */
+  WIREGUARD_API_URL: "http://api.wireguard.dappnode",
+  WIREGUARD_DEVICES_ENVNAME: "PEERS",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
   DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",

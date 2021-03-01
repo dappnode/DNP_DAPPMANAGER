@@ -10,6 +10,7 @@ import { ssh } from "./ssh";
 import { telegram } from "./telegram";
 import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
+import { wireguard } from "./wireguard";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -22,7 +23,8 @@ const namedSpacedCalls = {
   ...ssh,
   ...telegram,
   ...userActionLogs,
-  ...volumes
+  ...volumes,
+  ...wireguard
 };
 
 let dappnodeWebName = "Mock-DAppNode";

@@ -31,7 +31,8 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  HttpsPortalMapping
+  HttpsPortalMapping,
+  WireguardDeviceCredentials
 } from "./types";
 
 export interface Routes {
@@ -522,6 +523,15 @@ export interface Routes {
    * Returns public Ip in real time
    */
   ipPublicGet: () => Promise<PublicIpResponse>;
+
+  /** Add a device to Wireguard DNP ENVs */
+  wireguardDeviceAdd(device: string): Promise<void>;
+  /** Remove a device from Wireguard DNP ENVs */
+  wireguardDeviceRemove(device: string): Promise<void>;
+  /** Get credentials for a single Wireguard device */
+  wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
+  /** Get URLs to a single Wireguard credentials */
+  wireguardDevicesGet(): Promise<string[]>;
 }
 
 interface RouteData {
@@ -602,7 +612,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   volumeRemove: { log: true },
   volumesGet: {},
-  ipPublicGet: {}
+  ipPublicGet: {},
+  wireguardDeviceAdd: { log: true },
+  wireguardDeviceRemove: { log: true },
+  wireguardDeviceGet: {},
+  wireguardDevicesGet: {}
 };
 
 // DO NOT REMOVE
