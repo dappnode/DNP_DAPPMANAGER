@@ -1,11 +1,12 @@
 import React from "react";
-import { MdCheck, MdClose } from "react-icons/md";
+import { MdCheck, MdClose, MdHelpOutline } from "react-icons/md";
 import "./ok.scss";
 import "./loader-icon.scss";
 
 interface OkProps {
   ok?: boolean;
   loading?: boolean;
+  unknown?: boolean;
   msg: string;
 }
 
@@ -13,6 +14,7 @@ const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
   msg,
   ok,
   loading,
+  unknown,
   ...props
 }) => {
   return (
@@ -26,6 +28,8 @@ const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
             <div />
             <div />
           </div>
+        ) : unknown ? (
+          <MdHelpOutline />
         ) : (
           <MdClose color="#ff0000" />
         )}

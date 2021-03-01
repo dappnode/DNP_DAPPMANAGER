@@ -310,6 +310,39 @@ export interface PackagePort {
   protocol: PortProtocol;
 }
 
+export interface UpnpPortMapping {
+  protocol: PortProtocol;
+  exPort: string;
+  inPort: string;
+  ip: string;
+}
+
+export interface TablePortsStatus {
+  port: number;
+  protocol: PortProtocol;
+  serviceName: string;
+  dnpName: string;
+  message?: string;
+}
+
+export interface ApiTablePortStatus extends TablePortsStatus {
+  status: ApiStatus;
+}
+
+export interface UpnpTablePortStatus extends TablePortsStatus {
+  status: UpnpStatus;
+}
+
+// ApiStatus data structure is different than UpnpStatus because we want to attach an error message
+export type ApiStatus =
+  | "open"
+  | "closed"
+  | "unknown" // port not found or protocol UDP
+  | "error"; // error from/fetching the API
+
+// unknown => port not found. not-available => UPnP disabled or not recognized
+export type UpnpStatus = "open" | "closed";
+
 export interface VolumeMapping {
   host: string; // path
   container: string; // dest
@@ -591,6 +624,11 @@ export interface Compose {
 export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
+}
+
+export interface PortToOpen extends PackagePort {
+  serviceName: string;
+  dnpName: string;
 }
 
 export interface PackageRequest {
@@ -1168,6 +1206,10 @@ export type Diagnose = DiagnoseItem[];
 
 export interface PublicIpResponse {
   publicIp: string;
+}
+
+export interface LocalIpResponse {
+  localIp: string;
 }
 
 /**

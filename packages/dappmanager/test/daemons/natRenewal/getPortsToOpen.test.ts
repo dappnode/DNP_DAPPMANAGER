@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import defaultPortsToOpen from "../../../src/daemons/natRenewal/defaultPortsToOpen";
 import { PackageContainer } from "../../../src/types";
-import rewiremock from "rewiremock";
+
 // imports for typings
 import { mockContainer } from "../../testUtils";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
+import getPortsToOpen from "../../../src/daemons/natRenewal/getPortsToOpen";
 
 describe("daemons > natRenewal > getPortsToOpen", () => {
   it("Return portsToOpen on a normal case", async () => {
@@ -71,51 +71,46 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     ]);
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-      }
-    );
-
-    const portsToOpen = await getPortsToOpen();
+    const containersListed = await listContainers();
+    const portsToOpen = getPortsToOpen(containersListed);
 
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 8090 },
+      {
+        dnpName: "admin.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 8090,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
       // From  "vpn.dnp.dappnode.eth"
-      { protocol: "UDP", portNumber: 1194 },
+      {
+        dnpName: "vpn.dnp.dappnode.eth2",
+        protocol: "UDP",
+        portNumber: 1194,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
       // From "goerli.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 32769 },
-      { protocol: "UDP", portNumber: 32771 },
-      { protocol: "UDP", portNumber: 32770 },
-      // From "stopped.dnp.dappnode.eth"
-      { protocol: "UDP", portNumber: 4001 },
-      { protocol: "TCP", portNumber: 4001 }
-    ]);
-  });
 
-  it("Return default ports if portsToOpen throws", async () => {
-    async function listContainers(): Promise<PackageContainer[]> {
-      throw Error("Demo Error for listContainers");
-    }
-
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-        // mock(() => import("../../../src/utils/dockerComposeFile"))
-        //   .with({ getComposeInstance })
-        //   .toBeUsed();
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 32769,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "UDP",
+        portNumber: 32771,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      },
+      {
+        dnpName: "goerli.dnp.dappnode.eth",
+        protocol: "UDP",
+        portNumber: 32770,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
       }
-    );
-
-    const portsToOpen = await getPortsToOpen();
-    expect(portsToOpen).to.deep.equal(defaultPortsToOpen);
+      // From "stopped.dnp.dappnode.eth"
+    ]);
   });
 
   it("Ignore a DNP if it throws fetching it's docker-compose", async () => {
@@ -149,20 +144,17 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     //   }
     // }
 
-    const { default: getPortsToOpen } = await rewiremock.around(
-      () => import("../../../src/daemons/natRenewal/getPortsToOpen"),
-      mock => {
-        mock(() => import("../../../src/modules/docker/list"))
-          .with({ listContainers })
-          .toBeUsed();
-      }
-    );
-
-    const portsToOpen = await getPortsToOpen();
+    const containers = await listContainers();
+    const portsToOpen = getPortsToOpen(containers);
     expect(portsToOpen).to.deep.equal([
       // Should return only the admin's ports and ignore the other DNP's
       // From "admin.dnp.dappnode.eth"
-      { protocol: "TCP", portNumber: 8090 }
+      {
+        dnpName: "admin.dnp.dappnode.eth",
+        protocol: "TCP",
+        portNumber: 8090,
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      }
     ]);
   });
 });

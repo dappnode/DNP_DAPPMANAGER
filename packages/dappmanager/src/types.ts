@@ -1,4 +1,4 @@
-import { EthClientTargetPackage } from "./common";
+import { EthClientTargetPackage, PackagePort } from "./common";
 export * from "./common";
 
 export interface ContainerLabelsRaw {

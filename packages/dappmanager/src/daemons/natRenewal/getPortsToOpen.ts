@@ -1,55 +1,55 @@
-import { listContainers } from "../../modules/docker/list";
-// Default ports to open in case getPortsToOpen throws
-import defaultPortsToOpen from "./defaultPortsToOpen";
-import { PackagePort, PortProtocol } from "../../types";
+import { PackageContainer, PortMapping } from "../../common";
 import { logs } from "../../logs";
 import { ComposeFileEditor } from "../../modules/compose/editor";
+import { PortToOpen } from "../../types";
 
-export default async function getPortsToOpen(): Promise<PackagePort[]> {
-  try {
-    // Aggreate ports with an object form to prevent duplicates
-    const portsToOpen: {
-      [portId: string]: PackagePort;
-    } = {};
-    const addPortToOpen = (protocol: PortProtocol, host: number): void => {
-      const portNumber = host;
-      portsToOpen[`${portNumber}-${protocol}`] = { protocol, portNumber };
-    };
-    const getPortsToOpen = (): PackagePort[] => Object.values(portsToOpen);
+export default function getPortsToOpen(
+  containers: PackageContainer[]
+): PortToOpen[] {
+  // Aggreate ports with an object form to prevent duplicates
+  const portsToOpen = new Map<string, PortToOpen>();
+  const addPortToOpen = (
+    port: PortMapping,
+    container: PackageContainer
+  ): void => {
+    if (port.host) {
+      portsToOpen.set(`${port.host}-${port.protocol}`, {
+        protocol: port.protocol,
+        portNumber: port.host,
+        serviceName: container.serviceName,
+        dnpName: container.dnpName
+      });
+    }
+  };
 
-    const containers = await listContainers();
-    for (const container of containers) {
-      if (container.running) {
-        // If a container is running the port mapping is available in listContainers()
-        for (const port of container.ports || []) {
-          if (port.host) {
-            addPortToOpen(port.protocol, port.host);
-          }
+  for (const container of containers) {
+    if (container.running) {
+      // If a container is running the port mapping is available in listContainers()
+      for (const port of container.ports || []) {
+        addPortToOpen(port, container);
+      }
+    } else {
+      try {
+        // If DNP is exited, the port mapping is only available in the docker-compose
+        const compose = new ComposeFileEditor(
+          container.dnpName,
+          container.isCore
+        );
+
+        const service = compose.services()[container.serviceName];
+        if (service) {
+          // Only consider ports that are mapped (not ephemeral ports)
+          for (const port of service.getPortMappings())
+            addPortToOpen(port, container);
         }
-      } else {
-        try {
-          // If DNP is exited, the port mapping is only available in the docker-compose
-          const compose = new ComposeFileEditor(
-            container.dnpName,
-            container.isCore
-          );
-          for (const service of Object.values(compose.services())) {
-            // Only consider ports that are mapped (not ephemeral ports)
-            for (const port of service.getPortMappings())
-              if (port.host) addPortToOpen(port.protocol, port.host);
-          }
-        } catch (e) {
-          logs.error(
-            `Error getting ports of ${container.dnpName} from docker-compose`,
-            e
-          );
-        }
+      } catch (e) {
+        logs.error(
+          `Error getting ports of ${container.dnpName} from docker-compose`,
+          e
+        );
       }
     }
-
-    return getPortsToOpen();
-  } catch (e) {
-    logs.error("Error on getPortsToOpen", e);
-    return defaultPortsToOpen;
   }
+
+  return Array.from(portsToOpen.values());
 }

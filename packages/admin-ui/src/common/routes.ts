@@ -28,6 +28,9 @@ import {
   PublicIpResponse,
   ChainData,
   ShhStatus,
+  PortToOpen,
+  UpnpTablePortStatus,
+  ApiTablePortStatus,
   HttpsPortalMapping
 } from "./types";
 
@@ -412,6 +415,25 @@ export interface Routes {
   poweroffHost: () => Promise<void>;
 
   /**
+   * Returns ports to open
+   */
+  portsToOpenGet: () => Promise<PortToOpen[]>;
+
+  /**
+   * Returns ports status from upnp scanning
+   */
+  portsUpnpStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<UpnpTablePortStatus[]>;
+
+  /**
+   * Returns ports status from API scanning
+   */
+  portsApiStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<ApiTablePortStatus[]>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -551,6 +573,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
+  portsToOpenGet: {},
+  portsUpnpStatusGet: {},
+  portsApiStatusGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
