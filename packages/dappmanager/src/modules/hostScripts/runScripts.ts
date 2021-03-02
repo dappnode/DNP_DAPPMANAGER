@@ -3,7 +3,7 @@ import path from "path";
 import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import memoize from "memoizee";
-import { DockerUpdate, MountpointData } from "../../types";
+import { DockerScriptOptions, MountpointData } from "../../types";
 
 const hostScriptsDirFromHost = params.HOST_SCRIPTS_DIR_FROM_HOST;
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;
@@ -92,7 +92,9 @@ export async function migrateVolume(
 /**
  * Updates docker engine or docker-compose
  */
-export async function dockerUpdate(updateType: DockerUpdate): Promise<string> {
+export async function dockerUpdate(
+  updateType: DockerScriptOptions
+): Promise<string> {
   const result = await runScript("docker_update.sh", updateType);
   return result;
 }

@@ -1,7 +1,17 @@
 #!/bin/bash
-#
-# Script to update docker engine OR docker compose
-# ARGUMENTS: exactly 1 (between: "engine" and "compose")
+
+###################
+##### OPTIONS #####
+###################
+
+# engine
+#    -v | --version : returns json with docker-server and docker-cli versions
+#    -i | --install : installs docker engine using "package method"
+# compose
+#    -v | --version : returns json with docker-compose version
+#    -i | --install : installs docker compose
+
+###################
 
 # Exit on error
 set -e
@@ -16,10 +26,15 @@ set -e
 # 8 => docker compose is stable
 # 9 => architecture not supported
 # 10 => Debian version not supported by docker and/or dappnode
-# 11 => update docker engine unsuccessful
 # 12 => Only 1 argument accepted
 # 13 => Arg must be docker-engine or docker-compose
-# 14 => update docker compose unsuccessful
+# 14 => flag must be -i | --install OR -v | --version
+# 15 => Illegal to downgrade docker engine (current docker version > than stable docker version)
+# 16 => Illegal to downgrade docker compose (current compose version > than stable compose version)
+
+###################
+#####VARIABLES#####
+###################
 
 # (amd64 | x86_64) | (arm64 | )
 ARCHITECTURE=""
@@ -29,16 +44,24 @@ ID=""
 VERSION_ID=""
 # buster, stretch, bionic ...
 VERSION_CODENAME=""
-PRETTY_NAME=""
-# 19.03.8
+
+# Docker stable versions
 DOCKER_ENGINE_VERSION=""
-STABLE_DOCKER_ENGINE_VERSION="19.03.8"
-# 1.25.5
+STABLE_DOCKER_ENGINE_VERSION="20.10.2" # Same for PKG and CLI
+STABLE_DOCKER_CONTAINERD_VERSION="1.4.3-1"
+
+# Docker compose stable versions
 DOCKER_COMPOSE_VERSION=""
 STABLE_DOCKER_COMPOSE_VERSION="1.25.5"
 
 # Download
 WGET="wget -q -O"
+
+###################
+
+#####################
+##### FUNCTIONS #####
+#####################
 
 # non-case sensitive (only available in bash)
 shopt -s nocasematch
@@ -50,44 +73,41 @@ function check_requirements() {
     exit 2
   fi
 
-  if [[ "$1" == "engine" ]]; then
-    # check if docker exists
-    if type docker >/dev/null 2>&1; then
-      DOCKER_ENGINE_VERSION=$(docker version --format '{{.Server.Version}}')
-      # check if docker version is the one to be installed
-      if [[ $DOCKER_ENGINE_VERSION == "$STABLE_DOCKER_ENGINE_VERSION" ]]; then
-        echo "docker engine version is stable"
-        exit 7
-      fi
-    else
-      echo "docker does not exist"
-      exit 5
+  if [ "$INSTALL_OPTION" == "engine" ]; then
+    # get DOCKER_SERVER_VERSION and DOCKER_CLI_VERSION
+    get_docker_engine_version
+
+    # check if docker version is equal or lower than the stable version
+    if [[ $DOCKER_SERVER_VERSION == "$STABLE_DOCKER_ENGINE_VERSION" ]]; then
+      echo "docker engine version is already stable"
+      exit 7
+    elif $(dpkg --compare-versions ${STABLE_DOCKER_ENGINE_VERSION} "lt" ${DOCKER_SERVER_VERSION}); then 
+      echo "Illegal to downgrade docker engine"
+      exit 15
     fi
   else
-    # check if docker-compose exists
-    if type docker-compose >/dev/null 2>&1; then
-      # check if docker compose version is the one to be installed
-      DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
-      # check if docker compose version is the one to be installed
-      if [[ "$DOCKER_COMPOSE_VERSION" == "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
-        echo "docker compose version is stable"
-        exit 8
-      fi
-    else
-      echo "docker compose does not exist"
-      exit 6
+    # get DOCKER_SERVER_VERSION and DOCKER_CLI_VERSION
+    get_docker_compose_version
+
+    # check if docker compose version is equal or lower than the stable
+    if [[ "$DOCKER_COMPOSE_VERSION" == "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
+      echo "docker compose version is stable"
+      exit 8
+    elif $(dpkg --compare-versions ${$STABLE_DOCKER_COMPOSE_VERSION} "lt" ${DOCKER_COMPOSE_VERSION}); then 
+      echo "Illegal to downgrade docker compose"
+      exit 16
     fi
   fi
 
   # check if architecture is supported by docker
   if [ "$ARCHITECTURE" !=  "amd64" ] && [ "$ARCHITECTURE" !=  "arm64" ] && [ "$ARCHITECTURE" !=  "armhf" ]; then
-    echo "architecture not supported by docker"
+    echo "Architecture not supported by docker. Architectures allowed: amd64, arm64 and armhf"
     exit 9
   fi
 
   # check if debian version is supported by docker
-  if [ "$VERSION_CODENAME" != "buster" ] && [ "$VERSION_CODENAME" != "stretch"] && [ "$VERSION_CODENAME" != "bullseye" ]; then
-    echo "Debian version not supported by docker and/or dappnode"
+  if [ "$VERSION_CODENAME" != "buster" ] && [ "$VERSION_CODENAME" != "stretch" ] && [ "$VERSION_CODENAME" != "bullseye" ]; then
+    echo "Debian version not supported by docker and/or dappnode. Versions supported: buster, stretch and bullseye"
     exit 10
   fi
 }
@@ -99,11 +119,12 @@ function get_system_info(){
     . /etc/os-release
     ID=$ID
     VERSION_ID=$VERSION_ID
-    # IMPORTANT: VERSION_CODENAME might be empty in bullyese. Will be set with lsb_release command
+    # IMPORTANT: VERSION_CODENAME might be empty in bullseye. Will be set with lsb_release command
     VERSION_CODENAME=$VERSION_CODENAME
     # PRETTY_NAME is mandatory and use to contain the OS version (could be used with grep)
   fi
 
+  # To ensure values are set, use of command lsb_release
   if type lsb_release >/dev/null 2>&1 && [ -z "$ID" ] || [ -z "$VERSION_ID" ] || [ -z "$VERSION_CODENAME" ]; then
     # linuxbase.org
     if [ -z "$ID" ]; then
@@ -117,21 +138,21 @@ function get_system_info(){
     fi
   fi
 
+  # Check if all values are set
   if [ -z "$ID" ] || [ -z "$VERSION_ID" ] || [ -z "$VERSION_CODENAME" ]; then
-    echo "Error retrieving system info"
+    echo "Error retrieving system info: operating system and version"
     exit 4
   fi
 }
 
 function get_architecture() {
   if type uname >/dev/null 2>&1; then
-    # x86_64
     ARCHITECTURE=$(uname -m)
+    # x86_64 is equal to amnd64, correct the value
     if [[ "$ARCHITECTURE" == "x86_64" ]]; then
       ARCHITECTURE="amd64"
     fi
   elif type dpkg >/dev/null 2>&1; then
-    # amd64
     ARCHITECTURE=$(dpkg --print-architecture)
   else
     echo "Error retrieving architecture"
@@ -142,12 +163,22 @@ function get_architecture() {
 function install_docker_engine(){
   # Note: The client and container runtime are now in separate packages from the daemon in Docker Engine 18.09.
   # Users should install and update all three packages at the same time to get the latest patch releases
+
+  # TEMPORARY: Bullseye consider as Buster until it gets supported by docker
+  if [ "$VERSION_CODENAME" == "bullseye" ]; then
+    VERSION_CODENAME="buster"
+  fi
+
+  # Change versions for stretch
+  if [ "$VERSION_CODENAME" != "buster" ]; then
+    STABLE_DOCKER_ENGINE_VERSION="19.03.8"
+    STABLE_DOCKER_CONTAINERD_VERSION="1.2.6-3"
+  fi
   
   # Metadata
-  # https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64
-  DOCKER_PKG="docker-ce_19.03.8~3-0~debian-stretch_amd64.deb"
-  DOCKER_CLI="docker-ce-cli_19.03.8~3-0~debian-stretch_amd64.deb"
-  DOCKER_CONTAINERD="containerd.io_1.2.6-3_amd64.deb"
+  DOCKER_PKG="docker-ce_${STABLE_DOCKER_ENGINE_VERSION}~3-0~debian-${VERSION_CODENAME,,}_${ARCHITECTURE}.deb"
+  DOCKER_CLI="docker-ce-cli_${STABLE_DOCKER_ENGINE_VERSION}~3-0~debian-${VERSION_CODENAME,,}_${ARCHITECTURE}.deb"
+  DOCKER_CONTAINERD="containerd.io_${STABLE_DOCKER_CONTAINERD_VERSION}_${ARCHITECTURE}.deb"
 
   # URLs
   DOCKER_URL="https://download.docker.com/linux/debian/dists/${VERSION_CODENAME,,}/pool/stable/${ARCHITECTURE}"
@@ -161,34 +192,21 @@ function install_docker_engine(){
   DOCKER_CLI_PATH="${DOCKER_ENGINE_PATH}/bin/docker/${DOCKER_CLI}"
   DOCKER_CONTAINERD_PATH="${DOCKER_ENGINE_PATH}/bin/docker/${DOCKER_CONTAINERD}"
   mkdir -p $DOCKER_ENGINE_PATH
-  mkdir -p $DOCKER_PKG_PATH
+  mkdir -p "$DOCKER_ENGINE_PATH/bin/docker"
 
   # STEP 1: Download files
-  $WGET $DOCKER_PKG_PATH $DOCKER_URL
+  $WGET $DOCKER_PKG_PATH $DOCKER_PKG_URL
   $WGET $DOCKER_CLI_PATH $DOCKER_CLI_URL
-  $WGET $CONTAINERD_PATH $DOCKER_CONTAINERD_URL
+  $WGET $DOCKER_CONTAINERD_PATH $DOCKER_CONTAINERD_URL
 
   # STEP 2: Install packages
-  dpkg -i $DOCKER_PKG_PATH
-  dpkg -i $DOCKER_CLI_PATH
   dpkg -i $DOCKER_CONTAINERD_PATH
+  dpkg -i $DOCKER_CLI_PATH
+  dpkg -i $DOCKER_PKG_PATH
 
   # Post installation
-  if [[ -z "$USER" ]]; then
-    USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
-  fi
-  groupadd docker
-  usermod -aG docker $USER
-
-  # Verify installation
-  DOCKER_ENGINE_POST_INSTALLATION=$(docker version --format '{{.Server.Version}}')
-  if [[ "$DOCKER_ENGINE_POST_INSTALLATION" == "$STABLE_DOCKER_ENGINE_VERSION" ]]; then
-    echo "Update succesfull"
-    exit 0
-  else
-    echo "Update unsucessfull"
-    exit 14
-  fi
+  USER=$(grep 1000 "/etc/passwd" | cut -f 1 -d:)
+  [ -z "$USER" ] || usermod -aG docker "$USER"
 }
 
 function install_docker_compose() {
@@ -204,37 +222,115 @@ function install_docker_compose() {
 
   # Post installation
   chmod +x $DCMP_PATH
+}
 
-  # Verify installation
-  DOCKER_COMPOSE_POST_INSTALLATION=$(docker-compose version --short)
-  if [[ "$DOCKER_ENGINE_POST_INSTALLATION" == "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
-    echo "Update succesfull"
-    exit 0
-  else
-    echo "Update unsucessfull"
-    exit 11
+function post_install_check() {
+  # Docker-engine post installation check
+  if [ $INSTALL_OPTION == "engine" ]; then
+    DAPPMANAGER_CONTAINER="DAppNodeCore-dappmanager.dnp.dappnode.eth"
+
+    # If is container restarting wait 10 s
+    RESTARTING=$(docker inspect --format="{{.State.Restarting}}" $DAPPMANAGER_CONTAINER)
+    if [ $RESTARTING = true ]; then
+      sleep 10
+    fi
+
+    # Check if container is not running reboot
+    RUNNING=$(docker inspect --format="{{.State.Running}}" $DAPPMANAGER_CONTAINER 2> /dev/null)
+    if [ $RUNNING = false ]; then
+      echo "Dappmanager container is not running. Rebooting..."
+      reboot
+    fi
+
+    # Check version post installation equals stable engine version
+    DOCKER_SERVER_POST_INSTALLATION=$(docker version --format '{{.Server.Version}}')
+    DOCKER_CLI_POST_INSTALLATION=$(docker version --format '{{.Client.Version}}')
+    if [ "$DOCKER_SERVER_POST_INSTALLATION" != "$STABLE_DOCKER_ENGINE_VERSION" ] || [ "$STABLE_DOCKER_ENGINE_VERSION" != "$DOCKER_CLI_POST_INSTALLATION" ]; then
+      echo "Update unsucessfull, versions are not equal. Rebooting..."
+      reboot 
+    fi
+
+  # Docker-compose post installation check
+  elif [ $INSTALL_OPTION == "compose" ]; then
+    # Check version post installation equals stable compose version
+    DOCKER_COMPOSE_POST_INSTALLATION=$(docker-compose version --short)
+    if [[ "$DOCKER_ENGINE_POST_INSTALLATION" != "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
+      echo "Update unsucessfull, versions are not equal. Rebooting..."
+      reboot
+    fi
   fi
 }
 
-##### MAIN LOOP #####
+function get_docker_engine_version() {
+  # Check if docker exists
+  if type docker >/dev/null 2>&1; then
+    DOCKER_SERVER_VERSION=$(docker version --format '{{.Server.Version}}')
+    DOCKER_CLI_VERSION=$(docker version --format '{{.Client.Version}}')
+  else 
+    echo "docker does not exist or not recognized"
+    exit 5
+  fi
+}
+
+function get_docker_compose_version() {
+  # Check if docker compose exists
+  if type docker-compose >/dev/null 2>&1; then
+    DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
+  else 
+    echo "docker compose does not exist or not recognized"
+    exit 6
+  fi
+}
+
+#####################
+
+#######################
+###### MAIN LOOP ######
+#######################
+
 # Ensure 1 argument
-if [ "$#" -ne 1 ]; then
+if [ "$#" -ne 2 ]; then
   echo "Illegal number of parameters"
   exit 12
 fi
 # Ensure argument is defined
 if [ "$1" != "engine" ] && [ "$1" != "compose" ]; then
-  echo "Arg must be docker-engine or docker-compose"
+  echo "Arg must be engine or compose"
   exit 13
 fi
 
-get_system_info
-get_architecture
-check_requirements
+INSTALL_OPTION=$1
 
-if [ "$1" == "engine"]; then
-  install_docker_engine
-else
-  install_docker_compose
-fi
-##### MAIN LOOP #####
+case $2 in
+  -i | --install )
+    # Pre install
+    get_system_info
+    get_architecture
+    check_requirements
+    if [ $INSTALL_OPTION == "engine" ]; then
+      install_docker_engine
+      post_install_check
+      exit 0
+    else
+      install_docker_compose
+      post_install_check
+      exit 0
+    fi
+  ;;
+  -v | --version )
+    if [ $INSTALL_OPTION == "engine" ]; then
+      get_docker_engine_version
+      echo -n "{\"docker-server-version\": \"$DOCKER_SERVER_VERSION\",\"docker-cli-version\": \"$DOCKER_CLI_VERSION\"}"
+      exit 0
+    else
+      get_docker_compose_version
+      echo -n "{\"docker-compose-version\": \"$DOCKER_COMPOSE_VERSION\"}"
+      exit 0
+    fi
+  ;;
+  * )
+    echo "flag must be -i or -v" 
+    exit 14
+esac
+
+#######################
