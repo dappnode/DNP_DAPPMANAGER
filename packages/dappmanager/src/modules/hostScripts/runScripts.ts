@@ -3,7 +3,7 @@ import path from "path";
 import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import memoize from "memoizee";
-import { MountpointData } from "../../types";
+import { DockerUpdate, MountpointData } from "../../types";
 
 const hostScriptsDirFromHost = params.HOST_SCRIPTS_DIR_FROM_HOST;
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;
@@ -11,7 +11,7 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 /**
  * Script runners
  */
-type ScriptName = "detect_fs.sh" | "migrate_volume.sh";
+type ScriptName = "detect_fs.sh" | "migrate_volume.sh" | "docker_update.sh";
 
 /**
  * Detects mountpoints in the host
@@ -87,6 +87,14 @@ export async function migrateVolume(
   }
 
   await runScript("migrate_volume.sh", `${fromVolumeName} ${toVolumeName}`);
+}
+
+/**
+ * Updates docker engine or docker-compose
+ */
+export async function dockerUpdate(updateType: DockerUpdate): Promise<string> {
+  const result = await runScript("docker_update.sh", updateType);
+  return result;
 }
 
 /**

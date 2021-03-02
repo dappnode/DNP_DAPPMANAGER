@@ -2,6 +2,7 @@ import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
+import { DockerManager } from "./dockerManager";
 import { SshManager } from "./SshManager";
 
 export function Advanced() {
@@ -17,6 +18,8 @@ export function Advanced() {
       </Card>
       <SubTitle>SSH</SubTitle>
       <SshManager />
+      <SubTitle>Docker</SubTitle>
+      <DockerManager />
     </>
   );
 }
