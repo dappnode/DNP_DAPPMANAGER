@@ -5,18 +5,26 @@
 ###################
 
 # engine
-#    -v | --version : returns json with docker-server and docker-cli versions
-#    -i | --install : installs docker engine using "package method"
+#    -v | --version : returns string with docker-server version
+#    -i | --install : installs docker engine using "package method". If error returns string error
 # compose
-#    -v | --version : returns json with docker-compose version
-#    -i | --install : installs docker compose
+#    -v | --version : returns string with docker compose version
+#    -i | --install : installs docker compose. If error returns string error
 
-###################
+#####################
+### CONFIGURATION ###
+#####################
+
+# non-case sensitive (only available in bash)
+shopt -s nocasematch
 
 # Exit on error
 set -e
 
-### ERRORS CODES:
+####################
+### ERRORS CODES ###
+####################
+
 # 2 => no match requirements
 # 3 => unable to retrieve architecture
 # 4 => unable to retrieve os info
@@ -36,35 +44,19 @@ set -e
 #####VARIABLES#####
 ###################
 
-# (amd64 | x86_64) | (arm64 | )
-ARCHITECTURE=""
-# ubuntu, debian...
-ID=""
-# 10, 9, 18.04 ...
-VERSION_ID=""
-# buster, stretch, bionic ...
-VERSION_CODENAME=""
-
 # Docker stable versions
-DOCKER_ENGINE_VERSION=""
 STABLE_DOCKER_ENGINE_VERSION="20.10.2" # Same for PKG and CLI
 STABLE_DOCKER_CONTAINERD_VERSION="1.4.3-1"
 
 # Docker compose stable versions
-DOCKER_COMPOSE_VERSION=""
 STABLE_DOCKER_COMPOSE_VERSION="1.25.5"
 
 # Download
 WGET="wget -q -O"
 
-###################
-
 #####################
 ##### FUNCTIONS #####
 #####################
-
-# non-case sensitive (only available in bash)
-shopt -s nocasematch
 
 function check_requirements() {
   # check is debian
@@ -117,15 +109,18 @@ function get_system_info(){
   if [ -f /etc/os-release ]; then
     # freedesktop.org and systemd
     . /etc/os-release
+    # ID=Debian|ubuntu...
     ID=$ID
+    # VERSION_ID=10,9...
     VERSION_ID=$VERSION_ID
     # IMPORTANT: VERSION_CODENAME might be empty in bullseye. Will be set with lsb_release command
+    # VERSION_CODENAME=Bullyese|Stretch
     VERSION_CODENAME=$VERSION_CODENAME
     # PRETTY_NAME is mandatory and use to contain the OS version (could be used with grep)
   fi
 
   # To ensure values are set, use of command lsb_release
-  if type lsb_release >/dev/null 2>&1 && [ -z "$ID" ] || [ -z "$VERSION_ID" ] || [ -z "$VERSION_CODENAME" ]; then
+  if type lsb_release >/dev/null 2>&1; then
     # linuxbase.org
     if [ -z "$ID" ]; then
       ID=$(lsb_release -si)
@@ -146,14 +141,14 @@ function get_system_info(){
 }
 
 function get_architecture() {
-  if type uname >/dev/null 2>&1; then
+  if type dpkg >/dev/null 2>&1; then
+    ARCHITECTURE=$(dpkg --print-architecture)
+  elif type uname >/dev/null 2>&1; then
     ARCHITECTURE=$(uname -m)
     # x86_64 is equal to amnd64, correct the value
     if [[ "$ARCHITECTURE" == "x86_64" ]]; then
       ARCHITECTURE="amd64"
     fi
-  elif type dpkg >/dev/null 2>&1; then
-    ARCHITECTURE=$(dpkg --print-architecture)
   else
     echo "Error retrieving architecture"
     exit 3
@@ -282,8 +277,6 @@ function get_docker_compose_version() {
   fi
 }
 
-#####################
-
 #######################
 ###### MAIN LOOP ######
 #######################
@@ -310,21 +303,23 @@ case $2 in
     if [ $INSTALL_OPTION == "engine" ]; then
       install_docker_engine
       post_install_check
+      echo "Updated docker engine to ${STABLE_DOCKER_ENGINE_VERSION} successfully"
       exit 0
     else
       install_docker_compose
       post_install_check
+      echo "Updated docker engine to ${STABLE_DOCKER_COMPOSE_VERSION} successfully"
       exit 0
     fi
   ;;
   -v | --version )
     if [ $INSTALL_OPTION == "engine" ]; then
       get_docker_engine_version
-      echo -n "{\"docker-server-version\": \"$DOCKER_SERVER_VERSION\",\"docker-cli-version\": \"$DOCKER_CLI_VERSION\"}"
+      echo $DOCKER_SERVER_VERSION
       exit 0
     else
       get_docker_compose_version
-      echo -n "{\"docker-compose-version\": \"$DOCKER_COMPOSE_VERSION\"}"
+      echo $DOCKER_COMPOSE_VERSION
       exit 0
     fi
   ;;
@@ -332,5 +327,3 @@ case $2 in
     echo "flag must be -i or -v" 
     exit 14
 esac
-
-#######################

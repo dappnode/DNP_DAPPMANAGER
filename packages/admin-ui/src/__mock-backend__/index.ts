@@ -60,6 +60,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
+  updateDocker: async () => "Updated",
 
   portsToOpenGet: async () => [
     {

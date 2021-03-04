@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "components/Card";
-import { UpdateDockerCompose } from "./updateDockerCompose";
-import { UpdateDockerEngine } from "./updateDockerEngine";
+import { UpdateDockerCompose } from "./UpdateDockerCompose";
+import { UpdateDockerEngine } from "./UpdateDockerEngine";
 
 export function DockerManager() {
   return (

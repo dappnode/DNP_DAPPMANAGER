@@ -31,7 +31,8 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  HttpsPortalMapping
+  HttpsPortalMapping,
+  DockerScriptOptions
 } from "./types";
 
 export interface Routes {
@@ -110,7 +111,6 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
-
   dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
 
   /**
@@ -476,6 +476,13 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
+   * Updates/returns docker/docker-compose version
+   */
+  updateDocker: (kwargs: {
+    updateOption: DockerScriptOptions;
+  }) => Promise<string>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -588,6 +595,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
+  updateDocker: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {}

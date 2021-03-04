@@ -90,13 +90,12 @@ export async function migrateVolume(
 }
 
 /**
- * Updates docker engine or docker-compose
+ * Updates/returns docker engine/docker-compose versions
  */
 export async function dockerUpdate(
-  updateType: DockerScriptOptions
+  option: DockerScriptOptions
 ): Promise<string> {
-  const result = await runScript("docker_update.sh", updateType);
-  return result;
+  return await runScript("docker_update.sh", `${option}`);
 }
 
 /**
