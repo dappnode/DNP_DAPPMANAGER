@@ -1052,14 +1052,14 @@ export interface MountpointData {
 }
 
 export type DockerScriptOptions =
-  | "engine --version"
-  | "engine -v"
-  | "engine --install"
-  | "engine -i"
-  | "compose --version"
-  | "compose -v"
-  | "compose --install"
-  | "compose -i";
+  | "engine -- --version"
+  | "engine -- -v"
+  | "engine -- --install"
+  | "engine -- -i"
+  | "compose -- --version"
+  | "compose -- -v"
+  | "compose -- --install"
+  | "compose -- -i";
 
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on

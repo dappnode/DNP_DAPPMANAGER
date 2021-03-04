@@ -18,7 +18,7 @@ export function UpdateDockerEngine() {
     try {
       setReqGetEngineVersionStatus({ loading: true });
       const version = await api.updateDocker({
-        updateOption: "engine -v"
+        updateOption: "engine -- --version"
       });
       await new Promise<void>(() => {
         confirm({
@@ -42,7 +42,7 @@ export function UpdateDockerEngine() {
     try {
       setReqUpdateEngineStatus({ loading: true });
       const output = await api.updateDocker({
-        updateOption: "engine --install"
+        updateOption: "engine -- --install"
       });
       setReqUpdateEngineStatus({ result: output });
     } catch (e) {

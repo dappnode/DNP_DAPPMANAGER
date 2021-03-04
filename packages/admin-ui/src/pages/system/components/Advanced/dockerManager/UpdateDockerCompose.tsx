@@ -18,7 +18,7 @@ export function UpdateDockerCompose() {
     try {
       setReqGetComposeVersionStatus({ loading: true });
       const version = await api.updateDocker({
-        updateOption: "compose -v"
+        updateOption: "compose -- --version"
       });
       setReqGetComposeVersionStatus({ result: version });
       await new Promise<void>(() => {
@@ -42,7 +42,7 @@ export function UpdateDockerCompose() {
     try {
       setReqUpdateComposeStatus({ loading: true });
       const output = await api.updateDocker({
-        updateOption: "compose --install"
+        updateOption: "compose -- --install"
       });
       setReqUpdateComposeStatus({ result: output });
     } catch (e) {
