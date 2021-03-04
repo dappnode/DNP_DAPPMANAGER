@@ -3,7 +3,6 @@ import { ReqStatus } from "types";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
-import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 
 export function UpdateDockerEngine() {
@@ -20,15 +19,15 @@ export function UpdateDockerEngine() {
       const version = await api.updateDocker({
         updateOption: "engine -- --version"
       });
+      setReqGetEngineVersionStatus({ result: version });
       await new Promise<void>(() => {
         confirm({
           title: `Docker update`,
           text: `Warming, you are about to update docker compose. You must be completely sure to perform this action, it is possible that the system reboots. Your current docker version is ${version}`,
-          label: "Disable",
+          label: "Update",
           onClick: installDockerEngine
         });
       });
-      setReqGetEngineVersionStatus({ result: version });
     } catch (e) {
       setReqGetEngineVersionStatus({ error: e });
       console.error(
@@ -66,24 +65,30 @@ export function UpdateDockerEngine() {
       {reqUpdateEngineStatus.result ? (
         <Ok ok={true} msg={reqUpdateEngineStatus.result} />
       ) : reqUpdateEngineStatus.error ? (
-        <ErrorView
-          error={reqUpdateEngineStatus.error}
-          red={true}
-          hideIcon={true}
+        <Ok
+          msg={
+            reqUpdateEngineStatus.error instanceof Error
+              ? reqUpdateEngineStatus.error.message
+              : reqUpdateEngineStatus.error
+          }
+          ok={false}
         />
       ) : reqUpdateEngineStatus.loading ? (
         <Ok msg={"Updating docker engine..."} loading={true} />
       ) : null}
       {reqGetEngineVersionStatus.result ? (
-        <Ok
-          ok={true}
-          msg={`Docker engine version: ${reqGetEngineVersionStatus.result}`}
-        />
+        <p>
+          Docker engine version:
+          <strong>{reqGetEngineVersionStatus.result}</strong>
+        </p>
       ) : reqGetEngineVersionStatus.error ? (
-        <ErrorView
-          error={reqGetEngineVersionStatus.error}
-          red={true}
-          hideIcon={true}
+        <Ok
+          msg={
+            reqGetEngineVersionStatus.error instanceof Error
+              ? reqGetEngineVersionStatus.error.message
+              : reqGetEngineVersionStatus.error
+          }
+          ok={false}
         />
       ) : reqGetEngineVersionStatus.loading ? (
         <Ok msg={"Fetching docker engine version..."} loading={true} />

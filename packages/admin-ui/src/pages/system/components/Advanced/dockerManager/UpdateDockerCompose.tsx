@@ -3,7 +3,6 @@ import { confirm } from "components/ConfirmDialog";
 import { ReqStatus } from "types";
 import { api } from "api";
 import Button from "components/Button";
-import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 
 export function UpdateDockerCompose() {
@@ -25,7 +24,7 @@ export function UpdateDockerCompose() {
         confirm({
           title: `Docker compose update`,
           text: `Warming, you are about to update docker engine. You must be completely sure to perform this action, it is possible that the system reboots. Your current docker compose version is ${version}`,
-          label: "Disable",
+          label: "Update",
           onClick: installDockerCompose
         });
       });
@@ -67,24 +66,30 @@ export function UpdateDockerCompose() {
       {reqUpdateComposeStatus.result ? (
         <Ok ok={true} msg={reqUpdateComposeStatus.result} />
       ) : reqUpdateComposeStatus.error ? (
-        <ErrorView
-          error={reqUpdateComposeStatus.error}
-          red={true}
-          hideIcon={true}
+        <Ok
+          msg={
+            reqUpdateComposeStatus.error instanceof Error
+              ? reqUpdateComposeStatus.error.message
+              : reqUpdateComposeStatus.error
+          }
+          ok={false}
         />
       ) : reqUpdateComposeStatus.loading ? (
         <Ok msg={"Updating docker compose..."} loading={true} />
       ) : null}
       {reqGetComposeVersionStatus.result ? (
-        <Ok
-          ok={true}
-          msg={`Docker compose version: ${reqGetComposeVersionStatus.result}`}
-        />
+        <p>
+          Docker compose version:
+          <strong>{reqGetComposeVersionStatus.result}</strong>
+        </p>
       ) : reqGetComposeVersionStatus.error ? (
-        <ErrorView
-          error={reqGetComposeVersionStatus.error}
-          red={true}
-          hideIcon={true}
+        <Ok
+          msg={
+            reqGetComposeVersionStatus.error instanceof Error
+              ? reqGetComposeVersionStatus.error.message
+              : reqGetComposeVersionStatus.error
+          }
+          ok={false}
         />
       ) : reqGetComposeVersionStatus.loading ? (
         <Ok msg={"Fetching docker compose version..."} loading={true} />

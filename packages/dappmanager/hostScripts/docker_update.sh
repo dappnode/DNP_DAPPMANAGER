@@ -85,7 +85,7 @@ function check_requirements() {
     if [[ "$DOCKER_COMPOSE_VERSION" == "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
       echo "docker compose version is stable"
       exit 8
-    elif $(dpkg --compare-versions ${$STABLE_DOCKER_COMPOSE_VERSION} "lt" ${DOCKER_COMPOSE_VERSION}); then 
+    elif $(dpkg --compare-versions ${STABLE_DOCKER_COMPOSE_VERSION} "lt" ${DOCKER_COMPOSE_VERSION}); then 
       echo "Illegal to downgrade docker compose"
       exit 16
     fi
