@@ -49,7 +49,7 @@ export const sidenavItems: {
     icon: MdDashboard
   },
   {
-    name: "Devices",
+    name: "VPN",
     href: "/devices",
     icon: MdDevices
   },

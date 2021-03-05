@@ -77,7 +77,6 @@ export default function DevicesHome() {
   return (
     <>
       <Title title={title} />
-
       <Input
         placeholder="Device's unique name"
         value={input}
