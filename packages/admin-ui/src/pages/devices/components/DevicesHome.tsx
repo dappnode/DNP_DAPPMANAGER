@@ -77,6 +77,11 @@ export default function DevicesHome() {
   return (
     <>
       <Title title={title} />
+      <p>
+        Create a VPN profile for each of your devices (laptop, phone) so you can
+        access your DAppNode from an external network
+      </p>
+
       <Input
         placeholder="Device's unique name"
         value={input}
