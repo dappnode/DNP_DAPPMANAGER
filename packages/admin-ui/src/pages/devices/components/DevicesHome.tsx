@@ -13,7 +13,6 @@ import Card from "components/Card";
 import Switch from "components/Switch";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
-import SubTitle from "components/SubTitle";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
@@ -78,11 +77,6 @@ export default function DevicesHome() {
   return (
     <>
       <Title title={title} />
-      <SubTitle>What can you do in this VPN section?</SubTitle>
-      <p>
-      On this page, you can set up your VPN for every device you have. You should set up every device you
-      will access the UI of your dappnode, you should generate VPN credential for everyone.
-      </p>
       <Input
         placeholder="Device's unique name"
         value={input}
