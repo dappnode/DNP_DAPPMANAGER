@@ -5,6 +5,7 @@ export { backupRestore } from "./backupRestore";
 export { chainDataGet } from "./chainDataGet";
 export { changeIpfsTimeout } from "./changeIpfsTimeout";
 export { cleanCache } from "./cleanCache";
+export { cleanDb } from "./cleanDb";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
 export { domainAliasSet } from "./domainAliasSet";
