@@ -3,6 +3,7 @@ import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
 import { parseEnvironment } from "./environment";
+import { parseServiceNetworks } from "./networks";
 import { getPrivateNetworkAlias } from "../../domains";
 import {
   Compose,
@@ -45,6 +46,9 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
 
 // Disallow external volumes to prevent packages accessing sensitive data of others
 const volumeSafeKeys: (keyof ComposeVolumes)[] = [];
+
+// Disallow external network to prevent packages accessing un-wanted networks
+const networkSafeKeys: (keyof ComposeNetwork)[] = [];
 
 /**
  * Strict sanitation of a docker-compose to prevent
@@ -107,15 +111,15 @@ function parseUnsafeServiceNetworks(
     ? params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE
     : params.DNP_PRIVATE_NETWORK_NAME;
 
+  const networksObj = parseServiceNetworks(networks || {});
+
   // Only allow customizing config for core packages
-  const dnpPrivateNetwork =
-    isCore && networks && !Array.isArray(networks)
-      ? networks[dnpPrivateNetworkName]
-      : {};
+  const dnpPrivateNetwork = isCore ? networksObj[dnpPrivateNetworkName] : {};
 
   const alias = getPrivateNetworkAlias(service);
 
   return {
+    ...networksObj,
     [dnpPrivateNetworkName]: {
       aliases: [alias],
       ...dnpPrivateNetwork
@@ -124,25 +128,28 @@ function parseUnsafeServiceNetworks(
 }
 
 function parseUnsafeNetworks(
-  networks: ComposeNetworks | undefined,
+  networks: ComposeNetworks | undefined = {},
   isCore: boolean
 ): ComposeNetworks {
-  const dnpPrivateNetwork: ComposeNetwork = {
-    driver: "bridge",
-    ipam: { config: [{ subnet: params.DNP_PRIVATE_NETWORK_SUBNET }] }
-  };
+  // Allow the dncore network config to be customized, but only by isCore DNPs
+  const {
+    [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: dncoreNetwork,
+    ...otherNetworks
+  } = networks;
+
+  // Remote unsafe keys from all other networks
+  networks = mapValues(otherNetworks, net => pick(net, networkSafeKeys));
 
   // TODO: Use the name property so we can use the same name of core and non-core
   // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
   // Warning: It's only available on compose >=3.5, docker >=17.12.0
-  return isCore
-    ? {
-        [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: dnpPrivateNetwork,
-        ...networks
-      }
-    : {
-        [params.DNP_PRIVATE_NETWORK_NAME]: { external: true }
-      };
+  if (isCore && dncoreNetwork) {
+    networks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] = dncoreNetwork;
+  } else {
+    networks[params.DNP_PRIVATE_NETWORK_NAME] = { external: true };
+  }
+
+  return networks;
 }
 
 function parseUnsafeVolumes(
