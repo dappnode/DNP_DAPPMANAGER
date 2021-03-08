@@ -10,6 +10,7 @@
 # compose
 #    -v | --version : returns string with docker compose version
 #    -i | --install : installs docker compose. If error returns string error
+# system: returns system info: OS, version and docker versions (compose and engine)
 
 #####################
 ### CONFIGURATION ###
@@ -280,50 +281,63 @@ function get_docker_compose_version() {
 #######################
 ###### MAIN LOOP ######
 #######################
-
-# Ensure 1 argument
-if [ "$#" -ne 2 ]; then
-  echo "Illegal number of parameters"
-  exit 12
-fi
 # Ensure argument is defined
-if [ "$1" != "engine" ] && [ "$1" != "compose" ]; then
+if [ "$1" != "engine" ] && [ "$1" != "compose" ] && [ "$1" != "system" ]; then
   echo "Arg must be engine or compose"
   exit 13
 fi
 
-INSTALL_OPTION=$1
+if [ "$1" == "engine" ] || [ "$1" == "compose" ]; then
+  # Ensure 2 arguments
+  if [ "$#" -ne 2 ]; then
+    echo "Illegal number of parameters"
+    exit 12
+  fi
+  INSTALL_OPTION=$1
 
-case $2 in
-  -i | --install )
-    # Pre install
-    get_system_info
-    get_architecture
-    check_requirements
-    if [ $INSTALL_OPTION == "engine" ]; then
-      install_docker_engine
-      post_install_check
-      echo "Updated docker engine to ${STABLE_DOCKER_ENGINE_VERSION} successfully"
-      exit 0
-    else
-      install_docker_compose
-      post_install_check
-      echo "Updated docker engine to ${STABLE_DOCKER_COMPOSE_VERSION} successfully"
-      exit 0
-    fi
-  ;;
-  -v | --version )
-    if [ $INSTALL_OPTION == "engine" ]; then
-      get_docker_engine_version
-      echo $DOCKER_SERVER_VERSION
-      exit 0
-    else
-      get_docker_compose_version
-      echo $DOCKER_COMPOSE_VERSION
-      exit 0
-    fi
-  ;;
-  * )
-    echo "flag must be -i or -v" 
-    exit 14
-esac
+  case $2 in
+    -i | --install )
+      # Pre install
+      get_system_info
+      get_architecture
+      check_requirements
+      if [ $INSTALL_OPTION == "engine" ]; then
+        install_docker_engine
+        post_install_check
+        echo "Updated docker engine to ${STABLE_DOCKER_ENGINE_VERSION} successfully"
+        exit 0
+      else
+        install_docker_compose
+        post_install_check
+        echo "Updated docker engine to ${STABLE_DOCKER_COMPOSE_VERSION} successfully"
+        exit 0
+      fi
+    ;;
+    -v | --version )
+      if [ $INSTALL_OPTION == "engine" ]; then
+        get_docker_engine_version
+        echo $DOCKER_SERVER_VERSION
+        exit 0
+      else
+        get_docker_compose_version
+        echo $DOCKER_COMPOSE_VERSION
+        exit 0
+      fi
+    ;;
+    * )
+      echo "flag must be -i or -v" 
+      exit 14
+  esac
+elif [ "$1" == "system" ]; then
+# Ensure 2 arguments
+  if [ "$#" -ne 1 ]; then
+    echo "Illegal number of parameters"
+    exit 12
+  fi
+  get_system_info
+  get_docker_compose_version
+  get_docker_engine_version
+  get_architecture
+  echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\", \"dockerCliVersion\": \"${DOCKER_CLI_VERSION}\", \"os\": \"${ID}\", \"versionCodename\": \"${VERSION_CODENAME}\", \"architecture\": \"${ARCHITECTURE}\"}"
+  exit 0
+fi

@@ -1051,15 +1051,32 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
-export type DockerScriptOptions =
-  | "engine -- --version"
-  | "engine -- -v"
+export interface HostInfoScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+  dockerCliVersion: string;
+  os: string;
+  versionCodename: string;
+  architecture: string;
+}
+
+export type DockerScriptOptionHostInfo = "system";
+
+export type DockerScriptOptionUpdate =
   | "engine -- --install"
   | "engine -- -i"
-  | "compose -- --version"
-  | "compose -- -v"
   | "compose -- --install"
   | "compose -- -i";
+
+export type DockerScriptOptionVersion =
+  | "engine -- --version"
+  | "engine -- -v"
+  | "compose -- --version"
+  | "compose -- -v";
+
+export type DockerScriptOptions = DockerScriptOptionHostInfo &
+  DockerScriptOptionUpdate &
+  DockerScriptOptionVersion;
 
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on

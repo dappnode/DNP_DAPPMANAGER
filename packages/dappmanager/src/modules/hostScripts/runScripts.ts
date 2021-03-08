@@ -3,7 +3,13 @@ import path from "path";
 import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import memoize from "memoizee";
-import { DockerScriptOptions, MountpointData } from "../../types";
+import {
+  DockerScriptOptionHostInfo,
+  DockerScriptOptionUpdate,
+  DockerScriptOptionVersion,
+  HostInfoScript,
+  MountpointData
+} from "../../types";
 
 const hostScriptsDirFromHost = params.HOST_SCRIPTS_DIR_FROM_HOST;
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;
@@ -90,12 +96,44 @@ export async function migrateVolume(
 }
 
 /**
- * Updates/returns docker engine/docker-compose versions
+ * Updates docker engine/docker-compose.
+ * OPTIONS:
+ * engine
+ *    -i | --install : installs docker engine using "package method". If error returns string error
+ * compose
+ *    -i | --install : installs docker compose. If error returns string error
  */
 export async function dockerUpdate(
-  option: DockerScriptOptions
+  option: DockerScriptOptionUpdate
 ): Promise<string> {
   return await runScript("docker_update.sh", `${option}`);
+}
+
+/**
+ * Returns docker engine/docker-compose versions.
+ * OPTIONS:
+ * engine
+ *    -v | --version : returns string with docker-server version
+ * compose
+ *    -v | --version : returns string with docker compose version
+ */
+export async function dockerVersionGet(
+  option: DockerScriptOptionVersion
+): Promise<string> {
+  return await runScript("docker_update.sh", `${option}`);
+}
+
+/**
+ * Returns host info in JSON format.
+ * OPTIONS:
+ * system: returns system info in JSON format: OS, architecture, OS version and docker versions (compose and engine)
+ */
+export async function hostInfoGet(
+  option: DockerScriptOptionHostInfo
+): Promise<HostInfoScript> {
+  const hostInfo = await runScript("docker_update.sh", `${option}`);
+  const hostInfoJson: HostInfoScript = JSON.parse(hostInfo);
+  return hostInfoJson;
 }
 
 /**

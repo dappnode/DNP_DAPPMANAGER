@@ -32,7 +32,11 @@ import {
   UpnpTablePortStatus,
   ApiTablePortStatus,
   HttpsPortalMapping,
-  DockerScriptOptions
+  DockerScriptOptions,
+  DockerScriptOptionHostInfo,
+  DockerScriptOptionUpdate,
+  DockerScriptOptionVersion,
+  HostInfoScript
 } from "./types";
 
 export interface Routes {
@@ -476,11 +480,25 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
-   * Updates/returns docker/docker-compose version
+   * Updates docker/docker-compose
    */
   updateDocker: (kwargs: {
-    updateOption: DockerScriptOptions;
+    updateOption: DockerScriptOptionUpdate;
   }) => Promise<string>;
+
+  /**
+   * Returns docker/docker-compose version
+   */
+  getDockerVersion: (kwargs: {
+    versionOption: DockerScriptOptionVersion;
+  }) => Promise<string>;
+
+  /**
+   * Returns host info needed before update docker
+   */
+  getHostInfo: (kwargs: {
+    option: DockerScriptOptionHostInfo;
+  }) => Promise<HostInfoScript>;
 
   /**
    * Return the current SSH port from sshd
@@ -596,6 +614,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusSet: { log: true },
   systemInfoGet: {},
   updateDocker: {},
+  getDockerVersion: {},
+  getHostInfo: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {}
