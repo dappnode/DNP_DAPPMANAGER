@@ -121,21 +121,15 @@ export function noNatLoopback({
   };
 }
 
-export function ipfs({
-  data: ipfsConnectionStatus,
-  isValidating
-}: {
-  data?: { resolves: boolean; error?: string };
-  isValidating: boolean;
-}): DiagnoseResultOrNull {
-  if (isValidating)
+export function ipfs(
+  ipfsTestRes: responseInterface<void, Error>
+): DiagnoseResultOrNull {
+  if (ipfsTestRes.isValidating)
     return { loading: true, msg: "Checking if IPFS resolves..." };
-  if (!ipfsConnectionStatus) return null;
+  const error = ipfsTestRes.error;
   return {
-    ok: ipfsConnectionStatus.resolves,
-    msg: ipfsConnectionStatus.resolves
-      ? "IPFS resolves"
-      : "IPFS is not resolving: " + ipfsConnectionStatus.error,
+    ok: !error,
+    msg: error ? "IPFS is not resolving: " + error.message : "IPFS resolves",
     solutions: [
       `Go to the system tab and make sure IPFS is running. Otherwise open the package and click 'restart'`,
       `If the problem persist make sure your disk has not run of space; IPFS may malfunction in that case.`

@@ -215,12 +215,6 @@ export interface Routes {
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
-  statsCpuGet: () => Promise<HostStatCpu>;
-
-  statsMemoryGet: () => Promise<HostStatMemory>;
-
-  statsDiskGet: () => Promise<HostStatDisk>;
-
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
@@ -247,6 +241,11 @@ export interface Routes {
    * HTTPs Portal: get all mappings
    */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
+
+  /**
+   * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
+   */
+  ipfsTest(): Promise<void>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -458,6 +457,12 @@ export interface Routes {
    */
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
+  statsCpuGet: () => Promise<HostStatCpu>;
+
+  statsMemoryGet: () => Promise<HostStatMemory>;
+
+  statsDiskGet: () => Promise<HostStatDisk>;
+
   /**
    * Gets bot telegram status
    */
@@ -553,13 +558,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  statsCpuGet: {},
-  statsDiskGet: {},
-  statsMemoryGet: {},
   getUserActionLogs: {},
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -589,6 +592,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
+  statsCpuGet: {},
+  statsDiskGet: {},
+  statsMemoryGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},

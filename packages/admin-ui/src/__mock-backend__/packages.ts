@@ -48,7 +48,7 @@ export const packages: Pick<
       ...sampleDnp,
       dnpName: name,
       version: version || "0.1.0",
-      avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
+      avatarUrl: "http://example.com:8080/ipfs/Qm",
       origin: undefined,
       gettingStarted: `Welcome to the package **${name}**`,
       gettingStartedShow: true,
