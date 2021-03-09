@@ -1,6 +1,6 @@
 const Daemon = require("monero-rpc").Daemon;
-import { InstalledPackageData } from "../../../common";
-import { getDotDappnodeDomain } from "../../nsupdate";
+import { InstalledPackageData } from "../../../types";
+import { getPrivateNetworkAlias } from "../../../domains";
 import { ChainDataResult } from "../types";
 
 // Monero's average block time is 2 minutes
@@ -22,9 +22,12 @@ const MIN_BLOCK_DIFF_SYNC = 15;
 export async function monero(
   dnp: InstalledPackageData
 ): Promise<ChainDataResult> {
-  const packageDomain = getDotDappnodeDomain(dnp.dnpName);
+  const container = dnp.containers[0];
+  if (!container) throw Error("no container");
+  const containerDomain = getPrivateNetworkAlias(container);
+
   // http://monero.dappnode:18081
-  const apiUrl = `http://${packageDomain}:18081`;
+  const apiUrl = `http://${containerDomain}:18081`;
 
   const info: MoneroRpcGetInfoResult = await new Promise(
     (resolve, reject): void => {
