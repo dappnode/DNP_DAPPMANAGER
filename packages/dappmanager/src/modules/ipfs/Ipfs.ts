@@ -2,7 +2,7 @@ const ipfsClient = require("ipfs-http-client");
 import { logs } from "../../logs";
 import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
 import { IpfsCatOptions, IpfsLsFileResult } from "./types";
-import { handleIpfsError, sanitizeIpfsHash } from "./utils";
+import { handleIpfsError } from "./utils";
 
 export class Ipfs {
   /** Un-typed `ipfs-http-client` instance */
@@ -26,8 +26,6 @@ export class Ipfs {
    * @returns hash contents as a buffer
    */
   async cat(hash: string, opts?: IpfsCatOptions): Promise<Buffer> {
-    hash = sanitizeIpfsHash(hash);
-
     const chunks = [];
     try {
       for await (const chunk of this.ipfs.cat(hash, {
@@ -57,13 +55,10 @@ export class Ipfs {
   }
 
   async catStreamToFs(args: CatStreamToFsArgs): Promise<void> {
-    args.hash = sanitizeIpfsHash(args.hash);
     return await catStreamToFs(args, this.ipfs);
   }
 
   async ls(hash: string): Promise<IpfsLsFileResult[]> {
-    hash = sanitizeIpfsHash(hash);
-
     const files = [];
     try {
       for await (const file of this.ipfs.ls(hash, { timeout: this.timeout })) {
@@ -85,8 +80,6 @@ export class Ipfs {
    * Also possible to get it's size with it by summing its links size
    */
   async objectGet(hash: string): Promise<void> {
-    hash = sanitizeIpfsHash(hash);
-
     try {
       return await this.ipfs.object.get(hash, { timeout: this.timeout });
     } catch (e) {

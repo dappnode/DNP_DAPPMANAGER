@@ -1,6 +1,5 @@
 import os from "os";
 import { ipfs } from "../../ipfs";
-import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -35,8 +34,6 @@ export async function downloadReleaseIpfs(
   composeUnsafe: Compose;
   manifest: Manifest;
 }> {
-  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
-
   const arch = os.arch() as NodeArch;
 
   try {
