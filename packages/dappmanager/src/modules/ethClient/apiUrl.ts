@@ -1,4 +1,4 @@
-import { getDotDappnodeDomain } from "../nsupdate";
+import { getPrivateNetworkAlias } from "../../domains";
 
 /**
  * Computes the JSON RPC url of an Eth client package from its name
@@ -12,6 +12,10 @@ export function getEthClientApiUrl(dnpName: string, port = 8545): string {
    * domain = "bitcoin.dappnode", "other.public.dappnode"
    * ```
    */
-  const domain = getDotDappnodeDomain(dnpName);
+  const domain = getPrivateNetworkAlias({
+    dnpName: dnpName,
+    serviceName: dnpName
+  });
+
   return `http://${domain}:${port}`;
 }

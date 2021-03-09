@@ -1,6 +1,11 @@
+import { isEmpty } from "lodash";
 import { PackageContainer } from "../../types";
 import { getContainerDomain } from "../../params";
-import { isEmpty } from "lodash";
+import {
+  getPrivateNetworkAlias,
+  stripCharacters,
+  ContainerNames
+} from "../../domains";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -76,39 +81,30 @@ send
 `.trim();
 }
 
-function stripCharacters(s: string): string {
-  return s.replace(RegExp("_", "g"), "");
-}
-
 /**
- * - Strip container prefix
- * - Strip "_"
- *
  * @param name "bitcoin.dnp.dappnode.eth"
  * @returns "my.bitcoin.dnp.dappnode.eth"
- *
- * name=$(echo $name | sed 's/DAppNodePackage-//g'| tr -d '/_')
  */
 export function getMyDotEthdomain(dnpName: string): string {
   return "my." + stripCharacters(dnpName);
 }
 
 /**
- * - Strip container prefix
- * - Strip .dappnode, .eth, .dnp
- * - Strip "_"
- *
  * @param name "bitcoin.dnp.dappnode.eth"
  * @returns "bitcoin"
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin.dappnode"
  * - "other.public.dappnode.eth" > "other.public.dappnode"
- *
- * name=$(echo $name | sed 's/DAppNodePackage-//g'| sed 's/\.dappnode\.eth//g' |  sed 's/\.dnp//g' | tr -d '/_')
  */
-export function getDotDappnodeDomain(dnpName: string): string {
-  for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
-    if (dnpName.endsWith(s)) dnpName = dnpName.slice(0, -s.length);
-  return stripCharacters(dnpName) + ".dappnode";
+export function getDotDappnodeDomain(container: ContainerNames): string {
+  return getPrivateNetworkAlias(container);
+}
+
+/**
+ * @param alias "fullnode"
+ * @returns "fullnode.dappnode"
+ */
+function aliasToDappnodeDomain(alias: string): string {
+  return alias + ".dappnode";
 }
 
 /**
@@ -148,7 +144,7 @@ export function getNsupdateTxts({
   for (const container of containersToUpdate) {
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
-    dappnode[getDotDappnodeDomain(fullEns)] = container.ip;
+    dappnode[getDotDappnodeDomain(container)] = container.ip;
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
@@ -157,7 +153,7 @@ export function getNsupdateTxts({
         serviceName: container.dnpName
       });
       eth[getMyDotEthdomain(fullDnpEns)] = container.ip;
-      dappnode[getDotDappnodeDomain(fullDnpEns)] = container.ip;
+      dappnode[getDotDappnodeDomain(container)] = container.ip;
     }
   }
 
@@ -166,14 +162,14 @@ export function getNsupdateTxts({
     if (container.domainAlias)
       for (const alias of container.domainAlias)
         if (isAliasAllowed(alias, container))
-          dappnode[getDotDappnodeDomain(alias)] = container.ip;
+          dappnode[aliasToDappnodeDomain(alias)] = container.ip;
 
   // Add .dappnode domain alias from db (such as fullnode.dappnode)
   for (const [alias, dnpName] of Object.entries(domainAliases)) {
     const container = containersToUpdate.find(
       c => dnpName && c.dnpName === dnpName
     );
-    if (container) dappnode[getDotDappnodeDomain(alias)] = container.ip;
+    if (container) dappnode[aliasToDappnodeDomain(alias)] = container.ip;
   }
 
   return (

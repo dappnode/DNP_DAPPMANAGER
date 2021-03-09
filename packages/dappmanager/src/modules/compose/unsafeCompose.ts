@@ -121,8 +121,8 @@ function parseUnsafeServiceNetworks(
   return {
     ...networksObj,
     [dnpPrivateNetworkName]: {
-      aliases: [alias],
-      ...dnpPrivateNetwork
+      ...dnpPrivateNetwork,
+      aliases: [alias]
     }
   };
 }
