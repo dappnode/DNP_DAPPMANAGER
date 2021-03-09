@@ -12,7 +12,7 @@ import { shortNameCapitalized } from "../../utils/format";
  * docker ps --filter "name=DAppNodePackage" --format "{{.Names}}"
  * docker stop $(docker ps --filter "name=DAppNodePackage" -q)
  *
- * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth" -q)
+ * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-sample.dnp.dappnode.eth" -q)
  */
 
 const thresholds = [

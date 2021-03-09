@@ -24,12 +24,6 @@ export function getEthForwardMiddleware(): express.RequestHandler {
   };
 }
 
-// Define params
-
-const ipfsRedirect = params.ETHFORWARD_IPFS_REDIRECT; // "http://ipfs.dappnode:8080"
-const swarmRedirect = params.ETHFORWARD_SWARM_REDIRECT; // "http://swarm.dappnode";
-const pinContentOnVisit = params.ETHFORWARD_PIN_ON_VISIT;
-
 /**
  * Convert a decentralized content into a fetchable URL
  * @param content
@@ -37,9 +31,9 @@ const pinContentOnVisit = params.ETHFORWARD_PIN_ON_VISIT;
 function getTargetUrl(content: Content): string {
   switch (content.location) {
     case "ipfs":
-      return urlJoin(ipfsRedirect, content.hash);
+      return urlJoin(params.ETHFORWARD_IPFS_REDIRECT, content.hash);
     case "swarm":
-      return urlJoin(swarmRedirect, content.hash);
+      return urlJoin(params.ETHFORWARD_SWARM_REDIRECT, content.hash);
   }
 }
 
@@ -65,8 +59,8 @@ function getEthForwardHandler(): (
   req: http.IncomingMessage,
   res: http.ServerResponse
 ) => Promise<void> {
-  logs.info(`IPFS redirect set to: ${ipfsRedirect}`);
-  logs.info(`SWARM redirect set to: ${swarmRedirect}`);
+  logs.info(`IPFS redirect set to: ${params.ETHFORWARD_IPFS_REDIRECT}`);
+  logs.info(`SWARM redirect set to: ${params.ETHFORWARD_SWARM_REDIRECT}`);
 
   const proxy = httpProxy.createProxyServer({});
   proxy.on("error", e => {
@@ -107,7 +101,7 @@ function getEthForwardHandler(): (
         });
       });
 
-      if (content.location === "ipfs" && pinContentOnVisit)
+      if (content.location === "ipfs" && params.ETHFORWARD_PIN_ON_VISIT)
         pinAddNoThrow({ hash: content.hash });
     } catch (e) {
       /**
