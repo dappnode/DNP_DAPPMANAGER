@@ -1,4 +1,4 @@
-import * as ipfs from "../../ipfs";
+import { ipfs } from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
 
 /**

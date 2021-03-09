@@ -1,5 +1,5 @@
 import os from "os";
-import * as ipfs from "../../ipfs";
+import { ipfs } from "../../ipfs";
 import { isIpfsHash } from "../../../utils/validate";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
@@ -58,7 +58,7 @@ export async function downloadReleaseIpfs(
     };
   } catch (e) {
     if (e.message.includes("is a directory")) {
-      const files = await ipfs.ls({ hash });
+      const files = await ipfs.ls(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
 
       // Fetch image by arch, will throw if not available

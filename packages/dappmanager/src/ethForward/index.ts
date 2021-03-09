@@ -3,7 +3,7 @@ import httpProxy from "http-proxy";
 import express from "express";
 import params from "../params";
 import { EthProviderError } from "../modules/ethClient";
-import { pinAddNoThrow } from "../modules/ipfs/methods/pinAdd";
+import { ipfs } from "../modules/ipfs";
 import { urlJoin } from "../utils/url";
 import { ResolveDomainWithCache } from "./resolveDomain";
 import * as views from "./views";
@@ -102,7 +102,7 @@ function getEthForwardHandler(): (
       });
 
       if (content.location === "ipfs" && params.ETHFORWARD_PIN_ON_VISIT)
-        pinAddNoThrow({ hash: content.hash });
+        ipfs.pinAddNoThrow(content.hash);
     } catch (e) {
       /**
        * Returns the response error HTML. Use function format to make sure

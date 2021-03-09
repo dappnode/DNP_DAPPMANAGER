@@ -1,4 +1,4 @@
-import * as ipfs from "../../ipfs";
+import { ipfs } from "../../ipfs";
 import memoize from "memoizee";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
@@ -10,7 +10,9 @@ interface FileData {
 
 const ipfsCatStringMemoized = memoize(ipfs.catString, {
   promise: true,
-  normalizer: ([{ hash }]) => hash
+  normalizer: ([hash]) => hash,
+  max: 200,
+  maxAge: 60 * 60 * 1000
 });
 
 export async function downloadAsset<T>(
@@ -45,7 +47,7 @@ export async function downloadAssetRequired<T>(
   const validate = validateAsset[fileId];
 
   const hash = file.hash;
-  const content = await ipfsCatStringMemoized({ hash, maxLength });
+  const content = await ipfsCatStringMemoized(hash, { maxLength });
   const data = parseAsset(content, format);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
