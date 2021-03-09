@@ -21,6 +21,7 @@ export { statsDiskGet } from "./statsDiskGet";
 
 export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
+export { ipfsTest } from "./ipfsTest";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";

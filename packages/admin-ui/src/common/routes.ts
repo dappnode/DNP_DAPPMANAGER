@@ -249,6 +249,11 @@ export interface Routes {
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
 
   /**
+   * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
+   */
+  ipfsTest(): Promise<void>;
+
+  /**
    * Returns the list of current mountpoints in the host,
    * by running a pre-written script in the host
    */
@@ -560,6 +565,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
