@@ -1,5 +1,6 @@
-import { ipfs } from "../../ipfs";
 import memoize from "memoizee";
+import retry from "async-retry";
+import { ipfs, IpfsCatOptions } from "../../ipfs";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
 import { validateAsset, DirectoryFiles } from "./params";
@@ -8,12 +9,19 @@ interface FileData {
   hash: string;
 }
 
-const ipfsCatStringMemoized = memoize(ipfs.catString, {
-  promise: true,
-  normalizer: ([hash]) => hash,
-  max: 200,
-  maxAge: 60 * 60 * 1000
-});
+const ipfsCatStringMemoized = memoize(
+  (hash: string, opts: IpfsCatOptions) =>
+    retry(() => ipfs.catString(hash, opts), {
+      retries: 3,
+      minTimeout: 225
+    }),
+  {
+    promise: true,
+    normalizer: ([hash]) => hash,
+    max: 200,
+    maxAge: 60 * 60 * 1000
+  }
+);
 
 export async function downloadAsset<T>(
   file: FileData[] | FileData | undefined,

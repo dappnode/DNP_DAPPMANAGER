@@ -44,9 +44,6 @@ export class Ipfs {
     if (opts?.maxLength && data.length >= opts.maxLength)
       throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
 
-    // Pin files after a successful download
-    this.pinAddNoThrow(hash);
-
     return data;
   }
 
@@ -75,9 +72,6 @@ export class Ipfs {
     } catch (e) {
       handleIpfsError(e, hash);
     }
-
-    // Pin files after a successful download
-    this.pinAddNoThrow(hash);
 
     return files.map(file => ({
       ...file,

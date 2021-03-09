@@ -61,6 +61,9 @@ export async function downloadReleaseIpfs(
       const files = await ipfs.ls(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
 
+      // Pin release on visit
+      ipfs.pinAddNoThrow(hash);
+
       // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);
       const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
