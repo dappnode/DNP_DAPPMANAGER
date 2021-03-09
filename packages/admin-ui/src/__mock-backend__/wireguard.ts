@@ -1,6 +1,10 @@
 import { Routes } from "../../src/common";
 
-const initialDevices = ["dappnode_admin", "other-user", "other-user-2"];
+const initialDevices = [
+  "dappnode_admin",
+  "other-user",
+  "wireguard-other-user-2"
+];
 const devicesState = new Set<string>(initialDevices);
 
 export const wireguard: Pick<
@@ -10,14 +14,15 @@ export const wireguard: Pick<
   | "wireguardDeviceRemove"
   | "wireguardDevicesGet"
 > = {
-  wireguardDeviceAdd: async device => {
-    devicesState.add(device);
+  wireguardDeviceAdd: async id => {
+    devicesState.add(id);
   },
-  wireguardDeviceRemove: async device => {
-    devicesState.delete(device);
+  wireguardDeviceRemove: async id => {
+    devicesState.delete(id);
   },
   wireguardDevicesGet: async () => Array.from(devicesState.values()),
-  wireguardDeviceGet: async device => {
+  wireguardDeviceGet: async id => {
+    if (!devicesState.has(id)) throw Error(`No device id ${id}`);
     const config = `[Interface]
 Address = 172.34.1.2
 PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
