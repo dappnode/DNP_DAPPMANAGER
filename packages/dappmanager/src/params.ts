@@ -92,7 +92,7 @@ const params = {
 
   // Wireguard params
   WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
-  WIREGUARD_ISCORE: false,
+  WIREGUARD_ISCORE: true,
   WIREGUARD_MAIN_SERVICE: "wireguard",
   /** api.wireguard.dappnode/:device */
   WIREGUARD_API_URL: "http://api.wireguard.dappnode",

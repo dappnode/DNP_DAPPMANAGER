@@ -21,6 +21,7 @@ import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
+import { urlJoin } from "utils/url";
 
 export function HttpsMappings({
   dnpName,
@@ -116,7 +117,7 @@ export function HttpsMappings({
       dnp => dnp.dnpName === httpsPortalDnpName
     );
     if (!httpsPortalDnp) {
-      const url = `${installedRootPath}/${httpsPortalDnpName}`;
+      const url = urlJoin(installedRootPath, httpsPortalDnpName);
       return (
         <Alert variant="secondary">
           You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
