@@ -1,4 +1,5 @@
 import os from "os";
+import memoize from "memoizee";
 import { ipfs } from "../../ipfs";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
@@ -17,6 +18,15 @@ import { downloadAssetRequired } from "./downloadAssets";
 
 const source: "ipfs" = "ipfs";
 
+// Memoize fetching releases so refreshing the DAppStore is fast
+export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
+  // Wait for Promises to resolve. Do not cache rejections
+  promise: true,
+  normalizer: ([hash]) => hash,
+  max: 100,
+  maxAge: 60 * 60 * 1000
+});
+
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
  * Should return enough information to then query other files if necessary
@@ -26,7 +36,7 @@ const source: "ipfs" = "ipfs";
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-export async function downloadReleaseIpfs(
+async function downloadReleaseIpfsFn(
   hash: string
 ): Promise<{
   imageFile: DistributedFile;
