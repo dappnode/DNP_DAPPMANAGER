@@ -1,24 +1,19 @@
 import React, { useState } from "react";
-import { ReqStatus } from "types";
+import { DockerComposeUpdateRequirements, ReqStatus } from "types";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import { getIsDockerComposeUpgrade } from "./params";
+import "./dockerManager.scss";
 
 function UpdateDockerCompose({
-  dockerComposeVersion
+  composeUpdateRequirements
 }: {
-  dockerComposeVersion: string;
+  composeUpdateRequirements: DockerComposeUpdateRequirements;
 }) {
   const [reqUpdateComposeStatus, setReqUpdateComposeStatus] = useState<
     ReqStatus<string>
   >({});
-
-  // Requirements
-  const isDockerComposeUpgrade = getIsDockerComposeUpgrade(
-    dockerComposeVersion
-  );
 
   async function installDockerCompose() {
     try {
@@ -31,31 +26,31 @@ function UpdateDockerCompose({
           onClick: () => resolve
         });
       });
-      const output = await api.updateDocker({
-        updateOption: "compose -- --install"
-      });
+      const output = await api.dockerComposeUpdate();
       setReqUpdateComposeStatus({ result: output });
     } catch (e) {
       setReqUpdateComposeStatus({ error: e });
-      console.error(
-        `Error on docker_update.sh script (compose -- --install) updating docker Compose`,
-        e
-      );
+      console.error(`Error on docker_compose_update.sh script: --install`, e);
     }
   }
 
   return (
     <>
-      <Ok
-        ok={isDockerComposeUpgrade}
-        msg={
-          `Current compose version: ${dockerComposeVersion}` +
-          !isDockerComposeUpgrade
+      <div className="checkbox-docker-compose-update">
+        <input
+          id="isUpgrade"
+          readOnly={true}
+          type="checkbox"
+          checked={composeUpdateRequirements.isDockerComposeUpgrade}
+        ></input>
+        <label htmlFor={"test"}>
+          {`Current compose version: ${composeUpdateRequirements.dockerComposeVersion}` +
+          !composeUpdateRequirements.isDockerComposeUpgrade
             ? `Downgrade is not allowed`
-            : ""
-        }
-      />
-      {isDockerComposeUpgrade ? (
+            : ""}
+        </label>
+      </div>
+      {composeUpdateRequirements.isDockerComposeUpgrade ? (
         <Button
           disabled={
             reqUpdateComposeStatus.loading ||
@@ -65,7 +60,14 @@ function UpdateDockerCompose({
         >
           Update docker compose
         </Button>
-      ) : null}
+      ) : (
+        <Ok
+          ok={false}
+          msg={
+            "Docker compose update not allowed. You must fullfill the requirements"
+          }
+        />
+      )}
       {reqUpdateComposeStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker compose"} />
       ) : reqUpdateComposeStatus.loading ? (
@@ -87,22 +89,17 @@ function UpdateDockerCompose({
 export default function DockerComposeManager() {
   // Docker compose
   const [reqGetComposeVersionStatus, setReqGetComposeVersionStatus] = useState<
-    ReqStatus<string>
+    ReqStatus<DockerComposeUpdateRequirements>
   >({});
 
   async function fetchDockerComposeVersion() {
     try {
       setReqGetComposeVersionStatus({ loading: true });
-      const version = await api.getDockerVersion({
-        versionOption: `compose -- --version`
-      });
+      const version = await api.dockerComposeUpdateRequirements();
       setReqGetComposeVersionStatus({ result: version });
     } catch (e) {
       setReqGetComposeVersionStatus({ error: e });
-      console.error(
-        `Error on docker_update.sh script (compose -- --version) getting docker compose version`,
-        e
-      );
+      console.error(`Error on docker_compose_update.sh script: --version`, e);
     }
   }
 
@@ -113,6 +110,7 @@ export default function DockerComposeManager() {
         Update docker engine to a stable version with DAppNode. You must fulfill
         a series of requirements
       </p>
+      <br />
       <Button
         disabled={
           reqGetComposeVersionStatus.loading ||
@@ -124,7 +122,7 @@ export default function DockerComposeManager() {
       </Button>
       {reqGetComposeVersionStatus.result ? (
         <UpdateDockerCompose
-          dockerComposeVersion={reqGetComposeVersionStatus.result}
+          composeUpdateRequirements={reqGetComposeVersionStatus.result}
         />
       ) : reqGetComposeVersionStatus.error ? (
         <Ok

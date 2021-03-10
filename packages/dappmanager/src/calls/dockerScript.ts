@@ -1,68 +1,49 @@
 import {
-  dockerUpdate,
-  dockerVersionGet,
-  hostInfoGet
-} from "../modules/hostScripts";
+  getDockerEngineUpdateRequirements,
+  getDockerComposeUpdateRequirements
+} from "../modules/dockerUpdate";
 import {
-  DockerScriptOptionHostInfo,
-  DockerScriptOptionUpdate,
-  DockerScriptOptionVersion,
-  HostInfoScript
+  DockerComposeUpdateRequirements,
+  DockerEngineUpdateRequirements
 } from "../types";
 
 /**
- * Updates docker engine/docker-compose.
- * OPTIONS:
- * engine
- *    -i | --install : installs docker engine using "package method". If error returns string error
- * compose
- *    -i | --install : installs docker compose. If error returns string error
+ * Updates engine and compose
  */
-export async function updateDocker({
-  updateOption
-}: {
-  updateOption: DockerScriptOptionUpdate;
-}): Promise<string> {
-  try {
-    return await dockerUpdate(updateOption);
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+export async function dockerEngineAndComposeUpdate(): Promise<string> {
+  const engineUpdate = await dockerEngineUpdate();
+  const composeUpdate = await dockerComposeUpdate();
+  return engineUpdate + composeUpdate;
 }
 
 /**
- * Returns docker engine/docker-compose versions.
- * OPTIONS:
- * engine
- *    -v | --version : returns string with docker-server version
- * compose
- *    -v | --version : returns string with docker compose version
+ * Updates docker engine
  */
-export async function getDockerVersion({
-  versionOption
-}: {
-  versionOption: DockerScriptOptionVersion;
-}): Promise<string> {
-  try {
-    return await dockerVersionGet(versionOption);
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+export async function dockerEngineUpdate(): Promise<string> {
+  return await dockerEngineUpdate();
 }
 
 /**
- * Returns host info in JSON format.
- * OPTIONS:
- * system: returns system info in JSON format: OS, architecture, OS version and docker versions (compose and engine)
+ * Docker engine requirements
  */
-export async function getHostInfo({
-  option
-}: {
-  option: DockerScriptOptionHostInfo;
-}): Promise<HostInfoScript> {
-  try {
-    return await hostInfoGet(option);
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+export async function dockerEngineUpdateRequirements(): Promise<
+  DockerEngineUpdateRequirements
+> {
+  return await getDockerEngineUpdateRequirements();
+}
+
+/**
+ * Updates docker compose
+ */
+export async function dockerComposeUpdate(): Promise<string> {
+  return await dockerComposeUpdate();
+}
+
+/**
+ * Docker compose requirements
+ */
+export async function dockerComposeUpdateRequirements(): Promise<
+  DockerComposeUpdateRequirements
+> {
+  return await getDockerComposeUpdateRequirements();
 }

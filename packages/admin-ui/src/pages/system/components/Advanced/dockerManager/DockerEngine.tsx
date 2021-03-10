@@ -4,33 +4,19 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import { HostInfoScript } from "common";
+import { DockerEngineUpdateRequirements } from "common";
 import { params } from "./params";
-import {
-  getIsArchitecture,
-  getIsOs,
-  getIsOsVersion,
-  getIsDockerEngineUpgrade,
-  getIsDockerSynchronized
-} from "./params";
 
-function UpdateDockerEngine({ hostInfo }: { hostInfo: HostInfoScript }) {
+import "./dockerManager.scss";
+
+function UpdateDockerEngine({
+  updateEngineRequirements
+}: {
+  updateEngineRequirements: DockerEngineUpdateRequirements;
+}) {
   const [reqUpdateEngineStatus, setReqUpdateEngineStatus] = useState<
     ReqStatus<string>
   >({});
-
-  // Requirements
-  const isArchitecture = getIsArchitecture(hostInfo.architecture);
-  const isOs = getIsOs(hostInfo.os);
-  const isOsVersion = getIsOsVersion(hostInfo.versionCodename);
-  const isUpgrade = getIsDockerEngineUpgrade(
-    hostInfo.versionCodename,
-    hostInfo.dockerServerVersion
-  );
-  const isDockerSynchronized = getIsDockerSynchronized(
-    hostInfo.dockerServerVersion,
-    hostInfo.dockerCliVersion
-  );
 
   async function installDockerEngine() {
     try {
@@ -43,67 +29,79 @@ function UpdateDockerEngine({ hostInfo }: { hostInfo: HostInfoScript }) {
           onClick: () => resolve
         });
       });
-      const output = await api.updateDocker({
-        updateOption: "engine -- --install"
-      });
+      const output = await api.dockerEngineUpdate();
       setReqUpdateEngineStatus({ result: output });
     } catch (e) {
       setReqUpdateEngineStatus({ error: e });
-      console.error(
-        `Error on docker_update.sh script (engine -- --install) updating docker engine`,
-        e
-      );
+      console.error(`Error on docker_engine_update.sh script: --install`, e);
     }
   }
 
   return (
     <>
-      <Ok
-        ok={isArchitecture}
-        msg={
-          `Architecture: ${hostInfo.architecture}` + !isArchitecture
+      <div className="checkbox-docker-engine-update">
+        <input
+          type="checkbox"
+          readOnly={true}
+          checked={updateEngineRequirements.isArchitecture}
+        >
+          {`Architecture: ${updateEngineRequirements.hostInfo.architecture}` +
+          !updateEngineRequirements.isArchitecture
             ? `Architecture must be ${params.ARCHITECTURE.join(",")}`
-            : ""
-        }
-      />
-      <Ok
-        ok={isOs}
-        msg={
-          `Os: ${hostInfo.os}` + !isOs
+            : ""}
+        </input>
+        <input
+          type="checkbox"
+          readOnly={true}
+          checked={updateEngineRequirements.isOs}
+        >
+          {`Os: ${updateEngineRequirements.hostInfo.os}` +
+          !updateEngineRequirements.isOs
             ? `OS must be ${params.OS.join(",")}`
-            : ""
-        }
-      />
-      <Ok
-        ok={isOsVersion}
-        msg={
-          `Version: ${hostInfo.versionCodename}` + !isOsVersion
+            : ""}
+        </input>
+        <input
+          type="checkbox"
+          readOnly={true}
+          checked={updateEngineRequirements.isOsVersion}
+        >
+          {`Version: ${updateEngineRequirements.hostInfo.versionCodename}` +
+          !updateEngineRequirements.isOsVersion
             ? `Version must be ${params.VERSION_CODENAME.join(",")}`
-            : ""
-        }
-      />
-      <Ok
-        ok={isUpgrade}
-        msg={
-          `Current docker version: ${hostInfo.dockerServerVersion}` + !isUpgrade
+            : ""}
+        </input>
+        <input
+          readOnly={true}
+          type="checkbox"
+          checked={updateEngineRequirements.isDockerEngineUpgrade}
+        >
+          {`Current docker version: ${updateEngineRequirements.hostInfo.dockerServerVersion}` +
+          !updateEngineRequirements.isDockerEngineUpgrade
             ? `Downgrade is not allowed`
-            : ""
-        }
-      />
-      <Ok
-        ok={isDockerSynchronized}
-        msg={
-          `Docker CLI and server versions synchrnonized: ${isDockerSynchronized}` +
-          !isOsVersion
-            ? `Docker CLI and server versions must be equal`
-            : ""
-        }
-      />
-      {isArchitecture &&
-      isOs &&
-      isOsVersion &&
-      isUpgrade &&
-      isDockerSynchronized ? (
+            : ""}
+        </input>
+        <input
+          readOnly={true}
+          type="checkbox"
+          checked={updateEngineRequirements.isDockerSynchronized}
+        >
+          {`Docker CLI and server versions synchrnonized`}
+        </input>
+        <input
+          readOnly={true}
+          type="checkbox"
+          checked={updateEngineRequirements.isDockerEngineUpdateCompatible}
+        >
+          {`Versions compatibility`}
+        </input>
+      </div>
+
+      {updateEngineRequirements.isArchitecture &&
+      updateEngineRequirements.isOs &&
+      updateEngineRequirements.isOsVersion &&
+      updateEngineRequirements.isDockerEngineUpgrade &&
+      updateEngineRequirements.isDockerSynchronized &&
+      updateEngineRequirements.isDockerEngineUpdateCompatible ? (
         <Button
           disabled={
             reqUpdateEngineStatus.loading ||
@@ -113,7 +111,14 @@ function UpdateDockerEngine({ hostInfo }: { hostInfo: HostInfoScript }) {
         >
           Update docker engine
         </Button>
-      ) : null}
+      ) : (
+        <Ok
+          ok={false}
+          msg={
+            "Docker engine update not allowed. You must fullfill the requirements"
+          }
+        />
+      )}
       {reqUpdateEngineStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker engine"} />
       ) : reqUpdateEngineStatus.loading ? (
@@ -133,24 +138,19 @@ function UpdateDockerEngine({ hostInfo }: { hostInfo: HostInfoScript }) {
 }
 
 export default function DockerEngineManager() {
-  const [reqGetHostInfoStatus, setReqGetHostInfoStatus] = useState<
-    ReqStatus<HostInfoScript>
-  >({});
+  const [
+    reqGetEngineUpdateRequirements,
+    setReqGetEngineUpdateRequirements
+  ] = useState<ReqStatus<DockerEngineUpdateRequirements>>({});
 
-  async function fetchHostInfo() {
+  async function fetchEngineUpdateRequirements() {
     try {
-      setReqGetHostInfoStatus({ loading: true });
-      const hostInfo = await api.getHostInfo({
-        option: "system"
-      });
-      setReqGetHostInfoStatus({ result: hostInfo });
+      setReqGetEngineUpdateRequirements({ loading: true });
+      const requirements = await api.dockerEngineUpdateRequirements();
+      setReqGetEngineUpdateRequirements({ result: requirements });
     } catch (e) {
-      // Docker engine
-      setReqGetHostInfoStatus({ error: e });
-      console.error(
-        `Error on docker_update.sh script (system option) getting host info`,
-        e
-      );
+      setReqGetEngineUpdateRequirements({ error: e });
+      console.error(`Error on docker_engine_update.sh script: --system`, e);
     }
   }
 
@@ -163,25 +163,27 @@ export default function DockerEngineManager() {
       </p>
       <Button
         disabled={
-          reqGetHostInfoStatus.loading ||
-          reqGetHostInfoStatus.result !== undefined
+          reqGetEngineUpdateRequirements.loading ||
+          reqGetEngineUpdateRequirements.result !== undefined
         }
-        onClick={() => fetchHostInfo()}
+        onClick={() => fetchEngineUpdateRequirements()}
       >
         Check requirements
       </Button>
-      {reqGetHostInfoStatus.result ? (
-        <UpdateDockerEngine hostInfo={reqGetHostInfoStatus.result} />
-      ) : reqGetHostInfoStatus.error ? (
+      {reqGetEngineUpdateRequirements.result ? (
+        <UpdateDockerEngine
+          updateEngineRequirements={reqGetEngineUpdateRequirements.result}
+        />
+      ) : reqGetEngineUpdateRequirements.error ? (
         <Ok
           msg={
-            reqGetHostInfoStatus.error instanceof Error
-              ? reqGetHostInfoStatus.error.message
-              : reqGetHostInfoStatus.error
+            reqGetEngineUpdateRequirements.error instanceof Error
+              ? reqGetEngineUpdateRequirements.error.message
+              : reqGetEngineUpdateRequirements.error
           }
           ok={false}
         />
-      ) : reqGetHostInfoStatus.loading ? (
+      ) : reqGetEngineUpdateRequirements.loading ? (
         <Ok msg={"Checking host requirements..."} loading={true} />
       ) : null}
     </>

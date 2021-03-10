@@ -4,9 +4,7 @@ import { shellHost } from "../../utils/shell";
 import params from "../../params";
 import memoize from "memoizee";
 import {
-  DockerScriptOptionHostInfo,
-  DockerScriptOptionUpdate,
-  DockerScriptOptionVersion,
+  DockerVersionsScript,
   HostInfoScript,
   MountpointData
 } from "../../types";
@@ -17,7 +15,11 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
 /**
  * Script runners
  */
-type ScriptName = "detect_fs.sh" | "migrate_volume.sh" | "docker_update.sh";
+type ScriptName =
+  | "detect_fs.sh"
+  | "migrate_volume.sh"
+  | "docker_engine_update.sh"
+  | "docker_compose_update.sh";
 
 /**
  * Detects mountpoints in the host
@@ -96,44 +98,41 @@ export async function migrateVolume(
 }
 
 /**
- * Updates docker engine/docker-compose.
- * OPTIONS:
- * engine
- *    -i | --install : installs docker engine using "package method". If error returns string error
- * compose
- *    -i | --install : installs docker compose. If error returns string error
+ * Updates docker engine
  */
-export async function dockerUpdate(
-  option: DockerScriptOptionUpdate
-): Promise<string> {
-  return await runScript("docker_update.sh", `${option}`);
-}
-
-/**
- * Returns docker engine/docker-compose versions.
- * OPTIONS:
- * engine
- *    -v | --version : returns string with docker-server version
- * compose
- *    -v | --version : returns string with docker compose version
- */
-export async function dockerVersionGet(
-  option: DockerScriptOptionVersion
-): Promise<string> {
-  return await runScript("docker_update.sh", `${option}`);
+export async function updateDockerEngine(): Promise<string> {
+  return await runScript("docker_engine_update.sh", "-- --install");
 }
 
 /**
  * Returns host info in JSON format.
- * OPTIONS:
- * system: returns system info in JSON format: OS, architecture, OS version and docker versions (compose and engine)
  */
-export async function hostInfoGet(
-  option: DockerScriptOptionHostInfo
-): Promise<HostInfoScript> {
-  const hostInfo = await runScript("docker_update.sh", `${option}`);
+export async function getDockerEnginehostInfo(): Promise<HostInfoScript> {
+  const hostInfo = await runScript(
+    "docker_engine_update.sh",
+    "-- --print-host-info"
+  );
   const hostInfoJson: HostInfoScript = JSON.parse(hostInfo);
   return hostInfoJson;
+}
+
+/**
+ * Updates docker compose
+ */
+export async function updateDockerCompose(): Promise<string> {
+  return await runScript("docker_compose_update.sh", "-- --install");
+}
+
+/**
+ * Returns docker compose version
+ */
+export async function getDockerComposeVersion(): Promise<DockerVersionsScript> {
+  const dockerVersions = await runScript(
+    "docker_compose_update.sh",
+    "-- --version"
+  );
+  const dockerVersionsJson: DockerVersionsScript = JSON.parse(dockerVersions);
+  return dockerVersionsJson;
 }
 
 /**

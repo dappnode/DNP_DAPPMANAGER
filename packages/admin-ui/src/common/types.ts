@@ -1060,23 +1060,26 @@ export interface HostInfoScript {
   architecture: string;
 }
 
-export type DockerScriptOptionHostInfo = "system";
+export interface DockerVersionsScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+}
 
-export type DockerScriptOptionUpdate =
-  | "engine -- --install"
-  | "engine -- -i"
-  | "compose -- --install"
-  | "compose -- -i";
+export interface DockerEngineUpdateRequirements {
+  isOs: boolean;
+  isOsVersion: boolean;
+  isArchitecture: boolean;
+  isDockerEngineUpgrade: boolean;
+  isDockerSynchronized: boolean;
+  isDockerEngineUpdateCompatible: boolean;
+  hostInfo: HostInfoScript;
+}
 
-export type DockerScriptOptionVersion =
-  | "engine -- --version"
-  | "engine -- -v"
-  | "compose -- --version"
-  | "compose -- -v";
-
-export type DockerScriptOptions = DockerScriptOptionHostInfo &
-  DockerScriptOptionUpdate &
-  DockerScriptOptionVersion;
+export interface DockerComposeUpdateRequirements {
+  isDockerComposeUpgrade: boolean;
+  IsDockerComposeUpdateCompatible: boolean;
+  dockerComposeVersion: string;
+}
 
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on

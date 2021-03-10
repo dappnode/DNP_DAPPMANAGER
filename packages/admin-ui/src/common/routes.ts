@@ -32,11 +32,8 @@ import {
   UpnpTablePortStatus,
   ApiTablePortStatus,
   HttpsPortalMapping,
-  DockerScriptOptions,
-  DockerScriptOptionHostInfo,
-  DockerScriptOptionUpdate,
-  DockerScriptOptionVersion,
-  HostInfoScript
+  DockerComposeUpdateRequirements,
+  DockerEngineUpdateRequirements
 } from "./types";
 
 export interface Routes {
@@ -480,25 +477,31 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
-   * Updates docker/docker-compose
+   * Updates docker engine and docker compose
    */
-  updateDocker: (kwargs: {
-    updateOption: DockerScriptOptionUpdate;
-  }) => Promise<string>;
+  dockerEngineAndComposeUpdate: () => Promise<string>;
 
   /**
-   * Returns docker/docker-compose version
+   * Updates docker engine
    */
-  getDockerVersion: (kwargs: {
-    versionOption: DockerScriptOptionVersion;
-  }) => Promise<string>;
+  dockerEngineUpdate: () => Promise<string>;
 
   /**
-   * Returns host info needed before update docker
+   * Returns docker engine update requirements
    */
-  getHostInfo: (kwargs: {
-    option: DockerScriptOptionHostInfo;
-  }) => Promise<HostInfoScript>;
+  dockerEngineUpdateRequirements: () => Promise<DockerEngineUpdateRequirements>;
+
+  /**
+   * Returns docker-compose update requirements
+   */
+  dockerComposeUpdateRequirements: () => Promise<
+    DockerComposeUpdateRequirements
+  >;
+
+  /**
+   * Updates docker compose
+   */
+  dockerComposeUpdate: () => Promise<string>;
 
   /**
    * Return the current SSH port from sshd
@@ -613,9 +616,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
-  updateDocker: {},
-  getDockerVersion: {},
-  getHostInfo: {},
+  dockerEngineUpdate: {},
+  dockerEngineUpdateRequirements: {},
+  dockerComposeUpdateRequirements: {},
+  dockerEngineAndComposeUpdate: {},
+  dockerComposeUpdate: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {}

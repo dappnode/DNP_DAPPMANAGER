@@ -60,15 +60,30 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
-  updateDocker: async () => "Updated",
-  getDockerVersion: async () => "19.09.13",
-  getHostInfo: async () => ({
-    dockerComposeVersion: "1.28.2",
-    dockerServerVersion: "20.10.5",
-    dockerCliVersion: "20.10.5",
-    os: "Debian",
-    versionCodename: "buster",
-    architecture: "amd64"
+  dockerEngineAndComposeUpdate: async () =>
+    "Successfully updated docker engine. Successfully updated docker compose",
+  dockerEngineUpdate: async () => "Updated",
+  dockerComposeUpdate: async () => "Updated",
+  dockerComposeUpdateRequirements: async () => ({
+    dockerComposeVersion: "1.25.4",
+    IsDockerComposeUpdateCompatible: true,
+    isDockerComposeUpgrade: false
+  }),
+  dockerEngineUpdateRequirements: async () => ({
+    hostInfo: {
+      dockerComposeVersion: "1.28.2",
+      dockerServerVersion: "20.10.5",
+      dockerCliVersion: "20.10.5",
+      os: "Debian",
+      versionCodename: "buster",
+      architecture: "amd64"
+    },
+    isArchitecture: true,
+    isDockerEngineUpdateCompatible: true,
+    isDockerEngineUpgrade: true,
+    isDockerSynchronized: false,
+    isOs: true,
+    isOsVersion: true
   }),
 
   portsToOpenGet: async () => [
