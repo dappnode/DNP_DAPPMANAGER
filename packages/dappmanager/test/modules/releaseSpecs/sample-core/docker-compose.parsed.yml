@@ -11,7 +11,7 @@ services:
         max-size: "10m"
     networks:
       local: {}
-      network:
+      dncore_network:
         aliases:
           - "s1.sample-core.dappnode"
     restart: always
@@ -28,7 +28,7 @@ services:
         max-size: "10m"
     networks:
       local: {}
-      network:
+      dncore_network:
         aliases:
           - "s2.sample-core.dappnode"
     restart: always
