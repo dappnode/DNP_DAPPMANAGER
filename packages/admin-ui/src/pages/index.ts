@@ -5,6 +5,7 @@ import * as packages from "./packages";
 import * as sdk from "./sdk";
 import * as support from "./support";
 import * as system from "./system";
+import * as wireguard from "./wireguard";
 
 export default {
   dashboard,
@@ -13,7 +14,8 @@ export default {
   packages,
   sdk,
   support,
-  system
+  system,
+  wireguard
 };
 
 export const defaultPage = dashboard;
