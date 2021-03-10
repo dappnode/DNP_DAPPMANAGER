@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import ipfsRaw from "../src/modules/ipfs/ipfsSetup";
+import { ipfs } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
 const Ipfs = require("ipfs-http-client");
 
@@ -20,7 +20,7 @@ type IpfsAddResult = {
  */
 async function ipfsAdd(content: any): Promise<IpfsAddResult> {
   const files = [];
-  for await (const file of ipfsRaw.add(content)) {
+  for await (const file of ipfs.ipfs.add(content)) {
     files.push(file);
   }
   return files.map(file => ({

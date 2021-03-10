@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import * as ipfs from "../modules/ipfs";
+import { ipfs } from "../modules/ipfs";
 
 /** Well-known hash that should always be available */
 const hash = "QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB";
@@ -12,7 +12,7 @@ export async function ipfsTest(): Promise<void> {
   await retry(
     async () => {
       try {
-        const file = await ipfs.catString({ hash });
+        const file = await ipfs.catString(hash);
         if (!file.includes(expectedString))
           throw Error("Resolved file does not include expected string");
       } catch (e) {
