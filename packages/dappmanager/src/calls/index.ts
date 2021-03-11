@@ -51,7 +51,6 @@ export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export { ipPublicGet } from "./ipPublicGet";
 export {
-  dockerEngineAndComposeUpdate,
   dockerEngineUpdate,
   dockerEngineUpdateRequirements,
   dockerComposeUpdate,

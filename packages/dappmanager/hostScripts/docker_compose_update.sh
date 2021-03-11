@@ -50,14 +50,14 @@ function install_docker_compose() {
   DCMP_URL="https://github.com/docker/compose/releases/download/${STABLE_DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)"
 
   # Paths
-  DCMP_PATH="/usr/local/bin/docker-compose"
+  DCMP_PATH="/usr/local/bin"
   mkdir -p $DCMP_PATH
 
   # STEP 1: Download file
-  "wget -q -O" "$DCMP_PATH" "$DCMP_URL"
+  wget -q -O "$DCMP_PATH/docker-compose" $DCMP_URL
 
   # Post installation
-  chmod +x $DCMP_PATH
+  chmod +x "$DCMP_PATH/docker-compose"
 }
 
 function post_install_check() {
@@ -78,7 +78,7 @@ if [[ $# -eq 1 ]]; then
   case "${flag}" in
     --install )
       check_requirements
-      install_docker_engine
+      install_docker_compose
       post_install_check
       echo "Updated docker compose to ${STABLE_DOCKER_COMPOSE_VERSION} successfully"
       exit 0
@@ -90,7 +90,7 @@ if [[ $# -eq 1 ]]; then
       exit 0
       ;;
     * )
-      echo "flag must be -i or -v" 
+      echo "flag must be --install or --version" 
       exit 1
       ;;
   esac

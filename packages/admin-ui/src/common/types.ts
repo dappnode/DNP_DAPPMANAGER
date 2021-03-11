@@ -1069,12 +1069,14 @@ export interface DockerEngineUpdateRequirement {
   title: string;
   isFulFilled: boolean;
   message: string;
+  errorMessage: string;
 }
 
 export interface DockerComposeUpdateRequirement {
   title: string;
   isFulFilled: boolean;
   message: string;
+  errorMessage: string;
 }
 
 export interface VolumeOwnershipData {

@@ -6,6 +6,7 @@ interface Item {
   isFulFilled?: boolean;
   title: string;
   message: string;
+  errorMessage?: string;
 }
 
 interface ListProps {
@@ -44,6 +45,11 @@ const List: React.FC<ListProps & React.HTMLAttributes<HTMLDivElement>> = ({
             <span className="message-container">
               <p>{item.message}</p>
             </span>
+            {!item.isFulFilled && item.errorMessage ? (
+              <span className="error-message-container">
+                <p>. {item.errorMessage}</p>
+              </span>
+            ) : null}
 
             {IconRight ? (
               <span className="icon-container-right">

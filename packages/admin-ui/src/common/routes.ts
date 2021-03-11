@@ -477,11 +477,6 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
-   * Updates docker engine and docker compose
-   */
-  dockerEngineAndComposeUpdate: () => Promise<string>;
-
-  /**
    * Updates docker engine
    */
   dockerEngineUpdate: () => Promise<string>;
@@ -621,7 +616,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerEngineUpdate: {},
   dockerEngineUpdateRequirements: {},
   dockerComposeUpdateRequirements: {},
-  dockerEngineAndComposeUpdate: {},
   dockerComposeUpdate: {},
   volumeRemove: { log: true },
   volumesGet: {},

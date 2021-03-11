@@ -1,6 +1,7 @@
 import {
   DockerComposeUpdateRequirement,
   DockerEngineUpdateRequirement,
+  DockerVersionsScript,
   HostInfoScript
 } from "../../common";
 import {
@@ -17,8 +18,7 @@ import {
   getIsDockerEngineUpgrade,
   getIsDockerSynchronized,
   getIsDockerComposeUpgrade,
-  getIsDockerEngineUpdateCompatible,
-  getIsDockerComposeUpdateCompatible
+  getIsDockerComposeStable
 } from "./utils";
 
 // Docker engine
@@ -26,7 +26,7 @@ import {
 /**
  * Updates docker engine
  */
-export async function dockerEngineUpdate(): Promise<string> {
+export async function scriptUpdateDockerEngine(): Promise<string> {
   try {
     return await updateDockerEngine();
   } catch (e) {
@@ -37,7 +37,7 @@ export async function dockerEngineUpdate(): Promise<string> {
 /**
  * Returns host info required to update docker engine.
  */
-export async function getDockerEngineUpdateRequirements(): Promise<
+export async function scriptGetDockerEngineUpdateRequirements(): Promise<
   DockerEngineUpdateRequirement[]
 > {
   try {
@@ -46,23 +46,20 @@ export async function getDockerEngineUpdateRequirements(): Promise<
       {
         title: "OS",
         isFulFilled: getIsOs(hostInfoRequirements.os),
-        message: `Your OS is: ${
-          hostInfoRequirements.os
-        }. OS allowed: ${params.VERSION_CODENAME.join(",")}`
+        message: `Your OS is: ${hostInfoRequirements.os}`,
+        errorMessage: `OS allowed: ${params.VERSION_CODENAME.join(",")}`
       },
       {
         title: "Version",
         isFulFilled: getIsOsVersion(hostInfoRequirements.versionCodename),
-        message: `Your version is: ${
-          hostInfoRequirements.versionCodename
-        }. Versions allowed: ${params.VERSION_CODENAME.join(",")}`
+        message: `Your version is: ${hostInfoRequirements.versionCodename}`,
+        errorMessage: `Versions allowed: ${params.VERSION_CODENAME.join(",")}`
       },
       {
         title: "Architecture",
         isFulFilled: getIsArchitecture(hostInfoRequirements.architecture),
-        message: `Your architecture is: ${
-          hostInfoRequirements.architecture
-        }. Architectures allowed: ${params.ARCHITECTURE.join(",")}`
+        message: `Your architecture is: ${hostInfoRequirements.architecture}`,
+        errorMessage: `Architectures allowed: ${params.ARCHITECTURE.join(",")}`
       },
       {
         title: "Upgrade",
@@ -70,7 +67,8 @@ export async function getDockerEngineUpdateRequirements(): Promise<
           hostInfoRequirements.versionCodename,
           hostInfoRequirements.dockerServerVersion
         ),
-        message: `Your current docker engine version is ${hostInfoRequirements.dockerServerVersion}`
+        message: `Your current docker engine version is ${hostInfoRequirements.dockerServerVersion}`,
+        errorMessage: `Downgrade not allowed`
       },
       {
         title: "Synchronization",
@@ -78,14 +76,16 @@ export async function getDockerEngineUpdateRequirements(): Promise<
           hostInfoRequirements.dockerServerVersion,
           hostInfoRequirements.dockerCliVersion
         ),
-        message: `Docker server version: ${hostInfoRequirements.dockerServerVersion}. Docker cli version ${hostInfoRequirements.dockerCliVersion}`
+        message: `Docker server version: ${hostInfoRequirements.dockerServerVersion}. Docker cli version ${hostInfoRequirements.dockerCliVersion}`,
+        errorMessage: `Both versions must be equal`
       },
       {
         title: "Compatibility",
-        isFulFilled: getIsDockerEngineUpdateCompatible(
+        isFulFilled: getIsDockerComposeStable(
           hostInfoRequirements.dockerComposeVersion
         ),
-        message: `Docker engine version: ${hostInfoRequirements.dockerServerVersion}. Docker compose version: ${hostInfoRequirements.dockerComposeVersion}`
+        message: `Docker engine version: ${hostInfoRequirements.dockerServerVersion}. Docker compose version: ${hostInfoRequirements.dockerComposeVersion}`,
+        errorMessage: `Both versions must be compatible. Please, first update docker compose`
       }
     ];
   } catch (e) {
@@ -98,7 +98,7 @@ export async function getDockerEngineUpdateRequirements(): Promise<
 /**
  * Updates docker compose
  */
-export async function dockerComposeUpdate(): Promise<string> {
+export async function scriptUpdateDockerCompose(): Promise<string> {
   try {
     return await updateDockerCompose();
   } catch (e) {
@@ -109,25 +109,19 @@ export async function dockerComposeUpdate(): Promise<string> {
 /**
  * Returns docker-compose version
  */
-export async function getDockerComposeUpdateRequirements(): Promise<
+export async function scriptGetDockerComposeUpdateRequirements(): Promise<
   DockerComposeUpdateRequirement[]
 > {
   try {
-    const dockerVersions = await getDockerComposeVersion();
+    const dockerVersions: DockerVersionsScript = await getDockerComposeVersion();
     return [
       {
         title: "Upgrade",
         isFulFilled: getIsDockerComposeUpgrade(
           dockerVersions.dockerComposeVersion
         ),
-        message: `Your current docker compose version is ${dockerVersions.dockerComposeVersion}`
-      },
-      {
-        title: "Compatibility",
-        isFulFilled: getIsDockerComposeUpdateCompatible(
-          dockerVersions.dockerServerVersion
-        ),
-        message: `Docker engine version: ${dockerVersions.dockerServerVersion}. Docker compose version: ${dockerVersions.dockerComposeVersion}`
+        message: `Your current docker compose version is ${dockerVersions.dockerComposeVersion}`,
+        errorMessage: `Downgrade not allowed`
       }
     ];
   } catch (e) {

@@ -153,9 +153,9 @@ function install_docker_engine(){
   mkdir -p "$DOCKER_ENGINE_PATH/bin/docker"
 
   # STEP 1: Download files
-  "wget -q -O" "$DOCKER_PKG_PATH" "$DOCKER_PKG_URL"
-  "wget -q -O" "$DOCKER_CLI_PATH" "$DOCKER_CLI_URL"
-  "wget -q -O" "$DOCKER_CONTAINERD_PATH" "$DOCKER_CONTAINERD_URL"
+  wget -q -O $DOCKER_PKG_PATH $DOCKER_PKG_URL
+  wget -q -O $DOCKER_CLI_PATH $DOCKER_CLI_URL
+  wget -q -O $DOCKER_CONTAINERD_PATH $DOCKER_CONTAINERD_URL
 
   # STEP 2: Install packages
   dpkg -i $DOCKER_CONTAINERD_PATH
@@ -216,7 +216,7 @@ if [[ $# -eq 1 ]]; then
       exit 0
       ;;
     * )
-      echo "flag must be -i, -v or -s" 
+      echo "flag must be --install, or --print-host-info" 
       exit 1
       ;;
   esac

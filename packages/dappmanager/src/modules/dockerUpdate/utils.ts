@@ -34,38 +34,7 @@ export const getIsDockerComposeUpgrade = (
 ): boolean =>
   semver.lt(hostDockerComposeVersion, params.STABLE_DOCKER_COMPOSE_VERSION);
 
-export const getIsDockerEngineUpdateCompatible = (
+export const getIsDockerComposeStable = (
   hostDockerComposeVersion: string
-): boolean => {
-  // Check if update is compatible with docker compose
-  const arrayDockerComposeVersions = params.COMPATIBILITY_COMPOSE_ENGINE.map(
-    group => group.dockerComposeVersion
-  );
-  for (const [index, version] of arrayDockerComposeVersions.entries()) {
-    if (semver.gt(version, hostDockerComposeVersion)) {
-      return semver.satisfies(
-        hostDockerComposeVersion,
-        `${arrayDockerComposeVersions[index - 1]} - ${version}`
-      );
-    }
-  }
-  return false;
-};
-
-export const getIsDockerComposeUpdateCompatible = (
-  hostDockerEngineVersion: string
-): boolean => {
-  // Check if update is compatible with docker engine
-  const arrayDockerEngineVersions = params.COMPATIBILITY_COMPOSE_ENGINE.map(
-    group => group.dockerEngineVersion
-  );
-  for (const [index, version] of arrayDockerEngineVersions.entries()) {
-    if (semver.gt(version, hostDockerEngineVersion)) {
-      return semver.satisfies(
-        hostDockerEngineVersion,
-        `${arrayDockerEngineVersions[index - 1]} - ${version}`
-      );
-    }
-  }
-  return false;
-};
+): boolean =>
+  !semver.lt(hostDockerComposeVersion, params.STABLE_DOCKER_COMPOSE_VERSION);

@@ -4,9 +4,12 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import "./dockerManager.scss";
 import List from "components/List";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import {
+  MdInfoOutline,
+  MdRadioButtonChecked,
+  MdRadioButtonUnchecked
+} from "react-icons/md";
 
 function UpdateDockerCompose({
   composeUpdateRequirements
@@ -57,12 +60,12 @@ function UpdateDockerCompose({
           Update docker compose
         </Button>
       ) : (
-        <Ok
-          ok={false}
-          msg={
-            "Docker compose update not allowed. You must fullfill the requirements"
-          }
-        />
+        <div>
+          <MdInfoOutline />
+          <p>
+            Docker compose update not allowed. You must fulfill the requirements
+          </p>
+        </div>
       )}
       {reqUpdateComposeStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker compose"} />
@@ -88,11 +91,11 @@ export default function DockerComposeManager() {
     ReqStatus<DockerComposeUpdateRequirement[]>
   >({});
 
-  async function fetchDockerComposeVersion() {
+  async function fetchComposeUpdateRequirements() {
     try {
       setReqGetComposeVersionStatus({ loading: true });
-      const version = await api.dockerComposeUpdateRequirements();
-      setReqGetComposeVersionStatus({ result: version });
+      const requirements = await api.dockerComposeUpdateRequirements();
+      setReqGetComposeVersionStatus({ result: requirements });
     } catch (e) {
       setReqGetComposeVersionStatus({ error: e });
       console.error(`Error on docker_compose_update.sh script: --version`, e);
@@ -112,7 +115,7 @@ export default function DockerComposeManager() {
           reqGetComposeVersionStatus.loading ||
           reqGetComposeVersionStatus.result !== undefined
         }
-        onClick={() => fetchDockerComposeVersion()}
+        onClick={() => fetchComposeUpdateRequirements()}
       >
         Check requirements
       </Button>

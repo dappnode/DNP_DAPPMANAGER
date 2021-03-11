@@ -5,9 +5,12 @@ import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import { DockerEngineUpdateRequirement } from "common";
-import "./dockerManager.scss";
 import List from "components/List";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import {
+  MdInfoOutline,
+  MdRadioButtonChecked,
+  MdRadioButtonUnchecked
+} from "react-icons/md";
 
 function UpdateDockerEngine({
   updateEngineRequirements
@@ -58,12 +61,12 @@ function UpdateDockerEngine({
           Update docker engine
         </Button>
       ) : (
-        <Ok
-          ok={false}
-          msg={
-            "Docker engine update not allowed. You must fullfill the requirements"
-          }
-        />
+        <div>
+          <MdInfoOutline />
+          <p>
+            Docker engine update not allowed. You must fulfill the requirementss
+          </p>
+        </div>
       )}
       {reqUpdateEngineStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker engine"} />

@@ -60,42 +60,46 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
-  dockerEngineAndComposeUpdate: async () =>
-    "Successfully updated docker engine. Successfully updated docker compose",
   dockerEngineUpdate: async () => "Updated",
   dockerComposeUpdate: async () => "Updated",
   dockerComposeUpdateRequirements: async () => [
     {
       isFulFilled: true,
       title: "Upgrade",
-      message: "Illegal to upgrade compose"
+      message: "Illegal to upgrade compose",
+      errorMessage: "Downgrades not allowed"
     },
     {
       isFulFilled: true,
       title: "Compatibility",
-      message: "Engine and compose compatible"
+      message: "Engine and compose compatible",
+      errorMessage: "Must be compatible"
     }
   ],
   dockerEngineUpdateRequirements: async () => [
     {
       isFulFilled: false,
       title: "Upgrade",
-      message: "Illegal to upgrade compose"
+      message: "Docker version is 18.08.09",
+      errorMessage: "DOwngrade not allowed"
     },
     {
       isFulFilled: true,
       title: "Architecture",
-      message: "Architecture must be arm64 or amd64"
+      message: "Architecture is amd64",
+      errorMessage: "Architecture must be arm64 or amd64"
     },
     {
-      isFulFilled: true,
+      isFulFilled: false,
       title: "OS",
-      message: "Os must be debian"
+      message: "Your OS is ubuntu",
+      errorMessage: "Os must be debian"
     },
     {
       isFulFilled: false,
       title: "Version",
-      message: "Version must be buster"
+      message: "version jessie",
+      errorMessage: "Version must be buster"
     }
   ],
 

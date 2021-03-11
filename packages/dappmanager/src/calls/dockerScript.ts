@@ -1,6 +1,8 @@
 import {
-  getDockerEngineUpdateRequirements,
-  getDockerComposeUpdateRequirements
+  scriptUpdateDockerEngine,
+  scriptGetDockerEngineUpdateRequirements,
+  scriptUpdateDockerCompose,
+  scriptGetDockerComposeUpdateRequirements
 } from "../modules/dockerUpdate";
 import {
   DockerComposeUpdateRequirement,
@@ -8,19 +10,10 @@ import {
 } from "../types";
 
 /**
- * Updates engine and compose
- */
-export async function dockerEngineAndComposeUpdate(): Promise<string> {
-  const engineUpdate = await dockerEngineUpdate();
-  const composeUpdate = await dockerComposeUpdate();
-  return engineUpdate + composeUpdate;
-}
-
-/**
  * Updates docker engine
  */
 export async function dockerEngineUpdate(): Promise<string> {
-  return await dockerEngineUpdate();
+  return await scriptUpdateDockerEngine();
 }
 
 /**
@@ -29,14 +22,14 @@ export async function dockerEngineUpdate(): Promise<string> {
 export async function dockerEngineUpdateRequirements(): Promise<
   DockerEngineUpdateRequirement[]
 > {
-  return await getDockerEngineUpdateRequirements();
+  return await scriptGetDockerEngineUpdateRequirements();
 }
 
 /**
  * Updates docker compose
  */
 export async function dockerComposeUpdate(): Promise<string> {
-  return await dockerComposeUpdate();
+  return await scriptUpdateDockerCompose();
 }
 
 /**
@@ -45,5 +38,5 @@ export async function dockerComposeUpdate(): Promise<string> {
 export async function dockerComposeUpdateRequirements(): Promise<
   DockerComposeUpdateRequirement[]
 > {
-  return await getDockerComposeUpdateRequirements();
+  return await scriptGetDockerComposeUpdateRequirements();
 }
