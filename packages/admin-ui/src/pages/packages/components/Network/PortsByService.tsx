@@ -32,10 +32,11 @@ export function PortsByService({
     setPorts(
       [...(portsFromDnp || [])]
         .filter(({ host }) => host)
-        .sort((a, b) => a.container - b.container)
-        .sort((a, b) =>
-          a.deletable && !b.deletable ? 1 : !a.deletable && b.deletable ? -1 : 0
-        )
+        .sort((a, b) => {
+          if (a.deletable && !b.deletable) return 1;
+          if (!a.deletable && b.deletable) return -1;
+          return a.container - b.container;
+        })
     );
   }, [portsFromDnp]);
 

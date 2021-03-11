@@ -88,22 +88,18 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
         {/* Container display */}
         {showAll &&
-          [...dnp.containers]
-            .sort((a, b) => a.serviceName.localeCompare(b.serviceName))
-            .map(container => (
-              <React.Fragment key={container.serviceName}>
-                <StateBadgeContainer container={container} />
-                <span className="name">{sn(container.serviceName)}</span>
-                {container.running ? (
-                  <MdPauseCircleOutline
-                    onClick={() => onStartStop(container)}
-                  />
-                ) : (
-                  <MdPlayCircleOutline onClick={() => onStartStop(container)} />
-                )}
-                <MdRefresh onClick={() => onRestart(container)} />
-              </React.Fragment>
-            ))}
+          dnp.containers.map(container => (
+            <React.Fragment key={container.serviceName}>
+              <StateBadgeContainer container={container} />
+              <span className="name">{sn(container.serviceName)}</span>
+              {container.running ? (
+                <MdPauseCircleOutline onClick={() => onStartStop(container)} />
+              ) : (
+                <MdPlayCircleOutline onClick={() => onStartStop(container)} />
+              )}
+              <MdRefresh onClick={() => onRestart(container)} />
+            </React.Fragment>
+          ))}
       </div>
 
       {!showAll && <StateBadgeLegend dnps={[dnp]} />}

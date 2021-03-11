@@ -8,7 +8,7 @@ import { HttpsMappings } from "./HttpsMappings";
 import "./network.scss";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName).sort();
+  const serviceNames = containers.map(c => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const container = containers.find(c => c.serviceName === serviceName);
   return (
