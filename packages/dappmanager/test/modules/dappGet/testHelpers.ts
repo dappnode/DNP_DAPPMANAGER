@@ -1,5 +1,5 @@
 import "mocha";
-import * as safeSemver from "../../../src/modules/dappGet/utils/safeSemver";
+import { safeSemver } from "../../../src/modules/dappGet/utils/safeSemver";
 import { Dependencies, PackageRequest } from "../../../src/types";
 import { DappGetFetcher } from "../../../src/modules/dappGet/fetch";
 import { DappGetState, DappGetDnps } from "../../../src/modules/dappGet/types";

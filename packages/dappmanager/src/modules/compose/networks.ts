@@ -1,20 +1,16 @@
 import { ComposeServiceNetworks, ComposeServiceNetworksObj } from "../../types";
 
 /**
- * Parse service networks as object form
+ * Parse service networks to object form
  * @param networks
  */
 export function parseServiceNetworks(
   networks: ComposeServiceNetworks
 ): ComposeServiceNetworksObj {
   if (Array.isArray(networks)) {
-    return networks.reduce(
-      (networksObj, networkName) => ({
-        ...networksObj,
-        [networkName]: {}
-      }),
-      {} as ComposeServiceNetworksObj
-    );
+    const networksObj: ComposeServiceNetworksObj = {};
+    for (const networkName of networks) networksObj[networkName] = {};
+    return networksObj;
   } else {
     return networks;
   }

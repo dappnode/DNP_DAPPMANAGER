@@ -1,3 +1,4 @@
+import { PortProtocol } from "types";
 import { MockDnp } from "./types";
 
 const dnpName = "multi-service.dnp.dappnode.eth";
@@ -96,7 +97,7 @@ export const multiService: MockDnp = {
         {
           container: 8088,
           host: 8088,
-          protocol: "TCP"
+          protocol: PortProtocol.TCP
         }
       ],
       volumes: [
@@ -115,12 +116,12 @@ export const multiService: MockDnp = {
         {
           container: 6001,
           host: 6001,
-          protocol: "TCP"
+          protocol: PortProtocol.TCP
         },
         {
           container: 6002,
           host: 6002,
-          protocol: "TCP"
+          protocol: PortProtocol.TCP
         }
       ],
       volumes: [

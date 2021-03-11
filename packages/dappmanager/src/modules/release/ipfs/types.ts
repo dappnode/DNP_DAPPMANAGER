@@ -1,8 +1,8 @@
-export type Format = "JSON" | "YAML" | "TEXT";
+import { FileFormat } from "../../../types";
 
 export interface FileConfig {
   regex: RegExp;
-  format: Format;
+  format: FileFormat;
   maxSize: number;
   required: boolean;
   multiple: boolean;

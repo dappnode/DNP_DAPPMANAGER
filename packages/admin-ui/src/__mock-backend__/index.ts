@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -68,7 +68,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsToOpenGet: async () => [
     {
       portNumber: 8092,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       serviceName: "validator",
       dnpName: "Prysm"
     }
@@ -76,14 +76,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsUpnpStatusGet: async () => [
     {
       port: 8092,
-      protocol: "UDP",
+      protocol: PortProtocol.UDP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
@@ -92,14 +92,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsApiStatusGet: async () => [
     {
       port: 8092,
-      protocol: "UDP",
+      protocol: PortProtocol.UDP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"

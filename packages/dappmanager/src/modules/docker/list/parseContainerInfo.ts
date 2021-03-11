@@ -74,7 +74,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
         // "PublicPort" will be undefined / null / 0 if the port is not mapped
         ...(PublicPort ? { host: PublicPort } : {}),
         container: PrivatePort,
-        protocol: (Type === "udp" ? "UDP" : "TCP") as PortProtocol
+        protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP
       })
     ).map(
       (port): PortMapping => ({

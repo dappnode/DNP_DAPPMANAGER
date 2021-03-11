@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { PackageContainer } from "../../../src/types";
+import { PackageContainer, PortProtocol } from "../../../src/types";
 import { parseContainerInfo } from "../../../src/modules/docker/list/parseContainerInfo";
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
 
@@ -26,7 +26,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [
           {
             container: 80,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           }
         ],
@@ -60,13 +60,13 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 443,
             container: 443,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             host: 80,
             container: 80,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           }
         ],
@@ -180,12 +180,12 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 8090,
             container: 8090,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             container: 80,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           }
         ],
@@ -222,7 +222,7 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 1194,
             container: 1194,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: true
           }
         ],
@@ -323,7 +323,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [
           {
             container: 53,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: true
           }
         ],
@@ -360,19 +360,19 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 30303,
             container: 30303,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: false
           },
           {
             host: 30303,
             container: 30303,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: false
           },
           {
             host: 30304,
             container: 30304,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: false
           }
         ],
@@ -403,17 +403,17 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 30303,
             container: 30303,
-            protocol: "TCP"
+            protocol: PortProtocol.TCP
           },
           {
             host: 30303,
             container: 30303,
-            protocol: "UDP"
+            protocol: PortProtocol.UDP
           },
           {
             host: 30304,
             container: 30304,
-            protocol: "UDP"
+            protocol: PortProtocol.UDP
           }
         ],
         defaultVolumes: [
@@ -450,29 +450,29 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [
           {
             container: 5001,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             container: 8080,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             container: 8081,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             host: 4001,
             container: 4001,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: false
           },
           {
             host: 4002,
             container: 4002,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: false
           }
         ],
@@ -498,12 +498,12 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 4001,
             host: 4001,
-            protocol: "TCP"
+            protocol: PortProtocol.TCP
           },
           {
             container: 4002,
             host: 4002,
-            protocol: "UDP"
+            protocol: PortProtocol.UDP
           }
         ],
         dependencies: {},
@@ -550,13 +550,13 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 30399,
             container: 30399,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             host: 30399,
             container: 30399,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: true
           }
         ],
@@ -668,19 +668,19 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: 32769,
             container: 30303,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             host: 32771,
             container: 30303,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: true
           },
           {
             host: 32770,
             container: 30304,
-            protocol: "UDP",
+            protocol: PortProtocol.UDP,
             deletable: true
           }
         ],
@@ -717,18 +717,18 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [
           {
             container: 80,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             host: 9735,
             container: 9735,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             container: 10009,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           }
         ],
@@ -766,12 +766,12 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [
           {
             container: 8000,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           },
           {
             container: 8080,
-            protocol: "TCP",
+            protocol: PortProtocol.TCP,
             deletable: true
           }
         ],

@@ -1,13 +1,13 @@
+import { FileFormat } from "../../../types";
 import { yamlParse } from "../../../utils/yaml";
-import { Format } from "./types";
 
-export function parseAsset<T>(data: string, format: Format): T {
+export function parseAsset<T>(data: string, format: FileFormat): T {
   switch (format) {
-    case "YAML":
+    case FileFormat.YAML:
       return yamlParse(data);
-    case "JSON":
+    case FileFormat.JSON:
       return jsonParse(data);
-    case "TEXT":
+    case FileFormat.TEXT:
       return (data as unknown) as T;
     default:
       throw Error(`Attempting to parse unknown format ${format}`);

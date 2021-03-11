@@ -3,6 +3,7 @@ import { ipfs } from "../../ipfs";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
 import { validateAsset, DirectoryFiles } from "./params";
+import { FileFormat } from "../../../types";
 
 interface FileData {
   hash: string;
@@ -36,7 +37,7 @@ export async function downloadAssetRequired<T>(
   fileId: keyof DirectoryFiles
 ): Promise<T> {
   const maxLength = config.maxSize;
-  const format = config.format || "TEXT";
+  const format = config.format || FileFormat.TEXT;
   const validate = validateAsset[fileId];
 
   const hash = file.hash;
