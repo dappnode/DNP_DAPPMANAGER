@@ -614,13 +614,14 @@ export interface ComposeNetwork {
 
 export interface ComposeNetworks {
   /** networkName: "dncore_network" */
-  [networkName: string]: ComposeNetwork;
+  [networkName: string]: ComposeNetwork | null;
 }
 
 export interface ComposeVolume {
   // FORBIDDEN
   // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
   // NOT allowed to user, only used by DAppNode internally (if any)
+  external?: boolean;
   name?: string; // Volumes can only be declared locally or be external
   driver?: string; // Dangerous
   driver_opts?:
@@ -631,7 +632,7 @@ export interface ComposeVolume {
 
 export interface ComposeVolumes {
   /** volumeName: "dncore_ipfsdnpdappnodeeth_data" */
-  [volumeName: string]: ComposeVolume;
+  [volumeName: string]: ComposeVolume | null;
 }
 
 export interface Compose {
