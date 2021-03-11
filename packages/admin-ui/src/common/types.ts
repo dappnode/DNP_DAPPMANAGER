@@ -54,13 +54,11 @@ export type VpnDeviceCredentials = VpnDevice & {
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
-/**
- * ==============
- * ==============
- * ADMIN
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// ADMIN
+// ==============
+// ==============
 
 /**
  * [NOTE] Items MUST be ordered by the directory order
@@ -304,15 +302,16 @@ export interface ProgressLogsByDnp {
   [dnpName: string]: ProgressLogs;
 }
 
-/**
- * ==============
- * ==============
- * DAPPMANAGER
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// DAPPMANAGER
+// ==============
+// ==============
 
-export type PortProtocol = "UDP" | "TCP";
+export enum PortProtocol {
+  UDP = "UDP",
+  TCP = "TCP"
+}
 
 interface BasicPortMapping {
   host?: number;
@@ -537,6 +536,8 @@ interface ManifestImage {
   volumes?: string[];
   ports?: string[];
   environment?: string[];
+  /** FORBIDDEN FEATURE */
+  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];

@@ -1,4 +1,3 @@
-import parseGeneralErrors from "./parseGeneralErrors";
 import { PortProtocol } from "../../types";
 import { UpnpPortMapping } from "./types";
 
@@ -73,7 +72,7 @@ export default function parseListOutput(
         const exPort = mapping.split("->")[0];
         const [ip, inPort] = (mapping.split("->")[1] || "").split(":");
         return {
-          protocol: (protocol === "UDP" ? "UDP" : "TCP") as PortProtocol,
+          protocol: protocol === "UDP" ? PortProtocol.UDP : PortProtocol.TCP,
           exPort,
           inPort,
           ip
@@ -81,10 +80,7 @@ export default function parseListOutput(
       })
       // Make sure each result is correct, otherwise remove it
       .filter(
-        ({ protocol, exPort, inPort }) =>
-          (protocol === "UDP" || protocol === "TCP") &&
-          !isNaN(Number(exPort)) &&
-          !isNaN(Number(inPort))
+        ({ exPort, inPort }) => !isNaN(Number(exPort)) && !isNaN(Number(inPort))
       )
   );
 }

@@ -1,5 +1,10 @@
 import path from "path";
-import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
+import {
+  Architecture,
+  EthClientTargetPackage,
+  UserSettings,
+  FileFormat
+} from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -287,92 +292,83 @@ export const getContainerName = ({
 
 // From SDK, must be in sync
 
-// Declare true as true for conditional static types to work
-const TRUE: true = true;
-const FALSE: false = false;
-const FORMAT = {
-  JSON: "JSON" as "JSON",
-  YAML: "YAML" as "YAML",
-  TEXT: "TEXT" as "TEXT"
-};
-
 export const releaseFiles = {
   manifest: {
     regex: /dappnode_package.*\.json$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3, // Limit size to ~100KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   compose: {
     regex: /compose.*\.yml$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3, // Limit size to ~10KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   avatar: {
     regex: /avatar.*\.png$/,
     format: null,
     maxSize: 100e3,
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   setupWizard: {
     regex: /setup-wizard\..*(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupSchema: {
     regex: /setup\..*\.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupTarget: {
     regex: /setup-target\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupUiJson: {
     regex: /setup-ui\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   disclaimer: {
     regex: /disclaimer\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   gettingStarted: {
     regex: /getting.*started\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   prometheusTargets: {
     regex: /.*prometheus-targets.(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   grafanaDashboards: {
     regex: /.*grafana-dashboard.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e6, // ~ 10MB
-    required: FALSE,
-    multiple: TRUE
+    required: false as const,
+    multiple: true as const
   }
 };
 

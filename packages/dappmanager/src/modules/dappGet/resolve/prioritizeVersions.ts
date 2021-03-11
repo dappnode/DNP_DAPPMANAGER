@@ -1,4 +1,4 @@
-import * as safeSemver from "../utils/safeSemver";
+import { safeSemver } from "../utils/safeSemver";
 import { getVersionsFromDnp } from "../utils/dnpUtils";
 import { DappGetDnp } from "../types";
 

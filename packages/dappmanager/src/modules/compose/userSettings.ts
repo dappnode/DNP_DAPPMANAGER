@@ -90,7 +90,7 @@ export const parseUserSettingsFns: {
 export function parseUserSettings(compose: Compose): UserSettings {
   const userSettings = mapValues(parseUserSettingsFns, parseUserSettingsFn =>
     parseUserSettingsFn(compose)
-  ) as UserSettings;
+  );
   // Ignore objects that are empty to make tests and payloads cleaner
   return omitBy(
     userSettings,

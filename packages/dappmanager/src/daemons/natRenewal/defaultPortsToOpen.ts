@@ -1,19 +1,20 @@
+import { PortProtocol } from "../../common";
 import { PackagePort } from "../../types";
 
 // Default ports to open in case getPortsToOpen throws
 const defaultPortsToOpen: PackagePort[] = [
   // - OpenVPN: 1194 UDP
-  { protocol: "UDP", portNumber: 1194 },
+  { protocol: PortProtocol.UDP, portNumber: 1194 },
   // - SSH: 22 TCP (Ignore)
   // {protocol: 'TCP', portNumber: 22},
   // - Alt HTTP: 8080 TCP
-  { protocol: "TCP", portNumber: 8090 },
+  { protocol: PortProtocol.TCP, portNumber: 8090 },
   // - ETH: 30303 TCP, 30303 UDP
-  { protocol: "TCP", portNumber: 30303 },
-  { protocol: "UDP", portNumber: 30303 },
+  { protocol: PortProtocol.TCP, portNumber: 30303 },
+  { protocol: PortProtocol.UDP, portNumber: 30303 },
   // - IPFS: 4001 TCP, 4002 UDP
-  { protocol: "TCP", portNumber: 4001 },
-  { protocol: "UDP", portNumber: 4002 }
+  { protocol: PortProtocol.TCP, portNumber: 4001 },
+  { protocol: PortProtocol.UDP, portNumber: 4002 }
 ];
 
 export default defaultPortsToOpen;

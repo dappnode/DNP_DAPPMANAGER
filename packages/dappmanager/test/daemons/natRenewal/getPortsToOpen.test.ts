@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { PackageContainer } from "../../../src/types";
+import { PackageContainer, PortProtocol } from "../../../src/types";
 
 // imports for typings
 import { mockContainer } from "../../testUtils";
@@ -15,21 +15,21 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         ...mockContainer,
         isCore: true,
         dnpName: "admin.dnp.dappnode.eth",
-        ports: [{ container: 80, host: 8090, protocol: "TCP" }],
+        ports: [{ container: 80, host: 8090, protocol: PortProtocol.TCP }],
         running: true
       },
       {
         ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth",
-        ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
+        ports: [{ container: 1194, host: 1194, protocol: PortProtocol.UDP }],
         running: true
       },
       {
         ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth2",
-        ports: [{ container: 1194, host: 1194, protocol: "UDP" }],
+        ports: [{ container: 1194, host: 1194, protocol: PortProtocol.UDP }],
         running: true
       },
       {
@@ -37,9 +37,9 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         isCore: false,
         dnpName: "goerli.dnp.dappnode.eth",
         ports: [
-          { container: 30303, host: 32769, protocol: "TCP" },
-          { container: 30303, host: 32771, protocol: "UDP" },
-          { container: 30304, host: 32770, protocol: "UDP" }
+          { container: 30303, host: 32769, protocol: PortProtocol.TCP },
+          { container: 30303, host: 32771, protocol: PortProtocol.UDP },
+          { container: 30304, host: 32770, protocol: PortProtocol.UDP }
         ],
         running: true
       },
@@ -66,8 +66,8 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
       }
     });
     compose.services()[stoppedDnp].setPortMapping([
-      { host: 4001, container: 4001, protocol: "UDP" },
-      { host: 4001, container: 4001, protocol: "TCP" }
+      { host: 4001, container: 4001, protocol: PortProtocol.UDP },
+      { host: 4001, container: 4001, protocol: PortProtocol.TCP }
     ]);
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
@@ -122,7 +122,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
           ...mockContainer,
           isCore: true,
           dnpName: "admin.dnp.dappnode.eth",
-          ports: [{ container: 80, host: 8090, protocol: "TCP" }],
+          ports: [{ container: 80, host: 8090, protocol: PortProtocol.TCP }],
           running: true
         },
         {
