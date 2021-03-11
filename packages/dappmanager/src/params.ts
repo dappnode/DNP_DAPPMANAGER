@@ -129,7 +129,9 @@ const params = {
   IPFS_TIMEOUT: 0.5 * MINUTE,
 
   // Web3 parameters
-  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
+  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
+  ETH_MAINNET_RPC_URL_REMOTE:
+    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -155,10 +157,6 @@ const params = {
   DYNDNS_HOST: "https://ns.dappnode.io",
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
-
-  // DAppNode remote fullnode service
-  REMOTE_MAINNET_RPC_URL:
-    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",

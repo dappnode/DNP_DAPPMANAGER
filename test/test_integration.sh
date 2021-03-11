@@ -17,7 +17,6 @@ docker-compose down --timeout 0 --volumes
 # cp dappnode_package.json $DAPPNODE_DIR
 
 # docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml build
-# WEB3_HOST_WS
 # # Run test
 # ##########
 # docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml up -d

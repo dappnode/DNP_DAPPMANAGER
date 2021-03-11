@@ -30,7 +30,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     dappmanagerNaclPublicKey: db.naclPublicKey.get(),
     // From seedPhrase: If it's not stored yet, it's an empty string
     identityAddress: db.identityAddress.get(),
-    // Eth provider configured URL, if empty will default to WEB3_HOST
+    // Eth provider configured URL
     ethClientTarget,
     ethClientStatus: ethClientTarget
       ? db.ethClientStatus.get(ethClientTarget)
