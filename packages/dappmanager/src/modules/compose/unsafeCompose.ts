@@ -88,10 +88,12 @@ export function parseUnsafeCompose(
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),
         dns: params.DNS_SERVICE, // Common DAppNode ENS
-        networks: parseUnsafeServiceNetworks(serviceUnsafe.networks, isCore, {
-          serviceName,
-          dnpName
-        })
+        networks: parseUnsafeServiceNetworks(
+          serviceUnsafe.networks,
+          composeUnsafe.networks,
+          isCore,
+          { serviceName, dnpName }
+        )
       })
     ),
 
@@ -102,16 +104,20 @@ export function parseUnsafeCompose(
 }
 
 function parseUnsafeServiceNetworks(
-  networks: ComposeServiceNetworks | undefined,
+  serviceNetworks: ComposeServiceNetworks | undefined,
+  composeNetworks: ComposeNetworks | undefined = {},
   isCore: boolean,
   service: { serviceName: string; dnpName: string }
 ): ComposeServiceNetworks {
   // TODO: See note in parseUnsafeNetworks() about name property
-  const dnpPrivateNetworkName = isCore
-    ? params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE
-    : params.DNP_PRIVATE_NETWORK_NAME;
+  const isDncoreNetworkDeclared =
+    composeNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
+  const dnpPrivateNetworkName =
+    isCore && isDncoreNetworkDeclared
+      ? params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE
+      : params.DNP_PRIVATE_NETWORK_NAME;
 
-  const networksObj = parseServiceNetworks(networks || {});
+  const networksObj = parseServiceNetworks(serviceNetworks || {});
 
   // Only allow customizing config for core packages
   const dnpPrivateNetwork = isCore ? networksObj[dnpPrivateNetworkName] : {};
