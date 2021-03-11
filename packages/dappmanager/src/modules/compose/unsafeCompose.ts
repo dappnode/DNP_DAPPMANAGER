@@ -165,7 +165,7 @@ function parseUnsafeVolumes(
 
   // External volumes are not allowed
   for (const [volName, vol] of Object.entries(volumes)) {
-    if ((vol as { external: boolean }).external)
+    if (vol && vol.external)
       throw Error(`External volumes are not allowed '${volName}'`);
   }
 
