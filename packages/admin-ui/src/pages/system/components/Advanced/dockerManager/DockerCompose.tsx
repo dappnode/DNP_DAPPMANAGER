@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { DockerComposeUpdateRequirements, ReqStatus } from "types";
+import { DockerComposeUpdateRequirement, ReqStatus } from "types";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import "./dockerManager.scss";
+import List from "components/List";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerCompose({
   composeUpdateRequirements
 }: {
-  composeUpdateRequirements: DockerComposeUpdateRequirements;
+  composeUpdateRequirements: DockerComposeUpdateRequirement[];
 }) {
   const [reqUpdateComposeStatus, setReqUpdateComposeStatus] = useState<
     ReqStatus<string>
@@ -36,21 +38,15 @@ function UpdateDockerCompose({
 
   return (
     <>
-      <div className="checkbox-docker-compose-update">
-        <input
-          id="isUpgrade"
-          readOnly={true}
-          type="checkbox"
-          checked={composeUpdateRequirements.isDockerComposeUpgrade}
-        ></input>
-        <label htmlFor={"test"}>
-          {`Current compose version: ${composeUpdateRequirements.dockerComposeVersion}` +
-          !composeUpdateRequirements.isDockerComposeUpgrade
-            ? `Downgrade is not allowed`
-            : ""}
-        </label>
-      </div>
-      {composeUpdateRequirements.isDockerComposeUpgrade ? (
+      <List
+        listTitle="Update docker compose requirements"
+        items={composeUpdateRequirements}
+        IconLeft={MdRadioButtonChecked}
+        IconLeftFalse={MdRadioButtonUnchecked}
+      />
+      {composeUpdateRequirements.every(
+        requirement => requirement.isFulFilled === true
+      ) ? (
         <Button
           disabled={
             reqUpdateComposeStatus.loading ||
@@ -89,7 +85,7 @@ function UpdateDockerCompose({
 export default function DockerComposeManager() {
   // Docker compose
   const [reqGetComposeVersionStatus, setReqGetComposeVersionStatus] = useState<
-    ReqStatus<DockerComposeUpdateRequirements>
+    ReqStatus<DockerComposeUpdateRequirement[]>
   >({});
 
   async function fetchDockerComposeVersion() {

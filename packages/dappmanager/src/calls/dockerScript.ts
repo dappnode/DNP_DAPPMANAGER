@@ -3,8 +3,8 @@ import {
   getDockerComposeUpdateRequirements
 } from "../modules/dockerUpdate";
 import {
-  DockerComposeUpdateRequirements,
-  DockerEngineUpdateRequirements
+  DockerComposeUpdateRequirement,
+  DockerEngineUpdateRequirement
 } from "../types";
 
 /**
@@ -27,7 +27,7 @@ export async function dockerEngineUpdate(): Promise<string> {
  * Docker engine requirements
  */
 export async function dockerEngineUpdateRequirements(): Promise<
-  DockerEngineUpdateRequirements
+  DockerEngineUpdateRequirement[]
 > {
   return await getDockerEngineUpdateRequirements();
 }
@@ -43,7 +43,7 @@ export async function dockerComposeUpdate(): Promise<string> {
  * Docker compose requirements
  */
 export async function dockerComposeUpdateRequirements(): Promise<
-  DockerComposeUpdateRequirements
+  DockerComposeUpdateRequirement[]
 > {
   return await getDockerComposeUpdateRequirements();
 }

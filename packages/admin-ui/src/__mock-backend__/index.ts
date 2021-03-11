@@ -64,27 +64,40 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     "Successfully updated docker engine. Successfully updated docker compose",
   dockerEngineUpdate: async () => "Updated",
   dockerComposeUpdate: async () => "Updated",
-  dockerComposeUpdateRequirements: async () => ({
-    dockerComposeVersion: "1.25.4",
-    IsDockerComposeUpdateCompatible: true,
-    isDockerComposeUpgrade: false
-  }),
-  dockerEngineUpdateRequirements: async () => ({
-    hostInfo: {
-      dockerComposeVersion: "1.28.2",
-      dockerServerVersion: "20.10.5",
-      dockerCliVersion: "20.10.5",
-      os: "Debian",
-      versionCodename: "buster",
-      architecture: "amd64"
+  dockerComposeUpdateRequirements: async () => [
+    {
+      isFulFilled: true,
+      title: "Upgrade",
+      message: "Illegal to upgrade compose"
     },
-    isArchitecture: true,
-    isDockerEngineUpdateCompatible: true,
-    isDockerEngineUpgrade: true,
-    isDockerSynchronized: false,
-    isOs: true,
-    isOsVersion: true
-  }),
+    {
+      isFulFilled: true,
+      title: "Compatibility",
+      message: "Engine and compose compatible"
+    }
+  ],
+  dockerEngineUpdateRequirements: async () => [
+    {
+      isFulFilled: false,
+      title: "Upgrade",
+      message: "Illegal to upgrade compose"
+    },
+    {
+      isFulFilled: true,
+      title: "Architecture",
+      message: "Architecture must be arm64 or amd64"
+    },
+    {
+      isFulFilled: true,
+      title: "OS",
+      message: "Os must be debian"
+    },
+    {
+      isFulFilled: false,
+      title: "Version",
+      message: "Version must be buster"
+    }
+  ],
 
   portsToOpenGet: async () => [
     {

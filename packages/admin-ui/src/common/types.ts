@@ -1065,20 +1065,16 @@ export interface DockerVersionsScript {
   dockerServerVersion: string;
 }
 
-export interface DockerEngineUpdateRequirements {
-  isOs: boolean;
-  isOsVersion: boolean;
-  isArchitecture: boolean;
-  isDockerEngineUpgrade: boolean;
-  isDockerSynchronized: boolean;
-  isDockerEngineUpdateCompatible: boolean;
-  hostInfo: HostInfoScript;
+export interface DockerEngineUpdateRequirement {
+  title: string;
+  isFulFilled: boolean;
+  message: string;
 }
 
-export interface DockerComposeUpdateRequirements {
-  isDockerComposeUpgrade: boolean;
-  IsDockerComposeUpdateCompatible: boolean;
-  dockerComposeVersion: string;
+export interface DockerComposeUpdateRequirement {
+  title: string;
+  isFulFilled: boolean;
+  message: string;
 }
 
 export interface VolumeOwnershipData {

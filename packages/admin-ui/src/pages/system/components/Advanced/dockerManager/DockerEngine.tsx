@@ -4,15 +4,15 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import { DockerEngineUpdateRequirements } from "common";
-import { params } from "./params";
-
+import { DockerEngineUpdateRequirement } from "common";
 import "./dockerManager.scss";
+import List from "components/List";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerEngine({
   updateEngineRequirements
 }: {
-  updateEngineRequirements: DockerEngineUpdateRequirements;
+  updateEngineRequirements: DockerEngineUpdateRequirement[];
 }) {
   const [reqUpdateEngineStatus, setReqUpdateEngineStatus] = useState<
     ReqStatus<string>
@@ -39,69 +39,15 @@ function UpdateDockerEngine({
 
   return (
     <>
-      <div className="checkbox-docker-engine-update">
-        <input
-          type="checkbox"
-          readOnly={true}
-          checked={updateEngineRequirements.isArchitecture}
-        >
-          {`Architecture: ${updateEngineRequirements.hostInfo.architecture}` +
-          !updateEngineRequirements.isArchitecture
-            ? `Architecture must be ${params.ARCHITECTURE.join(",")}`
-            : ""}
-        </input>
-        <input
-          type="checkbox"
-          readOnly={true}
-          checked={updateEngineRequirements.isOs}
-        >
-          {`Os: ${updateEngineRequirements.hostInfo.os}` +
-          !updateEngineRequirements.isOs
-            ? `OS must be ${params.OS.join(",")}`
-            : ""}
-        </input>
-        <input
-          type="checkbox"
-          readOnly={true}
-          checked={updateEngineRequirements.isOsVersion}
-        >
-          {`Version: ${updateEngineRequirements.hostInfo.versionCodename}` +
-          !updateEngineRequirements.isOsVersion
-            ? `Version must be ${params.VERSION_CODENAME.join(",")}`
-            : ""}
-        </input>
-        <input
-          readOnly={true}
-          type="checkbox"
-          checked={updateEngineRequirements.isDockerEngineUpgrade}
-        >
-          {`Current docker version: ${updateEngineRequirements.hostInfo.dockerServerVersion}` +
-          !updateEngineRequirements.isDockerEngineUpgrade
-            ? `Downgrade is not allowed`
-            : ""}
-        </input>
-        <input
-          readOnly={true}
-          type="checkbox"
-          checked={updateEngineRequirements.isDockerSynchronized}
-        >
-          {`Docker CLI and server versions synchrnonized`}
-        </input>
-        <input
-          readOnly={true}
-          type="checkbox"
-          checked={updateEngineRequirements.isDockerEngineUpdateCompatible}
-        >
-          {`Versions compatibility`}
-        </input>
-      </div>
-
-      {updateEngineRequirements.isArchitecture &&
-      updateEngineRequirements.isOs &&
-      updateEngineRequirements.isOsVersion &&
-      updateEngineRequirements.isDockerEngineUpgrade &&
-      updateEngineRequirements.isDockerSynchronized &&
-      updateEngineRequirements.isDockerEngineUpdateCompatible ? (
+      <List
+        listTitle="Update docker engine requirements"
+        items={updateEngineRequirements}
+        IconLeft={MdRadioButtonChecked}
+        IconLeftFalse={MdRadioButtonUnchecked}
+      />
+      {updateEngineRequirements.every(
+        requirement => requirement.isFulFilled === true
+      ) ? (
         <Button
           disabled={
             reqUpdateEngineStatus.loading ||
@@ -141,7 +87,7 @@ export default function DockerEngineManager() {
   const [
     reqGetEngineUpdateRequirements,
     setReqGetEngineUpdateRequirements
-  ] = useState<ReqStatus<DockerEngineUpdateRequirements>>({});
+  ] = useState<ReqStatus<DockerEngineUpdateRequirement[]>>({});
 
   async function fetchEngineUpdateRequirements() {
     try {

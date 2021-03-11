@@ -32,8 +32,8 @@ import {
   UpnpTablePortStatus,
   ApiTablePortStatus,
   HttpsPortalMapping,
-  DockerComposeUpdateRequirements,
-  DockerEngineUpdateRequirements
+  DockerComposeUpdateRequirement,
+  DockerEngineUpdateRequirement
 } from "./types";
 
 export interface Routes {
@@ -489,13 +489,15 @@ export interface Routes {
   /**
    * Returns docker engine update requirements
    */
-  dockerEngineUpdateRequirements: () => Promise<DockerEngineUpdateRequirements>;
+  dockerEngineUpdateRequirements: () => Promise<
+    DockerEngineUpdateRequirement[]
+  >;
 
   /**
    * Returns docker-compose update requirements
    */
   dockerComposeUpdateRequirements: () => Promise<
-    DockerComposeUpdateRequirements
+    DockerComposeUpdateRequirement[]
   >;
 
   /**
