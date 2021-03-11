@@ -7,27 +7,31 @@ import { InstalledPackageData, PackageContainer } from "../../../types";
 export function groupPackagesFromContainers(
   containers: PackageContainer[]
 ): InstalledPackageData[] {
-  const dnps = new Map<string, InstalledPackageData>();
+  const dnpMap = new Map<string, InstalledPackageData>();
   for (const container of containers) {
-    dnps.set(container.dnpName, {
-      ...pick(container, [
-        "dnpName",
-        "instanceName",
-        "version",
-        "isDnp",
-        "isCore",
-        "dependencies",
-        "avatarUrl",
-        "origin",
-        "chain",
-        "domainAlias",
-        "canBeFullnode"
-      ]),
-      containers: [
-        ...(dnps.get(container.dnpName)?.containers || []),
-        container
-      ]
-    });
+    let dnp = dnpMap.get(container.dnpName);
+    if (!dnp) {
+      dnp = {
+        ...pick(container, [
+          "dnpName",
+          "instanceName",
+          "version",
+          "isDnp",
+          "isCore",
+          "dependencies",
+          "avatarUrl",
+          "origin",
+          "chain",
+          "domainAlias",
+          "canBeFullnode"
+        ]),
+        containers: []
+      };
+      dnpMap.set(container.dnpName, dnp);
+    }
+
+    dnp.containers.push(container);
   }
-  return Array.from(dnps.values());
+
+  return Array.from(dnpMap.values());
 }

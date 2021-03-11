@@ -11,7 +11,8 @@ export function ServiceSelector({
   setServiceName: (serviceName: string) => void;
   containers: PackageContainer[];
 }) {
-  const serviceNames = containers.map(c => c.serviceName).sort();
+  // services should already be sorted from the DAPPMANAGER, `calls/packagesGet.ts`
+  const serviceNames = containers.map(c => c.serviceName);
 
   if (serviceNames.length <= 1) return null;
 

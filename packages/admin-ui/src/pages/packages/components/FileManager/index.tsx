@@ -12,7 +12,7 @@ export const FileManager = ({
 }: {
   containers: PackageContainer[];
 }) => {
-  const serviceNames = containers.map(c => c.serviceName).sort();
+  const serviceNames = containers.map(c => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
