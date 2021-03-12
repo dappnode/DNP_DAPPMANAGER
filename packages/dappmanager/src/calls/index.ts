@@ -51,7 +51,6 @@ export { systemInfoGet } from "./systemInfoGet";
 export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
-export { ipPublicGet } from "./ipPublicGet";
 export {
   dockerEngineUpdate,
   dockerEngineUpdateRequirements,
