@@ -97,7 +97,6 @@ export default function DockerComposeManager() {
         Update docker engine to a stable version with DAppNode. You must fulfill
         a list of requirements
       </p>
-      <br />
       <Button
         disabled={
           reqGetComposeVersionStatus.loading ||
