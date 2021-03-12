@@ -203,7 +203,7 @@ const params = {
   ETHFORWARD_PIN_ON_VISIT: true,
 
   // API endpoint check tcp ports. req: /publicIp?tcpPorts=8092,1194 | res: /[{tcpPort, status}]
-  PORT_SCANNER_SERVICE_URL: "http://173.249.41.199:3000",
+  PORT_SCANNER_SERVICE_URL: "http://213.136.76.177:3030",
 
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
