@@ -13,6 +13,27 @@ export interface HttpsPortalMapping {
   port: number;
 }
 
+// Wireguard
+
+export interface WireguardDeviceCredentials {
+  /**
+   * Raw config file in plaintext
+   * ```txt
+   * [Interface]
+   * Address = 172.34.1.2
+   * PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+   * ListenPort = 51820
+   * DNS = 172.33.1.2
+   *
+   * [Peer]
+   * PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+   * Endpoint = aaaabbbbaaaabbbb.dyndns.dappnode.io:51820
+   * AllowedIPs = 172.33.0.0/16
+   * ```
+   */
+  config: string;
+}
+
 // SSH types
 
 export type ShhStatus = "enabled" | "disabled";
@@ -33,13 +54,11 @@ export type VpnDeviceCredentials = VpnDevice & {
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
-/**
- * ==============
- * ==============
- * ADMIN
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// ADMIN
+// ==============
+// ==============
 
 /**
  * [NOTE] Items MUST be ordered by the directory order
@@ -283,15 +302,16 @@ export interface ProgressLogsByDnp {
   [dnpName: string]: ProgressLogs;
 }
 
-/**
- * ==============
- * ==============
- * DAPPMANAGER
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// DAPPMANAGER
+// ==============
+// ==============
 
-export type PortProtocol = "UDP" | "TCP";
+export enum PortProtocol {
+  UDP = "UDP",
+  TCP = "TCP"
+}
 
 interface BasicPortMapping {
   host?: number;
@@ -516,6 +536,8 @@ interface ManifestImage {
   volumes?: string[];
   ports?: string[];
   environment?: string[];
+  /** FORBIDDEN FEATURE */
+  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];
@@ -593,13 +615,14 @@ export interface ComposeNetwork {
 
 export interface ComposeNetworks {
   /** networkName: "dncore_network" */
-  [networkName: string]: ComposeNetwork;
+  [networkName: string]: ComposeNetwork | null;
 }
 
 export interface ComposeVolume {
   // FORBIDDEN
   // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
   // NOT allowed to user, only used by DAppNode internally (if any)
+  external?: boolean;
   name?: string; // Volumes can only be declared locally or be external
   driver?: string; // Dangerous
   driver_opts?:
@@ -610,7 +633,7 @@ export interface ComposeVolume {
 
 export interface ComposeVolumes {
   /** volumeName: "dncore_ipfsdnpdappnodeeth_data" */
-  [volumeName: string]: ComposeVolume;
+  [volumeName: string]: ComposeVolume | null;
 }
 
 export interface Compose {

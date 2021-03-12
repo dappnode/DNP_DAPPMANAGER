@@ -1,6 +1,6 @@
 import { getContainerDomain } from "./params";
 
-function stripCharacters(s: string): string {
+export function stripCharacters(s: string): string {
   return s.replace(RegExp("_", "g"), "");
 }
 
@@ -20,7 +20,7 @@ export function shortUniqueDappnodeEns(dnpName: string): string {
   return stripCharacters(dnpName);
 }
 
-type ContainerNames = { serviceName: string; dnpName: string };
+export type ContainerNames = { serviceName: string; dnpName: string };
 
 export function getPrivateNetworkAlias(container: ContainerNames): string {
   const fullEns = getContainerDomain(container);

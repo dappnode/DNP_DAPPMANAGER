@@ -1,3 +1,4 @@
+import { PortProtocol } from "types";
 import { bitcoin } from "./bitcoin";
 import { MockDnp } from "./types";
 
@@ -171,12 +172,12 @@ Content in the first column | Content in the second column
         {
           host: 30303,
           container: 30303,
-          protocol: "TCP"
+          protocol: PortProtocol.TCP
         },
         {
           host: 30303,
           container: 30303,
-          protocol: "UDP"
+          protocol: PortProtocol.UDP
         }
       ],
       volumes: [

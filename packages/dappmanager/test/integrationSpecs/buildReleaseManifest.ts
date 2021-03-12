@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import * as ipfs from "../../src/modules/ipfs";
+import { ipfs } from "../../src/modules/ipfs";
 import { ManifestWithImage } from "../../src/types";
 import { ipfsAddManifest, ipfsAddFromFs } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
@@ -31,9 +31,8 @@ export async function uploadManifestRelease(
   const releaseHashManifest = await ipfsAddManifest(manifest);
 
   // Verify the uploaded files
-  const manifestUploaded = await ipfs
-    .cat({ hash: releaseHashManifest })
-    .then(file => JSON.parse(file.toString()));
+  const data = await ipfs.catString(releaseHashManifest);
+  const manifestUploaded = JSON.parse(data);
   if (!isEqual(manifestUploaded, manifest))
     throw Error("Wrong uploaded manifest");
 

@@ -19,7 +19,7 @@ const terminalID = "terminal";
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
 export function Logs({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName).sort();
+  const serviceNames = containers.map(c => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
 
   // User options

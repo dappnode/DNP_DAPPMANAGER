@@ -263,8 +263,7 @@ export function clearCompletedCoreUpdatesIfAny(
 ): void {
   const pending = getPending();
 
-  const { version: pendingVersionId } =
-    pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
+  const { version: pendingVersionId } = pending[coreDnpName] || {};
   const pendingVersionsAreInstalled =
     pendingVersionId &&
     isVersionIdUpdated(pendingVersionId, currentCorePackages);
@@ -392,7 +391,7 @@ export function getDnpFeedbackMessage({
   const currentVersionRegistry =
     (registry[dnpName] || {})[currentVersion] || {};
   const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[dnpName] || ({} as AutoUpdatePendingEntry);
+    pending[dnpName] || {};
 
   const lastUpdatedVersion = getLastRegistryEntry(registry[dnpName] || {});
   const lastUpdatedVersionsAreInstalled =
@@ -445,7 +444,7 @@ export function getCoreFeedbackMessage(
    */
 
   const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[coreDnpName] || ({} as AutoUpdatePendingEntry);
+    pending[coreDnpName] || {};
   const lastUpdatedVersion = getLastRegistryEntry(registry[coreDnpName] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&

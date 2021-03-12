@@ -1,26 +1,42 @@
 version: "3.4"
 services:
-  sample-core:
-    container_name: DAppNodeCore-sample-core.sample-core.dnp.dappnode.eth
+  s1:
+    container_name: DAppNodeCore-s1.sample-core.dnp.dappnode.eth
     dns: 172.33.1.2
-    image: "sample-core.sample-core.dnp.dappnode.eth:0.2.33"
+    image: "s1.sample-core.dnp.dappnode.eth:0.2.33"
     logging:
       driver: json-file
       options:
         max-file: "3"
         max-size: "10m"
     networks:
-      network:
+      local: {}
+      dncore_network:
         aliases:
-          - "sample-core.sample-core.dappnode"
+          - "s1.sample-core.dappnode"
+    restart: always
+    volumes:
+      - "data:/data"
+  s2:
+    container_name: DAppNodeCore-s2.sample-core.dnp.dappnode.eth
+    dns: 172.33.1.2
+    image: "s2.sample-core.dnp.dappnode.eth:0.2.33"
+    logging:
+      driver: json-file
+      options:
+        max-file: "3"
+        max-size: "10m"
+    networks:
+      local: {}
+      dncore_network:
+        aliases:
+          - "s2.sample-core.dappnode"
     restart: always
     volumes:
       - "data:/data"
 volumes:
   data: {}
 networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
+  local: {}
+  dncore_network:
+    external: true

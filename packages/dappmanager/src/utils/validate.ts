@@ -31,10 +31,14 @@ export function isEnsDomain(ensDomain: string): boolean {
 export function isIpfsHash(hash: string): boolean {
   if (!hash || typeof hash !== "string") return false;
   // Correct hash prefix
-  if (hash.includes("ipfs/")) {
-    hash = hash.split("ipfs/")[1];
-  }
-  hash.replace("/", "");
+
+  // Remove `ipfs/` or `/ipfs/` prefix
+  hash = hash.split("ipfs/")[1] || hash;
+  // Remove trailing and leading slashes
+  hash = hash.replace(/\/+$/, "").replace(/^\/+/, "");
+  // Ignore any subpath after the hash
+  hash = hash.split("/")[0];
+
   // Make sure hash if valid
   return isIPFS.cid(hash);
 }

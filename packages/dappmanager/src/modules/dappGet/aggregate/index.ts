@@ -1,7 +1,7 @@
 import semver from "semver";
 import params from "../../../params";
 // Internal
-import * as safeSemver from "../utils/safeSemver";
+import { safeSemver } from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
 import { InstalledPackageData, PackageRequest } from "../../../types";

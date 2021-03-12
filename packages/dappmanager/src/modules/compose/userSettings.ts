@@ -43,7 +43,7 @@ export const parseUserSettingsFns: {
     const namedVolumeMountpoints: { [volumeName: string]: string } = {};
     for (const [volumeName, volObj] of Object.entries(compose.volumes || {}))
       if (isComposeVolumeUsed(compose, volumeName))
-        if (volObj.driver_opts && volObj.driver_opts.device) {
+        if (volObj && volObj.driver_opts && volObj.driver_opts.device) {
           const devicePath = volObj.driver_opts.device;
           const mountpoint = parseDevicePathMountpoint(devicePath);
           if (mountpoint) namedVolumeMountpoints[volumeName] = mountpoint;
@@ -90,7 +90,7 @@ export const parseUserSettingsFns: {
 export function parseUserSettings(compose: Compose): UserSettings {
   const userSettings = mapValues(parseUserSettingsFns, parseUserSettingsFn =>
     parseUserSettingsFn(compose)
-  ) as UserSettings;
+  );
   // Ignore objects that are empty to make tests and payloads cleaner
   return omitBy(
     userSettings,

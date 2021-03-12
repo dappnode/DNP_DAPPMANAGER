@@ -28,6 +28,7 @@ import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
+import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 
 const BYPASS_CORE_RESTRICTION = "BYPASS_CORE_RESTRICTION";
 const SHOW_ADVANCED_EDITOR = "SHOW_ADVANCED_EDITOR";
@@ -107,6 +108,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           onSuccess: `Installed ${shortNameCapitalized(dnpName)}`
         }
       );
+
       // Re-direct user to package page if installation is successful
       if (componentIsMounted.current) {
         setShowSuccess(true);
@@ -117,6 +119,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           }
         }, 1000);
       }
+
+      enableAutoUpdatesForPackageWithConfirm(dnpName).catch(e => {
+        console.error("Error on enableAutoUpdatesForPackageWithConfirm", e);
+      });
     } catch (e) {
       console.error(e);
     } finally {

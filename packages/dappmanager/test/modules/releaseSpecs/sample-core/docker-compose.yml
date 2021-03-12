@@ -1,10 +1,20 @@
 version: "3.4"
 services:
-  sample-core:
+  s1:
     build: .
-    container_name: sample-core
+    restart: always
+    networks:
+      - "local"
+    volumes:
+      - "data:/data"
+  s2:
+    build: .
     restart: always
     volumes:
       - "data:/data"
+    networks:
+      - "local"
 volumes:
   data: {}
+networks:
+  local: {}

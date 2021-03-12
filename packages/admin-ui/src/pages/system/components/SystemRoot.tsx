@@ -20,7 +20,7 @@ import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Advanced } from "./Advanced";
-import Notifications from "./Notifications";
+import { Notifications } from "./Notifications";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**

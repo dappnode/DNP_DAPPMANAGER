@@ -8,12 +8,6 @@ import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
- *
- * @param id DNP .eth name
- * @param portMappings [
- *   { host: 30444, container: 30303, protocol: "UDP" },
- *   { host: 4000, container: 4000, protocol: "TCP" }
- * ]
  */
 export async function packageSetPortMappings({
   dnpName,

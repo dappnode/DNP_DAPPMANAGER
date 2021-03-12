@@ -26,7 +26,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
       if (vol.name) volumes[vol.name] = {};
 
   // FORBID, DEPRECATED features
-  if (((image as unknown) as { external_vol: string[] }).external_vol) {
+  if (image.external_vol) {
     throw Error("External volumes are not allowed");
   }
 

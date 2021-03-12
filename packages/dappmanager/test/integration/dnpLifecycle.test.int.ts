@@ -13,12 +13,12 @@ import {
   PackageEnvs,
   InstalledPackageData,
   Compose,
-  Manifest
+  Manifest,
+  PortProtocol
 } from "../../src/types";
 import {
   clearDbs,
   getTestMountpoint,
-  portProtocols,
   shellSafe,
   cleanRepos,
   cleanContainers,
@@ -100,14 +100,14 @@ describe("DNP lifecycle", function() {
     one: {
       host: 1111,
       container: 1111,
-      protocol: portProtocols.UDP,
+      protocol: PortProtocol.UDP,
       newHost: 1111
     },
     // Change from a host port to a different
     two: {
       host: 2222,
       container: 2222,
-      protocol: portProtocols.TCP,
+      protocol: PortProtocol.TCP,
       newHost: 2220
     }
   });
@@ -123,14 +123,14 @@ describe("DNP lifecycle", function() {
     three: {
       host: undefined,
       container: 3333,
-      protocol: portProtocols.UDP,
+      protocol: PortProtocol.UDP,
       newHost: 3330
     },
     // Change from a defined host port to ephemeral
     four: {
       host: 4444,
       container: 4444,
-      protocol: portProtocols.TCP,
+      protocol: PortProtocol.TCP,
       newHost: ""
     }
   });
@@ -497,7 +497,7 @@ describe("DNP lifecycle", function() {
 
     it(`Should update the port mappings of ${dnpNameMain}`, async () => {
       const portNumber = 13131;
-      const protocol = "TCP";
+      const protocol = PortProtocol.TCP;
       const portMappings: PortMapping[] = [
         { host: portNumber, container: portNumber, protocol }
       ];

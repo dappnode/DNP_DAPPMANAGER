@@ -5,6 +5,7 @@ export { backupRestore } from "./backupRestore";
 export { chainDataGet } from "./chainDataGet";
 export { changeIpfsTimeout } from "./changeIpfsTimeout";
 export { cleanCache } from "./cleanCache";
+export { cleanDb } from "./cleanDb";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
 export { domainAliasSet } from "./domainAliasSet";
@@ -14,12 +15,10 @@ export { ethClientFallbackSet } from "./ethClientFallbackSet";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
 export { fetchDirectory } from "./fetchDirectory";
 export { fetchDnpRequest } from "./fetchDnpRequest";
-export { statsCpuGet } from "./statsCpuGet";
-export { statsMemoryGet } from "./statsMemoryGet";
-export { statsDiskGet } from "./statsDiskGet";
-
 export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
+export { ipfsTest } from "./ipfsTest";
+export { ipPublicGet } from "./ipPublicGet";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";
@@ -45,6 +44,9 @@ export { portsToOpenGet } from "./portsToOpenGet";
 export { rebootHost } from "./rebootHost";
 export { seedPhraseSet } from "./seedPhraseSet";
 export { setStaticIp } from "./setStaticIp";
+export { statsCpuGet } from "./statsCpuGet";
+export { statsMemoryGet } from "./statsMemoryGet";
+export { statsDiskGet } from "./statsDiskGet";
 export { systemInfoGet } from "./systemInfoGet";
 export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
@@ -56,3 +58,4 @@ export {
   dockerComposeUpdate,
   dockerComposeUpdateRequirements
 } from "./dockerScript";
+export * from "./wireguard";

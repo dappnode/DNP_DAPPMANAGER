@@ -5,7 +5,6 @@ import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
 import { Info } from "../components/Info";
-import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
 import { Logs } from "../components/Logs";
 import { Config } from "../components/Config";
 import { FileManager } from "../components/FileManager";
@@ -45,7 +44,6 @@ export const PackageById: React.FC<RouteComponentProps<{
   }
 
   const dnpName = dnp.dnpName;
-  const DnpSpecific = dnpSpecific[dnpName];
   const {
     userSettings,
     setupWizard,
@@ -102,19 +100,6 @@ export const PackageById: React.FC<RouteComponentProps<{
       render: () => <FileManager containers={containers} />,
       available: true
     },
-    // DnpSpecific is a variable dynamic per DNP component
-    {
-      name: dnpSpecificList[dnpName],
-      // Convert name to subPath:
-      // "Connect with peers" => "connect-with-peers"
-      subPath: encodeURIComponent(
-        (dnpSpecificList[dnpName] || "")
-          .toLowerCase()
-          .replace(new RegExp(" ", "g"), "-")
-      ),
-      render: () => <DnpSpecific dnp={dnp} />,
-      available: DnpSpecific && dnpSpecificList[dnpName]
-    }
   ].filter(route => route.available);
 
   return (

@@ -33,7 +33,8 @@ import {
   ApiTablePortStatus,
   HttpsPortalMapping,
   DockerComposeUpdateRequirement,
-  DockerEngineUpdateRequirement
+  DockerEngineUpdateRequirement,
+  WireguardDeviceCredentials
 } from "./types";
 
 export interface Routes {
@@ -87,6 +88,11 @@ export interface Routes {
    * Cleans the cache files of the DAPPMANAGER:
    */
   cleanCache: () => Promise<void>;
+
+  /**
+   * Cleans the main database of the DAPPMANAGER:
+   */
+  cleanDb: () => Promise<void>;
 
   /**
    * Copy file to a DNP:
@@ -211,12 +217,6 @@ export interface Routes {
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
-  statsCpuGet: () => Promise<HostStatCpu>;
-
-  statsMemoryGet: () => Promise<HostStatMemory>;
-
-  statsDiskGet: () => Promise<HostStatDisk>;
-
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
@@ -243,6 +243,11 @@ export interface Routes {
    * HTTPs Portal: get all mappings
    */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
+
+  /**
+   * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
+   */
+  ipfsTest(): Promise<void>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -454,6 +459,12 @@ export interface Routes {
    */
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
+  statsCpuGet: () => Promise<HostStatCpu>;
+
+  statsMemoryGet: () => Promise<HostStatMemory>;
+
+  statsDiskGet: () => Promise<HostStatDisk>;
+
   /**
    * Gets bot telegram status
    */
@@ -537,6 +548,15 @@ export interface Routes {
    * Returns public Ip in real time
    */
   ipPublicGet: () => Promise<PublicIpResponse>;
+
+  /** Add a device to Wireguard DNP ENVs */
+  wireguardDeviceAdd(device: string): Promise<void>;
+  /** Remove a device from Wireguard DNP ENVs */
+  wireguardDeviceRemove(device: string): Promise<void>;
+  /** Get credentials for a single Wireguard device */
+  wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
+  /** Get URLs to a single Wireguard credentials */
+  wireguardDevicesGet(): Promise<string[]>;
 }
 
 interface RouteData {
@@ -555,6 +575,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
+  cleanDb: {},
   copyFileTo: { log: true },
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
@@ -572,13 +593,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  statsCpuGet: {},
-  statsDiskGet: {},
-  statsMemoryGet: {},
   getUserActionLogs: {},
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -608,6 +627,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
+  statsCpuGet: {},
+  statsDiskGet: {},
+  statsMemoryGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},
@@ -619,7 +641,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerComposeUpdate: {},
   volumeRemove: { log: true },
   volumesGet: {},
-  ipPublicGet: {}
+  ipPublicGet: {},
+  wireguardDeviceAdd: { log: true },
+  wireguardDeviceRemove: { log: true },
+  wireguardDeviceGet: {},
+  wireguardDevicesGet: {}
 };
 
 // DO NOT REMOVE

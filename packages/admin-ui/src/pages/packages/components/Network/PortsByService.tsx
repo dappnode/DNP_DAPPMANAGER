@@ -11,7 +11,7 @@ import { shortNameCapitalized } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./network.scss";
-import { InstalledPackageData } from "common";
+import { InstalledPackageData, PortProtocol } from "common";
 
 const maxPortNumber = 32768 - 1;
 const maxEphemeralPortNumber = 65535;
@@ -32,10 +32,11 @@ export function PortsByService({
     setPorts(
       [...(portsFromDnp || [])]
         .filter(({ host }) => host)
-        .sort((a, b) => a.container - b.container)
-        .sort((a, b) =>
-          a.deletable && !b.deletable ? 1 : !a.deletable && b.deletable ? -1 : 0
-        )
+        .sort((a, b) => {
+          if (a.deletable && !b.deletable) return 1;
+          if (!a.deletable && b.deletable) return -1;
+          return a.container - b.container;
+        })
     );
   }, [portsFromDnp]);
 
@@ -62,7 +63,7 @@ export function PortsByService({
   function addNewPort() {
     const newPort: PortMapping = {
       container: 8000,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       deletable: true
     };
     setPorts(ps => [...ps, newPort]);
@@ -216,7 +217,10 @@ export function PortsByService({
                     options={["TCP", "UDP"]}
                     value={protocol}
                     onValueChange={(value: string) =>
-                      editPort(i, { protocol: value === "UDP" ? "UDP" : "TCP" })
+                      editPort(i, {
+                        protocol:
+                          value === "UDP" ? PortProtocol.UDP : PortProtocol.TCP
+                      })
                     }
                   />
                 ) : (

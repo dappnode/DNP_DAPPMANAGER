@@ -1,9 +1,9 @@
 import { maxPortNumber } from "../../params";
-import { Compose as ComposeObj } from "../../types";
+import { Compose } from "../../types";
 import { applyRecursivelyToStringValues } from "../../utils/objects";
 import { parsePortMappings } from "./ports";
 
-export function verifyCompose(compose: ComposeObj): void {
+export function verifyCompose(compose: Compose): void {
   for (const serviceName in compose.services) {
     const service = compose.services[serviceName];
     try {

@@ -1,5 +1,10 @@
 import path from "path";
-import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
+import {
+  Architecture,
+  EthClientTargetPackage,
+  UserSettings,
+  FileFormat
+} from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -90,6 +95,14 @@ const params = {
   HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
   HTTPS_PORTAL_DNPNAME: "https-portal.dnp.dappnode.eth",
 
+  // Wireguard params
+  WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
+  WIREGUARD_ISCORE: true,
+  WIREGUARD_MAIN_SERVICE: "wireguard",
+  /** api.wireguard.dappnode/:device */
+  WIREGUARD_API_URL: "http://api.wireguard.dappnode",
+  WIREGUARD_DEVICES_ENVNAME: "PEERS",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
   DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",
@@ -121,7 +134,9 @@ const params = {
   IPFS_TIMEOUT: 0.5 * MINUTE,
 
   // Web3 parameters
-  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
+  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
+  ETH_MAINNET_RPC_URL_REMOTE:
+    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -147,10 +162,6 @@ const params = {
   DYNDNS_HOST: "https://ns.dappnode.io",
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
-
-  // DAppNode remote fullnode service
-  REMOTE_MAINNET_RPC_URL:
-    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
@@ -281,92 +292,83 @@ export const getContainerName = ({
 
 // From SDK, must be in sync
 
-// Declare true as true for conditional static types to work
-const TRUE: true = true;
-const FALSE: false = false;
-const FORMAT = {
-  JSON: "JSON" as "JSON",
-  YAML: "YAML" as "YAML",
-  TEXT: "TEXT" as "TEXT"
-};
-
 export const releaseFiles = {
   manifest: {
     regex: /dappnode_package.*\.json$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3, // Limit size to ~100KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   compose: {
     regex: /compose.*\.yml$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3, // Limit size to ~10KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   avatar: {
     regex: /avatar.*\.png$/,
     format: null,
     maxSize: 100e3,
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   setupWizard: {
     regex: /setup-wizard\..*(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupSchema: {
     regex: /setup\..*\.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupTarget: {
     regex: /setup-target\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupUiJson: {
     regex: /setup-ui\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   disclaimer: {
     regex: /disclaimer\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   gettingStarted: {
     regex: /getting.*started\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   prometheusTargets: {
     regex: /.*prometheus-targets.(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   grafanaDashboards: {
     regex: /.*grafana-dashboard.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e6, // ~ 10MB
-    required: FALSE,
-    multiple: TRUE
+    required: false as const,
+    multiple: true as const
   }
 };
 

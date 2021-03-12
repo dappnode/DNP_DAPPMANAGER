@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -10,6 +10,7 @@ import { ssh } from "./ssh";
 import { telegram } from "./telegram";
 import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
+import { wireguard } from "./wireguard";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -22,7 +23,8 @@ const namedSpacedCalls = {
   ...ssh,
   ...telegram,
   ...userActionLogs,
-  ...volumes
+  ...volumes,
+  ...wireguard
 };
 
 let dappnodeWebName = "Mock-DAppNode";
@@ -52,11 +54,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ],
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
+  cleanDb: async () => {},
   copyFileTo: async () => {},
   diagnose: async () => [],
   domainAliasSet: async () => {},
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
+  ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
@@ -106,7 +110,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsToOpenGet: async () => [
     {
       portNumber: 8092,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       serviceName: "validator",
       dnpName: "Prysm"
     }
@@ -114,14 +118,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsUpnpStatusGet: async () => [
     {
       port: 8092,
-      protocol: "UDP",
+      protocol: PortProtocol.UDP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
@@ -130,14 +134,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   portsApiStatusGet: async () => [
     {
       port: 8092,
-      protocol: "UDP",
+      protocol: PortProtocol.UDP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"
     },
     {
       port: 1194,
-      protocol: "TCP",
+      protocol: PortProtocol.TCP,
       status: "open",
       serviceName: "validator",
       dnpName: "dnp.prysm.eth"

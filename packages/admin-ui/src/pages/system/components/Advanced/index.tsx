@@ -4,6 +4,8 @@ import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
 import { DockerManager } from "./dockerManager";
 import { SshManager } from "./SshManager";
+import { MaindbManager } from "./MaindbManager/index";
+import { ClearCacheManager } from "./CacheManager/index";
 
 export function Advanced() {
   return (
@@ -18,8 +20,15 @@ export function Advanced() {
       </Card>
       <SubTitle>SSH</SubTitle>
       <SshManager />
+
       <SubTitle>Docker</SubTitle>
       <DockerManager />
+
+      <SubTitle>Dappmanager database</SubTitle>
+      <MaindbManager />
+
+      <SubTitle>Dappmanager cache</SubTitle>
+      <ClearCacheManager />
     </>
   );
 }

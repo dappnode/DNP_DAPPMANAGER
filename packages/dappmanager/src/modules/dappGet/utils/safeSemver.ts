@@ -28,16 +28,17 @@ function safeSort(
   };
 }
 
-export const rcompare = safeSort(semver.rcompare);
-export const compare = safeSort(semver.compare);
-
-export function satisfies(ver: string, range: string): boolean {
-  // satisfies(ver, range)
-  // 1. an IPFS ver satisfies any range
-  // 2. an IPFS range only allows that exact ver
-  if (isIpfsHash(ver)) return true;
-  if (isIpfsHash(range)) return ver === range;
-  if (!semver.valid(ver)) return false;
-  if (!semver.validRange(range)) return false;
-  return semver.satisfies(ver, range);
-}
+export const safeSemver = {
+  rcompare: safeSort(semver.rcompare),
+  compare: safeSort(semver.compare),
+  satisfies(ver: string, range: string): boolean {
+    // satisfies(ver, range)
+    // 1. an IPFS ver satisfies any range
+    // 2. an IPFS range only allows that exact ver
+    if (isIpfsHash(ver)) return true;
+    if (isIpfsHash(range)) return ver === range;
+    if (!semver.valid(ver)) return false;
+    if (!semver.validRange(range)) return false;
+    return semver.satisfies(ver, range);
+  }
+};

@@ -1,17 +1,13 @@
-import * as ipfs from "../../ipfs";
-import memoize from "memoizee";
+import retry from "async-retry";
+import { ipfs } from "../../ipfs";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
 import { validateAsset, DirectoryFiles } from "./params";
+import { FileFormat } from "../../../types";
 
 interface FileData {
   hash: string;
 }
-
-const ipfsCatStringMemoized = memoize(ipfs.catString, {
-  promise: true,
-  normalizer: ([{ hash }]) => hash
-});
 
 export async function downloadAsset<T>(
   file: FileData[] | FileData | undefined,
@@ -41,11 +37,15 @@ export async function downloadAssetRequired<T>(
   fileId: keyof DirectoryFiles
 ): Promise<T> {
   const maxLength = config.maxSize;
-  const format = config.format || "TEXT";
+  const format = config.format || FileFormat.TEXT;
   const validate = validateAsset[fileId];
 
   const hash = file.hash;
-  const content = await ipfsCatStringMemoized({ hash, maxLength });
+  const content = await retry(() => ipfs.catString(hash, { maxLength }), {
+    retries: 3,
+    minTimeout: 225
+  });
+
   const data = parseAsset(content, format);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

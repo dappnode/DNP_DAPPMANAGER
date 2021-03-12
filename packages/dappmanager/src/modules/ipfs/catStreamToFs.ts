@@ -1,11 +1,18 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import ipfs, { timeoutMs, TimeoutErrorKy } from "../ipfsSetup";
-import { pinAddNoThrow } from "./pinAdd";
+import { TimeoutErrorKy } from "./types";
 const toStream = require("it-to-stream");
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;
+
+export interface CatStreamToFsArgs {
+  hash: string;
+  path: string;
+  timeout?: number;
+  fileSize?: number;
+  progress?: (n: number) => void;
+}
 
 /**
  * Streams an IPFS object to the local fs.
@@ -18,17 +25,10 @@ const timeoutMaxDownloadTime = 5 * 60 * 1000;
  * - onChunk: {function} Gets called on every received chuck
  *   function(chunk) {}
  */
-export default async function catStreamToFs({
-  hash,
-  path,
-  fileSize,
-  progress
-}: {
-  hash: string;
-  path: string;
-  fileSize?: number;
-  progress?: (n: number) => void;
-}): Promise<string> {
+export async function catStreamToFs(
+  { hash, path, timeout, fileSize, progress }: CatStreamToFsArgs,
+  ipfs: any
+): Promise<void> {
   return new Promise((resolve, reject): void => {
     if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
       reject(Error(`Invalid path: "${path}"`));
@@ -36,7 +36,7 @@ export default async function catStreamToFs({
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
       reject(TimeoutErrorKy);
-    }, timeoutMs);
+    }, timeout || 30 * 1000);
 
     const onError = (streamId: string) => (err: Error): void => {
       clearTimeout(timeoutToCancel);
@@ -60,11 +60,9 @@ export default async function catStreamToFs({
       }
     };
 
-    const onFinish = (data: string): void => {
+    const onFinish = (): void => {
       clearTimeout(timeoutToCancel);
-      // Pin files after a successful download
-      pinAddNoThrow({ hash });
-      resolve(data);
+      resolve();
     };
 
     // IPFS native timeout will interrupt a working but slow stream

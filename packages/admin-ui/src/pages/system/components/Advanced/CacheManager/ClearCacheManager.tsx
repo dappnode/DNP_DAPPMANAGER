@@ -1,12 +1,10 @@
 import React from "react";
 import { api } from "api";
-// Components
-import Card from "components/Card";
 import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 
-export function DappmanagerDnpDappnodeEth() {
+export default function ClearCache() {
   async function cleanCache() {
     try {
       await new Promise<void>(resolve =>
@@ -26,19 +24,15 @@ export function DappmanagerDnpDappnodeEth() {
       console.error("Error on cleanCache", e);
     }
   }
-  /**
-   * Title:
-   * Clean cache
-   */
   return (
-    <Card>
-      <div className="help-text" style={{ marginBottom: "1rem" }}>
+    <>
+      <p>
         Remove the local cache of Aragon Package Manager (APM) entries,
         manifests, avatars. Also remove the user action logs shown in the
         Activity tab.
-      </div>
+      </p>
 
       <Button onClick={cleanCache}>Clean cache</Button>
-    </Card>
+    </>
   );
 }

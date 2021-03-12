@@ -92,11 +92,6 @@ export async function cleanContainers(
  * Mock data
  */
 
-export const portProtocols = {
-  TCP: "TCP" as "TCP", // Force string to be an enum
-  UDP: "UDP" as "UDP" // Force string to be an enum
-};
-
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";
 export const mockSize = 1111111;
