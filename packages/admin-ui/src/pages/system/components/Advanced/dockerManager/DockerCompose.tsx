@@ -28,7 +28,7 @@ function UpdateDockerCompose({
           title: `Docker compose update`,
           text: `Warming, you are about to update docker compose. You must be completely sure to perform this action, it is possible that the system reboots.`,
           label: "Update",
-          onClick: () => resolve
+          onClick: resolve
         });
       });
       const output = await api.dockerComposeUpdate();
@@ -60,12 +60,9 @@ function UpdateDockerCompose({
           Update docker compose
         </Button>
       ) : (
-        <div>
-          <MdInfoOutline />
-          <p>
-            Docker compose update not allowed. You must fulfill the requirements
-          </p>
-        </div>
+        <MdInfoOutline>
+          Docker compose update not allowed. You must fulfill the requirements
+        </MdInfoOutline>
       )}
       {reqUpdateComposeStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker compose"} />

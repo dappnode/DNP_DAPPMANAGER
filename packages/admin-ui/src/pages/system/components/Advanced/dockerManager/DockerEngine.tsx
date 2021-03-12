@@ -29,7 +29,7 @@ function UpdateDockerEngine({
           title: `Docker engine update`,
           text: `Warming, you are about to update docker engine. You must be completely sure to perform this action, it is possible that the system reboots.`,
           label: "Update",
-          onClick: () => resolve
+          onClick: resolve
         });
       });
       const output = await api.dockerEngineUpdate();
@@ -61,12 +61,9 @@ function UpdateDockerEngine({
           Update docker engine
         </Button>
       ) : (
-        <div>
-          <MdInfoOutline />
-          <p>
-            Docker engine update not allowed. You must fulfill the requirementss
-          </p>
-        </div>
+        <MdInfoOutline>
+          Docker engine update not allowed. You must fulfill the requirements
+        </MdInfoOutline>
       )}
       {reqUpdateEngineStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker engine"} />

@@ -46,20 +46,20 @@ export async function scriptGetDockerEngineUpdateRequirements(): Promise<
       {
         title: "OS",
         isFulFilled: getIsOs(hostInfoRequirements.os),
-        message: `Your OS is: ${hostInfoRequirements.os}`,
-        errorMessage: `OS allowed: ${params.VERSION_CODENAME.join(",")}`
+        message: `${hostInfoRequirements.os}`,
+        errorMessage: `OS allowed: ${params.VERSION_CODENAME.join(", ")}`
       },
       {
         title: "Version",
         isFulFilled: getIsOsVersion(hostInfoRequirements.versionCodename),
-        message: `Your version is: ${hostInfoRequirements.versionCodename}`,
-        errorMessage: `Versions allowed: ${params.VERSION_CODENAME.join(",")}`
+        message: `${hostInfoRequirements.versionCodename}`,
+        errorMessage: `Versions allowed: ${params.VERSION_CODENAME.join(", ")}`
       },
       {
         title: "Architecture",
         isFulFilled: getIsArchitecture(hostInfoRequirements.architecture),
-        message: `Your architecture is: ${hostInfoRequirements.architecture}`,
-        errorMessage: `Architectures allowed: ${params.ARCHITECTURE.join(",")}`
+        message: `${hostInfoRequirements.architecture}`,
+        errorMessage: `Architectures allowed: ${params.ARCHITECTURE.join(", ")}`
       },
       {
         title: "Upgrade",
@@ -67,8 +67,8 @@ export async function scriptGetDockerEngineUpdateRequirements(): Promise<
           hostInfoRequirements.versionCodename,
           hostInfoRequirements.dockerServerVersion
         ),
-        message: `Your current docker engine version is ${hostInfoRequirements.dockerServerVersion}`,
-        errorMessage: `Downgrade not allowed`
+        message: `docker engine version: ${hostInfoRequirements.dockerServerVersion}`,
+        errorMessage: `Docker is updated. Downgrade is not allowed`
       },
       {
         title: "Synchronization",
@@ -120,7 +120,7 @@ export async function scriptGetDockerComposeUpdateRequirements(): Promise<
         isFulFilled: getIsDockerComposeUpgrade(
           dockerVersions.dockerComposeVersion
         ),
-        message: `Your current docker compose version is ${dockerVersions.dockerComposeVersion}`,
+        message: `docker compose version: ${dockerVersions.dockerComposeVersion}`,
         errorMessage: `Downgrade not allowed`
       }
     ];
