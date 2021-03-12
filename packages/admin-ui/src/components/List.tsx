@@ -10,7 +10,7 @@ interface Item {
 }
 
 interface ListProps {
-  listTitle: string;
+  listTitle?: string;
   items: Item[];
   IconLeft: IconType;
   IconLeftFalse?: IconType;
@@ -27,8 +27,11 @@ const List: React.FC<ListProps & React.HTMLAttributes<HTMLDivElement>> = ({
 }) => {
   return (
     <span className="list" {...props}>
-      <h5>{listTitle}</h5>
-      <br />
+      {listTitle ? (
+        <span className="list-title">
+          <h5>{listTitle}</h5>
+        </span>
+      ) : null}
       <ul>
         {items.map(item => (
           <li key={item.title}>

@@ -5,11 +5,7 @@ import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import List from "components/List";
-import {
-  MdInfoOutline,
-  MdRadioButtonChecked,
-  MdRadioButtonUnchecked
-} from "react-icons/md";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerCompose({
   composeUpdateRequirements
@@ -42,7 +38,6 @@ function UpdateDockerCompose({
   return (
     <>
       <List
-        listTitle="Update docker compose requirements"
         items={composeUpdateRequirements}
         IconLeft={MdRadioButtonChecked}
         IconLeftFalse={MdRadioButtonUnchecked}
@@ -59,11 +54,7 @@ function UpdateDockerCompose({
         >
           Update docker compose
         </Button>
-      ) : (
-        <MdInfoOutline>
-          Docker compose update not allowed. You must fulfill the requirements
-        </MdInfoOutline>
-      )}
+      ) : null}
       {reqUpdateComposeStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker compose"} />
       ) : reqUpdateComposeStatus.loading ? (
@@ -104,7 +95,7 @@ export default function DockerComposeManager() {
       <div className="subtle-header">UPDATE DOCKER COMPOSE</div>
       <p>
         Update docker engine to a stable version with DAppNode. You must fulfill
-        a series of requirements
+        a list of requirements
       </p>
       <br />
       <Button

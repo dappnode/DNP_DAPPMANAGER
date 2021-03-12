@@ -1,9 +1,8 @@
 .list {
-  h5 {
-    display: flex;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
+  .list-title {
+    font-weight: bold;
   }
+
   ul {
     padding: inherit;
     list-style-type: none;
@@ -30,10 +29,11 @@
       .icon-container-right {
         float: right;
         margin-right: 6px;
+        margin-left: 6px;
       }
     }
     li:not(:last-child) {
-      margin-bottom: 3px;
+      margin-bottom: 1px;
     }
   }
 }

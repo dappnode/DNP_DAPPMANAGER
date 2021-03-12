@@ -6,11 +6,7 @@ import Button from "components/Button";
 import Ok from "components/Ok";
 import { DockerEngineUpdateRequirement } from "common";
 import List from "components/List";
-import {
-  MdInfoOutline,
-  MdRadioButtonChecked,
-  MdRadioButtonUnchecked
-} from "react-icons/md";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerEngine({
   updateEngineRequirements
@@ -43,7 +39,6 @@ function UpdateDockerEngine({
   return (
     <>
       <List
-        listTitle="Update docker engine requirements"
         items={updateEngineRequirements}
         IconLeft={MdRadioButtonChecked}
         IconLeftFalse={MdRadioButtonUnchecked}
@@ -60,11 +55,7 @@ function UpdateDockerEngine({
         >
           Update docker engine
         </Button>
-      ) : (
-        <MdInfoOutline>
-          Docker engine update not allowed. You must fulfill the requirements
-        </MdInfoOutline>
-      )}
+      ) : null}
       {reqUpdateEngineStatus.result ? (
         <Ok ok={true} msg={"Successfully updated docker engine"} />
       ) : reqUpdateEngineStatus.loading ? (
@@ -105,7 +96,7 @@ export default function DockerEngineManager() {
       <div className="subtle-header">UPDATE DOCKER ENGINE</div>
       <p>
         Update docker engine to a stable version with DAppNode. You must fulfill
-        a series of requirements
+        a list of requirements
       </p>
       <Button
         disabled={
