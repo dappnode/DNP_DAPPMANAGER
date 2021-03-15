@@ -13,6 +13,7 @@ export const subPaths = {
   autoUpdates: "auto-updates",
   repository: "repository",
   staticIp: "static-ip",
+  network: "network",
   update: "update",
   // Must be "add-ipfs-peer" for backwards compatibility with the previous IFPS peer links
   peers: "add-ipfs-peer",

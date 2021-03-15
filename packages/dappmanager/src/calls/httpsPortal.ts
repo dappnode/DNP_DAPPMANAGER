@@ -1,6 +1,10 @@
-import { HttpsPortal, HttpsPortalApiClient } from "../modules/https-portal";
-import { HttpsPortalMapping } from "../types";
 import params from "../params";
+import { HttpsPortalMapping, ExposableServiceMapping } from "../types";
+import {
+  HttpsPortal,
+  HttpsPortalApiClient,
+  getExposableServices
+} from "../modules/https-portal";
 
 const httpsPortalApiClient = new HttpsPortalApiClient(
   params.HTTPS_PORTAL_API_URL
@@ -31,4 +35,33 @@ export async function httpsPortalMappingRemove(
  */
 export async function httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]> {
   return await httpsPortal.getMappings();
+}
+
+/**
+ * HTTPs Portal: get exposable services with metadata
+ */
+export async function httpsPortalExposableServicesGet(): Promise<
+  ExposableServiceMapping[]
+> {
+  const exposable = await getExposableServices();
+  const mappings = await httpsPortal.getMappings();
+  const mappingsById = new Map(
+    mappings.map(mapping => [getServiceId(mapping), mapping])
+  );
+
+  return exposable.map(mapping => {
+    const exposedMapping = mappingsById.get(getServiceId(mapping));
+    if (exposedMapping) {
+      return { ...exposedMapping, ...mapping, exposed: true };
+    } else {
+      return { ...mapping, exposed: false };
+    }
+  });
+}
+
+/** Helper to uniquely identify mapping target services */
+function getServiceId(
+  mapping: Omit<HttpsPortalMapping, "fromSubdomain">
+): string {
+  return `${mapping.dnpName} ${mapping.serviceName} ${mapping.port}`;
 }

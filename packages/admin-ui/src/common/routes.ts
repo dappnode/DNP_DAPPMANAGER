@@ -33,7 +33,8 @@ import {
   ApiTablePortStatus,
   HttpsPortalMapping,
   DockerUpdateStatus,
-  WireguardDeviceCredentials
+  WireguardDeviceCredentials,
+  ExposableServiceMapping
 } from "./types";
 
 export interface Routes {
@@ -237,20 +238,14 @@ export interface Routes {
     after?: number;
   }) => Promise<UserActionLog[]>;
 
-  /**
-   * HTTPs Portal: map a subdomain
-   */
+  /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
-
-  /**
-   * HTTPs Portal: remove an existing mapping
-   */
+  /** HTTPs Portal: remove an existing mapping */
   httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
-
-  /**
-   * HTTPs Portal: get all mappings
-   */
+  /** HTTPs Portal: get all mappings */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
+  /** HTTPs Portal: get exposable services with metadata */
+  httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
 
   /**
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
@@ -585,6 +580,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  httpsPortalExposableServicesGet: {},
   ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
