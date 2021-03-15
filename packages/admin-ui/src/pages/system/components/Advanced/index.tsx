@@ -2,7 +2,7 @@ import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
-import { DockerManager } from "./dockerManager";
+import { DockerUpdate } from "./DockerUpdate";
 import { SshManager } from "./SshManager";
 import { MaindbManager } from "./MaindbManager/index";
 import { ClearCacheManager } from "./CacheManager/index";
@@ -21,8 +21,8 @@ export function Advanced() {
       <SubTitle>SSH</SubTitle>
       <SshManager />
 
-      <SubTitle>Docker</SubTitle>
-      <DockerManager />
+      <SubTitle>Docker update</SubTitle>
+      <DockerUpdate />
 
       <SubTitle>Dappmanager database</SubTitle>
       <MaindbManager />

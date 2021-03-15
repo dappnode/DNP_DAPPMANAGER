@@ -3,7 +3,7 @@ import Card from "components/Card";
 import { UpdateDockerEngine } from "./DockerEngine";
 import { UpdateDockerCompose } from "./DockerCompose";
 
-export function DockerManager() {
+export function DockerUpdate() {
   return (
     <Card spacing>
       <UpdateDockerCompose />

@@ -5,7 +5,6 @@ import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import { DockerUpdateStatus } from "common";
-import { List } from "components/List";
 import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 import Alert from "react-bootstrap/esm/Alert";
