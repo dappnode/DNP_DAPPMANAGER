@@ -46,14 +46,23 @@ export function formDataToUserSettings(
 
     for (const [propId, value] of Object.entries(formDataDnp)) {
       const target = targets[propId];
+
       if (target && target.type)
         switch (target.type) {
           case "environment":
             const envValue = value;
             if (target.name)
+              /**
+               * deepmerge function joins the properties of two objects
+               * In this case, it creates the property service from a string or an array and the object which defines
+               * the environment variable value
+               * */
+
               userSettings.environment = deepmerge(
                 userSettings.environment || {},
-                { [target.service || dnpName]: { [target.name]: envValue } }
+                getServicesNames(target.service || dnpName, {
+                  [target.name]: envValue
+                })
               );
             break;
 
@@ -129,9 +138,20 @@ export function userSettingsToFormData(
       if (target && target.type) {
         switch (target.type) {
           case "environment":
-            const environmentService = environment[target.service || dnpName];
-            if (hasProperty(target.name, environmentService))
-              formDataDnp[propId] = environmentService[target.name];
+            const serviceNames = target.service || dnpName;
+            /**
+             * The following loop check if the field service is an array or a string in order to
+             * define an environment object with its properties
+             *
+             */
+            for (let service of Array.isArray(serviceNames)
+              ? serviceNames
+              : [serviceNames]) {
+              const environmentService = environment[service];
+
+              if (hasProperty(target.name, environmentService))
+                formDataDnp[propId] = environmentService[target.name];
+            }
             break;
 
           case "portMapping":
@@ -236,4 +256,36 @@ export function isSetupWizardEmpty(setupWizard?: SetupWizardAllDnps): boolean {
       setupWizardDnp => isEmpty(setupWizardDnp) || !setupWizardDnp.fields.length
     )
   );
+}
+
+/**
+ * It's a type to create a dynamic way the environment object which is contained in UserSettingTarget
+ *
+ */
+
+interface EnvVarObject<T> {
+  [key: string]: T;
+}
+
+/**
+ * The getServicesNames purpose is creating an environment object (it's contained
+ * in UserSettingTarget) receiving an array with the name of the services use the
+ * environment variable or a string
+ *
+ *  @param serviceNames
+ *  @param envValue
+ *  @returns EnvVarObject
+ */
+
+function getServicesNames<T>(
+  serviceNames: string | string[],
+  envValue: T
+): EnvVarObject<T> {
+  let envObj: EnvVarObject<T> = {};
+  for (let service of Array.isArray(serviceNames)
+    ? serviceNames
+    : [serviceNames]) {
+    envObj[service] = envValue;
+  }
+  return envObj;
 }
