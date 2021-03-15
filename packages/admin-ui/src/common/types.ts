@@ -99,7 +99,7 @@ export interface SetupWizardField {
 }
 
 export type UserSettingTarget =
-  | { type: "environment"; name: string; service?: string }
+  | { type: "environment"; name: string; service?: string[] | string }
   | { type: "portMapping"; containerPort: string; service?: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
   | { type: "allNamedVolumesMountpoint" }
