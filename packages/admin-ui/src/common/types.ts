@@ -13,6 +13,20 @@ export interface HttpsPortalMapping {
   port: number;
 }
 
+export interface ExposableServiceInfo {
+  /** Example: `"Geth JSON RPC"` */
+  name: string;
+  /** Example: `"JSON RPC endpoint for Geth mainnet"` */
+  description: string;
+  // Service target
+  dnpName: string;
+  serviceName: string;
+  port: number;
+}
+
+export type ExposableServiceMapping = ExposableServiceInfo &
+  ((HttpsPortalMapping & { exposed: true }) | { exposed: false });
+
 // Wireguard
 
 export interface WireguardDeviceCredentials {

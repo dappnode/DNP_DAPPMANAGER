@@ -11,6 +11,7 @@ import { getExternalNetworkAlias } from "../../domains";
 import { PackageContainer, HttpsPortalMapping } from "../../types";
 import { HttpsPortalApiClient } from "./apiClient";
 export { HttpsPortalApiClient };
+export { getExposableServices } from "./getExposableServices";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
