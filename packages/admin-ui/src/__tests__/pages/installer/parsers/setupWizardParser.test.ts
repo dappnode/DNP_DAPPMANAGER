@@ -132,6 +132,43 @@ const testCases: {
         envService2: "value2"
       }
     }
+  },
+
+  {
+    testName: "Multi-service case2",
+    setupTarget: {
+      [dnpName]: {
+        envService1: {
+          type: "environment",
+          name: "ENV_SERVICE_1",
+          service: [service1, service2]
+        },
+        envService2: {
+          type: "environment",
+          name: "ENV_SERVICE_2",
+          service: service2
+        }
+      }
+    },
+    userSettings: {
+      [dnpName]: {
+        environment: {
+          [service1]: {
+            ENV_SERVICE_1: "value1"
+          },
+          [service2]: {
+            ENV_SERVICE_1: "value1",
+            ENV_SERVICE_2: "value2"
+          }
+        }
+      }
+    },
+    formData: {
+      [dnpName]: {
+        envService1: "value1",
+        envService2: "value2"
+      }
+    }
   }
 ];
 
