@@ -1088,13 +1088,6 @@ export interface DockerVersionsScript {
   dockerServerVersion: string;
 }
 
-export interface DockerEngineUpdateRequirement {
-  title: string;
-  isFulFilled: boolean;
-  message: string;
-  errorMessage: string;
-}
-
 export interface DockerUpdateStatus {
   updated: boolean;
   version: string;

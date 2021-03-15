@@ -27,6 +27,15 @@ export function parseDockerEngineRequirements(
     dockerComposeVersion
   } = info;
 
+  const dockerServerVersionCleaned = semver.clean(dockerServerVersion, {
+    loose: true
+  });
+  const dockerCliVersionCleaned = semver.clean(dockerCliVersion, {
+    loose: true
+  });
+  if (!dockerServerVersionCleaned || !dockerCliVersionCleaned)
+    throw Error("Docker version cannot be used by semver");
+
   const isOsSupported = supportedOs === os;
   const isArchSupported = supportedArchs.some(arch => arch === architecture);
   const debianRelease = supportedDebianReleases.find(
@@ -35,10 +44,11 @@ export function parseDockerEngineRequirements(
   const targetDockerVersion =
     debianRelease && targetDockerEngineVersions[debianRelease];
   const isDockerUpdated =
-    targetDockerVersion && semver.gte(dockerServerVersion, targetDockerVersion);
+    targetDockerVersion &&
+    semver.gte(dockerServerVersionCleaned, targetDockerVersion);
   const isDockerEngineVersionsSync = semver.eq(
-    dockerServerVersion,
-    dockerCliVersion
+    dockerServerVersionCleaned,
+    dockerCliVersionCleaned
   );
   const isComposeUpdated = semver.gte(
     dockerComposeVersion,
@@ -68,7 +78,7 @@ export function parseDockerEngineRequirements(
       isFulFilled: Boolean(debianRelease),
       message: debianRelease
         ? `Debian release ${debianRelease} supported`
-        : `Debian release ${debianRelease} not supported. Allowed ${supportedDebianReleasesStr}`
+        : `Debian release ${versionCodename} not supported. Allowed ${supportedDebianReleasesStr}`
     },
 
     // docker server version and docker cli versions should always be the same
@@ -102,8 +112,15 @@ export function parseDockerComposeRequirements(
 ): DockerUpdateStatus {
   const { dockerComposeVersion } = info;
 
+  const dockerComposeVersionCleaned = semver.clean(dockerComposeVersion, {
+    loose: true
+  });
+
+  if (!dockerComposeVersionCleaned)
+    throw Error("Docker compose version not allowed by semver");
+
   const isComposeUpdated = semver.gte(
-    dockerComposeVersion,
+    dockerComposeVersionCleaned,
     targetDockerComposeVersion
   );
 
