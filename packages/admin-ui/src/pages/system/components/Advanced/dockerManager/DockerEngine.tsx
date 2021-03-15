@@ -19,15 +19,16 @@ function UpdateDockerEngine({
 
   async function installDockerEngine() {
     try {
-      setReqUpdateEngineStatus({ loading: true });
       await new Promise<void>(resolve => {
         confirm({
           title: `Docker engine update`,
-          text: `Warming, you are about to update docker engine. You must be completely sure to perform this action, it is possible that the system reboots.`,
+          text: `Warming, you are about to update Docker engine. It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important packages.`,
           label: "Update",
           onClick: resolve
         });
       });
+
+      setReqUpdateEngineStatus({ loading: true });
       const output = await api.dockerEngineUpdate();
       setReqUpdateEngineStatus({ result: output });
     } catch (e) {
