@@ -5,7 +5,7 @@ import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import { DockerEngineUpdateRequirement } from "common";
-import List from "components/List";
+import { List } from "components/List";
 import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerEngine({
@@ -74,7 +74,7 @@ function UpdateDockerEngine({
   );
 }
 
-export default function DockerEngineManager() {
+export function DockerEngineManager() {
   const [
     reqGetEngineUpdateRequirements,
     setReqGetEngineUpdateRequirements

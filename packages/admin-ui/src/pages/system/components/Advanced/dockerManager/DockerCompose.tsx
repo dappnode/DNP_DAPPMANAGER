@@ -4,7 +4,7 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import List from "components/List";
+import { List } from "components/List";
 import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 function UpdateDockerCompose({
@@ -73,7 +73,7 @@ function UpdateDockerCompose({
   );
 }
 
-export default function DockerComposeManager() {
+export function DockerComposeManager() {
   // Docker compose
   const [reqGetComposeVersionStatus, setReqGetComposeVersionStatus] = useState<
     ReqStatus<DockerComposeUpdateRequirement[]>

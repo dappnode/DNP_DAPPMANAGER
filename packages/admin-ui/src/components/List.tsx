@@ -17,7 +17,8 @@ interface ListProps {
   IconRight?: IconType;
 }
 
-const List: React.FC<ListProps & React.HTMLAttributes<HTMLDivElement>> = ({
+export const List: React.FC<ListProps &
+  React.HTMLAttributes<HTMLDivElement>> = ({
   listTitle,
   items,
   IconLeft,
@@ -65,5 +66,3 @@ const List: React.FC<ListProps & React.HTMLAttributes<HTMLDivElement>> = ({
     </span>
   );
 };
-
-export default List;
