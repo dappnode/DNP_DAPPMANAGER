@@ -8,10 +8,12 @@ interface OkProps {
   loading?: boolean;
   unknown?: boolean;
   msg: string;
+  title?: string;
 }
 
 const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
   msg,
+  title,
   ok,
   loading,
   unknown,
@@ -34,7 +36,11 @@ const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
           <MdClose color="#ff0000" />
         )}
       </span>
-      <span>{msg}</span>
+
+      <span>
+        {title && <strong>{title}: </strong>}
+        {msg}
+      </span>
     </span>
   );
 };

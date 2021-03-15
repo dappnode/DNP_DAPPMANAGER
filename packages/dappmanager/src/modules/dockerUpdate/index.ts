@@ -1,96 +1,35 @@
-import {
-  DockerComposeUpdateRequirement,
-  DockerEngineUpdateRequirement,
-  DockerVersionsScript,
-  HostInfoScript
-} from "../../common";
+import { DockerUpdateStatus } from "../../types";
 import {
   getDockerComposeVersion,
   getDockerEnginehostInfo,
-  updateDockerCompose,
-  updateDockerEngine
+  updateDockerCompose as updateDockerComposeScript,
+  updateDockerEngine as updateDockerEngineScript
 } from "../hostScripts";
-import { params } from "./params";
 import {
-  getIsOs,
-  getIsOsVersion,
-  getIsArchitecture,
-  getIsDockerEngineUpgrade,
-  getIsDockerSynchronized,
-  getIsDockerComposeUpgrade,
-  getIsDockerComposeStable
+  parseDockerComposeRequirements,
+  parseDockerEngineRequirements
 } from "./utils";
 
 // Docker engine
 
-/**
- * Updates docker engine
- */
-export async function scriptUpdateDockerEngine(): Promise<string> {
-  try {
-    return await updateDockerEngine();
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+export async function updateDockerEngine(): Promise<string> {
+  return await updateDockerEngineScript().catch(e => {
+    e.message = `Error updating docker compose: ${e.message}`;
+    throw e;
+  });
 }
 
 /**
  * Returns host info required to update docker engine.
  */
-export async function scriptGetDockerEngineUpdateRequirements(): Promise<
-  DockerEngineUpdateRequirement[]
+export async function getDockerEngineUpdateCheck(): Promise<
+  DockerUpdateStatus
 > {
-  try {
-    const hostInfoRequirements: HostInfoScript = await getDockerEnginehostInfo();
-    return [
-      {
-        title: "OS",
-        isFulFilled: getIsOs(hostInfoRequirements.os),
-        message: `${hostInfoRequirements.os}`,
-        errorMessage: `OS allowed: ${params.VERSION_CODENAME.join(", ")}`
-      },
-      {
-        title: "Version",
-        isFulFilled: getIsOsVersion(hostInfoRequirements.versionCodename),
-        message: `${hostInfoRequirements.versionCodename}`,
-        errorMessage: `Versions allowed: ${params.VERSION_CODENAME.join(", ")}`
-      },
-      {
-        title: "Architecture",
-        isFulFilled: getIsArchitecture(hostInfoRequirements.architecture),
-        message: `${hostInfoRequirements.architecture}`,
-        errorMessage: `Architectures allowed: ${params.ARCHITECTURE.join(", ")}`
-      },
-      {
-        title: "Upgrade",
-        isFulFilled: getIsDockerEngineUpgrade(
-          hostInfoRequirements.versionCodename,
-          hostInfoRequirements.dockerServerVersion
-        ),
-        message: `docker engine version: ${hostInfoRequirements.dockerServerVersion}`,
-        errorMessage: `Docker is updated. Downgrade is not allowed`
-      },
-      {
-        title: "Synchronization",
-        isFulFilled: getIsDockerSynchronized(
-          hostInfoRequirements.dockerServerVersion,
-          hostInfoRequirements.dockerCliVersion
-        ),
-        message: `Docker server version: ${hostInfoRequirements.dockerServerVersion}. Docker cli version ${hostInfoRequirements.dockerCliVersion}`,
-        errorMessage: `Both versions must be equal`
-      },
-      {
-        title: "Compatibility",
-        isFulFilled: getIsDockerComposeStable(
-          hostInfoRequirements.dockerComposeVersion
-        ),
-        message: `Docker engine version: ${hostInfoRequirements.dockerServerVersion}. Docker compose version: ${hostInfoRequirements.dockerComposeVersion}`,
-        errorMessage: `Both versions must be compatible. Please, first update docker compose`
-      }
-    ];
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+  const info = await getDockerEnginehostInfo().catch(e => {
+    e.message = `Error getting docker engine host info: ${e.message}`;
+    throw e;
+  });
+  return parseDockerEngineRequirements(info);
 }
 
 // Docker compose
@@ -98,33 +37,22 @@ export async function scriptGetDockerEngineUpdateRequirements(): Promise<
 /**
  * Updates docker compose
  */
-export async function scriptUpdateDockerCompose(): Promise<string> {
-  try {
-    return await updateDockerCompose();
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+export async function updateDockerCompose(): Promise<string> {
+  return await updateDockerComposeScript().catch(e => {
+    e.message = `Error updating docker compose: ${e.message}`;
+    throw e;
+  });
 }
 
 /**
  * Returns docker-compose version
  */
-export async function scriptGetDockerComposeUpdateRequirements(): Promise<
-  DockerComposeUpdateRequirement[]
+export async function getDockerComposeUpdateCheck(): Promise<
+  DockerUpdateStatus
 > {
-  try {
-    const dockerVersions: DockerVersionsScript = await getDockerComposeVersion();
-    return [
-      {
-        title: "Upgrade",
-        isFulFilled: getIsDockerComposeUpgrade(
-          dockerVersions.dockerComposeVersion
-        ),
-        message: `docker compose version: ${dockerVersions.dockerComposeVersion}`,
-        errorMessage: `Downgrade not allowed`
-      }
-    ];
-  } catch (e) {
-    throw Error(`Error: ${e.stdout}`);
-  }
+  const info = await getDockerComposeVersion().catch(e => {
+    e.message = `Error getting docker engine host info: ${e.message}`;
+    throw e;
+  });
+  return parseDockerComposeRequirements(info);
 }

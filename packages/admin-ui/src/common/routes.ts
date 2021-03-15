@@ -32,8 +32,7 @@ import {
   UpnpTablePortStatus,
   ApiTablePortStatus,
   HttpsPortalMapping,
-  DockerComposeUpdateRequirement,
-  DockerEngineUpdateRequirement,
+  DockerUpdateStatus,
   WireguardDeviceCredentials
 } from "./types";
 
@@ -181,6 +180,15 @@ export interface Routes {
    * Run system diagnose to inform the user
    */
   diagnose: () => Promise<Diagnose>;
+
+  /** Updates docker compose */
+  dockerComposeUpdate: () => Promise<string>;
+  /** Returns docker-compose update requirements */
+  dockerComposeUpdateCheck: () => Promise<DockerUpdateStatus>;
+  /** Updates docker engine */
+  dockerEngineUpdate: () => Promise<string>;
+  /** Returns docker engine update requirements */
+  dockerEngineUpdateCheck: () => Promise<DockerUpdateStatus>;
 
   /**
    * Set a domain alias to a DAppNode package by name
@@ -488,30 +496,6 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
-   * Updates docker engine
-   */
-  dockerEngineUpdate: () => Promise<string>;
-
-  /**
-   * Returns docker engine update requirements
-   */
-  dockerEngineUpdateRequirements: () => Promise<
-    DockerEngineUpdateRequirement[]
-  >;
-
-  /**
-   * Returns docker-compose update requirements
-   */
-  dockerComposeUpdateRequirements: () => Promise<
-    DockerComposeUpdateRequirement[]
-  >;
-
-  /**
-   * Updates docker compose
-   */
-  dockerComposeUpdate: () => Promise<string>;
-
-  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -587,6 +571,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
+  dockerComposeUpdate: { log: true },
+  dockerComposeUpdateCheck: {},
+  dockerEngineUpdate: { log: true },
+  dockerEngineUpdateCheck: {},
   domainAliasSet: { log: true },
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
@@ -635,10 +623,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
-  dockerEngineUpdate: {},
-  dockerEngineUpdateRequirements: {},
-  dockerComposeUpdateRequirements: {},
-  dockerComposeUpdate: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

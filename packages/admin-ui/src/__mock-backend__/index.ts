@@ -1,6 +1,7 @@
 import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
+import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
 import { notifications } from "./notifications";
@@ -15,6 +16,7 @@ import { wireguard } from "./wireguard";
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
+  ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
   ...notifications,
@@ -64,48 +66,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
-  dockerEngineUpdate: async () => "Updated",
-  dockerComposeUpdate: async () => "Updated",
-  dockerComposeUpdateRequirements: async () => [
-    {
-      isFulFilled: true,
-      title: "Upgrade",
-      message: "Illegal to upgrade compose",
-      errorMessage: "Downgrades not allowed"
-    },
-    {
-      isFulFilled: true,
-      title: "Compatibility",
-      message: "Engine and compose compatible",
-      errorMessage: "Must be compatible"
-    }
-  ],
-  dockerEngineUpdateRequirements: async () => [
-    {
-      isFulFilled: false,
-      title: "Upgrade",
-      message: "Docker version is 18.08.09",
-      errorMessage: "DOwngrade not allowed"
-    },
-    {
-      isFulFilled: true,
-      title: "Architecture",
-      message: "Architecture is amd64",
-      errorMessage: "Architecture must be arm64 or amd64"
-    },
-    {
-      isFulFilled: false,
-      title: "OS",
-      message: "Your OS is ubuntu",
-      errorMessage: "Os must be debian"
-    },
-    {
-      isFulFilled: false,
-      title: "Version",
-      message: "version jessie",
-      errorMessage: "Version must be buster"
-    }
-  ],
 
   portsToOpenGet: async () => [
     {

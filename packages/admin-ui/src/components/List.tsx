@@ -1,6 +1,6 @@
 import React from "react";
 import "./list.scss";
-import { IconType } from "react-icons/lib";
+import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
 
 interface Item {
   isFulFilled?: boolean;
@@ -12,20 +12,10 @@ interface Item {
 interface ListProps {
   listTitle?: string;
   items: Item[];
-  IconLeft: IconType;
-  IconLeftFalse?: IconType;
-  IconRight?: IconType;
 }
 
 export const List: React.FC<ListProps &
-  React.HTMLAttributes<HTMLDivElement>> = ({
-  listTitle,
-  items,
-  IconLeft,
-  IconLeftFalse,
-  IconRight,
-  ...props
-}) => {
+  React.HTMLAttributes<HTMLDivElement>> = ({ listTitle, items, ...props }) => {
   return (
     <span className="list" {...props}>
       {listTitle ? (
@@ -37,10 +27,10 @@ export const List: React.FC<ListProps &
         {items.map(item => (
           <li key={item.title}>
             <span className="icon-container-left">
-              {IconLeftFalse && item.isFulFilled === false ? (
-                <IconLeftFalse color="#FF0000" />
+              {item.isFulFilled === false ? (
+                <MdRadioButtonUnchecked color="#FF0000" />
               ) : (
-                <IconLeft color="#00BC9F" />
+                <MdRadioButtonChecked color="#00BC9F" />
               )}
             </span>
             <span className="title-container">
@@ -52,12 +42,6 @@ export const List: React.FC<ListProps &
             {!item.isFulFilled && item.errorMessage ? (
               <span className="error-message-container">
                 <p>. {item.errorMessage}</p>
-              </span>
-            ) : null}
-
-            {IconRight ? (
-              <span className="icon-container-right">
-                <IconRight color="#BDBFBF" />
               </span>
             ) : null}
           </li>

@@ -1,17 +1,20 @@
-export const params = {
-  // Docker engine stable versions: CLI, PKG and CONTAINERD
-  // BUSTER | BULLYESE
-  STABLE_DOCKER_ENGINE_VERSION_BUSTER: "20.10.2", // Same for server and CLI
-  STABLE_DOCKER_CONTAINERD_VERSION_BUSTER: "1.4.3-1",
-  // STRETCH
-  STABLE_DOCKER_ENGINE_VERSION_STRETCH: "19.03.8",
-  STABLE_DOCKER_CONTAINERD_VERSION_STRETCH: "1.2.6-3",
+export const supportedOs = "debian";
+export const supportedArchs = ["amd64", "arm64"];
+export const supportedDebianReleases = [
+  "buster" as const,
+  "bullyese" as const,
+  "stretch" as const
+];
 
-  // Docker compose stable versions
-  STABLE_DOCKER_COMPOSE_VERSION: "1.25.5",
+export const targetDockerEngineVersions: DebianReleaseObj = {
+  buster: "20.10.2", // containerd "1.4.3-1"
+  bullyese: "20.10.2", // containerd "1.4.3-1"
+  stretch: "19.03.8" // containerd "1.2.6-3"
+};
 
-  // HOST REQUIREMENTS
-  ARCHITECTURE: ["amd64", "arm64"],
-  VERSION_CODENAME: ["buster", "stretch", "bullyese"],
-  OS: ["debian"]
+export const targetDockerComposeVersion = "1.25.5";
+
+/** Helper type to map debian release to docker version 1:1 */
+type DebianReleaseObj = {
+  [K in typeof supportedDebianReleases[0]]: string;
 };

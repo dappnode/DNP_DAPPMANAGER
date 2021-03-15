@@ -1,14 +1,14 @@
 import React from "react";
 import Card from "components/Card";
-import { DockerEngineManager } from "./DockerEngine";
-import { DockerComposeManager } from "./DockerCompose";
+import { UpdateDockerEngine } from "./DockerEngine";
+import { UpdateDockerCompose } from "./DockerCompose";
 
 export function DockerManager() {
   return (
     <Card spacing>
-      <DockerEngineManager />
+      <UpdateDockerCompose />
       <hr />
-      <DockerComposeManager />
+      <UpdateDockerEngine />
     </Card>
   );
 }

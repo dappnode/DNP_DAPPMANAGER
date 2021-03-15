@@ -4,20 +4,29 @@ import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
-import { DockerEngineUpdateRequirement } from "common";
+import { DockerUpdateStatus } from "common";
 import { List } from "components/List";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import ErrorView from "components/ErrorView";
+import { withToast } from "components/toast/Toast";
+import Alert from "react-bootstrap/esm/Alert";
+import { RequirementsList } from "./RequirementsList";
 
-function UpdateDockerEngine({
-  updateEngineRequirements
-}: {
-  updateEngineRequirements: DockerEngineUpdateRequirement[];
-}) {
-  const [reqUpdateEngineStatus, setReqUpdateEngineStatus] = useState<
-    ReqStatus<string>
-  >({});
+export function UpdateDockerEngine() {
+  const [checkReq, setCheckReq] = useState<ReqStatus<DockerUpdateStatus>>({});
+  const [updateReq, setUpdateReq] = useState<ReqStatus>({});
 
-  async function installDockerEngine() {
+  async function dockerEngineUpdateCheck() {
+    try {
+      setCheckReq({ loading: true });
+      const requirements = await api.dockerEngineUpdateCheck();
+      setCheckReq({ result: requirements });
+    } catch (e) {
+      setCheckReq({ error: e });
+      console.error("Error on dockerEngineUpdateCheck", e);
+    }
+  }
+
+  async function dockerEngineUpdate() {
     try {
       await new Promise<void>(resolve => {
         confirm({
@@ -28,102 +37,64 @@ function UpdateDockerEngine({
         });
       });
 
-      setReqUpdateEngineStatus({ loading: true });
-      const output = await api.dockerEngineUpdate();
-      setReqUpdateEngineStatus({ result: output });
+      setUpdateReq({ loading: true });
+      await withToast(() => api.dockerEngineUpdate(), {
+        message: "Updating Docker engine",
+        onSuccess: "Updated Docker engine"
+      });
+      setUpdateReq({ result: true });
+      dockerEngineUpdateCheck();
     } catch (e) {
-      setReqUpdateEngineStatus({ error: e });
-      console.error(`Error on docker_engine_update.sh script: --install`, e);
+      setUpdateReq({ error: e });
+      console.error("Error on dockerEngineUpdate", e);
     }
   }
 
-  return (
-    <>
-      <List
-        items={updateEngineRequirements}
-        IconLeft={MdRadioButtonChecked}
-        IconLeftFalse={MdRadioButtonUnchecked}
-      />
-      {updateEngineRequirements.every(
-        requirement => requirement.isFulFilled === true
-      ) ? (
-        <Button
-          disabled={
-            reqUpdateEngineStatus.loading ||
-            reqUpdateEngineStatus.result !== undefined
-          }
-          onClick={() => installDockerEngine()}
-        >
-          Update docker engine
-        </Button>
-      ) : null}
-      {reqUpdateEngineStatus.result ? (
-        <Ok ok={true} msg={"Successfully updated docker engine"} />
-      ) : reqUpdateEngineStatus.loading ? (
-        <Ok loading={true} msg={"Updating docker engine"} />
-      ) : reqUpdateEngineStatus.error ? (
-        <Ok
-          ok={false}
-          msg={
-            reqUpdateEngineStatus.error instanceof Error
-              ? reqUpdateEngineStatus.error.message
-              : reqUpdateEngineStatus.error
-          }
-        />
-      ) : null}
-    </>
-  );
-}
-
-export function DockerEngineManager() {
-  const [
-    reqGetEngineUpdateRequirements,
-    setReqGetEngineUpdateRequirements
-  ] = useState<ReqStatus<DockerEngineUpdateRequirement[]>>({});
-
-  async function fetchEngineUpdateRequirements() {
-    try {
-      setReqGetEngineUpdateRequirements({ loading: true });
-      const requirements = await api.dockerEngineUpdateRequirements();
-      setReqGetEngineUpdateRequirements({ result: requirements });
-    } catch (e) {
-      setReqGetEngineUpdateRequirements({ error: e });
-      console.error(`Error on docker_engine_update.sh script: --system`, e);
-    }
-  }
+  const canUpdate = checkReq.result?.requirements.every(r => r.isFulFilled);
 
   return (
     <>
       <div className="subtle-header">UPDATE DOCKER ENGINE</div>
       <p>
-        Update docker engine to a stable version with DAppNode. You must fulfill
-        a list of requirements
+        Update docker engine to a stable version with DAppNode. You must update
+        Docker compose first, then Docker engine
       </p>
-      <Button
-        disabled={
-          reqGetEngineUpdateRequirements.loading ||
-          reqGetEngineUpdateRequirements.result !== undefined
-        }
-        onClick={() => fetchEngineUpdateRequirements()}
-      >
-        Check requirements
-      </Button>
-      {reqGetEngineUpdateRequirements.result ? (
-        <UpdateDockerEngine
-          updateEngineRequirements={reqGetEngineUpdateRequirements.result}
-        />
-      ) : reqGetEngineUpdateRequirements.error ? (
-        <Ok
-          msg={
-            reqGetEngineUpdateRequirements.error instanceof Error
-              ? reqGetEngineUpdateRequirements.error.message
-              : reqGetEngineUpdateRequirements.error
-          }
-          ok={false}
-        />
-      ) : reqGetEngineUpdateRequirements.loading ? (
-        <Ok msg={"Checking host requirements..."} loading={true} />
+
+      {!canUpdate && (
+        <Button disabled={checkReq.loading} onClick={dockerEngineUpdateCheck}>
+          Check requirements
+        </Button>
+      )}
+
+      {checkReq.error ? (
+        <ErrorView error={checkReq.error} red hideIcon />
+      ) : checkReq.loading ? (
+        <Ok msg={"Checking update requirements..."} loading={true} />
       ) : null}
+
+      {checkReq.result && (
+        <>
+          <RequirementsList items={checkReq.result.requirements} />
+
+          {checkReq.result.updated ? (
+            <Alert variant="success">Docker engine is updated</Alert>
+          ) : !canUpdate ? (
+            <Alert variant="danger">Can not update Docker engine</Alert>
+          ) : (
+            <Button disabled={updateReq.loading} onClick={dockerEngineUpdate}>
+              Update docker engine
+            </Button>
+          )}
+
+          {updateReq.result ? (
+            <Ok ok={true} msg={"Successfully updated docker engine"} />
+          ) : updateReq.loading ? (
+            <Ok loading={true} msg={"Updating docker engine"} />
+          ) : updateReq.error ? (
+            <ErrorView error={updateReq.error} red hideIcon />
+          ) : null}
+        </>
+      )}
     </>
   );
 }

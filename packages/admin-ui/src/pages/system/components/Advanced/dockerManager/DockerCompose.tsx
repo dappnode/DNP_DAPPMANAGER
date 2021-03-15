@@ -1,22 +1,31 @@
 import React, { useState } from "react";
-import { DockerComposeUpdateRequirement, ReqStatus } from "types";
+import { DockerUpdateStatus, ReqStatus } from "types";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import { List } from "components/List";
-import { MdRadioButtonChecked, MdRadioButtonUnchecked } from "react-icons/md";
+import ErrorView from "components/ErrorView";
+import { withToast } from "components/toast/Toast";
+import Alert from "react-bootstrap/esm/Alert";
+import { RequirementsList } from "./RequirementsList";
 
-function UpdateDockerCompose({
-  composeUpdateRequirements
-}: {
-  composeUpdateRequirements: DockerComposeUpdateRequirement[];
-}) {
-  const [reqUpdateComposeStatus, setReqUpdateComposeStatus] = useState<
-    ReqStatus<string>
-  >({});
+export function UpdateDockerCompose() {
+  const [checkReq, setCheckReq] = useState<ReqStatus<DockerUpdateStatus>>({});
+  const [updateReq, setUpdateReq] = useState<ReqStatus>({});
 
-  async function installDockerCompose() {
+  async function dockerComposeUpdateCheck() {
+    try {
+      setCheckReq({ loading: true });
+      const requirements = await api.dockerComposeUpdateCheck();
+      setCheckReq({ result: requirements });
+    } catch (e) {
+      setCheckReq({ error: e });
+      console.error("Error on dockerComposeUpdateCheck", e);
+    }
+  }
+
+  async function dockerComposeUpdate() {
     try {
       await new Promise<void>(resolve => {
         confirm({
@@ -27,102 +36,61 @@ function UpdateDockerCompose({
         });
       });
 
-      setReqUpdateComposeStatus({ loading: true });
-      const output = await api.dockerComposeUpdate();
-      setReqUpdateComposeStatus({ result: output });
+      setUpdateReq({ loading: true });
+      await withToast(() => api.dockerComposeUpdate(), {
+        message: "Updating Docker compose",
+        onSuccess: "Updated Docker compose"
+      });
+      setUpdateReq({ result: true });
+      dockerComposeUpdateCheck();
     } catch (e) {
-      setReqUpdateComposeStatus({ error: e });
-      console.error(`Error on docker_compose_update.sh script: --install`, e);
+      setUpdateReq({ error: e });
+      console.error("Error on dockerComposeUpdate", e);
     }
   }
 
-  return (
-    <>
-      <List
-        items={composeUpdateRequirements}
-        IconLeft={MdRadioButtonChecked}
-        IconLeftFalse={MdRadioButtonUnchecked}
-      />
-      {composeUpdateRequirements.every(
-        requirement => requirement.isFulFilled === true
-      ) ? (
-        <Button
-          disabled={
-            reqUpdateComposeStatus.loading ||
-            reqUpdateComposeStatus.result !== undefined
-          }
-          onClick={() => installDockerCompose()}
-        >
-          Update docker compose
-        </Button>
-      ) : null}
-      {reqUpdateComposeStatus.result ? (
-        <Ok ok={true} msg={"Successfully updated docker compose"} />
-      ) : reqUpdateComposeStatus.loading ? (
-        <Ok loading={true} msg={"Updating docker compose"} />
-      ) : reqUpdateComposeStatus.error ? (
-        <Ok
-          ok={false}
-          msg={
-            reqUpdateComposeStatus.error instanceof Error
-              ? reqUpdateComposeStatus.error.message
-              : reqUpdateComposeStatus.error
-          }
-        />
-      ) : null}
-    </>
-  );
-}
-
-export function DockerComposeManager() {
-  // Docker compose
-  const [reqGetComposeVersionStatus, setReqGetComposeVersionStatus] = useState<
-    ReqStatus<DockerComposeUpdateRequirement[]>
-  >({});
-
-  async function fetchComposeUpdateRequirements() {
-    try {
-      setReqGetComposeVersionStatus({ loading: true });
-      const requirements = await api.dockerComposeUpdateRequirements();
-      setReqGetComposeVersionStatus({ result: requirements });
-    } catch (e) {
-      setReqGetComposeVersionStatus({ error: e });
-      console.error(`Error on docker_compose_update.sh script: --version`, e);
-    }
-  }
+  const canUpdate = checkReq.result?.requirements.every(r => r.isFulFilled);
 
   return (
     <>
       <div className="subtle-header">UPDATE DOCKER COMPOSE</div>
-      <p>
-        Update docker engine to a stable version with DAppNode. You must fulfill
-        a list of requirements
-      </p>
-      <Button
-        disabled={
-          reqGetComposeVersionStatus.loading ||
-          reqGetComposeVersionStatus.result !== undefined
-        }
-        onClick={() => fetchComposeUpdateRequirements()}
-      >
-        Check requirements
-      </Button>
-      {reqGetComposeVersionStatus.result ? (
-        <UpdateDockerCompose
-          composeUpdateRequirements={reqGetComposeVersionStatus.result}
-        />
-      ) : reqGetComposeVersionStatus.error ? (
-        <Ok
-          msg={
-            reqGetComposeVersionStatus.error instanceof Error
-              ? reqGetComposeVersionStatus.error.message
-              : reqGetComposeVersionStatus.error
-          }
-          ok={false}
-        />
-      ) : reqGetComposeVersionStatus.loading ? (
-        <Ok msg={"Checking host requirements..."} loading={true} />
+      <p>Update Docker compose to a stable version with DAppNode.</p>
+
+      {!canUpdate && (
+        <Button disabled={checkReq.loading} onClick={dockerComposeUpdateCheck}>
+          Check requirements
+        </Button>
+      )}
+
+      {checkReq.error ? (
+        <ErrorView error={checkReq.error} red hideIcon />
+      ) : checkReq.loading ? (
+        <Ok msg={"Checking update requirements..."} loading={true} />
       ) : null}
+
+      {checkReq.result && (
+        <>
+          <RequirementsList items={checkReq.result.requirements} />
+
+          {checkReq.result.updated ? (
+            <Alert variant="success">Docker compose is updated</Alert>
+          ) : !canUpdate ? (
+            <Alert variant="danger">Can not update Docker compose</Alert>
+          ) : (
+            <Button disabled={updateReq.loading} onClick={dockerComposeUpdate}>
+              Update docker compose
+            </Button>
+          )}
+
+          {updateReq.result ? (
+            <Ok ok={true} msg={"Successfully updated docker compose"} />
+          ) : updateReq.loading ? (
+            <Ok loading={true} msg={"Updating docker compose"} />
+          ) : updateReq.error ? (
+            <ErrorView error={updateReq.error} red hideIcon />
+          ) : null}
+        </>
+      )}
     </>
   );
 }

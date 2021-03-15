@@ -1,40 +1,115 @@
-import { params } from "./params";
 import semver from "semver";
+import {
+  DockerVersionsScript,
+  HostInfoScript,
+  UpdateRequirement,
+  DockerUpdateStatus
+} from "../../types";
+import {
+  supportedOs,
+  supportedArchs,
+  supportedDebianReleases,
+  targetDockerEngineVersions,
+  targetDockerComposeVersion
+} from "./params";
 
-export const getIsOs = (hostOs: string): boolean =>
-  params.OS.some(os => os === hostOs.toLowerCase());
+// Docker engine
 
-export const getIsArchitecture = (hostArchitecture: string): boolean =>
-  params.ARCHITECTURE.some(
-    architecture => architecture === hostArchitecture.toLowerCase()
+export function parseDockerEngineRequirements(
+  info: HostInfoScript
+): DockerUpdateStatus {
+  const {
+    os,
+    architecture,
+    versionCodename,
+    dockerServerVersion,
+    dockerCliVersion,
+    dockerComposeVersion
+  } = info;
+
+  const isOsSupported = supportedOs === os;
+  const isArchSupported = supportedArchs.some(arch => arch === architecture);
+  const debianRelease = supportedDebianReleases.find(
+    relVer => relVer === versionCodename
+  );
+  const targetDockerVersion =
+    debianRelease && targetDockerEngineVersions[debianRelease];
+  const isDockerUpdated =
+    targetDockerVersion && semver.gte(dockerServerVersion, targetDockerVersion);
+  const isDockerEngineVersionsSync = semver.eq(
+    dockerServerVersion,
+    dockerCliVersion
+  );
+  const isComposeUpdated = semver.gte(
+    dockerComposeVersion,
+    targetDockerComposeVersion
   );
 
-export const getIsOsVersion = (hostOsVersion: string): boolean =>
-  params.VERSION_CODENAME.some(
-    versionCodename => versionCodename === hostOsVersion.toLowerCase()
+  const supportedArchsStr = supportedArchs.join(", ");
+  const supportedDebianReleasesStr = supportedDebianReleases.join(", ");
+
+  const requirements: UpdateRequirement[] = [
+    {
+      title: "Operating System (OS)",
+      isFulFilled: isOsSupported,
+      message: isOsSupported
+        ? `OS ${os} supported`
+        : `OS ${os} not supported. Allowed: ${supportedOs}`
+    },
+    {
+      title: "OS Architecture",
+      isFulFilled: isArchSupported,
+      message: isArchSupported
+        ? `Arch ${architecture} supported`
+        : `Arch ${architecture} not supported. Allowed: ${supportedArchsStr}`
+    },
+    {
+      title: "OS release",
+      isFulFilled: Boolean(debianRelease),
+      message: debianRelease
+        ? `Debian release ${debianRelease} supported`
+        : `Debian release ${debianRelease} not supported. Allowed ${supportedDebianReleasesStr}`
+    },
+
+    // docker server version and docker cli versions should always be the same
+    // If they are not the same the best solution from online forums is to reboot the host
+    // and hope that the versions become the same again
+    {
+      title: "Docker engine versions synchronized",
+      isFulFilled: isDockerEngineVersionsSync,
+      message: isDockerEngineVersionsSync
+        ? `Docker server and Docker CLI versions are syncronized`
+        : `Docker server version ${dockerServerVersion} and Docker CLI version ${dockerCliVersion} are not syncronized. Reboot the machine`
+    },
+    {
+      title: "Docker compose compatibility",
+      isFulFilled: isComposeUpdated,
+      message: isComposeUpdated
+        ? `Docker compose is updated`
+        : `You must update Docker compose first. Current version ${dockerComposeVersion}, target version ${targetDockerComposeVersion}`
+    }
+  ];
+
+  return {
+    updated: Boolean(isDockerUpdated),
+    version: dockerServerVersion,
+    requirements
+  };
+}
+
+export function parseDockerComposeRequirements(
+  info: DockerVersionsScript
+): DockerUpdateStatus {
+  const { dockerComposeVersion } = info;
+
+  const isComposeUpdated = semver.gte(
+    dockerComposeVersion,
+    targetDockerComposeVersion
   );
 
-export const getIsDockerEngineUpgrade = (
-  hostOsVersion: string,
-  hostDockerVersion: string
-): boolean =>
-  hostOsVersion === "buster" || "bullyese"
-    ? semver.lt(hostDockerVersion, params.STABLE_DOCKER_ENGINE_VERSION_BUSTER)
-    : "stretch"
-    ? semver.lt(hostDockerVersion, params.STABLE_DOCKER_ENGINE_VERSION_STRETCH)
-    : false;
-
-export const getIsDockerSynchronized = (
-  hostDockerServerVersion: string,
-  hostDockerCliVersion: string
-): boolean => semver.eq(hostDockerServerVersion, hostDockerCliVersion);
-
-export const getIsDockerComposeUpgrade = (
-  hostDockerComposeVersion: string
-): boolean =>
-  semver.lt(hostDockerComposeVersion, params.STABLE_DOCKER_COMPOSE_VERSION);
-
-export const getIsDockerComposeStable = (
-  hostDockerComposeVersion: string
-): boolean =>
-  !semver.lt(hostDockerComposeVersion, params.STABLE_DOCKER_COMPOSE_VERSION);
+  return {
+    updated: Boolean(isComposeUpdated),
+    version: dockerComposeVersion,
+    requirements: []
+  };
+}

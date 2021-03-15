@@ -1095,11 +1095,16 @@ export interface DockerEngineUpdateRequirement {
   errorMessage: string;
 }
 
-export interface DockerComposeUpdateRequirement {
+export interface DockerUpdateStatus {
+  updated: boolean;
+  version: string;
+  requirements: UpdateRequirement[];
+}
+
+export interface UpdateRequirement {
   title: string;
   isFulFilled: boolean;
   message: string;
-  errorMessage: string;
 }
 
 export interface VolumeOwnershipData {
