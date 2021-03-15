@@ -46,6 +46,8 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     ([networkName, network]) => ({
       name: networkName,
       ip: network.IPAddress
+      // NOTE: /containers/json will always return Aliases: null even if there are aliases
+      // aliases: network.Aliases || []
     })
   );
 

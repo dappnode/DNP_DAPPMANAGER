@@ -24,6 +24,7 @@ import {
 } from "./utils/getVersionData";
 import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
+import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 
 const controller = new AbortController();
 
@@ -90,23 +91,23 @@ else logs.error(`Error getting version data: ${versionData.message}`);
  * moved from the old db to the cache db.
  */
 
-async function runLegacyOps(): Promise<void> {
-  try {
-    db.migrateToNewMainDb();
-  } catch (e) {
-    logs.error("Error migrating to new main DB", e);
-  }
-
-  migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
-
-  migrateUserActionLogs().catch(e =>
-    logs.error("Error migrating userActionLogs", e)
-  );
-
-  runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
+try {
+  db.migrateToNewMainDb();
+} catch (e) {
+  logs.error("Error migrating to new main DB", e);
 }
 
-runLegacyOps();
+migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
+
+migrateUserActionLogs().catch(e =>
+  logs.error("Error migrating userActionLogs", e)
+);
+
+runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
+
+addAliasToRunningContainersMigration().catch(e =>
+  logs.error("Error adding alias to running containers", e)
+);
 
 /**
  * Run initial opts

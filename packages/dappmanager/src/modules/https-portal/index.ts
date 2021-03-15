@@ -5,11 +5,12 @@ import {
   dockerNetworkDisconnect
 } from "../docker";
 import { listContainers } from "../docker/list";
-import { ComposeFileEditor } from "../compose/editor";
 import params from "../../params";
 import { getExternalNetworkAlias } from "../../domains";
 import { PackageContainer, HttpsPortalMapping } from "../../types";
 import { HttpsPortalApiClient } from "./apiClient";
+import { addNetworkAliasCompose, removeNetworkAliasCompose } from "./utils";
+export { addAliasToRunningContainersMigration } from "./migration";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./getExposableServices";
 
@@ -67,10 +68,7 @@ export class HttpsPortal {
     }
 
     // Edit compose to persist the setting
-    const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-    const composeService = compose.services()[container.serviceName];
-    composeService.addNetwork(externalNetworkName, { aliases });
-    compose.write();
+    addNetworkAliasCompose(container, externalNetworkName, aliases);
   }
 
   /**
@@ -107,10 +105,7 @@ export class HttpsPortal {
     }
 
     // Edit compose to persist the setting
-    const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-    const composeService = compose.services()[container.serviceName];
-    composeService.removeNetwork(externalNetworkName);
-    compose.write();
+    removeNetworkAliasCompose(container, externalNetworkName);
   }
 
   async getMappings(
