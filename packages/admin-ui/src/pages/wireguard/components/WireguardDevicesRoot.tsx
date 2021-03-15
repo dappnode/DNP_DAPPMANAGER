@@ -30,8 +30,8 @@ export const WireguardDevicesRoot: React.FC<RouteComponentProps> = ({
           <>
             <Title title={title} />
             <Alert variant="secondary">
-              You must <NavLink to={url}>install the HTTPs Portal</NavLink> to
-              use this feature
+              You must <NavLink to={url}>install the Wireguard package</NavLink>{" "}
+              to use this feature
             </Alert>
           </>
         );
