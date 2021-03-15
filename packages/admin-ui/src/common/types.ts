@@ -1088,6 +1088,32 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
+export interface HostInfoScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+  dockerCliVersion: string;
+  os: string;
+  versionCodename: string;
+  architecture: string;
+}
+
+export interface DockerVersionsScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+}
+
+export interface DockerUpdateStatus {
+  updated: boolean;
+  version: string;
+  requirements: UpdateRequirement[];
+}
+
+export interface UpdateRequirement {
+  title: string;
+  isFulFilled: boolean;
+  message: string;
+}
+
 export interface VolumeOwnershipData {
   name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
   owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner

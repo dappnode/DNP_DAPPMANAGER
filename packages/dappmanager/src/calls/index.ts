@@ -8,6 +8,7 @@ export { cleanCache } from "./cleanCache";
 export { cleanDb } from "./cleanDb";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
+export * from "./dockerUpdate";
 export { domainAliasSet } from "./domainAliasSet";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet";
 export { ethClientTargetSet } from "./ethClientTargetSet";

@@ -1,6 +1,7 @@
 import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
+import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
 import { notifications } from "./notifications";
@@ -15,6 +16,7 @@ import { wireguard } from "./wireguard";
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
+  ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
   ...notifications,
