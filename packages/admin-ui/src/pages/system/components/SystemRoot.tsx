@@ -19,6 +19,7 @@ import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
+import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { Notifications } from "./Notifications";
 
@@ -64,6 +65,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Static IP",
       subPath: subPaths.staticIp,
       component: StaticIp
+    },
+    {
+      name: "Network",
+      subPath: subPaths.network,
+      component: Network
     },
     {
       name: "Update",
