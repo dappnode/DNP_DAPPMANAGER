@@ -1,4 +1,4 @@
-import { PackageVersionData, TopicDataItem } from "types";
+import { PackageVersionData, HostInfoTopic } from "types";
 import { topicBaseUrl } from "params";
 
 /**
@@ -36,7 +36,7 @@ interface TopicBodySection {
 
 export function formatTopicBody(
   coreDnpVersions: { name: string; version: string | PackageVersionData }[],
-  systemData: TopicDataItem[]
+  systemData: HostInfoTopic[]
 ): string {
   const sections: TopicBodySection[] = [
     {

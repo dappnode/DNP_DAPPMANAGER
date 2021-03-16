@@ -6,7 +6,7 @@ import Card from "components/Card";
 import RenderMarkdown from "components/RenderMarkdown";
 import { formatTopicBody, formatTopicUrl } from "../formaters/discourseTopic";
 import { topicBaseUrl, dappnodeForumUrl } from "params";
-import { PackageVersionData, TopicDataItem } from "common/types";
+import { PackageVersionData, HostInfoTopic } from "common/types";
 import Ok from "components/Ok";
 import { FaDiscourse } from "react-icons/fa";
 import { MdChevronRight } from "react-icons/md";
@@ -37,7 +37,7 @@ export default function Report() {
       version: versionDatas[dnp.dnpName] || dnp.version
     }));
 
-  const systemData: TopicDataItem[] = [
+  const systemData: HostInfoTopic[] = [
     ...diagnose,
     { name: "Disk usage", result: diskUsedPercentage }
   ];

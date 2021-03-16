@@ -894,7 +894,7 @@ export interface PackageVersionData {
   commit?: string;
 }
 
-export interface TopicDataItem {
+export interface HostInfoTopic {
   name: string;
   result?: string;
   error?: string;
