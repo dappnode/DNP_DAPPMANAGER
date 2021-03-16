@@ -4,6 +4,18 @@ import { runScript } from "../runScripts";
 
 /**
  * Collects host info
+ * Returns host info in JSON format.
+ * ```
+ * {
+ *   "dockerComposeVersion": "1.28.2",
+ *   "dockerServerVersion": "20.10.5",
+ *   "dockerCliVersion": "20.10.5",
+ *   "os": "ubuntu",
+ *   "versionCodename": "bionic",
+ *   "architecture": "amd64",
+ *   "kernel": "5.4.0-66-generic"
+ * }
+ * ```
  */
 export const getHostInfoMemoized = memoize(
   async function(): Promise<HostInfoScript> {

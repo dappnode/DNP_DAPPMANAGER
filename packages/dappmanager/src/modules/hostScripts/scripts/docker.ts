@@ -33,7 +33,8 @@ export const updateDockerCompose = memoize(
  *   "dockerCliVersion": "20.10.5",
  *   "os": "ubuntu",
  *   "versionCodename": "bionic",
- *   "architecture": "amd64"
+ *   "architecture": "amd64",
+ *   "kernel": "5.4.0-66-generic"
  * }
  * ```
  */
