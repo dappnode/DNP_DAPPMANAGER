@@ -1,10 +1,6 @@
-import { PackageVersionData, DiagnoseItem } from "common/types";
+import { PackageVersionData } from "common/types";
 
 export * from "./common/types";
-
-export interface DiagnoseObj {
-  [diagnoseId: string]: DiagnoseItem;
-}
 
 export interface WifiCredentials {
   ssid: string;

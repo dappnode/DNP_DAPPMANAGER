@@ -1,4 +1,4 @@
-import { PackageVersionData } from "types";
+import { PackageVersionData, TopicDataItem } from "types";
 import { topicBaseUrl } from "params";
 
 /**
@@ -13,11 +13,6 @@ import { topicBaseUrl } from "params";
  *   error: {string}
  * }
  */
-interface TopicDataItem {
-  name: string;
-  result?: string;
-  error?: string;
-}
 
 /**
  * Construct discourse topic

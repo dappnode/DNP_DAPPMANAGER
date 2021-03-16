@@ -1,6 +1,5 @@
 import {
   AutoUpdateDataView,
-  Diagnose,
   EthClientTarget,
   CoreUpdateData,
   DirectoryItem,
@@ -34,7 +33,8 @@ import {
   HttpsPortalMapping,
   DockerUpdateStatus,
   WireguardDeviceCredentials,
-  ExposableServiceMapping
+  ExposableServiceMapping,
+  TopicDataItem
 } from "./types";
 
 export interface Routes {
@@ -178,9 +178,9 @@ export interface Routes {
   devicesList: () => Promise<VpnDevice[]>;
 
   /**
-   * Run system diagnose to inform the user
+   * Collect host info for support
    */
-  diagnose: () => Promise<Diagnose>;
+  diagnose: () => Promise<TopicDataItem[]>;
 
   /** Updates docker compose */
   dockerComposeUpdate: () => Promise<string>;
