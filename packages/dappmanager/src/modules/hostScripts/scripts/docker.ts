@@ -50,7 +50,8 @@ export const getDockerEnginehostInfo = memoize(
       dockerCliVersion: info.dockerCliVersion,
       os: info.os.toLowerCase().trim(),
       versionCodename: info.versionCodename.toLowerCase().trim(),
-      architecture: info.architecture.toLowerCase().trim()
+      architecture: info.architecture.toLowerCase().trim(),
+      kernel: info.kernel.toLowerCase().trim()
     };
   },
   // Prevent running this script more than once

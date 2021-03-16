@@ -1095,6 +1095,7 @@ export interface HostInfoScript {
   os: string;
   versionCodename: string;
   architecture: string;
+  kernel: string;
 }
 
 export interface DockerVersionsScript {
