@@ -35,10 +35,12 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
     const alias = getPrivateNetworkAlias(container);
 
     try {
-      const networkSettings = await getContainerNetworkSettings(containerName);
-      if (await hasAlias(networkSettings, alias)) return;
+      const networkSettingsBefore = await getContainerNetworkSettings(
+        containerName
+      );
+      if (await hasAlias(networkSettingsBefore, alias)) return;
 
-      addAlias(networkSettings, alias);
+      const networkSettings = addAlias(networkSettingsBefore, alias);
       addNetworkAliasCompose(container, networkName, [alias]);
 
       await dockerNetworkDisconnect(networkName, containerName);
