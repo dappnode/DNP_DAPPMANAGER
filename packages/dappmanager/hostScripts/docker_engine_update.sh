@@ -45,6 +45,12 @@ function get_system_info(){
   fi
 }
 
+function get_linux_kernel() {
+  if type uname >/dev/null 2>&1; then
+    KERNEL=$(uname -r)
+  fi
+}
+
 function get_architecture() {
   if type dpkg >/dev/null 2>&1; then
     ARCHITECTURE=$(dpkg --print-architecture)
@@ -212,7 +218,8 @@ if [[ $# -eq 1 ]]; then
       get_docker_compose_version
       get_docker_engine_version
       get_architecture
-      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\", \"dockerCliVersion\": \"${DOCKER_CLI_VERSION}\", \"os\": \"${ID}\", \"versionCodename\": \"${VERSION_CODENAME}\", \"architecture\": \"${ARCHITECTURE}\"}"
+      get_linux_kernel
+      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\", \"dockerCliVersion\": \"${DOCKER_CLI_VERSION}\", \"os\": \"${ID}\", \"versionCodename\": \"${VERSION_CODENAME}\", \"architecture\": \"${ARCHITECTURE}\", \"kernel\": \"${KERNEL}\"}"
       exit 0
       ;;
     * )

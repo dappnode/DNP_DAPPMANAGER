@@ -33,18 +33,6 @@ describe("Get system data", () => {
     clearDbs();
   });
 
-  it("Should do and return a diagnose", async () => {
-    const result = await calls.diagnose();
-    // Only verify the version calls (docker, docker-compose)
-    // that they actually returned a proper version
-    for (const diagnose of result.filter(d => d.name.includes("version"))) {
-      expect(diagnose.result).to.include(
-        "version",
-        `Diagnose of item ${diagnose.name} should include version`
-      );
-    }
-  }).timeout(10 * 1000);
-
   it("Should return parsed disk stats from host machine", async () => {
     const result = await calls.statsDiskGet();
     expect(result).to.be.ok;

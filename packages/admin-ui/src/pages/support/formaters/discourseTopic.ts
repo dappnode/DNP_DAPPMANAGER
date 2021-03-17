@@ -1,4 +1,4 @@
-import { PackageVersionData } from "types";
+import { PackageVersionData, HostDiagnoseItem } from "types";
 import { topicBaseUrl } from "params";
 
 /**
@@ -13,11 +13,6 @@ import { topicBaseUrl } from "params";
  *   error: {string}
  * }
  */
-interface TopicDataItem {
-  name: string;
-  result?: string;
-  error?: string;
-}
 
 /**
  * Construct discourse topic
@@ -41,7 +36,7 @@ interface TopicBodySection {
 
 export function formatTopicBody(
   coreDnpVersions: { name: string; version: string | PackageVersionData }[],
-  systemData: TopicDataItem[]
+  hostDiagnoseItems: HostDiagnoseItem[]
 ): string {
   const sections: TopicBodySection[] = [
     {
@@ -56,12 +51,7 @@ export function formatTopicBody(
     },
     {
       title: "System info",
-      items: Object.values(systemData)
-        .filter(Boolean)
-        .map(({ name, result, error }) => ({
-          name,
-          data: (result || error || "").trim()
-        }))
+      items: hostDiagnoseItems
     }
   ];
 

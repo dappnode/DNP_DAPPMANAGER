@@ -894,6 +894,11 @@ export interface PackageVersionData {
   commit?: string;
 }
 
+export interface HostDiagnoseItem {
+  name: string;
+  data: string;
+}
+
 export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
@@ -1095,6 +1100,7 @@ export interface HostInfoScript {
   os: string;
   versionCodename: string;
   architecture: string;
+  kernel: string;
 }
 
 export interface DockerVersionsScript {
@@ -1256,16 +1262,6 @@ export interface HostStatDisk {
 export interface HostStatCpu {
   usedPercentage: number;
 }
-
-/**
- * Summary of diagnose checks performed by the DAppNode host
- */
-export interface DiagnoseItem {
-  name: string;
-  result?: string;
-  error?: string;
-}
-export type Diagnose = DiagnoseItem[];
 
 export interface PublicIpResponse {
   publicIp: string;

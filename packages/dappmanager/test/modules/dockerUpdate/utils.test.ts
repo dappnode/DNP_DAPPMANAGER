@@ -18,7 +18,8 @@ describe("dockerUpdate / parse docker engine update requirements", () => {
       dockerCliVersion: "20.10.2",
       os: "ubuntu",
       versionCodename: "bionic",
-      architecture: "amd64"
+      architecture: "amd64",
+      kernel: "5.4.0-66-generic"
     };
     const dockerEngineUpdateRequirements = parseDockerEngineRequirements(
       hostInfo
@@ -71,7 +72,8 @@ describe("dockerUpdate / parse docker engine update requirements", () => {
       dockerCliVersion: "19.03.8",
       os: "debian",
       versionCodename: "buster",
-      architecture: "amd64"
+      architecture: "amd64",
+      kernel: "5.4.0-66-generic"
     };
     const dockerEngineUpdateRequirements = parseDockerEngineRequirements(
       hostInfo
