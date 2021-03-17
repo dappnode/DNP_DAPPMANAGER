@@ -8,6 +8,7 @@ import {
 } from "../docker";
 import { listContainers } from "../docker/list";
 import { addNetworkAliasCompose } from "./utils";
+import Dockerode from "dockerode";
 
 const networkName = params.DNP_PRIVATE_NETWORK_NAME;
 
@@ -21,7 +22,10 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
     dnpName: params.dappmanagerDnpName,
     serviceName: params.dappmanagerDnpName
   });
-  if (await hasAlias(params.dappmanagerContainerName, dappmanagerAlias)) {
+  const dappmanagerNetworkSettings = await getContainerNetworkSettings(
+    params.dappmanagerContainerName
+  );
+  if (await hasAlias(dappmanagerNetworkSettings, dappmanagerAlias)) {
     return logs.info(`Alias migration already done`);
   }
 
@@ -31,11 +35,18 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
     const alias = getPrivateNetworkAlias(container);
 
     try {
-      if (await hasAlias(containerName, alias)) return;
+      const networkSettings = await getContainerNetworkSettings(containerName);
+      if (await hasAlias(networkSettings, alias)) return;
 
+      addAlias(networkSettings, alias);
       addNetworkAliasCompose(container, networkName, [alias]);
+
       await dockerNetworkDisconnect(networkName, containerName);
-      await dockerNetworkConnect(networkName, containerName, [alias]);
+      await dockerNetworkConnect({
+        networkName,
+        containerName,
+        networkSettings
+      });
       logs.info(`Added alias to running container ${container.containerName}`);
     } catch (e) {
       logs.error(`Error adding alias to container ${containerName}`, e);
@@ -44,14 +55,31 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
 }
 
 async function hasAlias(
-  containerName: string,
+  containerNetworkSettings: Dockerode.NetworkInfo,
   alias: string
 ): Promise<boolean> {
-  const inspectInfo = await dockerContainerInspect(containerName);
-  const dncoreNetwork = inspectInfo.NetworkSettings.Networks[networkName];
   return (
-    dncoreNetwork.Aliases &&
-    Array.isArray(dncoreNetwork.Aliases) &&
-    dncoreNetwork.Aliases.includes(alias)
+    containerNetworkSettings.Aliases &&
+    Array.isArray(containerNetworkSettings.Aliases) &&
+    containerNetworkSettings.Aliases.includes(alias)
   );
+}
+
+function addAlias(
+  containerNetworkSettings: Dockerode.NetworkInfo,
+  alias: string
+): Dockerode.NetworkInfo {
+  containerNetworkSettings.Aliases.push(alias);
+  return containerNetworkSettings;
+}
+
+async function getContainerNetworkSettings(
+  containerName: string,
+  networkName = "dncore_network"
+): Promise<Dockerode.NetworkInfo> {
+  const inspectInfo = await dockerContainerInspect(containerName);
+  const containerNetworkSettings =
+    inspectInfo.NetworkSettings.Networks[networkName];
+  if (!containerNetworkSettings) throw Error("Network does not exist");
+  return containerNetworkSettings;
 }
