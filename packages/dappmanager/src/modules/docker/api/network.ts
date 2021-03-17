@@ -7,25 +7,15 @@ import { docker } from "./docker";
  * @param containerName "3613f73ba0e4" or "fullcontainername"
  * @param aliases `["network-alias"]`
  */
-export async function dockerNetworkConnect({
-  networkName,
-  containerName,
-  networkSettings,
-  customNetworkSettings
-}: {
-  networkName: string;
-  containerName: string;
-  networkSettings?: Dockerode.NetworkInfo;
-  customNetworkSettings?: Partial<Dockerode.NetworkInfo>;
-}): Promise<void> {
+export async function dockerNetworkConnect(
+  networkName: string,
+  containerName: string,
+  endpointConfig?: Partial<Dockerode.NetworkInfo>
+): Promise<void> {
   const network = docker.getNetwork(networkName);
   await network.connect({
     Container: containerName,
-    EndpointConfig: networkSettings
-      ? networkSettings
-      : customNetworkSettings
-      ? customNetworkSettings
-      : {}
+    EndpointConfig: endpointConfig
   });
 }
 

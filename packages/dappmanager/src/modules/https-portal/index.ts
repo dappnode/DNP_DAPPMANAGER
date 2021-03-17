@@ -51,24 +51,17 @@ export class HttpsPortal {
     );
     if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
     if (!this.isConnected(httpsPortalContainer)) {
-      await dockerNetworkConnect({
-        networkName: externalNetworkName,
-        containerName: httpsPortalContainer.containerName,
-        customNetworkSettings: {
-          Aliases: aliases
-        }
-      });
+      await dockerNetworkConnect(
+        externalNetworkName,
+        httpsPortalContainer.containerName
+      );
     }
 
     // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
     if (!this.isConnected(container)) {
-      await dockerNetworkConnect({
-        networkName: externalNetworkName,
-        containerName: container.containerName,
-        customNetworkSettings: {
-          Aliases: aliases
-        }
+      await dockerNetworkConnect(externalNetworkName, container.containerName, {
+        Aliases: aliases
       });
     }
 
