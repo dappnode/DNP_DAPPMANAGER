@@ -1,24 +1,15 @@
 import { getHostInfoMemoized } from "../modules/hostScripts/scripts/hostInfo";
-import { HostInfoScript, HostInfoTopic } from "../common";
+import { HostDiagnoseItem } from "../common";
 
 /**
  * Returns a list of checks done as a diagnose
  */
-export async function diagnose(): Promise<HostInfoTopic[]> {
+export async function diagnose(): Promise<HostDiagnoseItem[]> {
   try {
-    const hostInfo: HostInfoScript = await getHostInfoMemoized();
-    return parseHostInfo(hostInfo);
+    const hostInfo = await getHostInfoMemoized();
+    return Object.entries(hostInfo).map(([name, data]) => ({ name, data }));
   } catch (e) {
-    throw Error(`Error collecting host info: ${e}`);
+    e = `Error collecting host info: ${e.message}`;
+    throw e;
   }
-}
-
-// Utils
-function parseHostInfo(hostInfo: HostInfoScript): HostInfoTopic[] {
-  return Object.entries(hostInfo).map((info: [string, string]) => {
-    return {
-      name: info[0],
-      result: info[1]
-    };
-  });
 }

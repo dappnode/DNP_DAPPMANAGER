@@ -34,7 +34,7 @@ import {
   DockerUpdateStatus,
   WireguardDeviceCredentials,
   ExposableServiceMapping,
-  HostInfoTopic
+  HostDiagnoseItem
 } from "./types";
 
 export interface Routes {
@@ -180,7 +180,7 @@ export interface Routes {
   /**
    * Collect host info for support
    */
-  diagnose: () => Promise<HostInfoTopic[]>;
+  diagnose: () => Promise<HostDiagnoseItem[]>;
 
   /** Updates docker compose */
   dockerComposeUpdate: () => Promise<string>;

@@ -1,4 +1,4 @@
-import { PackageVersionData, HostInfoTopic } from "types";
+import { PackageVersionData, HostDiagnoseItem } from "types";
 import { topicBaseUrl } from "params";
 
 /**
@@ -36,7 +36,7 @@ interface TopicBodySection {
 
 export function formatTopicBody(
   coreDnpVersions: { name: string; version: string | PackageVersionData }[],
-  systemData: HostInfoTopic[]
+  hostDiagnoseItems: HostDiagnoseItem[]
 ): string {
   const sections: TopicBodySection[] = [
     {
@@ -51,12 +51,7 @@ export function formatTopicBody(
     },
     {
       title: "System info",
-      items: Object.values(systemData)
-        .filter(Boolean)
-        .map(({ name, result, error }) => ({
-          name,
-          data: (result || error || "").trim()
-        }))
+      items: hostDiagnoseItems
     }
   ];
 

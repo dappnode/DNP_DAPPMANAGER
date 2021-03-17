@@ -894,10 +894,9 @@ export interface PackageVersionData {
   commit?: string;
 }
 
-export interface HostInfoTopic {
+export interface HostDiagnoseItem {
   name: string;
-  result?: string;
-  error?: string;
+  data: string;
 }
 
 export type DistributedFileSource = "ipfs" | "swarm";

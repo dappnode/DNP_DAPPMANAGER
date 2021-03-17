@@ -6,7 +6,7 @@ import Card from "components/Card";
 import RenderMarkdown from "components/RenderMarkdown";
 import { formatTopicBody, formatTopicUrl } from "../formaters/discourseTopic";
 import { topicBaseUrl, dappnodeForumUrl } from "params";
-import { PackageVersionData, HostInfoTopic } from "common/types";
+import { PackageVersionData, HostDiagnoseItem } from "common/types";
 import Ok from "components/Ok";
 import { FaDiscourse } from "react-icons/fa";
 import { MdChevronRight } from "react-icons/md";
@@ -16,9 +16,7 @@ export default function Report() {
   const systemInfoReq = useApi.systemInfoGet();
   const diagnoseReq = useApi.diagnose();
   const hostStatsReq = useApi.statsDiskGet();
-  const dnps = dnpsReq.data || [];
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
-  const diagnose = diagnoseReq.data || [];
   const diskUsedPercentage =
     hostStatsReq.data?.usedPercentage != null
       ? `${hostStatsReq.data?.usedPercentage}%`
@@ -30,16 +28,16 @@ export default function Report() {
     "admin.dnp.dappnode.eth": window.versionData
   };
 
-  const coreDnpVersions = dnps
+  const coreDnpVersions = (dnpsReq.data || [])
     .filter(dnp => dnp.isCore)
     .map(dnp => ({
       name: dnp.dnpName,
       version: versionDatas[dnp.dnpName] || dnp.version
     }));
 
-  const systemData: HostInfoTopic[] = [
-    ...diagnose,
-    { name: "Disk usage", result: diskUsedPercentage }
+  const systemData: HostDiagnoseItem[] = [
+    ...(diagnoseReq.data || []),
+    { name: "Disk usage", data: diskUsedPercentage }
   ];
 
   const topicBody = formatTopicBody(coreDnpVersions, systemData);
