@@ -60,11 +60,9 @@ export class HttpsPortal {
     // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
     if (!this.isConnected(container)) {
-      await dockerNetworkConnect(
-        externalNetworkName,
-        container.containerName,
-        aliases
-      );
+      await dockerNetworkConnect(externalNetworkName, container.containerName, {
+        Aliases: aliases
+      });
     }
 
     // Edit compose to persist the setting
