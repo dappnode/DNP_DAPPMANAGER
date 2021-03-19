@@ -57,7 +57,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
 
     // Write the compose of the stopped container
     const compose = new ComposeEditor({
-      version: "3.4",
+      version: "3.5",
       services: {
         [stoppedDnp]: {
           container_name: stoppedDnp,

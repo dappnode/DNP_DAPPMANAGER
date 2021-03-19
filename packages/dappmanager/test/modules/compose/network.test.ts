@@ -40,7 +40,7 @@ describe("modules / compose / networks", () => {
       const aliases = ["sample-alias"];
 
       const compose = new ComposeEditor({
-        version: "3.4",
+        version: "3.5",
         services: {
           [serviceName]: { container_name, image }
         }
@@ -48,7 +48,7 @@ describe("modules / compose / networks", () => {
 
       compose.firstService().addNetwork(networkName, { aliases });
       expect(compose.output()).to.deep.equal({
-        version: "3.4",
+        version: "3.5",
         services: {
           "sample.dnp.dappnode.eth": {
             container_name,
@@ -65,7 +65,7 @@ describe("modules / compose / networks", () => {
 
       compose.firstService().removeNetwork(networkName);
       expect(compose.output()).to.deep.equal({
-        version: "3.4",
+        version: "3.5",
         services: {
           "sample.dnp.dappnode.eth": {
             container_name,

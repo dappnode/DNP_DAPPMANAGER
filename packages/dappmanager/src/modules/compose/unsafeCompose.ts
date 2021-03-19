@@ -66,7 +66,7 @@ export function parseUnsafeCompose(
   const isCore = getIsCore(manifest);
 
   return cleanCompose({
-    version: composeUnsafe.version || "3.4",
+    version: composeUnsafe.version || "3.5",
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({

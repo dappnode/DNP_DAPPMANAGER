@@ -151,7 +151,7 @@ describe("DNP lifecycle", function() {
     version: "0.1.0"
   };
   const composeMain: Compose = {
-    version: "3.4",
+    version: "3.5",
     services: {
       [dnpNameMain]: {
         container_name: "",
@@ -175,7 +175,7 @@ describe("DNP lifecycle", function() {
     version: "0.1.0"
   };
   const composeDep: Compose = {
-    version: "3.4",
+    version: "3.5",
     services: {
       [dnpNameDep]: {
         container_name: "",

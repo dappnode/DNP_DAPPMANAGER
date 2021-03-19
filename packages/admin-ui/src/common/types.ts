@@ -651,7 +651,7 @@ export interface ComposeVolumes {
 }
 
 export interface Compose {
-  version: string; // "3.4"
+  version: string; // "3.5"
   /** dnpName: "dappmanager.dnp.dappnode.eth" */
   services: { [dnpName: string]: ComposeService };
   networks?: ComposeNetworks;

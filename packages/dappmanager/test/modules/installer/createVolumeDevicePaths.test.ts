@@ -10,7 +10,7 @@ describe("Module > installer > createVolumeDevicePaths", () => {
       "/mnt/volume_ams3_01/dappnode-volumes/raiden.dnp.dappnode.eth/data";
 
     const compose: Compose = {
-      version: "3.4",
+      version: "3.5",
       services: {
         "raiden.dnp.dappnode.eth": {
           volumes: ["data:/root/.raiden"],
