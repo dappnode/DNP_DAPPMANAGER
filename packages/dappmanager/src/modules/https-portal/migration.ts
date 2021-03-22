@@ -7,7 +7,7 @@ import {
   dockerNetworkDisconnect
 } from "../docker";
 import { listContainers } from "../docker/list";
-import { addNetworkAliasCompose } from "./utils";
+import { addNetworkAliasCompose, coreNetworkMigration } from "./utils";
 import Dockerode from "dockerode";
 
 /** Alias for code succinctness */
@@ -43,7 +43,7 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
         ...currentEndpointConfig,
         Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
       };
-
+      coreNetworkMigration(container);
       addNetworkAliasCompose(container, dncoreNetworkName, [alias]);
       await dockerNetworkDisconnect(dncoreNetworkName, containerName);
       await dockerNetworkConnect(

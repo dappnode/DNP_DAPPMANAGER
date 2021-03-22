@@ -609,10 +609,10 @@ export interface ComposeService {
 export interface ComposeServiceNetwork {
   ipv4_address?: string;
   aliases?: string[];
-  name?: string;
 }
 
 export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
+
 export type ComposeServiceNetworksObj = {
   [networkName: string]: ComposeServiceNetwork;
 };

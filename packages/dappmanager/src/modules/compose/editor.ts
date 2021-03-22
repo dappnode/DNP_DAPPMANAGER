@@ -222,6 +222,13 @@ export class ComposeEditor {
     return parseUserSettings(this.compose);
   }
 
+  /**
+   * Returns compose network
+   */
+  getComposeNetwork(networkName: string): ComposeNetwork {
+    return this.compose.networks?.[networkName] || {};
+  }
+
   applyUserSettings(
     userSettings: UserSettings,
     { dnpName }: { dnpName: string }

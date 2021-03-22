@@ -109,6 +109,7 @@ const params = {
   DNP_PRIVATE_NETWORK_NAME: "dncore_network",
   DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
   DNP_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+  MINIMUM_COMPOSE_VERSION: "3.5",
 
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
