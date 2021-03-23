@@ -30,11 +30,12 @@ export function removeNetworkAliasCompose(
  * Get compose file network and compose network settings from dncore_network
  * And rewrites the compose with the core network edited
  */
-export function coreNetworkMigration(container: PackageContainer): void {
-  // 1. compose network settings
+export function migrateCoreNetworkInCompose(container: PackageContainer): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-  const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
-  if (Object.entries(networkConfig).length === 0) return;
+
+  // 1. compose network settings: not needed since will be declared as external
+  /* const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
+  if (!networkConfig) return; */
 
   // 2. compose service network settings
   const composeService = compose.services()[container.serviceName];
@@ -49,7 +50,9 @@ export function coreNetworkMigration(container: PackageContainer): void {
   composeService.addNetwork(
     dncoreNetworkName,
     { ...serviceNetwork },
-    { ...networkConfig, ...{ external: true, name: dncoreNetworkName } }
+    {
+      ...{ external: true, name: dncoreNetworkName }
+    } //...networkConfig,
   );
 
   compose.write();

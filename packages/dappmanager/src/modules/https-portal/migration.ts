@@ -7,7 +7,7 @@ import {
   dockerNetworkDisconnect
 } from "../docker";
 import { listContainers } from "../docker/list";
-import { addNetworkAliasCompose, coreNetworkMigration } from "./utils";
+import { addNetworkAliasCompose, migrateCoreNetworkInCompose } from "./utils";
 import Dockerode from "dockerode";
 
 /** Alias for code succinctness */
@@ -38,13 +38,14 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
     try {
       const currentEndpointConfig = await getEndpointConfig(containerName);
       if (hasAlias(currentEndpointConfig, alias)) return;
-
       const endpointConfig: Partial<Dockerode.NetworkInfo> = {
         ...currentEndpointConfig,
         Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
       };
-      coreNetworkMigration(container);
+
+      migrateCoreNetworkInCompose(container);
       addNetworkAliasCompose(container, dncoreNetworkName, [alias]);
+
       await dockerNetworkDisconnect(dncoreNetworkName, containerName);
       await dockerNetworkConnect(
         dncoreNetworkName,
@@ -60,7 +61,7 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
 }
 
 /** Return true if endpoint config exists and has alias */
-function hasAlias(
+export function hasAlias(
   endpointConfig: Dockerode.NetworkInfo | null,
   alias: string
 ): boolean {

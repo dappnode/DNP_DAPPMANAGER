@@ -69,7 +69,7 @@ export function parseUnsafeCompose(
   // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
 
   return cleanCompose({
-    version: sanitizeComposeFileVersion(composeUnsafe.version),
+    version: ensureMinimumComposeVersion(composeUnsafe.version),
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({
@@ -106,7 +106,7 @@ export function parseUnsafeCompose(
   });
 }
 
-function sanitizeComposeFileVersion(composeFileVersion: string): string {
+function ensureMinimumComposeVersion(composeFileVersion: string): string {
   if (
     semver.lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0")
   )
