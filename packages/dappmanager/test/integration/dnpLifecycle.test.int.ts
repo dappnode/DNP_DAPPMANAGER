@@ -268,6 +268,7 @@ describe("DNP lifecycle", function() {
     // SUPER important to clean dnp_repo folder to avoid caches
     await cleanRepos();
     await cleanContainers(...dnpNames);
+    await shellSafe("docker network rm dncore_network");
   });
 
   before(

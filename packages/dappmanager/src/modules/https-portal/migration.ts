@@ -18,18 +18,6 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * to all running containers.
  */
 export async function addAliasToRunningContainersMigration(): Promise<void> {
-  // Before running all, check DAPPMANAGER
-  const dappmanagerAlias = getPrivateNetworkAlias({
-    dnpName: params.dappmanagerDnpName,
-    serviceName: params.dappmanagerDnpName
-  });
-  const dappmanagerEndpointConfig = await getEndpointConfig(
-    params.dappmanagerContainerName
-  );
-  if (hasAlias(dappmanagerEndpointConfig, dappmanagerAlias)) {
-    return logs.info(`Alias migration already done`);
-  }
-
   // Otherwise check all packages
   for (const container of await listContainers()) {
     const containerName = container.containerName;

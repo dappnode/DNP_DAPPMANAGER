@@ -49,10 +49,8 @@ export function migrateCoreNetworkInCompose(container: PackageContainer): void {
   composeService.removeNetwork(dncoreNetworkNameFromCore);
   composeService.addNetwork(
     dncoreNetworkName,
-    { ...serviceNetwork },
-    {
-      ...{ external: true, name: dncoreNetworkName }
-    } //...networkConfig,
+    serviceNetwork,
+    { external: true, name: dncoreNetworkName } //...networkConfig,
   );
 
   compose.write();

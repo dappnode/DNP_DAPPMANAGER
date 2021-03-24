@@ -27,6 +27,7 @@ describe("Resilience features, when things go wrong", function() {
     name: dnpName
   };
   let releaseHash: string;
+  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
 
   beforeAndAfter("Clean files", async () => {
     await createTestDir();
@@ -34,11 +35,14 @@ describe("Resilience features, when things go wrong", function() {
   });
 
   before("Create DAppNode docker network", async () => {
-    const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
     const networkExists = await shell(
       `docker network ls --filter name=${dncoreNetwork} -q`
     );
     if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
+  });
+
+  after("Remove dncore_network", async () => {
+    await shell(`docker network rm ${dncoreNetwork}`);
   });
 
   before("Upload a vanilla package", async () => {

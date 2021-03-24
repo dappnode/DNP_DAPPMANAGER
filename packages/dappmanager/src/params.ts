@@ -149,6 +149,7 @@ const params = {
   vpnDnpName: "vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
+  ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [
