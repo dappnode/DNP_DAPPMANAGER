@@ -33,6 +33,16 @@ export function removeNetworkAliasCompose(
 export function migrateCoreNetworkInCompose(container: PackageContainer): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
+  // 0. Check if network migration has been done
+  const composeNetwork = compose.getComposeNetwork(
+    params.DNP_PRIVATE_NETWORK_NAME
+  );
+  if (
+    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME &&
+    composeNetwork?.external
+  )
+    return;
+
   // 1. compose network settings: not needed since will be declared as external
   /* const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
   if (!networkConfig) return; */
