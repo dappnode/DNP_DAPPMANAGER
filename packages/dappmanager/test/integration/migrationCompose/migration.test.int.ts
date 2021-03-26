@@ -7,34 +7,18 @@ import {
   migrateCoreNetworkInCompose
 } from "../../../src/modules/https-portal/utils";
 import params from "../../../src/params";
-import shell from "../../../src/utils/shell";
+import { mockContainer, shellSafe } from "../../testUtils";
 
-describe("Migration", () => {
+describe.only("Migration", () => {
   const container: PackageContainer = {
-    containerId:
-      "aa3cfc714b7dc0f5667795db520a7c132a1e8eade8268a0f8f1e0c63b73ee4ab",
+    ...mockContainer,
     containerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
     dnpName: "test-migration",
     serviceName: "dappmanager.dnp.dappnode.eth",
-    instanceName: "",
-    version: "0.2.38",
-    created: 0,
-    image:
-      "sha256:00e8945bfe1a8d2f4fd1e50cd14c3c97e653ba044277c1cd31771ac866eb055d",
-    state: "running",
-    running: true,
-    exitCode: 0,
-    ports: [],
-    volumes: [],
     networks: [
       { name: "random", ip: "10.0.1.1" },
       { name: "dncore_network", ip: "172.33.1.7" }
-    ],
-    isDnp: true,
-    isCore: false,
-    dependencies: {},
-    avatarUrl: "",
-    domainAlias: []
+    ]
   };
 
   const composeBefore = `
@@ -63,7 +47,7 @@ services:
 
   before("Run random container", async () => {
     // Create compose
-    await shell(`mkdir ${testMigrationPath}/test-migration`);
+    await shellSafe(`mkdir ${testMigrationPath}/test-migration`);
     fs.writeFileSync(
       `${testMigrationPath}/test-migration/docker-compose.yml`,
       composeBefore
@@ -72,14 +56,14 @@ services:
     params.DNCORE_DIR = testMigrationPath;
     params.REPO_DIR = testMigrationPath;
     // Startup container
-    await shell(
+    await shellSafe(
       `docker-compose -f ${testMigrationPath}/test-migration/docker-compose.yml -p DNCORE up -d`
     );
-    const containerkExists = await shell(
+    const containerkExists = await shellSafe(
       `docker container ls --filter name=${containerName}`
     );
 
-    const networkExists = await shell(
+    const networkExists = await shellSafe(
       `docker network ls --filter name=${dncoreNetwork}`
     );
 
@@ -142,17 +126,17 @@ services:
 
   after("Remove test setup", async () => {
     // Disconnect from network
-    await shell(
+    await shellSafe(
       `docker network disconnect ${dncoreNetwork} ${containerName} --force`
     );
     // Remove network
-    await shell(`docker network rm dncore_network`);
+    await shellSafe(`docker network rm dncore_network`);
     // Remove container
-    await shell(`docker rm ${containerName} --force`);
+    await shellSafe(`docker rm ${containerName} --force`);
     // Remove image
-    await shell(`docker image rm ${randomImage}`);
+    await shellSafe(`docker image rm ${randomImage}`);
     // Remove dir
-    await shell(`rm -rf ${testMigrationPath}/test-migration`);
+    await shellSafe(`rm -rf ${testMigrationPath}/test-migration`);
 
     // Return global vars to tests normal values
     params.DNCORE_DIR = "./DNCORE";

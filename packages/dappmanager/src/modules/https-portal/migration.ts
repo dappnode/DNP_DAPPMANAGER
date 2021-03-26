@@ -2,6 +2,7 @@ import params from "../../params";
 import { logs } from "../../logs";
 import { getPrivateNetworkAlias } from "../../domains";
 import {
+  dockerComposeUp,
   dockerContainerInspect,
   dockerNetworkConnect,
   dockerNetworkDisconnect
@@ -9,6 +10,7 @@ import {
 import { listContainers } from "../docker/list";
 import { addNetworkAliasCompose, migrateCoreNetworkInCompose } from "./utils";
 import Dockerode from "dockerode";
+import shell from "../../utils/shell";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -18,14 +20,13 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * to all running containers.
  */
 export async function addAliasToRunningContainersMigration(): Promise<void> {
-  // Otherwise check all packages
   for (const container of await listContainers()) {
     const containerName = container.containerName;
     const alias = getPrivateNetworkAlias(container);
 
     try {
       const currentEndpointConfig = await getEndpointConfig(containerName);
-      if (hasAlias(currentEndpointConfig, alias)) return;
+      if (hasAlias(currentEndpointConfig, alias)) continue;
       const endpointConfig: Partial<Dockerode.NetworkInfo> = {
         ...currentEndpointConfig,
         Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
@@ -34,6 +35,19 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
       migrateCoreNetworkInCompose(container);
       addNetworkAliasCompose(container, dncoreNetworkName, [alias]);
 
+      // Wifi and VPN containers needs a refresh connect due to its own network configuration
+      if (
+        container.containerName === params.vpnContainerName ||
+        container.containerName === params.wifiContainerName
+      ) {
+        await shell(`docker rm ${containerName} --force`);
+        await dockerComposeUp(
+          `${params.DNCORE_DIR}/docker-compose-${
+            container.dnpName.split(".")[0]
+          }.yml`
+        );
+        continue;
+      }
       await dockerNetworkDisconnect(dncoreNetworkName, containerName);
       await dockerNetworkConnect(
         dncoreNetworkName,

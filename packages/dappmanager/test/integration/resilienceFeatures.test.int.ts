@@ -8,10 +8,10 @@ import {
   mockManifestWithImage,
   beforeAndAfter,
   cleanRepos,
-  cleanContainers
+  cleanContainers,
+  shellSafe
 } from "../testUtils";
 import params from "../../src/params";
-import shell from "../../src/utils/shell";
 import { getDnpFromListPackages } from "../testPackageUtils";
 import {
   uploadManifestRelease,
@@ -35,14 +35,15 @@ describe("Resilience features, when things go wrong", function() {
   });
 
   before("Create DAppNode docker network", async () => {
-    const networkExists = await shell(
+    const networkExists = await shellSafe(
       `docker network ls --filter name=${dncoreNetwork} -q`
     );
-    if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
+    if (!networkExists)
+      await shellSafe(`docker network create ${dncoreNetwork}`);
   });
 
   after("Remove dncore_network", async () => {
-    await shell(`docker network rm ${dncoreNetwork}`);
+    await shellSafe(`docker network rm ${dncoreNetwork}`);
   });
 
   before("Upload a vanilla package", async () => {
