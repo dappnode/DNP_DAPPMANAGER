@@ -108,7 +108,7 @@ exit $UPEXIT
   const dappmanagerNewImage = dappmCompose.firstService().get().image;
 
   const composeRestart = new ComposeEditor({
-    version: "3.4",
+    version: "3.5",
     services: {
       [restartId]: {
         image: dappmanagerNewImage,

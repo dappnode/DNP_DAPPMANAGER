@@ -4,5 +4,6 @@ import { Compose } from "../../types";
 
 /**
  * Validates a compose 3.x not strictly
+ * Official schemas for docker compose https://github.com/docker/cli/tree/master/cli/compose/schema/data
  */
 export const validateCompose = getValidator<Compose>(compose3xSchema);

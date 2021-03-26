@@ -34,7 +34,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
   // Using ternary operators and undefined to avoid using if statements
   // and have a clearer docker-compose looking syntax
   return cleanCompose({
-    version: "3.4",
+    version: "3.5",
     services: {
       [serviceName]: {
         ...pick(image, [

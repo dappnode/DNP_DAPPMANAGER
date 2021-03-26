@@ -109,6 +109,8 @@ const params = {
   DNP_PRIVATE_NETWORK_NAME: "dncore_network",
   DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
   DNP_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+  // Use of new compose file feature: network name
+  MINIMUM_COMPOSE_VERSION: "3.5",
 
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
@@ -145,8 +147,11 @@ const params = {
   dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
   restartDnpName: "restart.dnp.dappnode.eth",
   vpnDnpName: "vpn.dnp.dappnode.eth",
+  vpnContainerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
+  wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
+  ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [

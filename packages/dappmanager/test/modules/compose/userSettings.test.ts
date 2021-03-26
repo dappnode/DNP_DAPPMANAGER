@@ -19,7 +19,7 @@ const mockComposeService: ComposeService = {
 };
 
 const mockCompose: Compose = {
-  version: "3.4",
+  version: "3.5",
   services: {
     [mockDnpName]: mockComposeService
   }
@@ -27,7 +27,7 @@ const mockCompose: Compose = {
 
 const polkadotServiceName = "polkadot-kusama.public.dappnode.eth";
 const polkadotNewCompose = {
-  version: "3.4",
+  version: "3.5",
   services: {
     [polkadotServiceName]: {
       image: "polkadot-kusama.public.dappnode.eth:0.0.2",
@@ -182,7 +182,7 @@ describe("parseUserSet", () => {
   it("Should parse a DNP_ETHCHAIN compose userSettings", () => {
     const serviceName = "ethchain.dnp.dappnode.eth";
     const compose: Compose = {
-      version: "3.4",
+      version: "3.5",
       networks: {
         network: {
           driver: "bridge",
@@ -459,7 +459,7 @@ describe("applyUserSettings", () => {
     const customBind = "/local/custom/bind";
 
     const oldLocalCompose: Compose = {
-      version: "3.4",
+      version: "3.5",
       services: {
         [dnpName]: {
           container_name: dnpName,
@@ -473,7 +473,7 @@ describe("applyUserSettings", () => {
     };
 
     const newCompose: Compose = {
-      version: "3.4",
+      version: "3.5",
       services: {
         [dnpName]: {
           container_name: dnpName,

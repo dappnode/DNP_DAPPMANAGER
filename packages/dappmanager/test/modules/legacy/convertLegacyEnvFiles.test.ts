@@ -19,7 +19,7 @@ describe("migrateLegacyEnvFiles", () => {
     const envFilePath = getPath.envFile(dnpName, isCore);
     const composePath = getPath.dockerCompose(dnpName, isCore);
     const compose = {
-      version: "3.4",
+      version: "3.5",
       services: { [dnpName]: { image: `${dnpName}:0.2.0` } }
     };
     const composeString = yamlDump(compose);
@@ -46,7 +46,7 @@ describe("migrateLegacyEnvFiles", () => {
     const composePath = getPath.dockerCompose(dnpName, isCore);
     const envsString = "NAME=VALUE";
     const composeString = yamlDump({
-      version: "3.4",
+      version: "3.5",
       services: {
         [dnpName]: {
           image: `${dnpName}:0.2.0`,
@@ -66,7 +66,7 @@ describe("migrateLegacyEnvFiles", () => {
     );
     expect(fs.readFileSync(composePath, "utf8")).to.equal(
       yamlDump({
-        version: "3.4",
+        version: "3.5",
         services: {
           [dnpName]: {
             image: `${dnpName}:0.2.0`,

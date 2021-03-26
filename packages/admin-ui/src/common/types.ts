@@ -612,6 +612,7 @@ export interface ComposeServiceNetwork {
 }
 
 export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
+
 export type ComposeServiceNetworksObj = {
   [networkName: string]: ComposeServiceNetwork;
 };
@@ -625,6 +626,7 @@ export interface ComposeNetwork {
       subnet: string;
     }[];
   };
+  name?: string;
 }
 
 export interface ComposeNetworks {
@@ -651,7 +653,7 @@ export interface ComposeVolumes {
 }
 
 export interface Compose {
-  version: string; // "3.4"
+  version: string; // "3.5"
   /** dnpName: "dappmanager.dnp.dappnode.eth" */
   services: { [dnpName: string]: ComposeService };
   networks?: ComposeNetworks;

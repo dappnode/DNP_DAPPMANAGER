@@ -14,6 +14,7 @@ import {
   ComposeNetworks,
   Manifest
 } from "../../types";
+import semver from "semver";
 
 interface ValidationAlert {
   name: string;
@@ -64,9 +65,11 @@ export function parseUnsafeCompose(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
+  // Use of new compose feature "name"only available in version 3.5
+  // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
 
   return cleanCompose({
-    version: composeUnsafe.version || "3.4",
+    version: ensureMinimumComposeVersion(composeUnsafe.version),
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({
@@ -101,6 +104,15 @@ export function parseUnsafeCompose(
 
     networks: parseUnsafeNetworks(composeUnsafe.networks, isCore)
   });
+}
+
+function ensureMinimumComposeVersion(composeFileVersion: string): string {
+  if (
+    semver.lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0")
+  )
+    composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
+
+  return composeFileVersion;
 }
 
 function parseUnsafeServiceNetworks(
@@ -143,12 +155,9 @@ function parseUnsafeNetworks(
     ...otherNetworks
   } = networks;
 
-  // Remote unsafe keys from all other networks
+  // Remove unsafe keys from all other networks
   networks = mapValues(otherNetworks, net => pick(net, networkSafeKeys));
 
-  // TODO: Use the name property so we can use the same name of core and non-core
-  // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
-  // Warning: It's only available on compose >=3.5, docker >=17.12.0
   if (isCore && dncoreNetwork) {
     networks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] = dncoreNetwork;
   } else {

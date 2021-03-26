@@ -1,10 +1,8 @@
-version: "3.4"
+version: "3.5"
 networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
+  dncore_network:
+    name: dncore_network
+    external: true
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
@@ -27,7 +25,9 @@ services:
       - DISABLE_UPNP=
     dns: 172.33.1.2
     networks:
-      network:
+      dncore_network:
         ipv4_address: 172.33.1.7
+        aliases:
+          - dappmanager.dappnode
     logging:
       driver: journald
