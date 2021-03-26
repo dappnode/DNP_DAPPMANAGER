@@ -1,4 +1,4 @@
-import { PackageContainer } from "../../common";
+import { PackageContainer } from "../../types";
 import { ComposeFileEditor } from "../compose/editor";
 import params from "../../params";
 
@@ -45,7 +45,13 @@ export function migrateCoreNetworkInCompose(container: PackageContainer): void {
   const serviceNetwork = serviceNetworks?.[dncoreNetworkNameFromCore];
   if (!serviceNetwork) return;
 
-  // 3. core network migration: network => dncore_network
+  // 3. Ensure compose file version 3.5
+  compose.compose = {
+    ...compose.compose,
+    version: params.MINIMUM_COMPOSE_VERSION
+  };
+
+  // 4. core network migration: network => dncore_network
   composeService.removeNetwork(dncoreNetworkNameFromCore);
   composeService.addNetwork(
     dncoreNetworkName,

@@ -9,7 +9,7 @@ import {
 import params from "../../../src/params";
 import { mockContainer, shellSafe } from "../../testUtils";
 
-describe.only("Migration", () => {
+describe("Migration", () => {
   const container: PackageContainer = {
     ...mockContainer,
     containerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
@@ -73,7 +73,7 @@ services:
 
   it("Should do network migration", async () => {
     const composeExpected = `
-version: '3.4'
+version: '3.5'
 networks:
   dncore_network:
     external: true
@@ -98,7 +98,7 @@ services:
 
   it("Should do alias migration", () => {
     const composeExpected = `
-version: '3.4'
+version: '3.5'
 networks:
   dncore_network:
     external: true

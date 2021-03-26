@@ -11,6 +11,7 @@ import { listContainers } from "../docker/list";
 import { addNetworkAliasCompose, migrateCoreNetworkInCompose } from "./utils";
 import Dockerode from "dockerode";
 import shell from "../../utils/shell";
+import * as getPath from "../../utils/getPath";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -18,6 +19,8 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
 /**
  * DAPPMANAGER updates from <= v0.2.38 must manually add aliases
  * to all running containers.
+ * This will run every single time dappmanager restarts and will list al packages
+ * and do docker inspect.
  */
 export async function addAliasToRunningContainersMigration(): Promise<void> {
   for (const container of await listContainers()) {
@@ -42,19 +45,16 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
       ) {
         await shell(`docker rm ${containerName} --force`);
         await dockerComposeUp(
-          `${params.DNCORE_DIR}/docker-compose-${
-            container.dnpName.split(".")[0]
-          }.yml`
+          getPath.dockerCompose(container.dnpName, container.isCore)
         );
-        continue;
+      } else {
+        await dockerNetworkDisconnect(dncoreNetworkName, containerName);
+        await dockerNetworkConnect(
+          dncoreNetworkName,
+          containerName,
+          endpointConfig
+        );
       }
-      await dockerNetworkDisconnect(dncoreNetworkName, containerName);
-      await dockerNetworkConnect(
-        dncoreNetworkName,
-        containerName,
-        endpointConfig
-      );
-
       logs.info(`Added alias to running container ${container.containerName}`);
     } catch (e) {
       logs.error(`Error adding alias to container ${containerName}`, e);
