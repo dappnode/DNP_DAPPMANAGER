@@ -1,11 +1,7 @@
 import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "../../../src/common";
-import { getPrivateNetworkAlias } from "../../../src/domains";
-import {
-  addNetworkAliasCompose,
-  migrateCoreNetworkInCompose
-} from "../../../src/modules/https-portal/utils";
+import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/https-portal/migration";
 import params from "../../../src/params";
 import { mockContainer, shellSafe } from "../../testUtils";
 
@@ -71,32 +67,7 @@ services:
       throw Error("Error creating container or/and dncore_network");
   });
 
-  it("Should do network migration", async () => {
-    const composeExpected = `
-version: '3.5'
-networks:
-  dncore_network:
-    external: true
-    name: dncore_network
-services:
-  dappmanager.dnp.dappnode.eth:
-    image: chentex/random-logger
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    dns: 172.33.1.2
-    networks:
-      dncore_network:
-        ipv4_address: 172.33.1.7`;
-
-    migrateCoreNetworkInCompose(container);
-    const composeAfter = fs.readFileSync(
-      `${testMigrationPath}/test-migration/docker-compose.yml`,
-      { encoding: "utf8" }
-    );
-    expect(composeAfter.trim()).to.equal(composeExpected.trim());
-  });
-
-  it("Should do alias migration", () => {
+  it("Should do network and alias migration", async () => {
     const composeExpected = `
 version: '3.5'
 networks:
@@ -115,8 +86,10 @@ services:
         aliases:
           - dappmanager.dnp.dappnode.eth.test-migration.dappnode`;
 
-    const alias = getPrivateNetworkAlias(container);
-    addNetworkAliasCompose(container, dncoreNetwork, [alias]);
+    migrateCoreNetworkAndAliasInCompose(
+      container,
+      "dappmanager.dnp.dappnode.eth.test-migration.dappnode"
+    );
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose.yml`,
       { encoding: "utf8" }
