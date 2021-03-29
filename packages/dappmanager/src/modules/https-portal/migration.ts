@@ -28,14 +28,13 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
     const alias = getPrivateNetworkAlias(container);
 
     try {
+      migrateCoreNetworkInCompose(container);
       const currentEndpointConfig = await getEndpointConfig(containerName);
       if (hasAlias(currentEndpointConfig, alias)) continue;
       const endpointConfig: Partial<Dockerode.NetworkInfo> = {
         ...currentEndpointConfig,
         Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
       };
-
-      migrateCoreNetworkInCompose(container);
       addNetworkAliasCompose(container, dncoreNetworkName, [alias]);
 
       // Wifi and VPN containers needs a refresh connect due to its own network configuration
