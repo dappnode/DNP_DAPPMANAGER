@@ -14,6 +14,8 @@ import * as getPath from "../../utils/getPath";
 import { ComposeFileEditor } from "../compose/editor";
 import { PackageContainer } from "../../types";
 import { parseServiceNetworks } from "../compose/networks";
+import { ComposeNetwork, ComposeServiceNetwork } from "../../common";
+import semver from "semver";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -96,10 +98,10 @@ export function migrateCoreNetworkAndAliasInCompose(
 ): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
-  // 0. Check if network migration has been done
-
-  // 1. Get compose network settings: not needed since will be declared as external
-  // const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
+  // 1. Get compose network settings
+  const composeNetwork = compose.getComposeNetwork(
+    params.DNP_PRIVATE_NETWORK_NAME
+  );
 
   // 2. Get compose service network settings
   const composeService = compose.services()[container.serviceName];
@@ -109,17 +111,16 @@ export function migrateCoreNetworkAndAliasInCompose(
   );
 
   const serviceNetwork =
-    serviceNetworks?.[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
+    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] ?? null;
 
   // 3. Check if migration was done
-  const composeNetwork = compose.getComposeNetwork(
-    params.DNP_PRIVATE_NETWORK_NAME
-  );
   if (
-    !serviceNetwork || // serviceNetwork will not exist in composes already migrated
-    (composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME &&
-      composeNetwork?.external &&
-      serviceNetwork.aliases?.includes(alias))
+    isComposeNetworkAndAliasMigrated(
+      composeNetwork,
+      serviceNetwork,
+      compose.compose.version,
+      alias
+    )
   )
     return;
 
@@ -129,8 +130,12 @@ export function migrateCoreNetworkAndAliasInCompose(
     version: params.MINIMUM_COMPOSE_VERSION
   };
 
-  // 5. core network migration: network => dncore_network
-  composeService.removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
+  // 5. Add network and alias
+  if (composeNetwork || serviceNetwork)
+    // composeNetwork and serviceNetwork might be null and have different values (eitherway it should be the same)
+    // Only remove network if exists
+    composeService.removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
+
   composeService.addNetwork(
     params.DNP_PRIVATE_NETWORK_NAME,
     { ...serviceNetwork, aliases: [alias] },
@@ -138,4 +143,37 @@ export function migrateCoreNetworkAndAliasInCompose(
   );
 
   compose.write();
+}
+
+function isComposeNetworkAndAliasMigrated(
+  composeNetwork: ComposeNetwork | null,
+  serviceNetwork: ComposeServiceNetwork | null,
+  composeVersion: string,
+  alias: string
+): boolean {
+  // semver can only work with version of 3 numbers. e.g: 3.5.0
+  const composeVersionCleaned = semver.clean(composeVersion + ".0", {
+    loose: true
+  });
+  const minimumComposeVersionCleaned = semver.clean(
+    params.MINIMUM_COMPOSE_VERSION + ".0",
+    {
+      loose: true
+    }
+  );
+
+  if (!composeVersionCleaned || !minimumComposeVersionCleaned)
+    throw Error("Docker compose file version cannot be used by semver");
+
+  // 1. Migration undone for aliases or networks or both => return false
+  if (!composeNetwork || !serviceNetwork) return false; // Consider as not migrated if either composeNetwork or serviceNetwork are not present
+  // 2. Migration done for aliases and networks => return true
+  if (
+    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check property name is defined
+    composeNetwork?.external && // Check is external network
+    semver.gte(composeVersionCleaned, minimumComposeVersionCleaned) && // Check version is at least 3.5
+    serviceNetwork.aliases?.includes(alias) // Check alias has been added
+  )
+    return true;
+  return false; // In other cases return false
 }
