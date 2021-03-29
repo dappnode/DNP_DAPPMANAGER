@@ -116,10 +116,10 @@ export function migrateCoreNetworkAndAliasInCompose(
     params.DNP_PRIVATE_NETWORK_NAME
   );
   if (
-    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME &&
-    composeNetwork?.external &&
-    serviceNetwork.aliases &&
-    serviceNetwork.aliases.includes(alias)
+    !serviceNetwork || // serviceNetwork will not exist in composes already migrated
+    (composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME &&
+      composeNetwork?.external &&
+      serviceNetwork.aliases?.includes(alias))
   )
     return;
 
