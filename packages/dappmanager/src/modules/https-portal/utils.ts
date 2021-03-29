@@ -1,6 +1,7 @@
 import { PackageContainer } from "../../types";
 import { ComposeFileEditor } from "../compose/editor";
 import params from "../../params";
+import { logs } from "../../logs";
 
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
 const dncoreNetworkNameFromCore = params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE;
@@ -40,34 +41,36 @@ export function migrateCoreNetworkInCompose(container: PackageContainer): void {
   if (
     composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME &&
     composeNetwork?.external
-  )
-    return;
-
-  // 1. compose network settings: not needed since will be declared as external
-  /* const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
+  ) {
+    logs.info(`Network migration already done on ${container.containerName}`);
+  } else {
+    // 1. compose network settings: not needed since will be declared as external
+    /* const networkConfig = compose.getComposeNetwork(dncoreNetworkNameFromCore);
   if (!networkConfig) return; */
 
-  // 2. compose service network settings
-  const composeService = compose.services()[container.serviceName];
-  const serviceNetworks = composeService.get().networks;
-  // core network should be defined as object not array
-  if (Array.isArray(serviceNetworks)) return;
-  const serviceNetwork = serviceNetworks?.[dncoreNetworkNameFromCore];
-  if (!serviceNetwork) return;
+    // 2. compose service network settings
+    const composeService = compose.services()[container.serviceName];
+    const serviceNetworks = composeService.get().networks;
+    // core network should be defined as object not array
+    if (Array.isArray(serviceNetworks)) return;
+    const serviceNetwork = serviceNetworks?.[dncoreNetworkNameFromCore];
+    if (!serviceNetwork) return;
 
-  // 3. Ensure compose file version 3.5
-  compose.compose = {
-    ...compose.compose,
-    version: params.MINIMUM_COMPOSE_VERSION
-  };
+    // 3. Ensure compose file version 3.5
+    compose.compose = {
+      ...compose.compose,
+      version: params.MINIMUM_COMPOSE_VERSION
+    };
 
-  // 4. core network migration: network => dncore_network
-  composeService.removeNetwork(dncoreNetworkNameFromCore);
-  composeService.addNetwork(
-    dncoreNetworkName,
-    serviceNetwork,
-    { external: true, name: dncoreNetworkName } //...networkConfig,
-  );
+    // 4. core network migration: network => dncore_network
+    composeService.removeNetwork(dncoreNetworkNameFromCore);
+    composeService.addNetwork(
+      dncoreNetworkName,
+      serviceNetwork,
+      { external: true, name: dncoreNetworkName } //...networkConfig,
+    );
 
-  compose.write();
+    compose.write();
+    logs.info(`Added external network on ${container.containerName}`);
+  }
 }
