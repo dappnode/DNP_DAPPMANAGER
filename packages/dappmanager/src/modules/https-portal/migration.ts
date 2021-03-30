@@ -16,7 +16,7 @@ import { PackageContainer } from "../../types";
 import { parseServiceNetworks } from "../compose/networks";
 import { ComposeNetwork, ComposeServiceNetwork } from "../../common";
 import semver from "semver";
-import { sanitizeVersion } from "../../utils/sanitizeVersion";
+import { parseComposeSemver } from "../../utils/sanitizeVersion";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -159,8 +159,8 @@ function isComposeNetworkAndAliasMigrated(
     composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check property name is defined
     composeNetwork?.external && // Check is external network
     semver.gte(
-      sanitizeVersion(composeVersion + ".0"),
-      sanitizeVersion(params.MINIMUM_COMPOSE_VERSION + ".0")
+      parseComposeSemver(composeVersion),
+      parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5
     serviceNetwork.aliases?.includes(alias) // Check alias has been added
   )

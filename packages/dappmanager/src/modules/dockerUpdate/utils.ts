@@ -30,8 +30,6 @@ export function parseDockerEngineRequirements(
 
   const dockerServerVersionCleaned = sanitizeVersion(dockerServerVersion);
   const dockerCliVersionCleaned = sanitizeVersion(dockerCliVersion);
-  if (!dockerServerVersionCleaned || !dockerCliVersionCleaned)
-    throw Error("Docker version cannot be used by semver");
 
   const isOsSupported = supportedOs === os;
   const isArchSupported = supportedArchs.some(arch => arch === architecture);
