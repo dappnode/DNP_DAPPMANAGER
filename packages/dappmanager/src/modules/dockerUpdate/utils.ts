@@ -5,6 +5,7 @@ import {
   UpdateRequirement,
   DockerUpdateStatus
 } from "../../types";
+import { sanitizeVersion } from "../../utils/sanitizeVersion";
 import {
   supportedOs,
   supportedArchs,
@@ -27,14 +28,8 @@ export function parseDockerEngineRequirements(
     dockerComposeVersion
   } = info;
 
-  const dockerServerVersionCleaned = semver.clean(dockerServerVersion, {
-    loose: true
-  });
-  const dockerCliVersionCleaned = semver.clean(dockerCliVersion, {
-    loose: true
-  });
-  if (!dockerServerVersionCleaned || !dockerCliVersionCleaned)
-    throw Error("Docker version cannot be used by semver");
+  const dockerServerVersionCleaned = sanitizeVersion(dockerServerVersion);
+  const dockerCliVersionCleaned = sanitizeVersion(dockerCliVersion);
 
   const isOsSupported = supportedOs === os;
   const isArchSupported = supportedArchs.some(arch => arch === architecture);
