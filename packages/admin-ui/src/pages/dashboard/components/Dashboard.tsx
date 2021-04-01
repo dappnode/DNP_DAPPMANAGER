@@ -1,27 +1,25 @@
 import React from "react";
 // Own module
 import { title } from "../data";
-import ChainCard from "./ChainCard";
+import { ChainCards } from "./ChainCard";
 import { HostStats } from "./HostStats";
-import "./dashboard.scss";
+import { PackageUpdates } from "./PackageUpdates";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
-import { useChainData } from "hooks/chainData";
+
+import "./dashboard.scss";
 
 export default function Dashboard() {
-  const chainData = useChainData();
-
   return (
     <>
       <Title title={title} />
 
+      <SubTitle>Package updates</SubTitle>
+      <PackageUpdates />
+
       <SubTitle>Chains</SubTitle>
-      <div className="dashboard-cards">
-        {chainData.map(chain => (
-          <ChainCard key={chain.dnpName} {...chain} />
-        ))}
-      </div>
+      <ChainCards />
 
       <SubTitle>Machine stats</SubTitle>
       <HostStats />

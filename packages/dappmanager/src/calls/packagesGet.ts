@@ -1,11 +1,30 @@
+import { UpdateAvailable } from "../common";
+import * as db from "../db";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import { listPackages } from "../modules/docker/list";
-import { InstalledPackageData } from "../types";
+import { InstalledPackageData, InstalledPackageDataApiReturn } from "../types";
 
 /**
  * Returns the list of current containers associated to packages
  */
-export async function packagesGet(): Promise<InstalledPackageData[]> {
-  return sortPackages(await listPackages());
+export async function packagesGet(): Promise<InstalledPackageDataApiReturn[]> {
+  const dnps = sortPackages(await listPackages());
+
+  // Check if an update is available from stored last known version
+  const latestKnownVersions = db.packageLatestKnownVersion.getAll();
+
+  return dnps.map(dnp => {
+    const latestKnownVersion: UpdateAvailable | undefined =
+      latestKnownVersions[dnp.dnpName];
+    return {
+      ...dnp,
+      updateAvailable:
+        latestKnownVersion &&
+        shouldUpdate(dnp.version, latestKnownVersion.newVersion)
+          ? latestKnownVersion
+          : null
+    };
+  });
 }
 
 /**

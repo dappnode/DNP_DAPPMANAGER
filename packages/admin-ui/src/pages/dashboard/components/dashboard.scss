@@ -15,6 +15,11 @@
   &.half {
     grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
   }
+
+  .package-updates {
+    // Give the single card a max width that matches the other cards
+    grid-column: 1 / 4;
+  }
 }
 
 /* Chain cards and  Stats cards */
@@ -56,4 +61,18 @@
 }
 .stats-card .text {
   margin-bottom: 0;
+}
+
+// Package updates card
+
+.package-update-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  // Make buttons smaller so the list is not that big
+  button {
+    padding: 3px 12px;
+    font-size: 94%;
+  }
 }

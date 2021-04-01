@@ -18,7 +18,6 @@ import {
   VpnDevice,
   PackageNotificationDb,
   UserActionLog,
-  InstalledPackageData,
   InstalledPackageDetailData,
   PackageEnvs,
   HostStatCpu,
@@ -34,7 +33,8 @@ import {
   DockerUpdateStatus,
   WireguardDeviceCredentials,
   ExposableServiceMapping,
-  HostDiagnoseItem
+  HostDiagnoseItem,
+  InstalledPackageDataApiReturn
 } from "./types";
 
 export interface Routes {
@@ -319,7 +319,7 @@ export interface Routes {
   /**
    * Returns the list of current containers associated to packages
    */
-  packagesGet: () => Promise<InstalledPackageData[]>;
+  packagesGet: () => Promise<InstalledPackageDataApiReturn[]>;
 
   /**
    * Toggles the visibility of a getting started block
