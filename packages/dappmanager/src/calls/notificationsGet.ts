@@ -19,6 +19,6 @@ export async function notificationsGet(): Promise<PackageNotificationDb[]> {
    * Notifications are stored at `notification.{id}`
    * The key `notification` returns an object { "id1": <notification obj>, ... }
    */
-  const notifications = db.notifications.get();
+  const notifications = db.notification.getAll();
   return Object.values(notifications);
 }

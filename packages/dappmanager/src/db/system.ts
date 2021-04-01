@@ -56,10 +56,10 @@ export const versionData = dbCache.staticKey<PackageVersionData>(
 
 // Disk usage threshould records
 
-export const diskUsageThreshold = dbCache.dynamicKeyValidate<boolean, string>(
-  id => joinWithDot(DISK_USAGE_THRESHOLD, id),
-  () => true
-);
+export const diskUsageThreshold = dbCache.indexedByKey<boolean, string>({
+  rootKey: DISK_USAGE_THRESHOLD,
+  getKey: id => id
+});
 
 // DAppNode Name appears on the UI
 

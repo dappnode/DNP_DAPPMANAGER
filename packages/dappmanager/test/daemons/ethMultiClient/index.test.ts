@@ -46,6 +46,7 @@ describe("daemons > ethMultiClient > runWatcher", () => {
         }
       },
       ethClientInstallStatus: {
+        getAll: () => ({}),
         get: (keyArg: EthClientTarget) => state.status[keyArg],
         set: (keyArg: EthClientTarget, status: EthClientInstallStatus) => {
           state.status[keyArg] = status;
@@ -61,6 +62,7 @@ describe("daemons > ethMultiClient > runWatcher", () => {
         }
       },
       ethClientUserSettings: {
+        getAll: () => ({}),
         get: (keyArg: EthClientTarget): UserSettings => {
           keyArg;
           return {};
