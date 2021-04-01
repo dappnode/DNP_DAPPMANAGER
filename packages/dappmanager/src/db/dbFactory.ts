@@ -1,7 +1,7 @@
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import * as validate from "../utils/validate";
-import { formatKey } from "./dbUtils";
+import { formatKey, joinWithDot } from "./dbUtils";
 import { logs } from "../logs";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
@@ -51,11 +51,20 @@ export default function dbFactory(dbPath: string) {
    * @param validate Must return a boolean (valid or not) given an item
    */
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-  function dynamicKeyValidate<T, K>(
-    keyGetter: (keyArg: K) => string,
-    validate?: (keyArg: K, value?: T) => boolean
-  ) {
+  function indexedByKey<T, K>({
+    rootKey,
+    getKey,
+    validate
+  }: {
+    rootKey: string;
+    getKey: (keyArg: K) => string;
+    validate?: (keyArg: K, value?: T) => boolean;
+  }) {
+    const keyGetter = (keyArg: K): string =>
+      joinWithDot(rootKey, getKey(keyArg));
+
     return {
+      getAll: (): { [key: string]: T } => get(rootKey),
       get: (keyArg: K): T | undefined => {
         const value = get(keyGetter(keyArg));
         if (!validate || validate(keyArg, value)) return value;
@@ -78,7 +87,7 @@ export default function dbFactory(dbPath: string) {
 
   return {
     staticKey,
-    dynamicKeyValidate,
+    indexedByKey,
     clearDb,
     lowLevel: { get, set, del, clearDb }
   };

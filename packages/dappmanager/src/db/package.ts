@@ -1,26 +1,19 @@
 import { UpdateAvailable } from "../types";
-import { dynamicKeyValidate } from "./dbCache";
-import { joinWithDot } from "./dbUtils";
+import { indexedByKey } from "./dbCache";
 
 const PACKAGE_GETTING_STARTED_SHOW = "package-getting-started-show";
 const PACKAGE_INSTALL_TIME = "package-install-time";
 const PACKAGE_LATEST_KNOWN_VERSION = "package-latest-known-version";
 
-const keyGetterGettingStartedShow = (dnpName: string): string =>
-  joinWithDot(PACKAGE_GETTING_STARTED_SHOW, dnpName);
-const keyGetterInstallTime = (dnpName: string): string =>
-  joinWithDot(PACKAGE_INSTALL_TIME, dnpName);
-const alwaysValid = (): true => true;
+export const packageGettingStartedShow = indexedByKey<boolean, string>({
+  rootKey: PACKAGE_GETTING_STARTED_SHOW,
+  getKey: dnpName => dnpName
+});
 
-export const packageGettingStartedShow = dynamicKeyValidate<boolean, string>(
-  keyGetterGettingStartedShow,
-  alwaysValid
-);
-
-export const packageInstallTime = dynamicKeyValidate<number, string>(
-  keyGetterInstallTime,
-  alwaysValid
-);
+export const packageInstallTime = indexedByKey<number, string>({
+  rootKey: PACKAGE_INSTALL_TIME,
+  getKey: dnpName => dnpName
+});
 
 export function addPackageInstalledMetadata(dnpName: string): void {
   packageGettingStartedShow.set(dnpName, true);
@@ -31,7 +24,7 @@ export function addPackageInstalledMetadata(dnpName: string): void {
  * Register the last emitted version for a dnpName
  * Only emit notifications for versions above this one
  */
-export const packageLatestKnownVersion = dynamicKeyValidate<
-  UpdateAvailable,
-  string
->(dnpName => joinWithDot(PACKAGE_LATEST_KNOWN_VERSION, dnpName), alwaysValid);
+export const packageLatestKnownVersion = indexedByKey<UpdateAvailable, string>({
+  rootKey: PACKAGE_LATEST_KNOWN_VERSION,
+  getKey: dnpName => dnpName
+});

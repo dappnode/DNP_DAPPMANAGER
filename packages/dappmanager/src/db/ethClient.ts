@@ -8,7 +8,6 @@ import {
   EthClientTargetPackage,
   EthClientSyncedNotificationStatus
 } from "../types";
-import { joinWithDot } from "./dbUtils";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
 import { eventBus } from "../eventBus";
 
@@ -43,17 +42,15 @@ export const ethClientFallback = interceptOnSet(
 // This is necessary if there was a migration and the settings have to
 // be kept after switching between clients
 
-const ethClientUserSettingsKeyGetter = (target: EthClientTarget): string =>
-  joinWithDot(ETH_CLIENT_USER_SETTINGS, target);
-const ethClientUserSettingsValidate = (
-  id: string,
-  userSettings?: UserSettings
-): boolean => typeof id === "string" && typeof userSettings === "object";
-
-export const ethClientUserSettings = dbMain.dynamicKeyValidate<
+export const ethClientUserSettings = dbMain.indexedByKey<
   UserSettings,
   EthClientTarget
->(ethClientUserSettingsKeyGetter, ethClientUserSettingsValidate);
+>({
+  rootKey: ETH_CLIENT_USER_SETTINGS,
+  getKey: target => target,
+  validate: (id, userSettings) =>
+    typeof id === "string" && typeof userSettings === "object"
+});
 
 // Cached status, not critical
 
@@ -61,23 +58,24 @@ export const ethClientUserSettings = dbMain.dynamicKeyValidate<
  * Cache the status of the eth client install loop
  */
 export const ethClientInstallStatus = interceptOnSet(
-  dbCache.dynamicKeyValidate<EthClientInstallStatus, EthClientTarget>(
-    (target: EthClientTarget): string =>
-      joinWithDot(ETH_CLIENT_INSTALL_STATUS, target),
-    (id: string, installStatus?: EthClientInstallStatus): boolean =>
+  dbCache.indexedByKey<EthClientInstallStatus, EthClientTarget>({
+    rootKey: ETH_CLIENT_INSTALL_STATUS,
+    getKey: target => target,
+    validate: (id, installStatus) =>
       typeof id === "string" && typeof installStatus === "object"
-  )
+  })
 );
 
 /**
  * Cache the general status of the eth client, if it's available or not
  */
 export const ethClientStatus = interceptOnSet(
-  dbCache.dynamicKeyValidate<EthClientStatus, EthClientTarget>(
-    (target: EthClientTarget): string => joinWithDot(ETH_CLIENT_STATUS, target),
-    (id: string, status?: EthClientStatus): boolean =>
+  dbCache.indexedByKey<EthClientStatus, EthClientTarget>({
+    rootKey: ETH_CLIENT_STATUS,
+    getKey: target => target,
+    validate: (id, status) =>
       typeof id === "string" && typeof status === "object"
-  )
+  })
 );
 
 export const ethProviderUrl = interceptOnSet(
