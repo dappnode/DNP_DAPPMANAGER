@@ -6,6 +6,7 @@ import { CopyFileTo } from "./To";
 import { CopyFileFrom } from "./From";
 import { PackageContainer } from "common";
 import { ServiceSelector } from "../ServiceSelector";
+import SubTitle from "components/SubTitle";
 
 export const FileManager = ({
   containers
@@ -19,33 +20,34 @@ export const FileManager = ({
 
   const container = containers.find(c => c.serviceName === serviceName);
   const containerName = container?.containerName;
-  const name = serviceNames.length === 1 ? "package" : serviceName;
 
   return (
-    <Card spacing divider className="file-manager">
-      <ServiceSelector
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        containers={containers}
-      />
+    <>
+      <Card spacing divider className="file-manager">
+        <ServiceSelector
+          serviceName={serviceName}
+          setServiceName={setServiceName}
+          containers={containers}
+        />
+      </Card>
 
       {containerName && (
         <>
-          <div>
-            <div className="subtle-header">Upload file to {name}</div>
+          <SubTitle>Upload file</SubTitle>
+          <Card spacing divider className="file-manager">
             <CopyFileTo containerName={containerName} toPathDefault={to} />
-          </div>
+          </Card>
 
-          <div>
-            <div className="subtle-header">Download file from {name}</div>
+          <SubTitle>Download file</SubTitle>
+          <Card spacing divider className="file-manager">
             <CopyFileFrom
               containerName={containerName}
               fromPathDefault={from}
             />
-          </div>
+          </Card>
         </>
       )}
-    </Card>
+    </>
   );
 };
 

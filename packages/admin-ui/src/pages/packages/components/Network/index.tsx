@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import Card from "components/Card";
+import SubTitle from "components/SubTitle";
 import { PackageContainer } from "types";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
@@ -12,36 +13,41 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const container = containers.find(c => c.serviceName === serviceName);
   return (
-    <Card spacing className="network-editor">
-      <ServiceSelector
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        containers={containers}
-      />
-
-      {container && (
-        <>
+    <>
+      <Card spacing className="network-editor">
+        <ServiceSelector
+          serviceName={serviceName}
+          setServiceName={setServiceName}
+          containers={containers}
+        />
+        {container && (
           <div>
             <strong>Container IP: </strong>
             {container.ip || "Not available"}
           </div>
+        )}
+      </Card>
 
-          <div className="subtle-header">HTTPS DOMAIN MAPPING</div>
-          <HttpsMappings
-            dnpName={container.dnpName}
-            serviceName={container.serviceName}
-          />
+      {container && (
+        <>
+          <SubTitle>Public port mapping</SubTitle>
+          <Card spacing className="network-editor">
+            <PortsByService
+              dnpName={container.dnpName}
+              serviceName={container.serviceName}
+              ports={container.ports}
+            />
+          </Card>
 
-          <hr />
-
-          <div className="subtle-header">PUBLIC PORT MAPPING</div>
-          <PortsByService
-            dnpName={container.dnpName}
-            serviceName={container.serviceName}
-            ports={container.ports}
-          />
+          <SubTitle>HTTPs domain mapping</SubTitle>
+          <Card spacing className="network-editor">
+            <HttpsMappings
+              dnpName={container.dnpName}
+              serviceName={container.serviceName}
+            />
+          </Card>
         </>
       )}
-    </Card>
+    </>
   );
 }
