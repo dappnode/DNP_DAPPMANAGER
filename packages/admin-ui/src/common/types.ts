@@ -1002,19 +1002,13 @@ export interface PackageReleaseMetadata {
   upstreamVersion?: string;
   shortDescription?: string;
   description?: string;
+
   type?: "service" | "library" | "dncore";
   chain?: ChainDriver;
-  dependencies?: Dependencies;
   mainService?: string;
-  architectures?: Architecture[];
-
-  // Safety properties to solve problematic updates
-  runOrder?: string[];
-  restartCommand?: string;
-  restartLaunchCommand?: string;
-
-  // "15min" | 3600
+  /** "15min" | 3600 */
   dockerTimeout?: string;
+  dependencies?: Dependencies;
 
   requirements?: {
     minimumDappnodeVersion: string;
@@ -1022,6 +1016,13 @@ export interface PackageReleaseMetadata {
   globalEnvs?: {
     all?: boolean;
   };
+  architectures?: Architecture[];
+
+  // Safety properties to solve problematic updates
+  runOrder?: string[];
+  restartCommand?: string;
+  restartLaunchCommand?: string;
+
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {
