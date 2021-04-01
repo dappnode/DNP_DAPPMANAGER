@@ -22,10 +22,12 @@ export function AlertPackageUpdateAvailable({
       dismissible
       className="main-notification"
     >
-      {prettyDnpName(dnpName)} update available to version{" "}
-      {updateAvailable.newVersion}{" "}
-      {updateAvailable.upstreamVersion &&
-        `(${updateAvailable.upstreamVersion} upstream)`}
+      <div>
+        {prettyDnpName(dnpName)} update available to version{" "}
+        {updateAvailable.newVersion}{" "}
+        {updateAvailable.upstreamVersion &&
+          `(${updateAvailable.upstreamVersion} upstream)`}
+      </div>
       <NavLink to={urlJoin(installerRootPath, dnpName)}>
         <Button variant="dappnode">Update</Button>
       </NavLink>
