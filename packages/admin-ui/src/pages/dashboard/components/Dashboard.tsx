@@ -15,14 +15,20 @@ export default function Dashboard() {
     <>
       <Title title={title} />
 
-      <SubTitle>Package updates</SubTitle>
-      <PackageUpdates />
+      <div className="dashboard-layout">
+        <div className="dashboard-right">
+          <SubTitle>Package updates</SubTitle>
+          <PackageUpdates />
+        </div>
 
-      <SubTitle>Chains</SubTitle>
-      <ChainCards />
+        <div className="dashboard-left">
+          <SubTitle>Chains</SubTitle>
+          <ChainCards />
 
-      <SubTitle>Machine stats</SubTitle>
-      <HostStats />
+          <SubTitle>Machine stats</SubTitle>
+          <HostStats />
+        </div>
+      </div>
     </>
   );
 }
