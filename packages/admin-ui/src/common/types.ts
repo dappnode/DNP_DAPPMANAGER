@@ -24,6 +24,13 @@ export interface ExposableServiceInfo {
   port: number;
 }
 
+export interface ExposableServiceManifestInfo {
+  name: string;
+  description?: string;
+  serviceName?: string;
+  port: number;
+}
+
 export type ExposableServiceMapping = ExposableServiceInfo &
   ((HttpsPortalMapping & { exposed: true }) | { exposed: false });
 
@@ -1043,6 +1050,9 @@ export interface PackageReleaseMetadata {
   // Monitoring
   grafanaDashboards?: GrafanaDashboard[];
   prometheusTargets?: PrometheusTarget[];
+
+  // Network metadata
+  exposable?: ExposableServiceManifestInfo[];
 
   author?: string;
   contributors?: string[];
