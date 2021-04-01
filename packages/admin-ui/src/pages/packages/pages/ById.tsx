@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash";
-import { rootPath as installerRootPath } from "pages/installer";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";
@@ -14,19 +13,12 @@ import { NoDnpInstalled } from "../components/NoDnpInstalled";
 import { Network } from "../components/Network";
 import { title } from "../data";
 // Components
-import Alert from "react-bootstrap/esm/Alert";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Title from "components/Title";
-import Button from "components/Button";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { urlJoin } from "utils/url";
-import {
-  InstalledPackageData,
-  InstalledPackageDetailData,
-  UpdateAvailable
-} from "common";
+import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -131,10 +123,10 @@ export const PackageById: React.FC<RouteComponentProps<{
       </div>
 
       {updateAvailable && (
-        <AlertNewUpdate
+        <AlertPackageUpdateAvailable
           dnpName={dnpName}
           updateAvailable={updateAvailable}
-        ></AlertNewUpdate>
+        ></AlertPackageUpdateAvailable>
       )}
 
       <div className="packages-content">
@@ -154,29 +146,3 @@ export const PackageById: React.FC<RouteComponentProps<{
     </>
   );
 };
-
-function AlertNewUpdate({
-  dnpName,
-  updateAvailable
-}: {
-  dnpName: string;
-  updateAvailable: UpdateAvailable;
-}) {
-  const [show, setShow] = useState(true);
-  return show ? (
-    <Alert
-      variant="info"
-      onClose={() => setShow(false)}
-      dismissible
-      className="main-notification"
-    >
-      {prettyDnpName(dnpName)} update available to version{" "}
-      {updateAvailable.newVersion}{" "}
-      {updateAvailable.upstreamVersion &&
-        `(${updateAvailable.upstreamVersion} upstream)`}
-      <NavLink to={urlJoin(installerRootPath, dnpName)}>
-        <Button variant="dappnode">Update</Button>
-      </NavLink>
-    </Alert>
-  ) : null;
-}
