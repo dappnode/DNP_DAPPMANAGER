@@ -6,16 +6,17 @@ import Button from "components/Button";
 // Utils
 import fileToDataUri from "utils/fileToDataUri";
 import humanFileSize from "utils/humanFileSize";
-import { shortNameCapitalized as sn } from "utils/format";
+import { prettyFullName } from "utils/format";
 import { withToast } from "components/toast/Toast";
+import { PackageContainer } from "types";
 
 const fileSizeWarning = 1e6;
 
 export function CopyFileTo({
-  containerName,
+  container,
   toPathDefault
 }: {
-  containerName: string;
+  container: PackageContainer;
   toPathDefault?: string;
 }) {
   const [file, setFile] = useState<File>();
@@ -28,30 +29,28 @@ export function CopyFileTo({
   const { name, size } = file || {};
 
   async function uploadFile() {
+    const prettyName = prettyFullName(container);
     if (file)
       try {
         const dataUri = await fileToDataUri(file);
         const filename = name || "";
+
         await withToast(
           () =>
             api.copyFileTo({
-              containerName,
+              containerName: container.containerName,
               dataUri,
               filename: name || "",
               toPath
             }),
           {
-            message: `Copying file ${filename} to ${sn(
-              containerName
-            )} ${toPath}...`,
-            onSuccess: `Copied file ${filename} to ${sn(
-              containerName
-            )} ${toPath}`
+            message: `Copying file ${filename} to ${prettyName} ${toPath}...`,
+            onSuccess: `Copied file ${filename} to ${prettyName} ${toPath}`
           }
         );
       } catch (e) {
         console.error(
-          `Error on copyFileTo ${containerName} ${toPath}: ${e.stack}`
+          `Error on copyFileTo ${prettyName} ${toPath}: ${e.stack}`
         );
       }
   }

@@ -4,7 +4,7 @@ import Badge from "react-bootstrap/Badge";
 import computeSemverUpdateType from "utils/computeSemverUpdateType";
 import RenderMarkdown from "components/RenderMarkdown";
 import styled from "styled-components";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { DependencyListItem } from "types";
 
 const InfoContainer = styled.div`
@@ -50,7 +50,7 @@ const DependencyList: React.FC<DependencyListProps> = ({ deps }) => {
         return (
           <div key={name} className="dependency-list">
             <InfoContainer>
-              <span>{shortNameCapitalized(name)}</span>
+              <span>{prettyDnpName(name)}</span>
               <SpanCenter>
                 {from ? `Update from ${from} to ${to}` : `Installs ${to}`}
                 {updateType === "downgrade" || updateType === "major" ? (

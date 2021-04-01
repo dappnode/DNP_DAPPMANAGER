@@ -6,7 +6,7 @@ import Button from "components/Button";
 import { rootPath as installerRootPath } from "pages/installer";
 import { rootPath as packagesRootPath } from "pages/packages";
 // Utils
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 
 export const NoDnpInstalled = ({ id }: { id: string }) => (
   <div className="centered-container">
@@ -16,7 +16,7 @@ export const NoDnpInstalled = ({ id }: { id: string }) => (
       <Button style={{ textTransform: "capitalize" }}>Packages</Button>
     </Link>
     <Link style={{ margin: "0 10px" }} to={installerRootPath + "/" + id}>
-      <Button>Install {shortNameCapitalized(id)}</Button>
+      <Button>Install {prettyDnpName(id)}</Button>
     </Link>
   </div>
 );

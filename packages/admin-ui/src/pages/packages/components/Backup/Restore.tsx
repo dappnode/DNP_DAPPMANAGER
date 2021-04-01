@@ -7,7 +7,7 @@ import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import { withToastNoThrow } from "components/toast/Toast";
 import ErrorView from "components/ErrorView";
 // Utils
-import { shortName } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import humanFS from "utils/humanFileSize";
 import { PackageBackup, ReqStatus } from "types";
 
@@ -45,8 +45,8 @@ export function BackupRestore({
       await withToastNoThrow(
         () => api.backupRestore({ dnpName, backup, fileId }),
         {
-          message: `Restoring backup for ${shortName(dnpName)}...`,
-          onSuccess: `Restored backup for ${shortName(dnpName)}`
+          message: `Restoring backup for ${prettyDnpName(dnpName)}...`,
+          onSuccess: `Restored backup for ${prettyDnpName(dnpName)}`
         }
       );
 

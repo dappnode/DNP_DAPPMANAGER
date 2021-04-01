@@ -5,7 +5,7 @@ import { isEqual } from "lodash";
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
 import { UserSettingsAllDnps, SetupWizardAllDnps } from "types";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { EditorAdvanced } from "./EditorAdvanced";
 import { EditorV2 } from "./EditorV2";
 import {
@@ -110,7 +110,7 @@ export function SetupWizard({
         <Alert variant="danger">
           {visibleDataErrors.map(({ dnpName, id, title, type, message }) => (
             <div key={dnpName + id + type}>
-              {shortNameCapitalized(dnpName)} - {title} - {message}
+              {prettyDnpName(dnpName)} - {title} - {message}
             </div>
           ))}
         </Alert>

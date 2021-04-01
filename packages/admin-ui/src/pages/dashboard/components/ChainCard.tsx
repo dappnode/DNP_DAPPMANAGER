@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import RenderMarkdown from "components/RenderMarkdown";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { ChainData } from "types";
 import { HelpTo } from "components/Help";
 
@@ -11,7 +11,7 @@ export default function ChainCard(chain: ChainData) {
   return (
     <Card className="chain-card">
       <div className="name">
-        <span className="text">{name || shortNameCapitalized(dnpName)}</span>
+        <span className="text">{name || prettyDnpName(dnpName)}</span>
         {help && <HelpTo url={help} />}
       </div>
 

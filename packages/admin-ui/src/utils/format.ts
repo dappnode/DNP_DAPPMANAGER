@@ -3,10 +3,24 @@ import { stringSplit } from "./strings";
 import prettyBytesLib from "pretty-bytes";
 import { VolumeData } from "types";
 
-export function shortName(ens: string) {
-  if (!ens || typeof ens !== "string") return ens;
-  if (!ens.includes(".")) return ens;
-  return stringSplit(ens, ".")[0];
+export function prettyFullName({
+  dnpName,
+  serviceName
+}: {
+  dnpName: string;
+  serviceName: string;
+}): string {
+  if (dnpName === serviceName) {
+    return prettyDnpName(dnpName);
+  } else {
+    const dnpNamePretty = prettyDnpName(dnpName);
+    const serviceNamePretty = prettyDnpName(serviceName);
+    if (dnpNamePretty === serviceNamePretty) {
+      return dnpNamePretty;
+    } else {
+      return `${dnpNamePretty} ${serviceNamePretty}`;
+    }
+  }
 }
 
 /**
@@ -17,17 +31,18 @@ export function shortName(ens: string) {
  * @param name ENS name
  * @returns pretty name
  */
-export function shortNameCapitalized(name: string) {
-  if (!name || typeof name !== "string") return name;
-  let _name = shortName(name)
-    // Convert all "-" and "_" to spaces
-    .replace(new RegExp("-", "g"), " ")
-    .replace(new RegExp("_", "g"), " ")
-    .split(" ")
-    .map(capitalize)
-    .join(" ");
-
-  return _name.charAt(0).toUpperCase() + _name.slice(1);
+export function prettyDnpName(dnpName: string) {
+  if (!dnpName || typeof dnpName !== "string") return dnpName;
+  return (
+    dnpName
+      .split(".")[0]
+      // Convert all "-" and "_" to spaces
+      .replace(new RegExp("-", "g"), " ")
+      .replace(new RegExp("_", "g"), " ")
+      .split(" ")
+      .map(capitalize)
+      .join(" ")
+  );
 }
 
 export function shortAuthor(author: string) {
@@ -105,7 +120,7 @@ export function getPrettyVolumeName(volData: VolumeData): string {
  */
 export function getPrettyVolumeOwner(volData: VolumeData): string | undefined {
   return volData.owner
-    ? shortNameCapitalized(volData.owner)
+    ? prettyDnpName(volData.owner)
     : prettyVolumeName(volData.name).owner;
 }
 

@@ -14,7 +14,7 @@ import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { InstalledPackageData, PackageContainer } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
-import { shortNameCapitalized as sn } from "utils/format";
+import { prettyDnpName, prettyFullName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
 import "./containerList.scss";
 
@@ -40,8 +40,8 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
     const serviceNames = container && [container.serviceName];
     const name = container
-      ? [sn(dnpName), sn(container.serviceName)].join(" ")
-      : sn(dnpName);
+      ? [prettyFullName(container)].join(" ")
+      : prettyDnpName(dnpName);
 
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${name}...`,
@@ -67,7 +67,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
             {dnp.containers.length > 1 ? (
               <span>All containers</span>
             ) : (
-              <span>{sn(dnp.dnpName)}</span>
+              <span>{prettyDnpName(dnp.dnpName)}</span>
             )}
 
             {dnp.containers.length > 1 && (
@@ -91,7 +91,9 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           dnp.containers.map(container => (
             <React.Fragment key={container.serviceName}>
               <StateBadgeContainer container={container} />
-              <span className="name">{sn(container.serviceName)}</span>
+              <span className="name">
+                {prettyDnpName(container.serviceName)}
+              </span>
               {container.running ? (
                 <MdPauseCircleOutline onClick={() => onStartStop(container)} />
               ) : (

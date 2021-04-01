@@ -7,12 +7,10 @@ import { parseMetadataFromManifest } from "../manifest";
 import { DistributedFile, Compose, Manifest } from "../../common";
 import { parseUnsafeCompose } from "../compose/unsafeCompose";
 import { ComposeEditor } from "../compose/editor";
-import { shortNameDomain } from "../../utils/format";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
-import { getContainerDomain } from "../../params";
 import { parseTimeoutSeconds } from "../../utils/timeout";
 
 /**

@@ -16,7 +16,7 @@ import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { Network } from "../components/Network";
 
 export const PackageById: React.FC<RouteComponentProps<{
@@ -31,7 +31,7 @@ export const PackageById: React.FC<RouteComponentProps<{
       <>
         <Title title={title} subtitle={id} />
         {dnpRequest.isValidating ? (
-          <Loading steps={[`Loading ${shortNameCapitalized(id)}`]} />
+          <Loading steps={[`Loading ${prettyDnpName(id)}`]} />
         ) : dnpRequest.error ? (
           dnpRequest.error.message.includes("package not found") ? (
             <NoDnpInstalled id={id} />
@@ -99,12 +99,12 @@ export const PackageById: React.FC<RouteComponentProps<{
       subPath: "file-manager",
       render: () => <FileManager containers={containers} />,
       available: true
-    },
+    }
   ].filter(route => route.available);
 
   return (
     <>
-      <Title title={title} subtitle={shortNameCapitalized(dnpName || id)} />
+      <Title title={title} subtitle={prettyDnpName(dnpName || id)} />
 
       <div className="horizontal-navbar">
         {availableRoutes.map(route => (

@@ -7,7 +7,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import { withToast } from "components/toast/Toast";
 import ErrorView from "components/ErrorView";
 // Utils
-import { shortName } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { PackageBackup, ReqStatus } from "types";
 
@@ -27,8 +27,8 @@ export function BackupDownload({
     try {
       setReqStatus({ loading: true });
       const fileId = await withToast(() => api.backupGet({ dnpName, backup }), {
-        message: `Preparing backup for ${shortName(dnpName)}...`,
-        onSuccess: `Backup for ${shortName(dnpName)} ready`
+        message: `Preparing backup for ${prettyDnpName(dnpName)}...`,
+        onSuccess: `Backup for ${prettyDnpName(dnpName)} ready`
       });
 
       if (!fileId) throw Error("Error preparing backup, no fileId returned");

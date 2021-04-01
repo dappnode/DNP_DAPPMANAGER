@@ -3,7 +3,7 @@ import {
   adminUiInstallPackageUrl,
   adminUiUpdateCoreUrl
 } from "../../externalLinks";
-import { shortNameCapitalized } from "../../utils/format";
+import { prettyDnpName } from "../../utils/format";
 import { urlJoin } from "../../utils/url";
 import { enableAutoUpdatesCmd } from "../telegramBot/commands";
 
@@ -20,7 +20,7 @@ export function formatPackageUpdateNotification({
   upstreamVersion?: string;
   autoUpdatesEnabled: boolean;
 }): string {
-  const prettyName = shortNameCapitalized(dnpName);
+  const prettyName = prettyDnpName(dnpName);
   const installUrl = urlJoin(adminUiInstallPackageUrl, dnpName);
 
   return [
@@ -48,7 +48,7 @@ export function formatSystemUpdateNotification({
     "New system version ready to install",
     packages.map(
       p =>
-        ` - ${shortNameCapitalized(p.name)}: ${p.to} ${
+        ` - ${prettyDnpName(p.name)}: ${p.to} ${
           p.from ? `(current: ${p.from})` : ""
         }`
     ),

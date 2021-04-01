@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import { isEmpty, throttle, pick } from "lodash";
 import { difference } from "utils/lodashExtended";
-import { shortNameCapitalized, isDnpVerified } from "utils/format";
+import { prettyDnpName, isDnpVerified } from "utils/format";
 // This module
 import { ProgressLogsView } from "./InstallCardComponents/ProgressLogsView";
 // Components
@@ -104,8 +104,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         // If call errors with "callee disconnected", resolve with success
         continueIfCalleDisconnected(() => api.packageInstall(kwargs), dnpName),
         {
-          message: `Installing ${shortNameCapitalized(dnpName)}...`,
-          onSuccess: `Installed ${shortNameCapitalized(dnpName)}`
+          message: `Installing ${prettyDnpName(dnpName)}...`,
+          onSuccess: `Installed ${prettyDnpName(dnpName)}`
         }
       );
 
@@ -143,7 +143,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
     });
   if (metadata.disclaimer)
     disclaimers.push({
-      name: shortNameCapitalized(dnpName),
+      name: prettyDnpName(dnpName),
       message: metadata.disclaimer.message
     });
 
@@ -282,9 +282,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
       {requiresCoreUpdate && (
         <div className="alert alert-danger">
-          <strong>{shortNameCapitalized(dnpName)}</strong> requires a more
-          recent version of DAppNode. <strong>Update your DAppNode</strong>{" "}
-          before continuing the installation.
+          <strong>{prettyDnpName(dnpName)}</strong> requires a more recent
+          version of DAppNode. <strong>Update your DAppNode</strong> before
+          continuing the installation.
         </div>
       )}
 

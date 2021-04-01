@@ -5,7 +5,7 @@ import Card from "components/Card";
 import Button from "components/Button";
 import StatusIcon from "components/StatusIcon";
 import { SpecialPermissionAllDnps } from "types";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import "./permissions.scss";
 
 interface PermissionsProps {
@@ -30,7 +30,7 @@ const Permissions: React.FC<PermissionsProps> = ({
       {Object.entries(permissions).map(([dnpName, permissionsDnp]) => (
         <div key={dnpName}>
           <div className="card-section-header">
-            {shortNameCapitalized(dnpName)} special permissions
+            {prettyDnpName(dnpName)} special permissions
           </div>
 
           <div className="special-permission">

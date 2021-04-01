@@ -7,11 +7,7 @@ import { BsTrash } from "react-icons/bs";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
-import {
-  prettyVolumeName,
-  prettyBytes,
-  shortNameCapitalized as sn
-} from "utils/format";
+import { prettyVolumeName, prettyBytes, prettyDnpName } from "utils/format";
 import { InstalledPackageDetailData } from "common";
 import "./volumesList.scss";
 
@@ -27,12 +23,13 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
 
   async function packageRestartVolumes(volumeName?: string) {
     const warningsList: WarningItem[] = [];
+    const prettyName = prettyDnpName(dnpName);
 
     // If there are NOT conflicting volumes,
     // Display a dialog to confirm volumes reset
     await new Promise<void>(resolve =>
       confirm({
-        title: `Removing ${sn(dnpName)} data`,
+        title: `Removing ${prettyName} data`,
         text: `This action cannot be undone. If this DAppNode Package is a blockchain node, it will lose all the chain data and start syncing from scratch.`,
         list: warningsList,
         label: "Remove volumes",
@@ -43,8 +40,8 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     await withToastNoThrow(
       () => api.packageRestartVolumes({ dnpName, volumeId: volumeName }),
       {
-        message: `Removing volumes of ${sn(dnpName)}...`,
-        onSuccess: `Removed volumes of ${sn(dnpName)}`
+        message: `Removing volumes of ${prettyName}...`,
+        onSuccess: `Removed volumes of ${prettyName}`
       }
     );
   }
@@ -115,7 +112,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
       {showAll &&
         orderBy(volumes, sortVolumesByKeys, ["desc", "asc"]).map(vol => (
           <React.Fragment key={vol.name}>
-            <span className="name">{sn(vol.prettyName)}</span>
+            <span className="name">{prettyDnpName(vol.prettyName)}</span>
             <span>
               {typeof vol.size === "number" ? prettyBytes(vol.size) : "-"}
             </span>

@@ -16,7 +16,7 @@ import Switch from "components/Switch";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { getPublicSubdomain } from "utils/domains";
-import { shortNameCapitalized as sn } from "utils/format";
+import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping } from "types";
 import { httpsPortalDnpName } from "params";
@@ -166,9 +166,7 @@ export function HttpsMappings({
             <span className="name">
               <BsArrowRight />
             </span>
-            <span className="name">
-              {sn(mapping.dnpName)} {sn(mapping.serviceName)}
-            </span>
+            <span className="name">{prettyFullName(mapping)}</span>
 
             <MdClose onClick={() => removeMapping(mapping)} />
           </React.Fragment>
@@ -240,8 +238,7 @@ function validateFromSubdomain(
 
   const dupMapping = mappings.find(m => m.fromSubdomain === from);
   if (dupMapping) {
-    const target = `${sn(dupMapping.dnpName)} ${sn(dupMapping.serviceName)}`;
-    return `subdomain is already used to map to ${target}`;
+    return `subdomain is already used to map to ${prettyFullName(dupMapping)}`;
   }
 
   return null;
