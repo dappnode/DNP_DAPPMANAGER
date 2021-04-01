@@ -3,15 +3,17 @@ import { apiRoutes } from "api";
 import Input from "components/Input";
 import Button from "components/Button";
 import newTabProps from "utils/newTabProps";
+import { PackageContainer } from "types";
 
 export function CopyFileFrom({
-  containerName,
+  container,
   fromPathDefault
 }: {
-  containerName: string;
+  container: PackageContainer;
   fromPathDefault?: string;
 }) {
   const [fromPathInput, setFromPathInput] = useState("");
+  const containerName = container.containerName;
 
   const getDownloadUrl = useCallback(
     fromPath => apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),

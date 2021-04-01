@@ -7,7 +7,7 @@ import Button from "components/Button";
 import Input from "components/Input";
 import Select from "components/Select";
 // Utils
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./network.scss";
@@ -53,8 +53,8 @@ export function PortsByService({
           portMappingsByService: { [serviceName]: ports }
         }),
       {
-        message: `Updating ${shortNameCapitalized(dnpName)} port mappings...`,
-        onSuccess: `Updated ${shortNameCapitalized(dnpName)} port mappings`
+        message: `Updating ${prettyDnpName(dnpName)} port mappings...`,
+        onSuccess: `Updated ${prettyDnpName(dnpName)} port mappings`
       }
     );
     setUpdating(false);
@@ -150,7 +150,7 @@ export function PortsByService({
 
   for (const conflictingPort of conflictingPorts) {
     const portName = `${conflictingPort.host}/${conflictingPort.protocol}`;
-    const ownerName = shortNameCapitalized(conflictingPort.owner);
+    const ownerName = prettyDnpName(conflictingPort.owner);
     errors.push(
       `Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
     );

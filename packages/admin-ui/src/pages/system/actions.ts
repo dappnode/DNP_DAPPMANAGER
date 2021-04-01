@@ -1,6 +1,6 @@
 import { confirm } from "components/ConfirmDialog";
 import { api } from "api";
-import { shortNameCapitalized, prettyVolumeName } from "utils/format";
+import { prettyDnpName, prettyVolumeName } from "utils/format";
 import { getEthClientPrettyName } from "components/EthMultiClient";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
@@ -105,9 +105,8 @@ export const packageVolumeRemove = (
   volName: string
 ): AppThunk => async () => {
   // Make sure there are no colliding volumes with this DNP
-  const prettyDnpName = shortNameCapitalized(dnpName);
   const prettyVolName = prettyVolumeName(volName, dnpName).name;
-  const prettyVolRef = `${prettyDnpName} ${prettyVolName} volume`;
+  const prettyVolRef = `${prettyDnpName(dnpName)} ${prettyVolName} volume`;
 
   const warningsList: { title: string; body: string }[] = [];
 

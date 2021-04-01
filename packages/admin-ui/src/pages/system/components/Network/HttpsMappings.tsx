@@ -11,7 +11,7 @@ import { confirmPromise } from "components/ConfirmDialog";
 import Switch from "components/Switch";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
-import { shortNameCapitalized as sn } from "utils/format";
+import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { getPublicSubdomain } from "utils/domains";
 import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
@@ -118,9 +118,7 @@ export function HttpsMappings() {
       {mappings.data.map((mapping, i) => (
         <React.Fragment key={i}>
           <span className="package">
-            <span>
-              {sn(mapping.dnpName)} {sn(mapping.serviceName)}
-            </span>
+            <span>{prettyFullName(mapping)}</span>
           </span>
           <span className="service">
             <span className="title">{mapping.name}</span>

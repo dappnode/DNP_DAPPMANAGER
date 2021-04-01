@@ -3,7 +3,7 @@ import { orderBy, isEmpty } from "lodash";
 // Components
 import Input from "components/Input";
 import { UserSettingsAllDnps } from "types";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import "./editorAdvanced.scss";
 
 interface EditableTableProps {
@@ -69,13 +69,13 @@ export function EditorAdvanced({
     <div className="dnps-section">
       {Object.entries(userSettings).map(([dnpName, dnpSettings]) => (
         <div className="dnp-section" key={dnpName}>
-          <div className="dnp-name">{shortNameCapitalized(dnpName)}</div>
+          <div className="dnp-name">{prettyDnpName(dnpName)}</div>
           {dnpSettings.environment &&
             Object.entries(dnpSettings.environment).map(
               ([serviceName, environment]) => (
                 <div className="service-section" key={serviceName}>
                   <div className="service-name">
-                    {shortNameCapitalized(serviceName)}
+                    {prettyDnpName(serviceName)}
                   </div>
                   <EditableTable
                     headers={["Env name", "Env value"]}
@@ -100,7 +100,7 @@ export function EditorAdvanced({
               ([serviceName, portMappings]) => (
                 <div className="service-section" key={serviceName}>
                   <div className="service-name">
-                    {shortNameCapitalized(serviceName)}
+                    {prettyDnpName(serviceName)}
                   </div>
                   <EditableTable
                     headers={["Port - container", "Port - host"]}

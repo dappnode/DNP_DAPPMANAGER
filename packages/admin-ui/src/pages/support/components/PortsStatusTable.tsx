@@ -8,7 +8,7 @@ import Table from "react-bootstrap/Table";
 import { ReqStatus } from "types";
 import { useApi } from "api";
 import { api } from "api";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import {
   ApiTablePortStatus,
   PortToOpen,
@@ -159,7 +159,7 @@ export function PortsStatusTable({
                 <tr>
                   <td>{port.portNumber}</td>
                   <td>{port.protocol}</td>
-                  <td>{shortNameCapitalized(port.dnpName)}</td>
+                  <td>{prettyDnpName(port.dnpName)}</td>
 
                   {apiReqStatus.result && (
                     <td>

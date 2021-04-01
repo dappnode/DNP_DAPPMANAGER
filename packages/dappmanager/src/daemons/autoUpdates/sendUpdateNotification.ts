@@ -3,7 +3,7 @@ import params from "../../params";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
-import { shortNameCapitalized } from "../../utils/format";
+import { prettyDnpName } from "../../utils/format";
 import { CoreUpdateDataAvailable } from "../../types";
 import {
   isCoreUpdateEnabled,
@@ -42,7 +42,7 @@ export async function sendUpdatePackageNotificationMaybe(
   eventBus.notification.emit({
     id: `update-available-${dnpName}-${newVersion}`,
     type: "info",
-    title: `Update available for ${shortNameCapitalized(dnpName)}`,
+    title: `Update available for ${prettyDnpName(dnpName)}`,
     body: formatPackageUpdateNotification({
       dnpName: dnpName,
       newVersion,

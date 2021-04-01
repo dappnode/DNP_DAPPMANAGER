@@ -1,7 +1,7 @@
 import React from "react";
 // Components
 import { SetupWizardAllDnps } from "types";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import RenderMarkdown from "components/RenderMarkdown";
 import InputField from "./InputField";
 import { SetupWizardError } from "pages/installer/parsers/formDataErrors";
@@ -22,7 +22,7 @@ export function EditorV2({
     <div className="dnps-section">
       {Object.entries(setupWizard).map(([dnpName, setupWizardDnp]) => (
         <div className="dnp-section" key={dnpName}>
-          <div className="dnp-name">{shortNameCapitalized(dnpName)}</div>
+          <div className="dnp-name">{prettyDnpName(dnpName)}</div>
           {setupWizardDnp.fields.map(field => {
             const { id } = field;
             const ownErrors = errors.filter(

@@ -19,7 +19,6 @@ export const FileManager = ({
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
   const container = containers.find(c => c.serviceName === serviceName);
-  const containerName = container?.containerName;
 
   return (
     <>
@@ -31,19 +30,16 @@ export const FileManager = ({
         />
       </Card>
 
-      {containerName && (
+      {container && (
         <>
           <SubTitle>Upload file</SubTitle>
           <Card spacing divider className="file-manager">
-            <CopyFileTo containerName={containerName} toPathDefault={to} />
+            <CopyFileTo container={container} toPathDefault={to} />
           </Card>
 
           <SubTitle>Download file</SubTitle>
           <Card spacing divider className="file-manager">
-            <CopyFileFrom
-              containerName={containerName}
-              fromPathDefault={from}
-            />
+            <CopyFileFrom container={container} fromPathDefault={from} />
           </Card>
         </>
       )}

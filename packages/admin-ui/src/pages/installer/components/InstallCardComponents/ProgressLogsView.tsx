@@ -1,6 +1,6 @@
 import React from "react";
 import { isEmpty } from "lodash";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 // Components
 import ProgressBar from "react-bootstrap/ProgressBar";
 import Card from "components/Card";
@@ -40,7 +40,7 @@ export function ProgressLogsView({
           return (
             <div key={dnpName} className="row">
               <div className="col-6 text-truncate">
-                <span>{shortNameCapitalized(dnpName)}</span>
+                <span>{prettyDnpName(dnpName)}</span>
               </div>
               <div className="col-6 text-truncate center">
                 <ProgressBar

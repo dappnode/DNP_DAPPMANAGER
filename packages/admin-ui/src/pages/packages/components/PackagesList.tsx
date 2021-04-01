@@ -9,7 +9,7 @@ import Card from "components/Card";
 // Icons
 import { MdRefresh, MdOpenInNew } from "react-icons/md";
 // Utils
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { sortBy } from "lodash";
 import { rootPath as packagesRootPath } from "pages/packages";
 // Images
@@ -60,7 +60,7 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
                   className="name"
                   to={urlJoin(packagesRootPath, dnp.dnpName)}
                 >
-                  {shortNameCapitalized(dnp.dnpName)}
+                  {prettyDnpName(dnp.dnpName)}
                 </NavLink>
                 <NavLink
                   className="open"
