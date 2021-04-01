@@ -63,5 +63,5 @@ export async function httpsPortalExposableServicesGet(): Promise<
 function getServiceId(
   mapping: Omit<HttpsPortalMapping, "fromSubdomain">
 ): string {
-  return `${mapping.dnpName} ${mapping.serviceName} ${mapping.port}`;
+  return `${mapping.dnpName}/${mapping.serviceName}/${mapping.port}`;
 }

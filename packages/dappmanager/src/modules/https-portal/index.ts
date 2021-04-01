@@ -12,7 +12,7 @@ import { HttpsPortalApiClient } from "./apiClient";
 import { addNetworkAliasCompose, removeNetworkAliasCompose } from "./utils";
 export { addAliasToRunningContainersMigration } from "./migration";
 export { HttpsPortalApiClient };
-export { getExposableServices } from "./getExposableServices";
+export { getExposableServices } from "./exposable";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
