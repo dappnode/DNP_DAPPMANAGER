@@ -508,6 +508,10 @@ export interface PackageContainer {
   // envs?: PackageEnvs;
 }
 
+export interface InstalledPackageDataApiReturn extends InstalledPackageData {
+  updateAvailable: UpdateAvailable | null;
+}
+
 export type InstalledPackageData = Pick<
   PackageContainer,
   | "dnpName"

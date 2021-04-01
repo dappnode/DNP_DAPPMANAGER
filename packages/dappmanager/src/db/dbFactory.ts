@@ -64,7 +64,7 @@ export default function dbFactory(dbPath: string) {
       joinWithDot(rootKey, getKey(keyArg));
 
     return {
-      getAll: (): { [key: string]: T } => get(rootKey),
+      getAll: (): { [key: string]: T } => get(rootKey) || {},
       get: (keyArg: K): T | undefined => {
         const value = get(keyGetter(keyArg));
         if (!validate || validate(keyArg, value)) return value;

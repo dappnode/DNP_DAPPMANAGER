@@ -156,13 +156,16 @@ Content in the first column | Content in the second column
 
   installedData: {
     version: "0.1.0",
-
     userSettings: {
       environment: {
         [serviceName]: {
           ENV_NAME: "ENV_VALUE"
         }
       }
+    },
+    updateAvailable: {
+      newVersion: "0.1.1",
+      upstreamVersion: "0.7.0-beta"
     }
   },
   installedContainers: {
