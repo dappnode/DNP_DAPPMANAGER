@@ -1,6 +1,7 @@
 import { omit } from "lodash";
 import { listPackages } from "../modules/docker/list";
 import { readManifestIfExists } from "../modules/manifest";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
@@ -23,8 +24,17 @@ export async function packageGet({
   if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   const volumesData = await getVolumesOwnershipData();
 
+  // Check if an update is available from stored last known version
+  const latestKnownVersion = db.packageLatestKnownVersion.get(dnpName);
+
   const dnpData: InstalledPackageDetailData = {
     ...dnp,
+
+    updateAvailable:
+      latestKnownVersion &&
+      shouldUpdate(dnp.version, latestKnownVersion.newVersion)
+        ? latestKnownVersion
+        : null,
 
     areThereVolumesToRemove:
       dnp.containers.some(container => container.volumes.length > 0) &&

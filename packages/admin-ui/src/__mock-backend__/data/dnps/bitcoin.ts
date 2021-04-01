@@ -114,6 +114,10 @@ export const bitcoin: MockDnp = {
         name: "data",
         path: "/data"
       }
-    ]
+    ],
+    updateAvailable: {
+      newVersion: "0.2.1",
+      upstreamVersion: "0.24.0"
+    }
   }
 };

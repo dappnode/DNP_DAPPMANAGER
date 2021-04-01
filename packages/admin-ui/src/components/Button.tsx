@@ -10,10 +10,12 @@ export type ButtonVariant =
   | "dappnode"
   | "warning"
   | "danger"
+  | "info"
   | "outline-secondary"
   | "outline-dappnode"
   | "outline-warning"
-  | "outline-danger";
+  | "outline-danger"
+  | "outline-info";
 const defaultVariant: ButtonVariant = "outline-secondary";
 
 interface ButtonProps {

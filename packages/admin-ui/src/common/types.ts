@@ -525,6 +525,11 @@ export type InstalledPackageData = Pick<
   containers: PackageContainer[];
 };
 
+export interface UpdateAvailable {
+  newVersion: string;
+  upstreamVersion?: string;
+}
+
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;
@@ -536,6 +541,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
    */
   areThereVolumesToRemove: boolean;
   dependantsOf: string[];
+  updateAvailable: UpdateAvailable | null;
   // Non-indexed data
   manifest?: Manifest;
 }

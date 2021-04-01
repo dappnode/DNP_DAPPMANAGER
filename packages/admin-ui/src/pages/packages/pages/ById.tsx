@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash";
+import { rootPath as installerRootPath } from "pages/installer";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";
@@ -10,14 +11,22 @@ import { Config } from "../components/Config";
 import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
+import { Network } from "../components/Network";
 import { title } from "../data";
 // Components
+import Alert from "react-bootstrap/esm/Alert";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Title from "components/Title";
+import Button from "components/Button";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { Network } from "../components/Network";
+import { urlJoin } from "utils/url";
+import {
+  InstalledPackageData,
+  InstalledPackageDetailData,
+  UpdateAvailable
+} from "common";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -51,7 +60,8 @@ export const PackageById: React.FC<RouteComponentProps<{
     gettingStarted,
     gettingStartedShow,
     backup = [],
-    containers
+    containers,
+    updateAvailable
   } = dnp;
 
   /**
@@ -104,7 +114,7 @@ export const PackageById: React.FC<RouteComponentProps<{
 
   return (
     <>
-      <Title title={title} subtitle={prettyDnpName(dnpName || id)} />
+      <Title title={title} subtitle={prettyDnpName(dnpName)} />
 
       <div className="horizontal-navbar">
         {availableRoutes.map(route => (
@@ -119,6 +129,13 @@ export const PackageById: React.FC<RouteComponentProps<{
           </button>
         ))}
       </div>
+
+      {updateAvailable && (
+        <AlertNewUpdate
+          dnpName={dnpName}
+          updateAvailable={updateAvailable}
+        ></AlertNewUpdate>
+      )}
 
       <div className="packages-content">
         <Switch>
@@ -137,3 +154,29 @@ export const PackageById: React.FC<RouteComponentProps<{
     </>
   );
 };
+
+function AlertNewUpdate({
+  dnpName,
+  updateAvailable
+}: {
+  dnpName: string;
+  updateAvailable: UpdateAvailable;
+}) {
+  const [show, setShow] = useState(true);
+  return show ? (
+    <Alert
+      variant="info"
+      onClose={() => setShow(false)}
+      dismissible
+      className="main-notification"
+    >
+      {prettyDnpName(dnpName)} update available to version{" "}
+      {updateAvailable.newVersion}{" "}
+      {updateAvailable.upstreamVersion &&
+        `(${updateAvailable.upstreamVersion} upstream)`}
+      <NavLink to={urlJoin(installerRootPath, dnpName)}>
+        <Button variant="dappnode">Update</Button>
+      </NavLink>
+    </Alert>
+  ) : null;
+}

@@ -37,6 +37,7 @@ export async function sendUpdatePackageNotificationMaybe(
 
   // Ensure the release resolves on IPFS
   const release = await releaseFetcher.getRelease(dnpName, newVersion);
+  const upstreamVersion = release.metadata.upstreamVersion;
 
   // Emit notification about new version available
   eventBus.notification.emit({
@@ -46,13 +47,14 @@ export async function sendUpdatePackageNotificationMaybe(
     body: formatPackageUpdateNotification({
       dnpName: dnpName,
       newVersion,
-      upstreamVersion: release.metadata.upstreamVersion,
+      upstreamVersion,
       currentVersion,
       autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
     })
   });
 
   // Register version to prevent sending notification again
+  db.packageLatestKnownVersion.set(dnpName, { newVersion, upstreamVersion });
   db.notificationLastEmitVersion.set(dnpName, newVersion);
 }
 
@@ -85,5 +87,6 @@ export async function sendUpdateSystemNotificationMaybe(
   data.packages;
 
   // Register version to prevent sending notification again
+  db.packageLatestKnownVersion.set(dnpName, { newVersion });
   db.notificationLastEmitVersion.set(dnpName, newVersion);
 }
