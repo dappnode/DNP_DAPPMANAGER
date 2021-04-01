@@ -10,14 +10,14 @@ on:
 
 jobs:
   unit-test:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     name: Unit tests
     steps:
       - uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
+          node-version: "12.22.0"
       - run: yarn
       - run: yarn bootstrap
       - run: yarn generate
@@ -26,14 +26,14 @@ jobs:
         working-directory: packages/admin-ui
 
   integration-test:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     name: In app integration tests
     steps:
       - uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
+          node-version: "12.22.0"
       - run: yarn # Caching only saves 30s
       - run: yarn bootstrap
       - run: yarn generate
@@ -49,7 +49,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "10.x"
+          node-version: "12.22.0"
       - name: Publish
         run: npx @dappnode/dappnodesdk publish patch --dappnode_team_preset
         env:
