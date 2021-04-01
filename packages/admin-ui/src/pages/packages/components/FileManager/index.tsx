@@ -22,13 +22,15 @@ export const FileManager = ({
 
   return (
     <>
-      <Card spacing divider className="file-manager">
-        <ServiceSelector
-          serviceName={serviceName}
-          setServiceName={setServiceName}
-          containers={containers}
-        />
-      </Card>
+      {containers.length > 1 && (
+        <Card spacing divider className="file-manager">
+          <ServiceSelector
+            serviceName={serviceName}
+            setServiceName={setServiceName}
+            containers={containers}
+          />
+        </Card>
+      )}
 
       {container && (
         <>
