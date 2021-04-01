@@ -79,7 +79,7 @@ export class Ipfs {
    * Useful to check if a large dataset is available
    * Also possible to get it's size with it by summing its links size
    */
-  async objectGet(hash: string): Promise<void> {
+  async objectGet(hash: string): Promise<{ size: number }> {
     try {
       return await this.ipfs.object.get(hash, { timeout: this.timeout });
     } catch (e) {
