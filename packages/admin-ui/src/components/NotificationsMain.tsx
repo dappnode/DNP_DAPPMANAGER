@@ -115,10 +115,9 @@ function AlertDismissible({
       dismissible
       className="main-notification"
     >
-      {/* <Alert.Heading>Oh snap! You got an error!</Alert.Heading> */}
       <RenderMarkdown source={body} />
       <NavLink to={linkPath}>
-        <Button variant={"warning"}>{linkText}</Button>
+        <Button variant="warning">{linkText}</Button>
       </NavLink>
     </Alert>
   ) : null;

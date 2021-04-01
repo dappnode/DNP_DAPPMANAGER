@@ -79,5 +79,6 @@ export const sampleDnp: InstalledPackageDetailData = {
   gettingStartedShow: true,
   areThereVolumesToRemove: false,
   dependantsOf: [],
+  updateAvailable: null,
   containers: []
 };

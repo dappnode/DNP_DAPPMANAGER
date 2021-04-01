@@ -10,6 +10,7 @@ import { Config } from "../components/Config";
 import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
+import { Network } from "../components/Network";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
@@ -17,7 +18,7 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { Network } from "../components/Network";
+import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -51,7 +52,8 @@ export const PackageById: React.FC<RouteComponentProps<{
     gettingStarted,
     gettingStartedShow,
     backup = [],
-    containers
+    containers,
+    updateAvailable
   } = dnp;
 
   /**
@@ -104,7 +106,7 @@ export const PackageById: React.FC<RouteComponentProps<{
 
   return (
     <>
-      <Title title={title} subtitle={prettyDnpName(dnpName || id)} />
+      <Title title={title} subtitle={prettyDnpName(dnpName)} />
 
       <div className="horizontal-navbar">
         {availableRoutes.map(route => (
@@ -119,6 +121,13 @@ export const PackageById: React.FC<RouteComponentProps<{
           </button>
         ))}
       </div>
+
+      {updateAvailable && (
+        <AlertPackageUpdateAvailable
+          dnpName={dnpName}
+          updateAvailable={updateAvailable}
+        ></AlertPackageUpdateAvailable>
+      )}
 
       <div className="packages-content">
         <Switch>
