@@ -1015,7 +1015,6 @@ export interface PackageReleaseMetadata {
   globalEnvs?: {
     all?: boolean;
   };
-  ssl?: boolean;
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {

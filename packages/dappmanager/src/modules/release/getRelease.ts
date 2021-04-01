@@ -55,22 +55,6 @@ export async function getRelease({
   );
 
   for (const service of Object.values(compose.services())) {
-    // Add SSL environment variables
-    if (manifest.ssl) {
-      const containerDomain = getContainerDomain({
-        dnpName,
-        serviceName: service.serviceName
-      });
-      const dnpSubDomain = [
-        shortNameDomain(containerDomain),
-        db.domain.get()
-      ].join(".");
-      service.mergeEnvs({
-        VIRTUAL_HOST: dnpSubDomain,
-        LETSENCRYPT_HOST: dnpSubDomain
-      });
-    }
-
     // Add global env_file on request
     if ((manifest.globalEnvs || {}).all)
       service.addEnvFile(getGlobalEnvsFilePath(isCore));
