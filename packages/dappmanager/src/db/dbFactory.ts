@@ -1,8 +1,6 @@
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
 import * as validate from "../utils/validate";
-import { formatKey, joinWithDot } from "./dbUtils";
 import { logs } from "../logs";
+import { JsonFileDb } from "../utils/fileDb";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export default function dbFactory(dbPath: string) {
@@ -11,27 +9,12 @@ export default function dbFactory(dbPath: string) {
   logs.info(`New DB instance at ${dbPath}`);
 
   // Initialize db
-  const adapter = new FileSync(dbPath);
-  const db = low(adapter);
-
   // DB returns are of unkown type. External methods below are typed
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  function get(key: string): any | null {
-    if (key) return db.get(formatKey(key)).value();
-  }
-
-  // DB returns are of unkown type. External methods below are typed
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  function set(key: string, value: any): void {
-    return db.set(formatKey(key), value).write();
-  }
-
-  function del(key: string): void {
-    db.unset(formatKey(key)).write();
-  }
+  const jsonFileDb = new JsonFileDb<Record<string, any>>(dbPath, {});
 
   function clearDb(): void {
-    db.setState({});
+    jsonFileDb.write({});
   }
 
   /**
@@ -41,8 +24,12 @@ export default function dbFactory(dbPath: string) {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   function staticKey<T>(key: string, defaultValue: T) {
     return {
-      get: (): T => get(key) || defaultValue,
-      set: (newValue: T): void => set(key, newValue)
+      get: (): T => jsonFileDb.read()[key] || defaultValue,
+      set: (newValue: T): void => {
+        const all = jsonFileDb.read();
+        all[key] = newValue;
+        jsonFileDb.write(all);
+      }
     };
   }
 
@@ -60,21 +47,32 @@ export default function dbFactory(dbPath: string) {
     getKey: (keyArg: K) => string;
     validate?: (keyArg: K, value?: T) => boolean;
   }) {
-    const keyGetter = (keyArg: K): string =>
-      joinWithDot(rootKey, getKey(keyArg));
+    const getRoot = (): { [key: string]: T } =>
+      jsonFileDb.read()[rootKey] || {};
 
     return {
-      getAll: (): { [key: string]: T } => get(rootKey) || {},
+      getAll: getRoot,
+
       get: (keyArg: K): T | undefined => {
-        const value = get(keyGetter(keyArg));
-        if (!validate || validate(keyArg, value)) return value;
+        const value = getRoot()[getKey(keyArg)];
+        if (validate && !validate(keyArg, value)) return undefined;
+        return value;
       },
+
       set: (keyArg: K, newValue: T): void => {
-        if (!validate || validate(keyArg, newValue))
-          set(keyGetter(keyArg), newValue);
+        const all = jsonFileDb.read();
+        const root = all[rootKey] || {};
+        root[getKey(keyArg)] = newValue;
+        all[rootKey] = root;
+        jsonFileDb.write(all);
       },
+
       remove: (keyArg: K): void => {
-        del(keyGetter(keyArg));
+        const all = jsonFileDb.read();
+        const root = all[rootKey] || {};
+        delete root[getKey(keyArg)];
+        all[rootKey] = root;
+        jsonFileDb.write(all);
       }
     };
   }
@@ -89,6 +87,6 @@ export default function dbFactory(dbPath: string) {
     staticKey,
     indexedByKey,
     clearDb,
-    lowLevel: { get, set, del, clearDb }
+    lowLevel: { clearDb }
   };
 }

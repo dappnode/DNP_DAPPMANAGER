@@ -1,5 +1,6 @@
 import { UpdateAvailable } from "../types";
 import { indexedByKey } from "./dbCache";
+import { stripDots } from "./dbUtils";
 
 const PACKAGE_GETTING_STARTED_SHOW = "package-getting-started-show";
 const PACKAGE_INSTALL_TIME = "package-install-time";
@@ -7,12 +8,12 @@ const PACKAGE_LATEST_KNOWN_VERSION = "package-latest-known-version";
 
 export const packageGettingStartedShow = indexedByKey<boolean, string>({
   rootKey: PACKAGE_GETTING_STARTED_SHOW,
-  getKey: dnpName => dnpName
+  getKey: dnpName => stripDots(dnpName)
 });
 
 export const packageInstallTime = indexedByKey<number, string>({
   rootKey: PACKAGE_INSTALL_TIME,
-  getKey: dnpName => dnpName
+  getKey: dnpName => stripDots(dnpName)
 });
 
 export function addPackageInstalledMetadata(dnpName: string): void {
@@ -26,5 +27,6 @@ export function addPackageInstalledMetadata(dnpName: string): void {
  */
 export const packageLatestKnownVersion = indexedByKey<UpdateAvailable, string>({
   rootKey: PACKAGE_LATEST_KNOWN_VERSION,
+  // Do NOT strip dots so the packages can be indexed by dnpName doing .getAll()
   getKey: dnpName => dnpName
 });

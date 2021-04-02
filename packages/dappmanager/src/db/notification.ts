@@ -1,13 +1,15 @@
 import { indexedByKey } from "./dbCache";
-import { PackageNotificationDb } from "../types";
-import { PackageNotification } from "../types";
+import { stripDots } from "./dbUtils";
+import { PackageNotificationDb, PackageNotification } from "../types";
 
 const NOTIFICATION = "notification";
 const NOTIFICATION_LAST_EMITTED_VERSION = "notification-last-emitted-version";
 
 export const notification = indexedByKey<PackageNotificationDb, string>({
   rootKey: NOTIFICATION,
-  getKey: id => id,
+  // The `update-available-${dnpName}-${newVersion}` included dots,
+  // so for backwards compatibility they must be stripped
+  getKey: id => stripDots(id),
   validate: (id, notification) =>
     typeof id === "string" && typeof notification === "object"
 });
@@ -22,7 +24,7 @@ export function notificationPush(id: string, n: PackageNotification): void {
  */
 export const notificationLastEmitVersion = indexedByKey<string, string>({
   rootKey: NOTIFICATION_LAST_EMITTED_VERSION,
-  getKey: dnpName => dnpName,
+  getKey: dnpName => stripDots(dnpName),
   validate: (dnpName, lastEmittedVersion) =>
     typeof lastEmittedVersion === "string"
 });
