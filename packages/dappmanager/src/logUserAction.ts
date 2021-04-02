@@ -14,7 +14,11 @@ import { JsonFileDb } from "./utils/fileDb";
  */
 const maxNumOfLogs = 2000;
 const dbPath = params.USER_ACTION_LOGS_DB_PATH;
-const db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+let db: JsonFileDb<UserActionLog[]> | null = null;
+function getDb(): JsonFileDb<UserActionLog[]> {
+  if (!db) db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+  return db;
+}
 
 type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
 
@@ -53,7 +57,7 @@ export function error(log: UserActionLogPartial): void {
  * Returns user actions logs, ordered from newest to oldest
  */
 export function get(): UserActionLog[] {
-  return db.read();
+  return getDb().read();
 }
 
 /**
@@ -61,7 +65,7 @@ export function get(): UserActionLog[] {
  * @param userActionLogs
  */
 function set(userActionLogs: UserActionLog[]): void {
-  db.write(userActionLogs.slice(0, maxNumOfLogs));
+  getDb().write(userActionLogs.slice(0, maxNumOfLogs));
 }
 
 /**
