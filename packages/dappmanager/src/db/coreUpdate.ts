@@ -1,13 +1,12 @@
-import { staticKey } from "./dbCache";
+import { dbCache } from "./dbFactory";
 import { pick } from "lodash";
 import { InstallPackageData, InstallPackageDataPaths } from "../types";
 
 const CORE_UPDATE_PACKAGES_DATA = "core-update-packages-data";
 
-const _coreUpdatePackagesData = staticKey<InstallPackageDataPaths[] | null>(
-  CORE_UPDATE_PACKAGES_DATA,
-  null
-);
+const _coreUpdatePackagesData = dbCache.staticKey<
+  InstallPackageDataPaths[] | null
+>(CORE_UPDATE_PACKAGES_DATA, null);
 
 /**
  * Store packages install data to finalize a core update after the DAPPMANAGER

@@ -1,5 +1,5 @@
 import params from "../params";
-import { clearCache } from "../db";
+import { clearCacheDb } from "../db";
 // Utils
 import shell from "../utils/shell";
 
@@ -19,5 +19,5 @@ export async function cleanCache(): Promise<void> {
   }
 
   // Clear cache DBs in friendly manner
-  clearCache();
+  clearCacheDb();
 }

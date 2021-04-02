@@ -91,12 +91,6 @@ else logs.error(`Error getting version data: ${versionData.message}`);
  * moved from the old db to the cache db.
  */
 
-try {
-  db.migrateToNewMainDb();
-} catch (e) {
-  logs.error("Error migrating to new main DB", e);
-}
-
 migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
 
 migrateUserActionLogs().catch(e =>

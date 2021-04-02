@@ -1,7 +1,7 @@
-import shell from "../src/utils/shell";
-import * as path from "path";
+import path from "path";
 import fs from "fs";
-import { lowLevelCacheDb, lowLevelMainDb } from "../src/db";
+import shell from "../src/utils/shell";
+import { clearCacheDb, clearMainDb } from "../src/db";
 import {
   PackageContainer,
   Manifest,
@@ -36,16 +36,8 @@ export const getTestMountpoint = (id: string): string => {
 };
 
 export function clearDbs(): void {
-  try {
-    lowLevelMainDb.clearDb();
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
-  }
-  try {
-    lowLevelCacheDb.clearDb();
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
-  }
+  clearCacheDb();
+  clearMainDb();
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {

@@ -1,4 +1,4 @@
-import { staticKey } from "./dbMain";
+import { dbMain } from "./dbFactory";
 import { IdentityInterface } from "../types";
 
 const PUBLIC_IP = "public-ip";
@@ -6,14 +6,13 @@ const DOMAIN = "domain";
 const DYNDNS_IDENTITY = "dyndns-identity";
 const STATIC_IP = "static-ip";
 
-export const publicIp = staticKey<string>(PUBLIC_IP, "");
+export const publicIp = dbMain.staticKey<string>(PUBLIC_IP, "");
 
-export const domain = staticKey<string>(DOMAIN, "");
+export const domain = dbMain.staticKey<string>(DOMAIN, "");
 
-export const dyndnsIdentity = staticKey<IdentityInterface>(DYNDNS_IDENTITY, {
-  address: "",
-  privateKey: "",
-  publicKey: ""
-});
+export const dyndnsIdentity = dbMain.staticKey<IdentityInterface>(
+  DYNDNS_IDENTITY,
+  { address: "", privateKey: "", publicKey: "" }
+);
 
-export const staticIp = staticKey<string>(STATIC_IP, "");
+export const staticIp = dbMain.staticKey<string>(STATIC_IP, "");

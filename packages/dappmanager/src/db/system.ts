@@ -1,7 +1,5 @@
-import * as dbMain from "./dbMain";
-import * as dbCache from "./dbCache";
-import { DiskUsageThresholds, PackageVersionData } from "../types";
-import { joinWithDot } from "./dbUtils";
+import { dbCache, dbMain } from "./dbFactory";
+import { PackageVersionData } from "../types";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";
