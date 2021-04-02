@@ -25,21 +25,27 @@ export async function checkNewPackagesVersion(
   const dnps = await listPackages();
 
   for (const { dnpName, isDnp, version: currentVersion } of dnps) {
-    // Ignore core DNPs, and non-valid versions (semver.lte will throw)
-    if (!dnpName || !isDnp || !semver.valid(currentVersion)) continue;
-
     try {
+      // Ignore core DNPs, and non-valid versions (semver.lte will throw)
+      if (!dnpName || !isDnp || !semver.valid(currentVersion)) {
+        continue;
+      }
+
       // MUST exist an APM repo with the package dnpName
       // Check here instead of the if statement to be inside the try / catch
       const repoExists = await releaseFetcher.repoExists(dnpName);
-      if (!repoExists) return;
+      if (!repoExists) {
+        continue;
+      }
 
       const { version: newVersion } = await releaseFetcher.fetchVersion(
         dnpName
       );
 
       // This version is not an update
-      if (semver.lte(newVersion, currentVersion)) return;
+      if (semver.lte(newVersion, currentVersion)) {
+        continue;
+      }
 
       const updateData = { dnpName, currentVersion, newVersion };
 
