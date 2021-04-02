@@ -25,10 +25,11 @@ export function parsePortMappings(portsArray: string[]): PortMapping[] {
       const container = parseInt(containerString);
       const protocol = protocolParsed;
 
-      // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
-      if (container) return { host, container, protocol };
-      // CONTAINER/protocol, return [null, CONTAINER/protocol]
-      else return { container: host, protocol };
+      return container
+        ? // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
+          { host, container, protocol }
+        : // CONTAINER/protocol, return [null, CONTAINER/protocol]
+          { container: host, protocol };
     }
   );
 }

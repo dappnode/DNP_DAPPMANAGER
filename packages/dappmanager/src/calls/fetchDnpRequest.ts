@@ -40,7 +40,6 @@ export async function fetchDnpRequest({
     const { dnpName, metadata, compose, isCore } = release;
 
     const dnp = dnpList.find(d => d.dnpName === dnpName);
-    const isInstalled = Boolean(dnp);
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
     const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(
@@ -54,39 +53,7 @@ export async function fetchDnpRequest({
     if (metadata.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
       for (const field of metadata.setupWizard.fields) {
-        async function shouldAddSetupWizardField(): Promise<boolean> {
-          if (field.target) {
-            switch (field.target.type) {
-              case "allNamedVolumesMountpoint":
-              case "namedVolumeMountpoint":
-                // If the package is installed, ignore (all)namedVolumesMountpoint
-                return !isInstalled;
-              case "fileUpload":
-                // If the container and path of file upload exists, ignore fileUpload
-                if (dnp) {
-                  const serviceName = field.target.service;
-                  // Find the container referenced by the target or the first one if unspecified
-                  const container = dnp.containers.find(
-                    c => !serviceName || c.serviceName === serviceName
-                  );
-                  if (container)
-                    try {
-                      const fileInfo = await dockerInfoArchive(
-                        container.containerId,
-                        field.target.path
-                      );
-                      return !fileInfo.size;
-                    } catch (e) {
-                      // Ignore all errors: 404 Container not found,
-                      // 404 path not found, Base64 parsing, JSON parsing, etc.
-                    }
-                }
-            }
-          }
-          return true;
-        }
-        // Declare and call this function to use a switch / return patten
-        if (await shouldAddSetupWizardField())
+        if (await shouldAddSetupWizardField(field, dnp))
           activeSetupWizardFields.push(field);
       }
       setupWizard[dnpName] = {
@@ -195,4 +162,44 @@ function getRequiresCoreUpdate(
       semver.valid(coreVersion) &&
       semver.gt(minDnVersion, coreVersion)
   );
+}
+
+async function shouldAddSetupWizardField(
+  field: SetupWizardField,
+  dnp: InstalledPackageData | undefined
+): Promise<boolean> {
+  if (!field.target) {
+    return true;
+  }
+
+  switch (field.target.type) {
+    case "allNamedVolumesMountpoint":
+    case "namedVolumeMountpoint":
+      // If the package is installed, ignore (all)namedVolumesMountpoint
+      return !dnp; // isInstalled = Boolean(dnp)
+
+    case "fileUpload":
+      // If the container and path of file upload exists, ignore fileUpload
+      if (dnp) {
+        const serviceName = field.target.service;
+        // Find the container referenced by the target or the first one if unspecified
+        const container = dnp.containers.find(
+          c => !serviceName || c.serviceName === serviceName
+        );
+        if (container)
+          try {
+            const fileInfo = await dockerInfoArchive(
+              container.containerId,
+              field.target.path
+            );
+            return !fileInfo.size;
+          } catch (e) {
+            // Ignore all errors: 404 Container not found,
+            // 404 path not found, Base64 parsing, JSON parsing, etc.
+          }
+      }
+
+    default:
+      return true;
+  }
 }
