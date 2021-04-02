@@ -1,5 +1,4 @@
-import * as dbMain from "./dbMain";
-import * as dbCache from "./dbCache";
+import { dbCache, dbMain } from "./dbFactory";
 import { PackageVersionData } from "../types";
 
 const SERVER_NAME = "server-name";

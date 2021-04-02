@@ -1,8 +1,8 @@
-import { cleardb } from "../db";
+import { clearMainDb } from "../db";
 
 /**
  * Cleans the database content
  */
 export async function cleanDb(): Promise<void> {
-  cleardb();
+  clearMainDb();
 }

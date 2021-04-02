@@ -1,6 +1,19 @@
 import * as validate from "../utils/validate";
 import { logs } from "../logs";
 import { JsonFileDb } from "../utils/fileDb";
+import params from "../params";
+
+/**
+ * Stores critical data for this DAppNode, such as the DynDNS identity
+ * This DB should be kept small in size (1-5 KB max) and never be deleted
+ */
+export const dbMain = dbFactory(params.DB_MAIN_PATH);
+/**
+ * Stores useful but not critical data, such as the record of last seen package
+ * versions, used to regulate when to send notifications. This DB can be bigger,
+ * and may be deleted by the user if necessary
+ */
+export const dbCache = dbFactory(params.DB_CACHE_PATH);
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function dbFactory(dbPath: string) {
@@ -86,7 +99,6 @@ export function dbFactory(dbPath: string) {
   return {
     staticKey,
     indexedByKey,
-    clearDb,
-    lowLevel: { clearDb }
+    clearDb
   };
 }

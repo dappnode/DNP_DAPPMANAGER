@@ -13,15 +13,9 @@ export * from "./ui";
 export * from "./upnp";
 export * from "./vpn";
 // Aditional low levels methods
-import { lowLevel as lowLevelMainDb } from "./dbMain";
-import { lowLevel as lowLevelCacheDb } from "./dbCache";
+import { dbCache, dbMain } from "./dbFactory";
 
-/**
- * Alias, General methods
- */
-export const clearCache = lowLevelCacheDb.clearDb;
-
-export const cleardb = lowLevelMainDb.clearDb;
-
-// Aditional low levels methods
-export { lowLevelMainDb, lowLevelCacheDb };
+/** WARNING! Only clear cache DB if necessary */
+export const clearCacheDb = dbCache.clearDb;
+/** DANGER! Calling this method will loose user data */
+export const clearMainDb = dbMain.clearDb;
