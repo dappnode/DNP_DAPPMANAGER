@@ -4,8 +4,8 @@ import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
 import { DockerUpdate } from "./DockerUpdate";
 import { SshManager } from "./SshManager";
-import { MaindbManager } from "./MaindbManager/index";
-import { ClearCacheManager } from "./CacheManager/index";
+import { ClearCacheDb } from "./ClearCacheDb";
+import { ClearMainDb } from "./ClearMainDb";
 
 export function Advanced() {
   return (
@@ -24,11 +24,11 @@ export function Advanced() {
       <SubTitle>Docker update</SubTitle>
       <DockerUpdate />
 
-      <SubTitle>Dappmanager database</SubTitle>
-      <MaindbManager />
+      <SubTitle>Clear cache db</SubTitle>
+      <ClearCacheDb />
 
-      <SubTitle>Dappmanager cache</SubTitle>
-      <ClearCacheManager />
+      <SubTitle>Clear main db</SubTitle>
+      <ClearMainDb />
     </>
   );
 }
