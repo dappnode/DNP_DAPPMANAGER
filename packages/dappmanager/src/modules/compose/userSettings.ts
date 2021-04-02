@@ -150,9 +150,9 @@ export function applyUserSettings(
       volumeMappings.map(
         (vol): VolumeMapping => {
           const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
-          if (hostUserSet && path.isAbsolute(hostUserSet))
-            return { host: hostUserSet, container: vol.container };
-          else return vol;
+          return hostUserSet && path.isAbsolute(hostUserSet)
+            ? { host: hostUserSet, container: vol.container }
+            : vol;
         }
       )
     );
@@ -180,15 +180,15 @@ export function applyUserSettings(
     const mountpoint =
       (userSettings.namedVolumeMountpoints || {})[volumeName] ||
       userSettings.allNamedVolumeMountpoint;
-    if (mountpoint)
-      return {
-        driver_opts: {
-          type: "none",
-          device: getDevicePath({ mountpoint, dnpName, volumeName }),
-          o: "bind"
+    return mountpoint
+      ? {
+          driver_opts: {
+            type: "none",
+            device: getDevicePath({ mountpoint, dnpName, volumeName }),
+            o: "bind"
+          }
         }
-      };
-    else return vol;
+      : vol;
   });
 
   return cleanCompose({

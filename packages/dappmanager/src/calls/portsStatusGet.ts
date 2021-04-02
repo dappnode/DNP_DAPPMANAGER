@@ -18,19 +18,17 @@ export async function portsUpnpStatusGet({
 }): Promise<UpnpTablePortStatus[]> {
   const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UPnP
 
-  return portsToOpen.map(port => {
-    return {
-      port: port.portNumber,
-      protocol: port.protocol,
-      dnpName: port.dnpName,
-      serviceName: port.serviceName,
-      status: upnpPortMappings.find(
-        upnpPort => parseInt(upnpPort.inPort) === port.portNumber
-      )
-        ? "open"
-        : "closed"
-    };
-  });
+  return portsToOpen.map(port => ({
+    port: port.portNumber,
+    protocol: port.protocol,
+    dnpName: port.dnpName,
+    serviceName: port.serviceName,
+    status: upnpPortMappings.find(
+      upnpPort => parseInt(upnpPort.inPort) === port.portNumber
+    )
+      ? "open"
+      : "closed"
+  }));
 }
 
 /**

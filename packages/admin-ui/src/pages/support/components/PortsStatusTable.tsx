@@ -154,43 +154,41 @@ export function PortsStatusTable({
             </tr>
           </thead>
           <tbody>
-            {portsToOpen.data.map(port => {
-              return (
-                <tr>
-                  <td>{port.portNumber}</td>
-                  <td>{port.protocol}</td>
-                  <td>{prettyDnpName(port.dnpName)}</td>
+            {portsToOpen.data.map(port => (
+              <tr>
+                <td>{port.portNumber}</td>
+                <td>{port.protocol}</td>
+                <td>{prettyDnpName(port.dnpName)}</td>
 
-                  {apiReqStatus.result && (
-                    <td>
-                      <RenderApiStatus
-                        apiScanResult={apiReqStatus.result}
-                        portToOpen={port}
-                      />
-                    </td>
-                  )}
-                  {apiReqStatus.loading && (
-                    <td>
-                      <ScanningPort />
-                    </td>
-                  )}
+                {apiReqStatus.result && (
+                  <td>
+                    <RenderApiStatus
+                      apiScanResult={apiReqStatus.result}
+                      portToOpen={port}
+                    />
+                  </td>
+                )}
+                {apiReqStatus.loading && (
+                  <td>
+                    <ScanningPort />
+                  </td>
+                )}
 
-                  {upnpReqStatus.result && (
-                    <td>
-                      <RenderUpnpStatus
-                        upnpScanResult={upnpReqStatus.result}
-                        portToOpen={port}
-                      />
-                    </td>
-                  )}
-                  {upnpReqStatus.loading && (
-                    <td>
-                      <ScanningPort />
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
+                {upnpReqStatus.result && (
+                  <td>
+                    <RenderUpnpStatus
+                      upnpScanResult={upnpReqStatus.result}
+                      portToOpen={port}
+                    />
+                  </td>
+                )}
+                {upnpReqStatus.loading && (
+                  <td>
+                    <ScanningPort />
+                  </td>
+                )}
+              </tr>
+            ))}
           </tbody>
         </Table>
 
