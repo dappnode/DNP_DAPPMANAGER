@@ -3,7 +3,7 @@ import { logs } from "../logs";
 import { JsonFileDb } from "../utils/fileDb";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-export default function dbFactory(dbPath: string) {
+export function dbFactory(dbPath: string) {
   // Define dbPath and make sure it exists (mkdir -p)
   validate.path(dbPath);
   logs.info(`New DB instance at ${dbPath}`);
