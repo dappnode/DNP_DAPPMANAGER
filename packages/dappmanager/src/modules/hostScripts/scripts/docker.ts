@@ -3,17 +3,6 @@ import { runScript } from "../runScripts";
 import { DockerVersionsScript, HostInfoScript } from "../../../types";
 
 /**
- * Updates docker engine
- */
-export const updateDockerEngine = memoize(
-  async function(): Promise<string> {
-    return await runScript("docker_engine_update.sh", "-- --install");
-  },
-  // Prevent running this script more than once
-  { promise: true, maxAge: 2000 }
-);
-
-/**
  * Updates docker compose
  */
 export const updateDockerCompose = memoize(

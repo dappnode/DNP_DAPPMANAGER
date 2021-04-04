@@ -2,9 +2,9 @@ import { DockerUpdateStatus } from "../../types";
 import {
   getDockerComposeVersion,
   getDockerEnginehostInfo,
-  updateDockerCompose as updateDockerComposeScript,
-  updateDockerEngine as updateDockerEngineScript
+  updateDockerCompose as updateDockerComposeScript
 } from "../hostScripts";
+import { updateDockerEngine as updateDockerEngineService } from "../hostServices";
 import {
   parseDockerComposeRequirements,
   parseDockerEngineRequirements
@@ -12,9 +12,16 @@ import {
 
 // Docker engine
 
+/**
+ * Updates docker engine:
+ * - Must be done through a service instead of a script
+ * - Will break docker engine communctation
+ * - Containers will restart
+ * - Cannot be done executing a script (due to the linux child process hierarchy)
+ */
 export async function updateDockerEngine(): Promise<string> {
-  return await updateDockerEngineScript().catch(e => {
-    e.message = `Error updating docker compose: ${e.message}`;
+  return await updateDockerEngineService().catch(e => {
+    e.message = `Error updating docker engine: ${e.message}`;
     throw e;
   });
 }
