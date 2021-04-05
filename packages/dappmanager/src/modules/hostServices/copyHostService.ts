@@ -1,35 +1,19 @@
-import fs from "fs";
 import path from "path";
 import params from "../../params";
-import { logs } from "../../logs";
-import { sha256File } from "../hostScripts";
+import { shellHost } from "../../utils/shell";
 
-const hostServicesDir = params.HOST_SERVICES_DIR;
-const hostServicesDirSource = params.HOST_SERVICES_SOURCE_DIR;
+const hostSystemdDir = params.HOST_SYSTEMD_DIR_FROM_HOST;
+const hostServicesDir = params.HOST_SERVICES_DIR_FROM_HOST;
 
 /**
- * Copies the services to the host shared folder
- * - Add new services
- * - Update services by comparing sha256 hashes
- * - Remove services that are not here
- * @returns For info and logging
+ * Copies the service to the default host path for services:
+ * /etc/systemd/system
  */
-export function copyHostService(serviceName: string): void {
-  // Paths
-  const pathNew = path.join(hostServicesDirSource, serviceName);
-  const pathOld = path.join(hostServicesDir, serviceName);
+export async function copyHostService(serviceName: string): Promise<void> {
+  const serviceSourcePath = path.join(hostServicesDir, serviceName);
+  const serviceDestPath = path.join(hostSystemdDir, serviceName);
 
-  // Make sure the target services dir exists
-  fs.mkdirSync(hostServicesDir, { recursive: true });
-
-  // Check if service already exists
-  if (sha256File(pathNew) === sha256File(pathOld)) {
-    logs.info(`hostService ${serviceName} already copied`);
-    return;
-  }
-
-  // Copy service in shared folder
-  fs.copyFileSync(pathNew, pathOld);
-
-  logs.info(`Successfully copied hostService: ${serviceName}`);
+  // --update: copy only when the SOURCE file is newer than the destination file
+  // or when the destination file is missing
+  await shellHost(`cp --update ${serviceSourcePath} ${serviceDestPath}`);
 }

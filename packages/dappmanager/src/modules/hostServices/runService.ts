@@ -30,7 +30,7 @@ export async function runService(
       throw Error(`Host service ${serviceName} not found`);
 
     // Copy service into shared volume
-    copyHostService(serviceName);
+    await copyHostService(serviceName);
 
     // Reload services if necessary
     if (reload) await reloadServices();

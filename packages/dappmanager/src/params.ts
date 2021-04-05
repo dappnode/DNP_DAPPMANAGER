@@ -65,7 +65,9 @@ const params = {
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
   // Host services paths
-  HOST_SERVICES_DIR: "DNCORE/services/host",
+  HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
+  HOST_SYSTEMD_DIR_FROM_HOST: "/etc/system/systemd",
+  HOST_SERVICES_DIR: "DNCORE/scripts/host",
   HOST_SERVICES_SOURCE_DIR: "hostServices",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
