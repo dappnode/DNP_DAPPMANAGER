@@ -8,6 +8,7 @@ import { runService } from "../runServices";
  * - Docker communication will be lost during the update and the container which starts the
  * host service will exit with an EXPECTED exit code 137
  * - `systemctl enable docker-update.service` would make the service to start on boot every single time
+ * - When running this host service containers will restart and connection with the dappnode will be lost for a while
  */
 export const updateDockerEngine = memoize(
   async function(): Promise<string> {

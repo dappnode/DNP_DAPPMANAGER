@@ -24,9 +24,5 @@ export async function runService(
   if (!fs.existsSync(servicePath))
     throw Error(`Host service ${serviceName} not found`);
 
-  const servicePathFromHost = path.resolve(
-    params.HOST_SERVICES_DIR_FROM_HOST,
-    serviceName
-  );
-  return await shellHost(`systemctl start ${servicePathFromHost} ${args}`);
+  return await shellHost(`systemctl start ${serviceName} ${args}`);
 }

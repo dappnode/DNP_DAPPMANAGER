@@ -65,7 +65,6 @@ const params = {
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
   // Host services paths
-  HOST_SERVICES_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
   HOST_SERVICES_SOURCE_DIR: "hostServices",
   // Local fallback versions, to be able to install and eth client without connecting to remote
