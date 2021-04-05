@@ -15,5 +15,5 @@ export async function copyHostService(serviceName: string): Promise<void> {
 
   // --update: copy only when the SOURCE file is newer than the destination file
   // or when the destination file is missing
-  await shellHost(`cp --update ${serviceSourcePath} ${serviceDestPath}`);
+  await shellHost(`cp -- --update ${serviceSourcePath} ${serviceDestPath}`);
 }
