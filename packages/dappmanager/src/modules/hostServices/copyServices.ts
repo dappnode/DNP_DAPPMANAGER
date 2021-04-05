@@ -18,7 +18,7 @@ export async function copyHostServices(): Promise<void> {
   // Make sure the target services dir exists
   fs.mkdirSync(hostServicesDir, { recursive: true });
 
-  // Fetch list of scripts to diff them
+  // Fetch list of services to diff them
   const newServices = fs.readdirSync(hostServicesDirSource);
   const copied: string[] = [];
 
@@ -31,6 +31,9 @@ export async function copyHostServices(): Promise<void> {
       copied.push(name);
     }
   }
+
+  // Reload services: Only necessary if there are any service "enabled" (systemctl enable service)
+  // await shellHost("systemctl daemon-reload")
 
   let message = "Successfully run copyHostScripts.";
   if (copied.length) message += ` Copied ${copied.join(", ")}.`;
