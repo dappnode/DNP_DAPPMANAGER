@@ -1,2 +1,2 @@
-export * from "./copyServices";
 export * from "./services/docker";
+export * from "./copyServices";

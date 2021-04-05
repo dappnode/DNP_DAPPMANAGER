@@ -11,7 +11,7 @@ import { runService } from "../runServices";
  */
 export const updateDockerEngine = memoize(
   async function(): Promise<string> {
-    return await runService("docker-update.service");
+    return await runService("update-docker-engine.service");
   },
   // Prevent running this service more than once
   { promise: true, maxAge: 2000 }

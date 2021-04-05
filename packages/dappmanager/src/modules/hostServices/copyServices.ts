@@ -1,35 +1,38 @@
 import fs from "fs";
 import path from "path";
 import params from "../../params";
-import { sha256File } from "../hostScripts";
 import { logs } from "../../logs";
+import { sha256File } from "../hostScripts";
 
+const hostServicesDir = params.HOST_SERVICES_DIR;
+const hostServicesDirSource = params.HOST_SERVICES_SOURCE_DIR;
+
+/**
+ * Copies the services to the host shared folder
+ * - Add new services
+ * - Update services by comparing sha256 hashes
+ * - Remove services that are not here
+ * @returns For info and logging
+ */
 export async function copyHostServices(): Promise<void> {
-  // Check if dir exists
-  // systemd is the default init system for debian since DebainJessie
-  // https://wiki.debian.org/systemd
-  if (!fs.existsSync(params.HOST_SERVICES_DIR)) {
-    logs.warn(
-      `copyHostServices cannot copy services, dir ${params.HOST_SERVICES_DIR} does not exist`
-    );
-    return;
-  }
+  // Make sure the target services dir exists
+  fs.mkdirSync(hostServicesDir, { recursive: true });
 
   // Fetch list of scripts to diff them
-  const newServices = fs.readdirSync(params.HOST_SERVICES_SOURCE_DIR);
+  const newServices = fs.readdirSync(hostServicesDirSource);
   const copied: string[] = [];
 
   // Compute files to add
   for (const name of newServices) {
-    const destPath = path.join(params.HOST_SERVICES_SOURCE_DIR, name);
-    const srcPath = path.join(params.HOST_SERVICES_DIR, name);
-    if (sha256File(destPath) !== sha256File(srcPath)) {
-      fs.copyFileSync(destPath, srcPath);
+    const pathNew = path.join(hostServicesDirSource, name);
+    const pathOld = path.join(hostServicesDir, name);
+    if (sha256File(pathNew) !== sha256File(pathOld)) {
+      fs.copyFileSync(pathNew, pathOld);
       copied.push(name);
     }
   }
 
-  let message = "Successfully run copyHostServices.";
+  let message = "Successfully run copyHostScripts.";
   if (copied.length) message += ` Copied ${copied.join(", ")}.`;
   logs.info(message);
 }
