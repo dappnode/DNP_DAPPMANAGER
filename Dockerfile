@@ -81,6 +81,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 
 # Copy the src last as it's the layer most likely to change
 COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
+COPY packages/dappmanager/hostServices /usr/src/app/hostServices
 COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
 COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH

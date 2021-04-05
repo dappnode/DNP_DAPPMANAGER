@@ -25,6 +25,7 @@ import {
 import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
+import { copyHostServices } from "./modules/hostServices/copyHostServices";
 
 const controller = new AbortController();
 
@@ -110,6 +111,8 @@ addAliasToRunningContainersMigration().catch(e =>
  */
 
 copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
+
+copyHostServices().catch(e => logs.error("Error copying host services", e));
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 
