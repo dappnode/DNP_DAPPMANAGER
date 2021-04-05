@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { runService } from "../runServices";
+import { runService } from "../runService";
 
 /**
  * Updates docker engine:
@@ -12,7 +12,7 @@ import { runService } from "../runServices";
  */
 export const updateDockerEngine = memoize(
   async function(): Promise<string> {
-    return await runService("update-docker-engine.service");
+    return await runService("update-docker-engine.service", false);
   },
   // Prevent running this service more than once
   { promise: true, maxAge: 2000 }
