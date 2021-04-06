@@ -107,6 +107,12 @@ export function HttpsMappings({
     }
   }
 
+  if (mappings.error && mappings.error.message.includes("ENOTFOUND"))
+    return (
+      <a href="http://my.dappnode/#/installer/https-portal.dnp.dappnode.eth">
+        Get HTTPS package
+      </a>
+    );
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
   if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
