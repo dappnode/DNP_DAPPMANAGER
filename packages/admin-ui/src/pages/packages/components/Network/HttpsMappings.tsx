@@ -107,11 +107,11 @@ export function HttpsMappings({
     }
   }
 
-  if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
-  if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
-  if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
-
   // Helper UI in case the HTTPs Portal is bad
+  if (dnpsRequest.error)
+    return <ErrorView error={dnpsRequest.error} hideIcon red />;
+  if (dnpsRequest.isValidating)
+    return <Ok loading msg="Loading HTTPS portal" />;
   if (dnpsRequest.data) {
     const httpsPortalDnp = dnpsRequest.data.find(
       dnp => dnp.dnpName === httpsPortalDnpName
@@ -126,6 +126,10 @@ export function HttpsMappings({
       );
     }
   }
+
+  if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
+  if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
+  if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
 
   const serviceMappings = mappings.data.filter(
     mapping =>
