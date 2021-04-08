@@ -4,7 +4,7 @@ import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
 import { parseEnvironment } from "./environment";
 import { parseServiceNetworks } from "./networks";
-import { getPrivateNetworkAlias } from "../../domains";
+import { getPrivateNetworkAliases } from "../../domains";
 import {
   Compose,
   ComposeService,
@@ -95,7 +95,7 @@ export function parseUnsafeCompose(
           serviceUnsafe.networks,
           composeUnsafe.networks,
           isCore,
-          { serviceName, dnpName }
+          { serviceName, dnpName, isMain: manifest.mainService === serviceName }
         )
       })
     ),
@@ -119,7 +119,7 @@ function parseUnsafeServiceNetworks(
   serviceNetworks: ComposeServiceNetworks | undefined,
   composeNetworks: ComposeNetworks | undefined = {},
   isCore: boolean,
-  service: { serviceName: string; dnpName: string }
+  service: { serviceName: string; dnpName: string; isMain: boolean }
 ): ComposeServiceNetworks {
   // TODO: See note in parseUnsafeNetworks() about name property
   const isDncoreNetworkDeclared =
@@ -134,13 +134,11 @@ function parseUnsafeServiceNetworks(
   // Only allow customizing config for core packages
   const dnpPrivateNetwork = isCore ? networksObj[dnpPrivateNetworkName] : {};
 
-  const alias = getPrivateNetworkAlias(service);
-
   return {
     ...networksObj,
     [dnpPrivateNetworkName]: {
       ...dnpPrivateNetwork,
-      aliases: [alias]
+      aliases: getPrivateNetworkAliases(service)
     }
   };
 }
