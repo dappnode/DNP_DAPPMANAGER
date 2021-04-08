@@ -22,7 +22,7 @@ export async function startAvahiDaemon(): Promise<void> {
 
     await retry(
       async () =>
-        shell(`avahi-publish -a ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`),
+        shell(`avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`),
       {
         retries: 10,
         maxRetryTime: Infinity,
