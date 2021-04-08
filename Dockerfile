@@ -63,7 +63,9 @@ FROM node:12.22.0-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.25.5
 
-RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind
+RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind \
+  # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
+  avahi-tools
 
 RUN curl -L https://github.com/dappnode/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-$(uname -m) > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
