@@ -39,6 +39,7 @@ services:
       dncore_network:
         aliases:
           - "validator.prysm.dappnode"
+          - "prysm.dappnode"
     logging:
       driver: json-file
       options:

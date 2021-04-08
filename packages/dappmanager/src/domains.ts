@@ -27,6 +27,20 @@ export function getPrivateNetworkAlias(container: ContainerNames): string {
   return `${shortUniqueDappnodeEns(fullEns)}.dappnode`;
 }
 
+export function getPrivateNetworkAliases(
+  container: ContainerNames & { isMain: boolean }
+): string[] {
+  const aliases: string[] = [getPrivateNetworkAlias(container)];
+  if (container.isMain) {
+    const rootAlias = getPrivateNetworkAlias({
+      dnpName: container.dnpName,
+      serviceName: container.dnpName
+    });
+    aliases.push(rootAlias);
+  }
+  return aliases;
+}
+
 export function getExternalNetworkAlias(container: ContainerNames): string {
   const fullEns = getContainerDomain(container);
   return `${shortUniqueDappnodeEns(fullEns)}.external`;
