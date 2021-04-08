@@ -175,7 +175,7 @@ const params = {
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
   // Local domains
-  AVAHI_LOCAL_DOMAIN: "dappnode.local",
+  AVAHI_LOCAL_DOMAIN: "my.dappnode.local",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
