@@ -47,11 +47,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
-      name: "Security",
-      subPath: subPaths.security,
-      component: Security
-    },
-    {
       name: "Auto updates",
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
@@ -86,6 +81,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Profile",
       subPath: subPaths.profile,
       component: Profile
+    },
+    {
+      name: "Security",
+      subPath: subPaths.security,
+      component: Security
     },
     {
       name: "Advanced",
