@@ -1,4 +1,12 @@
-import { mapValues, pick, omit, toPairs, sortBy, fromPairs } from "lodash";
+import {
+  mapValues,
+  pick,
+  omit,
+  toPairs,
+  sortBy,
+  fromPairs,
+  uniq
+} from "lodash";
 import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
@@ -132,13 +140,18 @@ function parseUnsafeServiceNetworks(
   const networksObj = parseServiceNetworks(serviceNetworks || {});
 
   // Only allow customizing config for core packages
-  const dnpPrivateNetwork = isCore ? networksObj[dnpPrivateNetworkName] : {};
+  const dnpPrivateNetwork = isCore
+    ? networksObj[dnpPrivateNetworkName] || {}
+    : {};
 
   return {
     ...networksObj,
     [dnpPrivateNetworkName]: {
       ...dnpPrivateNetwork,
-      aliases: getPrivateNetworkAliases(service)
+      aliases: uniq([
+        ...(dnpPrivateNetwork.aliases || []),
+        ...getPrivateNetworkAliases(service)
+      ])
     }
   };
 }

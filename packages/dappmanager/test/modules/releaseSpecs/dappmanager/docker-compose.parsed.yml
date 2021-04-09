@@ -10,6 +10,7 @@ services:
       network:
         ipv4_address: 172.33.1.7
         aliases:
+          - "my.dappnode"
           - "dappmanager.dappnode"
     restart: always
     volumes:
