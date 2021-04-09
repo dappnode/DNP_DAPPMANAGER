@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 // Components
 import Title from "components/Title";
-import StaticIp from "./StaticIp";
 import AutoUpdates from "./AutoUpdates";
 import Repository from "./Repository";
 import Security from "./Security";
@@ -55,11 +54,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Repository",
       subPath: subPaths.repository,
       component: Repository
-    },
-    {
-      name: "Static IP",
-      subPath: subPaths.staticIp,
-      component: StaticIp
     },
     {
       name: "Network",
