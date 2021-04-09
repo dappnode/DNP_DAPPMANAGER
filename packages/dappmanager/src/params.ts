@@ -97,8 +97,8 @@ const params = {
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
   // HTTPS Portal API URL
-  HTTPS_PORTAL_API_URL: "http://https-portal.dappnode:5000",
-  HTTPS_PORTAL_DNPNAME: "https-portal.dnp.dappnode.eth",
+  HTTPS_PORTAL_API_URL: "http://https.dappnode:5000",
+  HTTPS_PORTAL_DNPNAME: "https.dnp.dappnode.eth",
 
   // Wireguard params
   WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
