@@ -3,6 +3,7 @@ import {
   ExposableServiceManifestInfo,
   InstalledPackageData
 } from "../../../types";
+import { getPublicSubdomain } from "../../../domains";
 
 /**
  * Parse unsafe manifest.exposable property
@@ -17,15 +18,30 @@ export function parseExposableServiceManifest(
 
   const exposable: ExposableServiceInfo[] = [];
 
-  for (const { name, description, serviceName, port } of manifestExposable) {
-    const serviceName_ = serviceName || dnp.containers[0]?.serviceName;
-    if (serviceName_ && port) {
-      exposable.push({
-        name: name || "Exposable service",
-        description: description || "",
+  for (const info of manifestExposable) {
+    const serviceName = info.serviceName || dnp.containers[0]?.serviceName;
+
+    if (serviceName && info.port) {
+      const defaultFromSubdomain = getPublicSubdomain({
         dnpName: dnp.dnpName,
-        serviceName: serviceName_,
-        port
+        serviceName
+      });
+
+      if (
+        info.fromSubdomain &&
+        !defaultFromSubdomain.includes(info.fromSubdomain)
+      ) {
+        // Illegal fromSubdomain, MUST include the default subdomain
+        continue;
+      }
+
+      exposable.push({
+        name: info.name || "Exposable service",
+        description: info.description || "",
+        fromSubdomain: info.fromSubdomain || defaultFromSubdomain,
+        dnpName: dnp.dnpName,
+        serviceName,
+        port: info.port
       });
     }
   }

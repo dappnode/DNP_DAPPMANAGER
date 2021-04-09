@@ -4,6 +4,7 @@ const mappings = new Map<string, HttpsPortalMapping>();
 
 const exposable: ExposableServiceInfo[] = [
   {
+    fromSubdomain: "geth",
     dnpName: "geth.dnp.dappnode.eth",
     serviceName: "geth.dnp.dappnode.eth",
     port: 8545,

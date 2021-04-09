@@ -25,6 +25,7 @@ describe("modules / https-portal / exposable", () => {
 
     const expectedExposable: ExposableServiceInfo[] = [
       {
+        fromSubdomain: "mock-dnp",
         name: "name1",
         description: "",
         dnpName: "mock-dnp.dnp.dappnode.eth",
@@ -32,6 +33,7 @@ describe("modules / https-portal / exposable", () => {
         port: 1111
       },
       {
+        fromSubdomain: "serv-mock-dnp",
         name: "name3",
         description: "desc3",
         dnpName: "mock-dnp.dnp.dappnode.eth",
