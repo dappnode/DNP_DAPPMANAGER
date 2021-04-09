@@ -1,3 +1,5 @@
+import { uniq } from "lodash";
+import semver from "semver";
 import params from "../../params";
 import { logs } from "../../logs";
 import { getPrivateNetworkAlias } from "../../domains";
@@ -15,7 +17,6 @@ import { ComposeFileEditor } from "../compose/editor";
 import { PackageContainer } from "../../types";
 import { parseServiceNetworks } from "../compose/networks";
 import { ComposeNetwork, ComposeServiceNetwork } from "../../common";
-import semver from "semver";
 import { parseComposeSemver } from "../../utils/sanitizeVersion";
 
 /** Alias for code succinctness */
@@ -137,9 +138,10 @@ export function migrateCoreNetworkAndAliasInCompose(
     // Only remove network if exists
     composeService.removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
 
+  const aliases = uniq([...(serviceNetwork?.aliases || []), alias]);
   composeService.addNetwork(
     params.DNP_PRIVATE_NETWORK_NAME,
-    { ...serviceNetwork, aliases: [alias] },
+    { ...serviceNetwork, aliases },
     { external: true, name: params.DNP_PRIVATE_NETWORK_NAME } //...networkConfig,
   );
 
