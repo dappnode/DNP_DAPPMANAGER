@@ -51,3 +51,9 @@ export function getExternalNetworkAlias(container: ContainerNames): string {
   const fullEns = getContainerDomain(container);
   return `${shortUniqueDappnodeEns(fullEns)}.external`;
 }
+
+export function getPublicSubdomain(container: ContainerNames): string {
+  const fullEns = getContainerDomain(container);
+  // eslint-disable-next-line no-useless-escape
+  return shortUniqueDappnodeEns(fullEns).replace(/[^a-zA-Z\-]+/g, "-");
+}

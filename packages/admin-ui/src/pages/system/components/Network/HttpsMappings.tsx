@@ -13,7 +13,6 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { getPublicSubdomain } from "utils/domains";
 import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
@@ -37,13 +36,8 @@ export function HttpsMappings() {
         variant: "dappnode"
       });
 
-      const mapping: HttpsPortalMapping = {
-        ...mappingInfo,
-        fromSubdomain: getPublicSubdomain(mappingInfo)
-      };
-
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingAdd(mapping), {
+      await withToast(() => api.httpsPortalMappingAdd(mappingInfo), {
         message: "Adding HTTPs mapping...",
         onSuccess: "Added HTTPs mapping"
       });
