@@ -30,5 +30,61 @@ export const exposablePredefined: {
       description: "JSON RPC endpoint for Kovan network"
     }
   ],
+  "nethermind.dnp.dappnode.eth": [
+  {
+    dnpName: "nethermind.public.dappnode.eth",
+    serviceName: "nethermind.public.dappnode.eth",
+    port: 8545,
+    name: "Nethermind JSON RPC",
+    description: "JSON RPC endpoint for Ethereum 1.0 mainnet"
+  }
+  ],
+  "rinkeby.dnp.dappnode.eth": [
+    {
+      dnpName: "rinkeby.dnp.dappnode.eth",
+      serviceName: "rinkeby.dnp.dappnode.eth",
+      port: 8545,
+      name: "Rinkeby JSON RPC",
+      description: "JSON RPC endpoint for Rinkeby network"
+    }
+  ],
+  "ropsten.dnp.dappnode.eth": [
+    {
+      dnpName: "ropsten.dnp.dappnode.eth",
+      serviceName: "ropsten.dnp.dappnode.eth",
+      port: 8545,
+      name: "Ropsten JSON RPC",
+      description: "JSON RPC endpoint for Ropsten network"
+    }
+  ],
+  "avalanche.public.dappnode.eth": [
+    {
+      dnpName: "avalanche.public.dappnode.eth",
+      serviceName: "wallet",
+      port: 80,
+      name: "Ropsten JSON RPC",
+      description: "JSON RPC endpoint for Ropsten network"
+    }
+  ],
+  "bee.dnp.dappnode.eth": [
+    {
+      dnpName: "bee.dnp.dappnode.eth",
+      serviceName: "bee.dnp.dappnode.eth",
+      port: 1633,
+      name: "Bee http API endpoint",
+      description: "JSON http endpoint for bee"
+    }
+  ],
+  "bitcoin.dnp.dappnode.eth": [
+    {
+      dnpName: "bitcoin.dnp.dappnode.eth",
+      serviceName: "bitcoin.dnp.dappnode.eth",
+      port: 8332,
+      name: "Bitcoin JSON RPC endpoint",
+      description: "JSON endpoint for Bitcoin"
+    }
+  ],
+
+  
 };
 
