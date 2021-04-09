@@ -73,14 +73,14 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
-      name: "Peers",
-      subPath: subPaths.peers,
-      component: Peers
-    },
-    {
       name: "Profile",
       subPath: subPaths.profile,
       component: Profile
+    },
+    {
+      name: "Peers",
+      subPath: subPaths.peers,
+      component: Peers
     },
     {
       name: "Security",
