@@ -43,18 +43,18 @@ export async function httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]> {
 export async function httpsPortalExposableServicesGet(): Promise<
   ExposableServiceMapping[]
 > {
-  const exposable = await getExposableServices();
+  const mappingsInfo = await getExposableServices();
   const mappings = await httpsPortal.getMappings();
   const mappingsById = new Map(
     mappings.map(mapping => [getServiceId(mapping), mapping])
   );
 
-  return exposable.map(mapping => {
-    const exposedMapping = mappingsById.get(getServiceId(mapping));
+  return mappingsInfo.map(mappingInfo => {
+    const exposedMapping = mappingsById.get(getServiceId(mappingInfo));
     if (exposedMapping) {
-      return { ...exposedMapping, ...mapping, exposed: true };
+      return { ...mappingInfo, ...exposedMapping, exposed: true }; // override .fromSubdomain potentially
     } else {
-      return { ...mapping, exposed: false };
+      return { ...mappingInfo, exposed: false };
     }
   });
 }

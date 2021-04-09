@@ -10,7 +10,15 @@ export const exposablePredefined: {
       serviceName: "geth.dnp.dappnode.eth",
       port: 8545,
       name: "Geth JSON RPC",
-      description: "JSON RPC endpoint for Geth mainnet"
+      description: "JSON RPC endpoint for mainnet"
+    },
+    {
+      fromSubdomain: "geth-ws",
+      dnpName: "geth.dnp.dappnode.eth",
+      serviceName: "geth.dnp.dappnode.eth",
+      port: 8546,
+      name: "Geth JSON RPC (WS)",
+      description: "JSON RPC WebSocket endpoint for mainnet"
     }
   ],
   "geth.dnp.dappnode.eth": [
@@ -31,26 +39,6 @@ export const exposablePredefined: {
       port: 8545,
       name: "Goerli Geth JSON RPC",
       description: "JSON RPC endpoint for Goerli network"
-    }
-  ],
-  "goerli-geth.dnp.dappnode.eth": [
-    {
-      fromSubdomain: "goerli-geth-ws",
-      dnpName: "goerli-geth.dnp.dappnode.eth",
-      serviceName: "goerli-geth.dnp.dappnode.eth",
-      port: 8546,
-      name: "Goerli Geth JSON RPC (WS)",
-      description: "JSON RPC endpoint for Goerli network"
-    }
-  ],
-  "kovan.dnp.dappnode.eth": [
-    {
-      fromSubdomain: "kovan",
-      dnpName: "kovan.dnp.dappnode.eth",
-      serviceName: "kovan.dnp.dappnode.eth",
-      port: 8545,
-      name: "Kovan JSON RPC",
-      description: "JSON RPC endpoint for Kovan network"
     }
   ],
   "kovan.dnp.dappnode.eth": [

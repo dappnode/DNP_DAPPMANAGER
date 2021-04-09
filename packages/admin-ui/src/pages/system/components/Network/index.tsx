@@ -2,6 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import { HttpsMappings } from "./HttpsMappings";
+import { StaticIp } from "./StaticIp";
 
 export function Network() {
   return (
@@ -14,6 +15,16 @@ export function Network() {
           be exposed will show up here.
         </div>
         <HttpsMappings />
+      </Card>
+
+      <SubTitle>Static IP</SubTitle>
+      <Card spacing className="network-editor">
+        <div>
+          You can set a static IP for this DAppNode instead of using a dyndns.
+          Only set a static IP if you are sure it is static, otherwise you may
+          not be able to connect to its VPN.
+        </div>
+        <StaticIp />
       </Card>
     </>
   );

@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 // Components
 import Title from "components/Title";
-import StaticIp from "./StaticIp";
 import AutoUpdates from "./AutoUpdates";
 import Repository from "./Repository";
 import Security from "./Security";
@@ -47,11 +46,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
-      name: "Security",
-      subPath: subPaths.security,
-      component: Security
-    },
-    {
       name: "Auto updates",
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
@@ -60,11 +54,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Repository",
       subPath: subPaths.repository,
       component: Repository
-    },
-    {
-      name: "Static IP",
-      subPath: subPaths.staticIp,
-      component: StaticIp
     },
     {
       name: "Network",
@@ -78,14 +67,19 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
+      name: "Profile",
+      subPath: subPaths.profile,
+      component: Profile
+    },
+    {
       name: "Peers",
       subPath: subPaths.peers,
       component: Peers
     },
     {
-      name: "Profile",
-      subPath: subPaths.profile,
-      component: Profile
+      name: "Security",
+      subPath: subPaths.security,
+      component: Security
     },
     {
       name: "Advanced",
