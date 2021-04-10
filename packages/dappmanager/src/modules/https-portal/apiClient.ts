@@ -1,6 +1,9 @@
 import fetch from "node-fetch";
+import Ajv from "ajv";
 import querystring from "querystring";
 import { urlJoin } from "../../utils/url";
+
+const ajv = new Ajv({ allErrors: true });
 
 export interface HttpPortalEntry {
   /**
@@ -15,6 +18,18 @@ export interface HttpPortalEntry {
    */
   toHost: string;
 }
+
+export const httpsPortalResponseSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    required: ["from", "to"],
+    properties: {
+      from: { type: "string" },
+      to: { type: "string" }
+    }
+  }
+};
 
 export class HttpsPortalApiClient {
   baseUrl: string;
@@ -88,7 +103,13 @@ export class HttpsPortalApiClient {
     }
 
     try {
-      return JSON.parse(body);
+      const response = JSON.parse(body);
+
+      if (!ajv.validate(httpsPortalResponseSchema, response)) {
+        throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
+      }
+
+      return response;
     } catch (e) {
       throw Error(`Error parsing JSON ${e.message}\n${body}`);
     }
