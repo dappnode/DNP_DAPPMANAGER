@@ -88,6 +88,10 @@ export class HttpsPortalApiClient {
       urlJoin(this.baseUrl, `/?format=json`)
     );
 
+    if (!ajv.validate(httpsPortalResponseSchema, entries)) {
+      throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
+    }
+
     return entries.map(entry => ({
       fromSubdomain: entry.from,
       toHost: entry.to
@@ -103,13 +107,7 @@ export class HttpsPortalApiClient {
     }
 
     try {
-      const response = JSON.parse(body);
-
-      if (!ajv.validate(httpsPortalResponseSchema, response)) {
-        throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
-      }
-
-      return response;
+      return JSON.parse(body);
     } catch (e) {
       throw Error(`Error parsing JSON ${e.message}\n${body}`);
     }
