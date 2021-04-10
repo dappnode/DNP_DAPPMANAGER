@@ -75,10 +75,6 @@ export function HttpsMappings() {
   }
 
   // Helper UI in case the HTTPs Portal is bad
-  if (dnpsRequest.error)
-    return <ErrorView error={dnpsRequest.error} hideIcon red />;
-  if (dnpsRequest.isValidating)
-    return <Ok loading msg="Loading HTTPS portal" />;
   if (dnpsRequest.data) {
     const httpsPortalDnp = dnpsRequest.data.find(
       dnp => dnp.dnpName === httpsPortalDnpName
@@ -94,59 +90,67 @@ export function HttpsMappings() {
     }
   }
 
+  if (mappings.data) {
+    return (
+      <div className="list-grid system-network-mappings">
+        {/* Table header */}
+        <header>PACKAGE</header>
+        <header>SERVICE</header>
+        <header />
+        <header>PUBLIC URL</header>
+        <header>EXPOSE</header>
+
+        <hr />
+
+        {mappings.data.length === 0 && (
+          <span className="no-mappings">No exposable services available</span>
+        )}
+
+        {mappings.data.map((mapping, i) => (
+          <React.Fragment key={i}>
+            <span className="package">
+              <span>{prettyFullName(mapping)}</span>
+            </span>
+            <span className="service">
+              <span className="title">{mapping.name}</span>
+              <span className="help-text">{mapping.description}</span>
+            </span>
+            <span className="arrow">
+              <BsArrowRight />
+            </span>
+            <span className="subdomain">
+              {mapping.exposed ? (
+                <a
+                  href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
+                  {...newTabProps}
+                >
+                  {mapping.fromSubdomain}
+                  <wbr />.{dappnodeIdentity.domain}
+                </a>
+              ) : (
+                "-"
+              )}
+            </span>
+
+            <Switch
+              checked={mapping.exposed}
+              onToggle={() =>
+                mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
+              }
+            />
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
+  if (dnpsRequest.error)
+    return <ErrorView error={dnpsRequest.error} hideIcon red />;
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
+
+  if (dnpsRequest.isValidating)
+    return <Ok loading msg="Loading HTTPS portal" />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
-  if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
 
-  return (
-    <div className="list-grid system-network-mappings">
-      {/* Table header */}
-      <header>PACKAGE</header>
-      <header>SERVICE</header>
-      <header />
-      <header>PUBLIC URL</header>
-      <header>EXPOSE</header>
-
-      <hr />
-
-      {mappings.data.length === 0 && (
-        <span className="no-mappings">No exposable services available</span>
-      )}
-
-      {mappings.data.map((mapping, i) => (
-        <React.Fragment key={i}>
-          <span className="package">
-            <span>{prettyFullName(mapping)}</span>
-          </span>
-          <span className="service">
-            <span className="title">{mapping.name}</span>
-            <span className="help-text">{mapping.description}</span>
-          </span>
-          <span className="arrow">
-            <BsArrowRight />
-          </span>
-          <span className="subdomain">
-            {mapping.exposed ? (
-              <a
-                href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
-                {...newTabProps}
-              >
-                {mapping.fromSubdomain}
-                <wbr />.{dappnodeIdentity.domain}
-              </a>
-            ) : (
-              "-"
-            )}
-          </span>
-
-          <Switch
-            checked={mapping.exposed}
-            onToggle={() =>
-              mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
-            }
-          />
-        </React.Fragment>
-      ))}
-    </div>
-  );
+  return <ErrorView error={"No data"} hideIcon red />;
 }
