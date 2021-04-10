@@ -10,7 +10,7 @@ export const exposablePredefined: {
       serviceName: "geth.dnp.dappnode.eth",
       port: 8545,
       name: "Geth JSON RPC",
-      description: "JSON RPC endpoint for Geth mainnet"
+      description: "JSON RPC endpoint for Geth Ethereum mainnet"
     },
     {
       fromSubdomain: "geth-ws",
@@ -18,7 +18,7 @@ export const exposablePredefined: {
       serviceName: "geth.dnp.dappnode.eth",
       port: 8546,
       name: "Geth JSON RPC (WS)",
-      description: "JSON RPC endpoint for Geth mainnet"
+      description: "WebSockets endpoint for Geth Ethereum mainnet"
     }
   ],
   "goerli-geth.dnp.dappnode.eth": [
@@ -28,7 +28,7 @@ export const exposablePredefined: {
       serviceName: "goerli-geth.dnp.dappnode.eth",
       port: 8545,
       name: "Goerli Geth JSON RPC",
-      description: "JSON RPC endpoint for Goerli network"
+      description: "JSON RPC endpoint for Goerli Ethereum network"
     },
     {
       fromSubdomain: "goerli-geth-ws",
@@ -36,7 +36,7 @@ export const exposablePredefined: {
       serviceName: "goerli-geth.dnp.dappnode.eth",
       port: 8546,
       name: "Goerli Geth JSON RPC (WS)",
-      description: "JSON RPC endpoint for Goerli network"
+      description: "WebSockets endpoint for Goerli Ethereum network"
     }
   ],
   "kovan.dnp.dappnode.eth": [
@@ -46,7 +46,7 @@ export const exposablePredefined: {
       serviceName: "kovan.dnp.dappnode.eth",
       port: 8545,
       name: "Kovan JSON RPC",
-      description: "JSON RPC endpoint for Kovan network"
+      description: "JSON RPC endpoint for Kovan Ethereum network"
     },
     {
       fromSubdomain: "kovan-ws",
@@ -54,27 +54,27 @@ export const exposablePredefined: {
       serviceName: "kovan.dnp.dappnode.eth",
       port: 8546,
       name: "Kovan JSON RPC (WS)",
-      description: "JSON RPC endpoint for Kovan network"
+      description: "WebSockets endpoint for Kovan Ethereum network"
     }
   ],
   "nethermind.dnp.dappnode.eth": [
-  {
-    fromSubdomain: "nethermind",
-    dnpName: "nethermind.public.dappnode.eth",
-    serviceName: "nethermind.public.dappnode.eth",
-    port: 8545,
-    name: "Nethermind JSON RPC",
-    description: "JSON RPC endpoint for Ethereum 1.0 mainnet"
-  },
+    {
+      fromSubdomain: "nethermind",
+      dnpName: "nethermind.public.dappnode.eth",
+      serviceName: "nethermind.public.dappnode.eth",
+      port: 8545,
+      name: "Nethermind JSON RPC",
+      description: "JSON RPC endpoint for Nethermind Ethereum mainnet"
+    },
     {
       fromSubdomain: "nethermind-ws",
       dnpName: "nethermind.public.dappnode.eth",
       serviceName: "nethermind.public.dappnode.eth",
       port: 8546,
       name: "Nethermind JSON RPC (WS)",
-      description: "JSON RPC endpoint for Ethereum 1.0 mainnet"
+      description: "WebSockets endpoint for Nethermind Ethereum mainnet"
     }
-    ],
+  ],
   "rinkeby.dnp.dappnode.eth": [
     {
       fromSubdomain: "rinkeby",
@@ -82,7 +82,7 @@ export const exposablePredefined: {
       serviceName: "rinkeby.dnp.dappnode.eth",
       port: 8545,
       name: "Rinkeby JSON RPC",
-      description: "JSON RPC endpoint for Rinkeby network"
+      description: "JSON RPC endpoint for Rinkeby Ethereum network"
     },
     {
       fromSubdomain: "rinkeby-ws",
@@ -90,7 +90,7 @@ export const exposablePredefined: {
       serviceName: "rinkeby.dnp.dappnode.eth",
       port: 8546,
       name: "Rinkeby JSON RPC (WS)",
-      description: "JSON RPC endpoint for Rinkeby network"
+      description: "WebSockets endpoint for Rinkeby Ethereum network"
     }
   ],
   "ropsten.dnp.dappnode.eth": [
@@ -100,7 +100,7 @@ export const exposablePredefined: {
       serviceName: "ropsten.dnp.dappnode.eth",
       port: 8545,
       name: "Ropsten JSON RPC",
-      description: "JSON RPC endpoint for Ropsten network"
+      description: "JSON RPC endpoint for Ropsten Ethereum network"
     },
     {
       fromSubdomain: "ropsten-ws",
@@ -108,7 +108,7 @@ export const exposablePredefined: {
       serviceName: "ropsten.dnp.dappnode.eth",
       port: 8546,
       name: "Ropsten JSON RPC (WS)",
-      description: "JSON RPC endpoint for Ropsten network"
+      description: "WebSockets endpoint for Ropsten Ethereum network"
     }
   ],
   "avalanche.public.dappnode.eth": [
@@ -117,8 +117,8 @@ export const exposablePredefined: {
       dnpName: "avalanche.public.dappnode.eth",
       serviceName: "wallet",
       port: 80,
-      name: "Ropsten JSON RPC",
-      description: "JSON RPC endpoint for Ropsten network"
+      name: "Avalanche wallet",
+      description: "Avalanche wallet UI"
     }
   ],
   "bee.dnp.dappnode.eth": [
@@ -127,8 +127,8 @@ export const exposablePredefined: {
       dnpName: "bee.dnp.dappnode.eth",
       serviceName: "bee.dnp.dappnode.eth",
       port: 1633,
-      name: "Bee http API endpoint",
-      description: "JSON http endpoint for bee"
+      name: "Bee JSON RPC",
+      description: "JSON RPC endpoint for Bee"
     }
   ],
   "bitcoin.dnp.dappnode.eth": [
@@ -137,8 +137,8 @@ export const exposablePredefined: {
       dnpName: "bitcoin.dnp.dappnode.eth",
       serviceName: "bitcoin.dnp.dappnode.eth",
       port: 8332,
-      name: "Bitcoin JSON RPC endpoint",
-      description: "JSON endpoint for Bitcoin"
+      name: "Bitcoin JSON RPC",
+      description: "JSON RPC endpoint for Bitcoin"
     }
   ],
   "monero.dnp.dappnode.eth": [
@@ -147,8 +147,8 @@ export const exposablePredefined: {
       dnpName: "monero.dnp.dappnode.eth",
       serviceName: "monero.dnp.dappnode.eth",
       port: 18082,
-      name: "Monero JSON RPC endpoint",
-      description: "JSON endpoint for Bitcoin"
+      name: "Monero JSON RPC",
+      description: "JSON RPC endpoint for Monero"
     }
   ],
   "zcash.public.dappnode.eth": [
@@ -157,8 +157,8 @@ export const exposablePredefined: {
       dnpName: "zcash.public.dappnode.eth",
       serviceName: "zcash.public.dappnode.eth",
       port: 8232,
-      name: "Zcash JSON RPC endpoint",
-      description: "JSON endpoint for Zcash"
+      name: "Zcash JSON RPC",
+      description: "JSON RPC endpoint for Zcash"
     }
   ],
   "owncloud.public.dappnode.eth": [
@@ -167,8 +167,8 @@ export const exposablePredefined: {
       dnpName: "owncloud.dnp.dappnode.eth",
       serviceName: "owncloud",
       port: 80,
-      name: "Owncloud UI endpoint",
-      description: "Owncloud UI endpoint"
+      name: "Owncloud UI",
+      description: "Owncloud UI"
     }
   ],
   "trustlines.dnp.dappnode.eth": [
@@ -177,16 +177,16 @@ export const exposablePredefined: {
       dnpName: "trustlines.dnp.dappnode.eth",
       serviceName: "node",
       port: 8545,
-      name: "Truslines JSON RPC ",
-      description: "Truslines JSON RPC"
+      name: "Truslines JSON RPC",
+      description: "JSON RPC endpoint for Truslines network"
     },
     {
-      fromSubdomain: "trustlines",
+      fromSubdomain: "trustlines-ws",
       dnpName: "trustlines.dnp.dappnode.eth",
       serviceName: "node",
-      port: 8545,
+      port: 8546,
       name: "Truslines JSON RPC (WS)",
-      description: "Truslines JSON RPC"
+      description: "WebSockets endpoint for Truslines network"
     }
   ],
   "turbo-geth.dnp.dappnode.eth": [
@@ -195,16 +195,16 @@ export const exposablePredefined: {
       dnpName: "turbo-geth.dnp.dappnode.eth",
       serviceName: "rpcdaemon",
       port: 8545,
-      name: "Turbo-geth JSON RPC",
-      description: "Turbo-geth JSON RPC"
+      name: "Turbo-Geth JSON RPC",
+      description: "JSON RPC endpoint for Turbo-Geth Ethereum mainnet"
     },
     {
       fromSubdomain: "turbo-geth-ws",
       dnpName: "turbo-geth.dnp.dappnode.eth",
       serviceName: "rpcdaemon",
-      port: 8545,
-      name: "Turbo-geth JSON RPC (WS)",
-      description: "Turbo-geth JSON RPC"
+      port: 8546,
+      name: "Turbo-Geth JSON RPC (WS)",
+      description: "WebSockets endpoint for Turbo-Geth Ethereum mainnet"
     }
-  ],
+  ]
 };
