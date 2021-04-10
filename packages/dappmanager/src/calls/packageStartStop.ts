@@ -3,7 +3,11 @@ import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
 import { eventBus } from "../eventBus";
 import params from "../params";
 
-const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName];
+const dnpsAllowedToStop = [
+  params.ipfsDnpName,
+  params.wifiDnpName,
+  params.HTTPS_PORTAL_DNPNAME
+];
 
 /**
  * Stops or starts a package containers
