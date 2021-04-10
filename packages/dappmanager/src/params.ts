@@ -177,6 +177,9 @@ const params = {
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
+  // Local domains
+  AVAHI_LOCAL_DOMAIN: "my.dappnode.local",
+
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
   STATIC_IP_PATH: "/usr/src/app/config/static_ip",
