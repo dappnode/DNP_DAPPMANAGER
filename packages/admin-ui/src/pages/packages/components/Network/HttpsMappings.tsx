@@ -108,10 +108,6 @@ export function HttpsMappings({
   }
 
   // Helper UI in case the HTTPs Portal is bad
-  if (dnpsRequest.error)
-    return <ErrorView error={dnpsRequest.error} hideIcon red />;
-  if (dnpsRequest.isValidating)
-    return <Ok loading msg="Loading HTTPS portal" />;
   if (dnpsRequest.data) {
     const httpsPortalDnp = dnpsRequest.data.find(
       dnp => dnp.dnpName === httpsPortalDnpName
@@ -127,109 +123,117 @@ export function HttpsMappings({
     }
   }
 
+  if (mappings.data) {
+    const serviceMappings = mappings.data.filter(
+      mapping =>
+        showAll ||
+        (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
+    );
+
+    // New mapping validation
+    const fromError = validateFromSubdomain(from, mappings.data);
+    const portError = validatePort(port);
+    const isValid = !fromError && !portError;
+
+    return (
+      <div className="network-mappings">
+        <div className="list-grid">
+          {/* Table header */}
+          <header className="name">FROM</header>
+          <header className="name" />
+          <header className="name">TO</header>
+          <header className="header">REMOVE</header>
+
+          <hr />
+
+          {serviceMappings.length === 0 && (
+            <span className="no-mappings">No mappings</span>
+          )}
+
+          {serviceMappings.map(mapping => (
+            <React.Fragment key={mapping.fromSubdomain}>
+              <span className="name">
+                <a
+                  href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
+                  {...newTabProps}
+                >
+                  {mapping.fromSubdomain}
+                </a>
+              </span>
+              <span className="name">
+                <BsArrowRight />
+              </span>
+              <span className="name">{prettyFullName(mapping)}</span>
+
+              <MdClose onClick={() => removeMapping(mapping)} />
+            </React.Fragment>
+          ))}
+        </div>
+
+        {editing && (
+          <InputForm
+            fields={[
+              {
+                label: "From subdomain",
+                labelId: "from-subdomain",
+                value: from,
+                onValueChange: setFrom,
+                error: fromError
+              },
+              {
+                label: "To port",
+                labelId: "to-port",
+                type: "number",
+                value: port,
+                onValueChange: setPort,
+                error: portError
+              }
+            ]}
+          >
+            <Button
+              type="submit"
+              variant="dappnode"
+              onClick={addMapping}
+              disabled={!isValid || reqStatus.loading}
+            >
+              Add mapping
+            </Button>
+          </InputForm>
+        )}
+
+        <div className="bottom-buttons">
+          <Switch
+            className="show-all"
+            checked={showAll}
+            onToggle={setShowAll}
+            label="Show all"
+          />
+
+          {editing ? (
+            <Button onClick={() => setEditing(false)}>Cancel</Button>
+          ) : (
+            <Button
+              className="new-mapping-button"
+              variant="dappnode"
+              onClick={() => setEditing(true)}
+            >
+              New mapping <MdAdd />
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (dnpsRequest.error)
+    return <ErrorView error={dnpsRequest.error} hideIcon red />;
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
+
+  if (dnpsRequest.isValidating)
+    return <Ok loading msg="Loading HTTPS portal" />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
-  if (!mappings.data) return <ErrorView error={"No data"} hideIcon red />;
 
-  const serviceMappings = mappings.data.filter(
-    mapping =>
-      showAll ||
-      (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
-  );
-
-  // New mapping validation
-  const fromError = validateFromSubdomain(from, mappings.data);
-  const portError = validatePort(port);
-  const isValid = !fromError && !portError;
-
-  return (
-    <div className="network-mappings">
-      <div className="list-grid">
-        {/* Table header */}
-        <header className="name">FROM</header>
-        <header className="name" />
-        <header className="name">TO</header>
-        <header className="header">REMOVE</header>
-
-        <hr />
-
-        {serviceMappings.length === 0 && (
-          <span className="no-mappings">No mappings</span>
-        )}
-
-        {serviceMappings.map(mapping => (
-          <React.Fragment key={mapping.fromSubdomain}>
-            <span className="name">
-              <a
-                href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
-                {...newTabProps}
-              >
-                {mapping.fromSubdomain}
-              </a>
-            </span>
-            <span className="name">
-              <BsArrowRight />
-            </span>
-            <span className="name">{prettyFullName(mapping)}</span>
-
-            <MdClose onClick={() => removeMapping(mapping)} />
-          </React.Fragment>
-        ))}
-      </div>
-
-      {editing && (
-        <InputForm
-          fields={[
-            {
-              label: "From subdomain",
-              labelId: "from-subdomain",
-              value: from,
-              onValueChange: setFrom,
-              error: fromError
-            },
-            {
-              label: "To port",
-              labelId: "to-port",
-              type: "number",
-              value: port,
-              onValueChange: setPort,
-              error: portError
-            }
-          ]}
-        >
-          <Button
-            type="submit"
-            variant="dappnode"
-            onClick={addMapping}
-            disabled={!isValid || reqStatus.loading}
-          >
-            Add mapping
-          </Button>
-        </InputForm>
-      )}
-
-      <div className="bottom-buttons">
-        <Switch
-          className="show-all"
-          checked={showAll}
-          onToggle={setShowAll}
-          label="Show all"
-        />
-
-        {editing ? (
-          <Button onClick={() => setEditing(false)}>Cancel</Button>
-        ) : (
-          <Button
-            className="new-mapping-button"
-            variant="dappnode"
-            onClick={() => setEditing(true)}
-          >
-            New mapping <MdAdd />
-          </Button>
-        )}
-      </div>
-    </div>
-  );
+  return <ErrorView error={"No data"} hideIcon red />;
 }
 
 function validateFromSubdomain(
