@@ -108,7 +108,7 @@ exit $UPEXIT
   const dappmanagerNewImage = dappmCompose.firstService().get().image;
 
   const composeRestart = new ComposeEditor({
-    version: "3.4",
+    version: "3.5",
     services: {
       [restartId]: {
         image: dappmanagerNewImage,
@@ -258,8 +258,10 @@ function parsePackageDataRaw(
     return packageData;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pre0235Data: { name: string; version: string } = packageData as any;
+  const pre0235Data = (packageData as unknown) as {
+    name: string;
+    version: string;
+  };
   if (pre0235Data.name) {
     // packageData from < v0.2.35, won't have property .dnpName
     return {

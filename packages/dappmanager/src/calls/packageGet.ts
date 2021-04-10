@@ -1,15 +1,16 @@
 import { omit } from "lodash";
 import { listPackages } from "../modules/docker/list";
 import { readManifestIfExists } from "../modules/manifest";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
 import * as db from "../db";
 import { InstalledPackageDetailData } from "../types";
 import { logs } from "../logs";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { getVolumesOwnershipData } from "../modules/docker/volumesData";
+import { sortPackages } from "./packagesGet";
 
 /**
- * Toggles the visibility of a getting started block
- * @param show Should be shown on hidden
+ * Get package detail information
  */
 export async function packageGet({
   dnpName
@@ -18,13 +19,22 @@ export async function packageGet({
 }): Promise<InstalledPackageDetailData> {
   if (!dnpName) throw Error("kwarg id must be defined");
 
-  const dnpList = await listPackages();
+  const dnpList = sortPackages(await listPackages());
   const dnp = dnpList.find(d => d.dnpName === dnpName);
   if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   const volumesData = await getVolumesOwnershipData();
 
+  // Check if an update is available from stored last known version
+  const latestKnownVersion = db.packageLatestKnownVersion.get(dnpName);
+
   const dnpData: InstalledPackageDetailData = {
     ...dnp,
+
+    updateAvailable:
+      latestKnownVersion &&
+      shouldUpdate(dnp.version, latestKnownVersion.newVersion)
+        ? latestKnownVersion
+        : null,
 
     areThereVolumesToRemove:
       dnp.containers.some(container => container.volumes.length > 0) &&

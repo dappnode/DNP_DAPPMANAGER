@@ -1,43 +1,53 @@
-// React
 import React from "react";
 import { useState } from "react";
-
-// Components
 import Card from "components/Card";
+import SubTitle from "components/SubTitle";
+import { PackageContainer } from "types";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
-import { PackageContainer } from "common";
-
-// Styles
+import { HttpsMappings } from "./HttpsMappings";
 import "./network.scss";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName).sort();
+  const serviceNames = containers.map(c => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const container = containers.find(c => c.serviceName === serviceName);
   return (
-    <Card spacing className="network-editor">
-      <ServiceSelector
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        containers={containers}
-      />
-
-      {container && (
-        <>
+    <>
+      <Card spacing className="network-editor">
+        <ServiceSelector
+          serviceName={serviceName}
+          setServiceName={setServiceName}
+          containers={containers}
+        />
+        {container && (
           <div>
             <strong>Container IP: </strong>
             {container.ip || "Not available"}
           </div>
+        )}
+      </Card>
 
-          <PortsByService
-            key={container.serviceName}
-            dnpName={container.dnpName}
-            serviceName={container.serviceName}
-            ports={container.ports}
-          />
+      {container && (
+        <>
+          <SubTitle>Public port mapping</SubTitle>
+          <Card spacing className="network-editor">
+            <PortsByService
+              dnpName={container.dnpName}
+              serviceName={container.serviceName}
+              ports={container.ports}
+            />
+          </Card>
+
+          <SubTitle>HTTPs domain mapping</SubTitle>
+          <Card spacing className="network-editor">
+            <HttpsMappings
+              dnpName={container.dnpName}
+              serviceName={container.serviceName}
+            />
+          </Card>
         </>
       )}
-    </Card>
+    </>
   );
 }

@@ -13,12 +13,12 @@ import {
   PackageEnvs,
   InstalledPackageData,
   Compose,
-  Manifest
+  Manifest,
+  PortProtocol
 } from "../../src/types";
 import {
   clearDbs,
   getTestMountpoint,
-  portProtocols,
   shellSafe,
   cleanRepos,
   cleanContainers,
@@ -100,14 +100,14 @@ describe("DNP lifecycle", function() {
     one: {
       host: 1111,
       container: 1111,
-      protocol: portProtocols.UDP,
+      protocol: PortProtocol.UDP,
       newHost: 1111
     },
     // Change from a host port to a different
     two: {
       host: 2222,
       container: 2222,
-      protocol: portProtocols.TCP,
+      protocol: PortProtocol.TCP,
       newHost: 2220
     }
   });
@@ -123,14 +123,14 @@ describe("DNP lifecycle", function() {
     three: {
       host: undefined,
       container: 3333,
-      protocol: portProtocols.UDP,
+      protocol: PortProtocol.UDP,
       newHost: 3330
     },
     // Change from a defined host port to ephemeral
     four: {
       host: 4444,
       container: 4444,
-      protocol: portProtocols.TCP,
+      protocol: PortProtocol.TCP,
       newHost: ""
     }
   });
@@ -151,7 +151,7 @@ describe("DNP lifecycle", function() {
     version: "0.1.0"
   };
   const composeMain: Compose = {
-    version: "3.4",
+    version: "3.5",
     services: {
       [dnpNameMain]: {
         container_name: "",
@@ -175,7 +175,7 @@ describe("DNP lifecycle", function() {
     version: "0.1.0"
   };
   const composeDep: Compose = {
-    version: "3.4",
+    version: "3.5",
     services: {
       [dnpNameDep]: {
         container_name: "",
@@ -268,6 +268,7 @@ describe("DNP lifecycle", function() {
     // SUPER important to clean dnp_repo folder to avoid caches
     await cleanRepos();
     await cleanContainers(...dnpNames);
+    await shellSafe("docker network rm dncore_network");
   });
 
   before(
@@ -497,7 +498,7 @@ describe("DNP lifecycle", function() {
 
     it(`Should update the port mappings of ${dnpNameMain}`, async () => {
       const portNumber = 13131;
-      const protocol = "TCP";
+      const protocol = PortProtocol.TCP;
       const portMappings: PortMapping[] = [
         { host: portNumber, container: portNumber, protocol }
       ];

@@ -1,6 +1,12 @@
 import { EthClientTargetPackage } from "./common";
 export * from "./common";
 
+export enum FileFormat {
+  JSON = "JSON",
+  YAML = "YAML",
+  TEXT = "TEXT"
+}
+
 export interface ContainerLabelsRaw {
   [labelId: string]: string;
 }

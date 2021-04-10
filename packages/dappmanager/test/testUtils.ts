@@ -1,7 +1,7 @@
-import shell from "../src/utils/shell";
-import * as path from "path";
+import path from "path";
 import fs from "fs";
-import { lowLevelCacheDb, lowLevelMainDb } from "../src/db";
+import shell from "../src/utils/shell";
+import { clearCacheDb, clearMainDb } from "../src/db";
 import {
   PackageContainer,
   Manifest,
@@ -36,16 +36,8 @@ export const getTestMountpoint = (id: string): string => {
 };
 
 export function clearDbs(): void {
-  try {
-    lowLevelMainDb.clearDb();
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
-  }
-  try {
-    lowLevelCacheDb.clearDb();
-  } catch (e) {
-    if (e.code !== "ENOENT") throw e;
-  }
+  clearCacheDb();
+  clearMainDb();
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
@@ -92,11 +84,6 @@ export async function cleanContainers(
  * Mock data
  */
 
-export const portProtocols = {
-  TCP: "TCP" as "TCP", // Force string to be an enum
-  UDP: "UDP" as "UDP" // Force string to be an enum
-};
-
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";
 export const mockSize = 1111111;
@@ -118,6 +105,7 @@ export const mockContainer: PackageContainer = {
   exitCode: null,
   ports: [],
   volumes: [],
+  networks: [],
   defaultEnvironment: {},
   defaultPorts: [],
   defaultVolumes: [],
@@ -238,7 +226,7 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
 };
 
 export const mockCompose: Compose = {
-  version: "3.4",
+  version: "3.5",
   services: {
     [mockDnpName]: {
       image: `${mockDnpName}:${mockDnpVersion}`,

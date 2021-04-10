@@ -1,4 +1,4 @@
-import * as safeSemver from "../utils/safeSemver";
+import { safeSemver } from "../utils/safeSemver";
 import { hasVersion, getDependencies, toReq } from "../utils/dnpUtils";
 import { StateInternalInterface, DappGetDnps } from "../types";
 

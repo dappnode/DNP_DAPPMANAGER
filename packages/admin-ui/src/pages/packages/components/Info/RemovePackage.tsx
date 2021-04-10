@@ -7,7 +7,7 @@ import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 import { BsTrash } from "react-icons/bs";
 // Utils
-import { shortNameCapitalized as sn, shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import { InstalledPackageDetailData } from "common";
 import { rootPath as packagesRootPath } from "../../data";
 import { markdownList } from "utils/markdown";
@@ -27,7 +27,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     // Dialog to confirm remove + USER INPUT for delete volumes
     const deleteVolumes = await new Promise(
       (resolve: (_deleteVolumes: boolean) => void) => {
-        const title = `Removing ${sn(dnpName)}`;
+        const title = `Removing ${prettyDnpName(dnpName)}`;
         let text = `This action cannot be undone.`;
         const buttons = [{ label: "Remove", onClick: () => resolve(false) }];
         if (areThereVolumesToRemove) {
@@ -57,7 +57,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     if (dnpsToRemoveWarningsList.length > 0)
       await new Promise<void>(resolve =>
         confirm({
-          title: `Removing ${sn(dnpName)}`,
+          title: `Removing ${prettyDnpName(dnpName)}`,
           text: `This action cannot be undone.`,
           list: dnpsToRemoveWarningsList,
           label: "Continue",
@@ -67,7 +67,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
 
     // Use a try/catch to capture a successful remove and go to packages
     try {
-      const name = sn(dnpName);
+      const name = prettyDnpName(dnpName);
       await withToast(() => api.packageRemove({ dnpName, deleteVolumes }), {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
@@ -87,7 +87,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     <div className="remove-package">
       <div className="text">
         <strong>Remove</strong>
-        <div>Delete {shortNameCapitalized(dnpName)} package permanently.</div>
+        <div>Delete {prettyDnpName(dnpName)} package permanently.</div>
       </div>
       <Button
         variant="outline-danger"

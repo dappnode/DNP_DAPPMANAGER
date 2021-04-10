@@ -7,7 +7,7 @@ import { verifyCompose } from "../../../src/modules/compose";
 describe("verify compose", () => {
   function getTestCompose(service: Partial<ComposeService>): Compose {
     return {
-      version: "3.4",
+      version: "3.5",
       services: {
         test: { container_name: "name", image: "image", ...service }
       }

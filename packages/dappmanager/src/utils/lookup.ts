@@ -3,9 +3,9 @@ import dns from "dns";
 /**
  * Does a dns.lookup to resolve a hostname
  * Usage:
- *   `await lookup("ipfs.io")` > "209.94.90.1"
+ *   `await lookup("example.com")` > "209.94.90.1"
  *
- * @param hostname = "ipfs.io"
+ * @param hostname = "example.com"
  * @param options, available options:
  * - ignoreErrors: {bool}. If true, on error doesn't log anything
  *   and returns null

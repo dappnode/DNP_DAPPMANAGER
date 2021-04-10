@@ -3,7 +3,7 @@ import params from "../../params";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
-import { shortNameCapitalized } from "../../utils/format";
+import { prettyDnpName } from "../../utils/format";
 import { CoreUpdateDataAvailable } from "../../types";
 import {
   isCoreUpdateEnabled,
@@ -37,22 +37,24 @@ export async function sendUpdatePackageNotificationMaybe(
 
   // Ensure the release resolves on IPFS
   const release = await releaseFetcher.getRelease(dnpName, newVersion);
+  const upstreamVersion = release.metadata.upstreamVersion;
 
   // Emit notification about new version available
   eventBus.notification.emit({
     id: `update-available-${dnpName}-${newVersion}`,
     type: "info",
-    title: `Update available for ${shortNameCapitalized(dnpName)}`,
+    title: `Update available for ${prettyDnpName(dnpName)}`,
     body: formatPackageUpdateNotification({
       dnpName: dnpName,
       newVersion,
-      upstreamVersion: release.metadata.upstreamVersion,
+      upstreamVersion,
       currentVersion,
       autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
     })
   });
 
   // Register version to prevent sending notification again
+  db.packageLatestKnownVersion.set(dnpName, { newVersion, upstreamVersion });
   db.notificationLastEmitVersion.set(dnpName, newVersion);
 }
 
@@ -85,5 +87,6 @@ export async function sendUpdateSystemNotificationMaybe(
   data.packages;
 
   // Register version to prevent sending notification again
+  db.packageLatestKnownVersion.set(dnpName, { newVersion });
   db.notificationLastEmitVersion.set(dnpName, newVersion);
 }

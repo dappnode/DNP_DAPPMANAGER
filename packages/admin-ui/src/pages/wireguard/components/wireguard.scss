@@ -1,0 +1,90 @@
+.list-grid.wireguard {
+  /*
+  Col 1: Shrink the text to an extend, otherwise fill all available space
+  Col 2: Fit to the link buttons / switch always
+  Col 3: On small screens fit to the icon, otherwise to the text
+  NOTE: The min values are less than the content so it collapses over the
+  grid-gap space. On really small screens it helps delay the appearance of
+  the lateral scrollbar
+   */
+  grid-template-columns:
+    minmax(4rem, auto)
+    minmax(2.5rem, min-content)
+    minmax(calc(var(--icon-size) / 2), min-content);
+
+  /* When showing two buttons, inline and space them */
+  > .group {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: var(--grid-spacing);
+  }
+
+  /* Make it slightly bigger to compensate the svg path being smaller */
+  svg.bigger {
+    height: calc(var(--icon-size) + 0.2rem);
+    width: calc(var(--icon-size) + 0.2rem);
+  }
+  svg.smaller {
+    height: calc(var(--icon-size) - 0.05rem);
+    width: calc(var(--icon-size) - 0.1rem);
+  }
+
+  .get-link {
+    border-color: var(--border-color);
+  }
+  @media (min-width: 28rem) {
+    .get-link::after {
+      content: " link";
+    }
+  }
+
+  /* Make bootstrap buttons smaller */
+  .btn {
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+/* Device Settings `/devices/:id` */
+.wireguard-device-settings {
+  > header {
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: minmax(4rem, auto) min-content;
+    grid-gap: var(--default-spacing);
+    align-items: center;
+    > .card-title {
+      margin-bottom: 0;
+    }
+  }
+
+  .help-text {
+    margin: 0.15rem 0 0.5rem;
+  }
+
+  .buttons {
+    > *:not(:last-child) {
+      margin-right: var(--default-spacing);
+    }
+
+    button {
+      > span {
+        display: flex;
+        align-items: center;
+        svg {
+          margin-right: 0.5rem;
+          font-size: 133%;
+        }
+      }
+    }
+  }
+
+  .credentials-config {
+    white-space: pre;
+    font-size: 75%;
+    font-family: "Inconsolata", monospace;
+    overflow: auto;
+    padding: 1.25rem;
+    border-radius: 0.25rem;
+    background-color: #f7f9f9;
+  }
+}

@@ -5,9 +5,19 @@ import { isIpfsHash, isSemverRange } from "../../src/utils/validate";
 
 describe("Util > validate", () => {
   describe("isIpfsHash", () => {
-    it("Mock ipfs hash should be a valid hash", () => {
-      expect(isIpfsHash(mockHash)).to.equal(true);
-    });
+    const validHashes = [
+      mockHash,
+      "/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme",
+      "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme",
+      "/ipfs/QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB",
+      "QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB"
+    ];
+
+    for (const hash of validHashes) {
+      it(`valid hash ${hash}`, () => {
+        expect(isIpfsHash(hash)).to.equal(true);
+      });
+    }
   });
 
   describe("isSemverRange", () => {

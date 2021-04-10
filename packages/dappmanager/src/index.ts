@@ -24,6 +24,8 @@ import {
 } from "./utils/getVersionData";
 import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
+import { addAliasToRunningContainersMigration } from "./modules/https-portal";
+import { copyHostServices } from "./modules/hostServices/copyHostServices";
 
 const controller = new AbortController();
 
@@ -90,23 +92,17 @@ else logs.error(`Error getting version data: ${versionData.message}`);
  * moved from the old db to the cache db.
  */
 
-async function runLegacyOps(): Promise<void> {
-  try {
-    db.migrateToNewMainDb();
-  } catch (e) {
-    logs.error("Error migrating to new main DB", e);
-  }
+migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
 
-  migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
+migrateUserActionLogs().catch(e =>
+  logs.error("Error migrating userActionLogs", e)
+);
 
-  migrateUserActionLogs().catch(e =>
-    logs.error("Error migrating userActionLogs", e)
-  );
+runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 
-  runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
-}
-
-runLegacyOps();
+addAliasToRunningContainersMigration().catch(e =>
+  logs.error("Error adding alias to running containers", e)
+);
 
 /**
  * Run initial opts
@@ -115,6 +111,8 @@ runLegacyOps();
  */
 
 copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
+
+copyHostServices().catch(e => logs.error("Error copying host services", e));
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 

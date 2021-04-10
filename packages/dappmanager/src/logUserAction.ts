@@ -3,11 +3,10 @@ import { orderBy } from "lodash";
 import { eventBus } from "./eventBus";
 import params from "./params";
 import { UserActionLog } from "./types";
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
 import { logSafeObjects } from "./utils/logs";
 import { logs } from "./logs";
 import { isNotFoundError } from "./utils/node";
+import { JsonFileDb } from "./utils/fileDb";
 
 /**
  * Max number of logs to prevent the log file from growing too big
@@ -15,8 +14,11 @@ import { isNotFoundError } from "./utils/node";
  */
 const maxNumOfLogs = 2000;
 const dbPath = params.USER_ACTION_LOGS_DB_PATH;
-const adapter = new FileSync<UserActionLog[]>(dbPath, { defaultValue: [] });
-const db = low(adapter);
+let db: JsonFileDb<UserActionLog[]> | null = null;
+function getDb(): JsonFileDb<UserActionLog[]> {
+  if (!db) db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+  return db;
+}
 
 type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
 
@@ -55,7 +57,7 @@ export function error(log: UserActionLogPartial): void {
  * Returns user actions logs, ordered from newest to oldest
  */
 export function get(): UserActionLog[] {
-  return db.getState() || [];
+  return getDb().read();
 }
 
 /**
@@ -63,7 +65,7 @@ export function get(): UserActionLog[] {
  * @param userActionLogs
  */
 function set(userActionLogs: UserActionLog[]): void {
-  db.setState(userActionLogs.slice(0, maxNumOfLogs)).write();
+  getDb().write(userActionLogs.slice(0, maxNumOfLogs));
 }
 
 /**

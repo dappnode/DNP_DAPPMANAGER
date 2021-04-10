@@ -1,11 +1,11 @@
 import { base } from "./base";
 import { NotFoundError } from "../types";
+import params from "../../params";
 
 const adminUiUrl = `http://my.dappnode/`;
 const adminUiInstallUrl = `${adminUiUrl}#/installer`;
 const adminUiPackagesUrl = `${adminUiUrl}#/packages`;
 const ropstenName = "ropsten.dnp.dappnode.eth";
-const ipfsName = "ipfs.dnp.dappnode.eth";
 const swarmName = "swarm.dnp.dappnode.eth";
 
 const a = (url: string, text?: string): string =>
@@ -53,7 +53,7 @@ export function noIpfs(e: Error): string {
   return base(
     "IPFS not available",
     `Make sure your IPFS node is available 
-    ${a(`${adminUiPackagesUrl}/${ipfsName}`, "IPFS status")}`,
+    ${a(`${adminUiPackagesUrl}/${params.ipfsDnpName}`, "IPFS status")}`,
     e
   );
 }

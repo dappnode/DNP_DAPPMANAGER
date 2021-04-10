@@ -5,20 +5,20 @@ import { useApi } from "api";
 import { isEmpty } from "lodash";
 // This module
 import { Info } from "../components/Info";
-import { dnpSpecificList, dnpSpecific } from "../components/DnpSpecific";
 import { Logs } from "../components/Logs";
 import { Config } from "../components/Config";
 import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
+import { Network } from "../components/Network";
 import { title } from "../data";
 // Components
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Utils
-import { shortNameCapitalized } from "utils/format";
-import { Network } from "../components/Network";
+import { prettyDnpName } from "utils/format";
+import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -32,7 +32,7 @@ export const PackageById: React.FC<RouteComponentProps<{
       <>
         <Title title={title} subtitle={id} />
         {dnpRequest.isValidating ? (
-          <Loading steps={[`Loading ${shortNameCapitalized(id)}`]} />
+          <Loading steps={[`Loading ${prettyDnpName(id)}`]} />
         ) : dnpRequest.error ? (
           dnpRequest.error.message.includes("package not found") ? (
             <NoDnpInstalled id={id} />
@@ -45,7 +45,6 @@ export const PackageById: React.FC<RouteComponentProps<{
   }
 
   const dnpName = dnp.dnpName;
-  const DnpSpecific = dnpSpecific[dnpName];
   const {
     userSettings,
     setupWizard,
@@ -53,7 +52,8 @@ export const PackageById: React.FC<RouteComponentProps<{
     gettingStarted,
     gettingStartedShow,
     backup = [],
-    containers
+    containers,
+    updateAvailable
   } = dnp;
 
   /**
@@ -101,25 +101,12 @@ export const PackageById: React.FC<RouteComponentProps<{
       subPath: "file-manager",
       render: () => <FileManager containers={containers} />,
       available: true
-    },
-    // DnpSpecific is a variable dynamic per DNP component
-    {
-      name: dnpSpecificList[dnpName],
-      // Convert name to subPath:
-      // "Connect with peers" => "connect-with-peers"
-      subPath: encodeURIComponent(
-        (dnpSpecificList[dnpName] || "")
-          .toLowerCase()
-          .replace(new RegExp(" ", "g"), "-")
-      ),
-      render: () => <DnpSpecific dnp={dnp} />,
-      available: DnpSpecific && dnpSpecificList[dnpName]
     }
   ].filter(route => route.available);
 
   return (
     <>
-      <Title title={title} subtitle={shortNameCapitalized(dnpName || id)} />
+      <Title title={title} subtitle={prettyDnpName(dnpName)} />
 
       <div className="horizontal-navbar">
         {availableRoutes.map(route => (
@@ -134,6 +121,13 @@ export const PackageById: React.FC<RouteComponentProps<{
           </button>
         ))}
       </div>
+
+      {updateAvailable && (
+        <AlertPackageUpdateAvailable
+          dnpName={dnpName}
+          updateAvailable={updateAvailable}
+        ></AlertPackageUpdateAvailable>
+      )}
 
       <div className="packages-content">
         <Switch>

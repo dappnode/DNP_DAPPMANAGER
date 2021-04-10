@@ -61,7 +61,8 @@ export const sampleContainer: PackageContainer = {
   dependencies: {},
   ports: [],
   volumes: [],
-  avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
+  networks: [],
+  avatarUrl: "http://example.com:8080/ipfs/Qm",
   origin: undefined
 };
 
@@ -72,11 +73,12 @@ export const sampleDnp: InstalledPackageDetailData = {
   isDnp: true,
   isCore: false,
   dependencies: {},
-  avatarUrl: "http://ipfs.dappnode:8080/ipfs/Qm",
+  avatarUrl: "http://example.com:8080/ipfs/Qm",
   origin: undefined,
   gettingStarted: "",
   gettingStartedShow: true,
   areThereVolumesToRemove: false,
   dependantsOf: [],
+  updateAvailable: null,
   containers: []
 };

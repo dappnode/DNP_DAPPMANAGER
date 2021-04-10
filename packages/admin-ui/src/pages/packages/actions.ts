@@ -1,6 +1,6 @@
 // INSTALLER
 import { confirm } from "components/ConfirmDialog";
-import { shortNameCapitalized as sn } from "utils/format";
+import { prettyDnpName, prettyFullName } from "utils/format";
 import { api } from "api";
 // Selectors
 import { withToastNoThrow } from "components/toast/Toast";
@@ -19,8 +19,8 @@ export async function packageSetEnvironment(
   await withToastNoThrow(
     () => api.packageSetEnvironment({ dnpName, environmentByService }),
     {
-      message: `Updating ${sn(dnpName)} ${envList}...`,
-      onSuccess: `Updated ${sn(dnpName)} ${envList}`
+      message: `Updating ${prettyDnpName(dnpName)} ${envList}...`,
+      onSuccess: `Updated ${prettyDnpName(dnpName)} ${envList}`
     }
   );
 }
@@ -36,8 +36,8 @@ export async function packageRestart(
 
   const dnpName = dnp.dnpName;
   const name = container
-    ? [sn(dnpName), sn(container.serviceName)].join(" ")
-    : sn(dnpName);
+    ? [prettyFullName(container)].join(" ")
+    : prettyDnpName(dnpName);
 
   // If the DNP is not gracefully stopped, ask for confirmation to reset
   if (dnp && dnp.containers.some(container => container.running))

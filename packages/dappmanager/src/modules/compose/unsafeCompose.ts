@@ -1,9 +1,28 @@
-import { mapValues, pick, omit, toPairs, sortBy, fromPairs } from "lodash";
+import {
+  mapValues,
+  pick,
+  omit,
+  toPairs,
+  sortBy,
+  fromPairs,
+  uniq
+} from "lodash";
 import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
 import { parseEnvironment } from "./environment";
-import { Compose, ComposeService, ComposeVolumes, Manifest } from "../../types";
+import { parseServiceNetworks } from "./networks";
+import { getPrivateNetworkAliases } from "../../domains";
+import {
+  Compose,
+  ComposeService,
+  ComposeServiceNetworks,
+  ComposeVolumes,
+  ComposeNetwork,
+  ComposeNetworks,
+  Manifest
+} from "../../types";
+import semver from "semver";
 
 interface ValidationAlert {
   name: string;
@@ -37,6 +56,9 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
 // Disallow external volumes to prevent packages accessing sensitive data of others
 const volumeSafeKeys: (keyof ComposeVolumes)[] = [];
 
+// Disallow external network to prevent packages accessing un-wanted networks
+const networkSafeKeys: (keyof ComposeNetwork)[] = [];
+
 /**
  * Strict sanitation of a docker-compose to prevent
  * - Use of uncontroled features
@@ -51,9 +73,11 @@ export function parseUnsafeCompose(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
+  // Use of new compose feature "name"only available in version 3.5
+  // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
 
   return cleanCompose({
-    version: composeUnsafe.version || "3.4",
+    version: ensureMinimumComposeVersion(composeUnsafe.version),
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
       sortServiceKeys({
@@ -75,25 +99,83 @@ export function parseUnsafeCompose(
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),
         dns: params.DNS_SERVICE, // Common DAppNode ENS
-        networks: isCore
-          ? serviceUnsafe.networks || [params.DNP_NETWORK_EXTERNAL_NAME]
-          : [params.DNP_NETWORK_EXTERNAL_NAME]
+        networks: parseUnsafeServiceNetworks(
+          serviceUnsafe.networks,
+          composeUnsafe.networks,
+          isCore,
+          { serviceName, dnpName, isMain: manifest.mainService === serviceName }
+        )
       })
     ),
 
     volumes: parseUnsafeVolumes(composeUnsafe.volumes),
 
-    networks: isCore
-      ? composeUnsafe.networks || {
-          [params.DNP_NETWORK_INTERNAL_NAME]: {
-            driver: "bridge",
-            ipam: { config: [{ subnet: "172.33.0.0/16" }] }
-          }
-        }
-      : {
-          [params.DNP_NETWORK_EXTERNAL_NAME]: { external: true }
-        }
+    networks: parseUnsafeNetworks(composeUnsafe.networks, isCore)
   });
+}
+
+function ensureMinimumComposeVersion(composeFileVersion: string): string {
+  if (
+    semver.lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0")
+  )
+    composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
+
+  return composeFileVersion;
+}
+
+function parseUnsafeServiceNetworks(
+  serviceNetworks: ComposeServiceNetworks | undefined,
+  composeNetworks: ComposeNetworks | undefined = {},
+  isCore: boolean,
+  service: { serviceName: string; dnpName: string; isMain: boolean }
+): ComposeServiceNetworks {
+  // TODO: See note in parseUnsafeNetworks() about name property
+  const isDncoreNetworkDeclared =
+    composeNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
+  const dnpPrivateNetworkName =
+    isCore && isDncoreNetworkDeclared
+      ? params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE
+      : params.DNP_PRIVATE_NETWORK_NAME;
+
+  const networksObj = parseServiceNetworks(serviceNetworks || {});
+
+  // Only allow customizing config for core packages
+  const dnpPrivateNetwork = isCore
+    ? networksObj[dnpPrivateNetworkName] || {}
+    : {};
+
+  return {
+    ...networksObj,
+    [dnpPrivateNetworkName]: {
+      ...dnpPrivateNetwork,
+      aliases: uniq([
+        ...(dnpPrivateNetwork.aliases || []),
+        ...getPrivateNetworkAliases(service)
+      ])
+    }
+  };
+}
+
+function parseUnsafeNetworks(
+  networks: ComposeNetworks | undefined = {},
+  isCore: boolean
+): ComposeNetworks {
+  // Allow the dncore network config to be customized, but only by isCore DNPs
+  const {
+    [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: dncoreNetwork,
+    ...otherNetworks
+  } = networks;
+
+  // Remove unsafe keys from all other networks
+  networks = mapValues(otherNetworks, net => pick(net, networkSafeKeys));
+
+  if (isCore && dncoreNetwork) {
+    networks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] = dncoreNetwork;
+  } else {
+    networks[params.DNP_PRIVATE_NETWORK_NAME] = { external: true };
+  }
+
+  return networks;
 }
 
 function parseUnsafeVolumes(
@@ -103,7 +185,7 @@ function parseUnsafeVolumes(
 
   // External volumes are not allowed
   for (const [volName, vol] of Object.entries(volumes)) {
-    if ((vol as { external: boolean }).external)
+    if (vol && vol.external)
       throw Error(`External volumes are not allowed '${volName}'`);
   }
 

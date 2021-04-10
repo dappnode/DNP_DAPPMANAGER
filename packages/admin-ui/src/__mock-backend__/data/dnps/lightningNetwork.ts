@@ -1,3 +1,4 @@
+import { PortProtocol } from "types";
 import { bitcoin } from "./bitcoin";
 import { MockDnp } from "./types";
 
@@ -155,13 +156,16 @@ Content in the first column | Content in the second column
 
   installedData: {
     version: "0.1.0",
-
     userSettings: {
       environment: {
         [serviceName]: {
           ENV_NAME: "ENV_VALUE"
         }
       }
+    },
+    updateAvailable: {
+      newVersion: "0.1.1",
+      upstreamVersion: "0.7.0-beta"
     }
   },
   installedContainers: {
@@ -171,12 +175,12 @@ Content in the first column | Content in the second column
         {
           host: 30303,
           container: 30303,
-          protocol: "TCP"
+          protocol: PortProtocol.TCP
         },
         {
           host: 30303,
           container: 30303,
-          protocol: "UDP"
+          protocol: PortProtocol.UDP
         }
       ],
       volumes: [

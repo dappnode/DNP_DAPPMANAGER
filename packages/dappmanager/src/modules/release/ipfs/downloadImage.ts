@@ -1,5 +1,5 @@
-import * as ipfs from "../../ipfs";
-import { isIpfsHash } from "../../../utils/validate";
+import retry from "async-retry";
+import { ipfs } from "../../ipfs";
 
 /**
  * Handles the download of a DNP .xz image.
@@ -21,7 +21,8 @@ export default async function downloadImage(
   fileSize: number,
   progress: (n: number) => void
 ): Promise<void> {
-  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
+  // Ensure file is available
+  await retry(() => ipfs.objectGet(hash), { retries: 3, minTimeout: 225 });
 
   // Cat stream to file system
   // Make sure the path is correct and the parent folder exist or is created

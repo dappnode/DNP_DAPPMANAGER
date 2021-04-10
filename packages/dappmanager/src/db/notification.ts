@@ -1,36 +1,34 @@
-import { dynamicKeyValidate, staticKey } from "./dbCache";
-import { PackageNotificationDb } from "../types";
-import { joinWithDot } from "./dbUtils";
-import { PackageNotification } from "../types";
+import { dbCache } from "./dbFactory";
+import { stripDots } from "./dbUtils";
+import { PackageNotificationDb, PackageNotification } from "../types";
 
 const NOTIFICATION = "notification";
 const NOTIFICATION_LAST_EMITTED_VERSION = "notification-last-emitted-version";
 
-const notificationKeyGetter = (id: string): string =>
-  joinWithDot(NOTIFICATION, id);
-const notificationValidate = (
-  id: string,
-  notification?: PackageNotificationDb
-): boolean => typeof id === "string" && typeof notification === "object";
-
-export const notification = dynamicKeyValidate<PackageNotificationDb, string>(
-  notificationKeyGetter,
-  notificationValidate
+export const notification = dbCache.indexedByKey<PackageNotificationDb, string>(
+  {
+    rootKey: NOTIFICATION,
+    // The `update-available-${dnpName}-${newVersion}` included dots,
+    // so for backwards compatibility they must be stripped
+    getKey: id => stripDots(id),
+    validate: (id, notification) =>
+      typeof id === "string" && typeof notification === "object"
+  }
 );
+
 export function notificationPush(id: string, n: PackageNotification): void {
   notification.set(id, { ...n, timestamp: Date.now(), viewed: false });
 }
-
-export const notifications = staticKey<{ [id: string]: PackageNotificationDb }>(
-  NOTIFICATION,
-  {}
-);
 
 /**
  * Register the last emitted version for a dnpName
  * Only emit notifications for versions above this one
  */
-export const notificationLastEmitVersion = dynamicKeyValidate<string, string>(
-  dnpName => joinWithDot(NOTIFICATION_LAST_EMITTED_VERSION, dnpName),
-  (dnpName, lastEmittedVersion) => typeof lastEmittedVersion === "string"
+export const notificationLastEmitVersion = dbCache.indexedByKey<string, string>(
+  {
+    rootKey: NOTIFICATION_LAST_EMITTED_VERSION,
+    getKey: dnpName => stripDots(dnpName),
+    validate: (dnpName, lastEmittedVersion) =>
+      typeof lastEmittedVersion === "string"
+  }
 );

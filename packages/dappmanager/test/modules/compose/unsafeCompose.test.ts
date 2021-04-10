@@ -11,6 +11,7 @@ describe("parseUnsafeCompose", () => {
     const ports = ["1111/1111", "1111/1111:udp"];
     const volumes = ["mockdnpdappnodeeth_data:/mock/mock/mock/"];
     const serviceName = Object.keys(mockCompose.services)[0];
+    const dangerousNetwork = "dangerous-network";
 
     const composeWithExtraProps: Compose = {
       ...mockCompose,
@@ -23,7 +24,9 @@ describe("parseUnsafeCompose", () => {
         }
       },
       networks: {
-        "dangerous-network": {}
+        [dangerousNetwork]: {
+          driver: "bad-driver"
+        }
       }
     };
 
@@ -37,13 +40,18 @@ describe("parseUnsafeCompose", () => {
           volumes,
           logging: customLogging,
           dns: "172.33.1.2",
-          networks: ["dncore_network"]
+          networks: {
+            dncore_network: {
+              aliases: ["mock-dnp.dappnode"]
+            }
+          }
         }
       },
       networks: {
         dncore_network: {
           external: true
-        }
+        },
+        [dangerousNetwork]: {}
       }
     };
 

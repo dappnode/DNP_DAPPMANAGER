@@ -1,6 +1,6 @@
 import os from "os";
-import * as ipfs from "../../ipfs";
-import { isIpfsHash } from "../../../utils/validate";
+import memoize from "memoizee";
+import { ipfs } from "../../ipfs";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -18,6 +18,15 @@ import { downloadAssetRequired } from "./downloadAssets";
 
 const source: "ipfs" = "ipfs";
 
+// Memoize fetching releases so refreshing the DAppStore is fast
+export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
+  // Wait for Promises to resolve. Do not cache rejections
+  promise: true,
+  normalizer: ([hash]) => hash,
+  max: 100,
+  maxAge: 60 * 60 * 1000
+});
+
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
  * Should return enough information to then query other files if necessary
@@ -27,7 +36,7 @@ const source: "ipfs" = "ipfs";
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-export async function downloadReleaseIpfs(
+async function downloadReleaseIpfsFn(
   hash: string
 ): Promise<{
   imageFile: DistributedFile;
@@ -35,8 +44,6 @@ export async function downloadReleaseIpfs(
   composeUnsafe: Compose;
   manifest: Manifest;
 }> {
-  if (!isIpfsHash(hash)) throw Error(`Release must be an IPFS hash ${hash}`);
-
   const arch = os.arch() as NodeArch;
 
   try {
@@ -58,8 +65,11 @@ export async function downloadReleaseIpfs(
     };
   } catch (e) {
     if (e.message.includes("is a directory")) {
-      const files = await ipfs.ls({ hash });
+      const files = await ipfs.ls(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
+
+      // Pin release on visit
+      ipfs.pinAddNoThrow(hash);
 
       // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);

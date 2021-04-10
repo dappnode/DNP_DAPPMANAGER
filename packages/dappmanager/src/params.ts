@@ -1,5 +1,10 @@
 import path from "path";
-import { Architecture, EthClientTargetPackage, UserSettings } from "./types";
+import {
+  Architecture,
+  EthClientTargetPackage,
+  UserSettings,
+  FileFormat
+} from "./types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -59,6 +64,11 @@ const params = {
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
   HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+  // Host services paths
+  HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
+  HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
+  HOST_SERVICES_DIR: "DNCORE/services/host",
+  HOST_SERVICES_SOURCE_DIR: "hostServices",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
@@ -86,10 +96,27 @@ const params = {
   // VPN API
   VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
 
+  // HTTPS Portal API URL
+  HTTPS_PORTAL_API_URL: "http://https.dappnode:5000",
+  HTTPS_PORTAL_DNPNAME: "https.dnp.dappnode.eth",
+
+  // Wireguard params
+  WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
+  WIREGUARD_ISCORE: true,
+  WIREGUARD_MAIN_SERVICE: "wireguard",
+  /** api.wireguard.dappnode/:device */
+  WIREGUARD_API_URL: "http://api.wireguard.dappnode",
+  WIREGUARD_DEVICES_ENVNAME: "PEERS",
+
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
-  DNP_NETWORK_EXTERNAL_NAME: "dncore_network",
-  DNP_NETWORK_INTERNAL_NAME: "network",
+  DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",
+  DNP_PRIVATE_NETWORK_NAME: "dncore_network",
+  DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
+  DNP_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+  // Use of new compose file feature: network name
+  MINIMUM_COMPOSE_VERSION: "3.5",
+
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",
@@ -114,16 +141,25 @@ const params = {
   IPFS_TIMEOUT: 0.5 * MINUTE,
 
   // Web3 parameters
-  WEB3_HOST: process.env.WEB3_HOST || "http://fullnode.dappnode:8545",
+  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
+  ETH_MAINNET_RPC_URL_REMOTE:
+    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+
+  // DAPPMANAGER alias
+  DAPPMANAGER_ALIAS: "my.dappnode",
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
+  dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
   restartDnpName: "restart.dnp.dappnode.eth",
   vpnDnpName: "vpn.dnp.dappnode.eth",
+  vpnContainerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
+  wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
+  ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [
@@ -141,9 +177,8 @@ const params = {
   DYNDNS_DOMAIN: "dyndns.dappnode.io",
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
-  // DAppNode remote fullnode service
-  REMOTE_MAINNET_RPC_URL:
-    process.env.REMOTE_MAINNET_RPC_URL || "https://web3.dappnode.net",
+  // Local domains
+  AVAHI_LOCAL_DOMAIN: "my.dappnode.local",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
@@ -183,6 +218,9 @@ const params = {
   ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
   ETHFORWARD_PIN_ON_VISIT: true,
+
+  // API endpoint check tcp ports. req: /publicIp?tcpPorts=8092,1194 | res: /[{tcpPort, status}]
+  PORT_SCANNER_SERVICE_URL: "http://159.65.206.61:3030",
 
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
@@ -271,92 +309,83 @@ export const getContainerName = ({
 
 // From SDK, must be in sync
 
-// Declare true as true for conditional static types to work
-const TRUE: true = true;
-const FALSE: false = false;
-const FORMAT = {
-  JSON: "JSON" as "JSON",
-  YAML: "YAML" as "YAML",
-  TEXT: "TEXT" as "TEXT"
-};
-
 export const releaseFiles = {
   manifest: {
     regex: /dappnode_package.*\.json$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3, // Limit size to ~100KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   compose: {
     regex: /compose.*\.yml$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3, // Limit size to ~10KB
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   avatar: {
     regex: /avatar.*\.png$/,
     format: null,
     maxSize: 100e3,
-    required: TRUE,
-    multiple: FALSE
+    required: true as const,
+    multiple: false as const
   },
   setupWizard: {
     regex: /setup-wizard\..*(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupSchema: {
     regex: /setup\..*\.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupTarget: {
     regex: /setup-target\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   setupUiJson: {
     regex: /setup-ui\..*json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   disclaimer: {
     regex: /disclaimer\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   gettingStarted: {
     regex: /getting.*started\.md$/i,
-    format: FORMAT.TEXT,
+    format: FileFormat.TEXT,
     maxSize: 100e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   prometheusTargets: {
     regex: /.*prometheus-targets.(json|yaml|yml)$/,
-    format: FORMAT.YAML,
+    format: FileFormat.YAML,
     maxSize: 10e3,
-    required: FALSE,
-    multiple: FALSE
+    required: false as const,
+    multiple: false as const
   },
   grafanaDashboards: {
     regex: /.*grafana-dashboard.json$/,
-    format: FORMAT.JSON,
+    format: FileFormat.JSON,
     maxSize: 10e6, // ~ 10MB
-    required: FALSE,
-    multiple: TRUE
+    required: false as const,
+    multiple: true as const
   }
 };
 

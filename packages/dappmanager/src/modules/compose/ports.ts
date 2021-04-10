@@ -1,4 +1,5 @@
 import { uniqBy, concat } from "lodash";
+import { PortProtocol } from "../../common";
 import { PortMapping } from "../../types";
 
 /**
@@ -6,9 +7,6 @@ import { PortMapping } from "../../types";
  *
  * @param portsArray Should come from a parsed docker-compose.yml
  *   ["30505:4001/udp", "30505:4001"]
- * @returns PortMapping array
- *   [{ host: 30444, container: 30303, protocol: "UDP" }, ...]
- *
  */
 export function parsePortMappings(portsArray: string[]): PortMapping[] {
   return portsArray.map(
@@ -17,7 +15,9 @@ export function parsePortMappings(portsArray: string[]): PortMapping[] {
 
       // Make sure the protocol is correct
       const protocolParsed =
-        protocolString.toLowerCase() === "udp" ? "UDP" : "TCP";
+        protocolString.toLowerCase() === "udp"
+          ? PortProtocol.UDP
+          : PortProtocol.TCP;
       const [hostString, containerString] = portMapping.split(":");
 
       // Convert to appropiate types + Cast to a PortProtocol type
@@ -25,19 +25,17 @@ export function parsePortMappings(portsArray: string[]): PortMapping[] {
       const container = parseInt(containerString);
       const protocol = protocolParsed;
 
-      // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
-      if (container) return { host, container, protocol };
-      // CONTAINER/protocol, return [null, CONTAINER/protocol]
-      else return { container: host, protocol };
+      return container
+        ? // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
+          { host, container, protocol }
+        : // CONTAINER/protocol, return [null, CONTAINER/protocol]
+          { container: host, protocol };
     }
   );
 }
 
 /**
  * Stringifies a PortMapping array to be compatible for a docker-compose.yml
- *
- * @param portMappings array
- *   [{ host: 30444, container: 30303, protocol: "UDP" }, ...]
  * @returns portsArray ready for a docker-compose.yml
  *   ["30505:4001/udp", "30505:4001"]
  */

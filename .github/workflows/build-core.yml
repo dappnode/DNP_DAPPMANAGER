@@ -4,7 +4,7 @@ on:
 
 jobs:
   unit-test:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     name: Trigger DNP_CORE build
     steps:
       - name: Repository Dispatch Event

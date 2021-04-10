@@ -8,7 +8,7 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 // Components
-import StaticIp from "./StaticIp";
+import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
 import Repository from "./Repository";
 import Security from "./Security";
@@ -18,9 +18,9 @@ import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
+import { Network } from "./Network";
 import { Advanced } from "./Advanced";
-import Title from "components/Title";
-import Notifications from "./Notifications";
+import { Notifications } from "./Notifications";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -46,11 +46,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
-      name: "Security",
-      subPath: subPaths.security,
-      component: Security
-    },
-    {
       name: "Auto updates",
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
@@ -61,9 +56,9 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: Repository
     },
     {
-      name: "Static IP",
-      subPath: subPaths.staticIp,
-      component: StaticIp
+      name: "Network",
+      subPath: subPaths.network,
+      component: Network
     },
     {
       name: "Update",
@@ -72,14 +67,19 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       hideFromMenu: true
     },
     {
+      name: "Profile",
+      subPath: subPaths.profile,
+      component: Profile
+    },
+    {
       name: "Peers",
       subPath: subPaths.peers,
       component: Peers
     },
     {
-      name: "Profile",
-      subPath: subPaths.profile,
-      component: Profile
+      name: "Security",
+      subPath: subPaths.security,
+      component: Security
     },
     {
       name: "Advanced",

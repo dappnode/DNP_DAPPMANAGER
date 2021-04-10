@@ -27,6 +27,9 @@ export async function getEthersProvider(): Promise<
  * @returns ethProvier http://geth.dappnode:8545
  */
 export async function getEthProviderUrl(): Promise<string> {
+  if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
+    return params.ETH_MAINNET_RPC_URL_OVERRIDE;
+
   const target = db.ethClientTarget.get();
   const fallback = db.ethClientFallback.get();
 
@@ -34,7 +37,7 @@ export async function getEthProviderUrl(): Promise<string> {
   if (!target) throw new EthProviderError(`No ethereum client selected yet`);
 
   // Remote is selected, just return remote
-  if (target === "remote") return params.REMOTE_MAINNET_RPC_URL;
+  if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
 
   const status = await getClientStatus(target);
   db.ethClientStatus.set(target, status);
@@ -46,7 +49,7 @@ export async function getEthProviderUrl(): Promise<string> {
   } else {
     if (fallback === "on") {
       // Fallback on, ignore error and return remote
-      return params.REMOTE_MAINNET_RPC_URL;
+      return params.ETH_MAINNET_RPC_URL_REMOTE;
     } else {
       // Fallback off, throw nice error
       const message = parseClientStatusError(status);

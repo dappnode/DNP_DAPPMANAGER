@@ -38,6 +38,8 @@ export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
 // DNP names
+export const httpsPortalDnpName = "https.dnp.dappnode.eth";
+export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
 export const coreDnpName = "core.dnp.dappnode.eth";

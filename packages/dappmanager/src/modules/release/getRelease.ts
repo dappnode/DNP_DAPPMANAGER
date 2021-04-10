@@ -7,12 +7,10 @@ import { parseMetadataFromManifest } from "../manifest";
 import { DistributedFile, Compose, Manifest } from "../../common";
 import { parseUnsafeCompose } from "../compose/unsafeCompose";
 import { ComposeEditor } from "../compose/editor";
-import { shortNameDomain } from "../../utils/format";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
-import { getContainerDomain } from "../../params";
 import { parseTimeoutSeconds } from "../../utils/timeout";
 
 /**
@@ -55,22 +53,6 @@ export async function getRelease({
   );
 
   for (const service of Object.values(compose.services())) {
-    // Add SSL environment variables
-    if (manifest.ssl) {
-      const containerDomain = getContainerDomain({
-        dnpName,
-        serviceName: service.serviceName
-      });
-      const dnpSubDomain = [
-        shortNameDomain(containerDomain),
-        db.domain.get()
-      ].join(".");
-      service.mergeEnvs({
-        VIRTUAL_HOST: dnpSubDomain,
-        LETSENCRYPT_HOST: dnpSubDomain
-      });
-    }
-
     // Add global env_file on request
     if ((manifest.globalEnvs || {}).all)
       service.addEnvFile(getGlobalEnvsFilePath(isCore));

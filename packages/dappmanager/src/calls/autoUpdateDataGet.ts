@@ -2,7 +2,7 @@ import semver from "semver";
 import { listPackages } from "../modules/docker/list";
 import { getCoreVersionId } from "../utils/coreVersionId";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
-import { shortNameCapitalized } from "../utils/format";
+import { prettyDnpName } from "../utils/format";
 import { AutoUpdateDataDnpView, InstalledPackageData } from "../types";
 import { AutoUpdateDataView } from "../types";
 
@@ -63,7 +63,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
       const enabled = autoUpdateHelper.isDnpUpdateEnabled(dnp.dnpName);
       dnpsToShow.push({
         id: dnp.dnpName,
-        displayName: shortNameCapitalized(dnp.dnpName),
+        displayName: prettyDnpName(dnp.dnpName),
         enabled,
         feedback: enabled
           ? autoUpdateHelper.getDnpFeedbackMessage({

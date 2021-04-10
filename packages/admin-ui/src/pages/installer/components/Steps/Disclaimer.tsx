@@ -4,7 +4,7 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Card from "components/Card";
 import Button from "components/Button";
 import StatusIcon from "components/StatusIcon";
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import "./permissions.scss";
 
 interface DisclaimerProps {
@@ -29,7 +29,7 @@ const Disclaimer: React.FC<DisclaimerProps> = ({
       {disclaimers.map(disclaimer => (
         <div key={disclaimer.name}>
           <div className="card-section-header">
-            {shortNameCapitalized(disclaimer.name)} disclaimer
+            {prettyDnpName(disclaimer.name)} disclaimer
           </div>
           <div>
             <RenderMarkdown source={disclaimer.message} />

@@ -39,10 +39,5 @@ export default function parseOpenOutput(terminalOutput: string): boolean {
   const lastLine = lines[lines.length - 1];
 
   // Check if is contains "is redirected"
-  const okRegex = RegExp(/is.redirected/);
-  if (okRegex.test(lastLine)) {
-    return true;
-  } else {
-    return false;
-  }
+  return /is.redirected/.test(lastLine);
 }

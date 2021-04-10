@@ -1,0 +1,20 @@
+version: "3.5"
+services:
+  s1:
+    build: .
+    restart: always
+    networks:
+      - "local"
+    volumes:
+      - "data:/data"
+  s2:
+    build: .
+    restart: always
+    volumes:
+      - "data:/data"
+    networks:
+      - "local"
+volumes:
+  data: {}
+networks:
+  local: {}

@@ -1,8 +1,7 @@
 import fetch from "node-fetch";
 import memoize from "memoizee";
-import { getDotDappnodeDomain } from "../../nsupdate";
+import { getPrivateNetworkAlias } from "../../../domains";
 import { urlJoin } from "../../../utils/url";
-import { getContainerDomain } from "../../../params";
 import { InstalledPackageData } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
@@ -32,11 +31,12 @@ export async function ethereum2Prysm(
     return null; // OK to not be running, just ignore
   }
 
-  const containerEnsDomain = getContainerDomain(beaconChainContainer);
-  const containerDappnodeDomain = getDotDappnodeDomain(containerEnsDomain);
+  const container = dnp.containers[0];
+  if (!container) throw Error("no container");
+  const containerDomain = getPrivateNetworkAlias(container);
 
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
-  const apiUrl = `http://${containerDappnodeDomain}:3500`;
+  const apiUrl = `http://${containerDomain}:3500`;
 
   const [genesis, config, chainhead] = await Promise.all([
     fetchGenesisMemo(apiUrl),

@@ -1,6 +1,5 @@
 import {
   AutoUpdateDataView,
-  Diagnose,
   EthClientTarget,
   CoreUpdateData,
   DirectoryItem,
@@ -19,7 +18,6 @@ import {
   VpnDevice,
   PackageNotificationDb,
   UserActionLog,
-  InstalledPackageData,
   InstalledPackageDetailData,
   PackageEnvs,
   HostStatCpu,
@@ -27,7 +25,16 @@ import {
   HostStatMemory,
   PublicIpResponse,
   ChainData,
-  ShhStatus
+  ShhStatus,
+  PortToOpen,
+  UpnpTablePortStatus,
+  ApiTablePortStatus,
+  HttpsPortalMapping,
+  DockerUpdateStatus,
+  WireguardDeviceCredentials,
+  ExposableServiceMapping,
+  HostDiagnoseItem,
+  InstalledPackageDataApiReturn
 } from "./types";
 
 export interface Routes {
@@ -83,6 +90,11 @@ export interface Routes {
   cleanCache: () => Promise<void>;
 
   /**
+   * Cleans the main database of the DAPPMANAGER:
+   */
+  cleanDb: () => Promise<void>;
+
+  /**
    * Copy file to a DNP:
    * @param containerName Name of a docker container
    * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
@@ -104,6 +116,9 @@ export interface Routes {
     filename: string;
     toPath: string;
   }) => Promise<void>;
+
+  /** Set the dappnodeWebNameSet */
+  dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
 
   /**
    * Creates a new device with the provided id.
@@ -163,9 +178,18 @@ export interface Routes {
   devicesList: () => Promise<VpnDevice[]>;
 
   /**
-   * Run system diagnose to inform the user
+   * Collect host info for support
    */
-  diagnose: () => Promise<Diagnose>;
+  diagnose: () => Promise<HostDiagnoseItem[]>;
+
+  /** Updates docker compose */
+  dockerComposeUpdate: () => Promise<string>;
+  /** Returns docker-compose update requirements */
+  dockerComposeUpdateCheck: () => Promise<DockerUpdateStatus>;
+  /** Updates docker engine */
+  dockerEngineUpdate: () => Promise<string>;
+  /** Returns docker engine update requirements */
+  dockerEngineUpdateCheck: () => Promise<DockerUpdateStatus>;
 
   /**
    * Set a domain alias to a DAppNode package by name
@@ -202,12 +226,6 @@ export interface Routes {
    */
   fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
 
-  statsCpuGet: () => Promise<HostStatCpu>;
-
-  statsMemoryGet: () => Promise<HostStatMemory>;
-
-  statsDiskGet: () => Promise<HostStatDisk>;
-
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
@@ -219,6 +237,20 @@ export interface Routes {
     first?: number;
     after?: number;
   }) => Promise<UserActionLog[]>;
+
+  /** HTTPs Portal: map a subdomain */
+  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
+  /** HTTPs Portal: remove an existing mapping */
+  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
+  /** HTTPs Portal: get all mappings */
+  httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
+  /** HTTPs Portal: get exposable services with metadata */
+  httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
+
+  /**
+   * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
+   */
+  ipfsTest(): Promise<void>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -287,7 +319,7 @@ export interface Routes {
   /**
    * Returns the list of current containers associated to packages
    */
-  packagesGet: () => Promise<InstalledPackageData[]>;
+  packagesGet: () => Promise<InstalledPackageDataApiReturn[]>;
 
   /**
    * Toggles the visibility of a getting started block
@@ -392,6 +424,25 @@ export interface Routes {
   poweroffHost: () => Promise<void>;
 
   /**
+   * Returns ports to open
+   */
+  portsToOpenGet: () => Promise<PortToOpen[]>;
+
+  /**
+   * Returns ports status from upnp scanning
+   */
+  portsUpnpStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<UpnpTablePortStatus[]>;
+
+  /**
+   * Returns ports status from API scanning
+   */
+  portsApiStatusGet: (kwargs: {
+    portsToOpen: PortToOpen[];
+  }) => Promise<ApiTablePortStatus[]>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -410,6 +461,12 @@ export interface Routes {
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
+
+  statsCpuGet: () => Promise<HostStatCpu>;
+
+  statsMemoryGet: () => Promise<HostStatMemory>;
+
+  statsDiskGet: () => Promise<HostStatDisk>;
 
   /**
    * Gets bot telegram status
@@ -470,6 +527,15 @@ export interface Routes {
    * Returns public Ip in real time
    */
   ipPublicGet: () => Promise<PublicIpResponse>;
+
+  /** Add a device to Wireguard DNP ENVs */
+  wireguardDeviceAdd(device: string): Promise<void>;
+  /** Remove a device from Wireguard DNP ENVs */
+  wireguardDeviceRemove(device: string): Promise<void>;
+  /** Get credentials for a single Wireguard device */
+  wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
+  /** Get URLs to a single Wireguard credentials */
+  wireguardDevicesGet(): Promise<string[]>;
 }
 
 interface RouteData {
@@ -488,7 +554,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   chainDataGet: {},
   changeIpfsTimeout: { log: true },
   cleanCache: {},
+  cleanDb: {},
   copyFileTo: { log: true },
+  dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
   deviceCredentialsGet: {},
@@ -498,16 +566,22 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
+  dockerComposeUpdate: { log: true },
+  dockerComposeUpdateCheck: {},
+  dockerEngineUpdate: { log: true },
+  dockerEngineUpdateCheck: {},
   domainAliasSet: { log: true },
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchDnpRequest: {},
-  statsCpuGet: {},
-  statsDiskGet: {},
-  statsMemoryGet: {},
   getUserActionLogs: {},
+  httpsPortalMappingAdd: { log: true },
+  httpsPortalMappingRemove: { log: true },
+  httpsPortalMappingsGet: {},
+  httpsPortalExposableServicesGet: {},
+  ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -527,6 +601,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
+  portsToOpenGet: {},
+  portsUpnpStatusGet: {},
+  portsApiStatusGet: {},
   rebootHost: { log: true },
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
@@ -534,6 +611,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramTokenSet: { log: true },
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
+  statsCpuGet: {},
+  statsDiskGet: {},
+  statsMemoryGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},
@@ -541,7 +621,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   volumeRemove: { log: true },
   volumesGet: {},
-  ipPublicGet: {}
+  ipPublicGet: {},
+  wireguardDeviceAdd: { log: true },
+  wireguardDeviceRemove: { log: true },
+  wireguardDeviceGet: {},
+  wireguardDevicesGet: {}
 };
 
 // DO NOT REMOVE

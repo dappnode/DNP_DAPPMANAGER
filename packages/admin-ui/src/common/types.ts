@@ -4,6 +4,55 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
+// HTTPS portal mappings
+
+export interface HttpsPortalMapping {
+  fromSubdomain: string;
+  dnpName: string;
+  serviceName: string;
+  port: number;
+}
+
+export interface ExposableServiceInfo extends HttpsPortalMapping {
+  /** Example: `"Geth JSON RPC"` */
+  name: string;
+  /** Example: `"JSON RPC endpoint for Geth mainnet"` */
+  description: string;
+}
+
+export interface ExposableServiceManifestInfo {
+  name: string;
+  description?: string;
+  serviceName?: string;
+  fromSubdomain?: string;
+  port: number;
+}
+
+export interface ExposableServiceMapping extends ExposableServiceInfo {
+  exposed: boolean;
+}
+
+// Wireguard
+
+export interface WireguardDeviceCredentials {
+  /**
+   * Raw config file in plaintext
+   * ```txt
+   * [Interface]
+   * Address = 172.34.1.2
+   * PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+   * ListenPort = 51820
+   * DNS = 172.33.1.2
+   *
+   * [Peer]
+   * PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+   * Endpoint = aaaabbbbaaaabbbb.dyndns.dappnode.io:51820
+   * AllowedIPs = 172.33.0.0/16
+   * ```
+   */
+  config: string;
+}
+
 // SSH types
 
 export type ShhStatus = "enabled" | "disabled";
@@ -24,13 +73,11 @@ export type VpnDeviceCredentials = VpnDevice & {
 
 // Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
 
-/**
- * ==============
- * ==============
- * ADMIN
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// ADMIN
+// ==============
+// ==============
 
 /**
  * [NOTE] Items MUST be ordered by the directory order
@@ -99,7 +146,7 @@ export interface SetupWizardField {
 }
 
 export type UserSettingTarget =
-  | { type: "environment"; name: string; service?: string }
+  | { type: "environment"; name: string; service?: string[] | string }
   | { type: "portMapping"; containerPort: string; service?: string }
   | { type: "namedVolumeMountpoint"; volumeName: string }
   | { type: "allNamedVolumesMountpoint" }
@@ -274,15 +321,16 @@ export interface ProgressLogsByDnp {
   [dnpName: string]: ProgressLogs;
 }
 
-/**
- * ==============
- * ==============
- * DAPPMANAGER
- * ==============
- * ==============
- */
+// ==============
+// ==============
+// DAPPMANAGER
+// ==============
+// ==============
 
-export type PortProtocol = "UDP" | "TCP";
+export enum PortProtocol {
+  UDP = "UDP",
+  TCP = "TCP"
+}
 
 interface BasicPortMapping {
   host?: number;
@@ -300,6 +348,39 @@ export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
 }
+
+export interface UpnpPortMapping {
+  protocol: PortProtocol;
+  exPort: string;
+  inPort: string;
+  ip: string;
+}
+
+export interface TablePortsStatus {
+  port: number;
+  protocol: PortProtocol;
+  serviceName: string;
+  dnpName: string;
+  message?: string;
+}
+
+export interface ApiTablePortStatus extends TablePortsStatus {
+  status: ApiStatus;
+}
+
+export interface UpnpTablePortStatus extends TablePortsStatus {
+  status: UpnpStatus;
+}
+
+// ApiStatus data structure is different than UpnpStatus because we want to attach an error message
+export type ApiStatus =
+  | "open"
+  | "closed"
+  | "unknown" // port not found or protocol UDP
+  | "error"; // error from/fetching the API
+
+// unknown => port not found. not-available => UPnP disabled or not recognized
+export type UpnpStatus = "open" | "closed";
 
 export interface VolumeMapping {
   host: string; // path
@@ -405,6 +486,7 @@ export interface PackageContainer {
   exitCode: number | null;
   ports: PortMapping[];
   volumes: VolumeMapping[];
+  networks: { name: string; ip: string }[];
 
   // DAppNode package data
   isDnp: boolean;
@@ -424,6 +506,10 @@ export interface PackageContainer {
   // envs?: PackageEnvs;
 }
 
+export interface InstalledPackageDataApiReturn extends InstalledPackageData {
+  updateAvailable: UpdateAvailable | null;
+}
+
 export type InstalledPackageData = Pick<
   PackageContainer,
   | "dnpName"
@@ -441,6 +527,11 @@ export type InstalledPackageData = Pick<
   containers: PackageContainer[];
 };
 
+export interface UpdateAvailable {
+  newVersion: string;
+  upstreamVersion?: string;
+}
+
 export interface InstalledPackageDetailData extends InstalledPackageData {
   setupWizard?: SetupWizard;
   userSettings?: UserSettings;
@@ -452,6 +543,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
    */
   areThereVolumesToRemove: boolean;
   dependantsOf: string[];
+  updateAvailable: UpdateAvailable | null;
   // Non-indexed data
   manifest?: Manifest;
 }
@@ -473,6 +565,8 @@ interface ManifestImage {
   volumes?: string[];
   ports?: string[];
   environment?: string[];
+  /** FORBIDDEN FEATURE */
+  external_vol?: string[];
   restart?: string;
   privileged?: boolean;
   cap_add?: string[];
@@ -492,21 +586,6 @@ export interface Manifest extends PackageReleaseMetadata {
 
 export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
-}
-
-export interface ComposeVolumes {
-  // volumeName: "dncore_ipfsdnpdappnodeeth_data"
-  [volumeName: string]: {
-    // FORBIDDEN
-    // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
-    // NOT allowed to user, only used by DAppNode internally (if any)
-    name?: string; // Volumes can only be declared locally or be external
-    driver?: string; // Dangerous
-    driver_opts?:
-      | { type: "none"; device: string; o: "bind" }
-      | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
-    labels?: { [labelName: string]: string }; // User should not use this feature
-  };
 }
 
 export interface ComposeService {
@@ -531,7 +610,7 @@ export interface ComposeService {
     };
   };
   network_mode?: string;
-  networks?: string[] | { [networkName: string]: { ipv4_address: string } };
+  networks?: ComposeServiceNetworks;
   ports?: string[];
   privileged?: boolean;
   restart?: string; // "unless-stopped";
@@ -542,25 +621,68 @@ export interface ComposeService {
   working_dir?: string;
 }
 
+export interface ComposeServiceNetwork {
+  ipv4_address?: string;
+  aliases?: string[];
+}
+
+export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
+
+export type ComposeServiceNetworksObj = {
+  [networkName: string]: ComposeServiceNetwork;
+};
+
+export interface ComposeNetwork {
+  external?: boolean;
+  driver?: string; // "bridge";
+  ipam?: {
+    config: {
+      /** subnet: "172.33.0.0/16" */
+      subnet: string;
+    }[];
+  };
+  name?: string;
+}
+
+export interface ComposeNetworks {
+  /** networkName: "dncore_network" */
+  [networkName: string]: ComposeNetwork | null;
+}
+
+export interface ComposeVolume {
+  // FORBIDDEN
+  // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
+  // NOT allowed to user, only used by DAppNode internally (if any)
+  external?: boolean;
+  name?: string; // Volumes can only be declared locally or be external
+  driver?: string; // Dangerous
+  driver_opts?:
+    | { type: "none"; device: string; o: "bind" }
+    | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
+  labels?: { [labelName: string]: string }; // User should not use this feature
+}
+
+export interface ComposeVolumes {
+  /** volumeName: "dncore_ipfsdnpdappnodeeth_data" */
+  [volumeName: string]: ComposeVolume | null;
+}
+
 export interface Compose {
-  version: string; // "3.4"
-  // dnpName: "dappmanager.dnp.dappnode.eth"
-  services: {
-    [dnpName: string]: ComposeService;
-  };
-  networks?: {
-    [networkName: string]: {
-      external?: boolean;
-      driver?: string; // "bridge";
-      ipam?: { config: { subnet: string }[] }; // { subnet: "172.33.0.0/16" }
-    };
-  };
-  volumes?: ComposeVolumes; // { dappmanagerdnpdappnodeeth_data: {} };
+  version: string; // "3.5"
+  /** dnpName: "dappmanager.dnp.dappnode.eth" */
+  services: { [dnpName: string]: ComposeService };
+  networks?: ComposeNetworks;
+  volumes?: ComposeVolumes;
 }
 
 export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
+}
+
+export interface PortToOpen extends PackagePort {
+  serviceName: string;
+  dnpName: string;
 }
 
 export interface PackageRequest {
@@ -789,6 +911,11 @@ export interface PackageVersionData {
   commit?: string;
 }
 
+export interface HostDiagnoseItem {
+  name: string;
+  data: string;
+}
+
 export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
@@ -883,19 +1010,13 @@ export interface PackageReleaseMetadata {
   upstreamVersion?: string;
   shortDescription?: string;
   description?: string;
+
   type?: "service" | "library" | "dncore";
   chain?: ChainDriver;
-  dependencies?: Dependencies;
   mainService?: string;
-  architectures?: Architecture[];
-
-  // Safety properties to solve problematic updates
-  runOrder?: string[];
-  restartCommand?: string;
-  restartLaunchCommand?: string;
-
-  // "15min" | 3600
+  /** "15min" | 3600 */
   dockerTimeout?: string;
+  dependencies?: Dependencies;
 
   requirements?: {
     minimumDappnodeVersion: string;
@@ -903,7 +1024,13 @@ export interface PackageReleaseMetadata {
   globalEnvs?: {
     all?: boolean;
   };
-  ssl?: boolean;
+  architectures?: Architecture[];
+
+  // Safety properties to solve problematic updates
+  runOrder?: string[];
+  restartCommand?: string;
+  restartLaunchCommand?: string;
+
   backup?: PackageBackup[];
   changelog?: string;
   warnings?: {
@@ -931,6 +1058,9 @@ export interface PackageReleaseMetadata {
   // Monitoring
   grafanaDashboards?: GrafanaDashboard[];
   prometheusTargets?: PrometheusTarget[];
+
+  // Network metadata
+  exposable?: ExposableServiceManifestInfo[];
 
   author?: string;
   contributors?: string[];
@@ -981,6 +1111,33 @@ export interface MountpointData {
   free: number; // 25092776
   vendor: string; // "ATA", "SanDisk"
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
+}
+
+export interface HostInfoScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+  dockerCliVersion: string;
+  os: string;
+  versionCodename: string;
+  architecture: string;
+  kernel: string;
+}
+
+export interface DockerVersionsScript {
+  dockerComposeVersion: string;
+  dockerServerVersion: string;
+}
+
+export interface DockerUpdateStatus {
+  updated: boolean;
+  version: string;
+  requirements: UpdateRequirement[];
+}
+
+export interface UpdateRequirement {
+  title: string;
+  isFulFilled: boolean;
+  message: string;
 }
 
 export interface VolumeOwnershipData {
@@ -1069,7 +1226,8 @@ export interface SystemInfo {
   versionDataVpn: PackageVersionData;
   // Network params
   ip: string; // "85.84.83.82",
-  name: string; // "My-DAppNode",
+  name: string; // hostname
+  dappnodeWebName: string; // It's a front-end value
   staticIp: string; // "85.84.83.82" | null,
   domain: string; // "1234acbd.dyndns.io",
   upnpAvailable: boolean;
@@ -1125,18 +1283,12 @@ export interface HostStatCpu {
   usedPercentage: number;
 }
 
-/**
- * Summary of diagnose checks performed by the DAppNode host
- */
-export interface DiagnoseItem {
-  name: string;
-  result?: string;
-  error?: string;
-}
-export type Diagnose = DiagnoseItem[];
-
 export interface PublicIpResponse {
   publicIp: string;
+}
+
+export interface LocalIpResponse {
+  localIp: string;
 }
 
 /**

@@ -1,0 +1,256 @@
+/* General OVERWRITE styles or colors */
+/* Using div a to gain specificity infront of the default rule */
+a.no-a-style,
+a.no-a-style:hover,
+.no-a-style a,
+.no-a-style a:hover,
+button.no-a-style,
+button.no-a-style:hover {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+a,
+.a-style {
+  color: var(--dappnode-links-color);
+  text-decoration: inherit;
+  transition: color ease 150ms;
+  cursor: pointer;
+}
+a:hover,
+.a-style:hover {
+  color: var(--dappnode-links-darker-color);
+}
+
+/* Change default <p> margin-bottom */
+.no-p-style:last-child p:last-child,
+p.no-p-style:last-child {
+  margin-bottom: 0;
+}
+
+/* General layout coloring */
+
+.vertical-container-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-content-wrapper {
+  background-color: #f9f9f9;
+}
+
+.section-title {
+  border-bottom: var(--border-style);
+  padding-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.section-title .pre-title {
+  opacity: 0.3;
+  font-weight: 300;
+  text-transform: "capitalize";
+}
+
+.section-subtitle {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+}
+
+.section-card-subtitle {
+  margin-bottom: 8px;
+  font-size: 22.6px;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.6;
+}
+
+/* Table styles to have light gray separators.
+   Visible at /packages/:id, controls panel
+ */
+
+.table td {
+  border-top: 0 !important;
+}
+.table tr {
+  border-bottom: 1px solid #dee2e6;
+}
+.table tr:last-child {
+  border-bottom: 0 !important;
+}
+
+/* Space out card sub groups except last element 
+   Visible at installer/:id openning the advanced options
+*/
+
+.card-subgroup:not(:last-child) {
+  margin-bottom: var(--default-spacing);
+}
+
+.alert {
+  word-break: break-word;
+}
+
+/* #### DEV */
+
+.card-list > * {
+  padding: var(--default-spacing);
+}
+.card-list > *:not(:last-child) {
+  border-bottom: var(--border-style);
+}
+
+/* react-bootstrap's ProgressBar */
+.progress-bar {
+  background-color: var(--dappnode-color);
+  /* When the bar goes from full "starting" to downloading,
+     it moves too slow an looks wierd */
+  transition: none !important;
+}
+.progress {
+  height: 1.1rem;
+}
+
+/* 
+  Grid list
+  =========
+  - Make the fonts a little bit smaller for better mobile
+*/
+
+.list-grid {
+  --icon-size: 1.75em;
+  --grid-spacing: 1rem;
+  display: grid;
+  /* Specify a custom grid-template-columns:  */
+  grid-gap: var(--grid-spacing);
+  place-items: center;
+
+  > header {
+    color: var(--light-text-color);
+    text-transform: capitalize;
+    /* When the screen is really small, hide the name of the actions */
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+  > *:not(header) {
+    align-items: center;
+  }
+
+  /* Make the text break word */
+  > .name {
+    justify-self: left;
+    white-space: normal;
+    width: 100%;
+    font-size: 1.1rem;
+  }
+
+  /* Custom alignment */
+  > .center {
+    justify-self: center;
+    text-align: center;
+  }
+
+  svg {
+    height: var(--icon-size);
+    width: var(--icon-size);
+    opacity: 0.5;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(.disabled) {
+      opacity: 0.8;
+    }
+    &.disabled {
+      opacity: 0.15;
+      cursor: not-allowed;
+    }
+  }
+
+  > hr {
+    grid-column: 1 / -1;
+    border-top: var(--border-style);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    &:last-child {
+      display: none;
+    }
+  }
+
+  /* Center the button inside the NavLink */
+  a {
+    display: flex;
+  }
+}
+
+/* Generic centered container */
+
+.centered-container {
+  display: grid;
+  place-items: center;
+  grid-gap: var(--default-spacing);
+  text-align: center;
+  opacity: 0.5;
+}
+
+/* Card styling for children */
+
+.card-body.spacing > *:not(:last-child) {
+  margin-bottom: var(--default-spacing);
+}
+.card-body.spacing.divider > *:not(:last-child) {
+  padding-bottom: var(--default-spacing);
+  border-bottom: var(--border-style);
+}
+
+/* Center bootstrap columns */
+
+.row > .center {
+  display: grid;
+  align-items: center;
+}
+
+/* Help text */
+.help-text {
+  color: gray;
+  font-size: 90%;
+}
+
+/* Copy text with input display
+   The svg are not centered so the custom padding 
+   helps the icons look like they are centered  */
+.copy-input {
+  background-color: var(--color-background) !important;
+}
+.copy-input-copy {
+  padding: 4px 9px 0px 11px;
+  font-size: 1.3rem;
+}
+.copy-input-open {
+  padding: 0px 9px 0px 10px;
+  font-size: 1.3rem;
+}
+.copy-input-open > a {
+  display: flex;
+}
+
+/* Data-heavy card sections */
+.subtle-header {
+  color: #757575;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  .capitalize {
+    text-transform: capitalize;
+  }
+}

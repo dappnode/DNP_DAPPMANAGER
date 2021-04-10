@@ -13,6 +13,14 @@ import {
   MdDevices,
   MdDashboard
 } from "react-icons/md";
+// URLs
+import { rootPath as dashboardRootPath } from "pages/dashboard";
+import { rootPath as devicesRootPath } from "pages/devices";
+import { rootPath as installerRootPath } from "pages/installer";
+import { rootPath as packagesRootPath } from "pages/packages";
+import { rootPath as systemRootPath } from "pages/system";
+import { rootPath as sdkRootPath } from "pages/sdk";
+import { rootPath as supportRootPath } from "pages/support";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -45,37 +53,37 @@ export const sidenavItems: {
 }[] = [
   {
     name: "Dashboard",
-    href: "/dashboard",
+    href: dashboardRootPath,
     icon: MdDashboard
   },
   {
-    name: "Devices",
-    href: "/devices",
+    name: "VPN",
+    href: devicesRootPath,
     icon: MdDevices
   },
   {
     name: "DAppStore",
-    href: "/installer",
+    href: installerRootPath,
     icon: MdCreateNewFolder
   },
   {
     name: "Packages",
-    href: "/packages",
+    href: packagesRootPath,
     icon: MdFolder
   },
   {
     name: "System",
-    href: "/system",
+    href: systemRootPath,
     icon: MdSettings
   },
   {
     name: "Sdk",
-    href: "/sdk",
+    href: sdkRootPath,
     icon: MdBuild
   },
   {
     name: "Support",
-    href: "/support",
+    href: supportRootPath,
     icon: MdHelp
   }
 ];

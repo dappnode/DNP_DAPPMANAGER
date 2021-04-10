@@ -1,7 +1,5 @@
 import React from "react";
-import useSWR from "swr";
 import { useApi } from "api";
-import { checkIpfsConnection } from "../diagnoseFunctions/ipfs";
 import { notEmpty } from "utils/typescript";
 import { DiagnoseResult } from "../types";
 import * as formatDiagnose from "../formaters/autoDiagnoseTexts";
@@ -14,10 +12,10 @@ export default function AutoDiagnose() {
   const systemInfo = useApi.systemInfoGet();
   const hostStats = useApi.statsDiskGet();
   const dnpInstalled = useApi.packagesGet();
-  const ipfsConnection = useSWR(["ipfsConnection"], checkIpfsConnection);
+  const ipfsTest = useApi.ipfsTest();
 
   const diagnosesArray: DiagnoseResult[] = [
-    formatDiagnose.ipfs(ipfsConnection),
+    formatDiagnose.ipfs(ipfsTest),
     formatDiagnose.internetConnection(publicIpRes, systemInfo),
     formatDiagnose.openPorts(systemInfo),
     formatDiagnose.noNatLoopback(systemInfo),

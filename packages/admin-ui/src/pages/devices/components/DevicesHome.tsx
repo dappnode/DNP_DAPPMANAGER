@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink } from "react-router-dom";
 // Own module
-import { title, maxIdLength } from "../data";
+import { title, maxIdLength, rootPath } from "../data";
 import coerceDeviceName from "../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
@@ -16,6 +16,7 @@ import { renderResponse } from "components/SwrRender";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
+import { urlJoin } from "utils/url";
 
 export default function DevicesHome() {
   const [input, setInput] = useState("");
@@ -77,6 +78,10 @@ export default function DevicesHome() {
   return (
     <>
       <Title title={title} />
+      <p>
+        Create a VPN profile for each of your devices (laptop, phone) so you can
+        access your DAppNode from an external network
+      </p>
 
       <Input
         placeholder="Device's unique name"
@@ -115,7 +120,7 @@ export default function DevicesHome() {
             .map(({ id, admin }) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
-                <NavLink to={"/devices/" + id} className="no-a-style">
+                <NavLink to={urlJoin(rootPath, id)} className="no-a-style">
                   <Button className="get-link">Get</Button>
                 </NavLink>
 

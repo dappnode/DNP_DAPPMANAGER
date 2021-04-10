@@ -44,6 +44,7 @@ export function getVolumeDevicePaths(
     for (const volObj of Object.values(compose.volumes || []))
       if (
         typeof volObj === "object" &&
+        volObj != null &&
         volObj.driver_opts &&
         volObj.driver_opts.device &&
         path.isAbsolute(volObj.driver_opts.device)

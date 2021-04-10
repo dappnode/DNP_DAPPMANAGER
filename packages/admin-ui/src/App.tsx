@@ -18,8 +18,7 @@ import { NoConnection } from "start-pages/NoConnection";
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
-  // Check ONCE what is the status of the VPN, then display the page for nonAdmin
-  // Even make the non-admin a route and fore a redirect
+  // Check ONCE what is the status of the VPN and redirect to the login page.
 
   // Scroll to top on pathname change
   const location = useLocation();

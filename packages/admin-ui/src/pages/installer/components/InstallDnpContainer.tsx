@@ -6,7 +6,7 @@ import { title } from "../data";
 // This module
 import InstallDnpView from "./InstallDnpView";
 // Utils
-import { shortNameCapitalized } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import Title from "components/Title";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
@@ -26,10 +26,7 @@ const InstallDnpContainer: React.FC<RouteComponentProps<{ id: string }>> = ({
 
   return (
     <>
-      <Title
-        title={title}
-        subtitle={dnpName ? shortNameCapitalized(dnpName) : id}
-      />
+      <Title title={title} subtitle={dnpName ? prettyDnpName(dnpName) : id} />
 
       {dnp ? (
         <InstallDnpView dnp={dnp} progressLogs={progressLogs} />

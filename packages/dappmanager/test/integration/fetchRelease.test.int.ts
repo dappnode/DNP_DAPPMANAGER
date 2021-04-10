@@ -121,7 +121,7 @@ describe("Fetch releases", () => {
 
     // Compose fetched from disk, from previously installed version
     const composeMain = new ComposeEditor({
-      version: "3.4",
+      version: "3.5",
       services: {
         [dnpNameMain]: {
           container_name: getContainerName({
@@ -291,7 +291,7 @@ describe("Fetch releases", () => {
     };
 
     const composeMain = new ComposeEditor({
-      version: "3.4",
+      version: "3.5",
       services: {
         [dnpNameMain]: {
           container_name: getContainerName({

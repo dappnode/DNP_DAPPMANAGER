@@ -1,6 +1,9 @@
 import { IApiRoutes } from "api/interface";
+import newTabProps from "utils/newTabProps";
 
 // For mock return: "data:text/csv;charset=utf-8;base64,dddddd"
+
+newTabProps.download = "test-dappnode-file";
 
 export const apiRoutes: IApiRoutes = {
   fileDownloadUrl({ containerName, path }) {

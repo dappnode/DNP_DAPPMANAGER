@@ -2,7 +2,7 @@
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
 #####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:10.15.3-alpine as build-monorepo
+FROM --platform=${BUILDPLATFORM:-amd64} node:12.22.0-alpine as build-monorepo
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN yarn build
 
 # Compute git data
 #####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:10.15.3-alpine as git-data
+FROM --platform=${BUILDPLATFORM:-amd64} node:12.22.0-alpine as git-data
 
 WORKDIR /usr/src/app
 
@@ -51,7 +51,7 @@ RUN node getGitData /usr/src/app/.git-data.json
 
 # Build binaries
 #####################################
-FROM node:10.15.3-alpine as build-binaries
+FROM node:12.22.0-alpine as build-binaries
 
 RUN apk add --no-cache bind-tools docker
 
@@ -59,11 +59,13 @@ RUN apk add --no-cache bind-tools docker
 
 # Final layer
 #####################################
-FROM node:10.15.3-alpine
+FROM node:12.22.0-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.25.5
 
-RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind
+RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind \
+  # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
+  avahi-tools
 
 RUN curl -L https://github.com/dappnode/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-$(uname -m) > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
@@ -81,6 +83,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 
 # Copy the src last as it's the layer most likely to change
 COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
+COPY packages/dappmanager/hostServices /usr/src/app/hostServices
 COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
 COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH

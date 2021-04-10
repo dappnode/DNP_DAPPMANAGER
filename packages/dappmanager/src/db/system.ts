@@ -1,7 +1,5 @@
-import * as dbMain from "./dbMain";
-import * as dbCache from "./dbCache";
-import { DiskUsageThresholds, PackageVersionData } from "../types";
-import { joinWithDot } from "./dbUtils";
+import { dbCache, dbMain } from "./dbFactory";
+import { PackageVersionData } from "../types";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";
@@ -11,6 +9,7 @@ const TELEGRAM_STATUS = "telegram-status";
 const TELEGRAM_TOKEN = "telegram-token";
 const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
+const DAPPNODE_WEB_NAME = "dappnode-web-name";
 
 export const serverName = dbMain.staticKey<string>(SERVER_NAME, "");
 
@@ -55,7 +54,11 @@ export const versionData = dbCache.staticKey<PackageVersionData>(
 
 // Disk usage threshould records
 
-export const diskUsageThreshold = dbCache.dynamicKeyValidate<boolean, string>(
-  id => joinWithDot(DISK_USAGE_THRESHOLD, id),
-  () => true
-);
+export const diskUsageThreshold = dbCache.indexedByKey<boolean, string>({
+  rootKey: DISK_USAGE_THRESHOLD,
+  getKey: id => id
+});
+
+// DAppNode Name appears on the UI
+
+export const dappnodeWebName = dbMain.staticKey<string>(DAPPNODE_WEB_NAME, "");

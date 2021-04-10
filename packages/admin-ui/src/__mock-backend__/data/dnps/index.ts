@@ -1,5 +1,6 @@
 import { MockDnp } from "./types";
 import { bitcoin } from "./bitcoin";
+import { httpsPortal } from "./https-portal";
 import { isInstalling } from "./isInstalling";
 import { lightningNetwork } from "./lightningNetwork";
 import { multiService } from "./multiService";
@@ -8,9 +9,11 @@ import { raiden } from "./raiden";
 import { raidenTestnet } from "./raidenTestnet";
 import { trustlines } from "./trustlines";
 import { wifi } from "./wifi";
+import { wireguard } from "./wireguard";
 
 export const mockDnps: MockDnp[] = [
   bitcoin,
+  httpsPortal,
   isInstalling,
   lightningNetwork,
   multiService,
@@ -18,5 +21,6 @@ export const mockDnps: MockDnp[] = [
   raiden,
   raidenTestnet,
   trustlines,
-  wifi
+  wifi,
+  wireguard
 ];

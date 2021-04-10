@@ -1,7 +1,9 @@
-import { Routes } from "../common";
+import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
+import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
+import { httpsPortal } from "./httpsPortal";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -9,19 +11,25 @@ import { ssh } from "./ssh";
 import { telegram } from "./telegram";
 import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
+import { wireguard } from "./wireguard";
 
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
+  ...dockerUpdate,
   ...fetchPkgsData,
+  ...httpsPortal,
   ...notifications,
   ...packages,
   ...password,
   ...ssh,
   ...telegram,
   ...userActionLogs,
-  ...volumes
+  ...volumes,
+  ...wireguard
 };
+
+let dappnodeWebName = "Mock-DAppNode";
 
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () =>
@@ -48,15 +56,60 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ],
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
+  cleanDb: async () => {},
   copyFileTo: async () => {},
   diagnose: async () => [],
   domainAliasSet: async () => {},
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
+  ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
 
+  portsToOpenGet: async () => [
+    {
+      portNumber: 8092,
+      protocol: PortProtocol.TCP,
+      serviceName: "validator",
+      dnpName: "Prysm"
+    }
+  ],
+  portsUpnpStatusGet: async () => [
+    {
+      port: 8092,
+      protocol: PortProtocol.UDP,
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    },
+    {
+      port: 1194,
+      protocol: PortProtocol.TCP,
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    }
+  ],
+  portsApiStatusGet: async () => [
+    {
+      port: 8092,
+      protocol: PortProtocol.UDP,
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    },
+    {
+      port: 1194,
+      protocol: PortProtocol.TCP,
+      status: "open",
+      serviceName: "validator",
+      dnpName: "dnp.prysm.eth"
+    }
+  ],
+  dappnodeWebNameSet: async newDappnodeWebName => {
+    dappnodeWebName = newDappnodeWebName;
+  },
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
@@ -132,6 +185,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ip: "85.84.83.82",
     name: "My-DAppNode",
     staticIp: "", // "85.84.83.82",
+    dappnodeWebName,
     domain: "1234acbd.dyndns.io",
     upnpAvailable: true,
     noNatLoopback: false,

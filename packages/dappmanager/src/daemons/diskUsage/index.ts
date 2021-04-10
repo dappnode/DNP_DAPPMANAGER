@@ -5,14 +5,14 @@ import params from "../../params";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
 import { runAtMostEvery } from "../../utils/asyncFlows";
-import { shortNameCapitalized } from "../../utils/format";
+import { prettyDnpName } from "../../utils/format";
 
 /**
  * Commands
  * docker ps --filter "name=DAppNodePackage" --format "{{.Names}}"
  * docker stop $(docker ps --filter "name=DAppNodePackage" -q)
  *
- * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth" -q)
+ * docker stop $(docker ps --filter "name=DAppNodePackage" --filter "name=DAppNodeCore-sample.dnp.dappnode.eth" -q)
  */
 
 const thresholds = [
@@ -107,7 +107,7 @@ async function monitorDiskUsage(): Promise<void> {
             `Available disk space is less than a ${threshold.id}.`,
             `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
             stoppedDnpNames
-              .map(dnpName => ` - ${shortNameCapitalized(dnpName)}`)
+              .map(dnpName => ` - ${prettyDnpName(dnpName)}`)
               .join("\n"),
             `Please, free up enough disk space and start them again.`
           ].join("\n\n")

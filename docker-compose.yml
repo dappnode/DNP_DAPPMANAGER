@@ -1,16 +1,14 @@
-version: "3.4"
+version: "3.5"
 networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
+  dncore_network:
+    name: dncore_network
+    external: true
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
   dappmanager.dnp.dappnode.eth:
     build: .
-    image: "dappmanager.dnp.dappnode.eth:0.2.38"
+    image: "dappmanager.dnp.dappnode.eth:0.2.39"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     volumes:
@@ -21,13 +19,16 @@ services:
       - "/etc/hostname:/etc/dappnodename:ro"
     environment:
       - LOG_LEVEL=info
-      - WEB3_HOST=
+      - ETH_MAINNET_RPC_URL_OVERRIDE=
+      - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
-      - REMOTE_MAINNET_RPC_URL=
       - DISABLE_UPNP=
     dns: 172.33.1.2
     networks:
-      network:
+      dncore_network:
         ipv4_address: 172.33.1.7
+        aliases:
+          - dappmanager.dappnode
+          - my.dappnode
     logging:
       driver: journald

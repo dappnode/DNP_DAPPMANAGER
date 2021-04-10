@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import { isEmpty, throttle, pick } from "lodash";
 import { difference } from "utils/lodashExtended";
-import { shortNameCapitalized, isDnpVerified } from "utils/format";
+import { prettyDnpName, isDnpVerified } from "utils/format";
 // This module
 import { ProgressLogsView } from "./InstallCardComponents/ProgressLogsView";
 // Components
@@ -28,6 +28,7 @@ import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
+import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 
 const BYPASS_CORE_RESTRICTION = "BYPASS_CORE_RESTRICTION";
 const SHOW_ADVANCED_EDITOR = "SHOW_ADVANCED_EDITOR";
@@ -103,10 +104,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         // If call errors with "callee disconnected", resolve with success
         continueIfCalleDisconnected(() => api.packageInstall(kwargs), dnpName),
         {
-          message: `Installing ${shortNameCapitalized(dnpName)}...`,
-          onSuccess: `Installed ${shortNameCapitalized(dnpName)}`
+          message: `Installing ${prettyDnpName(dnpName)}...`,
+          onSuccess: `Installed ${prettyDnpName(dnpName)}`
         }
       );
+
       // Re-direct user to package page if installation is successful
       if (componentIsMounted.current) {
         setShowSuccess(true);
@@ -117,6 +119,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           }
         }, 1000);
       }
+
+      enableAutoUpdatesForPackageWithConfirm(dnpName).catch(e => {
+        console.error("Error on enableAutoUpdatesForPackageWithConfirm", e);
+      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -137,7 +143,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
     });
   if (metadata.disclaimer)
     disclaimers.push({
-      name: shortNameCapitalized(dnpName),
+      name: prettyDnpName(dnpName),
       message: metadata.disclaimer.message
     });
 
@@ -276,9 +282,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
       {requiresCoreUpdate && (
         <div className="alert alert-danger">
-          <strong>{shortNameCapitalized(dnpName)}</strong> requires a more
-          recent version of DAppNode. <strong>Update your DAppNode</strong>{" "}
-          before continuing the installation.
+          <strong>{prettyDnpName(dnpName)}</strong> requires a more recent
+          version of DAppNode. <strong>Update your DAppNode</strong> before
+          continuing the installation.
         </div>
       )}
 

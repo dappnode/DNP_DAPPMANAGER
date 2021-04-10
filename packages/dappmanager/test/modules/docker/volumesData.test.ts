@@ -56,6 +56,7 @@ describe("docker > volumes data", () => {
               name: "dependencydnpdappnodeeth_data"
             }
           ],
+          networks: [],
           state: "running",
           running: true,
           exitCode: null,
@@ -91,6 +92,7 @@ describe("docker > volumes data", () => {
               name: "dependencydnpdappnodeeth_data"
             }
           ],
+          networks: [],
           state: "running",
           running: true,
           exitCode: null,
