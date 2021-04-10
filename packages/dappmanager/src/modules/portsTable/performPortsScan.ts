@@ -3,6 +3,7 @@ import params from "../../params";
 import Ajv from "ajv";
 import { PackagePort } from "../../common";
 import { logs } from "../../logs";
+import { checkPortsResponseSchema } from "./schema";
 
 interface PortScanResponse {
   tcpPorts: PortScanResult[];
@@ -60,71 +61,9 @@ export async function performPortsScan({
  * Check if the response from the scan ports API
  * is well formatted
  */
-function sanitizeApiResponse(response: any): PortScanResponse {
-  //If the keyword value is an object, then for the data array to be valid
-  // each item of the array should be valid according to the schema in this value.
-  // In this case the additionalItems keyword is ignored.
-  const schema = {
-    type: "object",
-    maxProperties: 2,
-    additionalProperties: false,
-    properties: {
-      tcpPorts: {
-        uniqueItems: true,
-        type: "array",
-        items: {
-          type: "object",
-          maxProperties: 3,
-          minProperties: 2,
-          additionalProperties: false,
-          required: ["port", "status"],
-          properties: {
-            port: {
-              type: "integer",
-              minimum: 0,
-              maximum: 65535
-            },
-            status: {
-              type: "string",
-              pattern: "^(open|closed|error|unknown)$"
-            },
-            message: {
-              type: "string"
-            }
-          }
-        }
-      },
-      udpPorts: {
-        uniqueItems: true,
-        type: "array",
-        items: {
-          type: "object",
-          maxProperties: 3,
-          minProperties: 2,
-          additionalProperties: false,
-          required: ["port", "status"],
-          properties: {
-            port: {
-              type: "integer",
-              minimum: 0,
-              maximum: 65535
-            },
-            status: {
-              type: "string",
-              pattern: "^(open|closed|error|unknown)$"
-            },
-            message: {
-              type: "string"
-            }
-          }
-        }
-      }
-    }
-  };
-
-  if (ajv.validate(schema, response)) {
-    const responseSanitized = response as PortScanResponse;
-    return responseSanitized;
+function sanitizeApiResponse(response: unknown): PortScanResponse {
+  if (!ajv.validate(checkPortsResponseSchema, response)) {
+    throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
   }
-  throw Error("Error: API response not validated by the schema");
+  return response as PortScanResponse;
 }
