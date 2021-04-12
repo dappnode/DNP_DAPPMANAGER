@@ -33,6 +33,8 @@ async function runNsupdate({
       removeOnly
     });
 
+    logs.info("nsupdateTxts", nsupdateTxts);
+
     for (const nsupdateTxt of nsupdateTxts)
       await retry(() => execNsupdate(nsupdateTxt));
 
