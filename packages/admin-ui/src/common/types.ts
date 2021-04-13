@@ -544,6 +544,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   areThereVolumesToRemove: boolean;
   dependantsOf: string[];
   updateAvailable: UpdateAvailable | null;
+  notRemovable: boolean;
   // Non-indexed data
   manifest?: Manifest;
 }

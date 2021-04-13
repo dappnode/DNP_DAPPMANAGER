@@ -78,7 +78,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     }
   }
 
-  if (isCore) {
+  if (dnp.notRemovable) {
     return null;
   }
 

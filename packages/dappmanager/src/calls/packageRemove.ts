@@ -27,7 +27,10 @@ export async function packageRemove({
   const dnp = await listPackage({ dnpName });
   const timeout = getDockerTimeoutMax(dnp.containers);
 
-  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
+  if (
+    (dnp.isCore && params.corePackagesNotRemovable.includes(dnp.dnpName)) ||
+    dnp.dnpName === params.dappmanagerDnpName
+  ) {
     throw Error("Core packages cannot be removed");
   }
 
