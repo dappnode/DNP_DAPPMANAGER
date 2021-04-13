@@ -4,6 +4,11 @@ export function stripCharacters(s: string): string {
   return s.replace(RegExp("_", "g"), "");
 }
 
+export function stripBadDomainChars(s: string): string {
+  // eslint-disable-next-line no-useless-escape
+  return s.replace(/[^a-zA-Z\-]+/g, "-");
+}
+
 /**
  * - Strip container prefix
  * - Strip .dappnode, .eth, .dnp
@@ -54,6 +59,5 @@ export function getExternalNetworkAlias(container: ContainerNames): string {
 
 export function getPublicSubdomain(container: ContainerNames): string {
   const fullEns = getContainerDomain(container);
-  // eslint-disable-next-line no-useless-escape
-  return shortUniqueDappnodeEns(fullEns).replace(/[^a-zA-Z\-]+/g, "-");
+  return stripBadDomainChars(shortUniqueDappnodeEns(fullEns));
 }
