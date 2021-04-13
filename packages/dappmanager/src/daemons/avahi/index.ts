@@ -6,7 +6,13 @@ import { logs } from "../../logs";
 import shell from "../../utils/shell";
 
 export async function startAvahiDaemon(): Promise<void> {
-  const internalIp = await waitForInternalIp();
+  const { internalIp, publicIp } = await waitForIps();
+
+  if (publicIp === internalIp) {
+    logs.info(
+      "This DAppNode is not behind a router, skipping avahi-publish daemon"
+    );
+  }
 
   // avahi-publish -a -R $MDNS_DOMAIN $IP
   // where -R argument is neccesary only if you want to publish more domains pointing to the same IP
@@ -36,10 +42,11 @@ export async function startAvahiDaemon(): Promise<void> {
 }
 
 /**  Waits for internal IP to be available */
-async function waitForInternalIp(): Promise<string> {
+async function waitForIps(): Promise<{ internalIp: string; publicIp: string }> {
   while (true) {
     const internalIp = db.internalIp.get();
-    if (internalIp) return internalIp;
+    const publicIp = db.publicIp.get();
+    if (internalIp && publicIp) return { internalIp, publicIp };
     await pause(1000);
   }
 }
