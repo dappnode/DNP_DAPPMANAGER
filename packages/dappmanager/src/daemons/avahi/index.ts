@@ -27,9 +27,18 @@ export async function startAvahiDaemon(): Promise<void> {
   try {
     logs.info("Starting avahi-publish");
 
+    // Broken pipe. If you use pipes or FIFOs, you have to design your application so that one process
+    // opens the pipe for reading before another starts writing. If the reading process never starts,
+    // or terminates unexpectedly, writing to the pipe or FIFO raises a SIGPIPE signal. If SIGPIPE is blocked,
+    // handled or ignored, the offending call fails with EPIPE instead.
+    // To dettach the process from the parent: https://stackoverflow.com/questions/25323703/nodejs-execute-command-in-background-and-forget
     await retry(
       async () =>
-        shell(`avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`),
+        shell(
+          `avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`,
+          {},
+          true
+        ),
       {
         retries: 10,
         maxRetryTime: Infinity,
