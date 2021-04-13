@@ -148,9 +148,10 @@ export function HttpsMappings({
 
         <div className="list-grid">
           {/* Table header */}
-          <header className="name">FROM</header>
+
+          <header className="name">CONTAINER</header>
           <header className="name" />
-          <header className="name">TO</header>
+          <header className="name">SUBDOMAIN</header>
           <header className="header">REMOVE</header>
 
           <hr />
@@ -162,6 +163,13 @@ export function HttpsMappings({
           {serviceMappings.map(mapping => (
             <React.Fragment key={mapping.fromSubdomain}>
               <span className="name">
+                {prettyFullName(mapping)} : {mapping.port}
+              </span>
+              <span className="name">
+                <BsArrowRight />
+              </span>
+
+              <span className="name">
                 <a
                   href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
                   {...newTabProps}
@@ -169,10 +177,6 @@ export function HttpsMappings({
                   {mapping.fromSubdomain}
                 </a>
               </span>
-              <span className="name">
-                <BsArrowRight />
-              </span>
-              <span className="name">{prettyFullName(mapping)}</span>
 
               <MdClose onClick={() => removeMapping(mapping)} />
             </React.Fragment>
