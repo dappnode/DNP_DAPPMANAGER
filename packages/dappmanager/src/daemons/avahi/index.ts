@@ -12,6 +12,7 @@ export async function startAvahiDaemon(): Promise<void> {
     logs.info(
       "This DAppNode is not behind a router, skipping avahi-publish daemon"
     );
+    return;
   }
 
   // avahi-publish -a -R $MDNS_DOMAIN $IP
