@@ -175,6 +175,7 @@ export function HttpsMappings({
                   {...newTabProps}
                 >
                   {mapping.fromSubdomain}
+                  <wbr />.{dappnodeIdentity.domain}
                 </a>
               </span>
 
