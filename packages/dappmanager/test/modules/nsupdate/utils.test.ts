@@ -201,5 +201,53 @@ update delete my.bitcoin.dnp.dappnode.eth A`,
 update delete bitcoin.dappnode A`
       });
     });
+
+    it("Should add root domain to grafana container", () => {
+      const grafanaContainer: PackageContainer = {
+        ...mockContainer,
+        canBeFullnode: false,
+        containerId:
+          "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",
+        containerName: "DAppNodePackage-grafana.dms.dnp.dappnode.eth",
+        created: 1618303536,
+        dnpName: "dms.dnp.dappnode.eth",
+        exitCode: null,
+        image: "grafana.dms.dnp.dappnode.eth:1.0.1",
+        instanceName: "",
+        ip: "172.33.0.3",
+        isCore: false,
+        isDnp: true,
+        isMain: true,
+        networks: [
+          {
+            ip: "172.33.0.3",
+            name: "dncore_network"
+          }
+        ],
+
+        running: true,
+        serviceName: "grafana",
+        state: "running"
+      };
+
+      const nsupdateTxts = getNsupdateTxts({
+        containers: [grafanaContainer],
+        domainAliases: {}
+      });
+
+      assertNsUpdateTxts(nsupdateTxts, {
+        eth: `
+update delete my.grafana.dms.dnp.dappnode.eth A
+update add my.grafana.dms.dnp.dappnode.eth 60 A 172.33.0.3
+update delete my.dms.dnp.dappnode.eth A
+update add my.dms.dnp.dappnode.eth 60 A 172.33.0.3
+  `,
+        dappnode: `
+update delete grafana.dms.dappnode A
+update add grafana.dms.dappnode 60 A 172.33.0.3
+update delete dms.dappnode A
+update add dms.dappnode 60 A 172.33.0.3`
+      });
+    });
   });
 });
