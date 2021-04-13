@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { rootPath as installedRootPath } from "pages/installer";
+import { rootPath as systemRootPath } from "pages/system";
+import { subPaths as systemSubPaths } from "pages/system/data";
 import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
@@ -15,7 +17,6 @@ import Button from "components/Button";
 import Switch from "components/Switch";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
-import { getPublicSubdomain } from "utils/domains";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping } from "types";
@@ -40,10 +41,9 @@ export function HttpsMappings({
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
-  // Prefill the `from` input with the recommended subdomain on every select change
-  useEffect(() => {
-    setFrom(getPublicSubdomain({ dnpName, serviceName }));
-  }, [dnpName, serviceName]);
+  // DO NOT - Prefill the `from` input with the recommended subdomain on every select change
+  // Why? To des-incentivize users from randomly creating mappings for services that may
+  // conflict with pre-defined mappings in System > Network
 
   /** Add the new mapping created in the local editor */
   async function addMapping() {
@@ -137,11 +137,21 @@ export function HttpsMappings({
 
     return (
       <div className="network-mappings">
+        <p>
+          It recommended to only expose the pre-approved safe services listed in{" "}
+          <NavLink to={urlJoin(systemRootPath, systemSubPaths.network)}>
+            System / Network
+          </NavLink>
+          . Please, only add custom mappings manually if you understand the
+          security risks
+        </p>
+
         <div className="list-grid">
           {/* Table header */}
-          <header className="name">FROM</header>
+
+          <header className="name">CONTAINER</header>
           <header className="name" />
-          <header className="name">TO</header>
+          <header className="name">SUBDOMAIN</header>
           <header className="header">REMOVE</header>
 
           <hr />
@@ -153,17 +163,21 @@ export function HttpsMappings({
           {serviceMappings.map(mapping => (
             <React.Fragment key={mapping.fromSubdomain}>
               <span className="name">
+                {prettyFullName(mapping)} : {mapping.port}
+              </span>
+              <span className="name">
+                <BsArrowRight />
+              </span>
+
+              <span className="name">
                 <a
                   href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
                   {...newTabProps}
                 >
                   {mapping.fromSubdomain}
+                  <wbr />.{dappnodeIdentity.domain}
                 </a>
               </span>
-              <span className="name">
-                <BsArrowRight />
-              </span>
-              <span className="name">{prettyFullName(mapping)}</span>
 
               <MdClose onClick={() => removeMapping(mapping)} />
             </React.Fragment>

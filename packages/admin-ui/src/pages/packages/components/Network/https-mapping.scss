@@ -31,17 +31,6 @@
     }
   }
 
-  /* Customize name inside NavLink */
-  a {
-    color: inherit;
-    text-decoration: inherit;
-    transition: color 0.2s ease;
-    &:hover {
-      color: var(--dappnode-color);
-      text-decoration: none;
-    }
-  }
-
   .no-mappings {
     opacity: 0.5;
     grid-column: 1 / -1;
