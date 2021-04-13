@@ -8,6 +8,7 @@ import { logs } from "../logs";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { getVolumesOwnershipData } from "../modules/docker/volumesData";
 import { sortPackages } from "./packagesGet";
+import params from "../params";
 
 /**
  * Get package detail information
@@ -46,7 +47,10 @@ export async function packageGet({
       ),
     dependantsOf: dnpList
       .filter(d => d.dependencies[dnpName])
-      .map(d => d.dnpName)
+      .map(d => d.dnpName),
+
+    notRemovable:
+      dnp.isCore && params.corePackagesNotRemovable.includes(dnp.dnpName)
   };
 
   // Add non-blocking data
