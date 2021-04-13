@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { rootPath as installedRootPath } from "pages/installer";
+import { rootPath as systemRootPath } from "pages/system";
+import { subPaths as systemSubPaths } from "pages/system/data";
 import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
@@ -135,6 +137,15 @@ export function HttpsMappings({
 
     return (
       <div className="network-mappings">
+        <p>
+          It recommended to only expose the pre-approved safe services listed in{" "}
+          <NavLink to={urlJoin(systemRootPath, systemSubPaths.network)}>
+            System / Network
+          </NavLink>
+          . Please, only add custom mappings manually if you understand the
+          security risks
+        </p>
+
         <div className="list-grid">
           {/* Table header */}
           <header className="name">FROM</header>
