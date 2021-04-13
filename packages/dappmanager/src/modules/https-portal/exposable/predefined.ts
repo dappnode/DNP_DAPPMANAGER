@@ -57,7 +57,7 @@ export const exposablePredefined: {
       description: "WebSockets endpoint for Kovan Ethereum network"
     }
   ],
-  "nethermind.dnp.dappnode.eth": [
+  "nethermind.public.dappnode.eth": [
     {
       fromSubdomain: "nethermind",
       dnpName: "nethermind.public.dappnode.eth",
@@ -113,7 +113,7 @@ export const exposablePredefined: {
   ],
   "avalanche.public.dappnode.eth": [
     {
-      fromSubdomain: "avalanche-public",
+      fromSubdomain: "avalanche",
       dnpName: "avalanche.public.dappnode.eth",
       serviceName: "wallet",
       port: 80,
