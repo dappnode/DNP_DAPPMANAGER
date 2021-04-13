@@ -1295,5 +1295,82 @@ export const dockerApiResponseContainers: Docker.ContainerInfo[] = [
     ],
     State: "running",
     Status: "Up 5 weeks"
+  },
+  {
+    Id: "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",
+    Names: ["/DAppNodePackage-grafana.dms.dnp.dappnode.eth"],
+    Image: "grafana.dms.dnp.dappnode.eth:1.0.1",
+    ImageID:
+      "sha256:269651b5aa5472d188fda97a937fd0bf861edc7a73122d66591af0e464559f70",
+    Command:
+      "/run.sh grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini --packaging=docker",
+    Created: 1618303536,
+    Ports: [
+      {
+        PrivatePort: 3000,
+        Type: "tcp",
+        PublicPort: 0,
+        IP: "0.0.0.0"
+      }
+    ],
+    Labels: {
+      "com.docker.compose.config-hash":
+        "2e0732ce7e64078b071b27e65b7d60e4c05913b8e9aa3d7a1f525d7ae80ed5f7",
+      "com.docker.compose.container-number": "1",
+      "com.docker.compose.oneoff": "False",
+      "com.docker.compose.project": "dmsdnpdappnodeeth",
+      "com.docker.compose.project.config_files":
+        "/usr/src/app/dnp_repo/dms.dnp.dappnode.eth/docker-compose.yml",
+      "com.docker.compose.project.working_dir":
+        "/usr/src/app/dnp_repo/dms.dnp.dappnode.eth",
+      "com.docker.compose.service": "grafana",
+      "com.docker.compose.version": "1.25.5",
+      "dappnode.dnp.avatar":
+        "/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
+      "dappnode.dnp.default.volumes": '["grafana_data:/var/lib/grafana"]',
+      "dappnode.dnp.dependencies": "{}",
+      "dappnode.dnp.dnpName": "dms.dnp.dappnode.eth",
+      "dappnode.dnp.isCore": "false",
+      "dappnode.dnp.isMain": "true",
+      "dappnode.dnp.serviceName": "grafana",
+      "dappnode.dnp.version": "1.0.1"
+    },
+    State: "running",
+    Status: "Up 7 minutes",
+    HostConfig: {
+      NetworkMode: "dncore_network"
+    },
+    NetworkSettings: {
+      Networks: {
+        dncore_network: {
+          IPAMConfig: null,
+          Links: null,
+          Aliases: null,
+          NetworkID:
+            "e843eba0ca739a4008669e413147785777da160262ed5d46e27e625329c65ce8",
+          EndpointID:
+            "e072374b357cdef2a5cc8c9581b58c834bd58f9851bf93583fc4f85a2dd61952",
+          Gateway: "172.33.0.1",
+          IPAddress: "172.33.0.3",
+          IPPrefixLen: 16,
+          IPv6Gateway: "",
+          GlobalIPv6Address: "",
+          GlobalIPv6PrefixLen: 0,
+          MacAddress: "02:42:ac:21:00:03"
+        }
+      }
+    },
+    Mounts: [
+      {
+        Type: "volume",
+        Name: "dmsdnpdappnodeeth_grafana_data",
+        Source: "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
+        Destination: "/var/lib/grafana",
+        Driver: "local",
+        Mode: "rw",
+        RW: true,
+        Propagation: ""
+      }
+    ]
   }
 ];

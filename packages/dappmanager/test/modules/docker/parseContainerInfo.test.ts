@@ -783,6 +783,56 @@ describe("modules / docker / parseContainerInfo", function() {
         dependencies: {},
         avatarUrl: "",
         canBeFullnode: false
+      },
+      {
+        avatarUrl:
+          "http://ipfs.dappnode:8080/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
+        canBeFullnode: false,
+        containerId:
+          "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",
+        containerName: "DAppNodePackage-grafana.dms.dnp.dappnode.eth",
+        created: 1618303536,
+        defaultVolumes: [
+          {
+            container: "/var/lib/grafana",
+            host: "grafana_data",
+            name: "grafana_data"
+          }
+        ],
+        dependencies: {},
+        dnpName: "dms.dnp.dappnode.eth",
+        exitCode: null,
+        image: "grafana.dms.dnp.dappnode.eth:1.0.1",
+        instanceName: "",
+        ip: "172.33.0.3",
+        isCore: false,
+        isDnp: true,
+        isMain: true,
+        networks: [
+          {
+            ip: "172.33.0.3",
+            name: "dncore_network"
+          }
+        ],
+        ports: [
+          {
+            container: 3000,
+            deletable: true,
+            protocol: PortProtocol.TCP
+          }
+        ],
+        running: true,
+        serviceName: "grafana",
+        state: "running",
+        version: "1.0.1",
+        volumes: [
+          {
+            container: "/var/lib/grafana",
+            host:
+              "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
+            name: "dmsdnpdappnodeeth_grafana_data"
+          }
+        ]
       }
     ];
 
