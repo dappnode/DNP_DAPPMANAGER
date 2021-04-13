@@ -19,7 +19,7 @@ interface WarningItem {
 }
 
 export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
-  const { dnpName, areThereVolumesToRemove, dependantsOf, isCore } = dnp;
+  const { dnpName, areThereVolumesToRemove, dependantsOf, notRemovable } = dnp;
 
   const history = useHistory();
 
@@ -93,7 +93,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         variant="outline-danger"
         onClick={packageRemove}
         style={{ whiteSpace: "normal" }}
-        disabled={isCore}
+        disabled={notRemovable}
       >
         <BsTrash />
       </Button>
