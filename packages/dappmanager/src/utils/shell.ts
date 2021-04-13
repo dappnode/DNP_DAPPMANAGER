@@ -19,23 +19,16 @@ const defaultTimeout = 15 * 60 * 1000; // ms
  */
 export default async function shell(
   cmd: string | string[],
-  options?: { timeout?: number; maxBuffer?: number },
-  daemon?: boolean
+  options: { timeout?: number; noTimeout?: boolean; maxBuffer?: number } = {}
 ): Promise<string> {
-  const timeout = options && options.timeout ? options.timeout : defaultTimeout;
+  const timeout = options.noTimeout
+    ? undefined
+    : options.timeout || defaultTimeout;
   const maxBuffer = options && options.maxBuffer;
+  const cmdStr = Array.isArray(cmd) ? cmd.join(" ") : cmd;
   try {
-    // Execute daemon without timeout
-    if (daemon)
-      return (
-        await exec(Array.isArray(cmd) ? cmd.join(" ") : cmd)
-      ).stdout.trim();
-
-    const { stdout = "" } = await exec(
-      Array.isArray(cmd) ? cmd.join(" ") : cmd,
-      { timeout, maxBuffer }
-    );
-    return stdout.trim();
+    const { stdout } = await exec(cmdStr, { timeout, maxBuffer });
+    return (stdout || "").trim();
   } catch (e) {
     // Rethrow a typed error, and ignore the internal NodeJS stack trace
     const err: child.ExecException = e;
