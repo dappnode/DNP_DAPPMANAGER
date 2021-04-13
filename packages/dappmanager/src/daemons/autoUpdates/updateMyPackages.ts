@@ -1,4 +1,5 @@
 import semver from "semver";
+import params from "../../params";
 import { listPackages } from "../../modules/docker/list";
 import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
@@ -24,10 +25,16 @@ export async function checkNewPackagesVersion(
 ): Promise<void> {
   const dnps = await listPackages();
 
-  for (const { dnpName, isDnp, version: currentVersion } of dnps) {
+  for (const { dnpName, version: currentVersion } of dnps) {
     try {
-      // Ignore core DNPs, and non-valid versions (semver.lte will throw)
-      if (!dnpName || !isDnp || !semver.valid(currentVersion)) {
+      // Ignore:
+      // - core DNPs that must be updatable only from the "core.dnp.dappnode.eth" package
+      // - non-valid versions (semver.lte will throw)
+      if (
+        !dnpName ||
+        !semver.valid(currentVersion) ||
+        params.corePackagesNotAutoupdatable.includes(dnpName)
+      ) {
         continue;
       }
 
