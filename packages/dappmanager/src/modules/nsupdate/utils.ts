@@ -148,12 +148,12 @@ export function getNsupdateTxts({
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
-      const fullDnpEns = getContainerDomain({
+      const rootNames = {
         dnpName: container.dnpName,
         serviceName: container.dnpName
-      });
-      eth[getMyDotEthdomain(fullDnpEns)] = container.ip;
-      dappnode[getDotDappnodeDomain(container)] = container.ip;
+      };
+      eth[getMyDotEthdomain(getContainerDomain(rootNames))] = container.ip;
+      dappnode[getDotDappnodeDomain(rootNames)] = container.ip;
     }
   }
 
