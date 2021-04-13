@@ -15,7 +15,6 @@ import Button from "components/Button";
 import Switch from "components/Switch";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
-import { getPublicSubdomain } from "utils/domains";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping } from "types";
@@ -40,10 +39,9 @@ export function HttpsMappings({
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
-  // Prefill the `from` input with the recommended subdomain on every select change
-  useEffect(() => {
-    setFrom(getPublicSubdomain({ dnpName, serviceName }));
-  }, [dnpName, serviceName]);
+  // DO NOT - Prefill the `from` input with the recommended subdomain on every select change
+  // Why? To des-incentivize users from randomly creating mappings for services that may
+  // conflict with pre-defined mappings in System > Network
 
   /** Add the new mapping created in the local editor */
   async function addMapping() {
