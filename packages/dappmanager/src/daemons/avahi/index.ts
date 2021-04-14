@@ -36,8 +36,7 @@ export async function startAvahiDaemon(): Promise<void> {
       async () =>
         shell(
           `avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`,
-          {},
-          true
+          { noTimeout: true }
         ),
       {
         retries: 10,
