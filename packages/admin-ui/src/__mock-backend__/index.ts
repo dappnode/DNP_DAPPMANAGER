@@ -71,8 +71,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     {
       portNumber: 8092,
       protocol: PortProtocol.TCP,
-      serviceName: "validator",
-      dnpName: "Prysm"
+      serviceName: "vpn.dnp.dappnode.eth",
+      dnpName: "DAppNodeCore-vpn.dnp.dappnode.eth"
+    },
+    {
+      portNumber: 1194,
+      protocol: PortProtocol.UDP,
+      serviceName: "vpn.dnp.dappnode.eth",
+      dnpName: "DAppNodeCore-vpn.dnp.dappnode.eth"
     }
   ],
   portsUpnpStatusGet: async () => [
