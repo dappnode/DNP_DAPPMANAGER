@@ -1,0 +1,47 @@
+name: Build and Deploy to Netlify
+on:
+  push:
+    branches:
+      - "master"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "pablo/**"
+      - "tropicar/**"
+      - "dapplion/**"
+      - "eduadiaz/**"
+      - "luka/**"
+  pull_request:
+    branches:
+      - "master"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "pablo/**"
+      - "tropicar/**"
+      - "dapplion/**"
+      - "eduadiaz/**"
+      - "luka/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: packages/admin-ui/
+
+    steps:
+      - uses: actions/checkout@v2
+      # Build
+      - run: yarn mock-standalone:build
+      # Deploy
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.1
+        with:
+          publish-dir: "/packages/admin-ui/build"
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
