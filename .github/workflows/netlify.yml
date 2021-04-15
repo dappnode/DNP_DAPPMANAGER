@@ -28,6 +28,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      # Generate schemas
+      - run: yarn generate
       # Build
       - run: yarn mock-standalone:build
       # Deploy
