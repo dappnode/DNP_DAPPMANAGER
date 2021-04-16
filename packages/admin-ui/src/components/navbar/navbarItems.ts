@@ -11,7 +11,8 @@ import {
   MdFolder,
   MdHelp,
   MdDevices,
-  MdDashboard
+  MdDashboard,
+  MdWifi
 } from "react-icons/md";
 // URLs
 import { rootPath as dashboardRootPath } from "pages/dashboard";
@@ -21,6 +22,7 @@ import { rootPath as packagesRootPath } from "pages/packages";
 import { rootPath as systemRootPath } from "pages/system";
 import { rootPath as sdkRootPath } from "pages/sdk";
 import { rootPath as supportRootPath } from "pages/support";
+import { rootPath as wifiRootPath } from "pages/wifi";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -55,6 +57,11 @@ export const sidenavItems: {
     name: "Dashboard",
     href: dashboardRootPath,
     icon: MdDashboard
+  },
+  {
+    name: "Wifi",
+    href: wifiRootPath,
+    icon: MdWifi
   },
   {
     name: "VPN",
