@@ -1,4 +1,4 @@
-import { PortProtocol } from "types";
+import { PortProtocol } from "./types";
 import { bitcoin } from "./bitcoin";
 import { MockDnp } from "./types";
 

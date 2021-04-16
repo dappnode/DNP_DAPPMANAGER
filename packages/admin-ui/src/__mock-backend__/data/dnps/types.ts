@@ -7,6 +7,8 @@ import {
   PackageContainer
 } from "../../../common";
 
+export { PortProtocol } from "../../../common";
+
 export interface MockDnp {
   metadata: PackageReleaseMetadata;
   avatar?: string;
