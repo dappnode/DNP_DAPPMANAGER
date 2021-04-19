@@ -53,3 +53,4 @@ export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export * from "./wireguard";
+export * from "./wifi";
