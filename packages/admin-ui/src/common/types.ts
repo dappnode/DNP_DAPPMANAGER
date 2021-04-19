@@ -32,6 +32,22 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
   exposed: boolean;
 }
 
+// Wifi
+
+export interface WifiReport {
+  containerState: ContainerState;
+  info: string;
+  report?: {
+    lastLog: string;
+    exitCode: number | null;
+  };
+}
+
+export interface CurrentWifiCredentials {
+  ssid: string;
+  password: string;
+}
+
 // Wireguard
 
 export interface WireguardDeviceCredentials {
