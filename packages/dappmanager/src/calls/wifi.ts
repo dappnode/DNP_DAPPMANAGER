@@ -13,7 +13,7 @@ const WIFI_KEY_PASSWORD = "WPA_PASSPHRASE";
  * https://github.com/dappnode/DNP_WIFI/blob/master/build/wlanstart.sh
  */
 async function getWifiLastLog(): Promise<string> {
-  return await logContainer(params.wifiContainerName, { tail: 1 });
+  return await logContainer(params.wifiContainerName, { stderr: true });
 }
 
 /**
@@ -57,15 +57,17 @@ export async function wifiReportGet(): Promise<WifiReport> {
   };
 }
 
-const composeWifi = new ComposeFileEditor(params.wifiDnpName, true);
-
 /**
  * Returns wifi credentials
  */
 export async function wifiCredentialsGet(): Promise<CurrentWifiCredentials> {
+  const composeWifi = new ComposeFileEditor(params.wifiDnpName, true);
   const wifiService = composeWifi.services()[params.wifiDnpName];
   const wifiEnvs = wifiService.getEnvs();
-  if (!wifiEnvs[WIFI_KEY_SSID] || !wifiEnvs[WIFI_KEY_PASSWORD])
+  if (
+    typeof wifiEnvs[WIFI_KEY_SSID] === "undefined" ||
+    typeof wifiEnvs[WIFI_KEY_PASSWORD] === "undefined"
+  )
     throw Error(
       "Wifi SSID and/or Wifi password does not exist on compose file"
     );

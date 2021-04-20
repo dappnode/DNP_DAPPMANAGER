@@ -16,7 +16,7 @@ import Loading from "components/Loading";
 import { withToastNoThrow } from "components/toast/Toast";
 import { InputForm } from "components/InputForm";
 
-export default function WifiCredentials() {
+export default function WifiCredentials(): JSX.Element {
   const wifiCredentials = useApi.wifiCredentialsGet();
 
   const [ssid, setSsid] = useState("");
@@ -62,11 +62,7 @@ export default function WifiCredentials() {
 
   return (
     <>
-      {wifiCredentials.error ? (
-        <ErrorView error={wifiCredentials.error} />
-      ) : wifiCredentials.isValidating ? (
-        <Loading steps={["Loading wifi credentials"]} />
-      ) : wifiCredentials.data ? (
+      {wifiCredentials.data ? (
         <>
           <Card spacing>
             <div>Change the WIFI credentials.</div>
@@ -115,6 +111,10 @@ export default function WifiCredentials() {
             </InputForm>
           </Card>{" "}
         </>
+      ) : wifiCredentials.error ? (
+        <ErrorView error={wifiCredentials.error} />
+      ) : wifiCredentials.isValidating ? (
+        <Loading steps={["Loading wifi credentials"]} />
       ) : null}
     </>
   );

@@ -9,7 +9,7 @@ export const wifi: Pick<Routes, "wifiCredentialsGet" | "wifiReportGet"> = {
       containerState: "exited",
       info: "Wifi service exited due to an internal error",
       report: {
-        lastLog: "[Warning] No interface found after 60s, stopping gracefully",
+        lastLog: `[Warning] No interface found after 60s, stopping gracefully`,
         exitCode: 0
       }
     };
