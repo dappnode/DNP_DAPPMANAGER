@@ -3,4 +3,12 @@ export const rootPath = "/wifi";
 export const title = "Wifi";
 
 // Additional data
-export const maxIdLength = 80;
+
+// SubPaths
+export const wifiCredentialsSubpath = "/credentials";
+export const wifiCredentialsPath = rootPath + wifiCredentialsSubpath;
+
+export const subPaths = {
+  service: "service",
+  credentials: "credentials"
+};

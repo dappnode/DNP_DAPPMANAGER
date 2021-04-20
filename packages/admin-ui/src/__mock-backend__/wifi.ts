@@ -6,8 +6,12 @@ export const wifi: Pick<Routes, "wifiCredentialsGet" | "wifiReportGet"> = {
   },
   wifiReportGet: async () => {
     return {
-      containerState: "running",
-      info: "Wifi is currently running"
+      containerState: "exited",
+      info: "Wifi service exited due to an internal error",
+      report: {
+        lastLog: "[Warning] No interface found after 60s, stopping gracefully",
+        exitCode: 0
+      }
     };
   }
 };

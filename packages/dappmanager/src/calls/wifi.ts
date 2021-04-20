@@ -43,7 +43,7 @@ export async function wifiReportGet(): Promise<WifiReport> {
         "Wifi service dead, you must manually remove it and install it again";
       report = { lastLog: await getWifiLastLog(), exitCode: wifiDnp.exitCode };
     case "exited":
-      info = "Wifi service exited";
+      info = "Wifi service exited due to an internal error";
       report = { lastLog: await getWifiLastLog(), exitCode: wifiDnp.exitCode };
     case "paused":
       info = "Wifi service was paused. Restart wifi to get back access again";

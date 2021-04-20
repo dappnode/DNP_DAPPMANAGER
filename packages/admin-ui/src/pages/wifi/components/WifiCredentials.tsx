@@ -10,7 +10,6 @@ import {
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
-import SubTitle from "components/SubTitle";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 
@@ -20,16 +19,15 @@ import { InputForm } from "components/InputForm";
 export default function WifiCredentials() {
   const wifiCredentials = useApi.wifiCredentialsGet();
 
-  const [ssid, setSsid] = useState(wifiCredentials.data?.ssid || "");
-  const [password, setPassword] = useState(
-    wifiCredentials.data?.password || ""
-  );
+  const [ssid, setSsid] = useState("");
+  const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
 
   useEffect(() => {
-    if (ssid) setSsid(ssid);
-    if (password) setPassword(password);
-  }, [ssid, password]);
+    if (wifiCredentials.data?.ssid) setSsid(wifiCredentials.data.ssid);
+    if (wifiCredentials.data?.password)
+      setPassword(wifiCredentials.data.password);
+  }, [wifiCredentials.data]);
 
   const ssidError =
     validateDockerEnv(ssid, "SSID") || validateMinLength(ssid, "SSID");
@@ -70,7 +68,6 @@ export default function WifiCredentials() {
         <Loading steps={["Loading wifi credentials"]} />
       ) : wifiCredentials.data ? (
         <>
-          <SubTitle>Wifi credentials</SubTitle>
           <Card spacing>
             <div>Change the WIFI credentials.</div>
 
@@ -82,7 +79,7 @@ export default function WifiCredentials() {
                   name: "ssid",
                   autoComplete: "ssid",
                   value: wifiCredentials.data.ssid,
-                  onValueChange: () => setSsid(ssid),
+                  onValueChange: setSsid,
                   error: ssidError
                 },
                 {
@@ -92,7 +89,7 @@ export default function WifiCredentials() {
                   autoComplete: "new-password",
                   secret: true,
                   value: password,
-                  onValueChange: () => setPassword(password),
+                  onValueChange: setPassword,
                   error: passwordError
                 },
                 {
@@ -102,7 +99,7 @@ export default function WifiCredentials() {
                   autoComplete: "new-password",
                   secret: true,
                   value: password2,
-                  onValueChange: () => setPassword2(password2),
+                  onValueChange: setPassword2,
                   error: password2Error
                 }
               ]}
@@ -111,7 +108,7 @@ export default function WifiCredentials() {
                 type="submit"
                 variant="dappnode"
                 disabled={!isValid}
-                onClick={onChangeCredentials}
+                onClick={() => onChangeCredentials}
               >
                 Change credentials
               </Button>
