@@ -1,0 +1,12 @@
+.wifi-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wifi-actions {
+  justify-content: right;
+  button {
+    margin-left: 10px;
+  }
+}
