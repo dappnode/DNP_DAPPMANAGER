@@ -27,11 +27,13 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to your dappnode through the wifi hostpot exposed by your
-      dappnode.
+      Connect to your DAppNode WiFi.
       <ol>
         <li>Scan your local network</li>
-        <li>Connect to the wifi hostpot using your credentials</li>
+        <li>
+          Connect to DAppNodeWifi (check your{" "}
+          <a href="http://my.dappnode/#/wifi/credentials">credentials</a>)
+        </li>
         <li>
           Go to: <a href="http://my.dappnode/#/">http://my.dappnode/#/</a>
         </li>
@@ -48,16 +50,18 @@ function WifiAlert({ wifiReport }: { wifiReport: WifiReport }) {
   return (
     <Alert
       dismissible
-      variant={wifiReport.containerState === "running" ? "success" : "warning"}
+      variant={
+        wifiReport.containerState === ("exited" || "dead") ? "warning" : "info"
+      }
     >
-      <Alert.Heading>Report:</Alert.Heading>
-      <p>
-        {wifiReport.info}.{" "}
-        <RenderMarkdown
-          source={`~~~js\n${wifiReport.report?.lastLog}\n~~~` || ""}
-        />
-      </p>
-      <hr />
+      <Alert.Heading>{wifiReport.info}</Alert.Heading>
+      {wifiReport.report ? (
+        <p>
+          <RenderMarkdown
+            source={`~~~js\n${wifiReport.report.lastLog}. Exit code: ${wifiReport.report.exitCode}\n~~~`}
+          />
+        </p>
+      ) : null}
     </Alert>
   );
 }
@@ -149,8 +153,12 @@ export default function WifiService(): JSX.Element {
               ></Switch>
             </div>
           </div>
-          <hr />
-          <WifiAlert wifiReport={wifiReport.data} />
+          {wifiReport.data.containerState !== "running" ? (
+            <>
+              <hr />
+              <WifiAlert wifiReport={wifiReport.data} />
+            </>
+          ) : null}
         </Card>
       ) : wifiReport.error ? (
         <ErrorView error={wifiReport.error} />
