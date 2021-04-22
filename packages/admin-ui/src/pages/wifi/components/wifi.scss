@@ -10,3 +10,17 @@
     margin-left: 10px;
   }
 }
+
+.wifi-report {
+  button {
+    &:hover,
+    &:focus,
+    &:active {
+      outline: none;
+      box-shadow: none;
+      background: #fff;
+      color: #6c757d;
+    }
+    border: none;
+  }
+}

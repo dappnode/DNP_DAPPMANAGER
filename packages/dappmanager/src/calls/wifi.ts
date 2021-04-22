@@ -19,6 +19,9 @@ export async function wifiReportGet(): Promise<WifiReport> {
       `Wifi is not present. Container name: ${params.wifiContainerName}`
     );
 
+  // exitCode 0 means that wifi package was manually stopped. No errors
+  if (wifiDnp.exitCode === 0) wifiDnp.state === "paused";
+
   let report;
   let info = "";
 
@@ -85,9 +88,5 @@ async function getWifiLastLog(): Promise<string> {
 }
 
 function parseWifiLogs(lastLog: string): string {
-  // There are three exit logs defined in the wifi container
-  // https://github.com/dappnode/DNP_WIFI/blob/00685cf6160df4b8daeabd77246cb0af04a513f8/build/wlanstart.sh#L5
-  // https://github.com/dappnode/DNP_WIFI/blob/00685cf6160df4b8daeabd77246cb0af04a513f8/build/wlanstart.sh#L34
-  // https://github.com/dappnode/DNP_WIFI/blob/00685cf6160df4b8daeabd77246cb0af04a513f8/build/wlanstart.sh#L52
-  return lastLog.replace(/\[.*?\]/g, ""); // Replace [warning], [error], etc
+  return lastLog.replace(/\[.*?\]/g, ""); // Remove [warning], [error], etc
 }

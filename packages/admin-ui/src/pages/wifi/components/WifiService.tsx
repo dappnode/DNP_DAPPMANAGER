@@ -1,14 +1,17 @@
 // React
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 // Own components
 import Card from "components/Card";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 import Switch from "components/Switch";
+import Button from "components/Button";
+import RenderMarkdown from "components/RenderMarkdown";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 // External components
+import { Collapse } from "react-bootstrap";
 import Badge from "react-bootstrap/esm/Badge";
 import Alert from "react-bootstrap/esm/Alert";
 // API
@@ -19,7 +22,7 @@ import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { ContainerState, WifiReport } from "types";
 // css
 import "./wifi.scss";
-import RenderMarkdown from "components/RenderMarkdown";
+import { BsChevronContract, BsChevronExpand } from "react-icons/bs";
 
 const wifiDnpName = "wifi.dnp.dappnode.eth";
 
@@ -27,7 +30,7 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to your DAppNode WiFi.
+      Connect to your DAppNode Wi-Fi.
       <ol>
         <li>Scan your local network</li>
         <li>
@@ -47,29 +50,43 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
 }
 
 function WifiAlert({ wifiReport }: { wifiReport: WifiReport }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Alert
-      dismissible
-      variant={
-        wifiReport.containerState === ("exited" || "dead") ? "warning" : "info"
-      }
-    >
-      <Alert.Heading>{wifiReport.info}</Alert.Heading>
-      {wifiReport.report ? (
-        <p>
-          <RenderMarkdown
-            source={`~~~js\n${wifiReport.report.lastLog}. Exit code: ${wifiReport.report.exitCode}\n~~~`}
-          />
-        </p>
-      ) : null}
-    </Alert>
+    <>
+      <Button
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        Icon={open ? BsChevronContract : BsChevronExpand}
+      ></Button>
+      <Collapse in={open}>
+        <div>
+          <Alert
+            variant={
+              wifiReport.containerState === ("exited" || "dead")
+                ? "warning"
+                : "info"
+            }
+          >
+            <Alert.Heading>{wifiReport.info}</Alert.Heading>
+            {wifiReport.report ? (
+              <p>
+                <RenderMarkdown
+                  source={`~~~js\n${wifiReport.report.lastLog}. Exit code: ${wifiReport.report.exitCode}\n~~~`}
+                />
+              </p>
+            ) : null}
+          </Alert>
+        </div>
+      </Collapse>
+    </>
   );
 }
 
 function WifiStatus({ wifiStatus }: { wifiStatus: ContainerState }) {
   return (
     <h4>
-      Wifi status{" "}
+      Status{" "}
       <Badge
         variant={
           wifiStatus === "running"
@@ -142,6 +159,7 @@ export default function WifiService(): JSX.Element {
           <hr />
           <div className="wifi-status">
             <WifiStatus wifiStatus={wifiReport.data.containerState} />
+
             <div className="wifi-actions">
               <Switch
                 highlightOnHover
@@ -153,12 +171,11 @@ export default function WifiService(): JSX.Element {
               ></Switch>
             </div>
           </div>
-          {wifiReport.data.containerState !== "running" ? (
-            <>
-              <hr />
+          <div className="wifi-report">
+            {wifiReport.data.containerState !== "running" ? (
               <WifiAlert wifiReport={wifiReport.data} />
-            </>
-          ) : null}
+            ) : null}
+          </div>
         </Card>
       ) : wifiReport.error ? (
         <ErrorView error={wifiReport.error} />

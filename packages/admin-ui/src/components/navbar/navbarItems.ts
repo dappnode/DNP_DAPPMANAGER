@@ -59,7 +59,7 @@ export const sidenavItems: {
     icon: MdDashboard
   },
   {
-    name: "Wifi",
+    name: "Wi-Fi",
     href: wifiRootPath,
     icon: MdWifi
   },

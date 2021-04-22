@@ -9,11 +9,8 @@ export const wifi: Pick<Routes, "wifiCredentialsGet" | "wifiReportGet"> = {
       containerState: "exited",
       info: "Wifi service exited due to an internal error",
       report: {
-        lastLog: "[Warning] No interface found after 60s, stopping gracefully".replace(
-          /\[.*?\]/g,
-          ""
-        ),
-        exitCode: 0
+        lastLog: "[Error] any wifi error".replace(/\[.*?\]/g, ""),
+        exitCode: 57
       }
     };
   }
