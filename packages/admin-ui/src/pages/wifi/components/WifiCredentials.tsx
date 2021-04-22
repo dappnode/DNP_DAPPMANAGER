@@ -74,7 +74,7 @@ export default function WifiCredentials(): JSX.Element {
                   labelId: "ssid",
                   name: "ssid",
                   autoComplete: "ssid",
-                  value: wifiCredentials.data.ssid,
+                  value: ssid,
                   onValueChange: setSsid,
                   error: ssidError
                 },
