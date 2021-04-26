@@ -2,29 +2,29 @@ import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink } from "react-router-dom";
 // Own module
-import { title, maxIdLength, rootPath } from "../data";
-import coerceDeviceName from "../helpers/coerceDeviceName";
+import { maxIdLength, rootPath } from "../../data";
+import coerceDeviceName from "../../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
-import Title from "components/Title";
 import Card from "components/Card";
+import Switch from "components/Switch";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
 // Icons
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 import { urlJoin } from "utils/url";
 
-export function WireguardDevicesHome() {
+export default function OpenVpnDevicesHome() {
   const [input, setInput] = useState("");
-  const devicesReq = useApi.wireguardDevicesGet();
+  const devicesReq = useApi.devicesList();
 
   // Actions
 
   function addDevice(id: string) {
-    withToastNoThrow(() => api.wireguardDeviceAdd(id), {
+    withToastNoThrow(() => api.deviceAdd({ id }), {
       message: `Adding ${id}...`,
       onSuccess: `Added ${id}`
     }).then(devicesReq.revalidate);
@@ -36,11 +36,36 @@ export function WireguardDevicesHome() {
       text: "The user using this device will lose access to this DAppNode ",
       label: "Remove",
       onClick: () =>
-        withToastNoThrow(() => api.wireguardDeviceRemove(id), {
+        withToastNoThrow(() => api.deviceRemove({ id }), {
           message: `Removing ${id}...`,
           onSuccess: `Removed ${id}`
         }).then(devicesReq.revalidate)
     });
+  }
+
+  function resetDevice(id: string) {
+    const isMainAdmin = id === MAIN_ADMIN_NAME;
+    confirm({
+      title: isMainAdmin
+        ? `WARNING! Reseting main admin`
+        : `Reseting ${id} device`,
+      text: isMainAdmin
+        ? "You should only reset the credentials of the main admin if you suspect an unwanted party gained access to this credentials. If that is the case, reset the credentials, BUT download and install the new credentials IMMEDIATELY. Otherwise, you will lose access to your DAppNode when this connection stops"
+        : "All profiles and links pointing to this device will no longer be valid",
+      label: `Reset`,
+      onClick: () =>
+        withToastNoThrow(() => api.deviceReset({ id }), {
+          message: `Reseting ${id}...`,
+          onSuccess: `Reseted ${id}`
+        }).then(devicesReq.revalidate)
+    });
+  }
+
+  function toggleAdmin(id: string, isAdmin: boolean) {
+    withToastNoThrow(() => api.deviceAdminToggle({ id, isAdmin }), {
+      message: `${isAdmin ? "Making" : "Revoking"} ${id} admin...`,
+      onSuccess: `${isAdmin ? "Made" : "Revoked"} ${id} admin`
+    }).then(devicesReq.revalidate);
   }
 
   // Input errors
@@ -51,7 +76,10 @@ export function WireguardDevicesHome() {
 
   return (
     <>
-      <Title title={title} />
+      <p>
+        Create a VPN profile for each of your devices (laptop, phone) so you can
+        access your DAppNode from an external network
+      </p>
 
       <Input
         placeholder="Device's unique name"
@@ -78,21 +106,34 @@ export function WireguardDevicesHome() {
       ))}
 
       {renderResponse(devicesReq, ["Loading devices"], data => (
-        <Card className="list-grid wireguard">
+        <Card className="list-grid devices">
           <header>Name</header>
           <header className="center">Credentials</header>
+          <header>Admin</header>
+          <header>Reset</header>
           <header>Remove</header>
           {[...data]
             // Sort main admin device as first
-            .sort(d1 => (d1 === MAIN_ADMIN_NAME ? -1 : 0))
-            .map(id => (
+            .sort(d1 => (d1.id === MAIN_ADMIN_NAME ? -1 : 0))
+            .map(({ id, admin }) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
                 <NavLink to={urlJoin(rootPath, id)} className="no-a-style">
                   <Button className="get-link">Get</Button>
                 </NavLink>
 
-                <MdDelete onClick={() => removeDevice(id)} />
+                <Switch
+                  checked={admin}
+                  onToggle={() => toggleAdmin(id, !admin)}
+                />
+                <MdRefresh
+                  style={{ fontSize: "1.05rem" }}
+                  onClick={() => resetDevice(id)}
+                />
+                <MdDelete
+                  className={admin ? "disabled" : ""}
+                  onClick={() => (admin ? null : removeDevice(id))}
+                />
                 <hr />
               </React.Fragment>
             ))}
