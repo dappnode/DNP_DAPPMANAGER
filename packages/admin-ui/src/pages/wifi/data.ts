@@ -9,6 +9,6 @@ export const wifiCredentialsSubpath = "/credentials";
 export const wifiCredentialsPath = rootPath + wifiCredentialsSubpath;
 
 export const subPaths = {
-  service: "service",
+  status: "status",
   credentials: "credentials"
 };

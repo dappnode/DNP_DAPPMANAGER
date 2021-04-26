@@ -11,21 +11,21 @@ const WIFI_KEY_PASSWORD = "WPA_PASSPHRASE";
  * Return wifi report
  */
 export async function wifiReportGet(): Promise<WifiReport> {
-  const wifiDnp = await listContainer({
+  const wifiContainer = await listContainer({
     containerName: params.wifiContainerName
   });
-  if (!wifiDnp)
+  if (!wifiContainer)
     throw Error(
       `Wifi is not present. Container name: ${params.wifiContainerName}`
     );
 
   // exitCode 0 means that wifi package was manually stopped. No errors
-  if (wifiDnp.exitCode === 0) wifiDnp.state === "paused";
+  if (wifiContainer.exitCode === 0) wifiContainer.state === "paused";
 
   let report;
   let info = "";
 
-  switch (wifiDnp.state) {
+  switch (wifiContainer.state) {
     case "created":
       info = "Wifi has not been initialized yet";
     case "running":
@@ -37,20 +37,20 @@ export async function wifiReportGet(): Promise<WifiReport> {
         "Wifi service dead, you must manually remove it and install it again";
       report = {
         lastLog: parseWifiLogs(await getWifiLastLog()),
-        exitCode: wifiDnp.exitCode
+        exitCode: wifiContainer.exitCode
       };
     case "exited":
       info = "Wifi service exited due to an internal error";
       report = {
         lastLog: parseWifiLogs(await getWifiLastLog()),
-        exitCode: wifiDnp.exitCode
+        exitCode: wifiContainer.exitCode
       };
     case "paused":
       info = "Wifi service is paused. Restart wifi to get back access again";
   }
 
   return {
-    containerState: wifiDnp.state,
+    wifiContainer,
     info,
     report
   };

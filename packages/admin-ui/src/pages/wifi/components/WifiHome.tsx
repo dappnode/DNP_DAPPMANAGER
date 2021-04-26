@@ -10,15 +10,15 @@ import {
 import { title, subPaths } from "../data";
 // Components
 import Title from "components/Title";
-import WifiService from "./WifiService";
+import WifiStatus from "./WifiStatus";
 import WifiCredentials from "./WifiCredentials";
 
 const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
   const availableRoutes = [
     {
-      name: "Service",
-      subPath: subPaths.service,
-      component: WifiService
+      name: "Status",
+      subPath: subPaths.status,
+      component: WifiStatus
     },
     {
       name: "Credentials",
@@ -62,13 +62,3 @@ const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
 };
 
 export default WifiHome;
-
-// Brief introduction
-// Allow to change restart policy?
-// Show wifi status (if no running show why)
-// Show wifi creds and settings (setupwizard)
-// Allow to change wifi credentials
-// Add default dappnode wifi hostpot credentials somewhere
-// Add explanation of: internalIP === externalIP
-
-// issue stop avahi daemon (it exposes UI in internal network port 80)

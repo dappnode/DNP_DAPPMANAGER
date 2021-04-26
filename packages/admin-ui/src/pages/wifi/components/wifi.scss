@@ -1,26 +1,47 @@
-.wifi-status {
+.wifi {
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 
-.wifi-actions {
-  justify-content: right;
-  switch {
+.wifi-status {
+  .wifi-status-icon {
     margin-left: 10px;
+    font-size: larger;
+  }
+  .wifi-status-name {
+    color: inherit;
+    margin-left: 10px;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    overflow-wrap: normal;
+  }
+  .wifi-status-name:hover {
+    color: var(--dappnode-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
   }
 }
 
-.wifi-report {
-  button {
-    &:hover,
-    &:focus,
-    &:active {
-      outline: none;
-      box-shadow: none;
-      background: #fff;
-      color: #6c757d;
-    }
-    border: none;
+.wifi-actions {
+  align-content: flex-end;
+  switch {
+    opacity: 1;
   }
+}
+
+.error-stack {
+  /* Spacing */
+  padding: 0.5rem;
+  /* Box styling */
+  border: solid 1px #d3d3d396;
+  border-radius: 5px;
+  background-color: #f5f5f552;
+  /* Text styling */
+  display: block;
+  white-space: pre;
+  font-size: 75%;
+  font-family: "Inconsolata", monospace;
+  overflow: auto;
+  max-height: 500px;
 }
