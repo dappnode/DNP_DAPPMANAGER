@@ -11,14 +11,19 @@ import Input from "components/Input";
 import Card from "components/Card";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
+import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 import { urlJoin } from "utils/url";
+// Params
+import { wireguardDnpName } from "params";
+import { rootPath as installedRootPath } from "pages/installer";
 
 export function WireguardDevicesHome() {
   const [input, setInput] = useState("");
   const devicesReq = useApi.wireguardDevicesGet();
+  const dnpsRequest = useApi.packagesGet();
 
   // Actions
 
@@ -43,17 +48,28 @@ export function WireguardDevicesHome() {
   }
 
   // Input errors
-
   const errors: string[] = [];
   if (input.length > maxIdLength)
     errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
+  // Helper UI in case the Wireguard client is bad
+  if (dnpsRequest.data) {
+    const wireguardDnp = dnpsRequest.data.find(
+      dnp => dnp.dnpName === wireguardDnpName
+    );
+    if (!wireguardDnp) {
+      const url = `${installedRootPath}/${wireguardDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the Wireguard client</NavLink> to
+          use this feature
+        </Alert>
+      );
+    }
+  }
+
   return (
     <>
-      <p>
-        Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your DAppNode from an external network
-      </p>
       <Input
         placeholder="Device's unique name"
         value={input}

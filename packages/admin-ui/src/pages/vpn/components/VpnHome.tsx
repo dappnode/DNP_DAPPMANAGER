@@ -43,6 +43,11 @@ const VpnHome: React.FC<RouteComponentProps> = ({ match }) => {
         ))}
       </div>
 
+      <p>
+        Create a VPN profile for each of your devices (laptop, phone) so you can
+        access your DAppNode from an external network
+      </p>
+
       <div className="section-spacing">
         <Switch>
           {availableRoutes.map(route => (

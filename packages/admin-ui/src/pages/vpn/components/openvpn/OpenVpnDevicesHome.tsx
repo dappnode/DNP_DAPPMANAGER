@@ -12,14 +12,19 @@ import Card from "components/Card";
 import Switch from "components/Switch";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
+import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 import { urlJoin } from "utils/url";
+// Params
+import { vpnDnpName } from "params";
+import { rootPath as installedRootPath } from "pages/installer";
 
 export default function OpenVpnDevicesHome() {
   const [input, setInput] = useState("");
   const devicesReq = useApi.devicesList();
+  const dnpsRequest = useApi.packagesGet();
 
   // Actions
 
@@ -69,18 +74,26 @@ export default function OpenVpnDevicesHome() {
   }
 
   // Input errors
-
   const errors: string[] = [];
   if (input.length > maxIdLength)
     errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
+  // Helper UI in case the OpenVpn client is bad
+  if (dnpsRequest.data) {
+    const vpnDnp = dnpsRequest.data.find(dnp => dnp.dnpName === vpnDnpName);
+    if (!vpnDnp) {
+      const url = `${installedRootPath}/${vpnDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the OpenVPN client</NavLink> to use
+          this feature
+        </Alert>
+      );
+    }
+  }
+
   return (
     <>
-      <p>
-        Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your DAppNode from an external network
-      </p>
-
       <Input
         placeholder="Device's unique name"
         value={input}
