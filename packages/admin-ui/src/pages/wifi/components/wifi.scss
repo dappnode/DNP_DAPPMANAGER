@@ -1,32 +1,25 @@
-.wifi {
+.wifi-status-actions-row {
   display: flex;
   justify-content: space-between;
-}
 
-.wifi-status {
-  .wifi-status-icon {
-    margin-left: 10px;
-    font-size: larger;
-  }
-  .wifi-status-name {
-    color: inherit;
-    margin-left: 10px;
-    white-space: nowrap;
-    width: 100%;
-    overflow: hidden;
-    overflow-wrap: normal;
-  }
-  .wifi-status-name:hover {
-    color: var(--dappnode-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-}
-
-.wifi-actions {
-  align-content: flex-end;
-  switch {
-    opacity: 1;
+  .wifi-status-container {
+    > *:not(:last-child) {
+      margin-right: 10px;
+    }
+    .wifi-status-icon {
+      font-size: 140%;
+    }
+    .wifi-status-name {
+      color: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      overflow-wrap: normal;
+    }
+    .wifi-status-name:hover {
+      color: var(--dappnode-color);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
   }
 }
 

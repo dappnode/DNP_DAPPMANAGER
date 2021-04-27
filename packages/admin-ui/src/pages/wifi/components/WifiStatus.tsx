@@ -112,8 +112,8 @@ export default function WifiStatus(): JSX.Element {
         <Card spacing>
           <WifiInfo wifiStatus={wifiReport.data.wifiContainer.state} />
           <hr />
-          <div className="wifi">
-            <div className="wifi-status">
+          <div className="wifi-status-actions-row">
+            <div className="wifi-status-container">
               <StateBadgeContainer container={wifiReport.data.wifiContainer} />
               <MdWifi className="wifi-status-icon" />
               <NavLink
