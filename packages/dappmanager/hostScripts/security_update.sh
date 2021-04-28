@@ -43,7 +43,7 @@ function pre_update () {
   fi
 
   # Create security.sources.list
-  grep security "$FILE_SOURCES_LIST" | tee "$FILE_SECURITY_SOURCES_LIST" || echo "error creating file $FILE_SECURITY_SOURCES_LIST" && exit 1
+  grep security "$FILE_SOURCES_LIST" | tee "$FILE_SECURITY_SOURCES_LIST" > /dev/null || { echo "error creating file $FILE_SECURITY_SOURCES_LIST" ; exit 1; }
 
   # Prevent docker packages from been updated if docker installed via repositories
   if [ "$DOCKER_INSTALLATION_REPOSITORIES" = true ] ; then
@@ -60,8 +60,8 @@ function pre_update () {
 ##################
 
 function update () {
-  apt-get update -y > /dev/null || echo "error on apt-get update" && exit 1
-  apt-get upgrade -y -o "Dir::Etc::SourceList=$FILE_SECURITY_SOURCES_LIST" > /dev/null || echo "error on apt-get upgrade" && exit 1
+  apt-get update -y > /dev/null || { echo "error on apt-get update" ; exit 1; }
+  apt-get upgrade -y -o "Dir::Etc::SourceList=$FILE_SECURITY_SOURCES_LIST" > /dev/null || { echo "error on apt-get upgrade" ; exit 1; }
 }
 
 ###############
@@ -91,21 +91,22 @@ function post_upgrade_restart () {
   # in order for the security update to be useful. Otherwise, you will still be running the old (and vulnerable) kernel image"
 
   # Install needrestart: https://manpages.debian.org/testing/needrestart/needrestart.1.en.html
-  if ! command -v sudo needrestart &> /dev/null; then
-    sudo apt-get install -y needrestart > /dev/null || echo "Security updates have been executed successfully, error installing needrestart" && exit 1
+  if ! command -v needrestart &> /dev/null; then
+    sudo apt-get install -y needrestart > /dev/null || { echo "Security updates have been executed successfully, error installing needrestart" ; exit 1; }
   fi
 
   # Restart required services
-  sudo needrestart -r a -q > /dev/null || echo "Security updates have been executed successfully, error restarting services" && exit 1
+  sudo needrestart -r a -q > /dev/null || { echo "Security updates have been executed successfully, error restarting services" ; exit 1; }
 
-  # Reboot if still needed
+  # Reboot if still needed => need to be fixed
   NEEDS_TO_BE_RESTARTED=$(sudo needrestart -r l -q)
   if [ ! -z "$NEEDS_TO_BE_RESTARTED" ]; then
     echo "Security updates have been executed successfully, a reboot is needed to implement such updates"
     exit 0
   fi
 
-  echo "Security updates have been executed successfully, no reboot needed" && exit 0
+  echo "Security updates have been executed successfully, no reboot needed"
+  exit 0
 }
 
 ###########
