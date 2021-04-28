@@ -1,5 +1,4 @@
-import { PortProtocol } from "./types";
-import { MockDnp } from "./types";
+import { MockDnp, PortProtocol } from "./types";
 
 const dnpName = "open-ethereum.dnp.dappnode.eth";
 const serviceName = dnpName;

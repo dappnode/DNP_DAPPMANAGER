@@ -15,6 +15,11 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 // Types
 import { ContainerState, WifiReport } from "types";
+import {
+  dappnodeConnectWifi,
+  dappnodeWifiCredentials,
+  wifiDnpName
+} from "./../../../params";
 // css
 import "./wifi.scss";
 import { StateBadgeContainer } from "pages/packages/components/StateBadge";
@@ -22,21 +27,16 @@ import { MdWifi } from "react-icons/md";
 // Utils
 import { prettyDnpName } from "utils/format";
 
-const wifiDnpName = "wifi.dnp.dappnode.eth";
-
 function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
       Connect to the Wi-Fi hostpot exposed by your DAppNode using your{" "}
-      <a href="http://my.dappnode/#/wifi/credentials">credentials</a>. More
-      information available at:{" "}
-      <a href="https://docs.dappnode.io/connect/#via-wifi">
-        https://docs.dappnode.io/connect/#via-wifi
-      </a>
+      <a href={dappnodeWifiCredentials}>credentials</a>. More information
+      available at: <a href={dappnodeConnectWifi}>{dappnodeConnectWifi}</a>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
-        ? "Local an public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."
+        ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."
         : null}
     </p>
   );
@@ -59,6 +59,7 @@ function WifiLog({ wifiReport }: { wifiReport: WifiReport }) {
 
 export default function WifiStatus(): JSX.Element {
   const wifiReport = useApi.wifiReportGet();
+  const wifiDnp = useApi.packageGet({ dnpName: wifiDnpName });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -71,8 +72,8 @@ export default function WifiStatus(): JSX.Element {
 
   async function pauseWifi(): Promise<void> {
     try {
-      if (wifiReport.data) {
-        if (wifiReport.data.wifiContainer.state === "running")
+      if (wifiDnp.data) {
+        if (wifiDnp.data.containers[0].state === "running")
           await new Promise<void>(resolve => {
             confirm({
               title: `Pause wifi service`,
@@ -89,11 +90,11 @@ export default function WifiStatus(): JSX.Element {
           ),
           {
             message:
-              wifiReport.data.wifiContainer.state === "running"
+              wifiDnp.data.containers[0].state === "running"
                 ? "Pausing wifi"
                 : "Starting wifi",
             onSuccess:
-              wifiReport.data.wifiContainer.state === "running"
+              wifiDnp.data.containers[0].state === "running"
                 ? "Paused wifi"
                 : "Started wifi"
           }
@@ -108,41 +109,39 @@ export default function WifiStatus(): JSX.Element {
 
   return (
     <>
-      {wifiReport.data ? (
+      {wifiDnp.data ? (
         <Card spacing>
-          <WifiInfo wifiStatus={wifiReport.data.wifiContainer.state} />
+          <WifiInfo wifiStatus={wifiDnp.data.containers[0].state} />
           <hr />
           <div className="wifi-status-actions-row">
             <div className="wifi-status-container">
-              <StateBadgeContainer container={wifiReport.data.wifiContainer} />
+              <StateBadgeContainer container={wifiDnp.data.containers[0]} />
               <MdWifi className="wifi-status-icon" />
               <NavLink
                 className="wifi-status-name"
                 to="http://my.dappnode/#/packages/wifi.dnp.dappnode.eth"
               >
-                {prettyDnpName(wifiReport.data.wifiContainer.dnpName)}
+                {prettyDnpName(wifiDnpName)}
               </NavLink>
             </div>
             <div className="wifi-actions">
               <Switch
-                checked={wifiReport.data.wifiContainer.state === "running"}
+                checked={wifiDnp.data.containers[0].state === "running"}
                 onToggle={pauseWifi}
                 label={
-                  wifiReport.data.wifiContainer.state === "running"
-                    ? "On"
-                    : "Off"
+                  wifiDnp.data.containers[0].state === "running" ? "On" : "Off"
                 }
               ></Switch>
             </div>
           </div>
 
-          {wifiReport.data.wifiContainer.state !== "running" ? (
+          {wifiDnp.data.containers[0].state !== "running" && wifiReport.data ? (
             <WifiLog wifiReport={wifiReport.data} />
           ) : null}
         </Card>
-      ) : wifiReport.error ? (
-        <ErrorView error={wifiReport.error} />
-      ) : wifiReport.isValidating ? (
+      ) : wifiDnp.error ? (
+        <ErrorView error={wifiDnp.error} />
+      ) : wifiDnp.isValidating ? (
         <Loading steps={["Loading wifi service"]} />
       ) : null}
     </>

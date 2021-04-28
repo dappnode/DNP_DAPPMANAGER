@@ -4,9 +4,6 @@ import { listContainer } from "../modules/docker/list";
 import { CurrentWifiCredentials, WifiReport } from "../types";
 import params from "../params";
 
-const WIFI_KEY_SSID = "SSID";
-const WIFI_KEY_PASSWORD = "WPA_PASSPHRASE";
-
 /**
  * Return wifi report
  */
@@ -14,10 +11,7 @@ export async function wifiReportGet(): Promise<WifiReport> {
   const wifiContainer = await listContainer({
     containerName: params.wifiContainerName
   });
-  if (!wifiContainer)
-    throw Error(
-      `Wifi is not present. Container name: ${params.wifiContainerName}`
-    );
+  if (!wifiContainer) throw Error(`Wifi not installed`);
 
   // exitCode 0 means that wifi package was manually stopped. No errors
   if (wifiContainer.exitCode === 0) wifiContainer.state === "paused";
@@ -50,7 +44,6 @@ export async function wifiReportGet(): Promise<WifiReport> {
   }
 
   return {
-    wifiContainer,
     info,
     report
   };
@@ -64,15 +57,15 @@ export async function wifiCredentialsGet(): Promise<CurrentWifiCredentials> {
   const wifiService = composeWifi.services()[params.wifiDnpName];
   const wifiEnvs = wifiService.getEnvs();
   if (
-    typeof wifiEnvs[WIFI_KEY_SSID] === "undefined" ||
-    typeof wifiEnvs[WIFI_KEY_PASSWORD] === "undefined"
+    wifiEnvs[params.WIFI_KEY_SSID] === undefined ||
+    wifiEnvs[params.WIFI_KEY_PASSWORD] === undefined
   )
     throw Error(
       "Wifi SSID and/or Wifi password does not exist on compose file"
     );
   return {
-    ssid: wifiEnvs[WIFI_KEY_SSID],
-    password: wifiEnvs[WIFI_KEY_PASSWORD]
+    ssid: wifiEnvs[params.WIFI_KEY_SSID],
+    password: wifiEnvs[params.WIFI_KEY_PASSWORD]
   };
 }
 
@@ -84,7 +77,10 @@ export async function wifiCredentialsGet(): Promise<CurrentWifiCredentials> {
  * https://github.com/dappnode/DNP_WIFI/blob/master/build/wlanstart.sh
  */
 async function getWifiLastLog(): Promise<string> {
-  return await logContainer(params.wifiContainerName, { stderr: true });
+  return await logContainer(params.wifiContainerName, {
+    stderr: true,
+    tail: 1
+  });
 }
 
 function parseWifiLogs(lastLog: string): string {

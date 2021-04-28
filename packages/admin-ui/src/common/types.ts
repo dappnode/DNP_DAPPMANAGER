@@ -35,7 +35,6 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
 // Wifi
 
 export interface WifiReport {
-  wifiContainer: PackageContainer;
   info: string;
   report?: {
     lastLog: string;
