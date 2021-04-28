@@ -78,15 +78,15 @@ export default function OpenVpnDevicesHome() {
   if (input.length > maxIdLength)
     errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
-  // Helper UI in case the OpenVpn client is bad
+  // If the OpenVPN package (known as vpn) is not installed, invite the user to install it
   if (dnpsRequest.data) {
     const vpnDnp = dnpsRequest.data.find(dnp => dnp.dnpName === vpnDnpName);
     if (!vpnDnp) {
       const url = `${installedRootPath}/${vpnDnpName}`;
       return (
         <Alert variant="secondary">
-          You must <NavLink to={url}>install the OpenVPN client</NavLink> to use
-          this feature
+          You must <NavLink to={url}>install the OpenVPN package</NavLink> to
+          use this feature
         </Alert>
       );
     }

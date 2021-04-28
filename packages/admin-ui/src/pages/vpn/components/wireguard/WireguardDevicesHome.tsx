@@ -52,7 +52,7 @@ export function WireguardDevicesHome() {
   if (input.length > maxIdLength)
     errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
-  // Helper UI in case the Wireguard client is bad
+  // If the wireguard package is not installed, invite the user to install it
   if (dnpsRequest.data) {
     const wireguardDnp = dnpsRequest.data.find(
       dnp => dnp.dnpName === wireguardDnpName
@@ -61,7 +61,7 @@ export function WireguardDevicesHome() {
       const url = `${installedRootPath}/${wireguardDnpName}`;
       return (
         <Alert variant="secondary">
-          You must <NavLink to={url}>install the Wireguard client</NavLink> to
+          You must <NavLink to={url}>install the Wireguard package</NavLink> to
           use this feature
         </Alert>
       );
