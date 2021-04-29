@@ -3,7 +3,7 @@ import { NavLink, RouteComponentProps } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, title } from "../data";
+import { rootPath, title } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Card from "components/Card";

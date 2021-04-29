@@ -1,5 +1,5 @@
-import coerceDeviceName from "../../../../pages/devices/helpers/coerceDeviceName";
-import { maxIdLength } from "../../../../pages/devices/data";
+import coerceDeviceName from "../../../../pages/vpn/helpers/coerceDeviceName";
+import { maxIdLength } from "../../../../pages/vpn/data";
 
 describe("devices > helpers > coerceDeviceName", () => {
   it("Should remove non-alphanumeric characters", () => {

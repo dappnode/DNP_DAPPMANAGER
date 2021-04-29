@@ -4,7 +4,7 @@ import { NavLink, Route, RouteComponentProps } from "react-router-dom";
 import { wireguardDnpName } from "params";
 import { rootPath as installedRootPath } from "pages/installer";
 import { urlJoin } from "utils/url";
-import { title } from "../data";
+import { title } from "../../data";
 // Components
 import Alert from "react-bootstrap/esm/Alert";
 import { renderResponse } from "components/SwrRender";
