@@ -1,0 +1,15 @@
+.carousel-control-next,
+.carousel-control-prev {
+  filter: invert(100%);
+}
+
+.carousel-indicators {
+  visibility: hidden;
+}
+
+.card-text {
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 60px;
+  margin-inline-end: 60px;
+}
