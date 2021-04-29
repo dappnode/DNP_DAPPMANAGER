@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   NavLink,
   Switch,
@@ -6,26 +6,38 @@ import {
   Redirect,
   RouteComponentProps
 } from "react-router-dom";
+import { useApi } from "api";
 import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
 import { WireguardDevicesRoot } from "./wireguard/WireguardDevicesRoot";
-
-// Components
 import Title from "components/Title";
+import { vpnDnpName, wireguardDnpName } from "params";
 
-const VpnHome: React.FC<RouteComponentProps> = ({ match }) => {
-  const availableRoutes = [
-    {
-      name: "OpenVpn",
-      subPath: subPaths.openVpn,
-      component: OpenVpnDevicesRoot
-    },
-    {
-      name: "Wireguard",
-      subPath: subPaths.wireguard,
-      component: WireguardDevicesRoot
-    }
-  ];
+export function VpnHome({ match }: RouteComponentProps) {
+  const dnpsRequest = useApi.packagesGet();
+  const availableRoutes = useMemo(() => {
+    const dnpsSet = dnpsRequest.data
+      ? new Set(dnpsRequest.data.map(dnp => dnp.dnpName))
+      : new Set<string>();
+
+    return [
+      {
+        name: "OpenVpn",
+        subPath: subPaths.openVpn,
+        component: OpenVpnDevicesRoot,
+        installed: dnpsSet.has(vpnDnpName)
+      },
+      {
+        name: "Wireguard",
+        subPath: subPaths.wireguard,
+        component: WireguardDevicesRoot,
+        installed: dnpsSet.has(wireguardDnpName)
+      }
+    ].sort((a, b) =>
+      a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0
+    );
+  }, [dnpsRequest.data]);
+
   return (
     <>
       <Title title={title} />
@@ -64,6 +76,4 @@ const VpnHome: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
     </>
   );
-};
-
-export default VpnHome;
+}
