@@ -1,0 +1,40 @@
+.wifi-status-actions-row {
+  display: flex;
+  justify-content: space-between;
+
+  .wifi-status-container {
+    > *:not(:last-child) {
+      margin-right: 10px;
+    }
+    .wifi-status-icon {
+      font-size: 140%;
+    }
+    .wifi-status-name {
+      color: inherit;
+      white-space: nowrap;
+      overflow: hidden;
+      overflow-wrap: normal;
+    }
+    .wifi-status-name:hover {
+      color: var(--dappnode-color);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+  }
+}
+
+.error-stack {
+  /* Spacing */
+  padding: 0.5rem;
+  /* Box styling */
+  border: solid 1px #d3d3d396;
+  border-radius: 5px;
+  background-color: #f5f5f552;
+  /* Text styling */
+  display: block;
+  white-space: pre;
+  font-size: 75%;
+  font-family: "Inconsolata", monospace;
+  overflow: auto;
+  max-height: 500px;
+}

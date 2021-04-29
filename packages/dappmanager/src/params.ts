@@ -200,6 +200,10 @@ const params = {
   STATIC_IP_PATH: "/usr/src/app/config/static_ip",
   VPNDB_PATH: "/usr/src/app/secrets/vpndb.json",
 
+  // Wi-Fi ENVs
+  WIFI_KEY_SSID: "SSID",
+  WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
+
   // Global ENVs names
   GLOBAL_ENVS: {
     ACTIVE: "_DAPPNODE_GLOBAL_ENVS_ACTIVE",

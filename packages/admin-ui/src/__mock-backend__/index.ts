@@ -12,6 +12,7 @@ import { telegram } from "./telegram";
 import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
 import { wireguard } from "./wireguard";
+import { wifi } from "./wifi";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -26,7 +27,8 @@ const namedSpacedCalls = {
   ...telegram,
   ...userActionLogs,
   ...volumes,
-  ...wireguard
+  ...wireguard,
+  ...wifi
 };
 
 let dappnodeWebName = "Mock-DAppNode";

@@ -83,6 +83,9 @@ export const troubleShootMountpointsGuideUrl =
 export const dappnodeUserGuideUrl =
   "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
 
+export const dappnodeWifiCredentials = "http://my.dappnode/#/wifi/credentials";
+export const dappnodeConnectWifi = "https://docs.dappnode.io/connect/#via-wifi";
+
 // AutoUpdate IDSs
 export const autoUpdateIds = {
   MY_PACKAGES: "my-packages",
