@@ -6,6 +6,7 @@ import * as sdk from "./sdk";
 import * as support from "./support";
 import * as system from "./system";
 import * as wifi from "./wifi";
+import * as community from "./community";
 
 export default {
   dashboard,
@@ -15,6 +16,7 @@ export default {
   packages,
   sdk,
   support,
+  community,
   system
 };
 
