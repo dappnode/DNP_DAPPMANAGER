@@ -1,6 +1,6 @@
 import { securityUpdate } from "../modules/hostScripts/scripts/securityUpdate";
 
-export async function updateSecurity(): Promise<string> {
+export async function runHostSecurityUpdates(): Promise<string> {
   try {
     return await securityUpdate();
   } catch (e) {

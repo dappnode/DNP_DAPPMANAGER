@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import shell from "../../src/utils/shell";
+import fs from "fs";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 
@@ -25,4 +26,31 @@ describe("Host scripts", () => {
     );
     expect(hostInfo).to.be.ok;
   });
+
+  it("Should execute security updates", async () => {
+    try {
+      const securityUpdate = await shell(
+        `sudo bash ${hostScriptsPath}/security_update.sh`
+      );
+      console.log(securityUpdate);
+      expect(securityUpdate).to.be.ok;
+    } catch (e) {
+      try {
+        const usrFileStructure = fs.readdirSync("/usr/src");
+        console.log("usrFileStructure: ", usrFileStructure);
+        const securityLog = fs.readFileSync(
+          "/usr/src/dappnode/logs/security_update.log",
+          "utf8"
+        );
+        console.log(securityLog);
+      } catch (e) {
+        console.log("Error reading secuiryt log: ", e);
+      }
+      throw e;
+    }
+  });
+
+  /*   after("Clean logs", async function() {
+    await shell(`sudo rm -rf /usr/src/dappnode/logs`);
+  }); */
 });

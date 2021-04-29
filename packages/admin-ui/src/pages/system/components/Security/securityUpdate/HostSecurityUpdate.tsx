@@ -21,7 +21,7 @@ export default function HostSecurityUpdate() {
         });
       });
       setUpdateReq({ loading: true });
-      const result = await withToast(() => api.updateSecurity(), {
+      const result = await withToast(() => api.runHostSecurityUpdates(), {
         message: "Performing security updates",
         onSuccess: "Performed security updates"
       });

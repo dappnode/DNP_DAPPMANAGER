@@ -49,6 +49,7 @@ export { statsCpuGet } from "./statsCpuGet";
 export { statsMemoryGet } from "./statsMemoryGet";
 export { statsDiskGet } from "./statsDiskGet";
 export { systemInfoGet } from "./systemInfoGet";
+export { runHostSecurityUpdates } from "./runHostSecurityUpdates";
 export * from "./telegram";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";

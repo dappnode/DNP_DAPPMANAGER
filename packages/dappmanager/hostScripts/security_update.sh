@@ -4,51 +4,69 @@
 set -e
 
 # VARIABLES
+LOG_DIR="/usr/src/dappnode/logs"
+LOG_FILE="$LOG_DIR/security_update.log"
+DATE=$(date)
 FILE_SOURCES_LIST="/etc/apt/sources.list"
 FILE_SECURITY_SOURCES_LIST="/etc/apt/security.sources.list"
 DOCKER_PACKAGES=($(dpkg --get-selections | grep -o 'docker-ce\s\|containerd.io\s\|docker-ce-cli\s'))
 DOCKER_PACKAGES_LENGTH=${#DOCKER_PACKAGES[@]}
 DOCKER_INSTALLATION_REPOSITORIES=false
 
+############
+#0.LOG-FILE#
+############
+
+function create_log_file () {
+  mkdir -p $LOG_DIR
+  echo -e "\e[32mStarting security updates: $DATE\e[0m" >> $LOG_FILE
+}
+
 ##############
 #1.PRE-UPDATE#
 ##############
 
 function pre_update () {
+  echo -e "\e[32mPre update check\e[0m" >> $LOG_FILE 
   # Prevent needrestart interactive mode and debian frontend during upgrade: https://manpages.debian.org/testing/needrestart/needrestart.1.en.html
   export NEEDRESTART_SUSPEND=true # If set to a non-empty value the apt-get(8) hook will not run needrestart after installing or updating packages.
   export DEBIAN_FRONTEND=noninteractive
 
   # Check docker exists
   if ! command -v docker &> /dev/null; then
-    echo "docker not installed"
+    echo "docker not installed" | tee -a $LOG_FILE 
     exit 1
   fi
 
   # Check installation method
   if [[ "$DOCKER_PACKAGES_LENGTH" -eq 3 ]]; then
+    echo "docker installed through repositories" >> $LOG_FILE 
     DOCKER_INSTALLATION_REPOSITORIES=true
+  else
+    echo "docker installed through deb packages" >> $LOG_FILE 
   fi
 
   # Check sources.list exist
   if [ ! -f "$FILE_SOURCES_LIST" ]; then
-    echo "$FILE_SOURCES_LIST does not exist"
+    echo "$FILE_SOURCES_LIST does not exist" | tee -a $LOG_FILE 
     exit 1
   fi
 
   # Check security.sources.list does not exist
   if [ -f "$FILE_SECURITY_SOURCES_LIST" ]; then
-    echo "$FILE_SECURITY_SOURCES_LIST already exist"
+    echo "$FILE_SECURITY_SOURCES_LIST already exists" | tee -a $LOG_FILE 
     exit 1
   fi
 
   # Create security.sources.list
-  grep security "$FILE_SOURCES_LIST" | tee "$FILE_SECURITY_SOURCES_LIST" > /dev/null || { echo "error creating file $FILE_SECURITY_SOURCES_LIST" ; exit 1; }
+  echo -e "\e[32mCreating $FILE_SECURITY_SOURCES_LIST\e[0m" >> $LOG_FILE 
+  grep security "$FILE_SOURCES_LIST" | tee "$FILE_SECURITY_SOURCES_LIST" &>/dev/null || { echo "error creating file $FILE_SECURITY_SOURCES_LIST" | tee -a $LOG_FILE ; exit 1; }
 
   # Prevent docker packages from been updated if docker installed via repositories
   if [ "$DOCKER_INSTALLATION_REPOSITORIES" = true ] ; then
+    echo -e "\e[32mEditing docker repositories\e[0m" >> $LOG_FILE 
     for DOCKER_PACKAGE in "${DOCKER_PACKAGES[@]}"; do
-      echo "${DOCKER_PACKAGE} hold" | sudo dpkg --set-selections
+      echo "${DOCKER_PACKAGE} hold" | dpkg --set-selections
     done
   fi
 }
@@ -60,8 +78,11 @@ function pre_update () {
 ##################
 
 function update () {
-  apt-get update -y > /dev/null || { echo "error on apt-get update" ; exit 1; }
-  apt-get upgrade -y -o "Dir::Etc::SourceList=$FILE_SECURITY_SOURCES_LIST" > /dev/null || { echo "error on apt-get upgrade" ; exit 1; }
+  echo -e "\e[32mUpdating\e[0m" >> $LOG_FILE 
+  # 1>/dev/null 2>>$LOG_FILE: will redirect stdout to null and stderr to log file
+  apt-get update 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get update" | tee -a $LOG_FILE ; exit 1; }
+  echo -e "\e[32mUpgrading\e[0m" >> $LOG_FILE 
+  apt-get upgrade -y -o "Dir::Etc::SourceList=$FILE_SECURITY_SOURCES_LIST" 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get upgrade" | tee -a $LOG_FILE ; exit 1; }
 }
 
 ###############
@@ -69,12 +90,14 @@ function update () {
 ###############
 
 function post_upgrade_clean () {
+  echo -e "\e[32mPost upgrade clean\e[0m" >> $LOG_FILE 
   # Remove security-sources.list
   rm -rf "$FILE_SECURITY_SOURCES_LIST"
   # Put normal values on repositories
   if [ "$DOCKER_INSTALLATION_REPOSITORIES" = true ] ; then
+    echo -e "\e[32mEditing docker repositories\e[0m" >> $LOG_FILE 
     for DOCKER_PACKAGE in "${DOCKER_PACKAGES[@]}"; do
-      echo "${DOCKER_PACKAGE} install" | sudo dpkg --set-selections
+      echo "${DOCKER_PACKAGE} install" | dpkg --set-selections
     done
   fi
 }
@@ -84,6 +107,7 @@ function post_upgrade_clean () {
 ###########
 
 function post_upgrade_restart () {
+  echo -e "\e[32mRestart services\e[0m" >> $LOG_FILE 
   # Security UPDATE: https://www.debian.org/doc/manuals/securing-debian-manual/security-update.en.html
   # - libraries: "Once you have executed a security update you might need to restart some of the system services.
   # If you do not do this, some services might still be vulnerable after a security upgrade"
@@ -92,19 +116,23 @@ function post_upgrade_restart () {
 
   # Install needrestart: https://manpages.debian.org/testing/needrestart/needrestart.1.en.html
   if ! command -v needrestart &> /dev/null; then
-    sudo apt-get install -y needrestart > /dev/null || { echo "Security updates have been executed successfully, error installing needrestart" ; exit 1; }
+    echo -e "\e[32mInstalling needrestart package\e[0m" >> $LOG_FILE 
+    apt-get install -y needrestart 1>/dev/null 2>>$LOG_FILE || { echo "Security updates have been executed successfully, error installing needrestart" ; exit 1; }
   fi
 
   # Restart required services
-  sudo needrestart -r a -q > /dev/null || { echo "Security updates have been executed successfully, error restarting services" ; exit 1; }
+  echo -e "\e[32mRestarting services\e[0m" >> $LOG_FILE 
+  needrestart -r a -q 1>/dev/null 2>>$LOG_FILE || { echo "Security updates have been executed successfully, error restarting services" ; exit 1; }
 
-  # Reboot if still needed => need to be fixed
-  NEEDS_TO_BE_RESTARTED=$(sudo needrestart -r l -q)
+  # Check if reboot needed
+  NEEDS_TO_BE_RESTARTED=$(needrestart -r l -q) # Issue: perl throw warmings on remote machines
   if [ ! -z "$NEEDS_TO_BE_RESTARTED" ]; then
+    echo -e "\e[33mSecurity updates have been executed successfully, a reboot is needed to implement such updates\e[0m" >> $LOG_FILE 
     echo "Security updates have been executed successfully, a reboot is needed to implement such updates"
     exit 0
   fi
 
+  echo -e "\e[32mSecurity updates have been executed successfully, no reboot needed\e[0m" >> $LOG_FILE 
   echo "Security updates have been executed successfully, no reboot needed"
   exit 0
 }
@@ -112,9 +140,8 @@ function post_upgrade_restart () {
 ###########
 #MAIN-LOOP#
 ###########
+create_log_file
 pre_update
 update
 post_upgrade_clean
 post_upgrade_restart
-
-# NOTE: perl throw warmings on remote machines

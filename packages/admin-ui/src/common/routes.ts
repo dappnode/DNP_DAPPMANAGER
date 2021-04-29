@@ -515,7 +515,7 @@ export interface Routes {
   /**
    * Executes security updates on host
    */
-  updateSecurity: () => Promise<string>;
+  runHostSecurityUpdates: () => Promise<string>;
 
   /**
    * Removes a docker volume by name
@@ -624,7 +624,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
-  updateSecurity: {},
+  runHostSecurityUpdates: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

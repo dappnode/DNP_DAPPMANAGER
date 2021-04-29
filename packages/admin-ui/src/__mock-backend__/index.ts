@@ -215,7 +215,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       // "system-auto-updates",
       // "change-host-password"
     ]
-  })
+  }),
+  runHostSecurityUpdates: async () =>
+    "Security updates have been executed successfully, no reboot needed"
 };
 
 export const calls: Routes = {
