@@ -16,7 +16,7 @@ import {
 } from "react-icons/md";
 // URLs
 import { rootPath as dashboardRootPath } from "pages/dashboard";
-import { rootPath as devicesRootPath } from "pages/devices";
+import { rootPath as devicesRootPath } from "pages/vpn";
 import { rootPath as installerRootPath } from "pages/installer";
 import { rootPath as packagesRootPath } from "pages/packages";
 import { rootPath as systemRootPath } from "pages/system";

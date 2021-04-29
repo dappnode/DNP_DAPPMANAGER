@@ -3,7 +3,7 @@ import { NavLink, RouteComponentProps } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, title } from "../data";
+import { rootPath, title } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Alert from "react-bootstrap/esm/Alert";
@@ -20,7 +20,11 @@ import { MdOpenInNew } from "react-icons/md";
 import { GoClippy } from "react-icons/go";
 import { VpnDeviceCredentials } from "types";
 
-function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
+function OpenVpnDeviceDetailsLoaded({
+  device
+}: {
+  device: VpnDeviceCredentials;
+}) {
   const [showQr, setShowQr] = useState(false);
   const { id, url } = device;
 
@@ -131,9 +135,9 @@ function DeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
   );
 }
 
-export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
-  match
-}) => {
+export const OpenVpnDeviceDetails: React.FC<RouteComponentProps<{
+  id: string;
+}>> = ({ match }) => {
   const id = match.params.id;
   const deviceCredentials = useApi.deviceCredentialsGet({ id });
 
@@ -142,7 +146,7 @@ export const DeviceDetails: React.FC<RouteComponentProps<{ id: string }>> = ({
       <Title title={title} subtitle={id} />
 
       {deviceCredentials.data ? (
-        <DeviceDetailsLoaded device={deviceCredentials.data} />
+        <OpenVpnDeviceDetailsLoaded device={deviceCredentials.data} />
       ) : deviceCredentials.error ? (
         <ErrorView error={deviceCredentials.error} />
       ) : deviceCredentials.isValidating ? (

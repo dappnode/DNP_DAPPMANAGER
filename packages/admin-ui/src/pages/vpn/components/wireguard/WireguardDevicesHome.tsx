@@ -2,24 +2,28 @@ import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink } from "react-router-dom";
 // Own module
-import { title, maxIdLength, rootPath } from "../data";
-import coerceDeviceName from "../helpers/coerceDeviceName";
+import { maxIdLength, rootPath } from "../../data";
+import coerceDeviceName from "../../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
-import Title from "components/Title";
 import Card from "components/Card";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
+import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 import { urlJoin } from "utils/url";
+// Params
+import { wireguardDnpName } from "params";
+import { rootPath as installedRootPath } from "pages/installer";
 
 export function WireguardDevicesHome() {
   const [input, setInput] = useState("");
   const devicesReq = useApi.wireguardDevicesGet();
+  const dnpsRequest = useApi.packagesGet();
 
   // Actions
 
@@ -44,15 +48,28 @@ export function WireguardDevicesHome() {
   }
 
   // Input errors
-
   const errors: string[] = [];
   if (input.length > maxIdLength)
     errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
+  // If the wireguard package is not installed, invite the user to install it
+  if (dnpsRequest.data) {
+    const wireguardDnp = dnpsRequest.data.find(
+      dnp => dnp.dnpName === wireguardDnpName
+    );
+    if (!wireguardDnp) {
+      const url = `${installedRootPath}/${wireguardDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the Wireguard package</NavLink> to
+          use this feature
+        </Alert>
+      );
+    }
+  }
+
   return (
     <>
-      <Title title={title} />
-
       <Input
         placeholder="Device's unique name"
         value={input}
