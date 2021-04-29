@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import * as a from "../../actions";
+import * as a from "../../../actions";
 import {
   validatePasswordsMatch,
   validateStrongPasswordAsDockerEnv
