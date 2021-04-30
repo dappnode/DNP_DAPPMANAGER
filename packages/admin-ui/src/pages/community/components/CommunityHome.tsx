@@ -1,38 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 // Own module
-import { title } from "../data";
-import CommunityDiscord from "./CommunityDiscord";
-import CommunityGithub from "./CommunityGithub";
-import CommunityDiscourse from "./CommunityDiscourse";
-import CommunityTreasury from "./CommunityTreasury";
-import CommunityGrants from "./CommunityGrants";
+import { CommunityItem, communityTypes, title } from "../data";
 // Components
 import Title from "components/Title";
-import { Carousel } from "react-bootstrap";
+import Card from "components/Card";
+import SubTitle from "components/SubTitle";
 
 import "./community.scss";
+import { Collapse } from "react-bootstrap";
 
 export default function CommunityHome() {
+  const [item, setItem] = useState("Discord");
+
+  function onClick(communitySubtitle: string) {
+    setItem(communitySubtitle);
+  }
   return (
     <>
       <Title title={title} />
-      <Carousel interval={null}>
-        <Carousel.Item>
-          <CommunityDiscord />
-        </Carousel.Item>
-        <Carousel.Item>
-          <CommunityGithub />
-        </Carousel.Item>
-        <Carousel.Item>
-          <CommunityDiscourse />
-        </Carousel.Item>
-        <Carousel.Item>
-          <CommunityGrants />
-        </Carousel.Item>
-        <Carousel.Item>
-          <CommunityTreasury />
-        </Carousel.Item>
-      </Carousel>
+
+      <Card className="text-center">
+        <div className="card-subtitles">
+          {communityTypes.map((communityItem: CommunityItem) => (
+            <SubTitle key={communityItem.title}>
+              <div
+                onClick={() => onClick(communityItem.title)}
+                className="card-subtitle"
+              >
+                {communityItem.title} <communityItem.icon />
+              </div>
+            </SubTitle>
+          ))}
+        </div>
+
+        <Collapse in={true}>
+          <>
+            <hr />
+            <p className="card-text">
+              {
+                communityTypes.find(
+                  (communityItem: CommunityItem) => communityItem.title === item
+                )?.text
+              }
+            </p>
+          </>
+        </Collapse>
+        <Collapse in={true}>
+          <div className="card-actions">
+            {communityTypes
+              .find(
+                (communityItem: CommunityItem) => communityItem.title === item
+              )
+              ?.actions.map(CommunityItemAction => (
+                <CommunityItemAction />
+              ))}
+          </div>
+        </Collapse>
+      </Card>
     </>
   );
 }

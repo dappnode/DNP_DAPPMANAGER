@@ -1,15 +1,9 @@
-.carousel-control-next,
-.carousel-control-prev {
-  filter: invert(100%);
+.card-subtitles {
+  display: flex;
+  justify-content: space-between;
 }
 
-.carousel-indicators {
-  visibility: hidden;
-}
-
-.card-text {
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 60px;
-  margin-inline-end: 60px;
+.card-subtitle:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
