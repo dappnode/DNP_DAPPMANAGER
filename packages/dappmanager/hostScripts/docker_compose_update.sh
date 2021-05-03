@@ -25,7 +25,7 @@ function get_docker_compose_version() {
   if type docker-compose >/dev/null 2>&1; then
     DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
   else 
-    echo "docker compose does not exist or not recognized" 2>&1 | tee -a $LOG_FILE
+    echo "docker compose does not exist or not recognized" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -36,7 +36,7 @@ function get_docker_engine_version() {
   if type docker >/dev/null 2>&1; then
     DOCKER_SERVER_VERSION=$(docker version --format '{{.Server.Version}}')
   else 
-    echo "docker does not exist or not recognized" 2>&1 | tee -a $LOG_FILE
+    echo "docker does not exist or not recognized" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -47,13 +47,13 @@ function check_requirements() {
     get_docker_compose_version
     # check is same version
     if [[ "$DOCKER_COMPOSE_VERSION" == "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
-      echo "docker compose version is stable" 2>&1 | tee -a $LOG_FILE
+      echo "docker compose version is stable" | tee -a $LOG_FILE
       exit 1
     fi
 
     # check is downgrade
     if $(dpkg --compare-versions ${STABLE_DOCKER_COMPOSE_VERSION} "lt" ${DOCKER_COMPOSE_VERSION}); then 
-      echo "Illegal to downgrade docker compose" 2>&1 | tee -a $LOG_FILE
+      echo "Illegal to downgrade docker compose" | tee -a $LOG_FILE
       exit 1
     fi
 }
@@ -79,7 +79,7 @@ function post_install_check() {
   # Check version post installation equals stable compose version
   DOCKER_COMPOSE_POST_INSTALLATION=$(docker-compose version --short)
   if [[ "$DOCKER_COMPOSE_POST_INSTALLATION" != "$STABLE_DOCKER_COMPOSE_VERSION" ]]; then
-    echo "Update unsucessfull, versions are not equal. Rebooting..." 2>&1 | tee -a $LOG_FILE
+    echo "Update unsucessfull, versions are not equal. Rebooting..." | tee -a $LOG_FILE
     reboot
   fi
 }
@@ -95,21 +95,21 @@ if [[ $# -eq 1 ]]; then
       check_requirements
       install_docker_compose
       post_install_check
-      echo "Updated docker compose to ${STABLE_DOCKER_COMPOSE_VERSION} successfully" 2>&1 | tee -a $LOG_FILE
+      echo "Updated docker compose to ${STABLE_DOCKER_COMPOSE_VERSION} successfully" | tee -a $LOG_FILE
       exit 0
       ;;
     --version )
       get_docker_compose_version
       get_docker_engine_version
-      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\"}" 2>&1 | tee -a $LOG_FILE
+      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\"}" | tee -a $LOG_FILE
       exit 0
       ;;
     * )
-      echo "flag must be --install or --version" 2>&1 | tee -a $LOG_FILE
+      echo "flag must be --install or --version" | tee -a $LOG_FILE
       exit 1
       ;;
   esac
 else
-  echo "Illegal number of arguments"  2>&1 | tee -a $LOG_FILE
+  echo "Illegal number of arguments" | tee -a $LOG_FILE
   exit 1
 fi

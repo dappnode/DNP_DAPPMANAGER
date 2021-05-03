@@ -52,7 +52,7 @@ function get_system_info(){
 
   # Check if all values are set
   if [ -z "$ID" ] || [ -z "$VERSION_ID" ] || [ -z "$VERSION_CODENAME" ]; then
-    echo "Error retrieving system info: operating system and version" 2>&1 | tee -a $LOG_FILE
+    echo "Error retrieving system info: operating system and version" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -75,7 +75,7 @@ function get_architecture() {
       ARCHITECTURE="amd64"
     fi
   else
-    echo "Error retrieving architecture" 2>&1 | tee -a $LOG_FILE
+    echo "Error retrieving architecture" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -87,7 +87,7 @@ function get_docker_engine_version() {
     DOCKER_SERVER_VERSION=$(docker version --format '{{.Server.Version}}')
     DOCKER_CLI_VERSION=$(docker version --format '{{.Client.Version}}')
   else 
-    echo "docker does not exist or not recognized" 2>&1 | tee -a $LOG_FILE
+    echo "docker does not exist or not recognized" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -98,7 +98,7 @@ function get_docker_compose_version() {
   if type docker-compose >/dev/null 2>&1; then
     DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
   else 
-    echo "docker compose does not exist or not recognized" 2>&1 | tee -a $LOG_FILE
+    echo "docker compose does not exist or not recognized" | tee -a $LOG_FILE
     exit 1
   fi
 }
@@ -108,13 +108,13 @@ function check_requirements() {
   # 1. check is same version
   get_docker_engine_version
   if [[ $DOCKER_SERVER_VERSION == "$STABLE_DOCKER_ENGINE_VERSION" ]]; then
-    echo "docker engine version is already stable" 2>&1 | tee -a $LOG_FILE
+    echo "docker engine version is already stable" | tee -a $LOG_FILE
     exit 1
   fi
   
   # 2. Check is downgrade
   if $(dpkg --compare-versions ${STABLE_DOCKER_ENGINE_VERSION} "lt" ${DOCKER_SERVER_VERSION}); then 
-    echo "Illegal to downgrade docker engine" 2>&1 | tee -a $LOG_FILE
+    echo "Illegal to downgrade docker engine" | tee -a $LOG_FILE
     exit 1
   fi
 
@@ -123,20 +123,20 @@ function check_requirements() {
   
   # 3.1 check is debian
   if [[ "$ID" != "debian" ]]; then
-    echo "OS must be debian" 2>&1 | tee -a $LOG_FILE
+    echo "OS must be debian" | tee -a $LOG_FILE
     exit 1
   fi
 
   # 3.2 check is debian version supported by docker
   if [ "$VERSION_CODENAME" != "buster" ] && [ "$VERSION_CODENAME" != "stretch" ] && [ "$VERSION_CODENAME" != "bullseye" ]; then
-    echo "Debian version not supported by docker and/or dappnode. Versions supported: buster, stretch and bullseye" 2>&1 | tee -a $LOG_FILE
+    echo "Debian version not supported by docker and/or dappnode. Versions supported: buster, stretch and bullseye" | tee -a $LOG_FILE
     exit 1
   fi
 
   # 4. check is architecture supported by docker
   get_architecture
   if [ "$ARCHITECTURE" !=  "amd64" ] && [ "$ARCHITECTURE" !=  "arm64" ] && [ "$ARCHITECTURE" !=  "armhf" ]; then
-    echo "Architecture not supported by docker. Architectures allowed: amd64, arm64 and armhf"  2>&1 | tee -a $LOG_FILE
+    echo "Architecture not supported by docker. Architectures allowed: amd64, arm64 and armhf" | tee -a $LOG_FILE
     exit 1
   fi  
 }
@@ -207,7 +207,7 @@ function post_install_check() {
   # Check if container is not running reboot
   RUNNING=$(docker inspect --format="{{.State.Running}}" $DAPPMANAGER_CONTAINER 2> /dev/null)
   if [ $RUNNING = false ]; then
-    echo "Dappmanager container is not running. Rebooting..." 2>&1 | tee -a $LOG_FILE
+    echo "Dappmanager container is not running. Rebooting..." | tee -a $LOG_FILE
     reboot
   fi
 
@@ -215,7 +215,7 @@ function post_install_check() {
   DOCKER_SERVER_POST_INSTALLATION=$(docker version --format '{{.Server.Version}}')
   DOCKER_CLI_POST_INSTALLATION=$(docker version --format '{{.Client.Version}}')
   if [ "$DOCKER_SERVER_POST_INSTALLATION" != "$STABLE_DOCKER_ENGINE_VERSION" ] || [ "$STABLE_DOCKER_ENGINE_VERSION" != "$DOCKER_CLI_POST_INSTALLATION" ]; then
-    echo "Update unsucessfull, versions are not equal. Rebooting..." 2>&1 | tee -a $LOG_FILE
+    echo "Update unsucessfull, versions are not equal. Rebooting..." | tee -a $LOG_FILE
     reboot 
   fi
 }
@@ -231,7 +231,7 @@ if [[ $# -eq 1 ]]; then
       check_requirements
       install_docker_engine
       post_install_check
-      echo "Updated docker engine to ${STABLE_DOCKER_ENGINE_VERSION} successfully" 2>&1 | tee -a $LOG_FILE
+      echo "Updated docker engine to ${STABLE_DOCKER_ENGINE_VERSION} successfully" | tee -a $LOG_FILE
       exit 0
       ;;
     --print-host-info )
@@ -240,15 +240,15 @@ if [[ $# -eq 1 ]]; then
       get_docker_engine_version
       get_architecture
       get_linux_kernel
-      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\", \"dockerCliVersion\": \"${DOCKER_CLI_VERSION}\", \"os\": \"${ID}\", \"versionCodename\": \"${VERSION_CODENAME}\", \"architecture\": \"${ARCHITECTURE}\", \"kernel\": \"${KERNEL}\"}" 2>&1 | tee -a $LOG_FILE
+      echo -n "{\"dockerComposeVersion\": \"${DOCKER_COMPOSE_VERSION}\", \"dockerServerVersion\": \"${DOCKER_SERVER_VERSION}\", \"dockerCliVersion\": \"${DOCKER_CLI_VERSION}\", \"os\": \"${ID}\", \"versionCodename\": \"${VERSION_CODENAME}\", \"architecture\": \"${ARCHITECTURE}\", \"kernel\": \"${KERNEL}\"}" | tee -a $LOG_FILE
       exit 0
       ;;
     * )
-      echo "flag must be --install, or --print-host-info" 2>&1 | tee -a $LOG_FILE
+      echo "flag must be --install, or --print-host-info" | tee -a $LOG_FILE
       exit 1
       ;;
   esac
 else
-  echo "Illegal number of arguments" 2>&1 | tee -a $LOG_FILE
+  echo "Illegal number of arguments" | tee -a $LOG_FILE
   exit 1
 fi
