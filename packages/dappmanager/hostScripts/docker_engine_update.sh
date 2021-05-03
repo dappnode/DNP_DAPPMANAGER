@@ -16,7 +16,7 @@ STABLE_DOCKER_CONTAINERD_VERSION="1.4.3-1"
 
 function create_log_file () {
   mkdir -p $LOG_DIR
-  echo -e "\e[32mStarting compose update: $DATE\e[0m" >> $LOG_FILE
+  echo -e "\e[32mStarting engine update: $DATE\e[0m" >> $LOG_FILE
 }
 
 create_log_file
