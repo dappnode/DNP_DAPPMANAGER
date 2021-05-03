@@ -2,10 +2,5 @@ import React from "react";
 import Button from "components/Button";
 
 export default function DiscourseActions() {
-  return (
-    <>
-      <Button>Join Discourse</Button>
-      <Button>Report incident</Button>
-    </>
-  );
+  return <Button href="https://forum.dappnode.io/">Join Discourse</Button>;
 }

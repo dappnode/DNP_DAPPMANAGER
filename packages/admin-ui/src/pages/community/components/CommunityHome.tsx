@@ -12,51 +12,36 @@ import { Collapse } from "react-bootstrap";
 export default function CommunityHome() {
   const [item, setItem] = useState("Discord");
 
-  function onClick(communitySubtitle: string) {
-    setItem(communitySubtitle);
+  function onClick(communityTitle: string) {
+    setItem(communityTitle);
   }
   return (
     <>
       <Title title={title} />
 
-      <Card className="text-center">
-        <div className="card-subtitles">
-          {communityTypes.map((communityItem: CommunityItem) => (
-            <SubTitle key={communityItem.title}>
-              <div
-                onClick={() => onClick(communityItem.title)}
-                className="card-subtitle"
-              >
-                {communityItem.title} <communityItem.icon />
-              </div>
-            </SubTitle>
-          ))}
-        </div>
+      {communityTypes.map((communityItem: CommunityItem) => (
+        <Card className="text-center">
+          <SubTitle key={communityItem.title}>
+            <div
+              onClick={() => onClick(communityItem.title)}
+              className="card-subtitle"
+            >
+              {communityItem.title} <communityItem.icon />
+            </div>
+          </SubTitle>
 
-        <Collapse in={true}>
-          <>
-            <hr />
-            <p className="card-text">
-              {
-                communityTypes.find(
-                  (communityItem: CommunityItem) => communityItem.title === item
-                )?.text
-              }
-            </p>
-          </>
-        </Collapse>
-        <Collapse in={true}>
-          <div className="card-actions">
-            {communityTypes
-              .find(
-                (communityItem: CommunityItem) => communityItem.title === item
-              )
-              ?.actions.map(CommunityItemAction => (
+          <Collapse in={communityItem.title === item}>
+            <p className="card-text">{communityItem.text}</p>
+          </Collapse>
+          <Collapse in={communityItem.title === item}>
+            <div className="card-actions">
+              {communityItem.actions.map(CommunityItemAction => (
                 <CommunityItemAction />
               ))}
-          </div>
-        </Collapse>
-      </Card>
+            </div>
+          </Collapse>
+        </Card>
+      ))}
     </>
   );
 }
