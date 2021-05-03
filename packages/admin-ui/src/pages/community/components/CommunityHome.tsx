@@ -20,9 +20,11 @@ export default function CommunityHome() {
               {communityItem.title} <communityItem.icon />
             </SubTitle>
             <p>{communityItem.text}</p>
-            {communityItem.actions.map(CommunityItemAction => (
-              <CommunityItemAction />
-            ))}
+            <div className="community-actions">
+              {communityItem.actions.map(CommunityItemAction => (
+                <CommunityItemAction />
+              ))}
+            </div>
           </Card>
         ))}
       </div>

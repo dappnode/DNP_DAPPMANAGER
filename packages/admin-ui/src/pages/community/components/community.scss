@@ -4,3 +4,8 @@
   width: 100%;
   grid-gap: var(--default-spacing);
 }
+
+.community-actions {
+  display: flex;
+  justify-content: space-around;
+}
