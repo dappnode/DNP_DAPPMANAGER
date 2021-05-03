@@ -37,7 +37,8 @@ export const communityTypes: CommunityItem[] = [
     title: "Treasury",
     icon: FaCommentsDollar,
     actions: [TreasuryActions],
-    text: "Contribute on any of the DAppNode platforms and you will be rewarded"
+    text:
+      "The DAppNode Community Treasury is the way the community gets rewarded for contributing and helping each other out."
   },
   {
     subPath: "discourse",
