@@ -22,25 +22,8 @@ export const communityTypes: CommunityItem[] = [
     icon: FaDiscord,
     actions: [DiscordActions],
     text:
-      "DAppNode has a vibrant community. You can get support, share your experience, suggest improvements and just hang out with other Node Runners in our Discord Server"
+      "DAppNode has a vibrant community. You can get support, share your experience, and just hang out with other Node Runners in our Discord Server"
   },
-  {
-    subPath: "github",
-    title: "Github",
-    icon: FaGithub,
-    actions: [GithubActions],
-    text:
-      "DAppNode is Free Open Source Software. You can review and contribute to its codebase on GitHub!"
-  },
-  {
-    subPath: "discourse",
-    title: "Discourse",
-    icon: FaDiscourse,
-    actions: [DiscourseActions],
-    text:
-      "How-tos, Deep Dives, support questions… our Forum is the place where information that shouldn’t be lost in a chat should go!"
-  },
-
   {
     subPath: "grants",
     title: "Grants",
@@ -54,8 +37,23 @@ export const communityTypes: CommunityItem[] = [
     title: "Treasury",
     icon: FaCommentsDollar,
     actions: [TreasuryActions],
+    text: "Contribute on any of the DAppNode platforms and you will be rewarded"
+  },
+  {
+    subPath: "discourse",
+    title: "Discourse",
+    icon: FaDiscourse,
+    actions: [DiscourseActions],
     text:
-      "As an open source project, community contribution is our most added value. Contribute to DAppNode by asking questions, answering questions, developing DAppNode packages, reporting issues and anything you may think it is useful.You will be rewarded for contributing on any of the platforms"
+      "How-tos, Deep Dives, support questions… our Forum is the place where information that shouldn’t be lost in a chat should go!"
+  },
+  {
+    subPath: "github",
+    title: "Github",
+    icon: FaGithub,
+    actions: [GithubActions],
+    text:
+      "DAppNode is Free Open Source Software. You can review and contribute to its codebase on GitHub!"
   }
 ];
 
