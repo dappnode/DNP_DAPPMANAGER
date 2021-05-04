@@ -1,6 +1,8 @@
 import React from "react";
 import { IconType } from "react-icons/lib";
-import ButtonBootstap from "react-bootstrap/esm/Button";
+import ButtonBootstap, {
+  ButtonProps as ButtonBootstrapProps
+} from "react-bootstrap/esm/Button";
 import { joinCssClass } from "utils/css";
 import "./button.scss";
 
@@ -27,7 +29,8 @@ interface ButtonProps {
   Icon?: IconType;
 }
 
-const Button: React.FC<ButtonProps &
+const Button: React.FC<ButtonBootstrapProps &
+  ButtonProps &
   React.HTMLAttributes<HTMLButtonElement>> = ({
   variant = defaultVariant,
   children,
