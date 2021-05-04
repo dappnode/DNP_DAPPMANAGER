@@ -10,11 +10,6 @@ describe("Host scripts", () => {
     const dockerEngineUpdateRequirements = await shell(
       `sudo bash ${hostScriptsPath}/docker_engine_update.sh --print-host-info`
     );
-    const dockerEngine = fs.readFileSync(
-      "/usr/src/dappnode/logs/docker_engine_update.log",
-      "utf8"
-    );
-    console.log(dockerEngine);
     expect(dockerEngineUpdateRequirements).to.be.ok;
   });
 
@@ -22,11 +17,6 @@ describe("Host scripts", () => {
     const dockerComposeUpdateRequirements = await shell(
       `sudo bash ${hostScriptsPath}/docker_compose_update.sh --version`
     );
-    const dockerComposeLog = fs.readFileSync(
-      "/usr/src/dappnode/logs/docker_compose_update.log",
-      "utf8"
-    );
-    console.log(dockerComposeLog);
     expect(dockerComposeUpdateRequirements).to.be.ok;
   });
 
