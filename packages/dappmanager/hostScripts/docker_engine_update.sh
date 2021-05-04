@@ -11,8 +11,8 @@ LOG_DIR="/usr/src/dappnode/logs"
 LOG_FILE="$LOG_DIR/docker_engine_update.log"
 DATE=$(date)
 # Docker stable versions
-STABLE_DOCKER_ENGINE_VERSION="20.10.2" # Same for PKG and CLI
-STABLE_DOCKER_CONTAINERD_VERSION="1.4.3-1"
+STABLE_DOCKER_ENGINE_VERSION="20.10.6" # Same for PKG and CLI
+STABLE_DOCKER_CONTAINERD_VERSION="1.4.4-1"
 
 function create_log_file () {
   mkdir -p $LOG_DIR
@@ -146,13 +146,14 @@ function install_docker_engine(){
   # Note: The client and container runtime are now in separate packages from the daemon in Docker Engine 18.09.
   # Users should install and update all three packages at the same time to get the latest patch releases
 
-  # TEMPORARY: Bullseye consider as Buster until it gets supported by docker
-  if [ "$VERSION_CODENAME" == "bullseye" ]; then
-    VERSION_CODENAME="buster"
+  # Change version for Buster
+  if [ "$VERSION_CODENAME" == "buster" ]; then
+    STABLE_DOCKER_ENGINE_VERSION="20.10.2"
+    STABLE_DOCKER_CONTAINERD_VERSION="1.4.3-1"
   fi
 
   # Change versions for stretch
-  if [ "$VERSION_CODENAME" != "buster" ]; then
+  if [ "$VERSION_CODENAME" == "stretch" ]; then
     STABLE_DOCKER_ENGINE_VERSION="19.03.8"
     STABLE_DOCKER_CONTAINERD_VERSION="1.2.6-3"
   fi
