@@ -18,7 +18,7 @@ type IpfsAddResult = {
  * Wrapper to abstract converting the return values of ipfs.add
  * @param content
  */
-async function ipfsAdd(content: any): Promise<IpfsAddResult> {
+async function ipfsAdd(content: unknown): Promise<IpfsAddResult> {
   const files = [];
   for await (const file of ipfs.ipfs.add(content)) {
     files.push(file);

@@ -2,6 +2,10 @@ export interface IpfsCatOptions {
   maxLength?: number;
 }
 
+/** Un-typed `ipfs-http-client` instance */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IpfsInstance = any;
+
 export interface IpfsLsFileResult {
   depth: number; // 1,
   name: string; // 'avatar.png',

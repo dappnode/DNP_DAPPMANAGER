@@ -5,7 +5,7 @@ import { flagPackagesAreNotInstalling } from "./packageIsInstalling";
  * Bundle event emits that must be called on a successful and failed install
  * @param dnpNames ["pkg.dnp.dappnode.eth"]
  */
-export async function afterInstall(dnpNames: string[]) {
+export async function afterInstall(dnpNames: string[]): Promise<void> {
   /**
    * [NAT-RENEWAL] Trigger a natRenewal update to open ports if necessary
    * Since a package installation is not a very frequent activity it is okay to be

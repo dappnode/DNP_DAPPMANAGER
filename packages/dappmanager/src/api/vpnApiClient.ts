@@ -27,9 +27,11 @@ export interface VpnApiClientParams {
   VPN_API_RPC_URL: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Args = any[];
 
 export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return mapValues(vpnApiRoutesData, (data, route) => (...args: Args): any =>
     vpnRpcCall(params, route, ...args)
   );
@@ -53,7 +55,7 @@ async function vpnRpcCall<R>(
 
   // If body is not JSON log it to get info about the error. Express may respond with HTML
   const bodyText = await res.text();
-  let body: any;
+  let body: R;
   try {
     body = JSON.parse(bodyText);
   } catch (e) {
@@ -62,8 +64,10 @@ async function vpnRpcCall<R>(
     );
   }
 
-  if (!res.ok)
-    throw Error(`${res.status} ${res.statusText} ${body.message || ""}`);
+  if (!res.ok) {
+    const errorBody = (body as unknown) as Error;
+    throw Error(`${res.status} ${res.statusText} ${errorBody.message || ""}`);
+  }
 
   // RPC response are always code 200
   return parseRpcResponse<R>(body);

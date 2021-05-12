@@ -17,6 +17,6 @@ export function startDaemons(signal: AbortSignal): void {
   startEthMultiClientDaemon(signal);
   startNatRenewalDaemon(signal);
   startNsUpdateDaemon(signal);
-  startVpnBridgeDaemon(signal);
+  startVpnBridgeDaemon();
   startTelegramBotDaemon();
 }
