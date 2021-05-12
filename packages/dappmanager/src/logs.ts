@@ -37,7 +37,7 @@ export const logs: Logs = {
    * logs.debug("some process", ["arg", "arg"], id);
    * ```
    */
-  debug: formatLogger(tags.debug, logDebug ? console.debug : () => {}),
+  debug: formatLogger(tags.debug, logDebug ? console.debug : (): void => {}),
   /**
    * Allows to log any type of data. Strings will be shown first.
    * ```js

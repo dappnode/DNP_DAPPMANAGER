@@ -14,7 +14,11 @@ describe("docker / parseExitCodeFromStatus", () => {
     { id: "Up status", status: "Up 3 weeks", exitCode: null },
     { id: "Bad format", status: "AYSFDUTFY", exitCode: null },
     { id: "Empty", status: "", exitCode: null },
-    { id: "Not a string", status: undefined as any, exitCode: null }
+    {
+      id: "Not a string",
+      status: (undefined as unknown) as string,
+      exitCode: null
+    }
   ];
 
   for (const { id, status, exitCode } of testCases) {

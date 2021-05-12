@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../src/utils/shell";
 import fs from "fs";
 
 import dataUriToFile from "../../src/utils/dataUriToFile";

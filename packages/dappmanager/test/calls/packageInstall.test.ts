@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import { PackageRequest, Manifest, PackageRelease } from "../../src/types";
+import { getMockEventBus } from "./eventBus";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../src/calls/packageInstall";
@@ -70,11 +71,7 @@ describe.skip("Call function: packageInstall", function() {
     }
   }
 
-  const eventBus: any = {
-    runNatRenewal: { emit: sinon.stub(), on: sinon.stub() },
-    requestPackages: { emit: sinon.stub(), on: sinon.stub() },
-    packageModified: { emit: sinon.stub(), on: sinon.stub() }
-  };
+  const eventBus = getMockEventBus();
 
   let packageInstall: typeof packageInstallType;
 
@@ -182,9 +179,5 @@ describe.skip("Call function: packageInstall", function() {
   it("should request to emit packages to refresh the UI", async () => {
     sinon.assert.calledOnce(eventBus.runNatRenewal.emit);
     sinon.assert.calledOnce(eventBus.requestPackages.emit);
-    sinon.assert.calledOnce(eventBus.packageModified.emit);
-    expect(eventBus.packageModified.emit.lastCall.lastArg).to.deep.equal({
-      id: pkgName
-    });
   });
 });

@@ -1,4 +1,3 @@
-import * as db from "../../db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate";
 import { PackageRelease } from "../../types";

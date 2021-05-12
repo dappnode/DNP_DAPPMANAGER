@@ -129,6 +129,7 @@ export function runOnlyOneSequentially<A, R>(
  *
  * @param fn Target function (Callback style)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
   f: F
 ): F {

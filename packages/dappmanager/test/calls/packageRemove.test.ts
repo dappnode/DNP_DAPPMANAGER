@@ -9,6 +9,7 @@ import rewiremock from "rewiremock";
 import { packageRemove as packageRemoveType } from "../../src/calls/packageRemove";
 import { InstalledPackageData } from "../../src/types";
 import { mockDnp, cleanTestDir, mockContainer } from "../testUtils";
+import { getMockEventBus } from "./eventBus";
 
 describe("Call function: packageRemove", function() {
   const dnpName = "test.dnp.dappnode.eth";
@@ -37,10 +38,7 @@ describe("Call function: packageRemove", function() {
   const dockerContainerRemove = sinon.stub().resolves();
   const listPackage = sinon.stub().resolves(dnp);
 
-  const eventBus: any = {
-    requestPackages: { emit: sinon.stub(), on: sinon.stub() },
-    packagesModified: { emit: sinon.stub(), on: sinon.stub() }
-  };
+  const eventBus = getMockEventBus();
 
   let packageRemove: typeof packageRemoveType;
 
