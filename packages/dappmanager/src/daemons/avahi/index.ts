@@ -1,11 +1,12 @@
+import { spawn } from "child_process";
+import { AbortSignal } from "abort-controller";
 import retry from "async-retry";
 import * as db from "../../db";
 import params from "../../params";
 import { pause } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-import shell from "../../utils/shell";
 
-export async function startAvahiDaemon(): Promise<void> {
+export async function startAvahiDaemon(signal: AbortSignal): Promise<void> {
   const { internalIp, publicIp } = await waitForIps();
 
   if (publicIp === internalIp) {
@@ -32,12 +33,36 @@ export async function startAvahiDaemon(): Promise<void> {
     // or terminates unexpectedly, writing to the pipe or FIFO raises a SIGPIPE signal. If SIGPIPE is blocked,
     // handled or ignored, the offending call fails with EPIPE instead.
     // To dettach the process from the parent: https://stackoverflow.com/questions/25323703/nodejs-execute-command-in-background-and-forget
+
     await retry(
-      async () =>
-        shell(
-          `avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`,
-          { noTimeout: true }
-        ),
+      bail =>
+        new Promise<void>((resolve, reject) => {
+          // Using child_process.spawn since it's better for long running processes with unbounded outputs
+          // - shell(): Is meant for short processes and features a timeout and buffer limit that we don't want here
+          // - child_process.exec: Buffers output, which can cause issues since we want avahi-publish to run for potentially weeks
+          const avahi = spawn(
+            `avahi-publish -a -R ${params.AVAHI_LOCAL_DOMAIN} ${internalIp}`,
+            // Pass through the corresponding stdio stream to/from the parent process.
+            // In the first three positions, this is equivalent to process.stdin, process.stdout, and process.stderr, respectively
+            { stdio: ["inherit", "inherit", "inherit"] }
+          );
+
+          avahi.on("close", code => {
+            logs.info(`avahi-publish exited with code ${code}`);
+            if (code === 0) resolve();
+            else reject(Error(`Exit code ${code}`));
+          });
+
+          avahi.on("error", err => {
+            logs.error("avahi-publish error", err);
+            reject(err);
+          });
+
+          signal.addEventListener("abort", () => {
+            bail(Error("Aborted")); // Prevent more retries
+            avahi.kill("SIGINT"); // Gracefully kill spawned process
+          });
+        }),
       {
         retries: 10,
         maxRetryTime: Infinity,

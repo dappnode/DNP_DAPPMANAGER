@@ -19,11 +19,9 @@ const defaultTimeout = 15 * 60 * 1000; // ms
  */
 export default async function shell(
   cmd: string | string[],
-  options: { timeout?: number; noTimeout?: boolean; maxBuffer?: number } = {}
+  options: { timeout?: number; maxBuffer?: number } = {}
 ): Promise<string> {
-  const timeout = options.noTimeout
-    ? undefined
-    : options.timeout || defaultTimeout;
+  const timeout = options.timeout || defaultTimeout;
   const maxBuffer = options && options.maxBuffer;
   const cmdStr = Array.isArray(cmd) ? cmd.join(" ") : cmd;
   try {
