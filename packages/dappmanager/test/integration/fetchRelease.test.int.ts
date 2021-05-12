@@ -181,8 +181,7 @@ describe("Fetch releases", () => {
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
+        avatarUrl: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
         metadata: {
           name: dnpNameMain,
           version: mainVersion,
@@ -345,8 +344,7 @@ describe("Fetch releases", () => {
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
+        avatarUrl: "/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
         metadata: {
           name: dnpNameMain,
           version: mainVersion,

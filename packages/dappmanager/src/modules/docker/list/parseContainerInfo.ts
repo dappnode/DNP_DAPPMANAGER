@@ -13,7 +13,7 @@ import {
   parseVolumeMappings,
   readContainerLabels
 } from "../../compose";
-import { multiaddressToGatewayUrl } from "../../../utils/distributedFile";
+import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile";
 import { isPortMappingDeletable } from "./isPortMappingDeletable";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
 
@@ -100,7 +100,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: labels.avatar ? multiaddressToGatewayUrl(labels.avatar) : "",
+    avatarUrl: labels.avatar ? multiaddressToIpfsGatewayUrl(labels.avatar) : "",
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
