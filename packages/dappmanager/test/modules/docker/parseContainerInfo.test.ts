@@ -389,8 +389,7 @@ describe("modules / docker / parseContainerInfo", function() {
         running: true,
         exitCode: null,
         dependencies: {},
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+        avatarUrl: "/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
         origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         chain: "ethereum",
         canBeFullnode: false,
@@ -785,8 +784,7 @@ describe("modules / docker / parseContainerInfo", function() {
         canBeFullnode: false
       },
       {
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
+        avatarUrl: "/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
         canBeFullnode: false,
         containerId:
           "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",

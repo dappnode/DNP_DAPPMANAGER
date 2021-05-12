@@ -80,7 +80,8 @@ const params = {
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
   // HTTP API parameters
-  IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
+  /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
+  IPFS_GATEWAY: "/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
   HTTP_CORS_WHITELIST: [
     "http://localhost:3000",
@@ -234,7 +235,7 @@ const params = {
   ],
 
   // ETHFORWARD / HTTP proxy params
-  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
+  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
   ETHFORWARD_PIN_ON_VISIT: true,
 

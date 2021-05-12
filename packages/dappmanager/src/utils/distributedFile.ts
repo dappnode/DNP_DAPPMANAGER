@@ -10,8 +10,12 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
   // Fallback
   if (!distributedFile || !distributedFile.hash) return "";
 
-  const hash = normalizeHash(distributedFile.hash);
-  return `${params.IPFS_GATEWAY}${hash}`;
+  switch (distributedFile.source) {
+    case "ipfs":
+      return `${params.IPFS_GATEWAY}${normalizeHash(distributedFile.hash)}`;
+    default:
+      throw Error(`Source not supported: ${distributedFile.source}`);
+  }
 }
 
 /**
@@ -32,7 +36,7 @@ export function fileToMultiaddress(distributedFile?: DistributedFile): string {
  * @param multiaddress "/ipfs/Qm"
  * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
  */
-export function multiaddressToGatewayUrl(multiaddress: string): string {
+export function multiaddressToIpfsGatewayUrl(multiaddress: string): string {
   const hash = normalizeHash(multiaddress);
   return fileToGatewayUrl({ source: "ipfs", hash, size: 0 });
 }
@@ -46,7 +50,7 @@ export function multiaddressToGatewayUrl(multiaddress: string): string {
  * @param hash "/ipfs/Qm" | "ipfs:Qm" | "Qm"
  * @returns "Qm"
  */
-export function normalizeHash(hash: string): string {
+function normalizeHash(hash: string): string {
   return (
     hash
       // remove any number of trailing slashes
