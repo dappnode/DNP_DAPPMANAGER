@@ -7,6 +7,7 @@ import { prettyDnpName } from "utils/format";
 import { ChainData } from "types";
 import { HelpTo } from "components/Help";
 import { Link } from "react-router-dom";
+import { rootPath as packagesRootPath } from "pages/packages";
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -45,7 +46,9 @@ function ChainCard(chain: ChainData) {
 
       <div className="message">
         <RenderMarkdown source={message} noMargin />
-        {error ? <Link to={`/packages/${dnpName}/logs`}>More info</Link> : null}
+        {error ? (
+          <Link to={`${packagesRootPath}/${dnpName}/logs`}>More info</Link>
+        ) : null}
       </div>
     </Card>
   );
