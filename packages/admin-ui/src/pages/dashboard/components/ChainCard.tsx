@@ -6,8 +6,7 @@ import RenderMarkdown from "components/RenderMarkdown";
 import { prettyDnpName } from "utils/format";
 import { ChainData } from "types";
 import { HelpTo } from "components/Help";
-import { apiUrl } from "../../../params";
-import path from "path";
+import { Link } from "react-router-dom";
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -46,9 +45,7 @@ function ChainCard(chain: ChainData) {
 
       <div className="message">
         <RenderMarkdown source={message} noMargin />
-        {error ? (
-          <a href={path.join(apiUrl, dnpName, "logs")}>More info</a>
-        ) : null}
+        {error ? <Link to={`/packages/${dnpName}/logs`}>More info</Link> : null}
       </div>
     </Card>
   );
