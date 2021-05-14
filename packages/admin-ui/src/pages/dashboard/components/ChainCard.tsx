@@ -6,6 +6,8 @@ import RenderMarkdown from "components/RenderMarkdown";
 import { prettyDnpName } from "utils/format";
 import { ChainData } from "types";
 import { HelpTo } from "components/Help";
+import { apiUrl } from "../../../params";
+import path from "path";
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -37,13 +39,16 @@ function ChainCard(chain: ChainData) {
           />
         )
       ) : error ? (
-        <ProgressBar now={100} variant="danger" />
+        <ProgressBar now={100} variant="warning" />
       ) : (
         <ProgressBar now={100} variant="success" />
       )}
 
       <div className="message">
         <RenderMarkdown source={message} noMargin />
+        {error ? (
+          <a href={path.join(apiUrl, dnpName, "logs")}>More info</a>
+        ) : null}
       </div>
     </Card>
   );
