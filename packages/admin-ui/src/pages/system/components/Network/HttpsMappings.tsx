@@ -189,8 +189,15 @@ export function HttpsMappings() {
             </React.Fragment>
           ))}
         </div>
-        <hr />
-        <Button onClick={() => refreshMapping}>Refresh</Button>
+
+        {mappings.data.length !== 0 && (
+          <>
+            <hr />
+            <Button onClick={() => refreshMapping(mappings.data || [])}>
+              Refresh
+            </Button>
+          </>
+        )}
       </>
     );
   }
