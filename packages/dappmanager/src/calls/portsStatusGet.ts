@@ -1,4 +1,5 @@
 import * as db from "../db";
+import * as upnpc from "../modules/upnpc";
 import { PortToOpen } from "../types";
 import {
   ApiTablePortStatus,
@@ -16,7 +17,7 @@ export async function portsUpnpStatusGet({
 }: {
   portsToOpen: PortToOpen[];
 }): Promise<UpnpTablePortStatus[]> {
-  const upnpPortMappings: UpnpPortMapping[] = db.upnpPortMappings.get(); // Ports opened, mapped with UPnP
+  const upnpPortMappings: UpnpPortMapping[] = await upnpc.list(); // Ports opened, mapped with UPnP
 
   return portsToOpen.map(port => ({
     port: port.portNumber,
