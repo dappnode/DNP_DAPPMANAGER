@@ -515,6 +515,11 @@ export interface Routes {
   systemInfoGet: () => Promise<SystemInfo>;
 
   /**
+   * Executes security updates on host
+   */
+  runHostSecurityUpdates: () => Promise<string>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -630,6 +635,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
+  runHostSecurityUpdates: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

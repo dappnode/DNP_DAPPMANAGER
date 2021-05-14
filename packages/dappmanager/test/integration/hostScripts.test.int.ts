@@ -26,4 +26,17 @@ describe("Host scripts", () => {
     );
     expect(hostInfo).to.be.ok;
   });
+
+  // security_update.sh script not able to tested on github action
+  // works locally
+  /*   it("Should execute security updates", async () => {
+    const securityUpdate = await shell(
+      `sudo bash ${hostScriptsPath}/security_update.sh`
+    );
+    expect(securityUpdate).to.be.ok;
+  });
+ */
+  after("Clean logs", async function() {
+    await shell(`sudo rm -rf /usr/src/dappnode/logs`);
+  });
 });
