@@ -39,8 +39,8 @@ export function HttpsMappings() {
 
       setReqStatus({ loading: true });
       await withToast(() => api.httpsPortalMappingsRecreate(), {
-        message: "Recreating HTTPs mapping...",
-        onSuccess: "Recreated HTTPs mapping"
+        message: "Recreating HTTPs mappings...",
+        onSuccess: "Recreated HTTPs mappings"
       });
 
       setReqStatus({ result: true });
