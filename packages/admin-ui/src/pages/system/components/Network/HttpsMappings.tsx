@@ -16,12 +16,59 @@ import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
+import { ExposableServiceMapping } from "common";
+import Button from "components/Button";
 
 export function HttpsMappings() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const mappings = useApi.httpsPortalExposableServicesGet();
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
+
+  /** Refresh HTTPs Portal mapping */
+  async function refreshMapping(httpsMapping: ExposableServiceMapping[]) {
+    if (reqStatus.loading) return;
+
+    try {
+      await confirmPromise({
+        title: "Refresh",
+        text: "Refresh HTTPs portal mapping",
+        label: "Refresh",
+        variant: "dappnode"
+      });
+
+      setReqStatus({ loading: true });
+      await withToast(
+        () =>
+          Promise.all(
+            httpsMapping.map(httpsMapping =>
+              api.httpsPortalMappingRemove(httpsMapping)
+            )
+          ),
+        {
+          message: "Removing HTTPs mapping...",
+          onSuccess: "Removed HTTPs mapping"
+        }
+      );
+      await withToast(
+        () =>
+          Promise.all(
+            httpsMapping.map(httpsMapping =>
+              api.httpsPortalMappingAdd(httpsMapping)
+            )
+          ),
+        {
+          message: "Adding HTTPs mapping...",
+          onSuccess: "Added HTTPs mapping"
+        }
+      );
+      setReqStatus({ result: true });
+    } catch (e) {
+      setReqStatus({ error: e.message });
+    } finally {
+      mappings.revalidate();
+    }
+  }
 
   /** Add the new mapping created in the local editor */
   async function addMapping(mappingInfo: ExposableServiceInfo) {
@@ -92,55 +139,59 @@ export function HttpsMappings() {
 
   if (mappings.data) {
     return (
-      <div className="list-grid system-network-mappings">
-        {/* Table header */}
-        <header>PACKAGE</header>
-        <header>SERVICE</header>
-        <header />
-        <header>PUBLIC URL</header>
-        <header>EXPOSE</header>
+      <>
+        <div className="list-grid system-network-mappings">
+          {/* Table header */}
+          <header>PACKAGE</header>
+          <header>SERVICE</header>
+          <header />
+          <header>PUBLIC URL</header>
+          <header>EXPOSE</header>
 
+          <hr />
+
+          {mappings.data.length === 0 && (
+            <span className="no-mappings">No exposable services available</span>
+          )}
+
+          {mappings.data.map((mapping, i) => (
+            <React.Fragment key={i}>
+              <span className="package">
+                <span>{prettyFullName(mapping)}</span>
+              </span>
+              <span className="service">
+                <span className="title">{mapping.name}</span>
+                <span className="help-text">{mapping.description}</span>
+              </span>
+              <span className="arrow">
+                <BsArrowRight />
+              </span>
+              <span className="subdomain">
+                {mapping.exposed ? (
+                  <a
+                    href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
+                    {...newTabProps}
+                  >
+                    {mapping.fromSubdomain}
+                    <wbr />.{dappnodeIdentity.domain}
+                  </a>
+                ) : (
+                  "-"
+                )}
+              </span>
+
+              <Switch
+                checked={mapping.exposed}
+                onToggle={() =>
+                  mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
+                }
+              />
+            </React.Fragment>
+          ))}
+        </div>
         <hr />
-
-        {mappings.data.length === 0 && (
-          <span className="no-mappings">No exposable services available</span>
-        )}
-
-        {mappings.data.map((mapping, i) => (
-          <React.Fragment key={i}>
-            <span className="package">
-              <span>{prettyFullName(mapping)}</span>
-            </span>
-            <span className="service">
-              <span className="title">{mapping.name}</span>
-              <span className="help-text">{mapping.description}</span>
-            </span>
-            <span className="arrow">
-              <BsArrowRight />
-            </span>
-            <span className="subdomain">
-              {mapping.exposed ? (
-                <a
-                  href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
-                  {...newTabProps}
-                >
-                  {mapping.fromSubdomain}
-                  <wbr />.{dappnodeIdentity.domain}
-                </a>
-              ) : (
-                "-"
-              )}
-            </span>
-
-            <Switch
-              checked={mapping.exposed}
-              onToggle={() =>
-                mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
-              }
-            />
-          </React.Fragment>
-        ))}
-      </div>
+        <Button onClick={() => refreshMapping}>Refresh</Button>
+      </>
     );
   }
 
