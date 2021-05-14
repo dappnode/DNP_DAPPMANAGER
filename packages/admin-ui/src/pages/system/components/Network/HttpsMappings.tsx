@@ -16,7 +16,6 @@ import newTabProps from "utils/newTabProps";
 import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
-import { ExposableServiceMapping } from "common";
 import Button from "components/Button";
 
 export function HttpsMappings() {
@@ -25,43 +24,25 @@ export function HttpsMappings() {
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
-  /** Refresh HTTPs Portal mapping */
-  async function refreshMapping(httpsMapping: ExposableServiceMapping[]) {
+  /** Recreate HTTPs Portal mapping */
+  async function recreateMapping() {
     if (reqStatus.loading) return;
 
     try {
       await confirmPromise({
-        title: "Refresh",
-        text: "Refresh HTTPs portal mapping",
-        label: "Refresh",
+        title: "Recreate HTTPs mappings",
+        text:
+          "You are about to recreate the HTTPs mappings. You should execute this action only in response to an error",
+        label: "Recreate",
         variant: "dappnode"
       });
 
       setReqStatus({ loading: true });
-      await withToast(
-        () =>
-          Promise.all(
-            httpsMapping.map(httpsMapping =>
-              api.httpsPortalMappingRemove(httpsMapping)
-            )
-          ),
-        {
-          message: "Removing HTTPs mapping...",
-          onSuccess: "Removed HTTPs mapping"
-        }
-      );
-      await withToast(
-        () =>
-          Promise.all(
-            httpsMapping.map(httpsMapping =>
-              api.httpsPortalMappingAdd(httpsMapping)
-            )
-          ),
-        {
-          message: "Adding HTTPs mapping...",
-          onSuccess: "Added HTTPs mapping"
-        }
-      );
+      await withToast(() => api.httpsPortalMappingsRecreate(), {
+        message: "Recreating HTTPs mapping...",
+        onSuccess: "Recreated HTTPs mapping"
+      });
+
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e.message });
@@ -193,9 +174,8 @@ export function HttpsMappings() {
         {mappings.data.length !== 0 && (
           <>
             <hr />
-            <Button onClick={() => refreshMapping(mappings.data || [])}>
-              Refresh
-            </Button>
+            <p>Use the "Recreate" mappings button if you experience issues.</p>
+            <Button onClick={() => recreateMapping()}>Recreate</Button>
           </>
         )}
       </>
