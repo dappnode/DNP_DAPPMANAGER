@@ -31,6 +31,18 @@ export async function httpsPortalMappingRemove(
 }
 
 /**
+ * HTTPs Portal: recreate HTTPs portal mapping
+ */
+export async function httpsPortalMappingsRecreate(): Promise<void> {
+  const mappings = await httpsPortal.getMappings();
+
+  for (const mapping of mappings) {
+    await httpsPortal.removeMapping(mapping);
+    await httpsPortal.addMapping(mapping);
+  }
+}
+
+/**
  * HTTPs Portal: get all mappings
  */
 export async function httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]> {

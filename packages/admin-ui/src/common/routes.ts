@@ -248,6 +248,8 @@ export interface Routes {
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
   /** HTTPs Portal: get exposable services with metadata */
   httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
+  /** HTTPs Portal: recreate mappings */
+  httpsPortalMappingsRecreate(): Promise<void>;
 
   /**
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
@@ -596,6 +598,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
   mountpointsGet: {},

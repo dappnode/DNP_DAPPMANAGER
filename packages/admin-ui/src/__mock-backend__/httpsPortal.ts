@@ -19,6 +19,7 @@ export const httpsPortal: Pick<
   | "httpsPortalMappingRemove"
   | "httpsPortalMappingsGet"
   | "httpsPortalExposableServicesGet"
+  | "httpsPortalMappingsRecreate"
 > = {
   httpsPortalMappingAdd: async mapping => {
     mappings.set(mapping.fromSubdomain, mapping);
@@ -40,7 +41,8 @@ export const httpsPortal: Pick<
         return { ...mapping, exposed: false };
       }
     });
-  }
+  },
+  httpsPortalMappingsRecreate: async () => {}
 };
 
 /** Helper to uniquely identify mapping target services */
