@@ -30,6 +30,6 @@ export function decodeContentHash(contenthash: string): Content {
       hash: Buffer.from(multihash.decode(cid.multihash).digest).toString("hex")
     };
   } else {
-    throw Error(`Unsupported coded: ${contentCodec}`);
+    throw Error(`Unsupported codec: ${contentCodec}`);
   }
 }
