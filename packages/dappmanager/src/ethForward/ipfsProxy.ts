@@ -33,7 +33,9 @@ export function getIpfsProxyHandler<T>(
   });
 
   logs.info(
-    `Starting ${proxyType} proxy: IPFS -> ${params.ETHFORWARD_IPFS_REDIRECT} SWARM -> ${params.ETHFORWARD_SWARM_REDIRECT}`
+    `Starting ${proxyType} proxy:
+    IPFS -> ${params.ETHFORWARD_IPFS_REDIRECT}
+    SWARM -> ${params.ETHFORWARD_SWARM_REDIRECT}`
   );
 
   return async function ethForwardProxyHttpHandler(
@@ -86,12 +88,18 @@ export function getIpfsProxyHandler<T>(
  *   to `ipfs.dappnode:8080/Qm1234/image.png`. We only need to proxy to a new hostname
  *   the hash and path information is already present in the request
  */
-function getTargetUrl(proxyType: ProxyType, content: Content): string {
+function getTargetUrl(
+  proxyType: ProxyType,
+  content: Content,
+  domain: string
+): string {
   switch (proxyType) {
     case ProxyType.ETHFORWARD:
       switch (content.location) {
         case "ipfs":
           return urlJoin(params.ETHFORWARD_IPFS_REDIRECT, "ipfs", content.hash);
+        case "ipns":
+          return urlJoin(params.ETHFORWARD_IPFS_REDIRECT, "ipns", domain);
         case "swarm":
           return urlJoin(params.ETHFORWARD_SWARM_REDIRECT, content.hash);
       }
@@ -100,6 +108,8 @@ function getTargetUrl(proxyType: ProxyType, content: Content): string {
       switch (content.location) {
         case "ipfs":
           return params.ETHFORWARD_IPFS_REDIRECT;
+        case "ipns":
+          throw Error("IPNS gateway not supported");
         case "swarm":
           return params.ETHFORWARD_SWARM_REDIRECT;
       }

@@ -1,7 +1,7 @@
 /**
  * Content locations supported by the ETH FORWARD
  */
-export type Location = "ipfs" | "swarm";
+export type Location = "ipfs" | "ipns" | "swarm";
 
 /**
  * Network names supported by the ETH FORWARD
@@ -15,6 +15,10 @@ export type Content =
   | {
       location: "ipfs";
       hash: string; // "Qm7700z..."
+    }
+  | {
+      location: "ipns";
+      name: string; // "uniswap.eth"
     }
   | {
       location: "swarm";

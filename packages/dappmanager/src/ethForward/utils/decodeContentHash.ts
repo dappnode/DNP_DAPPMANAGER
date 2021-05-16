@@ -22,6 +22,11 @@ export function decodeContentHash(contenthash: string): Content {
       location: "ipfs",
       hash: multihash.toB58String(cid.multihash)
     };
+  } else if (contentCodec.startsWith("ipns")) {
+    return {
+      location: "ipns",
+      hash: multihash.toB58String(cid.multihash)
+    };
   } else if (contentCodec.startsWith("swarm")) {
     const value = multicodec.rmPrefix(contentHashEncoded);
     const cid = new CID(value);
