@@ -23,6 +23,11 @@ export function decodeContentHash(contenthash: string): Content {
       hash: multihash.toB58String(cid.multihash)
     };
   } else if (contentCodec.startsWith("ipns")) {
+    const value = multicodec.rmPrefix(contentHashEncoded);
+    // it's not clear that this is actually valid CID
+    // eg uniswap.eth -> 12uA8M8Ku8mHUumxHcu7uee
+    // not a Qm... hash
+    const cid = new CID(value);
     return {
       location: "ipns",
       hash: multihash.toB58String(cid.multihash)

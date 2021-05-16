@@ -18,7 +18,7 @@ export type Content =
     }
   | {
       location: "ipns";
-      name: string; // "uniswap.eth"
+      hash: string; // "12uA8M8Ku8mHUumxHcu7uee"
     }
   | {
       location: "swarm";
