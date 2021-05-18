@@ -86,7 +86,8 @@ const params = {
   HTTP_CORS_WHITELIST: [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://my.dappnode"
+    "http://my.dappnode",
+    "http://my.dappnode.local"
   ],
 
   // API auth sessions
@@ -95,7 +96,7 @@ const params = {
   SESSIONS_TTL_MS: 7 * DAY,
 
   // VPN API
-  VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
+  VPN_API_RPC_URL: "http://vpn.dappnode:3000/rpc",
 
   // HTTPS Portal API URL
   HTTPS_PORTAL_API_URL: "http://https.dappnode:5000",
