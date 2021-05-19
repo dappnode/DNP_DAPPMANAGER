@@ -9,7 +9,9 @@ const {
   WIREGUARD_DEVICES_ENVNAME,
   WIREGUARD_DNP_NAME,
   WIREGUARD_ISCORE,
-  WIREGUARD_MAIN_SERVICE
+  WIREGUARD_MAIN_SERVICE,
+  WIREGUARD_LOCAL,
+  WIREGUARD_REMOTE
 } = params;
 
 export class WireguardClient {
@@ -54,13 +56,28 @@ export class WireguardClient {
     });
   }
 
-  async getDeviceCredentials(device: string): Promise<{ config: string }> {
-    const configUrl = urlJoin(WIREGUARD_API_URL, device);
-    const res = await fetch(configUrl);
-    const body = await res.text();
-    if (res.status === 404) throw Error(`Device not found`);
-    if (!res.ok)
-      throw Error(`Error fetching credentials: ${res.statusText} ${body}`);
+  async getDeviceCredentials(device: string): Promise<{ config: string[] }> {
+    const remoteConfigUrl = urlJoin(
+      WIREGUARD_API_URL,
+      WIREGUARD_REMOTE,
+      device
+    );
+    const localConfigUrl = urlJoin(WIREGUARD_API_URL, WIREGUARD_LOCAL, device);
+    const responses = await Promise.all([
+      fetch(remoteConfigUrl),
+      fetch(localConfigUrl)
+    ]);
+    const body: string[] = [];
+    for (const response of responses) {
+      const responseText = await response.text();
+      body.push(responseText);
+
+      if (response.status === 404) throw Error(`Device not found`);
+      if (!response.ok)
+        throw Error(
+          `Error fetching remote credentials: ${response.statusText} ${body}`
+        );
+    }
     return { config: body };
   }
 }
