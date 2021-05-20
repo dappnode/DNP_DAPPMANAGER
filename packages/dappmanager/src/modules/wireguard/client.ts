@@ -56,7 +56,7 @@ export class WireguardClient {
     });
   }
 
-  async getDeviceCredentials(device: string): Promise<{ config: string[] }> {
+  async getDeviceCredentials(device: string): Promise<{ configs: string[] }> {
     const remoteConfigUrl = urlJoin(
       WIREGUARD_API_URL,
       WIREGUARD_REMOTE,
@@ -78,6 +78,6 @@ export class WireguardClient {
           `Error fetching credentials: ${response.statusText} ${body}`
         );
     }
-    return { config: body };
+    return { configs: body };
   }
 }
