@@ -24,8 +24,9 @@ function WireguardDeviceDetailsLoaded({
   id: string;
   device: WireguardDeviceCredentials;
 }) {
-  const [showQr, setShowQr] = useState(false);
-  const { configs } = device;
+  const [showQrRemote, setShowQrRemote] = useState(false);
+  const [showQrLocal, setShowQrLocal] = useState(false);
+  const { configRemote, configLocal } = device;
 
   useEffect(() => {
     // Activate the copy functionality
@@ -49,29 +50,50 @@ function WireguardDeviceDetailsLoaded({
       </div>
 
       <Form.Group>
-        <Form.Label>VPN credentials URL</Form.Label>
-        <div className="credentials-config">{configs}</div>
+        <Form.Label>VPN remote credentials URL</Form.Label>
+        <div className="credentials-config">{configRemote}</div>
+        <Form.Label>VPN local credentials URL</Form.Label>
+        <div className="credentials-config">{configLocal}</div>
       </Form.Group>
 
       <div className="buttons">
-        <Button data-clipboard-text={configs}>
+        <Button data-clipboard-text={configRemote}>
           <span>
             <GoClippy />
-            <span>Copy config</span>
+            <span>Copy remote config</span>
           </span>
         </Button>
 
-        <Button onClick={() => setShowQr(!showQr)}>
+        <Button onClick={() => setShowQrRemote(!showQrRemote)}>
           <span>
             <FaQrcode />
-            <span>{showQr ? "Hide" : "Show"} config QR code</span>
+            <span>{showQrRemote ? "Hide" : "Show"} remote config QR code</span>
           </span>
         </Button>
       </div>
 
-      {showQr &&
-        configs &&
-        configs.map(config => <QrCode url={config} width={"400px"} />)}
+      <div className="buttons">
+        <Button data-clipboard-text={configLocal}>
+          <span>
+            <GoClippy />
+            <span>Copy local config</span>
+          </span>
+        </Button>
+
+        <Button onClick={() => setShowQrLocal(!showQrLocal)}>
+          <span>
+            <FaQrcode />
+            <span>{showQrLocal ? "Hide" : "Show"} local config QR code</span>
+          </span>
+        </Button>
+      </div>
+
+      {showQrRemote && configRemote && (
+        <QrCode url={configRemote} width={"400px"} />
+      )}
+      {showQrLocal && configLocal && (
+        <QrCode url={configLocal} width={"400px"} />
+      )}
 
       <div className="alert alert-secondary" role="alert">
         Beware of shoulder surfing attacks (unsolicited observers), This data
