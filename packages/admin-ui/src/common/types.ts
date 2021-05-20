@@ -65,7 +65,7 @@ export interface WireguardDeviceCredentials {
    * AllowedIPs = 172.33.0.0/16
    * ```
    */
-  config: string[];
+  configs: string[];
 }
 
 // SSH types

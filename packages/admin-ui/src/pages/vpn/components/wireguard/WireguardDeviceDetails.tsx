@@ -25,7 +25,7 @@ function WireguardDeviceDetailsLoaded({
   device: WireguardDeviceCredentials;
 }) {
   const [showQr, setShowQr] = useState(false);
-  const { config } = device;
+  const { configs } = device;
 
   useEffect(() => {
     // Activate the copy functionality
@@ -50,11 +50,11 @@ function WireguardDeviceDetailsLoaded({
 
       <Form.Group>
         <Form.Label>VPN credentials URL</Form.Label>
-        <div className="credentials-config">{config}</div>
+        <div className="credentials-config">{configs}</div>
       </Form.Group>
 
       <div className="buttons">
-        <Button data-clipboard-text={config}>
+        <Button data-clipboard-text={configs}>
           <span>
             <GoClippy />
             <span>Copy config</span>
@@ -69,7 +69,9 @@ function WireguardDeviceDetailsLoaded({
         </Button>
       </div>
 
-      {showQr && config && <QrCode url={config} width={"400px"} />}
+      {showQr &&
+        configs &&
+        configs.map(config => <QrCode url={config} width={"400px"} />)}
 
       <div className="alert alert-secondary" role="alert">
         Beware of shoulder surfing attacks (unsolicited observers), This data

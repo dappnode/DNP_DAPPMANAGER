@@ -75,7 +75,7 @@ export class WireguardClient {
       if (response.status === 404) throw Error(`Device not found`);
       if (!response.ok)
         throw Error(
-          `Error fetching remote credentials: ${response.statusText} ${body}`
+          `Error fetching credentials: ${response.statusText} ${body}`
         );
     }
     return { config: body };

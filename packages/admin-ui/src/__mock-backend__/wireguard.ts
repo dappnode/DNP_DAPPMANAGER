@@ -23,7 +23,8 @@ export const wireguard: Pick<
   wireguardDevicesGet: async () => Array.from(devicesState.values()),
   wireguardDeviceGet: async id => {
     if (!devicesState.has(id)) throw Error(`No device id ${id}`);
-    const config = `[Interface]
+    const configs = [
+      `[Interface]
 Address = 172.34.1.2
 PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
 ListenPort = 51820
@@ -32,7 +33,18 @@ DNS = 172.33.1.2
 [Peer]
 PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
 Endpoint = aaaabbbbaaaabbbb.dyndns.dappnode.io:51820
-AllowedIPs = 172.33.0.0/16`;
-    return { config };
+AllowedIPs = 172.33.0.0/16`,
+      `[Interface]
+Address = 172.34.1.2
+PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+ListenPort = 51820
+DNS = 172.33.1.2
+
+[Peer]
+PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
+Endpoint = 192.168.1.45:51820
+AllowedIPs = 172.33.0.0/16`
+    ];
+    return { configs };
   }
 };
