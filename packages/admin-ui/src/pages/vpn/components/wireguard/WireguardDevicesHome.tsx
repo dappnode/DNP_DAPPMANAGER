@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink } from "react-router-dom";
 // Own module
-import { maxIdLength, rootPath } from "../../data";
+import { maxIdLength, rootPath, subPaths } from "../../data";
 import coerceDeviceName from "../../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
@@ -105,7 +105,10 @@ export function WireguardDevicesHome() {
             .map(id => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
-                <NavLink to={urlJoin(rootPath, id)} className="no-a-style">
+                <NavLink
+                  to={urlJoin(rootPath, subPaths.wireguard, id)}
+                  className="no-a-style"
+                >
                   <Button className="get-link">Get</Button>
                 </NavLink>
 

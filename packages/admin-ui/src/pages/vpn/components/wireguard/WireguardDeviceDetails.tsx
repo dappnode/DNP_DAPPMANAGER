@@ -3,7 +3,7 @@ import { NavLink, RouteComponentProps } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, title } from "../../data";
+import { rootPath, subPaths, title } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Card from "components/Card";
@@ -16,6 +16,8 @@ import Title from "components/Title";
 import { GoClippy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
 import { WireguardDeviceCredentials } from "types";
+// Utils
+import { urlJoin } from "utils/url";
 
 function WireguardDeviceDetailsLoaded({
   id,
@@ -38,7 +40,7 @@ function WireguardDeviceDetailsLoaded({
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
-        <NavLink to={rootPath}>
+        <NavLink to={urlJoin(rootPath, subPaths.wireguard)}>
           <Button>Back</Button>
         </NavLink>
       </header>
@@ -49,11 +51,14 @@ function WireguardDeviceDetailsLoaded({
         can share them with a trusted person through a secure channel.
       </div>
 
+      <div className="alert alert-secondary" role="definition">
+        Use remote credentials by default. In case of your router does not
+        support NAT loopback use local credentials
+      </div>
+
       <Form.Group>
         <Form.Label>VPN remote credentials URL</Form.Label>
         <div className="credentials-config">{configRemote}</div>
-        <Form.Label>VPN local credentials URL</Form.Label>
-        <div className="credentials-config">{configLocal}</div>
       </Form.Group>
 
       <div className="buttons">
@@ -72,6 +77,15 @@ function WireguardDeviceDetailsLoaded({
         </Button>
       </div>
 
+      {showQrRemote && configRemote && (
+        <QrCode url={configRemote} width={"400px"} />
+      )}
+
+      <Form.Group>
+        <Form.Label>VPN local credentials URL</Form.Label>
+        <div className="credentials-config">{configLocal}</div>
+      </Form.Group>
+
       <div className="buttons">
         <Button data-clipboard-text={configLocal}>
           <span>
@@ -88,9 +102,6 @@ function WireguardDeviceDetailsLoaded({
         </Button>
       </div>
 
-      {showQrRemote && configRemote && (
-        <QrCode url={configRemote} width={"400px"} />
-      )}
       {showQrLocal && configLocal && (
         <QrCode url={configLocal} width={"400px"} />
       )}
