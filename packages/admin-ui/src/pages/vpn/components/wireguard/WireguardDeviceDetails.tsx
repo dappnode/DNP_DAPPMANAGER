@@ -35,11 +35,6 @@ function WireguardCredentialsHeader({ id }: { id: string }) {
         You can then use the user and admin password to log in to the UI. You
         can share them with a trusted person through a secure channel.
       </div>
-
-      <div className="alert alert-secondary" role="definition">
-        Use remote credentials by default. In case of your router does not
-        support NAT loopback use local credentials
-      </div>
     </>
   );
 }
@@ -77,7 +72,7 @@ function WireguardDeviceDetailsLoaded({
 }) {
   const [showQrRemote, setShowQrRemote] = useState(false);
   const [showQrLocal, setShowQrLocal] = useState(false);
-  const [showCreds, setShowCreds] = useState("");
+  const [showLocalCreds, setShowLocalCreds] = useState(false);
   const { configRemote, configLocal } = device;
 
   useEffect(() => {
@@ -88,38 +83,22 @@ function WireguardDeviceDetailsLoaded({
   return (
     <Card className="wireguard-device-settings" spacing>
       <WireguardCredentialsHeader id={id} />
-
+      <div className="help-text">
+        In case you experience issues connecting from the same network as your
+        dappnode, use the local credentials.{" "}
+        <span
+          className="show-local-credentials"
+          onClick={() => setShowLocalCreds(true)}
+        >
+          Show local credentials
+        </span>
+      </div>
       <div className="buttons">
-        <Button onClick={() => setShowCreds("remote")}>
+        <Button onClick={() => setShowLocalCreds(false)}>
           Remote credentials
         </Button>
-        <Button onClick={() => setShowCreds("local")}>Local credentials</Button>
       </div>
-      {showCreds === "remote" ? (
-        <>
-          <WireguardCredentialsForm configType={configRemote} type={"remote"} />
-          <div className="buttons">
-            <Button data-clipboard-text={configRemote}>
-              <span>
-                <GoClippy />
-                <span>Copy remote config</span>
-              </span>
-            </Button>
-
-            <Button onClick={() => setShowQrRemote(!showQrRemote)}>
-              <span>
-                <FaQrcode />
-                <span>
-                  {showQrRemote ? "Hide" : "Show"} remote config QR code
-                </span>
-              </span>
-            </Button>
-          </div>
-          {showQrRemote && configRemote && (
-            <QrCode url={configRemote} width={"400px"} />
-          )}
-        </>
-      ) : showCreds === "local" ? (
+      {showLocalCreds ? (
         <>
           <WireguardCredentialsForm configType={configLocal} type={"local"} />
           <div className="buttons">
@@ -144,7 +123,31 @@ function WireguardDeviceDetailsLoaded({
             <QrCode url={configLocal} width={"400px"} />
           )}
         </>
-      ) : null}
+      ) : (
+        <>
+          <WireguardCredentialsForm configType={configRemote} type={"remote"} />
+          <div className="buttons">
+            <Button data-clipboard-text={configRemote}>
+              <span>
+                <GoClippy />
+                <span>Copy remote config</span>
+              </span>
+            </Button>
+
+            <Button onClick={() => setShowQrRemote(!showQrRemote)}>
+              <span>
+                <FaQrcode />
+                <span>
+                  {showQrRemote ? "Hide" : "Show"} remote config QR code
+                </span>
+              </span>
+            </Button>
+          </div>
+          {showQrRemote && configRemote && (
+            <QrCode url={configRemote} width={"400px"} />
+          )}
+        </>
+      )}
 
       <WireguardCredentialsFooter />
     </Card>

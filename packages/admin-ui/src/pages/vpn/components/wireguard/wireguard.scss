@@ -87,4 +87,12 @@
     border-radius: 0.25rem;
     background-color: #f7f9f9;
   }
+
+  .show-local-credentials {
+    cursor: pointer;
+    color: var(--dappnode-links-color);
+  }
+  .show-local-credentials:hover {
+    text-decoration: underline;
+  }
 }
