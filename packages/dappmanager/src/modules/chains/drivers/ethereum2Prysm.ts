@@ -31,9 +31,7 @@ export async function ethereum2Prysm(
     return null; // OK to not be running, just ignore
   }
 
-  const container = dnp.containers[0];
-  if (!container) throw Error("no container");
-  const containerDomain = getPrivateNetworkAlias(container);
+  const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
 
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
   const apiUrl = `http://${containerDomain}:3500`;
