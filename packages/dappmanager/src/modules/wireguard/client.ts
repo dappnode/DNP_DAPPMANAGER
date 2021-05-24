@@ -67,22 +67,22 @@ export class WireguardClient {
       device
     );
     const localConfigUrl = urlJoin(WIREGUARD_API_URL, WIREGUARD_LOCAL, device);
-    const [configRemoteResponse, configLocalResponse] = await Promise.all([
-      fetch(remoteConfigUrl),
-      fetch(localConfigUrl)
-    ]).then(responses => {
-      for (const response of responses) {
-        if (response.status === 404) throw Error(`Device not found`);
-        if (!response.ok)
-          throw Error(
-            `Error fetching credentials: ${response.statusText} ${response.body}`
-          );
-      }
-      return responses;
-    });
+    const [configRemote, configLocal] = await Promise.all([
+      fetchWireguardConfigFile(remoteConfigUrl),
+      fetchWireguardConfigFile(localConfigUrl)
+    ]);
 
-    const configRemote = await configRemoteResponse.text();
-    const configLocal = await configLocalResponse.text();
     return { configRemote, configLocal };
   }
+}
+
+// Utils
+
+async function fetchWireguardConfigFile(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (response.status === 404) throw Error(`Device not found`);
+  const body = await response.text();
+  if (!response.ok)
+    throw Error(`Error fetching credentials: ${response.statusText} ${body}`);
+  return body;
 }

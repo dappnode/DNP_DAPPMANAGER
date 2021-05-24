@@ -19,9 +19,25 @@ import { WireguardDeviceCredentials } from "types";
 // Utils
 import { urlJoin } from "utils/url";
 
-function WireguardCredentialsHeader({ id }: { id: string }) {
+function WireguardDeviceDetailsLoaded({
+  id,
+  device
+}: {
+  id: string;
+  device: WireguardDeviceCredentials;
+}) {
+  const [showQr, setShowQr] = useState(false);
+  const [showLocalCreds, setShowLocalCreds] = useState(false);
+  const config = showLocalCreds ? device.configLocal : device.configRemote;
+  const configType = showLocalCreds ? "local" : "remote";
+
+  useEffect(() => {
+    // Activate the copy functionality
+    new ClipboardJS(".copy-input-copy");
+  }, []);
+
   return (
-    <>
+    <Card className="wireguard-device-settings" spacing>
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
@@ -35,54 +51,7 @@ function WireguardCredentialsHeader({ id }: { id: string }) {
         You can then use the user and admin password to log in to the UI. You
         can share them with a trusted person through a secure channel.
       </div>
-    </>
-  );
-}
 
-function WireguardCredentialsFooter() {
-  return (
-    <div className="alert alert-secondary" role="alert">
-      Beware of shoulder surfing attacks (unsolicited observers), This data
-      grants admin access to your DAppNode
-    </div>
-  );
-}
-
-function WireguardCredentialsForm({
-  configType,
-  type
-}: {
-  configType: string;
-  type: "local" | "remote";
-}) {
-  return (
-    <Form.Group>
-      <Form.Label>VPN {type} credentials URL</Form.Label>
-      <div className="credentials-config">{configType}</div>
-    </Form.Group>
-  );
-}
-
-function WireguardDeviceDetailsLoaded({
-  id,
-  device
-}: {
-  id: string;
-  device: WireguardDeviceCredentials;
-}) {
-  const [showQrRemote, setShowQrRemote] = useState(false);
-  const [showQrLocal, setShowQrLocal] = useState(false);
-  const [showLocalCreds, setShowLocalCreds] = useState(false);
-  const { configRemote, configLocal } = device;
-
-  useEffect(() => {
-    // Activate the copy functionality
-    new ClipboardJS(".copy-input-copy");
-  }, []);
-
-  return (
-    <Card className="wireguard-device-settings" spacing>
-      <WireguardCredentialsHeader id={id} />
       <div className="help-text">
         In case you experience issues connecting from the same network as your
         dappnode, use the local credentials.{" "}
@@ -95,61 +64,39 @@ function WireguardDeviceDetailsLoaded({
       </div>
       <div className="buttons">
         <Button onClick={() => setShowLocalCreds(false)}>
-          Remote credentials
+          {config} credentials
         </Button>
       </div>
-      {showLocalCreds ? (
-        <>
-          <WireguardCredentialsForm configType={configLocal} type={"local"} />
-          <div className="buttons">
-            <Button data-clipboard-text={configLocal}>
-              <span>
-                <GoClippy />
-                <span>Copy local config</span>
-              </span>
-            </Button>
 
-            <Button onClick={() => setShowQrLocal(!showQrLocal)}>
-              <span>
-                <FaQrcode />
-                <span>
-                  {showQrLocal ? "Hide" : "Show"} local config QR code
-                </span>
-              </span>
-            </Button>
-          </div>
+      <Form.Group>
+        <Form.Label>VPN {configType} credentials URL</Form.Label>
+        <div className="credentials-config">{config}</div>
+      </Form.Group>
 
-          {showQrLocal && configLocal && (
-            <QrCode url={configLocal} width={"400px"} />
-          )}
-        </>
-      ) : (
-        <>
-          <WireguardCredentialsForm configType={configRemote} type={"remote"} />
-          <div className="buttons">
-            <Button data-clipboard-text={configRemote}>
-              <span>
-                <GoClippy />
-                <span>Copy remote config</span>
-              </span>
-            </Button>
+      <div className="buttons">
+        <Button data-clipboard-text={config}>
+          <span>
+            <GoClippy />
+            <span>Copy {configType} config</span>
+          </span>
+        </Button>
 
-            <Button onClick={() => setShowQrRemote(!showQrRemote)}>
-              <span>
-                <FaQrcode />
-                <span>
-                  {showQrRemote ? "Hide" : "Show"} remote config QR code
-                </span>
-              </span>
-            </Button>
-          </div>
-          {showQrRemote && configRemote && (
-            <QrCode url={configRemote} width={"400px"} />
-          )}
-        </>
-      )}
+        <Button onClick={() => setShowQr(!showQr)}>
+          <span>
+            <FaQrcode />
+            <span>
+              {showQr ? "Hide" : "Show"} {configType} config QR code
+            </span>
+          </span>
+        </Button>
+      </div>
 
-      <WireguardCredentialsFooter />
+      {showQr && config && <QrCode url={config} width={"400px"} />}
+
+      <div className="alert alert-secondary" role="alert">
+        Beware of shoulder surfing attacks (unsolicited observers), This data
+        grants admin access to your DAppNode
+      </div>
     </Card>
   );
 }
