@@ -7,7 +7,11 @@ import {
 import { listContainers } from "../docker/list";
 import params from "../../params";
 import { getExternalNetworkAlias } from "../../domains";
-import { PackageContainer, HttpsPortalMapping } from "../../types";
+import {
+  PackageContainer,
+  HttpsPortalMapping,
+  HttpsLocalProxyingStatus
+} from "../../types";
 import { HttpsPortalApiClient } from "./apiClient";
 import { addNetworkAliasCompose, removeNetworkAliasCompose } from "./utils";
 import { packageSetEnvironment } from "../../calls";
@@ -136,14 +140,14 @@ export class HttpsPortal {
     return mappings;
   }
 
-  async localProxyingEnableDisable(enable: boolean): Promise<void> {
+  async localProxyingEnableDisable(
+    enable: HttpsLocalProxyingStatus
+  ): Promise<void> {
     await packageSetEnvironment({
       dnpName: params.HTTPS_PORTAL_DNPNAME,
       environmentByService: {
         [params.HTTPS_PORTAL_MAIN_SERVICE]: {
           [params.HTTPS_PORTAL_LOCAL_PROXYING_ENVNAME]: enable
-            ? "true"
-            : "false"
         }
       }
     });

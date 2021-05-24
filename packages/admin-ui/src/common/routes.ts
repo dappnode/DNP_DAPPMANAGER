@@ -36,7 +36,8 @@ import {
   HostDiagnoseItem,
   InstalledPackageDataApiReturn,
   WifiReport,
-  CurrentWifiCredentials
+  CurrentWifiCredentials,
+  HttpsLocalProxyingStatus
 } from "./types";
 
 export interface Routes {
@@ -250,6 +251,12 @@ export interface Routes {
   httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
   /** HTTPs Portal: recreate mappings */
   httpsPortalMappingsRecreate(): Promise<void>;
+  /** HTTPs Portal: set LOCAL_PROXYING */
+  httpsLocalProxyingEnableDisable(
+    enable: HttpsLocalProxyingStatus
+  ): Promise<void>;
+  /** HTTPs Portal: get LOCAL_PROXYING env value */
+  httpsLocalProxyingGet(): Promise<HttpsLocalProxyingStatus>;
 
   /**
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
@@ -600,6 +607,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsGet: {},
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
+  httpsLocalProxyingEnableDisable: {},
+  httpsLocalProxyingGet: {},
   ipfsTest: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},

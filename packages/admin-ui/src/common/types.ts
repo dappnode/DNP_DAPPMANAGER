@@ -6,6 +6,9 @@ export interface LoginStatusReturn {
 
 // HTTPS portal mappings
 
+// https://github.com/dappnode/DNP_HTTPS/blob/2a52450061eb3b0c4bc321e9b75547661cba1017/docker-compose.yml#L13
+export type HttpsLocalProxyingStatus = "true" | "false";
+
 export interface HttpsPortalMapping {
   fromSubdomain: string;
   dnpName: string;

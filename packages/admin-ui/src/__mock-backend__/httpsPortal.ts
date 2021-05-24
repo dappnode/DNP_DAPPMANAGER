@@ -20,6 +20,8 @@ export const httpsPortal: Pick<
   | "httpsPortalMappingsGet"
   | "httpsPortalExposableServicesGet"
   | "httpsPortalMappingsRecreate"
+  | "httpsLocalProxyingEnableDisable"
+  | "httpsLocalProxyingGet"
 > = {
   httpsPortalMappingAdd: async mapping => {
     mappings.set(mapping.fromSubdomain, mapping);
@@ -42,7 +44,9 @@ export const httpsPortal: Pick<
       }
     });
   },
-  httpsPortalMappingsRecreate: async () => {}
+  httpsPortalMappingsRecreate: async () => {},
+  httpsLocalProxyingEnableDisable: async () => {},
+  httpsLocalProxyingGet: async () => "true"
 };
 
 /** Helper to uniquely identify mapping target services */
