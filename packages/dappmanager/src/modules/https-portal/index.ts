@@ -136,12 +136,14 @@ export class HttpsPortal {
     return mappings;
   }
 
-  async setLocalProxying(localProxying: boolean): Promise<void> {
+  async localProxyingEnableDisable(enable: boolean): Promise<void> {
     await packageSetEnvironment({
       dnpName: params.HTTPS_PORTAL_DNPNAME,
       environmentByService: {
         [params.HTTPS_PORTAL_MAIN_SERVICE]: {
-          [params.HTTPS_PORTAL_LOCAL_ENVNAME]: `${localProxying}`
+          [params.HTTPS_PORTAL_LOCAL_PROXYING_ENVNAME]: enable
+            ? "true"
+            : "false"
         }
       }
     });

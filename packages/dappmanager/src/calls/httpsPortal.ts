@@ -74,10 +74,10 @@ export async function httpsPortalExposableServicesGet(): Promise<
 /**
  * HTTPs Portal: set env value LOCAL_PROXYING
  */
-export async function httpsSetLocalProxying(
-  localProxying: boolean
+export async function httpsLocalProxyingEnableDisable(
+  enable: boolean
 ): Promise<void> {
-  await httpsPortal.setLocalProxying(localProxying);
+  await httpsPortal.localProxyingEnableDisable(enable);
 }
 
 /** Helper to uniquely identify mapping target services */
