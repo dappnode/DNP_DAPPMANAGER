@@ -71,6 +71,15 @@ export async function httpsPortalExposableServicesGet(): Promise<
   });
 }
 
+/**
+ * HTTPs Portal: set env value LOCAL_PROXYING
+ */
+export async function httpsSetLocalProxying(
+  localProxying: boolean
+): Promise<void> {
+  await httpsPortal.setLocalProxying(localProxying);
+}
+
 /** Helper to uniquely identify mapping target services */
 function getServiceId(
   mapping: Omit<HttpsPortalMapping, "fromSubdomain">

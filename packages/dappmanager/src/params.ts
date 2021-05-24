@@ -101,6 +101,8 @@ const params = {
   // HTTPS Portal API URL
   HTTPS_PORTAL_API_URL: "http://https.dappnode:5000",
   HTTPS_PORTAL_DNPNAME: "https.dnp.dappnode.eth",
+  HTTPS_PORTAL_MAIN_SERVICE: "https",
+  HTTPS_PORTAL_LOCAL_ENVNAME: "LOCAL_PROXYING",
 
   // Wireguard params
   WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
