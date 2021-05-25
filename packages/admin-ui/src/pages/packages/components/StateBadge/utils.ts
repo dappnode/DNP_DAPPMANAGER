@@ -1,5 +1,4 @@
-import { AvahiStatusType } from "common";
-import { PackageContainer } from "types";
+import { PackageContainer, AvahiStatusType } from "types";
 
 export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
 export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
