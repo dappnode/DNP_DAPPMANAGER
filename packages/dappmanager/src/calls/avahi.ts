@@ -1,4 +1,4 @@
-import { LocalNetworkState } from "../types";
+import { HttpsLocalProxyingStatus, LocalNetworkState } from "../types";
 import { avahiController } from "../daemons/avahi";
 import {
   httpsLocalProxyingEnableDisable,
@@ -11,10 +11,14 @@ import {
  */
 export async function avahiEnableDisable(enable: boolean): Promise<void> {
   if (enable) {
-    await httpsLocalProxyingEnableDisable(`${enable}`);
+    await httpsLocalProxyingEnableDisable(
+      `${enable}` as HttpsLocalProxyingStatus
+    );
     await avahiController.start();
   } else {
-    await httpsLocalProxyingEnableDisable(`${enable}`);
+    await httpsLocalProxyingEnableDisable(
+      `${enable}` as HttpsLocalProxyingStatus
+    );
     avahiController.stop();
   }
 }
