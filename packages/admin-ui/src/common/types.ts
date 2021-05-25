@@ -17,16 +17,6 @@ export enum AvahiStatusType {
   crashed = "crashed"
 }
 
-export type AvahiStatus =
-  | {
-      type: AvahiStatusType.started;
-      controller: AbortController;
-    }
-  | {
-      type: AvahiStatusType.stopped;
-    }
-  | { type: AvahiStatusType.crashed };
-
 // HTTPS portal mappings
 
 // https://github.com/dappnode/DNP_HTTPS/blob/2a52450061eb3b0c4bc321e9b75547661cba1017/docker-compose.yml#L13

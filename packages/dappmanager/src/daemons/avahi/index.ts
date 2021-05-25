@@ -5,7 +5,18 @@ import * as db from "../../db";
 import params from "../../params";
 import { pause } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-import { AvahiStatus, AvahiStatusType } from "../../types";
+import { AvahiStatusType } from "../../types";
+
+// type AbortController not found if declared in types.
+type AvahiStatus =
+  | {
+      type: AvahiStatusType.started;
+      controller: AbortController;
+    }
+  | {
+      type: AvahiStatusType.stopped;
+    }
+  | { type: AvahiStatusType.crashed };
 
 class AvahiController {
   status: AvahiStatus = { type: AvahiStatusType.stopped };
