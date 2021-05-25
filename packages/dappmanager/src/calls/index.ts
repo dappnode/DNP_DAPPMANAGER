@@ -1,5 +1,6 @@
 export { autoUpdateDataGet } from "./autoUpdateDataGet";
 export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit";
+export * from "./avahi";
 export { backupGet } from "./backupGet";
 export { backupRestore } from "./backupRestore";
 export { chainDataGet } from "./chainDataGet";

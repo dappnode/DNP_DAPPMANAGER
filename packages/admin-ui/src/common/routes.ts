@@ -37,7 +37,8 @@ import {
   InstalledPackageDataApiReturn,
   WifiReport,
   CurrentWifiCredentials,
-  HttpsLocalProxyingStatus
+  HttpsLocalProxyingStatus,
+  LocalNetworkState
 } from "./types";
 
 export interface Routes {
@@ -55,6 +56,19 @@ export interface Routes {
     id: string;
     enabled: boolean;
   }) => Promise<void>;
+
+  /** AVAHI: enable/disable avahi daemon consists in 2 steps:
+   * 1. Change HTTPs LOCAL_PROXYING variable
+   * 2. Start/stop avahi dameon
+   */
+  avahiEnableDisable: (enable: boolean) => Promise<void>;
+
+  /** AVAHI: return current status:
+   * - starting: avahi is starting (doing first 10 tries) or running for a while
+   * - stopped: avahi manually stopped by the user
+   * - crashed: avahi crashed due to an error
+   */
+  avahiStatusGet: () => Promise<LocalNetworkState>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
@@ -574,6 +588,8 @@ interface RouteData {
 export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateDataGet: {},
   autoUpdateSettingsEdit: { log: true },
+  avahiEnableDisable: {},
+  avahiStatusGet: {},
   backupGet: {},
   backupRestore: { log: true },
   chainDataGet: {},

@@ -1,3 +1,4 @@
+import { AvahiStatusType } from "common";
 import { PackageContainer } from "types";
 
 export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
@@ -51,4 +52,17 @@ export function allContainersHaveSameVariant(
         parseContainerState(containers[0]).variant
     )
   );
+}
+
+export function parseAvahiDaemonState(
+  avahiStatusType: AvahiStatusType
+): { variant: BadgeVariant; state: SimpleState; title: string } {
+  switch (avahiStatusType) {
+    case AvahiStatusType.started:
+      return { variant: "success", state: "running", title: "Running" };
+    case AvahiStatusType.stopped:
+      return { variant: "secondary", state: "stopped", title: "Paused" };
+    case AvahiStatusType.crashed:
+      return { variant: "danger", state: "crashed", title: `Exited` };
+  }
 }

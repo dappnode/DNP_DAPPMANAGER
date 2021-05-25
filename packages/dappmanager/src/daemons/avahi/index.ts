@@ -5,23 +5,7 @@ import * as db from "../../db";
 import params from "../../params";
 import { pause } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-
-// variable en db para saber si daemon apagado o no
-// para signal utilizar un enum
-
-enum AvahiStatusType {
-  started = "started",
-  stopped = "stopped"
-}
-
-type AvahiStatus =
-  | {
-      type: AvahiStatusType.started;
-      controller: AbortController;
-    }
-  | {
-      type: AvahiStatusType.stopped;
-    };
+import { AvahiStatus, AvahiStatusType } from "../../types";
 
 class AvahiController {
   status: AvahiStatus = { type: AvahiStatusType.stopped };
@@ -99,12 +83,14 @@ class AvahiController {
     } catch (e) {
       logs.error("Too many errors on avahi-publish - stopping daemon", e);
     } finally {
-      this.stop();
+      this.status.controller.abort();
+      this.status = { type: AvahiStatusType.crashed };
     }
   }
 
   stop(): void {
     if (this.status.type === AvahiStatusType.started) {
+      logs.info("Stopping avahi-publish");
       this.status.controller.abort();
       this.status = { type: AvahiStatusType.stopped };
     }

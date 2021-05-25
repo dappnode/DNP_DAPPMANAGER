@@ -37,6 +37,10 @@ export const wifiDefaultWPA_PASSPHRASE = "dappnode";
 export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
+// AVAHI
+export const avahiLocalDomain = "my.dappnode.local";
+export const avahiFriendlyName = "Local Network Discovery";
+
 // DNP names
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";

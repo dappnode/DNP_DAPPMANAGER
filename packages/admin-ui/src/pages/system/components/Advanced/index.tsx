@@ -6,7 +6,6 @@ import { DockerUpdate } from "./DockerUpdate";
 import { SshManager } from "./SshManager";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
-import { LocalNetworkManager } from "./LocalNetworkManager";
 
 export function Advanced() {
   return (
@@ -19,9 +18,6 @@ export function Advanced() {
         </div>
         <ChangeDappnodeWebName />
       </Card>
-
-      <SubTitle>Local network</SubTitle>
-      <LocalNetworkManager />
 
       <SubTitle>SSH</SubTitle>
       <SshManager />

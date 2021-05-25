@@ -7,23 +7,25 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 // Own module
-import { title, subPaths } from "../data";
+import { title, subPaths } from "./../data";
 // Components
 import Title from "components/Title";
-import WifiStatus from "./WifiStatus";
-import WifiCredentials from "./WifiCredentials";
+import WifiHome from "./wifi/WifiHome";
+import LocalNetworkHome from "./localNetwork/LocalNetworkHome";
+// CSS
+import "./wifiAvahi.scss";
 
-const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
+const WifiAvahiHome: React.FC<RouteComponentProps> = ({ match }) => {
   const availableRoutes = [
     {
-      name: "Status",
-      subPath: subPaths.status,
-      component: WifiStatus
+      name: "Wi-Fi",
+      subPath: subPaths.wifi,
+      component: WifiHome
     },
     {
-      name: "Credentials",
-      subPath: subPaths.credentials,
-      component: WifiCredentials
+      name: "Local Network",
+      subPath: subPaths.local,
+      component: LocalNetworkHome
     }
   ];
   return (
@@ -61,4 +63,4 @@ const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
   );
 };
 
-export default WifiHome;
+export default WifiAvahiHome;
