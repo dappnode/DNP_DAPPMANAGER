@@ -114,7 +114,8 @@ class AvahiController {
 export const avahiController = new AvahiController();
 
 export async function startAvahiDaemon(signal: AbortSignal): Promise<void> {
-  //if (db.avahiShouldBeDisabled) return;
+  // avahiShouldBeDisabled default value: false. Avahi daemon will start by default
+  if (db.avahiShouldBeDisabled.get()) return;
   avahiController.start();
 
   signal.addEventListener("abort", () => {
