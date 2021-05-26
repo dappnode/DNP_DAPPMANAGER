@@ -36,7 +36,7 @@ let dappnodeWebName = "Mock-DAppNode";
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   avahiEnableDisable: async () => {},
   avahiStatusGet: async () => ({
-    avahiStatus: "started" as AvahiStatusType,
+    avahiStatus: AvahiStatusType.started,
     localProxying: "true"
   }),
   backupGet: async () =>
