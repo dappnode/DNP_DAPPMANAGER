@@ -64,7 +64,7 @@ function WireguardDeviceDetailsLoaded({
       </div>
       <div className="buttons">
         <Button onClick={() => setShowLocalCreds(false)}>
-          {config} credentials
+          Remote credentials
         </Button>
       </div>
 
