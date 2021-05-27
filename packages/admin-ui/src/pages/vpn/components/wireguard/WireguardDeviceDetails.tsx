@@ -57,15 +57,12 @@ function WireguardDeviceDetailsLoaded({
         dappnode, use the local credentials.{" "}
         <span
           className="show-local-credentials"
-          onClick={() => setShowLocalCreds(true)}
+          onClick={() => setShowLocalCreds(x => !x)}
         >
-          Show local credentials
+          {showLocalCreds
+            ? "Go back to showing remote credentials"
+            : "Show local credentials"}
         </span>
-      </div>
-      <div className="buttons">
-        <Button onClick={() => setShowLocalCreds(false)}>
-          Remote credentials
-        </Button>
       </div>
 
       <Form.Group>
