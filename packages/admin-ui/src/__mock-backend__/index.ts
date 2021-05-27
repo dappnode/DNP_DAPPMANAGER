@@ -4,6 +4,7 @@ import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
+import { localProxying } from "./localProxying";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -20,6 +21,7 @@ const namedSpacedCalls = {
   ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
+  ...localProxying,
   ...notifications,
   ...packages,
   ...password,

@@ -1,14 +1,15 @@
-.wifi-status-actions-row {
+.wifi-local-status-actions-row {
   display: flex;
   justify-content: space-between;
 
-  .wifi-status-container {
+  .wifi-local-status-container {
     > *:not(:last-child) {
       margin-right: 10px;
     }
-    .wifi-status-icon {
+    .wifi-local-status-icon {
       font-size: 140%;
     }
+
     .wifi-status-name {
       color: inherit;
       white-space: nowrap;

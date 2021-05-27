@@ -10,20 +10,22 @@ import {
 import { title, subPaths } from "../data";
 // Components
 import Title from "components/Title";
-import WifiStatus from "./WifiStatus";
-import WifiCredentials from "./WifiCredentials";
+import WifiHome from "./wifi/WifiHome";
+import { LocalProxying } from "./localProxying/LocalProxying";
+// CSS
+import "./wifiLocal.scss";
 
-const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
+export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
   const availableRoutes = [
     {
-      name: "Status",
-      subPath: subPaths.status,
-      component: WifiStatus
+      name: "Wi-Fi",
+      subPath: subPaths.wifi,
+      component: WifiHome
     },
     {
-      name: "Credentials",
-      subPath: subPaths.credentials,
-      component: WifiCredentials
+      name: "Local Network",
+      subPath: subPaths.local,
+      component: LocalProxying
     }
   ];
   return (
@@ -60,5 +62,3 @@ const WifiHome: React.FC<RouteComponentProps> = ({ match }) => {
     </>
   );
 };
-
-export default WifiHome;

@@ -36,7 +36,8 @@ import {
   HostDiagnoseItem,
   InstalledPackageDataApiReturn,
   WifiReport,
-  CurrentWifiCredentials
+  CurrentWifiCredentials,
+  LocalProxyingStatus
 } from "./types";
 
 export interface Routes {
@@ -255,6 +256,24 @@ export interface Routes {
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
    */
   ipfsTest(): Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through my.dappnode.local.
+   * When disabling this feature:
+   * - Remove NGINX logic in HTTPs Portal to route .local domains
+   * - Stop exposing the port 80 to the local network
+   * - Stop broadcasting .local domains to mDNS
+   */
+  localProxyingEnableDisable: (enable: boolean) => Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through my.dappnode.local.
+   * Return current status of:
+   * - NGINX is routing .local domains
+   * - Port 80 is exposed
+   * - Is broadcasting to mDNS
+   */
+  localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -601,6 +620,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
+  localProxyingEnableDisable: { log: true },
+  localProxyingStatusGet: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},

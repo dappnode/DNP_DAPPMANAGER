@@ -9,6 +9,7 @@ interface SwitchProps {
   id?: string;
   className?: string;
   highlightOnHover?: boolean;
+  disabled?: boolean;
 }
 
 const Switch: React.FC<SwitchProps> = ({
@@ -18,6 +19,7 @@ const Switch: React.FC<SwitchProps> = ({
   id,
   className,
   highlightOnHover,
+  disabled,
   ...props
 }) => {
   if (!id) id = String(Math.random()).slice(2);
@@ -33,6 +35,7 @@ const Switch: React.FC<SwitchProps> = ({
         id={id}
         checked={checked}
         onChange={() => onToggle(!checked)}
+        disabled={disabled}
         {...props}
       />
       <label htmlFor={id}>{label}</label>

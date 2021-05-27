@@ -4,6 +4,29 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
+/**
+ * Local proxying (my.dappnode.local)
+ */
+export interface LocalProxyingStatus {
+  avahiPublishCmdState:
+    | {
+        status:
+          | AvahiPublishCmdStatusType.started
+          | AvahiPublishCmdStatusType.stopped;
+      }
+    | { status: AvahiPublishCmdStatusType.crashed; error: string };
+  localProxyingEnabled: boolean;
+}
+
+export enum AvahiPublishCmdStatusType {
+  /** avahi-publish cmd is starting or running */
+  started = "started",
+  /** avahi-publish cmd manually stopped by the user */
+  stopped = "stopped",
+  /** avahi-publish cmd has crashed and won't be attempted to restart */
+  crashed = "crashed"
+}
+
 // HTTPS portal mappings
 
 export interface HttpsPortalMapping {

@@ -37,6 +37,9 @@ export const wifiDefaultWPA_PASSPHRASE = "dappnode";
 export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
+// Local proxying
+export const adminUiLocalDomain = "my.dappnode.local";
+
 // DNP names
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
@@ -84,7 +87,9 @@ export const dappnodeUserGuideUrl =
   "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
 
 export const dappnodeWifiCredentials = "http://my.dappnode/#/wifi/credentials";
-export const dappnodeConnectWifi = "https://docs.dappnode.io/connect/#via-wifi";
+export const docsUrlConnectWifi = "https://docs.dappnode.io/connect/#via-wifi";
+export const docsUrlLocalProxy =
+  "https://docs.dappnode.io/connect/#via-local-proxy";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {

@@ -1,4 +1,4 @@
-import WifiHome from "./components/WifiHome";
+import { WifiLocalHome } from "./components/WifiLocalHome";
 
 export { rootPath } from "./data";
-export const RootComponent = WifiHome;
+export const RootComponent = WifiLocalHome;
