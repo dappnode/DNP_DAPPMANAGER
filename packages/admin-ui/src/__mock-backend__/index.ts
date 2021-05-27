@@ -1,9 +1,10 @@
-import { AvahiStatusType, PortProtocol, Routes } from "../common";
+import { PortProtocol, Routes } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
+import { localProxying } from "./localProxying";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -20,6 +21,7 @@ const namedSpacedCalls = {
   ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
+  ...localProxying,
   ...notifications,
   ...packages,
   ...password,
@@ -34,11 +36,6 @@ const namedSpacedCalls = {
 let dappnodeWebName = "Mock-DAppNode";
 
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
-  avahiEnableDisable: async () => {},
-  avahiStatusGet: async () => ({
-    avahiStatus: AvahiStatusType.started,
-    localProxying: "true"
-  }),
   backupGet: async () =>
     "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
   backupRestore: async () => {},

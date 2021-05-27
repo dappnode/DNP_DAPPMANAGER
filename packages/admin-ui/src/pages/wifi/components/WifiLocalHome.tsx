@@ -7,15 +7,15 @@ import {
   RouteComponentProps
 } from "react-router-dom";
 // Own module
-import { title, subPaths } from "./../data";
+import { title, subPaths } from "../data";
 // Components
 import Title from "components/Title";
 import WifiHome from "./wifi/WifiHome";
-import LocalNetworkHome from "./localNetwork/LocalNetworkHome";
+import { LocalProxying } from "./localProxying/LocalProxying";
 // CSS
-import "./wifiAvahi.scss";
+import "./wifiLocal.scss";
 
-const WifiAvahiHome: React.FC<RouteComponentProps> = ({ match }) => {
+export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
   const availableRoutes = [
     {
       name: "Wi-Fi",
@@ -25,7 +25,7 @@ const WifiAvahiHome: React.FC<RouteComponentProps> = ({ match }) => {
     {
       name: "Local Network",
       subPath: subPaths.local,
-      component: LocalNetworkHome
+      component: LocalProxying
     }
   ];
   return (
@@ -62,5 +62,3 @@ const WifiAvahiHome: React.FC<RouteComponentProps> = ({ match }) => {
     </>
   );
 };
-
-export default WifiAvahiHome;

@@ -1,6 +1,5 @@
 export { autoUpdateDataGet } from "./autoUpdateDataGet";
 export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit";
-export * from "./avahi";
 export { backupGet } from "./backupGet";
 export { backupRestore } from "./backupRestore";
 export { chainDataGet } from "./chainDataGet";
@@ -21,6 +20,7 @@ export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
 export { ipfsTest } from "./ipfsTest";
 export { ipPublicGet } from "./ipPublicGet";
+export * from "./localProxy";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";

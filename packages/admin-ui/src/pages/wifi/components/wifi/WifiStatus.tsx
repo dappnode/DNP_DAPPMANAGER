@@ -15,7 +15,7 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 // Types
 import { ContainerState, WifiReport } from "types";
-import { dappnodeConnectWifi, wifiDnpName } from "./../../../../params";
+import { docsUrlConnectWifi, wifiDnpName } from "./../../../../params";
 
 import { StateBadgeContainer } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
@@ -26,9 +26,9 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to the Wi-Fi hostpot exposed by your DAppNode using
-      yourcredentials. More information available at:{" "}
-      <a href={dappnodeConnectWifi}>{dappnodeConnectWifi}</a>
+      Connect to the Wi-Fi hostpot exposed by your DAppNode using your
+      credentials. More information at:{" "}
+      <a href={docsUrlConnectWifi}>{docsUrlConnectWifi}</a>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
         ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."
@@ -108,10 +108,10 @@ export default function WifiStatus(): JSX.Element {
         <Card spacing>
           <WifiInfo wifiStatus={wifiDnp.data.containers[0].state} />
           <hr />
-          <div className="wifi-avahi-status-actions-row">
-            <div className="wifi-avahi-status-container">
+          <div className="wifi-local-status-actions-row">
+            <div className="wifi-local-status-container">
               <StateBadgeContainer container={wifiDnp.data.containers[0]} />
-              <MdWifi className="wifi-avahi-status-icon" />
+              <MdWifi className="wifi-local-status-icon" />
               <NavLink
                 className="wifi-status-name"
                 to="http://my.dappnode/#/packages/wifi.dnp.dappnode.eth"
@@ -119,7 +119,7 @@ export default function WifiStatus(): JSX.Element {
                 {prettyDnpName(wifiDnpName)}
               </NavLink>
             </div>
-            <div className="wifi-avahi-actions">
+            <div className="wifi-local-actions">
               <Switch
                 checked={wifiDnp.data.containers[0].state === "running"}
                 onToggle={pauseWifi}

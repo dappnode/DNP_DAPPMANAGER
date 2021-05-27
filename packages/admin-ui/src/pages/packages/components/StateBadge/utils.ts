@@ -1,10 +1,14 @@
-import { PackageContainer, AvahiStatusType } from "types";
+import { PackageContainer } from "types";
 
 export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
 export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
+export type PackageContainerStatus = Pick<
+  PackageContainer,
+  "state" | "exitCode"
+>;
 
 export function parseContainerState(
-  container: PackageContainer
+  container: PackageContainerStatus
 ): { variant: BadgeVariant; state: SimpleState; title: string } {
   const { state, exitCode } = container;
 
@@ -51,17 +55,4 @@ export function allContainersHaveSameVariant(
         parseContainerState(containers[0]).variant
     )
   );
-}
-
-export function parseAvahiDaemonState(
-  avahiStatusType: AvahiStatusType
-): { variant: BadgeVariant; state: SimpleState; title: string } {
-  switch (avahiStatusType) {
-    case AvahiStatusType.started:
-      return { variant: "success", state: "running", title: "Running" };
-    case AvahiStatusType.stopped:
-      return { variant: "secondary", state: "stopped", title: "Paused" };
-    case AvahiStatusType.crashed:
-      return { variant: "danger", state: "crashed", title: `Exited` };
-  }
 }

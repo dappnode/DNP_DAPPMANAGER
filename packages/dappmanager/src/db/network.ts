@@ -14,7 +14,7 @@ export const alertToOpenPorts = dbMain.staticKey<boolean>(
 );
 export const internalIp = dbMain.staticKey<string>(INTERNAL_IP, "");
 
-export const avahiShouldBeDisabled = dbMain.staticKey<boolean>(
+export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(
   AVAHI_SHOULD_BE_DISABLED,
   false
 );

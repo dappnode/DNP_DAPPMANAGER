@@ -5,27 +5,23 @@ import * as db from "../../db";
 import params from "../../params";
 import { pause } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
-import { AvahiStatusType } from "../../types";
+import { AvahiPublishCmdStatusType } from "../../types";
+import { LocalProxyingStatus } from "../../common";
 
 // type AbortController not found if declared in types.
 type AvahiStatus =
-  | {
-      type: AvahiStatusType.started;
-      controller: AbortController;
-    }
-  | {
-      type: AvahiStatusType.stopped;
-    }
-  | { type: AvahiStatusType.crashed };
+  | { type: AvahiPublishCmdStatusType.started; controller: AbortController }
+  | { type: AvahiPublishCmdStatusType.stopped }
+  | { type: AvahiPublishCmdStatusType.crashed; error: string };
 
 class AvahiController {
-  status: AvahiStatus = { type: AvahiStatusType.stopped };
+  private status: AvahiStatus = { type: AvahiPublishCmdStatusType.stopped };
 
   async start(): Promise<void> {
-    if (this.status.type === AvahiStatusType.started) return;
+    if (this.status.type === AvahiPublishCmdStatusType.started) return;
 
     const controller = new AbortController();
-    this.status = { type: AvahiStatusType.started, controller };
+    this.status = { type: AvahiPublishCmdStatusType.started, controller };
 
     try {
       logs.info("Starting avahi-publish");
@@ -93,17 +89,39 @@ class AvahiController {
       );
     } catch (e) {
       logs.error("Too many errors on avahi-publish - stopping daemon", e);
+      this.status = {
+        type: AvahiPublishCmdStatusType.crashed,
+        error: e.stack || e.message
+      };
     } finally {
-      this.status.controller.abort();
-      this.status = { type: AvahiStatusType.crashed };
+      if (this.status.type === AvahiPublishCmdStatusType.started) {
+        this.status = { type: AvahiPublishCmdStatusType.stopped };
+      }
+      controller.abort();
     }
   }
 
   stop(): void {
-    if (this.status.type === AvahiStatusType.started) {
+    if (this.status.type === AvahiPublishCmdStatusType.started) {
       logs.info("Stopping avahi-publish");
       this.status.controller.abort();
-      this.status = { type: AvahiStatusType.stopped };
+      this.status = { type: AvahiPublishCmdStatusType.stopped };
+    }
+  }
+
+  get state(): LocalProxyingStatus["avahiPublishCmdState"] {
+    switch (this.status.type) {
+      case AvahiPublishCmdStatusType.crashed:
+        return {
+          status: AvahiPublishCmdStatusType.crashed,
+          error: this.status.error
+        };
+
+      case AvahiPublishCmdStatusType.started:
+      case AvahiPublishCmdStatusType.stopped:
+        return {
+          status: this.status.type
+        };
     }
   }
 }
@@ -111,13 +129,11 @@ class AvahiController {
 export const avahiController = new AvahiController();
 
 export async function startAvahiDaemon(signal: AbortSignal): Promise<void> {
-  // avahiShouldBeDisabled default value: false. Avahi daemon will start by default
-  if (db.avahiShouldBeDisabled.get()) return;
+  // avahiPublishCmdShouldNotRun default value: false. Avahi daemon will start by default
+  if (db.avahiPublishCmdShouldNotRun.get()) return;
   avahiController.start();
 
-  signal.addEventListener("abort", () => {
-    avahiController.stop();
-  });
+  signal.addEventListener("abort", () => avahiController.stop());
 }
 
 /**  Waits for internal IP to be available */

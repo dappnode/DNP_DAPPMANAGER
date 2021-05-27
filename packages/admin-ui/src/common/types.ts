@@ -4,23 +4,30 @@ export interface LoginStatusReturn {
   isAdmin: boolean;
 }
 
-// AVAHI
-
-export interface LocalNetworkState {
-  avahiStatus: AvahiStatusType;
-  localProxying: HttpsLocalProxyingStatus;
+/**
+ * Local proxying (my.dappnode.local)
+ */
+export interface LocalProxyingStatus {
+  avahiPublishCmdState:
+    | {
+        status:
+          | AvahiPublishCmdStatusType.started
+          | AvahiPublishCmdStatusType.stopped;
+      }
+    | { status: AvahiPublishCmdStatusType.crashed; error: string };
+  localProxyingEnabled: boolean;
 }
 
-export enum AvahiStatusType {
+export enum AvahiPublishCmdStatusType {
+  /** avahi-publish cmd is starting or running */
   started = "started",
+  /** avahi-publish cmd manually stopped by the user */
   stopped = "stopped",
+  /** avahi-publish cmd has crashed and won't be attempted to restart */
   crashed = "crashed"
 }
 
 // HTTPS portal mappings
-
-// https://github.com/dappnode/DNP_HTTPS/blob/2a52450061eb3b0c4bc321e9b75547661cba1017/docker-compose.yml#L13
-export type HttpsLocalProxyingStatus = "true" | "false";
 
 export interface HttpsPortalMapping {
   fromSubdomain: string;

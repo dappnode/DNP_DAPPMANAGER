@@ -37,8 +37,7 @@ import {
   InstalledPackageDataApiReturn,
   WifiReport,
   CurrentWifiCredentials,
-  HttpsLocalProxyingStatus,
-  LocalNetworkState
+  LocalProxyingStatus
 } from "./types";
 
 export interface Routes {
@@ -56,19 +55,6 @@ export interface Routes {
     id: string;
     enabled: boolean;
   }) => Promise<void>;
-
-  /** AVAHI: enable/disable avahi daemon consists in 2 steps:
-   * 1. Change HTTPs LOCAL_PROXYING variable
-   * 2. Start/stop avahi dameon
-   */
-  avahiEnableDisable: (enable: boolean) => Promise<void>;
-
-  /** AVAHI: return current status:
-   * - starting: avahi is starting (doing first 10 tries) or running for a while
-   * - stopped: avahi manually stopped by the user
-   * - crashed: avahi crashed due to an error
-   */
-  avahiStatusGet: () => Promise<LocalNetworkState>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
@@ -265,17 +251,29 @@ export interface Routes {
   httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
   /** HTTPs Portal: recreate mappings */
   httpsPortalMappingsRecreate(): Promise<void>;
-  /** HTTPs Portal: set LOCAL_PROXYING */
-  httpsLocalProxyingEnableDisable(
-    enable: HttpsLocalProxyingStatus
-  ): Promise<void>;
-  /** HTTPs Portal: get LOCAL_PROXYING env value */
-  httpsLocalProxyingGet(): Promise<HttpsLocalProxyingStatus>;
 
   /**
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
    */
   ipfsTest(): Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through my.dappnode.local.
+   * When disabling this feature:
+   * - Remove NGINX logic in HTTPs Portal to route .local domains
+   * - Stop exposing the port 80 to the local network
+   * - Stop broadcasting .local domains to mDNS
+   */
+  localProxyingEnableDisable: (enable: boolean) => Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through my.dappnode.local.
+   * Return current status of:
+   * - NGINX is routing .local domains
+   * - Port 80 is exposed
+   * - Is broadcasting to mDNS
+   */
+  localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -588,8 +586,6 @@ interface RouteData {
 export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateDataGet: {},
   autoUpdateSettingsEdit: { log: true },
-  avahiEnableDisable: {},
-  avahiStatusGet: {},
   backupGet: {},
   backupRestore: { log: true },
   chainDataGet: {},
@@ -623,9 +619,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsGet: {},
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
-  httpsLocalProxyingEnableDisable: {},
-  httpsLocalProxyingGet: {},
   ipfsTest: {},
+  localProxyingEnableDisable: { log: true },
+  localProxyingStatusGet: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
