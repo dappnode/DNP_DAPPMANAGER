@@ -3,7 +3,7 @@ import { NavLink, RouteComponentProps } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, title } from "../../data";
+import { rootPath, subPaths, title } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Card from "components/Card";
@@ -16,6 +16,8 @@ import Title from "components/Title";
 import { GoClippy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
 import { WireguardDeviceCredentials } from "types";
+// Utils
+import { urlJoin } from "utils/url";
 
 function WireguardDeviceDetailsLoaded({
   id,
@@ -25,7 +27,9 @@ function WireguardDeviceDetailsLoaded({
   device: WireguardDeviceCredentials;
 }) {
   const [showQr, setShowQr] = useState(false);
-  const { config } = device;
+  const [showLocalCreds, setShowLocalCreds] = useState(false);
+  const config = showLocalCreds ? device.configLocal : device.configRemote;
+  const configType = showLocalCreds ? "local" : "remote";
 
   useEffect(() => {
     // Activate the copy functionality
@@ -37,7 +41,7 @@ function WireguardDeviceDetailsLoaded({
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
-        <NavLink to={rootPath}>
+        <NavLink to={urlJoin(rootPath, subPaths.wireguard)}>
           <Button>Back</Button>
         </NavLink>
       </header>
@@ -48,8 +52,21 @@ function WireguardDeviceDetailsLoaded({
         can share them with a trusted person through a secure channel.
       </div>
 
+      <div className="help-text">
+        In case you experience issues connecting from the same network as your
+        dappnode, use the local credentials.{" "}
+        <span
+          className="show-local-credentials"
+          onClick={() => setShowLocalCreds(x => !x)}
+        >
+          {showLocalCreds
+            ? "Go back to showing remote credentials"
+            : "Show local credentials"}
+        </span>
+      </div>
+
       <Form.Group>
-        <Form.Label>VPN credentials URL</Form.Label>
+        <Form.Label>VPN {configType} credentials URL</Form.Label>
         <div className="credentials-config">{config}</div>
       </Form.Group>
 
@@ -57,14 +74,16 @@ function WireguardDeviceDetailsLoaded({
         <Button data-clipboard-text={config}>
           <span>
             <GoClippy />
-            <span>Copy config</span>
+            <span>Copy {configType} config</span>
           </span>
         </Button>
 
         <Button onClick={() => setShowQr(!showQr)}>
           <span>
             <FaQrcode />
-            <span>{showQr ? "Hide" : "Show"} config QR code</span>
+            <span>
+              {showQr ? "Hide" : "Show"} {configType} config QR code
+            </span>
           </span>
         </Button>
       </div>

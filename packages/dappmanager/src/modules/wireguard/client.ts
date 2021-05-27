@@ -3,13 +3,17 @@ import { urlJoin } from "../../utils/url";
 import params from "../../params";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment";
 import { ComposeFileEditor } from "../compose/editor";
+import { WireguardDeviceCredentials } from "../../types";
+import { response } from "express";
 
 const {
   WIREGUARD_API_URL,
   WIREGUARD_DEVICES_ENVNAME,
   WIREGUARD_DNP_NAME,
   WIREGUARD_ISCORE,
-  WIREGUARD_MAIN_SERVICE
+  WIREGUARD_MAIN_SERVICE,
+  WIREGUARD_LOCAL,
+  WIREGUARD_REMOTE
 } = params;
 
 export class WireguardClient {
@@ -54,13 +58,31 @@ export class WireguardClient {
     });
   }
 
-  async getDeviceCredentials(device: string): Promise<{ config: string }> {
-    const configUrl = urlJoin(WIREGUARD_API_URL, device);
-    const res = await fetch(configUrl);
-    const body = await res.text();
-    if (res.status === 404) throw Error(`Device not found`);
-    if (!res.ok)
-      throw Error(`Error fetching credentials: ${res.statusText} ${body}`);
-    return { config: body };
+  async getDeviceCredentials(
+    device: string
+  ): Promise<WireguardDeviceCredentials> {
+    const remoteConfigUrl = urlJoin(
+      WIREGUARD_API_URL,
+      WIREGUARD_REMOTE,
+      device
+    );
+    const localConfigUrl = urlJoin(WIREGUARD_API_URL, WIREGUARD_LOCAL, device);
+    const [configRemote, configLocal] = await Promise.all([
+      fetchWireguardConfigFile(remoteConfigUrl),
+      fetchWireguardConfigFile(localConfigUrl)
+    ]);
+
+    return { configRemote, configLocal };
   }
+}
+
+// Utils
+
+async function fetchWireguardConfigFile(url: string): Promise<string> {
+  const response = await fetch(url);
+  if (response.status === 404) throw Error(`Device not found`);
+  const body = await response.text();
+  if (!response.ok)
+    throw Error(`Error fetching credentials: ${response.statusText} ${body}`);
+  return body;
 }
