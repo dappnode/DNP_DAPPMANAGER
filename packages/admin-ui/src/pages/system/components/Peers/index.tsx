@@ -4,11 +4,18 @@ import SubTitle from "components/SubTitle";
 import AddIpfsPeer from "./AddIpfsPeer";
 import ShareIpfsPeer from "./ShareIpfsPeer";
 import { RouteComponentProps } from "react-router-dom";
+import { docsUrl } from "params";
 
 const Peers: React.FC<RouteComponentProps> = ({ location, match }) => {
   const peerFromUrl = getPeerFromUrl(location.pathname, match.url);
   return (
     <>
+      <p>
+        Learn more about IPFS peers at:{" "}
+        <a href={docsUrl.ipfsPeersExplanation}>
+          {docsUrl.ipfsPeersExplanation}
+        </a>
+      </p>
       <SubTitle>Share IPFS peer</SubTitle>
       <ShareIpfsPeer matchUrl={match.url} />
       <SubTitle>Add IPFS peer</SubTitle>
