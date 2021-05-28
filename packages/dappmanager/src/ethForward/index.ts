@@ -20,7 +20,6 @@ export function getEthForwardMiddleware(): express.RequestHandler {
 
   return (req, res, next): void => {
     try {
-      console.trace("HANDLING REQUEST!");
       const domain = parseEthDomainHost(req);
       if (domain !== null) {
         ethForwardHandler(req, res, domain);
