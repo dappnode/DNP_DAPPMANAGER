@@ -11,7 +11,7 @@ import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
 import { WireguardDevicesRoot } from "./wireguard/WireguardDevicesRoot";
 import Title from "components/Title";
-import { vpnDnpName, wireguardDnpName } from "params";
+import { docsUrl, vpnDnpName, wireguardDnpName } from "params";
 
 export function VpnHome({ match }: RouteComponentProps) {
   const dnpsRequest = useApi.packagesGet();
@@ -57,7 +57,8 @@ export function VpnHome({ match }: RouteComponentProps) {
 
       <p>
         Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your DAppNode from an external network
+        access your DAppNode from an external network. Learn more about VPN at:{" "}
+        <a href={docsUrl.connectVpn}>{docsUrl.connectVpn}</a>
       </p>
 
       <div className="section-spacing">

@@ -15,7 +15,7 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 // Types
 import { ContainerState, WifiReport } from "types";
-import { docsUrlConnectWifi, wifiDnpName } from "./../../../../params";
+import { docsUrl, wifiDnpName } from "./../../../../params";
 
 import { StateBadgeContainer } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
@@ -28,7 +28,7 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
     <p>
       Connect to the Wi-Fi hostpot exposed by your DAppNode using your
       credentials. More information at:{" "}
-      <a href={docsUrlConnectWifi}>{docsUrlConnectWifi}</a>
+      <a href={docsUrl.connectWifi}>{docsUrl.connectWifi}</a>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
         ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."

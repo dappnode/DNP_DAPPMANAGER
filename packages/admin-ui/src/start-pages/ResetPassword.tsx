@@ -8,7 +8,7 @@ import { StandaloneContainer } from "./StandaloneContainer";
 import { ReqStatus } from "types";
 import { InputForm } from "components/InputForm";
 import Ok from "components/Ok";
-import { recoverPasswordGuideUrl } from "params";
+import { docsUrl } from "params";
 
 export function ResetPassword({
   onSuccessfulReset
@@ -40,7 +40,7 @@ export function ResetPassword({
         machine via SSH or by connecting a keyboard and screen and follow this
         guide
         <br />
-        <a href={recoverPasswordGuideUrl}>
+        <a href={docsUrl.recoverPasswordGuide}>
           Reset your DAppNode admin password TODO
         </a>
       </Alert>

@@ -12,7 +12,7 @@ import Loading from "components/Loading";
 import Card from "components/Card";
 import Switch from "components/Switch";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
-import { adminUiLocalDomain, docsUrlLocalProxy } from "params";
+import { adminUiLocalDomain, docsUrl } from "params";
 import { StateBadge } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
 import { parseContainerState } from "pages/packages/components/StateBadge/utils";
@@ -80,7 +80,7 @@ export function LocalProxying(): JSX.Element {
             this page at{" "}
             <a href={adminUiLocalDomain}>http://my.dappnode.local</a>. Learn
             more about the Local Network Proxy at:{" "}
-            <a href={docsUrlLocalProxy}>{docsUrlLocalProxy}</a>
+            <a href={docsUrl.connectLocalProxy}>{docsUrl.connectLocalProxy}</a>
           </p>
           {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
             <p>
