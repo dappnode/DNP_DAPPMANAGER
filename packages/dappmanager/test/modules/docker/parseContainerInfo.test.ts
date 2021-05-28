@@ -1,8 +1,24 @@
 import "mocha";
 import { expect } from "chai";
 import { PackageContainer, PortProtocol } from "../../../src/types";
-import { parseContainerInfo } from "../../../src/modules/docker/list/parseContainerInfo";
+import {
+  parseContainerInfo,
+  parseDnpNameFromContainerName
+} from "../../../src/modules/docker/list/parseContainerInfo";
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
+
+describe("modules / docker / parseDnpNameFromContainerName", () => {
+  const testCases = {
+    "DAppNodeCore-api.wireguard.dnp.dappnode.eth": "wireguard.dnp.dappnode.eth",
+    "DAppNodePackage-geth.dnp.dappnode.eth": "geth.dnp.dappnode.eth"
+  };
+
+  for (const [containerName, dnpName] of Object.entries(testCases)) {
+    it(containerName, () => {
+      expect(parseDnpNameFromContainerName(containerName)).to.equal(dnpName);
+    });
+  }
+});
 
 describe("modules / docker / parseContainerInfo", function() {
   it("should parse docker containers", async () => {
