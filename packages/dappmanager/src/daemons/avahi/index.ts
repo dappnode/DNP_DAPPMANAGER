@@ -3,10 +3,16 @@ import AbortController, { AbortSignal } from "abort-controller";
 import retry from "async-retry";
 import * as db from "../../db";
 import params from "../../params";
-import { pause } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
 import { AvahiPublishCmdStatusType } from "../../types";
 import { LocalProxyingStatus } from "../../common";
+import {
+  installAvahiDaemon,
+  isAvahiDaemonInstalled,
+  isAvahiDaemonRunning,
+  startAvahiDaemonOnHost,
+  waitForIps
+} from "./utils";
 
 // type AbortController not found if declared in types.
 type AvahiStatus =
@@ -34,6 +40,12 @@ class AvahiController {
         );
         return;
       }
+
+      const isAvahiInstalled = await isAvahiDaemonInstalled();
+      if (!isAvahiInstalled) await installAvahiDaemon();
+
+      const isAvahiRunning = await isAvahiDaemonRunning();
+      if (!isAvahiRunning) await startAvahiDaemonOnHost();
 
       // avahi-publish -a -R $MDNS_DOMAIN $IP
       // where -R argument is neccesary only if you want to publish more domains pointing to the same IP
@@ -134,14 +146,4 @@ export async function startAvahiDaemon(signal: AbortSignal): Promise<void> {
   avahiController.start();
 
   signal.addEventListener("abort", () => avahiController.stop());
-}
-
-/**  Waits for internal IP to be available */
-async function waitForIps(): Promise<{ internalIp: string; publicIp: string }> {
-  while (true) {
-    const internalIp = db.internalIp.get();
-    const publicIp = db.publicIp.get();
-    if (internalIp && publicIp) return { internalIp, publicIp };
-    await pause(1000);
-  }
 }
