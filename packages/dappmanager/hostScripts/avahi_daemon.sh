@@ -1,19 +1,35 @@
 #!/bin/bash
 
-# non-case sensitive (only available in bash)
-shopt -s nocasematch
-
 # Exit on error
 set -e
 
+###########
 #VARIABLES#
+###########
+
+LOG_DIR="/usr/src/dappnode/logs"
+LOG_FILE="$LOG_DIR/avahi_daemon.log"
+DATE=$(date)
+
 HOSTNAME=$(hostname)
-LOCAL_IP=$(hostname -I | grep -Eo '192.168.[0-9]{1,3}.[0-9]{1,3}')
 AVAHI_IS_INSTALLED=false
 AVAHI_IS_RUNNING=false
 AVAHI_IS_ENABLED=false
 AVAHI_RESOLVES=false
+
+#LOCAL_IP=$(hostname -I | grep -Eo '192.168.[0-9]{1,3}.[0-9]{1,3}')
 # AVAHI_IS_WRONG_IP=false
+
+###########
+#FUNCTIONS#
+###########
+
+function create_log_file () {
+  mkdir -p $LOG_DIR
+  echo -e "\e[32mStarting AVAHI daemon: $DATE\e[0m" >> $LOG_FILE
+}
+
+create_log_file
 
 
 # Check avahi installed
@@ -62,4 +78,49 @@ function check_avahi_status () {
     # might be interesting to compare ip resolved to local ip found with $(hostname -I | grep -Eo '192.168.[0-9]{1,3}.[0-9]{1,3}')
 }
 
-#MAIN LOOP#
+#######################
+###### MAIN LOOP ######
+#######################
+
+if [[ $# -eq 1 ]]; then
+  flag="$1"
+  case "${flag}" in
+    --initialize )
+      check_avahi_installed
+      [ "${AVAHI_IS_INSTALLED}" = "false" ] && install_avahi
+      [ "${HOSTNAME}" != "dappnode" ] && edit_avahi_conf
+      check_avahi_status
+      [ "${AVAHI_IS_RUNNING}" != "true" || "${AVAHI_IS_ENABLED}" != "true" ] && start_avahi
+      [ "${AVAHI_RESOLVES}" != "true" ] && restart_avahi
+      echo "Initialized AVAHI daemon" | tee -a $LOG_FILE
+      exit 0
+      ;;
+    --status )
+      check_avahi_status
+      echo -n "{\"isAvahiRunning\": \"${AVAHI_IS_RUNNING}\", \"isAvahiEnabled\": \"${AVAHI_IS_ENABLED}\", \"avahiResolves\": \"${AVAHI_RESOLVES}\"}" | tee -a $LOG_FILE
+      exit 0
+      ;;
+    --start )
+      start_avahi
+      echo "Started AVAHI daemon" | tee -a $LOG_FILE
+      exit 0
+      ;;
+    --stop )
+      stop_avahi
+      echo "Stopped AVAHI daemon" | tee -a $LOG_FILE
+      exit 0
+      ;;
+    --restart )
+      restart_avahi
+      echo "Restarted AVAHI daemon" | tee -a $LOG_FILE
+      exit 0
+      ;;
+    * )
+      echo "flag must be --initialize or --status" | tee -a $LOG_FILE
+      exit 1
+      ;;
+  esac
+else
+  echo "Illegal number of arguments" | tee -a $LOG_FILE
+  exit 1
+fi
