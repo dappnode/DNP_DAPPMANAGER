@@ -16,7 +16,7 @@ import { adminUiLocalDomain, docsUrl } from "params";
 import { StateBadge } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
 import { parseContainerState } from "pages/packages/components/StateBadge/utils";
-import { AvahiPublishCmdStatusType, LocalProxyingStatus } from "common";
+import { LocalProxyingStatus } from "common";
 
 export function LocalProxying(): JSX.Element {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
@@ -37,10 +37,8 @@ export function LocalProxying(): JSX.Element {
       if (!localProxyingStatus.data) return;
       if (reqStatus.loading) return;
 
-      const localProxyingEnabled = isLocalProxyEnabled(
-        localProxyingStatus.data
-      );
-      if (localProxyingEnabled)
+      const isLocalProxyingRunning = localProxyingStatus.data === "running";
+      if (isLocalProxyingRunning)
         await new Promise<void>(resolve => {
           confirm({
             title: `Stopping Local Network Proxy`,
@@ -52,12 +50,12 @@ export function LocalProxying(): JSX.Element {
 
       setReqStatus({ loading: true });
       await withToast(
-        () => api.localProxyingEnableDisable(!localProxyingEnabled),
+        () => api.localProxyingEnableDisable(!isLocalProxyingRunning),
         {
-          message: localProxyingEnabled
+          message: isLocalProxyingRunning
             ? "Stopping Local Network Proxy..."
             : "Starting Local Network Proxy",
-          onSuccess: localProxyingEnabled
+          onSuccess: isLocalProxyingRunning
             ? "Stopped Local Network Proxy..."
             : "Started Local Network Proxy"
         }
@@ -94,9 +92,7 @@ export function LocalProxying(): JSX.Element {
           <div className="wifi-local-status-actions-row">
             <div className="wifi-local-status-container">
               <StateBadge
-                {...parseAvahiPublishCmdState(
-                  localProxyingStatus.data.avahiPublishCmdState
-                )}
+                {...parseAvahiPublishCmdState(localProxyingStatus.data)}
               />
               <MdWifi className="wifi-local-status-icon" />
               <span className="wifi-local-status-name">
@@ -106,12 +102,10 @@ export function LocalProxying(): JSX.Element {
 
             <div className="wifi-local-actions">
               <Switch
-                checked={isLocalProxyEnabled(localProxyingStatus.data)}
+                checked={localProxyingStatus.data === "running"}
                 onToggle={localProxyingEnableDisable}
                 disabled={reqStatus.loading}
-                label={
-                  isLocalProxyEnabled(localProxyingStatus.data) ? "On" : "Off"
-                }
+                label={localProxyingStatus.data === "running" ? "On" : "Off"}
               ></Switch>
             </div>
           </div>
@@ -125,27 +119,19 @@ export function LocalProxying(): JSX.Element {
   );
 }
 
-/**
- * Helper to ensure all display logic shows the same "enabled" status.
- * Note that local proxying involves multiple components which can be on / off.
- */
-function isLocalProxyEnabled(status: LocalProxyingStatus): boolean {
-  return status.localProxyingEnabled;
-}
-
 export function parseAvahiPublishCmdState(
-  state: LocalProxyingStatus["avahiPublishCmdState"]
+  state: LocalProxyingStatus
 ): ReturnType<typeof parseContainerState> {
-  switch (state.status) {
-    case AvahiPublishCmdStatusType.started:
+  switch (state) {
+    case "running":
       return { variant: "success", state: "running", title: "Running" };
-    case AvahiPublishCmdStatusType.stopped:
+    case "stopped":
       return { variant: "secondary", state: "stopped", title: "Paused" };
-    case AvahiPublishCmdStatusType.crashed:
+    case "crashed":
       return {
         variant: "danger",
         state: "crashed",
-        title: `Exited: ${state.error}`
+        title: "Exited"
       };
   }
 }

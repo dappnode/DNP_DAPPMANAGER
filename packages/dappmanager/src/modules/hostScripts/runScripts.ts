@@ -15,7 +15,8 @@ type ScriptName =
   | "docker_engine_update.sh"
   | "docker_compose_update.sh"
   | "collect_host_info.sh"
-  | "security_update.sh";
+  | "security_update.sh"
+  | "avahi_daemon.sh";
 
 /**
  * Run a script for the hostScripts folder
