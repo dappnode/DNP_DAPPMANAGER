@@ -76,7 +76,7 @@ function stop_avahi () {
   echo -e "\e[32mStopping avahi-daemon\e[0m" >> $LOG_FILE
   systemctl disable avahi-daemon.service &>/dev/null && systemctl disable avahi-daemon.socket &>/dev/null && \
   systemctl stop avahi-daemon.service &>/dev/null && systemctl stop avahi-daemon.socket &>/dev/null || \ 
-  { echo "Error stopping avahi-daemon" | tee -a $LOG_FILE && exit 1 ; }
+  { echo "Stopped avahi-daemon" | tee -a $LOG_FILE && exit 0 ; } # Stop avahi daemon/socket results in error whereas it successfully stop it
 }
 
 # Restart avahi-daemon

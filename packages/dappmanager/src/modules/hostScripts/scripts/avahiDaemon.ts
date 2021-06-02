@@ -24,11 +24,14 @@ export const initializeAvahiDaemon = memoize(
  */
 export const getAvahiDaemonStatus = memoize(
   async function(): Promise<AvahiDaemonStatus> {
-    const avahiDaemonStatus = await runScript(
-      "avahi_daemon.sh",
-      "-- --initialize"
-    );
-    const status = JSON.parse(avahiDaemonStatus);
+    const avahiDaemonStatus = await runScript("avahi_daemon.sh", "-- --status");
+
+    const status: {
+      isAvahiRunning: "true" | "false";
+      isAvahiEnabled: "true" | "false";
+      avahiResolves: "true" | "false";
+    } = JSON.parse(avahiDaemonStatus);
+
     return {
       isAvahiRunning: status.isAvahiRunning === "true",
       isAvahiEnabled: status.isAvahiEnabled === "true",

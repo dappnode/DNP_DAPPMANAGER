@@ -1,5 +1,5 @@
 // React
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 // API
 import { api, useApi } from "api";
@@ -22,15 +22,6 @@ export function LocalProxying(): JSX.Element {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const localProxyingStatus = useApi.localProxyingStatusGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      localProxyingStatus.revalidate();
-    }, 5 * 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [localProxyingStatus]);
 
   async function localProxyingEnableDisable(): Promise<void> {
     try {
@@ -75,9 +66,8 @@ export function LocalProxying(): JSX.Element {
         <Card spacing>
           <p>
             If you are connected to the same router as your DAppNode you can use
-            this page at{" "}
-            <a href={adminUiLocalDomain}>http://my.dappnode.local</a>. Learn
-            more about the Local Network Proxy at:{" "}
+            this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.
+            Learn more about the Local Network Proxy at:{" "}
             <a href={docsUrl.connectLocalProxy}>{docsUrl.connectLocalProxy}</a>
           </p>
           {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (

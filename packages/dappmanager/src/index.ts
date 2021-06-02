@@ -26,6 +26,7 @@ import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
+import { startAvahiDaemon } from "./daemons/avahi";
 
 const controller = new AbortController();
 
@@ -50,8 +51,15 @@ const server = startDappmanager({
 // Start daemons
 startDaemons(controller.signal);
 
-// Generate keypair, network stats, and run dyndns loop
-initializeDb();
+// Copy host services
+copyHostServices().catch(e => logs.error("Error copying host services", e));
+
+Promise.all([
+  initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
+  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
+]).then(() =>
+  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
+); // avahiDaemon uses a host script that must be copied before been initialized
 
 // Create the global env file
 createGlobalEnvsEnvFile();
@@ -103,16 +111,6 @@ runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 addAliasToRunningContainersMigration().catch(e =>
   logs.error("Error adding alias to running containers", e)
 );
-
-/**
- * Run initial opts
- * - Copy host scripts
- * -
- */
-
-copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
-
-copyHostServices().catch(e => logs.error("Error copying host services", e));
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 
