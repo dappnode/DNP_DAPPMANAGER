@@ -51,8 +51,13 @@ const server = startDappmanager({
 // Start daemons
 startDaemons(controller.signal);
 
-// Generate keypair, network stats, and run dyndns loop
-initializeDb();
+// Copy host services
+copyHostServices().catch(e => logs.error("Error copying host services", e));
+
+Promise.all([
+  initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
+  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
+]).then(() => startAvahiDaemon()); // avahiDaemon uses a host script that must be copied before been initialized
 
 // Create the global env file
 createGlobalEnvsEnvFile();
@@ -104,14 +109,6 @@ runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 addAliasToRunningContainersMigration().catch(e =>
   logs.error("Error adding alias to running containers", e)
 );
-
-// Copy host scripts
-copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
-
-// Copy host services
-copyHostServices()
-  .catch(e => logs.error("Error copying host services", e))
-  .then(() => startAvahiDaemon()); // avahiDaemon uses a host script that must be copied before been initialized
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 
