@@ -1,4 +1,5 @@
 import { Compose, SpecialPermission } from "../../types";
+import { parseEnvironment } from "./environment";
 
 /**
  * Parses relevant settings in the compose that may be dangerous or grant
@@ -11,7 +12,7 @@ export function parseSpecialPermissions(
   const specialPermissions: SpecialPermission[] = [];
 
   for (const [serviceName, service] of Object.entries(compose.services)) {
-    const { network_mode, privileged, cap_add } = service;
+    const { network_mode, privileged, cap_add, sysctls } = service;
 
     if (privileged || (cap_add || []).includes("ALL"))
       specialPermissions.push({
@@ -38,6 +39,15 @@ export function parseSpecialPermissions(
           details: `See docker docs for more information https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities`,
           serviceName
         });
+
+    if (sysctls)
+      for (const [name, value] of Object.entries(parseEnvironment(sysctls))) {
+        specialPermissions.push({
+          name: `Kernel parameter set for the container ${name} = ${value}`,
+          details: `See docker docs for more information https://docs.docker.com/compose/compose-file/compose-file-v3/#sysctls`,
+          serviceName
+        });
+      }
 
     if (network_mode === "host")
       specialPermissions.push({

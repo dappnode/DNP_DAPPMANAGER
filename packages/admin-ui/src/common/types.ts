@@ -633,6 +633,7 @@ export interface ComposeService {
   restart?: string; // "unless-stopped";
   stop_grace_period?: string;
   stop_signal?: string;
+  sysctls?: Record<string, string> | string[];
   user?: string;
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   working_dir?: string;

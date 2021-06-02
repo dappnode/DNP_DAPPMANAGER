@@ -48,6 +48,7 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "restart",
   "stop_grace_period",
   "stop_signal",
+  "sysctls",
   "user",
   "volumes",
   "working_dir"
