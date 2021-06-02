@@ -47,9 +47,6 @@ const server = startDappmanager({
   sshManager
 });
 
-// Start daemons
-startDaemons(controller.signal);
-
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
 
@@ -104,15 +101,14 @@ addAliasToRunningContainersMigration().catch(e =>
   logs.error("Error adding alias to running containers", e)
 );
 
-/**
- * Run initial opts
- * - Copy host scripts
- * -
- */
-
+// Copy host scripts
 copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
 
+// COpy host services
 copyHostServices().catch(e => logs.error("Error copying host services", e));
+
+// Start daemons
+startDaemons(controller.signal);
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 

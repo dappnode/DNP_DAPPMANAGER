@@ -23,15 +23,6 @@ export function LocalProxying(): JSX.Element {
   const localProxyingStatus = useApi.localProxyingStatusGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      localProxyingStatus.revalidate();
-    }, 5 * 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [localProxyingStatus]);
-
   async function localProxyingEnableDisable(): Promise<void> {
     try {
       if (!localProxyingStatus.data) return;
