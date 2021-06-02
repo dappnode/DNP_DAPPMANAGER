@@ -11,7 +11,7 @@ import { startVpnBridgeDaemon } from "./vpnBridge";
 
 export function startDaemons(signal: AbortSignal): void {
   startAutoUpdatesDaemon(signal);
-  startAvahiDaemon(signal);
+  startAvahiDaemon();
   startDiskUsageDaemon(signal);
   startDynDnsDaemon(signal);
   startEthMultiClientDaemon(signal);

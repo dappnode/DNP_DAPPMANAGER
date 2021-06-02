@@ -1,7 +1,11 @@
-import { LocalProxyingStatus } from "../types";
-import { avahiController } from "../daemons/avahi";
 import { ComposeFileEditor } from "../modules/compose/editor";
+import {
+  stopAvahiDaemon,
+  startAvahiDaemon,
+  getAvahiDaemonStatus
+} from "../modules/hostScripts/scripts/avahiDaemon";
 import params from "../params";
+import { AvahiDaemonStatus, LocalProxyingStatus } from "../types";
 import { packageSetEnvironment } from "./packageSetEnvironment";
 
 /**
@@ -21,14 +25,23 @@ export async function localProxyingEnableDisable(
         [params.HTTPS_PORTAL_LOCAL_PROXYING_ENVNAME]: enable ? "true" : "false"
       }
     }
+  }).catch(e => {
+    e.message = `Error setting LOCAL_PROXYING: ${e.message}`;
+    throw e;
   });
 
   // TODO: Stop exposing port 80
 
   if (enable) {
-    await avahiController.start();
+    await startAvahiDaemon().catch(e => {
+      e.message = `Error starting avahi daemon: ${e.message}`;
+      throw e;
+    });
   } else {
-    avahiController.stop();
+    await stopAvahiDaemon().catch(e => {
+      e.message = `Error stopping avahi daemon: ${e.message}`;
+      throw e;
+    });
   }
 }
 
@@ -54,8 +67,32 @@ export async function localProxyingStatusGet(): Promise<LocalProxyingStatus> {
   // if ENV['LOCAL_PROXYING'].downcase == 'true'
   const localProxyingEnabled = String(LOCAL_PROXYING).toLowerCase() === "true";
 
-  return {
-    avahiPublishCmdState: avahiController.state,
+  const avahiDaemonStatus = await getAvahiDaemonStatus().catch(e => {
+    e.message = `Error getting avahi daemon status: ${e.message}`;
+    throw e;
+  });
+
+  return parseLocalProxyingStatus(avahiDaemonStatus, localProxyingEnabled);
+}
+
+// Utils
+function parseLocalProxyingStatus(
+  avahiStatus: AvahiDaemonStatus,
+  localProxyingEnabled: boolean
+): LocalProxyingStatus {
+  if (
+    avahiStatus.avahiResolves &&
+    avahiStatus.isAvahiEnabled &&
+    avahiStatus.isAvahiRunning &&
     localProxyingEnabled
-  };
+  )
+    return "running";
+  if (
+    !avahiStatus.avahiResolves &&
+    !avahiStatus.isAvahiEnabled &&
+    !avahiStatus.isAvahiRunning &&
+    !localProxyingEnabled
+  )
+    return "stopped";
+  return "crashed";
 }
