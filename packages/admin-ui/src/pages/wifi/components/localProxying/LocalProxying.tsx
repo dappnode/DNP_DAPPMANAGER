@@ -66,7 +66,7 @@ export function LocalProxying(): JSX.Element {
         <Card spacing>
           <p>
             If you are connected to the same router as your DAppNode you can use
-            this page at <a href={adminUiLocalDomain}>http://dappnode.local</a>.
+            this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.
             Learn more about the Local Network Proxy at:{" "}
             <a href={docsUrl.connectLocalProxy}>{docsUrl.connectLocalProxy}</a>
           </p>
