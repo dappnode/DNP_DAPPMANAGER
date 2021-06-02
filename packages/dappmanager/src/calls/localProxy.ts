@@ -9,7 +9,7 @@ import { AvahiDaemonStatus, LocalProxyingStatus } from "../types";
 import { packageSetEnvironment } from "./packageSetEnvironment";
 
 /**
- * Local proxying allows to access the admin UI through my.dappnode.local.
+ * Local proxying allows to access the admin UI through dappnode.local.
  * When disabling this feature:
  * - Remove NGINX logic in HTTPs Portal to route .local domains
  * - Stop exposing the port 80 to the local network
@@ -46,7 +46,7 @@ export async function localProxyingEnableDisable(
 }
 
 /**
- * Local proxying allows to access the admin UI through my.dappnode.local.
+ * Local proxying allows to access the admin UI through dappnode.local.
  * Return current status of:
  * - NGINX is routing .local domains
  * - Port 80 is exposed

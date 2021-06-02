@@ -87,7 +87,7 @@ const params = {
     "http://localhost:3000",
     "http://localhost:3001",
     "http://my.dappnode",
-    "http://my.dappnode.local"
+    "http://dappnode.local"
   ],
 
   // API auth sessions
@@ -200,7 +200,7 @@ const params = {
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
   // Local domains
-  AVAHI_LOCAL_DOMAIN: "my.dappnode.local",
+  AVAHI_LOCAL_DOMAIN: "dappnode.local",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
