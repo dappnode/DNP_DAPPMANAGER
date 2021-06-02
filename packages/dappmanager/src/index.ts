@@ -57,7 +57,9 @@ copyHostServices().catch(e => logs.error("Error copying host services", e));
 Promise.all([
   initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
   copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
-]).then(() => startAvahiDaemon()); // avahiDaemon uses a host script that must be copied before been initialized
+]).then(() =>
+  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
+); // avahiDaemon uses a host script that must be copied before been initialized
 
 // Create the global env file
 createGlobalEnvsEnvFile();
