@@ -1,6 +1,5 @@
 import { AbortSignal } from "abort-controller";
 import { startAutoUpdatesDaemon } from "./autoUpdates";
-import { startAvahiDaemon } from "./avahi";
 import { startDiskUsageDaemon } from "./diskUsage";
 import { startDynDnsDaemon } from "./dyndns";
 import { startEthMultiClientDaemon } from "./ethMultiClient";
