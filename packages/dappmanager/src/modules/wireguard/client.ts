@@ -4,7 +4,6 @@ import params from "../../params";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment";
 import { ComposeFileEditor } from "../compose/editor";
 import { WireguardDeviceCredentials } from "../../types";
-import { response } from "express";
 
 const {
   WIREGUARD_API_URL,
@@ -79,10 +78,13 @@ export class WireguardClient {
 // Utils
 
 async function fetchWireguardConfigFile(url: string): Promise<string> {
-  const response = await fetch(url);
-  if (response.status === 404) throw Error(`Device not found`);
-  const body = await response.text();
-  if (!response.ok)
-    throw Error(`Error fetching credentials: ${response.statusText} ${body}`);
+  const res = await fetch(url);
+
+  const body = await res.text();
+  if (!res.ok) {
+    if (res.status === 404) throw Error(`Device not found: ${body}`);
+    throw Error(`Error fetching credentials: ${res.statusText} ${body}`);
+  }
+
   return body;
 }
