@@ -38,7 +38,7 @@ export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
 
 // Local proxying
-export const adminUiLocalDomain = "dappnode.local";
+export const adminUiLocalDomain = "http://dappnode.local";
 
 // DNP names
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
