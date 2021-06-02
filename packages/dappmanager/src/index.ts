@@ -26,6 +26,7 @@ import { shellHost } from "./utils/shell";
 import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
+import { startAvahiDaemon } from "./daemons/avahi";
 
 const controller = new AbortController();
 
@@ -46,6 +47,9 @@ const server = startDappmanager({
   vpnApiClient,
   sshManager
 });
+
+// Start daemons
+startDaemons(controller.signal);
 
 // Generate keypair, network stats, and run dyndns loop
 initializeDb();
@@ -104,11 +108,10 @@ addAliasToRunningContainersMigration().catch(e =>
 // Copy host scripts
 copyHostScripts().catch(e => logs.error("Error copying host scripts", e));
 
-// COpy host services
-copyHostServices().catch(e => logs.error("Error copying host services", e));
-
-// Start daemons
-startDaemons(controller.signal);
+// Copy host services
+copyHostServices()
+  .catch(e => logs.error("Error copying host services", e))
+  .then(() => startAvahiDaemon()); // avahiDaemon uses a host script that must be copied before been initialized
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 
