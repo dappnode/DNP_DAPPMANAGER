@@ -28,7 +28,12 @@ export const getAvahiDaemonStatus = memoize(
       "avahi_daemon.sh",
       "-- --initialize"
     );
-    const status = JSON.parse(avahiDaemonStatus);
+    const status: {
+      isAvahiRunning: "true" | "false";
+      isAvahiEnabled: "true" | "false";
+      avahiResolves: "true" | "false";
+    } = JSON.parse(avahiDaemonStatus);
+    console.log(status);
     return {
       isAvahiRunning: status.isAvahiRunning === "true",
       isAvahiEnabled: status.isAvahiEnabled === "true",
