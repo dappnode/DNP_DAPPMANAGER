@@ -10,8 +10,7 @@ const {
   WIREGUARD_DEVICES_ENVNAME,
   WIREGUARD_DNP_NAME,
   WIREGUARD_ISCORE,
-  WIREGUARD_MAIN_SERVICE,
-  WIREGUARD_LOCAL
+  WIREGUARD_MAIN_SERVICE
 } = params;
 
 export class WireguardClient {
@@ -64,11 +63,9 @@ export class WireguardClient {
   async getDeviceCredentials(
     device: string
   ): Promise<WireguardDeviceCredentials> {
-    const remoteConfigUrl = urlJoin(WIREGUARD_API_URL, device);
-    const localConfigUrl = `${urlJoin(
-      WIREGUARD_API_URL,
-      device
-    )}?${WIREGUARD_LOCAL}`;
+    const url = urlJoin(WIREGUARD_API_URL, device);
+    const remoteConfigUrl = url;
+    const localConfigUrl = `${url}?local=true`;
     const [configRemote, configLocal] = await Promise.all([
       fetchWireguardConfigFile(remoteConfigUrl),
       fetchWireguardConfigFile(localConfigUrl)
