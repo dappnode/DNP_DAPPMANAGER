@@ -112,8 +112,6 @@ const params = {
   /** api.wireguard.dappnode/:device */
   WIREGUARD_API_URL: "http://api.wireguard.dappnode",
   WIREGUARD_DEVICES_ENVNAME: "PEERS",
-  WIREGUARD_LOCAL: "local",
-  WIREGUARD_REMOTE: "remote",
 
   // Docker compose parameters
   DNS_SERVICE: "172.33.1.2",
