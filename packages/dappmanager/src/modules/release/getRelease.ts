@@ -51,7 +51,8 @@ export async function getRelease({
     parseUnsafeCompose(composeUnsafe, manifest)
   );
 
-  for (const service of Object.values(compose.services())) {
+  const services = Object.values(compose.services());
+  for (const service of services) {
     // Add global env_file on request
     if ((manifest.globalEnvs || {}).all)
       service.addEnvFile(getGlobalEnvsFilePath(isCore));
@@ -66,7 +67,13 @@ export async function getRelease({
         chain: metadata.chain,
         origin,
         isCore,
-        isMain: metadata.mainService === service.serviceName ? true : undefined,
+        isMain:
+          // If developer chooses this service as main
+          metadata.mainService === service.serviceName ||
+          // Or if there is a single service
+          services.length === 1
+            ? true
+            : undefined,
         dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout)
       })
     );
