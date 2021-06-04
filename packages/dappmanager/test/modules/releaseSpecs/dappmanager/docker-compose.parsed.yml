@@ -12,6 +12,7 @@ services:
         aliases:
           - "my.dappnode"
           - "dappmanager.dappnode"
+          - "dappnode.local"
     restart: always
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
