@@ -49,7 +49,8 @@ export function getPrivateNetworkAliases(
   if (container.dnpName === params.dappmanagerDnpName)
     aliases.push(params.DAPPMANAGER_ALIAS);
 
-  return aliases;
+  // Ensure uniqueness
+  return [...new Set(aliases)];
 }
 
 export function getExternalNetworkAlias(container: ContainerNames): string {
