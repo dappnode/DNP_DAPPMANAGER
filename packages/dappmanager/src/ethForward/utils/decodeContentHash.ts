@@ -24,9 +24,7 @@ export function decodeContentHash(contenthash: string): Content {
     };
   } else if (contentCodec.startsWith("ipns")) {
     const value = multicodec.rmPrefix(contentHashEncoded);
-    // it's not clear that this is actually valid CID
-    // eg uniswap.eth -> 12uA8M8Ku8mHUumxHcu7uee
-    // not a Qm... hash
+    // Example: uniswap.eth -> ipfs-ne 12uA8M8Ku8mHUumxHcu7uee
     const cid = new CID(value);
     return {
       location: "ipns",

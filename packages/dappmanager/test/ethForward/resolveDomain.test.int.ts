@@ -9,6 +9,9 @@ import {
 
 import { resolveDomain } from "../../src/ethForward/resolveDomain";
 import { ethers } from "ethers";
+import fetch from "node-fetch";
+
+const ipfsGateway = "https://ipfs.io";
 
 /**
  * The purpose of this test is to make sure it retrieves the correct content
@@ -35,6 +38,10 @@ describe("ethForward > resolveDomain", () => {
       "eth2dai.eduadiez.eth": {
         location: "ipfs",
         hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
+      },
+      "uniswap.eth": {
+        location: "ipns",
+        hash: "12uA8M8Ku8mHUumxHcu7uee"
       }
     };
 
@@ -46,6 +53,14 @@ describe("ethForward > resolveDomain", () => {
         expect(content).to.deep.equal(expectedContent, "Wrong content");
       });
     }
+  });
+
+  describe("Fetch IPNS content", () => {
+    it.skip("Should resolve IPNS content", async () => {
+      // Resolve uniswap.eth
+      const res = await fetch(`${ipfsGateway}/ipns/12uA8M8Ku8mHUumxHcu7uee`);
+      await res.text();
+    });
   });
 
   describe("resolveDomain with variable mainnet bzz domains", () => {
