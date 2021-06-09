@@ -151,7 +151,7 @@ const params = {
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
   // DAPPMANAGER alias
-  DAPPMANAGER_ALIAS: "my.dappnode",
+  DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
