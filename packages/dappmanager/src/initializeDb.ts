@@ -15,6 +15,7 @@ import retry from "async-retry";
 import shell from "./utils/shell";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
+import { localProxyingEnableDisable } from "./calls";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -51,6 +52,7 @@ export default async function initializeDb(): Promise<void> {
       await pause(60 * 1000);
     }
   }
+
   // > External IP
   //   If the host is exposed to the internet and the staticIp is set, avoid calling UPnP.
   //   Otherwise, get the externalIp from UPnP
@@ -120,6 +122,15 @@ export default async function initializeDb(): Promise<void> {
   writeGlobalEnvsToEnvFile();
 
   eventBus.initializedDb.emit();
+
+  // Disable local proxying if we the DAppNode is exposed to the public internet
+  if (publicIp === internalIp) {
+    logs.info("Exposed to the public internet, disabling local proxying");
+    localProxyingEnableDisable(false).then(
+      () => logs.info("Disabled local proxying"),
+      e => logs.error("Error disabling local proxying", e)
+    );
+  }
 }
 
 /**
