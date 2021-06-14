@@ -25,6 +25,8 @@ export interface IApiAuth {
 export interface IApiRoutes {
   /** Get URL to download a specific path with an HTTP GET req */
   fileDownloadUrl(data: { containerName: string; path: string }): string;
+  /** Download wireguard config */
+  downloadWireguardConfig(data: { device: string; isLocal: boolean }): string;
   /** Legacy download file URL using both REST api and JSON RPC */
   downloadUrl(data: { fileId: string }): string;
   /** Static URL to download all user actions logs */

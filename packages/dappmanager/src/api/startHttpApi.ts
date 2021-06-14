@@ -36,6 +36,7 @@ export interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
   download: RequestHandler<{ fileId: string }>;
   downloadUserActionLogs: RequestHandler<{}>;
+  downloadWireguardConfig: RequestHandler<{ device: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
@@ -146,7 +147,12 @@ export function startHttpApi({
 
   // ADMIN ONLY methods that do not fit into RPC
   // prettier-ignore
-  app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
+  app.get("/wireguard-config/:device", auth.onlyAdmin, routes.downloadWireguardConfig);
+  app.get(
+    "/container-logs/:containerName",
+    auth.onlyAdmin,
+    routes.containerLogs
+  );
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);

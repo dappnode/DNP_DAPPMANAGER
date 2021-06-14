@@ -17,6 +17,7 @@ export const apiUrls = {
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),
+  downloadWireguardConfig: urlJoin(apiUrl, "wireguard-config"),
   fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs")

@@ -11,6 +11,11 @@ export const apiRoutes: IApiRoutes = {
     return urlJoin(apiUrls.download, fileId);
   },
 
+  downloadWireguardConfig({ device, isLocal }) {
+    const url = urlJoin(apiUrls.downloadWireguardConfig, device);
+    return isLocal ? `${url}?local` : url;
+  },
+
   userActionLogsUrl() {
     return apiUrls.userActionLogs;
   },

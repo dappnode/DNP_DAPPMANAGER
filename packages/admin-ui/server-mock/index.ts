@@ -44,6 +44,7 @@ const server = startDappmanager({
   routes: {
     containerLogs: () => {},
     download: () => {},
+    downloadWireguardConfig: () => {},
     downloadUserActionLogs: () => {},
     fileDownload: () => {},
     globalEnvs: () => {},
