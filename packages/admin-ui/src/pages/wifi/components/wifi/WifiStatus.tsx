@@ -130,7 +130,9 @@ export default function WifiStatus(): JSX.Element {
             </div>
           </div>
 
-          {wifiDnp.data.containers[0].state !== "running" && wifiReport.data ? (
+          {wifiDnp.data.containers[0].state !== "running" &&
+          wifiDnp.data.containers[0].state !== "paused" &&
+          wifiReport.data ? (
             <WifiLog wifiReport={wifiReport.data} />
           ) : null}
         </Card>
