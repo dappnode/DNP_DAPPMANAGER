@@ -5,7 +5,7 @@ import * as db from "../../db";
 import params from "../../params";
 import { listContainers } from "../../modules/docker/list";
 import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate";
-import { setIntervalDynamic } from "../../utils/asyncFlows";
+import { runAtMostEveryIntervals } from "../../utils/asyncFlows";
 import { logs } from "../../logs";
 
 const nsupdateInterval = params.NSUPDATE_DAEMON_INTERVAL || 60 * 60 * 1000;
@@ -64,14 +64,9 @@ export function startNsUpdateDaemon(signal: AbortSignal): void {
     }
   });
 
-  // First call
-  runNsupdate({});
-
   // Every interval
-  setIntervalDynamic(
-    () => {
-      runNsupdate({});
-    },
+  runAtMostEveryIntervals(
+    async () => runNsupdate({}),
     [
       // There may be a race condition between the DAPPMANAGER and the BIND
       // On an update, if the DAPPMANAGER restarts first and then the BIND,
