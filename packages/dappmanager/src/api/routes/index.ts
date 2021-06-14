@@ -7,3 +7,4 @@ export * from "./packageManifest";
 export * from "./publicPackagesData";
 export * from "./sign";
 export * from "./upload";
+export * from "./downloadWireguardConfig";

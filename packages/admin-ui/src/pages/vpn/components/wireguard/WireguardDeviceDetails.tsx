@@ -12,12 +12,15 @@ import QrCode from "components/QrCode";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Title from "components/Title";
+import { apiRoutes } from "api";
 // Icons
+import { FiDownload } from "react-icons/fi";
 import { GoClippy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
 import { WireguardDeviceCredentials } from "types";
 // Utils
 import { urlJoin } from "utils/url";
+import { docsUrl } from "params";
 
 function WireguardDeviceDetailsLoaded({
   id,
@@ -29,7 +32,7 @@ function WireguardDeviceDetailsLoaded({
   const [showQr, setShowQr] = useState(false);
   const [showLocalCreds, setShowLocalCreds] = useState(false);
   const config = showLocalCreds ? device.configLocal : device.configRemote;
-  const configType = showLocalCreds ? "local" : "remote";
+  const configType = showLocalCreds ? "local" : "";
 
   useEffect(() => {
     // Activate the copy functionality
@@ -47,12 +50,9 @@ function WireguardDeviceDetailsLoaded({
       </header>
 
       <div className="help-text">
-        Use the VPN credentials URL to connect a new device to this DAppNode.
-        You can then use the user and admin password to log in to the UI. You
-        can share them with a trusted person through a secure channel.
-      </div>
-
-      <div className="help-text">
+        Add the following VPN configuration in your Wireguard client. (
+        <a href={docsUrl.connectVpn}>What is Wireguard</a>?)
+        <br /> <br />
         In case you experience issues connecting from the same network as your
         dappnode, use the local credentials.{" "}
         <span
@@ -65,12 +65,21 @@ function WireguardDeviceDetailsLoaded({
         </span>
       </div>
 
-      <Form.Group>
-        <Form.Label>VPN {configType} credentials URL</Form.Label>
-        <div className="credentials-config">{config}</div>
-      </Form.Group>
-
       <div className="buttons">
+        <a
+          href={apiRoutes.downloadWireguardConfig({
+            device: id,
+            isLocal: false
+          })}
+        >
+          <Button>
+            <span>
+              <FiDownload />
+              <span>Downlaod {configType} config</span>
+            </span>
+          </Button>
+        </a>
+
         <Button data-clipboard-text={config}>
           <span>
             <GoClippy />
@@ -88,11 +97,16 @@ function WireguardDeviceDetailsLoaded({
         </Button>
       </div>
 
+      <Form.Group>
+        <Form.Label>VPN {configType} credentials</Form.Label>
+        <div className="credentials-config">{config}</div>
+      </Form.Group>
+
       {showQr && config && <QrCode url={config} width={"400px"} />}
 
       <div className="alert alert-secondary" role="alert">
         Beware of shoulder surfing attacks (unsolicited observers), This data
-        grants admin access to your DAppNode
+        grants access to your DAppNode
       </div>
     </Card>
   );

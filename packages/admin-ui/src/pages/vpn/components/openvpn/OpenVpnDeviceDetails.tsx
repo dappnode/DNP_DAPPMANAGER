@@ -44,12 +44,6 @@ function OpenVpnDeviceDetailsLoaded({
         </NavLink>
       </header>
 
-      <div className="help-text">
-        Use the VPN credentials URL to connect a new device to this DAppNode.
-        You can then use the user and admin password to log in to the UI. You
-        can share them with a trusted person through a secure channel.
-      </div>
-
       <Form.Group>
         <Form.Label>VPN credentials URL</Form.Label>
         <Input
