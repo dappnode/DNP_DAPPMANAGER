@@ -221,7 +221,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ]
   }),
   runHostSecurityUpdates: async () =>
-    "Security updates have been executed successfully, no reboot needed"
+    "Security updates have been executed successfully, no reboot needed",
+  upnpPortsOpen: async () => {}
 };
 
 export const calls: Routes = {

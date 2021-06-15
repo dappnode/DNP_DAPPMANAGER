@@ -5,6 +5,7 @@ import SubTitle from "components/SubTitle";
 import React, { useState } from "react";
 import Button from "components/Button";
 import Table from "react-bootstrap/Table";
+import { withToast } from "components/toast/Toast";
 import { ReqStatus } from "types";
 import { useApi } from "api";
 import { api } from "api";
@@ -81,10 +82,11 @@ export function PortsStatusTable({
   const [apiReqStatus, setApiReqStatus] = useState<
     ReqStatus<ApiTablePortStatus[]>
   >({});
+  const [upnpOpenReqStatus, setUpnpOpenReqStatus] = useState<ReqStatus>({});
 
   const portsToOpen = useApi.portsToOpenGet();
 
-  async function apiButtonOnClick() {
+  async function apiStatusGet() {
     if (portsToOpen.data)
       try {
         setApiReqStatus({ loading: true });
@@ -97,7 +99,7 @@ export function PortsStatusTable({
       }
   }
 
-  async function upnpButtonOnClick() {
+  async function upnpStatusGet() {
     if (portsToOpen.data)
       try {
         setUpnpReqStatus({ loading: true });
@@ -110,6 +112,22 @@ export function PortsStatusTable({
       }
   }
 
+  async function upnpOpen() {
+    try {
+      setUpnpOpenReqStatus({ loading: true });
+      await withToast(() => api.upnpPortsOpen(), {
+        message: "Attemping to open ports with UPnP..",
+        onSuccess: "Successfully opened ports"
+      });
+      setUpnpOpenReqStatus({ result: true });
+      await upnpStatusGet();
+      await apiStatusGet();
+    } catch (e) {
+      setUpnpOpenReqStatus({ error: e });
+      console.error("Error on upnpPortsOpen", e);
+    }
+  }
+
   if (portsToOpen.data)
     return (
       <>
@@ -118,22 +136,33 @@ export function PortsStatusTable({
           <Button
             variant={"dappnode"}
             className="float-right"
-            onClick={apiButtonOnClick}
+            onClick={apiStatusGet}
             style={{ margin: "auto 5px auto" }}
             disabled={apiReqStatus.loading === true}
           >
             API Scan
           </Button>
           {isUpnpEnabled ? (
-            <Button
-              variant={"dappnode"}
-              className="float-right"
-              onClick={upnpButtonOnClick}
-              style={{ margin: "auto 5px auto" }}
-              disabled={upnpReqStatus.loading === true}
-            >
-              UPnP Scan
-            </Button>
+            <>
+              <Button
+                variant={"dappnode"}
+                className="float-right"
+                onClick={upnpStatusGet}
+                style={{ margin: "auto 5px auto" }}
+                disabled={upnpReqStatus.loading === true}
+              >
+                UPnP Scan
+              </Button>
+              <Button
+                variant={"dappnode"}
+                className="float-right"
+                style={{ margin: "auto 5px auto" }}
+                disabled={upnpOpenReqStatus.loading}
+                onClick={upnpOpen}
+              >
+                Refresh UPnP
+              </Button>
+            </>
           ) : null}
         </SubTitle>
 

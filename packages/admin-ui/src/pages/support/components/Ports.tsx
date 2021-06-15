@@ -1,15 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 
 import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
 import Ok from "components/Ok";
 import Card from "components/Card";
-import Button from "components/Button";
-import { withToast } from "components/toast/Toast";
-
-import { useApi, api } from "api";
+import { useApi } from "api";
 import { PortsStatusTable } from "./PortsStatusTable";
-import { ReqStatus } from "types";
 
 function UpnpStatus({
   isUpnpEnabled,
@@ -39,22 +35,7 @@ function UpnpStatus({
 }
 
 export default function Ports() {
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const systemInfo = useApi.systemInfoGet();
-
-  async function openPorts() {
-    try {
-      setReqStatus({ loading: true });
-      await withToast(() => api.upnpPortsOpen(), {
-        message: "Attemping to open ports with UPnP..",
-        onSuccess: "Successfully opened ports"
-      });
-      setReqStatus({ result: true });
-    } catch (e) {
-      setReqStatus({ error: e });
-      console.error("Error on upnpPortsOpen", e);
-    }
-  }
 
   return (
     <Card>
@@ -66,10 +47,6 @@ export default function Ports() {
                 isUpnpEnabled={systemInfo.data.upnpAvailable}
                 localIp={systemInfo.data.internalIp}
               />
-              <br />
-              <Button disabled={reqStatus.loading} onClick={openPorts}>
-                Refresh UPnP
-              </Button>
             </>
           ) : (
             <Ok
