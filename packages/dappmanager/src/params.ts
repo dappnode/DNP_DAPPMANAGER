@@ -173,22 +173,19 @@ const params = {
   ],
   corePackagesThatMustBeRunning: [
     "bind.dnp.dappnode.eth",
-    "dappmanager.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth"
+    "dappmanager.dnp.dappnode.eth"
   ],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
   corePackagesNotRemovable: [
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
 
