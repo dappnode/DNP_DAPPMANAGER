@@ -6,7 +6,11 @@ import * as db from "../../db";
 import getPortsToOpen from "./getPortsToOpen";
 import getLocalIp from "../../utils/getLocalIp";
 // Utils
-import { runAtMostEvery, runOnlyOneSequentially } from "../../utils/asyncFlows";
+import {
+  runAtMostEvery,
+  runAtMostEveryIntervals,
+  runOnlyOneSequentially
+} from "../../utils/asyncFlows";
 import { PackagePort } from "../../types";
 import { logs } from "../../logs";
 import { listContainers } from "../../modules/docker/list";
@@ -131,9 +135,15 @@ export function startNatRenewalDaemon(signal: AbortSignal): void {
     throttledNatRenewal();
   });
 
-  runAtMostEvery(
+  runAtMostEveryIntervals(
     async () => throttledNatRenewal(),
-    params.NAT_RENEWAL_DAEMON_INTERVAL,
+    [
+      // User may turn-on UPnP right after installing DAppNode.
+      // So run this daemon 2 times a bit more frequently for that case.
+      5 * 60 * 1000,
+      15 * 60 * 1000,
+      params.NAT_RENEWAL_DAEMON_INTERVAL
+    ],
     signal
   );
 }
