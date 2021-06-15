@@ -541,6 +541,11 @@ export interface Routes {
   runHostSecurityUpdates: () => Promise<string>;
 
   /**
+   * Attemps to open ports using UPnP
+   */
+  upnpPortsOpen: () => Promise<void>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -660,6 +665,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusSet: { log: true },
   systemInfoGet: {},
   runHostSecurityUpdates: {},
+  upnpPortsOpen: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
