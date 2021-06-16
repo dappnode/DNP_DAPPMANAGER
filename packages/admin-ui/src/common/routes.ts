@@ -543,7 +543,10 @@ export interface Routes {
   /**
    * Attemps to open ports using UPnP
    */
-  upnpPortsOpen: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
+  natRenewalEnable: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
+
+  /** Returns nat renewal status */
+  natRenewalStatusGet: () => Promise<boolean>;
 
   /**
    * Removes a docker volume by name
@@ -665,7 +668,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusSet: { log: true },
   systemInfoGet: {},
   runHostSecurityUpdates: {},
-  upnpPortsOpen: {},
+  natRenewalEnable: {},
+  natRenewalStatusGet: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

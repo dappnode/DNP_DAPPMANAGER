@@ -130,10 +130,9 @@ export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
  * Makes sure all necessary ports are mapped using UPNP
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
+  // TEMPRARY: This solution will make to run an empty loop if false
   function enableNatRenewal(): void {
-    if (db.isNatRenewalEnabled.get()) throttledNatRenewal();
-    db.isNatRenewalEnabled.set(false);
-    return;
+    if (db.isNatRenewalEnabled.get() === true) throttledNatRenewal();
   }
 
   eventBus.runNatRenewal.on(() => {

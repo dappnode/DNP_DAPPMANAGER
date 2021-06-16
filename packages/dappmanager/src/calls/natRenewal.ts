@@ -1,16 +1,17 @@
 import { throttledNatRenewal } from "../daemons/natRenewal";
 import * as db from "../db";
 
-export async function upnpPortsOpen({
+export async function natRenewalEnable({
   enableNatRenewal
 }: {
   enableNatRenewal: boolean;
 }): Promise<void> {
+  db.isNatRenewalEnabled.set(enableNatRenewal);
   if (enableNatRenewal) {
-    db.isNatRenewalEnabled.set(true);
-    throttledNatRenewal();
-  } else {
-    db.isNatRenewalEnabled.set(false);
     throttledNatRenewal();
   }
+}
+
+export async function natRenewalStatusGet(): Promise<boolean> {
+  return db.isNatRenewalEnabled.get();
 }

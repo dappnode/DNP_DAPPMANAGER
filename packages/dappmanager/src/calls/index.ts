@@ -52,7 +52,7 @@ export { statsDiskGet } from "./statsDiskGet";
 export { systemInfoGet } from "./systemInfoGet";
 export { runHostSecurityUpdates } from "./runHostSecurityUpdates";
 export * from "./telegram";
-export { upnpPortsOpen } from "./upnpPortsOpen";
+export { natRenewalStatusGet, natRenewalEnable } from "./natRenewal";
 export { volumeRemove } from "./volumeRemove";
 export { volumesGet } from "./volumesGet";
 export * from "./wireguard";

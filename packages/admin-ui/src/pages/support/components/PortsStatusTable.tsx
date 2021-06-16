@@ -15,6 +15,7 @@ import {
   PortToOpen,
   UpnpTablePortStatus
 } from "common/types";
+import Switch from "components/Switch";
 
 function RenderApiStatus({
   apiScanResult,
@@ -86,6 +87,8 @@ export function PortsStatusTable({
 
   const portsToOpen = useApi.portsToOpenGet();
 
+  const natRenewalStatus = useApi.natRenewalStatusGet();
+
   async function apiStatusGet() {
     if (portsToOpen.data)
       try {
@@ -115,7 +118,7 @@ export function PortsStatusTable({
   async function upnpOpen() {
     try {
       setUpnpOpenReqStatus({ loading: true });
-      await withToast(() => api.upnpPortsOpen({ enableNatRenewal: true }), {
+      await withToast(() => api.natRenewalEnable({ enableNatRenewal: true }), {
         message: "Attemping to open ports with UPnP..",
         onSuccess: "Successfully opened ports"
       });
@@ -124,7 +127,7 @@ export function PortsStatusTable({
       if (apiReqStatus.result) await apiStatusGet();
     } catch (e) {
       setUpnpOpenReqStatus({ error: e });
-      console.error("Error on upnpPortsOpen", e);
+      console.error("Error on natRenewalEnable", e);
     }
   }
 
@@ -143,26 +146,15 @@ export function PortsStatusTable({
             API Scan
           </Button>
           {isUpnpEnabled ? (
-            <>
-              <Button
-                variant={"dappnode"}
-                className="float-right"
-                onClick={upnpStatusGet}
-                style={{ margin: "auto 5px auto" }}
-                disabled={upnpReqStatus.loading === true}
-              >
-                UPnP Scan
-              </Button>
-              <Button
-                variant={"dappnode"}
-                className="float-right"
-                style={{ margin: "auto 5px auto" }}
-                disabled={upnpOpenReqStatus.loading}
-                onClick={upnpOpen}
-              >
-                Refresh UPnP
-              </Button>
-            </>
+            <Button
+              variant={"dappnode"}
+              className="float-right"
+              onClick={upnpStatusGet}
+              style={{ margin: "auto 5px auto" }}
+              disabled={upnpReqStatus.loading === true}
+            >
+              UPnP Scan
+            </Button>
           ) : null}
         </SubTitle>
 
@@ -237,6 +229,18 @@ export function PortsStatusTable({
             Only available if UPnP is enabled.
           </p>
         ) : null}
+
+        {isUpnpEnabled && (
+          <div>
+            <Switch
+              label="UPnP port mapping is enabled"
+              id="upnp-switch"
+              checked={natRenewalStatus.data === true}
+              disabled={upnpOpenReqStatus.loading}
+              onToggle={upnpOpen}
+            />
+          </div>
+        )}
       </>
     );
   if (portsToOpen.error) return <ErrorView error={portsToOpen.error} />;
