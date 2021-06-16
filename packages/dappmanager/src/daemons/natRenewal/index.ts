@@ -130,12 +130,18 @@ export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
  * Makes sure all necessary ports are mapped using UPNP
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
+  function enableNatRenewal(): void {
+    if (db.isNatRenewalEnabled.get()) throttledNatRenewal();
+    db.isNatRenewalEnabled.set(false);
+    return;
+  }
+
   eventBus.runNatRenewal.on(() => {
-    throttledNatRenewal();
+    enableNatRenewal();
   });
 
   runAtMostEveryIntervals(
-    async () => throttledNatRenewal(),
+    async () => enableNatRenewal(),
     [
       // User may turn-on UPnP right after installing DAppNode.
       // So run this daemon 2 times a bit more frequently for that case.

@@ -543,7 +543,7 @@ export interface Routes {
   /**
    * Attemps to open ports using UPnP
    */
-  upnpPortsOpen: () => Promise<void>;
+  upnpPortsOpen: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
 
   /**
    * Removes a docker volume by name

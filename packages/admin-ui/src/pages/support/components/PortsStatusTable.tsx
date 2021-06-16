@@ -115,7 +115,7 @@ export function PortsStatusTable({
   async function upnpOpen() {
     try {
       setUpnpOpenReqStatus({ loading: true });
-      await withToast(() => api.upnpPortsOpen(), {
+      await withToast(() => api.upnpPortsOpen({ enableNatRenewal: true }), {
         message: "Attemping to open ports with UPnP..",
         onSuccess: "Successfully opened ports"
       });
