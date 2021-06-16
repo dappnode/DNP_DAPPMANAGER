@@ -546,7 +546,7 @@ export interface Routes {
   natRenewalEnable: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
 
   /** Returns nat renewal status */
-  natRenewalStatusGet: () => Promise<boolean>;
+  natRenewalIsEnabled: () => Promise<boolean>;
 
   /**
    * Removes a docker volume by name
@@ -669,7 +669,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   runHostSecurityUpdates: {},
   natRenewalEnable: {},
-  natRenewalStatusGet: {},
+  natRenewalIsEnabled: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

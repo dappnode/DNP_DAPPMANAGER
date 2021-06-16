@@ -12,6 +12,6 @@ export async function natRenewalEnable({
   }
 }
 
-export async function natRenewalStatusGet(): Promise<boolean> {
+export async function natRenewalIsEnabled(): Promise<boolean> {
   return !db.isNatRenewalDisabled.get();
 }

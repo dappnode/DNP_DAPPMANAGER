@@ -87,7 +87,7 @@ export function PortsStatusTable({
 
   const portsToOpen = useApi.portsToOpenGet();
 
-  const natRenewalStatus = useApi.natRenewalStatusGet();
+  const natRenewalStatus = useApi.natRenewalIsEnabled();
 
   async function apiStatusGet() {
     if (portsToOpen.data)
