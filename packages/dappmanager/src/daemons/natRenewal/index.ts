@@ -132,7 +132,8 @@ export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
 export function startNatRenewalDaemon(signal: AbortSignal): void {
   // TEMPRARY: This solution will make to run an empty loop if false
   function enableNatRenewal(): void {
-    if (db.isNatRenewalEnabled.get() === true) throttledNatRenewal();
+    if (db.isNatRenewalDisabled.get() === true) return;
+    throttledNatRenewal();
   }
 
   eventBus.runNatRenewal.on(() => {

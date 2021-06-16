@@ -5,7 +5,7 @@ import { PackagePort } from "../types";
 const UPNP_AVAILABLE = "upnp-available";
 const UPNP_PORT_MAPPINGS = "upnp-port-mappings";
 const PORTS_TO_OPEN = "ports-to-ppen";
-const IS_NAT_RENEWAL_ENABLED = "is-nat-renewal-enabled";
+const IS_NAT_RENEWAL_DISABLED = "is-nat-renewal-disabled";
 
 export const upnpAvailable = dbCache.staticKey<boolean>(UPNP_AVAILABLE, false);
 
@@ -16,7 +16,7 @@ export const upnpPortMappings = dbCache.staticKey<UpnpPortMapping[]>(
 
 export const portsToOpen = dbCache.staticKey<PackagePort[]>(PORTS_TO_OPEN, []);
 
-export const isNatRenewalEnabled = dbCache.staticKey<boolean>(
-  IS_NAT_RENEWAL_ENABLED,
+export const isNatRenewalDisabled = dbCache.staticKey<boolean>(
+  IS_NAT_RENEWAL_DISABLED,
   true
 );
