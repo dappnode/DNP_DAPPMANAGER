@@ -120,8 +120,8 @@ export function PortsStatusTable({
         onSuccess: "Successfully opened ports"
       });
       setUpnpOpenReqStatus({ result: true });
-      await upnpStatusGet();
-      await apiStatusGet();
+      if (upnpReqStatus.result) await upnpStatusGet();
+      if (apiReqStatus.result) await apiStatusGet();
     } catch (e) {
       setUpnpOpenReqStatus({ error: e });
       console.error("Error on upnpPortsOpen", e);
