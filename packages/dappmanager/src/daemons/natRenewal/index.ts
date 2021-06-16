@@ -118,18 +118,18 @@ function portId(port: PackagePort): string {
 }
 
 /**
+ * runOnlyOneSequentially makes sure that natRenewal is not run twice
+ * in parallel. Also, if multiple requests to run natRenewal, they will
+ * be ignored and run only once more after the previous natRenewal is
+ * completed.
+ */
+export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+
+/**
  * NAT renewal daemon.
  * Makes sure all necessary ports are mapped using UPNP
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
-  /**
-   * runOnlyOneSequentially makes sure that natRenewal is not run twice
-   * in parallel. Also, if multiple requests to run natRenewal, they will
-   * be ignored and run only once more after the previous natRenewal is
-   * completed.
-   */
-  const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
-
   eventBus.runNatRenewal.on(() => {
     throttledNatRenewal();
   });
