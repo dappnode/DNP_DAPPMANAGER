@@ -18,5 +18,5 @@ export const portsToOpen = dbCache.staticKey<PackagePort[]>(PORTS_TO_OPEN, []);
 
 export const isNatRenewalDisabled = dbCache.staticKey<boolean>(
   IS_NAT_RENEWAL_DISABLED,
-  true
+  false
 );
