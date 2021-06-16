@@ -131,17 +131,17 @@ export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
   // TEMPRARY: This solution will make to run an empty loop if false
-  function enableNatRenewal(): void {
-    if (db.isNatRenewalDisabled.get() === true) return;
+  function runThrottledNatRenewalIfEnabled(): void {
+    if (db.isNatRenewalDisabled.get() === true) return; // is disabled, skip
     throttledNatRenewal();
   }
 
   eventBus.runNatRenewal.on(() => {
-    enableNatRenewal();
+    runThrottledNatRenewalIfEnabled();
   });
 
   runAtMostEveryIntervals(
-    async () => enableNatRenewal(),
+    async () => runThrottledNatRenewalIfEnabled(),
     [
       // User may turn-on UPnP right after installing DAppNode.
       // So run this daemon 2 times a bit more frequently for that case.
