@@ -37,7 +37,7 @@ export function dbFactory(dbPath: string) {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   function staticKey<T>(key: string, defaultValue: T) {
     return {
-      get: (): T => jsonFileDb.read()[key] || defaultValue,
+      get: (): T => jsonFileDb.read()[key] ?? defaultValue,
       set: (newValue: T): void => {
         const all = jsonFileDb.read();
         all[key] = newValue;
