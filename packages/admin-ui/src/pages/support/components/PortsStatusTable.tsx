@@ -146,11 +146,15 @@ export function PortsStatusTable({
               {(apiReqStatus.result || apiReqStatus.loading) && (
                 <th>Status (API) *</th>
               )}
-              {apiReqStatus.error && <ErrorView error={apiReqStatus.error} />}
+              {apiReqStatus.error && (
+                <Ok ok={false} msg={"Error on API, check activity log"} />
+              )}
               {(upnpReqStatus.result || upnpReqStatus.loading) && (
                 <th>Status (UPnP) **</th>
               )}
-              {upnpReqStatus.error && <ErrorView error={upnpReqStatus.error} />}
+              {upnpReqStatus.error && (
+                <Ok ok={false} msg={"Error on UPnP, check activity log"} />
+              )}
             </tr>
           </thead>
           <tbody>
