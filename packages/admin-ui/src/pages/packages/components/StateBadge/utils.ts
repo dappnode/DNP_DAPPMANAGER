@@ -2,9 +2,13 @@ import { PackageContainer } from "types";
 
 export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
 export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
+export type PackageContainerStatus = Pick<
+  PackageContainer,
+  "state" | "exitCode"
+>;
 
 export function parseContainerState(
-  container: PackageContainer
+  container: PackageContainerStatus
 ): { variant: BadgeVariant; state: SimpleState; title: string } {
   const { state, exitCode } = container;
 

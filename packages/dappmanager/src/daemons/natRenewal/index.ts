@@ -6,7 +6,10 @@ import * as db from "../../db";
 import getPortsToOpen from "./getPortsToOpen";
 import getLocalIp from "../../utils/getLocalIp";
 // Utils
-import { runAtMostEvery, runOnlyOneSequentially } from "../../utils/asyncFlows";
+import {
+  runAtMostEveryIntervals,
+  runOnlyOneSequentially
+} from "../../utils/asyncFlows";
 import { PackagePort } from "../../types";
 import { logs } from "../../logs";
 import { listContainers } from "../../modules/docker/list";
@@ -115,25 +118,37 @@ function portId(port: PackagePort): string {
 }
 
 /**
+ * runOnlyOneSequentially makes sure that natRenewal is not run twice
+ * in parallel. Also, if multiple requests to run natRenewal, they will
+ * be ignored and run only once more after the previous natRenewal is
+ * completed.
+ */
+export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+
+/**
  * NAT renewal daemon.
  * Makes sure all necessary ports are mapped using UPNP
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
-  /**
-   * runOnlyOneSequentially makes sure that natRenewal is not run twice
-   * in parallel. Also, if multiple requests to run natRenewal, they will
-   * be ignored and run only once more after the previous natRenewal is
-   * completed.
-   */
-  const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+  // TEMPRARY: This solution will make to run an empty loop if false
+  function runThrottledNatRenewalIfEnabled(): void {
+    if (db.isNatRenewalDisabled.get() === true) return; // is disabled, skip
+    throttledNatRenewal();
+  }
 
   eventBus.runNatRenewal.on(() => {
-    throttledNatRenewal();
+    runThrottledNatRenewalIfEnabled();
   });
 
-  runAtMostEvery(
-    async () => throttledNatRenewal(),
-    params.NAT_RENEWAL_DAEMON_INTERVAL,
+  runAtMostEveryIntervals(
+    async () => runThrottledNatRenewalIfEnabled(),
+    [
+      // User may turn-on UPnP right after installing DAppNode.
+      // So run this daemon 2 times a bit more frequently for that case.
+      5 * 60 * 1000,
+      15 * 60 * 1000,
+      params.NAT_RENEWAL_DAEMON_INTERVAL
+    ],
     signal
   );
 }

@@ -80,12 +80,14 @@ const params = {
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
   // HTTP API parameters
-  IPFS_GATEWAY: "http://ipfs.dappnode:8080/ipfs/",
+  /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
+  IPFS_GATEWAY: "/ipfs/",
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
   HTTP_CORS_WHITELIST: [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://my.dappnode"
+    "http://my.dappnode",
+    "http://dappnode.local"
   ],
 
   // API auth sessions
@@ -94,11 +96,14 @@ const params = {
   SESSIONS_TTL_MS: 7 * DAY,
 
   // VPN API
-  VPN_API_RPC_URL: "http://172.33.1.4:3000/rpc",
+  VPN_API_RPC_URL: "http://vpn.dappnode:3000/rpc",
 
   // HTTPS Portal API URL
   HTTPS_PORTAL_API_URL: "http://https.dappnode:5000",
   HTTPS_PORTAL_DNPNAME: "https.dnp.dappnode.eth",
+  HTTPS_PORTAL_ISCORE: true,
+  HTTPS_PORTAL_MAIN_SERVICE: "https.dnp.dappnode.eth",
+  HTTPS_PORTAL_LOCAL_PROXYING_ENVNAME: "LOCAL_PROXYING",
 
   // Wireguard params
   WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
@@ -146,7 +151,7 @@ const params = {
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
   // DAPPMANAGER alias
-  DAPPMANAGER_ALIAS: "my.dappnode",
+  DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -168,22 +173,19 @@ const params = {
   ],
   corePackagesThatMustBeRunning: [
     "bind.dnp.dappnode.eth",
-    "dappmanager.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth"
+    "dappmanager.dnp.dappnode.eth"
   ],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
   corePackagesNotRemovable: [
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
 
@@ -193,12 +195,16 @@ const params = {
   DYNDNS_INTERVAL: 30 * 60 * 1000, // 30 minutes
 
   // Local domains
-  AVAHI_LOCAL_DOMAIN: "my.dappnode.local",
+  AVAHI_LOCAL_DOMAIN: "dappnode.local",
 
   // System file paths
   HOSTNAME_PATH: "/etc/dappnodename",
   STATIC_IP_PATH: "/usr/src/app/config/static_ip",
   VPNDB_PATH: "/usr/src/app/secrets/vpndb.json",
+
+  // Wi-Fi ENVs
+  WIFI_KEY_SSID: "SSID",
+  WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
 
   // Global ENVs names
   GLOBAL_ENVS: {
@@ -230,7 +236,7 @@ const params = {
   ],
 
   // ETHFORWARD / HTTP proxy params
-  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080/ipfs/",
+  ETHFORWARD_IPFS_REDIRECT: "http://ipfs.dappnode:8080",
   ETHFORWARD_SWARM_REDIRECT: "http://swarm.dappnode",
   ETHFORWARD_PIN_ON_VISIT: true,
 

@@ -31,9 +31,7 @@ export async function ethereum2Prysm(
     return null; // OK to not be running, just ignore
   }
 
-  const container = dnp.containers[0];
-  if (!container) throw Error("no container");
-  const containerDomain = getPrivateNetworkAlias(container);
+  const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
 
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
   const apiUrl = `http://${containerDomain}:3500`;
@@ -61,16 +59,24 @@ export function parseEthereum2PrysmState(
   chainhead: PrysmChainhead,
   currentTimeMs = Date.now() // For deterministic testing
 ): ChainDataResult {
-  const genesisTime = genesis.genesisTime;
-  const headSlot = parseInt(chainhead.headSlot);
-  const secondsPerSlot = parseInt(config.config?.SecondsPerSlot);
+  const genesisTime = genesis.genesisTime ?? genesis.genesis_time;
+  const headSlotStr = chainhead.headSlot ?? chainhead.head_slot;
+  const secondsPerSlotStr = config.config?.SecondsPerSlot;
 
-  if (!genesisTime) throw Error(`Invalid genesisTime ${genesisTime}`);
+  if (!genesisTime) throw Error(`No property genesisTime or genesis_time`);
+  if (headSlotStr === undefined)
+    throw Error(`No property headSlot or head_slot`);
+  if (secondsPerSlotStr === undefined)
+    throw Error(`No property SecondsPerSlot`);
+
+  const headSlot = parseInt(headSlotStr);
+  const secondsPerSlot = parseInt(secondsPerSlotStr);
+
   if (isNaN(headSlot)) throw Error(`Invalid headSlot ${chainhead.headSlot}`);
   if (isNaN(secondsPerSlot))
     throw Error(`Invalid secondsPerSlot ${config.config?.SecondsPerSlot}`);
 
-  const genesisDate = new Date(genesis.genesisTime);
+  const genesisDate = new Date(genesisTime);
   const secondsSinceGenesis = (currentTimeMs - genesisDate.getTime()) / 1000;
   const clockSlot = Math.floor(secondsSinceGenesis / secondsPerSlot);
 
@@ -100,7 +106,9 @@ export function parseEthereum2PrysmState(
  * ```
  */
 interface PrysmGenesis {
-  genesisTime: string;
+  genesisTime?: string;
+  // v1.3.10 uses snake case
+  genesis_time?: string;
 }
 
 /**
@@ -120,7 +128,9 @@ interface PrysmGenesis {
  * }
  */
 interface PrysmChainhead {
-  headSlot: string;
+  headSlot?: string;
+  // v1.3.10 uses snake case
+  head_slot?: string;
 }
 
 /**

@@ -34,7 +34,10 @@ import {
   WireguardDeviceCredentials,
   ExposableServiceMapping,
   HostDiagnoseItem,
-  InstalledPackageDataApiReturn
+  InstalledPackageDataApiReturn,
+  WifiReport,
+  CurrentWifiCredentials,
+  LocalProxyingStatus
 } from "./types";
 
 export interface Routes {
@@ -246,11 +249,31 @@ export interface Routes {
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
   /** HTTPs Portal: get exposable services with metadata */
   httpsPortalExposableServicesGet(): Promise<ExposableServiceMapping[]>;
+  /** HTTPs Portal: recreate mappings */
+  httpsPortalMappingsRecreate(): Promise<void>;
 
   /**
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
    */
   ipfsTest(): Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through dappnode.local.
+   * When disabling this feature:
+   * - Remove NGINX logic in HTTPs Portal to route .local domains
+   * - Stop exposing the port 80 to the local network
+   * - Stop broadcasting .local domains to mDNS
+   */
+  localProxyingEnableDisable: (enable: boolean) => Promise<void>;
+
+  /**
+   * Local proxying allows to access the admin UI through dappnode.local.
+   * Return current status of:
+   * - NGINX is routing .local domains
+   * - Port 80 is exposed
+   * - Is broadcasting to mDNS
+   */
+  localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -513,6 +536,19 @@ export interface Routes {
   systemInfoGet: () => Promise<SystemInfo>;
 
   /**
+   * Executes security updates on host
+   */
+  runHostSecurityUpdates: () => Promise<string>;
+
+  /**
+   * Attemps to open ports using UPnP
+   */
+  natRenewalEnable: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
+
+  /** Returns nat renewal status */
+  natRenewalIsEnabled: () => Promise<boolean>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -528,12 +564,21 @@ export interface Routes {
    */
   ipPublicGet: () => Promise<PublicIpResponse>;
 
+  /**Get wifi credentials */
+  wifiCredentialsGet(): Promise<CurrentWifiCredentials>;
+
+  /** Get wifi report */
+  wifiReportGet(): Promise<WifiReport>;
+
   /** Add a device to Wireguard DNP ENVs */
   wireguardDeviceAdd(device: string): Promise<void>;
+
   /** Remove a device from Wireguard DNP ENVs */
   wireguardDeviceRemove(device: string): Promise<void>;
+
   /** Get credentials for a single Wireguard device */
   wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
+
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
 }
@@ -580,8 +625,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
+  httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
+  localProxyingEnableDisable: { log: true },
+  localProxyingStatusGet: {},
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},
@@ -619,9 +667,14 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
+  runHostSecurityUpdates: {},
+  natRenewalEnable: {},
+  natRenewalIsEnabled: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
+  wifiCredentialsGet: {},
+  wifiReportGet: {},
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},

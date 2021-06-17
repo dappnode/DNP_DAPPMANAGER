@@ -8,7 +8,7 @@ volumes:
 services:
   dappmanager.dnp.dappnode.eth:
     build: .
-    image: "dappmanager.dnp.dappnode.eth:0.2.39"
+    image: "dappmanager.dnp.dappnode.eth:0.2.41"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     volumes:
@@ -30,5 +30,6 @@ services:
         aliases:
           - dappmanager.dappnode
           - my.dappnode
+          - dappnode.local
     logging:
       driver: journald

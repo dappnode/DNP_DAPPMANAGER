@@ -4,6 +4,7 @@ import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
+import { localProxying } from "./localProxying";
 import { notifications } from "./notifications";
 import { packages } from "./packages";
 import { password } from "./password";
@@ -12,6 +13,7 @@ import { telegram } from "./telegram";
 import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
 import { wireguard } from "./wireguard";
+import { wifi } from "./wifi";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -19,6 +21,7 @@ const namedSpacedCalls = {
   ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
+  ...localProxying,
   ...notifications,
   ...packages,
   ...password,
@@ -26,7 +29,8 @@ const namedSpacedCalls = {
   ...telegram,
   ...userActionLogs,
   ...volumes,
-  ...wireguard
+  ...wireguard,
+  ...wifi
 };
 
 let dappnodeWebName = "Mock-DAppNode";
@@ -71,8 +75,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     {
       portNumber: 8092,
       protocol: PortProtocol.TCP,
-      serviceName: "validator",
-      dnpName: "Prysm"
+      serviceName: "vpn.dnp.dappnode.eth",
+      dnpName: "DAppNodeCore-vpn.dnp.dappnode.eth"
+    },
+    {
+      portNumber: 1194,
+      protocol: PortProtocol.UDP,
+      serviceName: "vpn.dnp.dappnode.eth",
+      dnpName: "DAppNodeCore-vpn.dnp.dappnode.eth"
     }
   ],
   portsUpnpStatusGet: async () => [
@@ -209,7 +219,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       // "system-auto-updates",
       // "change-host-password"
     ]
-  })
+  }),
+  runHostSecurityUpdates: async () =>
+    "Security updates have been executed successfully, no reboot needed",
+  natRenewalEnable: async () => {},
+  natRenewalIsEnabled: async () => true
 };
 
 export const calls: Routes = {

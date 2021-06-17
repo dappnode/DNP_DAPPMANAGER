@@ -1,6 +1,6 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { TimeoutErrorKy } from "./types";
+import { TimeoutErrorKy, IpfsInstance } from "./types";
 const toStream = require("it-to-stream");
 
 const resolution = 2;
@@ -27,7 +27,7 @@ export interface CatStreamToFsArgs {
  */
 export async function catStreamToFs(
   { hash, path, timeout, fileSize, progress }: CatStreamToFsArgs,
-  ipfs: any
+  ipfs: IpfsInstance
 ): Promise<void> {
   return new Promise((resolve, reject): void => {
     if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))

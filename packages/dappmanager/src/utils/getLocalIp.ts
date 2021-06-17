@@ -1,6 +1,7 @@
 import shell from "./shell";
 import isIp from "is-ip";
 import { logs } from "../logs";
+import getDappmanagerImage from "./getDappmanagerImage";
 
 export default async function getLocalIp(options?: {
   silent: boolean;
@@ -8,9 +9,7 @@ export default async function getLocalIp(options?: {
   const silent = options && options.silent;
 
   try {
-    const image = await shell(
-      `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`
-    );
+    const image = await getDappmanagerImage();
     const output = await shell(
       `docker run --rm --net=host --entrypoint=/sbin/ip ${image} route get 1`
     );

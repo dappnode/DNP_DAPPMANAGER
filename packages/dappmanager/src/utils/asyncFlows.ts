@@ -21,7 +21,33 @@ export async function runAtMostEvery(
   intervalMs: number,
   signal: AbortSignal
 ): Promise<void> {
+  runAtMostEveryIntervals(fn, [intervalMs], signal);
+}
+
+/**
+ * Like setInterval but you can pass a list ms values
+ *
+ * **Example**
+ * ```js
+ * setIntervalDynamic(callback, [1000, 2000, 3000])
+ * ```
+ * - First interval will take 1000 ms
+ * - Second interval will take 2000 ms
+ * - Third and all subsequent will take 3000 ms
+ *
+ * @param fn callback
+ * @param msArray [1000, 2000, 3000]
+ */
+export async function runAtMostEveryIntervals(
+  fn: () => Promise<void>,
+  intervalsMs: number[],
+  signal: AbortSignal
+): Promise<void> {
   let lastRunMs = 0;
+
+  const intervalMsFinal = intervalsMs[intervalsMs.length - 1];
+  if (intervalMsFinal === undefined)
+    throw Error(`msArray must have at least one element`);
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -31,6 +57,7 @@ export async function runAtMostEvery(
       console.error("Callbacks in runAtMostEvery should never throw", e);
     });
 
+    const intervalMs = intervalsMs.shift() || intervalMsFinal;
     const sleepTime = Math.max(intervalMs + lastRunMs - Date.now(), 0);
 
     try {
@@ -129,6 +156,7 @@ export function runOnlyOneSequentially<A, R>(
  *
  * @param fn Target function (Callback style)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
   f: F
 ): F {
@@ -150,42 +178,4 @@ export function pause(ms: number): Promise<void> {
   return new Promise((resolve): void => {
     setTimeout(resolve, ms);
   });
-}
-
-/**
- * Like setInterval but you can pass a list ms values
- *
- * **Example**
- * ```js
- * setIntervalDynamic(callback, [1000, 2000, 3000])
- * ```
- * - First interval will take 1000 ms
- * - Second interval will take 2000 ms
- * - Third and all subsequent will take 3000 ms
- *
- * @param fn callback
- * @param msArray [1000, 2000, 3000]
- */
-export function setIntervalDynamic(
-  fn: () => void | Promise<void>,
-  msArray: number[],
-  signal: AbortSignal
-): void {
-  let timeout: NodeJS.Timeout;
-  signal.addEventListener("abort", () => {
-    clearTimeout(timeout);
-  });
-
-  const msFinal = msArray[msArray.length - 1];
-  if (typeof msFinal !== "number")
-    throw Error(`msArray must have at least one element`);
-
-  function run(): void {
-    timeout = setTimeout(() => {
-      fn();
-      run();
-    }, msArray.shift() || msFinal);
-  }
-
-  run();
 }

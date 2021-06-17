@@ -17,6 +17,7 @@ export const apiUrls = {
   rpc: urlJoin(apiUrl, "rpc"),
   upload: urlJoin(apiUrl, "upload"),
   download: urlJoin(apiUrl, "download"),
+  downloadWireguardConfig: urlJoin(apiUrl, "wireguard-config"),
   fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs")
@@ -36,6 +37,9 @@ export const wifiDefaultSSID = "DAppNodeWIFI";
 export const wifiDefaultWPA_PASSPHRASE = "dappnode";
 export const wifiEnvWPA_PASSPHRASE = "WPA_PASSPHRASE";
 export const wifiEnvSSID = "SSID";
+
+// Local proxying
+export const adminUiLocalDomain = "http://dappnode.local";
 
 // DNP names
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
@@ -75,13 +79,32 @@ export const githubNewIssueDappnodeUrl =
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
-export const recoverPasswordGuideUrl =
-  "https://dappnode.github.io/DAppNodeDocs/troubleshooting/#recover-password";
-export const setupTelegramBotGuideUrl = "https://forum.dappnode.io/t/816";
+export const docsUrl = {
+  recoverPasswordGuide:
+    "https://docs.dappnode.io/user-guide/support/troubleshooting#recover-ui-password",
+  connectWifi: "https://docs.dappnode.io/user-guide/ui/access/wifi",
+  connectLocalProxy:
+    "https://docs.dappnode.io/user-guide/ui/access/local-proxy",
+  connectVpn: "https://docs.dappnode.io/user-guide/ui/access/vpn",
+  httpsExplanation: "https://docs.dappnode.io/user-guide/ui/system#network",
+  ipfsPeersExplanation:
+    "https://docs.dappnode.io/user-guide/ui/recommended-set-ups/add-ipfs-peers"
+};
+
+export const setupTelegramBotGuideUrl =
+  "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4";
 export const troubleShootMountpointsGuideUrl =
   "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
 export const dappnodeUserGuideUrl =
   "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
+export const mediumTreasuryUrl =
+  "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
+export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
+export const dappnodeGitcoin =
+  "https://gitcoin.co/grants/143/dappnode-panvala-league";
+export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
+export const dappnodeDiscourse = "https://forum.dappnode.io/";
+export const dappnodeDiscord = "https://discord.gg/c28an8dA5k";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {

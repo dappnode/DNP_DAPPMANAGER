@@ -1,8 +1,24 @@
 import "mocha";
 import { expect } from "chai";
 import { PackageContainer, PortProtocol } from "../../../src/types";
-import { parseContainerInfo } from "../../../src/modules/docker/list/parseContainerInfo";
+import {
+  parseContainerInfo,
+  parseDnpNameFromContainerName
+} from "../../../src/modules/docker/list/parseContainerInfo";
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
+
+describe("modules / docker / parseDnpNameFromContainerName", () => {
+  const testCases = {
+    "DAppNodeCore-api.wireguard.dnp.dappnode.eth": "wireguard.dnp.dappnode.eth",
+    "DAppNodePackage-geth.dnp.dappnode.eth": "geth.dnp.dappnode.eth"
+  };
+
+  for (const [containerName, dnpName] of Object.entries(testCases)) {
+    it(containerName, () => {
+      expect(parseDnpNameFromContainerName(containerName)).to.equal(dnpName);
+    });
+  }
+});
 
 describe("modules / docker / parseContainerInfo", function() {
   it("should parse docker containers", async () => {
@@ -389,8 +405,7 @@ describe("modules / docker / parseContainerInfo", function() {
         running: true,
         exitCode: null,
         dependencies: {},
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+        avatarUrl: "/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
         origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         chain: "ethereum",
         canBeFullnode: false,
@@ -785,8 +800,7 @@ describe("modules / docker / parseContainerInfo", function() {
         canBeFullnode: false
       },
       {
-        avatarUrl:
-          "http://ipfs.dappnode:8080/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
+        avatarUrl: "/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
         canBeFullnode: false,
         containerId:
           "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",

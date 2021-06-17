@@ -12,6 +12,7 @@ export function applyRecursivelyToStringValues(
   ): T | T[] {
     if (typeof obj === "object") {
       if (Array.isArray(obj)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return obj.map(objectModifier) as any;
       } else {
         return mapValues(obj, (value, key) => {

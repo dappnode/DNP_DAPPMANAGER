@@ -35,8 +35,9 @@ const nextComposeName = `docker-compose-next.yml`;
 const restartComposeName = `docker-compose-restart.yml`;
 const restartEntrypoint = "restart-entrypoint.sh";
 
-const inHost = (_path: string) => path.join(testDir, _path);
-const inContainer = (_path: string) => path.join(testDirContainer, _path);
+const inHost = (_path: string): string => path.join(testDir, _path);
+const inContainer = (_path: string): string =>
+  path.join(testDirContainer, _path);
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
@@ -433,7 +434,7 @@ async function runUntilExited(
 ): Promise<ProcessResult> {
   return new Promise(resolve => {
     const proc = child.exec(cmd, (error, stdout, stderr) => {
-      resolve({ error, stdout, stderr } as any);
+      resolve({ error, stdout, stderr } as ProcessResult);
     });
     if (proc.stdout) proc.stdout.on("data", logWithTag(tag));
     if (proc.stderr) proc.stderr.on("data", logWithTag(tag));

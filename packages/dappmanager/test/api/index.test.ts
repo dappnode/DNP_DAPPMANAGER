@@ -32,7 +32,7 @@ describe.skip("Test server auth", function() {
   }
 
   before("start server", () => {
-    server = startHttpApi({} as any);
+    server = startHttpApi({} as Parameters<typeof startHttpApi>[0]);
   });
 
   it("Should not be logged", async () => {
@@ -41,7 +41,7 @@ describe.skip("Test server auth", function() {
   });
 
   it("Should reject websocket connection", async () => {
-    const ok = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const socket = io(baseUrl);
       socket.on("connect", resolve);
       socket.io.on("connect_error", reject); // Handles server errors

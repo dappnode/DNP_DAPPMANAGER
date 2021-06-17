@@ -161,7 +161,7 @@ export const exposablePredefined: {
       description: "JSON RPC endpoint for Zcash"
     }
   ],
-  "owncloud.public.dappnode.eth": [
+  "owncloud.dnp.dappnode.eth": [
     {
       fromSubdomain: "owncloud",
       dnpName: "owncloud.dnp.dappnode.eth",

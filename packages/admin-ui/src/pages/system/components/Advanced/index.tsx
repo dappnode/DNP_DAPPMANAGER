@@ -18,6 +18,7 @@ export function Advanced() {
         </div>
         <ChangeDappnodeWebName />
       </Card>
+
       <SubTitle>SSH</SubTitle>
       <SshManager />
 

@@ -1,6 +1,5 @@
 import params from "../../params";
 import { InstallPackageData } from "../../types";
-import { sortBy } from "lodash";
 
 const dappmanager = params.dappmanagerDnpName;
 

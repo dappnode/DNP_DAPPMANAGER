@@ -11,16 +11,20 @@ import {
   MdFolder,
   MdHelp,
   MdDevices,
-  MdDashboard
+  MdDashboard,
+  MdWifi,
+  MdPeople
 } from "react-icons/md";
 // URLs
 import { rootPath as dashboardRootPath } from "pages/dashboard";
-import { rootPath as devicesRootPath } from "pages/devices";
+import { rootPath as devicesRootPath } from "pages/vpn";
 import { rootPath as installerRootPath } from "pages/installer";
 import { rootPath as packagesRootPath } from "pages/packages";
 import { rootPath as systemRootPath } from "pages/system";
 import { rootPath as sdkRootPath } from "pages/sdk";
 import { rootPath as supportRootPath } from "pages/support";
+import { rootPath as wifiRootPath } from "pages/wifi";
+import { rootPath as communityRootPath } from "pages/community";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -57,6 +61,11 @@ export const sidenavItems: {
     icon: MdDashboard
   },
   {
+    name: "Wi-Fi",
+    href: wifiRootPath,
+    icon: MdWifi
+  },
+  {
     name: "VPN",
     href: devicesRootPath,
     icon: MdDevices
@@ -75,6 +84,11 @@ export const sidenavItems: {
     name: "System",
     href: systemRootPath,
     icon: MdSettings
+  },
+  {
+    name: "Community",
+    href: communityRootPath,
+    icon: MdPeople
   },
   {
     name: "Sdk",

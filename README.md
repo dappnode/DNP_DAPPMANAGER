@@ -66,6 +66,13 @@ There are 3 different developing modes:
 
 1. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, to develop and test UI elements without connecting to a DAppNode or a mock server. This is a fully static site that will be deployed to Netlify on every PR to speed up the reviewing process of PRs.
 
+Netlify settings:
+
+- Production branch: **master**
+- Other branches: **v...** (e.g v0.2.41)
+
+Netlify will deploy an static site on every PR against the mentioned PRs
+
 ```
 cd packages/admin-ui
 yarn mock-standalone
@@ -90,9 +97,7 @@ cd packages/admin-ui
 yarn start
 ```
 
-*Note: This mode is not working a the moment since cross-domain cookies are not enabled.*
-
-
+_Note: This mode is not working a the moment since cross-domain cookies are not enabled._
 
 ### Distributing
 

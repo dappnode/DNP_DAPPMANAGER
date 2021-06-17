@@ -121,7 +121,7 @@ describe("dappGet integration test", () => {
   }
 });
 
-function expectNotEmpty(obj: any): void {
+function expectNotEmpty(obj: unknown): void {
   expect(isEmpty(obj), "Obj must not be empty: " + JSON.stringify(obj, null, 2))
     .to.be.false;
 }

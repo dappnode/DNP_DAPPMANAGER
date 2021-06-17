@@ -13,7 +13,7 @@ import {
   parseVolumeMappings,
   readContainerLabels
 } from "../../compose";
-import { multiaddressToGatewayUrl } from "../../../utils/distributedFile";
+import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile";
 import { isPortMappingDeletable } from "./isPortMappingDeletable";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
 
@@ -26,9 +26,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
   const containerName = (container.Names[0] || "").replace("/", "");
   const dnpName =
-    labels.dnpName ||
-    containerName.split(CONTAINER_NAME_PREFIX)[1] ||
-    containerName.split(CONTAINER_CORE_NAME_PREFIX)[1];
+    labels.dnpName || parseDnpNameFromContainerName(containerName);
 
   const defaultEnvironment =
     labels.defaultEnvironment && parseEnvironment(labels.defaultEnvironment);
@@ -100,7 +98,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: labels.avatar ? multiaddressToGatewayUrl(labels.avatar) : "",
+    avatarUrl: labels.avatar ? multiaddressToIpfsGatewayUrl(labels.avatar) : "",
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
@@ -111,4 +109,25 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     defaultVolumes,
     dockerTimeout
   };
+}
+
+/**
+ * Parse dnpName from containerName considering multi-service packages
+ * @param containerName DAppNodeCore-api.wireguard.dnp.dappnode.eth
+ * @returns wireguard.dnp.dappnode.eth
+ */
+export function parseDnpNameFromContainerName(containerName: string): string {
+  const containerDomain =
+    containerName.split(CONTAINER_NAME_PREFIX)[1] ||
+    containerName.split(CONTAINER_CORE_NAME_PREFIX)[1] ||
+    containerName;
+
+  if (containerDomain.endsWith(".dappnode.eth")) {
+    // Structure: service . nameShort . repo . dappnode . eth
+    // Example: api.wireguard.dnp.dappnode.eth
+    const parts = containerDomain.trim().split(".");
+    return parts.slice(-4).join("."); // Grab the 4 last parts, which ignores the service name
+  } else {
+    return containerDomain;
+  }
 }

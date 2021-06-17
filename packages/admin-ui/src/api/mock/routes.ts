@@ -10,6 +10,10 @@ export const apiRoutes: IApiRoutes = {
     return generateDownloadUrl(`Sample file ${containerName} ${path}`);
   },
 
+  downloadWireguardConfig({ device, isLocal }) {
+    return generateDownloadUrl(`Sample wireguard config ${device} ${isLocal}`);
+  },
+
   downloadUrl({ fileId }) {
     return generateDownloadUrl(`Sample file from ID ${fileId}`);
   },

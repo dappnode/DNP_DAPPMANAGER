@@ -47,9 +47,10 @@ export function getPrivateNetworkAliases(
 
   // Special unique alias for the Admin UI
   if (container.dnpName === params.dappmanagerDnpName)
-    aliases.push(params.DAPPMANAGER_ALIAS);
+    aliases.push(...params.DAPPMANAGER_ALIASES);
 
-  return aliases;
+  // Ensure uniqueness
+  return [...new Set(aliases)];
 }
 
 export function getExternalNetworkAlias(container: ContainerNames): string {

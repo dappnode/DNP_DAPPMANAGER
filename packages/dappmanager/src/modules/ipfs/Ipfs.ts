@@ -1,12 +1,12 @@
 const ipfsClient = require("ipfs-http-client");
 import { logs } from "../../logs";
 import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
-import { IpfsCatOptions, IpfsLsFileResult } from "./types";
+import { IpfsCatOptions, IpfsLsFileResult, IpfsInstance } from "./types";
 import { handleIpfsError } from "./utils";
 
 export class Ipfs {
   /** Un-typed `ipfs-http-client` instance */
-  ipfs: any;
+  ipfs: IpfsInstance;
   /** Default IPFS timeout for all requests */
   timeout = 30 * 1000;
 

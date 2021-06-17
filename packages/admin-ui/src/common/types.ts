@@ -32,6 +32,21 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
   exposed: boolean;
 }
 
+// Wifi
+
+export interface WifiReport {
+  info: string;
+  report?: {
+    lastLog: string;
+    exitCode: number | null;
+  };
+}
+
+export interface CurrentWifiCredentials {
+  ssid: string;
+  password: string;
+}
+
 // Wireguard
 
 export interface WireguardDeviceCredentials {
@@ -50,7 +65,8 @@ export interface WireguardDeviceCredentials {
    * AllowedIPs = 172.33.0.0/16
    * ```
    */
-  config: string;
+  configRemote: string;
+  configLocal: string;
 }
 
 // SSH types
@@ -1123,6 +1139,14 @@ export interface HostInfoScript {
   architecture: string;
   kernel: string;
 }
+
+export interface AvahiDaemonStatus {
+  isAvahiRunning: boolean;
+  isAvahiEnabled: boolean;
+  avahiResolves: boolean;
+}
+
+export type LocalProxyingStatus = "running" | "stopped" | "crashed";
 
 export interface DockerVersionsScript {
   dockerComposeVersion: string;
