@@ -148,11 +148,8 @@ export function startHttpApi({
   // ADMIN ONLY methods that do not fit into RPC
   // prettier-ignore
   app.get("/wireguard-config/:device", auth.onlyAdmin, routes.downloadWireguardConfig);
-  app.get(
-    "/container-logs/:containerName",
-    auth.onlyAdmin,
-    routes.containerLogs
-  );
+  // prettier-ignore
+  app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
