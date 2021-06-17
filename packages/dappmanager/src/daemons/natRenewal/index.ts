@@ -7,7 +7,6 @@ import getPortsToOpen from "./getPortsToOpen";
 import getLocalIp from "../../utils/getLocalIp";
 // Utils
 import {
-  runAtMostEvery,
   runAtMostEveryIntervals,
   runOnlyOneSequentially
 } from "../../utils/asyncFlows";
@@ -119,24 +118,30 @@ function portId(port: PackagePort): string {
 }
 
 /**
+ * runOnlyOneSequentially makes sure that natRenewal is not run twice
+ * in parallel. Also, if multiple requests to run natRenewal, they will
+ * be ignored and run only once more after the previous natRenewal is
+ * completed.
+ */
+export const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+
+/**
  * NAT renewal daemon.
  * Makes sure all necessary ports are mapped using UPNP
  */
 export function startNatRenewalDaemon(signal: AbortSignal): void {
-  /**
-   * runOnlyOneSequentially makes sure that natRenewal is not run twice
-   * in parallel. Also, if multiple requests to run natRenewal, they will
-   * be ignored and run only once more after the previous natRenewal is
-   * completed.
-   */
-  const throttledNatRenewal = runOnlyOneSequentially(natRenewal);
+  // TEMPRARY: This solution will make to run an empty loop if false
+  function runThrottledNatRenewalIfEnabled(): void {
+    if (db.isNatRenewalDisabled.get() === true) return; // is disabled, skip
+    throttledNatRenewal();
+  }
 
   eventBus.runNatRenewal.on(() => {
-    throttledNatRenewal();
+    runThrottledNatRenewalIfEnabled();
   });
 
   runAtMostEveryIntervals(
-    async () => throttledNatRenewal(),
+    async () => runThrottledNatRenewalIfEnabled(),
     [
       // User may turn-on UPnP right after installing DAppNode.
       // So run this daemon 2 times a bit more frequently for that case.

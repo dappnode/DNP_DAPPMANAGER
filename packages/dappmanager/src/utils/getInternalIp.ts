@@ -1,11 +1,10 @@
 import isIp from "is-ip";
 import shell from "./shell";
+import getDappmanagerImage from "./getDappmanagerImage";
 
 export default async function getInternalIp(): Promise<string> {
   try {
-    const image = await shell(
-      `docker inspect DAppNodeCore-dappmanager.dnp.dappnode.eth -f '{{.Config.Image}}'`
-    );
+    const image = await getDappmanagerImage();
     const output = await shell(
       `docker run --rm --net=host --entrypoint=/sbin/ip ${image} route get 1`
     );

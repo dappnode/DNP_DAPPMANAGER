@@ -541,6 +541,14 @@ export interface Routes {
   runHostSecurityUpdates: () => Promise<string>;
 
   /**
+   * Attemps to open ports using UPnP
+   */
+  natRenewalEnable: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
+
+  /** Returns nat renewal status */
+  natRenewalIsEnabled: () => Promise<boolean>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -660,6 +668,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusSet: { log: true },
   systemInfoGet: {},
   runHostSecurityUpdates: {},
+  natRenewalEnable: {},
+  natRenewalIsEnabled: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
