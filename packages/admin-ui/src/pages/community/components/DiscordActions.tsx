@@ -1,6 +1,7 @@
 import Button from "components/Button";
 import React from "react";
+import { dappnodeDiscord } from "params";
 
 export default function DiscordActions() {
-  return <Button href="https://discord.gg/c28an8dA5k">Join Discord</Button>;
+  return <Button href={dappnodeDiscord}>Join Discord</Button>;
 }

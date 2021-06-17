@@ -97,6 +97,14 @@ export const troubleShootMountpointsGuideUrl =
   "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
 export const dappnodeUserGuideUrl =
   "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
+export const mediumTreasuryUrl =
+  "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
+export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
+export const dappnodeGitcoin =
+  "https://gitcoin.co/grants/143/dappnode-panvala-league";
+export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
+export const dappnodeDiscourse = "https://forum.dappnode.io/";
+export const dappnodeDiscord = "https://discord.gg/c28an8dA5k";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {

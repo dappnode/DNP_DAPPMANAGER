@@ -1,15 +1,12 @@
 import Button from "components/Button";
 import React from "react";
+import { mediumTreasuryUrl, explorerTreasuryUrl } from "params";
 
 export default function TreasuryActions() {
   return (
     <>
-      <Button href="https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2">
-        Read more
-      </Button>
-      <Button href="https://sourcecred.dappnode.io/#/explorer">
-        Check my ranking
-      </Button>
+      <Button href={mediumTreasuryUrl}>Read more</Button>
+      <Button href={explorerTreasuryUrl}>Check my ranking</Button>
     </>
   );
 }

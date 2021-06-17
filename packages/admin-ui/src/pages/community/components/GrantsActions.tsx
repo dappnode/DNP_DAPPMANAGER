@@ -1,10 +1,7 @@
 import React from "react";
 import Button from "components/Button";
+import { dappnodeGitcoin } from "params";
 
 export default function GrantsActions() {
-  return (
-    <Button href="https://gitcoin.co/grants/143/dappnode-panvala-league">
-      Contribute
-    </Button>
-  );
+  return <Button href={dappnodeGitcoin}>Contribute</Button>;
 }
