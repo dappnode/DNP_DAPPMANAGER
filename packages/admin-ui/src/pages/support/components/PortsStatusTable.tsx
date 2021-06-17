@@ -115,12 +115,11 @@ export function PortsStatusTable({
       }
   }
 
-  async function upnpOpen() {
+  async function onUpnpSwitchToggle(checked: boolean) {
     try {
       setUpnpOpenReqStatus({ loading: true });
       await withToast(
-        () =>
-          api.natRenewalEnable({ enableNatRenewal: !natRenewalStatus.data }),
+        () => api.natRenewalEnable({ enableNatRenewal: checked }),
         {
           message: "Refreshing UPnP port mapping..",
           onSuccess: "Successfully mapped ports using UPnP"
@@ -171,11 +170,15 @@ export function PortsStatusTable({
               {(apiReqStatus.result || apiReqStatus.loading) && (
                 <th>Status (API) *</th>
               )}
-              {apiReqStatus.error && <ErrorView error={apiReqStatus.error} />}
+              {apiReqStatus.error && (
+                <ErrorView hideIcon red error={apiReqStatus.error} />
+              )}
               {(upnpReqStatus.result || upnpReqStatus.loading) && (
                 <th>Status (UPnP) **</th>
               )}
-              {upnpReqStatus.error && <ErrorView error={upnpReqStatus.error} />}
+              {upnpReqStatus.error && (
+                <ErrorView hideIcon red error={upnpReqStatus.error} />
+              )}
             </tr>
           </thead>
           <tbody>
@@ -241,7 +244,7 @@ export function PortsStatusTable({
               id="upnp-switch"
               checked={natRenewalStatus.data === true}
               disabled={upnpOpenReqStatus.loading}
-              onToggle={upnpOpen}
+              onToggle={onUpnpSwitchToggle}
             />
           </div>
         )}
