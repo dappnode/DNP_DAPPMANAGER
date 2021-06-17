@@ -118,10 +118,14 @@ export function PortsStatusTable({
   async function upnpOpen() {
     try {
       setUpnpOpenReqStatus({ loading: true });
-      await withToast(() => api.natRenewalEnable({ enableNatRenewal: true }), {
-        message: "Attemping to open ports with UPnP..",
-        onSuccess: "Successfully opened ports"
-      });
+      await withToast(
+        () =>
+          api.natRenewalEnable({ enableNatRenewal: !natRenewalStatus.data }),
+        {
+          message: "Refreshing UPnP port mapping..",
+          onSuccess: "Successfully mapped ports using UPnP"
+        }
+      );
       setUpnpOpenReqStatus({ result: true });
       if (upnpReqStatus.result) await upnpStatusGet();
       if (apiReqStatus.result) await apiStatusGet();
