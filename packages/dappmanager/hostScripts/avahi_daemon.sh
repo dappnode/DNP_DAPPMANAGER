@@ -42,7 +42,7 @@ function install_avahi () {
   # This package contains several utilities that allow you to interact with the Avahi daemon, including publish, browsing and discovering services.
   # https://packages.debian.org/unstable/avahi-utils
   echo -e "\e[32mInstalling avahi-utils\e[0m" >> $LOG_FILE
-  apt-get install avahi-utils -y &>/dev/null || { echo "Error installing avahi-utils" | tee -a $LOG_FILE && exit 1 ; }
+  apt-get update && apt-get install avahi-utils -y &>/dev/null || { echo "Error installing avahi-utils" | tee -a $LOG_FILE && exit 1 ; }
 }
 
 # Edit avahi-daemon.conf if hostname !== dappnode
