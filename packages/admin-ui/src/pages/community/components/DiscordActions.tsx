@@ -1,9 +1,12 @@
 import Button from "components/Button";
 import React from "react";
 import { dappnodeDiscord } from "params";
+import newTabProps from "utils/newTabProps";
 
 export default function DiscordActions() {
   return (
-    <Button onClick={() => window.open(dappnodeDiscord)}>Join Discord</Button>
+    <Button href={dappnodeDiscord} {...newTabProps}>
+      Join Discord
+    </Button>
   );
 }
