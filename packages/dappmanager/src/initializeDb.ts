@@ -1,6 +1,7 @@
 import * as db from "./db";
 import { eventBus } from "./eventBus";
 import * as dyndns from "./modules/dyndns";
+import * as upnpc from "./modules/upnpc";
 import getDappmanagerImage from "./utils/getDappmanagerImage";
 import getServerName from "./utils/getServerName";
 import getInternalIp from "./utils/getInternalIp";
@@ -71,7 +72,9 @@ export default async function initializeDb(): Promise<void> {
   //   UPnP is available and necessary only if the internalIp is not equal to the public IP
   //   and the external IP from UPnP command succeeded
   const upnpAvailable = publicIp
-    ? Boolean(externalIp && internalIp !== publicIp)
+    ? Boolean(externalIp && internalIp !== publicIp) && (await upnpc.list())
+      ? true
+      : false
     : false;
 
   // >
