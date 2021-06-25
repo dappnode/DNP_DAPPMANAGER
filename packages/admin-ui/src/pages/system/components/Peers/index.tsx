@@ -5,6 +5,7 @@ import AddIpfsPeer from "./AddIpfsPeer";
 import ShareIpfsPeer from "./ShareIpfsPeer";
 import { RouteComponentProps } from "react-router-dom";
 import { docsUrl } from "params";
+import LinkDocs from "components/LinkDocs";
 
 const Peers: React.FC<RouteComponentProps> = ({ location, match }) => {
   const peerFromUrl = getPeerFromUrl(location.pathname, match.url);
@@ -12,9 +13,10 @@ const Peers: React.FC<RouteComponentProps> = ({ location, match }) => {
     <>
       <p>
         Learn more about IPFS peers at:{" "}
-        <a href={docsUrl.ipfsPeersExplanation}>
-          {docsUrl.ipfsPeersExplanation}
-        </a>
+        <LinkDocs
+          urlDocs={docsUrl.ipfsPeersExplanation}
+          text={"What is IPFS"}
+        />
       </p>
       <SubTitle>Share IPFS peer</SubTitle>
       <ShareIpfsPeer matchUrl={match.url} />
