@@ -7,20 +7,24 @@ import { ReqStatus } from "types";
 // Own components
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
+import { rootPath as installedRootPath } from "pages/installer";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 import Card from "components/Card";
 import Switch from "components/Switch";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
-import { adminUiLocalDomain, docsUrl } from "params";
+import { adminUiLocalDomain, docsUrl, httpsPortalDnpName } from "params";
 import { StateBadge } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
 import { parseContainerState } from "pages/packages/components/StateBadge/utils";
+import Alert from "react-bootstrap/esm/Alert";
 import { LocalProxyingStatus } from "common";
+import { NavLink } from "react-router-dom";
 
 export function LocalProxying(): JSX.Element {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const localProxyingStatus = useApi.localProxyingStatusGet();
+  const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
   async function localProxyingEnableDisable(): Promise<void> {
@@ -57,6 +61,25 @@ export function LocalProxying(): JSX.Element {
     } catch (e) {
       setReqStatus({ error: e });
       console.error("Error on start/stop Local Network Proxy", e);
+    }
+  }
+
+  // Helper UI in case the HTTPs Portal is bad
+  if (dnpsRequest.data) {
+    const httpsPortalDnp = dnpsRequest.data.find(
+      dnp => dnp.dnpName === httpsPortalDnpName
+    );
+    if (
+      !httpsPortalDnp &&
+      dappnodeIdentity.internalIp !== dappnodeIdentity.ip
+    ) {
+      const url = `${installedRootPath}/${httpsPortalDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
+          this feature
+        </Alert>
+      );
     }
   }
 
