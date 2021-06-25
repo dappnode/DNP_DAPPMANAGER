@@ -69,10 +69,9 @@ export function LocalProxying(): JSX.Element {
             If you are connected to the same router as your DAppNode you can use
             this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.
             Learn more about the Local Network Proxy at:{" "}
-            <LinkDocs
-              urlDocs={docsUrl.connectLocalProxy}
-              text={"How to connect do DAppNode Local Network"}
-            />
+            <LinkDocs href={docsUrl.connectLocalProxy}>
+              How to connect do DAppNode Local Network
+            </LinkDocs>
           </p>
           {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
             <p>

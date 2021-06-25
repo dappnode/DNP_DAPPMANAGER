@@ -1,18 +1,17 @@
-import React from "react";
+import React, { AnchorHTMLAttributes } from "react";
 import newTabProps from "utils/newTabProps";
-import { FaReadme } from "react-icons/fa";
+import { BsInfoCircleFill } from "react-icons/bs";
 
-export default function LinkDocs({
-  urlDocs,
-  text
-}: {
-  urlDocs: string;
-  text?: string;
-}) {
+const LinkDocs: React.FC<AnchorHTMLAttributes<HTMLAnchorElement>> = ({
+  href,
+  children
+}) => {
   return (
-    <a style={{ display: "inLine" }} href={urlDocs} {...newTabProps}>
-      <FaReadme className="links-icon" />
-      {text || urlDocs}
+    <a style={{ display: "inLine" }} href={href} {...newTabProps}>
+      <BsInfoCircleFill className="links-icon" />
+      {children}
     </a>
   );
-}
+};
+
+export default LinkDocs;

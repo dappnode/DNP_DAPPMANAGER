@@ -41,10 +41,9 @@ export function ResetPassword({
         machine via SSH or by connecting a keyboard and screen and follow this
         guide
         <br />
-        <LinkDocs
-          urlDocs={docsUrl.recoverPasswordGuide}
-          text={"Reset your DAppNode admin password"}
-        />
+        <LinkDocs href={docsUrl.recoverPasswordGuide}>
+          Reset your DAppNode admin password
+        </LinkDocs>
       </Alert>
 
       <InputForm

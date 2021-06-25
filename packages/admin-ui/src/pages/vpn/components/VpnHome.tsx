@@ -59,10 +59,9 @@ export function VpnHome({ match }: RouteComponentProps) {
       <p>
         Create a VPN profile for each of your devices (laptop, phone) so you can
         access your DAppNode from an external network. Learn more about VPN at:{" "}
-        <LinkDocs
-          urlDocs={docsUrl.connectVpn}
-          text={"How to connect do DAppNode VPN"}
-        />
+        <LinkDocs href={docsUrl.connectVpn}>
+          How to connect do DAppNode VPN
+        </LinkDocs>
       </p>
 
       <div className="section-spacing">

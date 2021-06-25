@@ -15,7 +15,7 @@ export function Network() {
           HTTPs portal allows you to expose services to the external internet
           with a valid TLS/SSL certificate. Only the services that are safe to
           be exposed will show up here. Learn more about HTTPs portal at:{" "}
-          <LinkDocs urlDocs={docsUrl.httpsExplanation} text={"What is HTTPs"} />
+          <LinkDocs href={docsUrl.httpsExplanation}>What is HTTPs</LinkDocs>
         </div>
         <HttpsMappings />
       </Card>

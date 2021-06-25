@@ -29,10 +29,9 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
     <p>
       Connect to the Wi-Fi hostpot exposed by your DAppNode using your
       credentials. More information at:{" "}
-      <LinkDocs
-        urlDocs={docsUrl.connectWifi}
-        text={"How to connect do DAppNode WiFi"}
-      />
+      <LinkDocs href={docsUrl.connectWifi}>
+        How to connect do DAppNode WiFi
+      </LinkDocs>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
         ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."

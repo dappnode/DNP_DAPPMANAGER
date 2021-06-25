@@ -13,10 +13,7 @@ const Peers: React.FC<RouteComponentProps> = ({ location, match }) => {
     <>
       <p>
         Learn more about IPFS peers at:{" "}
-        <LinkDocs
-          urlDocs={docsUrl.ipfsPeersExplanation}
-          text={"What is IPFS"}
-        />
+        <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
       </p>
       <SubTitle>Share IPFS peer</SubTitle>
       <ShareIpfsPeer matchUrl={match.url} />
