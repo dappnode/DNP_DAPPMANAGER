@@ -3,5 +3,7 @@ import Button from "components/Button";
 import { dappnodeGitcoin } from "params";
 
 export default function GrantsActions() {
-  return <Button href={dappnodeGitcoin}>Contribute</Button>;
+  return (
+    <Button onClick={() => window.open(dappnodeGitcoin)}>Contribute</Button>
+  );
 }

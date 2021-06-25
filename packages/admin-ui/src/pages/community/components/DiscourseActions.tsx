@@ -3,5 +3,9 @@ import Button from "components/Button";
 import { dappnodeDiscourse } from "params";
 
 export default function DiscourseActions() {
-  return <Button href={dappnodeDiscourse}>Join Discourse</Button>;
+  return (
+    <Button onClick={() => window.open(dappnodeDiscourse)}>
+      Join Discourse
+    </Button>
+  );
 }
