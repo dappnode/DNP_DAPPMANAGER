@@ -206,7 +206,7 @@ export interface Routes {
    */
   ethClientTargetSet: (kwargs: {
     target: EthClientTarget;
-    deleteVolumes?: boolean;
+    deletePrevEthClient?: boolean;
   }) => Promise<void>;
 
   /**

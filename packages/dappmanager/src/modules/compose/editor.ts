@@ -89,6 +89,65 @@ class ComposeServiceEditor {
     }));
   }
 
+  removeNetworkAliases(
+    networkName: string,
+    aliasesToRemove: string[],
+    serviceNetwork: ComposeServiceNetwork
+  ): void {
+    this.edit(service => {
+      const networks = parseServiceNetworks(service.networks || {});
+      // Network and service network aliases must exist
+      if (!networks[networkName] || !serviceNetwork.aliases)
+        throw Error(
+          "Error removing alias: Network or serviceNetwork does not exist"
+        );
+
+      const serviceNetworNewAliases = serviceNetwork.aliases.filter(
+        item => !aliasesToRemove.includes(item)
+      );
+      const serviceNetworkUpdated = {
+        ...serviceNetwork,
+        aliases: serviceNetworNewAliases
+      };
+
+      return {
+        networks: {
+          ...networks,
+          [networkName]: {
+            ...(networks[networkName] || {}),
+            ...serviceNetworkUpdated
+          }
+        }
+      };
+    });
+  }
+
+  addNetworkAliases(
+    networkName: string,
+    newAliases: string[],
+    serviceNetwork: ComposeServiceNetwork
+  ): void {
+    this.edit(service => {
+      const networks = parseServiceNetworks(service.networks || {});
+      // Network and service network aliases must exist
+      if (!networks[networkName] || !serviceNetwork)
+        throw Error(
+          "Error adding alias: Network or serviceNetwork does not exist"
+        );
+      const serviceNetworkUpdated = { ...serviceNetwork, aliases: newAliases };
+
+      return {
+        networks: {
+          ...networks,
+          [networkName]: {
+            ...(networks[networkName] || {}),
+            ...serviceNetworkUpdated
+          }
+        }
+      };
+    });
+  }
+
   getEnvs(): PackageEnvs {
     return parseEnvironment(this.get().environment || {});
   }
