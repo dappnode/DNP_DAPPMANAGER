@@ -91,7 +91,7 @@ export async function migrateEthClientFullNode(
     ]
   };
   // Remove fullnode alias from compose
-  await editFullnodeAliasFromEthClient(
+  await editComposeFullnodeAliasEthClient(
     remove,
     dnpName,
     previousEthClientPackage
@@ -107,11 +107,11 @@ export async function migrateEthClientFullNode(
   );
 }
 
-export async function editFullnodeAliasFromEthClient(
+export function editComposeFullnodeAliasEthClient(
   remove: boolean,
   ethClientDnpName: string,
   ethClientPackage: InstalledPackageDetailData
-): Promise<void> {
+): void {
   const compose = new ComposeFileEditor(ethClientDnpName, false);
 
   const composeService = compose.services()[
