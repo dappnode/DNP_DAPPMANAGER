@@ -25,6 +25,28 @@ export function LocalProxying(): JSX.Element {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const localProxyingStatus = useApi.localProxyingStatusGet();
   const dnpsRequest = useApi.packagesGet();
+  // Helper UI in case the HTTPs Portal is bad
+  if (dnpsRequest.data) {
+    const httpsPortalDnp = dnpsRequest.data.find(
+      dnp => dnp.dnpName === httpsPortalDnpName
+    );
+    if (!httpsPortalDnp) {
+      const url = `${installedRootPath}/${httpsPortalDnpName}`;
+      return (
+        <Alert variant="secondary">
+          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
+          this feature
+        </Alert>
+      );
+    } else return <LocalProxyingHandler />;
+  }
+
+  return <Loading steps={["Loading Local Network..."]} />;
+}
+
+function LocalProxyingHandler() {
+  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const localProxyingStatus = useApi.localProxyingStatusGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
 
   async function localProxyingEnableDisable(): Promise<void> {
@@ -63,26 +85,6 @@ export function LocalProxying(): JSX.Element {
       console.error("Error on start/stop Local Network Proxy", e);
     }
   }
-
-  // Helper UI in case the HTTPs Portal is bad
-  if (dnpsRequest.data) {
-    const httpsPortalDnp = dnpsRequest.data.find(
-      dnp => dnp.dnpName === httpsPortalDnpName
-    );
-    if (
-      !httpsPortalDnp &&
-      dappnodeIdentity.internalIp !== dappnodeIdentity.ip
-    ) {
-      const url = `${installedRootPath}/${httpsPortalDnpName}`;
-      return (
-        <Alert variant="secondary">
-          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
-          this feature
-        </Alert>
-      );
-    }
-  }
-
   return (
     <>
       {localProxyingStatus.data ? (
@@ -124,7 +126,7 @@ export function LocalProxying(): JSX.Element {
           </div>
         </Card>
       ) : localProxyingStatus.isValidating ? (
-        <Loading steps={["Loading Local Network Proxy..."]} />
+        <Loading steps={["Loading Local Network Handler..."]} />
       ) : localProxyingStatus.error ? (
         <ErrorView error={localProxyingStatus.error} />
       ) : null}
@@ -132,7 +134,7 @@ export function LocalProxying(): JSX.Element {
   );
 }
 
-export function parseAvahiPublishCmdState(
+function parseAvahiPublishCmdState(
   state: LocalProxyingStatus
 ): ReturnType<typeof parseContainerState> {
   switch (state) {
