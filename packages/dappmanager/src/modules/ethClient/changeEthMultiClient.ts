@@ -2,17 +2,15 @@ import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import params, { ethClientData } from "../../params";
 import { packageRemove, packageGet } from "../../calls";
-import {
-  EthClientTarget,
-  UserSettings,
-  InstalledPackageDetailData
-} from "../../types";
+import { EthClientTarget, UserSettings } from "../../types";
 import { logs } from "../../logs";
 import { ComposeFileEditor } from "../compose/editor";
 import { parseServiceNetworks } from "../compose/networks";
 import { dockerNetworkDisconnect, dockerNetworkConnect } from "../docker";
 import { getEndpointConfig } from "../https-portal/migration";
 import Dockerode from "dockerode";
+
+// Types
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -44,7 +42,7 @@ export async function changeEthMultiClient(
     } else {
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
       try {
-        await migrateEthClientFullNode(clientData.dnpName, true);
+        await setDefaultEthClientFullNode(clientData.dnpName);
       } catch (e) {
         logs.error(
           "Error removing fullnode.dappnode alias from previous ETH multi-client",
@@ -64,19 +62,24 @@ export async function changeEthMultiClient(
 
 // Utils
 
-export async function migrateEthClientFullNode(
-  dnpName: string,
-  remove: boolean
+export async function setDefaultEthClientFullNode(
+  dnpName: string
 ): Promise<void> {
   const previousEthClientPackage = await packageGet({
     dnpName
   });
 
-  // Eth clients should have just one service
-  if (previousEthClientPackage.containers.length > 1)
-    throw Error("Unexpected number of services in ETH client 1");
+  // Check if ETH client is multiservice, if so get the mainContainer
+  const mainService = previousEthClientPackage.manifest?.mainService;
+  const serviceName =
+    mainService || previousEthClientPackage.containers[0].serviceName;
+  // The container selected will be:
+  // - Container owner of the main service (if exists)
+  // - First container otherwhise
   const previousEthClientContainerName =
-    previousEthClientPackage.containers[0].containerName;
+    previousEthClientPackage.containers.find(
+      container => container.serviceName === serviceName
+    )?.containerName || previousEthClientPackage.containers[0].containerName;
 
   // Remove fullnode alias from endpoint config
   const currentEndpointConfig = await getEndpointConfig(
@@ -86,16 +89,13 @@ export async function migrateEthClientFullNode(
     ...currentEndpointConfig,
     Aliases: [
       ...currentEndpointConfig?.Aliases.filter(
-        (item: string) => item !== params.FULLNODE_ALIAS // according to docs for compose file v3, aliases are declared as strings https://docs.docker.com/compose/compose-file/compose-file-v3/#aliases
+        // according to docs for compose file v3, aliases are declared as strings https://docs.docker.com/compose/compose-file/compose-file-v3/#aliases
+        (item: string) => item !== params.FULLNODE_ALIAS
       )
     ]
   };
   // Remove fullnode alias from compose
-  await editComposeFullnodeAliasEthClient(
-    remove,
-    dnpName,
-    previousEthClientPackage
-  );
+  removeFullnodeEthClient(dnpName, serviceName);
   await dockerNetworkDisconnect(
     params.DNP_PRIVATE_NETWORK_NAME,
     previousEthClientContainerName
@@ -107,23 +107,43 @@ export async function migrateEthClientFullNode(
   );
 }
 
-export function editComposeFullnodeAliasEthClient(
-  remove: boolean,
+export function removeFullnodeEthClient(
   ethClientDnpName: string,
-  ethClientPackage: InstalledPackageDetailData
+  ethClientServiceName: string
+): void {
+  editComposeFullnodeAliasEthClient(
+    true,
+    ethClientDnpName,
+    ethClientServiceName
+  );
+}
+
+export function addFullnodeEthClient(
+  ethClientDnpName: string,
+  ethClientServiceName: string
+): void {
+  editComposeFullnodeAliasEthClient(
+    false,
+    ethClientDnpName,
+    ethClientServiceName
+  );
+}
+
+function editComposeFullnodeAliasEthClient(
+  removeAlias: boolean,
+  ethClientDnpName: string,
+  ethClientServiceName: string
 ): void {
   const compose = new ComposeFileEditor(ethClientDnpName, false);
 
-  const composeService = compose.services()[
-    ethClientPackage.containers[0].serviceName
-  ];
+  const composeService = compose.services()[ethClientServiceName];
   const serviceNetworks = parseServiceNetworks(
     composeService.get().networks || {}
   );
   const serviceNetwork =
     serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] ?? null;
 
-  if (remove)
+  if (removeAlias)
     composeService.removeNetworkAliases(
       params.DNP_PRIVATE_NETWORK_NAME,
       [params.FULLNODE_ALIAS],
