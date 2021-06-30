@@ -141,7 +141,7 @@ function editComposeFullnodeAliasEthClient(
     composeService.get().networks || {}
   );
   const serviceNetwork =
-    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] ?? null;
+    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
 
   if (removeAlias)
     composeService.removeNetworkAliases(

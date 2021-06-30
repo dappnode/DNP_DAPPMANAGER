@@ -37,7 +37,7 @@ import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
 import { ComposeNetwork } from "../../common";
 
-class ComposeServiceEditor {
+export class ComposeServiceEditor {
   parent: ComposeEditor;
   serviceName: string;
 

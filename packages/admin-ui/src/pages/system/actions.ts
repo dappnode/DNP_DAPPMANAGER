@@ -25,7 +25,7 @@ export const changeEthClientTarget = (
     prevTarget && prevTarget !== "remote"
       ? await new Promise((resolve: (_deletePrevEthClient: boolean) => void) =>
           confirm({
-            title: `Remove ${getEthClientPrettyName(prevTarget)} volumes?`,
+            title: `Remove ${getEthClientPrettyName(prevTarget)}?`,
             text: `Do you want to keep or remove your current Ethereum client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
             buttons: [
               {
