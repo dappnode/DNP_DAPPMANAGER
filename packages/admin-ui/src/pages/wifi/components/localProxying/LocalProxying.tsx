@@ -23,8 +23,6 @@ import { NavLink } from "react-router-dom";
 import LinkDocs from "components/LinkDocs";
 
 export function LocalProxying(): JSX.Element {
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  const localProxyingStatus = useApi.localProxyingStatusGet();
   const dnpsRequest = useApi.packagesGet();
   // Helper UI in case the HTTPs Portal is bad
   if (dnpsRequest.data) {
