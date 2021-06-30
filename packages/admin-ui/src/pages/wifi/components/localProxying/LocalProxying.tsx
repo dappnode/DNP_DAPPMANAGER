@@ -34,7 +34,10 @@ export function LocalProxying(): JSX.Element {
       return (
         <Alert variant="secondary">
           You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
-          this feature
+          this feature.{" "}
+          <LinkDocs href={docsUrl.connectLocalProxy}>
+            Learn more about Local Network
+          </LinkDocs>
         </Alert>
       );
     } else return <LocalProxyingHandler />;
@@ -127,7 +130,7 @@ function LocalProxyingHandler() {
           </div>
         </Card>
       ) : localProxyingStatus.isValidating ? (
-        <Loading steps={["Loading Local Network Handler..."]} />
+        <Loading steps={["Loading Local Network Proxy..."]} />
       ) : localProxyingStatus.error ? (
         <ErrorView error={localProxyingStatus.error} />
       ) : null}
