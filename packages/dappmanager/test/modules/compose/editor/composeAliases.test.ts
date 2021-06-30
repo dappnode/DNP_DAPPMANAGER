@@ -98,8 +98,6 @@ networks:
     external: true
 `;
 
-    console.log(composeAfter);
-    console.log(composeExpected);
     expect(composeAfter.trim()).to.equal(composeExpected.trim());
   });
 
