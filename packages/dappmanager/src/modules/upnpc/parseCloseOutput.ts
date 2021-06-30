@@ -1,5 +1,3 @@
-import parseGeneralErrors from "./parseGeneralErrors";
-
 // SUCCESSFUL: Close an existing port
 
 // dappnode@machine:/usr/src/dappnode/DNCORE$ docker run --rm --net=host ${IMAGE} upnpc -e DAppNode -d 4002 UDP
@@ -45,17 +43,9 @@ import parseGeneralErrors from "./parseGeneralErrors";
  * @returns
  */
 export default function parseCloseOutput(terminalOutput: string): boolean {
-  parseGeneralErrors(terminalOutput);
-
   // Get the last line of the output
   const lines = terminalOutput.trim().split(/\r?\n/);
   const lastLine = lines[lines.length - 1] || "";
-
-  // Check if it contains "failed"
-  if (lastLine.includes("failed")) {
-    const errorMessage = "failed " + (lastLine.split("failed")[1] || "").trim();
-    throw Error(`Error closing port: ${errorMessage}`);
-  }
 
   // Check if is contains "returned.0"
   const okRegex = RegExp(/returned.+0/);

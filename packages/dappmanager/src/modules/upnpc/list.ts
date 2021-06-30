@@ -1,7 +1,7 @@
 import upnpcCommand from "./upnpcCommand";
 import parseListOutput from "./parseListOutput";
-import parseGeneralErrors from "./parseGeneralErrors";
 import { UpnpPortMapping } from "./types";
+import { UpnpError } from "./upnpError";
 
 /**
  * Lists current port mapping for DAppNode
@@ -16,11 +16,14 @@ import { UpnpPortMapping } from "./types";
  * ]
  */
 export default async function list(): Promise<UpnpPortMapping[]> {
+  const upnpListCommand = "-l";
   try {
-    const res = await upnpcCommand(`-l`);
+    const res = await upnpcCommand(upnpListCommand);
     return parseListOutput(res);
   } catch (e) {
-    parseGeneralErrors(e.message);
-    throw e;
+    throw new UpnpError({
+      terminalOutput: e.message,
+      command: upnpListCommand
+    });
   }
 }

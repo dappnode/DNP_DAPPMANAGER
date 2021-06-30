@@ -1,5 +1,3 @@
-import parseGeneralErrors from "./parseGeneralErrors";
-
 // SUCCESSFUL: Open a NON existing port
 // (ERROR): Open an already openned port (same output)
 
@@ -32,8 +30,6 @@ import parseGeneralErrors from "./parseGeneralErrors";
  * @returns
  */
 export default function parseOpenOutput(terminalOutput: string): boolean {
-  parseGeneralErrors(terminalOutput);
-
   // Get the last line of the output
   const lines = terminalOutput.trim().split(/\r?\n/);
   const lastLine = lines[lines.length - 1];
