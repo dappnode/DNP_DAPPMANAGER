@@ -1,7 +1,6 @@
 import * as db from "./db";
 import { eventBus } from "./eventBus";
 import * as dyndns from "./modules/dyndns";
-import * as upnpc from "./modules/upnpc";
 import getDappmanagerImage from "./utils/getDappmanagerImage";
 import getServerName from "./utils/getServerName";
 import getInternalIp from "./utils/getInternalIp";
@@ -17,7 +16,7 @@ import shell from "./utils/shell";
 import { IdentityInterface } from "./types";
 import { logs } from "./logs";
 import { localProxyingEnableDisable } from "./calls";
-import { UpnpError } from "./modules/upnpc/upnpError";
+import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -74,13 +73,7 @@ export default async function initializeDb(): Promise<void> {
   //   and the external IP from UPnP command succeeded
   const upnpAvailable =
     Boolean(publicIp && externalIp && internalIp !== publicIp) &&
-    upnpc
-      .list()
-      .then(() => true)
-      .catch(e => {
-        if (e instanceof UpnpError) return e.isUpnpAvailable;
-        return false;
-      })
+    (await isUpnpAvailable())
       ? true
       : false;
 

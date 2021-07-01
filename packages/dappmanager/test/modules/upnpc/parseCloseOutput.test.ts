@@ -32,14 +32,4 @@ UPNP_DeletePortMapping() failed with code : 714`;
     const ok = parseCloseOutput(terminalOutputSuccess);
     expect(ok).to.be.ok;
   });
-  /* 
-  it("On error, it should return error", () => {
-    let error;
-    try {
-      parseCloseOutput(terminalOutputErrorNoPort);
-    } catch (e) {
-      error = e.message;
-    }
-    expect(error).to.equal("Error closing port: failed with code : 714");
-  }); */
 });

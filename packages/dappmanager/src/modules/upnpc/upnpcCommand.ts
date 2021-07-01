@@ -1,6 +1,6 @@
 import shell from "../../utils/shell";
 import getDappmanagerImage from "../../utils/getDappmanagerImage";
-import { UpnpError } from "./upnpError";
+import { parseUpnpErrors } from "./upnpError";
 
 export default async function upnpcCommand(cmd: string): Promise<string> {
   try {
@@ -9,6 +9,7 @@ export default async function upnpcCommand(cmd: string): Promise<string> {
       `docker run --rm --net=host --entrypoint=/usr/bin/upnpc ${image} ${cmd}`
     );
   } catch (e) {
-    throw new UpnpError({ terminalOutput: e.message, command: cmd });
+    const upnpError = parseUpnpErrors(e.message);
+    throw upnpError;
   }
 }
