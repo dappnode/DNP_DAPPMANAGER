@@ -95,7 +95,7 @@ export async function setDefaultEthClientFullNode(
     ]
   };
   // Remove fullnode alias from compose
-  removeFullnodeEthClient(dnpName, serviceName);
+  removeFullnodeAliasFromCompose(dnpName, serviceName);
   await dockerNetworkDisconnect(
     params.DNP_PRIVATE_NETWORK_NAME,
     previousEthClientContainerName
@@ -107,7 +107,7 @@ export async function setDefaultEthClientFullNode(
   );
 }
 
-export function removeFullnodeEthClient(
+export function removeFullnodeAliasFromCompose(
   ethClientDnpName: string,
   ethClientServiceName: string
 ): void {
@@ -118,7 +118,7 @@ export function removeFullnodeEthClient(
   );
 }
 
-export function addFullnodeEthClient(
+export function addFullnodeAliasToCompose(
   ethClientDnpName: string,
   ethClientServiceName: string
 ): void {

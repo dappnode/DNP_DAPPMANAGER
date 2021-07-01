@@ -134,10 +134,13 @@ export class ComposeServiceEditor {
         throw Error(
           "Error adding alias: Network or serviceNetwork does not exist"
         );
-      const aliasesUpdated = [...(serviceNetwork.aliases || []), ...newAliases];
+      const aliasesUpdated = uniq([
+        ...(serviceNetwork.aliases || []),
+        ...newAliases
+      ]);
       const serviceNetworkUpdated = {
         ...serviceNetwork,
-        aliases: [...aliasesUpdated]
+        aliases: aliasesUpdated
       };
 
       return {
