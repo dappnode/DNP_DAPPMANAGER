@@ -9,7 +9,6 @@ import { shellSafe } from "../../../testUtils";
 import fs from "fs";
 import { parseServiceNetworks } from "../../../../src/modules/compose/networks";
 import { ComposeServiceNetwork } from "../../../../src/types";
-import { compose } from "async";
 
 describe("compose service editor", () => {
   const exampleCompose = `
