@@ -1,10 +1,15 @@
 import "mocha";
 import { expect } from "chai";
-import { ComposeFileEditor } from "../../../../src/modules/compose/editor";
+import {
+  ComposeFileEditor,
+  ComposeServiceEditor
+} from "../../../../src/modules/compose/editor";
 import params from "../../../../src/params";
 import { shellSafe } from "../../../testUtils";
 import fs from "fs";
 import { parseServiceNetworks } from "../../../../src/modules/compose/networks";
+import { ComposeServiceNetwork } from "../../../../src/types";
+import { compose } from "async";
 
 describe("compose service editor", () => {
   const exampleCompose = `
@@ -42,6 +47,7 @@ networks:
     external: true
 `;
 
+  // Example package
   const dnpName = "example";
   const serviceName = "goerli-geth.dnp.dappnode.eth";
   const dnpRepoExamplePath = process.cwd() + "/dnp_repo/example";
@@ -57,8 +63,18 @@ networks:
   });
 
   it("Should remove alias: example.dappnode", () => {
-    editCompose(dnpName, serviceName, "remove");
+    const { compose, composeService, serviceNetwork } = {
+      ...getComposeEditors(dnpName, serviceName)
+    };
+    // Edit existing compose
+    composeService.removeNetworkAliases(
+      params.DNP_PRIVATE_NETWORK_NAME,
+      ["goerli-geth.dappnode"],
+      serviceNetwork
+    );
+    compose.write();
 
+    // Get edited compose
     const composeAfter = fs.readFileSync(
       `${dnpRepoExamplePath}/docker-compose.yml`,
       "utf-8"
@@ -102,8 +118,18 @@ networks:
   });
 
   it("Should add alias: goerli-geth.dappnode", () => {
-    editCompose(dnpName, serviceName, "add");
+    const { compose, composeService, serviceNetwork } = {
+      ...getComposeEditors(dnpName, serviceName)
+    };
+    // Edit existing compose
+    composeService.addNetworkAliases(
+      params.DNP_PRIVATE_NETWORK_NAME,
+      ["example.dappnode"],
+      serviceNetwork
+    );
+    compose.write();
 
+    // Get edited compose
     const composeAfter = fs.readFileSync(
       `${dnpRepoExamplePath}/docker-compose.yml`,
       "utf-8"
@@ -160,32 +186,25 @@ networks:
   });
 });
 
-// Function to avoid deduplication of code
-function editCompose(
+function getComposeEditors(
   dnpName: string,
-  serviceName: string,
-  option: "add" | "remove"
-): void {
+  serviceName: string
+): {
+  compose: ComposeFileEditor;
+  composeService: ComposeServiceEditor;
+  serviceNetwork: ComposeServiceNetwork;
+} {
+  // Create compose editors
   const compose = new ComposeFileEditor(dnpName, false);
-
   const composeService = compose.services()[serviceName];
   const serviceNetworks = parseServiceNetworks(
     composeService.get().networks || {}
   );
   const serviceNetwork =
     serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
-
-  if (option === "remove")
-    composeService.removeNetworkAliases(
-      params.DNP_PRIVATE_NETWORK_NAME,
-      ["goerli-geth.dappnode"],
-      serviceNetwork
-    );
-  else
-    composeService.addNetworkAliases(
-      params.DNP_PRIVATE_NETWORK_NAME,
-      ["example.dappnode"],
-      serviceNetwork
-    );
-  compose.write();
+  return {
+    compose,
+    composeService,
+    serviceNetwork
+  };
 }
