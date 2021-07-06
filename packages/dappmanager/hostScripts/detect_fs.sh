@@ -13,7 +13,12 @@ for line in $(df -lPTB1 | grep ^/); do
     used=$(echo "$line" | awk '{ print $4 }')
     total=$(echo "$line" | awk '{ print $3 }')
     partition=$(echo "$line" | awk '{ print $1 }' | xargs basename)
-    device="$(readlink -f "/sys/class/block/$partition/.." | xargs basename || true)"
+    link=$(readlink -f "/sys/class/block/$partition/..")
+    if [ -z ${link+x} ]; then
+      device="$(echo $link | xargs basename || true)"
+    else
+      device=true
+    fi
     model="$(lsblk -no MODEL /dev/$device 2>/dev/null | sed -e 's/[[:space:]]*$//' || true)"
     vendor="$(lsblk -no VENDOR /dev/$device 2>/dev/null | sed -e 's/[[:space:]]*$//' || true)"
 
