@@ -1347,12 +1347,3 @@ export interface IdentityInterface {
   privateKey: string;
   publicKey: string;
 }
-
-/**
- * Single update sumbited by a package to the dataSend REST route
- */
-export interface PackageDataSend {
-  dnpName: string;
-  key: string;
-  data: string;
-}

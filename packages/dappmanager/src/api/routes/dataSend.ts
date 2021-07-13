@@ -37,11 +37,14 @@ export const dataSend = wrapHandler(async (req, res) => {
     throw Error("Too many keys already stored");
   }
 
+  const prevData = packageData[key];
   packageData[key] = data;
   db.packageSentData.set(dnpName, packageData);
 
   // Emit to the UI for instant refresh
-  eventBus.packageDataSend.emit({ dnpName, key, data });
+  if (prevData !== data) {
+    eventBus.requestPackages.emit();
+  }
 
   return res.status(200).send();
 });

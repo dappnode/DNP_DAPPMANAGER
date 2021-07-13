@@ -38,10 +38,6 @@ export function mapSubscriptionsToEventBus(
     subscriptions.pushNotification.emit(notification);
   });
 
-  eventBus.packageDataSend.on(dataSend => {
-    subscriptions.packageDataSend.emit(dataSend);
-  });
-
   /**
    * Initial calls when WAMP is active
    * - When the DAPPMANAGER starts, update the list of packages.

@@ -7,8 +7,7 @@ import {
   UserActionLog,
   VolumeData,
   VpnDevice,
-  InstalledPackageData,
-  PackageDataSend
+  InstalledPackageData
 } from "./types";
 
 export interface SubscriptionsTypes {
@@ -31,9 +30,6 @@ export interface SubscriptionsTypes {
    * Installed packages updates
    */
   packages: (packages: InstalledPackageData[]) => void;
-
-  /** Single update sumbited by a package to the dataSend REST route */
-  packageDataSend: (dataSend: PackageDataSend) => void;
 
   /**
    * Installation progress logs
@@ -97,7 +93,6 @@ export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   devices: {},
   directory: {},
   packages: {},
-  packageDataSend: {},
   progressLog: {},
   pushNotification: {},
   reloadClient: {},
