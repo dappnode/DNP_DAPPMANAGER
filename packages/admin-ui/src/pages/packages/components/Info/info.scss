@@ -96,3 +96,13 @@
     }
   }
 }
+
+.package-sent-data {
+  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(min-content, max-content) minmax(
+      min-content,
+      auto
+    );
+  grid-gap: 0.5rem 1rem;
+}
