@@ -112,7 +112,10 @@ export function Info({
           </div>
         </div>
 
-        <RenderPackageSentData data={dnp.packageSentData} />
+        <RenderPackageSentData
+          dnpName={dnp.dnpName}
+          data={dnp.packageSentData}
+        />
 
         <ContainerList dnp={dnp} />
 
