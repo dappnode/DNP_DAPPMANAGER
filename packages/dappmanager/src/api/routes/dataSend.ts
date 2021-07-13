@@ -1,4 +1,5 @@
 import * as db from "../../db";
+import { eventBus } from "../../eventBus";
 import { HttpError, wrapHandler } from "../utils";
 import { getDnpFromIp } from "./sign";
 
@@ -29,15 +30,18 @@ export const dataSend = wrapHandler(async (req, res) => {
     throw new HttpError({ statusCode: 400, name: `Arg data ${e.message}` });
   }
 
-  const dnp = await getDnpFromIp(req.ip);
+  const { dnpName } = await getDnpFromIp(req.ip);
 
-  const packageData = db.packageSentData.get(dnp.dnpName) ?? {};
+  const packageData = db.packageSentData.get(dnpName) ?? {};
   if (Object.keys(packageData).length > MAX_KEYS) {
     throw Error("Too many keys already stored");
   }
 
   packageData[key] = data;
-  db.packageSentData.set(dnp.dnpName, packageData);
+  db.packageSentData.set(dnpName, packageData);
+
+  // Emit to the UI for instant refresh
+  eventBus.packageDataSend.emit({ dnpName, key, data });
 
   return res.status(200).send();
 });

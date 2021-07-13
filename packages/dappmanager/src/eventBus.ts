@@ -9,6 +9,7 @@ import {
   PackageNotification,
   DirectoryItem
 } from "./types";
+import { PackageDataSend } from "./common";
 
 interface EventTypes {
   chainData: ChainData[];
@@ -18,6 +19,7 @@ interface EventTypes {
   notification: PackageNotification;
   packages: InstalledPackageData[];
   packagesModified: { dnpNames: string[]; removed?: boolean };
+  packageDataSend: PackageDataSend;
   // Events without arguments
   telegramStatusChanged: void;
   initializedDb: void;
@@ -38,8 +40,9 @@ const eventBusData: { [P in keyof EventTypes]: {} } = {
   notification: {},
   packages: {},
   packagesModified: {},
-  telegramStatusChanged: {},
+  packageDataSend: {},
   // Events without arguments
+  telegramStatusChanged: {},
   initializedDb: {},
   requestAutoUpdateData: {},
   requestChainData: {},
