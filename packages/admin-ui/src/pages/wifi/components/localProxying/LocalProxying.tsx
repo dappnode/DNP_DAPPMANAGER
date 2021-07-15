@@ -22,7 +22,7 @@ import { LocalProxyingStatus } from "common";
 import { NavLink } from "react-router-dom";
 import LinkDocs from "components/LinkDocs";
 
-export function LocalProxy() {
+export function LocalProxying() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const localProxyingStatus = useApi.localProxyingStatusGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
