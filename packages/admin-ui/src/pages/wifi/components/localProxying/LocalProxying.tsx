@@ -22,31 +22,7 @@ import { LocalProxyingStatus } from "common";
 import { NavLink } from "react-router-dom";
 import LinkDocs from "components/LinkDocs";
 
-export function LocalProxying(): JSX.Element {
-  const dnpsRequest = useApi.packagesGet();
-  // Helper UI in case the HTTPs Portal is bad
-  if (dnpsRequest.data) {
-    const httpsPortalDnp = dnpsRequest.data.find(
-      dnp => dnp.dnpName === httpsPortalDnpName
-    );
-    if (!httpsPortalDnp) {
-      const url = `${installedRootPath}/${httpsPortalDnpName}`;
-      return (
-        <Alert variant="secondary">
-          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
-          this feature.{" "}
-          <LinkDocs href={docsUrl.connectLocalProxy}>
-            Learn more about Local Network
-          </LinkDocs>
-        </Alert>
-      );
-    } else return <LocalProxyingHandler />;
-  }
-
-  return <Loading steps={["Loading Local Network..."]} />;
-}
-
-function LocalProxyingHandler() {
+export function LocalProxy() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const localProxyingStatus = useApi.localProxyingStatusGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
@@ -87,6 +63,20 @@ function LocalProxyingHandler() {
       console.error("Error on start/stop Local Network Proxy", e);
     }
   }
+
+  if (localProxyingStatus.data === "https missing") {
+    const url = `${installedRootPath}/${httpsPortalDnpName}`;
+    return (
+      <Alert variant="secondary">
+        You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
+        this feature.{" "}
+        <LinkDocs href={docsUrl.connectLocalProxy}>
+          Learn more about Local Network
+        </LinkDocs>
+      </Alert>
+    );
+  }
+
   return (
     <>
       {localProxyingStatus.data ? (
@@ -139,7 +129,7 @@ function LocalProxyingHandler() {
 }
 
 function parseAvahiPublishCmdState(
-  state: LocalProxyingStatus
+  state: Exclude<LocalProxyingStatus, "https missing">
 ): ReturnType<typeof parseContainerState> {
   switch (state) {
     case "running":
