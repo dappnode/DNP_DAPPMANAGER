@@ -1,8 +1,8 @@
 export function parseUpnpErrors(terminalOutput: string): UpnpError {
   if (isUpnpAvailable(terminalOutput))
-    return new UpnpError(terminalOutput, UPnPErrors.UPNPNOTAVAIL);
+    return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_AVAILABLE);
   if (isNotExistingPort(terminalOutput))
-    return new UpnpError(terminalOutput, UPnPErrors.UPNPNOTPORT);
+    return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_PORT);
   return new UpnpError(terminalOutput, UPnPErrors.UNKNOWN);
 }
 
@@ -26,7 +26,7 @@ export class UpnpError extends Error {
   typeUpnpError: UPnPErrors;
 
   constructor(terminalOutput: string, typeUpnpError: UPnPErrors) {
-    super(`UPnP Error: ${typeUpnpError}\nError:${terminalOutput}`);
+    super(`UPnP Error: ${terminalOutput}`);
     this.terminalOutput = terminalOutput;
     this.typeUpnpError = typeUpnpError;
   }
@@ -37,7 +37,7 @@ export class UpnpError extends Error {
 // UNKNOWN: UPnP unclassified error
 // Research for more errors!
 export enum UPnPErrors {
-  "UPNPNOTAVAIL",
-  "UPNPNOTPORT",
+  "UPNP_NOT_AVAILABLE",
+  "UPNP_NOT_PORT",
   "UNKNOWN"
 }

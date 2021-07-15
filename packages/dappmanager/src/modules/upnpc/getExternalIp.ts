@@ -11,8 +11,8 @@ export default async function getExternalIp(): Promise<string> {
     if (isIp(externalIp)) return externalIp;
     else throw Error("Wrong IP");
   } catch (e) {
-    const upnpError = parseUpnpErrors(e.message);
     e.message = `Error getting external IP: ${e.message}`;
+    const upnpError = parseUpnpErrors(e.message);
     throw upnpError;
   }
 }
