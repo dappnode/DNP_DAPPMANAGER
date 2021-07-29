@@ -631,6 +631,7 @@ export interface ComposeService {
   network_mode?: string;
   networks?: ComposeServiceNetworks;
   ports?: string[];
+  pid?: string;
   privileged?: boolean;
   restart?: string; // "unless-stopped";
   stop_grace_period?: string;

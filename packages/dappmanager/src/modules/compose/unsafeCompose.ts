@@ -43,6 +43,7 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "logging",
   "network_mode",
   "networks",
+  "pid",
   "ports",
   "privileged",
   "restart",
@@ -73,39 +74,53 @@ export function parseUnsafeCompose(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
-  // Use of new compose feature "name"only available in version 3.5
+  // Use of new compose feature "name" only available in version 3.5
   // https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
 
   return cleanCompose({
     version: ensureMinimumComposeVersion(composeUnsafe.version),
 
-    services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) =>
-      sortServiceKeys({
-        // Overridable defaults
-        restart: "unless-stopped",
-        logging: {
-          driver: "json-file",
-          options: {
-            "max-size": "10m",
-            "max-file": "3"
-          }
-        },
+    services: mapValues(
+      composeUnsafe.services,
+      (serviceUnsafe, serviceName) => {
+        // Restrict the values of 'pid'. Other possible values are:
+        // - 'host': Very dangerous, can manipulate the host
+        // - 'container:<container_name>': Very dangerous con manipulate DAPPMANAGER and then the host
+        if (serviceUnsafe.pid && !serviceUnsafe.pid.startsWith("service:")) {
+          throw Error(`Only pid 'service:* is allowed: ${serviceUnsafe.pid}`);
+        }
 
-        // Whitelisted optional keys
-        ...pick(serviceUnsafe, serviceSafeKeys),
+        return sortServiceKeys({
+          // Overridable defaults
+          restart: "unless-stopped",
+          logging: {
+            driver: "json-file",
+            options: {
+              "max-size": "10m",
+              "max-file": "3"
+            }
+          },
 
-        // Mandatory values
-        container_name: getContainerName({ dnpName, serviceName, isCore }),
-        image: getImageTag({ serviceName, dnpName, version }),
-        environment: parseEnvironment(serviceUnsafe.environment || {}),
-        dns: params.DNS_SERVICE, // Common DAppNode ENS
-        networks: parseUnsafeServiceNetworks(
-          serviceUnsafe.networks,
-          composeUnsafe.networks,
-          isCore,
-          { serviceName, dnpName, isMain: manifest.mainService === serviceName }
-        )
-      })
+          // Whitelisted optional keys
+          ...pick(serviceUnsafe, serviceSafeKeys),
+
+          // Mandatory values
+          container_name: getContainerName({ dnpName, serviceName, isCore }),
+          image: getImageTag({ serviceName, dnpName, version }),
+          environment: parseEnvironment(serviceUnsafe.environment || {}),
+          dns: params.DNS_SERVICE, // Common DAppNode ENS
+          networks: parseUnsafeServiceNetworks(
+            serviceUnsafe.networks,
+            composeUnsafe.networks,
+            isCore,
+            {
+              serviceName,
+              dnpName,
+              isMain: manifest.mainService === serviceName
+            }
+          )
+        });
+      }
     ),
 
     volumes: parseUnsafeVolumes(composeUnsafe.volumes),
