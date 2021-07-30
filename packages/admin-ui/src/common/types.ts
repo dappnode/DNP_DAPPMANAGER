@@ -1149,7 +1149,11 @@ export interface AvahiDaemonStatus {
   avahiResolves: boolean;
 }
 
-export type LocalProxyingStatus = "running" | "stopped" | "crashed";
+export type LocalProxyingStatus =
+  | "running"
+  | "stopped"
+  | "crashed"
+  | "https missing";
 
 export interface DockerVersionsScript {
   dockerComposeVersion: string;
