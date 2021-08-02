@@ -41,13 +41,13 @@ export default function WifiCredentials(): JSX.Element {
     !passwordError &&
     !password2Error;
 
-  function onChangeCredentials() {
+  async function onChangeCredentials() {
     const envs = {
       [wifiEnvSSID]: ssid,
       [wifiEnvWPA_PASSPHRASE]: password
     };
     if (isValid)
-      withToastNoThrow(
+      await withToastNoThrow(
         () =>
           api.packageSetEnvironment({
             dnpName: wifiDnpName,

@@ -21,14 +21,17 @@ import { StateBadgeContainer } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
 // Utils
 import { prettyDnpName } from "utils/format";
+import LinkDocs from "components/LinkDocs";
 
 function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to the Wi-Fi hostpot exposed by your DAppNode using your
+      Connect to the Wi-Fi hotspot exposed by your DAppNode using your
       credentials. More information at:{" "}
-      <a href={docsUrl.connectWifi}>{docsUrl.connectWifi}</a>
+      <LinkDocs href={docsUrl.connectWifi}>
+        How to connect do DAppNode WiFi
+      </LinkDocs>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
         ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."

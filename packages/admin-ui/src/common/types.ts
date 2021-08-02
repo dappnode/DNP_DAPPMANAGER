@@ -563,6 +563,8 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   notRemovable: boolean;
   // Non-indexed data
   manifest?: Manifest;
+  /** Arbitrary data sent by the package */
+  packageSentData: Record<string, string>;
 }
 
 export interface PackageEnvs {
@@ -629,6 +631,7 @@ export interface ComposeService {
   network_mode?: string;
   networks?: ComposeServiceNetworks;
   ports?: string[];
+  pid?: string;
   privileged?: boolean;
   restart?: string; // "unless-stopped";
   stop_grace_period?: string;
@@ -1146,7 +1149,11 @@ export interface AvahiDaemonStatus {
   avahiResolves: boolean;
 }
 
-export type LocalProxyingStatus = "running" | "stopped" | "crashed";
+export type LocalProxyingStatus =
+  | "running"
+  | "stopped"
+  | "crashed"
+  | "https missing";
 
 export interface DockerVersionsScript {
   dockerComposeVersion: string;

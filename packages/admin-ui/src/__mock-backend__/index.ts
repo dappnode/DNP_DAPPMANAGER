@@ -63,13 +63,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   cleanDb: async () => {},
   copyFileTo: async () => {},
   diagnose: async () => [],
-  domainAliasSet: async () => {},
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
+
+  packageSentDataDelete: async () => {},
 
   portsToOpenGet: async () => [
     {
