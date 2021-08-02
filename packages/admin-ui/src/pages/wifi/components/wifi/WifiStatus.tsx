@@ -27,7 +27,7 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to the Wi-Fi hostpot exposed by your DAppNode using your
+      Connect to the Wi-Fi hotspot exposed by your DAppNode using your
       credentials. More information at:{" "}
       <LinkDocs href={docsUrl.connectWifi}>
         How to connect do DAppNode WiFi
