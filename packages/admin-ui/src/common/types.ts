@@ -613,6 +613,7 @@ export interface ComposeService {
   command?: string;
   container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   devices?: string[];
+  depends_on?: string[];
   dns?: string; // "172.33.1.2";
   entrypoint?: string;
   env_file?: string[];
