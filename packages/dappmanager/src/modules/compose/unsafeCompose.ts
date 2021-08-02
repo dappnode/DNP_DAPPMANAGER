@@ -34,6 +34,7 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "cap_add",
   "cap_drop",
   "command",
+  "depends_on",
   "devices",
   "entrypoint",
   "environment",
