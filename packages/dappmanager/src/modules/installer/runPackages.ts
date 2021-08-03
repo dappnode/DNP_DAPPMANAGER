@@ -37,31 +37,33 @@ export async function runPackages(
     // - Allow copying files without duplicating logic
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
-    await dockerComposeUp(pkg.composePath, {
-      // To clean-up changing multi-service packages, remove orphans
-      // but NOT for core packages, which always have orphans
-      removeOrphans: !pkg.isCore,
-      noStart: true,
-      timeout: pkg.dockerTimeout
-    });
+    if (!pkg.compose.services[pkg.dnpName].pid) {
+      await dockerComposeUp(pkg.composePath, {
+        // To clean-up changing multi-service packages, remove orphans
+        // but NOT for core packages, which always have orphans
+        removeOrphans: !pkg.isCore,
+        noStart: true,
+        timeout: pkg.dockerTimeout
+      });
 
-    // Copy fileUploads if any to the container before up-ing
-    if (pkg.fileUploads) {
-      log(pkg.dnpName, "Copying file uploads...");
-      logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
+      // Copy fileUploads if any to the container before up-ing
+      if (pkg.fileUploads) {
+        log(pkg.dnpName, "Copying file uploads...");
+        logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-      for (const [serviceName, serviceFileUploads] of Object.entries(
-        pkg.fileUploads
-      ))
-        for (const [containerPath, dataUri] of Object.entries(
-          serviceFileUploads
-        )) {
-          const { dir: toPath, base: filename } = path.parse(containerPath);
-          const service = pkg.compose.services[serviceName];
-          if (!service) throw Error(`No service for ${serviceName}`);
-          const containerName = service.container_name;
-          await copyFileTo({ containerName, dataUri, filename, toPath });
-        }
+        for (const [serviceName, serviceFileUploads] of Object.entries(
+          pkg.fileUploads
+        ))
+          for (const [containerPath, dataUri] of Object.entries(
+            serviceFileUploads
+          )) {
+            const { dir: toPath, base: filename } = path.parse(containerPath);
+            const service = pkg.compose.services[serviceName];
+            if (!service) throw Error(`No service for ${serviceName}`);
+            const containerName = service.container_name;
+            await copyFileTo({ containerName, dataUri, filename, toPath });
+          }
+      }
     }
 
     log(pkg.dnpName, "Starting package... ");
