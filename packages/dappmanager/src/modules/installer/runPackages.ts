@@ -46,7 +46,7 @@ export async function runPackages(
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
       removeOrphans: !pkg.isCore,
-      noStart: hasPid(pkg) ? true : false,
+      noStart: !hasPid(pkg) ? true : false,
       timeout: pkg.dockerTimeout
     });
 
