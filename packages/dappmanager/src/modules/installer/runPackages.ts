@@ -37,7 +37,11 @@ export async function runPackages(
     // - Allow copying files without duplicating logic
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
-    if (!pkg.compose.services[pkg.dnpName].pid) {
+
+    // EXCEPTION!: If the compose contains: `pid:service.serviceName`
+    // compose must start with: `noStart: false`
+
+    if (!hasPid(pkg)) {
       await dockerComposeUp(pkg.composePath, {
         // To clean-up changing multi-service packages, remove orphans
         // but NOT for core packages, which always have orphans
@@ -77,4 +81,25 @@ export async function runPackages(
 
     log(pkg.dnpName, "Package started");
   }
+}
+
+/**
+ * Check if a package contains compose feature pid
+ * in any of its services
+ */
+export function hasPid(pkg: InstallPackageData): boolean {
+  const composeServices = Object.keys(pkg.compose.services);
+
+  if (composeServices.length === 1) {
+    // Monoservice package
+    return pkg.compose.services[pkg.dnpName].pid ? true : false;
+  } else if (composeServices.length > 1) {
+    // Multiservice package
+    for (const composeService of composeServices) {
+      if (pkg.compose.services[composeService].pid) return true;
+    }
+    return false;
+  }
+  // Unexpected number of services
+  else throw Error(`Unexpected number of services: ${composeServices.length}`);
 }
