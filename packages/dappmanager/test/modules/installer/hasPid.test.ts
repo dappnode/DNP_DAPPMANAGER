@@ -6,7 +6,7 @@ import {
   packageInstalledHasPid
 } from "../../../src/modules/compose/pid";
 
-describe.only("Module > compose > pid", () => {
+describe("Module > compose > pid", () => {
   it("Should return false because compose does not contains pid", () => {
     expect(packageToInstallHasPid(mockPackageData)).to.deep.equal(false);
   });
