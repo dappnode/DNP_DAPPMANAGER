@@ -7,7 +7,7 @@ import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
-import { hasPid } from "../compose/pid";
+import { packageToInstallHasPid } from "../compose/pid";
 
 /**
  * Create and run each package container in series
@@ -46,7 +46,7 @@ export async function runPackages(
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
       removeOrphans: !pkg.isCore,
-      noStart: !hasPid(pkg) ? true : false,
+      noStart: !packageToInstallHasPid(pkg) ? true : false,
       timeout: pkg.dockerTimeout
     });
 

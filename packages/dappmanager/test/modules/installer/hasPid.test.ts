@@ -1,11 +1,14 @@
 import "mocha";
 import { expect } from "chai";
-import { mockPackageData } from "../../testUtils";
-import { hasPid } from "../../../src/modules/compose/pid";
+import { mockPackageData, mockDnp } from "../../testUtils";
+import {
+  packageToInstallHasPid,
+  packageInstalledHasPid
+} from "../../../src/modules/compose/pid";
 
-describe("Module > installer > runPackages > hasPid", () => {
+describe.only("Module > compose > pid", () => {
   it("Should return false because compose does not contains pid", () => {
-    expect(hasPid(mockPackageData)).to.deep.equal(false);
+    expect(packageToInstallHasPid(mockPackageData)).to.deep.equal(false);
   });
 
   it("Should return true because compose contains pid", () => {
@@ -40,6 +43,10 @@ describe("Module > installer > runPackages > hasPid", () => {
       }
     };
 
-    expect(hasPid(examplePackage)).to.deep.equal(true);
+    expect(packageToInstallHasPid(examplePackage)).to.deep.equal(true);
+  });
+
+  it("Should return false because compose does not contains pid", () => {
+    expect(packageInstalledHasPid(mockDnp)).to.deep.equal(false);
   });
 });
