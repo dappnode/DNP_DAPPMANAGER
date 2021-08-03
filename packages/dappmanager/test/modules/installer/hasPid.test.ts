@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { hasPid } from "../../../src/modules/installer/runPackages";
 import { mockPackageData } from "../../testUtils";
+import { hasPid } from "../../../src/modules/compose/pid";
 
 describe("Module > installer > runPackages > hasPid", () => {
   it("Should return false because compose does not contains pid", () => {

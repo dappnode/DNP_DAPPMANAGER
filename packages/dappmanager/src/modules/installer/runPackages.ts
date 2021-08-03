@@ -7,6 +7,7 @@ import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
+import { hasPid } from "../compose/pid";
 
 /**
  * Create and run each package container in series
@@ -41,33 +42,31 @@ export async function runPackages(
     // EXCEPTION!: If the compose contains: `pid:service.serviceName`
     // compose must start with: `noStart: false`
 
-    if (!hasPid(pkg)) {
-      await dockerComposeUp(pkg.composePath, {
-        // To clean-up changing multi-service packages, remove orphans
-        // but NOT for core packages, which always have orphans
-        removeOrphans: !pkg.isCore,
-        noStart: true,
-        timeout: pkg.dockerTimeout
-      });
+    await dockerComposeUp(pkg.composePath, {
+      // To clean-up changing multi-service packages, remove orphans
+      // but NOT for core packages, which always have orphans
+      removeOrphans: !pkg.isCore,
+      noStart: hasPid(pkg) ? true : false,
+      timeout: pkg.dockerTimeout
+    });
 
-      // Copy fileUploads if any to the container before up-ing
-      if (pkg.fileUploads) {
-        log(pkg.dnpName, "Copying file uploads...");
-        logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
+    // Copy fileUploads if any to the container before up-ing
+    if (pkg.fileUploads) {
+      log(pkg.dnpName, "Copying file uploads...");
+      logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-        for (const [serviceName, serviceFileUploads] of Object.entries(
-          pkg.fileUploads
-        ))
-          for (const [containerPath, dataUri] of Object.entries(
-            serviceFileUploads
-          )) {
-            const { dir: toPath, base: filename } = path.parse(containerPath);
-            const service = pkg.compose.services[serviceName];
-            if (!service) throw Error(`No service for ${serviceName}`);
-            const containerName = service.container_name;
-            await copyFileTo({ containerName, dataUri, filename, toPath });
-          }
-      }
+      for (const [serviceName, serviceFileUploads] of Object.entries(
+        pkg.fileUploads
+      ))
+        for (const [containerPath, dataUri] of Object.entries(
+          serviceFileUploads
+        )) {
+          const { dir: toPath, base: filename } = path.parse(containerPath);
+          const service = pkg.compose.services[serviceName];
+          if (!service) throw Error(`No service for ${serviceName}`);
+          const containerName = service.container_name;
+          await copyFileTo({ containerName, dataUri, filename, toPath });
+        }
     }
 
     log(pkg.dnpName, "Starting package... ");
@@ -81,25 +80,4 @@ export async function runPackages(
 
     log(pkg.dnpName, "Package started");
   }
-}
-
-/**
- * Check if a package contains compose feature pid
- * in any of its services
- */
-export function hasPid(pkg: InstallPackageData): boolean {
-  const composeServices = Object.keys(pkg.compose.services);
-
-  if (composeServices.length === 1) {
-    // Monoservice package
-    return pkg.compose.services[pkg.dnpName].pid ? true : false;
-  } else if (composeServices.length > 1) {
-    // Multiservice package
-    for (const composeService of composeServices) {
-      if (pkg.compose.services[composeService].pid) return true;
-    }
-    return false;
-  }
-  // Unexpected number of services
-  else throw Error(`Unexpected number of services: ${composeServices.length}`);
 }
