@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { hasPid } from "../../../src/modules/installer/runPackages";
 import { mockPackageData } from "../../testUtils";
 
-describe.only("Module > installer > runPackages > hasPid", () => {
+describe("Module > installer > runPackages > hasPid", () => {
   it("Should return false because compose does not contains pid", () => {
     expect(hasPid(mockPackageData)).to.deep.equal(false);
   });
