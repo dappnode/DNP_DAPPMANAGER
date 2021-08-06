@@ -2,7 +2,6 @@
 
 // This SC allows to create ENS for dappnode like public.dappnode.eth and dnp.public.eth
 
-// public.dappnode.eth (0x9f85ae5aefe4a3eff39d9a44212aae21dd15079a) and dnp.dappnode.eth (0x266bfdb2124a68beb6769dc887bd655f78778923)
 // are generated from the same SC: APM Registry
 // To get into this SC is necessary to do in Etherscan:
 //     1. Verify proxy
@@ -12,6 +11,8 @@
 
 export const contractName = "registry";
 export const address = "0x1d9Bdf492e59A306DDa59E5aA13E7F1C7D89197A";
+// public.dappnode.eth: 0x9f85ae5aefe4a3eff39d9a44212aae21dd15079a
+// dnp.dappnode.eth: 0x266bfdb2124a68beb6769dc887bd655f78778923
 export const abi = [
   {
     constant: true,

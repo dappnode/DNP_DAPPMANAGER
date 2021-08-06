@@ -9,10 +9,12 @@ import {
   PackageNotification,
   DirectoryItem
 } from "./types";
+import { RegistryItem } from "./common";
 
 interface EventTypes {
   chainData: ChainData[];
   directory: DirectoryItem[];
+  registry: RegistryItem[];
   logUi: ProgressLog;
   logUserAction: UserActionLog;
   notification: PackageNotification;
@@ -33,6 +35,7 @@ interface EventTypes {
 const eventBusData: { [P in keyof EventTypes]: {} } = {
   chainData: {},
   directory: {},
+  registry: {},
   logUi: {},
   logUserAction: {},
   notification: {},
@@ -41,6 +44,7 @@ const eventBusData: { [P in keyof EventTypes]: {} } = {
   // Events without arguments
   telegramStatusChanged: {},
   initializedDb: {},
+
   requestAutoUpdateData: {},
   requestChainData: {},
   requestDevices: {},

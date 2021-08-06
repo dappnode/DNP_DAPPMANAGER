@@ -1,8 +1,10 @@
 import { ethers } from "ethers";
 import { ApmVersionMetadata } from "./types";
 import { getTimestamp } from "./apmUtils";
-import { Interface } from "ethers/lib/utils";
-import { abi } from "../../contracts/registry";
+
+const repoAbi = [
+  "event NewVersion(uint256 versionId, uint16[3] semanticVersion)"
+];
 
 /**
  * Fetches the new repos logs from a registry
@@ -18,13 +20,17 @@ export async function fetchApmVersionsMetadata(
   // Change this method if the web3 library is not ethjs
   // await ensureAncientBlocks();
 
-  const repo = new ethers.utils.Interface(abi);
+  const repo = new ethers.utils.Interface(repoAbi);
+
+  const event = repo.events;
+
+  const topic = repo.getEventTopic(event[0]);
 
   const result = await provider.getLogs({
     address: addressOrEnsName, // or contractEnsName,
     fromBlock: fromBlock || 0,
     toBlock: "latest",
-    topics: [getTopicFromEvent(repo, "NewVersion")]
+    topics: [topic]
   });
 
   return await Promise.all(
@@ -46,47 +52,4 @@ export async function fetchApmVersionsMetadata(
       }
     )
   );
-}
-
-// Utils
-
-export function getParsedLogs(
-  iface: Interface,
-  logs: ethers.providers.Log[],
-  topic: string
-): ethers.utils.LogDescription[] {
-  const parsedLogs: ethers.utils.LogDescription[] = [];
-  for (const log of logs) {
-    if (!log.topics.find(logTopic => logTopic === topic))
-      throw Error(`Topic ${topic} not found`);
-    parsedLogs.push(iface.parseLog(log));
-  }
-  return parsedLogs;
-}
-
-export function getArgFromParsedLogs(
-  parsedLogs: ethers.utils.LogDescription[],
-  argDesired: string
-): string[] {
-  const logsResultArray = parsedLogs.map(parsedLog => parsedLog.args);
-
-  const argsDesired: string[] = [];
-  for (const logResult of logsResultArray) {
-    for (const arg of logResult) {
-      if (Object.keys(arg) === [argDesired]) argsDesired.push(arg.name);
-    }
-  }
-
-  return argsDesired;
-}
-
-/** Get a topic from a given event, if either of event or topic does not exist error */
-export function getTopicFromEvent(iface: Interface, eventName: string): string {
-  const event = Object.values(iface.events).find(
-    eventValue => eventValue.name === eventName
-  );
-  if (!event) throw Error(`Event ${eventName} not found`);
-  const topic = iface.getEventTopic(event);
-  if (!topic) throw Error(`Topic not found on event ${event}`);
-  return topic;
 }

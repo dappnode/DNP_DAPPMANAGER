@@ -1,14 +1,19 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
+
+import { abi } from "../../../src/contracts/registry";
 import {
   getTopicFromEvent,
   getParsedLogs,
-  getArgFromParsedLogs
-} from "../../../src/modules/apm/fetchApmVersionsMetadata";
-import { abi } from "../../../src/contracts/registry";
+  getArgFromParsedLogs,
+  getRegistry
+} from "../../../src/modules/registry";
 
 describe.only("Apm > fetchApmVersionsMetadata > getTopicFromEvent", () => {
+  const provider = new ethers.providers.JsonRpcProvider(
+    "https://web3.dappnode.net"
+  );
   const iface = new ethers.utils.Interface(abi);
   const logs = [
     {
@@ -77,20 +82,36 @@ describe.only("Apm > fetchApmVersionsMetadata > getTopicFromEvent", () => {
     }
   ];
   let topic: string;
-  let parsedLogs: ethers.utils.LogDescription[];
 
   it("Should get topic from event", () => {
+    const expectedTopic =
+      "0x526d4ccf8c3d7b6f0b6d4cc0de526d515c87d1ea3bd264ace0b5c2e70d1b2208";
     topic = getTopicFromEvent(iface, "NewRepo");
-    console.log(topic);
-  });
-
-  it("Should get parsed logs", () => {
-    parsedLogs = getParsedLogs(iface, logs, topic);
-    console.log(parsedLogs);
+    expect(topic).to.deep.equal(expectedTopic);
   });
 
   it("Should get arg from parsed logs", () => {
-    const args = getArgFromParsedLogs(parsedLogs, "name");
-    console.log(args);
+    const parsedLogs = getParsedLogs(iface, logs, topic);
+    const expectedArgs = ["trinity", "masterethereum", "zcash", "polkadot"];
+    const args = getArgFromParsedLogs(parsedLogs, 1);
+    expect(args).to.deep.equal(expectedArgs);
+  });
+
+  it("Should fetch Registry SC and get newRepos from a given ENS", async () => {
+    const expectedPackages = [
+      { name: "big-dipper.public.dappnode.eth", position: 0 },
+      { name: "electrumx.public.dappnode.eth", position: 1 },
+      { name: "idchain.public.dappnode.eth", position: 2 },
+      { name: "sentinel.public.dappnode.eth", position: 3 }
+    ];
+
+    const packages = await getRegistry(
+      provider,
+      "public.dappnode.eth",
+      10076527,
+      10405289
+    );
+
+    expect(packages).to.deep.equal(expectedPackages);
   });
 });
