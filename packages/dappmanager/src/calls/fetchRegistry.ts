@@ -11,7 +11,7 @@ import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
 
-const defaultEnsName = "public.dnp.dappnode";
+const defaultEnsName = "public.dappnode.eth";
 const fistBlockPublicRegistry = 6312046;
 
 const loadThrottle = 500; // 0.5 seconds
@@ -20,7 +20,9 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the registry SC.
  */
 export async function fetchRegistry(
-  addressOrEnsName = defaultEnsName
+  addressOrEnsName = defaultEnsName,
+  fromBlock?: number,
+  toBlock?: number
 ): Promise<RegistryItem[]> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
@@ -30,7 +32,8 @@ export async function fetchRegistry(
   const registry = await getRegistry(
     provider,
     addressOrEnsName,
-    fistBlockPublicRegistry
+    10076527,
+    10405289
   );
   const registryPublicDnps: RegistryItem[] = [];
 

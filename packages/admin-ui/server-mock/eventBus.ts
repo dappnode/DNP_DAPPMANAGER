@@ -6,6 +6,7 @@ const emptySubscription = { on: () => {}, emit: () => {} };
 export const eventBus: EventBus = {
   chainData: emptySubscription,
   directory: emptySubscription,
+  registry: emptySubscription,
   logUi: emptySubscription,
   logUserAction: emptySubscription,
   notification: emptySubscription,

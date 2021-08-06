@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-
+import * as calls from "../../../src/calls";
 import { abi } from "../../../src/contracts/registry";
 import {
   getTopicFromEvent,
@@ -9,8 +9,16 @@ import {
   getArgFromParsedLogs,
   getRegistry
 } from "../../../src/modules/registry";
+import { clearDbs } from "../../testUtils";
+import { RegistryItem } from "../../../src/types";
 
-describe.only("Apm > fetchApmVersionsMetadata > getTopicFromEvent", () => {
+describe.only("Directory", () => {
+  before("Clear DBs and set remote", async () => {
+    clearDbs();
+    // Activate remote and fallback to fetch test data without a local node
+    await calls.ethClientFallbackSet({ fallback: "on" });
+    await calls.ethClientTargetSet({ target: "remote" });
+  });
   const provider = new ethers.providers.JsonRpcProvider(
     "https://web3.dappnode.net"
   );
@@ -113,5 +121,58 @@ describe.only("Apm > fetchApmVersionsMetadata > getTopicFromEvent", () => {
     );
 
     expect(packages).to.deep.equal(expectedPackages);
+  });
+
+  it("Should fetch Registry data", async () => {
+    const registryData = await calls.fetchRegistry();
+    const expectedRegistryData: RegistryItem[] = [
+      {
+        index: 0,
+        name: "big-dipper.public.dappnode.eth",
+        status: "ok",
+        description: "Tendermint Block Explorer",
+        avatarUrl: "/ipfs/QmbTYUuVizPqs2FRyfVZvxhDFAH1VpK9F5swtvJcHLi2AW",
+        isInstalled: false,
+        isUpdated: false,
+        featuredStyle: undefined,
+        categories: ["Blockchain"]
+      },
+      {
+        index: 1,
+        name: "electrumx.public.dappnode.eth",
+        status: "ok",
+        description: "A personal Electrum server",
+        avatarUrl: "/ipfs/QmQT1BkQDcCW5Qdip3eigrgnxKqyrmrjkxXejwHsA3dHaz",
+        isInstalled: false,
+        isUpdated: false,
+        featuredStyle: undefined,
+        categories: []
+      },
+      {
+        index: 3,
+        name: "sentinel.public.dappnode.eth",
+        status: "ok",
+        description: "Sentinel dVPN node",
+        avatarUrl: "/ipfs/QmVHENs72iFxNMGRmM29stHVTsicNf8qFpjPPwuvbsnzrT",
+        isInstalled: false,
+        isUpdated: false,
+        featuredStyle: undefined,
+        categories: ["dVPN"]
+      },
+      {
+        index: 2,
+        name: "idchain.public.dappnode.eth",
+        status: "ok",
+        description: "IDChain from BrightID.",
+        avatarUrl: "/ipfs/QmdJyHFAYsbDAM84NKem38vEPsFtCcztoxLuQac5312eEq",
+        isInstalled: false,
+        isUpdated: false,
+        featuredStyle: undefined,
+        categories: ["Blockchain"]
+      }
+    ];
+
+    // Compare unordered since the packages are pushed as they are resolved
+    expect(registryData).to.have.deep.members(expectedRegistryData);
   });
 });
