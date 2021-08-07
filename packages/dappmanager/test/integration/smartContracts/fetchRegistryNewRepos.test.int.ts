@@ -12,13 +12,17 @@ import {
 import { clearDbs } from "../../testUtils";
 import { RegistryItem } from "../../../src/types";
 
-describe.only("Directory", () => {
+describe("Directory", () => {
   before("Clear DBs and set remote", async () => {
     clearDbs();
     // Activate remote and fallback to fetch test data without a local node
     await calls.ethClientFallbackSet({ fallback: "on" });
     await calls.ethClientTargetSet({ target: "remote" });
   });
+  const fromBlock = 10076527;
+  const toBlock = 10405289;
+  const dappnodePublicEns = "public.dappnode.eth";
+
   const provider = new ethers.providers.JsonRpcProvider(
     "https://web3.dappnode.net"
   );
@@ -115,16 +119,20 @@ describe.only("Directory", () => {
 
     const packages = await getRegistry(
       provider,
-      "public.dappnode.eth",
-      10076527,
-      10405289
+      dappnodePublicEns,
+      fromBlock,
+      toBlock
     );
 
     expect(packages).to.deep.equal(expectedPackages);
   });
 
   it("Should fetch Registry data", async () => {
-    const registryData = await calls.fetchRegistry();
+    const registryData = await calls.fetchRegistry(
+      dappnodePublicEns,
+      fromBlock,
+      toBlock
+    );
     const expectedRegistryData: RegistryItem[] = [
       {
         index: 0,
@@ -172,7 +180,7 @@ describe.only("Directory", () => {
       }
     ];
 
-    // Compare unordered since the packages are pushed as they are resolved
+    // Compare unordered because the packages are pushed as they are resolved
     expect(registryData).to.have.deep.members(expectedRegistryData);
   });
 });
