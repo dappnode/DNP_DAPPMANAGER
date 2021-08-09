@@ -223,7 +223,11 @@ export interface Routes {
   /**
    * Fetch registry summary
    */
-  fetchRegistry: () => Promise<RegistryItem[]>;
+  fetchRegistry: (kwargs: {
+    addressOrEnsName: string;
+    fromBlock?: number;
+    toBlock?: number;
+  }) => Promise<RegistryItem[]>;
 
   /**
    * Fetch extended info about a new DNP

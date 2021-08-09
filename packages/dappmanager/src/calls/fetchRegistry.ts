@@ -19,11 +19,15 @@ const loadThrottle = 500; // 0.5 seconds
 /**
  * Fetches all package names in the registry SC.
  */
-export async function fetchRegistry(
+export async function fetchRegistry({
   addressOrEnsName = defaultEnsName,
-  fromBlock?: number,
-  toBlock?: number
-): Promise<RegistryItem[]> {
+  fromBlock,
+  toBlock
+}: {
+  addressOrEnsName: string;
+  fromBlock?: number;
+  toBlock?: number;
+}): Promise<RegistryItem[]> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 

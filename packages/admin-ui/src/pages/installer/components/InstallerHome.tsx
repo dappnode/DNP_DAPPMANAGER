@@ -25,6 +25,7 @@ import {
   getDnpDirectory,
   getDirectoryRequestStatus
 } from "services/dnpDirectory/selectors";
+import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
@@ -45,9 +46,17 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
     {} as SelectedCategories
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
+  const [dappstorePublic, setDappstorePublic] = useState(false);
+  const [dappstorePublicSearch, setDappstorePublicSearch] = useState(
+    "public.dappnode.eth"
+  );
 
   useEffect(() => {
-    dispatch(fetchDnpDirectory());
+    if (dappstorePublic) {
+      dispatch(fetchDnpRegistry(dappstorePublicSearch));
+    } else {
+      dispatch(fetchDnpDirectory());
+    }
   }, [dispatch]);
 
   // Limit the number of requests [TESTED]
