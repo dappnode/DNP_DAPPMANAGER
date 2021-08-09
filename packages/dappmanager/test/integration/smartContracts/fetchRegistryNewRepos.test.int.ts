@@ -128,11 +128,11 @@ describe("Directory", () => {
   });
 
   it("Should fetch Registry data", async () => {
-    const registryData = await calls.fetchRegistry(
-      dappnodePublicEns,
+    const registryData = await calls.fetchRegistry({
+      addressOrEnsName: dappnodePublicEns,
       fromBlock,
       toBlock
-    );
+    });
     const expectedRegistryData: RegistryItem[] = [
       {
         index: 0,
