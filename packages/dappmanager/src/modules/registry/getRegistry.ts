@@ -19,24 +19,23 @@ export async function getRegistry(
   const ensName = await provider.resolveName(addressOrEnsName);
   if (!ensName) throw Error(`ENS name ${ensName} does not exist`);
 
-  const iface = new ethers.utils.Interface(abi);
+  const registryInterface = new ethers.utils.Interface(abi);
 
-  const topic = getTopicFromEvent(iface, eventNewRepo);
+  const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
 
   const logs = await provider
     .getLogs({
       address: addressOrEnsName, // or contractEnsName,
       fromBlock: fromBlock || 0,
       toBlock: toBlock || "latest",
-      topics: [topic]
+      topics: [eventNewRepoTopic]
     })
     .catch(e => {
-      throw Error(
-        `Error retrieving logs from ${addressOrEnsName}. Error: ${e}`
-      );
+      e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
+      throw e;
     });
 
-  const parsedLogs = getParsedLogs(iface, logs, topic);
+  const parsedLogs = getParsedLogs(registryInterface, logs, eventNewRepoTopic);
 
   const dappNodePackagesNames = getArgFromParsedLogs(
     parsedLogs,
