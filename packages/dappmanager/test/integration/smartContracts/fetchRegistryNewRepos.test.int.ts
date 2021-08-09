@@ -12,7 +12,7 @@ import {
 import { clearDbs } from "../../testUtils";
 import { DirectoryItem } from "../../../src/types";
 
-describe.only("Directory", () => {
+describe("Directory", () => {
   before("Clear DBs and set remote", async () => {
     clearDbs();
     // Activate remote and fallback to fetch test data without a local node
