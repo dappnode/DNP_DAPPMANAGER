@@ -20,7 +20,7 @@ export const updateStatus = createAction<RequestStatus>(
 // Redux-thunk actions
 
 export const fetchDnpDirectory = (
-  isPublic?: boolean
+  isPublic: boolean
 ): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
