@@ -36,8 +36,8 @@ export async function fetchRegistry({
   const registry = await getRegistry(
     provider,
     addressOrEnsName,
-    fromBlock,
-    toBlock || fistBlockPublicRegistry
+    fromBlock || fistBlockPublicRegistry,
+    toBlock
   );
   const registryPublicDnps: DirectoryItem[] = [];
 
