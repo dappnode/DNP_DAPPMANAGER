@@ -7,7 +7,8 @@ import {
   getTopicFromEvent,
   getParsedLogs,
   getArgFromParsedLogs,
-  getRegistry
+  getRegistry,
+  getBlocksSections
 } from "../../../src/modules/registry";
 import { clearDbs } from "../../testUtils";
 import { DirectoryItem } from "../../../src/types";
@@ -94,6 +95,29 @@ describe("Directory", () => {
     }
   ];
   let topic: string;
+
+  it("Should return sections of 40000 blocks", () => {
+    const latestBlock = 12992306;
+    const latestBlockTest = 12545306;
+
+    const expectedBlockSections = [
+      { fromBlock: 12545306, toBlock: 12585306 },
+      { fromBlock: 12585306, toBlock: 12625306 },
+      { fromBlock: 12625306, toBlock: 12665306 },
+      { fromBlock: 12665306, toBlock: 12705306 },
+      { fromBlock: 12705306, toBlock: 12745306 },
+      { fromBlock: 12745306, toBlock: 12785306 },
+      { fromBlock: 12785306, toBlock: 12825306 },
+      { fromBlock: 12825306, toBlock: 12865306 },
+      { fromBlock: 12865306, toBlock: 12905306 },
+      { fromBlock: 12905306, toBlock: 12945306 },
+      { fromBlock: 12945306, toBlock: 12985306 },
+      { fromBlock: 12985306, toBlock: 12992306 }
+    ];
+
+    const sections = getBlocksSections(latestBlock, latestBlockTest);
+    expect(sections).to.deep.equal(expectedBlockSections);
+  });
 
   it("Should get topic from event", () => {
     const expectedTopic =

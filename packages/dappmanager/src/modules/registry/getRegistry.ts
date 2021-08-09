@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { abi } from "../../contracts/registry";
 import { isEnsDomain } from "../../utils/validate";
 import { notUndefined } from "../../utils/typingHelpers";
+import * as db from "../../db";
 
 // Topic name
 const eventNewRepo = "NewRepo";
@@ -18,22 +19,45 @@ export async function getRegistry(
 ): Promise<DirectoryDnp[]> {
   const ensName = await provider.resolveName(addressOrEnsName);
   if (!ensName) throw Error(`ENS name ${ensName} does not exist`);
-
   const registryInterface = new ethers.utils.Interface(abi);
 
+  // Get topic
   const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
 
-  const logs = await provider
-    .getLogs({
-      address: addressOrEnsName, // or contractEnsName,
-      fromBlock: fromBlock || 0,
-      toBlock: toBlock || "latest",
-      topics: [eventNewRepoTopic]
-    })
-    .catch(e => {
-      e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
-      throw e;
-    });
+  let logs: ethers.providers.Log[] = [];
+  if (fromBlock && toBlock)
+    logs = await provider
+      .getLogs({
+        address: addressOrEnsName, // or contractEnsName,
+        fromBlock: fromBlock,
+        toBlock: toBlock,
+        topics: [eventNewRepoTopic]
+      })
+      .catch(e => {
+        e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
+        throw e;
+      });
+  else {
+    // Get block sections to avoid ethers timeout error
+    const latestBlock = await provider.getBlockNumber();
+    const blockSections = getBlocksSections(latestBlock);
+
+    // Get logs from 40000 blocks sections
+    for (const blockSection of blockSections) {
+      const sectionLogs = await provider
+        .getLogs({
+          address: addressOrEnsName, // or contractEnsName,
+          fromBlock: blockSection.fromBlock,
+          toBlock: blockSection.toBlock,
+          topics: [eventNewRepoTopic]
+        })
+        .catch(e => {
+          e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
+          throw e;
+        });
+      logs.push(...sectionLogs);
+    }
+  }
 
   const parsedLogs = getParsedLogs(registryInterface, logs, eventNewRepoTopic);
 
@@ -75,7 +99,7 @@ export async function getRegistry(
 
 // Utils
 
-/** */
+/** Return package fullname with ENS*/
 export function createFullPackageName(
   ensName: string,
   packageName: string
@@ -121,7 +145,6 @@ export function getArgFromParsedLogs(
 }
 
 /** Get a topic from a given event, if either event or topic does not exist then error */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getTopicFromEvent(
   iface: ethers.utils.Interface,
   eventName: string
@@ -133,4 +156,58 @@ export function getTopicFromEvent(
   const topic = event.topic;
   if (!topic) throw Error(`Topic not found on event ${event}`);
   return topic;
+}
+
+/** Returns an array of blocks section with size of 40000*/
+export function getBlocksSections(
+  latestBlock: number,
+  fromBlock?: number
+): BlockSections[] {
+  const registryDnp = db.registryDnp.get();
+  const latestBlockFetched =
+    fromBlock ||
+    (registryDnp &&
+      Math.max.apply(
+        null,
+        registryDnp.map(registry => registry.latestBlock)
+      )) ||
+    0;
+
+  const blocksSections: BlockSections[] = [];
+
+  if (latestBlockFetched < latestBlock) {
+    const sectionSize = 40000;
+    const blocksPending = latestBlock - latestBlockFetched;
+
+    let numberOfSections = Math.floor(blocksPending / sectionSize) + 1;
+    const lastSectionSize = blocksPending % sectionSize;
+
+    if (lastSectionSize === 0) numberOfSections--;
+
+    if (numberOfSections === 0)
+      blocksSections.push({
+        fromBlock: latestBlockFetched,
+        toBlock: latestBlock
+      });
+
+    for (let i = 0; i < numberOfSections; i++) {
+      const currentBlock = latestBlockFetched + sectionSize * i;
+      if (i === numberOfSections - 1)
+        blocksSections.push({
+          fromBlock: currentBlock,
+          toBlock: currentBlock + lastSectionSize
+        });
+      else
+        blocksSections.push({
+          fromBlock: currentBlock,
+          toBlock: latestBlockFetched + sectionSize * (i + 1)
+        });
+    }
+  }
+  return blocksSections;
+}
+
+interface BlockSections {
+  fromBlock: number;
+  toBlock: number;
 }
