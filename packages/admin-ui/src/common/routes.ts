@@ -37,8 +37,7 @@ import {
   InstalledPackageDataApiReturn,
   WifiReport,
   CurrentWifiCredentials,
-  LocalProxyingStatus,
-  RegistryItem
+  LocalProxyingStatus
 } from "./types";
 
 export interface Routes {
@@ -227,7 +226,7 @@ export interface Routes {
     addressOrEnsName: string;
     fromBlock?: number;
     toBlock?: number;
-  }) => Promise<RegistryItem[]>;
+  }) => Promise<DirectoryItem[]>;
 
   /**
    * Fetch extended info about a new DNP

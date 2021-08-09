@@ -10,9 +10,9 @@ import {
   getRegistry
 } from "../../../src/modules/registry";
 import { clearDbs } from "../../testUtils";
-import { RegistryItem } from "../../../src/types";
+import { DirectoryItem } from "../../../src/types";
 
-describe("Directory", () => {
+describe.only("Directory", () => {
   before("Clear DBs and set remote", async () => {
     clearDbs();
     // Activate remote and fallback to fetch test data without a local node
@@ -111,10 +111,34 @@ describe("Directory", () => {
 
   it("Should fetch Registry SC and get newRepos from a given ENS", async () => {
     const expectedPackages = [
-      { name: "big-dipper.public.dappnode.eth", position: 0 },
-      { name: "electrumx.public.dappnode.eth", position: 1 },
-      { name: "idchain.public.dappnode.eth", position: 2 },
-      { name: "sentinel.public.dappnode.eth", position: 3 }
+      {
+        name: "big-dipper.public.dappnode.eth",
+        statusName: "Active",
+        position: 0,
+        isFeatured: false,
+        featuredIndex: 0
+      },
+      {
+        name: "electrumx.public.dappnode.eth",
+        statusName: "Active",
+        position: 1,
+        isFeatured: false,
+        featuredIndex: 0
+      },
+      {
+        name: "idchain.public.dappnode.eth",
+        statusName: "Active",
+        position: 2,
+        isFeatured: false,
+        featuredIndex: 0
+      },
+      {
+        name: "sentinel.public.dappnode.eth",
+        statusName: "Active",
+        position: 3,
+        isFeatured: false,
+        featuredIndex: 0
+      }
     ];
 
     const packages = await getRegistry(
@@ -133,21 +157,13 @@ describe("Directory", () => {
       fromBlock,
       toBlock
     });
-    const expectedRegistryData: RegistryItem[] = [
-      {
-        index: 0,
-        name: "big-dipper.public.dappnode.eth",
-        status: "ok",
-        description: "Tendermint Block Explorer",
-        avatarUrl: "/ipfs/QmbTYUuVizPqs2FRyfVZvxhDFAH1VpK9F5swtvJcHLi2AW",
-        isInstalled: false,
-        isUpdated: false,
-        featuredStyle: undefined,
-        categories: ["Blockchain"]
-      },
+
+    const expectedRegistryData: DirectoryItem[] = [
       {
         index: 1,
         name: "electrumx.public.dappnode.eth",
+        isFeatured: false,
+        whitelisted: true,
         status: "ok",
         description: "A personal Electrum server",
         avatarUrl: "/ipfs/QmQT1BkQDcCW5Qdip3eigrgnxKqyrmrjkxXejwHsA3dHaz",
@@ -157,19 +173,23 @@ describe("Directory", () => {
         categories: []
       },
       {
-        index: 3,
-        name: "sentinel.public.dappnode.eth",
+        index: 0,
+        name: "big-dipper.public.dappnode.eth",
+        isFeatured: false,
+        whitelisted: true,
         status: "ok",
-        description: "Sentinel dVPN node",
-        avatarUrl: "/ipfs/QmVHENs72iFxNMGRmM29stHVTsicNf8qFpjPPwuvbsnzrT",
+        description: "Tendermint Block Explorer",
+        avatarUrl: "/ipfs/QmbTYUuVizPqs2FRyfVZvxhDFAH1VpK9F5swtvJcHLi2AW",
         isInstalled: false,
         isUpdated: false,
         featuredStyle: undefined,
-        categories: ["dVPN"]
+        categories: ["Blockchain"]
       },
       {
         index: 2,
         name: "idchain.public.dappnode.eth",
+        isFeatured: false,
+        whitelisted: true,
         status: "ok",
         description: "IDChain from BrightID.",
         avatarUrl: "/ipfs/QmdJyHFAYsbDAM84NKem38vEPsFtCcztoxLuQac5312eEq",
@@ -177,6 +197,19 @@ describe("Directory", () => {
         isUpdated: false,
         featuredStyle: undefined,
         categories: ["Blockchain"]
+      },
+      {
+        index: 3,
+        name: "sentinel.public.dappnode.eth",
+        isFeatured: false,
+        whitelisted: true,
+        status: "ok",
+        description: "Sentinel dVPN node",
+        avatarUrl: "/ipfs/QmVHENs72iFxNMGRmM29stHVTsicNf8qFpjPPwuvbsnzrT",
+        isInstalled: false,
+        isUpdated: false,
+        featuredStyle: undefined,
+        categories: ["dVPN"]
       }
     ];
 

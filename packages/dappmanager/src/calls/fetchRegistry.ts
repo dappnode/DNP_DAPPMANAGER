@@ -6,7 +6,7 @@ import { eventBus } from "../eventBus";
 import { throttle } from "lodash";
 import { NoImageForArchError } from "../modules/release/errors";
 import { logs } from "../logs";
-import { RegistryItem } from "../types";
+import { DirectoryItem } from "../types";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
@@ -27,7 +27,7 @@ export async function fetchRegistry({
   addressOrEnsName: string;
   fromBlock?: number;
   toBlock?: number;
-}): Promise<RegistryItem[]> {
+}): Promise<DirectoryItem[]> {
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 
@@ -39,16 +39,16 @@ export async function fetchRegistry({
     fromBlock,
     toBlock || fistBlockPublicRegistry
   );
-  const registryPublicDnps: RegistryItem[] = [];
+  const registryPublicDnps: DirectoryItem[] = [];
 
-  let registryDnpsPending: RegistryItem[] = [];
+  let registryDnpsPending: DirectoryItem[] = [];
   // Prevent sending way to many updates in case the fetching process is fast
   const emitRegistryUpdate = throttle(() => {
-    eventBus.registry.emit(registryDnpsPending);
+    eventBus.directory.emit(registryDnpsPending);
     registryDnpsPending = [];
   }, loadThrottle);
 
-  function pushRegistryItem(item: RegistryItem): void {
+  function pushRegistryItem(item: DirectoryItem): void {
     registryPublicDnps.push(item);
     registryDnpsPending.push(item);
     emitRegistryUpdate();
@@ -56,8 +56,13 @@ export async function fetchRegistry({
 
   await Promise.all(
     registry.map(
-      async ({ name }, index): Promise<void> => {
-        const registryItemBasic = { index, name };
+      async ({ name, isFeatured }, index): Promise<void> => {
+        const registryItemBasic = {
+          index,
+          name,
+          whitelisted: true,
+          isFeatured
+        };
         try {
           // Now resolve the last version of the package
           const release = await releaseFetcher.getRelease(name);

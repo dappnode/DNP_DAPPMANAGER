@@ -115,26 +115,7 @@ interface DirectoryItemBasic {
   whitelisted: boolean;
   isFeatured: boolean;
 }
-
-interface RegistryItemBasic {
-  index: number;
-  name: string;
-}
 export interface DirectoryItemOk extends DirectoryItemBasic {
-  status: "ok";
-  description: string; // = metadata.shortDescription || metadata.description
-  avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
-  isInstalled: boolean; // Show "UPDATE"
-  isUpdated: boolean; // Show "UPDATED"
-  featuredStyle?: {
-    featuredBackground?: string;
-    featuredColor?: string;
-    featuredAvatarFilter?: string;
-  };
-  categories: string[];
-}
-
-export interface RegistryItemOk extends RegistryItemBasic {
   status: "ok";
   description: string; // = metadata.shortDescription || metadata.description
   avatarUrl: string; // Must be URL to a resource in a DAPPMANAGER API
@@ -152,14 +133,8 @@ export interface DirectoryItemError extends DirectoryItemBasic {
   status: "error";
   message: string;
 }
-export interface RegistryItemError extends RegistryItemBasic {
-  status: "error";
-  message: string;
-}
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
-
-export type RegistryItem = RegistryItemOk | RegistryItemError;
 
 export interface RequestStatus {
   loading?: boolean;
@@ -767,19 +742,10 @@ export type DirectoryDnpStatus = "Deleted" | "Active" | "Developing";
 
 export interface DirectoryDnp {
   name: string;
-  status: number;
   statusName: DirectoryDnpStatus;
   position: number;
-  directoryId: number;
   isFeatured: boolean;
   featuredIndex: number;
-  manifest?: Manifest;
-  avatar?: string;
-}
-
-export interface RegistryPublic {
-  name: string;
-  position: number;
   manifest?: Manifest;
   avatar?: string;
 }

@@ -1,4 +1,4 @@
-import { RegistryPublic } from "../../types";
+import { DirectoryDnp } from "../../types";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry";
 import { Interface } from "ethers/lib/utils";
@@ -16,7 +16,7 @@ export async function getRegistry(
   addressOrEnsName: string,
   fromBlock?: number,
   toBlock?: number
-): Promise<RegistryPublic[]> {
+): Promise<DirectoryDnp[]> {
   const ensName = await provider.resolveName(addressOrEnsName);
   if (!ensName) throw Error(`ENS name ${ensName} does not exist`);
 
@@ -53,7 +53,7 @@ export async function getRegistry(
 
   const packages = await Promise.all(
     registryIds.map(
-      async (i): Promise<RegistryPublic | undefined> => {
+      async (i): Promise<DirectoryDnp | undefined> => {
         const name = createFullPackageName(
           addressOrEnsName,
           dappNodePackagesNames[i]
@@ -63,7 +63,10 @@ export async function getRegistry(
 
         return {
           name,
-          position: i
+          statusName: "Active",
+          position: i,
+          isFeatured: false,
+          featuredIndex: 0
         };
       }
     )
@@ -83,9 +86,7 @@ export function createFullPackageName(
 }
 
 /** Sort DAppNode packages alphabetically */
-export function sortRegistryPackages(
-  packages: RegistryPublic[]
-): RegistryPublic[] {
+export function sortRegistryPackages(packages: DirectoryDnp[]): DirectoryDnp[] {
   return packages.sort((a, b) => a.name.localeCompare(b.name));
 }
 

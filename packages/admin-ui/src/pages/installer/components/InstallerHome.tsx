@@ -25,12 +25,12 @@ import {
   getDnpDirectory,
   getDirectoryRequestStatus
 } from "services/dnpDirectory/selectors";
-import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 // Styles
 import "./installer.scss";
+import Switch from "components/Switch";
 
 export const InstallerHome: React.FC<RouteComponentProps> = ({
   // React Routes
@@ -47,17 +47,10 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
   const [dappstorePublic, setDappstorePublic] = useState(false);
-  const [dappstorePublicSearch, setDappstorePublicSearch] = useState(
-    "public.dappnode.eth"
-  );
 
   useEffect(() => {
-    if (dappstorePublic) {
-      dispatch(fetchDnpRegistry(dappstorePublicSearch));
-    } else {
-      dispatch(fetchDnpDirectory());
-    }
-  }, [dispatch]);
+    dispatch(fetchDnpDirectory(dappstorePublic));
+  }, [dispatch, dappstorePublic]);
 
   // Limit the number of requests [TESTED]
   const fetchQueryThrottled = useMemo(
@@ -124,6 +117,14 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
         onValueChange={(value: string) => setQuery(correctPackageName(value))}
         onEnterPress={runQuery}
         append={<Button onClick={runQuery}>Search</Button>}
+      />
+
+      <Switch
+        label={`ENS: ${
+          dappstorePublic ? "public.dappnode.eth" : "dnp.dappnode.eth"
+        }`}
+        checked={dappstorePublic}
+        onToggle={() => setDappstorePublic(!dappstorePublic)}
       />
 
       {isEmpty(categories) && directory.length ? (

@@ -19,10 +19,14 @@ export const updateStatus = createAction<RequestStatus>(
 
 // Redux-thunk actions
 
-export const fetchDnpDirectory = (): AppThunk => async dispatch => {
+export const fetchDnpDirectory = (
+  isPublic?: boolean
+): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
-    const directory = await api.fetchDirectory();
+    const directory = !isPublic
+      ? await api.fetchDirectory()
+      : await api.fetchRegistry({ addressOrEnsName: "public.dappnode.eth" });
     // Some items in directory may be undefined
     dispatch(setDnpDirectory(directory.filter(Boolean)));
     dispatch(updateStatus({ loading: false, success: true }));

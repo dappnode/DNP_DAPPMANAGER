@@ -75,10 +75,8 @@ export async function getDirectory(
           const featuredIndex = featuredIndexes.indexOf(i);
           return {
             name,
-            status,
             statusName: DAppNodePackageStatus[status],
             position,
-            directoryId: i,
             isFeatured: featuredIndex > -1,
             featuredIndex: featuredIndex
           };
