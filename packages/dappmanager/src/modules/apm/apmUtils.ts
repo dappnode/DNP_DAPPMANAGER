@@ -17,10 +17,7 @@ export function parseApmVersionReturn(
     version: res.semanticVersion.join("."),
     // Second argument = true: ignore UTF8 parsing errors
     // Let downstream code identify the content hash as wrong
-    contentUri: ethers.utils.toUtf8String(
-      res.contentURI,
-      ethers.utils.Utf8ErrorFuncs.ignore
-    )
+    contentUri: ethers.utils.toUtf8String(res.contentURI, true)
   };
 }
 

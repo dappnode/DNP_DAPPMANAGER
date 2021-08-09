@@ -1,7 +1,6 @@
 import { DirectoryDnp } from "../../types";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry";
-import { Interface } from "ethers/lib/utils";
 import { isEnsDomain } from "../../utils/validate";
 import { notUndefined } from "../../utils/typingHelpers";
 
@@ -92,7 +91,7 @@ export function sortRegistryPackages(packages: DirectoryDnp[]): DirectoryDnp[] {
 
 /** Parse logs from hexadecimal format*/
 export function getParsedLogs(
-  iface: Interface,
+  iface: ethers.utils.Interface,
   logs: ethers.providers.Log[],
   topic: string
 ): ethers.utils.LogDescription[] {
@@ -110,7 +109,7 @@ export function getArgFromParsedLogs(
   parsedLogs: ethers.utils.LogDescription[],
   argDesiredIndex: number
 ): string[] {
-  const logsResultArray = parsedLogs.map(parsedLog => parsedLog.args);
+  const logsResultArray = parsedLogs.map(parsedLog => parsedLog.values);
 
   const argsDesired: string[] = [];
   for (const logResult of logsResultArray) {
@@ -123,12 +122,16 @@ export function getArgFromParsedLogs(
 }
 
 /** Get a topic from a given event, if either event or topic does not exist then error */
-export function getTopicFromEvent(iface: Interface, eventName: string): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getTopicFromEvent(
+  iface: ethers.utils.Interface,
+  eventName: string
+): string {
   const event = Object.values(iface.events).find(
     eventValue => eventValue.name === eventName
   );
   if (!event) throw Error(`Event ${eventName} not found`);
-  const topic = iface.getEventTopic(event);
+  const topic = event.topic;
   if (!topic) throw Error(`Topic not found on event ${event}`);
   return topic;
 }

@@ -24,7 +24,7 @@ export async function fetchApmVersionsMetadata(
 
   const event = repo.events;
 
-  const topic = repo.getEventTopic(event[0]);
+  const topic = event.topic.topic;
 
   const result = await provider.getLogs({
     address: addressOrEnsName, // or contractEnsName,
@@ -39,11 +39,11 @@ export async function fetchApmVersionsMetadata(
         // Parse values
         const parsedLog = repo.parseLog(log);
 
-        if (!parsedLog || !parsedLog.args)
+        if (!parsedLog || !parsedLog.values)
           throw Error(`Error parsing NewRepo event`);
         // const versionId = parsedLog.values.versionId.toNumber();
         return {
-          version: parsedLog.args.semanticVersion.join("."),
+          version: parsedLog.values.semanticVersion.join("."),
           // Parse tx data
           txHash: log.transactionHash,
           blockNumber: log.blockNumber,
