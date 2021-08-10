@@ -1,40 +1,50 @@
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
 import { listPackages } from "../modules/docker/list";
-import { getRegistry } from "../modules/registry";
 import { eventBus } from "../eventBus";
 import { throttle } from "lodash";
 import { NoImageForArchError } from "../modules/release/errors";
 import { logs } from "../logs";
-import { DirectoryItem } from "../types";
+import { DirectoryItem, DirectoryDnp } from "../types";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
+import { getRegistry } from "../modules/registry";
 
 const defaultEnsName = "public.dappnode.eth";
 
 const loadThrottle = 500; // 0.5 seconds
 
 /**
- * Fetches all package names in the registry SC.
+ * Fetches new repos from registry by scanning the chain
  */
 export async function fetchRegistry({
   addressOrEnsName = defaultEnsName
 }: {
-  addressOrEnsName: string;
+  addressOrEnsName?: string;
 }): Promise<DirectoryItem[]> {
   const provider = await getEthersProvider();
-  const releaseFetcher = new ReleaseFetcher();
+  const registry = await getRegistry(provider, addressOrEnsName);
+  return await fetchRegistryIpfsData(registry);
+}
 
+// Utils
+
+/**
+ *  Get IPFS data from registry packages
+ */
+async function fetchRegistryIpfsData(
+  registry: DirectoryDnp[]
+): Promise<DirectoryItem[]> {
+  const releaseFetcher = new ReleaseFetcher();
   const dnpList = await listPackages();
 
-  const registry = await getRegistry(provider, addressOrEnsName);
   const registryPublicDnps: DirectoryItem[] = [];
 
   let registryDnpsPending: DirectoryItem[] = [];
   // Prevent sending way to many updates in case the fetching process is fast
   const emitRegistryUpdate = throttle(() => {
-    eventBus.directory.emit(registryDnpsPending);
+    eventBus.registry.emit(registryDnpsPending);
     registryDnpsPending = [];
   }, loadThrottle);
 

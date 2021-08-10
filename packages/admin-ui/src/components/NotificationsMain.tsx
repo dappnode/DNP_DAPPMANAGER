@@ -98,14 +98,14 @@ export default function NotificationsView() {
 /**
  * Util component, alert banner that can be closed with an X button
  */
-function AlertDismissible({
+export function AlertDismissible({
   body,
   linkText,
   linkPath
 }: {
   body: string;
-  linkText: string;
-  linkPath: string;
+  linkText?: string;
+  linkPath?: string;
 }) {
   const [show, setShow] = useState(true);
   return show ? (
@@ -116,9 +116,11 @@ function AlertDismissible({
       className="main-notification"
     >
       <RenderMarkdown source={body} />
-      <NavLink to={linkPath}>
-        <Button variant="warning">{linkText}</Button>
-      </NavLink>
+      {linkText && linkPath ? (
+        <NavLink to={linkPath}>
+          <Button variant="warning">{linkText}</Button>
+        </NavLink>
+      ) : null}
     </Alert>
   ) : null;
 }

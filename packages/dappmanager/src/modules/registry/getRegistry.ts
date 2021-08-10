@@ -15,6 +15,9 @@ const blockStepIncrease = 2;
 
 const minDeployBlock = 6312046;
 
+const maxBlocksBehind = 100;
+
+/** Return the newRepos from registry not cached already scanning the chain if necessary. */
 export async function getRegistry(
   provider: ethers.providers.Provider,
   registryEns: string
@@ -23,19 +26,29 @@ export async function getRegistry(
   // TODO: Allow users to introduce the deploy block
   const prevFetchedBlock =
     db.registryLastFetchedBlock.get(registryEns) || minDeployBlock;
-
   const latestBlock = await provider.getBlockNumber();
+  const registryEvents = db.registryEvents.get(registryEns);
 
-  // Persist progress to db
+  // Return cache if is already synced
+  if (registryEvents && isBlockChainScanned(latestBlock, prevFetchedBlock))
+    return getRegistryCached(registryEns);
+
+  // Persist progress to db if does not exist already
   function onEventsProgress(rangeEvents: RegistryNewRepoEvent[]): void {
     if (rangeEvents.length > 0) {
       const cachedLogs = db.registryEvents.get(registryEns) || [];
-      for (const log of rangeEvents) cachedLogs.push(log);
+      const cachedLogsStringify = cachedLogs.map(cachedLog =>
+        JSON.stringify(cachedLog)
+      );
+      for (const log of rangeEvents) {
+        if (!cachedLogsStringify.includes(JSON.stringify(log)))
+          cachedLogs.push(log);
+      }
       db.registryEvents.set(registryEns, cachedLogs);
     }
   }
 
-  await getRegistryOnRange(
+  const registryNotCached = await getRegistryOnRange(
     provider,
     registryEns,
     prevFetchedBlock,
@@ -43,15 +56,7 @@ export async function getRegistry(
     onEventsProgress
   );
 
-  const allEvents = db.registryEvents.get(registryEns) || [];
-
-  return allEvents.map((event, i) => ({
-    name: event.ensName,
-    statusName: "Active",
-    position: i,
-    isFeatured: false,
-    featuredIndex: 0
-  }));
+  return getMockData(sortPackagesByTimestamp(registryNotCached));
 }
 
 export async function getRegistryOnRange(
@@ -148,9 +153,20 @@ export async function getRegistryOnRange(
     }
 
     if (onEvents) onEvents(rangeEvents, [from, to]);
+
+    // Update latest fetched block in db
+    db.registryLastFetchedBlock.set(registryEns, to);
   }
 
   return events;
+}
+
+/** Return the cache from the demmanded registry */
+function getRegistryCached(registryEns: string): DirectoryDnp[] {
+  const registryCached = db.registryEvents.get(registryEns);
+  if (registryCached)
+    return getMockData(sortPackagesByTimestamp(registryCached));
+  return [];
 }
 
 // Utils
@@ -167,4 +183,41 @@ function getTopicFromEvent(
   const topic = event.topic;
   if (!topic) throw Error(`Topic not found on event ${event}`);
   return topic;
+}
+
+/** Return the status of the chain scanned*/
+function isBlockChainScanned(
+  latestBlock: number,
+  prevFetchedBlock: number
+): boolean {
+  {
+    const isSynced = prevFetchedBlock + maxBlocksBehind > latestBlock;
+    return isSynced;
+  }
+}
+
+/** Clean the cache to rescan the chain*/
+function cleanRegistryFromCache(registryEns: string): void {
+  db.registryLastFetchedBlock.set(registryEns, null);
+  db.registryEvents.set(registryEns, []);
+}
+
+/** Sort packages in descendent order by timestamp (newest first) */
+function sortPackagesByTimestamp(
+  packages: RegistryNewRepoEvent[]
+): RegistryNewRepoEvent[] {
+  return packages.sort((a, b) => b.timestamp - a.timestamp);
+}
+
+/** Creates mock data for DnpDirectory */
+function getMockData(registry: RegistryNewRepoEvent[]): DirectoryDnp[] {
+  return registry.map((registryEvent, i) => {
+    return {
+      name: registryEvent.ensName,
+      statusName: "Active",
+      position: i,
+      isFeatured: false,
+      featuredIndex: 0
+    };
+  });
 }

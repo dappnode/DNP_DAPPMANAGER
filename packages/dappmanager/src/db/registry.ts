@@ -12,7 +12,10 @@ export const registryEvents = dbCache.indexedByKey<
   getKey: id => id
 });
 
-export const registryLastFetchedBlock = dbCache.indexedByKey<number, string>({
+export const registryLastFetchedBlock = dbCache.indexedByKey<
+  number | null,
+  string
+>({
   rootKey: REGISTRY_LAST_FETCHED_BLOCK,
   getKey: id => id
 });

@@ -10,7 +10,7 @@ import { RegistryNewRepoEvent } from "../../../src/types";
 describe("APM Registry", () => {
   before("Clear DBs and set remote", async () => {
     // TODO: TEMP - UNCOMMENT AFTER TESTING
-    // clearDbs();
+    clearDbs();
     // Activate remote and fallback to fetch test data without a local node
     await calls.ethClientFallbackSet({ fallback: "on" });
     await calls.ethClientTargetSet({ target: "remote" });

@@ -223,7 +223,7 @@ export interface Routes {
    * Fetch registry summary
    */
   fetchRegistry: (kwargs: {
-    addressOrEnsName: string;
+    addressOrEnsName?: string;
   }) => Promise<DirectoryItem[]>;
 
   /**

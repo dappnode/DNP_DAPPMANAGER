@@ -1,12 +1,19 @@
 import { CoreUpdateDataAvailable, Routes } from "../common";
-import { directory, dnpRequests } from "./data";
+import { directory, registry, dnpRequests } from "./data";
 
 export const fetchPkgsData: Pick<
   Routes,
-  "fetchCoreUpdateData" | "fetchDirectory" | "fetchDnpRequest"
+  "fetchCoreUpdateData" | "fetchDirectory" | "fetchDnpRequest" | "fetchRegistry"
 > = {
   fetchCoreUpdateData: async () => sampleCoreUpdateData,
   fetchDirectory: async () => directory,
+  fetchRegistry: async () => {
+    return await new Promise(resolve => {
+      setTimeout(() => {
+        resolve(registry);
+      }, 10000);
+    });
+  },
   fetchDnpRequest: async ({ id }) => {
     const dnpRequest = dnpRequests[id];
     if (!dnpRequest) throw Error(`No dnp request found for ${id}`);
