@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
 import * as calls from "../../../src/calls";
+import * as db from "../../../src/db";
 import { getRegistryOnRange } from "../../../src/modules/registry";
 import { clearDbs } from "../../testUtils";
 import { RegistryNewRepoEvent } from "../../../src/types";
@@ -15,6 +16,7 @@ describe("APM Registry", () => {
     await calls.ethClientTargetSet({ target: "remote" });
   });
 
+  const publicDappnodeEth = "public.dappnode.eth";
   const provider = new ethers.providers.JsonRpcProvider(
     "https://web3.dappnode.net"
   );
@@ -26,7 +28,7 @@ describe("APM Registry", () => {
     expectedEvents: RegistryNewRepoEvent[];
   }[] = [
     {
-      registryEns: "public.dappnode.eth",
+      registryEns: publicDappnodeEth,
       fromBlock: 8497450,
       toBlock: 8597419,
       expectedEvents: [
@@ -45,7 +47,7 @@ describe("APM Registry", () => {
       ]
     },
     {
-      registryEns: "public.dappnode.eth",
+      registryEns: publicDappnodeEth,
       fromBlock: 12755850,
       toBlock: 12755860,
       expectedEvents: [
@@ -58,7 +60,7 @@ describe("APM Registry", () => {
       ]
     },
     {
-      registryEns: "public.dappnode.eth",
+      registryEns: publicDappnodeEth,
       fromBlock: 12934550,
       toBlock: 12934558,
       expectedEvents: [
@@ -91,13 +93,20 @@ describe("APM Registry", () => {
 
     await getRegistryOnRange(
       provider,
-      "public.dappnode.eth",
+      publicDappnodeEth,
       // 6312046, // Deploy block
       8905883,
       await provider.getBlockNumber(),
       // Log events for sanity during the long wait
-      console.log,
-      console.error
+      (events, range) => {
+        console.log(range, range[1] - range[0], events);
+        if (events.length > 0) {
+          const cachedLogs = db.registryEvents.get(publicDappnodeEth) || [];
+          for (const log of events) cachedLogs.push(log);
+          db.registryEvents.set(publicDappnodeEth, cachedLogs);
+        }
+      },
+      (error, range) => console.log(range, range[1] - range[0], error)
     );
   });
 });

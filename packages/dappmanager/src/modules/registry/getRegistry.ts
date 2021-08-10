@@ -8,7 +8,10 @@ import { wrapError } from "../../utils/wrapError";
 const eventNewRepo = "NewRepo";
 const maxBlocksPerRequest = 100_000;
 const minBlocksPerRequest = 5;
-const blocksStepFactor = 4;
+/** Failures are very slow, decrease size fast to get to a good range fast */
+const blockStepDecrease = 4;
+/** Successes are fast, don't increase too quickly to not trigger failures again too soon */
+const blockStepIncrease = 2;
 
 const minDeployBlock = 6312046;
 
@@ -27,9 +30,8 @@ export async function getRegistry(
   function onEventsProgress(rangeEvents: RegistryNewRepoEvent[]): void {
     if (rangeEvents.length > 0) {
       const cachedLogs = db.registryEvents.get(registryEns) || [];
-      for (const log of rangeEvents) {
-        cachedLogs.push(log);
-      }
+      for (const log of rangeEvents) cachedLogs.push(log);
+      db.registryEvents.set(registryEns, cachedLogs);
     }
   }
 
@@ -103,12 +105,15 @@ export async function getRegistryOnRange(
         throw logsResult.err;
       } else {
         if (onRetry) onRetry(logsResult.err, [from, to]);
-        blockStep = Math.max(blockStep / blocksStepFactor, minBlocksPerRequest);
+        blockStep = Math.max(
+          Math.floor(blockStep / blockStepDecrease),
+          minBlocksPerRequest
+        );
         continue;
       }
     } else {
       // On success, increase step
-      blockStep = Math.min(blockStep * blocksStepFactor, maxBlocksPerRequest);
+      blockStep = Math.min(blockStep * blockStepIncrease, maxBlocksPerRequest);
       latestBlock = to;
     }
 
