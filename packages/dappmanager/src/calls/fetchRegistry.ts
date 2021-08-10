@@ -12,7 +12,6 @@ import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
 
 const defaultEnsName = "public.dappnode.eth";
-const fistBlockPublicRegistry = 6312046;
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -33,12 +32,7 @@ export async function fetchRegistry({
 
   const dnpList = await listPackages();
 
-  const registry = await getRegistry(
-    provider,
-    addressOrEnsName,
-    fromBlock || fistBlockPublicRegistry,
-    toBlock
-  );
+  const registry = await getRegistry(provider, addressOrEnsName);
   const registryPublicDnps: DirectoryItem[] = [];
 
   let registryDnpsPending: DirectoryItem[] = [];

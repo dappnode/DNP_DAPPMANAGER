@@ -145,19 +145,6 @@ export const abi = [
     type: "function"
   },
   {
-    constant: false,
-    inputs: [
-      { name: "_kernel", type: "address" },
-      { name: "_appId", type: "bytes32" },
-      { name: "_initializePayload", type: "bytes" }
-    ],
-    name: "newAppProxyPinned",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
     constant: true,
     inputs: [],
     name: "kernel",
@@ -167,49 +154,12 @@ export const abi = [
     type: "function"
   },
   {
-    constant: false,
-    inputs: [
-      { name: "_kernel", type: "address" },
-      { name: "_appId", type: "bytes32" }
-    ],
-    name: "newAppProxy",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "_kernel", type: "address" },
-      { name: "_appId", type: "bytes32" },
-      { name: "_initializePayload", type: "bytes" }
-    ],
-    name: "newAppProxy",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
-  },
-  {
     constant: true,
     inputs: [{ name: "_script", type: "bytes" }],
     name: "getExecutor",
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function"
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "_kernel", type: "address" },
-      { name: "_appId", type: "bytes32" }
-    ],
-    name: "newAppProxyPinned",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "nonpayable",
     type: "function"
   },
   {

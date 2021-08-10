@@ -40,3 +40,9 @@ export type EthClientSyncedNotificationStatus = {
 export interface DiskUsageThresholds {
   [thresholdId: string]: boolean;
 }
+
+export interface RegistryNewRepoEvent {
+  txHash: string;
+  ensName: string;
+  timestamp: number;
+}

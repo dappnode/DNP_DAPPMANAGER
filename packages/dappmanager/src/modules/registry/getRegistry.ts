@@ -1,151 +1,157 @@
-import { DirectoryDnp } from "../../types";
+import { DirectoryDnp, RegistryNewRepoEvent } from "../../types";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry";
-import { isEnsDomain } from "../../utils/validate";
-import { notUndefined } from "../../utils/typingHelpers";
 import * as db from "../../db";
+import { wrapError } from "../../utils/wrapError";
 
 // Topic name
 const eventNewRepo = "NewRepo";
+const maxBlocksPerRequest = 100_000;
+const minBlocksPerRequest = 5;
+const blocksStepFactor = 4;
 
-// Index of name in logs of Registry SC
-const indexOfPackageName = 1;
+const minDeployBlock = 6312046;
 
 export async function getRegistry(
   provider: ethers.providers.Provider,
-  addressOrEnsName: string,
-  fromBlock?: number,
-  toBlock?: number
+  registryEns: string
 ): Promise<DirectoryDnp[]> {
-  const ensName = await provider.resolveName(addressOrEnsName);
-  if (!ensName) throw Error(`ENS name ${ensName} does not exist`);
-  const registryInterface = new ethers.utils.Interface(abi);
+  // Fetch only from latest fetched block
+  // TODO: Allow users to introduce the deploy block
+  const prevFetchedBlock =
+    db.registryLastFetchedBlock.get(registryEns) || minDeployBlock;
 
-  // Get topic
-  const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
+  const latestBlock = await provider.getBlockNumber();
 
-  let logs: ethers.providers.Log[] = [];
-  if (fromBlock && toBlock)
-    logs = await provider
-      .getLogs({
-        address: addressOrEnsName, // or contractEnsName,
-        fromBlock: fromBlock,
-        toBlock: toBlock,
-        topics: [eventNewRepoTopic]
-      })
-      .catch(e => {
-        e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
-        throw e;
-      });
-  else {
-    // Get block sections to avoid ethers timeout error
-    const latestBlock = await provider.getBlockNumber();
-    const blockSections = getBlocksSections(latestBlock);
-
-    // Get logs from 40000 blocks sections
-    for (const blockSection of blockSections) {
-      const sectionLogs = await provider
-        .getLogs({
-          address: addressOrEnsName, // or contractEnsName,
-          fromBlock: blockSection.fromBlock,
-          toBlock: blockSection.toBlock,
-          topics: [eventNewRepoTopic]
-        })
-        .catch(e => {
-          e.message = ` Error retrieving logs from ${addressOrEnsName}: ${e.message}`;
-          throw e;
-        });
-      logs.push(...sectionLogs);
+  // Persist progress to db
+  function onEventsProgress(rangeEvents: RegistryNewRepoEvent[]): void {
+    if (rangeEvents.length > 0) {
+      const cachedLogs = db.registryEvents.get(registryEns) || [];
+      for (const log of rangeEvents) {
+        cachedLogs.push(log);
+      }
     }
   }
 
-  const parsedLogs = getParsedLogs(registryInterface, logs, eventNewRepoTopic);
-
-  const dappNodePackagesNames = getArgFromParsedLogs(
-    parsedLogs,
-    indexOfPackageName
+  await getRegistryOnRange(
+    provider,
+    registryEns,
+    prevFetchedBlock,
+    latestBlock,
+    onEventsProgress
   );
 
-  const numberOfDAppNodePackages = dappNodePackagesNames.length;
+  const allEvents = db.registryEvents.get(registryEns) || [];
 
-  const registryIds: number[] = [];
-  for (let i = 0; i < numberOfDAppNodePackages; i++) {
-    registryIds.push(i);
+  return allEvents.map((event, i) => ({
+    name: event.ensName,
+    statusName: "Active",
+    position: i,
+    isFeatured: false,
+    featuredIndex: 0
+  }));
+}
+
+export async function getRegistryOnRange(
+  provider: ethers.providers.Provider,
+  registryEns: string,
+  _fromBlock: number,
+  _toBlock: number,
+  onEvents?: (
+    events: RegistryNewRepoEvent[],
+    blockRange: [number, number]
+  ) => void,
+  onRetry?: (e: Error, blockRange: [number, number]) => void
+): Promise<RegistryNewRepoEvent[]> {
+  // TODO: Ensure registryEns is not an address, but an ENS domain
+  const registryAddress = await provider.resolveName(registryEns);
+  if (!registryAddress) {
+    throw Error(`Registry ENS ${registryEns} does not exist`);
   }
 
-  const packages = await Promise.all(
-    registryIds.map(
-      async (i): Promise<DirectoryDnp | undefined> => {
-        const name = createFullPackageName(
-          addressOrEnsName,
-          dappNodePackagesNames[i]
-        );
-        // Make sure the DNP is not Deprecated or Deleted
-        if (!isEnsDomain(name)) return;
+  const registryInterface = new ethers.utils.Interface(abi);
+  const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
 
-        return {
-          name,
-          statusName: "Active",
-          position: i,
-          isFeatured: false,
-          featuredIndex: 0
-        };
+  const events: RegistryNewRepoEvent[] = [];
+
+  // Fetch events in a dynamic step depending on errors
+  // Geth nodes may randomly take much longer to process logs on some sections of the chain
+  let latestBlock = _fromBlock;
+  let blockStep = maxBlocksPerRequest;
+
+  while (latestBlock < _toBlock) {
+    const from = latestBlock;
+    const to = Math.min(latestBlock + blockStep, _toBlock);
+
+    const logsResult = await wrapError(
+      provider
+        .getLogs({
+          address: registryAddress,
+          fromBlock: from,
+          toBlock: to,
+          topics: [eventNewRepoTopic]
+        })
+        .catch(e => {
+          e.message = `Error retrieving logs from ${registryEns} [${from},${to}]: ${e.message}`;
+          throw e;
+        })
+    );
+
+    if (logsResult.err) {
+      // On failure, decrease step
+      if (blockStep <= minBlocksPerRequest) {
+        throw logsResult.err;
+      } else {
+        if (onRetry) onRetry(logsResult.err, [from, to]);
+        blockStep = Math.max(blockStep / blocksStepFactor, minBlocksPerRequest);
+        continue;
       }
-    )
-  );
+    } else {
+      // On success, increase step
+      blockStep = Math.min(blockStep * blocksStepFactor, maxBlocksPerRequest);
+      latestBlock = to;
+    }
 
-  return sortRegistryPackages(packages.filter(notUndefined));
+    const rangeEvents = await Promise.all(
+      logsResult.result.map(async log => {
+        const event = registryInterface.parseLog(log);
+        if (!log.blockNumber) {
+          throw Error(`${eventNewRepo} log has no blockNumber`);
+        }
+        if (!log.transactionHash) {
+          throw Error(
+            `${eventNewRepo} log at ${log.blockNumber} has no txHash`
+          );
+        }
+        if (!event.values) {
+          throw Error(
+            `${eventNewRepo} event at ${log.blockNumber} has no values`
+          );
+        }
+        const name = event.values.name as string;
+        const block = await provider.getBlock(log.blockNumber);
+        return {
+          ensName: `${name}.${registryEns}`,
+          timestamp: block.timestamp,
+          txHash: log.transactionHash
+        };
+      })
+    );
+
+    for (const event of rangeEvents) {
+      events.push(event);
+    }
+
+    if (onEvents) onEvents(rangeEvents, [from, to]);
+  }
+
+  return events;
 }
 
 // Utils
 
-/** Return package fullname with ENS*/
-export function createFullPackageName(
-  ensName: string,
-  packageName: string
-): string {
-  return `${packageName}.${ensName}`;
-}
-
-/** Sort DAppNode packages alphabetically */
-export function sortRegistryPackages(packages: DirectoryDnp[]): DirectoryDnp[] {
-  return packages.sort((a, b) => a.name.localeCompare(b.name));
-}
-
-/** Parse logs from hexadecimal format*/
-export function getParsedLogs(
-  iface: ethers.utils.Interface,
-  logs: ethers.providers.Log[],
-  topic: string
-): ethers.utils.LogDescription[] {
-  const parsedLogs: ethers.utils.LogDescription[] = [];
-  for (const log of logs) {
-    if (!log.topics.find(logTopic => logTopic === topic))
-      throw Error(`Topic ${topic} not found`);
-    parsedLogs.push(iface.parseLog(log));
-  }
-  return parsedLogs;
-}
-
-/** Get args from the log. There must be known the index of the arg to get */
-export function getArgFromParsedLogs(
-  parsedLogs: ethers.utils.LogDescription[],
-  argDesiredIndex: number
-): string[] {
-  const logsResultArray = parsedLogs.map(parsedLog => parsedLog.values);
-
-  const argsDesired: string[] = [];
-  for (const logResult of logsResultArray) {
-    const packageName = logResult[argDesiredIndex];
-    if (packageName && !packageName.includes("0x"))
-      argsDesired.push(packageName);
-  }
-
-  return argsDesired;
-}
-
 /** Get a topic from a given event, if either event or topic does not exist then error */
-export function getTopicFromEvent(
+function getTopicFromEvent(
   iface: ethers.utils.Interface,
   eventName: string
 ): string {
@@ -156,58 +162,4 @@ export function getTopicFromEvent(
   const topic = event.topic;
   if (!topic) throw Error(`Topic not found on event ${event}`);
   return topic;
-}
-
-/** Returns an array of blocks section with size of 40000*/
-export function getBlocksSections(
-  latestBlock: number,
-  fromBlock?: number
-): BlockSections[] {
-  const registryDnp = db.registryDnp.get();
-  const latestBlockFetched =
-    fromBlock ||
-    (registryDnp &&
-      Math.max.apply(
-        null,
-        registryDnp.map(registry => registry.latestBlock)
-      )) ||
-    0;
-
-  const blocksSections: BlockSections[] = [];
-
-  if (latestBlockFetched < latestBlock) {
-    const sectionSize = 40000;
-    const blocksPending = latestBlock - latestBlockFetched;
-
-    let numberOfSections = Math.floor(blocksPending / sectionSize) + 1;
-    const lastSectionSize = blocksPending % sectionSize;
-
-    if (lastSectionSize === 0) numberOfSections--;
-
-    if (numberOfSections === 0)
-      blocksSections.push({
-        fromBlock: latestBlockFetched,
-        toBlock: latestBlock
-      });
-
-    for (let i = 0; i < numberOfSections; i++) {
-      const currentBlock = latestBlockFetched + sectionSize * i;
-      if (i === numberOfSections - 1)
-        blocksSections.push({
-          fromBlock: currentBlock,
-          toBlock: currentBlock + lastSectionSize
-        });
-      else
-        blocksSections.push({
-          fromBlock: currentBlock,
-          toBlock: latestBlockFetched + sectionSize * (i + 1)
-        });
-    }
-  }
-  return blocksSections;
-}
-
-interface BlockSections {
-  fromBlock: number;
-  toBlock: number;
 }

@@ -779,15 +779,6 @@ export interface UserActionLog {
   count?: number;
 }
 
-export interface RegistryDnp {
-  latestBlock: number;
-  data: {
-    transactionHash: string;
-    name: string;
-    timestamp: number;
-  };
-}
-
 /**
  * Auto-update helper types
  */

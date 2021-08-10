@@ -1,9 +1,18 @@
 import { dbCache } from "./dbFactory";
-import { RegistryDnp } from "../types";
+import { RegistryNewRepoEvent } from "../types";
 
-const REGISTRY_DNP = "registry-dnp";
+const REGISTRY_EVENTS = "registry-events";
+const REGISTRY_LAST_FETCHED_BLOCK = "registry-last-fetched-block";
 
-export const registryDnp = dbCache.staticKey<RegistryDnp[] | undefined>(
-  REGISTRY_DNP,
-  []
-);
+export const registryEvents = dbCache.indexedByKey<
+  RegistryNewRepoEvent[],
+  string
+>({
+  rootKey: REGISTRY_EVENTS,
+  getKey: id => id
+});
+
+export const registryLastFetchedBlock = dbCache.indexedByKey<number, string>({
+  rootKey: REGISTRY_LAST_FETCHED_BLOCK,
+  getKey: id => id
+});
