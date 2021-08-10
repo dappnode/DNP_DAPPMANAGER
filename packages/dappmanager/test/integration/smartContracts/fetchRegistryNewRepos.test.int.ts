@@ -87,7 +87,7 @@ describe("APM Registry", () => {
     });
   }
 
-  it.only("Fetch all events from public.dappnode.eth", async function() {
+  it.skip("Fetch all events from public.dappnode.eth", async function() {
     // takes a loooong time
     this.timeout(30 * 60 * 1000);
 

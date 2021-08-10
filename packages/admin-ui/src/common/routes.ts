@@ -224,8 +224,6 @@ export interface Routes {
    */
   fetchRegistry: (kwargs: {
     addressOrEnsName: string;
-    fromBlock?: number;
-    toBlock?: number;
   }) => Promise<DirectoryItem[]>;
 
   /**
