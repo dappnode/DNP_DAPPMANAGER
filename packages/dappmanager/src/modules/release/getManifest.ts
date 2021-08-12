@@ -1,5 +1,5 @@
 import { ipfs } from "../ipfs";
-import { validateManifestBasic } from "../manifest";
+import { parseManifest, validateManifestBasic } from "../manifest";
 import { Manifest } from "../../types";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
@@ -14,5 +14,5 @@ export async function getManifest(contentUri: string): Promise<Manifest> {
     }
   }
 
-  return validateManifestBasic(JSON.parse(data));
+  return validateManifestBasic(parseManifest(data));
 }
