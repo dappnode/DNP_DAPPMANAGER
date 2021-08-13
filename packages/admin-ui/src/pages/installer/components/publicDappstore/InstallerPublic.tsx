@@ -44,11 +44,14 @@ export const InstallerPublic: React.FC<RouteComponentProps> = props => {
   const registryProgress = useApi.fetchRegistryProgress({});
 
   useEffect(() => {
-    while (requestStatus.loading) {
-      setTimeout(() => {
+    const interval = 5000;
+    if (requestStatus.loading) {
+      setInterval(() => {
         registryProgress.revalidate();
-      }, 5000);
+      }, interval);
     }
+
+    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestStatus.loading]);
 
