@@ -16,6 +16,7 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
 export { fetchDirectory } from "./fetchDirectory";
 export { fetchDnpRequest } from "./fetchDnpRequest";
 export { fetchRegistry } from "./fetchRegistry";
+export { fetchRegistryProgress } from "./fetchRegistry";
 export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
 export { ipfsTest } from "./ipfsTest";

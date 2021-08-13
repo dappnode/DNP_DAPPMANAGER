@@ -136,6 +136,11 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
+export interface RegistryScanProgress {
+  lastFetchedBlock: number;
+  latestBlock: number;
+}
+
 export interface RequestStatus {
   loading?: boolean;
   error?: string;

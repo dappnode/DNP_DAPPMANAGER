@@ -3,6 +3,7 @@ import { RegistryNewRepoEvent } from "../types";
 
 const REGISTRY_EVENTS = "registry-events";
 const REGISTRY_LAST_FETCHED_BLOCK = "registry-last-fetched-block";
+const REGISTRY_LAST_PROVIDER_BLOCK = "registry-last-block";
 
 export const registryEvents = dbCache.indexedByKey<
   RegistryNewRepoEvent[],
@@ -19,3 +20,8 @@ export const registryLastFetchedBlock = dbCache.indexedByKey<
   rootKey: REGISTRY_LAST_FETCHED_BLOCK,
   getKey: id => id
 });
+
+export const registryLastProviderBlock = dbCache.staticKey<number | null>(
+  REGISTRY_LAST_PROVIDER_BLOCK,
+  null
+);

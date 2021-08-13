@@ -13,21 +13,27 @@ const blockStepDecrease = 4;
 /** Successes are fast, don't increase too quickly to not trigger failures again too soon */
 const blockStepIncrease = 2;
 
-const minDeployBlock = 6312046;
-
 const maxBlocksBehind = 100;
 
 /** Return the newRepos from registry not cached already scanning the chain if necessary. */
 export async function getRegistry(
   provider: ethers.providers.Provider,
-  registryEns: string
+  registryEns: string,
+  fromBlock: number
 ): Promise<DirectoryDnp[]> {
   // Fetch only from latest fetched block
   // TODO: Allow users to introduce the deploy block
+
+  // Get from and to blocks
   const prevFetchedBlock =
-    db.registryLastFetchedBlock.get(registryEns) || minDeployBlock;
+    db.registryLastFetchedBlock.get(registryEns) || fromBlock;
   const latestBlock = await provider.getBlockNumber();
+
+  // Get registry cache
   const registryEvents = db.registryEvents.get(registryEns);
+
+  // Update latest chain block in cache
+  db.registryLastProviderBlock.set(latestBlock);
 
   // Return cache if is already synced
   if (registryEvents && isBlockChainScanned(latestBlock, prevFetchedBlock))

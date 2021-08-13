@@ -5,26 +5,56 @@ import { eventBus } from "../eventBus";
 import { throttle } from "lodash";
 import { NoImageForArchError } from "../modules/release/errors";
 import { logs } from "../logs";
-import { DirectoryItem, DirectoryDnp } from "../types";
+import { DirectoryItem, DirectoryDnp, RegistryScanProgress } from "../types";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
 import { getRegistry } from "../modules/registry";
+import * as db from "../db";
 
 const defaultEnsName = "public.dappnode.eth";
+const minDeployBlock = 6312046;
 
 const loadThrottle = 500; // 0.5 seconds
+
+/**
+ * Return last block and last fetched block
+ * to show progress in the UI
+ */
+export async function fetchRegistryProgress({
+  addressOrEnsName = defaultEnsName,
+  fromBlock = minDeployBlock
+}: {
+  addressOrEnsName?: string;
+  fromBlock?: number;
+}): Promise<RegistryScanProgress> {
+  const lastFetchedBlock =
+    db.registryLastFetchedBlock.get(addressOrEnsName) || fromBlock;
+
+  let latestBlock = db.registryLastProviderBlock.get();
+  if (!latestBlock) {
+    const provider = await getEthersProvider();
+    latestBlock = await provider.getBlockNumber();
+  }
+
+  return {
+    lastFetchedBlock,
+    latestBlock
+  };
+}
 
 /**
  * Fetches new repos from registry by scanning the chain
  */
 export async function fetchRegistry({
-  addressOrEnsName = defaultEnsName
+  addressOrEnsName = defaultEnsName,
+  fromBlock = minDeployBlock
 }: {
   addressOrEnsName?: string;
+  fromBlock?: number;
 }): Promise<DirectoryItem[]> {
   const provider = await getEthersProvider();
-  const registry = await getRegistry(provider, addressOrEnsName);
+  const registry = await getRegistry(provider, addressOrEnsName, fromBlock);
   return await fetchRegistryIpfsData(registry);
 }
 
