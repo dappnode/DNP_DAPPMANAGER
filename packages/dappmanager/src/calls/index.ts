@@ -13,6 +13,7 @@ export * from "./dockerUpdate";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet";
 export { ethClientTargetSet } from "./ethClientTargetSet";
 export { ethClientFallbackSet } from "./ethClientFallbackSet";
+export { ethClientsGet } from "./ethClientsGet";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData";
 export { fetchDirectory } from "./fetchDirectory";
 export { fetchDnpRequest } from "./fetchDnpRequest";
