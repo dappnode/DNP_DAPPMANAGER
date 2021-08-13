@@ -176,8 +176,8 @@ export const InstallerPublic: React.FC<RouteComponentProps> = props => {
       ) : requestStatus.loading ? (
         <Loading
           steps={[
-            `Loading DAppNode Packages ${registryProgress.data &&
-              `${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
+            `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
+              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
           ]}
         />
       ) : requestStatus.success ? (
