@@ -39,6 +39,8 @@ export async function packageSetEnvironment({
   // Packages sharing namespace (pid) MUST be treated as one container
   if (packageInstalledHasPid(dnp)) {
     const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    if (!composePath)
+      throw Error(`Not able to find compose path for dnp: ${dnpName}`);
     await dockerComposeUp(composePath, { forceRecreate: true });
   } else {
     const containersStatus = await getContainersStatus({ dnpName });

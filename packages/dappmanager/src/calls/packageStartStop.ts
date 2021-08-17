@@ -43,6 +43,8 @@ export async function packageStartStop({
   // Packages sharing namespace (pid) MUST be treated as one container
   if (packageInstalledHasPid(dnp)) {
     const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    if (!composePath)
+      throw Error(`Not able to find compose path for dnp: ${dnpName}`);
     // Stop if all services are running
     if (dnp.containers.every(container => container.running))
       await dockerComposeStop(composePath);

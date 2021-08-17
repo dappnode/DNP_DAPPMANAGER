@@ -54,6 +54,8 @@ export async function packageSetPortMappings({
   try {
     // Packages sharing namespace (pid) MUST be treated as one container
     if (packageInstalledHasPid(dnp)) {
+      if (!compose.composePath)
+        throw Error(`Not able to find compose path for dnp: ${dnpName}`);
       await dockerComposeUp(compose.composePath, { forceRecreate: true });
     } else {
       await dockerComposeUpPackage({ dnpName }, containersStatus);
