@@ -1,11 +1,12 @@
 import React from "react";
-import { ethers } from "ethers";
 import CardList from "components/CardList";
 import { useApi } from "api";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import Alert from "react-bootstrap/esm/Alert";
-
+import { EthClientWalletOk } from "common";
+import Button from "components/Button";
+import { prettyDnpName } from "utils/format";
 declare global {
   interface Window {
     ethereum: any;
@@ -15,9 +16,35 @@ declare global {
 export default function ConnectWallet() {
   const ethClients = useApi.ethClientsGet();
 
-  async function connectWallet() {
-    await window.ethereum.enable();
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+  async function walletConnect(ethClient: EthClientWalletOk) {
+    // TODO: add testnets ethclients. Chain ID will change: https://chainlist.org/
+    if (ethClient.ok) {
+      try {
+        // https://eips.ethereum.org/EIPS/eip-3326
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0xf00" }]
+        });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          try {
+            // https://eips.ethereum.org/EIPS/eip-3085
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              // IMPORTANT! RPC without HTTPs is not allowed
+              // IMPORTANT! Add new chains with a default chain ID in metamask is not allowed
+              params: [{ chainId: ethClient.chainId, rpcUrls: [ethClient.url] }]
+            });
+          } catch (addError) {
+            // handle "add" error
+            throw addError;
+          }
+        }
+        // handle other "switch" errors
+        throw switchError;
+      }
+    }
   }
 
   if (ethClients.error)
@@ -34,9 +61,20 @@ export default function ConnectWallet() {
           </Alert>
         ) : (
           <CardList className="connect-wallet">
-            {ethClients.data.map(ethClient => (
-              <span></span>
-            ))}
+            {ethClients.data.map(
+              ethClient =>
+                ethClient.ok && (
+                  <div className="connect-wallet-item">
+                    <span>{prettyDnpName(ethClient.dnpName)}</span>
+                    <Button
+                      variant="dappnode"
+                      onClick={() => walletConnect(ethClient)}
+                    >
+                      Connect
+                    </Button>
+                  </div>
+                )
+            )}
           </CardList>
         )}
       </div>

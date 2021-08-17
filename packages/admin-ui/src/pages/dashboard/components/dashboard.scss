@@ -27,7 +27,8 @@
     grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
   }
 
-  .package-updates {
+  .package-updates,
+  .connect-wallet {
     // Give the single card a max width that matches the other cards
     grid-column: 1 / 4;
   }
@@ -76,7 +77,8 @@
 
 // Package updates card
 
-.package-update-item {
+.package-update-item,
+.connect-wallet-item {
   display: flex;
   justify-content: space-between;
   align-items: center;

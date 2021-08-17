@@ -1022,9 +1022,13 @@ export enum EthClientRemote {
 
 export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
 
+export type EthClientWallet = EthClientWalletOk | EthClientStatusError;
+
 export type EthClientStatusOk =
   // All okay, client is functional
   { ok: true; url: string; dnpName: string };
+
+export type EthClientWalletOk = EthClientStatusOk & { chainId: string };
 
 export type EthClientStatusError =
   // Unexpected error

@@ -1,3 +1,5 @@
-import { EthClient } from "../types";
+import { EthClientWallet } from "../types";
 
-export async function ethClientsGet(): Promise<EthClient[]> {}
+export async function ethClientsGet(): Promise<EthClientWallet[]> {
+  return [];
+}
