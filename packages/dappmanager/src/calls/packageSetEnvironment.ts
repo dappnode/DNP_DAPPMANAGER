@@ -5,7 +5,8 @@ import { ComposeFileEditor } from "../modules/compose/editor";
 import {
   getContainersStatus,
   dockerComposeUpPackage,
-  dockerComposeUp
+  dockerComposeUp,
+  dockerComposeRm
 } from "../modules/docker";
 import { packageInstalledHasPid } from "../modules/compose/pid";
 
@@ -41,6 +42,9 @@ export async function packageSetEnvironment({
     const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
     if (!composePath)
       throw Error(`Not able to find compose path for dnp: ${dnpName}`);
+    // Editing envs for the service sharing the PID will result into critical errors
+    // First remove the existing containers and then recreate them
+    await dockerComposeRm(composePath);
     await dockerComposeUp(composePath, { forceRecreate: true });
   } else {
     const containersStatus = await getContainersStatus({ dnpName });
