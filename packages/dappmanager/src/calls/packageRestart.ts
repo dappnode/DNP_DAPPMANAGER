@@ -30,11 +30,10 @@ export async function packageRestart({
     return await restartDappmanagerPatch({ composePath });
   }
 
-  // `docker-compose up --force-recreate` whole package if pid
-  // present in compose, otherwise it will crashed
+  // Packages sharing namespace (pid) MUST be treated as one container
   if (packageInstalledHasPid(dnp)) {
-    const composePath = new ComposeFileEditor(dnpName, dnp.isCore);
-    await dockerComposeUp(composePath.composePath, { forceRecreate: true });
+    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    await dockerComposeUp(composePath, { forceRecreate: true });
   } else {
     const targetContainers = dnp.containers.filter(
       c => !serviceNames || serviceNames.includes(c.serviceName)

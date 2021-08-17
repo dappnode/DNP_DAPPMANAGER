@@ -1,7 +1,13 @@
 import { listPackage } from "../modules/docker/list";
-import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
+import {
+  dockerContainerStop,
+  dockerContainerStart,
+  dockerComposeUp
+} from "../modules/docker";
 import { eventBus } from "../eventBus";
 import params from "../params";
+import { packageInstalledHasPid } from "../modules/compose/pid";
+import { ComposeFileEditor } from "../modules/compose/editor";
 
 const dnpsAllowedToStop = [
   params.ipfsDnpName,
@@ -32,27 +38,33 @@ export async function packageStartStop({
     }
   }
 
-  const targetContainers = dnp.containers.filter(
-    c => !serviceNames || serviceNames.includes(c.serviceName)
-  );
-
-  if (targetContainers.length === 0) {
-    const queryId = [dnpName, ...(serviceNames || [])].join(", ");
-    throw Error(`No targetContainers found for ${queryId}`);
-  }
-
-  if (targetContainers.every(container => container.running)) {
-    await Promise.all(
-      targetContainers.map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
-    );
+  // Packages sharing namespace (pid) MUST be treated as one container
+  if (packageInstalledHasPid(dnp)) {
+    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    await dockerComposeUp(composePath, { forceRecreate: true });
   } else {
-    await Promise.all(
-      targetContainers.map(async container =>
-        dockerContainerStart(container.containerName)
-      )
+    const targetContainers = dnp.containers.filter(
+      c => !serviceNames || serviceNames.includes(c.serviceName)
     );
+
+    if (targetContainers.length === 0) {
+      const queryId = [dnpName, ...(serviceNames || [])].join(", ");
+      throw Error(`No targetContainers found for ${queryId}`);
+    }
+
+    if (targetContainers.every(container => container.running)) {
+      await Promise.all(
+        targetContainers.map(async c =>
+          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+        )
+      );
+    } else {
+      await Promise.all(
+        targetContainers.map(async container =>
+          dockerContainerStart(container.containerName)
+        )
+      );
+    }
   }
 
   // Emit packages update

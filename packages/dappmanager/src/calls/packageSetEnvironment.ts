@@ -2,7 +2,12 @@ import { PackageEnvs } from "../types";
 import { eventBus } from "../eventBus";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
+import {
+  getContainersStatus,
+  dockerComposeUpPackage,
+  dockerComposeUp
+} from "../modules/docker";
+import { packageInstalledHasPid } from "../modules/compose/pid";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -31,8 +36,14 @@ export async function packageSetEnvironment({
 
   compose.write();
 
-  const containersStatus = await getContainersStatus({ dnpName });
-  await dockerComposeUpPackage({ dnpName }, containersStatus);
+  // Packages sharing namespace (pid) MUST be treated as one container
+  if (packageInstalledHasPid(dnp)) {
+    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    await dockerComposeUp(composePath, { forceRecreate: true });
+  } else {
+    const containersStatus = await getContainersStatus({ dnpName });
+    await dockerComposeUpPackage({ dnpName }, containersStatus);
+  }
 
   // Emit packages update
   eventBus.requestPackages.emit();

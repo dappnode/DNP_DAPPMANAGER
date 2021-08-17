@@ -9,9 +9,12 @@ import {
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
-  getContainersAndVolumesToRemove
+  getContainersAndVolumesToRemove,
+  dockerComposeUp
 } from "../modules/docker";
 import { listPackage } from "../modules/docker/list";
+import { packageInstalledHasPid } from "../modules/compose/pid";
+import { ComposeFileEditor } from "../modules/compose/editor";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -67,7 +70,15 @@ export async function packageRestartVolumes({
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
-  await dockerComposeUpPackage({ dnpName }, containersStatus);
+
+  // Packages sharing namespace (pid) MUST be treated as one container
+  if (packageInstalledHasPid(dnp)) {
+    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
+    await dockerComposeUp(composePath, { forceRecreate: true });
+  } else {
+    await dockerComposeUpPackage({ dnpName }, containersStatus);
+  }
+
   if (err) {
     throw err;
   }
