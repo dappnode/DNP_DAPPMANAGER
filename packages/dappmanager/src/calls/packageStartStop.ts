@@ -2,6 +2,8 @@ import { listPackage } from "../modules/docker/list";
 import {
   dockerContainerStop,
   dockerContainerStart,
+  dockerComposeStop,
+  dockerComposeStart,
   dockerComposeUp
 } from "../modules/docker";
 import { eventBus } from "../eventBus";
@@ -41,7 +43,14 @@ export async function packageStartStop({
   // Packages sharing namespace (pid) MUST be treated as one container
   if (packageInstalledHasPid(dnp)) {
     const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
-    await dockerComposeUp(composePath, { forceRecreate: true });
+    // Stop if all services are running
+    if (dnp.containers.every(container => container.running))
+      await dockerComposeStop(composePath);
+    // Start if all services are stopped
+    else if (dnp.containers.every(container => !container.running))
+      await dockerComposeStart(composePath);
+    // Otherwise recreate containers
+    else await dockerComposeUp(composePath, { forceRecreate: true });
   } else {
     const targetContainers = dnp.containers.filter(
       c => !serviceNames || serviceNames.includes(c.serviceName)
