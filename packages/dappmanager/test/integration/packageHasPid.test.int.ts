@@ -1,10 +1,10 @@
 import "mocha";
 import { expect } from "chai";
-import { mockPackageData, mockDnp } from "../../testUtils";
+import { mockPackageData, mockDnp } from "../testUtils";
 import {
   packageToInstallHasPid,
   packageInstalledHasPid
-} from "../../../src/modules/compose/pid";
+} from "../../src/modules/compose/pid";
 
 describe("Module > compose > pid", () => {
   it("Should return false because compose to install does not contains pid", () => {
