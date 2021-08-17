@@ -1,12 +1,59 @@
 import "mocha";
+import fs from "fs";
 import { expect } from "chai";
-import { mockPackageData, mockDnp } from "../testUtils";
+import { mockPackageData, shellSafe } from "../testUtils";
 import {
   packageToInstallHasPid,
   packageInstalledHasPid
 } from "../../src/modules/compose/pid";
+import { InstalledPackageData } from "../../src/types";
 
 describe("Module > compose > pid", () => {
+  // Example package
+  const dnpName = "erigon.dnp.dappnode.eth";
+  const dnpErigonPath = process.cwd() + "/dnp_repo/" + dnpName;
+  const erigonCompose = `
+version: "3.4"
+services:
+  erigon:
+    image: "erigon.erigon.dnp.dappnode.eth:0.1.0"
+    build:
+      context: erigon
+      args:
+        UPSTREAM_VERSION: v2021.07.05
+    ports:
+      - 30303/tcp
+      - 30303/udp
+      - 30304/tcp
+      - 30304/udp
+    restart: unless-stopped
+    volumes:
+      - "data:/home/erigon/.local/share/erigon"
+    environment:
+      ERIGON_EXTRA_OPTS: ""
+  rpcdaemon:
+    image: "rpcdaemon.erigon.dnp.dappnode.eth:0.1.0"
+    build:
+      context: rpcdaemon
+      args:
+        UPSTREAM_VERSION: v2021.07.05
+    pid: "service:erigon"
+    environment:
+      RPCDAEMON_EXTRA_OPTS: "--http.api=eth,debug,net,web3"
+    restart: unless-stopped
+    volumes:
+      - "data:/home/erigon/.local/share/erigon"
+volumes:
+  data: {}
+`;
+
+  before("Create random compose to be analyzed", async () => {
+    // Create necessary dir
+    await shellSafe(`mkdir -p ${dnpErigonPath}`);
+    // Create example compose
+    fs.writeFileSync(`${dnpErigonPath}/docker-compose.yml`, erigonCompose);
+  });
+
   it("Should return false because compose to install does not contains pid", () => {
     expect(packageToInstallHasPid(mockPackageData)).to.deep.equal(false);
   });
@@ -46,7 +93,18 @@ describe("Module > compose > pid", () => {
     expect(packageToInstallHasPid(examplePackage)).to.deep.equal(true);
   });
 
-  it("Should return false because compose installed does not contain pid", () => {
-    expect(packageInstalledHasPid(mockDnp)).to.deep.equal(false);
+  it("Should return true because erigon compose installed contains pid", () => {
+    const packageData: InstalledPackageData = {
+      dnpName,
+      instanceName: "",
+      version: "0.0.0",
+      isDnp: true,
+      isCore: false,
+      dependencies: {},
+      origin: "",
+      avatarUrl: "",
+      containers: []
+    };
+    expect(packageInstalledHasPid(packageData)).to.deep.equal(true);
   });
 });
