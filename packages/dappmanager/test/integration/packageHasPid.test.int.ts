@@ -96,10 +96,12 @@ volumes:
 
   it("Should return the target pid service", () => {
     const compose = new ComposeFileEditor(dnpName, false);
-    const expectedResult: ComposeServiceSharingPid = {
-      targetPidService: "erigon",
-      serviceWithPid: "rpcdaemon"
-    };
+    const expectedResult: ComposeServiceSharingPid[] = [
+      {
+        targetPidService: "erigon",
+        serviceWithPid: "rpcdaemon"
+      }
+    ];
     expect(getServicesSharingPid(compose.compose)).to.deep.equal(
       expectedResult
     );
