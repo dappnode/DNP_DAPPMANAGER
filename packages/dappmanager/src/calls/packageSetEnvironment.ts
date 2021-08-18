@@ -2,13 +2,7 @@ import { PackageEnvs } from "../types";
 import { eventBus } from "../eventBus";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import {
-  getContainersStatus,
-  dockerComposeUpPackage,
-  dockerComposeUp,
-  dockerComposeRm
-} from "../modules/docker";
-import { packageInstalledHasPid } from "../modules/compose/pid";
+import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -37,19 +31,8 @@ export async function packageSetEnvironment({
 
   compose.write();
 
-  // Packages sharing namespace (pid) MUST be treated as one container
-  if (packageInstalledHasPid(dnp)) {
-    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
-    if (!composePath)
-      throw Error(`Not able to find compose path for dnp: ${dnpName}`);
-    // Editing envs for the service sharing the PID will result into critical errors
-    // First remove the existing containers and then recreate them
-    await dockerComposeRm(composePath);
-    await dockerComposeUp(composePath, { forceRecreate: true });
-  } else {
-    const containersStatus = await getContainersStatus({ dnpName });
-    await dockerComposeUpPackage({ dnpName }, containersStatus);
-  }
+  const containersStatus = await getContainersStatus({ dnpName });
+  await dockerComposeUpPackage({ dnpName }, containersStatus);
 
   // Emit packages update
   eventBus.requestPackages.emit();

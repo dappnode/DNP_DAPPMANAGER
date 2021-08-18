@@ -696,6 +696,11 @@ export interface Compose {
   volumes?: ComposeVolumes;
 }
 
+export interface ComposeServiceSharingPid {
+  targetPidService: string;
+  serviceWithPid: string;
+}
+
 export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;

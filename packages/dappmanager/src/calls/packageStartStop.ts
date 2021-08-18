@@ -1,14 +1,11 @@
 import { listPackage } from "../modules/docker/list";
-import {
-  dockerContainerStop,
-  dockerContainerStart,
-  dockerComposeStop,
-  dockerComposeStart,
-  dockerComposeUp
-} from "../modules/docker";
+import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
 import { eventBus } from "../eventBus";
 import params from "../params";
-import { packageInstalledHasPid } from "../modules/compose/pid";
+import {
+  packageInstalledHasPid,
+  pushDependantPidContainers
+} from "../utils/pid";
 import { ComposeFileEditor } from "../modules/compose/editor";
 
 const dnpsAllowedToStop = [
@@ -31,6 +28,7 @@ export async function packageStartStop({
   if (!dnpName) throw Error("kwarg containerName must be defined");
 
   const dnp = await listPackage({ dnpName });
+  const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
   if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     if (dnpsAllowedToStop.includes(dnp.dnpName)) {
@@ -40,42 +38,36 @@ export async function packageStartStop({
     }
   }
 
-  // Packages sharing namespace (pid) MUST be treated as one container
-  if (packageInstalledHasPid(dnp)) {
-    const { composePath } = new ComposeFileEditor(dnpName, dnp.isCore);
-    if (!composePath)
-      throw Error(`Not able to find compose path for dnp: ${dnpName}`);
-    // Stop if all services are running
-    if (dnp.containers.every(container => container.running))
-      await dockerComposeStop(composePath);
-    // Start if all services are stopped
-    else if (dnp.containers.every(container => !container.running))
-      await dockerComposeStart(composePath);
-    // Otherwise recreate containers
-    else await dockerComposeUp(composePath, { forceRecreate: true });
-  } else {
-    const targetContainers = dnp.containers.filter(
-      c => !serviceNames || serviceNames.includes(c.serviceName)
+  let targetContainers = dnp.containers.filter(
+    c => !serviceNames || serviceNames.includes(c.serviceName)
+  );
+
+  if (targetContainers.length === 0) {
+    const queryId = [dnpName, ...(serviceNames || [])].join(", ");
+    throw Error(`No targetContainers found for ${queryId}`);
+  }
+
+  // Push dependandt PID containers if needed
+  if (packageInstalledHasPid(compose)) {
+    targetContainers = pushDependantPidContainers(
+      compose,
+      dnp,
+      targetContainers
     );
+  }
 
-    if (targetContainers.length === 0) {
-      const queryId = [dnpName, ...(serviceNames || [])].join(", ");
-      throw Error(`No targetContainers found for ${queryId}`);
-    }
-
-    if (targetContainers.every(container => container.running)) {
-      await Promise.all(
-        targetContainers.map(async c =>
-          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-        )
-      );
-    } else {
-      await Promise.all(
-        targetContainers.map(async container =>
-          dockerContainerStart(container.containerName)
-        )
-      );
-    }
+  if (targetContainers.every(container => container.running)) {
+    await Promise.all(
+      targetContainers.map(async c =>
+        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+      )
+    );
+  } else {
+    await Promise.all(
+      targetContainers.map(async container =>
+        dockerContainerStart(container.containerName)
+      )
+    );
   }
 
   // Emit packages update

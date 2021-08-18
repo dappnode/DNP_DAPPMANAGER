@@ -4,9 +4,10 @@ import { expect } from "chai";
 import { mockPackageData, shellSafe } from "../testUtils";
 import {
   packageToInstallHasPid,
-  packageInstalledHasPid
-} from "../../src/modules/compose/pid";
-import { InstalledPackageData } from "../../src/types";
+  getServicesSharingPid
+} from "../../src/utils/pid";
+import { ComposeFileEditor } from "../../src/modules/compose/editor";
+import { ComposeServiceSharingPid } from "../../src/types";
 
 describe("Module > compose > pid", () => {
   // Example package
@@ -93,18 +94,14 @@ volumes:
     expect(packageToInstallHasPid(examplePackage)).to.deep.equal(true);
   });
 
-  it("Should return true because erigon compose installed contains pid", () => {
-    const packageData: InstalledPackageData = {
-      dnpName,
-      instanceName: "",
-      version: "0.0.0",
-      isDnp: true,
-      isCore: false,
-      dependencies: {},
-      origin: "",
-      avatarUrl: "",
-      containers: []
+  it("Should return the target pid service", () => {
+    const compose = new ComposeFileEditor(dnpName, false);
+    const expectedResult: ComposeServiceSharingPid = {
+      targetPidService: "erigon",
+      serviceWithPid: "rpcdaemon"
     };
-    expect(packageInstalledHasPid(packageData)).to.deep.equal(true);
+    expect(getServicesSharingPid(compose.compose)).to.deep.equal(
+      expectedResult
+    );
   });
 });

@@ -4,12 +4,7 @@ import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { PortMapping } from "../types";
 import { mapValues } from "lodash";
-import {
-  getContainersStatus,
-  dockerComposeUpPackage,
-  dockerComposeUp
-} from "../modules/docker";
-import { packageInstalledHasPid } from "../modules/compose/pid";
+import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -52,14 +47,7 @@ export async function packageSetPortMappings({
   const containersStatus = await getContainersStatus({ dnpName });
 
   try {
-    // Packages sharing namespace (pid) MUST be treated as one container
-    if (packageInstalledHasPid(dnp)) {
-      if (!compose.composePath)
-        throw Error(`Not able to find compose path for dnp: ${dnpName}`);
-      await dockerComposeUp(compose.composePath, { forceRecreate: true });
-    } else {
-      await dockerComposeUpPackage({ dnpName }, containersStatus);
-    }
+    await dockerComposeUpPackage({ dnpName }, containersStatus);
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
@@ -70,11 +58,7 @@ export async function packageSetPortMappings({
           services[serviceName].setPortMapping(portMappings);
       compose.write();
 
-      if (packageInstalledHasPid(dnp)) {
-        await dockerComposeUp(compose.composePath, { forceRecreate: true });
-      } else {
-        await dockerComposeUpPackage({ dnpName }, containersStatus);
-      }
+      await dockerComposeUpPackage({ dnpName }, containersStatus);
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(

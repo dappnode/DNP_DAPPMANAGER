@@ -7,7 +7,7 @@ import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
-import { packageToInstallHasPid } from "../compose/pid";
+import { packageToInstallHasPid } from "../../utils/pid";
 
 /**
  * Create and run each package container in series
