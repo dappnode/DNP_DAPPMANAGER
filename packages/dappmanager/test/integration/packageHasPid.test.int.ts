@@ -7,7 +7,7 @@ import {
   getServicesSharingPid
 } from "../../src/utils/pid";
 import { ComposeFileEditor } from "../../src/modules/compose/editor";
-import { ComposeServiceSharingPid } from "../../src/types";
+import { ComposeServicesSharingPid } from "../../src/types";
 
 describe("Module > compose > pid", () => {
   // Example package
@@ -94,14 +94,13 @@ volumes:
     expect(packageToInstallHasPid(examplePackage)).to.deep.equal(true);
   });
 
-  it("Should return the target pid service", () => {
+  it.only("Should return the services sharing pid", () => {
     const compose = new ComposeFileEditor(dnpName, false);
-    const expectedResult: ComposeServiceSharingPid[] = [
-      {
-        targetPidService: "erigon",
-        serviceWithPid: "rpcdaemon"
-      }
-    ];
+    const expectedResult: ComposeServicesSharingPid = {
+      targetPidServices: ["erigon"],
+      dependantPidServices: ["rpcdaemon"]
+    };
+
     expect(getServicesSharingPid(compose.compose)).to.deep.equal(
       expectedResult
     );

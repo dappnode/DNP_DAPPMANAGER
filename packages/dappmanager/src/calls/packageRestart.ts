@@ -2,11 +2,12 @@ import fs from "fs";
 import params from "../params";
 import { eventBus } from "../eventBus";
 import * as getPath from "../utils/getPath";
-import { dockerContainerRestart, dockerComposeUp } from "../modules/docker";
+import { dockerContainerRestart } from "../modules/docker";
 import { listPackage } from "../modules/docker/list";
 import { restartDappmanagerPatch } from "../modules/installer/restartPatch";
-import { packageInstalledHasPid, getServicesSharingPid } from "../utils/pid";
+import { getServicesSharingPid } from "../utils/pid";
 import { ComposeFileEditor } from "../modules/compose/editor";
+import { PackageContainer } from "../types";
 
 /**
  * Recreates a package containers
@@ -22,7 +23,6 @@ export async function packageRestart({
 
   const dnp = await listPackage({ dnpName });
   const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
-  let isPidTargetServiceIncluded = false;
 
   // DAPPMANAGER patch
   if (dnp.dnpName === params.dappmanagerDnpName) {
@@ -41,31 +41,37 @@ export async function packageRestart({
     throw Error(`No targetContainers found for ${queryId}`);
   }
 
-  // Check if targetService contains pid
-  if (packageInstalledHasPid(compose)) {
-    const servicesSharingPid = getServicesSharingPid(compose);
-    isPidTargetServiceIncluded = targetContainers.some(tc =>
-      servicesSharingPid
-        .map(service => service.targetPidService)
-        .includes(tc.serviceName)
-    );
-  }
+  const servicesSharingPid = getServicesSharingPid(compose, targetContainers);
 
-  if (isPidTargetServiceIncluded) {
-    // If the target PID service will be restartedt, the whole package must be recreated
-    const composePath = getPath.dockerComposeSmart(dnpName);
-    if (!fs.existsSync(composePath))
-      throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
-    await dockerComposeUp(composePath);
-  } else {
-    await Promise.all(
-      targetContainers.map(async c =>
-        dockerContainerRestart(c.containerName, { timeout: c.dockerTimeout })
-      )
+  if (servicesSharingPid) {
+    // First restart targetPid services (Process MUST exist)
+    const targetContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.targetPidServices.includes(c.serviceName)
     );
+    await containersRestart(targetContainersPid);
+
+    // Second restart dependandtPidServices (Process exists)
+    const dependantContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.dependantPidServices.includes(c.serviceName)
+    );
+    await containersRestart(dependantContainersPid);
+  } else {
+    await containersRestart(targetContainers);
   }
 
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnpName] });
+}
+
+// Utils
+
+async function containersRestart(
+  targetContainers: PackageContainer[]
+): Promise<void> {
+  await Promise.all(
+    targetContainers.map(async c =>
+      dockerContainerRestart(c.containerName, { timeout: c.dockerTimeout })
+    )
+  );
 }

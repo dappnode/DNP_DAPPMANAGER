@@ -1,8 +1,7 @@
 import {
   InstallPackageData,
   Compose,
-  ComposeServiceSharingPid,
-  InstalledPackageData,
+  ComposeServicesSharingPid,
   PackageContainer
 } from "../types";
 
@@ -27,56 +26,55 @@ export function packageInstalledHasPid(compose: Compose): boolean {
   return false;
 }
 
+export function isTargetPidServiceIncluded(
+  targetContainers: PackageContainer[],
+  targetPidServices: string[]
+): boolean {
+  return targetContainers.some(tc =>
+    targetPidServices.includes(tc.serviceName)
+  );
+}
+
 /**
  * Get the target service of the pid feature
  * - Return the target service if found
  * - Return empty string if not found
  */
 export function getServicesSharingPid(
-  compose: Compose
-): ComposeServiceSharingPid[] {
-  const composeServiceWithPid: ComposeServiceSharingPid[] = [];
-
-  for (const [index, service] of Object.values(compose.services).entries()) {
-    if (service.pid) {
-      // Pid MUST be present in compose in the format   pid: service:erigon
-      const targetPidService = service.pid.split(":")[1];
-      const serviceWithPid = Object.keys(compose.services)[index];
-
-      // Ensure targetPidService is well formatted and exists in compose
-      if (!targetPidService)
-        throw Error(`target pid service in wrong format: ${targetPidService}`);
-      if (!Object.keys(compose.services).includes(targetPidService))
-        throw Error(
-          `target pid service ${targetPidService} not found in the compose`
-        );
-
-      composeServiceWithPid.push({ targetPidService, serviceWithPid });
-    }
-  }
-  return composeServiceWithPid;
-}
-
-export function pushDependantPidContainers(
   compose: Compose,
-  dnp: InstalledPackageData,
-  targetContainers: PackageContainer[]
-): PackageContainer[] {
-  const servicesSharingPid = getServicesSharingPid(compose);
+  targetContainers?: PackageContainer[]
+): ComposeServicesSharingPid | null {
+  if (packageInstalledHasPid(compose)) {
+    const targetPidServices: string[] = [];
+    const dependantPidServices: string[] = [];
 
-  for (const targetContainer of targetContainers) {
-    servicesSharingPid.map(s => {
-      if (
-        s.targetPidService === targetContainer.serviceName &&
-        !targetContainers.map(tc => tc.serviceName).includes(s.serviceWithPid)
-      ) {
-        const containerDependant = dnp.containers.find(
-          c => c.serviceName === s.serviceWithPid
-        );
-        containerDependant && targetContainers.push(containerDependant);
+    for (const [index, service] of Object.values(compose.services).entries()) {
+      if (service.pid) {
+        // Pid MUST be present in compose in the format   pid: service:erigon
+        const targetPidService = service.pid.split(":")[1];
+        const dependantPidService = Object.keys(compose.services)[index];
+
+        // Ensure targetPidService is well formatted and exists in compose
+        if (!targetPidService)
+          throw Error(
+            `target pid service in wrong format: ${targetPidService}`
+          );
+        if (!Object.keys(compose.services).includes(targetPidService))
+          throw Error(
+            `target pid service ${targetPidService} not found in the compose`
+          );
+
+        targetPidServices.push(targetPidService);
+        dependantPidServices.push(dependantPidService);
       }
-    });
+    }
+    // Return null if the targetPid is not included because these
+    if (
+      targetContainers &&
+      !isTargetPidServiceIncluded(targetContainers, targetPidServices)
+    )
+      return null;
+    return { dependantPidServices, targetPidServices };
   }
-
-  return targetContainers;
+  return null;
 }
