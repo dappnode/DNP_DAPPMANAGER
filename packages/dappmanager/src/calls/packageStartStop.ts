@@ -66,9 +66,9 @@ export async function packageStartStop({
     }
   } else {
     if (targetContainers.every(container => container.running)) {
-      await containersStart(targetContainers);
-    } else {
       await containersStop(targetContainers);
+    } else {
+      await containersStart(targetContainers);
     }
   }
 
