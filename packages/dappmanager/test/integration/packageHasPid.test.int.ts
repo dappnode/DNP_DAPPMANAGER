@@ -94,7 +94,7 @@ volumes:
     expect(packageToInstallHasPid(examplePackage)).to.deep.equal(true);
   });
 
-  it.only("Should return the services sharing pid", () => {
+  it("Should return the services sharing pid", () => {
     const compose = new ComposeFileEditor(dnpName, false);
     const expectedResult: ComposeServicesSharingPid = {
       targetPidServices: ["erigon"],
