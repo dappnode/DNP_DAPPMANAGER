@@ -52,7 +52,6 @@ export const vpnDnpName = "vpn.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
-  vpnDnpName,
   ipfsDnpName,
   bindDnpName
   // WIFI package is not mandatory to be running
