@@ -7,9 +7,8 @@ export async function natRenewalEnable({
   enableNatRenewal: boolean;
 }): Promise<void> {
   db.isNatRenewalDisabled.set(!enableNatRenewal);
-  if (enableNatRenewal) {
-    throttledNatRenewal();
-  }
+
+  throttledNatRenewal();
 }
 
 export async function natRenewalIsEnabled(): Promise<boolean> {
