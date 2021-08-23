@@ -29,7 +29,7 @@ export function UpdateDockerCompose() {
       await new Promise<void>(resolve => {
         confirm({
           title: `Docker compose update`,
-          text: `Warming, you are about to update Docker compose. It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important packages.`,
+          text: `Warning, you are about to update Docker compose. It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important packages.`,
           label: "Update",
           onClick: resolve
         });

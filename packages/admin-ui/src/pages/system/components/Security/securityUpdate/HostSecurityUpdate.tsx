@@ -15,7 +15,7 @@ export default function HostSecurityUpdate() {
       await new Promise<void>(resolve => {
         confirm({
           title: `Host security update`,
-          text: `Warming, you are about to perform host security updates. It is possible that the system will need to reboot.`,
+          text: `Warning, you are about to perform host security updates. It is possible that the system will need to reboot.`,
           label: "Security update",
           onClick: resolve
         });
