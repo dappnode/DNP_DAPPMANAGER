@@ -2,8 +2,15 @@ import React from "react";
 import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { PackageReleaseMetadata } from "types";
+import { AiFillBug } from "react-icons/ai";
 
-export function Links({ links }: { links: PackageReleaseMetadata["links"] }) {
+export function Links({
+  links,
+  bugs
+}: {
+  links: PackageReleaseMetadata["links"];
+  bugs: PackageReleaseMetadata["bugs"];
+}) {
   const linksArray =
     typeof links === "object"
       ? Object.entries(links || {})
@@ -15,11 +22,14 @@ export function Links({ links }: { links: PackageReleaseMetadata["links"] }) {
       ? [{ name: "homepage", url: links }]
       : [];
 
+  if (linksArray && bugs) linksArray.push({ name: "report", url: bugs.url });
+
   const items = linksArray.map(({ name, url }) =>
     name === "homepage" ||
     name === "ui" ||
     name === "webui" ||
-    name === "gateway" ? (
+    name === "gateway" ||
+    name === "report" ? (
       <a className="links-url" href={url} {...newTabProps}>
         <span className="links-icon">
           {name === "homepage" ? (
@@ -28,6 +38,8 @@ export function Links({ links }: { links: PackageReleaseMetadata["links"] }) {
             <MdHome />
           ) : name === "gateway" ? (
             <MdSettingsRemote />
+          ) : name === "report" ? (
+            <AiFillBug />
           ) : null}
         </span>
         <span>{name}</span>
