@@ -76,7 +76,7 @@ async function shouldUpdate(): Promise<boolean> {
  * On any doubt, update the IP
  */
 
-async function checkIpAndUpdateIfNecessary(): Promise<void> {
+export async function checkIpAndUpdateIfNecessary(): Promise<void> {
   try {
     const isStaticIpSet = Boolean(db.staticIp.get());
     if (isStaticIpSet) return;

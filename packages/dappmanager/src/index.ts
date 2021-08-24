@@ -27,11 +27,23 @@ import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
+import { checkIpAndUpdateIfNecessary } from "./daemons/dyndns";
 
 const controller = new AbortController();
 
 const vpnApiClient = getVpnApiClient(params);
 const sshManager = new SshManager({ shellHost });
+
+Promise.all([
+  // Initialize DB
+  initializeDb().catch(e => logs.error("Error copying host scripts", e))
+]).then(() =>
+  // Db must be initialized so public IP exist
+  // Services like Wireguard need dynds to exist to be able to generate credendtials
+  checkIpAndUpdateIfNecessary().catch(e =>
+    logs.error("Error getting dynds domain", e)
+  )
+);
 
 // Start HTTP API
 const server = startDappmanager({
@@ -55,11 +67,11 @@ startDaemons(controller.signal);
 copyHostServices().catch(e => logs.error("Error copying host services", e));
 
 Promise.all([
-  initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
   copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
 ]).then(() =>
+  // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
-); // avahiDaemon uses a host script that must be copied before been initialized
+);
 
 // Create the global env file
 createGlobalEnvsEnvFile();
