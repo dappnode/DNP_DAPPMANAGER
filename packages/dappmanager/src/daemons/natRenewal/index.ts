@@ -20,6 +20,10 @@ async function natRenewal(): Promise<void> {
     return logs.debug("UPNP is disabled by flag");
   }
 
+  if (db.isNatRenewalDisabled.get() === true) {
+    return logs.debug("UPNP is disabled by user");
+  }
+
   // Signal it's no longer the first run
   const isFirstRun = isFirstRunGlobal;
   isFirstRunGlobal = false;
