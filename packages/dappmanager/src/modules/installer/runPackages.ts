@@ -39,13 +39,12 @@ export async function runPackages(
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
 
-    // EXCEPTION!: If the compose contains: `pid:service.serviceName`
-    // compose must start with: `noStart: false`
-
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
       removeOrphans: !pkg.isCore,
+      // EXCEPTION!: If the compose contains: `pid:service.serviceName`
+      // compose must start with: `noStart: false`
       noStart: !packageToInstallHasPid(pkg) ? true : false,
       timeout: pkg.dockerTimeout
     });
