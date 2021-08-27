@@ -3,14 +3,15 @@ import { Manifest } from "../../types";
 import * as getPath from "../../utils/getPath";
 import * as validate from "../../utils/validate";
 import { isNotFoundError } from "../../utils/node";
+import { yamlParse } from "../../utils/yaml";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
  * Without this error renaming, it's very hard to debug parsing errors
  */
-function parseManifest(manifestString: string): Manifest {
+export function parseManifest(manifestString: string): Manifest {
   try {
-    return JSON.parse(manifestString);
+    return yamlParse(manifestString);
   } catch (e) {
     throw Error(`Error parsing manifest json: ${e.message}`);
   }
