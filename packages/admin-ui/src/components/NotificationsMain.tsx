@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { useApi } from "api";
@@ -17,11 +17,11 @@ import {
   rootPath as systemRootPath,
   subPaths as systemSubPaths
 } from "pages/system/data";
-import Alert from "react-bootstrap/Alert";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
 import { autoUpdateIds } from "params";
+import { AlertDismissible } from "./AlertDismissible";
 
 /**
  * Aggregate notification and display logic
@@ -89,36 +89,19 @@ export default function NotificationsView() {
       {notifications
         .filter(({ active }) => active)
         .map(({ id, linkText, linkPath, body }) => (
-          <AlertDismissible key={id} {...{ linkText, linkPath, body }} />
+          <AlertDismissible
+            key={id}
+            className="main-notification"
+            variant="warning"
+          >
+            <RenderMarkdown source={body} />
+            {linkText && linkPath ? (
+              <NavLink to={linkPath}>
+                <Button variant="warning">{linkText}</Button>
+              </NavLink>
+            ) : null}
+          </AlertDismissible>
         ))}
     </div>
   );
-}
-
-/**
- * Util component, alert banner that can be closed with an X button
- */
-function AlertDismissible({
-  body,
-  linkText,
-  linkPath
-}: {
-  body: string;
-  linkText: string;
-  linkPath: string;
-}) {
-  const [show, setShow] = useState(true);
-  return show ? (
-    <Alert
-      variant="warning"
-      onClose={() => setShow(false)}
-      dismissible
-      className="main-notification"
-    >
-      <RenderMarkdown source={body} />
-      <NavLink to={linkPath}>
-        <Button variant="warning">{linkText}</Button>
-      </NavLink>
-    </Alert>
-  ) : null;
 }

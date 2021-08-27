@@ -2,19 +2,17 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, NavLink } from "react-router-dom";
 import { throttle, isEmpty } from "lodash";
-import { SelectedCategories } from "../types";
-import { title } from "../data";
+import { SelectedCategories } from "../../types";
 // This page
 import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
-import { correctPackageName } from "../utils";
-import filterDirectory from "../helpers/filterDirectory";
-import { rootPath } from "../data";
-import NoPackageFound from "./NoPackageFound";
-import CategoryFilter from "./CategoryFilter";
-import DnpStore from "./DnpStore";
+import { correctPackageName } from "../../utils";
+import filterDirectory from "../../helpers/filterDirectory";
+import { rootPath } from "../../data";
+import NoPackageFound from "../NoPackageFound";
+import CategoryFilter from "../CategoryFilter";
+import DnpStore from "../DnpStore";
 // Components
-import Title from "components/Title";
 import Input from "components/Input";
 import Button from "components/Button";
 import Loading from "components/Loading";
@@ -28,13 +26,9 @@ import {
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
-// Styles
-import "./installer.scss";
+import { PublicSwitch } from "../PublicSwitch";
 
-export const InstallerHome: React.FC<RouteComponentProps> = ({
-  // React Routes
-  history
-}) => {
+export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -66,7 +60,7 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    history.push(rootPath + "/" + encodeURIComponent(id));
+    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -107,8 +101,7 @@ export const InstallerHome: React.FC<RouteComponentProps> = ({
 
   return (
     <>
-      <Title title={title} />
-
+      <PublicSwitch {...routeProps} />
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}

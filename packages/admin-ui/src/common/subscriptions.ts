@@ -48,6 +48,11 @@ export interface SubscriptionsTypes {
   reloadClient: (data: { reason: string }) => void;
 
   /**
+   * Registry updates
+   */
+  registry: (registry: DirectoryItem[]) => void;
+
+  /**
    * Relevant system params
    */
   systemInfo: (systemInfo: SystemInfo) => void;
@@ -96,6 +101,7 @@ export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   progressLog: {},
   pushNotification: {},
   reloadClient: {},
+  registry: {},
   systemInfo: {},
   userActionLog: {},
   volumes: {}

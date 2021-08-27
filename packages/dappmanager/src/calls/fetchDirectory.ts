@@ -82,7 +82,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
 /**
  * Get a short description and trim it
  */
-function getShortDescription(metadata: {
+export function getShortDescription(metadata: {
   description?: string;
   shortDescription?: string;
 }): string {
@@ -115,6 +115,6 @@ const fallbackCategories: { [dnpName: string]: string[] } = {
  * until all of them are updated
  * @param dnpName "bitcoin.dnp.dappnode.eth"
  */
-function getFallBackCategories(dnpName: string): string[] {
+export function getFallBackCategories(dnpName: string): string[] {
   return fallbackCategories[dnpName];
 }

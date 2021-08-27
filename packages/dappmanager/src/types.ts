@@ -41,6 +41,12 @@ export interface DiskUsageThresholds {
   [thresholdId: string]: boolean;
 }
 
+export interface RegistryNewRepoEvent {
+  txHash: string;
+  ensName: string;
+  timestamp: number;
+}
+
 export interface ComposeServicesSharingPid {
   targetPidServices: string[];
   dependantPidServices: string[];

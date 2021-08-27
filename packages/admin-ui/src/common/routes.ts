@@ -37,7 +37,8 @@ import {
   InstalledPackageDataApiReturn,
   WifiReport,
   CurrentWifiCredentials,
-  LocalProxyingStatus
+  LocalProxyingStatus,
+  RegistryScanProgress
 } from "./types";
 
 export interface Routes {
@@ -218,6 +219,23 @@ export interface Routes {
    * Fetch directory summary
    */
   fetchDirectory: () => Promise<DirectoryItem[]>;
+
+  /**
+   * Fetch registry summary
+   */
+  fetchRegistry: (kwargs: {
+    addressOrEnsName?: string;
+    fromBlock?: number;
+  }) => Promise<DirectoryItem[]>;
+
+  /**
+   * Fetch registry scan progress
+   * scanned x / y blocks
+   */
+  fetchRegistryProgress: (kwargs: {
+    addressOrEnsName?: string;
+    fromBlock?: number;
+  }) => Promise<RegistryScanProgress>;
 
   /**
    * Fetch extended info about a new DNP
@@ -620,6 +638,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ethClientTargetSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
+  fetchRegistry: {},
+  fetchRegistryProgress: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
   httpsPortalMappingAdd: { log: true },

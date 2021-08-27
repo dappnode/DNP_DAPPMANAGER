@@ -133,7 +133,13 @@ export interface DirectoryItemError extends DirectoryItemBasic {
   status: "error";
   message: string;
 }
+
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
+
+export interface RegistryScanProgress {
+  lastFetchedBlock: number;
+  latestBlock: number;
+}
 
 export interface RequestStatus {
   loading?: boolean;
@@ -738,12 +744,11 @@ export interface PackageNotificationDb extends PackageNotification {
 export type UpdateType = "major" | "minor" | "patch" | null;
 
 export type DirectoryDnpStatus = "Deleted" | "Active" | "Developing";
+
 export interface DirectoryDnp {
   name: string;
-  status: number;
   statusName: DirectoryDnpStatus;
   position: number;
-  directoryId: number;
   isFeatured: boolean;
   featuredIndex: number;
   manifest?: Manifest;

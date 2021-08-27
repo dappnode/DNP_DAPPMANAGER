@@ -22,27 +22,32 @@ export async function fetchApmVersionsMetadata(
 
   const repo = new ethers.utils.Interface(repoAbi);
 
+  const event = repo.events;
+
+  const topic = event.topic.topic;
+
   const result = await provider.getLogs({
     address: addressOrEnsName, // or contractEnsName,
     fromBlock: fromBlock || 0,
     toBlock: "latest",
-    topics: [repo.events.NewVersion.topic]
+    topics: [topic]
   });
 
   return await Promise.all(
     result.map(
-      async (event): Promise<ApmVersionMetadata> => {
+      async (log): Promise<ApmVersionMetadata> => {
         // Parse values
-        const parsedLog = repo.parseLog(event);
+        const parsedLog = repo.parseLog(log);
+
         if (!parsedLog || !parsedLog.values)
           throw Error(`Error parsing NewRepo event`);
         // const versionId = parsedLog.values.versionId.toNumber();
         return {
           version: parsedLog.values.semanticVersion.join("."),
           // Parse tx data
-          txHash: event.transactionHash,
-          blockNumber: event.blockNumber,
-          timestamp: await getTimestamp(event.blockNumber, provider)
+          txHash: log.transactionHash,
+          blockNumber: log.blockNumber,
+          timestamp: await getTimestamp(log.blockNumber, provider)
         };
       }
     )
