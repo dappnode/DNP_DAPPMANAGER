@@ -13,7 +13,7 @@ import CategoryFilter from "../CategoryFilter";
 import NoPackageFound from "../NoPackageFound";
 import DnpStore from "../DnpStore";
 // Components
-import { AlertDismissible } from "components/NotificationsMain";
+import { AlertDismissible } from "components/AlertDismissible";
 import Input from "components/Input";
 import Button from "components/Button";
 import Loading from "components/Loading";
@@ -30,7 +30,7 @@ import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 import { PublicSwitch } from "../PublicSwitch";
 import { useApi } from "api";
 
-export const InstallerPublic: React.FC<RouteComponentProps> = props => {
+export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
   const registry = useSelector(getDnpRegistry);
   const requestStatus = useSelector(getRegistryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -44,16 +44,13 @@ export const InstallerPublic: React.FC<RouteComponentProps> = props => {
   const registryProgress = useApi.fetchRegistryProgress({});
 
   useEffect(() => {
-    const interval = 5000;
-    if (requestStatus.loading) {
+    const interval =
+      requestStatus.loading &&
       setInterval(() => {
         registryProgress.revalidate();
-      }, interval);
-    }
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestStatus.loading]);
+      }, 5000);
+    return () => clearInterval(interval as number);
+  }, [requestStatus.loading, registryProgress]);
 
   useEffect(() => {
     dispatch(fetchDnpRegistry({}));
@@ -75,7 +72,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = props => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    props.history.push(rootPath + "/" + encodeURIComponent(id));
+    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -116,13 +113,13 @@ export const InstallerPublic: React.FC<RouteComponentProps> = props => {
 
   return (
     <>
-      <PublicSwitch props={props} />
-      <AlertDismissible
-        body={`The public repository is open and permissionless and can contain
+      <PublicSwitch {...routeProps} />
+      <AlertDismissible variant="warning">
+        The public repository is open and permissionless and can contain
         malicious packages that can compromise the security of your DAppNode.
         ONLY use the public repo if you know what you are doing and ONLY install
-        packages whose developer you trust.`}
-      />
+        packages whose developer you trust.
+      </AlertDismissible>
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}

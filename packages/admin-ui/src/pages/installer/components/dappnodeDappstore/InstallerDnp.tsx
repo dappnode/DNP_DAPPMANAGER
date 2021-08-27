@@ -28,7 +28,7 @@ import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { PublicSwitch } from "../PublicSwitch";
 
-export const InstallerDnp: React.FC<RouteComponentProps> = props => {
+export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -60,7 +60,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = props => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    props.history.push(rootPath + "/" + encodeURIComponent(id));
+    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -101,7 +101,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = props => {
 
   return (
     <>
-      <PublicSwitch props={props} />
+      <PublicSwitch {...routeProps} />
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}

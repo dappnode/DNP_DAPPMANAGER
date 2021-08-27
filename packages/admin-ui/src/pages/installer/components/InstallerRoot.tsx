@@ -25,7 +25,7 @@ const InstallerRoot: React.FC<RouteComponentProps> = ({ match }) => {
         {/*Public path: dappstore public*/}
         <Route
           key={subPathPublic}
-          path={match.path + "/" + subPathPublic}
+          path={match.path + subPathPublic}
           component={InstallerPublic}
         />
         {/*DNP installer path*/}

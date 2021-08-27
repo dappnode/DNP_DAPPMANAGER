@@ -4,16 +4,16 @@ import { RouteComponentProps } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { subPathPublic, rootPath } from "../data";
 
-export function PublicSwitch({ props }: { props: RouteComponentProps }) {
+export function PublicSwitch({ location, history }: RouteComponentProps) {
   const [dappstorePublic, setDappstorePublic] = useState(
-    props.location.pathname === "/installer/public" ? true : false
+    location.pathname === "/installer/public" ? true : false
   );
 
   useEffect(() => {
-    props.location.pathname === "/installer/public"
+    location.pathname === "/installer/public"
       ? setDappstorePublic(true)
       : setDappstorePublic(false);
-  }, [props.location]);
+  }, [location]);
 
   async function confirmPublicDappstore() {
     if (!dappstorePublic) {
@@ -34,7 +34,7 @@ export function PublicSwitch({ props }: { props: RouteComponentProps }) {
               variant: "danger",
               label: "I understand, take me to the public repo",
               onClick: () => {
-                props.history.push(rootPath + "/" + subPathPublic);
+                history.push(rootPath + subPathPublic);
                 setDappstorePublic(true);
               }
             }
@@ -42,7 +42,7 @@ export function PublicSwitch({ props }: { props: RouteComponentProps }) {
         })
       );
     } else {
-      props.history.push(rootPath);
+      history.push(rootPath);
       setDappstorePublic(false);
     }
   }

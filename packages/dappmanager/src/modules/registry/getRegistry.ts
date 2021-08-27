@@ -35,8 +35,8 @@ export async function getRegistry(
   // Update latest chain block in cache
   db.registryLastProviderBlock.set(latestBlock);
 
-  // Return cache if is already synced
-  if (registryEvents && isBlockChainScanned(latestBlock, prevFetchedBlock))
+  // Return cache if we have scanned close enough to the head
+  if (registryEvents && prevFetchedBlock + maxBlocksBehind > latestBlock)
     return getRegistryCached(registryEns);
 
   // Persist progress to db if does not exist already
@@ -189,23 +189,6 @@ function getTopicFromEvent(
   const topic = event.topic;
   if (!topic) throw Error(`Topic not found on event ${event}`);
   return topic;
-}
-
-/** Return the status of the chain scanned*/
-function isBlockChainScanned(
-  latestBlock: number,
-  prevFetchedBlock: number
-): boolean {
-  {
-    const isSynced = prevFetchedBlock + maxBlocksBehind > latestBlock;
-    return isSynced;
-  }
-}
-
-/** Clean the cache to rescan the chain*/
-function cleanRegistryFromCache(registryEns: string): void {
-  db.registryLastFetchedBlock.set(registryEns, null);
-  db.registryEvents.set(registryEns, []);
 }
 
 /** Sort packages in descendent order by timestamp (newest first) */
