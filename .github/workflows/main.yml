@@ -1,5 +1,10 @@
 name: "Main"
 on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Bump type, it must be: patch | minor | major"
+        required: true
   pull_request:
   push:
     branches:
@@ -7,6 +12,9 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
     paths-ignore:
       - "README.md"
+
+env:
+  BUMP_TYPE: ${{ github.event.inputs.bump }}
 
 jobs:
   unit-test:
@@ -44,14 +52,18 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     steps:
+      - name: Verify input
+        run: |
+          [ "$BUMP_TYPE" == "patch"] || [ "$BUMP_TYPE" == "minor"] || \
+          [ "$BUMP_TYPE" == "major"] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
       - uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
         with:
           node-version: "12.22.0"
       - name: Publish
-        run: npx @dappnode/dappnodesdk publish patch --dappnode_team_preset
+        run: npx @dappnode/dappnodesdk publish ${BUMP_TYPE} --dappnode_team_preset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
