@@ -5,6 +5,7 @@ import { ComposeFileEditor } from "../modules/compose/editor";
 import { PortMapping } from "../types";
 import { mapValues } from "lodash";
 import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
+import { packageInstalledHasPid } from "../utils/pid";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -46,8 +47,15 @@ export async function packageSetPortMappings({
 
   const containersStatus = await getContainersStatus({ dnpName });
 
+  const dockerComposeUpOptions =
+    (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {};
+
   try {
-    await dockerComposeUpPackage({ dnpName }, containersStatus);
+    await dockerComposeUpPackage(
+      { dnpName },
+      containersStatus,
+      dockerComposeUpOptions
+    );
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
@@ -58,7 +66,11 @@ export async function packageSetPortMappings({
           services[serviceName].setPortMapping(portMappings);
       compose.write();
 
-      await dockerComposeUpPackage({ dnpName }, containersStatus);
+      await dockerComposeUpPackage(
+        { dnpName },
+        containersStatus,
+        dockerComposeUpOptions
+      );
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(

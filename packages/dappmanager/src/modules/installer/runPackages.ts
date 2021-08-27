@@ -7,6 +7,7 @@ import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
+import { packageToInstallHasPid } from "../../utils/pid";
 
 /**
  * Create and run each package container in series
@@ -37,11 +38,14 @@ export async function runPackages(
     // - Allow copying files without duplicating logic
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
+
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
       removeOrphans: !pkg.isCore,
-      noStart: true,
+      // EXCEPTION!: If the compose contains: `pid:service.serviceName`
+      // compose must start with: `noStart: false`
+      noStart: !packageToInstallHasPid(pkg) ? true : false,
       timeout: pkg.dockerTimeout
     });
 

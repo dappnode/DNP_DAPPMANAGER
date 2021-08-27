@@ -40,3 +40,8 @@ export type EthClientSyncedNotificationStatus = {
 export interface DiskUsageThresholds {
   [thresholdId: string]: boolean;
 }
+
+export interface ComposeServicesSharingPid {
+  targetPidServices: string[];
+  dependantPidServices: string[];
+}

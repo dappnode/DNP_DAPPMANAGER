@@ -2,6 +2,9 @@ import { listPackage } from "../modules/docker/list";
 import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
 import { eventBus } from "../eventBus";
 import params from "../params";
+import { getServicesSharingPid } from "../utils/pid";
+import { ComposeFileEditor } from "../modules/compose/editor";
+import { PackageContainer } from "../common";
 
 const dnpsAllowedToStop = [
   params.ipfsDnpName,
@@ -23,6 +26,7 @@ export async function packageStartStop({
   if (!dnpName) throw Error("kwarg containerName must be defined");
 
   const dnp = await listPackage({ dnpName });
+  const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
   if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
     if (dnpsAllowedToStop.includes(dnp.dnpName)) {
@@ -41,20 +45,55 @@ export async function packageStartStop({
     throw Error(`No targetContainers found for ${queryId}`);
   }
 
-  if (targetContainers.every(container => container.running)) {
-    await Promise.all(
-      targetContainers.map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
+  const servicesSharingPid = getServicesSharingPid(compose, targetContainers);
+
+  if (servicesSharingPid) {
+    const targetContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.targetPidServices.includes(c.serviceName)
     );
+    const dependantContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.dependantPidServices.includes(c.serviceName)
+    );
+
+    if (targetContainers.every(container => container.running)) {
+      // START: first start targetPid containers, second start dependantPid containers (pid must exist)
+      await containersStart(targetContainersPid);
+      await containersStart(dependantContainersPid);
+    } else {
+      // STOP: first stop dependatPid containers (pid must exist), second stop targetPid containers
+      await containersStop(dependantContainersPid);
+      await containersStop(targetContainersPid);
+    }
   } else {
-    await Promise.all(
-      targetContainers.map(async container =>
-        dockerContainerStart(container.containerName)
-      )
-    );
+    if (targetContainers.every(container => container.running)) {
+      await containersStop(targetContainers);
+    } else {
+      await containersStart(targetContainers);
+    }
   }
 
   // Emit packages update
   eventBus.requestPackages.emit();
+}
+
+// Utils
+
+async function containersStop(
+  targetContainers: PackageContainer[]
+): Promise<void> {
+  await Promise.all(
+    targetContainers.map(async c =>
+      dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+    )
+  );
+}
+
+async function containersStart(
+  targetContainers: PackageContainer[]
+): Promise<void> {
+  await Promise.all(
+    targetContainers.map(async container =>
+      dockerContainerStart(container.containerName)
+    )
+  );
 }

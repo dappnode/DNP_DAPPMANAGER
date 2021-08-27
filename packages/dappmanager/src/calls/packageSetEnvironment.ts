@@ -3,6 +3,7 @@ import { eventBus } from "../eventBus";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
+import { packageInstalledHasPid } from "../utils/pid";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -32,7 +33,11 @@ export async function packageSetEnvironment({
   compose.write();
 
   const containersStatus = await getContainersStatus({ dnpName });
-  await dockerComposeUpPackage({ dnpName }, containersStatus);
+  await dockerComposeUpPackage(
+    { dnpName },
+    containersStatus,
+    (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {}
+  );
 
   // Emit packages update
   eventBus.requestPackages.emit();
