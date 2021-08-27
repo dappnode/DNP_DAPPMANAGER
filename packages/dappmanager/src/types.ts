@@ -46,3 +46,8 @@ export interface RegistryNewRepoEvent {
   ensName: string;
   timestamp: number;
 }
+
+export interface ComposeServicesSharingPid {
+  targetPidServices: string[];
+  dependantPidServices: string[];
+}

@@ -334,7 +334,7 @@ export const getContainerName = ({
 
 export const releaseFiles = {
   manifest: {
-    regex: /dappnode_package.*\.json$/,
+    regex: /dappnode_package.*\.(json|yaml|yml)$/,
     format: FileFormat.YAML,
     maxSize: 100e3, // Limit size to ~100KB
     required: true as const,

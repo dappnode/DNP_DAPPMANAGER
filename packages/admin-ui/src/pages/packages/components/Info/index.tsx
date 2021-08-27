@@ -33,7 +33,7 @@ export function Info({
   // Show the version from `docker ps`, which the one affecting logic
   const { dnpName, version, origin } = dnp;
   // Show the upstream version from the manifest which is used for metadata only
-  const { upstreamVersion, links } = manifest || {};
+  const { upstreamVersion, links, bugs } = manifest || {};
 
   useEffect(() => {
     setGettingStartedIsShown(Boolean(gettingStartedShow));
@@ -108,7 +108,10 @@ export function Info({
 
           <div>
             {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
-            <Links links={links || ((manifest as any) || {}).homepage || {}} />
+            <Links
+              links={links || ((manifest as any) || {}).homepage || {}}
+              bugs={bugs || ((manifest as any) || {}).url || {}}
+            />
           </div>
         </div>
 

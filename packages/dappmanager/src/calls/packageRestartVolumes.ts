@@ -12,6 +12,8 @@ import {
   getContainersAndVolumesToRemove
 } from "../modules/docker";
 import { listPackage } from "../modules/docker/list";
+import { packageInstalledHasPid } from "../utils/pid";
+import { ComposeFileEditor } from "../modules/compose/editor";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -35,6 +37,7 @@ export async function packageRestartVolumes({
   // Fetching all containers to not re-fetch below
   const volumes = await dockerVolumesList();
   const dnp = await listPackage({ dnpName });
+  const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
   // Make sure the compose exists before deleting it's containers
   const composePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
@@ -67,7 +70,12 @@ export async function packageRestartVolumes({
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
-  await dockerComposeUpPackage({ dnpName }, containersStatus);
+  await dockerComposeUpPackage(
+    { dnpName },
+    containersStatus,
+    (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
+  );
+
   if (err) {
     throw err;
   }
