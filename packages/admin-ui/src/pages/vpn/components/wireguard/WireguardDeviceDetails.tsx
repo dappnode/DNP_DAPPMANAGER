@@ -73,7 +73,7 @@ function WireguardDeviceDetailsLoaded({
           <Button>
             <span>
               <FiDownload />
-              <span>Downlaod {configType} config</span>
+              <span>Download {configType} config</span>
             </span>
           </Button>
         </a>
