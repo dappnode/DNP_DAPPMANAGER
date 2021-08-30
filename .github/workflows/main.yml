@@ -56,8 +56,8 @@ jobs:
     steps:
       - name: Verify input
         run: |
-          [ "$BUMP_TYPE" == "patch"] || [ "$BUMP_TYPE" == "minor"] || \
-          [ "$BUMP_TYPE" == "major"] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
+          [[ "$BUMP_TYPE" == "patch" ]] || [[ "$BUMP_TYPE" == "minor" ]] || \
+          [[ "$BUMP_TYPE" == "major" ]] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
       - uses: actions/checkout@v2
       - name: Setup node
         uses: actions/setup-node@v1
