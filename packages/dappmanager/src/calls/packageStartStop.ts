@@ -56,13 +56,13 @@ export async function packageStartStop({
     );
 
     if (targetContainers.every(container => container.running)) {
-      // START: first start targetPid containers, second start dependantPid containers (pid must exist)
-      await containersStart(targetContainersPid);
-      await containersStart(dependantContainersPid);
-    } else {
       // STOP: first stop dependatPid containers (pid must exist), second stop targetPid containers
       await containersStop(dependantContainersPid);
       await containersStop(targetContainersPid);
+    } else {
+      // START: first start targetPid containers, second start dependantPid containers (pid must exist)
+      await containersStart(targetContainersPid);
+      await containersStart(dependantContainersPid);
     }
   } else {
     if (targetContainers.every(container => container.running)) {
