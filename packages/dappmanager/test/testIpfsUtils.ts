@@ -3,6 +3,14 @@ import path from "path";
 import { ipfs, IPFSEntry } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
 import { globSource } from "ipfs-http-client";
+import shell from "../src/utils/shell";
+import { testDir } from "./testUtils";
+
+const ipfsStagingPath = path.join(testDir, "ipfs_staging");
+const ipfsDataPath = path.join(testDir, "ipfs_data");
+const ipfsTestContainerName = "dappnode_ipfs_host";
+const dappnodeIpfsNodeUrl =
+  "/dns4/ipfs.dappnode.io/tcp/4001/ipfs/QmfB6dT5zxUq1BXiXisgcZKYkvjywdDYBK5keRaqDKH633";
 
 /**
  * Util, IPFS wrapper with type info
@@ -55,4 +63,38 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
   const addResult = await ipfsAdd(content);
   return addResult.hash;
+}
+
+// Set Up an IPFS node for testing purposes
+// source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
+export async function setUpIpfsNode(): Promise<void> {
+  await createIpfsDIrs();
+  await shell(
+    `docker run -d --name ${ipfsTestContainerName} -v ${ipfsStagingPath}:/export -v ${ipfsDataPath}:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest`
+  );
+}
+
+async function connectTestIpfsNodeToDappnode(): Promise<void> {
+  await shell(
+    `docker run -it ${ipfsTestContainerName} /bin/sh ipfs swarm connect ${dappnodeIpfsNodeUrl}`
+  );
+}
+
+// Set down the testing IPFS node
+export async function setDownIpfsNode(): Promise<void> {
+  await shell(`docker stop ${ipfsTestContainerName}`);
+  await shell(`docker rm ${ipfsTestContainerName}`);
+  await removeIPfsDirs();
+}
+
+// Create necessary dirs for the IPFS node
+async function createIpfsDIrs(): Promise<void> {
+  await shell(`mkdir -p ${ipfsStagingPath}`);
+  await shell(`mkdir -p ${ipfsDataPath}`);
+}
+
+// Remove dirs from the IPFS node
+async function removeIPfsDirs(): Promise<void> {
+  await shell(`rm -rf ${ipfsStagingPath}`);
+  await shell(`rm -rf ${ipfsDataPath}`);
 }
