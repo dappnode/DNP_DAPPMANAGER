@@ -78,7 +78,7 @@
       --not-ok-color: #fae1e3;
       --neutral-color: #e6e6e6;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0px, max-content));
+      grid-template-columns: repeat(3, minmax(0px, max-content));
       @media screen and (max-width: 30rem) {
         grid-template-columns: minmax(0px, max-content);
       }

@@ -14,7 +14,7 @@ import { prettyDnpName, isDnpVerified } from "utils/format";
 // This module
 import { ProgressLogsView } from "./InstallCardComponents/ProgressLogsView";
 // Components
-import Info from "./Steps/Info";
+import { InstallerStepInfo } from "./Steps/Info";
 import { SetupWizard } from "components/SetupWizard";
 import Permissions from "./Steps/Permissions";
 import Disclaimer from "./Steps/Disclaimer";
@@ -61,7 +61,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const isCore = metadata.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
-  const requiresCoreUpdate = dnp.request.compatible.requiresCoreUpdate;
+  const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
 
@@ -300,7 +300,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           path={match.path}
           exact
           render={() => (
-            <Info
+            <InstallerStepInfo
               dnp={dnp}
               onInstall={() => goNext()}
               disableInstallation={disableInstallation}

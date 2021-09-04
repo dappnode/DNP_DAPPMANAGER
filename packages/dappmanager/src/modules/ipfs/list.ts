@@ -1,5 +1,5 @@
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { IpfsInstance, IpfsDagGet } from "./types";
+import { IpfsInstance, IpfsDagGet, IPFSPath } from "./types";
 import { sanitizeIpfsPath } from "./utils";
 import path from "path";
 import { CID } from "multiformats";
@@ -14,7 +14,7 @@ import { CID } from "multiformats";
 export async function ls(
   ipfs: IpfsInstance,
   timeout: number,
-  hash: string
+  hash: IPFSPath
 ): Promise<IPFSEntry[]> {
   const files: IPFSEntry[] = [];
   for await (const file of ipfs.ls(hash, {
@@ -33,7 +33,7 @@ export async function ls(
  */
 export async function dagGet(
   ipfs: IpfsInstance,
-  hash: string
+  hash: IPFSPath
 ): Promise<IPFSEntry[]> {
   const files: IPFSEntry[] = [];
   const hashSanitized = sanitizeIpfsPath(hash);

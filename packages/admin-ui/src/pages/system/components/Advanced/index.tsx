@@ -6,6 +6,7 @@ import { DockerUpdate } from "./DockerUpdate";
 import { SshManager } from "./SshManager";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
+import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
 
 export function Advanced() {
   return (
@@ -21,6 +22,9 @@ export function Advanced() {
 
       <SubTitle>SSH</SubTitle>
       <SshManager />
+
+      <SubTitle>Release trusted keys</SubTitle>
+      <ReleaseTrustedKeysEditor />
 
       <SubTitle>Docker update</SubTitle>
       <DockerUpdate />

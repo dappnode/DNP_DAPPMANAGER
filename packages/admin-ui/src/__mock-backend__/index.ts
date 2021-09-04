@@ -14,6 +14,7 @@ import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
 import { wireguard } from "./wireguard";
 import { wifi } from "./wifi";
+import { releaseTrustedKey } from "./releaseTrustedKey";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -25,6 +26,7 @@ const namedSpacedCalls = {
   ...notifications,
   ...packages,
   ...password,
+  ...releaseTrustedKey,
   ...ssh,
   ...telegram,
   ...userActionLogs,

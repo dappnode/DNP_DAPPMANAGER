@@ -1,3 +1,7 @@
+// Aliases
+
+export type DnpName = string;
+
 // AUTH, SESSION types
 export interface LoginStatusReturn {
   username: string;
@@ -306,19 +310,22 @@ export interface RequestedDnp {
   metadata: PackageReleaseMetadata;
   specialPermissions: SpecialPermissionAllDnps;
   // Request status and dependencies
-  request: {
-    compatible: {
-      requiresCoreUpdate: boolean;
-      resolving: boolean;
-      isCompatible: boolean; // false;
-      error: string; // "LN requires incompatible dependency";
-      dnps: CompatibleDnps;
-    };
-    available: {
-      isAvailable: boolean; // false;
-      message: string; // "LN image not available";
-    };
+  compatible: {
+    requiresCoreUpdate: boolean;
+    resolving: boolean;
+    isCompatible: boolean; // false;
+    error: string; // "LN requires incompatible dependency";
+    dnps: CompatibleDnps;
   };
+  available: {
+    isAvailable: boolean; // false;
+    message: string; // "LN image not available";
+  };
+
+  /** SignedSafe = signed or from a safe origin */
+  signedSafe: Record<DnpName, { safe: boolean; message: string }>;
+  /** Requested DNP plus all their dependencies are either signed or from a safe origin */
+  signedSafeAll: boolean;
 }
 
 export interface GrafanaDashboard {
@@ -560,9 +567,7 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   gettingStarted?: string;
   gettingStartedShow?: boolean;
   backup?: PackageBackup[];
-  /**
-   * Checks if there are volumes to be removed on this DNP
-   */
+  /** Checks if there are volumes to be removed on this DNP */
   areThereVolumesToRemove: boolean;
   dependantsOf: string[];
   updateAvailable: UpdateAvailable | null;
@@ -984,7 +989,24 @@ export interface PackageRelease {
   warnings: ReleaseWarnings;
   origin?: string;
   isCore: boolean;
+  // Signed release
+  signatureStatus: ReleaseSignatureStatus;
 }
+
+export enum ReleaseSignatureStatusCode {
+  notSigned = "notSigned",
+  signedByKnownKey = "signedByKnownKey",
+  signedByUnknownKey = "signedByUnknownKey"
+}
+
+export type ReleaseSignatureStatus =
+  | { status: ReleaseSignatureStatusCode.notSigned }
+  | { status: ReleaseSignatureStatusCode.signedByKnownKey; keyName: string }
+  | {
+      status: ReleaseSignatureStatusCode.signedByUnknownKey;
+      signatureProtocol: string;
+      key: string;
+    };
 
 export type InstallPackageDataPaths = Pick<
   InstallPackageData,
@@ -1364,4 +1386,21 @@ export interface IdentityInterface {
   address: string;
   privateKey: string;
   publicKey: string;
+}
+
+/** TODO: Add RSA_2048, OpenPGP */
+export type ReleaseSignatureProtocol = "ECDSA_256";
+// NOTE: Must list all available protocols to be shown in the UI select component
+export const releaseSignatureProtocols: ReleaseSignatureProtocol[] = [
+  "ECDSA_256"
+];
+
+export interface TrustedReleaseKey {
+  /** Metadata name to identify this key: `DAppnode association` */
+  name: string;
+  signatureProtocol: ReleaseSignatureProtocol;
+  /** `.dnp.dappnode.eth` */
+  dnpNameSuffix: string;
+  /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
+  key: string;
 }

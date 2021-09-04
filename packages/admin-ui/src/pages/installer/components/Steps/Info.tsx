@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RenderMarkdown from "components/RenderMarkdown";
 // This module
 import Dependencies from "../InstallCardComponents/Dependencies";
@@ -17,9 +17,10 @@ import DnpNameVerified from "components/DnpNameVerified";
 import Ok from "components/Ok";
 import defaultAvatar from "img/defaultAvatar.png";
 import { MdExpandMore, MdClose, MdExpandLess } from "react-icons/md";
+import { RequestedDnp } from "types";
+import { SignedStatus } from "./SignedStatus";
 // Styles
 import "./info.scss";
-import { RequestedDnp } from "types";
 
 interface OkBadgeProps {
   ok?: boolean;
@@ -51,19 +52,22 @@ interface InstallerStepInfoProps {
   }[];
 }
 
-const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
+export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
   dnp,
   onInstall,
   disableInstallation,
   optionsArray
 }) => {
+  const [showSignedStatus, setShowSignedStatus] = useState(false);
   const [showResolveStatus, setShowResolveStatus] = useState(false);
   const [showAvailableStatus, setShowAvailableStatus] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
   const {
     dnpName,
-    request,
+    compatible,
+    signedSafe,
+    signedSafeAll,
     metadata,
     isUpdated,
     isInstalled,
@@ -87,9 +91,16 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
   const repoSlug = getRepoSlugFromManifest(metadata);
 
   // Resolution status
-  const isCompatible = request.compatible.isCompatible;
-  const resolvingCompatibility = request.compatible.resolving;
-  const compatibilityError = request.compatible.error;
+  const isCompatible = compatible.isCompatible;
+  const resolvingCompatibility = compatible.resolving;
+  const compatibilityError = compatible.error;
+  // Automatically expand resolve status panel if not compatible
+  useEffect(() => {
+    if (!isCompatible) setShowResolveStatus(true);
+  }, [isCompatible]);
+  useEffect(() => {
+    if (!signedSafeAll) setShowSignedStatus(true);
+  }, [signedSafeAll]);
 
   /**
    * Construct expandable pannels
@@ -114,6 +125,12 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
       )
     },
     {
+      name: "Signed status",
+      show: showSignedStatus,
+      close: () => setShowSignedStatus(false),
+      Component: () => <SignedStatus signedSafe={signedSafe} />
+    },
+    {
       name: "Compatible status",
       show: showResolveStatus,
       close: () => setShowResolveStatus(false),
@@ -122,7 +139,7 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
           noCard
           resolving={resolvingCompatibility}
           error={compatibilityError}
-          dnps={request.compatible.dnps}
+          dnps={compatible.dnps}
         />
       )
     },
@@ -149,6 +166,11 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
                   {shortAuthor(author)}
                 </div>
                 <div className="right-bottom">
+                  <OkBadge
+                    ok={signedSafeAll}
+                    msg={signedSafeAll ? "Signed" : "Not signed"}
+                    onClick={() => setShowSignedStatus(x => !x)}
+                  />
                   <OkBadge
                     loading={resolvingCompatibility}
                     ok={isCompatible}
@@ -247,5 +269,3 @@ const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     </>
   );
 };
-
-export default InstallerStepInfo;

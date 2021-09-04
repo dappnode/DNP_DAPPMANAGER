@@ -18,8 +18,10 @@ import {
   SetupWizardAllDnps,
   SetupWizardField,
   SpecialPermissionAllDnps,
-  InstalledPackageData
+  InstalledPackageData,
+  ReleaseSignatureStatus
 } from "../types";
+import { ReleaseSignatureStatusCode } from "../common";
 
 export async function fetchDnpRequest({
   id
@@ -33,6 +35,7 @@ export async function fetchDnpRequest({
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
   const setupWizard: SetupWizardAllDnps = {};
+  const signedSafe: RequestedDnp["signedSafe"] = {};
 
   const dnpList = await listPackages();
 
@@ -61,6 +64,12 @@ export async function fetchDnpRequest({
         fields: activeSetupWizardFields
       };
     }
+
+    // if origin is falsy, the hash is fetched from the blockchain, otherwise from IPFS directly
+    signedSafe[dnpName] = getReleaseSignedSafe(
+      release.signatureStatus,
+      release.origin
+    );
   }
 
   await addReleaseToSettings(mainRelease);
@@ -70,14 +79,11 @@ export async function fetchDnpRequest({
   let compatibleDnps: CompatibleDnps = {};
   try {
     const { dnpName, reqVersion } = mainRelease;
-    const {
-      state,
-      currentVersions,
-      releases
-    } = await releaseFetcher.getReleasesResolved({
-      name: dnpName,
-      ver: reqVersion
-    });
+    const { state, currentVersions, releases } =
+      await releaseFetcher.getReleasesResolved({
+        name: dnpName,
+        ver: reqVersion
+      });
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
       from: currentVersions[dnpName],
       to: nextVersion
@@ -85,7 +91,9 @@ export async function fetchDnpRequest({
 
     // Add dependencies' metadata
     for (const release of releases)
-      if (release.dnpName !== dnpName) await addReleaseToSettings(release);
+      if (release.dnpName !== dnpName) {
+        await addReleaseToSettings(release);
+      }
   } catch (e) {
     compatibleError = e.message;
   }
@@ -107,20 +115,21 @@ export async function fetchDnpRequest({
     specialPermissions, // Decoupled metadata
     // Settings must include the previous user settings
     settings,
-    request: {
-      compatible: {
-        // Compute version metadata
-        requiresCoreUpdate: getRequiresCoreUpdate(mainRelease, dnpList),
-        resolving: false,
-        isCompatible: !compatibleError,
-        error: compatibleError,
-        dnps: compatibleDnps
-      },
-      available: {
-        isAvailable: true,
-        message: "" // "LN image not available";
-      }
-    }
+    compatible: {
+      // Compute version metadata
+      requiresCoreUpdate: getRequiresCoreUpdate(mainRelease, dnpList),
+      resolving: false,
+      isCompatible: !compatibleError,
+      error: compatibleError,
+      dnps: compatibleDnps
+    },
+    available: {
+      isAvailable: true,
+      message: "" // "LN image not available";
+    },
+
+    signedSafe,
+    signedSafeAll: Object.values(signedSafe).every(r => r.safe === true)
   };
 }
 
@@ -201,5 +210,32 @@ async function shouldAddSetupWizardField(
 
     default:
       return true;
+  }
+}
+
+function getReleaseSignedSafe(
+  releaseSignatureStatus: ReleaseSignatureStatus,
+  origin: string | undefined
+): { safe: boolean; message: string } {
+  switch (releaseSignatureStatus.status) {
+    case ReleaseSignatureStatusCode.signedByKnownKey:
+      return {
+        safe: true,
+        message: `Signed by known key ${releaseSignatureStatus.keyName}`
+      };
+
+    case ReleaseSignatureStatusCode.notSigned:
+      if (!origin) {
+        return { safe: true, message: "Safe origin, not signed" };
+      } else {
+        return { safe: false, message: "Unsafe origin, not signed" };
+      }
+
+    case ReleaseSignatureStatusCode.signedByUnknownKey:
+      if (!origin) {
+        return { safe: true, message: "Safe origin, bad signature" };
+      } else {
+        return { safe: false, message: "Unsafe origin, bad signature" };
+      }
   }
 }

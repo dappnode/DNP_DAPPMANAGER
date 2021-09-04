@@ -7,13 +7,14 @@ export * from "./fileTransferPath";
 export * from "./network";
 export * from "./notification";
 export * from "./package";
+export * from "./registry";
+export * from "./releaseKeys";
 export * from "./secrets";
 export * from "./system";
 export * from "./systemFlags";
 export * from "./ui";
 export * from "./upnp";
 export * from "./vpn";
-export * from "./registry";
 // Aditional low levels methods
 import { dbCache, dbMain } from "./dbFactory";
 

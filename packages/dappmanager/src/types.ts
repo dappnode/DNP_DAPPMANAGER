@@ -1,4 +1,4 @@
-import { EthClientTargetPackage } from "./common";
+import { EthClientTargetPackage, ReleaseSignatureProtocol } from "./common";
 export * from "./common";
 
 export enum FileFormat {
@@ -50,4 +50,22 @@ export interface RegistryNewRepoEvent {
 export interface ComposeServicesSharingPid {
   targetPidServices: string[];
   dependantPidServices: string[];
+}
+
+export interface ReleaseSignature {
+  /** Version of the ReleaseSignature format */
+  version: 1;
+  /** Specs of the signed CIDs */
+  cid: {
+    version: 0 | 1;
+    base: "base58btc" | "base32" | "base64" | "base64url";
+  };
+  signature_protocol: ReleaseSignatureProtocol;
+  /**
+   * Signature of the serialized files in the directory
+   * ```
+   * 0x71b61418808a85c495f52bc9c781cbfeb0154c86aec8528c6cf7a83a26a0365f7ac4dea4eea7eea5e4ec14a10e01d8b8708d8c0c7c12420d152a272b69092b851b
+   * ```
+   */
+  signature: string;
 }

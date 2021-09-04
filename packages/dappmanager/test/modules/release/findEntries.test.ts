@@ -22,7 +22,8 @@ describe("validateTarImage", () => {
       "docker-grafana-dashboard.json",
       "host-grafana-dashboard.json",
       "prometheus-targets.json",
-      "setup-wizard.json"
+      "setup-wizard.json",
+      "signature.json"
     ].map(name => ({
       name,
       path: `Qm-root/${name}`,
@@ -37,6 +38,7 @@ describe("validateTarImage", () => {
       setupSchema: undefined,
       setupTarget: undefined,
       setupUiJson: undefined,
+      signature: "signature.json",
       disclaimer: "disclaimer.md",
       gettingStarted: "getting-started.md",
       prometheusTargets: "prometheus-targets.json",

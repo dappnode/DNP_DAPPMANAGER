@@ -1,9 +1,9 @@
+import * as db from "../../db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate";
 import { PackageRelease } from "../../types";
 import { getIsCore } from "../manifest/getIsCore";
 import { parseMetadataFromManifest } from "../manifest";
-import { DistributedFile, Compose, Manifest } from "../../common";
 import { parseUnsafeCompose } from "../compose/unsafeCompose";
 import { ComposeEditor } from "../compose/editor";
 import { writeMetadataToLabels } from "../compose";
@@ -11,6 +11,8 @@ import { fileToMultiaddress } from "../../utils/distributedFile";
 import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { parseTimeoutSeconds } from "../../utils/timeout";
+import { ReleaseDownloadedContents } from "./types";
+import { getReleaseSignatureStatus } from "./releaseSignature";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -37,7 +39,8 @@ export async function getRelease({
     imageFile,
     avatarFile,
     manifest,
-    composeUnsafe
+    composeUnsafe,
+    signature
   } = await downloadRelease(hash, reqName || hash);
 
   if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
@@ -79,6 +82,15 @@ export async function getRelease({
     );
   }
 
+  // Verify release signature if available
+  const trustedKeys = db.releaseKeysTrusted.get();
+  // TODO: Add default well-known
+  const signatureStatus = getReleaseSignatureStatus(
+    manifest.name,
+    signature,
+    trustedKeys
+  );
+
   return {
     dnpName,
     reqVersion: origin || manifest.version,
@@ -95,7 +107,8 @@ export async function getRelease({
       unverifiedCore:
         isCore && Boolean(origin) && dnpName.endsWith(".dnp.dappnode.eth"),
       requestNameMismatch: isEnsDomain(reqName || "") && reqName !== dnpName
-    }
+    },
+    signatureStatus
   };
 }
 
@@ -107,12 +120,7 @@ export async function getRelease({
 async function downloadRelease(
   hash: string,
   id: string
-): Promise<{
-  imageFile: DistributedFile;
-  avatarFile?: DistributedFile;
-  composeUnsafe: Compose;
-  manifest: Manifest;
-}> {
+): Promise<ReleaseDownloadedContents> {
   if (isIpfsHash(hash)) {
     try {
       return await downloadReleaseIpfs(hash);

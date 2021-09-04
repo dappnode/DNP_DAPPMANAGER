@@ -5,12 +5,13 @@ import {
   PackageContainer
 } from "../../common";
 
+const dnpName = "test.dnp.dappnode.eth";
 export const sampleRequestState: RequestedDnp = {
-  dnpName: "demo-name",
+  dnpName: dnpName,
   semVersion: "0.0.0",
   reqVersion: "0.0.0",
   avatarUrl: "",
-  metadata: { name: "demo-name", version: "0.0.0", description: "demo" },
+  metadata: { name: dnpName, version: "0.0.0", description: "demo" },
   specialPermissions: {},
   imageSize: 10000000,
   isUpdated: false,
@@ -18,22 +19,27 @@ export const sampleRequestState: RequestedDnp = {
   settings: {},
   setupWizard: {},
 
-  request: {
-    compatible: {
-      requiresCoreUpdate: false,
-      resolving: false,
-      isCompatible: true,
-      error: "",
-      dnps: { "demo-name": { to: "0.0.0" } }
-    },
-    available: { isAvailable: true, message: "" }
-  }
+  compatible: {
+    requiresCoreUpdate: false,
+    resolving: false,
+    isCompatible: true,
+    error: "",
+    dnps: { dnpName: { to: "0.0.0" } }
+  },
+  available: { isAvailable: true, message: "" },
+  signedSafe: {
+    [dnpName]: {
+      safe: true,
+      message: "Signed by known key 0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
+    }
+  },
+  signedSafeAll: true
 };
 
 export const sampleDirectoryState: DirectoryItem = {
   index: 0,
   status: "ok",
-  name: "demo-name",
+  name: dnpName,
   description: "Demo description",
   avatarUrl: "",
   isInstalled: false,
@@ -67,7 +73,7 @@ export const sampleContainer: PackageContainer = {
 };
 
 export const sampleDnp: InstalledPackageDetailData = {
-  dnpName: "demo-name",
+  dnpName: dnpName,
   instanceName: "",
   version: "0.0.0",
   isDnp: true,

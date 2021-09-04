@@ -10,7 +10,8 @@ import {
   Compose,
   ManifestWithImage,
   InstallPackageData,
-  InstalledPackageData
+  InstalledPackageData,
+  ReleaseSignatureStatusCode
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
@@ -243,7 +244,8 @@ export const mockRelease: PackageRelease = {
   metadata: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
-  isCore: false
+  isCore: false,
+  signatureStatus: { status: ReleaseSignatureStatusCode.notSigned }
 };
 
 export const mockPackageData: InstallPackageData = {

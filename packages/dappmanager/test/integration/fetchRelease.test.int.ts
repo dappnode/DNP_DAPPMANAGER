@@ -7,7 +7,8 @@ import {
   ManifestWithImage,
   RequestedDnp,
   Manifest,
-  SetupWizard
+  SetupWizard,
+  ReleaseSignatureStatusCode
 } from "../../src/types";
 import {
   getTestMountpoint,
@@ -272,6 +273,10 @@ describe("Fetch releases", () => {
             isAvailable: true,
             message: ""
           }
+        },
+        releaseSignatures: {
+          [dnpNameMain]: { status: ReleaseSignatureStatusCode.notSigned },
+          [dnpNameDep]: { status: ReleaseSignatureStatusCode.notSigned }
         }
       };
 
@@ -379,7 +384,10 @@ describe("Fetch releases", () => {
           }
         },
         // Mock, ommited below
-        imageSize: 0
+        imageSize: 0,
+        releaseSignatures: {
+          [dnpNameMain]: { status: ReleaseSignatureStatusCode.notSigned }
+        }
       };
 
       expect(omit(result, ["imageSize"])).to.deep.equal(

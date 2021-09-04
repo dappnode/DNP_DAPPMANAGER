@@ -1,5 +1,5 @@
 import { mapValues } from "lodash";
-import { Manifest, Compose } from "../../../types";
+import { Manifest, Compose, ReleaseSignature } from "../../../types";
 import { findEntries } from "./findEntries";
 import { downloadAsset } from "./downloadAssets";
 import { IPFSEntry } from "ipfs-core-types/src/root";
@@ -13,6 +13,7 @@ import {
 export async function downloadDirectoryFiles(ipfsFiles: IPFSEntry[]): Promise<{
   manifest: Manifest;
   compose: Compose;
+  signature?: ReleaseSignature;
 }> {
   // Use Required<> to assert that DirectoryFiles keys match releaseFilesToDownload
   const files = await promiseAllValues<Required<DirectoryFiles>>(
@@ -26,6 +27,7 @@ export async function downloadDirectoryFiles(ipfsFiles: IPFSEntry[]): Promise<{
 
   return {
     manifest: joinFilesInManifest(files),
-    compose: files.compose
+    compose: files.compose,
+    signature: files.signature
   };
 }
