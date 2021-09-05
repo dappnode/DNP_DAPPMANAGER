@@ -34,7 +34,7 @@ describe("ipfs / integration test", function() {
 
   it("List directory files", async () => {
     files = await ipfs.ls(dirHash);
-    fileHash = files[0].hash;
+    fileHash = files[0].cid.toString();
   });
 
   it("Download file to FS", async () => {
@@ -54,7 +54,7 @@ describe("ipfs / integration test", function() {
 
   it("objectSize", async () => {
     const data = await ipfs.objectGet(dirHash);
-    expect(data.size).to.be.a("number");
+    expect(data.Data?.length).to.be.a("number");
   });
 });
 

@@ -10,7 +10,10 @@ module.exports = {
   },
   // externals: [/node_modules/, "bufferutil", "utf-8-validate"],
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".ts", ".js"],
+    fallback: {
+      electron: false
+    }
   },
   module: {
     rules: [

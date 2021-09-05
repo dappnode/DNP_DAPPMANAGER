@@ -1,16 +1,12 @@
 import retry from "async-retry";
-import { ipfs } from "../../ipfs";
+import { ipfs, IPFSEntry } from "../../ipfs";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
 import { validateAsset, DirectoryFiles } from "./params";
 import { FileFormat } from "../../../types";
 
-interface FileData {
-  hash: string;
-}
-
 export async function downloadAsset<T>(
-  file: FileData[] | FileData | undefined,
+  file: IPFSEntry[] | IPFSEntry | undefined,
   config: FileConfig,
   fileId: keyof DirectoryFiles
 ): Promise<T[] | T | undefined> {
@@ -24,15 +20,15 @@ export async function downloadAsset<T>(
       throw Error(`Got multiple ${fileId}`);
     }
     return await Promise.all(
-      file.map(f => downloadAssetRequired<T>(f, config, fileId))
+      file.map(f => downloadAssetRequired<T>(f.cid.toString(), config, fileId))
     );
   } else {
-    return downloadAssetRequired(file, config, fileId);
+    return downloadAssetRequired(file.cid.toString(), config, fileId);
   }
 }
 
 export async function downloadAssetRequired<T>(
-  file: FileData,
+  hash: string,
   config: FileConfig,
   fileId: keyof DirectoryFiles
 ): Promise<T> {
@@ -40,7 +36,6 @@ export async function downloadAssetRequired<T>(
   const format = config.format || FileFormat.TEXT;
   const validate = validateAsset[fileId];
 
-  const hash = file.hash;
   const content = await retry(() => ipfs.catString(hash, { maxLength }), {
     retries: 3,
     minTimeout: 225

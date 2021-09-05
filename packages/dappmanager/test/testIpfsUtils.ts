@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { ipfs } from "../src/modules/ipfs";
+import { ipfs, IPFSEntry } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
-const Ipfs = require("ipfs-http-client");
+import { globSource } from "ipfs-http-client";
 
 /**
  * Util, IPFS wrapper with type info
@@ -18,11 +18,10 @@ type IpfsAddResult = {
  * Wrapper to abstract converting the return values of ipfs.add
  * @param content
  */
-async function ipfsAdd(content: unknown): Promise<IpfsAddResult> {
-  const files = [];
-  for await (const file of ipfs.ipfs.add(content)) {
-    files.push(file);
-  }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ipfsAdd(content: any): Promise<IpfsAddResult> {
+  const files = ((await ipfs.ipfs.add(content)) as unknown) as IPFSEntry[];
+
   return files.map(file => ({
     path: file.path,
     hash: file.cid.toString(),
@@ -40,7 +39,7 @@ export async function ipfsAddFromFs(
 ): Promise<IpfsAddResult> {
   if (!fs.existsSync(path))
     throw Error(`ipfs.addFromFs error: no file found at: ${path}`);
-  return await ipfsAdd(Ipfs.globSource(path, options));
+  return await ipfsAdd(globSource(path, options));
 }
 
 export async function ipfsAddDirFromFs(path: string): Promise<string> {
@@ -52,7 +51,7 @@ export async function ipfsAddDirFromFs(path: string): Promise<string> {
  * This should be part of the `DAppNodeSDK`
  */
 export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
-  const content = Ipfs.Buffer.from(JSON.stringify(manifest, null, 2));
+  const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
   const results = await ipfsAdd(content);
   return results[0].hash;
 }
