@@ -17,7 +17,7 @@ export class HttpError extends Error {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function wrapHandler<
-  ReqParams extends { [key: string]: any } = Record<string, never>
+  ReqParams extends { [key: string]: any } = Record<string, any>
 >(
   handler: express.RequestHandler<ReqParams>
 ): express.RequestHandler<ReqParams> {
@@ -47,7 +47,7 @@ export function wrapHandler<
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function wrapHandlerHtml<
-  ReqParams extends { [key: string]: any } = Record<string, never>
+  ReqParams extends { [key: string]: any } = Record<string, any>
 >(
   handler: express.RequestHandler<ReqParams>
 ): express.RequestHandler<ReqParams> {

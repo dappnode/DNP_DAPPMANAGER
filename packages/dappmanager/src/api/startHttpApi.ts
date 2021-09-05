@@ -34,16 +34,16 @@ export interface HttpApiParams
 
 export interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
-  dataSend: RequestHandler<Record<string, never>>;
+  dataSend: RequestHandler;
   download: RequestHandler<{ fileId: string }>;
-  downloadUserActionLogs: RequestHandler<Record<string, never>>;
+  downloadUserActionLogs: RequestHandler;
   downloadWireguardConfig: RequestHandler<{ device: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
   publicPackagesData: RequestHandler<{ containerName: string }>;
-  sign: RequestHandler<Record<string, never>>;
-  upload: RequestHandler<Record<string, never>>;
+  sign: RequestHandler;
+  upload: RequestHandler;
 }
 
 /**
