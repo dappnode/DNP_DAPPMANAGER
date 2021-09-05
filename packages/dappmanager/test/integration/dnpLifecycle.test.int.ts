@@ -57,7 +57,7 @@ const testMountpointDnpLifeCycleDep = getTestMountpoint("dnplifecycle-dep");
  */
 
 //           #### Must be function() for this.timeout ####
-describe("DNP lifecycle", function() {
+describe("DNP lifecycle", function () {
   //         #### Must be function() for this.timeout ####
 
   const dnpNameMain = "main.dnp.dappnode.eth";

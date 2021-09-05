@@ -13,11 +13,8 @@ describe("ipfs / integration test", function() {
   const filePathResult = path.join(testDir, "sample-result.txt");
   const fileContents = "sample-contents";
 
-  type Await<T> = T extends PromiseLike<infer U> ? U : T;
-
   let dirHash: string;
   let fileHash: string;
-  let files: Await<ReturnType<typeof ipfs.ls>>;
 
   before("Prepare directory", () => {
     fs.mkdirSync(dirPath, { recursive: true });
@@ -33,7 +30,10 @@ describe("ipfs / integration test", function() {
   });
 
   it("List directory files", async () => {
-    files = await ipfs.ls(dirHash);
+    const files = await ipfs.ls(dirHash);
+    expect(files.map(file => file.name)).to.deep.equal([
+      path.parse(filepath).base
+    ]);
     fileHash = files[0].cid.toString();
   });
 
