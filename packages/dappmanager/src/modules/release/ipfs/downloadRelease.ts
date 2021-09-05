@@ -16,7 +16,7 @@ import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
 import { downloadAssetRequired } from "./downloadAssets";
 
-const source: "ipfs" = "ipfs";
+const source = "ipfs" as const;
 
 // Memoize fetching releases so refreshing the DAppStore is fast
 export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {

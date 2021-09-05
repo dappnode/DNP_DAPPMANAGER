@@ -16,7 +16,9 @@ export class HttpError extends Error {
  * @param handler
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function wrapHandler<ReqParams extends { [key: string]: any } = {}>(
+export function wrapHandler<
+  ReqParams extends { [key: string]: any } = Record<string, never>
+>(
   handler: express.RequestHandler<ReqParams>
 ): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
@@ -44,7 +46,9 @@ export function wrapHandler<ReqParams extends { [key: string]: any } = {}>(
  * @param handler
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function wrapHandlerHtml<ReqParams extends { [key: string]: any } = {}>(
+export function wrapHandlerHtml<
+  ReqParams extends { [key: string]: any } = Record<string, never>
+>(
   handler: express.RequestHandler<ReqParams>
 ): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
@@ -59,9 +63,9 @@ export function wrapHandlerHtml<ReqParams extends { [key: string]: any } = {}>(
 export function toSocketIoHandler(
   expressHandler: express.Handler
 ): Parameters<Server["use"]>[0] {
-  return function(socket, next): void {
+  return function (socket, next): void {
     expressHandler(
-      (socket.handshake as unknown) as express.Request,
+      socket.handshake as unknown as express.Request,
       {} as express.Response,
       next
     );

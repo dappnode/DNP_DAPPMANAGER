@@ -29,7 +29,7 @@ export interface DockerApiListImagesOptions {
      * (<image-name>[:<tag>], <image id> or <image@digest>),
      */
     before?: string;
-    dangling?: {};
+    dangling?: Record<string, unknown>;
     /**
      * key or label="key=value" of an image label
      */

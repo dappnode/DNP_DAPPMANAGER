@@ -31,7 +31,7 @@ interface EventTypes {
   runNatRenewal: void;
 }
 
-const eventBusData: { [P in keyof EventTypes]: {} } = {
+const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   chainData: {},
   directory: {},
   registry: {},

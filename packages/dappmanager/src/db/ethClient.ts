@@ -85,14 +85,15 @@ export const ethProviderUrl = interceptOnSet(
  * Intercept all on set methods to request an update to the UI
  * @param dbSetter
  */
-function interceptOnSet<F extends Function, T extends { set: F }>(
-  dbSetter: T
-): T {
+function interceptOnSet<
+  F extends (...args: any[]) => any,
+  T extends { set: F }
+>(dbSetter: T): T {
   return {
     ...dbSetter,
     // Arguments are not used, so their type is not relevant
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    set: function(...args: any[]): void {
+    set: function (...args: any[]): void {
       dbSetter.set(...args);
       eventBus.requestSystemInfo.emit();
     }
@@ -112,6 +113,8 @@ export const ethClientMigrationTempSettings = dbCache.staticKey<{
 /**
  * Cache the status of the eth client install loop
  */
-export const ethClientSyncedNotificationStatus = dbCache.staticKey<
-  EthClientSyncedNotificationStatus
->(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);
+export const ethClientSyncedNotificationStatus =
+  dbCache.staticKey<EthClientSyncedNotificationStatus>(
+    ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
+    null
+  );
