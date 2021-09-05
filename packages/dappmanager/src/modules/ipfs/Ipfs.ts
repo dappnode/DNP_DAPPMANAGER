@@ -14,7 +14,7 @@ export class Ipfs {
    */
   constructor(ipfsHost: string) {
     this.ipfs = create({
-      host: ipfsHost,
+      url: ipfsHost,
       timeout: this.timeout
     });
   }
