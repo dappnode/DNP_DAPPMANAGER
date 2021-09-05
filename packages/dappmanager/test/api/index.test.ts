@@ -10,7 +10,7 @@ interface RequestRes {
   body: string;
 }
 
-describe.skip("Test server auth", function() {
+describe.skip("Test server auth", function () {
   this.timeout(5000);
 
   const port = 8654;
@@ -89,7 +89,7 @@ describe.skip("Test server auth", function() {
     await new Promise((resolve, reject) => {
       const socket = io(baseUrl, {
         // Socket.io is not typing 'extraHeaders' which actually exists
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         extraHeaders: { cookie }
       });

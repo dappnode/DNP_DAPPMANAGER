@@ -1,7 +1,8 @@
 import { mapValues } from "lodash";
-import { Manifest, Compose, IpfsFileResult } from "../../../types";
+import { Manifest, Compose } from "../../../types";
 import { findEntries } from "./findEntries";
 import { downloadAsset } from "./downloadAssets";
+import { IPFSEntry } from "../../ipfs";
 import { promiseAllValues } from "../../../utils/promises";
 import {
   releaseFilesToDownload,
@@ -10,7 +11,7 @@ import {
 } from "./params";
 
 export async function downloadDirectoryFiles(
-  ipfsFiles: IpfsFileResult[]
+  ipfsFiles: IPFSEntry[]
 ): Promise<{
   manifest: Manifest;
   compose: Compose;

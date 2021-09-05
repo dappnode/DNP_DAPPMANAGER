@@ -32,7 +32,8 @@ const writeNumber = (num: number | undefined): string | undefined =>
   num === undefined ? undefined : String(num);
 const writeBool = (data: boolean | undefined): string | undefined =>
   data === true ? "true" : data === false ? "false" : undefined;
-const writeJson = (data: object | string[]): string => JSON.stringify(data);
+const writeJson = (data: Record<string, unknown> | string[]): string =>
+  JSON.stringify(data);
 
 const labelParseFns: {
   [K in keyof Required<ContainerLabelTypes>]: (
@@ -121,9 +122,7 @@ export function writeDefaultsToLabels({
   });
 }
 
-export function readContainerLabels(
-  labelsRaw: ContainerLabelsRaw
-): Partial<{
+export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   dnpName: string;
   version: string;
   serviceName: string;

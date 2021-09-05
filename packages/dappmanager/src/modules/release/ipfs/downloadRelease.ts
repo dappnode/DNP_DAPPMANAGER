@@ -1,6 +1,6 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs } from "../../ipfs";
+import { ipfs, IPFSEntry } from "../../ipfs";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -16,7 +16,7 @@ import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
 import { downloadAssetRequired } from "./downloadAssets";
 
-const source: "ipfs" = "ipfs";
+const source = "ipfs" as const;
 
 // Memoize fetching releases so refreshing the DAppStore is fast
 export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
@@ -47,7 +47,7 @@ async function downloadReleaseIpfsFn(
   const arch = os.arch() as NodeArch;
 
   try {
-    const manifest = await downloadManifest({ hash });
+    const manifest = await downloadManifest(hash);
 
     // Disable manifest type releases for ARM architectures
     if (isArmArch(arch)) throw new NoImageForArchError(arch);
@@ -89,9 +89,9 @@ async function downloadReleaseIpfsFn(
 
 // Helpers
 
-async function downloadManifest(file: { hash: string }): Promise<Manifest> {
+async function downloadManifest(hash: string): Promise<Manifest> {
   return downloadAssetRequired<Manifest>(
-    file,
+    hash,
     releaseFiles.manifest,
     "manifest"
   );
@@ -101,14 +101,12 @@ function getFileFromHash(hash: string, size?: number): DistributedFile {
   return { hash, size: size || 0, source };
 }
 
-function getFileFromEntry({
-  hash,
-  size
-}: {
-  hash: string;
-  size: number;
-}): DistributedFile {
-  return { hash, size, source };
+function getFileFromEntry(entry: IPFSEntry): DistributedFile {
+  return {
+    hash: entry.cid.toString(),
+    size: entry.size,
+    source
+  };
 }
 
 function isArmArch(arch: NodeArch): boolean {

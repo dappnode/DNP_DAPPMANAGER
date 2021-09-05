@@ -1,22 +1,27 @@
+import { IPFSHTTPClient } from "ipfs-http-client";
+
 export interface IpfsCatOptions {
   maxLength?: number;
 }
 
-/** Un-typed `ipfs-http-client` instance */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IpfsInstance = any;
+export type IpfsInstance = IPFSHTTPClient;
 
-export interface IpfsLsFileResult {
-  depth: number; // 1,
-  name: string; // 'avatar.png',
-  path: string; // 'QmR7ALYdVQCSfdob9tzE8mvPn3KJk653maMqLeqMo7eeTg/avatar.png',
-  size: number; // 9305,
-  cid: unknown;
-  type: string; // 'file',
-  mode: string; // Number,
-  mtime: { secs: number; nsecs: number };
-  hash: string; // 'QmRFfqN93JN5hDfqWhxaY6M16dafS6t9qzRCAKzzNT9ved',
-}
+// Extract IPFSEntry type from ls since it's not exported
+export type IPFSEntry = ReturnType<IPFSHTTPClient["ls"]> extends AsyncIterable<
+  infer U
+>
+  ? U
+  : never;
+
+// {
+//   name: string; // 'avatar.png',
+//   path: string; // 'QmR7ALYdVQCSfdob9tzE8mvPn3KJk653maMqLeqMo7eeTg/avatar.png',
+//   size: number; // 9305,
+//   cid: CID;
+//   type: string; // 'file',
+//   depth: number; // 1,
+//   hash: string; // 'QmRFfqN93JN5hDfqWhxaY6M16dafS6t9qzRCAKzzNT9ved',
+// }
 
 /**
  * From https://github.com/sindresorhus/ky/blob/2f37c3f999efb36db9108893b8b3d4b3a7f5ec45/index.js#L127-L132

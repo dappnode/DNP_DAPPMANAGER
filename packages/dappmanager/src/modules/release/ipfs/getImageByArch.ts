@@ -1,18 +1,13 @@
-import {
-  Manifest,
-  IpfsFileResult,
-  NodeArch,
-  Architecture,
-  defaultArch
-} from "../../../types";
+import { Manifest, NodeArch, Architecture, defaultArch } from "../../../types";
 import { NoImageForArchError } from "../errors";
 import { getImagePath, getLegacyImagePath } from "../../../params";
+import { IPFSEntryName } from "../types";
 
-export function getImageByArch(
+export function getImageByArch<T extends IPFSEntryName>(
   manifest: Manifest,
-  files: IpfsFileResult[],
+  files: T[],
   nodeArch: NodeArch
-): IpfsFileResult {
+): T {
   const arch = parseNodeArch(nodeArch);
   const { name, version } = manifest;
   const imageAsset =

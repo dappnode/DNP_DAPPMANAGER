@@ -7,7 +7,7 @@ import {
 } from "../../utils/sign";
 import { HttpError, wrapHandler } from "../utils";
 
-type Params = {};
+type Params = Record<string, unknown>;
 
 /**
  * Sign arbitrary requests by packages

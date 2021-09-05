@@ -1,12 +1,11 @@
-const ipfsClient = require("ipfs-http-client");
+import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
 import { logs } from "../../logs";
 import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
-import { IpfsCatOptions, IpfsLsFileResult, IpfsInstance } from "./types";
+import { IpfsCatOptions, IPFSEntry } from "./types";
 import { handleIpfsError } from "./utils";
 
 export class Ipfs {
-  /** Un-typed `ipfs-http-client` instance */
-  ipfs: IpfsInstance;
+  ipfs: IPFSHTTPClient;
   /** Default IPFS timeout for all requests */
   timeout = 30 * 1000;
 
@@ -14,7 +13,10 @@ export class Ipfs {
    * Full URL to an IPFS API
    */
   constructor(ipfsHost: string) {
-    this.ipfs = ipfsClient(ipfsHost, { timeout: this.timeout });
+    this.ipfs = create({
+      url: ipfsHost,
+      timeout: this.timeout
+    });
   }
 
   /**
@@ -35,7 +37,7 @@ export class Ipfs {
         chunks.push(chunk);
       }
     } catch (e) {
-      handleIpfsError(e, hash);
+      handleIpfsError(e as Error, hash);
     }
 
     const data = Buffer.concat(chunks);
@@ -58,32 +60,30 @@ export class Ipfs {
     return await catStreamToFs(args, this.ipfs);
   }
 
-  async ls(hash: string): Promise<IpfsLsFileResult[]> {
-    const files = [];
+  async ls(hash: string): Promise<IPFSEntry[]> {
+    const files: IPFSEntry[] = [];
     try {
       for await (const file of this.ipfs.ls(hash, { timeout: this.timeout })) {
         files.push(file);
       }
     } catch (e) {
-      handleIpfsError(e, hash);
+      handleIpfsError(e as Error, hash);
     }
 
-    return files.map(file => ({
-      ...file,
-      // cid: CID('QmZyUEQVuRK3XV7L9Dk26pg6RVSgaYkiSTEdnT2kZZdwoi'),
-      hash: file.cid.toString()
-    }));
+    return files;
   }
 
   /**
    * Useful to check if a large dataset is available
    * Also possible to get it's size with it by summing its links size
    */
-  async objectGet(hash: string): Promise<{ size: number }> {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  async objectGet(hash: string) {
     try {
-      return await this.ipfs.object.get(hash, { timeout: this.timeout });
+      const cid = CID.parse(hash);
+      return await this.ipfs.object.get(cid, { timeout: this.timeout });
     } catch (e) {
-      handleIpfsError(e, hash);
+      handleIpfsError(e as Error, hash);
     }
   }
 
@@ -91,7 +91,7 @@ export class Ipfs {
    * Pin a hash
    */
   async pinAdd(hash: string): Promise<void> {
-    return await this.ipfs.pin.add(hash, { timeout: this.timeout });
+    await this.ipfs.pin.add(hash, { timeout: this.timeout });
   }
 
   async pinAddNoThrow(hash: string): Promise<void> {
