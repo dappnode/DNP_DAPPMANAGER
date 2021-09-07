@@ -2,7 +2,7 @@ import { mapValues } from "lodash";
 import { Manifest, Compose } from "../../../types";
 import { findEntries } from "./findEntries";
 import { downloadAsset } from "./downloadAssets";
-import { IPFSEntry } from "../../ipfs";
+import { IPFSEntry } from "../../ipfs/local";
 import { promiseAllValues } from "../../../utils/promises";
 import {
   releaseFilesToDownload,
@@ -10,9 +10,7 @@ import {
   joinFilesInManifest
 } from "./params";
 
-export async function downloadDirectoryFiles(
-  ipfsFiles: IPFSEntry[]
-): Promise<{
+export async function downloadDirectoryFiles(ipfsFiles: IPFSEntry[]): Promise<{
   manifest: Manifest;
   compose: Compose;
 }> {

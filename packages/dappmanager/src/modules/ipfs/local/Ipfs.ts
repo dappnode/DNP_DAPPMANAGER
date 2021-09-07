@@ -1,5 +1,5 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
-import { logs } from "../../logs";
+import { logs } from "../../../logs";
 import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
 import { IpfsCatOptions, IPFSEntry } from "./types";
 import { handleIpfsError } from "./utils";

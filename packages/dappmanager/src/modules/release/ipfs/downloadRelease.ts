@@ -1,6 +1,6 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs, IPFSEntry } from "../../ipfs";
+import { ipfs, IPFSEntry } from "../../ipfs/local";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -36,9 +36,7 @@ export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-async function downloadReleaseIpfsFn(
-  hash: string
-): Promise<{
+async function downloadReleaseIpfsFn(hash: string): Promise<{
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   composeUnsafe: Compose;

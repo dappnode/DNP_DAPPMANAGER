@@ -3,7 +3,7 @@ import httpProxy from "http-proxy";
 import express from "express";
 import params from "../params";
 import { EthProviderError } from "../modules/ethClient";
-import { ipfs } from "../modules/ipfs";
+import { ipfs } from "../modules/ipfs/local";
 import { urlJoin } from "../utils/url";
 import { logs } from "../logs";
 import * as views from "./views";

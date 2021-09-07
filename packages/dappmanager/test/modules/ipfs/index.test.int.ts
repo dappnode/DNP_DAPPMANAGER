@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { expect } from "chai";
-import { ipfs } from "../../../src/modules/ipfs";
+import { ipfs } from "../../../src/modules/ipfs/local";
 import { cleanTestDir, testDir } from "../../testUtils";
 import { ipfsAddDirFromFs } from "../../testIpfsUtils";
 
-describe("ipfs / integration test", function() {
+describe("ipfs / integration test", function () {
   this.timeout(60 * 1000);
 
   const dirPath = path.join(testDir, "ipfs-test-upload");

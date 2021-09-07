@@ -1,5 +1,5 @@
 import { isEqual } from "lodash";
-import { ipfs } from "../../src/modules/ipfs";
+import { ipfs } from "../../src/modules/ipfs/local";
 import { parseManifest } from "../../src/modules/manifest";
 import { ManifestWithImage } from "../../src/types";
 import { ipfsAddManifest, ipfsAddFromFs } from "../testIpfsUtils";

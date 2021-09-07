@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { mapValues } from "lodash";
-import { ipfs } from "../../src/modules/ipfs";
+import { ipfs } from "../../src/modules/ipfs/local";
 import shell from "../../src/utils/shell";
 import { yamlDump } from "../../src/utils/yaml";
 import { getContainerName, getImageTag } from "../../src/params";

@@ -1,4 +1,4 @@
-import { ipfs } from "../ipfs";
+import { ipfs } from "../ipfs/local";
 import { parseManifest, validateManifestBasic } from "../manifest";
 import { Manifest } from "../../types";
 
