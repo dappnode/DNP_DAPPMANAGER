@@ -16,6 +16,7 @@ import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
 
 export const testDir = "./test_files/";
+export const absoluteTestDir = path.resolve(__dirname, "..", testDir);
 const testMountpoint = "./test_mountpoints";
 
 // Default file names
@@ -41,7 +42,7 @@ export function clearDbs(): void {
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
-  return async function(arg: A): Promise<R | undefined> {
+  return async function (arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {
@@ -154,8 +155,7 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
   LayersSize: 101010101,
   Images: [
     {
-      Id:
-        "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
+      Id: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
       ParentId: "",
       RepoTags: ["busybox:latest"],
       RepoDigests: [

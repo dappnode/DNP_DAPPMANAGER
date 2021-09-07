@@ -139,6 +139,8 @@ const params = {
   NSUPDATE_DAEMON_INTERVAL: 1 * HOUR,
 
   // IPFS parameters
+  // TEMPORARY, to be substitute by the final DAPPNODE IPFS GATEWAY HOST
+  IPFS_HOST_GATEWAY: "http://ipfs.dappnode.io:5001",
   IPFS_HOST:
     process.env.IPFS_HOST ||
     process.env.IPFS_REDIRECT ||
