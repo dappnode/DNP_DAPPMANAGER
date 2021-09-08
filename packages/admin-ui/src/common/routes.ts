@@ -273,10 +273,13 @@ export interface Routes {
   ipfsTest(): Promise<void>;
 
   /** Switches IPFS target: remote - local */
-  ipfsTargetSet(target: IpfsTarget, deleteIpfs?: boolean): Promise<void>;
+  ipfsTargetSet(kwargs: {
+    target: IpfsTarget;
+    deleteIpfs?: boolean;
+  }): Promise<void>;
 
   /** Sets IPFS fallback */
-  ipfsFallbackSet(fallback: IpfsFallback): Promise<void>;
+  ipfsFallbackSet(kwargs: { fallback: IpfsFallback }): Promise<void>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.
@@ -656,8 +659,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
-  ipfsTargetSet: {},
-  ipfsFallbackSet: {},
+  ipfsTargetSet: { log: true },
+  ipfsFallbackSet: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   mountpointsGet: {},
