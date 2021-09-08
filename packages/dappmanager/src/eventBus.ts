@@ -28,6 +28,7 @@ interface EventTypes {
   requestPackages: void;
   requestSystemInfo: void;
   runEthClientInstaller: void;
+  runIpfsInstaller: void;
   runNatRenewal: void;
 }
 
@@ -50,6 +51,7 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   requestPackages: {},
   requestSystemInfo: {},
   runEthClientInstaller: {},
+  runIpfsInstaller: {},
   runNatRenewal: {}
 };
 

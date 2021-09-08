@@ -66,6 +66,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
   ipfsTest: async () => {},
+  ipfsTargetSet: async () => {},
+  ipfsFallbackSet: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
@@ -213,12 +215,17 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       error: { message: "Some Error", stack: "Some Error\nline 56 file.ts" }
     },
     ethProvider: "http://geth.dappnode:8545",
+    ipfsTarget: "local",
+    ipfsFallback: "on",
+    ipfsProvider: "http://ipfs.dappnode.eth:5001",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
-      // "repository",
-      // "repository-fallback",
-      // "system-auto-updates",
-      // "change-host-password"
+      "ipfs",
+      "ipfs-fallback",
+      "repository",
+      "repository-fallback",
+      "system-auto-updates",
+      "change-host-password"
     ]
   }),
   runHostSecurityUpdates: async () =>

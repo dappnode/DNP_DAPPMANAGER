@@ -1194,6 +1194,35 @@ export interface VolumeData extends VolumeOwnershipData {
   fileSystem?: MountpointData;
 }
 
+/** IPFS provider: local IPFS node or remote IPFS gateway provided by dappnode */
+export type IpfsTarget = "local" | "remote";
+
+/** IPFS remote option in case of error */
+export type IpfsFallback = "on" | "off";
+
+export type IpfsStatus = IpfsStatusOk | IpfsStatusError;
+
+export type IpfsStatusOk =
+  // All okay, client is functional
+  { ok: true; url: string; dnpName: string };
+
+export type IpfsStatusError =
+  // Unexpected error
+  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
+  // ipfs call failed, but the node is running
+  // ???, a connection error?
+  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
+  // NOT Expected: Package's container is not running
+  | { ok: false; code: "NOT_RUNNING" }
+  // Package's container does not exist in docker ps -a, and there's no clear reason why
+  | { ok: false; code: "NOT_INSTALLED" }
+  // Expected: Package is installing or pending to be installed
+  | { ok: false; code: "INSTALLING" }
+  // Expected: Package is installing but an error happened
+  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
+  // NOT Expected: Package should be installed but it is not
+  | { ok: false; code: "UNINSTALLED" };
+
 /**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
@@ -1288,6 +1317,10 @@ export interface SystemInfo {
   // - null = current target is remote and has no status
   ethClientStatus: EthClientStatus | undefined | null;
   ethProvider: string;
+  // Ipfs configuration
+  ipfsTarget: IpfsTarget | null;
+  ipfsFallback: IpfsFallback;
+  ipfsProvider: string;
   // Domain maps
   fullnodeDomainTarget: string;
   // UI stats
@@ -1334,6 +1367,8 @@ export interface LocalIpResponse {
  * Available routes / views in the UI
  */
 export type NewFeatureId =
+  | "ipfs"
+  | "ipfs-fallback"
   | "repository"
   | "repository-fallback"
   | "system-auto-updates"

@@ -8,6 +8,7 @@ import { NewFeatureId, SystemInfo } from "../types";
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
   const ethClientTarget = db.ethClientTarget.get();
+  const ipfsTarget = db.ipfsTarget.get();
 
   return {
     // Git version data
@@ -37,6 +38,10 @@ export async function systemInfoGet(): Promise<SystemInfo> {
       : null,
     ethClientFallback: db.ethClientFallback.get(),
     ethProvider: db.ethProviderUrl.get(),
+    // Ipfs
+    ipfsTarget,
+    ipfsFallback: db.ipfsFallback.get(),
+    ipfsProvider: db.ipfsProviderUrl.get(),
     // Domain map
     fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
     // UI stats

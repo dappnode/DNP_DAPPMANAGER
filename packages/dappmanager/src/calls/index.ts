@@ -19,6 +19,8 @@ export { fetchRegistry } from "./fetchRegistry";
 export { fetchRegistryProgress } from "./fetchRegistry";
 export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
+export { ipfsFallbackSet } from "./ipfsFallbackSet";
+export { ipfsTargetSet } from "./ipfsTargetSet";
 export { ipfsTest } from "./ipfsTest";
 export { ipPublicGet } from "./ipPublicGet";
 export * from "./localProxy";

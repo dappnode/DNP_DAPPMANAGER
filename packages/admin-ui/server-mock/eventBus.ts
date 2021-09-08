@@ -22,5 +22,6 @@ export const eventBus: EventBus = {
   requestPackages: emptySubscription,
   requestSystemInfo: emptySubscription,
   runEthClientInstaller: emptySubscription,
+  runIpfsInstaller: emptySubscription,
   runNatRenewal: emptySubscription
 };

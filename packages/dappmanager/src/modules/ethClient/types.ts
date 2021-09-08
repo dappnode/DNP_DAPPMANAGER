@@ -5,6 +5,8 @@ export type EthClientInstallStatus =
   | { status: "INSTALLED" }
   | { status: "UNINSTALLED" };
 
+export type IpfsInstallStatus = EthClientInstallStatus;
+
 // type ProviderStatusErrorCode = ProviderStatusError["code"];
 // type ProviderStatusErrorMessage = { [key in ProviderStatusErrorCode]: string };
 
