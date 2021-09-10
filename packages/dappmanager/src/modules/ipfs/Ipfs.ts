@@ -83,7 +83,7 @@ export class Ipfs {
    * Useful to check if a large dataset is available
    * Also possible to get it's size with it by summing its links size
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async objectGet(hash: string) {
     try {
       const cid = CID.parse(hash);
