@@ -3,6 +3,9 @@ import { logs } from "../../logs";
 import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
 import { IpfsCatOptions, IPFSEntry } from "./types";
 import { handleIpfsError } from "./utils";
+import { getContentFromIpfsGateway, writeCarReaderToFs } from "./carEditor";
+import { CarReader } from "@ipld/car/reader";
+import { unpack } from "ipfs-car/unpack";
 
 export class Ipfs {
   ipfs: IPFSHTTPClient;
@@ -98,5 +101,51 @@ export class Ipfs {
     await this.pinAdd(hash).catch((e: Error) =>
       logs.error(`Error pinning hash ${hash}`, e)
     );
+  }
+
+  // GATEWAY
+
+  /**
+   * Keeps a CarReader in memory
+   * @param ipfsPath "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
+   * @returns hash contents as a buffer
+   */
+  async catCarReaderToMemory(
+    ipfsPath: string,
+    opts?: IpfsCatOptions
+  ): Promise<Buffer> {
+    const chunks = [];
+    try {
+      const carReader = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
+      for await (const unixFsEntry of unpack(carReader)) {
+        try {
+          const content = unixFsEntry.content();
+          for await (const chunk of content) {
+            chunks.push(chunk);
+          }
+        } catch (e) {
+          throw Error(
+            `Error getting chunk from file ${unixFsEntry.name}. ${e}`
+          );
+        }
+      }
+    } catch (e) {
+      throw Error(`Error getting carReaderToMemory from ${ipfsPath}. ${e}`);
+    }
+
+    const data = Buffer.concat(chunks);
+    if (opts?.maxLength && data.length >= opts.maxLength)
+      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
+
+    return data;
+  }
+
+  /**
+   * Writes a CarReader to the disk
+   * @param ipfsPath QmUn3rbJmLinK518kLwvHfcVbefnLfwe4AYQz88KkaTZZp
+   */
+  async catCarReaderToFs(ipfsPath: string): Promise<void> {
+    const carReader = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
+    return await writeCarReaderToFs(carReader);
   }
 }
