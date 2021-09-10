@@ -1,6 +1,7 @@
 import fs from "fs";
 import { isAbsolute } from "path";
 import { TimeoutErrorKy, IpfsInstance } from "./types";
+import { getContentFromIpfsGateway } from "./car";
 const toStream = require("it-to-stream");
 
 const resolution = 2;
@@ -14,20 +15,10 @@ export interface CatStreamToFsArgs {
   progress?: (n: number) => void;
 }
 
-/**
- * Streams an IPFS object to the local fs.
- * If the stream does not start within the specified timeout,
- * it will throw and error. This utility does not verify the file
- *
- * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- * @param path "/usr/src/path-to-file/file.ext"
- * @param options Available options:
- * - onChunk: {function} Gets called on every received chuck
- *   function(chunk) {}
- */
-export async function catStreamToFs(
-  { hash, path, timeout, fileSize, progress }: CatStreamToFsArgs,
-  ipfs: IpfsInstance
+async function readableStream(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readable: any,
+  { path, timeout, fileSize, progress }: CatStreamToFsArgs
 ): Promise<void> {
   return new Promise((resolve, reject): void => {
     if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
@@ -38,10 +29,12 @@ export async function catStreamToFs(
       reject(TimeoutErrorKy);
     }, timeout || 30 * 1000);
 
-    const onError = (streamId: string) => (err: Error): void => {
-      clearTimeout(timeoutToCancel);
-      reject(Error(streamId + ": " + err));
-    };
+    const onError =
+      (streamId: string) =>
+      (err: Error): void => {
+        clearTimeout(timeoutToCancel);
+        reject(Error(streamId + ": " + err));
+      };
 
     let totalData = 0;
     let previousProgress = -1;
@@ -65,12 +58,6 @@ export async function catStreamToFs(
       resolve();
     };
 
-    // IPFS native timeout will interrupt a working but slow stream
-    // Use a max higher timeout that the one to check availability
-    const readable = toStream.readable(
-      ipfs.cat(hash, { timeout: timeoutMaxDownloadTime })
-    );
-
     const readStream = readable
       .on("data", onData)
       .on("error", onError("ReadableStream"));
@@ -80,4 +67,39 @@ export async function catStreamToFs(
       .on("error", onError("WriteStream"));
     readStream.pipe(writeStream);
   });
+}
+
+/**
+ * Streams an IPFS object to the local fs.
+ * If the stream does not start within the specified timeout,
+ * it will throw and error. This utility does not verify the file
+ *
+ * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+ * @param path "/usr/src/path-to-file/file.ext"
+ * @param options Available options:
+ * - onChunk: {function} Gets called on every received chuck
+ *   function(chunk) {}
+ */
+export async function catStreamToFs(
+  args: CatStreamToFsArgs,
+  ipfs: IpfsInstance
+): Promise<void> {
+  // IPFS native timeout will interrupt a working but slow stream
+  // Use a max higher timeout that the one to check availability
+  const readable = toStream.readable(
+    ipfs.cat(args.hash, { timeout: timeoutMaxDownloadTime })
+  );
+
+  await readableStream(readable, args);
+}
+
+/** Writes CarReader to the fs in a given path */
+export async function writeCarToFs(
+  args: CatStreamToFsArgs,
+  ipfs: IpfsInstance
+): Promise<void> {
+  const content = await getContentFromIpfsGateway(ipfs, args.hash);
+  const readable = toStream.readable(content.carStream);
+
+  await readableStream(readable, args);
 }

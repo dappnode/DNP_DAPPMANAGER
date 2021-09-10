@@ -1,10 +1,13 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
 import { logs } from "../../logs";
-import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
+import {
+  CatStreamToFsArgs,
+  catStreamToFs,
+  writeCarToFs
+} from "./writeStreamToFs";
 import { IpfsCatOptions, IPFSEntry } from "./types";
 import { handleIpfsError } from "./utils";
-import { getContentFromIpfsGateway, writeCarReaderToFs } from "./carEditor";
-import { CarReader } from "@ipld/car/reader";
+import { getContentFromIpfsGateway } from "./car";
 import { unpack } from "ipfs-car/unpack";
 
 export class Ipfs {
@@ -116,8 +119,8 @@ export class Ipfs {
   ): Promise<Buffer> {
     const chunks = [];
     try {
-      const carReader = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
-      for await (const unixFsEntry of unpack(carReader)) {
+      const content = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
+      for await (const unixFsEntry of unpack(content.carReader)) {
         try {
           const content = unixFsEntry.content();
           for await (const chunk of content) {
@@ -144,8 +147,7 @@ export class Ipfs {
    * Writes a CarReader to the disk
    * @param ipfsPath QmUn3rbJmLinK518kLwvHfcVbefnLfwe4AYQz88KkaTZZp
    */
-  async catCarReaderToFs(ipfsPath: string): Promise<void> {
-    const carReader = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
-    return await writeCarReaderToFs(carReader);
+  async writeCarToFs(args: CatStreamToFsArgs): Promise<void> {
+    return await writeCarToFs(args, this.ipfs);
   }
 }
