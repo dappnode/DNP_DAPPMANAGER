@@ -1,12 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { mockManifestWithImage } from "../../testUtils";
-import { setUpIpfsNode, setDownIpfsNode } from "../../testIpfsUtils";
 import { ManifestWithImage } from "../../../src/types";
 import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
 import { ipfs } from "../../../src/modules/ipfs";
 
-describe.only("IPFS remote", function () {
+describe("IPFS remote", function () {
   this.timeout(100000 * 5);
   const testMockPrefix = "testmock-";
   const dnpName = testMockPrefix + "remote-gateway.dnp.dappnode.eth";
@@ -17,7 +16,6 @@ describe.only("IPFS remote", function () {
   let releaseHash: string;
 
   before(async () => {
-    await setUpIpfsNode();
     releaseHash = await uploadManifestRelease(manifest);
   });
 
@@ -40,9 +38,5 @@ describe.only("IPFS remote", function () {
       }
     };
     expect(contentParsed).to.deep.equal(expectedContent);
-  });
-
-  after(async () => {
-    await setDownIpfsNode();
   });
 });

@@ -16,7 +16,6 @@ import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
 
 export const testDir = "./test_files/";
-export const absoluteTestDir = path.resolve(__dirname, "..", testDir);
 const testMountpoint = "./test_mountpoints";
 
 // Default file names
