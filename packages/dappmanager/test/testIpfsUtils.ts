@@ -12,14 +12,20 @@ const ipfsStagingPath = path.join(absoluteTestDir, "ipfs_staging");
 const ipfsDataPath = path.join(absoluteTestDir, "ipfs_data");
 const ipfsTestContainerName = "dappnode_ipfs_host";
 
+export type IpfsAddResult = {
+  path: string;
+  hash: string;
+  size: number;
+};
+
 /**
  * Wrapper to abstract converting the return values of ipfs.add
  * @param content
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function ipfsAdd(content: any) {
-  const addResult = await ipfs.ipfs.add(content);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ipfsAdd(content: any): Promise<IpfsAddResult> {
+  const addResult = await ipfs.ipfs.add(content);
   return {
     path: addResult.path,
     hash: addResult.cid.toString(),
@@ -61,10 +67,10 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
 export async function setUpIpfsNode(): Promise<void> {
   await createIpfsDIrs();
   await shell(
-    `docker run -d --name ${ipfsTestContainerName} -v ${ipfsStagingPath}:/export -v ${ipfsDataPath}:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest`
+    `docker run -d --name ${ipfsTestContainerName} -v ${ipfsStagingPath}:/export -v ${ipfsDataPath}:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.9.1`
   );
   // Timeout for container to be initialized
-  await sleep(5000);
+  await sleep(30000);
 }
 
 // Set down the testing IPFS node
