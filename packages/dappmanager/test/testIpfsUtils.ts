@@ -1,18 +1,16 @@
 import fs from "fs";
 import path from "path";
-import { ipfs, IPFSEntry } from "../src/modules/ipfs";
+import { ipfs } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
 import { globSource } from "ipfs-http-client";
+import { sleep } from "../src/utils/asyncFlows";
+import shell from "../src/utils/shell";
+import { testDir } from "./testUtils";
 
-/**
- * Util, IPFS wrapper with type info
- */
-
-type IpfsAddResult = {
-  path: string;
-  hash: string;
-  size: number;
-}[];
+const absoluteTestDir = path.resolve(__dirname, "..", testDir);
+const ipfsStagingPath = path.join(absoluteTestDir, "ipfs_staging");
+const ipfsDataPath = path.join(absoluteTestDir, "ipfs_data");
+const ipfsTestContainerName = "dappnode_ipfs_host";
 
 /**
  * Wrapper to abstract converting the return values of ipfs.add
@@ -33,6 +31,7 @@ async function ipfsAdd(content: any) {
  * Uploads a directory / file from the local filesystem
  * This should be part of the `DAppNodeSDK`
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function ipfsAddFromFs(
   path: string,
   options?: { recursive: boolean }
@@ -55,4 +54,34 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
   const addResult = await ipfsAdd(content);
   return addResult.hash;
+}
+
+// Set Up an IPFS node for testing purposes on localhost
+// source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
+export async function setUpIpfsNode(): Promise<void> {
+  await createIpfsDIrs();
+  await shell(
+    `docker run -d --name ${ipfsTestContainerName} -v ${ipfsStagingPath}:/export -v ${ipfsDataPath}:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:latest`
+  );
+  // Timeout for container to be initialized
+  await sleep(5000);
+}
+
+// Set down the testing IPFS node
+export async function setDownIpfsNode(): Promise<void> {
+  await shell(`docker stop ${ipfsTestContainerName}`);
+  await shell(`docker rm ${ipfsTestContainerName}`);
+  await removeIPfsDirs();
+}
+
+// Create necessary dirs for the IPFS node
+async function createIpfsDIrs(): Promise<void> {
+  await shell(`mkdir -p ${ipfsStagingPath}`);
+  await shell(`mkdir -p ${ipfsDataPath}`);
+}
+
+// Remove dirs from the IPFS node
+async function removeIPfsDirs(): Promise<void> {
+  await shell(`rm -rf ${ipfsStagingPath}`);
+  await shell(`rm -rf ${ipfsDataPath}`);
 }
