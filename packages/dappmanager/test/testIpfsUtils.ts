@@ -2,11 +2,13 @@ import fs from "fs";
 import path from "path";
 import { ipfs } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
-import { globSource } from "ipfs-http-client";
+import { globSource, multiaddr } from "ipfs-http-client";
 import { sleep } from "../src/utils/asyncFlows";
 import shell from "../src/utils/shell";
 import { testDir } from "./testUtils";
 
+const ipfsDappnodeAddress =
+  "/dns4/ipfs.dappnode.io/tcp/4001/ipfs/QmfB6dT5zxUq1BXiXisgcZKYkvjywdDYBK5keRaqDKH633";
 const absoluteTestDir = path.resolve(__dirname, "..", testDir);
 const ipfsStagingPath = path.join(absoluteTestDir, "ipfs_staging");
 const ipfsDataPath = path.join(absoluteTestDir, "ipfs_data");
@@ -62,8 +64,10 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   return addResult.hash;
 }
 
-// Set Up an IPFS node for testing purposes on localhost
-// source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
+/**
+ * Set Up an IPFS node for testing purposes on localhost.
+ * source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
+ */
 export async function setUpIpfsNode(): Promise<void> {
   await createIpfsDIrs();
   await shell(
@@ -71,23 +75,34 @@ export async function setUpIpfsNode(): Promise<void> {
   );
   // Timeout for container to be initialized
   await sleep(30000);
+  // Connect to ipfs.dappnode.io
+  await connectToDappnodeIpfs();
 }
 
-// Set down the testing IPFS node
+/** Set down the testing IPFS node */
 export async function setDownIpfsNode(): Promise<void> {
   await shell(`docker stop ${ipfsTestContainerName}`);
   await shell(`docker rm ${ipfsTestContainerName}`);
   await removeIPfsDirs();
 }
 
-// Create necessary dirs for the IPFS node
+/** Create necessary dirs for the IPFS node */
 async function createIpfsDIrs(): Promise<void> {
   await shell(`mkdir -p ${ipfsStagingPath}`);
   await shell(`mkdir -p ${ipfsDataPath}`);
 }
 
-// Remove dirs from the IPFS node
+/** Add ipfs.dappnode.io swarm connection */
+async function connectToDappnodeIpfs(): Promise<void> {
+  await ipfs.ipfs.swarm.connect(ipfsDappnodeAddress);
+  await ipfs.ipfs.bootstrap.add(multiaddr(ipfsDappnodeAddress));
+}
+
+/** Remove dirs from the IPFS node */
+
 async function removeIPfsDirs(): Promise<void> {
+  await shell(`ls -la ${ipfsStagingPath}`);
+  await shell(`ls -la ${ipfsStagingPath}`);
   await shell(`rm -rf ${ipfsStagingPath}`);
   await shell(`rm -rf ${ipfsDataPath}`);
 }
