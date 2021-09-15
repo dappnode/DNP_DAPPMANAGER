@@ -40,25 +40,44 @@ export const localIpfsGateway: IPFSHTTPClient = create({
  * source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
  */
 export async function setUpIpfsNode(): Promise<void> {
+  // Startup ipfs container
   await shell(
     `docker run --rm -d --name ${ipfsTestContainerName} -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.9.1`
   );
-  // Timeout for container to be initialized
-  await sleep(30000);
+
+  // Wait until ipfs is available
+  let isIpfsAvail = false;
+  let counter = 0;
+  while (!isIpfsAvail) {
+    isIpfsAvail = await isIpfsNodeAvailable();
+    await sleep(1000);
+    counter++;
+    if (counter === 30) throw Error("Error starting up local IPFS node");
+  }
+
   // Connect to ipfs.dappnode.io
   await connectToDappnodeIpfs();
 }
 
 /** Set down the testing IPFS node */
 export async function setDownIpfsNode(): Promise<void> {
+  // Docker stop sends the SIGTERM signal which makes the container to be removed due to the --rm flag
   await shell(`docker stop ${ipfsTestContainerName}`);
-  await shell(`docker rm -v ${ipfsTestContainerName}`);
 }
 
 /** Add ipfs.dappnode.io swarm connection */
 async function connectToDappnodeIpfs(): Promise<void> {
   await localIpfsApi.swarm.connect(ipfsDappnodeAddress);
   await localIpfsApi.bootstrap.add(multiaddr(ipfsDappnodeAddress));
+}
+
+async function isIpfsNodeAvailable(): Promise<boolean> {
+  try {
+    await localIpfsApi.version();
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 // IPFS utils
