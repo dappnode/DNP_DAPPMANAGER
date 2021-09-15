@@ -1,19 +1,67 @@
 import fs from "fs";
-import { ipfs } from "../src/modules/ipfs";
 import { Manifest } from "../src/types";
-import { globSource, multiaddr } from "ipfs-http-client";
+import {
+  globSource,
+  multiaddr,
+  create,
+  IPFSHTTPClient
+} from "ipfs-http-client";
 import { sleep } from "../src/utils/asyncFlows";
 import shell from "../src/utils/shell";
 
 const ipfsDappnodeAddress =
   "/dns4/ipfs.dappnode.io/tcp/4001/ipfs/QmfB6dT5zxUq1BXiXisgcZKYkvjywdDYBK5keRaqDKH633";
 const ipfsTestContainerName = "dappnode_ipfs_host";
+const ipfsLocalUrl = "http://localhost";
+const ipfsApiPort = "5001";
+const ipfsGatewayPort = "8080";
+const timeout = 30 * 1000;
 
-export type IpfsAddResult = {
+type IpfsAddResult = {
   path: string;
   hash: string;
   size: number;
 };
+
+// IPFS local node for Integration tests
+
+export const localIpfsApi: IPFSHTTPClient = create({
+  url: ipfsLocalUrl + ":" + ipfsApiPort,
+  timeout
+});
+
+export const localIpfsGateway: IPFSHTTPClient = create({
+  url: ipfsLocalUrl + ":" + ipfsGatewayPort,
+  timeout
+});
+
+/**
+ * Set Up an IPFS node for testing purposes on localhost.
+ * source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
+ */
+export async function setUpIpfsNode(): Promise<void> {
+  await shell(
+    `docker run --rm -d --name ${ipfsTestContainerName} -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.9.1`
+  );
+  // Timeout for container to be initialized
+  await sleep(30000);
+  // Connect to ipfs.dappnode.io
+  await connectToDappnodeIpfs();
+}
+
+/** Set down the testing IPFS node */
+export async function setDownIpfsNode(): Promise<void> {
+  await shell(`docker stop ${ipfsTestContainerName}`);
+  await shell(`docker rm -v ${ipfsTestContainerName}`);
+}
+
+/** Add ipfs.dappnode.io swarm connection */
+async function connectToDappnodeIpfs(): Promise<void> {
+  await localIpfsApi.swarm.connect(ipfsDappnodeAddress);
+  await localIpfsApi.bootstrap.add(multiaddr(ipfsDappnodeAddress));
+}
+
+// IPFS utils
 
 /**
  * Wrapper to abstract converting the return values of ipfs.add
@@ -21,7 +69,7 @@ export type IpfsAddResult = {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function ipfsAdd(content: any): Promise<IpfsAddResult> {
-  const addResult = await ipfs.ipfs.add(content);
+  const addResult = await localIpfsApi.add(content);
   return {
     path: addResult.path,
     hash: addResult.cid.toString(),
@@ -56,30 +104,4 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
   const addResult = await ipfsAdd(content);
   return addResult.hash;
-}
-
-/**
- * Set Up an IPFS node for testing purposes on localhost.
- * source: https://docs.ipfs.io/how-to/run-ipfs-inside-docker/
- */
-export async function setUpIpfsNode(): Promise<void> {
-  await shell(
-    `docker run -d --name ${ipfsTestContainerName} -v ipfsdnpdappnodeeth_export:/export -v ipfsdnpdappnodeeth_data:/data/ipfs -p 4001:4001 -p 4001:4001/udp -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.9.1`
-  );
-  // Timeout for container to be initialized
-  await sleep(30000);
-  // Connect to ipfs.dappnode.io
-  await connectToDappnodeIpfs();
-}
-
-/** Set down the testing IPFS node */
-export async function setDownIpfsNode(): Promise<void> {
-  await shell(`docker stop ${ipfsTestContainerName}`);
-  await shell(`docker rm -v ${ipfsTestContainerName}`);
-}
-
-/** Add ipfs.dappnode.io swarm connection */
-async function connectToDappnodeIpfs(): Promise<void> {
-  await ipfs.ipfs.swarm.connect(ipfsDappnodeAddress);
-  await ipfs.ipfs.bootstrap.add(multiaddr(ipfsDappnodeAddress));
 }
