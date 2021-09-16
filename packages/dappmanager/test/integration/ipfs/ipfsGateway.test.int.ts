@@ -6,7 +6,7 @@ import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManife
 import { catCarReaderToMemory } from "../../../src/modules/ipfs/car";
 import { localIpfsGateway } from "../../testIpfsUtils";
 
-describe.only("IPFS remote", function () {
+describe("IPFS remote", function () {
   this.timeout(100000 * 5);
   const testMockPrefix = "testmock-";
   const dnpName = testMockPrefix + "remote-gateway.dnp.dappnode.eth";
@@ -33,9 +33,9 @@ describe.only("IPFS remote", function () {
       dependencies: {},
       license: "Mock-license",
       image: {
-        hash: "QmX33713xY7URwdNyhdHU84mT89KjumaL188W45TzyMKy8",
+        hash: "QmQfLRBMw88TcoQSsCjba3NibsrCKs6x1Lfxft9D4XmkGj",
         path: "mock/mock/mock.mock",
-        size: 641390
+        size: 642090
       }
     };
     expect(contentParsed).to.deep.equal(expectedContent);
