@@ -3,9 +3,10 @@ import { expect } from "chai";
 import { mockManifestWithImage } from "../../testUtils";
 import { ManifestWithImage } from "../../../src/types";
 import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
-import { ipfs } from "../../../src/modules/ipfs";
+import { catCarReaderToMemory } from "../../../src/modules/ipfs/car";
+import { localIpfsGateway } from "../../testIpfsUtils";
 
-describe("IPFS remote", function () {
+describe.only("IPFS remote", function () {
   this.timeout(100000 * 5);
   const testMockPrefix = "testmock-";
   const dnpName = testMockPrefix + "remote-gateway.dnp.dappnode.eth";
@@ -21,7 +22,7 @@ describe("IPFS remote", function () {
 
   it("Should get content from IPFS gateway", async function () {
     // If the content hashed does not match the CID there is thrown an error
-    const buff = await ipfs.catCarReaderToMemory(releaseHash);
+    const buff = await catCarReaderToMemory(localIpfsGateway, releaseHash);
     const contentParsed = JSON.parse(buff.toString());
     const expectedContent = {
       name: "testmock-remote-gateway.dnp.dappnode.eth",

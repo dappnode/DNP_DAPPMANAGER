@@ -1,10 +1,11 @@
 // Ipfs
-import { IpfsInstance } from "./types";
+import { IpfsInstance, IpfsCatOptions } from "./types";
 import { CID } from "ipfs-http-client";
 import { CarReader } from "@ipld/car";
 // Hash
 import crypto from "crypto";
 import mh from "multihashes";
+import { unpack } from "ipfs-car/unpack";
 
 export interface ContentFromIpfsGateway {
   carReader: CarReader;
@@ -34,6 +35,40 @@ export async function getContentFromIpfsGateway(
   } catch (e) {
     throw Error(`Error getting content package from ipfs gateway. ${e}`);
   }
+}
+
+/**
+ * Keeps a CarReader in memory
+ * @param ipfsPath "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
+ * @returns hash contents as a buffer
+ */
+export async function catCarReaderToMemory(
+  ipfs: IpfsInstance,
+  ipfsPath: string,
+  opts?: IpfsCatOptions
+): Promise<Buffer> {
+  const chunks = [];
+  try {
+    const content = await getContentFromIpfsGateway(ipfs, ipfsPath);
+    for await (const unixFsEntry of unpack(content.carReader)) {
+      try {
+        const content = unixFsEntry.content();
+        for await (const chunk of content) {
+          chunks.push(chunk);
+        }
+      } catch (e) {
+        throw Error(`Error getting chunk from file ${unixFsEntry.name}. ${e}`);
+      }
+    }
+  } catch (e) {
+    throw Error(`Error getting carReaderToMemory from ${ipfsPath}. ${e}`);
+  }
+
+  const data = Buffer.concat(chunks);
+  if (opts?.maxLength && data.length >= opts.maxLength)
+    throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
+
+  return data;
 }
 
 // Utils

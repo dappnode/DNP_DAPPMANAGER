@@ -1,4 +1,5 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
+import * as db from "../../db";
 import { logs } from "../../logs";
 import {
   CatStreamToFsArgs,
@@ -7,11 +8,12 @@ import {
 } from "./writeStreamToFs";
 import { IpfsCatOptions, IPFSEntry } from "./types";
 import { handleIpfsError } from "./utils";
-import { getContentFromIpfsGateway } from "./car";
-import { unpack } from "ipfs-car/unpack";
+import { catCarReaderToMemory } from "./car";
+import { IpfsClientTarget } from "../../common";
 
 export class Ipfs {
   ipfs: IPFSHTTPClient;
+  ipfsClientTarget: IpfsClientTarget;
   /** Default IPFS timeout for all requests */
   timeout = 30 * 1000;
 
@@ -23,47 +25,36 @@ export class Ipfs {
       url: ipfsHost,
       timeout: this.timeout
     });
+    this.ipfsClientTarget = db.ipfsClientTarget.get();
   }
 
   /**
-   * Returns a file addressed by a valid IPFS Path.
-   * @param hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
-   * @param options Available options:
-   * - maxLength: specifies a length to read from the stream.
-   *   if reached, it will throw an error
-   * @returns hash contents as a buffer
+   * Downloads and parses buffer to UTF8. Used for small files
+   * @see catString
+   * @see catCarReaderToMemory
    */
-  async cat(hash: string, opts?: IpfsCatOptions): Promise<Buffer> {
-    const chunks = [];
-    try {
-      for await (const chunk of this.ipfs.cat(hash, {
-        length: opts?.maxLength,
-        timeout: this.timeout
-      })) {
-        chunks.push(chunk);
-      }
-    } catch (e) {
-      handleIpfsError(e as Error, hash);
+  async writeFileToMemory(
+    hash: string,
+    opts?: IpfsCatOptions
+  ): Promise<string> {
+    if (this.ipfsClientTarget === "local") {
+      return await this.catString(hash, opts);
+    } else {
+      return await this.catCarReaderToMemory(hash, opts);
     }
-
-    const data = Buffer.concat(chunks);
-    if (opts?.maxLength && data.length >= opts.maxLength)
-      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
-
-    return data;
   }
 
   /**
-   * Downloads and parses buffer to UTF8
-   * @see cat
+   * Directly write the stream to the fs. Used for big files
+   * such as docker images
+   * @param args
    */
-  async catString(hash: string, opts?: IpfsCatOptions): Promise<string> {
-    const buffer = await this.cat(hash, opts);
-    return buffer.toString();
-  }
-
-  async catStreamToFs(args: CatStreamToFsArgs): Promise<void> {
-    return await catStreamToFs(args, this.ipfs);
+  async writeFileToFs(args: CatStreamToFsArgs): Promise<void> {
+    if (this.ipfsClientTarget === "local") {
+      return await catStreamToFs(args, this.ipfs);
+    } else {
+      return await writeCarToFs(args, this.ipfs);
+    }
   }
 
   async ls(hash: string): Promise<IPFSEntry[]> {
@@ -75,7 +66,6 @@ export class Ipfs {
     } catch (e) {
       handleIpfsError(e as Error, hash);
     }
-
     return files;
   }
 
@@ -116,38 +106,42 @@ export class Ipfs {
   async catCarReaderToMemory(
     ipfsPath: string,
     opts?: IpfsCatOptions
-  ): Promise<Buffer> {
-    const chunks = [];
-    try {
-      const content = await getContentFromIpfsGateway(this.ipfs, ipfsPath);
-      for await (const unixFsEntry of unpack(content.carReader)) {
-        try {
-          const content = unixFsEntry.content();
-          for await (const chunk of content) {
-            chunks.push(chunk);
-          }
-        } catch (e) {
-          throw Error(
-            `Error getting chunk from file ${unixFsEntry.name}. ${e}`
-          );
-        }
-      }
-    } catch (e) {
-      throw Error(`Error getting carReaderToMemory from ${ipfsPath}. ${e}`);
-    }
-
-    const data = Buffer.concat(chunks);
-    if (opts?.maxLength && data.length >= opts.maxLength)
-      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
-
-    return data;
+  ): Promise<string> {
+    return (await catCarReaderToMemory(this.ipfs, ipfsPath, opts)).toString();
   }
 
+  // API
+
   /**
-   * Writes a CarReader to the disk
-   * @param ipfsPath QmUn3rbJmLinK518kLwvHfcVbefnLfwe4AYQz88KkaTZZp
+   * Parses a file addressed by a valid IPFS Path.
+   * @param hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
+   * @param options Available options:
+   * - maxLength: specifies a length to read from the stream.
+   *   if reached, it will throw an error
+   * @returns hash contents as a buffer
+   * Downloads and parses buffer to UTF8
+   * @see cat
    */
-  async writeCarToFs(args: CatStreamToFsArgs): Promise<void> {
-    return await writeCarToFs(args, this.ipfs);
+  private async catString(
+    hash: string,
+    opts?: IpfsCatOptions
+  ): Promise<string> {
+    const chunks = [];
+    try {
+      for await (const chunk of this.ipfs.cat(hash, {
+        length: opts?.maxLength,
+        timeout: this.timeout
+      })) {
+        chunks.push(chunk);
+      }
+    } catch (e) {
+      handleIpfsError(e as Error, hash);
+    }
+
+    const buffer = Buffer.concat(chunks);
+    if (opts?.maxLength && buffer.length >= opts.maxLength)
+      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
+
+    return buffer.toString();
   }
 }

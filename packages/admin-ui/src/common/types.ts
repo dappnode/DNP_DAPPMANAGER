@@ -1194,6 +1194,10 @@ export interface VolumeData extends VolumeOwnershipData {
   fileSystem?: MountpointData;
 }
 
+export type IpfsClientTarget = "local" | "remote";
+
+export type IpfsClientFallback = "on" | "off";
+
 /**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup

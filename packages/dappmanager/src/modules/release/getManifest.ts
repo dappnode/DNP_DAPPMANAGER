@@ -5,10 +5,12 @@ import { Manifest } from "../../types";
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
   try {
-    data = await ipfs.catString(contentUri);
+    data = await ipfs.writeFileToMemory(contentUri);
   } catch (e) {
     if (e.message.includes("is a directory")) {
-      data = await ipfs.catString(`${contentUri}/dappnode_package.json`);
+      data = await ipfs.writeFileToMemory(
+        `${contentUri}/dappnode_package.json`
+      );
     } else {
       throw e;
     }

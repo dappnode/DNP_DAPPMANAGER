@@ -36,10 +36,13 @@ export async function downloadAssetRequired<T>(
   const format = config.format || FileFormat.TEXT;
   const validate = validateAsset[fileId];
 
-  const content = await retry(() => ipfs.catString(hash, { maxLength }), {
-    retries: 3,
-    minTimeout: 225
-  });
+  const content = await retry(
+    () => ipfs.writeFileToMemory(hash, { maxLength }),
+    {
+      retries: 3,
+      minTimeout: 225
+    }
+  );
 
   const data = parseAsset(content, format);
 

@@ -85,7 +85,7 @@ export const ethProviderUrl = interceptOnSet(
  * Intercept all on set methods to request an update to the UI
  * @param dbSetter
  */
-function interceptOnSet<
+export function interceptOnSet<
   F extends (...args: any[]) => any,
   T extends { set: F }
 >(dbSetter: T): T {

@@ -139,11 +139,10 @@ const params = {
   NSUPDATE_DAEMON_INTERVAL: 1 * HOUR,
 
   // IPFS parameters
-  IPFS_HOST:
-    process.env.IPFS_HOST ||
-    process.env.IPFS_REDIRECT ||
-    "http://ipfs.dappnode:5001",
+  IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
+  IPFS_LOCAL: "http://ipfs.dappnode:5001",
+  IPFS_REMOTE: "http://ipfs.dappnode.io:8080",
 
   // Web3 parameters
   ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
