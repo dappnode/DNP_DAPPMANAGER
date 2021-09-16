@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { api } from "api";
+import { api, useApi } from "api";
 import Card from "components/Card";
 import Button from "components/Button";
 import {
@@ -17,8 +17,16 @@ import {
 import { changeEthClientTarget } from "pages/system/actions";
 import Alert from "react-bootstrap/Alert";
 import { withToastNoThrow } from "components/toast/Toast";
+import { IpfsClient } from "components/IpfsClient";
+import { IpfsClientTarget } from "common";
 
 export default function Repository() {
+  // IPFS
+  const ipfsClientTarget = useApi.ipfsClientTargetGet();
+  const [ipfsTarget, setIpfsTarget] = useState<IpfsClientTarget | null>(
+    ipfsClientTarget.data || null
+  );
+  // Eth
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
@@ -31,6 +39,20 @@ export default function Repository() {
   useEffect(() => {
     if (ethClientTarget) setTarget(ethClientTarget);
   }, [ethClientTarget]);
+
+  useEffect(() => {
+    if (ipfsClientTarget.data) setIpfsTarget(ipfsClientTarget.data);
+  }, [ipfsClientTarget.data]);
+
+  async function changeIpfsClient() {
+    if (ipfsTarget)
+      await withToastNoThrow(
+        () => api.ipfsClientTargetSet({ target: ipfsTarget }),
+        {
+          onError: true
+        }
+      );
+  }
 
   function changeClient() {
     if (target) dispatch(changeEthClientTarget(target));
@@ -80,38 +102,63 @@ export default function Repository() {
   }
 
   return (
-    <Card className="dappnode-identity">
-      <div>
-        DAppNode uses smart contracts to access a decentralized respository of
-        DApps. Choose to connect to a remote network or use your own local node
-      </div>
-      {ethClientTarget && ethClientTarget !== "remote" && (
-        <div className="description">
-          <strong>Client:</strong> {getEthClientPrettyName(ethClientTarget)}
-          <br />
-          <strong>Status:</strong>{" "}
-          {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
+    <>
+      <Card className="dappnode-identity">
+        <div>
+          DAppNode uses smart contracts to access a decentralized respository of
+          DApps. Choose to connect to a remote network or use your own local
+          node
         </div>
-      )}
+        {ethClientTarget && ethClientTarget !== "remote" && (
+          <div className="description">
+            <strong>Client:</strong> {getEthClientPrettyName(ethClientTarget)}
+            <br />
+            <strong>Status:</strong>{" "}
+            {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
+          </div>
+        )}
 
-      {renderEthMultiClientWarning()}
+        {renderEthMultiClientWarning()}
 
-      <EthMultiClientsAndFallback
-        target={target}
-        onTargetChange={setTarget}
-        fallback={ethClientFallback || "off"}
-        onFallbackChange={changeFallback}
-      />
+        <EthMultiClientsAndFallback
+          target={target}
+          onTargetChange={setTarget}
+          fallback={ethClientFallback || "off"}
+          onFallbackChange={changeFallback}
+        />
 
-      <div style={{ textAlign: "end" }}>
-        <Button
-          variant="dappnode"
-          onClick={changeClient}
-          disabled={!target || ethClientTarget === target}
-        >
-          Change
-        </Button>
-      </div>
-    </Card>
+        <div style={{ textAlign: "end" }}>
+          <Button
+            variant="dappnode"
+            onClick={changeClient}
+            disabled={!target || ethClientTarget === target}
+          >
+            Change
+          </Button>
+        </div>
+      </Card>
+      <Card className="dappnode-identity">
+        <div>
+          DAppNode uses IPFS to distribute DAppNode packages in a decentrallized
+          way. Choose to connect to a remote IPFS gateway or use your own local
+          IPFS node
+        </div>
+        {ipfsClientTarget.data ? (
+          <>
+            <IpfsClient target={ipfsTarget} onTargetChange={setIpfsTarget} />
+
+            <div style={{ textAlign: "end" }}>
+              <Button
+                variant="dappnode"
+                onClick={() => changeIpfsClient()}
+                disabled={!ipfsTarget || ipfsClientTarget.data === ipfsTarget}
+              >
+                Change
+              </Button>
+            </div>
+          </>
+        ) : null}
+      </Card>
+    </>
   );
 }

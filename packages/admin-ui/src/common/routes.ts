@@ -274,7 +274,15 @@ export interface Routes {
   /**
    * Sets the ipfs client target: local | remote
    */
-  ipfsClientTargetSet(ipfsClientTarget: IpfsClientTarget): Promise<void>;
+  ipfsClientTargetSet(kwargs: {
+    target: IpfsClientTarget;
+    deleteLocalIpfsClient?: boolean;
+  }): Promise<void>;
+
+  /**
+   * Gets the Ipfs client target
+   */
+  ipfsClientTargetGet(): Promise<IpfsClientTarget>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.
@@ -655,6 +663,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
   ipfsClientTargetSet: { log: true },
+  ipfsClientTargetGet: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   mountpointsGet: {},

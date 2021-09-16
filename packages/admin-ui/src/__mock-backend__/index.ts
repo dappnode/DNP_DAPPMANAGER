@@ -225,7 +225,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     "Security updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
-  ipfsClientTargetSet: async () => {}
+  ipfsClientTargetSet: async () => {},
+  ipfsClientTargetGet: async () => "local"
 };
 
 export const calls: Routes = {
