@@ -23,9 +23,7 @@ import { IpfsClientTarget } from "common";
 export default function Repository() {
   // IPFS
   const ipfsClientTarget = useApi.ipfsClientTargetGet();
-  const [ipfsTarget, setIpfsTarget] = useState<IpfsClientTarget | null>(
-    ipfsClientTarget.data || null
-  );
+  const [ipfsTarget, setIpfsTarget] = useState<IpfsClientTarget | null>(null);
   // Eth
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
@@ -45,13 +43,8 @@ export default function Repository() {
   }, [ipfsClientTarget.data]);
 
   async function changeIpfsClient() {
-    if (ipfsTarget)
-      await withToastNoThrow(
-        () => api.ipfsClientTargetSet({ target: ipfsTarget }),
-        {
-          onError: true
-        }
-      );
+    if (ipfsTarget) await api.ipfsClientTargetSet({ target: ipfsTarget });
+    await ipfsClientTarget.revalidate();
   }
 
   function changeClient() {
@@ -150,7 +143,7 @@ export default function Repository() {
             <div style={{ textAlign: "end" }}>
               <Button
                 variant="dappnode"
-                onClick={() => changeIpfsClient()}
+                onClick={changeIpfsClient}
                 disabled={!ipfsTarget || ipfsClientTarget.data === ipfsTarget}
               >
                 Change

@@ -18,7 +18,7 @@ export async function getContentFromIpfsGateway(
   ipfsPath: string
 ): Promise<ContentFromIpfsGateway> {
   try {
-    const cid = CID.parse(ipfsPath);
+    const cid = CID.parse(sanitizeIpfsPath(ipfsPath));
     const carStream = ipfs.dag.export(cid);
     const carReader = await CarReader.fromIterable(carStream);
     const carReaderRoots = await carReader.getRoots();
@@ -85,4 +85,15 @@ function isTrustedContent(buf: Uint8Array, originalCid: CID): boolean {
   }
 
   return hashBuff(buf) === fromIpfsToHashSha(originalCid.toString());
+}
+
+/** Receives an ipfs path and returns it without the /ipfs/
+ * @ipfsPath /ipfs/QmXiTSZNtahKFvwTsBmiXAXmwGhaXtYx1LyyP6QHKfXEWH
+ * @returns QmXiTSZNtahKFvwTsBmiXAXmwGhaXtYx1LyyP6QHKfXEWH
+ */
+function sanitizeIpfsPath(ipfsPath: string): string {
+  if (ipfsPath.includes("ipfs")) {
+    return ipfsPath.replace("/ipfs/", "");
+  }
+  return ipfsPath;
 }

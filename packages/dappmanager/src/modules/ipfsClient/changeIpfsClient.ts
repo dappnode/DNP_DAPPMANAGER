@@ -2,6 +2,7 @@ import params from "../../params";
 import * as db from "../../db";
 import { packageRemove, packageGet, packageInstall } from "../../calls";
 import { IpfsClientTarget } from "../../types";
+import { ipfs } from "../ipfs";
 
 /**
  * Changes IPFS client from remote to local and viceversa.
@@ -23,10 +24,12 @@ export async function changeIpfsClient(
     if (nextTarget === "local") {
       if (!isInstalled) await packageInstall({ name: params.ipfsDnpName });
       db.ipfsClientTarget.set("local");
+      ipfs.changeHost(params.IPFS_LOCAL);
     } else {
       if (isInstalled && deleteLocalIpfsClient)
         await packageRemove({ dnpName: params.ipfsDnpName });
       db.ipfsClientTarget.set("remote");
+      ipfs.changeHost(params.IPFS_REMOTE);
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

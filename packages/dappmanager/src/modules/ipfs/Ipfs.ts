@@ -29,6 +29,17 @@ export class Ipfs {
   }
 
   /**
+   *
+   * @param newHost
+   */
+  changeHost(newHost: string): void {
+    this.ipfs = create({
+      url: newHost,
+      timeout: this.timeout
+    });
+  }
+
+  /**
    * Downloads and parses buffer to UTF8. Used for small files
    * @see catString
    * @see catCarReaderToMemory
@@ -103,7 +114,7 @@ export class Ipfs {
    * @param ipfsPath "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
    * @returns hash contents as a buffer
    */
-  async catCarReaderToMemory(
+  private async catCarReaderToMemory(
     ipfsPath: string,
     opts?: IpfsCatOptions
   ): Promise<string> {

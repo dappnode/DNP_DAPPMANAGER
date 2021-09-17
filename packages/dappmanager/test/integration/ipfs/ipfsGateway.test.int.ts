@@ -33,9 +33,9 @@ describe("IPFS remote", function () {
       dependencies: {},
       license: "Mock-license",
       image: {
-        hash: "QmQfLRBMw88TcoQSsCjba3NibsrCKs6x1Lfxft9D4XmkGj",
+        hash: "QmS56YysKP8aBLUh3rEm2iwqivdBdfbTF5fDUAwWNMhJQA",
         path: "mock/mock/mock.mock",
-        size: 642090
+        size: 642158
       }
     };
     expect(contentParsed).to.deep.equal(expectedContent);

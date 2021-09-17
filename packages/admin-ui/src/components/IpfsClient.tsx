@@ -2,6 +2,7 @@ import React from "react";
 import "./multiClient.scss";
 import { IpfsClientTarget } from "common";
 import Card from "components/Card";
+import { joinCssClass } from "utils/css";
 
 interface IpfsClientData {
   title: string;
@@ -30,29 +31,26 @@ const clients: IpfsClientData[] = [
  */
 export function IpfsClient({
   target: selectedTarget,
-  onTargetChange,
-  showStats
+  onTargetChange
 }: {
   target: IpfsClientTarget | null;
   onTargetChange: (newTarget: IpfsClientTarget) => void;
-  showStats?: boolean;
 }) {
   return (
     <div className="ipfs-multi-clients">
       {clients
         .filter(({ option }) => option.length > 0)
         .map(({ title, description, option }) => {
-          const defaultTarget = option;
           const selected = selectedTarget && option === selectedTarget;
 
           return (
             <Card
-              key={defaultTarget}
+              key={option}
               shadow
-              className="ipfs-multi-client"
+              className={`ipfs-multi-client ${joinCssClass({ selected })}`}
               onClick={() => {
                 // Prevent over-riding the options onTargetChange call
-                if (!selected) onTargetChange(defaultTarget);
+                if (!selected) onTargetChange(option);
               }}
             >
               <div className="title">{title}</div>
