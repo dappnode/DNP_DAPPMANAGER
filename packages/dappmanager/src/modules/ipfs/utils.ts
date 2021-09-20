@@ -1,4 +1,4 @@
-import { IPFSEntry } from ".";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 import { IpfsFileResult } from "../../types";
 import * as db from "../../db";
 import params from "../../params";

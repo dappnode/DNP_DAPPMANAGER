@@ -1,5 +1,6 @@
 import retry from "async-retry";
-import { ipfs, IPFSEntry } from "../../ipfs";
+import { ipfs } from "../../ipfs";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 import { parseAsset } from "./parseAsset";
 import { FileConfig } from "./types";
 import { validateAsset, DirectoryFiles } from "./params";

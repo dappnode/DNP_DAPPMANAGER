@@ -1,4 +1,5 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import {
@@ -6,10 +7,11 @@ import {
   catStreamToFs,
   writeCarToFs
 } from "./writeStreamToFs";
-import { IpfsCatOptions, IPFSEntry } from "./types";
+import { IpfsCatOptions, IpfsDagGet } from "./types";
 import { handleIpfsError } from "./utils";
 import { catCarReaderToMemory } from "./car";
 import { IpfsClientTarget } from "../../common";
+import path from "path";
 
 export class Ipfs {
   ipfs: IPFSHTTPClient;
@@ -72,8 +74,28 @@ export class Ipfs {
   async ls(hash: string): Promise<IPFSEntry[]> {
     const files: IPFSEntry[] = [];
     try {
-      for await (const file of this.ipfs.ls(hash, { timeout: this.timeout })) {
-        files.push(file);
+      if (this.ipfsClientTarget === "local") {
+        for await (const file of this.ipfs.ls(hash, {
+          timeout: this.timeout
+        })) {
+          files.push(file);
+        }
+      } else {
+        const cid = CID.parse(hash);
+        const content = await this.ipfs.dag.get(cid);
+        const contentLinks: IpfsDagGet[] = content.value.links;
+        if (!contentLinks) throw Error(`hash ${hash} does not contain links`);
+        contentLinks.map(link => {
+          const cid = CID.asCID(link.Cid["/"]);
+          if (!cid) throw Error("Error getting cid");
+          files.push({
+            type: "file",
+            cid,
+            name: link.Name,
+            path: path.join(link.Cid["/"], link.Name),
+            size: link.Size
+          });
+        });
       }
     } catch (e) {
       handleIpfsError(e as Error, hash);

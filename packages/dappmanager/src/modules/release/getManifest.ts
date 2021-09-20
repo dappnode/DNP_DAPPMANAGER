@@ -6,8 +6,8 @@ import { isDirectoryRelease } from "./ipfs/isDirectoryRelease";
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
   try {
-    const files = await ipfs.ls(contentUri);
-    const isDirectory = await isDirectoryRelease(files);
+    const ipfsEntries = await ipfs.ls(contentUri);
+    const isDirectory = await isDirectoryRelease(ipfsEntries);
     if (isDirectory) {
       data = await ipfs.writeFileToMemory(
         `${contentUri}/dappnode_package.json`

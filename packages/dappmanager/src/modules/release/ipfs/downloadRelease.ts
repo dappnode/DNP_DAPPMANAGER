@@ -1,6 +1,7 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs, IPFSEntry } from "../../ipfs";
+import { ipfs } from "../../ipfs";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -47,8 +48,8 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
 
   try {
     // Check if it is an ipfs path of a root directory release
-    const files = await ipfs.ls(hash);
-    const isDirectory = await isDirectoryRelease(files);
+    const ipfsEntries = await ipfs.ls(hash);
+    const isDirectory = await isDirectoryRelease(ipfsEntries);
 
     if (!isDirectory) {
       const manifest = await downloadManifest(hash);
@@ -68,6 +69,7 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
         composeUnsafe: manifestToCompose(manifestWithImage)
       };
     } else {
+      const files = await ipfs.ls(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
 
       // Pin release on visit

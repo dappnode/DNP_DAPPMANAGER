@@ -37,6 +37,28 @@ export async function getContentFromIpfsGateway(
   }
 }
 
+export async function unpackFileFromCarReader(
+  carReader: CarReader
+): Promise<AsyncIterable<Uint8Array>> {
+  const filesIterables = [];
+  try {
+    for await (const unixFsEntry of unpack(carReader)) {
+      if (unixFsEntry.type === "file") {
+        filesIterables.push(unixFsEntry.content());
+      } else {
+        throw Error(`Expexted type: file. Got: ${unixFsEntry.type}`);
+      }
+    }
+
+    if (filesIterables.length > 1)
+      throw Error(`Unexpected number of files. There must be only one`);
+
+    return filesIterables[0];
+  } catch (e) {
+    throw e;
+  }
+}
+
 /**
  * Keeps a CarReader in memory
  * @param ipfsPath "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"

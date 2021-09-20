@@ -1,5 +1,5 @@
 import { FileFormat } from "../../types";
-import { IPFSEntry } from "../ipfs";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 
 export interface FileConfig {
   regex: RegExp;

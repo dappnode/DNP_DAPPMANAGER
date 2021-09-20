@@ -19,6 +19,7 @@ import Alert from "react-bootstrap/Alert";
 import { withToastNoThrow, withToast } from "components/toast/Toast";
 import { IpfsClient } from "components/IpfsClient";
 import { IpfsClientTarget } from "common";
+import SubTitle from "components/SubTitle";
 
 export default function Repository() {
   // IPFS
@@ -101,6 +102,7 @@ export default function Repository() {
   return (
     <>
       <Card className="dappnode-identity">
+        <SubTitle>Ethereum</SubTitle>
         <div>
           DAppNode uses smart contracts to access a decentralized respository of
           DApps. Choose to connect to a remote network or use your own local
@@ -135,6 +137,7 @@ export default function Repository() {
         </div>
       </Card>
       <Card className="dappnode-identity">
+        <SubTitle>Ipfs</SubTitle>
         <div>
           DAppNode uses IPFS to distribute DAppNode packages in a decentrallized
           way. Choose to connect to a remote IPFS gateway or use your own local
