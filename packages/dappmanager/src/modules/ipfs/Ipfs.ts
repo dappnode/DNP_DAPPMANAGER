@@ -32,11 +32,12 @@ export class Ipfs {
    *
    * @param newHost
    */
-  changeHost(newHost: string): void {
+  changeHost(newHost: string, ipfsClientTarget: IpfsClientTarget): void {
     this.ipfs = create({
       url: newHost,
       timeout: this.timeout
     });
+    this.ipfsClientTarget = ipfsClientTarget;
   }
 
   /**

@@ -9,7 +9,7 @@ export class ReleaseFetcher extends Apm {
   /**
    * Resolves name + version to an IPFS hash
    */
-  /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async resolveReleaseName(name: string, version?: string) {
     return resolveReleaseName(this, name, version);
   }
@@ -38,7 +38,7 @@ export class ReleaseFetcher extends Apm {
   /**
    * Resolve a request dependencies and fetch their release assets
    */
-  /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async getReleasesResolved(req: PackageRequest, options?: DappgetOptions) {
     const result = await dappGet(req, options);
     const releases = await this.getReleases(result.state);

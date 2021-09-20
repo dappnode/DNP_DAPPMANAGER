@@ -16,7 +16,7 @@ import {
 } from "services/dappnodeStatus/selectors";
 import { changeEthClientTarget } from "pages/system/actions";
 import Alert from "react-bootstrap/Alert";
-import { withToastNoThrow } from "components/toast/Toast";
+import { withToastNoThrow, withToast } from "components/toast/Toast";
 import { IpfsClient } from "components/IpfsClient";
 import { IpfsClientTarget } from "common";
 
@@ -43,7 +43,11 @@ export default function Repository() {
   }, [ipfsClientTarget.data]);
 
   async function changeIpfsClient() {
-    if (ipfsTarget) await api.ipfsClientTargetSet({ target: ipfsTarget });
+    if (ipfsTarget)
+      await withToast(() => api.ipfsClientTargetSet({ target: ipfsTarget }), {
+        message: `Setting IPFS mode ${ipfsTarget}...`,
+        onSuccess: `Successfully changed to ${ipfsTarget}`
+      });
     await ipfsClientTarget.revalidate();
   }
 

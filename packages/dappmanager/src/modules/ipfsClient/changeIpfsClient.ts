@@ -24,12 +24,12 @@ export async function changeIpfsClient(
     if (nextTarget === "local") {
       if (!isInstalled) await packageInstall({ name: params.ipfsDnpName });
       db.ipfsClientTarget.set("local");
-      ipfs.changeHost(params.IPFS_LOCAL);
+      ipfs.changeHost(params.IPFS_LOCAL, "local");
     } else {
       if (isInstalled && deleteLocalIpfsClient)
         await packageRemove({ dnpName: params.ipfsDnpName });
       db.ipfsClientTarget.set("remote");
-      ipfs.changeHost(params.IPFS_REMOTE);
+      ipfs.changeHost(params.IPFS_REMOTE, "remote");
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

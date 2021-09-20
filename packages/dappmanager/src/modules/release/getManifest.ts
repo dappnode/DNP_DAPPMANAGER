@@ -1,19 +1,22 @@
 import { ipfs } from "../ipfs";
 import { parseManifest, validateManifestBasic } from "../manifest";
 import { Manifest } from "../../types";
+import { isDirectoryRelease } from "./ipfs/isDirectoryRelease";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
   try {
-    data = await ipfs.writeFileToMemory(contentUri);
-  } catch (e) {
-    if (e.message.includes("is a directory")) {
+    const files = await ipfs.ls(contentUri);
+    const isDirectory = await isDirectoryRelease(files);
+    if (isDirectory) {
       data = await ipfs.writeFileToMemory(
         `${contentUri}/dappnode_package.json`
       );
     } else {
-      throw e;
+      data = await ipfs.writeFileToMemory(contentUri);
     }
+  } catch (e) {
+    throw e;
   }
 
   return validateManifestBasic(parseManifest(data));
