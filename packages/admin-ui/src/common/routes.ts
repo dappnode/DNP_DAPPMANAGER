@@ -39,7 +39,7 @@ import {
   CurrentWifiCredentials,
   LocalProxyingStatus,
   RegistryScanProgress,
-  IpfsClientTarget
+  IpfsRepository
 } from "./types";
 
 export interface Routes {
@@ -275,14 +275,14 @@ export interface Routes {
    * Sets the ipfs client target: local | remote
    */
   ipfsClientTargetSet(kwargs: {
-    target: IpfsClientTarget;
+    ipfsRepository: IpfsRepository;
     deleteLocalIpfsClient?: boolean;
   }): Promise<void>;
 
   /**
    * Gets the Ipfs client target
    */
-  ipfsClientTargetGet(): Promise<IpfsClientTarget>;
+  ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.

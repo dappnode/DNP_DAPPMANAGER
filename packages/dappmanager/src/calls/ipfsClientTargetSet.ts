@@ -1,17 +1,22 @@
 import { changeIpfsClient } from "../modules/ipfsClient";
-import { IpfsClientTarget } from "../types";
+import { IpfsRepository } from "../types";
 
 /**
  * Changes the ethereum client used to fetch package data
  */
 export async function ipfsClientTargetSet({
-  target,
+  ipfsRepository,
   deleteLocalIpfsClient
 }: {
-  target: IpfsClientTarget;
+  ipfsRepository: IpfsRepository;
   deleteLocalIpfsClient?: boolean;
 }): Promise<void> {
-  if (!target) throw Error(`Argument target must be defined`);
+  if (!ipfsRepository.ipfsClientTarget)
+    throw Error(`Argument target must be defined`);
 
-  await changeIpfsClient(target, deleteLocalIpfsClient);
+  await changeIpfsClient(
+    ipfsRepository.ipfsClientTarget,
+    deleteLocalIpfsClient,
+    ipfsRepository.ipfsGateway
+  );
 }

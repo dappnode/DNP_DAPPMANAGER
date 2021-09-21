@@ -22,8 +22,13 @@ export function fromIpfsEntries(ipfsEntries: IPFSEntry[]): IpfsFileResult[] {
 }
 
 export function getIpfsUrl(): string {
+  // 1. Check for process envs insert in tests
   if (params.IPFS_HOST) return params.IPFS_HOST;
+  // 2. Get ipfs client target
   const ipfsClientTarget = db.ipfsClientTarget.get();
   if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
-  return ipfsClientTarget === "local" ? params.IPFS_LOCAL : params.IPFS_REMOTE;
+  // 2.1 If LOCAL
+  if (ipfsClientTarget === "local") return params.IPFS_LOCAL;
+  // 2.2 If REMOTE
+  return db.ipfsGateway.get();
 }

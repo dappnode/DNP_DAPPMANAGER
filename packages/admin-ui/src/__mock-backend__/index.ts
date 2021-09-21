@@ -226,7 +226,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   ipfsClientTargetSet: async () => {},
-  ipfsClientTargetGet: async () => "local"
+  ipfsClientTargetGet: async () => ({
+    ipfsClientTarget: "remote",
+    ipfsGateway: "http://ipfs.dappnode.io:8081"
+  })
 };
 
 export const calls: Routes = {

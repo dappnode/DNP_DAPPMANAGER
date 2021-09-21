@@ -1194,6 +1194,11 @@ export interface VolumeData extends VolumeOwnershipData {
   fileSystem?: MountpointData;
 }
 
+export interface IpfsRepository {
+  ipfsClientTarget: IpfsClientTarget;
+  ipfsGateway: string;
+}
+
 export type IpfsClientTarget = "local" | "remote";
 
 /**

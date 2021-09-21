@@ -23,9 +23,16 @@ import SubTitle from "components/SubTitle";
 
 export default function Repository() {
   // IPFS
-  const ipfsClientTarget = useApi.ipfsClientTargetGet();
-  const [ipfsTarget, setIpfsTarget] = useState<IpfsClientTarget | null>(null);
-  // Eth
+  const ipfsRepository = useApi.ipfsClientTargetGet();
+  const [
+    ipfsClientTarget,
+    setIpfsClientTarget
+  ] = useState<IpfsClientTarget | null>(null);
+  const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string | null>(
+    null
+  );
+
+  // ETH
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
@@ -35,22 +42,41 @@ export default function Repository() {
     ethClientTarget || null
   );
 
+  // IPFS
+  useEffect(() => {
+    if (ipfsRepository.data)
+      setIpfsClientTarget(ipfsRepository.data.ipfsClientTarget);
+    if (ipfsRepository.data)
+      setIpfsGatewayTarget(ipfsRepository.data.ipfsGateway);
+  }, [ipfsRepository.data]);
+
+  // ETH
   useEffect(() => {
     if (ethClientTarget) setTarget(ethClientTarget);
   }, [ethClientTarget]);
 
-  useEffect(() => {
-    if (ipfsClientTarget.data) setIpfsTarget(ipfsClientTarget.data);
-  }, [ipfsClientTarget.data]);
+  // IPFS
 
   async function changeIpfsClient() {
-    if (ipfsTarget)
-      await withToast(() => api.ipfsClientTargetSet({ target: ipfsTarget }), {
-        message: `Setting IPFS mode ${ipfsTarget}...`,
-        onSuccess: `Successfully changed to ${ipfsTarget}`
-      });
-    await ipfsClientTarget.revalidate();
+    if (ipfsClientTarget && ipfsGatewayTarget)
+      await withToast(
+        () =>
+          api.ipfsClientTargetSet({
+            ipfsRepository: {
+              ipfsClientTarget: ipfsClientTarget,
+              ipfsGateway: ipfsGatewayTarget
+            },
+            deleteLocalIpfsClient: false
+          }),
+        {
+          message: `Setting IPFS mode ${ipfsClientTarget}...`,
+          onSuccess: `Successfully changed to ${ipfsClientTarget}`
+        }
+      );
+    await ipfsRepository.revalidate();
   }
+
+  // ETH
 
   function changeClient() {
     if (target) dispatch(changeEthClientTarget(target));
@@ -143,15 +169,24 @@ export default function Repository() {
           way. Choose to connect to a remote IPFS gateway or use your own local
           IPFS node
         </div>
-        {ipfsClientTarget.data ? (
+        {ipfsRepository.data ? (
           <>
-            <IpfsClient target={ipfsTarget} onTargetChange={setIpfsTarget} />
+            <IpfsClient
+              clientTarget={ipfsClientTarget}
+              onClientTargetChange={setIpfsClientTarget}
+              gatewayTarget={ipfsGatewayTarget}
+              onGatewayTargetChange={setIpfsGatewayTarget}
+            />
 
             <div style={{ textAlign: "end" }}>
               <Button
                 variant="dappnode"
                 onClick={changeIpfsClient}
-                disabled={!ipfsTarget || ipfsClientTarget.data === ipfsTarget}
+                disabled={
+                  !ipfsClientTarget ||
+                  (ipfsRepository.data.ipfsClientTarget === ipfsClientTarget &&
+                    ipfsRepository.data.ipfsGateway === ipfsGatewayTarget)
+                }
               >
                 Change
               </Button>

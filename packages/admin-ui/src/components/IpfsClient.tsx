@@ -3,6 +3,7 @@ import "./multiClient.scss";
 import { IpfsClientTarget } from "common";
 import Card from "components/Card";
 import { joinCssClass } from "utils/css";
+import Input from "./Input";
 
 interface IpfsClientData {
   title: string;
@@ -30,18 +31,23 @@ const clients: IpfsClientData[] = [
  * - Local
  */
 export function IpfsClient({
-  target: selectedTarget,
-  onTargetChange
+  clientTarget: selectedClientTarget,
+  gatewayTarget,
+  onClientTargetChange,
+  onGatewayTargetChange
 }: {
-  target: IpfsClientTarget | null;
-  onTargetChange: (newTarget: IpfsClientTarget) => void;
+  clientTarget: IpfsClientTarget | null;
+  gatewayTarget: string | null;
+  onClientTargetChange: (newTarget: IpfsClientTarget) => void;
+  onGatewayTargetChange: (newTarget: string) => void;
 }) {
   return (
     <div className="ipfs-multi-clients">
       {clients
         .filter(({ option }) => option.length > 0)
         .map(({ title, description, option }) => {
-          const selected = selectedTarget && option === selectedTarget;
+          const selected =
+            selectedClientTarget && option === selectedClientTarget;
 
           return (
             <Card
@@ -49,12 +55,19 @@ export function IpfsClient({
               shadow
               className={`ipfs-multi-client ${joinCssClass({ selected })}`}
               onClick={() => {
-                // Prevent over-riding the options onTargetChange call
-                if (!selected) onTargetChange(option);
+                // Prevent over-riding the options onClientTargetChange call
+                if (!selected) onClientTargetChange(option);
               }}
             >
               <div className="title">{title}</div>
               <div className="description">{description}</div>
+
+              {option === "remote" && (
+                <Input
+                  value={gatewayTarget || ""}
+                  onValueChange={onGatewayTargetChange}
+                />
+              )}
             </Card>
           );
         })}

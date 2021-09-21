@@ -8,16 +8,20 @@ import { ipfs } from "../ipfs";
  * Changes IPFS client from remote to local and viceversa.
  * I local mode is set and IPFS is not installed, it will install
  * the IPFS package
+ * @param nextTarget "local" | "remote"
  * @param deleteLocalIpfsClient If set delete IPFS package
+ * @param nextGateway Gateway endpoint to be used by remote node. By default dappnode gateway
  */
 export async function changeIpfsClient(
   nextTarget: IpfsClientTarget,
-  deleteLocalIpfsClient?: boolean
+  deleteLocalIpfsClient?: boolean,
+  nextGateway?: string
 ): Promise<void> {
   try {
-    // Return if targets are equal
+    // Return if targets and gateways are equal
     const currentTarget = db.ipfsClientTarget.get();
-    if (currentTarget === nextTarget) return;
+    const currentGateway = db.ipfsGateway.get();
+    if (currentTarget === nextTarget && currentGateway === nextGateway) return;
 
     const isInstalled = await isIpfsInstalled();
 
@@ -26,10 +30,16 @@ export async function changeIpfsClient(
       db.ipfsClientTarget.set("local");
       ipfs.changeHost(params.IPFS_LOCAL, "local");
     } else {
+      // Delete IPFS on demmand
       if (isInstalled && deleteLocalIpfsClient)
         await packageRemove({ dnpName: params.ipfsDnpName });
+
+      // Set new values in db
+      db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
       db.ipfsClientTarget.set("remote");
-      ipfs.changeHost(params.IPFS_REMOTE, "remote");
+
+      // Change IPFS host
+      ipfs.changeHost(db.ipfsGateway.get(), "remote");
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

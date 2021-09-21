@@ -1,6 +1,9 @@
 import * as db from "../db";
-import { IpfsClientTarget } from "../common";
+import { IpfsRepository } from "../common";
 
-export async function ipfsClientTargetGet(): Promise<IpfsClientTarget> {
-  return db.ipfsClientTarget.get();
+export async function ipfsClientTargetGet(): Promise<IpfsRepository> {
+  return {
+    ipfsClientTarget: db.ipfsClientTarget.get(),
+    ipfsGateway: db.ipfsGateway.get()
+  };
 }
