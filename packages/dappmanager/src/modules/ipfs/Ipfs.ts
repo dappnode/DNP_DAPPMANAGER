@@ -86,11 +86,10 @@ export class Ipfs {
         const contentLinks: IpfsDagGet[] = content.value.links;
         if (!contentLinks) throw Error(`hash ${hash} does not contain links`);
         contentLinks.map(link => {
-          const cid = CID.asCID(link.Cid["/"]);
           if (!cid) throw Error("Error getting cid");
           files.push({
             type: "file",
-            cid,
+            cid: CID.parse(link.Cid["/"]),
             name: link.Name,
             path: path.join(link.Cid["/"], link.Name),
             size: link.Size
