@@ -83,10 +83,12 @@ export class Ipfs {
           files.push(file);
         }
       } else {
-        const cid = CID.parse(sanitizeIpfsPath(hash));
+        const hashSanitized = sanitizeIpfsPath(hash);
+        const cid = CID.parse(hashSanitized);
         const content = await this.ipfs.dag.get(cid);
         const contentLinks: IpfsDagGet[] = content.value.links;
-        if (!contentLinks) throw Error(`hash ${hash} does not contain links`);
+        if (!contentLinks)
+          throw Error(`hash ${hashSanitized} does not contain links`);
         contentLinks.map(link => {
           if (!cid) throw Error("Error getting cid");
           files.push({
