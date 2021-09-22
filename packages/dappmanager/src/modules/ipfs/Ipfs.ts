@@ -86,7 +86,7 @@ export class Ipfs {
         const hashSanitized = sanitizeIpfsPath(hash);
         const cid = CID.parse(hashSanitized);
         const content = await this.ipfs.dag.get(cid);
-        const contentLinks: IpfsDagGet[] = content.value.links;
+        const contentLinks: IpfsDagGet[] = content.value.Links;
         if (!contentLinks)
           throw Error(`hash ${hashSanitized} does not contain links`);
         contentLinks.map(link => {
