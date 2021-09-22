@@ -93,9 +93,9 @@ export class Ipfs {
           if (!cid) throw Error("Error getting cid");
           files.push({
             type: "file",
-            cid: CID.parse(link.Cid["/"]),
+            cid: CID.parse(link.Hash),
             name: link.Name,
-            path: path.join(link.Cid["/"], link.Name),
+            path: path.join(link.Hash, link.Name),
             size: link.Size
           });
         });

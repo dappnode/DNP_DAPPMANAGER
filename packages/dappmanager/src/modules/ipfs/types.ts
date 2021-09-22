@@ -3,9 +3,7 @@ import { IPFSHTTPClient } from "ipfs-http-client";
 export interface IpfsDagGet {
   Name: string;
   Size: number;
-  Cid: {
-    "/": string;
-  };
+  Hash: string;
 }
 
 export interface IpfsCatOptions {

@@ -4,6 +4,7 @@ import { IpfsClientTarget } from "common";
 import Card from "components/Card";
 import { joinCssClass } from "utils/css";
 import Input from "./Input";
+import { IPFS_DAPPNODE_GATEWAY, IPFS_GATEWAY_CHECKER } from "params";
 
 interface IpfsClientData {
   title: string;
@@ -14,7 +15,7 @@ interface IpfsClientData {
 const clients: IpfsClientData[] = [
   {
     title: "Remote",
-    description: "Public IPFS node API mantained by DAppNode",
+    description: `Public IPFS node API mantained by DAppNode ${IPFS_DAPPNODE_GATEWAY} or choose one from ${IPFS_GATEWAY_CHECKER}`,
     option: "remote"
   },
   {
