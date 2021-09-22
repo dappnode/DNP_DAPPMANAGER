@@ -2,7 +2,7 @@ import { changeIpfsClient } from "../modules/ipfsClient";
 import { IpfsRepository } from "../types";
 
 /**
- * Changes the ethereum client used to fetch package data
+ * Changes the IPFS client
  */
 export async function ipfsClientTargetSet({
   ipfsRepository,

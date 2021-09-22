@@ -1,5 +1,5 @@
 import { IpfsInstance, IpfsCatOptions } from "./types";
-import { getContentFromGw } from "./getContentFromGw";
+import { getContentFromGateway } from "./getContentFromGateway";
 import { unpack } from "ipfs-car/unpack";
 import { handleIpfsError } from "./utils";
 
@@ -16,7 +16,7 @@ export async function catCarReaderToMemory(
 ): Promise<Buffer> {
   const chunks = [];
   try {
-    const content = await getContentFromGw(ipfs, hash);
+    const content = await getContentFromGateway(ipfs, hash);
     for await (const unixFsEntry of unpack(content.carReader)) {
       try {
         const content = unixFsEntry.content();

@@ -1,7 +1,7 @@
 import fs from "fs";
 import { isAbsolute } from "path";
 import { TimeoutErrorKy, IpfsInstance } from "./types";
-import { getContentFromGw } from "./getContentFromGw";
+import { getContentFromGateway } from "./getContentFromGateway";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
 const toStream = require("it-to-stream");
@@ -104,7 +104,7 @@ export async function writeCarToFs(
   args: CatStreamToFsArgs,
   ipfs: IpfsInstance
 ): Promise<void> {
-  const content = await getContentFromGw(ipfs, args.hash);
+  const content = await getContentFromGateway(ipfs, args.hash);
   const fileIterable = await unpackFileFromCarReader(content.carReader);
 
   const readable = toStream.readable(fileIterable);

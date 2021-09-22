@@ -13,7 +13,7 @@ export interface ContentFromIpfsGateway {
 }
 
 /** Get CarReader from IPFS gateway with dag.export endpoint */
-export async function getContentFromGw(
+export async function getContentFromGateway(
   ipfs: IpfsInstance,
   ipfsPath: string
 ): Promise<ContentFromIpfsGateway> {
@@ -41,14 +41,10 @@ export async function getContentFromGw(
 
 /** Verifies the data contains the same hash has the original CID */
 function isTrustedContent(buf: Uint8Array, originalCid: CID): boolean {
-  function hashBuff(buf: Uint8Array): string {
-    return crypto.createHash("sha256").update(buf).digest("hex");
-  }
-  function fromIpfsToHashSha(multihash: string, prefix = false): string {
-    const uint = mh.decode(mh.fromB58String(multihash)).digest;
-    const buf = Buffer.from(uint).toString("hex");
-    return prefix ? "0x" : "" + buf;
-  }
+  const buffHashed = crypto.createHash("sha256").update(buf).digest("hex");
+  const originalCidHashed = Buffer.from(
+    mh.decode(mh.fromB58String(originalCid.toString())).digest
+  ).toString("hex");
 
-  return hashBuff(buf) === fromIpfsToHashSha(originalCid.toString());
+  return buffHashed === originalCidHashed;
 }
