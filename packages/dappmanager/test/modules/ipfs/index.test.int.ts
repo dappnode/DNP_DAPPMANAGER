@@ -30,7 +30,7 @@ describe("ipfs / integration test", function () {
   });
 
   it("List directory files", async () => {
-    const files = await ipfs.ls(dirHash);
+    const files = await ipfs.list(dirHash);
     expect(files.map(file => file.name)).to.deep.equal([
       path.parse(filepath).base
     ]);

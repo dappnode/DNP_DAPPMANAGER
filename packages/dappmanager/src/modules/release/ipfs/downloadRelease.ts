@@ -48,7 +48,7 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
 
   try {
     // Check if it is an ipfs path of a root directory release
-    const ipfsEntries = await ipfs.ls(hash);
+    const ipfsEntries = await ipfs.list(hash);
     const isDirectory = await isDirectoryRelease(ipfsEntries);
 
     if (!isDirectory) {
@@ -69,7 +69,7 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
         composeUnsafe: manifestToCompose(manifestWithImage)
       };
     } else {
-      const files = await ipfs.ls(hash);
+      const files = await ipfs.list(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
 
       // Pin release on visit

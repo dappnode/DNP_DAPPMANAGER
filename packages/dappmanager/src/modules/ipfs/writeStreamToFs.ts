@@ -1,7 +1,9 @@
 import fs from "fs";
 import { isAbsolute } from "path";
 import { TimeoutErrorKy, IpfsInstance } from "./types";
-import { getContentFromIpfsGateway, unpackFileFromCarReader } from "./car";
+import { getContentFromGw } from "./getContentFromGw";
+import { CarReader } from "@ipld/car";
+import { unpack } from "ipfs-car/unpack";
 const toStream = require("it-to-stream");
 
 const resolution = 2;
@@ -70,6 +72,7 @@ async function readableStream(
 }
 
 /**
+ * LOCAL-API
  * Streams an IPFS object to the local fs.
  * If the stream does not start within the specified timeout,
  * it will throw and error. This utility does not verify the file
@@ -93,15 +96,40 @@ export async function catStreamToFs(
   await readableStream(readable, args);
 }
 
-/** Writes CarReader to the fs */
+/**
+ * REMOTE-GATEWAY
+ * Writes CarReader to the fs
+ */
 export async function writeCarToFs(
   args: CatStreamToFsArgs,
   ipfs: IpfsInstance
 ): Promise<void> {
-  const content = await getContentFromIpfsGateway(ipfs, args.hash);
+  const content = await getContentFromGw(ipfs, args.hash);
   const fileIterable = await unpackFileFromCarReader(content.carReader);
 
   const readable = toStream.readable(fileIterable);
 
   await readableStream(readable, args);
+}
+
+async function unpackFileFromCarReader(
+  carReader: CarReader
+): Promise<AsyncIterable<Uint8Array>> {
+  const filesIterables = [];
+  try {
+    for await (const unixFsEntry of unpack(carReader)) {
+      if (unixFsEntry.type === "file") {
+        filesIterables.push(unixFsEntry.content());
+      } else {
+        throw Error(`Expexted type: file. Got: ${unixFsEntry.type}`);
+      }
+    }
+
+    if (filesIterables.length > 1)
+      throw Error(`Unexpected number of files. There must be only one`);
+
+    return filesIterables[0];
+  } catch (e) {
+    throw e;
+  }
 }

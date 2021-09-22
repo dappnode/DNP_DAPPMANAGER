@@ -21,6 +21,9 @@ export function fromIpfsEntries(ipfsEntries: IPFSEntry[]): IpfsFileResult[] {
   }));
 }
 
+/**
+ * Returns the ipfsUrl to initialize the ipfs instance
+ */
 export function getIpfsUrl(): string {
   // 1. Check for process envs insert in tests
   if (params.IPFS_HOST) return params.IPFS_HOST;
@@ -31,4 +34,13 @@ export function getIpfsUrl(): string {
   if (ipfsClientTarget === "local") return params.IPFS_LOCAL;
   // 2.2 If REMOTE
   return db.ipfsGateway.get();
+}
+
+/** Receives an ipfs path and returns it without the /ipfs/
+ * @ipfsPath /ipfs/QmXiTSZNtahKFvwTsBmiXAXmwGhaXtYx1LyyP6QHKfXEWH
+ * @returns QmXiTSZNtahKFvwTsBmiXAXmwGhaXtYx1LyyP6QHKfXEWH
+ */
+export function sanitizeIpfsPath(ipfsPath: string): string {
+  if (ipfsPath.includes("ipfs")) return ipfsPath.replace("/ipfs/", "");
+  return ipfsPath;
 }

@@ -8,8 +8,8 @@ import {
   writeCarToFs
 } from "./writeStreamToFs";
 import { IpfsCatOptions, IpfsDagGet } from "./types";
-import { handleIpfsError } from "./utils";
-import { catCarReaderToMemory } from "./car";
+import { handleIpfsError, sanitizeIpfsPath } from "./utils";
+import { catCarReaderToMemory, catString } from "./writeFileToMemory";
 import { IpfsClientTarget } from "../../common";
 import path from "path";
 
@@ -31,8 +31,8 @@ export class Ipfs {
   }
 
   /**
-   *
-   * @param newHost
+   * Changes the ipfs instance with the given url
+   * @param newHost url of the Ipfs node: http://ipfs.dappnode:5001 | http://ipfs.io
    */
   changeHost(newHost: string, ipfsClientTarget: IpfsClientTarget): void {
     this.ipfs = create({
@@ -51,11 +51,9 @@ export class Ipfs {
     hash: string,
     opts?: IpfsCatOptions
   ): Promise<string> {
-    if (this.ipfsClientTarget === "local") {
-      return await this.catString(hash, opts);
-    } else {
-      return await this.catCarReaderToMemory(hash, opts);
-    }
+    if (this.ipfsClientTarget === "local")
+      return await catString(this.ipfs, hash, this.timeout, opts);
+    else return (await catCarReaderToMemory(this.ipfs, hash, opts)).toString();
   }
 
   /**
@@ -64,14 +62,18 @@ export class Ipfs {
    * @param args
    */
   async writeFileToFs(args: CatStreamToFsArgs): Promise<void> {
-    if (this.ipfsClientTarget === "local") {
+    if (this.ipfsClientTarget === "local")
       return await catStreamToFs(args, this.ipfs);
-    } else {
-      return await writeCarToFs(args, this.ipfs);
-    }
+    else return await writeCarToFs(args, this.ipfs);
   }
 
-  async ls(hash: string): Promise<IPFSEntry[]> {
+  /**
+   * List items contained in a CID hash.
+   * - LOCAL: ipfs.ls
+   * - REMOTE: ipfs.dag.get => created a fake mock that returns same data structure
+   * @param hash
+   */
+  async list(hash: string): Promise<IPFSEntry[]> {
     const files: IPFSEntry[] = [];
     try {
       if (this.ipfsClientTarget === "local") {
@@ -81,7 +83,7 @@ export class Ipfs {
           files.push(file);
         }
       } else {
-        const cid = CID.parse(hash);
+        const cid = CID.parse(sanitizeIpfsPath(hash));
         const content = await this.ipfs.dag.get(cid);
         const contentLinks: IpfsDagGet[] = content.value.links;
         if (!contentLinks) throw Error(`hash ${hash} does not contain links`);
@@ -127,54 +129,5 @@ export class Ipfs {
     await this.pinAdd(hash).catch((e: Error) =>
       logs.error(`Error pinning hash ${hash}`, e)
     );
-  }
-
-  // GATEWAY
-
-  /**
-   * Keeps a CarReader in memory
-   * @param ipfsPath "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
-   * @returns hash contents as a buffer
-   */
-  private async catCarReaderToMemory(
-    ipfsPath: string,
-    opts?: IpfsCatOptions
-  ): Promise<string> {
-    return (await catCarReaderToMemory(this.ipfs, ipfsPath, opts)).toString();
-  }
-
-  // API
-
-  /**
-   * Parses a file addressed by a valid IPFS Path.
-   * @param hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
-   * @param options Available options:
-   * - maxLength: specifies a length to read from the stream.
-   *   if reached, it will throw an error
-   * @returns hash contents as a buffer
-   * Downloads and parses buffer to UTF8
-   * @see cat
-   */
-  private async catString(
-    hash: string,
-    opts?: IpfsCatOptions
-  ): Promise<string> {
-    const chunks = [];
-    try {
-      for await (const chunk of this.ipfs.cat(hash, {
-        length: opts?.maxLength,
-        timeout: this.timeout
-      })) {
-        chunks.push(chunk);
-      }
-    } catch (e) {
-      handleIpfsError(e as Error, hash);
-    }
-
-    const buffer = Buffer.concat(chunks);
-    if (opts?.maxLength && buffer.length >= opts.maxLength)
-      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
-
-    return buffer.toString();
   }
 }

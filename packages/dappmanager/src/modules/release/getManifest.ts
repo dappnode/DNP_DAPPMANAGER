@@ -6,7 +6,7 @@ import { isDirectoryRelease } from "./ipfs/isDirectoryRelease";
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
   try {
-    const ipfsEntries = await ipfs.ls(contentUri);
+    const ipfsEntries = await ipfs.list(contentUri);
     const isDirectory = await isDirectoryRelease(ipfsEntries);
     if (isDirectory) {
       data = await ipfs.writeFileToMemory(
