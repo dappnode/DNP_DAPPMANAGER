@@ -48,7 +48,7 @@ export async function dagGet(
       type: "file",
       cid: CID.parse(sanitizeIpfsPath(link.Hash.toString())),
       name: link.Name,
-      path: path.join(link.Hash, link.Name),
+      path: path.join(link.Hash.toString(), link.Name),
       size: link.Size
     });
   });
