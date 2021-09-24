@@ -46,7 +46,7 @@ export async function dagGet(
     if (!cid) throw Error("Error getting cid");
     files.push({
       type: "file",
-      cid: CID.parse(link.Hash),
+      cid: CID.parse(sanitizeIpfsPath(link.Hash)),
       name: link.Name,
       path: path.join(link.Hash, link.Name),
       size: link.Size
