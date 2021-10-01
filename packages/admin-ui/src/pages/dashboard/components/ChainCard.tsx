@@ -10,7 +10,9 @@ import { Link } from "react-router-dom";
 import { rootPath as packagesRootPath } from "pages/packages";
 
 export function ChainCards() {
-  const chainData = useChainData();
+  const chainData = useChainData().sort((a, b) =>
+    a.dnpName.localeCompare(b.dnpName)
+  );
 
   return (
     <div className="dashboard-cards">
