@@ -10,6 +10,7 @@ const hostScriptsDir = params.HOST_SCRIPTS_DIR;
  * Script runners. Helps ensure no typos
  */
 type ScriptName =
+  | "lvm.sh"
   | "detect_fs.sh"
   | "migrate_volume.sh"
   | "docker_engine_update.sh"
