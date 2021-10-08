@@ -22,13 +22,13 @@ function create_log_file () {
 
 function check_requirements () {
   # 1.Commands available
-  lsblk -v 2>/dev/null || { echo "Error: command lsblk not found" | tee -a "$LOG_FILE"; exit 1; }
-  lvdisplay -v 2>/dev/null || { echo "Error: command lvdisplay not found" | tee -a "$LOG_FILE"; exit 1; }
-  pvs -v 2>/dev/null || { echo "Error: command pvs not found" | tee -a "$LOG_FILE"; exit 1; }
-  vgs -v 2>/dev/null || { echo "Error: command vgs not found" | tee -a "$LOG_FILE"; exit 1; }
-  lvs -v 2>/dev/null || { echo "Error: command lvs not found" | tee -a "$LOG_FILE"; exit 1; }
+  lsblk --version &>/dev/null || { echo "Error: command lsblk not found" | tee -a "$LOG_FILE"; exit 1; }
+  lvdisplay -v &>/dev/null || { echo "Error: command lvdisplay not found" | tee -a "$LOG_FILE"; exit 1; }
+  pvs -v &>/dev/null || { echo "Error: command pvs not found" | tee -a "$LOG_FILE"; exit 1; }
+  vgs -v &>/dev/null || { echo "Error: command vgs not found" | tee -a "$LOG_FILE"; exit 1; }
+  lvs -v &>/dev/null || { echo "Error: command lvs not found" | tee -a "$LOG_FILE"; exit 1; }
   # 2. LVM is on host
-  lvdisplay > /dev/null 2>&1 || { echo "Error: LVM is not on host" | tee -a "$LOG_FILE"; exit 1; }
+  lvdisplay &>/dev/null || { echo "Error: LVM is not on host" | tee -a "$LOG_FILE"; exit 1; }
 }
 
 # Extends the space of the dappnode LVM with a given hard disk
@@ -40,11 +40,11 @@ function expand_disk () {
   echo "Extending disk space..." >> "$LOG_FILE"
   # 1. Check given args exists
   # Hard disk
-  [ -f "/dev/${1}" ] || { echo "Error: Hard disk ${1} not found" | tee -a "$LOG_FILE"; exit 1; }
+  [ -b "/dev/${1}" ] || { echo "Error: Hard disk ${1} not found" | tee -a "$LOG_FILE"; exit 1; }
   # Volume group
-  vgs | grep -q "$2" || { echo "Error: Volume group ${2} not found" | tee -a "$LOG_FILE"; exit 1; }
+  vgs --noheadings -o vg_name | grep -q "$2" || { echo "Error: Volume group ${2} not found" | tee -a "$LOG_FILE"; exit 1; }
   # Logical volume
-  lvs | grep -q "$3" || { echo "Error: Logical volume ${3} not found" | tee -a "$LOG_FILE"; exit 1; }
+  lvs --noheadings -o lv_name | grep -q "$3" || { echo "Error: Logical volume ${3} not found" | tee -a "$LOG_FILE"; exit 1; }
   # 2. Create pv
   pvcreate "/dev/${1}"
   # 3. Extend vg
@@ -86,39 +86,35 @@ function get_lv () {
 ## MAIN ##
 ##########
 
-if [[ $# -eq 1 ]]; then
-  create_log_file
-  flag="$1"
-  case "${flag}" in
-    --get-disks )
-      get_hard_disks
-      exit 0
-      ;;
-    --get-lv )
-      get_lv
-      exit 0
-      ;;
-    --get-vg )
-      get_vg
-      exit 0
-      ;;
-    --extend )
-      check_requirements
-      expand_disk
-      echo "Successfully extended LVM disk space" | tee -a "$LOG_FILE"
-      exit 0
-      ;;
-    --reduce )
-      check_requirements
-      echo "Successfully reduced LVM disk space" | tee -a "$LOG_FILE"
-      exit 0
-      ;;
-    * )
-      echo "flag must be --extend, --reduce, --get-disks, --get-vg or --get-lv" | tee -a "$LOG_FILE"
-      exit 1
-      ;;
-  esac
-else
-  echo "Illegal number of arguments" | tee -a "$LOG_FILE"
-  exit 1
-fi
+create_log_file
+flag="$1"
+case "${flag}" in
+  --get-disks )
+    get_hard_disks
+    exit 0
+    ;;
+  --get-lv )
+    get_lv
+    exit 0
+    ;;
+  --get-vg )
+    get_vg
+    exit 0
+    ;;
+  --extend )
+    [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] && { echo "Error: hard disk or logical volume or volume group missing" | tee -a "$LOG_FILE"; exit 1; }
+    check_requirements
+    expand_disk "$2" "$3" "$4"
+    echo "Successfully extended LVM disk space" | tee -a "$LOG_FILE"
+    exit 0
+    ;;
+  --reduce )
+    check_requirements
+    echo "Successfully reduced LVM disk space" | tee -a "$LOG_FILE"
+    exit 0
+    ;;
+  * )
+    echo "flag must be --extend, --reduce, --get-disks, --get-vg or --get-lv" | tee -a "$LOG_FILE"
+    exit 1
+    ;;
+esac
