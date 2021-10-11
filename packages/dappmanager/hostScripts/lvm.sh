@@ -36,7 +36,7 @@ function check_requirements () {
 #   1) hard disk name
 #   2) Volume Group name
 #   3) Logical Volume name
-function expand_disk () {
+function extend_disk () {
   echo "Extending disk space..." >> "$LOG_FILE"
   # 1. Check given args exists
   # Hard disk
@@ -104,7 +104,7 @@ case "${flag}" in
   --extend )
     [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] && { echo "Error: hard disk or logical volume or volume group missing" | tee -a "$LOG_FILE"; exit 1; }
     check_requirements
-    expand_disk "$2" "$3" "$4"
+    extend_disk "$2" "$3" "$4"
     echo "Successfully extended LVM disk space" | tee -a "$LOG_FILE"
     exit 0
     ;;

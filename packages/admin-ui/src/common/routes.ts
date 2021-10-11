@@ -288,6 +288,22 @@ export interface Routes {
    */
   localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
 
+  /** LVM: get hard disks */
+  lvmhardDisksGet: () => Promise<string[]>;
+
+  /** LVM: get Volume Groups */
+  lvmVolumeGroupsGet: () => Promise<string[]>;
+
+  /** LVM: get Logical Volumes */
+  lvmLogicalVolumes: () => Promise<string[]>;
+
+  /** LVM: extend host disk space */
+  lvmDiskSpaceExtend: (kwargs: {
+    disk: string;
+    volumeGroup: string;
+    logicalVolume: string;
+  }) => Promise<string>;
+
   /**
    * Returns the list of current mountpoints in the host,
    * by running a pre-written script in the host
@@ -650,6 +666,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
+  lvmhardDisksGet: {},
+  lvmVolumeGroupsGet: {},
+  lvmLogicalVolumes: {},
+  lvmDiskSpaceExtend: { log: true },
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},

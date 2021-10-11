@@ -224,7 +224,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   runHostSecurityUpdates: async () =>
     "Security updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
-  natRenewalIsEnabled: async () => true
+  natRenewalIsEnabled: async () => true,
+  lvmhardDisksGet: async () => [""],
+  lvmVolumeGroupsGet: async () => [""],
+  lvmLogicalVolumes: async () => [""],
+  lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space"
 };
 
 export const calls: Routes = {
