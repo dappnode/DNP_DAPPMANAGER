@@ -21,6 +21,7 @@ import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { Notifications } from "./Notifications";
+import Hardware from "./Hardware";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -80,6 +81,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Security",
       subPath: subPaths.security,
       component: Security
+    },
+    {
+      name: "Hardware",
+      subpath: subPaths.hardware,
+      component: Hardware
     },
     {
       name: "Advanced",

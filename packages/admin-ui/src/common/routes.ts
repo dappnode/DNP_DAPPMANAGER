@@ -295,7 +295,7 @@ export interface Routes {
   lvmVolumeGroupsGet: () => Promise<string[]>;
 
   /** LVM: get Logical Volumes */
-  lvmLogicalVolumes: () => Promise<string[]>;
+  lvmLogicalVolumesGet: () => Promise<string[]>;
 
   /** LVM: extend host disk space */
   lvmDiskSpaceExtend: (kwargs: {
@@ -668,7 +668,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},
   lvmVolumeGroupsGet: {},
-  lvmLogicalVolumes: {},
+  lvmLogicalVolumesGet: {},
   lvmDiskSpaceExtend: { log: true },
   mountpointsGet: {},
   newFeatureStatusSet: {},

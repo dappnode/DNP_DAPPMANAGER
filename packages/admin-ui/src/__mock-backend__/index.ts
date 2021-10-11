@@ -227,7 +227,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [""],
   lvmVolumeGroupsGet: async () => [""],
-  lvmLogicalVolumes: async () => [""],
+  lvmLogicalVolumesGet: async () => [""],
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space"
 };
 
