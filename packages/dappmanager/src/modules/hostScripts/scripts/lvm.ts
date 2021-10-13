@@ -8,7 +8,7 @@ import { HostVolumeGroup, HostLogicalVolume } from "../../../types";
 export const getHostHardDisks = memoize(
   async function (): Promise<string[]> {
     const hardDisks = await runScript("lvm.sh", "-- --get-disks");
-    return hardDisks.trim().split(" ");
+    return hardDisks.trim().split(/\s+/);
   },
   { promise: true, maxAge: 2000 }
 );
@@ -33,7 +33,7 @@ export const getHostLogicalVolumes = memoize(
   async function (): Promise<string[]> {
     const logicalVolumeInfo = await runScript("lvm.sh", "-- --get-lv");
     const logicalVolumes: HostLogicalVolume = JSON.parse(logicalVolumeInfo);
-    return logicalVolumes.report[0].lv.map(item => item.vg_name);
+    return logicalVolumes.report[0].lv.map(item => item.lv_name);
   },
   { promise: true, maxAge: 2000 }
 );
