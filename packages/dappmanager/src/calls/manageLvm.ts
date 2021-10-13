@@ -13,7 +13,7 @@ export async function lvmVolumeGroupsGet(): Promise<string[]> {
   return await getHostVolumeGroups();
 }
 
-export async function lvmLogicalVolumes(): Promise<string[]> {
+export async function lvmLogicalVolumesGet(): Promise<string[]> {
   return await getHostLogicalVolumes();
 }
 
