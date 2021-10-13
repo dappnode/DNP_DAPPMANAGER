@@ -1,11 +1,21 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
+import { IPFSEntry } from "ipfs-core-types/src/root";
+import * as db from "../../db";
 import { logs } from "../../logs";
-import { CatStreamToFsArgs, catStreamToFs } from "./catStreamToFs";
-import { IpfsCatOptions, IPFSEntry } from "./types";
+import {
+  CatStreamToFsArgs,
+  catStreamToFs,
+  writeCarToFs
+} from "./writeStreamToFs";
+import { IpfsCatOptions } from "./types";
 import { handleIpfsError } from "./utils";
+import { catCarReaderToMemory, catString } from "./writeFileToMemory";
+import { IpfsClientTarget } from "../../common";
+import { dagGet, ls } from "./list";
 
 export class Ipfs {
   ipfs: IPFSHTTPClient;
+  ipfsClientTarget: IpfsClientTarget;
   /** Default IPFS timeout for all requests */
   timeout = 30 * 1000;
 
@@ -17,67 +27,67 @@ export class Ipfs {
       url: ipfsHost,
       timeout: this.timeout
     });
+    this.ipfsClientTarget = db.ipfsClientTarget.get();
   }
 
   /**
-   * Returns a file addressed by a valid IPFS Path.
-   * @param hash "QmPTkMuuL6PD8L2SwTwbcs1NPg14U8mRzerB1ZrrBrkSDD"
-   * @param options Available options:
-   * - maxLength: specifies a length to read from the stream.
-   *   if reached, it will throw an error
-   * @returns hash contents as a buffer
+   * Changes the ipfs instance with the given url
+   * @param newHost url of the Ipfs node: http://ipfs.dappnode:5001 | http://ipfs.io
    */
-  async cat(hash: string, opts?: IpfsCatOptions): Promise<Buffer> {
-    const chunks = [];
-    try {
-      for await (const chunk of this.ipfs.cat(hash, {
-        length: opts?.maxLength,
-        timeout: this.timeout
-      })) {
-        chunks.push(chunk);
-      }
-    } catch (e) {
-      handleIpfsError(e as Error, hash);
-    }
-
-    const data = Buffer.concat(chunks);
-    if (opts?.maxLength && data.length >= opts.maxLength)
-      throw Error(`Maximum size ${opts.maxLength} bytes exceeded`);
-
-    return data;
+  changeHost(newHost: string, ipfsClientTarget: IpfsClientTarget): void {
+    this.ipfs = create({
+      url: newHost,
+      timeout: this.timeout
+    });
+    this.ipfsClientTarget = ipfsClientTarget;
   }
 
   /**
-   * Downloads and parses buffer to UTF8
-   * @see cat
+   * Downloads and parses buffer to UTF8. Used for small files
+   * @see catString
+   * @see catCarReaderToMemory
    */
-  async catString(hash: string, opts?: IpfsCatOptions): Promise<string> {
-    const buffer = await this.cat(hash, opts);
-    return buffer.toString();
+  async writeFileToMemory(
+    hash: string,
+    opts?: IpfsCatOptions
+  ): Promise<string> {
+    if (this.ipfsClientTarget === "local")
+      return await catString(this.ipfs, hash, this.timeout, opts);
+    else return (await catCarReaderToMemory(this.ipfs, hash, opts)).toString();
   }
 
-  async catStreamToFs(args: CatStreamToFsArgs): Promise<void> {
-    return await catStreamToFs(args, this.ipfs);
+  /**
+   * Directly write the stream to the fs. Used for big files
+   * such as docker images
+   * @param args
+   */
+  async writeFileToFs(args: CatStreamToFsArgs): Promise<void> {
+    if (this.ipfsClientTarget === "local")
+      return await catStreamToFs(args, this.ipfs);
+    else return await writeCarToFs(args, this.ipfs);
   }
 
-  async ls(hash: string): Promise<IPFSEntry[]> {
-    const files: IPFSEntry[] = [];
+  /**
+   * List items contained in a CID hash.
+   * - LOCAL: ipfs.ls
+   * - REMOTE: ipfs.dag.get => created a fake mock that returns same data structure
+   * @param hash
+   */
+  async list(hash: string): Promise<IPFSEntry[]> {
     try {
-      for await (const file of this.ipfs.ls(hash, { timeout: this.timeout })) {
-        files.push(file);
-      }
+      if (this.ipfsClientTarget === "local")
+        return await ls(this.ipfs, this.timeout, hash);
+      else return await dagGet(this.ipfs, hash);
     } catch (e) {
       handleIpfsError(e as Error, hash);
     }
-
-    return files;
   }
 
   /**
    * Useful to check if a large dataset is available
    * Also possible to get it's size with it by summing its links size
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async objectGet(hash: string) {
     try {
       const cid = CID.parse(hash);

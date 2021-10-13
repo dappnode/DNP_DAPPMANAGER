@@ -5,7 +5,7 @@ import { ipfs } from "../../../src/modules/ipfs";
 import { cleanTestDir, testDir } from "../../testUtils";
 import { ipfsAddDirFromFs } from "../../testIpfsUtils";
 
-describe("ipfs / integration test", function() {
+describe("ipfs / integration test", function () {
   this.timeout(60 * 1000);
 
   const dirPath = path.join(testDir, "ipfs-test-upload");
@@ -30,7 +30,7 @@ describe("ipfs / integration test", function() {
   });
 
   it("List directory files", async () => {
-    const files = await ipfs.ls(dirHash);
+    const files = await ipfs.list(dirHash);
     expect(files.map(file => file.name)).to.deep.equal([
       path.parse(filepath).base
     ]);
@@ -38,13 +38,13 @@ describe("ipfs / integration test", function() {
   });
 
   it("Download file to FS", async () => {
-    await ipfs.catStreamToFs({ hash: fileHash, path: filePathResult });
+    await ipfs.writeFileToFs({ hash: fileHash, path: filePathResult });
     const result = fs.readFileSync(filePathResult, "utf8");
     expect(result).to.equal(fileContents, "Wrong downloaded file contents");
   });
 
   it("Download file to memory", async () => {
-    const result = await ipfs.catString(fileHash);
+    const result = await ipfs.writeFileToMemory(fileHash);
     expect(result).to.equal(fileContents, "Wrong downloaded file contents");
   });
 
@@ -70,7 +70,7 @@ describe("ipfs / hash format", () => {
 
   for (const hash of hashes) {
     it(`Should download getting started page from ${hash}`, async () => {
-      const data = await ipfs.catString(hash);
+      const data = await ipfs.writeFileToMemory(hash);
       expect(data).to.include(content);
     });
   }

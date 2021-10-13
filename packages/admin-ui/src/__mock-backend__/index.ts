@@ -224,7 +224,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   runHostSecurityUpdates: async () =>
     "Security updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
-  natRenewalIsEnabled: async () => true
+  natRenewalIsEnabled: async () => true,
+  ipfsClientTargetSet: async () => {},
+  ipfsClientTargetGet: async () => ({
+    ipfsClientTarget: "remote",
+    ipfsGateway: "http://ipfs.dappnode.io:8081"
+  })
 };
 
 export const calls: Routes = {

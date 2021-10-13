@@ -1,5 +1,5 @@
 import { Ipfs } from "./Ipfs";
-import params from "../../params";
+import { getIpfsUrl } from "./utils";
 export * from "./types";
 
-export const ipfs = new Ipfs(params.IPFS_HOST);
+export const ipfs = new Ipfs(getIpfsUrl());

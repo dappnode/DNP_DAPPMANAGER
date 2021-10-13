@@ -12,7 +12,7 @@ export async function ipfsTest(): Promise<void> {
   await retry(
     async () => {
       try {
-        const file = await ipfs.catString(hash);
+        const file = await ipfs.writeFileToMemory(hash);
         if (!file.includes(expectedString))
           throw Error("Resolved file does not include expected string");
       } catch (e) {

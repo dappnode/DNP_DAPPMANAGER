@@ -38,7 +38,8 @@ import {
   WifiReport,
   CurrentWifiCredentials,
   LocalProxyingStatus,
-  RegistryScanProgress
+  RegistryScanProgress,
+  IpfsRepository
 } from "./types";
 
 export interface Routes {
@@ -269,6 +270,19 @@ export interface Routes {
    * Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise
    */
   ipfsTest(): Promise<void>;
+
+  /**
+   * Sets the ipfs client target: local | remote
+   */
+  ipfsClientTargetSet(kwargs: {
+    ipfsRepository: IpfsRepository;
+    deleteLocalIpfsClient?: boolean;
+  }): Promise<void>;
+
+  /**
+   * Gets the Ipfs client target
+   */
+  ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.
@@ -648,6 +662,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
+  ipfsClientTargetSet: {},
+  ipfsClientTargetGet: {},
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   mountpointsGet: {},

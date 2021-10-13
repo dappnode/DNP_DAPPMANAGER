@@ -20,6 +20,8 @@ export { fetchRegistryProgress } from "./fetchRegistry";
 export { getUserActionLogs } from "./getUserActionLogs";
 export * from "./httpsPortal";
 export { ipfsTest } from "./ipfsTest";
+export { ipfsClientTargetSet } from "./ipfsClientTargetSet";
+export { ipfsClientTargetGet } from "./ipfsClientTargetGet";
 export { ipPublicGet } from "./ipPublicGet";
 export * from "./localProxy";
 export { mountpointsGet } from "./mountpointsGet";

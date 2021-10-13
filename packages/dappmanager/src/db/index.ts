@@ -2,6 +2,7 @@ export * from "./autoUpdateSettings";
 export * from "./coreUpdate";
 export * from "./dyndns";
 export * from "./ethClient";
+export * from "./ipfsClient";
 export * from "./fileTransferPath";
 export * from "./network";
 export * from "./notification";
