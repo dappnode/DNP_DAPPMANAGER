@@ -111,6 +111,10 @@ export const autoUpdateIds = {
   SYSTEM_PACKAGES: "system-packages"
 };
 
+// LVM default dappnode values
+export const dappnodeVolumeGroup = "rootvg";
+export const dappnodeLogicalVolume = "root";
+
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 

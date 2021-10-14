@@ -1,20 +1,29 @@
 import React, { useState } from "react";
-import { ReqStatus } from "types";
+import {
+  ReqStatus,
+  HostLogicalVolume,
+  HostHardDisk,
+  HostVolumeGroup
+} from "types";
 import { api } from "api";
 import Button from "components/Button";
 import Ok from "components/Ok";
 import ErrorView from "components/ErrorView";
 import Select from "components/Select";
 import Card from "components/Card";
+import { dappnodeVolumeGroup, dappnodeLogicalVolume } from "params";
 
 export default function Lvm() {
-  const [start, setStart] = useState(false);
+  const [manual, setManual] = useState(false);
+  const [automatic, setAutomatic] = useState(false);
   // Requests
-  const [diskReq, setDiskReq] = useState<ReqStatus<string[]>>({});
-  const [volumeGroupReq, setVolumeGroupReq] = useState<ReqStatus<string[]>>({});
-  const [logicalVolumeReq, setLogicalVolumeReq] = useState<ReqStatus<string[]>>(
-    {}
-  );
+  const [diskReq, setDiskReq] = useState<ReqStatus<HostHardDisk[]>>({});
+  const [volumeGroupReq, setVolumeGroupReq] = useState<
+    ReqStatus<HostVolumeGroup[]>
+  >({});
+  const [logicalVolumeReq, setLogicalVolumeReq] = useState<
+    ReqStatus<HostLogicalVolume[]>
+  >({});
   const [expandDiskReq, setExpandDiskReq] = useState<ReqStatus<string>>({});
 
   // Select options
@@ -26,7 +35,7 @@ export default function Lvm() {
     try {
       setDiskReq({ loading: true });
       const disks = await api.lvmhardDisksGet();
-      setDisk(disks[0]);
+      setDisk(disks[0].name);
       setDiskReq({ result: disks });
     } catch (e) {
       setDiskReq({ error: e });
@@ -38,7 +47,7 @@ export default function Lvm() {
     try {
       setVolumeGroupReq({ loading: true });
       const volumeGroups = await api.lvmVolumeGroupsGet();
-      setVolumeGroup(volumeGroups[0]);
+      setVolumeGroup(volumeGroups[0].vg_name);
       setVolumeGroupReq({ result: volumeGroups });
     } catch (e) {
       setVolumeGroupReq({ error: e });
@@ -50,7 +59,7 @@ export default function Lvm() {
     try {
       setLogicalVolumeReq({ loading: true });
       const logicalVolumes = await api.lvmLogicalVolumesGet();
-      setLogicalVolume(logicalVolumes[0]);
+      setLogicalVolume(logicalVolumes[0].lv_name);
       setLogicalVolumeReq({ result: logicalVolumes });
     } catch (e) {
       setLogicalVolumeReq({ error: e });
@@ -77,26 +86,78 @@ export default function Lvm() {
     }
   }
 
+  async function getDappnodeDefaults() {
+    try {
+      const volumeGroups = await api.lvmVolumeGroupsGet();
+      const defaultVg = volumeGroups.find(
+        vg => vg.vg_name === dappnodeVolumeGroup
+      )?.vg_name;
+      if (defaultVg) setVolumeGroup(defaultVg);
+      else
+        throw Error(
+          `Dappnode default volume group ${dappnodeVolumeGroup} not found`
+        );
+
+      const logicalVolumes = await api.lvmLogicalVolumesGet();
+      const defaultLv = logicalVolumes.find(
+        lv => lv.lv_name === dappnodeLogicalVolume
+      )?.lv_name;
+      if (defaultLv) setLogicalVolume(defaultLv);
+      else
+        throw Error(
+          `Dappnode default logical volume ${dappnodeLogicalVolume} not found`
+        );
+    } catch (e) {
+      setExpandDiskReq({ error: e });
+      console.error("Not possible to expand the disk space", e);
+    }
+  }
+
   return (
     <Card spacing>
       <div>
         <p>Expand the disk space of your dappnode</p>
-        <Button onClick={() => setStart(!start)} variant="dappnode">
-          Start
-        </Button>
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <Button
+            onClick={() => {
+              setAutomatic(true);
+              setManual(false);
+              setDisk("");
+              setVolumeGroup("");
+              setLogicalVolume("");
+            }}
+            variant="dappnode"
+          >
+            Automatic expansion
+          </Button>
+          <Button
+            onClick={() => {
+              setAutomatic(false);
+              setManual(true);
+              setDisk("");
+              setVolumeGroup("");
+              setLogicalVolume("");
+            }}
+            variant="dappnode"
+          >
+            Manual expansion
+          </Button>
+        </div>
       </div>
 
       {/** FIRST STEP: select hard disk */}
-      {start && (
+      {(automatic || manual) && (
         <>
-          <div className="subtle-header">1. Select hard disk</div>
+          <div className="subtle-header">Select hard disk</div>
           <p>Check and select the hard disk to be added.</p>
           <Button onClick={getDisks}>Get hard disks</Button>
           {diskReq.result ? (
             <Select
               value={undefined}
-              options={diskReq.result}
-              onValueChange={(value: string) => setDisk(value)}
+              options={diskReq.result.map(
+                disk => `${disk.name} (${disk.size})`
+              )}
+              onValueChange={(value: string) => setDisk(value.split(/\s+/)[0])}
             />
           ) : diskReq.loading ? (
             <Ok msg="Getting hard disks" loading={true} />
@@ -105,10 +166,22 @@ export default function Lvm() {
           ) : null}
         </>
       )}
-      {/** SECOND STEP: select volume group */}
-      {disk && (
+
+      {/** AUTOMATIC STEPS: select volume group and logical volume*/}
+      {automatic && disk && (
         <>
-          <div className="subtle-header">2. Select Volume Group</div>
+          <div className="subtle-header">Get default dappnode values</div>
+          <p>Select the Volume Group to be expanded.</p>
+          <Button disabled={!disk} onClick={getDappnodeDefaults}>
+            Get default values
+          </Button>
+        </>
+      )}
+
+      {/** SECOND STEP: select volume group */}
+      {manual && disk && (
+        <>
+          <div className="subtle-header">Select Volume Group</div>
           <p>Select the Volume Group to be expanded.</p>
           <Button disabled={!disk} onClick={getVolumeGroups}>
             Get volume groups
@@ -116,8 +189,12 @@ export default function Lvm() {
           {volumeGroupReq.result ? (
             <Select
               value={undefined}
-              options={volumeGroupReq.result}
-              onValueChange={(value: string) => setVolumeGroup(value)}
+              options={volumeGroupReq.result.map(
+                vg => `${vg.vg_name} (${vg.vg_size})`
+              )}
+              onValueChange={(value: string) =>
+                setVolumeGroup(value.split(/\s+/)[0])
+              }
             />
           ) : volumeGroupReq.loading ? (
             <Ok msg="Getting volumes groups" loading={true} />
@@ -128,9 +205,9 @@ export default function Lvm() {
       )}
 
       {/** THIRD STEP: select logical volume */}
-      {volumeGroup && (
+      {manual && volumeGroup && (
         <>
-          <div className="subtle-header">3. Select Logical Volume</div>
+          <div className="subtle-header">Select Logical Volume</div>
           <p>Select the Logical Volume to be expanded.</p>
           <Button disabled={!disk || !volumeGroup} onClick={getLogicalVolumes}>
             Get Logical Volumes
@@ -138,8 +215,12 @@ export default function Lvm() {
           {logicalVolumeReq.result ? (
             <Select
               value={undefined}
-              options={logicalVolumeReq.result}
-              onValueChange={(value: string) => setLogicalVolume(value)}
+              options={logicalVolumeReq.result.map(
+                lv => `${lv.lv_name} (${lv.lv_size}) (${lv.vg_name})`
+              )}
+              onValueChange={(value: string) =>
+                setLogicalVolume(value.split(/\s+/)[0])
+              }
             />
           ) : logicalVolumeReq.loading ? (
             <Ok msg="Getting logical volumes" loading={true} />
@@ -150,15 +231,19 @@ export default function Lvm() {
       )}
 
       {/** FORTH STEP: expand disk space */}
-      {logicalVolume && (
+      {(manual || automatic) && logicalVolume && (
         <>
-          <div className="subtle-header">4. Expand disk space</div>
+          <div className="subtle-header">Expand disk space</div>
           <p>Expand the disk space with the selected options.</p>
           {disk && volumeGroup && logicalVolume ? (
             <>
               <p>
-                Options selected: hard disk {disk}, Volume Group {volumeGroup}{" "}
-                and Logical Volume {logicalVolume}
+                Options selected:
+                <ul>
+                  <li key={disk}>Hard disk: {disk}</li>
+                  <li key={logicalVolume}>Volume Group: {volumeGroup}</li>
+                  <li key={volumeGroup}>Logical Volume: {logicalVolume}</li>
+                </ul>
               </p>
               <Button
                 onClick={() => expandDisk(disk, volumeGroup, logicalVolume)}

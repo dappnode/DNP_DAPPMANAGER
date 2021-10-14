@@ -1139,23 +1139,36 @@ export interface MountpointData {
   model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
 }
 
-export interface HostVolumeGroup {
+export interface HostVolumeGroupReport {
   report: {
-    vg: {
-      vg_name: string;
-      vg_size: string;
-    }[];
+    vg: HostVolumeGroup[];
+  }[];
+}
+
+export interface HostVolumeGroup {
+  vg_name: string;
+  vg_size: string;
+}
+
+export interface HostLogicalVolumeReport {
+  report: {
+    lv: HostLogicalVolume[];
   }[];
 }
 
 export interface HostLogicalVolume {
-  report: {
-    lv: {
-      lv_name: string;
-      vg_name: string;
-      lv_size: string;
-    }[];
-  }[];
+  lv_name: string;
+  vg_name: string;
+  lv_size: string;
+}
+
+export interface HostHardDisksReport {
+  blockdevices: HostHardDisk[];
+}
+
+export interface HostHardDisk {
+  name: string;
+  size: string;
 }
 
 export interface HostInfoScript {

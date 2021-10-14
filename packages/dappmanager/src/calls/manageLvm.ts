@@ -4,16 +4,17 @@ import {
   getHostLogicalVolumes,
   extendHostDiskSpace
 } from "../modules/hostScripts/scripts/lvm";
+import { HostHardDisk, HostVolumeGroup, HostLogicalVolume } from "../types";
 
-export async function lvmhardDisksGet(): Promise<string[]> {
+export async function lvmhardDisksGet(): Promise<HostHardDisk[]> {
   return await getHostHardDisks();
 }
 
-export async function lvmVolumeGroupsGet(): Promise<string[]> {
+export async function lvmVolumeGroupsGet(): Promise<HostVolumeGroup[]> {
   return await getHostVolumeGroups();
 }
 
-export async function lvmLogicalVolumesGet(): Promise<string[]> {
+export async function lvmLogicalVolumesGet(): Promise<HostLogicalVolume[]> {
   return await getHostLogicalVolumes();
 }
 

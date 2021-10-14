@@ -225,9 +225,15 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     "Security updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
-  lvmhardDisksGet: async () => ["sda", "sda1"],
-  lvmVolumeGroupsGet: async () => ["rootvg", "randomvg"],
-  lvmLogicalVolumesGet: async () => ["logicalVolume1", "logicalVolume2"],
+  lvmhardDisksGet: async () => [
+    { name: "sda", size: "3.7T" },
+    { name: "nvme0n1", size: "3.7T" }
+  ],
+  lvmVolumeGroupsGet: async () => [{ vg_name: "rootvg", vg_size: "<7.28t" }],
+  lvmLogicalVolumesGet: async () => [
+    { lv_name: "root", vg_name: "rootvg", lv_size: "<7.28t" },
+    { lv_name: "swap_1", vg_name: "rootvg", lv_size: "976.00m" }
+  ],
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space"
 };
 

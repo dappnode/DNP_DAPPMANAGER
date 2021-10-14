@@ -38,7 +38,10 @@ import {
   WifiReport,
   CurrentWifiCredentials,
   LocalProxyingStatus,
-  RegistryScanProgress
+  RegistryScanProgress,
+  HostHardDisk,
+  HostVolumeGroup,
+  HostLogicalVolume
 } from "./types";
 
 export interface Routes {
@@ -289,13 +292,13 @@ export interface Routes {
   localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
 
   /** LVM: get hard disks */
-  lvmhardDisksGet: () => Promise<string[]>;
+  lvmhardDisksGet: () => Promise<HostHardDisk[]>;
 
   /** LVM: get Volume Groups */
-  lvmVolumeGroupsGet: () => Promise<string[]>;
+  lvmVolumeGroupsGet: () => Promise<HostVolumeGroup[]>;
 
   /** LVM: get Logical Volumes */
-  lvmLogicalVolumesGet: () => Promise<string[]>;
+  lvmLogicalVolumesGet: () => Promise<HostLogicalVolume[]>;
 
   /** LVM: extend host disk space */
   lvmDiskSpaceExtend: (kwargs: {

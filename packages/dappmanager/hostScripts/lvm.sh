@@ -46,26 +46,28 @@ function extend_disk () {
   # Logical volume
   lvs --noheadings -o lv_name | grep -q "$3" || { echo "Error: Logical volume ${3} not found" | tee -a "$LOG_FILE"; exit 1; }
   # 2. Create pv
-  pvcreate "/dev/${1}"
+  pvcreate "/dev/${1}" &>> "$LOG_FILE"
   # 3. Extend vg
-  vgextend "$2" "/dev/${1}"
+  vgextend "$2" "/dev/${1}" &>> "$LOG_FILE"
   # 4. Extend lv
-  lvextend -l +100%FREE "/dev/${2}/${3}"
+  lvextend -l +100%FREE "/dev/${2}/${3}" &>> "$LOG_FILE"
   # 5. Resize fs
-  resize2fs -p "/dev/${2}/${3}"
+  resize2fs -p "/dev/${2}/${3}" &>> "$LOG_FILE"
   # 6. LVM extension check
 }
 
-# Returns an array of disks detected in the dappnode
+# Returns disks names and its size detected in the dappnode
+# e.g {"blockdevices": [{"name":"sda", "size":"3.6T"},{"name":"nvme0n1", "size":"3.6T"}]}
 function get_hard_disks () {
   # lsblk - list block devices
   # -e 7: exclude loops. The major node type of a loop block device is 7
   # -n: Print without headings
   # -d: Do not print slave/holders
-  # -o NAME: Prints only NAME column
+  # --json: json format
+  # -o NAME,SIZE: Prints only NAME and SIZE columns
   # ALTERNATIVES: fdisk | parted
   echo "Getting Hard Disks..." >> "$LOG_FILE"
-  lsblk -e 7 -nd -o NAME | tee -a "$LOG_FILE"
+  lsblk -e 7 -nd -o NAME,SIZE --json | tee -a "$LOG_FILE"
 }
 
 # Returns Volume groups (VG)
