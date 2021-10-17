@@ -52,12 +52,14 @@ export async function signRelease(
 
   // Validate that the new release hash contains all previous files + signature
   const newReleaseFiles = await ipfs.list(newReleaseCid.toString());
-  const newReleaseFilenames = newReleaseFiles.map(file => file.name);
-  const filesNamesStr = serializeDir(newReleaseFilenames);
-  const expectedFns = serializeDir([...newReleaseFilenames, signatureFilename]);
+  const filesNamesStr = serializeDir(newReleaseFiles.map(file => file.name));
+  const expectedFns = serializeDir([
+    ...releaseFiles.map(file => file.name),
+    signatureFilename
+  ]);
   if (filesNamesStr !== expectedFns) {
     throw Error(
-      `Wrong files in new release: ${filesNamesStr}\nexpected: ${expectedFns}`
+      `Wrong files in new release: ${filesNamesStr} - expected: ${expectedFns}`
     );
   }
 
