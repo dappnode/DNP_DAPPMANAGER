@@ -7,8 +7,7 @@ import {
   ManifestWithImage,
   RequestedDnp,
   Manifest,
-  SetupWizard,
-  ReleaseSignatureStatusCode
+  SetupWizard
 } from "../../src/types";
 import {
   getTestMountpoint,
@@ -258,25 +257,24 @@ describe("Fetch releases", () => {
             }
           }
         },
-        request: {
-          compatible: {
-            requiresCoreUpdate: false,
-            resolving: false,
-            isCompatible: true,
-            error: "",
-            dnps: {
-              [dnpNameDep]: { from: undefined, to: dependencyReleaseHash },
-              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
-            }
-          },
-          available: {
-            isAvailable: true,
-            message: ""
+        compatible: {
+          requiresCoreUpdate: false,
+          resolving: false,
+          isCompatible: true,
+          error: "",
+          dnps: {
+            [dnpNameDep]: { from: undefined, to: dependencyReleaseHash },
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
           }
         },
-        releaseSignatures: {
-          [dnpNameMain]: { status: ReleaseSignatureStatusCode.notSigned },
-          [dnpNameDep]: { status: ReleaseSignatureStatusCode.notSigned }
+        available: {
+          isAvailable: true,
+          message: ""
+        },
+        signedSafeAll: true,
+        signedSafe: {
+          [dnpNameMain]: { safe: true, message: "" },
+          [dnpNameDep]: { safe: true, message: "" }
         }
       };
 
@@ -368,25 +366,24 @@ describe("Fetch releases", () => {
         settings: {
           [dnpNameMain]: {}
         },
-        request: {
-          compatible: {
-            requiresCoreUpdate: false,
-            resolving: false,
-            isCompatible: true,
-            error: "",
-            dnps: {
-              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
-            }
-          },
-          available: {
-            isAvailable: true,
-            message: ""
+        compatible: {
+          requiresCoreUpdate: false,
+          resolving: false,
+          isCompatible: true,
+          error: "",
+          dnps: {
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
           }
+        },
+        available: {
+          isAvailable: true,
+          message: ""
         },
         // Mock, ommited below
         imageSize: 0,
-        releaseSignatures: {
-          [dnpNameMain]: { status: ReleaseSignatureStatusCode.notSigned }
+        signedSafeAll: true,
+        signedSafe: {
+          [dnpNameMain]: { safe: true, message: "" }
         }
       };
 

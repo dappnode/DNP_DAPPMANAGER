@@ -49,7 +49,7 @@ describe("Sign release", () => {
       compose: composeMain.output()
     });
 
-    const releaseFiles = await ipfs.ls(dnpReleaseHash);
+    const releaseFiles = await ipfs.list(dnpReleaseHash);
 
     const cidOpts: ReleaseSignature["cid"] = { version: 0, base: "base58btc" };
     const signedData = serializeIpfsDirectory(releaseFiles, cidOpts);
@@ -92,7 +92,7 @@ describe("Sign release", () => {
     });
 
     // Validate that the new release hash contains all previous files + signature
-    const newReleaseFiles = await ipfs.ls(newReleaseCid);
+    const newReleaseFiles = await ipfs.list(newReleaseCid.toString());
     expect(newReleaseFiles.map(file => file.name).sort()).to.deep.equal(
       [...releaseFiles.map(file => file.name), "signature.json"].sort(),
       "Wrong files in new release"
