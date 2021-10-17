@@ -31,6 +31,7 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 
 const BYPASS_CORE_RESTRICTION = "BYPASS_CORE_RESTRICTION";
+const BYPASS_SIGNED_RESTRICTION = "BYPASS_SIGNED_RESTRICTION";
 const SHOW_ADVANCED_EDITOR = "SHOW_ADVANCED_EDITOR";
 
 interface InstallDnpViewProps {
@@ -161,6 +162,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
       name: "Bypass core restriction",
       id: BYPASS_CORE_RESTRICTION,
       available: dnp.origin && isCore
+    },
+    {
+      name: "Bypass only signed safe restriction",
+      id: BYPASS_SIGNED_RESTRICTION,
+      available: !dnp.signedSafeAll
     }
   ]
     .filter(option => option.available)
