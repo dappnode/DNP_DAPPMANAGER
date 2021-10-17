@@ -305,7 +305,8 @@ describe("DNP lifecycle", function () {
     await calls.packageInstall({
       name: dnpNameMain,
       version: mainDnpReleaseHash,
-      userSettings
+      userSettings,
+      options: { BYPASS_SIGNED_RESTRICTION: true }
     });
   });
 

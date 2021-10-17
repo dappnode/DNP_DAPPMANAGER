@@ -164,13 +164,8 @@ describe("Release format tests", () => {
   });
 
   for (const releaseTest of releaseTests) {
-    const {
-      id,
-      dnpName,
-      version,
-      prepareRelease,
-      expectedEnvValues
-    } = releaseTest();
+    const { id, dnpName, version, prepareRelease, expectedEnvValues } =
+      releaseTest();
     describe(id, () => {
       let releaseHash: string;
 
@@ -198,8 +193,9 @@ describe("Release format tests", () => {
 
         await calls.packageInstall({
           name: dnpName,
-          version: releaseHash
+          version: releaseHash,
           // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
+          options: { BYPASS_SIGNED_RESTRICTION: true }
         });
 
         // Verify it is running correctly
