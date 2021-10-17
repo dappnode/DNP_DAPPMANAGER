@@ -18,8 +18,7 @@ import {
   SetupWizardAllDnps,
   SetupWizardField,
   SpecialPermissionAllDnps,
-  InstalledPackageData,
-  ReleaseSignatureStatus
+  InstalledPackageData
 } from "../types";
 import { ReleaseSignatureStatusCode } from "../common";
 
@@ -66,10 +65,10 @@ export async function fetchDnpRequest({
     }
 
     // if origin is falsy, the hash is fetched from the blockchain, otherwise from IPFS directly
-    signedSafe[dnpName] = getReleaseSignedSafe(
-      release.signatureStatus,
-      release.origin
-    );
+    signedSafe[dnpName] = {
+      safe: release.signedSafe,
+      message: getReleaseSignedSafeMessage(release)
+    };
   }
 
   await addReleaseToSettings(mainRelease);
@@ -213,29 +212,24 @@ async function shouldAddSetupWizardField(
   }
 }
 
-function getReleaseSignedSafe(
-  releaseSignatureStatus: ReleaseSignatureStatus,
-  origin: string | undefined
-): { safe: boolean; message: string } {
-  switch (releaseSignatureStatus.status) {
+function getReleaseSignedSafeMessage(release: PackageRelease): string {
+  const { signatureStatus, signedSafe } = release;
+  switch (signatureStatus.status) {
     case ReleaseSignatureStatusCode.signedByKnownKey:
-      return {
-        safe: true,
-        message: `Signed by known key ${releaseSignatureStatus.keyName}`
-      };
+      return `Signed by known key ${signatureStatus.keyName}`;
 
     case ReleaseSignatureStatusCode.notSigned:
-      if (!origin) {
-        return { safe: true, message: "Safe origin, not signed" };
+      if (signedSafe) {
+        return "Safe origin, not signed";
       } else {
-        return { safe: false, message: "Unsafe origin, not signed" };
+        return "Unsafe origin, not signed";
       }
 
     case ReleaseSignatureStatusCode.signedByUnknownKey:
-      if (!origin) {
-        return { safe: true, message: "Safe origin, bad signature" };
+      if (signedSafe) {
+        return "Safe origin, bad signature";
       } else {
-        return { safe: false, message: "Unsafe origin, bad signature" };
+        return "Unsafe origin, bad signature";
       }
   }
 }

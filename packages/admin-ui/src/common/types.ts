@@ -990,6 +990,8 @@ export interface PackageRelease {
   origin?: string;
   isCore: boolean;
   // Signed release
+  /** Release is from safe origin OR has trusted signature */
+  signedSafe: boolean;
   signatureStatus: ReleaseSignatureStatus;
 }
 

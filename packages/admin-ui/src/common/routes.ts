@@ -355,8 +355,13 @@ export interface Routes {
     version?: string;
     userSettings?: UserSettingsAllDnps;
     options?: {
+      /**
+       * Forwarded option to dappGet
+       * If true, uses the dappGetBasic, which only fetches first level deps
+       */
       BYPASS_RESOLVER?: boolean;
       BYPASS_CORE_RESTRICTION?: boolean;
+      BYPASS_SIGNED_RESTRICTION?: boolean;
     };
   }) => Promise<void>;
 

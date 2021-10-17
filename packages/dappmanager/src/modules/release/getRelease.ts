@@ -1,7 +1,7 @@
 import * as db from "../../db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate";
-import { PackageRelease } from "../../types";
+import { PackageRelease, ReleaseSignatureStatusCode } from "../../types";
 import { getIsCore } from "../manifest/getIsCore";
 import { parseMetadataFromManifest } from "../manifest";
 import { parseUnsafeCompose } from "../compose/unsafeCompose";
@@ -108,6 +108,9 @@ export async function getRelease({
         isCore && Boolean(origin) && dnpName.endsWith(".dnp.dappnode.eth"),
       requestNameMismatch: isEnsDomain(reqName || "") && reqName !== dnpName
     },
+    signedSafe:
+      !origin ||
+      signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey,
     signatureStatus
   };
 }
