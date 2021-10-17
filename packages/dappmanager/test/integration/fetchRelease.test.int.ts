@@ -271,10 +271,10 @@ describe("Fetch releases", () => {
           isAvailable: true,
           message: ""
         },
-        signedSafeAll: true,
+        signedSafeAll: false,
         signedSafe: {
-          [dnpNameMain]: { safe: true, message: "" },
-          [dnpNameDep]: { safe: true, message: "" }
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" },
+          [dnpNameDep]: { safe: false, message: "Unsafe origin, not signed" }
         }
       };
 
@@ -381,9 +381,9 @@ describe("Fetch releases", () => {
         },
         // Mock, ommited below
         imageSize: 0,
-        signedSafeAll: true,
+        signedSafeAll: false,
         signedSafe: {
-          [dnpNameMain]: { safe: true, message: "" }
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" }
         }
       };
 
