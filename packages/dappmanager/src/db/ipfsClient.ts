@@ -8,7 +8,7 @@ const IPFS_GATEWAY = "ipfs-gateway";
 
 export const ipfsClientTarget = dbMain.staticKey<IpfsClientTarget>(
   IPFS_CLIENT_TARGET,
-  "local"
+  IpfsClientTarget.local
 );
 
 export const ipfsGateway = dbMain.staticKey<string>(

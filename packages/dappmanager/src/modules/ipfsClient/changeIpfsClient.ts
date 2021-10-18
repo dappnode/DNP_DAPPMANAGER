@@ -25,10 +25,10 @@ export async function changeIpfsClient(
 
     const isInstalled = await isIpfsInstalled();
 
-    if (nextTarget === "local") {
+    if (nextTarget === IpfsClientTarget.local) {
       if (!isInstalled) await packageInstall({ name: params.ipfsDnpName });
-      db.ipfsClientTarget.set("local");
-      ipfs.changeHost(params.IPFS_LOCAL, "local");
+      db.ipfsClientTarget.set(IpfsClientTarget.local);
+      ipfs.changeHost(params.IPFS_LOCAL, IpfsClientTarget.local);
     } else {
       // Delete IPFS on demmand
       if (isInstalled && deleteLocalIpfsClient)
@@ -36,10 +36,10 @@ export async function changeIpfsClient(
 
       // Set new values in db
       db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
-      db.ipfsClientTarget.set("remote");
+      db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
-      ipfs.changeHost(db.ipfsGateway.get(), "remote");
+      ipfs.changeHost(db.ipfsGateway.get(), IpfsClientTarget.remote);
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

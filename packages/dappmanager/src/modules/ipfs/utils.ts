@@ -1,5 +1,5 @@
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { IpfsFileResult } from "../../types";
+import { IpfsFileResult, IpfsClientTarget } from "../../types";
 import * as db from "../../db";
 import params from "../../params";
 
@@ -31,7 +31,7 @@ export function getIpfsUrl(): string {
   const ipfsClientTarget = db.ipfsClientTarget.get();
   if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
   // 2.1 If LOCAL
-  if (ipfsClientTarget === "local") return params.IPFS_LOCAL;
+  if (ipfsClientTarget === IpfsClientTarget.local) return params.IPFS_LOCAL;
   // 2.2 If REMOTE
   return db.ipfsGateway.get();
 }
