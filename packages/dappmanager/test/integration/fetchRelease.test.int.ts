@@ -257,21 +257,24 @@ describe("Fetch releases", () => {
             }
           }
         },
-        request: {
-          compatible: {
-            requiresCoreUpdate: false,
-            resolving: false,
-            isCompatible: true,
-            error: "",
-            dnps: {
-              [dnpNameDep]: { from: undefined, to: dependencyReleaseHash },
-              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
-            }
-          },
-          available: {
-            isAvailable: true,
-            message: ""
+        compatible: {
+          requiresCoreUpdate: false,
+          resolving: false,
+          isCompatible: true,
+          error: "",
+          dnps: {
+            [dnpNameDep]: { from: undefined, to: dependencyReleaseHash },
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
           }
+        },
+        available: {
+          isAvailable: true,
+          message: ""
+        },
+        signedSafeAll: false,
+        signedSafe: {
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" },
+          [dnpNameDep]: { safe: false, message: "Unsafe origin, not signed" }
         }
       };
 
@@ -363,23 +366,25 @@ describe("Fetch releases", () => {
         settings: {
           [dnpNameMain]: {}
         },
-        request: {
-          compatible: {
-            requiresCoreUpdate: false,
-            resolving: false,
-            isCompatible: true,
-            error: "",
-            dnps: {
-              [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
-            }
-          },
-          available: {
-            isAvailable: true,
-            message: ""
+        compatible: {
+          requiresCoreUpdate: false,
+          resolving: false,
+          isCompatible: true,
+          error: "",
+          dnps: {
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
           }
         },
+        available: {
+          isAvailable: true,
+          message: ""
+        },
         // Mock, ommited below
-        imageSize: 0
+        imageSize: 0,
+        signedSafeAll: false,
+        signedSafe: {
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" }
+        }
       };
 
       expect(omit(result, ["imageSize"])).to.deep.equal(

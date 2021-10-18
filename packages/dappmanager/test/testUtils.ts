@@ -10,7 +10,8 @@ import {
   Compose,
   ManifestWithImage,
   InstallPackageData,
-  InstalledPackageData
+  InstalledPackageData,
+  ReleaseSignatureStatusCode
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
@@ -41,7 +42,7 @@ export function clearDbs(): void {
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
-  return async function (arg: A): Promise<R | undefined> {
+  return async function(arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {
@@ -154,7 +155,8 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
   LayersSize: 101010101,
   Images: [
     {
-      Id: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
+      Id:
+        "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
       ParentId: "",
       RepoTags: ["busybox:latest"],
       RepoDigests: [
@@ -243,7 +245,9 @@ export const mockRelease: PackageRelease = {
   metadata: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
-  isCore: false
+  isCore: false,
+  signedSafe: true,
+  signatureStatus: { status: ReleaseSignatureStatusCode.notSigned }
 };
 
 export const mockPackageData: InstallPackageData = {

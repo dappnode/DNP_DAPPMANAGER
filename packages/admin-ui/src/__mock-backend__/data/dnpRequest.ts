@@ -8,6 +8,7 @@ import {
 import { sampleRequestState } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
+import { mapValues } from "lodash";
 
 function getRequestDnp(dnp: MockDnp): RequestedDnp {
   const settings: UserSettingsAllDnps = {};
@@ -43,19 +44,24 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
     setupWizard,
     specialPermissions,
 
-    request: {
-      compatible: {
-        requiresCoreUpdate: false,
-        resolving: false,
-        isCompatible: true,
-        error: "",
-        dnps: compatibleDnps
-      },
-      available: {
-        isAvailable: true,
-        message: ""
-      }
-    }
+    compatible: {
+      requiresCoreUpdate: false,
+      resolving: false,
+      isCompatible: true,
+      error: "",
+      dnps: compatibleDnps
+    },
+    available: {
+      isAvailable: true,
+      message: ""
+    },
+
+    signedSafe: mapValues(compatibleDnps, () => ({
+      safe: true,
+      message: "Signed by known key 0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
+    })),
+    signedSafeAll: true,
+    ...dnp.requestDnp
   };
 }
 

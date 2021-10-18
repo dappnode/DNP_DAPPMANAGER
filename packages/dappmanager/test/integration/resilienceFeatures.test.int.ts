@@ -19,7 +19,7 @@ import {
 } from "../integrationSpecs";
 import { ManifestWithImage } from "../../src/types";
 
-describe("Resilience features, when things go wrong", function() {
+describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";
   const dnpName = testMockPrefix + "resilience-features.dnp.dappnode.eth";
   const manifest: ManifestWithImage = {
@@ -56,11 +56,34 @@ describe("Resilience features, when things go wrong", function() {
     await cleanContainers(dnpName);
   });
 
+  describe("Signed safe restrictions", () => {
+    it("Prevent installing package from unsafe origin not signed", async () => {
+      try {
+        await calls.packageInstall({
+          name: dnpName,
+          version: releaseHash
+        });
+        throw Error("Should prevent installation");
+      } catch (e) {
+        if (
+          (e as Error).message.includes(
+            `Package ${dnpName} is from untrusted origin and is not signed`
+          )
+        ) {
+          // OK, expected error
+        } else {
+          throw e;
+        }
+      }
+    });
+  });
+
   describe("Remove a package without compose", () => {
     before("Install the release", async () => {
       await calls.packageInstall({
         name: dnpName,
-        version: releaseHash
+        version: releaseHash,
+        options: { BYPASS_SIGNED_RESTRICTION: true }
       });
     });
 
@@ -75,7 +98,8 @@ describe("Resilience features, when things go wrong", function() {
     before("Install the release", async () => {
       await calls.packageInstall({
         name: dnpName,
-        version: releaseHash
+        version: releaseHash,
+        options: { BYPASS_SIGNED_RESTRICTION: true }
       });
     });
 
@@ -92,7 +116,8 @@ describe("Resilience features, when things go wrong", function() {
     before("Install the good release", async () => {
       await calls.packageInstall({
         name: dnpName,
-        version: releaseHash
+        version: releaseHash,
+        options: { BYPASS_SIGNED_RESTRICTION: true }
       });
     });
 
@@ -114,7 +139,8 @@ describe("Resilience features, when things go wrong", function() {
       try {
         await calls.packageInstall({
           name: dnpName,
-          version: brokenReleaseHash
+          version: brokenReleaseHash,
+          options: { BYPASS_SIGNED_RESTRICTION: true }
         });
       } catch (e) {
         errorMessage = e.message;

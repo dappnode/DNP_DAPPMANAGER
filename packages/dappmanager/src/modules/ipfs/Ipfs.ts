@@ -7,7 +7,7 @@ import {
   catStreamToFs,
   writeCarToFs
 } from "./writeStreamToFs";
-import { IpfsCatOptions } from "./types";
+import { IpfsCatOptions, IPFSPath } from "./types";
 import { handleIpfsError } from "./utils";
 import { catCarReaderToMemory, catString } from "./writeFileToMemory";
 import { IpfsClientTarget } from "../../common";
@@ -100,11 +100,11 @@ export class Ipfs {
   /**
    * Pin a hash
    */
-  async pinAdd(hash: string): Promise<void> {
+  async pinAdd(hash: IPFSPath): Promise<void> {
     await this.ipfs.pin.add(hash, { timeout: this.timeout });
   }
 
-  async pinAddNoThrow(hash: string): Promise<void> {
+  async pinAddNoThrow(hash: IPFSPath): Promise<void> {
     await this.pinAdd(hash).catch((e: Error) =>
       logs.error(`Error pinning hash ${hash}`, e)
     );

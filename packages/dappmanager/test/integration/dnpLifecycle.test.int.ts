@@ -294,9 +294,9 @@ describe("DNP lifecycle", function () {
       id: mainDnpReleaseHash
     });
     expect(result.dnpName, "Wrong result name").to.equal(dnpNameMain);
-    expect(result.request.compatible, "Result is not compatible").to.be.ok;
+    expect(result.compatible, "Result is not compatible").to.be.ok;
     expect(
-      result.request.compatible.dnps,
+      result.compatible.dnps,
       "Resolved state should include this dnp"
     ).to.have.property(dnpNameMain);
   });
@@ -305,7 +305,8 @@ describe("DNP lifecycle", function () {
     await calls.packageInstall({
       name: dnpNameMain,
       version: mainDnpReleaseHash,
-      userSettings
+      userSettings,
+      options: { BYPASS_SIGNED_RESTRICTION: true }
     });
   });
 

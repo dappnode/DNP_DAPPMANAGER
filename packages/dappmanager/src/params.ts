@@ -246,7 +246,16 @@ const params = {
 
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
-  AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP)
+  AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP),
+
+  DEFAULT_RELEASE_TRUSTED_KEYS: [
+    {
+      name: "DAppNode Association",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
+    }
+  ]
 };
 
 if (devMode) {
@@ -344,6 +353,13 @@ export const releaseFiles = {
     format: FileFormat.YAML,
     maxSize: 10e3, // Limit size to ~10KB
     required: true as const,
+    multiple: false as const
+  },
+  signature: {
+    regex: /^signature\.json$/,
+    format: FileFormat.JSON,
+    maxSize: 10e3, // Limit size to ~10KB
+    required: false as const,
     multiple: false as const
   },
   avatar: {
