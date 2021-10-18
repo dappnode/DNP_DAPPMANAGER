@@ -958,7 +958,7 @@ export interface ReleaseWarnings {
   /**
    * If a core package does not come from the DAppNode Package APM registry
    */
-  unverifiedCore?: boolean;
+  coreFromForeignRegistry?: boolean;
   /**
    * If the requested name does not match the manifest name
    */

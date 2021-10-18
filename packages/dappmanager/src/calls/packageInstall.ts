@@ -53,8 +53,13 @@ export async function packageInstall({
 
     // Throw any errors found in the release
     for (const release of releases) {
-      if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
-        throw Error(`Core package ${release.dnpName} is from untrusted origin`);
+      if (
+        release.warnings.coreFromForeignRegistry &&
+        !options.BYPASS_CORE_RESTRICTION
+      )
+        throw Error(
+          `Core package ${release.dnpName} is from a foreign registry`
+        );
       if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
         throw Error(
           `Package ${release.dnpName} is from untrusted origin and is not signed`

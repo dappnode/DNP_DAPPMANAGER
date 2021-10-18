@@ -104,8 +104,7 @@ export async function getRelease({
     // Generates an object of warnings so other components can
     // decide to throw an error or just show a warning in the UI
     warnings: {
-      unverifiedCore:
-        isCore && Boolean(origin) && dnpName.endsWith(".dnp.dappnode.eth"),
+      coreFromForeignRegistry: isCore && dnpName.endsWith(".dnp.dappnode.eth"),
       requestNameMismatch: isEnsDomain(reqName || "") && reqName !== dnpName
     },
     signedSafe:
