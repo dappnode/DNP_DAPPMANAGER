@@ -1223,7 +1223,10 @@ export interface IpfsRepository {
   ipfsGateway: string;
 }
 
-export type IpfsClientTarget = "local" | "remote";
+export enum IpfsClientTarget {
+  local = "local",
+  remote = "remote"
+}
 
 /**
  * Eth provider / client types
