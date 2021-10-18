@@ -234,7 +234,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     { lv_name: "root", vg_name: "rootvg", lv_size: "<7.28t" },
     { lv_name: "swap_1", vg_name: "rootvg", lv_size: "976.00m" }
   ],
-  lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space"
+  lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space",
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: "remote",
