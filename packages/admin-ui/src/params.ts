@@ -115,6 +115,11 @@ export const autoUpdateIds = {
 export const dappnodeVolumeGroup = "rootvg";
 export const dappnodeLogicalVolume = "root";
 
+// IPFS
+export const IPFS_DAPPNODE_GATEWAY = "http://ipfs.dappnode.io:8081";
+export const IPFS_GATEWAY_CHECKER =
+  "https://ipfs.github.io/public-gateway-checker/";
+
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 

@@ -1,6 +1,7 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs, IPFSEntry } from "../../ipfs";
+import { ipfs } from "../../ipfs";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
 import {
   Manifest,
@@ -15,6 +16,7 @@ import { getImageByArch } from "./getImageByArch";
 import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
 import { downloadAssetRequired } from "./downloadAssets";
+import { isDirectoryRelease } from "./isDirectoryRelease";
 
 const source = "ipfs" as const;
 
@@ -36,9 +38,7 @@ export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-async function downloadReleaseIpfsFn(
-  hash: string
-): Promise<{
+async function downloadReleaseIpfsFn(hash: string): Promise<{
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   composeUnsafe: Compose;
@@ -47,25 +47,29 @@ async function downloadReleaseIpfsFn(
   const arch = os.arch() as NodeArch;
 
   try {
-    const manifest = await downloadManifest(hash);
+    // Check if it is an ipfs path of a root directory release
+    const ipfsEntries = await ipfs.list(hash);
+    const isDirectory = await isDirectoryRelease(ipfsEntries);
 
-    // Disable manifest type releases for ARM architectures
-    if (isArmArch(arch)) throw new NoImageForArchError(arch);
+    if (!isDirectory) {
+      const manifest = await downloadManifest(hash);
 
-    // Make sure manifest.image.hash exists. Otherwise, will throw
-    const manifestWithImage = validateManifestWithImage(
-      manifest as ManifestWithImage
-    );
-    const { image, avatar } = manifestWithImage;
-    return {
-      imageFile: getFileFromHash(image.hash, image.size),
-      avatarFile: avatar ? getFileFromHash(avatar) : undefined,
-      manifest,
-      composeUnsafe: manifestToCompose(manifestWithImage)
-    };
-  } catch (e) {
-    if (e.message.includes("is a directory")) {
-      const files = await ipfs.ls(hash);
+      // Disable manifest type releases for ARM architectures
+      if (isArmArch(arch)) throw new NoImageForArchError(arch);
+
+      // Make sure manifest.image.hash exists. Otherwise, will throw
+      const manifestWithImage = validateManifestWithImage(
+        manifest as ManifestWithImage
+      );
+      const { image, avatar } = manifestWithImage;
+      return {
+        imageFile: getFileFromHash(image.hash, image.size),
+        avatarFile: avatar ? getFileFromHash(avatar) : undefined,
+        manifest,
+        composeUnsafe: manifestToCompose(manifestWithImage)
+      };
+    } else {
+      const files = await ipfs.list(hash);
       const { manifest, compose } = await downloadDirectoryFiles(files);
 
       // Pin release on visit
@@ -81,9 +85,9 @@ async function downloadReleaseIpfsFn(
         manifest,
         composeUnsafe: compose
       };
-    } else {
-      throw e;
     }
+  } catch (e) {
+    throw e;
   }
 }
 

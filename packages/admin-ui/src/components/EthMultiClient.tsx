@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "components/Card";
-import "./ethMultiClient.scss";
+import "./multiClient.scss";
 import { joinCssClass } from "utils/css";
 import Select from "components/Select";
 import {

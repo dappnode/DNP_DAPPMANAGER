@@ -32,7 +32,7 @@ export async function uploadManifestRelease(
   const releaseHashManifest = await ipfsAddManifest(manifest);
 
   // Verify the uploaded files
-  const data = await ipfs.catString(releaseHashManifest);
+  const data = await ipfs.writeFileToMemory(releaseHashManifest);
   const manifestUploaded = parseManifest(data);
   if (!isEqual(manifestUploaded, manifest))
     throw Error("Wrong uploaded manifest");

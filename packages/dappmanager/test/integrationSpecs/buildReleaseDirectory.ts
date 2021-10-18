@@ -70,7 +70,7 @@ export async function uploadDirectoryRelease({
   const rootHash = await ipfsAddDirFromFs(releaseDir);
 
   // Verify the uploaded files
-  const files = await ipfs.ls(rootHash);
+  const files = await ipfs.list(rootHash);
   const fileNames = files.map(file => file.name);
   for (const fileToCheck of [manifestFileName, composeFileName])
     if (!fileNames.includes(fileToCheck))

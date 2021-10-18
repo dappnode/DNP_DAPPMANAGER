@@ -3,7 +3,8 @@
   --eth-multi-client-description-color: var(--light-text-color);
 }
 
-.eth-multi-clients {
+.eth-multi-clients,
+.ipfs-multi-clients {
   display: grid;
   grid-gap: var(--default-spacing);
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -15,7 +16,8 @@
   width: 100%;
 }
 
-.eth-multi-client {
+.eth-multi-client,
+.ipfs-multi-client {
   text-align: center;
   // For the underline line that highlights on select
   border-bottom: 6px solid white;
