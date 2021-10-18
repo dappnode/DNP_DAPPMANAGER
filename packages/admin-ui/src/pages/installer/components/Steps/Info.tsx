@@ -45,7 +45,6 @@ interface InstallerStepInfoProps {
   onInstall: () => void;
   disableInstallation: boolean;
   optionsArray: {
-    id: string;
     name: string;
     checked: boolean;
     toggle: () => void;
@@ -112,13 +111,13 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
       close: () => setShowOptions(false),
       Component: () => (
         <div>
-          {optionsArray.map(({ id, name, checked, toggle }) => (
+          {optionsArray.map(({ name, checked, toggle }) => (
             <Switch
-              key={id}
+              key={name}
               checked={checked}
               onToggle={toggle}
               label={name}
-              id={"switch-" + id}
+              id={"switch-" + name}
             />
           ))}
         </div>
