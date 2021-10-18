@@ -7,7 +7,7 @@ import { getRegistryOnRange } from "../../../src/modules/registry";
 import { clearDbs } from "../../testUtils";
 import { RegistryNewRepoEvent } from "../../../src/types";
 
-describe("APM Registry", () => {
+describe.skip("APM Registry", () => {
   before("Clear DBs and set remote", async () => {
     // TODO: TEMP - UNCOMMENT AFTER TESTING
     clearDbs();
