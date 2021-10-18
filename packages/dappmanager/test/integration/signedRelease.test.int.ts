@@ -4,17 +4,13 @@ import { ComposeEditor } from "../../src/modules/compose/editor";
 import { ipfs } from "../../src/modules/ipfs";
 import { ReleaseFetcher } from "../../src/modules/release";
 import { getContainerName, getImageTag } from "../../src/params";
-import {
-  Manifest,
-  ReleaseSignatureStatus,
-  ReleaseSignatureStatusCode
-} from "../../src/types";
+import { Manifest, ReleaseSignatureStatusCode } from "../../src/types";
 import { uploadDirectoryRelease } from "../integrationSpecs";
 import { signRelease } from "../integrationSpecs/signRelease";
 
 // Sign the string message
 const privateKey =
-  "0x0123456789012345678901234567890123456789012345678901234567890123";
+  "0x0111111111111111111111111111111111111111111111111111111111111111";
 
 describe("Sign release", () => {
   it("Sign uploaded release", async () => {
@@ -56,7 +52,7 @@ describe("Sign release", () => {
     const releaseFetcher = new ReleaseFetcher();
     const mainRelease = await releaseFetcher.getRelease(newReleaseHash);
 
-    const expectedSignatureStatus: ReleaseSignatureStatus = {
+    const expectedSignatureStatus: typeof mainRelease.signatureStatus = {
       status: ReleaseSignatureStatusCode.signedByUnknownKey,
       signatureProtocol: "ECDSA_256",
       key: wallet.address

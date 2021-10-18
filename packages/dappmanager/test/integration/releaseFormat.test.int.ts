@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash";
 import * as calls from "../../src/calls";
-import { createTestDir, beforeAndAfter } from "../testUtils";
+import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
 import { TrustedReleaseKey } from "../../src/types";
@@ -277,5 +277,6 @@ describe("Release format tests", () => {
 
   after("Remove DAppNode docker network", async () => {
     await shell(`docker network remove ${params.DNP_PRIVATE_NETWORK_NAME}`);
+    await cleanTestDir();
   });
 });
