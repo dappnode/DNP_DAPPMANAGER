@@ -1,4 +1,4 @@
-import { PortProtocol, Routes } from "../common";
+import { PortProtocol, Routes, IpfsClientTarget } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
@@ -227,7 +227,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   natRenewalIsEnabled: async () => true,
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
-    ipfsClientTarget: "remote",
+    ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "http://ipfs.dappnode.io:8081"
   })
 };

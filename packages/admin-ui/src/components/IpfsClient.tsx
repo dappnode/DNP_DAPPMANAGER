@@ -16,12 +16,12 @@ const clients: IpfsClientData[] = [
   {
     title: "Remote",
     description: `Public IPFS node API mantained by DAppNode ${IPFS_DAPPNODE_GATEWAY} or choose one from ${IPFS_GATEWAY_CHECKER}`,
-    option: "remote"
+    option: IpfsClientTarget.remote
   },
   {
     title: "Local",
     description: "Your own IPFS node w/out 3rd parties",
-    option: "local"
+    option: IpfsClientTarget.local
   }
 ];
 
