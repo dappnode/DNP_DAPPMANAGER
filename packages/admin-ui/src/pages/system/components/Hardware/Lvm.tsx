@@ -113,6 +113,16 @@ export default function Lvm() {
     }
   }
 
+  function cleanValues(): void {
+    setDisk("");
+    setVolumeGroup("");
+    setLogicalVolume("");
+    setDiskReq({});
+    setLogicalVolumeReq({});
+    setVolumeGroupReq({});
+    setExpandDiskReq({});
+  }
+
   return (
     <Card spacing>
       <div>
@@ -122,9 +132,7 @@ export default function Lvm() {
             onClick={() => {
               setAutomatic(true);
               setManual(false);
-              setDisk("");
-              setVolumeGroup("");
-              setLogicalVolume("");
+              cleanValues();
             }}
             variant="dappnode"
           >
@@ -134,9 +142,7 @@ export default function Lvm() {
             onClick={() => {
               setAutomatic(false);
               setManual(true);
-              setDisk("");
-              setVolumeGroup("");
-              setLogicalVolume("");
+              cleanValues();
             }}
             variant="dappnode"
           >
@@ -148,6 +154,7 @@ export default function Lvm() {
       {/** FIRST STEP: select hard disk */}
       {(automatic || manual) && (
         <>
+          <hr />
           <div className="subtle-header">Select hard disk</div>
           <p>Check and select the hard disk to be added.</p>
           <Button onClick={getDisks}>Get hard disks</Button>
@@ -170,6 +177,7 @@ export default function Lvm() {
       {/** AUTOMATIC STEPS: select volume group and logical volume*/}
       {automatic && disk && (
         <>
+          <hr />
           <div className="subtle-header">Get default dappnode values</div>
           <p>Select the Volume Group to be expanded.</p>
           <Button disabled={!disk} onClick={getDappnodeDefaults}>
@@ -181,6 +189,7 @@ export default function Lvm() {
       {/** SECOND STEP: select volume group */}
       {manual && disk && (
         <>
+          <hr />
           <div className="subtle-header">Select Volume Group</div>
           <p>Select the Volume Group to be expanded.</p>
           <Button disabled={!disk} onClick={getVolumeGroups}>
@@ -207,6 +216,7 @@ export default function Lvm() {
       {/** THIRD STEP: select logical volume */}
       {manual && volumeGroup && (
         <>
+          <hr />
           <div className="subtle-header">Select Logical Volume</div>
           <p>Select the Logical Volume to be expanded.</p>
           <Button disabled={!disk || !volumeGroup} onClick={getLogicalVolumes}>
@@ -233,6 +243,7 @@ export default function Lvm() {
       {/** FORTH STEP: expand disk space */}
       {(manual || automatic) && logicalVolume && (
         <>
+          <hr />
           <div className="subtle-header">Expand disk space</div>
           <p>Expand the disk space with the selected options.</p>
           {disk && volumeGroup && logicalVolume ? (
