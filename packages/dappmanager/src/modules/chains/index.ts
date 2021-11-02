@@ -52,5 +52,5 @@ export async function getChainsData(): Promise<ChainData[]> {
     })
   );
 
-  return chainsData;
+  return chainsData.sort((a, b) => a.dnpName.localeCompare(b.dnpName));
 }
