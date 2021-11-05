@@ -11,11 +11,12 @@ const MAX_KEYS = 20;
  */
 export const dataSend = wrapHandler(async (req, res) => {
   const key = req.query.key;
-  const data = req.query.data || req.body;
+  const data = req.query.data;
 
   try {
     if (typeof key === undefined) throw Error("missing");
-    if (typeof key !== "string") throw Error("must be a string");
+    if (typeof key !== "string")
+      throw Error(`must be a string but received ${typeof key}`);
     if (!key) throw Error("must not be empty");
   } catch (e) {
     throw new HttpError({ statusCode: 400, name: `Arg key ${e.message}` });
@@ -23,8 +24,10 @@ export const dataSend = wrapHandler(async (req, res) => {
 
   try {
     if (typeof data === undefined) throw Error("missing");
-    if (typeof data !== "string") throw Error("must be a string");
+    if (typeof data !== "string")
+      throw Error(`must be a string but received ${typeof data}`);
     // OK to be empty
+    if (!data) throw Error("must not be empty");
     if (data.length > MAX_LENGTH) throw Error("too long");
   } catch (e) {
     throw new HttpError({ statusCode: 400, name: `Arg data ${e.message}` });
