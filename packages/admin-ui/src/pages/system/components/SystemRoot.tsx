@@ -21,6 +21,7 @@ import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { Notifications } from "./Notifications";
+import Hardware from "./Hardware";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
   /**
@@ -28,7 +29,12 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
    * - Link (to)
    * - Route (render, path)
    */
-  const availableRoutes = [
+  const availableRoutes: {
+    name: string;
+    subPath: string;
+    component: React.ComponentType<any>;
+    hideFromMenu?: boolean;
+  }[] = [
     {
       name: "Info",
       subPath: subPaths.info,
@@ -80,6 +86,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Security",
       subPath: subPaths.security,
       component: Security
+    },
+    {
+      name: "Hardware",
+      subPath: subPaths.hardware,
+      component: Hardware
     },
     {
       name: "Advanced",

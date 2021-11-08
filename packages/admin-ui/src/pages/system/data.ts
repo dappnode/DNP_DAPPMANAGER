@@ -20,7 +20,8 @@ export const subPaths = {
   power: "power",
   profile: "profile",
   notifications: "notifications",
-  advanced: "advanced"
+  advanced: "advanced",
+  hardware: "hardware"
 };
 
 // Computed paths

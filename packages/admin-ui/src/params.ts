@@ -111,6 +111,10 @@ export const autoUpdateIds = {
   SYSTEM_PACKAGES: "system-packages"
 };
 
+// LVM default dappnode values
+export const dappnodeVolumeGroup = "rootvg";
+export const dappnodeLogicalVolume = "root";
+
 // IPFS
 export const IPFS_DAPPNODE_GATEWAY = "http://ipfs.dappnode.io:8081";
 export const IPFS_GATEWAY_CHECKER =

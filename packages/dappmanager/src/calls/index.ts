@@ -24,6 +24,7 @@ export { ipfsClientTargetSet } from "./ipfsClientTargetSet";
 export { ipfsClientTargetGet } from "./ipfsClientTargetGet";
 export { ipPublicGet } from "./ipPublicGet";
 export * from "./localProxy";
+export * from "./manageLvm";
 export { mountpointsGet } from "./mountpointsGet";
 export { newFeatureStatusSet } from "./newFeatureStatusSet";
 export { notificationsGet } from "./notificationsGet";

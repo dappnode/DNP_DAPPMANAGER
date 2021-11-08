@@ -39,6 +39,9 @@ import {
   CurrentWifiCredentials,
   LocalProxyingStatus,
   RegistryScanProgress,
+  HostHardDisk,
+  HostVolumeGroup,
+  HostLogicalVolume,
   IpfsRepository,
   TrustedReleaseKey
 } from "./types";
@@ -302,6 +305,22 @@ export interface Routes {
    * - Is broadcasting to mDNS
    */
   localProxyingStatusGet: () => Promise<LocalProxyingStatus>;
+
+  /** LVM: get hard disks */
+  lvmhardDisksGet: () => Promise<HostHardDisk[]>;
+
+  /** LVM: get Volume Groups */
+  lvmVolumeGroupsGet: () => Promise<HostVolumeGroup[]>;
+
+  /** LVM: get Logical Volumes */
+  lvmLogicalVolumesGet: () => Promise<HostLogicalVolume[]>;
+
+  /** LVM: extend host disk space */
+  lvmDiskSpaceExtend: (kwargs: {
+    disk: string;
+    volumeGroup: string;
+    logicalVolume: string;
+  }) => Promise<string>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -679,6 +698,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsClientTargetGet: {},
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
+  lvmhardDisksGet: {},
+  lvmVolumeGroupsGet: {},
+  lvmLogicalVolumesGet: {},
+  lvmDiskSpaceExtend: { log: true },
   mountpointsGet: {},
   newFeatureStatusSet: {},
   notificationsGet: {},

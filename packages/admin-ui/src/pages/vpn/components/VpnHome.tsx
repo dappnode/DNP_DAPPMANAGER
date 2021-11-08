@@ -21,7 +21,12 @@ export function VpnHome({ match }: RouteComponentProps) {
       ? new Set(dnpsRequest.data.map(dnp => dnp.dnpName))
       : new Set<string>();
 
-    return [
+    const routes: {
+      name: string;
+      subPath: string;
+      component: React.ComponentType<any>;
+      installed: boolean;
+    }[] = [
       {
         name: "OpenVpn",
         subPath: subPaths.openVpn,
@@ -34,7 +39,9 @@ export function VpnHome({ match }: RouteComponentProps) {
         component: WireguardDevicesRoot,
         installed: dnpsSet.has(wireguardDnpName)
       }
-    ].sort((a, b) =>
+    ];
+
+    return routes.sort((a, b) =>
       a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0
     );
   }, [dnpsRequest.data]);
