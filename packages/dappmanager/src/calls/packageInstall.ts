@@ -4,7 +4,7 @@ import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePath
 import { getLogUi, logUiClear } from "../utils/logUi";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import { ReleaseFetcher } from "../modules/release";
-import { UserSettingsAllDnps, PackageRequest } from "../types";
+import { PackageRequest, Routes } from "../types";
 import {
   downloadImages,
   loadImages,
@@ -35,19 +35,7 @@ export async function packageInstall({
   version: reqVersion,
   userSettings = {},
   options = {}
-}: {
-  name: string;
-  version?: string;
-  userSettings?: UserSettingsAllDnps;
-  options?: {
-    /**
-     * Forwarded option to dappGet
-     * If true, uses the dappGetBasic, which only fetches first level deps
-     */
-    BYPASS_RESOLVER?: boolean;
-    BYPASS_CORE_RESTRICTION?: boolean;
-  };
-}): Promise<void> {
+}: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
     name: sanitizeRequestName(reqName),
@@ -59,19 +47,24 @@ export async function packageInstall({
   try {
     log(id, "Resolving dependencies...");
     const releaseFetcher = new ReleaseFetcher();
-    const {
-      state,
-      currentVersions,
-      releases
-    } = await releaseFetcher.getReleasesResolved(req, options);
+    const { state, currentVersions, releases } =
+      await releaseFetcher.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
 
     // Throw any errors found in the release
     for (const release of releases) {
-      if (release.warnings.unverifiedCore && !options.BYPASS_CORE_RESTRICTION)
+      if (
+        release.warnings.coreFromForeignRegistry &&
+        !options.BYPASS_CORE_RESTRICTION
+      )
         throw Error(
-          `Core package ${release.dnpName} is from an unverified origin`
+          `Core package ${release.dnpName} is from a foreign registry`
         );
+      if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
+        throw Error(
+          `Package ${release.dnpName} is from untrusted origin and is not signed`
+        );
+      }
     }
 
     // Gather all data necessary for the install

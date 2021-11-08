@@ -7,7 +7,7 @@ import {
   catStreamToFs,
   writeCarToFs
 } from "./writeStreamToFs";
-import { IpfsCatOptions } from "./types";
+import { IpfsCatOptions, IPFSPath } from "./types";
 import { handleIpfsError } from "./utils";
 import { catCarReaderToMemory, catString } from "./writeFileToMemory";
 import { IpfsClientTarget } from "../../common";
@@ -51,7 +51,7 @@ export class Ipfs {
     hash: string,
     opts?: IpfsCatOptions
   ): Promise<string> {
-    if (this.ipfsClientTarget === "local")
+    if (this.ipfsClientTarget === IpfsClientTarget.local)
       return await catString(this.ipfs, hash, this.timeout, opts);
     else return (await catCarReaderToMemory(this.ipfs, hash, opts)).toString();
   }
@@ -62,7 +62,7 @@ export class Ipfs {
    * @param args
    */
   async writeFileToFs(args: CatStreamToFsArgs): Promise<void> {
-    if (this.ipfsClientTarget === "local")
+    if (this.ipfsClientTarget === IpfsClientTarget.local)
       return await catStreamToFs(args, this.ipfs);
     else return await writeCarToFs(args, this.ipfs);
   }
@@ -75,7 +75,7 @@ export class Ipfs {
    */
   async list(hash: string): Promise<IPFSEntry[]> {
     try {
-      if (this.ipfsClientTarget === "local")
+      if (this.ipfsClientTarget === IpfsClientTarget.local)
         return await ls(this.ipfs, this.timeout, hash);
       else return await dagGet(this.ipfs, hash);
     } catch (e) {
@@ -100,11 +100,11 @@ export class Ipfs {
   /**
    * Pin a hash
    */
-  async pinAdd(hash: string): Promise<void> {
+  async pinAdd(hash: IPFSPath): Promise<void> {
     await this.ipfs.pin.add(hash, { timeout: this.timeout });
   }
 
-  async pinAddNoThrow(hash: string): Promise<void> {
+  async pinAddNoThrow(hash: IPFSPath): Promise<void> {
     await this.pinAdd(hash).catch((e: Error) =>
       logs.error(`Error pinning hash ${hash}`, e)
     );

@@ -42,7 +42,8 @@ import {
   HostHardDisk,
   HostVolumeGroup,
   HostLogicalVolume,
-  IpfsRepository
+  IpfsRepository,
+  TrustedReleaseKey
 } from "./types";
 
 export interface Routes {
@@ -373,8 +374,13 @@ export interface Routes {
     version?: string;
     userSettings?: UserSettingsAllDnps;
     options?: {
+      /**
+       * Forwarded option to dappGet
+       * If true, uses the dappGetBasic, which only fetches first level deps
+       */
       BYPASS_RESOLVER?: boolean;
       BYPASS_CORE_RESTRICTION?: boolean;
+      BYPASS_SIGNED_RESTRICTION?: boolean;
     };
   }) => Promise<void>;
 
@@ -521,6 +527,13 @@ export interface Routes {
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
+
+  /** Add a release key to trusted keys db */
+  releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
+  /** List all keys from trusted keys db */
+  releaseTrustedKeyList(): Promise<TrustedReleaseKey[]>;
+  /** Remove a release key from trusted keys db, by name */
+  releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
   /**
    * Receives an encrypted message containing the seed phrase of
@@ -713,10 +726,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
-  telegramStatusGet: {},
-  telegramStatusSet: { log: true },
-  telegramTokenGet: {},
-  telegramTokenSet: { log: true },
+  releaseTrustedKeyAdd: { log: true },
+  releaseTrustedKeyList: {},
+  releaseTrustedKeyRemove: { log: true },
+  runHostSecurityUpdates: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   statsCpuGet: {},
@@ -727,7 +740,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   sshStatusGet: {},
   sshStatusSet: { log: true },
   systemInfoGet: {},
-  runHostSecurityUpdates: {},
+  telegramStatusGet: {},
+  telegramStatusSet: { log: true },
+  telegramTokenGet: {},
+  telegramTokenSet: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   volumeRemove: { log: true },

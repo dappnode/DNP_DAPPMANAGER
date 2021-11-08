@@ -1,16 +1,17 @@
 import "mocha";
 import { expect } from "chai";
+import { mapValues } from "lodash";
 import * as calls from "../../src/calls";
-import { createTestDir, beforeAndAfter } from "../testUtils";
+import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
+import { TrustedReleaseKey } from "../../src/types";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
 } from "../integrationSpecs";
 import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
-import { mapValues } from "lodash";
 
 /**
  * Generate mock releases in the different formats,
@@ -44,6 +45,7 @@ describe("Release format tests", () => {
     dnpName: string;
     version: string;
     expectedEnvValues: { [serviceName: string]: string };
+    trustedReleaseKey?: TrustedReleaseKey;
     prepareRelease: () => Promise<string>;
   }
 
@@ -95,11 +97,7 @@ describe("Release format tests", () => {
             manifest: {
               name: dnpName,
               version: version,
-              description: "mock-test description",
-              avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
-              type: "service",
-              author: "lion",
-              license: "GLP-3.0"
+              description: "mock-test description"
             },
             compose: {
               version: "3.5",
@@ -131,11 +129,7 @@ describe("Release format tests", () => {
             manifest: {
               name: dnpName,
               version: version,
-              description: "mock-test description",
-              avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
-              type: "service",
-              author: "lion",
-              license: "GLP-3.0"
+              description: "mock-test description"
             },
             compose: {
               version: "3.5",
@@ -150,6 +144,48 @@ describe("Release format tests", () => {
                 }
               }
             }
+          })
+      };
+    },
+
+    (): TestCase => {
+      // Sign the string message
+      const privateKey =
+        "0x0123456789012345678901234567890123456789012345678901234567890123";
+      const pubkey = "0x14791697260E4c9A71f18484C9f997B308e59325";
+
+      const dnpName = testMockPrefix + "directory.dnp.dappnode.eth";
+      const version = "0.2.0";
+      const expectedEnvValue = dnpName;
+
+      return {
+        id: "Directory-type-signed",
+        dnpName,
+        version,
+        expectedEnvValues: { [dnpName]: expectedEnvValue },
+        trustedReleaseKey: {
+          name: "Test key",
+          signatureProtocol: "ECDSA_256",
+          dnpNameSuffix: ".dnp.dappnode.eth",
+          key: pubkey
+        },
+        prepareRelease: async (): Promise<string> =>
+          uploadDirectoryRelease({
+            manifest: {
+              name: dnpName,
+              version: version,
+              description: "mock-test description"
+            },
+            compose: {
+              version: "3.5",
+              services: {
+                [dnpName]: {
+                  restart: "unless-stopped",
+                  environment: mockEnvs(expectedEnvValue)
+                }
+              }
+            },
+            signReleaseWithPrivKey: privateKey
           })
       };
     }
@@ -169,8 +205,10 @@ describe("Release format tests", () => {
       dnpName,
       version,
       prepareRelease,
-      expectedEnvValues
+      expectedEnvValues,
+      trustedReleaseKey
     } = releaseTest();
+
     describe(id, () => {
       let releaseHash: string;
 
@@ -196,10 +234,19 @@ describe("Release format tests", () => {
       it("Install the release", async () => {
         if (!releaseHash) throw Error("Previous test failed");
 
+        // Persist trustedPubkey to local db
+        if (trustedReleaseKey) {
+          await calls.releaseTrustedKeyAdd(trustedReleaseKey);
+        }
+
         await calls.packageInstall({
           name: dnpName,
-          version: releaseHash
+          version: releaseHash,
           // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
+          options: {
+            // Only bypass signed restriction if no release key is specified
+            BYPASS_SIGNED_RESTRICTION: trustedReleaseKey === undefined
+          }
         });
 
         // Verify it is running correctly
@@ -230,5 +277,6 @@ describe("Release format tests", () => {
 
   after("Remove DAppNode docker network", async () => {
     await shell(`docker network remove ${params.DNP_PRIVATE_NETWORK_NAME}`);
+    await cleanTestDir();
   });
 });

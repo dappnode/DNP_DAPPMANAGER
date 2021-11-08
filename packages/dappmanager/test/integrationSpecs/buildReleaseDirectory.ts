@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { ethers } from "ethers";
 import { mapValues } from "lodash";
 import { ipfs } from "../../src/modules/ipfs";
 import shell from "../../src/utils/shell";
@@ -15,6 +16,7 @@ import { testDir, manifestFileName, composeFileName } from "../testUtils";
 import { ipfsAddDirFromFs } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
 import { saveMockAvatarTo } from "./mockAvatar";
+import { signRelease } from "./signRelease";
 
 // Helper type to prevent having to write valid container_name, image per service
 type ComposeUncomplete = Omit<Compose, "services"> & {
@@ -37,12 +39,14 @@ export async function uploadDirectoryRelease({
   manifest,
   compose,
   setupWizard,
-  disclaimer
+  disclaimer,
+  signReleaseWithPrivKey
 }: {
   manifest: Manifest;
   compose: ComposeUncomplete;
   setupWizard?: SetupWizard;
   disclaimer?: string;
+  signReleaseWithPrivKey?: string;
 }): Promise<string> {
   const releaseDir = path.join(testDir, manifest.name);
   await shell(`rm -rf ${releaseDir}`); // Clean dir before populating
@@ -76,7 +80,12 @@ export async function uploadDirectoryRelease({
     if (!fileNames.includes(fileToCheck))
       throw Error(`No ${fileToCheck} uploaded`);
 
-  return rootHash;
+  if (signReleaseWithPrivKey) {
+    const wallet = new ethers.Wallet(signReleaseWithPrivKey);
+    return await signRelease(wallet, ipfs, rootHash);
+  } else {
+    return rootHash;
+  }
 }
 
 /**

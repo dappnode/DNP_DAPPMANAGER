@@ -6,7 +6,8 @@ import {
   SetupSchema,
   SetupUiJson,
   GrafanaDashboard,
-  PrometheusTarget
+  PrometheusTarget,
+  ReleaseSignature
 } from "../../../types";
 import { releaseFiles } from "../../../params";
 import { validateManifestBasic } from "../../manifest";
@@ -17,6 +18,7 @@ import { validateCompose } from "../../compose";
 export const releaseFilesToDownload = {
   manifest: releaseFiles.manifest,
   compose: releaseFiles.compose,
+  signature: releaseFiles.signature,
   setupWizard: releaseFiles.setupWizard,
   setupSchema: releaseFiles.setupSchema,
   setupTarget: releaseFiles.setupTarget,
@@ -30,6 +32,7 @@ export const releaseFilesToDownload = {
 export type DirectoryFiles = {
   manifest: Manifest;
   compose: Compose;
+  signature?: ReleaseSignature;
   setupWizard?: SetupWizard;
   setupSchema?: SetupSchema;
   setupTarget?: SetupTarget;

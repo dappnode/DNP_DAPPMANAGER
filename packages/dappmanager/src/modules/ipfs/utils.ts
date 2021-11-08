@@ -1,12 +1,13 @@
-import { IPFSEntry } from "ipfs-core-types/src/root";
-import { IpfsFileResult } from "../../types";
+import { IPFSEntry, IPFSPath } from "./types";
+import { IpfsFileResult, IpfsClientTarget } from "../../types";
 import * as db from "../../db";
 import params from "../../params";
 
 /**
  * ky specific timeout errors https://github.com/sindresorhus/ky/blob/2f37c3f999efb36db9108893b8b3d4b3a7f5ec45/index.js#L127-L132
  */
-export function handleIpfsError(e: Error, hash: string): never {
+export function handleIpfsError(e: Error, ipfsPath: IPFSPath): never {
+  const hash = ipfsPath.toString();
   if (e.name === "TimeoutError" || e.message.includes("timed out")) {
     throw Error(`IPFS hash not available ${hash}`);
   } else {
@@ -31,7 +32,7 @@ export function getIpfsUrl(): string {
   const ipfsClientTarget = db.ipfsClientTarget.get();
   if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
   // 2.1 If LOCAL
-  if (ipfsClientTarget === "local") return params.IPFS_LOCAL;
+  if (ipfsClientTarget === IpfsClientTarget.local) return params.IPFS_LOCAL;
   // 2.2 If REMOTE
   return db.ipfsGateway.get();
 }

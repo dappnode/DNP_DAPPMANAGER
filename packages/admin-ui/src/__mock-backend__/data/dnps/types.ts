@@ -4,7 +4,8 @@ import {
   SetupWizard,
   SpecialPermission,
   InstalledPackageDetailData,
-  PackageContainer
+  PackageContainer,
+  RequestedDnp
 } from "../../../common";
 
 export { PortProtocol } from "../../../common";
@@ -21,4 +22,5 @@ export interface MockDnp {
     InstalledPackageDetailData & { containers: PackageContainer[] }
   >;
   installedContainers?: { [serviceName: string]: Partial<PackageContainer> };
+  requestDnp?: Partial<RequestedDnp>;
 }

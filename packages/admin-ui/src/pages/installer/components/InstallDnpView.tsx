@@ -8,13 +8,13 @@ import {
   withRouter,
   RouteComponentProps
 } from "react-router-dom";
-import { isEmpty, throttle, pick } from "lodash";
+import { isEmpty, throttle } from "lodash";
 import { difference } from "utils/lodashExtended";
 import { prettyDnpName, isDnpVerified } from "utils/format";
 // This module
 import { ProgressLogsView } from "./InstallCardComponents/ProgressLogsView";
 // Components
-import Info from "./Steps/Info";
+import { InstallerStepInfo } from "./Steps/Info";
 import { SetupWizard } from "components/SetupWizard";
 import Permissions from "./Steps/Permissions";
 import Disclaimer from "./Steps/Disclaimer";
@@ -29,9 +29,6 @@ import { isSetupWizardEmpty } from "../parsers/formDataParser";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
-
-const BYPASS_CORE_RESTRICTION = "BYPASS_CORE_RESTRICTION";
-const SHOW_ADVANCED_EDITOR = "SHOW_ADVANCED_EDITOR";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -52,7 +49,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   match
 }) => {
   const [userSettings, setUserSettings] = useState({} as UserSettingsAllDnps);
-  const [options, setOptions] = useState({} as { [optionId: string]: boolean });
+  const [bypassCoreOpt, setBypassCoreOpt] = useState<boolean>();
+  const [bypassSignedOpt, setBypassSignedOpt] = useState<boolean>();
+
+  const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const isCore = metadata.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
-  const requiresCoreUpdate = dnp.request.compatible.requiresCoreUpdate;
+  const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
 
@@ -87,22 +87,26 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         ? newData.newUserSettings
         : userSettings;
 
-    const kwargs = {
-      name: dnpName,
-      version: reqVersion,
-      // Send only relevant data, ignoring settings that are equal to the current
-      userSettings: difference(settings || {}, _userSettings),
-      // Prevent sending the SHOW_ADVANCED_EDITOR option
-      options: pick(options, [BYPASS_CORE_RESTRICTION])
-    };
-
     // Do the process here to control when the installation finishes,
     // and do some nice transition to the package
     try {
       setIsInstalling(true);
       await withToast(
         // If call errors with "callee disconnected", resolve with success
-        continueIfCalleDisconnected(() => api.packageInstall(kwargs), dnpName),
+        continueIfCalleDisconnected(
+          () =>
+            api.packageInstall({
+              name: dnpName,
+              version: reqVersion,
+              // Send only relevant data, ignoring settings that are equal to the current
+              userSettings: difference(settings || {}, _userSettings),
+              options: {
+                BYPASS_CORE_RESTRICTION: bypassCoreOpt,
+                BYPASS_SIGNED_RESTRICTION: bypassSignedOpt
+              }
+            }),
+          dnpName
+        ),
         {
           message: `Installing ${prettyDnpName(dnpName)}...`,
           onSuccess: `Installed ${prettyDnpName(dnpName)}`
@@ -154,22 +158,23 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const optionsArray = [
     {
       name: "Show advanced editor",
-      id: SHOW_ADVANCED_EDITOR,
-      available: isWizardEmpty && oldEditorAvailable
+      available: isWizardEmpty && oldEditorAvailable,
+      checked: showAdvancedEditor,
+      toggle: () => setShowAdvancedEditor(x => !x)
     },
     {
       name: "Bypass core restriction",
-      id: BYPASS_CORE_RESTRICTION,
-      available: dnp.origin && isCore
+      available: dnp.origin && isCore,
+      checked: bypassCoreOpt ?? false,
+      toggle: () => setBypassCoreOpt(x => !x)
+    },
+    {
+      name: "Bypass only signed safe restriction",
+      available: !dnp.signedSafeAll,
+      checked: bypassSignedOpt ?? false,
+      toggle: () => setBypassSignedOpt(x => !x)
     }
-  ]
-    .filter(option => option.available)
-    .map(option => ({
-      ...option,
-      checked: options[option.id],
-      toggle: () =>
-        setOptions(x => ({ ...x, [option.id]: !options[option.id] }))
-    }));
+  ].filter(option => option.available);
 
   const disableInstallation = !isEmpty(progressLogs) || requiresCoreUpdate;
 
@@ -197,7 +202,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           goBack={goBack}
         />
       ),
-      available: !isWizardEmpty || options[SHOW_ADVANCED_EDITOR]
+      available: !isWizardEmpty || showAdvancedEditor
     },
     {
       name: "Permissions",
@@ -304,7 +309,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           path={match.path}
           exact
           render={() => (
-            <Info
+            <InstallerStepInfo
               dnp={dnp}
               onInstall={() => goNext()}
               disableInstallation={disableInstallation}

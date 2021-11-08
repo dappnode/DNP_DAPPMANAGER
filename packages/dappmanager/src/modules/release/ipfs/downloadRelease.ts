@@ -7,7 +7,6 @@ import {
   Manifest,
   DistributedFile,
   ManifestWithImage,
-  Compose,
   NodeArch
 } from "../../../types";
 import { NoImageForArchError } from "../errors";
@@ -17,6 +16,8 @@ import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
 import { downloadAssetRequired } from "./downloadAssets";
 import { isDirectoryRelease } from "./isDirectoryRelease";
+import { serializeIpfsDirectory } from "../releaseSignature";
+import { ReleaseDownloadedContents } from "../types";
 
 const source = "ipfs" as const;
 
@@ -38,12 +39,9 @@ export const downloadReleaseIpfs = memoize(downloadReleaseIpfsFn, {
  * - The download methods should be communicated with enough information to
  *   know where to fetch the content, hence the @DistributedFileSource
  */
-async function downloadReleaseIpfsFn(hash: string): Promise<{
-  imageFile: DistributedFile;
-  avatarFile?: DistributedFile;
-  composeUnsafe: Compose;
-  manifest: Manifest;
-}> {
+async function downloadReleaseIpfsFn(
+  hash: string
+): Promise<ReleaseDownloadedContents> {
   const arch = os.arch() as NodeArch;
 
   try {
@@ -70,7 +68,9 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
       };
     } else {
       const files = await ipfs.list(hash);
-      const { manifest, compose } = await downloadDirectoryFiles(files);
+      const { manifest, compose, signature } = await downloadDirectoryFiles(
+        files
+      );
 
       // Pin release on visit
       ipfs.pinAddNoThrow(hash);
@@ -83,7 +83,11 @@ async function downloadReleaseIpfsFn(hash: string): Promise<{
         imageFile: getFileFromEntry(imageEntry),
         avatarFile: getFileFromEntry(avatarEntry),
         manifest,
-        composeUnsafe: compose
+        composeUnsafe: compose,
+        signature: signature && {
+          signature,
+          signedData: serializeIpfsDirectory(files, signature.cid)
+        }
       };
     }
   } catch (e) {

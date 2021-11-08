@@ -1,0 +1,9 @@
+.signed-status-grid {
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(min-content, max-content)
+    minmax(min-content, max-content);
+
+  grid-gap: 0.5rem 1rem;
+}

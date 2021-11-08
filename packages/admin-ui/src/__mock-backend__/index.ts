@@ -1,4 +1,4 @@
-import { PortProtocol, Routes } from "../common";
+import { PortProtocol, Routes, IpfsClientTarget } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
@@ -14,6 +14,7 @@ import { userActionLogs } from "./userActionLogs";
 import { volumes } from "./volumes";
 import { wireguard } from "./wireguard";
 import { wifi } from "./wifi";
+import { releaseTrustedKey } from "./releaseTrustedKey";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -25,6 +26,7 @@ const namedSpacedCalls = {
   ...notifications,
   ...packages,
   ...password,
+  ...releaseTrustedKey,
   ...ssh,
   ...telegram,
   ...userActionLogs,
@@ -237,7 +239,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space",
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
-    ipfsClientTarget: "remote",
+    ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "http://ipfs.dappnode.io:8081"
   })
 };

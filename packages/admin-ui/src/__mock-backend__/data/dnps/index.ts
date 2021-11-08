@@ -1,4 +1,5 @@
 import { MockDnp } from "./types";
+import { badSignature } from "./badSignature";
 import { bitcoin } from "./bitcoin";
 import { httpsPortal } from "./https-portal";
 import { isInstalling } from "./isInstalling";
@@ -15,6 +16,7 @@ export const mockDnps: MockDnp[] = [
   bitcoin,
   httpsPortal,
   isInstalling,
+  badSignature,
   lightningNetwork,
   multiService,
   openEthereum,
