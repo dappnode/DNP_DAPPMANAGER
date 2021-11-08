@@ -29,7 +29,12 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
    * - Link (to)
    * - Route (render, path)
    */
-  const availableRoutes = [
+  const availableRoutes: {
+    name: string;
+    subPath: string;
+    component: React.ComponentType<any>;
+    hideFromMenu?: boolean;
+  }[] = [
     {
       name: "Info",
       subPath: subPaths.info,

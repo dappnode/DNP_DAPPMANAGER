@@ -178,7 +178,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const disclaimerSubPath = "disclaimer";
   const installSubPath = "install";
 
-  const availableRoutes = [
+  const availableRoutes: {
+    name: string;
+    subPath: string;
+    render?: () => React.ComponentType<any> | React.ReactElement<any>;
+  }[] = [
     {
       name: "Setup",
       subPath: setupSubPath,

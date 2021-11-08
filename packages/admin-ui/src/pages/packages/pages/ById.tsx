@@ -61,7 +61,11 @@ export const PackageById: React.FC<RouteComponentProps<{
    * - Link (to)
    * - Route (render, path)
    */
-  const availableRoutes = [
+  const availableRoutes: {
+    name: string;
+    subPath: string;
+    render: () => React.ComponentType<any> | React.ReactElement<any>;
+  }[] = [
     {
       name: "Info",
       subPath: "info",

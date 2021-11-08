@@ -16,7 +16,11 @@ import { LocalProxying } from "./localProxying/LocalProxying";
 import "./wifiLocal.scss";
 
 export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
-  const availableRoutes = [
+  const availableRoutes: {
+    name: string;
+    subPath: string;
+    component: React.ComponentType<any>;
+  }[] = [
     {
       name: "Wi-Fi",
       subPath: subPaths.wifi,
@@ -28,6 +32,7 @@ export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
       component: LocalProxying
     }
   ];
+
   return (
     <>
       <Title title={title} />
