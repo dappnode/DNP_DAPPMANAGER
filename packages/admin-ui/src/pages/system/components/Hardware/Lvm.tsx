@@ -144,7 +144,7 @@ export default function Lvm() {
               setManual(true);
               cleanValues();
             }}
-            variant="dappnode"
+            variant="outline-secondary"
           >
             Manual expansion
           </Button>
