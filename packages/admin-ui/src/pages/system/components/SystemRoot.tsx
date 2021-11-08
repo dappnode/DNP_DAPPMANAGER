@@ -89,7 +89,7 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
     },
     {
       name: "Hardware",
-      subpath: subPaths.hardware,
+      subPath: subPaths.hardware,
       component: Hardware
     },
     {
