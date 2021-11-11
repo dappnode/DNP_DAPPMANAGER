@@ -86,7 +86,7 @@ export function LocalProxying() {
             this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.
             Learn more about the Local Network Proxy at:{" "}
             <LinkDocs href={docsUrl.connectLocalProxy}>
-              How to connect do DAppNode Local Network
+              How to connect to DAppNode Local Network Proxy
             </LinkDocs>
           </p>
           {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
