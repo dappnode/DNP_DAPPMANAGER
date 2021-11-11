@@ -30,7 +30,7 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
       Connect to the Wi-Fi hotspot exposed by your DAppNode using your
       credentials. More information at:{" "}
       <LinkDocs href={docsUrl.connectWifi}>
-        How to connect do DAppNode WiFi
+        How to connect to DAppNode WiFi
       </LinkDocs>
       {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
       wifiStatus !== "running"
