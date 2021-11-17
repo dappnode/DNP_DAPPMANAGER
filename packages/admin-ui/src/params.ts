@@ -90,8 +90,15 @@ export const docsUrl = {
     "https://docs.dappnode.io/user-guide/ui/recommended-set-ups/add-ipfs-peers"
 };
 
-export const setupTelegramBotGuideUrl =
-  "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4";
+export const forumUrl = {
+  telegramHowTo:
+    "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
+  ipfsRemoteHowTo:
+    "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
+  expandFileSystemHowTo:
+    "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
+};
+
 export const troubleShootMountpointsGuideUrl =
   "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
 export const dappnodeUserGuideUrl =

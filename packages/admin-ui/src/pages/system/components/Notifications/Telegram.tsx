@@ -9,7 +9,7 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
-import { setupTelegramBotGuideUrl } from "params";
+import { forumUrl } from "params";
 
 export function TelegramNotifications() {
   const telegramStatus = useApi.telegramStatusGet();
@@ -80,7 +80,7 @@ export function TelegramNotifications() {
       <div>
         Receive important notifications directly to your telegram account. To
         get your own token from Telegram botfather follow{" "}
-        <a href={setupTelegramBotGuideUrl}>this guide</a>
+        <a href={forumUrl.telegramHowTo}>this guide</a>
       </div>
       <div>
         Available commands in to start your bot chat

@@ -6,6 +6,8 @@ import SubTitle from "components/SubTitle";
 import { IpfsClient } from "components/IpfsClient";
 import Button from "components/Button";
 import Card from "components/Card";
+import LinkDocs from "components/LinkDocs";
+import { forumUrl } from "params";
 
 export default function Ipfs() {
   const ipfsRepository = useApi.ipfsClientTargetGet();
@@ -49,7 +51,10 @@ export default function Ipfs() {
       <div>
         DAppNode uses IPFS to distribute DAppNode packages in a decentrallized
         way. Choose to connect to a remote IPFS gateway or use your own local
-        IPFS node
+        IPFS node. More information at:{" "}
+        <LinkDocs href={forumUrl.ipfsRemoteHowTo}>
+          How to use DAppNode IPFS remote
+        </LinkDocs>
       </div>
       {ipfsRepository.data ? (
         <>
