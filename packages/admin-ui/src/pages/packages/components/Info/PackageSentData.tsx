@@ -72,7 +72,7 @@ function SentDataRow({
   isSecret
 }: {
   value: string;
-  isLink: boolean;
+  isLink?: boolean;
   isSecret?: boolean;
 }) {
   const [show, setShow] = useState(false);
@@ -85,7 +85,9 @@ function SentDataRow({
   return (
     <InputGroup>
       {isLink ? (
-        <Link to={value}>{value}</Link>
+        <Link className="form-control link-box" to={value}>
+          {value}
+        </Link>
       ) : (
         <input
           className="form-control copiable-input"
