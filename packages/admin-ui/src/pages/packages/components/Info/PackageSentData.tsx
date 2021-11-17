@@ -8,6 +8,8 @@ import { api } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
 import { confirm } from "components/ConfirmDialog";
 import "./packageSentData.scss";
+import { isLink } from "utils/isLink";
+import { Link } from "react-router-dom";
 
 export function RenderPackageSentData({
   dnpName,
@@ -45,7 +47,12 @@ export function RenderPackageSentData({
         <React.Fragment key={key}>
           <div>{key}</div>
           <div>
-            <SentDataRow key={key} value={value} isSecret={isSecret(key)} />
+            <SentDataRow
+              key={key}
+              value={value}
+              isLink={isLink(value)}
+              isSecret={isSecret(key)}
+            />
           </div>
         </React.Fragment>
       ))}
@@ -61,9 +68,11 @@ export function RenderPackageSentData({
 
 function SentDataRow({
   value,
+  isLink,
   isSecret
 }: {
   value: string;
+  isLink?: boolean;
   isSecret?: boolean;
 }) {
   const [show, setShow] = useState(false);
@@ -75,30 +84,38 @@ function SentDataRow({
 
   return (
     <InputGroup>
-      <input
-        className="form-control copiable-input"
-        type={!isSecret || show ? "text" : "password"}
-        value={value}
-        readOnly={true}
-      />
+      {isLink ? (
+        <Link className="form-control link-box" to={value}>
+          {value}
+        </Link>
+      ) : (
+        <input
+          className="form-control copiable-input"
+          type={!isSecret || show ? "text" : "password"}
+          value={value}
+          readOnly={true}
+        />
+      )}
 
-      <InputGroup.Append>
-        {isSecret && (
+      {!isLink && (
+        <InputGroup.Append>
+          {isSecret && (
+            <Button
+              onClick={() => setShow(x => !x)}
+              className="input-append-button"
+            >
+              {show ? <GoEyeClosed /> : <GoEye />}
+            </Button>
+          )}
+
           <Button
-            onClick={() => setShow(x => !x)}
-            className="input-append-button"
+            className="input-append-button copy-input-copy"
+            data-clipboard-text={value}
           >
-            {show ? <GoEyeClosed /> : <GoEye />}
+            <GoClippy />
           </Button>
-        )}
-
-        <Button
-          className="input-append-button copy-input-copy"
-          data-clipboard-text={value}
-        >
-          <GoClippy />
-        </Button>
-      </InputGroup.Append>
+        </InputGroup.Append>
+      )}
     </InputGroup>
   );
 }
