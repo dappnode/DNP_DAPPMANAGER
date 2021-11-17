@@ -168,7 +168,9 @@ Content in the first column | Content in the second column
     },
     packageSentData: {
       apiKey: "AAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXX",
-      secretKey: "ZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXX"
+      secretKey: "ZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXX",
+      link:
+        "http://lightningNetwork.dappnode.eth/initialize?token=geagehTEGEgeg36eb.NIGE43"
     }
   },
   installedContainers: {
