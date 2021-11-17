@@ -11,7 +11,8 @@ import Ok from "components/Ok";
 import ErrorView from "components/ErrorView";
 import Select from "components/Select";
 import Card from "components/Card";
-import { dappnodeVolumeGroup, dappnodeLogicalVolume } from "params";
+import { dappnodeVolumeGroup, dappnodeLogicalVolume, forumUrl } from "params";
+import LinkDocs from "components/LinkDocs";
 
 export default function Lvm() {
   const [manual, setManual] = useState(false);
@@ -126,7 +127,13 @@ export default function Lvm() {
   return (
     <Card spacing>
       <div>
-        <p>Expand the disk space of your dappnode</p>
+        <p>
+          Expand your DAppNode filesystem with another storage device. More
+          information at:{" "}
+          <LinkDocs href={forumUrl.expandFileSystemHowTo}>
+            How to expand your DAppNode filesystem
+          </LinkDocs>
+        </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <Button
             onClick={() => {
