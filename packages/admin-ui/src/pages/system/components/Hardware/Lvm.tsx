@@ -13,6 +13,7 @@ import Select from "components/Select";
 import Card from "components/Card";
 import { dappnodeVolumeGroup, dappnodeLogicalVolume, forumUrl } from "params";
 import LinkDocs from "components/LinkDocs";
+import { confirm } from "components/ConfirmDialog";
 
 export default function Lvm() {
   const [manual, setManual] = useState(false);
@@ -124,6 +125,40 @@ export default function Lvm() {
     setExpandDiskReq({});
   }
 
+  async function disclaimer(automatic: boolean) {
+    await new Promise<void>(resolve =>
+      confirm({
+        title: `Are you sure you want to extend the host filesystem with another storage device?`,
+        text: `Extending the filesystem is a dangerous operation that cannot be undone. You must very well know what you are doing.
+      
+You must read the DAppNode documentation about extending the filesystem with LVM. Contact support if you have any doubt about the process.`,
+        label: "Extend filesystem",
+        buttons: [
+          {
+            variant: "dappnode",
+            label: "Cancel",
+            onClick: () => resolve
+          },
+          {
+            variant: "danger",
+            label: "I understand, I want to extend the host filesystem",
+            onClick: () => {
+              if (automatic) {
+                setAutomatic(true);
+                setManual(false);
+              } else {
+                setAutomatic(false);
+                setManual(true);
+              }
+
+              cleanValues();
+            }
+          }
+        ]
+      })
+    );
+  }
+
   return (
     <Card spacing>
       <div>
@@ -135,36 +170,22 @@ export default function Lvm() {
           </LinkDocs>
         </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <Button
-            onClick={() => {
-              setAutomatic(true);
-              setManual(false);
-              cleanValues();
-            }}
-            variant="dappnode"
-          >
+          <Button onClick={() => disclaimer(true)} variant="dappnode">
             Automatic expansion
           </Button>
-          <Button
-            onClick={() => {
-              setAutomatic(false);
-              setManual(true);
-              cleanValues();
-            }}
-            variant="outline-secondary"
-          >
+          <Button onClick={() => disclaimer(false)} variant="outline-secondary">
             Manual expansion
           </Button>
         </div>
       </div>
 
-      {/** FIRST STEP: select hard disk */}
+      {/** FIRST STEP: select storage device */}
       {(automatic || manual) && (
         <>
           <hr />
-          <div className="subtle-header">Select hard disk</div>
-          <p>Check and select the hard disk to be added.</p>
-          <Button onClick={getDisks}>Get hard disks</Button>
+          <div className="subtle-header">Select storage device</div>
+          <p>Check and select the storage device to be added.</p>
+          <Button onClick={getDisks}>Get storage devices</Button>
           {diskReq.result ? (
             <Select
               value={undefined}
@@ -174,7 +195,7 @@ export default function Lvm() {
               onValueChange={(value: string) => setDisk(value.split(/\s+/)[0])}
             />
           ) : diskReq.loading ? (
-            <Ok msg="Getting hard disks" loading={true} />
+            <Ok msg="Getting storage devices" loading={true} />
           ) : diskReq.error ? (
             <ErrorView error={diskReq.error} red hideIcon />
           ) : null}
@@ -258,7 +279,7 @@ export default function Lvm() {
               <p>
                 Options selected:
                 <ul>
-                  <li key={disk}>Hard disk: {disk}</li>
+                  <li key={disk}>Storage device: {disk}</li>
                   <li key={logicalVolume}>Volume Group: {volumeGroup}</li>
                   <li key={volumeGroup}>Logical Volume: {logicalVolume}</li>
                 </ul>
@@ -266,7 +287,7 @@ export default function Lvm() {
               <Button
                 onClick={() => expandDisk(disk, volumeGroup, logicalVolume)}
               >
-                Expand disk
+                Expand host filesystem
               </Button>
             </>
           ) : null}
