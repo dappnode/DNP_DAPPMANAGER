@@ -9,7 +9,6 @@ import { withToastNoThrow } from "components/toast/Toast";
 import { confirm } from "components/ConfirmDialog";
 import "./packageSentData.scss";
 import { isLink } from "utils/isLink";
-import { Link } from "react-router-dom";
 
 export function RenderPackageSentData({
   dnpName,
@@ -85,9 +84,9 @@ function SentDataRow({
   return (
     <InputGroup>
       {isLink ? (
-        <Link className="form-control link-box" to={value}>
+        <a className="form-control link-box" href={value}>
           {value}
-        </Link>
+        </a>
       ) : (
         <input
           className="form-control copiable-input"
