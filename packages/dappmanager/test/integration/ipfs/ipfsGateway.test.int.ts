@@ -1,10 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { mockManifestWithImage } from "../../testUtils";
-import { ManifestWithImage } from "../../../src/types";
+import { ManifestWithImage, IpfsClientTarget } from "../../../src/types";
 import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
-import { localIpfsGateway } from "../../testIpfsUtils";
-import { catCarReaderToMemory } from "../../../src/modules/ipfs/writeFileToMemory";
+import { uploadDirectoryRelease } from "../../integrationSpecs/buildReleaseDirectory";
+import { ipfs } from "../../../src/modules/ipfs";
+import { getManifest } from "../../../src/modules/release/getManifest";
+import { ipfsGatewayUrl } from "../../testIpfsUtils";
 
 describe("IPFS remote", function () {
   this.timeout(100000 * 5);
@@ -14,16 +16,41 @@ describe("IPFS remote", function () {
     ...mockManifestWithImage,
     name: dnpName
   };
-  let releaseHash: string;
+  let manifestHash: string;
+  let dnpReleaseHash: string;
 
   before(async () => {
-    releaseHash = await uploadManifestRelease(manifest);
+    // Set remote IPFS host
+    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.remote);
+    // Upload manifest and dnp directrory
+    manifestHash = await uploadManifestRelease(manifest);
+    dnpReleaseHash = await uploadDirectoryRelease({
+      manifest,
+      compose: {
+        version: "3.5",
+        services: {
+          [dnpName]: {
+            restart: "unless-stopped"
+          }
+        }
+      }
+    });
   });
 
-  it("Should get content from IPFS gateway", async function () {
+  it("Should get manifest from IPFS gateway", async function () {
     // If the content hashed does not match the CID there is thrown an error
-    const buff = await catCarReaderToMemory(localIpfsGateway, releaseHash);
+    const buff = await ipfs.writeFileToMemory(manifestHash);
     const contentParsed = JSON.parse(buff.toString());
     expect(contentParsed).to.be.ok;
+  });
+
+  it("Should get manifest from directory using IPFS gateway", async function () {
+    const manifest = await getManifest(dnpReleaseHash);
+    expect(manifest).to.be.ok;
+  });
+
+  after(async () => {
+    // Set remote IPFS host
+    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
   });
 });
