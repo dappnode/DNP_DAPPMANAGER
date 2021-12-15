@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseValidatorAccounts } from "../../../src/modules/eth2migration/utils";
+import { parseValidatorAccounts } from "../../../src/modules/eth2migration/export/utils";
 
 describe("eth2migration / utils", () => {
   it("Should parse validator accounts list", () => {
