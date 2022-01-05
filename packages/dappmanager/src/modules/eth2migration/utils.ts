@@ -34,8 +34,8 @@ export function getMigrationParams(testnet: boolean): {
   return {
     network: testnet ? "prater" : "mainnet",
     dnpName: testnet
-      ? eth2migrationParams.testnet.dnpName
-      : eth2migrationParams.mainnet.dnpName,
+      ? eth2migrationParams.testnet.clientDnpName
+      : eth2migrationParams.mainnet.clientDnpName,
     containerName: testnet
       ? eth2migrationParams.testnet.validatorContainerName
       : eth2migrationParams.mainnet.validatorContainerName

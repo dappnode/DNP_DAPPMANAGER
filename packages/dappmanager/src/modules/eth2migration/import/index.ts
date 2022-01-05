@@ -1,11 +1,29 @@
+import { extendError } from "../../../utils/extendError";
+import { ValidatorFiles } from "../params";
+import { checkImportRequirements } from "./checkImportRequirements";
+import { importValidatorFiles } from "./importValidator";
+import { verifyImport } from "./verifyImport";
+
 /** Import validator public keys into eth2-client web3signer */
-export async function importValidator(): Promise<void> {
-  // CHECK REQUIREMENTS
-  // 1. Verify web3signer is installed, if not install it WITHOUT starting it
-  // Get web3signer volume to upload files: /opt/web3signer/key_files_tmp
-  // IMPORT VALIDATOR
-  // 1. Upload backup.zip with keys (and unzip) and wallet password into web3signer volume
-  // 2. Upload slashing protection data into web3signer volume: https://docs.web3signer.consensys.net/en/latest/Reference/CLI/CLI-Subcommands/#eth2-import
-  // RUN WEB3SIGNER
-  // 2. Start web3signer (it will generate the validator_yaml files neecesary)
+export async function importValidator({
+  signerDnpName,
+  validatorFiles
+}: {
+  signerDnpName: string;
+  validatorFiles: ValidatorFiles;
+}): Promise<void> {
+  try {
+    // Check import requirements
+    await checkImportRequirements({ signerDnpName });
+
+    // Import validator: validator_keystore_x.json and walletpassword.txt and slashing_protection.json
+    await importValidatorFiles({ signerDnpName, validatorFiles });
+
+    // Verify import
+    await verifyImport();
+
+    // Restart web3signer ??
+  } catch (e) {
+    throw extendError(e, "Eth2 migration: import failed");
+  }
 }
