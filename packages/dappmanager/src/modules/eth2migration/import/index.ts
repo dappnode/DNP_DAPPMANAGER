@@ -1,26 +1,29 @@
 import { extendError } from "../../../utils/extendError";
-import { ValidatorFiles } from "../params";
 import { checkImportRequirements } from "./checkImportRequirements";
-import { importValidatorFiles } from "./importValidator";
+import { importValidatorFiles } from "./importValidatorFiles";
 import { verifyImport } from "./verifyImport";
 
-/** Import validator public keys into eth2-client web3signer */
+/** Import validator public keys and slashing_protection into eth2-client web3signer */
 export async function importValidator({
+  newEth2ClientDnpName,
   signerDnpName,
-  validatorFiles
+  signerContainerName,
+  volume
 }: {
+  newEth2ClientDnpName: string;
   signerDnpName: string;
-  validatorFiles: ValidatorFiles;
+  signerContainerName: string;
+  volume: string;
 }): Promise<void> {
   try {
     // Check import requirements
-    await checkImportRequirements({ signerDnpName });
+    await checkImportRequirements({ newEth2ClientDnpName, signerDnpName });
 
     // Import validator: validator_keystore_x.json and walletpassword.txt and slashing_protection.json
-    await importValidatorFiles({ signerDnpName, validatorFiles });
+    await importValidatorFiles({ signerContainerName, volume });
 
     // Verify import
-    await verifyImport();
+    await verifyImport({ signerDnpName });
 
     // Restart web3signer ??
   } catch (e) {

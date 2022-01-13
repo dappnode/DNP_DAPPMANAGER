@@ -8,15 +8,15 @@ import { extendError } from "../../../utils/extendError";
  */
 export async function exportSlashingProtectionData({
   network,
-  containerName
+  currentValidatorContainerName
 }: {
   network: Eth2Network;
-  containerName: string;
+  currentValidatorContainerName: string;
 }): Promise<void> {
   try {
     // validator slashing-protection-history export --datadir=/root/.eth2validators --slashing-protection-export-dir=/root --accept-terms-of-use --prater
     await shell(
-      `docker exec ${containerName} validator slashing-protection-history export --datadir=/root/.eth2validators --slashing-protection-export-dir=/root \
+      `docker exec ${currentValidatorContainerName} validator slashing-protection-history export --datadir=/root/.eth2validators --slashing-protection-export-dir=/root \
 --accept-terms-of-use --${network}`
     );
   } catch (e) {
