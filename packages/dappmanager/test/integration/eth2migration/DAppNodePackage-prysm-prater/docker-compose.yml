@@ -1,0 +1,35 @@
+version: "3.4"
+services:
+  beacon-chain:
+    image: "beacon-chain.prysm-prater.dnp.dappnode.eth:0.1.16"
+    build:
+      context: ./beacon-chain
+      args:
+        UPSTREAM_VERSION: v2.0.5
+    volumes:
+      - "beacon-chain-data:/data"
+    ports:
+      - "13000"
+      - 12000/udp
+    restart: unless-stopped
+    environment:
+      HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545"
+      CORSDOMAIN: "http://prysm-prater.dappnode"
+      EXTRA_OPTS: ""
+  validator:
+    image: "validator.prysm-prater.dnp.dappnode.eth:0.1.16"
+    build:
+      context: ./validator
+      args:
+        UPSTREAM_VERSION: v2.0.5
+    volumes:
+      - "validator-data:/root/"
+    restart: unless-stopped
+    environment:
+      BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000"
+      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500"
+      GRAFFITI: validating_from_DAppNode
+      EXTRA_OPTS: ""
+volumes:
+  beacon-chain-data: {}
+  validator-data: {}
