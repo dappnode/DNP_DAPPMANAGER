@@ -15,6 +15,7 @@ import { importKeystoresAndSlashingProtectionViaApi } from "./importKeystoresAnd
 import { configValidatorToFollowWeb3signer } from "./configValidatorToFollowWeb3signer";
 import { ensureEth2ClientIsInstalledAndSynced } from "./ensureEth2ClientIsInstalledAndSynced";
 import getDappmanagerImage from "../../utils/getDappmanagerImage";
+import { getPrysmValidatorImage } from "./getPrysmValidatorImage";
 
 export async function eth2Migrate({
   client,
@@ -36,16 +37,10 @@ export async function eth2Migrate({
   // Get SOME image to run 'cp' or 'rm' commands on Prysm's volume
   const alpineImage = await getDappmanagerImage();
 
-  // prysmValidatorImage Fetch _SOME_ image from the available prysm package
-  // MUST be fetched dynamically here because we don't know when user will do the migration
-  // They may have an old version of Prysm or a newer version of Prysm.
-  // 'prysm.dnp.dappnode.eth:0.1.5'
-  const prysmOldValidatorImage: string = await getPrysmValidatorImage(
-    prysmOldDnpName
-  );
-
-  // TODO: To ensure that the Prysm validator API is stable and works as expected,
-  // ensure that the available prysm image is within some expected version range
+  const prysmOldValidatorImage = await getPrysmValidatorImage({
+    prysmOldDnpName,
+    network
+  });
 
   // Ensure Web3Signer:
   // - is installed
