@@ -1,29 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { Eth2Network } from "./params";
-import shell from "../../utils/shell";
-import params from "../../params";
-import { logs } from "../../logs";
-
-/** Volume name to output data to */
-const outputVolumeName = "dappmanagerdnpdappnodeeth_data";
-/** Temporal (removed) migration container name */
-const prysmMigrationContainerName = `${params.CONTAINER_TOOL_NAME_PREFIX}prysm-migration`;
-
-const dappmanagerOutPaths = {
-  outVolumeTarget: "/usr/src/app/dnp_repo/prysm-migration",
-  walletDir: "/root/.eth2validators",
-  // Written in prysmPaths.outDir
-  walletpasswordOutFilepath:
-    "/usr/src/app/dnp_repo/prysm-migration/walletpassword.txt",
-  // Written in prysmPaths.outDir
-  backupOutFilepath: "/usr/src/app/dnp_repo/prysm-migration/backup.zip",
-  // Written in prysmPaths.outDir
-  slashingProtectionOutFilepath:
-    "/usr/src/app/dnp_repo/prysm-migration/slashing_protection.json",
-  // Created latter as unzip target
-  keystoresOutDir: "/usr/src/app/dnp_repo/prysm-migration/keystores"
-};
+import { Eth2Network } from "../params";
+import shell from "../../../utils/shell";
+import {
+  prysmMigrationContainerName,
+  outputVolumeName,
+  dappmanagerOutPaths
+} from "./params";
 
 /**
  * Export eth2 validator from Prysm non-web3signer version to docker volume:
@@ -179,56 +162,7 @@ export async function exportKeystoresAndSlashingProtection({
   );
 }
 
-export function readExportedKeystoresAndSlashingProtection(): {
-  keystoresStr: string[];
-  keystorePasswordStr: string;
-  slashingProtectionStr: string;
-} {
-  const keystoresStr: string[] = [];
-  const keystorePaths = fs.readdirSync(dappmanagerOutPaths.keystoresOutDir);
-  for (const keystoreFilename of keystorePaths) {
-    const keystoreFilepath = path.join(
-      dappmanagerOutPaths.keystoresOutDir,
-      keystoreFilename
-    );
-    keystoresStr.push(fs.readFileSync(keystoreFilepath, "utf8"));
-  }
-
-  return {
-    keystoresStr,
-    keystorePasswordStr: fs
-      .readFileSync(dappmanagerOutPaths.walletpasswordOutFilepath, "utf8")
-      .trim(),
-    slashingProtectionStr: fs.readFileSync(
-      dappmanagerOutPaths.slashingProtectionOutFilepath,
-      "utf8"
-    )
-  };
-}
-
-export function cleanExportedKeystoresAndSlashingProtection(): void {
-  for (const filepath of [
-    dappmanagerOutPaths.walletpasswordOutFilepath,
-    dappmanagerOutPaths.backupOutFilepath,
-    dappmanagerOutPaths.slashingProtectionOutFilepath
-  ]) {
-    try {
-      fs.unlinkSync(filepath);
-    } catch (e) {
-      if (e.code !== "ENOENT") {
-        logs.error(`Error cleaning Prysm migration file ${filepath}`, e);
-      }
-    }
-  }
-
-  try {
-    fs.rmdirSync(dappmanagerOutPaths.keystoresOutDir, { recursive: true });
-  } catch (e) {
-    if (e.code !== "ENOENT") {
-      logs.error("Error cleaning Prysm migration keystores dir", e);
-    }
-  }
-}
+// Utils
 
 /**
  * Return a string with the public keys comma separated

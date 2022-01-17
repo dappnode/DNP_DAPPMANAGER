@@ -12,15 +12,13 @@ describe.only("eth2migrations", function () {
   });
 
   before(async () => {
-    const validatorContainerName = "dappnodepackage-prysm-prater_validator_1";
+    const validatorContainerName =
+      "DAppNodePackage-validator.prysm-prater.dnp.dappnode.eth";
     // Create necessary network
     await shellSafe("docker network create dncore_network");
 
     // Setup validator container: run DAppNodePackage-prysm-prater
     await shell(`docker-compose -f ${composePath} up -d`);
-
-    //const containers = await shell("docker ps -a");
-    //console.log(containers);
 
     // Copy files to container
     await shell(`docker cp ${__dirname}/files ${validatorContainerName}:/`);
@@ -44,6 +42,6 @@ describe.only("eth2migrations", function () {
 
   after(async () => {
     // Remove validator container
-    //await shell(`docker-compose -f ${composePath} down`);
+    await shell(`docker-compose -f ${composePath} down`);
   });
 });

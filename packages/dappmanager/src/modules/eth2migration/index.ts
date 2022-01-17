@@ -1,21 +1,23 @@
-import {
-  cleanExportedKeystoresAndSlashingProtection,
-  exportKeystoresAndSlashingProtection,
-  readExportedKeystoresAndSlashingProtection
-} from "./exportKeystoresAndSlashingProtection";
-import { getMigrationParams } from "./utils";
-import { Eth2Client, Eth2Network } from "./params";
-import { extendError } from "../../utils/extendError";
+// Import
+import { importKeystoresAndSlashingProtectionViaApi } from "./import/importKeystoresAndSlashingProtectionViaApi";
+// Export
+import { exportKeystoresAndSlashingProtection } from "./export/exportKeystoresAndSlashingProtection";
+import { cleanExportedKeystoresAndSlashingProtection } from "./export/cleanExportedKeystoresAndSlashingProtection";
+import { readExportedKeystoresAndSlashingProtection } from "./export/readExportedKeystoresAndSlashingProtection";
+// Requirements
+import { ensureRequirements } from "./requirements";
+// Rollback
 import { rollbackToPrysmOld } from "./rollbackToPrysmOld";
+// Other
+import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
-import { dockerContainerRemove, dockerVolumeRemove } from "../docker";
-import { ensureWeb3SignerIsInstalledAndStopped } from "./web3signer";
+import { dockerVolumeRemove } from "../docker";
+// Params
 import params from "../../params";
-import { importKeystoresAndSlashingProtectionViaApi } from "./importKeystoresAndSlashingProtectionViaApi";
-import { configValidatorToFollowWeb3signer } from "./configValidatorToFollowWeb3signer";
-import { ensureEth2ClientIsInstalledAndSynced } from "./ensureEth2ClientIsInstalledAndSynced";
+import { Eth2Client, Eth2Network } from "./params";
+// Utils
 import getDappmanagerImage from "../../utils/getDappmanagerImage";
-import { getPrysmValidatorImage } from "./getPrysmValidatorImage";
+import { getMigrationParams, getPrysmOldValidatorImage } from "./utils";
 
 export async function eth2Migrate({
   client,
@@ -24,12 +26,16 @@ export async function eth2Migrate({
   client: Eth2Client;
   network: Eth2Network;
 }): Promise<void> {
+  // TODO: determine the prysm-web3signer version
+  const prysmWeb3signerVersion = "2.0.0";
+
   // Get params deppending on the network
   const {
     newEth2ClientDnpName,
     prysmOldDnpName,
     prysmOldValidatorContainerName,
     prysmOldValidatorVolumeName,
+    prysmOldStableVersion,
     signerDnpName,
     signerContainerName
   } = getMigrationParams(client, network);
@@ -37,43 +43,22 @@ export async function eth2Migrate({
   // Get SOME image to run 'cp' or 'rm' commands on Prysm's volume
   const alpineImage = await getDappmanagerImage();
 
-  const prysmOldValidatorImage = await getPrysmValidatorImage({
+  const prysmOldValidatorImage = await getPrysmOldValidatorImage({
     prysmOldDnpName,
-    network
+    prysmOldStableVersion
   });
 
-  // Ensure Web3Signer:
-  // - is installed
-  // - has expected container
-  await ensureWeb3SignerIsInstalledAndStopped({
+  // Ensure requirements
+  await ensureRequirements({
     signerDnpName,
-    signerContainerName
+    signerContainerName,
+    newEth2ClientDnpName,
+    client,
+    prysmWeb3signerVersion,
+    prysmOldValidatorContainerName
   });
-
-  // TODO: Should ensure Web3Signer container is not running?
-
-  // Ensure new Eth2 client is installed
-  // TODO: Should it be done before hand?
-  await ensureEth2ClientIsInstalledAndSynced({ dnpName: newEth2ClientDnpName });
-
-  // - If to Prysm: The update will have deleted the old container
-  // - If NOT to Prysm: Delete validator container
-  if (client === "prysm") {
-    // TODO: Ensure that old prysm capable of validating has been removed
-  } else {
-    await dockerContainerRemove(prysmOldValidatorContainerName);
-  }
 
   try {
-    // Ensure validator is stopped and won't be able to start again
-    //
-    // Validator command
-    // --wallet-dir=/root/.eth2validators
-    // --wallet-password-file=/root/.eth2wallets/wallet-password.txt
-    //
-    // Validator volumes
-    // - "validator-data:/root/"
-
     // Move wallet dir to a new location different to what the container expects
     await shell([
       "docker run",
@@ -101,9 +86,6 @@ export async function eth2Migrate({
       signerDnpName,
       ...exportedData
     });
-
-    // Tell next container to validate with the migrated keys
-    await configValidatorToFollowWeb3signer(client);
   } catch (e) {
     cleanExportedKeystoresAndSlashingProtection();
     await rollbackToPrysmOld();
@@ -114,9 +96,8 @@ export async function eth2Migrate({
   // Clean up DAPPMANAGER temp files
   cleanExportedKeystoresAndSlashingProtection();
 
-  // - If to Prysm: Only delete keys, don't delete volume
-  // - If NOT to Prysm: Delete volume
   if (client === "prysm") {
+    // If Prysm: Only delete keys, don't delete volume
     // MUST confirm that keys are alive in Web3Signer
     // - Delete keys from Prysm's legacy container
     await shell([
@@ -130,6 +111,7 @@ export async function eth2Migrate({
       throw extendError(e, "Error moving Prysm's legacy wallet directory");
     });
   } else {
+    // If NOT Prysm: Delete volume
     await dockerVolumeRemove(prysmOldValidatorVolumeName);
   }
 }

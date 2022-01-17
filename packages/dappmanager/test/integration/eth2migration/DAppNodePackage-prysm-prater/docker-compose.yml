@@ -2,6 +2,7 @@ version: "3.4"
 services:
   beacon-chain:
     image: "beacon-chain.prysm-prater.dnp.dappnode.eth:0.1.16"
+    container_name: "DAppNodePackage-beacon-chain.prysm-prater.dnp.dappnode.eth"
     build:
       context: ./beacon-chain
       args:
@@ -18,6 +19,7 @@ services:
       EXTRA_OPTS: ""
   validator:
     image: "validator.prysm-prater.dnp.dappnode.eth:0.1.16"
+    container_name: "DAppNodePackage-validator.prysm-prater.dnp.dappnode.eth"
     build:
       context: ./validator
       args:

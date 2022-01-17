@@ -1,12 +1,13 @@
-import { logs } from "../../logs";
-import { packageInstall } from "../../calls";
-import { extendError } from "../../utils/extendError";
-import { dockerContainerStop } from "../docker";
-import { listPackageNoThrow } from "../docker/list";
+import { packageInstall } from "../../../calls";
+import { logs } from "../../../logs";
+import { extendError } from "../../../utils/extendError";
+import { dockerContainerStop } from "../../docker";
+import { listPackageNoThrow } from "../../docker/list";
 
 /**
- * - MAY install the web3signer package
- * - MUST resolve after the signer container is available and stopped
+ * Ensures:
+ * - web3signer is installed
+ * - web3signer stopped
  */
 export async function ensureWeb3SignerIsInstalledAndStopped({
   signerDnpName,
@@ -39,6 +40,6 @@ export async function ensureWeb3SignerIsInstalledAndStopped({
     throw Error(`Web3Signer container ${signerContainerName} not found`);
   }
 
-  // TODO: Check if this throws if container is already stopped
-  await dockerContainerStop(signerContainerName);
+  if (signerContainer.state === "running")
+    await dockerContainerStop(signerContainerName);
 }
