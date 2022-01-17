@@ -1,52 +1,5 @@
-import { PackageContainer } from "../../types";
-import { packageGet } from "../../calls";
-import { docker } from "../docker/api/docker";
-import Dockerode from "dockerode";
-import { Eth2Network, eth2migrationParams, Eth2Client } from "./params";
-
-/**
- * Returns the validator container specs
- * @param dnpName
- * @param containerName
- */
-export async function getCurrentValidatorContainerSpecs(
-  dnpName: string,
-  containerName: string
-): Promise<{ container: PackageContainer; volume: Dockerode.Volume }> {
-  const container = await getCurrentEth2ClientValidatorContainer(
-    dnpName,
-    containerName
-  );
-  const volume = await getCurrentEth2ClientValidatorVolumes(container);
-  return {
-    container,
-    volume
-  };
-}
-
-/**
- * Returns the eth2client validator container
- * @param dnpName
- * @param containerName
- */
-export async function getCurrentEth2ClientValidatorContainer(
-  dnpName: string,
-  containerName: string
-): Promise<PackageContainer> {
-  const eth2ClientPackage = await packageGet({
-    dnpName
-  });
-
-  const eth2ClientValidatorContainer = eth2ClientPackage.containers.find(
-    container => container.containerName === containerName
-  );
-  if (!eth2ClientValidatorContainer)
-    throw Error(
-      `Eth2 client validator container not found in package ${dnpName}`
-    );
-
-  return eth2ClientValidatorContainer;
-}
+import { Eth2Network, Eth2Client } from "./params";
+import params from "../../params";
 
 /**
  * Get dnpname, container and network of eth2 client validator
@@ -65,61 +18,98 @@ export async function getCurrentEth2ClientValidatorContainer(
  */
 export function getMigrationParams(
   client: Eth2Client,
-  testnet: boolean
+  network: Eth2Network
 ): {
-  network: Eth2Network;
   newEth2ClientDnpName: string;
-  currentEth2ClientDnpName: string;
-  currentValidatorContainerName: string;
+  prysmOldDnpName: string;
+  prysmOldValidatorContainerName: string;
+  prysmOldValidatorVolumeName: string;
   signerDnpName: string;
   signerContainerName: string;
 } {
+  const prysmOld = getPrysmOldData(network);
+  const newEth2Client = getNewEth2Client(client, network);
+  const eth2Web3Signer = getEth2Web3Signer(network);
+
   return {
-    network: testnet ? "prater" : "mainnet",
-    newEth2ClientDnpName: testnet
-      ? client + "-prater" + eth2migrationParams.dappnodeDomain
-      : client + eth2migrationParams.dappnodeDomain,
-    currentEth2ClientDnpName: testnet
-      ? "prysm" + "-prater" + eth2migrationParams.dappnodeDomain
-      : "prysm" + eth2migrationParams.dappnodeDomain,
-    currentValidatorContainerName: testnet
-      ? eth2migrationParams.dappnodePackagePrefix +
-        "-validator.prysm" +
-        "-prater" +
-        eth2migrationParams.dappnodeDomain
-      : eth2migrationParams.dappnodePackagePrefix +
-        "-validator.prysm" +
-        eth2migrationParams.dappnodeDomain,
-    signerDnpName: testnet
-      ? "web3signer" + "-prater" + eth2migrationParams.dappnodeDomain
-      : "web3signer" + eth2migrationParams.dappnodeDomain,
-    signerContainerName: testnet
-      ? eth2migrationParams.dappnodePackagePrefix +
-        "web3signer" +
-        "-prater" +
-        eth2migrationParams.dappnodeDomain
-      : eth2migrationParams.dappnodePackagePrefix +
-        "web3signer" +
-        eth2migrationParams.dappnodeDomain
+    prysmOldDnpName: prysmOld.dnpName,
+    prysmOldValidatorContainerName: prysmOld.validatorContainerName,
+    prysmOldValidatorVolumeName: prysmOld.validatorContainerName,
+    newEth2ClientDnpName: newEth2Client.dnpName,
+    signerDnpName: eth2Web3Signer.dnpName,
+    signerContainerName: eth2Web3Signer.signerContainerName
   };
 }
 
-/**
- * Returns the volume of the Eth2 client validator container
- * @param container
- */
-export async function getCurrentEth2ClientValidatorVolumes(
-  container: PackageContainer
-): Promise<Dockerode.Volume> {
-  const eth2ClientValidatorVolume = container.volumes.find(volume => {
-    volume.container;
-  });
+function getPrysmOldData(network: Eth2Network): {
+  dnpName: string;
+  validatorContainerName: string;
+  prysmValidatorVolumeName: string;
+} {
+  switch (network) {
+    case "mainnet":
+      return {
+        dnpName: "prysm.dnp.dappnode.eth",
+        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm.dnp.dappnode.eth`,
+        // TODO: Check in production DAppNode 'prysmdnpdappnodeeth_validator-data'
+        prysmValidatorVolumeName: null
+      };
+    case "prater":
+      return {
+        dnpName: "prysm-prater.dnp.dappnode.eth",
+        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm-prater.dnp.dappnode.eth`,
+        prysmValidatorVolumeName: null
+      };
+    default:
+      throw Error(`Network ${network} not supported`);
+  }
+}
 
-  if (!eth2ClientValidatorVolume)
-    throw Error(`Eth2 client validator container has no volume`);
+function getNewEth2Client(
+  client: Eth2Client,
+  network: Eth2Network
+): {
+  dnpName: string;
+  validatorContainerName: string;
+} {
+  switch (client) {
+    case "prysm":
+      switch (network) {
+        case "mainnet":
+          return {
+            dnpName: "prysm.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm.dnp.dappnode.eth`
+          };
+        case "prater":
+          return {
+            dnpName: "prysm-prater.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm-prater.dnp.dappnode.eth`
+          };
+      }
 
-  const volume = docker.getVolume(eth2ClientValidatorVolume.host);
-  if (!volume) throw Error(`Eth2 client validator volume not found`);
+    case "lighthouse":
+    case "teku":
+    default:
+      throw Error(`Client ${client} not supported`);
+  }
+}
 
-  return volume;
+function getEth2Web3Signer(network: Eth2Network): {
+  dnpName: string;
+  signerContainerName: string;
+} {
+  switch (network) {
+    case "mainnet":
+      return {
+        dnpName: "web3signer.dnp.dappnode.eth",
+        signerContainerName: `${params.CONTAINER_NAME_PREFIX}-signer.web3signer.dnp.dappnode.eth`
+      };
+    case "prater":
+      return {
+        dnpName: "web3signer-prater.dnp.dappnode.eth",
+        signerContainerName: `${params.CONTAINER_NAME_PREFIX}-signer.web3signer-prater.dnp.dappnode.eth`
+      };
+    default:
+      throw Error(`Network ${network} not supported`);
+  }
 }

@@ -13,13 +13,20 @@ const nsenterCommand = params.NSENTER_COMMAND;
  */
 const defaultTimeout = 15 * 60 * 1000; // ms
 
+type ShellOptions = {
+  timeout?: number;
+  maxBuffer?: number;
+  /** Descriptive message to prepend to the error message if exit code != 0 */
+  errorMessage?: string;
+};
+
 /**
  * Run arbitrary commands in a shell in the DAPPMANAGER container
  * If the child process exits with code > 0, rejects
  */
 export default async function shell(
   cmd: string | string[],
-  options: { timeout?: number; maxBuffer?: number } = {}
+  options: ShellOptions = {}
 ): Promise<string> {
   const timeout = options.timeout || defaultTimeout;
   const maxBuffer = options && options.maxBuffer;
@@ -32,7 +39,13 @@ export default async function shell(
     const err: child.ExecException = e;
     if (err.signal === "SIGTERM")
       throw new ShellError(e, `process timeout ${timeout} ms, cmd: ${cmd}`);
-    else throw new ShellError(e);
+    else
+      throw new ShellError(
+        e,
+        options.errorMessage
+          ? `${options.errorMessage} - ${e.message}`
+          : e.message
+      );
   }
 }
 
@@ -63,9 +76,9 @@ export class ShellError extends Error implements child.ExecException {
   stderr?: string;
   constructor(
     e: child.ExecException & { stdout?: string; stderr?: string },
-    message?: string
+    message: string
   ) {
-    super(message || e.message);
+    super(message);
     this.cmd = e.cmd;
     this.killed = e.killed;
     this.code = e.code;
