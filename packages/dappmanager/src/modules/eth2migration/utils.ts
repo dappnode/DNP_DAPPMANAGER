@@ -1,6 +1,5 @@
 import { Eth2Network, Eth2Client } from "./params";
 import params from "../../params";
-
 import { imagesList } from "../docker/api";
 import semver from "semver";
 

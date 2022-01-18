@@ -7,7 +7,7 @@ import { readExportedKeystoresAndSlashingProtection } from "./export/readExporte
 // Requirements
 import { ensureRequirements } from "./requirements";
 // Rollback
-import { rollbackToPrysmOld } from "./rollbackToPrysmOld";
+import { rollbackToPrysmOld } from "./rollback/rollbackToPrysmOld";
 // Other
 import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
@@ -64,7 +64,7 @@ export async function eth2Migrate({
       "docker run",
       "--rm",
       `--name ${params.CONTAINER_TOOL_NAME_PREFIX}prysm-migration`,
-      "--volume validator-data:/root/",
+      `--volume ${prysmOldValidatorVolumeName}:/root/`,
       alpineImage,
       "mv /root/.eth2validators /root/.eth2validators.backup"
     ]).catch(e => {
@@ -88,7 +88,13 @@ export async function eth2Migrate({
     });
   } catch (e) {
     cleanExportedKeystoresAndSlashingProtection();
-    await rollbackToPrysmOld();
+    await rollbackToPrysmOld({
+      signerDnpName,
+      alpineImage,
+      prysmOldValidatorVolumeName,
+      prysmOldStableVersion,
+      prysmOldDnpName
+    });
 
     throw extendError(e, "Eth2 migration failed");
   }
