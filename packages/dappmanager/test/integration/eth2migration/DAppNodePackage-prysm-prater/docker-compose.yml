@@ -32,6 +32,11 @@ services:
       BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500"
       GRAFFITI: validating_from_DAppNode
       EXTRA_OPTS: ""
+networks:
+  default:
+    external: true
+    name: dncore_network
 volumes:
   beacon-chain-data: {}
-  validator-data: {}
+  # EXTRA FOR INT TEST: give the volume the standar name given in a dappnode environment
+  validator-data: { name: prysm-praterdnpdappnodeeth_validator-data }

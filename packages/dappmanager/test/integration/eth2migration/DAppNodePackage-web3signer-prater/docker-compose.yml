@@ -1,0 +1,49 @@
+version: "3.5"
+services:
+  web3signer:
+    container_name: DAppNodePackage-web3signer.web3signer-prater.dnp.dappnode.eth
+    image: "web3signer.web3signer-prater.dnp.dappnode.eth:0.1.0"
+    build:
+      context: web3signer
+      args:
+        KEYFILES_DIR: /opt/web3signer/keyfiles
+        KEYFILES_DIR_TMP: /opt/web3signer/keyfiles_tmp
+        UPSTREAM_VERSION: 21.10.5
+    environment:
+      KEYFILES_DIR: /opt/web3signer/keyfiles
+      KEYFILES_DIR_TMP: /opt/web3signer/keyfiles_tmp
+    ports:
+      - "9003:9000"
+    volumes:
+      - "web3signer_keyfiles:/opt/web3signer/keyfiles"
+      - "web3signer_keyfiles_tmp:/opt/web3signer/keyfiles_tmp"
+    restart: unless-stopped
+  postgres:
+    container_name: DAppNodePackage-postgres.web3signer-prater.dnp.dappnode.eth
+    build:
+      context: postgres
+      args:
+        UPSTREAM_VERSION: 21.10.5
+    image: "postgres.web3signer-prater.dnp.dappnode.eth:0.1.0"
+    env_file:
+      - ./postgres/.env.postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: web3signer
+    user: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+      - "postgres_migrations:/docker-entrypoint-initdb.d"
+    restart: unless-stopped
+networks:
+  default:
+    external: true
+    name: dncore_network
+volumes:
+  web3signer_keyfiles: {}
+  web3signer_keyfiles_tmp: {}
+  postgres_data: {}
+  postgres_migrations: {}

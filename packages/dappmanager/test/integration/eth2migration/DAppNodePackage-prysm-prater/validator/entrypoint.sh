@@ -37,8 +37,22 @@ TOKEN=""
 #[ -z "$BEACON_RPC_GATEWAY_PROVIDER" ] && { echo "[ERROR] BEACON_RPC_GATEWAY_PROVIDER is not set"; exit 1; } || echo "[INFO] BEACON_RPC_GATEWAY_PROVIDER ${BEACON_RPC_GATEWAY_PROVIDER}"
 #[ -z "$GRAFFITI" ] && echo "[WARN] GRAFFITI is not set" || echo "[INFO] GRAFFITI ${GRAFFITI}"
 
+# EXTRA FOR INT TEST: import accounts and slashing protection
+echo "[INFO] importing accounts..."
+validator accounts import --accept-terms-of-use --prater \
+--wallet-password-file=/files/password.txt --wallet-dir=/root/.eth2validators \
+--account-password-file=/files/password.txt --keys-dir=/files/keystore_0.json || { echo "[ERROR] failed to import accounts"; exit 1; }
+echo "[INFO] successfully imported accounts"
+
+echo "[INFO] importing slashing protection..."
+validator slashing-protection-history import --datadir=/root/.eth2validators --slashing-protection-json-file=/files/slashing_protection.json --accept-terms-of-use --prater || { echo "[ERROR] failed to import slashing protection"; exit 1; }
+echo "[INFO] successfully imported slashing protection"
+
+cp /files/password.txt /root/.eth2validators/walletpassword.txt
+
 # Must used escaped \"$VAR\" to accept spaces: --graffiti=\"$GRAFFITI\"
 exec -c validator \
+  --accept-terms-of-use \
   --prater \
   --datadir=/root/.eth2 \
   --rpc-host 0.0.0.0 \
@@ -46,11 +60,10 @@ exec -c validator \
   --beacon-rpc-provider="$BEACON_RPC_PROVIDER" \
   --beacon-rpc-gateway-provider="$BEACON_RPC_GATEWAY_PROVIDER" \
   --wallet-dir=/root/.eth2validators \
-  --wallet-password-file=/root/.eth2wallets/wallet-password.txt \
-  --write-wallet-password-on-web-onboarding \
+  --wallet-password-file=/root/.eth2validators/walletpassword.txt \
+  #--write-wallet-password-on-web-onboarding \
   --graffiti="$GRAFFITI" \
   --web \
   --grpc-gateway-host=0.0.0.0 \
   --grpc-gateway-port=80 \
-  --accept-terms-of-use \
   ${EXTRA_OPTS}

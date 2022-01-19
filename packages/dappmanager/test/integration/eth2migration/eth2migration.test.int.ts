@@ -2,46 +2,81 @@ import "mocha";
 import { expect } from "chai";
 import shell from "../../../src/utils/shell";
 import { shellSafe } from "../../testUtils";
+import { eth2Migrate } from "../../../src/modules/eth2migration";
+import params from "../../../src/params";
+import {
+  dappmanagerOutPaths,
+  outputVolumeName
+} from "../../../src/modules/eth2migration/export/params";
+import fs from "fs";
 
 describe.only("eth2migrations", function () {
-  const composePath = `${__dirname}/DAppNodePackage-prysm-prater/docker-compose.yml`;
+  const prysmComposePath = `${__dirname}/DAppNodePackage-prysm-prater/docker-compose.yml`;
+  const web3signerComposePath = `${__dirname}/DAppNodePackage-teku-prater/docker-compose.yml`;
+  const tekuComposePath = `${__dirname}/DAppNodePackage-web3signer-prater/docker-compose.yml`;
+
+  /**
+   * Create dappmanager volume
+   */
+  /*   before(() => {
+    fs.mkdirSync(dappmanagerOutPaths.outVolumeTarget, { recursive: true });
+  }); */
 
   before(async () => {
-    // web3signer installation package
-    // eth2client (teku prater) installation package
-  });
-
-  before(async () => {
-    const validatorContainerName =
-      "DAppNodePackage-validator.prysm-prater.dnp.dappnode.eth";
     // Create necessary network
     await shellSafe("docker network create dncore_network");
+  });
 
-    // Setup validator container: run DAppNodePackage-prysm-prater
-    await shell(`docker-compose -f ${composePath} up -d`);
+  /**
+   * Get docker images needed
+   */
+  before(async () => {
+    await shell(`docker pull consensys/teku:22.1.0`);
+    await shell(`docker pull consensys/web3signer:21.10.5`);
+    await shell(`docker pull postgres:14.1-bullseye`);
+    await shell(`docker pull alpine`);
+  });
 
-    // Copy files to container
-    await shell(`docker cp ${__dirname}/files ${validatorContainerName}:/`);
-    const dirs = await shell(
-      `docker exec ${validatorContainerName} ls -l /files`
-    );
-    console.log(dirs);
-    // Import keystores: https://docs.prylabs.network/docs/install/install-with-docker/#step-3-import-keystores-into-prysm
+  /**
+   * Set-up prysm validator, teku and web3signer and dappmanager
+   */
+  before(async () => {
+    await shell(`docker-compose -f ${prysmComposePath} up -d`);
+    await shell(`docker-compose -f ${tekuComposePath} up -d`);
+    await shell(`docker-compose -f ${web3signerComposePath} up -d`);
     await shell(
-      `docker exec ${validatorContainerName} validator accounts import --keys-dir=/files/keystore_0.json`
-    );
-    // Import slashing protection: https://docs.prylabs.network/docs/wallet/slashing-protect
-    await shell(
-      `docker exec  ${validatorContainerName} validator slashing-protection import --datadir=/files/slashing_protection.json`
+      `docker run --network=dncore_network -d --name=${params.dappmanagerDnpName} \
+--volume=${outputVolumeName}:${dappmanagerOutPaths.outVolumeTarget} alpine`
     );
   });
 
   it("should migrate validator", async () => {
     // Run migration: https://docs.prylabs.network/docs/install/install-with-docker/#step-4-run-migration
+    await eth2Migrate({
+      client: "teku",
+      network: "prater"
+    });
   });
 
+  /*   after(() => {
+    fs.rmdirSync(dappmanagerOutPaths.outVolumeTarget, { recursive: false });
+  }); */
+
+  /**
+   * Compose down all packages
+   */
   after(async () => {
-    // Remove validator container
-    await shell(`docker-compose -f ${composePath} down`);
+    await shell(`docker-compose -f ${prysmComposePath} down -v`);
+    await shell(`docker-compose -f ${web3signerComposePath} down -v`);
+    await shell(`docker-compose -f ${tekuComposePath} down -v`);
+    await shell(`docker rm ${params.dappmanagerDnpName}`);
+    await shell(`docker volume rm ${outputVolumeName}`);
+  });
+
+  /**
+   * Remove dncore_network
+   */
+  after(async () => {
+    await shell(`docker network rm dncore_network`);
   });
 });

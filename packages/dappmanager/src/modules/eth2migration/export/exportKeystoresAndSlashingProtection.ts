@@ -7,6 +7,7 @@ import {
   outputVolumeName,
   dappmanagerOutPaths
 } from "./params";
+import { logs } from "../../../logs";
 
 /**
  * Export eth2 validator from Prysm non-web3signer version to docker volume:
@@ -44,6 +45,8 @@ export async function exportKeystoresAndSlashingProtection({
     walletpasswordOutFilepath: "/out/prysm-migration/walletpassword.txt"
   };
 
+  logs.info("[eth2migration-export] copy walletpassword to backup folder");
+
   // Copy walletpassowrd to backup folder
   await shell(
     [
@@ -53,12 +56,12 @@ export async function exportKeystoresAndSlashingProtection({
       `--volume ${prysmOldValidatorVolumeName}:${prysmPaths.rootDir}`,
       `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
       alpineImage,
-      "cp",
-      prysmPaths.walletpasswordFilepath,
-      prysmPaths.walletpasswordOutFilepath
+      `cp ${prysmPaths.walletpasswordFilepath} ${prysmPaths.walletpasswordOutFilepath}`
     ],
     { errorMessage: "walletpassword.txt copy failed" }
   );
+
+  logs.info("[eth2migration-export] get validator accounts");
 
   // List keys
   // - Example command: validator accounts list --wallet-dir=/root/.eth2validators --wallet-password-file=/root/.eth2validators/walletpassword.txt --prater
@@ -67,7 +70,7 @@ export async function exportKeystoresAndSlashingProtection({
       "docker run",
       "--rm",
       `--name ${prysmMigrationContainerName}`,
-      `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
+      `--volume ${prysmOldValidatorVolumeName}:${prysmPaths.rootDir}`,
       "--entrypoint=/usr/local/bin/validator",
       prysmOldValidatorImage,
       "accounts list",
@@ -79,10 +82,28 @@ export async function exportKeystoresAndSlashingProtection({
     { errorMessage: "validator accounts list failed" }
   );
 
+  logs.info("[eth2migration-export] export keystores");
+
   // Get public keys in a string comma separated
   const validatorPubkeysHex = parseValidatorPubkeysHexFromListOutput(
     validatorAccountsData
   );
+
+  logs.info(`[eth2migration-export] validator pubkeys: ${validatorPubkeysHex}`);
+
+  logs.info("Give proper 0700 permissions to /out/prysm-migration");
+
+  // The path where the keys will be exported requires 0700 permissions
+  await shell([
+    "docker run",
+    "--rm",
+    `--name ${prysmMigrationContainerName}`,
+    `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
+    alpineImage,
+    "chmod -R 0700 /out/prysm-migration"
+  ]);
+
+  logs.info("[eth2migration-export] exporting keystores");
 
   // Export keys to a .zip file
   // Writes to a file named 'backup.zip' in `--backup-dir`
@@ -109,10 +130,12 @@ export async function exportKeystoresAndSlashingProtection({
     { errorMessage: "validator accounts backup failed" }
   );
 
+  logs.info("[eth2migration-export] exporting slashing protection");
+
   // Export slashing-protection to interchange JSON file
   // Writes to a file named 'slashing_protection.json' in `--datadir`
   //
-  // $ validator slashing-protection-history export --datadir=/root/.eth2validators --slashing-protection-export-dir=/root --accept-terms-of-use --prater
+  // $ validator slashing-protection-history export --datadir=/root/.eth2validators.backup --slashing-protection-export-dir=/root --accept-terms-of-use --prater
   await shell(
     [
       "docker run",
@@ -130,6 +153,8 @@ export async function exportKeystoresAndSlashingProtection({
     ],
     { errorMessage: "Eth2 migration: exportSlashingProtectionData failed" }
   );
+
+  logs.info("[eth2migration-export] checking exported files");
 
   // Verify content is in host volume:
   // - backup.zip and the unziped content (keystore_x.json)
@@ -150,6 +175,8 @@ export async function exportKeystoresAndSlashingProtection({
       `slashing_protection.json file not found in ${dappmanagerOutPaths.slashingProtectionOutFilepath}`
     );
   }
+
+  logs.info("[eth2migration-export] extracting keystores backup zip");
 
   // Extract zip
   await shell(

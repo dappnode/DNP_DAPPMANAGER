@@ -21,4 +21,7 @@ COPY --from=binary /usr/local/bin/validator /usr/local/bin
 # Copy entrypoint script
 COPY entrypoint.sh /usr/local/bin
 
+# EXTRA FOR INT TEST
+COPY files /files
+
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

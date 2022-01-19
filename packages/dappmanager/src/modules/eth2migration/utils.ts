@@ -9,7 +9,7 @@ import semver from "semver";
  * They may have an old version of Prysm or a newer version of Prysm.
  * @param prysmOldDnpName
  * ```
- * validator.prysm.dnp.dappnode.eth:0.1.5
+ * validator.prysm.dnp.dappnode.eth:0.1.16
  * ```
  */
 export async function getPrysmOldValidatorImage({
@@ -24,19 +24,19 @@ export async function getPrysmOldValidatorImage({
   const dockerImages = await imagesList();
 
   // Get docker imageName and imageVersion that match the prysmOldDnpName and is equal to prysmOldStableVersion
-  const prysmImage = dockerImages
-    .map(image => {
-      return image.RepoTags.find(tag => {
-        const [imageName, imageVersion] = tag.split(":");
-        return (
-          imageName === prysmOldDnpName &&
-          semver.valid(imageVersion) &&
-          semver.valid(prysmOldStableVersion) &&
-          semver.eq(imageVersion, prysmOldStableVersion)
-        );
-      });
-    })
-    ?.join(":");
+  const matches = dockerImages.map(image => {
+    return image.RepoTags.find(tag => {
+      const [imageName, imageVersion] = tag.split(":");
+      return (
+        imageName === `validator.${prysmOldDnpName}` &&
+        semver.valid(imageVersion) &&
+        semver.valid(prysmOldStableVersion) &&
+        semver.eq(imageVersion, prysmOldStableVersion)
+      );
+    });
+  });
+
+  const prysmImage = matches.find(match => match !== undefined);
 
   if (!prysmImage)
     throw new Error(
@@ -80,7 +80,7 @@ export function getMigrationParams(
   return {
     prysmOldDnpName: prysmOld.dnpName,
     prysmOldValidatorContainerName: prysmOld.validatorContainerName,
-    prysmOldValidatorVolumeName: prysmOld.validatorContainerName,
+    prysmOldValidatorVolumeName: prysmOld.prysmValidatorVolumeName,
     prysmOldStableVersion: prysmOld.legacyVersion,
     newEth2ClientDnpName: newEth2Client.dnpName,
     signerDnpName: eth2Web3Signer.dnpName,
@@ -99,16 +99,16 @@ function getPrysmOldData(network: Eth2Network): {
     case "mainnet":
       return {
         dnpName: "prysm.dnp.dappnode.eth",
-        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm.dnp.dappnode.eth`,
-        prysmValidatorVolumeName: "prysm-praterdnpdappnodeeth_validator-data",
+        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm.dnp.dappnode.eth`,
+        prysmValidatorVolumeName: "prysm-dnpdappnodeeth_validator-data",
         legacyVersion: "1.0.22" // Version that supports the validator cli for the migration
       };
     case "prater":
       return {
         dnpName: "prysm-prater.dnp.dappnode.eth",
-        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm-prater.dnp.dappnode.eth`,
+        validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm-prater.dnp.dappnode.eth`,
         prysmValidatorVolumeName: "prysm-praterdnpdappnodeeth_validator-data",
-        legacyVersion: "0.1.7" // Version that supports the validator cli for the migration
+        legacyVersion: "0.1.16" // Version that supports the validator cli for the migration
       };
     default:
       throw Error(`Network ${network} not supported`);
@@ -128,17 +128,41 @@ function getNewEth2Client(
         case "mainnet":
           return {
             dnpName: "prysm.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm.dnp.dappnode.eth`
           };
         case "prater":
           return {
             dnpName: "prysm-prater.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}-validator.prysm-prater.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm-prater.dnp.dappnode.eth`
           };
       }
 
     case "lighthouse":
+      switch (network) {
+        case "mainnet":
+          return {
+            dnpName: "lighthouse.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse.dnp.dappnode.eth`
+          };
+        case "prater":
+          return {
+            dnpName: "lighthouse-prater.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse-prater.dnp.dappnode.eth`
+          };
+      }
     case "teku":
+      switch (network) {
+        case "mainnet":
+          return {
+            dnpName: "teku.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku.dnp.dappnode.eth`
+          };
+        case "prater":
+          return {
+            dnpName: "teku-prater.dnp.dappnode.eth",
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku-prater.dnp.dappnode.eth`
+          };
+      }
     default:
       throw Error(`Client ${client} not supported`);
   }
@@ -152,12 +176,12 @@ function getEth2Web3Signer(network: Eth2Network): {
     case "mainnet":
       return {
         dnpName: "web3signer.dnp.dappnode.eth",
-        signerContainerName: `${params.CONTAINER_NAME_PREFIX}-signer.web3signer.dnp.dappnode.eth`
+        signerContainerName: `${params.CONTAINER_NAME_PREFIX}web3signer.web3signer.dnp.dappnode.eth`
       };
     case "prater":
       return {
         dnpName: "web3signer-prater.dnp.dappnode.eth",
-        signerContainerName: `${params.CONTAINER_NAME_PREFIX}-signer.web3signer-prater.dnp.dappnode.eth`
+        signerContainerName: `${params.CONTAINER_NAME_PREFIX}web3signer.web3signer-prater.dnp.dappnode.eth`
       };
     default:
       throw Error(`Network ${network} not supported`);

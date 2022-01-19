@@ -11,18 +11,18 @@ import { Web3Signer } from "../web3signer";
  *  - slashing_protection.json
  */
 export async function importKeystoresAndSlashingProtectionViaApi({
-  signerDnpName,
+  signerContainerName,
   keystoresStr,
   keystorePasswordStr,
   slashingProtectionStr
 }: {
-  signerDnpName: string;
+  signerContainerName: string;
   keystoresStr: string[];
   keystorePasswordStr: string;
   slashingProtectionStr: string;
 }): Promise<void> {
   // Get web3signer instance
-  const web3signerApiUrl = `http://${signerDnpName}`;
+  const web3signerApiUrl = `http://${signerContainerName}`;
   const web3signer = new Web3Signer(web3signerApiUrl);
 
   // web3signer upcheck

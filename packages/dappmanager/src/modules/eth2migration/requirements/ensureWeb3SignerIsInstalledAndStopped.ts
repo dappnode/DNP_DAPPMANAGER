@@ -16,10 +16,12 @@ export async function ensureWeb3SignerIsInstalledAndStopped({
   signerDnpName: string;
   signerContainerName: string;
 }): Promise<void> {
-  let web3SignerDnp = await listPackageNoThrow({ dnpName: signerDnpName });
+  let web3SignerDnp = await listPackageNoThrow({
+    dnpName: signerDnpName
+  });
   if (!web3SignerDnp) {
     logs.info(
-      "Eth2 migration: web3signer package not installed, installing it"
+      `Eth2 migration: web3signer package not installed, installing ${signerDnpName}`
     );
 
     // TODO: Don't run the signer container
@@ -41,5 +43,7 @@ export async function ensureWeb3SignerIsInstalledAndStopped({
   }
 
   if (signerContainer.state === "running")
-    await dockerContainerStop(signerContainerName);
+    await dockerContainerStop(signerContainerName).catch(e => {
+      throw extendError(e, "web3signer stop failled");
+    });
 }
