@@ -11,6 +11,7 @@ import { raidenTestnet } from "./raidenTestnet";
 import { trustlines } from "./trustlines";
 import { wifi } from "./wifi";
 import { wireguard } from "./wireguard";
+import { prysmPraterLegacy } from "./prysmPraterLegacy";
 
 export const mockDnps: MockDnp[] = [
   bitcoin,
@@ -24,5 +25,6 @@ export const mockDnps: MockDnp[] = [
   raidenTestnet,
   trustlines,
   wifi,
-  wireguard
+  wireguard,
+  prysmPraterLegacy
 ];

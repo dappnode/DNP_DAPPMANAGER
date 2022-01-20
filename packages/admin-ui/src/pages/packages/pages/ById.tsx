@@ -19,6 +19,8 @@ import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
+import { isLegacyPrysm } from "../eth2migration/isLegacyPrysm";
+import AlertEth2migration from "../eth2migration/AlertEth2Migration";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
@@ -55,6 +57,11 @@ export const PackageById: React.FC<RouteComponentProps<{
     containers,
     updateAvailable
   } = dnp;
+
+  const isPrysmMigration = isLegacyPrysm({
+    dnpName: dnp.dnpName,
+    version: dnp.version
+  });
 
   /**
    * Construct all subroutes to iterate them both in:
@@ -126,12 +133,14 @@ export const PackageById: React.FC<RouteComponentProps<{
         ))}
       </div>
 
-      {updateAvailable && (
+      {isPrysmMigration ? (
+        <AlertEth2migration dnp={dnp} />
+      ) : updateAvailable ? (
         <AlertPackageUpdateAvailable
           dnpName={dnpName}
           updateAvailable={updateAvailable}
         ></AlertPackageUpdateAvailable>
-      )}
+      ) : null}
 
       <div className="packages-content">
         <Switch>

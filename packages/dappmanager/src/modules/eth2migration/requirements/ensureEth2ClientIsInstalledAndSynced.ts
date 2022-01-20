@@ -13,30 +13,30 @@ import semver from "semver";
 export async function ensureEth2ClientIsInstalledAndSynced({
   dnpName,
   client,
-  prysmWeb3signerVersion
+  newEth2ClientVersion
 }: {
   dnpName: string;
   client: Eth2Client;
-  prysmWeb3signerVersion: string;
+  newEth2ClientVersion: string;
 }): Promise<void> {
   const dnp = await listPackageNoThrow({ dnpName });
 
-  // If Prysm ensure it's the "new" version, that works with web3 signer else install eth2client
+  // If Prysm ensure it's the "new" version that works with web3 signer else install eth2client
   if (client === "prysm") {
-    if (dnp && semver.gte(dnp.version, prysmWeb3signerVersion))
+    if (dnp && semver.gte(dnp.version, newEth2ClientVersion))
       logs.info("Prysm satifies web3signer version");
     else {
       logs.info(
-        `Updating Prysm legacy to Prysm-web3signer (${prysmWeb3signerVersion})`
+        `Updating Prysm legacy to Prysm-web3signer (${newEth2ClientVersion})`
       );
-      await packageInstall({ name: dnpName, version: prysmWeb3signerVersion });
+      await packageInstall({ name: dnpName, version: newEth2ClientVersion });
     }
   } else {
     if (!dnp) {
       logs.info(
-        `Eth2 migration: eth2 client not installed ${dnpName}, installing it`
+        `Eth2 migration: eth2 client ${client} not installed ${dnpName}, installing it`
       );
-      await packageInstall({ name: dnpName });
+      await packageInstall({ name: dnpName, version: newEth2ClientVersion });
     }
   }
 

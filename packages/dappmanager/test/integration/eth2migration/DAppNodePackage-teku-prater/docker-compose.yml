@@ -12,12 +12,12 @@ services:
       - "teku-prater-data:/opt/teku/data"
     environment:
       HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545"
-      HTTP_WEB3SIGNER: "http://web3signer.web3signer.dappnode:9003"
+      HTTP_WEB3SIGNER: "http://web3signer.web3signer.dappnode:9000"
       INITIAL_STATE: ""
       EXTRA_OPTS: ""
     ports:
-      - "9000:9000"
-      - "5051:5051"
+      - "9000"
+      - "5051"
     restart: unless-stopped
 networks:
   default:

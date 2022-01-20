@@ -2,6 +2,7 @@ import { packageInstall, packageRemove } from "../../../calls";
 import params from "../../../params";
 import { extendError } from "../../../utils/extendError";
 import shell from "../../../utils/shell";
+import { moveWalletDirOldPrysmVolume } from "../utils";
 
 /**
  * Rollback to the previous state before the migration
@@ -29,6 +30,13 @@ export async function rollbackToPrysmOld({
   await packageRemove({ dnpName: signerDnpName });
 
   // Move .eth2validators.backup to .eth2validators
+  await moveWalletDirOldPrysmVolume({
+    prysmOldValidatorVolumeName,
+    alpineImage,
+    source: "/root/.eth2validators.backup",
+    target: "/root/.eth2validators"
+  });
+
   await shell([
     "docker run",
     "--rm",

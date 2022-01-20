@@ -5,16 +5,16 @@ import { listContainerNoThrow } from "../../docker/list";
 
 export async function ensureOldPrysmValidatorContainerIsRemoved({
   prysmOldValidatorContainerName,
-  prysmWeb3signerVersion
+  newEth2ClientVersion
 }: {
   prysmOldValidatorContainerName: string;
-  prysmWeb3signerVersion: string;
+  newEth2ClientVersion: string;
 }): Promise<void> {
   const container = await listContainerNoThrow({
     containerName: prysmOldValidatorContainerName
   });
 
-  if (container && semver.lt(container.version, prysmWeb3signerVersion)) {
+  if (container && semver.lt(container.version, newEth2ClientVersion)) {
     logs.warn(
       "old prysm container still exists, attempint to delete it once again"
     );

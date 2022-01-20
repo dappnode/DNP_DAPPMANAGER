@@ -35,6 +35,7 @@ function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   return {
     ...sampleDnp,
 
+    version: dnp.metadata.version,
     dnpName,
     instanceName: "",
     isCore: dnp.metadata.type === "dncore",

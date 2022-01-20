@@ -18,7 +18,8 @@ export function readExportedKeystoresAndSlashingProtection(): {
       dappmanagerOutPaths.keystoresOutDir,
       keystoreFilename
     );
-    keystoresStr.push(fs.readFileSync(keystoreFilepath, "utf8"));
+    const file = fs.readFileSync(keystoreFilepath, "utf8");
+    keystoresStr.push(JSON.stringify(JSON.parse(file)));
   }
 
   return {
@@ -26,9 +27,13 @@ export function readExportedKeystoresAndSlashingProtection(): {
     keystorePasswordStr: fs
       .readFileSync(dappmanagerOutPaths.walletpasswordOutFilepath, "utf8")
       .trim(),
-    slashingProtectionStr: fs.readFileSync(
-      dappmanagerOutPaths.slashingProtectionOutFilepath,
-      "utf8"
+    slashingProtectionStr: JSON.stringify(
+      JSON.parse(
+        fs.readFileSync(
+          dappmanagerOutPaths.slashingProtectionOutFilepath,
+          "utf8"
+        )
+      )
     )
   };
 }

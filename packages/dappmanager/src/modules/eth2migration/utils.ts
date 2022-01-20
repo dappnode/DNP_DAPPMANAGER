@@ -2,6 +2,8 @@ import { Eth2Network, Eth2Client } from "./params";
 import params from "../../params";
 import { imagesList } from "../docker/api";
 import semver from "semver";
+import { extendError } from "../../utils/extendError";
+import shell from "../../utils/shell";
 
 /**
  * Fetch _SOME_ image from the available prysm package
@@ -19,8 +21,6 @@ export async function getPrysmOldValidatorImage({
   prysmOldDnpName: string;
   prysmOldStableVersion: string;
 }): Promise<string> {
-  // TODO: To ensure that the Prysm validator API is stable and works as expected,
-  // ensure that the available prysm image is within some expected version range
   const dockerImages = await imagesList();
 
   // Get docker imageName and imageVersion that match the prysmOldDnpName and is equal to prysmOldStableVersion
@@ -47,6 +47,32 @@ export async function getPrysmOldValidatorImage({
 }
 
 /**
+ * Moves prysm legacy volume wallet dir
+ */
+export async function moveWalletDirOldPrysmVolume({
+  prysmOldValidatorVolumeName,
+  alpineImage,
+  source,
+  target
+}: {
+  prysmOldValidatorVolumeName: string;
+  alpineImage: string;
+  source: string;
+  target: string;
+}): Promise<void> {
+  await shell([
+    "docker run",
+    "--rm",
+    `--name ${params.CONTAINER_TOOL_NAME_PREFIX}prysm-migration`,
+    `--volume ${prysmOldValidatorVolumeName}:/root`,
+    alpineImage,
+    `mv ${source} ${target}`
+  ]).catch(e => {
+    throw extendError(e, "Error moving Prysm's legacy wallet directory");
+  });
+}
+
+/**
  * Get dnpname, container and network of eth2 client validator
  * @param client
  * @param testnet
@@ -66,6 +92,7 @@ export function getMigrationParams(
   network: Eth2Network
 ): {
   newEth2ClientDnpName: string;
+  newEth2ClientVersion: string;
   prysmOldDnpName: string;
   prysmOldValidatorContainerName: string;
   prysmOldValidatorVolumeName: string;
@@ -83,6 +110,7 @@ export function getMigrationParams(
     prysmOldValidatorVolumeName: prysmOld.prysmValidatorVolumeName,
     prysmOldStableVersion: prysmOld.legacyVersion,
     newEth2ClientDnpName: newEth2Client.dnpName,
+    newEth2ClientVersion: newEth2Client.version,
     signerDnpName: eth2Web3Signer.dnpName,
     signerContainerName: eth2Web3Signer.signerContainerName
   };
@@ -121,6 +149,7 @@ function getNewEth2Client(
 ): {
   dnpName: string;
   validatorContainerName: string;
+  version: string;
 } {
   switch (client) {
     case "prysm":
@@ -128,12 +157,14 @@ function getNewEth2Client(
         case "mainnet":
           return {
             dnpName: "prysm.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm.dnp.dappnode.eth`,
+            version: "2.0.0"
           };
         case "prater":
           return {
             dnpName: "prysm-prater.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm-prater.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm-prater.dnp.dappnode.eth`,
+            version: "2.0.0"
           };
       }
 
@@ -142,12 +173,14 @@ function getNewEth2Client(
         case "mainnet":
           return {
             dnpName: "lighthouse.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse.dnp.dappnode.eth`,
+            version: "0.1.0"
           };
         case "prater":
           return {
             dnpName: "lighthouse-prater.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse-prater.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.lighthouse-prater.dnp.dappnode.eth`,
+            version: "0.1.0"
           };
       }
     case "teku":
@@ -155,12 +188,14 @@ function getNewEth2Client(
         case "mainnet":
           return {
             dnpName: "teku.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku.dnp.dappnode.eth`,
+            version: "0.1.0"
           };
         case "prater":
           return {
             dnpName: "teku-prater.dnp.dappnode.eth",
-            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku-prater.dnp.dappnode.eth`
+            validatorContainerName: `${params.CONTAINER_NAME_PREFIX}teku-prater.dnp.dappnode.eth`,
+            version: "0.1.0"
           };
       }
     default:

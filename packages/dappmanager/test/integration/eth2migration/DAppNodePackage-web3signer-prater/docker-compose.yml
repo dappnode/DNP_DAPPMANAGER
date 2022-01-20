@@ -6,17 +6,10 @@ services:
     build:
       context: web3signer
       args:
-        KEYFILES_DIR: /opt/web3signer/keyfiles
-        KEYFILES_DIR_TMP: /opt/web3signer/keyfiles_tmp
         UPSTREAM_VERSION: 21.10.5
-    environment:
-      KEYFILES_DIR: /opt/web3signer/keyfiles
-      KEYFILES_DIR_TMP: /opt/web3signer/keyfiles_tmp
-    ports:
-      - "9003:9000"
+    network_mode: "host" # Network mode host so container is accesible from host running int test
     volumes:
-      - "web3signer_keyfiles:/opt/web3signer/keyfiles"
-      - "web3signer_keyfiles_tmp:/opt/web3signer/keyfiles_tmp"
+      - "web3signer_data:/opt/web3signer"
     restart: unless-stopped
   postgres:
     container_name: DAppNodePackage-postgres.web3signer-prater.dnp.dappnode.eth
@@ -32,18 +25,13 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: web3signer
     user: postgres
-    ports:
-      - "5432:5432"
+    network_mode: "host" # Network mode host so container is accesible from host running int test
     volumes:
       - "postgres_data:/var/lib/postgresql/data"
       - "postgres_migrations:/docker-entrypoint-initdb.d"
     restart: unless-stopped
-networks:
-  default:
-    external: true
-    name: dncore_network
+
 volumes:
-  web3signer_keyfiles: {}
-  web3signer_keyfiles_tmp: {}
+  web3signer_data: {}
   postgres_data: {}
   postgres_migrations: {}

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { Eth2Network } from "../params";
 import shell from "../../../utils/shell";
 import {
@@ -39,32 +40,24 @@ export async function exportKeystoresAndSlashingProtection({
   const prysmPaths = {
     rootDir: "/root",
     outVolumeTarget: "/out",
-    outDir: "/out/prysm-migration",
+    outDir: "/out",
     walletDir: prysmPathWalletDir,
+    /**
+     * Outputs file at /out/backup/backup.zip
+     * MUST be a new path for Prysm to give it a set permissions different than docker's directories
+     */
+    backupOutDir: "/out/backup",
     walletpasswordFilepath: path.join(prysmPathWalletDir, "walletpassword.txt"),
-    walletpasswordOutFilepath: "/out/prysm-migration/walletpassword.txt"
+    walletpasswordOutFilepath: "/out/walletpassword.txt",
+    /** Outputs file at /out/slashing_protection.json */
+    slashingProtectionOutDir: "/out"
   };
 
-  logs.info("[eth2migration-export] copy walletpassword to backup folder");
-
-  // Copy walletpassowrd to backup folder
-  await shell(
-    [
-      "docker run",
-      "--rm",
-      `--name ${prysmMigrationContainerName}`,
-      `--volume ${prysmOldValidatorVolumeName}:${prysmPaths.rootDir}`,
-      `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
-      alpineImage,
-      `cp ${prysmPaths.walletpasswordFilepath} ${prysmPaths.walletpasswordOutFilepath}`
-    ],
-    { errorMessage: "walletpassword.txt copy failed" }
-  );
-
-  logs.info("[eth2migration-export] get validator accounts");
+  logs.debug("Listing validator accounts");
 
   // List keys
   // - Example command: validator accounts list --wallet-dir=/root/.eth2validators --wallet-password-file=/root/.eth2validators/walletpassword.txt --prater
+  // TODO: deep test this command, check if might be pagination. ask for an --all flag in github issue
   const validatorAccountsData = await shell(
     [
       "docker run",
@@ -82,28 +75,14 @@ export async function exportKeystoresAndSlashingProtection({
     { errorMessage: "validator accounts list failed" }
   );
 
-  logs.info("[eth2migration-export] export keystores");
-
   // Get public keys in a string comma separated
   const validatorPubkeysHex = parseValidatorPubkeysHexFromListOutput(
     validatorAccountsData
   );
 
-  logs.info(`[eth2migration-export] validator pubkeys: ${validatorPubkeysHex}`);
-
-  logs.info("Give proper 0700 permissions to /out/prysm-migration");
-
-  // The path where the keys will be exported requires 0700 permissions
-  await shell([
-    "docker run",
-    "--rm",
-    `--name ${prysmMigrationContainerName}`,
-    `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
-    alpineImage,
-    "chmod -R 0700 /out/prysm-migration"
-  ]);
-
-  logs.info("[eth2migration-export] exporting keystores");
+  logs.debug(
+    `Exporting keystores to ${prysmPaths.outDir} pubkeys: ${validatorPubkeysHex}`
+  );
 
   // Export keys to a .zip file
   // Writes to a file named 'backup.zip' in `--backup-dir`
@@ -115,13 +94,13 @@ export async function exportKeystoresAndSlashingProtection({
       "--rm",
       `--name ${prysmMigrationContainerName}`,
       `--volume ${prysmOldValidatorVolumeName}:${prysmPaths.rootDir}`,
-      `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
+      `--volume ${outputVolumeName}:${prysmPaths.outVolumeTarget}`,
       "--entrypoint=/usr/local/bin/validator",
       prysmOldValidatorImage,
       "accounts backup",
       `--wallet-dir=${prysmPaths.walletDir}`,
       `--wallet-password-file=${prysmPaths.walletpasswordFilepath}`,
-      `--backup-dir=${prysmPaths.outDir}`,
+      `--backup-dir=${prysmPaths.backupOutDir}`,
       `--backup-password-file=${prysmPaths.walletpasswordFilepath}`,
       `--backup-public-keys=${validatorPubkeysHex.join(",")}`,
       `--${network}`,
@@ -130,7 +109,23 @@ export async function exportKeystoresAndSlashingProtection({
     { errorMessage: "validator accounts backup failed" }
   );
 
-  logs.info("[eth2migration-export] exporting slashing protection");
+  logs.debug("Copying walletpassword to backup folder");
+
+  // Copy walletpassowrd to backup folder
+  await shell(
+    [
+      "docker run",
+      "--rm",
+      `--name ${prysmMigrationContainerName}`,
+      `--volume ${prysmOldValidatorVolumeName}:${prysmPaths.rootDir}`,
+      `--volume ${outputVolumeName}:${prysmPaths.outDir}`,
+      alpineImage,
+      `cp ${prysmPaths.walletpasswordFilepath} ${prysmPaths.walletpasswordOutFilepath}`
+    ],
+    { errorMessage: "walletpassword.txt copy failed" }
+  );
+
+  logs.debug("Exporting slashing protection data");
 
   // Export slashing-protection to interchange JSON file
   // Writes to a file named 'slashing_protection.json' in `--datadir`
@@ -147,40 +142,65 @@ export async function exportKeystoresAndSlashingProtection({
       prysmOldValidatorImage,
       "slashing-protection-history export",
       `--datadir=${prysmPaths.walletDir}`,
-      `--slashing-protection-export-dir=${prysmPaths.outDir}`,
+      `--slashing-protection-export-dir=${prysmPaths.slashingProtectionOutDir}`,
       `--${network}`,
       "--accept-terms-of-use"
     ],
     { errorMessage: "Eth2 migration: exportSlashingProtectionData failed" }
   );
 
-  logs.info("[eth2migration-export] checking exported files");
+  if (os.userInfo().username !== "root") {
+    logs.debug("Changing backup dir permissions to allow reading by non-root");
+    // The backup directory created by the Prysm container can only be read by its owner.
+    // In local integration tests that's the root user
+    // drwx------ 2 root root 4096 ene 20 19:35 backup
+    await shell(
+      [
+        "docker run",
+        "--rm",
+        `--name ${prysmMigrationContainerName}`,
+        `--volume ${outputVolumeName}:${prysmPaths.outVolumeTarget}`,
+        "--entrypoint=''",
+        prysmOldValidatorImage,
+        `chmod -R 777 ${prysmPaths.outDir}`
+      ],
+      { errorMessage: "change of outDir permissions failed" }
+    );
+  } else {
+    logs.debug("Skipping changing backup dir permissions, user is root");
+  }
+
+  logs.debug("Checking exported files");
 
   // Verify content is in host volume:
-  // - backup.zip and the unziped content (keystore_x.json)
-  // - slashing_protection.json
-  // - walletpassword.txt
-  if (!fs.existsSync(dappmanagerOutPaths.backupOutFilepath)) {
-    throw Error(
-      `backup.zip file not found in ${dappmanagerOutPaths.backupOutFilepath}`
-    );
-  }
-  if (!fs.existsSync(dappmanagerOutPaths.walletpasswordOutFilepath)) {
-    throw Error(
-      `walletpassword.txt file not found in ${dappmanagerOutPaths.walletpasswordOutFilepath}`
-    );
-  }
-  if (!fs.existsSync(dappmanagerOutPaths.slashingProtectionOutFilepath)) {
-    throw Error(
-      `slashing_protection.json file not found in ${dappmanagerOutPaths.slashingProtectionOutFilepath}`
-    );
+  //  - backup.zip and the unziped content (keystore_x.json)
+  //  - slashing_protection.json
+  //  - walletpassword.txt
+  for (const expectedFilePath of [
+    dappmanagerOutPaths.walletpasswordOutFilepath,
+    dappmanagerOutPaths.slashingProtectionOutFilepath,
+    dappmanagerOutPaths.backupOutFilepath
+  ]) {
+    if (!fs.existsSync(expectedFilePath)) {
+      const filepath = path.parse(expectedFilePath);
+      const filesInDir = fs.existsSync(filepath.dir)
+        ? fs.readdirSync(filepath.dir)
+        : null;
+
+      throw Error(`${filepath.base} file not found at ${expectedFilePath}
+Files in dir: ${filesInDir ? filesInDir.join(" ") : "dir does not exist"}`);
+    }
   }
 
-  logs.info("[eth2migration-export] extracting keystores backup zip");
+  logs.debug("Extracting keystores backup zip");
 
   // Extract zip
   await shell(
     [
+      // The backup directory created by the Prysm container can only be read by its owner.
+      // In local integration tests that's the root user
+      // drwx------ 2 root root 4096 ene 20 19:35 backup
+      // So we must unzip with sudo
       "unzip",
       dappmanagerOutPaths.backupOutFilepath,
       `-d ${dappmanagerOutPaths.keystoresOutDir}`
@@ -188,8 +208,6 @@ export async function exportKeystoresAndSlashingProtection({
     { errorMessage: "Error unzip backup.zip file" }
   );
 }
-
-// Utils
 
 /**
  * Return a string with the public keys comma separated
