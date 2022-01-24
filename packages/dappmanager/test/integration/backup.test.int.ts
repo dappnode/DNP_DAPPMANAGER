@@ -17,7 +17,7 @@ import { backupGet } from "../../src/calls/backupGet";
 import { backupRestore } from "../../src/calls/backupRestore";
 
 // MUST use function for this.timeout to work <====== function() ???
-describe("Integration test for backup to and from:", function() {
+describe("Integration test for backup to and from:", function () {
   /**
    * /etc/nginx/nginx.conf - single file 646 Bytes
    * /etc/nginx/conf.d - directory 8 KB
@@ -50,7 +50,7 @@ describe("Integration test for backup to and from:", function() {
    *   - data.conf
    */
 
-  beforeEach("Up a test docker container", async function() {
+  beforeEach("Up a test docker container", async function () {
     await createTestDir();
     // Create container
     await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
@@ -142,8 +142,9 @@ volumes:
     );
   });
 
-  after("Clean test docker container", async function() {
+  after("Clean test docker container", async function () {
     await cleanTestDir();
-    await shell(`docker rm -f ${containerName}`);
+    await shell(`docker rm -f -v ${containerName}`);
+    await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
   });
 });
