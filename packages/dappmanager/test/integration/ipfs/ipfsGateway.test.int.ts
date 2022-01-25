@@ -21,7 +21,7 @@ describe("IPFS remote", function () {
 
   before(async () => {
     // Set remote IPFS host
-    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.remote);
+    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
     // Upload manifest and dnp directrory
     manifestHash = await uploadManifestRelease(manifest);
     dnpReleaseHash = await uploadDirectoryRelease({
@@ -50,7 +50,7 @@ describe("IPFS remote", function () {
   });
 
   after(async () => {
-    // Set remote IPFS host
+    // Set remote IPFS host again
     ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
   });
 });

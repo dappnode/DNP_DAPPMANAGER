@@ -13,7 +13,7 @@ import {
 } from "../integrationSpecs";
 import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
 import { ipfs } from "../../src/modules/ipfs";
-import { ipfsApiUrl } from "../testIpfsUtils";
+import { ipfsApiUrl, ipfsGatewayUrl } from "../testIpfsUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -284,5 +284,8 @@ describe("Release format tests", () => {
   after("Remove DAppNode docker network", async () => {
     await shell(`docker network remove ${params.DNP_PRIVATE_NETWORK_NAME}`);
     await cleanTestDir();
+
+    // Set remote IPFS host again
+    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
   });
 });
