@@ -14,7 +14,8 @@ import {
   clearDbs,
   createTestDir,
   cleanRepos,
-  cleanContainers
+  cleanContainers,
+  shellSafe
 } from "../testUtils";
 import {
   uploadManifestRelease,
@@ -22,10 +23,7 @@ import {
 } from "../integrationSpecs";
 import shell from "../../src/utils/shell";
 import * as validate from "../../src/utils/validate";
-import {
-  dockerComposeDown,
-  dockerComposeUp
-} from "../../src/modules/docker/compose";
+import { dockerComposeUp } from "../../src/modules/docker/compose";
 import { ComposeEditor } from "../../src/modules/compose/editor";
 import { writeDefaultsToLabels } from "../../src/modules/compose";
 import { getContainerName, getImageTag } from "../../src/params";
@@ -395,7 +393,7 @@ describe("Fetch releases", () => {
       );
 
       after(async () => {
-        await dockerComposeDown(composePathMain, { volumes: true });
+        await shellSafe(`docker-compose -f ${composePathMain} down -v`);
       });
     });
   });
