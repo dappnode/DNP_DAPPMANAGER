@@ -61,12 +61,12 @@ export interface WireguardDeviceCredentials {
    * Address = 172.34.1.2
    * PrivateKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
    * ListenPort = 51820
-   * DNS = 172.33.1.2
+   * DNS = 172.30.1.2
    *
    * [Peer]
    * PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
    * Endpoint = aaaabbbbaaaabbbb.dyndns.dappnode.io:51820
-   * AllowedIPs = 172.33.0.0/16
+   * AllowedIPs = 172.30.0.0/16
    * ```
    */
   configRemote: string;
@@ -625,14 +625,14 @@ export interface ComposeService {
   container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   devices?: string[];
   depends_on?: string[];
-  dns?: string; // "172.33.1.2";
+  dns?: string; // "172.30.1.2";
   entrypoint?: string;
   env_file?: string[];
   environment?: PackageEnvs | string[];
   expose?: string[];
   extra_hosts?: string[];
   image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  // ipv4_address: "172.33.1.7";
+  // ipv4_address: "172.30.1.7";
   labels?: { [labelName: string]: string };
   logging?: {
     driver?: string;
@@ -669,7 +669,7 @@ export interface ComposeNetwork {
   driver?: string; // "bridge";
   ipam?: {
     config: {
-      /** subnet: "172.33.0.0/16" */
+      /** subnet: "172.30.0.0/16" */
       subnet: string;
     }[];
   };

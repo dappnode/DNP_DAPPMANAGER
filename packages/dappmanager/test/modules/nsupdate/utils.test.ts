@@ -56,7 +56,7 @@ describe("modules > nsupdate", () => {
   ): void {
     expect(nsupdateTxts[0]).to.equal(
       `
-server 172.33.1.2
+server 172.30.1.2
 debug yes
 zone eth.
 ${expectedNsupdateTxts.eth.trim()}
@@ -67,7 +67,7 @@ send
     );
     expect(nsupdateTxts[1]).to.equal(
       `
-server 172.33.1.2
+server 172.30.1.2
 debug yes
 zone dappnode.
 ${expectedNsupdateTxts.dappnode.trim()}
@@ -89,26 +89,26 @@ send
         ...mockContainer,
         dnpName: bitcoinDnpName,
         serviceName: bitcoinDnpName,
-        ip: "172.33.0.2"
+        ip: "172.30.0.2"
       },
       {
         ...mockContainer,
         dnpName: gethDnpName,
         serviceName: gethDnpName,
-        ip: "172.33.0.3",
+        ip: "172.30.0.3",
         chain: "ethereum"
       },
       {
         ...mockContainer,
         dnpName: pinnerDnpName,
         serviceName: pinnerService1,
-        ip: "172.33.0.4"
+        ip: "172.30.0.4"
       },
       {
         ...mockContainer,
         dnpName: pinnerDnpName,
         serviceName: pinnerService2,
-        ip: "172.33.0.5"
+        ip: "172.30.0.5"
       }
     ];
     const domainAliases = {
@@ -120,25 +120,25 @@ send
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.30.0.2
 update delete my.geth.dnp.dappnode.eth A
-update add my.geth.dnp.dappnode.eth 60 A 172.33.0.3
+update add my.geth.dnp.dappnode.eth 60 A 172.30.0.3
 update delete my.cluster.pinner.dnp.dappnode.eth A
-update add my.cluster.pinner.dnp.dappnode.eth 60 A 172.33.0.4
+update add my.cluster.pinner.dnp.dappnode.eth 60 A 172.30.0.4
 update delete my.app.pinner.dnp.dappnode.eth A
-update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
+update add my.app.pinner.dnp.dappnode.eth 60 A 172.30.0.5
 `,
         dappnode: `
 update delete bitcoin.dappnode A
-update add bitcoin.dappnode 60 A 172.33.0.2
+update add bitcoin.dappnode 60 A 172.30.0.2
 update delete geth.dappnode A
-update add geth.dappnode 60 A 172.33.0.3
+update add geth.dappnode 60 A 172.30.0.3
 update delete cluster.pinner.dappnode A
-update add cluster.pinner.dappnode 60 A 172.33.0.4
+update add cluster.pinner.dappnode 60 A 172.30.0.4
 update delete app.pinner.dappnode A
-update add app.pinner.dappnode 60 A 172.33.0.5
+update add app.pinner.dappnode 60 A 172.30.0.5
 update delete fullnode.dappnode A
-update add fullnode.dappnode 60 A 172.33.0.3
+update add fullnode.dappnode 60 A 172.30.0.3
 `
       });
     });
@@ -177,11 +177,11 @@ update delete fullnode.dappnode A
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A
-update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
+update add my.bitcoin.dnp.dappnode.eth 60 A 172.30.0.2
 `,
         dappnode: `
 update delete bitcoin.dappnode A
-update add bitcoin.dappnode 60 A 172.33.0.2
+update add bitcoin.dappnode 60 A 172.30.0.2
 `
       });
     });
@@ -214,13 +214,13 @@ update delete bitcoin.dappnode A`
         exitCode: null,
         image: "grafana.dms.dnp.dappnode.eth:1.0.1",
         instanceName: "",
-        ip: "172.33.0.3",
+        ip: "172.30.0.3",
         isCore: false,
         isDnp: true,
         isMain: true,
         networks: [
           {
-            ip: "172.33.0.3",
+            ip: "172.30.0.3",
             name: "dncore_network"
           }
         ],
@@ -238,15 +238,15 @@ update delete bitcoin.dappnode A`
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
 update delete my.grafana.dms.dnp.dappnode.eth A
-update add my.grafana.dms.dnp.dappnode.eth 60 A 172.33.0.3
+update add my.grafana.dms.dnp.dappnode.eth 60 A 172.30.0.3
 update delete my.dms.dnp.dappnode.eth A
-update add my.dms.dnp.dappnode.eth 60 A 172.33.0.3
+update add my.dms.dnp.dappnode.eth 60 A 172.30.0.3
   `,
         dappnode: `
 update delete grafana.dms.dappnode A
-update add grafana.dms.dappnode 60 A 172.33.0.3
+update add grafana.dms.dappnode 60 A 172.30.0.3
 update delete dms.dappnode A
-update add dms.dappnode 60 A 172.33.0.3`
+update add dms.dappnode 60 A 172.30.0.3`
       });
     });
   });

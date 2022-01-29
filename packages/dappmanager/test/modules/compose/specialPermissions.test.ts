@@ -16,7 +16,7 @@ describe("Modules > compose", () => {
           privileged: true,
           networks: {
             network: {
-              ipv4_address: "172.33.10.4"
+              ipv4_address: "172.30.10.4"
             }
           },
           cap_add: ["NET_ADMIN", "SYS_ADMIN"],

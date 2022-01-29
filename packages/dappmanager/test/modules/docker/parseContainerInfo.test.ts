@@ -38,7 +38,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1560420780,
         image: "otpweb.dnp.dappnode.eth:0.0.3",
-        ip: "172.33.0.9",
+        ip: "172.30.0.9",
         ports: [
           {
             container: 80,
@@ -47,7 +47,7 @@ describe("modules / docker / parseContainerInfo", function() {
           }
         ],
         volumes: [],
-        networks: [{ name: "dncore_network", ip: "172.33.0.9" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.9" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -71,7 +71,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1560420777,
         image: "nginx-proxy.dnp.dappnode.eth:0.0.3",
-        ip: "172.33.0.6",
+        ip: "172.30.0.6",
         ports: [
           {
             host: 443,
@@ -113,7 +113,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "nginxproxydnpdappnodeeth_html"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.6" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.6" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -133,7 +133,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1560369616,
         image: "vipnode.dnp.dappnode.eth:0.0.2",
-        ip: "172.33.0.5",
+        ip: "172.30.0.5",
         ports: [],
         volumes: [
           {
@@ -143,7 +143,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.5" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.5" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -191,7 +191,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560335154,
         image: "admin.dnp.dappnode.eth:0.2.3",
-        ip: "172.33.1.9",
+        ip: "172.30.1.9",
         ports: [
           {
             host: 8090,
@@ -213,7 +213,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.9" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.9" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -233,7 +233,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334861,
         image: "vpn.dnp.dappnode.eth:0.2.0",
-        ip: "172.33.1.4",
+        ip: "172.30.1.4",
         ports: [
           {
             host: 1194,
@@ -277,7 +277,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_vpndnpdappnodeeth_shared"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.4" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.4" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -297,7 +297,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334707,
         image: "dappmanager.dnp.dappnode.eth:0.2.3",
-        ip: "172.33.1.7",
+        ip: "172.30.1.7",
         ports: [],
         volumes: [
           {
@@ -315,7 +315,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.7" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.7" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -335,7 +335,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334707,
         image: "bind.dnp.dappnode.eth:0.2.0",
-        ip: "172.33.1.2",
+        ip: "172.30.1.2",
         ports: [
           {
             container: 53,
@@ -351,7 +351,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_binddnpdappnodeeth_data"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.2" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.2" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -371,7 +371,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334707,
         image: "ethchain.dnp.dappnode.eth:0.2.1",
-        ip: "172.33.1.6",
+        ip: "172.30.1.6",
         ports: [
           {
             host: 30303,
@@ -400,7 +400,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.6" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.6" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -461,7 +461,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334697,
         image: "ipfs.dnp.dappnode.eth:0.2.2",
-        ip: "172.33.1.5",
+        ip: "172.30.1.5",
         ports: [
           {
             container: 5001,
@@ -505,7 +505,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "dncore_ipfsdnpdappnodeeth_export"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.1.5" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.5" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -537,10 +537,10 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1560334412,
         image: "ethforward.dnp.dappnode.eth:0.2.1",
-        ip: "172.33.1.3",
+        ip: "172.30.1.3",
         ports: [],
         volumes: [],
-        networks: [{ name: "dncore_network", ip: "172.33.1.3" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.3" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -560,7 +560,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1558708223,
         image: "swarm.dnp.dappnode.eth:0.1.0",
-        ip: "172.33.0.7",
+        ip: "172.30.0.7",
         ports: [
           {
             host: 30399,
@@ -582,7 +582,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "swarmdnpdappnodeeth_swarm"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.7" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.7" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -602,7 +602,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1558377639,
         image: "letsencrypt-nginx.dnp.dappnode.eth:0.0.4",
-        ip: "172.33.0.8",
+        ip: "172.30.0.8",
         ports: [],
         volumes: [
           {
@@ -625,7 +625,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.8" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.8" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -647,7 +647,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1558258487,
         image: "ipfs-replicator.dnp.dappnode.eth:0.1.0",
-        ip: "172.33.0.4",
+        ip: "172.30.0.4",
         ports: [],
         volumes: [
           {
@@ -657,7 +657,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "ipfsreplicatordnpdappnodeeth_pin-data"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.4" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.4" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -678,7 +678,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1558258483,
         image: "goerli-geth.dnp.dappnode.eth:0.2.2",
-        ip: "172.33.0.3",
+        ip: "172.30.0.3",
         ports: [
           {
             host: 32769,
@@ -707,7 +707,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "goerligethdnpdappnodeeth_goerli"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.3" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.3" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -728,7 +728,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: false,
         created: 1558258481,
         image: "ln.dnp.dappnode.eth:0.1.1",
-        ip: "172.33.0.2",
+        ip: "172.30.0.2",
         ports: [
           {
             container: 80,
@@ -755,7 +755,7 @@ describe("modules / docker / parseContainerInfo", function() {
             name: "lndnpdappnodeeth_lndconfig_data"
           }
         ],
-        networks: [{ name: "dncore_network", ip: "172.33.0.2" }],
+        networks: [{ name: "dncore_network", ip: "172.30.0.2" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -777,7 +777,7 @@ describe("modules / docker / parseContainerInfo", function() {
         isCore: true,
         created: 1557330387,
         image: "wamp.dnp.dappnode.eth:0.2.0",
-        ip: "172.33.1.8",
+        ip: "172.30.1.8",
         ports: [
           {
             container: 8000,
@@ -791,7 +791,7 @@ describe("modules / docker / parseContainerInfo", function() {
           }
         ],
         volumes: [],
-        networks: [{ name: "dncore_network", ip: "172.33.1.8" }],
+        networks: [{ name: "dncore_network", ip: "172.30.1.8" }],
         state: "running",
         running: true,
         exitCode: null,
@@ -818,13 +818,13 @@ describe("modules / docker / parseContainerInfo", function() {
         exitCode: null,
         image: "grafana.dms.dnp.dappnode.eth:1.0.1",
         instanceName: "",
-        ip: "172.33.0.3",
+        ip: "172.30.0.3",
         isCore: false,
         isDnp: true,
         isMain: true,
         networks: [
           {
-            ip: "172.33.0.3",
+            ip: "172.30.0.3",
             name: "dncore_network"
           }
         ],

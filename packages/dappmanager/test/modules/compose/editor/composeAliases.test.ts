@@ -16,7 +16,7 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -84,7 +84,7 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -139,7 +139,7 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'

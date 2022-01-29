@@ -8,11 +8,11 @@ rndc showzone ${DOMAIN} in dappmanager >/dev/null 2>&1 && rndc delzone ${DOMAIN}
 rndc showzone ${DOMAIN} in internal_domain >/dev/null 2>&1 && rndc delzone ${DOMAIN} in internal_domain;
 
 ## Add an upgradeable DOMAIN zone to 'dappmanager' view
-rndc addzone ${DOMAIN} in dappmanager '{type master; file "/etc/bind/dappnode.io.hosts"; allow-update{ 172.33.1.7;}; };'
+rndc addzone ${DOMAIN} in dappmanager '{type master; file "/etc/bind/dappnode.io.hosts"; allow-update{ 172.30.1.7;}; };'
 
 ## Update the DOMAIN zone with the DOMAIN and its interal IP address
 nsupdate << EOF
-server 172.33.1.2
+server 172.30.1.2
 debug yes
 zone ${DOMAIN}.
 update delete ${DOMAIN}. A

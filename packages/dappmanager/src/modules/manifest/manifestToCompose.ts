@@ -71,7 +71,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
           [params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]: {
             driver: "bridge",
             ipam: {
-              config: [{ subnet: image.subnet || "172.33.0.0/16" }]
+              config: [{ subnet: image.subnet || "172.30.0.0/16" }]
             }
           }
         }

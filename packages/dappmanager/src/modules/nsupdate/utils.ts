@@ -42,19 +42,19 @@ function isAliasAllowed(alias: string, dnp: PackageContainerWithIp): boolean {
  * Constructs a nsupdate.txt file contents
  *
  * @param domains [
- *   { domain: "bitcoin.dappnode", ip: "172.33.0.2" },
- *   { domain: "monero.dappnode", ip: "172.33.0.3" }
+ *   { domain: "bitcoin.dappnode", ip: "172.30.0.2" },
+ *   { domain: "monero.dappnode", ip: "172.30.0.3" }
  * ]
  * @param zone "dappnode."
  * @returns nsupdate.txt contents
  *
- * server 172.33.1.2
+ * server 172.30.1.2
  * debug yes
  * zone dappnode.
  * update delete bitcoin.dappnode A
- * update add bitcoin.dappnode 60 A 172.33.0.2
+ * update add bitcoin.dappnode 60 A 172.30.0.2
  * update delete monero.dappnode A
- * update add monero.dappnode 60 A 172.33.0.3
+ * update add monero.dappnode 60 A 172.30.0.3
  * show
  * send
  */
@@ -72,7 +72,7 @@ function getNsupdateTxt(
     .join("\n");
 
   return `
-server 172.33.1.2
+server 172.30.1.2
 debug yes
 zone ${zone}
 ${nsupdateInstructions}

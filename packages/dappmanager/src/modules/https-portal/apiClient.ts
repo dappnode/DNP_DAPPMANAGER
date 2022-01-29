@@ -35,7 +35,7 @@ export class HttpsPortalApiClient {
   baseUrl: string;
 
   /**
-   * @param baseUrl "http://172.33.0.6:5000"
+   * @param baseUrl "http://172.30.0.6:5000"
    */
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;

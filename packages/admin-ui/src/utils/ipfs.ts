@@ -46,7 +46,7 @@ export async function addBootstrap(peer: string) {
  *   PublicKey: "AsDFGHJkKjHGfDsQwErTyUiKNDsdFGhjKkJhGFdSeRtYUiJhFDsdfGHjIGcG/bGeEo3+BYjFkjMLor/thjk8wq4chVNCj+VH8RuKzQrkCJr++1i3NFHpJaRsy0zuXPWRJcO2sRVJn6ZMUG1lM/cFlpBpb3VSj1AFeoIXec547Bz36Q7AQdKWxwskRBJ1gCo0unJ4lsBBongstuywTtPReLbki+jb3OgOwcfiRM/uq/kP0bq6rBzLRx0d5cYIo4cQdoN4IaL/99TEKji/sLOPZEQdzYq0UV6yk3uTpza9pq1kL6Nd4obY6F1QW7BUw/vunxHMThtD+j1+5M84FHLFWjRaoOnhJ6PLLzM0f40FOOvLUzdwdDm4eBXBjUZpWUO+mpoOAkwxAgMBAAE=",
  *   Addresses: [
  *     "/ip4/127.0.0.1/tcp/4001/ipfs/QmWasdappdappdapptyuioasdfghjqwertyuiasdfghjdap",
- *     "/ip4/172.33.1.5/tcp/4001/ipfs/QmWasdappdappdapptyuioasdfghjqwertyuiasdfghjdap",
+ *     "/ip4/172.30.1.5/tcp/4001/ipfs/QmWasdappdappdapptyuioasdfghjqwertyuiasdfghjdap",
  *     "/ip4/85.200.85.20/tcp/4001/ipfs/QmWasdappdappdapptyuioasdfghjqwertyuiasdfghjdap"
  *   ],
  *   AgentVersion: "go-ipfs/0.4.20/8efc82534",

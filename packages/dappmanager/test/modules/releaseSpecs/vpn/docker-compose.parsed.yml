@@ -2,13 +2,13 @@ version: "3.5"
 services:
   vpn.dnp.dappnode.eth:
     container_name: DAppNodeCore-vpn.dnp.dappnode.eth
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     image: "vpn.dnp.dappnode.eth:0.2.5"
     logging:
       driver: journald
     networks:
       network:
-        ipv4_address: 172.33.1.4
+        ipv4_address: 172.30.1.4
         aliases:
           - "vpn.dappnode"
     ports:
@@ -32,4 +32,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.33.0.0/16
+        - subnet: 172.30.0.0/16

@@ -13,7 +13,7 @@ describe("Migration", () => {
     serviceName: "dappmanager.dnp.dappnode.eth",
     networks: [
       { name: "random", ip: "10.0.1.1" },
-      { name: "dncore_network", ip: "172.33.1.7" }
+      { name: "dncore_network", ip: "172.30.1.7" }
     ]
   };
 
@@ -28,10 +28,10 @@ services:
     image: "chentex/random-logger"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     networks:
       dncore_network:
-        ipv4_address: 172.33.1.7`;
+        ipv4_address: 172.30.1.7`;
 
   const composeToBeMigratedBefore = `
 version: '3.4'
@@ -40,16 +40,16 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.33.0.0/16
+        - subnet: 172.30.0.0/16
 services:
   dappmanager.dnp.dappnode.eth:
     image: "chentex/random-logger"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     networks:
       network:
-        ipv4_address: 172.33.1.7`;
+        ipv4_address: 172.30.1.7`;
 
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
   const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
@@ -101,10 +101,10 @@ services:
     image: chentex/random-logger
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
+    dns: 172.30.1.2
     networks:
       dncore_network:
-        ipv4_address: 172.33.1.7
+        ipv4_address: 172.30.1.7
         aliases:
           - dappmanager.dnp.dappnode.eth.test-migration.dappnode`;
 
