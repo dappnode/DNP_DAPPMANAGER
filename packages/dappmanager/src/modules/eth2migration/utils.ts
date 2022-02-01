@@ -1,9 +1,9 @@
-import { Eth2Network, Eth2Client } from "./params";
 import params from "../../params";
 import { imagesList } from "../docker/api";
 import semver from "semver";
 import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
+import { Eth2Client, Eth2Network } from "../../types";
 
 /**
  * Fetch _SOME_ image from the available prysm package

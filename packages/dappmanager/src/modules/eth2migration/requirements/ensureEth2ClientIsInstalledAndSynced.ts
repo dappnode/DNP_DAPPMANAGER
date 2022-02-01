@@ -1,8 +1,8 @@
 import { packageInstall } from "../../../calls";
 import { logs } from "../../../logs";
 import { listPackageNoThrow } from "../../docker/list";
-import { Eth2Client } from "../params";
 import semver from "semver";
+import { Eth2Client } from "../../../types";
 
 /**
  * Ensures:

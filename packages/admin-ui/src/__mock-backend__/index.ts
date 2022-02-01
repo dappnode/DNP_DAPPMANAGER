@@ -241,7 +241,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "http://ipfs.dappnode.io:8081"
-  })
+  }),
+  eth2Migrate: async () => {}
 };
 
 export const calls: Routes = {

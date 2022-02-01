@@ -21,10 +21,6 @@ export const eth2migrationParams = {
   }
 };
 
-export type Eth2Network = "prater" | "mainnet";
-
-export type Eth2Client = "prysm" | "teku" | "lighthouse";
-
 // Web3signer
 export interface Web3signerImportResponse {
   data: {

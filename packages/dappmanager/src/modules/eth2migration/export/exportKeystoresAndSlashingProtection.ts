@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { Eth2Network } from "../params";
 import shell from "../../../utils/shell";
 import {
   prysmMigrationContainerName,
@@ -9,6 +8,7 @@ import {
   dappmanagerOutPaths
 } from "./params";
 import { logs } from "../../../logs";
+import { Eth2Network } from "../../../types";
 
 /**
  * Export eth2 validator from Prysm non-web3signer version to docker volume:

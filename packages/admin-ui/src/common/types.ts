@@ -1441,3 +1441,7 @@ export interface TrustedReleaseKey {
   /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
   key: string;
 }
+
+export type Eth2Network = "prater" | "mainnet";
+
+export type Eth2Client = "prysm" | "teku" | "lighthouse";

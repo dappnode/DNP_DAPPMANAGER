@@ -1,5 +1,5 @@
+import { Eth2Client } from "../../../types";
 import { dockerContainerRemove } from "../../docker";
-import { Eth2Client } from "../params";
 import { ensureEth2ClientIsInstalledAndSynced } from "./ensureEth2ClientIsInstalledAndSynced";
 import { ensureOldPrysmValidatorContainerIsRemoved } from "./ensureOldPrysmValidatorContainerIsRemoved";
 import { ensureWeb3SignerIsInstalledAndStopped } from "./ensureWeb3SignerIsInstalledAndStopped";

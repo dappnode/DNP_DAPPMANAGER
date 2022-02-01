@@ -17,7 +17,7 @@ const imagesToPull = [
   "alpine:latest"
 ];
 
-describe("eth2migrations", function () {
+describe.skip("eth2migrations", function () {
   const prysmComposePath = `${__dirname}/DAppNodePackage-prysm-prater/docker-compose.yml`;
   const tekuComposePath = `${__dirname}/DAppNodePackage-teku-prater/docker-compose.yml`;
   const web3signerComposePath = `${__dirname}/DAppNodePackage-web3signer-prater/docker-compose.yml`;

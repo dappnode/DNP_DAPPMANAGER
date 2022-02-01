@@ -43,7 +43,9 @@ import {
   HostVolumeGroup,
   HostLogicalVolume,
   IpfsRepository,
-  TrustedReleaseKey
+  TrustedReleaseKey,
+  Eth2Client,
+  Eth2Network
 } from "./types";
 
 export interface Routes {
@@ -213,6 +215,15 @@ export interface Routes {
   ethClientTargetSet: (kwargs: {
     target: EthClientTarget;
     deletePrevEthClient?: boolean;
+  }) => Promise<void>;
+
+  /**
+   * Eth2migrate from prysm-non-web3signer version
+   * to eth2client-web3signer-version
+   */
+  eth2Migrate: (kwargs: {
+    client: Eth2Client;
+    network: Eth2Network;
   }) => Promise<void>;
 
   /**
@@ -682,6 +693,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerEngineUpdateCheck: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
+  eth2Migrate: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},

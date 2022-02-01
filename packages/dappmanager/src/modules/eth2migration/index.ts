@@ -14,7 +14,6 @@ import shell from "../../utils/shell";
 import { dockerContainerStart, dockerVolumeRemove } from "../docker";
 // Params
 import params from "../../params";
-import { Eth2Client, Eth2Network } from "./params";
 // Utils
 import getDappmanagerImage from "../../utils/getDappmanagerImage";
 import {
@@ -23,6 +22,7 @@ import {
   moveWalletDirOldPrysmVolume
 } from "./utils";
 import { logs } from "../../logs";
+import { Eth2Client, Eth2Network } from "../../types";
 
 export async function eth2Migrate({
   client,
