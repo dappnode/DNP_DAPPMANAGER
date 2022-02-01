@@ -12,7 +12,7 @@ export async function cleanInstallationArtifacts(
   // Kill one by one. Otherwise if container 1 errors, the rest won't be deleted
   for (const containerToKill of containersToKill.trim().split(/\s+/))
     if (containerToKill)
-      await shell(`docker rm -f ${containerToKill}`).catch(e => {
+      await shell(`docker rm -v -f ${containerToKill}`).catch(e => {
         console.warn(`Error cleaning container ${containerToKill}`, e);
       });
 }

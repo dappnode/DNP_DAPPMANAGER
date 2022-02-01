@@ -14,7 +14,8 @@ import {
   clearDbs,
   createTestDir,
   cleanRepos,
-  cleanContainers
+  cleanContainers,
+  shellSafe
 } from "../testUtils";
 import {
   uploadManifestRelease,
@@ -390,6 +391,10 @@ describe("Fetch releases", () => {
       expect(omit(result, ["imageSize"])).to.deep.equal(
         omit(expectRequestDnp, ["imageSize"])
       );
+
+      after(async () => {
+        await shellSafe(`docker-compose -f ${composePathMain} down -v`);
+      });
     });
   });
 });

@@ -42,7 +42,7 @@ export function clearDbs(): void {
 }
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
-  return async function(arg: A): Promise<R | undefined> {
+  return async function (arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {
@@ -71,7 +71,7 @@ export async function cleanContainers(
   for (const containerId of containerIds) {
     // Clean containers
     await shellSafe(
-      `docker rm -f $(docker ps -aq --filter name=${containerId})`
+      `docker rm -f -v $(docker ps -aq --filter name=${containerId})`
     );
     // Clean associated volumes
     const volumePrefix = containerId;
@@ -155,8 +155,7 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
   LayersSize: 101010101,
   Images: [
     {
-      Id:
-        "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
+      Id: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
       ParentId: "",
       RepoTags: ["busybox:latest"],
       RepoDigests: [

@@ -5,13 +5,15 @@ import * as calls from "../../src/calls";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
-import { TrustedReleaseKey } from "../../src/types";
+import { IpfsClientTarget, TrustedReleaseKey } from "../../src/types";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
 } from "../integrationSpecs";
 import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
+import { ipfs } from "../../src/modules/ipfs";
+import { ipfsApiUrl } from "../testIpfsUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -197,6 +199,10 @@ describe("Release format tests", () => {
       `docker network ls --filter name=${dncoreNetwork} -q`
     );
     if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
+  });
+
+  before("Change IPFS host", async () => {
+    ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
   });
 
   for (const releaseTest of releaseTests) {
