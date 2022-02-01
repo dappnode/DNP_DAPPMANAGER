@@ -7,7 +7,10 @@ import semver from "semver";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 import {
   prysmLegacyStableVersion,
-  prysmLegacyStableUpstreamVersion
+  prysmLegacyStableUpstreamVersion,
+  prysmDnpName,
+  prysmPraterDnpName,
+  prysmPraterLegacyStableVersion
 } from "./params";
 
 /**
@@ -19,23 +22,52 @@ export default function AlertEth2migration({
 }: {
   dnp: InstalledPackageDetailData;
 }) {
-  return (
-    <>
-      {semver.eq(dnp.version, prysmLegacyStableVersion) ? (
-        <Alert variant="info" className="main-notification">
-          <div>{prettyDnpName(dnp.dnpName)} update available to version </div>
+  switch (dnp.dnpName) {
+    case prysmDnpName:
+      return (
+        <>
+          {semver.eq(dnp.version, prysmLegacyStableVersion) ? (
+            <Alert variant="info" className="main-notification">
+              <div>
+                {prettyDnpName(dnp.dnpName)} update available to version{" "}
+              </div>
 
-          <Button variant="dappnode">Eth2 migration</Button>
-        </Alert>
-      ) : semver.lte(dnp.version, prysmLegacyStableVersion) ? (
-        <AlertPackageUpdateAvailable
-          dnpName={dnp.dnpName}
-          updateAvailable={{
-            newVersion: prysmLegacyStableVersion,
-            upstreamVersion: prysmLegacyStableUpstreamVersion
-          }}
-        />
-      ) : null}
-    </>
-  );
+              <Button variant="dappnode">Eth2 migration</Button>
+            </Alert>
+          ) : semver.lte(dnp.version, prysmLegacyStableVersion) ? (
+            <AlertPackageUpdateAvailable
+              dnpName={dnp.dnpName}
+              updateAvailable={{
+                newVersion: prysmLegacyStableVersion,
+                upstreamVersion: prysmLegacyStableUpstreamVersion
+              }}
+            />
+          ) : null}
+        </>
+      );
+    case prysmPraterDnpName:
+      return (
+        <>
+          {semver.eq(dnp.version, prysmPraterLegacyStableVersion) ? (
+            <Alert variant="info" className="main-notification">
+              <div>
+                {prettyDnpName(dnp.dnpName)} update available to version{" "}
+              </div>
+
+              <Button variant="dappnode">Eth2 migration</Button>
+            </Alert>
+          ) : semver.lte(dnp.version, prysmLegacyStableVersion) ? (
+            <AlertPackageUpdateAvailable
+              dnpName={dnp.dnpName}
+              updateAvailable={{
+                newVersion: prysmPraterLegacyStableVersion,
+                upstreamVersion: prysmLegacyStableUpstreamVersion
+              }}
+            />
+          ) : null}
+        </>
+      );
+    default:
+      return null;
+  }
 }

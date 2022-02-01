@@ -1,5 +1,7 @@
 import { MockDnp, PortProtocol } from "./types";
 
+// There should be shown in the mock UI the eth2migration option for the prysm prater package
+
 const dnpName = "prysm-prater.dnp.dappnode.eth";
 const serviceNames = {
   beaconChain: "beacon-chain",
@@ -8,12 +10,11 @@ const serviceNames = {
 const serviceName = dnpName;
 
 export const prysmPraterLegacy: MockDnp = {
-  avatar:
-    "https://github.com/dappnode/DAppNodePackage-prysm-prater/blob/master/avatar-prysm-prater.png",
+  avatar: "",
 
   metadata: {
     name: dnpName,
-    version: "0.1.6",
+    version: "0.1.7",
     upstreamVersion: "v2.0.6",
     description:
       "Validate with prysm: a Go implementation of the Ethereum 2.0 Serenity protocol and open source project created by Prysmatic Labs. Beacon node which powers the beacon chain at the core of Ethereum 2.0\n\nIt includes a Grafana dashboard for the [DMS](http://my.dappnode/#/installer/dms.dnp.dappnode.eth) thanks to the amazing work of [metanull-operator](https://github.com/metanull-operator/eth2-grafana)",
