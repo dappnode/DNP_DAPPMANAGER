@@ -11,5 +11,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repository: lodotek/DNP_CORE
+          repository: dappnode/DNP_CORE
           event-type: build_release
