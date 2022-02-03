@@ -16,7 +16,7 @@ export function SshManager() {
 
       <div className="subtle-header">CHANGE SSH PORT</div>
       <p>
-        Change SHH port of your DAppNode. Port number must be greater than 0 and
+        Change SSH port of your DAppNode. Port number must be greater than 0 and
         less than 65536
       </p>
       <SshManagerChangePort />
