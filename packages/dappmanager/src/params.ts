@@ -144,7 +144,7 @@ const params = {
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
   IPFS_LOCAL: "http://ipfs.dappnode:5001",
-  IPFS_REMOTE: "http://ipfs.dappnode.io:8081",
+  IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
   ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
