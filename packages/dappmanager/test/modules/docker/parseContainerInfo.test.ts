@@ -20,7 +20,7 @@ describe("modules / docker / parseDnpNameFromContainerName", () => {
   }
 });
 
-describe("modules / docker / parseContainerInfo", function() {
+describe("modules / docker / parseContainerInfo", function () {
   it("should parse docker containers", async () => {
     const containers = dockerApiResponseContainers.map(parseContainerInfo);
     // console.log(JSON.stringify(containers, null, 2));
@@ -43,7 +43,8 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [],
@@ -77,13 +78,15 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 443,
             container: 443,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 80,
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
@@ -94,12 +97,10 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             host: "",
             container: "/etc/nginx/dhparam",
-            name:
-              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
+            name: "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
           },
           {
-            host:
-              "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+            host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
             name: "nginxproxydnpdappnodeeth_vhost.d"
           },
@@ -137,8 +138,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
+            host: "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/app/.ethchain",
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
@@ -197,18 +197,19 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 8090,
             container: 8090,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/usr/www/openvpn/cred",
             name: "dncore_vpndnpdappnodeeth_shared"
           }
@@ -239,13 +240,13 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 1194,
             container: 1194,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
+            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
             container: "/etc/openvpn",
             name: "dncore_vpndnpdappnodeeth_config"
           },
@@ -271,8 +272,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/var/run/docker.sock"
           },
           {
-            host:
-              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/var/spool/openvpn",
             name: "dncore_vpndnpdappnodeeth_shared"
           }
@@ -305,8 +305,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/usr/src/app/DNCORE"
           },
           {
-            host:
-              "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
+            host: "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
             container: "/usr/src/app/dnp_repo",
             name: "dncore_dappmanagerdnpdappnodeeth_data"
           },
@@ -340,13 +339,13 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 53,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
+            host: "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
             container: "/etc/bind",
             name: "dncore_binddnpdappnodeeth_data"
           }
@@ -377,25 +376,27 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: false
+            deletable: false,
+            hasIpv6: false
           },
           {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: false
+            deletable: false,
+            hasIpv6: false
           },
           {
             host: 30304,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: false
+            deletable: false,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
+            host: "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/root/.local/share/io.parity.ethereum",
             name: "dncore_ethchaindnpdappnodeeth_data"
           }
@@ -466,41 +467,44 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 5001,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             container: 8081,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 4001,
             container: 4001,
             protocol: PortProtocol.TCP,
-            deletable: false
+            deletable: false,
+            hasIpv6: false
           },
           {
             host: 4002,
             container: 4002,
             protocol: PortProtocol.UDP,
-            deletable: false
+            deletable: false,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
+            host: "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
             container: "/data/ipfs",
             name: "dncore_ipfsdnpdappnodeeth_data"
           },
           {
-            host:
-              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
+            host: "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
             container: "/export",
             name: "dncore_ipfsdnpdappnodeeth_export"
           }
@@ -566,13 +570,15 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
@@ -610,8 +616,7 @@ describe("modules / docker / parseContainerInfo", function() {
             container: "/etc/nginx/certs"
           },
           {
-            host:
-              "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+            host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
             name: "nginxproxydnpdappnodeeth_vhost.d"
           },
@@ -651,8 +656,7 @@ describe("modules / docker / parseContainerInfo", function() {
         ports: [],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
+            host: "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
             container: "/usr/src/app/data",
             name: "ipfsreplicatordnpdappnodeeth_pin-data"
           }
@@ -684,25 +688,27 @@ describe("modules / docker / parseContainerInfo", function() {
             host: 32769,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 32771,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 32770,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
+            host: "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
             container: "/goerli",
             name: "goerligethdnpdappnodeeth_goerli"
           }
@@ -733,24 +739,26 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             host: 9735,
             container: 9735,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             container: 10009,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [
           {
-            host:
-              "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
+            host: "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
             container: "/root/.lnd",
             name: "lndnpdappnodeeth_lndconfig_data"
           }
@@ -782,12 +790,14 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 8000,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
+            hasIpv6: false
           }
         ],
         volumes: [],
@@ -832,6 +842,7 @@ describe("modules / docker / parseContainerInfo", function() {
           {
             container: 3000,
             deletable: true,
+            hasIpv6: false,
             protocol: PortProtocol.TCP
           }
         ],
@@ -842,8 +853,7 @@ describe("modules / docker / parseContainerInfo", function() {
         volumes: [
           {
             container: "/var/lib/grafana",
-            host:
-              "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
+            host: "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
             name: "dmsdnpdappnodeeth_grafana_data"
           }
         ]

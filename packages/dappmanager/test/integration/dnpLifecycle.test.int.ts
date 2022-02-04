@@ -353,13 +353,15 @@ describe("DNP lifecycle", function () {
         host: portsMain.one.host,
         container: portsMain.one.container,
         protocol: portsMain.one.protocol,
-        deletable: false
+        deletable: false,
+        hasIpv6: true
       });
       expect(port2222).to.deep.equal({
         host: portsMain.two.newHost,
         container: portsMain.two.container,
         protocol: portsMain.two.protocol,
-        deletable: false
+        deletable: false,
+        hasIpv6: true
       });
     });
 
@@ -521,7 +523,8 @@ describe("DNP lifecycle", function () {
         host: portNumber,
         container: portNumber,
         protocol,
-        deletable: true
+        deletable: true,
+        hasIpv6: true
       });
     });
   });

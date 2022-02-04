@@ -103,7 +103,7 @@ export function parseDockerApiListPorts(
   defaultPorts: PortMapping[] | undefined
 ): PortMapping[] {
   return ports
-    .filter(port => port.IP.trim() !== "::")
+    .filter(port => port.IP && port.IP.trim() !== "::")
     .map(
       ({ PrivatePort, PublicPort, Type }): PortMapping =>
         // "PublicPort" will be undefined / null / 0 if the port is not mapped
