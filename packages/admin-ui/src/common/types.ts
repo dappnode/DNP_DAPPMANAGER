@@ -371,6 +371,7 @@ export interface PortMapping extends BasicPortMapping {
   ephemeral?: boolean;
   ip?: string;
   deletable?: boolean;
+  hasIpv6?: boolean;
 }
 
 export interface PackagePort {

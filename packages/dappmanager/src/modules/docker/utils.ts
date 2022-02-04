@@ -1,4 +1,7 @@
+import Dockerode from "dockerode";
 import stripAnsi from "strip-ansi";
+import { PortMapping, PortProtocol } from "../../types";
+import { isPortMappingDeletable } from "./list/isPortMappingDeletable";
 
 /**
  * When fetching logs from the API, each line is prefixed by a Header
@@ -67,4 +70,60 @@ export function getDockerTimeoutMax(
     }
   }
   return timeout;
+}
+
+/**
+ * Returns the ports value returned by the docker api for a specific container.
+ * Example of ports: Dockerode.Ports[]
+ *   - "IP": "0.0.0.0" => for ipv4
+ *   - "IP": "::" => for ipv6
+ * ```
+ * "Ports": [
+      {
+        "PrivatePort": 80,
+        "Type": "tcp"
+      },
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8000,
+        "PublicPort": 2345,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8000,
+        "PublicPort": 2345,
+        "Type": "tcp"
+      }
+    ]
+ * ```
+ */
+export function parseDockerApiListPorts(
+  ports: Dockerode.Port[],
+  defaultPorts: PortMapping[] | undefined
+): PortMapping[] {
+  return ports
+    .filter(port => port.IP.trim() !== "::")
+    .map(
+      ({ PrivatePort, PublicPort, Type }): PortMapping =>
+        // "PublicPort" will be undefined / null / 0 if the port is not mapped
+        ({
+          ...(PublicPort ? { host: PublicPort } : {}),
+          container: PrivatePort,
+          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP,
+          hasIpv6: ports.some(
+            port =>
+              port.PrivatePort === PrivatePort &&
+              port.PublicPort === PublicPort &&
+              port.Type === Type &&
+              port.IP.trim() === "::"
+          )
+        })
+    )
+    .map(
+      (port): PortMapping => ({
+        ...port,
+        deletable: isPortMappingDeletable(port, defaultPorts)
+      })
+    );
 }

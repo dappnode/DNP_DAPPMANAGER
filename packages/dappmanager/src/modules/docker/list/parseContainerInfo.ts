@@ -3,9 +3,7 @@ import params from "../../../params";
 import {
   PackageContainer,
   VolumeMapping,
-  ContainerState,
-  PortProtocol,
-  PortMapping
+  ContainerState
 } from "../../../types";
 import {
   parseEnvironment,
@@ -14,8 +12,8 @@ import {
   readContainerLabels
 } from "../../compose";
 import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile";
-import { isPortMappingDeletable } from "./isPortMappingDeletable";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
+import { parseDockerApiListPorts } from "../utils";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -69,19 +67,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     created: container.Created,
     image: container.Image,
     ip: containerNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.IPAddress,
-    ports: container.Ports.map(
-      ({ PrivatePort, PublicPort, Type }): PortMapping => ({
-        // "PublicPort" will be undefined / null / 0 if the port is not mapped
-        ...(PublicPort ? { host: PublicPort } : {}),
-        container: PrivatePort,
-        protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP
-      })
-    ).map(
-      (port): PortMapping => ({
-        ...port,
-        deletable: isPortMappingDeletable(port, defaultPorts)
-      })
-    ),
+    ports: parseDockerApiListPorts(container.Ports, defaultPorts),
     volumes: container.Mounts.map(
       ({ Name, Source, Destination }): VolumeMapping => ({
         host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
