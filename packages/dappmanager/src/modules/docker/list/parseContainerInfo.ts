@@ -13,7 +13,7 @@ import {
 } from "../../compose";
 import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
-import { parseDockerApiListPorts } from "../utils";
+import { ensureUniquePortsFromDockerApi } from "../utils";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -67,7 +67,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     created: container.Created,
     image: container.Image,
     ip: containerNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.IPAddress,
-    ports: parseDockerApiListPorts(container.Ports, defaultPorts),
+    ports: ensureUniquePortsFromDockerApi(container.Ports, defaultPorts),
     volumes: container.Mounts.map(
       ({ Name, Source, Destination }): VolumeMapping => ({
         host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",

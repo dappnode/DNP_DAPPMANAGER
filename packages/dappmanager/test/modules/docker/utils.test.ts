@@ -3,7 +3,7 @@ import { expect } from "chai";
 
 import {
   getDockerTimeoutMax,
-  parseDockerApiListPorts,
+  ensureUniquePortsFromDockerApi,
   stripDockerApiLogsHeaderAndAnsi
 } from "../../../src/modules/docker/utils";
 import { PackageContainer } from "../../../src/types";
@@ -114,33 +114,29 @@ info Webserver on 80, /usr/src/app/dist`;
           host: 49969,
           container: 30303,
           protocol: "TCP",
-          hasIpv6: true,
           deletable: true
         },
         {
           host: 49939,
           container: 30303,
           protocol: "UDP",
-          hasIpv6: true,
           deletable: true
         },
         {
           host: 49968,
           container: 30304,
           protocol: "TCP",
-          hasIpv6: true,
           deletable: true
         },
         {
           host: 49938,
           container: 30304,
           protocol: "UDP",
-          hasIpv6: true,
           deletable: true
         }
       ];
 
-      const dockerApiPortsParsed = parseDockerApiListPorts(
+      const dockerApiPortsParsed = ensureUniquePortsFromDockerApi(
         dockerApiPorts,
         undefined
       );

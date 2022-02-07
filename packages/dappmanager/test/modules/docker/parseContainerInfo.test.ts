@@ -43,8 +43,7 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [],
@@ -78,15 +77,13 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 443,
             container: 443,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 80,
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -197,14 +194,12 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 8090,
             container: 8090,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -240,8 +235,7 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 1194,
             container: 1194,
             protocol: PortProtocol.UDP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -339,8 +333,7 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 53,
             protocol: PortProtocol.UDP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -376,22 +369,19 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: false,
-            hasIpv6: false
+            deletable: false
           },
           {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: false,
-            hasIpv6: false
+            deletable: false
           },
           {
             host: 30304,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: false,
-            hasIpv6: false
+            deletable: false
           }
         ],
         volumes: [
@@ -467,34 +457,29 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 5001,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             container: 8081,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 4001,
             container: 4001,
             protocol: PortProtocol.TCP,
-            deletable: false,
-            hasIpv6: false
+            deletable: false
           },
           {
             host: 4002,
             container: 4002,
             protocol: PortProtocol.UDP,
-            deletable: false,
-            hasIpv6: false
+            deletable: false
           }
         ],
         volumes: [
@@ -570,15 +555,13 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.UDP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -688,22 +671,19 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 32769,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 32771,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 32770,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -739,21 +719,18 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             host: 9735,
             container: 9735,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             container: 10009,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [
@@ -790,14 +767,12 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 8000,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true,
-            hasIpv6: false
+            deletable: true
           }
         ],
         volumes: [],
@@ -842,7 +817,7 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 3000,
             deletable: true,
-            hasIpv6: false,
+
             protocol: PortProtocol.TCP
           }
         ],

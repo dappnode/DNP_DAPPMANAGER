@@ -98,11 +98,11 @@ export function getDockerTimeoutMax(
     ]
  * ```
  */
-export function parseDockerApiListPorts(
+export function ensureUniquePortsFromDockerApi(
   ports: Dockerode.Port[],
   defaultPorts: PortMapping[] | undefined
 ): PortMapping[] {
-  return ports
+  const portsFromApi = ports
     .filter(port => port.IP && port.IP.trim() !== "::")
     .map(
       ({ PrivatePort, PublicPort, Type }): PortMapping =>
@@ -110,14 +110,7 @@ export function parseDockerApiListPorts(
         ({
           ...(PublicPort ? { host: PublicPort } : {}),
           container: PrivatePort,
-          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP,
-          hasIpv6: ports.some(
-            port =>
-              port.PrivatePort === PrivatePort &&
-              port.PublicPort === PublicPort &&
-              port.Type === Type &&
-              port.IP.trim() === "::"
-          )
+          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP
         })
     )
     .map(
@@ -126,4 +119,7 @@ export function parseDockerApiListPorts(
         deletable: isPortMappingDeletable(port, defaultPorts)
       })
     );
+
+  // deduplicate ports
+  return [...new Set(portsFromApi)];
 }
