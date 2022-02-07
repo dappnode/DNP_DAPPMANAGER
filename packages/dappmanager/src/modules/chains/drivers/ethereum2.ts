@@ -4,6 +4,7 @@ import { getPrivateNetworkAlias } from "../../../domains";
 import { urlJoin } from "../../../utils/url";
 import { InstalledPackageData } from "../../../types";
 import { ChainDataResult } from "../types";
+import { safeProgress } from "../utils";
 
 const beaconChainServiceName = "beacon-chain";
 
@@ -36,22 +37,40 @@ export async function ethereum2(
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
   const apiUrl = `http://${containerDomain}:3500`;
 
-  const nodeSyncing = await fetchNodeSyncingMemo(apiUrl);
+  try {
+    const nodeSyncing = await fetchNodeSyncingMemo(apiUrl);
 
-  return parseEthereum2State(nodeSyncing);
+    return parseEthereum2State(nodeSyncing);
+  } catch (e) {
+    return {
+      syncing: false,
+      message: `Could not connect to RPC. ${e.message}`,
+      error: true
+    };
+  }
 }
 
 /**
- * Compute the current clock slot from the genesis time itself.
- * Then, you can use localhost:3500/eth/v1alpha1/beacon/chainhead
- * and use headSlot. Then you can produce
- *
- * X slots synced / Y slot total =
- * currentHeadSlot / computeSlot(Date.now - genesisTime)
+ * Parses the response from the beacon node to describe if it's currently syncing or not, and if it is, what block it is up to.
  */
-export function parseEthereum2State(
-  nodeSyncing: NodeSyncing
-): ChainDataResult {}
+export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
+  if (!nodeSyncing || !nodeSyncing.data)
+    return {
+      syncing: false,
+      message: "No node syncing data",
+      error: true,
+      progress: 0
+    };
+
+  const { head_slot, sync_distance, is_syncing } = nodeSyncing.data;
+  const highestBlock = parseInt(head_slot) + parseInt(sync_distance);
+  return {
+    syncing: is_syncing,
+    message: `Blocks synced ${head_slot} / ${highestBlock}`,
+    progress: safeProgress(parseInt(head_slot) / highestBlock),
+    error: false
+  };
+}
 
 /**
  * Requests the beacon node to describe if it's currently syncing or not, and if it is, what block it is up to.
@@ -70,14 +89,27 @@ async function fetchPrysmApi<T>(baseUrl: string, apiPath: string): Promise<T> {
 }
 
 /**
+ * Chain synced
  * ```
  * {
  *  "data":{
- *      "head_slot":"2310476",
- *      "sync_distance":"1",
- *      "is_syncing":false
- *    }
+ *    "head_slot":"2310476",
+ *    "sync_distance":"1",
+ *    "is_syncing":false
+ *   }
  * }
+ * ```
+ * Chain syncing
+ * ```
+ * {
+ *  "data":{
+ *    "head_slot":"696",
+ *    "sync_distance":"2311112",
+ *    "is_syncing":true
+ *  }
+ * }
+ * ```
+ * {"data":{"head_slot":"10445","sync_distance":"0","is_syncing":false}}
  */
 interface NodeSyncing {
   data: {
