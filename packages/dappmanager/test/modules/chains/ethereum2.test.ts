@@ -6,37 +6,55 @@ import { parseEthereum2State } from "../../../src/modules/chains/drivers/ethereu
 describe("Watchers > chains > ethereum2Prysm", () => {
   describe("parseEthereum2PrysmState", () => {
     it("Should parse a syncing state", () => {
-      const currentTime = 1607525912672;
-      const chainData = parseEthereum2State(
-        { genesisTime: "2020-11-18T12:00:07Z" },
-        { config: { SecondsPerSlot: "12" } },
-        { headSlot: "76050" },
-        currentTime
-      );
+      const chainData = parseEthereum2State({
+        data: {
+          head_slot: "2310476",
+          sync_distance: "1",
+          is_syncing: false
+        }
+      });
 
+      const expecteChainData: ChainDataResult = {
+        syncing: false,
+        error: false,
+        message: "Synced #2310476"
+      };
+
+      expect(chainData).to.deep.equal(expecteChainData);
+    });
+
+    it("Should parse a syncing state", () => {
+      const chainData = parseEthereum2State({
+        data: {
+          head_slot: "134030",
+          sync_distance: "2179666",
+          is_syncing: true
+        }
+      });
       const expecteChainData: ChainDataResult = {
         syncing: true,
         error: false,
-        message: "Slots synced: 76050 / 152092",
-        progress: 0.5000262998711307
+        message: "Blocks synced 134030 / 2313696",
+        progress: 0.05792895868774463
       };
 
       expect(chainData).to.deep.equal(expecteChainData);
     });
 
     it("Should parse a synced state", () => {
-      const currentTime = 1607525912672;
-      const chainData = parseEthereum2State(
-        { genesisTime: "2020-11-18T12:00:07Z" },
-        { config: { SecondsPerSlot: "12" } },
-        { headSlot: "152105" },
-        currentTime
-      );
+      const chainData = parseEthereum2State({
+        data: {
+          head_slot: "696",
+          sync_distance: "2311112",
+          is_syncing: true
+        }
+      });
 
       const expecteChainData: ChainDataResult = {
-        syncing: false,
+        syncing: true,
         error: false,
-        message: "Synced #152105"
+        message: "Blocks synced 696 / 2311808",
+        progress: 0.00030106306406068326
       };
 
       expect(chainData).to.deep.equal(expecteChainData);

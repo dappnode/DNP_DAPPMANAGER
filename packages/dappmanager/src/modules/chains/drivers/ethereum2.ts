@@ -7,6 +7,7 @@ import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 
 const beaconChainServiceName = "beacon-chain";
+const MIN_SLOT_DIFF_SYNC = 60;
 
 // Wait for Promises to resolve. Do not cache rejections
 // Cache for 1 hour, genesis and config should never change
@@ -64,12 +65,21 @@ export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
 
   const { head_slot, sync_distance, is_syncing } = nodeSyncing.data;
   const highestBlock = parseInt(head_slot) + parseInt(sync_distance);
-  return {
-    syncing: is_syncing,
-    message: `Blocks synced ${head_slot} / ${highestBlock}`,
-    progress: safeProgress(parseInt(head_slot) / highestBlock),
-    error: false
-  };
+
+  if (highestBlock - parseInt(head_slot) < MIN_SLOT_DIFF_SYNC) {
+    return {
+      syncing: false,
+      error: false,
+      message: `Synced #${head_slot}`
+    };
+  } else {
+    return {
+      syncing: is_syncing,
+      message: `Blocks synced ${head_slot} / ${highestBlock}`,
+      progress: safeProgress(parseInt(head_slot) / highestBlock),
+      error: false
+    };
+  }
 }
 
 /**
