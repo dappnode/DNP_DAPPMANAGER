@@ -10,13 +10,17 @@ export function getChainDriverName(
   return (dnp.chain || knownChains[dnp.dnpName]) ?? null;
 }
 
-export const knownChains: { [dnpName: string]: ChainDriver } = {
+const knownChains: { [dnpName: string]: ChainDriver } = {
   "openethereum.dnp.dappnode.eth": "ethereum",
   "ropsten.dnp.dappnode.eth": "ethereum",
   "rinkeby.dnp.dappnode.eth": "ethereum",
   "kovan.dnp.dappnode.eth": "ethereum",
   "bitcoin.dnp.dappnode.eth": "bitcoin",
   "monero.dnp.dappnode.eth": "monero",
-  "prysm.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm",
-  "prysm-pyrmont.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm"
+  "prysm.dnp.dappnode.eth": "ethereum2",
+  "prysm-prater.dnp.dappnode.eth": "ethereum2",
+  "teku.dnp.dappnode.eth": "ethereum2",
+  "teku-prater.dnp.dappnode.eth": "ethereum2",
+  "lighthouse.dnp.dappnode.eth": "ethereum2",
+  "lighthouse-prater.dnp.dappnode.eth": "ethereum2"
 };
