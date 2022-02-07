@@ -75,6 +75,24 @@ export const exposablePredefined: {
       description: "WebSockets endpoint for Nethermind Ethereum mainnet"
     }
   ],
+  "nethermind-xdai.dappnode.eth": [
+    {
+      fromSubdomain: "nethermind-xdai",
+      dnpName: "nethermind-xdai.dappnode.eth",
+      serviceName: "nethermind-xdai.dappnode.eth",
+      port: 8545,
+      name: "Nethermind xDai JSON RPC",
+      description: "JSON RPC endpoint for Nethermind Gnosis Chain (xDai)"
+    },
+    {
+      fromSubdomain: "nethermind-xdai-ws",
+      dnpName: "nethermind-xdai.dappnode.eth",
+      serviceName: "nethermind-xdai.dappnode.eth",
+      port: 8546,
+      name: "Nethermind xDai JSON RPC (WS)",
+      description: "WebSockets endpoint for Nethermind Gnosis Chain (xDai)"
+    }
+  ],
   "rinkeby.dnp.dappnode.eth": [
     {
       fromSubdomain: "rinkeby",
