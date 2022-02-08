@@ -1,4 +1,4 @@
-import Docker from "dockerode";
+import Dockerode from "dockerode";
 import { docker } from "./docker";
 
 /**
@@ -9,11 +9,33 @@ import { docker } from "./docker";
  *     reference: ["dappmanager.dnp.dappnode.eth"]
  *   }
  * }
+ * @returns Promise<DockerImageInfo[]>
+ * ```
+ * {
+        Containers: -1,
+        Created: 1643703266,
+        Id: "sha256:f214cf9544ca5e0078082e629b7a2181d14a5cbc6df22a85d64ea06141a1bedb",
+        Labels: null,
+        ParentId: "",
+        RepoDigests: null,
+        RepoTags: ["beacon-chain.prysm-prater.dnp.dappnode.eth:0.1.7"],
+        SharedSize: -1,
+        Size: 174829283,
+        VirtualSize: 174829283
+      }
+  * ```
  */
 export async function imagesList(
   options?: DockerApiListImagesOptions
-): Promise<Docker.ImageInfo[]> {
-  return docker.listImages(options);
+): Promise<DockerImageInfo[]> {
+  return docker.listImages(options) as Promise<DockerImageInfo[]>;
+}
+export interface DockerImageInfo
+  extends Omit<Dockerode.ImageInfo, "RepoDigests" | "Labels"> {
+  Containers: number;
+  SharedSize: number;
+  RepoDigests?: string[] | null;
+  Labels: { [label: string]: string } | null;
 }
 
 export interface DockerApiListImagesOptions {

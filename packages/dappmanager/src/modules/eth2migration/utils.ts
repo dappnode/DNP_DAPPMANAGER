@@ -1,9 +1,9 @@
 import params from "../../params";
-import { imagesList } from "../docker/api";
 import semver from "semver";
 import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
 import { Eth2Client, Eth2Network } from "../../types";
+import { DockerImageInfo } from "../docker/api/listImages";
 
 /**
  * Fetch _SOME_ image from the available prysm package
@@ -14,29 +14,38 @@ import { Eth2Client, Eth2Network } from "../../types";
  * validator.prysm.dnp.dappnode.eth:0.1.16
  * ```
  */
-export async function getPrysmOldValidatorImage({
+export function getPrysmOldValidatorImage({
+  dockerImages,
   prysmOldDnpName,
   prysmOldStableVersion
 }: {
+  dockerImages: DockerImageInfo[];
   prysmOldDnpName: string;
   prysmOldStableVersion: string;
-}): Promise<string> {
-  const dockerImages = await imagesList();
-
+}): string {
   // Get docker imageName and imageVersion that match the prysmOldDnpName and is equal to prysmOldStableVersion
-  const matches = dockerImages.map(image => {
-    return image.RepoTags.find(tag => {
-      const [imageName, imageVersion] = tag.split(":");
-      return (
-        imageName === `validator.${prysmOldDnpName}` &&
-        semver.valid(imageVersion) &&
-        semver.valid(prysmOldStableVersion) &&
-        semver.eq(imageVersion, prysmOldStableVersion)
-      );
-    });
-  });
+  const prysmImages = dockerImages.filter(image =>
+    image.RepoTags.includes(
+      `validator.${prysmOldDnpName}:${prysmOldStableVersion}`
+    )
+  );
 
-  const prysmImage = matches.find(match => match !== undefined);
+  if (!prysmImages.length) throw new Error(`Could not find prysm images`);
+
+  // merge arrays: string[][] -> string[]
+  const prysmImagesRepoTags = ([] as string[]).concat(
+    ...prysmImages.map(image => image.RepoTags)
+  );
+
+  const prysmImage = prysmImagesRepoTags.find(tag => {
+    const [imageName, imageVersion] = tag.split(":");
+    return (
+      imageName === `validator.${prysmOldDnpName}` &&
+      semver.valid(imageVersion) &&
+      semver.valid(prysmOldStableVersion) &&
+      semver.eq(imageVersion, prysmOldStableVersion)
+    );
+  });
 
   if (!prysmImage)
     throw new Error(

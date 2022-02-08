@@ -11,7 +11,11 @@ import { rollbackToPrysmOld } from "./rollback/rollbackToPrysmOld";
 // Other
 import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
-import { dockerContainerStart, dockerVolumeRemove } from "../docker";
+import {
+  dockerContainerStart,
+  dockerVolumeRemove,
+  imagesList
+} from "../docker";
 // Params
 import params from "../../params";
 // Utils
@@ -65,7 +69,9 @@ export async function eth2Migrate({
 
   logs.debug("getting old prysm validator image");
 
-  const prysmOldValidatorImage = await getPrysmOldValidatorImage({
+  const dockerImages = await imagesList();
+  const prysmOldValidatorImage = getPrysmOldValidatorImage({
+    dockerImages,
     prysmOldDnpName,
     prysmOldStableVersion
   });
