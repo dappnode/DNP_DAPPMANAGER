@@ -43,6 +43,7 @@ export async function ethereum2(
 
     return parseEthereum2State(nodeSyncing);
   } catch (e) {
+    // Retuturn error if cant fetch
     return {
       syncing: false,
       message: `Could not connect to RPC. ${e.message}`,
@@ -55,6 +56,7 @@ export async function ethereum2(
  * Parses the response from the beacon node to describe if it's currently syncing or not, and if it is, what block it is up to.
  */
 export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
+  // Return error if no data
   if (!nodeSyncing || !nodeSyncing.data)
     return {
       syncing: false,
@@ -64,19 +66,24 @@ export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
     };
 
   const { head_slot, sync_distance, is_syncing } = nodeSyncing.data;
-  const highestBlock = parseInt(head_slot) + parseInt(sync_distance);
+  const headSlot = toNum(head_slot);
+  const syncDistance = toNum(sync_distance);
+  const highestBlock = headSlot + syncDistance;
+  const progress = safeProgress(headSlot / highestBlock);
 
-  if (highestBlock - parseInt(head_slot) < MIN_SLOT_DIFF_SYNC) {
+  if (highestBlock - headSlot < MIN_SLOT_DIFF_SYNC) {
+    // Return synced state
     return {
       syncing: false,
       error: false,
-      message: `Synced #${head_slot}`
+      message: `Synced #${headSlot}`
     };
   } else {
+    // Return syncing state
     return {
       syncing: is_syncing,
-      message: `Blocks synced ${head_slot} / ${highestBlock}`,
-      progress: safeProgress(parseInt(head_slot) / highestBlock),
+      message: `Blocks synced ${headSlot} / ${highestBlock}`,
+      progress: progress,
       error: false
     };
   }
@@ -127,4 +134,12 @@ interface NodeSyncing {
     sync_distance: string;
     is_syncing: boolean;
   };
+}
+
+// Utils
+
+function toNum(numStr: string): number {
+  const num = parseInt(numStr, 10);
+  if (isNaN(num)) throw Error(`${numStr} is not a number`);
+  return num;
 }
