@@ -102,8 +102,17 @@ export function ensureUniquePortsFromDockerApi(
   ports: Dockerode.Port[],
   defaultPorts: PortMapping[] | undefined
 ): PortMapping[] {
+  // `${port.host}-${port.protocol}`
+  const deduplicatedPorts = new Set<string>();
+
   const portsFromApi = ports
-    .filter(port => port.IP && port.IP.trim() !== "::")
+    .filter(({ PrivatePort, Type }) => {
+      if (!deduplicatedPorts.has(`${PrivatePort}-${Type}`)) {
+        deduplicatedPorts.add(`${PrivatePort}-${Type}`);
+        return true;
+      }
+      return false;
+    })
     .map(
       ({ PrivatePort, PublicPort, Type }): PortMapping =>
         // "PublicPort" will be undefined / null / 0 if the port is not mapped
@@ -120,6 +129,5 @@ export function ensureUniquePortsFromDockerApi(
       })
     );
 
-  // deduplicate ports
-  return [...new Set(portsFromApi)];
+  return portsFromApi;
 }
