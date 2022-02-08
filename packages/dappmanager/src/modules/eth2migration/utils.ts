@@ -24,17 +24,19 @@ export function getPrysmOldValidatorImage({
   prysmOldStableVersion: string;
 }): string {
   // Get docker imageName and imageVersion that match the prysmOldDnpName and is equal to prysmOldStableVersion
-  const prysmImages = dockerImages.filter(image =>
-    image.RepoTags.includes(
-      `validator.${prysmOldDnpName}:${prysmOldStableVersion}`
-    )
+  const prysmImages = dockerImages.filter(
+    image =>
+      image.RepoTags &&
+      image.RepoTags.includes(
+        `validator.${prysmOldDnpName}:${prysmOldStableVersion}`
+      )
   );
 
   if (!prysmImages.length) throw new Error(`Could not find prysm images`);
 
   // merge arrays: string[][] -> string[]
   const prysmImagesRepoTags = ([] as string[]).concat(
-    ...prysmImages.map(image => image.RepoTags)
+    ...prysmImages.map(image => image.RepoTags as string[])
   );
 
   const prysmImage = prysmImagesRepoTags.find(tag => {
@@ -145,7 +147,7 @@ function getPrysmOldData(network: Eth2Network): {
         dnpName: "prysm-prater.dnp.dappnode.eth",
         validatorContainerName: `${params.CONTAINER_NAME_PREFIX}validator.prysm-prater.dnp.dappnode.eth`,
         prysmValidatorVolumeName: "prysm-praterdnpdappnodeeth_validator-data",
-        legacyVersion: "0.1.16" // Version that supports the validator cli for the migration
+        legacyVersion: "0.1.7" // Version that supports the validator cli for the migration
       };
     default:
       throw Error(`Network ${network} not supported`);

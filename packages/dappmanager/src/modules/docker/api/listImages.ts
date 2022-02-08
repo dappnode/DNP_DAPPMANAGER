@@ -31,9 +31,10 @@ export async function imagesList(
   return docker.listImages(options) as Promise<DockerImageInfo[]>;
 }
 export interface DockerImageInfo
-  extends Omit<Dockerode.ImageInfo, "RepoDigests" | "Labels"> {
+  extends Omit<Dockerode.ImageInfo, "RepoDigests" | "Labels" | "RepoTags"> {
   Containers: number;
   SharedSize: number;
+  RepoTags: string[] | null;
   RepoDigests?: string[] | null;
   Labels: { [label: string]: string } | null;
 }
