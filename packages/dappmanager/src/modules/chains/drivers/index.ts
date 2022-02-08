@@ -25,7 +25,8 @@ export async function runWithChainDriver(
     case "ethereum":
       return await ethereum(dnp);
 
-    case "ethereum2" || "ethereum2-beacon-chain-prysm":
+    case "ethereum2":
+    case "ethereum2-beacon-chain-prysm":
       return await ethereum2(dnp);
 
     case "monero":
