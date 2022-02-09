@@ -11,11 +11,7 @@ import { rollbackToPrysmOld } from "./rollback/rollbackToPrysmOld";
 // Other
 import { extendError } from "../../utils/extendError";
 import shell from "../../utils/shell";
-import {
-  dockerContainerStart,
-  dockerVolumeRemove,
-  imagesList
-} from "../docker";
+import { dockerContainerStart, imagesList } from "../docker";
 // Params
 import params from "../../params";
 // Utils
@@ -27,6 +23,7 @@ import {
 } from "./utils";
 import { logs } from "../../logs";
 import { Eth2Client, Eth2Network } from "../../types";
+import { packageRemove } from "../../calls";
 
 export async function eth2Migrate({
   client,
@@ -151,9 +148,7 @@ export async function eth2Migrate({
 
     if (client === "prysm") {
       logs.debug("removing backup from prysm docker volume");
-      // If Prysm: Only delete keys, don't delete volume
-      // MUST confirm that keys are alive in Web3Signer
-      // - Delete keys from Prysm's legacy container
+      // If Prysm: delete validator keys from validator volume
       await shell([
         "docker run",
         "--rm",
@@ -162,12 +157,12 @@ export async function eth2Migrate({
         alpineImage,
         "rm -rf /root/.eth2validators.backup"
       ]).catch(e => {
-        throw extendError(e, "Error moving Prysm's legacy wallet directory");
+        throw extendError(e, "Error deleting prysm validator volume");
       });
     } else {
       logs.debug("removing prysm old docker volume");
-      // If NOT Prysm: Delete volume
-      await dockerVolumeRemove(prysmOldValidatorVolumeName);
+      // If NOT Prysm: Delete prysm package
+      await packageRemove({ dnpName: prysmOldDnpName, deleteVolumes: true });
     }
   } catch (e) {
     logs.error("Error migrating", e);
