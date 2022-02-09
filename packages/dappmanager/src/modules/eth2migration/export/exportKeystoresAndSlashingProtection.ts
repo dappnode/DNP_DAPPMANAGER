@@ -46,11 +46,11 @@ export async function exportKeystoresAndSlashingProtection({
      * Outputs file at /out/backup/backup.zip
      * MUST be a new path for Prysm to give it a set permissions different than docker's directories
      */
-    backupOutDir: "/out/backup",
+    backupOutDir: "/out/prysm-migration/backup",
     walletpasswordFilepath: path.join(prysmPathWalletDir, "walletpassword.txt"),
-    walletpasswordOutFilepath: "/out/walletpassword.txt",
+    walletpasswordOutFilepath: "/out/prysm-migration/walletpassword.txt",
     /** Outputs file at /out/slashing_protection.json */
-    slashingProtectionOutDir: "/out"
+    slashingProtectionOutDir: "/out/prysm-migration"
   };
 
   logs.debug("Listing validator accounts");
@@ -146,7 +146,7 @@ export async function exportKeystoresAndSlashingProtection({
       `--${network}`,
       "--accept-terms-of-use"
     ],
-    { errorMessage: "Eth2 migration: exportSlashingProtectionData failed" }
+    { errorMessage: "exportSlashingProtectionData failed" }
   );
 
   if (os.userInfo().username !== "root") {

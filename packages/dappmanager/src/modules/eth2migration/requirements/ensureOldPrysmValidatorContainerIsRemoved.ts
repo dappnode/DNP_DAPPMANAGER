@@ -18,6 +18,8 @@ export async function ensureOldPrysmValidatorContainerIsRemoved({
     logs.warn(
       "old prysm container still exists, attempint to delete it once again"
     );
-    await dockerContainerRemove(prysmOldValidatorContainerName);
+    await dockerContainerRemove(prysmOldValidatorContainerName, {
+      volumes: false
+    });
   }
 }

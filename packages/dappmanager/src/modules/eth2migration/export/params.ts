@@ -2,7 +2,7 @@ import path from "path";
 import params from "../../../params";
 
 /** Volume name to output data to */
-export const outputVolumeName = "dappmanagerdnpdappnodeeth_data";
+export const outputVolumeName = "dncore_dappmanagerdnpdappnodeeth_data";
 /** Temporal (removed) migration container name */
 export const prysmMigrationContainerName = `${params.CONTAINER_TOOL_NAME_PREFIX}prysm-migration`;
 
