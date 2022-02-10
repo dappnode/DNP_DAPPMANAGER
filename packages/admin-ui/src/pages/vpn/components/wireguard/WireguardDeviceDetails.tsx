@@ -35,7 +35,7 @@ function WireguardDeviceDetailsLoaded({
 
   useEffect(() => {
     // Activate the copy functionality
-    new ClipboardJS(".copy-input-copy");
+    new ClipboardJS(".btn");
   }, []);
 
   return (
