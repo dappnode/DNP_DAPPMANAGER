@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
 # VARIABLES
 LOG_DIR="/usr/src/dappnode/logs"
-LOG_FILE="$LOG_DIR/security_update.log"
+LOG_FILE="$LOG_DIR/update.log"
 DATE=$(date)
 FILE_SOURCES_LIST="/etc/apt/sources.list"
 FILE_SECURITY_SOURCES_LIST="/etc/apt/security.sources.list"
@@ -52,16 +49,6 @@ function pre_update () {
     exit 1
   fi
 
-  # Check security.sources.list does not exist
-  if [ -f "$FILE_SECURITY_SOURCES_LIST" ]; then
-    echo "$FILE_SECURITY_SOURCES_LIST already exists" | tee -a $LOG_FILE 
-    exit 1
-  fi
-
-  # Create security.sources.list
-  echo -e "\e[32mCreating $FILE_SECURITY_SOURCES_LIST\e[0m" >> $LOG_FILE 
-  grep security "$FILE_SOURCES_LIST" | tee "$FILE_SECURITY_SOURCES_LIST" &>/dev/null || { echo "error creating file $FILE_SECURITY_SOURCES_LIST" | tee -a $LOG_FILE ; exit 1; }
-
   # Prevent docker packages from been updated if docker installed via repositories
   if [ "$DOCKER_INSTALLATION_REPOSITORIES" = true ] ; then
     echo -e "\e[32mEditing docker repositories\e[0m" >> $LOG_FILE 
@@ -82,7 +69,7 @@ function update () {
   # 1>/dev/null 2>>$LOG_FILE: will redirect stdout to null and stderr to log file
   apt-get update 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get update" | tee -a $LOG_FILE ; exit 1; }
   echo -e "\e[32mUpgrading\e[0m" >> $LOG_FILE 
-  apt-get upgrade -y -o "Dir::Etc::SourceList=$FILE_SECURITY_SOURCES_LIST" 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get upgrade" | tee -a $LOG_FILE ; exit 1; }
+  apt-get upgrade -y 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get upgrade" | tee -a $LOG_FILE ; exit 1; }
 }
 
 ###############
@@ -91,8 +78,6 @@ function update () {
 
 function post_upgrade_clean () {
   echo -e "\e[32mPost upgrade clean\e[0m" >> $LOG_FILE 
-  # Remove security-sources.list
-  rm -rf "$FILE_SECURITY_SOURCES_LIST"
   # Put normal values on repositories
   if [ "$DOCKER_INSTALLATION_REPOSITORIES" = true ] ; then
     echo -e "\e[32mEditing docker repositories\e[0m" >> $LOG_FILE 
