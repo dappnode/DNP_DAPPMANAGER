@@ -24,16 +24,16 @@ export async function ensureEth2ClientIsInstalledAndSynced({
   // If Prysm ensure it's the "new" version that works with web3 signer else install eth2client
   if (client === "prysm") {
     if (dnp && semver.gte(dnp.version, newEth2ClientVersion))
-      logs.info("Prysm satifies web3signer version");
+      logs.debug("Prysm satifies web3signer version");
     else {
-      logs.info(
+      logs.debug(
         `Updating Prysm legacy to Prysm-web3signer (${newEth2ClientVersion})`
       );
       await packageInstall({ name: dnpName, version: newEth2ClientVersion });
     }
   } else {
     if (!dnp) {
-      logs.info(
+      logs.debug(
         `Eth2 migration: eth2 client ${client} not installed ${dnpName}, installing it`
       );
       await packageInstall({ name: dnpName, version: newEth2ClientVersion });

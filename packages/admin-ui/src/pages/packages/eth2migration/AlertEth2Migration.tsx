@@ -1,6 +1,6 @@
 import { Eth2Client, Eth2Network, InstalledPackageDetailData } from "common";
 import Button from "components/Button";
-import React from "react";
+import React, { useState } from "react";
 import Alert from "react-bootstrap/esm/Alert";
 import { prettyDnpName } from "utils/format";
 import semver from "semver";
@@ -16,6 +16,7 @@ import { Dropdown } from "react-bootstrap";
 import { api } from "api";
 import { withToast } from "components/toast/Toast";
 import { confirm } from "components/ConfirmDialog";
+import MigrationDetails from "./MigrationDetails";
 
 /**
  * Returns alert to do eth2migration if version is prysmLegacyStableVersion
@@ -26,6 +27,13 @@ export default function AlertEth2migration({
 }: {
   dnp: InstalledPackageDetailData;
 }) {
+  const [loading, setLoading] = React.useState(false);
+  const [migrationDetails, setMigrationDetails] = useState<{
+    status: boolean;
+    client: string;
+    network: string;
+  }>({ status: false, client: "", network: "" });
+
   async function migrateEth2({ client }: { client: Eth2Client }) {
     const network: Eth2Network = dnp.dnpName.includes("prater")
       ? "prater"
@@ -40,10 +48,15 @@ export default function AlertEth2migration({
       });
     });
 
+    setLoading(true);
+    setMigrationDetails({ status: true, client, network });
+
     await withToast(() => api.eth2Migrate({ client, network }), {
       message: `Eth2 migrating to ${client}`,
       onSuccess: `Eth2 migrated to ${client}`
     });
+
+    setLoading(false);
   }
 
   switch (dnp.dnpName) {
@@ -75,23 +88,30 @@ export default function AlertEth2migration({
               {prettyDnpName(dnp.dnpName)} is in the stable version required to
               migrate to web3signer{" "}
               <Dropdown>
-                <Dropdown.Toggle variant="dappnode" id="dropdown-basic">
+                <Dropdown.Toggle
+                  disabled={loading}
+                  variant="dappnode"
+                  id="dropdown-basic"
+                >
                   Eth2 migrate
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
                   <Dropdown.Item
+                    disabled={loading}
                     onClick={() => migrateEth2({ client: "teku" })}
                   >
                     Teku
                   </Dropdown.Item>
                   <Dropdown.Item
+                    disabled={loading}
                     onClick={() => migrateEth2({ client: "prysm" })}
                   >
                     Prysm
                   </Dropdown.Item>
                   <Dropdown.Item
-                    onCLick={() => migrateEth2({ client: "lighthouse" })}
+                    disabled={loading}
+                    onClick={() => migrateEth2({ client: "lighthouse" })}
                   >
                     Lighthouse
                   </Dropdown.Item>
@@ -107,6 +127,12 @@ export default function AlertEth2migration({
               }}
             />
           ) : null}
+          {migrationDetails && migrationDetails.status && (
+            <MigrationDetails
+              migrationDetails={migrationDetails}
+              setMigrationDetails={setMigrationDetails}
+            />
+          )}
         </>
       );
     default:

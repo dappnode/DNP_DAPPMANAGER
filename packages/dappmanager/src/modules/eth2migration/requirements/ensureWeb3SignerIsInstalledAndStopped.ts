@@ -20,7 +20,7 @@ export async function ensureWeb3SignerIsInstalledAndStopped({
     dnpName: signerDnpName
   });
   if (!web3SignerDnp) {
-    logs.info(
+    logs.debug(
       `Eth2 migration: web3signer package not installed, installing ${signerDnpName}`
     );
 

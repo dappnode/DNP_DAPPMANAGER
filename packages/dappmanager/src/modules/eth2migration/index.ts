@@ -78,7 +78,6 @@ export async function eth2Migrate({
 
     logs.debug("ensuring requirements");
 
-    // Ensure requirements
     await ensureRequirements({
       signerDnpName,
       signerContainerName,
@@ -90,6 +89,7 @@ export async function eth2Migrate({
 
     try {
       logs.debug("moving wallet dir in docker volume");
+
       // Move wallet dir to a new location different to what the container expects
       await moveWalletDirOldPrysmVolume({
         prysmOldValidatorVolumeName,
@@ -111,10 +111,15 @@ export async function eth2Migrate({
 
       // Import validator: keystores and slashing protection from docker volume to web3signer
       const exportedData = readExportedKeystoresAndSlashingProtection();
+
       logs.debug("exportedData: ", exportedData);
+
       logs.debug("Starting web3signer");
+
       await dockerContainerStart(signerContainerName);
+
       logs.debug("importing keystores and slashing protection data");
+
       await importKeystoresAndSlashingProtectionViaApi({
         signerContainerName,
         ...exportedData
@@ -160,7 +165,7 @@ export async function eth2Migrate({
         throw extendError(e, "Error deleting prysm validator volume");
       });
     } else {
-      logs.debug("removing prysm old docker volume");
+      logs.debug("removing prysm package");
       // If NOT Prysm: Delete prysm package
       await packageRemove({ dnpName: prysmOldDnpName, deleteVolumes: true });
     }

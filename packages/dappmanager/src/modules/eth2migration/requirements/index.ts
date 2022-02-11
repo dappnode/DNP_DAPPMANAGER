@@ -38,13 +38,13 @@ export async function ensureRequirements({
   });
 
   // - If to Prysm: The update will have deleted the old container
-  // - If NOT to Prysm: Delete validator container
   if (client === "prysm") {
     await ensureOldPrysmValidatorContainerIsRemoved({
       prysmOldValidatorContainerName,
       newEth2ClientVersion
     });
   } else {
+    // - If NOT to Prysm: Delete validator container
     await dockerContainerRemove(prysmOldValidatorContainerName);
   }
 }

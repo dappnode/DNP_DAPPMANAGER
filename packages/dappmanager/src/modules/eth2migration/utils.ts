@@ -58,7 +58,7 @@ export function getPrysmOldValidatorImage({
 }
 
 /**
- * Moves prysm legacy volume wallet dir
+ * Moves prysm legacy volume wallet dir from source to target
  */
 export async function moveWalletDirOldPrysmVolume({
   prysmOldValidatorVolumeName,
