@@ -438,7 +438,8 @@ export type ChainDriver =
 export const chainDrivers: ChainDriver[] = [
   "bitcoin",
   "ethereum",
-  "ethereum2" || "ethereum2-beacon-chain-prysm",
+  "ethereum2",
+  "ethereum2-beacon-chain-prysm",
   "monero"
 ];
 
