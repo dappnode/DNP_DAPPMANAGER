@@ -432,7 +432,8 @@ export type ContainerState =
 export type ChainDriver =
   | "bitcoin"
   | "ethereum"
-  | ("ethereum2" | "ethereum2-beacon-chain-prysm")
+  | "ethereum2"
+  | "ethereum2-beacon-chain-prysm"
   | "monero";
 export const chainDrivers: ChainDriver[] = [
   "bitcoin",
