@@ -1,12 +1,16 @@
 import {
   Dependencies,
   ChainDriver,
-  chainDrivers,
+  chainDriversTypes,
   ContainerLabelsRaw,
   ContainerLabelTypes
 } from "../../types";
 import { stringifyEnvironment } from "./environment";
-import { ComposeService } from "../../common";
+import {
+  ChainDriverSpecs,
+  ChainDriverType,
+  ComposeService
+} from "../../common";
 import { pick, omitBy, mapValues } from "lodash";
 
 /**
@@ -48,7 +52,11 @@ const labelParseFns: {
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
   "dappnode.dnp.chain": value =>
-    value && chainDrivers.includes(value as ChainDriver)
+    value &&
+    (chainDriversTypes.includes(value as ChainDriverType) ||
+      chainDriversTypes.includes(
+        (parseJsonSafe(value) as ChainDriverSpecs).driver as ChainDriverType
+      ))
       ? (value as ChainDriver)
       : undefined,
   "dappnode.dnp.isCore": parseBool,
@@ -71,7 +79,10 @@ const labelStringifyFns: {
   "dappnode.dnp.dependencies": writeJson,
   "dappnode.dnp.avatar": writeString,
   "dappnode.dnp.origin": writeString,
-  "dappnode.dnp.chain": writeString,
+  "dappnode.dnp.chain": value =>
+    value && chainDriversTypes.includes(value as ChainDriverType)
+      ? writeString(value as ChainDriverType)
+      : writeJson(value as ChainDriverSpecs),
   "dappnode.dnp.isCore": writeBool,
   "dappnode.dnp.isMain": writeBool,
   "dappnode.dnp.dockerTimeout": writeNumber,
