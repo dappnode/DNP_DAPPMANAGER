@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { ChainDataResult } from "../../../src/modules/chains/types";
-import { parseEthereum2State } from "../../../src/modules/chains/drivers/ethereum2";
+import { parseNodeSyncingResponse } from "../../../src/modules/chains/drivers/ethereum2";
 
 describe("Watchers > chains > ethereum2Prysm", () => {
   describe("parseEthereum2PrysmState", () => {
     it("Should parse a syncing state", () => {
-      const chainData = parseEthereum2State({
+      const chainData = parseNodeSyncingResponse({
         data: {
           head_slot: "2310476",
           sync_distance: "1",
@@ -24,7 +24,7 @@ describe("Watchers > chains > ethereum2Prysm", () => {
     });
 
     it("Should parse a syncing state", () => {
-      const chainData = parseEthereum2State({
+      const chainData = parseNodeSyncingResponse({
         data: {
           head_slot: "134030",
           sync_distance: "2179666",
@@ -42,7 +42,7 @@ describe("Watchers > chains > ethereum2Prysm", () => {
     });
 
     it("Should parse a synced state", () => {
-      const chainData = parseEthereum2State({
+      const chainData = parseNodeSyncingResponse({
         data: {
           head_slot: "696",
           sync_distance: "2311112",

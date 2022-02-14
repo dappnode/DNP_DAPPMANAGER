@@ -41,7 +41,7 @@ export async function ethereum2(
   try {
     const nodeSyncing = await fetchNodeSyncingMemo(apiUrl);
 
-    return parseEthereum2State(nodeSyncing);
+    return parseNodeSyncingResponse(nodeSyncing);
   } catch (e) {
     // Retuturn error if cant fetch
     return {
@@ -55,7 +55,9 @@ export async function ethereum2(
 /**
  * Parses the response from the beacon node to describe if it's currently syncing or not, and if it is, what block it is up to.
  */
-export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
+export function parseNodeSyncingResponse(
+  nodeSyncing: NodeSyncing
+): ChainDataResult {
   // Return error if no data
   if (!nodeSyncing || !nodeSyncing.data)
     return {
@@ -71,7 +73,7 @@ export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
   const highestBlock = headSlot + syncDistance;
   const progress = safeProgress(headSlot / highestBlock);
 
-  if (highestBlock - headSlot < MIN_SLOT_DIFF_SYNC) {
+  if (syncDistance < MIN_SLOT_DIFF_SYNC) {
     // Return synced state
     return {
       syncing: false,
@@ -94,15 +96,9 @@ export function parseEthereum2State(nodeSyncing: NodeSyncing): ChainDataResult {
  * https://ethereum.github.io/beacon-APIs/#/Node/getSyncingStatus
  */
 async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
-  const response: NodeSyncing = await fetchPrysmApi(
-    baseUrl,
-    "/eth/v1/node/syncing"
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then(res =>
+    res.json()
   );
-  return response;
-}
-
-async function fetchPrysmApi<T>(baseUrl: string, apiPath: string): Promise<T> {
-  return await fetch(urlJoin(baseUrl, apiPath)).then(res => res.json());
 }
 
 /**
@@ -126,7 +122,6 @@ async function fetchPrysmApi<T>(baseUrl: string, apiPath: string): Promise<T> {
  *  }
  * }
  * ```
- * {"data":{"head_slot":"10445","sync_distance":"0","is_syncing":false}}
  */
 interface NodeSyncing {
   data: {
