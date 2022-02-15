@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "../../../common";
+import { ChainDriverSpecs, InstalledPackageData } from "../../../common";
 import { ChainDriver } from "../../../types";
 import { ChainDataResult } from "../types";
 // Drivers
@@ -18,18 +18,24 @@ export async function runWithChainDriver(
   dnp: InstalledPackageData,
   chainDriver: ChainDriver
 ): Promise<ChainDataResult | null> {
-  if (chainDriver.bitcoin) {
-    return await bitcoin(dnp);
-  } else if (chainDriver.ethereum) {
-    return await ethereum(dnp);
-  } else if (
-    chainDriver.ethereum2 ||
-    chainDriver["ethereum2-beacon-chain-prysm"]
-  ) {
-    return await ethereum2(dnp, chainDriver);
-  } else if (chainDriver.monero) {
-    return await monero(dnp);
+  let chainDriverCasted: ChainDriverSpecs;
+  if (typeof chainDriver === "string") {
+    chainDriverCasted = { driver: chainDriver };
   } else {
-    throw Error(`Unsupported driver: ${chainDriver}`);
+    chainDriverCasted = chainDriver;
+  }
+
+  switch (chainDriverCasted.driver) {
+    case "bitcoin":
+      return bitcoin(dnp);
+    case "ethereum":
+      return ethereum(dnp);
+    case "ethereum2-beacon-chain-prysm":
+    case "ethereum2":
+      return ethereum2(dnp, chainDriverCasted);
+    case "monero":
+      return monero(dnp);
+    default:
+      throw Error(`Unsupported driver: ${chainDriver}`);
   }
 }

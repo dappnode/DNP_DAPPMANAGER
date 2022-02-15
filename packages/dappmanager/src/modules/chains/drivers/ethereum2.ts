@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { urlJoin } from "../../../utils/url";
-import { InstalledPackageData, ChainDriver } from "../../../types";
+import { InstalledPackageData, ChainDriverSpecs } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 
@@ -11,15 +11,14 @@ import { safeProgress } from "../utils";
  */
 export async function ethereum2(
   dnp: InstalledPackageData,
-  chainDriver: ChainDriver
+  chainDriver: ChainDriverSpecs
 ): Promise<ChainDataResult | null> {
   // base URL for the beacon chain node (e.g http://beacon-chain.prysm-pyrmont.dappnode:3500/)
   const defaultBeaconChainServiceName = "beacon-chain";
   const defaultBeaconPortNumber = 3500;
 
   // 1. Get network alias from the beacon chain service (use the default beaconchain service name if not specified)
-  const serviceName =
-    chainDriver.ethereum2?.serviceName || defaultBeaconChainServiceName;
+  const serviceName = chainDriver.serviceName || defaultBeaconChainServiceName;
   const beaconChainContainer = dnp.containers.find(
     container => container.serviceName === serviceName
   );
@@ -32,7 +31,7 @@ export async function ethereum2(
   const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
 
   // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
-  const port = chainDriver.ethereum2?.portNumber || defaultBeaconPortNumber;
+  const port = chainDriver.portNumber || defaultBeaconPortNumber;
 
   // http://beacon-chain.prysm-pyrmont.dappnode:3500/
   const apiUrl = `http://${containerDomain}:${port}`;
