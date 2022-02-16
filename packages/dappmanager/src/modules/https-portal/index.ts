@@ -10,6 +10,7 @@ import { getExternalNetworkAlias } from "../../domains";
 import { PackageContainer, HttpsPortalMapping } from "../../types";
 import { HttpsPortalApiClient } from "./apiClient";
 import { addNetworkAliasCompose, removeNetworkAliasCompose } from "./utils";
+import { ComposeEditor } from "../compose/editor";
 export { addAliasToRunningContainersMigration } from "./migration";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable";
@@ -67,6 +68,16 @@ export class HttpsPortal {
 
     // Edit compose to persist the setting
     addNetworkAliasCompose(container, externalNetworkName, aliases);
+
+
+    // Check whether DNP_HTTPS compose has external network persisted
+    const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true)
+    const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath))
+
+    if(editor.getComposeNetwork(externalNetworkName) === null) {
+      const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer)
+      addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias])
+    }
   }
 
   /**
