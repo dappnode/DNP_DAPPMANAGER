@@ -1,4 +1,4 @@
-import { capitalize, stringEndsWith } from "utils/strings";
+import { capitalize } from "utils/strings";
 import { stringSplit } from "./strings";
 import prettyBytesLib from "pretty-bytes";
 import { VolumeData } from "types";
@@ -50,15 +50,6 @@ export function shortAuthor(author: string) {
   const beforeParentesis = stringSplit(author, "(")[0];
   const beforeLessthan = stringSplit(beforeParentesis, "<")[0];
   return beforeLessthan;
-}
-
-/**
- *
- * @param name "bitcoin.dnp.dappnode.eth"
- * @returns isVerified
- */
-export function isDnpVerified(name: string) {
-  return stringEndsWith(name, "dnp.dappnode.eth");
 }
 
 const dnpString = "dnpdappnodeeth_";

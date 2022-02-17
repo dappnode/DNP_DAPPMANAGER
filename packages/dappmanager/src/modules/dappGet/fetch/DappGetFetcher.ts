@@ -14,8 +14,8 @@ export class DappGetFetcher {
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
-  async dependencies(name: string, version: string): Promise<Dependencies> {
-    const manifest = await this.releaseFetcher.getManifest(name, version);
+  async dependencies(dnpName: string, version: string): Promise<Dependencies> {
+    const manifest = await this.releaseFetcher.getManifest(dnpName, version);
     return manifest.dependencies || {};
   }
 
@@ -32,22 +32,22 @@ export class DappGetFetcher {
    * }
    * @returns set of versions
    */
-  async versions(name: string, versionRange: string): Promise<string[]> {
+  async versions(dnpName: string, versionRange: string): Promise<string[]> {
     if (semver.validRange(versionRange)) {
       if (versionRange === "*") {
         // ##### TODO: Case 0. Force "*" to strictly fetch the last version only
         // If "*" is interpreted as any version, many old manifests are not well
         // hosted and delay the resolution too much because all old versions have
         // to timeout in order to proceed
-        const latestVersion = await this.releaseFetcher.fetchVersion(name);
+        const latestVersion = await this.releaseFetcher.fetchVersion(dnpName);
         return [latestVersion.version];
       } else if (semver.valid(versionRange)) {
         // Case 1. Valid semver version (not range): Return that version
         return [versionRange];
       } else {
         // Case 1. Valid semver range: Fetch the valid versions from APM
-        const requestedVersions = await this.releaseFetcher.fetchApmVersionsState(
-          name
+        const requestedVersions = await this.releaseFetcher.fetchVersions(
+          dnpName
         );
         return Object.values(requestedVersions)
           .map(({ version }) => version)

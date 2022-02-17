@@ -5,7 +5,7 @@ import { SelectedCategories } from "pages/installer/types";
 const sampleDirectoryState: DirectoryItem = {
   index: 0,
   status: "ok",
-  name: "demo-name",
+  dnpName: "demo-name",
   description: "Demo description",
   avatarUrl: "",
   isInstalled: false,
@@ -21,12 +21,12 @@ describe("pages > installer > helpers", () => {
     const dnp2Name = "dnp2.dnp.dappnode.eth";
     const dnp1: DirectoryItem = {
       ...sampleDirectoryState,
-      name: dnp1Name,
+      dnpName: dnp1Name,
       categories: ["Blockchain"]
     };
     const dnp2: DirectoryItem = {
       ...sampleDirectoryState,
-      name: dnp2Name,
+      dnpName: dnp2Name,
       categories: ["Storage"]
     };
     const directory: DirectoryItem[] = [dnp1, dnp2];

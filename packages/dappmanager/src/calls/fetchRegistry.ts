@@ -1,128 +1,149 @@
+import throttle from "lodash/throttle";
+import params from "../params";
+import { eventBus } from "../eventBus";
+import { DirectoryItem } from "../types";
+import { logs } from "../logs";
+import { listPackages } from "../modules/docker/list";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
+import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/list";
-import { eventBus } from "../eventBus";
-import { throttle } from "lodash";
 import { NoImageForArchError } from "../modules/release/errors";
-import { logs } from "../logs";
-import { DirectoryItem, DirectoryDnp, RegistryScanProgress } from "../types";
-import { fileToGatewayUrl } from "../utils/distributedFile";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
-import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
-import { getRegistry } from "../modules/registry";
-import * as db from "../db";
+import {
+  fetchDpmRegistryPackages,
+  sortWithPackageList
+} from "../modules/dpm/registry";
+import { getRegistryAddress } from "../modules/dpm";
 
-const defaultEnsName = "public.dappnode.eth";
-const minDeployBlock = 6312046;
-
-const loadThrottle = 500; // 0.5 seconds
+const loadThrottleMs = 500; // 0.5 seconds
 
 /**
- * Return last block and last fetched block
- * to show progress in the UI
- */
-export async function fetchRegistryProgress({
-  addressOrEnsName = defaultEnsName,
-  fromBlock = minDeployBlock
-}: {
-  addressOrEnsName?: string;
-  fromBlock?: number;
-}): Promise<RegistryScanProgress> {
-  const lastFetchedBlock =
-    db.registryLastFetchedBlock.get(addressOrEnsName) || fromBlock;
-
-  let latestBlock = db.registryLastProviderBlock.get();
-  if (!latestBlock) {
-    const provider = await getEthersProvider();
-    latestBlock = await provider.getBlockNumber();
-  }
-
-  return {
-    lastFetchedBlock,
-    latestBlock
-  };
-}
-
-/**
- * Fetches new repos from registry by scanning the chain
+ * Fetches all packages with their latest version from a Dappnode Package Registry
  */
 export async function fetchRegistry({
-  addressOrEnsName = defaultEnsName,
-  fromBlock = minDeployBlock
+  registryName
 }: {
-  addressOrEnsName?: string;
-  fromBlock?: number;
+  registryName?: string;
 }): Promise<DirectoryItem[]> {
+  if (!registryName) registryName = params.DAPPNODE_MAIN_REGISTRY_XDAI_NAME;
+
   const provider = await getEthersProvider();
-  const registry = await getRegistry(provider, addressOrEnsName, fromBlock);
-  return await fetchRegistryIpfsData(registry);
-}
-
-// Utils
-
-/**
- *  Get IPFS data from registry packages
- */
-async function fetchRegistryIpfsData(
-  registry: DirectoryDnp[]
-): Promise<DirectoryItem[]> {
   const releaseFetcher = new ReleaseFetcher();
-  const dnpList = await listPackages();
 
-  const registryPublicDnps: DirectoryItem[] = [];
+  const registryAddress = getRegistryAddress(registryName);
+
+  const { packages, packageList } = await fetchDpmRegistryPackages(
+    provider,
+    registryAddress
+  );
+
+  // First push the packages listed in packageList
+  // Then push the rest of packages expect the already pushed
+  // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
+  const packagesSorted = sortWithPackageList(packageList, packages);
+  const packageSet = new Set(packageList);
+
+  const registryDnps: DirectoryItem[] = [];
 
   let registryDnpsPending: DirectoryItem[] = [];
   // Prevent sending way to many updates in case the fetching process is fast
   const emitRegistryUpdate = throttle(() => {
     eventBus.registry.emit(registryDnpsPending);
     registryDnpsPending = [];
-  }, loadThrottle);
+  }, loadThrottleMs);
 
   function pushRegistryItem(item: DirectoryItem): void {
-    registryPublicDnps.push(item);
+    registryDnps.push(item);
     registryDnpsPending.push(item);
     emitRegistryUpdate();
   }
 
-  await Promise.all(
-    registry.map(
-      async ({ name, isFeatured }, index): Promise<void> => {
-        const registryItemBasic = {
-          index,
-          name,
-          whitelisted: true,
-          isFeatured
-        };
-        try {
-          // Now resolve the last version of the package
-          const release = await releaseFetcher.getRelease(name);
-          const { metadata, avatarFile } = release;
+  const dnpList = await listPackages();
 
+  await Promise.all(
+    packagesSorted.map(async (pkg, index): Promise<void> => {
+      const whitelisted = true;
+      const dnpName = `${pkg.repoName}.${registryName}`;
+
+      const registryItemBasic = {
+        index,
+        dnpName,
+        whitelisted,
+        isFeatured: packageSet.has(index),
+        isVerified: pkg.flags.validated
+      };
+      try {
+        // Now resolve the last version of the package
+        const release = await releaseFetcher.getRelease(dnpName);
+        const { metadata, avatarFile } = release;
+
+        pushRegistryItem({
+          ...registryItemBasic,
+          status: "ok",
+          description: getShortDescription(metadata),
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          isInstalled: getIsInstalled(release, dnpList),
+          isUpdated: getIsUpdated(release, dnpList),
+          featuredStyle: metadata.style,
+          categories:
+            metadata.categories || getFallBackCategories(dnpName) || []
+        });
+      } catch (e) {
+        if (e instanceof NoImageForArchError) {
+          logs.debug(`Package ${dnpName} is not available in current arch`);
+        } else {
+          logs.error(`Error fetching ${dnpName} release`, e);
           pushRegistryItem({
             ...registryItemBasic,
-            status: "ok",
-            description: getShortDescription(metadata),
-            avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-            isInstalled: getIsInstalled(release, dnpList),
-            isUpdated: getIsUpdated(release, dnpList),
-            featuredStyle: metadata.style,
-            categories: metadata.categories || getFallBackCategories(name) || []
+            status: "error",
+            message: e.message
           });
-        } catch (e) {
-          if (e instanceof NoImageForArchError) {
-            logs.debug(`Package ${name} is not available in current arch`);
-          } else {
-            logs.error(`Error fetching ${name} release`, e);
-            pushRegistryItem({
-              ...registryItemBasic,
-              status: "error",
-              message: e.message
-            });
-          }
         }
       }
-    )
+    })
   );
 
-  return registryPublicDnps;
+  return registryDnps.sort((a, b) => a.index - b.index);
+}
+
+// Helpers
+
+/**
+ * Get a short description and trim it
+ */
+export function getShortDescription(metadata: {
+  description?: string;
+  shortDescription?: string;
+}): string {
+  const desc =
+    metadata.shortDescription || metadata.description || "No description";
+  // Don't send big descriptions, the UI crops them anyway
+  return desc.slice(0, 80);
+}
+
+const fallbackCategories: { [dnpName: string]: string[] } = {
+  "kovan.dnp.dappnode.eth": ["Developer tools"],
+  "artis-sigma1.public.dappnode.eth": ["Blockchain"],
+  "monero.dnp.dappnode.eth": ["Blockchain"],
+  "vipnode.dnp.dappnode.eth": ["Economic incentive"],
+  "ropsten.dnp.dappnode.eth": ["Developer tools"],
+  "rinkeby.dnp.dappnode.eth": ["Developer tools"],
+  "lightning-network.dnp.dappnode.eth": [
+    "Payment channels",
+    "Economic incentive"
+  ],
+  "swarm.dnp.dappnode.eth": ["Storage", "Communications"],
+  "goerli-geth.dnp.dappnode.eth": ["Developer tools"],
+  "bitcoin.dnp.dappnode.eth": ["Blockchain"],
+  "raiden-testnet.dnp.dappnode.eth": ["Developer tools"],
+  "raiden.dnp.dappnode.eth": ["Payment channels"]
+};
+
+/**
+ * For known packages that are not yet updated, used this for nicer UX
+ * until all of them are updated
+ * @param dnpName "bitcoin.dnp.dappnode.eth"
+ */
+export function getFallBackCategories(dnpName: string): string[] {
+  return fallbackCategories[dnpName];
 }

@@ -1,6 +1,11 @@
 import { EthClientTargetPackage, ReleaseSignatureProtocol } from "./common";
 export * from "./common";
 
+/**
+ * Ethereum (EVM) 20 bytes hex address
+ */
+export type AddressHex = string;
+
 export enum FileFormat {
   JSON = "JSON",
   YAML = "YAML",
@@ -39,12 +44,6 @@ export type EthClientSyncedNotificationStatus = {
 
 export interface DiskUsageThresholds {
   [thresholdId: string]: boolean;
-}
-
-export interface RegistryNewRepoEvent {
-  txHash: string;
-  ensName: string;
-  timestamp: number;
 }
 
 export interface ComposeServicesSharingPid {

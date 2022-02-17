@@ -12,7 +12,6 @@ import {
 
 interface EventTypes {
   chainData: ChainData[];
-  directory: DirectoryItem[];
   registry: DirectoryItem[];
   logUi: ProgressLog;
   logUserAction: UserActionLog;
@@ -33,7 +32,6 @@ interface EventTypes {
 
 const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   chainData: {},
-  directory: {},
   registry: {},
   logUi: {},
   logUserAction: {},

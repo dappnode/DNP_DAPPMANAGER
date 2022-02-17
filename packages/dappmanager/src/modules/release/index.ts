@@ -1,17 +1,52 @@
-import resolveReleaseName from "./resolveReleaseName";
 import { getRelease } from "./getRelease";
 import { getManifest } from "./getManifest";
 import { PackageRelease, PackageRequest, Manifest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
-import { Apm } from "../apm";
+import { Dpm } from "../dpm";
+import {
+  isIpfsHash,
+  isEnsDomain,
+  isSemver,
+  isSemverRange
+} from "../../utils/validate";
 
-export class ReleaseFetcher extends Apm {
+export class ReleaseFetcher extends Dpm {
   /**
    * Resolves name + version to an IPFS hash
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async resolveReleaseName(name: string, version?: string) {
-    return resolveReleaseName(this, name, version);
+  async resolveReleaseName(
+    dnpName: string,
+    version?: string
+  ): Promise<{ hash: string; origin?: string }> {
+    // Correct version
+    if (!version || version === "latest") version = "*";
+
+    // Normal case, name = eth domain & ver = semverVersion
+    // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
+    if (isEnsDomain(dnpName) && (isSemver(version) || isSemverRange(version)))
+      return {
+        hash: (await this.fetchVersion(dnpName, version)).contentUri
+      };
+
+    // IPFS normal case, name = eth domain & ver = IPFS hash
+    if (isEnsDomain(dnpName) && isIpfsHash(version))
+      return {
+        hash: version,
+        origin: version
+      };
+
+    // When requesting IPFS hashes for the first time, their name is unknown
+    // name = IPFS hash, ver = null
+    if (isIpfsHash(dnpName))
+      return {
+        hash: dnpName,
+        origin: dnpName
+      };
+
+    // All other cases are invalid
+    if (isEnsDomain(dnpName))
+      throw Error(`Invalid version, must be a semver or a hash: ${version}`);
+    else throw Error(`Invalid DNP name, must be a ENS domain: ${dnpName}`);
   }
 
   /**
@@ -23,25 +58,17 @@ export class ReleaseFetcher extends Apm {
   }
 
   /**
-   * Get multiple release assets for multiple requests
-   */
-  async getReleases(packages: {
-    [name: string]: string;
-  }): Promise<PackageRelease[]> {
-    return await Promise.all(
-      Object.entries(packages).map(([name, version]) =>
-        this.getRelease(name, version)
-      )
-    );
-  }
-
-  /**
    * Resolve a request dependencies and fetch their release assets
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async getReleasesResolved(req: PackageRequest, options?: DappgetOptions) {
     const result = await dappGet(req, options);
-    const releases = await this.getReleases(result.state);
+    const releases = await Promise.all(
+      Object.entries(result.state).map(([name, version]) =>
+        this.getRelease(name, version)
+      )
+    );
+
     return {
       ...result,
       releases

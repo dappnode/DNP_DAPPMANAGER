@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import { isEmpty, throttle } from "lodash";
 import { difference } from "utils/lodashExtended";
-import { prettyDnpName, isDnpVerified } from "utils/format";
+import { prettyDnpName } from "utils/format";
 // This module
 import { ProgressLogsView } from "./InstallCardComponents/ProgressLogsView";
 // Components
@@ -139,7 +139,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
   const disclaimers: { name: string; message: string }[] = [];
   // Default disclaimer for public DNPs
-  if (!isDnpVerified(dnpName) || dnp.origin)
+  if (!dnp.isVerified || dnp.origin)
     disclaimers.push({
       name: "Unverified package",
       message:

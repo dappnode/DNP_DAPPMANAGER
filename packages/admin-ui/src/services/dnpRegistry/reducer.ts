@@ -17,8 +17,8 @@ export const reducer = createReducer<{
   builder.addCase(updateDnpRegistry, (state, action) => ({
     ...state,
     registry: Object.values({
-      ...keyBy(state.registry, dnp => dnp.name),
-      ...keyBy(action.payload, dnp => dnp.name)
+      ...keyBy(state.registry, dnp => dnp.dnpName),
+      ...keyBy(action.payload, dnp => dnp.dnpName)
     })
   }));
 

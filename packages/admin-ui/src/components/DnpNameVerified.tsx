@@ -1,22 +1,20 @@
 import React from "react";
 import { GoVerified } from "react-icons/go";
-import { prettyDnpName, isDnpVerified } from "utils/format";
+import { prettyDnpName } from "utils/format";
 import "./dnpNameVerified.scss";
 
 export default function DnpNameVerified({
-  name,
-  origin,
+  dnpName,
+  isVerified,
   big
 }: {
-  name: string;
-  origin?: string | null;
+  dnpName: string;
+  isVerified: boolean;
   big?: boolean;
 }) {
-  const isVerified = !origin && isDnpVerified(name);
-
   return (
     <div className={`dnp-name-verified ${big ? "big" : ""}`}>
-      <span className="name">{prettyDnpName(name)}</span>
+      <span className="name">{prettyDnpName(dnpName)}</span>
       <span className="verified-badge">{isVerified && <GoVerified />}</span>
     </div>
   );

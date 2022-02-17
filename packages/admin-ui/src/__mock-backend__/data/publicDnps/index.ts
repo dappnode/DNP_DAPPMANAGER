@@ -5,7 +5,7 @@ import { DirectoryItem } from "common";
 export const mockPublicDnps: DirectoryItem[] = [
   {
     index: 17,
-    name: "x-core.public.dappnode.eth",
+    dnpName: "x-core.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -18,7 +18,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 5,
-    name: "turbo-geth.public.dappnode.eth",
+    dnpName: "turbo-geth.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -32,7 +32,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 26,
-    name: "beaconcha-in.public.dappnode.eth",
+    dnpName: "beaconcha-in.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -45,7 +45,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 15,
-    name: "eth2stats-client.public.dappnode.eth",
+    dnpName: "eth2stats-client.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -58,7 +58,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 19,
-    name: "boinc.public.dappnode.eth",
+    dnpName: "boinc.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -72,7 +72,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 9,
-    name: "electrumx.public.dappnode.eth",
+    dnpName: "electrumx.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -85,7 +85,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 4,
-    name: "ethereum-optimism.public.dappnode.eth",
+    dnpName: "ethereum-optimism.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -98,7 +98,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 11,
-    name: "dms.public.dappnode.eth",
+    dnpName: "dms.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -111,7 +111,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 29,
-    name: "prysm-validator.public.dappnode.eth",
+    dnpName: "prysm-validator.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -124,7 +124,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 30,
-    name: "prysm-beacon-chain.public.dappnode.eth",
+    dnpName: "prysm-beacon-chain.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -137,7 +137,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 12,
-    name: "prometheus-grafana.public.dappnode.eth",
+    dnpName: "prometheus-grafana.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -150,7 +150,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 18,
-    name: "archipel-ui.public.dappnode.eth",
+    dnpName: "archipel-ui.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "error",
@@ -159,7 +159,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 8,
-    name: "idchain.public.dappnode.eth",
+    dnpName: "idchain.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -172,7 +172,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 1,
-    name: "polygon.public.dappnode.eth",
+    dnpName: "polygon.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -186,7 +186,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 27,
-    name: "polkadot-kusama.public.dappnode.eth",
+    dnpName: "polkadot-kusama.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -199,7 +199,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 24,
-    name: "storj.public.dappnode.eth",
+    dnpName: "storj.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -212,7 +212,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 7,
-    name: "sentinel.public.dappnode.eth",
+    dnpName: "sentinel.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -225,7 +225,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 13,
-    name: "dappnode-exporter.public.dappnode.eth",
+    dnpName: "dappnode-exporter.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -238,7 +238,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 10,
-    name: "big-dipper.public.dappnode.eth",
+    dnpName: "big-dipper.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -251,7 +251,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 28,
-    name: "polkadot-apps.public.dappnode.eth",
+    dnpName: "polkadot-apps.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -264,7 +264,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 2,
-    name: "avalanche.public.dappnode.eth",
+    dnpName: "avalanche.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -277,7 +277,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 22,
-    name: "archipel.public.dappnode.eth",
+    dnpName: "archipel.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -291,7 +291,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 16,
-    name: "folding-at-home.public.dappnode.eth",
+    dnpName: "folding-at-home.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -305,7 +305,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 23,
-    name: "tornado-cash-relayer.public.dappnode.eth",
+    dnpName: "tornado-cash-relayer.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -318,7 +318,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 14,
-    name: "prysm-slasher.public.dappnode.eth",
+    dnpName: "prysm-slasher.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -331,7 +331,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 20,
-    name: "substrate-telemetry-archipel.public.dappnode.eth",
+    dnpName: "substrate-telemetry-archipel.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -344,7 +344,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 21,
-    name: "substrate-telemetry-backend-archipel.public.dappnode.eth",
+    dnpName: "substrate-telemetry-backend-archipel.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -357,7 +357,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 25,
-    name: "nethermind.public.dappnode.eth",
+    dnpName: "nethermind.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -370,7 +370,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 6,
-    name: "pocket-core-testnet.public.dappnode.eth",
+    dnpName: "pocket-core-testnet.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -383,7 +383,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 3,
-    name: "brightid-node.public.dappnode.eth",
+    dnpName: "brightid-node.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "ok",
@@ -396,7 +396,7 @@ export const mockPublicDnps: DirectoryItem[] = [
   },
   {
     index: 0,
-    name: "binance-smart-chain-node.public.dappnode.eth",
+    dnpName: "binance-smart-chain-node.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     status: "error",

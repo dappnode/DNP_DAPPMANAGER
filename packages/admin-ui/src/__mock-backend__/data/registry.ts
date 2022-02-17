@@ -6,7 +6,7 @@ export const registry: DirectoryItem[] = [
   {
     index: 99,
     status: "error",
-    name: "fetch-fails.public.dappnode.eth",
+    dnpName: "fetch-fails.public.dappnode.eth",
     whitelisted: true,
     isFeatured: false,
     message: "Sample error: Can't download manifest"

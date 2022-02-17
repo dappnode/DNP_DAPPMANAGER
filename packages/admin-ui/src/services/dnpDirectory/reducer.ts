@@ -17,8 +17,8 @@ export const reducer = createReducer<{
   builder.addCase(updateDnpDirectory, (state, action) => ({
     ...state,
     directory: Object.values({
-      ...keyBy(state.directory, dnp => dnp.name),
-      ...keyBy(action.payload, dnp => dnp.name)
+      ...keyBy(state.directory, dnp => dnp.dnpName),
+      ...keyBy(action.payload, dnp => dnp.dnpName)
     })
   }));
 

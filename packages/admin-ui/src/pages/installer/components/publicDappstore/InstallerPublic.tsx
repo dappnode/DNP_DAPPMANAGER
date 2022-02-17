@@ -28,7 +28,6 @@ import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 import { PublicSwitch } from "../PublicSwitch";
-import { useApi } from "api";
 
 export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
   const registry = useSelector(getDnpRegistry);
@@ -41,18 +40,6 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
     {} as SelectedCategories
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
-  const registryProgress = useApi.fetchRegistryProgress({});
-
-  useEffect(() => {
-    const interval =
-      requestStatus.loading &&
-      setInterval(() => {
-        registryProgress.revalidate();
-      }, 5000);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [requestStatus.loading, registryProgress]);
 
   useEffect(() => {
     dispatch(fetchDnpRegistry({}));
@@ -95,7 +82,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
   function runQuery() {
     if (isIpfsHash(query)) return openDnp(query);
     if (directoryFiltered.length === 1)
-      return openDnp(directoryFiltered[0].name);
+      return openDnp(directoryFiltered[0].dnpName);
     else openDnp(query);
   }
 
@@ -173,12 +160,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />
       ) : requestStatus.loading ? (
-        <Loading
-          steps={[
-            `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
-              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
-          ]}
-        />
+        <Loading steps={[`Loading public registry ${registryName}`]} />
       ) : requestStatus.success ? (
         <ErrorView error={"Directory loaded but found no packages"} />
       ) : null}

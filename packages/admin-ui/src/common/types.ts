@@ -115,9 +115,10 @@ export type VpnDeviceCredentials = VpnDevice & {
 // Information immediatelly available in the directory smart contract
 interface DirectoryItemBasic {
   index: number;
-  name: string;
+  dnpName: string;
   whitelisted: boolean;
   isFeatured: boolean;
+  isVerified: boolean;
 }
 export interface DirectoryItemOk extends DirectoryItemBasic {
   status: "ok";
@@ -139,11 +140,6 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 }
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
-
-export interface RegistryScanProgress {
-  lastFetchedBlock: number;
-  latestBlock: number;
-}
 
 export interface RequestStatus {
   loading?: boolean;
@@ -954,10 +950,6 @@ export interface DistributedFile {
 }
 
 export interface ReleaseWarnings {
-  /**
-   * If a core package does not come from the DAppNode Package APM registry
-   */
-  coreFromForeignRegistry?: boolean;
   /**
    * If the requested name does not match the manifest name
    */

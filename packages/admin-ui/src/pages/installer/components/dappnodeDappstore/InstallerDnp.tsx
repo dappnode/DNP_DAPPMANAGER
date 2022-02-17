@@ -81,7 +81,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   function runQuery() {
     if (isIpfsHash(query)) return openDnp(query);
     if (directoryFiltered.length === 1)
-      return openDnp(directoryFiltered[0].name);
+      return openDnp(directoryFiltered[0].dnpName);
     else openDnp(query);
   }
 
