@@ -18,9 +18,5 @@ const knownChains: { [dnpName: string]: ChainDriver } = {
   "bitcoin.dnp.dappnode.eth": "bitcoin",
   "monero.dnp.dappnode.eth": "monero",
   "prysm.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm",
-  "prysm-prater.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm",
-  "teku.dnp.dappnode.eth": "ethereum2",
-  "teku-prater.dnp.dappnode.eth": "ethereum2",
-  "lighthouse.dnp.dappnode.eth": "ethereum2",
-  "lighthouse-prater.dnp.dappnode.eth": "ethereum2"
+  "prysm-prater.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm"
 };
