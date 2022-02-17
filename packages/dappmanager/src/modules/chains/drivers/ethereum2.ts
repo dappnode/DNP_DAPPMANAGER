@@ -13,27 +13,24 @@ export async function ethereum2(
   dnp: InstalledPackageData,
   chainDriver: ChainDriverSpecs
 ): Promise<ChainDataResult | null> {
-  // base URL for the beacon chain node (e.g http://beacon-chain.prysm-pyrmont.dappnode:3500/)
-  const defaultBeaconChainServiceName = "beacon-chain";
-  const defaultBeaconPortNumber = 3500;
-
   // 1. Get network alias from the beacon chain service (use the default beaconchain service name if not specified)
-  const serviceName = chainDriver.serviceName || defaultBeaconChainServiceName;
+  const serviceName = chainDriver.serviceName || "beacon-chain";
   const beaconChainContainer = dnp.containers.find(
     container => container.serviceName === serviceName
   );
   if (!beaconChainContainer) {
-    throw Error(`${defaultBeaconChainServiceName} service not found`);
+    throw Error(`${serviceName} service not found`);
   }
   if (!beaconChainContainer.running) {
     return null; // OK to not be running, just ignore
   }
+
   const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
 
   // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
-  const port = chainDriver.portNumber || defaultBeaconPortNumber;
+  const port = chainDriver.portNumber || 3500;
 
-  // http://beacon-chain.prysm-pyrmont.dappnode:3500/
+  // base URL for the beacon chain node (e.g http://beacon-chain.prysm-pyrmont.dappnode:3500/)
   const apiUrl = `http://${containerDomain}:${port}`;
 
   try {
