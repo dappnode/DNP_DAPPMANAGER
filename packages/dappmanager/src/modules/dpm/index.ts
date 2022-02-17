@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
 import { AddressHex } from "../../types";
-import { fetchDpmRegistryPackage } from "./registry";
+import { fetchDpmRegistryPackage, Package } from "./registry";
 import {
   fetchDnpRepoLastPublishedVersion,
   fetchDpmRepoVersion,
@@ -97,11 +97,7 @@ export class Dpm {
     }
   }
 
-  /**
-   * Resolves a dnpNme to a repo address
-   * @param dnpName `"bitcoin.dnp.dappnode.eth"`
-   */
-  async resolveDnpNameToRepoAddress(dnpName: string): Promise<AddressHex> {
+  async resolveDnpNameToPackage(dnpName: string): Promise<Package> {
     const dotIdx = dnpName.indexOf(".");
     if (dotIdx < 0) {
       throw Error(`Invalid dnpName ${dnpName} must contain the '.' character`);
@@ -111,12 +107,19 @@ export class Dpm {
     const registryName = dnpName.slice(dotIdx + 1);
     const registryAddress = getRegistryAddress(registryName);
 
-    const pkg = await fetchDpmRegistryPackage(
+    return await fetchDpmRegistryPackage(
       await this.getProvider(),
       registryAddress,
       pkgName
     );
+  }
 
+  /**
+   * Resolves a dnpNme to a repo address
+   * @param dnpName `"bitcoin.dnp.dappnode.eth"`
+   */
+  async resolveDnpNameToRepoAddress(dnpName: string): Promise<AddressHex> {
+    const pkg = await this.resolveDnpNameToPackage(dnpName);
     return pkg.repoAddress;
   }
 }
