@@ -10,7 +10,7 @@ import SideBar from "./components/navbar/SideBar";
 import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
 // Pages
-import pages, { defaultPage } from "./pages";
+import { pages, defaultPage } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";

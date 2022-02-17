@@ -5,10 +5,10 @@ import makeBlockie from "ethereum-blockies-base64";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { stringSplit } from "utils/strings";
 
-type DappnodeIdentity = ReturnType<typeof getDappnodeIdentityClean>;
+type DappnodeIdentityType = ReturnType<typeof getDappnodeIdentityClean>;
 
 function renderIdentityValue(
-  key: keyof DappnodeIdentity,
+  key: keyof DappnodeIdentityType,
   value?: string
 ): JSX.Element | string | null {
   switch (key) {
