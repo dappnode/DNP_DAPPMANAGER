@@ -16,6 +16,7 @@ export const sampleRequestState: RequestedDnp = {
   imageSize: 10000000,
   isUpdated: false,
   isInstalled: true,
+  isVerified: true,
   settings: {},
   setupWizard: {},
 
@@ -46,6 +47,7 @@ export const sampleDirectoryState: DirectoryItem = {
   isUpdated: false,
   whitelisted: true,
   isFeatured: false,
+  isVerified: false,
   categories: ["Blockchain"]
 };
 

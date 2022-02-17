@@ -1,4 +1,4 @@
-import filterDirectory from "pages/installer/helpers/filterDirectory";
+import filterRegistry from "pages/installer/helpers/filterDirectory";
 import { DirectoryItem } from "types";
 import { SelectedCategories } from "pages/installer/types";
 
@@ -12,6 +12,7 @@ const sampleDirectoryState: DirectoryItem = {
   isUpdated: false,
   whitelisted: true,
   isFeatured: false,
+  isVerified: false,
   categories: ["Blockchain"]
 };
 
@@ -29,14 +30,14 @@ describe("pages > installer > helpers", () => {
       dnpName: dnp2Name,
       categories: ["Storage"]
     };
-    const directory: DirectoryItem[] = [dnp1, dnp2];
+    const packages: DirectoryItem[] = [dnp1, dnp2];
 
     it("Should filter directory by input", () => {
       const query = dnp1Name;
       const selectedCategories: SelectedCategories = {};
-      expect(
-        filterDirectory({ directory, query, selectedCategories })
-      ).toEqual([dnp1]);
+      expect(filterRegistry({ packages, query, selectedCategories })).toEqual([
+        dnp1
+      ]);
     });
 
     it("Should filter directory by type", () => {
@@ -45,9 +46,9 @@ describe("pages > installer > helpers", () => {
         Blockchain: false,
         Storage: true
       };
-      expect(
-        filterDirectory({ directory, query, selectedCategories })
-      ).toEqual([dnp2]);
+      expect(filterRegistry({ packages, query, selectedCategories })).toEqual([
+        dnp2
+      ]);
     });
   });
 });

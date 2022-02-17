@@ -301,6 +301,7 @@ export interface RequestedDnp {
   imageSize: number;
   isUpdated: boolean;
   isInstalled: boolean;
+  isVerified: boolean;
   // Decoupled metadata
   metadata: PackageReleaseMetadata;
   specialPermissions: SpecialPermissionAllDnps;

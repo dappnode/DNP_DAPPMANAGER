@@ -8,16 +8,11 @@ import {
 } from "services/isInstallingLogs/actions";
 import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
-import { updateDnpDirectory } from "services/dnpDirectory/actions";
 import { updateDnpRegistry } from "services/dnpRegistry/actions";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
-  subscriptions.directory.on(directoryDnps => {
-    store.dispatch(updateDnpDirectory(directoryDnps));
-  });
-
-  subscriptions.registry.on(registryDnps => {
-    store.dispatch(updateDnpRegistry(registryDnps));
+  subscriptions.registry.on(data => {
+    store.dispatch(updateDnpRegistry(data));
   });
 
   subscriptions.packages.on(dnpsInstalled => {

@@ -70,6 +70,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     metadata,
     isUpdated,
     isInstalled,
+    isVerified,
     avatarUrl,
     imageSize,
     origin
@@ -160,7 +161,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
           <div className="right">
             <div className="right-top">
               <div className="info">
-                <DnpNameVerified name={dnpName} origin={origin} />
+                <DnpNameVerified dnpName={dnpName} isVerified={isVerified} />
                 <div className="subtle-header capitalize">
                   {shortAuthor(author)}
                 </div>
