@@ -120,7 +120,7 @@ export function runOnlyOneSequentially<A, R>(
   fn: (arg?: A) => Promise<R>
 ): (arg?: A) => void {
   // create a cargo object with an infinite payload
-  const cargo = async.cargo(function(
+  const cargo = async.cargo(function (
     tasks: { arg: A }[],
     callback: () => void
   ) {
@@ -137,8 +137,8 @@ export function runOnlyOneSequentially<A, R>(
   },
   1e9);
 
-  return function(arg?: A): void {
-    cargo.push({ arg });
+  return function (arg?: A): void {
+    cargo.push({ arg: arg as A });
   };
 }
 
