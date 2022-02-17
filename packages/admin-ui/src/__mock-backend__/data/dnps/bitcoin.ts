@@ -9,8 +9,10 @@ export const bitcoin: MockDnp = {
   metadata: {
     name: dnpName,
     version: "0.1.3",
-    description:
-      "The Bitcoin Core daemon (0.18.0). Bitcoind is a program that implements the Bitcoin protocol for remote procedure call (RPC) use.",
+    description: `The Bitcoin Core daemon (0.18.0). Bitcoind is a program that implements the Bitcoin protocol for remote procedure call (RPC) use.
+
+[Link to bitcoin core](https://github.com/bitcoin/bitcoin)
+`,
     type: "service",
     style: {
       featuredBackground: "linear-gradient(to right, #4b3317, #cb6e00)",

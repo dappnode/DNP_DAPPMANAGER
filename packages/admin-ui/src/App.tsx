@@ -93,13 +93,13 @@ export default function App() {
   useEffect(() => {
     if (isError) {
       let timeToNext = 500;
-      let timeout: number;
+      let timeout: unknown;
       const recursiveTimeout = () => {
         onFetchLoginStatus();
         timeout = setTimeout(recursiveTimeout, (timeToNext *= 2));
       };
       recursiveTimeout();
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout as number);
     }
   }, [isError, onFetchLoginStatus]);
 

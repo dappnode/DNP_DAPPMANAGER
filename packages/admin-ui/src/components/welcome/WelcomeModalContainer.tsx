@@ -21,7 +21,7 @@ const WelcomeModalContainer: React.FC<{
   const [status, setStatus] = useState<FadeStatus>("null");
 
   useEffect(() => {
-    let timeout: number;
+    let timeout: unknown;
     if (show) {
       if (status === "null") setStatus("opacity-0");
       if (status === "opacity-0")
@@ -33,7 +33,7 @@ const WelcomeModalContainer: React.FC<{
     }
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(timeout as number);
     };
   }, [show, status]);
 
