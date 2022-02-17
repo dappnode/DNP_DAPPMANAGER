@@ -12,7 +12,7 @@ import {
 
 interface EventTypes {
   chainData: ChainData[];
-  registry: DirectoryItem[];
+  registry: { registryName: string; items: DirectoryItem[] };
   logUi: ProgressLog;
   logUserAction: UserActionLog;
   notification: PackageNotification;

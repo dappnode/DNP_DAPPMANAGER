@@ -21,12 +21,10 @@ const loadThrottleMs = 500; // 0.5 seconds
  * Fetches all packages with their latest version from a Dappnode Package Registry
  */
 export async function fetchRegistry({
-  registryName
+  registryName = params.DAPPNODE_MAIN_REGISTRY_XDAI_NAME
 }: {
   registryName?: string;
 }): Promise<DirectoryItem[]> {
-  if (!registryName) registryName = params.DAPPNODE_MAIN_REGISTRY_XDAI_NAME;
-
   const provider = await getEthersProvider();
   const releaseFetcher = new ReleaseFetcher();
 
@@ -48,7 +46,7 @@ export async function fetchRegistry({
   let registryDnpsPending: DirectoryItem[] = [];
   // Prevent sending way to many updates in case the fetching process is fast
   const emitRegistryUpdate = throttle(() => {
-    eventBus.registry.emit(registryDnpsPending);
+    eventBus.registry.emit({ registryName, items: registryDnpsPending });
     registryDnpsPending = [];
   }, loadThrottleMs);
 
