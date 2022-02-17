@@ -4,8 +4,6 @@ import SubTitle from "components/SubTitle";
 import { ChangePassword } from "./ChangePassword";
 import { SignOut } from "./SignOut";
 
-type ShowStatus = "loading" | "show" | "hide";
-
 export default function Profile() {
   return (
     <>

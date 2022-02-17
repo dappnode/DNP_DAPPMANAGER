@@ -8,7 +8,7 @@ import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
 
-export default {
+export const pages = {
   dashboard,
   wifi,
   VPN,

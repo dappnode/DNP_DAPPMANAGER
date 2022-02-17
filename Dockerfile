@@ -14,10 +14,8 @@ COPY patches patches/
 # Install lerna first
 RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
 COPY packages/admin-ui/package.json \ 
-  packages/admin-ui/yarn.lock \ 
   packages/admin-ui/
 COPY packages/dappmanager/package.json \ 
-  packages/dappmanager/yarn.lock \
   packages/dappmanager/
 RUN yarn bootstrap --production
 

@@ -13,8 +13,8 @@ export async function loadImage(
       if (err) reject(err);
       else
         docker.modem.followProgress(
-          stream,
-          function onFinished(err: Error): void {
+          stream as NodeJS.ReadableStream,
+          function onFinished(err: Error | null): void {
             if (err) reject(err);
             else resolve();
           },

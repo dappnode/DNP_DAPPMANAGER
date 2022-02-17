@@ -49,7 +49,9 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
       setInterval(() => {
         registryProgress.revalidate();
       }, 5000);
-    return () => clearInterval(interval as number);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [requestStatus.loading, registryProgress]);
 
   useEffect(() => {
