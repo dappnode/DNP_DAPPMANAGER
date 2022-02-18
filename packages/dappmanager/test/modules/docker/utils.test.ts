@@ -3,10 +3,12 @@ import { expect } from "chai";
 
 import {
   getDockerTimeoutMax,
+  ensureUniquePortsFromDockerApi,
   stripDockerApiLogsHeaderAndAnsi
 } from "../../../src/modules/docker/utils";
 import { PackageContainer } from "../../../src/types";
 import { mockContainer } from "../../testUtils";
+import Dockerode from "dockerode";
 
 describe("docker API > utils", () => {
   describe("stripDockerApiLogsHeaderAndAnsi", () => {
@@ -51,6 +53,94 @@ info Webserver on 80, /usr/src/app/dist`;
       ];
       const timeout = getDockerTimeoutMax(containers);
       expect(timeout).to.equal(120);
+    });
+  });
+
+  describe("parseDockerApiListPorts", () => {
+    it("Should parse the docker ports from docker api (not duplicated)", () => {
+      const dockerApiPorts: Dockerode.Port[] = [
+        {
+          IP: "0.0.0.0",
+          PrivatePort: 30303,
+          PublicPort: 49969,
+          Type: "tcp"
+        },
+        {
+          IP: "::",
+          PrivatePort: 30303,
+          PublicPort: 49969,
+          Type: "tcp"
+        },
+        {
+          IP: "0.0.0.0",
+          PrivatePort: 30303,
+          PublicPort: 49939,
+          Type: "udp"
+        },
+        {
+          IP: "::",
+          PrivatePort: 30303,
+          PublicPort: 49939,
+          Type: "udp"
+        },
+        {
+          IP: "0.0.0.0",
+          PrivatePort: 30304,
+          PublicPort: 49968,
+          Type: "tcp"
+        },
+        {
+          IP: "::",
+          PrivatePort: 30304,
+          PublicPort: 49968,
+          Type: "tcp"
+        },
+        {
+          IP: "0.0.0.0",
+          PrivatePort: 30304,
+          PublicPort: 49938,
+          Type: "udp"
+        },
+        {
+          IP: "::",
+          PrivatePort: 30304,
+          PublicPort: 49938,
+          Type: "udp"
+        }
+      ];
+
+      const expectedPorts = [
+        {
+          host: 49969,
+          container: 30303,
+          protocol: "TCP",
+          deletable: true
+        },
+        {
+          host: 49939,
+          container: 30303,
+          protocol: "UDP",
+          deletable: true
+        },
+        {
+          host: 49968,
+          container: 30304,
+          protocol: "TCP",
+          deletable: true
+        },
+        {
+          host: 49938,
+          container: 30304,
+          protocol: "UDP",
+          deletable: true
+        }
+      ];
+
+      const dockerApiPortsParsed = ensureUniquePortsFromDockerApi(
+        dockerApiPorts,
+        undefined
+      );
+      expect(dockerApiPortsParsed).to.eql(expectedPorts);
     });
   });
 });
