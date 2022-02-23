@@ -18,24 +18,24 @@ export async function runWithChainDriver(
   dnp: InstalledPackageData,
   chainDriver: ChainDriver
 ): Promise<ChainDataResult | null> {
-  let chainDriverCasted: ChainDriverSpecs;
+  let chainDriverSpecs: ChainDriverSpecs;
   if (typeof chainDriver === "string") {
-    chainDriverCasted = { driver: chainDriver };
+    chainDriverSpecs = { driver: chainDriver };
   } else {
-    chainDriverCasted = chainDriver;
+    chainDriverSpecs = chainDriver;
   }
 
-  switch (chainDriverCasted.driver) {
+  switch (chainDriverSpecs.driver) {
     case "bitcoin":
       return bitcoin(dnp);
     case "ethereum":
       return ethereum(dnp);
-    case "ethereum2-beacon-chain-prysm":
+    case "ethereum2-beacon-chain-prysm": // TEMPORARY! Remove when all prysm dnps are updated: https://github.com/dappnode/DAppNodePackage-prysm/pull/62 and https://github.com/dappnode/DAppNodePackage-prysm-prater/pull/35
     case "ethereum-beacon-chain":
-      return ethereum2(dnp, chainDriverCasted);
+      return ethereum2(dnp, chainDriverSpecs);
     case "monero":
       return monero(dnp);
     default:
-      throw Error(`Unsupported driver: ${chainDriver}`);
+      throw Error(`Unsupported driver: ${chainDriverSpecs.driver}`);
   }
 }

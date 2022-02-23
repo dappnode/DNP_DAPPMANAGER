@@ -51,14 +51,19 @@ const labelParseFns: {
   "dappnode.dnp.dependencies": value => parseJsonSafe(value) || {},
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
-  "dappnode.dnp.chain": value =>
-    value &&
-    (chainDriversTypes.includes(value as ChainDriverType) ||
+  "dappnode.dnp.chain": value => {
+    if (chainDriversTypes.includes(value as ChainDriverType))
+      return value as ChainDriver;
+    const valueParsed = parseJsonSafe(value);
+    if (
+      valueParsed &&
       chainDriversTypes.includes(
-        (parseJsonSafe(value) as ChainDriverSpecs).driver as ChainDriverType
-      ))
-      ? (value as ChainDriver)
-      : undefined,
+        (valueParsed as ChainDriverSpecs).driver as ChainDriverType
+      )
+    )
+      return value as ChainDriver;
+    return undefined;
+  },
   "dappnode.dnp.isCore": parseBool,
   "dappnode.dnp.isMain": parseBool,
   "dappnode.dnp.dockerTimeout": parseNumber,
@@ -91,7 +96,7 @@ const labelStringifyFns: {
   "dappnode.dnp.default.volumes": writeJson
 };
 
-export function parseContainerLabels(
+function parseContainerLabels(
   labelsRaw: ContainerLabelsRaw
 ): Partial<ContainerLabelTypes> {
   return mapValues(labelParseFns, (labelParseFn, label) =>
@@ -99,7 +104,7 @@ export function parseContainerLabels(
   ) as Partial<ContainerLabelTypes>;
 }
 
-export function stringifyContainerLabels(
+function stringifyContainerLabels(
   labels: Partial<ContainerLabelTypes>
 ): ContainerLabelsRaw {
   const labelsRaw = mapValues(
