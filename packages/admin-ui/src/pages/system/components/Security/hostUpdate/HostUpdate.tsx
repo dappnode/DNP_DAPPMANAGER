@@ -14,16 +14,16 @@ export default function HostUpdate() {
     try {
       await new Promise<void>(resolve => {
         confirm({
-          title: `Host security update`,
-          text: `Warning, you are about to perform host security updates. It is possible that the system will need to reboot.`,
-          label: "Security update",
+          title: `Host update`,
+          text: `Warning, you are about to perform host updates. It is possible that the system will need to reboot.`,
+          label: "Host update",
           onClick: resolve
         });
       });
       setUpdateReq({ loading: true });
       const result = await withToast(() => api.runHostUpdates(), {
-        message: "Performing security updates",
-        onSuccess: "Performed security updates"
+        message: "Performing host updates",
+        onSuccess: "Performed host updates"
       });
       setUpdateReq({ result: result });
     } catch (e) {
@@ -34,20 +34,20 @@ export default function HostUpdate() {
   return (
     <>
       <p>
-        Keep your host updated by performing security updates of outdated
-        libraries and the kernel
+        Keep your host updated by performing host updates of outdated libraries
+        and the kernel
       </p>
 
       <Button disabled={updateReq.loading} onClick={hostUpdate}>
-        Security updates
+        Host updates
       </Button>
 
       {updateReq.result ? (
-        <Ok ok={true} msg={"Successfully perform security updates"} />
+        <Ok ok={true} msg={"Successfully perform host updates"} />
       ) : updateReq.error ? (
         <ErrorView error={updateReq.error} red hideIcon />
       ) : updateReq.loading ? (
-        <Ok msg={"Performing security updates..."} loading={true} />
+        <Ok msg={"Performing host updates..."} loading={true} />
       ) : null}
     </>
   );
