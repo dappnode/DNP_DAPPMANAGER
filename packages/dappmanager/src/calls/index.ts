@@ -50,7 +50,7 @@ export { portsUpnpStatusGet } from "./portsStatusGet";
 export { portsToOpenGet } from "./portsToOpenGet";
 export { rebootHost } from "./rebootHost";
 export * from "./releaseTrustedKey";
-export { runHostSecurityUpdates } from "./runHostSecurityUpdates";
+export { runHostUpdates } from "./runHostUpdates";
 export { seedPhraseSet } from "./seedPhraseSet";
 export { setStaticIp } from "./setStaticIp";
 export { statsCpuGet } from "./statsCpuGet";

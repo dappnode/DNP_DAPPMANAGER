@@ -223,8 +223,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       // "change-host-password"
     ]
   }),
-  runHostSecurityUpdates: async () =>
-    "Security updates have been executed successfully, no reboot needed",
+  runHostUpdates: async () =>
+    "Host updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [

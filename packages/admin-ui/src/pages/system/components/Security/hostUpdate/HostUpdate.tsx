@@ -7,10 +7,10 @@ import Ok from "components/Ok";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 
-export default function HostSecurityUpdate() {
+export default function HostUpdate() {
   const [updateReq, setUpdateReq] = useState<ReqStatus<string>>({});
 
-  async function hostSecurityUpdate() {
+  async function hostUpdate() {
     try {
       await new Promise<void>(resolve => {
         confirm({
@@ -21,14 +21,14 @@ export default function HostSecurityUpdate() {
         });
       });
       setUpdateReq({ loading: true });
-      const result = await withToast(() => api.runHostSecurityUpdates(), {
+      const result = await withToast(() => api.runHostUpdates(), {
         message: "Performing security updates",
         onSuccess: "Performed security updates"
       });
       setUpdateReq({ result: result });
     } catch (e) {
       setUpdateReq({ error: e });
-      console.error("Error on securityUpdate", e);
+      console.error("Error on hostUpdates", e);
     }
   }
   return (
@@ -38,7 +38,7 @@ export default function HostSecurityUpdate() {
         libraries and the kernel
       </p>
 
-      <Button disabled={updateReq.loading} onClick={hostSecurityUpdate}>
+      <Button disabled={updateReq.loading} onClick={hostUpdate}>
         Security updates
       </Button>
 

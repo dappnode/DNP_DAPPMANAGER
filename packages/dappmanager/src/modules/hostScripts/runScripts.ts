@@ -16,7 +16,7 @@ type ScriptName =
   | "docker_engine_update.sh"
   | "docker_compose_update.sh"
   | "collect_host_info.sh"
-  | "security_update.sh"
+  | "host_update.sh"
   | "avahi_daemon.sh";
 
 /**
