@@ -16,7 +16,7 @@ export async function exposeByDefaultHttpsPorts(
   if (pkg.metadata.exposable) {
     const portMappinRollback: HttpsPortalMapping[] = [];
     for (const exposable of pkg.metadata.exposable) {
-      if (exposable.exposedByDefault) {
+      if (exposable.exposeByDefault) {
         // Check HTTPS package exists
         const httpsPackage = await listPackageNoThrow({
           dnpName: params.HTTPS_PORTAL_DNPNAME
