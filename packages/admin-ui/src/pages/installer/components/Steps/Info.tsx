@@ -196,7 +196,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
                   className="install"
                   variant="dappnode"
                   onClick={onInstall}
-                  disabled={disableInstallation}
+                  disabled={disableInstallation || isUpdated}
                 >
                   {tagDisplay}
                 </Button>
