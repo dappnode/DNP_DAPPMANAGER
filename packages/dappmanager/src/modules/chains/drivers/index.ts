@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "../../../common";
+import { ChainDriverSpecs, InstalledPackageData } from "../../../common";
 import { ChainDriver } from "../../../types";
 import { ChainDataResult } from "../types";
 // Drivers
@@ -16,23 +16,26 @@ import { monero } from "./monero";
  */
 export async function runWithChainDriver(
   dnp: InstalledPackageData,
-  chainDriverName: ChainDriver
+  chainDriver: ChainDriver
 ): Promise<ChainDataResult | null> {
-  switch (chainDriverName) {
+  let chainDriverSpecs: ChainDriverSpecs;
+  if (typeof chainDriver === "string") {
+    chainDriverSpecs = { driver: chainDriver };
+  } else {
+    chainDriverSpecs = chainDriver;
+  }
+
+  switch (chainDriverSpecs.driver) {
     case "bitcoin":
-      return await bitcoin(dnp);
-
+      return bitcoin(dnp);
     case "ethereum":
-      return await ethereum(dnp);
-
-    case "ethereum2":
-    case "ethereum2-beacon-chain-prysm":
-      return await ethereum2(dnp);
-
+      return ethereum(dnp);
+    case "ethereum2-beacon-chain-prysm": // TEMPORARY! Remove when all prysm dnps are updated: https://github.com/dappnode/DAppNodePackage-prysm/pull/62 and https://github.com/dappnode/DAppNodePackage-prysm-prater/pull/35
+    case "ethereum-beacon-chain":
+      return ethereum2(dnp, chainDriverSpecs);
     case "monero":
-      return await monero(dnp);
-
+      return monero(dnp);
     default:
-      throw Error(`Unsupported driver: ${chainDriverName}`);
+      throw Error(`Unsupported driver: ${chainDriverSpecs.driver}`);
   }
 }

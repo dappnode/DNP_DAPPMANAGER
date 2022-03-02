@@ -1,33 +1,25 @@
 import fetch from "node-fetch";
-import memoize from "memoizee";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { urlJoin } from "../../../utils/url";
-import { InstalledPackageData } from "../../../types";
+import { InstalledPackageData, ChainDriverSpecs } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
-
-const beaconChainServiceName = "beacon-chain";
-const MIN_SLOT_DIFF_SYNC = 60;
-
-// Wait for Promises to resolve. Do not cache rejections
-// Cache for 1 hour, genesis and config should never change
-const fetchNodeSyncingMemo = memoize(fetchNodeSyncingStatus, {
-  promise: true,
-  maxAge: 3e6
-});
 
 /**
  * Returns a chain data object for an Ethereum 2.0 Prysm beacon chain node
  * @param apiUrl = "http://beacon-chain.prysm-pyrmont.dappnode:3500/"
  */
 export async function ethereum2(
-  dnp: InstalledPackageData
+  dnp: InstalledPackageData,
+  chainDriver: ChainDriverSpecs
 ): Promise<ChainDataResult | null> {
+  // 1. Get network alias from the beacon chain service (use the default beaconchain service name if not specified)
+  const serviceName = chainDriver.serviceName || "beacon-chain";
   const beaconChainContainer = dnp.containers.find(
-    container => container.serviceName === beaconChainServiceName
+    container => container.serviceName === serviceName
   );
   if (!beaconChainContainer) {
-    throw Error(`${beaconChainServiceName} service not found`);
+    throw Error(`${serviceName} service not found`);
   }
   if (!beaconChainContainer.running) {
     return null; // OK to not be running, just ignore
@@ -35,11 +27,14 @@ export async function ethereum2(
 
   const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
 
-  // http://beacon-chain.prysm-pyrmont.dappnode:3500/
-  const apiUrl = `http://${containerDomain}:3500`;
+  // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
+  const port = chainDriver.portNumber || 3500;
+
+  // base URL for the beacon chain node (e.g http://beacon-chain.prysm-pyrmont.dappnode:3500/)
+  const apiUrl = `http://${containerDomain}:${port}`;
 
   try {
-    const nodeSyncing = await fetchNodeSyncingMemo(apiUrl);
+    const nodeSyncing = await fetchNodeSyncingStatus(apiUrl);
 
     return parseNodeSyncingResponse(nodeSyncing);
   } catch (e) {
@@ -58,6 +53,7 @@ export async function ethereum2(
 export function parseNodeSyncingResponse(
   nodeSyncing: NodeSyncing
 ): ChainDataResult {
+  const MIN_SLOT_DIFF_SYNC = 60;
   // Return error if no data
   if (!nodeSyncing || !nodeSyncing.data)
     return {
