@@ -601,9 +601,9 @@ export interface Routes {
   systemInfoGet: () => Promise<SystemInfo>;
 
   /**
-   * Executes security updates on host
+   * Executes updates on host
    */
-  runHostSecurityUpdates: () => Promise<string>;
+  runHostUpdates: () => Promise<string>;
 
   /**
    * Attemps to open ports using UPnP
@@ -729,7 +729,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
-  runHostSecurityUpdates: {},
+  runHostUpdates: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   statsCpuGet: {},

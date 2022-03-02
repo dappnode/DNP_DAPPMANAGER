@@ -1,14 +1,14 @@
 import React from "react";
 import SecurityIssues from "./securityIssues";
-import SecurityUpdate from "./securityUpdate";
+import HostUpdates from "./hostUpdate";
 import SubTitle from "components/SubTitle";
 
 export default function SystemSecurity() {
   return (
     <>
       <SecurityIssues />
-      <SubTitle>Security update</SubTitle>
-      <SecurityUpdate />
+      <SubTitle>Host update</SubTitle>
+      <HostUpdates />
     </>
   );
 }
