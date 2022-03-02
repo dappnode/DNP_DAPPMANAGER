@@ -30,6 +30,7 @@ export interface ExposableServiceManifestInfo {
   serviceName?: string;
   fromSubdomain?: string;
   port: number;
+  exposeByDefault?: boolean;
 }
 
 export interface ExposableServiceMapping extends ExposableServiceInfo {

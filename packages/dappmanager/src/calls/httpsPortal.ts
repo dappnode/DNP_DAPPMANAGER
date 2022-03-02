@@ -10,7 +10,7 @@ const httpsPortalApiClient = new HttpsPortalApiClient(
   params.HTTPS_PORTAL_API_URL
 );
 
-const httpsPortal = new HttpsPortal(httpsPortalApiClient);
+export const httpsPortal = new HttpsPortal(httpsPortalApiClient);
 
 /**
  * HTTPs Portal: map a subdomain

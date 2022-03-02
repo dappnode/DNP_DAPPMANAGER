@@ -8,6 +8,7 @@ import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
+import { exposeByDefaultHttpsPorts } from "./exposeByDefaultHttpsPorts";
 
 /**
  * Create and run each package container in series
@@ -78,5 +79,7 @@ export async function runPackages(
     );
 
     log(pkg.dnpName, "Package started");
+
+    await exposeByDefaultHttpsPorts(pkg, log);
   }
 }
