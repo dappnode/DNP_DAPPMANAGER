@@ -21,9 +21,9 @@ export const repoAbi = [
       },
       {
         indexed: false,
-        internalType: "string",
-        name: "contentURI",
-        type: "string"
+        internalType: "string[]",
+        name: "contentURIs",
+        type: "string[]"
       }
     ],
     name: "NewVersion",
@@ -148,9 +148,9 @@ export const repoAbi = [
             type: "string"
           },
           {
-            internalType: "string",
-            name: "contentURI",
-            type: "string"
+            internalType: "string[]",
+            name: "contentURIs",
+            type: "string[]"
           }
         ],
         internalType: "struct Repo.Version",
@@ -179,9 +179,9 @@ export const repoAbi = [
             type: "string"
           },
           {
-            internalType: "string",
-            name: "contentURI",
-            type: "string"
+            internalType: "string[]",
+            name: "contentURIs",
+            type: "string[]"
           }
         ],
         internalType: "struct Repo.Version",
@@ -204,9 +204,9 @@ export const repoAbi = [
             type: "string"
           },
           {
-            internalType: "string",
-            name: "contentURI",
-            type: "string"
+            internalType: "string[]",
+            name: "contentURIs",
+            type: "string[]"
           }
         ],
         internalType: "struct Repo.Version",
@@ -355,9 +355,9 @@ export const repoAbi = [
         type: "string"
       },
       {
-        internalType: "string",
-        name: "_contentURI",
-        type: "string"
+        internalType: "string[]",
+        name: "_contentURIs",
+        type: "string[]"
       }
     ],
     name: "newVersion",
@@ -404,6 +404,19 @@ export const repoAbi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_versionSorting",
+        type: "uint256"
+      }
+    ],
+    name: "setVersionSorting",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [
+      {
         internalType: "bytes4",
         name: "interfaceId",
         type: "bytes4"
@@ -440,6 +453,19 @@ export const repoAbi = [
     type: "function"
   },
   {
+    inputs: [],
+    name: "versionSorting",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256"
+      }
+    ],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -452,11 +478,6 @@ export const repoAbi = [
       {
         internalType: "string",
         name: "version",
-        type: "string"
-      },
-      {
-        internalType: "string",
-        name: "contentURI",
         type: "string"
       }
     ],

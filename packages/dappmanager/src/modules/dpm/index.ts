@@ -1,19 +1,28 @@
 import { ethers } from "ethers";
+import semver from "semver";
 import * as db from "../../db";
 import { AddressHex } from "../../types";
 import { fetchDpmRegistryPackage, Package } from "./registry";
 import {
-  fetchDnpRepoLastPublishedVersion,
+  fetchDnpRepoVersionSorting,
   fetchDpmRepoVersion,
   fetchDpmRepoVersions,
   VersionDpm,
-  VersionDpmWithId
+  VersionDpmWithId,
+  VersionSorting
 } from "./repo";
 import { getEthersProvider } from "../ethClient";
 import params from "../../params";
 
 export { fetchDpmRegistryPackages, Package } from "./registry";
 export { fetchDpmRepoVersion, fetchDpmRepoVersions } from "./repo";
+
+type RepoAddress = string;
+type VersionStr = string;
+
+type VersionsCache = Map<VersionStr, VersionDpm>;
+
+const versionsByStrByRepo = new Map<RepoAddress, VersionsCache>();
 
 // Packages are referred by
 // - Direct installs by searching for them
@@ -53,17 +62,44 @@ export class Dpm {
    * @param dnpName "bitcoin.dnp.dappnode.eth"
    * @param version "0.2.4"
    */
-  async fetchVersion(dnpName: string, version?: string): Promise<VersionDpm> {
+  async fetchVersion(
+    dnpName: string,
+    versionStr?: string
+  ): Promise<VersionDpm> {
     const provider = await this.getProvider();
-    const repoName = await this.resolveDnpNameToRepoAddress(dnpName);
+    const repoAddress = await this.resolveDnpNameToRepoAddress(dnpName);
 
-    if (version) {
-      return fetchDpmRepoVersion(provider, repoName, version);
-    } else {
-      // TODO: Latest know is not clear what it means:
-      // - versions may not be published in order, sorted by ID may not yield the actual latest
-      // - `version` is an arbitrary string, it may not be sortable by semver logic
-      return fetchDnpRepoLastPublishedVersion(provider, repoName);
+    if (versionStr) {
+      return await fetchDpmRepoVersion(provider, repoAddress, versionStr);
+    }
+
+    // Note: Latest know is as clear as with previous APM contracts:
+    // - versions may not be published in order, sorted by ID may not yield the actual latest
+    // - `version` is an arbitrary string, it may not be sortable by semver logic
+    else {
+      const versionsByStr = await this.populateRepoVersionsCache(
+        provider,
+        repoAddress
+      );
+
+      const versionSorting = await fetchDnpRepoVersionSorting(
+        provider,
+        repoAddress
+      );
+
+      // Note: Depending on the version sorting algorythm do something different
+      const maxVersionStr = sortLatestVersion(
+        Array.from(versionsByStr.keys()),
+        versionSorting
+      );
+
+      const version = versionsByStr.get(maxVersionStr);
+      if (!version) {
+        // Should never happen
+        throw Error(`latest versionStr ${maxVersionStr} is unknown`);
+      }
+
+      return version;
     }
   }
 
@@ -121,5 +157,46 @@ export class Dpm {
   async resolveDnpNameToRepoAddress(dnpName: string): Promise<AddressHex> {
     const pkg = await this.resolveDnpNameToPackage(dnpName);
     return pkg.repoAddress;
+  }
+
+  private async populateRepoVersionsCache(
+    provider: ethers.providers.Provider,
+    repoAddress: string
+  ): Promise<VersionsCache> {
+    // First sync up all versions
+    let versionsByStr = versionsByStrByRepo.get(repoAddress);
+    if (!versionsByStr) {
+      versionsByStr = new Map();
+      versionsByStrByRepo.set(repoAddress, versionsByStr);
+    }
+
+    const newVersions = await fetchDpmRepoVersions(
+      provider,
+      repoAddress,
+      versionsByStr.size
+    );
+
+    for (const newVersion of newVersions) {
+      versionsByStr.set(newVersion.version, newVersion);
+    }
+
+    return versionsByStr;
+  }
+}
+
+export function sortLatestVersion(
+  versionsStrs: VersionStr[],
+  versionSorting: VersionSorting
+): VersionStr {
+  switch (versionSorting) {
+    case VersionSorting.semver: {
+      const versionStrSorted = versionsStrs.sort(semver.rcompare);
+      return versionStrSorted[0];
+    }
+
+    case VersionSorting.alphabetical: {
+      const versionStrSorted = versionsStrs.sort((a, b) => b.localeCompare(a));
+      return versionStrSorted[0];
+    }
   }
 }

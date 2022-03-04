@@ -10,6 +10,11 @@ import {
   isSemverRange
 } from "../../utils/validate";
 
+enum ContentProtocol {
+  ipfs = "ipfs://",
+  bzz = "bzz://"
+}
+
 export class ReleaseFetcher extends Dpm {
   /**
    * Resolves name + version to an IPFS hash
@@ -23,10 +28,12 @@ export class ReleaseFetcher extends Dpm {
 
     // Normal case, name = eth domain & ver = semverVersion
     // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
-    if (isEnsDomain(dnpName) && (isSemver(version) || isSemverRange(version)))
+    if (isEnsDomain(dnpName) && (isSemver(version) || isSemverRange(version))) {
+      const versionDpm = await this.fetchVersion(dnpName, version);
       return {
-        hash: (await this.fetchVersion(dnpName, version)).contentUri
+        hash: findContentUri(versionDpm.contentUris, ContentProtocol.ipfs)
       };
+    }
 
     // IPFS normal case, name = eth domain & ver = IPFS hash
     if (isEnsDomain(dnpName) && isIpfsHash(version))
@@ -82,4 +89,17 @@ export class ReleaseFetcher extends Dpm {
     const { hash } = await this.resolveReleaseName(name, version);
     return await getManifest(hash);
   }
+}
+
+export function findContentUri(
+  contentURIs: string[],
+  contentProtocol: ContentProtocol
+): string {
+  for (const contentURI of contentURIs) {
+    if (contentURI.startsWith(contentProtocol)) {
+      return contentURI.slice(contentProtocol.length);
+    }
+  }
+
+  throw Error(`No contentURI found for protocol ${contentProtocol}`);
 }

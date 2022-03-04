@@ -49,7 +49,7 @@ export class DappGetFetcher {
         const requestedVersions = await this.releaseFetcher.fetchVersions(
           dnpName
         );
-        return Object.values(requestedVersions)
+        return requestedVersions
           .map(({ version }) => version)
           .filter(version => semver.satisfies(version, versionRange));
       }

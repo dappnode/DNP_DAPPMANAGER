@@ -5,14 +5,19 @@ import { repoAbi } from "./repoAbi";
 export type VersionDpm = {
   /** `'1.0.1'` */
   version: string;
-  /** `'/ipfs/Qmc3Kt4BuM84kEy3ojZMKXjSDPi1HNu8m5tyDvW9KaKaYu'` */
-  contentUri: string;
+  /** `'ipfs://Qmc3Kt4BuM84kEy3ojZMKXjSDPi1HNu8m5tyDvW9KaKaYu'` */
+  contentUris: string[];
 };
 
 export type VersionDpmWithId = VersionDpm & {
   /** Version ID in Repo contract. Min version has id = 1 */
   id: number;
 };
+
+export enum VersionSorting {
+  semver = 0,
+  alphabetical = 1
+}
 
 /**
  * Fetch versions of a DPM from `lastVersionId`. Note that the first version has id = 1.
@@ -22,7 +27,7 @@ export type VersionDpmWithId = VersionDpm & {
 export async function fetchDpmRepoVersions(
   provider: ethers.providers.Provider,
   repoAddress: AddressHex,
-  lastVersionId?: number
+  prevVersionCount = 0
 ): Promise<VersionDpmWithId[]> {
   const repo = new ethers.Contract(repoAddress, repoAbi, provider);
 
@@ -30,10 +35,14 @@ export async function fetchDpmRepoVersions(
   const versionCountBn = await repo.getVersionsCount();
   const versionCount = versionCountBn.toNumber();
 
+  if (prevVersionCount === versionCount) {
+    return [];
+  }
+
   // Versions called by id are ordered in ascending order.
   // The min version = 1 and the latest = versionCount
   const ids: number[] = [];
-  for (let i = lastVersionId ?? 1; i <= versionCount; i++) {
+  for (let i = prevVersionCount + 1; i <= versionCount; i++) {
     ids.push(i);
   }
 
@@ -41,11 +50,7 @@ export async function fetchDpmRepoVersions(
   return await Promise.all(
     ids.map(async id => {
       const version = (await repo.getByVersionId(id)) as VersionDpm;
-      return {
-        id,
-        version: version.version,
-        contentUri: version.contentUri
-      };
+      return { id, ...parseVersionDpm(version) };
     })
   );
 }
@@ -62,11 +67,7 @@ export async function fetchDpmRepoVersion(
 
   // function getBySemanticVersion(string memory _version) public view returns (Version memory)
   const version = (await repo.getBySemanticVersion(versionStr)) as VersionDpm;
-
-  return {
-    version: version.version,
-    contentUri: version.contentUri
-  };
+  return parseVersionDpm(version);
 }
 
 /**
@@ -80,9 +81,30 @@ export async function fetchDnpRepoLastPublishedVersion(
 
   // function getLastPublished() public view returns (Version memory)
   const version = (await repo.getLastPublished()) as VersionDpm;
+  return parseVersionDpm(version);
+}
 
+export async function fetchDnpRepoVersionSorting(
+  provider: ethers.providers.Provider,
+  repoAddress: AddressHex
+): Promise<VersionSorting> {
+  const repo = new ethers.Contract(repoAddress, repoAbi, provider);
+
+  // uint256 public versionSorting;
+  const versionSortingBn = await repo.versionSorting();
+  const versionSorting = versionSortingBn.toNumber();
+
+  if (VersionSorting[versionSorting] === undefined) {
+    throw Error(`Unknown version sorting ${versionSorting}`);
+  }
+
+  return versionSorting;
+}
+
+function parseVersionDpm(version: VersionDpm): VersionDpm {
+  // Drop extra properties from ethers value return
   return {
     version: version.version,
-    contentUri: version.contentUri
+    contentUris: version.contentUris
   };
 }
