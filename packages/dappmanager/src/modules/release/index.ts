@@ -2,7 +2,7 @@ import { getRelease } from "./getRelease";
 import { getManifest } from "./getManifest";
 import { PackageRelease, PackageRequest, Manifest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
-import { Dpm } from "../dpm";
+import { Dpm, LATEST_VERSION_STR } from "../dpm";
 import {
   isIpfsHash,
   isEnsDomain,
@@ -24,14 +24,19 @@ export class ReleaseFetcher extends Dpm {
     version?: string
   ): Promise<{ hash: string; origin?: string }> {
     // Correct version
-    if (!version || version === "latest") version = "*";
+    if (!version || version === "latest" || version === "*") {
+      version = LATEST_VERSION_STR;
+    }
 
-    // Normal case, name = eth domain & ver = semverVersion
-    // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
-    if (isEnsDomain(dnpName) && (isSemver(version) || isSemverRange(version))) {
+    if (
+      // Normal case, name = eth domain & ver = semverVersion
+      isEnsDomain(dnpName) &&
+      // Normal case, name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
+      (isSemver(version) || isSemverRange(version))
+    ) {
       const versionDpm = await this.fetchVersion(dnpName, version);
       return {
-        hash: findContentUri(versionDpm.contentUris, ContentProtocol.ipfs)
+        hash: findContentUri(versionDpm.contentURIs, ContentProtocol.ipfs)
       };
     }
 

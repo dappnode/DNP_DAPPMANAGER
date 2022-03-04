@@ -17,6 +17,8 @@ import params from "../../params";
 export { fetchDpmRegistryPackages, Package } from "./registry";
 export { fetchDpmRepoVersion, fetchDpmRepoVersions } from "./repo";
 
+export const LATEST_VERSION_STR = "*";
+
 type RepoAddress = string;
 type VersionStr = string;
 
@@ -60,7 +62,7 @@ export class Dpm {
    * Fetch a specific version of an DPM repo
    * If version is falsy, gets the latest version
    * @param dnpName "bitcoin.dnp.dappnode.eth"
-   * @param version "0.2.4"
+   * @param versionStr "0.2.4"
    */
   async fetchVersion(
     dnpName: string,
@@ -69,7 +71,7 @@ export class Dpm {
     const provider = await this.getProvider();
     const repoAddress = await this.resolveDnpNameToRepoAddress(dnpName);
 
-    if (versionStr) {
+    if (versionStr && versionStr !== LATEST_VERSION_STR) {
       return await fetchDpmRepoVersion(provider, repoAddress, versionStr);
     }
 

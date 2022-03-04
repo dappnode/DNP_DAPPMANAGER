@@ -39,7 +39,9 @@ export async function getRelease({
     await downloadRelease(hash, reqName || hash);
 
   if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
-    throw Error("DNP's name doesn't match the manifest's name");
+    throw Error(
+      `manifest.name ${manifest.name} not equal to request name ${reqName}`
+    );
 
   const dnpName = manifest.name;
   const isCore = getIsCore(manifest);

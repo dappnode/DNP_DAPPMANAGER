@@ -6,7 +6,7 @@ export type VersionDpm = {
   /** `'1.0.1'` */
   version: string;
   /** `'ipfs://Qmc3Kt4BuM84kEy3ojZMKXjSDPi1HNu8m5tyDvW9KaKaYu'` */
-  contentUris: string[];
+  contentURIs: string[];
 };
 
 export type VersionDpmWithId = VersionDpm & {
@@ -102,9 +102,16 @@ export async function fetchDnpRepoVersionSorting(
 }
 
 function parseVersionDpm(version: VersionDpm): VersionDpm {
+  if (version.version === undefined) {
+    throw Error("no version.version property");
+  }
+  if (version.contentURIs === undefined) {
+    throw Error("no version.contentURIs property");
+  }
+
   // Drop extra properties from ethers value return
   return {
     version: version.version,
-    contentUris: version.contentUris
+    contentURIs: version.contentURIs
   };
 }
