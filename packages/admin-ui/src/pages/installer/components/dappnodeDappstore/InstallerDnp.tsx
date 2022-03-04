@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, NavLink } from "react-router-dom";
 import { throttle, isEmpty } from "lodash";
 import { SelectedCategories } from "../../types";
+import { DNP_REGISTRY_NAME, PUBLIC_REGISTRY_NAME } from "params";
 // This page
 import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
@@ -39,9 +40,9 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
 
   const registryName =
     routeProps.location.pathname === "/installer/public"
-      ? "public.dappnode"
-      : "dnp.dappnode";
-  const isSafeRegistry = registryName === "dnp.dappnode";
+      ? PUBLIC_REGISTRY_NAME
+      : DNP_REGISTRY_NAME;
+  const isSafeRegistry = registryName === DNP_REGISTRY_NAME;
 
   const packages = useSelector(state =>
     getDnpRegistry(state as RootState, registryName)
