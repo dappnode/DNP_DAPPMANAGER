@@ -5,7 +5,8 @@ import { registryAbi } from "./registryAbi";
 export enum Flags {
   active = "active",
   validated = "validated",
-  banned = "banned"
+  banned = "banned",
+  hidden = "hidden"
 }
 
 export type Package = {
@@ -130,7 +131,8 @@ export function parseFlags(flags: number): Record<Flags, boolean> {
   return {
     active: (flags & 1) === 1,
     validated: (flags & 2) === 2,
-    banned: (flags & 4) === 4
+    banned: (flags & 4) === 4,
+    hidden: (flags & 8) === 8
   };
 }
 
