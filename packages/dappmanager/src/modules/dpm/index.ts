@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import semver from "semver";
 import * as db from "../../db";
 import { AddressHex } from "../../types";
 import { fetchDpmRegistryPackage, Package } from "./registry";
@@ -7,9 +6,9 @@ import {
   fetchDnpRepoVersionSorting,
   fetchDpmRepoVersion,
   fetchDpmRepoVersions,
+  sortLatestVersion,
   VersionDpm,
-  VersionDpmWithId,
-  VersionSorting
+  VersionDpmWithId
 } from "./repo";
 import { getEthersProvider } from "../ethClient";
 import params from "../../params";
@@ -95,8 +94,8 @@ export class Dpm {
 
       // Note: Depending on the version sorting algorythm do something different
       const maxVersionStr = sortLatestVersion(
-        Array.from(versionsByStr.keys()),
-        versionSorting
+        versionSorting,
+        Array.from(versionsByStr.keys())
       );
 
       const version = versionsByStr.get(maxVersionStr);
@@ -187,22 +186,5 @@ export class Dpm {
     }
 
     return versionsByStr;
-  }
-}
-
-export function sortLatestVersion(
-  versionsStrs: VersionStr[],
-  versionSorting: VersionSorting
-): VersionStr {
-  switch (versionSorting) {
-    case VersionSorting.semver: {
-      const versionStrSorted = versionsStrs.sort(semver.rcompare);
-      return versionStrSorted[0];
-    }
-
-    case VersionSorting.alphabetical: {
-      const versionStrSorted = versionsStrs.sort((a, b) => b.localeCompare(a));
-      return versionStrSorted[0];
-    }
   }
 }

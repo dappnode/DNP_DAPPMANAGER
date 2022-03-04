@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import semver from "semver";
 import { AddressHex } from "../../types";
 import { repoAbi } from "./repoAbi";
 
@@ -114,4 +115,23 @@ function parseVersionDpm(version: VersionDpm): VersionDpm {
     version: version.version,
     contentURIs: version.contentURIs
   };
+}
+
+export function sortLatestVersion(
+  versionSorting: VersionSorting,
+  versionsStrs: string[]
+): string {
+  switch (versionSorting) {
+    case VersionSorting.semver: {
+      const versionStrSorted = versionsStrs.sort((a, b) =>
+        semver.rcompare(a, b, { loose: true, includePrerelease: true })
+      );
+      return versionStrSorted[0];
+    }
+
+    case VersionSorting.alphabetical: {
+      const versionStrSorted = versionsStrs.sort((a, b) => b.localeCompare(a));
+      return versionStrSorted[0];
+    }
+  }
 }
