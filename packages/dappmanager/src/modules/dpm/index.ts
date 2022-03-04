@@ -39,9 +39,13 @@ const versionsByStrByRepo = new Map<RepoAddress, VersionsCache>();
 export function getRegistryAddress(registryName: string): AddressHex {
   const registryAddress = db.registryAddresses.get(registryName);
   if (!registryAddress) {
+    const knownRegistryAddress =
+      params.DAPPNODE_XDAI_KNOWN_REGISTRIES[
+        registryName as keyof typeof params.DAPPNODE_XDAI_KNOWN_REGISTRIES
+      ];
     // Allow to over-ride DAPPNODE_MAIN_REGISTRY_XDAI_NAME, otherwise always default to known value
-    if (registryName === params.DAPPNODE_MAIN_REGISTRY_XDAI_NAME) {
-      return params.DAPPNODE_MAIN_REGISTRY_XDAI_ADDRESS;
+    if (knownRegistryAddress) {
+      return knownRegistryAddress;
     } else {
       throw Error(`Unknown registry ${registryName}`);
     }

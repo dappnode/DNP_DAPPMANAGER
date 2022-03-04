@@ -21,7 +21,7 @@ const loadThrottleMs = 500; // 0.5 seconds
  * Fetches all packages with their latest version from a Dappnode Package Registry
  */
 export async function fetchRegistry({
-  registryName = params.DAPPNODE_MAIN_REGISTRY_XDAI_NAME
+  registryName = params.DAPPNODE_XDAI_MAIN_REGISTRY
 }: {
   registryName?: string;
 }): Promise<DirectoryItem[]> {

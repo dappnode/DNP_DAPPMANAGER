@@ -79,9 +79,11 @@ const params = {
   // Signature API
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
-  DAPPNODE_MAIN_REGISTRY_XDAI_NAME: "dnp.dappnode.eth",
-  DAPPNODE_MAIN_REGISTRY_XDAI_ADDRESS:
-    "0x565f36177230A782FF72f6C63617b70db154f6AB",
+  DAPPNODE_XDAI_MAIN_REGISTRY: "dnp.dappnode.eth",
+  DAPPNODE_XDAI_KNOWN_REGISTRIES: {
+    "dnp.dappnode.eth": "0xe1Fd27F4390DcBE165f4D60DBF821e4B9Bb02dEd",
+    "public.dappnode.eth": "0xE8addD62feD354203d079926a8e563BC1A7FE81e"
+  },
 
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
