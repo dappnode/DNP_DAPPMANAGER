@@ -29,11 +29,51 @@ describe("dpm / registry", () => {
 
   describe("parseFlags", () => {
     const testCases: { flags: number; result: Record<Flags, boolean> }[] = [
-      { flags: 0, result: { active: false, validated: false, banned: false } },
-      { flags: 1, result: { active: true, validated: false, banned: false } },
-      { flags: 2, result: { active: false, validated: true, banned: false } },
-      { flags: 4, result: { active: false, validated: false, banned: true } },
-      { flags: 7, result: { active: true, validated: true, banned: true } }
+      {
+        flags: 0,
+        result: {
+          active: false,
+          validated: false,
+          banned: false,
+          hidden: false
+        }
+      },
+      {
+        flags: 1,
+        result: {
+          active: true,
+          validated: false,
+          banned: false,
+          hidden: false
+        }
+      },
+      {
+        flags: 2,
+        result: {
+          active: false,
+          validated: true,
+          banned: false,
+          hidden: false
+        }
+      },
+      {
+        flags: 4,
+        result: {
+          active: false,
+          validated: false,
+          banned: true,
+          hidden: false
+        }
+      },
+      {
+        flags: 15,
+        result: {
+          active: true,
+          validated: true,
+          banned: true,
+          hidden: true
+        }
+      }
     ];
 
     for (const { flags, result } of testCases) {
