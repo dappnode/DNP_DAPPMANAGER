@@ -12,9 +12,7 @@ export class EthProviderError extends Error {}
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(): Promise<
-  ethers.providers.JsonRpcProvider
-> {
+export async function getEthersProvider(): Promise<ethers.providers.JsonRpcProvider> {
   const url = await getEthProviderUrl();
   // Store (just for UI / info purposes) the latest used url
   db.ethProviderUrl.set(url);
@@ -27,8 +25,7 @@ export async function getEthersProvider(): Promise<
  * @returns ethProvier http://geth.dappnode:8545
  */
 export async function getEthProviderUrl(): Promise<string> {
-  if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
-    return params.ETH_MAINNET_RPC_URL_OVERRIDE;
+  if (params.XDAI_RPC_URL_OVERRIDE) return params.XDAI_RPC_URL_OVERRIDE;
 
   const target = db.ethClientTarget.get();
   const fallback = db.ethClientFallback.get();
@@ -37,7 +34,7 @@ export async function getEthProviderUrl(): Promise<string> {
   if (!target) throw new EthProviderError(`No ethereum client selected yet`);
 
   // Remote is selected, just return remote
-  if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
+  if (target === "remote") return params.XDAI_RPC_URL_REMOTE;
 
   const status = await getClientStatus(target);
   db.ethClientStatus.set(target, status);
@@ -49,7 +46,7 @@ export async function getEthProviderUrl(): Promise<string> {
   } else {
     if (fallback === "on") {
       // Fallback on, ignore error and return remote
-      return params.ETH_MAINNET_RPC_URL_REMOTE;
+      return params.XDAI_RPC_URL_REMOTE;
     } else {
       // Fallback off, throw nice error
       const message = parseClientStatusError(status);

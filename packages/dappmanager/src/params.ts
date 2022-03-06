@@ -151,9 +151,9 @@ const params = {
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
-  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
-  ETH_MAINNET_RPC_URL_REMOTE:
-    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  XDAI_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
+  XDAI_RPC_URL_REMOTE:
+    process.env.XDAI_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
