@@ -81,7 +81,7 @@ const params = {
 
   DAPPNODE_XDAI_MAIN_REGISTRY: "dnp.dappnode.eth",
   DAPPNODE_XDAI_KNOWN_REGISTRIES: {
-    "dnp.dappnode.eth": "0xe1Fd27F4390DcBE165f4D60DBF821e4B9Bb02dEd",
+    "dnp.dappnode.eth": "0x01c58A553F92A61Fd713e6006fa7D1d82044c389",
     "public.dappnode.eth": "0xE8addD62feD354203d079926a8e563BC1A7FE81e"
   },
 
