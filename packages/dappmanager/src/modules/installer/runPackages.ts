@@ -86,6 +86,7 @@ export async function runPackages(
 
     // Recreate HTTPs portal mapping if installing or updating HTTPs package
     if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME)
+      log(pkg.dnpName, "Recreating HTTPS mappings... ");
       await httpsPortalMappingsRecreate();
   }
 }
