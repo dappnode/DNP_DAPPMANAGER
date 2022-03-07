@@ -2,7 +2,7 @@ import { InstallPackageData } from "../../types";
 import semver from "semver";
 
 /**
- * Prevent from installing legacy version (previous to remote signer support) for packages:
+ * From dappmanager v0.2.46 prevent from installing legacy version (previous to remote signer support) for packages:
  * - Prysm
  * - Prysm-Prater
  * - Gnosis-Beacon-Chain-Prysm
