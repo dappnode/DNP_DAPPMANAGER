@@ -151,6 +151,14 @@ const params = {
   ETH_MAINNET_RPC_URL_REMOTE:
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
+  // Validators legacy versions
+  minimumAllowedPackageVersions: [
+    {
+      dnpName: "prysm-prater.dnp.dappnode.eth",
+      version: "1.0.7"
+    }
+  ],
+
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
 

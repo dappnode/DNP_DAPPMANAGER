@@ -17,6 +17,7 @@ import {
   afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
+import { ensureIsNotValidatorLegacyPackage } from "../modules/installer/ensureIsNotValidatorLegacyPackage";
 
 /**
  * Installs a DAppNode Package.
@@ -81,6 +82,9 @@ export async function packageInstall({
     const dnpNames = packagesData.map(({ dnpName }) => dnpName);
     for (const dnpName of dnpNames)
       if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
+
+    // Ensure is not a validator client legacy package
+    await ensureIsNotValidatorLegacyPackage(packagesData);
 
     try {
       flagPackagesAreInstalling(dnpNames);
