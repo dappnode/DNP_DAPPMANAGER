@@ -40,6 +40,7 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "environment",
   "expose",
   "extra_hosts",
+  "healthcheck",
   "labels",
   "logging",
   "network_mode",
