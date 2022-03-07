@@ -9,7 +9,7 @@ import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
 import { exposeByDefaultHttpsPorts } from "./exposeByDefaultHttpsPorts";
-import { httpsPortalMappingsRecreate } from "../../calls/httpsPortal";
+import * as calls from "../../calls";
 
 /**
  * Create and run each package container in series
@@ -87,6 +87,6 @@ export async function runPackages(
     // Recreate HTTPs portal mapping if installing or updating HTTPs package
     if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME)
       log(pkg.dnpName, "Recreating HTTPS mappings... ");
-      await httpsPortalMappingsRecreate();
+    await calls.httpsPortalMappingsRecreate();
   }
 }
