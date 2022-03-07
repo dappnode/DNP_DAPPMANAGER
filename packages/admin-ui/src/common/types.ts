@@ -642,6 +642,12 @@ export interface ComposeService {
   environment?: PackageEnvs | string[];
   expose?: string[];
   extra_hosts?: string[];
+  healthcheck?: {
+    test: string | string[];
+    interval?: string;
+    timeout?: string;
+    retries?: string;
+  };
   image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
   // ipv4_address: "172.33.1.7";
   labels?: { [labelName: string]: string };
