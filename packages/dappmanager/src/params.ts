@@ -155,7 +155,7 @@ const params = {
   minimumAllowedPackageVersions: [
     {
       dnpName: "prysm-prater.dnp.dappnode.eth",
-      version: "1.0.7"
+      version: "0.1.7"
     }
   ],
 
