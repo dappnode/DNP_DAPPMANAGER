@@ -9,7 +9,7 @@ import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
 import { exposeByDefaultHttpsPorts } from "./exposeByDefaultHttpsPorts";
-import * as calls from "../../calls";
+import { ComposeFileEditor } from "../compose/editor";
 
 /**
  * Create and run each package container in series
@@ -40,6 +40,19 @@ export async function runPackages(
     // - Allow copying files without duplicating logic
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
+
+
+    // Recreate HTTPs portal mapping if installing or updating HTTPs package
+    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME) {
+      // Check whether DNP_HTTPS compose has external network persisted
+      const compose = new ComposeFileEditor(pkg.dnpName, true);
+      if(compose.getComposeNetwork(params.DNP_EXTERNAL_NETWORK_NAME) === null) {
+        log(pkg.dnpName, "Adding external network to HTTPS compose...");
+        const composeService = compose.services()["https.dnp.dappnode.eth"];
+        composeService.addNetwork(params.DNP_EXTERNAL_NETWORK_NAME);
+        compose.write();
+      }
+    }
 
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
@@ -83,11 +96,5 @@ export async function runPackages(
 
     // Expose default HTTPs ports if required
     await exposeByDefaultHttpsPorts(pkg, log);
-
-    // Recreate HTTPs portal mapping if installing or updating HTTPs package
-    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME) {
-      log(pkg.dnpName, "Recreating HTTPS mappings... ");
-      await calls.httpsPortalMappingsRecreate();
-    }
   }
 }
