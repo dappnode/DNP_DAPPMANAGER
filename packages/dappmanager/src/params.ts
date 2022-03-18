@@ -159,6 +159,9 @@ const params = {
     }
   ],
 
+  // Web3signer dnpname
+  web3SignerDnpName: "web3signer-prater.dnp.dappnode.eth",
+
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
 
