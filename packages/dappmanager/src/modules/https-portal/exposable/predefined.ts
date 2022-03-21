@@ -146,7 +146,7 @@ export const exposablePredefined: {
       fromSubdomain: "monero",
       dnpName: "monero.dnp.dappnode.eth",
       serviceName: "monero.dnp.dappnode.eth",
-      port: 18082,
+      port: 18081,
       name: "Monero JSON RPC",
       description: "JSON RPC endpoint for Monero"
     }
