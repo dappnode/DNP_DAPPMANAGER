@@ -1,12 +1,8 @@
 import { hasVersion, setVersion } from "../utils/dnpUtils";
 import { sanitizeVersions } from "../utils/sanitizeVersions";
 import { sanitizeDependencies } from "../utils/sanitizeDependencies";
-import { Dependencies } from "../../../types";
 import { DappGetDnps } from "../types";
-import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch";
-
-const emptyDeps: Dependencies = {};
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -63,12 +59,10 @@ export default async function aggregateDependencies({
         .dependencies(name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
-          logs.warn(
-            `Error fetching ${name}@${version} dependencies (assuming it has none)`,
-            e
-          );
-          return emptyDeps;
+          e.message += `Error fetching ${name}@${version}`;
+          throw e;
         });
+
       // 3. Store dependencies
       setVersion(dnps, name, version, dependencies);
       // 4. Fetch sub-dependencies recursively
