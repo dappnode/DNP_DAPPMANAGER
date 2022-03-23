@@ -118,6 +118,11 @@ export const autoUpdateIds = {
   SYSTEM_PACKAGES: "system-packages"
 };
 
+// Legacy client packages
+export const legacyClientPackages = [
+  { dnpName: "prysm-prater.dnp.dappnode.eth", version: "0.1.7" }
+];
+
 // LVM default dappnode values
 export const dappnodeVolumeGroup = "rootvg";
 export const dappnodeLogicalVolume = "root";

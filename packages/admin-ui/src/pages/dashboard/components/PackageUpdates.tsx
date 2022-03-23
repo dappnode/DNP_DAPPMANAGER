@@ -10,6 +10,9 @@ import Ok from "components/Ok";
 import CardList from "components/CardList";
 import { prettyDnpName } from "utils/format";
 import { urlJoin } from "utils/url";
+import { legacyClientPackages } from "params";
+import { confirm } from "components/ConfirmDialog";
+import semver from "semver";
 
 export function PackageUpdates() {
   const dnps = useApi.packagesGet();
@@ -20,15 +23,28 @@ export function PackageUpdates() {
 
   const updatesAvailable: {
     dnpName: string;
+    dnpVersion: string;
     updateAvailable: UpdateAvailable;
   }[] = [];
   for (const dnp of dnps.data) {
     if (dnp.updateAvailable) {
       updatesAvailable.push({
         dnpName: dnp.dnpName,
+        dnpVersion: dnp.version,
         updateAvailable: dnp.updateAvailable
       });
     }
+  }
+
+  async function clientLegacyUpdateWarning(dnpName: string) {
+    await new Promise<void>(resolve =>
+      confirm({
+        title: `Update ${prettyDnpName(dnpName)}`,
+        text: `This is a major update with breaking changes with no rollback available. Please, stay until the update is done`,
+        label: "Continue",
+        onClick: resolve
+      })
+    );
   }
 
   return (
@@ -40,19 +56,36 @@ export function PackageUpdates() {
           </Alert>
         ) : (
           <CardList className="package-updates">
-            {updatesAvailable.map(({ dnpName, updateAvailable }) => (
-              <div className="package-update-item">
-                <span>
-                  <strong>{prettyDnpName(dnpName)}</strong> to version{" "}
-                  {updateAvailable.newVersion}{" "}
-                  {updateAvailable.upstreamVersion &&
-                    `(${updateAvailable.upstreamVersion} upstream)`}
-                </span>
-                <NavLink to={urlJoin(installerRootPath, dnpName)}>
-                  <Button variant="dappnode">Update</Button>
-                </NavLink>
-              </div>
-            ))}
+            {updatesAvailable.map(
+              ({ dnpName, dnpVersion, updateAvailable }) => (
+                <div className="package-update-item">
+                  <span>
+                    <strong>{prettyDnpName(dnpName)}</strong> to version{" "}
+                    {updateAvailable.newVersion}{" "}
+                    {updateAvailable.upstreamVersion &&
+                      `(${updateAvailable.upstreamVersion} upstream)`}
+                  </span>
+                  {legacyClientPackages.some(
+                    clientPkg =>
+                      clientPkg.dnpName === dnpName &&
+                      semver.lt(dnpVersion, clientPkg.version)
+                  ) ? (
+                    <NavLink to={urlJoin(installerRootPath, dnpName)}>
+                      <Button
+                        onClick={() => clientLegacyUpdateWarning(dnpName)}
+                        variant="dappnode"
+                      >
+                        Update
+                      </Button>
+                    </NavLink>
+                  ) : (
+                    <NavLink to={urlJoin(installerRootPath, dnpName)}>
+                      <Button variant="dappnode">Update</Button>
+                    </NavLink>
+                  )}
+                </div>
+              )
+            )}
           </CardList>
         )}
       </div>
