@@ -17,7 +17,7 @@ import {
   afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
-import { ensureIsNotValidatorLegacyPackage } from "../modules/installer/ensureIsNotValidatorLegacyPackage";
+import { ensureEth2MigrationRequirements } from "../modules/installer/ensureEth2MigrationRequirements";
 
 /**
  * Installs a DAppNode Package.
@@ -83,8 +83,8 @@ export async function packageInstall({
     for (const dnpName of dnpNames)
       if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 
-    // Ensure is not a validator client legacy package
-    await ensureIsNotValidatorLegacyPackage(packagesData);
+    // Ensure Eth2 migration requirements
+    await ensureEth2MigrationRequirements(packagesData);
 
     try {
       flagPackagesAreInstalling(dnpNames);

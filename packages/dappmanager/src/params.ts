@@ -151,11 +151,19 @@ const params = {
   ETH_MAINNET_RPC_URL_REMOTE:
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
-  // Validators legacy versions
+  // Validators legacy versions: Prysm, Prysm-prater, Prysm-gnosis
   minimumAllowedPackageVersions: [
     {
       dnpName: "prysm-prater.dnp.dappnode.eth",
       version: "0.1.7"
+    }
+  ],
+
+  // Web3signer and clients dnpnames
+  web3SignerClientsDnpNames: [
+    {
+      web3SignerDnpName: "web3signer-prater.dnp.dappnode.eth",
+      clientDnpName: "prysm-prater.dnp.dappnode.eth"
     }
   ],
 
