@@ -29,6 +29,7 @@ import { isSetupWizardEmpty } from "../parsers/formDataParser";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
+import Warnings from "./Steps/Warnings";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -180,6 +181,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
   const setupSubPath = "setup";
   const permissionsSubPath = "permissions";
+  const warningsSubPath = "warnings";
   const disclaimerSubPath = "disclaimer";
   const installSubPath = "install";
 
@@ -215,6 +217,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         />
       ),
       available: hasPermissions
+    },
+    {
+      name: "Warnings",
+      subPath: warningsSubPath,
+      render: () => <Warnings warnings={metadata.warnings || {}} />,
+      available: metadata.warnings
     },
     {
       name: "Disclaimer",
