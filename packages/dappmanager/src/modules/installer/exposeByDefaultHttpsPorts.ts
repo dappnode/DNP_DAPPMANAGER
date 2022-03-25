@@ -14,25 +14,26 @@ export async function exposeByDefaultHttpsPorts(
   log: Log
 ): Promise<void> {
   if (pkg.metadata.exposable) {
+    // Check HTTPS package exists
+    const httpsPackage = await listPackageNoThrow({
+      dnpName: params.HTTPS_PORTAL_DNPNAME
+    });
+    if (!httpsPackage)
+      throw Error(
+        `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
+      );
+    // Check HTTPS package running
+    httpsPackage.containers.map(container => {
+      if (!container.running)
+        throw Error(
+          `HTTPS package not running but required to expose HTTPS ports by default.`
+        );
+    });
+    const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
+
     for (const exposable of pkg.metadata.exposable) {
       if (exposable.exposeByDefault) {
-        // Check HTTPS package exists
-        const httpsPackage = await listPackageNoThrow({
-          dnpName: params.HTTPS_PORTAL_DNPNAME
-        });
-        if (!httpsPackage)
-          throw Error(
-            `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
-          );
-        // Check HTTPS package running
-        httpsPackage.containers.map(container => {
-          if (!container.running)
-            throw Error(
-              `HTTPS package not running but required to expose HTTPS ports by default.`
-            );
-        });
-
         const portalMapping: HttpsPortalMapping = {
           fromSubdomain: exposable.fromSubdomain || prettyDnpName(pkg.dnpName), // get dnpName by default
           dnpName: pkg.dnpName,
@@ -40,6 +41,12 @@ export async function exposeByDefaultHttpsPorts(
             exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
           port: exposable.port
         };
+
+        if (
+          currentMappings.length > 0 &&
+          currentMappings.includes(portalMapping)
+        )
+          continue;
 
         try {
           // Expose default HTTPS ports
