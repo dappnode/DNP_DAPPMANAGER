@@ -129,6 +129,13 @@ const params = {
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",
   // Docker volume parameters
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
+  DOCKER_SOCKET: "/var/run/docker.sock",
+  WHITELISTED_DOCKER_SOCKET_VOLUME: [
+    "wifi.dnp.dappnode.eth",
+    "dappmanager.dnp.dappnode.eth",
+    "core.dnp.dappnode.eth",
+    "vpn.dnp.dappnode.eth"
+  ],
 
   // Auto-update parameters
   AUTO_UPDATE_DELAY: 1 * DAY,

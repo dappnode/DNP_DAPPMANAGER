@@ -66,6 +66,7 @@ const networkSafeKeys: (keyof ComposeNetwork)[] = [];
  * Strict sanitation of a docker-compose to prevent
  * - Use of uncontroled features
  * - Use of unsupported docker-compose syntax
+ * - Use of dokcer socket volume except for whitelisted packages
  * [NOTE] Allow but dangerous usage is tolerated by this function
  * but will generate a warning in unsafeComposeAlerts.
  */
@@ -111,6 +112,7 @@ export function parseUnsafeCompose(
           image: getImageTag({ serviceName, dnpName, version }),
           environment: parseEnvironment(serviceUnsafe.environment || {}),
           dns: params.DNS_SERVICE, // Common DAppNode ENS
+          volumes: parseUnsafeServiceVolumes(dnpName, serviceUnsafe.volumes),
           networks: parseUnsafeServiceNetworks(
             serviceUnsafe.networks,
             composeUnsafe.networks,
@@ -138,6 +140,26 @@ function ensureMinimumComposeVersion(composeFileVersion: string): string {
     composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
 
   return composeFileVersion;
+}
+
+function parseUnsafeServiceVolumes(
+  dnpName: string,
+  serviceVolumes: string[] | undefined
+): string[] | undefined {
+  if (!serviceVolumes) return undefined;
+  for (const volume of serviceVolumes) {
+    if (
+      volume.includes(params.DOCKER_SOCKET) &&
+      !params.WHITELISTED_DOCKER_SOCKET_VOLUME.find(
+        whitelistedDnpaname => whitelistedDnpaname === dnpName
+      )
+    ) {
+      throw Error(
+        `dnpName '${dnpName}' is not whitelisted to use docker socket as a volume`
+      );
+    }
+  }
+  return serviceVolumes;
 }
 
 function parseUnsafeServiceNetworks(
@@ -202,7 +224,8 @@ function parseUnsafeVolumes(
 
   // External volumes are not allowed
   for (const [volName, vol] of Object.entries(volumes)) {
-    if (vol && vol.external)
+    if (!vol) continue;
+    if (vol.external)
       throw Error(`External volumes are not allowed '${volName}'`);
   }
 

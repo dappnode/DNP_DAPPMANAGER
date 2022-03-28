@@ -1,5 +1,5 @@
 import "mocha";
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import { Compose } from "../../../src/types";
 import { mockManifest, mockCompose } from "../../testUtils";
 
@@ -58,5 +58,34 @@ describe("parseUnsafeCompose", () => {
     const compose = parseUnsafeCompose(composeWithExtraProps, mockManifest);
 
     expect(compose).to.deep.equal(expectedCompose);
+  });
+
+  it("Should throw error due to an unwhitelisted dnp attempting to share the docker socket as a volume", () => {
+    const customLogging = { driver: "syslog" };
+    const ports = ["1111/1111", "1111/1111:udp"];
+    const volumes = ["/var/run/docker.sock:/var/run/docker.sock"];
+    const serviceName = Object.keys(mockCompose.services)[0];
+    const dangerousNetwork = "dangerous-network";
+
+    const composeWithExtraProps: Compose = {
+      ...mockCompose,
+      services: {
+        [serviceName]: {
+          ...mockCompose.services[serviceName],
+          ports,
+          volumes,
+          logging: customLogging
+        }
+      },
+      networks: {
+        [dangerousNetwork]: {
+          driver: "bad-driver"
+        }
+      }
+    };
+
+    assert.throw(() => {
+      parseUnsafeCompose(composeWithExtraProps, mockManifest);
+    }, Error);
   });
 });

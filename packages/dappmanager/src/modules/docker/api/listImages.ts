@@ -13,9 +13,7 @@ import { docker } from "./docker";
 export async function imagesList(
   options?: DockerApiListImagesOptions
 ): Promise<Dockerode.ImageInfo[]> {
-  return docker.listImages(options as Dockerode.ListImagesOptions) as Promise<
-    Dockerode.ImageInfo[]
-  >;
+  return docker.listImages(options);
 }
 
 export interface DockerApiListImagesOptions {
