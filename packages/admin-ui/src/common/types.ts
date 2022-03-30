@@ -1102,7 +1102,9 @@ export interface PackageReleaseMetadata {
   changelog?: string;
   warnings?: {
     onInstall?: string;
-    onUpdate?: string;
+    onPatchUpdate?: string;
+    onMinorUpdate?: string;
+    onMajorUpdate?: string;
     onReset?: string;
     onRemove?: string;
   };
