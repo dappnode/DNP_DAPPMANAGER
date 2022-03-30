@@ -2,10 +2,15 @@ import React from "react";
 import Card from "components/Card";
 import { PackageReleaseMetadata } from "types";
 import RenderMarkdown from "components/RenderMarkdown";
+import Button from "components/Button";
 
 export default function Warnings({
+  goNext,
+  goBack,
   warnings
 }: {
+  goNext: () => void;
+  goBack: () => void;
   warnings: PackageReleaseMetadata["warnings"];
 }) {
   if (!warnings)
@@ -65,6 +70,13 @@ export default function Warnings({
           </div>
         </div>
       )}
+
+      <div className="button-group">
+        <Button onClick={goBack}>Back</Button>
+        <Button variant="dappnode" onClick={goNext}>
+          Next
+        </Button>
+      </div>
     </Card>
   );
 }

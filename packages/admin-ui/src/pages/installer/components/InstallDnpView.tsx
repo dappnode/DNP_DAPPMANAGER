@@ -221,8 +221,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
     {
       name: "Warnings",
       subPath: warningsSubPath,
-      render: () => <Warnings warnings={metadata.warnings || {}} />,
-      available: metadata.warnings
+      render: () => (
+        <Warnings
+          goNext={goNext}
+          goBack={goBack}
+          warnings={metadata.warnings || {}}
+        />
+      ),
+      available: metadata.warnings?.onInstall
     },
     {
       name: "Disclaimer",
