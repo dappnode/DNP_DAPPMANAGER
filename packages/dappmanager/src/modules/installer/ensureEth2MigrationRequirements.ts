@@ -49,3 +49,13 @@ export async function ensureEth2MigrationRequirements(
     }
   }
 }
+
+export function isClientLegacy(dnpName: string, dnpVersion: string): boolean {
+  const dnpVersionParsed = semver.valid(dnpVersion);
+  if (!dnpVersionParsed) return false;
+  return params.minimumAllowedPackageVersions.some(
+    clientPkg =>
+      clientPkg.dnpName === dnpName &&
+      semver.lt(dnpVersionParsed, clientPkg.version)
+  );
+}

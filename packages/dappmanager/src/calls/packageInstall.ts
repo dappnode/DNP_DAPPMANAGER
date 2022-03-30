@@ -17,7 +17,10 @@ import {
   afterInstall
 } from "../modules/installer";
 import { logs } from "../logs";
-import { ensureEth2MigrationRequirements } from "../modules/installer/ensureEth2MigrationRequirements";
+import {
+  ensureEth2MigrationRequirements,
+  isClientLegacy
+} from "../modules/installer/ensureEth2MigrationRequirements";
 
 /**
  * Installs a DAppNode Package.
@@ -98,8 +101,16 @@ export async function packageInstall({
       try {
         await runPackages(packagesData, log);
       } catch (e) {
-        await rollbackPackages(packagesData, log);
-        throw e;
+        // Bypass rollback if is Client legacy
+        if (!isClientLegacy(req.name, req.ver)) {
+          await rollbackPackages(packagesData, log);
+          throw e;
+        } else {
+          logs.error(
+            "Bypassing rollback due to client legacy version. ",
+            e.message
+          );
+        }
       }
 
       await postInstallClean(packagesData, log);
