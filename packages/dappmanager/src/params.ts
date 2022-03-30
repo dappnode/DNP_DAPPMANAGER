@@ -162,8 +162,8 @@ const params = {
   // Web3signer and clients dnpnames
   web3SignerClientsDnpNames: [
     {
-      web3SignerDnpName: "web3signer-prater.dnp.dappnode.eth",
-      clientDnpName: "prysm-prater.dnp.dappnode.eth"
+      clientDnpName: "prysm-prater.dnp.dappnode.eth",
+      web3SignerDnpName: "web3signer-prater.dnp.dappnode.eth"
     }
   ],
 
