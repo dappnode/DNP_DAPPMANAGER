@@ -21,12 +21,12 @@ export async function runWithChainDriver(
 ): Promise<ChainDataResult | null> {
   let chainDriverSpecs: ChainDriverSpecs;
   if (typeof chainDriver === "string") {
-    chainDriverSpecs = { driver: chainDriver };
+    chainDriverSpecs = { chain: chainDriver };
   } else {
     chainDriverSpecs = chainDriver;
   }
 
-  switch (chainDriverSpecs.driver) {
+  switch (chainDriverSpecs.chain) {
     case "bitcoin":
       return bitcoin(dnp);
     case "ethereum":
@@ -39,6 +39,6 @@ export async function runWithChainDriver(
     case "handshake":
       return handshake(dnp);
     default:
-      throw Error(`Unsupported driver: ${chainDriverSpecs.driver}`);
+      throw Error(`Unsupported chain: ${chainDriverSpecs.chain}`);
   }
 }
