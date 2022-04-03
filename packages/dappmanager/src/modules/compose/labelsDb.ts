@@ -52,16 +52,17 @@ const labelParseFns: {
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
   "dappnode.dnp.chain": value => {
-    if (chainDriversTypes.includes(value as ChainDriverType))
-      return value as ChainDriver;
+    if (chainDriversTypes.includes(value as ChainDriverType)) {
+      return value as ChainDriverType ;
+    }
     const valueParsed = parseJsonSafe(value);
     if (
       valueParsed &&
       chainDriversTypes.includes(
-        (valueParsed as ChainDriverSpecs).chain as ChainDriverType
+        (valueParsed as ChainDriverSpecs).driver as ChainDriverType
       )
     )
-      return value as ChainDriver;
+      return valueParsed as ChainDriver;
     return undefined;
   },
   "dappnode.dnp.isCore": parseBool,
