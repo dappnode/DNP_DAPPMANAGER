@@ -429,7 +429,7 @@ export type ContainerState =
 export type ChainDriver = ChainDriverType | ChainDriverSpecs;
 
 export type ChainDriverSpecs = {
-  driver: ChainDriverType;
+  chain: ChainDriverType;
   serviceName?: string;
   portNumber?: number;
 };
