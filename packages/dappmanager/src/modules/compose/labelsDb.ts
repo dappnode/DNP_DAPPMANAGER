@@ -58,7 +58,7 @@ const labelParseFns: {
     if (
       valueParsed &&
       chainDriversTypes.includes(
-        (valueParsed as ChainDriverSpecs).chain as ChainDriverType
+        (valueParsed as ChainDriverSpecs).driver as ChainDriverType
       )
     )
       return value as ChainDriver;

@@ -4,7 +4,7 @@ import { ContainerLabelsRaw } from "../../../src/types";
 import { readContainerLabels } from "../../../src/modules/compose";
 
 describe("Parse and validate manifest labels to be used in the compose", () => {
-  it("should parse and validate chain as a string", () => {
+  it("should parse and validate driver as a string", () => {
     const expectedLabels = {
       dnpName: "dnp-name",
       version: "1.0.0",
@@ -44,7 +44,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
     expect(labelValues).to.deep.equal(expectedLabels);
   });
 
-  it("should parse and validate chain as an object", () => {
+  it("should parse and validate driver as an object", () => {
     const expectedLabels = {
       dnpName: "dnp-name",
       version: "1.0.0",
@@ -84,7 +84,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
     expect(labelValues).to.deep.equal(expectedLabels);
   });
 
-  it("should parse and validate chain as undefined", () => {
+  it("should parse and validate driver as undefined", () => {
     const expectedLabels = {
       dnpName: "dnp-name",
       version: "1.0.0",
@@ -109,7 +109,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       "dappnode.dnp.dependencies": '{"oneDependency": "dependency-name"}',
       "dappnode.dnp.avatar": "avatar-url",
       "dappnode.dnp.origin": "origin-url",
-      "dappnode.dnp.chain": '{"driverd": "ethereum2-beacon-chain-prysm"}',
+      "dappnode.dnp.chain": '{"driverd": "ethereudm2-beacon-chain-prysm"}',
       "dappnode.dnp.isCore": "true",
       "dappnode.dnp.isMain": "true",
       "dappnode.dnp.dockerTimeout": "10",
