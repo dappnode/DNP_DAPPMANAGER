@@ -3,8 +3,32 @@ export * from "./common";
 
 /**
  * Ethereum (EVM) 20 bytes hex address
+ * ```
+ * 0x01c58A553F92A61Fd713e6006fa7D1d82044c389
+ * ```
  */
 export type AddressHex = string;
+
+/**
+ * EIP-3770: Chain-specific addresses https://eips.ethereum.org/EIPS/eip-3770
+ * ```
+ * xdai:0x01c58A553F92A61Fd713e6006fa7D1d82044c389
+ * ```
+ */
+export type EIP3770AddressStr = string;
+
+/**
+ * EIP-3770: Chain-specific addresses https://eips.ethereum.org/EIPS/eip-3770
+ * ```
+ * xdai:0x01c58A553F92A61Fd713e6006fa7D1d82044c389
+ * ```
+ */
+export type EIP3770Address = {
+  /** `xdai` */
+  chainId: string;
+  /** `0x01c58A553F92A61Fd713e6006fa7D1d82044c389` */
+  address: string;
+};
 
 export enum FileFormat {
   JSON = "JSON",

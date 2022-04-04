@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
-import { AddressHex } from "../../types";
+import { AddressHex, EIP3770Address, EIP3770AddressStr } from "../../types";
 import { fetchDpmRegistryPackage, Package } from "./registry";
 import {
   fetchDnpRepoVersionSorting,
@@ -36,21 +36,27 @@ const versionsByStrByRepo = new Map<RepoAddress, VersionsCache>();
 // - Then package name -> repoAddress with the registry contract
 
 export function getRegistryAddress(registryName: string): AddressHex {
-  const registryAddress = db.registryAddresses.get(registryName);
-  if (!registryAddress) {
-    const knownRegistryAddress =
-      params.DAPPNODE_XDAI_KNOWN_REGISTRIES[
-        registryName as keyof typeof params.DAPPNODE_XDAI_KNOWN_REGISTRIES
+  let registryEIP3770Address = db.registryEIP3770Addresses.get(registryName);
+
+  if (!registryEIP3770Address) {
+    registryEIP3770Address =
+      params.DAPPNODE_KNOWN_REGISTRIES[
+        registryName as keyof typeof params.DAPPNODE_KNOWN_REGISTRIES
       ];
-    // Allow to over-ride DAPPNODE_MAIN_REGISTRY_XDAI_NAME, otherwise always default to known value
-    if (knownRegistryAddress) {
-      return knownRegistryAddress;
-    } else {
+    // Allow to over-ride known registries, otherwise always default to known value
+    if (!registryEIP3770Address) {
       throw Error(`Unknown registry ${registryName}`);
     }
   }
 
-  return registryAddress;
+  const { chainId, address } = parseEIP3770Address(registryEIP3770Address);
+
+  // TODO: Support more chainIds
+  if (chainId !== "xdai" && chainId !== "gno") {
+    throw Error(`Unsupported registry chainId ${chainId}`);
+  }
+
+  return address;
 }
 
 export class Dpm {
@@ -187,4 +193,20 @@ export class Dpm {
 
     return versionsByStr;
   }
+}
+
+function parseEIP3770Address(
+  eip3770AddressStr: EIP3770AddressStr
+): EIP3770Address {
+  // EIP-3770: Chain-specific addresses https://eips.ethereum.org/EIPS/eip-3770
+  // xdai:0x01c58A553F92A61Fd713e6006fa7D1d82044c389
+  const chrIdx = eip3770AddressStr.indexOf(":");
+  if (chrIdx < 0) {
+    throw Error(`Invalid EIP-3770 address no ':' ${eip3770AddressStr}`);
+  }
+
+  const chainId = eip3770AddressStr.slice(0, chrIdx);
+  const address = eip3770AddressStr.slice(chrIdx + 1);
+
+  return { chainId, address };
 }

@@ -79,10 +79,11 @@ const params = {
   // Signature API
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
-  DAPPNODE_XDAI_MAIN_REGISTRY: "dnp.dappnode.eth",
-  DAPPNODE_XDAI_KNOWN_REGISTRIES: {
-    "dnp.dappnode.eth": "0x01c58A553F92A61Fd713e6006fa7D1d82044c389",
-    "public.dappnode.eth": "0xE8addD62feD354203d079926a8e563BC1A7FE81e"
+  DAPPNODE_MAIN_REGISTRY: "dnp.dappnode.eth",
+  DAPPNODE_KNOWN_REGISTRIES: {
+    // EIP-3770: Chain-specific addresses https://eips.ethereum.org/EIPS/eip-3770
+    "dnp.dappnode.eth": "xdai:0x01c58A553F92A61Fd713e6006fa7D1d82044c389",
+    "public.dappnode.eth": "xdai:0xE8addD62feD354203d079926a8e563BC1A7FE81e"
   },
 
   // HTTP API parameters
