@@ -109,7 +109,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       "dappnode.dnp.dependencies": '{"oneDependency": "dependency-name"}',
       "dappnode.dnp.avatar": "avatar-url",
       "dappnode.dnp.origin": "origin-url",
-      "dappnode.dnp.chain": '{"driverd": "ethereudm2-beacon-chain-prysm"}',
+      "dappnode.dnp.chain": '{"driverd": "ethereum2-beacon-chain-prysm"}',
       "dappnode.dnp.isCore": "true",
       "dappnode.dnp.isMain": "true",
       "dappnode.dnp.dockerTimeout": "10",
