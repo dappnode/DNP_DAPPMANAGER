@@ -10,6 +10,12 @@ import { dockerComposeUpPackage, dockerCreateNetwork, dockerListNetworks } from 
 import { packageToInstallHasPid } from "../../utils/pid";
 import { exposeByDefaultHttpsPorts } from "./exposeByDefaultHttpsPorts";
 import { ComposeFileEditor } from "../compose/editor";
+import { getExternalNetworkAliasFromPackage } from "../../domains";
+import { httpsPortal } from "../../calls/httpsPortal";
+
+
+const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
+
 
 /**
  * Create and run each package container in series
@@ -47,7 +53,6 @@ export async function runPackages(
       log(pkg.dnpName, "Ensuring HTTPS network exists...");
       
       const networks = await dockerListNetworks();
-      const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
       if (!networks.find(network => network.Name === externalNetworkName)) {
         await dockerCreateNetwork(externalNetworkName);
       }
@@ -56,12 +61,32 @@ export async function runPackages(
       const compose = new ComposeFileEditor(pkg.dnpName, true);
       if(compose.getComposeNetwork(externalNetworkName) === null) {
         log(pkg.dnpName, "Adding external network to HTTPS compose...");
-        const composeService = compose.services()["https.dnp.dappnode.eth"];
-        const aliases: string[] = ["https.external"];
+        const composeService = compose.firstService();
+        const alias = getExternalNetworkAliasFromPackage(pkg.dnpName, composeService.serviceName)
+        const aliases = [alias];
         composeService.addNetwork(externalNetworkName, {aliases});
         compose.write();
       }
+    } else {
+      const compose = new ComposeFileEditor(pkg.dnpName, true);
+      const services = [compose.firstService()] // TODO: list of all service
+
+      for(const composeService of services) {
+        if(await httpsPortal.hasMapping(pkg.dnpName, composeService.serviceName)) {
+          
+          const networks = await dockerListNetworks();
+          if (!networks.find(network => network.Name === externalNetworkName)) {
+            await dockerCreateNetwork(externalNetworkName);
+          }
+          
+          const alias = getExternalNetworkAliasFromPackage(pkg.dnpName, composeService.serviceName)
+          const aliases = [alias];
+          composeService.addNetwork(externalNetworkName, {aliases});
+          compose.write();
+        }
+      }
     }
+    
 
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans

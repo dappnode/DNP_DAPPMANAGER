@@ -6,7 +6,7 @@ import {
 } from "../docker";
 import { listContainers } from "../docker/list";
 import params from "../../params";
-import { getExternalNetworkAlias } from "../../domains";
+import { getExternalNetworkAlias, getExternalNetworkAliasFromPackage } from "../../domains";
 import { PackageContainer, HttpsPortalMapping } from "../../types";
 import { HttpsPortalApiClient } from "./apiClient";
 import { addNetworkAliasCompose, removeNetworkAliasCompose } from "./utils";
@@ -144,6 +144,19 @@ export class HttpsPortal {
       }
     }
     return mappings;
+  }
+
+  async hasMapping(dnpName: string, serviceName: string) : Promise<boolean> {
+
+    const entries = await this.httpsPortalApiClient.list();
+    const mappingAlias = getExternalNetworkAliasFromPackage(dnpName, serviceName);
+    for (const { fromSubdomain, toHost } of entries) {
+      const [alias, port] = toHost.split(":");
+      if(alias === mappingAlias) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private async getContainerForMapping(
