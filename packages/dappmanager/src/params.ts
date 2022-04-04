@@ -289,15 +289,14 @@ export const ethClientData: {
     userSettings?: UserSettings; // Custom installation for geth light client
   };
 } = {
-  "geth-light": {
-    dnpName: "geth.dnp.dappnode.eth",
-    userSettings: {
-      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
-    }
-  },
-  geth: { dnpName: "geth.dnp.dappnode.eth" },
-  openethereum: { dnpName: "openethereum.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
+  "nethermind-xdai": { dnpName: "nethermind-xdai.dnp.dappnode.eth" }
+  // // Example of client data with userSettings
+  // "geth-light": {
+  //   dnpName: "geth.dnp.dappnode.eth",
+  //   userSettings: {
+  //     environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
+  //   }
+  // },
 };
 
 // Naming

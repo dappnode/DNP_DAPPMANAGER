@@ -1257,17 +1257,12 @@ export enum IpfsClientTarget {
  * Manage the Ethereum multi-client setup
  */
 export type EthClientTargetPackage =
-  | "geth-light"
-  | "geth"
-  | "openethereum"
-  | "nethermind";
+  // Add more clients here
+  "nethermind-xdai";
 export type EthClientTarget = EthClientTargetPackage | "remote";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
-  "geth-light",
-  "geth",
-  "openethereum",
-  "nethermind"
+  "nethermind-xdai"
 ];
 
 /**
