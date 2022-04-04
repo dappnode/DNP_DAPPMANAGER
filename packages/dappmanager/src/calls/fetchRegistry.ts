@@ -61,7 +61,7 @@ export async function fetchRegistry({
   await Promise.all(
     packagesSorted.map(async (pkg, index): Promise<void> => {
       // Ignore packages as set in the registry contract
-      if (pkg.flags.hidden || pkg.flags.banned || !pkg.flags.active) {
+      if (!pkg.flags.visible || pkg.flags.banned) {
         return;
       }
 

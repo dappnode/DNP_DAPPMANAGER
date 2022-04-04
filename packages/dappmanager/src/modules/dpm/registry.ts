@@ -2,11 +2,20 @@ import { ethers } from "ethers";
 import { AddressHex } from "../../types";
 import { registryAbi } from "./registryAbi";
 
+/**
+ * @dev Bitfield with status flags, TBD
+ * - 0: visible: Display in a public list. Can be set to false for early stage
+ *      packages or while testing.
+ * - 1: validated: The quality of this package has been validated. Useful for a
+ *      governing authority to attest the package.
+ * - 2: banned: This package is damaging in some way and must not be installed
+ *      nor showed. Useful for a governing authority to attest the package and
+ *      override `visible` which may be controlled by the developer.
+ */
 export enum Flags {
-  active = "active",
+  visible = "visible",
   validated = "validated",
-  banned = "banned",
-  hidden = "hidden"
+  banned = "banned"
 }
 
 export type Package = {
@@ -129,10 +138,9 @@ export function parsePackageListHex(
 
 export function parseFlags(flags: number): Record<Flags, boolean> {
   return {
-    active: (flags & 1) === 1,
+    visible: (flags & 1) === 1,
     validated: (flags & 2) === 2,
-    banned: (flags & 4) === 4,
-    hidden: (flags & 8) === 8
+    banned: (flags & 4) === 4
   };
 }
 
