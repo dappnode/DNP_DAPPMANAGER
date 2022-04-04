@@ -16,12 +16,12 @@ import { SelectedCategories } from "../types";
  * @param selectedCategories = { library: false, service: true }
  * @returns some elements of directory
  */
-export default function filterDirectory({
-  directory,
+export default function filterRegistry({
+  packages,
   query,
   selectedCategories
 }: {
-  directory: DirectoryItem[];
+  packages: DirectoryItem[];
   query: string;
   selectedCategories: SelectedCategories;
 }): DirectoryItem[] {
@@ -29,7 +29,7 @@ export default function filterDirectory({
     (acc, val) => acc || val,
     false
   );
-  return directory
+  return packages
     .filter(dnp => !query || includesSafe(dnp, query))
     .filter(
       dnp =>

@@ -24,7 +24,7 @@ function getTag({
  * Their style is customizable via the manifest
  */
 function DnpCardFeaturedOk({
-  directoryItem: { name, description, avatarUrl, featuredStyle },
+  directoryItem: { dnpName, description, avatarUrl, isVerified, featuredStyle },
   ...props
 }: {
   directoryItem: DirectoryItemOk;
@@ -45,7 +45,7 @@ function DnpCardFeaturedOk({
       </div>
       <div className="info-big">
         <div className="badge gray featured">Featured</div>
-        <DnpNameVerified name={name} big />
+        <DnpNameVerified dnpName={dnpName} isVerified={isVerified} big />
         <div className="description">{description}</div>
       </div>
     </Card>
@@ -58,13 +58,19 @@ function DnpCardOk({
 }: {
   directoryItem: DirectoryItemOk;
 }) {
-  const { name, description, avatarUrl, isUpdated } = directoryItem;
+  const {
+    dnpName,
+    description,
+    avatarUrl,
+    isUpdated,
+    isVerified
+  } = directoryItem;
   return (
     <Card {...props}>
       <div className="avatar">
         <img src={avatarUrl || defaultAvatar} alt="avatar" />
       </div>
-      <DnpNameVerified name={name} />
+      <DnpNameVerified dnpName={dnpName} isVerified={isVerified} />
       {/* <div className="badge">New version available</div> */}
       <div className="description">{description}</div>
       {/* Show the button as disabled (gray) if it's updated */}
@@ -76,7 +82,7 @@ function DnpCardOk({
 }
 
 function DnpCardError({
-  directoryItem: { name, message },
+  directoryItem: { dnpName, message, isVerified },
   className,
   ...props
 }: {
@@ -88,7 +94,7 @@ function DnpCardError({
       <div className="avatar">
         <img src={errorAvatar} alt="avatar" />
       </div>
-      <DnpNameVerified name={name} />
+      <DnpNameVerified dnpName={dnpName} isVerified={isVerified} />
       <div className="description">{message}</div>
       <Button className="action" variant="dappnode" disabled={true}>
         ERROR
@@ -113,13 +119,13 @@ export default function DnpStore({
     <div className={`dnp-cards ${featured ? "featured" : ""}`}>
       {directory.map(directoryItem => {
         const cardProps = {
-          onClick: () => openDnp(directoryItem.name),
+          onClick: () => openDnp(directoryItem.dnpName),
           className: "dnp-card",
           shadow: true
         };
 
         return (
-          <React.Fragment key={directoryItem.name}>
+          <React.Fragment key={directoryItem.dnpName}>
             {directoryItem.status === "ok" ? (
               directoryItem.isFeatured ? (
                 <DnpCardFeaturedOk {...{ ...cardProps, directoryItem }} />

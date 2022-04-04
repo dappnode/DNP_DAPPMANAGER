@@ -30,6 +30,10 @@ export async function fetchDnpRequest({
   const releaseFetcher = new ReleaseFetcher();
 
   const mainRelease = await releaseFetcher.getRelease(id);
+  const registryPackage = await releaseFetcher
+    .resolveDnpNameToPackage(mainRelease.dnpName)
+    // TODO: Improve detection if this package exist in the registry or not
+    .catch(() => null);
 
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
@@ -109,6 +113,7 @@ export async function fetchDnpRequest({
     imageSize: mainRelease.imageFile.size,
     isUpdated: getIsUpdated(mainRelease, dnpList),
     isInstalled: getIsInstalled(mainRelease, dnpList),
+    isVerified: registryPackage ? registryPackage.flags.validated : false,
     // Prevent sending duplicated data
     metadata: omit(mainRelease.metadata, ["setupWizard"]),
     specialPermissions, // Decoupled metadata

@@ -207,7 +207,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     publicIp: "85.84.83.82",
     dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
-    ethClientTarget: "openethereum",
+    ethClientTarget: "nethermind-xdai",
     ethClientFallback: "off",
     ethClientStatus: {
       ok: false,

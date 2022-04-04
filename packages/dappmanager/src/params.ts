@@ -79,7 +79,12 @@ const params = {
   // Signature API
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
-  DAPPNODE_REGISTRY: ".dnp.dappnode.eth",
+  DAPPNODE_MAIN_REGISTRY: "dnp.dappnode.eth",
+  DAPPNODE_KNOWN_REGISTRIES: {
+    // EIP-3770: Chain-specific addresses https://eips.ethereum.org/EIPS/eip-3770
+    "dnp.dappnode.eth": "xdai:0x01c58A553F92A61Fd713e6006fa7D1d82044c389",
+    "public.dappnode.eth": "xdai:0xE8addD62feD354203d079926a8e563BC1A7FE81e"
+  },
 
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
@@ -147,9 +152,9 @@ const params = {
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
-  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
-  ETH_MAINNET_RPC_URL_REMOTE:
-    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  XDAI_RPC_URL_OVERRIDE: process.env.XDAI_RPC_URL_OVERRIDE,
+  XDAI_RPC_URL_REMOTE:
+    process.env.XDAI_RPC_URL_REMOTE || "https://rpc.gnosischain.com/",
 
   // Validators legacy versions: Prysm, Prysm-prater, Prysm-gnosis
   minimumAllowedClientsLegacyVersions: [
@@ -294,15 +299,14 @@ export const ethClientData: {
     userSettings?: UserSettings; // Custom installation for geth light client
   };
 } = {
-  "geth-light": {
-    dnpName: "geth.dnp.dappnode.eth",
-    userSettings: {
-      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
-    }
-  },
-  geth: { dnpName: "geth.dnp.dappnode.eth" },
-  openethereum: { dnpName: "openethereum.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
+  "nethermind-xdai": { dnpName: "nethermind-xdai.dnp.dappnode.eth" }
+  // // Example of client data with userSettings
+  // "geth-light": {
+  //   dnpName: "geth.dnp.dappnode.eth",
+  //   userSettings: {
+  //     environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
+  //   }
+  // },
 };
 
 // Naming

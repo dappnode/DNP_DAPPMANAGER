@@ -23,14 +23,8 @@ export function getEthClientPrettyName(target: EthClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth-light":
-      return "Geth light client";
-    case "geth":
-      return "Geth";
-    case "openethereum":
-      return "OpenEthereum";
-    case "nethermind":
-      return "Nethermind";
+    case "nethermind-xdai":
+      return "Nethermind xDAI";
   }
 }
 
@@ -41,11 +35,9 @@ export function getEthClientType(target: EthClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth-light":
-      return "Light client";
-    case "geth":
-    case "openethereum":
-    case "nethermind":
+    // case "geth-light":
+    //   return "Light client";
+    case "nethermind-xdai":
       return "Full node";
   }
 }
@@ -111,21 +103,21 @@ const clients: EthClientData[] = [
     },
     highlight: "syncTime"
   },
-  {
-    title: "Light client",
-    description: "Lightweight client for low-resource devices",
-    options: ["geth-light"],
-    stats: {
-      syncTime: "Fast sync",
-      requirements: "Light requirements",
-      trust: "Semi-decentralized"
-    },
-    highlight: "requirements"
-  },
+  // {
+  //   title: "Light client",
+  //   description: "Lightweight client for low-resource devices",
+  //   options: ["geth-light"],
+  //   stats: {
+  //     syncTime: "Fast sync",
+  //     requirements: "Light requirements",
+  //     trust: "Semi-decentralized"
+  //   },
+  //   highlight: "requirements"
+  // },
   {
     title: "Full node",
-    description: "Your own Ethereum node w/out 3rd parties",
-    options: ["geth", "openethereum", "nethermind"],
+    description: "Your own node w/out 3rd parties",
+    options: ["nethermind-xdai"],
     stats: {
       syncTime: "Slow sync",
       requirements: "High requirements",

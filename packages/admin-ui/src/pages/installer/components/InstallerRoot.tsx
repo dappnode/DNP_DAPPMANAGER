@@ -5,7 +5,6 @@ import InstallDnpContainer from "./InstallDnpContainer";
 import { title, rootPath, subPathPublic } from "../data";
 import Title from "components/Title";
 import { InstallerDnp } from "./dappnodeDappstore/InstallerDnp";
-import { InstallerPublic } from "./publicDappstore/InstallerPublic";
 // Styles
 import "./installer.scss";
 
@@ -26,7 +25,7 @@ const InstallerRoot: React.FC<RouteComponentProps> = ({ match }) => {
         <Route
           key={subPathPublic}
           path={match.path + subPathPublic}
-          component={InstallerPublic}
+          component={InstallerDnp}
         />
         {/*DNP installer path*/}
         <Route path={match.path + "/:id"} component={InstallDnpContainer} />

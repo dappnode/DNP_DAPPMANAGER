@@ -2,7 +2,10 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock";
-import { EthClientSyncedNotificationStatus } from "../../../src/types";
+import {
+  EthClientSyncedNotificationStatus,
+  EthClientTarget
+} from "../../../src/types";
 import { EventBus, eventBus } from "../../../src/eventBus";
 
 describe("modules / ethClient / emitSyncedNotification", () => {
@@ -14,6 +17,8 @@ describe("modules / ethClient / emitSyncedNotification", () => {
         notificationStatus = newValue;
       }
     };
+
+    const target: EthClientTarget = "nethermind-xdai";
 
     const notificationEmit = sinon.stub();
     const mockEventBus: EventBus = {
@@ -37,36 +42,37 @@ describe("modules / ethClient / emitSyncedNotification", () => {
       }
     );
 
-    emitSyncedNotification("geth", { ok: false, code: "IS_SYNCING" });
+    emitSyncedNotification(target, { ok: false, code: "IS_SYNCING" });
     expect(notificationEmit.callCount).to.equal(
       0,
       "Should not emit when syncing"
     );
 
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(target, { ok: true, url: "", dnpName: "" });
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should emit when sync is complete"
     );
 
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(target, { ok: true, url: "", dnpName: "" });
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should not emit again on complete"
     );
 
-    emitSyncedNotification("geth", { ok: false, code: "IS_SYNCING" });
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(target, { ok: false, code: "IS_SYNCING" });
+    emitSyncedNotification(target, { ok: true, url: "", dnpName: "" });
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should not emit again after synced"
     );
 
-    emitSyncedNotification("nethermind", { ok: false, code: "IS_SYNCING" });
-    emitSyncedNotification("nethermind", { ok: true, url: "", dnpName: "" });
-    expect(notificationEmit.callCount).to.equal(
-      2,
-      "Should emit when changing target"
-    );
+    // // TODO: Re-enable when a new target is added
+    // emitSyncedNotification("nethermind", { ok: false, code: "IS_SYNCING" });
+    // emitSyncedNotification("nethermind", { ok: true, url: "", dnpName: "" });
+    // expect(notificationEmit.callCount).to.equal(
+    //   2,
+    //   "Should emit when changing target"
+    // );
   });
 });

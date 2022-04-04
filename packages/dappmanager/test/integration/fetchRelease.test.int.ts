@@ -226,6 +226,7 @@ describe("Fetch releases", () => {
 
         isUpdated: false,
         isInstalled: true,
+        isVerified: false,
         settings: {
           [dnpNameMain]: {
             environment: {
@@ -364,6 +365,7 @@ describe("Fetch releases", () => {
 
         isUpdated: false,
         isInstalled: true,
+        isVerified: false,
         settings: {
           [dnpNameMain]: {}
         },
