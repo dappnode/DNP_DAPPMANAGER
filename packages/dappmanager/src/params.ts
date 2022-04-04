@@ -153,7 +153,7 @@ const params = {
   // Web3 parameters
   XDAI_RPC_URL_OVERRIDE: process.env.XDAI_RPC_URL_OVERRIDE,
   XDAI_RPC_URL_REMOTE:
-    process.env.XDAI_RPC_URL_REMOTE || "https://web3.dappnode.net",
+    process.env.XDAI_RPC_URL_REMOTE || "https://rpc.gnosischain.com/",
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
