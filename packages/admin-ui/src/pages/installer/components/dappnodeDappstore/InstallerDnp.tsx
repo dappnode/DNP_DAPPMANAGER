@@ -9,7 +9,7 @@ import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterRegistry from "../../helpers/filterDirectory";
-import { rootPath } from "../../data";
+import { pathPublic, rootPath } from "../../data";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
@@ -39,7 +39,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   const [showErrorDnps, setShowErrorDnps] = useState(false);
 
   const registryName =
-    routeProps.location.pathname === "/installer/public"
+    routeProps.location.pathname === pathPublic
       ? PUBLIC_REGISTRY_NAME
       : DNP_REGISTRY_NAME;
   const isSafeRegistry = registryName === DNP_REGISTRY_NAME;
