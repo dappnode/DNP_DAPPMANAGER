@@ -6,16 +6,15 @@ import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
 import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
-import { dockerComposeUpPackage, dockerCreateNetwork, dockerListNetworks } from "../docker";
+import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
-import { exposeByDefaultHttpsPorts } from "./exposeByDefaultHttpsPorts";
-import { ComposeFileEditor } from "../compose/editor";
-import { getExternalNetworkAliasFromPackage } from "../../domains";
-import { httpsPortal } from "../../calls/httpsPortal";
-
+import {
+  httpsEnsureNetworkExists,
+  httpsExposeByDefaultPorts,
+  httpsPersistPackagesExternalNetwork
+} from "./https";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
-
 
 /**
  * Create and run each package container in series
@@ -47,46 +46,9 @@ export async function runPackages(
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
 
-
-    // Recreate HTTPs portal mapping if installing or updating HTTPs package
-    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME) {
-      log(pkg.dnpName, "Ensuring HTTPS network exists...");
-      
-      const networks = await dockerListNetworks();
-      if (!networks.find(network => network.Name === externalNetworkName)) {
-        await dockerCreateNetwork(externalNetworkName);
-      }
-
-      // Check whether DNP_HTTPS compose has external network persisted
-      const compose = new ComposeFileEditor(pkg.dnpName, true);
-      if(compose.getComposeNetwork(externalNetworkName) === null) {
-        log(pkg.dnpName, "Adding external network to HTTPS compose...");
-        const composeService = compose.firstService();
-        const alias = getExternalNetworkAliasFromPackage(pkg.dnpName, composeService.serviceName)
-        const aliases = [alias];
-        composeService.addNetwork(externalNetworkName, {aliases});
-        compose.write();
-      }
-    } else {
-      const compose = new ComposeFileEditor(pkg.dnpName, true);
-      const services = [compose.firstService()] // TODO: list of all service
-
-      for(const composeService of services) {
-        if(await httpsPortal.hasMapping(pkg.dnpName, composeService.serviceName)) {
-          
-          const networks = await dockerListNetworks();
-          if (!networks.find(network => network.Name === externalNetworkName)) {
-            await dockerCreateNetwork(externalNetworkName);
-          }
-          
-          const alias = getExternalNetworkAliasFromPackage(pkg.dnpName, composeService.serviceName)
-          const aliases = [alias];
-          composeService.addNetwork(externalNetworkName, {aliases});
-          compose.write();
-        }
-      }
-    }
-    
+    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME)
+      await httpsEnsureNetworkExists(pkg, externalNetworkName);
+    else await httpsPersistPackagesExternalNetwork(pkg, externalNetworkName);
 
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
@@ -129,6 +91,6 @@ export async function runPackages(
     log(pkg.dnpName, "Package started");
 
     // Expose default HTTPs ports if required
-    await exposeByDefaultHttpsPorts(pkg, log);
+    await httpsExposeByDefaultPorts(pkg, log);
   }
 }
