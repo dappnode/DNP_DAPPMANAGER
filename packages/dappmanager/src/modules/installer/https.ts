@@ -43,7 +43,7 @@ export async function httpsPersistPackagesExternalNetwork(
   externalNetworkName: string
 ): Promise<void> {
 
-  if(!hasRunningHTTPS()) { // if there is no https, checks aren't needed
+  if(!(await hasRunningHTTPS())) { // if there is no https, checks aren't needed
     return;
   }
   const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
@@ -78,7 +78,7 @@ export async function httpsExposeByDefaultPorts(
   if (pkg.metadata.exposable) {
     // Check HTTPS package exists
 
-    hasRunningHTTPS(true); // require that https package exists and it is running
+    await hasRunningHTTPS(true); // require that https package exists and it is running
 
     const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
@@ -141,7 +141,7 @@ async function hasRunningHTTPS(require: boolean = false) {
     dnpName: params.HTTPS_PORTAL_DNPNAME
   });
   if (!httpsPackage) {
-    if(require) {
+    if(!require) {
       return false;
     }
 
@@ -153,7 +153,7 @@ async function hasRunningHTTPS(require: boolean = false) {
   // Check HTTPS package running
   httpsPackage.containers.forEach(container => {
     if (!container.running){
-      if(require) {
+      if(!require) {
         return false;
       }
       throw Error(
