@@ -42,7 +42,7 @@ export async function httpsPersistPackagesExternalNetwork(
   pkg: InstallPackageData,
   externalNetworkName: string
 ): Promise<void> {
-  const compose = new ComposeFileEditor(pkg.dnpName, true);
+  const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
   const services = Object.entries(compose.services());
 
   for (const [serviceName, composeServiceEditor] of services) {
