@@ -42,6 +42,10 @@ export async function httpsPersistPackagesExternalNetwork(
   pkg: InstallPackageData,
   externalNetworkName: string
 ): Promise<void> {
+
+  if(!hasRunningHTTPS()) { // if there is no https, checks aren't needed
+    return;
+  }
   const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
   const services = Object.entries(compose.services());
 
@@ -73,20 +77,9 @@ export async function httpsExposeByDefaultPorts(
 ): Promise<void> {
   if (pkg.metadata.exposable) {
     // Check HTTPS package exists
-    const httpsPackage = await listPackageNoThrow({
-      dnpName: params.HTTPS_PORTAL_DNPNAME
-    });
-    if (!httpsPackage)
-      throw Error(
-        `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
-      );
-    // Check HTTPS package running
-    httpsPackage.containers.map(container => {
-      if (!container.running)
-        throw Error(
-          `HTTPS package not running but required to expose HTTPS ports by default.`
-        );
-    });
+
+    hasRunningHTTPS(true); // require that https package exists and it is running
+
     const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
 
@@ -140,4 +133,34 @@ export async function httpsExposeByDefaultPorts(
       }
     }
   }
+}
+
+async function hasRunningHTTPS(require: boolean = false) {
+
+  const httpsPackage = await listPackageNoThrow({
+    dnpName: params.HTTPS_PORTAL_DNPNAME
+  });
+  if (!httpsPackage) {
+    if(require) {
+      return false;
+    }
+
+    throw Error(
+      `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
+    );
+  }
+    
+  // Check HTTPS package running
+  httpsPackage.containers.forEach(container => {
+    if (!container.running){
+      if(require) {
+        return false;
+      }
+      throw Error(
+        `HTTPS package not running but required to expose HTTPS ports by default.`
+      );
+    }
+  });
+  
+  return true;
 }
