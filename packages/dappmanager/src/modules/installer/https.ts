@@ -59,6 +59,7 @@ export async function httpsPersistPackagesExternalNetwork(
       const aliases = [alias];
       composeServiceEditor.addNetwork(externalNetworkName, { aliases });
       compose.write();
+      break;
     }
   }
 }
