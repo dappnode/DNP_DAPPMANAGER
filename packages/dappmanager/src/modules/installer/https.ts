@@ -135,13 +135,13 @@ export async function httpsExposeByDefaultPorts(
   }
 }
 
-async function hasRunningHTTPS(require: boolean = false) {
+async function hasRunningHTTPS(required: boolean = false) {
 
   const httpsPackage = await listPackageNoThrow({
     dnpName: params.HTTPS_PORTAL_DNPNAME
   });
   if (!httpsPackage) {
-    if(!require) {
+    if(!required) {
       return false;
     }
 
@@ -153,7 +153,7 @@ async function hasRunningHTTPS(require: boolean = false) {
   // Check HTTPS package running
   httpsPackage.containers.forEach(container => {
     if (!container.running){
-      if(!require) {
+      if(!required) {
         return false;
       }
       throw Error(
