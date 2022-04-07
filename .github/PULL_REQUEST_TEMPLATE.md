@@ -1,22 +1,18 @@
-<!-- Once the Pull Request is created, do not forget to:
+<!-- For DAppNode core members, once the Pull Request is created, do not forget to:
 1.  Link issues to the PR if available
 2.  Mention dappnode core members
 3.  Add proper labels
 -->
 
-**What type of PR is this?**
+## Context
 
-> Uncomment one line below and remove others.
->
-> Bug fix
-> Feature
-> Documentation
-> Other
+> Provide context of this PR: why it was created? what does it fixes? what new feature does it provides? ...
 
-**What does this PR do? Why is it needed?**
+## Approach
 
-**How can be tested?**
+> Define the solution for the issue or feature that this PR aims to fix
 
-> Provide well detailed instructions to test this PR
+## Test instructions
 
-**Other notes for review**
+<!-- MANDATORY: please, do not skip this step, it is very importand for DAppNode team to have simple and well defined instructions on how to test this PR.
+-->
