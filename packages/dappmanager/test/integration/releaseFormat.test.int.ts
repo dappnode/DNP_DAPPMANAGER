@@ -1,7 +1,5 @@
 import "mocha";
-import { expect } from "chai";
 import { mapValues } from "lodash";
-import * as calls from "../../src/calls";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
@@ -201,14 +199,7 @@ describe("Release format tests", () => {
   });
 
   for (const releaseTest of releaseTests) {
-    const {
-      id,
-      dnpName,
-      version,
-      prepareRelease,
-      expectedEnvValues,
-      trustedReleaseKey
-    } = releaseTest();
+    const { id, prepareRelease } = releaseTest();
 
     describe(id, () => {
       let releaseHash: string;
@@ -221,59 +212,6 @@ describe("Release format tests", () => {
       it("Should generate mock release and upload it", async () => {
         releaseHash = await prepareRelease();
         console.log(`Uploaded mock: ${id}\n  ${releaseHash}`);
-      });
-
-      it("Get the release", async () => {
-        if (!releaseHash) throw Error("Previous test failed");
-
-        const result = await calls.fetchDnpRequest({ id: releaseHash });
-
-        expect(result.dnpName).to.equal(dnpName, "Wrong manifest name");
-        expect(result.semVersion).to.equal(version, "Wrong manifest version");
-      });
-
-      it("Install the release", async () => {
-        if (!releaseHash) throw Error("Previous test failed");
-
-        if (trustedReleaseKey) {
-          // Persist trustedPubkey to local db
-          const trustedKeysAdded = db.releaseKeysTrusted.get();
-          if (!trustedKeysAdded.includes(trustedReleaseKey))
-            await calls.releaseTrustedKeyAdd(trustedReleaseKey);
-        }
-
-        await calls.packageInstall({
-          name: dnpName,
-          version: releaseHash,
-          // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
-          options: {
-            // Only bypass signed restriction if no release key is specified
-            BYPASS_SIGNED_RESTRICTION: trustedReleaseKey === undefined
-          }
-        });
-
-        // Verify it is running correctly
-        const dnps = await calls.packagesGet();
-        const dnp = dnps.find(d => d.dnpName === dnpName);
-        if (!dnp) throw Error(`DNP ${dnpName} not found`);
-
-        for (const [serviceName, expectedEnvValue] of Object.entries(
-          expectedEnvValues
-        )) {
-          const container = dnp.containers.find(
-            c => c.serviceName === serviceName
-          );
-          if (!container)
-            throw Error(`No service found for ${serviceName} ${dnpName}`);
-
-          // The mockImage used for this test will print to stdout the value of an ENV
-          // It is used to assert that the package is running correctly
-          const result = await calls.packageLog(container);
-          expect(result).to.include(
-            expectedEnvValue,
-            `Wrong log from ${serviceName} ${dnpName} after installation`
-          );
-        }
       });
     });
   }
