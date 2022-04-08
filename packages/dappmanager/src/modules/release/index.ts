@@ -9,6 +9,7 @@ import {
   isSemver,
   isSemverRange
 } from "../../utils/validate";
+import { DappGetState } from "../dappGet/types";
 
 enum ContentProtocol {
   ipfs = "ipfs://",
@@ -73,7 +74,16 @@ export class ReleaseFetcher extends Dpm {
    * Resolve a request dependencies and fetch their release assets
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async getReleasesResolved(req: PackageRequest, options?: DappgetOptions) {
+  async getReleasesResolved(
+    req: PackageRequest,
+    options?: DappgetOptions
+  ): Promise<{
+    message: string;
+    state: DappGetState;
+    alreadyUpdated: DappGetState;
+    currentVersions: DappGetState;
+    releases: PackageRelease[];
+  }> {
     const result = await dappGet(req, options);
     const releases = await Promise.all(
       Object.entries(result.state).map(([name, version]) =>

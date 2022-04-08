@@ -2,20 +2,11 @@ import os from "os";
 import memoize from "memoizee";
 import { ipfs } from "../../ipfs";
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { manifestToCompose, validateManifestWithImage } from "../../manifest";
-import {
-  Manifest,
-  DistributedFile,
-  ManifestWithImage,
-  NodeArch
-} from "../../../types";
-import { NoImageForArchError } from "../errors";
+import { DistributedFile, NodeArch } from "../../../types";
 import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
 import { getImageByArch } from "./getImageByArch";
 import { findEntries } from "./findEntries";
 import { releaseFiles } from "../../../params";
-import { downloadAssetRequired } from "./downloadAssets";
-import { isDirectoryRelease } from "./isDirectoryRelease";
 import { serializeIpfsDirectory } from "../releaseSignature";
 import { ReleaseDownloadedContents } from "../types";
 
@@ -47,48 +38,27 @@ async function downloadReleaseIpfsFn(
   try {
     // Check if it is an ipfs path of a root directory release
     const ipfsEntries = await ipfs.list(hash);
-    const isDirectory = await isDirectoryRelease(ipfsEntries);
+    const { manifest, compose, signature } = await downloadDirectoryFiles(
+      ipfsEntries
+    );
 
-    if (!isDirectory) {
-      const manifest = await downloadManifest(hash);
+    // Pin release on visit
+    ipfs.pinAddNoThrow(hash);
 
-      // Disable manifest type releases for ARM architectures
-      if (isArmArch(arch)) throw new NoImageForArchError(arch);
+    // Fetch image by arch, will throw if not available
+    const imageEntry = getImageByArch(manifest, ipfsEntries, arch);
+    const avatarEntry = findEntries(ipfsEntries, releaseFiles.avatar, "avatar");
 
-      // Make sure manifest.image.hash exists. Otherwise, will throw
-      const manifestWithImage = validateManifestWithImage(
-        manifest as ManifestWithImage
-      );
-      const { image, avatar } = manifestWithImage;
-      return {
-        imageFile: getFileFromHash(image.hash, image.size),
-        avatarFile: avatar ? getFileFromHash(avatar) : undefined,
-        manifest,
-        composeUnsafe: manifestToCompose(manifestWithImage)
-      };
-    } else {
-      const files = await ipfs.list(hash);
-      const { manifest, compose, signature } = await downloadDirectoryFiles(
-        files
-      );
-
-      ipfs.pinAddNoThrow(hash);
-
-      // Fetch image by arch, will throw if not available
-      const imageEntry = getImageByArch(manifest, files, arch);
-      const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
-
-      return {
-        imageFile: getFileFromEntry(imageEntry),
-        avatarFile: getFileFromEntry(avatarEntry),
-        manifest,
-        composeUnsafe: compose,
-        signature: signature && {
-          signature,
-          signedData: serializeIpfsDirectory(files, signature.cid)
-        }
-      };
-    }
+    return {
+      imageFile: getFileFromEntry(imageEntry),
+      avatarFile: getFileFromEntry(avatarEntry),
+      manifest,
+      composeUnsafe: compose,
+      signature: signature && {
+        signature,
+        signedData: serializeIpfsDirectory(ipfsEntries, signature.cid)
+      }
+    };
   } catch (e) {
     throw e;
   }
@@ -96,33 +66,10 @@ async function downloadReleaseIpfsFn(
 
 // Helpers
 
-async function downloadManifest(hash: string): Promise<Manifest> {
-  return downloadAssetRequired<Manifest>(
-    hash,
-    releaseFiles.manifest,
-    "manifest"
-  );
-}
-
-function getFileFromHash(hash: string, size?: number): DistributedFile {
-  return { hash, size: size || 0, source };
-}
-
 function getFileFromEntry(entry: IPFSEntry): DistributedFile {
   return {
     hash: entry.cid.toString(),
     size: entry.size,
     source
   };
-}
-
-function isArmArch(arch: NodeArch): boolean {
-  switch (arch) {
-    case "arm":
-    case "arm64":
-      return true;
-
-    default:
-      return false;
-  }
 }
