@@ -46,9 +46,10 @@ describe("Resilience features, when things go wrong", function () {
     await shellSafe(`docker network rm ${dncoreNetwork}`);
   });
 
-  before("Upload a vanilla package", async () => {
+  // Upload package in standard format
+  /*   before("Upload a vanilla package", async () => {
     releaseHash = await uploadManifestRelease(manifest);
-  });
+  }); */
 
   afterEach("Clean environment", async () => {
     // SUPER important to clean dnp_repo folder to avoid caches
@@ -57,7 +58,7 @@ describe("Resilience features, when things go wrong", function () {
   });
 
   describe("Signed safe restrictions", () => {
-    it("Prevent installing package from unsafe origin not signed", async () => {
+    /*     it("Prevent installing package from unsafe origin not signed", async () => {
       try {
         await calls.packageInstall({
           name: dnpName,
@@ -75,11 +76,11 @@ describe("Resilience features, when things go wrong", function () {
           throw e;
         }
       }
-    });
+    }); */
   });
 
   describe("Remove a package without compose", () => {
-    before("Install the release", async () => {
+    /*     before("Install the release", async () => {
       await calls.packageInstall({
         name: dnpName,
         version: releaseHash,
@@ -91,11 +92,11 @@ describe("Resilience features, when things go wrong", function () {
       const composePath = getPath.dockerCompose(dnpName, false);
       fs.unlinkSync(composePath);
       await calls.packageRemove({ dnpName, deleteVolumes: true });
-    });
+    }); */
   });
 
   describe("Remove a package with a broken compose", () => {
-    before("Install the release", async () => {
+    /*     before("Install the release", async () => {
       await calls.packageInstall({
         name: dnpName,
         version: releaseHash,
@@ -108,11 +109,11 @@ describe("Resilience features, when things go wrong", function () {
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
       await calls.packageRemove({ dnpName, deleteVolumes: true });
-    });
+    }); */
   });
 
   describe("Failing installation due to bad compose", () => {
-    let brokenReleaseHash: string;
+    /*     let brokenReleaseHash: string;
     before("Install the good release", async () => {
       await calls.packageInstall({
         name: dnpName,
@@ -163,6 +164,6 @@ describe("Resilience features, when things go wrong", function () {
         dnpAfter.origin,
         "Rollback should leave the before version running"
       );
-    });
+    }); */
   });
 });
