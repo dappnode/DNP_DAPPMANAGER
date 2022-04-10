@@ -74,7 +74,7 @@ export class HttpsPortal {
     const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true)
     const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath))
 
-    if(editor.getComposeNetwork(externalNetworkName) === null) {
+    if (editor.getComposeNetwork(externalNetworkName) === null) {
       const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer)
       addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias])
     }
@@ -146,13 +146,13 @@ export class HttpsPortal {
     return mappings;
   }
 
-  async hasMapping(dnpName: string, serviceName: string) : Promise<boolean> {
+  async hasMapping(dnpName: string, serviceName: string): Promise<boolean> {
 
     const entries = await this.httpsPortalApiClient.list();
     const mappingAlias = getExternalNetworkAliasFromPackage(dnpName, serviceName);
     for (const { fromSubdomain, toHost } of entries) {
       const [alias, port] = toHost.split(":");
-      if(alias === mappingAlias) {
+      if (alias === mappingAlias) {
         return true;
       }
     }
