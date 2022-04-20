@@ -26,12 +26,14 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
   return (
     <div className="body">
       {/* SideNav expands on big screens, while content-wrapper moves left */}
-      <SideBar />
-      <TopBar username={username} />
-      <div id="main">
+      <SideBar theme={theme} />
+      <TopBar username={username} theme={theme} setTheme={setTheme} />
+      <div id="main" className={`main-${theme}`}>
         <ErrorBoundary>
           <NotificationsMain />
         </ErrorBoundary>

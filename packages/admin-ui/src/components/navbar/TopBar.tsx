@@ -10,9 +10,18 @@ import { toggleSideNav } from "./SideBar";
 import "./topbar.scss";
 import "./notifications.scss";
 import { MdMenu } from "react-icons/md";
+import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 
-export const TopBar = ({ username }: { username: string }) => (
-  <div id="topbar">
+export const TopBar = ({
+  username,
+  theme,
+  setTheme
+}: {
+  username: string;
+  theme: "light" | "dark";
+  setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
+}) => (
+  <div id="topbar" className={`topbar-${theme}`}>
     {/* Left justified items */}
     <div className="left">
       <button className="sidenav-toggler" onClick={toggleSideNav}>
@@ -21,6 +30,7 @@ export const TopBar = ({ username }: { username: string }) => (
     </div>
     {/* Right justified items */}
     <div className="right">
+      <ThemeSwitch theme={theme} setTheme={setTheme} />
       <DappnodeIdentity />
       <div className="topnav-icon-separator" />
       <ChainDataDropdown />

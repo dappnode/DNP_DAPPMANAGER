@@ -16,7 +16,7 @@ export function toggleSideNav() {
   window.dispatchEvent(new Event(toggleSideNavEvent));
 }
 
-export default function SideBar() {
+export default function SideBar({ theme }: { theme: "light" | "dark" }) {
   const [collapsed, setCollapsed] = useState(true);
 
   const sidebarEl = useRef<HTMLDivElement>(null);
@@ -62,7 +62,11 @@ export default function SideBar() {
   }, [collapsed]);
 
   return (
-    <div id="sidebar" ref={sidebarEl} className={collapsed ? "collapsed" : ""}>
+    <div
+      id="sidebar"
+      ref={sidebarEl}
+      className={collapsed ? "collapsed" : `sidebar-${theme}`}
+    >
       <NavLink className="sidenav-item top" to={"/"} onClick={collapseSideNav}>
         <img className="sidebar-logo header" src={logo} alt="logo" />
       </NavLink>

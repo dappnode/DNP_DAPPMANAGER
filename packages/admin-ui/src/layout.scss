@@ -4,11 +4,14 @@
   --transition-time: 0.25s;
   --topbar-height: 3.5rem;
   --container-padding: 1.5rem;
-  --color-white: white;
-  --color-border: #e5e5e5;
-  --color-background: #f7f9f9;
+  --color-white: white; // Used by sidebar and topbar
+  --color-light-border: #e5e5e5;
+  --color-dark-border: #282828;
+  --color-light-background: #f7f9f9;
+  --color-dark-background: #121212;
   --border-size: 0.08rem;
-  --border-style: var(--border-size) solid var(--color-border);
+  --border-style-light: var(--border-size) solid var(--color-light-border);
+  --border-style-dark: var(--border-size) solid var(--color-dark-border);
   --default-spacing: 1.25rem;
 }
 /* MUST ONLY defined z-index properties here 
@@ -51,11 +54,11 @@ body,
 .body {
   /* ### Todo: Substract the topbar height to prevent showing scrollbar when not necessary */
   /* min-height: calc(100vh - var(--topbar-height)); */
-  background-color: var(--color-background);
+  background-color: var(--color-light-background);
 }
 html,
 body {
-  background-color: var(--color-background);
+  background-color: var(--color-light-background);
 }
 
 /********
@@ -81,7 +84,7 @@ body {
   white-space: nowrap;
   /* Colors */
   background-color: var(--color-white);
-  border-right: var(--border-style);
+  border-right: var(--border-style-light);
   box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   /* place sidebar on top of the header and content */
   z-index: var(--z-index-sidebar);
@@ -116,7 +119,7 @@ body {
   /* SIDEBAR > TOP */
   &.top {
     height: var(--topbar-height);
-    border-bottom: var(--border-style);
+    border-bottom: var(--border-style-light);
     /* Prevent the item from shrinking */
     flex-shrink: 0;
   }
@@ -160,7 +163,7 @@ body {
   grid-gap: 1em;
   /* Colors */
   background-color: var(--color-white);
-  border-bottom: var(--border-style);
+  border-bottom: var(--border-style-light);
   padding: 0 var(--container-padding);
   /* place topbar between the sidebar (2) and the main (0) */
   z-index: var(--z-index-topbar);
@@ -200,7 +203,7 @@ body {
   position: relative;
   margin-top: var(--topbar-height);
   margin-left: var(--sidenav-width);
-  background-color: var(--color-background);
+  background-color: var(--color-light-background);
   padding: var(--container-padding);
 
   > div {
