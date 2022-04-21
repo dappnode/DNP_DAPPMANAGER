@@ -53,7 +53,6 @@ function MainApp({ username }: { username: string }) {
           <ErrorBoundary>
             <NotificationsMain />
           </ErrorBoundary>
-
           <Switch>
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
               <Route
