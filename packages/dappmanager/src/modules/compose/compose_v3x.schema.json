@@ -16,6 +16,22 @@
             "cap_add": { "$ref": "#/definitions/list_of_strings" },
             "cap_drop": { "$ref": "#/definitions/list_of_strings" },
             "devices": { "$ref": "#/definitions/list_of_strings" },
+            "deploy":{ 
+              "type": "object",
+              "properties":{ 
+                "resources":{
+                  "type": "object",
+                  "properties":{
+                    "limits":{
+                      "type": "object",
+                      "properties":{
+                        "memory":{ "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "environment": { "$ref": "#/definitions/list_or_dict" },
             "labels": { "$ref": "#/definitions/list_or_dict" },
             "mac_address": { "type": "string" },
