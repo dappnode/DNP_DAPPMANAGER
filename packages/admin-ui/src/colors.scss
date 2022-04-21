@@ -1,0 +1,87 @@
+/*
+  COLORS
+*/
+#light.body {
+  background-color: var(--color-light-background);
+}
+#light {
+  #main {
+    background-color: var(--color-light-background);
+  }
+  #sidebar {
+    background-color: var(--color-white);
+    border-right: var(--border-style-light);
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
+  }
+  #topbar {
+    border-bottom: var(--border-style-light);
+    background-color: var(--color-white);
+  }
+  .body {
+    background-color: var(--color-light-background);
+  }
+}
+#dark.body {
+  background-color: var(--color-dark-background);
+}
+#dark {
+  #main {
+    background-color: var(--color-dark-background);
+    p,
+    strong,
+    span,
+    div {
+      color: var(--color-white);
+    }
+    .card {
+      background-color: var(--dappnode-dark-card);
+    }
+    .section-title {
+      color: var(--color-white);
+    }
+    .section-subtitle {
+      color: var(--dappnode-white-color);
+    }
+  }
+  #sidebar {
+    background-color: var(--color-black);
+    box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
+    .nav a,
+    .nav .sidenav-item svg {
+      color: var(--dappnode-strong-main-color);
+      opacity: 1;
+    }
+    .funded-by {
+      .funded-by-text {
+        color: var(--dappnode-strong-main-color);
+      }
+      .funded-by-logos .img-fluid {
+        opacity: 1;
+        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
+          brightness(97%) contrast(93%);
+      }
+    }
+  }
+  #topbar {
+    border-bottom: none;
+    background-color: var(--color-black);
+    .left {
+      a img {
+        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
+          brightness(97%) contrast(93%);
+      }
+      button {
+        color: var(--dappnode-strong-main-color);
+      }
+    }
+    .right .tn-dropdown {
+      .tn-dropdown-toggle {
+        color: var(--dappnode-strong-main-color) !important;
+        opacity: 1;
+      }
+    }
+  }
+  .body {
+    background-color: var(--color-dark-background);
+  }
+}
