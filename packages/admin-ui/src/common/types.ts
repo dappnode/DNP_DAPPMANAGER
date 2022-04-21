@@ -1,5 +1,7 @@
 // Aliases
 
+import { ResourceLimits } from "worker_threads";
+
 export type DnpName = string;
 
 // AUTH, SESSION types
@@ -633,6 +635,13 @@ export interface ComposeService {
   container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   devices?: string[];
   depends_on?: string[];
+  deploy?: {
+    resources: {
+      limits: {
+        memory: string;
+      };
+    };
+  };
   dns?: string; // "172.33.1.2";
   entrypoint?: string;
   env_file?: string[];
