@@ -44,8 +44,6 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <div className="body" id={theme}>

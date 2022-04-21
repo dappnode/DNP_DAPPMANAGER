@@ -1,22 +1,29 @@
-import { BsSunFill, BsMoonFill } from "react-icons/bs";
+import { BsMoonFill } from "react-icons/bs";
+import { FaSun } from "react-icons/fa";
 import React from "react";
-import { Button } from "react-bootstrap";
-import "./themeSwitch.scss";
+import "./dropdown.scss";
+import { ThemeContext } from "App";
 
 export default function ThemeSwitch({
-  theme,
-  setTheme
+  toggleTheme
 }: {
-  theme: "light" | "dark";
-  setTheme: React.Dispatch<React.SetStateAction<"light" | "dark">>;
+  toggleTheme: () => void;
 }) {
+  // get context provider
+  const { theme } = React.useContext(ThemeContext);
   return (
-    <button
-      onClick={
-        theme === "dark" ? () => setTheme("light") : () => setTheme("dark")
-      }
-    >
-      {theme === "light" ? <BsMoonFill /> : <BsSunFill />}
-    </button>
+    <div className="tn-dropdown">
+      <button
+        style={{ border: "none", background: "none" }}
+        className="tn-dropdown-toggle"
+        onClick={toggleTheme}
+      >
+        {theme === "light" ? (
+          <BsMoonFill style={{ fontSize: "larger" }} />
+        ) : (
+          <FaSun style={{ fontSize: "larger" }} />
+        )}
+      </button>
+    </div>
   );
 }
