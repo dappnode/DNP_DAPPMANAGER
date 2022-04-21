@@ -15,10 +15,38 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 
+export const ThemeContext = React.createContext({
+  theme: "light",
+  toggleTheme: () => {}
+});
+
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN and redirect to the login page.
+
+  const [screenWidth, setScreenWidth] = useState(window.screen.width);
+  const [sideBarCollapsed, setSideBar] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  const toggleTheme = () => {
+    setTheme(curr => (curr === "light" ? "dark" : "light"));
+  };
+
+  const toggleSideBar = () => {
+    setSideBar(!sideBarCollapsed);
+    const root = document.documentElement;
+    root.style.setProperty(
+      "--sidenav-collapsed-width",
+      sideBarCollapsed ? "0" : "4.75rem"
+    );
+  };
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [screenWidth]);
 
   // Scroll to top on pathname change
   const location = useLocation();
@@ -26,41 +54,45 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
   return (
-    <div className="body">
-      {/* SideNav expands on big screens, while content-wrapper moves left */}
-      <SideBar theme={theme} />
-      <TopBar username={username} theme={theme} setTheme={setTheme} />
-      <div id="main" className={`main-${theme}`}>
-        <ErrorBoundary>
-          <NotificationsMain />
-        </ErrorBoundary>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <div className="body" id={theme}>
+        <SideBar screenWidth={screenWidth} />
+        <TopBar
+          username={username}
+          screenWidth={screenWidth}
+          toggleTheme={toggleTheme}
+          toggleSideBar={toggleSideBar}
+        />
+        <div id="main">
+          <ErrorBoundary>
+            <NotificationsMain />
+          </ErrorBoundary>
 
-        <Switch>
-          {Object.values(pages).map(({ RootComponent, rootPath }) => (
-            <Route
-              key={rootPath}
-              path={rootPath}
-              render={props => (
-                <ErrorBoundary>
-                  <RootComponent {...props} />
-                </ErrorBoundary>
-              )}
-            />
-          ))}
-          {/* 404 routes redirect to dashboard or default page */}
-          <Route path="*">
-            <Redirect to={defaultPage.rootPath} />
-          </Route>
-        </Switch>
+          <Switch>
+            {Object.values(pages).map(({ RootComponent, rootPath }) => (
+              <Route
+                key={rootPath}
+                path={rootPath}
+                render={props => (
+                  <ErrorBoundary>
+                    <RootComponent {...props} />
+                  </ErrorBoundary>
+                )}
+              />
+            ))}
+            {/* 404 routes redirect to dashboard or default page */}
+            <Route path="*">
+              <Redirect to={defaultPage.rootPath} />
+            </Route>
+          </Switch>
+        </div>
+
+        {/* Place here non-page components */}
+        <Welcome />
+        <ToastContainer />
       </div>
-
-      {/* Place here non-page components */}
-      <Welcome />
-      <ToastContainer />
-    </div>
+    </ThemeContext.Provider>
   );
 }
 

@@ -12,6 +12,7 @@ import { cleanObj } from "utils/objects";
 import "react-toastify/dist/ReactToastify.css";
 // Boostrap loaders
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./colors.scss";
 import "./layout.scss";
 import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";

@@ -79,3 +79,21 @@
     opacity: 0.5;
   }
 }
+
+/* Responsive */
+@media only screen and (max-width: 40rem) {
+  .sidenav-item {
+    border: 0;
+  }
+
+  .funded-by-logos {
+    display: flex;
+    flex-direction: column;
+  }
+  .funded-by-logo {
+    width: 40%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
