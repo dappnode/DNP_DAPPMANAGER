@@ -14,8 +14,7 @@
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   }
   #topbar {
-    border-bottom: var(--border-style-light);
-    background-color: var(--color-light-background-sidebar-topbar);
+    background-color: var(--color-light-background-main);
   }
   .body {
     background-color: var(--color-light-background-main);
@@ -23,7 +22,7 @@
 }
 
 /*
-  DATK
+  DARK
 */
 #dark.body {
   background-color: var(--color-dark-background-main);
@@ -37,17 +36,17 @@
     div,
     a,
     label {
-      color: var(--color-dark-maintext);
+      color: var(--color-dark-tertiarytext);
     }
     .card {
       background-color: var(--color-dark-card);
     }
     .section-title,
     header {
-      color: var(--color-dark-secondarytext);
+      color: var(--color-dark-maintext);
     }
     .section-subtitle {
-      color: var(--color-dark-tertiarytext);
+      color: var(--color-dark-secondarytext);
     }
   }
   #sidebar {
@@ -55,39 +54,26 @@
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
     .nav a,
     .nav .sidenav-item {
-      color: var(--dappnode-strong-main-color);
+      color: var(--color-dark-quaternarytext);
       svg {
         opacity: 1;
       }
     }
     .funded-by {
       .funded-by-text {
-        color: var(--dappnode-strong-main-color);
+        color: var(--color-dark-quaternarytext);
       }
       .funded-by-logos .img-fluid {
         opacity: 1;
-        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
-          brightness(97%) contrast(93%);
+        //filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)brightness(97%) contrast(93%);
       }
     }
   }
   #topbar {
-    border-bottom: none;
     background-color: var(--color-dark-background-sidebar-topbar);
-    .left {
-      a img {
-        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
-          brightness(97%) contrast(93%);
-      }
-      button {
-        color: var(--dappnode-strong-main-color);
-      }
-    }
-    .right .tn-dropdown {
-      .tn-dropdown-toggle {
-        color: var(--dappnode-strong-main-color) !important;
-        opacity: 1;
-      }
+    .tn-dropdown .tn-dropdown-toggle {
+      color: var(--dappnode-strong-main-color) !important;
+      opacity: 1;
     }
   }
   .body {
