@@ -7,14 +7,6 @@
 #light {
   #main {
     background-color: var(--color-light-background-main);
-
-    .eth-multi-client,
-    .ipfs-multi-client {
-      &:hover:not(.selected) {
-        border-color: rgb(218, 218, 218);
-        background-color: rgb(218, 218, 218);
-      }
-    }
   }
   #sidebar {
     background-color: var(--color-light-background-sidebar-topbar);
@@ -22,7 +14,8 @@
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   }
   #topbar {
-    background-color: var(--color-light-background-main);
+    border-bottom: var(--border-style-light);
+    background-color: var(--color-light-background-sidebar-topbar);
   }
   .body {
     background-color: var(--color-light-background-main);
@@ -30,7 +23,7 @@
 }
 
 /*
-  DARK
+  DATK
 */
 #dark.body {
   background-color: var(--color-dark-background-main);
@@ -38,69 +31,63 @@
 #dark {
   #main {
     background-color: var(--color-dark-background-main);
-
-    // =============
-    // HTML elements
-    // =============
     p,
     strong,
     span,
     div,
-    td,
     a,
     label {
-      color: var(--color-dark-secondarytext);
-    }
-    .section-title,
-    .section-subtitle,
-    th,
-    header {
       color: var(--color-dark-maintext);
     }
-
-    // ====================
-    // Bootstrap components
-    // ====================
-
-    // ALERTS
-    .alert:not(a) {
-      color: #000000;
-
-      p,
-      strong {
-        color: #000000;
-      }
-    }
-
-    // CARDS
     .card {
       background-color: var(--color-dark-card);
     }
-    .eth-multi-client,
-    .ipfs-multi-client {
-      &:hover:not(.selected) {
-        border-color: var(--color-dark-card-hover);
-        background-color: var(--color-dark-card-hover);
-      }
+    .section-title,
+    header {
+      color: var(--color-dark-secondarytext);
+    }
+    .section-subtitle {
+      color: var(--color-dark-tertiarytext);
     }
   }
   #sidebar {
-    background-color: var(--color-dark-background-sidebar);
+    background-color: var(--color-dark-background-sidebar-topbar);
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
     .nav a,
-    .nav .sidenav-item,
-    .sidebar-media-footer {
-      color: var(--color-dark-secondarytext);
+    .nav .sidenav-item {
+      color: var(--dappnode-strong-main-color);
       svg {
         opacity: 1;
       }
     }
+    .funded-by {
+      .funded-by-text {
+        color: var(--dappnode-strong-main-color);
+      }
+      .funded-by-logos .img-fluid {
+        opacity: 1;
+        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
+          brightness(97%) contrast(93%);
+      }
+    }
   }
   #topbar {
-    background-color: var(--color-dark-background-topbar);
-    .tn-dropdown .tn-dropdown-toggle {
-      color: var(--dappnode-strong-main-color) !important;
-      opacity: 1;
+    border-bottom: none;
+    background-color: var(--color-dark-background-sidebar-topbar);
+    .left {
+      a img {
+        filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
+          brightness(97%) contrast(93%);
+      }
+      button {
+        color: var(--dappnode-strong-main-color);
+      }
+    }
+    .right .tn-dropdown {
+      .tn-dropdown-toggle {
+        color: var(--dappnode-strong-main-color) !important;
+        opacity: 1;
+      }
     }
   }
   .body {
