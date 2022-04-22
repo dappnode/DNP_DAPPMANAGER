@@ -1,55 +1,64 @@
 /*
-  COLORS
+  LIGHT
 */
 #light.body {
-  background-color: var(--color-light-background);
+  background-color: var(--color-light-background-main);
 }
 #light {
   #main {
-    background-color: var(--color-light-background);
+    background-color: var(--color-light-background-main);
   }
   #sidebar {
-    background-color: var(--color-white);
+    background-color: var(--color-light-background-sidebar-topbar);
     border-right: var(--border-style-light);
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   }
   #topbar {
     border-bottom: var(--border-style-light);
-    background-color: var(--color-white);
+    background-color: var(--color-light-background-sidebar-topbar);
   }
   .body {
-    background-color: var(--color-light-background);
+    background-color: var(--color-light-background-main);
   }
 }
+
+/*
+  DATK
+*/
 #dark.body {
-  background-color: var(--color-dark-background);
+  background-color: var(--color-dark-background-main);
 }
 #dark {
   #main {
-    background-color: var(--color-dark-background);
+    background-color: var(--color-dark-background-main);
     p,
     strong,
     span,
-    div {
-      color: var(--color-white);
+    div,
+    a,
+    label {
+      color: var(--color-dark-maintext);
     }
     .card {
-      background-color: var(--dappnode-dark-card);
+      background-color: var(--color-dark-card);
     }
-    .section-title {
-      color: var(--color-white);
+    .section-title,
+    header {
+      color: var(--color-dark-secondarytext);
     }
     .section-subtitle {
-      color: var(--dappnode-white-color);
+      color: var(--color-dark-tertiarytext);
     }
   }
   #sidebar {
-    background-color: var(--color-black);
+    background-color: var(--color-dark-background-sidebar-topbar);
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
     .nav a,
-    .nav .sidenav-item svg {
+    .nav .sidenav-item {
       color: var(--dappnode-strong-main-color);
-      opacity: 1;
+      svg {
+        opacity: 1;
+      }
     }
     .funded-by {
       .funded-by-text {
@@ -64,7 +73,7 @@
   }
   #topbar {
     border-bottom: none;
-    background-color: var(--color-black);
+    background-color: var(--color-dark-background-sidebar-topbar);
     .left {
       a img {
         filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)
@@ -82,6 +91,6 @@
     }
   }
   .body {
-    background-color: var(--color-dark-background);
+    background-color: var(--color-dark-background-main);
   }
 }

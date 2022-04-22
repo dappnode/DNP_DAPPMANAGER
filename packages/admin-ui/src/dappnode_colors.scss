@@ -1,5 +1,4 @@
 :root {
-  // DAppNode colors
   --dappnode-white-color: #fff;
   --dappnode-strong-main-color: #00b1f4;
   --dappnode-darker-main-color: #007dfc;
@@ -9,15 +8,29 @@
   --dappnode-links-color: #00b1f4;
   --dappnode-links-darker-color: #007dfc;
   --dappnode-complimentary-color: #bc2f39;
-  --dappnode-dark-card: #414141;
+  // Border colors
   --border-color: #e5e5e5;
-  // Other colors
-  --color-white: white; // Used by sidebar and topbar
-  --color-black: #212121; // Used by topbar
   --color-light-border: #e5e5e5;
   --color-dark-border: #616161;
-  --color-light-background: #f7f9f9;
-  --color-dark-background: #313131;
+  --border-style-light: var(--border-size) solid var(--color-light-border);
+  --border-style-dark: var(--border-size) solid var(--color-dark-border);
+
+  // LIGHT mode
+  --color-light-background-sidebar-topbar: white; // Used by sidebar and topbar
+  --color-light-background-main: #f7f9f9; // Used by main
+
+  // DARK mode
+  --color-dark-background-sidebar-topbar: #212121; // Used by sidebar and topbar
+  --color-dark-background-main: #313131; // Used by main
+  --color-dark-maintext: #ffffff; // Used by main
+  --color-dark-secondarytext: #dddddd; // Used by main
+  --color-dark-tertiarytext: #cccccc; // Used by main
+  --color-dark-card: #414141; // Used by cards
+
+  // Buttons
+  --dappnode-white-color: #fff; // Used by buttons
+
+  // Alert colors
   /* Danger color from the complimentary color of #2fbcb2 (dappnode-color) */
   /* Warning color from From https://www.colorcombos.com/color-schemes/429/ColorCombo429.html */
   --danger-color: var(--dappnode-complimentary-color);

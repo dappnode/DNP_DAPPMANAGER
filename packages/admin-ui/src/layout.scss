@@ -1,14 +1,15 @@
 :root {
-  // Widths
+  // widths
   --sidenav-width: 12.5rem;
   --sidenav-collapsed-width: 4.75rem;
-  --transition-time: 0.25s;
+  // heights
   --topbar-height: 3.5rem;
+  // Borders and padding
   --container-padding: 1.5rem;
   --border-size: 0.08rem;
-  --border-style-light: var(--border-size) solid var(--color-light-border);
-  --border-style-dark: var(--border-size) solid var(--color-dark-border);
   --default-spacing: 1.25rem;
+  // time
+  --transition-time: 0.25s;
 }
 /* MUST ONLY defined z-index properties here 
    Variable definitions are ordered from front to back
