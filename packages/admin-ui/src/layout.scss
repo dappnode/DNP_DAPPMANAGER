@@ -2,7 +2,7 @@
   // widths
   --sidenav-width: 12.5rem;
   --sidenav-collapsed-width: 4.75rem;
-  // heights
+
   --topbar-height: 3.5rem;
   // Borders and padding
   --container-padding: 1.5rem;
@@ -42,18 +42,6 @@ body,
   height: 100%;
 }
 
-/*****
-  BODY
-  ****
-  Body is the main app container. 
-  It will always have a fix height of the entire screen
-  and only the main content area is scrollable 
-*/
-.body {
-  /* ### Todo: Substract the topbar height to prevent showing scrollbar when not necessary */
-  /* min-height: calc(100vh - var(--topbar-height)); */
-}
-
 /********
   SIDEBAR
   ******* 
@@ -61,9 +49,10 @@ body,
   The responsiveness is controlled by making the width = 0 
 */
 #sidebar {
+  align-items: center;
   /* Basic sizing */
   position: fixed;
-  top: var(--topbar-height);
+  top: 0;
   bottom: 0;
   left: 0;
   width: var(--sidenav-width);
@@ -89,10 +78,12 @@ body,
     flex: 0 1 auto;
     overflow: hidden;
   }
-}
 
-.sidebar-logo {
-  width: calc(0.7 * var(--sidenav-width));
+  .sidebar-logo {
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    width: calc(0.7 * var(--sidenav-width));
+  }
 }
 
 /* SIDEBAR > NAV */
@@ -128,55 +119,25 @@ body,
   }
 }
 
-/* Styles below apply when screen width big */
-@media (min-width: 40rem) {
-  .sidenav-toggler {
-    display: none;
-  }
-}
-
 /*******
   TOPBAR
   ******
   The topbar will always be visible and fixed on the top of the screen
 */
 #topbar {
+  z-index: 1000;
   position: fixed;
+  border-bottom-left-radius: 0.5rem;
+  border-width: 0;
   top: 0;
-  left: 0;
   right: 0;
   height: var(--topbar-height);
-  /* Postion left and right divs on each side + security gap margin */
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  align-items: center;
   grid-gap: 1em;
   padding: 0 var(--container-padding);
-  /* place topbar between the sidebar (2) and the main (0) */
-  z-index: var(--z-index-topbar);
-
-  .right,
-  .left {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Align right to the right so the position does not change when the left div is not there */
-  .right {
-    --icon-size: 1.5rem;
-    flex: auto;
-    display: grid;
-    /* Create as much columns as necessary aligned center vertically and justified to the right */
-    grid-template-columns:
-      minmax(var(--icon-size), min-content)
-      min-content
-      minmax(var(--icon-size), min-content)
-      minmax(var(--icon-size), min-content);
-
-    grid-auto-flow: column;
-    place-content: center end;
-    /* Auto-space the items only in-between, hard to achieve with flex */
-    grid-gap: 1rem;
-  }
+  grid-auto-flow: column;
+  place-content: center end;
 }
 
 /*****
@@ -186,8 +147,7 @@ body,
   Overflow on the y axis is expected and will be scrollable
 */
 #main {
-  position: relative;
-  margin-top: var(--topbar-height);
+  padding-top: var(--topbar-height) !important;
   margin-left: var(--sidenav-width);
   padding: var(--container-padding);
 
@@ -213,6 +173,10 @@ body,
     transition: width var(--transition-time);
     width: var(--sidenav-collapsed-width);
     border-right-width: 0;
+
+    .sidebar-logo {
+      width: calc(0.2 * var(--sidenav-width));
+    }
   }
   #main {
     margin-left: var(--sidenav-collapsed-width);

@@ -26,20 +26,10 @@ function MainApp({ username }: { username: string }) {
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
-  const [sideBarCollapsed, setSideBar] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleTheme = () => {
     setTheme(curr => (curr === "light" ? "dark" : "light"));
-  };
-
-  const toggleSideBar = () => {
-    setSideBar(!sideBarCollapsed);
-    const root = document.documentElement;
-    root.style.setProperty(
-      "--sidenav-collapsed-width",
-      sideBarCollapsed ? "0" : "4.75rem"
-    );
   };
 
   useEffect(() => {
@@ -58,12 +48,7 @@ function MainApp({ username }: { username: string }) {
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <div className="body" id={theme}>
         <SideBar screenWidth={screenWidth} />
-        <TopBar
-          username={username}
-          screenWidth={screenWidth}
-          toggleTheme={toggleTheme}
-          toggleSideBar={toggleSideBar}
-        />
+        <TopBar username={username} toggleTheme={toggleTheme} />
         <div id="main">
           <ErrorBoundary>
             <NotificationsMain />

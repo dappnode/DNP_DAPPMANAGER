@@ -26,8 +26,7 @@
   cursor: pointer;
   padding: 0;
   opacity: 0.7;
-  /* Increase clickable area */
-  min-height: calc(var(--topbar-height) / 2);
+
   /* Center icon vertically */
   display: flex;
   align-items: center;
