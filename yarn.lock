@@ -4563,6 +4563,13 @@ batch@0.6.1:
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
   integrity sha1-3DQxT05nkxgJP8dgJyUl+UvyXBY=
 
+bcfg@~0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/bcfg/-/bcfg-0.1.7.tgz#610198a67a56160305fdc1f54b5b5c90b52530d7"
+  integrity sha512-+4beq5bXwfmxdcEoHYQsaXawh1qFzjLcRvPe5k5ww/NEWzZTm56Jk8LuPmfeGB7X584jZ8xGq6UgMaZnNDa5Ww==
+  dependencies:
+    bsert "~0.0.10"
+
 bcrypt-pbkdf@^1.0.0, bcrypt-pbkdf@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.2.tgz#a4301d389b6a43f9b67ff3ca11a3f6637e360e9e"
@@ -4574,6 +4581,15 @@ bcryptjs@^2.4.3:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/bcryptjs/-/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
   integrity sha1-mrVie5PmBiH/fNrF2pczAn3x0Ms=
+
+bcurl@~0.1.9:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/bcurl/-/bcurl-0.1.10.tgz#6ba260ca07fe80bbd114dc18b53331d7bad14f02"
+  integrity sha512-NPxrIkc61tI2FvuibKW8IHaWs7YpgGvOWTgYEJYoE0vOiCvjuL6PXeKYq6bZqadeZfQ6v+R74qvj3Siiv+/Pvg==
+  dependencies:
+    brq "~0.1.8"
+    bsert "~0.0.10"
+    bsock "~0.1.9"
 
 before-after-hook@^2.0.0:
   version "2.2.2"
@@ -4847,6 +4863,13 @@ browserslist@^4.0.0, browserslist@^4.14.5, browserslist@^4.16.6, browserslist@^4
     node-releases "^2.0.1"
     picocolors "^1.0.0"
 
+brq@~0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/brq/-/brq-0.1.8.tgz#35c68bf48e0aef19e397dcd1a1ba7a0cfb3baca2"
+  integrity sha512-6SDY1lJMKXgt5TZ6voJQMH2zV1XPWWtm203PSkx3DSg9AYNYuRfOPFSBDkNemabzgpzFW9/neR4YhTvyJml8rQ==
+  dependencies:
+    bsert "~0.0.10"
+
 bs58@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-4.0.1.tgz#be161e76c354f6f788ae4071f63f34e8c4f0a42a"
@@ -4860,6 +4883,18 @@ bser@2.1.1:
   integrity sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==
   dependencies:
     node-int64 "^0.4.0"
+
+bsert@~0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/bsert/-/bsert-0.0.10.tgz#231ac82873a1418c6ade301ab5cd9ae385895597"
+  integrity sha512-NHNwlac+WPy4t2LoNh8pXk8uaIGH3NSaIUbTTRXGpE2WEbq0te/tDykYHkFK57YKLPjv/aGHmbqvnGeVWDz57Q==
+
+bsock@~0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/bsock/-/bsock-0.1.9.tgz#6aa14b8e4bda730e0f60ec73eb52a8a888ac22c8"
+  integrity sha512-/l9Kg/c5o+n/0AqreMxh2jpzDMl1ikl4gUxT7RFNe3A3YRIyZkiREhwcjmqxiymJSRI/Qhew357xGn1SLw/xEw==
+  dependencies:
+    bsert "~0.0.10"
 
 btoa-lite@^1.0.0:
   version "1.0.0"
@@ -8756,6 +8791,15 @@ hpack.js@^2.1.6:
     obuf "^1.0.0"
     readable-stream "^2.0.1"
     wbuf "^1.1.0"
+
+hs-client@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/hs-client/-/hs-client-0.0.10.tgz#b2801441613fbb255cbeacbc764085a36c42ee5e"
+  integrity sha512-15tfeQEMRS1FZA0q9gFbQ1jYs8v4z9oKw9xFwVEyRuckn72hoVAglN4IrFxkOCDMYV7TWCY/nO/yNZp5njYFBw==
+  dependencies:
+    bcfg "~0.1.7"
+    bcurl "~0.1.9"
+    bsert "~0.0.10"
 
 html-encoding-sniffer@^2.0.1:
   version "2.0.1"

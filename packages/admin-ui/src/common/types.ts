@@ -439,6 +439,7 @@ export type ChainDriverType =
   | "ethereum"
   | "ethereum-beacon-chain"
   | "ethereum2-beacon-chain-prysm"
+  | "handshake"
   | "monero";
 
 export const chainDriversTypes: ChainDriverType[] = [
@@ -446,6 +447,7 @@ export const chainDriversTypes: ChainDriverType[] = [
   "ethereum",
   "ethereum-beacon-chain",
   "ethereum2-beacon-chain-prysm",
+  "handshake",
   "monero"
 ];
 

@@ -6,6 +6,7 @@ import { bitcoin } from "./bitcoin";
 import { ethereum } from "./ethereum";
 import { ethereum2 } from "./ethereum2";
 import { monero } from "./monero";
+import { handshake } from "./handshake";
 
 /**
  * Returns chain data given a driver and api URL
@@ -35,6 +36,8 @@ export async function runWithChainDriver(
       return ethereum2(dnp, chainDriverSpecs);
     case "monero":
       return monero(dnp);
+    case "handshake":
+      return handshake(dnp);
     default:
       throw Error(`Unsupported driver: ${chainDriverSpecs.driver}`);
   }
