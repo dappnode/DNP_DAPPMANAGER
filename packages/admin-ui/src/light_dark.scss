@@ -50,27 +50,19 @@
     }
   }
   #sidebar {
-    background-color: var(--color-dark-background-sidebar-topbar);
+    background-color: var(--color-dark-background-sidebar);
     box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
     .nav a,
-    .nav .sidenav-item {
-      color: var(--color-dark-quaternarytext);
+    .nav .sidenav-item,
+    .sidebar-media-footer {
+      color: var(--color-dark-secondarytext);
       svg {
         opacity: 1;
       }
     }
-    .funded-by {
-      .funded-by-text {
-        color: var(--color-dark-quaternarytext);
-      }
-      .funded-by-logos .img-fluid {
-        opacity: 1;
-        //filter: invert(63%) sepia(10%) saturate(2588%) hue-rotate(127deg)brightness(97%) contrast(93%);
-      }
-    }
   }
   #topbar {
-    background-color: var(--color-dark-background-sidebar-topbar);
+    background-color: var(--color-dark-background-topbar);
     .tn-dropdown .tn-dropdown-toggle {
       color: var(--dappnode-strong-main-color) !important;
       opacity: 1;
