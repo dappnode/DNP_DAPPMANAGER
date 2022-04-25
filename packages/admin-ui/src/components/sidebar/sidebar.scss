@@ -9,6 +9,18 @@
   > .spacer {
     flex: auto;
   }
+
+  .sidebar-media-footer {
+    display: flex;
+    padding: 0.5rem;
+    a {
+      color: inherit;
+      opacity: 0.5;
+      font-size: larger;
+      padding: 0.5rem;
+      text-decoration: none;
+    }
+  }
 }
 
 /* Sidenav-item
@@ -54,46 +66,14 @@
   }
 }
 
-/* Funded-by
-   =========
- */
-
-.funded-by-text {
-  opacity: 0.3;
-  text-align: center;
-}
-/* Controls the layout of the logos, all in one row with equal spacing */
-.funded-by-logos {
-  --spacing: 0.7rem;
-  display: grid;
-  grid-auto-columns: auto;
-  grid-auto-flow: column;
-  /* Auto-space the items only in-between, hard to achieve with flex */
-  grid-gap: var(--spacing);
-  padding: var(--spacing);
-}
-.funded-by-logo {
-  opacity: 0.15;
-  transition: opacity 500ms ease;
-  &:hover {
-    opacity: 0.5;
-  }
-}
-
 /* Responsive */
 @media only screen and (max-width: 40rem) {
   .sidenav-item {
     border: 0;
   }
 
-  .funded-by-logos {
-    display: flex;
-    flex-direction: column;
-  }
-  .funded-by-logo {
-    width: 40%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  #sidebar .sidebar-media-footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 }

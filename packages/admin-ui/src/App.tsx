@@ -5,10 +5,10 @@ import { startApi, apiAuth, LoginStatus } from "api";
 import { ToastContainer } from "react-toastify";
 import NotificationsMain from "./components/NotificationsMain";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { TopBar } from "./components/navbar/TopBar";
-import SideBar from "./components/navbar/SideBar";
 import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
+import SideBar from "components/sidebar/SideBar";
+import { TopBar } from "components/topbar/TopBar";
 // Pages
 import { pages, defaultPage } from "./pages";
 import { Login } from "./start-pages/Login";
