@@ -84,14 +84,8 @@
     border: 0;
   }
 
-  .funded-by-logos {
-    display: flex;
-    flex-direction: column;
-  }
-  .funded-by-logo {
-    width: 40%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  #sidebar .sidebar-media-footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
