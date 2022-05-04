@@ -65,7 +65,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.5",
     "helmet": "^4.4.1",
-    "hs-client": "^0.0.10",
+    "hs-client": "0.0.10",
     "http-proxy": "^1.18.0",
     "ipfs-car": "^0.5.8",
     "ipfs-http-client": "^52.0.3",
