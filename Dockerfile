@@ -2,11 +2,11 @@
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
 #####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:14.17.6-alpine as build-monorepo
+FROM --platform=${BUILDPLATFORM:-amd64} node:16.15.0-alpine as build-monorepo
 
 WORKDIR /app
 
-RUN apk add --no-cache python build-base bash
+RUN apk add --no-cache python3 build-base bash
 
 # Copy and install deps first to cache
 COPY package.json yarn.lock lerna.json ./
@@ -35,7 +35,7 @@ RUN yarn build
 
 # Compute git data
 #####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:14.17.6-alpine as git-data
+FROM --platform=${BUILDPLATFORM:-amd64} node:16.15.0-alpine as git-data
 
 WORKDIR /usr/src/app
 
@@ -49,7 +49,7 @@ RUN node getGitData /usr/src/app/.git-data.json
 
 # Build binaries
 #####################################
-FROM node:14.17.6-alpine as build-binaries
+FROM node:16.15.0-alpine as build-binaries
 
 RUN apk add --no-cache bind-tools docker
 
@@ -57,7 +57,7 @@ RUN apk add --no-cache bind-tools docker
 
 # Final layer
 #####################################
-FROM node:14.17.6-alpine
+FROM node:16.15.0-alpine
 
 ENV DOCKER_COMPOSE_VERSION 1.25.5
 
