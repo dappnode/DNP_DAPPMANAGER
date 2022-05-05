@@ -2,7 +2,7 @@ import { isEqual } from "lodash";
 import { ipfs } from "../../src/modules/ipfs";
 import { parseManifest } from "../../src/modules/manifest";
 import { ManifestWithImage } from "../../src/types";
-import { ipfsAddManifest, ipfsAddFromFs } from "../testIpfsUtils";
+import { ipfsAddManifest, ipfsAddAll } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
 
 /**
@@ -18,16 +18,21 @@ import { saveNewImageToDisk } from "./mockImage";
 export async function uploadManifestRelease(
   manifest: ManifestWithImage
 ): Promise<string> {
+  if (!manifest.image) throw Error("No image in manifest");
+
   const imagePath = await saveNewImageToDisk({
     dnpName: manifest.name,
     version: manifest.version,
     serviceNames: [manifest.name]
   });
-  const imageUploadResult = await ipfsAddFromFs(imagePath);
 
-  if (!manifest.image) throw Error("No image in manifest");
-  manifest.image.hash = imageUploadResult.hash;
-  manifest.image.size = imageUploadResult.size;
+  const addResults = await ipfsAddAll(imagePath);
+  for (const addResult of addResults) {
+    if (addResult.path.includes("dappnode_package")) {
+      manifest.image.hash = addResult.cid.toString();
+      manifest.image.size = addResult.size;
+    }
+  }
 
   const releaseHashManifest = await ipfsAddManifest(manifest);
 

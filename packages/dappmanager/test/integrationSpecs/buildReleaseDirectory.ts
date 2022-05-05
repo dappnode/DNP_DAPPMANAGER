@@ -13,7 +13,7 @@ import {
   ComposeService
 } from "../../src/types";
 import { testDir, manifestFileName, composeFileName } from "../testUtils";
-import { ipfsAddDirFromFs } from "../testIpfsUtils";
+import { ipfsAddAll } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
 import { saveMockAvatarTo } from "./mockAvatar";
 import { signRelease } from "./signRelease";
@@ -71,7 +71,8 @@ export async function uploadDirectoryRelease({
   if (setupWizard) writeJson("setup-wizard.json", setupWizard);
   if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
-  const rootHash = await ipfsAddDirFromFs(releaseDir);
+  const addResults = await ipfsAddAll(releaseDir);
+  const rootHash = addResults[addResults.length - 1].cid.toString();
 
   // Verify the uploaded files
   const files = await ipfs.list(rootHash);

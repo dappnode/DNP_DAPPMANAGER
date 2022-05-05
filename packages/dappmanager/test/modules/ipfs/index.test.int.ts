@@ -3,7 +3,7 @@ import path from "path";
 import { expect } from "chai";
 import { ipfs } from "../../../src/modules/ipfs";
 import { cleanTestDir, testDir } from "../../testUtils";
-import { ipfsAddDirFromFs, ipfsApiUrl } from "../../testIpfsUtils";
+import { ipfsAddAll, ipfsApiUrl } from "../../testIpfsUtils";
 import { IpfsClientTarget } from "../../../src/common";
 
 describe("ipfs / integration test", function () {
@@ -31,7 +31,7 @@ describe("ipfs / integration test", function () {
   });
 
   it("Upload directory", async () => {
-    dirHash = await ipfsAddDirFromFs(dirPath);
+    dirHash = (await ipfsAddAll(dirPath))[0].cid.toString();
   });
 
   it("List directory files", async () => {

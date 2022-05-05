@@ -46,7 +46,7 @@ export async function signRelease(
   getRes.value.Links = sortBy(getRes.value.Links, ["Name", "Tsize"]);
 
   const newReleaseCid = await ipfs.ipfs.dag.put(getRes.value, {
-    format: "dag-pb",
+    storeCodec: "dag-pb",
     hashAlg: "sha2-256"
   });
 
