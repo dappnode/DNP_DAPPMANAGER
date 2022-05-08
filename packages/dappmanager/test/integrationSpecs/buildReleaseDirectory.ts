@@ -72,7 +72,8 @@ export async function uploadDirectoryRelease({
   if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
   const addResults = await ipfsAddAll(releaseDir);
-  const rootHash = addResults[addResults.length - 1].cid.toString();
+  // The last result is the root /test_files, the second is the dir /test_files/something/
+  const rootHash = addResults[addResults.length - 2].cid.toString();
 
   // Verify the uploaded files
   const files = await ipfs.list(rootHash);
