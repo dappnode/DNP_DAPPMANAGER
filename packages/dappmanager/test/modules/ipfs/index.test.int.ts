@@ -26,11 +26,17 @@ describe("ipfs / integration test", function () {
   });
 
   it("Upload directory", async () => {
-    dirHash = (await ipfsAddAll(dirPath))[0].cid.toString();
+    const addResults = await ipfsAddAll(dirPath);
+    dirHash =
+      addResults
+        .find(addResult => addResult.path === "test_files/ipfs-test-upload")
+        ?.cid.toString() || "";
+    if (!dirHash) throw Error("No directory hash found");
   });
 
   it("List directory files", async () => {
     const files = await ipfs.list(dirHash);
+
     expect(files.map(file => file.name)).to.deep.equal([
       path.parse(filepath).base
     ]);

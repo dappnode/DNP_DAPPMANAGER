@@ -1,6 +1,7 @@
 import fs from "fs";
+import path from "path";
 import { Manifest } from "../src/types";
-import { globSource, create, IPFSHTTPClient } from "ipfs-http-client";
+import { create, IPFSHTTPClient } from "ipfs-http-client";
 import { AddResult } from "ipfs-core-types/src/root";
 import { sleep } from "../src/utils/asyncFlows";
 import all from "it-all";
@@ -96,13 +97,16 @@ async function isIpfsNodeAvailable(): Promise<boolean> {
  * @param path
  * @returns
  */
-export async function ipfsAddAll(path: string): Promise<AddResult[]> {
-  if (!fs.existsSync(path))
-    throw Error(`ipfs.addFromFs error: no file found at: ${path}`);
-  return await all(
-    // Arg passed wrapWithDirectory: true returns the root CID dir as the last element of the array
-    localIpfsApi.addAll(globSource(path, "**/*"), { wrapWithDirectory: true })
-  );
+export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
+  if (!fs.existsSync(dirPath))
+    throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
+  const files = fs.readdirSync(dirPath).map(file => {
+    return {
+      path: path.join(dirPath, file),
+      content: fs.readFileSync(path.join(dirPath, file))
+    };
+  });
+  return all(localIpfsApi.addAll(files));
 }
 
 /**
