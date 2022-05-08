@@ -2,7 +2,7 @@ import { isEqual } from "lodash";
 import { ipfs } from "../../src/modules/ipfs";
 import { parseManifest } from "../../src/modules/manifest";
 import { ManifestWithImage } from "../../src/types";
-import { ipfsAddManifest, ipfsAddAll } from "../testIpfsUtils";
+import { ipfsAddManifest, ipfsAddFileFromFs } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
 
 /**
@@ -26,21 +26,19 @@ export async function uploadManifestRelease(
     serviceNames: [manifest.name]
   });
 
-  const addResults = await ipfsAddAll(imagePath);
-  for (const addResult of addResults) {
-    if (addResult.path.includes("dappnode_package")) {
-      manifest.image.hash = addResult.cid.toString();
-      manifest.image.size = addResult.size;
-    }
-  }
+  const fileUploaded = await ipfsAddFileFromFs(imagePath);
+  manifest.image.hash = fileUploaded.cid.toString();
+  manifest.image.size = fileUploaded.size;
 
   const releaseHashManifest = await ipfsAddManifest(manifest);
 
   // Verify the uploaded files
   const data = await ipfs.writeFileToMemory(releaseHashManifest);
   const manifestUploaded = parseManifest(data);
-  if (!isEqual(manifestUploaded, manifest))
+
+  if (!isEqual(manifestUploaded, manifest)) {
     throw Error("Wrong uploaded manifest");
+  }
 
   return releaseHashManifest;
 }
