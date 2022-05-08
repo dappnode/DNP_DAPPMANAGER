@@ -1,12 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { mockManifestWithImage } from "../../testUtils";
-import { ManifestWithImage, IpfsClientTarget } from "../../../src/types";
+import { ManifestWithImage } from "../../../src/types";
 import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
 import { uploadDirectoryRelease } from "../../integrationSpecs/buildReleaseDirectory";
 import { ipfs } from "../../../src/modules/ipfs";
 import { getManifest } from "../../../src/modules/release/getManifest";
-import { ipfsGatewayUrl } from "../../testIpfsUtils";
 
 describe("IPFS remote", function () {
   this.timeout(100000 * 5);
@@ -20,8 +19,6 @@ describe("IPFS remote", function () {
   let dnpReleaseHash: string;
 
   before(async () => {
-    // Set remote IPFS host
-    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
     // Upload manifest and dnp directrory
     manifestHash = await uploadManifestRelease(manifest);
     dnpReleaseHash = await uploadDirectoryRelease({
@@ -47,10 +44,5 @@ describe("IPFS remote", function () {
   it("Should get manifest from directory using IPFS gateway", async function () {
     const manifest = await getManifest(dnpReleaseHash);
     expect(manifest).to.be.ok;
-  });
-
-  after(async () => {
-    // Set remote IPFS host again
-    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
   });
 });

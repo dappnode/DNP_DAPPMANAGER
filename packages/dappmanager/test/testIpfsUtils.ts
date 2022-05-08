@@ -54,7 +54,7 @@ export async function setUpIpfsNode(): Promise<void> {
     counter++;
     if (counter === 30) throw Error("Error starting up local IPFS node");
   }
-
+  /* 
   // Get dappnode ipfs gateway ID
   const dappnodeIpfsGatewayId = await remoteIpfsApi.id().catch(e => {
     throw Error(
@@ -70,7 +70,7 @@ export async function setUpIpfsNode(): Promise<void> {
     } catch {
       console.warn(`Cannot connect to ${peer}`);
     }
-  }
+  } */
 }
 
 /** Set down the testing IPFS node */
@@ -89,15 +89,6 @@ async function isIpfsNodeAvailable(): Promise<boolean> {
 }
 
 // IPFS utils
-
-/**
- * Wrapper to abstract converting the return values of ipfs.add
- * @param content
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function ipfsAdd(content: any): Promise<AddResult> {
-  return await localIpfsApi.add(content);
-}
 
 /**
  * Upload multiple files to a directory
@@ -120,6 +111,15 @@ export async function ipfsAddAll(path: string): Promise<AddResult[]> {
  */
 export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
-  const addResult = await ipfsAdd(content);
+  const addResult = await localIpfsApi.add(content);
   return addResult.cid.toString();
+}
+
+/**
+ * Uploads a file from the file system
+ */
+export async function ipfsAddFileFromFs(path: string): Promise<AddResult> {
+  if (!fs.existsSync(path))
+    throw Error(`ipfsAddFileFromFs error. Not file found at path ${path}`);
+  return await localIpfsApi.add(fs.readFileSync(path));
 }

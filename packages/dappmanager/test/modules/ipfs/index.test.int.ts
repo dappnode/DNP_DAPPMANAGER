@@ -3,8 +3,7 @@ import path from "path";
 import { expect } from "chai";
 import { ipfs } from "../../../src/modules/ipfs";
 import { cleanTestDir, testDir } from "../../testUtils";
-import { ipfsAddAll, ipfsApiUrl } from "../../testIpfsUtils";
-import { IpfsClientTarget } from "../../../src/common";
+import { ipfsAddAll } from "../../testIpfsUtils";
 
 describe("ipfs / integration test", function () {
   this.timeout(60 * 1000);
@@ -16,10 +15,6 @@ describe("ipfs / integration test", function () {
 
   let dirHash: string;
   let fileHash: string;
-
-  before("Change IPFS host", async () => {
-    ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
-  });
 
   before("Prepare directory", () => {
     fs.mkdirSync(dirPath, { recursive: true });
