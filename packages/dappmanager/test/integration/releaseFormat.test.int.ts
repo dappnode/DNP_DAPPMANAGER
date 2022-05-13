@@ -11,6 +11,7 @@ import {
   uploadDirectoryRelease,
   uploadManifestRelease
 } from "../integrationSpecs";
+import * as db from "../../src/db";
 import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
 
 /**
@@ -234,11 +235,11 @@ describe("Release format tests", () => {
       it("Install the release", async () => {
         if (!releaseHash) throw Error("Previous test failed");
 
-        // Persist trustedPubkey to local db
         if (trustedReleaseKey) {
-          await calls
-            .releaseTrustedKeyAdd(trustedReleaseKey)
-            .catch(e => console.warn("Failed to add trusted key", e));
+          // Persist trustedPubkey to local db
+          const trustedKeysAdded = db.releaseKeysTrusted.get();
+          if (!trustedKeysAdded.includes(trustedReleaseKey))
+            await calls.releaseTrustedKeyAdd(trustedReleaseKey);
         }
 
         await calls.packageInstall({
