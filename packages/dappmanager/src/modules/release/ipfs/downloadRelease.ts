@@ -72,7 +72,6 @@ async function downloadReleaseIpfsFn(
         files
       );
 
-      // Pin release on visit
       ipfs.pinAddNoThrow(hash);
 
       // Fetch image by arch, will throw if not available
