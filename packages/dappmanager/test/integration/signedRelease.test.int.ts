@@ -4,24 +4,15 @@ import { ComposeEditor } from "../../src/modules/compose/editor";
 import { ipfs } from "../../src/modules/ipfs";
 import { ReleaseFetcher } from "../../src/modules/release";
 import { getContainerName, getImageTag } from "../../src/params";
-import {
-  IpfsClientTarget,
-  Manifest,
-  ReleaseSignatureStatusCode
-} from "../../src/types";
+import { Manifest, ReleaseSignatureStatusCode } from "../../src/types";
 import { uploadDirectoryRelease } from "../integrationSpecs";
 import { signRelease } from "../integrationSpecs/signRelease";
-import { ipfsApiUrl } from "../testIpfsUtils";
 
 // Sign the string message
 const privateKey =
   "0x0111111111111111111111111111111111111111111111111111111111111111";
 
 describe("Sign release", () => {
-  before("Change IPFS host", async () => {
-    ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
-  });
-
   it("Sign uploaded release", async () => {
     const dnpName = "test.dnp.dappnode.eth";
     const version = "1.0.0";

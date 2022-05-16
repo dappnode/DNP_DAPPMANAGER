@@ -5,15 +5,14 @@ import * as calls from "../../src/calls";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
-import { IpfsClientTarget, TrustedReleaseKey } from "../../src/types";
+import { TrustedReleaseKey } from "../../src/types";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
 } from "../integrationSpecs";
+import * as db from "../../src/db";
 import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
-import { ipfs } from "../../src/modules/ipfs";
-import { ipfsApiUrl, ipfsGatewayUrl } from "../testIpfsUtils";
 
 /**
  * Generate mock releases in the different formats,
@@ -201,10 +200,6 @@ describe("Release format tests", () => {
     if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
   });
 
-  before("Change IPFS host", async () => {
-    ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
-  });
-
   for (const releaseTest of releaseTests) {
     const {
       id,
@@ -240,9 +235,11 @@ describe("Release format tests", () => {
       it("Install the release", async () => {
         if (!releaseHash) throw Error("Previous test failed");
 
-        // Persist trustedPubkey to local db
         if (trustedReleaseKey) {
-          await calls.releaseTrustedKeyAdd(trustedReleaseKey);
+          // Persist trustedPubkey to local db
+          const trustedKeysAdded = db.releaseKeysTrusted.get();
+          if (!trustedKeysAdded.includes(trustedReleaseKey))
+            await calls.releaseTrustedKeyAdd(trustedReleaseKey);
         }
 
         await calls.packageInstall({
@@ -284,8 +281,5 @@ describe("Release format tests", () => {
   after("Remove DAppNode docker network", async () => {
     await shell(`docker network remove ${params.DNP_PRIVATE_NETWORK_NAME}`);
     await cleanTestDir();
-
-    // Set remote IPFS host again
-    ipfs.changeHost(ipfsGatewayUrl, IpfsClientTarget.local);
   });
 });

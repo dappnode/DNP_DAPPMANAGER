@@ -2,7 +2,7 @@ import { isEqual } from "lodash";
 import { ipfs } from "../../src/modules/ipfs";
 import { parseManifest } from "../../src/modules/manifest";
 import { ManifestWithImage } from "../../src/types";
-import { ipfsAddManifest, ipfsAddFromFs } from "../testIpfsUtils";
+import { ipfsAddManifest, ipfsAddFileFromFs } from "../testIpfsUtils";
 import { saveNewImageToDisk } from "./mockImage";
 
 /**
@@ -18,24 +18,27 @@ import { saveNewImageToDisk } from "./mockImage";
 export async function uploadManifestRelease(
   manifest: ManifestWithImage
 ): Promise<string> {
+  if (!manifest.image) throw Error("No image in manifest");
+
   const imagePath = await saveNewImageToDisk({
     dnpName: manifest.name,
     version: manifest.version,
     serviceNames: [manifest.name]
   });
-  const imageUploadResult = await ipfsAddFromFs(imagePath);
 
-  if (!manifest.image) throw Error("No image in manifest");
-  manifest.image.hash = imageUploadResult.hash;
-  manifest.image.size = imageUploadResult.size;
+  const fileUploaded = await ipfsAddFileFromFs(imagePath);
+  manifest.image.hash = fileUploaded.cid.toString();
+  manifest.image.size = fileUploaded.size;
 
   const releaseHashManifest = await ipfsAddManifest(manifest);
 
   // Verify the uploaded files
   const data = await ipfs.writeFileToMemory(releaseHashManifest);
   const manifestUploaded = parseManifest(data);
-  if (!isEqual(manifestUploaded, manifest))
+
+  if (!isEqual(manifestUploaded, manifest)) {
     throw Error("Wrong uploaded manifest");
+  }
 
   return releaseHashManifest;
 }

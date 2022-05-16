@@ -3,8 +3,7 @@ import path from "path";
 import { expect } from "chai";
 import { ipfs } from "../../../src/modules/ipfs";
 import { cleanTestDir, testDir } from "../../testUtils";
-import { ipfsAddDirFromFs, ipfsApiUrl } from "../../testIpfsUtils";
-import { IpfsClientTarget } from "../../../src/common";
+import { ipfsAddAll } from "../../testIpfsUtils";
 
 describe("ipfs / integration test", function () {
   this.timeout(60 * 1000);
@@ -17,10 +16,6 @@ describe("ipfs / integration test", function () {
   let dirHash: string;
   let fileHash: string;
 
-  before("Change IPFS host", async () => {
-    ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
-  });
-
   before("Prepare directory", () => {
     fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(filepath, fileContents);
@@ -31,11 +26,17 @@ describe("ipfs / integration test", function () {
   });
 
   it("Upload directory", async () => {
-    dirHash = await ipfsAddDirFromFs(dirPath);
+    const addResults = await ipfsAddAll(dirPath);
+    dirHash =
+      addResults
+        .find(addResult => addResult.path === "test_files/ipfs-test-upload")
+        ?.cid.toString() || "";
+    if (!dirHash) throw Error("No directory hash found");
   });
 
   it("List directory files", async () => {
     const files = await ipfs.list(dirHash);
+
     expect(files.map(file => file.name)).to.deep.equal([
       path.parse(filepath).base
     ]);
