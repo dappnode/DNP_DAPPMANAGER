@@ -59,13 +59,13 @@ RUN apk add --no-cache bind-tools docker
 #####################################
 FROM node:16.15.0-alpine
 
-ENV DOCKER_COMPOSE_VERSION 1.25.5
+ENV DOCKER_COMPOSE_VERSION v2.5.0
 
 RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind \
   # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
   avahi-tools
 
-RUN curl -L https://github.com/dappnode/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-$(uname -m) > /usr/local/bin/docker-compose \
+RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-$(uname -m) > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
 
 WORKDIR /usr/src/app
