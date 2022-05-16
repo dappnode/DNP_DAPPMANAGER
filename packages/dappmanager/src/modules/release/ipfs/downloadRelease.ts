@@ -18,7 +18,6 @@ import { downloadAssetRequired } from "./downloadAssets";
 import { isDirectoryRelease } from "./isDirectoryRelease";
 import { serializeIpfsDirectory } from "../releaseSignature";
 import { ReleaseDownloadedContents } from "../types";
-import * as db from "../../../db";
 
 const source = "ipfs" as const;
 
@@ -73,8 +72,7 @@ async function downloadReleaseIpfsFn(
         files
       );
 
-      // Pin release on visit
-      if (db.ipfsClientTarget.get() === "local") ipfs.pinAddNoThrow(hash);
+      ipfs.pinAddNoThrow(hash);
 
       // Fetch image by arch, will throw if not available
       const imageEntry = getImageByArch(manifest, files, arch);
