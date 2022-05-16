@@ -46,7 +46,7 @@ function extend_disk () {
   # Logical volume
   lvs --noheadings -o lv_name | grep -q "$3" || { echo "Error: Logical volume ${3} not found" | tee -a "$LOG_FILE"; exit 1; }
   # 2. Create pv
-  pvcreate "/dev/${1}" &>> "$LOG_FILE"
+  pvcreate "/dev/${1}" -y &>> "$LOG_FILE"
   # 3. Extend vg
   vgextend "$2" "/dev/${1}" &>> "$LOG_FILE"
   # 4. Extend lv
