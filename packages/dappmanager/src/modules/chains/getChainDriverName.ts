@@ -17,6 +17,8 @@ const knownChains: { [dnpName: string]: ChainDriver } = {
   "kovan.dnp.dappnode.eth": "ethereum",
   "bitcoin.dnp.dappnode.eth": "bitcoin",
   "monero.dnp.dappnode.eth": "monero",
-  "prysm.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm",
-  "prysm-prater.dnp.dappnode.eth": "ethereum2-beacon-chain-prysm"
+  "prysm.dnp.dappnode.eth": "ethereum-beacon-chain",
+  "prysm-prater.dnp.dappnode.eth": "ethereum-beacon-chain",
+  "lighthouse-prater.dnp.dappnode.eth": "ethereum-beacon-chain",
+  "teku-prater.dnp.dappnode.eth": "ethereum-beacon-chain"
 };
