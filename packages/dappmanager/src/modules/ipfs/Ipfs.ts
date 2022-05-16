@@ -105,8 +105,13 @@ export class Ipfs {
   }
 
   async pinAddNoThrow(hash: IPFSPath): Promise<void> {
-    await this.pinAdd(hash).catch((e: Error) =>
-      logs.error(`Error pinning hash ${hash}`, e)
-    );
+    // Pin release on visit
+    if (db.ipfsClientTarget.get() === "local") {
+      await this.pinAdd(hash).catch((e: Error) =>
+        logs.error(`Error pinning hash ${hash}`, e)
+      );
+    } else {
+      logs.info("Pinning hash not supported when using remote ipfs client");
+    }
   }
 }
