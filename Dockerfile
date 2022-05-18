@@ -42,7 +42,7 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache git
 COPY .git .git
 COPY dappnode_package.json .
-COPY build/getGitData.js .
+COPY docker/getGitData.js .
 RUN node getGitData /usr/src/app/.git-data.json
 
 
@@ -86,7 +86,7 @@ COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
 COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
-COPY build/rndc.conf /etc/bind/
-COPY build/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
+COPY docker/rndc.conf /etc/bind/
+COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
 CMD [ "node", "index" ]
