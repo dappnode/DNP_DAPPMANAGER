@@ -665,6 +665,7 @@ export interface ComposeService {
   user?: string;
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   working_dir?: string;
+  security_opt?: string[];
 }
 
 export interface ComposeServiceNetwork {
