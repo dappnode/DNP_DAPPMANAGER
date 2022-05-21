@@ -1,4 +1,5 @@
 const argMinLen = 8;
+const argMaxLen = 63;
 
 export function validateDockerEnv(
   value: string,
@@ -26,9 +27,22 @@ export function validateMinLength(
   return null;
 }
 
+export function validateMiaxLength(
+  value: string,
+  argName: string
+): string | null {
+  if (value.length > argMiaxLen) {
+    return `${argName} must be at less than ${argMaxLen} characters long`;
+  }
+  return null;
+}
+
 export function validateStrongPassword(password: string): string | null {
   if (password.length < argMinLen) {
     return `Password must be at least ${argMinLen} characters long`;
+  }
+   if (password.length > argMaxLen) {
+    return `Password must be less than ${argMaxLen} characters long`;
   }
   if (!/\d+/.test(password)) {
     return "Password must contain at least one number";
