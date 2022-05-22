@@ -31,7 +31,7 @@ export function validateMiaxLength(
   value: string,
   argName: string
 ): string | null {
-  if (value.length > argMiaxLen) {
+  if (value.length > argMaxLen) {
     return `${argName} must be at less than ${argMaxLen} characters long`;
   }
   return null;
