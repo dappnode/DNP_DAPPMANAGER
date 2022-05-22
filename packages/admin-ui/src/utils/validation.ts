@@ -42,7 +42,7 @@ export function validateStrongPassword(password: string): string | null {
     return `Password must be at least ${argMinLen} characters long`;
   }
    if (password.length > argMaxLen) {
-    return `Password must be less than ${argMaxLen} characters long`;
+    return `Password must not exeed ${argMaxLen} characters long`;
   }
   if (!/\d+/.test(password)) {
     return "Password must contain at least one number";
