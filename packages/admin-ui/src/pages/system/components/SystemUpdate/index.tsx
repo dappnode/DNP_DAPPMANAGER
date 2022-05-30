@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { coreDnpName } from "params";
 // Selectors
-import { RootState } from "rootReducer";
 import { getProgressLogsOfDnp } from "services/isInstallingLogs/selectors";
 import {
   getCoreUpdateAvailable,
@@ -18,8 +17,8 @@ import ErrorView from "components/ErrorView";
 import { ProgressLogsView } from "pages/installer/components/InstallCardComponents/ProgressLogsView";
 
 export default function SystemUpdate() {
-  const coreProgressLogs = useSelector(state =>
-    getProgressLogsOfDnp(state as RootState, coreDnpName)
+  const coreProgressLogs = useSelector((state: any) =>
+    getProgressLogsOfDnp(state, coreDnpName)
   );
   const { loading, success, error } = useSelector(getCoreRequestStatus);
   const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);

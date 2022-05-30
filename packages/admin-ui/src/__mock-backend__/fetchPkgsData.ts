@@ -1,19 +1,28 @@
 import { CoreUpdateDataAvailable, Routes } from "../common";
-import { registries, dnpRequests } from "./data";
+import { directory, registry, dnpRequests } from "./data";
 
 export const fetchPkgsData: Pick<
   Routes,
-  "fetchCoreUpdateData" | "fetchDnpRequest" | "fetchRegistry"
+  | "fetchCoreUpdateData"
+  | "fetchDirectory"
+  | "fetchDnpRequest"
+  | "fetchRegistry"
+  | "fetchRegistryProgress"
 > = {
   fetchCoreUpdateData: async () => sampleCoreUpdateData,
-  fetchRegistry: async ({ registryName }) => {
-    await new Promise(r => setTimeout(r, 1000));
-
-    if (!registryName) throw Error("No registryName");
-
-    const registry = registries[registryName];
-    if (!registry) throw Error(`Unknown registry ${registryName}`);
-    return registry;
+  fetchDirectory: async () => directory,
+  fetchRegistry: async () => {
+    return await new Promise(resolve => {
+      setTimeout(() => {
+        resolve(registry);
+      }, 10000);
+    });
+  },
+  fetchRegistryProgress: async () => {
+    return {
+      lastFetchedBlock: 6200000,
+      latestBlock: 13000000
+    };
   },
   fetchDnpRequest: async ({ id }) => {
     const dnpRequest = dnpRequests[id];

@@ -4,4 +4,3 @@ export const title = "DAppStore";
 
 // Subpaths
 export const subPathPublic = "/public";
-export const pathPublic = `${rootPath}${subPathPublic}`;
