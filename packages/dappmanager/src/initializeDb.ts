@@ -30,6 +30,11 @@ const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
  */
 export default async function initializeDb(): Promise<void> {
   /**
+   * Migrate dappnode ipfs gateway endpoint
+   */
+  migrateIpfsGatewayEndpoint();
+
+  /**
    * Migrate data from the VPN db
    * - dyndns identity (including the domain)
    * - staticIp (if set)
@@ -137,6 +142,15 @@ export default async function initializeDb(): Promise<void> {
 }
 
 /**
+ * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
+ * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
+ */
+function migrateIpfsGatewayEndpoint(): void {
+  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081")
+    db.ipfsGateway.set(params.IPFS_REMOTE);
+}
+
+/**
  * Migrate data from the VPN db
  * - dyndns identity (including the domain)
  * - staticIp (if set)
@@ -221,7 +235,7 @@ function returnNullIfError(
   fn: () => Promise<string>,
   silent?: boolean
 ): () => Promise<string | null> {
-  return async function(): Promise<string | null> {
+  return async function (): Promise<string | null> {
     try {
       return await fn();
     } catch (e) {
