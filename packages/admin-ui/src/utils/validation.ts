@@ -27,7 +27,7 @@ export function validateMinLength(
   return null;
 }
 
-export function validateMiaxLength(
+export function validateMaxLength(
   value: string,
   argName: string
 ): string | null {
