@@ -81,7 +81,7 @@ export default function Eth() {
   }
   return (
     <Card className="dappnode-identity">
-      <SubTitle>Repository Source</SubTitle>
+      <SubTitle>Ethereum</SubTitle>
       <div>
         DAppNode uses smart contracts to access a decentralized respository of
         DApps. Choose to connect to a remote network or use your own local node

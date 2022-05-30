@@ -50,7 +50,7 @@ export interface SubscriptionsTypes {
   /**
    * Registry updates
    */
-  registry: (data: { registryName: string; items: DirectoryItem[] }) => void;
+  registry: (registry: DirectoryItem[]) => void;
 
   /**
    * Relevant system params

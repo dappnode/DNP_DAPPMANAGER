@@ -3,13 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, NavLink } from "react-router-dom";
 import { throttle, isEmpty } from "lodash";
 import { SelectedCategories } from "../../types";
-import { DNP_REGISTRY_NAME, PUBLIC_REGISTRY_NAME } from "params";
 // This page
 import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
-import filterRegistry from "../../helpers/filterDirectory";
-import { pathPublic, rootPath } from "../../data";
+import filterDirectory from "../../helpers/filterDirectory";
+import { rootPath } from "../../data";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
@@ -20,42 +19,30 @@ import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import Alert from "react-bootstrap/Alert";
 // Selectors
-import { RootState } from "rootReducer";
 import {
-  getDnpRegistry,
-  getRegistryRequestStatus
-} from "services/dnpRegistry/selectors";
-import { fetchDnpRegistry } from "services/dnpRegistry/actions";
+  getDnpDirectory,
+  getDirectoryRequestStatus
+} from "services/dnpDirectory/selectors";
+import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { PublicSwitch } from "../PublicSwitch";
-import { AlertDismissible } from "components/AlertDismissible";
 
 export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
+  const directory = useSelector(getDnpDirectory);
+  const requestStatus = useSelector(getDirectoryRequestStatus);
+  const ethClientWarning = useSelector(getEthClientWarning);
+  const dispatch = useDispatch();
+
   const [query, setQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState(
     {} as SelectedCategories
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
 
-  const registryName =
-    routeProps.location.pathname === pathPublic
-      ? PUBLIC_REGISTRY_NAME
-      : DNP_REGISTRY_NAME;
-  const isSafeRegistry = registryName === DNP_REGISTRY_NAME;
-
-  const packages = useSelector(state =>
-    getDnpRegistry(state as RootState, registryName)
-  );
-  const requestStatus = useSelector(state =>
-    getRegistryRequestStatus(state as RootState, registryName)
-  );
-  const ethClientWarning = useSelector(getEthClientWarning);
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    dispatch(fetchDnpRegistry({ registryName }));
-  }, [dispatch, registryName]);
+    dispatch(fetchDnpDirectory());
+  }, [dispatch]);
 
   // Limit the number of requests [TESTED]
   const fetchQueryThrottled = useMemo(
@@ -80,8 +67,8 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
     setSelectedCategories(x => ({ ...x, [category]: !x[category] }));
   }
 
-  const packagesFiltered = filterRegistry({
-    packages,
+  const directoryFiltered = filterDirectory({
+    directory,
     query,
     selectedCategories
   });
@@ -93,13 +80,13 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
    */
   function runQuery() {
     if (isIpfsHash(query)) return openDnp(query);
-    if (packagesFiltered.length === 1)
-      return openDnp(packagesFiltered[0].dnpName);
+    if (directoryFiltered.length === 1)
+      return openDnp(directoryFiltered[0].name);
     else openDnp(query);
   }
 
   const categories = {
-    ...packagesFiltered.reduce((obj: SelectedCategories, dnp) => {
+    ...directory.reduce((obj: SelectedCategories, dnp) => {
       if (dnp.status === "ok")
         for (const category of dnp.categories) obj[category] = false;
       return obj;
@@ -107,24 +94,14 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
     ...selectedCategories
   };
 
-  const dnpsNoError = packagesFiltered.filter(dnp => dnp.status !== "error");
+  const dnpsNoError = directoryFiltered.filter(dnp => dnp.status !== "error");
   const dnpsFeatured = dnpsNoError.filter(dnp => dnp.isFeatured);
   const dnpsNormal = dnpsNoError.filter(dnp => !dnp.isFeatured);
-  const dnpsError = packagesFiltered.filter(dnp => dnp.status === "error");
+  const dnpsError = directoryFiltered.filter(dnp => dnp.status === "error");
 
   return (
     <>
       <PublicSwitch {...routeProps} />
-
-      {!isSafeRegistry && (
-        <AlertDismissible variant="warning">
-          The public repository is open and permissionless and can contain
-          malicious packages that can compromise the security of your DAppNode.
-          ONLY use the public repo if you know what you are doing and ONLY
-          install packages whose developer you trust.
-        </AlertDismissible>
-      )}
-
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}
@@ -133,7 +110,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
         append={<Button onClick={runQuery}>Search</Button>}
       />
 
-      {isEmpty(categories) && packages.length ? (
+      {isEmpty(categories) && directory.length ? (
         <div className="type-filter placeholder" />
       ) : (
         <CategoryFilter
@@ -155,8 +132,8 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
         </Alert>
       )}
 
-      {packages.length ? (
-        !packagesFiltered.length ? (
+      {directory.length ? (
+        !directoryFiltered.length ? (
           <NoPackageFound query={query} />
         ) : (
           <div className="dnps-container">

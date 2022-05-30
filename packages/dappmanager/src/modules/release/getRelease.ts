@@ -13,6 +13,7 @@ import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { parseTimeoutSeconds } from "../../utils/timeout";
 import { ReleaseDownloadedContents } from "./types";
 import { getReleaseSignatureStatus } from "./releaseSignature";
+import params from "../../params";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -35,13 +36,16 @@ export async function getRelease({
   name?: string;
   origin?: string;
 }): Promise<PackageRelease> {
-  const { imageFile, avatarFile, manifest, composeUnsafe, signature } =
-    await downloadRelease(hash, reqName || hash);
+  const {
+    imageFile,
+    avatarFile,
+    manifest,
+    composeUnsafe,
+    signature
+  } = await downloadRelease(hash, reqName || hash);
 
   if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
-    throw Error(
-      `manifest.name ${manifest.name} not equal to request name ${reqName}`
-    );
+    throw Error("DNP's name doesn't match the manifest's name");
 
   const dnpName = manifest.name;
   const isCore = getIsCore(manifest);
@@ -101,6 +105,8 @@ export async function getRelease({
     // Generates an object of warnings so other components can
     // decide to throw an error or just show a warning in the UI
     warnings: {
+      coreFromForeignRegistry:
+        isCore && !dnpName.endsWith(params.DAPPNODE_REGISTRY),
       requestNameMismatch: isEnsDomain(reqName || "") && reqName !== dnpName
     },
     signedSafe:

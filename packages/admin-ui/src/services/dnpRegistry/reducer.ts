@@ -5,48 +5,25 @@ import { DirectoryItem, RequestStatus } from "common/types";
 
 // Service > dnpRegistry
 
-type RegistryName = string;
-
-/**
- * Empty state
- * `{ registry: [], requestStatus: {} }`
- */
-type RegistryState = {
+export const reducer = createReducer<{
   registry: DirectoryItem[];
   requestStatus: RequestStatus;
-};
+}>({ registry: [], requestStatus: {} }, builder => {
+  builder.addCase(setDnpRegistry, (state, action) => ({
+    ...state,
+    registry: action.payload
+  }));
 
-export const reducer = createReducer<Record<RegistryName, RegistryState>>(
-  {},
-  builder => {
-    builder.addCase(setDnpRegistry, (state, action) => ({
-      ...state,
-      [action.payload.registryName]: {
-        ...state[action.payload.registryName],
-        registry: action.payload.items
-      }
-    }));
+  builder.addCase(updateDnpRegistry, (state, action) => ({
+    ...state,
+    registry: Object.values({
+      ...keyBy(state.registry, dnp => dnp.name),
+      ...keyBy(action.payload, dnp => dnp.name)
+    })
+  }));
 
-    builder.addCase(updateDnpRegistry, (state, action) => ({
-      ...state,
-      [action.payload.registryName]: {
-        ...state[action.payload.registryName],
-        registry: Object.values({
-          ...keyBy(
-            state[action.payload.registryName]?.registry ?? [],
-            dnp => dnp.dnpName
-          ),
-          ...keyBy(action.payload.items, dnp => dnp.dnpName)
-        })
-      }
-    }));
-
-    builder.addCase(updateStatus, (state, action) => ({
-      ...state,
-      [action.payload.registryName]: {
-        ...state[action.payload.registryName],
-        requestStatus: action.payload.status
-      }
-    }));
-  }
-);
+  builder.addCase(updateStatus, (state, action) => ({
+    ...state,
+    requestStatus: action.payload
+  }));
+});
