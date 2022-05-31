@@ -9,41 +9,11 @@ import { getExternalNetworkAliasFromPackage } from "../../domains";
 import { ComposeFileEditor } from "../compose/editor";
 import { dockerListNetworks, dockerCreateNetwork, dockerNetworkConnect } from "../docker";
 
-/**
- * Recreate HTTPs portal mapping if installing or updating HTTPs package
- */
-export async function httpsEnsureNetworkExists(
-  externalNetworkName: string
-): Promise<void> {
-
-  const httpsPackage = await listPackageNoThrow({
-    dnpName: params.HTTPS_PORTAL_DNPNAME
-  });
-
-  if (!(await hasRunningHTTPS())) { // if there is no https, checks aren't needed
-    return;
-  }
-
-  const networks = await dockerListNetworks();
-
-  if (!networks.find(network => network.Name === externalNetworkName)) {
-    await dockerCreateNetwork(externalNetworkName);
-  }
-
-  const containers = httpsPackage?.containers ?? []
-
-  await Promise.all(
-    containers.map(async (container) => {
-      if(!container.networks.find(n => n.name === externalNetworkName)) {
-        await dockerNetworkConnect(externalNetworkName, container.containerName)
-      }
-  }))
-}
 
 /**
  * Persist external network on packages compose files
  */
-export async function httpsPersistPackagesExternalNetwork(
+export async function connectToPublicNetwork(
   pkg: InstallPackageData,
   externalNetworkName: string
 ): Promise<void> {
@@ -51,24 +21,26 @@ export async function httpsPersistPackagesExternalNetwork(
   if (!(await hasRunningHTTPS())) { // if there is no https, checks aren't needed
     return;
   }
-  const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
-  const services = Object.entries(compose.services());
 
-  for (const [serviceName, composeServiceEditor] of services) {
-    if (await httpsPortal.hasMapping(pkg.dnpName, serviceName)) {
-      const networks = await dockerListNetworks();
-      if (!networks.find(network => network.Name === externalNetworkName)) {
-        await dockerCreateNetwork(externalNetworkName);
-      }
+  const networks = await dockerListNetworks();
+  if (!networks.find(network => network.Name === externalNetworkName)) {
+    await dockerCreateNetwork(externalNetworkName);
+  }
 
+  const containers = (await listPackageNoThrow({
+    dnpName: pkg.dnpName
+  }))?.containers || [];
+
+  for(const container of containers) {
+    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME || await httpsPortal.hasMapping(pkg.dnpName, container.serviceName)) {
       const alias = getExternalNetworkAliasFromPackage(
         pkg.dnpName,
-        serviceName
+        container.serviceName
       );
-      const aliases = [alias];
-      composeServiceEditor.addNetwork(externalNetworkName, { aliases });
-      compose.write();
-      break;
+
+       if(!container.networks.find(n => n.name === externalNetworkName)) {
+        await dockerNetworkConnect(externalNetworkName, container.containerName, {Aliases: [alias]})
+      }
     }
   }
 }
