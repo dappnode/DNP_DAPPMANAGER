@@ -45,11 +45,6 @@ export async function runPackages(
     // - Allow copying files without duplicating logic
     // - Allow conditionally starting containers latter if were previously running
     log(pkg.dnpName, "Preparing package...");
-
-    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME)
-      await httpsEnsureNetworkExists(pkg, externalNetworkName);
-    else await httpsPersistPackagesExternalNetwork(pkg, externalNetworkName);
-
     await dockerComposeUp(pkg.composePath, {
       // To clean-up changing multi-service packages, remove orphans
       // but NOT for core packages, which always have orphans
@@ -91,6 +86,15 @@ export async function runPackages(
     log(pkg.dnpName, "Package started");
 
     // Expose default HTTPs ports if required
-    await httpsExposeByDefaultPorts(pkg, log);
+    
+    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME) {
+      await httpsEnsureNetworkExists(externalNetworkName);
+    }
+      
+    else {
+      await httpsExposeByDefaultPorts(pkg, log);
+      await httpsPersistPackagesExternalNetwork(pkg, externalNetworkName);
+    }
+
   }
 }
