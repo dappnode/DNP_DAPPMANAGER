@@ -53,7 +53,8 @@ const serviceSafeKeys: (keyof ComposeService)[] = [
   "stop_signal",
   "user",
   "volumes",
-  "working_dir"
+  "working_dir",
+  "security_opt"
 ];
 
 // Disallow external volumes to prevent packages accessing sensitive data of others

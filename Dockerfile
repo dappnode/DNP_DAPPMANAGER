@@ -42,7 +42,7 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache git
 COPY .git .git
 COPY dappnode_package.json .
-COPY build/getGitData.js .
+COPY docker/getGitData.js .
 RUN node getGitData /usr/src/app/.git-data.json
 
 
@@ -59,13 +59,13 @@ RUN apk add --no-cache bind-tools docker
 #####################################
 FROM node:16.15.0-alpine
 
-ENV DOCKER_COMPOSE_VERSION 1.25.5
+ENV DOCKER_COMPOSE_VERSION v2.5.0
 
 RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind \
   # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
   avahi-tools
 
-RUN curl -L https://github.com/dappnode/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-Linux-$(uname -m) > /usr/local/bin/docker-compose \
+RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-$(uname -m) > /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
 
 WORKDIR /usr/src/app
@@ -86,7 +86,7 @@ COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
 COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
-COPY build/rndc.conf /etc/bind/
-COPY build/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
+COPY docker/rndc.conf /etc/bind/
+COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
 CMD [ "node", "index" ]

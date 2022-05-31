@@ -41,9 +41,6 @@ export const wifiEnvSSID = "SSID";
 // Local proxying
 export const adminUiLocalDomain = "http://dappnode.local";
 
-export const DNP_REGISTRY_NAME = "dnp.dappnode.eth";
-export const PUBLIC_REGISTRY_NAME = "public.dappnode.eth";
-
 // DNP names
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";

@@ -10,6 +10,7 @@ export function mapSubscriptionsToEventBus(
   eventBus.logUi.on(subscriptions.progressLog.emit);
   eventBus.logUserAction.on(subscriptions.userActionLog.emit);
   eventBus.packages.on(subscriptions.packages.emit);
+  eventBus.directory.on(subscriptions.directory.emit);
   eventBus.registry.on(subscriptions.registry.emit);
 
   // Emit the list of devices

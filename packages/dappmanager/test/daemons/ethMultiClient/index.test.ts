@@ -19,7 +19,7 @@ interface State {
 
 describe("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    const newTarget: EthClientTarget = "nethermind-xdai";
+    const newTarget: EthClientTarget = "geth";
     const newTargetData = ethClientData[newTarget];
 
     /**

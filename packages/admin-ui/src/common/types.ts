@@ -116,10 +116,9 @@ export type VpnDeviceCredentials = VpnDevice & {
 // Information immediatelly available in the directory smart contract
 interface DirectoryItemBasic {
   index: number;
-  dnpName: string;
+  name: string;
   whitelisted: boolean;
   isFeatured: boolean;
-  isVerified: boolean;
 }
 export interface DirectoryItemOk extends DirectoryItemBasic {
   status: "ok";
@@ -141,6 +140,11 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 }
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
+
+export interface RegistryScanProgress {
+  lastFetchedBlock: number;
+  latestBlock: number;
+}
 
 export interface RequestStatus {
   loading?: boolean;
@@ -302,7 +306,6 @@ export interface RequestedDnp {
   imageSize: number;
   isUpdated: boolean;
   isInstalled: boolean;
-  isVerified: boolean;
   // Decoupled metadata
   metadata: PackageReleaseMetadata;
   specialPermissions: SpecialPermissionAllDnps;
@@ -667,6 +670,7 @@ export interface ComposeService {
   user?: string;
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   working_dir?: string;
+  security_opt?: string[];
 }
 
 export interface ComposeServiceNetwork {
@@ -971,6 +975,10 @@ export interface DistributedFile {
 }
 
 export interface ReleaseWarnings {
+  /**
+   * If a core package does not come from the DAppNode Package APM registry
+   */
+  coreFromForeignRegistry?: boolean;
   /**
    * If the requested name does not match the manifest name
    */
@@ -1279,12 +1287,17 @@ export enum IpfsClientTarget {
  * Manage the Ethereum multi-client setup
  */
 export type EthClientTargetPackage =
-  // Add more clients here
-  "nethermind-xdai";
+  | "geth-light"
+  | "geth"
+  | "openethereum"
+  | "nethermind";
 export type EthClientTarget = EthClientTargetPackage | "remote";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
-  "nethermind-xdai"
+  "geth-light",
+  "geth",
+  "openethereum",
+  "nethermind"
 ];
 
 /**

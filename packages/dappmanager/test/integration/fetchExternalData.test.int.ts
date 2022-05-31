@@ -27,15 +27,13 @@ describe("Fetch external data", () => {
 
   describe("fetchDirectory", () => {
     it("Should fetch directory data", async () => {
-      const directoryDnps = await calls.fetchRegistry({});
+      const directoryDnps = await calls.fetchDirectory();
       expect(directoryDnps).to.have.length.greaterThan(
         0,
         "There should be packages in the directory return"
       );
       // Make sure the bitcoin DNP is there
-      const dnpBitcoin = directoryDnps.find(
-        ({ dnpName: name }) => name === bitcoinId
-      );
+      const dnpBitcoin = directoryDnps.find(({ name }) => name === bitcoinId);
       expect(dnpBitcoin, "Bitcoin DNP should be in directory array").to.be.ok;
 
       // Make sure that if there's a featured package it's first
