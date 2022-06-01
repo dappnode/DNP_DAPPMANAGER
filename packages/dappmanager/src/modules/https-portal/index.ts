@@ -69,14 +69,18 @@ export class HttpsPortal {
     // Edit compose to persist the setting
     addNetworkAliasCompose(container, externalNetworkName, aliases);
 
-
     // Check whether DNP_HTTPS compose has external network persisted
-    const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true)
-    const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath))
+    const httpsComposePath = ComposeEditor.getComposePath(
+      params.HTTPS_PORTAL_DNPNAME,
+      true
+    );
+    const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath));
 
-    if(editor.getComposeNetwork(externalNetworkName) === null) {
-      const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer)
-      addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias])
+    if (editor.getComposeNetwork(externalNetworkName) === null) {
+      const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
+      addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [
+        httpsExternalAlias
+      ]);
     }
   }
 
@@ -144,6 +148,20 @@ export class HttpsPortal {
       }
     }
     return mappings;
+  }
+
+  /**
+   * Returns true if the container has assigned a mapping to the https-portal
+   */
+  async hasMapping(dnpName: string, serviceName: string): Promise<boolean> {
+    const entries = await this.httpsPortalApiClient.list();
+    const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
+    for (const { toHost } of entries) {
+      // toHost format: someDomain:80
+      const alias = toHost.split(":")[0];
+      if (alias === mappingAlias) return true;
+    }
+    return false;
   }
 
   private async getContainerForMapping(
