@@ -8,10 +8,7 @@ import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
-import {
-  connectToPublicNetwork,
-  httpsExposeByDefaultPorts,
-} from "./https";
+import { connectToPublicNetwork, exposeByDefaultHttpsPorts } from "./https";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
@@ -85,9 +82,8 @@ export async function runPackages(
     log(pkg.dnpName, "Package started");
 
     // Expose default HTTPs ports if required
-    
+
     await connectToPublicNetwork(pkg, externalNetworkName);
-    await httpsExposeByDefaultPorts(pkg, log);
-  
+    await exposeByDefaultHttpsPorts(pkg, log);
   }
 }

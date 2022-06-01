@@ -5,41 +5,55 @@ import params from "../../params";
 import { InstallPackageData } from "../../types";
 import { Log } from "../../utils/logUi";
 import { HttpsPortalMapping } from "../../common";
-import { getExternalNetworkAliasFromPackage } from "../../domains";
-import { ComposeFileEditor } from "../compose/editor";
-import { dockerListNetworks, dockerCreateNetwork, dockerNetworkConnect } from "../docker";
-
+import { getExternalNetworkAlias } from "../../domains";
+import {
+  dockerListNetworks,
+  dockerCreateNetwork,
+  dockerNetworkConnect
+} from "../docker";
 
 /**
- * Persist external network on packages compose files
+ * Connect to dnpublic_network with an alias if:
+ * - is HTTPS package
+ * - any package with https portal mappings
  */
 export async function connectToPublicNetwork(
   pkg: InstallPackageData,
   externalNetworkName: string
 ): Promise<void> {
+  // if there is no https, checks aren't needed
+  if (!(await isRunningHttps())) return;
 
-  if (!(await hasRunningHTTPS())) { // if there is no https, checks aren't needed
-    return;
-  }
-
+  // create network if necessary
   const networks = await dockerListNetworks();
-  if (!networks.find(network => network.Name === externalNetworkName)) {
+  if (!networks.find(network => network.Name === externalNetworkName))
     await dockerCreateNetwork(externalNetworkName);
-  }
 
-  const containers = (await listPackageNoThrow({
-    dnpName: pkg.dnpName
-  }))?.containers || [];
+  const containers =
+    (
+      await listPackageNoThrow({
+        dnpName: pkg.dnpName
+      })
+    )?.containers || [];
 
-  for(const container of containers) {
-    if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME || await httpsPortal.hasMapping(pkg.dnpName, container.serviceName)) {
-      const alias = getExternalNetworkAliasFromPackage(
-        pkg.dnpName,
-        container.serviceName
-      );
+  if (containers.length === 0) return;
 
-       if(!container.networks.find(n => n.name === externalNetworkName)) {
-        await dockerNetworkConnect(externalNetworkName, container.containerName, {Aliases: [alias]})
+  for (const container of containers) {
+    if (
+      pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
+      (await httpsPortal.hasMapping(pkg.dnpName, container.serviceName))
+    ) {
+      const alias = getExternalNetworkAlias({
+        serviceName: container.serviceName,
+        dnpName: pkg.dnpName
+      });
+
+      if (!container.networks.find(n => n.name === externalNetworkName)) {
+        await dockerNetworkConnect(
+          externalNetworkName,
+          container.containerName,
+          { Aliases: [alias] }
+        );
       }
     }
   }
@@ -48,14 +62,16 @@ export async function connectToPublicNetwork(
 /**
  * Expose default HTTPS ports on installation defined in the manifest - exposable
  */
-export async function httpsExposeByDefaultPorts(
+export async function exposeByDefaultHttpsPorts(
   pkg: InstallPackageData,
   log: Log
 ): Promise<void> {
   if (pkg.metadata.exposable) {
-    // Check HTTPS package exists
-
-    await hasRunningHTTPS(true); // require that https package exists and it is running
+    // Requires that https package exists and it is running
+    if (!(await isRunningHttps()))
+      throw Error(
+        `HTTPS package not running but required to expose HTTPS ports by default.`
+      );
 
     const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
@@ -80,14 +96,18 @@ export async function httpsExposeByDefaultPorts(
           // Expose default HTTPS ports
           log(
             pkg.dnpName,
-            `Exposing ${prettyDnpName(pkg.dnpName)}:${exposable.port} to the external internet`
+            `Exposing ${prettyDnpName(pkg.dnpName)}:${
+              exposable.port
+            } to the external internet`
           );
           await httpsPortal.addMapping(portalMapping);
           portMappinRollback.push(portalMapping);
 
           log(
             pkg.dnpName,
-            `Exposed ${prettyDnpName(pkg.dnpName)}:${exposable.port} to the external internet`
+            `Exposed ${prettyDnpName(pkg.dnpName)}:${
+              exposable.port
+            } to the external internet`
           );
         } catch (e) {
           e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
@@ -95,7 +115,9 @@ export async function httpsExposeByDefaultPorts(
             await httpsPortal.removeMapping(mappingRollback).catch(e => {
               log(
                 pkg.dnpName,
-                `Error removing mapping ${JSON.stringify(mappingRollback)}, ${e.message}`
+                `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
+                  e.message
+                }`
               );
             });
           }
@@ -106,31 +128,21 @@ export async function httpsExposeByDefaultPorts(
   }
 }
 
-async function hasRunningHTTPS(required: boolean = false) {
+// Utils
 
+/**
+ * Returns true if HTTPS package installed and running, otherwise return false
+ */
+async function isRunningHttps() {
   const httpsPackage = await listPackageNoThrow({
     dnpName: params.HTTPS_PORTAL_DNPNAME
   });
-  if (!httpsPackage) {
-    if (!required) {
-      return false;
-    }
 
-    throw Error(
-      `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
-    );
-  }
+  if (!httpsPackage) return false;
 
-  // Check HTTPS package running
+  // Check every HTTPS container is running
   httpsPackage.containers.forEach(container => {
-    if (!container.running) {
-      if (!required) {
-        return false;
-      }
-      throw Error(
-        `HTTPS package not running but required to expose HTTPS ports by default.`
-      );
-    }
+    if (!container.running) return false;
   });
 
   return true;

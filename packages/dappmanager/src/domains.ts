@@ -58,12 +58,6 @@ export function getExternalNetworkAlias(container: ContainerNames): string {
   return `${shortUniqueDappnodeEns(fullEns)}.external`;
 }
 
-
-export function getExternalNetworkAliasFromPackage(dnpName: string, serviceName: string): string {
-  const fullEns = getContainerDomain({dnpName, serviceName});
-  return `${shortUniqueDappnodeEns(fullEns)}.external`;
-}
-
 export function getPublicSubdomain(container: ContainerNames): string {
   const fullEns = getContainerDomain(container);
   return stripBadDomainChars(shortUniqueDappnodeEns(fullEns));
