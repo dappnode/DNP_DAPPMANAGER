@@ -84,7 +84,7 @@
     "socket.io": "^2.4.0",
     "source-map-support": "^0.5.19",
     "stack-trace": "^0.0.10",
-    "strip-ansi": "^6.0.0",
+    "strip-ansi": "^7.0.1",
     "tar-stream": "^2.1.4",
     "timestring": "^6.0.0",
     "ts-loader": "^9.2.5",
