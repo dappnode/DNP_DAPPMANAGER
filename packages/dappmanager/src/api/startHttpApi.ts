@@ -79,7 +79,7 @@ export function startHttpApi({
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
-  const io = socketio(server, { serveClient: false });
+  const io = new socketio.Server(server, { serveClient: false });
 
   // Subscriptions
   const subscriptions = subscriptionsFactory(io, subscriptionsLogger);
