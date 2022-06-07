@@ -20,6 +20,6 @@
   "dependencies": {
     "lerna": "^3.22.1",
     "patch-package": "^6.2.1",
-    "ts-node": "^10.2.1"
+    "ts-node": "^10.8.1"
   }
 }

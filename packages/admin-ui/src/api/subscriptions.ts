@@ -48,6 +48,6 @@ export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
     console.log(`DAPPMANAGER triggered a client reload`, data);
     // If we needed to pull the document from the web-server again (such as where
     // the document contents change dynamically) we would pass the argument as 'true'.
-    window.location.reload(true);
+    window.location.reload();
   });
 }
