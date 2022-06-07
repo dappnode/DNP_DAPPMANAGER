@@ -108,6 +108,6 @@
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
     "socket.io-client": "^3.0.3",
-    "ts-node": "^10.2.1"
+    "ts-node": "^10.8.1"
   }
 }
