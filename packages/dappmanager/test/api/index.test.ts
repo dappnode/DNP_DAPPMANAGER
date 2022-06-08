@@ -43,8 +43,8 @@ describe.skip("Test server auth", function () {
   it("Should reject websocket connection", async () => {
     await new Promise((resolve, reject) => {
       const socket = io(baseUrl);
-      socket.on("connect", resolve);
-      socket.io.on("connect_error", reject); // Handles server errors
+      socket.on("connect", () => resolve);
+      socket.on("connect_error", reject); // Handles server errors
       socket.on("error", reject); // Handles middleware / authentication errors
       socket.on("disconnect", reject); // Handles individual socket errors
     });
@@ -93,8 +93,8 @@ describe.skip("Test server auth", function () {
         // @ts-ignore
         extraHeaders: { cookie }
       });
-      socket.on("connect", resolve);
-      socket.io.on("connect_error", reject); // Handles server errors
+      socket.on("connect", () => resolve);
+      socket.on("connect_error", reject); // Handles server errors
       socket.on("error", reject); // Handles middleware / authentication errors
       socket.on("disconnect", reject); // Handles individual socket errors
     });

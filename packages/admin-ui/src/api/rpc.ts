@@ -1,11 +1,11 @@
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import { Emitter } from "mitt";
 import { Args, RpcPayload, RpcResponse } from "common/transport/types";
 import { subscriptionsData } from "common";
 import { IApiRpc } from "./interface";
 import { socketIoUrl } from "params";
 
-let socketGlobal: SocketIOClient.Socket | null = null;
+let socketGlobal: Socket | null = null;
 let apiStarted = false;
 
 export const apiRpc: IApiRpc = {
@@ -41,7 +41,7 @@ export const apiRpc: IApiRpc = {
     }
 
     // Handles server errors
-    socket.io.on("connect_error", handleConnectionError);
+    socket.on("connect_error", handleConnectionError);
 
     // Handles middleware / authentication errors
     socket.on("error", handleConnectionError);
@@ -51,7 +51,7 @@ export const apiRpc: IApiRpc = {
   }
 };
 
-function setupSocket(): SocketIOClient.Socket {
+function setupSocket(): Socket {
   if (!socketGlobal) {
     /* eslint-disable-next-line no-console */
     console.log("Connecting API with Socket.io to", socketIoUrl);
