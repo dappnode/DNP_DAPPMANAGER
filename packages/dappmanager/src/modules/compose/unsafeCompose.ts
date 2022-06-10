@@ -23,6 +23,7 @@ import {
   Manifest
 } from "../../types";
 import semver from "semver";
+import { parseVolumeMappings } from "./volumes";
 
 interface ValidationAlert {
   name: string;
@@ -92,6 +93,11 @@ export function parseUnsafeCompose(
         if (serviceUnsafe.pid && !serviceUnsafe.pid.startsWith("service:")) {
           throw Error(`Only pid 'service:* is allowed: ${serviceUnsafe.pid}`);
         }
+
+        const volumes = parseVolumeMappings(serviceUnsafe.volumes || [])
+        for(const volume of volumes)
+          if(!volume.name)
+            throw Error(`Bind mounts are not allowed.`);
 
         return sortServiceKeys({
           // Overridable defaults
@@ -201,15 +207,10 @@ function parseUnsafeVolumes(
 ): ComposeVolumes | undefined {
   if (!volumes) return undefined;
 
-  // External volumes and bind mounts are not allowed
+  // External volumes are not allowed
   for (const [volName, vol] of Object.entries(volumes)) {
-    if (vol)
-    {
-      if(vol.external)
-        throw Error(`External volumes are not allowed '${volName}'`);
-      if (!vol.isNamed) // Volumes that are not named are bind mounts
-        throw Error(`Bind mounts are not allowed.`);
-    }
+    if (vol && vol.external)
+      throw Error(`External volumes are not allowed '${volName}'`);
   }
 
   return mapValues(volumes, vol => pick(vol, volumeSafeKeys));
