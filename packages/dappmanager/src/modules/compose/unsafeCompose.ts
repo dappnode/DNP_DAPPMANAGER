@@ -201,10 +201,15 @@ function parseUnsafeVolumes(
 ): ComposeVolumes | undefined {
   if (!volumes) return undefined;
 
-  // External volumes are not allowed
+  // External volumes and bind mounts are not allowed
   for (const [volName, vol] of Object.entries(volumes)) {
-    if (vol && vol.external)
-      throw Error(`External volumes are not allowed '${volName}'`);
+    if (vol)
+    {
+      if(vol.external)
+        throw Error(`External volumes are not allowed '${volName}'`);
+      if (!vol.isNamed) // Volumes that are not named are bind mounts
+        throw Error(`Bind mounts are not allowed.`);
+    }
   }
 
   return mapValues(volumes, vol => pick(vol, volumeSafeKeys));
