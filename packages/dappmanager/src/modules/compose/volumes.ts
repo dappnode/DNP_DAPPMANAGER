@@ -27,7 +27,7 @@ export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
         const [host, container] = volString
           .split(/:(.*)/)
           .map(normalizeVolumePath);
-        const isNamed = !host.startsWith("/") && !host.startsWith("~");
+        const isNamed = !host.startsWith("/") && !host.startsWith("~") && !host.startsWith("./");
         return {
           host,
           container,
