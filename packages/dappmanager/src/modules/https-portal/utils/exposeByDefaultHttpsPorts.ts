@@ -1,63 +1,8 @@
-import { listPackageNoThrow } from "../docker/list/listPackages";
-import { httpsPortal } from "../../calls/httpsPortal";
-import { prettyDnpName } from "../../utils/format";
-import params from "../../params";
-import { InstallPackageData } from "../../types";
-import { Log } from "../../utils/logUi";
-import { HttpsPortalMapping } from "../../common";
-import { getExternalNetworkAlias } from "../../domains";
-import {
-  dockerListNetworks,
-  dockerCreateNetwork,
-  dockerNetworkConnect
-} from "../docker";
-
-/**
- * Connect to dnpublic_network with an alias if:
- * - is HTTPS package
- * - any package with https portal mappings
- */
-export async function connectToPublicNetwork(
-  pkg: InstallPackageData,
-  externalNetworkName: string
-): Promise<void> {
-  // if there is no https, checks aren't needed
-  if (!(await isRunningHttps())) return;
-
-  // create network if necessary
-  const networks = await dockerListNetworks();
-  if (!networks.find(network => network.Name === externalNetworkName))
-    await dockerCreateNetwork(externalNetworkName);
-
-  const containers =
-    (
-      await listPackageNoThrow({
-        dnpName: pkg.dnpName
-      })
-    )?.containers || [];
-
-  if (containers.length === 0) return;
-
-  for (const container of containers) {
-    if (
-      pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
-      (await httpsPortal.hasMapping(pkg.dnpName, container.serviceName))
-    ) {
-      const alias = getExternalNetworkAlias({
-        serviceName: container.serviceName,
-        dnpName: pkg.dnpName
-      });
-
-      if (!container.networks.find(n => n.name === externalNetworkName)) {
-        await dockerNetworkConnect(
-          externalNetworkName,
-          container.containerName,
-          { Aliases: [alias] }
-        );
-      }
-    }
-  }
-}
+import { Log } from "../../../utils/logUi";
+import { httpsPortal } from "../../../calls";
+import { InstallPackageData, HttpsPortalMapping } from "../../../types";
+import { prettyDnpName } from "../../../utils/format";
+import { isRunningHttps } from "./isRunningHttps";
 
 /**
  * Expose default HTTPS ports on installation defined in the manifest - exposable
@@ -126,24 +71,4 @@ export async function exposeByDefaultHttpsPorts(
       }
     }
   }
-}
-
-// Utils
-
-/**
- * Returns true if HTTPS package installed and running, otherwise return false
- */
-async function isRunningHttps() {
-  const httpsPackage = await listPackageNoThrow({
-    dnpName: params.HTTPS_PORTAL_DNPNAME
-  });
-
-  if (!httpsPackage) return false;
-
-  // Check every HTTPS container is running
-  httpsPackage.containers.forEach(container => {
-    if (!container.running) return false;
-  });
-
-  return true;
 }
