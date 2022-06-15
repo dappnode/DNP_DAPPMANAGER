@@ -34,7 +34,7 @@ export async function runWithChainDriver(
     case "bitcoin":
       return bitcoin(dnp);
     case "ethereum":
-      return ethereum(dnp);
+      return ethereum(dnp, chainDriverSpecs);
     case "ethereum2-beacon-chain-prysm": // TEMPORARY! Remove when all prysm dnps are updated: https://github.com/dappnode/DAppNodePackage-prysm/pull/62 and https://github.com/dappnode/DAppNodePackage-prysm-prater/pull/35
     case "ethereum-beacon-chain":
       return ethereum2(dnp, chainDriverSpecs);
