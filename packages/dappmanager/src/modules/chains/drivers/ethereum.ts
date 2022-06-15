@@ -3,6 +3,7 @@ import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
+import { ChainDriverSpecs } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 
@@ -23,14 +24,16 @@ const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
  * }
  */
 export async function ethereum(
-  dnp: InstalledPackageData
+  dnp: InstalledPackageData,
+  chainDriver: ChainDriverSpecs
 ): Promise<ChainDataResult> {
   const container = dnp.containers[0];
   if (!container) throw Error("no container");
   const containerDomain = getPrivateNetworkAlias(container);
 
+  const port = chainDriver.portNumber || 8545;
   // http://ropsten.dappnode:8545
-  const apiUrl = `http://${containerDomain}:8545`;
+  const apiUrl = `http://${containerDomain}:${port}`;
 
   const provider = new ethers.providers.JsonRpcProvider(apiUrl);
   const [syncing, blockNumber] = await Promise.all([
