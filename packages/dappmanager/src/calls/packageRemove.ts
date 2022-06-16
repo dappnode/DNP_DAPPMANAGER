@@ -53,7 +53,10 @@ export async function packageRemove({
     }
   } catch (e) {
     // Bypass error to continue deleting the package
-    logs.error(`Error removing https mapping of ${dnp.dnpName}`, e);
+    logs.error(
+      `Error trying to remove https mappings from ${dnp.dnpName}. Continue with package remove`,
+      e
+    );
   }
 
   // Only no-cores reach this block
