@@ -36,6 +36,26 @@ export async function packageRemove({
     throw Error("Core packages cannot be removed");
   }
 
+  // Remove portal https portal mappings if any.
+  // MUST removed before deleting containers
+  try {
+    if ((await isRunningHttps()) === true) {
+      const mappings = await httpsPortal.getMappings(dnp.containers);
+      for (const mapping of mappings) {
+        if (mapping.dnpName === dnpName)
+          await httpsPortal
+            .removeMapping(mapping)
+            // Bypass error to continue deleting mappings
+            .catch(e =>
+              logs.error(`Error removing https mapping of ${dnp.dnpName}`, e)
+            );
+      }
+    }
+  } catch (e) {
+    // Bypass error to continue deleting the package
+    logs.error(`Error removing https mapping of ${dnp.dnpName}`, e);
+  }
+
   // Only no-cores reach this block
   const composePath = getPath.dockerCompose(dnp.dnpName, false);
   const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
@@ -72,21 +92,6 @@ export async function packageRemove({
 
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
-
-  // Remove portal https portal mappings if any
-  if ((await isRunningHttps()) === true) {
-    const mappings = await httpsPortal.getMappings(dnp.containers);
-    for (const mapping of mappings) {
-      if (mapping.dnpName === dnpName) {
-        try {
-          await httpsPortal.removeMapping(mapping);
-        } catch (e) {
-          // Bypass error to continue deleting mappings
-          logs.error(`Error removing https mapping of ${dnp.dnpName}`, e);
-        }
-      }
-    }
-  }
 
   // Emit packages update
   eventBus.requestPackages.emit();
