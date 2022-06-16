@@ -55,18 +55,29 @@ export async function exposeByDefaultHttpsPorts(
             } to the external internet`
           );
         } catch (e) {
-          e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
-          for (const mappingRollback of portMappinRollback) {
-            await httpsPortal.removeMapping(mappingRollback).catch(e => {
-              log(
-                pkg.dnpName,
-                `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
-                  e.message
-                }`
-              );
-            });
+          if (e.message.includes("External endpoint already exists")) {
+            // Bypass error if already exposed: 400 Bad Request {"error":"External endpoint already exists"}
+            log(
+              pkg.dnpName,
+              `External endpoint already exists for ${prettyDnpName(
+                pkg.dnpName
+              )}:${exposable.port}`
+            );
+          } else {
+            // Remove all mappings and throw error to trigger package install rollback
+            e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
+            for (const mappingRollback of portMappinRollback) {
+              await httpsPortal.removeMapping(mappingRollback).catch(e => {
+                log(
+                  pkg.dnpName,
+                  `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
+                    e.message
+                  }`
+                );
+              });
+            }
+            throw e;
           }
-          throw e;
         }
       }
     }
