@@ -74,7 +74,7 @@ export async function packageRemove({
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
 
   // Remove portal https portal mappings if any
-  if (await isRunningHttps()) {
+  if ((await isRunningHttps()) === true) {
     const mappings = await httpsPortal.getMappings(dnp.containers);
     for (const mapping of mappings) {
       if (mapping.dnpName === dnpName) {
