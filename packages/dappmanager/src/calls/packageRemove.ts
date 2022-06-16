@@ -8,6 +8,8 @@ import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/list";
 import { logs } from "../logs";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
+import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps";
+import { httpsPortal } from "./httpsPortal";
 
 /**
  * Remove package data: docker down + disk files
@@ -70,6 +72,21 @@ export async function packageRemove({
 
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
+
+  // Remove portal https portal mappings if any
+  if (await isRunningHttps()) {
+    const mappings = await httpsPortal.getMappings(dnp.containers);
+    for (const mapping of mappings) {
+      if (mapping.dnpName === dnpName) {
+        try {
+          await httpsPortal.removeMapping(mapping);
+        } catch (e) {
+          // Bypass error to continue deleting mappings
+          logs.error(`Error removing https mapping of ${dnp.dnpName}`, e);
+        }
+      }
+    }
+  }
 
   // Emit packages update
   eventBus.requestPackages.emit();
