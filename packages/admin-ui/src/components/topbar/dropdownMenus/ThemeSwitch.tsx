@@ -1,4 +1,4 @@
-import { BsMoonFill } from "react-icons/bs";
+import { BsMoon } from "react-icons/bs";
 import { FaSun } from "react-icons/fa";
 import React from "react";
 import "./dropdown.scss";
@@ -19,7 +19,7 @@ export default function ThemeSwitch({
         onClick={toggleTheme}
       >
         {theme === "light" ? (
-          <BsMoonFill style={{ fontSize: "larger" }} />
+          <BsMoon style={{ fontSize: "larger" }} />
         ) : (
           <FaSun style={{ fontSize: "larger" }} />
         )}

@@ -63,22 +63,15 @@
     // ====================
 
     // ALERTS
-    .alert-warning {
-      background-color: #ffea30;
-      color: var(--color-dark-maintext);
+    .alert:not(a) {
+      color: #000000;
+
       p,
       strong {
-        color: var(--color-dark-maintext);
+        color: #000000;
       }
     }
 
-    .alert-danger {
-      background-color: #ff4961;
-      p,
-      strong {
-        color: var(--color-dark-maintext);
-      }
-    }
     // CARDS
     .card {
       background-color: var(--color-dark-card);
