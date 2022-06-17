@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { PackageContainer, PortProtocol } from "../../../src/types";
-
 // imports for typings
 import { mockContainer } from "../../testUtils";
 import { ComposeEditor } from "../../../src/modules/compose/editor";

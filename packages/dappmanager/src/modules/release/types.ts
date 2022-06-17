@@ -1,10 +1,7 @@
-import {
-  DistributedFile,
-  Compose,
-  Manifest,
-  ReleaseSignature
-} from "../../types";
+import { DistributedFile, ReleaseSignature } from "../../types";
 import { FileFormat } from "../../types";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 
 export interface FileConfig {

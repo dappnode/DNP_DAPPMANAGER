@@ -8,7 +8,8 @@ import {
   parseDevicePathMountpoint,
   getDevicePath
 } from "./index";
-import { PortMapping, Compose, UserSettings, VolumeMapping } from "../../types";
+import { PortMapping, UserSettings, VolumeMapping } from "../../types";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
 import { cleanCompose, isOmitable } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb";
@@ -133,28 +134,24 @@ export function applyUserSettings(
     );
 
     const nextPorts = stringifyPortMappings(
-      portMappings.map(
-        (portMapping): PortMapping => {
-          const portId = getPortMappingId(portMapping);
-          const userSetHost = parseInt(userSetPortMappings[portId]);
-          // Use `in` operator to tolerate empty hosts (= ephemeral port)
-          return portId in userSetPortMappings
-            ? { ...portMapping, host: userSetHost || undefined }
-            : portMapping;
-        }
-      )
+      portMappings.map((portMapping): PortMapping => {
+        const portId = getPortMappingId(portMapping);
+        const userSetHost = parseInt(userSetPortMappings[portId]);
+        // Use `in` operator to tolerate empty hosts (= ephemeral port)
+        return portId in userSetPortMappings
+          ? { ...portMapping, host: userSetHost || undefined }
+          : portMapping;
+      })
     );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
-      volumeMappings.map(
-        (vol): VolumeMapping => {
-          const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
-          return hostUserSet && path.isAbsolute(hostUserSet)
-            ? { host: hostUserSet, container: vol.container }
-            : vol;
-        }
-      )
+      volumeMappings.map((vol): VolumeMapping => {
+        const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
+        return hostUserSet && path.isAbsolute(hostUserSet)
+          ? { host: hostUserSet, container: vol.container }
+          : vol;
+      })
     );
     // ##### </DEPRECATED>
 

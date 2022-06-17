@@ -1,3 +1,6 @@
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { ChainDriver } from "@dappnode/dappnodesdk/src/files/manifest";
+
 // Aliases
 
 export type DnpName = string;
@@ -429,29 +432,6 @@ export type ContainerState =
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
 
-export type ChainDriver = ChainDriverType | ChainDriverSpecs;
-
-export type ChainDriverSpecs = {
-  driver: ChainDriverType;
-  serviceName?: string;
-  portNumber?: number;
-};
-
-export type ChainDriverType =
-  | "bitcoin"
-  | "ethereum"
-  | "ethereum-beacon-chain"
-  | "ethereum2-beacon-chain-prysm"
-  | "monero";
-
-export const chainDriversTypes: ChainDriverType[] = [
-  "bitcoin",
-  "ethereum",
-  "ethereum-beacon-chain",
-  "ethereum2-beacon-chain-prysm",
-  "monero"
-];
-
 /**
  * Type mapping of a package container labels
  * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
@@ -627,129 +607,6 @@ export interface Manifest extends PackageReleaseMetadata {
 
 export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
-}
-
-export interface ComposeService {
-  cap_add?: string[];
-  cap_drop?: string[];
-  command?: string;
-  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  devices?: string[];
-  depends_on?: string[];
-  deploy?: ComposeServiceResources;
-  dns?: string; // "172.33.1.2";
-  entrypoint?: string;
-  env_file?: string[];
-  environment?: PackageEnvs | string[];
-  expose?: string[];
-  extra_hosts?: string[];
-  healthcheck?: {
-    test: string | string[];
-    interval?: string;
-    timeout?: string;
-    retries?: string;
-  };
-  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  // ipv4_address: "172.33.1.7";
-  labels?: { [labelName: string]: string };
-  logging?: {
-    driver?: string;
-    options?: {
-      [optName: string]: string | number | null;
-    };
-  };
-  network_mode?: string;
-  networks?: ComposeServiceNetworks;
-  ports?: string[];
-  pid?: string;
-  privileged?: boolean;
-  restart?: string; // "unless-stopped";
-  stop_grace_period?: string;
-  stop_signal?: string;
-  ulimits?: { nproc: number } | { nofile: { soft: number; hard: number } };
-  user?: string;
-  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
-  working_dir?: string;
-  security_opt?: string[];
-}
-
-/**
- * Docs: https://docs.docker.com/compose/compose-file/deploy/#resources
- */
-export interface ComposeServiceResources {
-  resources: {
-    limits?: {
-      cpus?: number | string;
-      memory?: string;
-      pids?: number;
-    };
-    reservations?: {
-      cpus?: number | string;
-      memory?: string;
-      devices?: {
-        capabilities?: string[];
-        driver?: string;
-        count?: number;
-        device_ids?: string[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        options?: { [key: string]: any };
-      };
-    };
-  };
-}
-
-export interface ComposeServiceNetwork {
-  ipv4_address?: string;
-  aliases?: string[];
-}
-
-export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
-
-export type ComposeServiceNetworksObj = {
-  [networkName: string]: ComposeServiceNetwork;
-};
-
-export interface ComposeNetwork {
-  external?: boolean;
-  driver?: string; // "bridge";
-  ipam?: {
-    config: {
-      /** subnet: "172.33.0.0/16" */
-      subnet: string;
-    }[];
-  };
-  name?: string;
-}
-
-export interface ComposeNetworks {
-  /** networkName: "dncore_network" */
-  [networkName: string]: ComposeNetwork | null;
-}
-
-export interface ComposeVolume {
-  // FORBIDDEN
-  // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
-  // NOT allowed to user, only used by DAppNode internally (if any)
-  external?: boolean;
-  name?: string; // Volumes can only be declared locally or be external
-  driver?: string; // Dangerous
-  driver_opts?:
-    | { type: "none"; device: string; o: "bind" }
-    | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
-  labels?: { [labelName: string]: string }; // User should not use this feature
-}
-
-export interface ComposeVolumes {
-  /** volumeName: "dncore_ipfsdnpdappnodeeth_data" */
-  [volumeName: string]: ComposeVolume | null;
-}
-
-export interface Compose {
-  version: string; // "3.5"
-  /** dnpName: "dappmanager.dnp.dappnode.eth" */
-  services: { [dnpName: string]: ComposeService };
-  networks?: ComposeNetworks;
-  volumes?: ComposeVolumes;
 }
 
 export interface PackagePort {

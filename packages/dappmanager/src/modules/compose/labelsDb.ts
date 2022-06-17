@@ -6,11 +6,8 @@ import {
   ContainerLabelTypes
 } from "../../types";
 import { stringifyEnvironment } from "./environment";
-import {
-  ChainDriverSpecs,
-  ChainDriverType,
-  ComposeService
-} from "../../common";
+import { ChainDriverSpecs, ChainDriverType } from "../../common";
+import { ComposeService } from "@dappnode/dappnodesdk/src/files/compose";
 import { pick, omitBy, mapValues } from "lodash";
 
 /**
@@ -53,7 +50,7 @@ const labelParseFns: {
   "dappnode.dnp.origin": parseString,
   "dappnode.dnp.chain": value => {
     if (chainDriversTypes.includes(value as ChainDriverType)) {
-      return value as ChainDriverType ;
+      return value as ChainDriverType;
     }
     const valueParsed = parseJsonSafe(value);
     if (

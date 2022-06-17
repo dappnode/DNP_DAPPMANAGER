@@ -1,8 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { Compose } from "../../../src/types";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
 import { mockManifest, mockCompose } from "../../testUtils";
-
 import { parseUnsafeCompose } from "../../../src/modules/compose/unsafeCompose";
 
 describe("parseUnsafeCompose", () => {

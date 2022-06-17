@@ -1,4 +1,7 @@
-import { ComposeServiceNetworks, ComposeServiceNetworksObj } from "../../types";
+import {
+  ComposeServiceNetworks,
+  ComposeServiceNetworksObj
+} from "@dappnode/dappnodesdk/src/files/compose";
 
 /**
  * Parse service networks to object form
@@ -9,7 +12,9 @@ export function parseServiceNetworks(
 ): ComposeServiceNetworksObj {
   if (Array.isArray(networks)) {
     const networksObj: ComposeServiceNetworksObj = {};
-    for (const networkName of networks) networksObj[networkName] = {};
+    for (const networkName of networks) {
+      if (typeof networkName === "string") networksObj[networkName] = {};
+    }
     return networksObj;
   } else {
     return networks;

@@ -8,7 +8,7 @@ import params from "../../../../src/params";
 import { shellSafe } from "../../../testUtils";
 import fs from "fs";
 import { parseServiceNetworks } from "../../../../src/modules/compose/networks";
-import { ComposeServiceNetwork } from "../../../../src/types";
+import { ComposeServiceNetwork } from "@dappnode/dappnodesdk/src/files/compose";
 
 describe("compose service editor", () => {
   const exampleCompose = `

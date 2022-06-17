@@ -1,7 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import { mockManifest, mockManifestWithImage } from "../../testUtils";
-import { Manifest, ManifestWithImage } from "../../../src/types";
+import { ManifestWithImage } from "../../../src/types";
+import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
 
 import {
   validateManifestBasic,
@@ -15,7 +16,7 @@ describe("validateManifestBasic", () => {
   });
 
   it("Should reject an empty manifest", () => {
-    expect(function() {
+    expect(function () {
       validateManifestBasic({} as Manifest);
     }).to.throw("Invalid manifest");
   });
@@ -33,7 +34,7 @@ describe("validateManifestWithImage", () => {
   });
 
   it("Should reject an empty manifest", () => {
-    expect(function() {
+    expect(function () {
       validateManifestWithImage({} as ManifestWithImage);
     }).to.throw("Invalid manifest");
   });

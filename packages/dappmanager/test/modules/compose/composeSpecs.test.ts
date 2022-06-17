@@ -2,7 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import { Manifest, Compose } from "../../../src/types";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
 import { yamlParse, yamlDump } from "../../../src/utils/yaml";
 
 import {

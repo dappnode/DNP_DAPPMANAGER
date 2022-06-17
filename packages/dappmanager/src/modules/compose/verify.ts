@@ -1,5 +1,5 @@
 import { maxPortNumber } from "../../params";
-import { Compose } from "../../types";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
 import { applyRecursivelyToStringValues } from "../../utils/objects";
 import { parsePortMappings } from "./ports";
 

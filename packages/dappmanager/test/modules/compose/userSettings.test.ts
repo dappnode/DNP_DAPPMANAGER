@@ -1,7 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { pick } from "lodash";
-import { Compose, ComposeService, UserSettings } from "../../../src/types";
+import {
+  Compose,
+  ComposeService
+} from "@dappnode/dappnodesdk/src/files/compose";
+import { UserSettings } from "../../../src/types";
 
 import {
   parseUserSettings,

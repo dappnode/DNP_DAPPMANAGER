@@ -19,9 +19,9 @@ import {
   ComposeServiceNetworks,
   ComposeVolumes,
   ComposeNetwork,
-  ComposeNetworks,
-  Manifest
-} from "../../types";
+  ComposeNetworks
+} from "@dappnode/dappnodesdk/src/files/compose";
+import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
 import semver from "semver";
 
 interface ValidationAlert {

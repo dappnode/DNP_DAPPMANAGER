@@ -4,10 +4,8 @@ import shell from "../src/utils/shell";
 import { clearCacheDb, clearMainDb } from "../src/db";
 import {
   PackageContainer,
-  Manifest,
   VolumeMapping,
   PackageRelease,
-  Compose,
   ManifestWithImage,
   InstallPackageData,
   InstalledPackageData,
@@ -15,6 +13,8 @@ import {
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
+import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
+import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";

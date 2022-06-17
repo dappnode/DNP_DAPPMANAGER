@@ -12,13 +12,13 @@ import {
   omit
 } from "lodash";
 import * as getPath from "../../utils/getPath";
+import { PortMapping, PackageEnvs, ContainerLabelsRaw } from "../../types";
 import {
   Compose,
   ComposeService,
-  PortMapping,
-  PackageEnvs,
-  ContainerLabelsRaw
-} from "../../types";
+  ComposeNetwork,
+  ComposeServiceNetwork
+} from "@dappnode/dappnodesdk/src/files/compose";
 import {
   stringifyPortMappings,
   parsePortMappings,
@@ -31,11 +31,10 @@ import {
 } from "./environment";
 import { parseServiceNetworks } from "./networks";
 import { verifyCompose } from "./verify";
-import { UserSettings, ComposeServiceNetwork } from "../../types";
+import { UserSettings } from "../../types";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
-import { ComposeNetwork } from "../../common";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;
