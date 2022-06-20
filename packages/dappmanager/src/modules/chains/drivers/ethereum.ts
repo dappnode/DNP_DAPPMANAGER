@@ -3,6 +3,7 @@ import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
+import { ChainDriverSpecs } from "../../../types";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 
@@ -23,14 +24,26 @@ const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
  * }
  */
 export async function ethereum(
-  dnp: InstalledPackageData
-): Promise<ChainDataResult> {
-  const container = dnp.containers[0];
-  if (!container) throw Error("no container");
-  const containerDomain = getPrivateNetworkAlias(container);
+  dnp: InstalledPackageData,
+  chainDriver: ChainDriverSpecs
+): Promise<ChainDataResult | null> {
 
-  // http://ropsten.dappnode:8545
-  const apiUrl = `http://${containerDomain}:8545`;
+  // Get serviceName from chainDriverSpec and use normal method if no serviceName is defined in chainDriver
+  const serviceName = chainDriver.serviceName || dnp.containers[0].serviceName;
+  const executionLayerContainer = dnp.containers.find(
+    container => container.serviceName === serviceName
+  );
+  if (!executionLayerContainer) {
+    throw Error(`${serviceName} service not found`);
+  }
+  if (!executionLayerContainer.running) {
+    return null; // OK to not be running, just ignore
+  }
+
+  const port = chainDriver.portNumber || 8545; // grab specified port in chainDriver and use default port if none specified
+  const containerDomain = getPrivateNetworkAlias(executionLayerContainer);
+
+  const apiUrl = `http://${containerDomain}:${port}`;
 
   const provider = new ethers.providers.JsonRpcProvider(apiUrl);
   const [syncing, blockNumber] = await Promise.all([
