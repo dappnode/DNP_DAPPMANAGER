@@ -8,6 +8,8 @@ import shell from "../utils/shell";
 import { listPackage } from "../modules/docker/list";
 import { logs } from "../logs";
 import { getDockerTimeoutMax } from "../modules/docker/utils";
+import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps";
+import { httpsPortal } from "./httpsPortal";
 
 /**
  * Remove package data: docker down + disk files
@@ -32,6 +34,29 @@ export async function packageRemove({
     dnp.dnpName === params.dappmanagerDnpName
   ) {
     throw Error("Core packages cannot be removed");
+  }
+
+  // Remove portal https portal mappings if any.
+  // MUST removed before deleting containers
+  try {
+    if ((await isRunningHttps()) === true) {
+      const mappings = await httpsPortal.getMappings(dnp.containers);
+      for (const mapping of mappings) {
+        if (mapping.dnpName === dnpName)
+          await httpsPortal
+            .removeMapping(mapping)
+            // Bypass error to continue deleting mappings
+            .catch(e =>
+              logs.error(`Error removing https mapping of ${dnp.dnpName}`, e)
+            );
+      }
+    }
+  } catch (e) {
+    // Bypass error to continue deleting the package
+    logs.error(
+      `Error trying to remove https mappings from ${dnp.dnpName}. Continue with package remove`,
+      e
+    );
   }
 
   // Only no-cores reach this block
