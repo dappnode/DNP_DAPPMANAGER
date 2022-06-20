@@ -1,10 +1,8 @@
-import { listPackageNoThrow } from "../docker/list/listPackages";
-import { httpsPortal } from "../../calls/httpsPortal";
-import { prettyDnpName } from "../../utils/format";
-import params from "../../params";
-import { InstallPackageData } from "../../types";
-import { Log } from "../../utils/logUi";
-import { HttpsPortalMapping } from "../../common";
+import { Log } from "../../../utils/logUi";
+import { httpsPortal } from "../../../calls";
+import { InstallPackageData, HttpsPortalMapping } from "../../../types";
+import { prettyDnpName } from "../../../utils/format";
+import { isRunningHttps } from "./isRunningHttps";
 
 /**
  * Expose default HTTPS ports on installation defined in the manifest - exposable
@@ -14,21 +12,12 @@ export async function exposeByDefaultHttpsPorts(
   log: Log
 ): Promise<void> {
   if (pkg.metadata.exposable) {
-    // Check HTTPS package exists
-    const httpsPackage = await listPackageNoThrow({
-      dnpName: params.HTTPS_PORTAL_DNPNAME
-    });
-    if (!httpsPackage)
+    // Requires that https package exists and it is running
+    if (!(await isRunningHttps()))
       throw Error(
-        `HTTPS package not found but required to expose HTTPS ports by default. Install HTTPS package first.`
+        `HTTPS package not running but required to expose HTTPS ports by default.`
       );
-    // Check HTTPS package running
-    httpsPackage.containers.map(container => {
-      if (!container.running)
-        throw Error(
-          `HTTPS package not running but required to expose HTTPS ports by default.`
-        );
-    });
+
     const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
 
@@ -66,18 +55,29 @@ export async function exposeByDefaultHttpsPorts(
             } to the external internet`
           );
         } catch (e) {
-          e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
-          for (const mappingRollback of portMappinRollback) {
-            await httpsPortal.removeMapping(mappingRollback).catch(e => {
-              log(
-                pkg.dnpName,
-                `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
-                  e.message
-                }`
-              );
-            });
+          if (e.message.includes("External endpoint already exists")) {
+            // Bypass error if already exposed: 400 Bad Request {"error":"External endpoint already exists"}
+            log(
+              pkg.dnpName,
+              `External endpoint already exists for ${prettyDnpName(
+                pkg.dnpName
+              )}:${exposable.port}`
+            );
+          } else {
+            // Remove all mappings and throw error to trigger package install rollback
+            e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
+            for (const mappingRollback of portMappinRollback) {
+              await httpsPortal.removeMapping(mappingRollback).catch(e => {
+                log(
+                  pkg.dnpName,
+                  `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
+                    e.message
+                  }`
+                );
+              });
+            }
+            throw e;
           }
-          throw e;
         }
       }
     }

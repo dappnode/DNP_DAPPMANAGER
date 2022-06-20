@@ -8,7 +8,8 @@ import { InstallPackageData } from "../../types";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";
-import { connectToPublicNetwork, exposeByDefaultHttpsPorts } from "./https";
+import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork";
+import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
