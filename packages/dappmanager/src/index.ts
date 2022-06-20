@@ -5,7 +5,7 @@ import initializeDb from "./initializeDb";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
-import { migrateEthchain } from "./modules/ethClient";
+import { deprecateOpenEthereum } from "./modules/ethClient";
 import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
@@ -100,7 +100,9 @@ else logs.error(`Error getting version data: ${versionData.message}`);
  * moved from the old db to the cache db.
  */
 
-migrateEthchain().catch(e => logs.error("Error migrating ETHCHAIN", e));
+deprecateOpenEthereum().catch(e =>
+  logs.error("Error deprecating openethereum", e)
+);
 
 migrateUserActionLogs().catch(e =>
   logs.error("Error migrating userActionLogs", e)
