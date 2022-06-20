@@ -153,10 +153,17 @@ const params = {
 
   // Validators legacy versions: Prysm, Prysm-prater, Prysm-gnosis
   minimumAllowedClientsLegacyVersions: [
+    //  v0.2.46
     {
       clientDnpName: "prysm-prater.dnp.dappnode.eth",
       clientVersion: "0.1.7",
       web3signerDnpName: "web3signer-prater.dnp.dappnode.eth"
+    },
+    // v0.2.51
+    {
+      clientDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+      clientVersion: "0.1.8",
+      web3signerDnpName: "web3signer-gnosis.dnp.dappnode.eth"
     }
   ],
 

@@ -17,7 +17,7 @@ export function isClientLegacy(dnpName: string, dnpVersion: string): boolean {
 }
 
 /**
- * Ensure the following requirements for Eth2 migration, from dappmanager v0.2.46 prevent the following:
+ * Ensure the following requirements for Eth2 migration:
  * - Ensure not installing client legacy version (previous to remote signer support) for packages: (Prysm, Prysm-prater and Gnosis-Beacon-Chain-Prysm)
  * - Ensure not installing web3signer if Prysm package legacy version is installed
  */
