@@ -19,7 +19,7 @@ export async function deprecateOpenEthereum(): Promise<void> {
     const openEthereumPackage = await listPackageNoThrow({
       dnpName: openEthereumPackageName
     });
-    if (!openEthereumPackage) return;
+    if (!openEthereumPackage) continue;
 
     logs.info(`${openEthereumPackageName} is deprecated, removing it`);
     await packageRemove({
