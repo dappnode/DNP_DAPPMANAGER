@@ -151,19 +151,29 @@ const params = {
   ETH_MAINNET_RPC_URL_REMOTE:
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
 
-  // Validators legacy versions: Prysm, Prysm-prater, Prysm-gnosis
-  minimumAllowedClientsLegacyVersions: [
+  // Prysm legacy specs for: prater, gnosis and mainnet
+  prysmLegacySpecs: [
     //  v0.2.46
     {
-      clientDnpName: "prysm-prater.dnp.dappnode.eth",
-      clientVersion: "0.1.7",
-      web3signerDnpName: "web3signer-prater.dnp.dappnode.eth"
+      prysmDnpName: "prysm-prater.dnp.dappnode.eth",
+      prysmVersion: "0.1.7",
+      web3signerDnpName: "web3signer-prater.dnp.dappnode.eth",
+      incompatibleClientsDnpNames: [
+        "teku-prater.dnp.dappnode.eth",
+        "lighthouse-prater.dnp.dappnode.eth",
+        "nimbus-prater.dnp.dappnode.eth"
+      ]
     },
     // v0.2.51
     {
-      clientDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
-      clientVersion: "0.1.8",
-      web3signerDnpName: "web3signer-gnosis.dnp.dappnode.eth"
+      prysmDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+      prysmVersion: "0.1.8",
+      web3signerDnpName: "web3signer-gnosis.dnp.dappnode.eth",
+      incompatibleClientsDnpNames: [
+        "teku-gnosis.dnp.dappnode.eth",
+        "lighthouse-gnosis.dnp.dappnode.eth",
+        "nimbus-gnosis.dnp.dappnode.eth"
+      ]
     }
   ],
 

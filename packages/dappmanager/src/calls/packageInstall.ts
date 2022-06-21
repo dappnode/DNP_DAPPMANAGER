@@ -19,7 +19,7 @@ import {
 import { logs } from "../logs";
 import {
   ensureEth2MigrationRequirements,
-  isClientLegacy
+  isPrysmLegacy
 } from "../modules/installer/ensureEth2MigrationRequirements";
 
 /**
@@ -101,8 +101,8 @@ export async function packageInstall({
       try {
         await runPackages(packagesData, log);
       } catch (e) {
-        // Bypass rollback if is Client legacy
-        if (!isClientLegacy(req.name, req.ver)) {
+        // Bypass rollback if is Prysm legacy
+        if (!isPrysmLegacy(req.name, req.ver)) {
           await rollbackPackages(packagesData, log);
           throw e;
         } else {
