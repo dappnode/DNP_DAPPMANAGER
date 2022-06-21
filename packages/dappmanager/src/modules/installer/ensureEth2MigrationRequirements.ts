@@ -39,20 +39,25 @@ export async function ensureEth2MigrationRequirements(
     ])
   );
 
-  for (const pkg of packagesData) {
-    ensureNotInstallPrysmLegacy(pkg, prysmLegacyVersions);
+  try {
+    for (const pkg of packagesData) {
+      ensureNotInstallPrysmLegacy(pkg, prysmLegacyVersions);
 
-    params.prysmLegacySpecs.map(async prysmLegacySpec => {
-      await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
-        prysmLegacySpec,
-        pkg
-      );
+      for await (const prysmLegacySpec of params.prysmLegacySpecs) {
+        await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
+          prysmLegacySpec,
+          pkg
+        );
 
-      await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
-        prysmLegacySpec,
-        pkg
-      );
-    });
+        await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
+          prysmLegacySpec,
+          pkg
+        );
+      }
+    }
+  } catch (e) {
+    e.message = `Eth2 migration requirements failed: ${e.message}`;
+    throw e;
   }
 }
 
@@ -67,7 +72,7 @@ function ensureNotInstallPrysmLegacy(
     );
 }
 
-async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
+export async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
   prysmLegacySpec: PrysmLegacySpec,
   pkg: InstallPackageData
 ): Promise<void> {
@@ -76,14 +81,14 @@ async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
       dnpName: prysmLegacySpec.prysmDnpName
     });
 
-    if (prysmPkg && semver.lte(prysmPkg.version, pkg.semVersion))
+    if (prysmPkg && semver.lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
       throw Error(
-        `Not allowed to install web3signer ${prysmLegacySpec.web3signerDnpName} having Prysm legacy client installed ${pkg.dnpName}:${pkg.semVersion}. Update it or remove it`
+        `Not allowed to install ${prysmLegacySpec.web3signerDnpName} having Prysm legacy client installed ${prysmPkg.dnpName}:${prysmPkg.version}. Update it or remove it`
       );
   }
 }
 
-async function ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
+export async function ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
   prysmLegacySpec: PrysmLegacySpec,
   pkg: InstallPackageData
 ): Promise<void> {
@@ -92,9 +97,9 @@ async function ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
       dnpName: prysmLegacySpec.prysmDnpName
     });
 
-    if (prysmPkg && semver.lte(prysmPkg.version, pkg.semVersion))
+    if (prysmPkg && semver.lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
       throw Error(
-        `Not allowed to install client ${pkg.dnpName} having Prysm legacy client installed: ${pkg.dnpName}:${pkg.semVersion}. Update it or remove it`
+        `Not allowed to install client ${pkg.dnpName} having Prysm legacy client installed: ${prysmPkg.dnpName}:${prysmPkg.version}. Update it or remove it`
       );
   }
 }
