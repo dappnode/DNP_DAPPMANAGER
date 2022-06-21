@@ -48,6 +48,12 @@ const server = startDappmanager({
   sshManager
 });
 
+// Deprecate openethereum. MUST be executed before EthClientInstaller daemon to avoid have the error:
+// `Error on eth client installer daemon Error: No client data for target: openethereum`
+deprecateOpenEthereum().catch(e =>
+  logs.error("Error deprecating openethereum", e)
+);
+
 // Start daemons
 startDaemons(controller.signal);
 
@@ -99,10 +105,6 @@ else logs.error(`Error getting version data: ${versionData.message}`);
  * and the new one is for permanent required data. Some key-values will be
  * moved from the old db to the cache db.
  */
-
-deprecateOpenEthereum().catch(e =>
-  logs.error("Error deprecating openethereum", e)
-);
 
 migrateUserActionLogs().catch(e =>
   logs.error("Error migrating userActionLogs", e)
