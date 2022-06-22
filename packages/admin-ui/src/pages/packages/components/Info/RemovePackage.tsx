@@ -19,11 +19,36 @@ interface WarningItem {
 }
 
 export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
-  const { dnpName, areThereVolumesToRemove, dependantsOf, notRemovable } = dnp;
+  const {
+    dnpName,
+    areThereVolumesToRemove,
+    dependantsOf,
+    notRemovable,
+    manifest
+  } = dnp;
 
   const history = useHistory();
 
   async function packageRemove() {
+    // Dialog to confirm warning onRemove from manifest
+    const removeWarnings = manifest?.warnings?.onRemove;
+    if (removeWarnings) {
+      await new Promise(
+        (resolve: (confirmOnRemoveWarning: boolean) => void) => {
+          confirm({
+            title: `Removal warning`,
+            text: removeWarnings,
+            buttons: [
+              {
+                label: "Continue",
+                onClick: () => resolve(true)
+              }
+            ]
+          });
+        }
+      );
+    }
+
     // Dialog to confirm remove + USER INPUT for delete volumes
     const deleteVolumes = await new Promise(
       (resolve: (_deleteVolumes: boolean) => void) => {
