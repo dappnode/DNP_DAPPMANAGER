@@ -43,17 +43,19 @@ export async function ensureEth2MigrationRequirements(
     for (const pkg of packagesData) {
       ensureNotInstallPrysmLegacy(pkg, prysmLegacyVersions);
 
-      for await (const prysmLegacySpec of params.prysmLegacySpecs) {
-        await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
-          prysmLegacySpec,
-          pkg
-        );
+      await Promise.all(
+        params.prysmLegacySpecs.map(async prysmLegacySpec => {
+          await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
+            prysmLegacySpec,
+            pkg
+          );
 
-        await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
-          prysmLegacySpec,
-          pkg
-        );
-      }
+          await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
+            prysmLegacySpec,
+            pkg
+          );
+        })
+      );
     }
   } catch (e) {
     e.message = `Eth2 migration requirements failed: ${e.message}`;
