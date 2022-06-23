@@ -25,6 +25,9 @@ export const bitcoin: MockDnp = {
       "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
       "Loco del Bitcoin <ellocodelbitcoin@gmail.com>"
     ],
+    warnings: {
+      onRemove: "Make sure you have change the endpoint in your bitcoin miner"
+    },
     keywords: ["bitcoin", "btc"],
     // @ts-ignore
     homepage: {
