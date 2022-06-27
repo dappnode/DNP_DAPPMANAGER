@@ -12,6 +12,7 @@ describe("ensureEth2MigrationRequirements", () => {
   const networkName = "dncore_network";
   const prysmLegacyContainerName =
     "DAppNodePackage-gnosis-beacon-chain-prysm.dnp.dappnode.eth";
+  const prysmGnosisSpecs = params.prysmLegacySpecs[1];
 
   before(async () => {
     await shellSafe(`docker network create ${networkName}`);
@@ -35,45 +36,59 @@ describe("ensureEth2MigrationRequirements", () => {
   });
 
   it("Should throw an error when installing Prysm legacy ", async () => {
-    await ensureEth2MigrationRequirements([
+    const err = await ensureEth2MigrationRequirements([
       {
         ...mockPackageData,
         dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
         semVersion: "0.1.6"
       }
-    ]).catch(err => {
-      expect(err.message).to.equal(
-        `Eth2 migration requirements failed: gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6 is a legacy validator client, install a more recent version with remote signer support`
-      );
-    });
+    ]).catch(err => err);
+
+    expect(err.message).to.equal(
+      `Eth2 migration requirements failed: gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6 is a legacy validator client, install a more recent version with remote signer support`
+    );
   });
 
   it("Should throw an error when installing web3signer and Prysm legacy is installed", async () => {
-    await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
-      params.prysmLegacySpecs[1],
+    const err = await ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
+      prysmGnosisSpecs,
       {
         ...mockPackageData,
         dnpName: "web3signer-gnosis.dnp.dappnode.eth"
       }
-    ).catch(err => {
-      expect(err.message).to.equal(
-        `Not allowed to install web3signer-gnosis.dnp.dappnode.eth having Prysm legacy client installed gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6. Update it or remove it`
-      );
-    });
+    ).catch(err => err);
+
+    expect(err.message).to.equal(
+      `Not allowed to install web3signer-gnosis.dnp.dappnode.eth having Prysm legacy client installed gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6. Update it or remove it`
+    );
   });
 
   it("Should throw an error when installing any client and Prysm legacy is installed", async () => {
-    await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
-      params.prysmLegacySpecs[1],
+    const err = await ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
+      prysmGnosisSpecs,
       {
         ...mockPackageData,
         dnpName: "teku-gnosis.dnp.dappnode.eth"
       }
-    ).catch(err => {
-      expect(err.message).to.equal(
-        `Not allowed to install client teku-gnosis.dnp.dappnode.eth having Prysm legacy client installed: gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6. Update it or remove it`
-      );
-    });
+    ).catch(err => err);
+
+    expect(err.message).to.equal(
+      `Not allowed to install client teku-gnosis.dnp.dappnode.eth having Prysm legacy client installed: gnosis-beacon-chain-prysm.dnp.dappnode.eth:0.1.6. Update it or remove it`
+    );
+  });
+
+  it("Should not throw an error when installing web3signer and it is an update of Prysm and Prysm legacy is installed", async () => {
+    await ensureEth2MigrationRequirements([
+      {
+        ...mockPackageData,
+        dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+        semVersion: "1.0.0"
+      },
+      {
+        ...mockPackageData,
+        dnpName: "web3signer-gnosis.dnp.dappnode.eth"
+      }
+    ]);
   });
 
   after(async () => {
