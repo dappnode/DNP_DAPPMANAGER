@@ -49,6 +49,7 @@ startDappmanager({
     downloadUserActionLogs: () => {},
     fileDownload: () => {},
     globalEnvs: () => {},
+    notificationSend: () => {},
     packageManifest: () => {},
     publicPackagesData: () => {},
     sign: () => {},
