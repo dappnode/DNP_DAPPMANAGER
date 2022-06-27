@@ -40,6 +40,7 @@ export interface HttpRoutes {
   downloadWireguardConfig: RequestHandler<{ device: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
+  notificationSend: RequestHandler;
   packageManifest: RequestHandler<{ dnpName: string }>;
   publicPackagesData: RequestHandler<{ containerName: string }>;
   sign: RequestHandler;
@@ -162,6 +163,7 @@ export function startHttpApi({
   app.get("/package-manifest/:dnpName", routes.packageManifest);
   app.post("/sign", routes.sign);
   app.post("/data-send", routes.dataSend);
+  app.post("/notification-send", routes.notificationSend);
 
   // Rest of RPC methods
   app.post(

@@ -11,6 +11,15 @@ export const notifications: Pick<
 
 const sampleNotifications: PackageNotificationDb[] = [
   {
+    id: "notification-web3signer-gnosis.dnp.dappnode.eth",
+    type: "danger",
+    title: "Web3signer eth2 client selected is not available",
+    body:
+      "Make sure you hace selected an available client at packages > web3signer > config > eth2 client",
+    timestamp: 153834826,
+    viewed: false
+  },
+  {
     id: "diskSpaceRanOut-stoppedPackages",
     type: "danger",
     title: "Disk space ran out, stopped packages",
