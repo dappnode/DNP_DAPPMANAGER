@@ -41,7 +41,15 @@ export async function ensureEth2MigrationRequirements(
 
   try {
     for (const pkg of packagesData) {
-      ensureNotInstallPrysmLegacy(pkg, prysmLegacyVersions);
+      const prysmVersion = prysmLegacyVersions.get(pkg.dnpName);
+
+      // not allow to install Prysm Legacy
+      if (prysmVersion && semver.lte(pkg.semVersion, prysmVersion))
+        throw Error(
+          `${pkg.dnpName}:${pkg.semVersion} is a legacy validator client, install a more recent version with remote signer support`
+        );
+      // bypass if it is a Prysm update that installs web3signer
+      if (prysmVersion && semver.gt(pkg.semVersion, prysmVersion)) return;
 
       await Promise.all(
         params.prysmLegacySpecs.map(async prysmLegacySpec => {
@@ -63,17 +71,6 @@ export async function ensureEth2MigrationRequirements(
   }
 }
 
-function ensureNotInstallPrysmLegacy(
-  pkg: InstallPackageData,
-  prysmLegacyVersions: Map<string, string>
-): void {
-  const pkgLegacyVersion = prysmLegacyVersions.get(pkg.dnpName);
-  if (pkgLegacyVersion && semver.lte(pkg.semVersion, pkgLegacyVersion))
-    throw Error(
-      `${pkg.dnpName}:${pkg.semVersion} is a legacy validator client, install a more recent version with remote signer support`
-    );
-}
-
 export async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
   prysmLegacySpec: PrysmLegacySpec,
   pkg: InstallPackageData
@@ -82,7 +79,6 @@ export async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
     const prysmPkg = await listPackageNoThrow({
       dnpName: prysmLegacySpec.prysmDnpName
     });
-
     if (prysmPkg && semver.lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
       throw Error(
         `Not allowed to install ${prysmLegacySpec.web3signerDnpName} having Prysm legacy client installed ${prysmPkg.dnpName}:${prysmPkg.version}. Update it or remove it`
