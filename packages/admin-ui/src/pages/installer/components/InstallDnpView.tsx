@@ -228,7 +228,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           warnings={metadata.warnings || {}}
         />
       ),
-      available: metadata.warnings?.onInstall
+      available:
+        metadata.warnings?.onInstall ||
+        metadata.warnings?.onMajorUpdate ||
+        metadata.warnings?.onMinorUpdate ||
+        metadata.warnings?.onPatchUpdate
     },
     {
       name: "Disclaimer",
