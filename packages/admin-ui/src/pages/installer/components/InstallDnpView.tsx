@@ -58,7 +58,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const dispatch = useDispatch();
 
-  const { dnpName, reqVersion, settings, metadata, setupWizard } = dnp;
+  const {
+    dnpName,
+    reqVersion,
+    settings,
+    metadata,
+    setupWizard,
+    isInstalled
+  } = dnp;
   const isCore = metadata.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
@@ -226,13 +233,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
           goNext={goNext}
           goBack={goBack}
           warnings={metadata.warnings || {}}
+          isInstalled={isInstalled}
         />
       ),
-      available:
-        metadata.warnings?.onInstall ||
-        metadata.warnings?.onMajorUpdate ||
-        metadata.warnings?.onMinorUpdate ||
-        metadata.warnings?.onPatchUpdate
+      available: metadata.warnings?.onInstall || isInstalled
     },
     {
       name: "Disclaimer",

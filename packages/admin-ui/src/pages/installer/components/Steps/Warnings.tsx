@@ -1,17 +1,19 @@
 import React from "react";
 import Card from "components/Card";
-import { PackageReleaseMetadata } from "types";
+import { PackageReleaseMetadata, RequestedDnp } from "types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
 
 export default function Warnings({
   goNext,
   goBack,
-  warnings
+  warnings,
+  isInstalled
 }: {
   goNext: () => void;
   goBack: () => void;
   warnings: PackageReleaseMetadata["warnings"];
+  isInstalled: RequestedDnp["isInstalled"];
 }) {
   if (!warnings)
     return (
@@ -34,7 +36,7 @@ export default function Warnings({
           </div>
         </div>
       )}
-      {warnings.onPatchUpdate && (
+      {isInstalled && warnings.onPatchUpdate && (
         <div>
           <div className="card-section-header">
             <span>
@@ -46,7 +48,7 @@ export default function Warnings({
           </div>
         </div>
       )}
-      {warnings.onMinorUpdate && (
+      {isInstalled && warnings.onMinorUpdate && (
         <div>
           <div className="card-section-header">
             <span>
@@ -58,7 +60,7 @@ export default function Warnings({
           </div>
         </div>
       )}
-      {warnings.onMajorUpdate && (
+      {isInstalled && warnings.onMajorUpdate && (
         <div>
           <div className="card-section-header">
             <span>
