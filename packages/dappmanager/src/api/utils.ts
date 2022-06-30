@@ -1,6 +1,5 @@
 import express from "express";
 import { Server } from "socket.io";
-import { logs } from "../logs";
 
 export class HttpError extends Error {
   name: string;
@@ -26,15 +25,17 @@ export function wrapHandler<
     try {
       await handler(req, res, next);
     } catch (e) {
-      logs.info("req: ", req);
-      logs.info("res: ", res);
-      logs.info("next: ", next);
       if (res.headersSent) {
         next(e);
       } else if (e instanceof HttpError) {
-        res.status(e.statusCode).send({
-          error: { name: e.name, message: e.message }
-        });
+        if (res && res.status) {
+          res.status(e.statusCode).send({
+            error: { name: e.name, message: e.message }
+          });
+        } else {
+          // End session due to a probably cookie change
+          // req.session = null;
+        }
       } else {
         res.status(500).send({
           error: { message: e.message, data: e.stack }
