@@ -48,8 +48,13 @@ export async function dockerComposeUpPackage(
     serviceName => containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
-  if (serviceNames.length === servicesToStart.length) {
-    // For new packages and all running run docker-compose up as is
+  if (
+    serviceNames.length === servicesToStart.length ||
+    dnpName === params.coreDnpName
+  ) {
+    // Run docker-compose up on all services for:
+    // - packages with all services running
+    // - core package, it must be executed always. No matter the previous status
     await dockerComposeUp(composePath, dockerComposeUpOptions);
   } else {
     // If some services are not running, first create the containers
