@@ -33,6 +33,7 @@ export function wrapHandler<
             error: { name: e.name, message: e.message }
           });
         } else {
+          // TODO: Find a proper way to end the session and redirect the user to a beauty UI
           // End session due to a probably cookie change
           // req.session = null;
         }
