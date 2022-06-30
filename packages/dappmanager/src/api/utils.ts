@@ -28,9 +28,15 @@ export function wrapHandler<
       if (res.headersSent) {
         next(e);
       } else if (e instanceof HttpError) {
-        res.status(e.statusCode).send({
-          error: { name: e.name, message: e.message }
-        });
+        if (res && res.status) {
+          res.status(e.statusCode).send({
+            error: { name: e.name, message: e.message }
+          });
+        } else {
+          // TODO: Find a proper way to end the session and redirect the user to a beauty UI
+          // End session due to a probably cookie change
+          // req.session = null;
+        }
       } else {
         res.status(500).send({
           error: { message: e.message, data: e.stack }
