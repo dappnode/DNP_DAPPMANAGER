@@ -13,8 +13,7 @@ import {
 } from "../src/types";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
 import params from "../src/params";
-import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
-import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Compose, Manifest } from "@dappnode/dappnodesdk";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";

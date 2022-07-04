@@ -1,13 +1,13 @@
-import {
-  Dependencies,
-  ChainDriver,
-  chainDriversTypes,
-  ContainerLabelsRaw,
-  ContainerLabelTypes
-} from "../../types";
+import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types";
 import { stringifyEnvironment } from "./environment";
-import { ChainDriverSpecs, ChainDriverType } from "../../common";
-import { ComposeService } from "@dappnode/dappnodesdk/src/files/compose";
+import {
+  ComposeService,
+  ChainDriver,
+  ChainDriverSpecs,
+  ChainDriverType,
+  chainDriversTypes,
+  Dependencies
+} from "@dappnode/dappnodesdk";
 import { pick, omitBy, mapValues } from "lodash";
 
 /**

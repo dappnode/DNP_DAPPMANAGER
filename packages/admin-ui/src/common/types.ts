@@ -1,5 +1,15 @@
-import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
-import { ChainDriver } from "@dappnode/dappnodesdk/src/files/manifest";
+import {
+  Manifest,
+  SetupWizard,
+  Compose,
+  ChainDriver,
+  SetupSchema,
+  SetupUiJson,
+  SetupTarget,
+  ManifestUpdateAlert,
+  PackageBackup,
+  Dependencies
+} from "@dappnode/dappnodesdk";
 
 // Aliases
 
@@ -155,39 +165,8 @@ export interface RequestStatus {
   success?: boolean;
 }
 
-export interface SetupWizard {
-  version: "2";
-  fields: SetupWizardField[];
-}
-
-export interface SetupWizardField {
-  id: string;
-  target?: UserSettingTarget; // Allow form questions
-  // UI
-  title: string;
-  description: string;
-  secret?: boolean;
-  // Validation options
-  pattern?: string;
-  patternErrorMessage?: string;
-  enum?: string[];
-  required?: boolean;
-  if?: SetupSchema | { [id: string]: SetupSchema };
-}
-
-export type UserSettingTarget =
-  | { type: "environment"; name: string; service?: string[] | string }
-  | { type: "portMapping"; containerPort: string; service?: string }
-  | { type: "namedVolumeMountpoint"; volumeName: string }
-  | { type: "allNamedVolumesMountpoint" }
-  | { type: "fileUpload"; path: string; service?: string };
-
 export interface SetupWizardAllDnps {
   [dnpName: string]: SetupWizard;
-}
-
-export interface SetupTarget {
-  [propId: string]: UserSettingTarget;
 }
 
 export interface SetupSchemaAllDnps {
@@ -200,35 +179,6 @@ export interface SetupTargetAllDnps {
 
 export interface SetupUiJsonAllDnps {
   [dnpName: string]: SetupUiJson;
-}
-
-// Setup schema types
-
-export type SetupSchema = {
-  type?: string;
-  title?: string;
-  description?: string;
-  default?: string;
-  enum?: string[];
-  pattern?: string;
-  customErrors?: { pattern?: string };
-  required?: string[];
-  properties?: {
-    [k: string]: any;
-  };
-  dependencies?: {
-    [k: string]: any;
-  };
-  oneOf?: any[];
-};
-export interface SetupUiJson {
-  [propId: string]: {
-    "ui:widget"?: "password";
-  };
-  // SetupUiJson is a legacy non-critical type that needs to exist and be
-  // different from any so await Promise.all([ ... ]) typing works
-  // @ts-ignore
-  "ui:order"?: string[];
 }
 
 // Settings must include the previous user settings
@@ -310,7 +260,7 @@ export interface RequestedDnp {
   isUpdated: boolean;
   isInstalled: boolean;
   // Decoupled metadata
-  metadata: PackageReleaseMetadata;
+  metadata: Manifest;
   specialPermissions: SpecialPermissionAllDnps;
   // Request status and dependencies
   compatible: {
@@ -329,18 +279,6 @@ export interface RequestedDnp {
   signedSafe: Record<DnpName, { safe: boolean; message: string }>;
   /** Requested DNP plus all their dependencies are either signed or from a safe origin */
   signedSafeAll: boolean;
-}
-
-export interface GrafanaDashboard {
-  uid: string;
-}
-
-export interface PrometheusTarget {
-  targets: string[];
-  labels?: {
-    job?: string;
-    group?: string;
-  };
 }
 
 // Installing types
@@ -418,10 +356,6 @@ export interface VolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
-}
-
-export interface Dependencies {
-  [dependencyName: string]: string;
 }
 
 export type ContainerState =
@@ -573,12 +507,6 @@ export interface PackageEnvs {
   [envName: string]: string;
 }
 
-export interface ManifestUpdateAlert {
-  from: string;
-  to: string;
-  message: string;
-}
-
 interface ManifestImage {
   hash: string;
   size: number;
@@ -598,11 +526,6 @@ interface ManifestImage {
   network_mode?: string;
   command?: string;
   labels?: string[];
-}
-export interface Manifest extends PackageReleaseMetadata {
-  name: string;
-  version: string;
-  avatar?: string;
 }
 
 export interface ManifestWithImage extends Manifest {
@@ -628,12 +551,6 @@ export interface PackageRequest {
 export interface DappnodeParams {
   DNCORE_DIR: string;
   REPO_DIR: string;
-}
-
-export interface PackageBackup {
-  name: string;
-  path: string;
-  service?: string;
 }
 
 export type NotificationType = "danger" | "warning" | "success" | "info";
@@ -885,7 +802,7 @@ export interface PackageRelease {
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   // Data for release processing
-  metadata: PackageReleaseMetadata;
+  metadata: Manifest;
   compose: Compose;
   // Aditional
   warnings: ReleaseWarnings;
@@ -955,88 +872,6 @@ export interface ContainerStatus {
 export type Architecture = "linux/amd64" | "linux/arm64";
 export const architectures: Architecture[] = ["linux/amd64", "linux/arm64"];
 export const defaultArch = "linux/amd64";
-
-export interface PackageReleaseMetadata {
-  name: string;
-  version: string;
-  upstreamVersion?: string;
-  shortDescription?: string;
-  description?: string;
-
-  type?: "service" | "library" | "dncore";
-  chain?: ChainDriver;
-  mainService?: string;
-  /** "15min" | 3600 */
-  dockerTimeout?: string;
-  dependencies?: Dependencies;
-
-  requirements?: {
-    minimumDappnodeVersion: string;
-  };
-  globalEnvs?: {
-    all?: boolean;
-  };
-  architectures?: Architecture[];
-
-  // Safety properties to solve problematic updates
-  runOrder?: string[];
-  restartCommand?: string;
-  restartLaunchCommand?: string;
-
-  backup?: PackageBackup[];
-  changelog?: string;
-  warnings?: {
-    onInstall?: string;
-    onPatchUpdate?: string;
-    onMinorUpdate?: string;
-    onMajorUpdate?: string;
-    onReset?: string;
-    onRemove?: string;
-  };
-  updateAlerts?: ManifestUpdateAlert[];
-  disclaimer?: {
-    message: string;
-  };
-  gettingStarted?: string;
-  style?: {
-    featuredBackground?: string;
-    featuredColor?: string;
-    featuredAvatarFilter?: string;
-  };
-  setupWizard?: SetupWizard;
-  // Legacy setupWizardv1
-  setupSchema?: SetupSchema;
-  setupTarget?: SetupTarget;
-  setupUiJson?: SetupUiJson;
-
-  // Monitoring
-  grafanaDashboards?: GrafanaDashboard[];
-  prometheusTargets?: PrometheusTarget[];
-
-  // Network metadata
-  exposable?: ExposableServiceManifestInfo[];
-
-  author?: string;
-  contributors?: string[];
-  categories?: string[];
-  keywords?: string[];
-  links?: {
-    homepage?: string;
-    ui?: string;
-    api?: string;
-    gateway?: string;
-    [linkName: string]: string | undefined;
-  };
-  repository?: {
-    type?: string;
-    url?: string;
-    directory?: string;
-  };
-  bugs?: {
-    url: string;
-  };
-  license?: string;
-}
 
 export interface PackageReleaseImageData {
   // Mergable properties (editable)

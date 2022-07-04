@@ -14,14 +14,14 @@ import { parseEnvironment } from "./environment";
 import { parseServiceNetworks } from "./networks";
 import { getPrivateNetworkAliases } from "../../domains";
 import {
+  Manifest,
   Compose,
   ComposeService,
   ComposeServiceNetworks,
   ComposeVolumes,
   ComposeNetwork,
   ComposeNetworks
-} from "@dappnode/dappnodesdk/src/files/compose";
-import { Manifest } from "@dappnode/dappnodesdk/src/files/manifest";
+} from "@dappnode/dappnodesdk";
 import semver from "semver";
 
 interface ValidationAlert {

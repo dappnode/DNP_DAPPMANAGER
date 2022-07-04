@@ -9,7 +9,7 @@ import {
   getDevicePath
 } from "./index";
 import { PortMapping, UserSettings, VolumeMapping } from "../../types";
-import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Compose } from "@dappnode/dappnodesdk";
 import { cleanCompose, isOmitable } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb";

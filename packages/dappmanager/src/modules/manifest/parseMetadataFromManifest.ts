@@ -1,10 +1,7 @@
 import { omit } from "lodash";
 import { setupWizard1To2 } from "../setupWizard/setupWizard1To2";
-import {
-  Manifest,
-  PackageReleaseMetadata,
-  ManifestWithImage
-} from "../../types";
+import { ManifestWithImage } from "../../types";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 /**
  * Sanitize metadata from the manifest.
@@ -13,9 +10,7 @@ import {
  *
  * @param manifest
  */
-export function parseMetadataFromManifest(
-  manifest: Manifest
-): PackageReleaseMetadata {
+export function parseMetadataFromManifest(manifest: Manifest): Manifest {
   const setupWizard = manifest.setupWizard
     ? manifest.setupWizard
     : manifest.setupSchema && manifest.setupTarget

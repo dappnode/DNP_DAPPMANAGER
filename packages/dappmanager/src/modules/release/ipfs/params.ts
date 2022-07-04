@@ -1,17 +1,17 @@
 import {
-  Manifest,
-  Compose,
-  SetupTarget,
   SetupWizard,
   SetupSchema,
-  SetupUiJson,
   GrafanaDashboard,
   PrometheusTarget,
-  ReleaseSignature
-} from "../../../types";
+  SetupTarget,
+  SetupUiJson,
+  Manifest
+} from "@dappnode/dappnodesdk";
+import { ReleaseSignature } from "../../../types";
 import { releaseFiles } from "../../../params";
 import { validateManifestBasic } from "../../manifest";
 import { validateCompose } from "../../compose";
+import { Compose } from "@dappnode/dappnodesdk";
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets
 // that may be added in the future

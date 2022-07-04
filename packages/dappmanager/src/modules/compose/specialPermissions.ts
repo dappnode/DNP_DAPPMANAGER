@@ -1,5 +1,5 @@
 import { SpecialPermission } from "../../types";
-import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Compose } from "@dappnode/dappnodesdk";
 
 /**
  * Parses relevant settings in the compose that may be dangerous or grant

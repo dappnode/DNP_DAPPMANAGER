@@ -1,5 +1,5 @@
 import React from "react";
-import { SetupWizardField } from "types";
+import { SetupWizardField } from "@dappnode/dappnodesdk";
 import Input from "components/Input";
 import InputFieldSelect from "./InputFieldSelect";
 import InputFieldFile from "./InputFieldFile";

@@ -1,15 +1,15 @@
 import React from "react";
 import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
-import { PackageReleaseMetadata } from "types";
 import { AiFillBug } from "react-icons/ai";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 export function Links({
   links,
   bugs
 }: {
-  links: PackageReleaseMetadata["links"];
-  bugs: PackageReleaseMetadata["bugs"];
+  links: Manifest["links"];
+  bugs: Manifest["bugs"];
 }) {
   const linksArray =
     typeof links === "object"

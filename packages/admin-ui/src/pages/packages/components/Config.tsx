@@ -3,11 +3,8 @@ import { packageSetEnvironment } from "../actions";
 // Components
 import { SetupWizard } from "components/SetupWizard";
 // Utils
-import {
-  SetupWizard as SetupWizardType,
-  UserSettingsAllDnps,
-  UserSettings
-} from "types";
+import { SetupWizard as SetupWizardType } from "@dappnode/dappnodesdk";
+import { UserSettingsAllDnps, UserSettings } from "types";
 import { difference } from "utils/lodashExtended";
 import { PackageEnvs } from "common";
 

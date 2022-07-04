@@ -18,7 +18,7 @@ import {
   ComposeService,
   ComposeNetwork,
   ComposeServiceNetwork
-} from "@dappnode/dappnodesdk/src/files/compose";
+} from "@dappnode/dappnodesdk";
 import {
   stringifyPortMappings,
   parsePortMappings,

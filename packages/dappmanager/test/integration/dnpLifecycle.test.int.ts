@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
+import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import { mapValues, pick } from "lodash";
 import * as calls from "../../src/calls";
 import params from "../../src/params";
@@ -12,8 +13,6 @@ import {
   PackageContainer,
   PackageEnvs,
   InstalledPackageData,
-  Compose,
-  Manifest,
   PortProtocol
 } from "../../src/types";
 import {

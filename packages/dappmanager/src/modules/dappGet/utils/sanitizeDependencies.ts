@@ -1,4 +1,4 @@
-import { Dependencies } from "../../../types";
+import { Dependencies } from "@dappnode/dappnodesdk";
 import { mapValues } from "lodash";
 
 /**

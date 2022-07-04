@@ -1,6 +1,6 @@
 import { getValidator } from "../../utils/schema";
 import compose3xSchema from "./compose_v3x.schema.json";
-import { Compose } from "@dappnode/dappnodesdk/src/files/compose";
+import { Compose } from "@dappnode/dappnodesdk";
 
 /**
  * Validates a compose 3.x not strictly

@@ -1152,14 +1152,14 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
-"@dappnode/dappnodesdk@^0.2.54":
-  version "0.2.54"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.54.tgz#fc429e6c21c844e3cafb61f78b796eef106595e1"
-  integrity sha512-Unv1Ki1Rq8u2dZav4PnKtb6rK3795NMQzOdJDUt7Ny1bxAjsnnEC+zM6/NfSmXcWdlAn7w3u5nHvXFdikR6f0A==
+"@dappnode/dappnodesdk@^0.2.62":
+  version "0.2.62"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.62.tgz#ad99922cc793c3a2614ae7263056846998869fca"
+  integrity sha512-v1abDa40ztjnUQ4WtJJFKc8jwCJ7TOsSLecjXwRg/81VttadJQJsS0t3v0UKFzKYC1wam4oqFqRAfrcEGf6fTQ==
   dependencies:
     "@octokit/rest" "^18.0.12"
-    ajv "^6.12.2"
-    ajv-errors "^1.0.1"
+    ajv "^8.11.0"
+    ajv-errors "^3.0.0"
     async-retry "^1.2.3"
     chalk "^2.4.2"
     cli-progress "^3.8.2"
@@ -4489,10 +4489,10 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
-ajv-errors@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-1.0.1.tgz#f35986aceb91afadec4102fbd85014950cefa64d"
-  integrity sha512-DCRfO/4nQ+89p/RK43i8Ezd41EqdGIU4ld7nGF8OQ14oc/we5rEntLCUa7+jrn3nn83BosfwZA0wb4pon2o8iQ==
+ajv-errors@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-3.0.0.tgz#e54f299f3a3d30fe144161e5f0d8d51196c527bc"
+  integrity sha512-V3wD15YHfHz6y0KdhYFjyy9vWtEVALT9UrxfN3zqlI6dMioHnJrqOYfyPKol3oqrnCM9uwkcdCwkJ0WUcbLMTQ==
 
 ajv-formats@^2.1.1:
   version "2.1.1"
@@ -4527,6 +4527,16 @@ ajv@^8.0.0, ajv@^8.0.1, ajv@^8.6.0, ajv@^8.8.0:
   version "8.10.0"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.10.0.tgz#e573f719bd3af069017e3b66538ab968d040e54d"
   integrity sha512-bzqAEZOjkrUMl2afH8dknrq5KEk2SrwdBROR+vH1EKVQTqaUbJVPdc/gEdggTMM0Se+s+Ja4ju4TlNcStKl2Hw==
+  dependencies:
+    fast-deep-equal "^3.1.1"
+    json-schema-traverse "^1.0.0"
+    require-from-string "^2.0.2"
+    uri-js "^4.2.2"
+
+ajv@^8.11.0:
+  version "8.11.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
+  integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"

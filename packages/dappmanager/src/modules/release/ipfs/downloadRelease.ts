@@ -3,12 +3,7 @@ import memoize from "memoizee";
 import { ipfs } from "../../ipfs";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 import { manifestToCompose, validateManifestWithImage } from "../../manifest";
-import {
-  Manifest,
-  DistributedFile,
-  ManifestWithImage,
-  NodeArch
-} from "../../../types";
+import { DistributedFile, ManifestWithImage, NodeArch } from "../../../types";
 import { NoImageForArchError } from "../errors";
 import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
 import { getImageByArch } from "./getImageByArch";
@@ -18,6 +13,7 @@ import { downloadAssetRequired } from "./downloadAssets";
 import { isDirectoryRelease } from "./isDirectoryRelease";
 import { serializeIpfsDirectory } from "../releaseSignature";
 import { ReleaseDownloadedContents } from "../types";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 const source = "ipfs" as const;
 

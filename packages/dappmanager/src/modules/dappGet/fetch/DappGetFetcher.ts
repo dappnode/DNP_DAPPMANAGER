@@ -1,6 +1,6 @@
+import { Dependencies } from "@dappnode/dappnodesdk";
 import semver from "semver";
 import { ReleaseFetcher } from "../../release";
-import { Dependencies } from "../../../types";
 
 export class DappGetFetcher {
   private releaseFetcher: ReleaseFetcher;
@@ -46,9 +46,8 @@ export class DappGetFetcher {
         return [versionRange];
       } else {
         // Case 1. Valid semver range: Fetch the valid versions from APM
-        const requestedVersions = await this.releaseFetcher.fetchApmVersionsState(
-          name
-        );
+        const requestedVersions =
+          await this.releaseFetcher.fetchApmVersionsState(name);
         return Object.values(requestedVersions)
           .map(({ version }) => version)
           .filter(version => semver.satisfies(version, versionRange));

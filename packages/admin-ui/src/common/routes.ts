@@ -10,7 +10,6 @@ import {
   VolumeData,
   PortMapping,
   PackageNotification,
-  PackageBackup,
   EthClientFallback,
   NewFeatureId,
   NewFeatureStatus,
@@ -45,6 +44,7 @@ import {
   IpfsRepository,
   TrustedReleaseKey
 } from "./types";
+import { PackageBackup } from "@dappnode/dappnodesdk";
 
 export interface Routes {
   /**

@@ -1,6 +1,6 @@
+import { Compose } from "@dappnode/dappnodesdk";
 import {
   InstallPackageData,
-  Compose,
   ComposeServicesSharingPid,
   PackageContainer
 } from "../types";

@@ -1,5 +1,6 @@
 import { mapValues, omit } from "lodash";
 import semver from "semver";
+import { Manifest, SetupWizardField } from "@dappnode/dappnodesdk";
 import { listPackages } from "../modules/docker/list";
 import params from "../params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
@@ -14,9 +15,7 @@ import {
   UserSettingsAllDnps,
   CompatibleDnps,
   PackageRelease,
-  PackageReleaseMetadata,
   SetupWizardAllDnps,
-  SetupWizardField,
   SpecialPermissionAllDnps,
   InstalledPackageData
 } from "../types";
@@ -155,7 +154,7 @@ export function getIsUpdated(
 }
 
 function getRequiresCoreUpdate(
-  { metadata }: { metadata: PackageReleaseMetadata },
+  { metadata }: { metadata: Manifest },
   dnpList: InstalledPackageData[]
 ): boolean {
   const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);

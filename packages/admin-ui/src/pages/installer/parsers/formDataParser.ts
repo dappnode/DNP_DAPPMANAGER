@@ -8,7 +8,7 @@ import {
   SetupWizardAllDnps
 } from "types";
 import { SetupWizardFormDataReturn } from "../types";
-import { SetupSchema } from "types";
+import { SetupSchema } from "@dappnode/dappnodesdk";
 
 const ajv = new Ajv({ allErrors: true });
 
