@@ -28,7 +28,7 @@ export default function Warnings({
         <div>
           <div className="card-section-header">
             <span>
-              <strong>Installation warning</strong>
+              <strong>Installation Warning</strong>
             </span>
           </div>
           <div>
@@ -40,7 +40,7 @@ export default function Warnings({
         <div>
           <div className="card-section-header">
             <span>
-              <strong>Update patch warning</strong>
+              <strong>Patch Update Warning</strong>
             </span>
           </div>
           <div>
@@ -52,7 +52,7 @@ export default function Warnings({
         <div>
           <div className="card-section-header">
             <span>
-              <strong>Update minor warning</strong>
+              <strong>Minor Update Warning</strong>
             </span>
           </div>
           <div>
@@ -64,7 +64,7 @@ export default function Warnings({
         <div>
           <div className="card-section-header">
             <span>
-              <strong>Update major warning</strong>
+              <strong>Major Update Warning</strong>
             </span>
           </div>
           <div>
