@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { Compose } from "@dappnode/dappnodesdk";
 import { mockManifest, mockCompose } from "../../testUtils";
-import { parseUnsafeCompose } from "../../../src/modules/compose/unsafeCompose";
+import { setDappnodeComposeDefaults } from "../../../src/modules/compose/unsafeCompose";
 
 describe("parseUnsafeCompose", () => {
   it("Should sanitize an unsafe compose", () => {
@@ -54,7 +54,10 @@ describe("parseUnsafeCompose", () => {
       }
     };
 
-    const compose = parseUnsafeCompose(composeWithExtraProps, mockManifest);
+    const compose = setDappnodeComposeDefaults(
+      composeWithExtraProps,
+      mockManifest
+    );
 
     expect(compose).to.deep.equal(expectedCompose);
   });

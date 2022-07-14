@@ -13,7 +13,12 @@ import { downloadAssetRequired } from "./downloadAssets";
 import { isDirectoryRelease } from "./isDirectoryRelease";
 import { serializeIpfsDirectory } from "../releaseSignature";
 import { ReleaseDownloadedContents } from "../types";
-import { Manifest } from "@dappnode/dappnodesdk";
+import {
+  Manifest,
+  validateDappnodeCompose,
+  validateManifestSchema,
+  validateSetupWizardSchema
+} from "@dappnode/dappnodesdk";
 
 const source = "ipfs" as const;
 
@@ -67,6 +72,8 @@ async function downloadReleaseIpfsFn(
       const { manifest, compose, signature } = await downloadDirectoryFiles(
         files
       );
+      validateManifestSchema(manifest);
+      validateDappnodeCompose(compose, manifest);
 
       ipfs.pinAddNoThrow(hash);
 

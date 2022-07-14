@@ -72,7 +72,7 @@ const networkSafeKeys: (keyof ComposeNetwork)[] = [];
  * [NOTE] Allow but dangerous usage is tolerated by this function
  * but will generate a warning in unsafeComposeAlerts.
  */
-export function parseUnsafeCompose(
+export function setDappnodeComposeDefaults(
   composeUnsafe: Compose,
   manifest: Manifest
 ): Compose {

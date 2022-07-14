@@ -4,7 +4,7 @@ import { isEnsDomain, isIpfsHash } from "../../utils/validate";
 import { PackageRelease, ReleaseSignatureStatusCode } from "../../types";
 import { getIsCore } from "../manifest/getIsCore";
 import { parseMetadataFromManifest } from "../manifest";
-import { parseUnsafeCompose } from "../compose/unsafeCompose";
+import { setDappnodeComposeDefaults } from "../compose/unsafeCompose";
 import { ComposeEditor } from "../compose/editor";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
@@ -36,13 +36,8 @@ export async function getRelease({
   name?: string;
   origin?: string;
 }): Promise<PackageRelease> {
-  const {
-    imageFile,
-    avatarFile,
-    manifest,
-    composeUnsafe,
-    signature
-  } = await downloadRelease(hash, reqName || hash);
+  const { imageFile, avatarFile, manifest, composeUnsafe, signature } =
+    await downloadRelease(hash, reqName || hash);
 
   if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
     throw Error("DNP's name doesn't match the manifest's name");
@@ -52,7 +47,7 @@ export async function getRelease({
 
   const metadata = parseMetadataFromManifest(manifest);
   const compose = new ComposeEditor(
-    parseUnsafeCompose(composeUnsafe, manifest)
+    setDappnodeComposeDefaults(composeUnsafe, manifest)
   );
 
   const services = Object.values(compose.services());
