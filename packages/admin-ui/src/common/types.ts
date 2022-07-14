@@ -8,7 +8,8 @@ import {
   SetupTarget,
   ManifestUpdateAlert,
   PackageBackup,
-  Dependencies
+  Dependencies,
+  PackageEnvs
 } from "@dappnode/dappnodesdk";
 
 // Aliases
@@ -501,10 +502,6 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   manifest?: Manifest;
   /** Arbitrary data sent by the package */
   packageSentData: Record<string, string>;
-}
-
-export interface PackageEnvs {
-  [envName: string]: string;
 }
 
 interface ManifestImage {

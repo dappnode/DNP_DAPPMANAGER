@@ -18,7 +18,6 @@ import {
   PackageNotificationDb,
   UserActionLog,
   InstalledPackageDetailData,
-  PackageEnvs,
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
@@ -44,7 +43,7 @@ import {
   IpfsRepository,
   TrustedReleaseKey
 } from "./types";
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
 export interface Routes {
   /**

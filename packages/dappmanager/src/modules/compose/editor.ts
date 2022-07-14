@@ -12,12 +12,13 @@ import {
   omit
 } from "lodash";
 import * as getPath from "../../utils/getPath";
-import { PortMapping, PackageEnvs, ContainerLabelsRaw } from "../../types";
+import { PortMapping, ContainerLabelsRaw } from "../../types";
 import {
   Compose,
   ComposeService,
   ComposeNetwork,
-  ComposeServiceNetwork
+  ComposeServiceNetwork,
+  PackageEnvs
 } from "@dappnode/dappnodesdk";
 import {
   stringifyPortMappings,
