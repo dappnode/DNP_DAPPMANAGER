@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { PackageRequest, Manifest, PackageRelease } from "../../src/types";
+import { PackageRequest, PackageRelease } from "../../src/types";
 import { getMockEventBus } from "./eventBus";
 import rewiremock from "rewiremock";
 // Imports for typings
@@ -9,8 +9,9 @@ import { packageInstall as packageInstallType } from "../../src/calls/packageIns
 import { DappGetState } from "../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../testUtils";
 import { ReleaseFetcher } from "../../src/modules/release";
+import { Manifest } from "@dappnode/dappnodesdk";
 
-describe.skip("Call function: packageInstall", function() {
+describe.skip("Call function: packageInstall", function () {
   // Pkg data
   const pkgName = "dapp.dnp.dappnode.eth";
   const pkgVer = "0.1.1";
@@ -51,9 +52,7 @@ describe.skip("Call function: packageInstall", function() {
   const dappGetSpy = sinon.spy();
 
   class ReleaseFetcherMock extends ReleaseFetcher {
-    async getReleasesResolved(
-      req: PackageRequest
-    ): Promise<{
+    async getReleasesResolved(req: PackageRequest): Promise<{
       releases: PackageRelease[];
       message: string;
       state: DappGetState;

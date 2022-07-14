@@ -1,15 +1,14 @@
 import "mocha";
+import {
+  SetupWizardField,
+  SetupSchema,
+  SetupUiJson,
+  SetupTarget
+} from "@dappnode/dappnodesdk";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import {
-  SetupSchema,
-  SetupUiJson,
-  SetupTarget,
-  SetupWizardField
-} from "../../../src/types";
 import { yamlParse, yamlDump } from "../../../src/utils/yaml";
-
 import { setupWizard1To2 } from "../../../src/modules/setupWizard/setupWizard1To2";
 import { isNotFoundError } from "../../../src/utils/node";
 

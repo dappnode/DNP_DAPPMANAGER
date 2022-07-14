@@ -9,7 +9,8 @@ import ErrorView from "components/ErrorView";
 // Utils
 import { prettyDnpName } from "utils/format";
 import humanFS from "utils/humanFileSize";
-import { PackageBackup, ReqStatus } from "types";
+import { ReqStatus } from "types";
+import { PackageBackup } from "@dappnode/dappnodesdk";
 
 type ProgressType = { label: string; percent?: number };
 type UploadReqStatus = ReqStatus<true, ProgressType>;

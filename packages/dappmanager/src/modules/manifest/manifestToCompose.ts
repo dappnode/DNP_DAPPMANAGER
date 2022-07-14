@@ -2,7 +2,8 @@ import { pick } from "lodash";
 import { parseVolumeMappings } from "../compose/volumes";
 import { parseEnvironment } from "../compose/environment";
 import params, { getContainerName, getImageTag } from "../../params";
-import { ComposeVolumes, Compose, ManifestWithImage } from "../../types";
+import { ManifestWithImage } from "../../types";
+import { Compose, ComposeVolumes } from "@dappnode/dappnodesdk";
 import { getIsCore } from "./getIsCore";
 import { cleanCompose } from "../compose/clean";
 

@@ -5,11 +5,10 @@ import { SetupWizard } from "components/SetupWizard";
 // Utils
 import {
   SetupWizard as SetupWizardType,
-  UserSettingsAllDnps,
-  UserSettings
-} from "types";
+  PackageEnvs
+} from "@dappnode/dappnodesdk";
+import { UserSettingsAllDnps, UserSettings } from "types";
 import { difference } from "utils/lodashExtended";
-import { PackageEnvs } from "common";
 
 export function Config({
   dnpName,

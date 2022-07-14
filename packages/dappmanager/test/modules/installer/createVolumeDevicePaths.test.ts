@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { Compose } from "../../../src/types";
-
+import { Compose } from "@dappnode/dappnodesdk";
 import { getVolumeDevicePaths } from "../../../src/modules/installer/createVolumeDevicePaths";
 
 describe("Module > installer > createVolumeDevicePaths", () => {

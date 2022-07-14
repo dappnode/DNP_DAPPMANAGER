@@ -10,7 +10,6 @@ import {
   VolumeData,
   PortMapping,
   PackageNotification,
-  PackageBackup,
   EthClientFallback,
   NewFeatureId,
   NewFeatureStatus,
@@ -19,7 +18,6 @@ import {
   PackageNotificationDb,
   UserActionLog,
   InstalledPackageDetailData,
-  PackageEnvs,
   HostStatCpu,
   HostStatDisk,
   HostStatMemory,
@@ -45,6 +43,7 @@ import {
   IpfsRepository,
   TrustedReleaseKey
 } from "./types";
+import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
 export interface Routes {
   /**

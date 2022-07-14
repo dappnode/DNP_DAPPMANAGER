@@ -9,7 +9,8 @@ import ErrorView from "components/ErrorView";
 // Utils
 import { prettyDnpName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { PackageBackup, ReqStatus } from "types";
+import { PackageBackup } from "@dappnode/dappnodesdk";
+import { ReqStatus } from "types";
 
 export function BackupDownload({
   dnpName,

@@ -1,4 +1,5 @@
-import { ChainDriver, InstalledPackageData } from "../../common";
+import { InstalledPackageData } from "../../common";
+import { ChainDriver } from "@dappnode/dappnodesdk";
 
 /**
  * Get ChainDriver for a given dnp

@@ -1,5 +1,6 @@
 import { mapValues } from "lodash";
-import { Manifest, Compose, ReleaseSignature } from "../../../types";
+import { ReleaseSignature } from "../../../types";
+import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import { findEntries } from "./findEntries";
 import { downloadAsset } from "./downloadAssets";
 import { IPFSEntry } from "ipfs-core-types/src/root";

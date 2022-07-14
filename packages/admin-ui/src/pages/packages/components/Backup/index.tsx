@@ -1,10 +1,10 @@
 import React from "react";
 import Card from "components/Card";
 import Columns from "components/Columns";
-import { PackageBackup } from "types";
 import { BackupDownload } from "./Download";
 import { BackupRestore } from "./Restore";
 import "./backup.scss";
+import { PackageBackup } from "@dappnode/dappnodesdk";
 
 export function Backup({
   dnpName,

@@ -1,9 +1,10 @@
 import resolveReleaseName from "./resolveReleaseName";
 import { getRelease } from "./getRelease";
 import { getManifest } from "./getManifest";
-import { PackageRelease, PackageRequest, Manifest } from "../../types";
+import { PackageRelease, PackageRequest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
 import { Apm } from "../apm";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 export class ReleaseFetcher extends Apm {
   /**

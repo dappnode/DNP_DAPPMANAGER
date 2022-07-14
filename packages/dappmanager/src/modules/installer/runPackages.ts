@@ -67,6 +67,8 @@ export async function runPackages(
           const service = pkg.compose.services[serviceName];
           if (!service) throw Error(`No service for ${serviceName}`);
           const containerName = service.container_name;
+          if (!containerName)
+            throw Error(`No container name for ${serviceName}`);
           await copyFileTo({ containerName, dataUri, filename, toPath });
         }
     }

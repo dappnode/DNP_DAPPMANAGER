@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { ManifestWithImage, Compose } from "../../../src/types";
+import { ManifestWithImage } from "../../../src/types";
+import { Compose } from "@dappnode/dappnodesdk";
 import { mockManifestWithImage, mockCompose } from "../../testUtils";
-
 import { manifestToCompose } from "../../../src/modules/manifest";
 import { ComposeEditor } from "../../../src/modules/compose/editor";
 

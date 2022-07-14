@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { Manifest } from "../src/types";
 import { create, IPFSHTTPClient } from "ipfs-http-client";
 import { AddResult } from "ipfs-core-types/src/root";
 import { sleep } from "../src/utils/asyncFlows";
 import all from "it-all";
 import shell from "../src/utils/shell";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";
 const ipfsTestContainerName = "dappnode_ipfs_host";

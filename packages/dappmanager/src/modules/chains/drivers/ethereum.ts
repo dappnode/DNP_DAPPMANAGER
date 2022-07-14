@@ -3,7 +3,7 @@ import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
-import { ChainDriverSpecs } from "../../../types";
+import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 
@@ -27,7 +27,6 @@ export async function ethereum(
   dnp: InstalledPackageData,
   chainDriver: ChainDriverSpecs
 ): Promise<ChainDataResult | null> {
-
   // Get serviceName from chainDriverSpec and use normal method if no serviceName is defined in chainDriver
   const serviceName = chainDriver.serviceName || dnp.containers[0].serviceName;
   const executionLayerContainer = dnp.containers.find(

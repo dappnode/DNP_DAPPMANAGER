@@ -1,14 +1,11 @@
-import {
-  ChainDriver,
-  ChainDriverSpecs,
-  InstalledPackageData
-} from "../../../common";
+import { InstalledPackageData } from "../../../common";
 import { ChainDataResult } from "../types";
 // Drivers
 import { bitcoin } from "./bitcoin";
 import { ethereum } from "./ethereum";
 import { ethereum2 } from "./ethereum2";
 import { monero } from "./monero";
+import { ChainDriver, ChainDriverSpecs } from "@dappnode/dappnodesdk/src/files";
 
 /**
  * Returns chain data given a driver and api URL

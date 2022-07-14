@@ -1,3 +1,17 @@
+import {
+  Manifest,
+  SetupWizard,
+  Compose,
+  ChainDriver,
+  SetupSchema,
+  SetupUiJson,
+  SetupTarget,
+  ManifestUpdateAlert,
+  PackageBackup,
+  Dependencies,
+  PackageEnvs
+} from "@dappnode/dappnodesdk";
+
 // Aliases
 
 export type DnpName = string;
@@ -152,39 +166,8 @@ export interface RequestStatus {
   success?: boolean;
 }
 
-export interface SetupWizard {
-  version: "2";
-  fields: SetupWizardField[];
-}
-
-export interface SetupWizardField {
-  id: string;
-  target?: UserSettingTarget; // Allow form questions
-  // UI
-  title: string;
-  description: string;
-  secret?: boolean;
-  // Validation options
-  pattern?: string;
-  patternErrorMessage?: string;
-  enum?: string[];
-  required?: boolean;
-  if?: SetupSchema | { [id: string]: SetupSchema };
-}
-
-export type UserSettingTarget =
-  | { type: "environment"; name: string; service?: string[] | string }
-  | { type: "portMapping"; containerPort: string; service?: string }
-  | { type: "namedVolumeMountpoint"; volumeName: string }
-  | { type: "allNamedVolumesMountpoint" }
-  | { type: "fileUpload"; path: string; service?: string };
-
 export interface SetupWizardAllDnps {
   [dnpName: string]: SetupWizard;
-}
-
-export interface SetupTarget {
-  [propId: string]: UserSettingTarget;
 }
 
 export interface SetupSchemaAllDnps {
@@ -197,35 +180,6 @@ export interface SetupTargetAllDnps {
 
 export interface SetupUiJsonAllDnps {
   [dnpName: string]: SetupUiJson;
-}
-
-// Setup schema types
-
-export type SetupSchema = {
-  type?: string;
-  title?: string;
-  description?: string;
-  default?: string;
-  enum?: string[];
-  pattern?: string;
-  customErrors?: { pattern?: string };
-  required?: string[];
-  properties?: {
-    [k: string]: any;
-  };
-  dependencies?: {
-    [k: string]: any;
-  };
-  oneOf?: any[];
-};
-export interface SetupUiJson {
-  [propId: string]: {
-    "ui:widget"?: "password";
-  };
-  // SetupUiJson is a legacy non-critical type that needs to exist and be
-  // different from any so await Promise.all([ ... ]) typing works
-  // @ts-ignore
-  "ui:order"?: string[];
 }
 
 // Settings must include the previous user settings
@@ -307,7 +261,7 @@ export interface RequestedDnp {
   isUpdated: boolean;
   isInstalled: boolean;
   // Decoupled metadata
-  metadata: PackageReleaseMetadata;
+  metadata: Manifest;
   specialPermissions: SpecialPermissionAllDnps;
   // Request status and dependencies
   compatible: {
@@ -326,18 +280,6 @@ export interface RequestedDnp {
   signedSafe: Record<DnpName, { safe: boolean; message: string }>;
   /** Requested DNP plus all their dependencies are either signed or from a safe origin */
   signedSafeAll: boolean;
-}
-
-export interface GrafanaDashboard {
-  uid: string;
-}
-
-export interface PrometheusTarget {
-  targets: string[];
-  labels?: {
-    job?: string;
-    group?: string;
-  };
 }
 
 // Installing types
@@ -417,10 +359,6 @@ export interface VolumeMapping {
   name?: string;
 }
 
-export interface Dependencies {
-  [dependencyName: string]: string;
-}
-
 export type ContainerState =
   | "created" // created A container that has been created(e.g.with docker create) but not started
   | "restarting" // restarting A container that is in the process of being restarted
@@ -428,29 +366,6 @@ export type ContainerState =
   | "paused" // paused A container whose processes have been paused
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
   | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
-
-export type ChainDriver = ChainDriverType | ChainDriverSpecs;
-
-export type ChainDriverSpecs = {
-  driver: ChainDriverType;
-  serviceName?: string;
-  portNumber?: number;
-};
-
-export type ChainDriverType =
-  | "bitcoin"
-  | "ethereum"
-  | "ethereum-beacon-chain"
-  | "ethereum2-beacon-chain-prysm"
-  | "monero";
-
-export const chainDriversTypes: ChainDriverType[] = [
-  "bitcoin",
-  "ethereum",
-  "ethereum-beacon-chain",
-  "ethereum2-beacon-chain-prysm",
-  "monero"
-];
 
 /**
  * Type mapping of a package container labels
@@ -589,16 +504,6 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   packageSentData: Record<string, string>;
 }
 
-export interface PackageEnvs {
-  [envName: string]: string;
-}
-
-export interface ManifestUpdateAlert {
-  from: string;
-  to: string;
-  message: string;
-}
-
 interface ManifestImage {
   hash: string;
   size: number;
@@ -619,137 +524,9 @@ interface ManifestImage {
   command?: string;
   labels?: string[];
 }
-export interface Manifest extends PackageReleaseMetadata {
-  name: string;
-  version: string;
-  avatar?: string;
-}
 
 export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
-}
-
-export interface ComposeService {
-  cap_add?: string[];
-  cap_drop?: string[];
-  command?: string;
-  container_name: string; // "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  devices?: string[];
-  depends_on?: string[];
-  deploy?: ComposeServiceResources;
-  dns?: string; // "172.33.1.2";
-  entrypoint?: string;
-  env_file?: string[];
-  environment?: PackageEnvs | string[];
-  expose?: string[];
-  extra_hosts?: string[];
-  healthcheck?: {
-    test: string | string[];
-    interval?: string;
-    timeout?: string;
-    retries?: string;
-  };
-  image: string; // "dappmanager.dnp.dappnode.eth:0.2.6";
-  // ipv4_address: "172.33.1.7";
-  labels?: { [labelName: string]: string };
-  logging?: {
-    driver?: string;
-    options?: {
-      [optName: string]: string | number | null;
-    };
-  };
-  network_mode?: string;
-  networks?: ComposeServiceNetworks;
-  ports?: string[];
-  pid?: string;
-  privileged?: boolean;
-  restart?: string; // "unless-stopped";
-  stop_grace_period?: string;
-  stop_signal?: string;
-  ulimits?: { nproc: number } | { nofile: { soft: number; hard: number } };
-  user?: string;
-  volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
-  working_dir?: string;
-  security_opt?: string[];
-}
-
-/**
- * Docs: https://docs.docker.com/compose/compose-file/deploy/#resources
- */
-export interface ComposeServiceResources {
-  resources: {
-    limits?: {
-      cpus?: number | string;
-      memory?: string;
-      pids?: number;
-    };
-    reservations?: {
-      cpus?: number | string;
-      memory?: string;
-      devices?: {
-        capabilities?: string[];
-        driver?: string;
-        count?: number;
-        device_ids?: string[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        options?: { [key: string]: any };
-      };
-    };
-  };
-}
-
-export interface ComposeServiceNetwork {
-  ipv4_address?: string;
-  aliases?: string[];
-}
-
-export type ComposeServiceNetworks = string[] | ComposeServiceNetworksObj;
-
-export type ComposeServiceNetworksObj = {
-  [networkName: string]: ComposeServiceNetwork;
-};
-
-export interface ComposeNetwork {
-  external?: boolean;
-  driver?: string; // "bridge";
-  ipam?: {
-    config: {
-      /** subnet: "172.33.0.0/16" */
-      subnet: string;
-    }[];
-  };
-  name?: string;
-}
-
-export interface ComposeNetworks {
-  /** networkName: "dncore_network" */
-  [networkName: string]: ComposeNetwork | null;
-}
-
-export interface ComposeVolume {
-  // FORBIDDEN
-  // external?: boolean | { name: string }; // name: "dncore_ipfsdnpdappnodeeth_data"
-  // NOT allowed to user, only used by DAppNode internally (if any)
-  external?: boolean;
-  name?: string; // Volumes can only be declared locally or be external
-  driver?: string; // Dangerous
-  driver_opts?:
-    | { type: "none"; device: string; o: "bind" }
-    | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
-  labels?: { [labelName: string]: string }; // User should not use this feature
-}
-
-export interface ComposeVolumes {
-  /** volumeName: "dncore_ipfsdnpdappnodeeth_data" */
-  [volumeName: string]: ComposeVolume | null;
-}
-
-export interface Compose {
-  version: string; // "3.5"
-  /** dnpName: "dappmanager.dnp.dappnode.eth" */
-  services: { [dnpName: string]: ComposeService };
-  networks?: ComposeNetworks;
-  volumes?: ComposeVolumes;
 }
 
 export interface PackagePort {
@@ -771,12 +548,6 @@ export interface PackageRequest {
 export interface DappnodeParams {
   DNCORE_DIR: string;
   REPO_DIR: string;
-}
-
-export interface PackageBackup {
-  name: string;
-  path: string;
-  service?: string;
 }
 
 export type NotificationType = "danger" | "warning" | "success" | "info";
@@ -1028,7 +799,7 @@ export interface PackageRelease {
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
   // Data for release processing
-  metadata: PackageReleaseMetadata;
+  metadata: Manifest;
   compose: Compose;
   // Aditional
   warnings: ReleaseWarnings;
@@ -1098,88 +869,6 @@ export interface ContainerStatus {
 export type Architecture = "linux/amd64" | "linux/arm64";
 export const architectures: Architecture[] = ["linux/amd64", "linux/arm64"];
 export const defaultArch = "linux/amd64";
-
-export interface PackageReleaseMetadata {
-  name: string;
-  version: string;
-  upstreamVersion?: string;
-  shortDescription?: string;
-  description?: string;
-
-  type?: "service" | "library" | "dncore";
-  chain?: ChainDriver;
-  mainService?: string;
-  /** "15min" | 3600 */
-  dockerTimeout?: string;
-  dependencies?: Dependencies;
-
-  requirements?: {
-    minimumDappnodeVersion: string;
-  };
-  globalEnvs?: {
-    all?: boolean;
-  };
-  architectures?: Architecture[];
-
-  // Safety properties to solve problematic updates
-  runOrder?: string[];
-  restartCommand?: string;
-  restartLaunchCommand?: string;
-
-  backup?: PackageBackup[];
-  changelog?: string;
-  warnings?: {
-    onInstall?: string;
-    onPatchUpdate?: string;
-    onMinorUpdate?: string;
-    onMajorUpdate?: string;
-    onReset?: string;
-    onRemove?: string;
-  };
-  updateAlerts?: ManifestUpdateAlert[];
-  disclaimer?: {
-    message: string;
-  };
-  gettingStarted?: string;
-  style?: {
-    featuredBackground?: string;
-    featuredColor?: string;
-    featuredAvatarFilter?: string;
-  };
-  setupWizard?: SetupWizard;
-  // Legacy setupWizardv1
-  setupSchema?: SetupSchema;
-  setupTarget?: SetupTarget;
-  setupUiJson?: SetupUiJson;
-
-  // Monitoring
-  grafanaDashboards?: GrafanaDashboard[];
-  prometheusTargets?: PrometheusTarget[];
-
-  // Network metadata
-  exposable?: ExposableServiceManifestInfo[];
-
-  author?: string;
-  contributors?: string[];
-  categories?: string[];
-  keywords?: string[];
-  links?: {
-    homepage?: string;
-    ui?: string;
-    api?: string;
-    gateway?: string;
-    [linkName: string]: string | undefined;
-  };
-  repository?: {
-    type?: string;
-    url?: string;
-    directory?: string;
-  };
-  bugs?: {
-    url: string;
-  };
-  license?: string;
-}
 
 export interface PackageReleaseImageData {
   // Mergable properties (editable)

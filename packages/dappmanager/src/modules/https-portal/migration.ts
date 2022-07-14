@@ -16,7 +16,7 @@ import * as getPath from "../../utils/getPath";
 import { ComposeFileEditor } from "../compose/editor";
 import { PackageContainer } from "../../types";
 import { parseServiceNetworks } from "../compose/networks";
-import { ComposeNetwork, ComposeServiceNetwork } from "../../common";
+import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
 import { parseComposeSemver } from "../../utils/sanitizeVersion";
 
 /** Alias for code succinctness */

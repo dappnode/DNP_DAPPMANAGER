@@ -1,8 +1,9 @@
 import React from "react";
 import Card from "components/Card";
-import { PackageReleaseMetadata, RequestedDnp } from "types";
+import { RequestedDnp } from "types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
+import { Manifest } from "@dappnode/dappnodesdk";
 
 export default function Warnings({
   goNext,
@@ -12,7 +13,7 @@ export default function Warnings({
 }: {
   goNext: () => void;
   goBack: () => void;
-  warnings: PackageReleaseMetadata["warnings"];
+  warnings: Manifest["warnings"];
   isInstalled: RequestedDnp["isInstalled"];
 }) {
   if (!warnings)

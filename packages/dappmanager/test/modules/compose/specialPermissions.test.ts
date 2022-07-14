@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { mapValues } from "lodash";
 import { parseSpecialPermissions } from "../../../src/modules/compose/specialPermissions";
 import { mockCompose } from "../../testUtils";
-import { Compose } from "../../../src/types";
+import { Compose } from "@dappnode/dappnodesdk";
 
 describe("Modules > compose", () => {
   describe("parseSpecialPermissions", () => {

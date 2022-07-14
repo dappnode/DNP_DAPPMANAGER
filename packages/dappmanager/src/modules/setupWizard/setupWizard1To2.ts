@@ -1,12 +1,12 @@
 import { pick, omit, uniq, isEmpty } from "lodash";
 import deepmerge from "deepmerge";
 import {
-  SetupWizardField,
-  SetupTarget,
   SetupWizard,
   SetupSchema,
-  SetupUiJson
-} from "../../types";
+  SetupWizardField,
+  SetupUiJson,
+  SetupTarget
+} from "@dappnode/dappnodesdk";
 
 /**
  * Format setup wizard v1 files as a unique setup wizard v2 object

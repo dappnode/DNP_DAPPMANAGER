@@ -1,5 +1,5 @@
+import { PackageBackup } from "@dappnode/dappnodesdk";
 import path from "path";
-import { PackageBackup } from "../types";
 
 /**
  * Verify conditions on the backup array
