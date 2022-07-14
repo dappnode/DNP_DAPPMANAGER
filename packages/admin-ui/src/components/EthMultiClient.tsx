@@ -126,7 +126,7 @@ const clients: EthClientData[] = [
   {
     title: "Full node",
     description: "Your own Ethereum node w/out 3rd parties",
-    options: ["geth", "nethermind"],
+    options: ["geth", "nethermind", "besu"],
     stats: {
       syncTime: "Slow sync",
       requirements: "High requirements",
