@@ -1311,13 +1311,14 @@ export enum IpfsClientTarget {
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
  */
-export type EthClientTargetPackage = "geth-light" | "geth" | "nethermind";
+export type EthClientTargetPackage = "geth-light" | "geth" | "nethermind" | "besu";
 export type EthClientTarget = EthClientTargetPackage | "remote";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
   "geth-light",
   "geth",
-  "nethermind"
+  "nethermind",
+  "besu"
 ];
 
 /**

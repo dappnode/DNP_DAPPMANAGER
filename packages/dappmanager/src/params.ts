@@ -318,7 +318,8 @@ export const ethClientData: {
     }
   },
   geth: { dnpName: "geth.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" },
+  besu: { dnpName: "besu.public.dappnode.eth" }
 };
 
 // Naming

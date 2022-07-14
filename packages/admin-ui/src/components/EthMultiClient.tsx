@@ -29,6 +29,8 @@ export function getEthClientPrettyName(target: EthClientTarget): string {
       return "Geth";
     case "nethermind":
       return "Nethermind";
+    case "besu":
+      return "Besu";
   }
 }
 
@@ -43,6 +45,8 @@ export function getEthClientType(target: EthClientTarget): string {
       return "Light client";
     case "geth":
     case "nethermind":
+      return "Full node";
+    case "besu":
       return "Full node";
   }
 }
