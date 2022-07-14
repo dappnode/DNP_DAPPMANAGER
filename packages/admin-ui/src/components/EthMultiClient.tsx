@@ -45,7 +45,6 @@ export function getEthClientType(target: EthClientTarget): string {
       return "Light client";
     case "geth":
     case "nethermind":
-      return "Full node";
     case "besu":
       return "Full node";
   }
