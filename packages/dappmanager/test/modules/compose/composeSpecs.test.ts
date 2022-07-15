@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 import { Manifest, Compose } from "@dappnode/dappnodesdk";
 import { yamlParse, yamlDump } from "../../../src/utils/yaml";
-
 import {
   setDappnodeComposeDefaults,
   validateCompose,

@@ -19,6 +19,7 @@ import {
   validateManifestSchema,
   validateSetupWizardSchema
 } from "@dappnode/dappnodesdk";
+import { getIsCore } from "../../manifest/getIsCore";
 
 const source = "ipfs" as const;
 
@@ -73,7 +74,16 @@ async function downloadReleaseIpfsFn(
         files
       );
       validateManifestSchema(manifest);
-      validateDappnodeCompose(compose, manifest);
+      // Bypass error until publish DNP_BIND v0.2.7 (current DNP_BIND docker-compose.yml file has docker network wrong defined)
+      try {
+        validateDappnodeCompose(compose, manifest);
+      } catch (e) {
+        if (getIsCore(manifest)) {
+          console.warn(e);
+        } else {
+          throw e;
+        }
+      }
 
       ipfs.pinAddNoThrow(hash);
 

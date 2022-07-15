@@ -69,6 +69,9 @@ describe("Fetch releases", () => {
     const mainDnpManifest: ManifestWithImage = {
       name: dnpNameMain,
       version: mainVersion,
+      description: "Main DNP",
+      type: "service",
+      license: "GPL-3.0",
       avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
       image: {
         hash: "",
@@ -185,6 +188,8 @@ describe("Fetch releases", () => {
           dependencies: {
             [dnpNameDep]: dependencyReleaseHash
           },
+          description: "Main DNP",
+          license: "GPL-3.0",
           type: "service"
         },
         specialPermissions: {
@@ -286,6 +291,9 @@ describe("Fetch releases", () => {
     const mainDnpManifest: Manifest = {
       name: dnpNameMain,
       version: mainVersion,
+      description: "Main DNP",
+      license: "GPL-3.0",
+      type: "service",
       avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt"
     };
 
@@ -346,6 +354,8 @@ describe("Fetch releases", () => {
         origin: mainDnpReleaseHash,
         avatarUrl: "/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
         metadata: {
+          description: "Main DNP",
+          license: "GPL-3.0",
           name: dnpNameMain,
           version: mainVersion,
           type: "service",

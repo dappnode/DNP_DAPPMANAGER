@@ -2,6 +2,10 @@ version: "3.5"
 services:
   s1:
     container_name: DAppNodeCore-s1.sample-core.dnp.dappnode.eth
+    deploy:
+      resources:
+        limits:
+          memory: "16384M"
     dns: 172.33.1.2
     image: "s1.sample-core.dnp.dappnode.eth:0.2.33"
     logging:
@@ -19,6 +23,10 @@ services:
       - "data:/data"
   s2:
     container_name: DAppNodeCore-s2.sample-core.dnp.dappnode.eth
+    deploy:
+      resources:
+        limits:
+          memory: "16384M"
     dns: 172.33.1.2
     image: "s2.sample-core.dnp.dappnode.eth:0.2.33"
     logging:

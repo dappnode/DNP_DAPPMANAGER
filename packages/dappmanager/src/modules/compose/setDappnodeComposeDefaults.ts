@@ -1,4 +1,4 @@
-import { mapValues, toPairs, sortBy, fromPairs } from "lodash";
+import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash";
 import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";
@@ -10,7 +10,8 @@ import {
   Compose,
   ComposeService,
   ComposeServiceNetworks,
-  ComposeNetworks
+  ComposeNetworks,
+  composeSafeKeys
 } from "@dappnode/dappnodesdk";
 import semver from "semver";
 
@@ -40,7 +41,6 @@ export function setDappnodeComposeDefaults(
               }
             }
           },
-          restart: "unless-stopped",
           logging: {
             driver: "json-file",
             options: {
@@ -48,6 +48,13 @@ export function setDappnodeComposeDefaults(
               "max-file": "3"
             }
           },
+          restart: "unless-stopped",
+
+          // SAFE KEYS: values that are whitelisted
+          ...pick(
+            serviceUnsafe,
+            composeSafeKeys.filter(safeKey => safeKey !== "build")
+          ),
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults
           container_name: getContainerName({ dnpName, serviceName, isCore }),
