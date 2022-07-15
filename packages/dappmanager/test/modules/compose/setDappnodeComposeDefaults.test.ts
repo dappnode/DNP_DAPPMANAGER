@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { Compose } from "@dappnode/dappnodesdk";
 import { mockManifest, mockCompose } from "../../testUtils";
-import { setDappnodeComposeDefaults } from "../../../src/modules/compose/unsafeCompose";
+import { setDappnodeComposeDefaults } from "../../../src/modules/compose/setDappnodeComposeDefaults";
 
 describe("parseUnsafeCompose", () => {
   it("Should sanitize an unsafe compose", () => {

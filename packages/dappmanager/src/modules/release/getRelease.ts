@@ -4,7 +4,7 @@ import { isEnsDomain, isIpfsHash } from "../../utils/validate";
 import { PackageRelease, ReleaseSignatureStatusCode } from "../../types";
 import { getIsCore } from "../manifest/getIsCore";
 import { parseMetadataFromManifest } from "../manifest";
-import { setDappnodeComposeDefaults } from "../compose/unsafeCompose";
+import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefaults";
 import { ComposeEditor } from "../compose/editor";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
