@@ -174,6 +174,17 @@ const params = {
         "lighthouse-gnosis.dnp.dappnode.eth",
         "nimbus-gnosis.dnp.dappnode.eth"
       ]
+    },
+    // v0.2.52
+    {
+      prysmDnpName: "prysm.dnp.dappnode.eth",
+      prysmVersion: "1.0.25",
+      web3signerDnpName: "web3signer.dnp.dappnode.eth",
+      incompatibleClientsDnpNames: [
+        "teku.dnp.dappnode.eth",
+        "lighthouse.dnp.dappnode.eth",
+        "nimbus.dnp.dappnode.eth"
+      ]
     }
   ],
 
