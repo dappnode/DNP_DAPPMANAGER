@@ -46,7 +46,7 @@ export function BackupDownload({
   return (
     <>
       <p>
-        Download a backup of the critical files of this package in you local
+        Download a backup of the critical files of this package in your local
         machine.
       </p>
 
