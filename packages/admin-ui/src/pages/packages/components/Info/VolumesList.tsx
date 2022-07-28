@@ -79,6 +79,8 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     return null;
   }
 
+  const isTotalVolumeSizeIllDefined = volumes.some(v => !v.size);
+
   const totalVolumeSize = volumes.reduce(
     (total, vol) => total + (vol.size || 0),
     0
@@ -101,7 +103,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
             {showAll ? <BsChevronContract /> : <BsChevronExpand />}
           </span>
         </span>
-        <span>{prettyBytes(totalVolumeSize)}</span>
+        <span>{isTotalVolumeSizeIllDefined ? "-" : prettyBytes(totalVolumeSize)}</span>
 
         <BsTrash
           className="trash-icon"
