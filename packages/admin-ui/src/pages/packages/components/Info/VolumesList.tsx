@@ -79,7 +79,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     return null;
   }
 
-  const isTotalVolumeSizeIllDefined = volumes.map(v => v.size).includes(undefined);
+  const isTotalVolumeSizeIllDefined = volumes.some(v => !v.size);
 
   const totalVolumeSize = volumes.reduce(
     (total, vol) => total + (vol.size || 0),
