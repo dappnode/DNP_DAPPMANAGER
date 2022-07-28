@@ -50,11 +50,11 @@ export async function telegramTokenSet({
  * Sets a new telegram channel id into the whitelist
  */
 export async function telegramChannelIdWhitelistSet({
-  telegramChannelId
+  channelId
 }: {
-  telegramChannelId: string;
+  channelId: string;
 }): Promise<void> {
-  if (!channelIdExists(telegramChannelId)) addChannelId(telegramChannelId);
+  if (!channelIdExists(channelId)) addChannelId(channelId);
 }
 
 /**
