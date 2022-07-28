@@ -1,3 +1,8 @@
+import {
+  addChannelId,
+  channelIdExists,
+  removeChannelId
+} from "../daemons/telegramBot/commands";
 import * as db from "../db";
 import { eventBus } from "../eventBus";
 
@@ -39,4 +44,33 @@ export async function telegramTokenSet({
 }): Promise<void> {
   db.telegramToken.set(telegramToken);
   eventBus.telegramStatusChanged.emit();
+}
+
+/**
+ * Sets a new telegram channel id into the whitelist
+ */
+export async function telegramChannelIdWhitelistSet({
+  telegramChannelId
+}: {
+  telegramChannelId: string;
+}): Promise<void> {
+  if (!channelIdExists(telegramChannelId)) addChannelId(telegramChannelId);
+}
+
+/**
+ * Gets the telegram channel id whitelist
+ */
+export async function telegramChannelIdWhitelistGet(): Promise<string[]> {
+  return db.telegramChannelIds.get();
+}
+
+/**
+ * Removes a telegram channel id from the whitelist
+ */
+export async function telegramChannelIdWhitelistRemove({
+  telegramChannelId
+}: {
+  telegramChannelId: string;
+}): Promise<void> {
+  removeChannelId(telegramChannelId);
 }

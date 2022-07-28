@@ -37,6 +37,7 @@ const cmds = [
  */
 export class DappnodeTelegramBot {
   private bot: TelegramBot;
+  private whitelistChannelId: string[] = [];
 
   constructor(telegramToken: string) {
     this.bot = new TelegramBot(telegramToken);
@@ -56,6 +57,16 @@ export class DappnodeTelegramBot {
       try {
         if (!msg.text) return;
 
+        // Check it is a whitelisted channel
+        if (!channelIdExists(msg.chat.id.toString())) {
+          await this.sendMessage(
+            msg.chat.id.toString(),
+            "This channel ID is not whitelisted, closing connection"
+          );
+          await this.bot.leaveChat(msg.chat.id.toString());
+          return;
+        }
+
         if (msg.text.startsWith(enableAutoUpdatesCmd)) {
           await this.enableAutoUpdatesCmd(msg);
         } else if (msg.text.startsWith(unsubscribeCmd)) {
@@ -64,7 +75,7 @@ export class DappnodeTelegramBot {
           await this.helpCmd(msg);
         } else {
           // If channel is not subscribed yet, subscribe
-          if (!this.channelIdExists(msg.chat.id.toString())) {
+          if (!channelIdExists(msg.chat.id.toString())) {
             await this.subscribeCmd(msg);
           } else if (msg.text.startsWith(helpCmd)) {
             await this.sendMessage(
@@ -115,7 +126,7 @@ export class DappnodeTelegramBot {
     const message =
       formatTelegramCommandHeader("Success") + "Successfully saved channel ID";
 
-    this.addChannelId(chatId);
+    addChannelId(chatId);
 
     await this.sendMessage(chatId, message);
   }
@@ -126,8 +137,8 @@ export class DappnodeTelegramBot {
   private async unsubscribeCmd(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     let message = "";
-    if (this.channelIdExists(chatId)) {
-      this.removeChannelId(chatId);
+    if (channelIdExists(chatId)) {
+      removeChannelId(chatId);
 
       message =
         formatTelegramCommandHeader("Success") +
@@ -151,22 +162,22 @@ export class DappnodeTelegramBot {
 
     await this.sendMessage(chatId, message);
   }
+}
 
-  private channelIdExists(chatId: string): boolean {
-    const channelIds = db.telegramChannelIds.get();
-    return channelIds.includes(chatId);
-  }
+// Utils
 
-  private addChannelId(channelId: string): void {
-    const channelIds = db.telegramChannelIds.get();
-    channelIds.push(channelId);
-    db.telegramChannelIds.set(uniq(channelIds));
-  }
+export function channelIdExists(chatId: string): boolean {
+  const channelIds = db.telegramChannelIds.get();
+  return channelIds.includes(chatId);
+}
 
-  private removeChannelId(channelId: string): void {
-    const channelIds = db.telegramChannelIds.get();
-    db.telegramChannelIds.set(
-      channelIds.filter(chatId => chatId !== channelId)
-    );
-  }
+export function addChannelId(channelId: string): void {
+  const channelIds = db.telegramChannelIds.get();
+  channelIds.push(channelId);
+  db.telegramChannelIds.set(uniq(channelIds));
+}
+
+export function removeChannelId(channelId: string): void {
+  const channelIds = db.telegramChannelIds.get();
+  db.telegramChannelIds.set(channelIds.filter(chatId => chatId !== channelId));
 }

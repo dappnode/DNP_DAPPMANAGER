@@ -9,6 +9,9 @@ export const telegram: Pick<
   | "telegramStatusSet"
   | "telegramTokenGet"
   | "telegramTokenSet"
+  | "telegramChannelIdWhitelistGet"
+  | "telegramChannelIdWhitelistSet"
+  | "telegramChannelIdWhitelistRemove"
 > = {
   telegramStatusGet: async () => isEnabled,
   telegramStatusSet: async ({ telegramStatus }) => {
@@ -17,5 +20,11 @@ export const telegram: Pick<
   telegramTokenGet: async () => token,
   telegramTokenSet: async ({ telegramToken }) => {
     token = telegramToken;
-  }
+  },
+  telegramChannelIdWhitelistGet: async () => [
+    "h4dk49dk3nnckd8",
+    "dj3jsd93jdhcy3k"
+  ],
+  telegramChannelIdWhitelistSet: async ({ channelId }) => {},
+  telegramChannelIdWhitelistRemove: async ({ channelId }) => {}
 };
