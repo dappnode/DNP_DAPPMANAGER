@@ -4,9 +4,8 @@ import fs from "fs";
 import path from "path";
 import { Manifest, Compose } from "@dappnode/dappnodesdk";
 import { yamlParse, yamlDump } from "../../../src/utils/yaml";
-
 import {
-  parseUnsafeCompose,
+  setDappnodeComposeDefaults,
   validateCompose,
   verifyCompose
 } from "../../../src/modules/compose";
@@ -45,7 +44,7 @@ describe("Compose specs, against real DNPs", () => {
       });
 
       it("parseUnsafeCompose", () => {
-        const safeCompose = parseUnsafeCompose(unsafeCompose, manifest);
+        const safeCompose = setDappnodeComposeDefaults(unsafeCompose, manifest);
         if (!composeParsed) {
           console.log(JSON.stringify(safeCompose, null, 2));
           fs.writeFileSync(

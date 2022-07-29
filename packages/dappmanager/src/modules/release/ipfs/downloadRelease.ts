@@ -13,7 +13,13 @@ import { downloadAssetRequired } from "./downloadAssets";
 import { isDirectoryRelease } from "./isDirectoryRelease";
 import { serializeIpfsDirectory } from "../releaseSignature";
 import { ReleaseDownloadedContents } from "../types";
-import { Manifest } from "@dappnode/dappnodesdk";
+import {
+  Manifest,
+  validateDappnodeCompose,
+  validateManifestSchema,
+  validateSetupWizardSchema
+} from "@dappnode/dappnodesdk";
+import { getIsCore } from "../../manifest/getIsCore";
 
 const source = "ipfs" as const;
 
@@ -67,6 +73,17 @@ async function downloadReleaseIpfsFn(
       const { manifest, compose, signature } = await downloadDirectoryFiles(
         files
       );
+      validateManifestSchema(manifest);
+      // Bypass error until publish DNP_BIND v0.2.7 (current DNP_BIND docker-compose.yml file has docker network wrong defined)
+      try {
+        validateDappnodeCompose(compose, manifest);
+      } catch (e) {
+        if (getIsCore(manifest)) {
+          console.warn(e);
+        } else {
+          throw e;
+        }
+      }
 
       ipfs.pinAddNoThrow(hash);
 

@@ -98,6 +98,8 @@ describe("Release format tests", () => {
             manifest: {
               name: dnpName,
               version: version,
+              type: "service",
+              license: "GPL-3.0",
               description: "mock-test description"
             },
             compose: {
@@ -130,6 +132,8 @@ describe("Release format tests", () => {
             manifest: {
               name: dnpName,
               version: version,
+              type: "service",
+              license: "GPL-3.0",
               description: "mock-test description"
             },
             compose: {
@@ -175,6 +179,8 @@ describe("Release format tests", () => {
             manifest: {
               name: dnpName,
               version: version,
+              type: "service",
+              license: "GPL-3.0",
               description: "mock-test description"
             },
             compose: {

@@ -2,6 +2,10 @@ version: "3.5"
 services:
   beacon-chain:
     container_name: DAppNodePackage-beacon-chain.prysm.dnp.dappnode.eth
+    deploy:
+      resources:
+        limits:
+          memory: "16384M"
     image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "beacon-chain-data:/data"
@@ -25,6 +29,10 @@ services:
         max-size: "10m"
   validator:
     container_name: DAppNodePackage-validator.prysm.dnp.dappnode.eth
+    deploy:
+      resources:
+        limits:
+          memory: "16384M"
     image: "validator.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "validator-data:/root/"

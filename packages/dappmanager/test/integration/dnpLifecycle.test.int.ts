@@ -146,6 +146,9 @@ describe("DNP lifecycle", function () {
 
   const manifestMain: Manifest = {
     name: dnpNameMain,
+    description: "Main DNP",
+    type: "service",
+    license: "GPL-3.0",
     version: "0.1.0"
   };
   const composeMain: Compose = {
@@ -170,6 +173,9 @@ describe("DNP lifecycle", function () {
 
   const manifestDep: Manifest = {
     name: dnpNameDep,
+    description: "Main DNP",
+    type: "service",
+    license: "GPL-3.0",
     version: "0.1.0"
   };
   const composeDep: Compose = {
@@ -291,6 +297,7 @@ describe("DNP lifecycle", function () {
     const result = await calls.fetchDnpRequest({
       id: mainDnpReleaseHash
     });
+    console.log(result);
     expect(result.dnpName, "Wrong result name").to.equal(dnpNameMain);
     expect(result.compatible, "Result is not compatible").to.be.ok;
     expect(

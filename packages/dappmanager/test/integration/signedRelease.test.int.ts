@@ -20,7 +20,10 @@ describe("Sign release", () => {
 
     const mainDnpManifest: Manifest = {
       name: dnpName,
-      version
+      version,
+      description: "Main DNP",
+      type: "service",
+      license: "GPL-3.0"
     };
 
     const composeMain = new ComposeEditor({
