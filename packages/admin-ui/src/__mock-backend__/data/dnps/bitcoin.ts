@@ -43,7 +43,7 @@ export const bitcoin: MockDnp = {
     api: {
       url: "http://bitcoin.dappnode:8545"
     },
-    api-engine: {
+    apiEngine: {
       url: "http://bitcoin.dappnode:8511"
     },
     license: "GPL-3.0"
