@@ -33,6 +33,12 @@ export const bitcoin: MockDnp = {
     homepage: {
       homepage: "https://github.com/dappnode/DAppNodePackage-bitcoin#readme"
     },
+    api: {
+      url: "http://bitcoin.dnp.dappnode.eth:8545"
+    },
+    apiEngine: {
+      url: "http://bitcoin.dnp.dappnode.eth:8511"
+    },
     repository: {
       type: "git",
       url: "git+https://github.com/dappnode/DAppNodePackage-bitcoin.git"
