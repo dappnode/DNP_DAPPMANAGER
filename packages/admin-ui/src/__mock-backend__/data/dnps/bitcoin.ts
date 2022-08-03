@@ -40,6 +40,12 @@ export const bitcoin: MockDnp = {
     bugs: {
       url: "https://github.com/dappnode/DAppNodePackage-bitcoin/issues"
     },
+    api: {
+      url: "http://bitcoin.dappnode:8545"
+    },
+    api-engine: {
+      url: "http://bitcoin.dappnode:8511"
+    },
     license: "GPL-3.0"
   },
 
