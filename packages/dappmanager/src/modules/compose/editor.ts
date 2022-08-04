@@ -81,10 +81,11 @@ export class ComposeServiceEditor {
     }));
   }
 
-  mergeEnvs(newEnvs: PackageEnvs): void {
+  mergeEnvs(newEnvs: PackageEnvs | string[]): void {
+    const newEnvsParsed = parseEnvironment(newEnvs);
     this.edit(service => ({
       environment: stringifyEnvironment(
-        mergeEnvs(newEnvs, parseEnvironment(service.environment || []))
+        mergeEnvs(newEnvsParsed, parseEnvironment(service.environment || []))
       )
     }));
   }
