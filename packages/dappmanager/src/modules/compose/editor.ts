@@ -18,7 +18,8 @@ import {
   ComposeService,
   ComposeNetwork,
   ComposeServiceNetwork,
-  PackageEnvs
+  PackageEnvs,
+  Manifest
 } from "@dappnode/dappnodesdk";
 import {
   stringifyPortMappings,
@@ -36,6 +37,7 @@ import { UserSettings } from "../../types";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
+import { computeGlobalEnvsFromDb, getGlobalEnvsFilePath } from "../globalEnvs";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -158,6 +160,36 @@ export class ComposeServiceEditor {
 
   getEnvs(): PackageEnvs {
     return parseEnvironment(this.get().environment || {});
+  }
+
+  /**
+   * Set global envs to the service, there might be two types of global envs:
+   * - "all" global envs. In this case the `.env` file is injected
+   * - global envs defined for each service
+   */
+  setGlobalEnvs(
+    manifestGlobalEnvs: Manifest["globalEnvs"],
+    isCore: boolean
+  ): void {
+    if (!manifestGlobalEnvs) return;
+    if (Array.isArray(manifestGlobalEnvs)) {
+      // Add the defined global envs to the selected services
+      for (const globEnv of manifestGlobalEnvs) {
+        if (!globEnv.services.includes(this.serviceName)) continue;
+        const globalEnvsFromDb = computeGlobalEnvsFromDb();
+        if (globEnv.envs.some(env => !(env in globalEnvsFromDb)))
+          throw Error(
+            `Global envs allowed are ${Object.keys(globalEnvsFromDb).join(
+              ", "
+            )}. Got ${globEnv.envs.join(", ")}`
+          );
+
+        this.mergeEnvs(globEnv.envs);
+      }
+    } else if ((manifestGlobalEnvs || {}).all) {
+      // Add global env_file on request
+      this.addEnvFile(getGlobalEnvsFilePath(isCore));
+    }
   }
 
   addEnvFile(envFile: string): void {

@@ -8,10 +8,6 @@ import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefault
 import { ComposeEditor } from "../compose/editor";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
-import {
-  computeGlobalEnvsFromDb,
-  getGlobalEnvsFilePath
-} from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { parseTimeoutSeconds } from "../../utils/timeout";
 import { ReleaseDownloadedContents } from "./types";
@@ -55,24 +51,7 @@ export async function getRelease({
 
   const services = Object.values(compose.services());
   for (const service of services) {
-    if (Array.isArray(manifest.globalEnvs)) {
-      // Add the defined global envs to the selected services
-      for (const globEnv of manifest.globalEnvs) {
-        if (!globEnv.services.includes(service.serviceName)) continue;
-        const globalEnvsFromDb = computeGlobalEnvsFromDb();
-        if (globEnv.envs.some(env => !(env in globalEnvsFromDb)))
-          throw Error(
-            `Global envs allowed are ${Object.keys(globalEnvsFromDb).join(
-              ", "
-            )}. Got ${globEnv.envs.join(", ")}`
-          );
-
-        service.mergeEnvs(globEnv.envs);
-      }
-    } else if ((manifest.globalEnvs || {}).all) {
-      // Add global env_file on request
-      service.addEnvFile(getGlobalEnvsFilePath(isCore));
-    }
+    service.setGlobalEnvs(manifest.globalEnvs, isCore);
 
     service.mergeLabels(
       writeMetadataToLabels({
