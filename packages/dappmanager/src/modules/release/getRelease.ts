@@ -8,7 +8,6 @@ import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefault
 import { ComposeEditor } from "../compose/editor";
 import { writeMetadataToLabels } from "../compose";
 import { fileToMultiaddress } from "../../utils/distributedFile";
-import { getGlobalEnvsFilePath } from "../../modules/globalEnvs";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
 import { parseTimeoutSeconds } from "../../utils/timeout";
 import { ReleaseDownloadedContents } from "./types";
@@ -52,9 +51,7 @@ export async function getRelease({
 
   const services = Object.values(compose.services());
   for (const service of services) {
-    // Add global env_file on request
-    if ((manifest.globalEnvs || {}).all)
-      service.addEnvFile(getGlobalEnvsFilePath(isCore));
+    service.setGlobalEnvs(manifest.globalEnvs, isCore);
 
     service.mergeLabels(
       writeMetadataToLabels({

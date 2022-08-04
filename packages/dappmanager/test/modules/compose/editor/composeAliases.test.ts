@@ -44,7 +44,7 @@ volumes:
 networks:
   dncore_network:
     external: true
-`;
+  `;
 
   // Example package
   const dnpName = "example";
@@ -53,7 +53,7 @@ networks:
 
   before("Create random compose to be edited", async () => {
     // Create necessary dir
-    await shellSafe(`mkdir ${dnpRepoExamplePath}`);
+    await shellSafe(`mkdir -p ${dnpRepoExamplePath}`);
     // Create example compose
     fs.writeFileSync(
       `${dnpRepoExamplePath}/docker-compose.yml`,
@@ -61,25 +61,26 @@ networks:
     );
   });
 
-  it("Should remove alias: example.dappnode", () => {
-    const { compose, composeService, serviceNetwork } = {
-      ...getComposeEditors(dnpName, serviceName)
-    };
-    // Edit existing compose
-    composeService.removeNetworkAliases(
-      params.DNP_PRIVATE_NETWORK_NAME,
-      ["goerli-geth.dappnode"],
-      serviceNetwork
-    );
-    compose.write();
+  describe("Add/remove network aliases", () => {
+    it("Should remove alias: example.dappnode", () => {
+      const { compose, composeService, serviceNetwork } = {
+        ...getComposeEditors(dnpName, serviceName)
+      };
+      // Edit existing compose
+      composeService.removeNetworkAliases(
+        params.DNP_PRIVATE_NETWORK_NAME,
+        ["goerli-geth.dappnode"],
+        serviceNetwork
+      );
+      compose.write();
 
-    // Get edited compose
-    const composeAfter = fs.readFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      "utf-8"
-    );
+      // Get edited compose
+      const composeAfter = fs.readFileSync(
+        `${dnpRepoExamplePath}/docker-compose.yml`,
+        "utf-8"
+      );
 
-    const composeExpected = `
+      const composeExpected = `
 version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
@@ -110,31 +111,30 @@ volumes:
   goerli: {}
 networks:
   dncore_network:
-    external: true
-`;
+    external: true`;
 
-    expect(composeAfter.trim()).to.equal(composeExpected.trim());
-  });
+      expect(composeAfter.trim()).to.equal(composeExpected.trim());
+    });
 
-  it("Should add alias: goerli-geth.dappnode", () => {
-    const { compose, composeService, serviceNetwork } = {
-      ...getComposeEditors(dnpName, serviceName)
-    };
-    // Edit existing compose
-    composeService.addNetworkAliases(
-      params.DNP_PRIVATE_NETWORK_NAME,
-      ["example.dappnode"],
-      serviceNetwork
-    );
-    compose.write();
+    it("Should add alias: goerli-geth.dappnode", () => {
+      const { compose, composeService, serviceNetwork } = {
+        ...getComposeEditors(dnpName, serviceName)
+      };
+      // Edit existing compose
+      composeService.addNetworkAliases(
+        params.DNP_PRIVATE_NETWORK_NAME,
+        ["example.dappnode"],
+        serviceNetwork
+      );
+      compose.write();
 
-    // Get edited compose
-    const composeAfter = fs.readFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      "utf-8"
-    );
+      // Get edited compose
+      const composeAfter = fs.readFileSync(
+        `${dnpRepoExamplePath}/docker-compose.yml`,
+        "utf-8"
+      );
 
-    const composeExpected = `
+      const composeExpected = `
 version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
@@ -167,9 +167,127 @@ volumes:
   goerli: {}
 networks:
   dncore_network:
-    external: true
-`;
-    expect(composeAfter.trim()).to.equal(composeExpected.trim());
+    external: true`;
+      expect(composeAfter.trim()).to.equal(composeExpected.trim());
+    });
+  });
+
+  describe("Setglobal envs", () => {
+    it("Should add global env file", () => {
+      const { compose, composeService } = {
+        ...getComposeEditors(dnpName, serviceName)
+      };
+
+      // Edit existing compose
+      composeService.setGlobalEnvs({ all: true }, false);
+      compose.write();
+
+      // Get edited compose
+      const composeAfter = fs.readFileSync(
+        `${dnpRepoExamplePath}/docker-compose.yml`,
+        "utf-8"
+      );
+
+      const composeExpected = `
+version: '3.5'
+services:
+  goerli-geth.dnp.dappnode.eth:
+    container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
+    dns: 172.33.1.2
+    environment:
+      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
+    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+      dncore_network:
+        aliases:
+          - goerli-geth.dappnode
+    ports:
+      - '30303'
+      - 30303/udp
+      - 30304/udp
+    restart: always
+    volumes:
+      - 'goerli:/goerli'
+    labels:
+      dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
+      dappnode.dnp.version: 0.4.12
+    env_file:
+      - DNCORE/dnp.dappnode.global.env
+volumes:
+  goerli: {}
+networks:
+  dncore_network:
+    external: true`;
+
+      expect(composeAfter.trim()).to.equal(composeExpected.trim());
+    });
+
+    it("Should add selected global envs", () => {
+      const { compose, composeService } = {
+        ...getComposeEditors(dnpName, serviceName)
+      };
+
+      // Edit existing compose
+      composeService.setGlobalEnvs(
+        [
+          {
+            envs: ["ACTIVE", "NO_NAT_LOOPBACK"],
+            services: ["goerli-geth.dnp.dappnode.eth"]
+          }
+        ],
+        false
+      );
+      compose.write();
+
+      // Get edited compose
+      const composeAfter = fs.readFileSync(
+        `${dnpRepoExamplePath}/docker-compose.yml`,
+        "utf-8"
+      );
+
+      const composeExpected = `
+version: '3.5'
+services:
+  goerli-geth.dnp.dappnode.eth:
+    container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
+    dns: 172.33.1.2
+    environment:
+      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
+      - ACTIVE=true
+      - NO_NAT_LOOPBACK=false
+    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+      dncore_network:
+        aliases:
+          - goerli-geth.dappnode
+    ports:
+      - '30303'
+      - 30303/udp
+      - 30304/udp
+    restart: always
+    volumes:
+      - 'goerli:/goerli'
+    labels:
+      dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
+      dappnode.dnp.version: 0.4.12
+volumes:
+  goerli: {}
+networks:
+  dncore_network:
+    external: true`;
+
+      expect(composeAfter.trim()).to.equal(composeExpected.trim());
+    });
   });
 
   afterEach(() => {
