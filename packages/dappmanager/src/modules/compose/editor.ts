@@ -83,11 +83,10 @@ export class ComposeServiceEditor {
     }));
   }
 
-  mergeEnvs(newEnvs: PackageEnvs | string[]): void {
-    const newEnvsParsed = parseEnvironment(newEnvs);
+  mergeEnvs(newEnvs: PackageEnvs): void {
     this.edit(service => ({
       environment: stringifyEnvironment(
-        mergeEnvs(newEnvsParsed, parseEnvironment(service.environment || []))
+        mergeEnvs(newEnvs, parseEnvironment(service.environment || []))
       )
     }));
   }
@@ -184,7 +183,7 @@ export class ComposeServiceEditor {
             )}. Got ${globEnv.envs.join(", ")}`
           );
 
-        this.mergeEnvs(globEnv.envs);
+        this.mergeEnvs(pick(globalEnvsFromDb, globEnv.envs));
       }
     } else if ((manifestGlobalEnvs || {}).all) {
       // Add global env_file on request
