@@ -38,6 +38,7 @@ import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
 import { computeGlobalEnvsFromDb, getGlobalEnvsFilePath } from "../globalEnvs";
+import { GlobalEnvs } from "../../modules/globalEnvs";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -162,7 +163,7 @@ export class ComposeServiceEditor {
   }
 
   /**
-   * Set global envs to the service, there might be two types of global envs:
+   * Set global envs to the service (with the rpefix _DAPPNODE_GLOBAL_), there might be two types of global envs:
    * - "all" global envs. In this case the `.env` file is injected
    * - global envs defined for each service
    */
@@ -176,6 +177,7 @@ export class ComposeServiceEditor {
       for (const globEnv of manifestGlobalEnvs) {
         if (!globEnv.services.includes(this.serviceName)) continue;
         const globalEnvsFromDb = computeGlobalEnvsFromDb();
+
         if (globEnv.envs.some(env => !(env in globalEnvsFromDb)))
           throw Error(
             `Global envs allowed are ${Object.keys(globalEnvsFromDb).join(
@@ -183,7 +185,21 @@ export class ComposeServiceEditor {
             )}. Got ${globEnv.envs.join(", ")}`
           );
 
-        this.mergeEnvs(pick(globalEnvsFromDb, globEnv.envs));
+        // Rename all the keys of the object globalEnvsFromDb with the prefix _DAPPNODE_GLOBAL_
+        (Object.keys(globalEnvsFromDb) as (keyof GlobalEnvs)[]).forEach(
+          oldKey => {
+            delete Object.assign(globalEnvsFromDb, {
+              [`_DAPPNODE_GLOBAL_${oldKey}`]: globalEnvsFromDb[oldKey]
+            })[oldKey];
+          }
+        );
+
+        this.mergeEnvs(
+          pick(
+            globalEnvsFromDb,
+            globEnv.envs.map(env => `_DAPPNODE_GLOBAL_${env}`)
+          )
+        );
       }
     } else if ((manifestGlobalEnvs || {}).all) {
       // Add global env_file on request
