@@ -15,6 +15,7 @@ export * from "./systemFlags";
 export * from "./ui";
 export * from "./upnp";
 export * from "./vpn";
+export * from "./interceptGlobalEnvOnSet";
 // Aditional low levels methods
 import { dbCache, dbMain } from "./dbFactory";
 

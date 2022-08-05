@@ -3,31 +3,100 @@ import { mapKeys } from "lodash";
 import * as db from "../db";
 import params from "../params";
 import { stringifyEnvironment } from "../modules/compose";
+import { PackageEnvs } from "@dappnode/dappnodesdk";
+import { packageSetEnvironment } from "../calls";
+import { logs } from "../logs";
+import { ComposeFileEditor } from "./compose/editor";
+import { listContainers } from "./docker/list";
+
+type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
+type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
 
 export type GlobalEnvs = {
   [K in keyof typeof params.GLOBAL_ENVS]: string;
 };
 
+// Create type GlobalEnvsPrefixed where the key may be any value from GlobalEnvsValues
+export type GlobalEnvsPrefixed = {
+  [K in GlobalEnvsValues]: string;
+};
+
+export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
+
 /**
  * Compute global ENVs from DB values
  */
-export function computeGlobalEnvsFromDb(): GlobalEnvs {
+export function computeGlobalEnvsFromDb<B extends boolean>(
+  prefixed: B
+): B extends true ? GlobalEnvsPrefixed : GlobalEnvs {
+  const prefix = prefixed ? "_DAPPNODE_GLOBAL_" : "";
   return {
-    ACTIVE: "true",
-    INTERNAL_IP: db.internalIp.get(),
-    STATIC_IP: db.staticIp.get(),
-    HOSTNAME: db.staticIp.get() || db.domain.get(),
-    UPNP_AVAILABLE: db.upnpAvailable.get() ? "true" : "false",
-    NO_NAT_LOOPBACK: db.noNatLoopback.get() ? "true" : "false",
-    DOMAIN: db.domain.get(),
-    PUBKEY: db.dyndnsIdentity.get().publicKey,
-    ADDRESS: db.dyndnsIdentity.get().address,
-    PUBLIC_IP: db.publicIp.get(),
-    SERVER_NAME: db.serverName.get()
-  };
+    [`${prefix}ACTIVE`]: "true",
+    [`${prefix}INTERNAL_IP`]: db.internalIp.get(),
+    [`${prefix}STATIC_IP`]: db.staticIp.get(),
+    [`${prefix}HOSTNAME`]: db.staticIp.get() || db.domain.get(),
+    [`${prefix}UPNP_AVAILABLE`]: db.upnpAvailable.get() ? "true" : "false",
+    [`${prefix}NO_NAT_LOOPBACK`]: db.noNatLoopback.get() ? "true" : "false",
+    [`${prefix}DOMAIN`]: db.domain.get(),
+    [`${prefix}PUBKEY`]: db.dyndnsIdentity.get().publicKey,
+    [`${prefix}ADDRESS`]: db.dyndnsIdentity.get().address,
+    [`${prefix}PUBLIC_IP`]: db.publicIp.get(),
+    [`${prefix}SERVER_NAME`]: db.serverName.get()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any;
 }
 
-export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
+/**
+ * Find, update and restart all the dappnode packages that contains the given global env.
+ *
+ * globalEnvs can be used with:
+ * 1. Global env file (https://docs.docker.com/compose/environment-variables/#the-env_file-configuration-option): in this case the pkgs only needs to be restarted to make the changes take effect
+ * 2. Global envs in environment (https://docs.docker.com/compose/environment-variables/#pass-environment-variables-to-containers): in this case the pkgs needs to be updated and restarted to make the changes take effect
+ *
+ * TODO: find a proper way to restart pkgs with global envs defined in the env_file (through manifest > globalEnvs = {all: true})
+ */
+export async function updatePkgsWithGlobalEnvs(
+  globalEnvKey: string,
+  globEnvValue: string
+): Promise<void> {
+  const packages = await listContainers();
+
+  const pkgsWithGlobalEnv = packages.filter(
+    pkg =>
+      pkg.defaultEnvironment &&
+      Object.keys(pkg.defaultEnvironment).some(key => key === globalEnvKey)
+  );
+
+  if (pkgsWithGlobalEnv.length === 0) return;
+
+  logs.info(
+    `Found ${
+      pkgsWithGlobalEnv.length
+    } packages with global envs: ${pkgsWithGlobalEnv
+      .map(pkg => pkg.dnpName)
+      .join(", ")}`
+  );
+
+  for await (const pkg of pkgsWithGlobalEnv) {
+    if (!pkg.defaultEnvironment) continue;
+    const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
+    const services = Object.values(compose.services());
+    for (const service of services) {
+      const serviceEnvs = service.getEnvs();
+      if (serviceEnvs[globalEnvKey] && serviceEnvs[globalEnvKey].length > 0) {
+        const environmentByService: { [serviceName: string]: PackageEnvs } = {};
+        environmentByService[pkg.serviceName] = {
+          [globalEnvKey]: globEnvValue
+        };
+
+        await packageSetEnvironment({
+          dnpName: pkg.dnpName,
+          environmentByService
+        });
+      }
+    }
+  }
+}
 
 export function getGlobalEnvsFilePath(isCore: boolean): string {
   return isCore
@@ -39,7 +108,7 @@ export function getGlobalEnvsFilePath(isCore: boolean): string {
  * Compute global ENVs from DB values and persist it to .env file
  */
 export function writeGlobalEnvsToEnvFile(): void {
-  writeEnvFile(globalEnvsFilePath, computeGlobalEnvsFromDb());
+  writeEnvFile(globalEnvsFilePath, computeGlobalEnvsFromDb(false));
 }
 
 /**

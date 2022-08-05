@@ -38,7 +38,7 @@ import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
 import { computeGlobalEnvsFromDb, getGlobalEnvsFilePath } from "../globalEnvs";
-import { GlobalEnvs } from "../../modules/globalEnvs";
+import params from "../../params";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -164,8 +164,8 @@ export class ComposeServiceEditor {
 
   /**
    * Set global envs to the service (with the rpefix _DAPPNODE_GLOBAL_), there might be two types of global envs:
-   * - "all" global envs. In this case the `.env` file is injected
-   * - global envs defined for each service
+   * 1. Compose with global env file (https://docs.docker.com/compose/environment-variables/#the-env_file-configuration-option): in this case the pkgs only needs to be restarted to make the changes take effect
+   * 2. Compose with global envs under environment (https://docs.docker.com/compose/environment-variables/#pass-environment-variables-to-containers): in this case the pkgs needs to be updated and restarted to make the changes take effect
    */
   setGlobalEnvs(
     manifestGlobalEnvs: Manifest["globalEnvs"],
@@ -176,29 +176,24 @@ export class ComposeServiceEditor {
       // Add the defined global envs to the selected services
       for (const globEnv of manifestGlobalEnvs) {
         if (!globEnv.services.includes(this.serviceName)) continue;
-        const globalEnvsFromDb = computeGlobalEnvsFromDb();
+        const globalEnvsFromManifestPrefixed = globEnv.envs.map(
+          env => `${params.GLOBAL_ENVS_PREFIX}${env}`
+        );
+        const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
 
-        if (globEnv.envs.some(env => !(env in globalEnvsFromDb)))
+        if (
+          globalEnvsFromManifestPrefixed.some(
+            env => !(env in globalEnvsFromDbPrefixed)
+          )
+        )
           throw Error(
-            `Global envs allowed are ${Object.keys(globalEnvsFromDb).join(
-              ", "
-            )}. Got ${globEnv.envs.join(", ")}`
+            `Global envs allowed are ${Object.keys(
+              globalEnvsFromDbPrefixed
+            ).join(", ")}. Got ${globEnv.envs.join(", ")}`
           );
 
-        // Rename all the keys of the object globalEnvsFromDb with the prefix _DAPPNODE_GLOBAL_
-        (Object.keys(globalEnvsFromDb) as (keyof GlobalEnvs)[]).forEach(
-          oldKey => {
-            delete Object.assign(globalEnvsFromDb, {
-              [`_DAPPNODE_GLOBAL_${oldKey}`]: globalEnvsFromDb[oldKey]
-            })[oldKey];
-          }
-        );
-
         this.mergeEnvs(
-          pick(
-            globalEnvsFromDb,
-            globEnv.envs.map(env => `_DAPPNODE_GLOBAL_${env}`)
-          )
+          pick(globalEnvsFromDbPrefixed, globalEnvsFromManifestPrefixed)
         );
       }
     } else if ((manifestGlobalEnvs || {}).all) {

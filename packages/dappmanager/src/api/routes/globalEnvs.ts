@@ -10,7 +10,7 @@ interface Params {
  */
 export const globalEnvs = wrapHandler<Params>(async (req, res) => {
   const name = req.params.name as keyof GlobalEnvs | undefined;
-  const globalEnvs = computeGlobalEnvsFromDb();
+  const globalEnvs = computeGlobalEnvsFromDb(false);
 
   if (name) {
     // Accept both "INTERNAL_IP" and "internal_ip"

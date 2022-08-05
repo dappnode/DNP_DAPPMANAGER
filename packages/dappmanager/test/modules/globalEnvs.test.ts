@@ -9,14 +9,14 @@ import {
   writeGlobalEnvsToEnvFile
 } from "../../src/modules/globalEnvs";
 
-describe("Module > globalEnvs", function() {
+describe("Module > globalEnvs", function () {
   beforeEach(async () => {
     await cleanTestDir();
     await createTestDir();
   });
 
   it("Should compute global ENVs from an empty DB", () => {
-    const globalEnvs = computeGlobalEnvsFromDb();
+    const globalEnvs = computeGlobalEnvsFromDb(false);
     expect(globalEnvs).to.deep.include({ ACTIVE: "true", INTERNAL_IP: "" });
   });
 

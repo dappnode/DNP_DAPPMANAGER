@@ -258,6 +258,8 @@ const params = {
     PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
     SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME" // "MyDAppNode"
   },
+  // Global ENVs dappnode prefix
+  GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
 
   // nsenter line to run commands on host
   NSENTER_COMMAND:
