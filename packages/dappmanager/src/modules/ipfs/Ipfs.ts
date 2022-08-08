@@ -27,7 +27,8 @@ export class Ipfs {
       url: ipfsHost,
       timeout: this.timeout
     });
-    this.ipfsClientTarget = db.ipfsClientTarget.get();
+    if (process.env.TEST) this.ipfsClientTarget = IpfsClientTarget.local;
+    else this.ipfsClientTarget = db.ipfsClientTarget.get();
   }
 
   /**
