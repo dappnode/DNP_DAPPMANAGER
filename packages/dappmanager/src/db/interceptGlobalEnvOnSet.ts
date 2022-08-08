@@ -1,6 +1,3 @@
-// GLOBAL ENVS
-// ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
-
 import { logs } from "../logs";
 import {
   updatePkgsWithGlobalEnvs,
@@ -14,6 +11,9 @@ import params from "../params";
  * - Update the .env file
  * - Update the compose file of all dappnode packages using this global env
  * - Restart all dappnode packages using this global env
+ *
+ * Global ENVs that must be tracked:
+ * ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
  * @param dbSetter
  */
 export function interceptGlobalEnvOnSet({
@@ -21,12 +21,16 @@ export function interceptGlobalEnvOnSet({
   set,
   globEnvKey
 }: {
-  get: () => string;
-  set: (globEnvValue: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get: () => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: (globEnvValue: any) => void;
   globEnvKey: string;
 }): {
-  get: () => string;
-  set: (globEnvValue: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get: () => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  set: (globEnvValue: any) => void;
 } {
   return {
     get,

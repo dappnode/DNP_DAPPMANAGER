@@ -1,5 +1,6 @@
 import { dbCache, dbMain } from "./dbFactory";
 import { PackageVersionData } from "../types";
+import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";
@@ -11,7 +12,10 @@ const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
 
-export const serverName = dbMain.staticKey<string>(SERVER_NAME, "");
+export const serverName = interceptGlobalEnvOnSet({
+  ...dbMain.staticKey<string>(SERVER_NAME, ""),
+  globEnvKey: SERVER_NAME
+});
 
 // Domains
 
