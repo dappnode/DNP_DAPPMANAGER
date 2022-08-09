@@ -258,8 +258,8 @@ services:
     dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-      - ACTIVE=true
-      - NO_NAT_LOOPBACK=false
+      - _DAPPNODE_GLOBAL_ACTIVE=true
+      - _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK=false
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
     logging:
       driver: json-file
