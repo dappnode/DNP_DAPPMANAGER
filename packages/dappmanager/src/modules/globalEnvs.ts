@@ -41,7 +41,13 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}PUBKEY`]: db.dyndnsIdentity.get().publicKey,
     [`${prefix}ADDRESS`]: db.dyndnsIdentity.get().address,
     [`${prefix}PUBLIC_IP`]: db.publicIp.get(),
-    [`${prefix}SERVER_NAME`]: db.serverName.get()
+    [`${prefix}SERVER_NAME`]: db.serverName.get(),
+    [`${prefix}CONSENSUS_CLIENT_MAINNET`]: db.consensusClientMainnet.get(),
+    [`${prefix}EXECUTION_CLIENT_MAINNET`]: db.executionClientMainnet.get(),
+    [`${prefix}CONSENSUS_CLIENT_GNOSIS`]: db.consensusClientGnosis.get(),
+    [`${prefix}EXECUTION_CLIENT_GNOSIS`]: db.executionClientGnosis.get(),
+    [`${prefix}CONSENSUS_CLIENT_PRATER`]: db.consensusClientPrater.get(),
+    [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
