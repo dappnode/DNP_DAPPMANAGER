@@ -33,8 +33,8 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
           "nethermind.dnp.dappnode.eth",
           "erigon.dnp.dappnode.eth"
         ],
-        signers: ["web3signer.dnp.dappnode.eth"],
-        mevBoost: ["mev-geth.dnp.dappnode.eth"]
+        signer: "web3signer.dnp.dappnode.eth",
+        mevBoost: "mev-geth.dnp.dappnode.eth"
       })
     },
     {
@@ -49,7 +49,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
           "teku-gnosis.dnp.dappnode.eth"
         ],
         executionClients: ["nethermind-xdai.dnp.dappnode.eth"],
-        signers: ["web3signer-gnosis.dnp.dappnode.eth"]
+        signer: "web3signer-gnosis.dnp.dappnode.eth"
       })
     },
     {
@@ -65,7 +65,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
           "nimbus-prater.dnp.dappnode.eth"
         ],
         executionClients: ["goerli-geth.dnp.dappnode.eth"],
-        signers: ["web3signer-prater.dnp.dappnode.eth"]
+        signer: "web3signer-prater.dnp.dappnode.eth"
       })
     }
   ];
