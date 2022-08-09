@@ -15,6 +15,7 @@ import {
   MdWifi,
   MdPeople
 } from "react-icons/md";
+import { SiEthereum } from "react-icons/si";
 // URLs
 import { rootPath as dashboardRootPath } from "pages/dashboard";
 import { rootPath as devicesRootPath } from "pages/vpn";
@@ -25,6 +26,7 @@ import { rootPath as sdkRootPath } from "pages/sdk";
 import { rootPath as supportRootPath } from "pages/support";
 import { rootPath as wifiRootPath } from "pages/wifi";
 import { rootPath as communityRootPath } from "pages/community";
+import { rootPath as stakersRootPath } from "pages/stakers";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -79,6 +81,11 @@ export const sidenavItems: {
     name: "Packages",
     href: packagesRootPath,
     icon: MdFolder
+  },
+  {
+    name: "Stakers",
+    href: stakersRootPath,
+    icon: SiEthereum
   },
   {
     name: "System",
