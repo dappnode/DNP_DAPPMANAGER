@@ -1172,3 +1172,20 @@ export interface TrustedReleaseKey {
   /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
   key: string;
 }
+
+// CONSENSUS-EXECUTION CLIENTS
+
+// Mainnet
+
+export type ConensusClientMainnet = "geth" | "nethermind" | "besu" | "erigon";
+export type ExecutionClientMainnet = "prysm" | "lighthouse" | "teku" | "nimbus";
+
+// Gnosis
+
+export type ConensusClientGnosis = "nethermind";
+export type ExecutionClientGnosis = "prysm" | "lighthouse" | "teku";
+
+// Prater
+
+export type ConensusClientPrater = "geth";
+export type ExecutionClientPrater = "prysm" | "lighthouse" | "teku" | "nimbus";
