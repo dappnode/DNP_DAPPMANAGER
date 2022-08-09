@@ -7,6 +7,7 @@ import * as support from "./support";
 import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
+import * as stakers from "./stakers";
 
 export const pages = {
   dashboard,
@@ -14,6 +15,7 @@ export const pages = {
   VPN,
   installer,
   packages,
+  stakers,
   sdk,
   support,
   community,
