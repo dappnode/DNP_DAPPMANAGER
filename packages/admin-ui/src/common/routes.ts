@@ -223,6 +223,17 @@ export interface Routes {
     deletePrevEthClient?: boolean;
   }) => Promise<void>;
 
+  /** Get the execution client for a given network */
+  executionClientGet: <T extends Network>(
+    network: T
+  ) => Promise<NetworkExecutionType<T>>;
+
+  /** Set the execution client for a given network */
+  executionClientSet: <T extends Network>(
+    network: T,
+    executionClient: NetworkExecutionType<T>
+  ) => Promise<void>;
+
   /**
    * Return formated core update data
    */
@@ -692,6 +703,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerEngineUpdateCheck: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
+  executionClientGet: {},
+  executionClientSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
