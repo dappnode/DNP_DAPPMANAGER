@@ -1175,17 +1175,35 @@ export interface TrustedReleaseKey {
 
 // CONSENSUS-EXECUTION CLIENTS
 
+export type Network = "mainnet" | "prater" | "gnosis";
+
+export type NetworkConsensusType<T extends Network> = T extends "mainnet"
+  ? ConsensusClientMainnet
+  : T extends "gnosis"
+  ? ConsensusClientGnosis
+  : T extends "prater"
+  ? ConsensusClientPrater
+  : never;
+
+export type NetworkExecutionType<T extends Network> = T extends "mainnet"
+  ? ExecutionClientMainnet
+  : T extends "gnosis"
+  ? ExecutionClientGnosis
+  : T extends "prater"
+  ? ExecutionClientPrater
+  : never;
+
 // Mainnet
 
-export type ConensusClientMainnet = "geth" | "nethermind" | "besu" | "erigon";
+export type ConsensusClientMainnet = "geth" | "nethermind" | "besu" | "erigon";
 export type ExecutionClientMainnet = "prysm" | "lighthouse" | "teku" | "nimbus";
 
 // Gnosis
 
-export type ConensusClientGnosis = "nethermind";
+export type ConsensusClientGnosis = "nethermind";
 export type ExecutionClientGnosis = "prysm" | "lighthouse" | "teku";
 
 // Prater
 
-export type ConensusClientPrater = "geth";
+export type ConsensusClientPrater = "geth";
 export type ExecutionClientPrater = "prysm" | "lighthouse" | "teku" | "nimbus";

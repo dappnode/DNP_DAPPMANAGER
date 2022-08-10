@@ -1,8 +1,8 @@
 import {
   ExecutionClientMainnet,
-  ConensusClientMainnet,
+  ConsensusClientMainnet,
   ExecutionClientGnosis,
-  ConensusClientGnosis
+  ConsensusClientGnosis
 } from "../common";
 import { dbMain } from "./dbFactory";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
@@ -21,7 +21,7 @@ export const consensusClientMainnet = interceptGlobalEnvOnSet({
 });
 
 export const executionClientMainnet = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConensusClientMainnet | null>(
+  ...dbMain.staticKey<ConsensusClientMainnet | null>(
     EXECUTION_CLIENT_MAINNET,
     null
   ),
@@ -42,7 +42,7 @@ export const consensusClientGnosis = interceptGlobalEnvOnSet({
 });
 
 export const executionClientGnosis = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConensusClientGnosis | null>(
+  ...dbMain.staticKey<ConsensusClientGnosis | null>(
     EXECUTION_CLIENT_GNOSIS,
     null
   ),
