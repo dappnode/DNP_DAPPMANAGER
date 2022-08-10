@@ -3,14 +3,19 @@ import SubTitle from "components/SubTitle";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { InstalledPackageDataApiReturn } from "types";
+import {
+  InstalledPackageDataApiReturn,
+  Network,
+  NetworkConsensusType,
+  NetworkExecutionType
+} from "types";
 import { useApi } from "api";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
-import MevBoost from "./MevBoost";
-import RemoteSigner from "./RemoteSigner";
-import ConsensusClient from "./ConsensusClient";
-import ExecutionClient from "./ExecutionClient";
+import MevBoost from "./columns/MevBoost";
+import RemoteSigner from "./columns/RemoteSigner";
+import ConsensusClient from "./columns/ConsensusClient";
+import ExecutionClient from "./columns/ExecutionClient";
 
 export default function StakerNetwork({
   network,
@@ -20,7 +25,7 @@ export default function StakerNetwork({
   signer,
   mevBoost
 }: {
-  network: string;
+  network: Network;
   description: string;
   executionClients: string[];
   consensusClients: string[];
@@ -40,7 +45,22 @@ export default function StakerNetwork({
     InstalledPackageDataApiReturn
   >();
 
+  const [consensusClientSelected, setConsensusClientSelected] = useState<
+    NetworkConsensusType<typeof network>
+  >();
+
+  const [executionClientSelected, setExecutionClientSelected] = useState<
+    NetworkExecutionType<typeof network>
+  >();
+
   const dnps = useApi.packagesGet();
+  const consensusClient = useApi.consensusClientGet(network);
+  const executionClient = useApi.executionClientGet(network);
+
+  useEffect(() => {
+    if (consensusClient.data) setConsensusClientSelected(consensusClient.data);
+    if (executionClient.data) setExecutionClientSelected(executionClient.data);
+  }, [consensusClient.data, executionClient.data]);
 
   useEffect(() => {
     if (dnps.data) {
@@ -89,6 +109,13 @@ export default function StakerNetwork({
                 isInstalled={executionClientsInstalled.some(
                   el => el.dnpName === executionClient
                 )}
+                isSelected={
+                  executionClientSelected
+                    ? executionClient.includes(
+                        executionClientSelected.toString()
+                      )
+                    : false
+                }
               />
             ))}
           </Card>
@@ -102,6 +129,13 @@ export default function StakerNetwork({
                 isInstalled={consensusClientsInstalled.some(
                   cl => cl.dnpName === consensusClient
                 )}
+                isSelected={
+                  consensusClientSelected
+                    ? consensusClient.includes(
+                        consensusClientSelected.toString()
+                      )
+                    : false
+                }
               />
             ))}
           </Card>
