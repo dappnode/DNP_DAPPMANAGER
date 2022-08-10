@@ -1,18 +1,18 @@
 import React from "react";
 import Card from "components/Card";
 
-export default function ExecutionClient({
-  executionClient,
+export default function ConsensusClient({
+  consensusClient,
   isInstalled,
   isSelected
 }: {
-  executionClient: string;
+  consensusClient: string;
   isInstalled: boolean;
   isSelected: boolean;
 }) {
   return (
-    <Card>
-      <p>{executionClient}</p>
+    <Card shadow={isSelected}>
+      <p>{consensusClient}</p>
     </Card>
   );
 }
