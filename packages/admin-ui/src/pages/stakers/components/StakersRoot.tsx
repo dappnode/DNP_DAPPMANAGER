@@ -21,35 +21,15 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       title: "Mainnet",
       component: StakerNetwork({
         network: "mainnet",
-        description: "Mainnet stakers",
-        consensusClients: [
-          "prysm.dnp.dappnode.eth",
-          "lighthouse.dnp.dappnode.eth",
-          "teku.dnp.dappnode.eth",
-          "nimbus.dnp.dappnode.eth"
-        ],
-        executionClients: [
-          "geth.dnp.dappnode.eth",
-          "nethermind.dnp.dappnode.eth",
-          "erigon.dnp.dappnode.eth"
-        ],
-        signer: "web3signer.dnp.dappnode.eth",
-        mevBoost: "mev-geth.dnp.dappnode.eth"
+        description: "Mainnet stakers"
       })
     },
     {
-      subPath: "gnosis",
+      subPath: "gnoexecutionClientsis",
       title: "Gnosis chain",
       component: StakerNetwork({
         network: "gnosis",
-        description: "Gnosis stakers",
-        consensusClients: [
-          "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
-          "lighthouse-gnosis.dnp.dappnode.eth",
-          "teku-gnosis.dnp.dappnode.eth"
-        ],
-        executionClients: ["nethermind-xdai.dnp.dappnode.eth"],
-        signer: "web3signer-gnosis.dnp.dappnode.eth"
+        description: "Gnosis stakers"
       })
     },
     {
@@ -57,15 +37,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       title: "Prater",
       component: StakerNetwork({
         network: "prater",
-        description: "Prater stakers",
-        consensusClients: [
-          "prysm-prater.dnp.dappnode.eth",
-          "lighthouse-prater.dnp.dappnode.eth",
-          "teku-prater.dnp.dappnode.eth",
-          "nimbus-prater.dnp.dappnode.eth"
-        ],
-        executionClients: ["goerli-geth.dnp.dappnode.eth"],
-        signer: "web3signer-prater.dnp.dappnode.eth"
+        description: "Prater stakers"
       })
     }
   ];
