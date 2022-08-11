@@ -43,8 +43,8 @@ import {
   IpfsRepository,
   TrustedReleaseKey,
   Network,
-  NetworkConsensusType,
-  NetworkExecutionType
+  StakerConfigSet,
+  StakerConfigGet
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -128,16 +128,11 @@ export interface Routes {
     toPath: string;
   }) => Promise<void>;
 
-  /** Get the consensus client for a given network */
-  consensusClientGet: <T extends Network>(
-    network: T
-  ) => Promise<NetworkConsensusType<T>>;
+  /** Gets the staker configuration for a given network */
+  stakerConfigGet: (network: Network) => Promise<StakerConfigGet>;
 
-  /** Set the consensus client for a given network */
-  consensusClientSet: <T extends Network>(
-    network: T,
-    consensusClient: NetworkConsensusType<T>
-  ) => Promise<void>;
+  /** Sets the staker configuration for a given network */
+  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
@@ -227,17 +222,6 @@ export interface Routes {
     target: EthClientTarget;
     deletePrevEthClient?: boolean;
   }) => Promise<void>;
-
-  /** Get the execution client for a given network */
-  executionClientGet: <T extends Network>(
-    network: T
-  ) => Promise<NetworkExecutionType<T>>;
-
-  /** Set the execution client for a given network */
-  executionClientSet: <T extends Network>(
-    network: T,
-    executionClient: NetworkExecutionType<T>
-  ) => Promise<void>;
 
   /**
    * Return formated core update data
@@ -690,8 +674,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   cleanCache: {},
   cleanDb: {},
   copyFileTo: { log: true },
-  consensusClientGet: {},
-  consensusClientSet: { log: true },
+  stakerConfigGet: { log: true },
+  stakerConfigSet: { log: true },
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -708,8 +692,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerEngineUpdateCheck: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
-  executionClientGet: {},
-  executionClientSet: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
