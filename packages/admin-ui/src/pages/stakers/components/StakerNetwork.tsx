@@ -1,164 +1,204 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import SubTitle from "components/SubTitle";
+import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  InstalledPackageDataApiReturn,
-  Network,
-  NetworkConsensusType,
-  NetworkExecutionType
-} from "types";
-import { useApi } from "api";
+import { Network, StakerConfigSet } from "types";
+import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
+import { confirm } from "components/ConfirmDialog";
 import MevBoost from "./columns/MevBoost";
 import RemoteSigner from "./columns/RemoteSigner";
 import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
+import Button from "components/Button";
+import AdvanceView from "./AdvanceView";
 
 export default function StakerNetwork({
   network,
-  description,
-  executionClients,
-  consensusClients,
-  signer,
-  mevBoost
+  description
 }: {
   network: Network;
   description: string;
-  executionClients: string[];
-  consensusClients: string[];
-  signer: string;
-  mevBoost?: string;
 }) {
-  const [executionClientsInstalled, setExecutionClientsInstalled] = useState<
-    InstalledPackageDataApiReturn[]
-  >([]);
-  const [consensusClientsInstalled, setConsensusClientsInstalled] = useState<
-    InstalledPackageDataApiReturn[]
-  >([]);
-  const [signerInstalled, setSignerInstalled] = useState<
-    InstalledPackageDataApiReturn
-  >();
-  const [mevBoostInstalled, setMevBoostInstalled] = useState<
-    InstalledPackageDataApiReturn
+  // New selections
+  const [newExecClient, setNewExecClient] = useState<string>();
+  const [newConsClient, setNewConsClient] = useState<string>();
+  const [installMevBoost, setInstallMevBoost] = useState<boolean>(false);
+  const [installWeb3signer, setInstallWeb3signer] = useState<boolean>(false);
+  const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
+  const [newGraffiti, setNewGraffiti] = useState<string>();
+
+  const [currentStakerConfig, setCurrentStakerConfig] = useState<
+    StakerConfigSet
   >();
 
-  const [consensusClientSelected, setConsensusClientSelected] = useState<
-    NetworkConsensusType<typeof network>
-  >();
-
-  const [executionClientSelected, setExecutionClientSelected] = useState<
-    NetworkExecutionType<typeof network>
-  >();
-
-  const dnps = useApi.packagesGet();
-  const consensusClient = useApi.consensusClientGet(network);
-  const executionClient = useApi.executionClientGet(network);
+  const currentStakerConfigReq = useApi.stakerConfigGet(network);
 
   useEffect(() => {
-    if (consensusClient.data) setConsensusClientSelected(consensusClient.data);
-    if (executionClient.data) setExecutionClientSelected(executionClient.data);
-  }, [consensusClient.data, executionClient.data]);
+    if (currentStakerConfigReq.data) {
+      const ec =
+        currentStakerConfigReq.data.executionClients.find(
+          executionClient => executionClient.isSelected
+        )?.dnpName || "";
+      const cc =
+        currentStakerConfigReq.data.consensusClients.find(
+          consensusClient => consensusClient.isSelected
+        )?.dnpName || "";
 
-  useEffect(() => {
-    if (dnps.data) {
-      setExecutionClientsInstalled(
-        dnps.data.filter(dnp => executionClients.includes(dnp.dnpName))
-      );
-      setConsensusClientsInstalled(
-        dnps.data.filter(dnp => consensusClients.includes(dnp.dnpName))
-      );
-      setSignerInstalled(dnps.data.find(dnp => dnp.dnpName === signer));
-      if (mevBoost)
-        setMevBoostInstalled(dnps.data.find(dnp => dnp.dnpName === mevBoost));
+      // Set default values for new staker config
+      setNewExecClient(ec);
+      setNewConsClient(cc);
+      setInstallMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
+      setInstallWeb3signer(currentStakerConfigReq.data.web3signer.isInstalled);
+      setNewFeeRecipient(currentStakerConfigReq.data.feeRecipient);
+      setNewGraffiti(currentStakerConfigReq.data.graffiti);
+
+      // Set the current config to be displayed in advance view
+      setCurrentStakerConfig({
+        network,
+        executionClient: ec,
+        consensusClient: cc,
+        graffiti: currentStakerConfigReq.data.graffiti,
+        feeRecipient: currentStakerConfigReq.data.feeRecipient,
+        installMevBoost: currentStakerConfigReq.data.mevBoost.isInstalled,
+        installWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dnps.data]);
+  }, [currentStakerConfigReq, network]);
 
-  /**
-   * Set the execution client to be used:
-   * -
-   */
-  async function setExecutionClient() {
-    // TODO
+  function thereAreChanges(): boolean {
+    return newExecClient ||
+      newConsClient ||
+      installMevBoost ||
+      installWeb3signer ||
+      newFeeRecipient ||
+      newGraffiti
+      ? true
+      : false;
   }
 
   /**
-   * Set the consensus client to be used:
-   * -
+   * Set new staker config
    */
-  async function setConsensusClient() {
-    // TODO
+  async function setNewConfig() {
+    try {
+      if (thereAreChanges()) {
+        // Make sure there are changes
+        // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
+        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+          confirm({
+            title: `Removal warning`,
+            text: "Are you sure you want to set these changes?",
+            buttons: [
+              {
+                label: "Continue",
+                onClick: () => resolve(true)
+              }
+            ]
+          });
+        });
+
+        await withToast(
+          () =>
+            api.stakerConfigSet({
+              stakerConfig: {
+                network,
+                executionClient: newExecClient,
+                consensusClient: newConsClient,
+                graffiti: newGraffiti,
+                feeRecipient: newFeeRecipient,
+                installMevBoost,
+                installWeb3signer
+              }
+            }),
+          {
+            message: `Setting new staker config...`,
+            onSuccess: `Setted new staker config`
+          }
+        );
+      }
+    } catch (e) {}
   }
 
-  if (dnps.error) return <ErrorView error={dnps.error} hideIcon red />;
-  if (dnps.isValidating) return <Ok loading msg="Loading packages" />;
-  if (!dnps.data) return <ErrorView error={"No data"} hideIcon red />;
+  if (currentStakerConfigReq.error)
+    return <ErrorView error={currentStakerConfigReq.error} hideIcon red />;
+  if (currentStakerConfigReq.isValidating)
+    return <Ok loading msg="Loading packages" />;
+  if (!currentStakerConfigReq.data)
+    return <ErrorView error={"No data"} hideIcon red />;
 
   return (
-    <>
+    <Card>
       <Row>
         <Col>
           <SubTitle>Execution Clients</SubTitle>
-          <Card>
-            {executionClients.map(executionClient => (
-              <ExecutionClient
-                executionClient={executionClient}
-                isInstalled={executionClientsInstalled.some(
-                  el => el.dnpName === executionClient
-                )}
-                isSelected={
-                  executionClientSelected
-                    ? executionClient.includes(
-                        executionClientSelected.toString()
-                      )
-                    : false
-                }
-              />
-            ))}
-          </Card>
+          {currentStakerConfigReq.data.executionClients.map(executionClient => (
+            <ExecutionClient
+              executionClient={executionClient.dnpName}
+              setNewExecClient={setNewExecClient}
+              isInstalled={executionClient.isInstalled}
+              isSelected={executionClient.isSelected}
+            />
+          ))}
         </Col>
         <Col>
           <SubTitle>Consensus Clients</SubTitle>
-          <Card>
-            {consensusClients.map(consensusClient => (
-              <ConsensusClient
-                consensusClient={consensusClient}
-                isInstalled={consensusClientsInstalled.some(
-                  cl => cl.dnpName === consensusClient
-                )}
-                isSelected={
-                  consensusClientSelected
-                    ? consensusClient.includes(
-                        consensusClientSelected.toString()
-                      )
-                    : false
-                }
-              />
-            ))}
-          </Card>
+          {currentStakerConfigReq.data.consensusClients.map(consensusClient => (
+            <ConsensusClient
+              consensusClient={consensusClient.dnpName}
+              setNewConsClient={setNewConsClient}
+              isInstalled={consensusClient.isInstalled}
+              isSelected={consensusClient.isSelected}
+              currentGraffiti={currentStakerConfigReq.data?.graffiti}
+              setNewGraffiti={setNewGraffiti}
+              currentFeeRecipient={currentStakerConfigReq.data?.feeRecipient}
+              setNewFeeRecipient={setNewFeeRecipient}
+            />
+          ))}
         </Col>
 
         <Col>
           <SubTitle>Remote signer</SubTitle>
           <RemoteSigner
-            signer={signer}
-            isInstalled={signerInstalled ? true : false}
+            signer={currentStakerConfigReq.data.web3signer.dnpName}
+            setInstallWeb3signer={setInstallWeb3signer}
+            isInstalled={currentStakerConfigReq.data.web3signer.isInstalled}
           />
         </Col>
 
-        {mevBoost && (
-          <Col>
-            <SubTitle>Mev Boost</SubTitle>
-            <MevBoost
-              mevBoost={mevBoost}
-              isInstalled={mevBoostInstalled ? true : false}
-            />
-          </Col>
-        )}
+        <Col>
+          <SubTitle>Mev Boost</SubTitle>
+          <MevBoost
+            mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
+            setInstallMevBoost={setInstallMevBoost}
+            isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
+          />
+        </Col>
       </Row>
-    </>
+      <hr />
+      <div>
+        {currentStakerConfig && (
+          <AdvanceView
+            currentStakerConfig={currentStakerConfig}
+            newStakerConfig={{
+              network,
+              executionClient: newExecClient,
+              consensusClient: newConsClient,
+              graffiti: newGraffiti,
+              feeRecipient: newFeeRecipient,
+              installMevBoost,
+              installWeb3signer
+            }}
+          />
+        )}
+
+        <Button variant="dappnode" disabled={true} onClick={setNewConfig}>
+          Apply changes
+        </Button>
+      </div>
+    </Card>
   );
 }

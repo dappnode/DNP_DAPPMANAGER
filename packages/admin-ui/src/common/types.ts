@@ -1177,33 +1177,27 @@ export interface TrustedReleaseKey {
 
 export type Network = "mainnet" | "prater" | "gnosis";
 
-export type NetworkConsensusType<T extends Network> = T extends "mainnet"
-  ? ConsensusClientMainnet
-  : T extends "gnosis"
-  ? ConsensusClientGnosis
-  : T extends "prater"
-  ? ConsensusClientPrater
-  : never;
+export interface StakerConfigGet {
+  executionClients: PkgStatus[];
+  consensusClients: PkgStatus[];
+  web3signer: PkgStatus;
+  mevBoost: PkgStatus;
+  graffiti: string;
+  feeRecipient: string;
+}
 
-export type NetworkExecutionType<T extends Network> = T extends "mainnet"
-  ? ExecutionClientMainnet
-  : T extends "gnosis"
-  ? ExecutionClientGnosis
-  : T extends "prater"
-  ? ExecutionClientPrater
-  : never;
+export interface PkgStatus {
+  dnpName: string;
+  isInstalled: boolean;
+  isSelected: boolean;
+}
 
-// Mainnet
-
-export type ConsensusClientMainnet = "geth" | "nethermind" | "besu" | "erigon";
-export type ExecutionClientMainnet = "prysm" | "lighthouse" | "teku" | "nimbus";
-
-// Gnosis
-
-export type ConsensusClientGnosis = "nethermind";
-export type ExecutionClientGnosis = "prysm" | "lighthouse" | "teku";
-
-// Prater
-
-export type ConsensusClientPrater = "geth";
-export type ExecutionClientPrater = "prysm" | "lighthouse" | "teku" | "nimbus";
+export interface StakerConfigSet {
+  network: Network;
+  executionClient?: string;
+  consensusClient?: string;
+  installWeb3signer?: boolean;
+  installMevBoost?: boolean;
+  graffiti?: string;
+  feeRecipient?: string;
+}

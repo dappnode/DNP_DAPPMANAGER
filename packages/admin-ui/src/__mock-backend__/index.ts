@@ -1,4 +1,4 @@
-import { PortProtocol, Routes, IpfsClientTarget } from "../common";
+import { PortProtocol, Routes, IpfsClientTarget, Network } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
@@ -242,10 +242,160 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
   }),
-  executionClientGet: async () => "geth" as any,
-  executionClientSet: async () => {},
-  consensusClientGet: async () => "prysm" as any,
-  consensusClientSet: async () => {}
+  stakerConfigGet: async (network: Network) => {
+    switch (network) {
+      case "mainnet":
+        return {
+          executionClients: [
+            {
+              dnpName: "geth.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: true
+            },
+            {
+              dnpName: "nethermind.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "besu.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "erigon.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            }
+          ],
+          consensusClients: [
+            {
+              dnpName: "prysm.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: true
+            },
+            {
+              dnpName: "lighthouse.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "teku.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "nimbus.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            }
+          ],
+          web3signer: {
+            dnpName: "web3signer.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          mevBoost: {
+            dnpName: "mevboost.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          graffiti: "",
+          feeRecipient: ""
+        };
+      case "prater":
+        return {
+          executionClients: [
+            {
+              dnpName: "goerli-geth.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: true
+            }
+          ],
+          consensusClients: [
+            {
+              dnpName: "prysm-prater.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: true
+            },
+            {
+              dnpName: "lighthouse-prater.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "teku-prater.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "nimbus-prater.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            }
+          ],
+          web3signer: {
+            dnpName: "web3signer-prater.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          mevBoost: {
+            dnpName: "mevboost-prater.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          graffiti: "",
+          feeRecipient: ""
+        };
+
+      case "gnosis":
+        return {
+          executionClients: [
+            {
+              dnpName: "nethermind-xdai.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            }
+          ],
+          consensusClients: [
+            {
+              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: true
+            },
+            {
+              dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "teku-gnosis.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            },
+            {
+              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
+              isInstalled: true,
+              isSelected: false
+            }
+          ],
+          web3signer: {
+            dnpName: "web3signer-gnosis.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          mevBoost: {
+            dnpName: "mevboost-gnosis.dnp.dappnode.eth",
+            isInstalled: true,
+            isSelected: false
+          },
+          graffiti: "",
+          feeRecipient: ""
+        };
+    }
+  },
+
+  stakerConfigSet: async () => {}
 };
 
 export const calls: Routes = {
