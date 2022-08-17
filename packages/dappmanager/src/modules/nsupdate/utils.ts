@@ -130,7 +130,6 @@ export function getNsupdateTxts({
     if (
       container.ip &&
       container.isDnp &&
-      !container.isCore &&
       (!dnpNames || !dnpNames.length || dnpNames.includes(container.dnpName))
     )
       containersToUpdate.push({ ...container, ip: container.ip });
