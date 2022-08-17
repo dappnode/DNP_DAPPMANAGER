@@ -147,7 +147,7 @@ export function getNsupdateTxts({
     dappnode[getDotDappnodeDomain(container)] = container.ip;
     // Add multilabel IPFS domains to the IPFS container IP
     if (container.dnpName === params.ipfsDnpName)
-      dappnode[`*.${getDotDappnodeDomain(container)}.`] = container.ip;
+      dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {

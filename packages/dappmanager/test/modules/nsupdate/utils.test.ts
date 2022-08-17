@@ -9,7 +9,7 @@ import {
 import { mockContainer } from "../../testUtils";
 import { PackageContainer } from "../../../src/types";
 
-describe.only("modules > nsupdate", () => {
+describe("modules > nsupdate", () => {
   describe("getMyDotEthdomain", () => {
     const cases: { [name: string]: string } = {
       "ipfs.dnp.dappnode.eth": "my.ipfs.dnp.dappnode.eth",
@@ -142,8 +142,8 @@ update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
         dappnode: `
 update delete ipfs.dappnode A
 update add ipfs.dappnode 60 A 172.33.1.5
-update delete *.ipfs.dappnode. A
-update add *.ipfs.dappnode. 60 A 172.33.1.5
+update delete *.ipfs.dappnode A
+update add *.ipfs.dappnode 60 A 172.33.1.5
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete geth.dappnode A
@@ -175,7 +175,7 @@ update delete my.app.pinner.dnp.dappnode.eth A
 `,
         dappnode: `
 update delete ipfs.dappnode A
-update delete *.ipfs.dappnode. A
+update delete *.ipfs.dappnode A
 update delete bitcoin.dappnode A
 update delete geth.dappnode A
 update delete cluster.pinner.dappnode A
