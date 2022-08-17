@@ -6,6 +6,7 @@ import {
   stripCharacters,
   ContainerNames
 } from "../../domains";
+import { logs } from "../../logs";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -142,12 +143,15 @@ export function getNsupdateTxts({
 
   // Add domains from installed package names
   for (const container of containersToUpdate) {
+    logs.info(`Adding ${container}`);
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
     dappnode[getDotDappnodeDomain(container)] = container.ip;
     // Add multilabel IPFS domains to the IPFS container IP
-    if (container.dnpName === params.ipfsDnpName)
+    if (container.dnpName === params.ipfsDnpName) {
+      logs.info(`Container: ${container}`);
       dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
+    }
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
