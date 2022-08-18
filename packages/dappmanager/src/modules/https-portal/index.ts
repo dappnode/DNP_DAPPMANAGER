@@ -12,6 +12,7 @@ import { HttpsPortalApiClient } from "./apiClient";
 import { ComposeEditor } from "../compose/editor";
 import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose";
 import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose";
+import { eventBus } from "../../eventBus";
 export { addAliasToRunningContainersMigration } from "./migration";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable";
@@ -83,6 +84,9 @@ export class HttpsPortal {
         httpsExternalAlias
       ]);
     }
+
+    // Adds to the bind the domain:https-IP
+    eventBus.packagesModified.emit({ dnpNames: [container.dnpName] });
   }
 
   /**
@@ -120,6 +124,9 @@ export class HttpsPortal {
 
     // Edit compose to persist the setting
     removeNetworkAliasCompose(container, externalNetworkName);
+
+    // Removes from the bind the domain:https-IP
+    eventBus.packagesModified.emit({ dnpNames: [container.dnpName] });
   }
 
   async getMappings(
