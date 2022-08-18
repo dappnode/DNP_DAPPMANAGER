@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
 import { PackageContainer } from "../../types";
-import { getContainerDomain } from "../../params";
+import params, { getContainerDomain } from "../../params";
 import {
   getPrivateNetworkAlias,
   stripCharacters,
@@ -130,7 +130,6 @@ export function getNsupdateTxts({
     if (
       container.ip &&
       container.isDnp &&
-      !container.isCore &&
       (!dnpNames || !dnpNames.length || dnpNames.includes(container.dnpName))
     )
       containersToUpdate.push({ ...container, ip: container.ip });
@@ -145,6 +144,9 @@ export function getNsupdateTxts({
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
     dappnode[getDotDappnodeDomain(container)] = container.ip;
+    // Add multilabel IPFS domains to the IPFS container IP
+    if (container.dnpName === params.ipfsDnpName)
+      dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {

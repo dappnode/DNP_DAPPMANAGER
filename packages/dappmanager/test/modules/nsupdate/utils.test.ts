@@ -12,6 +12,7 @@ import { PackageContainer } from "../../../src/types";
 describe("modules > nsupdate", () => {
   describe("getMyDotEthdomain", () => {
     const cases: { [name: string]: string } = {
+      "ipfs.dnp.dappnode.eth": "my.ipfs.dnp.dappnode.eth",
       "bitcoin.dnp.dappnode.eth": "my.bitcoin.dnp.dappnode.eth",
       "artis.public.dappnode.eth": "my.artis.public.dappnode.eth",
       "ln-network.dnp.dappnode.eth": "my.ln-network.dnp.dappnode.eth",
@@ -29,6 +30,7 @@ describe("modules > nsupdate", () => {
 
   describe("getDotDappnodeDomain", () => {
     const cases: { [name: string]: string } = {
+      "ipfs.dnp.dappnode.eth": "ipfs.dappnode",
       "bitcoin.dnp.dappnode.eth": "bitcoin.dappnode",
       "artis.public.dappnode.eth": "artis.public.dappnode",
       "ln-network.dnp.dappnode.eth": "ln-network.dappnode",
@@ -79,12 +81,19 @@ send
   }
 
   describe("getNsupdateTxts", () => {
+    const ipfsDnpName = "ipfs.dnp.dappnode.eth";
     const bitcoinDnpName = "bitcoin.dnp.dappnode.eth";
     const gethDnpName = "geth.dnp.dappnode.eth";
     const pinnerDnpName = "pinner.dnp.dappnode.eth";
     const pinnerService1 = "cluster";
     const pinnerService2 = "app";
     const containers: PackageContainer[] = [
+      {
+        ...mockContainer,
+        dnpName: ipfsDnpName,
+        serviceName: ipfsDnpName,
+        ip: "172.33.1.5"
+      },
       {
         ...mockContainer,
         dnpName: bitcoinDnpName,
@@ -119,6 +128,8 @@ send
       const nsupdateTxts = getNsupdateTxts({ containers, domainAliases });
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
+update delete my.ipfs.dnp.dappnode.eth A
+update add my.ipfs.dnp.dappnode.eth 60 A 172.33.1.5
 update delete my.bitcoin.dnp.dappnode.eth A
 update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
 update delete my.geth.dnp.dappnode.eth A
@@ -129,6 +140,10 @@ update delete my.app.pinner.dnp.dappnode.eth A
 update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
 `,
         dappnode: `
+update delete ipfs.dappnode A
+update add ipfs.dappnode 60 A 172.33.1.5
+update delete *.ipfs.dappnode A
+update add *.ipfs.dappnode 60 A 172.33.1.5
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 update delete geth.dappnode A
@@ -152,12 +167,15 @@ update add fullnode.dappnode 60 A 172.33.0.3
 
       assertNsUpdateTxts(nsupdateTxts, {
         eth: `
+update delete my.ipfs.dnp.dappnode.eth A
 update delete my.bitcoin.dnp.dappnode.eth A
 update delete my.geth.dnp.dappnode.eth A
 update delete my.cluster.pinner.dnp.dappnode.eth A
 update delete my.app.pinner.dnp.dappnode.eth A
 `,
         dappnode: `
+update delete ipfs.dappnode A
+update delete *.ipfs.dappnode A
 update delete bitcoin.dappnode A
 update delete geth.dappnode A
 update delete cluster.pinner.dappnode A
