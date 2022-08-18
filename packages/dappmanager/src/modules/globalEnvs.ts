@@ -4,7 +4,7 @@ import * as db from "../db";
 import params from "../params";
 import { stringifyEnvironment } from "../modules/compose";
 import { PackageEnvs } from "@dappnode/dappnodesdk";
-import { packageSetEnvironment } from "../calls";
+import { packageSetEnvironment } from "../calls/packageSetEnvironment";
 import { logs } from "../logs";
 import { ComposeFileEditor } from "./compose/editor";
 import { listContainers } from "./docker/list";
