@@ -3,10 +3,11 @@ import params from "../../../params";
 import { PackageContainer } from "../../../types";
 import { dockerContainerInspect } from "../../docker";
 import { isRunningHttps } from "./isRunningHttps";
+import * as db from "../../../db";
 
 /**
  * Returns an array of tuples with the format
- * [ [httpsMapping, httpsContainer.ip], ... ]
+ * @returns [ [goerli-geth.f6e36f19e349b0dd.dyndns.dappnode.io, 172.33.15.0], ... ]
  */
 export async function getHttpsIpMappings(
   containersToUpdate: PackageContainer[]
@@ -21,11 +22,18 @@ export async function getHttpsIpMappings(
     const httpsIp = httpsNetworkSettings.IPAddress;
     if (!httpsIp) throw Error(`No IP for ${params.httpsContainerName}`);
 
+    // Get the dyndns identity
+    const dyndnsIdentity = db.dyndnsIdentity.get();
+    if (!dyndnsIdentity) throw Error(`No dyndns identity available`);
+
     // Get the HTTPS mappings fo the containersToUpdate
     const mappings = await httpsPortal.getMappings(containersToUpdate);
     if (!mappings) return [];
 
-    return mappings.map(mapping => [mapping.fromSubdomain, httpsIp]);
+    return mappings.map(mapping => [
+      `${mapping.fromSubdomain}.${dyndnsIdentity}`,
+      httpsIp
+    ]);
   }
   return [];
 }
