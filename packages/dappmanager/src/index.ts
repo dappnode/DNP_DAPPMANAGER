@@ -55,7 +55,9 @@ switchEthClientIfOpenethereum().catch(e =>
 );
 
 // Initialize DB
-initializeDb().catch(e => logs.error("Error inititializing Database", e));
+initializeDb()
+  .then(() => logs.info("Initialized Database"))
+  .catch(e => logs.error("Error inititializing Database", e));
 
 // Start daemons
 startDaemons(controller.signal);
