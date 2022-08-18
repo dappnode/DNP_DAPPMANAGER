@@ -6,6 +6,8 @@ import {
   stripCharacters,
   ContainerNames
 } from "../../domains";
+import { logs } from "../../logs";
+import { getHttpsIpMappings } from "../https-portal/utils/getHttpsIpMappings";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -158,6 +160,18 @@ export function getNsupdateTxts({
       dappnode[getDotDappnodeDomain(rootNames)] = container.ip;
     }
   }
+
+  // Set the containers HTTPS mappings to the HTTPS container IP (from the dncore_network)
+  //    dappnode[httpsMapping] = container.ip
+  // This would allow to use HTTPS locally without having to expose it to the internet
+  getHttpsIpMappings(containersToUpdate)
+    .then(mappings => {
+      if (mappings.length)
+        for (const mapping of mappings) dappnode[mapping[0]] = mapping[1];
+    })
+    .catch(e => {
+      logs.error(e);
+    });
 
   // Add dappnode domain alias from installed packages
   for (const container of containersToUpdate)

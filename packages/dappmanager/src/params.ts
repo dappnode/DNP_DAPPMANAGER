@@ -196,6 +196,8 @@ const params = {
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
   dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+  httpsDnpName: "https.dnp.dappnode.eth",
+  httpsContainerName: "DAppNodeCore-https.dnp.dappnode.eth",
   restartDnpName: "restart.dnp.dappnode.eth",
   vpnDnpName: "vpn.dnp.dappnode.eth",
   vpnContainerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
