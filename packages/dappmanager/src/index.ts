@@ -54,18 +54,20 @@ switchEthClientIfOpenethereum().catch(e =>
   logs.error("Error switch client openethereum", e)
 );
 
+// Initialize DB
+initializeDb().catch(e => logs.error("Error inititializing Database", e));
+
 // Start daemons
 startDaemons(controller.signal);
 
-// Copy host services
-copyHostServices().catch(e => logs.error("Error copying host services", e));
-
 Promise.all([
-  initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
+  // Copy host services
+  copyHostServices().catch(e => logs.error("Error copying host services", e)),
   copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
 ]).then(() =>
+  // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
-); // avahiDaemon uses a host script that must be copied before been initialized
+);
 
 // Create the global env file
 createGlobalEnvsEnvFile();
