@@ -126,7 +126,10 @@ export class HttpsPortal {
     removeNetworkAliasCompose(container, externalNetworkName);
 
     // Removes from the bind the domain:https-IP
-    eventBus.packagesModified.emit({ dnpNames: [container.dnpName] });
+    eventBus.packagesModified.emit({
+      dnpNames: [container.dnpName],
+      removed: true
+    });
   }
 
   async getMappings(
