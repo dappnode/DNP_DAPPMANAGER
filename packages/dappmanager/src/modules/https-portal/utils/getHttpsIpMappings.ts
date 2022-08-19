@@ -22,16 +22,16 @@ export async function getHttpsIpMappings(
     const httpsIp = httpsNetworkSettings.IPAddress;
     if (!httpsIp) throw Error(`No IP for ${params.httpsContainerName}`);
 
-    // Get the dyndns identity
-    const dyndnsIdentity = db.dyndnsIdentity.get();
-    if (!dyndnsIdentity) throw Error(`No dyndns identity available`);
+    // Get the dyndns address
+    const domain = db.domain.get();
+    if (!domain) throw Error("No domain set");
 
     // Get the HTTPS mappings fo the containersToUpdate
     const mappings = await httpsPortal.getMappings(containersToUpdate);
     if (!mappings) return [];
 
     return mappings.map(mapping => [
-      `${mapping.fromSubdomain}.${dyndnsIdentity}`,
+      `${mapping.fromSubdomain}.${domain}`,
       httpsIp
     ]);
   }
