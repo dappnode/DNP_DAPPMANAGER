@@ -96,6 +96,12 @@ export class HttpsPortal {
     const containers = await listContainers();
     const container = await this.getContainerForMapping(mapping, containers);
 
+    // Removes from the bind the domain:https-IP
+    eventBus.packagesModified.emit({
+      dnpNames: [container.dnpName],
+      removed: true
+    });
+
     const externalNetworkAlias = getExternalNetworkAlias(container);
 
     // Call Http Portal API to remove the mapping
@@ -124,12 +130,6 @@ export class HttpsPortal {
 
     // Edit compose to persist the setting
     removeNetworkAliasCompose(container, externalNetworkName);
-
-    // Removes from the bind the domain:https-IP
-    eventBus.packagesModified.emit({
-      dnpNames: [container.dnpName],
-      removed: true
-    });
   }
 
   async getMappings(
