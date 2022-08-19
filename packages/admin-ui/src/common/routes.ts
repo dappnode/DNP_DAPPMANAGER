@@ -578,6 +578,25 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
+   * Gets telegram whitelist channel IDs
+   */
+  telegramChannelIdWhitelistGet: () => Promise<string[]>;
+
+  /**
+   * Set a new telegram channel ID in the whitelist
+   */
+  telegramChannelIdWhitelistSet: (kwargs: {
+    channelId: string;
+  }) => Promise<void>;
+
+  /**
+   * Removes a telegram channel ID from the whitelist
+   */
+  telegramChannelIdWhitelistRemove: (kwargs: {
+    channelId: string;
+  }) => Promise<void>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -743,6 +762,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramStatusSet: { log: true },
   telegramTokenGet: {},
   telegramTokenSet: { log: true },
+  telegramChannelIdWhitelistGet: {},
+  telegramChannelIdWhitelistSet: { log: true },
+  telegramChannelIdWhitelistRemove: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   volumeRemove: { log: true },
