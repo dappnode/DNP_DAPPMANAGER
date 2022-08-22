@@ -1,6 +1,8 @@
 import React from "react";
 import { StakerConfigSet } from "common";
 import { BsArrowRight } from "react-icons/bs";
+import "./advance-view.scss";
+import { prettyDnpName } from "utils/format";
 
 export default function AdvanceView({
   currentStakerConfig,
@@ -12,13 +14,13 @@ export default function AdvanceView({
   const stakerConfig = [
     {
       name: "Execution Client",
-      current: currentStakerConfig.executionClient,
-      new: newStakerConfig.executionClient
+      current: prettyDnpName(currentStakerConfig.executionClient || ""),
+      new: prettyDnpName(newStakerConfig.executionClient || "")
     },
     {
       name: "Consensus Client",
-      current: currentStakerConfig.consensusClient,
-      new: newStakerConfig.consensusClient
+      current: prettyDnpName(currentStakerConfig.consensusClient || ""),
+      new: prettyDnpName(newStakerConfig.consensusClient || "")
     },
     {
       name: "Graffiti",
@@ -32,37 +34,45 @@ export default function AdvanceView({
     },
     {
       name: "Web3 Signer",
-      current: currentStakerConfig.installWeb3signer,
-      new: newStakerConfig.installWeb3signer
+      current: currentStakerConfig.enableWeb3signer ? "enabled" : "disabled",
+      new: newStakerConfig.enableWeb3signer ? "enabled" : "disabled"
     },
     {
       name: "Mev Boost",
-      current: currentStakerConfig.installMevBoost,
-      new: newStakerConfig.installMevBoost
+      current: currentStakerConfig.enableMevBoost ? "enabled" : "disabled",
+      new: newStakerConfig.enableMevBoost ? "enabled" : "disabled"
     }
   ];
   return (
-    <>
-      <div className="list-grid system-network-mappings">
-        {/* Table header */}
-        <header>CONFIG</header>
-        <header>CURRENT</header>
-        <header />
-        <header>NEW</header>
+    <div className="list-grid staker-advance-view">
+      {/* Table header */}
+      <header>CONFIG</header>
+      <header>CURRENT</header>
+      <header />
+      <header>NEW</header>
 
-        <hr />
+      <hr />
 
-        {stakerConfig.map((config, i) => (
-          <React.Fragment key={i}>
-            <span className="config">{config.name}</span>
-            <span className="current">{config.current}</span>
-            <span className="arrow">
-              <BsArrowRight />
+      {stakerConfig.map((config, i) => (
+        <React.Fragment key={i}>
+          <span className="config">
+            <span>
+              <strong>{config.name}</strong>
             </span>
-            <span className="new">{config.new}</span>
-          </React.Fragment>
-        ))}
-      </div>
-    </>
+          </span>
+          <span className="current">
+            <span>{config.current?.toString()}</span>
+          </span>
+          <span className="arrow">
+            <BsArrowRight />
+          </span>
+          <span className="new">
+            <span>{config.new}</span>
+          </span>
+        </React.Fragment>
+      ))}
+
+      <br />
+    </div>
   );
 }

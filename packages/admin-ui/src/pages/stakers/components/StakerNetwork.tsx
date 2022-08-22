@@ -26,8 +26,8 @@ export default function StakerNetwork({
   // New selections
   const [newExecClient, setNewExecClient] = useState<string>();
   const [newConsClient, setNewConsClient] = useState<string>();
-  const [installMevBoost, setInstallMevBoost] = useState<boolean>(false);
-  const [installWeb3signer, setInstallWeb3signer] = useState<boolean>(false);
+  const [enableMevBoost, setEnableMevBoost] = useState<boolean>(false);
+  const [enableWeb3signer, setEnableWeb3signer] = useState<boolean>(false);
   const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newGraffiti, setNewGraffiti] = useState<string>();
 
@@ -51,8 +51,8 @@ export default function StakerNetwork({
       // Set default values for new staker config
       setNewExecClient(ec);
       setNewConsClient(cc);
-      setInstallMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
-      setInstallWeb3signer(currentStakerConfigReq.data.web3signer.isInstalled);
+      setEnableMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
+      setEnableWeb3signer(currentStakerConfigReq.data.web3signer.isInstalled);
       setNewFeeRecipient(currentStakerConfigReq.data.feeRecipient);
       setNewGraffiti(currentStakerConfigReq.data.graffiti);
 
@@ -63,17 +63,18 @@ export default function StakerNetwork({
         consensusClient: cc,
         graffiti: currentStakerConfigReq.data.graffiti,
         feeRecipient: currentStakerConfigReq.data.feeRecipient,
-        installMevBoost: currentStakerConfigReq.data.mevBoost.isInstalled,
-        installWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
+        enableMevBoost: currentStakerConfigReq.data.mevBoost.isInstalled,
+        enableWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
       });
     }
-  }, [currentStakerConfigReq, network]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStakerConfigReq.data]);
 
   function thereAreChanges(): boolean {
     return newExecClient ||
       newConsClient ||
-      installMevBoost ||
-      installWeb3signer ||
+      enableMevBoost ||
+      enableWeb3signer ||
       newFeeRecipient ||
       newGraffiti
       ? true
@@ -110,8 +111,8 @@ export default function StakerNetwork({
                 consensusClient: newConsClient,
                 graffiti: newGraffiti,
                 feeRecipient: newFeeRecipient,
-                installMevBoost,
-                installWeb3signer
+                enableMevBoost,
+                enableWeb3signer
               }
             }),
           {
@@ -135,37 +136,47 @@ export default function StakerNetwork({
       <Row>
         <Col>
           <SubTitle>Execution Clients</SubTitle>
-          {currentStakerConfigReq.data.executionClients.map(executionClient => (
-            <ExecutionClient
-              executionClient={executionClient.dnpName}
-              setNewExecClient={setNewExecClient}
-              isInstalled={executionClient.isInstalled}
-              isSelected={executionClient.isSelected}
-            />
-          ))}
+          {currentStakerConfigReq.data.executionClients.map(
+            (executionClient, i) => (
+              <ExecutionClient
+                key={i}
+                executionClient={executionClient.dnpName}
+                setNewExecClient={setNewExecClient}
+                isInstalled={executionClient.isInstalled}
+                isSelected={
+                  executionClient.dnpName === newExecClient ? true : false
+                }
+              />
+            )
+          )}
         </Col>
         <Col>
           <SubTitle>Consensus Clients</SubTitle>
-          {currentStakerConfigReq.data.consensusClients.map(consensusClient => (
-            <ConsensusClient
-              consensusClient={consensusClient.dnpName}
-              setNewConsClient={setNewConsClient}
-              isInstalled={consensusClient.isInstalled}
-              isSelected={consensusClient.isSelected}
-              currentGraffiti={currentStakerConfigReq.data?.graffiti}
-              setNewGraffiti={setNewGraffiti}
-              currentFeeRecipient={currentStakerConfigReq.data?.feeRecipient}
-              setNewFeeRecipient={setNewFeeRecipient}
-            />
-          ))}
+          {currentStakerConfigReq.data.consensusClients.map(
+            (consensusClient, i) => (
+              <ConsensusClient
+                key={i}
+                consensusClient={consensusClient.dnpName}
+                setNewConsClient={setNewConsClient}
+                isInstalled={consensusClient.isInstalled}
+                isSelected={
+                  consensusClient.dnpName === newConsClient ? true : false
+                }
+                graffiti={newGraffiti}
+                setNewGraffiti={setNewGraffiti}
+                feeRecipient={newFeeRecipient}
+                setNewFeeRecipient={setNewFeeRecipient}
+              />
+            )
+          )}
         </Col>
 
         <Col>
           <SubTitle>Remote signer</SubTitle>
           <RemoteSigner
             signer={currentStakerConfigReq.data.web3signer.dnpName}
-            setInstallWeb3signer={setInstallWeb3signer}
-            isInstalled={currentStakerConfigReq.data.web3signer.isInstalled}
+            setEnableWeb3signer={setEnableWeb3signer}
+            enableWeb3signer={enableWeb3signer}
           />
         </Col>
 
@@ -173,12 +184,15 @@ export default function StakerNetwork({
           <SubTitle>Mev Boost</SubTitle>
           <MevBoost
             mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
-            setInstallMevBoost={setInstallMevBoost}
+            setEnableMevBoost={setEnableMevBoost}
             isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
+            enableMevBoost={enableMevBoost}
           />
         </Col>
       </Row>
+
       <hr />
+
       <div>
         {currentStakerConfig && (
           <AdvanceView
@@ -189,8 +203,8 @@ export default function StakerNetwork({
               consensusClient: newConsClient,
               graffiti: newGraffiti,
               feeRecipient: newFeeRecipient,
-              installMevBoost,
-              installWeb3signer
+              enableMevBoost,
+              enableWeb3signer
             }}
           />
         )}

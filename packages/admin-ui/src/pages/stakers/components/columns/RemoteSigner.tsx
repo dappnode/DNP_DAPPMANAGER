@@ -5,17 +5,20 @@ import { prettyDnpName } from "utils/format";
 
 export default function RemoteSigner({
   signer,
-  setInstallWeb3signer,
-  isInstalled
+  setEnableWeb3signer,
+  enableWeb3signer
 }: {
   signer: string;
-  setInstallWeb3signer: (installWeb3signer: boolean) => void;
-  isInstalled: boolean;
+  setEnableWeb3signer: (installWeb3signer: boolean) => void;
+  enableWeb3signer: boolean;
 }) {
   return (
-    <Card onClick={() => setInstallWeb3signer(true)} shadow={isInstalled}>
+    <Card
+      onClick={() => setEnableWeb3signer(!enableWeb3signer)}
+      shadow={enableWeb3signer}
+    >
       <p>{prettyDnpName(signer)}</p>
-      {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed
+      {enableWeb3signer ? <BsCircleFill /> : <BsCircle />} Enabled <br />
     </Card>
   );
 }

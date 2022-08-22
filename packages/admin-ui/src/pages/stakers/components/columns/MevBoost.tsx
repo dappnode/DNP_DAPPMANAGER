@@ -5,17 +5,23 @@ import { prettyDnpName } from "utils/format";
 
 export default function MevBoost({
   mevBoost,
-  setInstallMevBoost,
-  isInstalled
+  setEnableMevBoost,
+  isInstalled,
+  enableMevBoost
 }: {
   mevBoost: string;
-  setInstallMevBoost: (installMevBoost: boolean) => void;
+  setEnableMevBoost: (installMevBoost: boolean) => void;
   isInstalled: boolean;
+  enableMevBoost: boolean;
 }) {
   return (
-    <Card onClick={() => setInstallMevBoost(true)} shadow={isInstalled}>
+    <Card
+      onClick={() => setEnableMevBoost(!enableMevBoost)}
+      shadow={enableMevBoost}
+    >
       <p>{prettyDnpName(mevBoost)}</p>
-      {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed
+      {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed <br />
+      {enableMevBoost ? <BsCircleFill /> : <BsCircle />} Enabled
     </Card>
   );
 }
