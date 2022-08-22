@@ -94,18 +94,25 @@ export async function stakerConfigSet(
   // WEB3SIGNER
   if (pkgs.find(p => p.dnpName === web3signerAvail)) {
     logs.info("Web3Signer is already installed");
-  } else if (stakerConfig.installWeb3signer) {
+  } else if (stakerConfig.enableWeb3signer) {
     logs.info("Installing Web3Signer");
     await packageInstall({ name: web3signerAvail });
   }
 
   // MEV BOOST
-  if (pkgs.find(p => p.dnpName === mevBoostAvail)) {
-    logs.info("MevBoost is already installed");
-  } else if (stakerConfig.installMevBoost) {
-    logs.info("Installing MevBoost");
-    await packageInstall({ name: mevBoostAvail });
+  const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
+  if (stakerConfig.enableMevBoost) {
+    if (mevBoostPkg) {
+      logs.info("MevBoost is already installed");
+    } else if (stakerConfig.enableMevBoost) {
+      // Install mevboost if selected and not installed
+      logs.info("Installing MevBoost");
+      await packageInstall({ name: mevBoostAvail });
+    }
   }
+
+  // Persist the staker config on db
+  setStakerConfigOnDb(stakerConfig.network, stakerConfig);
 }
 
 /**
@@ -127,7 +134,8 @@ export async function stakerConfigGet(
     consClientsAvail,
     currentConsClient,
     web3signerAvail,
-    mevBoostAvail
+    mevBoostAvail,
+    isMevBoostSelected
   } = getNetworkStakerPkgs(network);
 
   // TODO: implement a proper try-catch error handler
@@ -158,14 +166,14 @@ export async function stakerConfigGet(
   const web3signer = {
     dnpName: web3signerAvail,
     isInstalled: pkgs.some(pkg => pkg.dnpName === web3signerAvail),
-    isSelected: false
+    isSelected: true
   };
 
   // Mevboost
   const mevBoost = {
     dnpName: mevBoostAvail,
     isInstalled: pkgs.some(pkg => pkg.dnpName === mevBoostAvail),
-    isSelected: false
+    isSelected: isMevBoostSelected
   };
 
   // Get graffiti and feerecipientAddress from the consClientInstalled (if any)
@@ -180,6 +188,7 @@ export async function stakerConfigGet(
       consensusPkgSelected.isCore
     ).getUserSettings().environment;
     if (environment) {
+      // Nimbus package is monoservice (beacon-validator)
       const validatorService = consensusPkgSelected.dnpName.includes("nimbus")
         ? "validator"
         : "beacon-validator";
@@ -201,6 +210,31 @@ export async function stakerConfigGet(
 // Utils
 
 /**
+ * Sets the staker configuration on db for a given network
+ */
+function setStakerConfigOnDb(
+  network: Network,
+  stakerConfig: StakerConfigSet
+): Promise<void> {
+  switch (network) {
+    case "mainnet":
+      db.executionClientMainnet.set(stakerConfig.executionClient);
+      db.consensusClientMainnet.set(stakerConfig.consensusClient);
+      db.mevBoostMainnet.set(stakerConfig.enableMevBoost);
+    case "gnosis":
+      db.executionClientGnosis.set(stakerConfig.executionClient);
+      db.consensusClientGnosis.set(stakerConfig.consensusClient);
+      db.mevBoostGnosis.set(stakerConfig.enableMevBoost);
+    case "prater":
+      db.executionClientPrater.set(stakerConfig.executionClient);
+      db.consensusClientPrater.set(stakerConfig.consensusClient);
+      db.mevBoostPrater.set(stakerConfig.enableMevBoost);
+    default:
+      throw new Error("Unknown network");
+  }
+}
+
+/**
  * Get the current staker config (execution and consensus clients selected) as well as
  * the pkgs available for each network
  */
@@ -211,6 +245,7 @@ function getNetworkStakerPkgs(network: Network): {
   currentConsClient: string;
   web3signerAvail: string;
   mevBoostAvail: string;
+  isMevBoostSelected: boolean;
 } {
   switch (network) {
     case "mainnet":
@@ -230,7 +265,8 @@ function getNetworkStakerPkgs(network: Network): {
         ],
         currentConsClient: db.consensusClientMainnet.get(),
         web3signerAvail: "web3signer.dnp.dappnode.eth",
-        mevBoostAvail: "mevboost.dnp.dappnode.eth"
+        mevBoostAvail: "mevboost.dnp.dappnode.eth",
+        isMevBoostSelected: db.mevBoostMainnet.get()
       };
 
     case "gnosis":
@@ -244,7 +280,8 @@ function getNetworkStakerPkgs(network: Network): {
         ],
         currentConsClient: db.consensusClientGnosis.get(),
         web3signerAvail: "web3signer-gnosis.dnp.dappnode.eth",
-        mevBoostAvail: "mevboost-gnosis.dnp.dappnode.eth"
+        mevBoostAvail: "mevboost-gnosis.dnp.dappnode.eth",
+        isMevBoostSelected: db.mevBoostGnosis.get()
       };
     case "prater":
       return {
@@ -258,7 +295,10 @@ function getNetworkStakerPkgs(network: Network): {
         ],
         currentConsClient: db.consensusClientPrater.get(),
         web3signerAvail: "web3signer-prater.dnp.dappnode.eth",
-        mevBoostAvail: "mevboost-prater.dnp.dappnode.eth"
+        mevBoostAvail: "mevboost-prater.dnp.dappnode.eth",
+        isMevBoostSelected: db.mevBoostPrater.get()
       };
+    default:
+      throw new Error(`Unknown network: ${network}`);
   }
 }

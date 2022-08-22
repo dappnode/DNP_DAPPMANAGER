@@ -300,8 +300,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             isInstalled: true,
             isSelected: false
           },
-          graffiti: "",
-          feeRecipient: ""
+          graffiti: "Validating_from_DAppNode",
+          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
       case "prater":
         return {
@@ -354,7 +354,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "nethermind-xdai.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: true
             }
           ],
           consensusClients: [
