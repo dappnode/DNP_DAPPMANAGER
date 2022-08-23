@@ -4,7 +4,7 @@ import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { Network, StakerConfigSet } from "types";
+import { Network, ReqStatus, StakerConfigSet } from "types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
@@ -15,6 +15,7 @@ import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
+import "./staker-network.scss";
 
 export default function StakerNetwork({
   network,
@@ -23,14 +24,19 @@ export default function StakerNetwork({
   network: Network;
   description: string;
 }) {
-  // New selections
+  // Req
+  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  // New config
   const [newExecClient, setNewExecClient] = useState<string>();
   const [newConsClient, setNewConsClient] = useState<string>();
-  const [enableMevBoost, setEnableMevBoost] = useState<boolean>(false);
-  const [enableWeb3signer, setEnableWeb3signer] = useState<boolean>(false);
+  const [newEnableMevBoost, setNewEnableMevBoost] = useState<boolean>(false);
+  const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
+    false
+  );
   const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newGraffiti, setNewGraffiti] = useState<string>();
 
+  // Current config
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
   >();
@@ -51,8 +57,10 @@ export default function StakerNetwork({
       // Set default values for new staker config
       setNewExecClient(ec);
       setNewConsClient(cc);
-      setEnableMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
-      setEnableWeb3signer(currentStakerConfigReq.data.web3signer.isInstalled);
+      setNewEnableMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
+      setNewEnableWeb3signer(
+        currentStakerConfigReq.data.web3signer.isInstalled
+      );
       setNewFeeRecipient(currentStakerConfigReq.data.feeRecipient);
       setNewGraffiti(currentStakerConfigReq.data.graffiti);
 
@@ -71,14 +79,25 @@ export default function StakerNetwork({
   }, [currentStakerConfigReq.data]);
 
   function thereAreChanges(): boolean {
-    return newExecClient ||
-      newConsClient ||
-      enableMevBoost ||
-      enableWeb3signer ||
-      newFeeRecipient ||
-      newGraffiti
-      ? true
-      : false;
+    if (currentStakerConfig) {
+      const {
+        executionClient,
+        consensusClient,
+        feeRecipient,
+        graffiti,
+        enableMevBoost,
+        enableWeb3signer
+      } = currentStakerConfig;
+      return (
+        executionClient !== newExecClient ||
+        consensusClient !== newConsClient ||
+        feeRecipient !== newFeeRecipient ||
+        graffiti !== newGraffiti ||
+        enableMevBoost !== newEnableMevBoost ||
+        enableWeb3signer !== newEnableWeb3signer
+      );
+    }
+    return false;
   }
 
   /**
@@ -101,7 +120,7 @@ export default function StakerNetwork({
             ]
           });
         });
-
+        setReqStatus({ loading: true });
         await withToast(
           () =>
             api.stakerConfigSet({
@@ -111,17 +130,20 @@ export default function StakerNetwork({
                 consensusClient: newConsClient,
                 graffiti: newGraffiti,
                 feeRecipient: newFeeRecipient,
-                enableMevBoost,
-                enableWeb3signer
+                enableMevBoost: newEnableMevBoost,
+                enableWeb3signer: newEnableWeb3signer
               }
             }),
           {
-            message: `Setting new staker config...`,
-            onSuccess: `Setted new staker config`
+            message: `Setting new staker configuration...`,
+            onSuccess: `Setted new staker configuration`
           }
         );
+        setReqStatus({ result: true });
       }
-    } catch (e) {}
+    } catch (e) {
+      setReqStatus({ error: e });
+    }
   }
 
   if (currentStakerConfigReq.error)
@@ -133,61 +155,71 @@ export default function StakerNetwork({
 
   return (
     <Card>
+      <p>{description}</p>
       <Row>
         <Col>
           <SubTitle>Execution Clients</SubTitle>
           {currentStakerConfigReq.data.executionClients.map(
             (executionClient, i) => (
-              <ExecutionClient
-                key={i}
-                executionClient={executionClient.dnpName}
-                setNewExecClient={setNewExecClient}
-                isInstalled={executionClient.isInstalled}
-                isSelected={
-                  executionClient.dnpName === newExecClient ? true : false
-                }
-              />
+              <div className="execution-client">
+                <ExecutionClient
+                  key={i}
+                  executionClient={executionClient.dnpName}
+                  setNewExecClient={setNewExecClient}
+                  isInstalled={executionClient.isInstalled}
+                  isSelected={
+                    executionClient.dnpName === newExecClient ? true : false
+                  }
+                />
+              </div>
             )
           )}
         </Col>
+
         <Col>
           <SubTitle>Consensus Clients</SubTitle>
           {currentStakerConfigReq.data.consensusClients.map(
             (consensusClient, i) => (
-              <ConsensusClient
-                key={i}
-                consensusClient={consensusClient.dnpName}
-                setNewConsClient={setNewConsClient}
-                isInstalled={consensusClient.isInstalled}
-                isSelected={
-                  consensusClient.dnpName === newConsClient ? true : false
-                }
-                graffiti={newGraffiti}
-                setNewGraffiti={setNewGraffiti}
-                feeRecipient={newFeeRecipient}
-                setNewFeeRecipient={setNewFeeRecipient}
-              />
+              <div className="consensus-client">
+                <ConsensusClient
+                  key={i}
+                  consensusClient={consensusClient.dnpName}
+                  setNewConsClient={setNewConsClient}
+                  isInstalled={consensusClient.isInstalled}
+                  isSelected={
+                    consensusClient.dnpName === newConsClient ? true : false
+                  }
+                  graffiti={newGraffiti}
+                  setNewGraffiti={setNewGraffiti}
+                  feeRecipient={newFeeRecipient}
+                  setNewFeeRecipient={setNewFeeRecipient}
+                />
+              </div>
             )
           )}
         </Col>
 
         <Col>
           <SubTitle>Remote signer</SubTitle>
-          <RemoteSigner
-            signer={currentStakerConfigReq.data.web3signer.dnpName}
-            setEnableWeb3signer={setEnableWeb3signer}
-            enableWeb3signer={enableWeb3signer}
-          />
+          <div className="remote-signer">
+            <RemoteSigner
+              signer={currentStakerConfigReq.data.web3signer.dnpName}
+              setEnableWeb3signer={setNewEnableWeb3signer}
+              enableWeb3signer={newEnableWeb3signer}
+            />
+          </div>
         </Col>
 
         <Col>
           <SubTitle>Mev Boost</SubTitle>
-          <MevBoost
-            mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
-            setEnableMevBoost={setEnableMevBoost}
-            isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
-            enableMevBoost={enableMevBoost}
-          />
+          <div className="mev-boost">
+            <MevBoost
+              mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
+              setEnableMevBoost={setNewEnableMevBoost}
+              isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
+              enableMevBoost={newEnableMevBoost}
+            />
+          </div>
         </Col>
       </Row>
 
@@ -203,15 +235,21 @@ export default function StakerNetwork({
               consensusClient: newConsClient,
               graffiti: newGraffiti,
               feeRecipient: newFeeRecipient,
-              enableMevBoost,
-              enableWeb3signer
+              enableMevBoost: newEnableMevBoost,
+              enableWeb3signer: newEnableWeb3signer
             }}
           />
         )}
 
-        <Button variant="dappnode" disabled={true} onClick={setNewConfig}>
+        <Button
+          variant="dappnode"
+          disabled={!thereAreChanges() || reqStatus.loading}
+          onClick={setNewConfig}
+        >
           Apply changes
         </Button>
+
+        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
       </div>
     </Card>
   );

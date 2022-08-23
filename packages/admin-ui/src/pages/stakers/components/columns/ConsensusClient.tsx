@@ -33,6 +33,7 @@ export default function ConsensusClient({
       {isSelected ? <BsCircleFill /> : <BsCircle />} Selected
       {isSelected && isInstalled && (
         <>
+          <hr />
           <InputForm
             fields={[
               {
