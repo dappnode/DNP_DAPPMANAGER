@@ -1,11 +1,17 @@
 import * as db from "../db";
 import { logs } from "../logs";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import { Network, PkgStatus, StakerConfigGet, StakerConfigSet } from "../types";
+import {
+  Network,
+  PkgStatus,
+  StakerConfigGet,
+  StakerConfigSet,
+  UserSettingsAllDnps
+} from "../types";
 import { prettyDnpName } from "../utils/format";
 import { packageInstall } from "./packageInstall";
-import { packageRemove } from "./packageRemove";
 import { packagesGet } from "./packagesGet";
+import { packageStartStop } from "./packageStartStop";
 
 /**
  * Sets a new staker configuration based on user selection:
@@ -27,92 +33,127 @@ export async function stakerConfigSet(
     mevBoostAvail
   } = getNetworkStakerPkgs(stakerConfig.network);
 
-  // TODO: implement a proper try-catch error handler
-
-  // Ensure Execution clients DNP's names are valid
-  if (
-    stakerConfig.executionClient &&
-    !execClientsAvail.includes(prettyDnpName(stakerConfig.executionClient))
-  )
-    throw Error(
-      `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
-    );
-  // Ensure Execution clients DNP's names are valid
-  if (
-    stakerConfig.consensusClient &&
-    !consClientsAvail.includes(prettyDnpName(stakerConfig.consensusClient))
-  )
-    throw Error(
-      `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
-    );
-
-  const pkgs = await packagesGet();
-
-  // EXECUTION CLIENT
-  if (stakerConfig.executionClient) {
-    if (currentExecClient === stakerConfig.executionClient) {
-      logs.info(
-        "Execution client is already set to " + stakerConfig.executionClient
+  try {
+    // Ensure Execution clients DNP's names are valid
+    if (
+      stakerConfig.executionClient &&
+      !execClientsAvail.includes(prettyDnpName(stakerConfig.executionClient))
+    )
+      throw Error(
+        `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
       );
-      // Make sure the EC is installed
-      if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
+    // Ensure Execution clients DNP's names are valid
+    if (
+      stakerConfig.consensusClient &&
+      !consClientsAvail.includes(prettyDnpName(stakerConfig.consensusClient))
+    )
+      throw Error(
+        `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
+      );
+
+    const pkgs = await packagesGet();
+
+    // EXECUTION CLIENT
+    if (stakerConfig.executionClient) {
+      if (currentExecClient === stakerConfig.executionClient) {
+        logs.info(
+          "Execution client is already set to " + stakerConfig.executionClient
+        );
+        // Make sure the EC is installed
+        if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
+          logs.info("Installing " + stakerConfig.executionClient);
+          await packageInstall({ name: stakerConfig.executionClient });
+        }
+      } else {
+        // Remove the previous
+        /* logs.info("Removing " + currentExecClient);
+      await packageRemove({ dnpName: currentExecClient }); */
+        // Install the new EC
         logs.info("Installing " + stakerConfig.executionClient);
         await packageInstall({ name: stakerConfig.executionClient });
       }
-    } else {
-      // Remove the previous
-      logs.info("Removing " + currentExecClient);
-      await packageRemove({ dnpName: currentExecClient });
-      // Install the new EC
-      logs.info("Installing " + stakerConfig.executionClient);
-      await packageInstall({ name: stakerConfig.executionClient });
     }
-  }
 
-  // CONSENSUS CLIENT
-  if (stakerConfig.consensusClient) {
-    if (currentConsClient === stakerConfig.consensusClient) {
-      logs.info(
-        "Consensus client is already set to " + stakerConfig.consensusClient
-      );
-      // Make sure the CC is installed
-      if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
+    // CONSENSUS CLIENT
+    if (stakerConfig.consensusClient) {
+      const userSettings: UserSettingsAllDnps = {
+        [stakerConfig.consensusClient]: {
+          environment: {
+            [getValidatorServiceName(stakerConfig.consensusClient)]: {
+              ["GRAFFITI"]: stakerConfig.graffiti || "Validating_from_DAppNode",
+              ["FEE_RECIPIENT_ADDRESS"]:
+                stakerConfig.feeRecipient ||
+                "0x0000000000000000000000000000000000000000"
+            }
+          }
+        }
+      };
+
+      if (currentConsClient === stakerConfig.consensusClient) {
+        logs.info(
+          "Consensus client is already set to " + stakerConfig.consensusClient
+        );
+        // Make sure the CC is installed
+        if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
+          logs.info("Installing " + stakerConfig.consensusClient);
+          await packageInstall({
+            name: stakerConfig.consensusClient,
+            userSettings
+          });
+        }
+      } else {
+        // Remove the previous
+        /*       logs.info("Removing " + currentConsClient);
+      await packageRemove({ dnpName: currentConsClient }); */
+        // Install the new CC
         logs.info("Installing " + stakerConfig.consensusClient);
-        await packageInstall({ name: stakerConfig.consensusClient });
+        await packageInstall({
+          name: stakerConfig.consensusClient,
+          userSettings
+        });
       }
-    } else {
-      // Remove the previous
-      logs.info("Removing " + currentConsClient);
-      await packageRemove({ dnpName: currentConsClient });
-      // Install the new CC
-      logs.info("Installing " + stakerConfig.consensusClient);
-      // TODO: the graffiti and the fee recipient must be set (if nothing set default values)
-      await packageInstall({ name: stakerConfig.consensusClient });
     }
-  }
 
-  // WEB3SIGNER
-  if (pkgs.find(p => p.dnpName === web3signerAvail)) {
-    logs.info("Web3Signer is already installed");
-  } else if (stakerConfig.enableWeb3signer) {
-    logs.info("Installing Web3Signer");
-    await packageInstall({ name: web3signerAvail });
-  }
-
-  // MEV BOOST
-  const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
-  if (stakerConfig.enableMevBoost) {
-    if (mevBoostPkg) {
-      logs.info("MevBoost is already installed");
-    } else if (stakerConfig.enableMevBoost) {
-      // Install mevboost if selected and not installed
-      logs.info("Installing MevBoost");
-      await packageInstall({ name: mevBoostAvail });
+    // WEB3SIGNER
+    const web3signerPkg = pkgs.find(p => p.dnpName === web3signerAvail);
+    if (web3signerPkg && stakerConfig.enableWeb3signer) {
+      // Do nothing, web3signer enabled and installed
+      logs.info("Web3Signer is already installed");
+    } else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
+      // Install web3signer
+      logs.info("Installing Web3Signer");
+      // TODO: check if its necessary userSettings needed for web3signer
+      await packageInstall({ name: web3signerAvail });
+    } else if (web3signerPkg && !stakerConfig.enableWeb3signer) {
+      // Stop web3signer
+      for (const container of web3signerPkg.containers) {
+        if (container.running) {
+          logs.info("Stopping Web3Signer");
+          await packageStartStop({
+            dnpName: web3signerPkg.dnpName,
+            serviceNames: [container.serviceName]
+          });
+        }
+      }
     }
-  }
 
-  // Persist the staker config on db
-  setStakerConfigOnDb(stakerConfig.network, stakerConfig);
+    // MEV BOOST
+    const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
+    if (stakerConfig.enableMevBoost) {
+      if (mevBoostPkg) {
+        logs.info("MevBoost is already installed");
+      } else if (stakerConfig.enableMevBoost) {
+        // Install mevboost if selected and not installed
+        logs.info("Installing MevBoost");
+        await packageInstall({ name: mevBoostAvail });
+      }
+    }
+
+    // Persist the staker config on db
+    setStakerConfigOnDb(stakerConfig.network, stakerConfig);
+  } catch (e) {
+    throw Error(`Error setting staker config: ${e}`);
+  }
 }
 
 /**
@@ -128,83 +169,85 @@ export async function stakerConfigSet(
 export async function stakerConfigGet(
   network: Network
 ): Promise<StakerConfigGet> {
-  const {
-    execClientsAvail,
-    currentExecClient,
-    consClientsAvail,
-    currentConsClient,
-    web3signerAvail,
-    mevBoostAvail,
-    isMevBoostSelected
-  } = getNetworkStakerPkgs(network);
+  try {
+    const {
+      execClientsAvail,
+      currentExecClient,
+      consClientsAvail,
+      currentConsClient,
+      web3signerAvail,
+      mevBoostAvail,
+      isMevBoostSelected
+    } = getNetworkStakerPkgs(network);
 
-  // TODO: implement a proper try-catch error handler
+    const pkgs = await packagesGet();
 
-  const pkgs = await packagesGet();
-
-  // Execution clients
-  const executionClients: PkgStatus[] = [];
-  for (const exCl of execClientsAvail) {
-    executionClients.push({
-      dnpName: exCl,
-      isInstalled: pkgs.some(pkg => pkg.dnpName === exCl),
-      isSelected: currentExecClient === exCl
-    });
-  }
-
-  // Consensus clients
-  const consensusClients: PkgStatus[] = [];
-  for (const conCl of consClientsAvail) {
-    consensusClients.push({
-      dnpName: conCl,
-      isInstalled: pkgs.some(pkg => pkg.dnpName === conCl),
-      isSelected: currentConsClient === conCl
-    });
-  }
-
-  // Web3signer
-  const web3signer = {
-    dnpName: web3signerAvail,
-    isInstalled: pkgs.some(pkg => pkg.dnpName === web3signerAvail),
-    isSelected: true
-  };
-
-  // Mevboost
-  const mevBoost = {
-    dnpName: mevBoostAvail,
-    isInstalled: pkgs.some(pkg => pkg.dnpName === mevBoostAvail),
-    isSelected: isMevBoostSelected
-  };
-
-  // Get graffiti and feerecipientAddress from the consClientInstalled (if any)
-  const consensusPkgSelected = pkgs.find(
-    pkg => pkg.dnpName === currentConsClient
-  );
-  let graffiti = "";
-  let feeRecipient = "";
-  if (consensusPkgSelected) {
-    const environment = new ComposeFileEditor(
-      consensusPkgSelected.dnpName,
-      consensusPkgSelected.isCore
-    ).getUserSettings().environment;
-    if (environment) {
-      // Nimbus package is monoservice (beacon-validator)
-      const validatorService = consensusPkgSelected.dnpName.includes("nimbus")
-        ? "validator"
-        : "beacon-validator";
-      graffiti = environment[validatorService].graffiti || "";
-      feeRecipient = environment[validatorService].feeRecipient || "";
+    // Execution clients
+    const executionClients: PkgStatus[] = [];
+    for (const exCl of execClientsAvail) {
+      executionClients.push({
+        dnpName: exCl,
+        isInstalled: pkgs.some(pkg => pkg.dnpName === exCl),
+        isSelected: currentExecClient === exCl
+      });
     }
-  }
 
-  return {
-    executionClients,
-    consensusClients,
-    web3signer,
-    mevBoost,
-    graffiti,
-    feeRecipient
-  };
+    // Consensus clients
+    const consensusClients: PkgStatus[] = [];
+    for (const conCl of consClientsAvail) {
+      consensusClients.push({
+        dnpName: conCl,
+        isInstalled: pkgs.some(pkg => pkg.dnpName === conCl),
+        isSelected: currentConsClient === conCl
+      });
+    }
+
+    // Web3signer
+    const isWeb3signer = pkgs.some(pkg => pkg.dnpName === web3signerAvail);
+    const web3signer = {
+      dnpName: web3signerAvail,
+      isInstalled: isWeb3signer,
+      isSelected: isWeb3signer
+    };
+
+    // Mevboost
+    const mevBoost = {
+      dnpName: mevBoostAvail,
+      isInstalled: pkgs.some(pkg => pkg.dnpName === mevBoostAvail),
+      isSelected: isMevBoostSelected
+    };
+
+    // Get graffiti and feerecipientAddress from the consClientInstalled (if any)
+    const consensusPkgSelected = pkgs.find(
+      pkg => pkg.dnpName === currentConsClient
+    );
+    let graffiti = "";
+    let feeRecipient = "";
+    if (consensusPkgSelected) {
+      const environment = new ComposeFileEditor(
+        consensusPkgSelected.dnpName,
+        consensusPkgSelected.isCore
+      ).getUserSettings().environment;
+      if (environment) {
+        const validatorService = getValidatorServiceName(
+          consensusPkgSelected.dnpName
+        );
+        graffiti = environment[validatorService].graffiti || "";
+        feeRecipient = environment[validatorService].feeRecipient || "";
+      }
+    }
+
+    return {
+      executionClients,
+      consensusClients,
+      web3signer,
+      mevBoost,
+      graffiti,
+      feeRecipient
+    };
+  } catch (e) {
+    throw Error(`Error getting staker config: ${e}`);
+  }
 }
 
 // Utils
@@ -301,4 +344,12 @@ function getNetworkStakerPkgs(network: Network): {
     default:
       throw new Error(`Unknown network: ${network}`);
   }
+}
+
+/**
+ * Get the validator service name.
+ * Nimbus package is monoservice (beacon-validator)
+ */
+function getValidatorServiceName(dnpName: string): string {
+  return dnpName.includes("nimbus") ? "validator" : "beacon-validator";
 }

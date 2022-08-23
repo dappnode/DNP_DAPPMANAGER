@@ -21,7 +21,8 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       title: "Mainnet",
       component: StakerNetwork({
         network: "mainnet",
-        description: "Mainnet stakers"
+        description:
+          "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
       })
     },
     {
@@ -29,7 +30,8 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       title: "Gnosis chain",
       component: StakerNetwork({
         network: "gnosis",
-        description: "Gnosis stakers"
+        description:
+          "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
       })
     },
     {
@@ -37,7 +39,8 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       title: "Prater",
       component: StakerNetwork({
         network: "prater",
-        description: "Prater stakers"
+        description:
+          "The Prater testnet allows developers to test node operations such as adding and removing validators, migrating between clients and performing upgrades and backups. The Prater testnet is unique because it involves a proof-of-stake testing environment rather than proof-of-work."
       })
     }
   ];
