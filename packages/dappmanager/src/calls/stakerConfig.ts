@@ -21,9 +21,11 @@ import { packageStartStop } from "./packageStartStop";
  * - graffiti and fee recipient address
  * @param stakerConfig
  */
-export async function stakerConfigSet(
-  stakerConfig: StakerConfigSet
-): Promise<void> {
+export async function stakerConfigSet({
+  stakerConfig
+}: {
+  stakerConfig: StakerConfigSet;
+}): Promise<void> {
   const {
     execClientsAvail,
     currentExecClient,
