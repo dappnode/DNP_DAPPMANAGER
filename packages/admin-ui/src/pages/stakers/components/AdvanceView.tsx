@@ -61,7 +61,7 @@ export default function AdvanceView({
             </span>
           </span>
           <span className="current">
-            <span>{config.current?.toString()}</span>
+            <span>{config.current}</span>
           </span>
           <span className="arrow">
             <BsArrowRight />
