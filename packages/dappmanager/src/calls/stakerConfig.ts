@@ -352,5 +352,5 @@ function getNetworkStakerPkgs(network: Network): {
  * Nimbus package is monoservice (beacon-validator)
  */
 function getValidatorServiceName(dnpName: string): string {
-  return dnpName.includes("nimbus") ? "validator" : "beacon-validator";
+  return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
 }
