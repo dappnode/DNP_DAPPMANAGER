@@ -8,7 +8,6 @@ import {
   StakerConfigSet,
   UserSettingsAllDnps
 } from "../types";
-import { prettyDnpName } from "../utils/format";
 import { packageInstall } from "./packageInstall";
 import { packagesGet } from "./packagesGet";
 import { packageStartStop } from "./packageStartStop";
@@ -39,7 +38,7 @@ export async function stakerConfigSet({
     // Ensure Execution clients DNP's names are valid
     if (
       stakerConfig.executionClient &&
-      !execClientsAvail.includes(prettyDnpName(stakerConfig.executionClient))
+      !execClientsAvail.includes(stakerConfig.executionClient)
     )
       throw Error(
         `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
@@ -47,7 +46,7 @@ export async function stakerConfigSet({
     // Ensure Execution clients DNP's names are valid
     if (
       stakerConfig.consensusClient &&
-      !consClientsAvail.includes(prettyDnpName(stakerConfig.consensusClient))
+      !consClientsAvail.includes(stakerConfig.consensusClient)
     )
       throw Error(
         `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
