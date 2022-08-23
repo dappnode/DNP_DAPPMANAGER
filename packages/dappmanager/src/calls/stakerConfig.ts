@@ -233,8 +233,8 @@ export async function stakerConfigGet(
         const validatorService = getValidatorServiceName(
           consensusPkgSelected.dnpName
         );
-        graffiti = environment[validatorService].graffiti || "";
-        feeRecipient = environment[validatorService].feeRecipient || "";
+        graffiti = environment[validatorService]["GRAFFITI"];
+        feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
       }
     }
 
