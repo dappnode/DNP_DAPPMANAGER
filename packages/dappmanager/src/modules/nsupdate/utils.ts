@@ -7,6 +7,7 @@ import {
   ContainerNames
 } from "../../domains";
 import * as db from "../../db";
+import { logs } from "../../logs";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -150,9 +151,13 @@ export function getNsupdateTxts({
       dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
     // Add multilabel dynds domains to the HTTPS container IP
     if (container.dnpName === params.httpsDnpName) {
+      logs.info("hey luka");
       // f6e36f19e349b0dd.dyndns.dappnode.io
       const domain = db.domain.get();
-      if (domain) dappnode[`*.${domain}`] = container.ip;
+      if (domain) {
+        logs.info("this should f*cking work");
+        dappnode[`*.${domain}`] = container.ip;
+      }
     }
 
     // For multi-service DNPs, link the main container to the root URL
