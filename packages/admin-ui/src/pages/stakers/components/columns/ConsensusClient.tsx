@@ -31,7 +31,7 @@ export default function ConsensusClient({
       <p>{prettyDnpName(consensusClient)}</p>
       {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed <br />
       {isSelected ? <BsCircleFill /> : <BsCircle />} Selected
-      {isSelected && isInstalled && (
+      {isSelected && (
         <>
           <hr />
           <InputForm

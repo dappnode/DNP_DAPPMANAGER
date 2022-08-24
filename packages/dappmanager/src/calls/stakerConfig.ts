@@ -19,6 +19,7 @@ import { packageStartStop } from "./packageStartStop";
  * - Install web3signer and/or mevboost
  * - graffiti and fee recipient address
  * @param stakerConfig
+ * TODO: add option to remove previous or not
  */
 export async function stakerConfigSet({
   stakerConfig
@@ -43,7 +44,7 @@ export async function stakerConfigSet({
       throw Error(
         `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
       );
-    // Ensure Execution clients DNP's names are valid
+    // Ensure Consensus clients DNP's names are valid
     if (
       stakerConfig.consensusClient &&
       !consClientsAvail.includes(stakerConfig.consensusClient)
@@ -68,7 +69,7 @@ export async function stakerConfigSet({
       } else {
         // Remove the previous
         /* logs.info("Removing " + currentExecClient);
-      await packageRemove({ dnpName: currentExecClient }); */
+        await packageRemove({ dnpName: currentExecClient }); */
         // Install the new EC
         logs.info("Installing " + stakerConfig.executionClient);
         await packageInstall({ name: stakerConfig.executionClient });
@@ -105,7 +106,7 @@ export async function stakerConfigSet({
       } else {
         // Remove the previous
         /*       logs.info("Removing " + currentConsClient);
-      await packageRemove({ dnpName: currentConsClient }); */
+        await packageRemove({ dnpName: currentConsClient }); */
         // Install the new CC
         logs.info("Installing " + stakerConfig.consensusClient);
         await packageInstall({
