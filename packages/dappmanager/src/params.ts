@@ -201,6 +201,8 @@ const params = {
   vpnContainerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
   wifiDnpName: "wifi.dnp.dappnode.eth",
   wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
+  httpsDnpName: "https.dnp.dappnode.eth",
+  httpsContainerName: "DAppNodeCore-https.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",

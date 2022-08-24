@@ -6,6 +6,7 @@ import {
   stripCharacters,
   ContainerNames
 } from "../../domains";
+import * as db from "../../db";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -147,6 +148,12 @@ export function getNsupdateTxts({
     // Add multilabel IPFS domains to the IPFS container IP
     if (container.dnpName === params.ipfsDnpName)
       dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
+    // Add multilabel dynds domains to the HTTPS container IP
+    if (container.dnpName === params.httpsDnpName) {
+      // f6e36f19e349b0dd.dyndns.dappnode.io
+      const domain = db.domain.get();
+      if (domain) dappnode[`*.${domain}`] = container.ip;
+    }
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
