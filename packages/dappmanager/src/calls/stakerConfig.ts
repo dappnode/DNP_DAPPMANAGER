@@ -260,7 +260,7 @@ export async function stakerConfigGet(
 function setStakerConfigOnDb(
   network: Network,
   stakerConfig: StakerConfigSet
-): Promise<void> {
+): void {
   switch (network) {
     case "mainnet":
       db.executionClientMainnet.set(stakerConfig.executionClient);
@@ -274,8 +274,6 @@ function setStakerConfigOnDb(
       db.executionClientPrater.set(stakerConfig.executionClient);
       db.consensusClientPrater.set(stakerConfig.consensusClient);
       db.mevBoostPrater.set(stakerConfig.enableMevBoost);
-    default:
-      throw new Error("Unknown network");
   }
 }
 
@@ -343,8 +341,6 @@ function getNetworkStakerPkgs(network: Network): {
         mevBoostAvail: "mevboost-prater.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
       };
-    default:
-      throw new Error(`Unknown network: ${network}`);
   }
 }
 
