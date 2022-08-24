@@ -14,7 +14,7 @@ const DAPPNODE_WEB_NAME = "dappnode-web-name";
 
 export const serverName = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<string>(SERVER_NAME, ""),
-  globEnvKey: SERVER_NAME
+  globEnvKey: Object.keys({ SERVER_NAME })[0]
 });
 
 // Domains
