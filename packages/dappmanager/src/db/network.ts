@@ -9,7 +9,7 @@ const AVAHI_SHOULD_BE_DISABLED = "avahi-should-be-disabled";
 
 export const noNatLoopback = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<boolean>(NO_NAT_LOOPBACK, false),
-  globEnvKey: NO_NAT_LOOPBACK
+  globEnvKey: Object.keys({ NO_NAT_LOOPBACK })[0]
 });
 export const doubleNat = dbMain.staticKey<boolean>(DOUBLE_NAT, false);
 export const alertToOpenPorts = dbMain.staticKey<boolean>(
@@ -18,7 +18,7 @@ export const alertToOpenPorts = dbMain.staticKey<boolean>(
 );
 export const internalIp = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<string>(INTERNAL_IP, ""),
-  globEnvKey: INTERNAL_IP
+  globEnvKey: Object.keys({ INTERNAL_IP })[0]
 });
 
 export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(
