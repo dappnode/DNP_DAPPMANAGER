@@ -155,7 +155,7 @@ export function getNsupdateTxts({
       // f6e36f19e349b0dd.dyndns.dappnode.io
       const domain = db.domain.get();
       if (domain) {
-        logs.info("this should f*cking work");
+        logs.info("this should work");
         dappnode[`*.${domain}`] = container.ip;
       }
     }
