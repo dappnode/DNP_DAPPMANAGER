@@ -14,23 +14,35 @@ export default function AdvanceView({
   const stakerConfig = [
     {
       name: "Execution Client",
-      current: prettyDnpName(currentStakerConfig.executionClient || ""),
-      new: prettyDnpName(newStakerConfig.executionClient || "")
+      current: currentStakerConfig.executionClient
+        ? prettyDnpName(currentStakerConfig.executionClient)
+        : "-",
+      new: newStakerConfig.executionClient
+        ? prettyDnpName(newStakerConfig.executionClient)
+        : "-"
     },
     {
       name: "Consensus Client",
-      current: prettyDnpName(currentStakerConfig.consensusClient || ""),
-      new: prettyDnpName(newStakerConfig.consensusClient || "")
+      current: currentStakerConfig.consensusClient
+        ? prettyDnpName(currentStakerConfig.consensusClient)
+        : "-",
+      new: newStakerConfig.consensusClient
+        ? prettyDnpName(newStakerConfig.consensusClient)
+        : "-"
     },
     {
       name: "Graffiti",
-      current: currentStakerConfig.graffiti,
-      new: newStakerConfig.graffiti
+      current: currentStakerConfig.graffiti
+        ? currentStakerConfig.graffiti
+        : "-",
+      new: newStakerConfig.graffiti ? newStakerConfig.graffiti : "-"
     },
     {
       name: "Fee Recipient",
-      current: currentStakerConfig.feeRecipient,
-      new: newStakerConfig.feeRecipient
+      current: currentStakerConfig.feeRecipient
+        ? currentStakerConfig.feeRecipient
+        : "-",
+      new: newStakerConfig.feeRecipient ? newStakerConfig.feeRecipient : "-"
     },
     {
       name: "Web3 Signer",
