@@ -288,7 +288,7 @@ function setStakerConfigOnDb(
  * Get the current staker config (execution and consensus clients selected) as well as
  * the pkgs available for each network
  */
-function getNetworkStakerPkgs(network: Network): {
+export function getNetworkStakerPkgs(network: Network): {
   execClientsAvail: string[];
   currentExecClient: string;
   consClientsAvail: string[];
