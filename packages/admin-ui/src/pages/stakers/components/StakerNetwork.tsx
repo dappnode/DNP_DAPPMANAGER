@@ -135,6 +135,7 @@ export default function StakerNetwork({
                 consensusClient: newConsClient,
                 graffiti: newGraffiti,
                 feeRecipient: newFeeRecipient,
+                checkpointSync: newCheckpointSync,
                 enableMevBoost: newEnableMevBoost,
                 enableWeb3signer: newEnableWeb3signer
               }
@@ -242,6 +243,7 @@ export default function StakerNetwork({
               consensusClient: newConsClient,
               graffiti: newGraffiti,
               feeRecipient: newFeeRecipient,
+              checkpointSync: newCheckpointSync,
               enableMevBoost: newEnableMevBoost,
               enableWeb3signer: newEnableWeb3signer
             }}
