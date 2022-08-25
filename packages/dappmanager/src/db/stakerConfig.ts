@@ -20,7 +20,7 @@ export const consensusClientMainnet = interceptGlobalEnvOnSet({
     CONSENSUS_CLIENT_MAINNET,
     null
   ),
-  globEnvKey: CONSENSUS_CLIENT_MAINNET
+  globEnvKey: Object.keys({ CONSENSUS_CLIENT_MAINNET })[0]
 });
 
 export const executionClientMainnet = interceptGlobalEnvOnSet({
@@ -28,12 +28,12 @@ export const executionClientMainnet = interceptGlobalEnvOnSet({
     EXECUTION_CLIENT_MAINNET,
     null
   ),
-  globEnvKey: EXECUTION_CLIENT_MAINNET
+  globEnvKey: Object.keys({ EXECUTION_CLIENT_MAINNET })[0]
 });
 
 export const mevBoostMainnet = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<boolean>(MEVBOOST_MAINNET, false),
-  globEnvKey: MEVBOOST_MAINNET
+  globEnvKey: Object.keys({ MEVBOOST_MAINNET })[0]
 });
 
 // Gnosis
@@ -47,7 +47,7 @@ export const consensusClientGnosis = interceptGlobalEnvOnSet({
     CONSENSUS_CLIENT_GNOSIS,
     null
   ),
-  globEnvKey: CONSENSUS_CLIENT_GNOSIS
+  globEnvKey: Object.keys({ CONSENSUS_CLIENT_GNOSIS })[0]
 });
 
 export const executionClientGnosis = interceptGlobalEnvOnSet({
@@ -55,37 +55,37 @@ export const executionClientGnosis = interceptGlobalEnvOnSet({
     EXECUTION_CLIENT_GNOSIS,
     null
   ),
-  globEnvKey: EXECUTION_CLIENT_GNOSIS
+  globEnvKey: Object.keys({ EXECUTION_CLIENT_GNOSIS })[0]
 });
 
 export const mevBoostGnosis = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<boolean>(MEVBOOST_GNOSIS, false),
-  globEnvKey: MEVBOOST_GNOSIS
+  globEnvKey: Object.keys({ MEVBOOST_GNOSIS })[0]
 });
 
 // Prater
 
-const CONENSUS_CLIENT_PRATER = "consensus-client-prater";
+const CONSENSUS_CLIENT_PRATER = "consensus-client-prater";
 const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
 
 export const consensusClientPrater = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ExecutionClientPrater | null>(
-    CONENSUS_CLIENT_PRATER,
+  ...dbMain.staticKey<ConsensusClientPrater | null>(
+    CONSENSUS_CLIENT_PRATER,
     null
   ),
-  globEnvKey: CONENSUS_CLIENT_PRATER
+  globEnvKey: Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
 });
 
 export const executionClientPrater = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConsensusClientPrater | null>(
+  ...dbMain.staticKey<ExecutionClientPrater | null>(
     EXECUTION_CLIENT_PRATER,
     null
   ),
-  globEnvKey: EXECUTION_CLIENT_PRATER
+  globEnvKey: Object.keys({ EXECUTION_CLIENT_PRATER })[0]
 });
 
 export const mevBoostPrater = interceptGlobalEnvOnSet({
   ...dbMain.staticKey<boolean>(MEVBOOST_PRATER, false),
-  globEnvKey: MEVBOOST_PRATER
+  globEnvKey: Object.keys({ MEVBOOST_PRATER })[0]
 });
