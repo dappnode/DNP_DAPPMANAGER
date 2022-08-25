@@ -65,10 +65,10 @@ function pre_update () {
 
 function update () {
   echo -e "\e[32mUpdating\e[0m" >> $LOG_FILE 
-  # 1>/dev/null 2>>$LOG_FILE: will redirect stdout to null and stderr to log file
-  apt-get update 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get update" | tee -a $LOG_FILE ; post_upgrade_clean ; exit 1; }
+
+  apt-get update 2>&1 >> $LOG_FILE || { echo "error on apt-get update" | tee -a $LOG_FILE ; post_upgrade_clean ; exit 1; }
   echo -e "\e[32mUpgrading\e[0m" >> $LOG_FILE 
-  apt-get upgrade -y 1>/dev/null 2>>$LOG_FILE || { echo "error on apt-get upgrade" | tee -a $LOG_FILE ; post_upgrade_clean ; exit 1; }
+  apt-get upgrade -y 2>&1 >> $LOG_FILE || { echo "error on apt-get upgrade" | tee -a $LOG_FILE ; post_upgrade_clean ; exit 1; }
 }
 
 ###############
