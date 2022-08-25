@@ -1,8 +1,9 @@
 import React from "react";
 import Card from "components/Card";
-import { BsCircle, BsCircleFill } from "react-icons/bs";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
+import { joinCssClass } from "utils/css";
+import "./columns.scss";
 
 export default function ConsensusClient({
   consensusClient,
@@ -12,7 +13,9 @@ export default function ConsensusClient({
   graffiti,
   setNewGraffiti,
   feeRecipient,
-  setNewFeeRecipient
+  setNewFeeRecipient,
+  checkpointSync,
+  setNewCheckpointSync
 }: {
   consensusClient: string;
   setNewConsClient: (consensusClient: string) => void;
@@ -22,15 +25,19 @@ export default function ConsensusClient({
   setNewGraffiti: (newGraffiti: string) => void;
   feeRecipient?: string;
   setNewFeeRecipient: (newFeeRecipient: string) => void;
+  checkpointSync?: string;
+  setNewCheckpointSync: (newCheckpointSync: string) => void;
 }) {
   const feeRecipientError = validateEthereumAddress(feeRecipient);
   const graffitiError = validateGraffiti(graffiti);
 
   return (
-    <Card onClick={() => setNewConsClient(consensusClient)} shadow={isSelected}>
-      <p>{prettyDnpName(consensusClient)}</p>
-      {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed <br />
-      {isSelected ? <BsCircleFill /> : <BsCircle />} Selected
+    <Card
+      className={`consensus-client ${joinCssClass({ isSelected })}`}
+      onClick={() => setNewConsClient(consensusClient)}
+      shadow={isSelected}
+    >
+      <div className="title">{prettyDnpName(consensusClient)}</div>
       {isSelected && (
         <>
           <hr />
@@ -55,6 +62,16 @@ export default function ConsensusClient({
                 value: graffiti || "",
                 onValueChange: (value: string) => setNewGraffiti(value),
                 error: graffitiError
+              },
+              {
+                label: "Checkpoint sync",
+                labelId: "checkpoint-sync",
+                name: "checkpoint-sync",
+                autoComplete: "checkpoint-sync",
+                secret: false,
+                value: checkpointSync || "",
+                onValueChange: (value: string) => setNewCheckpointSync(value),
+                error: null
               }
             ]}
           />

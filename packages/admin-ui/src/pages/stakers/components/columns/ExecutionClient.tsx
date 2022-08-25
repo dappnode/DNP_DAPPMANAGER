@@ -1,7 +1,8 @@
 import React from "react";
 import Card from "components/Card";
-import { BsCircle, BsCircleFill } from "react-icons/bs";
 import { prettyDnpName } from "utils/format";
+import { joinCssClass } from "utils/css";
+import "./columns.scss";
 
 export default function ExecutionClient({
   executionClient,
@@ -15,10 +16,12 @@ export default function ExecutionClient({
   isSelected: boolean;
 }) {
   return (
-    <Card onClick={() => setNewExecClient(executionClient)} shadow={isSelected}>
-      <p>{prettyDnpName(executionClient)}</p>
-      {isInstalled ? <BsCircleFill /> : <BsCircle />} Installed <br />
-      {isSelected ? <BsCircleFill /> : <BsCircle />} Selected
+    <Card
+      className={`execution-client ${joinCssClass({ isSelected })}`}
+      onClick={() => setNewExecClient(executionClient)}
+      shadow={isSelected}
+    >
+      <div className="title">{prettyDnpName(executionClient)}</div>
     </Card>
   );
 }
