@@ -301,7 +301,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             isSelected: false
           },
           graffiti: "Validating_from_DAppNode",
-          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
+          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+          checkpointSync: "https://checkpoint-sync.dappnode.io/"
         };
       case "prater":
         return {
@@ -345,7 +346,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             isSelected: false
           },
           graffiti: "",
-          feeRecipient: ""
+          feeRecipient: "",
+          checkpointSync: ""
         };
 
       case "gnosis":
@@ -390,7 +392,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             isSelected: false
           },
           graffiti: "",
-          feeRecipient: ""
+          feeRecipient: "",
+          checkpointSync: ""
         };
     }
   },

@@ -82,10 +82,14 @@ export async function stakerConfigSet({
         [stakerConfig.consensusClient]: {
           environment: {
             [getValidatorServiceName(stakerConfig.consensusClient)]: {
+              // Graffiti is a mandatory value
               ["GRAFFITI"]: stakerConfig.graffiti || "Validating_from_DAppNode",
+              // Fee recipient is a mandatory value
               ["FEE_RECIPIENT_ADDRESS"]:
                 stakerConfig.feeRecipient ||
-                "0x0000000000000000000000000000000000000000"
+                "0x0000000000000000000000000000000000000000",
+              // Checkpoint sync is an optional value
+              ["CHECKPOINT_SYNC_URL"]: stakerConfig.checkpointSync || ""
             }
           }
         }
@@ -219,12 +223,13 @@ export async function stakerConfigGet(
       isSelected: isMevBoostSelected
     };
 
-    // Get graffiti and feerecipientAddress from the consClientInstalled (if any)
+    // Get graffiti, feerecipientAddress and checkpointSync from the consClientInstalled (if any)
     const consensusPkgSelected = pkgs.find(
       pkg => pkg.dnpName === currentConsClient
     );
     let graffiti = "";
     let feeRecipient = "";
+    let checkpointSync = "";
     if (consensusPkgSelected) {
       const environment = new ComposeFileEditor(
         consensusPkgSelected.dnpName,
@@ -236,6 +241,7 @@ export async function stakerConfigGet(
         );
         graffiti = environment[validatorService]["GRAFFITI"];
         feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
+        checkpointSync = environment[validatorService]["CHECKPOINT_SYNC_URL"];
       }
     }
 
@@ -245,7 +251,8 @@ export async function stakerConfigGet(
       web3signer,
       mevBoost,
       graffiti,
-      feeRecipient
+      feeRecipient,
+      checkpointSync
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);

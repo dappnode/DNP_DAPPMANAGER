@@ -1215,6 +1215,7 @@ export interface StakerConfigGet {
   mevBoost: PkgStatus;
   graffiti: string;
   feeRecipient: string;
+  checkpointSync: string;
 }
 
 export interface PkgStatus {
@@ -1231,4 +1232,5 @@ export interface StakerConfigSet {
   enableMevBoost?: boolean;
   graffiti?: string;
   feeRecipient?: string;
+  checkpointSync?: string;
 }
