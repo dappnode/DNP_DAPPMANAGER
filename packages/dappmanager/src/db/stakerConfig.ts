@@ -70,7 +70,7 @@ const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
 
 export const consensusClientPrater = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConsensusClientPrater | null>(
+  ...dbMain.staticKey<ConsensusClientPrater | null | undefined>(
     CONSENSUS_CLIENT_PRATER,
     null
   ),
@@ -78,7 +78,7 @@ export const consensusClientPrater = interceptGlobalEnvOnSet({
 });
 
 export const executionClientPrater = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ExecutionClientPrater | null>(
+  ...dbMain.staticKey<ExecutionClientPrater | null | undefined>(
     EXECUTION_CLIENT_PRATER,
     null
   ),
