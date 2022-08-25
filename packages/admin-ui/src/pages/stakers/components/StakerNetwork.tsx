@@ -35,6 +35,7 @@ export default function StakerNetwork({
   );
   const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newGraffiti, setNewGraffiti] = useState<string>();
+  const [newCheckpointSync, setNewCheckpointSync] = useState<string>();
 
   // Current config
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
@@ -63,6 +64,7 @@ export default function StakerNetwork({
       );
       setNewFeeRecipient(currentStakerConfigReq.data.feeRecipient);
       setNewGraffiti(currentStakerConfigReq.data.graffiti);
+      setNewCheckpointSync(currentStakerConfigReq.data.checkpointSync);
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
@@ -71,6 +73,7 @@ export default function StakerNetwork({
         consensusClient: cc,
         graffiti: currentStakerConfigReq.data.graffiti,
         feeRecipient: currentStakerConfigReq.data.feeRecipient,
+        checkpointSync: currentStakerConfigReq.data.checkpointSync,
         enableMevBoost: currentStakerConfigReq.data.mevBoost.isInstalled,
         enableWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
       });
@@ -86,12 +89,14 @@ export default function StakerNetwork({
         feeRecipient,
         graffiti,
         enableMevBoost,
-        enableWeb3signer
+        enableWeb3signer,
+        checkpointSync
       } = currentStakerConfig;
       return (
         executionClient !== newExecClient ||
         consensusClient !== newConsClient ||
         feeRecipient !== newFeeRecipient ||
+        checkpointSync !== newCheckpointSync ||
         graffiti !== newGraffiti ||
         enableMevBoost !== newEnableMevBoost ||
         enableWeb3signer !== newEnableWeb3signer
@@ -193,6 +198,8 @@ export default function StakerNetwork({
                   setNewGraffiti={setNewGraffiti}
                   feeRecipient={newFeeRecipient}
                   setNewFeeRecipient={setNewFeeRecipient}
+                  checkpointSync={newCheckpointSync}
+                  setNewCheckpointSync={setNewCheckpointSync}
                 />
               </div>
             )
@@ -205,7 +212,7 @@ export default function StakerNetwork({
             <RemoteSigner
               signer={currentStakerConfigReq.data.web3signer.dnpName}
               setEnableWeb3signer={setNewEnableWeb3signer}
-              enableWeb3signer={newEnableWeb3signer}
+              isSelected={newEnableWeb3signer}
             />
           </div>
         </Col>
@@ -217,7 +224,7 @@ export default function StakerNetwork({
               mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
               setEnableMevBoost={setNewEnableMevBoost}
               isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
-              enableMevBoost={newEnableMevBoost}
+              isSelected={newEnableMevBoost}
             />
           </div>
         </Col>
