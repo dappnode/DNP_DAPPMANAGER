@@ -1,24 +1,25 @@
 import React from "react";
 import Card from "components/Card";
-import { BsCircle, BsCircleFill } from "react-icons/bs";
 import { prettyDnpName } from "utils/format";
+import { joinCssClass } from "utils/css";
+import "./columns.scss";
 
 export default function RemoteSigner({
   signer,
   setEnableWeb3signer,
-  enableWeb3signer
+  isSelected
 }: {
   signer: string;
   setEnableWeb3signer: (installWeb3signer: boolean) => void;
-  enableWeb3signer: boolean;
+  isSelected: boolean;
 }) {
   return (
     <Card
-      onClick={() => setEnableWeb3signer(!enableWeb3signer)}
-      shadow={enableWeb3signer}
+      className={`remote-signer ${joinCssClass({ isSelected })}`}
+      onClick={() => setEnableWeb3signer(!isSelected)}
+      shadow={isSelected}
     >
-      <p>{prettyDnpName(signer)}</p>
-      {enableWeb3signer ? <BsCircleFill /> : <BsCircle />} Enabled <br />
+      <div className="title">{prettyDnpName(signer)}</div>
     </Card>
   );
 }
