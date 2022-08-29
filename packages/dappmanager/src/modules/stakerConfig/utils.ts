@@ -13,14 +13,19 @@ export function setStakerConfigOnDb(
       db.executionClientMainnet.set(stakerConfig.executionClient);
       db.consensusClientMainnet.set(stakerConfig.consensusClient);
       db.mevBoostMainnet.set(stakerConfig.enableMevBoost);
+      break;
     case "gnosis":
       db.executionClientGnosis.set(stakerConfig.executionClient);
       db.consensusClientGnosis.set(stakerConfig.consensusClient);
       db.mevBoostGnosis.set(stakerConfig.enableMevBoost);
+      break;
     case "prater":
       db.executionClientPrater.set(stakerConfig.executionClient);
       db.consensusClientPrater.set(stakerConfig.consensusClient);
       db.mevBoostPrater.set(stakerConfig.enableMevBoost);
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
   }
 }
 

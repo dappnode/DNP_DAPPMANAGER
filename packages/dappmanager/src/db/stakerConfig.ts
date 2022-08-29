@@ -16,7 +16,7 @@ const EXECUTION_CLIENT_MAINNET = "execution-client-mainnet";
 const MEVBOOST_MAINNET = "mevboost-mainnet";
 
 export const consensusClientMainnet = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ExecutionClientMainnet | null | undefined>(
+  ...dbMain.staticKey<ConsensusClientMainnet | null | undefined>(
     CONSENSUS_CLIENT_MAINNET,
     null
   ),
@@ -24,7 +24,7 @@ export const consensusClientMainnet = interceptGlobalEnvOnSet({
 });
 
 export const executionClientMainnet = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConsensusClientMainnet | null | undefined>(
+  ...dbMain.staticKey<ExecutionClientMainnet | null | undefined>(
     EXECUTION_CLIENT_MAINNET,
     null
   ),
@@ -43,7 +43,7 @@ const EXECUTION_CLIENT_GNOSIS = "execution-client-gnosis";
 const MEVBOOST_GNOSIS = "mevboost-gnosis";
 
 export const consensusClientGnosis = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ExecutionClientGnosis | null | undefined>(
+  ...dbMain.staticKey<ConsensusClientGnosis | null | undefined>(
     CONSENSUS_CLIENT_GNOSIS,
     null
   ),
@@ -51,7 +51,7 @@ export const consensusClientGnosis = interceptGlobalEnvOnSet({
 });
 
 export const executionClientGnosis = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<ConsensusClientGnosis | null | undefined>(
+  ...dbMain.staticKey<ExecutionClientGnosis | null | undefined>(
     EXECUTION_CLIENT_GNOSIS,
     null
   ),
