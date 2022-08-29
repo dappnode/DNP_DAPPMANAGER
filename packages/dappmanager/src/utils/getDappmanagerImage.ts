@@ -17,7 +17,7 @@ const getDappmanagerImageMemoized = memoize(
 
 /**
  * Returns the image of the current dappmanager instance running
- * It's memoized since the image will not change until this app is reseted
+ * It's memoized since the image will not change until this app is reset
  */
 export default async function getDappmanagerImage(): Promise<string> {
   return getDappmanagerImageMemoized();

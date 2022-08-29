@@ -61,7 +61,7 @@ export default function OpenVpnDevicesHome() {
       onClick: () =>
         withToastNoThrow(() => api.deviceReset({ id }), {
           message: `Reseting ${id}...`,
-          onSuccess: `Reseted ${id}`
+          onSuccess: `Reset ${id}`
         }).then(devicesReq.revalidate)
     });
   }

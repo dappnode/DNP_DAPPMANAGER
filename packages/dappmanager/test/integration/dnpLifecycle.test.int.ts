@@ -626,7 +626,7 @@ describe("DNP lifecycle", function () {
 
         expect(containerIdPrev).to.not.equal(
           containerIdNext,
-          `${dnpName} container ids are not different, so it was not reseted: ${containerIdPrev}`
+          `${dnpName} container ids are not different, so it was not reset: ${containerIdPrev}`
         );
       });
     }

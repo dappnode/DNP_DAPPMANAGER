@@ -223,7 +223,7 @@ export function clearPendingUpdates(dnpName: string): void {
 
 /**
  * Clears the pending updates from the registry so:
- * - The update delay time is reseted
+ * - The update delay time is reset
  * - The UI does no longer show the "Scheduled" info
  *
  * @param dnpName "core.dnp.dappnode.eth", "bitcoin.dnp.dappnode.eth"

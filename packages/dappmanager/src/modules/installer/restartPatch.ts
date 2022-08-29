@@ -163,7 +163,7 @@ export async function postRestartPatch(): Promise<void> {
     const packagesDataRaw = db.coreUpdatePackagesData.get();
     const log = getLogUi(params.coreDnpName);
     if (!packagesDataRaw) {
-      // Assuming the dappmanager has been reseted, not updated
+      // Assuming the dappmanager has been reset, not updated
       logs.info(`No core update packages data found`);
     } else {
       // Ensure compatibility across core updates
