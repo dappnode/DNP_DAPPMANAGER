@@ -1,8 +1,8 @@
 import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { getNetworkStakerPkgs } from "../../calls/stakerConfig";
 import { Network } from "../../types";
+import { getNetworkStakerPkgs } from "../../modules/stakerConfig/utils";
 
 function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   try {
