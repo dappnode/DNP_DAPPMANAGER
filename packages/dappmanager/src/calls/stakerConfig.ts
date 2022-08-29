@@ -9,6 +9,7 @@ import {
   UserSettingsAllDnps
 } from "../types";
 import { packageInstall } from "./packageInstall";
+import { packageSetEnvironment } from "./packageSetEnvironment";
 import { packagesGet } from "./packagesGet";
 import { packageStartStop } from "./packageStartStop";
 
@@ -69,14 +70,14 @@ export async function stakerConfigSet({
       } else {
         // Remove the previous
         /* logs.info("Removing " + currentExecClient);
-        await packageRemove({ dnpName: currentExecClient }); */
+          await packageRemove({ dnpName: currentExecClient }); */
         // Install the new EC
         logs.info("Installing " + stakerConfig.executionClient);
         await packageInstall({ name: stakerConfig.executionClient });
       }
     }
 
-    // CONSENSUS CLIENT
+    // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     if (stakerConfig.consensusClient) {
       const userSettings: UserSettingsAllDnps = {
         [stakerConfig.consensusClient]: {
@@ -106,6 +107,24 @@ export async function stakerConfigSet({
             name: stakerConfig.consensusClient,
             userSettings
           });
+          // Make sure to set the new environment (if any)
+        } else if (
+          stakerConfig.graffiti ||
+          stakerConfig.feeRecipient ||
+          stakerConfig.checkpointSync
+        ) {
+          const serviceEnv =
+            userSettings[stakerConfig.consensusClient].environment;
+
+          if (serviceEnv) {
+            logs.info(
+              "Updating environment for " + stakerConfig.consensusClient
+            );
+            await packageSetEnvironment({
+              dnpName: stakerConfig.consensusClient,
+              environmentByService: serviceEnv
+            });
+          }
         }
       } else {
         // Remove the previous
@@ -128,7 +147,6 @@ export async function stakerConfigSet({
     } else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
       // Install web3signer
       logs.info("Installing Web3Signer");
-      // TODO: check if its necessary userSettings needed for web3signer
       await packageInstall({ name: web3signerAvail });
     } else if (web3signerPkg && !stakerConfig.enableWeb3signer) {
       // Stop web3signer
@@ -138,7 +156,7 @@ export async function stakerConfigSet({
           await packageStartStop({
             dnpName: web3signerPkg.dnpName,
             serviceNames: [container.serviceName]
-          });
+          }).catch(e => logs.error(e.message));
         }
       }
     }
@@ -166,10 +184,11 @@ export async function stakerConfigSet({
  * Fetches the current staker configuration:
  * - execution clients: isInstalled and isSelected
  * - consensus clients: isInstalled and isSelected
- * - web3signer: isInstalled
- * - mevBoost: isInstalled
+ * - web3signer: isInstalled and isSelected
+ * - mevBoost: isInstalled and isSelected
  * - graffiti
  * - fee recipient address
+ * - checkpoint sync url
  * @param network
  */
 export async function stakerConfigGet(
@@ -326,7 +345,8 @@ export function getNetworkStakerPkgs(network: Network): {
         consClientsAvail: [
           "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
           "lighthouse-gnosis.dnp.dappnode.eth",
-          "teku-gnosis.dnp.dappnode.eth"
+          "teku-gnosis.dnp.dappnode.eth",
+          "nimbus-gnosis.dnp.dappnode.eth"
         ],
         currentConsClient: db.consensusClientGnosis.get(),
         web3signerAvail: "web3signer-gnosis.dnp.dappnode.eth",
