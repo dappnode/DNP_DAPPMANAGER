@@ -27,6 +27,7 @@ import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
+import { setDefaultStakerConfig } from "./modules/stakerConfig/setDefaultStakerConfig";
 
 const controller = new AbortController();
 
@@ -118,6 +119,10 @@ runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 
 addAliasToRunningContainersMigration().catch(e =>
   logs.error("Error adding alias to running containers", e)
+);
+
+setDefaultStakerConfig().catch(e =>
+  logs.error("Error setting default staker config", e)
 );
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
