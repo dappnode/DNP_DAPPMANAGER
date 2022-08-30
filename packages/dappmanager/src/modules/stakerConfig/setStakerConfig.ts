@@ -250,6 +250,10 @@ async function setWeb3signerConfig(
           timeout: 2
         }).catch(e => logs.error(e.message));
       }
+    } // Web3signer not installed and enable => install it
+    else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
+      logs.info("Installing Web3Signer");
+      await packageInstall({ name: web3signerAvail });
     }
   } // Web3signer not installed and enable => make sure its installed
   else if (!web3signerPkg && enableWeb3signer) {
