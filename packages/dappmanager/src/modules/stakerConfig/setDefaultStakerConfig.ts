@@ -15,7 +15,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
     if (stakerConfig.currentExecClient === null) {
-      let newExexClientValue = undefined;
+      let newExexClientValue = "";
 
       for (const execClient of stakerConfig.execClientsAvail) {
         if (pkgs.find(pkg => pkg.dnpName === execClient)) {
@@ -50,13 +50,13 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If the web3signer is installed then grab the value from its compose ENV value
     // If not web3signer then is undefined
     if (stakerConfig.currentConsClient === null) {
-      let newConsClientValue = undefined;
+      let newConsClientValue = "";
 
       const web3signerPkg = pkgs.find(
         pkg => pkg.dnpName === stakerConfig.web3signerAvail
       );
 
-      if (web3signerPkg) {
+      label: if (web3signerPkg) {
         // Get the env value from ETH2_CLIENT
         const environment = new ComposeFileEditor(
           web3signerPkg.dnpName,
@@ -71,10 +71,12 @@ export async function setDefaultStakerConfig(): Promise<void> {
           const eth2ClientDnpName = stakerConfig.consClientsAvail.find(
             dnpName => dnpName.includes(eth2Client)
           );
+          if (!eth2ClientDnpName) break label;
           const eth2ClientPkg = pkgs.find(
             pkg => pkg.dnpName === eth2ClientDnpName
           );
-          if (eth2ClientPkg) newConsClientValue = eth2ClientDnpName;
+          if (!eth2ClientPkg) break label;
+          newConsClientValue = eth2ClientDnpName;
         }
       }
 
