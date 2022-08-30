@@ -10,10 +10,10 @@ export async function setDefaultStakerConfig(): Promise<void> {
   for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
     const stakerConfig = getNetworkStakerPkgs(network);
 
-    /*     EXECUTION_CLIENT_<NETWORK>:
-    If the user has selected the repository full node option (geth-light should be considered as remote) then use this value.
-    If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
-    If there is no repository full node option selected and there are no execution clients packages installed then set undefined */
+    // EXECUTION_CLIENT_<NETWORK>:
+    // If the user has selected the repository full node option (geth-light should be considered as remote) then use this value.
+    // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
+    // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
     if (stakerConfig.currentExecClient === null) {
       let newExexClientValue = undefined;
 
@@ -46,9 +46,9 @@ export async function setDefaultStakerConfig(): Promise<void> {
       }
     }
 
-    /* CONSENSUS_CLIENT_<NETWORK>:
-    If the web3signer is installed then grab the value from its compose ENV value https://github.com/dappnode/DAppNodePackage-web3signer-prater/blob/49fd37ea3acee0d06908b4f96a017123ec328e78/docker-compose.yml#L20 .
-    If not web3signer then is undefined */
+    // CONSENSUS_CLIENT_<NETWORK>:
+    // If the web3signer is installed then grab the value from its compose ENV value
+    // If not web3signer then is undefined
     if (stakerConfig.currentConsClient === null) {
       let newConsClientValue = undefined;
 
@@ -62,9 +62,12 @@ export async function setDefaultStakerConfig(): Promise<void> {
           web3signerPkg.dnpName,
           web3signerPkg.isCore
         ).getUserSettings().environment;
-        if (environment) {
+        if (
+          environment &&
+          "web3signer" in environment &&
+          "ETH2_CLIENT" in environment.web3signer
+        ) {
           const eth2Client = environment["web3signer"]["ETH2_CLIENT"];
-          // check the selected client is installed
           const eth2ClientDnpName = stakerConfig.consClientsAvail.find(
             dnpName => dnpName.includes(eth2Client)
           );
