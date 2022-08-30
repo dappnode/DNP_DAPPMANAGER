@@ -57,16 +57,17 @@ export async function setStakerConfig({
 
     // EXECUTION CLIENT
     if (stakerConfig.executionClient) {
+      // Ensure the EC is installed
       if (currentExecClient === stakerConfig.executionClient) {
         logs.info(
           "Execution client is already set to " + stakerConfig.executionClient
         );
-        // Make sure the EC is installed
         if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
           logs.info("Installing " + stakerConfig.executionClient);
           await packageInstall({ name: stakerConfig.executionClient });
         }
-      } else {
+      } // If the EC is not installed, install it
+      else {
         // Remove the previous
         /* logs.info("Removing " + currentExecClient);
           await packageRemove({ dnpName: currentExecClient }); */
@@ -78,6 +79,7 @@ export async function setStakerConfig({
 
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     if (stakerConfig.consensusClient) {
+      // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
       const userSettings: UserSettingsAllDnps = {
         [stakerConfig.consensusClient]: {
           environment: {
@@ -95,19 +97,19 @@ export async function setStakerConfig({
         }
       };
 
+      // Ensure the CC selected is installed
       if (currentConsClient === stakerConfig.consensusClient) {
         logs.info(
           "Consensus client is already set to " + stakerConfig.consensusClient
         );
-        // Make sure the CC is installed
         if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
           logs.info("Installing " + stakerConfig.consensusClient);
           await packageInstall({
             name: stakerConfig.consensusClient,
             userSettings
           });
-          // Make sure to set the new environment (if any)
-        } else if (
+        } // If the CC is not installed, install it
+        else if (
           stakerConfig.graffiti ||
           stakerConfig.feeRecipient ||
           stakerConfig.checkpointSync
@@ -125,7 +127,8 @@ export async function setStakerConfig({
             });
           }
         }
-      } else {
+      } // Install the new CC
+      else {
         // Remove the previous
         /*       logs.info("Removing " + currentConsClient);
         await packageRemove({ dnpName: currentConsClient }); */
@@ -140,29 +143,38 @@ export async function setStakerConfig({
 
     // WEB3SIGNER
     const web3signerPkg = pkgs.find(p => p.dnpName === web3signerAvail);
+    // Web3signer installed and enable => make sure its running
     if (web3signerPkg && stakerConfig.enableWeb3signer) {
-      // Do nothing, web3signer enabled and installed
       logs.info("Web3Signer is already installed");
-    } else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
-      // Install web3signer
-      logs.info("Installing Web3Signer");
-      await packageInstall({ name: web3signerAvail });
-    } else if (web3signerPkg && !stakerConfig.enableWeb3signer) {
-      // Stop web3signer
       for (const container of web3signerPkg.containers) {
-        if (container.running) {
-          logs.info("Stopping Web3Signer");
+        if (!container.running) {
+          logs.info("Starting Web3Signer container");
           await packageStartStop({
             dnpName: web3signerPkg.dnpName,
             serviceNames: [container.serviceName]
           }).catch(e => logs.error(e.message));
         }
       }
+    } // Web3signer installed and disabled => make sure its stopped
+    else if (web3signerPkg && !stakerConfig.enableWeb3signer) {
+      for (const container of web3signerPkg.containers) {
+        if (container.running) {
+          logs.info("Stopping Web3Signer container");
+          await packageStartStop({
+            dnpName: web3signerPkg.dnpName,
+            serviceNames: [container.serviceName]
+          }).catch(e => logs.error(e.message));
+        }
+      }
+    } // Web3signer not installed and enable => install it
+    else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
+      logs.info("Installing Web3Signer");
+      await packageInstall({ name: web3signerAvail });
     }
 
     // MEV BOOST
-    const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
     if (stakerConfig.enableMevBoost) {
+      const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
       if (mevBoostPkg) {
         logs.info("MevBoost is already installed");
       } else if (stakerConfig.enableMevBoost) {

@@ -4,6 +4,16 @@ import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
 
+/**
+ * Sets default values for the global environment variables:
+ * - _DAPPNODE_GLOBAL_EXECUTION_CLIENT_<NETWORK>
+ * - _DAPPNODE_GLOBAL_CONSENSUS_CLIENT_<NETWORK>
+ *
+ * Based on:
+ * - Web3siger package installed and ETH2_CLIENT selected at that moment
+ * - Full Eth repository selected
+ * - Execution and/or consensus clients installed
+ */
 export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
