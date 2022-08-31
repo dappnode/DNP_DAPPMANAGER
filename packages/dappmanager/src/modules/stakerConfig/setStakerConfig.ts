@@ -67,7 +67,7 @@ export async function setStakerConfig({
           await packageInstall({ name: stakerConfig.executionClient });
         }
       } // If the EC is not installed, install it
-      else {
+      else if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
         // Remove the previous
         /* logs.info("Removing " + currentExecClient);
           await packageRemove({ dnpName: currentExecClient }); */
@@ -128,11 +128,11 @@ export async function setStakerConfig({
           }
         }
       } // Install the new CC
-      else {
+      else if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
         // Remove the previous
         /*       logs.info("Removing " + currentConsClient);
         await packageRemove({ dnpName: currentConsClient }); */
-        // Install the new CC
+        // Install the new CC if not already installed
         logs.info("Installing " + stakerConfig.consensusClient);
         await packageInstall({
           name: stakerConfig.consensusClient,
