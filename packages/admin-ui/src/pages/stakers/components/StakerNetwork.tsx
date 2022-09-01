@@ -74,7 +74,7 @@ export default function StakerNetwork({
         graffiti: currentStakerConfigReq.data.graffiti,
         feeRecipient: currentStakerConfigReq.data.feeRecipient,
         checkpointSync: currentStakerConfigReq.data.checkpointSync,
-        enableMevBoost: currentStakerConfigReq.data.mevBoost.isInstalled,
+        enableMevBoost: currentStakerConfigReq.data.mevBoost.isSelected,
         enableWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
       });
     }
@@ -163,6 +163,12 @@ export default function StakerNetwork({
 
   return (
     <Card>
+      <p>
+        Setup your staker configuration by selecting the Execution and Consensus
+        clients based on your needs, enable and disable the remote signer and
+        the mev boost
+      </p>
+      <br />
       <p>{description}</p>
       <Row>
         <Col>
@@ -219,18 +225,19 @@ export default function StakerNetwork({
             />
           </div>
         </Col>
-
-        <Col>
-          <SubTitle>Mev Boost</SubTitle>
-          <div className="mev-boost">
-            <MevBoost
-              mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
-              setEnableMevBoost={setNewEnableMevBoost}
-              isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
-              isSelected={newEnableMevBoost}
-            />
-          </div>
-        </Col>
+        {network === "prater" && (
+          <Col>
+            <SubTitle>Mev Boost</SubTitle>
+            <div className="mev-boost">
+              <MevBoost
+                mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
+                setEnableMevBoost={setNewEnableMevBoost}
+                isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
+                isSelected={newEnableMevBoost}
+              />
+            </div>
+          </Col>
+        )}
       </Row>
 
       <hr />
