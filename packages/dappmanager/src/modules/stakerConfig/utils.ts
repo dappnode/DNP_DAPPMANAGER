@@ -47,9 +47,9 @@ export function getNetworkStakerPkgs(network: Network): {
       return {
         execClientsAvail: [
           "geth.dnp.dappnode.eth",
-          "nethermind.dnp.dappnode.eth",
-          "besu.dnp.dappnode.eth",
+          "nethermind.public.dappnode.eth",
           "erigon.dnp.dappnode.eth"
+          //"besu.dnp.dappnode.eth",
         ],
         currentExecClient: db.executionClientMainnet.get(),
         consClientsAvail: [
@@ -71,8 +71,8 @@ export function getNetworkStakerPkgs(network: Network): {
         consClientsAvail: [
           "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
           "lighthouse-gnosis.dnp.dappnode.eth",
-          "teku-gnosis.dnp.dappnode.eth",
-          "nimbus-gnosis.dnp.dappnode.eth"
+          "teku-gnosis.dnp.dappnode.eth"
+          //"nimbus-gnosis.dnp.dappnode.eth"
         ],
         currentConsClient: db.consensusClientGnosis.get(),
         web3signerAvail: "web3signer-gnosis.dnp.dappnode.eth",
@@ -81,7 +81,11 @@ export function getNetworkStakerPkgs(network: Network): {
       };
     case "prater":
       return {
-        execClientsAvail: ["goerli-geth.dnp.dappnode.eth"],
+        execClientsAvail: [
+          "goerli-geth.dnp.dappnode.eth",
+          "goerli-erigon.dnp.dappnode.eth",
+          "goerli-nethermind.dnp.dappnode.eth"
+        ],
         currentExecClient: db.executionClientPrater.get(),
         consClientsAvail: [
           "prysm-prater.dnp.dappnode.eth",
@@ -91,7 +95,7 @@ export function getNetworkStakerPkgs(network: Network): {
         ],
         currentConsClient: db.consensusClientPrater.get(),
         web3signerAvail: "web3signer-prater.dnp.dappnode.eth",
-        mevBoostAvail: "mevboost-prater.dnp.dappnode.eth",
+        mevBoostAvail: "mev-boost-goerli.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
       };
   }
