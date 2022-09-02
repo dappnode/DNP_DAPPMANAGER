@@ -11,17 +11,17 @@ export function setStakerConfigOnDb(
   switch (network) {
     case "mainnet":
       db.executionClientMainnet.set(stakerConfig.executionClient);
-      db.consensusClientMainnet.set(stakerConfig.consensusClient);
+      db.consensusClientMainnet.set(stakerConfig.consensusClient?.dnpName);
       db.mevBoostMainnet.set(stakerConfig.enableMevBoost);
       break;
     case "gnosis":
       db.executionClientGnosis.set(stakerConfig.executionClient);
-      db.consensusClientGnosis.set(stakerConfig.consensusClient);
+      db.consensusClientGnosis.set(stakerConfig.consensusClient?.dnpName);
       db.mevBoostGnosis.set(stakerConfig.enableMevBoost);
       break;
     case "prater":
       db.executionClientPrater.set(stakerConfig.executionClient);
-      db.consensusClientPrater.set(stakerConfig.consensusClient);
+      db.consensusClientPrater.set(stakerConfig.consensusClient?.dnpName);
       db.mevBoostPrater.set(stakerConfig.enableMevBoost);
       break;
     default:

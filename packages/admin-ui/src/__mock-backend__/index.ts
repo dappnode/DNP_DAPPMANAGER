@@ -272,7 +272,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              graffiti: "Validating_from_prysm-mainnet",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse.dnp.dappnode.eth",
@@ -287,7 +290,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              graffiti: "Validating_from_prysm-nimbus",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
           web3signer: {
@@ -317,12 +323,18 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "prysm-prater.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              graffiti: "Validating_from_Prysm-prater",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse-prater.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              graffiti: "Validating_from_lighthouse-prater",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "teku-prater.dnp.dappnode.eth",
@@ -363,12 +375,18 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              graffiti: "Validating_from_Prysm-gnosis",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              graffiti: "Validating_from_lighthouse-gnosis",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "teku-gnosis.dnp.dappnode.eth",
@@ -390,10 +408,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             dnpName: "mevboost-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isSelected: false
-          },
-          graffiti: "",
-          feeRecipient: "",
-          checkpointSync: ""
+          }
         };
     }
   },

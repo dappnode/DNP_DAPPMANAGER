@@ -1213,23 +1213,27 @@ export interface StakerConfigGet {
   consensusClients: PkgStatus[];
   web3signer: PkgStatus;
   mevBoost: PkgStatus;
-  graffiti: string;
-  feeRecipient: string;
-  checkpointSync: string;
 }
 
 export interface PkgStatus {
   dnpName: string;
   isInstalled: boolean;
   isSelected: boolean;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
 }
 
 export interface StakerConfigSet {
   network: Network;
   executionClient?: string;
-  consensusClient?: string;
+  consensusClient?: ConsensusClient;
   enableWeb3signer?: boolean;
   enableMevBoost?: boolean;
+}
+
+export interface ConsensusClient {
+  dnpName: string;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;
