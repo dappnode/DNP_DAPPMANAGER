@@ -16,7 +16,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
     title: string;
     component: JSX.Element;
   }[] = [
-    {
+    /*     {
       subPath: "mainnet",
       title: "Mainnet",
       component: StakerNetwork({
@@ -33,7 +33,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
         description:
           "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
       })
-    },
+    }, */
     {
       subPath: "prater",
       title: "Prater",
