@@ -90,8 +90,7 @@ export default function StakerNetwork({
         executionClient,
         consensusClient,
         enableMevBoost,
-        enableWeb3signer,
-        checkpointSync
+        enableWeb3signer
       } = currentStakerConfig;
       return (
         executionClient !== newExecClient ||
