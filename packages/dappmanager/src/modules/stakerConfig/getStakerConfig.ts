@@ -43,10 +43,31 @@ export async function getStakerConfig(
     // Consensus clients
     const consensusClients: PkgStatus[] = [];
     for (const conCl of consClientsAvail) {
+      const pkgInstalled = pkgs.find(pkg => pkg.dnpName === conCl);
+      let graffiti = "";
+      let feeRecipient = "";
+      let checkpointSync = "";
+      if (pkgInstalled) {
+        const environment = new ComposeFileEditor(
+          pkgInstalled.dnpName,
+          pkgInstalled.isCore
+        ).getUserSettings().environment;
+        if (environment) {
+          const validatorService = getValidatorServiceName(
+            pkgInstalled.dnpName
+          );
+          graffiti = environment[validatorService]["GRAFFITI"];
+          feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
+          checkpointSync = environment[validatorService]["CHECKPOINT_SYNC_URL"];
+        }
+      }
       consensusClients.push({
         dnpName: conCl,
         isInstalled: pkgs.some(pkg => pkg.dnpName === conCl),
-        isSelected: currentConsClient === conCl
+        isSelected: currentConsClient === conCl,
+        graffiti,
+        feeRecipient,
+        checkpointSync
       });
     }
 
@@ -65,36 +86,11 @@ export async function getStakerConfig(
       isSelected: isMevBoostSelected
     };
 
-    // Get graffiti, feerecipientAddress and checkpointSync from the consClientInstalled (if any)
-    const consensusPkgSelected = pkgs.find(
-      pkg => pkg.dnpName === currentConsClient
-    );
-    let graffiti = "";
-    let feeRecipient = "";
-    let checkpointSync = "";
-    if (consensusPkgSelected) {
-      const environment = new ComposeFileEditor(
-        consensusPkgSelected.dnpName,
-        consensusPkgSelected.isCore
-      ).getUserSettings().environment;
-      if (environment) {
-        const validatorService = getValidatorServiceName(
-          consensusPkgSelected.dnpName
-        );
-        graffiti = environment[validatorService]["GRAFFITI"];
-        feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
-        checkpointSync = environment[validatorService]["CHECKPOINT_SYNC_URL"];
-      }
-    }
-
     return {
       executionClients,
       consensusClients,
       web3signer,
-      mevBoost,
-      graffiti,
-      feeRecipient,
-      checkpointSync
+      mevBoost
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);

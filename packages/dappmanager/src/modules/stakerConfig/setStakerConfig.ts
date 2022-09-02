@@ -47,7 +47,7 @@ export async function setStakerConfig({
     // Ensure Consensus clients DNP's names are valid
     if (
       stakerConfig.consensusClient &&
-      !consClientsAvail.includes(stakerConfig.consensusClient)
+      !consClientsAvail.includes(stakerConfig.consensusClient.dnpName)
     )
       throw Error(
         `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
@@ -81,61 +81,68 @@ export async function setStakerConfig({
     if (stakerConfig.consensusClient) {
       // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
       const userSettings: UserSettingsAllDnps = {
-        [stakerConfig.consensusClient]: {
+        [stakerConfig.consensusClient.dnpName]: {
           environment: {
-            [getValidatorServiceName(stakerConfig.consensusClient)]: {
+            [getValidatorServiceName(stakerConfig.consensusClient.dnpName)]: {
               // Graffiti is a mandatory value
-              ["GRAFFITI"]: stakerConfig.graffiti || "Validating_from_DAppNode",
+              ["GRAFFITI"]:
+                stakerConfig.consensusClient.graffiti ||
+                "Validating_from_DAppNode",
               // Fee recipient is a mandatory value
               ["FEE_RECIPIENT_ADDRESS"]:
-                stakerConfig.feeRecipient ||
+                stakerConfig.consensusClient.feeRecipient ||
                 "0x0000000000000000000000000000000000000000",
               // Checkpoint sync is an optional value
-              ["CHECKPOINT_SYNC_URL"]: stakerConfig.checkpointSync || ""
+              ["CHECKPOINT_SYNC_URL"]:
+                stakerConfig.consensusClient.checkpointSync || ""
             }
           }
         }
       };
 
       // Ensure the CC selected is installed
-      if (currentConsClient === stakerConfig.consensusClient) {
+      if (currentConsClient === stakerConfig.consensusClient.dnpName) {
         logs.info(
           "Consensus client is already set to " + stakerConfig.consensusClient
         );
-        if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
+        if (
+          !pkgs.find(p => p.dnpName === stakerConfig.consensusClient?.dnpName)
+        ) {
           logs.info("Installing " + stakerConfig.consensusClient);
           await packageInstall({
-            name: stakerConfig.consensusClient,
+            name: stakerConfig.consensusClient.dnpName,
             userSettings
           });
         } // If the CC is not installed, install it
         else if (
-          stakerConfig.graffiti ||
-          stakerConfig.feeRecipient ||
-          stakerConfig.checkpointSync
+          stakerConfig.consensusClient.graffiti ||
+          stakerConfig.consensusClient.feeRecipient ||
+          stakerConfig.consensusClient.checkpointSync
         ) {
           const serviceEnv =
-            userSettings[stakerConfig.consensusClient].environment;
+            userSettings[stakerConfig.consensusClient.dnpName].environment;
 
           if (serviceEnv) {
             logs.info(
               "Updating environment for " + stakerConfig.consensusClient
             );
             await packageSetEnvironment({
-              dnpName: stakerConfig.consensusClient,
+              dnpName: stakerConfig.consensusClient.dnpName,
               environmentByService: serviceEnv
             });
           }
         }
       } // Install the new CC
-      else if (!pkgs.find(p => p.dnpName === stakerConfig.consensusClient)) {
+      else if (
+        !pkgs.find(p => p.dnpName === stakerConfig.consensusClient?.dnpName)
+      ) {
         // Remove the previous
         /*       logs.info("Removing " + currentConsClient);
         await packageRemove({ dnpName: currentConsClient }); */
         // Install the new CC if not already installed
         logs.info("Installing " + stakerConfig.consensusClient);
         await packageInstall({
-          name: stakerConfig.consensusClient,
+          name: stakerConfig.consensusClient.dnpName,
           userSettings
         });
       }
@@ -188,5 +195,5 @@ export async function setStakerConfig({
     setStakerConfigOnDb(stakerConfig.network, stakerConfig);
   } catch (e) {
     throw Error(`Error setting staker config: ${e}`);
-  }
+  } // TODO: consider having a finally block to ensure the correct staker config is persisted
 }

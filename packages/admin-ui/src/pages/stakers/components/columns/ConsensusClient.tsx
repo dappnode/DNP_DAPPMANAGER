@@ -3,33 +3,26 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
+import { ConsensusClient as ConsensusClientIface } from "types";
 import "./columns.scss";
 
 export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   isInstalled,
-  isSelected,
-  graffiti,
-  setNewGraffiti,
-  feeRecipient,
-  setNewFeeRecipient,
-  checkpointSync,
-  setNewCheckpointSync
+  isSelected
 }: {
-  consensusClient: string;
-  setNewConsClient: (consensusClient: string) => void;
+  consensusClient: ConsensusClientIface;
+  setNewConsClient: React.Dispatch<
+    React.SetStateAction<ConsensusClientIface | undefined>
+  >;
   isInstalled: boolean;
   isSelected: boolean;
-  graffiti?: string;
-  setNewGraffiti: (newGraffiti: string) => void;
-  feeRecipient?: string;
-  setNewFeeRecipient: (newFeeRecipient: string) => void;
-  checkpointSync?: string;
-  setNewCheckpointSync: (newCheckpointSync: string) => void;
 }) {
-  const feeRecipientError = validateEthereumAddress(feeRecipient);
-  const graffitiError = validateGraffiti(graffiti);
+  const feeRecipientError = validateEthereumAddress(
+    consensusClient.feeRecipient
+  );
+  const graffitiError = validateGraffiti(consensusClient.graffiti);
 
   return (
     <Card
@@ -37,7 +30,7 @@ export default function ConsensusClient({
       onClick={() => setNewConsClient(consensusClient)}
       shadow={isSelected}
     >
-      <div className="title">{prettyDnpName(consensusClient)}</div>
+      <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
       {isSelected && (
         <>
           <hr />
@@ -49,8 +42,9 @@ export default function ConsensusClient({
                 name: "fee-recipient-address",
                 autoComplete: "fee-recipient-address",
                 secret: false,
-                value: feeRecipient || "",
-                onValueChange: (value: string) => setNewFeeRecipient(value),
+                value: consensusClient.feeRecipient || "",
+                onValueChange: (value: string) =>
+                  setNewConsClient({ ...consensusClient, feeRecipient: value }),
                 error: feeRecipientError
               },
               {
@@ -59,8 +53,9 @@ export default function ConsensusClient({
                 name: "graffiti",
                 autoComplete: "validating_from_DAppNode",
                 secret: false,
-                value: graffiti || "",
-                onValueChange: (value: string) => setNewGraffiti(value),
+                value: consensusClient.graffiti || "",
+                onValueChange: (value: string) =>
+                  setNewConsClient({ ...consensusClient, graffiti: value }),
                 error: graffitiError
               },
               {
@@ -69,8 +64,12 @@ export default function ConsensusClient({
                 name: "checkpoint-sync",
                 autoComplete: "checkpoint-sync",
                 secret: false,
-                value: checkpointSync || "",
-                onValueChange: (value: string) => setNewCheckpointSync(value),
+                value: consensusClient.checkpointSync || "",
+                onValueChange: (value: string) =>
+                  setNewConsClient({
+                    ...consensusClient,
+                    checkpointSync: value
+                  }),
                 error: null
               }
             ]}

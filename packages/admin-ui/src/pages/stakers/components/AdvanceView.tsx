@@ -11,6 +11,17 @@ export default function AdvanceView({
   currentStakerConfig: StakerConfigSet;
   newStakerConfig: StakerConfigSet;
 }) {
+  const consClientGraffiti = currentStakerConfig.consensusClient?.graffiti;
+  const newConstClientGraffiti = newStakerConfig.consensusClient?.graffiti;
+  const consClientFeeRecipient =
+    currentStakerConfig.consensusClient?.feeRecipient;
+  const newConstClientFeeRecipient =
+    newStakerConfig.consensusClient?.feeRecipient;
+  const consClientCheckpointSync =
+    currentStakerConfig.consensusClient?.checkpointSync;
+  const newConstClientCheckpointSync =
+    newStakerConfig.consensusClient?.checkpointSync;
+
   const stakerConfig = [
     {
       name: "Execution Client",
@@ -24,32 +35,26 @@ export default function AdvanceView({
     {
       name: "Consensus Client",
       current: currentStakerConfig.consensusClient
-        ? prettyDnpName(currentStakerConfig.consensusClient)
+        ? prettyDnpName(currentStakerConfig.consensusClient.dnpName)
         : "-",
       new: newStakerConfig.consensusClient
-        ? prettyDnpName(newStakerConfig.consensusClient)
+        ? prettyDnpName(newStakerConfig.consensusClient.dnpName)
         : "-"
     },
     {
       name: "Graffiti",
-      current: currentStakerConfig.graffiti
-        ? currentStakerConfig.graffiti
-        : "-",
-      new: newStakerConfig.graffiti ? newStakerConfig.graffiti : "-"
+      current: consClientGraffiti ? consClientGraffiti : "-",
+      new: newConstClientGraffiti ? newConstClientGraffiti : "-"
     },
     {
       name: "Fee Recipient",
-      current: currentStakerConfig.feeRecipient
-        ? currentStakerConfig.feeRecipient
-        : "-",
-      new: newStakerConfig.feeRecipient ? newStakerConfig.feeRecipient : "-"
+      current: consClientFeeRecipient ? consClientFeeRecipient : "-",
+      new: newConstClientFeeRecipient ? newConstClientFeeRecipient : "-"
     },
     {
       name: "Checkpoint Sync",
-      current: currentStakerConfig.checkpointSync
-        ? currentStakerConfig.checkpointSync
-        : "-",
-      new: newStakerConfig.checkpointSync ? newStakerConfig.checkpointSync : "-"
+      current: consClientCheckpointSync ? consClientCheckpointSync : "-",
+      new: newConstClientCheckpointSync ? newConstClientCheckpointSync : "-"
     },
     {
       name: "Web3 Signer",
