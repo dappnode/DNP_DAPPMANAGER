@@ -77,11 +77,12 @@ export async function getStakerConfig(
     }
 
     // Web3signer
-    const isWeb3signer = pkgs.some(pkg => pkg.dnpName === web3signerAvail);
+    const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signerAvail);
     const web3signer = {
       dnpName: web3signerAvail,
-      isInstalled: isWeb3signer,
-      isSelected: isWeb3signer
+      isInstalled: web3signerPkg ? true : false,
+      isSelected:
+        web3signerPkg?.containers.every(container => container.running) ?? false
     };
 
     // Mevboost

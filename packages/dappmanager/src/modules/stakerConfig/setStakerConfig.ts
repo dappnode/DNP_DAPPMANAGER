@@ -50,11 +50,11 @@ export async function setStakerConfig({
     );
   // Ensure Consensus clients DNP's names are valid
   if (
-    stakerConfig.consensusClient &&
+    stakerConfig.consensusClient?.dnpName &&
     !consClientsAvail.includes(stakerConfig.consensusClient.dnpName)
   )
     throw Error(
-      `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
+      `Invalid consensus client ${stakerConfig.consensusClient.dnpName} for network ${stakerConfig.network}`
     );
 
   const pkgs = await packagesGet();
@@ -68,7 +68,7 @@ export async function setStakerConfig({
     );
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-  if (stakerConfig.consensusClient)
+  if (stakerConfig.consensusClient?.dnpName)
     await setConsensusClientConfig(
       currentConsClient,
       stakerConfig.consensusClient,
