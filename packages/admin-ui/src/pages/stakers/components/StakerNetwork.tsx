@@ -51,18 +51,24 @@ export default function StakerNetwork({
     if (currentStakerConfigReq.data) {
       const ec =
         currentStakerConfigReq.data.executionClients.find(
-          executionClient => executionClient.isSelected
+          executionClient =>
+            executionClient.isSelected && executionClient.isRunning
         )?.dnpName || "";
       const cc = currentStakerConfigReq.data.consensusClients.find(
-        consensusClient => consensusClient.isSelected
+        consensusClient =>
+          consensusClient.isSelected && consensusClient.isRunning
       ) || { dnpName: "" };
 
       // Set default values for new staker config
       setNewExecClient(ec);
       setNewConsClient(cc);
-      setNewEnableMevBoost(currentStakerConfigReq.data.mevBoost.isInstalled);
+      setNewEnableMevBoost(
+        currentStakerConfigReq.data.mevBoost.isInstalled &&
+          currentStakerConfigReq.data.mevBoost.isRunning
+      );
       setNewEnableWeb3signer(
-        currentStakerConfigReq.data.web3signer.isInstalled
+        currentStakerConfigReq.data.web3signer.isInstalled &&
+          currentStakerConfigReq.data.web3signer.isRunning
       );
 
       // Set the current config to be displayed in advance view
@@ -205,6 +211,7 @@ export default function StakerNetwork({
                       ? true
                       : false
                   }
+                  network={network}
                 />
               </div>
             )
