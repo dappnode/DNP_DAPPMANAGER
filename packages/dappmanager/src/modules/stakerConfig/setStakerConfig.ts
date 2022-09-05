@@ -229,7 +229,7 @@ async function setConsensusClientConfig({
 <<<<<<< HEAD
 =======
     // Stop the current consensus client if no target provided
-  } else if (!targetConsensusClient) {
+  } else if (!targetConsensusClient.dnpName) {
     for (const container of consClientPkg.containers) {
       if (container.running)
         await packageStartStop({
