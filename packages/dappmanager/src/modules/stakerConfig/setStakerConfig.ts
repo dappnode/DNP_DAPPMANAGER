@@ -4,7 +4,12 @@ import {
   packageSetEnvironment,
   packageStartStop
 } from "../../calls";
-import { StakerConfigSet, UserSettingsAllDnps } from "../../types";
+import {
+  ConsensusClient,
+  InstalledPackageDataApiReturn,
+  StakerConfigSet,
+  UserSettingsAllDnps
+} from "../../types";
 import { logs } from "../../logs";
 import {
   getValidatorServiceName,
@@ -35,165 +40,201 @@ export async function setStakerConfig({
     mevBoostAvail
   } = getNetworkStakerPkgs(stakerConfig.network);
 
+  // Ensure Execution clients DNP's names are valid
+  if (
+    stakerConfig.executionClient &&
+    !execClientsAvail.includes(stakerConfig.executionClient)
+  )
+    throw Error(
+      `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
+    );
+  // Ensure Consensus clients DNP's names are valid
+  if (
+    stakerConfig.consensusClient &&
+    !consClientsAvail.includes(stakerConfig.consensusClient.dnpName)
+  )
+    throw Error(
+      `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
+    );
+
+  const pkgs = await packagesGet();
+
   try {
-    // Ensure Execution clients DNP's names are valid
-    if (
-      stakerConfig.executionClient &&
-      !execClientsAvail.includes(stakerConfig.executionClient)
-    )
-      throw Error(
-        `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
-      );
-    // Ensure Consensus clients DNP's names are valid
-    if (
-      stakerConfig.consensusClient &&
-      !consClientsAvail.includes(stakerConfig.consensusClient.dnpName)
-    )
-      throw Error(
-        `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
-      );
-
-    const pkgs = await packagesGet();
-
     // EXECUTION CLIENT
-    if (stakerConfig.executionClient) {
-      // Ensure the EC is installed
-      if (currentExecClient === stakerConfig.executionClient) {
-        logs.info(
-          "Execution client is already set to " + stakerConfig.executionClient
-        );
-        if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
-          logs.info("Installing " + stakerConfig.executionClient);
-          await packageInstall({ name: stakerConfig.executionClient });
-        }
-      } // If the EC is not installed, install it
-      else if (!pkgs.find(p => p.dnpName === stakerConfig.executionClient)) {
-        // Remove the previous
-        /* logs.info("Removing " + currentExecClient);
-          await packageRemove({ dnpName: currentExecClient }); */
-        // Install the new EC
-        logs.info("Installing " + stakerConfig.executionClient);
-        await packageInstall({ name: stakerConfig.executionClient });
-      }
-    }
+    if (stakerConfig.executionClient)
+      await setExecutionClientConfig(
+        currentExecClient,
+        stakerConfig.executionClient,
+        pkgs.find(pkg => pkg.dnpName === stakerConfig.executionClient)
+      );
 
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-    if (stakerConfig.consensusClient) {
-      // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-      const userSettings: UserSettingsAllDnps = {
-        [stakerConfig.consensusClient.dnpName]: {
-          environment: {
-            [getValidatorServiceName(stakerConfig.consensusClient.dnpName)]: {
-              // Graffiti is a mandatory value
-              ["GRAFFITI"]:
-                stakerConfig.consensusClient.graffiti ||
-                "Validating_from_DAppNode",
-              // Fee recipient is a mandatory value
-              ["FEE_RECIPIENT_ADDRESS"]:
-                stakerConfig.consensusClient.feeRecipient ||
-                "0x0000000000000000000000000000000000000000",
-              // Checkpoint sync is an optional value
-              ["CHECKPOINT_SYNC_URL"]:
-                stakerConfig.consensusClient.checkpointSync || ""
-            }
-          }
-        }
-      };
+    if (stakerConfig.consensusClient)
+      await setConsensusClientConfig(
+        currentConsClient,
+        stakerConfig.consensusClient,
+        pkgs.find(pkg => pkg.dnpName === stakerConfig.consensusClient?.dnpName)
+      );
 
-      // Ensure the CC selected is installed
-      if (currentConsClient === stakerConfig.consensusClient.dnpName) {
-        logs.info(
-          "Consensus client is already set to " + stakerConfig.consensusClient
-        );
-        if (
-          !pkgs.find(p => p.dnpName === stakerConfig.consensusClient?.dnpName)
-        ) {
-          logs.info("Installing " + stakerConfig.consensusClient);
-          await packageInstall({
-            name: stakerConfig.consensusClient.dnpName,
-            userSettings
-          });
-        } // If the CC is not installed, install it
-        else if (
-          stakerConfig.consensusClient.graffiti ||
-          stakerConfig.consensusClient.feeRecipient ||
-          stakerConfig.consensusClient.checkpointSync
-        ) {
-          const serviceEnv =
-            userSettings[stakerConfig.consensusClient.dnpName].environment;
+    // WEB3SIGNER
+    if (stakerConfig.enableWeb3signer !== undefined)
+      await setWeb3signerConfig(
+        stakerConfig.enableWeb3signer,
+        web3signerAvail,
+        pkgs.find(pkg => pkg.dnpName === web3signerAvail)
+      );
 
-          if (serviceEnv) {
-            logs.info(
-              "Updating environment for " + stakerConfig.consensusClient
-            );
-            await packageSetEnvironment({
-              dnpName: stakerConfig.consensusClient.dnpName,
-              environmentByService: serviceEnv
-            });
-          }
+    // MEV BOOST
+    if (stakerConfig.enableMevBoost !== undefined)
+      await setMevBoostConfig(
+        stakerConfig.enableMevBoost,
+        mevBoostAvail,
+        pkgs.find(pkg => pkg.dnpName === mevBoostAvail)
+      );
+  } catch (e) {
+    throw Error(`Error setting staker config: ${e}`);
+  } finally {
+    // Persist the staker config on db
+    setStakerConfigOnDb(stakerConfig.network, stakerConfig);
+  }
+}
+
+async function setExecutionClientConfig(
+  currentExecClient: string,
+  executionClient: string,
+  execClientPkg: InstalledPackageDataApiReturn | undefined
+): Promise<void> {
+  // Ensure the EC is installed
+  if (currentExecClient === executionClient) {
+    logs.info("Execution client is already set to " + executionClient);
+    if (execClientPkg) {
+      for (const container of execClientPkg.containers) {
+        if (!container.running)
+          await packageStartStop({
+            dnpName: execClientPkg.dnpName,
+            serviceNames: [container.serviceName]
+          }).catch(e => logs.error(e.message));
+      }
+    } else {
+      logs.info("Installing " + executionClient);
+      await packageInstall({ name: executionClient });
+    }
+  } // If the EC is not installed, install it
+  else if (!execClientPkg) {
+    // Remove the previous
+    /* logs.info("Removing " + currentExecClient);
+            await packageRemove({ dnpName: currentExecClient }); */
+    // Install the new EC
+    logs.info("Installing " + executionClient);
+    await packageInstall({ name: executionClient });
+  }
+}
+
+async function setConsensusClientConfig(
+  currentConsClient: string,
+  consensusClient: ConsensusClient,
+  consClientPkg: InstalledPackageDataApiReturn | undefined
+): Promise<void> {
+  // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
+  const userSettings: UserSettingsAllDnps = {
+    [consensusClient.dnpName]: {
+      environment: {
+        [getValidatorServiceName(consensusClient.dnpName)]: {
+          // Graffiti is a mandatory value
+          ["GRAFFITI"]: consensusClient.graffiti || "Validating_from_DAppNode",
+          // Fee recipient is a mandatory value
+          ["FEE_RECIPIENT_ADDRESS"]:
+            consensusClient.feeRecipient ||
+            "0x0000000000000000000000000000000000000000",
+          // Checkpoint sync is an optional value
+          ["CHECKPOINT_SYNC_URL"]: consensusClient.checkpointSync || ""
         }
-      } // Install the new CC
-      else if (
-        !pkgs.find(p => p.dnpName === stakerConfig.consensusClient?.dnpName)
-      ) {
-        // Remove the previous
-        /*       logs.info("Removing " + currentConsClient);
-        await packageRemove({ dnpName: currentConsClient }); */
-        // Install the new CC if not already installed
-        logs.info("Installing " + stakerConfig.consensusClient);
-        await packageInstall({
-          name: stakerConfig.consensusClient.dnpName,
-          userSettings
+      }
+    }
+  };
+
+  // Ensure the CC selected is installed
+  if (currentConsClient === consensusClient.dnpName) {
+    logs.info("Consensus client is already set to " + consensusClient);
+    if (!consClientPkg) {
+      logs.info("Installing " + consensusClient);
+      await packageInstall({
+        name: consensusClient.dnpName,
+        userSettings
+      });
+    } // If the CC is not installed, install it
+    else if (
+      consensusClient.graffiti ||
+      consensusClient.feeRecipient ||
+      consensusClient.checkpointSync
+    ) {
+      const serviceEnv = userSettings[consensusClient.dnpName].environment;
+
+      if (serviceEnv) {
+        logs.info("Updating environment for " + consensusClient);
+        await packageSetEnvironment({
+          dnpName: consensusClient.dnpName,
+          environmentByService: serviceEnv
         });
       }
     }
+  } // Install the new CC
+  else if (!consClientPkg) {
+    // Remove the previous
+    /*       logs.info("Removing " + currentConsClient);
+          await packageRemove({ dnpName: currentConsClient }); */
+    // Install the new CC if not already installed
+    logs.info("Installing " + consensusClient);
+    await packageInstall({
+      name: consensusClient.dnpName,
+      userSettings
+    });
+  }
+}
 
-    // WEB3SIGNER
-    const web3signerPkg = pkgs.find(p => p.dnpName === web3signerAvail);
-    // Web3signer installed and enable => make sure its running
-    if (web3signerPkg && stakerConfig.enableWeb3signer) {
-      logs.info("Web3Signer is already installed");
-      for (const container of web3signerPkg.containers) {
-        if (!container.running) {
-          logs.info("Starting Web3Signer container");
-          await packageStartStop({
-            dnpName: web3signerPkg.dnpName,
-            serviceNames: [container.serviceName]
-          }).catch(e => logs.error(e.message));
-        }
-      }
-    } // Web3signer installed and disabled => make sure its stopped
-    else if (web3signerPkg && !stakerConfig.enableWeb3signer) {
-      for (const container of web3signerPkg.containers) {
-        if (container.running) {
-          logs.info("Stopping Web3Signer container");
-          await packageStartStop({
-            dnpName: web3signerPkg.dnpName,
-            serviceNames: [container.serviceName]
-          }).catch(e => logs.error(e.message));
-        }
-      }
-    } // Web3signer not installed and enable => install it
-    else if (!web3signerPkg && stakerConfig.enableWeb3signer) {
-      logs.info("Installing Web3Signer");
-      await packageInstall({ name: web3signerAvail });
-    }
-
-    // MEV BOOST
-    if (stakerConfig.enableMevBoost) {
-      const mevBoostPkg = pkgs.find(p => p.dnpName === mevBoostAvail);
-      if (mevBoostPkg) {
-        logs.info("MevBoost is already installed");
-      } else if (stakerConfig.enableMevBoost) {
-        // Install mevboost if selected and not installed
-        logs.info("Installing MevBoost");
-        await packageInstall({ name: mevBoostAvail });
+async function setWeb3signerConfig(
+  enableWeb3signer: boolean,
+  web3signerAvail: string,
+  web3signerPkg: InstalledPackageDataApiReturn | undefined
+): Promise<void> {
+  // Web3signer installed and enable => make sure its running
+  if (web3signerPkg && enableWeb3signer) {
+    logs.info("Web3Signer is already installed");
+    for (const container of web3signerPkg.containers) {
+      if (!container.running) {
+        await packageStartStop({
+          dnpName: web3signerPkg.dnpName,
+          serviceNames: [container.serviceName]
+        }).catch(e => logs.error(e.message));
       }
     }
+  } // Web3signer installed and disabled => make sure its stopped
+  else if (web3signerPkg && !enableWeb3signer) {
+    for (const container of web3signerPkg.containers) {
+      if (container.running) {
+        await packageStartStop({
+          dnpName: web3signerPkg.dnpName,
+          serviceNames: [container.serviceName]
+        }).catch(e => logs.error(e.message));
+      }
+    }
+  } // Web3signer not installed and enable => install it
+  else if (!web3signerPkg && enableWeb3signer) {
+    logs.info("Installing Web3Signer");
+    await packageInstall({ name: web3signerAvail });
+  }
+}
 
-    // Persist the staker config on db
-    setStakerConfigOnDb(stakerConfig.network, stakerConfig);
-  } catch (e) {
-    throw Error(`Error setting staker config: ${e}`);
-  } // TODO: consider having a finally block to ensure the correct staker config is persisted
+async function setMevBoostConfig(
+  enableMevBoost: boolean,
+  mevBoostAvail: string,
+  mevBoostPkg: InstalledPackageDataApiReturn | undefined
+): Promise<void> {
+  if (mevBoostPkg) {
+    logs.info("MevBoost is already installed");
+  } else if (enableMevBoost) {
+    // Install mevboost if selected and not installed
+    logs.info("Installing MevBoost");
+    await packageInstall({ name: mevBoostAvail });
+  }
 }
