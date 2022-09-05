@@ -7,12 +7,10 @@ import "./columns.scss";
 export default function ExecutionClient({
   executionClient,
   setNewExecClient,
-  isInstalled,
   isSelected
 }: {
   executionClient: string;
   setNewExecClient: (executionClient: string) => void;
-  isInstalled: boolean;
   isSelected: boolean;
 }) {
   return (

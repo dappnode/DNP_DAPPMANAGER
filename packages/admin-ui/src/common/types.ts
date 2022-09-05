@@ -1217,9 +1217,8 @@ export interface StakerConfigGet {
 
 export interface PkgStatus {
   dnpName: string;
-  isInstalled: boolean;
+  isInstalledAndRunning: boolean;
   isSelected: boolean;
-  isRunning: boolean;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;

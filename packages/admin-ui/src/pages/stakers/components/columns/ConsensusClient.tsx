@@ -9,7 +9,6 @@ import "./columns.scss";
 export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
-  isInstalled,
   isSelected,
   network
 }: {
@@ -17,7 +16,6 @@ export default function ConsensusClient({
   setNewConsClient: React.Dispatch<
     React.SetStateAction<ConsensusClientIface | undefined>
   >;
-  isInstalled: boolean;
   isSelected: boolean;
   network: Network;
 }) {

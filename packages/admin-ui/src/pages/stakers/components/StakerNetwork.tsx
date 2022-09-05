@@ -49,35 +49,36 @@ export default function StakerNetwork({
 
   useEffect(() => {
     if (currentStakerConfigReq.data) {
-      const ec =
-        currentStakerConfigReq.data.executionClients.find(
-          executionClient =>
-            executionClient.isSelected && executionClient.isRunning
-        )?.dnpName || "";
-      const cc = currentStakerConfigReq.data.consensusClients.find(
-        consensusClient =>
-          consensusClient.isSelected && consensusClient.isRunning
+      const {
+        executionClients,
+        consensusClients,
+        mevBoost,
+        web3signer
+      } = currentStakerConfigReq.data;
+
+      const executionClient =
+        executionClients.find(ec => ec.isSelected && ec.isInstalledAndRunning)
+          ?.dnpName || "";
+      const consensusClient = consensusClients.find(
+        cc => cc.isSelected && cc.isInstalledAndRunning
       ) || { dnpName: "" };
+      const enableMevBoost =
+        mevBoost.isInstalledAndRunning && mevBoost.isSelected;
+      const enableWeb3signer = web3signer.isInstalledAndRunning;
 
       // Set default values for new staker config
-      setNewExecClient(ec);
-      setNewConsClient(cc);
-      setNewEnableMevBoost(
-        currentStakerConfigReq.data.mevBoost.isInstalled &&
-          currentStakerConfigReq.data.mevBoost.isRunning
-      );
-      setNewEnableWeb3signer(
-        currentStakerConfigReq.data.web3signer.isInstalled &&
-          currentStakerConfigReq.data.web3signer.isRunning
-      );
+      setNewExecClient(executionClient);
+      setNewConsClient(consensusClient);
+      setNewEnableMevBoost(enableMevBoost);
+      setNewEnableWeb3signer(enableWeb3signer);
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
         network,
-        executionClient: ec,
-        consensusClient: cc,
-        enableMevBoost: currentStakerConfigReq.data.mevBoost.isSelected,
-        enableWeb3signer: currentStakerConfigReq.data.web3signer.isInstalled
+        executionClient,
+        consensusClient,
+        enableMevBoost,
+        enableWeb3signer
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,7 +187,6 @@ export default function StakerNetwork({
                   key={i}
                   executionClient={executionClient.dnpName}
                   setNewExecClient={setNewExecClient}
-                  isInstalled={executionClient.isInstalled}
                   isSelected={
                     executionClient.dnpName === newExecClient ? true : false
                   }
@@ -205,7 +205,6 @@ export default function StakerNetwork({
                   key={i}
                   consensusClient={consensusClient}
                   setNewConsClient={setNewConsClient}
-                  isInstalled={consensusClient.isInstalled}
                   isSelected={
                     consensusClient.dnpName === newConsClient?.dnpName
                       ? true
@@ -235,7 +234,6 @@ export default function StakerNetwork({
               <MevBoost
                 mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
                 setEnableMevBoost={setNewEnableMevBoost}
-                isInstalled={currentStakerConfigReq.data.mevBoost.isInstalled}
                 isSelected={newEnableMevBoost}
               />
             </div>

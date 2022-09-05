@@ -2,7 +2,6 @@ import {
   packagesGet,
   packageInstall,
   packageSetEnvironment,
-  packageStartStop,
   packageRestart
 } from "../../calls";
 import {
@@ -17,6 +16,7 @@ import {
   setStakerConfigOnDb,
   getNetworkStakerPkgs
 } from "./utils";
+import { dockerContainerStart, dockerContainerStop } from "../docker/api";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -132,29 +132,28 @@ async function setExecutionClientConfig({
   targetExecutionClient: string;
   execClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
-  // If the EC is not installed, install it
-  if (!execClientPkg) {
+  // Stop the current execution client if no target provided
+  if (!targetExecutionClient) {
+    if (execClientPkg)
+      for (const container of execClientPkg.containers) {
+        if (container.running)
+          await dockerContainerStop(container.containerName, {
+            timeout: 2
+          }).catch(e => logs.error(e.message));
+      }
+  } // If the EC is not installed, install it
+  else if (!execClientPkg) {
     logs.info("Installing " + targetExecutionClient);
     await packageInstall({ name: targetExecutionClient });
   } // Stop the current execution client if no target provided
-  else if (!targetExecutionClient) {
-    for (const container of execClientPkg.containers) {
-      if (container.running)
-        await packageStartStop({
-          dnpName: execClientPkg.dnpName,
-          serviceNames: [container.serviceName]
-        }).catch(e => logs.error(e.message));
-    }
-  }
   // Ensure the EC selected is running
   else if (currentExecClient === targetExecutionClient) {
     logs.info("Execution client is already set to " + targetExecutionClient);
     for (const container of execClientPkg.containers) {
       if (!container.running)
-        await packageStartStop({
-          dnpName: execClientPkg.dnpName,
-          serviceNames: [container.serviceName]
-        }).catch(e => logs.error(e.message));
+        await dockerContainerStart(container.containerName).catch(e =>
+          logs.error(e.message)
+        );
     }
   }
 }
@@ -187,32 +186,30 @@ async function setConsensusClientConfig({
     }
   };
 
-  // Install the new CC
-  if (!consClientPkg) {
+  // Stop the current consensus client if no target provided
+  if (!targetConsensusClient.dnpName) {
+    if (consClientPkg)
+      for (const container of consClientPkg.containers)
+        if (container.running)
+          await dockerContainerStop(container.containerName, {
+            timeout: 2
+          }).catch(e => logs.error(e.message));
+  } // Install the new CC
+  else if (!consClientPkg) {
     // Install the new CC if not already installed
     logs.info("Installing " + targetConsensusClient);
     await packageInstall({
       name: targetConsensusClient.dnpName,
       userSettings
     });
-    // Stop the current consensus client if no target provided
-  } else if (!targetConsensusClient.dnpName) {
-    for (const container of consClientPkg.containers) {
-      if (container.running)
-        await packageStartStop({
-          dnpName: consClientPkg.dnpName,
-          serviceNames: [container.serviceName]
-        }).catch(e => logs.error(e.message));
-    }
   } // Ensure the CC selected is installed and running and set the user settings
   else if (currentConsClient === targetConsensusClient.dnpName) {
     logs.info("Consensus client is already set to " + targetConsensusClient);
     for (const container of consClientPkg.containers) {
       if (!container.running)
-        await packageStartStop({
-          dnpName: consClientPkg.dnpName,
-          serviceNames: [container.serviceName]
-        }).catch(e => logs.error(e.message));
+        await dockerContainerStart(container.containerName).catch(e =>
+          logs.error(e.message)
+        );
     }
     if (
       targetConsensusClient.graffiti ||
@@ -241,7 +238,7 @@ async function setWeb3signerConfig(
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");
-    if (web3signerPkg.containers.some(container => !container.running))
+    if (web3signerPkg.containers.some(c => !c.running))
       await packageRestart({ dnpName: web3signerPkg.dnpName }).catch(e =>
         logs.error(e.message)
       );
@@ -249,9 +246,8 @@ async function setWeb3signerConfig(
   else if (web3signerPkg && !enableWeb3signer) {
     for (const container of web3signerPkg.containers) {
       if (container.running) {
-        await packageStartStop({
-          dnpName: web3signerPkg.dnpName,
-          serviceNames: [container.serviceName]
+        await dockerContainerStop(container.containerName, {
+          timeout: 2
         }).catch(e => logs.error(e.message));
       }
     }
@@ -270,23 +266,17 @@ async function setMevBoostConfig(
   // MevBoost installed and enable => make sure its running
   if (mevBoostPkg && enableMevBoost) {
     logs.info("MevBoost is already installed");
-    for (const container of mevBoostPkg.containers) {
-      if (!container.running) {
-        await packageStartStop({
-          dnpName: mevBoostPkg.dnpName,
-          serviceNames: [container.serviceName]
-        }).catch(e => logs.error(e.message));
-      }
-    }
+    if (mevBoostPkg.containers.some(c => !c.running))
+      await packageRestart({ dnpName: mevBoostPkg.dnpName }).catch(e =>
+        logs.error(e.message)
+      );
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
     for (const container of mevBoostPkg.containers) {
-      if (container.running) {
-        await packageStartStop({
-          dnpName: mevBoostPkg.dnpName,
-          serviceNames: [container.serviceName]
+      if (container.running)
+        await dockerContainerStop(container.containerName, {
+          timeout: 2
         }).catch(e => logs.error(e.message));
-      }
     }
   } // MevBoost not installed and enable => make sure its installed
   else if (!mevBoostPkg && enableMevBoost) {
