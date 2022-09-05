@@ -196,7 +196,7 @@ async function setConsensusClientConfig({
       userSettings
     });
     // Stop the current consensus client if no target provided
-  } else if (!targetConsensusClient) {
+  } else if (!targetConsensusClient.dnpName) {
     for (const container of consClientPkg.containers) {
       if (container.running)
         await packageStartStop({
@@ -223,7 +223,7 @@ async function setConsensusClientConfig({
         userSettings[targetConsensusClient.dnpName].environment;
 
       if (serviceEnv) {
-        logs.info("Updating environment for " + targetConsensusClient);
+        logs.info("Updating environment for " + targetConsensusClient.dnpName);
         await packageSetEnvironment({
           dnpName: targetConsensusClient.dnpName,
           environmentByService: serviceEnv
