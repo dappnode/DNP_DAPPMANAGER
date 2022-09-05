@@ -12,17 +12,16 @@ export async function exposeByDefaultHttpsPorts(
   log: Log
 ): Promise<void> {
   if (pkg.metadata.exposable) {
-    // Requires that https package exists and it is running
-    if (!(await isRunningHttps()))
-      throw Error(
-        `HTTPS package not running but required to expose HTTPS ports by default.`
-      );
-
     const currentMappings = await httpsPortal.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
 
     for (const exposable of pkg.metadata.exposable) {
       if (exposable.exposeByDefault) {
+        // Requires that https package exists and it is running
+        if (!(await isRunningHttps()))
+          throw Error(
+            `HTTPS package not running but required to expose HTTPS ports by default.`
+          );
         const portalMapping: HttpsPortalMapping = {
           fromSubdomain: exposable.fromSubdomain || prettyDnpName(pkg.dnpName), // get dnpName by default
           dnpName: pkg.dnpName,
