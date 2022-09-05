@@ -3,14 +3,15 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface } from "types";
+import { ConsensusClient as ConsensusClientIface, Network } from "types";
 import "./columns.scss";
 
 export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   isInstalled,
-  isSelected
+  isSelected,
+  network
 }: {
   consensusClient: ConsensusClientIface;
   setNewConsClient: React.Dispatch<
@@ -18,23 +19,34 @@ export default function ConsensusClient({
   >;
   isInstalled: boolean;
   isSelected: boolean;
+  network: Network;
 }) {
   const feeRecipientError = validateEthereumAddress(
     consensusClient.feeRecipient
   );
   const graffitiError = validateGraffiti(consensusClient.graffiti);
+  const checkpointSyncPlaceHolder =
+    network === "mainnet"
+      ? "https://checkpoint-sync.dappnode.io/"
+      : network === "prater"
+      ? "https://checkpoint-sync-prater.dappnode.io/"
+      : "";
 
   return (
     <Card
       className={`consensus-client ${joinCssClass({ isSelected })}`}
-      onClick={
-        isSelected
-          ? () => setNewConsClient({ dnpName: "" })
-          : () => setNewConsClient(consensusClient)
-      }
       shadow={isSelected}
     >
-      <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
+      <div
+        className="title"
+        onClick={
+          isSelected
+            ? () => setNewConsClient({ dnpName: "" })
+            : () => setNewConsClient(consensusClient)
+        }
+      >
+        {prettyDnpName(consensusClient.dnpName)}
+      </div>
       {isSelected && (
         <>
           <hr />
@@ -67,6 +79,7 @@ export default function ConsensusClient({
                 labelId: "checkpoint-sync",
                 name: "checkpoint-sync",
                 autoComplete: "checkpoint-sync",
+                placeholder: checkpointSyncPlaceHolder,
                 secret: false,
                 value: consensusClient.checkpointSync || "",
                 onValueChange: (value: string) =>

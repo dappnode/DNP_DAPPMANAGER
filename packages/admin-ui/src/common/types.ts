@@ -1219,6 +1219,7 @@ export interface PkgStatus {
   dnpName: string;
   isInstalled: boolean;
   isSelected: boolean;
+  isRunning: boolean;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;

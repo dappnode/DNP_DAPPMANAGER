@@ -250,22 +250,26 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              isRunning: true
             },
             {
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             },
             {
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             },
             {
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             }
           ],
           consensusClients: [
@@ -273,6 +277,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: true,
+              isRunning: true,
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -280,17 +285,20 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             },
             {
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: true
             },
             {
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: false,
+              isRunning: false,
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -299,16 +307,15 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           web3signer: {
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
+            isSelected: false,
+            isRunning: false
           },
           mevBoost: {
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
-          },
-          graffiti: "Validating_from_DAppNode",
-          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-          checkpointSync: "https://checkpoint-sync.dappnode.io/"
+            isSelected: false,
+            isRunning: false
+          }
         };
       case "prater":
         return {
@@ -316,7 +323,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "goerli-geth.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              isRunning: true
             }
           ],
           consensusClients: [
@@ -324,6 +332,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "prysm-prater.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: true,
+              isRunning: true,
               graffiti: "Validating_from_Prysm-prater",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -332,6 +341,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "lighthouse-prater.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: false,
+              isRunning: false,
               graffiti: "Validating_from_lighthouse-prater",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -339,27 +349,28 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "teku-prater.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             },
             {
               dnpName: "nimbus-prater.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             }
           ],
           web3signer: {
             dnpName: "web3signer-prater.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
+            isSelected: false,
+            isRunning: false
           },
           mevBoost: {
             dnpName: "mevboost-prater.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
-          },
-          graffiti: "",
-          feeRecipient: "",
-          checkpointSync: ""
+            isSelected: false,
+            isRunning: false
+          }
         };
 
       case "gnosis":
@@ -368,7 +379,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "nethermind-xdai.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: true
+              isSelected: true,
+              isRunning: true
             }
           ],
           consensusClients: [
@@ -376,6 +388,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: true,
+              isRunning: true,
               graffiti: "Validating_from_Prysm-gnosis",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -384,6 +397,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isSelected: false,
+              isRunning: false,
               graffiti: "Validating_from_lighthouse-gnosis",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -391,23 +405,27 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             {
               dnpName: "teku-gnosis.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             },
             {
               dnpName: "nimbus-gnosis.dnp.dappnode.eth",
               isInstalled: true,
-              isSelected: false
+              isSelected: false,
+              isRunning: false
             }
           ],
           web3signer: {
             dnpName: "web3signer-gnosis.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
+            isSelected: false,
+            isRunning: false
           },
           mevBoost: {
             dnpName: "mevboost-gnosis.dnp.dappnode.eth",
             isInstalled: true,
-            isSelected: false
+            isSelected: false,
+            isRunning: false
           }
         };
     }

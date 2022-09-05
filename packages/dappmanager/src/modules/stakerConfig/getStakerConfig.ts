@@ -37,30 +37,32 @@ export async function getStakerConfig(
     // Execution clients
     const executionClients: PkgStatus[] = [];
     for (const exCl of execClientsAvail) {
+      const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
       executionClients.push({
         dnpName: exCl,
-        isInstalled: pkgs.some(pkg => pkg.dnpName === exCl),
-        isSelected: currentExecClient === exCl
+        isInstalled: execClientPkg ? true : false,
+        isSelected: currentExecClient === exCl,
+        isRunning: execClientPkg?.containers.every(c => c.running) ?? false
       });
     }
 
     // Consensus clients
     const consensusClients: PkgStatus[] = [];
     for (const conCl of consClientsAvail) {
-      const pkgInstalled = pkgs.find(pkg => pkg.dnpName === conCl);
+      const consClientPkg = pkgs.find(pkg => pkg.dnpName === conCl);
       let graffiti = "";
       let feeRecipient = "";
       let checkpointSync = "";
-      if (pkgInstalled) {
+      if (consClientPkg) {
         const environment = new ComposeFileEditor(
-          pkgInstalled.dnpName,
-          pkgInstalled.isCore
+          consClientPkg.dnpName,
+          consClientPkg.isCore
         ).getUserSettings().environment;
         if (environment) {
           const validatorService = getValidatorServiceName(
-            pkgInstalled.dnpName
+            consClientPkg.dnpName
           );
-          const beaconService = getBeaconServiceName(pkgInstalled.dnpName);
+          const beaconService = getBeaconServiceName(consClientPkg.dnpName);
           graffiti = environment[validatorService]["GRAFFITI"];
           feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
           checkpointSync = environment[beaconService]["CHECKPOINT_SYNC_URL"];
@@ -68,8 +70,9 @@ export async function getStakerConfig(
       }
       consensusClients.push({
         dnpName: conCl,
-        isInstalled: pkgs.some(pkg => pkg.dnpName === conCl),
+        isInstalled: consClientPkg ? true : false,
         isSelected: currentConsClient === conCl,
+        isRunning: consClientPkg?.containers.every(c => c.running) ?? false,
         graffiti,
         feeRecipient,
         checkpointSync
@@ -81,15 +84,17 @@ export async function getStakerConfig(
     const web3signer = {
       dnpName: web3signerAvail,
       isInstalled: web3signerPkg ? true : false,
-      isSelected:
-        web3signerPkg?.containers.every(container => container.running) ?? false
+      isSelected: web3signerPkg?.containers.every(c => c.running) ?? false, // Same value
+      isRunning: web3signerPkg?.containers.every(c => c.running) ?? false
     };
 
     // Mevboost
+    const mevBoostPkg = pkgs.find(pkg => pkg.dnpName === mevBoostAvail);
     const mevBoost = {
       dnpName: mevBoostAvail,
-      isInstalled: pkgs.some(pkg => pkg.dnpName === mevBoostAvail),
-      isSelected: isMevBoostSelected
+      isInstalled: mevBoostPkg ? true : false,
+      isSelected: isMevBoostSelected,
+      isRunning: mevBoostPkg?.containers.every(c => c.running) ?? false
     };
 
     return {
