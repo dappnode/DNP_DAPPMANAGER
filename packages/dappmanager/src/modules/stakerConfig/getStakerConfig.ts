@@ -40,9 +40,9 @@ export async function getStakerConfig(
       const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
       executionClients.push({
         dnpName: exCl,
-        isInstalled: execClientPkg ? true : false,
-        isSelected: currentExecClient === exCl,
-        isRunning: execClientPkg?.containers.every(c => c.running) ?? false
+        isInstalledAndRunning:
+          execClientPkg?.containers.every(c => c.running) ?? false,
+        isSelected: currentExecClient === exCl
       });
     }
 
@@ -70,9 +70,9 @@ export async function getStakerConfig(
       }
       consensusClients.push({
         dnpName: conCl,
-        isInstalled: consClientPkg ? true : false,
+        isInstalledAndRunning:
+          consClientPkg?.containers.every(c => c.running) ?? false,
         isSelected: currentConsClient === conCl,
-        isRunning: consClientPkg?.containers.every(c => c.running) ?? false,
         graffiti,
         feeRecipient,
         checkpointSync
@@ -81,20 +81,21 @@ export async function getStakerConfig(
 
     // Web3signer
     const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signerAvail);
+    const web3signerPkgIsInstalledAndRunning =
+      web3signerPkg?.containers.every(c => c.running) ?? false;
     const web3signer = {
       dnpName: web3signerAvail,
-      isInstalled: web3signerPkg ? true : false,
-      isSelected: web3signerPkg?.containers.every(c => c.running) ?? false, // Same value
-      isRunning: web3signerPkg?.containers.every(c => c.running) ?? false
+      isInstalledAndRunning: web3signerPkgIsInstalledAndRunning,
+      isSelected: web3signerPkgIsInstalledAndRunning
     };
 
     // Mevboost
     const mevBoostPkg = pkgs.find(pkg => pkg.dnpName === mevBoostAvail);
     const mevBoost = {
       dnpName: mevBoostAvail,
-      isInstalled: mevBoostPkg ? true : false,
-      isSelected: isMevBoostSelected,
-      isRunning: mevBoostPkg?.containers.every(c => c.running) ?? false
+      isInstalledAndRunning:
+        mevBoostPkg?.containers.every(c => c.running) ?? false,
+      isSelected: isMevBoostSelected
     };
 
     return {

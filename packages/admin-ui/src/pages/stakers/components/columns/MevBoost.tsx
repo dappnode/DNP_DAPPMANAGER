@@ -7,12 +7,10 @@ import "./columns.scss";
 export default function MevBoost({
   mevBoost,
   setEnableMevBoost,
-  isInstalled,
   isSelected
 }: {
   mevBoost: string;
   setEnableMevBoost: (installMevBoost: boolean) => void;
-  isInstalled: boolean;
   isSelected: boolean;
 }) {
   return (
