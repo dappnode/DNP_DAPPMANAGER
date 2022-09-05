@@ -21,6 +21,7 @@ import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
 import "./staker-network.scss";
+import { disclaimer } from "../data";
 
 export default function StakerNetwork({
   network,
@@ -99,14 +100,26 @@ export default function StakerNetwork({
    */
   async function setNewConfig() {
     try {
+      // Make sure there are changes
       if (thereAreChanges()) {
-        // Make sure there are changes
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
             title: `Staker configuration`,
             text:
               "Are you sure you want to implement this staker configuration?",
+            buttons: [
+              {
+                label: "Continue",
+                onClick: () => resolve(true)
+              }
+            ]
+          });
+        });
+        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+          confirm({
+            title: `Disclaimer`,
+            text: disclaimer,
             buttons: [
               {
                 label: "Continue",
