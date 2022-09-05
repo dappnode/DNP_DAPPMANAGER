@@ -4,11 +4,8 @@ import * as db from "../../db";
 /**
  * Sets the staker configuration on db for a given network
  */
-export function setStakerConfigOnDb(
-  network: Network,
-  stakerConfig: StakerConfigSet
-): void {
-  switch (network) {
+export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
+  switch (stakerConfig.network) {
     case "mainnet":
       db.executionClientMainnet.set(stakerConfig.executionClient);
       db.consensusClientMainnet.set(stakerConfig.consensusClient?.dnpName);
@@ -25,7 +22,7 @@ export function setStakerConfigOnDb(
       db.mevBoostPrater.set(stakerConfig.enableMevBoost);
       break;
     default:
-      throw new Error(`Unsupported network: ${network}`);
+      throw new Error(`Unsupported network: ${stakerConfig.network}`);
   }
 }
 
