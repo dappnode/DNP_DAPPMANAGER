@@ -1,7 +1,11 @@
 import { packagesGet } from "../../calls";
 import { Network, PkgStatus, StakerConfigGet } from "../../types";
 import { ComposeFileEditor } from "../compose/editor";
-import { getNetworkStakerPkgs, getValidatorServiceName } from "./utils";
+import {
+  getBeaconServiceName,
+  getNetworkStakerPkgs,
+  getValidatorServiceName
+} from "./utils";
 
 /**
  * Fetches the current staker configuration:
@@ -56,9 +60,10 @@ export async function getStakerConfig(
           const validatorService = getValidatorServiceName(
             pkgInstalled.dnpName
           );
+          const beaconService = getBeaconServiceName(pkgInstalled.dnpName);
           graffiti = environment[validatorService]["GRAFFITI"];
           feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
-          checkpointSync = environment[validatorService]["CHECKPOINT_SYNC_URL"];
+          checkpointSync = environment[beaconService]["CHECKPOINT_SYNC_URL"];
         }
       }
       consensusClients.push({
