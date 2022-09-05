@@ -18,7 +18,11 @@ export default function ExecutionClient({
   return (
     <Card
       className={`execution-client ${joinCssClass({ isSelected })}`}
-      onClick={() => setNewExecClient(executionClient)}
+      onClick={
+        isSelected
+          ? () => setNewExecClient("")
+          : () => setNewExecClient(executionClient)
+      }
       shadow={isSelected}
     >
       <div className="title">{prettyDnpName(executionClient)}</div>

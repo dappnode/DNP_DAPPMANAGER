@@ -27,7 +27,11 @@ export default function ConsensusClient({
   return (
     <Card
       className={`consensus-client ${joinCssClass({ isSelected })}`}
-      onClick={() => setNewConsClient(consensusClient)}
+      onClick={
+        isSelected
+          ? () => setNewConsClient({ dnpName: "" })
+          : () => setNewConsClient(consensusClient)
+      }
       shadow={isSelected}
     >
       <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
