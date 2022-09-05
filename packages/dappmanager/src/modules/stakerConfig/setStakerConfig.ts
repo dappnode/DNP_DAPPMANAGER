@@ -183,6 +183,9 @@ async function setConsensusClientConfig({
           ["CHECKPOINT_SYNC_URL"]: targetConsensusClient.checkpointSync || ""
         }
       }
+    } else {
+      logs.info("Installing " + executionClient);
+      await packageInstall({ name: executionClient });
     }
   };
 
