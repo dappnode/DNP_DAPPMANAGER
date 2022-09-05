@@ -105,3 +105,11 @@ export function getNetworkStakerPkgs(network: Network): {
 export function getValidatorServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
 }
+
+/**
+ * Get the beacon service name
+ * Nimbus package is monoservice (beacon-validator)
+ */
+export function getBeaconServiceName(dnpName: string): string {
+  return dnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain";
+}
