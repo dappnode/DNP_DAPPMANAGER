@@ -274,15 +274,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             },
             {
               dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalled: true,
-              isSelected: false,
-              isRunning: false
+              isInstalledAndRunning: true,
+              isSelected: false
             },
             {
               dnpName: "besu.dnp.dappnode.eth",
-              isInstalled: true,
-              isSelected: false,
-              isRunning: false
+              isInstalledAndRunning: true,
+              isSelected: false
             },
             {
               dnpName: "erigon.dnp.dappnode.eth",
@@ -297,7 +295,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalledAndRunning: true,
               isSelected: true,
-              isRunning: true,
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -328,7 +325,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalledAndRunning: true,
               isSelected: false,
-              isRunning: false,
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
@@ -441,23 +437,23 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
-              dnpName: "teku-prater.dnp.dappnode.eth",
-              isInstalled: true,
-              isSelected: false,
-              isRunning: false
+              dnpName: "teku.dnp.dappnode.eth",
+              isInstalledAndRunning: true,
+              isSelected: false
             },
             {
-              dnpName: "nimbus-prater.dnp.dappnode.eth",
-              isInstalled: true,
+              dnpName: "nimbus.dnp.dappnode.eth",
+              isInstalledAndRunning: true,
               isSelected: false,
-              isRunning: false
+              graffiti: "Validating_from_prysm-nimbus",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
           web3signer: {
-            dnpName: "web3signer-prater.dnp.dappnode.eth",
-            isInstalled: true,
-            isSelected: false,
-            isRunning: false
+            dnpName: "web3signer.dnp.dappnode.eth",
+            isInstalledAndRunning: true,
+            isSelected: false
           },
           mevBoost: {
             dnpName: "mevboost-prater.dnp.dappnode.eth",
@@ -552,23 +548,23 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
-              dnpName: "teku-gnosis.dnp.dappnode.eth",
-              isInstalled: true,
-              isSelected: false,
-              isRunning: false
+              dnpName: "teku.dnp.dappnode.eth",
+              isInstalledAndRunning: true,
+              isSelected: false
             },
             {
-              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
-              isInstalled: true,
+              dnpName: "nimbus.dnp.dappnode.eth",
+              isInstalledAndRunning: true,
               isSelected: false,
-              isRunning: false
+              graffiti: "Validating_from_prysm-nimbus",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
           web3signer: {
-            dnpName: "web3signer-gnosis.dnp.dappnode.eth",
-            isInstalled: true,
-            isSelected: false,
-            isRunning: false
+            dnpName: "web3signer.dnp.dappnode.eth",
+            isInstalledAndRunning: true,
+            isSelected: false
           },
           mevBoost: {
             dnpName: "mevboost-gnosis.dnp.dappnode.eth",

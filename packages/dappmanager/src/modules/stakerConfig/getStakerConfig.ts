@@ -83,7 +83,6 @@ export async function getStakerConfig(
         isInstalled: consClientPkg ? true : false,
 >>>>>>> c760b2dc (ad de-select options)
         isSelected: currentConsClient === conCl,
-        isRunning: consClientPkg?.containers.every(c => c.running) ?? false,
         graffiti,
         feeRecipient,
         checkpointSync
