@@ -2,6 +2,10 @@ import {
   packagesGet,
   packageInstall,
   packageSetEnvironment,
+<<<<<<< HEAD
+=======
+  packageStartStop,
+>>>>>>> c760b2dc (ad de-select options)
   packageRestart
 } from "../../calls";
 import {
@@ -132,6 +136,7 @@ async function setExecutionClientConfig({
   targetExecutionClient: string;
   execClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
+<<<<<<< HEAD
   // Stop the current execution client if no target provided
   if (!targetExecutionClient) {
     if (execClientPkg)
@@ -146,6 +151,22 @@ async function setExecutionClientConfig({
     logs.info("Installing " + targetExecutionClient);
     await packageInstall({ name: targetExecutionClient });
   } // Stop the current execution client if no target provided
+=======
+  // If the EC is not installed, install it
+  if (!execClientPkg) {
+    logs.info("Installing " + targetExecutionClient);
+    await packageInstall({ name: targetExecutionClient });
+  } // Stop the current execution client if no target provided
+  else if (!targetExecutionClient) {
+    for (const container of execClientPkg.containers) {
+      if (container.running)
+        await packageStartStop({
+          dnpName: execClientPkg.dnpName,
+          serviceNames: [container.serviceName]
+        }).catch(e => logs.error(e.message));
+    }
+  }
+>>>>>>> c760b2dc (ad de-select options)
   // Ensure the EC selected is running
   else if (currentExecClient === targetExecutionClient) {
     logs.info("Execution client is already set to " + targetExecutionClient);
@@ -205,6 +226,18 @@ async function setConsensusClientConfig({
       name: targetConsensusClient.dnpName,
       userSettings
     });
+<<<<<<< HEAD
+=======
+    // Stop the current consensus client if no target provided
+  } else if (!targetConsensusClient) {
+    for (const container of consClientPkg.containers) {
+      if (container.running)
+        await packageStartStop({
+          dnpName: consClientPkg.dnpName,
+          serviceNames: [container.serviceName]
+        }).catch(e => logs.error(e.message));
+    }
+>>>>>>> c760b2dc (ad de-select options)
   } // Ensure the CC selected is installed and running and set the user settings
   else if (currentConsClient === targetConsensusClient.dnpName) {
     logs.info("Consensus client is already set to " + targetConsensusClient);
@@ -223,7 +256,11 @@ async function setConsensusClientConfig({
         userSettings[targetConsensusClient.dnpName].environment;
 
       if (serviceEnv) {
+<<<<<<< HEAD
         logs.info("Updating environment for " + targetConsensusClient.dnpName);
+=======
+        logs.info("Updating environment for " + targetConsensusClient);
+>>>>>>> c760b2dc (ad de-select options)
         await packageSetEnvironment({
           dnpName: targetConsensusClient.dnpName,
           environmentByService: serviceEnv
@@ -241,7 +278,11 @@ async function setWeb3signerConfig(
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");
+<<<<<<< HEAD
     if (web3signerPkg.containers.some(c => !c.running))
+=======
+    if (web3signerPkg.containers.some(container => !container.running))
+>>>>>>> c760b2dc (ad de-select options)
       await packageRestart({ dnpName: web3signerPkg.dnpName }).catch(e =>
         logs.error(e.message)
       );
