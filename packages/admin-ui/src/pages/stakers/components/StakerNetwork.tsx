@@ -12,7 +12,6 @@ import {
 } from "types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
-import Ok from "components/Ok";
 import { confirm } from "components/ConfirmDialog";
 import MevBoost from "./columns/MevBoost";
 import RemoteSigner from "./columns/RemoteSigner";
@@ -22,6 +21,7 @@ import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
 import "./staker-network.scss";
 import { disclaimer } from "../data";
+import Loading from "components/Loading";
 
 export default function StakerNetwork({
   network,
@@ -163,7 +163,7 @@ export default function StakerNetwork({
   if (currentStakerConfigReq.error)
     return <ErrorView error={currentStakerConfigReq.error} hideIcon red />;
   if (currentStakerConfigReq.isValidating)
-    return <Ok loading msg={`Loading ${network} staker configuration`} />;
+    return <Loading steps={[`Loading ${network} staker configuration`]} />;
   if (!currentStakerConfigReq.data)
     return <ErrorView error={"No data"} hideIcon red />;
 
