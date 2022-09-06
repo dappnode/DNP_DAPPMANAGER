@@ -58,10 +58,8 @@ export default function AdvanceView({
     },
     {
       name: "Checkpoint Sync",
-      current: currentStakerConfig.checkpointSync
-        ? currentStakerConfig.checkpointSync
-        : "-",
-      new: newStakerConfig.checkpointSync ? newStakerConfig.checkpointSync : "-"
+      current: consClientCheckpointSync ? consClientCheckpointSync : "-",
+      new: newConstClientCheckpointSync ? newConstClientCheckpointSync : "-"
     },
     {
       name: "Web3 Signer",
