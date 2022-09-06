@@ -9,10 +9,7 @@ import "./columns.scss";
 export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
-<<<<<<< HEAD
-=======
-  isInstalled,
->>>>>>> c760b2dc (ad de-select options)
+  newConsClient,
   isSelected,
   network
 }: {

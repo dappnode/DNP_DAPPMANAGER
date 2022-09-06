@@ -40,15 +40,9 @@ export async function getStakerConfig(
       const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
       executionClients.push({
         dnpName: exCl,
-<<<<<<< HEAD
         isInstalledAndRunning:
           execClientPkg?.containers.every(c => c.running) ?? false,
         isSelected: currentExecClient === exCl
-=======
-        isInstalled: execClientPkg ? true : false,
-        isSelected: currentExecClient === exCl,
-        isRunning: execClientPkg?.containers.every(c => c.running) ?? false
->>>>>>> c760b2dc (ad de-select options)
       });
     }
 
@@ -76,12 +70,8 @@ export async function getStakerConfig(
       }
       consensusClients.push({
         dnpName: conCl,
-<<<<<<< HEAD
         isInstalledAndRunning:
           consClientPkg?.containers.every(c => c.running) ?? false,
-=======
-        isInstalled: consClientPkg ? true : false,
->>>>>>> c760b2dc (ad de-select options)
         isSelected: currentConsClient === conCl,
         graffiti,
         feeRecipient,
@@ -95,29 +85,17 @@ export async function getStakerConfig(
       web3signerPkg?.containers.every(c => c.running) ?? false;
     const web3signer = {
       dnpName: web3signerAvail,
-<<<<<<< HEAD
       isInstalledAndRunning: web3signerPkgIsInstalledAndRunning,
       isSelected: web3signerPkgIsInstalledAndRunning
-=======
-      isInstalled: web3signerPkg ? true : false,
-      isSelected: web3signerPkg?.containers.every(c => c.running) ?? false, // Same value
-      isRunning: web3signerPkg?.containers.every(c => c.running) ?? false
->>>>>>> c760b2dc (ad de-select options)
     };
 
     // Mevboost
     const mevBoostPkg = pkgs.find(pkg => pkg.dnpName === mevBoostAvail);
     const mevBoost = {
       dnpName: mevBoostAvail,
-<<<<<<< HEAD
       isInstalledAndRunning:
         mevBoostPkg?.containers.every(c => c.running) ?? false,
       isSelected: isMevBoostSelected
-=======
-      isInstalled: mevBoostPkg ? true : false,
-      isSelected: isMevBoostSelected,
-      isRunning: mevBoostPkg?.containers.every(c => c.running) ?? false
->>>>>>> c760b2dc (ad de-select options)
     };
 
     return {
