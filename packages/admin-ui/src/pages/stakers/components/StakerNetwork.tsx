@@ -30,6 +30,18 @@ export default function StakerNetwork({
   network: Network;
   description: string;
 }) {
+  // Checkpointsync
+  const checkpointSyncPlaceHolder =
+    network === "mainnet"
+      ? "https://checkpoint-sync.dappnode.io"
+      : network === "prater"
+      ? "https://checkpoint-sync-prater.dappnode.io"
+      : "";
+  // Error
+  const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
+    null
+  );
+  const [graffitiError, setGraffitiError] = useState<string | null>(null);
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
@@ -84,16 +96,14 @@ export default function StakerNetwork({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStakerConfigReq.data]);
 
-  const feeRecipientError = validateEthereumAddress(
-    newConsClient?.feeRecipient
-  );
-  const graffitiError = validateGraffiti(newConsClient?.graffiti);
-  const checkpointSyncPlaceHolder =
-    network === "mainnet"
-      ? "https://checkpoint-sync.dappnode.io/"
-      : network === "prater"
-      ? "https://checkpoint-sync-prater.dappnode.io/"
-      : "";
+  useEffect(() => {
+    if (newConsClient) {
+      setFeeRecipientError(
+        validateEthereumAddress(newConsClient?.feeRecipient)
+      );
+      setGraffitiError(validateGraffiti(newConsClient?.graffiti));
+    }
+  }, [newConsClient]);
 
   function changeStakerConfigIsAllowed(): boolean {
     if (currentStakerConfig) {
