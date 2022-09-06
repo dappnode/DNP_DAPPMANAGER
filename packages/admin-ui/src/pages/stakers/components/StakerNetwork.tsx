@@ -229,6 +229,7 @@ export default function StakerNetwork({
                   key={i}
                   consensusClient={consensusClient}
                   setNewConsClient={setNewConsClient}
+                  newConsClient={newConsClient}
                   isSelected={
                     consensusClient.dnpName === newConsClient?.dnpName
                       ? true
