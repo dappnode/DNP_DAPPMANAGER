@@ -3,7 +3,7 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface, Network } from "types";
+import { ConsensusClient as ConsensusClientIface } from "types";
 import "./columns.scss";
 
 export default function ConsensusClient({
@@ -11,7 +11,9 @@ export default function ConsensusClient({
   setNewConsClient,
   newConsClient,
   isSelected,
-  network
+  feeRecipientError,
+  graffitiError,
+  checkpointSyncPlaceHolder
 }: {
   consensusClient: ConsensusClientIface;
   setNewConsClient: React.Dispatch<
@@ -19,19 +21,10 @@ export default function ConsensusClient({
   >;
   newConsClient: ConsensusClientIface | undefined;
   isSelected: boolean;
-  network: Network;
+  feeRecipientError: string | null;
+  graffitiError: string | null;
+  checkpointSyncPlaceHolder: string;
 }) {
-  const feeRecipientError = validateEthereumAddress(
-    newConsClient?.feeRecipient
-  );
-  const graffitiError = validateGraffiti(newConsClient?.graffiti);
-  const checkpointSyncPlaceHolder =
-    network === "mainnet"
-      ? "https://checkpoint-sync.dappnode.io/"
-      : network === "prater"
-      ? "https://checkpoint-sync-prater.dappnode.io/"
-      : "";
-
   return (
     <Card
       className={`consensus-client ${joinCssClass({ isSelected })}`}
@@ -95,18 +88,4 @@ export default function ConsensusClient({
       )}
     </Card>
   );
-}
-
-// Utils
-
-function validateEthereumAddress(value?: string): string | null {
-  if (value && !/^0x[0-9a-fA-F]{40}$/.test(value)) return "Invalid address";
-  return null;
-}
-
-function validateGraffiti(value?: string): string | null {
-  // It must be not more than 32 characters long
-  if (value && value.length > 32)
-    return "Graffiti must be less than 32 characters";
-  return null;
 }

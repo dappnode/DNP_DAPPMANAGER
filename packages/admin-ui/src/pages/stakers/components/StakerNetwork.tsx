@@ -84,6 +84,17 @@ export default function StakerNetwork({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStakerConfigReq.data]);
 
+  const feeRecipientError = validateEthereumAddress(
+    newConsClient?.feeRecipient
+  );
+  const graffitiError = validateGraffiti(newConsClient?.graffiti);
+  const checkpointSyncPlaceHolder =
+    network === "mainnet"
+      ? "https://checkpoint-sync.dappnode.io/"
+      : network === "prater"
+      ? "https://checkpoint-sync-prater.dappnode.io/"
+      : "";
+
   function changeStakerConfigIsAllowed(): boolean {
     if (currentStakerConfig) {
       const {
@@ -96,6 +107,8 @@ export default function StakerNetwork({
         executionClient && consensusClient?.dnpName
       );
       return (
+        !feeRecipientError &&
+        !graffitiError &&
         isExecAndConsSelected &&
         (executionClient !== newExecClient ||
           consensusClient !== newConsClient ||
@@ -215,7 +228,9 @@ export default function StakerNetwork({
                       ? true
                       : false
                   }
-                  network={network}
+                  graffitiError={graffitiError}
+                  feeRecipientError={feeRecipientError}
+                  checkpointSyncPlaceHolder={checkpointSyncPlaceHolder}
                 />
               </div>
             )
@@ -274,4 +289,18 @@ export default function StakerNetwork({
       </div>
     </Card>
   );
+}
+
+// Utils
+
+function validateEthereumAddress(value?: string): string | null {
+  if (value && !/^0x[0-9a-fA-F]{40}$/.test(value)) return "Invalid address";
+  return null;
+}
+
+function validateGraffiti(value?: string): string | null {
+  // It must be not more than 32 characters long
+  if (value && value.length > 32)
+    return "Graffiti must be less than 32 characters";
+  return null;
 }
