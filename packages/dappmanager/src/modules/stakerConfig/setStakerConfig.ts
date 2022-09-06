@@ -16,7 +16,11 @@ import {
   setStakerConfigOnDb,
   getNetworkStakerPkgs
 } from "./utils";
-import { dockerContainerStart, dockerContainerStop } from "../docker/api";
+import {
+  dockerContainerKill,
+  dockerContainerStart,
+  dockerContainerStop
+} from "../docker/api";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -246,9 +250,10 @@ async function setWeb3signerConfig(
   else if (web3signerPkg && !enableWeb3signer) {
     for (const container of web3signerPkg.containers) {
       if (container.running) {
-        await dockerContainerStop(container.containerName, {
-          timeout: 2
-        }).catch(e => logs.error(e.message));
+        // TODO: looks like dockerContainerStop fails for multiservices (i.e web3signer pakcage)
+        await dockerContainerKill(container.containerName).catch(e =>
+          logs.error(e.message)
+        );
       }
     }
   } // Web3signer not installed and enable => make sure its installed
