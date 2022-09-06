@@ -16,11 +16,7 @@ import {
   setStakerConfigOnDb,
   getNetworkStakerPkgs
 } from "./utils";
-import {
-  dockerContainerKill,
-  dockerContainerStart,
-  dockerContainerStop
-} from "../docker/api";
+import { dockerContainerStart, dockerContainerStop } from "../docker/api";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -249,12 +245,9 @@ async function setWeb3signerConfig(
   } // Web3signer installed and disabled => make sure its stopped
   else if (web3signerPkg && !enableWeb3signer) {
     for (const container of web3signerPkg.containers) {
-      if (container.running) {
-        // TODO: looks like dockerContainerStop fails for multiservices (i.e web3signer pakcage)
-        await dockerContainerKill(container.containerName).catch(e =>
-          logs.error(e.message)
-        );
-      }
+      await dockerContainerStop(container.containerName, {
+        timeout: 2
+      }).catch(e => logs.error(e.message));
     }
   } // Web3signer not installed and enable => make sure its installed
   else if (!web3signerPkg && enableWeb3signer) {
@@ -278,10 +271,9 @@ async function setMevBoostConfig(
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
     for (const container of mevBoostPkg.containers) {
-      if (container.running)
-        await dockerContainerStop(container.containerName, {
-          timeout: 2
-        }).catch(e => logs.error(e.message));
+      await dockerContainerStop(container.containerName, {
+        timeout: 2
+      }).catch(e => logs.error(e.message));
     }
   } // MevBoost not installed and enable => make sure its installed
   else if (!mevBoostPkg && enableMevBoost) {
