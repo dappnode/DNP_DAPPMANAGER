@@ -22,9 +22,9 @@ export default function ConsensusClient({
   network: Network;
 }) {
   const feeRecipientError = validateEthereumAddress(
-    consensusClient.feeRecipient
+    newConsClient?.feeRecipient
   );
-  const graffitiError = validateGraffiti(consensusClient.graffiti);
+  const graffitiError = validateGraffiti(newConsClient?.graffiti);
   const checkpointSyncPlaceHolder =
     network === "mainnet"
       ? "https://checkpoint-sync.dappnode.io/"

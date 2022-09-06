@@ -57,11 +57,6 @@ export default function AdvanceView({
       new: newConstClientCheckpointSync ? newConstClientCheckpointSync : "-"
     },
     {
-      name: "Checkpoint Sync",
-      current: consClientCheckpointSync ? consClientCheckpointSync : "-",
-      new: newConstClientCheckpointSync ? newConstClientCheckpointSync : "-"
-    },
-    {
       name: "Web3 Signer",
       current: currentStakerConfig.enableWeb3signer ? "enabled" : "disabled",
       new: newStakerConfig.enableWeb3signer ? "enabled" : "disabled"
