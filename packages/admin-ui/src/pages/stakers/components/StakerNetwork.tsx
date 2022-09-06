@@ -84,7 +84,7 @@ export default function StakerNetwork({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStakerConfigReq.data]);
 
-  function thereAreChanges(): boolean {
+  function changeStakerConfigIsAllowed(): boolean {
     if (currentStakerConfig) {
       const {
         executionClient,
@@ -92,11 +92,15 @@ export default function StakerNetwork({
         enableMevBoost,
         enableWeb3signer
       } = currentStakerConfig;
+      const isExecAndConsSelected = Boolean(
+        executionClient && consensusClient?.dnpName
+      );
       return (
-        executionClient !== newExecClient ||
-        consensusClient !== newConsClient ||
-        enableMevBoost !== newEnableMevBoost ||
-        enableWeb3signer !== newEnableWeb3signer
+        isExecAndConsSelected &&
+        (executionClient !== newExecClient ||
+          consensusClient !== newConsClient ||
+          enableMevBoost !== newEnableMevBoost ||
+          enableWeb3signer !== newEnableWeb3signer)
       );
     }
     return false;
@@ -108,7 +112,7 @@ export default function StakerNetwork({
   async function setNewConfig() {
     try {
       // Make sure there are changes
-      if (thereAreChanges()) {
+      if (changeStakerConfigIsAllowed()) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
@@ -260,7 +264,7 @@ export default function StakerNetwork({
 
         <Button
           variant="dappnode"
-          disabled={!thereAreChanges() || reqStatus.loading}
+          disabled={!changeStakerConfigIsAllowed() || reqStatus.loading}
           onClick={setNewConfig}
         >
           Apply changes
