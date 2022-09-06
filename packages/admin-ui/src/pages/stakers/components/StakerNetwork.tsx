@@ -49,7 +49,6 @@ export default function StakerNetwork({
 
   useEffect(() => {
     if (currentStakerConfigReq.data) {
-<<<<<<< HEAD
       const {
         executionClients,
         consensusClients,
@@ -62,39 +61,16 @@ export default function StakerNetwork({
           ?.dnpName || "";
       const consensusClient = consensusClients.find(
         cc => cc.isSelected && cc.isInstalledAndRunning
-=======
-      const ec =
-        currentStakerConfigReq.data.executionClients.find(
-          executionClient =>
-            executionClient.isSelected && executionClient.isRunning
-        )?.dnpName || "";
-      const cc = currentStakerConfigReq.data.consensusClients.find(
-        consensusClient =>
-          consensusClient.isSelected && consensusClient.isRunning
->>>>>>> c760b2dc (ad de-select options)
       ) || { dnpName: "" };
       const enableMevBoost =
         mevBoost.isInstalledAndRunning && mevBoost.isSelected;
       const enableWeb3signer = web3signer.isInstalledAndRunning;
 
       // Set default values for new staker config
-<<<<<<< HEAD
       setNewExecClient(executionClient);
       setNewConsClient(consensusClient);
       setNewEnableMevBoost(enableMevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
-=======
-      setNewExecClient(ec);
-      setNewConsClient(cc);
-      setNewEnableMevBoost(
-        currentStakerConfigReq.data.mevBoost.isInstalled &&
-          currentStakerConfigReq.data.mevBoost.isRunning
-      );
-      setNewEnableWeb3signer(
-        currentStakerConfigReq.data.web3signer.isInstalled &&
-          currentStakerConfigReq.data.web3signer.isRunning
-      );
->>>>>>> c760b2dc (ad de-select options)
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
