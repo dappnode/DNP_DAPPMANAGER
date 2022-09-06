@@ -20,6 +20,7 @@ export default function ConsensusClient({
   setNewConsClient: React.Dispatch<
     React.SetStateAction<ConsensusClientIface | undefined>
   >;
+  newConsClient: ConsensusClientIface | undefined;
   isSelected: boolean;
   network: Network;
 }) {
@@ -49,7 +50,7 @@ export default function ConsensusClient({
       >
         {prettyDnpName(consensusClient.dnpName)}
       </div>
-      {isSelected && (
+      {isSelected && newConsClient && (
         <>
           <hr />
           <InputForm
@@ -60,9 +61,9 @@ export default function ConsensusClient({
                 name: "fee-recipient-address",
                 autoComplete: "fee-recipient-address",
                 secret: false,
-                value: consensusClient.feeRecipient || "",
+                value: newConsClient.feeRecipient || "",
                 onValueChange: (value: string) =>
-                  setNewConsClient({ ...consensusClient, feeRecipient: value }),
+                  setNewConsClient({ ...newConsClient, feeRecipient: value }),
                 error: feeRecipientError
               },
               {
@@ -71,9 +72,9 @@ export default function ConsensusClient({
                 name: "graffiti",
                 autoComplete: "validating_from_DAppNode",
                 secret: false,
-                value: consensusClient.graffiti || "",
+                value: newConsClient.graffiti || "",
                 onValueChange: (value: string) =>
-                  setNewConsClient({ ...consensusClient, graffiti: value }),
+                  setNewConsClient({ ...newConsClient, graffiti: value }),
                 error: graffitiError
               },
               {
@@ -83,10 +84,10 @@ export default function ConsensusClient({
                 autoComplete: "checkpoint-sync",
                 placeholder: checkpointSyncPlaceHolder,
                 secret: false,
-                value: consensusClient.checkpointSync || "",
+                value: newConsClient.checkpointSync || "",
                 onValueChange: (value: string) =>
                   setNewConsClient({
-                    ...consensusClient,
+                    ...newConsClient,
                     checkpointSync: value
                   }),
                 error: null
