@@ -81,17 +81,33 @@ export default function AdvanceView({
         <React.Fragment key={i}>
           <span className="config">
             <span>
-              <strong>{config.name}</strong>
+              {config.current !== config.new ? (
+                <strong>{config.name}</strong>
+              ) : (
+                config.name
+              )}
             </span>
           </span>
           <span className="current">
-            <span>{config.current}</span>
+            <span>
+              {config.current !== config.new ? (
+                <strong>{config.current}</strong>
+              ) : (
+                config.current
+              )}
+            </span>
           </span>
           <span className="arrow">
             <BsArrowRight />
           </span>
           <span className="new">
-            <span>{config.new}</span>
+            <span>
+              {config.new !== config.current ? (
+                <strong>{config.new}</strong>
+              ) : (
+                config.new
+              )}
+            </span>
           </span>
         </React.Fragment>
       ))}

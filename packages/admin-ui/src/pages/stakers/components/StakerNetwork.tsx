@@ -22,6 +22,7 @@ import AdvanceView from "./AdvanceView";
 import "./staker-network.scss";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
+import { validateEthereumAddress, validateGraffiti } from "./utils";
 
 export default function StakerNetwork({
   network,
@@ -30,13 +31,6 @@ export default function StakerNetwork({
   network: Network;
   description: string;
 }) {
-  // Checkpointsync
-  const checkpointSyncPlaceHolder =
-    network === "mainnet"
-      ? "https://checkpoint-sync.dappnode.io"
-      : network === "prater"
-      ? "https://checkpoint-sync-prater.dappnode.io"
-      : "";
   // Error
   const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
     null
@@ -200,7 +194,7 @@ export default function StakerNetwork({
       <p>
         Setup your staker configuration by selecting the Execution and Consensus
         clients based on your needs, enable and disable the remote signer and
-        the mev boost
+        the mev boost.
       </p>
       <br />
       <p>{description}</p>
@@ -240,7 +234,13 @@ export default function StakerNetwork({
                   }
                   graffitiError={graffitiError}
                   feeRecipientError={feeRecipientError}
-                  checkpointSyncPlaceHolder={checkpointSyncPlaceHolder}
+                  checkpointSyncPlaceHolder={
+                    network === "mainnet"
+                      ? "https://checkpoint-sync.dappnode.io"
+                      : network === "prater"
+                      ? "https://checkpoint-sync-prater.dappnode.io"
+                      : ""
+                  }
                 />
               </div>
             )
@@ -299,18 +299,4 @@ export default function StakerNetwork({
       </div>
     </Card>
   );
-}
-
-// Utils
-
-function validateEthereumAddress(value?: string): string | null {
-  if (value && !/^0x[0-9a-fA-F]{40}$/.test(value)) return "Invalid address";
-  return null;
-}
-
-function validateGraffiti(value?: string): string | null {
-  // It must be not more than 32 characters long
-  if (value && value.length > 32)
-    return "Graffiti must be less than 32 characters";
-  return null;
 }
