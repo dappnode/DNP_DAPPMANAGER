@@ -244,11 +244,13 @@ async function setWeb3signerConfig(
       );
   } // Web3signer installed and disabled => make sure its stopped
   else if (web3signerPkg && !enableWeb3signer) {
-    for (const container of web3signerPkg.containers) {
-      await dockerContainerStop(container.containerName, {
-        timeout: 2
-      }).catch(e => logs.error(e.message));
-    }
+    await Promise.all(
+      web3signerPkg.containers
+        .filter(c => c.running)
+        .map(async c =>
+          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+        )
+    ).catch(e => logs.error(e.message));
   } // Web3signer not installed and enable => make sure its installed
   else if (!web3signerPkg && enableWeb3signer) {
     logs.info("Installing Web3Signer");
@@ -270,11 +272,13 @@ async function setMevBoostConfig(
       );
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
-    for (const container of mevBoostPkg.containers) {
-      await dockerContainerStop(container.containerName, {
-        timeout: 2
-      }).catch(e => logs.error(e.message));
-    }
+    await Promise.all(
+      mevBoostPkg.containers
+        .filter(c => c.running)
+        .map(async c =>
+          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+        )
+    ).catch(e => logs.error(e.message));
   } // MevBoost not installed and enable => make sure its installed
   else if (!mevBoostPkg && enableMevBoost) {
     logs.info("Installing MevBoost");
