@@ -1,5 +1,4 @@
 import {
-  FaCoins,
   FaCommentsDollar,
   FaDiscord,
   FaDiscourse,
