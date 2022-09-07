@@ -68,7 +68,7 @@ export const adminNaclPublicKey =
 // URLs / Links
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
-export const discordInviteUrl = "https://discord.gg/c28an8dA5k";
+export const discordInviteUrl = "https://discord.gg/dappnode";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
@@ -106,11 +106,9 @@ export const dappnodeUserGuideUrl =
 export const mediumTreasuryUrl =
   "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
 export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
-export const dappnodeGitcoin =
-  "https://gitcoin.co/grants/143/dappnode-panvala-league";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
-export const dappnodeDiscord = "https://discord.gg/c28an8dA5k";
+export const dappnodeDiscord = "https://discord.gg/dappnode";
 
 // AutoUpdate IDSs
 export const autoUpdateIds = {
