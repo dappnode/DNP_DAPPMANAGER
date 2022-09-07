@@ -114,7 +114,7 @@ export default function StakerNetwork({
         enableWeb3signer
       } = currentStakerConfig;
       const isExecAndConsSelected = Boolean(
-        executionClient && consensusClient?.dnpName
+        newExecClient && newConsClient?.dnpName
       );
       return (
         !feeRecipientError &&
