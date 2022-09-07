@@ -1,5 +1,4 @@
 import {
-  FaCoins,
   FaCommentsDollar,
   FaDiscord,
   FaDiscourse,
@@ -9,7 +8,6 @@ import { IconType } from "react-icons/lib";
 import DiscordActions from "./components/DiscordActions";
 import DiscourseActions from "./components/DiscourseActions";
 import GithubActions from "./components/GithubActions";
-import GrantsActions from "./components/GrantsActions";
 import TreasuryActions from "./components/TreasuryActions";
 
 export const rootPath = "/community";
@@ -23,14 +21,6 @@ export const communityTypes: CommunityItem[] = [
     actions: [DiscordActions],
     text:
       "DAppNode has a vibrant community. You can get support, share your experience, and just hang out with other Node Runners in our Discord Server"
-  },
-  {
-    subPath: "grants",
-    title: "Grants",
-    icon: FaCoins,
-    actions: [GrantsActions],
-    text:
-      "If you are getting value out of DAppNode, consider donating to our Gitcoin Grant. And even better if it is during an active Matching Round!"
   },
   {
     subPath: "treasury",
