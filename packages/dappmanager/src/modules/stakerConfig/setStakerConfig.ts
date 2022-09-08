@@ -67,9 +67,7 @@ export async function setStakerConfig({
     await setExecutionClientConfig({
       currentExecClient,
       targetExecutionClient: stakerConfig.executionClient,
-      currentExecClientPkg: pkgs.find(
-        pkg => pkg.dnpName === stakerConfig.executionClient
-      )
+      currentExecClientPkg: pkgs.find(pkg => pkg.dnpName === currentExecClient)
     });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
@@ -77,9 +75,7 @@ export async function setStakerConfig({
     await setConsensusClientConfig({
       currentConsClient,
       targetConsensusClient: stakerConfig.consensusClient,
-      currentConsClientPkg: pkgs.find(
-        pkg => pkg.dnpName === stakerConfig.consensusClient?.dnpName
-      )
+      currentConsClientPkg: pkgs.find(pkg => pkg.dnpName === currentConsClient)
     }).catch(e => {
       // The previous EXECUTION CLIENT must be persisted
       setStakerConfigOnDb({
