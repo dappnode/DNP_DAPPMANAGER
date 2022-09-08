@@ -99,7 +99,7 @@ export default function StakerNetwork({
     }
   }, [newConsClient]);
 
-  function changeStakerConfigIsAllowed(): boolean {
+  function setStakerConfigIsAllowed(): boolean {
     if (currentStakerConfig) {
       const {
         executionClient,
@@ -110,10 +110,13 @@ export default function StakerNetwork({
       const isExecAndConsSelected = Boolean(
         newExecClient && newConsClient?.dnpName
       );
+      const isExecAndConsDeSelected = Boolean(
+        !newExecClient && !newConsClient?.dnpName
+      );
       return (
         !feeRecipientError &&
         !graffitiError &&
-        isExecAndConsSelected &&
+        (isExecAndConsSelected || isExecAndConsDeSelected) &&
         (executionClient !== newExecClient ||
           consensusClient !== newConsClient ||
           enableMevBoost !== newEnableMevBoost ||
@@ -129,7 +132,7 @@ export default function StakerNetwork({
   async function setNewConfig() {
     try {
       // Make sure there are changes
-      if (changeStakerConfigIsAllowed()) {
+      if (setStakerConfigIsAllowed()) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
@@ -289,7 +292,7 @@ export default function StakerNetwork({
 
         <Button
           variant="dappnode"
-          disabled={!changeStakerConfigIsAllowed() || reqStatus.loading}
+          disabled={!setStakerConfigIsAllowed() || reqStatus.loading}
           onClick={setNewConfig}
         >
           Apply changes
