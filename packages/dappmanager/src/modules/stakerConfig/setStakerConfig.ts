@@ -5,6 +5,7 @@ import {
 } from "../../calls";
 import {
   ConsensusClient,
+  InstalledPackageData,
   InstalledPackageDataApiReturn,
   StakerConfigSet,
   UserSettingsAllDnps
@@ -16,6 +17,7 @@ import {
   getNetworkStakerPkgs
 } from "./utils";
 import { dockerContainerStart, dockerContainerStop } from "../docker/api";
+import { listPackageNoThrow } from "../docker/list/listPackages";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -131,28 +133,46 @@ async function setExecutionClientConfig({
   targetExecutionClient: string;
   currentExecClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
-  // Stop the current execution client if no target provided
-  if (!targetExecutionClient) {
-    if (currentExecClientPkg)
-      await Promise.all(
-        currentExecClientPkg.containers
-          .filter(c => c.running)
-          .map(async c =>
-            dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-          )
-      ).catch(e => logs.error(e.message));
-  } // If the EC is not installed, install it
-  else if (!currentExecClientPkg) {
-    logs.info("Installing " + targetExecutionClient);
-    await packageInstall({ name: targetExecutionClient });
-  } // Ensure the EC selected is running
-  else if (currentExecClient === targetExecutionClient) {
-    logs.info("Execution client is already set to " + targetExecutionClient);
-    await Promise.all(
-      currentExecClientPkg.containers
-        .filter(c => !c.running)
-        .map(async c => dockerContainerStart(c.containerName))
-    ).catch(e => logs.error(e.message));
+  if (!targetExecutionClient && !currentExecClient) {
+    // Stop the current execution client if no option and not currentu execution client
+    logs.info(`Not execution client selected`);
+    if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
+  } else if (!targetExecutionClient && currentExecClient) {
+    // Stop the current execution client if no target provided
+    logs.info(`Not execution client selected`);
+    if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
+  } else if (targetExecutionClient && !currentExecClient) {
+    const targetExecClientPkg = await listPackageNoThrow({
+      dnpName: targetExecutionClient
+    });
+    if (!targetExecClientPkg) {
+      // Install new consensus client if not installed
+      await packageInstall({ name: targetExecutionClient });
+    } else {
+      // Start new consensus client if not running
+      await startAllPkgContainers(targetExecClientPkg);
+    }
+  } else if (targetExecutionClient === currentExecClient) {
+    if (!currentExecClientPkg) {
+      logs.info("Installing execution client " + targetExecutionClient);
+      await packageInstall({ name: targetExecutionClient });
+    } else {
+      await startAllPkgContainers(currentExecClientPkg);
+    }
+  } else if (targetExecutionClient !== currentExecClient) {
+    const targetExecClientPkg = await listPackageNoThrow({
+      dnpName: targetExecutionClient
+    });
+    if (!targetExecClientPkg) {
+      // Install new client if not installed
+      await packageInstall({ name: targetExecutionClient });
+      // Stop old client
+      if (currentExecClientPkg)
+        await stopAllPkgContainers(currentExecClientPkg);
+    } else {
+      // Start new client
+      await startAllPkgContainers(targetExecClientPkg);
+    }
   }
 }
 
@@ -184,47 +204,72 @@ async function setConsensusClientConfig({
     }
   };
 
-  // Stop the current consensus client if no target provided
-  if (!targetConsensusClient.dnpName) {
-    if (currentConsClientPkg)
-      await Promise.all(
-        currentConsClientPkg.containers
-          .filter(c => c.running)
-          .map(async c =>
-            dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-          )
-      ).catch(e => logs.error(e.message));
-  } // Install the new CC
-  else if (!currentConsClientPkg) {
-    // Install the new CC if not already installed
-    logs.info("Installing " + targetConsensusClient);
-    await packageInstall({
-      name: targetConsensusClient.dnpName,
-      userSettings
+  if (!targetConsensusClient.dnpName && !currentConsClient) {
+    // Stop the current consensus client if no option and not current consensus client
+    logs.info(`Not consensus client selected`);
+    if (currentConsClientPkg) await stopAllPkgContainers(currentConsClientPkg);
+  } else if (!targetConsensusClient.dnpName && currentConsClient) {
+    // Stop the current consensus client if no target provided
+    logs.info(`Not consensus client selected`);
+    if (currentConsClientPkg) await stopAllPkgContainers(currentConsClientPkg);
+  } else if (targetConsensusClient.dnpName && !currentConsClient) {
+    const targetConsClientPkg = await listPackageNoThrow({
+      dnpName: targetConsensusClient.dnpName
     });
-  } // Ensure the CC selected is installed and running and set the user settings
-  else if (currentConsClient === targetConsensusClient.dnpName) {
-    logs.info("Consensus client is already set to " + targetConsensusClient);
-    await Promise.all(
-      currentConsClientPkg.containers
-        .filter(c => !c.running)
-        .map(async c => dockerContainerStart(c.containerName))
-    ).catch(e => logs.error(e.message));
-    if (
-      targetConsensusClient.graffiti ||
-      targetConsensusClient.feeRecipient ||
-      targetConsensusClient.checkpointSync
-    ) {
-      const serviceEnv =
-        userSettings[targetConsensusClient.dnpName].environment;
+    if (!targetConsClientPkg) {
+      // Install new consensus client if not installed
+      await packageInstall({
+        name: targetConsensusClient.dnpName,
+        userSettings
+      });
+    } else {
+      // Start new consensus client if not running
+      await startAllPkgContainers(targetConsClientPkg);
+    }
+  } else if (targetConsensusClient.dnpName === currentConsClient) {
+    if (!currentConsClientPkg) {
+      logs.info("Installing consensus client " + targetConsensusClient);
+      await packageInstall({
+        name: targetConsensusClient.dnpName,
+        userSettings
+      });
+    } else {
+      await startAllPkgContainers(currentConsClientPkg);
+      if (
+        targetConsensusClient.graffiti ||
+        targetConsensusClient.feeRecipient ||
+        targetConsensusClient.checkpointSync
+      ) {
+        const serviceEnv =
+          userSettings[targetConsensusClient.dnpName].environment;
 
-      if (serviceEnv) {
-        logs.info("Updating environment for " + targetConsensusClient.dnpName);
-        await packageSetEnvironment({
-          dnpName: targetConsensusClient.dnpName,
-          environmentByService: serviceEnv
-        });
+        if (serviceEnv) {
+          logs.info(
+            "Updating environment for " + targetConsensusClient.dnpName
+          );
+          await packageSetEnvironment({
+            dnpName: targetConsensusClient.dnpName,
+            environmentByService: serviceEnv
+          });
+        }
       }
+    }
+  } else if (targetConsensusClient.dnpName !== currentConsClient) {
+    const targetExecClientPkg = await listPackageNoThrow({
+      dnpName: targetConsensusClient.dnpName
+    });
+    if (!targetExecClientPkg) {
+      // Install new client if not installed
+      await packageInstall({
+        name: targetConsensusClient.dnpName,
+        userSettings
+      });
+      // Stop old client
+      if (currentConsClientPkg)
+        await stopAllPkgContainers(currentConsClientPkg);
+    } else {
+      // Start new client
+      await startAllPkgContainers(targetExecClientPkg);
     }
   }
 }
@@ -237,20 +282,10 @@ async function setWeb3signerConfig(
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");
-    await Promise.all(
-      web3signerPkg.containers
-        .filter(c => !c.running)
-        .map(async c => dockerContainerStart(c.containerName))
-    ).catch(e => logs.error(e.message));
+    await startAllPkgContainers(web3signerPkg);
   } // Web3signer installed and disabled => make sure its stopped
   else if (web3signerPkg && !enableWeb3signer) {
-    await Promise.all(
-      web3signerPkg.containers
-        .filter(c => c.running)
-        .map(async c =>
-          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-        )
-    ).catch(e => logs.error(e.message));
+    await stopAllPkgContainers(web3signerPkg);
   } // Web3signer not installed and enable => make sure its installed
   else if (!web3signerPkg && enableWeb3signer) {
     logs.info("Installing Web3Signer");
@@ -266,23 +301,35 @@ async function setMevBoostConfig(
   // MevBoost installed and enable => make sure its running
   if (mevBoostPkg && enableMevBoost) {
     logs.info("MevBoost is already installed");
-    await Promise.all(
-      mevBoostPkg.containers
-        .filter(c => !c.running)
-        .map(async c => dockerContainerStart(c.containerName))
-    ).catch(e => logs.error(e.message));
+    await startAllPkgContainers(mevBoostPkg);
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
-    await Promise.all(
-      mevBoostPkg.containers
-        .filter(c => c.running)
-        .map(async c =>
-          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-        )
-    ).catch(e => logs.error(e.message));
+    await stopAllPkgContainers(mevBoostPkg);
   } // MevBoost not installed and enable => make sure its installed
   else if (!mevBoostPkg && enableMevBoost) {
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoostDnpName });
   }
+}
+
+async function startAllPkgContainers(
+  pkg: InstalledPackageDataApiReturn | InstalledPackageData
+): Promise<void> {
+  await Promise.all(
+    pkg.containers
+      .filter(c => !c.running)
+      .map(async c => dockerContainerStart(c.containerName))
+  ).catch(e => logs.error(e.message));
+}
+
+async function stopAllPkgContainers(
+  pkg: InstalledPackageDataApiReturn | InstalledPackageData
+): Promise<void> {
+  await Promise.all(
+    pkg.containers
+      .filter(c => c.running)
+      .map(async c =>
+        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+      )
+  ).catch(e => logs.error(e.message));
 }
