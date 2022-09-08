@@ -1,8 +1,7 @@
 import {
   packagesGet,
   packageInstall,
-  packageSetEnvironment,
-  packageRestart
+  packageSetEnvironment
 } from "../../calls";
 import {
   ConsensusClient,
@@ -65,7 +64,7 @@ export async function setStakerConfig({
     await setExecutionClientConfig({
       currentExecClient,
       targetExecutionClient: stakerConfig.executionClient,
-      execClientPkg: pkgs.find(
+      currentExecClientPkg: pkgs.find(
         pkg => pkg.dnpName === stakerConfig.executionClient
       )
     });
@@ -75,7 +74,7 @@ export async function setStakerConfig({
     await setConsensusClientConfig({
       currentConsClient,
       targetConsensusClient: stakerConfig.consensusClient,
-      consClientPkg: pkgs.find(
+      currentConsClientPkg: pkgs.find(
         pkg => pkg.dnpName === stakerConfig.consensusClient?.dnpName
       )
     }).catch(e => {
@@ -126,46 +125,45 @@ export async function setStakerConfig({
 async function setExecutionClientConfig({
   currentExecClient,
   targetExecutionClient,
-  execClientPkg
+  currentExecClientPkg
 }: {
   currentExecClient: string;
   targetExecutionClient: string;
-  execClientPkg: InstalledPackageDataApiReturn | undefined;
+  currentExecClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
   // Stop the current execution client if no target provided
   if (!targetExecutionClient) {
-    if (execClientPkg)
-      for (const container of execClientPkg.containers) {
-        if (container.running)
-          await dockerContainerStop(container.containerName, {
-            timeout: 2
-          }).catch(e => logs.error(e.message));
-      }
+    if (currentExecClientPkg)
+      await Promise.all(
+        currentExecClientPkg.containers
+          .filter(c => c.running)
+          .map(async c =>
+            dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+          )
+      ).catch(e => logs.error(e.message));
   } // If the EC is not installed, install it
-  else if (!execClientPkg) {
+  else if (!currentExecClientPkg) {
     logs.info("Installing " + targetExecutionClient);
     await packageInstall({ name: targetExecutionClient });
-  } // Stop the current execution client if no target provided
-  // Ensure the EC selected is running
+  } // Ensure the EC selected is running
   else if (currentExecClient === targetExecutionClient) {
     logs.info("Execution client is already set to " + targetExecutionClient);
-    for (const container of execClientPkg.containers) {
-      if (!container.running)
-        await dockerContainerStart(container.containerName).catch(e =>
-          logs.error(e.message)
-        );
-    }
+    await Promise.all(
+      currentExecClientPkg.containers
+        .filter(c => !c.running)
+        .map(async c => dockerContainerStart(c.containerName))
+    ).catch(e => logs.error(e.message));
   }
 }
 
 async function setConsensusClientConfig({
   currentConsClient,
   targetConsensusClient,
-  consClientPkg
+  currentConsClientPkg
 }: {
   currentConsClient: string;
   targetConsensusClient: ConsensusClient;
-  consClientPkg: InstalledPackageDataApiReturn | undefined;
+  currentConsClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const userSettings: UserSettingsAllDnps = {
@@ -188,14 +186,16 @@ async function setConsensusClientConfig({
 
   // Stop the current consensus client if no target provided
   if (!targetConsensusClient.dnpName) {
-    if (consClientPkg)
-      for (const container of consClientPkg.containers)
-        if (container.running)
-          await dockerContainerStop(container.containerName, {
-            timeout: 2
-          }).catch(e => logs.error(e.message));
+    if (currentConsClientPkg)
+      await Promise.all(
+        currentConsClientPkg.containers
+          .filter(c => c.running)
+          .map(async c =>
+            dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+          )
+      ).catch(e => logs.error(e.message));
   } // Install the new CC
-  else if (!consClientPkg) {
+  else if (!currentConsClientPkg) {
     // Install the new CC if not already installed
     logs.info("Installing " + targetConsensusClient);
     await packageInstall({
@@ -205,12 +205,11 @@ async function setConsensusClientConfig({
   } // Ensure the CC selected is installed and running and set the user settings
   else if (currentConsClient === targetConsensusClient.dnpName) {
     logs.info("Consensus client is already set to " + targetConsensusClient);
-    for (const container of consClientPkg.containers) {
-      if (!container.running)
-        await dockerContainerStart(container.containerName).catch(e =>
-          logs.error(e.message)
-        );
-    }
+    await Promise.all(
+      currentConsClientPkg.containers
+        .filter(c => !c.running)
+        .map(async c => dockerContainerStart(c.containerName))
+    ).catch(e => logs.error(e.message));
     if (
       targetConsensusClient.graffiti ||
       targetConsensusClient.feeRecipient ||
@@ -238,10 +237,11 @@ async function setWeb3signerConfig(
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");
-    if (web3signerPkg.containers.some(c => !c.running))
-      await packageRestart({ dnpName: web3signerPkg.dnpName }).catch(e =>
-        logs.error(e.message)
-      );
+    await Promise.all(
+      web3signerPkg.containers
+        .filter(c => !c.running)
+        .map(async c => dockerContainerStart(c.containerName))
+    ).catch(e => logs.error(e.message));
   } // Web3signer installed and disabled => make sure its stopped
   else if (web3signerPkg && !enableWeb3signer) {
     await Promise.all(
@@ -266,10 +266,11 @@ async function setMevBoostConfig(
   // MevBoost installed and enable => make sure its running
   if (mevBoostPkg && enableMevBoost) {
     logs.info("MevBoost is already installed");
-    if (mevBoostPkg.containers.some(c => !c.running))
-      await packageRestart({ dnpName: mevBoostPkg.dnpName }).catch(e =>
-        logs.error(e.message)
-      );
+    await Promise.all(
+      mevBoostPkg.containers
+        .filter(c => !c.running)
+        .map(async c => dockerContainerStart(c.containerName))
+    ).catch(e => logs.error(e.message));
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
     await Promise.all(
