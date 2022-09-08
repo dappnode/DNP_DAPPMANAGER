@@ -27,7 +27,9 @@ export async function setDefaultStakerConfig(): Promise<void> {
     if (stakerConfig.currentExecClient === null) {
       let newExexClientValue = "";
 
-      for (const execClient of stakerConfig.execClientsAvail) {
+      for (const execClient of stakerConfig.execClients.map(
+        exCl => exCl.dnpName
+      )) {
         if (pkgs.find(pkg => pkg.dnpName === execClient)) {
           newExexClientValue = execClient;
           break;
@@ -63,7 +65,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
       let newConsClientValue = "";
 
       const web3signerPkg = pkgs.find(
-        pkg => pkg.dnpName === stakerConfig.web3signerAvail
+        pkg => pkg.dnpName === stakerConfig.web3signer.dnpName
       );
 
       label: if (web3signerPkg) {
@@ -78,9 +80,9 @@ export async function setDefaultStakerConfig(): Promise<void> {
           "ETH2_CLIENT" in environment.web3signer
         ) {
           const eth2Client = environment["web3signer"]["ETH2_CLIENT"];
-          const eth2ClientDnpName = stakerConfig.consClientsAvail.find(
-            dnpName => dnpName.includes(eth2Client)
-          );
+          const eth2ClientDnpName = stakerConfig.consClients
+            .map(cCl => cCl.dnpName)
+            .find(dnpName => dnpName.includes(eth2Client));
           if (!eth2ClientDnpName) break label;
           const eth2ClientPkg = pkgs.find(
             pkg => pkg.dnpName === eth2ClientDnpName
