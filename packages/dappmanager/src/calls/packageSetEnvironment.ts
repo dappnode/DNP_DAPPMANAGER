@@ -33,11 +33,16 @@ export async function packageSetEnvironment({
   compose.write();
 
   const containersStatus = await getContainersStatus({ dnpName });
-  await dockerComposeUpPackage(
-    { dnpName },
-    containersStatus,
-    (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {}
-  );
+  // Packages sharing PID or in sopped status must be recreated:
+  // - Packages sharing PID must be recreated to ensure startup order
+  // - Packages in stopped status must be recreated to apply the new envs
+  const forceRecreate =
+    Object.values(containersStatus).every(
+      status => status.targetStatus === "stopped"
+    ) || packageInstalledHasPid(compose.compose);
+  await dockerComposeUpPackage({ dnpName }, containersStatus, {
+    forceRecreate
+  });
 
   // Emit packages update
   eventBus.requestPackages.emit();
