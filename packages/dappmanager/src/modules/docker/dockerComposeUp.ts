@@ -22,7 +22,8 @@ interface ComposeUpArgs {
 export async function dockerComposeUpPackage(
   { dnpName, composePath }: ComposeUpArgs,
   containersStatus: ContainersStatus,
-  dockerComposeUpOptions: DockerComposeUpOptions = {}
+  dockerComposeUpOptions: DockerComposeUpOptions = {},
+  upAll = false
 ): Promise<void> {
   if (!composePath) composePath = getPath.dockerComposeSmart(dnpName);
   if (!fs.existsSync(composePath)) {
@@ -48,6 +49,7 @@ export async function dockerComposeUpPackage(
   );
 
   if (
+    upAll ||
     serviceNames.length === servicesToStart.length ||
     dnpName === params.coreDnpName
   ) {
