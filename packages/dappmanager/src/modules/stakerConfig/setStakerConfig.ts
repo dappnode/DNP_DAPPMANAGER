@@ -16,8 +16,9 @@ import {
   setStakerConfigOnDb,
   getNetworkStakerPkgs
 } from "./utils";
-import { dockerContainerStart, dockerContainerStop } from "../docker/api";
+import { dockerContainerStop } from "../docker/api";
 import { listPackageNoThrow } from "../docker/list/listPackages";
+import { dockerComposeUpPackage } from "../docker";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -150,14 +151,24 @@ async function setExecutionClientConfig({
       await packageInstall({ name: targetExecutionClient });
     } else {
       // Start new consensus client if not running
-      await startAllPkgContainers(targetExecClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: targetExecClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
     }
   } else if (targetExecutionClient === currentExecClient) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
       await packageInstall({ name: targetExecutionClient });
     } else {
-      await startAllPkgContainers(currentExecClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: currentExecClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
     }
   } else if (targetExecutionClient !== currentExecClient) {
     const targetExecClientPkg = await listPackageNoThrow({
@@ -171,7 +182,12 @@ async function setExecutionClientConfig({
         await stopAllPkgContainers(currentExecClientPkg);
     } else {
       // Start new client
-      await startAllPkgContainers(targetExecClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: targetExecClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);
@@ -227,7 +243,12 @@ async function setConsensusClientConfig({
       });
     } else {
       // Start new consensus client if not running
-      await startAllPkgContainers(targetConsClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: targetConsClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
     }
   } else if (targetConsensusClient.dnpName === currentConsClient) {
     if (!currentConsClientPkg) {
@@ -237,7 +258,12 @@ async function setConsensusClientConfig({
         userSettings
       });
     } else {
-      await startAllPkgContainers(currentConsClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: currentConsClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
       if (
         targetConsensusClient.graffiti ||
         targetConsensusClient.feeRecipient ||
@@ -272,7 +298,12 @@ async function setConsensusClientConfig({
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
       // Start new client
-      await startAllPkgContainers(targetExecClientPkg);
+      await dockerComposeUpPackage(
+        { dnpName: targetExecClientPkg.dnpName },
+        {},
+        {},
+        true
+      ).catch(err => logs.error(err));
       // Stop old client
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
@@ -288,7 +319,12 @@ async function setWeb3signerConfig(
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");
-    await startAllPkgContainers(web3signerPkg);
+    await dockerComposeUpPackage(
+      { dnpName: web3signerPkg.dnpName },
+      {},
+      {},
+      true
+    ).catch(err => logs.error(err));
   } // Web3signer installed and disabled => make sure its stopped
   else if (web3signerPkg && !enableWeb3signer) {
     await stopAllPkgContainers(web3signerPkg);
@@ -307,7 +343,12 @@ async function setMevBoostConfig(
   // MevBoost installed and enable => make sure its running
   if (mevBoostPkg && enableMevBoost) {
     logs.info("MevBoost is already installed");
-    await startAllPkgContainers(mevBoostPkg);
+    await dockerComposeUpPackage(
+      { dnpName: mevBoostPkg.dnpName },
+      {},
+      {},
+      true
+    ).catch(err => logs.error(err));
   } // MevBoost installed and disabled => make sure its stopped
   else if (mevBoostPkg && !enableMevBoost) {
     await stopAllPkgContainers(mevBoostPkg);
@@ -316,16 +357,6 @@ async function setMevBoostConfig(
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoostDnpName });
   }
-}
-
-async function startAllPkgContainers(
-  pkg: InstalledPackageDataApiReturn | InstalledPackageData
-): Promise<void> {
-  await Promise.all(
-    pkg.containers
-      .filter(c => !c.running)
-      .map(async c => dockerContainerStart(c.containerName))
-  ).catch(e => logs.error(e.message));
 }
 
 async function stopAllPkgContainers(
