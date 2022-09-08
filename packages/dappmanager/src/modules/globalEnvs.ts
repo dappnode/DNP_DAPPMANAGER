@@ -97,6 +97,11 @@ export async function updatePkgsWithGlobalEnvs(
         await packageSetEnvironment({
           dnpName: pkg.dnpName,
           environmentByService
+        }).catch(err => {
+          logs.error(
+            `Error updating ${pkg.dnpName} service ${service.serviceName} with global env ${globalEnvKey}=${globEnvValue}`
+          );
+          logs.error(err);
         });
       }
     }
