@@ -19,6 +19,7 @@ import {
 import { dockerContainerStop } from "../docker/api";
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
+import semver from "semver";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -35,18 +36,20 @@ export async function setStakerConfig({
   stakerConfig: StakerConfigSet;
 }): Promise<void> {
   const {
-    execClientsAvail,
+    execClients,
     currentExecClient,
-    consClientsAvail,
+    consClients,
     currentConsClient,
-    web3signerAvail,
+    web3signer,
     mevBoostAvail
   } = getNetworkStakerPkgs(stakerConfig.network);
 
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&
-    !execClientsAvail.includes(stakerConfig.executionClient)
+    !execClients
+      .map(exCl => exCl.dnpName)
+      .includes(stakerConfig.executionClient)
   )
     throw Error(
       `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
@@ -54,7 +57,9 @@ export async function setStakerConfig({
   // Ensure Consensus clients DNP's names are valid
   if (
     stakerConfig.consensusClient?.dnpName &&
-    !consClientsAvail.includes(stakerConfig.consensusClient.dnpName)
+    !consClients
+      .map(coCl => coCl.dnpName)
+      .includes(stakerConfig.consensusClient.dnpName)
   )
     throw Error(
       `Invalid consensus client ${stakerConfig.consensusClient.dnpName} for network ${stakerConfig.network}`
@@ -62,12 +67,58 @@ export async function setStakerConfig({
 
   const pkgs = await packagesGet();
 
+  const currentExecClientPkg = pkgs.find(
+    pkg => pkg.dnpName === currentExecClient
+  );
+  // Ensure Execution clients DNP's versions names are valid
+  if (currentExecClientPkg) {
+    const execClient = execClients.find(
+      exCl => exCl.dnpName === currentExecClientPkg.dnpName
+    );
+    if (
+      execClient &&
+      semver.lt(currentExecClientPkg.version, execClient.minVersion)
+    )
+      throw Error(
+        `Execution client ${currentExecClientPkg.dnpName} version ${currentExecClientPkg.version} is lower than the minimum version ${execClient.minVersion} required to work with the stakers UI. Update it to continue.`
+      );
+  }
+
+  const currentConsClientPkg = pkgs.find(
+    pkg => pkg.dnpName === currentConsClient
+  );
+  // Ensure Execution clients DNP's versions names are valid
+  if (currentConsClientPkg) {
+    const consClient = consClients.find(
+      exCl => exCl.dnpName === currentConsClientPkg.dnpName
+    );
+    if (
+      consClient &&
+      semver.lt(currentConsClientPkg.version, consClient.minVersion)
+    )
+      throw Error(
+        `Consensus client ${currentConsClientPkg.dnpName} version ${currentConsClientPkg.version} is lower than the minimum version ${consClient.minVersion} required to work with the stakers UI. Update it to continue.`
+      );
+  }
+
+  const currentWeb3signerPkg = pkgs.find(
+    pkg => pkg.dnpName === web3signer.dnpName
+  );
+  // Ensure Web3signer DNP's version is valid
+  if (
+    currentWeb3signerPkg &&
+    semver.lt(currentWeb3signerPkg.version, web3signer.minVersion)
+  )
+    throw Error(
+      `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${web3signer.minVersion} required to work with the stakers UI. Update it to continue.`
+    );
+
   // EXECUTION CLIENT
   if (stakerConfig.executionClient !== undefined)
     await setExecutionClientConfig({
       currentExecClient,
       targetExecutionClient: stakerConfig.executionClient,
-      currentExecClientPkg: pkgs.find(pkg => pkg.dnpName === currentExecClient)
+      currentExecClientPkg
     });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
@@ -75,7 +126,7 @@ export async function setStakerConfig({
     await setConsensusClientConfig({
       currentConsClient,
       targetConsensusClient: stakerConfig.consensusClient,
-      currentConsClientPkg: pkgs.find(pkg => pkg.dnpName === currentConsClient)
+      currentConsClientPkg
     }).catch(e => {
       // The previous EXECUTION CLIENT must be persisted
       setStakerConfigOnDb({
@@ -89,8 +140,8 @@ export async function setStakerConfig({
   if (stakerConfig.enableWeb3signer !== undefined)
     await setWeb3signerConfig(
       stakerConfig.enableWeb3signer,
-      web3signerAvail,
-      pkgs.find(pkg => pkg.dnpName === web3signerAvail)
+      web3signer.dnpName,
+      currentWeb3signerPkg
     ).catch(e => {
       // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
       setStakerConfigOnDb({

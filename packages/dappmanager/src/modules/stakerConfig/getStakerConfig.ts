@@ -23,11 +23,11 @@ export async function getStakerConfig(
 ): Promise<StakerConfigGet> {
   try {
     const {
-      execClientsAvail,
+      execClients,
       currentExecClient,
-      consClientsAvail,
+      consClients,
       currentConsClient,
-      web3signerAvail,
+      web3signer,
       mevBoostAvail,
       isMevBoostSelected
     } = getNetworkStakerPkgs(network);
@@ -36,7 +36,7 @@ export async function getStakerConfig(
 
     // Execution clients
     const executionClients: PkgStatus[] = [];
-    for (const exCl of execClientsAvail) {
+    for (const exCl of execClients.map(exexClient => exexClient.dnpName)) {
       const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
       executionClients.push({
         dnpName: exCl,
@@ -48,7 +48,7 @@ export async function getStakerConfig(
 
     // Consensus clients
     const consensusClients: PkgStatus[] = [];
-    for (const conCl of consClientsAvail) {
+    for (const conCl of consClients.map(consClient => consClient.dnpName)) {
       const consClientPkg = pkgs.find(pkg => pkg.dnpName === conCl);
       let graffiti = "";
       let feeRecipient = "";
@@ -80,11 +80,11 @@ export async function getStakerConfig(
     }
 
     // Web3signer
-    const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signerAvail);
+    const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signer.dnpName);
     const web3signerPkgIsInstalledAndRunning =
       web3signerPkg?.containers.every(c => c.running) ?? false;
-    const web3signer = {
-      dnpName: web3signerAvail,
+    const signer = {
+      dnpName: web3signer.dnpName,
       isInstalledAndRunning: web3signerPkgIsInstalledAndRunning,
       isSelected: web3signerPkgIsInstalledAndRunning
     };
@@ -101,7 +101,7 @@ export async function getStakerConfig(
     return {
       executionClients,
       consensusClients,
-      web3signer,
+      web3signer: signer,
       mevBoost
     };
   } catch (e) {
