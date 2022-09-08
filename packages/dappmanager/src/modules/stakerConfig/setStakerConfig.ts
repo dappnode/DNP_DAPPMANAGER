@@ -172,6 +172,9 @@ async function setExecutionClientConfig({
     } else {
       // Start new client
       await startAllPkgContainers(targetExecClientPkg);
+      // Stop old client
+      if (currentExecClientPkg)
+        await stopAllPkgContainers(currentExecClientPkg);
     }
   }
 }
@@ -270,6 +273,9 @@ async function setConsensusClientConfig({
     } else {
       // Start new client
       await startAllPkgContainers(targetExecClientPkg);
+      // Stop old client
+      if (currentConsClientPkg)
+        await stopAllPkgContainers(currentConsClientPkg);
     }
   }
 }
