@@ -82,29 +82,28 @@ export async function updatePkgsWithGlobalEnvs(
     if (!pkg.defaultEnvironment) continue;
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
+    const environmentsByService: { [serviceName: string]: PackageEnvs }[] = [];
     for (const service of services) {
       const serviceEnvs = service.getEnvs();
       if (globalEnvKey in serviceEnvs) {
-        const environmentByService: { [serviceName: string]: PackageEnvs } = {};
-        environmentByService[pkg.serviceName] = {
-          [globalEnvKey]: globEnvValue
-        };
-
-        logs.info(
-          `Updating ${pkg.dnpName} service ${service.serviceName} with global env ${globalEnvKey}=${globEnvValue}`
-        );
-
-        await packageSetEnvironment({
-          dnpName: pkg.dnpName,
-          environmentByService
-        }).catch(err => {
-          logs.error(
-            `Error updating ${pkg.dnpName} service ${service.serviceName} with global env ${globalEnvKey}=${globEnvValue}`
-          );
-          logs.error(err);
+        environmentsByService.push({
+          [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
         });
       }
     }
+    if (environmentsByService.length === 0) continue;
+    const environmentByService: { [serviceName: string]: PackageEnvs } =
+      environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+    await packageSetEnvironment({
+      dnpName: pkg.dnpName,
+      environmentByService
+    }).catch(err => {
+      logs.error(
+        `Error updating ${pkg.dnpName} with global env ${globalEnvKey}=${globEnvValue}`
+      );
+      logs.error(err);
+    });
   }
 }
 
