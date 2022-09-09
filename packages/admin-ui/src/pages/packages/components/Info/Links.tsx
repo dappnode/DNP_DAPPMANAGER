@@ -44,13 +44,23 @@ export function Links({
         </span>
         <span>{name}</span>
       </a>
-    ) : name === "api" || name === "endpoint" ? (
+    ) : name === "api" || name === "queryingApi" || name === "endpoint" ? (
       <span className="api-link-container">
         <a href={url} {...newTabProps}>
           <span className="links-icon">
             <MdSettings />
           </span>
-          <span>Api</span>
+          <span>Querying-API</span>
+        </a>
+        <div className="api-link-box">{url}</div>
+      </span>
+    ) : name === "apiEngine" || name ==="engineAPI" ? (
+      <span className="api-link-container">
+        <a href={url} {...newTabProps}>
+          <span className="links-icon">
+            <MdSettings />
+          </span>
+          <span>Engine-API</span>
         </a>
         <div className="api-link-box">{url}</div>
       </span>
