@@ -6,7 +6,6 @@ import { ComposeFileEditor } from "../compose/editor";
 import { dockerComposeUp, DockerComposeUpOptions } from "./compose";
 import { listPackageNoThrow } from "./list";
 import { getDockerTimeoutMax } from "./utils";
-import { dockerContainerInspect } from "./api";
 import { ContainersStatus, PackageContainer } from "../../types";
 import { InstalledPackageData } from "../../common";
 
@@ -23,7 +22,8 @@ interface ComposeUpArgs {
 export async function dockerComposeUpPackage(
   { dnpName, composePath }: ComposeUpArgs,
   containersStatus: ContainersStatus,
-  dockerComposeUpOptions: DockerComposeUpOptions = {}
+  dockerComposeUpOptions: DockerComposeUpOptions = {},
+  upAll = false
 ): Promise<void> {
   if (!composePath) composePath = getPath.dockerComposeSmart(dnpName);
   if (!fs.existsSync(composePath)) {
@@ -49,6 +49,7 @@ export async function dockerComposeUpPackage(
   );
 
   if (
+    upAll ||
     serviceNames.length === servicesToStart.length ||
     dnpName === params.coreDnpName
   ) {
@@ -126,26 +127,10 @@ async function getContainerTargetStatus(
   }
 
   switch (container.state) {
-    case "exited": {
-      let exitCode: number;
-      if (typeof container.exitCode === "number") {
-        exitCode = container.exitCode;
-      } else {
-        const inspectData = await dockerContainerInspect(
-          container.containerName
-        );
-        exitCode = inspectData.State.ExitCode;
-      }
-
-      // A package must only be consider stopped only if it's certain that it was gracefully
-      // stopped. Graceful stop should always yield exitCode = 0
-      if (exitCode === 0) {
-        return "stopped";
-      } else {
-        return "running";
-      }
-    }
-
+    // Status exited means that the container has receive a signal to stop or kill the process. Deppending on
+    // how the docker container handles the signal it will exit with code 0 or != 0. So it cannot be
+    // determined if the container was manually and gracefully stopped or not.
+    case "exited":
     // When packages are gracefully stopped they might be recreated again by this code
     // and stay in created status, because they won't be stopped. So we must consider
     // a created state as stopped to preserve the user's preference

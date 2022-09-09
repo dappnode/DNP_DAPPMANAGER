@@ -26,6 +26,12 @@ export async function dockerContainerStop(
     .stop({ t: options?.timeout });
 }
 
+export async function dockerContainerKill(
+  containerNameOrId: string
+): Promise<Docker.ContainerInspectInfo> {
+  return await docker.getContainer(containerNameOrId).kill();
+}
+
 export async function dockerContainerRestart(
   containerNameOrId: string,
   options?: DockerStopOptions

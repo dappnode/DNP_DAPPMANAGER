@@ -13,7 +13,7 @@ import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
 import retry from "async-retry";
 import shell from "./utils/shell";
-import { IdentityInterface } from "./types";
+import { IdentityInterface, IpfsClientTarget } from "./types";
 import { logs } from "./logs";
 import { localProxyingEnableDisable } from "./calls";
 import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable";
@@ -23,6 +23,21 @@ const getInternalIpSafe = returnNullIfError(getInternalIp);
 const getExternalUpnpIpSafe = returnNullIfError(getExternalUpnpIp, true);
 const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
 
+function returnNullIfError(
+  fn: () => Promise<string>,
+  silent?: boolean
+): () => Promise<string | null> {
+  return async function (): Promise<string | null> {
+    try {
+      return await fn();
+    } catch (e) {
+      if (silent) logs.warn(e.message);
+      else logs.error(e);
+      return null;
+    }
+  };
+}
+
 /**
  * - Generate local keypair for dyndns
  * - Get network status variables
@@ -30,16 +45,74 @@ const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
  */
 export default async function initializeDb(): Promise<void> {
   /**
-   * Migrate dappnode ipfs gateway endpoint
+   * ipfsClientTarget
    */
-  migrateDappnodeIpfsGatewayEndpoint();
+  try {
+    const ipfsClientTarget = db.ipfsClientTarget.get();
+    if (!ipfsClientTarget) {
+      logs.info("ipfsClientTarget not found, setting to local");
+      db.ipfsClientTarget.set(IpfsClientTarget.local);
+    }
+  } catch (e) {
+    logs.error("Error getting ipfsClientTarget", e);
+    db.ipfsClientTarget.set(IpfsClientTarget.local);
+  }
+
+  /**
+   * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
+   * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
+   */
+  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081")
+    db.ipfsGateway.set(params.IPFS_REMOTE);
 
   /**
    * Migrate data from the VPN db
    * - dyndns identity (including the domain)
    * - staticIp (if set)
    */
-  await migrateVpnDb();
+  label: try {
+    if (db.isVpnDbMigrated.get()) break label;
+
+    interface VpnDb extends IdentityInterface {
+      domain: string;
+      staticIp: string | null;
+      "imported-installation-staticIp": boolean;
+    }
+    const image = await getDappmanagerImage();
+    const output = await shell(
+      `docker run --rm -v  ${params.vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
+    );
+    if (!output) throw Error(`VPN DB is empty`);
+    const vpndb: VpnDb = JSON.parse(output);
+
+    // Only set the params from the VPN if
+    // - they are NOT set in the DAPPMANAGER
+    // - they ARE set in the VPN
+    if (vpndb.privateKey && !db.dyndnsIdentity.get().privateKey) {
+      db.dyndnsIdentity.set({
+        address: vpndb.address,
+        privateKey: vpndb.privateKey,
+        publicKey: vpndb.publicKey
+      });
+      db.domain.set(vpndb.domain);
+    }
+    if (vpndb.staticIp && !db.staticIp.get())
+      db.staticIp.set(vpndb.staticIp || "");
+    if (vpndb["imported-installation-staticIp"])
+      db.importedInstallationStaticIp.set(
+        Boolean(vpndb["imported-installation-staticIp"])
+      );
+
+    db.isVpnDbMigrated.set(true);
+
+    logs.info("VPN DB imported successfully imported");
+  } catch (e) {
+    if (e.message && e.message.includes("No such file or directory")) {
+      logs.warn(`VPN DB not imported, vpndb.json missing.`);
+    } else {
+      logs.error("Error importing VPN DB", e);
+    }
+  }
 
   // 1. Directly connected to the internet: Public IP is the interface IP
   // 2. Behind a router: Needs to get the public IP, open ports and get the internal IP
@@ -118,96 +191,13 @@ export default async function initializeDb(): Promise<void> {
   // - Updates the domain: db.domain.set(domain);
   dyndns.generateKeys(); // Auto-checks if keys are already generated
 
-  // Set the domain of this DAppNode to point to the internal IP for better UX
-  // on Wifi connections, only if the internal IP !== public IP
-  // MUST be run after key generation `dyndns.generateKeys()`
-  // NOTE: Runs as a forked process with retry and a try / catch block
-  updateLocalDyndns();
-
-  // After initializing all the internal params (hostname, internal_ip, etc)
-  // Persist them to the global ENVs file so other packages can consume it
-  // However, the prefered way to consume global envs is via API
-  writeGlobalEnvsToEnvFile();
-
-  eventBus.initializedDb.emit();
-
-  // Disable local proxying if we the DAppNode is exposed to the public internet
-  if (publicIp === internalIp) {
-    logs.info("Exposed to the public internet, disabling local proxying");
-    localProxyingEnableDisable(false).then(
-      () => logs.info("Disabled local proxying"),
-      e => logs.error("Error disabling local proxying", e)
-    );
-  }
-}
-
-/**
- * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
- * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
- */
-function migrateDappnodeIpfsGatewayEndpoint(): void {
-  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081")
-    db.ipfsGateway.set(params.IPFS_REMOTE);
-}
-
-/**
- * Migrate data from the VPN db
- * - dyndns identity (including the domain)
- * - staticIp (if set)
- */
-async function migrateVpnDb(): Promise<void> {
-  try {
-    if (db.isVpnDbMigrated.get()) return;
-
-    interface VpnDb extends IdentityInterface {
-      domain: string;
-      staticIp: string | null;
-      "imported-installation-staticIp": boolean;
-    }
-    const image = await getDappmanagerImage();
-    const output = await shell(
-      `docker run --rm -v  ${params.vpnDataVolume}:/data --entrypoint=/bin/cat ${image} /data/vpndb.json`
-    );
-    if (!output) throw Error(`VPN DB is empty`);
-    const vpndb: VpnDb = JSON.parse(output);
-
-    // Only set the params from the VPN if
-    // - they are NOT set in the DAPPMANAGER
-    // - they ARE set in the VPN
-    if (vpndb.privateKey && !db.dyndnsIdentity.get().privateKey) {
-      db.dyndnsIdentity.set({
-        address: vpndb.address,
-        privateKey: vpndb.privateKey,
-        publicKey: vpndb.publicKey
-      });
-      db.domain.set(vpndb.domain);
-    }
-    if (vpndb.staticIp && !db.staticIp.get())
-      db.staticIp.set(vpndb.staticIp || "");
-    if (vpndb["imported-installation-staticIp"])
-      db.importedInstallationStaticIp.set(
-        Boolean(vpndb["imported-installation-staticIp"])
-      );
-
-    db.isVpnDbMigrated.set(true);
-
-    logs.info("VPN DB imported successfully imported");
-  } catch (e) {
-    if (e.message && e.message.includes("No such file or directory")) {
-      logs.warn(`VPN DB not imported, vpndb.json missing.`);
-    } else {
-      logs.error("Error importing VPN DB", e);
-    }
-  }
-}
-
-/**
- * Set the domain of this DAppNode to point to the internal IP for better UX
- * on Wifi connections, only if the internal IP !== public IP
- * MUST be run after key generation `dyndns.generateKeys()`
- * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
- */
-async function updateLocalDyndns(): Promise<void> {
+  /**
+   * Set the domain of this DAppNode to point to the internal IP for better UX
+   * on Wifi connections, only if the internal IP !== public IP
+   * MUST be run after key generation `dyndns.generateKeys()`
+   * NOTE: Runs as a forked process with retry and a try / catch block
+   * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
+   */
   try {
     await retry(async function updateLocalDyndnsCall(): Promise<void> {
       const domain = db.domain.get();
@@ -227,21 +217,22 @@ async function updateLocalDyndns(): Promise<void> {
   } catch (e) {
     logs.error("Error on update local dyndns", e);
   }
-}
 
-// Utils
+  /**
+   * After initializing all the internal params (hostname, internal_ip, etc)
+   * Persist them to the global ENVs file so other packages can consume it
+   * However, the prefered way to consume global envs is via API
+   */
+  writeGlobalEnvsToEnvFile();
 
-function returnNullIfError(
-  fn: () => Promise<string>,
-  silent?: boolean
-): () => Promise<string | null> {
-  return async function (): Promise<string | null> {
-    try {
-      return await fn();
-    } catch (e) {
-      if (silent) logs.warn(e.message);
-      else logs.error(e);
-      return null;
-    }
-  };
+  eventBus.initializedDb.emit();
+
+  // Disable local proxying if we the DAppNode is exposed to the public internet
+  if (publicIp === internalIp) {
+    logs.info("Exposed to the public internet, disabling local proxying");
+    localProxyingEnableDisable(false).then(
+      () => logs.info("Disabled local proxying"),
+      e => logs.error("Error disabling local proxying", e)
+    );
+  }
 }

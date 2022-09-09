@@ -6,6 +6,7 @@ export { chainDataGet } from "./chainDataGet";
 export { changeIpfsTimeout } from "./changeIpfsTimeout";
 export { cleanCache } from "./cleanCache";
 export { cleanDb } from "./cleanDb";
+export { stakerConfigSet, stakerConfigGet } from "./stakerConfig";
 export { copyFileTo } from "./copyFileTo";
 export { diagnose } from "./diagnose";
 export * from "./dockerUpdate";

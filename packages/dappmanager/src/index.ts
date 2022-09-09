@@ -27,6 +27,7 @@ import { startDappmanager } from "./startDappmanager";
 import { addAliasToRunningContainersMigration } from "./modules/https-portal";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
+import { setDefaultStakerConfig } from "./modules/stakerConfig/setDefaultStakerConfig";
 
 const controller = new AbortController();
 
@@ -54,18 +55,22 @@ switchEthClientIfOpenethereum().catch(e =>
   logs.error("Error switch client openethereum", e)
 );
 
+// Initialize DB
+initializeDb()
+  .then(() => logs.info("Initialized Database"))
+  .catch(e => logs.error("Error inititializing Database", e));
+
 // Start daemons
 startDaemons(controller.signal);
 
-// Copy host services
-copyHostServices().catch(e => logs.error("Error copying host services", e));
-
 Promise.all([
-  initializeDb().catch(e => logs.error("Error copying host scripts", e)), // Generate keypair, network stats, and run dyndns loop
+  // Copy host services
+  copyHostServices().catch(e => logs.error("Error copying host services", e)),
   copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
 ]).then(() =>
+  // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
-); // avahiDaemon uses a host script that must be copied before been initialized
+);
 
 // Create the global env file
 createGlobalEnvsEnvFile();
@@ -114,6 +119,10 @@ runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
 
 addAliasToRunningContainersMigration().catch(e =>
   logs.error("Error adding alias to running containers", e)
+);
+
+setDefaultStakerConfig().catch(e =>
+  logs.error("Error setting default staker config", e)
 );
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));

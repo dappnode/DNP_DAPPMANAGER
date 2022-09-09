@@ -18,7 +18,8 @@ import {
   ComposeService,
   ComposeNetwork,
   ComposeServiceNetwork,
-  PackageEnvs
+  PackageEnvs,
+  Manifest
 } from "@dappnode/dappnodesdk";
 import {
   stringifyPortMappings,
@@ -36,6 +37,8 @@ import { UserSettings } from "../../types";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";
+import { computeGlobalEnvsFromDb, getGlobalEnvsFilePath } from "../globalEnvs";
+import params from "../../params";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;
@@ -157,6 +160,46 @@ export class ComposeServiceEditor {
 
   getEnvs(): PackageEnvs {
     return parseEnvironment(this.get().environment || {});
+  }
+
+  /**
+   * Set global envs to the service (with the rpefix _DAPPNODE_GLOBAL_), there might be two types of global envs:
+   * 1. Compose with global env file (https://docs.docker.com/compose/environment-variables/#the-env_file-configuration-option): in this case the pkgs only needs to be restarted to make the changes take effect
+   * 2. Compose with global envs under environment (https://docs.docker.com/compose/environment-variables/#pass-environment-variables-to-containers): in this case the pkgs needs to be updated and restarted to make the changes take effect
+   */
+  setGlobalEnvs(
+    manifestGlobalEnvs: Manifest["globalEnvs"],
+    isCore: boolean
+  ): void {
+    if (!manifestGlobalEnvs) return;
+    if (Array.isArray(manifestGlobalEnvs)) {
+      // Add the defined global envs to the selected services
+      for (const globEnv of manifestGlobalEnvs) {
+        if (!globEnv.services.includes(this.serviceName)) continue;
+        const globalEnvsFromManifestPrefixed = globEnv.envs.map(
+          env => `${params.GLOBAL_ENVS_PREFIX}${env}`
+        );
+        const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
+
+        if (
+          globalEnvsFromManifestPrefixed.some(
+            env => !(env in globalEnvsFromDbPrefixed)
+          )
+        )
+          throw Error(
+            `Global envs allowed are ${Object.keys(
+              globalEnvsFromDbPrefixed
+            ).join(", ")}. Got ${globEnv.envs.join(", ")}`
+          );
+
+        this.mergeEnvs(
+          pick(globalEnvsFromDbPrefixed, globalEnvsFromManifestPrefixed)
+        );
+      }
+    } else if ((manifestGlobalEnvs || {}).all) {
+      // Add global env_file on request
+      this.addEnvFile(getGlobalEnvsFilePath(isCore));
+    }
   }
 
   addEnvFile(envFile: string): void {

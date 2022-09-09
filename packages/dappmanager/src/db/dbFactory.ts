@@ -15,8 +15,27 @@ export const dbMain = dbFactory(params.DB_MAIN_PATH);
  */
 export const dbCache = dbFactory(params.DB_CACHE_PATH);
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-export function dbFactory(dbPath: string) {
+export function dbFactory(dbPath: string): {
+  staticKey: <T>(
+    key: string,
+    defaultValue: T
+  ) => { get: () => T; set: (value: T) => void };
+  indexedByKey: <V, K>({
+    rootKey,
+    getKey,
+    validate
+  }: {
+    rootKey: string;
+    getKey: (keyArg: K) => string;
+    validate?: ((keyArg: K, value?: V | undefined) => boolean) | undefined;
+  }) => {
+    getAll: () => { [key: string]: V };
+    get: (keyArg: K) => V | undefined;
+    set: (keyArg: K, value: V) => void;
+    remove: (keyArg: K) => void;
+  };
+  clearDb: () => void;
+} {
   // Define dbPath and make sure it exists (mkdir -p)
   validate.path(dbPath);
   logs.info(`New DB instance at ${dbPath}`);
@@ -34,8 +53,10 @@ export function dbFactory(dbPath: string) {
    * Factory methods
    */
 
-  /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-  function staticKey<T>(key: string, defaultValue: T) {
+  function staticKey<T>(
+    key: string,
+    defaultValue: T
+  ): { get: () => T; set: (value: T) => void } {
     return {
       get: (): T => jsonFileDb.read()[key] ?? defaultValue,
       set: (newValue: T): void => {
@@ -50,7 +71,7 @@ export function dbFactory(dbPath: string) {
    * @param keyGetter Must return a unique string key
    * @param validate Must return a boolean (valid or not) given an item
    */
-  /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+
   function indexedByKey<V, K>({
     rootKey,
     getKey,
@@ -59,7 +80,14 @@ export function dbFactory(dbPath: string) {
     rootKey: string;
     getKey: (keyArg: K) => string;
     validate?: (keyArg: K, value?: V) => boolean;
-  }) {
+  }): {
+    getAll: () => {
+      [key: string]: V;
+    };
+    get: (keyArg: K) => V | undefined;
+    set: (keyArg: K, value: V) => void;
+    remove: (keyArg: K) => void;
+  } {
     const getRoot = (): { [key: string]: V } =>
       jsonFileDb.read()[rootKey] || {};
 
