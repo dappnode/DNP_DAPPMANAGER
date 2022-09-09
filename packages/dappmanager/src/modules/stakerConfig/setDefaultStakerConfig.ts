@@ -17,7 +17,7 @@ import { ComposeFileEditor } from "../compose/editor";
 export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
-  for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
+  for (const network of [/* "mainnet", "gnosis",  */ "prater"] as Network[]) {
     const stakerConfig = getNetworkStakerPkgs(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
