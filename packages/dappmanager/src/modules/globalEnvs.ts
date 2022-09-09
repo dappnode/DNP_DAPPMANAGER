@@ -79,6 +79,7 @@ export async function updatePkgsWithGlobalEnvs(
   if (pkgsWithGlobalEnv.length === 0) return;
 
   for await (const pkg of pkgsWithGlobalEnv) {
+    if (pkg.dnpName === params.dappmanagerDnpName) continue;
     if (!pkg.defaultEnvironment) continue;
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
