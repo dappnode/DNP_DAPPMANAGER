@@ -3,11 +3,14 @@
   --eth-multi-client-description-color: var(--light-text-color);
 }
 
+.card {
+  margin-top: 15px;
+}
+
 .consensus-client,
 .execution-client,
 .mev-boost,
 .remote-signer {
-  margin: 0 auto;
   width: 100%;
 }
 

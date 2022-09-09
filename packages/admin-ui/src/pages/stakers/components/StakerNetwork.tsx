@@ -19,7 +19,6 @@ import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
-import "./staker-network.scss";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { validateEthereumAddress, validateGraffiti } from "./utils";
@@ -201,21 +200,19 @@ export default function StakerNetwork({
       </p>
       <br />
       <p>{description}</p>
-      <Row>
+      <Row className="staker-network">
         <Col>
           <SubTitle>Execution Clients</SubTitle>
           {currentStakerConfigReq.data.executionClients.map(
             (executionClient, i) => (
-              <div className="execution-client">
-                <ExecutionClient
-                  key={i}
-                  executionClient={executionClient.dnpName}
-                  setNewExecClient={setNewExecClient}
-                  isSelected={
-                    executionClient.dnpName === newExecClient ? true : false
-                  }
-                />
-              </div>
+              <ExecutionClient
+                key={i}
+                executionClient={executionClient.dnpName}
+                setNewExecClient={setNewExecClient}
+                isSelected={
+                  executionClient.dnpName === newExecClient ? true : false
+                }
+              />
             )
           )}
         </Col>
@@ -224,52 +221,46 @@ export default function StakerNetwork({
           <SubTitle>Consensus Clients</SubTitle>
           {currentStakerConfigReq.data.consensusClients.map(
             (consensusClient, i) => (
-              <div className="consensus-client">
-                <ConsensusClient
-                  key={i}
-                  consensusClient={consensusClient}
-                  setNewConsClient={setNewConsClient}
-                  newConsClient={newConsClient}
-                  isSelected={
-                    consensusClient.dnpName === newConsClient?.dnpName
-                      ? true
-                      : false
-                  }
-                  graffitiError={graffitiError}
-                  feeRecipientError={feeRecipientError}
-                  checkpointSyncPlaceHolder={
-                    network === "mainnet"
-                      ? "https://checkpoint-sync.dappnode.io"
-                      : network === "prater"
-                      ? "https://checkpoint-sync-prater.dappnode.io"
-                      : ""
-                  }
-                />
-              </div>
+              <ConsensusClient
+                key={i}
+                consensusClient={consensusClient}
+                setNewConsClient={setNewConsClient}
+                newConsClient={newConsClient}
+                isSelected={
+                  consensusClient.dnpName === newConsClient?.dnpName
+                    ? true
+                    : false
+                }
+                graffitiError={graffitiError}
+                feeRecipientError={feeRecipientError}
+                checkpointSyncPlaceHolder={
+                  network === "mainnet"
+                    ? "https://checkpoint-sync.dappnode.io"
+                    : network === "prater"
+                    ? "https://checkpoint-sync-prater.dappnode.io"
+                    : ""
+                }
+              />
             )
           )}
         </Col>
 
         <Col>
           <SubTitle>Remote signer</SubTitle>
-          <div className="remote-signer">
-            <RemoteSigner
-              signer={currentStakerConfigReq.data.web3signer.dnpName}
-              setEnableWeb3signer={setNewEnableWeb3signer}
-              isSelected={newEnableWeb3signer}
-            />
-          </div>
+          <RemoteSigner
+            signer={currentStakerConfigReq.data.web3signer.dnpName}
+            setEnableWeb3signer={setNewEnableWeb3signer}
+            isSelected={newEnableWeb3signer}
+          />
         </Col>
         {network === "prater" && (
           <Col>
             <SubTitle>Mev Boost</SubTitle>
-            <div className="mev-boost">
-              <MevBoost
-                mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
-                setEnableMevBoost={setNewEnableMevBoost}
-                isSelected={newEnableMevBoost}
-              />
-            </div>
+            <MevBoost
+              mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
+              setEnableMevBoost={setNewEnableMevBoost}
+              isSelected={newEnableMevBoost}
+            />
           </Col>
         )}
       </Row>
