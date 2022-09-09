@@ -41,7 +41,10 @@ import {
   HostVolumeGroup,
   HostLogicalVolume,
   IpfsRepository,
-  TrustedReleaseKey
+  TrustedReleaseKey,
+  Network,
+  StakerConfigSet,
+  StakerConfigGet
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -124,6 +127,12 @@ export interface Routes {
     filename: string;
     toPath: string;
   }) => Promise<void>;
+
+  /** Gets the staker configuration for a given network */
+  stakerConfigGet: (network: Network) => Promise<StakerConfigGet>;
+
+  /** Sets the staker configuration for a given network */
+  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
@@ -665,6 +674,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   cleanCache: {},
   cleanDb: {},
   copyFileTo: { log: true },
+  stakerConfigGet: { log: true },
+  stakerConfigSet: { log: true },
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },

@@ -44,10 +44,13 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}SERVER_NAME`]: db.serverName.get(),
     [`${prefix}CONSENSUS_CLIENT_MAINNET`]: db.consensusClientMainnet.get(),
     [`${prefix}EXECUTION_CLIENT_MAINNET`]: db.executionClientMainnet.get(),
+    [`${prefix}MEVBOOST_MAINNET`]: db.mevBoostMainnet.get(),
     [`${prefix}CONSENSUS_CLIENT_GNOSIS`]: db.consensusClientGnosis.get(),
     [`${prefix}EXECUTION_CLIENT_GNOSIS`]: db.executionClientGnosis.get(),
+    [`${prefix}MEVBOOST_GNOSIS`]: db.mevBoostGnosis.get(),
     [`${prefix}CONSENSUS_CLIENT_PRATER`]: db.consensusClientPrater.get(),
-    [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get()
+    [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get(),
+    [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
@@ -75,32 +78,32 @@ export async function updatePkgsWithGlobalEnvs(
 
   if (pkgsWithGlobalEnv.length === 0) return;
 
-  logs.info(
-    `Found ${
-      pkgsWithGlobalEnv.length
-    } packages with global envs: ${pkgsWithGlobalEnv
-      .map(pkg => pkg.dnpName)
-      .join(", ")}`
-  );
-
   for await (const pkg of pkgsWithGlobalEnv) {
     if (!pkg.defaultEnvironment) continue;
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
+    const environmentsByService: { [serviceName: string]: PackageEnvs }[] = [];
     for (const service of services) {
       const serviceEnvs = service.getEnvs();
-      if (serviceEnvs[globalEnvKey] && serviceEnvs[globalEnvKey].length > 0) {
-        const environmentByService: { [serviceName: string]: PackageEnvs } = {};
-        environmentByService[pkg.serviceName] = {
-          [globalEnvKey]: globEnvValue
-        };
-
-        await packageSetEnvironment({
-          dnpName: pkg.dnpName,
-          environmentByService
+      if (globalEnvKey in serviceEnvs) {
+        environmentsByService.push({
+          [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
         });
       }
     }
+    if (environmentsByService.length === 0) continue;
+    const environmentByService: { [serviceName: string]: PackageEnvs } =
+      environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+    await packageSetEnvironment({
+      dnpName: pkg.dnpName,
+      environmentByService
+    }).catch(err => {
+      logs.error(
+        `Error updating ${pkg.dnpName} with global env ${globalEnvKey}=${globEnvValue}`
+      );
+      logs.error(err);
+    });
   }
 }
 

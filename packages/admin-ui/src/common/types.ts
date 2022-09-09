@@ -1175,17 +1175,66 @@ export interface TrustedReleaseKey {
 
 // CONSENSUS-EXECUTION CLIENTS
 
+export type Network = "mainnet" | "prater" | "gnosis";
+
 // Mainnet
 
-export type ConensusClientMainnet = "geth" | "nethermind" | "besu" | "erigon";
-export type ExecutionClientMainnet = "prysm" | "lighthouse" | "teku" | "nimbus";
-
-// Gnosis
-
-export type ConensusClientGnosis = "nethermind";
-export type ExecutionClientGnosis = "prysm" | "lighthouse" | "teku";
+export type ConsensusClientMainnet =
+  | "prysm.dnp.dappnode.eth"
+  | "lighthouse.dnp.dappnode.eth"
+  | "teku.dnp.dappnode.eth"
+  | "nimbus.dnp.dappnode.eth";
+export type ExecutionClientMainnet =
+  | "geth.dnp.dappnode.eth"
+  | "besu.dnp.dappnode.eth"
+  | "erigon.dnp.dappnode.eth"
+  | "nethermind.dnp.dappnode.eth";
 
 // Prater
 
-export type ConensusClientPrater = "geth";
-export type ExecutionClientPrater = "prysm" | "lighthouse" | "teku" | "nimbus";
+export type ConsensusClientPrater =
+  | "prysm-prater.dnp.dappnode.eth"
+  | "lighthouse-prater.dnp.dappnode.eth"
+  | "teku-prater.dnp.dappnode.eth"
+  | "nimbus-prater.dnp.dappnode.eth";
+export type ExecutionClientPrater = "goerli-geth.dnp.dappnode.eth";
+
+// Gnosis
+
+export type ConsensusClientGnosis =
+  | "gnosis-beacon-chain-prysm.dnp.dappnode.eth"
+  | "lighthouse-gnosis.dnp.dappnode.eth"
+  | "teku-gnosis.dnp.dappnode.eth"
+  | "nimbus-gnosis.dnp.dappnode.eth";
+export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth";
+
+export interface StakerConfigGet {
+  executionClients: PkgStatus[];
+  consensusClients: PkgStatus[];
+  web3signer: PkgStatus;
+  mevBoost: PkgStatus;
+}
+
+export interface PkgStatus {
+  dnpName: string;
+  isInstalledAndRunning: boolean;
+  isSelected: boolean;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
+}
+
+export interface StakerConfigSet {
+  network: Network;
+  executionClient?: string;
+  consensusClient?: ConsensusClient;
+  enableWeb3signer?: boolean;
+  enableMevBoost?: boolean;
+}
+
+export interface ConsensusClient {
+  dnpName: string;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
+}
