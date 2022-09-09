@@ -50,7 +50,7 @@ export function Links({
           <span className="links-icon">
             <MdSettings />
           </span>
-          <span>Querying-API</span>
+          <span>Querying API</span>
         </a>
         <div className="api-link-box">{url}</div>
       </span>
@@ -60,7 +60,7 @@ export function Links({
           <span className="links-icon">
             <MdSettings />
           </span>
-          <span>Engine-API</span>
+          <span>Engine API</span>
         </a>
         <div className="api-link-box">{url}</div>
       </span>
