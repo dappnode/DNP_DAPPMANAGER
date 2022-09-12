@@ -36,8 +36,7 @@ export async function packageSetEnvironment({
   // Packages sharing PID or must be recreated:
   // - Packages sharing PID must be recreated to ensure startup order
   await dockerComposeUpPackage({ dnpName }, containersStatus, {
-    forceRecreate: packageInstalledHasPid(compose.compose),
-    removeOrphans: true
+    forceRecreate: packageInstalledHasPid(compose.compose)
   });
 
   // Emit packages update

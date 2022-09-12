@@ -78,7 +78,7 @@ export async function updatePkgsWithGlobalEnvs(
 
   if (pkgsWithGlobalEnv.length === 0) return;
 
-  for await (const pkg of pkgsWithGlobalEnv) {
+  for (const pkg of pkgsWithGlobalEnv) {
     if (pkg.dnpName === params.dappmanagerDnpName) continue;
     if (!pkg.defaultEnvironment) continue;
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
@@ -95,6 +95,8 @@ export async function updatePkgsWithGlobalEnvs(
     if (environmentsByService.length === 0) continue;
     const environmentByService: { [serviceName: string]: PackageEnvs } =
       environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+
+    logs.info(`Setting environment: ${environmentByService}`);
 
     await packageSetEnvironment({
       dnpName: pkg.dnpName,
