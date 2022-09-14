@@ -1,6 +1,14 @@
-import { packagesGet } from "../../calls";
-import { Network, PkgStatus, StakerConfigGet } from "../../types";
-import { ComposeFileEditor } from "../compose/editor";
+import { fetchDnpRequest, packageGet, packagesGet } from "../../calls";
+import { getIsInstalled } from "../../calls/fetchDnpRequest";
+import {
+  InstalledPackageData,
+  Network,
+  RequestedDnp,
+  StakerConfigGet
+} from "../../types";
+import { fileToGatewayUrl } from "../../utils/distributedFile";
+import { listPackageNoThrow, listPackages } from "../docker/list";
+import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
   getNetworkStakerPkgs,
@@ -22,89 +30,109 @@ export async function getStakerConfig(
   network: Network
 ): Promise<StakerConfigGet> {
   try {
+    const releaseFetcher = new ReleaseFetcher();
+
     const {
       execClients,
       currentExecClient,
       consClients,
       currentConsClient,
       web3signer,
-      mevBoostAvail,
+      mevBoostDnpName,
       isMevBoostSelected
     } = getNetworkStakerPkgs(network);
 
-    const pkgs = await packagesGet();
+    const dnpList = await listPackages();
 
-    // Execution clients
-    const executionClients: PkgStatus[] = [];
-    for (const exCl of execClients.map(exexClient => exexClient.dnpName)) {
-      const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
-      executionClients.push({
-        dnpName: exCl,
-        isInstalledAndRunning:
-          execClientPkg?.containers.every(c => c.running) ?? false,
-        isSelected: currentExecClient === exCl
-      });
-    }
+    const executionClients = await Promise.all(
+      execClients.map(async execClient => {
+        const repository = await releaseFetcher.getRelease(execClient.dnpName);
+        return {
+          dnpName: repository.dnpName,
+          avatarUrl: fileToGatewayUrl(repository.avatarFile),
+          isInstalled: getIsInstalled(repository, dnpList),
+          isRunning: getIsRunning(repository, dnpList),
+          metadata: repository.metadata,
+          isSelected: repository.dnpName === currentExecClient
+        };
+      })
+    );
 
-    // Consensus clients
-    const consensusClients: PkgStatus[] = [];
-    for (const conCl of consClients.map(consClient => consClient.dnpName)) {
-      const consClientPkg = pkgs.find(pkg => pkg.dnpName === conCl);
-      let graffiti = "";
-      let feeRecipient = "";
-      let checkpointSync = "";
-      if (consClientPkg) {
-        const environment = new ComposeFileEditor(
-          consClientPkg.dnpName,
-          consClientPkg.isCore
-        ).getUserSettings().environment;
-        if (environment) {
-          const validatorService = getValidatorServiceName(
-            consClientPkg.dnpName
-          );
-          const beaconService = getBeaconServiceName(consClientPkg.dnpName);
-          graffiti = environment[validatorService]["GRAFFITI"];
-          feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
-          checkpointSync = environment[beaconService]["CHECKPOINT_SYNC_URL"];
+    const consensusClients = await Promise.all(
+      consClients.map(async consClient => {
+        const repository = await releaseFetcher.getRelease(consClient.dnpName);
+        const isInstalled = getIsInstalled(repository, dnpList);
+        let graffiti, feeRecipient, checkpointSync;
+        if (isInstalled) {
+          const pkgEnv = (await packageGet({ dnpName: repository.dnpName }))
+            .userSettings?.environment;
+          if (pkgEnv) {
+            const validatorService = getValidatorServiceName(
+              repository.dnpName
+            );
+            const beaconService = getBeaconServiceName(repository.dnpName);
+            graffiti = pkgEnv[validatorService]["GRAFFITI"];
+            feeRecipient = pkgEnv[validatorService]["FEE_RECIPIENT_ADDRESS"];
+            checkpointSync = pkgEnv[beaconService]["CHECKPOINT_SYNC_URL"];
+          }
         }
-      }
-      consensusClients.push({
-        dnpName: conCl,
-        isInstalledAndRunning:
-          consClientPkg?.containers.every(c => c.running) ?? false,
-        isSelected: currentConsClient === conCl,
-        graffiti,
-        feeRecipient,
-        checkpointSync
-      });
-    }
+        return {
+          dnpName: repository.dnpName,
+          avatarUrl: fileToGatewayUrl(repository.avatarFile),
+          isInstalled: getIsInstalled(repository, dnpList),
+          isRunning: getIsRunning(repository, dnpList),
+          metadata: repository.metadata,
+          isSelected: repository.dnpName === currentConsClient,
+          graffiti,
+          feeRecipient,
+          checkpointSync
+        };
+      })
+    );
 
-    // Web3signer
-    const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signer.dnpName);
-    const web3signerPkgIsInstalledAndRunning =
-      web3signerPkg?.containers.every(c => c.running) ?? false;
+    const web3signerRepository = await releaseFetcher.getRelease(
+      web3signer.dnpName
+    );
+    const signerIsRunning = getIsRunning(web3signerRepository, dnpList);
     const signer = {
-      dnpName: web3signer.dnpName,
-      isInstalledAndRunning: web3signerPkgIsInstalledAndRunning,
-      isSelected: web3signerPkgIsInstalledAndRunning
+      dnpName: web3signerRepository.dnpName,
+      avatarUrl: fileToGatewayUrl(web3signerRepository.avatarFile),
+      isInstalled: getIsInstalled(web3signerRepository, dnpList),
+      isRunning: signerIsRunning,
+      metadata: web3signerRepository.metadata,
+      isSelected: signerIsRunning
     };
 
-    // Mevboost
-    const mevBoostPkg = pkgs.find(pkg => pkg.dnpName === mevBoostAvail);
+    const mevBoostRepository = await releaseFetcher.getRelease(mevBoostDnpName);
     const mevBoost = {
-      dnpName: mevBoostAvail,
-      isInstalledAndRunning:
-        mevBoostPkg?.containers.every(c => c.running) ?? false,
+      dnpName: mevBoostRepository.dnpName,
+      avatarUrl: fileToGatewayUrl(mevBoostRepository.avatarFile),
+      isInstalled: getIsInstalled(mevBoostRepository, dnpList),
+      isRunning: getIsRunning(mevBoostRepository, dnpList),
+      metadata: mevBoostRepository.metadata,
       isSelected: isMevBoostSelected
     };
 
     return {
       executionClients,
       consensusClients,
-      web3signer: signer,
+      web3Signer: signer,
       mevBoost
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);
   }
+}
+
+// Utils
+
+function getIsRunning(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): boolean {
+  return (
+    dnpList
+      .find(dnp => dnp.dnpName === dnpName)
+      ?.containers.every(c => c.running) ?? false
+  );
 }

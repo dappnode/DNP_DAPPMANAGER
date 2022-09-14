@@ -3,7 +3,8 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface } from "types";
+import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
+import defaultAvatar from "img/defaultAvatar.png";
 import "./columns.scss";
 
 export default function ConsensusClient({
@@ -13,9 +14,10 @@ export default function ConsensusClient({
   isSelected,
   feeRecipientError,
   graffitiError,
-  checkpointSyncPlaceHolder
+  checkpointSyncPlaceHolder,
+  ...props
 }: {
-  consensusClient: ConsensusClientIface;
+  consensusClient: StakerItem;
   setNewConsClient: React.Dispatch<
     React.SetStateAction<ConsensusClientIface | undefined>
   >;
@@ -27,9 +29,13 @@ export default function ConsensusClient({
 }) {
   return (
     <Card
+      {...props}
       className={`consensus-client ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
+      <div className="avatar">
+        <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
+      </div>
       <div
         className="title"
         onClick={
@@ -38,8 +44,10 @@ export default function ConsensusClient({
             : () => setNewConsClient(consensusClient)
         }
       >
-        {prettyDnpName(consensusClient.dnpName)}
+        {prettyDnpName(consensusClient.dnpName)}{" "}
+        {consensusClient.metadata.version}
       </div>
+      <div className="description">{consensusClient.metadata.description}</div>
       {isSelected && newConsClient && (
         <>
           <hr />

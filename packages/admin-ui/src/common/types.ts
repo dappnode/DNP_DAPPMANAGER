@@ -1208,20 +1208,23 @@ export type ConsensusClientGnosis =
   | "nimbus-gnosis.dnp.dappnode.eth";
 export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth";
 
-export interface StakerConfigGet {
-  executionClients: PkgStatus[];
-  consensusClients: PkgStatus[];
-  web3signer: PkgStatus;
-  mevBoost: PkgStatus;
-}
-
-export interface PkgStatus {
+export interface StakerItem {
   dnpName: string;
-  isInstalledAndRunning: boolean;
+  avatarUrl: string;
+  isInstalled: boolean;
+  isRunning: boolean;
+  metadata: Manifest;
   isSelected: boolean;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;
+}
+
+export interface StakerConfigGet {
+  executionClients: StakerItem[];
+  consensusClients: StakerItem[];
+  web3Signer: StakerItem;
+  mevBoost: StakerItem;
 }
 
 export interface StakerConfigSet {

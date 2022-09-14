@@ -58,18 +58,19 @@ export default function StakerNetwork({
         executionClients,
         consensusClients,
         mevBoost,
-        web3signer
+        web3Signer
       } = currentStakerConfigReq.data;
 
       const executionClient =
-        executionClients.find(ec => ec.isSelected && ec.isInstalledAndRunning)
-          ?.dnpName || "";
+        executionClients.find(
+          ec => ec.isSelected && ec.isInstalled && ec.isRunning
+        )?.dnpName || "";
       const consensusClient = consensusClients.find(
-        cc => cc.isSelected && cc.isInstalledAndRunning
+        cc => cc.isSelected && cc.isInstalled && cc.isRunning
       ) || { dnpName: "" };
       const enableMevBoost =
-        mevBoost.isInstalledAndRunning && mevBoost.isSelected;
-      const enableWeb3signer = web3signer.isInstalledAndRunning;
+        mevBoost.isInstalled && mevBoost.isRunning && mevBoost.isSelected;
+      const enableWeb3signer = web3Signer.isInstalled && web3Signer.isRunning;
 
       // Set default values for new staker config
       setNewExecClient(executionClient);
@@ -207,7 +208,7 @@ export default function StakerNetwork({
             (executionClient, i) => (
               <ExecutionClient
                 key={i}
-                executionClient={executionClient.dnpName}
+                executionClient={executionClient}
                 setNewExecClient={setNewExecClient}
                 isSelected={
                   executionClient.dnpName === newExecClient ? true : false
@@ -248,7 +249,7 @@ export default function StakerNetwork({
         <Col>
           <SubTitle>Remote signer</SubTitle>
           <RemoteSigner
-            signer={currentStakerConfigReq.data.web3signer.dnpName}
+            signer={currentStakerConfigReq.data.web3Signer}
             setEnableWeb3signer={setNewEnableWeb3signer}
             isSelected={newEnableWeb3signer}
           />
@@ -257,7 +258,7 @@ export default function StakerNetwork({
           <Col>
             <SubTitle>Mev Boost</SubTitle>
             <MevBoost
-              mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
+              mevBoost={currentStakerConfigReq.data.mevBoost}
               setEnableMevBoost={setNewEnableMevBoost}
               isSelected={newEnableMevBoost}
             />

@@ -41,7 +41,7 @@ export async function setStakerConfig({
     consClients,
     currentConsClient,
     web3signer,
-    mevBoostAvail
+    mevBoostDnpName
   } = getNetworkStakerPkgs(stakerConfig.network);
 
   // Ensure Execution clients DNP's names are valid
@@ -156,8 +156,8 @@ export async function setStakerConfig({
   if (stakerConfig.enableMevBoost !== undefined)
     await setMevBoostConfig(
       stakerConfig.enableMevBoost,
-      mevBoostAvail,
-      pkgs.find(pkg => pkg.dnpName === mevBoostAvail)
+      mevBoostDnpName,
+      pkgs.find(pkg => pkg.dnpName === mevBoostDnpName)
     ).catch(e => {
       // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
       setStakerConfigOnDb({

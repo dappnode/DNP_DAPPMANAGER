@@ -249,62 +249,152 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           executionClients: [
             {
               dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
+              isInstalled: true,
+              isRunning: true,
+              isSelected: true,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "geth.dnp.dappnode.eth",
+                description: "Go implementation of ethereum. Execution client",
+                shortDescription: "Go implementation of ethereum",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nethermind.dnp.dappnode.eth",
+                description: "Nethermind execution client",
+                shortDescription: "Nethermind execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "besu.dnp.dappnode.eth",
+                description: "Besu execution client",
+                shortDescription: "Besu execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "erigon.dnp.dappnode.eth",
+                description: "Erigon execution client",
+                shortDescription: "Erigon execution client",
+                version: "0.1.0"
+              }
             }
           ],
           consensusClients: [
             {
               dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: true,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "prysm.dnp.dappnode.eth",
+                description: "Prysm consensus client",
+                shortDescription: "Prysm consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "lighthouse.dnp.dappnode.eth",
+                description: "Lighthouse consensus client",
+                shortDescription: "Lighthouse consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "teku.dnp.dappnode.eth",
+                description: "Teku consensus client",
+                shortDescription: "Teku consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nimbus.dnp.dappnode.eth",
+                description: "Nimbus consensus client",
+                shortDescription: "Nimbus consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
-          web3signer: {
+          web3Signer: {
             dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: true,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "web3signer.dnp.dappnode.eth",
+              description: "Web3Signer",
+              shortDescription: "Web3Signer",
+              version: "0.1.0"
+            }
           },
           mevBoost: {
             dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: true,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "mevboost.dnp.dappnode.eth",
+              description: "MEV Boost",
+              shortDescription: "MEV Boost",
+              version: "0.1.0"
+            }
           }
         };
       case "prater":
@@ -312,62 +402,152 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           executionClients: [
             {
               dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "geth.dnp.dappnode.eth",
+                description: "Geth execution client",
+                shortDescription: "Geth execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nethermind.dnp.dappnode.eth",
+                description: "Nethermind execution client",
+                shortDescription: "Nethermind execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "besu.dnp.dappnode.eth",
+                description: "Besu execution client",
+                shortDescription: "Besu execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "erigon.dnp.dappnode.eth",
+                description: "Erigon execution client",
+                shortDescription: "Erigon execution client",
+                version: "0.1.0"
+              }
             }
           ],
           consensusClients: [
             {
               dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: true,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "prysm.dnp.dappnode.eth",
+                description: "Prysm consensus client",
+                shortDescription: "Prysm consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "lighthouse.dnp.dappnode.eth",
+                description: "Lighthouse consensus client",
+                shortDescription: "Lighthouse consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "teku.dnp.dappnode.eth",
+                description: "Teku consensus client",
+                shortDescription: "Teku consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nimbus.dnp.dappnode.eth",
+                description: "Nimbus consensus client",
+                shortDescription: "Nimbus consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
-          web3signer: {
+          web3Signer: {
             dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: false,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "web3signer.dnp.dappnode.eth",
+              description: "Web3Signer",
+              shortDescription: "Web3Signer",
+              version: "0.1.0"
+            }
           },
           mevBoost: {
             dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: false,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "mevboost.dnp.dappnode.eth",
+              description: "MEV Boost",
+              shortDescription: "MEV Boost",
+              version: "0.1.0"
+            }
           }
         };
 
@@ -376,62 +556,152 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           executionClients: [
             {
               dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
+              isInstalled: true,
+              isRunning: true,
+              isSelected: true,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "geth.dnp.dappnode.eth",
+                description: "Geth execution client",
+                shortDescription: "Geth execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nethermind.dnp.dappnode.eth",
+                description: "Nethermind execution client",
+                shortDescription: "Nethermind execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "besu.dnp.dappnode.eth",
+                description: "Besu execution client",
+                shortDescription: "Besu execution client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "erigon.dnp.dappnode.eth",
+                description: "Erigon execution client",
+                shortDescription: "Erigon execution client",
+                version: "0.1.0"
+              }
             }
           ],
           consensusClients: [
             {
               dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: true,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "prysm.dnp.dappnode.eth",
+                description: "Prysm consensus client",
+                shortDescription: "Prysm consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
               dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "lighthouse.dnp.dappnode.eth",
+                description: "Lighthouse consensus client",
+                shortDescription: "Lighthouse consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
+              isInstalled: true,
+              isRunning: true,
+              isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "teku.dnp.dappnode.eth",
+                description: "Teku consensus client",
+                shortDescription: "Teku consensus client",
+                version: "0.1.0"
+              }
             },
             {
               dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
+              isInstalled: true,
+              isRunning: true,
               isSelected: false,
+              avatarUrl:
+                "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+              metadata: {
+                name: "nimbus.dnp.dappnode.eth",
+                description: "Nimbus consensus client",
+                shortDescription: "Nimbus consensus client",
+                version: "0.1.0"
+              },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             }
           ],
-          web3signer: {
+          web3Signer: {
             dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: true,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "web3signer.dnp.dappnode.eth",
+              description: "Web3Signer",
+              shortDescription: "Web3Signer",
+              version: "0.1.0"
+            }
           },
           mevBoost: {
             dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
+            isInstalled: true,
+            isRunning: true,
+            isSelected: true,
+            avatarUrl:
+              "https://avatars.githubusercontent.com/u/1016218?s=200&v=4",
+            metadata: {
+              name: "mevboost.dnp.dappnode.eth",
+              description: "MEV Boost",
+              shortDescription: "MEV Boost",
+              version: "0.1.0"
+            }
           }
         };
     }

@@ -35,7 +35,7 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
         }
       }
 
-      if (dnpNames.find(dnpName => dnpName === stakerConfig.mevBoostAvail)) {
+      if (dnpNames.find(dnpName => dnpName === stakerConfig.mevBoostDnpName)) {
         switch (network) {
           case "mainnet":
             db.mevBoostMainnet.set(false);
