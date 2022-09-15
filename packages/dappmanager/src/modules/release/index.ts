@@ -5,14 +5,20 @@ import { PackageRelease, PackageRequest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
 import { Apm } from "../apm";
 import { Manifest } from "@dappnode/dappnodesdk";
+import { DappGetState } from "../dappGet/types";
 
 export class ReleaseFetcher extends Apm {
   /**
    * Resolves name + version to an IPFS hash
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async resolveReleaseName(name: string, version?: string) {
-    return resolveReleaseName(this, name, version);
+  async resolveReleaseName(
+    name: string,
+    version?: string
+  ): Promise<{
+    hash: string;
+    origin?: string | undefined;
+  }> {
+    return await resolveReleaseName(this, name, version);
   }
 
   /**
@@ -30,8 +36,8 @@ export class ReleaseFetcher extends Apm {
     [name: string]: string;
   }): Promise<PackageRelease[]> {
     return await Promise.all(
-      Object.entries(packages).map(([name, version]) =>
-        this.getRelease(name, version)
+      Object.entries(packages).map(
+        async ([name, version]) => await this.getRelease(name, version)
       )
     );
   }
@@ -39,8 +45,16 @@ export class ReleaseFetcher extends Apm {
   /**
    * Resolve a request dependencies and fetch their release assets
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  async getReleasesResolved(req: PackageRequest, options?: DappgetOptions) {
+  async getReleasesResolved(
+    req: PackageRequest,
+    options?: DappgetOptions
+  ): Promise<{
+    releases: PackageRelease[];
+    message: string;
+    state: DappGetState;
+    alreadyUpdated: DappGetState;
+    currentVersions: DappGetState;
+  }> {
     const result = await dappGet(req, options);
     const releases = await this.getReleases(result.state);
     return {
