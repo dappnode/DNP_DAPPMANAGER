@@ -48,6 +48,8 @@ export async function getStakerConfig(
       executionClients: await Promise.all(
         execClients.map(async execClient => {
           try {
+            if (!(await releaseFetcher.repoExists(execClient.dnpName)))
+              throw Error(`Repository ${execClient.dnpName} does not exist`);
             const repository = await releaseFetcher.getRelease(
               execClient.dnpName
             );
@@ -73,6 +75,8 @@ export async function getStakerConfig(
       consensusClients: await Promise.all(
         consClients.map(async consClient => {
           try {
+            if (!(await releaseFetcher.repoExists(consClient.dnpName)))
+              throw Error(`Repository ${consClient.dnpName} does not exist`);
             const repository = await releaseFetcher.getRelease(
               consClient.dnpName
             );
@@ -115,6 +119,8 @@ export async function getStakerConfig(
       ),
       web3Signer: await new Promise<StakerItem>(async resolve => {
         try {
+          if (!(await releaseFetcher.repoExists(web3signer.dnpName)))
+            throw Error(`Repository ${web3signer.dnpName} does not exist`);
           const repository = await releaseFetcher.getRelease(
             web3signer.dnpName
           );
@@ -138,6 +144,8 @@ export async function getStakerConfig(
       }),
       mevBoost: await new Promise<StakerItem>(async resolve => {
         try {
+          if (!(await releaseFetcher.repoExists(mevBoostDnpName)))
+            throw Error(`Repository ${mevBoostDnpName} does not exist`);
           const repository = await releaseFetcher.getRelease(mevBoostDnpName);
           resolve({
             status: "ok",
