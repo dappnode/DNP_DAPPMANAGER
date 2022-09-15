@@ -34,16 +34,16 @@ export default function ConsensusClient({
       className={`consensus-client ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
-      <div className="avatar">
-        <img
-          src={
-            consensusClient.status === "error"
-              ? errorAvatar
-              : consensusClient.avatarUrl || defaultAvatar
-          }
-          alt="avatar"
-        />
-      </div>
+      {consensusClient.status === "ok" && isSelected ? (
+        <div className="avatar">
+          <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
+        </div>
+      ) : consensusClient.status === "error" ? (
+        <div className="avatar">
+          <img src={errorAvatar} alt="avatar" />
+        </div>
+      ) : null}
+
       <div
         className="title"
         onClick={
@@ -57,7 +57,9 @@ export default function ConsensusClient({
       </div>
       {consensusClient.status === "ok" && (
         <div className="description">
-          {consensusClient.metadata.description}
+          {isSelected
+            ? consensusClient.metadata.description
+            : consensusClient.metadata.shortDescription}
         </div>
       )}
       {isSelected && newConsClient && (

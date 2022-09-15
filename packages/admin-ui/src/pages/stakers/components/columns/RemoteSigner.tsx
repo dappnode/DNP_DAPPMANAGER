@@ -24,23 +24,28 @@ export default function RemoteSigner({
       onClick={() => setEnableWeb3signer(!isSelected)}
       shadow={isSelected}
     >
-      <div className="avatar">
-        <img
-          src={
-            signer.status === "error"
-              ? errorAvatar
-              : signer.avatarUrl || defaultAvatar
-          }
-          alt="avatar"
-        />
-      </div>
+      {signer.status === "ok" && isSelected ? (
+        <div className="avatar">
+          <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
+        </div>
+      ) : signer.status === "error" ? (
+        <div className="avatar">
+          <img src={errorAvatar} alt="avatar" />
+        </div>
+      ) : null}
+
       <div className="title">
         {prettyDnpName(signer.dnpName)}{" "}
         {signer.status === "ok" && signer.metadata.version}
       </div>
-      <div className="description">
-        {signer.status === "ok" && signer.metadata.description}
-      </div>
+
+      {signer.status === "ok" && (
+        <div className="description">
+          {isSelected
+            ? signer.metadata.description
+            : signer.metadata.shortDescription}
+        </div>
+      )}
     </Card>
   );
 }

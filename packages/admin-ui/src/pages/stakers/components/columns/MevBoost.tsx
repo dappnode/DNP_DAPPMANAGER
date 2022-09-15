@@ -24,22 +24,27 @@ export default function MevBoost({
       onClick={() => setEnableMevBoost(!isSelected)}
       shadow={isSelected}
     >
-      <div className="avatar">
-        <img
-          src={
-            mevBoost.status === "error"
-              ? errorAvatar
-              : mevBoost.avatarUrl || defaultAvatar
-          }
-          alt="avatar"
-        />
-      </div>
+      {mevBoost.status === "ok" && isSelected ? (
+        <div className="avatar">
+          <img src={mevBoost.avatarUrl || defaultAvatar} alt="avatar" />
+        </div>
+      ) : mevBoost.status === "error" ? (
+        <div className="avatar">
+          <img src={errorAvatar} alt="avatar" />
+        </div>
+      ) : null}
+
       <div className="title">
         {prettyDnpName(mevBoost.dnpName)}{" "}
         {mevBoost.status === "ok" && mevBoost.metadata.version}
       </div>
+
       {mevBoost.status === "ok" && (
-        <div className="description">{mevBoost.metadata.description}</div>
+        <div className="description">
+          {isSelected
+            ? mevBoost.metadata.description
+            : mevBoost.metadata.shortDescription}
+        </div>
       )}
     </Card>
   );

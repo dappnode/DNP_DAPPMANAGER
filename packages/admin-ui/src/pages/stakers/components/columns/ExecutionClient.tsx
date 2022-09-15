@@ -28,23 +28,26 @@ export default function ExecutionClient({
       }
       shadow={isSelected}
     >
-      <div className="avatar">
-        <img
-          src={
-            executionClient.status === "error"
-              ? errorAvatar
-              : executionClient.avatarUrl || defaultAvatar
-          }
-          alt="avatar"
-        />
-      </div>
+      {executionClient.status === "ok" && isSelected ? (
+        <div className="avatar">
+          <img src={executionClient.avatarUrl || defaultAvatar} alt="avatar" />
+        </div>
+      ) : executionClient.status === "error" ? (
+        <div className="avatar">
+          <img src={errorAvatar} alt="avatar" />
+        </div>
+      ) : null}
+
       <div className="title">
         {prettyDnpName(executionClient.dnpName)}{" "}
         {executionClient.status === "ok" && executionClient.metadata.version}
       </div>
+
       {executionClient.status === "ok" && (
         <div className="description">
-          {executionClient.metadata.description}
+          {isSelected
+            ? executionClient.metadata.description
+            : executionClient.metadata.shortDescription}
         </div>
       )}
     </Card>
